@@ -24,11 +24,10 @@
     enrichGroups,
     getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
     getGroupArray,
-    onLatestGroup,
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
-  import { pauseLiveUpdates } from '$lib/stores/events';
+  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
@@ -78,14 +77,14 @@
     ),
   );
 
-  const workflowTaskFailedError = $derived(
-    historyCtx.fetchComplete
-      ? (getBufferWftFailedEvent() as
-          | WorkflowTaskFailedEvent
-          | WorkflowTaskTimedOutEvent
-          | undefined)
-      : undefined,
-  );
+  const workflowTaskFailedError = $derived.by(() => {
+    void $bufferVersion;
+    if (!historyCtx.fetchComplete) return undefined;
+    return getBufferWftFailedEvent() as
+      | WorkflowTaskFailedEvent
+      | WorkflowTaskTimedOutEvent
+      | undefined;
+  });
 
   const isNotPending = $derived(
     Boolean(workflow && !workflow?.isRunning && !workflow?.isPaused),
@@ -115,36 +114,26 @@
   onMount(() => {
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-
-    // Throttle buffer → Svelte updates to at most once per animation frame.
-    // onLatestGroup fires for every new group head (~N times during load), each
-    // triggering getGroupArray() (O(N log N) sort) + a full reactive cascade;
-    // batching via rAF caps that at ≤60 updates/sec regardless of how fast the
-    // bidirectional cursors push data.
-    let groupUpdatePending = false;
-    const unsub = onLatestGroup(() => {
-      if (!groupUpdatePending) {
-        groupUpdatePending = true;
-        requestAnimationFrame(() => {
-          groupUpdatePending = false;
-          bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-        });
-      }
-    });
-
-    return () => {
-      unsub();
-    };
   });
 
   $effect(() => {
-    if (historyCtx.fetchComplete) {
-      enrichGroups(
-        $workflowRun.workflow?.pendingActivities ?? [],
-        $workflowRun.workflow?.pendingNexusOperations ?? [],
-      );
+    void $bufferVersion;
+    const fetchComplete = historyCtx.fetchComplete;
+    const pendingActivities = $workflowRun.workflow?.pendingActivities ?? [];
+    const pendingNexusOperations =
+      $workflowRun.workflow?.pendingNexusOperations ?? [];
+
+    let frame: number | null = requestAnimationFrame(() => {
+      frame = null;
+      if (fetchComplete) {
+        enrichGroups(pendingActivities, pendingNexusOperations);
+      }
       bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-    }
+    });
+
+    return () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
   });
 
   let timeline = $state<Timeline>();

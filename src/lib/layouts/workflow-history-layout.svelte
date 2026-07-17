@@ -27,11 +27,10 @@
     getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
     getEventArray,
     getGroupArray,
-    onLatestGroup,
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import { pauseLiveUpdates } from '$lib/stores/events';
+  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
@@ -79,20 +78,27 @@
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
     bufferEvents = getEventArray();
-
-    const unsub = onLatestGroup(() => {
-      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-      bufferEvents = getEventArray();
-    });
-    return () => unsub();
   });
 
   $effect(() => {
-    if (historyCtx.fetchComplete) {
-      enrichGroups(pendingActivities, pendingNexusOperations);
+    void $bufferVersion;
+
+    const fetchComplete = historyCtx.fetchComplete;
+    const activities = pendingActivities;
+    const nexusOperations = pendingNexusOperations;
+
+    let frame: number | null = requestAnimationFrame(() => {
+      frame = null;
+      if (fetchComplete) {
+        enrichGroups(activities, nexusOperations);
+      }
       bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
       bufferEvents = getEventArray();
-    }
+    });
+
+    return () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
   });
 
   const filteredGroups = $derived.by(() => {
@@ -116,14 +122,14 @@
     });
   });
 
-  const workflowTaskFailedError = $derived(
-    historyCtx.fetchComplete
-      ? (getBufferWftFailedEvent() as
-          | WorkflowTaskFailedEvent
-          | WorkflowTaskTimedOutEvent
-          | undefined)
-      : undefined,
-  );
+  const workflowTaskFailedError = $derived.by(() => {
+    void $bufferVersion;
+    if (!historyCtx.fetchComplete) return undefined;
+    return getBufferWftFailedEvent() as
+      | WorkflowTaskFailedEvent
+      | WorkflowTaskTimedOutEvent
+      | undefined;
+  });
 
   const isNotPending = $derived(
     !!workflow && !workflow.isRunning && !workflow.isPaused,
