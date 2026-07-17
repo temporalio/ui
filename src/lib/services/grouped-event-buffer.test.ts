@@ -17,6 +17,7 @@ import {
   getGroupMeta,
   getLatestEvent,
   getLatestGroup,
+  getLiveGroupCount,
   getRows,
   getVisibleGroupCount,
   getWorkflowTaskFailedEvent,
@@ -34,6 +35,9 @@ import {
   makeActivityGroup,
   makeActivityScheduled,
   makeActivityStarted,
+  makeActivityTimeoutGroup,
+  makeChildWorkflowGroup,
+  makeNexusOperationGroup,
   makeSyntheticEvents,
   makeSyntheticEventsWithWorkflowTasks,
   makeTimerGroup,
@@ -44,6 +48,7 @@ import {
   makeWorkflowTaskGroup,
   makeWorkflowTaskScheduled,
   makeWorkflowTaskStarted,
+  makeWorkflowUpdateGroup,
 } from './test-helpers/synthetic-events';
 
 // ---------------------------------------------------------------------------
@@ -751,6 +756,95 @@ describe('enrichGroups', () => {
     expect(group.pendingActivity).toBeUndefined();
   });
 
+  it('clears pendingActivity when live completion extends an existing group', async () => {
+    reset(10);
+    resetLive();
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    processEvent(scheduled, true);
+    processEvent(started, true);
+
+    enrichGroups(
+      [
+        {
+          activityId: '1',
+          state: 'Started',
+          activityType: 'TestActivity',
+        },
+      ] as Parameters<typeof enrichGroups>[0],
+      [],
+    );
+
+    let [group] = await Promise.all(getRows(0, 1));
+    expect(group.pendingActivity).toBeDefined();
+    expect(group.isPending).toBe(true);
+
+    expect(appendLiveEvent(completed)).toBe(true);
+
+    [group] = await Promise.all(getRows(0, 1));
+    expect(group.eventList).toHaveLength(3);
+    expect(group.pendingActivity).toBeUndefined();
+    expect(group.isPending).toBe(false);
+  });
+
+  it('clears pendingActivity when a live timeout resolves a short activity group', async () => {
+    reset(10);
+    resetLive();
+    const [scheduled, timedOut] = makeActivityTimeoutGroup(1);
+    processEvent(scheduled, true);
+
+    enrichGroups(
+      [
+        {
+          activityId: '1',
+          state: 'Started',
+          activityType: 'TestActivity',
+        },
+      ] as Parameters<typeof enrichGroups>[0],
+      [],
+    );
+
+    let [group] = await Promise.all(getRows(0, 1));
+    expect(group.pendingActivity).toBeDefined();
+    expect(group.isPending).toBe(true);
+
+    expect(appendLiveEvent(timedOut)).toBe(true);
+
+    [group] = await Promise.all(getRows(0, 1));
+    expect(group.eventList.map((event) => event.id)).toEqual(['1', '2']);
+    expect(group.pendingActivity).toBeUndefined();
+    expect(group.isPending).toBe(false);
+  });
+
+  it('annotates live-only activity and nexus groups with pending metadata', () => {
+    reset(20);
+    resetLive();
+    appendLiveEvent(makeActivityScheduled(1, 'MyActivity'));
+    appendLiveEvent(makeNexusOperationGroup(4)[0]);
+
+    enrichGroups(
+      [
+        {
+          activityId: '1',
+          state: 'Started',
+          activityType: 'MyActivity',
+        },
+      ] as Parameters<typeof enrichGroups>[0],
+      [
+        {
+          scheduledEventId: '4',
+        },
+      ] as Parameters<typeof enrichGroups>[1],
+    );
+
+    const groups = getGroupArray();
+    expect(
+      groups.find((group) => group.id === '1')?.pendingActivity,
+    ).toBeDefined();
+    expect(
+      groups.find((group) => group.id === '4')?.pendingNexusOperation,
+    ).toBeDefined();
+  });
+
   it('ignores activities not in the pending list', async () => {
     reset(10);
     processEvent(makeActivityScheduled(1, 'MyActivity'), true);
@@ -844,6 +938,63 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
     const failed = getWorkflowTaskFailedEvent();
     expect(failed?.eventType).toBe('WorkflowTaskFailed');
     expect(failed?.id).toBe('6');
+  });
+
+  it('returns a WFT failure whose group arrives entirely via the live poll', () => {
+    reset(10);
+    resetLive();
+    appendLiveEvent(makeWorkflowTaskScheduled(1));
+    appendLiveEvent(makeWorkflowTaskStarted(2, 1));
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+
+    expect(appendLiveEvent(makeWorkflowTaskFailed(3, 1))).toBe(true);
+
+    const failed = getWorkflowTaskFailedEvent();
+    expect(failed?.eventType).toBe('WorkflowTaskFailed');
+    expect(failed?.id).toBe('3');
+  });
+
+  it('returns a live WFT failure appended to a WFT head already in the pool', () => {
+    reset(10);
+    resetLive();
+    processEvent(makeWorkflowTaskScheduled(1), true);
+    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+
+    expect(appendLiveEvent(makeWorkflowTaskFailed(3, 1))).toBe(true);
+
+    const failed = getWorkflowTaskFailedEvent();
+    expect(failed?.eventType).toBe('WorkflowTaskFailed');
+    expect(failed?.id).toBe('3');
+  });
+
+  it('clears the WFT failure when a later WFT completes via the live poll', () => {
+    reset(20);
+    resetLive();
+    processEvent(makeWorkflowTaskScheduled(1), true);
+    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    processEvent(makeWorkflowTaskFailed(3, 1), true);
+    expect(getWorkflowTaskFailedEvent()?.id).toBe('3');
+
+    // Workflow recovers: a new WFT completes, delivered live.
+    appendLiveEvent(makeWorkflowTaskScheduled(4));
+    appendLiveEvent(makeWorkflowTaskStarted(5, 4));
+    appendLiveEvent(makeWorkflowTaskCompleted(6, 4));
+
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+  });
+
+  it('does not double-count a live WFT group once the fetch claims its head', () => {
+    reset(10);
+    resetLive();
+    // Failure lands live first, then the bidirectional fetch reaches the head.
+    appendLiveEvent(makeWorkflowTaskScheduled(1));
+    appendLiveEvent(makeWorkflowTaskFailed(3, 1));
+    processEvent(makeWorkflowTaskScheduled(1), true);
+
+    const failed = getWorkflowTaskFailedEvent();
+    expect(failed?.eventType).toBe('WorkflowTaskFailed');
+    expect(failed?.id).toBe('3');
   });
 });
 
@@ -1444,6 +1595,108 @@ describe('concurrent live poll and bidirectional fetch', () => {
     expect(unique.has('2')).toBe(true);
     expect(unique.has('3')).toBe(true);
     expect(unique.has('4')).toBe(true);
+  });
+
+  it.each([
+    ['activity', () => makeActivityGroup(2)],
+    ['timer', () => makeTimerGroup(2)],
+    ['child workflow', () => makeChildWorkflowGroup(2)],
+    ['workflow task', () => makeWorkflowTaskGroup(2)],
+    ['update', () => makeWorkflowUpdateGroup(2)],
+    ['nexus', () => makeNexusOperationGroup(2)],
+  ])(
+    'keeps live %s followers visible when bidirectional fetch later claims the head',
+    (_, buildGroup) => {
+      const group = buildGroup();
+      reset(10);
+      resetLive();
+
+      for (const ev of group) appendLiveEvent(ev);
+      expect(getGroupArray()).toHaveLength(1);
+      expect(getGroupArray()[0].eventList).toHaveLength(group.length);
+
+      processEvent(group[0], true);
+
+      const groups = getGroupArray();
+      expect(groups).toHaveLength(1);
+      expect(groups[0].id).toBe(group[0].eventId);
+      expect(groups[0].eventList.map((event) => event.id)).toEqual(
+        group.map((event) => event.eventId),
+      );
+      expect(getLiveGroupCount()).toBe(0);
+    },
+  );
+
+  it.each([
+    ['activity', () => makeActivityGroup(2)],
+    ['timer', () => makeTimerGroup(2)],
+    ['child workflow', () => makeChildWorkflowGroup(2)],
+    ['workflow task', () => makeWorkflowTaskGroup(2)],
+    ['update', () => makeWorkflowUpdateGroup(2)],
+    ['nexus', () => makeNexusOperationGroup(2)],
+  ])(
+    'flushes live %s followers parked before the history head arrives',
+    (_, buildGroup) => {
+      const group = buildGroup();
+      reset(10);
+      resetLive();
+
+      for (const ev of group.slice(1)) appendLiveEvent(ev);
+      expect(getGroupArray()).toHaveLength(0);
+
+      processEvent(group[0], true);
+
+      const groups = getGroupArray();
+      expect(groups).toHaveLength(1);
+      expect(groups[0].id).toBe(group[0].eventId);
+      expect(groups[0].eventList.map((event) => event.id)).toEqual(
+        group.map((event) => event.eventId),
+      );
+    },
+  );
+
+  it.each([
+    ['activity', () => makeActivityGroup(2)],
+    ['timer', () => makeTimerGroup(2)],
+    ['child workflow', () => makeChildWorkflowGroup(2)],
+    ['workflow task', () => makeWorkflowTaskGroup(2)],
+    ['update', () => makeWorkflowUpdateGroup(2)],
+    ['nexus', () => makeNexusOperationGroup(2)],
+  ])(
+    'attaches live %s followers to an existing history group head',
+    (_, buildGroup) => {
+      const group = buildGroup();
+      reset(10);
+      resetLive();
+
+      processEvent(group[0], true);
+      for (const ev of group.slice(1)) appendLiveEvent(ev);
+
+      const groups = getGroupArray();
+      expect(groups).toHaveLength(1);
+      expect(groups[0].id).toBe(group[0].eventId);
+      expect(groups[0].eventList.map((event) => event.id)).toEqual(
+        group.map((event) => event.eventId),
+      );
+    },
+  );
+
+  it('does not duplicate a far-ahead live follower when history later processes it', () => {
+    reset(5);
+    resetLive();
+    const scheduled = makeActivityScheduled(1);
+    const started = makeActivityStarted(100, 1);
+
+    processEvent(scheduled, true);
+    expect(appendLiveEvent(started)).toBe(true);
+    processEvent(started, true);
+
+    const groups = getGroupArray();
+    expect(groups).toHaveLength(1);
+    expect(groups[0].eventList.map((event) => event.id)).toEqual(['1', '100']);
+    expect(getEventArray().filter((event) => event.id === '100')).toHaveLength(
+      1,
+    );
   });
 
   it('new events from live poll remain after bidirectional fetch completes', () => {
