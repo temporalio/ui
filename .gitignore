@@ -22,6 +22,10 @@ server/ui/assets
 go.work
 go.work.sum
 
+# Temporal proto generation — local-only output + cache (see scripts/generate-temporal-proto.ts)
+/.proto-cache/
+/vendor/temporalio-proto/
+
 # Claude Code local settings
 .serena
 .claude/settings.local.json
