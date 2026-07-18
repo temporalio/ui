@@ -90,9 +90,9 @@ test.describe('Standalone Activity Commands', () => {
     await activityCommandsPage.resetConfirmButton.click();
 
     await expect(activityCommandsPage.resetModal).toBeHidden();
-    await expect(
-      page.getByText(/Activity .* has been reset successfully\./),
-    ).toBeVisible();
+    await expect(page.getByTestId('toast-live-region-polite')).toContainText(
+      /Activity .* has been reset successfully\./,
+    );
   });
 
   test('should update activity options', async ({ page }) => {
@@ -110,8 +110,8 @@ test.describe('Standalone Activity Commands', () => {
     await activityCommandsPage.saveButton.click();
 
     await expect(activityCommandsPage.updateDrawer).toBeHidden();
-    await expect(
-      page.getByText(/Options for Activity .* have been updated\./),
-    ).toBeVisible();
+    await expect(page.getByTestId('toast-live-region-polite')).toContainText(
+      /Options for Activity .* have been updated\./,
+    );
   });
 });

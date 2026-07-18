@@ -22,10 +22,10 @@ export class StandaloneActivityCommandsPage {
   constructor(page: Page) {
     this.page = page;
     this.pauseButton = page
-      .getByRole('button', { name: 'Pause', exact: true })
+      .getByRole('button', { name: 'Pause Activity', exact: true })
       .first();
     this.unpauseButton = page
-      .getByRole('button', { name: 'Unpause', exact: true })
+      .getByRole('button', { name: 'Unpause Activity', exact: true })
       .first();
     this.moreActionsButton = page
       .getByRole('button', { name: 'More Actions' })
