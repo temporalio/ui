@@ -11,6 +11,7 @@
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { setPaginatedTableMaxHeight } from '$lib/holocene/table/paginated-table/context';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
@@ -49,6 +50,8 @@
     id,
     children,
   }: Props = $props();
+
+  setPaginatedTableMaxHeight('var(--panel-h)');
 
   let activeQueryView: SavedQuery | undefined = $state();
   let saveViewModalOpen = $state(false);
