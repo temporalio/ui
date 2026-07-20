@@ -256,6 +256,20 @@ function hasTerminalNexusEvent(group: EventGroup): boolean {
   );
 }
 
+// Shallow structural clone that preserves the object's accessor descriptors
+// (isPending, lastEvent, finalClassification, …) and shares the same eventList
+// array reference, so the getters keep tracking live appends. Used to hand a
+// FRESH object reference to reference-tracking Svelte consumers when a group's
+// pending metadata changes without a new history event (e.g. an activity is
+// paused). In-place mutation alone leaves the reference stable, so those views
+// never re-derive.
+function cloneGroup(group: EventGroup): EventGroup {
+  return Object.create(
+    Object.getPrototypeOf(group) as object,
+    Object.getOwnPropertyDescriptors(group),
+  ) as EventGroup;
+}
+
 function clearResolvedPendingState(group: EventGroup): void {
   if (group.pendingActivity && hasTerminalActivityEvent(group)) {
     delete group.pendingActivity;
@@ -344,33 +358,37 @@ function absorbLiveGroupIntoPool(poolIdx: number, liveGroup: EventGroup): void {
   invalidateGroupArrayCaches();
 }
 
+// Returns the group to keep in the pool — a fresh clone when the pending
+// metadata changed (so reference-tracking consumers re-derive), otherwise the
+// same instance so unchanged groups keep a stable identity and don't churn.
 function enrichGroup(
   group: EventGroup,
   byActivityId: Map<string, PendingActivity>,
   byNexusScheduledId: Map<string, PendingNexusOperation>,
-): void {
+): EventGroup {
   const initial = group.initialEvent;
 
   if (isActivityTaskScheduledEvent(initial)) {
     const pa = byActivityId.get(
       initial.activityTaskScheduledEventAttributes?.activityId ?? '',
     );
-    if (pa && !hasTerminalActivityEvent(group)) {
-      group.pendingActivity = pa;
-    } else {
-      delete group.pendingActivity;
-    }
-    return;
+    const next = pa && !hasTerminalActivityEvent(group) ? pa : undefined;
+    if (group.pendingActivity === next) return group;
+    const enriched = cloneGroup(group);
+    enriched.pendingActivity = next;
+    return enriched;
   }
 
   if (isNexusOperationScheduledEvent(initial)) {
     const pn = byNexusScheduledId.get(group.id);
-    if (pn && !hasTerminalNexusEvent(group)) {
-      group.pendingNexusOperation = pn;
-    } else {
-      delete group.pendingNexusOperation;
-    }
+    const next = pn && !hasTerminalNexusEvent(group) ? pn : undefined;
+    if (group.pendingNexusOperation === next) return group;
+    const enriched = cloneGroup(group);
+    enriched.pendingNexusOperation = next;
+    return enriched;
   }
+
+  return group;
 }
 
 function notifyLatestGroupListeners(group: EventGroup): void {
@@ -701,13 +719,17 @@ export function enrichGroups(
   );
 
   for (let i = 0; i < poolTop; i++) {
-    const { group } = groupPool[i];
-    if (!group) continue;
-    enrichGroup(group, byActivityId, byNexusScheduledId);
+    const meta = groupPool[i];
+    if (!meta.group) continue;
+    meta.group = enrichGroup(meta.group, byActivityId, byNexusScheduledId);
   }
 
-  for (const group of liveGroups) {
-    enrichGroup(group, byActivityId, byNexusScheduledId);
+  for (let i = 0; i < liveGroups.length; i++) {
+    liveGroups[i] = enrichGroup(
+      liveGroups[i],
+      byActivityId,
+      byNexusScheduledId,
+    );
   }
   invalidateGroupArrayCaches();
 }
