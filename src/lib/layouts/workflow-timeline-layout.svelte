@@ -66,6 +66,11 @@
   const reverseSort = $derived($eventFilterSort === 'descending');
 
   let bufferGroups = $state.raw<EventGroup[]>([]);
+  // Loaded event count sampled at the same rAF tick as bufferGroups, so the
+  // rows-per-event estimate below divides two counts from the same snapshot
+  // (reading $fullEventHistory directly would race — it updates every buffer
+  // tick while bufferGroups is rAF-throttled).
+  let bufferEventCount = $state.raw(0);
 
   const filteredBufferGroups = $derived.by(() => {
     const active = $eventTypeFilter;
@@ -117,7 +122,7 @@
   const estimatedTotalGroups = $derived.by(() => {
     if (historyCtx.fetchComplete) return groups.length;
     const totalEvents = historyCtx.totalExpectedEvents ?? 0;
-    const loadedEvents = $fullEventHistory.length;
+    const loadedEvents = bufferEventCount;
     const loadedRows = groups.length;
     if (!totalEvents || !loadedEvents || !loadedRows) {
       return Math.max(loadedRows, Math.ceil(totalEvents * 0.5));
@@ -129,6 +134,7 @@
   onMount(() => {
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+    bufferEventCount = $fullEventHistory.length;
   });
 
   $effect(() => {
@@ -144,6 +150,7 @@
         enrichGroups(pendingActivities, pendingNexusOperations);
       }
       bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+      bufferEventCount = $fullEventHistory.length;
     });
 
     return () => {
