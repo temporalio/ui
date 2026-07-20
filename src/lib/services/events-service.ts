@@ -16,6 +16,8 @@ import type {
   NamespaceScopedRequest,
   NextPageToken,
   PaginationCallbacks,
+  Replace,
+  WithoutNextPageToken,
 } from '$lib/types/global';
 import { isSortOrder } from '$lib/utilities/is';
 import { paginated } from '$lib/utilities/paginated';
@@ -28,6 +30,11 @@ import type {
 } from './fetch-bidirectional';
 
 export type { BidirectionalProgress, BidirectionalStats };
+
+type PaginatedHistoryResponse = Replace<
+  GetWorkflowExecutionHistoryResponse,
+  { nextPageToken?: NextPageToken }
+>;
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
@@ -57,9 +64,9 @@ export const getEndpointForRawHistory = ({
 };
 
 const getEndpointForSortOrder = (
-  sortOrder: EventSortOrder,
+  sortOrder: EventSortOrder | undefined,
 ): WorkflowAPIRoutePath => {
-  if (!isSortOrder(sortOrder)) return 'events.descending';
+  if (!sortOrder || !isSortOrder(sortOrder)) return 'events.descending';
   if (sortOrder === 'descending') return 'events.descending';
   if (sortOrder === 'ascending') return 'events.ascending';
   return 'events.descending';
@@ -76,18 +83,20 @@ export const fetchRawEvents = async ({
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId });
-  const response = await paginated(
-    async (token: string) => {
-      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
-        token,
-        request: fetch,
-        params: { 'execution.runId': runId },
-      });
+  const response = await paginated<PaginatedHistoryResponse>(
+    async (token?: NextPageToken) => {
+      return (
+        (await requestFromAPI<PaginatedHistoryResponse>(route, {
+          token: token as string,
+          request: fetch,
+          params: { 'execution.runId': runId },
+        })) ?? { history: { events: [] } }
+      );
     },
     { onStart, onUpdate, onComplete },
   );
 
-  return response.history.events;
+  return response?.history?.events ?? [];
 };
 
 export const throttleRefresh = throttle(() => {
@@ -107,13 +116,19 @@ export const fetchAllEvents = async ({
     fullEventHistory.set([]);
   };
 
-  const onUpdate = (full, current) => {
+  const onUpdate = (
+    full: WithoutNextPageToken<GetWorkflowExecutionHistoryResponse>,
+    current: WithoutNextPageToken<GetWorkflowExecutionHistoryResponse>,
+  ) => {
     if (!signal) return;
     fullEventHistory.set([...toEventHistory(full.history?.events)]);
     const next = current?.history?.events;
     const hasNewHistory =
       historySize &&
-      next?.every((e) => parseInt(e.eventId) > parseInt(historySize));
+      next?.every(
+        (event: HistoryEvent) =>
+          parseInt(event.eventId) > parseInt(historySize),
+      );
     if (hasNewHistory) {
       throttleRefresh();
     }
@@ -126,17 +141,19 @@ export const fetchAllEvents = async ({
 
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId });
-  const response = await paginated(
-    async (token: string) => {
-      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
-        token,
-        request: fetch,
-        params: {
-          'execution.runId': runId,
-          waitNewEvent: signal ? 'true' : 'false',
-        },
-        options: { signal },
-      });
+  const response = await paginated<PaginatedHistoryResponse>(
+    async (token?: NextPageToken) => {
+      return (
+        (await requestFromAPI<PaginatedHistoryResponse>(route, {
+          token: token as string,
+          request: fetch,
+          params: {
+            'execution.runId': runId,
+            waitNewEvent: signal ? 'true' : 'false',
+          },
+          options: { signal },
+        })) ?? { history: { events: [] } }
+      );
     },
     { onStart, onUpdate, onComplete },
   );
@@ -153,7 +170,7 @@ export const fetchPartialRawEvents = async ({
   sort,
   maximumPageSize = '20',
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
-  const route = routeForApi(`events.${sort}`, {
+  const route = routeForApi(getEndpointForSortOrder(sort), {
     namespace,
     workflowId,
   });
@@ -167,7 +184,7 @@ export const fetchPartialRawEvents = async ({
       },
     );
 
-    return response.history.events;
+    return response?.history?.events ?? [];
   } catch {
     return [];
   }
@@ -194,20 +211,20 @@ export async function getPaginatedEvents({
 > {
   return async (_pageSize = 100, token = '') => {
     const historyRoute = routeForApi(
-      compact ? 'events.ascending' : `events.${sort}`,
+      compact ? 'events.ascending' : getEndpointForSortOrder(sort),
       {
         namespace,
         workflowId,
       },
     );
     const { history, nextPageToken } =
-      await requestFromAPI<GetWorkflowExecutionHistoryResponse>(historyRoute, {
+      (await requestFromAPI<GetWorkflowExecutionHistoryResponse>(historyRoute, {
         request: fetch,
         params: {
           nextPageToken: token,
           'execution.runId': runId,
         },
-      });
+      })) ?? { history: { events: [] }, nextPageToken: '' };
 
     const events = await toEventHistory(history.events);
 
@@ -353,7 +370,7 @@ export const fetchAllEventsBidirectional = async ({
         descCtrl.abort();
       }
 
-      let response: GetWorkflowExecutionHistoryResponse;
+      let response: GetWorkflowExecutionHistoryResponse | undefined;
       try {
         response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
           route,
@@ -391,7 +408,7 @@ export const fetchAllEventsBidirectional = async ({
       }
       onPage?.(snapshotAccumulated());
 
-      if (!response.nextPageToken || gap() <= 0) {
+      if (!response?.nextPageToken || gap() <= 0) {
         descCtrl.abort();
         break;
       }
@@ -413,7 +430,7 @@ export const fetchAllEventsBidirectional = async ({
         ascCtrl.abort();
       }
 
-      let response: GetWorkflowExecutionHistoryResponse;
+      let response: GetWorkflowExecutionHistoryResponse | undefined;
       try {
         response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
           route,
@@ -457,7 +474,7 @@ export const fetchAllEventsBidirectional = async ({
       if (descPages === 1) onFirstDescPage?.(snap!);
       if (snap) onPage?.(snap);
 
-      if (!response.nextPageToken || gap() <= 0) {
+      if (!response?.nextPageToken || gap() <= 0) {
         ascCtrl.abort();
         break;
       }

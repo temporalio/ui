@@ -6,6 +6,8 @@
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import Table from '$lib/holocene/table/table.svelte';
 
+  import { getPaginatedTableMaxHeight } from './context';
+
   type Item = $$Generic;
 
   interface $$Props extends Omit<HTMLAttributes<HTMLTableElement>, 'class'> {
@@ -26,6 +28,8 @@
   let className: ClassNameValue = '';
   export { className as class };
 
+  const contextMaxHeight = getPaginatedTableMaxHeight();
+
   let tableContainer: HTMLDivElement;
   let footerHeight = 0;
 
@@ -45,7 +49,9 @@
   )}
   id="{$$restProps['id']}-container"
   bind:this={tableContainer}
-  style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`};
+  style="max-height: {maxHeight ||
+    contextMaxHeight ||
+    `calc(100vh - ${tableOffset}px)`};
   scroll-padding-top: var(--table-header-h, 2.25rem);
   scroll-padding-bottom: {footerHeight}px;
 

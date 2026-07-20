@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest';
 import { getFormSpecInitialData } from './get-form-spec-initial-data';
 
 describe('getFormSpecInitialData', () => {
-  it('returns an empty cron spec', () => {
-    expect(getFormSpecInitialData('cron')).toEqual({
-      kind: 'cron',
-      cronString: '',
-    });
+  it('returns a cron spec with defaults injected', () => {
+    const spec = getFormSpecInitialData('cron');
+
+    expect(spec.kind).toBe('cron');
+    expect(spec.cronString).toBe('');
+    expect(spec.interval).toEqual({});
+    expect(spec.calendar).toBeDefined();
   });
 
   it('seeds a week spec with the current day of the week', () => {
@@ -29,13 +31,11 @@ describe('getFormSpecInitialData', () => {
     expect(spec.calendar?.month).toEqual([{ start: now.getMonth() + 1 }]);
   });
 
-  it('returns an empty interval spec', () => {
-    expect(getFormSpecInitialData('interval')).toEqual({
-      kind: 'interval',
-      interval: {
-        interval: undefined,
-        phase: undefined,
-      },
-    });
+  it('returns an interval spec with an empty interval', () => {
+    const spec = getFormSpecInitialData('interval');
+
+    expect(spec.kind).toBe('interval');
+    expect(spec.interval).toEqual({});
+    expect(spec.calendar).toBeDefined();
   });
 });

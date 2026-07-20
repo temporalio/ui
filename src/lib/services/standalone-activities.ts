@@ -51,6 +51,22 @@ export type ListActivitiesResponse = {
   nextPageToken: string;
 };
 
+const emptyActivityExecutionInfo: ActivityExecutionInfo = {
+  status: 'ACTIVITY_EXECUTION_STATUS_UNSPECIFIED',
+  scheduleToCloseTimeout: '',
+  scheduleToStartTimeout: '',
+  startToCloseTimeout: '',
+  heartbeatTimeout: '',
+  stateTransitionCount: '',
+  currentRetryInterval: '',
+  searchAttributes: {},
+};
+
+const emptyActivityExecution: ActivityExecution = {
+  runId: '',
+  info: emptyActivityExecutionInfo,
+};
+
 export interface StartStandaloneActivityResponse {
   runId: string;
   started: boolean;
@@ -96,7 +112,7 @@ export const fetchPaginatedActivities = async (
   };
 };
 
-const toStartActivityExecutionRequest = async (
+export const toStartActivityExecutionRequest = async (
   activityFormData: StandaloneActivityFormData,
 ): Promise<StartActivityExecutionRequest> => {
   let inputPayloads: Payload[] | null = null;
@@ -155,7 +171,7 @@ const toStartActivityExecutionRequest = async (
     };
   }
 
-  return {
+  const request = {
     identity: activityFormData.identity,
     namespace: activityFormData.namespace,
     activityId: activityFormData.activityId,
@@ -184,14 +200,16 @@ const toStartActivityExecutionRequest = async (
       ...(activityFormData.maximumInterval && {
         maximumInterval: activityFormData.maximumInterval,
       }),
-      ...(activityFormData.maximumAttempts && {
+      ...(activityFormData.maximumAttempts.trim() && {
         maximumAttempts: Number(activityFormData.maximumAttempts),
       }),
-      ...(activityFormData.backoffCoefficient && {
+      ...(activityFormData.backoffCoefficient.trim() && {
         backoffCoefficient: Number(activityFormData.backoffCoefficient),
       }),
     },
-  };
+  } as StartActivityExecutionRequest;
+
+  return request;
 };
 
 export const startStandaloneActivity = async (
@@ -207,12 +225,12 @@ export const startStandaloneActivity = async (
   const startActivityExecutionRequest =
     await toStartActivityExecutionRequest(activity);
 
-  return requestFromAPI(route, {
+  return requestFromAPI<StartStandaloneActivityResponse>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt(startActivityExecutionRequest),
     },
-  });
+  }).then((response) => response ?? { runId: '', started: false });
 };
 
 interface ActivityInputValues {
@@ -327,9 +345,9 @@ export const getActivityExecution = (
     runId,
   });
 
-  return requestFromAPI(route, {
+  return requestFromAPI<ActivityExecution>(route, {
     params,
-  });
+  }).then((response) => response ?? emptyActivityExecution);
 };
 
 export const pollActivityExecution = (
@@ -338,7 +356,7 @@ export const pollActivityExecution = (
   runId: string,
   token: string,
   signal: AbortSignal,
-): Promise<ActivityExecution> => {
+): Promise<ActivityExecution | undefined> => {
   const route = routeForApi('standalone-activity', {
     namespace,
     activityId,
@@ -353,7 +371,7 @@ export const pollActivityExecution = (
     longPollToken: token,
   });
 
-  return requestFromAPI(route, {
+  return requestFromAPI<ActivityExecution>(route, {
     params,
     notifyOnError: false,
     options: { signal },
