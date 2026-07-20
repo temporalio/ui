@@ -1,3 +1,5 @@
+import { writable } from 'svelte/store';
+
 import {
   addEventToGroup,
   createEventGroup,
@@ -56,6 +58,27 @@ const processedWorkflowTaskIds = new Set<string>();
 let cachedGroups: EventGroup[] | null = null;
 let cachedGroupsNoWFT: EventGroup[] | null = null;
 
+/**
+ * Reactivity signal for the buffer. invalidateCache() — the single choke point
+ * hit by every mutation (ingest, enrichGroups, reset) — schedules a coalesced
+ * bump, so many synchronous ingests (a whole fetch page or live-poll response)
+ * notify subscribers once. Svelte consumers read this in a derived/effect and
+ * then call getEventArray() / getGroupArray().
+ */
+export const bufferVersion = writable(0);
+
+let bumpScheduled = false;
+function scheduleBufferChange(): void {
+  if (bumpScheduled) {
+    return;
+  }
+  bumpScheduled = true;
+  queueMicrotask(() => {
+    bumpScheduled = false;
+    bufferVersion.update((version) => version + 1);
+  });
+}
+
 function toWorkflowEvent(
   raw: HistoryEvent,
   isAscending: boolean,
@@ -79,6 +102,7 @@ function insertEventById(list: WorkflowEvent[], event: WorkflowEvent): void {
 function invalidateCache(): void {
   cachedGroups = null;
   cachedGroupsNoWFT = null;
+  scheduleBufferChange();
 }
 
 function isWorkflowTaskGroup(group: EventGroup): boolean {

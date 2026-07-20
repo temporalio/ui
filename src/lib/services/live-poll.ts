@@ -12,14 +12,10 @@ export type LivePollOptions = {
   /**
    * Called for each raw event from the server.
    * Must return true if the event is genuinely new (not a duplicate), false
-   * otherwise. Only true returns count toward the `onNewEvents` callback.
+   * otherwise. Only true returns count toward the new-event tally that decides
+   * whether the loop backs off.
    */
   onEvent: (ev: HistoryEvent) => boolean;
-  /**
-   * Called once per poll iteration when at least one new event was added.
-   * Typically increments bufferVersion so Svelte consumers re-render.
-   */
-  onNewEvents: () => void;
   /** ms to wait when a long-poll times out with no new events. Default 2000. */
   backoffMs?: number;
   /** ms to wait after a network error before retrying. Default 5000. */
@@ -50,7 +46,6 @@ export async function runLivePoll({
   startToken,
   signal,
   onEvent,
-  onNewEvents,
   backoffMs = 2000,
   errorBackoffMs = 5000,
 }: LivePollOptions): Promise<string> {
@@ -72,7 +67,6 @@ export async function runLivePoll({
       for (const ev of events) {
         if (onEvent(ev)) added++;
       }
-      if (added > 0) onNewEvents();
 
       if (response?.nextPageToken) {
         token = response.nextPageToken as unknown as string;

@@ -3,7 +3,10 @@ import { derived, type Readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import type { FetchEventsParameters } from '$lib/services/events-service';
-import { getEventArray } from '$lib/services/grouped-event-buffer';
+import {
+  bufferVersion,
+  getEventArray,
+} from '$lib/services/grouped-event-buffer';
 import type {
   WorkflowEvents,
   WorkflowTaskCompletedEvent,
@@ -57,20 +60,14 @@ export const timelineEvents = writable(null);
 
 export const pauseLiveUpdates = writable(false);
 
-/**
- * Incremented whenever the grouped-event-buffer changes: after each rAF-batched
- * group update, after fetch completes, and after each live-event batch arrives.
- * Consumers call getEventArray() / getGroupArray() inside a derived that reads
- * this value so they re-run once per batch rather than once per raw event.
- */
-export const bufferVersion = writable(0);
+export { bufferVersion };
 
 /**
  * Flat view of all workflow events sourced from the grouped-event-buffer.
- * Updated by workflow-run-layout via bufferVersion — elements are the same
- * WorkflowEvent instances held in groupPool (shallow pointer array, not a copy).
- * Writable so standalone pages (e.g. workflow-history-event) can populate it
- * independently via fetchAllEvents.
+ * Updated by workflow-run-layout in a bufferVersion-gated effect — elements are
+ * the same WorkflowEvent instances held by the buffer (shallow pointer array,
+ * not a copy). Writable so standalone pages (e.g. workflow-history-event) can
+ * populate it independently via fetchAllEvents.
  */
 export const fullEventHistory = writable<WorkflowEvents>([]);
 

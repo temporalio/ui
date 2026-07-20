@@ -81,7 +81,7 @@
       : '',
   );
   let totalActions = $derived.by(() => {
-    $bufferVersion;
+    void $bufferVersion;
     return getEventArray()
       .reduce((acc, e) => (e?.billableActions ?? 0) + acc, 0)
       .toString();

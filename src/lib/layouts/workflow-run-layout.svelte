@@ -60,7 +60,7 @@
   let runId = $derived(page.params.run);
   let showJson = $derived(page.url.searchParams.has('json'));
   let fullJson = $derived.by(() => {
-    $bufferVersion;
+    void $bufferVersion;
     return { ...$workflowRun, eventHistory: getEventArray() };
   });
 
@@ -160,7 +160,6 @@
           latestEventId = Math.max(latestEventId, parseInt(ev.eventId));
         return isNew;
       },
-      onNewEvents: () => bufferVersion.update((v) => v + 1),
     }).then((lastToken) => {
       _lastPollToken = lastToken;
     });
@@ -243,7 +242,6 @@
           const id = parseInt(event.eventId);
           if (id > latestEventId) latestEventId = id;
         }
-        if (events.length) bufferVersion.update((v) => v + 1);
       },
     })
       .then(() => {
@@ -252,7 +250,6 @@
           $workflowRun.workflow?.pendingNexusOperations ?? [],
         );
         fetchComplete = true;
-        bufferVersion.update((v) => v + 1);
       })
       .catch((e: unknown) => {
         if (e instanceof Error && e.name !== 'AbortError') {
@@ -290,7 +287,7 @@
   };
 
   $effect(() => {
-    $bufferVersion;
+    void $bufferVersion;
     untrack(() => {
       const events = getEventArray();
       $fullEventHistory = events;
@@ -301,7 +298,6 @@
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $fullEventHistory = [];
-    $bufferVersion = 0;
     workflowError = null;
     fetchComplete = false;
     latestEventId = 0;
@@ -312,13 +308,14 @@
     _lastPollToken = '';
     _pollPaused = false;
     abortAll();
+    resetBuffer();
     resetLastDataEncoderSuccess();
     if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = null;
   };
 
   $effect(() => {
-    runId;
+    void runId;
     untrack(() => {
       clearWorkflowData();
     });

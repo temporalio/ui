@@ -66,7 +66,6 @@ function startPoll(
 ) {
   const ctrl = new AbortController();
   const onEvent = vi.fn().mockReturnValue(onEventReturn);
-  const onNewEvents = vi.fn();
 
   let callIdx = 0;
   requestFromAPI.mockImplementation(() => {
@@ -81,11 +80,10 @@ function startPoll(
     startToken: 'start-tok',
     signal: ctrl.signal,
     onEvent,
-    onNewEvents,
     ...FAST,
   });
 
-  return { ctrl, onEvent, onNewEvents, done };
+  return { ctrl, onEvent, done };
 }
 
 // ---------------------------------------------------------------------------
@@ -106,7 +104,6 @@ describe('runLivePoll — waitNewEvent long-poll', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(false),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -131,7 +128,6 @@ describe('runLivePoll — waitNewEvent long-poll', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(false),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -156,7 +152,6 @@ describe('runLivePoll — waitNewEvent long-poll', () => {
       startToken: 'initial-cursor',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(false),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -179,7 +174,6 @@ describe('runLivePoll — waitNewEvent long-poll', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(false),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -204,28 +198,6 @@ describe('runLivePoll — event delivery', () => {
     expect(onEvent).toHaveBeenNthCalledWith(2, makeRawEvent(2));
     expect(onEvent).toHaveBeenNthCalledWith(3, makeRawEvent(3));
   });
-
-  it('calls onNewEvents once when at least one event is new', async () => {
-    const { onNewEvents, done } = startPoll([pollResponse([1, 2])], {
-      onEventReturn: true,
-    });
-    await done;
-    expect(onNewEvents).toHaveBeenCalledTimes(1);
-  });
-
-  it('does NOT call onNewEvents when all events are duplicates', async () => {
-    const { onNewEvents, done } = startPoll([pollResponse([1, 2])], {
-      onEventReturn: false,
-    });
-    await done;
-    expect(onNewEvents).not.toHaveBeenCalled();
-  });
-
-  it('does NOT call onNewEvents when response has no events', async () => {
-    const { onNewEvents, done } = startPoll([pollResponse([])]);
-    await done;
-    expect(onNewEvents).not.toHaveBeenCalled();
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -235,7 +207,6 @@ describe('runLivePoll — event delivery', () => {
 describe('runLivePoll — nextPageToken threading', () => {
   it('follows nextPageToken immediately without delay', async () => {
     const ctrl = new AbortController();
-    const onNewEvents = vi.fn();
     let callIdx = 0;
     const responses = [
       pollResponse([1, 2], 'page-2-tok'),
@@ -253,7 +224,6 @@ describe('runLivePoll — nextPageToken threading', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(true),
-      onNewEvents,
       ...FAST,
     });
 
@@ -285,7 +255,6 @@ describe('runLivePoll — nextPageToken threading', () => {
       startToken: 'initial',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(true),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -296,31 +265,6 @@ describe('runLivePoll — nextPageToken threading', () => {
       '/api/events',
       expect.objectContaining({ token: undefined }),
     );
-  });
-
-  it('calls onNewEvents per iteration, not once per event batch', async () => {
-    // Two iterations, each delivering new events.
-    const ctrl = new AbortController();
-    let callIdx = 0;
-    const responses = [pollResponse([1]), pollResponse([2])];
-    requestFromAPI.mockImplementation(() => {
-      const resp = responses[callIdx++];
-      if (callIdx >= responses.length) ctrl.abort();
-      return Promise.resolve(resp);
-    });
-    const onNewEvents = vi.fn();
-
-    await runLivePoll({
-      route: '/api/events',
-      runId: 'run-1',
-      startToken: '',
-      signal: ctrl.signal,
-      onEvent: vi.fn().mockReturnValue(true),
-      onNewEvents,
-      ...FAST,
-    });
-
-    expect(onNewEvents).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -348,7 +292,6 @@ describe('runLivePoll — back-off', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(false),
-      onNewEvents: vi.fn(),
       backoffMs: 0,
       errorBackoffMs: 0,
     });
@@ -357,7 +300,7 @@ describe('runLivePoll — back-off', () => {
   });
 
   it('does NOT delay when response delivers new events without nextPageToken', async () => {
-    // Abort inside onNewEvents so the loop exits right after processing events
+    // Abort while processing the event so the loop exits right after the batch
     // but before any setTimeout could fire. If backoffMs=999 appears in delays
     // it means the code incorrectly backed off even though events were delivered.
     const delays: number[] = [];
@@ -372,16 +315,18 @@ describe('runLivePoll — back-off', () => {
     const ctrl = new AbortController();
     requestFromAPI.mockResolvedValueOnce(pollResponse([1])); // events delivered, no token
 
-    // Abort during onNewEvents — happens before the setTimeout check in the loop.
-    const onNewEvents = vi.fn().mockImplementation(() => ctrl.abort());
+    // Abort during event processing — happens before the setTimeout check in the loop.
+    const onEvent = vi.fn().mockImplementation(() => {
+      ctrl.abort();
+      return true;
+    });
 
     await runLivePoll({
       route: '/api/events',
       runId: 'run-1',
       startToken: '',
       signal: ctrl.signal,
-      onEvent: vi.fn().mockReturnValue(true),
-      onNewEvents,
+      onEvent,
       backoffMs: 999, // must NOT appear in delays
       errorBackoffMs: 0,
     });
@@ -414,7 +359,6 @@ describe('runLivePoll — back-off', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(false),
-      onNewEvents: vi.fn(),
       backoffMs: 1234, // distinctive value
       errorBackoffMs: 0,
     });
@@ -447,7 +391,6 @@ describe('runLivePoll — back-off', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(false),
-      onNewEvents: vi.fn(),
       backoffMs: 0,
       errorBackoffMs: 5678, // distinctive value
     });
@@ -484,7 +427,6 @@ describe('runLivePoll — back-off', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn().mockReturnValue(false),
-      onNewEvents: vi.fn(),
       // No backoffMs / errorBackoffMs → use defaults
     });
 
@@ -511,7 +453,6 @@ describe('runLivePoll — abort', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn(),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -531,7 +472,6 @@ describe('runLivePoll — abort', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn(),
-      onNewEvents: vi.fn(),
       errorBackoffMs: 0,
       backoffMs: 0,
     });
@@ -561,7 +501,6 @@ describe('runLivePoll — pause/resume cursor', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn(),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -581,7 +520,6 @@ describe('runLivePoll — pause/resume cursor', () => {
       startToken: 'resume-tok',
       signal: ctrl.signal,
       onEvent: vi.fn(),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -607,7 +545,6 @@ describe('runLivePoll — pause/resume cursor', () => {
       startToken: '',
       signal: ctrl.signal,
       onEvent: vi.fn(),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -632,7 +569,6 @@ describe('runLivePoll — pause/resume cursor', () => {
       startToken: '',
       signal: ctrl1.signal,
       onEvent: vi.fn().mockReturnValue(true),
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
@@ -650,7 +586,6 @@ describe('runLivePoll — pause/resume cursor', () => {
       startToken: resumeToken,
       signal: ctrl2.signal,
       onEvent: onEvent2,
-      onNewEvents: vi.fn(),
       ...FAST,
     });
 
