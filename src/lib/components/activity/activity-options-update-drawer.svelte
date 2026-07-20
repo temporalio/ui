@@ -30,13 +30,13 @@
   };
 
   let { open = $bindable(), namespace, execution, activity }: Props = $props();
-  let { activityId: id, activityType: type } = $derived(activity);
+  let { activityId: id } = $derived(activity);
 
   // Form fields are seeded from activity.activityOptions once when the drawer
   // opens. They must NOT reset reactively if the activity prop changes while
   // the user is mid-edit — untrack() captures the initial value intentionally.
   let taskQueue = $state(
-    untrack(() => activity.activityOptions?.taskQueue?.name),
+    untrack(() => activity.activityOptions?.taskQueue?.name ?? ''),
   );
   let scheduleToCloseTimeout = $state(
     untrack(() =>
@@ -65,10 +65,14 @@
     ),
   );
   let maximumAttempts = $state(
-    untrack(() => activity?.activityOptions?.retryPolicy?.maximumAttempts),
+    untrack(() => activity?.activityOptions?.retryPolicy?.maximumAttempts ?? 0),
   );
+  // Temporal rejects backoffCoefficient < 1; default to the server default (2)
+  // when unset rather than submitting an invalid 0 via the full field mask.
   let backoffCoefficient = $state(
-    untrack(() => activity?.activityOptions?.retryPolicy?.backoffCoefficient),
+    untrack(
+      () => activity?.activityOptions?.retryPolicy?.backoffCoefficient ?? 2,
+    ),
   );
   let initialInterval = $state(
     untrack(() =>
@@ -125,7 +129,7 @@
       console.error('Error updating activity options:', error);
       toaster.push({
         variant: 'error',
-        message: `Options for Activity ${id} have been failed to update: ${error?.message}`,
+        message: `Options for Activity ${id} have been failed to update: ${(error as Error)?.message}`,
         duration: 5000,
       });
     } finally {

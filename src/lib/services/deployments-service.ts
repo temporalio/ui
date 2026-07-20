@@ -21,6 +21,41 @@ type PaginatedDeploymentsPromise = (
   token: string,
 ) => Promise<{ items: WorkerDeploymentSummary[]; nextPageToken: string }>;
 
+const emptyVersionSummary = { version: '', createTime: {} };
+
+const emptyWorkerDeploymentResponse: WorkerDeploymentResponse = {
+  conflictToken: '',
+  workerDeploymentInfo: {
+    name: '',
+    createTime: {},
+    routingConfig: {},
+    currentVersionSummary: emptyVersionSummary,
+    lastModifierIdentity: '',
+    versionSummaries: [],
+  },
+};
+
+const emptyWorkerDeploymentVersionResponse: WorkerDeploymentVersionResponse = {
+  workerDeploymentVersionInfo: {
+    version: '',
+    deploymentName: '',
+    createTime: {},
+    routingChangedTime: {},
+    currentSinceTime: {},
+    rampingSinceTime: {},
+    rampPercentage: 0,
+    taskQueueInfos: [],
+    drainageInfo: {
+      status: '',
+      lastChangedTime: {},
+      lastCheckedTime: {},
+    },
+    metadata: {
+      entries: {},
+    },
+  },
+};
+
 export const fetchPaginatedDeployments = async (
   namespace: string,
   query: string,
@@ -37,9 +72,10 @@ export const fetchPaginatedDeployments = async (
       },
       request,
       onError,
-    }).then(({ workerDeployments, nextPageToken }) => {
+    }).then((response) => {
+      const { workerDeployments, nextPageToken } = response ?? {};
       return {
-        items: workerDeployments,
+        items: workerDeployments ?? [],
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });
@@ -63,7 +99,7 @@ export const createWorkerDeployment = async (
     },
     onError,
     notifyOnError: false,
-  });
+  }).then((response) => response ?? { conflictToken: '' });
 };
 
 export const fetchDeployment = async (
@@ -74,12 +110,12 @@ export const fetchDeployment = async (
   signal?: AbortSignal,
 ): Promise<WorkerDeploymentResponse> => {
   const route = routeForApi('worker-deployment', parameters);
-  return requestFromAPI(route, {
+  return requestFromAPI<WorkerDeploymentResponse>(route, {
     request,
     onError,
     notifyOnError,
     options: { signal },
-  });
+  }).then((response) => response ?? emptyWorkerDeploymentResponse);
 };
 
 export const fetchDeploymentVersion = async (
@@ -87,7 +123,9 @@ export const fetchDeploymentVersion = async (
   request = fetch,
 ): Promise<WorkerDeploymentVersionResponse> => {
   const route = routeForApi('worker-deployment-version', parameters);
-  return requestFromAPI(route, { request });
+  return requestFromAPI<WorkerDeploymentVersionResponse>(route, {
+    request,
+  }).then((response) => response ?? emptyWorkerDeploymentVersionResponse);
 };
 
 export const deleteWorkerDeployment = async (
@@ -207,7 +245,7 @@ export const validateWorkerDeploymentVersionComputeConfig = async (
     },
     onError,
     notifyOnError: false,
-  });
+  }).then((response) => response ?? { valid: false });
 };
 
 export const setCurrentDeploymentVersion = async (
