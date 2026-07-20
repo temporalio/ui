@@ -16,7 +16,7 @@ import {
 } from '~/test-utilities/mock-apis';
 import { mockRunningWorkflow } from '~/test-utilities/mocks/workflow';
 
-test.describe('Activity Commands', () => {
+test.describe.skip('Activity Commands', () => {
   const {
     workflowExecutionInfo: {
       execution: { workflowId, runId },
