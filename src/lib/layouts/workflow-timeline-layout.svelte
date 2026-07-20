@@ -27,7 +27,11 @@
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
-  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
+  import {
+    bufferVersion,
+    fullEventHistory,
+    pauseLiveUpdates,
+  } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
@@ -105,10 +109,21 @@
   // scrolls it and the controls bar sticks to the top-nav. TimelineGraph
   // virtualizes internally via IntersectionObserver, so there's no bounded
   // scroll container, no scroll-offset bridge, and no height plumbing here.
+  // Estimate the total row count so the loading-gap skeleton and scroll range
+  // roughly match the final size. totalExpectedEvents is an EVENT count, not a
+  // row count, so extrapolate from the observed rows-per-event of what's loaded
+  // rather than a fixed ratio — most histories have well over 2 events per
+  // visible row (WFT groups are excluded here but still counted in the total).
   const estimatedTotalGroups = $derived.by(() => {
     if (historyCtx.fetchComplete) return groups.length;
     const totalEvents = historyCtx.totalExpectedEvents ?? 0;
-    return Math.max(groups.length, Math.ceil(totalEvents * 0.5));
+    const loadedEvents = $fullEventHistory.length;
+    const loadedRows = groups.length;
+    if (!totalEvents || !loadedEvents || !loadedRows) {
+      return Math.max(loadedRows, Math.ceil(totalEvents * 0.5));
+    }
+    const rowsPerEvent = loadedRows / loadedEvents;
+    return Math.max(loadedRows, Math.round(totalEvents * rowsPerEvent));
   });
 
   onMount(() => {
