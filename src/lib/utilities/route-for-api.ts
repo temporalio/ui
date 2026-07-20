@@ -207,6 +207,10 @@ export function pathForApi(
     'standalone-nexus-operation.cancel': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}/cancel`,
     'standalone-nexus-operation.terminate': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}/terminate`,
     'standalone-nexus-operations.count': `/namespaces/${parameters?.namespace}/nexus-operation-count`,
+    'standalone-activity.pause': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/pause`,
+    'standalone-activity.unpause': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/unpause`,
+    'standalone-activity.reset': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/reset`,
+    'standalone-activity.update-options': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/update-options`,
   };
 
   return getPath(routes[route]);

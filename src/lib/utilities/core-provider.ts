@@ -24,6 +24,7 @@ export type CoreProvider = {
   };
   getDataEncoderEndpoint: (namespace: string) => Promise<string>;
   searchNamespaces: (query: string) => Promise<string[]>;
+  isStandaloneActivitiesGaEnabled: () => boolean;
 };
 
 export type InitOptions = {
@@ -36,6 +37,7 @@ export type InitOptions = {
   };
   getDataEncoderEndpoint?: (namespace: string) => Promise<string>;
   searchNamespaces?: (query: string) => Promise<string[]>;
+  isStandaloneActivitiesGaEnabled?: () => boolean;
 };
 
 let provider: CoreProvider | null = null;
@@ -54,6 +56,8 @@ export function initCoreProvider(options: InitOptions): void {
     },
     getDataEncoderEndpoint: options.getDataEncoderEndpoint ?? (async () => ''),
     searchNamespaces: options.searchNamespaces ?? (async () => []),
+    isStandaloneActivitiesGaEnabled:
+      options.isStandaloneActivitiesGaEnabled ?? (() => true),
   };
 }
 
@@ -82,6 +86,11 @@ export async function getDataEncoderEndpoint(
 export async function searchNamespaces(query: string): Promise<string[]> {
   if (!BROWSER || !provider) return [];
   return provider.searchNamespaces(query);
+}
+
+export function getStandaloneActivitiesGaEnabled(): boolean {
+  if (!BROWSER || !provider) return false;
+  return provider.isStandaloneActivitiesGaEnabled();
 }
 
 export async function runPreRequest(

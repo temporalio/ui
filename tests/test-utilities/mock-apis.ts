@@ -70,9 +70,19 @@ export {
   mockWorkflowApi,
   mockWorkflowPauseApi,
   mockWorkflowUnpauseApi,
+  mockWorkflowWithRunningActivity,
+  mockWorkflowWithPausedActivity,
+  mockActivityPauseApi,
+  mockActivityUnpauseApi,
+  mockActivityResetApi,
+  mockActivityUpdateOptionsApi,
   WORKFLOW_API,
   WORKFLOW_PAUSE_API,
   WORKFLOW_UNPAUSE_API,
+  ACTIVITY_PAUSE_API,
+  ACTIVITY_UNPAUSE_API,
+  ACTIVITY_RESET_API,
+  ACTIVITY_UPDATE_OPTIONS_API,
 } from './mocks/workflow';
 export {
   mockWorkflowsCountApi,
@@ -85,6 +95,20 @@ export {
   CREATE_BATCH_OPERATION_API,
   DESCRIBE_BATCH_OPERATION_API,
 } from './mocks/batch-operations';
+export {
+  mockRunningActivityExecution,
+  mockPausedActivityExecution,
+  mockStandaloneActivityApi,
+  mockStandaloneActivityPauseApi,
+  mockStandaloneActivityUnpauseApi,
+  mockStandaloneActivityResetApi,
+  mockStandaloneActivityUpdateOptionsApi,
+  STANDALONE_ACTIVITY_API,
+  STANDALONE_ACTIVITY_PAUSE_API,
+  STANDALONE_ACTIVITY_UNPAUSE_API,
+  STANDALONE_ACTIVITY_RESET_API,
+  STANDALONE_ACTIVITY_UPDATE_OPTIONS_API,
+} from './mocks/activity-execution';
 export { EVENT_HISTORY_API, mockEventHistoryApi } from './mocks/event-history';
 export { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
 export { mockWorkersApi, WORKERS_API } from './mocks/workers';

@@ -128,6 +128,9 @@ export const resetActivity = async ({
   );
 };
 
+export const ACTIVITY_OPTIONS_UPDATE_MASK =
+  'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts';
+
 export const updateActivityOptions = async ({
   namespace,
   execution,
@@ -140,8 +143,6 @@ export const updateActivityOptions = async ({
     namespace: namespace ?? '',
   });
 
-  const fullMask =
-    'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts';
   return (
     (await requestWithActivityFallback<ActivityUpdateOptionsResponse>(route, {
       options: {
@@ -151,7 +152,7 @@ export const updateActivityOptions = async ({
           id,
           type,
           activityOptions,
-          updateMask: fullMask,
+          updateMask: ACTIVITY_OPTIONS_UPDATE_MASK,
           ...(identity && { identity }),
         }),
       },
