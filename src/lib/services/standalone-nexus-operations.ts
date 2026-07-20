@@ -3,6 +3,7 @@ import {
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
 import { nexusOperationError } from '$lib/stores/nexus-operations';
+import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 import type {
   NexusOperationIdConflictPolicy,
   NexusOperationIdReusePolicy,
@@ -12,6 +13,7 @@ import type {
 } from '$lib/types';
 import type {
   NexusOperationExecution,
+  NexusOperationExecutionInfo,
   NexusOperationExecutionListInfo,
   StartNexusOperationRequest,
 } from '$lib/types/nexus-operation-execution';
@@ -29,6 +31,25 @@ import { setSearchAttributes } from './workflow-service';
 export type ListNexusOperationsResponse = {
   operations: NexusOperationExecutionListInfo[];
   nextPageToken: string;
+};
+
+const emptyNexusOperationExecutionInfo: NexusOperationExecutionInfo = {
+  status: 'NEXUS_OPERATION_EXECUTION_STATUS_UNSPECIFIED',
+  scheduleToCloseTimeout: '',
+  scheduleToStartTimeout: '',
+  startToCloseTimeout: '',
+  executionDuration: '',
+  stateTransitionCount: '',
+  scheduleTime: '',
+  expirationTime: '',
+  closeTime: '',
+  lastAttemptCompleteTime: '',
+  nextAttemptScheduleTime: '',
+  searchAttributes: {},
+};
+
+const emptyNexusOperationExecution: NexusOperationExecution = {
+  info: emptyNexusOperationExecutionInfo,
 };
 
 export type PaginatedNexusOperationsPromise = (
@@ -157,7 +178,9 @@ const toStartNexusOperationRequest = async (
   if (formData.searchAttributes) {
     searchAttributes = {
       indexedFields: {
-        ...setSearchAttributes(formData.searchAttributes),
+        ...setSearchAttributes(
+          formData.searchAttributes as unknown as SearchAttributesSchema,
+        ),
       },
     };
   }
@@ -211,13 +234,13 @@ export const startStandaloneNexusOperation = async (
 
   const request = await toStartNexusOperationRequest(formData);
 
-  return requestFromAPI(route, {
+  return requestFromAPI<StartNexusOperationExecutionResponse>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt(request),
     },
     notifyOnError: false,
-  });
+  }).then((response) => response ?? {});
 };
 
 export const getNexusOperationExecution = (
@@ -237,7 +260,9 @@ export const getNexusOperationExecution = (
     includeOutcome: String(includeOutcome),
   });
 
-  return requestFromAPI(route, { params });
+  return requestFromAPI<NexusOperationExecution>(route, { params }).then(
+    (response) => response ?? emptyNexusOperationExecution,
+  );
 };
 
 export interface NexusOperationInitialValues {
@@ -303,7 +328,7 @@ export const fetchInitialValuesForStartNexusOperation = async (
       false,
     );
     const { input, encoding, messageType } = await extractNexusInputValues(
-      operation.input,
+      operation.input ?? undefined,
     );
     const summary = await extractMetadataString(
       operation.info.userMetadata?.summary,
@@ -331,7 +356,7 @@ export const pollNexusOperationExecution = (
   runId: string,
   token: string,
   signal: AbortSignal,
-): Promise<NexusOperationExecution> => {
+): Promise<NexusOperationExecution | undefined> => {
   const route = routeForApi('standalone-nexus-operation', {
     namespace,
     operationId,
@@ -344,7 +369,7 @@ export const pollNexusOperationExecution = (
     longPollToken: token,
   });
 
-  return requestFromAPI(route, {
+  return requestFromAPI<NexusOperationExecution>(route, {
     params,
     notifyOnError: false,
     options: { signal },

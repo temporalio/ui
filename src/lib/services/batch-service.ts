@@ -95,6 +95,8 @@ const batchActionToOperation = (
         },
       };
     }
+    default:
+      return {};
   }
 };
 
@@ -132,6 +134,8 @@ const createBatchOperationRequest = (
       visibilityQuery: options.query,
     };
   }
+
+  return body;
 };
 
 export async function batchCancelWorkflows(
@@ -156,8 +160,8 @@ export async function batchCancelWorkflows(
   });
 
   inProgressBatchOperation.set({
-    jobId: body.jobId,
-    namespace: body.namespace,
+    jobId: options.jobId,
+    namespace: options.namespace,
   });
 }
 
@@ -180,8 +184,8 @@ export async function batchTerminateWorkflows(
   });
 
   inProgressBatchOperation.set({
-    jobId: body.jobId,
-    namespace: body.namespace,
+    jobId: options.jobId,
+    namespace: options.namespace,
   });
 }
 
@@ -204,8 +208,8 @@ export const batchResetWorkflows = async (
   });
 
   inProgressBatchOperation.set({
-    jobId: body.jobId,
-    namespace: body.namespace,
+    jobId: options.jobId,
+    namespace: options.namespace,
   });
 };
 
@@ -219,7 +223,7 @@ export async function pollBatchOperation({
         if (state === 'Failed') {
           reject();
         } else if (state !== 'Running') {
-          resolve(completeOperationCount);
+          resolve(completeOperationCount ?? 0);
         } else {
           setTimeout(() => {
             try {
@@ -251,16 +255,21 @@ export async function describeBatchOperation(
 }
 
 const toBatchOperationDetails = (
-  apiBatchOperationDetails: DescribeBatchOperationResponse,
+  apiBatchOperationDetails: DescribeBatchOperationResponse | undefined,
 ): BatchOperation => {
   return {
     ...apiBatchOperationDetails,
     operationType: toBatchOperationTypeReadable(
-      apiBatchOperationDetails.operationType,
+      apiBatchOperationDetails?.operationType ?? 'Unspecified',
     ),
-    state: toBatchOperationStateReadable(apiBatchOperationDetails.state),
-    startTime: apiBatchOperationDetails.startTime,
-    closeTime: apiBatchOperationDetails.closeTime,
+    state: toBatchOperationStateReadable(
+      apiBatchOperationDetails?.state ?? 'Unspecified',
+    ),
+    jobId: apiBatchOperationDetails?.jobId ?? '',
+    identity: apiBatchOperationDetails?.identity ?? '',
+    reason: apiBatchOperationDetails?.reason ?? '',
+    startTime: apiBatchOperationDetails?.startTime ?? '',
+    closeTime: apiBatchOperationDetails?.closeTime ?? '',
     totalOperationCount: parseInt(
       apiBatchOperationDetails?.totalOperationCount ?? '0',
       10,
@@ -290,8 +299,8 @@ export async function listBatchOperations(
   });
 
   return {
-    nextPageToken: response.nextPageToken,
-    operations: response.operationInfo
+    nextPageToken: response?.nextPageToken ?? null,
+    operations: response?.operationInfo
       ? response.operationInfo.map(toBatchOperationInfo)
       : [],
   };

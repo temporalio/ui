@@ -78,78 +78,81 @@ const formSpecKind = z.enum([
 ]);
 export type FormSpecKind = z.infer<typeof formSpecKind>;
 
-export const formSpecSchema = z
-  .object({
-    kind: formSpecKind,
-    cronString: z.string().trim().default(''),
-    interval: z
-      .object({
-        interval: durationString().optional(),
-        phase: durationString().optional(),
-      })
-      .default({}),
-    calendar: structuredCalendarSchema(),
-  })
-  .superRefine((spec, ctx) => {
-    switch (spec.kind) {
-      case 'none': {
+// The bare object schema, without the cross-field validation below. Parsing a
+// partial seed through this injects the field defaults without tripping the
+// refinements (e.g. "cron string is required"), yielding a complete spec.
+export const formSpecObject = z.object({
+  kind: formSpecKind,
+  cronString: z.string().trim().default(''),
+  interval: z
+    .object({
+      interval: durationString().optional(),
+      phase: durationString().optional(),
+    })
+    .default({}),
+  calendar: structuredCalendarSchema(),
+});
+
+export const formSpecSchema = formSpecObject.superRefine((spec, ctx) => {
+  switch (spec.kind) {
+    case 'none': {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Type is required ',
+        path: ['kind'],
+      });
+      return;
+    }
+
+    case 'cron': {
+      if (!spec.cronString) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Type is required ',
-          path: ['kind'],
+          message: 'Cron expression is required',
+          path: ['cronString'],
         });
-        return;
       }
 
-      case 'cron': {
-        if (!spec.cronString) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Cron expression is required',
-            path: ['cronString'],
-          });
-        }
-
-        if (!isValidCronString(spec.cronString)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              'Cron string format invalid. Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6) separated by a space',
-            path: ['cronString'],
-          });
-        }
-
-        return;
+      if (!isValidCronString(spec.cronString)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'Cron string format invalid. Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6) separated by a space',
+          path: ['cronString'],
+        });
       }
 
-      case 'frozen': {
-        return;
-      }
-
-      case 'interval': {
-        if (
-          !spec.interval?.interval ||
-          !Number(parseDuration(spec.interval.interval))
-        ) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Interval is required',
-            path: ['interval.interval'],
-          });
-        }
-
-        return;
-      }
-
-      case 'month': {
-        return;
-      }
-
-      case 'week': {
-        return;
-      }
+      return;
     }
-  });
+
+    case 'frozen': {
+      return;
+    }
+
+    case 'interval': {
+      if (
+        !spec.interval?.interval ||
+        !Number(parseDuration(spec.interval.interval))
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Interval is required',
+          path: ['interval.interval'],
+        });
+      }
+
+      return;
+    }
+
+    case 'month': {
+      return;
+    }
+
+    case 'week': {
+      return;
+    }
+  }
+});
 
 export type FormSpecSchema = z.infer<typeof formSpecSchema>;
 const formScheduleTimingSchema = z.object({
@@ -209,7 +212,10 @@ export const formScheduleSchema = z
         });
       }
 
-      if (schedule.endAfterOccurrences <= 0) {
+      if (
+        typeof schedule.endAfterOccurrences === 'number' &&
+        schedule.endAfterOccurrences <= 0
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Number of occurrences must be greater than 0',
