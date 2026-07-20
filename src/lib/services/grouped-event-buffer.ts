@@ -403,7 +403,7 @@ function notifyLatestGroupListeners(group: EventGroup): void {
 
 /**
  * (Re)initialise the buffer for a new workflow fetch.
- * Call before starting fetchAllEventsBidirectional.
+ * Call before starting fetchBidirectional.
  */
 export function reset(historyLength: number): void {
   const N = Math.max(historyLength + 16, 16);
