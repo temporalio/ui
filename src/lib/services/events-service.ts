@@ -13,15 +13,25 @@ import type {
 } from '$lib/types/events';
 import type {
   NamespaceScopedRequest,
+  NextPageToken,
   PaginationCallbacks,
+  WithNextPageToken,
+  WithoutNextPageToken,
 } from '$lib/types/global';
 import { isSortOrder } from '$lib/utilities/is';
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
+// A single history page for paginated(): the proto response types nextPageToken
+// as `Uint8Array | null` (doesn't satisfy the WithNextPageToken constraint), and
+// paginated merges partial pages, so history is optional here.
+type HistoryPage = {
+  history?: GetWorkflowExecutionHistoryResponse['history'];
+} & WithNextPageToken;
+
 export type FetchEventsParameters = NamespaceScopedRequest &
-  PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
+  PaginationCallbacks<HistoryPage> & {
     workflowId: string;
     runId: string;
     rawPayloads?: boolean;
@@ -48,9 +58,9 @@ export const getEndpointForRawHistory = ({
 };
 
 const getEndpointForSortOrder = (
-  sortOrder: EventSortOrder,
+  sortOrder: EventSortOrder | undefined,
 ): WorkflowAPIRoutePath => {
-  if (!isSortOrder(sortOrder)) return 'events.descending';
+  if (!sortOrder || !isSortOrder(sortOrder)) return 'events.descending';
   if (sortOrder === 'descending') return 'events.descending';
   if (sortOrder === 'ascending') return 'events.ascending';
   return 'events.descending';
@@ -67,18 +77,17 @@ export const fetchRawEvents = async ({
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId });
-  const response = await paginated(
-    async (token: string) => {
-      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
-        token,
+  const response = await paginated<HistoryPage>(
+    async (token?: NextPageToken) =>
+      (await requestFromAPI<HistoryPage>(route, {
+        token: token as string,
         request: fetch,
         params: { 'execution.runId': runId },
-      });
-    },
+      })) ?? {},
     { onStart, onUpdate, onComplete },
   );
 
-  return response.history.events;
+  return response?.history?.events ?? [];
 };
 
 export const throttleRefresh = throttle(() => {
@@ -98,9 +107,12 @@ export const fetchAllEvents = async ({
     fullEventHistory.set([]);
   };
 
-  const onUpdate = (full, current) => {
+  const onUpdate = (
+    full: WithoutNextPageToken<HistoryPage>,
+    current: WithoutNextPageToken<HistoryPage>,
+  ) => {
     if (!signal) return;
-    fullEventHistory.set([...toEventHistory(full.history?.events)]);
+    fullEventHistory.set([...toEventHistory(full.history?.events ?? [])]);
     const next = current?.history?.events;
     const hasNewHistory =
       historySize &&
@@ -117,24 +129,22 @@ export const fetchAllEvents = async ({
 
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId });
-  const response = await paginated(
-    async (token: string) => {
-      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
-        token,
+  const response = await paginated<HistoryPage>(
+    async (token?: NextPageToken) =>
+      (await requestFromAPI<HistoryPage>(route, {
+        token: token as string,
         request: fetch,
         params: {
           'execution.runId': runId,
           waitNewEvent: signal ? 'true' : 'false',
         },
         options: { signal },
-      });
-    },
+      })) ?? {},
     { onStart, onUpdate, onComplete },
   );
 
   if (!response?.history) return [];
-  const allEvents = await toEventHistory(response.history.events);
-  return allEvents;
+  return toEventHistory(response.history.events ?? []);
 };
 
 export const fetchPartialRawEvents = async ({
@@ -144,7 +154,7 @@ export const fetchPartialRawEvents = async ({
   sort,
   maximumPageSize = '20',
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
-  const route = routeForApi(`events.${sort}`, {
+  const route = routeForApi(getEndpointForSortOrder(sort), {
     namespace,
     workflowId,
   });
@@ -158,7 +168,7 @@ export const fetchPartialRawEvents = async ({
       },
     );
 
-    return response.history.events;
+    return response?.history?.events ?? [];
   } catch {
     return [];
   }
