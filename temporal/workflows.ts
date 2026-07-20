@@ -42,18 +42,6 @@ const { alwaysFails } = workflow.proxyActivities<typeof activities>({
   },
 });
 
-// Fast, endless retry so the pending activity's attempt count climbs on a
-// human-watchable cadence (used by TimelineFixVerificationWorkflow). No
-// maximumAttempts → retries indefinitely (0 is rejected as non-positive).
-const { alwaysFails: fastRetry } = workflow.proxyActivities<typeof activities>({
-  startToCloseTimeout: '5 seconds',
-  retry: {
-    initialInterval: '10 seconds',
-    backoffCoefficient: 1,
-    maximumInterval: '10 seconds',
-  },
-});
-
 export async function Workflow(input: string): Promise<string> {
   let result: string;
 
@@ -567,50 +555,4 @@ export async function MixedOpenWorkflow(): Promise<void> {
   });
 
   await longSleep(12 * 60 * 1000);
-}
-
-/**
- * Child workflow that completes after ~90s so the parent's timeline shows a
- * child-workflow dot flip from in-progress to completed live.
- */
-export async function VerificationChildWorkflow(): Promise<string> {
-  await workflow.sleep('90 seconds');
-  return 'child done';
-}
-
-/**
- * Manual verification harness for the timeline live-refresh fixes. Runs in
- * parallel and stays open ~1 hour:
- *
- *   Issue #1 (stuck "in progress"): a steady cadence of ~60s activities and
- *   ~90s child workflows keeps completing, so there is always something in
- *   progress to watch flip to done LIVE — no page refresh.
- *
- *   Issue #2 (commands/values not reflecting): a long-pending activity and a
- *   fast-retrying activity to pause / unpause / edit options on, and watch the
- *   UI reflect the change LIVE — no page refresh. The retrying activity's
- *   attempt count also climbs on a ~10s cadence.
- */
-export async function TimelineFixVerificationWorkflow(): Promise<void> {
-  await Activity('setup');
-
-  const steadyActivities = (async () => {
-    for (let i = 0; i < 60; i++) await longSleep(60_000);
-  })();
-
-  const steadyChildren = (async () => {
-    for (let i = 0; i < 40; i++) {
-      await workflow.executeChild(VerificationChildWorkflow, {
-        workflowId: `${workflow.workflowInfo().workflowId}-child-${i}`,
-        taskQueue: 'e2e-1',
-      });
-    }
-  })();
-
-  await Promise.all([
-    steadyActivities,
-    steadyChildren,
-    longSleep(60 * 60 * 1000),
-    fastRetry(workflow.workflowInfo().attempt),
-  ]);
 }
