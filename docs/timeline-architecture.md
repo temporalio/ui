@@ -1,218 +1,123 @@
 # Timeline & Event History Architecture
 
-## Core Principle: One Copy, One Truth
+The mental model and the invariants behind the workflow timeline / event
+history. It deliberately avoids line-by-line mechanics (those live in the code
+and rot fast here) — read it for _why_ the pieces are shaped the way they are.
 
-All event data lives in a **single module-level singleton** (`grouped-event-buffer.ts`).
-Consumers read it via `getEventArray()` / `getGroupArray()`. A thin `bufferVersion`
-signal and `fullEventHistory` store expose it to Svelte, but they carry references
-to the same objects — never copies.
+Key files: `services/grouped-event-buffer.ts`, `services/fetch-bidirectional.ts`,
+`services/live-poll.ts`, `layouts/workflow-run-layout.svelte`,
+`components/lines-and-dots/timeline-graph/`.
+
+## The model: one store, one signal
+
+All event data lives in a single module-level singleton, the
+**grouped-event-buffer**. Two producers feed it and the UI reads from it:
 
 ```mermaid
 flowchart LR
-    API["API / live stream"] -->|processEvent| BUF
-
-    subgraph BUF["grouped-event-buffer.ts (singleton)"]
-        direction TB
-        EV["events[]<br/>one array, no copies"]
-        GR["groups[]<br/>metadata only — stores IDs + refs"]
-        SO["soloEvents[]<br/>WorkflowExecutionStarted etc."]
-        ID["liveSeenIds Set<br/>dedup guard"]
-    end
-
-    BUF -->|getEventArray| TL["Timeline layout"]
-    BUF -->|getGroupArray| HL["History layout"]
-    BUF -->|getEventArray| WD["Workflow Details"]
-
-    BUF -->|bufferVersion signal| TL
-    BUF -->|onLatestGroup callback| HL
+    FETCH["fetch-bidirectional<br/>(2 cursors)"] --> ING
+    LIVE["live-poll<br/>(long-poll)"] --> ING
+    ING["ingest()"] --> BUF["grouped-event-buffer<br/>groupsById · seenIds · soloEvents"]
+    BUF -->|getGroupArray / getEventArray| UI["timeline & history layouts"]
+    BUF -.->|bufferVersion signal| UI
 ```
 
-### Key tenets
+The buffer is **plain TypeScript — no `$state`, no stores inside the module.**
+Svelte reactivity is entered only at the boundary: the layout bumps a single
+`bufferVersion` writable after each batch of events, and consumers re-read the
+buffer in a `$derived` that depends on `$bufferVersion`. The signal carries only
+"something changed" — never the data itself.
 
-| Tenet                        | How                                                                                                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **No second data structure** | `EventGroup` is a metadata envelope — it stores event IDs and a reference to the head event; it does not copy field values                              |
-| **No duplicate objects**     | `liveSeenIds` rejects any event ID seen before; `appendLiveEvent` and `processEvent` both gate on this set                                              |
-| **Lazy detail rendering**    | Raw event payload is read from the existing array entry only when a detail panel opens — not on every group build                                       |
-| **Solo events included**     | `WorkflowExecutionStarted` events that don't belong to a group live in `soloEvents[]` and are merged into `getEventArray()` at read time                |
-| **Reactive signal is cheap** | `bufferVersion` is a plain Svelte `writable(0)` incremented on each buffer flush; consumers `$derived` off it to re-read without diffing the full array |
+Why not make the buffer reactive (Svelte `$state`/`SvelteMap`)? At tens of
+thousands of events, per-item reactivity means per-event signal churn. Mutating
+plain structures silently and signalling once per batch is the whole point.
 
----
+## Invariants
 
-## Group Assembly: Park-and-Flush Pattern
+These change slowly; rely on them.
 
-Temporal events arrive out of order. A group (Activity, Timer, Child Workflow, …) is made up of 2–5 events where only the **head event** (e.g. `ActivityTaskScheduled`) carries the group identity. Followers (Started, Completed) reference the head by ID.
+1. **One copy of each event.** An event lives in exactly one group's `eventList`
+   (or in `soloEvents`). Nothing is copied into a second structure.
+2. **A group is visible only once its head has arrived.** Followers that arrive
+   first are parked and flushed in when the head lands — no stub/partial groups.
+3. **Dedup is a single set.** Both fetch cursors and the live poll pass through
+   the same `seenIds` guard, so overlap between them is dropped once.
+4. **Metadata changes swap the group reference.** `enrichGroups` hands back a
+   _new_ group object when a group's pending state changes (see Reactivity).
+5. **UI updates only via `bufferVersion` or a fresh array reference** — never by
+   the UI observing buffer internals.
 
-Two separate sources can deliver events concurrently:
+## Group assembly (park-and-flush)
 
-- **Bidirectional fetch** — ascending cursor from event 1, descending cursor from the last event, racing toward the middle.
-- **Live poll** — long-poll at the frontier while a workflow is running.
+A group (Activity, Timer, Child Workflow, Nexus, …) is 2–5 events where only the
+**head** (e.g. `ActivityTaskScheduled`) carries the group id; followers
+(Started, Completed, …) reference it. Events do not arrive in order — the
+descending fetch cursor delivers higher ids first, and the live poll interleaves.
 
-Both use the same core pattern: **park followers invisibly until the head arrives, then flush them into the group in one shot.**
+`ingest()` is the single path for both producers:
 
-```mermaid
-flowchart TD
-    subgraph SOURCES["Event sources"]
-        ASC["Ascending cursor\n(processEvent)"]
-        DESC["Descending cursor\n(processEvent)"]
-        LIVE["Live poll\n(appendLiveEvent)"]
-    end
+- **Head** → create the group, then flush any parked followers into it.
+- **Follower, head present** → insert into the group (kept sorted by event id).
+- **Follower, head absent** → park under the head id until the head arrives.
+- **Non-group event** (WorkflowExecutionStarted/Completed/…) → `soloEvents`.
 
-    ASC & DESC --> PE["processEvent(event)"]
-    LIVE --> ALE["appendLiveEvent(event)"]
+There is no separate live-vs-fetch store or reconciliation step: because both
+producers share `ingest()`, `seenIds`, and one `groupsById` map, a duplicate
+from either side is simply dropped.
 
-    PE -->|isHead = true| POOL["groupPool slot\neventToGroup[slot] = poolIdx+1"]
-    PE -->|isHead = false| ATF["attachFollower(headSlotIdx, followerSlotIdx)"]
+## Reactivity: why references matter
 
-    ATF -->|head already in pool| ATFP["attachFollowerToPool\n→ insertEventById into group\n→ eventSlots[slot] = null"]
-    ATF -->|head not yet in pool| PF["pendingFollowers.set(headSlot, followerSlots[])"]
+Consumers track groups **by reference** (the timeline row pool reuses a slot
+while `prev.group === group`; detail views read `group.pendingActivity` in a
+`$derived`). So a change that mutates a group _in place_ without adding an event
+— e.g. pausing a pending activity flips a `describe` flag but emits no history
+event — is invisible: the reference is unchanged and nothing re-derives.
 
-    POOL -->|flush| PF_FLUSH["flush pendingFollowers\n→ attachFollowerToPool × N"]
-    POOL -->|flush| LPF_FLUSH["flush livePendingFollowers\n→ insertEventById × N\n→ eventToGroup[slot] = poolIdx+1"]
+`enrichGroups` therefore **clones the group** (preserving its accessor getters,
+sharing its `eventList`) and swaps the new reference into the store whenever
+pending metadata actually changes. Appends are already covered because they grow
+`eventList`, which the row pool keys on. Rule of thumb: **any buffer change a
+view must see either grows `eventList` or produces a new group reference.**
 
-    ALE -->|isHead = true| LG["liveGroups entry\n+ flush livePendingFollowers"]
-    ALE -->|head in liveGroups| LG_EXT["extend live group directly"]
-    ALE -->|head in groupPool| POOL_EXT["extend pool group directly\n(Option B)"]
-    ALE -->|head unknown| LPF["livePendingFollowers.set(headId, events[])"]
-```
+## Why bidirectional fetch (and why 2× is the ceiling)
 
-### Four resolution paths for a follower event
+Temporal's history API is **token-paginated**: each page's cursor comes from the
+previous page, so you can't seek to an arbitrary offset or fan out N parallel
+requests. The only two anchors available without a prior request are
+ascending-from-1 and descending-from-newest, so `fetch-bidirectional` runs those
+two cursors concurrently until they meet in the middle — ~2× throughput on large
+histories, and the descending cursor's first page gives an immediate total-count
+estimate for sizing the timeline.
 
-| Source                   | Head already where? | Action                                                                                  |
-| ------------------------ | ------------------- | --------------------------------------------------------------------------------------- |
-| `processEvent` (bidir)   | groupPool           | `attachFollowerToPool` — inserts immediately, nulls raw slot                            |
-| `processEvent` (bidir)   | Nowhere yet         | `pendingFollowers` map — parks slot index; flushed when head arrives                    |
-| `appendLiveEvent` (live) | liveGroups          | Extends live group's `eventList` in place                                               |
-| `appendLiveEvent` (live) | groupPool           | Extends pool group's `eventList` directly; marks `eventToGroup[followerSlot]`           |
-| `appendLiveEvent` (live) | Nowhere yet         | `livePendingFollowers` map — parks converted `WorkflowEvent`; flushed when head arrives |
+Breaking past 2× would need a _server_ change (e.g. an endpoint returning several
+valid cursors at once), not a client one. Offset/page-number pagination is not
+the answer — it degrades to an O(offset) scan server-side and still can't produce
+independent start points.
 
-**A group only becomes visible in `getGroupArray()` once its head has been processed.** No partial or stub groups are rendered.
+## Virtualization
 
-### What each map stores
+The timeline can have tens of thousands of rows; only a small windowed pool is
+ever in the DOM. Rows are absolutely-positioned HTML divs (not SVG).
 
-```
-pendingFollowers:    Map<headSlotIdx: number, followerSlotIdx[]: number[]>
-                     ↑ slot indices only — raw HistoryEvent stays in eventSlots[]
-
-livePendingFollowers: Map<headEventId: string, WorkflowEvent[]>
-                      ↑ already-converted events — appendLiveEvent never writes to eventSlots
-```
-
-One copy of each event exists at any time — either waiting in a park map, or committed inside `group.eventList`.
-
-### Dedup when both sources deliver the same event
-
-`attachFollowerToPool` guards with:
-
-```
-if (eventToGroup[followerSlotIdx] !== 0) { null the slot; return; }
-```
-
-If `livePendingFollowers` already claimed a slot (by writing `eventToGroup[followerSlotIdx]` during flush), the bidirectional cursor's delivery of the same event is silently discarded.
-
-### Live groups in `getGroupArray()`
-
-Complete live groups (head delivered by live poll) are included alongside pool groups. Once `processEvent` claims the head (`eventToGroup[headSlot] !== 0`) the live group is excluded — the pool group takes over with an identical or superset `eventList`.
-
----
-
-## Reactivity: Events and Callbacks, Not Svelte Primitives
-
-The buffer is **plain TypeScript** — no `$state`, no `$derived`, no stores inside the module.
-Svelte's reactive graph is only entered at the outermost boundary, via two narrow escape hatches.
-
-```mermaid
-flowchart TD
-    subgraph NEW["✅ New approach (buffer + narrow signals)"]
-        direction LR
-        N1["Plain TS array mutated<br/>in-place — no reactive cost"] -->|batch complete| N2["bufferVersion.set(v+1)<br/>one integer write"]
-        N2 -->|$derived reads version| N3["Consumer calls getEventArray()<br/>reads already-built array — O(1)"]
-        N1 -->|group head appended| N4["onLatestGroup() fires<br/>registered callback"]
-        N4 --> N5["Layout calls getGroupArray()<br/>reads cached sorted slice — O(1)"]
-    end
-```
-
-```mermaid
-flowchart TD
-    subgraph OLD["❌ Old approach (stores)"]
-        direction LR
-        O1["Svelte writable store<br/>holds full WorkflowEvent[]"] -->|every push triggers| O2["$derived chains re-run<br/>across all subscribers"]
-        O2 --> O3["Full array diff + re-render<br/>at 50k events = jank"]
-    end
-```
-
-### Why this matters at scale
-
-|                  | Svelte store approach                           | Buffer + signal approach                                                  |
-| ---------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
-| 10 k event push  | Re-runs every `$derived` chain for each push    | Mutates array silently; one `bufferVersion` tick at end                   |
-| Subscriber count | Every component watching the store re-evaluates | Only components that read `bufferVersion` or register via `onLatestGroup` |
-| Memory per event | Two copies — one in store, one in group         | One copy in `events[]`; group holds a reference to the same object        |
-| Render trigger   | Svelte decides (potentially every frame)        | Explicit: either a version bump or a callback — nothing else              |
-
-### The two signal types
-
-**`bufferVersion`** — a plain `writable(0)`. Consumers write:
-
-```svelte
-let rows = $derived.by(() => {
-  $bufferVersion;           // subscribe to the tick
-  return getEventArray();   // read the already-built array
-});
-```
-
-No array is passed through the signal. The signal carries only the intent to re-read.
-
-**`onLatestGroup(cb)`** — a callback registration (pub/sub, not Svelte reactive). Layouts register on mount and receive a teardown function. The buffer calls every registered callback synchronously after appending a new group head. No Svelte primitive involved — the callback fires imperative code that then reassigns a `$state` variable once, queueing exactly one Svelte flush.
-
----
-
-## Virtualization: Scroll-Driven Window + Row Pool
-
-The timeline can have tens of thousands of rows; only a small pooled window is
-ever in the DOM. Rows are plain absolutely-positioned **HTML** divs (not SVG).
-
-```mermaid
-flowchart TD
-    A["scroll / wheel / touchmove"] --> B["pokeSampler: (re)start the rAF loop"]
-    B --> C["rAF: read container offset via getBoundingClientRect\n→ visible pixel band"]
-    C --> D{band changed?}
-    D -- no, N frames --> E["idle out (loop stops)"]
-    D -- yes --> F["getWindowBounds(band) → [start, end) row indices"]
-    F --> G["pool re-points its slots to those groups\n(no create/destroy — props update in place)"]
-    G --> C
-```
-
-- **The container is the full drawn height** (`svgHeight`) and scrolls with the
-  page inside its overflow ancestor (found via `findScrollParent`, in practice
-  `#content-wrapper`). There is no `translateY`, no sentinel, and no spacer div —
-  the page scrolls the tall container directly.
-- **Band measurement is scroll-driven, per frame.** A self-driven `requestAnimationFrame`
-  loop reads the container's offset within its scroll parent each frame and idles
-  out after a few still frames. It's kept alive by `scroll` **and** `wheel` /
-  `touchmove`, because a wheel/trackpad fling fires `wheel` but coalesces `scroll`
-  — an event-only measure goes stale mid-fling and rows blank out. (This replaced
-  an earlier IntersectionObserver approach, which the browser throttles during
+- **Row pool, not keyed `{#each}`.** A fixed set of slots (keyed by slot index)
+  is reused; as you scroll, each slot re-points to a new group and only props
+  update — no mount/unmount churn (which caused major-GC pauses).
+- **Scroll-driven window, measured per frame.** A self-driven `requestAnimationFrame`
+  loop reads the container's offset within its scroll parent to compute the
+  visible band, then idles out after a few still frames. It listens to
+  `scroll` + `wheel`/`touchmove` because a trackpad fling coalesces `scroll`.
+  (This replaced an IntersectionObserver approach the browser throttled during
   fast scroll.)
-- **`getWindowBounds`** is the closed-form inverse of `getRowY` — it maps the
-  visible band to a `[start, end)` row-index range (ascending/descending/pending-gap
-  aware), plus `OVERSCAN` rows on each side.
-- **Row pool.** Instead of a keyed `{#each}` that creates/destroys rows as the
-  window slides, a fixed-size set of slots (keyed by slot **index**) is reused. As
-  you scroll, each slot re-points to a new group — the `<li>` and its component
-  instance stay mounted and only props update. This removed the `cloneNode` /
-  insert / effect-teardown churn that was tripping frequent major-GC pauses.
+- **Closed-form window bounds.** `getWindowBounds` is the analytic inverse of
+  `getRowY`, mapping the pixel band to a `[start, end)` row range plus overscan —
+  no per-row measurement.
 
-### Positioning math (`timeline-graph/timeline-positioning.ts`)
+### Loading-gap positioning
 
-- `getRowY(i, …)` — y (px) for the group at index `i`; descending-cursor rows
-  shift down by `pendingGroupCount` to open the loading gap.
-- `getPendingBlockY(…)` — top of the skeleton gap rectangle.
-- `getDescStart` / `getTotalForY` — locate the cursor split and the descending-sort
-  denominator.
-- Row height and dot radius come from `timeline-graph/constants.ts`
-  (`ROW_HEIGHT`, `RADIUS`, `GUTTER`); the color helpers live in `lines-and-dots/colors.ts`.
-
-> Point-in-time change summaries (regressions fixed, tests added, test-workflow
-> setup) intentionally live in the PR description and git history, not here, so
-> this document can stay a description of the _current_ architecture.
+While the fetch streams, descending-cursor rows fill from the top and ascending
+from the bottom, with a shrinking skeleton gap between. `getRowY` is therefore a
+two-segment piecewise function (the descending segment is offset by the pending
+row count derived from `descMinId` / `totalExpectedEvents`). Once the fetch
+completes the pending count is 0 and it collapses to a single linear map — so the
+piecewise math only runs during load. Geometry lives in `timeline-positioning.ts`;
+time-axis compression of idle gaps in `timeline.svelte.ts` / `timeline-scale.svelte.ts`.
