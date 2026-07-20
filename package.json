@@ -40,7 +40,6 @@
     "test": "TZ=UTC vitest",
     "perf:signals": "esno scripts/perf-signals.ts",
     "perf:events": "esno scripts/perf-events.ts",
-    "preview:workflows": "esno scripts/preview-workflows.ts",
     "test:ui": "TZ=UTC vitest --ui",
     "test:coverage": "TZ=UTC vitest run --coverage",
     "test:e2e": "PW_MODE=e2e playwright test tests/e2e",
