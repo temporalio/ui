@@ -175,6 +175,7 @@
     );
   }
 
+  // svelte-ignore state_referenced_locally
   const initialData: z.infer<typeof schema> = {
     ...formDefaults,
     input: '',
