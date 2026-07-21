@@ -129,7 +129,7 @@ export const resetActivity = async ({
 };
 
 export const ACTIVITY_OPTIONS_UPDATE_MASK =
-  'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts';
+  'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts,startDelay';
 
 export const updateActivityOptions = async ({
   namespace,

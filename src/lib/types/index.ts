@@ -190,7 +190,9 @@ export type ActivityUpdateOptionsRequest =
   temporal.api.workflowservice.v1.IUpdateActivityOptionsRequest;
 export type ActivityUpdateOptionsResponse =
   temporal.api.workflowservice.v1.IUpdateActivityOptionsResponse;
-export type ActivityOptions = temporal.api.activity.v1.IActivityOptions;
+export type ActivityOptions = temporal.api.activity.v1.IActivityOptions & {
+  startDelay?: string;
+};
 
 export type WorkflowPropertiesModifiedEventAttributes =
   temporal.api.history.v1.IWorkflowPropertiesModifiedEventAttributes;

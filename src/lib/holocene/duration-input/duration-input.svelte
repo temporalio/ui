@@ -117,6 +117,7 @@
     hintText?: string;
     hintTextAbove?: string;
     error?: boolean;
+    disabled?: boolean;
     class?: ClassNameValue;
     inputClass?: ClassNameValue;
   }
@@ -141,6 +142,7 @@
     hintText,
     hintTextAbove,
     error = false,
+    disabled = false,
     units = DEFAULT_UNITS as T,
     initialUnit = 'second(s)' as ExtractLabel<T>,
     required = false,
@@ -193,19 +195,22 @@
       'surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50',
       inputClass,
       error && 'border-danger focus-within:ring-danger/50',
+      disabled && 'cursor-not-allowed opacity-50',
     )}
   >
     <input
       {id}
-      class="flex h-full grow border-r border-subtle bg-transparent p-2 focus-visible:outline-none"
+      class="flex h-full grow border-r border-subtle bg-transparent p-2 focus-visible:outline-none disabled:cursor-not-allowed"
       type="number"
+      {disabled}
       bind:value={rawValue}
       {...inputProps}
       oninput={composeEventHandlers(handleNumberInput, inputProps.oninput)}
     />
     <select
       id="{id}-unit-select"
-      class="surface-secondary h-full pl-2 focus-visible:outline-none"
+      class="surface-secondary h-full pl-2 focus-visible:outline-none disabled:cursor-not-allowed"
+      {disabled}
       bind:value={unit}
       onchange={handleUnitChange}
     >

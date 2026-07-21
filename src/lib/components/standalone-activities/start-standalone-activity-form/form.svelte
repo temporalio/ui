@@ -111,7 +111,7 @@
       summary: z.string().default(''),
       details: z.string().default(''),
       scheduleToStartTimeout: z.string().default(''),
-      startDelay: z.string().optional(''),
+      startDelay: z.string().default(''),
       heartbeatTimeout: z.string().default(''),
       initialInterval: z.string().default(''),
       backoffCoefficient: z.string().default(''),
@@ -138,7 +138,7 @@
       }
     });
 
-  // svelte-ignore state_referenced_locally     
+  // svelte-ignore state_referenced_locally
   const initialData: z.infer<typeof schema> = {
     ...formDefaults,
     input: '',

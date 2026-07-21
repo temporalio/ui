@@ -77,6 +77,8 @@ export const Strings = {
   'form-start-delay-label': 'Start Delay',
   'form-start-delay-hint':
     'Determines the amount of time to wait before initiating an Activity Execution.',
+  'form-start-delay-disabled-hint':
+    'Start Delay cannot be changed after the first Activity attempt has been dispatched.',
   'form-search-attributes-heading': 'Custom Search Attributes',
   'form-search-attributes-description':
     'Indexed fields used in a List Filter to filter a list of Standalone Activities.',
