@@ -19,7 +19,7 @@ import { minimumVersionRequired } from '$lib/utilities/version-check';
 const requestWithActivityFallback = async <T>(
   route: string,
   init: Parameters<typeof requestFromAPI>[1],
-): Promise<T> => {
+): Promise<T | undefined> => {
   const fallbackRoute = route.replace(
     '/activities-deprecated/',
     '/activities/',
@@ -55,21 +55,23 @@ export const pauseActivity = async ({
   reason?: string;
 }): Promise<ActivityPauseResponse> => {
   const route = routeForApi('activity.pause', {
-    namespace,
+    namespace: namespace ?? '',
   });
 
-  return requestWithActivityFallback(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        execution,
-        reason,
-        id,
-        type,
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestWithActivityFallback<ActivityPauseResponse>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          execution,
+          reason,
+          id,
+          type,
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? {}
+  );
 };
 
 export const unpauseActivity = async ({
@@ -80,20 +82,22 @@ export const unpauseActivity = async ({
   identity,
 }: ActivityUnpauseRequest): Promise<ActivityUnpauseResponse> => {
   const route = routeForApi('activity.unpause', {
-    namespace,
+    namespace: namespace ?? '',
   });
 
-  return requestWithActivityFallback(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        execution,
-        id,
-        type,
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestWithActivityFallback<ActivityUnpauseResponse>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          execution,
+          id,
+          type,
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? {}
+  );
 };
 
 export const resetActivity = async ({
@@ -105,22 +109,27 @@ export const resetActivity = async ({
   identity,
 }: ActivityResetRequest): Promise<ActivityResetResponse> => {
   const route = routeForApi('activity.reset', {
-    namespace,
+    namespace: namespace ?? '',
   });
 
-  return requestWithActivityFallback(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        execution,
-        id,
-        type,
-        resetHeartbeat,
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestWithActivityFallback<ActivityResetResponse>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          execution,
+          id,
+          type,
+          resetHeartbeat,
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? {}
+  );
 };
+
+export const ACTIVITY_OPTIONS_UPDATE_MASK =
+  'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts,startDelay';
 
 export const updateActivityOptions = async ({
   namespace,
@@ -131,22 +140,22 @@ export const updateActivityOptions = async ({
   identity,
 }: ActivityUpdateOptionsRequest): Promise<ActivityUpdateOptionsResponse> => {
   const route = routeForApi('activity.update-options', {
-    namespace,
+    namespace: namespace ?? '',
   });
 
-  const fullMask =
-    'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts';
-  return requestWithActivityFallback(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        execution,
-        id,
-        type,
-        activityOptions,
-        updateMask: fullMask,
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestWithActivityFallback<ActivityUpdateOptionsResponse>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          execution,
+          id,
+          type,
+          activityOptions,
+          updateMask: ACTIVITY_OPTIONS_UPDATE_MASK,
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? {}
+  );
 };

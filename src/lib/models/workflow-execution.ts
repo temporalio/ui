@@ -12,6 +12,7 @@ import type { Callback } from '$lib/types/nexus';
 import type {
   DecodedWorkflowSearchAttributes,
   ListWorkflowExecutionsResponse,
+  MostRecentWorkflowVersionStamp,
   WorkflowExecution,
   WorkflowExecutionAPIResponse,
   WorkflowSearchAttributes,
@@ -49,17 +50,19 @@ const toPendingNexusOperations = (
   return operations.map((operation): PendingNexusOperation => {
     return {
       ...operation,
-      state: toPendingNexusOperationStateReadable(operation.state),
+      state: toPendingNexusOperationStateReadable(operation.state ?? undefined),
     };
   });
 };
 
-const toCallbacks = (callbacks?: Callbacks): Callbacks => {
+const toCallbacks = (callbacks?: Callbacks): Callback[] => {
   if (!callbacks) return [];
   return callbacks.map((callback): Callback => {
     return {
       ...callback,
-      state: toCallbackStateReadable(callback.state),
+      blockedReason: callback.blockedReason ?? undefined,
+      callback: (callback.callback ?? undefined) as Callback['callback'],
+      state: toCallbackStateReadable(callback.state ?? undefined),
     };
   });
 };
@@ -83,7 +86,7 @@ const getStartDelay = ({
 }: {
   executionTime: string;
   startTime: string;
-}): string => {
+}): string | undefined => {
   if (!executionTime || !startTime) return undefined;
   const delayMs =
     new Date(executionTime).getTime() - new Date(startTime).getTime();
@@ -96,61 +99,60 @@ const getStartDelay = ({
 export const toWorkflowExecution = (
   response?: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
-  const searchAttributes = toSearchAttributes(
-    response.workflowExecutionInfo.searchAttributes,
-  );
-  const memo = response.workflowExecutionInfo.memo;
-  const name = response.workflowExecutionInfo.type.name;
-  const id = response.workflowExecutionInfo.execution.workflowId;
-  const runId = response.workflowExecutionInfo.execution.runId;
-  const startTime = response.workflowExecutionInfo.startTime;
-  const endTime = response.workflowExecutionInfo.closeTime;
-  const executionTime = response.workflowExecutionInfo.executionTime;
-  const status = toWorkflowStatusReadable(
-    response.workflowExecutionInfo.status,
-  );
+  const info = response?.workflowExecutionInfo;
+  const searchAttributes = toSearchAttributes(info?.searchAttributes ?? {});
+  const memo = info?.memo ?? {};
+  const name = info?.type?.name ?? '';
+  const id = info?.execution?.workflowId ?? '';
+  const runId = info?.execution?.runId ?? '';
+  const startTime = info?.startTime ?? '';
+  const endTime = info?.closeTime ?? '';
+  const executionTime = info?.executionTime ?? '';
+  const status = toWorkflowStatusReadable(info?.status ?? null);
   const isRunning = status === 'Running';
   const isPaused = status === 'Paused';
-  const historyEvents = response.workflowExecutionInfo.historyLength;
-  const historySizeBytes = response.workflowExecutionInfo.historySizeBytes;
+  const historyEvents = info?.historyLength ?? '';
+  const historySizeBytes = info?.historySizeBytes ?? '';
   const url = `/workflows/${id}/${runId}`;
   const taskQueue =
     response?.executionConfig?.taskQueue?.name ||
-    response?.workflowExecutionInfo?.taskQueue;
-  const mostRecentWorkerVersionStamp =
-    response?.workflowExecutionInfo?.mostRecentWorkerVersionStamp;
-  const assignedBuildId = response?.workflowExecutionInfo?.assignedBuildId;
-  const parentNamespaceId = response?.workflowExecutionInfo?.parentNamespaceId;
-  const parent = response?.workflowExecutionInfo?.parentExecution;
-  const stateTransitionCount =
-    response.workflowExecutionInfo.stateTransitionCount;
+    response?.workflowExecutionInfo?.taskQueue ||
+    undefined;
+  const mostRecentWorkerVersionStamp = (response?.workflowExecutionInfo
+    ?.mostRecentWorkerVersionStamp ?? undefined) as
+    | MostRecentWorkflowVersionStamp
+    | undefined;
+  const assignedBuildId =
+    response?.workflowExecutionInfo?.assignedBuildId ?? undefined;
+  const parentNamespaceId =
+    response?.workflowExecutionInfo?.parentNamespaceId ?? undefined;
+  const parent = response?.workflowExecutionInfo?.parentExecution ?? undefined;
+  const stateTransitionCount = info?.stateTransitionCount ?? '';
   const defaultWorkflowTaskTimeout =
-    response.executionConfig?.defaultWorkflowTaskTimeout;
+    response?.executionConfig?.defaultWorkflowTaskTimeout ?? undefined;
   const workflowExecutionTimeout =
-    response.executionConfig?.workflowExecutionTimeout;
+    response?.executionConfig?.workflowExecutionTimeout ?? undefined;
   const pendingActivities: PendingActivity[] = toPendingActivities(
-    response.pendingActivities,
+    response?.pendingActivities ?? [],
   );
   const pendingChildren: PendingChildren[] = response?.pendingChildren ?? [];
   const pendingNexusOperations: PendingNexusOperation[] =
     toPendingNexusOperations(response?.pendingNexusOperations);
-  const pendingWorkflowTask = response?.pendingWorkflowTask;
+  const pendingWorkflowTask = response?.pendingWorkflowTask ?? undefined;
   const callbacks = toCallbacks(response?.callbacks);
-  const rootExecution = response.workflowExecutionInfo?.rootExecution;
-  const versioningInfo = response.workflowExecutionInfo?.versioningInfo;
-  const priority = response.workflowExecutionInfo?.priority;
-  const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
+  const rootExecution = info?.rootExecution ?? undefined;
+  const versioningInfo = info?.versioningInfo ?? undefined;
+  const priority = info?.priority ?? undefined;
+  const workflowExtendedInfo = response?.workflowExtendedInfo ?? {};
   const startDelay = getStartDelay({ executionTime, startTime });
-  const externalPayloadCount =
-    response?.workflowExecutionInfo?.externalPayloadCount;
-  const externalPayloadSizeBytes =
-    response?.workflowExecutionInfo?.externalPayloadSizeBytes;
+  const externalPayloadCount = info?.externalPayloadCount ?? undefined;
+  const externalPayloadSizeBytes = info?.externalPayloadSizeBytes ?? undefined;
 
   let summary;
   let details;
   if (response?.executionConfig?.userMetadata) {
-    summary = response?.executionConfig?.userMetadata?.summary;
-    details = response?.executionConfig?.userMetadata?.details;
+    summary = response?.executionConfig?.userMetadata?.summary ?? undefined;
+    details = response?.executionConfig?.userMetadata?.details ?? undefined;
   }
 
   return {

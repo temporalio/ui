@@ -5,10 +5,10 @@
   import type { Meta } from '@storybook/svelte';
   import type { ComponentProps } from 'svelte';
 
-  import WorkflowStatus from './workflow-status.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
 
   export const meta = {
-    title: 'Workflow Status',
+    title: 'Execution Status',
     component: WorkflowStatus,
     args: {
       count: undefined as number | undefined,

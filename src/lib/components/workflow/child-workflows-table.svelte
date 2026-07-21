@@ -1,4 +1,5 @@
 <script lang="ts">
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -8,8 +9,6 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-
-  import WorkflowStatus from '../workflow-status.svelte';
 
   interface Props {
     children?: ChildWorkflowClosedEvent[];

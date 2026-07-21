@@ -17,25 +17,21 @@ describe('getFormSpecFromSpec', () => {
   });
 
   it('fills in defaults for a bare structured calendar', () => {
-    const specs = getFormSpecFromSpec({
+    const [spec] = getFormSpecFromSpec({
       structuredCalendar: [{}],
     } as ScheduleSpec);
 
-    expect(specs).toEqual([
-      {
-        kind: 'frozen',
-        calendar: {
-          dayOfMonth: [{ start: 1, end: 31, step: 1 }],
-          dayOfWeek: [{ start: 0, end: 6, step: 1 }],
-          hour: [{ start: 0, end: 0, step: 1 }],
-          minute: [{ start: 0, end: 0, step: 1 }],
-          second: [{ start: 0, end: 0, step: 1 }],
-          month: [{ start: 1, end: 12, step: 1 }],
-          year: undefined,
-          comment: '',
-        },
-      },
-    ]);
+    expect(spec.kind).toBe('frozen');
+    expect(spec.calendar).toEqual({
+      dayOfMonth: [{ start: 1, end: 31, step: 1 }],
+      dayOfWeek: [{ start: 0, end: 6, step: 1 }],
+      hour: [{ start: 0, end: 0, step: 1 }],
+      minute: [{ start: 0, end: 0, step: 1 }],
+      second: [{ start: 0, end: 0, step: 1 }],
+      month: [{ start: 1, end: 12, step: 1 }],
+      year: undefined,
+      comment: '',
+    });
   });
 
   it('preserves the calendar comment', () => {
@@ -61,19 +57,12 @@ describe('getFormSpecFromSpec', () => {
   });
 
   it('maps intervals to frozen interval specs', () => {
-    const specs = getFormSpecFromSpec({
+    const [spec] = getFormSpecFromSpec({
       interval: [{ interval: '3600s', phase: '60s' }],
     } as ScheduleSpec);
 
-    expect(specs).toEqual([
-      {
-        kind: 'frozen',
-        interval: {
-          interval: '3600s',
-          phase: '60s',
-        },
-      },
-    ]);
+    expect(spec.kind).toBe('frozen');
+    expect(spec.interval).toEqual({ interval: '3600s', phase: '60s' });
   });
 
   it('defaults a missing interval phase to zero seconds', () => {

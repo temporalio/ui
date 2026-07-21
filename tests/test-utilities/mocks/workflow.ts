@@ -12,6 +12,14 @@ export const WORKFLOW_PAUSE_API =
   /\/api\/v1\/namespaces\/[^/]+\/workflows\/[^/]+\/pause/;
 export const WORKFLOW_UNPAUSE_API =
   /\/api\/v1\/namespaces\/[^/]+\/workflows\/[^/]+\/unpause/;
+export const ACTIVITY_PAUSE_API =
+  /\/api\/v1\/namespaces\/[^/]+\/activities(-deprecated)?\/pause/;
+export const ACTIVITY_UNPAUSE_API =
+  /\/api\/v1\/namespaces\/[^/]+\/activities(-deprecated)?\/unpause/;
+export const ACTIVITY_RESET_API =
+  /\/api\/v1\/namespaces\/[^/]+\/activities(-deprecated)?\/reset/;
+export const ACTIVITY_UPDATE_OPTIONS_API =
+  /\/api\/v1\/namespaces\/[^/]+\/activities(-deprecated)?\/update-options/;
 
 export const mockWorkflow = {
   executionConfig: {
@@ -340,4 +348,63 @@ export const mockWorkflowUnpauseApi = (page: Page) => {
       json: {},
     });
   });
+};
+
+const mockActivityPendingActivity = {
+  ...mockWorkflow.pendingActivities[0],
+  activityOptions: {
+    taskQueue: { name: 'rainbow-statuses' },
+    scheduleToCloseTimeout: '0s',
+    scheduleToStartTimeout: '0s',
+    startToCloseTimeout: '30s',
+    heartbeatTimeout: '0s',
+    retryPolicy: {
+      initialInterval: '1s',
+      backoffCoefficient: 2,
+      maximumInterval: '100s',
+      maximumAttempts: 0,
+    },
+  },
+};
+
+export const mockWorkflowWithRunningActivity: WorkflowExecutionAPIResponse = {
+  ...mockRunningWorkflow,
+  pendingActivities: [mockActivityPendingActivity],
+};
+
+export const mockWorkflowWithPausedActivity: WorkflowExecutionAPIResponse = {
+  ...mockRunningWorkflow,
+  pendingActivities: [
+    {
+      ...mockActivityPendingActivity,
+      paused: true,
+      pauseInfo: {
+        manual: {
+          reason: 'Testing activity pause',
+          identity: 'test-user',
+        },
+        pauseTime: '2025-01-01T00:00:00Z',
+      },
+    },
+  ],
+};
+
+export const mockActivityPauseApi = (page: Page) => {
+  return page.route(ACTIVITY_PAUSE_API, (route) => route.fulfill({ json: {} }));
+};
+
+export const mockActivityUnpauseApi = (page: Page) => {
+  return page.route(ACTIVITY_UNPAUSE_API, (route) =>
+    route.fulfill({ json: {} }),
+  );
+};
+
+export const mockActivityResetApi = (page: Page) => {
+  return page.route(ACTIVITY_RESET_API, (route) => route.fulfill({ json: {} }));
+};
+
+export const mockActivityUpdateOptionsApi = (page: Page) => {
+  return page.route(ACTIVITY_UPDATE_OPTIONS_API, (route) =>
+    route.fulfill({ json: { activityOptions: {} } }),
+  );
 };

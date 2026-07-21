@@ -6,7 +6,16 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/activity-actions';
+  import {
+    pauseActivity,
+    resetActivity,
+    unpauseActivity,
+  } from '$lib/services/workflow-activities-service';
+  import { toaster } from '$lib/stores/toaster';
+  import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
+  import { getIdentity } from '$lib/utilities/core-context';
 
   import ActivityOptionsUpdateDrawer from './activity-options-update-drawer.svelte';
   import ActivityPauseConfirmationModal from './activity-pause-confirmation-modal.svelte';
@@ -24,6 +33,8 @@
     workflowId: workflow,
     runId: run,
   });
+
+  const identity = getIdentity();
 
   let pauseConfirmationModalOpen = $state(false);
   let unpauseConfirmationModalOpen = $state(false);
@@ -44,6 +55,44 @@
 
   const onUpdate = () => {
     optionsUpdateDrawerOpen = true;
+  };
+
+  const onConfirmPause = async (reason: string) => {
+    await pauseActivity({
+      namespace,
+      execution,
+      id: activity.activityId,
+      reason,
+      identity,
+    });
+    triggerRefresh(Action.Pause);
+  };
+
+  const onConfirmUnpause = async () => {
+    await unpauseActivity({
+      namespace,
+      execution,
+      id: activity.activityId,
+      identity,
+    });
+    triggerRefresh(Action.Unpause);
+  };
+
+  const onConfirmReset = async (resetHeartbeat: boolean) => {
+    await resetActivity({
+      namespace,
+      execution,
+      id: activity.activityId,
+      resetHeartbeat,
+      identity,
+    });
+    triggerRefresh(Action.Reset);
+    toaster.push({
+      variant: 'success',
+      message: translate('activities.reset-success', {
+        activityId: activity.activityId,
+      }),
+    });
   };
 </script>
 
@@ -90,23 +139,20 @@
 
 <ActivityPauseConfirmationModal
   bind:open={pauseConfirmationModalOpen}
-  {namespace}
-  {execution}
-  {activity}
+  activityId={activity.id}
+  onConfirm={onConfirmPause}
 />
 
 <ActivityUnpauseConfirmationModal
   bind:open={unpauseConfirmationModalOpen}
-  {namespace}
-  {execution}
-  {activity}
+  activityId={activity.id}
+  onConfirm={onConfirmUnpause}
 />
 
 <ActivityResetConfirmationModal
   bind:open={resetConfirmationModalOpen}
-  {namespace}
-  {execution}
-  {activity}
+  activityId={activity.id}
+  onConfirm={onConfirmReset}
 />
 
 {#key optionsUpdateDrawerOpen}

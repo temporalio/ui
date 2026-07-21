@@ -5,6 +5,7 @@ import {
   mockClusterApi,
   mockGlobalApis,
   mockNamespaceApi,
+  mockNamespaceWithoutStandaloneActivityStartDelay,
   mockSearchAttributesApi,
   mockSettingsApi,
   mockTaskQueuesApi,
@@ -118,5 +119,28 @@ test.describe('Start a Standalone Activity', () => {
     await startStandaloneActivityPage.submitButton.click();
 
     await expect(startStandaloneActivityPage.timeoutError).toBeVisible();
+  });
+
+  test('shows the Start Delay input when the namespace supports standalone activity start delay', async ({
+    page,
+  }) => {
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    await expect(startStandaloneActivityPage.startDelayInput).toBeVisible();
+  });
+
+  test('hides the Start Delay input when the namespace does not support standalone activity start delay', async ({
+    page,
+  }) => {
+    await mockNamespaceWithoutStandaloneActivityStartDelay(page);
+
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    await expect(
+      startStandaloneActivityPage.startToCloseTimeoutInput,
+    ).toBeVisible();
+    await expect(startStandaloneActivityPage.startDelayInput).toBeHidden();
   });
 });

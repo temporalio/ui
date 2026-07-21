@@ -63,7 +63,7 @@ test.describe('Saved Query Views', () => {
       .toBe('`WorkflowId`="user-view-1"');
 
     await page.getByTestId('create-view-button').click();
-    await page.getByTestId('save-view-modal-input').fill('My View');
+    await page.getByTestId('workflow-save-view-modal-input').fill('My View');
     await page
       .getByLabel('Save as New View')
       .getByTestId('confirm-modal-button')
@@ -90,7 +90,7 @@ test.describe('Saved Query Views', () => {
     await expect(page.getByTestId('my-view')).toBeVisible();
     await page.getByTestId('edit-view-button').click();
 
-    await page.getByTestId('edit-view-modal-input').fill('My View 2');
+    await page.getByTestId('workflow-edit-view-modal-input').fill('My View 2');
     await page
       .getByLabel('Edit View')
       .getByTestId('confirm-modal-button')
@@ -125,7 +125,9 @@ test.describe('Saved Query Views', () => {
       .toBe('`WorkflowId`="user-view-1"');
 
     await page.getByTestId('create-view-button').click();
-    await page.getByTestId('save-view-modal-input').fill('Original view');
+    await page
+      .getByTestId('workflow-save-view-modal-input')
+      .fill('Original view');
     await page
       .getByLabel('Save as New View')
       .getByTestId('confirm-modal-button')

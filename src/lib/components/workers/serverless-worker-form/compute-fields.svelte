@@ -148,27 +148,21 @@
       placeholder={translate('workers.gcp-project-placeholder')}
       required
     />
-    <div class="flex flex-col gap-1.5">
-      <Combobox
-        bind:value={gcpRegion}
-        id="gcpRegion"
-        name="gcpRegion"
-        label={translate('workers.gcp-region-label')}
-        placeholder={translate('workers.gcp-region-placeholder')}
-        options={gcpRegions}
-        noResultsText={translate('common.no-results')}
-        valid={!errors.gcpRegion?.[0]}
-        error={errors.gcpRegion?.[0]}
-        allowCustomValue
-        showChevron
-        required
-      />
-      {#if !errors.gcpRegion?.[0]}
-        <p class="text-xs text-primary">
-          {translate('workers.gcp-region-hint')}
-        </p>
-      {/if}
-    </div>
+    <Combobox
+      bind:value={gcpRegion}
+      id="gcpRegion"
+      name="gcpRegion"
+      label={translate('workers.gcp-region-label')}
+      hintText={translate('workers.gcp-region-hint')}
+      placeholder={translate('workers.gcp-region-placeholder')}
+      options={gcpRegions}
+      noResultsText={translate('common.no-results')}
+      valid={!errors.gcpRegion?.[0]}
+      error={errors.gcpRegion?.[0]}
+      allowCustomValue
+      showChevron
+      required
+    />
     <div class="flex flex-wrap items-end gap-4">
       <Input
         bind:value={gcpWorkerPool}
