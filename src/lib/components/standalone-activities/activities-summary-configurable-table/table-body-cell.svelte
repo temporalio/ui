@@ -91,6 +91,8 @@
       {/if}
     {:else if label === 'State Transitions'}
       {activity.stateTransitionCount ?? ''}
+    {:else if label === 'Execution Time'}
+      <Timestamp dateTime={activity.executionTime} />
     {/if}
   </td>
 {/if}

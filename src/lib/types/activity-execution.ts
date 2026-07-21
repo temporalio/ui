@@ -1,13 +1,6 @@
 import type { temporal } from '@temporalio/proto';
 
-import type {
-  ActivityType,
-  Failure,
-  Payloads,
-  SearchAttribute,
-  TaskQueue,
-  UserMetadata,
-} from '.';
+import type { Failure, Payloads } from '.';
 import type { WorkflowSearchAttributes } from './workflows';
 
 // Enum values arrive over REST/JSON as their SCREAMING_SNAKE names, so these are
