@@ -27,7 +27,7 @@ import {
 // "control" here.
 
 const { workflowId, runId } =
-  mockRunningWorkflow.workflowExecutionInfo.execution;
+  mockRunningWorkflow.workflowExecutionInfo!.execution!;
 
 const historyUrl = `/namespaces/default/workflows/${workflowId}/${runId}/history`;
 const pendingActivitiesUrl = `/namespaces/default/workflows/${workflowId}/${runId}/pending-activities`;
