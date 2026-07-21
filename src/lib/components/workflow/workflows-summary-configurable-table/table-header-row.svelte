@@ -7,7 +7,7 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { supportsWorkflowBulkActions } from '$lib/stores/workflow-bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import BatchActions from './batch-actions.svelte';
@@ -42,7 +42,7 @@
 </script>
 
 <tr>
-  {#if !empty && $supportsBulkActions}
+  {#if !empty && $supportsWorkflowBulkActions}
     <th scope="col" class="batch-actions-checkbox-table-cell">
       <Checkbox
         {label}
@@ -56,7 +56,7 @@
     </th>
   {/if}
   <th scope="col" class="w-6"></th>
-  {#if $supportsBulkActions && $batchActionsVisible}
+  {#if $supportsWorkflowBulkActions && $batchActionsVisible}
     <th scope="col" class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
     </th>

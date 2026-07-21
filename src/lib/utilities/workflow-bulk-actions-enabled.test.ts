@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
-import { bulkActionsEnabled } from './bulk-actions-enabled';
+import { workflowBulkActionsEnabled } from './workflow-bulk-actions-enabled';
 
-describe('bulkActionsEnabled', () => {
+describe('workflowBulkActionsEnabled', () => {
   test('returns true when all settings flags are false', () => {
     expect(
-      bulkActionsEnabled({
+      workflowBulkActionsEnabled({
         disableWriteActions: false,
         batchActionsDisabled: false,
         workflowTerminateDisabled: false,
@@ -17,7 +17,7 @@ describe('bulkActionsEnabled', () => {
   describe('returns false', () => {
     test('when `disableWriteActions` is `true`', () => {
       expect(
-        bulkActionsEnabled({
+        workflowBulkActionsEnabled({
           disableWriteActions: true,
         }),
       ).toBe(false);
@@ -25,7 +25,7 @@ describe('bulkActionsEnabled', () => {
 
     test('when `disableWriteActions` is `false`, but `batchActionsDisabled` is `true`', () => {
       expect(
-        bulkActionsEnabled({
+        workflowBulkActionsEnabled({
           disableWriteActions: false,
           batchActionsDisabled: true,
         }),
@@ -34,7 +34,7 @@ describe('bulkActionsEnabled', () => {
 
     test('when `disableWriteActions` and `batchActionsDisabled` are both `false`, but `worklowCancelDisabled` and `workflowTerminateDisabled` are both true', () => {
       expect(
-        bulkActionsEnabled({
+        workflowBulkActionsEnabled({
           disableWriteActions: false,
           batchActionsDisabled: false,
           workflowCancelDisabled: true,

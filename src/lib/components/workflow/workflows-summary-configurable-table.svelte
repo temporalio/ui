@@ -26,6 +26,10 @@
   import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import {
+    getPageSelectionStatus,
+    type PageSelectionStatus,
+  } from '$lib/utilities/batch-selection';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
@@ -156,29 +160,13 @@
 
   let prevClickedRow = $state<VisibleRow | null>(null);
 
-  type PageSelectionStatus = 'checked' | 'unchecked' | 'partial';
-
-  const pageSelectionStatus: PageSelectionStatus = $derived.by(() => {
-    const selectedRunIdSet = new Set($selectedWorkflows.map((w) => w.runId));
-
-    if ($allSelected) {
-      return 'checked';
-    }
-
-    const visibleItemsNotSelected = visiblePaginatedItems.filter(
-      (i) => !selectedRunIdSet.has(i.runId),
-    );
-
-    if (visibleItemsNotSelected.length === visiblePaginatedItems.length) {
-      return 'unchecked';
-    }
-
-    if (visibleItemsNotSelected.length === 0) {
-      return 'checked';
-    }
-
-    return 'partial';
-  });
+  const pageSelectionStatus: PageSelectionStatus = $derived(
+    getPageSelectionStatus(
+      visiblePaginatedItems.map((i) => i.runId),
+      new Set($selectedWorkflows.map((w) => w.runId)),
+      $allSelected,
+    ),
+  );
 
   const handleSelectPage = (
     isSelected: boolean,
