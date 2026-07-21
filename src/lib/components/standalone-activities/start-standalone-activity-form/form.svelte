@@ -13,7 +13,10 @@
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput, {
+    DAYS,
+    DEFAULT_UNITS,
     parseDuration,
+    SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -55,6 +58,7 @@
   import RandomUuidButton from '../../random-uuid-button.svelte';
   import RetryPolicyInput from '../../retry-policy-input.svelte';
   import AddSearchAttributes from '../../workflow/add-search-attributes.svelte';
+  import StartDelayGuard from '../start-delay-guard.svelte';
 
   interface Props {
     namespace: string;
@@ -107,6 +111,7 @@
       summary: z.string().default(''),
       details: z.string().default(''),
       scheduleToStartTimeout: z.string().default(''),
+      startDelay: z.string().default(''),
       heartbeatTimeout: z.string().default(''),
       initialInterval: z.string().default(''),
       backoffCoefficient: z.string().default(''),
@@ -133,11 +138,13 @@
       }
     });
 
+  // svelte-ignore state_referenced_locally
   const initialData: z.infer<typeof schema> = {
     ...formDefaults,
     input: '',
     messageType: '',
     scheduleToStartTimeout: '',
+    startDelay: '',
     summary: '',
     details: '',
     heartbeatTimeout: '',
@@ -307,7 +314,7 @@
       $errors.startToCloseTimeout ? 'border-danger' : '',
     )}
   >
-    <h5>{translate('standalone-activities.form-timeouts-heading')}</h5>
+    <h5>{translate('standalone-activities.form-options-heading')}</h5>
 
     <DurationInput
       id="startToCloseTimeout"
@@ -355,6 +362,17 @@
         {$errors.startToCloseTimeout}
       </p>
     {/if}
+
+    <StartDelayGuard namespace={page.data.namespace}>
+      <DurationInput
+        id="startDelay"
+        label={translate('standalone-activities.form-start-delay-label')}
+        bind:value={$form.startDelay}
+        initialUnit={SECONDS.label}
+        units={[...DEFAULT_UNITS, DAYS]}
+        hintText={translate('standalone-activities.form-start-delay-hint')}
+      />
+    </StartDelayGuard>
   </Card>
 
   {#if advancedOptionsVisible}

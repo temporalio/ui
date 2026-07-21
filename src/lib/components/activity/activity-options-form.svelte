@@ -4,7 +4,11 @@
   import Button from '$lib/holocene/button.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
-  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput, {
+    DAYS,
+    DEFAULT_UNITS,
+    SECONDS,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -14,14 +18,18 @@
     TIMEOUT_UNITS,
   } from '$lib/services/standalone-activities';
   import { toaster } from '$lib/stores/toaster';
-  import type { ActivityOptions } from '$lib/types';
+  import type { ActivityOptions, DescribeNamespaceResponse } from '$lib/types';
   import { has } from '$lib/utilities/has';
+
+  import StartDelayGuard from '../standalone-activities/start-delay-guard.svelte';
 
   type Props = {
     open: boolean;
     activityId: string;
     activityOptions: ActivityOptions | undefined;
     onSave: (activityOptions: ActivityOptions) => Promise<void>;
+    namespace?: DescribeNamespaceResponse;
+    delayed?: boolean;
   };
 
   let {
@@ -29,6 +37,8 @@
     activityId,
     activityOptions: initialOptions,
     onSave,
+    namespace,
+    delayed = false,
   }: Props = $props();
 
   // Form fields are seeded from activity.activityOptions once when the drawer
@@ -59,6 +69,9 @@
   let maximumInterval = $state(
     untrack(() => String(initialOptions?.retryPolicy?.maximumInterval ?? '')),
   );
+  let startDelay = $state(
+    untrack(() => String(initialOptions?.startDelay ?? '')),
+  );
 
   const activityOptions = $derived({
     taskQueue: { name: taskQueue },
@@ -66,6 +79,7 @@
     scheduleToStartTimeout: scheduleToStartTimeout || undefined,
     startToCloseTimeout: startToCloseTimeout || undefined,
     heartbeatTimeout: heartbeatTimeout || undefined,
+    startDelay: startDelay || undefined,
     retryPolicy: {
       maximumAttempts,
       backoffCoefficient,
@@ -210,6 +224,25 @@
         min={0}
         class="max-w-80"
       />
+      {#if namespace}
+        <StartDelayGuard {namespace}>
+          {#if delayed}
+            <DurationInput
+              id="start-delay"
+              label={translate('standalone-activities.form-start-delay-label')}
+              hintTextAbove={translate(
+                'standalone-activities.form-start-delay-hint',
+              )}
+              inputmode="numeric"
+              bind:value={startDelay}
+              initialUnit={SECONDS.label}
+              units={[...DEFAULT_UNITS, DAYS]}
+              min={0}
+              class="max-w-80"
+            />
+          {/if}
+        </StartDelayGuard>
+      {/if}
       <div>
         <Label
           for="task-queue-name"

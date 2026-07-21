@@ -3,10 +3,11 @@
 
   import { page } from '$app/state';
 
+  import ActivityExecutionStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { isActivityDelayed } from '$lib/utilities/delayed-activities';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
   import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
@@ -76,7 +77,10 @@
 {:else}
   <td class={className} data-testid={testId}>
     {#if label === 'Status'}
-      <WorkflowStatus status={toActivityStatus(activity.status)} />
+      <ActivityExecutionStatus
+        status={toActivityStatus(activity.status)}
+        delayed={isActivityDelayed(activity)}
+      />
     {:else if label === 'Start'}
       <Timestamp dateTime={activity.scheduleTime} />
     {:else if label === 'End'}

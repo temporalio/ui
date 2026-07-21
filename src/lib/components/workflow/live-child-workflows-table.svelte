@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -9,8 +10,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-
-  import WorkflowStatus from '../workflow-status.svelte';
 
   interface Props {
     children?: WorkflowExecution[];

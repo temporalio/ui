@@ -69,6 +69,7 @@ export interface ActivityExecutionInfo extends Omit<
   | 'executionDuration'
   | 'stateTransitionCount'
   | 'currentRetryInterval'
+  | 'startDelay'
 > {
   status: ActivityExecutionStatus;
   runState?: string; // only for running activities
@@ -82,6 +83,8 @@ export interface ActivityExecutionInfo extends Omit<
   searchAttributes: WorkflowSearchAttributes;
   sdkName?: string;
   sdkVersion?: string;
+  executionTime?: string;
+  startDelay?: string;
 }
 
 export interface ActivityExecution {
@@ -92,18 +95,17 @@ export interface ActivityExecution {
   longPollToken?: string;
 }
 
-export interface StartActivityExecutionRequest {
-  namespace: string;
-  identity: string;
-  requestId: string;
-  activityId: string;
-  activityType: ActivityType;
-  taskQueue: TaskQueue;
+export interface StartActivityExecutionRequest extends Omit<
+  temporal.api.workflowservice.v1.IStartActivityExecutionRequest,
+  | 'startToCloseTimeout'
+  | 'scheduleToCloseTimeout'
+  | 'scheduleToStartTimeout'
+  | 'retryPolicy'
+  | 'startDelay'
+> {
   startToCloseTimeout: string;
   scheduleToCloseTimeout: string;
   scheduleToStartTimeout: string;
-  input?: Payloads;
-  userMetadata?: UserMetadata;
   retryPolicy?: Partial<RetryPolicy>;
-  searchAttributes?: SearchAttribute;
+  startDelay?: string;
 }

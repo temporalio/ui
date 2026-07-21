@@ -62,7 +62,7 @@ export const Strings = {
   'form-activity-type-label': 'Activity Type',
   'form-activity-type-required': 'Activity Type is required.',
   'form-random-uuid': 'Random UUID',
-  'form-timeouts-heading': 'Activity Timeouts',
+  'form-options-heading': 'Activity Options',
   'form-start-to-close-timeout-label': 'Start to Close Timeout',
   'form-start-to-close-timeout-hint':
     'Maximum time an activity is allowed to execute after being picked up by a worker.',
@@ -74,6 +74,9 @@ export const Strings = {
     'Limits time an activity task can stay in a task queue before a worker picks it up. Defaults to "Schedule to Close Timeout" if not specified.',
   'form-timeout-required':
     'Either "Start to Close Timeout" or "Schedule to Close Timeout" is required.',
+  'form-start-delay-label': 'Start Delay',
+  'form-start-delay-hint':
+    'Determines the amount of time to wait before initiating an Activity Execution.',
   'form-search-attributes-heading': 'Custom Search Attributes',
   'form-search-attributes-description':
     'Indexed fields used in a List Filter to filter a list of Standalone Activities.',
@@ -98,10 +101,12 @@ export const Strings = {
   health: 'Health',
   'retry-state': 'Retry State',
   'timeout-configuration': 'Timeout Configuration',
+  'start-delay': 'Start Delay',
   worker: 'Worker',
   'run-state': 'Run State',
   attempt: 'Attempt',
   'schedule-time': 'Schedule Time',
+  'execution-time': 'Execution Time',
   'execution-duration': 'Execution Duration',
   'last-heartbeat': 'Last Heartbeat',
   'heartbeat-timeout': 'Heartbeat Timeout',

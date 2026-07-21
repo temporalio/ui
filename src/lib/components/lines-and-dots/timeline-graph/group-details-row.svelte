@@ -4,7 +4,7 @@
   import { page } from '$app/stores';
 
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';

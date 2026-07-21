@@ -3,7 +3,11 @@ import type { google, temporal } from '@temporalio/proto';
 // api.workflowservice
 
 export type DescribeNamespaceResponse =
-  temporal.api.workflowservice.v1.IDescribeNamespaceResponse;
+  temporal.api.workflowservice.v1.IDescribeNamespaceResponse & {
+    namespaceInfo: temporal.api.workflowservice.v1.IDescribeNamespaceResponse['namespaceInfo'] & {
+      capabilities?: NamespaceCapabilities;
+    };
+  };
 export type DescribeWorkflowExecutionResponse =
   temporal.api.workflowservice.v1.IDescribeWorkflowExecutionResponse;
 export type ListNamespacesResponse =
@@ -19,8 +23,10 @@ export type Capabilities =
   };
 
 export type NamespaceCapabilities = NonNullable<
-  DescribeNamespaceResponse['namespaceInfo']
->['capabilities'];
+  temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
+    standaloneActivityStartDelay?: boolean | null;
+  }
+>;
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
@@ -184,7 +190,9 @@ export type ActivityUpdateOptionsRequest =
   temporal.api.workflowservice.v1.IUpdateActivityOptionsRequest;
 export type ActivityUpdateOptionsResponse =
   temporal.api.workflowservice.v1.IUpdateActivityOptionsResponse;
-export type ActivityOptions = temporal.api.activity.v1.IActivityOptions;
+export type ActivityOptions = temporal.api.activity.v1.IActivityOptions & {
+  startDelay?: string;
+};
 
 export type WorkflowPropertiesModifiedEventAttributes =
   temporal.api.history.v1.IWorkflowPropertiesModifiedEventAttributes;
