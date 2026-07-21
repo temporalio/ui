@@ -13,6 +13,7 @@ export class ActivityCommandsPage {
   readonly pauseReasonInput: Locator;
   readonly resetHeartbeatCheckbox: Locator;
   readonly taskQueueInput: Locator;
+  readonly startDelayInput: Locator;
   readonly pauseConfirmButton: Locator;
   readonly unpauseConfirmButton: Locator;
   readonly resetConfirmButton: Locator;
@@ -53,6 +54,7 @@ export class ActivityCommandsPage {
     this.taskQueueInput = page
       .locator('#task-queue-name')
       .locator('visible=true');
+    this.startDelayInput = this.updateDrawer.locator('#start-delay');
     this.pauseConfirmButton = this.pauseModal.getByRole('button', {
       name: 'Pause',
     });

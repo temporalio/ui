@@ -12,7 +12,6 @@
   import Input from '$lib/holocene/input/input.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Label from '$lib/holocene/label.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     initialTimeoutUnit,
@@ -227,14 +226,7 @@
       />
       {#if namespace}
         <StartDelayGuard {namespace}>
-          <Tooltip
-            text={translate(
-              'standalone-activities.form-start-delay-disabled-hint',
-            )}
-            width={250}
-            bottomLeft
-            hide={delayed}
-          >
+          {#if delayed}
             <DurationInput
               id="start-delay"
               label={translate('standalone-activities.form-start-delay-label')}
@@ -246,10 +238,9 @@
               initialUnit={SECONDS.label}
               units={[...DEFAULT_UNITS, DAYS]}
               min={0}
-              disabled={!delayed}
               class="max-w-80"
             />
-          </Tooltip>
+          {/if}
         </StartDelayGuard>
       {/if}
       <div>

@@ -122,6 +122,7 @@ test.describe.skip('Activity Commands', () => {
 
     await activityCommandsPage.updateButton.click();
     await expect(activityCommandsPage.updateDrawer).toBeVisible();
+    await expect(activityCommandsPage.startDelayInput).toBeHidden();
     await activityCommandsPage.taskQueueInput.fill('new-task-queue');
     await activityCommandsPage.saveButton.click();
 

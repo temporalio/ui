@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { StandaloneActivityCommandsPage } from '~/pages/standalone-activity-commands';
 import {
   mockClusterApi,
+  mockDelayedActivityExecution,
   mockGlobalApis,
   mockNamespaceApi,
   mockPausedActivityExecution,
@@ -106,6 +107,7 @@ test.describe('Standalone Activity Commands', () => {
     await activityCommandsPage.updateMenuItem.click();
 
     await expect(activityCommandsPage.updateDrawer).toBeVisible();
+    await expect(activityCommandsPage.startDelayInput).toBeHidden();
     await activityCommandsPage.taskQueueInput.fill('new-task-queue');
     await activityCommandsPage.saveButton.click();
 
@@ -113,5 +115,21 @@ test.describe('Standalone Activity Commands', () => {
     await expect(page.getByTestId('toast-live-region-polite')).toContainText(
       /Options for Activity .* have been updated\./,
     );
+  });
+
+  test('should show the start delay input when the activity is delayed', async ({
+    page,
+  }) => {
+    await mockStandaloneActivityApi(page, () => mockDelayedActivityExecution);
+    await mockStandaloneActivityUpdateOptionsApi(page);
+
+    await activityCommandsPage.goto({ activityId, runId });
+
+    await expect(activityCommandsPage.moreActionsButton).toBeVisible();
+    await activityCommandsPage.moreActionsButton.click();
+    await activityCommandsPage.updateMenuItem.click();
+
+    await expect(activityCommandsPage.updateDrawer).toBeVisible();
+    await expect(activityCommandsPage.startDelayInput).toBeVisible();
   });
 });

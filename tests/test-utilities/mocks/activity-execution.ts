@@ -48,6 +48,17 @@ export const mockRunningActivityExecution: ActivityExecution = {
   },
 };
 
+export const mockDelayedActivityExecution: ActivityExecution = {
+  runId: baseActivityExecutionInfo.runId,
+  longPollToken: 'long-poll-token',
+  info: {
+    ...baseActivityExecutionInfo,
+    runState: 'PENDING_ACTIVITY_STATE_RUNNING',
+    executionTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    startDelay: '3600s',
+  } as unknown as ActivityExecution['info'],
+};
+
 export const mockPausedActivityExecution: ActivityExecution = {
   runId: baseActivityExecutionInfo.runId,
   longPollToken: 'long-poll-token',

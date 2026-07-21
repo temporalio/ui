@@ -98,6 +98,7 @@ export {
 } from './mocks/batch-operations';
 export {
   mockRunningActivityExecution,
+  mockDelayedActivityExecution,
   mockPausedActivityExecution,
   mockStandaloneActivityApi,
   mockStandaloneActivityPauseApi,
