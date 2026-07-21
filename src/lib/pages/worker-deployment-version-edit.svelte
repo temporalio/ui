@@ -70,6 +70,8 @@
         scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
         maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
         metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
+        minReplicas: scalerDetails.minReplicas,
+        maxReplicas: scalerDetails.maxReplicas,
       }}
       cancelHref={backHref}
       onSubmit={async (data) => {
@@ -81,6 +83,10 @@
                 data.gcpRegion,
                 data.gcpWorkerPool,
                 data.gcpServiceAccount,
+                {
+                  minReplicas: data.minReplicas,
+                  maxReplicas: data.maxReplicas,
+                },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {
                 roleExternalId: data.roleExternalId,

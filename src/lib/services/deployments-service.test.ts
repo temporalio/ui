@@ -3,9 +3,11 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { base } from '$app/paths';
 
 import {
+  buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
   createWorkerDeployment,
   createWorkerDeploymentVersion,
+  decodeGcpCloudRunProviderDetails,
   decodeLambdaProviderDetails,
   decodeScalerDetails,
   deleteWorkerDeployment,
@@ -425,6 +427,50 @@ describe('deployments service', () => {
       const decoded = JSON.parse(atob(scalerData!));
       expect(decoded.scale_up_cooloff_ms).toBe(1000);
       expect(decoded.max_worker_lifetime_ms).toBe(60000);
+    });
+  });
+
+  describe('buildGcpCloudRunComputeConfig', () => {
+    test('builds rate-based scaler details with replica defaults', () => {
+      const result = buildGcpCloudRunComputeConfig(
+        'test-project',
+        'us-central1',
+        'test-pool',
+        'worker@test-project.iam.gserviceaccount.com',
+      );
+      const scalingGroup = result.scalingGroups?.['default'];
+
+      expect(scalingGroup?.provider?.type).toBe('gcp-cloud-run');
+      expect(scalingGroup?.scaler?.type).toBe('rate-based');
+      expect(
+        JSON.parse(atob(scalingGroup?.scaler?.details?.data ?? '')),
+      ).toEqual({ min_count: 0, max_count: 30, initial_count: 0 });
+    });
+
+    test('round-trips custom provider and replica details', () => {
+      const config = buildGcpCloudRunComputeConfig(
+        'test-project',
+        'us-east1',
+        'worker-pool',
+        'worker@example.com',
+        { minReplicas: 4, maxReplicas: 12 },
+      );
+
+      expect(decodeGcpCloudRunProviderDetails(config)).toEqual({
+        gcpProject: 'test-project',
+        gcpRegion: 'us-east1',
+        gcpWorkerPool: 'worker-pool',
+        gcpServiceAccount: 'worker@example.com',
+      });
+      expect(decodeScalerDetails(config)).toMatchObject({
+        minReplicas: 4,
+        maxReplicas: 12,
+      });
+      expect(
+        JSON.parse(
+          atob(config.scalingGroups?.['default']?.scaler?.details?.data ?? ''),
+        ),
+      ).toMatchObject({ initial_count: 4 });
     });
   });
 

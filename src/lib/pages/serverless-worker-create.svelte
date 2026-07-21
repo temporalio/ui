@@ -83,6 +83,10 @@
         data.gcpRegion,
         data.gcpWorkerPool,
         data.gcpServiceAccount,
+        {
+          minReplicas: data.minReplicas,
+          maxReplicas: data.maxReplicas,
+        },
       );
     } else {
       computeConfig = buildLambdaComputeConfig(

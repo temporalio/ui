@@ -16,6 +16,8 @@ const providerFields = {
   gcpRegion: z.string().default(''),
   gcpWorkerPool: z.string().default(''),
   gcpServiceAccount: z.string().default(''),
+  minReplicas: z.number().int().min(0).default(0),
+  maxReplicas: z.number().int().min(1).default(30),
 };
 
 const validateProviderFields = (
@@ -89,6 +91,12 @@ const validateProviderFields = (
         code: z.ZodIssueCode.custom,
         path: ['gcpServiceAccount'],
         message: 'Service Account is required',
+      });
+    if (data.minReplicas > data.maxReplicas)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['minReplicas'],
+        message: 'Min Replicas must be less than or equal to Max Replicas',
       });
   }
 };

@@ -22,6 +22,8 @@
       gcpRegion?: string;
       gcpWorkerPool?: string;
       gcpServiceAccount?: string;
+      minReplicas?: number;
+      maxReplicas?: number;
       scaleUpCooloffMs?: number;
       scaleUpBacklogThreshold?: number;
       maxWorkerLifetimeMs?: number;
@@ -53,6 +55,8 @@
       gcpRegion: initialData.gcpRegion ?? '',
       gcpWorkerPool: initialData.gcpWorkerPool ?? '',
       gcpServiceAccount: initialData.gcpServiceAccount ?? '',
+      minReplicas: initialData.minReplicas ?? 0,
+      maxReplicas: initialData.maxReplicas ?? 30,
       scaleUpCooloffMs: initialData.scaleUpCooloffMs,
       scaleUpBacklogThreshold: initialData.scaleUpBacklogThreshold,
       maxWorkerLifetimeMs: initialData.maxWorkerLifetimeMs,
@@ -98,6 +102,8 @@
         {gcpRegions}
         bind:gcpWorkerPool={$form.gcpWorkerPool}
         bind:gcpServiceAccount={$form.gcpServiceAccount}
+        bind:minReplicas={$form.minReplicas}
+        bind:maxReplicas={$form.maxReplicas}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}

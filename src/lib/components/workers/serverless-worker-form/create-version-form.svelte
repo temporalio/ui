@@ -42,6 +42,8 @@
       gcpRegion: '',
       gcpWorkerPool: '',
       gcpServiceAccount: '',
+      minReplicas: 0,
+      maxReplicas: 30,
       scaleUpCooloffMs: undefined as number | undefined,
       scaleUpBacklogThreshold: undefined as number | undefined,
       maxWorkerLifetimeMs: undefined as number | undefined,
@@ -108,6 +110,8 @@
           {gcpRegions}
           bind:gcpWorkerPool={$form.gcpWorkerPool}
           bind:gcpServiceAccount={$form.gcpServiceAccount}
+          bind:minReplicas={$form.minReplicas}
+          bind:maxReplicas={$form.maxReplicas}
           bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
           bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
