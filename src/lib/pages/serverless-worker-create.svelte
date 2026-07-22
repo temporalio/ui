@@ -86,6 +86,8 @@
         {
           minReplicas: data.minReplicas,
           maxReplicas: data.maxReplicas,
+          initialReplicas: data.initialReplicas,
+          utilizationTarget: data.utilizationTarget,
         },
       );
     } else {

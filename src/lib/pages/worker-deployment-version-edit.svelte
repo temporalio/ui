@@ -72,6 +72,8 @@
         metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
         minReplicas: scalerDetails.minReplicas,
         maxReplicas: scalerDetails.maxReplicas,
+        initialReplicas: scalerDetails.initialReplicas,
+        utilizationTarget: scalerDetails.utilizationTarget,
       }}
       cancelHref={backHref}
       onSubmit={async (data) => {
@@ -86,6 +88,8 @@
                 {
                   minReplicas: data.minReplicas,
                   maxReplicas: data.maxReplicas,
+                  initialReplicas: data.initialReplicas,
+                  utilizationTarget: data.utilizationTarget,
                 },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {

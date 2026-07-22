@@ -444,7 +444,12 @@ describe('deployments service', () => {
       expect(scalingGroup?.scaler?.type).toBe('rate-based');
       expect(
         JSON.parse(atob(scalingGroup?.scaler?.details?.data ?? '')),
-      ).toEqual({ min_count: 0, max_count: 30, initial_count: 0 });
+      ).toEqual({
+        min_count: 0,
+        max_count: 30,
+        initial_count: 0,
+        utilization_target: 0.8,
+      });
     });
 
     test('round-trips custom provider and replica details', () => {
@@ -453,7 +458,12 @@ describe('deployments service', () => {
         'us-east1',
         'worker-pool',
         'worker@example.com',
-        { minReplicas: 4, maxReplicas: 12 },
+        {
+          minReplicas: 4,
+          maxReplicas: 12,
+          initialReplicas: 6,
+          utilizationTarget: 0.65,
+        },
       );
 
       expect(decodeGcpCloudRunProviderDetails(config)).toEqual({
@@ -465,12 +475,14 @@ describe('deployments service', () => {
       expect(decodeScalerDetails(config)).toMatchObject({
         minReplicas: 4,
         maxReplicas: 12,
+        initialReplicas: 6,
+        utilizationTarget: 0.65,
       });
       expect(
         JSON.parse(
           atob(config.scalingGroups?.['default']?.scaler?.details?.data ?? ''),
         ),
-      ).toMatchObject({ initial_count: 4 });
+      ).toMatchObject({ initial_count: 6, utilization_target: 0.65 });
     });
   });
 

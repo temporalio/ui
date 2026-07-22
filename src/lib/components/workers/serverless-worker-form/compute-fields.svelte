@@ -25,6 +25,8 @@
     gcpServiceAccount?: string;
     minReplicas?: number;
     maxReplicas?: number;
+    initialReplicas?: number;
+    utilizationTarget?: number;
     scaleUpCooloffMs?: number;
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
@@ -41,6 +43,8 @@
       gcpServiceAccount?: string[];
       minReplicas?: string[];
       maxReplicas?: string[];
+      initialReplicas?: string[];
+      utilizationTarget?: string[];
       scaleUpCooloffMs?: string[];
       scaleUpBacklogThreshold?: string[];
       maxWorkerLifetimeMs?: string[];
@@ -60,6 +64,8 @@
     gcpServiceAccount = $bindable(''),
     minReplicas = $bindable(0),
     maxReplicas = $bindable(30),
+    initialReplicas = $bindable(0),
+    utilizationTarget = $bindable(0.8),
     scaleUpCooloffMs = $bindable(),
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
@@ -401,10 +407,11 @@
       name="minReplicas"
       type="number"
       min={0}
+      max={2_147_483_647}
       step={1}
-      label={translate('workers.min-instances-label')}
+      label={translate('workers.min-replicas-label')}
       hintText={errors.minReplicas?.[0] ||
-        translate('workers.min-instances-hint')}
+        translate('workers.min-replicas-hint')}
       error={!!errors.minReplicas?.[0]}
       required
     />
@@ -417,11 +424,46 @@
       name="maxReplicas"
       type="number"
       min={1}
+      max={2_147_483_647}
       step={1}
-      label={translate('workers.max-instances-label')}
+      label={translate('workers.max-replicas-label')}
       hintText={errors.maxReplicas?.[0] ||
-        translate('workers.max-instances-hint')}
+        translate('workers.max-replicas-hint')}
       error={!!errors.maxReplicas?.[0]}
+      required
+    />
+    <Input
+      value={String(initialReplicas)}
+      onchange={(e) => {
+        initialReplicas = Number((e.target as HTMLInputElement).value);
+      }}
+      id="initialReplicas"
+      name="initialReplicas"
+      type="number"
+      min={0}
+      max={2_147_483_647}
+      step={1}
+      label={translate('workers.initial-replicas-label')}
+      hintText={errors.initialReplicas?.[0] ||
+        translate('workers.initial-replicas-hint')}
+      error={!!errors.initialReplicas?.[0]}
+      required
+    />
+    <Input
+      value={String(utilizationTarget)}
+      onchange={(e) => {
+        utilizationTarget = Number((e.target as HTMLInputElement).value);
+      }}
+      id="utilizationTarget"
+      name="utilizationTarget"
+      type="number"
+      min={0}
+      max={1}
+      step="any"
+      label={translate('workers.utilization-target-label')}
+      hintText={errors.utilizationTarget?.[0] ||
+        translate('workers.utilization-target-hint')}
+      error={!!errors.utilizationTarget?.[0]}
       required
     />
   </div>
