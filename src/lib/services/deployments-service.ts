@@ -444,6 +444,12 @@ export const buildGcpCloudRunComputeConfig = (
   region: string,
   workerPool: string,
   serviceAccount: string,
+  scalingOptions: {
+    minReplicas?: number;
+    maxReplicas?: number;
+    initialReplicas?: number;
+    utilizationTarget?: number;
+  } = {},
 ): ComputeConfig => {
   const providerPayload: Record<string, string> = {
     project,
@@ -453,6 +459,12 @@ export const buildGcpCloudRunComputeConfig = (
   };
   const providerData = btoa(JSON.stringify(providerPayload));
   const encoding = btoa('json/plain');
+  const scalerConfig = {
+    min_count: scalingOptions.minReplicas ?? 0,
+    max_count: scalingOptions.maxReplicas ?? 30,
+    initial_count: scalingOptions.initialReplicas ?? 0,
+    utilization_target: scalingOptions.utilizationTarget ?? 0.8,
+  };
 
   return {
     scalingGroups: {
@@ -464,6 +476,13 @@ export const buildGcpCloudRunComputeConfig = (
         provider: {
           type: 'gcp-cloud-run',
           details: { metadata: { encoding }, data: providerData },
+        },
+        scaler: {
+          type: 'rate-based',
+          details: {
+            metadata: { encoding },
+            data: btoa(JSON.stringify(scalerConfig)),
+          },
         },
       },
     },
@@ -527,6 +546,10 @@ export const decodeScalerDetails = (
   maxWorkerLifetimeMs?: number;
   scaleUpDispatchRateEpsilon?: number;
   metricsPollIntervalMs?: number;
+  minReplicas?: number;
+  maxReplicas?: number;
+  initialReplicas?: number;
+  utilizationTarget?: number;
 } => {
   const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
   if (!scalingGroup?.scaler?.details?.data) return {};
@@ -543,6 +566,12 @@ export const decodeScalerDetails = (
       result.scaleUpDispatchRateEpsilon = raw['scale_up_dispatch_rate_epsilon'];
     if (raw['metrics_poll_interval_ms'] !== undefined)
       result.metricsPollIntervalMs = raw['metrics_poll_interval_ms'];
+    if (raw['min_count'] !== undefined) result.minReplicas = raw['min_count'];
+    if (raw['max_count'] !== undefined) result.maxReplicas = raw['max_count'];
+    if (raw['initial_count'] !== undefined)
+      result.initialReplicas = raw['initial_count'];
+    if (raw['utilization_target'] !== undefined)
+      result.utilizationTarget = raw['utilization_target'];
     return result;
   } catch {
     return {};

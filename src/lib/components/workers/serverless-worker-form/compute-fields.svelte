@@ -1,6 +1,5 @@
 <script lang="ts">
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
@@ -24,6 +23,10 @@
     gcpRegions?: string[];
     gcpWorkerPool?: string;
     gcpServiceAccount?: string;
+    minReplicas?: number;
+    maxReplicas?: number;
+    initialReplicas?: number;
+    utilizationTarget?: number;
     scaleUpCooloffMs?: number;
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
@@ -39,6 +42,10 @@
       gcpRegion?: string[];
       gcpWorkerPool?: string[];
       gcpServiceAccount?: string[];
+      minReplicas?: string[];
+      maxReplicas?: string[];
+      initialReplicas?: string[];
+      utilizationTarget?: string[];
       scaleUpCooloffMs?: string[];
       scaleUpBacklogThreshold?: string[];
       maxWorkerLifetimeMs?: string[];
@@ -56,6 +63,10 @@
     gcpRegions = [...GCP_REGIONS],
     gcpWorkerPool = $bindable(''),
     gcpServiceAccount = $bindable(''),
+    minReplicas = $bindable(0),
+    maxReplicas = $bindable(30),
+    initialReplicas = $bindable(0),
+    utilizationTarget = $bindable(0.8),
     scaleUpCooloffMs = $bindable(),
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
@@ -301,14 +312,9 @@
 
 <div class="flex flex-wrap items-center justify-between gap-4">
   <div>
-    <div class="flex items-center gap-2">
-      <h2 class="text-base font-medium">
-        {translate('workers.scaling-lifecycle-section')}
-      </h2>
-      {#if provider === 'cloud-run'}
-        <Badge type="secondary">{translate('workers.coming-soon')}</Badge>
-      {/if}
-    </div>
+    <h2 class="text-base font-medium">
+      {translate('workers.scaling-lifecycle-section')}
+    </h2>
     <p class="text-sm text-secondary">
       {translate('workers.scaling-lifecycle-description')}
     </p>
@@ -317,7 +323,6 @@
     variant="secondary"
     size="sm"
     type="button"
-    disabled={provider === 'cloud-run'}
     trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
     on:click={() => (showScaling = !showScaling)}
   >
@@ -389,6 +394,77 @@
         translate('workers.metrics-poll-interval-ms-hint')}
       error={!!errors.metricsPollIntervalMs?.[0]}
       placeholder="60000"
+    />
+  </div>
+{:else if showScaling && provider === 'cloud-run'}
+  <div class="mt-4 flex flex-col gap-4">
+    <Input
+      value={String(minReplicas)}
+      onchange={(e) => {
+        minReplicas = Number((e.target as HTMLInputElement).value);
+      }}
+      id="minReplicas"
+      name="minReplicas"
+      type="number"
+      min={0}
+      max={2_147_483_647}
+      step={1}
+      label={translate('workers.min-replicas-label')}
+      hintText={errors.minReplicas?.[0] ||
+        translate('workers.min-replicas-hint')}
+      error={!!errors.minReplicas?.[0]}
+      required
+    />
+    <Input
+      value={String(maxReplicas)}
+      onchange={(e) => {
+        maxReplicas = Number((e.target as HTMLInputElement).value);
+      }}
+      id="maxReplicas"
+      name="maxReplicas"
+      type="number"
+      min={1}
+      max={2_147_483_647}
+      step={1}
+      label={translate('workers.max-replicas-label')}
+      hintText={errors.maxReplicas?.[0] ||
+        translate('workers.max-replicas-hint')}
+      error={!!errors.maxReplicas?.[0]}
+      required
+    />
+    <Input
+      value={String(initialReplicas)}
+      onchange={(e) => {
+        initialReplicas = Number((e.target as HTMLInputElement).value);
+      }}
+      id="initialReplicas"
+      name="initialReplicas"
+      type="number"
+      min={0}
+      max={2_147_483_647}
+      step={1}
+      label={translate('workers.initial-replicas-label')}
+      hintText={errors.initialReplicas?.[0] ||
+        translate('workers.initial-replicas-hint')}
+      error={!!errors.initialReplicas?.[0]}
+      required
+    />
+    <Input
+      value={String(utilizationTarget)}
+      onchange={(e) => {
+        utilizationTarget = Number((e.target as HTMLInputElement).value);
+      }}
+      id="utilizationTarget"
+      name="utilizationTarget"
+      type="number"
+      min={0}
+      max={1}
+      step="any"
+      label={translate('workers.utilization-target-label')}
+      hintText={errors.utilizationTarget?.[0] ||
+        translate('workers.utilization-target-hint')}
+      error={!!errors.utilizationTarget?.[0]}
+      required
     />
   </div>
 {/if}

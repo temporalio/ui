@@ -106,6 +106,12 @@
                 data.gcpRegion,
                 data.gcpWorkerPool,
                 data.gcpServiceAccount,
+                {
+                  minReplicas: data.minReplicas,
+                  maxReplicas: data.maxReplicas,
+                  initialReplicas: data.initialReplicas,
+                  utilizationTarget: data.utilizationTarget,
+                },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {
                 roleExternalId: data.roleExternalId,

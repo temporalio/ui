@@ -176,6 +176,16 @@ export const Strings = {
   'min-instances-hint': 'Minimum number of worker instances to keep running.',
   'max-instances-label': 'Max Instances',
   'max-instances-hint': 'Maximum number of worker instances to scale to.',
+  'min-replicas-label': 'Min Replicas',
+  'min-replicas-hint': 'Minimum number of Cloud Run replicas to keep running.',
+  'max-replicas-label': 'Max Replicas',
+  'max-replicas-hint': 'Maximum number of Cloud Run replicas to scale to.',
+  'initial-replicas-label': 'Initial Replicas',
+  'initial-replicas-hint':
+    'Number of Cloud Run replicas to assume when creating the worker deployment version.',
+  'utilization-target-label': 'Utilization Target',
+  'utilization-target-hint':
+    'Target average worker utilization across the fleet, from greater than 0 to 1.',
   'compute-provider': 'Compute Provider',
   'compute-provider-description':
     'Select how your worker activities will be executed.',
