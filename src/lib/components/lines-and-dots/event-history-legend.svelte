@@ -110,6 +110,7 @@
   bottomLeft
   width={380}
   tooltipClass="!surface-primary border border-subtle"
+  usePortal
 >
   <div
     slot="content"
