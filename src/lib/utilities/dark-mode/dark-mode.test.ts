@@ -65,22 +65,73 @@ describe('dark-mode utilities', () => {
   });
 
   describe('darkMode', () => {
-    it('should set data-theme to "dark" when dark mode is enabled', async () => {
+    it('should set data-theme to "dark" when dark mode is enabled', () => {
       const node = document.createElement('div');
       useDarkModePreference.set(true);
 
       darkMode(node);
-      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(node.dataset.theme).toBe('dark');
     });
 
-    it('should set data-theme to "light" when dark mode is disabled', async () => {
+    it('should set data-theme to "light" when dark mode is disabled', () => {
       const node = document.createElement('div');
       useDarkModePreference.set(false);
 
       darkMode(node);
-      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(node.dataset.theme).toBe('light');
+    });
+
+    it('should force "light" via overrideTheme even when dark mode is enabled', () => {
+      const node = document.createElement('div');
+      useDarkModePreference.set(true);
+
+      darkMode(node, 'light');
+
+      expect(node.dataset.theme).toBe('light');
+    });
+
+    it('should force "dark" via overrideTheme even when dark mode is disabled', () => {
+      const node = document.createElement('div');
+      useDarkModePreference.set(false);
+
+      darkMode(node, 'dark');
+
+      expect(node.dataset.theme).toBe('dark');
+    });
+
+    it('should re-apply the theme when the override changes via update', () => {
+      const node = document.createElement('div');
+      useDarkModePreference.set(true);
+
+      const action = darkMode(node, 'light');
+      expect(node.dataset.theme).toBe('light');
+
+      action.update('dark');
+      expect(node.dataset.theme).toBe('dark');
+    });
+
+    it('should fall back to the store theme when the override is cleared', () => {
+      const node = document.createElement('div');
+      useDarkModePreference.set(true);
+
+      const action = darkMode(node, 'light');
+      expect(node.dataset.theme).toBe('light');
+
+      action.update(undefined);
+      expect(node.dataset.theme).toBe('dark');
+    });
+
+    it('should stop updating data-theme after destroy', () => {
+      const node = document.createElement('div');
+      useDarkModePreference.set(false);
+
+      const action = darkMode(node);
+      expect(node.dataset.theme).toBe('light');
+
+      action.destroy();
+      useDarkModePreference.set(true);
 
       expect(node.dataset.theme).toBe('light');
     });
