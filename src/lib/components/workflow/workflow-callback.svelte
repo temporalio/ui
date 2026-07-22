@@ -11,7 +11,10 @@
   import type { CallbackState } from '$lib/types';
   import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
-  import { toEventLinkViews } from '$lib/utilities/event-link';
+  import {
+    type EventLinkView,
+    toEventLinkViews,
+  } from '$lib/utilities/event-link';
 
   import EventLink from '../event/event-link.svelte';
 
@@ -27,7 +30,7 @@
   const blockedReason = $derived(callback?.blockedReason);
   const callbackUrl = $derived(callback?.callback?.nexus?.url);
 
-  const titles = {
+  const titles: Record<string, string> = {
     Standby: translate('nexus.callback.standby'),
     Scheduled: translate('nexus.callback.scheduled'),
     'Backing Off': translate('nexus.callback.backing-off'),
@@ -38,7 +41,7 @@
   const failedState = 'Failed' as unknown as CallbackState;
   const failed = $derived(callback.state === failedState);
   const title = $derived(
-    titles[callback.state] || translate('nexus.nexus-callback'),
+    titles[callback.state ?? ''] || translate('nexus.nexus-callback'),
   );
   const links = $derived(callback?.callback?.links || []);
   const showCallbackUrl = $derived(!links.length && !link && callbackUrl);
@@ -47,7 +50,7 @@
   const linkViews = $derived(toEventLinkViews(callbackLinks, { namespace }));
 </script>
 
-{#snippet callbackLink(view)}
+{#snippet callbackLink(view: EventLinkView)}
   <EventLink {view} />
   {#if view.namespace}
     <EventLink view={view.namespace} />
@@ -99,6 +102,7 @@
         <p>{translate('nexus.last-attempt-failure')}</p>
         <CodeBlock
           content={failure}
+          label={translate('workflows.callback-metadata')}
           language="text"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}

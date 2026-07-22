@@ -3,7 +3,7 @@
     workflowId?: string;
     runId?: string;
     scheduleId?: string;
-    type: 'input' | 'result' | undefined;
+    type: string | undefined;
     eventId?: string | undefined;
   };
 </script>
@@ -35,12 +35,21 @@
 
   interface Props {
     value: Payload | Payloads | PayloadContainingObject;
+    label?: string;
     maxHeight?: number;
     testId?: string;
     filenameData?: PayloadDownloadFilenameData;
+    lazy?: boolean;
   }
 
-  let { value, maxHeight, testId, filenameData = undefined }: Props = $props();
+  let {
+    value,
+    label = '',
+    maxHeight,
+    testId,
+    filenameData = undefined,
+    lazy = false,
+  }: Props = $props();
 
   let downloadError: string | undefined = $state(undefined);
   let downloadLoading: boolean = $state(false);
@@ -68,7 +77,7 @@
     let data: Payloads | undefined = undefined;
     try {
       data = await downloadExternalPayloadWithCodec(payload);
-      const parsed = parseRawPayloadToJSON(data.payloads[0]);
+      const parsed = parseRawPayloadToJSON(data.payloads![0]);
       const content = stringifyWithBigInt(parsed, undefined, 2);
       const a = document.createElement('a');
       const file = new Blob([content], { type: 'json/plain' });
@@ -96,11 +105,13 @@
     {#snippet loading()}
       <CodeBlock
         content={stringifyWithBigInt(value)}
+        {label}
         {maxHeight}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         {testId}
         language="json"
+        {lazy}
       />
     {/snippet}
     {#snippet children(results)}
@@ -112,11 +123,13 @@
             )}
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue.data)}
+              {label}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
               {testId}
               language="json"
+              {lazy}
             >
               {#snippet headerActions()}
                 <Tooltip
@@ -159,20 +172,24 @@
           {:else if isParsedPayload(result.decodedValue)}
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue.data)}
+              {label}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
               {testId}
               language="json"
+              {lazy}
             />
           {:else}
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue)}
+              {label}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
               {testId}
               language="json"
+              {lazy}
             />
           {/if}
         {/each}
@@ -181,11 +198,13 @@
     {#snippet error({ error, retry })}
       <CodeBlock
         content={stringifyWithBigInt(value)}
+        {label}
         {maxHeight}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         {testId}
         language="json"
+        {lazy}
       >
         {#snippet headerActions()}
           <IconButton

@@ -92,7 +92,9 @@ export async function submitCreateSchedule(
   try {
     body = await getRequestBody(formData);
   } catch (e) {
-    serverError.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+    serverError.set(
+      `${translate('data-encoder.encode-error')}: ${(e as Error)?.message}`,
+    );
     return;
   }
 
@@ -127,7 +129,9 @@ export async function submitEditSchedule(
   try {
     body = await getRequestBody(formData, schedule);
   } catch (e) {
-    serverError.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+    serverError.set(
+      `${translate('data-encoder.encode-error')}: ${(e as Error)?.message}`,
+    );
     return;
   }
 
@@ -170,7 +174,7 @@ export async function submitDeleteSchedule(context: ScheduleContext) {
     actionPending.set(false);
     serverError.set(
       translate('schedules.delete-schedule-error', {
-        error: e?.message,
+        error: (e as Error)?.message,
       }),
     );
   }
@@ -210,7 +214,7 @@ export async function submitPauseSchedule(
           ? 'schedules.pause-schedule-error'
           : 'schedules.unpause-schedule-error',
         {
-          error: e?.message,
+          error: (e as Error)?.message,
         },
       ),
     );
@@ -250,7 +254,7 @@ export async function submitTriggerImmediatelySchedule(
     actionPending.set(false);
     serverError.set(
       translate('schedules.trigger-schedule-error', {
-        error: e?.message,
+        error: (e as Error)?.message,
       }),
     );
   }
@@ -297,14 +301,14 @@ export async function submitBackfillSchedule(
     actionPending.set(false);
     serverError.set(
       translate('schedules.backfill-schedule-error', {
-        error: e?.message,
+        error: (e as Error)?.message,
       }),
     );
   }
 }
 
 export const currentScheduleFetch =
-  writable<Promise<DescribeFullSchedule | null>>(null);
+  writable<Promise<DescribeFullSchedule | null> | null>(null);
 
 export function refreshCurrentScheduleFetch(
   context: Pick<ScheduleContext, 'namespace' | 'scheduleId'>,

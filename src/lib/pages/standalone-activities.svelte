@@ -1,14 +1,13 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
-  import SavedActivityViews from '$lib/components/standalone-activities/saved-views.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
@@ -29,12 +28,16 @@
   } from '$lib/stores/configurable-table-columns';
   import { activityFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
+  import {
+    DEFAULT_ACTIVITY_SYSTEM_VIEW,
+    savedActivityQueries,
+    systemActivityViews,
+  } from '$lib/stores/saved-queries';
   import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
   import { getActivityStatusAndCountOfGroup } from '$lib/utilities/get-activity-status-and-count';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
-  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
+  import { standaloneActivityWriteActionsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   interface Props {
     releaseStageBadge?: Snippet;
@@ -51,7 +54,7 @@
   const refreshTimeFormatted = $derived($timestamp(refreshTime));
   const availableColumns = $derived(availableActivityColumns(namespace));
   const activityStartEnabled = $derived(
-    !standaloneActivityCommandsDisabled(page),
+    !standaloneActivityWriteActionsDisabled(page),
   );
 
   onMount(() => {
@@ -130,19 +133,18 @@
 </header>
 
 <FilterBar />
-<div class="flex overflow-auto">
-  <SavedActivityViews />
-  <div
-    class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-    )}
-  >
-    <ActivitiesSummaryConfigurableTable
-      onClickConfigure={openCustomizationDrawer}
-    />
-  </div>
-</div>
+<SavedQueryViews
+  filters={activityFilters}
+  savedQueries={savedActivityQueries}
+  systemViews={systemActivityViews}
+  defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
+  searchAttributes={activityExecutionSearchAttributes}
+  id="activity"
+>
+  <ActivitiesSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
+  />
+</SavedQueryViews>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

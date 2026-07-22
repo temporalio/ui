@@ -1,11 +1,11 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
-  import { formatDistance } from '$lib/utilities/format-time';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
 
@@ -57,22 +57,22 @@
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="OperationId"
-        value={operation.operationId}
+        value={operation.operationId ?? ''}
         href={routeForStandaloneNexusOperationDetails({
           namespace,
-          operationId: operation.operationId,
-          runId: operation.runId,
+          operationId: operation.operationId ?? '',
+          runId: operation.runId ?? '',
         })}
       />
     {:else if label === 'Run ID'}
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="RunId"
-        value={operation.runId}
+        value={operation.runId ?? ''}
         href={routeForStandaloneNexusOperationDetails({
           namespace,
-          operationId: operation.operationId,
-          runId: operation.runId,
+          operationId: operation.operationId ?? '',
+          runId: operation.runId ?? '',
         })}
       />
     {:else if label === 'Endpoint'}
@@ -108,10 +108,10 @@
       <Timestamp dateTime={operation.closeTime} />
     {:else if label === 'Execution Duration'}
       {#if operation.executionDuration}
-        {formatDistance({
+        {formatDistanceAbbreviated({
           start: operation.scheduleTime,
           end: operation.closeTime,
-          includeMillisecondsForUnderSecond: true,
+          includeMilliseconds: true,
         })}
       {/if}
     {:else if label === 'State Transitions'}

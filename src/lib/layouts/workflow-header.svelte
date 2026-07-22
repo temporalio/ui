@@ -10,10 +10,10 @@
   import DetailListLabel from '$lib/components/detail-list/detail-list-label.svelte';
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import DetailList from '$lib/components/detail-list/detail-list.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';

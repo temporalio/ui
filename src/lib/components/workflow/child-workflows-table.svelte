@@ -1,4 +1,5 @@
 <script lang="ts">
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -8,8 +9,6 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-
-  import WorkflowStatus from '../workflow-status.svelte';
 
   interface Props {
     children?: ChildWorkflowClosedEvent[];
@@ -22,8 +21,8 @@
   const formattedPending = $derived(
     pendingChildren.map((c) => {
       return {
-        runId: c.runId,
-        workflowId: c.workflowId,
+        runId: c.runId ?? '',
+        workflowId: c.workflowId ?? '',
         status: 'Running' as const,
         type: c.workflowTypeName,
         namespace,
@@ -34,8 +33,8 @@
   const formattedCompleted = $derived(
     children.map((c) => {
       return {
-        runId: c.attributes.workflowExecution.runId,
-        workflowId: c.attributes.workflowExecution.workflowId,
+        runId: c.attributes.workflowExecution?.runId ?? '',
+        workflowId: c.attributes.workflowExecution?.workflowId ?? '',
         type: c.attributes.workflowType,
         status: c.classification,
         namespace: c.attributes?.namespace || namespace,

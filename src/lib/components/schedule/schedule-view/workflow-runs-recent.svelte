@@ -1,8 +1,8 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
@@ -59,7 +59,7 @@
       >
         <div class="col-start-1 row-start-1 flex items-center">
           <WorkflowStatus
-            status={toWorkflowStatusReadable(run.startWorkflowStatus)}
+            status={toWorkflowStatusReadable(run.startWorkflowStatus ?? null)}
           />
         </div>
 
@@ -68,8 +68,8 @@
         >
           <Link
             href={routeForWorkflow({
-              workflow: run.startWorkflowResult?.workflowId,
-              run: run.startWorkflowResult?.runId,
+              workflow: run.startWorkflowResult?.workflowId ?? '',
+              run: run.startWorkflowResult?.runId ?? '',
               namespace,
             })}
           >

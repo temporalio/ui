@@ -5,6 +5,7 @@ import type { HistoryEvent } from '$lib/types/events';
 import {
   decodeEventAttributesForExport,
   parsePayloadAttributes,
+  type PotentiallyDecodable,
 } from './decode-payload';
 import { stringifyWithBigInt } from './parse-with-big-int';
 
@@ -18,18 +19,23 @@ const decodePayloads = async (
       decodeSetting,
     );
 
-    return parsePayloadAttributes(convertedAttributes, false);
+    return parsePayloadAttributes(
+      convertedAttributes as PotentiallyDecodable,
+      false,
+    );
   } catch {
     return event;
   }
 };
 
+type DecodedHistoryEvent = Awaited<ReturnType<typeof decodePayloads>>;
+
 function download(
-  events: HistoryEvent[],
+  events: DecodedHistoryEvent[],
   fileName: string,
   contentType: string,
 ) {
-  const content = stringifyWithBigInt({ events }, null, 2);
+  const content = stringifyWithBigInt({ events }, undefined, 2);
   const a = document.createElement('a');
   const file = new Blob([content], { type: contentType });
   a.href = URL.createObjectURL(file);
@@ -59,7 +65,7 @@ export const exportHistory = async ({
     if (decodeSetting === 'encoded') {
       download(rawEvents, `${runId}/events.json`, 'text/plain');
     } else {
-      const decodedEvents = [];
+      const decodedEvents: DecodedHistoryEvent[] = [];
       for (const event of rawEvents) {
         const decodedEvent = await decodePayloads(event, decodeSetting);
         decodedEvents.push(decodedEvent);

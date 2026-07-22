@@ -4,21 +4,18 @@
   import Button from '$lib/holocene/button.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
-  import DurationInput, {
-    parseDuration,
-  } from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
 
   interface Props {
     open: boolean;
-    startToCloseTimeout: string | undefined;
-    scheduleToCloseTimeout: string | undefined;
-    scheduleToStartTimeout: string | undefined;
+    startToCloseTimeout: string;
+    scheduleToCloseTimeout: string;
+    scheduleToStartTimeout: string;
     idReusePolicy: string;
     idConflictPolicy: string;
-    timeoutError?: string;
   }
 
   let {
@@ -28,18 +25,7 @@
     scheduleToStartTimeout = $bindable(),
     idReusePolicy = $bindable(),
     idConflictPolicy = $bindable(),
-    timeoutError = '',
   }: Props = $props();
-
-  const isPositiveDuration = (value: string | undefined): boolean => {
-    const seconds = Number(parseDuration(value ?? ''));
-    return !isNaN(seconds) && seconds > 0;
-  };
-
-  const hasTimeout = $derived(
-    isPositiveDuration(startToCloseTimeout) ||
-      isPositiveDuration(scheduleToCloseTimeout),
-  );
 
   const idReusePolicyStore = writable(idReusePolicy);
   const idConflictPolicyStore = writable(idConflictPolicy);
@@ -212,9 +198,6 @@
               )}
             </p>
           </div>
-          {#if timeoutError && !hasTimeout}
-            <p class="text-xs text-danger">{timeoutError}</p>
-          {/if}
         </div>
       </section>
 

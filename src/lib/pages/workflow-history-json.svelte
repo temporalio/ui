@@ -5,9 +5,18 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { decodeEventHistory, filteredEventHistory } from '$lib/stores/events';
+  import type { WorkflowEvent } from '$lib/types/events';
+
+  interface Props {
+    events?: WorkflowEvent[];
+  }
+
+  let { events }: Props = $props();
+
+  const resolvedEvents = $derived(events ?? $filteredEventHistory);
 </script>
 
-<WorkflowJsonNavigator events={$filteredEventHistory}>
+<WorkflowJsonNavigator events={resolvedEvents}>
   {#snippet decode()}
     <ToggleSwitch
       label={translate('events.decode-event-history')}

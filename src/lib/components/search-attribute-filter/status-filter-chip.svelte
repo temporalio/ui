@@ -1,8 +1,8 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';

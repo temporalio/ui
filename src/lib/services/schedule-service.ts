@@ -44,9 +44,10 @@ export const fetchPaginatedSchedules = async (
       },
       request,
       onError,
-    }).then(({ schedules, nextPageToken }) => {
+    }).then((response) => {
+      const { schedules, nextPageToken } = response ?? {};
       return {
-        items: schedules,
+        items: schedules ?? [],
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });
@@ -71,10 +72,10 @@ export const fetchAllSchedules = async (
       params: {},
       onError,
       request,
-    })) ?? { schedules: [], nextPageToken: '' };
+    })) ?? { schedules: [] as ScheduleListEntry[], nextPageToken: '' };
 
   return {
-    schedules,
+    schedules: schedules ?? [],
     nextPageToken: String(nextPageToken),
     error,
   };
@@ -134,7 +135,7 @@ export async function createSchedule({
     namespace,
     scheduleId,
   });
-  const { conflictToken } = await requestFromAPI<{ conflictToken: string }>(
+  const { conflictToken } = (await requestFromAPI<{ conflictToken: string }>(
     route,
     {
       options: {
@@ -147,7 +148,7 @@ export async function createSchedule({
       },
       onError,
     },
-  );
+  )) ?? { conflictToken: '' };
 
   return { conflictToken, error };
 }
@@ -174,8 +175,8 @@ export async function editSchedule({
       `Error editing schedule: ${err.status}: ${err.statusText}`);
 
   const route = routeForApi('schedule.edit', {
-    namespace,
-    scheduleId,
+    namespace: namespace ?? '',
+    scheduleId: scheduleId ?? '',
   });
   await requestFromAPI<null>(route, {
     options: {
@@ -215,17 +216,19 @@ export async function pauseSchedule({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...options,
-        request_id: crypto.randomUUID(),
-        ...(identity && { identity }),
-      }),
-    },
-    onError: (error) => console.error(error),
-  });
+  return (
+    (await requestFromAPI<null>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...options,
+          request_id: crypto.randomUUID(),
+          ...(identity && { identity }),
+        }),
+      },
+      onError: (error) => console.error(error),
+    })) ?? null
+  );
 }
 
 type UnpauseScheduleOptions = {
@@ -251,16 +254,18 @@ export async function unpauseSchedule({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...options,
-        request_id: crypto.randomUUID(),
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestFromAPI<null>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...options,
+          request_id: crypto.randomUUID(),
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? null
+  );
 }
 
 type TriggerImmediatelyOptions = {
@@ -288,16 +293,18 @@ export async function triggerImmediately({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...options,
-        request_id: crypto.randomUUID(),
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestFromAPI<null>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...options,
+          request_id: crypto.randomUUID(),
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? null
+  );
 }
 
 type BackfillOptions = TriggerImmediatelyOptions & {
@@ -329,14 +336,16 @@ export async function backfillRequest({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...options,
-        request_id: crypto.randomUUID(),
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestFromAPI<null>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...options,
+          request_id: crypto.randomUUID(),
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? null
+  );
 }

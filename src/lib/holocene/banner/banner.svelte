@@ -70,7 +70,7 @@
   export let message: string;
   export let dismissLabel: string = '';
   export let dismissable = false;
-  export let icon: IconName = null;
+  export let icon: IconName | undefined = undefined;
   export let type: BannerType = 'default';
 
   let className = '';

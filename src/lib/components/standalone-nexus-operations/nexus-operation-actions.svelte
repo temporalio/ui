@@ -75,11 +75,11 @@
           goto(
             routeForStartStandaloneNexusOperation({
               namespace,
-              operationId: nexusOperationInfo.operationId,
-              endpoint: nexusOperationInfo.endpoint,
-              service: nexusOperationInfo.service,
-              operation: nexusOperationInfo.operation,
-              runId: nexusOperationInfo.runId,
+              operationId: nexusOperationInfo.operationId ?? undefined,
+              endpoint: nexusOperationInfo.endpoint ?? undefined,
+              service: nexusOperationInfo.service ?? undefined,
+              operation: nexusOperationInfo.operation ?? undefined,
+              runId: nexusOperationInfo.runId ?? undefined,
             }),
           )}
         data-testid="start-nexus-operation-button"
@@ -95,13 +95,13 @@
 {#if !commandsDisabled}
   <CancelConfirmationModal
     onConfirm={onConfirmCancelOrTerminate}
-    operationId={nexusOperationInfo.operationId}
+    operationId={nexusOperationInfo.operationId ?? ''}
     {namespace}
     bind:open={cancelConfirmationModalOpen}
   />
   <TerminateConfirmationModal
     onConfirm={onConfirmCancelOrTerminate}
-    operationId={nexusOperationInfo.operationId}
+    operationId={nexusOperationInfo.operationId ?? ''}
     {namespace}
     bind:open={terminateConfirmationModalOpen}
   />

@@ -107,12 +107,12 @@
   export let disabled = false;
   export let loading = false;
   export let active = false;
-  export let leadingIcon: IconName = null;
-  export let trailingIcon: IconName = null;
+  export let leadingIcon: IconName | undefined = undefined;
+  export let trailingIcon: IconName | undefined = undefined;
   export let count = 0;
-  export let id: string = null;
-  export let href: string = null;
-  export let target: string = null;
+  export let id: string | undefined = undefined;
+  export let href: string | undefined = undefined;
+  export let target: string | null | undefined = undefined;
   export let disableTracking = false;
 
   let element: HTMLElement;
@@ -127,6 +127,7 @@
   const onLinkClick = (e: MouseEvent) => {
     // Skip if middle mouse click or new tab
     if (e.button === 1 || target || e.metaKey) return;
+    if (!href) return;
     e.preventDefault();
     goto(href);
   };
@@ -166,7 +167,7 @@
   >
     {#if leadingIcon || (loading && !trailingIcon)}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+        <Icon name={loading ? 'spinner' : leadingIcon!} />
       </span>
     {/if}
     <slot />
@@ -207,7 +208,7 @@
   >
     {#if leadingIcon || (loading && !trailingIcon)}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+        <Icon name={loading ? 'spinner' : leadingIcon!} />
       </span>
     {/if}
     <slot />

@@ -178,6 +178,7 @@ export function formatUTCOffset(
     absoluteValue > 9 ? `${absoluteValue}:00` : `0${absoluteValue}:00`;
   if (offset > 0) return `${utc}+${formattedOffset}`;
   if (offset < 0) return `${utc}-${formattedOffset}`;
+  return '';
 }
 
 export function getSelectedTimezone(timeFormat: string): string {

@@ -1,12 +1,12 @@
 <script lang="ts">
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NexusOperationExecutionInfo } from '$lib/types/nexus-operation-execution';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
   import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneNexusOperationPoller } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
-  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
     DetailList,
@@ -48,7 +48,7 @@
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={nexusOperationInfo.operationId}
+          content={nexusOperationInfo.operationId ?? ''}
           clickAllToCopy
           container-class="w-full"
           class="overflow-hidden text-ellipsis text-left"
@@ -81,7 +81,7 @@
       >
       <DetailListTextValue
         text={nexusOperationInfo.executionDuration
-          ? fromSeconds(nexusOperationInfo.executionDuration)
+          ? formatDurationAbbreviated(nexusOperationInfo.executionDuration)
           : '-'}
       />
       <DetailListLabel
@@ -95,24 +95,24 @@
       <DetailListLabel
         >{translate('standalone-nexus-operations.run-id')}</DetailListLabel
       >
-      <DetailListTextValue copyable text={nexusOperationInfo.runId} />
+      <DetailListTextValue copyable text={nexusOperationInfo.runId ?? ''} />
       <DetailListLabel
         >{translate('standalone-nexus-operations.endpoint')}</DetailListLabel
       >
       <DetailListLinkValue
         copyable
         iconName="filter"
-        text={nexusOperationInfo.endpoint}
+        text={nexusOperationInfo.endpoint ?? ''}
         href={endpointFilterLink}
       />
       <DetailListLabel
         >{translate('standalone-nexus-operations.service')}</DetailListLabel
       >
-      <DetailListTextValue text={nexusOperationInfo.service} />
+      <DetailListTextValue text={nexusOperationInfo.service ?? ''} />
       <DetailListLabel
         >{translate('standalone-nexus-operations.operation')}</DetailListLabel
       >
-      <DetailListTextValue text={nexusOperationInfo.operation} />
+      <DetailListTextValue text={nexusOperationInfo.operation ?? ''} />
     </DetailListColumn>
   </DetailList>
 </div>

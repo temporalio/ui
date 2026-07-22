@@ -1,7 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import MultiSelect from '$lib/holocene/select/multi-select.svelte';
+  import MultiSelect, {
+    type MultiSelectOptions,
+  } from '$lib/holocene/select/multi-select.svelte';
   import { translate } from '$lib/i18n/translate';
   import { eventClassifications } from '$lib/models/event-history/get-event-classification';
   import { eventClassificationFilter } from '$lib/stores/filters';
@@ -21,12 +23,12 @@
       : [],
   );
 
-  const onOptionClick = (_options) => {
+  const onOptionClick = (_options: MultiSelectOptions) => {
     if (_options.length === options.length) {
       _options = [];
     }
 
-    const value = _options.map((o) => o.value).join(',');
+    const value = _options.map((option) => option.value).join(',');
     updateQueryParameters({
       parameter: parameter,
       value,

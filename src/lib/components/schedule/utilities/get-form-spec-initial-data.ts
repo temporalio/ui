@@ -1,18 +1,25 @@
-import { type FormSpecKind, type FormSpecSchema } from '../schema/form';
+import {
+  type FormSpecKind,
+  formSpecObject,
+  type FormSpecSchema,
+} from '../schema/form';
 
+// Seeds carry only the fields meaningful for their kind; parsing through the
+// bare object schema injects zod's defaults so the result is a complete
+// FormSpecSchema (the same shape submit-time validation would produce).
 export function getFormSpecInitialData(
   kind: Exclude<FormSpecKind, 'none' | 'frozen'>,
 ): FormSpecSchema {
   switch (kind) {
     case 'cron': {
-      return {
+      return formSpecObject.parse({
         kind: 'cron',
         cronString: '',
-      } satisfies FormSpecSchema;
+      });
     }
 
     case 'week': {
-      return {
+      return formSpecObject.parse({
         kind: 'week',
         calendar: {
           dayOfWeek: [{ start: new Date().getDay() }],
@@ -20,27 +27,27 @@ export function getFormSpecInitialData(
           minute: [],
           second: [],
         },
-      } satisfies FormSpecSchema;
+      });
     }
 
     case 'month': {
-      return {
+      return formSpecObject.parse({
         kind: 'month',
         calendar: {
           dayOfMonth: [{ start: new Date().getDate() }],
           month: [{ start: new Date().getMonth() + 1 }],
         },
-      };
+      });
     }
 
     case 'interval': {
-      return {
+      return formSpecObject.parse({
         kind: 'interval',
         interval: {
           interval: undefined,
           phase: undefined,
         },
-      };
+      });
     }
   }
 }

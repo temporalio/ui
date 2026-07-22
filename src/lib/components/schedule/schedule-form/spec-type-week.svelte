@@ -116,7 +116,7 @@
       { label: translate('schedules.recurrence-weekends'), value: 'weekends' },
       { label: translate('schedules.recurrence-custom'), value: 'custom' },
     ]}
-    onChange={selectType}
+    onChange={(value) => selectType(value as Selection['type'])}
   >
     {#snippet item({ option, checked, attrs, onSelect, onKeydown })}
       <Button

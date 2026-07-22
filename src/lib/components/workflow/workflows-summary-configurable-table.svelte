@@ -5,6 +5,7 @@
 
   import { page } from '$app/state';
 
+  import DownloadJsonButton from '$lib/components/download-json-button.svelte';
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
@@ -25,7 +26,6 @@
   import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { exportWorkflows } from '$lib/utilities/export-workflows';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
@@ -211,7 +211,6 @@
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
-    maxHeight="var(--panel-h)"
   >
     <caption class="sr-only" slot="caption">
       {translate('common.workflows')}
@@ -301,17 +300,12 @@
             : translate('common.comfortable')}
         ></Button>
       </Tooltip>
-      <Tooltip text={translate('common.download-json')} top>
-        <Button
-          on:click={() => exportWorkflows(visibleItems, page)}
-          data-testid="export-history-button"
-          size="xs"
-          variant="ghost"
-          aria-label={translate('common.download-json')}
-        >
-          <Icon name="download" />
-        </Button>
-      </Tooltip>
+      <DownloadJsonButton
+        items={visibleItems}
+        {page}
+        filePrefix="workflows"
+        testId="export-history-button"
+      />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button
           on:click={onClickConfigure}

@@ -42,11 +42,11 @@ export const fetchNexusOperationCountByStatus = async ({
     namespace,
   });
   const { count, groups } =
-    await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
+    (await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
       params: {
         query: query ? `${query} ${groupByClause}` : `${groupByClause}`,
       },
       notifyOnError: false,
-    });
+    })) ?? {};
   return { count: count ?? '0', groups: groups ?? [] };
 };

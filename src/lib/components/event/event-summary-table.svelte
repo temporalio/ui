@@ -6,7 +6,7 @@
   import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { isEventGroup } from '$lib/models/event-groups';
+  import { buildGroupIndex, isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -23,7 +23,7 @@
     isPendingNexusOperation,
   } from '$lib/utilities/is-pending-activity';
 
-  import HistoryGraph from '../lines-and-dots/svg/history-graph.svelte';
+  import HistoryGraph from '../lines-and-dots/history-graph/history-graph.svelte';
   import TableHeaderCell from '../workflow/workflows-summary-configurable-table/table-header-cell.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
@@ -51,6 +51,7 @@
 
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
+  const groupIndex = $derived(buildGroupIndex(groups));
   const url = $derived(page.url);
   const perPageParam = $derived(url.searchParams.get(perPageKey) ?? '100');
   const currentPageParam = $derived(
@@ -149,7 +150,7 @@
           bind:hoveredEventId
           {event}
           {index}
-          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
+          group={isEvent(event) ? groupIndex.get(event.id) : undefined}
           {compact}
           {initialItem}
         />

@@ -55,7 +55,12 @@ inertBackground walk from re-inerting it as a body-level sibling. -->
 
 <div class={toast({ position: $position })}>
   {#each $toasts as { message, variant, id, link } (id)}
-    <ToastComponent {closeButtonLabel} {variant} {id} on:dismiss={dismissToast}>
+    <ToastComponent
+      {closeButtonLabel}
+      variant={variant ?? 'primary'}
+      id={id ?? ''}
+      on:dismiss={dismissToast}
+    >
       {#if link}
         <Link href={link}>
           {message}

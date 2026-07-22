@@ -22,7 +22,7 @@
   const { copy, copied } = copyToClipboard();
 
   const handleCopy = (e: Event) => {
-    copy(e, copyableText);
+    copy(e, copyableText ?? '');
   };
 </script>
 

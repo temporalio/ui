@@ -12,16 +12,14 @@
   export let pannable = true;
 
   let zoomLevel = initialZoom;
-  let panX = 0;
-  let panY = 0;
 
-  let svg;
+  let svg: SVGSVGElement;
 
   $: viewBox = {
-    x: panX,
-    y: panY,
-    width: (width * zoomLevel) / initialZoom,
-    height: (height * zoomLevel) / initialZoom,
+    x: 0,
+    y: 0,
+    width,
+    height,
   };
 
   let isPanning = false;
@@ -35,67 +33,22 @@
 
   function panBy(dx: number, dy: number) {
     if (!pannable) return;
-    panX += dx * viewBox.width;
-    panY += dy * viewBox.height;
+    viewBox.x += dx * viewBox.width;
+    viewBox.y += dy * viewBox.height;
   }
 
-  function zoomBy(factor: number, centerX = width / 2, centerY = height / 2) {
+  function zoomBy(factor: number) {
     if (!zoomable) return;
     const newZoomLevel = zoomLevel + factor;
     if (newZoomLevel < maxZoomIn || newZoomLevel > maxZoomOut) return;
-    panX += (centerX * (zoomLevel - newZoomLevel)) / initialZoom;
-    panY += (centerY * (zoomLevel - newZoomLevel)) / initialZoom;
+    const centerX = viewBox.x + viewBox.width / 2;
+    const centerY = viewBox.y + viewBox.height / 2;
+    const zoomRatio = newZoomLevel / zoomLevel;
+    viewBox.width *= zoomRatio;
+    viewBox.height *= zoomRatio;
+    viewBox.x = centerX - viewBox.width / 2;
+    viewBox.y = centerY - viewBox.height / 2;
     zoomLevel = newZoomLevel;
-  }
-
-  const handleWheel = (event: WheelEvent) => {
-    if (!zoomable) return;
-    event.preventDefault();
-
-    const rect = svg.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    const newZoomLevel = zoomLevel + event.deltaY * 0.001;
-
-    if (newZoomLevel < maxZoomIn || newZoomLevel > maxZoomOut) return;
-
-    panX += (mouseX * (zoomLevel - newZoomLevel)) / initialZoom;
-    panY += (mouseY * (zoomLevel - newZoomLevel)) / initialZoom;
-    zoomLevel = newZoomLevel;
-  };
-
-  function handleMouseDown(event: MouseEvent) {
-    if (!pannable) return;
-    isPanning = true;
-    startX = event.clientX;
-    startY = event.clientY;
-    panOffsetX = panX;
-    panOffsetY = panY;
-  }
-
-  function handleMouseMove(event: MouseEvent) {
-    if (!isPanning) return;
-
-    const dx = (startX - event.clientX) * (viewBox.width / svg.clientWidth);
-    const dy = (startY - event.clientY) * (viewBox.height / svg.clientHeight);
-
-    panX = panOffsetX + dx;
-    panY = panOffsetY + dy;
-  }
-
-  function handleMouseUp() {
-    isPanning = false;
-  }
-
-  function handleMouseLeave() {
-    isPanning = false;
-  }
-
-  function onCenter() {
-    panX = 0;
-    panY = 0;
-    zoomLevel = initialZoom;
   }
 
   function handleKeydown(event: KeyboardEvent) {
@@ -127,6 +80,66 @@
         zoomBy(ZOOM_STEP);
         break;
     }
+  }
+
+  const handleWheel = (event: WheelEvent) => {
+    if (!zoomable) return;
+    event.preventDefault();
+
+    const rect = svg.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const zoomAmount = event.deltaY * 0.001;
+    let newZoomLevel = zoomLevel + zoomAmount;
+
+    if (newZoomLevel < maxZoomIn || newZoomLevel > maxZoomOut) return;
+
+    const zoomRatio = newZoomLevel / zoomLevel;
+    const newWidth = viewBox.width * zoomRatio;
+    const newHeight = viewBox.height * zoomRatio;
+
+    viewBox.x = mouseX - (mouseX - viewBox.x) * zoomRatio;
+    viewBox.y = mouseY - (mouseY - viewBox.y) * zoomRatio;
+    viewBox.width = newWidth;
+    viewBox.height = newHeight;
+
+    zoomLevel = newZoomLevel;
+  };
+
+  function handleMouseDown(event: MouseEvent) {
+    if (!pannable) return;
+    isPanning = true;
+    startX = event.clientX;
+    startY = event.clientY;
+    panOffsetX = viewBox.x;
+    panOffsetY = viewBox.y;
+  }
+
+  function handleMouseMove(event: MouseEvent) {
+    if (!isPanning) return;
+
+    const dx = (startX - event.clientX) * (viewBox.width / svg.clientWidth);
+    const dy = (startY - event.clientY) * (viewBox.height / svg.clientHeight);
+
+    viewBox.x = panOffsetX + dx;
+    viewBox.y = panOffsetY + dy;
+  }
+
+  function handleMouseUp() {
+    isPanning = false;
+  }
+
+  function handleMouseLeave() {
+    isPanning = false;
+  }
+
+  function onCenter() {
+    viewBox.x = 0;
+    viewBox.y = 0;
+    viewBox.width = width;
+    viewBox.height = height;
+    zoomLevel = initialZoom;
   }
 </script>
 
@@ -188,7 +201,7 @@
         <Button
           variant="secondary"
           size="sm"
-          leadingIcon="plus"
+          leadingIcon="add"
           aria-label="Zoom in"
           disabled={zoomLevel - ZOOM_STEP < maxZoomIn}
           on:click={() => zoomBy(-ZOOM_STEP)}
@@ -198,7 +211,7 @@
         <Button
           variant="secondary"
           size="sm"
-          leadingIcon="minus"
+          leadingIcon="hyphen"
           aria-label="Zoom out"
           disabled={zoomLevel + ZOOM_STEP > maxZoomOut}
           on:click={() => zoomBy(ZOOM_STEP)}

@@ -46,7 +46,7 @@
       identity,
       scheduleId,
       namespace,
-      isPaused: isSchedulePaused,
+      isPaused: isSchedulePaused ?? false,
     })}
 >
   <h3 slot="title">

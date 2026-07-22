@@ -10,7 +10,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import { GCP_REGIONS } from './gcp-regions';
-  import terraformTemplate from './serverless-worker-lambda.tf?raw';
+  import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
 
   interface Props {
@@ -33,6 +33,7 @@
     metricsPollIntervalMs?: number;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    terraformTemplate?: string;
     errors?: {
       lambdaArn?: string[];
       iamRoleArn?: string[];
@@ -72,10 +73,14 @@
     metricsPollIntervalMs = $bindable(),
     cfnTemplateUrl,
     cfnTemplate: cfnTemplateProp,
+    terraformTemplate,
     errors = {},
   }: Props = $props();
 
   const resolvedCfnTemplate = $derived(cfnTemplateProp ?? cfnTemplate);
+  const resolvedTerraformTemplate = $derived(
+    terraformTemplate ?? defaultTerraformTemplate,
+  );
 
   const launchStackHref = $derived.by(() => {
     if (!cfnTemplateUrl) {
@@ -154,27 +159,21 @@
       placeholder={translate('workers.gcp-project-placeholder')}
       required
     />
-    <div class="flex flex-col gap-1.5">
-      <Combobox
-        bind:value={gcpRegion}
-        id="gcpRegion"
-        name="gcpRegion"
-        label={translate('workers.gcp-region-label')}
-        placeholder={translate('workers.gcp-region-placeholder')}
-        options={gcpRegions}
-        noResultsText={translate('common.no-results')}
-        valid={!errors.gcpRegion?.[0]}
-        error={errors.gcpRegion?.[0]}
-        allowCustomValue
-        showChevron
-        required
-      />
-      {#if !errors.gcpRegion?.[0]}
-        <p class="text-xs text-primary">
-          {translate('workers.gcp-region-hint')}
-        </p>
-      {/if}
-    </div>
+    <Combobox
+      bind:value={gcpRegion}
+      id="gcpRegion"
+      name="gcpRegion"
+      label={translate('workers.gcp-region-label')}
+      hintText={translate('workers.gcp-region-hint')}
+      placeholder={translate('workers.gcp-region-placeholder')}
+      options={gcpRegions}
+      noResultsText={translate('common.no-results')}
+      valid={!errors.gcpRegion?.[0]}
+      error={errors.gcpRegion?.[0]}
+      allowCustomValue
+      showChevron
+      required
+    />
     <div class="flex flex-wrap items-end gap-4">
       <Input
         bind:value={gcpWorkerPool}
@@ -283,10 +282,11 @@
             >{translate('workers.terraform-description-after')}
           </p>
           <CodeBlock
-            content={terraformTemplate}
+            content={resolvedTerraformTemplate}
             language="text"
             maxHeight={300}
             copyable
+            label={translate('workers.terraform-iam-module-link')}
             copyIconTitle={translate('workers.copy-snippet')}
             copySuccessIconTitle={translate('workers.copied')}
           />

@@ -17,7 +17,7 @@ export class StandaloneNexusOperationPoller {
   private namespace: string;
   private operationId: string;
   private runId: string;
-  private token: string;
+  private token: string = '';
   private onUpdate: (nexusOperationExecution: NexusOperationExecution) => void;
   private onError: (error: Error) => void;
 
@@ -44,9 +44,10 @@ export class StandaloneNexusOperationPoller {
       nexusOperationExecution = await getNexusOperationExecution(
         this.namespace,
         this.operationId,
+        this.runId,
       );
     } catch (error) {
-      this.onError(error);
+      this.onError(error as Error);
       return;
     }
 
@@ -56,7 +57,7 @@ export class StandaloneNexusOperationPoller {
       nexusOperationExecution.info.status ===
       'NEXUS_OPERATION_EXECUTION_STATUS_RUNNING'
     ) {
-      this.token = nexusOperationExecution.longPollToken;
+      this.token = nexusOperationExecution.longPollToken ?? '';
 
       while (!this.abortController.signal.aborted) {
         try {
@@ -73,7 +74,7 @@ export class StandaloneNexusOperationPoller {
             polledNexusOperationExecution &&
             !isEmptyObject(polledNexusOperationExecution)
           ) {
-            this.token = polledNexusOperationExecution.longPollToken;
+            this.token = polledNexusOperationExecution.longPollToken ?? '';
             this.onUpdate(polledNexusOperationExecution);
           }
         } catch (error) {
@@ -81,7 +82,7 @@ export class StandaloneNexusOperationPoller {
             return;
           }
 
-          this.onError(error);
+          this.onError(error as Error);
           break;
         }
       }
@@ -92,6 +93,7 @@ export class StandaloneNexusOperationPoller {
     const nexusOperationExecution = await getNexusOperationExecution(
       this.namespace,
       this.operationId,
+      this.runId,
     );
     this.onUpdate(nexusOperationExecution);
   }

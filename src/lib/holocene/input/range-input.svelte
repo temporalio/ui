@@ -1,26 +1,27 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
+  import { omit } from 'es-toolkit';
+
   import Label from '$lib/holocene/label.svelte';
-  import { omit } from '$lib/utilities/omit';
 
   interface $$Props extends HTMLInputAttributes {
     value: number;
     id: string;
     label: string;
     labelHidden?: boolean;
-    min?: number;
-    max?: number;
+    min: number;
+    max: number;
     step?: number;
     'data-testid'?: string;
   }
 
   export let label: string;
   export let labelHidden = false;
-  export let min: number = undefined;
-  export let max: number = undefined;
-  export let step: number = undefined;
-  export let id: string = undefined;
+  export let min: number;
+  export let max: number;
+  export let step: number | undefined = undefined;
+  export let id: string;
   export let value: number = Math.round((min + max) / 2);
   let valid = true;
   let outputElement: HTMLOutputElement;
@@ -49,12 +50,26 @@
       event.currentTarget.valueAsNumber <= max;
   };
 
-  const getOutputXPos = ({ value, min, max }) => {
+  const getOutputXPos = ({
+    value,
+    min,
+    max,
+  }: {
+    value: number;
+    min: number;
+    max: number;
+  }) => {
     // calculates the value as a percentage to position the output text
     return ((value - min) * 100) / (max - min);
   };
 
-  const getOutputXPosOffset = ({ outputElement, outputXPos }) => {
+  const getOutputXPosOffset = ({
+    outputElement,
+    outputXPos,
+  }: {
+    outputElement: HTMLOutputElement | undefined;
+    outputXPos: number;
+  }) => {
     // as the output text moves to the right with the slider thumb, it needs to shift left slightly
     // such that it doesn't overflow the width of the slider track.
     const offset = outputElement?.clientWidth ?? 15;
@@ -92,7 +107,7 @@
           {min}
           {max}
           {step}
-          {...omit($$restProps, 'class')}
+          {...omit($$restProps, ['class'])}
         />
         <Label hidden {label} for="{id}-range" />
       </div>

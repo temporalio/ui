@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { omit } from 'es-toolkit';
   import type { Snippet } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
@@ -7,13 +8,12 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { PendingNexusOperation } from '$lib/types/events';
-  import { omit } from '$lib/utilities/omit';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   let { operation }: { operation: PendingNexusOperation } = $props();
 
-  const failed = $derived(operation.attempt > 1);
+  const failed = $derived((operation.attempt ?? 0) > 1);
 </script>
 
 <div
@@ -102,6 +102,7 @@
           <CodeBlock
             language="text"
             content={operation.blockedReason}
+            label={translate('nexus.blocked-reason')}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -115,6 +116,7 @@
           <CodeBlock
             language="text"
             content={stringifyWithBigInt(operation.cancellationInfo)}
+            label={translate('nexus.cancellation-info')}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -124,7 +126,7 @@
   </div>
 </div>
 
-{#snippet nextRetry(timeDifference)}
+{#snippet nextRetry(timeDifference: string)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {translate('workflows.next-retry')}
@@ -167,8 +169,9 @@
         </p>
         <CodeBlock
           content={stringifyWithBigInt(
-            omit(operation.lastAttemptFailure, 'stackTrace'),
+            omit(operation.lastAttemptFailure, ['stackTrace']),
           )}
+          label={translate('workflows.last-failure')}
           maxHeight={384}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -184,6 +187,7 @@
           language="text"
           maxHeight={384}
           content={operation.lastAttemptFailure.stackTrace}
+          label={translate('common.stack-trace')}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />

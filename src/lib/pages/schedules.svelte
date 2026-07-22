@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
@@ -26,6 +27,11 @@
   } from '$lib/stores/configurable-table-columns';
   import { coreUserStore } from '$lib/stores/core-user';
   import { scheduleFilters } from '$lib/stores/filters';
+  import {
+    DEFAULT_SCHEDULE_SYSTEM_VIEW,
+    savedScheduleQueries,
+    systemScheduleViews,
+  } from '$lib/stores/saved-queries';
   import { schedulesCount, schedulesRefresh } from '$lib/stores/schedules';
   import {
     scheduleSearchAttributeOptions,
@@ -85,8 +91,6 @@
       (err as APIErrorResponse)?.body?.message ||
       translate('schedules.error-message-fetching');
   };
-
-  const showFilters = $derived($schedulesCount.count > 0 || query);
 </script>
 
 <header class="flex flex-col gap-2">
@@ -135,82 +139,90 @@
   </div>
 </header>
 
-{#if showFilters}
-  <FilterBar
-    filters={scheduleFilters}
-    options={$scheduleSearchAttributeOptions}
-    searchAttributes={$scheduleSearchAttributes}
-    id="schedules"
-  />
-{/if}
-
-{#key [namespace, query, $schedulesRefresh]}
-  <PaginatedTable
-    let:visibleItems
-    {onFetch}
-    {onError}
-    total={$schedulesCount.count}
-    aria-label={translate('common.schedules')}
-    pageSizeSelectLabel={translate('common.per-page')}
-    nextButtonLabel={translate('common.next')}
-    previousButtonLabel={translate('common.previous')}
-    emptyStateMessage={translate('schedules.empty-state-title')}
-    errorMessage={translate('schedules.error-message-fetching')}
-  >
-    <caption class="sr-only" slot="caption"
-      >{translate('common.schedules')}</caption
+<FilterBar
+  filters={scheduleFilters}
+  options={$scheduleSearchAttributeOptions}
+  searchAttributes={$scheduleSearchAttributes}
+  id="schedules"
+/>
+<SavedQueryViews
+  filters={scheduleFilters}
+  savedQueries={savedScheduleQueries}
+  systemViews={systemScheduleViews}
+  defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+  searchAttributes={scheduleSearchAttributes}
+  id="schedule"
+>
+  {#key [namespace, query, $schedulesRefresh]}
+    <PaginatedTable
+      let:visibleItems
+      {onFetch}
+      {onError}
+      total={$schedulesCount.count}
+      aria-label={translate('common.schedules')}
+      pageSizeSelectLabel={translate('common.per-page')}
+      nextButtonLabel={translate('common.next')}
+      previousButtonLabel={translate('common.previous')}
+      emptyStateMessage={translate('schedules.empty-state-title')}
+      errorMessage={translate('schedules.error-message-fetching')}
     >
-    <tr slot="headers" class="text-left">
-      {#each columns as { label }}
-        <th>{label}</th>
+      <caption class="sr-only" slot="caption"
+        >{translate('common.schedules')}</caption
+      >
+      <tr slot="headers" class="text-left">
+        {#each columns as { label }, i (`${label}:${i}`)}
+          <th>{label}</th>
+        {/each}
+      </tr>
+      {#each visibleItems as schedule (schedule.scheduleId)}
+        <SchedulesTableRow {schedule} {columns} />
       {/each}
-    </tr>
-    {#each visibleItems as schedule}
-      <SchedulesTableRow {schedule} {columns} />
-    {/each}
 
-    <svelte:fragment slot="empty">
-      {#if error}
-        <EmptyState title={translate('schedules.empty-state-title')}>
-          <Alert intent="warning" icon="warning" class="mx-12">
-            {error}
-          </Alert>
-        </EmptyState>
-      {:else if query}
-        <EmptyState
-          title={translate('schedules.empty-state-title')}
-          content={translate('schedules.empty-state-description')}
-        />
-      {:else}
-        <EmptyState title={translate('schedules.empty-state-title')}>
-          <p>
-            {translate('schedules.getting-started-docs-link-preface')}
-            <Link newTab href="https://docs.temporal.io/workflows/#schedule"
-              >{translate('schedules.getting-started-docs-link')}</Link
-            >
-            {translate('schedules.getting-started-cli-link-preface')}
-            <Link newTab href="https://docs.temporal.io/cli/schedule"
-              >Temporal CLI</Link
-            >.
-          </p>
-        </EmptyState>
-      {/if}
-    </svelte:fragment>
-    <svelte:fragment slot="actions-end-additional">
-      <Tooltip text={translate('common.configure-columns')} top>
-        <Button
-          on:click={openCustomizationDrawer}
-          data-testid="workflows-summary-table-configuration-button"
-          size="xs"
-          variant="ghost"
-          aria-label={translate('common.configure-columns')}
-        >
-          <Icon name="settings" />
-        </Button>
-      </Tooltip>
-    </svelte:fragment>
-  </PaginatedTable>
-{/key}
+      <svelte:fragment slot="empty">
+        <div class="flex h-full flex-col items-center justify-center">
+          {#if error}
+            <EmptyState title={translate('schedules.empty-state-title')}>
+              <Alert intent="warning" icon="warning" class="mx-12">
+                {error}
+              </Alert>
+            </EmptyState>
+          {:else if query}
+            <EmptyState
+              title={translate('schedules.empty-state-title')}
+              content={translate('schedules.empty-state-description')}
+            />
+          {:else}
+            <EmptyState title={translate('schedules.empty-state-title')}>
+              <p>
+                {translate('schedules.getting-started-docs-link-preface')}
+                <Link newTab href="https://docs.temporal.io/workflows/#schedule"
+                  >{translate('schedules.getting-started-docs-link')}</Link
+                >
+                {translate('schedules.getting-started-cli-link-preface')}
+                <Link newTab href="https://docs.temporal.io/cli/schedule"
+                  >Temporal CLI</Link
+                >.
+              </p>
+            </EmptyState>
+          {/if}
+        </div>
+      </svelte:fragment>
+      <svelte:fragment slot="actions-end-additional">
+        <Tooltip text={translate('common.configure-columns')} top>
+          <Button
+            on:click={openCustomizationDrawer}
+            data-testid="workflows-summary-table-configuration-button"
+            size="xs"
+            variant="ghost"
+            aria-label={translate('common.configure-columns')}
+          >
+            <Icon name="settings" />
+          </Button>
+        </Tooltip>
+      </svelte:fragment>
+    </PaginatedTable>
+  {/key}
+</SavedQueryViews>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

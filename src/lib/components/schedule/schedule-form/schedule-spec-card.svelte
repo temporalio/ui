@@ -11,6 +11,7 @@
   import type { DescribeFullSchedule } from '$lib/types/schedule';
 
   import type { FormScheduleSchema } from '../schema/form';
+  import { getFormSpecInitialData } from '../utilities/get-form-spec-initial-data';
 
   import ScheduleSpecItem from './schedule-spec-item.svelte';
 
@@ -48,7 +49,7 @@
       return;
     }
 
-    $form.specs = [...$form.specs, { kind: 'cron', cronString: '' }];
+    $form.specs = [...$form.specs, getFormSpecInitialData('cron')];
     expandedIndex = $form.specs.length - 1;
 
     await tick();
@@ -59,7 +60,7 @@
     $form.specs = $form.specs.filter((_, i) => i !== index);
 
     if (!$form.specs.length) {
-      $form.specs = [{ kind: 'cron', cronString: '' }];
+      $form.specs = [getFormSpecInitialData('cron')];
       expandedIndex = 0;
       await tick();
       specItemElsByIndex.get(expandedIndex)?.focus();

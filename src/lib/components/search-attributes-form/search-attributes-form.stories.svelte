@@ -8,10 +8,7 @@
   import { translate } from '$lib/i18n/translate';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
-  import type {
-    SearchAttributeDefinition,
-    SearchAttributeTypeOption,
-  } from './types';
+  import type { SearchAttributeDefinition } from './types';
 
   import SearchAttributesForm from './search-attributes-form.svelte';
 

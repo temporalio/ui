@@ -3,13 +3,14 @@
 
   import { page } from '$app/state';
 
+  import ActivityExecutionStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { isActivityDelayed } from '$lib/utilities/delayed-activities';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
   import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
-  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
@@ -76,17 +77,22 @@
 {:else}
   <td class={className} data-testid={testId}>
     {#if label === 'Status'}
-      <WorkflowStatus status={toActivityStatus(activity.status)} />
+      <ActivityExecutionStatus
+        status={toActivityStatus(activity.status)}
+        delayed={isActivityDelayed(activity)}
+      />
     {:else if label === 'Start'}
       <Timestamp dateTime={activity.scheduleTime} />
     {:else if label === 'End'}
       <Timestamp dateTime={activity.closeTime} />
     {:else if label === 'Execution Duration'}
       {#if activity.executionDuration}
-        {fromSeconds(activity.executionDuration)}
+        {formatDurationAbbreviated(activity.executionDuration)}
       {/if}
     {:else if label === 'State Transitions'}
       {activity.stateTransitionCount ?? ''}
+    {:else if label === 'Execution Time'}
+      <Timestamp dateTime={activity.executionTime} />
     {/if}
   </td>
 {/if}

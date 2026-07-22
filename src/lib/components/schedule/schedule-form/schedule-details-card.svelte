@@ -12,7 +12,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import { formatOffset, TimezoneOptions } from '$lib/utilities/timezone';
+  import { ianaTimezoneComboboxOptions } from '$lib/utilities/timezone';
 
   import type { FormScheduleSchema } from '../schema/form';
   import { fromCalendarDateStr, toCalendarDateStr } from '../utilities/date';
@@ -26,18 +26,6 @@
   }
 
   let { form, errors, schedule = null }: Props = $props();
-
-  const timezoneComboboxOptions = $derived.by(() => {
-    const opts = [{ label: translate('common.utc'), value: 'UTC' }];
-    for (const tz of TimezoneOptions) {
-      const offsetStr = formatOffset(tz.offset);
-      opts.push({
-        label: `${tz.label} (${tz.abbr}) ${offsetStr}`,
-        value: tz.zones?.[0] ?? tz.label,
-      });
-    }
-    return opts;
-  });
 
   // svelte-ignore state_referenced_locally
   const endKindStore = fieldProxy(form, 'endKind');
@@ -177,7 +165,7 @@
               label={translate('schedules.occurrences-label')}
               labelHidden
               bind:value={
-                () => $form.endAfterOccurrences?.toString(),
+                () => $form.endAfterOccurrences?.toString() ?? '',
                 (v) => ($form.endAfterOccurrences = Number(v))
               }
               placeholder={translate('schedules.occurrences-placeholder')}
@@ -199,7 +187,7 @@
         id="timezoneName"
         label={translate('schedules.timezone-label')}
         bind:value={$form.timezoneName}
-        options={timezoneComboboxOptions}
+        options={ianaTimezoneComboboxOptions}
         optionValueKey="value"
         optionLabelKey="label"
         noResultsText={translate('common.no-results')}
@@ -209,6 +197,7 @@
       />
 
       <Input
+        class="gap-1.5"
         id="jitter"
         label={translate('schedules.jitter')}
         type="number"
@@ -235,11 +224,13 @@
     </div>
 
     <ScheduleInputPayload
-      bind:input={$form.input}
+      bind:input={() => $form.input ?? '', (v) => ($form.input = v)}
       bind:editInput={$form.editInput}
       bind:encoding={$form.encoding}
-      bind:messageType={$form.messageType}
-      payloads={schedule?.schedule?.action?.startWorkflow?.input}
+      bind:messageType={
+        () => $form.messageType ?? '', (v) => ($form.messageType = v)
+      }
+      payloads={schedule?.schedule?.action?.startWorkflow?.input ?? undefined}
       showEditActions={Boolean(schedule)}
     />
   </div>

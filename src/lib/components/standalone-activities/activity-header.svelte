@@ -1,13 +1,16 @@
 <script lang="ts">
+  import ActivityExecutionStatus from '$lib/components/execution-status.svelte';
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { isActivityDelayed } from '$lib/utilities/delayed-activities';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
+  import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { routeForStandaloneActivitiesWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
-  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
     DetailList,
@@ -20,7 +23,6 @@
   } from '../detail-list';
 
   import ActivityExecutionActions from './activity-actions.svelte';
-  import ActivityExecutionStatus from './activity-status.svelte';
 
   interface Props {
     activityExecutionInfo: ActivityExecutionInfo;
@@ -50,7 +52,11 @@
     class="flex items-center justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
   >
     <div class="flex items-center gap-4">
-      <ActivityExecutionStatus status={activityExecutionInfo.status} />
+      <ActivityExecutionStatus
+        status={toActivityStatus(activityExecutionInfo.status)}
+        delayed={isActivityDelayed(activityExecutionInfo)}
+        big
+      />
       <div class="text-2xl font-medium">
         <h1
           data-testid="activity-id-heading"
@@ -69,12 +75,23 @@
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
-  <DetailList aria-label="activity execution details" rowCount={3}>
+  <DetailList
+    aria-label="activity execution details"
+    rowCount={activityExecutionInfo.executionTime ? 4 : 3}
+  >
     <DetailListColumn>
       <DetailListLabel>{translate('common.start')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.scheduleTime}
       />
+      {#if activityExecutionInfo.executionTime}
+        <DetailListLabel
+          >{translate('standalone-activities.execution-time')}</DetailListLabel
+        >
+        <DetailListTimestampValue
+          timestamp={activityExecutionInfo.executionTime}
+        />
+      {/if}
       <DetailListLabel>{translate('common.end')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.closeTime}
@@ -85,7 +102,7 @@
       >
       <DetailListTextValue
         text={activityExecutionInfo.executionDuration
-          ? fromSeconds(activityExecutionInfo.executionDuration)
+          ? formatDurationAbbreviated(activityExecutionInfo.executionDuration)
           : '-'}
       />
     </DetailListColumn>

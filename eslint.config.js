@@ -152,6 +152,7 @@ export default [
       'dist/**',
       'build/**',
       'node_modules/**',
+      'vendor/**',
       'playwright-report/**',
       'test-results/**',
       'coverage/**',

@@ -46,7 +46,7 @@
     label,
     afterLabel,
     labelHidden = false,
-    icon = null,
+    icon = undefined,
     placeholder = '',
     suffix = '',
     prefix = '',
@@ -59,7 +59,7 @@
     hintText = '',
     maxLength = 0,
     hideCount = false,
-    spellcheck = null,
+    spellcheck = undefined,
     noBorder = false,
     autoFocus = false,
     error = false,
@@ -102,7 +102,13 @@
       !afterLabel && 'contents',
     )}
   >
-    <Label class="grow-0" {required} {label} hidden={labelHidden} for={id} />
+    <Label
+      class="grow-0"
+      required={required ?? false}
+      {label}
+      hidden={labelHidden}
+      for={id}
+    />
     {@render afterLabel?.()}
   </div>
   <div class="input-group flex">

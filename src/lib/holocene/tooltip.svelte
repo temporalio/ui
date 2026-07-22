@@ -5,7 +5,10 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Portal from '$lib/holocene/portal/portal.svelte';
-  import type { PortalPosition } from '$lib/holocene/portal/types';
+  import type {
+    PortalOffset,
+    PortalPosition,
+  } from '$lib/holocene/portal/types';
   import type { Only } from '$lib/types/global';
 
   const HOVER_HIDE_DELAY_MS = 120;
@@ -19,6 +22,7 @@
     tooltipClass?: string;
     show?: boolean;
     usePortal?: boolean;
+    portalOffset?: PortalOffset;
     scrollContainer?: string;
   };
 
@@ -57,7 +61,7 @@
   let className = '';
   export { className as class };
   export let text = '';
-  export let icon: IconName = null;
+  export let icon: IconName | undefined = undefined;
   /** bottom center of the tooltip aligned to the top center of the wrapper */
   export let top = false;
   /** bottom right of the tooltip aligned to the top right of the wrapper */
@@ -79,6 +83,7 @@
   export let tooltipClass = '';
   export let show = false;
   export let usePortal = false;
+  export let portalOffset: PortalOffset | undefined = undefined;
   export let scrollContainer: string | undefined = undefined;
 
   let wrapperElement: HTMLElement | null = null;
@@ -147,7 +152,7 @@
   })();
 </script>
 
-<svelte:window on:keydown={handleWindowKeydown} />
+<svelte:window on:keydown|capture={handleWindowKeydown} />
 
 {#if hide}
   <slot />
@@ -166,6 +171,7 @@
 
     {#if usePortal && wrapperElement}
       <Portal
+        offset={portalOffset}
         anchor={wrapperElement}
         open={isOpen}
         position={portalPosition}

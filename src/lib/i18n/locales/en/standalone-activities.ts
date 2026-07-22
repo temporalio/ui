@@ -16,6 +16,17 @@ export const Strings = {
   'timed-out-activities': 'Timed Out',
   'empty-state-title': 'No Activities Found',
   'empty-state-description': 'No activities match the current filters.',
+  'no-activities-title':
+    'This Namespace doesn’t have any Standalone Activities yet.',
+  'no-activities-description-part-1-preface': ' are Temporal’s ',
+  'job-queue-link': 'job queue',
+  'no-activities-description-part-1-postface':
+    ' – the simplest way to run durable, retryable tasks on Temporal. Create an Activity function once and invoke it standalone (as a job) or as a step in a Workflow.',
+  'no-activities-description-part-2':
+    'Standalone Activities come with the durability benefits of Temporal plus declarative retries, deduplication, priority & fairness, and heartbeats with checkpointing for longer running jobs.',
+  'no-activities-description-part-3':
+    'Get started with a job today and graduate to a Workflow when you need multi-step orchestration, human-in-the-loop, signals, updates, or timers.',
+  'get-started-title': 'Get started with your preferred SDK’s code samples',
   'custom-views': 'Custom Views',
   'recent-activities': 'Recent Standalone Activities',
   'activity-id': 'Activity ID',
@@ -51,7 +62,7 @@ export const Strings = {
   'form-activity-type-label': 'Activity Type',
   'form-activity-type-required': 'Activity Type is required.',
   'form-random-uuid': 'Random UUID',
-  'form-timeouts-heading': 'Activity Timeouts',
+  'form-options-heading': 'Activity Options',
   'form-start-to-close-timeout-label': 'Start to Close Timeout',
   'form-start-to-close-timeout-hint':
     'Maximum time an activity is allowed to execute after being picked up by a worker.',
@@ -63,6 +74,9 @@ export const Strings = {
     'Limits time an activity task can stay in a task queue before a worker picks it up. Defaults to "Schedule to Close Timeout" if not specified.',
   'form-timeout-required':
     'Either "Start to Close Timeout" or "Schedule to Close Timeout" is required.',
+  'form-start-delay-label': 'Start Delay',
+  'form-start-delay-hint':
+    'Determines the amount of time to wait before initiating an Activity Execution.',
   'form-search-attributes-heading': 'Custom Search Attributes',
   'form-search-attributes-description':
     'Indexed fields used in a List Filter to filter a list of Standalone Activities.',
@@ -87,10 +101,12 @@ export const Strings = {
   health: 'Health',
   'retry-state': 'Retry State',
   'timeout-configuration': 'Timeout Configuration',
+  'start-delay': 'Start Delay',
   worker: 'Worker',
   'run-state': 'Run State',
   attempt: 'Attempt',
   'schedule-time': 'Schedule Time',
+  'execution-time': 'Execution Time',
   'execution-duration': 'Execution Duration',
   'last-heartbeat': 'Last Heartbeat',
   'heartbeat-timeout': 'Heartbeat Timeout',
@@ -104,9 +120,15 @@ export const Strings = {
   'last-failure': 'Last Failure',
   'retry-policy': 'Retry Policy',
   'heartbeat-details': 'Heartbeat Details',
+  'activity-input': 'Activity Input',
+  'activity-outcome': 'Activity Outcome',
+  'cluster-config': 'Cluster Configuration',
+  'namespace-config': 'Namespace Configuration',
   header: 'Header',
   priority: 'Priority',
   'priority-key': 'Priority Key',
   'fairness-key': 'Fairness Key',
   'fairness-weight': 'Fairness Weight',
+  'pause-activity': 'Pause Activity',
+  'unpause-activity': 'Unpause Activity',
 } as const;

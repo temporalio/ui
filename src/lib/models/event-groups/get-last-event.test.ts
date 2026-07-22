@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import type { Failure, Payloads } from '$lib/types';
 import type { WorkflowEvents } from '$lib/types/events';
 
 import { groupEvents } from '.';
@@ -22,7 +23,7 @@ const scheduledEvent = {
       name: 'rainbow-statuses',
       kind: 'Normal',
     },
-    input: null,
+    input: null as unknown as Payloads,
   },
 };
 
@@ -43,7 +44,7 @@ const anotherScheduledEvent = {
       name: 'test-events',
       kind: 'Normal',
     },
-    input: null,
+    input: null as unknown as Payloads,
   },
 };
 
@@ -59,7 +60,7 @@ const startedEvent = {
     identity: '21665@temporal@',
     requestId: '0202572f-485c-426a-a3ee-02ea46d3cad7',
     attempt: 1,
-    lastFailure: null,
+    lastFailure: null as unknown as Failure,
   },
 };
 
@@ -71,7 +72,7 @@ const completedEvent = {
   version: '0',
   taskId: '1049498',
   activityTaskCompletedEventAttributes: {
-    result: null,
+    result: null as unknown as Payloads,
     scheduledEventId: '5',
     startedEventId: '6',
     identity: '21665@temporal@',

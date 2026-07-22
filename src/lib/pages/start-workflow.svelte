@@ -12,7 +12,11 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput, {
+    DAYS,
+    DEFAULT_UNITS,
+    SECONDS,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -29,6 +33,7 @@
   import {
     customSearchAttributes,
     type SearchAttributeInput,
+    type SearchAttributesSchema,
   } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
@@ -64,7 +69,7 @@
   let pollerCount: undefined | number = undefined;
   let viewAdvancedOptions = false;
 
-  let searchAttributes: SearchAttributeInput[] = [];
+  let searchAttributes: SearchAttributesSchema = [];
 
   $: errorWorkflowDetails = extractWorkflowFromError(error);
 
@@ -120,7 +125,7 @@
         details,
         encoding: $encoding,
         messageType,
-        searchAttributes,
+        searchAttributes: searchAttributes as SearchAttributeInput[],
         identity,
         workflowStartDelay: workflowStartDelay || undefined,
       });
@@ -135,7 +140,8 @@
         }),
       });
     } catch (e) {
-      error = e?.message || translate('workflows.start-workflow-error');
+      error =
+        (e as Error)?.message || translate('workflows.start-workflow-error');
       toaster.push({
         variant: 'error',
         message: translate('workflows.start-workflow-error'),
@@ -156,7 +162,7 @@
   const checkTaskQueue = async (queue: string) => {
     if (queue) {
       const { pollers } = await getPollers({ namespace, queue });
-      pollerCount = pollers.length;
+      pollerCount = pollers?.length ?? 0;
     }
   };
 
@@ -191,7 +197,7 @@
               label: key,
               value,
               type: $customSearchAttributes[key],
-            } as SearchAttributeInput,
+            },
           ];
         }
       });
@@ -235,7 +241,7 @@
     !!inputValid &&
     !workflowCreateDisabled($page);
 
-  $: checkTaskQueue(taskQueueParam);
+  $: checkTaskQueue(taskQueueParam ?? '');
 </script>
 
 <div class="flex w-full flex-col gap-4 pb-20">
@@ -338,6 +344,8 @@
           labelHidden
           inputmode="numeric"
           bind:value={workflowStartDelay}
+          units={[...DEFAULT_UNITS, DAYS]}
+          initialUnit={SECONDS.label}
           min={0}
           class="max-w-80"
         />

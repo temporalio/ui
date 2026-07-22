@@ -13,7 +13,10 @@
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput, {
+    DAYS,
+    DEFAULT_UNITS,
     parseDuration,
+    SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -55,6 +58,7 @@
   import RandomUuidButton from '../../random-uuid-button.svelte';
   import RetryPolicyInput from '../../retry-policy-input.svelte';
   import AddSearchAttributes from '../../workflow/add-search-attributes.svelte';
+  import StartDelayGuard from '../start-delay-guard.svelte';
 
   interface Props {
     namespace: string;
@@ -65,7 +69,7 @@
 
   const formDefaults = $derived<StandaloneActivityFormDefaults>({
     namespace,
-    identity: getIdentity(),
+    identity: getIdentity() ?? '',
     encoding: 'json/plain',
     activityId: page.url.searchParams.get('activityId') ?? '',
     activityType: page.url.searchParams.get('activityType') ?? '',
@@ -99,19 +103,20 @@
       activityType: z.string().min(1, {
         message: translate('standalone-activities.form-activity-type-required'),
       }),
-      input: z.string().optional(),
-      startToCloseTimeout: z.string().optional(),
-      scheduleToCloseTimeout: z.string().optional(),
+      input: z.string().default(''),
+      startToCloseTimeout: z.string().default(''),
+      scheduleToCloseTimeout: z.string().default(''),
       encoding: z.enum(encodings).default('json/plain'),
-      messageType: z.string().optional(),
-      summary: z.string().optional(),
-      details: z.string().optional(),
-      scheduleToStartTimeout: z.string().optional(),
-      heartbeatTimeout: z.string().optional(),
+      messageType: z.string().default(''),
+      summary: z.string().default(''),
+      details: z.string().default(''),
+      scheduleToStartTimeout: z.string().default(''),
+      startDelay: z.string().default(''),
+      heartbeatTimeout: z.string().default(''),
       initialInterval: z.string().default(''),
-      backoffCoefficient: z.number().optional().nullable(),
+      backoffCoefficient: z.string().default(''),
       maximumInterval: z.string().default(''),
-      maximumAttempts: z.number().optional().nullable(),
+      maximumAttempts: z.string().default(''),
       idReusePolicy: z.string().optional(),
       idConflictPolicy: z.string().optional(),
     })
@@ -133,56 +138,57 @@
       }
     });
 
-  const { form, enhance, errors, message } = superForm(
-    {
-      ...formDefaults,
-      input: '',
-      messageType: '',
-      scheduleToStartTimeout: '',
-      summary: '',
-      details: '',
-      heartbeatTimeout: '',
-      initialInterval: '',
-      backoffCoefficient: null,
-      maximumInterval: '',
-      maximumAttempts: null,
-      idReusePolicy: '',
-      idConflictPolicy: '',
-    },
-    {
-      SPA: true,
-      dataType: 'json',
-      resetForm: false,
-      invalidateAll: false,
-      validators: zodClient(schema),
-      onUpdate: async ({ form }) => {
-        if (!form.valid) return;
+  // svelte-ignore state_referenced_locally
+  const initialData: z.infer<typeof schema> = {
+    ...formDefaults,
+    input: '',
+    messageType: '',
+    scheduleToStartTimeout: '',
+    startDelay: '',
+    summary: '',
+    details: '',
+    heartbeatTimeout: '',
+    initialInterval: '',
+    backoffCoefficient: '',
+    maximumInterval: '',
+    maximumAttempts: '',
+    idReusePolicy: '',
+    idConflictPolicy: '',
+  };
 
-        try {
-          const { runId } = await startStandaloneActivity({
-            ...form.data,
-            searchAttributes,
-          });
-          toaster.push({
-            duration: 5000,
-            variant: 'success',
-            message: translate('standalone-activities.form-activity-started'),
-            link: routeForStandaloneActivityDetails({
-              namespace,
-              activityId: form.data.activityId,
-              runId,
-            }),
-          });
-          return { type: 'success' };
-        } catch (error) {
-          console.error(error);
-          return {
-            type: 'error',
-          };
-        }
-      },
+  const { form, enhance, errors, message } = superForm(initialData, {
+    SPA: true,
+    dataType: 'json',
+    resetForm: false,
+    invalidateAll: false,
+    validators: zodClient(schema),
+    onUpdate: async ({ form }) => {
+      if (!form.valid) return;
+
+      try {
+        const { runId } = await startStandaloneActivity({
+          ...form.data,
+          searchAttributes,
+        });
+        toaster.push({
+          duration: 5000,
+          variant: 'success',
+          message: translate('standalone-activities.form-activity-started'),
+          link: routeForStandaloneActivityDetails({
+            namespace,
+            activityId: form.data.activityId,
+            runId,
+          }),
+        });
+        return { type: 'success' };
+      } catch (error) {
+        console.error(error);
+        return {
+          type: 'error',
+        };
+      }
     },
-  );
+  });
 
   const unsubscribe = encoding.subscribe((e) => {
     $form.encoding = e;
@@ -308,7 +314,7 @@
       $errors.startToCloseTimeout ? 'border-danger' : '',
     )}
   >
-    <h5>{translate('standalone-activities.form-timeouts-heading')}</h5>
+    <h5>{translate('standalone-activities.form-options-heading')}</h5>
 
     <DurationInput
       id="startToCloseTimeout"
@@ -356,6 +362,17 @@
         {$errors.startToCloseTimeout}
       </p>
     {/if}
+
+    <StartDelayGuard namespace={page.data.namespace}>
+      <DurationInput
+        id="startDelay"
+        label={translate('standalone-activities.form-start-delay-label')}
+        bind:value={$form.startDelay}
+        initialUnit={SECONDS.label}
+        units={[...DEFAULT_UNITS, DAYS]}
+        hintText={translate('standalone-activities.form-start-delay-hint')}
+      />
+    </StartDelayGuard>
   </Card>
 
   {#if advancedOptionsVisible}

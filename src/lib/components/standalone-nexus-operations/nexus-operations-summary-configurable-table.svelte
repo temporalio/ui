@@ -51,7 +51,6 @@
     emptyStateMessage={translate(
       'standalone-nexus-operations.empty-state-title',
     )}
-    maxHeight="var(--panel-h)"
     onLoadingChange={(loading) => {
       $nexusOperationLoading = loading;
     }}

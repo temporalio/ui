@@ -21,7 +21,7 @@
       removeChipButtonLabel: 'Remove',
       labelHidden: false,
       validator: isEmail,
-      maxLength: undefined,
+      maxLength: undefined as number | undefined,
       chips: ['tobias@temporal.io'],
       scrollTo: false,
     },

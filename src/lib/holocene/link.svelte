@@ -31,9 +31,9 @@
   export let active = false;
   export let interactive = false;
   export let newTab = false;
-  export let icon: IconName = null;
-  export let leadingIcon: IconName = null;
-  export let trailingIcon: IconName = null;
+  export let icon: IconName | undefined = undefined;
+  export let leadingIcon: IconName | undefined = undefined;
+  export let trailingIcon: IconName | undefined = undefined;
   export let text: string = '';
   export let light = false;
   export let gotoParams = {};
@@ -67,12 +67,7 @@
 >
   {#if effectiveLeading}
     <Icon class="mt-0.5" name={effectiveLeading} />
-  {/if}
-  {#if text}
-    {text}
-  {/if}
-  <slot />
-  {#if trailingIcon}
+  {/if}{#if text}{text}{/if}<slot />{#if trailingIcon}
     <Icon class="mt-0.5" name={trailingIcon} />
   {/if}
 </a>

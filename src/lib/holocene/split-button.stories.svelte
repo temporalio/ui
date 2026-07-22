@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
+  import type { IconName } from '$lib/holocene/icon';
   import { iconNames } from '$lib/holocene/icon';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
@@ -14,7 +15,7 @@
       label: 'Split Button',
       menuLabel: 'Actions',
       position: 'left',
-      icon: undefined,
+      icon: undefined as IconName | undefined,
       disabled: false,
       primaryActionDisabled: false,
       href: 'https://caniuse.com',

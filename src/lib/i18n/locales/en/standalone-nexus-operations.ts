@@ -36,7 +36,6 @@ export const Strings = {
   'empty-state-code-samples-title':
     'Explore code samples for Standalone Nexus Operations',
   'start-standalone-nexus-operation': 'Start a Standalone Nexus Operation',
-  'custom-views': 'Custom Views',
   'back-to-nexus-operations': 'Back to Standalone Nexus Operations',
   'layout-tabs-label': 'Nexus Operation Details',
   'layout-details-tab': 'Details',
@@ -114,8 +113,6 @@ export const Strings = {
     "The name of the Operation in the handler's namespace. A non-exact match will result in an operation failure.",
   'form-operation-name-required':
     "Operation Name from the handler Namespace's services is required.",
-  'form-timeout-required':
-    'At least one timeout (Start To Close or Schedule To Close) is required.',
   'form-timeouts-heading': 'Timeouts',
   'form-schedule-to-close-timeout-label': 'Schedule To Close Timeout',
   'form-schedule-to-start-timeout-label': 'Schedule To Start Timeout',

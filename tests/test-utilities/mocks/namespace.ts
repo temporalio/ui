@@ -46,6 +46,7 @@ const MOCK_DEFAULT_NAMESPACE = {
     capabilities: {
       standaloneActivities: true,
       workerHeartbeats: true,
+      standaloneActivityStartDelay: true,
     },
   },
   config: {
@@ -134,6 +135,27 @@ export const mockNamespaceWithNoWorkerHeartbeats = (page: Page) => {
   return page.route(NAMESPACE_API, (route) => {
     route.fulfill({
       json: MOCK_NAMESPACE_WITH_NO_WORKER_HEARTBEATS,
+    });
+  });
+};
+
+const MOCK_NAMESPACE_WITHOUT_STANDALONE_ACTIVITY_START_DELAY = {
+  ...MOCK_DEFAULT_NAMESPACE,
+  namespaceInfo: {
+    ...MOCK_DEFAULT_NAMESPACE.namespaceInfo,
+    capabilities: {
+      ...MOCK_DEFAULT_NAMESPACE.namespaceInfo.capabilities,
+      standaloneActivityStartDelay: false,
+    },
+  },
+};
+
+export const mockNamespaceWithoutStandaloneActivityStartDelay = (
+  page: Page,
+) => {
+  return page.route(NAMESPACE_API, (route) => {
+    route.fulfill({
+      json: MOCK_NAMESPACE_WITHOUT_STANDALONE_ACTIVITY_START_DELAY,
     });
   });
 };

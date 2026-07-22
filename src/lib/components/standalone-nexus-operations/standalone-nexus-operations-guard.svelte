@@ -15,7 +15,7 @@
 
   const capabilityState = $derived(
     namespaceCapabilityState(
-      namespace?.namespaceInfo?.capabilities,
+      namespace?.namespaceInfo?.capabilities ?? undefined,
       'standaloneNexusOperation',
     ),
   );

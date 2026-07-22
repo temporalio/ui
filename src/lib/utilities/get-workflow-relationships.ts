@@ -75,7 +75,7 @@ export const getWorkflowRelationships = (
   ) as ChildWorkflowClosedEvent[];
   const hasChildren = !!workflow?.pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
-  const parentNamespaceName = namespace.namespaceInfo?.name;
+  const parentNamespaceName = namespace.namespaceInfo?.name ?? undefined;
 
   const workflowExecutionStartedEvent = fullEventHistory.find(
     isWorkflowExecutionStartedEvent,
@@ -87,10 +87,13 @@ export const getWorkflowRelationships = (
     workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;
 
   const first =
-    firstExecutionRunId === workflow?.runId ? undefined : firstExecutionRunId;
+    firstExecutionRunId === workflow?.runId
+      ? undefined
+      : (firstExecutionRunId ?? undefined);
 
   const previous =
-    workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;
+    workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId ??
+    undefined;
 
   let scheduleId = '';
   const temporalScheduledById =
@@ -111,7 +114,7 @@ export const getWorkflowRelationships = (
 
   const relationshipCount =
     (parent ? 1 : 0) +
-    workflow?.pendingChildren.length +
+    (workflow?.pendingChildren?.length ?? 0) +
     children.length +
     (first ? 1 : 0) +
     (previous ? 1 : 0) +

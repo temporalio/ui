@@ -77,7 +77,7 @@
     return { childX: getX(), childY };
   };
 
-  const nodeClick = (e, node: RootNode) => {
+  const nodeClick = (e: Event, node: RootNode) => {
     e.stopPropagation();
     onNodeClick(node, generation);
   };
@@ -169,7 +169,7 @@
     tabindex="0"
     aria-label={translate('workflows.family-node-label', {
       id: child.workflow.id,
-      status: child.workflow.status,
+      status: child.workflow.status ?? '',
     })}
     class="outline-none transition-all"
     on:click={(e) => nodeClick(e, child)}
@@ -230,14 +230,14 @@
         y={!child?.children?.length
           ? childY + 1.15 * radius
           : childY - 1.15 * radius}
-        class={!child?.children?.length && '[writing-mode:vertical-lr]'}
+        class={!child?.children?.length ? '[writing-mode:vertical-lr]' : ''}
         fill="currentcolor"
         text-anchor={!child?.children?.length ? 'start' : 'start'}
         font-weight="500">{child.workflow.id}</text
       >
     {/if}
   </g>
-  {#if !$showFullTree && child.siblingCount > 0}
+  {#if !$showFullTree && (child.siblingCount ?? 0) > 0}
     <line
       x1={x}
       y1={y}
@@ -298,7 +298,7 @@
     tabindex="0"
     aria-label={translate('workflows.family-node-label', {
       id: root.workflow.id,
-      status: root.workflow.status,
+      status: root.workflow.status ?? '',
     })}
     on:click={(e) => nodeClick(e, root)}
     on:keydown={(e) => handleNodeKeydown(e, root)}

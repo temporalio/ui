@@ -7,8 +7,8 @@
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
   import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -123,14 +123,14 @@
           }"`,
           `TemporalScheduledById="${scheduleId}"`,
         ].join(' AND '),
-      })}
-      text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+      }) ?? ''}
+      text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name ?? ''}
       iconName="filter"
       copyable={Boolean(
         schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
       )}
       copyableText={schedule?.schedule?.action?.startWorkflow?.workflowType
-        ?.name}
+        ?.name ?? undefined}
     />
 
     <DetailListLabel class="items-center">
@@ -193,7 +193,7 @@
     <div class="flex w-full flex-col gap-4 xl:w-1/3">
       <WorkflowInputCard
         {scheduleId}
-        input={schedule?.schedule?.action?.startWorkflow?.input}
+        input={schedule?.schedule?.action?.startWorkflow?.input ?? undefined}
       />
       <ScheduleSpecCard {schedule} />
     </div>

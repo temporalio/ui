@@ -37,7 +37,7 @@
       {translate('batch.total-operations')}
     </p>
     <p class="batch-operation-value">
-      {Intl.NumberFormat('en-US').format(operation.totalOperationCount)}
+      {Intl.NumberFormat('en-US').format(operation.totalOperationCount ?? 0)}
     </p>
   </div>
 </div>

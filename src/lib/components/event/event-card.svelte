@@ -31,7 +31,8 @@
 
   import EventDetailsLink from './event-details-link.svelte';
 
-  let { event }: { event: WorkflowEvent } = $props();
+  let { event, lazy = false }: { event: WorkflowEvent; lazy?: boolean } =
+    $props();
   const { namespace, workflow, run } = $derived(page.params);
 
   const displayName = $derived(
@@ -160,7 +161,7 @@
   </div>
 {/snippet}
 
-{#snippet payloads(key, value)}
+{#snippet payloads(key: string, value: Record<string, unknown>)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
@@ -175,8 +176,10 @@
           eventId: event.id,
           type: key,
         }}
+        label={format(key)}
         {value}
         maxHeight={384}
+        {lazy}
       />
     {:else}
       <PayloadCodeBlock
@@ -186,8 +189,10 @@
           eventId: event.id,
           type: key,
         }}
+        label={format(key)}
         value={codeBlockValue}
         maxHeight={384}
+        {lazy}
       />
     {/if}
   </div>
@@ -200,14 +205,16 @@
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         content={stackTrace}
+        label={translate('workflows.call-stack-tab')}
         language="text"
         maxHeight={384}
+        {lazy}
       />
     </div>
   {/if}
 {/snippet}
 
-{#snippet link(key, value)}
+{#snippet link(key: string, value: string | number)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
@@ -227,7 +234,7 @@
   </div>
 {/snippet}
 
-{#snippet details(key, value)}
+{#snippet details(key: string, value: string | number)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}

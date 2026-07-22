@@ -5,6 +5,7 @@
 
   import { page } from '$app/state';
 
+  import WorkflowCountStatus from '$lib/components/execution-status.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
@@ -29,8 +30,6 @@
     createFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-
-  import WorkflowCountStatus from './workflow-status.svelte';
 
   type Status = WorkflowStatus | ActivityStatus;
   type StatusCount = { status: Status; count: number };

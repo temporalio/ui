@@ -6,6 +6,7 @@
 
   import { intervalUnits } from '../constants';
   import type { FormScheduleSchema } from '../schema/form';
+  import type { DurationString } from '../types';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
@@ -28,11 +29,11 @@
     inputClass="max-w-96"
     label={translate('schedules.interval-label')}
     bind:value={
-      () => spec.interval.interval,
+      () => spec.interval.interval ?? '',
       (v) =>
         ($form.specs[index] = {
           ...spec,
-          interval: { ...spec.interval, interval: v },
+          interval: { ...spec.interval, interval: v as DurationString },
         })
     }
     units={intervalUnits}
@@ -50,11 +51,11 @@
     inputClass="max-w-96"
     label={translate('schedules.offset-heading')}
     bind:value={
-      () => spec.interval.phase,
+      () => spec.interval.phase ?? '',
       (v) =>
         ($form.specs[index] = {
           ...spec,
-          interval: { ...spec.interval, phase: v },
+          interval: { ...spec.interval, phase: v as DurationString },
         })
     }
     units={intervalUnits}

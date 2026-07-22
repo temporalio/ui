@@ -168,7 +168,7 @@ export const pagination = <T>(
 
   const pageSize = writable(perPage);
   const index = writable(start);
-  const activeRowIndex = writable(undefined);
+  const activeRowIndex = writable<number | undefined>(undefined);
 
   const adjustPageSize = (n: number | string) => {
     pageSize.set(toNumber(n));
@@ -202,7 +202,8 @@ export const pagination = <T>(
       nextIndex,
       nextIndex + itemsPerPage,
     ).length;
-    if (get(activeRowIndex) > pageItemSize - 1) {
+    const currentRowIndex = get(activeRowIndex);
+    if (currentRowIndex !== undefined && currentRowIndex > pageItemSize - 1) {
       activeRowIndex.set(pageItemSize - 1);
     }
     return index.set(nextIndex);
@@ -232,6 +233,7 @@ export const pagination = <T>(
     for (let i = 0; i < items.length; i++) {
       if (fn(items[i])) return i;
     }
+    return -1;
   };
 
   const findPage = (fn: (item: T) => boolean): number => {
@@ -240,7 +242,10 @@ export const pagination = <T>(
   };
 
   const setActiveRowIndex = (nextIndex: number | undefined = undefined) => {
-    if (nextIndex === undefined) activeRowIndex.set(nextIndex);
+    if (nextIndex === undefined) {
+      activeRowIndex.set(nextIndex);
+      return;
+    }
     const pageItemSize = items.slice(
       get(index),
       get(index) + get(pageSize),
@@ -257,15 +262,20 @@ export const pagination = <T>(
       get(index) + get(pageSize),
     ).length;
     const maxRowIndex = getMaxRowIndex(pageItemSize, get(pageSize));
-    if (get(activeRowIndex) === undefined) {
+    const currentRowIndex = get(activeRowIndex);
+    if (currentRowIndex === undefined) {
       activeRowIndex.set(0);
-    } else if (get(activeRowIndex) < maxRowIndex) {
-      activeRowIndex.set(get(activeRowIndex) + 1);
+    } else if (currentRowIndex < maxRowIndex) {
+      activeRowIndex.set(currentRowIndex + 1);
     }
   };
 
   const previousRow = () => {
-    const nextIndex = get(activeRowIndex) >= 1 ? get(activeRowIndex) - 1 : 0;
+    const currentRowIndex = get(activeRowIndex);
+    const nextIndex =
+      currentRowIndex !== undefined && currentRowIndex >= 1
+        ? currentRowIndex - 1
+        : 0;
     activeRowIndex.set(nextIndex);
   };
 

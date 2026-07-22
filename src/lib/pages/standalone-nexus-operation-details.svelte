@@ -11,6 +11,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { toEventLinkView } from '$lib/utilities/event-link';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
   import { toNexusOperationCancellationStateReadable } from '$lib/utilities/screaming-enums';
   import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
@@ -65,9 +66,9 @@
 
 {#if $nexusOperationExecution && info}
   <NexusOperationInputAndOutcome
-    input={$nexusOperationExecution.input}
-    result={$nexusOperationExecution.result}
-    failure={$nexusOperationExecution.failure}
+    input={$nexusOperationExecution.input ?? undefined}
+    result={$nexusOperationExecution.result ?? undefined}
+    failure={$nexusOperationExecution.failure ?? undefined}
   />
   <Card class="space-y-6">
     <h5>{translate('standalone-nexus-operations.operation-event-history')}</h5>
@@ -111,19 +112,19 @@
         >
         <DetailListTextValue
           text={info.executionDuration
-            ? fromSeconds(info.executionDuration)
+            ? formatDurationAbbreviated(info.executionDuration)
             : '-'}
         />
         <DetailListLabel
           >{translate('standalone-nexus-operations.run-id')}</DetailListLabel
         >
-        <DetailListTextValue copyable text={info.runId} />
+        <DetailListTextValue copyable text={info.runId ?? ''} />
         <DetailListLabel
           >{translate(
             'standalone-nexus-operations.request-id',
           )}</DetailListLabel
         >
-        <DetailListTextValue text={info.requestId} />
+        <DetailListTextValue text={info.requestId ?? ''} />
         {#if info.operationToken}
           <DetailListLabel
             >{translate(
@@ -156,7 +157,7 @@
             'standalone-nexus-operations.operation-id',
           )}</DetailListLabel
         >
-        <DetailListTextValue copyable text={info.operationId} />
+        <DetailListTextValue copyable text={info.operationId ?? ''} />
         <DetailListLabel
           >{translate(
             'standalone-nexus-operations.endpoint-name',
@@ -166,11 +167,11 @@
           <DetailListLinkValue
             copyable
             iconName="filter"
-            text={info.endpoint}
+            text={info.endpoint ?? ''}
             href={endpointFilterLink}
           />
         {:else}
-          <DetailListTextValue text={info.endpoint} />
+          <DetailListTextValue text={info.endpoint ?? ''} />
         {/if}
         <DetailListLabel
           >{translate(
@@ -181,11 +182,11 @@
           <DetailListLinkValue
             copyable
             iconName="filter"
-            text={info.service}
+            text={info.service ?? ''}
             href={serviceFilterLink}
           />
         {:else}
-          <DetailListTextValue text={info.service} />
+          <DetailListTextValue text={info.service ?? ''} />
         {/if}
         <DetailListLabel
           >{translate(
@@ -196,11 +197,11 @@
           <DetailListLinkValue
             copyable
             iconName="filter"
-            text={info.operation}
+            text={info.operation ?? ''}
             href={operationFilterLink}
           />
         {:else}
-          <DetailListTextValue text={info.operation} />
+          <DetailListTextValue text={info.operation ?? ''} />
         {/if}
         {#if info.blockedReason}
           <DetailListLabel
@@ -284,7 +285,7 @@
       </DetailList>
     </div>
 
-    {#if info.attempt > 1}
+    {#if (info.attempt ?? 0) > 1}
       <div class="space-y-4">
         <h5 class="text-secondary">
           {translate('standalone-nexus-operations.attempt-section')}
@@ -369,7 +370,7 @@
               'standalone-nexus-operations.cancellation-reason',
             )}</DetailListLabel
           >
-          <DetailListTextValue text={info.cancellationInfo.reason} />
+          <DetailListTextValue text={info.cancellationInfo.reason ?? ''} />
           {#if info.cancellationInfo.blockedReason}
             <DetailListLabel
               >{translate(

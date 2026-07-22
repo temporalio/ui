@@ -41,13 +41,6 @@ const validateProviderFields = (
         path: ['lambdaArn'],
         message: 'Invalid Lambda ARN format',
       });
-    } else if (/:\$LATEST$/.test(data.lambdaArn)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['lambdaArn'],
-        message:
-          'Lambda ARN must reference a published version or alias, not $LATEST',
-      });
     }
     if (!data.iamRoleArn) {
       ctx.addIssue({
@@ -146,3 +139,38 @@ export const editVersionSchema = z
 export type CreateDeploymentFormData = z.infer<typeof createDeploymentSchema>;
 export type CreateVersionFormData = z.infer<typeof createVersionSchema>;
 export type EditVersionFormData = z.infer<typeof editVersionSchema>;
+
+export type ComputeProviderValue = 'lambda' | 'cloud-run';
+
+export type ComputeProviderOption = {
+  value: ComputeProviderValue;
+  disabled?: boolean;
+  disabledReason?: string;
+  hidden?: boolean;
+};
+
+interface InitialComputeProviderOptions {
+  provider?: ComputeProviderValue;
+  providers?: readonly ComputeProviderOption[];
+}
+
+export const getInitialComputeProvider = ({
+  provider,
+  providers,
+}: InitialComputeProviderOptions = {}): ComputeProviderValue => {
+  const configuredProvider = providers?.find(
+    (option) => option.value === provider,
+  );
+
+  if (
+    provider &&
+    (!providers || (configuredProvider && !configuredProvider.hidden))
+  ) {
+    return provider;
+  }
+
+  return (
+    providers?.find(({ disabled, hidden }) => !disabled && !hidden)?.value ??
+    'lambda'
+  );
+};

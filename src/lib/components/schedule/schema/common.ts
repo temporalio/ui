@@ -1,4 +1,4 @@
-import { z, ZodSchema } from 'zod/v3';
+import { z, ZodSchema, type ZodTypeDef } from 'zod/v3';
 
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 
@@ -49,7 +49,9 @@ export const jsonString = () =>
       }
     }, 'Input must be valid JSON');
 
-export function rangeSchemaOf<T, U, V>(schema: ZodSchema<T, U, V>) {
+export function rangeSchemaOf<T, U extends ZodTypeDef, V>(
+  schema: ZodSchema<T, U, V>,
+) {
   return z.object({
     start: schema,
     end: schema.optional(),

@@ -5,7 +5,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import debounce from 'just-debounce';
+  import { debounce } from 'es-toolkit';
   import { onMount } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
@@ -55,12 +55,13 @@
     query?: string,
   ) => Promise<{ items: T[]; nextPageToken: string }>;
 
-  export let onError: (error: Error) => void | undefined = undefined;
+  export let onError: ((error: Error) => void) | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest<T>>;
-  export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
-  export let onShiftDown: (event: KeyboardEvent) => void | undefined =
+  export let onShiftUp: ((event: KeyboardEvent) => void) | undefined =
     undefined;
-  export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
+  export let onShiftDown: ((event: KeyboardEvent) => void) | undefined =
+    undefined;
+  export let onSpace: ((event: KeyboardEvent) => void) | undefined = undefined;
 
   export let pageSizeOptions: string[] | number[] = options;
   export let defaultPageSize: string | number | undefined = undefined;
@@ -72,7 +73,7 @@
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
   export let filterable = false;
-  export let filterInputPlaceholder: string = undefined;
+  export let filterInputPlaceholder: string | undefined = undefined;
   export let filterDebounceInMilliseconds = 1000;
 
   let query = '';
@@ -82,7 +83,7 @@
     defaultPageSize,
   );
 
-  let error: Error;
+  let error: Error | undefined;
 
   function clearError() {
     if (error) error = undefined;
@@ -108,10 +109,11 @@
     try {
       const response = await fetchData($store.pageSize, '');
       const { nextPageToken } = response;
-      const items = response[itemsKeyname] || [];
+      const items =
+        (response as unknown as Record<string, T[]>)[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
-      error = err;
+      error = err as Error;
       if (onError) onError(error);
     }
   }
@@ -127,7 +129,8 @@
           $store.indexData[$store.index].nextToken,
         );
         const { nextPageToken } = response;
-        const items = response[itemsKeyname] || [];
+        const items =
+          (response as unknown as Record<string, T[]>)[itemsKeyname] || [];
         store.nextPageWithItems(nextPageToken, items);
       } catch (error) {
         if (isError(error) && onError) {
@@ -190,10 +193,11 @@
       const fetchItems = await onFetch();
       const response = await fetchItems($store.pageSize, '', query);
       const { nextPageToken } = response;
-      const items = response[itemsKeyname] || [];
+      const items =
+        (response as unknown as Record<string, T[]>)[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
-      error = err;
+      error = err as Error;
       if (onError) onError(error);
     }
   };

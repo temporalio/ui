@@ -142,7 +142,7 @@ export const createTemporalServer = async ({
       return ports;
     });
 
-    return portsPromise.every(({ open }) => open);
+    return portsPromise.every((port) => typeof port === 'object' && port.open);
   };
 
   temporalServer = {

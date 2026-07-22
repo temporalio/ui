@@ -19,6 +19,7 @@
     formatAttemptsLeft,
     formatMaximumAttempts,
   } from '$lib/utilities/format-event-attributes';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
@@ -115,11 +116,11 @@
             {translate('standalone-activities.timing-and-progress')}
           </h5>
           <DetailList
-            rowCount={isClosed
+            rowCount={(isClosed
               ? ($activityExecution.info.attempt ?? 0) > 1
                 ? 5
                 : 4
-              : 2}
+              : 2) + ($activityExecution.info.startDelay ? 1 : 0)}
             aria-label={translate('standalone-activities.timing-and-progress')}
           >
             {#if isClosed}
@@ -129,7 +130,7 @@
                 )}</DetailListLabel
               >
               <DetailListTextValue
-                text={fromSeconds(
+                text={formatDurationAbbreviated(
                   $activityExecution.info.executionDuration ?? '',
                 )}
               />
@@ -161,6 +162,16 @@
             <DetailListTimestampValue
               timestamp={$activityExecution.info.scheduleTime}
             />
+            {#if $activityExecution.info.startDelay}
+              <DetailListLabel
+                >{translate(
+                  'standalone-activities.start-delay',
+                )}</DetailListLabel
+              >
+              <DetailListTextValue
+                text={fromSeconds($activityExecution.info.startDelay)}
+              />
+            {/if}
             <DetailListLabel
               >{translate(
                 'standalone-activities.last-started-time',
@@ -361,7 +372,10 @@
               <p class="font-medium text-secondary">
                 {translate('standalone-activities.last-failure')}
               </p>
-              <PayloadCodeBlock value={$activityExecution.info.lastFailure} />
+              <PayloadCodeBlock
+                value={$activityExecution.info.lastFailure}
+                label={translate('standalone-activities.last-failure')}
+              />
             </div>
           {/if}
           {#if $activityExecution.info.retryPolicy}
@@ -375,6 +389,7 @@
                   null,
                   2,
                 )}
+                label={translate('standalone-activities.retry-policy')}
               />
             </div>
           {/if}
@@ -385,6 +400,7 @@
               </p>
               <PayloadCodeBlock
                 value={$activityExecution.info.heartbeatDetails}
+                label={translate('standalone-activities.heartbeat-details')}
               />
             </div>
           {/if}
@@ -393,7 +409,10 @@
               <p class="font-medium text-secondary">
                 {translate('standalone-activities.header')}
               </p>
-              <PayloadCodeBlock value={$activityExecution.info.header.fields} />
+              <PayloadCodeBlock
+                value={$activityExecution.info.header.fields}
+                label={translate('standalone-activities.header')}
+              />
             </div>
           {/if}
         </div>

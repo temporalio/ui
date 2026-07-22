@@ -133,7 +133,6 @@
 
       <!-- Info Alert -->
       <Alert intent="info" class="text-sm">
-        <Icon name="info" slot="icon" />
         {translate('codec-server.info-message')}
       </Alert>
 

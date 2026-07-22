@@ -50,7 +50,7 @@
     }
 
     if (specKind === 'frozen') {
-      return spec.calendar ? 'Calendar' : 'Interval';
+      return spec.interval?.interval ? 'Interval' : 'Calendar';
     }
 
     return translate('schedules.spec-type-none');

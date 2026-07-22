@@ -27,7 +27,7 @@
   export let isValid = true;
   export let placeholder = '';
   export let rows = 5;
-  export let spellcheck: boolean = null;
+  export let spellcheck: boolean | undefined = undefined;
   export let value: string;
   export let label: string;
   export let labelHidden = false;

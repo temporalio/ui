@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
@@ -99,13 +99,13 @@
   </MenuButton>
   <Menu keepOpen id="execution-status-filter">
     {#each workflowStatusFilters as status (status)}
-      <MenuItem onclick={() => onStatusClick(status)}>
+      <MenuItem onclick={() => onStatusClick(status ?? '')}>
         {#snippet leading()}
           <Checkbox
-            label={status}
+            label={status ?? ''}
             labelHidden
             tabindex={-1}
-            on:click={() => onStatusClick(status)}
+            on:click={() => onStatusClick(status ?? '')}
             checked={statusFilters.some((filter) => filter.value === status) ||
               (!statusFilters.length && status === 'All')}
           />

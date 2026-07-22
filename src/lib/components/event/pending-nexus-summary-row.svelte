@@ -113,7 +113,7 @@
             />
             {translate('workflows.attempt')}
             {event.attempt}
-            {#if event.attempt > 1}
+            {#if event.attempt > 1 && event.nextAttemptScheduleTime}
               {@const timeDifference = toTimeDifference({
                 date: event.nextAttemptScheduleTime,
                 negativeDefault: '',
