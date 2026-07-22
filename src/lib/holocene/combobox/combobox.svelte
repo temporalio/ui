@@ -96,6 +96,7 @@
     class?: string;
     optionClass?: string;
     action?: Snippet;
+    optionLabel?: Snippet<[string | T, string]>;
     onchange?: (value: string | T) => void;
     onclose?: (selected: string | T) => void;
     oninput?: (value: string) => void;
@@ -168,6 +169,7 @@
     open = writable(false),
     maxMenuHeight = 'max-h-[20rem]',
     action,
+    optionLabel,
     chipLimit = 5,
     displayChips = true,
     selectAllLabel = 'Select All',
@@ -689,12 +691,23 @@
     {/if}
 
     {#each list as option, i (i)}
-      <ComboboxOption
-        onclick={() => handleSelectOption(option)}
-        selected={isSelected(option, value)}
-        label={getDisplayValue(option)}
-        class={optionClass}
-      />
+      {#if optionLabel}
+        <ComboboxOption
+          onclick={() => handleSelectOption(option)}
+          selected={isSelected(option, value)}
+          label={getDisplayValue(option)}
+          class={optionClass}
+        >
+          {@render optionLabel(option, filterValue)}
+        </ComboboxOption>
+      {:else}
+        <ComboboxOption
+          onclick={() => handleSelectOption(option)}
+          selected={isSelected(option, value)}
+          label={getDisplayValue(option)}
+          class={optionClass}
+        />
+      {/if}
     {:else}
       {#if !showAddCustom && loading === false}
         <ComboboxOption disabled label={noResultsText} />
