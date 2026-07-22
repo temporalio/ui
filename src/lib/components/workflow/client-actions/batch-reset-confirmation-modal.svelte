@@ -14,7 +14,7 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { batchResetWorkflows } from '$lib/services/batch-service';
+  import { batchResetWorkflows } from '$lib/services/workflow-batch-service';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
@@ -63,6 +63,7 @@
     error = '';
     const options = {
       namespace,
+      identity,
       reason: $reason ? $reason : reasonPlaceholder,
       jobId: $jobId || jobIdPlaceholder,
       resetType: $resetType,

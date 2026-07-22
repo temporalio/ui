@@ -1,4 +1,3 @@
-import { getAuthUser } from '$lib/stores/auth-user';
 import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 import { type Execution, ExecutionType } from '$lib/types';
 import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
@@ -14,6 +13,7 @@ type CreateActivityBatchOperationOptions = {
   jobId: string;
   query?: string;
   activities?: ActivityExecutionInfo[];
+  identity?: string;
 };
 
 interface StartActivityBatchOperationRequest {
@@ -22,16 +22,15 @@ interface StartActivityBatchOperationRequest {
   reason: string;
   visibilityQuery?: string;
   targetExecutions?: Execution[];
-  cancelActivitiesOperation?: { identity: string; reason: string };
-  terminateActivitiesOperation?: { identity: string; reason: string };
+  cancelActivitiesOperation?: { identity?: string; reason: string };
+  terminateActivitiesOperation?: { identity?: string; reason: string };
 }
 
 const activityActionToOperation = (
   action: ActivityBatchAction,
   reason: string,
+  identity?: string,
 ): Partial<StartActivityBatchOperationRequest> => {
-  const identity = getAuthUser().email ?? '';
-
   switch (action) {
     case 'cancel':
       return {
@@ -63,7 +62,7 @@ const createActivityBatchOperationRequest = (
     jobId: options.jobId,
     namespace: options.namespace,
     reason: options.reason,
-    ...activityActionToOperation(action, options.reason),
+    ...activityActionToOperation(action, options.reason, options.identity),
   };
 
   if (options.activities) {

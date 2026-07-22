@@ -60,6 +60,7 @@
     try {
       const options = {
         namespace,
+        identity,
         reason: $reason ? $reason : reasonPlaceholder,
         jobId: $jobId || jobIdPlaceholder,
         ...($allSelected
