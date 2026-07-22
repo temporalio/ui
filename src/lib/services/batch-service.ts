@@ -256,7 +256,7 @@ const toBatchOperationDetails = (
 ): BatchOperation => {
   return {
     ...apiBatchOperationDetails,
-    operationType: apiBatchOperationDetails?.operationType ?? 'Unspecified',
+    operationType: apiBatchOperationDetails?.operationType,
     state: toBatchOperationStateReadable(
       apiBatchOperationDetails?.state ?? 'Unspecified',
     ),
@@ -309,6 +309,6 @@ const toBatchOperationInfo = (
     closeTime: apiBatchOperationInfo.closeTime,
     jobId: apiBatchOperationInfo.jobId,
     state: toBatchOperationStateReadable(apiBatchOperationInfo.state),
-    operationType: apiBatchOperationInfo.operationType ?? 'Unspecified',
+    operationType: apiBatchOperationInfo.operationType,
   };
 };

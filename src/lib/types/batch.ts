@@ -50,11 +50,11 @@ export type BatchOperationInfo = {
   closeTime: string;
   state: BatchOperationState;
   jobId: string;
-  operationType: BatchOperationType;
+  operationType?: BatchOperationType;
 };
 
 export type BatchOperation = {
-  operationType: BatchOperationType;
+  operationType?: BatchOperationType;
   jobId: string;
   state: BatchOperationState;
   startTime: string;

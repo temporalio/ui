@@ -8,7 +8,7 @@
   import { toBatchOperationTypeReadable } from '$lib/utilities/screaming-enums';
 
   interface Props {
-    operationType: BatchOperationType;
+    operationType?: BatchOperationType;
   }
 
   let { operationType }: Props = $props();
@@ -50,13 +50,17 @@
 </script>
 
 <span class="flex items-center gap-2">
-  <Badge class="h-5" type={operationTypeToBadgeType[action]}>
-    {action}
-  </Badge>
-  {#if executionType}
-    <span class="flex items-center gap-1">
-      <Icon name={executionType === 'Activity' ? 'activity' : 'workflow'} />
-      {executionType}
-    </span>
+  {#if operationType}
+    <Badge class="h-5" type={operationTypeToBadgeType[action]}>
+      {action}
+    </Badge>
+    {#if executionType}
+      <span class="flex items-center gap-1">
+        <Icon name={executionType === 'Activity' ? 'activity' : 'workflow'} />
+        {executionType}
+      </span>
+    {/if}
+  {:else}
+    -
   {/if}
 </span>
