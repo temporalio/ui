@@ -6,6 +6,8 @@ export type BatchOperationType =
   | 'Delete'
   | 'Unspecified';
 
+export type BatchOperationExecutionType = 'Workflow' | 'Activity';
+
 export type BatchOperationState =
   | 'Running'
   | 'Completed'
@@ -40,6 +42,7 @@ export type APIBatchOperationInfo = {
   closeTime: string;
   state: BatchOperationState;
   jobId: string;
+  operationType?: BatchOperationType;
 };
 
 export type BatchOperationInfo = {
@@ -47,6 +50,7 @@ export type BatchOperationInfo = {
   closeTime: string;
   state: BatchOperationState;
   jobId: string;
+  operationType: BatchOperationType;
 };
 
 export type BatchOperation = {

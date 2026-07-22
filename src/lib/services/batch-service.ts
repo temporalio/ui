@@ -7,10 +7,7 @@ import { temporalVersion } from '$lib/stores/versions';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import {
-  toBatchOperationStateReadable,
-  toBatchOperationTypeReadable,
-} from '$lib/utilities/screaming-enums';
+import { toBatchOperationStateReadable } from '$lib/utilities/screaming-enums';
 import { isVersionNewer } from '$lib/utilities/version-check';
 
 import type {
@@ -259,9 +256,7 @@ const toBatchOperationDetails = (
 ): BatchOperation => {
   return {
     ...apiBatchOperationDetails,
-    operationType: toBatchOperationTypeReadable(
-      apiBatchOperationDetails?.operationType ?? 'Unspecified',
-    ),
+    operationType: apiBatchOperationDetails?.operationType ?? 'Unspecified',
     state: toBatchOperationStateReadable(
       apiBatchOperationDetails?.state ?? 'Unspecified',
     ),
@@ -314,5 +309,6 @@ const toBatchOperationInfo = (
     closeTime: apiBatchOperationInfo.closeTime,
     jobId: apiBatchOperationInfo.jobId,
     state: toBatchOperationStateReadable(apiBatchOperationInfo.state),
+    operationType: apiBatchOperationInfo.operationType ?? 'Unspecified',
   };
 };

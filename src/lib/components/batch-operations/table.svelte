@@ -1,4 +1,5 @@
 <script lang="ts">
+  import OperationType from '$lib/components/batch-operations/operation-type.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -35,6 +36,7 @@
   <TableHeaderRow slot="headers">
     <th scope="col" class="w-28">{translate('common.status')}</th>
     <th scope="col" class="w-auto">{translate('common.job-id')}</th>
+    <th scope="col" class="w-40">{translate('batch.operation-type')}</th>
     <th scope="col" class="max-sm:hidden lg:w-56"
       >{translate('common.start-time')}</th
     >
@@ -42,10 +44,10 @@
       >{translate('common.close-time')}</th
     >
   </TableHeaderRow>
-  {#each operations as { state, jobId, startTime, closeTime }}
+  {#each operations as { state, jobId, operationType, startTime, closeTime }, i (`${jobId}:${i}`)}
     <TableRow>
       <td>
-        <Badge type={jobStateToBadgeType[state]}>
+        <Badge class="h-5" type={jobStateToBadgeType[state]}>
           {state}
         </Badge>
       </td>
@@ -53,12 +55,15 @@
         ><Link href={routeForBatchOperation({ namespace, jobId })}>{jobId}</Link
         ></td
       >
+      <td>
+        <OperationType {operationType} />
+      </td>
       <Timestamp as="td" class="max-sm:hidden" dateTime={startTime} />
       <Timestamp as="td" class="max-sm:hidden" dateTime={closeTime} />
     </TableRow>
   {:else}
     <TableRow>
-      <td class="max-sm:hidden" colspan="4">
+      <td class="max-sm:hidden" colspan="5">
         <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
       </td>
     </TableRow>
