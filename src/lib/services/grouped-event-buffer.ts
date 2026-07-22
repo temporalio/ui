@@ -1001,12 +1001,16 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
 
   if (!isHead) {
     // Option A: head already in a live group — extend it directly.
-    const existing = liveGroups.find((g) => g.id === gid);
-    if (existing) {
+    const existingIdx = liveGroups.findIndex((g) => g.id === gid);
+    if (existingIdx !== -1) {
+      const existing = liveGroups[existingIdx];
       insertEventById(existing.eventList, event);
       existing.timestamp = event.timestamp;
       addEventToGroup(existing, event);
       clearResolvedPendingState(existing);
+      // Swap in a fresh reference so reference-tracking views re-derive from
+      // the grown eventList / cleared pending (a live follower mutates in place).
+      liveGroups[existingIdx] = cloneEventGroup(existing);
       _liveVersion++;
       invalidateGroupArrayCaches();
       return true;
@@ -1025,6 +1029,9 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
         meta.group.timestamp = event.timestamp;
         addEventToGroup(meta.group, event);
         clearResolvedPendingState(meta.group);
+        // Swap in a fresh reference so reference-tracking views re-derive from
+        // the grown eventList / cleared pending (a live follower mutates in place).
+        meta.group = cloneEventGroup(meta.group);
         growArraysFor(slotIdx);
         eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
         const followerMs = toMs(event.eventTime);
