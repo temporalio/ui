@@ -823,6 +823,25 @@ describe('enrichGroups', () => {
     expect(group.isPending).toBe(false);
   });
 
+  it('swaps in a fresh group reference when a live event extends a pool group', () => {
+    reset(10);
+    resetLive();
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    processEvent(scheduled, true);
+    processEvent(started, true);
+
+    const before = getGroupArray().find((g) => g.id === '1');
+
+    expect(appendLiveEvent(completed)).toBe(true);
+
+    const after = getGroupArray().find((g) => g.id === '1');
+    // Reference-tracking views (event-summary-row / group-details-row) only
+    // re-derive when the object identity changes; a live follower mutates the
+    // group in place, so the append swaps in a fresh reference.
+    expect(after).not.toBe(before);
+    expect(after?.eventList).toHaveLength(3);
+  });
+
   it('clears pendingActivity when a live timeout resolves a short activity group', async () => {
     reset(10);
     resetLive();
