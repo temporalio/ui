@@ -2,6 +2,7 @@
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type {
+    BatchOperationActionType,
     BatchOperationExecutionType,
     BatchOperationType,
   } from '$lib/types/batch';
@@ -39,14 +40,15 @@
     ),
   );
 
-  const operationTypeToBadgeType: Record<BatchOperationType, BadgeType> = {
-    Terminate: 'warning',
-    Cancel: 'default',
-    Reset: 'primary',
-    Signal: 'secondary',
-    Delete: 'danger',
-    Unspecified: 'default',
-  };
+  const operationTypeToBadgeType: Record<BatchOperationActionType, BadgeType> =
+    {
+      Terminate: 'warning',
+      Cancel: 'default',
+      Reset: 'primary',
+      Signal: 'secondary',
+      Delete: 'danger',
+      Unspecified: 'default',
+    };
 </script>
 
 <span class="flex items-center gap-2">

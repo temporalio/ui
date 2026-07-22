@@ -1,4 +1,9 @@
+import type { temporal } from '@temporalio/proto';
+
 export type BatchOperationType =
+  keyof typeof temporal.api.enums.v1.BatchOperationType;
+
+export type BatchOperationActionType =
   | 'Cancel'
   | 'Terminate'
   | 'Reset'
