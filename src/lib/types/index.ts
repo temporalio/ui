@@ -25,6 +25,7 @@ export type Capabilities =
 export type NamespaceCapabilities = NonNullable<
   temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
     standaloneActivityStartDelay?: boolean | null;
+    standaloneActivityOperatorCommands?: boolean | null;
   }
 >;
 export type GetWorkflowExecutionHistoryResponse =
