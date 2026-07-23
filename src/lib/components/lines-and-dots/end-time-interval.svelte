@@ -1,29 +1,49 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
+  import type { Snippet } from 'svelte';
   import { onDestroy } from 'svelte';
 
   import { pauseLiveUpdates } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
-  export let workflow: WorkflowExecution;
-  export let startTime: string | Timestamp;
+  interface Props {
+    workflow: WorkflowExecution;
+    startTime: string | Timestamp;
+    currentTime?: number;
+    children?: Snippet<
+      [
+        {
+          endTime: string | number;
+          duration: number | null;
+          currentTime: number;
+        },
+      ]
+    >;
+  }
 
-  export let currentTime = Date.now();
+  let {
+    workflow,
+    startTime,
+    currentTime = $bindable(Date.now()),
+    children,
+  }: Props = $props();
 
   const rightNow = () => {
     currentTime = Date.now();
     return currentTime + 1000;
   };
 
-  $: endTime = workflow?.endTime || rightNow();
-  $: duration = getMillisecondDuration({
-    start: startTime,
-    end: endTime,
-    onlyUnderSecond: false,
-  });
+  let endTime = $derived(workflow?.endTime || rightNow());
+  let duration = $derived(
+    getMillisecondDuration({
+      start: startTime,
+      end: endTime,
+      onlyUnderSecond: false,
+    }),
+  );
 
-  let endTimeInterval: ReturnType<typeof setInterval> | null;
+  let endTimeInterval: ReturnType<typeof setInterval> | null = $state(null);
 
   const clearEndTimeInterval = (endTime: string) => {
     if (endTime) {
@@ -43,8 +63,12 @@
     }
   };
 
-  $: clearEndTimeInterval(workflow.endTime);
-  $: startStopInterval($pauseLiveUpdates);
+  $effect(() => {
+    clearEndTimeInterval(workflow.endTime);
+  });
+  $effect(() => {
+    startStopInterval($pauseLiveUpdates);
+  });
 
   onDestroy(() => {
     clearInterval(endTimeInterval ?? undefined);
@@ -53,4 +77,4 @@
   });
 </script>
 
-<slot {endTime} {duration} {currentTime} />
+{@render children?.({ endTime, duration, currentTime })}
