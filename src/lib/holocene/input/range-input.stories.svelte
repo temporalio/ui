@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import RangeInput from '$lib/holocene/input/range-input.svelte';
 
@@ -42,7 +43,7 @@
       },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
     },
-  } satisfies Meta<RangeInput>;
+  } satisfies Meta<ComponentProps<typeof RangeInput>>;
 </script>
 
 <script lang="ts">
