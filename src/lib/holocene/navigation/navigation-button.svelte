@@ -6,15 +6,29 @@
 
   import Icon from '../icon/icon.svelte';
 
-  export let onClick: () => void = () => {};
-  export let label: string;
-  export let icon: IconName | undefined = undefined;
-  export let tooltip = label;
-  export let animate = false;
-  export let active = false;
-  export let disabled = false;
-  export let className = '';
-  export { className as class };
+  interface Props {
+    onClick?: () => void;
+    label: string;
+    icon?: IconName;
+    tooltip?: string;
+    animate?: boolean;
+    active?: boolean;
+    disabled?: boolean;
+    class?: string;
+    'data-testid'?: string;
+  }
+
+  let {
+    onClick = () => {},
+    label,
+    icon,
+    tooltip = label,
+    animate = false,
+    active = false,
+    disabled = false,
+    class: className = '',
+    'data-testid': testId,
+  }: Props = $props();
 
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -32,10 +46,10 @@
 >
   <div
     role="button"
-    on:click={onClick}
-    on:keydown={handleKeydown}
+    onclick={onClick}
+    onkeydown={handleKeydown}
     tabindex="0"
-    data-testid={$$props['data-testid']}
+    data-testid={testId}
     data-track-name="navigation-button"
     data-track-intent="action"
     data-track-text={label}
