@@ -100,26 +100,28 @@
 {/if}
 <div class="w-full overflow-x-auto">
   <Table class="mb-6 min-w-[640px]" fixed>
-    <caption class="sr-only" slot="caption"
-      >{translate('workers.pollers')}</caption
-    >
-    <TableHeaderRow slot="headers">
-      <th scope="col">{translate('common.id')}</th>
-      <th scope="col">{translate('workers.buildId')}</th>
-      <th scope="col">{translate('deployments.deployment')}</th>
-      <th scope="col" class="hidden md:table-cell"
-        >{translate('workflows.last-accessed')}</th
-      >
-      <th scope="col" class="!text-center xl:w-48">
-        {translate('workflows.workflow-task-handler')}
-      </th>
-      <th scope="col" class="!text-center xl:w-36">
-        {translate('workflows.activity-handler')}
-      </th>
-      <th scope="col" class="!text-center xl:w-36">
-        {translate('workflows.nexus-handler')}
-      </th>
-    </TableHeaderRow>
+    {#snippet caption()}
+      <caption class="sr-only">{translate('workers.pollers')}</caption>
+    {/snippet}
+    {#snippet headers()}
+      <TableHeaderRow>
+        <th scope="col">{translate('common.id')}</th>
+        <th scope="col">{translate('workers.buildId')}</th>
+        <th scope="col">{translate('deployments.deployment')}</th>
+        <th scope="col" class="hidden md:table-cell"
+          >{translate('workflows.last-accessed')}</th
+        >
+        <th scope="col" class="!text-center xl:w-48">
+          {translate('workflows.workflow-task-handler')}
+        </th>
+        <th scope="col" class="!text-center xl:w-36">
+          {translate('workflows.activity-handler')}
+        </th>
+        <th scope="col" class="!text-center xl:w-36">
+          {translate('workflows.nexus-handler')}
+        </th>
+      </TableHeaderRow>
+    {/snippet}
     {#each pollers as poller}
       {@const deployment = getPollerDeploymentName(poller)}
       {@const buildId = getPollerBuildId(poller)}

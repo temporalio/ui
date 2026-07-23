@@ -19,14 +19,16 @@
 </script>
 
 <Table class="w-full">
-  <caption class="sr-only" slot="caption"
-    >{translate('workflows.relationships')}</caption
-  >
-  <TableHeaderRow slot="headers">
-    <th scope="col">{translate('workflows.first-execution')}</th>
-    <th scope="col">{translate('workflows.previous-execution')}</th>
-    <th scope="col">{translate('workflows.next-execution')}</th>
-  </TableHeaderRow>
+  {#snippet caption()}
+    <caption class="sr-only">{translate('workflows.relationships')}</caption>
+  {/snippet}
+  {#snippet headers()}
+    <TableHeaderRow>
+      <th scope="col">{translate('workflows.first-execution')}</th>
+      <th scope="col">{translate('workflows.previous-execution')}</th>
+      <th scope="col">{translate('workflows.next-execution')}</th>
+    </TableHeaderRow>
+  {/snippet}
   <TableRow>
     <td class="w-1/3">
       {#if first}
