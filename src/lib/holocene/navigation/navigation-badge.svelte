@@ -1,26 +1,36 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
 
-  export let icon: IconName;
-  export let link: string;
-  export let tooltip: string = '';
-  export let external = false;
+  interface Props {
+    icon: IconName;
+    link: string;
+    tooltip?: string;
+    external?: boolean;
+    class?: string;
+    'data-testid'?: string;
+    children?: Snippet;
+  }
 
-  let className: string = '';
-  export { className as class };
+  let {
+    icon,
+    link,
+    tooltip = '',
+    external = false,
+    class: className = '',
+    'data-testid': testId,
+    children,
+  }: Props = $props();
 
-  $: rel = external ? 'noopener noreferrer' : '';
-  $: target = external ? '_blank' : '';
+  const rel = $derived(external ? 'noopener noreferrer' : '');
+  const target = $derived(external ? '_blank' : '');
 </script>
 
-<div
-  class="relative {className}"
-  role="listitem"
-  data-testid={$$props['data-testid']}
->
+<div class="relative {className}" role="listitem" data-testid={testId}>
   <Tooltip
     text={tooltip}
     right
@@ -43,7 +53,7 @@
       <div
         class="text-center group-data-[nav=open]:visible group-data-[nav=closed]:hidden"
       >
-        <slot />
+        {@render children?.()}
       </div>
     </a>
   </Tooltip>
