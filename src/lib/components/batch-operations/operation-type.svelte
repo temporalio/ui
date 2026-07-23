@@ -21,12 +21,12 @@
 
   const executionType: BatchOperationExecutionType | undefined = $derived.by(
     () => {
-      if (rawOperationType.endsWith('_ACTIVITY')) return 'Activity';
       if (
         rawOperationType === 'Unspecified' ||
         rawOperationType.endsWith('_UNSPECIFIED')
       )
         return undefined;
+      if (/ACTIVITY/.test(rawOperationType)) return 'Activity';
       return 'Workflow';
     },
   );
