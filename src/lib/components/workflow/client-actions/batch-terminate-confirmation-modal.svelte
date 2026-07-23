@@ -3,6 +3,7 @@
 
   import { getContext } from 'svelte';
 
+  import BatchOperationConfirmationModalBody from '$lib/components/batch/batch-operation-confirmation-form.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
@@ -11,14 +12,12 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { batchTerminateWorkflows } from '$lib/services/batch-service';
+  import { batchTerminateWorkflows } from '$lib/services/workflow-batch-service';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { getPlaceholder } from '$lib/utilities/workflow-actions';
-
-  import BatchOperationConfirmationModalBody from './batch-operation-confirmation-form.svelte';
 
   interface Props {
     namespace: string;
@@ -38,6 +37,14 @@
   const { allSelected, terminableWorkflows } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
+  const actionText = translate('workflows.terminate');
+  const confirmationText = $derived(
+    translate('workflows.batch-confirmation', {
+      action: actionText,
+      count: $terminableWorkflows.length,
+    }),
+  );
+
   const resetForm = () => {
     $reason = '';
     $jobId = '';
@@ -54,6 +61,7 @@
     try {
       const options = {
         namespace,
+        identity,
         reason: $reason ? $reason : reasonPlaceholder,
         jobId: $jobId || jobIdPlaceholder,
         ...($allSelected
@@ -97,7 +105,21 @@
       bind:jobIdValid={$jobIdValid}
       {reasonPlaceholder}
       {jobIdPlaceholder}
-      action={Action.Terminate}
+      reasonInputId="bulk-action-reason-{Action.Terminate}"
+      reasonHint={translate(
+        'workflows.batch-operation-confirmation-input-hint',
+      )}
+      allSelected={$allSelected}
+      query={$workflowsQuery}
+      queryTestId="batch-action-workflows-query"
+      {confirmationText}
+      allSelectedText={translate('workflows.batch-operation-confirmation-all', {
+        action: actionText,
+      })}
+      countDisclaimerText={translate(
+        'workflows.batch-operation-count-disclaimer',
+        { action: actionText },
+      )}
     />
   </svelte:fragment>
 </Modal>

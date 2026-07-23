@@ -26,6 +26,11 @@
   import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import {
+    getBatchSelectionTargets,
+    getPageSelectionStatus,
+    type PageSelectionStatus,
+  } from '$lib/utilities/batch-selection';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
@@ -156,29 +161,13 @@
 
   let prevClickedRow = $state<VisibleRow | null>(null);
 
-  type PageSelectionStatus = 'checked' | 'unchecked' | 'partial';
-
-  const pageSelectionStatus: PageSelectionStatus = $derived.by(() => {
-    const selectedRunIdSet = new Set($selectedWorkflows.map((w) => w.runId));
-
-    if ($allSelected) {
-      return 'checked';
-    }
-
-    const visibleItemsNotSelected = visiblePaginatedItems.filter(
-      (i) => !selectedRunIdSet.has(i.runId),
-    );
-
-    if (visibleItemsNotSelected.length === visiblePaginatedItems.length) {
-      return 'unchecked';
-    }
-
-    if (visibleItemsNotSelected.length === 0) {
-      return 'checked';
-    }
-
-    return 'partial';
-  });
+  const pageSelectionStatus: PageSelectionStatus = $derived(
+    getPageSelectionStatus(
+      visiblePaginatedItems.map((i) => i.runId),
+      new Set($selectedWorkflows.map((w) => w.runId)),
+      $allSelected,
+    ),
+  );
 
   const handleSelectPage = (
     isSelected: boolean,
@@ -190,6 +179,32 @@
     if (!isSelected) {
       allSelected.set(false);
     }
+  };
+
+  const handleBatchSelect = (
+    event: MouseEvent,
+    row: VisibleRow,
+    visibleRowIndex: number,
+  ) => {
+    // child rows are inserted and removed dynamically, so re-derive the index
+    // of the previously clicked row by runId rather than caching a number.
+    const prevClickedRowIndex = visibleRows.findIndex(
+      (r) => r.value.runId === prevClickedRow?.value.runId,
+    );
+
+    const selection = getBatchSelectionTargets(
+      event,
+      visibleRows,
+      visibleRowIndex,
+      prevClickedRowIndex,
+    );
+    if (!selection) return;
+
+    selectWorkflows(
+      selection.isChecked,
+      selection.targeted.map((r) => r.value),
+    );
+    prevClickedRow = row;
   };
 
   $effect(() => {
@@ -236,42 +251,8 @@
           ? row.childCount
           : undefined}
         child={isChildRow}
-        onClickBatchSelect={(event) => {
-          // this is required due to how the underlying Checkbox component
-          // gets its onclick type from svelte event forwarding. It does not
-          // know what the current event target type is a checkbox input
-          if (!(event.currentTarget instanceof HTMLInputElement)) {
-            return;
-          }
-
-          const isChecked = event.currentTarget.checked;
-
-          let targetedWorkflows = [row.value];
-
-          const prevClickedRowIndex = visibleRows.findIndex(
-            (r) => r.value.runId === prevClickedRow?.value.runId,
-          );
-
-          if (event.shiftKey && prevClickedRowIndex >= 0) {
-            const rangeStartInclusive = Math.min(
-              prevClickedRowIndex,
-              visibleRowIndex,
-            );
-            const rangeEndInclusive = Math.max(
-              prevClickedRowIndex,
-              visibleRowIndex,
-            );
-
-            // end of the slice range is exclusive, so add 1 to include the full range
-            targetedWorkflows = visibleRows
-              .slice(rangeStartInclusive, rangeEndInclusive + 1)
-              .map((r) => r.value);
-          }
-
-          selectWorkflows(isChecked, targetedWorkflows);
-
-          prevClickedRow = row;
-        }}
+        onClickBatchSelect={(event) =>
+          handleBatchSelect(event, row, visibleRowIndex)}
       >
         {#each columns as column (column.label)}
           <TableBodyCell workflow={row.value} {column} truncate={dense} />

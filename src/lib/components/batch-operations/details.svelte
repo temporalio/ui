@@ -1,4 +1,5 @@
 <script lang="ts">
+  import OperationType from '$lib/components/batch-operations/operation-type.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { BatchOperation } from '$lib/types/batch';
@@ -12,7 +13,9 @@
     <p class="batch-operation-key">
       {translate('batch.operation-type')}
     </p>
-    <p class="batch-operation-value">{operation.operationType}</p>
+    <div class="batch-operation-value mb-1">
+      <OperationType operationType={operation.operationType} />
+    </div>
   </div>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">

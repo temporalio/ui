@@ -131,4 +131,25 @@ export const Strings = {
   'fairness-weight': 'Fairness Weight',
   'pause-activity': 'Pause Activity',
   'unpause-activity': 'Unpause Activity',
+  'select-all-activities': 'Select all Standalone Activities',
+  'select-activity': 'Select {{activity}}',
+  'n-selected': '{{count, number}} selected',
+  'all-selected': 'All {{count, number}} selected.',
+  'select-all-leading': 'or ',
+  'select-all': 'select all {{count, number}} Standalone Activities',
+  'select-all-trailing': ' matching your query',
+  'batch-cancel-modal-title': 'Cancel Standalone Activities',
+  'batch-terminate-modal-title': 'Terminate Standalone Activities',
+  'batch-confirmation_one':
+    'Are you sure you want to {{action}} one running Standalone Activity?',
+  'batch-confirmation_other':
+    'Are you sure you want to {{action}} {{count, number}} running Standalone Activities?',
+  'batch-operation-confirmation-all':
+    'Are you sure you want to {{action}} all Standalone Activities matching the following query? This action cannot be undone.',
+  'batch-operation-count-disclaimer':
+    'Note: The actual count of Standalone Activities that will be affected is the total number of running Standalone Activities matching this query at the time of clicking "{{action}}".',
+  'batch-cancel-all-success':
+    'The batch cancel request is processing in the background.',
+  'batch-terminate-all-success':
+    'The batch terminate request is processing in the background.',
 } as const;

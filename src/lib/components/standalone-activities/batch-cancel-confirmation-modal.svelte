@@ -3,18 +3,17 @@
 
   import { getContext } from 'svelte';
 
-  import BatchOperationConfirmationModalBody from '$lib/components/batch/batch-operation-confirmation-form.svelte';
+  import BatchOperationConfirmationForm from '$lib/components/batch/batch-operation-confirmation-form.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
   import {
-    BATCH_OPERATION_CONTEXT,
-    type BatchOperationContext,
-  } from '$lib/pages/workflows-with-new-search.svelte';
-  import { batchCancelWorkflows } from '$lib/services/workflow-batch-service';
+    ACTIVITY_BATCH_OPERATION_CONTEXT,
+    type ActivityBatchOperationContext,
+  } from '$lib/pages/standalone-activities.svelte';
+  import { batchCancelActivities } from '$lib/services/activity-batch-service';
+  import { activitiesQuery } from '$lib/stores/activities';
   import { toaster } from '$lib/stores/toaster';
-  import { workflowsQuery } from '$lib/stores/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { getPlaceholder } from '$lib/utilities/workflow-actions';
@@ -34,14 +33,14 @@
   let jobIdPlaceholder = $state(crypto.randomUUID());
   let error = $state('');
 
-  const { allSelected, cancelableWorkflows } =
-    getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
+  const { allSelected, cancelableActivities } =
+    getContext<ActivityBatchOperationContext>(ACTIVITY_BATCH_OPERATION_CONTEXT);
 
   const actionText = translate('common.cancel');
   const confirmationText = $derived(
-    translate('workflows.batch-confirmation', {
+    translate('standalone-activities.batch-confirmation', {
       action: actionText,
-      count: $cancelableWorkflows.length,
+      count: $cancelableActivities.length,
     }),
   );
 
@@ -56,23 +55,23 @@
     if (open) resetForm();
   });
 
-  const cancelWorkflows = async () => {
+  const cancelActivities = async () => {
     error = '';
-    const options = {
-      namespace,
-      identity,
-      reason: $reason ? $reason : reasonPlaceholder,
-      jobId: $jobId || jobIdPlaceholder,
-      ...($allSelected
-        ? { query: $workflowsQuery }
-        : { workflows: $cancelableWorkflows }),
-    };
     try {
-      await batchCancelWorkflows(options);
+      const options = {
+        namespace,
+        identity,
+        reason: $reason ? $reason : reasonPlaceholder,
+        jobId: $jobId || jobIdPlaceholder,
+        ...($allSelected
+          ? { query: $activitiesQuery }
+          : { activities: $cancelableActivities }),
+      };
+      await batchCancelActivities(options);
       open = false;
       resetForm();
       toaster.push({
-        message: translate('workflows.batch-cancel-all-success'),
+        message: translate('standalone-activities.batch-cancel-all-success'),
         id: 'batch-cancel-success-toast',
       });
     } catch (err) {
@@ -93,13 +92,13 @@
   cancelText={translate('common.cancel')}
   confirmDisabled={!$jobIdValid}
   confirmText={translate('common.confirm')}
-  on:confirmModal={cancelWorkflows}
+  on:confirmModal={cancelActivities}
 >
   <h3 slot="title">
-    <Translate key="workflows.batch-cancel-modal-title" />
+    {translate('standalone-activities.batch-cancel-modal-title')}
   </h3>
   <svelte:fragment slot="content">
-    <BatchOperationConfirmationModalBody
+    <BatchOperationConfirmationForm
       bind:reason={$reason}
       bind:jobId={$jobId}
       bind:jobIdValid={$jobIdValid}
@@ -110,14 +109,15 @@
         'workflows.batch-operation-confirmation-input-hint',
       )}
       allSelected={$allSelected}
-      query={$workflowsQuery}
-      queryTestId="batch-action-workflows-query"
+      query={$activitiesQuery}
+      queryTestId="batch-action-activities-query"
       {confirmationText}
-      allSelectedText={translate('workflows.batch-operation-confirmation-all', {
-        action: actionText,
-      })}
+      allSelectedText={translate(
+        'standalone-activities.batch-operation-confirmation-all',
+        { action: actionText },
+      )}
       countDisclaimerText={translate(
-        'workflows.batch-operation-count-disclaimer',
+        'standalone-activities.batch-operation-count-disclaimer',
         { action: actionText },
       )}
     />

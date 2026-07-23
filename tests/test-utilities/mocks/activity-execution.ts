@@ -4,6 +4,10 @@ import type { ActivityExecution } from '$src/lib/types/activity-execution';
 
 export const STANDALONE_ACTIVITY_API =
   /\/api\/v1\/namespaces\/[^/]+\/activities\/[^/]+(\?.*)?$/;
+export const STANDALONE_ACTIVITIES_LIST_API =
+  /\/api\/v1\/namespaces\/[^/]+\/activities(\?.*)?$/;
+export const STANDALONE_ACTIVITY_COUNT_API =
+  /\/api\/v1\/namespaces\/[^/]+\/activity-count(\?.*)?$/;
 export const STANDALONE_ACTIVITY_PAUSE_API =
   /\/api\/v1\/namespaces\/[^/]+\/activities\/[^/]+\/pause/;
 export const STANDALONE_ACTIVITY_UNPAUSE_API =
@@ -93,6 +97,52 @@ export const mockStandaloneActivityApi = (
     }
     return route.fulfill({ json: getExecution() });
   });
+};
+
+export const mockRunningActivityExecutionInfos: ActivityExecution['info'][] = [
+  {
+    ...baseActivityExecutionInfo,
+    activityId: 'greet-activity-1',
+    runId: '11111111-1111-1111-1111-111111111111',
+  },
+  {
+    ...baseActivityExecutionInfo,
+    activityId: 'greet-activity-2',
+    runId: '22222222-2222-2222-2222-222222222222',
+  },
+  {
+    ...baseActivityExecutionInfo,
+    activityId: 'greet-activity-3',
+    runId: '33333333-3333-3333-3333-333333333333',
+  },
+] as unknown as ActivityExecution['info'][];
+
+export const mockStandaloneActivitiesListApi = (
+  page: Page,
+  executions: ActivityExecution['info'][] = mockRunningActivityExecutionInfos,
+) => {
+  return page.route(STANDALONE_ACTIVITIES_LIST_API, (route) =>
+    route.fulfill({ json: { executions, nextPageToken: '' } }),
+  );
+};
+
+export const mockStandaloneActivityCountApi = (
+  page: Page,
+  count = mockRunningActivityExecutionInfos.length,
+) => {
+  return page.route(STANDALONE_ACTIVITY_COUNT_API, (route) =>
+    route.fulfill({
+      json: {
+        count: String(count),
+        groups: [
+          {
+            groupValues: [{ data: { data: btoa('"Running"') } }],
+            count: String(count),
+          },
+        ],
+      },
+    }),
+  );
 };
 
 export const mockStandaloneActivityPauseApi = (page: Page) => {

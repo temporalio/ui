@@ -25,6 +25,7 @@ export type Capabilities =
 export type NamespaceCapabilities = NonNullable<
   temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
     standaloneActivityStartDelay?: boolean | null;
+    standaloneActivityBatchOperations?: boolean | null;
     standaloneActivityOperatorCommands?: boolean | null;
   }
 >;
@@ -47,6 +48,12 @@ export type UpdateScheduleRequest =
   temporal.api.workflowservice.v1.IUpdateScheduleRequest;
 export type StartBatchOperationRequest =
   temporal.api.workflowservice.v1.IStartBatchOperationRequest;
+// TODO: Replace with temporal.api.common.v1.Execution
+export type Execution = {
+  type?: ExecutionType;
+  businessId?: string;
+  runId?: string;
+};
 export type CancelWorkflowRequest =
   temporal.api.workflowservice.v1.IRequestCancelWorkflowExecutionRequest;
 export type ResetWorkflowRequest =
@@ -232,6 +239,13 @@ export enum ResetReapplyType {
   RESET_REAPPLY_TYPE_SIGNAL = 1,
   RESET_REAPPLY_TYPE_NONE = 2,
   RESET_REAPPLY_TYPE_ALL_ELIGIBLE = 3,
+}
+
+// temporal.api.enums.v1.ExecutionType
+export enum ExecutionType {
+  EXECUTION_TYPE_UNSPECIFIED = 0,
+  EXECUTION_TYPE_WORKFLOW = 1,
+  EXECUTION_TYPE_ACTIVITY = 2,
 }
 
 // api.workflow

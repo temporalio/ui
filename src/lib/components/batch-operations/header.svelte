@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
 
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -42,13 +43,18 @@
       <h1>
         {translate('batch.describe-page-title')}
       </h1>
-      <Badge type={jobStateToBadgeType[operation.state]}>
+      <Badge
+        type={jobStateToBadgeType[operation.state]}
+        class="h-8 px-4 text-lg"
+      >
         {operation.state}
       </Badge>
     </div>
-    <p>
-      {operation.jobId}
-    </p>
+    <Copyable
+      content={operation.jobId}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    />
   </div>
   {#if operation.state === 'Running'}
     <Tooltip
