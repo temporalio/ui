@@ -43,7 +43,7 @@
     class={visible
       ? 'visible'
       : 'invisible group-focus-within:visible group-hover:visible'}
-    on:click={handleOnClick}
+    onclick={handleOnClick}
     copied={$copied}
   />
 </div>

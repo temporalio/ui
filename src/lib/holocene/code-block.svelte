@@ -319,7 +319,7 @@
             {copyIconTitle}
             {copySuccessIconTitle}
             class="m-0 rounded-full text-secondary"
-            on:click={handleCopy}
+            onclick={handleCopy}
             copied={!!$copied}
           />
         {/if}
@@ -359,7 +359,7 @@
             {copyIconTitle}
             {copySuccessIconTitle}
             class="m-0 rounded-full text-secondary"
-            on:click={handleCopy}
+            onclick={handleCopy}
             copied={$copied}
           />
         {/if}

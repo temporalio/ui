@@ -6,7 +6,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  interface $$Props extends HTMLButtonAttributes {
+  interface Props extends HTMLButtonAttributes {
     copyIconTitle?: string;
     copySuccessIconTitle?: string;
     copied: boolean;
@@ -15,14 +15,13 @@
     class?: string;
   }
 
-  export let copyIconTitle: string = translate('common.copy-icon-title');
-  export let copySuccessIconTitle: string = translate(
-    'common.copy-success-icon-title',
-  );
-  export let copied: boolean;
-
-  let className = '';
-  export { className as class };
+  let {
+    copyIconTitle = translate('common.copy-icon-title'),
+    copySuccessIconTitle = translate('common.copy-success-icon-title'),
+    copied,
+    class: className = '',
+    ...rest
+  }: Props = $props();
 </script>
 
 <button
@@ -33,8 +32,7 @@
   data-track-name="copyable-button"
   data-track-intent="copy"
   data-track-text={copyIconTitle}
-  on:click
-  {...$$restProps}
+  {...rest}
 >
   <Icon
     title={copied ? copySuccessIconTitle : copyIconTitle}
