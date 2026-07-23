@@ -29,8 +29,8 @@
     children,
   }: Props = $props();
 
-  let endTime = $derived(workflow?.endTime || currentTime + 1000);
-  let duration = $derived(
+  const endTime = $derived(workflow?.endTime || currentTime + 1000);
+  const duration = $derived(
     getMillisecondDuration({
       start: startTime,
       end: endTime,
@@ -38,36 +38,18 @@
     }),
   );
 
-  let endTimeInterval: ReturnType<typeof setInterval> | null = $state(null);
-
-  const clearEndTimeInterval = (endTime: string) => {
-    if (endTime) {
-      clearInterval(endTimeInterval ?? undefined);
-      endTimeInterval = null;
-    }
-  };
-
-  const startStopInterval = (pauseLiveUpdates: boolean) => {
-    if (pauseLiveUpdates) {
-      clearInterval(endTimeInterval ?? undefined);
-      endTimeInterval = null;
-    } else if (!endTimeInterval && (workflow.isRunning || workflow.isPaused)) {
-      endTimeInterval = setInterval(() => {
-        currentTime = Date.now();
-      }, 1000);
-    }
-  };
-
   $effect(() => {
-    clearEndTimeInterval(workflow.endTime);
-  });
-  $effect(() => {
-    startStopInterval($pauseLiveUpdates);
+    if ($pauseLiveUpdates) return;
+    if (workflow.endTime) return;
+    if (!(workflow.isRunning || workflow.isPaused)) return;
+
+    const interval = setInterval(() => {
+      currentTime = Date.now();
+    }, 1000);
+    return () => clearInterval(interval);
   });
 
   onDestroy(() => {
-    clearInterval(endTimeInterval ?? undefined);
-    endTimeInterval = null;
     $pauseLiveUpdates = false;
   });
 </script>
