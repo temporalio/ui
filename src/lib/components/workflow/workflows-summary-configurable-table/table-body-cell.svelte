@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -46,7 +47,7 @@
     archival = false,
   }: Props = $props();
 
-  const { label } = $derived(column);
+  const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
   const isCustomKeywordOrTextAttribute = $derived(
     isCustomSearchAttribute(label) &&
@@ -66,7 +67,21 @@
     'Scheduled By ID',
   ];
 
-  const className = 'relative h-8 whitespace-nowrap';
+  // a pinned width only holds in the table's auto layout if the cell clamps its own content, so the cell and its link/tooltip child have to ellipsize
+  const truncateToWidth =
+    'overflow-hidden text-ellipsis [&_.wrapper]:block [&_.wrapper]:max-w-full [&_.wrapper]:overflow-hidden [&_.wrapper]:text-ellipsis [&_a]:block [&_a]:overflow-hidden [&_a]:text-ellipsis';
+
+  const className = $derived(
+    twMerge(
+      'relative h-8 whitespace-nowrap',
+      width !== undefined && truncateToWidth,
+    ),
+  );
+  const widthStyle = $derived(
+    width !== undefined
+      ? `width: ${width}px; min-width: ${width}px; max-width: ${width}px`
+      : undefined,
+  );
   const testId = 'workflows-summary-table-body-cell';
 
   const hideTooltip = (value: string | undefined) => {
@@ -84,6 +99,7 @@
 )}
   <FilterableTableCell
     class={className}
+    style={widthStyle}
     data-testid={testId}
     {truncate}
     {...filterableCellProps}
@@ -176,7 +192,7 @@
     })}
   {/if}
 {:else}
-  <td class={className} data-testid={testId}>
+  <td class={className} style={widthStyle} data-testid={testId}>
     {#if label === 'Status'}
       <WorkflowStatus
         status={workflow.status}
