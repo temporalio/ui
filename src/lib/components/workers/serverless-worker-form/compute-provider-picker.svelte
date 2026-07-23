@@ -88,17 +88,20 @@
       description={providerDescription(option.value)}
       disabled={option.disabled}
     >
-      <span slot="label-badge">
-        {#if option.disabled && option.disabledReason}
-          <Badge type="secondary">{option.disabledReason}</Badge>
-        {/if}
-      </span>
-      <div
-        slot="icon"
-        class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded-none border border-subtle"
-      >
-        <Icon name={providerIcon[option.value]} width={32} height={32} />
-      </div>
+      {#snippet labelBadge()}
+        <span>
+          {#if option.disabled && option.disabledReason}
+            <Badge type="secondary">{option.disabledReason}</Badge>
+          {/if}
+        </span>
+      {/snippet}
+      {#snippet icon()}
+        <div
+          class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded-none border border-subtle"
+        >
+          <Icon name={providerIcon[option.value]} width={32} height={32} />
+        </div>
+      {/snippet}
     </RadioCard>
   {/each}
 </RadioGroup>
