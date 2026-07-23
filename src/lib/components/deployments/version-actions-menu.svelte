@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -48,56 +47,34 @@
       <Icon name="vertical-ellipsis" class="h-4 w-4" />
     </MenuButton>
     <Menu id="version-actions-{buildId}" position="right" usePortal>
-      <CapabilityGuard capability="serverScaledDeployments">
-        <MenuItem href={editHref}>
-          {translate('deployments.edit')}
-        </MenuItem>
-      </CapabilityGuard>
-      <CapabilityGuard capability="serverScaledDeployments">
-        {#if hasComputeConfig}
-          {#if isCurrent}
-            <MenuItem onclick={onUnsetCurrent}>
-              {translate('deployments.unset-current')}
-            </MenuItem>
-          {:else}
-            <MenuItem onclick={onSetCurrent}>
-              {translate('deployments.set-as-current')}
-            </MenuItem>
-          {/if}
-          <MenuItem onclick={onSetRamping} disabled={isCurrent}>
-            {isRamping
-              ? translate('deployments.edit-ramping-percentage')
-              : translate('deployments.set-ramping-version')}
+      <MenuItem href={editHref}>
+        {translate('deployments.edit')}
+      </MenuItem>
+      {#if hasComputeConfig}
+        {#if isCurrent}
+          <MenuItem onclick={onUnsetCurrent}>
+            {translate('deployments.unset-current')}
           </MenuItem>
-          <MenuItem onclick={onValidate}>
-            {translate('deployments.validate-connection')}
+        {:else}
+          <MenuItem onclick={onSetCurrent}>
+            {translate('deployments.set-as-current')}
           </MenuItem>
         {/if}
-        {#snippet fallback()}
-          {#if isCurrent}
-            <MenuItem onclick={onUnsetCurrent}>
-              {translate('deployments.unset-current')}
-            </MenuItem>
-          {:else}
-            <MenuItem onclick={onSetCurrent}>
-              {translate('deployments.set-as-current')}
-            </MenuItem>
-          {/if}
-          <MenuItem onclick={onSetRamping} disabled={isCurrent}>
-            {isRamping
-              ? translate('deployments.edit-ramping-percentage')
-              : translate('deployments.set-ramping-version')}
-          </MenuItem>
-        {/snippet}
-      </CapabilityGuard>
+        <MenuItem onclick={onSetRamping} disabled={isCurrent}>
+          {isRamping
+            ? translate('deployments.edit-ramping-percentage')
+            : translate('deployments.set-ramping-version')}
+        </MenuItem>
+        <MenuItem onclick={onValidate}>
+          {translate('deployments.validate-connection')}
+        </MenuItem>
+      {/if}
       <MenuItem href={workflowHref}>
         {translate('deployments.view-workflows')}
       </MenuItem>
-      <CapabilityGuard capability="serverScaledDeployments">
-        <MenuItem onclick={onDelete} destructive>
-          {translate('common.delete')}
-        </MenuItem>
-      </CapabilityGuard>
+      <MenuItem onclick={onDelete} destructive>
+        {translate('common.delete')}
+      </MenuItem>
     </Menu>
   </MenuContainer>
 </td>

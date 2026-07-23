@@ -2,7 +2,6 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
   import DeploymentHeader from '$lib/components/deployments/deployment-header.svelte';
   import RampUnversionedModal from '$lib/components/deployments/ramp-unversioned-modal.svelte';
@@ -116,15 +115,13 @@
   />
 
   {#if unversionedRampingPercentage !== null}
-    <CapabilityGuard capability="serverScaledDeployments">
-      <Alert
-        intent="warning"
-        title={translate('deployments.unversioned-ramping-banner', {
-          percentage: unversionedRampingPercentage,
-        })}
-        class="mt-4"
-      />
-    </CapabilityGuard>
+    <Alert
+      intent="warning"
+      title={translate('deployments.unversioned-ramping-banner', {
+        percentage: unversionedRampingPercentage,
+      })}
+      class="mt-4"
+    />
   {/if}
 
   <div class="mt-4">
@@ -144,12 +141,8 @@
       <tr slot="headers">
         <th>{translate('deployments.build-id')}</th>
         <th>{translate('deployments.lifecycle')}</th>
-        <CapabilityGuard capability="serverScaledDeployments">
-          <th>{translate('deployments.compute')}</th>
-        </CapabilityGuard>
-        <CapabilityGuard capability="serverScaledDeployments">
-          <th>{translate('deployments.connection')}</th>
-        </CapabilityGuard>
+        <th>{translate('deployments.compute')}</th>
+        <th>{translate('deployments.connection')}</th>
         <th>{translate('deployments.deployed')}</th>
         <th>{translate('deployments.actions')}</th>
       </tr>
