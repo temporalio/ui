@@ -459,131 +459,133 @@
   style:height="{svgHeight}px"
   bind:this={containerEl}
 >
-  <EndTimeInterval {workflow} {startTime} bind:currentTime={nowMs} let:endTime>
-    <div
-      class="pointer-events-none sticky top-[120px]"
-      class:invisible={!!$activeGroups.length}
-    >
-      <div class="flex w-full justify-between text-xs">
-        <p class="w-60 -translate-x-24 rotate-90">
-          {$timestamp(startTime, { format: 'short' })}
-        </p>
-        <p class="w-60 translate-x-24 rotate-90">
-          {$timestamp(endTime, { format: 'short' })}
-        </p>
-      </div>
-    </div>
-    <!-- Tall scrolled layer; rows/lines/dots are absolutely-positioned divs,
-         only the windowed slots exist in the DOM. -->
-    <div
-      class="canvas"
-      style:width="{canvasWidth}px"
-      style:height="{svgHeight}px"
-      style:--dot="{dotSize}px"
-      style:--dot-r="{dotRadius}px"
-    >
-      <TimelineIconDefs />
-
-      <!-- Border rails -->
+  <EndTimeInterval {workflow} {startTime} bind:currentTime={nowMs}>
+    {#snippet children({ endTime })}
       <div
-        class="absolute bg-current"
-        style:left="{GUTTER - RADIUS / 4}px"
-        style:top="{lineTop}px"
-        style:width="{RADIUS / 2}px"
-        style:height="{lineBottom}px"
-      ></div>
-      <div
-        class="absolute bg-current"
-        style:left="{canvasWidth - GUTTER - RADIUS / 4}px"
-        style:top="{lineTop}px"
-        style:width="{RADIUS / 2}px"
-        style:height="{lineBottom}px"
-      ></div>
-
-      <TimelineAxis
-        x1={GUTTER - RADIUS / 4}
-        x2={canvasWidth - GUTTER + RADIUS / 4}
-        gutter={GUTTER}
-        {timelineHeight}
-        {startTime}
-        {scale}
-      />
-      <WorkflowRow {workflow} y={ROW_HEIGHT} length={canvasWidth} />
-      {#if !loading}
-        <!-- Anchor's left provides the gutter offset for the layer's 0-based coords. -->
-        <div class="absolute top-0" style:left="{GUTTER}px">
-          <TimelineCollapsedLayer
-            {scale}
-            {timelineHeight}
-            bandTop={layerBandTop}
-            bandHeight={layerBandHeight}
-            {readOnly}
-            onToggle={toggleSegment}
-          />
+        class="pointer-events-none sticky top-[120px]"
+        class:invisible={!!$activeGroups.length}
+      >
+        <div class="flex w-full justify-between text-xs">
+          <p class="w-60 -translate-x-24 rotate-90">
+            {$timestamp(startTime, { format: 'short' })}
+          </p>
+          <p class="w-60 translate-x-24 rotate-90">
+            {$timestamp(endTime, { format: 'short' })}
+          </p>
         </div>
-      {/if}
+      </div>
+      <!-- Tall scrolled layer; rows/lines/dots are absolutely-positioned divs,
+         only the windowed slots exist in the DOM. -->
+      <div
+        class="canvas"
+        style:width="{canvasWidth}px"
+        style:height="{svgHeight}px"
+        style:--dot="{dotSize}px"
+        style:--dot-r="{dotRadius}px"
+      >
+        <TimelineIconDefs />
 
-      <!-- Keyed by slot index so Svelte reuses the <li>s in place; the <li>
+        <!-- Border rails -->
+        <div
+          class="absolute bg-current"
+          style:left="{GUTTER - RADIUS / 4}px"
+          style:top="{lineTop}px"
+          style:width="{RADIUS / 2}px"
+          style:height="{lineBottom}px"
+        ></div>
+        <div
+          class="absolute bg-current"
+          style:left="{canvasWidth - GUTTER - RADIUS / 4}px"
+          style:top="{lineTop}px"
+          style:width="{RADIUS / 2}px"
+          style:height="{lineBottom}px"
+        ></div>
+
+        <TimelineAxis
+          x1={GUTTER - RADIUS / 4}
+          x2={canvasWidth - GUTTER + RADIUS / 4}
+          gutter={GUTTER}
+          {timelineHeight}
+          {startTime}
+          {scale}
+        />
+        <WorkflowRow {workflow} y={ROW_HEIGHT} length={canvasWidth} />
+        {#if !loading}
+          <!-- Anchor's left provides the gutter offset for the layer's 0-based coords. -->
+          <div class="absolute top-0" style:left="{GUTTER}px">
+            <TimelineCollapsedLayer
+              {scale}
+              {timelineHeight}
+              bandTop={layerBandTop}
+              bandHeight={layerBandHeight}
+              {readOnly}
+              onToggle={toggleSegment}
+            />
+          </div>
+        {/if}
+
+        <!-- Keyed by slot index so Svelte reuses the <li>s in place; the <li>
            persists when its slot is null, only the inner row toggles.
            pointer-events-none so clicks fall through to the collapse toggles;
            event buttons opt back in with pointer-events:auto. -->
-      <ul class="pointer-events-none absolute inset-0 m-0 list-none p-0">
-        {#each pool as slot, slotIndex (slotIndex)}
-          <li
-            class="absolute left-0 right-0 top-0"
-            style:display={slot ? 'block' : 'none'}
-            style:height="{ROW_HEIGHT}px"
-            style:contain="layout"
-            style:transform={slot
-              ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + shiftFor(slot.index)}px)`
-              : undefined}
-          >
-            {#if slot}
-              <TimelineGraphRow
-                group={slot.group}
-                eventCount={slot.group.eventList.length}
-                {canvasWidth}
-                project={projectX}
-                {readOnly}
-              />
-            {/if}
-          </li>
-        {/each}
-      </ul>
+        <ul class="pointer-events-none absolute inset-0 m-0 list-none p-0">
+          {#each pool as slot, slotIndex (slotIndex)}
+            <li
+              class="absolute left-0 right-0 top-0"
+              style:display={slot ? 'block' : 'none'}
+              style:height="{ROW_HEIGHT}px"
+              style:contain="layout"
+              style:transform={slot
+                ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + shiftFor(slot.index)}px)`
+                : undefined}
+            >
+              {#if slot}
+                <TimelineGraphRow
+                  group={slot.group}
+                  eventCount={slot.group.eventList.length}
+                  {canvasWidth}
+                  project={projectX}
+                  {readOnly}
+                />
+              {/if}
+            </li>
+          {/each}
+        </ul>
 
-      {#if loading && pendingGroupCount > 0}
-        {@const rectY = getPendingBlockY({
-          descStart,
-          filteredGroupsLength: filteredGroups.length,
-          reverseSort,
-        })}
-        {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
-        <div
-          class="absolute animate-pulse rounded bg-slate-400/30"
-          style:left="{GUTTER}px"
-          style:top="{rectY}px"
-          style:width="{canvasWidth - GUTTER * 2}px"
-          style:height="{rectH}px"
-        ></div>
-      {/if}
-
-      <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
-      {#if !readOnly && activeIdx >= 0}
-        {@const activeGroup = filteredGroups[activeIdx]}
-        {#if activeGroup}
-          {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
-          <GroupDetailsRow
-            y={panelY}
-            group={activeGroup}
-            {canvasWidth}
-            endTime={workflow?.endTime ? endTime : nowMs}
-            onHeight={(height) => {
-              panelHeight = height;
-            }}
-          />
+        {#if loading && pendingGroupCount > 0}
+          {@const rectY = getPendingBlockY({
+            descStart,
+            filteredGroupsLength: filteredGroups.length,
+            reverseSort,
+          })}
+          {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
+          <div
+            class="absolute animate-pulse rounded bg-slate-400/30"
+            style:left="{GUTTER}px"
+            style:top="{rectY}px"
+            style:width="{canvasWidth - GUTTER * 2}px"
+            style:height="{rectH}px"
+          ></div>
         {/if}
-      {/if}
-    </div>
+
+        <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
+        {#if !readOnly && activeIdx >= 0}
+          {@const activeGroup = filteredGroups[activeIdx]}
+          {#if activeGroup}
+            {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
+            <GroupDetailsRow
+              y={panelY}
+              group={activeGroup}
+              {canvasWidth}
+              endTime={workflow?.endTime ? endTime : nowMs}
+              onHeight={(height) => {
+                panelHeight = height;
+              }}
+            />
+          {/if}
+        {/if}
+      </div>
+    {/snippet}
   </EndTimeInterval>
 </div>
 
