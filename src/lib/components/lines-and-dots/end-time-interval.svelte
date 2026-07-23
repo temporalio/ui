@@ -29,12 +29,7 @@
     children,
   }: Props = $props();
 
-  const rightNow = () => {
-    currentTime = Date.now();
-    return currentTime + 1000;
-  };
-
-  let endTime = $derived(workflow?.endTime || rightNow());
+  let endTime = $derived(workflow?.endTime || currentTime + 1000);
   let duration = $derived(
     getMillisecondDuration({
       start: startTime,
@@ -58,7 +53,7 @@
       endTimeInterval = null;
     } else if (!endTimeInterval && (workflow.isRunning || workflow.isPaused)) {
       endTimeInterval = setInterval(() => {
-        endTime = rightNow();
+        currentTime = Date.now();
       }, 1000);
     }
   };
