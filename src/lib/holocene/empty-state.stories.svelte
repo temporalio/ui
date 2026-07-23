@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import { iconNames } from './icon';
 
@@ -28,7 +29,7 @@
         },
       },
     },
-  } satisfies Meta<EmptyState>;
+  } satisfies Meta<ComponentProps<typeof EmptyState>>;
 </script>
 
 <script lang="ts">
