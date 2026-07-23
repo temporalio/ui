@@ -20,6 +20,7 @@
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import {
+    getBatchSelectionTargets,
     getPageSelectionStatus,
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
@@ -76,6 +77,19 @@
     }
   };
 
+  const handleBatchSelect = (event: MouseEvent, visibleRowIndex: number) => {
+    const selection = getBatchSelectionTargets(
+      event,
+      visiblePaginatedItems,
+      visibleRowIndex,
+      prevClickedIndex,
+    );
+    if (!selection) return;
+
+    selectActivities(selection.isChecked, selection.targeted);
+    prevClickedIndex = visibleRowIndex;
+  };
+
   $effect(() => {
     void visiblePaginatedItems;
     void $allSelected;
@@ -116,39 +130,8 @@
       <TableRow
         {activity}
         {showBatchActions}
-        onClickBatchSelect={(event) => {
-          if (!(event.currentTarget instanceof HTMLInputElement)) {
-            return;
-          }
-
-          const isChecked = event.currentTarget.checked;
-
-          let targetedActivities = [activity];
-
-          if (
-            event.shiftKey &&
-            prevClickedIndex !== null &&
-            prevClickedIndex >= 0
-          ) {
-            const rangeStartInclusive = Math.min(
-              prevClickedIndex,
-              visibleRowIndex,
-            );
-            const rangeEndInclusive = Math.max(
-              prevClickedIndex,
-              visibleRowIndex,
-            );
-
-            targetedActivities = visiblePaginatedItems.slice(
-              rangeStartInclusive,
-              rangeEndInclusive + 1,
-            );
-          }
-
-          selectActivities(isChecked, targetedActivities);
-
-          prevClickedIndex = visibleRowIndex;
-        }}
+        onClickBatchSelect={(event) =>
+          handleBatchSelect(event, visibleRowIndex)}
       >
         {#each columns as column, i (`${column.label}:${i}`)}
           <TableBodyCell {activity} {column} />
