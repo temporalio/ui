@@ -48,6 +48,7 @@ const MOCK_DEFAULT_NAMESPACE = {
       workerHeartbeats: true,
       standaloneActivityStartDelay: true,
       standaloneActivityBatchOperations: true,
+      standaloneActivityOperatorCommands: true,
     },
   },
   config: {

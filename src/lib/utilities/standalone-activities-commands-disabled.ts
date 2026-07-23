@@ -5,8 +5,6 @@ import type { Page } from '@sveltejs/kit';
 import { coreUserStore } from '$lib/stores/core-user';
 
 import { activityCommandsEnabled } from './activity-commands-enabled';
-import { getStandaloneActivitiesGaEnabled } from './core-provider';
-import { minimumVersionRequired } from './version-check';
 
 export const standaloneActivityWriteActionsDisabled = (
   page: Page,
@@ -25,10 +23,11 @@ export const standaloneActivityCommandsDisabled = (
   page: Page,
   namespace?: string,
 ): boolean => {
-  if (!getStandaloneActivitiesGaEnabled()) return true;
-
-  const version = page.data?.cluster?.serverVersion;
-  if (version && !minimumVersionRequired('1.32.0', version)) return true;
+  if (
+    !page?.data?.namespace?.namespaceInfo?.capabilities
+      ?.standaloneActivityOperatorCommands
+  )
+    return true;
 
   const coreUser = coreUserStore();
   return !activityCommandsEnabled(
