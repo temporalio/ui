@@ -61,15 +61,17 @@
   {#if inboundLinkEvents?.length}
     <h3>Inbound</h3>
     <Table class="mb-6 w-full min-w-[600px]" fixed>
-      <caption class="sr-only" slot="caption"
-        >{translate('workflows.workers-tab')}</caption
-      >
-      <TableHeaderRow slot="headers">
-        <th class="w-24">{translate('nexus.caller-event')}</th>
-        <th>{translate('nexus.caller-link')}</th>
-        <th>{translate('nexus.caller-namespace')}</th>
-        <th>{translate('nexus.handler-event')}</th>
-      </TableHeaderRow>
+      {#snippet caption()}
+        <caption class="sr-only">{translate('workflows.workers-tab')}</caption>
+      {/snippet}
+      {#snippet headers()}
+        <TableHeaderRow>
+          <th class="w-24">{translate('nexus.caller-event')}</th>
+          <th>{translate('nexus.caller-link')}</th>
+          <th>{translate('nexus.caller-namespace')}</th>
+          <th>{translate('nexus.handler-event')}</th>
+        </TableHeaderRow>
+      {/snippet}
       {#each inboundLinkEvents as event (event?.id)}
         {@const link = event ? getInboundLinkForEvent(event) : undefined}
         {@const linkView = toEventLinkView(link || undefined, { namespace })}
@@ -106,18 +108,20 @@
   {#if nexusGroups.length}
     <h3>Outbound</h3>
     <Table class="mb-6 w-full min-w-[600px]" fixed>
-      <caption class="sr-only" slot="caption"
-        >{translate('workflows.workers-tab')}</caption
-      >
-      <TableHeaderRow slot="headers">
-        <th class="w-28">{translate('nexus.source-event')}</th>
-        <th>{translate('nexus.nexus-endpoint-simple')}</th>
-        <th>{translate('nexus.nexus-service')}</th>
-        <th>{translate('nexus.nexus-operation')}</th>
-        <th>{translate('nexus.handler-namespace')}</th>
-        <th>{translate('nexus.handler-workflow')}</th>
-        <th>{translate('nexus.handler-event')}</th>
-      </TableHeaderRow>
+      {#snippet caption()}
+        <caption class="sr-only">{translate('workflows.workers-tab')}</caption>
+      {/snippet}
+      {#snippet headers()}
+        <TableHeaderRow>
+          <th class="w-28">{translate('nexus.source-event')}</th>
+          <th>{translate('nexus.nexus-endpoint-simple')}</th>
+          <th>{translate('nexus.nexus-service')}</th>
+          <th>{translate('nexus.nexus-operation')}</th>
+          <th>{translate('nexus.handler-namespace')}</th>
+          <th>{translate('nexus.handler-workflow')}</th>
+          <th>{translate('nexus.handler-event')}</th>
+        </TableHeaderRow>
+      {/snippet}
       {#each nexusGroups as group (group.id)}
         {@const link = group.links?.[0]}
         {@const linkView = toEventLinkView(link, { namespace })}

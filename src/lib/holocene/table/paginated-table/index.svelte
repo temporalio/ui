@@ -65,8 +65,12 @@
     {/if}
   {:else}
     <Table bordered={false} {updating} {fixed} {...$$restProps}>
-      <slot slot="caption" name="caption" />
-      <slot slot="headers" name="headers" {visibleItems} />
+      {#snippet caption()}
+        <slot name="caption" />
+      {/snippet}
+      {#snippet headers()}
+        <slot name="headers" {visibleItems} />
+      {/snippet}
       <slot />
     </Table>
     {#if visibleItems.length}
