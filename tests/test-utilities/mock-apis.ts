@@ -1,6 +1,11 @@
 import type { Page } from '@playwright/test';
 
 import {
+  mockStandaloneActivitiesListApi,
+  mockStandaloneActivityCountApi,
+  STANDALONE_ACTIVITIES_LIST_API,
+} from './mocks/activity-execution';
+import {
   mockCreateBatchOperationApi,
   mockDescribeBatchOperationApi,
 } from './mocks/batch-operations';
@@ -100,12 +105,17 @@ export {
   mockRunningActivityExecution,
   mockDelayedActivityExecution,
   mockPausedActivityExecution,
+  mockRunningActivityExecutionInfos,
   mockStandaloneActivityApi,
+  mockStandaloneActivitiesListApi,
+  mockStandaloneActivityCountApi,
   mockStandaloneActivityPauseApi,
   mockStandaloneActivityUnpauseApi,
   mockStandaloneActivityResetApi,
   mockStandaloneActivityUpdateOptionsApi,
   STANDALONE_ACTIVITY_API,
+  STANDALONE_ACTIVITIES_LIST_API,
+  STANDALONE_ACTIVITY_COUNT_API,
   STANDALONE_ACTIVITY_PAUSE_API,
   STANDALONE_ACTIVITY_UNPAUSE_API,
   STANDALONE_ACTIVITY_RESET_API,
@@ -196,6 +206,20 @@ export const mockBatchOperationApis = (page: Page) => {
     mockCreateBatchOperationApi(page),
     mockDescribeBatchOperationApi(page),
   ]);
+};
+
+export const mockActivitiesApis = (page: Page) => {
+  return Promise.all([
+    mockGlobalApis(page),
+    mockNamespaceApi(page),
+    mockSearchAttributesApi(page),
+    mockStandaloneActivitiesListApi(page),
+    mockStandaloneActivityCountApi(page),
+  ]);
+};
+
+export const waitForActivitiesApis = (page: Page) => {
+  return Promise.all([page.waitForResponse(STANDALONE_ACTIVITIES_LIST_API)]);
 };
 
 export const mockWorkflowApis = (

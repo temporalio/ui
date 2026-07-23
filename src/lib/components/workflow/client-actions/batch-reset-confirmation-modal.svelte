@@ -3,6 +3,7 @@
 
   import { getContext } from 'svelte';
 
+  import BatchOperationConfirmationForm from '$lib/components/batch/batch-operation-confirmation-form.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
@@ -13,14 +14,12 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { batchResetWorkflows } from '$lib/services/batch-service';
+  import { batchResetWorkflows } from '$lib/services/workflow-batch-service';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { getPlaceholder } from '$lib/utilities/workflow-actions';
-
-  import BatchOperationConfirmationForm from './batch-operation-confirmation-form.svelte';
 
   interface Props {
     namespace: string;
@@ -42,6 +41,13 @@
     BATCH_OPERATION_CONTEXT,
   );
 
+  const actionText = translate('workflows.reset');
+  const confirmationText = $derived(
+    translate('workflows.batch-reset-confirmation', {
+      count: $selectedWorkflows.length,
+    }),
+  );
+
   const resetForm = () => {
     $reason = '';
     $jobId = '';
@@ -57,6 +63,7 @@
     error = '';
     const options = {
       namespace,
+      identity,
       reason: $reason ? $reason : reasonPlaceholder,
       jobId: $jobId || jobIdPlaceholder,
       resetType: $resetType,
@@ -101,7 +108,21 @@
       bind:jobIdValid={$jobIdValid}
       {jobIdPlaceholder}
       {reasonPlaceholder}
-      action={Action.Reset}
+      reasonInputId="bulk-action-reason-{Action.Reset}"
+      reasonHint={translate(
+        'workflows.batch-operation-confirmation-input-hint',
+      )}
+      allSelected={$allSelected}
+      query={$workflowsQuery}
+      queryTestId="batch-action-workflows-query"
+      {confirmationText}
+      allSelectedText={translate('workflows.batch-operation-confirmation-all', {
+        action: actionText,
+      })}
+      countDisclaimerText={translate(
+        'workflows.batch-operation-count-disclaimer',
+        { action: actionText },
+      )}
     >
       <RadioGroup
         description={translate('workflows.reset-event-radio-group-description')}

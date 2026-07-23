@@ -1,6 +1,35 @@
+<script lang="ts" module>
+  import type { Readable, Writable } from 'svelte/store';
+
+  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+
+  export const ACTIVITY_BATCH_OPERATION_CONTEXT =
+    'ACTIVITY_BATCH_OPERATION_CONTEXT';
+
+  export type ActivityBatchOperationContext = {
+    allSelected: Writable<boolean>;
+    cancelableActivities: Readable<ActivityExecutionInfo[]>;
+    terminableActivities: Readable<ActivityExecutionInfo[]>;
+    selectedActivities: Writable<ActivityExecutionInfo[]>;
+    batchActionsVisible: Readable<boolean>;
+    openBatchCancelConfirmationModal: () => void;
+    openBatchTerminateConfirmationModal: () => void;
+    handleSelectAll: (activities: ActivityExecutionInfo[]) => void;
+    selectActivities: (
+      checked: boolean,
+      activities: ActivityExecutionInfo[],
+    ) => void;
+  };
+
+  export const activityKey = (activity: ActivityExecutionInfo): string =>
+    `${activity.activityId ?? ''}:${activity.runId ?? ''}`;
+</script>
+
 <script lang="ts">
+  import { derived as derivedStore } from 'svelte/store';
+
   import type { Snippet } from 'svelte';
-  import { onMount } from 'svelte';
+  import { onMount, setContext } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -8,6 +37,8 @@
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
+  import BatchCancelConfirmationModal from '$lib/components/standalone-activities/batch-cancel-confirmation-modal.svelte';
+  import BatchTerminateConfirmationModal from '$lib/components/standalone-activities/batch-terminate-confirmation-modal.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
@@ -22,6 +53,7 @@
     activityRefresh,
   } from '$lib/stores/activities';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { createBatchSelection } from '$lib/stores/batch-selection';
   import {
     availableActivityColumns,
     TABLE_TYPE,
@@ -77,10 +109,71 @@
 
   let customizationDrawerOpen = $state(false);
 
+  let batchCancelConfirmationModalOpen = $state(false);
+  let batchTerminateConfirmationModalOpen = $state(false);
+
+  const {
+    allSelected,
+    selectedItems: selectedActivities,
+    batchActionsVisible,
+    selectItems: selectActivities,
+    handleSelectAll,
+    reset: resetSelection,
+  } = createBatchSelection<ActivityExecutionInfo>(activityKey);
+
+  const isRunning = (activity: ActivityExecutionInfo) =>
+    activity.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING';
+
+  const cancelableActivities = derivedStore(selectedActivities, (activities) =>
+    activities.filter(isRunning),
+  );
+
+  const terminableActivities = derivedStore(selectedActivities, (activities) =>
+    activities.filter(isRunning),
+  );
+
+  $effect(() => {
+    void namespace;
+    void query;
+    void searchParams;
+    void $activityRefresh;
+    resetSelection();
+  });
+
+  const openBatchCancelConfirmationModal = () => {
+    batchCancelConfirmationModalOpen = true;
+  };
+
+  const openBatchTerminateConfirmationModal = () => {
+    batchTerminateConfirmationModalOpen = true;
+  };
+
+  setContext<ActivityBatchOperationContext>(ACTIVITY_BATCH_OPERATION_CONTEXT, {
+    allSelected,
+    cancelableActivities,
+    terminableActivities,
+    selectedActivities,
+    batchActionsVisible,
+    openBatchCancelConfirmationModal,
+    openBatchTerminateConfirmationModal,
+    handleSelectAll,
+    selectActivities,
+  });
+
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
 </script>
+
+<BatchCancelConfirmationModal
+  {namespace}
+  bind:open={batchCancelConfirmationModalOpen}
+/>
+
+<BatchTerminateConfirmationModal
+  {namespace}
+  bind:open={batchTerminateConfirmationModalOpen}
+/>
 
 <header class="flex flex-col gap-2">
   <div class="flex flex-col justify-between gap-2 md:flex-row">

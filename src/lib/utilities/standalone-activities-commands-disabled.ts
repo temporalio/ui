@@ -37,3 +37,15 @@ export const standaloneActivityCommandsDisabled = (
     namespace ?? page.params.namespace,
   );
 };
+
+export const standaloneActivityBulkActionsEnabled = (
+  page: Page,
+  namespace?: string,
+): boolean => {
+  const capabilities = page?.data?.namespace?.namespaceInfo?.capabilities;
+  if (!capabilities?.standaloneActivityBatchOperations) return false;
+  if (page?.data?.settings?.batchActionsDisabled) return false;
+  if (standaloneActivityWriteActionsDisabled(page, namespace)) return false;
+
+  return true;
+};
