@@ -11,8 +11,12 @@
   import { translate } from '$lib/i18n/translate';
 
   import { GCP_REGIONS } from './gcp-regions';
+  import cloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
   import terraformTemplate from './serverless-worker-lambda.tf?raw';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
+
+  const CLOUD_RUN_PROJECT_TOKEN = '"__TEMPORAL_GCP_PROJECT_ID__"';
+  const CLOUD_RUN_PROJECT_PLACEHOLDER = '<YOUR-GCP-PROJECT-ID>';
 
   interface Props {
     provider?: string;
@@ -65,6 +69,12 @@
   }: Props = $props();
 
   const resolvedCfnTemplate = $derived(cfnTemplateProp ?? cfnTemplate);
+  const resolvedCloudRunTerraformTemplate = $derived(
+    cloudRunTerraformTemplate.replace(
+      CLOUD_RUN_PROJECT_TOKEN,
+      JSON.stringify(gcpProject || CLOUD_RUN_PROJECT_PLACEHOLDER),
+    ),
+  );
 
   const launchStackHref = $derived.by(() => {
     if (!cfnTemplateUrl) {
@@ -83,6 +93,7 @@
   });
 
   let showRoleHelp = $state(false);
+  let showCloudRunHelp = $state(false);
   let showScaling = $state(false);
   let activeRoleHelpTab = $state<'cloudformation' | 'terraform'>(
     'cloudformation',
@@ -284,17 +295,51 @@
     </Accordion>
   </div>
 {:else}
-  <Input
-    bind:value={gcpServiceAccount}
-    id="gcpServiceAccount"
-    name="gcpServiceAccount"
-    label={translate('workers.gcp-service-account-label')}
-    hintText={errors.gcpServiceAccount?.[0] ||
-      translate('workers.gcp-service-account-hint')}
-    error={!!errors.gcpServiceAccount?.[0]}
-    placeholder={translate('workers.gcp-service-account-placeholder')}
-    required
-  />
+  <div class="flex flex-col gap-4">
+    <Input
+      bind:value={gcpServiceAccount}
+      id="gcpServiceAccount"
+      name="gcpServiceAccount"
+      label={translate('workers.gcp-service-account-label')}
+      hintText={errors.gcpServiceAccount?.[0] ||
+        translate('workers.gcp-service-account-hint')}
+      error={!!errors.gcpServiceAccount?.[0]}
+      placeholder={translate('workers.gcp-service-account-placeholder')}
+      required
+    />
+    {#if provider === 'cloud-run'}
+      <Accordion
+        icon="info"
+        title={translate('workers.cloud-run-setup-prompt')}
+        bind:open={showCloudRunHelp}
+        class="[&_h3]:text-sm"
+      >
+        <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+          <p class="text-sm text-secondary">
+            {translate('workers.cloud-run-terraform-description-before')}<Link
+              href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
+              newTab
+              >{translate('workers.cloud-run-terraform-module-link')}</Link
+            >{translate('workers.cloud-run-terraform-description-after')}
+          </p>
+          <p class="text-sm text-warning">
+            {translate('workers.cloud-run-impersonator-warning')}
+          </p>
+          <CodeBlock
+            content={resolvedCloudRunTerraformTemplate}
+            language="text"
+            maxHeight={300}
+            copyable
+            copyIconTitle={translate('workers.copy-snippet')}
+            copySuccessIconTitle={translate('workers.copied')}
+          />
+          <p class="text-sm text-secondary">
+            {translate('workers.cloud-run-invoker-handoff')}
+          </p>
+        </div>
+      </Accordion>
+    {/if}
+  </div>
 {/if}
 
 <hr class="my-5 border-subtle" />

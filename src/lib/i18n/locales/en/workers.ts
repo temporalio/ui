@@ -324,6 +324,15 @@ export const Strings = {
   'terraform-iam-module-link': 'AWS IAM Role Module',
   'terraform-description-after':
     ' to create the IAM role Temporal Cloud assumes to invoke your Lambda functions.',
+  'cloud-run-setup-prompt': "Don't have a service account yet? Create one",
+  'cloud-run-terraform-description-before': 'Use our Terraform ',
+  'cloud-run-terraform-module-link': 'Google Cloud Run Module',
+  'cloud-run-terraform-description-after':
+    ' to create the service account Temporal Cloud impersonates to manage your Worker Pool.',
+  'cloud-run-impersonator-warning':
+    'Before applying, replace the impersonator service account placeholder with the service account email provided by Temporal Cloud.',
+  'cloud-run-invoker-handoff':
+    "After applying, copy the module's invoker_email output into the Service Account field above.",
   'hide-defaults': 'Hide Defaults',
   'show-defaults': 'Show Defaults',
   'gcp-project-label': 'Project ID',
