@@ -143,8 +143,12 @@ describe('interpolateTerraformTemplate', () => {
   const template = `module "serverless-worker-lambda" {
   source = "terraform-modules/modules/serverless-workers/aws/lambda"
 
-  external_id               = "<external-id>"
-  temporal_cloud_principals = "<provided by Temporal Cloud>"
+  external_id = "<external-id>"
+
+  # IAM principals allowed to assume this role to invoke your workers.
+  temporal_cloud_principals = [
+    "<principal-arn>",
+  ]
 
   lambda_function_arns = [
     "arn:aws:lambda:us-east-1:123456789012:function:my-worker-1",
@@ -157,7 +161,7 @@ describe('interpolateTerraformTemplate', () => {
       externalId: 'my-external-id',
     });
 
-    expect(result).toContain('external_id               = "my-external-id"');
+    expect(result).toContain('external_id = "my-external-id"');
     expect(result).not.toContain('<external-id>');
   });
 
@@ -198,7 +202,7 @@ describe('interpolateTerraformTemplate', () => {
       lambdaArn: arn,
     });
 
-    expect(result).toContain('external_id               = "test"');
+    expect(result).toContain('external_id = "test"');
     expect(result).toContain(`"${arn}"`);
     expect(result).not.toContain('<external-id>');
     expect(result).not.toContain('123456789012');
@@ -216,7 +220,7 @@ describe('interpolateTerraformTemplate', () => {
       externalId: "$' $& $1",
     });
 
-    expect(result).toContain('external_id               = "$\' $& $1"');
+    expect(result).toContain('external_id = "$\' $& $1"');
   });
 
   it('leaves other principals and comments untouched', () => {
@@ -226,7 +230,7 @@ describe('interpolateTerraformTemplate', () => {
     });
 
     expect(result).toContain(
-      'temporal_cloud_principals = "<provided by Temporal Cloud>"',
+      'temporal_cloud_principals = [\n    "<principal-arn>",\n  ]',
     );
     expect(result).toContain('source = "terraform-modules/modules');
   });

@@ -3,8 +3,14 @@
 module "serverless-worker-lambda" {
   source = "terraform-modules/modules/serverless-workers/aws/lambda"
 
-  external_id               = "<external-id>"
-  temporal_cloud_principals = "<provided by Temporal Cloud>"
+  external_id = "<external-id>"
+
+  # IAM principals allowed to assume this role to invoke your workers.
+  # Temporal Cloud provides these values; for self-hosted deployments,
+  # use the IAM identity your Temporal service runs as.
+  temporal_cloud_principals = [
+    "<principal-arn>",
+  ]
 
   lambda_function_arns = [
     "arn:aws:lambda:us-east-1:123456789012:function:my-worker-1",
