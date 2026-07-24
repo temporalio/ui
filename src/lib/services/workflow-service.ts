@@ -11,7 +11,7 @@ import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
-import { isCloud } from '$lib/stores/advanced-visibility';
+import { isCloud, rejectOrderByClause } from '$lib/stores/advanced-visibility';
 import type {
   SearchAttributeInput,
   SearchAttributesSchema,
@@ -64,6 +64,7 @@ import {
 import { paginated } from '$lib/utilities/paginated';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+import { isOrderByUnsupportedError } from '$lib/utilities/query/order-by';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
@@ -1128,6 +1129,13 @@ export const fetchPaginatedWorkflows = async (
 
     const onError: ErrorCallback = (err) => {
       handleUnauthorizedOrForbiddenError(err);
+
+      if (
+        query.toLowerCase().includes('order by') &&
+        isOrderByUnsupportedError(err?.body?.message)
+      ) {
+        rejectOrderByClause(namespace);
+      }
 
       if (get(hideWorkflowQueryErrors)) {
         workflowError.set(translate('workflows.workflows-error-querying'));

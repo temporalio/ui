@@ -24,6 +24,7 @@ startWorkflowDisabled: false
 hideWorkflowQueryErrors: false
 refreshWorkflowCountsDisabled: false
 activityCommandsDisabled: false
+workflowSortingEnabled: false
 auth:
   enabled: false
   redirectToProvider: false

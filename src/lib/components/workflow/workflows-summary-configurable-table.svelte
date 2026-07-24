@@ -21,9 +21,14 @@
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
+  import {
+    orderByClauseRejected,
+    supportsAdvancedVisibilityWithOrderBy,
+  } from '$lib/stores/advanced-visibility';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import { viewFeature } from '$lib/stores/new-feature-tags';
   import { tableDensity } from '$lib/stores/table-density';
+  import { toaster } from '$lib/stores/toaster';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import {
@@ -31,6 +36,13 @@
     getPageSelectionStatus,
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
+  import {
+    SORT_COLUMN_PARAM,
+    SORT_ORDER_PARAM,
+    toQueryWithOrderBy,
+    toWorkflowSort,
+  } from '$lib/utilities/query/order-by';
+  import { updateMultipleQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
@@ -116,7 +128,30 @@
     }
   };
 
-  const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
+  const sortParam = $derived(toWorkflowSort(page.url.searchParams));
+  const sort = $derived(
+    $supportsAdvancedVisibilityWithOrderBy ? sortParam : undefined,
+  );
+  const listQuery = $derived(toQueryWithOrderBy(query, sort));
+
+  const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, listQuery));
+
+  $effect(() => {
+    if (!sortParam || !$orderByClauseRejected) return;
+
+    toaster.push({
+      variant: 'error',
+      message: translate('workflows.sorting-not-supported'),
+      duration: 8000,
+    });
+    updateMultipleQueryParameters({
+      url: page.url,
+      parameters: [
+        { parameter: SORT_COLUMN_PARAM },
+        { parameter: SORT_ORDER_PARAM },
+      ],
+    });
+  });
 
   const dense = $derived($tableDensity === 'dense');
 
@@ -214,7 +249,7 @@
   });
 </script>
 
-{#key [namespace, query, $refresh]}
+{#key [namespace, listQuery, $refresh]}
   <PaginatedTable
     total={$workflowCount.count}
     {onFetch}
