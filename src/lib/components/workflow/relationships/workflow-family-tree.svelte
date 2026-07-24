@@ -78,7 +78,7 @@
             labelPosition="left"
             id="autorefresh"
             checked={expandAll}
-            on:change={onExpandAll}
+            onchange={onExpandAll}
           />
         {/if}
       </div>

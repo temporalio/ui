@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
@@ -30,7 +31,7 @@
         table: { disable: true },
       },
     },
-  } satisfies Meta<ToggleSwitch>;
+  } satisfies Meta<ComponentProps<typeof ToggleSwitch>>;
 </script>
 
 <script lang="ts">
