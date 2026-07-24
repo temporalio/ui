@@ -1,56 +1,57 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
+  import type { Snippet } from 'svelte';
   import { onDestroy } from 'svelte';
 
   import { pauseLiveUpdates } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
 
-  export let workflow: WorkflowExecution;
-  export let startTime: string | Timestamp;
+  interface Props {
+    workflow: WorkflowExecution;
+    startTime: string | Timestamp;
+    currentTime?: number;
+    children?: Snippet<
+      [
+        {
+          endTime: string | number;
+          duration: number | null;
+          currentTime: number;
+        },
+      ]
+    >;
+  }
 
-  export let currentTime = Date.now();
+  let {
+    workflow,
+    startTime,
+    currentTime = $bindable(Date.now()),
+    children,
+  }: Props = $props();
 
-  const rightNow = () => {
-    currentTime = Date.now();
-    return currentTime + 1000;
-  };
+  const endTime = $derived(workflow?.endTime || currentTime + 1000);
+  const duration = $derived(
+    getMillisecondDuration({
+      start: startTime,
+      end: endTime,
+      onlyUnderSecond: false,
+    }),
+  );
 
-  $: endTime = workflow?.endTime || rightNow();
-  $: duration = getMillisecondDuration({
-    start: startTime,
-    end: endTime,
-    onlyUnderSecond: false,
+  $effect(() => {
+    if ($pauseLiveUpdates) return;
+    if (workflow.endTime) return;
+    if (!(workflow.isRunning || workflow.isPaused)) return;
+
+    const interval = setInterval(() => {
+      currentTime = Date.now();
+    }, 1000);
+    return () => clearInterval(interval);
   });
 
-  let endTimeInterval: ReturnType<typeof setInterval> | null;
-
-  const clearEndTimeInterval = (endTime: string) => {
-    if (endTime) {
-      clearInterval(endTimeInterval ?? undefined);
-      endTimeInterval = null;
-    }
-  };
-
-  const startStopInterval = (pauseLiveUpdates: boolean) => {
-    if (pauseLiveUpdates) {
-      clearInterval(endTimeInterval ?? undefined);
-      endTimeInterval = null;
-    } else if (!endTimeInterval && (workflow.isRunning || workflow.isPaused)) {
-      endTimeInterval = setInterval(() => {
-        endTime = rightNow();
-      }, 1000);
-    }
-  };
-
-  $: clearEndTimeInterval(workflow.endTime);
-  $: startStopInterval($pauseLiveUpdates);
-
   onDestroy(() => {
-    clearInterval(endTimeInterval ?? undefined);
-    endTimeInterval = null;
     $pauseLiveUpdates = false;
   });
 </script>
 
-<slot {endTime} {duration} {currentTime} />
+{@render children?.({ endTime, duration, currentTime })}
