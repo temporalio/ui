@@ -24,6 +24,8 @@ package auth_test
 
 import (
 	_ "embed"
+	"encoding/base64"
+	"encoding/json"
 	"net/http/httptest"
 	"testing"
 
@@ -216,4 +218,179 @@ func TestValidateAuthHeaderExists(t *testing.T) {
 			}
 		})
 	}
+}
+
+// fakeJWT creates a fake JWT with the given claims payload for testing.
+// The header and signature are placeholders since ValidateAllowedClaims
+// only reads the payload (the token is already verified at that point).
+func fakeJWT(t *testing.T, claims map[string]interface{}) string {
+	t.Helper()
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"RS256","typ":"JWT"}`))
+	payload, err := json.Marshal(claims)
+	assert.NoError(t, err)
+	payloadB64 := base64.RawURLEncoding.EncodeToString(payload)
+	return header + "." + payloadB64 + ".fake-signature"
+}
+
+func TestValidateAllowedClaims(t *testing.T) {
+	tests := []struct {
+		name          string
+		claims        map[string]interface{}
+		claimKey      string
+		allowedValues []string
+		wantErr       bool
+		errContains   string
+	}{
+		{
+			name:          "no allowlist configured - empty key",
+			claims:        map[string]interface{}{"groups": []interface{}{"admin"}},
+			claimKey:      "",
+			allowedValues: nil,
+			wantErr:       false,
+		},
+		{
+			name:          "no allowlist configured - empty values",
+			claims:        map[string]interface{}{"groups": []interface{}{"admin"}},
+			claimKey:      "groups",
+			allowedValues: []string{},
+			wantErr:       false,
+		},
+		{
+			name:          "flat string claim - matches",
+			claims:        map[string]interface{}{"role": "admin"},
+			claimKey:      "role",
+			allowedValues: []string{"admin", "superadmin"},
+			wantErr:       false,
+		},
+		{
+			name:          "flat string claim - no match",
+			claims:        map[string]interface{}{"role": "viewer"},
+			claimKey:      "role",
+			allowedValues: []string{"admin", "superadmin"},
+			wantErr:       true,
+			errContains:   "does not have any of the required values",
+		},
+		{
+			name:          "array claim - one match",
+			claims:        map[string]interface{}{"groups": []interface{}{"readers", "myApp-Admin", "users"}},
+			claimKey:      "groups",
+			allowedValues: []string{"myApp-Admin"},
+			wantErr:       false,
+		},
+		{
+			name:          "array claim - multiple allowed, one matches",
+			claims:        map[string]interface{}{"groups": []interface{}{"readers", "ops-team"}},
+			claimKey:      "groups",
+			allowedValues: []string{"myApp-Admin", "ops-team"},
+			wantErr:       false,
+		},
+		{
+			name:          "array claim - no match",
+			claims:        map[string]interface{}{"groups": []interface{}{"readers", "users"}},
+			claimKey:      "groups",
+			allowedValues: []string{"myApp-Admin", "ops-team"},
+			wantErr:       true,
+			errContains:   "does not have any of the required values",
+		},
+		{
+			name: "nested dot-notation claim - matches",
+			claims: map[string]interface{}{
+				"realm_access": map[string]interface{}{
+					"roles": []interface{}{"user", "temporal-admin"},
+				},
+			},
+			claimKey:      "realm_access.roles",
+			allowedValues: []string{"temporal-admin"},
+			wantErr:       false,
+		},
+		{
+			name: "nested dot-notation claim - no match",
+			claims: map[string]interface{}{
+				"realm_access": map[string]interface{}{
+					"roles": []interface{}{"user", "viewer"},
+				},
+			},
+			claimKey:      "realm_access.roles",
+			allowedValues: []string{"temporal-admin"},
+			wantErr:       true,
+			errContains:   "does not have any of the required values",
+		},
+		{
+			name: "deeply nested claim - matches",
+			claims: map[string]interface{}{
+				"resource_access": map[string]interface{}{
+					"temporal": map[string]interface{}{
+						"roles": []interface{}{"admin"},
+					},
+				},
+			},
+			claimKey:      "resource_access.temporal.roles",
+			allowedValues: []string{"admin"},
+			wantErr:       false,
+		},
+		{
+			name:          "missing claim - error",
+			claims:        map[string]interface{}{"email": "user@example.com"},
+			claimKey:      "groups",
+			allowedValues: []string{"myApp-Admin"},
+			wantErr:       true,
+			errContains:   "not found in token",
+		},
+		{
+			name: "missing nested claim - error",
+			claims: map[string]interface{}{
+				"realm_access": map[string]interface{}{
+					"other": "value",
+				},
+			},
+			claimKey:      "realm_access.roles",
+			allowedValues: []string{"admin"},
+			wantErr:       true,
+			errContains:   "not found in token",
+		},
+		{
+			name:          "colon-containing key (cognito:groups) - matches",
+			claims:        map[string]interface{}{"cognito:groups": []interface{}{"temporal-admins"}},
+			claimKey:      "cognito:groups",
+			allowedValues: []string{"temporal-admins"},
+			wantErr:       false,
+		},
+		{
+			name:          "colon-containing key (cognito:groups) - no match",
+			claims:        map[string]interface{}{"cognito:groups": []interface{}{"readers"}},
+			claimKey:      "cognito:groups",
+			allowedValues: []string{"temporal-admins"},
+			wantErr:       true,
+			errContains:   "does not have any of the required values",
+		},
+		{
+			name:          "URL-namespaced claim key with dots - literal match",
+			claims:        map[string]interface{}{"https://myapp.example.com/roles": []interface{}{"admin"}},
+			claimKey:      "https://myapp.example.com/roles",
+			allowedValues: []string{"admin"},
+			wantErr:       false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			token := fakeJWT(t, tt.claims)
+			err := auth.ValidateAllowedClaims(token, tt.claimKey, tt.allowedValues)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				if tt.errContains != "" {
+					assert.Contains(t, err.Error(), tt.errContains)
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestValidateAllowedClaims_MalformedToken(t *testing.T) {
+	err := auth.ValidateAllowedClaims("not-a-jwt", "groups", []string{"admin"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unable to decode token claims")
 }

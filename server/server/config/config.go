@@ -134,6 +134,15 @@ type (
 		Options map[string]interface{} `yaml:"options"`
 		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
 		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
+		// AllowedClaimKey is the OIDC ID token claim to check for authorization.
+		// Supports dot notation for nested claims (e.g., "realm_access.roles" for Keycloak).
+		// Common values: "groups" (Entra ID/Azure AD), "roles", "cognito:groups" (AWS Cognito).
+		// If empty, no claim-based authorization is performed (all authenticated users are allowed).
+		AllowedClaimKey string `yaml:"allowedClaimKey"`
+		// AllowedClaimValues is the list of acceptable values for the claim specified by AllowedClaimKey.
+		// If the claim is an array (e.g., groups), the user is authorized if ANY value in the claim
+		// matches ANY value in this list. If the claim is a string, it must match one of these values.
+		AllowedClaimValues []string `yaml:"allowedClaimValues"`
 	}
 
 	Codec struct {
