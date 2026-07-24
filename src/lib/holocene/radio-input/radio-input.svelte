@@ -1,7 +1,6 @@
-<script lang="ts">
-  import { writable, type Writable } from 'svelte/store';
+<script lang="ts" generics="T">
+  import { writable } from 'svelte/store';
 
-  import { omit } from 'es-toolkit';
   import { getContext } from 'svelte';
 
   import Label from '$lib/holocene/label.svelte';
@@ -10,27 +9,26 @@
 
   import { RADIO_GROUP_CONTEXT } from './radio-group.svelte';
 
-  type T = $$Generic;
-
-  type $$Props = RadioInputProps<T>;
-  export let value: T;
-  export let id: string;
-  export let label: string;
-  export let description: string | undefined = undefined;
-  export let labelHidden = false;
-  export let disabled = false;
-
-  let internalGroup: Writable<T> = writable(value);
-  let internalName: string = '';
-  let className: string | undefined = undefined;
-
-  export { internalGroup as group };
-  export { internalName as name };
-  export { className as class };
+  let {
+    value,
+    id,
+    label,
+    description = undefined,
+    labelHidden = false,
+    disabled = false,
+    group: internalGroup = writable(value),
+    name: internalName = '',
+    class: className = undefined,
+    ...rest
+  }: RadioInputProps<T> = $props();
 
   const ctx = getContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT) ?? {
-    name: internalName,
-    group: internalGroup,
+    get name() {
+      return internalName;
+    },
+    get group() {
+      return internalGroup;
+    },
   };
 
   const { name, group } = ctx;
@@ -51,7 +49,7 @@
         {value}
         {id}
         {disabled}
-        {...omit($$restProps, ['class'])}
+        {...rest}
       />
       <span class="font-normal" class:hidden={labelHidden}>
         {label}
