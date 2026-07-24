@@ -1,32 +1,42 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
-  export let link: string;
-  export let label: string;
-  export let icon: IconName | undefined = undefined;
-  export let tooltip = label;
-  export let external = false;
-  export let animate = false;
-  export let disabled = false;
-  export let isActive: ((path: string) => boolean | undefined) | undefined =
-    undefined;
+  interface Props {
+    link: string;
+    label: string;
+    icon?: IconName;
+    tooltip?: string;
+    external?: boolean;
+    animate?: boolean;
+    disabled?: boolean;
+    isActive?: (path: string) => boolean | undefined;
+    'data-testid'?: string;
+  }
 
-  $: rel = external ? 'noopener noreferrer' : '';
-  $: target = external ? '_blank' : '';
-  $: active = isActive && isActive($page.url.href);
+  let {
+    link,
+    label,
+    icon,
+    tooltip = label,
+    external = false,
+    animate = false,
+    disabled = false,
+    isActive,
+    'data-testid': testId,
+  }: Props = $props();
+
+  const rel = $derived(external ? 'noopener noreferrer' : '');
+  const target = $derived(external ? '_blank' : '');
+  const active = $derived(isActive && isActive(page.url.href));
 </script>
 
-<div
-  role="listitem"
-  data-testid={$$props?.['data-testid'] || `${icon}-button`}
-  class="relative"
->
+<div role="listitem" data-testid={testId || `${icon}-button`} class="relative">
   <Tooltip
     text={tooltip}
     right

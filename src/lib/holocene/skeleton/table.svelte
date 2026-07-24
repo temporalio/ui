@@ -13,13 +13,15 @@
 </script>
 
 <Table class="w-full" fixed {bordered}>
-  <TableHeaderRow slot="headers" class="h-8">
-    <slot name="headers">
-      {#each Array.from(new Array(columns)) as _column, index}
-        <th style="width: {columnWidths[index]}%;"></th>
-      {/each}
-    </slot>
-  </TableHeaderRow>
+  {#snippet headers()}
+    <TableHeaderRow class="h-8">
+      <slot name="headers">
+        {#each Array.from(new Array(columns)) as _column, index}
+          <th style="width: {columnWidths[index]}%;"></th>
+        {/each}
+      </slot>
+    </TableHeaderRow>
+  {/snippet}
   {#each Array.from(Array(rows).keys()) as _row}
     <TableRow>
       {#each Array.from(new Array(columns)) as _column}

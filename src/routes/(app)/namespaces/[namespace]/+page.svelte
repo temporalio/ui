@@ -77,16 +77,20 @@
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
     <Table>
-      <caption class="sr-only" slot="caption"
-        >{`${translate('namespaces.namespace')} ${translate(
-          'common.details',
-        )}`}</caption
-      >
-      <tr slot="headers">
-        <th colspan="2">
-          <h3>{translate('common.details')}</h3>
-        </th>
-      </tr>
+      {#snippet caption()}
+        <caption class="sr-only"
+          >{`${translate('namespaces.namespace')} ${translate(
+            'common.details',
+          )}`}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th colspan="2">
+            <h3>{translate('common.details')}</h3>
+          </th>
+        </tr>
+      {/snippet}
       <tr data-testid="namespace-owner">
         <td>{translate('namespaces.owner')}</td>
         <td
@@ -154,14 +158,16 @@
 
   <article class="namespace-info flex w-full flex-col">
     <Table>
-      <caption class="sr-only" slot="caption"
-        >{translate('namespaces.versions')}</caption
-      >
-      <tr slot="headers">
-        <th colspan="2">
-          <h3>{translate('namespaces.versions')}</h3>
-        </th>
-      </tr>
+      {#snippet caption()}
+        <caption class="sr-only">{translate('namespaces.versions')}</caption>
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th colspan="2">
+            <h3>{translate('namespaces.versions')}</h3>
+          </th>
+        </tr>
+      {/snippet}
 
       <tr data-testid="server-version">
         <td>Temporal Server Version</td>
@@ -176,17 +182,20 @@
 
   <article class="namespace-info flex w-full flex-col">
     <Table>
-      <caption class="sr-only" slot="caption"
-        >{translate('namespaces.client-actions')}</caption
-      >
-
-      <tr slot="headers">
-        <th colspan="2">
-          <h3>
-            {translate('namespaces.client-actions')}
-          </h3>
-        </th>
-      </tr>
+      {#snippet caption()}
+        <caption class="sr-only"
+          >{translate('namespaces.client-actions')}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th colspan="2">
+            <h3>
+              {translate('namespaces.client-actions')}
+            </h3>
+          </th>
+        </tr>
+      {/snippet}
 
       <tr>
         <td>{translate('namespaces.client-actions')}</td>
@@ -260,13 +269,17 @@
       {translate('events.attribute-group.search-attributes')}
     </h3>
     <Table class="w-full">
-      <caption class="sr-only" slot="caption"
-        >{translate('events.attribute-group.search-attributes')}</caption
-      >
-      <TableHeaderRow slot="headers">
-        <th>{translate('common.key')}</th>
-        <th>{translate('common.type')}</th>
-      </TableHeaderRow>
+      {#snippet caption()}
+        <caption class="sr-only"
+          >{translate('events.attribute-group.search-attributes')}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <TableHeaderRow>
+          <th>{translate('common.key')}</th>
+          <th>{translate('common.type')}</th>
+        </TableHeaderRow>
+      {/snippet}
       {#each Object.entries($searchAttributes) as [key, type]}
         <TableRow>
           <td>{key}</td>

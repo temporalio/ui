@@ -2,7 +2,7 @@ import { get, type writable as writableFunc } from 'svelte/store';
 
 import { describe, expect, test, vi } from 'vitest';
 
-import { supportsBulkActions } from './bulk-actions';
+import { supportsWorkflowBulkActions } from './workflow-bulk-actions';
 
 const mockedPageStore = await vi.hoisted(async () => {
   const { writable } = await vi.importActual<{
@@ -20,7 +20,7 @@ vi.mock('$app/stores', () => ({
   page: mockedPageStore,
 }));
 
-describe('supportsBulkActions store', () => {
+describe('supportsWorkflowBulkActions store', () => {
   describe('for Cloud', () => {
     test('returns true when batch actions are enabled, and visibility store is elasticsearch regardless of server version', () => {
       mockedPageStore.mockSetSubscribeValue({
@@ -33,7 +33,7 @@ describe('supportsBulkActions store', () => {
         },
       });
 
-      expect(get(supportsBulkActions)).toBe(true);
+      expect(get(supportsWorkflowBulkActions)).toBe(true);
     });
   });
 
@@ -52,7 +52,7 @@ describe('supportsBulkActions store', () => {
         },
       });
 
-      expect(get(supportsBulkActions)).toBe(true);
+      expect(get(supportsWorkflowBulkActions)).toBe(true);
     });
 
     test('returns false when version is older, even if visibility store is elasticsearch and batch actions are enabled', () => {
@@ -69,7 +69,7 @@ describe('supportsBulkActions store', () => {
         },
       });
 
-      expect(get(supportsBulkActions)).toBe(false);
+      expect(get(supportsWorkflowBulkActions)).toBe(false);
     });
 
     test('returns false when advanced visibility store is not elasticsearch, even if version is newer and batch actions are enabled', () => {
@@ -83,7 +83,7 @@ describe('supportsBulkActions store', () => {
         },
       });
 
-      expect(get(supportsBulkActions)).toBe(false);
+      expect(get(supportsWorkflowBulkActions)).toBe(false);
     });
 
     test('returns false when batch actions are not enabled, even if version is newer and advanced visibility is supported', () => {
@@ -100,7 +100,7 @@ describe('supportsBulkActions store', () => {
         },
       });
 
-      expect(get(supportsBulkActions)).toBe(false);
+      expect(get(supportsWorkflowBulkActions)).toBe(false);
     });
   });
 });

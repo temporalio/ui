@@ -30,15 +30,18 @@
 >
   <div slot="pagination-top"></div>
   <Table class="w-full">
-    <caption class="sr-only" slot="caption"
-      >{translate('workflows.child-workflows')}</caption
-    >
-    <TableHeaderRow slot="headers">
-      <th scope="col" class="max-md:hidden">{translate('common.status')}</th>
-      <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
-      <th scope="col">{translate('workflows.child-id')}</th>
-      <th scope="col">{translate('workflows.child-run-id')}</th>
-    </TableHeaderRow>
+    {#snippet caption()}
+      <caption class="sr-only">{translate('workflows.child-workflows')}</caption
+      >
+    {/snippet}
+    {#snippet headers()}
+      <TableHeaderRow>
+        <th scope="col" class="max-md:hidden">{translate('common.status')}</th>
+        <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
+        <th scope="col">{translate('workflows.child-id')}</th>
+        <th scope="col">{translate('workflows.child-run-id')}</th>
+      </TableHeaderRow>
+    {/snippet}
     {#each visibleItems as child}
       <TableRow>
         <td class="max-md:hidden">

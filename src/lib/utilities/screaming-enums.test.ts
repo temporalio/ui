@@ -13,7 +13,6 @@ import {
   toWorkflowTaskFailureReadable,
 } from './screaming-enums';
 
-fromScreamingEnum;
 describe('fromScreamingEnum', () => {
   it('should return readable word from split with prefix', () => {
     expect(fromScreamingEnum('THIS_IS_PREFIX_CATS_MEOW', 'ThisIsPrefix')).toBe(

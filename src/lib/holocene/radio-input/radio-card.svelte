@@ -1,27 +1,42 @@
-<script lang="ts">
+<script lang="ts" generics="T">
   import { writable, type Writable } from 'svelte/store';
 
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { RadioGroupContext } from './types';
 
   import { RADIO_GROUP_CONTEXT } from './radio-group.svelte';
 
-  type T = $$Generic;
+  interface Props {
+    value: T;
+    id: string;
+    label: string;
+    labelContainerClass?: string;
+    description?: string;
+    disabled?: boolean;
+    class?: string;
+    labelBadge?: Snippet;
+    icon?: Snippet;
+    children?: Snippet;
+  }
 
-  export let value: T;
-  export let id: string;
-  export let label: string;
-  export let labelContainerClass: string = '';
-  export let description: string = '';
-  export let disabled: boolean = false;
+  let {
+    value,
+    id,
+    label,
+    labelContainerClass = '',
+    description = '',
+    disabled = false,
+    class: className = '',
+    labelBadge,
+    icon,
+    children,
+  }: Props = $props();
 
-  let className: string = '';
-  export { className as class };
-
-  let internalGroup: Writable<T> = writable(value);
-  let internalName: string = '';
+  // svelte-ignore state_referenced_locally
+  const internalGroup: Writable<T> = writable(value);
+  const internalName = '';
 
   const ctx = getContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT) ?? {
     name: internalName,
@@ -30,7 +45,7 @@
 
   const { name, group } = ctx;
 
-  $: selected = $group === value;
+  const selected = $derived($group === value);
 </script>
 
 <div class={merge('flex flex-col', className)}>
@@ -61,23 +76,23 @@
       <div class="flex-1">
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span class="text-sm font-medium">{label}</span>
-          <slot name="label-badge" />
+          {@render labelBadge?.()}
         </div>
         {#if description}
           <p class="text-sm text-secondary">{description}</p>
         {/if}
       </div>
     </label>
-    {#if $$slots.icon}
+    {#if icon}
       <div class="shrink-0">
-        <slot name="icon" />
+        {@render icon()}
       </div>
     {/if}
   </div>
 
-  {#if selected && $$slots.default}
+  {#if selected && children}
     <div class="surface-background border border-t-0 border-subtle p-5">
-      <slot />
+      {@render children()}
     </div>
   {/if}
 </div>

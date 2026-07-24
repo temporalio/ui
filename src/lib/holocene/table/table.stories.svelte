@@ -27,11 +27,13 @@
 
 <Template let:args let:context>
   <Table class="w-full" updating={args.updating} data-testid={context.id}>
-    <tr slot="headers">
-      {#each Array(args.columns) as _, index}
-        <th>Heading {index + 1}</th>
-      {/each}
-    </tr>
+    {#snippet headers()}
+      <tr>
+        {#each Array(args.columns) as _, index}
+          <th>Heading {index + 1}</th>
+        {/each}
+      </tr>
+    {/snippet}
     {#each Array(args.rows) as _}
       <tr>
         {#each Array(args.columns) as _, colIdx}

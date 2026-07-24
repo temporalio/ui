@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { base } from '$app/paths';
 
-import { batchCancelWorkflows, batchTerminateWorkflows } from './batch-service';
+import {
+  batchCancelWorkflows,
+  batchTerminateWorkflows,
+} from './workflow-batch-service';
 import { temporalVersion } from '../stores/versions';
 import { getApiOrigin } from '../utilities/get-api-origin';
 import { requestFromAPI } from '../utilities/request-from-api';
@@ -53,6 +56,7 @@ describe('Batch Service', () => {
         reason: 'test',
         workflows: mockWorkflows,
         jobId: 'xxx',
+        identity: 'test@temporal.io',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -62,7 +66,7 @@ describe('Batch Service', () => {
           notifyOnError: false,
           options: {
             method: 'POST',
-            body: '{"jobId":"xxx","namespace":"default","reason":"test","terminationOperation":{},"visibilityQuery":"RunId=\\"a\\" OR RunId=\\"b\\" OR RunId=\\"c\\""}',
+            body: '{"jobId":"xxx","namespace":"default","reason":"test","terminationOperation":{"identity":"test@temporal.io"},"visibilityQuery":"RunId=\\"a\\" OR RunId=\\"b\\" OR RunId=\\"c\\""}',
           },
         },
       );
@@ -74,6 +78,7 @@ describe('Batch Service', () => {
         reason: 'test',
         workflows: mockWorkflows,
         jobId: 'xxx',
+        identity: 'test@temporal.io',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -83,7 +88,7 @@ describe('Batch Service', () => {
           notifyOnError: false,
           options: {
             method: 'POST',
-            body: '{"jobId":"xxx","namespace":"default","reason":"test","cancellationOperation":{},"visibilityQuery":"RunId=\\"a\\" OR RunId=\\"b\\" OR RunId=\\"c\\""}',
+            body: '{"jobId":"xxx","namespace":"default","reason":"test","cancellationOperation":{"identity":"test@temporal.io"},"visibilityQuery":"RunId=\\"a\\" OR RunId=\\"b\\" OR RunId=\\"c\\""}',
           },
         },
       );
@@ -103,6 +108,7 @@ describe('Batch Service', () => {
         reason: 'test',
         workflows: mockWorkflows,
         jobId: 'xxx',
+        identity: 'test@temporal.io',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -112,7 +118,7 @@ describe('Batch Service', () => {
           notifyOnError: false,
           options: {
             method: 'POST',
-            body: '{"jobId":"xxx","namespace":"default","reason":"test","terminationOperation":{},"executions":[{"workflowId":"1","runId":"a"},{"workflowId":"2","runId":"b"},{"workflowId":"3","runId":"c"}]}',
+            body: '{"jobId":"xxx","namespace":"default","reason":"test","terminationOperation":{"identity":"test@temporal.io"},"executions":[{"workflowId":"1","runId":"a"},{"workflowId":"2","runId":"b"},{"workflowId":"3","runId":"c"}]}',
           },
         },
       );
@@ -124,6 +130,7 @@ describe('Batch Service', () => {
         reason: 'test',
         workflows: mockWorkflows,
         jobId: 'xxx',
+        identity: 'test@temporal.io',
       });
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
@@ -133,7 +140,7 @@ describe('Batch Service', () => {
           notifyOnError: false,
           options: {
             method: 'POST',
-            body: '{"jobId":"xxx","namespace":"default","reason":"test","cancellationOperation":{},"executions":[{"workflowId":"1","runId":"a"},{"workflowId":"2","runId":"b"},{"workflowId":"3","runId":"c"}]}',
+            body: '{"jobId":"xxx","namespace":"default","reason":"test","cancellationOperation":{"identity":"test@temporal.io"},"executions":[{"workflowId":"1","runId":"a"},{"workflowId":"2","runId":"b"},{"workflowId":"3","runId":"c"}]}',
           },
         },
       );
