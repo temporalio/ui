@@ -34,7 +34,7 @@
     labelHidden = false,
     indeterminate = false,
     disabled = false,
-    value,
+    value = $bindable(),
     group = $bindable(),
     valid = true,
     error = '',
