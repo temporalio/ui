@@ -65,7 +65,7 @@
           data-testid="batch-checkbox"
           {label}
           labelHidden
-          on:click={onClickBatchSelect}
+          onclick={onClickBatchSelect}
           {checked}
           value={activity}
           disabled={$allSelected}
