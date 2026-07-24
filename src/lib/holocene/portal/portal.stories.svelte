@@ -59,12 +59,12 @@
 <script lang="ts">
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
-  import Button from '../button.svelte';
+  import Button from '../button-runes.svelte';
 </script>
 
 <Template let:args>
   <div class="flex min-h-screen items-center justify-center p-8">
-    <Button id="portal-button" on:click={() => (args.open = !args.open)}>
+    <Button id="portal-button" onclick={() => (args.open = !args.open)}>
       Toggle Portal
     </Button>
 
@@ -89,7 +89,7 @@
   <div class="relative min-h-screen p-4">
     <Button
       id="top-button"
-      on:click={() => (args.open = !args.open)}
+      onclick={() => (args.open = !args.open)}
       class="absolute left-1/2 top-4"
     >
       Top
@@ -116,7 +116,7 @@
   <div class="relative min-h-screen p-4">
     <Button
       id="bottom-button"
-      on:click={() => (args.open = !args.open)}
+      onclick={() => (args.open = !args.open)}
       class="absolute bottom-4 left-1/2"
     >
       Bottom
@@ -143,7 +143,7 @@
   <div class="relative min-h-screen p-4">
     <Button
       id="left-button"
-      on:click={() => (args.open = !args.open)}
+      onclick={() => (args.open = !args.open)}
       class="absolute left-4 top-1/2"
     >
       Left
@@ -170,7 +170,7 @@
   <div class="relative min-h-screen p-4">
     <Button
       id="right-button"
-      on:click={() => (args.open = !args.open)}
+      onclick={() => (args.open = !args.open)}
       class="absolute right-4 top-1/2"
     >
       Right
@@ -200,7 +200,7 @@
         when near edges.
       </p>
       <div class="ml-[200px] mt-[300px]">
-        <Button id="combined-button" on:click={() => (args.open = !args.open)}>
+        <Button id="combined-button" onclick={() => (args.open = !args.open)}>
           Toggle Portal
         </Button>
         <Portal

@@ -3,10 +3,10 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import type { ButtonStyles } from '$lib/holocene/button-runes.svelte';
   import Button, {
     type ButtonWithoutHrefProps,
-  } from '$lib/holocene/button.svelte';
+  } from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     MENU_CONTEXT,
@@ -91,8 +91,8 @@
   {id}
   {disabled}
   type="button"
-  on:click={handleClick}
-  on:keydown={handleKeyDown}
+  onclick={handleClick}
+  onkeydown={handleKeyDown}
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={$open}

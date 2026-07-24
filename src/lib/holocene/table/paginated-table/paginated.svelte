@@ -3,7 +3,7 @@
 
   import { page } from '$app/stores';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import {
@@ -132,7 +132,7 @@
             ? 'bg-interactive-secondary-active'
             : ''}
           aria-label={pageButtonLabel(page)}
-          on:click={() => handlePageChange(page)}>{page}</Button
+          onclick={() => handlePageChange(page)}>{page}</Button
         >
       {/if}
     {/each}

@@ -4,7 +4,7 @@
   import { type ComponentProps, createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
 
   import IconButton from './icon-button.svelte';
 
@@ -12,7 +12,7 @@
     cancelText: string;
     confirmDisabled?: boolean;
     confirmText: string;
-    confirmType?: ComponentProps<Button>['variant'];
+    confirmType?: ComponentProps<typeof Button>['variant'];
     hideCancel?: boolean;
     hideConfirm?: boolean;
     hightlightNav?: boolean;
@@ -29,7 +29,7 @@
   export let hideConfirm = false;
   export let confirmText: string;
   export let cancelText: string;
-  export let confirmType: ComponentProps<Button>['variant'] = 'primary';
+  export let confirmType: ComponentProps<typeof Button>['variant'] = 'primary';
   export let confirmDisabled = false;
   export let large = false;
   export let loading = false;
@@ -136,7 +136,7 @@
             data-testid="cancel-modal-button"
             variant="ghost"
             disabled={loading}
-            on:click={closeModal}>{cancelText}</Button
+            onclick={closeModal}>{cancelText}</Button
           >
         {/if}
         {#if !hideConfirm}

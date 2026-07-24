@@ -40,7 +40,7 @@
   import { onDestroy } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import type { IconName } from '../icon';
@@ -112,7 +112,7 @@
     </span>
     {#if dismissable}
       <Button
-        on:click={dismissBanner}
+        onclick={dismissBanner}
         leadingIcon="close"
         variant="ghost"
         size="xs"
