@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { FormEventHandler } from 'svelte/elements';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
@@ -90,7 +90,7 @@
     <Button
       variant="ghost"
       size="xs"
-      on:click={onRemove}
+      onclick={onRemove}
       disabled={submitting}
       leadingIcon="close"
       class="rounded-full"
@@ -104,7 +104,7 @@
       <Button
         variant="ghost"
         size="xs"
-        on:click={onRemove}
+        onclick={onRemove}
         disabled={submitting || isCloud}
         leadingIcon="trash"
       />

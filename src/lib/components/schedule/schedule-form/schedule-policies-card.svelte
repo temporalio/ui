@@ -2,7 +2,7 @@
   import { untrack } from 'svelte';
   import { type SuperForm } from 'sveltekit-superforms';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -127,7 +127,7 @@
       <Button
         bind:this={editPoliciesButton}
         variant="secondary"
-        on:click={() => (isEditingPolicies = true)}
+        onclick={() => (isEditingPolicies = true)}
         >{translate('schedules.policies-title')}</Button
       >
     </div>

@@ -4,7 +4,7 @@
   import { fieldProxy, superForm, type SuperForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import DurationInput, {
@@ -314,7 +314,7 @@
     {/key}
 
     <div class="ml-auto mt-2 flex gap-4">
-      <Button variant="secondary" on:click={onCancel}
+      <Button variant="secondary" onclick={onCancel}
         >{translate('common.cancel')}</Button
       >
       <Button variant="primary" type="submit"

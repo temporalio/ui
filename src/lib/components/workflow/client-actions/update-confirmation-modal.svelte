@@ -7,7 +7,7 @@
   import PayloadInput from '$lib/components/payload-input.svelte';
   import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
@@ -149,7 +149,7 @@
         />
         {#if customUpdate}
           <Button
-            on:click={() => {
+            onclick={() => {
               customUpdate = false;
               name = '';
             }}

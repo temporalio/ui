@@ -3,7 +3,7 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import StandaloneNexusOperations from '$lib/pages/standalone-nexus-operations.svelte';
   import { routeForStartStandaloneNexusOperation } from '$lib/utilities/route-for';

@@ -4,7 +4,7 @@
   import { zodClient } from 'sveltekit-superforms/adapters';
 
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -147,7 +147,7 @@
           >{translate('common.cancel')}</Button
         >
       </div>
-      <Button variant="destructive" type="button" on:click={() => onDelete()}>
+      <Button variant="destructive" type="button" onclick={() => onDelete()}>
         {translate('common.delete')}
       </Button>
     </div>

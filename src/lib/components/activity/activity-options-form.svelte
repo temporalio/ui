@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import DurationInput, {
@@ -259,7 +259,7 @@
       <div class="flex items-center justify-end gap-4">
         <Button
           type="button"
-          on:click={closeCustomizationDrawer}
+          onclick={closeCustomizationDrawer}
           variant="ghost"
           size="sm">{translate('common.cancel')}</Button
         >

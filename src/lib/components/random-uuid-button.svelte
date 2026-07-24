@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button, {
     type ButtonWithoutHrefProps,
-  } from '$lib/holocene/button.svelte';
+  } from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
 
   type Props = ButtonWithoutHrefProps & {
@@ -17,6 +17,6 @@
   };
 </script>
 
-<Button variant="secondary" leadingIcon="retry" on:click={generate} {...rest}>
+<Button variant="secondary" leadingIcon="retry" onclick={generate} {...rest}>
   {translate('common.random-uuid')}
 </Button>

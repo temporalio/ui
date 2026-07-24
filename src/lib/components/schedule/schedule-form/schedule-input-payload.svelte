@@ -5,7 +5,7 @@
     type DecodedPayloadResult,
   } from '$lib/components/payload/payload-decoder.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     isPayloadInputEncodingType,
@@ -107,7 +107,7 @@
         copyable={true}
       >
         <div slot="action" class:hidden={!showEditActions}>
-          <Button variant="secondary" on:click={handleEdit}>
+          <Button variant="secondary" onclick={handleEdit}>
             {editInput ? translate('common.cancel') : translate('common.edit')}
           </Button>
         </div>

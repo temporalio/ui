@@ -1,6 +1,6 @@
 <script lang="ts">
   import CapabilityGuard from '$lib/components/capability-guard.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';

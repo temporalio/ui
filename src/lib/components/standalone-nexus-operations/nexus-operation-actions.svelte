@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -44,7 +44,7 @@
 
 <div class="flex items-center gap-2">
   <Button
-    on:click={() => (cancelConfirmationModalOpen = true)}
+    onclick={() => (cancelConfirmationModalOpen = true)}
     disabled={!isRunning || commandsDisabled}
     size="sm"
   >

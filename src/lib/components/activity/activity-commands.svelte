@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/activity-actions';
@@ -108,7 +108,7 @@
       variant="secondary"
       size="sm"
       leadingIcon={activity.paused ? 'play' : 'pause'}
-      on:click={onPause}
+      onclick={onPause}
     >
       {activity.paused
         ? translate('workflows.unpause')
@@ -120,18 +120,13 @@
       variant="secondary"
       size="sm"
       leadingIcon="pencil"
-      on:click={onUpdate}
+      onclick={onUpdate}
     >
       {translate('common.update')}
     </Button>
   </Tooltip>
   <Tooltip bottom width={200} text="Reset this Activity.">
-    <Button
-      variant="secondary"
-      size="sm"
-      leadingIcon="retry"
-      on:click={onReset}
-    >
+    <Button variant="secondary" size="sm" leadingIcon="retry" onclick={onReset}>
       {translate('workflows.reset')}
     </Button>
   </Tooltip>

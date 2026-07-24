@@ -2,7 +2,7 @@
   import type { SuperForm } from 'sveltekit-superforms';
 
   import ButtonRadioGroup from '$lib/holocene/button-radio-group.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { getWeekdayLabel } from '$lib/i18n/format-date-names';
   import { translate } from '$lib/i18n/translate';
 
@@ -123,8 +123,8 @@
         variant="secondary"
         active={checked}
         {...attrs}
-        on:click={onSelect}
-        on:keydown={onKeydown}
+        onclick={onSelect}
+        onkeydown={onKeydown}
       >
         {option.label}
       </Button>
@@ -144,7 +144,7 @@
           aria-pressed={isSelected}
           variant="secondary"
           active={isSelected}
-          on:click={() => toggleCustomDay(value)}
+          onclick={() => toggleCustomDay(value)}
         >
           {getWeekdayLabel(Number(value))}
         </Button>

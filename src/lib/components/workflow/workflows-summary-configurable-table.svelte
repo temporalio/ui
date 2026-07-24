@@ -7,7 +7,7 @@
 
   import DownloadJsonButton from '$lib/components/download-json-button.svelte';
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
@@ -271,7 +271,7 @@
       >
         <FeatureTag feature="tableDensity" />
         <Button
-          on:click={setTableDensity}
+          onclick={setTableDensity}
           data-testid="table-density-button"
           size="xs"
           variant="ghost"
@@ -289,7 +289,7 @@
       />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button
-          on:click={onClickConfigure}
+          onclick={onClickConfigure}
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"

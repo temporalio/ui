@@ -5,7 +5,7 @@
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -62,11 +62,7 @@
           class="mb-4 w-fit"
         />
         <div class="flex items-center gap-2">
-          <Button
-            variant="primary"
-            leadingIcon="retry"
-            on:click={setStackTrace}
-          >
+          <Button variant="primary" leadingIcon="retry" onclick={setStackTrace}>
             {translate('workflows.refresh-call-stack')}
           </Button>
           <p>

@@ -5,7 +5,7 @@
 
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
@@ -123,7 +123,7 @@
     {/each}
 
     {#if hasMoreFilters}
-      <Button variant="secondary" size="xs" on:click={viewMoreFilters}>
+      <Button variant="secondary" size="xs" onclick={viewMoreFilters}>
         {translate('common.view-more')}
       </Button>
     {/if}

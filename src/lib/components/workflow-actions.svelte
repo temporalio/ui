@@ -10,7 +10,7 @@
   import UnpauseConfirmationModal from '$lib/components/workflow/client-actions/unpause-confirmation-modal.svelte';
   import UpdateConfirmationModal from '$lib/components/workflow/client-actions/update-confirmation-modal.svelte';
   import { dismissedWorkflowCommonErrors } from '$lib/components/workflow/workflow-common-errors.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -194,7 +194,7 @@
 
 {#snippet pauseButton()}
   <Button
-    on:click={() => (pauseConfirmationModalOpen = true)}
+    onclick={() => (pauseConfirmationModalOpen = true)}
     disabled={!pauseAuthorized || isDelayed}
     size="sm"
   >
@@ -208,7 +208,7 @@
 
 {#snippet requestCancellationButton()}
   <Button
-    on:click={() => (cancelConfirmationModalOpen = true)}
+    onclick={() => (cancelConfirmationModalOpen = true)}
     disabled={!cancelEnabled || cancelInProgress}
     size="sm"
   >
@@ -218,7 +218,7 @@
 
 {#snippet resetButton()}
   <Button
-    on:click={() => (resetConfirmationModalOpen = true)}
+    onclick={() => (resetConfirmationModalOpen = true)}
     disabled={!resetEnabled}
     size="sm"
   >

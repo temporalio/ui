@@ -10,7 +10,7 @@
   import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput, {
     DAYS,
@@ -383,12 +383,12 @@
         variant="ghost"
         class="max-sm:w-full"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
-        on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
+        onclick={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
       >
       <Button
         disabled={!enableStart}
-        on:click={onWorkflowStart}
+        onclick={onWorkflowStart}
         data-testid="start-workflow-button"
         class="max-sm:w-full">{translate('workflows.start-workflow')}</Button
       >

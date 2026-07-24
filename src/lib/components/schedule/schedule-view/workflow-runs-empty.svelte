@@ -1,7 +1,7 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   interface Props {
@@ -36,7 +36,7 @@
     <Button
       size="sm"
       leadingIcon="play"
-      on:click={openTriggerConfirmationModal}
+      onclick={openTriggerConfirmationModal}
       variant="ghost"
       class="border border-subtle"
     >
@@ -45,7 +45,7 @@
     <Button
       size="sm"
       leadingIcon="retry"
-      on:click={openBackfillConfirmationModal}
+      onclick={openBackfillConfirmationModal}
       variant="ghost"
       class="border border-subtle"
     >

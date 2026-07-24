@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type SuperForm } from 'sveltekit-superforms';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
@@ -96,7 +96,7 @@
         {#if spec.kind === 'interval'}
           <Button
             variant="ghost"
-            on:click={() => (isIntervalExampleModalOpen = true)}
+            onclick={() => (isIntervalExampleModalOpen = true)}
           >
             {translate('schedules.explore-interval-examples')}
           </Button>

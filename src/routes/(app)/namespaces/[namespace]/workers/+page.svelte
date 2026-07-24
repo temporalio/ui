@@ -3,7 +3,7 @@
 
   import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkersLayout from '$lib/layouts/workers-layout.svelte';
   import Workers from '$lib/pages/workers.svelte';

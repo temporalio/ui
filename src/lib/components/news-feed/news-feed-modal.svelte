@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
@@ -105,7 +105,7 @@
         size="xs"
         leadingIcon="retry"
         loading={$newsFeed.isLoading}
-        on:click={() => newsFeed.refresh({ cache: 'reload' })}
+        onclick={() => newsFeed.refresh({ cache: 'reload' })}
       >
         {translate('common.refresh')}
       </Button>

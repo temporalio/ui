@@ -4,7 +4,7 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
 
   interface Props {
@@ -22,7 +22,7 @@
   size="xs"
   variant="ghost"
   leadingIcon="retry"
-  on:click={() => {
+  onclick={() => {
     $refresh = Date.now();
     onRefresh?.();
   }}

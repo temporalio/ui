@@ -1,7 +1,7 @@
 <script lang="ts">
   import { kebabCase } from 'es-toolkit';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
 

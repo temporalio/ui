@@ -6,7 +6,7 @@
   import { getContext, untrack } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
@@ -576,7 +576,7 @@
             size="xs"
             data-testid="remove-filter-button"
             type="button"
-            on:click={onRemove}>Remove</Button
+            onclick={onRemove}>Remove</Button
           >
           <Button
             variant="primary"

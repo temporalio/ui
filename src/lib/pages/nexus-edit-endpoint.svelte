@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -64,7 +64,7 @@
           variant="destructive"
           disabled={submitting}
           class="max-sm:w-full"
-          on:click={() => (deleteConfirmationModalOpen = true)}
+          onclick={() => (deleteConfirmationModalOpen = true)}
           data-testid="delete-endpoint-button"
         >
           {translate('common.delete')}

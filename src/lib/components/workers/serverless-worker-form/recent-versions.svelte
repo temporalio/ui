@@ -1,7 +1,7 @@
 <script lang="ts">
   import DeploymentStatus from '$lib/components/deployments/deployment-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     isVersionSummaryNew,
@@ -71,7 +71,7 @@
       {/each}
     </ol>
     {#if hiddenCount > 0}
-      <Button variant="secondary" size="xs" on:click={loadMore}>
+      <Button variant="secondary" size="xs" onclick={loadMore}>
         {translate('workers.recent-versions-more', { count: hiddenCount })}
       </Button>
     {/if}

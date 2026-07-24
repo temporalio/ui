@@ -6,7 +6,7 @@
   import Message from '$lib/components/form/message.svelte';
   import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -222,7 +222,7 @@
                 type="button"
                 variant="secondary"
                 size="sm"
-                on:click={() => {
+                onclick={() => {
                   showCustomSection = false;
                   $form.customMessage = '';
                   $form.customLink = '';
@@ -241,7 +241,7 @@
           type="button"
           variant="secondary"
           size="sm"
-          on:click={() => (showCustomSection = true)}
+          onclick={() => (showCustomSection = true)}
           disabled={$submitting}
           leadingIcon="add"
         >
@@ -267,7 +267,7 @@
           type="button"
           size="sm"
           variant="secondary"
-          on:click={handleCancel}
+          onclick={handleCancel}
           disabled={$submitting}
         >
           {translate('common.cancel')}

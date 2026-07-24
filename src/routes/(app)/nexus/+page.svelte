@@ -3,7 +3,7 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';

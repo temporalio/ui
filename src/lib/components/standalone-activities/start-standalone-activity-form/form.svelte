@@ -10,7 +10,7 @@
   import { page } from '$app/state';
 
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput, {
     DAYS,
@@ -474,7 +474,7 @@
       variant="ghost"
       trailingIcon={advancedOptionsVisible ? 'chevron-up' : 'chevron-down'}
       data-testid="start-standalone-activity-more-options"
-      on:click={() => (advancedOptionsVisible = !advancedOptionsVisible)}
+      onclick={() => (advancedOptionsVisible = !advancedOptionsVisible)}
     >
       {translate('common.more-options')}
     </Button>

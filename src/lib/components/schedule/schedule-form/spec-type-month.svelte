@@ -2,7 +2,7 @@
   import type { SuperForm } from 'sveltekit-superforms';
 
   import ButtonRadioGroup from '$lib/holocene/button-radio-group.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { getMonthLabel } from '$lib/i18n/format-date-names';
   import { translate } from '$lib/i18n/translate';
 
@@ -134,7 +134,7 @@
           variant="secondary"
           size="sm"
           class="aspect-square min-h-12 min-w-12"
-          on:click={() => toggleDay(day)}>{day}</Button
+          onclick={() => toggleDay(day)}>{day}</Button
         >
       {/each}
     </div>
@@ -160,8 +160,8 @@
         <Button
           active={checked}
           variant="secondary"
-          on:click={onSelect}
-          on:keydown={onKeydown}
+          onclick={onSelect}
+          onkeydown={onKeydown}
           {...attrs}
         >
           {option.label}
@@ -183,7 +183,7 @@
             variant="secondary"
             size="sm"
             class="w-full"
-            on:click={() => toggleCustomMonth(value)}
+            onclick={() => toggleCustomMonth(value)}
           >
             {getMonthLabel(Number(value) - 1)}
           </Button>

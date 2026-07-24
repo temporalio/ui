@@ -4,7 +4,7 @@
   import { tick } from 'svelte';
   import type { SuperForm } from 'sveltekit-superforms';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -119,7 +119,7 @@
     </div>
 
     <div>
-      <Button variant="secondary" on:click={addSpec}>
+      <Button variant="secondary" onclick={addSpec}>
         {translate('schedules.add-another-spec')}
       </Button>
     </div>
