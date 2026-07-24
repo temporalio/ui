@@ -4,6 +4,7 @@ import {
   createDeploymentSchema,
   editVersionSchema,
   getInitialComputeProvider,
+  interpolateTerraformTemplate,
 } from './shared';
 
 describe('getInitialComputeProvider', () => {
@@ -135,5 +136,76 @@ describe('Cloud Run replica validation', () => {
       initialReplicas: 0,
       utilizationTarget: 0.8,
     });
+  });
+});
+
+describe('interpolateTerraformTemplate', () => {
+  const template = `module "serverless-worker-lambda" {
+  source = "terraform-modules/modules/serverless-workers/aws/lambda"
+
+  external_id               = "<external-id>"
+  temporal_cloud_principals = "<provided by Temporal Cloud>"
+
+  lambda_function_arns = [
+    "arn:aws:lambda:us-east-1:123456789012:function:my-worker-1",
+    "arn:aws:lambda:us-east-1:123456789012:function:my-worker-2",
+  ]
+}`;
+
+  it('replaces the external id placeholder with the provided value', () => {
+    const result = interpolateTerraformTemplate(template, {
+      externalId: 'my-external-id',
+    });
+
+    expect(result).toContain('external_id               = "my-external-id"');
+    expect(result).not.toContain('<external-id>');
+  });
+
+  it('replaces the example lambda function ARNs with the provided ARN', () => {
+    const arn = 'arn:aws:lambda:us-west-2:093235337669:function:hello-activity';
+    const result = interpolateTerraformTemplate(template, { lambdaArn: arn });
+
+    expect(result).toContain(`lambda_function_arns = [\n    "${arn}",\n  ]`);
+    expect(result).not.toContain('my-worker-1');
+  });
+
+  it('replaces both values together', () => {
+    const arn = 'arn:aws:lambda:us-east-1:093235337669:function:surveypoll';
+    const result = interpolateTerraformTemplate(template, {
+      externalId: 'test',
+      lambdaArn: arn,
+    });
+
+    expect(result).toContain('external_id               = "test"');
+    expect(result).toContain(`"${arn}"`);
+    expect(result).not.toContain('<external-id>');
+    expect(result).not.toContain('123456789012');
+  });
+
+  it('returns the template unchanged when no values are provided', () => {
+    expect(interpolateTerraformTemplate(template, {})).toBe(template);
+    expect(
+      interpolateTerraformTemplate(template, { externalId: '', lambdaArn: '' }),
+    ).toBe(template);
+  });
+
+  it('does not treat replacement-pattern characters in values specially', () => {
+    const result = interpolateTerraformTemplate(template, {
+      externalId: "$' $& $1",
+    });
+
+    expect(result).toContain('external_id               = "$\' $& $1"');
+  });
+
+  it('leaves other principals and comments untouched', () => {
+    const result = interpolateTerraformTemplate(template, {
+      externalId: 'abc',
+      lambdaArn: 'arn:aws:lambda:us-east-1:093235337669:function:f',
+    });
+
+    expect(result).toContain(
+      'temporal_cloud_principals = "<provided by Temporal Cloud>"',
+    );
+    expect(result).toContain('source = "terraform-modules/modules');
   });
 });

@@ -11,6 +11,7 @@
 
   import { GCP_REGIONS } from './gcp-regions';
   import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
+  import { interpolateTerraformTemplate } from './shared';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
 
   interface Props {
@@ -79,7 +80,13 @@
 
   const resolvedCfnTemplate = $derived(cfnTemplateProp ?? cfnTemplate);
   const resolvedTerraformTemplate = $derived(
-    terraformTemplate ?? defaultTerraformTemplate,
+    interpolateTerraformTemplate(
+      terraformTemplate ?? defaultTerraformTemplate,
+      {
+        externalId: roleExternalId,
+        lambdaArn,
+      },
+    ),
   );
 
   const launchStackHref = $derived.by(() => {

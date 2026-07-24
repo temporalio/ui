@@ -174,3 +174,32 @@ export const getInitialComputeProvider = ({
     'lambda'
   );
 };
+
+interface TerraformTemplateValues {
+  externalId?: string;
+  lambdaArn?: string;
+}
+
+export const interpolateTerraformTemplate = (
+  template: string,
+  { externalId, lambdaArn }: TerraformTemplateValues,
+): string => {
+  let result = template;
+
+  if (externalId) {
+    result = result.replace(
+      /(external_id\s*=\s*)"[^"]*"/,
+      (_, assignment: string) => `${assignment}"${externalId}"`,
+    );
+  }
+
+  if (lambdaArn) {
+    result = result.replace(
+      /(lambda_function_arns\s*=\s*\[)[^\]]*(\])/,
+      (_, open: string, close: string) =>
+        `${open}\n    "${lambdaArn}",\n  ${close}`,
+    );
+  }
+
+  return result;
+};
