@@ -1,30 +1,3 @@
-<script module lang="ts">
-  import type {
-    APIErrorResponse,
-    ErrorCallback,
-  } from '$lib/utilities/request-from-api';
-
-  type ValidationResponse = { valid: boolean; message?: string };
-
-  export const runConnectionValidation = async (
-    validate: (onError: ErrorCallback) => Promise<ValidationResponse>,
-    onValidationComplete?: () => void,
-  ): Promise<{
-    validation: ValidationResponse;
-    providerError?: APIErrorResponse;
-  }> => {
-    let providerError: APIErrorResponse | undefined;
-    const validation = await validate((error) => {
-      providerError = error;
-    });
-
-    // Provider validation failures resolve through onError; only a resolved
-    // request represents a handled result that should refresh status.
-    onValidationComplete?.();
-    return { validation, providerError };
-  };
-</script>
-
 <script lang="ts">
   import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
@@ -216,18 +189,16 @@
     validateLoading = true;
     showValidateModal = true;
     try {
-      const { validation, providerError } = await runConnectionValidation(
-        (onError) =>
-          validateCurrentWorkerDeploymentVersionComputeConfig(
-            { namespace, deploymentName, buildId: versionBuildId },
-            onError,
-          ),
-        onValidationComplete,
-      );
-      const errorMessage = providerError
-        ? ((providerError.body as { message?: string })?.message ??
-          translate('deployments.validate-connection-error'))
-        : undefined;
+      let errorMessage: string | undefined;
+      const validation =
+        await validateCurrentWorkerDeploymentVersionComputeConfig(
+          { namespace, deploymentName, buildId: versionBuildId },
+          (error) => {
+            errorMessage =
+              (error.body as { message?: string })?.message ??
+              translate('deployments.validate-connection-error');
+          },
+        );
       validateResult = {
         message:
           errorMessage ??
@@ -236,6 +207,10 @@
             : (validation.message ??
               translate('deployments.validate-connection-error'))),
       };
+
+      // A handled provider error still completes validation and may update the
+      // persisted connection status, so refresh once for either resolved result.
+      onValidationComplete?.();
     } catch {
       validateResult = {
         message: translate('deployments.validate-connection-error'),
