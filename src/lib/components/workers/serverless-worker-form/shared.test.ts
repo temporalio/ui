@@ -169,6 +169,28 @@ describe('interpolateTerraformTemplate', () => {
     expect(result).not.toContain('my-worker-1');
   });
 
+  it('renders comma-separated ARNs as separate list entries', () => {
+    const first = 'arn:aws:lambda:us-east-1:093235337669:function:worker-a';
+    const second = 'arn:aws:lambda:us-east-1:093235337669:function:worker-b';
+    const result = interpolateTerraformTemplate(template, {
+      lambdaArn: `${first}, ${second}`,
+    });
+
+    expect(result).toContain(
+      `lambda_function_arns = [\n    "${first}",\n    "${second}",\n  ]`,
+    );
+    expect(result).not.toContain('my-worker-1');
+  });
+
+  it('ignores empty segments from stray commas and whitespace', () => {
+    const arn = 'arn:aws:lambda:us-east-1:093235337669:function:worker-a';
+    const result = interpolateTerraformTemplate(template, {
+      lambdaArn: ` ${arn}, `,
+    });
+
+    expect(result).toContain(`lambda_function_arns = [\n    "${arn}",\n  ]`);
+  });
+
   it('replaces both values together', () => {
     const arn = 'arn:aws:lambda:us-east-1:093235337669:function:surveypoll';
     const result = interpolateTerraformTemplate(template, {

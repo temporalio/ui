@@ -193,11 +193,16 @@ export const interpolateTerraformTemplate = (
     );
   }
 
-  if (lambdaArn) {
+  const arns = (lambdaArn ?? '')
+    .split(',')
+    .map((arn) => arn.trim())
+    .filter(Boolean);
+
+  if (arns.length) {
+    const entries = arns.map((arn) => `    "${arn}",`).join('\n');
     result = result.replace(
       /(lambda_function_arns\s*=\s*\[)[^\]]*(\])/,
-      (_, open: string, close: string) =>
-        `${open}\n    "${lambdaArn}",\n  ${close}`,
+      (_, open: string, close: string) => `${open}\n${entries}\n  ${close}`,
     );
   }
 
