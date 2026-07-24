@@ -20,7 +20,7 @@
 </script>
 
 <script lang="ts">
-  import { derived as derivedStore, writable } from 'svelte/store';
+  import { derived as derivedStore } from 'svelte/store';
 
   import { onMount, setContext, type Snippet } from 'svelte';
 
@@ -43,6 +43,7 @@
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchWorkflowTaskFailures } from '$lib/services/workflow-counts';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { createBatchSelection } from '$lib/stores/batch-selection';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
@@ -115,6 +116,15 @@
     $workflowsSearchParams = searchParams;
   });
 
+  const {
+    allSelected,
+    selectedItems: selectedWorkflows,
+    batchActionsVisible,
+    selectItems: selectWorkflows,
+    handleSelectAll,
+    reset: resetSelection,
+  } = createBatchSelection<WorkflowExecution>((workflow) => workflow.runId);
+
   $effect(() => {
     void namespace;
     void query;
@@ -122,11 +132,6 @@
     void $refresh;
     resetSelection();
   });
-
-  const resetSelection = () => {
-    $allSelected = false;
-    $selectedWorkflows = [];
-  };
 
   let customizationDrawerOpen = $state(false);
 
@@ -136,12 +141,6 @@
   let terminateConfirmationModalOpen = $state(false);
   let cancelConfirmationModalOpen = $state(false);
 
-  const allSelected = writable<boolean>(false);
-  const selectedWorkflows = writable<WorkflowExecution[]>([]);
-  const batchActionsVisible = derivedStore(
-    selectedWorkflows,
-    (workflows) => workflows.length > 0,
-  );
   const workflowStartEnabled = $derived(!workflowCreateDisabled(page));
 
   const terminableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
@@ -170,37 +169,6 @@
 
   const openBatchResetConfirmationModal = () => {
     batchResetConfirmationModalOpen = true;
-  };
-
-  const handleSelectAll = (workflows: WorkflowExecution[]) => {
-    allSelected.set(true);
-    selectedWorkflows.set([...workflows]);
-  };
-
-  /**
-   * Handle the selection or deselection of workflows.
-   * This modifies the existing selection. It does not replace it (i.e., if a workflow was already selected and it was not deselected by this call, it will remain selected).
-   * @param checked Whether to select or deselect workflows
-   * @param workflows Workflows to be selected or deselected
-   */
-  const selectWorkflows = (
-    checked: boolean,
-    workflows: WorkflowExecution[],
-  ): void => {
-    // Map is not being used reactively here.
-    // We could refactor the selected workflows store to use SvelteMap if we wanted to though.
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const selected = new Map($selectedWorkflows.map((w) => [w.runId, w]));
-
-    for (const workflow of workflows) {
-      if (checked) {
-        selected.set(workflow.runId, workflow);
-      } else {
-        selected.delete(workflow.runId);
-      }
-    }
-
-    selectedWorkflows.set(Array.from(selected.values()));
   };
 
   setContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT, {

@@ -1,10 +1,17 @@
+import type { temporal } from '@temporalio/proto';
+
 export type BatchOperationType =
+  keyof typeof temporal.api.enums.v1.BatchOperationType;
+
+export type BatchOperationActionType =
   | 'Cancel'
   | 'Terminate'
   | 'Reset'
   | 'Signal'
   | 'Delete'
   | 'Unspecified';
+
+export type BatchOperationExecutionType = 'Workflow' | 'Activity';
 
 export type BatchOperationState =
   | 'Running'
@@ -40,6 +47,7 @@ export type APIBatchOperationInfo = {
   closeTime: string;
   state: BatchOperationState;
   jobId: string;
+  operationType?: BatchOperationType;
 };
 
 export type BatchOperationInfo = {
@@ -47,10 +55,11 @@ export type BatchOperationInfo = {
   closeTime: string;
   state: BatchOperationState;
   jobId: string;
+  operationType?: BatchOperationType;
 };
 
 export type BatchOperation = {
-  operationType: BatchOperationType;
+  operationType?: BatchOperationType;
   jobId: string;
   state: BatchOperationState;
   startTime: string;
