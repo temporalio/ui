@@ -7,12 +7,19 @@ import { configDefaults } from 'vitest/config';
 export default defineConfig({
   plugins: [svelte({ hot: false })],
   resolve: {
+    conditions: ['browser'],
     alias: {
       $lib: path.resolve(__dirname, './src/lib'),
       $types: path.resolve(__dirname, './src/types'),
       $components: path.resolve(__dirname, './src/lib/components/'),
       $app: path.resolve(__dirname, './src/lib/svelte-mocks/app/'),
       $fixtures: path.resolve(__dirname, './src/fixtures/'),
+    },
+  },
+  ssr: {
+    noExternal: ['svelte'],
+    resolve: {
+      conditions: ['browser'],
     },
   },
   test: {

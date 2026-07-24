@@ -1,3 +1,30 @@
+<script module lang="ts">
+  import type {
+    APIErrorResponse,
+    ErrorCallback,
+  } from '$lib/utilities/request-from-api';
+
+  type ValidationResponse = { valid: boolean; message?: string };
+
+  export const runConnectionValidation = async (
+    validate: (onError: ErrorCallback) => Promise<ValidationResponse>,
+    onValidationComplete?: () => void,
+  ): Promise<{
+    validation: ValidationResponse;
+    providerError?: APIErrorResponse;
+  }> => {
+    let providerError: APIErrorResponse | undefined;
+    const validation = await validate((error) => {
+      providerError = error;
+    });
+
+    // Provider validation failures resolve through onError; only a resolved
+    // request represents a handled result that should refresh status.
+    onValidationComplete?.();
+    return { validation, providerError };
+  };
+</script>
+
 <script lang="ts">
   import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
@@ -8,12 +35,11 @@
   import { translate } from '$lib/i18n/translate';
   import {
     deleteWorkerDeploymentVersion,
-    fetchDeploymentVersion,
     removeRampingDeploymentVersion,
     setCurrentDeploymentVersion,
     setRampingDeploymentVersion,
     unsetCurrentDeploymentVersion,
-    validateWorkerDeploymentVersionComputeConfig,
+    validateCurrentWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { toaster } from '$lib/stores/toaster';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
@@ -51,6 +77,7 @@
     deploymentName: string;
     conflictToken?: string;
     onChange?: () => void;
+    onValidationComplete?: () => void;
   }
   let {
     routingConfig,
@@ -59,6 +86,7 @@
     deploymentName,
     conflictToken,
     onChange,
+    onValidationComplete,
   }: Props = $props();
 
   const currentDeploymentName = $derived(
@@ -181,54 +209,40 @@
   let setRampingLoading = $state(false);
   let rampingPercentage = $state(0);
 
-  const newVersionGracePeriodMs = 2 * 60 * 1000;
-
   async function handleValidateConnection() {
+    if (validateLoading) return;
+
     validateResult = null;
     validateLoading = true;
     showValidateModal = true;
-    const versionDetails = await fetchDeploymentVersion({
-      namespace,
-      deploymentName,
-      buildId: versionBuildId,
-    });
-    const computeConfig =
-      versionDetails.workerDeploymentVersionInfo.computeConfig;
-    if (!computeConfig) {
+    try {
+      const { validation, providerError } = await runConnectionValidation(
+        (onError) =>
+          validateCurrentWorkerDeploymentVersionComputeConfig(
+            { namespace, deploymentName, buildId: versionBuildId },
+            onError,
+          ),
+        onValidationComplete,
+      );
+      const errorMessage = providerError
+        ? ((providerError.body as { message?: string })?.message ??
+          translate('deployments.validate-connection-error'))
+        : undefined;
       validateResult = {
-        message: translate('deployments.validate-connection-no-config'),
+        message:
+          errorMessage ??
+          (validation.valid
+            ? undefined
+            : (validation.message ??
+              translate('deployments.validate-connection-error'))),
       };
-      validateLoading = false;
-      return;
-    }
-    const taskQueueInfos =
-      versionDetails.workerDeploymentVersionInfo.taskQueueInfos;
-    if (!taskQueueInfos?.length) {
-      const createTime = versionDetails.workerDeploymentVersionInfo.createTime;
-      const isNewlyCreated =
-        Date.now() - new Date(String(createTime)).getTime() <
-        newVersionGracePeriodMs;
+    } catch {
       validateResult = {
-        message: translate(
-          isNewlyCreated
-            ? 'deployments.validate-connection-no-task-queue-pending'
-            : 'deployments.validate-connection-no-task-queue',
-        ),
+        message: translate('deployments.validate-connection-error'),
       };
+    } finally {
       validateLoading = false;
-      return;
     }
-    let errorMessage: string | undefined;
-    await validateWorkerDeploymentVersionComputeConfig(
-      { namespace, deploymentName, buildId: versionBuildId, computeConfig },
-      (error) => {
-        errorMessage =
-          (error.body as { message?: string })?.message ??
-          translate('deployments.validate-connection-error');
-      },
-    );
-    validateResult = { message: errorMessage };
-    validateLoading = false;
   }
 
   async function handleSetCurrentVersion() {
