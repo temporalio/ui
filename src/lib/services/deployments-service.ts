@@ -256,19 +256,19 @@ export const validateWorkerDeploymentVersionComputeConfig = async (
 export const validateCurrentWorkerDeploymentVersionComputeConfig = async (
   parameters: DeploymentVersionParameters,
   onError?: ErrorCallback,
-): Promise<{ valid: boolean; message?: string }> => {
+): Promise<void> => {
   const route = routeForApi(
     'worker-deployment-version-validate-compute-config',
     parameters,
   );
-  return requestFromAPI<{ valid: boolean; message?: string }>(route, {
+  await requestFromAPI<void>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({}),
     },
     onError,
     notifyOnError: false,
-  }).then((response) => response ?? { valid: false });
+  });
 };
 
 export const setCurrentDeploymentVersion = async (

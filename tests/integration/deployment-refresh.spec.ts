@@ -85,7 +85,13 @@ test('keeps validation available while connection status is hidden', async ({
   await page.route(VALIDATE_API, (route) => {
     validationRequests += 1;
     connectionStatus = validationRequests === 1 ? 'connected' : 'failed';
-    return route.fulfill({ json: { valid: true } });
+    if (validationRequests === 3) {
+      return route.fulfill({
+        status: 400,
+        json: { message: 'Connection failed' },
+      });
+    }
+    return route.fulfill({ json: {} });
   });
 
   await page.goto(deploymentUrl);
@@ -120,4 +126,12 @@ test('keeps validation available while connection status is hidden', async ({
   await expect(modal).toBeVisible();
   await expect(modal.getByText('Connection is valid')).toBeVisible();
   await expect(page.getByText('Failed', { exact: true })).toHaveCount(0);
+
+  await modal.getByRole('button', { name: 'Retry' }).click();
+
+  await expect.poll(() => validationRequests).toBe(3);
+  await expect(modal.getByText('Connection is invalid')).toBeVisible();
+  await expect(
+    modal.getByText('Connection failed', { exact: true }),
+  ).toBeVisible();
 });

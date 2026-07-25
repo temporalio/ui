@@ -387,7 +387,7 @@ describe('deployments service', () => {
 
   describe('validateCurrentWorkerDeploymentVersionComputeConfig', () => {
     test('calls requestFromAPI with an empty POST body to validate the persisted config', async () => {
-      vi.mocked(requestFromAPI).mockResolvedValueOnce({ valid: true } as never);
+      vi.mocked(requestFromAPI).mockResolvedValueOnce({} as never);
 
       await validateCurrentWorkerDeploymentVersionComputeConfig({
         namespace,

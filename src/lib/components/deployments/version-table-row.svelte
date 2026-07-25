@@ -192,23 +192,15 @@
     showValidateModal = true;
     try {
       let errorMessage: string | undefined;
-      const validation =
-        await validateCurrentWorkerDeploymentVersionComputeConfig(
-          { namespace, deploymentName, buildId: versionBuildId },
-          (error) => {
-            errorMessage =
-              (error.body as { message?: string })?.message ??
-              translate('deployments.validate-connection-error');
-          },
-        );
-      validateResult = {
-        message:
-          errorMessage ??
-          (validation.valid
-            ? undefined
-            : (validation.message ??
-              translate('deployments.validate-connection-error'))),
-      };
+      await validateCurrentWorkerDeploymentVersionComputeConfig(
+        { namespace, deploymentName, buildId: versionBuildId },
+        (error) => {
+          errorMessage =
+            (error.body as { message?: string })?.message ??
+            translate('deployments.validate-connection-error');
+        },
+      );
+      validateResult = { message: errorMessage };
 
       // A handled provider error still completes validation and may update the
       // persisted connection status, so refresh once for either resolved result.
