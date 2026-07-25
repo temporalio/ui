@@ -24,9 +24,11 @@
 
   interface Props {
     showInstancesLink?: boolean;
+    showConnectionStatus?: boolean;
   }
 
-  let { showInstancesLink = true }: Props = $props();
+  let { showInstancesLink = true, showConnectionStatus = false }: Props =
+    $props();
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
@@ -41,11 +43,11 @@
       initialPromise: fetchDeployment(parameters),
     };
   });
-  let refreshedDeployment = $state<{
+  let refreshedDeployment = $state.raw<{
     route: typeof deploymentRoute;
     deployment: WorkerDeploymentResponse;
   }>();
-  let refreshError = $state<{
+  let refreshError = $state.raw<{
     route: typeof deploymentRoute;
     error: unknown;
   }>();
@@ -177,9 +179,11 @@
         <CapabilityGuard capability="serverScaledDeployments">
           <th>{translate('deployments.compute')}</th>
         </CapabilityGuard>
-        <CapabilityGuard capability="serverScaledDeployments">
-          <th>{translate('deployments.connection')}</th>
-        </CapabilityGuard>
+        {#if showConnectionStatus}
+          <CapabilityGuard capability="serverScaledDeployments">
+            <th>{translate('deployments.connection')}</th>
+          </CapabilityGuard>
+        {/if}
         <th>{translate('deployments.deployed')}</th>
         <th>{translate('deployments.actions')}</th>
       </tr>
@@ -190,6 +194,7 @@
           {namespace}
           {deploymentName}
           conflictToken={deployment.conflictToken}
+          {showConnectionStatus}
           onChange={reload}
           onValidationComplete={reload}
         />

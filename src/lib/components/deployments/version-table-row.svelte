@@ -49,6 +49,7 @@
     namespace: string;
     deploymentName: string;
     conflictToken?: string;
+    showConnectionStatus?: boolean;
     onChange?: () => void;
     onValidationComplete?: () => void;
   }
@@ -58,6 +59,7 @@
     namespace,
     deploymentName,
     conflictToken,
+    showConnectionStatus = false,
     onChange,
     onValidationComplete,
   }: Props = $props();
@@ -378,15 +380,17 @@
       <ComputeBadge type={computeProviderType} />
     </td>
   </CapabilityGuard>
-  <CapabilityGuard capability="serverScaledDeployments">
-    <td class="text-left">
-      {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
-        <ConnectionBadge computeStatus={version.computeStatus} />
-      {:else}
-        <span class="text-secondary">—</span>
-      {/if}
-    </td>
-  </CapabilityGuard>
+  {#if showConnectionStatus}
+    <CapabilityGuard capability="serverScaledDeployments">
+      <td class="text-left">
+        {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
+          <ConnectionBadge computeStatus={version.computeStatus} />
+        {:else}
+          <span class="text-secondary">—</span>
+        {/if}
+      </td>
+    </CapabilityGuard>
+  {/if}
   <Timestamp
     as="td"
     class="whitespace-pre-line break-words text-left"
@@ -411,7 +415,7 @@
 
 {#if expanded}
   <tr class="surface-primary border-y border-subtle">
-    <td colspan={6} class="!p-1">
+    <td colspan={showConnectionStatus ? 6 : 5} class="!p-1">
       <VersionRowDetails
         {namespace}
         {deploymentName}

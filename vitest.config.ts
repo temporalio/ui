@@ -7,6 +7,7 @@ import { configDefaults } from 'vitest/config';
 export default defineConfig({
   plugins: [svelte({ hot: false })],
   resolve: {
+    conditions: ['browser'],
     alias: {
       $lib: path.resolve(__dirname, './src/lib'),
       $types: path.resolve(__dirname, './src/types'),
