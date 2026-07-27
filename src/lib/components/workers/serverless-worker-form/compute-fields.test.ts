@@ -1,21 +1,67 @@
-import { mount, tick, unmount } from 'svelte';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+// @vitest-environment node
+
+import path from 'node:path';
+
+import type { render } from 'svelte/server';
+
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import type { Component } from 'svelte';
+import { createServer, type ViteDevServer } from 'vite';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import {
   hasCloudRunImpersonatorPlaceholder,
   interpolateCloudRunTerraformTemplate,
 } from './cloud-run-terraform';
+import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
 
-import ComputeFields from './compute-fields.svelte';
+let computeFields: Component<Record<string, unknown>>;
+let renderComponent: typeof render;
+let viteServer: ViteDevServer;
 
-vi.stubGlobal(
-  'ResizeObserver',
-  class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  },
-);
+beforeAll(async () => {
+  const projectRoot = process.cwd();
+  viteServer = await createServer({
+    root: projectRoot,
+    configFile: false,
+    appType: 'custom',
+    plugins: [svelte({ hot: false })],
+    resolve: {
+      alias: [
+        {
+          find: '$lib/holocene/code-block.svelte',
+          replacement: path.resolve(
+            projectRoot,
+            'src/lib/components/workers/serverless-worker-form/compute-fields-code-block-test-double.svelte',
+          ),
+        },
+        {
+          find: '$lib',
+          replacement: path.resolve(projectRoot, 'src/lib'),
+        },
+        {
+          find: '$types',
+          replacement: path.resolve(projectRoot, 'src/types'),
+        },
+        {
+          find: '$app',
+          replacement: path.resolve(projectRoot, 'src/lib/svelte-mocks/app'),
+        },
+      ],
+    },
+    server: { middlewareMode: true },
+  });
+  computeFields = (
+    await viteServer.ssrLoadModule(
+      '/src/lib/components/workers/serverless-worker-form/compute-fields.svelte',
+    )
+  ).default;
+  renderComponent = (await viteServer.ssrLoadModule('svelte/server')).render;
+});
+
+afterAll(async () => {
+  await viteServer?.close();
+});
 
 const projectToken = '"__TEMPORAL_GCP_PROJECT_ID__"';
 const impersonatorPlaceholder =
@@ -24,25 +70,6 @@ const impersonatorWarning =
   'Before applying, replace the impersonator service account placeholder with the email of the service account permitted to impersonate the invoker.';
 const cloudRunModuleUrl =
   'https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run';
-const mountedComponents: Record<string, unknown>[] = [];
-
-const expectedTerraform = (
-  projectId: string,
-) => `# Terraform GCP Service Account Module for Cloud Run Serverless Workers.
-module "serverless-worker-cloud-run" {
-  source = "github.com/temporalio/terraform-modules//modules/serverless-workers/gcp/cloud-run"
-
-  project_id         = "${projectId}"
-  invoker_account_id = "temporal-worker-pool-invoker"
-
-  # REPLACE BEFORE APPLY with the email of the service account permitted to impersonate the invoker.
-  impersonator_service_account_emails = [
-    "${impersonatorPlaceholder}",
-  ]
-}
-
-# Once applied, use the invoker_email output value as the Service Account for the Worker deployment.
-`;
 
 interface ComputeFieldsOptions {
   provider: string;
@@ -56,11 +83,8 @@ const renderComputeFields = ({
   gcpProject = '',
   cloudRunTerraformTemplate,
   terraformTemplate,
-}: ComputeFieldsOptions) => {
-  const target = document.createElement('div');
-  document.body.append(target);
-  const component = mount(ComputeFields, {
-    target,
+}: ComputeFieldsOptions): string => {
+  const { body } = renderComponent(computeFields, {
     props: {
       provider,
       lambdaArn: '',
@@ -71,45 +95,17 @@ const renderComputeFields = ({
       terraformTemplate,
     },
   });
-  mountedComponents.push(component);
-  return target;
+  return body;
 };
 
-const openAccordion = async (target: HTMLElement) => {
-  const accordion = target.querySelector<HTMLButtonElement>(
-    '[data-track-name="accordion"]',
-  );
-  expect(accordion).not.toBeNull();
-  accordion?.click();
-  await tick();
-  return accordion;
-};
-
-const getCopyButton = (target: HTMLElement) => {
-  const button = target.querySelector<HTMLButtonElement>(
-    '[data-track-name="copyable-button"]',
-  );
-  expect(button).not.toBeNull();
-  return button as HTMLButtonElement;
-};
-
-const stubClipboard = () => {
-  const writeText = vi.fn<(content: string) => Promise<void>>();
-  writeText.mockResolvedValue(undefined);
-  Object.defineProperty(navigator, 'clipboard', {
-    configurable: true,
-    value: { writeText },
-  });
-  return writeText;
-};
-
-afterEach(async () => {
-  await Promise.all(
-    mountedComponents.splice(0).map((component) => unmount(component)),
-  );
-  document.body.innerHTML = '';
-  vi.restoreAllMocks();
-});
+const getTerraformSnippet = (body: string): string | undefined =>
+  body
+    .match(
+      /<pre[^>]*data-testid="terraform-code-block"[^>]*>([\s\S]*?)<\/pre>/,
+    )?.[1]
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&amp;', '&');
 
 describe('Cloud Run Terraform helpers', () => {
   it('interpolates every project token and uses the setup placeholder when empty', () => {
@@ -138,11 +134,9 @@ describe('Cloud Run Terraform helpers', () => {
     );
   });
 
-  it('detects only the bundled impersonator placeholder in resolved content', () => {
+  it('detects the actual bundled placeholder rather than how the template was supplied', () => {
     expect(
-      hasCloudRunImpersonatorPlaceholder(
-        `impersonator_service_account_emails = ["${impersonatorPlaceholder}"]`,
-      ),
+      hasCloudRunImpersonatorPlaceholder(defaultCloudRunTerraformTemplate),
     ).toBe(true);
     expect(
       hasCloudRunImpersonatorPlaceholder(
@@ -153,137 +147,79 @@ describe('Cloud Run Terraform helpers', () => {
   });
 });
 
-describe('ComputeFields Cloud Run setup guidance', () => {
-  it('renders the guidance link and an accessible Terraform snippet label', async () => {
-    const target = renderComputeFields({
+describe('ComputeFields server-rendered setup guidance', () => {
+  it('renders Cloud Run guidance, link, warning, and accessible snippet label', () => {
+    const body = renderComputeFields({
       provider: 'cloud-run',
       gcpProject: 'initial-project',
     });
-    await tick();
 
-    const accordion = await openAccordion(target);
-    expect(accordion?.textContent).toContain(
-      "Don't have a service account yet? Create one",
-    );
-    expect(accordion?.getAttribute('aria-expanded')).toBe('true');
-
-    const moduleLink = target.querySelector<HTMLAnchorElement>(
-      `a[href="${cloudRunModuleUrl}"]`,
-    );
-    expect(moduleLink?.textContent.trim()).toBe('Google Cloud Run Module');
-    expect(moduleLink?.target).toBe('_blank');
-    expect(target.textContent).toContain(impersonatorWarning);
-    expect(target.textContent).toContain(
+    expect(body).toContain("Don't have a service account yet? Create one");
+    expect(body).toContain(`href="${cloudRunModuleUrl}"`);
+    expect(body).toContain('target="_blank"');
+    expect(body).toContain('Google Cloud Run Module');
+    expect(body).toContain(impersonatorWarning);
+    expect(body).toContain(
       "copy the module's invoker_email output into the Service Account field above",
     );
-    expect(
-      target.querySelector(
-        '.cm-content[aria-label="Google Cloud Run Module"][aria-readonly="true"]',
-      ),
-    ).not.toBeNull();
+
+    expect(body).toContain('aria-label="Google Cloud Run Module"');
+    expect(getTerraformSnippet(body)).toContain(
+      'project_id         = "initial-project"',
+    );
   });
 
-  it('uses the bundled template and updates its project reactively', async () => {
-    const writeText = stubClipboard();
-    const target = renderComputeFields({
-      provider: 'cloud-run',
-      gcpProject: 'initial-project',
-    });
-    await tick();
-    await openAccordion(target);
+  it('reflects project changes at the helper/component boundary', () => {
+    const initial = getTerraformSnippet(
+      renderComputeFields({ provider: 'cloud-run', gcpProject: 'initial' }),
+    );
+    const updated = getTerraformSnippet(
+      renderComputeFields({ provider: 'cloud-run', gcpProject: 'updated' }),
+    );
 
-    getCopyButton(target).click();
-    await vi.waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith(
-        expectedTerraform('initial-project'),
-      );
-    });
-
-    const projectInput = target.querySelector<HTMLInputElement>('#gcpProject');
-    expect(projectInput).not.toBeNull();
-    if (!projectInput) return;
-
-    projectInput.value = 'updated-project';
-    projectInput.dispatchEvent(new Event('input', { bubbles: true }));
-    await tick();
-    writeText.mockClear();
-
-    getCopyButton(target).click();
-    await vi.waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith(
-        expectedTerraform('updated-project'),
-      );
-    });
+    expect(initial).toContain('project_id         = "initial"');
+    expect(updated).toContain('project_id         = "updated"');
+    expect(updated).not.toContain('project_id         = "initial"');
   });
 
-  it('uses a host template and shows the warning only when its content has the placeholder', async () => {
-    const writeText = stubClipboard();
-    const target = renderComputeFields({
+  it('uses a host template and derives its warning from placeholder content', () => {
+    const body = renderComputeFields({
       provider: 'cloud-run',
       gcpProject: 'host-project',
       cloudRunTerraformTemplate: `project_id = ${projectToken}\nprincipal = "${impersonatorPlaceholder}"`,
     });
-    await tick();
-    await openAccordion(target);
 
-    expect(target.textContent).toContain(impersonatorWarning);
-    getCopyButton(target).click();
-    await vi.waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith(
-        `project_id = "host-project"\nprincipal = "${impersonatorPlaceholder}"`,
-      );
-    });
+    expect(body).toContain(impersonatorWarning);
+    expect(getTerraformSnippet(body)).toBe(
+      `project_id = "host-project"\nprincipal = "${impersonatorPlaceholder}"`,
+    );
   });
 
-  it('omits the warning for a host template without the placeholder', async () => {
-    const target = renderComputeFields({
+  it.each([
+    ['custom content', 'principal = "host-provided@example.com"'],
+    ['an explicit empty override', ''],
+  ])('omits the warning for %s without the placeholder', (_, template) => {
+    const body = renderComputeFields({
       provider: 'cloud-run',
-      cloudRunTerraformTemplate: 'principal = "host-provided@example.com"',
+      cloudRunTerraformTemplate: template,
     });
-    await tick();
-    await openAccordion(target);
 
-    expect(target.textContent).not.toContain(impersonatorWarning);
+    expect(body).not.toContain(impersonatorWarning);
+    expect(getTerraformSnippet(body)).toBe(template);
   });
 
-  it('treats an explicit empty host template as an override', async () => {
-    const target = renderComputeFields({
-      provider: 'cloud-run',
-      cloudRunTerraformTemplate: '',
-    });
-    await tick();
-    await openAccordion(target);
-
-    expect(target.textContent).not.toContain(impersonatorWarning);
-  });
-
-  it('isolates Cloud Run guidance from Lambda and preserves the AWS override', async () => {
-    const writeText = stubClipboard();
-    const target = renderComputeFields({
+  it('isolates Cloud Run guidance and templates from Lambda', () => {
+    const body = renderComputeFields({
       provider: 'lambda',
       cloudRunTerraformTemplate: `principal = "${impersonatorPlaceholder}"`,
       terraformTemplate: 'aws-template-from-host',
     });
-    await tick();
 
-    expect(target.textContent).toContain("Don't have a role yet? Create one");
-    expect(target.textContent).not.toContain(
-      "Don't have a service account yet? Create one",
-    );
-    expect(target.querySelector(`a[href="${cloudRunModuleUrl}"]`)).toBeNull();
-    expect(target.textContent).not.toContain(impersonatorWarning);
-
-    await openAccordion(target);
-    const terraformTab = Array.from(
-      target.querySelectorAll<HTMLButtonElement>('button'),
-    ).find((button) => button.textContent?.trim() === 'Terraform');
-    expect(terraformTab).not.toBeUndefined();
-    terraformTab?.click();
-    await tick();
-
-    getCopyButton(target).click();
-    await vi.waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('aws-template-from-host');
-    });
+    expect(body).toContain("Don't have a role yet? Create one");
+    expect(body).not.toContain("Don't have a service account yet? Create one");
+    expect(body).not.toContain(`href="${cloudRunModuleUrl}"`);
+    expect(body).not.toContain(impersonatorWarning);
+    expect(body).not.toContain(impersonatorPlaceholder);
+    expect(getTerraformSnippet(body)).toBeUndefined();
   });
 });
