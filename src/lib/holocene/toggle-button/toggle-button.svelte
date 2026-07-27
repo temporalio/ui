@@ -8,22 +8,33 @@
 
   import type {
     ButtonProps,
+    ButtonWithHrefProps,
     ButtonWithoutHrefProps,
   } from '../button-runes.svelte';
   import Button from '../button-runes.svelte';
 
-  type Props = Omit<ButtonWithoutHrefProps, 'href' | 'target'> & {
+  type ToggleBaseProps = {
     group?: boolean;
     active?: boolean;
-    href?: string | null;
-    base?: string | null;
   };
+
+  type AnchorProps = ToggleBaseProps &
+    ButtonWithHrefProps & {
+      base?: string;
+    };
+
+  type ButtonToggleProps = ToggleBaseProps &
+    ButtonWithoutHrefProps & {
+      base?: never;
+    };
+
+  type Props = AnchorProps | ButtonToggleProps;
 
   let {
     class: className = '',
     group = getAppContext('group'),
-    href = null,
-    base = null,
+    href,
+    base,
     active = false,
     variant = 'secondary',
     leadingIcon,
