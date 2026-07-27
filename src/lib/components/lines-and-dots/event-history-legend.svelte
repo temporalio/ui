@@ -112,27 +112,26 @@
   tooltipClass="!surface-primary border border-subtle"
   usePortal
 >
-  <div
-    slot="content"
-    class="flex gap-6 whitespace-normal p-2 text-xs max-sm:flex-col"
-  >
-    {#if !eventTypesOnly}
+  {#snippet content()}
+    <div class="flex gap-6 whitespace-normal p-2 text-xs max-sm:flex-col">
+      {#if !eventTypesOnly}
+        <dl>
+          {@render term(translate('common.status'))}
+          {#each statuses as { status, label, style } (status)}
+            {@render statusKey({ label, status, style })}
+          {/each}
+          {#each pendingStatuses as status (status.label)}
+            {@render pendingStatusKey(status)}
+          {/each}
+        </dl>
+      {/if}
       <dl>
-        {@render term(translate('common.status'))}
-        {#each statuses as { status, label, style } (status)}
-          {@render statusKey({ label, status, style })}
-        {/each}
-        {#each pendingStatuses as status (status.label)}
-          {@render pendingStatusKey(status)}
+        {@render term(translate('events.event-types'))}
+        {#each categories as category (category)}
+          {@render eventCategoryKey(category)}
         {/each}
       </dl>
-    {/if}
-    <dl>
-      {@render term(translate('events.event-types'))}
-      {#each categories as category (category)}
-        {@render eventCategoryKey(category)}
-      {/each}
-    </dl>
-  </div>
+    </div>
+  {/snippet}
   <Icon name="info" class="text-secondary" />
 </Tooltip>
