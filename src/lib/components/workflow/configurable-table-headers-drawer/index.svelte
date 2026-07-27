@@ -44,13 +44,13 @@
   class="w-[35vw] min-w-min max-w-fit"
 >
   <DrawerContent title={translate('workflows.configure-headers', { title })}>
-    <svelte:fragment slot="subtitle">
+    {#snippet subtitle()}
       Add (<Icon class="inline" name="add" />), re-arrange (<Icon
         class="inline"
         name="chevron-selector-vertical"
       />), and remove (<Icon class="inline" name="hyphen" />), {type} to personalize
       the {title}.
-    </svelte:fragment>
+    {/snippet}
 
     <OrderableList {availableColumns} {table} {type} />
   </DrawerContent>
