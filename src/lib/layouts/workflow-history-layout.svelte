@@ -221,21 +221,21 @@
           data-testid="feed"
           icon="feed"
           class="h-10"
-          on:click={onAllClick}>All</TabButton
+          onclick={onAllClick}>All</TabButton
         >
         <TabButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
           icon="compact"
           class="h-10"
-          on:click={onCompactClick}>Compact</TabButton
+          onclick={onCompactClick}>Compact</TabButton
         >
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
           icon="json"
           class="h-10"
-          on:click={onJSONClick}>JSON</TabButton
+          onclick={onJSONClick}>JSON</TabButton
         >
       </TabButtons>
     </div>
