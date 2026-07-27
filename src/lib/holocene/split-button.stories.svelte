@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import type { IconName } from '$lib/holocene/icon';
   import { iconNames } from '$lib/holocene/icon';
@@ -42,7 +43,7 @@
         control: 'boolean',
       },
     },
-  } satisfies Meta<SplitButton>;
+  } satisfies Meta<ComponentProps<typeof SplitButton>>;
 </script>
 
 <script lang="ts">
