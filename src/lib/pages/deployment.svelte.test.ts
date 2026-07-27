@@ -1,23 +1,19 @@
-import { flushSync, mount, unmount } from 'svelte';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-
-import { page } from '$app/state';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 
 import {
-  fetchDeployment,
-  fetchDeploymentVersion,
-} from '$lib/services/deployments-service';
+  closeDeploymentClientTestRunner,
+  getDeploymentClientTestRunner,
+} from '$lib/components/deployments/deployment-client-test-runner';
 import type { WorkerDeploymentResponse } from '$lib/types/deployments';
-
-import Deployment from './deployment.svelte';
-
-vi.mock('$lib/services/deployments-service', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('$lib/services/deployments-service')
-  >()),
-  fetchDeployment: vi.fn(),
-  fetchDeploymentVersion: vi.fn(),
-}));
 
 const deployment = {
   conflictToken: 'token',
@@ -54,33 +50,13 @@ const deployment = {
   },
 } as unknown as WorkerDeploymentResponse;
 
-const mounted: ReturnType<typeof mount>[] = [];
-
-async function renderDeployment(showConnectionStatus: boolean) {
-  const target = document.body.appendChild(document.createElement('div'));
-  const component = mount(Deployment, {
-    target,
-    props: { showConnectionStatus },
-  });
-  mounted.push(component);
-  await Promise.resolve();
-  flushSync();
-  return target;
-}
-
-function expandDetails(target: HTMLElement) {
-  const expand = target.querySelector<HTMLButtonElement>(
-    'button[aria-label="Expand"]',
-  );
-  expect(expand).not.toBeNull();
-  expand?.click();
-  flushSync();
-  return target.querySelector<HTMLTableCellElement>(
-    'tr.surface-primary > td[colspan]',
-  );
-}
-
 describe('deployment connection status visibility', () => {
+  let client: Awaited<ReturnType<typeof getDeploymentClientTestRunner>>;
+
+  beforeAll(async () => {
+    client = await getDeploymentClientTestRunner();
+  });
+
   beforeEach(() => {
     vi.stubGlobal(
       'ResizeObserver',
@@ -116,44 +92,46 @@ describe('deployment connection status visibility', () => {
         },
       },
     });
-    Object.assign(page.params, {
-      namespace: 'default',
-      deployment: 'deployment',
-    });
-    Object.assign(page.data, {
-      systemInfo: { capabilities: { serverScaledDeployments: true } },
-    });
-    vi.mocked(fetchDeployment).mockResolvedValue(deployment);
-    vi.mocked(fetchDeploymentVersion).mockResolvedValue({
-      workerDeploymentVersionInfo: {},
-    } as Awaited<ReturnType<typeof fetchDeploymentVersion>>);
   });
 
   afterEach(async () => {
-    await Promise.all(mounted.splice(0).map((component) => unmount(component)));
-    document.body.replaceChildren();
+    await client.cleanup();
     delete (Element.prototype as { animate?: unknown }).animate;
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
+  afterAll(closeDeploymentClientTestRunner);
+
   test('hides the connection header and cell by default', async () => {
-    const target = await renderDeployment(false);
+    const target = await client.renderDeployment({
+      fetchDeployment: deployment,
+      fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
+      showConnectionStatus: false,
+    });
 
     expect(target.querySelector('th:nth-child(4)')?.textContent).toBe(
       'Deployed At',
     );
     expect(target.textContent).not.toContain('Connected');
-    expect(expandDetails(target)?.getAttribute('colspan')).toBe('5');
+    const details = client.expandDetails(target);
+    expect(details).not.toBeNull();
+    expect(details?.getAttribute('colspan')).toBe('5');
   });
 
   test('renders the matching connection header and cell when enabled', async () => {
-    const target = await renderDeployment(true);
+    const target = await client.renderDeployment({
+      fetchDeployment: deployment,
+      fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
+      showConnectionStatus: true,
+    });
 
     expect(target.querySelector('th:nth-child(4)')?.textContent).toBe(
       'Connection',
     );
     expect(target.textContent).toContain('Connected');
-    expect(expandDetails(target)?.getAttribute('colspan')).toBe('6');
+    const details = client.expandDetails(target);
+    expect(details).not.toBeNull();
+    expect(details?.getAttribute('colspan')).toBe('6');
   });
 });
