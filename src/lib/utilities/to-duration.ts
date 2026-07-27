@@ -11,7 +11,7 @@ import { pluralize } from './pluralize';
 
 type DurationKey = keyof Duration;
 
-export const durationKeys: Readonly<DurationKey[]> = [
+export const durationKeys: readonly DurationKey[] = [
   'years',
   'months',
   'weeks',
@@ -131,6 +131,8 @@ export const fromSeconds = (
   seconds: string,
   { delimiter = ', ' } = {},
 ): string => {
+  if (!seconds) return '';
+
   const parsedSeconds = parseInt(seconds);
   const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
 
@@ -155,16 +157,4 @@ export const fromSeconds = (
   }
 
   return `${durationString}`;
-};
-
-export const isValidDurationQuery = (value: string): boolean => {
-  const isValidNumber = !isNaN(Number(value));
-  const isValidGolangDuration =
-    /^-?\d+\S*$/.test(value) &&
-    ['ns', 'us', 'µs', 'ms', 's', 'm', 'h'].some((char) =>
-      value.endsWith(char),
-    );
-  const isValidTime = /^\d+:[0-5][0-9]:[0-5][0-9]$/.test(value);
-
-  return isValidNumber || isValidGolangDuration || isValidTime;
 };

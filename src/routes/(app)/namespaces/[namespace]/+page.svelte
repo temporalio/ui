@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import type { PageData } from './$types';
 
@@ -18,7 +18,11 @@
   import { temporalVersion, uiVersion } from '$lib/stores/versions';
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 
   enum ArchivalState {
     ARCHIVAL_STATE_UNSPECIFIED = 0,
@@ -47,7 +51,11 @@
     return bool ? translate('common.disabled') : translate('common.enabled');
   };
 
-  $: ({ namespace, clusters } = data);
+  const namespace = $derived(data.namespace);
+  const clusters = $derived(data.clusters);
+  const pauseEnabled = $derived(
+    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause,
+  );
 
   onMount(() => {
     $lastUsedNamespace = namespace?.namespaceInfo?.name;
@@ -58,7 +66,7 @@
   title={`${translate('namespaces.namespace')} | ${
     namespace?.namespaceInfo?.name
   }`}
-  url={$page.url.href}
+  url={page.url.href}
 />
 <h1 data-testid="namespace-title">
   {translate('namespaces.namespace')}: {namespace?.namespaceInfo?.name}
@@ -68,7 +76,7 @@
 </h2>
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
-    <Table variant="simple">
+    <Table>
       <caption class="sr-only" slot="caption"
         >{`${translate('namespaces.namespace')} ${translate(
           'common.details',
@@ -145,7 +153,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <Table variant="simple">
+    <Table>
       <caption class="sr-only" slot="caption"
         >{translate('namespaces.versions')}</caption
       >
@@ -167,7 +175,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <Table variant="simple">
+    <Table>
       <caption class="sr-only" slot="caption"
         >{translate('namespaces.client-actions')}</caption
       >
@@ -230,6 +238,18 @@
           ></td
         >
       </tr>
+      {#if pauseEnabled}
+        <tr>
+          <td>{translate('workflows.pause-workflow')}</td>
+          <td
+            ><Badge
+              class="px-1 py-0"
+              type={badgeTypeForBoolean($settings.workflowPauseDisabled)}
+              >{badgeTextForBoolean($settings.workflowPauseDisabled)}</Badge
+            ></td
+          >
+        </tr>
+      {/if}
     </Table>
   </article>
 </Card>

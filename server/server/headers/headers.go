@@ -24,7 +24,9 @@ package headers
 
 import (
 	"context"
+	"encoding/base64"
 	"net/http"
+	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/labstack/echo/v4"
@@ -34,17 +36,32 @@ import (
 
 func WithForwardHeaders(headers []string) api.Middleware {
 	return func(c echo.Context) runtime.ServeMuxOption {
-		return runtime.WithMetadata(
-			func(ctx context.Context, req *http.Request) metadata.MD {
-				md := metadata.MD{}
-				for _, header := range headers {
-					if x := c.Request().Header.Get(header); x != "" {
-						md.Append(header, x)
-					}
-				}
-
-				return md
-			},
-		)
+		return runtime.WithMetadata(handleForwardHeaders(c, headers))
 	}
+}
+
+func handleForwardHeaders(c echo.Context, headers []string) func(context.Context, *http.Request) metadata.MD {
+	return func(ctx context.Context, req *http.Request) metadata.MD {
+		md := metadata.MD{}
+		for _, header := range headers {
+			headerValue := c.Request().Header.Get(header)
+			if headerValue != "" {
+				if len(header) > 4 && header[len(header)-4:] == "-bin" {
+					decoded, err := base64DecodeWithOrWithoutPadding(headerValue)
+					if err == nil {
+						md.Set(header, string(decoded))
+					}
+				} else {
+					md.Append(header, headerValue)
+				}
+			}
+		}
+
+		return md
+	}
+}
+
+func base64DecodeWithOrWithoutPadding(s string) ([]byte, error) {
+	s = strings.TrimRight(s, "=")
+	return base64.RawStdEncoding.DecodeString(s)
 }

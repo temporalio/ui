@@ -1,39 +1,57 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
+  import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
 
-  export let namespaceList: NamespaceListItem[] = [];
+  interface Props {
+    namespaceList?: NamespaceListItem[];
+    namespace?: string;
+    noResultsText?: string;
+  }
 
-  $: namespace = $page.params.namespace || $lastUsedNamespace;
-  $: namespaceExists = namespaceList.some(
-    (namespaceListItem) => namespaceListItem.namespace === namespace,
+  let {
+    namespaceList = [],
+    namespace,
+    noResultsText = translate('common.no-results'),
+  }: Props = $props();
+
+  let value = $derived(
+    namespace ?? (page.params.namespace || $lastUsedNamespace),
   );
-  $: href = routeForNamespace({ namespace });
+  let namespaceExists = $derived(
+    namespaceList.some(
+      (namespaceListItem) => namespaceListItem.namespace === value,
+    ),
+  );
+  let href = $derived(
+    value ? routeForNamespace({ namespace: value }) : undefined,
+  );
 
-  const handleNamespaceSelect = (
-    event: CustomEvent<{ value: NamespaceListItem }>,
-  ) => {
-    const namespaceListItem = event.detail.value;
+  const handleNamespaceSelect = (namespaceListItem: NamespaceListItem) => {
     $lastUsedNamespace = namespaceListItem.namespace;
     namespaceListItem?.onClick(namespaceListItem.namespace);
   };
+
+  let sortedNamespaceList = $derived(
+    sortAlphabetically(namespaceList, (ns) => ns.namespace),
+  );
 </script>
 
 <Combobox
-  label={translate('namespaces.namespace-label', { namespace })}
-  noResultsText={translate('common.no-results')}
+  label={translate('namespaces.namespace-label', { namespace: value })}
+  {noResultsText}
   labelHidden
-  value={namespace}
+  {value}
   id="namespace-switcher"
   leadingIcon="namespace-switcher"
-  options={namespaceList}
+  options={sortedNamespaceList}
   optionValueKey="namespace"
-  on:change={handleNamespaceSelect}
+  onchange={handleNamespaceSelect}
   minSize={32}
   actionTooltip={translate('namespaces.go-to-namespace')}
   {href}

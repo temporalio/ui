@@ -1,54 +1,69 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Logo from '$lib/holocene/logo.svelte';
-  import { translate } from '$lib/i18n/translate';
   import { navOpen } from '$lib/stores/nav-open';
 
-  export let isCloud = false;
+  import CloudNavBar from './cloud-nav-bar.svelte';
+  import OSSNavBar from './oss-nav-bar.svelte';
+
+  interface Props extends HTMLAttributes<HTMLElement> {
+    isCloud?: boolean;
+    subtitle?: string;
+    subtitleHref?: string;
+    children?: Snippet;
+    bottom?: Snippet;
+  }
+
+  let {
+    isCloud = false,
+    subtitle,
+    subtitleHref,
+    children,
+    bottom,
+    ...restProps
+  }: Props = $props();
 
   const toggle = () => ($navOpen = !$navOpen);
 
-  $: version = $page.data?.settings?.version ?? '';
+  let version = $derived(page.data?.settings?.version ?? '');
 </script>
 
 <nav
   class={merge(
-    'group grid h-screen min-h-[600px] w-16 grid-cols-[2rem] grid-rows-[fit-content(1.5rem)_minmax(3rem,4rem)_1fr_8rem] gap-2 border-r border-subtle px-4 py-5 transition-width data-[nav=open]:w-[180px] data-[nav=open]:grid-cols-[100%]',
+    'group grid min-h-full grid-cols-[2rem] grid-rows-[fit-content(1.5rem)] gap-2 border-r border-subtle px-2 py-4 transition-width data-[nav=closed]:w-[calc(3rem_+_1px)] data-[nav=open]:w-[16rem] data-[nav=open]:grid-cols-[100%] motion-reduce:transition-none',
     'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary/70 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70',
     isCloud
-      ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
+      ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
       : 'surface-black',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
   data-testid="navigation-header"
-  {...$$restProps}
+  {...restProps}
 >
-  <a href="/" class="w-fit">
-    <Logo height={24} width={24} class="m-1" />
-  </a>
-  <button
-    title={$navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[8px] self-start justify-self-end opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 {isCloud
-      ? 'focus-visible:ring-primary/70 focus-visible:dark:ring-success'
-      : 'focus-visible:ring-primary/70'}"
-    on:click={toggle}
-  >
-    <Icon name="chevron-right" />
-  </button>
-  <div role="list">
-    <slot />
-  </div>
-  <div class="self-end">
-    <slot name="bottom" />
-    <div
-      class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-300"
-    >
-      <span class="sr-only">{translate('common.version')}</span>
+  {#if isCloud}
+    <CloudNavBar
       {version}
-    </div>
-  </div>
+      navOpen={$navOpen}
+      {subtitle}
+      {subtitleHref}
+      {children}
+      {bottom}
+      ontoggle={toggle}
+    />
+  {:else}
+    <OSSNavBar
+      {version}
+      navOpen={$navOpen}
+      {subtitle}
+      {subtitleHref}
+      {children}
+      {bottom}
+      ontoggle={toggle}
+    />
+  {/if}
 </nav>

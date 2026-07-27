@@ -1,0 +1,72 @@
+name: Trigger Downstream Updates
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # Only trigger when actual code changes are made
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+    inputs:
+      target-sha:
+        description: 'Specific SHA to use (defaults to current HEAD)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  trigger-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Generate token for cross-repo access
+        id: generate_token
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        with:
+          client-id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private-key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+          owner: temporalio
+          repositories: cloud-ui,ui,pack-dependency-actions
+
+      - name: Prepare workflow inputs
+        id: prepare
+        env:
+          INPUT_TARGET_SHA: ${{ github.event.inputs.target-sha }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          # Determine SHA to use
+          if [ -n "$INPUT_TARGET_SHA" ]; then
+            SHA="$INPUT_TARGET_SHA"
+          else
+            SHA="$GITHUB_SHA"
+          fi
+
+          # Create workflow inputs JSON (compact format for GITHUB_OUTPUT)
+          INPUTS=$(jq -nc \
+            --arg sha "$SHA" \
+            --arg mode "release" \
+            '{"ui_commit_sha": $sha, "mode": $mode}')
+
+          echo "inputs=$INPUTS" >> $GITHUB_OUTPUT
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+          echo "sha_short=$(echo $SHA | cut -c1-8)" >> $GITHUB_OUTPUT
+          echo "Using SHA: $(echo $SHA | cut -c1-8)"
+
+      - name: Trigger cloud-ui update
+        uses: temporalio/pack-dependency-actions/dispatch-workflow@main
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          repository: temporalio/cloud-ui
+          workflow: generate-ui-pr.yml
+          ref: main
+          inputs: ${{ steps.prepare.outputs.inputs }}
+          add-commit-comment: true
+          commit-comment-template: '🚀 Triggered `{workflow}` in {repository} on {ref} with SHA `${{ steps.prepare.outputs.sha_short }}`'
+          log-title: Downstream Update Triggered

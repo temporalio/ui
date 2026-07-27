@@ -1,34 +1,62 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  export let intent: 'warning' | 'default' = 'default';
-  export let button = false;
-  export let removeButtonLabel: string;
-  export let disabled = false;
+  interface Props {
+    intent?: 'warning' | 'default';
+    button?: boolean;
+    removeButtonLabel: string;
+    disabled?: boolean;
+    onclick?: () => void;
+    onremove?: () => void;
+    children?: Snippet;
+  }
 
-  const dispatch = createEventDispatcher();
+  let {
+    intent = 'default',
+    button = false,
+    removeButtonLabel,
+    disabled = false,
+    onclick,
+    onremove,
+    children,
+  }: Props = $props();
 
   const handleRemove = (e: Event) => {
     e.preventDefault();
-    dispatch('remove');
+    onremove?.();
   };
 </script>
 
 <span class={merge('chip', intent)}>
+  {#if intent === 'warning'}
+    <Icon name="warning" class="shrink-0" />
+  {/if}
   {#if button}
-    <button class="flex items-center gap-1" on:click>
-      <slot />
+    <button
+      class="flex items-center gap-1"
+      data-track-name="chip"
+      data-track-intent="action"
+      data-track-text="*textContent*"
+      {onclick}
+    >
+      {@render children?.()}
     </button>
   {:else}
-    <slot />
+    {@render children?.()}
   {/if}
   <button
     aria-label={removeButtonLabel}
-    class:hidden={disabled}
-    on:click={handleRemove}
+    class={merge(
+      'inline-flex items-center justify-center p-1',
+      disabled ? 'hidden' : '',
+    )}
+    data-track-name="chip"
+    data-track-intent="remove"
+    data-track-text={removeButtonLabel}
+    onclick={handleRemove}
   >
     <Icon name="close" />
   </button>
@@ -36,7 +64,7 @@
 
 <style lang="postcss">
   .chip {
-    @apply surface-subtle flex h-8 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm p-1 text-sm;
+    @apply surface-subtle flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm p-1 pl-2 text-sm leading-[1.5];
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;

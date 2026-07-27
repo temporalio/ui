@@ -1,46 +1,78 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/holocene/link.svelte';
+  import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
+  import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
-  import type { APIErrorResponse } from '$lib/utilities/request-from-api';
+  import {
+    availableDeploymentColumns,
+    configurableTableColumns,
+    DEFAULT_DEPLOYMENTS_COLUMNS,
+    TABLE_TYPE,
+  } from '$lib/stores/configurable-table-columns';
+  import { refresh } from '$lib/stores/workers';
+  import { has } from '$lib/utilities/has';
+  import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
-  let error = '';
+  let error = $state('');
 
-  $: namespace = $page.params.namespace;
+  const namespace = $derived(page.params.namespace);
+  const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 
-  $: onFetch = () => {
-    error = '';
-    return fetchPaginatedDeployments(namespace, '', onError);
+  const onFetch = $derived.by(() => {
+    return () => {
+      error = '';
+      return fetchPaginatedDeployments(namespace, '', onError);
+    };
+  });
+
+  const onError = (err: unknown) => {
+    if (
+      has(err, 'body') &&
+      has(err.body, 'message') &&
+      typeof err.body.message === 'string'
+    ) {
+      error = err.body.message;
+      return;
+    }
+    error = translate('deployments.error-message-fetching');
   };
 
-  const onError = (err: APIErrorResponse) => {
-    error =
-      err?.body?.message || translate('deployments.error-message-fetching');
+  const columns = $derived(
+    $configurableTableColumns?.[namespace]?.deployments ??
+      DEFAULT_DEPLOYMENTS_COLUMNS,
+  );
+  const availableColumns = $derived(availableDeploymentColumns(namespace));
+
+  let customizationDrawerOpen = $state(false);
+  const openCustomizationDrawer = () => {
+    customizationDrawerOpen = true;
   };
 
-  const columns = [
-    { label: translate('deployments.name'), pinned: true },
-    {
-      label: translate('deployments.deployment-version'),
-      pinned: true,
-    },
-    { label: translate('deployments.deployed'), pinned: true },
-    {
-      label: translate('deployments.workflows'),
-      pinned: true,
-    },
-  ];
+  const columnLabel = (label: string): string => {
+    switch (label) {
+      case 'Deployment':
+        return translate('deployments.deployment');
+      case 'Current Version':
+        return translate('deployments.current-version');
+      case 'Latest Version':
+        return translate('deployments.latest-version');
+      case 'Created At':
+        return translate('deployments.created');
+      default:
+        return label;
+    }
+  };
 </script>
 
-<div class="flex flex-col gap-4">
-  {#key [namespace]}
+{#key [namespace, $refresh]}
+  <div class="flex flex-col gap-4">
     <PaginatedTable
       let:visibleItems
       {onFetch}
@@ -55,42 +87,43 @@
       <caption class="sr-only" slot="caption"
         >{translate('deployments.deployments')}</caption
       >
-      <div class="flex flex-col gap-4" slot="header">
-        <div class="flex flex-wrap items-center gap-2">
-          <h1>
-            {translate('deployments.worker-deployments')}
-          </h1>
-          <Badge class="shrink-0">Pre-Release</Badge>
-        </div>
-      </div>
-
       <tr slot="headers" class="text-left">
-        {#each columns as { label }, index}
-          <th class={index === 0 && 'w-full'}>{label}</th>
+        {#each columns as { label } (label)}
+          <th>{columnLabel(label)}</th>
         {/each}
+        <th>{translate('deployments.actions')}</th>
       </tr>
       {#each visibleItems as deployment}
-        <DeploymentTableRow {deployment} {columns} />
+        <DeploymentTableRow
+          {deployment}
+          {columns}
+          onChange={() => refresh.update((n) => n + 1)}
+        />
       {/each}
 
       <svelte:fragment slot="empty">
-        <EmptyState
-          title={translate('deployments.empty-state-title')}
-          class="px-4"
-        >
-          <p class="text-center">
-            Enable Worker Deployments to manage your workers more effectively. <Link
-              href="https://docs.temporal.io/worker-deployments"
-              newTab>Learn more</Link
-            >.
-          </p>
-          {#if error}
-            <Alert intent="warning" icon="warning" class="px-12">
-              {error}
-            </Alert>
-          {/if}
-        </EmptyState>
+        <DeploymentsEmptyState {createHref} {error} />
+      </svelte:fragment>
+      <svelte:fragment slot="actions-end-additional">
+        <Tooltip text="Configure Columns" top>
+          <Button
+            on:click={openCustomizationDrawer}
+            data-testid="deployments-table-configuration-button"
+            size="xs"
+            variant="ghost"
+          >
+            <Icon name="settings" />
+          </Button>
+        </Tooltip>
       </svelte:fragment>
     </PaginatedTable>
-  {/key}
-</div>
+  </div>
+{/key}
+
+<ConfigurableTableHeadersDrawer
+  {availableColumns}
+  bind:open={customizationDrawerOpen}
+  table={TABLE_TYPE.DEPLOYMENTS}
+  type={translate('common.columns')}
+  title={translate('deployments.deployments')}
+/>

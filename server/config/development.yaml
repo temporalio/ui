@@ -1,28 +1,32 @@
 publicPath:
 port: 8081
 enableUi: true
-bannerText:
 cors:
   cookieInsecure: false
   allowOrigins:
-    - http://localhost:3000 # used at development by https://github.com/temporalio/ui
+    - "*"
+  unsafeAllowAllOrigins: true
 refreshInterval: 1m
 defaultNamespace: default
 showTemporalSystemNamespace: false
 feedbackUrl:
-notifyOnNewVersion: true
+disableNewsFetch: false
+navCollapsedByDefault: false
 disableWriteActions: false
 workflowTerminateDisabled: false
 workflowCancelDisabled: false
 workflowSignalDisabled: false
 workflowUpdateDisabled: false
 workflowResetDisabled: false
+workflowPauseDisabled: false
 batchActionsDisabled: false
 startWorkflowDisabled: false
 hideWorkflowQueryErrors: false
 refreshWorkflowCountsDisabled: false
+activityCommandsDisabled: false
 auth:
   enabled: false
+  redirectToProvider: false
   providers:
     - label: Auth0 oidc # for internal use; in future may expose as button text
       type: oidc # for futureproofing; only oidc is supported today
@@ -48,9 +52,14 @@ tls:
   keyData:
   enableHostVerification: false
   serverName:
+uiServerTLS:
+  certFile:
+  keyFile:
 codec:
   endpoint:
   passAccessToken: false
   includeCredentials: false
+  defaultErrorMessage:
+  defaultErrorLink:
 forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
   - X-Forwarded-For

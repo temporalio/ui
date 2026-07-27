@@ -1,0 +1,30 @@
+# Version control
+.git
+.gitignore
+
+# Documentation
+*.md
+README*
+docs/
+
+# Tests
+*_test.go
+**/*_test.go
+
+# Development
+.env
+.env.*
+*.log
+
+# Build artifacts
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# CI/CD
+.github/
+.goreleaser.yml

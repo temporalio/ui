@@ -19,6 +19,7 @@
     required?: boolean;
     description?: string;
     maxLength?: number;
+    class?: string;
   };
 
   export let disabled = false;
@@ -37,6 +38,8 @@
 
   let className = 'text-primary';
   export { className as class };
+
+  $: errorId = `${id}-error`;
 </script>
 
 <div class={merge('group flex flex-col gap-1', className)}>
@@ -54,7 +57,7 @@
     <textarea
       bind:value
       class={merge(
-        'surface-primary min-h-fit w-full px-3 py-2 text-sm placeholder:text-secondary focus-visible:outline-none',
+        'surface-primary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-none',
         disabled && 'cursor-not-allowed opacity-50',
       )}
       {id}
@@ -62,6 +65,9 @@
       {placeholder}
       {rows}
       {spellcheck}
+      {required}
+      aria-invalid={!isValid ? 'true' : undefined}
+      aria-describedby={!isValid && error ? errorId : undefined}
       on:input
       on:change
       on:focus
@@ -70,13 +76,14 @@
       maxlength={maxLength > 0 ? maxLength : undefined}
       data-testid={id}
       {...$$restProps}
-    />
+    ></textarea>
   </div>
   <div class="flex justify-between gap-2">
     <div
+      id={errorId}
       class="error-msg"
       class:min-width={maxLength}
-      aria-live={isValid ? 'off' : 'assertive'}
+      role="alert"
     >
       {#if !isValid}
         {#if error}
@@ -103,7 +110,7 @@
   }
 
   .error-msg {
-    @apply min-h-[1.25rem] break-words border-danger text-sm font-normal text-danger;
+    @apply min-h-[1.25rem] break-words border-danger text-xs text-danger;
   }
 
   .error-msg.min-width {
@@ -111,7 +118,7 @@
   }
 
   .count {
-    @apply invisible text-right text-sm font-medium text-primary group-focus-within:visible;
+    @apply invisible text-right text-xs text-primary group-focus-within:visible;
   }
 
   .count > .warn {

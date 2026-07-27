@@ -1,11 +1,16 @@
 <script lang="ts">
+  import { translate } from '$lib/i18n/translate';
   import type {
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import type { WorkflowEventWithPending } from '$lib/types/events';
+  import type {
+    EventTypeCategory,
+    WorkflowEventWithPending,
+  } from '$lib/types/events';
+  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -20,49 +25,89 @@
   import Dot from './dot.svelte';
   import Line from './line.svelte';
 
-  export let event: WorkflowEventWithPending;
-  export let group: EventGroup;
-  export let history: WorkflowEventWithPending[];
-  export let groups: EventGroups;
-  export let index: number;
-  export let canvasWidth: number;
+  interface Props {
+    event: WorkflowEventWithPending;
+    group: EventGroup;
+    history: WorkflowEventWithPending[];
+    groups: EventGroups;
+    index: number;
+    canvasWidth: number;
+  }
+
+  let { event, group, history, groups, index, canvasWidth }: Props = $props();
 
   const { height, radius } = HistoryConfig;
   const strokeWidth = radius / 2;
 
-  $: y = index * height + height / 2;
-  $: ({ nextDistance, offset } = getNextDistanceAndOffset(
-    history,
-    event,
-    groups,
-    height,
-    $eventFilterSort,
-  ));
+  const y = $derived(index * height + height / 2);
+  const distanceAndOffset = $derived(
+    getNextDistanceAndOffset(history, event, groups, height, $eventFilterSort),
+  );
+  const nextDistance = $derived(distanceAndOffset.nextDistance);
+  const offset = $derived(distanceAndOffset.offset);
 
-  $: zoomNextDistance = offset > 0 && nextDistance;
+  const zoomNextDistance = $derived(offset > 0 && nextDistance);
 
-  $: classification =
+  const classification = $derived(
     isPendingActivity(event) || isPendingNexusOperation(event)
       ? 'pending'
-      : event?.classification;
+      : event?.classification,
+  );
 
-  $: horizontalOffset = offset * 1.75 * radius;
-  $: nextIsPending =
-    isEvent(event) && group?.lastEvent.id === event?.id && group?.isPending;
-  $: connectLine =
+  const horizontalOffset = $derived(offset * 1.75 * radius);
+  const nextIsPending = $derived(
+    isEvent(event) && group?.lastEvent.id === event?.id && group?.isPending,
+  );
+  const connectLine = $derived(
     isPendingActivity(event) || isPendingNexusOperation(event) || offset === 0
       ? false
-      : !isMiddleEvent(event, groups);
-  $: category =
+      : !isMiddleEvent(event, groups),
+  );
+  const category = $derived(
     isPendingActivity(event) || isPendingNexusOperation(event)
       ? 'pending'
       : nextIsPending
-      ? event?.category
-      : '';
-  $: reverseSort = $eventFilterSort === 'descending';
+        ? event?.category
+        : (undefined as EventTypeCategory | 'pending' | undefined),
+  );
+  const reverseSort = $derived($eventFilterSort === 'descending');
+
+  const isRetrying = $derived(
+    !!group?.pendingActivity && Number(group.pendingActivity.attempt) > 1,
+  );
+
+  const statusForLabel = $derived(
+    isRetrying
+      ? 'Retrying'
+      : classification === 'pending'
+        ? 'Pending'
+        : classification,
+  );
+
+  const classificationLabel = $derived(
+    getEventClassificationLabel(statusForLabel),
+  );
+
+  const eventTypeLabel = $derived(
+    event && 'eventType' in event
+      ? event.eventType
+      : translate('common.unknown'),
+  );
+
+  const accessibleName = $derived(
+    translate('events.row-accessible-name', {
+      eventType: eventTypeLabel,
+      classification: classificationLabel,
+    }),
+  );
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer">
+<g
+  role="button"
+  tabindex="0"
+  aria-label={accessibleName}
+  class="relative cursor-pointer"
+>
   {#if connectLine}
     <Line
       startPoint={[canvasWidth, y]}
@@ -87,7 +132,7 @@
         y + zoomNextDistance + radius,
       ]}
       category={group?.pendingActivity
-        ? group.pendingActivity.attempt > 1
+        ? Number(group.pendingActivity.attempt) > 1
           ? 'retry'
           : 'pending'
         : category}

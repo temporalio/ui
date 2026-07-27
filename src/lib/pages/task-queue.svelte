@@ -1,48 +1,29 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import WorkerTable from '$lib/components/worker-table.svelte';
-  import TabList from '$lib/holocene/tab/tab-list.svelte';
-  import Tab from '$lib/holocene/tab/tab.svelte';
-  import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { getPollers } from '$lib/services/pollers-service';
-  import { taskQueueView } from '$lib/stores/task-queue-view';
 
-  import TaskQueueVersioning from './task-queue-versioning.svelte';
+  interface Props {
+    namespace: string;
+    queue: string;
+    useFallback?: boolean;
+  }
 
-  $: ({ queue: taskQueue, namespace } = $page.params);
-
-  const onTab = (view: 'workers' | 'versioning') => {
-    $taskQueueView = view;
-  };
+  let { namespace, queue: taskQueue, useFallback = false }: Props = $props();
+  const workerHeartbeatsEnabled = $derived(
+    !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
 </script>
 
-{#await getPollers({ queue: taskQueue, namespace }) then workers}
-  <section class="flex flex-col gap-4">
-    <h2 data-testid="task-queue-name">
-      {taskQueue}
-    </h2>
-    <Tabs>
-      <TabList class="flex flex-wrap gap-6 p-4 pl-0" label="task queue detail">
-        <Tab
-          label={translate('workers.workers')}
-          id="worker-tab"
-          onClick={() => onTab('workers')}
-          active={$taskQueueView === 'workers'}
-        />
-        <Tab
-          label={translate('workers.versioning')}
-          id="versioning-tab"
-          onClick={() => onTab('versioning')}
-          active={$taskQueueView === 'versioning'}
-        />
-      </TabList>
-    </Tabs>
-    {#if $taskQueueView === 'versioning'}
-      <TaskQueueVersioning {taskQueue} {workers} />
-    {:else}
-      <WorkerTable {workers} />
-    {/if}
-  </section>
-{/await}
+<section class="flex flex-col gap-4">
+  <h1 data-testid="task-queue-title">{translate('workers.task-queue')}</h1>
+  <h2 data-testid="task-queue-name">
+    {taskQueue}
+  </h2>
+  <WorkersTable
+    {namespace}
+    {taskQueue}
+    useFallback={!workerHeartbeatsEnabled || useFallback}
+  />
+</section>

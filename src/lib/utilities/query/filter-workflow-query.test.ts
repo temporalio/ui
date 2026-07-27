@@ -202,6 +202,136 @@ describe('toListWorkflowQueryFromFilters', () => {
     );
   });
 
+  it.each([
+    ['null', null],
+    ['empty string', ''],
+    ['undefined', undefined],
+  ])(
+    'should convert a Keyword filter with is null conditional when value is %s',
+    (_, value) => {
+      const filters = [
+        {
+          attribute: 'CustomKeywordField',
+          type: 'Keyword',
+          conditional: 'is',
+          operator: '',
+          parenthesis: '',
+          value,
+        },
+        {
+          attribute: 'CustomKeywordField',
+          type: 'Keyword',
+          conditional: 'is not',
+          operator: '',
+          parenthesis: '',
+          value,
+        },
+      ];
+      const query = toListWorkflowQueryFromFilters(combineFilters(filters));
+      expect(query).toBe(
+        '`CustomKeywordField` is null AND `CustomKeywordField` is not null',
+      );
+    },
+  );
+
+  it('should convert an Int filter without quoting the value', () => {
+    const filters = [
+      {
+        attribute: 'CustomIntField',
+        type: 'Int',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: '1',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`CustomIntField`=1');
+  });
+
+  it('should convert a Double filter without quoting the value', () => {
+    const filters = [
+      {
+        attribute: 'CustomDoubleField',
+        type: 'Double',
+        conditional: '>',
+        operator: '',
+        parenthesis: '',
+        value: '1.5',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`CustomDoubleField`>1.5');
+  });
+
+  it('should convert numeric filters alongside keyword filters', () => {
+    const filters = [
+      {
+        attribute: 'CustomIntField',
+        type: 'Int',
+        conditional: '>=',
+        operator: '',
+        parenthesis: '',
+        value: '10',
+      },
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'abcd',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
+    expect(query).toBe('`CustomIntField`>=10 AND `WorkflowId`="abcd"');
+  });
+
+  it('should convert an Int filter with is null conditional', () => {
+    const filters = [
+      {
+        attribute: 'CustomIntField',
+        type: 'Int',
+        conditional: 'is',
+        operator: '',
+        parenthesis: '',
+        value: null,
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`CustomIntField` is null');
+  });
+
+  it('should quote ExecutionDuration Go duration strings', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionDuration',
+        type: 'Int',
+        conditional: '>=',
+        operator: '',
+        parenthesis: '',
+        value: '30s',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`ExecutionDuration`>="30s"');
+  });
+
+  it('should not quote ExecutionDuration nanosecond integers', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionDuration',
+        type: 'Int',
+        conditional: '>=',
+        operator: '',
+        parenthesis: '',
+        value: '30000000000',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`ExecutionDuration`>=30000000000');
+  });
+
   it('should convert a KeywordList filter', () => {
     const filters = [
       {

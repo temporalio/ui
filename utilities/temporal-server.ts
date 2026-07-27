@@ -85,8 +85,25 @@ export const createTemporalServer = async ({
     flags.push(`--db-filename=${dbFilename}`);
   }
 
+  [
+    { flag: 'frontend.enableUpdateWorkflowExecution', value: 'true' },
+    {
+      flag: 'frontend.enableUpdateWorkflowExecutionAsyncAccepted',
+      value: 'true',
+    },
+    { flag: 'frontend.workerVersioningDataAPIs', value: 'true' },
+    { flag: 'frontend.workerVersioningWorkflowAPIs', value: 'true' },
+    { flag: 'worker.buildIdScavengerEnabled', value: 'true' },
+    { flag: 'history.enableChasm', value: 'true' },
+    { flag: 'history.externalPayloadsEnabled', value: 'true' },
+    { flag: 'activity.enableStandalone', value: 'true' },
+  ].forEach(({ flag, value }) => {
+    flags.push('--dynamic-config-value');
+    flags.push(`${flag}=${value}`);
+  });
+
   const temporal =
-    $`${cliPath} server start-dev --dynamic-config-value frontend.enableUpdateWorkflowExecution=true --dynamic-config-value frontend.enableUpdateWorkflowExecutionAsyncAccepted=true --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true --dynamic-config-value worker.buildIdScavengerEnabled=true --dynamic-config-value system.enableNexus=true ${flags}`.quiet();
+    $`${cliPath} server start-dev --search-attribute CustomKeywordField=Keyword --search-attribute CustomIntField=Int ${flags}`.quiet();
 
   temporal.catch(async ({ stdout, stderr, exitCode }) => {
     console.log('EXIT CODE', exitCode);

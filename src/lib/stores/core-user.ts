@@ -6,6 +6,7 @@ import { type CoreUser, CoreUserKey } from '$lib/models/core-user';
 
 export const defaultCoreUserStore: Readable<CoreUser> = readable({
   namespaceWriteDisabled: () => false,
+  isActivityCommandsDisabled: false,
 });
 
 export const coreUserStore = (): Readable<CoreUser> => {

@@ -41,13 +41,14 @@ type (
 		EnableUI            bool   `yaml:"enableUi"`
 		CloudUI             bool   `yaml:"cloudUi"`
 		UIAssetPath         string `yaml:"uiAssetPath"`
-		BannerText          string `yaml:"bannerText"`
 		CORS                CORS   `yaml:"cors"`
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
-		NotifyOnNewVersion  bool   `yaml:"notifyOnNewVersion"`
+		DisableNewsFetch    bool   `yaml:"disableNewsFetch"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
+		// Collapse the left navigation and saved views navigation by default
+		NavCollapsedByDefault bool `yaml:"navCollapsedByDefault"`
 		// How often to reload the config
 		RefreshInterval     time.Duration `yaml:"refreshInterval"`
 		Codec               Codec         `yaml:"codec"`
@@ -58,6 +59,7 @@ type (
 		WorkflowSignalDisabled    bool `yaml:"workflowSignalDisabled"`
 		WorkflowUpdateDisabled    bool `yaml:"workflowUpdateDisabled"`
 		WorkflowResetDisabled     bool `yaml:"workflowResetDisabled"`
+		WorkflowPauseDisabled     bool `yaml:"workflowPauseDisabled"`
 		// Whether bulk/batch actions are enabled in the UI
 		BatchActionsDisabled bool `yaml:"batchActionsDisabled"`
 		// Whether start workflow is enabled in the UI
@@ -66,13 +68,18 @@ type (
 		HideWorkflowQueryErrors bool `yaml:"hideWorkflowQueryErrors"`
 		// Whether to disable refreshing workflow counts in UI
 		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
+		// Whether to disable activity commands in the UI
+		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
 		HideLogs       bool     `yaml:"hideLogs"`
+		// TLS configuration options to start UI Server in TLS mode
+		UIServerTLS UIServerTLS `yaml:"uiServerTLS"`
 	}
 
 	CORS struct {
-		AllowOrigins []string `yaml:"allowOrigins"`
+		AllowOrigins          []string `yaml:"allowOrigins"`
+		UnsafeAllowAllOrigins bool     `yaml:"unsafeAllowAllOrigins"`
 		// CookieInsecure allows CSRF cookie to be sent to servers that the browser considers
 		// unsecured. Useful for cases where the connection is secured via VPN rather than
 		// HTTPS directly.
@@ -90,11 +97,22 @@ type (
 		ServerName             string `yaml:"serverName"`
 	}
 
+	UIServerTLS struct {
+		CertFile string `yaml:"certFile"`
+		KeyFile  string `yaml:"keyFile"`
+	}
+
 	Auth struct {
 		// Enabled - UI checks this first before reading your provider config
 		Enabled bool `yaml:"enabled"`
+		// RedirectToProvider - skip the UI login page and redirect unauthenticated users directly to the auth provider
+		RedirectToProvider bool `yaml:"redirectToProvider"`
 		// A list of auth providers. Currently enables only the first provider in the list.
 		Providers []AuthProvider `yaml:"providers"`
+		// MaxSessionDuration - optional maximum session duration. If set, users will be
+		// forced to re-login after this duration regardless of token validity.
+		// Example values: "8h", "24h", "168h" (1 week). If zero, no max duration is enforced.
+		MaxSessionDuration time.Duration `yaml:"maxSessionDuration"`
 	}
 
 	AuthProvider struct {
@@ -114,12 +132,16 @@ type (
 		CallbackURL string `yaml:"callbackUrl"`
 		// Options added as URL query params when redirecting to auth provider. Can be used to configure custom auth flows such as Auth0 invitation flow.
 		Options map[string]interface{} `yaml:"options"`
+		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
+		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
 	}
 
 	Codec struct {
-		Endpoint           string `yaml:"endpoint"`
-		PassAccessToken    bool   `yaml:"passAccessToken"`
-		IncludeCredentials bool   `yaml:"includeCredentials"`
+		Endpoint            string `yaml:"endpoint"`
+		PassAccessToken     bool   `yaml:"passAccessToken"`
+		IncludeCredentials  bool   `yaml:"includeCredentials"`
+		DefaultErrorMessage string `yaml:"defaultErrorMessage"`
+		DefaultErrorLink    string `yaml:"defaultErrorLink"`
 	}
 
 	Filesystem struct {

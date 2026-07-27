@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+
+  import { page } from '$app/state';
 
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -10,14 +12,14 @@
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({
+  const {
     id: eventId,
     namespace,
     workflow: workflowId,
     run: runId,
-  } = $page.params);
+  } = $derived(page.params);
 
-  $: ids = [eventId];
+  let ids = $derived([eventId]);
 
   const resetFullHistory = () => {
     $fullEventHistory = [];
@@ -38,25 +40,48 @@
     }
   };
 
-  $: fetchEvents(namespace, workflowId, runId);
+  onMount(() => {
+    fetchEvents(namespace, workflowId, runId);
+  });
 
-  $: ({ workflow } = $workflowRun);
-  $: pendingActivities = workflow?.pendingActivities;
-  $: pendingNexusOperations = workflow?.pendingNexusOperations;
+  const { workflow } = $derived($workflowRun);
+  const pendingActivities = $derived(workflow?.pendingActivities);
+  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
-  $: ascendingGroups = groupEvents(
-    $fullEventHistory,
-    'ascending',
-    pendingActivities,
-    pendingNexusOperations,
+  const ascendingGroups = $derived(
+    groupEvents(
+      $fullEventHistory,
+      'ascending',
+      pendingActivities,
+      pendingNexusOperations,
+    ),
   );
-  $: groups =
+  const groups = $derived(
     $eventFilterSort === 'ascending'
       ? ascendingGroups
-      : [...ascendingGroups].reverse();
+      : [...ascendingGroups].reverse(),
+  );
 
-  $: visibleItems = $fullEventHistory.filter((e) => ids.includes(e.id));
-  $: loading = !visibleItems.length;
+  const initialEvent = $derived(
+    $fullEventHistory.find(
+      (e) =>
+        e.id === eventId ||
+        e.id ===
+          String(
+            workflow.workflowExtendedInfo?.requestIdInfos?.[eventId]?.eventId,
+          ),
+    ),
+  );
+
+  const visibleItems = $derived(
+    $fullEventHistory.filter(
+      (e) => ids.includes(e.id) || e.id === initialEvent?.id,
+    ),
+  );
+  const loading = $derived(!visibleItems.length);
+  const lastEventId = $derived(
+    $fullEventHistory[$fullEventHistory.length - 1]?.id,
+  );
 
   const loadPrevious = () => {
     const firstId = parseInt(ids[0]);
@@ -85,14 +110,9 @@
 
     ids = [...ids, ...nextTen];
   };
-
-  $: lastEventId = $fullEventHistory[$fullEventHistory.length - 1]?.id;
 </script>
 
-<div
-  class="flex flex-col gap-2 px-8 pb-24 pt-2"
-  data-testid="event-summary-log"
->
+<div class="flex flex-col gap-2 pb-24" data-testid="event-summary-log">
   <Button
     variant="secondary"
     size="xs"
@@ -108,6 +128,7 @@
         <EventSummaryRow
           {event}
           {index}
+          expanded={event.id === initialEvent?.id}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
           initialItem={$fullEventHistory[0]}
         />
@@ -126,32 +147,12 @@
 
 <style lang="postcss">
   tbody {
-    :global(tr.dense) {
-      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
-    }
-
-    :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
-    }
-
-    :global(tr.dense:nth-of-type(odd)) {
-      @apply surface-primary hover:bg-interactive-table-hover;
-    }
-
-    :global(tr.dense.expanded) {
-      @apply bg-interactive-secondary-active;
-    }
-
-    :global(tr.dense.active) {
-      @apply bg-interactive-table-hover;
+    :global(tr:nth-of-type(odd)) {
+      @apply surface-primary;
     }
 
     :global(tr > td) {
       @apply whitespace-nowrap p-2;
-    }
-
-    :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
     }
   }
 </style>

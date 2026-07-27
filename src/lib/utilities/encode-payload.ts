@@ -1,19 +1,30 @@
 import { get } from 'svelte/store';
 
-import type { PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
+import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
 import { encodePayloadsWithCodec } from '$lib/services/data-encoder';
 import { dataEncoder } from '$lib/stores/data-encoder';
-import type { Payloads } from '$lib/types';
+import type { Payload } from '$lib/types';
+import { atob } from '$lib/utilities/atob';
 import { btoa } from '$lib/utilities/btoa';
 import {
   parseWithBigInt,
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
 
+export const isBase64EncodedPayload = (value: unknown): value is Payload => {
+  if (!value || typeof value !== 'object') return false;
+  const { metadata, data } = value as Payload;
+  const encoding = metadata?.encoding;
+  if (typeof encoding !== 'string' || typeof data !== 'string') return false;
+  return atob(encoding) !== encoding;
+};
+
 export const getSinglePayload = (decodedValue: string): string => {
   if (decodedValue) {
     const parsedValue = parseWithBigInt(decodedValue);
-    const firstPayload = parsedValue?.[0];
+    const firstPayload = Array.isArray(parsedValue)
+      ? parsedValue?.[0]
+      : parsedValue;
     if (firstPayload) {
       return stringifyWithBigInt(firstPayload);
     }
@@ -32,14 +43,14 @@ export const setBase64Payload = (
         encoding: btoa(encoding),
         messageType: btoa(messageType),
       },
-      data: btoa(JSON.stringify(payload)),
+      data: btoa(stringifyWithBigInt(payload)),
     };
   }
   return {
     metadata: {
       encoding: btoa(encoding),
     },
-    data: btoa(JSON.stringify(payload)),
+    data: btoa(stringifyWithBigInt(payload)),
   };
 };
 
@@ -55,20 +66,26 @@ export const encodePayloads = async ({
   encoding,
   messageType = '',
   encodeWithCodec = true,
-}: EncodePayloads): Promise<Payloads> => {
-  let payloads = null;
+}: EncodePayloads): Promise<Payload[]> => {
+  if (!input) return null;
 
-  if (input) {
-    const parsedInput = JSON.parse(input);
-    payloads = [setBase64Payload(parsedInput, encoding, messageType)];
-    const endpoint = get(dataEncoder).endpoint;
-    if (endpoint && encodeWithCodec) {
-      const awaitData = await encodePayloadsWithCodec({
-        payloads: { payloads },
-      });
-      payloads = awaitData?.payloads ?? null;
-    }
+  const parsedInput = parseWithBigInt(input);
+  let payloads: Payload[] = isBase64EncodedPayload(parsedInput)
+    ? [parsedInput]
+    : [
+        setBase64Payload(
+          parsedInput,
+          encoding,
+          messageType,
+        ) as unknown as Payload,
+      ];
+
+  const endpoint = get(dataEncoder).endpoint;
+  if (endpoint && encodeWithCodec) {
+    const awaitData = await encodePayloadsWithCodec({
+      payloads: { payloads },
+    });
+    payloads = (awaitData?.payloads as Payload[]) ?? null;
   }
-
   return payloads;
 };

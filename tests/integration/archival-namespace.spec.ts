@@ -20,8 +20,10 @@ test.describe('Archival - Archival disabled', () => {
   test('it have the correct title on archival page', async ({ page }) => {
     await mockNamespaceApi(page, archived);
     await page.goto(archivalWorkflowsUrl);
-    const title = await page.getByTestId('archived-disabled-title').innerText();
-    expect(title).toBe('This namespace is currently not enabled for archival.');
+    const title = page.getByTestId('archived-disabled-title');
+    await expect(title).toHaveText(
+      'This namespace is currently not enabled for archival.',
+    );
   });
 });
 
@@ -33,7 +35,7 @@ test.describe('Archival - Archival enabled', () => {
   test('it have the correct title on archival page', async ({ page }) => {
     await mockNamespaceApi(page, archived);
     await page.goto(archivalWorkflowsUrl);
-    const title = await page.getByTestId('archived-enabled-title').innerText();
-    expect(title).toBe('Archived Workflows');
+    const title = page.getByTestId('archived-enabled-title');
+    await expect(title).toHaveText('Archived Workflows');
   });
 });

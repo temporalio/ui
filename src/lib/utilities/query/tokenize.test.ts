@@ -11,7 +11,7 @@ const combinedQuery =
   '`WorkflowId`="Hello" and `WorkflowType`="World" and `StartTime` BETWEEN "2022-04-18T18:09:49-06:00" AND "2022-04-20T18:09:49-06:00"';
 const valuesWithSpacesQuery =
   '`Custom Key Word`="Hello there world" AND `WorkflowId`="one and two = three" OR `WorkflowType`="example=\'one\'"';
-const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
+const startsWithQuery = '`WorkflowType` STARTS_WITH "Hello"';
 
 describe('tokenize', () => {
   it('should eliminate spaces', () => {
@@ -62,6 +62,22 @@ describe('tokenize', () => {
     ]);
   });
 
+  it('should tokenize the not equal to conditional', () => {
+    const result = [
+      'WorkflowId',
+      '=',
+      'Hello',
+      'and',
+      'WorkflowType',
+      '!=',
+      'World',
+    ];
+    let query = '`WorkflowId`="Hello" and `WorkflowType`!="World"';
+    expect(tokenize(query)).toEqual(result);
+    query = '`WorkflowId` = "Hello" and `WorkflowType` != "World"';
+    expect(tokenize(query)).toEqual(result);
+  });
+
   it('should tokenize the customAttributesWithSpacesQuery', () => {
     const query = customAttributesWithSpacesQuery;
 
@@ -85,16 +101,24 @@ describe('tokenize', () => {
       'some workflow',
       'AND',
       'Custom Boolean',
-      '=true',
+      '=',
+      'true',
     ]);
   });
 
-  it('should tokenize the keywordListQuery', () => {
-    const query = keywordListQuery;
+  it('should tokenize KeywordList queries', () => {
+    const keywordListInQuery = '`CustomKeywordListField`in("Hello", "World")';
+    const keywordListNotInQuery =
+      '`CustomKeywordListField`not in("Hello", "World")';
 
-    expect(tokenize(query)).toEqual([
+    expect(tokenize(keywordListInQuery)).toEqual([
       'CustomKeywordListField',
       'in',
+      '("Hello", "World")',
+    ]);
+    expect(tokenize(keywordListNotInQuery)).toEqual([
+      'CustomKeywordListField',
+      'not in',
       '("Hello", "World")',
     ]);
   });
@@ -144,5 +168,35 @@ describe('tokenize', () => {
       'AND',
       '2022-04-20T18:09:49-06:00',
     ]);
+  });
+
+  it('should tokenize the startsWithQuery', () => {
+    const query = startsWithQuery;
+
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Hello']);
+  });
+
+  it('should tokenize the startsWithQuery without spaces', () => {
+    const query = '`WorkflowType`STARTS_WITH"Hello"';
+
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Hello']);
+  });
+
+  it('should tokenize the startsWithInQuery for values with IN conditional in them', () => {
+    const query = '`WorkflowType` STARTS_WITH "Inspect"';
+
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Inspect']);
+  });
+
+  it('should tokenize the startsWithInQuery for values with IS conditional in them', () => {
+    const query = '`WorkflowType` STARTS_WITH "issue"';
+
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'issue']);
+  });
+
+  it('should tokenize the startsWithInQuery for values with JOIN conditional in them', () => {
+    const query = '`WorkflowType` STARTS_WITH "Joiner"';
+
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Joiner']);
   });
 });

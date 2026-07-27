@@ -1,5 +1,6 @@
 import { BROWSER } from 'esm-env';
 
+import { setAuthUser } from '$lib/stores/auth-user';
 import type { User } from '$lib/types/global';
 import { atob } from '$lib/utilities/atob';
 
@@ -64,4 +65,29 @@ export const cleanAuthUserCookie = (isBrowser = BROWSER) => {
     i++;
     next = cookies.find((c) => c.includes(cookieName + i));
   }
+};
+
+/**
+ * Reads the Go server's `user*` transport cookies into the auth store,
+ * then deletes them.
+ *
+ * The Go server sets `user0`, `user1`, ... cookies after the OIDC callback
+ * because it cannot write to localStorage directly. These cookies are
+ * chunked to work around the ~4KB per-cookie size limit for large JWTs.
+ * They are a one-time transport mechanism — not persistent storage.
+ *
+ * This function should be called once on app init (before the token provider
+ * reads from the store) and again after each token refresh.
+ */
+export const consumeAuthCookies = (isBrowser = BROWSER): boolean => {
+  if (!isBrowser) return false;
+
+  const user = getAuthUserCookie(isBrowser);
+  if (user?.accessToken) {
+    setAuthUser(user);
+    cleanAuthUserCookie(isBrowser);
+    return true;
+  }
+
+  return false;
 };

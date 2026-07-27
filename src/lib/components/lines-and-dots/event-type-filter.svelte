@@ -1,7 +1,8 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/state';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -19,146 +20,179 @@
   import { eventViewType } from '$lib/stores/event-view';
   import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
+  import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
   import { nexusEnabled } from '$lib/utilities/nexus-enabled';
   import { isVersionNewer } from '$lib/utilities/version-check';
 
   import { CategoryIcon } from './constants';
 
-  export let compact = false;
-  export let minimized = true;
+  interface Props {
+    compact?: boolean;
+  }
 
-  let open = writable(false);
+  let { compact = false }: Props = $props();
 
-  $: defaultOptions = compact
-    ? compactEventTypeOptions.map((o) => o.value)
-    : allEventTypeOptions.map((o) => o.value);
+  const open = writable(false);
 
-  $: options = [
-    ...(compact ? compactEventTypeOptions : allEventTypeOptions).map((o) => ({
-      ...o,
-      label: translate(o.label),
-      icon: CategoryIcon[o.value],
-      description: translate(o.description),
-    })),
-  ];
+  const defaultOptions = $derived(
+    compact
+      ? compactEventTypeOptions.map((o) => o.value)
+      : allEventTypeOptions.map((o) => o.value),
+  );
 
-  $: {
+  const options = $derived.by(() => {
+    let list = (compact ? compactEventTypeOptions : allEventTypeOptions).map(
+      (o) => ({
+        ...o,
+        label: translate(o.label),
+        icon: CategoryIcon[o.value],
+        description: o.description ? translate(o.description) : '',
+      }),
+    );
     if (isVersionNewer('1.21.0', $temporalVersion)) {
-      options = options.filter(({ value }) => value !== 'update');
+      list = list.filter(({ value }) => value !== 'update');
     }
-  }
-
-  $: {
-    if (!nexusEnabled($page.data.systemInfo?.capabilities)) {
-      options = options.filter(({ value }) => value !== 'nexus');
+    if (!nexusEnabled(page.data.systemInfo?.capabilities)) {
+      list = list.filter(({ value }) => value !== 'nexus');
     }
-  }
+    return list;
+  });
 
-  const onOptionClick = ({ value }) => {
+  const onOptionClick = ({ value }: (typeof options)[number]) => {
     clearActiveGroups();
-    $eventTypeFilter = $eventTypeFilter.some((type) => type === value)
+    const newCategories = $eventTypeFilter.some((type) => type === value)
       ? $eventTypeFilter.filter((type) => type !== value)
       : [...$eventTypeFilter, value];
+    $eventTypeFilter = newCategories;
+    updateEventFilterParams(
+      page.url,
+      {
+        categories:
+          newCategories.length === defaultOptions.length ? null : newCategories,
+      },
+      goto,
+    );
   };
 
-  $: filterActive = $eventTypeFilter.length < defaultOptions.length;
+  const onAllClick = () => {
+    $eventTypeFilter = defaultOptions;
+    $eventStatusFilter = false;
+    updateEventFilterParams(
+      page.url,
+      { categories: null, statusFilter: false },
+      goto,
+    );
+  };
+
+  const onPendingClick = () => {
+    $eventTypeFilter = defaultOptions;
+    $eventStatusFilter = !$eventStatusFilter;
+    updateEventFilterParams(
+      page.url,
+      { categories: null, statusFilter: !$eventStatusFilter },
+      goto,
+    );
+  };
+
+  const onNoneClick = () => {
+    $eventTypeFilter = [];
+    $eventStatusFilter = false;
+    updateEventFilterParams(
+      page.url,
+      { categories: [], statusFilter: false },
+      goto,
+    );
+  };
+
+  const filterActive = $derived(
+    $eventTypeFilter.length < defaultOptions.length,
+  );
 </script>
 
 <MenuContainer {open}>
-  <MenuButton controls="status-menu">
-    <div
-      slot="leading"
-      class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
-      class:bg-interactive={filterActive}
-    >
-      <Icon name="filter" class={filterActive && 'pt-0.5 text-white'} />
-    </div>
+  <MenuButton controls="status-menu" size="sm">
+    {#snippet leading()}
+      <div
+        class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
+        class:bg-interactive={filterActive}
+      >
+        <Icon
+          name="filter"
+          class={filterActive ? 'pt-0.5 text-white' : undefined}
+        />
+      </div>
+    {/snippet}
     <span class="hidden text-sm md:block">{translate('common.filter')}</span>
   </MenuButton>
   <Menu
     id="event-type-menu"
     keepOpen
-    position={minimized ? 'top-right' : 'right'}
+    position="right"
     class="w-[220px] md:w-[360px]"
   >
-    <MenuItem
-      data-testid={translate('common.all')}
-      on:click={() => {
-        $eventTypeFilter = defaultOptions;
-        $eventStatusFilter = false;
-      }}
-    >
-      <Checkbox
-        on:change={() => {
-          $eventTypeFilter = defaultOptions;
-          $eventStatusFilter = false;
-        }}
-        slot="leading"
-        checked={!$eventStatusFilter &&
-          $eventTypeFilter.length === defaultOptions.length}
-        label={translate('common.all')}
-        labelHidden
-      />
+    <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>
+      {#snippet leading()}
+        <Checkbox
+          on:change={onAllClick}
+          checked={!$eventStatusFilter &&
+            $eventTypeFilter.length === defaultOptions.length}
+          label={translate('common.all')}
+          labelHidden
+          class="mt-px"
+        />
+      {/snippet}
       {translate('common.all')}
     </MenuItem>
     {#if $eventViewType !== 'json'}
       <MenuItem
         data-testid={translate('common.pending-and-failed')}
         description={translate('common.pending-and-failed-description')}
-        on:click={() => {
-          $eventTypeFilter = defaultOptions;
-          $eventStatusFilter = !$eventStatusFilter;
-        }}
+        onclick={onPendingClick}
+        class="items-start"
       >
-        <Checkbox
-          on:change={() => {
-            $eventTypeFilter = defaultOptions;
-            $eventStatusFilter = !$eventStatusFilter;
-          }}
-          slot="leading"
-          checked={$eventStatusFilter}
-          label={translate('common.all')}
-          labelHidden
-        />
+        {#snippet leading()}
+          <Checkbox
+            on:change={onPendingClick}
+            checked={$eventStatusFilter}
+            label={translate('common.all')}
+            labelHidden
+            class="mt-px"
+          />
+        {/snippet}
         {translate('common.pending-and-failed')}
       </MenuItem>
     {/if}
-    <MenuItem
-      data-testid={translate('common.none')}
-      on:click={() => {
-        $eventTypeFilter = [];
-        $eventStatusFilter = false;
-      }}
-    >
-      <Checkbox
-        on:change={() => {
-          $eventTypeFilter = [];
-          $eventStatusFilter = false;
-        }}
-        slot="leading"
-        checked={!$eventStatusFilter && !$eventTypeFilter.length}
-        label={translate('common.none')}
-        labelHidden
-      />
+    <MenuItem data-testid={translate('common.none')} onclick={onNoneClick}>
+      {#snippet leading()}
+        <Checkbox
+          on:change={onNoneClick}
+          checked={!$eventStatusFilter && !$eventTypeFilter.length}
+          label={translate('common.none')}
+          labelHidden
+          class="mt-px"
+        />
+      {/snippet}
       {translate('common.none')}
     </MenuItem>
     <MenuDivider />
-    {#each options as option}
+    {#each options as option (option.value)}
       <MenuItem
         data-testid={option.label}
         description={option.description}
-        on:click={() => {
+        onclick={() => {
           onOptionClick(option);
         }}
         class="items-start"
       >
-        <Checkbox
-          on:click={() => onOptionClick(option)}
-          slot="leading"
-          checked={$eventTypeFilter.some((type) => type === option.value)}
-          label={option.label}
-          labelHidden
-        />
+        {#snippet leading()}
+          <Checkbox
+            on:click={() => onOptionClick(option)}
+            checked={$eventTypeFilter.some((type) => type === option.value)}
+            label={option.label}
+            labelHidden
+            class="mt-px"
+          />
+        {/snippet}
         {option.label}
       </MenuItem>
     {/each}

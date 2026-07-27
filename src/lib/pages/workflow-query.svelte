@@ -18,9 +18,9 @@
     getWorkflowMetadata,
     type ParsedQuery,
   } from '$lib/services/query-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { Payloads } from '$lib/types';
+  import type { WorkflowInteractionDefinition } from '$lib/types/workflows';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -41,15 +41,30 @@
   $: edited = initialQueryType !== queryType || input !== initialInput;
 
   $: metadataError = $workflowRun.metadata?.error?.message;
-  $: queryTypes =
+  $: queryTypes = sortByName(
     $workflowRun?.metadata?.definition?.queryDefinitions?.filter((query) => {
       return query?.name !== '__stack_trace';
-    }) || [];
+    }) || [],
+  );
 
   $: queryType = queryType || queryTypes?.[0]?.name;
 
   let queryResult: Promise<ParsedQuery>;
   let encodePayloadResult: Promise<Payloads>;
+
+  const sortByName = (
+    list: WorkflowInteractionDefinition[],
+  ): WorkflowInteractionDefinition[] => {
+    return [...list].sort((a, b) => {
+      const aStartsWithDunder = a.name.startsWith('__');
+      const bStartsWithDunder = b.name.startsWith('__');
+
+      if (aStartsWithDunder && !bStartsWithDunder) return 1;
+      if (!aStartsWithDunder && bStartsWithDunder) return -1;
+
+      return a.name.localeCompare(b.name);
+    });
+  };
 
   onMount(() => {
     if (!$workflowRun.metadata) {
@@ -58,18 +73,13 @@
   });
 
   const fetchCurrentDetails = async () => {
-    const { settings } = $page.data;
-    const metadata = await getWorkflowMetadata(
-      {
-        namespace,
-        workflow: {
-          id: workflowId,
-          runId: runId,
-        },
+    const metadata = await getWorkflowMetadata({
+      namespace,
+      workflow: {
+        id: workflowId,
+        runId: runId,
       },
-      settings,
-      $authUser?.accessToken,
-    );
+    });
     $workflowRun.metadata = metadata;
   };
 
@@ -92,21 +102,17 @@
           })
         : Promise.resolve(null);
       payloads = await encodePayloadResult;
-    } catch (e) {
+    } catch {
       reset();
       return;
     }
 
-    queryResult = getQuery(
-      {
-        namespace,
-        workflow: params,
-        queryType,
-        queryArgs: payloads ? { payloads } : null,
-      },
-      $page.data?.settings,
-      $authUser?.accessToken,
-    ).finally(() => {
+    queryResult = getQuery({
+      namespace,
+      workflow: params,
+      queryType,
+      queryArgs: payloads ? { payloads } : null,
+    }).finally(() => {
       reset();
     });
   };
@@ -139,7 +145,7 @@
             <Option {value} {description}>{value}</Option>
           {/each}
         </Select>
-        <div class="flex flex-col gap-1">
+        <div data-testid="query-input" class="flex flex-col gap-1">
           <PayloadInput bind:input label={translate('workflows.query-arg')} />
         </div>
         <div class="flex w-full flex-wrap items-end justify-end gap-4">
@@ -172,6 +178,7 @@
           <CodeBlock
             {content}
             language={jsonFormatting ? 'json' : 'text'}
+            label={translate('workflows.query-result')}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             testId="query-result"

@@ -1,63 +1,161 @@
 import {
-  formatDistanceToNow,
+  differenceInHours,
   formatDistanceToNowStrict,
   parseISO,
   parseJSON,
 } from 'date-fns';
-import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import {
+  BASE_TIME_FORMAT_OPTIONS,
+  getLocalTime,
   getTimezone,
-  type TimeFormat,
-  TimezoneOptions,
   Timezones,
-} from '$lib/stores/time-format';
+} from '$lib/utilities/timezone';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
-const pattern = 'yyyy-MM-dd z HH:mm:ss.SS';
+export type { ValidTime };
+
+export type HourFormat = 'system' | '12' | '24';
+
+export type FormatDateOptions = {
+  format?: TimestampFormat;
+  relative?: boolean;
+  relativeLabel?: string;
+  flexibleUnits?: boolean;
+  hourFormat?: HourFormat;
+};
+
+export const timestampFormats: Record<
+  string,
+  Partial<Intl.DateTimeFormatOptions>
+> = {
+  short: {
+    year: '2-digit',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    fractionalSecondDigits: 2,
+    timeZoneName: 'short',
+  },
+  medium: {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZoneName: 'short',
+    fractionalSecondDigits: 2,
+  },
+  long: {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZoneName: 'short',
+    fractionalSecondDigits: 2,
+  },
+  iso: {},
+} as const;
+
+export type TimestampFormat = keyof typeof timestampFormats;
+
+const dateTimeFormatters = new Map<string, Intl.DateTimeFormat>();
+
+const getHour12Option = (hourFormat: HourFormat): boolean | undefined => {
+  if (hourFormat === 'system') return undefined;
+  return hourFormat === '12';
+};
+
+const getDateTimeFormatter = (
+  format: TimestampFormat,
+  hourFormat: HourFormat,
+  timeZone?: string,
+): Intl.DateTimeFormat => {
+  const cacheKey = `${timeZone ?? BASE_TIME_FORMAT_OPTIONS.LOCAL}|${format}|${hourFormat}`;
+  const cachedFormatter = dateTimeFormatters.get(cacheKey);
+  if (cachedFormatter) return cachedFormatter;
+
+  const hour12 = getHour12Option(hourFormat);
+  const formatter = new Intl.DateTimeFormat(undefined, {
+    ...timestampFormats[format],
+    ...(hour12 !== undefined && { hour12 }),
+    ...(timeZone && { timeZone }),
+  });
+  dateTimeFormatters.set(cacheKey, formatter);
+  return formatter;
+};
+
+/**
+ * Determines if a given date/time value represents a future moment.
+ * Handles ValidTime types including strings, numbers, Dates, and Timestamp objects.
+ *
+ * @param time - The time value to check (can be a string, Date, or Timestamp)
+ * @returns true if the time is in the future, false otherwise (including null/undefined)
+ */
+export function isFuture(time: ValidTime | undefined | null): boolean {
+  if (!time) return false;
+
+  try {
+    const date = isTimestamp(time) ? timestampToDate(time) : new Date(time);
+    return date > new Date();
+  } catch {
+    return false;
+  }
+}
 
 export function formatDate(
   date: ValidTime | undefined | null,
-  timeFormat: TimeFormat = 'UTC',
-  options: {
-    relative?: boolean;
-    relativeLabel?: string;
-    relativeStrict?: boolean;
-    abbrFormat?: boolean;
-  } = {},
+  timeFormat: string = BASE_TIME_FORMAT_OPTIONS.UTC,
+  options: FormatDateOptions = {},
 ): string {
   if (!date) return '';
-
-  const {
-    relative = false,
-    relativeLabel = 'ago',
-    relativeStrict = false,
-    abbrFormat = false,
-  } = options;
 
   try {
     if (isTimestamp(date)) {
       date = timestampToDate(date);
     }
 
-    const parsed = parseJSON(date);
+    const {
+      relative = false,
+      relativeLabel = isFuture(date) ? 'from now' : 'ago',
+      flexibleUnits = false,
+      format = 'medium',
+      hourFormat = 'system',
+    } = options;
 
-    const format = abbrFormat
-      ? parsed.getSeconds()
-        ? 'yyyy-MM-dd HH:mm:ss a'
-        : 'yyyy-MM-dd HH:mm a'
-      : pattern;
+    const currentDate = Date.now();
 
-    if (timeFormat === 'local') {
-      if (relative)
-        return relativeStrict
-          ? formatDistanceToNowStrict(parsed) + ` ${relativeLabel}`
-          : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
-      return dateTz.format(parsed, format);
+    const parsed = parseJSON(new Date(date));
+
+    // Handle relative time first (takes precedence over format)
+    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL && relative) {
+      return (
+        formatDistanceToNowStrict(parsed, {
+          ...(!flexibleUnits &&
+            Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
+              unit: 'day',
+            }),
+        }) + ` ${relativeLabel}`
+      );
     }
-    const timezone = getTimezone(timeFormat);
-    return dateTz.formatInTimeZone(parsed, timezone, format);
+
+    // Handle ISO format
+    if (format === 'iso') {
+      return parsed.toISOString();
+    }
+
+    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
+      return getDateTimeFormatter(format, hourFormat).format(parsed);
+    }
+
+    const timeZone = getTimezone(timeFormat);
+    return getDateTimeFormatter(format, hourFormat, timeZone).format(parsed);
   } catch (e) {
     console.error('Error formatting date:', e);
     return '';
@@ -82,22 +180,8 @@ export function formatUTCOffset(
   if (offset < 0) return `${utc}-${formattedOffset}`;
 }
 
-export function getLocalTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
-export function getLocalTime(): string {
-  const localTimezone = getLocalTimezone();
-  const localOption = TimezoneOptions.find(
-    ({ zones }) => zones?.includes(localTimezone),
-  );
-  return localOption
-    ? `${localOption.label} (${localOption.abbr})`
-    : localTimezone;
-}
-
-export function getSelectedTimezone(timeFormat: TimeFormat): string {
-  if (timeFormat === 'local') return getLocalTime();
+export function getSelectedTimezone(timeFormat: string): string {
+  if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) return getLocalTime();
 
   const selectedTimezone = Timezones[timeFormat];
   if (selectedTimezone) return `${timeFormat} (${selectedTimezone.abbr})`;

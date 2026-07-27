@@ -1,8 +1,12 @@
 import { BROWSER } from 'esm-env';
 
-import { getAuthUser } from '$lib/stores/auth-user';
 import type { NetworkError } from '$lib/types/global';
 
+import {
+  type RequestContext,
+  runPostResponse,
+  runPreRequest,
+} from './core-provider';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
@@ -38,6 +42,8 @@ type RequestFromAPIOptions = {
   signal?: AbortController['signal'];
 };
 
+export const MAX_QUERY_LENGTH = 15000;
+
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
   (obj as TemporalAPIError)?.message !== undefined &&
   typeof (obj as TemporalAPIError)?.message === 'string';
@@ -67,7 +73,6 @@ export const requestFromAPI = async <T>(
     onError,
     isBrowser = BROWSER,
   } = init;
-  let { options } = init;
 
   let query = new URLSearchParams();
   if (params?.entries) {
@@ -75,23 +80,63 @@ export const requestFromAPI = async <T>(
     if (token) query.set('nextPageToken', token);
   } else {
     const nextPageToken = token ? { next_page_token: token } : {};
-    query = new URLSearchParams({
-      ...params,
-      ...nextPageToken,
-    });
+    const paramsWithoutUndefined = Object.fromEntries(
+      Object.entries({ ...params, ...nextPageToken }).filter(
+        ([_, v]) => v !== undefined,
+      ),
+    ) as Record<string, string>;
+    query = new URLSearchParams(paramsWithoutUndefined);
   }
   const url = toURL(endpoint, query);
 
   try {
-    options = withSecurityOptions(options, isBrowser);
-    if (!endpoint.endsWith('api/v1/settings')) {
-      options = await withAuth(options, isBrowser);
+    const baseOptions: RequestInit = {
+      ...init.options,
+      headers: withCallerType(init.options?.headers),
+    };
+
+    const queryIsTooLong = [...query.values()].some(
+      (value) => value.length > MAX_QUERY_LENGTH,
+    );
+
+    const executeRequest = async (ctx: {
+      url: string;
+      options: RequestInit;
+    }) =>
+      queryIsTooLong
+        ? new Response(
+            JSON.stringify({ message: 'Query string is too long' }),
+            { status: 414, statusText: 'URI Too Long' },
+          )
+        : await request(ctx.url, ctx.options);
+
+    let context = { url, options: baseOptions };
+
+    if (isBrowser) {
+      context = await runPreRequest(context);
     }
 
-    const response = await request(url, options);
-    const body = await response.json();
+    let response = await executeRequest(context);
+
+    if (isBrowser) {
+      response = await runPostResponse(response, {
+        ...context,
+        retry: async () => {
+          let retryContext: RequestContext = {
+            url,
+            options: {
+              ...init.options,
+              headers: withCallerType(init.options?.headers),
+            },
+          };
+          retryContext = await runPreRequest(retryContext);
+          return executeRequest(retryContext);
+        },
+      });
+    }
 
     const { status, statusText } = response;
+    const body = await response.json();
 
     if (!response.ok) {
       if (onError && isFunction(onError)) {
@@ -116,96 +161,10 @@ export const requestFromAPI = async <T>(
   }
 };
 
-const withSecurityOptions = (
-  options: RequestInit,
-  isBrowser = BROWSER,
-): RequestInit => {
-  const opts: RequestInit = { credentials: 'include', ...options };
-  opts.headers = withCsrf(options?.headers, isBrowser);
-  return opts;
-};
-
-const withAuth = async (
-  options: RequestInit,
-  isBrowser = BROWSER,
-): Promise<RequestInit> => {
-  if (globalThis?.AccessToken) {
-    options.headers = await withBearerToken(
-      options?.headers,
-      globalThis.AccessToken,
-      isBrowser,
-    );
-  } else if (getAuthUser().accessToken) {
-    options.headers = await withBearerToken(
-      options?.headers,
-      async () => getAuthUser().accessToken,
-      isBrowser,
-    );
-    options.headers = withIdToken(
-      options?.headers,
-      getAuthUser().idToken,
-      isBrowser,
-    );
-  }
-
-  return options;
-};
-
-const withBearerToken = async (
-  headers: HeadersInit,
-  accessToken: () => Promise<string>,
-  isBrowser = BROWSER,
-): Promise<HeadersInit> => {
-  // At this point in the code path, headers will always be set.
-  /* c8 ignore next */
-  if (!headers) headers = {};
-  if (!isBrowser) return headers;
-
-  try {
-    const token = await accessToken();
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    /* c8 ignore next 4 */
-  } catch (e) {
-    console.error(e);
-  }
-
-  return headers;
-};
-
-const withIdToken = (
-  headers: HeadersInit = {},
-  idToken: string,
-  isBrowser = BROWSER,
-): HeadersInit => {
-  if (!isBrowser) return headers;
-
-  if (idToken) {
-    headers['Authorization-Extras'] = idToken;
-  }
-
-  return headers;
-};
-
-const withCsrf = (headers: HeadersInit, isBrowser = BROWSER): HeadersInit => {
-  if (!headers) headers = {};
-  headers['Caller-Type'] = 'operator';
-  if (!isBrowser) return headers;
-
-  const csrfCookie = '_csrf=';
-  const csrfHeader = 'X-CSRF-TOKEN';
-  try {
-    const cookies = document.cookie.split(';');
-    let csrf = cookies.find((c) => c.includes(csrfCookie));
-    if (csrf && !headers[csrfHeader]) {
-      csrf = csrf.trim().slice(csrfCookie.length);
-      headers[csrfHeader] = csrf;
-    }
-    /* c8 ignore next 4 */
-  } catch (error) {
-    console.error(error);
-  }
-
-  return headers;
+const withCallerType = (
+  headers: HeadersInit | undefined,
+): Record<string, string> => {
+  const h: Record<string, string> = (headers as Record<string, string>) ?? {};
+  h['Caller-Type'] = 'operator';
+  return h;
 };

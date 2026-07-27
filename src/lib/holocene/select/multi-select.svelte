@@ -1,3 +1,8 @@
+<script module lang="ts">
+  type Option = { label: string; value: string; icon?: IconName };
+  export type MultiSelectOptions = Option[];
+</script>
+
 <script lang="ts">
   import { writable } from 'svelte/store';
 
@@ -14,28 +19,46 @@
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
 
-  type Option = { label: string; value: string; icon?: IconName };
-  type MultiSelectOptions = Option[];
+  interface Props {
+    options?: MultiSelectOptions;
+    initialSelected?: MultiSelectOptions;
+    onChange: (options: MultiSelectOptions) => void;
+    label: string;
+    id: string;
+    variant?: ButtonStyles['variant'];
+    icon?: IconName | undefined;
+    selectAllLabel: string;
+    clearAllLabel: string;
+    active?: boolean;
+    disabled?: boolean;
+    position?: 'left' | 'right';
+    initialSelectedAll?: boolean;
+  }
 
-  export let options: MultiSelectOptions = [];
-  export let initialSelected: MultiSelectOptions = [];
-  export let onChange: (options: MultiSelectOptions) => void;
-  export let label: string;
-  export let id: string;
-  export let variant: ButtonStyles['variant'] = 'secondary';
-  export let icon: IconName | undefined = undefined;
-  export let selectAllLabel: string;
-  export let clearAllLabel: string;
-  export let active = false;
-  export let disabled = false;
-  export let position: 'left' | 'right' = 'left';
-  export let initialSelectedAll = true;
+  let {
+    options = [],
+    initialSelected = [],
+    onChange,
+    label,
+    id,
+    variant = 'secondary',
+    icon = undefined,
+    selectAllLabel,
+    clearAllLabel,
+    active = false,
+    disabled = false,
+    position = 'left',
+    initialSelectedAll = true,
+  }: Props = $props();
 
-  let selectedOptions = initialSelected.length
-    ? initialSelected
-    : initialSelectedAll
-    ? options
-    : [];
+  // svelte-ignore state_referenced_locally
+  let selectedOptions = $state(
+    initialSelected.length
+      ? initialSelected
+      : initialSelectedAll
+        ? options
+        : [],
+  );
 
   const open = writable(false);
 
@@ -61,7 +84,16 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton hasIndicator controls={id} {variant} {active} {disabled}>
+  <MenuButton
+    hasIndicator
+    controls={id}
+    {variant}
+    {active}
+    {disabled}
+    data-track-name="multi-select"
+    data-track-intent="select"
+    data-track-text={label}
+  >
     {#if icon}<Icon class="md:hidden" name={icon} />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>
@@ -72,20 +104,21 @@
       )}
       <MenuItem
         data-testid={option.label}
-        on:click={() => {
+        onclick={() => {
           onOptionClick(option);
         }}
       >
-        <Checkbox
-          on:click={() => onOptionClick(option)}
-          slot="leading"
-          {checked}
-          label={option.label}
-          labelHidden
-        />
+        {#snippet leading()}
+          <Checkbox
+            on:click={() => onOptionClick(option)}
+            {checked}
+            label={option.label}
+            labelHidden
+          />
+        {/snippet}
         <div class="flex items-center gap-2">
           {#if option.icon}
-            <Icon slot="trailing" name={option.icon} />
+            <Icon name={option.icon} />
           {/if}
           {option.label}
         </div>
@@ -94,13 +127,13 @@
     <MenuDivider />
     <MenuItem
       data-testid="multiselect-select-all"
-      on:click={onSelectAllOptionClick}
+      onclick={onSelectAllOptionClick}
     >
       {selectAllLabel}
     </MenuItem>
     <MenuItem
       data-testid="multiselect-remove-all"
-      on:click={onRemoveAllOptionClick}
+      onclick={onRemoveAllOptionClick}
     >
       {clearAllLabel}
     </MenuItem>

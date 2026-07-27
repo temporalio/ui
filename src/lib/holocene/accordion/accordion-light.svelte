@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import { v4 } from 'uuid';
-
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
@@ -16,7 +14,7 @@
     'data-testid'?: string;
   }
 
-  export let id: string = v4();
+  export let id: string = crypto.randomUUID();
   export let open = false;
   export let onToggle = undefined;
   export let icon: IconName | undefined = undefined;
@@ -32,23 +30,25 @@
 </script>
 
 <div class="w-full {$$restProps.class}">
-  <button
-    id="{id}-trigger"
-    aria-expanded={open}
-    aria-controls="{id}-content"
-    class="focus-visible:outline-interactive w-full cursor-pointer hover:bg-interactive-secondary-hover"
-    type="button"
-    on:click={toggleAccordion}
-  >
-    <div class="flex w-full flex-row items-center justify-between gap-2 pr-4">
-      <slot name="title" />
-      <slot name="description" />
-      <div class="flex items-center gap-4">
-        <slot name="action" />
+  <div class="flex w-full flex-row items-center">
+    <button
+      id="{id}-trigger"
+      aria-expanded={open}
+      aria-controls="{id}-content"
+      class="focus-visible:outline-interactive grow cursor-pointer hover:bg-interactive-secondary-hover"
+      type="button"
+      on:click={toggleAccordion}
+    >
+      <div class="flex w-full flex-row items-center justify-between gap-2 pr-4">
+        <slot name="title" />
+        <slot name="description" />
         <Icon name={icon ? icon : open ? 'arrow-down' : 'arrow-right'} />
       </div>
+    </button>
+    <div class="flex shrink-0 items-center gap-4 pr-4">
+      <slot name="action" />
     </div>
-  </button>
+  </div>
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"

@@ -1,83 +1,108 @@
 <script lang="ts">
+  import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let isRootWorkflow = false;
-  export let isActive = false;
+  import { showFullTree } from '../workflow-relationships.svelte';
 
-  $: elapsedTime = formatDistanceAbbreviated({
-    start: workflow?.startTime,
-    end: workflow?.endTime || Date.now(),
-    includeMilliseconds: true,
-  });
+  type Props = {
+    workflow: WorkflowExecution;
+    namespace: string;
+    isRootWorkflow?: boolean;
+    isActive?: boolean;
+    childrenCount?: number;
+    expanded?: boolean;
+  };
+
+  let {
+    workflow,
+    namespace,
+    isRootWorkflow = false,
+    isActive = false,
+    childrenCount = 0,
+    expanded = false,
+  }: Props = $props();
+
+  const elapsedTime = $derived(
+    formatDistanceAbbreviated({
+      start: workflow?.startTime,
+      end: workflow?.endTime || Date.now(),
+      includeMilliseconds: true,
+    }),
+  );
+
+  const showExpandIcon = $derived(
+    !isRootWorkflow && $showFullTree && childrenCount,
+  );
 </script>
 
 <div
-  class="flex w-full flex-col gap-2 p-1 text-left text-sm lg:flex-row lg:items-center"
+  class="flex w-full items-center justify-between gap-2 p-1 text-left text-sm lg:gap-4"
 >
-  <div class="flex items-center gap-2 lg:basis-96">
-    <div class="w-32 leading-4">
-      <WorkflowStatus status={workflow.status} />
+  <div class="flex w-full flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+    <div class="flex items-center gap-2 lg:basis-96">
+      <div class="w-32 leading-4">
+        <WorkflowStatus status={workflow.status} />
+      </div>
+      <div class="w-full leading-4">
+        {#if isRootWorkflow}
+          <p class="text-xs">{translate('common.type')}</p>
+        {/if}
+        <p>{workflow.name}</p>
+      </div>
     </div>
-    <div class="w-full leading-4">
+    <div class="leading-4 lg:basis-[800px]">
       {#if isRootWorkflow}
-        <p class="font-mono text-xs">{translate('common.type')}</p>
+        <p class="text-xs">{translate('common.id')}</p>
       {/if}
-      <p>{workflow.name}</p>
-    </div>
-  </div>
-  <div class="leading-4 lg:basis-[800px]">
-    {#if isRootWorkflow}
-      <p class="font-mono text-xs">{translate('common.id')}</p>
-    {/if}
-    <Link
-      href={routeForEventHistory({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-      })}
-      interactive={isActive}
-    >
-      {workflow.id}
-    </Link>
-  </div>
-  <div class="hidden items-center gap-4 lg:flex lg:basis-5/12">
-    <div class="leading-4">
-      {#if isRootWorkflow}
-        <p class="font-mono text-xs">
-          {translate('common.start')}
-        </p>
-      {/if}
-      <p>
-        {formatDate(workflow?.startTime, $timeFormat, {
-          relative: $relativeTime,
+      <Link
+        href={routeForWorkflow({
+          namespace,
+          workflow: workflow.id,
+          run: workflow.runId,
         })}
-      </p>
+        interactive={isActive}
+      >
+        {workflow.id}
+      </Link>
     </div>
-    <div class="leading-4">
-      {#if isRootWorkflow}
-        <p class="min-w-12 font-mono text-xs">{translate('common.end')}</p>
-      {/if}
-      <p>
-        {formatDate(workflow?.endTime, $timeFormat, {
-          relative: $relativeTime,
-        }) || '-'}
-      </p>
-    </div>
-    <div class="leading-4">
-      {#if isRootWorkflow}
-        <Icon name="clock" class="h-4 w-3" />
-      {/if}
-      <p>{elapsedTime}</p>
+    {#if $showFullTree}
+      <div class="text-left leading-4 lg:basis-[140px] lg:text-right">
+        {#if isRootWorkflow}
+          <p class="text-xs">{translate('common.child-count')}</p>
+        {/if}
+        <div class="flex basis-16 items-center gap-1 leading-4 lg:justify-end">
+          <span class="font-mono">{childrenCount}</span>
+        </div>
+      </div>
+    {/if}
+    <div class="hidden items-center gap-4 lg:flex lg:basis-5/12">
+      <div class="leading-4">
+        {#if isRootWorkflow}
+          <p class="text-xs">{translate('common.start')}</p>
+        {/if}
+        <Timestamp as="p" dateTime={workflow?.startTime} />
+      </div>
+      <div class="leading-4">
+        {#if isRootWorkflow}
+          <p class="text-xs">{translate('common.end')}</p>
+        {/if}
+        <Timestamp as="p" dateTime={workflow?.endTime} fallback="-" />
+      </div>
+      <div class="leading-4">
+        {#if isRootWorkflow}
+          <p class="text-xs">{translate('common.duration')}</p>
+        {/if}
+        <p>{elapsedTime}</p>
+      </div>
     </div>
   </div>
+  {#if showExpandIcon}
+    <Icon class="shrink-0" name={expanded ? 'hyphen' : 'add'} />
+  {/if}
 </div>

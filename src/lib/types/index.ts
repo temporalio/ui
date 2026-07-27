@@ -14,8 +14,12 @@ export type GetSystemInfoResponse =
   temporal.api.workflowservice.v1.IGetSystemInfoResponse;
 export type Capabilities =
   temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
-    nexus?: boolean;
+    serverScaledDeployments?: boolean | null;
+    serverScaledProviderCloudRun?: boolean | null;
   };
+
+export type NamespaceCapabilities =
+  DescribeNamespaceResponse['namespaceInfo']['capabilities'];
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
@@ -35,13 +39,40 @@ export type UpdateScheduleRequest =
   temporal.api.workflowservice.v1.IUpdateScheduleRequest;
 export type StartBatchOperationRequest =
   temporal.api.workflowservice.v1.IStartBatchOperationRequest;
+export type CancelWorkflowRequest =
+  temporal.api.workflowservice.v1.IRequestCancelWorkflowExecutionRequest;
 export type ResetWorkflowRequest =
   temporal.api.workflowservice.v1.IResetWorkflowExecutionRequest;
 export type UpdateWorkflowRequest =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionRequest;
 export type UpdateWorkflowResponse =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionResponse;
-
+export type PendingWorkflowTaskInfo =
+  temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
+export type WorkflowExtendedInfo =
+  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo;
+export type PauseWorkflowRequest =
+  temporal.api.workflowservice.v1.IPauseWorkflowExecutionRequest;
+export type UnpauseWorkflowRequest =
+  temporal.api.workflowservice.v1.IUnpauseWorkflowExecutionRequest;
+export type ListTaskQueuePartitionsRequest =
+  temporal.api.workflowservice.v1.IListTaskQueuePartitionsRequest;
+export type ListWorkersRequest =
+  temporal.api.workflowservice.v1.IListWorkersRequest;
+export type ListWorkersResponse =
+  temporal.api.workflowservice.v1.IListWorkersResponse & {
+    workers?: WorkerListInfo[];
+  };
+export type DescribeWorkerRequest =
+  temporal.api.workflowservice.v1.IDescribeWorkerRequest;
+export type DescribeWorkerResponse =
+  temporal.api.workflowservice.v1.IDescribeWorkerResponse;
+export type StartNexusOperationExecutionRequest =
+  temporal.api.workflowservice.v1.IStartNexusOperationExecutionRequest;
+export type StartNexusOperationExecutionResponse =
+  temporal.api.workflowservice.v1.IStartNexusOperationExecutionResponse;
+export type DescribeNexusOperationResponse =
+  temporal.api.workflowservice.v1.IDescribeNexusOperationExecutionResponse;
 // api.history
 
 export type History = temporal.api.history.v1.IHistory;
@@ -136,6 +167,24 @@ export type ActivityTaskCompletedByIdRequest =
   temporal.api.workflowservice.v1.IRespondActivityTaskCompletedRequest;
 export type ActivityTaskCompletedByIdResponse =
   temporal.api.workflowservice.v1.IRespondActivityTaskCompletedResponse;
+export type ActivityPauseRequest =
+  temporal.api.workflowservice.v1.IPauseActivityRequest;
+export type ActivityPauseResponse =
+  temporal.api.workflowservice.v1.IPauseActivityResponse;
+export type ActivityUnpauseRequest =
+  temporal.api.workflowservice.v1.IUnpauseActivityRequest;
+export type ActivityUnpauseResponse =
+  temporal.api.workflowservice.v1.IUnpauseActivityResponse;
+export type ActivityResetRequest =
+  temporal.api.workflowservice.v1.IResetActivityRequest;
+export type ActivityResetResponse =
+  temporal.api.workflowservice.v1.IResetActivityResponse;
+export type ActivityUpdateOptionsRequest =
+  temporal.api.workflowservice.v1.IUpdateActivityOptionsRequest;
+export type ActivityUpdateOptionsResponse =
+  temporal.api.workflowservice.v1.IUpdateActivityOptionsResponse;
+export type ActivityOptions = temporal.api.activity.v1.IActivityOptions;
+
 export type WorkflowPropertiesModifiedEventAttributes =
   temporal.api.history.v1.IWorkflowPropertiesModifiedEventAttributes;
 
@@ -149,9 +198,16 @@ export type NamespaceState = temporal.api.enums.v1.NamespaceState;
 export type TaskReachability = temporal.api.enums.v1.TaskReachability;
 export type PendingNexusOperationState =
   temporal.api.enums.v1.PendingNexusOperationState;
+export type NexusOperationCancellationState =
+  temporal.api.enums.v1.NexusOperationCancellationState;
 export type CallbackState = temporal.api.enums.v1.CallbackState;
-export type PendingWorkflowTaskInfo =
-  temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
+export type VersioningBehavior = temporal.api.enums.v1.VersioningBehavior;
+export type EventType = temporal.api.enums.v1.EventType;
+export type WorkerStatus = temporal.api.enums.v1.WorkerStatus;
+export type NexusOperationIdConflictPolicy =
+  keyof typeof temporal.api.enums.v1.NexusOperationIdConflictPolicy;
+export type NexusOperationIdReusePolicy =
+  keyof typeof temporal.api.enums.v1.NexusOperationIdReusePolicy;
 
 // temporal.api.enums.v1.ResetReapplyExcludeType
 export enum ResetReapplyExcludeType {
@@ -176,6 +232,7 @@ export type PendingChildrenInfo =
 export type PendingNexusInfo =
   temporal.api.workflow.v1.IPendingNexusOperationInfo;
 export type CallbackInfo = temporal.api.workflow.v1.ICallbackInfo;
+export type Callback = temporal.api.common.v1.ICallback;
 export type WorkflowExecutionConfig =
   temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =
@@ -183,6 +240,7 @@ export type WorkflowExecutionInfo =
 export type WorkflowVersionTimpstamp =
   temporal.api.common.v1.IWorkerVersionStamp;
 export type SearchAttribute = temporal.api.common.v1.ISearchAttributes;
+export type Priority = temporal.api.common.v1.IPriority;
 
 // api response
 export type Payload = temporal.api.common.v1.IPayload;
@@ -190,9 +248,16 @@ export type Payloads = temporal.api.common.v1.IPayloads;
 export type WorkflowExecutionInput = temporal.api.common.v1.IWorkflowExecution;
 export type Memo = temporal.api.common.v1.IMemo;
 export type Header = temporal.api.common.v1.IHeader;
+export type ActivityType = temporal.api.common.v1.IActivityType;
+export type RetryPolicy = temporal.api.common.v1.IRetryPolicy;
 
 // api.taskqueue
 
+export type TaskQueue = temporal.api.taskqueue.v1.ITaskQueue;
+export type TaskQueueRequest =
+  temporal.api.workflowservice.v1.IDescribeTaskQueueRequest;
+export type TaskQueueResponse =
+  temporal.api.workflowservice.v1.IDescribeTaskQueueResponse;
 export type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
 export type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
 export type TaskQueueCompatibleVersionSet =
@@ -231,22 +296,53 @@ export type BatchTerminateOperation =
 // api.nexus
 export type Endpoint = temporal.api.nexus.v1.IEndpoint;
 export type EndpointSpec = temporal.api.nexus.v1.IEndpointSpec;
+export type EventLink = temporal.api.common.v1.ILink;
 
 // api.failure
 export type Failure = temporal.api.failure.v1.IFailure;
 
+// api.worker
+export type WorkerHostInfo = temporal.api.worker.v1.IWorkerHostInfo & {
+  workerGroupingKey?: string;
+};
+export type WorkerHeartbeat = temporal.api.worker.v1.IWorkerHeartbeat;
+export type WorkerPollerInfo = temporal.api.worker.v1.IWorkerPollerInfo;
+export type WorkerSlotsInfo = temporal.api.worker.v1.IWorkerSlotsInfo;
+export type WorkerInfo = temporal.api.worker.v1.IWorkerInfo;
+export type WorkerListInfo = {
+  workerInstanceKey?: string | null;
+  workerIdentity?: string | null;
+  taskQueue?: string | null;
+  deploymentVersion?: temporal.api.deployment.v1.IWorkerDeploymentVersion | null;
+  sdkName?: string | null;
+  sdkVersion?: string | null;
+  status?: temporal.api.enums.v1.WorkerStatus | null;
+  startTime?: google.protobuf.ITimestamp | null;
+  hostName?: string | null;
+  workerGroupingKey?: string | null;
+  processId?: string | null;
+  plugins?: temporal.api.worker.v1.IPluginInfo[] | null;
+};
+export type PluginInfo = temporal.api.worker.v1.PluginInfo;
+
 // google
 
 export type Timestamp = google.protobuf.ITimestamp;
+export type Duration = google.protobuf.IDuration;
 
 // extra APIs
 export type SettingsResponse = {
-  Auth: { Enabled: boolean; Options: string[] };
-  BannerText: string;
+  Auth: {
+    Enabled: boolean;
+    Options: string[] | null;
+    RedirectToProvider?: boolean;
+  };
   Codec: {
     Endpoint: string;
     PassAccessToken?: boolean;
     IncludeCredentials?: boolean;
+    DefaultErrorMessage?: string;
+    DefaultErrorLink?: string;
   };
   DefaultNamespace: string;
   DisableWriteActions: boolean;
@@ -255,12 +351,17 @@ export type SettingsResponse = {
   WorkflowSignalDisabled: boolean;
   WorkflowUpdateDisabled: boolean;
   WorkflowResetDisabled: boolean;
+  WorkflowPauseDisabled: boolean;
   BatchActionsDisabled: boolean;
   StartWorkflowDisabled: boolean;
   HideWorkflowQueryErrors: boolean;
   RefreshWorkflowCountsDisabled: boolean;
+  ActivityCommandsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
-  NotifyOnNewVersion: boolean;
+  NavCollapsedByDefault: boolean;
   FeedbackURL: string;
+  DisableNewsFetch: boolean;
   Version: string;
 };
+
+export type UserMetadata = temporal.api.sdk.v1.IUserMetadata;

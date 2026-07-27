@@ -7,27 +7,35 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
   import { resetWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { temporalVersion } from '$lib/stores/versions';
+  import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let refresh: Writable<number>;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+  }
 
-  let error = '';
-  let loading = false;
+  let { open = $bindable(), workflow, namespace }: Props = $props();
+
+  let error = $state('');
+  let loading = $state(false);
   let eventId: Writable<string> = writable('');
-  let reason: string;
-  let includeSignals = true;
-  let excludeSignals = false;
-  let excludeUpdates = false;
+  let reason = $state('');
+  let includeSignals = $state(true);
+  let excludeSignals = $state(false);
+  let excludeUpdates = $state(false);
+
+  const identity = getIdentity();
 
   const hideResetModal = () => {
     open = false;
@@ -50,6 +58,7 @@
         includeSignals,
         excludeSignals,
         excludeUpdates,
+        identity,
       });
 
       if (response && response.runId) {
@@ -58,7 +67,7 @@
           [workflow.runId]: response.runId,
         }));
       }
-      $refresh = Date.now();
+      triggerRefresh(Action.Reset);
       hideResetModal();
     } catch (err) {
       error = isNetworkError(err)
@@ -67,7 +76,6 @@
     } finally {
       loading = false;
     }
-    hideResetModal();
   };
 </script>
 
@@ -92,8 +100,9 @@
         label={translate('workflows.reset-event-radio-group-description')}
         bind:value={$eventId}
         id="reset-event-id"
+        required
       >
-        {#each $resetEvents as event}
+        {#each $resetEvents as event (event.eventId)}
           <Option value={event.id}>{event.id} - {event.eventType}</Option>
         {/each}
       </Select>
@@ -122,7 +131,8 @@
       <Input
         id="reset-reason"
         bind:value={reason}
-        label={translate('common.reason')}
+        label={translate('common.reason-optional')}
+        placeholder={translate('common.reason-placeholder')}
       />
     </div>
   </svelte:fragment>

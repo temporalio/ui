@@ -1,69 +1,21 @@
+<svelte:options runes />
+
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
+  import ScheduleFormView from '$lib/components/schedule/schedule-form/form.svelte';
+  import type { FormScheduleSchema } from '$lib/components/schedule/schema/form';
   import { submitCreateSchedule } from '$lib/stores/schedules';
-  import type {
-    ScheduleActionParameters,
-    ScheduleParameters,
-    SchedulePreset,
-    SchedulePresetsParameters,
-    ScheduleSpecParameters,
-  } from '$lib/types/schedule';
+  import { getIdentity } from '$lib/utilities/core-context';
 
-  let { namespace } = $page.params;
+  const identity = getIdentity();
 
-  const handleCreate = (
-    preset: SchedulePreset,
-    args: Partial<ScheduleParameters>,
-  ) => {
-    const {
-      name,
-      workflowType,
-      workflowId,
-      taskQueue,
-      input,
-      encoding,
-      messageType,
-      hour,
-      minute,
-      second,
-      phase,
-      cronString,
-      daysOfWeek,
-      daysOfMonth,
-      days,
-      months,
-      searchAttributes,
-    } = args;
-
-    const action: ScheduleActionParameters = {
-      namespace,
-      name,
-      workflowType,
-      workflowId,
-      taskQueue,
-      input,
-      encoding,
-      messageType,
-      searchAttributes,
-    };
-    const spec: Partial<ScheduleSpecParameters> = {
-      hour,
-      minute,
-      second,
-      phase,
-      cronString,
-    };
-    const presets: SchedulePresetsParameters = {
-      preset,
-      daysOfWeek,
-      daysOfMonth,
-      months,
-      days,
-    };
-    submitCreateSchedule({ action, spec, presets });
+  const handleCreate = async (formData: FormScheduleSchema) => {
+    await submitCreateSchedule(formData, {
+      namespace: page.params.namespace,
+      identity,
+    });
   };
 </script>
 
-<ScheduleFormView onConfirm={handleCreate} />
+<ScheduleFormView onSubmit={handleCreate} />

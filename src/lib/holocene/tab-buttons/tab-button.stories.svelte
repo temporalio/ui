@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
   import { expect, userEvent, within } from '@storybook/test';
 
@@ -67,7 +69,7 @@
 
 <Template let:args>
   <TabButtons>
-    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index}
+    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index (name)}
       <TabButton
         {...args}
         data-testid={`toggle-button-${index}`}

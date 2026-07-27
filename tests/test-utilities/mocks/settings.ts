@@ -8,12 +8,11 @@ const defaultSettings = {
   Auth: {
     Enabled: false,
     Options: null,
+    RedirectToProvider: false,
   },
-  BannerText: '',
   DefaultNamespace: '',
   ShowTemporalSystemNamespace: false,
   FeedbackURL: '',
-  NotifyOnNewVersion: false,
   Codec: {
     Endpoint: '',
     PassAccessToken: false,
@@ -25,10 +24,13 @@ const defaultSettings = {
   WorkflowCancelDisabled: false,
   WorkflowSignalDisabled: false,
   WorkflowResetDisabled: false,
+  WorkflowPauseDisabled: false,
   StartWorkflowDisabled: true,
   BatchActionsDisabled: false,
   HideWorkflowQueryErrors: false,
   RefreshWorkflowCountsDisabled: false,
+  ActivityCommandsDisabled: false,
+  NavCollapsedByDefault: false,
 };
 
 export const mockSettingsApi = async (

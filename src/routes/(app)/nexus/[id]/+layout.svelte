@@ -1,12 +1,17 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { LayoutData } from './$types';
 
   import Error from '$lib/holocene/error.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let data: LayoutData;
-
-  $: ({ endpoint } = data);
+  interface Props {
+    data: LayoutData;
+    children: Snippet;
+  }
+  let { data, children }: Props = $props();
+  let { endpoint } = $derived(data);
 </script>
 
 {#if !endpoint}
@@ -18,5 +23,5 @@
     status={404}
   />
 {:else}
-  <slot />
+  {@render children()}
 {/if}

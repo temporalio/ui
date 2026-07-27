@@ -1,16 +1,11 @@
 <script lang="ts">
-  import type {
-    EventGroup,
-    EventGroups,
-  } from '$lib/models/event-groups/event-groups';
+  import { timestamp } from '$lib/components/timestamp.svelte';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, activeGroups } from '$lib/stores/active-events';
-  import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
-  import { timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { formatDate } from '$lib/utilities/format-date';
+  import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
   import { TimelineConfig } from '../constants';
@@ -22,57 +17,96 @@
   import TimelineGraphRow from './timeline-graph-row.svelte';
   import WorkflowRow from './workflow-row.svelte';
 
-  export let x = 0;
-  export let y = 0;
-  export let workflow: WorkflowExecution;
-  export let groups: EventGroups;
-  export let viewportHeight: number | undefined;
-  export let readOnly = false;
-  export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
-    undefined;
+  interface Props {
+    x?: number;
+    y?: number;
+    workflow: WorkflowExecution;
+    groups: EventGroups;
+    viewportHeight: number | undefined;
+    readOnly?: boolean;
+    error?: boolean;
+  }
+
+  let {
+    x = 0,
+    y = 0,
+    workflow,
+    groups,
+    viewportHeight,
+    readOnly = false,
+    error = false,
+  }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
 
-  let canvasWidth = 0;
-  let scrollY = 0;
+  let canvasWidth = $state(0);
+  let scrollY = $state(0);
 
-  $: expandedGroupHeight = readOnly ? 0 : $activeGroupHeight;
-  $: filteredGroups = getFailedOrPendingGroups(groups, $eventStatusFilter);
-  $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
-  $: timelineHeight =
-    Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight;
-  $: canvasHeight = timelineHeight + 120;
+  const expandedGroupHeight = $derived(readOnly ? 0 : $activeGroupHeight);
+  const filteredGroups = $derived(
+    getFailedOrPendingGroups(groups, $eventStatusFilter),
+  );
+  const firstStartTime = $derived.by(() => {
+    const firstEventTime = $fullEventHistory[0]?.eventTime;
 
-  const handleScroll = (e) => {
-    scrollY = e?.target?.scrollTop;
+    if (!firstEventTime) {
+      return workflow.executionTime;
+    }
+
+    return firstEventTime < workflow.executionTime
+      ? firstEventTime
+      : workflow.executionTime;
+  });
+
+  const startTime = $derived(
+    (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime,
+  );
+  const timelineHeight = $derived(
+    Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight,
+  );
+  const canvasHeight = $derived(timelineHeight + 120);
+
+  const handleScroll = (e: Event) => {
+    scrollY = (e?.target as HTMLElement)?.scrollTop;
   };
 
-  $: activeGroupsHeightAboveGroup = (group: EventGroup) => {
-    const activeGroupIsAbove = $activeGroups?.filter((id) => {
-      if ($eventFilterSort === 'ascending')
-        return parseInt(id) < parseInt(group.id);
-      return parseInt(id) > parseInt(group.id);
-    });
+  const groupIndexMap = $derived(
+    new Map(filteredGroups.map((g, i) => [g.id, i])),
+  );
 
-    if (!activeGroupIsAbove?.length) return 0;
-    return expandedGroupHeight;
+  const activeGroupsHeightAboveGroup = (groupIndex: number) => {
+    const hasActiveAbove = $activeGroups?.some((id) => {
+      const activeIndex = groupIndexMap.get(id);
+      return activeIndex !== undefined && activeIndex < groupIndex;
+    });
+    return hasActiveAbove ? expandedGroupHeight : 0;
   };
 </script>
 
 <div
-  class="relative h-auto overflow-auto border-b border-subtle"
+  id="event-history-timeline-graph"
+  class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary [scrollbar-gutter:stable]"
   bind:clientWidth={canvasWidth}
   style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
-  on:scroll={handleScroll}
+  onscroll={handleScroll}
 >
-  <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
-    <div class="sticky top-[120px]" class:invisible={!!$activeGroups.length}>
+  <EndTimeInterval
+    {workflow}
+    {startTime}
+    let:endTime
+    let:duration
+    let:currentTime
+  >
+    <div
+      class="pointer-events-none sticky top-[120px]"
+      class:invisible={!!$activeGroups.length}
+    >
       <div class="flex w-full justify-between text-xs">
         <p class="w-60 -translate-x-24 rotate-90">
-          {formatDate(startTime, $timeFormat)}
+          {$timestamp(startTime, { format: 'short' })}
         </p>
         <p class="w-60 translate-x-24 rotate-90">
-          {formatDate(endTime, $timeFormat)}
+          {$timestamp(endTime, { format: 'short' })}
         </p>
       </div>
     </div>
@@ -83,7 +117,7 @@
       height={canvasHeight}
       width={canvasWidth}
       class="-mt-4"
-      class:error={workflowTaskFailedError}
+      class:error
     >
       <Line
         startPoint={[gutter, 0]}
@@ -100,17 +134,16 @@
         x2={canvasWidth - gutter + radius / 4}
         {timelineHeight}
         {startTime}
-        {duration}
+        duration={duration ?? 0}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
       {#each filteredGroups as group, index (group.id)}
-        {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(group)}
+        {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(index)}
         {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
           {#key group.eventList.length}
             <TimelineGraphRow
               {y}
               {group}
-              activeGroups={$activeGroups}
               {canvasWidth}
               {startTime}
               {endTime}
@@ -118,8 +151,13 @@
             />
           {/key}
         {/if}
-        {#if $activeGroups.includes(group.id)}
-          <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
+        {#if !readOnly && $activeGroups.includes(group.id)}
+          <GroupDetailsRow
+            y={y + 1.33 * radius}
+            {group}
+            {canvasWidth}
+            endTime={workflow?.endTime ? endTime : currentTime}
+          />
         {/if}
       {/each}
     </svg>

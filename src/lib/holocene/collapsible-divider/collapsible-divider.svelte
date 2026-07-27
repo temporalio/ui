@@ -8,6 +8,7 @@
   type $$Props = HTMLAttributes<HTMLDivElement> & {
     label: string;
     open?: boolean;
+    class?: string;
   };
 
   let className: string | undefined = undefined;
@@ -26,7 +27,7 @@
   )}
   {...$$restProps}
 >
-  <div class="w-full border border-subtle" />
+  <div class="w-full border border-subtle"></div>
   <button
     class="flex grow items-center gap-2 whitespace-nowrap"
     on:click={toggleOpen}
@@ -34,7 +35,7 @@
     {label}
     <Icon name={open ? 'chevron-up' : 'chevron-down'} />
   </button>
-  <div class="w-full border border-subtle" />
+  <div class="w-full border border-subtle"></div>
 </div>
 
 <div class:hidden={!open}>

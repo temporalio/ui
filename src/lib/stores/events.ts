@@ -2,17 +2,14 @@ import { derived, type Readable, writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import type {
-  FetchEventsParameters,
-  FetchEventsParametersWithSettings,
-} from '$lib/services/events-service';
-import { authUser } from '$lib/stores/auth-user';
-import { refresh } from '$lib/stores/workflow-run';
+import type { FetchEventsParameters } from '$lib/services/events-service';
 import type { WorkflowEvents } from '$lib/types/events';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
 import {
   isLocalActivityMarkerEvent,
   isResetEvent,
+  isWorkflowTaskCompletedEvent,
 } from '$lib/utilities/is-event-type';
 
 import { eventFilterSort } from './event-view';
@@ -40,13 +37,6 @@ const runId = derived([page], ([$page]) => {
   return '';
 });
 
-const settings = derived([page], ([$page]) => $page.data?.settings);
-
-const accessToken = derived(
-  [authUser],
-  ([$authUser]) => $authUser?.accessToken,
-);
-
 export const parameters: Readable<FetchEventsParameters> = derived(
   [namespace, workflowId, runId, eventFilterSort],
   ([$namespace, $workflowId, $runId, $sort]) => {
@@ -58,20 +48,6 @@ export const parameters: Readable<FetchEventsParameters> = derived(
     };
   },
 );
-
-export const parametersWithSettings: Readable<FetchEventsParametersWithSettings> =
-  derived(
-    [parameters, settings, accessToken, refresh],
-    ([$parameters, $settings, $accessToken, $refresh]) => {
-      return {
-        ...$parameters,
-        settings: $settings,
-        accessToken: $accessToken,
-        refresh,
-        $refresh,
-      };
-    },
-  );
 
 export const timelineEvents = writable(null);
 export const fullEventHistory = writable<WorkflowEvents>([]);
@@ -94,6 +70,11 @@ export const filteredEventHistory = derived(
 export const resetEvents = derived(fullEventHistory, (events) =>
   events.filter(isResetEvent),
 );
+
+export const sdkInfo = derived(fullEventHistory, ($history) => {
+  const workflowCompletedTasks = $history.filter(isWorkflowTaskCompletedEvent);
+  return getSDKandVersion(workflowCompletedTasks);
+});
 
 export const decodeEventHistory = persistStore<boolean>(
   'decodeEventHistory',

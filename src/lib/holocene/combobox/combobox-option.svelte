@@ -1,35 +1,54 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
+
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
 
-  interface Props {
-    selected?: boolean;
-    disabled?: boolean;
+  interface BaseProps {
     label: string;
+    class?: ClassNameValue;
+    onclick?: () => void;
+    leading?: Snippet;
+    trailing?: Snippet;
   }
 
-  interface DisabledProps {
-    label: string;
+  interface EnabledProps extends BaseProps {
+    active?: boolean;
+    selected?: boolean;
+    disabled?: boolean;
+  }
+
+  interface DisabledProps extends BaseProps {
+    active?: never;
     disabled: true;
     selected?: never;
   }
 
-  type $$Props = Props | DisabledProps;
+  type Props = EnabledProps | DisabledProps;
 
-  export let selected = false;
-  export let disabled = false;
-  export let label: string;
+  let {
+    active = false,
+    selected = false,
+    disabled = false,
+    label,
+    class: className = '',
+    onclick,
+    leading,
+    trailing,
+  }: Props = $props();
 </script>
 
 <MenuItem
-  on:click
   role="option"
-  class="break-all"
+  class={merge('break-all', className)}
   aria-selected={selected}
   aria-disabled={disabled}
+  {onclick}
+  {active}
   {selected}
   {disabled}
+  {leading}
+  {trailing}
 >
-  <slot slot="leading" name="leading" />
   {label}
-  <slot slot="trailing" name="trailing" />
 </MenuItem>

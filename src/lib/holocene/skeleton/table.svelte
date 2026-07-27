@@ -9,13 +9,14 @@
   export let rows = 10;
   export let columns = 4;
   export let columnWidths: number[] = new Array(columns).fill(100 / columns);
+  export let bordered: boolean = true;
 </script>
 
-<Table class="w-full table-fixed" variant="fancy">
+<Table class="w-full" fixed {bordered}>
   <TableHeaderRow slot="headers" class="h-8">
     <slot name="headers">
-      {#each Array.from(new Array(columns)) as _column, i}
-        <th style="width: {columnWidths[i]}%;" />
+      {#each Array.from(new Array(columns)) as _column, index}
+        <th style="width: {columnWidths[index]}%;"></th>
       {/each}
     </slot>
   </TableHeaderRow>

@@ -1,15 +1,29 @@
 import { writable } from 'svelte/store';
 
-import type { GetPollersResponse } from '$lib/services/pollers-service';
+import { Action as ActivityAction } from '$lib/models/activity-actions';
+import { Action as WorkflowAction } from '$lib/models/workflow-actions';
 import { persistStore } from '$lib/stores/persist-store';
+import type { TaskQueueResponse } from '$lib/types';
 import type { WorkflowExecution, WorkflowMetadata } from '$lib/types/workflows';
 
-export const refresh = writable(0);
+export type RefreshAction = {
+  timestamp: number;
+  action: WorkflowAction | ActivityAction | null;
+};
+
+export const refresh = writable<RefreshAction>({ timestamp: 0, action: null });
+
+export const triggerRefresh = (
+  action: WorkflowAction | ActivityAction | null = null,
+): void => {
+  refresh.set({ timestamp: Date.now(), action });
+};
 
 export type WorkflowRunWithWorkers = {
   workflow: WorkflowExecution | null;
-  workers: GetPollersResponse;
-  metadata: WorkflowMetadata;
+  workers: TaskQueueResponse;
+  workersLoaded: boolean;
+  metadata: WorkflowMetadata | null;
   userMetadata: {
     summary: string;
     details: string;
@@ -19,7 +33,8 @@ export type WorkflowRunWithWorkers = {
 export const initialWorkflowRun: WorkflowRunWithWorkers = {
   workflow: null,
   workers: { pollers: [], taskQueueStatus: null },
-  metadata: undefined,
+  workersLoaded: false,
+  metadata: null,
   userMetadata: {
     summary: '',
     details: '',

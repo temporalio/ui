@@ -2,6 +2,7 @@
 // Continue to add to Interface as more actions are added in core
 export interface CoreUser {
   namespaceWriteDisabled: (namespace: string) => boolean;
+  isActivityCommandsDisabled: boolean;
 }
 
 // Set context with this key

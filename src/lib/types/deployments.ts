@@ -7,22 +7,31 @@ export interface DeploymentParameters {
 
 export interface DeploymentVersionParameters {
   namespace: string;
-  version: string;
+  deploymentName: string;
+  buildId: string;
 }
-
+export interface WorkerDeploymentVersion {
+  buildId: string;
+  deploymentName: string;
+}
 export interface RoutingConfig {
-  currentVersion: string;
-  rampingVersion: string;
-  rampingVersionPercentage: number;
-  currentVersionChangedTime: Timestamp;
-  rampingVersionChangedTime: Timestamp;
-  rampingVersionPercentageChangedTime: Timestamp;
+  currentVersion?: string;
+  currentDeploymentVersion?: WorkerDeploymentVersion;
+  rampingVersion?: string;
+  rampingDeploymentVersion?: WorkerDeploymentVersion;
+  rampingVersionPercentage?: number;
+  currentVersionChangedTime?: Timestamp;
+  rampingVersionChangedTime?: Timestamp;
+  rampingVersionPercentageChangedTime?: Timestamp;
 }
 
 export interface WorkerDeploymentSummary {
   name: string;
   createTime: Timestamp;
   routingConfig: RoutingConfig;
+  latestVersionSummary?: VersionSummaryNew;
+  currentVersionSummary: VersionSummaryNew;
+  rampingVersionSummary?: VersionSummaryNew;
 }
 
 export interface ListWorkerDeploymentsResponse {
@@ -30,14 +39,55 @@ export interface ListWorkerDeploymentsResponse {
   workerDeployments: WorkerDeploymentSummary[];
 }
 
-export interface VersionSummary {
+export function isVersionSummaryNew(
+  version: VersionSummary,
+): version is VersionSummaryNew & {
+  deploymentVersion: WorkerDeploymentVersion;
+} {
+  return (
+    'deploymentVersion' in version && version.deploymentVersion !== undefined
+  );
+}
+
+export type VersionSummary = VersionSummaryOld | VersionSummaryNew;
+export interface VersionSummaryOld {
   version: string;
   createTime: Timestamp;
   drainageStatus: string;
 }
+
+export interface ProviderValidation {
+  errorMessage?: string;
+  lastCheckTime?: Timestamp;
+}
+
+export interface ComputeStatus {
+  providerValidation?: ProviderValidation;
+}
+
+export interface VersionSummaryNew {
+  version: string;
+  status?: string;
+  drainageStatus?: string;
+  deploymentVersion?: WorkerDeploymentVersion;
+  createTime: Timestamp;
+  drainageInfo?: {
+    lastChangedTime?: Timestamp;
+    lastCheckedTime?: Timestamp;
+  };
+  currentSinceTime?: Timestamp;
+  rampingSinceTime?: Timestamp;
+  routingUpdateTime?: Timestamp;
+  firstActivationTime?: Timestamp;
+  lastDeactivationTime?: Timestamp;
+  computeConfig?: ComputeConfig;
+  computeStatus?: ComputeStatus;
+}
+
 export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {
   lastModifierIdentity: string;
   versionSummaries: VersionSummary[];
+  computeConfig?: ComputeConfig;
 }
 
 export interface WorkerDeploymentResponse {
@@ -57,6 +107,7 @@ export interface VersioningInfo {
 
 export interface WorkerDeploymentVersionInfo {
   version: string;
+  deploymentVersion?: WorkerDeploymentVersion;
   deploymentName: string;
   createTime: Timestamp;
   routingChangedTime: Timestamp;
@@ -64,6 +115,7 @@ export interface WorkerDeploymentVersionInfo {
   rampingSinceTime: Timestamp;
   rampPercentage: number;
   taskQueueInfos: TaskQueueInfo[];
+  computeConfig?: ComputeConfig;
   drainageInfo: {
     status: string;
     lastChangedTime: Timestamp;
@@ -78,9 +130,60 @@ export interface WorkerDeploymentVersionResponse {
   workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
 }
 
+export interface Payload {
+  metadata?: { encoding?: string; [key: string]: string | undefined };
+  data?: string;
+}
+
+export interface ComputeProvider {
+  type?: string;
+  details?: Payload;
+  nexusEndpoint?: string;
+}
+
+export interface ComputeScaler {
+  type?: string;
+  details?: Payload;
+}
+
+export interface ComputeConfigScalingGroup {
+  taskQueueTypes?: string[];
+  providerType?: string;
+  provider?: ComputeProvider;
+  scaler?: ComputeScaler;
+}
+
+export interface ComputeConfig {
+  scalingGroups?: { [key: string]: ComputeConfigScalingGroup };
+}
+
+export interface CreateWorkerDeploymentRequest {
+  namespace: string;
+  deploymentName: string;
+}
+
+export interface CreateWorkerDeploymentVersionRequest {
+  namespace: string;
+  deploymentVersion: { deploymentName: string; buildId: string };
+  computeConfig?: ComputeConfig;
+  identity?: string;
+  requestId?: string;
+}
+
+export interface CreateWorkerDeploymentResponse {
+  conflictToken: string;
+}
+
+export const VersioningBehaviorEnum = {
+  Pinned: 'Pinned',
+  AutoUpgrade: 'AutoUpgrade',
+};
+
 export type DeploymentStatus =
   | 'Ramping'
   | 'Current'
+  | 'Latest'
   | 'Draining'
   | 'Drained'
-  | 'Inactive';
+  | 'Inactive'
+  | 'Created';

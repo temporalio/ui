@@ -21,6 +21,7 @@ describe('toTimeDifference', () => {
     const now = 1683060815883;
     const date = '2022-04-13T16:29:35.630571Z';
     expect(toTimeDifference({ date, now, negativeDefault })).toEqual('None');
+    expect(toTimeDifference({ date, now, negativeDefault: '' })).toEqual('');
   });
 
   it('should correctly parse an invalid date', () => {

@@ -12,18 +12,6 @@ export const query = derived([page], ([$page]) =>
   $page.url.searchParams.get('query'),
 );
 
-export const showChildWorkflows = persistStore<boolean>(
-  'showChildWorkflows',
-  true,
-  true,
-);
-
-export const hideChildWorkflows = persistStore<boolean>(
-  'hideChildWorkflows',
-  false,
-  true,
-);
-
 const category = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );
@@ -80,13 +68,58 @@ export const scheduleFilters = writable<SearchAttributeFilter[]>(
   updateScheduleFilters,
 );
 
+const updateActivityFilters: StartStopNotifier<SearchAttributeFilter[]> = (
+  set,
+) => {
+  return parameters.subscribe(({ query }) => {
+    if (!query && get(activityFilters).length) {
+      // Clear filters if there is no query
+      set([]);
+    }
+  });
+};
+
+export const activityFilters = writable<SearchAttributeFilter[]>(
+  [],
+  updateActivityFilters,
+);
+
+const updateNexusOperationFilters: StartStopNotifier<
+  SearchAttributeFilter[]
+> = (set) => {
+  return parameters.subscribe(({ query }) => {
+    if (!query && get(nexusOperationFilters).length) {
+      set([]);
+    }
+  });
+};
+
+export const nexusOperationFilters = writable<SearchAttributeFilter[]>(
+  [],
+  updateNexusOperationFilters,
+);
+
+const updateWorkerFilters: StartStopNotifier<SearchAttributeFilter[]> = (
+  set,
+) => {
+  return parameters.subscribe(({ query }) => {
+    if (!query && get(workerFilters).length) {
+      set([]);
+    }
+  });
+};
+
+export const workerFilters = writable<SearchAttributeFilter[]>(
+  [],
+  updateWorkerFilters,
+);
+
 const updateEventCategoryFilter: StartStopNotifier<
-  EventTypeCategory[] | null
+  EventTypeCategory[] | undefined
 > = (set) => {
   return parameters.subscribe(({ category }) => {
     if (!category && get(eventCategoryFilter)) {
-      // Clear filter if there is no category
-      set(null);
+      set(undefined);
     }
   });
 };
@@ -97,12 +130,11 @@ export const eventCategoryFilter = writable<EventTypeCategory[] | undefined>(
 );
 
 const updateEventClassificationFilter: StartStopNotifier<
-  EventClassification[] | null
+  EventClassification[] | undefined
 > = (set) => {
   return parameters.subscribe(({ classification }) => {
     if (!classification && get(eventClassificationFilter)) {
-      // Clear filter if there is no category
-      set(null);
+      set(undefined);
     }
   });
 };

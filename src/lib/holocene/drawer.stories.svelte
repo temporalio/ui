@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import Drawer from './drawer.svelte';
@@ -42,11 +44,15 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Button from './button.svelte';
   import DrawerContent from './drawer-content.svelte';
+
+  let open = $state(true);
 </script>
 
 <Template let:args>
-  <Drawer {...args} onClick={action('click')}>
+  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Drawer bind:open {...args} onClick={action('click')}>
     <DrawerContent title="Drawer Title">
       <p class={merge(args.position === 'right' && 'max-w-80')}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
@@ -67,6 +73,43 @@
   </Drawer>
 </Template>
 
+<Template id="with-subtitle" let:args>
+  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Drawer bind:open {...args} onClick={action('click')}>
+    <DrawerContent title="Drawer Title">
+      <span slot="subtitle">A supporting subtitle line</span>
+      <p class={merge(args.position === 'right' && 'max-w-80')}>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
+      </p>
+    </DrawerContent>
+  </Drawer>
+</Template>
+
+<Template id="subtitle-only" let:args>
+  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Drawer bind:open {...args} onClick={action('click')}>
+    <DrawerContent>
+      <span slot="subtitle">Subtitle rendered without a title</span>
+      <p class={merge(args.position === 'right' && 'max-w-80')}>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
+      </p>
+    </DrawerContent>
+  </Drawer>
+</Template>
+
+<Template id="no-header" let:args>
+  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Drawer bind:open {...args} onClick={action('click')}>
+    <DrawerContent>
+      <p class={merge(args.position === 'right' && 'max-w-80')}>
+        With no title and no subtitle slot, DrawerContent omits the header
+        wrapper and applies its own top padding, so the content is not flush
+        against the top edge of the drawer.
+      </p>
+    </DrawerContent>
+  </Drawer>
+</Template>
+
 <Story name="Bottom" />
 
 <Story name="Right" args={{ position: 'right' }} />
@@ -74,3 +117,9 @@
 <Story name="Bottom (Light)" args={{ dark: false }} />
 
 <Story name="Right (Light)" args={{ position: 'right', dark: false }} />
+
+<Story name="With Subtitle" template="with-subtitle" />
+
+<Story name="Subtitle Only" template="subtitle-only" />
+
+<Story name="No Title or Subtitle" template="no-header" />

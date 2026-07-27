@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import { goto } from '$app/navigation';
 
@@ -6,7 +8,7 @@
 
 <button
   class="login-button min-w-min"
-  on:click={() => goto(routeForLoginPage())}
+  onclick={() => goto(routeForLoginPage())}
 >
   Login
 </button>

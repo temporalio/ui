@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
@@ -13,28 +12,28 @@
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-  $: ({ workflow } = $workflowRun);
+  const namespace = $derived(page.params.namespace);
+  const workflowId = $derived(page.params.workflow);
+  const runId = $derived(page.params.run);
+  const workflow = $derived($workflowRun.workflow);
 
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
+  const workflowRelationships = $derived(
+    getWorkflowRelationships(workflow, $fullEventHistory, page.data.namespace),
   );
 
-  $: ({
-    hasChildren,
-    first,
-    parent,
-    parentNamespaceName,
-    children,
-    next,
-    previous,
-    scheduleId,
-  } = workflowRelationships);
+  const hasChildren = $derived(workflowRelationships.hasChildren);
+  const first = $derived(workflowRelationships.first);
+  const parent = $derived(workflowRelationships.parent);
+  const parentNamespaceName = $derived(
+    workflowRelationships.parentNamespaceName,
+  );
+  const children = $derived(workflowRelationships.children);
+  const next = $derived(workflowRelationships.next);
+  const previous = $derived(workflowRelationships.previous);
+  const scheduleId = $derived(workflowRelationships.scheduleId);
 </script>
 
-<div class="flex flex-col gap-4 px-2 py-4 md:px-4 lg:px-8">
+<div class="flex flex-col gap-4 px-4 py-4 xl:px-8">
   <div class="flex w-full flex-wrap gap-4">
     {#if scheduleId}
       <SchedulerTable {scheduleId} {namespace} />
@@ -59,7 +58,7 @@
       <ChildWorkflowsTable
         {children}
         pendingChildren={$workflowRun.workflow.pendingChildren}
-        namespace={$page.params.namespace}
+        namespace={page.params.namespace}
       />
     {/if}
   {/await}

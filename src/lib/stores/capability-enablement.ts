@@ -6,12 +6,6 @@ import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 import { temporalVersion } from './versions';
 
-export const groupByCountEnabled = derived([page], ([$page]) => {
-  return Boolean(
-    $page.data?.systemInfo?.capabilities?.countGroupByExecutionStatus,
-  );
-});
-
 export const prefixSearchEnabled = derived(
   [page, temporalVersion],
   ([$page, $temporalVersion]) => {

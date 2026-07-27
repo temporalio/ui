@@ -2,6 +2,7 @@ import type {
   Callbacks,
   PendingActivity,
   PendingActivityInfo,
+  PendingActivityState,
   PendingChildren,
   PendingNexusOperation,
 } from '$lib/types/events';
@@ -13,9 +14,10 @@ import type {
   WorkflowExecutionAPIResponse,
   WorkflowSearchAttributes,
 } from '$lib/types/workflows';
-import { decodePayload } from '$lib/utilities/decode-payload';
+import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
 import {
   toCallbackStateReadable,
+  toPendingActivityStateReadable,
   toPendingNexusOperationStateReadable,
   toWorkflowStatusReadable,
 } from '$lib/utilities/screaming-enums';
@@ -29,8 +31,12 @@ export const toPendingActivities = (
   return pendingActivity.map((activity): PendingActivity => {
     const attributes = simplifyAttributes(activity, true);
     const id = activity.activityId;
-
-    return { ...attributes, id };
+    const state = activity.state as unknown as PendingActivityState;
+    return {
+      ...attributes,
+      id,
+      state: toPendingActivityStateReadable(state),
+    };
   });
 };
 
@@ -64,7 +70,7 @@ const toSearchAttributes = (
     (searchAttributes, [searchAttributeName, payload]) => {
       return {
         ...searchAttributes,
-        [searchAttributeName]: decodePayload(payload),
+        [searchAttributeName]: parseRawPayloadToJSON(payload),
       };
     },
     {},
@@ -73,6 +79,22 @@ const toSearchAttributes = (
   return {
     indexedFields: decoded,
   };
+};
+
+const getStartDelay = ({
+  executionTime,
+  startTime,
+}: {
+  executionTime: string;
+  startTime: string;
+}): string => {
+  if (!executionTime || !startTime) return undefined;
+  const delayMs =
+    new Date(executionTime).getTime() - new Date(startTime).getTime();
+  if (delayMs > 0) {
+    return Math.round(delayMs / 1000) + 's';
+  }
+  return undefined;
 };
 
 export const toWorkflowExecution = (
@@ -92,6 +114,7 @@ export const toWorkflowExecution = (
     response.workflowExecutionInfo.status,
   );
   const isRunning = status === 'Running';
+  const isPaused = status === 'Paused';
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const historySizeBytes = response.workflowExecutionInfo.historySizeBytes;
   const url = `/workflows/${id}/${runId}`;
@@ -107,7 +130,8 @@ export const toWorkflowExecution = (
     response.workflowExecutionInfo.stateTransitionCount;
   const defaultWorkflowTaskTimeout =
     response.executionConfig?.defaultWorkflowTaskTimeout;
-
+  const workflowExecutionTimeout =
+    response.executionConfig?.workflowExecutionTimeout;
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
   );
@@ -118,6 +142,13 @@ export const toWorkflowExecution = (
   const callbacks = toCallbacks(response?.callbacks);
   const rootExecution = response.workflowExecutionInfo?.rootExecution;
   const versioningInfo = response.workflowExecutionInfo?.versioningInfo;
+  const priority = response.workflowExecutionInfo?.priority;
+  const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
+  const startDelay = getStartDelay({ executionTime, startTime });
+  const externalPayloadCount =
+    response?.workflowExecutionInfo?.externalPayloadCount;
+  const externalPayloadSizeBytes =
+    response?.workflowExecutionInfo?.externalPayloadSizeBytes;
 
   let summary;
   let details;
@@ -136,6 +167,8 @@ export const toWorkflowExecution = (
     status,
     historyEvents,
     historySizeBytes,
+    externalPayloadCount,
+    externalPayloadSizeBytes,
     searchAttributes,
     memo,
     rootExecution,
@@ -149,15 +182,20 @@ export const toWorkflowExecution = (
     pendingWorkflowTask,
     callbacks,
     versioningInfo,
+    priority,
     summary,
     details,
     parentNamespaceId,
     parent,
     stateTransitionCount,
     isRunning,
+    isPaused,
     defaultWorkflowTaskTimeout,
+    workflowExecutionTimeout,
+    workflowExtendedInfo,
+    startDelay,
     get canBeTerminated(): boolean {
-      return isRunning && writeActionsAreAllowed();
+      return (isRunning || isPaused) && writeActionsAreAllowed();
     },
   };
 };

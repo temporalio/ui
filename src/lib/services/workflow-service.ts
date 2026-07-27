@@ -1,28 +1,35 @@
 import { get } from 'svelte/store';
 
-import { v4 } from 'uuid';
-
 import { page } from '$app/stores';
 
+import { translate } from '$lib/i18n/translate';
 import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
-} from '$lib/components/payload-input-with-encoding.svelte';
-import { Action } from '$lib/models/workflow-actions';
+} from '$lib/models/payload-encoding';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 import { isCloud } from '$lib/stores/advanced-visibility';
-import { authUser } from '$lib/stores/auth-user';
-import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+import type {
+  SearchAttributeInput,
+  SearchAttributesSchema,
+} from '$lib/stores/search-attributes';
 import { temporalVersion } from '$lib/stores/versions';
-import { canFetchChildWorkflows } from '$lib/stores/workflows';
 import {
+  canFetchChildWorkflows,
+  hideWorkflowQueryErrors,
+  workflowError,
+} from '$lib/stores/workflows';
+import {
+  type CancelWorkflowRequest,
+  type PauseWorkflowRequest,
   ResetReapplyExcludeType,
   ResetReapplyType,
   type ResetWorkflowRequest,
   type SearchAttribute,
+  type UnpauseWorkflowRequest,
   type UpdateWorkflowResponse,
 } from '$lib/types';
 import type {
@@ -43,8 +50,7 @@ import type {
   WorkflowIdentifier,
 } from '$lib/types/workflows';
 import {
-  cloneAllPotentialPayloadsWithCodec,
-  decodeSingleReadablePayloadWithCodec,
+  decodePayloadAndParseDataToJSON,
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
 import {
@@ -66,14 +72,13 @@ import {
   isVersionNewer,
   minimumVersionRequired,
 } from '$lib/utilities/version-check';
-import { formatReason } from '$lib/utilities/workflow-actions';
 
 import { fetchInitialEvent } from './events-service';
 import { fetchWorkflowCountByExecutionStatus } from './workflow-counts';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
-  runId: string;
+  runId?: string;
 };
 
 export type CombinedWorkflowExecutionsResponse = {
@@ -85,6 +90,7 @@ export type CombinedWorkflowExecutionsResponse = {
 type CancelWorkflowOptions = {
   namespace: string;
   workflow: WorkflowExecution;
+  identity?: string;
 };
 
 type SignalWorkflowOptions = {
@@ -94,6 +100,7 @@ type SignalWorkflowOptions = {
   input: string;
   encoding: PayloadInputEncoding;
   messageType: string;
+  identity?: string;
 };
 
 type UpdateWorkflowOptions = {
@@ -117,12 +124,16 @@ type StartWorkflowOptions = {
   summary: string;
   details: string;
   searchAttributes: SearchAttributeInput[];
+  identity?: string;
+  workflowStartDelay?: string;
 };
 
 type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
   reason: string;
+  first: string | undefined;
+  identity?: string;
 };
 
 export type ResetWorkflowOptions = {
@@ -130,6 +141,7 @@ export type ResetWorkflowOptions = {
   workflow: WorkflowExecution;
   eventId: string;
   reason: string;
+  identity?: string;
   // used pre temporal server v1.24
   includeSignals: boolean;
   // used post temporal server v1.24
@@ -272,9 +284,11 @@ export async function fetchWorkflow(
   return requestFromAPI(route, {
     request,
     notifyOnError: false,
-    params: {
-      'execution.runId': parameters.runId,
-    },
+    params: parameters.runId
+      ? {
+          'execution.runId': parameters.runId,
+        }
+      : {},
   })
     .then((response) => {
       return { workflow: toWorkflowExecution(response) };
@@ -288,38 +302,49 @@ export async function terminateWorkflow({
   workflow,
   namespace,
   reason,
+  first,
+  identity,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
   });
-
-  const email = get(authUser).email;
-  const formattedReason = formatReason({
-    reason,
-    action: Action.Terminate,
-    email,
-  });
-
   return await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
-        reason: formattedReason,
-        ...(email && { identity: email }),
+        reason: reason?.trim(),
+        ...(identity && { identity }),
+        firstExecutionRunId: first,
       }),
     },
     notifyOnError: false,
-    params: {
-      'execution.runId': workflow.runId,
-    },
+    params: first
+      ? {}
+      : {
+          'execution.runId': workflow.runId,
+        },
   });
 }
 
 export async function cancelWorkflow(
-  { namespace, workflow: { id: workflowId, runId } }: CancelWorkflowOptions,
+  {
+    namespace,
+    workflow: { id: workflowId, runId },
+    identity,
+  }: CancelWorkflowOptions,
   request = fetch,
 ) {
+  const body: CancelWorkflowRequest = {
+    namespace,
+    workflowExecution: {
+      workflowId,
+      runId,
+    },
+    requestId: crypto.randomUUID(),
+    ...(identity && { identity }),
+  };
+
   const route = routeForApi('workflow.cancel', {
     namespace,
     workflowId,
@@ -330,6 +355,7 @@ export async function cancelWorkflow(
     notifyOnError: false,
     options: {
       method: 'POST',
+      body: stringifyWithBigInt(body),
     },
     params: {
       'execution.runId': runId,
@@ -344,6 +370,7 @@ export async function signalWorkflow({
   input,
   encoding,
   messageType,
+  identity,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
@@ -354,26 +381,25 @@ export async function signalWorkflow({
   const settings = get(page).data.settings;
   const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
-  const body = newVersion
-    ? {
-        signalName: name,
-        workflowExecution: {
-          workflowId,
-          runId,
-        },
-        input: {
-          payloads,
-        },
-      }
-    : {
-        signalName: name,
-        input: {
-          payloads,
-        },
-        params: {
-          'execution.runId': runId,
-        },
-      };
+  const body = {
+    signalName: name,
+    input: {
+      payloads,
+    },
+    ...(identity && { identity }),
+    ...(newVersion
+      ? {
+          workflowExecution: {
+            workflowId,
+            runId,
+          },
+        }
+      : {
+          params: {
+            'execution.runId': runId,
+          },
+        }),
+  };
 
   return requestFromAPI(route, {
     notifyOnError: false,
@@ -433,17 +459,11 @@ export async function resetWorkflow({
   includeSignals,
   excludeSignals,
   excludeUpdates,
+  identity,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow.reset', {
     namespace,
     workflowId,
-  });
-
-  const email = get(authUser).email;
-  const formattedReason = formatReason({
-    action: Action.Reset,
-    reason,
-    email,
   });
 
   const body: Replace<
@@ -455,8 +475,9 @@ export async function resetWorkflow({
       runId,
     },
     workflowTaskFinishEventId: eventId,
-    requestId: v4(),
-    reason: formattedReason,
+    requestId: crypto.randomUUID(),
+    reason: reason?.trim(),
+    ...(identity && { identity }),
   };
 
   if (get(isCloud) || minimumVersionRequired('1.24.0', get(temporalVersion))) {
@@ -507,6 +528,85 @@ export async function resetWorkflow({
   });
 }
 
+type PauseWorkflowOptions = {
+  namespace: string;
+  workflow: WorkflowExecution;
+  identity?: string;
+  reason: string;
+};
+
+export async function pauseWorkflow(
+  {
+    namespace,
+    workflow: { id: workflowId, runId },
+    reason,
+    identity,
+  }: PauseWorkflowOptions,
+  request = fetch,
+) {
+  const body: PauseWorkflowRequest = {
+    namespace,
+    workflowId,
+    runId,
+    reason: reason?.trim(),
+    requestId: crypto.randomUUID(),
+    ...(identity && { identity }),
+  };
+
+  const route = routeForApi('workflow.pause', {
+    namespace,
+    workflowId,
+  });
+
+  return requestFromAPI(route, {
+    request,
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+    params: {
+      'execution.runId': runId,
+    },
+  });
+}
+
+export async function unpauseWorkflow(
+  {
+    namespace,
+    workflow: { id: workflowId, runId },
+    reason,
+    identity,
+  }: PauseWorkflowOptions,
+  request = fetch,
+) {
+  const body: UnpauseWorkflowRequest = {
+    namespace,
+    workflowId,
+    runId,
+    reason: reason?.trim(),
+    requestId: crypto.randomUUID(),
+    ...(identity && { identity }),
+  };
+
+  const route = routeForApi('workflow.unpause', {
+    namespace,
+    workflowId,
+  });
+
+  return requestFromAPI(route, {
+    request,
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+    params: {
+      'execution.runId': runId,
+    },
+  });
+}
+
 export async function fetchWorkflowForSchedule(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
@@ -515,11 +615,20 @@ export async function fetchWorkflowForSchedule(
     console.error(err);
   };
 
-  const route = routeForApi('workflow', parameters);
+  const route = routeForApi('workflow', {
+    namespace: parameters.namespace,
+    workflowId: parameters.workflowId,
+  });
+
   return requestFromAPI(route, {
     request,
     onError,
     handleError: onError,
+    params: parameters.runId
+      ? {
+          'execution.runId': parameters.runId,
+        }
+      : {},
   }).then(toWorkflowExecution);
 }
 
@@ -538,13 +647,13 @@ export async function fetchAllChildWorkflows(
     }
     const { workflows } = await fetchAllWorkflows(namespace, { query });
     return workflows;
-  } catch (e) {
+  } catch {
     return [];
   }
 }
 
 export const setSearchAttributes = (
-  attributes: SearchAttributeInput[],
+  attributes: SearchAttributesSchema,
 ): SearchAttribute => {
   if (!attributes.length) return {};
 
@@ -567,6 +676,8 @@ export async function startWorkflow({
   encoding,
   messageType,
   searchAttributes,
+  identity,
+  workflowStartDelay,
 }: StartWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow', {
     namespace,
@@ -579,7 +690,7 @@ export async function startWorkflow({
   if (input) {
     try {
       payloads = await encodePayloads({ input, encoding, messageType });
-    } catch (_) {
+    } catch {
       throw new Error('Could not encode input for starting workflow');
     }
   }
@@ -602,7 +713,7 @@ export async function startWorkflow({
         })
       )[0];
     }
-  } catch (e) {
+  } catch {
     console.error('Could not encode summary or details for starting workflow');
   }
 
@@ -627,6 +738,8 @@ export async function startWorkflow({
               ...setSearchAttributes(searchAttributes),
             },
           },
+    ...(identity && { identity }),
+    ...(workflowStartDelay && { workflowStartDelay }),
   });
 
   return requestFromAPI(route, {
@@ -640,10 +753,12 @@ export async function startWorkflow({
 
 export const fetchInitialValuesForStartWorkflow = async ({
   namespace,
+  runId,
   workflowType,
   workflowId,
 }: {
   namespace: string;
+  runId?: string;
   workflowType?: string;
   workflowId?: string;
 }): Promise<{
@@ -666,15 +781,18 @@ export const fetchInitialValuesForStartWorkflow = async ({
     details: '',
   };
   try {
-    let query = '';
-    if (workflowType && workflowId) {
-      query = `WorkflowType = "${workflowType}" AND WorkflowId = "${workflowId}"`;
-    } else if (workflowType) {
-      query = `WorkflowType = "${workflowType}"`;
-    } else if (workflowId) {
-      query = `WorkflowId = "${workflowId}"`;
+    const searchParams = [];
+    if (runId) {
+      searchParams.push(`RunId = "${runId}"`);
+    }
+    if (workflowType) {
+      searchParams.push(`WorkflowType = "${workflowType}"`);
+    }
+    if (workflowId) {
+      searchParams.push(`WorkflowId = "${workflowId}"`);
     }
 
+    const query = searchParams.join(' AND ');
     const route = routeForApi('workflows', { namespace });
     const workflows = await requestFromAPI<ListWorkflowExecutionsResponse>(
       route,
@@ -695,18 +813,14 @@ export const fetchInitialValuesForStartWorkflow = async ({
     const firstEvent = await fetchInitialEvent(params);
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
-    const convertedAttributes = (await cloneAllPotentialPayloadsWithCodec(
-      startEvent?.attributes?.input,
-      namespace,
-      get(page).data.settings,
-      get(authUser).accessToken,
-      'readable',
+    const decodedInput = await decodePayloadAndParseDataToJSON(
+      startEvent.attributes.input?.payloads[0],
       false,
-    )) as PotentiallyDecodable;
+    ); // only single payloads are supported starting a workflow;
 
     let summary = '';
     if (workflow.summary) {
-      const decodedSummary = await decodeSingleReadablePayloadWithCodec(
+      const decodedSummary = await decodePayloadAndParseDataToJSON(
         workflow.summary,
       );
       if (typeof decodedSummary === 'string') {
@@ -716,26 +830,36 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     let details = '';
     if (workflow.details) {
-      const decodedDetails = await decodeSingleReadablePayloadWithCodec(
+      const decodedDetails = await decodePayloadAndParseDataToJSON(
         workflow.details,
       );
       if (typeof decodedDetails === 'string') {
         details = decodedDetails;
       }
     }
-    const input = convertedAttributes?.payloads
-      ? stringifyWithBigInt(convertedAttributes.payloads[0]?.data)
-      : '';
-    const encoding =
-      convertedAttributes?.payloads &&
-      isPayloadInputEncodingType(
-        convertedAttributes.payloads[0]?.metadata?.encoding,
-      )
-        ? convertedAttributes.payloads[0]?.metadata?.encoding
-        : 'json/plain';
-    const messageType = convertedAttributes?.payloads
-      ? convertedAttributes.payloads[0]?.metadata?.messageType
-      : '';
+
+    let input = '';
+    let encoding: PayloadInputEncoding = 'json/plain';
+    let messageType = '';
+
+    if (decodedInput) {
+      if (decodedInput.data) {
+        input = stringifyWithBigInt(decodedInput.data);
+      }
+
+      if (decodedInput.metadata) {
+        if (
+          decodedInput.metadata.encoding &&
+          isPayloadInputEncodingType(decodedInput.metadata.encoding)
+        ) {
+          encoding = decodedInput.metadata.encoding;
+        }
+
+        if (decodedInput.metadata.messageType) {
+          messageType = decodedInput.metadata.messageType;
+        }
+      }
+    }
 
     return {
       input,
@@ -745,7 +869,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
       summary,
       details,
     };
-  } catch (e) {
+  } catch {
     return emptyValues;
   }
 };
@@ -753,6 +877,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
 export interface RootNode {
   workflow: WorkflowExecution;
   children: RootNode[];
+  siblingCount?: number;
+  scheduleId?: string;
   rootPaths: { runId: string; workflowId: string }[];
 }
 
@@ -780,6 +906,8 @@ const buildRoots = (
 
     const node: RootNode = {
       workflow,
+      scheduleId:
+        workflow?.searchAttributes?.indexedFields?.TemporalScheduledById,
       children: [],
       rootPaths: [...paths, { runId: workflow.runId, workflowId: workflow.id }],
     };
@@ -790,6 +918,58 @@ const buildRoots = (
   };
 
   return buildNode(root, []);
+};
+
+const buildDirectRoots = ({
+  parent,
+  workflow,
+  children,
+  siblingCount,
+}: {
+  parent: WorkflowExecution | undefined;
+  workflow: WorkflowExecution;
+  children: WorkflowExecution[];
+  siblingCount: number;
+}): RootNode => {
+  const childNodes: RootNode[] = children.map((child) => {
+    const rootPaths = parent
+      ? [
+          { runId: parent.runId, workflowId: parent.id },
+          { runId: workflow.runId, workflowId: workflow.id },
+          { runId: child.runId, workflowId: child.id },
+        ]
+      : [
+          { runId: workflow.runId, workflowId: workflow.id },
+          { runId: child.runId, workflowId: child.id },
+        ];
+    return {
+      workflow: child,
+      siblingCount,
+      children: [],
+      rootPaths,
+    };
+  });
+
+  const currentNode: RootNode = {
+    workflow,
+    children: childNodes,
+    rootPaths: parent
+      ? [
+          { runId: parent.runId, workflowId: parent.id },
+          { runId: workflow.runId, workflowId: workflow.id },
+        ]
+      : [{ runId: workflow.runId, workflowId: workflow.id }],
+  };
+
+  if (!parent) return currentNode;
+
+  const parentNode: RootNode = {
+    workflow: parent,
+    children: [currentNode],
+    rootPaths: [{ runId: parent.runId, workflowId: parent.id }],
+  };
+
+  return parentNode;
 };
 
 export async function fetchAllRootWorkflowsCount(
@@ -806,7 +986,6 @@ export async function fetchAllRootWorkflowsCount(
     namespace,
     query,
   });
-
   return count;
 }
 
@@ -827,6 +1006,54 @@ export async function fetchAllRootWorkflows(
   });
   const workflows = await fetchAllPaginatedWorkflows(namespace, { query });
   return buildRoots(root?.workflow, workflows);
+}
+
+type DirectWorkflowInputs = {
+  namespace: string;
+  parentWorkflowId: string;
+  parentRunId?: string;
+  workflow: WorkflowExecution;
+};
+
+export async function fetchAllDirectWorkflows({
+  namespace,
+  parentWorkflowId,
+  parentRunId,
+  workflow,
+}: DirectWorkflowInputs): Promise<RootNode> {
+  let parent;
+
+  const fetchChildWorkflows = async (
+    workflowId: string,
+    runId: string,
+  ): Promise<WorkflowExecution[]> => {
+    const query = `ParentWorkflowId = "${workflowId}" AND ParentRunId = "${runId}"`;
+    return await fetchAllPaginatedWorkflows(namespace, { query });
+  };
+
+  let siblingCount = 0;
+  if (parentWorkflowId) {
+    parent = await fetchWorkflow({
+      namespace,
+      workflowId: parentWorkflowId,
+      runId: parentRunId,
+    });
+
+    const query = `ParentWorkflowId = "${parentWorkflowId}" AND ParentRunId = "${parentRunId}"`;
+    const { count } = await fetchWorkflowCountByExecutionStatus({
+      namespace,
+      query,
+    });
+    siblingCount = parseInt(count);
+  }
+
+  const children = await fetchChildWorkflows(workflow.id, workflow.runId);
+  return buildDirectRoots({
+    parent: parent?.workflow,
+    workflow,
+    children,
+    siblingCount,
+  });
 }
 
 export const fetchAllPaginatedWorkflows = async (
@@ -853,4 +1080,77 @@ export const fetchAllPaginatedWorkflows = async (
     });
   });
   return toWorkflowExecutions({ executions });
+};
+
+type PaginatedWorkflowsPromise = (
+  pageSize: number,
+  token: string,
+) => Promise<{ items: WorkflowExecution[]; nextPageToken: string }>;
+
+export const fetchPaginatedWorkflows = async (
+  namespace: string,
+  query: string = '',
+  request = fetch,
+): Promise<PaginatedWorkflowsPromise> => {
+  return (pageSize = 100, token = '') => {
+    workflowError.set('');
+
+    const onError: ErrorCallback = (err) => {
+      handleUnauthorizedOrForbiddenError(err);
+
+      if (get(hideWorkflowQueryErrors)) {
+        workflowError.set(translate('workflows.workflows-error-querying'));
+      } else {
+        workflowError.set(
+          err?.body?.message || translate('workflows.workflows-error-querying'),
+        );
+      }
+    };
+
+    const route = routeForApi('workflows', { namespace });
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: {
+        pageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
+      request,
+      onError,
+      handleError: onError,
+    }).then(({ executions = [], nextPageToken = '' }) => {
+      return {
+        items: toWorkflowExecutions({ executions }),
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
+};
+
+export const fetchPaginatedArchivedWorkflows = async (
+  namespace: string,
+  query: string = '',
+  request = fetch,
+): Promise<PaginatedWorkflowsPromise> => {
+  return (pageSize = 100, token = '') => {
+    const onError: ErrorCallback = (err) => {
+      handleUnauthorizedOrForbiddenError(err);
+    };
+
+    const route = routeForApi('workflows.archived', { namespace });
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: {
+        pageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
+      request,
+      onError,
+      handleError: onError,
+    }).then(({ executions = [], nextPageToken = '' }) => {
+      return {
+        items: toWorkflowExecutions({ executions }),
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
 };

@@ -1,8 +1,15 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
+
+  import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
+
+  interface Props {
+    children: Snippet;
+  }
+  let { children }: Props = $props();
 </script>
 
-<PageTitle title="Import Event History" url={$page.url.href} />
-<slot />
+<PageTitle title="Import Event History" url={page.url.href} />
+{@render children()}

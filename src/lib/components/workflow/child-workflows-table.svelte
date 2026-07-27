@@ -7,35 +7,43 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '../workflow-status.svelte';
 
-  export let children: ChildWorkflowClosedEvent[] = [];
-  export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
-  export let namespace: string;
+  interface Props {
+    children?: ChildWorkflowClosedEvent[];
+    pendingChildren?: WorkflowExecution['pendingChildren'];
+    namespace: string;
+  }
 
-  $: formattedPending = pendingChildren.map((c) => {
-    return {
-      runId: c.runId,
-      workflowId: c.workflowId,
-      status: 'Running' as const,
-      type: c.workflowTypeName,
-      namespace,
-    };
-  });
+  let { children = [], pendingChildren = [], namespace }: Props = $props();
 
-  $: formattedCompleted = children.map((c) => {
-    return {
-      runId: c.attributes.workflowExecution.runId,
-      workflowId: c.attributes.workflowExecution.workflowId,
-      type: c.attributes.workflowType,
-      status: c.classification,
-      namespace: c.attributes?.namespace || namespace,
-    };
-  });
+  const formattedPending = $derived(
+    pendingChildren.map((c) => {
+      return {
+        runId: c.runId,
+        workflowId: c.workflowId,
+        status: 'Running' as const,
+        type: c.workflowTypeName,
+        namespace,
+      };
+    }),
+  );
 
-  $: formattedAll = [...formattedPending, ...formattedCompleted];
+  const formattedCompleted = $derived(
+    children.map((c) => {
+      return {
+        runId: c.attributes.workflowExecution.runId,
+        workflowId: c.attributes.workflowExecution.workflowId,
+        type: c.attributes.workflowType,
+        status: c.classification,
+        namespace: c.attributes?.namespace || namespace,
+      };
+    }),
+  );
+
+  const formattedAll = $derived([...formattedPending, ...formattedCompleted]);
 </script>
 
 <Pagination
@@ -46,16 +54,16 @@
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
-  <div slot="pagination-top" />
+  <div slot="pagination-top"></div>
   <Table class="w-full">
     <caption class="sr-only" slot="caption"
       >{translate('workflows.child-workflows')}</caption
     >
     <TableHeaderRow slot="headers">
-      <th class="max-md:hidden">{translate('common.status')}</th>
-      <th class="max-lg:hidden">{translate('common.type')}</th>
-      <th>{translate('workflows.child-id')}</th>
-      <th>{translate('workflows.child-run-id')}</th>
+      <th scope="col" class="max-md:hidden">{translate('common.status')}</th>
+      <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
+      <th scope="col">{translate('workflows.child-id')}</th>
+      <th scope="col">{translate('workflows.child-run-id')}</th>
     </TableHeaderRow>
     {#each visibleItems as child}
       <TableRow>
@@ -67,7 +75,7 @@
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link
-            href={routeForEventHistory({
+            href={routeForWorkflow({
               namespace: child.namespace,
               workflow: child.workflowId,
               run: child.runId,
@@ -78,7 +86,7 @@
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link
-            href={routeForEventHistory({
+            href={routeForWorkflow({
               namespace: child.namespace,
               workflow: child.workflowId,
               run: child.runId,

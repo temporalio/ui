@@ -1,8 +1,9 @@
 <script lang="ts">
   import Svg from '../svg.svelte';
+  let props = $props();
 </script>
 
-<Svg {...$$props}>
+<Svg {...props}>
   <path d="M23 14H13L14 21H23V14Z" fill="#F87171" />
   <path d="M1 14H11L10 21H1V14Z" fill="#F87171" />
   <path

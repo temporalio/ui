@@ -45,23 +45,26 @@ import (
 )
 
 type Auth struct {
-	Enabled bool
-	Options []string
+	Enabled            bool
+	Options            []string
+	RedirectToProvider bool
 }
 
 type CodecResponse struct {
-	Endpoint           string
-	PassAccessToken    bool
-	IncludeCredentials bool
+	Endpoint            string
+	PassAccessToken     bool
+	IncludeCredentials  bool
+	DefaultErrorMessage string
+	DefaultErrorLink    string
 }
 
 type SettingsResponse struct {
 	Auth                          *Auth
-	BannerText                    string
 	DefaultNamespace              string
 	ShowTemporalSystemNamespace   bool
+	NavCollapsedByDefault         bool
 	FeedbackURL                   string
-	NotifyOnNewVersion            bool
+	DisableNewsFetch              bool
 	Codec                         *CodecResponse
 	Version                       string
 	DisableWriteActions           bool
@@ -70,10 +73,12 @@ type SettingsResponse struct {
 	WorkflowSignalDisabled        bool
 	WorkflowUpdateDisabled        bool
 	WorkflowResetDisabled         bool
+	WorkflowPauseDisabled         bool
 	BatchActionsDisabled          bool
 	StartWorkflowDisabled         bool
 	HideWorkflowQueryErrors       bool
 	RefreshWorkflowCountsDisabled bool
+	ActivityCommandsDisabled      bool
 }
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware, conn *grpc.ClientConn) echo.HandlerFunc {
@@ -125,18 +130,21 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 
 		settings := &SettingsResponse{
 			Auth: &Auth{
-				Enabled: cfg.Auth.Enabled,
-				Options: options,
+				Enabled:            cfg.Auth.Enabled,
+				Options:            options,
+				RedirectToProvider: cfg.Auth.RedirectToProvider,
 			},
-			BannerText:                  cfg.BannerText,
 			DefaultNamespace:            cfg.DefaultNamespace,
 			ShowTemporalSystemNamespace: cfg.ShowTemporalSystemNamespace,
+			NavCollapsedByDefault:       cfg.NavCollapsedByDefault,
 			FeedbackURL:                 cfg.FeedbackURL,
-			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
+			DisableNewsFetch:            cfg.DisableNewsFetch,
 			Codec: &CodecResponse{
-				Endpoint:           cfg.Codec.Endpoint,
-				PassAccessToken:    cfg.Codec.PassAccessToken,
-				IncludeCredentials: cfg.Codec.IncludeCredentials,
+				Endpoint:            cfg.Codec.Endpoint,
+				PassAccessToken:     cfg.Codec.PassAccessToken,
+				IncludeCredentials:  cfg.Codec.IncludeCredentials,
+				DefaultErrorMessage: cfg.Codec.DefaultErrorMessage,
+				DefaultErrorLink:    cfg.Codec.DefaultErrorLink,
 			},
 			Version:                       version.UIVersion,
 			DisableWriteActions:           cfg.DisableWriteActions,
@@ -145,10 +153,12 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			WorkflowSignalDisabled:        cfg.WorkflowSignalDisabled,
 			WorkflowUpdateDisabled:        cfg.WorkflowUpdateDisabled,
 			WorkflowResetDisabled:         cfg.WorkflowResetDisabled,
+			WorkflowPauseDisabled:         cfg.WorkflowPauseDisabled,
 			BatchActionsDisabled:          cfg.BatchActionsDisabled,
 			StartWorkflowDisabled:         cfg.StartWorkflowDisabled,
 			HideWorkflowQueryErrors:       cfg.HideWorkflowQueryErrors,
 			RefreshWorkflowCountsDisabled: cfg.RefreshWorkflowCountsDisabled,
+			ActivityCommandsDisabled:      cfg.ActivityCommandsDisabled,
 		}
 
 		return c.JSON(http.StatusOK, settings)

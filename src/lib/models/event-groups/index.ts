@@ -10,6 +10,7 @@ import {
   isNexusOperationCanceledEvent,
   isNexusOperationCompletedEvent,
   isNexusOperationFailedEvent,
+  isNexusOperationTimedOutEvent,
 } from '$lib/utilities/is-event-type';
 import {
   getPendingActivity,
@@ -53,7 +54,8 @@ const addToExistingGroup = (
   const completedNexusEvent =
     isNexusOperationCompletedEvent(event) ||
     isNexusOperationFailedEvent(event) ||
-    isNexusOperationCanceledEvent(event);
+    isNexusOperationCanceledEvent(event) ||
+    isNexusOperationTimedOutEvent(event);
   if (group.pendingNexusOperation && completedNexusEvent) {
     delete group.pendingNexusOperation;
   }

@@ -1,31 +1,67 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { WorkflowStatus } from '$lib/types/workflows';
 
   import type { GraphConfig } from '../constants';
 
   import Line from './line.svelte';
 
-  export let point: [number, number] = [0, 0];
-  export let category: string | undefined = undefined;
-  export let status: string | undefined = 'none';
-  export let fontSize = '13px';
-  export let fontWeight = '400';
-  export let textAnchor = 'start';
-  export let backdrop = false;
-  export let backdropHeight = 0;
-  export let icon: IconName | undefined = undefined;
-  export let config: GraphConfig | undefined = undefined;
-  export let label = false;
+  type Props = {
+    point?: [number, number];
+    category?: string;
+    status?: WorkflowStatus | 'none';
+    fontSize?: string;
+    fontWeight?: string | number;
+    textAnchor?: string;
+    backdrop?: boolean;
+    backdropHeight?: number;
+    icon?: IconName;
+    config?: GraphConfig;
+    label?: boolean;
+    children?: Snippet;
+    /**
+     * Pass any value that captures the rendered content (e.g. the decoded text).
+     * Whenever it changes, the text bbox is re-measured so the background rect
+     * stays sized to the actual text.
+     */
+    contentKey?: unknown;
+  };
 
-  $: [x, y] = point;
+  let {
+    point = [0, 0],
+    category = undefined,
+    status = 'none',
+    fontSize = '13px',
+    fontWeight = '400',
+    textAnchor = 'start',
+    backdrop = false,
+    backdropHeight = 0,
+    icon = undefined,
+    config = undefined,
+    label = false,
+    children,
+    contentKey,
+  }: Props = $props();
 
-  let textElement: SVGTextElement;
+  const [x, y] = $derived(point);
 
-  $: showIcon = icon && config;
-  $: textWidth = textElement?.getBBox()?.width || 0;
-  $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
-  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2 : x;
+  let textElement: SVGTextElement | undefined = $state();
+
+  const iconInfo = $derived(icon && config ? { icon, config } : undefined);
+  let textBBox = $state<DOMRect | undefined>();
+  $effect(() => {
+    void contentKey;
+    if (textElement) textBBox = textElement.getBBox();
+  });
+  const textWidth = $derived(textBBox?.width || 0);
+  const textHeight = $derived(textBBox?.height || 0);
+  const backdropWidth = $derived(iconInfo ? textWidth + 36 : textWidth + 12);
+  const textX = $derived(
+    iconInfo && textAnchor === 'start' ? x + iconInfo.config.radius * 2 : x,
+  );
 </script>
 
 {#if backdrop}
@@ -36,27 +72,39 @@
     strokeWidth={backdropHeight}
   />
 {/if}
-{#if showIcon}
+{#if iconInfo}
   <Icon
-    name={icon}
+    name={iconInfo.icon}
     x={textAnchor === 'end' ? x - textWidth - backdropHeight : x}
     y={y - 8}
     class={!backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
-<text
-  bind:this={textElement}
-  class="cursor-pointer select-none outline-none {category} text-primary"
-  class:label
-  class:backdrop
-  x={textX}
-  {y}
-  font-size={fontSize}
-  font-weight={fontWeight}
-  text-anchor={textAnchor}
->
-  <slot />
-</text>
+{#key textX}
+  {#if !backdrop}
+    <rect
+      x={textBBox?.x ?? 0}
+      y={y - textHeight / 2}
+      width={textWidth}
+      height={textHeight}
+      class="text-background"
+      pointer-events="none"
+    />
+  {/if}
+  <text
+    bind:this={textElement}
+    class="cursor-pointer select-none outline-none {category} text-primary"
+    class:label
+    class:backdrop
+    x={textX}
+    y={y + 1}
+    font-size={fontSize}
+    font-weight={fontWeight}
+    text-anchor={textAnchor}
+  >
+    {@render children?.()}
+  </text>
+{/key}
 
 <style lang="postcss">
   text {
@@ -66,6 +114,10 @@
     stroke: none;
     dominant-baseline: middle;
     alignment-baseline: baseline;
+  }
+
+  rect.text-background {
+    fill: rgb(var(--color-surface-primary));
   }
 
   text.backdrop {
@@ -99,7 +151,7 @@
   }
 
   text.child-workflow {
-    fill: #67e4f9;
+    fill: theme('colors.cyan.600');
   }
 
   text.workflow {
@@ -107,7 +159,7 @@
   }
 
   text.Failed {
-    fill: #ff4518;
+    fill: #ff4418;
   }
 
   text.none {

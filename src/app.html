@@ -3,6 +3,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <style>
+      html {
+        background-color: #f8fafc;
+        color: #141414;
+      }
+      body {
+        margin: 0;
+        background-color: #f8fafc;
+        color: #141414;
+      }
+      @media (prefers-color-scheme: dark) {
+        html,
+        body {
+          background-color: #141414;
+          color: #f8fafc;
+        }
+      }
+    </style>
     %sveltekit.head%
   </head>
 

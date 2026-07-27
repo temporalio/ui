@@ -8,7 +8,7 @@
   </h5>
   <ol class="orderable-list">
     <slot>
-      <OrderableListItem readonly label="No Items" pinned={false} />
+      <OrderableListItem readonly label="No Items" />
     </slot>
   </ol>
 </div>

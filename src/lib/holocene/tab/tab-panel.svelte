@@ -1,20 +1,22 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { getContext } from 'svelte';
 
   import { type TabContext, TABS } from './tabs.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     id: string;
     tabId: string;
+    children?: Snippet;
   }
 
-  export let id: string;
-  export let tabId: string;
+  let { id, tabId, children, ...rest }: Props = $props();
   const { registerPanel, activePanel } = getContext<TabContext>(TABS);
-  $: active = $activePanel === id;
-  registerPanel(id);
+  const initialId = id;
+  const active = $derived($activePanel === initialId);
+  registerPanel(initialId);
 </script>
 
 <div
@@ -24,7 +26,7 @@
   aria-labelledby={tabId}
   tabindex="0"
   role="tabpanel"
-  {...$$restProps}
+  {...rest}
 >
-  <slot />
+  {@render children?.()}
 </div>

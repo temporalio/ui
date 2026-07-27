@@ -71,7 +71,7 @@ export async function fetchNamespaces(
       .map(toNamespaceDetails);
 
     namespaces.set(_namespaces);
-  } catch (e) {
+  } catch {
     namespaces.set([]);
   }
 }
@@ -91,7 +91,7 @@ export async function fetchNamespace(
   const results = await requestFromAPI<DescribeNamespaceResponse>(route, {
     request,
     onError: () =>
-      toaster.push({ variant: 'error', message: 'Unable to fetch namespaces' }),
+      toaster.push({ variant: 'error', message: 'Unable to fetch namespace' }),
   });
 
   return results ? toNamespaceDetails(results) : empty;

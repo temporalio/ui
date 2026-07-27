@@ -1,11 +1,17 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
 
-  export let isCloud = false;
+  import { page } from '$app/state';
+
+  let {
+    isCloud = false,
+    children,
+    fallback,
+  }: { isCloud?: boolean; children?: Snippet; fallback?: Snippet } = $props();
 </script>
 
-{#if isCloud || $page.data?.settings?.runtimeEnvironment?.isCloud}
-  <slot />
+{#if isCloud || page.data?.settings?.runtimeEnvironment?.isCloud}
+  {@render children?.()}
 {:else}
-  <slot name="fallback" />
+  {@render fallback?.()}
 {/if}

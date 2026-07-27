@@ -1,15 +1,16 @@
 import type {
   Memo,
-  Payloads,
+  Payload,
   PendingWorkflowTaskInfo,
+  Priority,
   WorkflowExecutionStatus,
+  WorkflowExtendedInfo,
   WorkflowVersionTimpstamp,
 } from '$lib/types';
+import type { Callback } from '$lib/types/nexus';
 
 import type { VersioningInfo } from './deployments';
 import type {
-  Callbacks,
-  Payload,
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,
@@ -36,6 +37,8 @@ export type WorkflowExecutionInfo = Replace<
     closeTime: string;
     executionTime: string;
     historySizeBytes: string;
+    externalPayloadCount?: string;
+    externalPayloadSizeBytes?: string;
     historyLength: string;
     searchAttributes?: WorkflowSearchAttributes;
     memo?: Memo;
@@ -49,12 +52,20 @@ export type ListWorkflowExecutionsResponse = Replace<
 
 export type CountWorkflowExecutionsResponse = {
   count?: string;
-  groups?: { count: string; groupValues: Payloads }[];
+  groups?: { count: string; groupValues: Payload[] }[];
+};
+
+export type CountSchedulesResponse = {
+  count?: string;
+  groups?: { count: string; groupValues: Payload[] }[];
 };
 
 export type WorkflowExecutionConfig = Replace<
   import('$lib/types').WorkflowExecutionConfig,
-  { defaultWorkflowTaskTimeout: Duration }
+  {
+    defaultWorkflowTaskTimeout: Duration;
+    workflowExecutionTimeout?: Duration;
+  }
 >;
 
 export type WorkflowInteractionDefinition = {
@@ -78,18 +89,15 @@ export type UserMetadata = {
   details?: Payload;
 };
 
-export type WorkflowExecutionConfigWithMetadata = WorkflowExecutionConfig & {
-  userMetadata?: UserMetadata;
-};
-
 export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
-  executionConfig: WorkflowExecutionConfigWithMetadata;
-  callbacks: Callbacks;
+  executionConfig: WorkflowExecutionConfig;
+  callbacks: Callback[];
   pendingWorkflowTask: PendingWorkflowTaskInfo;
+  workflowExtendedInfo: WorkflowExtendedInfo;
 }>;
 
 export type WorkflowStatus =
@@ -100,6 +108,7 @@ export type WorkflowStatus =
   | 'ContinuedAsNew'
   | 'Canceled'
   | 'Terminated'
+  | 'Paused'
   | null;
 
 export type WorkflowType = string | null;
@@ -150,8 +159,7 @@ export type DecodedWorkflowSearchAttributes = {
   indexedFields?: Record<string, string>;
 };
 
-export interface MostRecentWOrkflowVersionStamp
-  extends WorkflowVersionTimpstamp {
+export interface MostRecentWOrkflowVersionStamp extends WorkflowVersionTimpstamp {
   useVersioning?: boolean;
 }
 
@@ -166,6 +174,8 @@ export type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
+  externalPayloadCount: string | undefined;
+  externalPayloadSizeBytes: string | undefined;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
   assignedBuildId?: string;
   searchAttributes?: DecodedWorkflowSearchAttributes;
@@ -180,12 +190,17 @@ export type WorkflowExecution = {
   parent?: WorkflowIdentifier;
   url: string;
   isRunning: boolean;
+  isPaused: boolean;
   defaultWorkflowTaskTimeout: Duration;
+  workflowExecutionTimeout?: Duration;
   canBeTerminated: boolean;
-  callbacks: Callbacks;
+  callbacks: Callback[];
   versioningInfo?: VersioningInfo;
+  priority?: Priority;
   summary?: Payload;
   details?: Payload;
+  workflowExtendedInfo: WorkflowExtendedInfo;
+  startDelay?: string;
 };
 
 export type WorkflowTaskFailedCause =
@@ -221,4 +236,5 @@ export type WorkflowTaskFailedCause =
   | 'PendingSignalsLimitExceeded'
   | 'PendingRequestCancelLimitExceeded'
   | 'BadUpdateWorkflowExecutionMessage'
-  | 'UnhandledUpdate';
+  | 'UnhandledUpdate'
+  | 'WorkflowTaskTimedOut';

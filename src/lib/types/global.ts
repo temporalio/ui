@@ -74,14 +74,20 @@ export interface NetworkError {
 export type Settings = {
   auth: {
     enabled: boolean;
-    options: string[];
+    options: string[] | null;
+    redirectToProvider: boolean;
   };
-  bannerText: string;
   baseUrl: string;
   codec: {
     endpoint?: string;
     passAccessToken?: boolean;
     includeCredentials?: boolean;
+    customErrorMessage?: {
+      default?: {
+        message?: string;
+        link?: string;
+      };
+    };
   };
   defaultNamespace: string;
   disableWriteActions: boolean;
@@ -90,11 +96,14 @@ export type Settings = {
   workflowSignalDisabled: boolean;
   workflowUpdateDisabled: boolean;
   workflowResetDisabled: boolean;
+  workflowPauseDisabled: boolean;
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
+  activityCommandsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
-  notifyOnNewVersion: boolean;
+  navCollapsedByDefault: boolean;
   feedbackURL: string;
+  disableNewsFetch: boolean;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;
@@ -138,13 +147,12 @@ export type BooleanString = 'true' | 'false';
 
 export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
-export type NavLinkListItem = {
+export type NavLinkItem = {
   href: string;
   icon: IconName;
   label: string;
   tooltip?: string;
   external?: boolean;
-  divider?: boolean;
   enabled?: boolean;
   hidden?: boolean;
   animate?: boolean;

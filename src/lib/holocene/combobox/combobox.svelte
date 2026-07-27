@@ -1,14 +1,58 @@
+<script module lang="ts">
+  import { cva, type VariantProps } from 'class-variance-authority';
+
+  const comboboxStyles = cva(
+    [
+      'surface-primary',
+      'flex',
+      'max-h-28',
+      'min-h-10',
+      'w-full',
+      'flex-row',
+      'items-center',
+      'overflow-auto',
+      'border',
+      'text-sm',
+      'dark:focus-within:surface-primary',
+      'focus-within:outline-none',
+      'focus-within:ring-2',
+    ],
+    {
+      variants: {
+        variant: {
+          default:
+            'border-subtle focus-within:border-interactive focus-within:ring-primary/70',
+          ghost:
+            'bg-transparent border-transparent focus-within:border-transparent focus-within:ring-transparent focus-within:bg-transparent hover:surface-interactive-secondary',
+        },
+      },
+      defaultVariants: {
+        variant: 'default',
+      },
+    },
+  );
+
+  export type ComboboxStyles = VariantProps<typeof comboboxStyles>;
+</script>
+
 <script lang="ts">
-  import type { HTMLInputAttributes } from 'svelte/elements';
+  import type {
+    FocusEventHandler,
+    FormEventHandler,
+    HTMLInputAttributes,
+    KeyboardEventHandler,
+    MouseEventHandler,
+  } from 'svelte/elements';
   import { writable, type Writable } from 'svelte/store';
 
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import ComboboxOption from '$lib/holocene/combobox/combobox-option.svelte';
   import Label from '$lib/holocene/label.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import Badge from '../badge.svelte';
   import Button from '../button.svelte';
@@ -20,18 +64,10 @@
 
   type T = $$Generic;
 
-  const dispatch = createEventDispatcher<{
-    change: { value: string | T };
-    filter: string;
-    close: { selectedOption: string | T };
-    input: string;
-  }>();
-
-  type ExtendedInputEvent = Event & {
-    currentTarget: EventTarget & HTMLInputElement;
-  };
-
-  interface BaseProps extends HTMLInputAttributes {
+  interface BaseProps extends Omit<
+    HTMLInputAttributes,
+    'onchange' | 'oninput' | 'onclose'
+  > {
     id: string;
     label: string;
     noResultsText: string;
@@ -41,6 +77,7 @@
     readonly?: boolean;
     required?: boolean;
     leadingIcon?: IconName;
+    showChevron?: boolean;
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
@@ -51,106 +88,145 @@
     hrefDisabled?: boolean;
     loading?: boolean;
     loadingText?: string;
+    allowCustomValue?: boolean;
     open?: Writable<boolean>;
     maxMenuHeight?: string;
+    variant?: ComboboxStyles['variant'];
+    class?: string;
+    optionClass?: string;
+    action?: Snippet;
+    onchange?: (value: string | T) => void;
+    onclose?: (selected: string | T) => void;
+    oninput?: (value: string) => void;
   }
 
-  type MultiSelectProps = {
+  interface MultiSelectProps {
     multiselect: true;
     value: string[];
     displayChips?: boolean;
     chipLimit?: number;
     removeChipLabel?: string;
     selectAllLabel?: string;
-    selectNoneLabel?: string;
+    deselectAllLabel?: string;
+    hideControls?: boolean;
     numberOfItemsSelectedLabel?: (count: number) => string;
-  };
+  }
 
-  type SingleSelectProps = {
+  interface SingleSelectProps {
     multiselect?: false;
     value: string;
     chipLimit?: never;
-  };
+    displayChips?: never;
+    removeChipLabel?: never;
+    selectAllLabel?: never;
+    deselectAllLabel?: never;
+    hideControls?: never;
+    numberOfItemsSelectedLabel?: never;
+  }
 
-  type StringOptionProps = {
+  interface StringOptionProps {
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
-    displayValue?: never;
-  };
+  }
 
-  type CustomOptionProps = {
+  interface CustomOptionProps {
     options: T[];
     optionValueKey: keyof T;
     optionLabelKey?: keyof T;
-  };
+  }
 
-  type $$Props =
+  type Props =
     | (BaseProps & StringOptionProps & SingleSelectProps)
     | (BaseProps & StringOptionProps & MultiSelectProps)
     | (BaseProps & CustomOptionProps & SingleSelectProps)
     | (BaseProps & CustomOptionProps & MultiSelectProps);
 
-  let className = '';
-  export { className as class };
-  export let id: string;
-  export let label: string;
-  export let multiselect = false;
-  export let value: string | string[] = multiselect ? [] : undefined;
-  export let noResultsText: string;
-  export let disabled = false;
-  export let labelHidden = false;
-  export let options: (T | string)[];
-  export let placeholder: string = null;
-  export let readonly = false;
-  export let required = false;
-  export let leadingIcon: IconName = null;
-  export let optionValueKey: keyof T = null;
-  export let optionLabelKey: keyof T = optionValueKey;
-  export let minSize = 0;
-  export let maxSize = 120;
-  export let error = '';
-  export let valid = true;
-  export let displayChips = true;
-  export let chipLimit = 5;
-  export let selectAllLabel = 'Select All';
-  export let deselectAllLabel = 'Deselect All';
-  export let removeChipLabel = 'Remove Option';
-  export let actionTooltip = '';
-  export let href = '';
-  export let hrefDisabled = false;
-  export let loading = false;
-  export let loadingText = 'Loading more results';
+  let {
+    class: className,
+    id,
+    label,
+    multiselect = false,
+    value = $bindable(),
+    noResultsText,
+    disabled = false,
+    labelHidden = false,
+    options,
+    placeholder = null,
+    readonly = false,
+    required = false,
+    leadingIcon = null,
+    showChevron = false,
+    optionValueKey = null,
+    optionLabelKey = optionValueKey,
+    minSize = 0,
+    maxSize = 120,
+    error = '',
+    valid = true,
+    open = writable(false),
+    maxMenuHeight = 'max-h-[20rem]',
+    action,
+    chipLimit = 5,
+    displayChips = true,
+    selectAllLabel = 'Select All',
+    deselectAllLabel = 'Deselect All',
+    hideControls = false,
+    removeChipLabel = 'Remove Option',
+    numberOfItemsSelectedLabel = (count: number) =>
+      `${count} option${count > 1 ? 's' : ''} selected`,
+    actionTooltip = '',
+    href = '',
+    hrefDisabled = false,
+    loading = false,
+    loadingText = 'Loading more results',
+    allowCustomValue = false,
+    variant = 'default',
+    optionClass = '',
+    onchange,
+    onclose,
+    oninput,
+    'data-testid': testId = id,
+    ...rest
+  }: Props = $props();
 
-  export let numberOfItemsSelectedLabel = (count: number) =>
-    `${count} option${count > 1 ? 's' : ''} selected`;
-
-  let displayValue: string = '';
   // Filter value and display value are close but different in a few cases
   // primary difference is when opening a select box display value is filled
   // and filter value should be blank
-  let filterValue: string = '';
-  let selectedOption: string | T;
-  let menuElement: HTMLUListElement;
-  let inputElement: HTMLInputElement;
+  let filterValue: string = $state('');
+  let menuElement: HTMLUListElement | null = $state(null);
+  let inputElement: HTMLInputElement | null = $state(null);
+  let inputFocused: boolean = $state(false);
+  let customOptions: string[] = $state([]);
 
-  export let open = writable<boolean>(false);
-  export let maxMenuHeight: string = 'max-h-[20rem]';
+  const allOptions = $derived(
+    allowCustomValue ? [...customOptions, ...options] : options,
+  );
+  const selectedOption = $derived(getSelectedOption(allOptions));
+  let list = $derived(filterOptions(filterValue, allOptions));
+  const trimmedFilterValue = $derived(filterValue.trim());
+  const showAddCustom = $derived(
+    allowCustomValue &&
+      trimmedFilterValue &&
+      !list.some(
+        (o) =>
+          getDisplayValue(o).toLowerCase() === trimmedFilterValue.toLowerCase(),
+      ),
+  );
+  let displayValue = $derived(
+    !multiselect ? getDisplayValue(selectedOption) : undefined,
+  );
 
   // We need this piece of code to focus the element when externally modifying the
   // open store. Specifically we use this behaviour in bottom nav to focus the combobox
   // after the bottom nav is clicked
-  $: {
+  $effect(() => {
     if ($open && inputElement && document.activeElement !== inputElement) {
       inputElement.focus();
       inputElement.select();
     }
-  }
+  });
 
-  // We want this to react to external changes to the options prop to support async use cases
-  $: list = filterOptions(filterValue, options);
-
-  $: {
+  $effect(() => {
     if (inputElement && displayValue) {
       if (displayValue.length < minSize) {
         inputElement.size = minSize;
@@ -160,23 +236,10 @@
         inputElement.size = displayValue.length;
       }
     }
-  }
-
-  $: if (!multiselect) {
-    selectedOption = options.find((option) => {
-      if (isStringOption(option)) {
-        return option === value;
-      }
-
-      if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return option[optionValueKey] === value;
-      }
-    });
-
-    displayValue = getDisplayValue(selectedOption);
-  }
+  });
 
   const openList = () => {
+    if ($open) return;
     $open = true;
     filterValue = '';
     inputElement.focus();
@@ -186,22 +249,35 @@
   const closeList = () => {
     if (!$open) return;
     $open = false;
-    dispatch('close', { selectedOption });
+    onclose?.(selectedOption);
     resetValueAndOptions();
   };
 
   const handleMenuClose = () => {
-    dispatch('close', { selectedOption });
+    onclose?.(selectedOption);
     resetValueAndOptions();
   };
 
   const resetValueAndOptions = () => {
     displayValue = getDisplayValue(selectedOption);
-    list = options;
+    list = allOptions;
   };
 
   const isArrayValue = (value: string | string[]): value is string[] => {
     return Array.isArray(value);
+  };
+
+  const addCustomValue = () => {
+    if (!trimmedFilterValue) return;
+    if (isArrayValue(value) && value.includes(trimmedFilterValue)) return;
+    if (!customOptions.includes(trimmedFilterValue)) {
+      customOptions = [trimmedFilterValue, ...customOptions];
+    }
+    handleSelectOption(trimmedFilterValue);
+    filterValue = '';
+    if (multiselect) {
+      displayValue = '';
+    }
   };
 
   const isStringOption = (option: string | T): option is string => {
@@ -224,7 +300,7 @@
     );
   };
 
-  const getDisplayValue = (option: string | T | undefined): string => {
+  function getDisplayValue(option: string | T | undefined): string {
     if (!option) {
       if (isArrayValue(value)) {
         return '';
@@ -240,7 +316,19 @@
     if (isObjectOption(option) && canRenderCustomOption(option)) {
       return String(option[optionLabelKey]);
     }
-  };
+  }
+
+  function getSelectedOption(options: (string | T)[]) {
+    return options.find((option) => {
+      if (isStringOption(option)) {
+        return option === value;
+      }
+
+      if (isObjectOption(option) && canRenderCustomOption(option)) {
+        return option[optionValueKey] === value;
+      }
+    });
+  }
 
   /**
    * Given an option that could be an object of type T set internal value in the component to string/string[]
@@ -276,7 +364,7 @@
 
   const handleSelectOption = (option: string | T) => {
     setValue(option);
-    dispatch('change', { value: option });
+    onchange?.(option);
     if (!multiselect) {
       resetValueAndOptions();
     }
@@ -314,7 +402,10 @@
     }
   };
 
-  const handleInputKeydown = (event: KeyboardEvent) => {
+  const handleInputKeydown: KeyboardEventHandler<HTMLInputElement> = (
+    event,
+  ) => {
+    event.stopPropagation();
     switch (event.key) {
       case 'Escape':
         closeList();
@@ -324,8 +415,12 @@
         focusFirstOption();
         break;
       case 'Enter':
-        openList();
-        focusFirstOption();
+        if (showAddCustom) {
+          addCustomValue();
+        } else {
+          openList();
+          focusFirstOption();
+        }
         break;
       case 'ArrowUp':
       case 'ArrowRight':
@@ -336,17 +431,26 @@
     }
   };
 
-  const handleInput = (event: ExtendedInputEvent) => {
+  const handleFocus: FocusEventHandler<HTMLInputElement> = (event) => {
+    event.stopPropagation();
+    inputFocused = true;
+    openList();
+  };
+
+  const handleBlur: FocusEventHandler<HTMLInputElement> = () => {
+    inputFocused = false;
+  };
+
+  const handleInput: FormEventHandler<HTMLInputElement> = (event) => {
+    event.stopPropagation();
     if (!$open) $open = true;
     // Reactive statement at top makes this work, not my favorite tho
     displayValue = event.currentTarget.value;
     filterValue = displayValue;
-    dispatch('input', displayValue);
+    oninput?.(displayValue);
   };
 
   function filterOptions(value: string, options: (T | string)[]) {
-    dispatch('filter', displayValue);
-
     return options.filter((option) => {
       if (isStringOption(option)) {
         return option.toLowerCase().includes(value.toLowerCase());
@@ -360,8 +464,21 @@
     });
   }
 
-  const handleInputClick = () => {
+  const errorId = $derived(`${id}-error`);
+  const showError = $derived(!!error && !valid);
+
+  const handleInputClick: MouseEventHandler<HTMLInputElement> = (event) => {
+    event.stopPropagation();
     if (!$open) openList();
+  };
+
+  const handleChevronClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.stopPropagation();
+    if ($open) {
+      closeList();
+    } else {
+      openList();
+    }
   };
 
   const isSelected = (
@@ -379,87 +496,107 @@
   };
 </script>
 
-<MenuContainer {open} on:close={handleMenuClose}>
-  <Label class="pb-1" hidden={labelHidden} {required} {label} for={id} />
-
-  <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
-    {#if leadingIcon}
-      <Icon class="ml-2 shrink-0" name={leadingIcon} />
-    {/if}
+<MenuContainer {open} onclose={handleMenuClose}>
+  <div class="flex flex-col gap-1.5">
+    <Label hidden={labelHidden} {required} {label} for={id} />
     <div
       class={merge(
-        'input-wrapper',
-        multiselect && 'gap-1',
-        multiselect && 'm-1',
-        leadingIcon && multiselect && 'ml-2',
+        comboboxStyles({ variant }),
+        !valid &&
+          variant === 'default' &&
+          'border border-danger text-danger focus-within:ring-danger/70',
+        disabled && 'opacity-50',
+        className,
       )}
     >
-      {#if multiselect && isArrayValue(value) && value.length > 0}
-        {#if displayChips}
-          {#each value.slice(0, chipLimit) as v}
-            <Chip
-              on:remove={() => removeOption(v)}
-              removeButtonLabel={removeChipLabel}>{v}</Chip
-            >
-          {/each}
-          {#if value.length > chipLimit}
-            <p>+{value.slice(chipLimit).length}</p>
-          {/if}
-        {:else}
-          <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
-        {/if}
+      {#if leadingIcon}
+        <Icon class="ml-2 shrink-0" name={leadingIcon} />
       {/if}
-      <input
-        {id}
-        {placeholder}
-        {required}
-        {readonly}
-        {disabled}
-        type="text"
-        value={displayValue}
-        class:disabled
+      <div
         class={merge(
-          'combobox-input',
-          multiselect
-            ? value.length > 0 || leadingIcon
-              ? 'indent-0'
-              : 'indent-1'
-            : 'indent-2',
-          className,
+          'input-wrapper',
+          multiselect && 'gap-1',
+          multiselect && 'm-1',
+          leadingIcon && multiselect && 'ml-2',
         )}
-        role="combobox"
-        autocomplete="off"
-        autocapitalize="off"
-        spellcheck="false"
-        data-lpignore="true"
-        data-1p-ignore="true"
-        aria-controls="{id}-listbox"
-        aria-expanded={$open}
-        aria-required={required}
-        aria-autocomplete="list"
-        on:focus|stopPropagation={openList}
-        on:input|stopPropagation={handleInput}
-        on:keydown|stopPropagation={handleInputKeydown}
-        on:click|stopPropagation={handleInputClick}
-        data-testid={$$props['data-testid'] ?? id}
-        bind:this={inputElement}
-        {...$$restProps}
-      />
-    </div>
-    {#if $$slots.action}
-      <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
-        {#if actionTooltip}
-          <Tooltip text={actionTooltip} right>
-            <slot name="action" />
-          </Tooltip>
-        {:else}
-          <slot name="action" />
+      >
+        {#if multiselect && isArrayValue(value) && value.length > 0}
+          {#if displayChips}
+            {#each value.slice(0, chipLimit) as v, i (i)}
+              <Chip
+                onremove={() => removeOption(v)}
+                removeButtonLabel={removeChipLabel}>{v}</Chip
+              >
+            {/each}
+            {#if value.length > chipLimit}
+              <p>+{value.slice(chipLimit).length}</p>
+            {/if}
+          {:else}
+            <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
+          {/if}
         {/if}
+        <input
+          {id}
+          {placeholder}
+          {required}
+          {readonly}
+          {disabled}
+          type="text"
+          value={displayValue}
+          class={merge(
+            'combobox-input',
+            multiselect
+              ? value.length > 0 || leadingIcon
+                ? 'indent-0'
+                : 'indent-1'
+              : 'indent-2',
+            className,
+          )}
+          role="combobox"
+          autocomplete={rest.autocomplete ?? 'off'}
+          autocapitalize="off"
+          spellcheck="false"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          aria-controls="{id}-listbox"
+          aria-expanded={$open}
+          aria-required={required}
+          aria-invalid={!valid ? 'true' : undefined}
+          aria-describedby={showError ? errorId : undefined}
+          aria-autocomplete="list"
+          onfocus={handleFocus}
+          onblur={handleBlur}
+          oninput={handleInput}
+          onkeydown={handleInputKeydown}
+          onclick={handleInputClick}
+          data-testid={testId}
+          bind:this={inputElement}
+          {...rest}
+        />
       </div>
-    {:else if href}
-      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
-        {#if actionTooltip}
-          <Tooltip text={actionTooltip} right>
+      {#if action}
+        <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
+          {#if actionTooltip}
+            <Tooltip text={actionTooltip} right>
+              {@render action()}
+            </Tooltip>
+          {:else}
+            {@render action()}
+          {/if}
+        </div>
+      {:else if href}
+        <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+          {#if actionTooltip}
+            <Tooltip text={actionTooltip} right>
+              <Button
+                variant="ghost"
+                size="xs"
+                {href}
+                disabled={hrefDisabled}
+                leadingIcon="external-link"
+              />
+            </Tooltip>
+          {:else}
             <Button
               variant="ghost"
               size="xs"
@@ -467,18 +604,28 @@
               disabled={hrefDisabled}
               leadingIcon="external-link"
             />
-          </Tooltip>
-        {:else}
-          <Button
-            variant="ghost"
-            size="xs"
-            {href}
-            disabled={hrefDisabled}
-            leadingIcon="external-link"
+          {/if}
+        </div>
+      {/if}
+      {#if showChevron}
+        <button
+          type="button"
+          class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
+          onclick={handleChevronClick}
+          aria-label={$open ? 'Close options' : 'Open options'}
+          tabindex="-1"
+        >
+          <Icon
+            name="chevron-down"
+            class={merge(
+              'transition-transform duration-200',
+              $open && 'rotate-180',
+              !$open && 'rotate-0',
+            )}
           />
-        {/if}
-      </div>
-    {/if}
+        </button>
+      {/if}
+    </div>
   </div>
 
   <Menu
@@ -489,66 +636,72 @@
     class="w-full"
     maxHeight={maxMenuHeight}
   >
-    {#if multiselect && isArrayValue(value)}
+    {#if multiselect && isArrayValue(value) && !hideControls}
       <ComboboxOption
-        disabled={value.length === options.length}
-        on:click={selectAll}
+        disabled={value.length === allOptions.length}
+        onclick={selectAll}
         label={selectAllLabel}
       />
       <ComboboxOption
         disabled={value.length === 0}
-        on:click={deselectAll}
+        onclick={deselectAll}
         label={deselectAllLabel}
       />
       <MenuDivider />
     {/if}
 
-    {#each list as option}
+    {#if showAddCustom}
       <ComboboxOption
-        on:click={() => handleSelectOption(option)}
+        active={inputFocused}
+        onclick={addCustomValue}
+        label="{translate('common.add')} {trimmedFilterValue}"
+      >
+        {#snippet leading()}
+          <Icon name="add" />
+        {/snippet}
+      </ComboboxOption>
+      {#if list.length > 0}
+        <MenuDivider />
+      {/if}
+    {/if}
+
+    {#each list as option, i (i)}
+      <ComboboxOption
+        onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}
+        class={optionClass}
       />
     {:else}
-      {#if loading === false}
+      {#if !showAddCustom && loading === false}
         <ComboboxOption disabled label={noResultsText} />
       {/if}
     {/each}
 
     {#if loading}
       <ComboboxOption disabled label={loadingText}>
-        <Icon slot="leading" name="spinner" class="animate-spin" />
+        {#snippet leading()}
+          <Icon name="spinner" class="animate-spin" />
+        {/snippet}
       </ComboboxOption>
     {/if}
   </Menu>
 
-  {#if error && !valid}
-    <span class="error">{error}</span>
-  {/if}
+  <span id={errorId} role="alert" class="error">
+    {#if showError}{error}{/if}
+  </span>
 </MenuContainer>
 
 <style lang="postcss">
-  .combobox-wrapper {
-    @apply surface-primary flex max-h-28 min-h-10 w-full flex-row items-center overflow-auto border border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
-
-    &.invalid {
-      @apply border border-danger text-danger focus-within:ring-danger/70;
-    }
-
-    &.disabled {
-      @apply opacity-50;
-    }
-  }
-
   .error {
     @apply text-xs text-danger;
   }
 
   .input-wrapper {
-    @apply flex w-full flex-wrap items-center;
+    @apply flex grow flex-wrap items-center;
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
+    @apply flex grow bg-transparent text-primary focus:outline-none;
   }
 </style>

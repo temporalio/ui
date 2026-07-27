@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -20,7 +20,11 @@
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
 
-  export let workflows: WorkflowExecution[];
+  type Props = {
+    workflows: WorkflowExecution[];
+  };
+
+  let { workflows }: Props = $props();
 
   const {
     selectedWorkflows,
@@ -32,41 +36,39 @@
     openBatchResetConfirmationModal,
   } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
-  let coreUser = coreUserStore();
-  let selectedWorkflowsCount: number;
+  const coreUser = coreUserStore();
 
-  $: {
-    selectedWorkflowsCount = $selectedWorkflows?.length ?? 0;
-  }
+  const selectedWorkflowsCount = $derived($selectedWorkflows?.length ?? 0);
 
-  $: terminateEnabled = workflowTerminateEnabled(
-    $page.data.settings,
-    $coreUser,
-    $page.params.namespace,
-  );
-
-  $: cancelEnabled = workflowCancelEnabled(
-    $page.data.settings,
-    $coreUser,
-    $page.params.namespace,
-  );
-
-  $: resetEnabled =
-    workflowResetEnabled(
-      $page.data.settings,
+  const terminateEnabled = $derived(
+    workflowTerminateEnabled(
+      page.data.settings,
       $coreUser,
-      $page.params.namespace,
+      page.params.namespace,
+    ),
+  );
+
+  const cancelEnabled = $derived(
+    workflowCancelEnabled(page.data.settings, $coreUser, page.params.namespace),
+  );
+
+  const resetEnabled = $derived(
+    workflowResetEnabled(
+      page.data.settings,
+      $coreUser,
+      page.params.namespace,
     ) && $isCloud
       ? true
-      : minimumVersionRequired('1.23.0', $temporalVersion);
+      : minimumVersionRequired('1.23.0', $temporalVersion),
+  );
 </script>
 
 {#if $allSelected}
-  <span class="font-semibold">
+  <span class="font-medium">
     <Translate key="workflows.all-selected" count={$workflowCount.count} />
   </span>
 {:else}
-  <span class="font-semibold"
+  <span class="font-medium"
     ><Translate
       key="workflows.n-selected"
       count={selectedWorkflowsCount}
@@ -77,7 +79,7 @@
       ({translate('workflows.select-all-leading')}
       <button
         data-testid="select-all-workflows"
-        on:click={() => handleSelectAll(workflows)}
+        onclick={() => handleSelectAll(workflows)}
         class="cursor-pointer underline"
         ><Translate
           key="workflows.select-all"
@@ -93,7 +95,7 @@
     <Button
       size="xs"
       variant="ghost"
-      class="text-off-white focus-visible:border-table"
+      class="focus-visible:border-table"
       data-testid="bulk-cancel-button"
       disabled={!$cancelableWorkflows.length}
       on:click={openBatchCancelConfirmationModal}
@@ -104,7 +106,7 @@
     <Button
       size="xs"
       variant="ghost"
-      class="text-off-white focus-visible:border-table"
+      class="focus-visible:border-table"
       data-testid="bulk-reset-button"
       on:click={openBatchResetConfirmationModal}
       >{translate('workflows.reset')}</Button

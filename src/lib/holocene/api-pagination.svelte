@@ -1,3 +1,7 @@
+<!--
+@component ApiPagination
+@deprecated This component is deprecated. Use `src/lib/holocene/table/paginated-table/api-paginated.svelte` instead.
+-->
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
@@ -231,8 +235,8 @@
         label={filterInputPlaceholder}
         labelHidden
         placeholder={filterInputPlaceholder}
-        on:input={debouncedHandleFilter}
-        on:clear={handleFilter}
+        oninput={debouncedHandleFilter}
+        onClear={handleFilter}
         clearable
       />
     {/if}
@@ -257,7 +261,7 @@
             on:click={store.previousPage}
             aria-label={previousButtonLabel}
           >
-            <span class="arrow arrow-left" />
+            <span class="arrow arrow-left"></span>
           </button>
           <div class="flex gap-1">
             <p>
@@ -275,7 +279,7 @@
             on:click={fetchIndexData}
             aria-label={nextButtonLabel}
           >
-            <span class="arrow arrow-right" />
+            <span class="arrow arrow-right"></span>
           </button>
         </div>
       {/if}
@@ -322,7 +326,7 @@
             on:click={store.previousPage}
             aria-label={previousButtonLabel}
           >
-            <span class="arrow arrow-left" />
+            <span class="arrow arrow-left"></span>
           </button>
           <div class="flex gap-1">
             <p>
@@ -340,7 +344,7 @@
             on:click={fetchIndexData}
             aria-label={nextButtonLabel}
           >
-            <span class="arrow arrow-right" />
+            <span class="arrow arrow-right"></span>
           </button>
         </div>
       {/if}
@@ -351,7 +355,7 @@
 
 <style lang="postcss">
   .arrow {
-    @apply absolute left-0 top-0 h-0 w-0;
+    @apply h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;
@@ -370,10 +374,10 @@
   }
 
   .caret {
-    @apply relative;
+    @apply inline-flex items-center justify-center;
 
-    width: 12px;
-    height: 12px;
+    width: 24px;
+    height: 24px;
   }
 
   .caret:disabled {

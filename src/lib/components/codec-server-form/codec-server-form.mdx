@@ -1,0 +1,264 @@
+import { Meta } from '@storybook/blocks';
+import { Markdown } from '@storybook/blocks';
+
+import CodecServerForm from './codec-server-form.stories.svelte';
+
+<Meta of={CodecServerForm} />
+
+# CodecServerForm Component
+
+A reusable form component for managing codec server configuration with SuperForms validation.
+
+## Features
+
+- **Promise-Based Loading**: Async data loading with built-in error handling
+- **SuperForms Integration**: Built-in validation with Zod schema and dirty state tracking
+- **Smart Visibility**: Custom section automatically shows when values are populated
+- **Toggle Switches**: Modern UI controls for boolean settings
+- **URL Validation**: Required valid endpoints with optional custom links
+- **Comprehensive Error Handling**: Form state management with proper error display
+- **Type Safety**: Full TypeScript support with Svelte 5 runes
+
+## Architecture
+
+The component uses two main parts:
+
+1. **Parent Component**: Handles async data loading with `#await` pattern
+2. **Content Component**: Renders the form with SuperForms configuration
+
+## Props Interface
+
+The component accepts the following props:
+
+```typescript
+interface Props {
+  class?: string;
+  initialDataPromise: Promise<CodecServerFormData>;
+  onSave: (data: CodecServerFormData) => Promise<void>;
+  onSuccess?: (data: CodecServerFormData) => void;
+  onCancel?: () => void;
+  onRetry?: () => void;
+}
+```
+
+### Form Data Structure
+
+```typescript
+interface CodecServerFormData {
+  endpoint: string; // Required valid URL
+  passUserAccessToken: boolean; // Toggle for access token
+  includeCrossOriginCredentials: boolean; // Toggle for CORS credentials
+  customMessage?: string; // Optional error message
+  customLink?: string; // Optional redirect URL
+}
+```
+
+## Usage Examples
+
+### Basic Usage
+
+```svelte
+<script lang="ts">
+  import CodecServerForm from '$lib/components/codec-server-form/codec-server-form.svelte';
+  import type { CodecServerFormData } from '$lib/components/codec-server-form/types';
+
+  async function fetchCodecServerConfig(): Promise<CodecServerFormData> {
+    const response = await fetch('/api/v1/codec-server');
+    return await response.json();
+  }
+
+  async function handleSave(data: CodecServerFormData): Promise<void> {
+    await fetch('/api/v1/codec-server', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  }
+
+  function handleSuccess(data: CodecServerFormData) {
+    console.log('Codec server updated:', data);
+    // Show toast, redirect, etc.
+  }
+
+  function handleCancel() {
+    console.log('Form cancelled');
+    // Navigate back, reset state, etc.
+  }
+
+  const initialDataPromise = fetchCodecServerConfig();
+</script>
+
+<CodecServerForm
+  {initialDataPromise}
+  onSave={handleSave}
+  onSuccess={handleSuccess}
+  onCancel={handleCancel}
+/>
+```
+
+### Integration with SvelteKit
+
+```svelte
+<!-- src/routes/namespaces/[namespace]/codec-server/+page.svelte -->
+<script lang="ts">
+  import { page } from '$app/state';
+  import CodecServerForm from '$lib/components/codec-server-form/codec-server-form.svelte';
+  import type { CodecServerFormData } from '$lib/components/codec-server-form/types';
+
+  const namespace = $derived(page.params.namespace);
+
+  async function fetchCodecServerConfig(): Promise<CodecServerFormData> {
+    // TODO: Replace with actual service call when available
+    // For now, return default values
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return {
+      endpoint: '',
+      passUserAccessToken: false,
+      includeCrossOriginCredentials: false,
+      customMessage: '',
+      customLink: '',
+    };
+  }
+
+  async function handleSave(data: CodecServerFormData): Promise<void> {
+    // TODO: Implement when codec server update endpoint is available
+    console.log('Saving codec server config:', data);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  function handleSuccess(data: CodecServerFormData) {
+    console.log('Codec server configuration saved successfully');
+    // Add any other success handling here (toasts, navigation, etc.)
+  }
+
+  function handleCancel() {
+    console.log('Codec server form cancelled');
+    // Add any cancel handling here (navigation, confirmation, etc.)
+  }
+
+  function handleRetry() {
+    console.log('Retrying load');
+    // Refresh the promise or reload the page
+  }
+
+  const initialDataPromise = fetchCodecServerConfig();
+</script>
+
+<svelte:head>
+  <title>Codec Server Configuration</title>
+</svelte:head>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Codec Server Configuration</h1>
+    <p class="text-gray-600 mt-2">
+      Configure codec server endpoint to decode payloads for this namespace.
+    </p>
+  </div>
+
+  <CodecServerForm
+    {initialDataPromise}
+    onSave={handleSave}
+    onSuccess={handleSuccess}
+    onCancel={handleCancel}
+    onRetry={handleRetry}
+  />
+</div>
+```
+
+## Props
+
+<Markdown>
+  {`
+| Prop               | Type                                          | Default    | Description                             |
+| ------------------ | --------------------------------------------- | ---------- | --------------------------------------- |
+| initialDataPromise | Promise<CodecServerFormData>                 | Required   | Promise that resolves to initial data  |
+| onSave             | (data: CodecServerFormData) => Promise<void> | Required   | Save handler function                  |
+| onSuccess          | (data: CodecServerFormData) => void          | () => {}   | Success callback after save            |
+| onCancel           | () => void                                   | () => {}   | Cancel callback                        |
+| onRetry            | () => void                                   | undefined  | Retry callback for error state         |
+| class              | string                                        | ''         | Additional CSS classes                 |
+  `}
+</Markdown>
+
+## Form Sections
+
+### Main Configuration
+
+- **Info Alert**: Explains that users can override the namespace-level endpoint in their browser
+- **Endpoint Input**: Required valid URL field with validation
+- **Access Token Toggle**: Whether to pass user access token to codec server
+- **Cross-Origin Credentials Toggle**: Whether to include credentials in requests
+
+### Custom Error Handling (Expandable)
+
+- **Smart Visibility**: Automatically visible if custom values exist
+- **Custom Message**: Optional error message for codec server failures
+- **Custom Link**: Optional redirect URL with validation and security warning
+- **Remove Button**: Clears all custom values and hides the section
+
+## Loading States
+
+The component automatically handles three states:
+
+- **Loading**: Shows skeleton loaders while the promise resolves
+- **Success**: Renders the form with loaded configuration
+- **Error**: Shows error messages with retry functionality
+
+## Validation
+
+Form validation is handled by Zod schema with the following rules:
+
+- **Endpoint**: Required valid URL format
+- **Custom Link**: Optional but must be valid URL if provided
+- **Access Token**: Boolean toggle (no validation needed)
+- **Cross-Origin Credentials**: Boolean toggle (no validation needed)
+- **Custom Message**: Optional string (no validation needed)
+
+## Error Handling
+
+The component provides comprehensive error handling:
+
+- **Form State Management**: Prevents form from getting stuck in "Saving..." state
+- **SuperForms Integration**: Proper error handling with `onUpdate` callback
+- **Field-Level Validation**: Real-time feedback for URL validation
+- **API Error Display**: Status messages with proper intent styling
+- **Dirty State Tracking**: Shows when form has unsaved changes
+- **Form Reset**: Cancel button properly resets form to initial state
+
+## Dirty State Management
+
+The form automatically tracks unsaved changes using SuperForms `isTainted` function:
+
+- **Visual Indicator**: Save button shows a badge when there are unsaved changes
+- **Real-time Updates**: Badge updates immediately as user makes changes
+- **Form Reset**: Cancel button clears dirty state and resets to initial values
+- **Save Button State**: Disabled when no changes or while submitting
+
+## Custom Section Behavior
+
+The expandable custom section has intelligent visibility:
+
+- **Hidden by default** when no custom values exist
+- **Visible by default** when custom message or link are populated
+- **Add button** shows when section is hidden
+- **Remove button** clears values and hides section when visible
+- **Security warning** displayed for custom links
+
+## Accessibility
+
+- Proper ARIA labels and roles for all form controls
+- Toggle switches with appropriate accessibility markup
+- Keyboard navigation support
+- Screen reader friendly error messages and descriptions
+- Focus management for form interactions
+- Semantic HTML structure with proper form labeling
+
+## Key Benefits
+
+1. **Flexibility**: Each handler can be customized independently
+2. **Testability**: Individual functions are easier to test in isolation
+3. **Composability**: Functions can be shared across different components
+4. **Type Safety**: Direct function signatures provide better TypeScript inference
+5. **Simplicity**: Clean API with direct function props
+6. **Tree Shaking**: Better optimization as unused functions can be eliminated

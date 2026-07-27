@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ClassNameValue } from 'tailwind-merge';
+
   import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
@@ -18,9 +20,9 @@
 
   type Item = $$Generic;
 
-  export let id: string = null;
+  export let id: string | null = null;
   export let items: Item[];
-  export let variant: 'primary' | 'split' = 'primary';
+  export let loading = false;
   export let updating = false;
   export let perPageLabel: string;
   export let pageButtonLabel: (page: number) => string;
@@ -29,6 +31,11 @@
   export let maxHeight = '';
   export let pageSizeOptions: string[] = options;
   export let fixed = false;
+
+  let className: ClassNameValue = '';
+  export { className as class };
+
+  let paginatedTable: PaginatedTable<Item>;
 
   $: url = $page.url;
   $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
@@ -81,6 +88,7 @@
       value: page,
       url,
     });
+    paginatedTable?.scrollToTop();
   };
 
   $: {
@@ -90,12 +98,14 @@
 </script>
 
 <PaginatedTable
+  bind:this={paginatedTable}
+  {loading}
   {updating}
-  {variant}
   {maxHeight}
   visibleItems={$store.items}
   {fixed}
   {id}
+  class={className}
 >
   <slot name="caption" slot="caption" />
   <slot name="headers" slot="headers" visibleItems={$store.items} />
@@ -148,5 +158,5 @@
     />
   </nav>
 
-  <slot name="empty" slot="empty" {updating} />
+  <slot name="empty" slot="empty" />
 </PaginatedTable>

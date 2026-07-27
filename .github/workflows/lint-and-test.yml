@@ -11,6 +11,9 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -23,24 +26,24 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+        uses: ./.github/actions/setup-node
       - name: Lint
         run: pnpm run --if-present lint:ci
   check-types:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+        uses: ./.github/actions/setup-node
       - name: Check Types
         run: pnpm run check
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+        uses: ./.github/actions/setup-node
       - name: Run Unit Tests
         run: pnpm test

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { FullAutoFill } from 'svelte/elements';
+
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -18,7 +20,9 @@
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
+  export let step: number = 1;
   export let search = false;
+  export let autocomplete: FullAutoFill = 'off';
 
   let valid = true;
 
@@ -33,11 +37,13 @@
   $: {
     validate(value);
   }
+
+  $: errorId = `${id}-error`;
 </script>
 
 <div class={merge('flex flex-col gap-1', $$props.class)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
-  <div class="flex items-center gap-2">
+  <div class="flex items-center">
     <div
       class="surface-primary relative box-border flex h-10 min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
       class:opacity-50={disabled}
@@ -50,7 +56,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-primary focus:outline-none"
+        class="m-2 block w-full bg-transparent text-center text-primary focus:text-brand focus:outline-none"
         type="number"
         {max}
         {min}
@@ -60,7 +66,11 @@
         {placeholder}
         {id}
         {name}
-        autocomplete="off"
+        {step}
+        {required}
+        aria-invalid={!valid ? 'true' : undefined}
+        aria-describedby={!valid && hintText ? errorId : undefined}
+        {autocomplete}
         spellcheck="false"
         bind:value
         on:input
@@ -70,18 +80,25 @@
         on:keydown
       />
     </div>
-    <div class="units">{units}</div>
+    {#if units}
+      <div
+        class="flex h-10 items-center border-y border-r border-subtle bg-subtle px-2"
+      >
+        <p class="text-sm font-normal text-primary">{units}</p>
+      </div>
+    {/if}
   </div>
 </div>
-{#if !valid && hintText}
-  <span class="mt-1 text-xs text-danger">{hintText}</span>
-{/if}
+<span
+  id={errorId}
+  role="alert"
+  class="text-xs text-danger"
+  class:mt-1={!valid && !!hintText}
+>
+  {#if !valid && hintText}{hintText}{/if}
+</span>
 
 <style lang="postcss">
-  .units {
-    @apply text-sm font-medium text-primary;
-  }
-
   .search {
     @apply w-fit;
 

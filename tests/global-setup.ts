@@ -1,15 +1,16 @@
 import { chromium, FullConfig } from '@playwright/test';
 
-import { startWorkflows } from '../temporal/client';
-import { connect } from '../temporal/client';
+import { connect, startWorkflows } from '../temporal/client';
 import { createCodecServer } from '../temporal/codec-server';
-import { runWorker } from '../temporal/workers';
+import { runWorker } from '../temporal/worker';
 import { createTemporalServer } from '../utilities/temporal-server';
 import { createUIServer } from '../utilities/ui-server';
 
 const setupDependencies = async () => {
   const codecServer = await createCodecServer({ port: 8888 });
   const temporalServer = await createTemporalServer({
+    headless: true,
+    uiPort: 8080,
     codecEndpoint: 'http://127.0.0.1:8888',
   });
   const uiServer = await createUIServer('e2e');
@@ -21,7 +22,7 @@ const setupDependencies = async () => {
 
     const client = await connect();
     await runWorker();
-    await startWorkflows(client);
+    await startWorkflows(client, { waitForResult: false });
   } catch (e) {
     console.log('Error setting up server: ', e);
   }

@@ -29,7 +29,7 @@ export const variables = {
   },
   '--color-text-subtle': {
     light: 'slate.700',
-    dark: 'slate.700',
+    dark: 'slate.400',
   },
   '--color-text-danger': {
     light: 'red.700',
@@ -44,7 +44,7 @@ export const variables = {
     dark: 'green.600',
   },
   '--color-text-warning': {
-    light: 'yellow.600',
+    light: 'yellow.700',
     dark: 'yellow.500',
   },
   '--color-text-pink': {
@@ -75,6 +75,10 @@ export const variables = {
   '--color-surface-table': {
     light: 'space-black',
     dark: 'slate.900',
+  },
+  '--color-surface-table-header': {
+    light: 'slate.50',
+    dark: 'slate.800',
   },
   '--color-surface-success': {
     light: 'green.100',
@@ -163,6 +167,10 @@ export const variables = {
   },
   '--color-interactive-table-hover': {
     light: 'indigo.100',
+    dark: 'slate.700',
+  },
+  '--color-surface-table-related-hover': {
+    light: 'indigo.100',
     dark: 'slate.900',
   },
   // Border
@@ -204,7 +212,7 @@ export const variables = {
   },
   '--color-border-focus-info': {
     light: 'indigo.600',
-    dark: 'indigo.600',
+    dark: 'indigo.400',
   },
   '--color-border-focus-danger': {
     light: 'red.600',

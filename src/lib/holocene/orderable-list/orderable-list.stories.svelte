@@ -1,12 +1,14 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import OrderableListItem from './orderable-list-item.svelte';
   import OrderableList from './orderable-list.svelte';
 
   const items = [
-    { label: 'Item A', pinned: true },
-    { label: 'Item B', pinned: true },
+    { label: 'Item A' },
+    { label: 'Item B' },
     { label: 'Item C' },
     { label: 'Item D' },
     { label: 'Item E' },
@@ -51,7 +53,6 @@
         addButtonLabel="Add"
         static={false}
         label={item.label}
-        pinned={item.pinned}
         moveUpButtonLabel="Move Up"
         moveDownButtonLabel="Move Down"
         removeButtonLabel="Remove"

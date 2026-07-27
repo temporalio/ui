@@ -1,4 +1,6 @@
+import action from './svg/action.svelte';
 import activity from './svg/activity.svelte';
+import addSquare from './svg/add-square.svelte';
 import add from './svg/add.svelte';
 import apple from './svg/apple.svelte';
 import archives from './svg/archives.svelte';
@@ -8,10 +10,12 @@ import arrowRight from './svg/arrow-right.svelte';
 import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
 import astronaut from './svg/astronaut.svelte';
+import aws from './svg/aws.svelte';
+import bars from './svg/bars.svelte';
 import batchOperation from './svg/batch-operation.svelte';
 import book from './svg/book-sparkles.svelte';
-// import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
+import buildings from './svg/buildings.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import calendar from './svg/calendar.svelte';
 import canceled from './svg/canceled.svelte';
@@ -28,6 +32,8 @@ import circleCheck from './svg/circle-check.svelte';
 import cirlceQuestion from './svg/circle-question.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
+import code from './svg/code.svelte';
+import collapse from './svg/collapse.svelte';
 import cometSolid from './svg/comet-solid.svelte';
 import comet from './svg/comet.svelte';
 import compact from './svg/compact.svelte';
@@ -38,9 +44,11 @@ import copy from './svg/copy.svelte';
 import creditCard from './svg/credit-card.svelte';
 import descending from './svg/descending.svelte';
 import dollarBadge from './svg/dollar-badge.svelte';
+import dollarInvoice from './svg/dollar-invoice.svelte';
 import download from './svg/download.svelte';
 import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
+import exclamationOctagon from './svg/exclamation-octagon.svelte';
 import exit from './svg/exit.svelte';
 import expand from './svg/expand.svelte';
 import externalLink from './svg/external-link.svelte';
@@ -56,34 +64,48 @@ import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
 import fireExtinguisher from './svg/fire-extinguisher.svelte';
 import flag from './svg/flag.svelte';
+import folders from './svg/folders.svelte';
+import gcp from './svg/gcp.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
+import happyLappy from './svg/happy-lappy.svelte';
 import heartbeat from './svg/heartbeat.svelte';
+import house from './svg/house.svelte';
 import hyphen from './svg/hyphen.svelte';
+import identities from './svg/identities.svelte';
 import importIcon from './svg/import.svelte';
 import inactive from './svg/inactive.svelte';
 import info from './svg/info.svelte';
+import invite from './svg/invite.svelte';
 import json from './svg/json.svelte';
+import key from './svg/key.svelte';
 import keyboard from './svg/keyboard.svelte';
-import labs from './svg/labs.svelte';
+import laptopCode from './svg/laptop-code.svelte';
 import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
 import linux from './svg/linux.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import marker from './svg/marker.svelte';
+import megaphoneUnread from './svg/megaphone-unread.svelte';
+import megaphone from './svg/megaphone.svelte';
 import merge from './svg/merge.svelte';
+import microchip from './svg/microchip.svelte';
 import microsoft from './svg/microsoft.svelte';
 import minimize from './svg/minimize.svelte';
+import minus from './svg/minus.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import nexus from './svg/nexus.svelte';
 import officeBuildings from './svg/office-buildings.svelte';
+import overview from './svg/overview.svelte';
 import pause from './svg/pause.svelte';
+import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import play from './svg/play.svelte';
+import plus from './svg/plus.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -92,17 +114,26 @@ import robot from './svg/robot.svelte';
 import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
+import server from './svg/server.svelte';
 import settings from './svg/settings.svelte';
+import shield from './svg/shield.svelte';
 import signal from './svg/signal.svelte';
+import slashForward from './svg/slash-forward.svelte';
 import sliders from './svg/sliders.svelte';
-import spinnerSolid from './svg/spinner-solid.svelte';
 import spinner from './svg/spinner.svelte';
+import squareInfo from './svg/square-info.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
+import storage from './svg/storage.svelte';
 import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
+import switchIcon from './svg/switch.svelte';
+import systemWindow from './svg/system-window.svelte';
+import tableComfy from './svg/table-comfy.svelte';
+import tableDense from './svg/table-dense.svelte';
 import table from './svg/table.svelte';
+import tag from './svg/tag.svelte';
 import target from './svg/target.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
@@ -118,13 +149,20 @@ import tutorial from './svg/tutorial.svelte';
 import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
+import userGroup from './svg/user-group.svelte';
+import vercel from './svg/vercel.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
+import workers from './svg/workers.svelte';
 import workflow from './svg/workflow.svelte';
+import workflows from './svg/workflows.svelte';
 import xmarkFilled from './svg/xmark-filled.svelte';
+import xmarkSquare from './svg/xmark-square.svelte';
 
 export const icons = {
+  action,
   activity,
+  'add-square': addSquare,
   add,
   apple,
   archives,
@@ -134,9 +172,12 @@ export const icons = {
   'arrow-right': arrowRight,
   ascending,
   astronaut,
+  aws,
+  bars,
   'batch-operation': batchOperation,
   book,
   bookmark,
+  buildings,
   'calendar-plus': calendarPlus,
   calendar,
   canceled,
@@ -153,6 +194,8 @@ export const icons = {
   'circle-question': cirlceQuestion,
   clock,
   close,
+  code,
+  collapse,
   'comet-solid': cometSolid,
   comet,
   compact,
@@ -164,8 +207,10 @@ export const icons = {
   descending,
   download,
   'dollar-badge': dollarBadge,
+  'dollar-invoice': dollarInvoice,
   drained,
   error,
+  'exclamation-octagon': exclamationOctagon,
   exit,
   expand,
   'external-link': externalLink,
@@ -181,32 +226,46 @@ export const icons = {
   filter,
   'filter-solid': filterSolid,
   'fire-extinguisher': fireExtinguisher,
+  folders,
+  gcp,
   github,
   graph,
+  'happy-lappy': happyLappy,
   heartbeat,
+  house,
   hyphen,
+  identities,
   inactive,
   import: importIcon,
   info,
+  invite,
   json,
   keyboard,
-  labs,
+  key,
+  'laptop-code': laptopCode,
   'lightning-bolt': lightningBolt,
   link,
   linux,
   lock,
   logout,
   marker,
+  megaphone,
+  'megaphone-unread': megaphoneUnread,
   merge,
+  microchip,
   microsoft,
   minimize,
+  minus,
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
   nexus,
   'office-buildings': officeBuildings,
+  overview,
   play,
+  plus,
   pause,
+  pencil,
   'pin-filled': pinFilled,
   pin,
   regions,
@@ -217,18 +276,26 @@ export const icons = {
   'rocket-ship': rocketShip,
   schedules,
   search,
+  server,
   settings,
+  shield,
   signal,
+  'slash-forward': slashForward,
   sliders,
   spinner,
+  'square-info': squareInfo,
   'star-empty': starEmpty,
   'star-filled': starFilled,
+  storage,
   success: checkmark,
   sun,
   summary,
   support,
-  'spinner-solid': spinnerSolid,
+  switch: switchIcon,
   table,
+  'table-comfy': tableComfy,
+  'table-dense': tableDense,
+  tag,
   target,
   'temporal-logo': temporalLogo,
   terminal,
@@ -244,10 +311,16 @@ export const icons = {
   update,
   upload,
   usage,
+  'user-group': userGroup,
+  vercel,
   'vertical-ellipsis': verticalEllipsis,
   warning,
+  'system-window': systemWindow,
+  workers,
   workflow,
+  workflows,
   'xmark-filled': xmarkFilled,
+  'xmark-square': xmarkSquare,
 } as const;
 
 export type IconName = keyof typeof icons;

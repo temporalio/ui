@@ -2,24 +2,25 @@
   import { writable, type Writable } from 'svelte/store';
 
   import { onMount } from 'svelte';
-  import { v4 } from 'uuid';
 
   import { page } from '$app/stores';
 
-  import PayloadInputWithEncoding, {
-    type PayloadInputEncoding,
-  } from '$lib/components/payload-input-with-encoding.svelte';
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
+  import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
+  import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
+  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Editor from '$lib/holocene/monaco/editor.svelte';
+  import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
   import { getPollers } from '$lib/services/pollers-service';
   import {
     fetchInitialValuesForStartWorkflow,
@@ -31,16 +32,19 @@
   } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
-    routeForEventHistory,
     routeForTaskQueue,
+    routeForWorkflow,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   $: ({ namespace } = $page.params);
+
+  const identity = getIdentity();
 
   let workflowId = '';
   let taskQueue = '';
@@ -50,7 +54,9 @@
   let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let messageType = '';
+  let workflowStartDelay = '';
 
+  let initialRunId = '';
   let initialWorkflowId = '';
   let initialWorkflowType = '';
 
@@ -60,17 +66,44 @@
 
   let searchAttributes: SearchAttributeInput[] = [];
 
+  $: errorWorkflowDetails = extractWorkflowFromError(error);
+
+  function extractWorkflowFromError(errorMessage: string): {
+    workflowId?: string;
+    runId?: string;
+  } {
+    if (!errorMessage) return {};
+
+    const match = errorMessage.match(/WorkflowId: (.+?), RunId: (.+?)\.?$/);
+    if (!match) return {};
+
+    const workflowId = match[1]?.trim();
+    const runId = match[2]?.trim();
+
+    if (!workflowId || !runId) return {};
+
+    return {
+      workflowId,
+      runId,
+    };
+  }
+
   $: taskQueueParam = $page.url.searchParams.get('taskQueue');
 
   onMount(() => {
     workflowId = $page.url.searchParams.get('workflowId') || '';
     taskQueue = $page.url.searchParams.get('taskQueue') || '';
     workflowType = $page.url.searchParams.get('workflowType') || '';
+    initialRunId = $page.url.searchParams.get('runId') || '';
     initialWorkflowId = $page.url.searchParams.get('workflowId') || '';
     initialWorkflowType = $page.url.searchParams.get('workflowType') || '';
 
-    if (initialWorkflowId || initialWorkflowType) {
-      getInitialValues(initialWorkflowId, initialWorkflowType);
+    if (initialWorkflowId || initialWorkflowType || initialRunId) {
+      getInitialValues({
+        runId: initialRunId,
+        workflowId: initialWorkflowId,
+        workflowType: initialWorkflowType,
+      });
     }
   });
 
@@ -88,12 +121,14 @@
         encoding: $encoding,
         messageType,
         searchAttributes,
+        identity,
+        workflowStartDelay: workflowStartDelay || undefined,
       });
       toaster.push({
         variant: 'success',
         duration: 5000,
         message: translate('workflows.start-workflow-success'),
-        link: routeForEventHistory({
+        link: routeForWorkflow({
           namespace,
           workflow: workflowId,
           run: runId,
@@ -108,11 +143,10 @@
     }
   };
 
-  const generateRandomWorkflowId = () => {
-    workflowId = v4();
+  const syncWorkflowId = (value: string) => {
     updateQueryParameters({
       parameter: 'workflowId',
-      value: workflowId,
+      value,
       url: $page.url,
       allowEmpty: true,
       options: { keepFocus: true, noScroll: true, replaceState: true },
@@ -126,11 +160,20 @@
     }
   };
 
-  const getInitialValues = async (id: string, type: string) => {
+  const getInitialValues = async ({
+    runId,
+    workflowId,
+    workflowType,
+  }: {
+    runId: string;
+    workflowId: string;
+    workflowType: string;
+  }) => {
     const initialValues = await fetchInitialValuesForStartWorkflow({
       namespace,
-      workflowId: id,
-      workflowType: type,
+      runId,
+      workflowId,
+      workflowType,
     });
     input = initialValues.input;
     encoding.set(initialValues.encoding);
@@ -178,7 +221,7 @@
     try {
       JSON.parse(input);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   };
@@ -206,7 +249,7 @@
     {translate('workflows.back-to-workflows')}
   </Link>
   <h1 class="mb-4 overflow-hidden" data-testid="start-workflow">
-    Start a Workflow
+    Start Workflow
   </h1>
   <Card class="flex w-full flex-col gap-4 xl:w-3/4 2xl:w-1/2">
     <div
@@ -218,14 +261,13 @@
         bind:value={workflowId}
         label="Workflow ID"
         class="w-full grow"
-        on:blur={(e) => onInputChange(e, 'workflowId')}
+        onblur={(e) => onInputChange(e, 'workflowId')}
       />
-      <Button
+      <RandomUuidButton
         class="mt-0 md:mt-6"
-        variant="secondary"
-        leadingIcon="retry"
-        on:click={generateRandomWorkflowId}>Random UUID</Button
-      >
+        bind:value={workflowId}
+        onGenerate={syncWorkflowId}
+      />
     </div>
     <div class="flex w-full items-center justify-between gap-4">
       <Input
@@ -234,7 +276,7 @@
         bind:value={taskQueue}
         label="Task Queue"
         class="grow"
-        on:blur={(e) => onInputChange(e, 'taskQueue')}
+        onblur={(e) => onInputChange(e, 'taskQueue')}
       />
     </div>
     {#if pollerCount !== undefined}
@@ -261,14 +303,55 @@
       required
       bind:value={workflowType}
       label="Workflow Type"
-      on:blur={(e) => onInputChange(e, 'workflowType')}
+      onblur={(e) => onInputChange(e, 'workflowType')}
     />
     <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
+        <div>
+          <h3>{translate('search-attributes.custom-search-attributes')}</h3>
+          <p class="text-xs text-secondary">
+            Indexed fields used in a List Filter to filter a list of Workflow
+            Executions.
+          </p>
+        </div>
+        <AddSearchAttributes
+          bind:attributesToAdd={searchAttributes}
+          buttonCopy={translate('common.add')}
+          variant="secondary"
+        />
+      </Card>
+      <Card class="flex flex-col gap-2">
+        <div>
+          <Label
+            for="workflow-start-delay"
+            label={translate('workflows.workflow-start-delay')}
+            class="text-xl"
+          />
+          <p class="text-xs text-secondary">
+            Time to wait before dispatching the first workflow task.
+          </p>
+        </div>
+        <DurationInput
+          id="workflow-start-delay"
+          label={translate('workflows.workflow-start-delay')}
+          labelHidden
+          inputmode="numeric"
+          bind:value={workflowStartDelay}
+          min={0}
+          class="max-w-80"
+        />
+      </Card>
+      <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">
-          <h3>{translate('workflows.user-metadata')}</h3>
-          <p class="flex items-center gap-1 text-sm text-subtle">
+          <div>
+            <h3>{translate('workflows.user-metadata')}</h3>
+            <p class="text-xs text-secondary">
+              Add context to Workflow Execution to help identity and understand
+              its operations.
+            </p>
+          </div>
+          <p class="flex items-center gap-1 text-sm text-secondary">
             {translate('workflows.markdown-supported')}
             <Tooltip
               topRight
@@ -280,18 +363,10 @@
           </p>
         </div>
         <Label label={translate('workflows.summary')} for="summary" />
-        <Editor
-          content={summary}
-          on:change={(event) => (summary = event.detail.value)}
-          class="min-h-48"
-        />
+        <MarkdownEditor bind:content={summary} />
         <Label label={translate('workflows.details')} for="details" />
-        <Editor
-          content={details}
-          on:change={(event) => (details = event.detail.value)}
-        />
+        <MarkdownEditor bind:content={details} />
       </Card>
-      <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
     <div
       class="mt-4 flex w-full flex-row justify-between gap-4 max-sm:flex-col"
@@ -311,7 +386,24 @@
       >
     </div>
     {#if error}
-      <Alert intent="error" title={error} />
+      <Alert intent="error" title={error}>
+        {#if errorWorkflowDetails.workflowId && errorWorkflowDetails.runId}
+          <div class="mt-2">
+            <Link
+              href={routeForWorkflow({
+                namespace,
+                workflow: errorWorkflowDetails.workflowId,
+                run: errorWorkflowDetails.runId,
+              })}
+              class="inline-flex items-center gap-1"
+            >
+              <Icon name="external-link" class="h-4 w-4" />
+              {translate('workflows.view-running-workflow')}
+            </Link>
+          </div>
+        {/if}
+      </Alert>
     {/if}
+    <CodecServerErrorBanner />
   </Card>
 </div>

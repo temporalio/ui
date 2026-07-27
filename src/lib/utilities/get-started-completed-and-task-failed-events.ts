@@ -1,3 +1,4 @@
+import type { Payloads } from '$lib/types';
 import type {
   WorkflowEvent,
   WorkflowExecutionCanceledEvent,
@@ -13,11 +14,10 @@ import {
   isWorkflowExecutionCompletedEvent,
   isWorkflowExecutionContinuedAsNewEvent,
 } from './is-event-type';
-import { stringifyWithBigInt } from './parse-with-big-int';
 
 export type WorkflowInputAndResults = {
-  input: string;
-  results: string;
+  input: Payloads;
+  results: Payloads | CompletionEventAttributes;
   contAsNew: boolean;
 };
 
@@ -28,6 +28,8 @@ type CompletionEvent =
   | WorkflowExecutionTimedOutEvent
   | WorkflowExecutionCanceledEvent
   | WorkflowExecutionTerminatedEvent;
+
+export type CompletionEventAttributes = CompletionEvent['attributes'];
 
 const completedEventTypes = [
   'WorkflowExecutionFailed',
@@ -67,8 +69,8 @@ const getEventResult = (event: CompletionEvent) => {
 export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   eventHistory: WorkflowEvent[],
 ): WorkflowInputAndResults => {
-  let input: string;
-  let results: string;
+  let input: Payloads;
+  let results: Payloads | CompletionEventAttributes;
   let contAsNew = false;
 
   let workflowStartedEvent: WorkflowExecutionStartedEvent;
@@ -85,15 +87,14 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   }
 
   if (workflowStartedEvent) {
-    input = stringifyWithBigInt(
+    input =
       workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input ??
-        null,
-    );
+      null;
   }
 
   if (workflowCompletedEvent) {
     contAsNew = isWorkflowExecutionContinuedAsNewEvent(workflowCompletedEvent);
-    results = stringifyWithBigInt(getEventResult(workflowCompletedEvent));
+    results = getEventResult(workflowCompletedEvent);
   }
 
   return {

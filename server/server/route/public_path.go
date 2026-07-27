@@ -23,12 +23,25 @@
 package route
 
 import (
+	"regexp"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
+// PublicPath returns middleware that strips publicPath from the start of the
+// request URL so downstream routes (registered without the prefix) can match.
+//
+// The regex is start-anchored (^) deliberately. echo's string-rule Rewrite
+// translates path+"/*" into "<path>/(.*?)$" — end-anchored but NOT
+// start-anchored — which causes any URL with publicPath as a substring past
+// position 0 (e.g. /foo/custom/bar, or asset chunks whose hashed names
+// happen to contain the literal "/custom/") to be silently rewritten to just
+// the suffix. Building the regex explicitly forces start-position matching.
 func PublicPath(path string) echo.MiddlewareFunc {
-	return middleware.Rewrite(map[string]string{
-		path + "/*": "/$1",
+	return middleware.RewriteWithConfig(middleware.RewriteConfig{
+		RegexRules: map[*regexp.Regexp]string{
+			regexp.MustCompile("^" + regexp.QuoteMeta(path) + "/(.*?)$"): "/$1",
+		},
 	})
 }

@@ -1,41 +1,31 @@
 <script lang="ts">
-  import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
-  import Navigation from '$lib/holocene/navigation/navigation-container.svelte';
-  import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import type { NavLinkListItem } from '$lib/types/global';
-  import { useDarkMode } from '$lib/utilities/dark-mode';
+  import type { Snippet } from 'svelte';
 
-  export let isCloud = false;
-  export let linkList: NavLinkListItem[];
+  import NavSection from '$lib/holocene/navigation/nav-section.svelte';
+  import Navigation from '$lib/holocene/navigation/navigation-container.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import type { NavLinkItem } from '$lib/types/global';
+
+  interface Props {
+    isCloud?: boolean;
+    sections: NavLinkItem[][];
+    bottom?: Snippet;
+  }
+
+  let isNotLastItem = (section: NavLinkItem[], i: number): boolean => {
+    return i != section.length - 1;
+  };
+
+  let { isCloud = false, sections, bottom }: Props = $props();
 </script>
 
-<Navigation {isCloud} aria-label={translate('common.primary')}>
-  {#each linkList as item}
-    {#if !item?.hidden}
-      {#if item.divider}
-        <hr class="-mx-4 my-4 border-subtle" />
-      {/if}
-      <NavigationItem
-        link={item.href}
-        label={item.label}
-        icon={item.icon}
-        tooltip={item?.tooltip || item.label}
-        external={item?.external}
-        animate={item?.animate}
-        isActive={item.isActive}
+<Navigation {isCloud} {bottom} aria-label={translate('common.primary')}>
+  {#each sections as section, i (i)}
+    <NavSection navItems={section} />
+    {#if isNotLastItem(section, i)}
+      <hr
+        class="border-black border-opacity-25 group-data-[nav=closed]:hidden"
       />
     {/if}
   {/each}
-  <svelte:fragment slot="bottom">
-    <NavigationButton
-      onClick={() => ($useDarkMode = !$useDarkMode)}
-      tooltip={$useDarkMode
-        ? translate('common.night')
-        : translate('common.day')}
-      label={$useDarkMode ? translate('common.night') : translate('common.day')}
-      icon={$useDarkMode ? 'moon' : 'sun'}
-    />
-    <slot name="bottom" />
-  </svelte:fragment>
 </Navigation>

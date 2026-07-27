@@ -1,17 +1,29 @@
 <script lang="ts">
-  export let error = false;
+  import type { Snippet } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
+
+  interface Props {
+    as?: string;
+    error?: boolean;
+    class?: string;
+    children?: Snippet;
+  }
+
+  let {
+    as = 'div',
+    error = false,
+    class: className = '',
+    children,
+  }: Props = $props();
 </script>
 
-<div class="panel surface-primary {$$props.class}" class:error>
-  <slot />
-</div>
-
-<style lang="postcss">
-  .panel {
-    @apply border p-8 dark:border-subtle;
-
-    &.error {
-      @apply border-danger bg-danger;
-    }
-  }
-</style>
+<svelte:element
+  this={as}
+  class={twMerge(
+    'surface-primary border p-8 dark:border-subtle',
+    className,
+    error && 'border-danger bg-danger',
+  )}
+>
+  {@render children?.()}
+</svelte:element>

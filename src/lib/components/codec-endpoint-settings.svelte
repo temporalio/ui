@@ -3,10 +3,19 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let endpoint = '';
-  export let passToken = false;
-  export let includeCreds = false;
-  export let error = '';
+  interface Props {
+    endpoint: string | undefined;
+    passToken: boolean | undefined;
+    includeCreds: boolean | undefined;
+    error: string | undefined;
+  }
+
+  let {
+    endpoint = $bindable(''),
+    passToken = $bindable(false),
+    includeCreds = $bindable(false),
+    error = '',
+  }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-4">

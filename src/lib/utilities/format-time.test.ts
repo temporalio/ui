@@ -4,9 +4,11 @@ import {
   formatDistance,
   formatDistanceAbbreviated,
   formatDurationAbbreviated,
+  formatSecondsAbbreviated,
   fromSecondsToDaysOrHours,
   fromSecondsToMinutesAndSeconds,
   getDuration,
+  getEpochMilliseconds,
   getTimestampDifference,
 } from './format-time';
 
@@ -96,12 +98,16 @@ describe('getDuration', () => {
     expect(distance).toBe('11 days, 5 hours, 5 minutes, 45 seconds');
     expect(abbvDistancer).toBe('11d 5h 5m 45s');
   });
-  it('should get months/days/hours/minutes/seconds duration of a start and end date', () => {
+  it('should get months/days/hours/minutes/seconds duration of a start and end date with and without flexibleUnits enabled', () => {
     const start = '2022-04-02T16:29:35.630571Z';
     const end = '2022-11-13T21:35:21.300609Z';
-    const duration = getDuration({ start, end });
-    const distance = formatDistance({ start, end });
-    const abbvDistancer = formatDistanceAbbreviated({ start, end });
+    let duration = getDuration({ start, end, flexibleUnits: true });
+    let distance = formatDistance({ start, end, flexibleUnits: true });
+    let abbvDistancer = formatDistanceAbbreviated({
+      start,
+      end,
+      flexibleUnits: true,
+    });
     expect(duration).toStrictEqual({
       days: 11,
       hours: 5,
@@ -112,14 +118,32 @@ describe('getDuration', () => {
     });
     expect(distance).toBe('7 months, 11 days, 5 hours, 5 minutes, 45 seconds');
     expect(abbvDistancer).toBe('7months 11d 5h 5m 45s');
+
+    duration = getDuration({ start, end });
+    distance = formatDistance({ start, end });
+    abbvDistancer = formatDistanceAbbreviated({ start, end });
+    expect(duration).toStrictEqual({
+      days: 225,
+      hours: 5,
+      minutes: 5,
+      months: 0,
+      seconds: 45,
+      years: 0,
+    });
+    expect(distance).toBe('225 days, 5 hours, 5 minutes, 45 seconds');
+    expect(abbvDistancer).toBe('225d 5h 5m 45s');
   });
 
-  it('should get months/days/hours/minutes/seconds duration of a start and end date', () => {
+  it('should get months/days/hours/minutes/seconds duration of a start and end date with and without flexibleUnits enabled', () => {
     const start = '2020-02-02T16:51:02.630571Z';
     const end = '2022-11-13T21:35:21.300609Z';
-    const duration = getDuration({ start, end });
-    const distance = formatDistance({ start, end });
-    const abbvDistancer = formatDistanceAbbreviated({ start, end });
+    let duration = getDuration({ start, end, flexibleUnits: true });
+    let distance = formatDistance({ start, end, flexibleUnits: true });
+    let abbvDistancer = formatDistanceAbbreviated({
+      start,
+      end,
+      flexibleUnits: true,
+    });
     expect(duration).toStrictEqual({
       days: 11,
       hours: 4,
@@ -132,6 +156,20 @@ describe('getDuration', () => {
       '2 years, 9 months, 11 days, 4 hours, 44 minutes, 18 seconds',
     );
     expect(abbvDistancer).toBe('2years 9months 11d 4h 44m 18s');
+
+    duration = getDuration({ start, end });
+    distance = formatDistance({ start, end });
+    abbvDistancer = formatDistanceAbbreviated({ start, end });
+    expect(duration).toStrictEqual({
+      days: 1015,
+      hours: 4,
+      minutes: 44,
+      months: 0,
+      seconds: 18,
+      years: 0,
+    });
+    expect(distance).toBe('1015 days, 4 hours, 44 minutes, 18 seconds');
+    expect(abbvDistancer).toBe('1015d 4h 44m 18s');
   });
   it('should get minutes/seconds duration with milliseconds of a start and end date', () => {
     const start = '2022-04-13T16:29:35.630571Z';
@@ -281,6 +319,35 @@ describe('fromSecondsToDaysOrHours', () => {
   });
 });
 
+describe('getEpochMilliseconds', () => {
+  it('should return epoch milliseconds, not the sub-second component', () => {
+    expect(getEpochMilliseconds('2026-06-30T08:03:25.812286937Z')).toBe(
+      Date.parse('2026-06-30T08:03:25.812Z'),
+    );
+  });
+
+  it('should sort timestamps chronologically regardless of sub-second fraction', () => {
+    const times = [
+      '2026-06-30T11:05:30.793784947Z',
+      '2026-06-30T08:03:25.812286937Z',
+      '2026-06-30T13:01:01.591393007Z',
+    ];
+    const sorted = [...times].sort(
+      (a, b) => getEpochMilliseconds(a) - getEpochMilliseconds(b),
+    );
+    expect(sorted).toEqual([
+      '2026-06-30T08:03:25.812286937Z',
+      '2026-06-30T11:05:30.793784947Z',
+      '2026-06-30T13:01:01.591393007Z',
+    ]);
+  });
+
+  it('should return 0 for nullish input', () => {
+    expect(getEpochMilliseconds(undefined)).toBe(0);
+    expect(getEpochMilliseconds(null)).toBe(0);
+  });
+});
+
 describe('getTimestampDifference', () => {
   it('should return ms difference for two dates seconds apart', () => {
     const start = '2022-04-13T11:29:32.633009Z';
@@ -320,5 +387,16 @@ describe('getTimestampDifference', () => {
         '1year, 13d, 9h, 46m, 1s',
       );
     });
+  });
+});
+
+describe('formatSecondsAbbreviated', () => {
+  it('should return "13m 20s" for 800 seconds', () => {
+    expect(formatSecondsAbbreviated(800)).toBe('13m 20s');
+    expect(formatSecondsAbbreviated('800')).toBe('13m 20s');
+  });
+  it('should return "1ms" for 0.001 seconds', () => {
+    expect(formatSecondsAbbreviated(0.001)).toBe('1ms');
+    expect(formatSecondsAbbreviated('0.001')).toBe('1ms');
   });
 });

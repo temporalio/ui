@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
+import { base } from '$app/paths';
+
 import { fetchAllWorkflows, fetchWorkflowForRunId } from './workflow-service';
+import { getApiOrigin } from '../utilities/get-api-origin';
 import { requestFromAPI } from '../utilities/request-from-api';
 
 vi.mock('../utilities/request-from-api', () => ({
@@ -15,6 +18,8 @@ vi.mock('../utilities/request-from-api', () => ({
   ),
 }));
 
+const origin = getApiOrigin();
+
 describe('workflow service', () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -28,7 +33,7 @@ describe('workflow service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledOnce();
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/test/workflows',
+        `${origin}${base}/api/v1/namespaces/test/workflows`,
         {
           handleError: expect.any(Function),
           onError: expect.any(Function),
@@ -48,7 +53,7 @@ describe('workflow service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledOnce();
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/test/workflows',
+        `${origin}${base}/api/v1/namespaces/test/workflows`,
         {
           params: {
             query: `WorkflowId="${workflowId}"`,

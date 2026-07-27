@@ -1,5 +1,8 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import Chip from '$lib/holocene/chip.svelte';
 
@@ -22,7 +25,7 @@
         },
       },
     },
-  } satisfies Meta<Chip>;
+  } satisfies Meta<ComponentProps<typeof Chip>>;
 </script>
 
 <script lang="ts">
@@ -31,7 +34,7 @@
 </script>
 
 <Template let:args>
-  <Chip {...args} on:remove={action('remove')} on:click={action('click')}>
+  <Chip {...args} onremove={action('remove')} onclick={action('click')}>
     ross.edfort@temporal.io
   </Chip>
 </Template>

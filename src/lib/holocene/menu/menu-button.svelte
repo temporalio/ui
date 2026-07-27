@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -14,26 +14,36 @@
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
 
-  interface $$Props extends ButtonWithoutHrefProps {
+  export interface Props extends Omit<ButtonWithoutHrefProps, 'onclick'> {
     controls: string;
     count?: number;
     hasIndicator?: boolean;
     label?: string;
     class?: string;
     active?: boolean;
+    size?: ButtonStyles['size'];
+    onclick?: (open: boolean) => void;
+    leading?: Snippet;
+    trailing?: Snippet;
   }
 
-  let className = '';
-  export { className as class };
-  export let controls: string;
-  export let count = 0;
-  export let disabled = false;
-  export let hasIndicator = false;
-  export let id: string = null;
-  export let label: string = null;
-  export let variant: ButtonStyles['variant'] = 'secondary';
+  const {
+    controls,
+    class: className = '',
+    count = 0,
+    disabled = false,
+    hasIndicator = false,
+    id = undefined,
+    label = undefined,
+    variant = 'secondary',
+    size = 'md',
+    onclick,
+    leading,
+    trailing,
+    children,
+    ...rest
+  }: Props = $props();
 
-  const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
 
   const handleClick = () => {
@@ -43,7 +53,7 @@
         newState = !previousState;
       }
 
-      dispatch('click', { open: newState });
+      onclick?.(newState);
       return newState;
     });
   };
@@ -68,7 +78,7 @@
 
   const focusFirstMenuItem = () => {
     const focusable: (HTMLInputElement | HTMLLIElement)[] = Array.from(
-      $menuElement.querySelectorAll(MENU_ITEM_SELECTORS),
+      $menuElement?.querySelectorAll(MENU_ITEM_SELECTORS) ?? [],
     );
 
     if (focusable && focusable[0]) {
@@ -89,18 +99,26 @@
   aria-label={label}
   {variant}
   class={merge(className)}
-  {...$$restProps}
+  {size}
+  active={$open}
+  disableTracking={true}
+  {...rest}
 >
-  <slot name="leading" />
-  <div class="flex grow items-center" class:hidden={!$$slots.default}>
-    <slot />
-  </div>
-  {#if hasIndicator}
-    <div class="flex">
-      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
+  {@render leading?.()}
+  {#if children}
+    <div class="flex grow items-center">
+      {@render children()}
     </div>
   {/if}
-  <slot name="trailing" />
+  {#if hasIndicator}
+    <div class="flex">
+      <Icon
+        name="chevron-down"
+        class={merge('transition-transform', $open && 'rotate-180')}
+      />
+    </div>
+  {/if}
+  {@render trailing?.()}
   {#if count > 0}
     <Badge
       class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"

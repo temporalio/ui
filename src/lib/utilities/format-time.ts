@@ -1,4 +1,5 @@
 import {
+  differenceInDays,
   formatDuration as durationToString,
   getMilliseconds as getSecondAsMilliseconds,
   intervalToDuration,
@@ -78,9 +79,11 @@ function formatDistanceToSingleLetters(distance: string) {
 export function getDuration({
   start,
   end,
+  flexibleUnits = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
+  flexibleUnits?: boolean;
 }): Duration | null {
   if (!start || !end) return null;
 
@@ -96,8 +99,17 @@ export function getDuration({
     const parsedStart = parseJSON(start);
     const parsedEnd = parseJSON(end);
 
-    const distance = intervalToDuration({ start: parsedStart, end: parsedEnd });
-    return distance;
+    const duration = intervalToDuration({ start: parsedStart, end: parsedEnd });
+    return flexibleUnits
+      ? duration
+      : {
+          years: 0,
+          months: 0,
+          days: differenceInDays(parsedEnd, parsedStart),
+          hours: duration.hours,
+          minutes: duration.minutes,
+          seconds: duration.seconds,
+        };
   } catch {
     return null;
   }
@@ -137,13 +149,15 @@ export function formatDistance({
   end,
   includeMilliseconds = false,
   includeMillisecondsForUnderSecond = false,
+  flexibleUnits = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
   includeMilliseconds?: boolean;
   includeMillisecondsForUnderSecond?: boolean;
+  flexibleUnits?: boolean;
 }): string {
-  const duration = getDuration({ start, end });
+  const duration = getDuration({ start, end, flexibleUnits });
   const distance = formatDuration(duration);
   const msDuration = getMillisecondDuration({ start, end });
 
@@ -161,13 +175,15 @@ export function formatDistanceAbbreviated({
   end,
   includeMilliseconds = false,
   includeMillisecondsForUnderSecond = false,
+  flexibleUnits = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
   includeMilliseconds?: boolean;
   includeMillisecondsForUnderSecond?: boolean;
+  flexibleUnits?: boolean;
 }): string {
-  const duration = getDuration({ start, end });
+  const duration = getDuration({ start, end, flexibleUnits });
   const distance = formatDuration(duration, ' ');
   const formattedDistance = formatDistanceToSingleLetters(distance);
   const msDuration = getMillisecondDuration({ start, end });
@@ -189,6 +205,20 @@ export function getMilliseconds(date: ValidTime | undefined | null): number {
   const parsedDate = parseJSON(date);
 
   return getSecondAsMilliseconds(parsedDate);
+}
+
+// Milliseconds since the Unix epoch, for comparing/sorting instants.
+// Unlike getMilliseconds, which returns only the 0-999 sub-second component.
+export function getEpochMilliseconds(
+  date: ValidTime | undefined | null,
+): number {
+  if (!date) return 0;
+  if (isTimestamp(date)) {
+    date = timestampToDate(date);
+  }
+  const parsedDate = parseJSON(date);
+
+  return parsedDate.getTime();
 }
 
 export function fromSecondsToMinutesAndSeconds(seconds: number): string {
@@ -232,4 +262,23 @@ export const getTimestampDifference = (
   const parse1 = Date.parse(date1);
   const parse2 = Date.parse(date2);
   return Math.abs(parse1 - parse2);
+};
+
+export const formatSecondsAbbreviated = (seconds: number | string): string => {
+  const start = new Date();
+  const end = new Date(start.getTime() + Number(seconds) * 1000);
+  return formatDistanceAbbreviated({ start, end, includeMilliseconds: true });
+};
+
+export const fromDurationToNumber = (duration: string): string => {
+  if (!duration || !duration.endsWith('s')) {
+    return '';
+  }
+
+  return duration?.replace('s', '');
+};
+
+export const fromNumberToDuration = (duration: string): string => {
+  if (!duration) return undefined;
+  return duration + 's';
 };

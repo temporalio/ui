@@ -127,7 +127,7 @@ describe('getEventClassification', () => {
 
   it('should return undefined for MarkerRecorded', () => {
     const eventType: EventType = 'MarkerRecorded';
-    expect(getEventClassification(eventType)).toBeUndefined();
+    expect(getEventClassification(eventType)).toBe('Unspecified');
   });
 
   it('should return "Signaled" for WorkflowExecutionSignaled', () => {
@@ -236,8 +236,12 @@ describe('getEventClassification', () => {
   });
 
   it('should return undefined for UpsertWorkflowSearchAttributes', () => {
-    expect(
-      getEventClassification('UpsertWorkflowSearchAttributes'),
-    ).toBeUndefined();
+    expect(getEventClassification('UpsertWorkflowSearchAttributes')).toBe(
+      'Unspecified',
+    );
+  });
+
+  it('should return Unspecified for unknown event type', () => {
+    expect(getEventClassification(4)).toBe('Unspecified');
   });
 });

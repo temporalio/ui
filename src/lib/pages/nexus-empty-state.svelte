@@ -1,12 +1,16 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import type { Snippet } from 'svelte';
+
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { useDarkMode } from '$lib/utilities/dark-mode';
-  import { routeForNexusEndpointCreate } from '$lib/utilities/route-for';
   import andromeda from '$lib/vendor/andromeda.png';
 
-  export let createDisabled = false;
+  type Props = {
+    actions?: Snippet;
+  };
+
+  let { actions }: Props = $props();
 </script>
 
 <div class="flex min-h-screen flex-col gap-8 p-10">
@@ -29,8 +33,8 @@
           > allows you to reliably connect Temporal Applications. It promotes a more
           modular architecture for sharing a subset of your team's capabilities with
           well-defined microservice contracts for other teams to use. Nexus was designed
-          with Durable Execution in mind and enables each team to have their own
-          Namespace for improved modularity, security, debugging, and fault isolation.
+          with Durable Execution in mind and enables each team to have their own Namespace
+          for improved modularity, security, debugging, and fault isolation.
         </p>
         <p>
           <Link href="https://docs.temporal.io/nexus/services" newTab
@@ -53,17 +57,15 @@
           > are often registered in the same Worker as the underlying Temporal primitives
           they abstract.
         </p>
-        <slot />
-        <Button
-          disabled={createDisabled}
-          variant="primary"
-          href={routeForNexusEndpointCreate()}
-          >{translate('nexus.create-endpoint')}</Button
-        >
+        {@render actions?.()}
       </div>
     </div>
-    <div class="bg-dark mx-auto mt-8 w-full" class:invert={!$useDarkMode}>
-      <img src={andromeda} alt="Andromeda" />
+    <div
+      class="bg-dark mx-auto mt-8 w-full"
+      class:invert={!$useDarkMode}
+      aria-hidden="true"
+    >
+      <img src={andromeda} alt="" />
     </div>
   </div>
 </div>

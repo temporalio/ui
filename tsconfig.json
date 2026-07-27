@@ -2,9 +2,9 @@
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "bundler",
-    // "strict": true,
+    "strict": false,
     "module": "es2020",
-    "lib": ["es2020", "dom", "DOM.Iterable"],
+    "lib": ["es2020", "es2023", "dom", "DOM.Iterable"],
     "target": "es2019",
     /**
 			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript
@@ -20,17 +20,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "allowJs": true,
-    "checkJs": true,
-    "paths": {
-      "$lib": ["src/lib"],
-      "$lib/*": ["src/lib/*"],
-      "$types": ["src/lib/types"],
-      "$types/*": ["src/lib/types/*"],
-      "$components/*": ["src/components/*"],
-      "$fixtures/*": ["src/fixtures/*"]
-    }
+    "checkJs": true
   },
   "include": [
     "src/**/*.d.ts",

@@ -8,6 +8,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import debounce from 'just-debounce';
   import { onMount } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
@@ -24,15 +25,18 @@
 
   import PaginatedTable from './index.svelte';
 
+  type KeyboardHandler = ((event: KeyboardEvent) => void) | undefined;
   type T = $$Generic;
   type $$Props = HTMLAttributes<HTMLDivElement> & {
     id?: string;
     maxHeight?: string;
-    onError?: (error: Error | unknown) => void | undefined;
+    onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
-    onShiftUp?: (event: KeyboardEvent) => void | undefined;
-    onShiftDown?: (event: KeyboardEvent) => void | undefined;
-    onSpace?: (event: KeyboardEvent) => void | undefined;
+    onItemsChange?: (items: T[]) => void;
+    onLoadingChange?: ((loading: boolean) => void) | undefined;
+    onShiftUp?: KeyboardHandler;
+    onShiftDown?: KeyboardHandler;
+    onSpace?: KeyboardHandler;
     total?: string | number;
     pageSizeSelectLabel: string;
     emptyStateTitle?: string;
@@ -45,14 +49,16 @@
     pageSizeOptions?: string[];
   };
 
-  export let id: string = null;
+  export let id: string | null = null;
   export let maxHeight = '';
-  export let onError: (error: Error) => void | undefined = undefined;
+  export let onError: ((error: Error) => void) | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest<T>>;
-  export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
-  export let onShiftDown: (event: KeyboardEvent) => void | undefined =
+  export let onItemsChange: ((items: T[]) => void) | undefined = undefined;
+  export let onLoadingChange: ((loading: boolean) => void) | undefined =
     undefined;
-  export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
+  export let onShiftUp: KeyboardHandler = undefined;
+  export let onShiftDown: KeyboardHandler = undefined;
+  export let onSpace: KeyboardHandler = undefined;
 
   export let total: string | number = '';
   export let pageSizeSelectLabel: string;
@@ -64,12 +70,14 @@
   export let previousButtonLabel: string;
   export let nextButtonLabel: string;
   export let pageSizeOptions = options;
+  export let debounceDelay = 250;
 
   let store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
     pageSizeOptions[0],
   );
-  let error: Error;
+  let error: Error | undefined;
+  let paginatedTable: PaginatedTable<T>;
 
   function clearError() {
     if (error) error = undefined;
@@ -97,35 +105,46 @@
       const items = response[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
-      error = err;
+      error = err as Error;
       if (onError) onError(error);
     }
   }
+
+  const fetchNextPageData = async () => {
+    try {
+      const fetchData = await onFetch();
+      const response = await fetchData(
+        $store.pageSize,
+        $store.indexData[$store.index].nextToken,
+      );
+      const { nextPageToken } = response;
+      const items = response[itemsKeyname] || [];
+      store.nextPageWithItems(nextPageToken, items);
+    } catch (error) {
+      if (isError(error) && onError) {
+        onError(error);
+      }
+    }
+  };
 
   async function fetchIndexData() {
     clearError();
     store.setUpdating();
     if (!$store.hasNextIndexData) {
-      try {
-        const fetchData = await onFetch();
-        const response = await fetchData(
-          $store.pageSize,
-          $store.indexData[$store.index].nextToken,
-        );
-        const { nextPageToken } = response;
-        const items = response[itemsKeyname] || [];
-        store.nextPageWithItems(nextPageToken, items);
-      } catch (error) {
-        if (isError(error) && onError) {
-          onError(error);
-        }
-      }
+      debounce(await fetchNextPageData, debounceDelay)();
     } else {
       store.nextPage();
     }
+    paginatedTable?.scrollToTop();
+  }
+
+  function handlePreviousPage() {
+    store.previousPage();
+    paginatedTable?.scrollToTop();
   }
 
   async function handleKeydown(event: KeyboardEvent) {
+    if (event.repeat) return;
     const shifted = event.shiftKey;
     switch (event.code) {
       case 'ArrowRight':
@@ -167,13 +186,24 @@
         break;
     }
   }
+
+  $: if (onLoadingChange) onLoadingChange($store.loading);
+
+  let previousItems: T[] | undefined;
+  $: if (onItemsChange && $store.visibleItems !== previousItems) {
+    previousItems = $store.visibleItems;
+    onItemsChange($store.visibleItems);
+  }
+
+  $: adjustedTotal =
+    !$store.hasNext && $store.indexEnd !== total ? $store.indexEnd : total;
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
 
-<slot name="header" visibleItems={$store.visibleItems} />
-
 <PaginatedTable
+  bind:this={paginatedTable}
+  loading={$store.loading}
   updating={$store.updating}
   visibleItems={$store.visibleItems}
   {maxHeight}
@@ -216,26 +246,30 @@
     aria-label={$$restProps['aria-label']}
     slot="actions-end"
   >
-    <slot name="actions-end-additional" />
+    <slot
+      name="actions-end-additional"
+      visibleItems={$store.visibleItems}
+      page={$store.index + 1}
+    />
     <IconButton
       label={previousButtonLabel}
       disabled={!$store.hasPrevious}
-      on:click={store.previousPage}
+      on:click={handlePreviousPage}
       icon="arrow-left"
     />
     <div class="flex gap-1">
       <p>
-        {$store.indexStart}–{$store.indexEnd}
+        {$store.indexStart.toLocaleString()}–{$store.indexEnd.toLocaleString()}
       </p>
-      {#if total}
+      {#if adjustedTotal}
         <p>
-          of {total}
+          of {adjustedTotal.toLocaleString()}
         </p>
       {/if}
     </div>
     <IconButton
       label={nextButtonLabel}
-      disabled={!$store.hasNext}
+      disabled={!$store.hasNext || $store.updating}
       on:click={fetchIndexData}
       icon="arrow-right"
     />

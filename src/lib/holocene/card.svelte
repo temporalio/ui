@@ -1,9 +1,26 @@
-<div class="card surface-primary {$$props.class}">
-  <slot />
-</div>
+<script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
 
-<style lang="postcss">
-  .card {
-    @apply border border-subtle p-4;
+  import type { Snippet } from 'svelte';
+  import { type ClassNameValue, twMerge } from 'tailwind-merge';
+
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class'> {
+    class?: ClassNameValue;
+    children?: Snippet;
   }
-</style>
+
+  let { class: className = '', children, ...rest }: Props = $props();
+</script>
+
+<div
+  class={twMerge(
+    'surface-primary',
+    'border',
+    'border-subtle',
+    'p-4',
+    className,
+  )}
+  {...rest}
+>
+  {@render children?.()}
+</div>

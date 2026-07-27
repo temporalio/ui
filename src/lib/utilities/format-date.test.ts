@@ -3,11 +3,26 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   formatDate,
   formatUTCOffset,
-  getLocalTime,
   getSelectedTimezone,
   getUTCString,
   isValidDate,
 } from './format-date';
+import { getLocalTime } from './timezone';
+
+// // force GH action runners to use en-US and 12-hour clocks starting at 0:00
+// but respect explicit hour12 option when provided
+const DateTimeFormat = Intl.DateTimeFormat;
+const dateTimeFormatSpy = vi
+  .spyOn(global.Intl, 'DateTimeFormat')
+  .mockImplementation((_, options) => {
+    const hour12 = options?.hour12 !== undefined ? options.hour12 : true;
+    const hourCycle = options?.hour12 !== undefined ? undefined : 'h11';
+    return new DateTimeFormat('en-US', {
+      ...options,
+      hour12,
+      ...(hourCycle && { hourCycle }),
+    });
+  });
 
 describe('formatDate', () => {
   const date = '2022-04-13T16:29:35.630571Z';
@@ -33,32 +48,58 @@ describe('formatDate', () => {
   });
 
   it('should default to UTC', () => {
-    expect(formatDate(date)).toEqual('2022-04-13 UTC 16:29:35.63');
+    expect(formatDate(date)).toEqual('Apr 13, 2022, 4:29:35.63 PM UTC');
+  });
+
+  it('should reuse formatters for matching format options', () => {
+    dateTimeFormatSpy.mockClear();
+
+    expect(formatDate(date, 'UTC', { format: 'short', hourFormat: '12' })).toBe(
+      '4/13/22, 4:29:35.63 PM UTC',
+    );
+    expect(
+      formatDate('2022-04-14T16:29:35.630571Z', 'UTC', {
+        format: 'short',
+        hourFormat: '12',
+      }),
+    ).toBe('4/14/22, 4:29:35.63 PM UTC');
+
+    expect(dateTimeFormatSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should format other timezones', () => {
     expect(formatDate(date, 'Greenwich Mean Time')).toEqual(
-      '2022-04-13 GMT 16:29:35.63',
+      'Apr 13, 2022, 4:29:35.63 PM GMT',
     );
     expect(formatDate(date, 'Central Standard Time')).toEqual(
-      '2022-04-13 CDT 11:29:35.63',
+      'Apr 13, 2022, 11:29:35.63 AM CDT',
     );
-    expect(formatDate(date, 'Pacific Daylight Time')).toEqual(
-      '2022-04-13 PDT 09:29:35.63',
+  });
+
+  it('should format already formatted strings', () => {
+    expect(formatDate('2022-04-13 UTC 4:29:35.63 PM')).toEqual(
+      'Apr 13, 2022, 4:29:35.63 PM UTC',
     );
   });
 
   it('should format local time', () => {
-    expect(formatDate(date, 'local')).toEqual('2022-04-13 UTC 16:29:35.63');
+    expect(formatDate(date, 'local')).toEqual(
+      'Apr 13, 2022, 4:29:35.63 PM UTC',
+    );
   });
 
   it('should format relative local time', () => {
     expect(formatDate(date, 'local', { relative: true })).toContain('ago');
+    const currentDate = new Date();
+    const futureDate = currentDate.setDate(currentDate.getDate() + 1);
+    expect(formatDate(futureDate, 'local', { relative: true })).toContain(
+      'from now',
+    );
   });
 
   it('should not format other timezones as relative', () => {
     expect(formatDate(date, 'UTC', { relative: true })).toEqual(
-      '2022-04-13 UTC 16:29:35.63',
+      'Apr 13, 2022, 4:29:35.63 PM UTC',
     );
   });
 
@@ -68,23 +109,146 @@ describe('formatDate', () => {
     ).toContain('custom');
   });
 
-  it('should shorten format for local and other timezones', () => {
-    expect(formatDate(date, 'local', { abbrFormat: true })).toEqual(
-      '2022-04-13 16:29:35 PM',
+  it('should format relative time with days instead of months for past dates if flexibleUnits is not enabled', () => {
+    const currentDate = new Date();
+    const pastDate = currentDate.setDate(currentDate.getDate() - 90);
+    let formattedDate = formatDate(pastDate, 'local', {
+      relative: true,
+      flexibleUnits: true,
+    });
+    expect(formattedDate).toEqual('3 months ago');
+
+    formattedDate = formatDate(pastDate, 'local', { relative: true });
+    expect(formattedDate).toEqual('90 days ago');
+  });
+
+  it('should format relative time with days instead of months for future dates if flexibleUnits is not enabled', () => {
+    const currentDate = new Date();
+    const futureDate = currentDate.setDate(currentDate.getDate() + 90);
+    let formattedDate = formatDate(futureDate, 'local', {
+      relative: true,
+      flexibleUnits: true,
+    });
+    expect(formattedDate).toEqual('3 months from now');
+
+    formattedDate = formatDate(futureDate, 'local', { relative: true });
+    expect(formattedDate).toEqual('90 days from now');
+  });
+
+  it('should not format relative time with days if less than a day for past dates even if flexibleUnits is enabled', () => {
+    const currentDate = new Date();
+    const pastDate = currentDate.setHours(currentDate.getHours() - 23);
+    let formattedDate = formatDate(pastDate, 'local', {
+      relative: true,
+      flexibleUnits: true,
+    });
+    expect(formattedDate).toEqual('23 hours ago');
+
+    formattedDate = formatDate(pastDate, 'local', { relative: true });
+    expect(formattedDate).toEqual('23 hours ago');
+  });
+
+  it('should not format relative time with days if less than a day for future dates even if flexibleUnits is enabled', () => {
+    const currentDate = new Date();
+    const futureDate = currentDate.setHours(currentDate.getHours() + 23);
+    let formattedDate = formatDate(futureDate, 'local', {
+      relative: true,
+      flexibleUnits: true,
+    });
+    expect(formattedDate).toEqual('23 hours from now');
+
+    formattedDate = formatDate(futureDate, 'local', { relative: true });
+    expect(formattedDate).toEqual('23 hours from now');
+  });
+
+  it('supports different timestamps formats', () => {
+    expect(formatDate(date, 'utc', { format: 'short' })).toEqual(
+      '4/13/22, 4:29:35.63 PM UTC',
     );
-    expect(formatDate(date, 'utc', { abbrFormat: true })).toEqual(
-      '2022-04-13 16:29:35 PM',
+    expect(formatDate(date, 'utc', { format: 'medium' })).toEqual(
+      'Apr 13, 2022, 4:29:35.63 PM UTC',
+    );
+    expect(formatDate(date, 'utc', { format: 'long' })).toEqual(
+      'April 13, 2022 at 4:29:35.63 PM UTC',
     );
   });
 
-  it('should shorten format without seconds if there are none for local and other timezones', () => {
-    const dateWithoutSeconds = '2022-04-13T16:29:00.630571Z';
-    expect(
-      formatDate(dateWithoutSeconds, 'local', { abbrFormat: true }),
-    ).toEqual('2022-04-13 16:29 PM');
-    expect(formatDate(dateWithoutSeconds, 'utc', { abbrFormat: true })).toEqual(
-      '2022-04-13 16:29 PM',
-    );
+  describe('hourFormat option', () => {
+    it('should use 24-hour format when hourFormat is "24"', () => {
+      const result = formatDate(date, 'UTC', { hourFormat: '24' });
+      expect(result).toContain('16:29:35');
+      expect(result).not.toContain('PM');
+      expect(result).not.toContain('AM');
+    });
+
+    it('should use 12-hour format when hourFormat is "12"', () => {
+      const result = formatDate(date, 'UTC', { hourFormat: '12' });
+      expect(result).toContain('4:29:35');
+      expect(result).toContain('PM');
+    });
+
+    it('should use system default when hourFormat is "system"', () => {
+      const result = formatDate(date, 'UTC', { hourFormat: 'system' });
+      // System default is mocked to be 12-hour format
+      expect(result).toContain('4:29:35');
+      expect(result).toContain('PM');
+    });
+
+    it('should default to system format when hourFormat is not specified', () => {
+      const result = formatDate(date, 'UTC');
+      // System default is mocked to be 12-hour format
+      expect(result).toContain('4:29:35');
+      expect(result).toContain('PM');
+    });
+
+    it('should work with 24-hour format in different timezones', () => {
+      const result = formatDate(date, 'Central Standard Time', {
+        hourFormat: '24',
+      });
+      expect(result).toContain('11:29:35');
+      expect(result).not.toContain('AM');
+      expect(result).not.toContain('PM');
+    });
+
+    it('should work with 12-hour format in different timezones', () => {
+      const result = formatDate(date, 'Central Standard Time', {
+        hourFormat: '12',
+      });
+      expect(result).toContain('11:29:35');
+      expect(result).toContain('AM');
+    });
+
+    it('should work with different timestamp formats', () => {
+      expect(
+        formatDate(date, 'UTC', { format: 'short', hourFormat: '24' }),
+      ).toContain('16:29:35');
+      expect(
+        formatDate(date, 'UTC', { format: 'long', hourFormat: '24' }),
+      ).toContain('16:29:35');
+    });
+
+    it('should not affect relative time formatting', () => {
+      const result = formatDate(date, 'local', {
+        relative: true,
+        hourFormat: '24',
+      });
+      expect(result).toContain('ago');
+      expect(result).not.toContain(':');
+    });
+
+    it('should handle midnight correctly in 24-hour format', () => {
+      const midnight = '2022-04-13T00:00:00.000Z';
+      const result = formatDate(midnight, 'UTC', { hourFormat: '24' });
+      expect(result).toContain('0:00:00');
+      expect(result).not.toContain('12:00:00');
+    });
+
+    it('should handle noon correctly in 24-hour format', () => {
+      const noon = '2022-04-13T12:00:00.000Z';
+      const result = formatDate(noon, 'UTC', { hourFormat: '24' });
+      expect(result).toContain('12:00:00');
+      expect(result).not.toContain('PM');
+    });
   });
 });
 

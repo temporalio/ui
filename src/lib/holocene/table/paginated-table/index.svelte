@@ -1,132 +1,81 @@
 <script lang="ts">
-  import ProgressBar from '$lib/holocene/progress-bar.svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
+
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
+
+  import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
 
   type Item = $$Generic;
 
+  interface $$Props extends Omit<HTMLAttributes<HTMLTableElement>, 'class'> {
+    visibleItems: Item[];
+    loading?: boolean;
+    updating?: boolean;
+    maxHeight?: string;
+    fixed?: boolean;
+    class?: ClassNameValue;
+  }
+
   export let visibleItems: Item[];
-  export let variant: 'primary' | 'split' = 'primary';
+  export let loading = false;
   export let updating = false;
   export let maxHeight = '';
   export let fixed = false;
 
+  let className: ClassNameValue = '';
+  export { className as class };
+
   let tableContainer: HTMLDivElement;
+  let footerHeight = 0;
 
   $: tableOffset = tableContainer?.offsetTop
-    ? tableContainer?.offsetTop + 32
+    ? tableContainer.offsetTop + 32
     : 0;
+
+  export function scrollToTop() {
+    tableContainer?.scrollTo({ top: 0, behavior: 'instant' });
+  }
 </script>
 
 <div
-  class="paginated-table-wrapper {variant}"
+  class={merge(
+    'surface-primary min-h-[154px] grow overflow-auto border border-subtle',
+    className,
+  )}
+  id="{$$restProps['id']}-container"
   bind:this={tableContainer}
-  style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`}"
+  style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`};
+  scroll-padding-top: var(--table-header-h, 2.25rem);
+  scroll-padding-bottom: {footerHeight}px;
+
+  --table-header-h: 2.25rem;"
 >
-  <table
-    class="paginated-table"
-    class:table-fixed={fixed}
-    class:table-auto={!fixed}
-    {...$$restProps}
-  >
-    <slot name="caption" />
-    <thead class="paginated-table-header">
-      <slot name="headers" {visibleItems} />
-      {#if updating}
-        <ProgressBar />
-      {/if}
-    </thead>
-    <tbody class="paginated-table-body">
-      <slot />
-    </tbody>
-  </table>
-  {#if visibleItems.length}
-    <div class="paginated-table-controls">
-      <slot name="actions-start" />
-      <slot name="actions-center" />
-      <slot name="actions-end" />
-    </div>
+  {#if loading}
+    {#if $$slots.loading}
+      <slot name="loading" />
+    {:else}
+      <SkeletonTable bordered={false} rows={25} />
+    {/if}
   {:else}
-    <slot name="empty" />
+    <Table bordered={false} {updating} {fixed} {...$$restProps}>
+      <slot slot="caption" name="caption" />
+      <slot slot="headers" name="headers" {visibleItems} />
+      <slot />
+    </Table>
+    {#if visibleItems.length}
+      <div
+        class="surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2"
+        bind:clientHeight={footerHeight}
+      >
+        <slot name="actions-start" />
+        <slot name="actions-center" />
+        <slot name="actions-end" />
+      </div>
+    {:else}
+      <div style="height: calc(100% - var(--table-header-h));">
+        <slot name="empty" />
+      </div>
+    {/if}
   {/if}
 </div>
-
-<style lang="postcss">
-  .paginated-table-wrapper {
-    @apply surface-primary min-h-[154px] overflow-auto;
-  }
-
-  .primary {
-    @apply border border-table;
-  }
-
-  .split {
-    @apply border-t border-subtle;
-  }
-
-  .paginated-table {
-    @apply w-full;
-  }
-
-  .paginated-table-header {
-    @apply sticky top-0 z-10;
-
-    :global(tr) {
-      @apply surface-table h-10 text-off-white;
-    }
-
-    :global(tr > th) {
-      @apply whitespace-nowrap p-2 text-left font-medium;
-    }
-  }
-
-  .paginated-table-body {
-    :global(tr.primary) {
-      @apply border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
-    }
-
-    :global(tr.dense) {
-      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
-    }
-
-    :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
-    }
-
-    :global(tr.dense:nth-of-type(odd)) {
-      @apply surface-background hover:bg-interactive-table-hover;
-    }
-
-    :global(tr.dense.expanded) {
-      @apply bg-interactive-secondary-active;
-    }
-
-    :global(tr.dense.active) {
-      @apply bg-interactive-table-hover;
-    }
-
-    :global(tr > td) {
-      @apply whitespace-nowrap p-2;
-    }
-
-    :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
-    }
-  }
-
-  .primary .paginated-table-body {
-    :global(tr:not(.empty)) {
-      @apply h-12 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
-    }
-  }
-
-  .split .paginated-table-body {
-    @apply flex;
-
-    :global(tr > td) {
-      @apply px-0;
-    }
-  }
-
-  .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-table px-4 py-2;
-  }
-</style>

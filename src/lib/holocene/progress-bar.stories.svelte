@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import type { Meta } from '@storybook/svelte';
 
@@ -7,18 +9,13 @@
   export const meta = {
     title: 'Progress Bar',
     component: ProgressBar,
-    args: {
-      width: '50%',
-    },
   } as Meta<ProgressBar>;
 </script>
 
-<Template let:args>
+<Template>
   <div class="relative mx-auto p-8">
-    <ProgressBar {...args} />
+    <ProgressBar />
   </div>
 </Template>
 
-<Story name="Partial" args={{ width: '60%' }} />
-<Story name="Full" args={{ width: '100%' }} />
-<Story name="Empty" args={{ width: '0%' }} />
+<Story name="Full" />

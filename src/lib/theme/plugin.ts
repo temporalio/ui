@@ -126,6 +126,10 @@ const temporal = plugin(
           backgroundColor: css('--color-interactive-ghost-active'),
         },
       },
+      '.surface-information': {
+        backgroundColor: css('--color-surface-information'),
+        color: css('--color-text-primary'),
+      },
       '.surface-inverse': {
         backgroundColor: css('--color-surface-inverse'),
         color: css('--color-text-inverse'),
@@ -138,6 +142,10 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-table'),
         color: css('--color-text-inverse'),
       },
+      '.surface-table-header': {
+        backgroundColor: css('--color-surface-table-header'),
+        color: css('--color-text-primary'),
+      },
       '.surface-warning': {
         backgroundColor: css('--color-surface-subtle'),
         color: css('--color-text-black'),
@@ -146,13 +154,13 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-danger'),
         color: css('--color-text-primary'),
       },
+      '.surface-table-related-hover': {
+        backgroundColor: css('--color-surface-table-related-hover'),
+        color: css('--color-text-primary'),
+      },
       '.surface-black': {
         backgroundColor: css('--color-surface-black'),
         color: css('--color-text-white'),
-      },
-      '.surface-retry': {
-        backgroundColor: colors.red[300],
-        color: css('--color-text-black'),
       },
     });
   },
@@ -200,6 +208,7 @@ const temporal = plugin(
         'interactive-hover': css('--color-interactive-hover'),
         inverse: css('--color-border-inverse'),
         table: css('--color-border-table'),
+        'table-related-hover': css('--color-surface-table-related-hover'),
         information: css('--color-border-information'),
         success: css('--color-border-success'),
         warning: css('--color-border-warning'),

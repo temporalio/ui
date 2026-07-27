@@ -22,9 +22,11 @@
     required?: boolean;
     valid?: boolean;
     error?: string;
+    class?: string;
+    description?: string;
   }
 
-  export let id = '';
+  export let id: string = crypto.randomUUID();
   export let checked = false;
   export let label = '';
   export let labelHidden = false;
@@ -35,12 +37,15 @@
   export let valid = true;
   export let error = '';
   export let required = false;
+  export let description = '';
 
   let className = '';
   export { className as class };
 
   let inputElement: HTMLInputElement;
-  $: inputElement !== undefined && (inputElement.indeterminate = indeterminate);
+  $: if (inputElement !== undefined) {
+    inputElement.indeterminate = indeterminate;
+  }
 
   const dispatch = createEventDispatcher<{
     change: { checked: boolean; value?: T };
@@ -66,15 +71,30 @@
   };
 
   $: checked = group !== undefined ? group.includes(value) : checked;
+
+  $: checkIconName = indeterminate
+    ? ('hyphen' as const)
+    : checked
+      ? ('checkmark' as const)
+      : null;
+
+  $: errorId = `${id}-error`;
+  $: showError = !valid && !!error;
 </script>
 
 <div
-  data-testid={$$restProps['data-testid'] ?? null}
-  on:click|stopPropagation
+  data-testid={$$restProps['data-testid']}
+  on:click|stopPropagation={() => {
+    // applying noop handler because without it on:click handlers get forwarded
+    // to this div element (in addition to the input checkbox element).
+  }}
   on:keypress|stopPropagation
   role="none"
 >
   <Label
+    data-testid={$$restProps['data-testid']
+      ? `${$$restProps['data-testid']}-label`
+      : undefined}
     class={merge(
       [
         'flex',
@@ -83,9 +103,12 @@
         'gap-3',
         'text-sm',
         'leading-[18px]',
+        'min-h-6',
+        'min-w-6',
         'group',
       ],
       disabled && 'cursor-not-allowed',
+      labelHidden && 'justify-center',
       className,
     )}
   >
@@ -96,6 +119,11 @@
       {value}
       type="checkbox"
       class="peer sr-only"
+      data-track-name="checkbox"
+      data-track-intent="toggle"
+      data-track-text={label}
+      aria-invalid={!valid ? 'true' : undefined}
+      aria-describedby={showError ? errorId : undefined}
       bind:checked
       {disabled}
       {required}
@@ -135,27 +163,34 @@
           'group-hover:ring-primary/70',
           'peer-focus-visible:ring-2',
           'peer-focus-visible:ring-primary/70',
+          'peer-focus-visible:ring-offset-2',
+          'peer-focus-visible:ring-offset-[var(--color-surface-primary)]',
         ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
         valid ? 'border-secondary' : 'border-danger peer-checked:border-danger',
       )}
     >
-      {#if indeterminate || checked}
+      {#if checkIconName}
         <Icon
           class="absolute left-0 top-0 h-4 w-4"
-          name={indeterminate ? 'hyphen' : checked ? 'checkmark' : null}
+          name={checkIconName}
           strokeWidth={3}
         />
       {/if}
     </span>
 
     <slot name="flex">
-      <span class="label" class:sr-only={labelHidden}>
-        {label}
-      </span>
+      <div>
+        <span class="label" class:sr-only={labelHidden}>
+          {label}
+        </span>
+        {#if description}
+          <p class="text-xs font-normal text-secondary">{description}</p>
+        {/if}
+      </div>
     </slot>
   </Label>
-  {#if !valid && error}
-    <span class="text-xs text-danger">{error}</span>
-  {/if}
+  <span id={errorId} role="alert" class="text-xs text-danger">
+    {#if showError}{error}{/if}
+  </span>
 </div>

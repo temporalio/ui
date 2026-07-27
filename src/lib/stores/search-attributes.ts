@@ -1,11 +1,16 @@
-import { derived, get, type Readable, writable } from 'svelte/store';
+import { derived, get, readable, type Readable, writable } from 'svelte/store';
 
-import type {
+import { z } from 'zod/v3';
+
+import { isCloud } from '$lib/stores/advanced-visibility';
+import { temporalVersion } from '$lib/stores/versions';
+import {
   SEARCH_ATTRIBUTE_TYPE,
-  SearchAttributes,
-  SearchAttributeType,
-  WorkflowExecution,
+  type SearchAttributes,
+  type SearchAttributeType,
+  type WorkflowExecution,
 } from '$lib/types/workflows';
+import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 type SearchAttributesStore = {
   customAttributes: SearchAttributes;
@@ -25,6 +30,35 @@ export const searchAttributes: Readable<SearchAttributes> = derived(
   }),
 );
 
+export const scheduleSearchAttributes: Readable<SearchAttributes> = derived(
+  [allSearchAttributes, isCloud, temporalVersion],
+  ([$allSearchAttributes, $isCloud, $temporalVersion]) => ({
+    ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
+      ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    }),
+    TemporalSchedulePaused: SEARCH_ATTRIBUTE_TYPE.BOOL,
+    ...$allSearchAttributes.customAttributes,
+  }),
+);
+
+export const scheduleSearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived(scheduleSearchAttributes, ($scheduleSearchAttributes) => {
+    return Object.entries($scheduleSearchAttributes).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
+    });
+  });
+
+export const activityExecutionSearchAttributes: Readable<SearchAttributes> =
+  derived(searchAttributes, ($searchAttributes) => ({
+    ...$searchAttributes,
+    ActivityId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ActivityType: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  }));
+
 export const internalSearchAttributes: Readable<SearchAttributes> = derived(
   [allSearchAttributes],
   ([$allSearchAttributes]) => $allSearchAttributes.systemAttributes,
@@ -32,7 +66,9 @@ export const internalSearchAttributes: Readable<SearchAttributes> = derived(
 
 export const customSearchAttributes: Readable<SearchAttributes> = derived(
   [allSearchAttributes],
-  ([$allSearchAttributes]) => $allSearchAttributes.customAttributes,
+  ([$allSearchAttributes]) => {
+    return $allSearchAttributes.customAttributes;
+  },
 );
 
 export const customSearchAttributeOptions: Readable<
@@ -41,13 +77,13 @@ export const customSearchAttributeOptions: Readable<
     value: string;
     type: SearchAttributeType;
   }[]
-> = derived([customSearchAttributes], ([$customSearchAttributes]) =>
-  Object.entries($customSearchAttributes).map(([key, value]) => ({
+> = derived([customSearchAttributes], ([$customSearchAttributes]) => {
+  return Object.entries($customSearchAttributes).map(([key, value]) => ({
     label: key,
     value: key,
     type: value,
-  })),
-);
+  }));
+});
 
 export const isCustomSearchAttribute = (key: string) => {
   const customSearchAttrs = get(customSearchAttributes);
@@ -104,6 +140,35 @@ export type SearchAttributeInput =
   | StringSearchAttributeInput
   | ListSearchAttributeInput;
 
+export const searchAttributeSchema = z
+  .object({
+    value: z.any(),
+    label: z.string(),
+    type: z.enum([
+      SEARCH_ATTRIBUTE_TYPE.BOOL,
+      SEARCH_ATTRIBUTE_TYPE.INT,
+      SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+      SEARCH_ATTRIBUTE_TYPE.TEXT,
+      SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+      SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED,
+    ]),
+  })
+  .superRefine((data, context) => {
+    if (data.type && data.label && data.value === null) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['value'],
+        message: 'Search Attribute Value is required.',
+      });
+    }
+  });
+
+export type SearchAttributeSchema = z.infer<typeof searchAttributeSchema>;
+export const searchAttributesSchema = z.array(searchAttributeSchema);
+export type SearchAttributesSchema = z.infer<typeof searchAttributesSchema>;
+
 export const searchAttributeOptions: Readable<SearchAttributeOption[]> =
   derived([searchAttributes], ([$searchAttributes]) => {
     return $searchAttributes
@@ -127,7 +192,6 @@ export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
       'StartTime',
       'CloseTime',
     ];
-
     return $searchAttributeOptions
       .sort((a, b) => {
         if (a.label < b.label) return -1;
@@ -143,3 +207,95 @@ export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
         return indexA - indexB;
       });
   });
+
+export const workerSearchAttributes: Readable<SearchAttributes> = readable({
+  WorkerStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  WorkerInstanceKey: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  WorkerIdentity: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  HostName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  DeploymentName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  // BuildId: SEARCH_ATTRIBUTE_TYPE.KEYWORD, // TODO: Add back with DT-3745
+  SdkName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  SdkVersion: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+});
+
+export const workerSearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived(workerSearchAttributes, ($workerSearchAttributes) => {
+    return Object.entries($workerSearchAttributes).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
+    });
+  });
+
+export const activitySearchAttributes: Readable<SearchAttributes> = derived(
+  customSearchAttributes,
+  ($customSearchAttributes) => ({
+    ExecutionStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ActivityId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ActivityType: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    ExecutionDuration: SEARCH_ATTRIBUTE_TYPE.INT,
+    StateTransitionCount: SEARCH_ATTRIBUTE_TYPE.INT,
+    ...$customSearchAttributes,
+  }),
+);
+export const activitySearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived(activitySearchAttributes, ($activitySearchAttributes) => {
+    return Object.entries($activitySearchAttributes)
+      .map(([key, value]) => {
+        return {
+          label: key,
+          value: key,
+          type: value,
+        };
+      })
+      .sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        return 0;
+      });
+  });
+
+export const nexusOperationSearchAttributes: Readable<SearchAttributes> =
+  derived(customSearchAttributes, ($customSearchAttributes) => ({
+    ExecutionStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    OperationId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    Endpoint: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    Service: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    Operation: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ScheduleTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    ExecutionDuration: SEARCH_ATTRIBUTE_TYPE.INT,
+    StateTransitionCount: SEARCH_ATTRIBUTE_TYPE.INT,
+    ...$customSearchAttributes,
+  }));
+
+export const nexusOperationSearchAttributeOptions: Readable<
+  SearchAttributeOption[]
+> = derived(
+  nexusOperationSearchAttributes,
+  ($nexusOperationSearchAttributes) => {
+    return Object.entries($nexusOperationSearchAttributes)
+      .map(([key, value]) => {
+        return {
+          label: key,
+          value: key,
+          type: value,
+        };
+      })
+      .sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        return 0;
+      });
+  },
+);

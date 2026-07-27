@@ -5,8 +5,11 @@ function unhandledAction(action: never) {
   console.error('Unhandled action:', action);
 }
 
-export const getPlacholder = (action: Action, email?: string): string => {
-  let translatedAction: string;
+export const getPlaceholder = (
+  action: Action,
+  identity: string | undefined,
+): string => {
+  let translatedAction = '';
   switch (action) {
     case Action.Cancel:
       translatedAction = translate('workflows.canceled');
@@ -17,29 +20,21 @@ export const getPlacholder = (action: Action, email?: string): string => {
     case Action.Terminate:
       translatedAction = translate('workflows.terminated');
       break;
+    case Action.Pause:
+      translatedAction = translate('workflows.paused');
+      break;
+    case Action.Unpause:
+      translatedAction = translate('workflows.unpaused');
+      break;
+    case Action.Signal:
+      translatedAction = translate('workflows.signaled');
+      break;
     default:
       unhandledAction(action);
   }
 
-  return email
-    ? translate('workflows.workflow-action-reason-placeholder-with-email', {
-        action: translatedAction,
-        email,
-      })
-    : translate('workflows.workflow-action-reason-placeholder', {
-        action: translatedAction,
-      });
-};
-
-export const formatReason = ({
-  action,
-  reason,
-  email,
-}: {
-  action: Action;
-  reason: string;
-  email?: string;
-}) => {
-  const placeholder = getPlacholder(action, email);
-  return reason ? [reason.trim(), placeholder].join(' ') : placeholder;
+  return translate('workflows.workflow-action-reason-placeholder', {
+    action: translatedAction,
+    identity: identity || 'webui',
+  });
 };

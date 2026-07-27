@@ -1,5 +1,5 @@
 import type { Readable } from 'svelte/store';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
@@ -87,18 +87,21 @@ export function createPaginationStore<T>(
   pageSizeOptions: string[] | number[] = options,
   defaultPageSize: string | number | undefined = undefined,
 ): PaginationStore<T> {
-  const initialPageSize = getInitialPageSize(pageSizeOptions, defaultPageSize);
+  const pageSize = derived([page], ([$page]) => {
+    const perPage = $page.url.searchParams.get(perPageKey);
+    return perPage ? perPageFromSearchParameter(perPage) : undefined;
+  });
+
+  const initialPageSize = getInitialPageSize(
+    pageSizeOptions,
+    get(pageSize) || defaultPageSize,
+  );
   const paginationStore = writable({
     ...defaultStore,
     previousPageSize: initialPageSize,
     pageSize: initialPageSize,
   });
   const { set, update } = paginationStore;
-
-  const pageSize = derived([page], ([$page]) => {
-    const perPage = $page.url.searchParams.get(perPageKey);
-    return perPage ? perPageFromSearchParameter(perPage) : undefined;
-  });
 
   const { subscribe } = derived(
     [paginationStore, pageSize],
@@ -147,13 +150,13 @@ export function createPaginationStore<T>(
       };
       store.hasPrevious = false;
     } else {
-      (store.index = currentIndex + 1),
-        (store.indexData[store.index] = {
-          nextToken,
-          start: store.indexData[currentIndex].end + 1,
-          end: store.indexData[currentIndex].end + items.length,
-          items,
-        });
+      store.index = currentIndex + 1;
+      store.indexData[store.index] = {
+        nextToken,
+        start: store.indexData[currentIndex].end + 1,
+        end: store.indexData[currentIndex].end + items.length,
+        items,
+      };
       store.hasPrevious = true;
     }
 

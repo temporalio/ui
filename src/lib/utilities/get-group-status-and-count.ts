@@ -1,12 +1,17 @@
 import { workflowStatuses } from '$lib/models/workflow-status';
-import type { WorkflowStatus } from '$lib/types/workflows';
+import type {
+  CountWorkflowExecutionsResponse,
+  WorkflowStatus,
+} from '$lib/types/workflows';
 
-import { decodePayload } from './decode-payload';
+import { parseRawPayloadToJSON } from './decode-payload';
 
-export const getStatusAndCountOfGroup = (groups = []) => {
+export const getStatusAndCountOfGroup = (
+  groups: CountWorkflowExecutionsResponse['groups'] = [],
+): { status: WorkflowStatus; count: number }[] => {
   return groups
     .map((group) => {
-      const status = decodePayload(
+      const status = parseRawPayloadToJSON(
         group?.groupValues[0],
       ) as unknown as WorkflowStatus;
       const count = parseInt(group.count);

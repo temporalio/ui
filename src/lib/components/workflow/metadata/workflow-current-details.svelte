@@ -1,74 +1,103 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
 
-  import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
+  import { page } from '$app/state';
+
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Markdown from '$lib/holocene/monaco/markdown.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowMetadata } from '$lib/services/query-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
-  $: currentDetails = $workflowRun?.metadata?.currentDetails || '';
-  $: closedWithoutDetails = !workflow.isRunning && !currentDetails;
+  const { namespace } = $derived(page.params);
+  const { workflow } = $derived($workflowRun);
 
-  let loading = false;
+  const currentDetails = $derived($workflowRun?.metadata?.currentDetails || '');
+
+  let loading = $state(false);
+  let lastFetched = $state<Date | null>(null);
 
   const fetchCurrentDetails = async () => {
-    if (loading) return;
+    if (!workflow || loading) return;
     loading = true;
     try {
-      const { settings } = $page.data;
-      const metadata = await getWorkflowMetadata(
-        {
-          namespace,
-          workflow: {
-            id: workflow.id,
-            runId: workflow.runId,
-          },
+      const metadata = await getWorkflowMetadata({
+        namespace,
+        workflow: {
+          id: workflow.id,
+          runId: workflow.runId,
         },
-        settings,
-        $authUser?.accessToken,
-      );
+      });
       $workflowRun.metadata = metadata;
+      lastFetched = new Date();
     } catch (error) {
       console.error('Error fetching current details:', error);
     } finally {
       loading = false;
     }
   };
+
+  onMount(() => {
+    fetchCurrentDetails();
+  });
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    const { target } = event;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      (target instanceof HTMLElement && target.isContentEditable)
+    ) {
+      return;
+    }
+    if (event.key === 'r' || event.key === 'R') {
+      fetchCurrentDetails();
+    }
+  };
 </script>
 
-<AccordionLight
-  let:open
-  onToggle={closedWithoutDetails ? fetchCurrentDetails : undefined}
-  icon={closedWithoutDetails ? 'retry' : undefined}
->
-  <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-    <Icon name="flag" class="text-brand" width={32} height={32} />
-    {translate('workflows.current-details')}
-    {#if loading}{translate('common.loading')}{/if}
+<svelte:window onkeydown={handleKeydown} />
+
+<div class="flex flex-1 flex-col border-l border-subtle">
+  <div class="surface-information w-full px-6 py-2">
+    <div class="flex items-center justify-between">
+      <h3>{translate('workflows.current-details')}</h3>
+      <div class="flex flex-row items-center gap-2 lg:flex-col xl:flex-row">
+        <p class="hidden sm:block">
+          Press the <span
+            class="mx-1 rounded bg-subtle px-1 text-sm font-medium leading-4"
+            >R</span
+          > for freshness
+        </p>
+        <div class="flex items-center sm:hidden">
+          <p>Press for freshness</p>
+          <Button
+            variant="ghost"
+            on:click={fetchCurrentDetails}
+            disabled={loading}
+            aria-label={translate('common.refresh')}
+          >
+            <Icon name="retry" />
+          </Button>
+        </div>
+        {#if lastFetched}
+          <Timestamp
+            as="p"
+            class="text-xs text-secondary"
+            dateTime={lastFetched}
+          />
+        {/if}
+      </div>
+    </div>
   </div>
-  {#if open}
-    {#key currentDetails}
-      <Markdown content={currentDetails} />
-    {/key}
-  {/if}
-  <svelte:fragment slot="action">
-    {#if workflow.isRunning}
-      <Tooltip text={translate('workflows.update-details')} left>
-        <Button
-          variant="ghost"
-          on:click={fetchCurrentDetails}
-          disabled={loading}
-        >
-          <Icon name="retry" />
-        </Button>
-      </Tooltip>
-    {/if}
-  </svelte:fragment>
-</AccordionLight>
+  {#key currentDetails}
+    <Markdown
+      frameId="user-metadata-current-details"
+      class="p-3"
+      overrideTheme="primary"
+      content={currentDetails}
+    />
+  {/key}
+</div>

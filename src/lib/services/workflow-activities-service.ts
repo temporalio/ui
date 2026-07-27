@@ -1,65 +1,152 @@
+import { page } from '$app/state';
+
 import type {
-  CompleteActivityTaskRequest,
-  CompleteActivityTaskResponse,
-  FailActivityTaskRequest,
-  FailActivityTaskResponse,
-} from '$lib/types/events';
+  ActivityPauseRequest,
+  ActivityPauseResponse,
+  ActivityResetRequest,
+  ActivityResetResponse,
+  ActivityUnpauseRequest,
+  ActivityUnpauseResponse,
+  ActivityUpdateOptionsRequest,
+  ActivityUpdateOptionsResponse,
+} from '$lib/types';
+import { isNotFound, isNotImplemented } from '$lib/utilities/handle-error';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-type WorkflowInformation = {
-  workflowId: string;
-  runId: string;
-  activityId: string;
+const requestWithActivityFallback = async <T>(
+  route: string,
+  init: Parameters<typeof requestFromAPI>[1],
+): Promise<T> => {
+  const fallbackRoute = route.replace(
+    '/activities-deprecated/',
+    '/activities/',
+  );
+  const version = page.data?.settings?.version;
+
+  if (version && !minimumVersionRequired('2.45.3', version)) {
+    return requestFromAPI<T>(fallbackRoute, init);
+  }
+
+  try {
+    return await requestFromAPI<T>(route, {
+      ...init,
+      notifyOnError: false,
+    });
+  } catch (error: unknown) {
+    if (isNotImplemented(error) || isNotFound(error)) {
+      return requestFromAPI<T>(fallbackRoute, init);
+    }
+
+    throw error;
+  }
 };
 
-export const failActivityTask = async ({
+export const pauseActivity = async ({
   namespace,
-  workflowId,
-  runId,
-  activityId,
-  failure,
+  execution,
+  id,
+  reason,
+  type,
   identity,
-  lastHeartbeatDetails,
-}: FailActivityTaskRequest &
-  WorkflowInformation): Promise<FailActivityTaskResponse> => {
-  const route = routeForApi('activity.fail', {
+}: ActivityPauseRequest & {
+  reason?: string;
+}): Promise<ActivityPauseResponse> => {
+  const route = routeForApi('activity.pause', {
     namespace,
   });
-  return requestFromAPI<FailActivityTaskResponse>(route, {
-    notifyOnError: false,
+
+  return requestWithActivityFallback(route, {
     options: {
-      body: stringifyWithBigInt({ failure, identity, lastHeartbeatDetails }),
-    },
-    params: {
-      workflowId,
-      runId,
-      activityId,
+      method: 'POST',
+      body: stringifyWithBigInt({
+        execution,
+        reason,
+        id,
+        type,
+        ...(identity && { identity }),
+      }),
     },
   });
 };
 
-export const completeActivityTask = async ({
+export const unpauseActivity = async ({
   namespace,
-  workflowId,
-  runId,
-  activityId,
+  execution,
+  id,
+  type,
   identity,
-  result,
-}: CompleteActivityTaskRequest &
-  WorkflowInformation): Promise<CompleteActivityTaskResponse> => {
-  const route = routeForApi('activity.complete', {
+}: ActivityUnpauseRequest): Promise<ActivityUnpauseResponse> => {
+  const route = routeForApi('activity.unpause', {
     namespace,
   });
 
-  return requestFromAPI(route, {
-    notifyOnError: false,
-    options: { body: stringifyWithBigInt({ identity, result }) },
-    params: {
-      workflowId,
-      runId,
-      activityId,
+  return requestWithActivityFallback(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        execution,
+        id,
+        type,
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const resetActivity = async ({
+  namespace,
+  execution,
+  id,
+  type,
+  resetHeartbeat,
+  identity,
+}: ActivityResetRequest): Promise<ActivityResetResponse> => {
+  const route = routeForApi('activity.reset', {
+    namespace,
+  });
+
+  return requestWithActivityFallback(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        execution,
+        id,
+        type,
+        resetHeartbeat,
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const updateActivityOptions = async ({
+  namespace,
+  execution,
+  id,
+  type,
+  activityOptions,
+  identity,
+}: ActivityUpdateOptionsRequest): Promise<ActivityUpdateOptionsResponse> => {
+  const route = routeForApi('activity.update-options', {
+    namespace,
+  });
+
+  const fullMask =
+    'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts';
+  return requestWithActivityFallback(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        execution,
+        id,
+        type,
+        activityOptions,
+        updateMask: fullMask,
+        ...(identity && { identity }),
+      }),
     },
   });
 };

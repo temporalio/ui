@@ -13,6 +13,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { BASE_TIME_FORMAT_OPTIONS } from '$lib/utilities/timezone';
   import { durations } from '$lib/utilities/to-duration';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -91,7 +92,7 @@
       id="advanced-search"
       placeholder={translate('common.query')}
       value={query}
-      on:submit={updateQuery}
+      onsubmit={updateQuery}
     />
   {:else}
     <div
@@ -106,7 +107,7 @@
         label={translate('common.workflow-id')}
         labelHidden
         bind:value={parameters.workflowId}
-        on:input={handleParameterChange}
+        oninput={handleParameterChange}
       />
       <Input
         icon="search"
@@ -116,13 +117,13 @@
         label={translate('common.workflow-type')}
         labelHidden
         bind:value={parameters.workflowType}
-        on:input={handleParameterChange}
+        oninput={handleParameterChange}
       />
       <Select
         id="time-range-filter"
         label={translate('common.time-range')}
         bind:value={parameters.timeRange}
-        on:change={handleParameterChange}
+        onchange={handleParameterChange}
       >
         <Option value={null}>All</Option>
         {#if parameters.timeRange && !durations.includes(parameters.timeRange)}
@@ -136,7 +137,7 @@
         id="execution-status-filter"
         label={translate('common.status')}
         bind:value={parameters.executionStatus}
-        on:change={handleParameterChange}
+        onchange={handleParameterChange}
       >
         {#each Object.entries(statuses) as [label, value] (label)}
           <Option {value}>{label}</Option>
@@ -147,9 +148,13 @@
         bind:value={$timeFormat}
         label={translate('common.time-format')}
       >
-        <Option value={'relative'}>{translate('common.relative')}</Option>
-        <Option value={'UTC'}>{translate('common.utc')}</Option>
-        <Option value={'local'}>{translate('common.local')}</Option>
+        <Option value="relative">{translate('common.relative')}</Option>
+        <Option value={BASE_TIME_FORMAT_OPTIONS.UTC}
+          >{translate('common.utc')}</Option
+        >
+        <Option value={BASE_TIME_FORMAT_OPTIONS.LOCAL}
+          >{translate('common.local')}</Option
+        >
       </Select>
     </div>
   {/if}

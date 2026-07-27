@@ -1,6 +1,7 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
+  import type { Props } from '$lib/holocene/code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export const meta = {
@@ -31,7 +32,18 @@
       },
       language: {
         control: 'select',
-        options: ['json', 'shell', 'text'],
+        options: [
+          'json',
+          'shell',
+          'text',
+          'java',
+          'python',
+          'go',
+          'php',
+          'dotnet',
+          'ruby',
+          'typescript',
+        ],
         table: { category: 'Content' },
       },
       minHeight: {
@@ -51,30 +63,69 @@
         table: { category: 'Copy Icon' },
       },
     },
-  } satisfies Meta<CodeBlock>;
+  } satisfies Meta<Props>;
 </script>
 
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+
+  const content = {
+    'File A': 'console.log("***");',
+    'File B': 'console.log("***");',
+  };
+
+  let activeTab = $state('File A');
+  let hidden = $state(true);
+
+  let editableContent = $state(
+    stringifyWithBigInt({ hello: 'world' }, null, 2),
+  );
+
+  const handleEditableChange = (text: string) => {
+    editableContent = text;
+    action('change')(text);
+  };
+
+  const createLargeJson = () => {
+    const obj: Record<string, unknown> = {};
+    obj['section'] = {
+      id: 1,
+      name: 'Section',
+      items: Array.from({ length: 200 }, (_, j) => ({
+        index: j,
+        flags: { a: true, b: false, c: null },
+        values: Array.from({ length: 6 }, (_, k) => ({
+          k,
+          v: `value-${j}-${k}`,
+        })),
+        nested: { foo: { bar: { baz: j, list: [1, 2, 3, 4, 5] } } },
+      })),
+      meta: {
+        createdAt: new Date(0).toISOString(),
+        tags: ['alpha', 'beta', 'gamma', 'delta'],
+        notes: 'This is a generated payload for folding test',
+      },
+    };
+    return stringifyWithBigInt(obj, null, 2);
+  };
+
+  const largeJson = createLargeJson();
 </script>
 
-<Template id="json" let:args>
-  <CodeBlock language="json" {...args} on:change={action('change')} />
-</Template>
-
-<Template id="shell" let:args>
-  <CodeBlock language="shell" {...args} on:change={action('change')} />
-</Template>
-
-<Template id="text" let:args>
-  <CodeBlock language="text" {...args} on:change={action('change')} />
-</Template>
-
 <Template let:args>
-  <CodeBlock {...args} />
+  <CodeBlock {...args} onchange={action('change')} />
+</Template>
+
+<Template id="editable" let:args>
+  <CodeBlock
+    {...args}
+    content={editableContent}
+    onchange={handleEditableChange}
+  />
 </Template>
 
 <Story
@@ -86,9 +137,9 @@
 
 <Story
   name="Editable"
+  template="editable"
   args={{
     editable: true,
-    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
   }}
 />
 
@@ -131,18 +182,25 @@
 />
 
 <Story
-  name="Shell"
+  name="Copyable (Maximum Height)"
   args={{
-    language: 'shell',
-    content: 'echo "Hello, World!"',
+    maxHeight: 100,
+    content: stringifyWithBigInt(
+      Object.getOwnPropertyDescriptors(Array.prototype),
+      null,
+      2,
+    ),
+    copyable: true,
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
   }}
 />
 
 <Story
-  name="Text"
+  name="Shell"
   args={{
-    language: 'text',
-    content: 'Hello, World!',
+    language: 'shell',
+    content: 'echo "Hello, World!"',
   }}
 />
 
@@ -158,6 +216,14 @@
 />
 
 <Story
+  name="Text"
+  args={{
+    language: 'text',
+    content: 'Hello, World!',
+  }}
+/>
+
+<Story
   name="Copyable (Text)"
   args={{
     language: 'text',
@@ -167,3 +233,169 @@
     copySuccessIconTitle: 'Content copied to clipboard',
   }}
 />
+
+<Story
+  name="Java"
+  args={{
+    language: 'java',
+    content: `// Initialize client connection
+    WorkflowServiceStubs service =
+        WorkflowServiceStubs.newServiceStubs(
+            WorkflowServiceStubsOptions.newBuilder()
+                .addApiKey(
+                    () ->
+                        "<APIKey>")
+                .setTarget("<endpoint>")
+                .setEnableHttps(true)
+                ...
+                .build());
+
+    WorkflowClient client =
+        WorkflowClient.newInstance(
+            service, WorkflowClientOptions.newBuilder().setNamespace("<namespace_id>.<account_id>").build());
+`,
+  }}
+/>
+
+<Story
+  name="Typescript"
+  args={{
+    language: 'typescript',
+    content: `// Initialize client connection
+const connection = await Connection.connect({
+    address: "<endpoint>",
+    tls: true,
+    apiKey: "<APIKey>",
+});
+const client = new Client({
+    connection,
+    namespace: "<namespace_id>.<account_id>",
+});
+`,
+  }}
+/>
+
+<Story
+  name="Python"
+  args={{
+    language: 'python',
+    content: `# stuff
+client = await Client.connect(
+    "<endpoint>",
+    namespace="<namespace_id>.<account_id>",
+    api_key="<APIKey>",
+    tls=True,
+)`,
+  }}
+/>
+
+<Story
+  name="Ruby"
+  args={{
+    language: 'ruby',
+    content: `# Initialize client connection
+client = Temporalio::Client.connect(
+  "<endpoint>",
+  "<namespace_id>.<account_id>",
+  api_key: "<APIKey>",
+  tls: true
+)
+`,
+  }}
+/>
+
+<Story
+  name="Go"
+  args={{
+    language: 'go',
+    content: `// Initialize client connection
+clientOptions := client.Options{
+    HostPort: "<endpoint>",
+    Namespace: "<namespace_id>.<account_id>",
+    ConnectionOptions: client.ConnectionOptions{TLS: &tls.Config{}},
+    Credentials: client.NewAPIKeyStaticCredentials("<APIKey>"),
+}
+c, err := client.Dial(clientOptions)
+`,
+  }}
+/>
+
+<Story
+  name=".NET"
+  args={{
+    language: 'dotnet',
+    content: `// Initialize client connection
+var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
+{
+    Namespace = "<namespace_id>.<account_id>",
+    ApiKey = "<APIKey>",
+    Tls = new(),
+});
+`,
+  }}
+/>
+
+<Story name="With Header">
+  <CodeBlock
+    copyable
+    language="typescript"
+    label="Code example"
+    tabs={['File A', 'File B']}
+    bind:activeTab
+    content={hidden
+      ? content[activeTab]
+      : content[activeTab].replace('***', 'secret')}
+  >
+    {#snippet headerActions()}
+      <button onclick={() => (hidden = !hidden)}>
+        {#if hidden}
+          <Icon name="eye-show" />
+        {:else}
+          <Icon name="eye-hide" />
+        {/if}
+      </button>
+    {/snippet}
+  </CodeBlock>
+</Story>
+
+<Story
+  name="Large JSON (Folding)"
+  args={{
+    language: 'json',
+    content: largeJson,
+    maxHeight: 300,
+    copyable: false,
+  }}
+/>
+
+<Story name="Test page scrolling">
+  <div>
+    <p>
+      content<br />
+      content<br />
+      content<br />
+      content<br />
+      content<br />
+      content<br />
+      content<br />
+      content
+    </p>
+    <CodeBlock
+      copyable
+      language="json"
+      label="JSON content"
+      content={largeJson}
+      maxHeight={300}
+    />
+    <p>
+      content<br />
+      content<br />
+      content<br />
+      content<br />
+      content<br />
+      content<br />
+      content<br />
+      content
+    </p>
+  </div>
+</Story>

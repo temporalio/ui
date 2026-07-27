@@ -1,27 +1,24 @@
-import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { Timestamp } from '@temporalio/common';
+import type { google } from '@temporalio/proto';
 
-import type { Replace, Settings } from './global';
+import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { ActivityOptions, EventLink } from '$lib/types';
+
+import type { Replace } from './global';
 
 export type EventHistory = Replace<
   import('$lib/types').History,
   { events: HistoryEvent[] }
 >;
 
-export type EventLink = {
-  workflowEvent: {
-    eventRef: {
-      eventType: string;
-      eventId?: string;
-    };
-    namespace: string;
-    workflowId: string;
-    runId: string;
-  };
-};
-
 export type HistoryEvent = Replace<
   import('$lib/types').HistoryEvent,
-  { eventType: EventType; eventId: string; links?: EventLink[] }
+  {
+    eventType: EventType;
+    eventId: string;
+    links?: EventLink[];
+    principal?: Principal;
+  }
 >;
 
 export type GetWorkflowExecutionHistoryResponse = Replace<
@@ -39,12 +36,22 @@ export type Payload = {
   data?: string;
 };
 
+export type PauseInfo = {
+  manual: {
+    reason: string;
+    identity: string;
+  };
+  pauseTime: Timestamp;
+};
+
 export type PendingActivity = Replace<
   PendingActivityInfo,
   {
     id: string;
     state: PendingActivityState;
-    activityType?: { name: string };
+    activityType?: string;
+    pauseInfo?: PauseInfo;
+    activityOptions?: ActivityOptions;
   }
 >;
 
@@ -56,23 +63,18 @@ export type PendingActivityState =
 
 export type PendingChildren = import('$lib/types').PendingChildrenInfo;
 export type PendingNexusOperation = import('$lib/types').PendingNexusInfo & {
-  scheduledEventId: string;
+  scheduleToStartTimeout: google.protobuf.IDuration | null;
+  startToCloseTimeout: google.protobuf.IDuration | null;
 };
 export type Callbacks = import('$lib/types').CallbackInfo[];
 
-export type EventRequestMetadata = {
-  namespace: string;
-  settings: Settings;
-  accessToken: string;
+// Remove once TS SDK has support
+export type Principal = {
+  type?: string;
+  name?: string;
 };
 
-export type EventWithMetadata = {
-  historyEvent: HistoryEvent;
-} & EventRequestMetadata;
-
 export type EventType = import('$lib/utilities/is-event-type').EventType;
-export type ResetEventType =
-  import('$lib/utilities/is-event-type').ResetEventType;
 
 export type EventTypeCategory =
   import('$lib/models/event-history/get-event-categorization').EventTypeCategory;
@@ -88,13 +90,15 @@ export interface WorkflowEvent extends HistoryEvent {
   category: EventTypeCategory;
   name: EventType;
   links?: EventLink[];
+  billableActions?: number;
+  principal?: Principal;
 }
 
 export type WorkflowEvents = WorkflowEvent[];
 
 export type PendingActivityWithMetadata = {
   activity: PendingActivity;
-} & EventRequestMetadata;
+};
 
 export type CommonEventKey =
   | 'id'
@@ -108,7 +112,9 @@ export type CommonEventKey =
   | 'classification'
   | 'category'
   | 'workerMayIgnore'
-  | 'name';
+  | 'name'
+  | 'links'
+  | 'principal';
 
 export type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 
@@ -166,6 +172,8 @@ export type WorkflowExecutionStartedEvent =
   EventWithAttributes<'workflowExecutionStartedEventAttributes'>;
 export type WorkflowExecutionCompletedEvent =
   EventWithAttributes<'workflowExecutionCompletedEventAttributes'>;
+export type WorkflowExecutionOptionsUpdatedEvent =
+  EventWithAttributes<'workflowExecutionOptionsUpdatedEventAttributes'>;
 export type WorkflowExecutionFailedEvent =
   EventWithAttributes<'workflowExecutionFailedEventAttributes'>;
 export type WorkflowExecutionTimedOutEvent =
@@ -245,6 +253,8 @@ export type WorkflowExecutionUpdateAdmittedEvent =
   EventWithAttributes<'workflowExecutionUpdateAdmittedEventAttributes'>;
 export type WorkflowExecutionUpdateAcceptedEvent =
   EventWithAttributes<'workflowExecutionUpdateAcceptedEventAttributes'>;
+export type WorkflowExecutionUpdateRejectedEvent =
+  EventWithAttributes<'workflowExecutionUpdateRejectedEventAttributes'>;
 export type WorkflowExecutionUpdateCompletedEvent =
   EventWithAttributes<'workflowExecutionUpdateCompletedEventAttributes'>;
 export type NexusOperationScheduledEvent =
@@ -261,14 +271,9 @@ export type NexusOperationTimedOutEvent =
   EventWithAttributes<'nexusOperationTimedOutEventAttributes'>;
 export type NexusOperationCancelRequestedEvent =
   EventWithAttributes<'nexusOperationCancelRequestedEventAttributes'>;
+export type NexusOperationCancelRequestCompletedEvent =
+  EventWithAttributes<'nexusOperationCancelRequestCompletedEventAttributes'>;
+export type NexusOperationCancelRequestFailedEvent =
+  EventWithAttributes<'nexusOperationCancelRequestFailedEventAttributes'>;
 export type WorkflowPropertiesModifiedEvent =
   EventWithAttributes<'workflowPropertiesModifiedEventAttributes'>;
-
-export type FailActivityTaskRequest =
-  import('$lib/types').ActivityTaskFailedByIdRequest;
-export type FailActivityTaskResponse =
-  import('$lib/types').ActivityTaskFailedByIdResponse;
-export type CompleteActivityTaskRequest =
-  import('$lib/types').ActivityTaskCompletedByIdRequest;
-export type CompleteActivityTaskResponse =
-  import('$lib/types').ActivityTaskCompletedByIdResponse;

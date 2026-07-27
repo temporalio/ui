@@ -8,7 +8,6 @@ import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 
-export const MAX_PINNED_COLUMNS = 2;
 export const WorkflowHeaderLabels = [
   'Status',
   'Workflow ID',
@@ -31,17 +30,19 @@ export type WorkflowHeaderLabel = (typeof WorkflowHeaderLabels)[number];
 
 // https://github.com/microsoft/TypeScript/issues/29729
 // https://stackoverflow.com/a/61048124
-// eslint-disable-next-line @typescript-eslint/ban-types
 type AnyWorkflowHeaderLabel = WorkflowHeaderLabel | (string & {});
 
 export type ConfigurableTableHeader = {
   label: AnyWorkflowHeaderLabel;
-  pinned: boolean;
+  pinned?: boolean;
 };
 
 export const TABLE_TYPE = {
   WORKFLOWS: 'workflows',
   SCHEDULES: 'schedules',
+  ACTIVITIES: 'activities',
+  DEPLOYMENTS: 'deployments',
+  NEXUS_OPERATIONS: 'nexus-operations',
 } as const;
 
 type Keys = keyof typeof TABLE_TYPE;
@@ -77,14 +78,6 @@ type Action =
       };
     }
   | {
-      type: 'CONFIGURABLE_COLUMN.PIN';
-      payload: {
-        label: AnyWorkflowHeaderLabel;
-        namespace: string;
-        table: ConfigurableTableType;
-      };
-    }
-  | {
       type: 'CONFIGURABLE_COLUMN.MOVE';
       payload: {
         from: number;
@@ -94,66 +87,124 @@ type Action =
       };
     };
 
-const DEFAULT_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
-  { label: 'Status', pinned: true },
-  { label: 'Workflow ID', pinned: true },
-  { label: 'Run ID', pinned: false },
-  { label: 'Type', pinned: false },
-  { label: 'Start', pinned: false },
-  { label: 'End', pinned: false },
+export const DEFAULT_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Status' },
+  { label: 'Workflow ID' },
+  { label: 'Run ID' },
+  { label: 'Type' },
+  { label: 'Start' },
+  { label: 'End' },
 ];
 
 const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
-  { label: 'History Size', pinned: false },
-  { label: 'History Length', pinned: false },
-  { label: 'Execution Time', pinned: false },
-  { label: 'Execution Duration', pinned: false },
-  { label: 'State Transitions', pinned: false },
-  { label: 'Parent Namespace', pinned: false },
-  { label: 'Task Queue', pinned: false },
-  { label: 'Scheduled By ID', pinned: false },
-  { label: 'Scheduled Start Time', pinned: false },
-  { label: 'Deployment', pinned: false },
-  { label: 'Deployment Version', pinned: false },
-  { label: 'Versioning Behavior', pinned: false },
+  { label: 'History Size' },
+  { label: 'History Length' },
+  { label: 'Execution Time' },
+  { label: 'Execution Duration' },
+  { label: 'State Transitions' },
+  { label: 'Task Queue' },
+  { label: 'Scheduled By ID' },
+  { label: 'Scheduled Start Time' },
+  { label: 'Deployment' },
+  { label: 'Deployment Version' },
+  { label: 'Versioning Behavior' },
+  { label: 'Change Version' },
+];
+
+const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS_CORE: ConfigurableTableHeader[] = [
+  ...DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS,
+  { label: 'Parent Namespace' },
 ];
 
 const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [
-  { label: 'Status', pinned: false },
-  { label: 'Schedule ID', pinned: false },
-  { label: 'Workflow Type', pinned: false },
-  { label: 'Recent Runs', pinned: false },
-  { label: 'Upcoming Runs', pinned: false },
-  { label: 'Schedule Spec', pinned: false },
+  { label: 'Status' },
+  { label: 'Schedule ID' },
+  { label: 'Workflow Type' },
+  { label: 'Recent Runs' },
+  { label: 'Upcoming Runs' },
+  { label: 'Schedule Spec' },
 ];
 
-const isNotParentWorkflowIdColumn = (column: ConfigurableTableHeader) =>
-  column.label !== 'Parent Workflow ID';
+export const ActivityHeaderLabels = [
+  'Activity ID',
+  'Run ID',
+  'Type',
+  'Task Queue',
+  'Start',
+  'End',
+  'Status',
+  'Execution Duration',
+  'State Transitions',
+] as const;
 
-const getDefaultWorkflowsTableColumns = (): ConfigurableTableHeader[] => {
-  let columns: ConfigurableTableHeader[];
-  try {
-    // try to get the list of columns that was stored last time they interacted
-    // with the table before we made it namespace-specific
-    const stringifiedOldColumns = window.localStorage.getItem(
-      'workflow-table-columns',
-    );
-    const parsedOldColumns = JSON.parse(stringifiedOldColumns);
+export type ActivityHeaderLabel = (typeof ActivityHeaderLabels)[number];
 
-    if (stringifiedOldColumns && parsedOldColumns?.length) {
-      const filteredOldColumns = parsedOldColumns.filter(
-        isNotParentWorkflowIdColumn,
-      );
-      columns = filteredOldColumns;
-    } else {
-      columns = DEFAULT_WORKFLOWS_COLUMNS;
-    }
-  } catch {
-    columns = DEFAULT_WORKFLOWS_COLUMNS;
-  }
+export const NexusOperationHeaderLabels = [
+  'Operation ID',
+  'Run ID',
+  'Endpoint',
+  'Service',
+  'Operation',
+  'Status',
+  'Schedule Time',
+  'Close Time',
+  'Execution Duration',
+  'State Transitions',
+] as const;
 
-  return columns;
-};
+export type NexusOperationHeaderLabel =
+  (typeof NexusOperationHeaderLabels)[number];
+
+export const DEFAULT_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Status' },
+  { label: 'Activity ID' },
+  { label: 'Run ID' },
+  { label: 'Type' },
+  { label: 'Start' },
+  { label: 'End' },
+];
+
+const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Task Queue' },
+  { label: 'Execution Duration' },
+  { label: 'State Transitions' },
+];
+
+export const DeploymentHeaderLabels = [
+  'Deployment',
+  'Current Version',
+  'Latest Version',
+  'Created At',
+] as const;
+
+export type DeploymentHeaderLabel = (typeof DeploymentHeaderLabels)[number];
+
+export const DEFAULT_DEPLOYMENTS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Deployment' },
+  { label: 'Current Version' },
+  { label: 'Created At' },
+];
+
+const DEFAULT_AVAILABLE_DEPLOYMENTS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Latest Version' },
+];
+
+export const DEFAULT_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Status' },
+  { label: 'Operation ID' },
+  { label: 'Run ID' },
+  { label: 'Endpoint' },
+  { label: 'Service' },
+  { label: 'Operation' },
+  { label: 'Schedule Time' },
+  { label: 'Close Time' },
+];
+
+const DEFAULT_AVAILABLE_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Close Time' },
+  { label: 'Execution Duration' },
+  { label: 'State Transitions' },
+];
 
 export const persistedWorkflowTableColumns = persistStore<State>(
   'namespace-workflow-table-columns',
@@ -165,37 +216,49 @@ export const persistedSchedulesTableColumns = persistStore<State>(
   {},
 );
 
+export const persistedActivitiesTableColumns = persistStore<State>(
+  'namespace-activities-table-columns',
+  {},
+);
+
+export const persistedDeploymentsTableColumns = persistStore<State>(
+  'namespace-deployment-table-columns',
+  {},
+);
+
+export const persistedNexusOperationsTableColumns = persistStore<State>(
+  'namespace-nexus-operations-table-columns',
+  {},
+);
+
 export const configurableTableColumns: Readable<TableColumns> = derived(
   [
     namespaces,
     page,
     persistedWorkflowTableColumns,
     persistedSchedulesTableColumns,
+    persistedActivitiesTableColumns,
+    persistedDeploymentsTableColumns,
+    persistedNexusOperationsTableColumns,
   ],
   ([
     $namespaces,
     $page,
     $persistedWorkflowTableColumns,
     $persistedSchedulesTableColumns,
+    $persistedActivitiesTableColumns,
+    $persistedDeploymentsTableColumns,
+    $persistedNexusOperationsTableColumns,
   ]) => {
     const state: TableColumns = {};
     const useOrAddDefaultTableColumnsToNamespace = (
       columns: State,
       namespace: string,
       defaultColumns: ConfigurableTableHeader[],
-      update: (columns: State) => void,
     ) => {
       if (!columns?.[namespace]?.length) {
         columns[namespace] = [...defaultColumns];
         return columns[namespace];
-      }
-      const filteredColumns = columns[namespace].filter(
-        isNotParentWorkflowIdColumn,
-      );
-
-      if (filteredColumns.length !== columns[namespace].length) {
-        columns[namespace] = filteredColumns;
-        update(columns);
       }
 
       return columns[namespace];
@@ -205,14 +268,27 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
       workflows: useOrAddDefaultTableColumnsToNamespace(
         $persistedWorkflowTableColumns,
         namespace,
-        getDefaultWorkflowsTableColumns(),
-        (columns) => persistedWorkflowTableColumns.set(columns),
+        DEFAULT_WORKFLOWS_COLUMNS,
       ),
       schedules: useOrAddDefaultTableColumnsToNamespace(
         $persistedSchedulesTableColumns,
         namespace,
         DEFAULT_SCHEDULES_COLUMNS,
-        (columns) => persistedSchedulesTableColumns.set(columns),
+      ),
+      activities: useOrAddDefaultTableColumnsToNamespace(
+        $persistedActivitiesTableColumns,
+        namespace,
+        DEFAULT_ACTIVITIES_COLUMNS,
+      ),
+      deployments: useOrAddDefaultTableColumnsToNamespace(
+        $persistedDeploymentsTableColumns,
+        namespace,
+        DEFAULT_DEPLOYMENTS_COLUMNS,
+      ),
+      'nexus-operations': useOrAddDefaultTableColumnsToNamespace(
+        $persistedNexusOperationsTableColumns,
+        namespace,
+        DEFAULT_NEXUS_OPERATIONS_COLUMNS,
       ),
     });
 
@@ -237,10 +313,6 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
   },
 );
 
-export const pinnedColumnsWidth = persistStore<number>(
-  'workflow-table-pinned-columns-width',
-);
-
 export const availableWorkflowSystemSearchAttributeColumns: (
   namespace: string,
   settings: Settings,
@@ -249,10 +321,8 @@ export const availableWorkflowSystemSearchAttributeColumns: (
     [
       ...DEFAULT_WORKFLOWS_COLUMNS,
       ...(settings?.runtimeEnvironment?.isCloud
-        ? DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS.filter(
-            (col) => col.label !== 'Parent Namespace',
-          )
-        : DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS),
+        ? DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS
+        : DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS_CORE),
     ].filter(
       (header) =>
         !$configurableTableColumns[namespace]?.workflows?.some(
@@ -268,6 +338,51 @@ export const availableScheduleColumns: (
     [...DEFAULT_SCHEDULES_COLUMNS].filter(
       (header) =>
         !$configurableTableColumns[namespace]?.schedules?.some(
+          (column) => column.label === header.label,
+        ),
+    ),
+  );
+
+export const availableActivityColumns: (
+  namespace: string,
+) => Readable<ConfigurableTableHeader[]> = (namespace) =>
+  derived(configurableTableColumns, ($configurableTableColumns) =>
+    [
+      ...DEFAULT_ACTIVITIES_COLUMNS,
+      ...DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS,
+    ].filter(
+      (header) =>
+        !$configurableTableColumns[namespace]?.activities?.some(
+          (column) => column.label === header.label,
+        ),
+    ),
+  );
+
+export const availableDeploymentColumns: (
+  namespace: string,
+) => Readable<ConfigurableTableHeader[]> = (namespace) =>
+  derived(configurableTableColumns, ($configurableTableColumns) =>
+    [
+      ...DEFAULT_DEPLOYMENTS_COLUMNS,
+      ...DEFAULT_AVAILABLE_DEPLOYMENTS_COLUMNS,
+    ].filter(
+      (header) =>
+        !$configurableTableColumns[namespace]?.deployments?.some(
+          (column) => column.label === header.label,
+        ),
+    ),
+  );
+
+export const availableNexusOperationColumns: (
+  namespace: string,
+) => Readable<ConfigurableTableHeader[]> = (namespace) =>
+  derived(configurableTableColumns, ($configurableTableColumns) =>
+    [
+      ...DEFAULT_NEXUS_OPERATIONS_COLUMNS,
+      ...DEFAULT_AVAILABLE_NEXUS_OPERATIONS_COLUMNS,
+    ].filter(
+      (header) =>
+        !$configurableTableColumns[namespace]?.['nexus-operations']?.some(
           (column) => column.label === header.label,
         ),
     ),
@@ -292,7 +407,6 @@ export const availableCustomSearchAttributeColumns: (
         )
         .map((key) => ({
           label: key,
-          pinned: false,
         })),
   );
 
@@ -302,6 +416,12 @@ const getDefaultColumns = (table: ConfigurableTableType) => {
       return DEFAULT_WORKFLOWS_COLUMNS;
     case TABLE_TYPE.SCHEDULES:
       return DEFAULT_SCHEDULES_COLUMNS;
+    case TABLE_TYPE.ACTIVITIES:
+      return DEFAULT_ACTIVITIES_COLUMNS;
+    case TABLE_TYPE.DEPLOYMENTS:
+      return DEFAULT_DEPLOYMENTS_COLUMNS;
+    case TABLE_TYPE.NEXUS_OPERATIONS:
+      return DEFAULT_NEXUS_OPERATIONS_COLUMNS;
   }
 };
 
@@ -314,7 +434,7 @@ const reducer = (action: Action, state: State): State => {
 
       return {
         ...state,
-        [namespace]: [...columns, { label, pinned: false }],
+        [namespace]: [...columns, { label }],
       };
     }
     case 'CONFIGURABLE_COLUMN.REMOVE': {
@@ -326,62 +446,16 @@ const reducer = (action: Action, state: State): State => {
         [namespace]: columns.filter(({ label }) => label !== labelToRemove),
       };
     }
-    case 'CONFIGURABLE_COLUMN.PIN': {
-      const { label: labelToPin, namespace } = action.payload;
-      const columns = state?.[namespace] ?? defaultColumns;
-      const index = columns.findIndex(({ label }) => label === labelToPin);
-
-      const isPinned = columns[index].pinned;
-
-      let lastPinned = -1;
-      for (let i = columns.length - 1; i >= 0; i--) {
-        if (columns[i].pinned) {
-          lastPinned = i;
-          break;
-        }
-      }
-
-      const newColumns = [...columns];
-      newColumns[index].pinned = !isPinned;
-
-      if (index > lastPinned && !isPinned) {
-        newColumns.splice(lastPinned + 1, 0, newColumns.splice(index, 1)[0]);
-      } else if (index < lastPinned && isPinned) {
-        newColumns.splice(lastPinned, 0, newColumns.splice(index, 1)[0]);
-      }
-
-      return {
-        ...state,
-        [namespace]: newColumns,
-      };
-    }
     case 'CONFIGURABLE_COLUMN.MOVE': {
       const { from, to, namespace } = action.payload;
-      const columns = state?.[namespace] ?? DEFAULT_WORKFLOWS_COLUMNS;
-      const isPinned = columns[from].pinned;
-
-      let lastPinned = 0;
-      for (let i = columns.length - 1; i >= 0; i--) {
-        if (columns[i].pinned) {
-          lastPinned = i;
-          break;
-        }
-      }
-
+      const columns = state?.[namespace] ?? defaultColumns;
       const tempColumns = [...columns];
-      if (to <= lastPinned && !isPinned) {
-        tempColumns[from].pinned = true;
-      } else if (to > lastPinned && isPinned) {
-        tempColumns[from].pinned = false;
-      }
 
       tempColumns.splice(to, 0, tempColumns.splice(from, 1)[0]);
 
       return {
         ...state,
-        [namespace]: tempColumns.map((c, idx) =>
-          idx > MAX_PINNED_COLUMNS - 1 ? { ...c, pinned: false } : c,
-        ),
+        [namespace]: tempColumns,
       };
     }
     default:
@@ -395,6 +469,12 @@ const getPersistedColumns = (table: ConfigurableTableType): Writable<State> => {
       return persistedWorkflowTableColumns;
     case TABLE_TYPE.SCHEDULES:
       return persistedSchedulesTableColumns;
+    case TABLE_TYPE.ACTIVITIES:
+      return persistedActivitiesTableColumns;
+    case TABLE_TYPE.DEPLOYMENTS:
+      return persistedDeploymentsTableColumns;
+    case TABLE_TYPE.NEXUS_OPERATIONS:
+      return persistedNexusOperationsTableColumns;
   }
 };
 
@@ -434,16 +514,5 @@ export const moveColumn = (
   dispatch({
     type: 'CONFIGURABLE_COLUMN.MOVE',
     payload: { from, to, namespace, table },
-  });
-};
-
-export const pinColumn = (
-  label: AnyWorkflowHeaderLabel,
-  namespace: string,
-  table: ConfigurableTableType,
-) => {
-  dispatch({
-    type: 'CONFIGURABLE_COLUMN.PIN',
-    payload: { label, namespace, table },
   });
 };

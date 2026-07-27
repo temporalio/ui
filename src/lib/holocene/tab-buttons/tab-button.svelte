@@ -20,6 +20,7 @@
     active?: boolean;
     'data-testid'?: string;
     tooltip?: string;
+    class?: string;
   };
 
   type AnchorProps = BaseProps &
@@ -53,9 +54,13 @@
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
   class:disabled={$$restProps.disabled}
+  data-track-name="tab-button"
+  data-track-intent="select"
+  data-track-text="*textContent*"
   on:click
   role="button"
   tabindex="0"
+  type={href ? undefined : 'button'}
   {...$$restProps}
 >
   <Tooltip hide={!tooltip} text={tooltip} top>

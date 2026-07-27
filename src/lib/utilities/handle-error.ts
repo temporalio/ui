@@ -1,4 +1,8 @@
+import { get } from 'svelte/store';
+
 import { BROWSER } from 'esm-env';
+
+import { page } from '$app/stores';
 
 import { networkError } from '$lib/stores/error';
 import { toaster } from '$lib/stores/toaster';
@@ -7,7 +11,7 @@ import type { NetworkError } from '$lib/types/global';
 import { has } from './has';
 import { isNetworkError } from './is-network-error';
 import type { APIErrorResponse, TemporalAPIError } from './request-from-api';
-import { routeForLoginPage } from './route-for';
+import { routeForAuthenticationRedirect, routeForLoginPage } from './route-for';
 
 interface NetworkErrorWithReport extends NetworkError {
   report?: boolean;
@@ -34,11 +38,11 @@ export const handleError = (
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.message));
+    window.location.assign(routeForCurrentAuthSettings());
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.message));
+    window.location.assign(routeForCurrentAuthSettings());
   }
 
   if (isNetworkError(error)) {
@@ -57,15 +61,13 @@ export const handleUnauthorizedOrForbiddenError = (
   error: APIErrorResponse,
   isBrowser = BROWSER,
 ): void => {
-  const msg = `${error?.status} ${error?.body?.message}`;
-
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(msg));
+    window.location.assign(routeForCurrentAuthSettings());
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(msg));
+    window.location.assign(routeForCurrentAuthSettings());
     return;
   }
 };
@@ -76,6 +78,14 @@ export const isUnauthorized = (error: unknown): error is TemporalAPIError => {
 
 export const isForbidden = (error: unknown): error is TemporalAPIError => {
   return hasStatusCode(error, 403);
+};
+
+export const isNotFound = (error: unknown): error is TemporalAPIError => {
+  return hasStatusCode(error, 404);
+};
+
+export const isNotImplemented = (error: unknown): error is TemporalAPIError => {
+  return hasStatusCode(error, 501);
 };
 
 const hasStatusCode = (
@@ -91,4 +101,14 @@ const hasStatusCode = (
   }
 
   return false;
+};
+
+const routeForCurrentAuthSettings = (): string => {
+  const settings = get(page)?.data?.settings;
+  if (!settings) return routeForLoginPage();
+
+  return routeForAuthenticationRedirect(
+    settings,
+    new URL(window.location.href),
+  );
 };

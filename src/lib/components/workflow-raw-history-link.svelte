@@ -3,15 +3,19 @@
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { parameters } from '$lib/stores/events';
-  import { routeForWorkflowHistoryJson } from '$lib/utilities/route-for';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   const { namespace, workflowId, runId } = $parameters;
 
-  $: href = routeForWorkflowHistoryJson({
-    namespace,
-    workflow: workflowId,
-    run: runId,
-  });
+  const href = $derived(
+    routeForEventHistory({
+      namespace,
+      workflow: workflowId,
+      run: runId,
+    }),
+  );
+
+  const jsonHref = $derived(href + '.json');
 </script>
 
 {#if !$isCloud}
@@ -19,7 +23,7 @@
     <Link
       icon="external-link"
       class="whitespace-nowrap"
-      {href}
+      href={jsonHref}
       newTab={true}
       data-testid="view-raw-event-history"
     >

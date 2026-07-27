@@ -14,10 +14,12 @@ test.describe('Enable write actions by default', () => {
   });
 
   test('Cancel workflow button enabled', async ({ page }) => {
-    const workflowActionButton = page
-      .locator('#workflow-actions-primary-button')
-      .locator('visible=true');
-    await expect(workflowActionButton).toBeEnabled();
+    test.slow();
+    const cancelButton = page.getByRole('button', {
+      name: 'Request Cancellation',
+    });
+    await expect(cancelButton).toBeVisible();
+    await expect(cancelButton).toBeEnabled();
   });
 });
 
@@ -29,26 +31,25 @@ test.describe('Disable write actions on workflow actions', () => {
   });
 
   test('Cancel workflow button disabled', async ({ page }) => {
-    const workflowActionButton = page
-      .locator('#workflow-actions-primary-button')
-      .locator('visible=true');
-    await expect(workflowActionButton).toBeDisabled();
+    const cancelButton = page.getByRole('button', {
+      name: 'Request Cancellation',
+    });
+    await expect(cancelButton).toBeDisabled();
   });
 });
 
 test.describe('Disable write actions on empty schedules list actions', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(schedulesUrl);
-    await mockSchedulesApis(page, true);
+    await mockSchedulesApis(page, true, true);
     await mockSettingsApi(page, { DisableWriteActions: true });
   });
 
   test('Create Schedule button is disabled', async ({ page }) => {
     await page.goto(schedulesUrl);
 
-    const namespace = await page.locator('h1').innerText();
-    expect(namespace).toBe('0 Schedules');
-
+    const namespace = page.locator('h1');
+    await expect(namespace).toHaveText('0 Schedules');
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeDisabled();
   });

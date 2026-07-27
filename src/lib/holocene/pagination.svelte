@@ -167,7 +167,7 @@
               }}
               aria-label={previousButtonLabel}
             >
-              <span class="arrow arrow-left" />
+              <span class="arrow arrow-left"></span>
             </button>
             <p>
               {#if updating}
@@ -187,7 +187,7 @@
               }}
               aria-label={nextButtonLabel}
             >
-              <span class="arrow arrow-right" />
+              <span class="arrow arrow-right"></span>
             </button>
           </div>
         </slot>
@@ -228,7 +228,7 @@
           }}
           aria-label={previousButtonLabel}
         >
-          <span class="arrow arrow-left" />
+          <span class="arrow arrow-left"></span>
         </button>
         <p>
           {#if updating}
@@ -247,7 +247,7 @@
           }}
           aria-label={nextButtonLabel}
         >
-          <span class="arrow arrow-right" />
+          <span class="arrow arrow-right"></span>
         </button>
       </div>
       <slot name="action-bottom-right" />
@@ -257,10 +257,10 @@
 
 <style lang="postcss">
   .caret {
-    @apply relative;
+    @apply inline-flex items-center justify-center;
 
-    width: 12px;
-    height: 12px;
+    width: 24px;
+    height: 24px;
   }
 
   .caret:disabled {
@@ -268,7 +268,7 @@
   }
 
   .arrow {
-    @apply absolute left-0 top-0 h-0 w-0;
+    @apply h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;

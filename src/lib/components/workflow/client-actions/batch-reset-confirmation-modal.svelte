@@ -2,7 +2,6 @@
   import { writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
-  import { v4 } from 'uuid';
 
   import Modal from '$lib/holocene/modal.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
@@ -15,21 +14,27 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { batchResetWorkflows } from '$lib/services/batch-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
-  import { getPlacholder } from '$lib/utilities/workflow-actions';
+  import { getPlaceholder } from '$lib/utilities/workflow-actions';
 
   import BatchOperationConfirmationForm from './batch-operation-confirmation-form.svelte';
 
-  export let namespace: string;
-  export let open = false;
-  let error = '';
-  let jobIdPlaceholder = v4();
-  let resetType = writable<'first' | 'last'>('first');
+  interface Props {
+    namespace: string;
+    open?: boolean;
+  }
+
+  let { namespace, open = $bindable(false) }: Props = $props();
+
+  let error = $state('');
+  let jobIdPlaceholder = $state(crypto.randomUUID());
+  const resetType = writable<'first' | 'last'>('first');
+  const identity = getIdentity();
   const reason = writable('');
-  const reasonPlaceholder = getPlacholder(Action.Reset, $authUser.email);
+  const reasonPlaceholder = getPlaceholder(Action.Reset, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
 
@@ -41,16 +46,18 @@
     $reason = '';
     $jobId = '';
     $jobIdValid = true;
-    jobIdPlaceholder = v4();
+    jobIdPlaceholder = crypto.randomUUID();
   };
 
-  $: if (open) resetForm();
+  $effect(() => {
+    if (open) resetForm();
+  });
 
   const resetWorkflows = async () => {
     error = '';
     const options = {
       namespace,
-      reason: $reason || reasonPlaceholder,
+      reason: $reason ? $reason : reasonPlaceholder,
       jobId: $jobId || jobIdPlaceholder,
       resetType: $resetType,
       ...($allSelected
@@ -67,9 +74,10 @@
         id: 'batch-reset-success-toast',
       });
     } catch (err) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     }
   };
 </script>
@@ -97,7 +105,7 @@
     >
       <RadioGroup
         description={translate('workflows.reset-event-radio-group-description')}
-        bind:group={resetType}
+        group={resetType}
         name="reset-event"
       >
         <RadioInput

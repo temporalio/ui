@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
@@ -48,5 +50,3 @@
 <Story name="Label Hidden" args={{ labelHidden: true }} />
 
 <Story name="Label Left" args={{ labelPosition: 'left' }} />
-
-<Story name="Unchecked" />

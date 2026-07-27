@@ -1,11 +1,19 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
 
-  $: nexusEnabled = $page.data?.systemInfo?.capabilities?.nexus;
+  import { page } from '$app/state';
+
+  interface Props {
+    children: Snippet;
+    fallback?: Snippet;
+  }
+
+  let { children, fallback }: Props = $props();
+  let nexusEnabled = $derived(page.data?.systemInfo?.capabilities?.nexus);
 </script>
 
 {#if nexusEnabled}
-  <slot />
+  {@render children()}
 {:else}
-  <slot name="fallback" />
+  {@render fallback?.()}
 {/if}

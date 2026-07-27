@@ -1,0 +1,69 @@
+name: 'Validate Published Release'
+description: 'Validates that published release version matches current codebase versions'
+inputs:
+  release-tag:
+    description: 'Release tag from GitHub release event'
+    required: true
+outputs:
+  release-version:
+    description: 'Release version (without v prefix)'
+    value: ${{ steps.validate.outputs.release-version }}
+  validation-passed:
+    description: 'Whether validation passed'
+    value: ${{ steps.validate.outputs.validation-passed }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate release version
+      id: validate
+      shell: bash
+      run: |
+        RELEASE_TAG="${{ inputs.release-tag }}"
+
+        echo "🔍 Validating release version..."
+
+        # Remove 'v' prefix if present
+        RELEASE_VERSION=${RELEASE_TAG#v}
+
+        # Validate semantic version format
+        if [[ ! $RELEASE_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "❌ Invalid release version format: $RELEASE_VERSION"
+          echo "Expected format: x.y.z (e.g., 2.38.0)"
+          echo "validation-passed=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+
+        # Get current versions from files
+        PACKAGE_VERSION=$(jq -r '.version' package.json)
+        GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
+
+        echo "📊 Release tag: $RELEASE_TAG"
+        echo "📊 Release version: $RELEASE_VERSION"
+        echo "📊 Package.json version: $PACKAGE_VERSION"
+        echo "📊 Version.go version: $GO_VERSION"
+
+        # Validate versions are in sync
+        if [[ "$PACKAGE_VERSION" != "$GO_VERSION" ]]; then
+          echo "❌ Version files are not in sync!"
+          echo "  package.json: $PACKAGE_VERSION"
+          echo "  version.go: $GO_VERSION"
+          echo "validation-passed=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+
+        # Validate release version matches current version
+        if [[ "$RELEASE_VERSION" != "$PACKAGE_VERSION" ]]; then
+          echo "❌ Release version does not match current version!"
+          echo "  Release: $RELEASE_VERSION"
+          echo "  Current: $PACKAGE_VERSION"
+          echo ""
+          echo "💡 Please ensure the release tag matches the version in the code."
+          echo "💡 Use the Version Bump workflow to update versions before creating a release."
+          echo "validation-passed=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+
+        echo "✅ Version validation passed: $RELEASE_VERSION"
+        echo "release-version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+        echo "validation-passed=true" >> $GITHUB_OUTPUT

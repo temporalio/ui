@@ -1,8 +1,9 @@
 <script lang="ts">
   import Svg from '../svg.svelte';
+  let props = $props();
 </script>
 
-<Svg {...$$props}>
+<Svg {...props}>
   <path
     fill-rule="evenodd"
     clip-rule="evenodd"

@@ -7,7 +7,11 @@
   import { translate } from '$lib/i18n/translate';
   import { getUTCString } from '$lib/utilities/format-date';
 
-  export let value: string | null;
+  interface Props {
+    value: string | null;
+  }
+
+  let { value = $bindable() }: Props = $props();
 
   const datetime = value ? new Date(value) : new Date();
   const utcDate = new Date(
@@ -15,17 +19,17 @@
     datetime.getUTCMonth(),
     datetime.getUTCDate(),
   );
-  let date = startOfDay(utcDate);
-  let hour = value ? String(datetime.getUTCHours()) : '';
-  let minute = value ? String(datetime.getUTCMinutes()) : '';
-  let second = value ? String(datetime.getUTCSeconds()) : '';
+  let date = $state(startOfDay(utcDate));
+  let hour = $state(value ? String(datetime.getUTCHours()) : '');
+  let minute = $state(value ? String(datetime.getUTCMinutes()) : '');
+  let second = $state(value ? String(datetime.getUTCSeconds()) : '');
 
   onMount(() => {
     if (!value) updateDatetime();
   });
 
-  const onDateChange = (d: CustomEvent) => {
-    date = startOfDay(d.detail);
+  const onDateChange = (d: Date) => {
+    date = startOfDay(d);
     updateDatetime();
   };
 
@@ -37,7 +41,7 @@
 <div class="flex flex-col gap-2">
   <DatePicker
     label="{translate('common.value')} ({translate('common.utc')})"
-    on:datechange={onDateChange}
+    {onDateChange}
     selected={date}
     todayLabel={translate('common.today')}
     closeLabel={translate('common.close')}

@@ -8,9 +8,10 @@ The `<Icon />` component allows for rendering of SVG Icons in our app. It is des
 ```
 <script lang="ts">
   import Svg from './svg.svelte';
+let props = $props();
 </script>
 
-<Svg {...$$props}></Svg>
+<Svg {...props}></Svg>
 ```
 
 3. Take the `<path />` element(s) from your SVG markup, and paste them in the default slot of the `<Svg />` Component.

@@ -1,7 +1,11 @@
 <script lang="ts">
+  import { writable, type Writable } from 'svelte/store';
+
   import { getContext } from 'svelte';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { page } from '$app/state';
+
+  import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -11,123 +15,138 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { hideChildWorkflows, searchInputViewOpen } from '$lib/stores/filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
-  import { workflowRoutePattern } from '$lib/utilities/namespace-url-pattern';
-  import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
 
-  import IsTemporalServerVersionGuard from '../is-temporal-server-version-guard.svelte';
+  import {
+    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
+    type SearchAttributeFilterContext,
+  } from './filter.svelte';
 
-  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
-
-  export let filters: SearchAttributeFilter[];
-  export let options: SearchAttributeOption[];
-
-  const { filter, activeQueryIndex, focusedElementId } =
-    getContext<FilterContext>(FILTER_CONTEXT);
-
-  function isOptionDisabled(value: string, filters: SearchAttributeFilter[]) {
-    return filters.some(
-      (filter) =>
-        ['=', '!=', 'is', 'is not'].includes(filter.conditional) &&
-        filter.attribute === value,
-    );
+  interface Props {
+    options: SearchAttributeOption[];
+    filters: Writable<SearchAttributeFilter[]>;
+    statusAttribute?: string;
   }
+
+  let { options, filters, statusAttribute }: Props = $props();
+
+  const query = $derived(page.url.searchParams.get('query') ?? '');
+  let searchAttributeValue = $state('');
+
+  const { filter, activeQueryIndex, handleSubmit, id } =
+    getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT);
+
+  const open = writable(false);
+
+  const getDefaultConditional = (type: SearchAttributeType) => {
+    switch (type) {
+      case SEARCH_ATTRIBUTE_TYPE.BOOL:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.DATETIME:
+        return '>=';
+      case SEARCH_ATTRIBUTE_TYPE.INT:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.DOUBLE:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST:
+        return 'in';
+      case SEARCH_ATTRIBUTE_TYPE.KEYWORD:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.TEXT:
+        return '=';
+      default:
+        return '=';
+    }
+  };
 
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
-    const conditional = type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST ? 'in' : '=';
-    filter.set({ ...emptyFilter(), attribute: value, conditional, type });
-    $focusedElementId = getFocusedElementId($filter);
+    filter.set(
+      createFilter({
+        attribute: value,
+        conditional: getDefaultConditional(type),
+        type,
+      }),
+    );
+    handleSubmit();
+    $open = false;
   }
 
-  let searchAttributeValue = '';
+  const filteredOptions = $derived(
+    !searchAttributeValue
+      ? options
+      : options.filter((option) =>
+          option.value
+            .toLowerCase()
+            .includes(searchAttributeValue.toLowerCase()),
+        ),
+  );
 
-  $: filteredOptions = !searchAttributeValue
-    ? options
-    : options.filter((option) =>
-        option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
-      );
-
-  $: workflowsPage = workflowRoutePattern.match(window?.location?.pathname);
+  function clearAllFilters() {
+    $filters = [];
+    updateQueryParamsFromFilter(page.url, $filters, true);
+    $activeQueryIndex = null;
+    $filter = createFilter();
+  }
 </script>
 
-<MenuContainer>
+<MenuContainer {open}>
   <MenuButton
-    id="search-attribute-filter-button"
-    controls="search-attribute-menu"
-    disabled={$activeQueryIndex !== null}
-    count={$filter.attribute ? 0 : filters.length}
-    on:click={() => (searchAttributeValue = '')}
+    id="{id}-search-attribute-filter-button"
+    controls="{id}-search-attribute-menu"
+    leadingIcon="filter"
+    variant="secondary"
+    data-testid="add-filter-button"
+    disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
+    onclick={() => (searchAttributeValue = '')}
     class="text-nowrap"
+    size="xs"
   >
-    <svelte:fragment slot="leading">
-      {#if !$filter.attribute}
-        <Icon name="filter" />
-      {/if}
-    </svelte:fragment>
-    {$filter.attribute || translate('workflows.filter')}
+    Add Filter
   </MenuButton>
-  <Menu id="search-attribute-menu" keepOpen>
+  <Menu id="{id}-search-attribute-menu">
     <MenuItem
       class="p-0"
       hoverable={false}
-      on:click={() => {
-        document.getElementById('filter-search')?.focus();
+      onclick={() => {
+        document.getElementById(`${id}-filter-search`)?.focus();
       }}
     >
       <Input
         label={translate('common.search')}
         labelHidden
-        id="filter-search"
+        id="{id}-filter-search"
         noBorder
         bind:value={searchAttributeValue}
         icon="search"
         placeholder={translate('common.search')}
-        class="w-full"
+        class="w-full min-w-[300px]"
       />
     </MenuItem>
-    {#if workflowsPage}
-      <MenuItem
-        class="min-w-56"
-        data-testid="manual-search-toggle"
-        on:click={() => ($searchInputViewOpen = !$searchInputViewOpen)}
-        description={translate('workflows.view-search-description')}
-        >{translate('workflows.view-search-input')}</MenuItem
-      >
-      <IsTemporalServerVersionGuard minimumVersion="1.23.0">
-        <MenuItem
-          on:click={() => ($hideChildWorkflows = !$hideChildWorkflows)}
-          description={$hideChildWorkflows
-            ? 'Child Workflows hidden by default when no filter applied'
-            : ''}
-        >
-          <div class="flex items-center gap-1">
-            {#if $hideChildWorkflows}
-              <Icon name="eye-hide" />{translate('workflows.hide-children')}
-            {:else}
-              <Icon name="eye-show" />{translate('workflows.show-children')}
-            {/if}
-          </div>
-        </MenuItem>
-      </IsTemporalServerVersionGuard>
-    {/if}
     <hr class="border-subtle" />
 
-    {#each filteredOptions as { value, label, type }}
-      {@const disabled = isOptionDisabled(value, filters)}
+    {#each filteredOptions as { value, label, type } (value)}
       <MenuItem
-        on:click={() => {
+        onclick={() => {
           handleNewQuery(value, type);
         }}
-        {disabled}
+        disabled={Boolean(statusAttribute) &&
+          value === statusAttribute &&
+          !!$filters.find((f) => f.attribute === statusAttribute)}
       >
-        {label}
+        <div>
+          <p class="leading-3">{label}</p>
+          <small class="text-secondary">{type}</small>
+        </div>
       </MenuItem>
     {:else}
       <MenuItem class="whitespace-nowrap" disabled
@@ -136,3 +155,13 @@
     {/each}
   </Menu>
 </MenuContainer>
+{#if $filters.length > 0}
+  <Button
+    variant="ghost"
+    size="xs"
+    on:click={clearAllFilters}
+    data-testid="clear-all-filters-button"
+  >
+    {translate('common.clear-all')}
+  </Button>
+{/if}

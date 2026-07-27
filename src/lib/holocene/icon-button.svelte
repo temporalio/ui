@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
+  import type { ComponentProps } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
@@ -11,6 +12,8 @@
     'data-testid'?: string;
     label: string;
     variant?: 'primary' | 'secondary' | 'ghost';
+    class?: string;
+    size?: ComponentProps<typeof Button>['size'];
   }
 
   let className = '';
@@ -23,8 +26,12 @@
 <Button
   {variant}
   leadingIcon={icon}
-  class={merge('h-9 w-9 shrink-0 rounded-full p-0', className)}
+  class={merge('h-9 w-9 shrink-0 p-0', className)}
   aria-label={label}
+  disableTracking={true}
+  data-track-name="icon-button"
+  data-track-intent="{variant}-{icon}"
+  data-track-text={label}
   on:click
   {...$$restProps}
 />

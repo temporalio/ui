@@ -31,7 +31,7 @@ test.describe('Accessibility: With Schedules', () => {
     }, testInfo) => {
       await page.goto(url);
       await page.waitForRequest('**/api/v1/**');
-      await page.waitForSelector('#content', { state: 'visible' });
+      await page.locator('#content').waitFor({ state: 'visible' });
 
       const accessibilityScanResults = await new AxeBuilder({
         page,

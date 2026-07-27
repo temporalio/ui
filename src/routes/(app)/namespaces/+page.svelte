@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import { page } from '$app/stores';
 
@@ -26,14 +28,14 @@
     previousButtonLabel={translate('common.previous')}
     nextButtonLabel={translate('common.next')}
   >
-    <Table variant="fancy" class="w-full">
+    <Table class="w-full">
       <caption class="sr-only" slot="caption"
         >{translate('common.namespaces')}</caption
       >
       <TableHeaderRow slot="headers">
         <th>{translate('common.name')}</th>
       </TableHeaderRow>
-      {#each visibleItems as namespace}
+      {#each visibleItems as namespace (namespace.namespaceInfo.name)}
         <TableRow>
           <td>
             <Link

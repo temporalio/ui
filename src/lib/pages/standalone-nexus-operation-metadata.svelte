@@ -1,0 +1,47 @@
+<svelte:options runes />
+
+<script lang="ts">
+  import UserMetadata from '$lib/components/user-metadata.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
+  import type { UserMetadata as IUserMetadata } from '$lib/types';
+  import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+  import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
+
+  const decodeMetadata = async (userMetadata: IUserMetadata) => {
+    const metadata = {
+      summary: '',
+      details: '',
+    };
+
+    if (!userMetadata) return metadata;
+
+    if (userMetadata.summary) {
+      const summary = await decodePayloadAndParseDataToJSON(
+        userMetadata.summary,
+      );
+      if (typeof summary === 'string') {
+        metadata.summary = summary;
+      }
+    }
+
+    if (userMetadata.details) {
+      const details = await decodePayloadAndParseDataToJSON(
+        userMetadata.details,
+      );
+
+      if (typeof details === 'string') {
+        metadata.details = details;
+      }
+    }
+
+    return metadata;
+  };
+</script>
+
+{#await decodeMetadata($nexusOperationExecution?.info?.userMetadata) then { summary, details }}
+  <UserMetadata {summary} {details} />
+{:catch error}
+  <Alert intent="error" title="Error decoding User Metadata">
+    {error}
+  </Alert>
+{/await}

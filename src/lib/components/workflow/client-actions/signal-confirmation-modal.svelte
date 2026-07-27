@@ -1,38 +1,44 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import PayloadInputWithEncoding, {
-    type PayloadInputEncoding,
-  } from '$lib/components/payload-input-with-encoding.svelte';
+  import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
+  import { Action } from '$lib/models/workflow-actions';
   import { signalWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let refresh: Writable<number>;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+  }
 
-  $: ({ metadata } = $workflowRun);
-  $: signalDefinitions = metadata?.definition?.signalDefinitions;
+  let { open = $bindable(), workflow, namespace }: Props = $props();
+
+  const metadata = $derived($workflowRun.metadata);
+  const signalDefinitions = $derived(metadata?.definition?.signalDefinitions);
 
   const defaultEncoding: PayloadInputEncoding = 'json/plain';
 
-  let error: string = '';
-  let loading = false;
-  let name = '';
-  let customSignal = false;
+  let error = $state('');
+  let loading = $state(false);
+  let name = $state('');
+  let customSignal = $state(false);
 
-  let input = '';
-  let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
-  let messageType = '';
+  let input = $state('');
+  const encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
+  let messageType = $state('');
+
+  const identity = getIdentity();
 
   const hideSignalModal = () => {
     open = false;
@@ -54,17 +60,19 @@
         encoding: $encoding,
         messageType,
         name,
+        identity,
       });
-      $refresh = Date.now();
+      triggerRefresh(Action.Signal);
       toaster.push({
         message: translate('workflows.signal-success'),
         id: 'workflow-signal-success-toast',
       });
       hideSignalModal();
     } catch (err) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     } finally {
       loading = false;
     }
@@ -84,13 +92,13 @@
   {loading}
   confirmText={translate('common.submit')}
   cancelText={translate('common.cancel')}
-  confirmDisabled={!name || !encoding}
+  confirmDisabled={!name || !$encoding}
   on:cancelModal={hideSignalModal}
   on:confirmModal={signal}
 >
   <h3 slot="title">{translate('workflows.signal-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
-    {#if signalDefinitions?.length > 0 && !customSignal}
+    {#if signalDefinitions && signalDefinitions.length > 0 && !customSignal}
       <Select
         id="signal-select"
         label={translate('workflows.signal-name-label')}
@@ -100,14 +108,14 @@
         placeholder="Select a signal"
         required
       >
+        <Option
+          onclick={handleCustom}
+          value="custom"
+          description="Input Signal name">{translate('common.custom')}</Option
+        >
         {#each signalDefinitions as { name: value, description = '' }}
           <Option {value} {description}>{value}</Option>
         {/each}
-        <Option
-          on:click={handleCustom}
-          value="custom"
-          description="Input Signal name">Custom</Option
-        >
       </Select>
     {:else}
       <Input
@@ -117,6 +125,6 @@
         bind:value={name}
       />
     {/if}
-    <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
+    <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
   </div>
 </Modal>

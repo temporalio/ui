@@ -12,6 +12,7 @@ type RenderOptions = {
   host: string;
   nonce: string;
   theme?: string;
+  overrideTheme?: string;
 };
 
 /**
@@ -25,7 +26,16 @@ const generateNonce = (): string => crypto.randomBytes(16).toString('hex');
  * @returns
  */
 const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
-  return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; sandbox allow-same-origin allow-popups allow-popups-to-escape-sandbox;`;
+  const sandbox = [
+    'sandbox',
+    'allow-same-origin',
+    'allow-popups',
+    'allow-popups-to-escape-sandbox',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; ${sandbox};`;
 };
 
 /**
@@ -33,7 +43,7 @@ const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
  */
 const createPage = (
   ast: ReturnType<typeof toHast>,
-  { nonce, theme }: RenderOptions,
+  { nonce, theme, overrideTheme }: RenderOptions,
 ) => {
   const cssPath = path.resolve('src/markdown.reset.css');
   const css = fs.readFileSync(cssPath, 'utf8');
@@ -49,7 +59,14 @@ const createPage = (
         }),
         h('style', { nonce }, css),
       ]),
-      h('body.prose', { 'data-theme': theme }, h('main', ast)),
+      h(
+        'body',
+        {
+          class: 'prose',
+          'data-theme': overrideTheme ? `${theme}-${overrideTheme}` : theme,
+        },
+        h('main', ast),
+      ),
     ]),
   );
 };
@@ -60,24 +77,29 @@ export const GET = async (req: Request) => {
   const host = url.origin;
   const content = url.searchParams.get('content') || '';
   const theme = url.searchParams.get('theme') || '';
+  const overrideTheme = url.searchParams.get('overrideTheme') || '';
 
   if (host === null) return new Response('Not found', { status: 404 });
   if (content === null) return new Response('Not found', { status: 404 });
 
   const nonce = generateNonce();
+  const html = createPage(await process(content), {
+    nonce,
+    host,
+    theme,
+    overrideTheme,
+  });
 
-  const response = new Response(
-    createPage(await process(content), { nonce, host, theme }),
-    {
-      headers: {
-        'Content-Type': 'text/html',
-        'Content-Security-Policy': generateContentSecurityPolicy({
-          nonce,
-          host,
-        }),
-      },
+  const response = new Response(html, {
+    headers: {
+      'Content-Type': 'text/html',
+      'Content-Security-Policy': generateContentSecurityPolicy({
+        nonce,
+        host,
+        overrideTheme,
+      }),
     },
-  );
+  });
 
   return response;
 };

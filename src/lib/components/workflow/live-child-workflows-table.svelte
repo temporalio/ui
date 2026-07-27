@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -8,13 +8,17 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '../workflow-status.svelte';
 
-  export let children: WorkflowExecution[] = [];
+  interface Props {
+    children?: WorkflowExecution[];
+  }
 
-  $: ({ namespace } = $page.params);
+  let { children = [] }: Props = $props();
+
+  const namespace = $derived(page.params.namespace);
 </script>
 
 <Pagination
@@ -25,16 +29,16 @@
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
-  <div slot="pagination-top" />
+  <div slot="pagination-top"></div>
   <Table class="w-full">
     <caption class="sr-only" slot="caption"
       >{translate('workflows.child-workflows')}</caption
     >
     <TableHeaderRow slot="headers">
-      <th class="max-md:hidden">{translate('common.status')}</th>
-      <th class="max-lg:hidden">{translate('common.type')}</th>
-      <th>{translate('workflows.child-id')}</th>
-      <th>{translate('workflows.child-run-id')}</th>
+      <th scope="col" class="max-md:hidden">{translate('common.status')}</th>
+      <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
+      <th scope="col">{translate('workflows.child-id')}</th>
+      <th scope="col">{translate('workflows.child-run-id')}</th>
     </TableHeaderRow>
     {#each visibleItems as child}
       <TableRow>
@@ -46,7 +50,7 @@
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link
-            href={routeForEventHistory({
+            href={routeForWorkflow({
               namespace,
               workflow: child.id,
               run: child.runId,
@@ -57,7 +61,7 @@
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link
-            href={routeForEventHistory({
+            href={routeForWorkflow({
               namespace,
               workflow: child.id,
               run: child.runId,

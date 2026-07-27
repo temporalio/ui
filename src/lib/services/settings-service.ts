@@ -21,13 +21,19 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     auth: {
       enabled: !!settingsResponse?.Auth?.Enabled,
       options: settingsResponse?.Auth?.Options,
+      redirectToProvider: !!settingsResponse?.Auth?.RedirectToProvider,
     },
-    bannerText: settingsResponse?.BannerText,
     baseUrl: getApiOrigin(),
     codec: {
       endpoint: settingsResponse?.Codec?.Endpoint,
       passAccessToken: settingsResponse?.Codec?.PassAccessToken,
       includeCredentials: settingsResponse?.Codec?.IncludeCredentials,
+      customErrorMessage: {
+        default: {
+          message: settingsResponse?.Codec?.DefaultErrorMessage || '',
+          link: settingsResponse?.Codec?.DefaultErrorLink || '',
+        },
+      },
     },
     defaultNamespace: settingsResponse?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
     disableWriteActions: !!settingsResponse?.DisableWriteActions || false,
@@ -36,15 +42,18 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     workflowSignalDisabled: !!settingsResponse?.WorkflowSignalDisabled,
     workflowUpdateDisabled: !!settingsResponse?.WorkflowUpdateDisabled,
     workflowResetDisabled: !!settingsResponse?.WorkflowResetDisabled,
+    workflowPauseDisabled: !!settingsResponse?.WorkflowPauseDisabled,
     batchActionsDisabled: !!settingsResponse?.BatchActionsDisabled,
     startWorkflowDisabled: !!settingsResponse?.StartWorkflowDisabled,
     hideWorkflowQueryErrors: !!settingsResponse?.HideWorkflowQueryErrors,
     refreshWorkflowCountsDisabled:
       !!settingsResponse?.RefreshWorkflowCountsDisabled,
+    activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
-    notifyOnNewVersion: settingsResponse?.NotifyOnNewVersion,
+    navCollapsedByDefault: !!settingsResponse?.NavCollapsedByDefault,
     feedbackURL: settingsResponse?.FeedbackURL,
+    disableNewsFetch: !!settingsResponse?.DisableNewsFetch,
     runtimeEnvironment: {
       get isCloud() {
         if (EnvironmentOverride) {

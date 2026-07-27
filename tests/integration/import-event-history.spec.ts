@@ -25,11 +25,11 @@ test('Navigate to import page from nav', async ({ page }, {
   await page.goto(workflowsUrl);
   await waitForWorkflowsApis(page);
 
-  const count = await page.getByTestId('workflow-count').innerText();
-  expect(count).toBe('31,230');
+  const count = page.getByTestId('workflow-count');
+  await expect(count).toHaveText('31,230');
 
   await page.goto(importUrl);
-  page.waitForRequest(SETTINGS_API);
+  await page.waitForRequest(SETTINGS_API);
 
   // eslint-disable-next-line playwright/no-conditional-in-test
   if (isMobile) {
@@ -37,8 +37,8 @@ test('Navigate to import page from nav', async ({ page }, {
   }
   await page.getByTestId('import-button').locator('visible=true').click();
 
-  const title = await page.getByTestId('import-event-history').innerText();
-  expect(title).toBe('Import Event History');
+  const title = page.getByTestId('import-event-history');
+  await expect(title).toHaveText('Import Event History');
 
   const importButton = page.getByRole('button', { name: 'Import' });
   await expect(importButton).toBeDisabled();
@@ -48,10 +48,10 @@ test('Navigate to import page directly and upload a json file for event history 
   page,
 }) => {
   await page.goto(importUrl);
-  page.waitForRequest(SETTINGS_API);
+  await page.waitForRequest(SETTINGS_API);
 
-  const title = await page.getByTestId('import-event-history').innerText();
-  expect(title).toBe('Import Event History');
+  const title = page.getByTestId('import-event-history');
+  await expect(title).toHaveText('Import Event History');
 
   const importButton = page.getByRole('button', { name: 'Import' });
   await expect(importButton).toBeDisabled();
@@ -72,7 +72,7 @@ test('Navigate to import event history page directly to import event history', a
   page,
 }) => {
   await page.goto(importEventHistoryUrl);
-  page.waitForRequest(SETTINGS_API);
+  await page.waitForRequest(SETTINGS_API);
 
   const table = page.locator('table');
   await expect(table).toBeVisible();

@@ -1,18 +1,20 @@
+<svelte:options runes />
+
 <div class="row">
   <div class="cell md:table-cell">
-    <p />
+    <p></p>
   </div>
   <div class="cell w-1/2 md:table-cell">
     <p>Loading</p>
   </div>
   <div class="cell md:table-cell">
-    <p />
+    <p></p>
   </div>
   <div class="cell inline-block md:hidden xl:table-cell">
-    <p />
+    <p></p>
   </div>
   <div class="cell inline-block md:hidden xl:table-cell">
-    <p />
+    <p></p>
   </div>
 </div>
 
@@ -26,6 +28,6 @@
   }
 
   .row:last-of-type .cell {
-    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+    @apply border-b-0 first-of-type:rounded-bl-lg last-of-type:rounded-br-lg;
   }
 </style>

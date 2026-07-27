@@ -1,0 +1,46 @@
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  import { type ClassNameValue, twMerge } from 'tailwind-merge';
+
+  import CopyButton from '$lib/holocene/copyable/button.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+
+  interface Props {
+    copyable?: boolean;
+    copyableText?: string;
+    children: Snippet;
+    class?: ClassNameValue;
+  }
+
+  const {
+    children,
+    copyable,
+    copyableText,
+    class: className = '',
+  }: Props = $props();
+  const { copy, copied } = copyToClipboard();
+
+  const handleCopy = (e: Event) => {
+    copy(e, copyableText);
+  };
+</script>
+
+<dd class={twMerge('col-[2] flex', className)}>
+  {@render children()}
+  {#if copyable}
+    <!-- 
+      The CopyButton is larger than the line height, which pushes around grid items. Rather than removing its margin/padding, which makes the 
+      click box too small, it is absolute so it can slightly spill over the edges of the dt.
+    -->
+    <div class="relative flex w-6 items-center">
+      <CopyButton
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        copied={$copied}
+        on:click={handleCopy}
+        class="absolute left-0"
+      />
+    </div>
+  {/if}
+</dd>

@@ -1,25 +1,16 @@
-<script context="module" lang="ts">
-  const encoding = ['json/plain', 'json/protobuf'] as const;
-  export type PayloadInputEncoding = (typeof encoding)[number];
-  export const isPayloadInputEncodingType = (
-    x: unknown,
-  ): x is PayloadInputEncoding => encoding.includes(x as PayloadInputEncoding);
-</script>
-
 <script lang="ts">
-  import { type Writable } from 'svelte/store';
-
-  import { v4 as uuid } from 'uuid';
+  import type { Writable } from 'svelte/store';
 
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
 
   import PayloadInput from './payload-input.svelte';
 
-  export let id = uuid();
+  export let id: string = crypto.randomUUID();
   export let input: string;
   export let encoding: Writable<PayloadInputEncoding>;
   export let messageType: string;
@@ -27,6 +18,10 @@
   export let loading = false;
   export let label = translate('workflows.input');
   export let editing = true;
+  export let hintText: string | undefined = undefined;
+  export let placeholder: string | undefined = undefined;
+  export let payloadLabel: string | undefined = undefined;
+  export let copyable = false;
 
   $: {
     if ($encoding === 'json/plain' && messageType) {
@@ -37,8 +32,18 @@
 
 <div>
   <h5 class="pb-1 text-sm font-medium">{label}</h5>
-  <Card class="flex flex-col gap-2">
-    <PayloadInput bind:input bind:loading {error} {id} {editing} />
+  <Card class="flex flex-col gap-4">
+    <PayloadInput
+      bind:input
+      bind:loading
+      {error}
+      {id}
+      {editing}
+      {placeholder}
+      label={payloadLabel}
+      {hintText}
+      {copyable}
+    />
     <div
       class="flex items-end gap-2 {editing ? 'justify-between' : 'justify-end'}"
     >
@@ -46,8 +51,9 @@
         <div class="flex w-full flex-col gap-2">
           <RadioGroup
             description={translate('workflows.encoding')}
-            bind:group={encoding}
+            group={encoding}
             name="encoding"
+            class="p-0"
           >
             <RadioInput id="json/plain" value="json/plain" label="json/plain" />
             <RadioInput

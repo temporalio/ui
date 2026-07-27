@@ -5,7 +5,6 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
-  import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
@@ -14,6 +13,7 @@
     confirmDisabled?: boolean;
     confirmText: string;
     confirmType?: ComponentProps<Button>['variant'];
+    hideCancel?: boolean;
     hideConfirm?: boolean;
     hightlightNav?: boolean;
     id: string;
@@ -22,8 +22,10 @@
     'data-testid'?: string;
     open: boolean;
     error?: string;
+    class?: string;
   }
 
+  export let hideCancel = false;
   export let hideConfirm = false;
   export let confirmText: string;
   export let cancelText: string;
@@ -87,14 +89,19 @@
   {id}
   on:close={handleCancel}
   bind:this={modalElement}
-  class={merge('body', className)}
+  class={merge(
+    'body',
+    'transition-all duration-200 ease-out',
+    open && 'scale-100 opacity-100',
+    !open && 'scale-95 opacity-0',
+    className,
+  )}
   class:large
   class:hightlightNav
   aria-modal="true"
   aria-labelledby="modal-title-{id}"
   data-testid={$$props['data-testid']}
   {...$$restProps}
-  use:focusTrap={true}
 >
   {#if !loading}
     <IconButton
@@ -118,19 +125,30 @@
         {error}
       </p>
     </div>
-    <div class="flex items-center justify-end space-x-2 p-6">
-      <Button variant="ghost" disabled={loading} on:click={closeModal}
-        >{cancelText}</Button
-      >
-      {#if !hideConfirm}
-        <Button
-          variant={confirmType}
-          {loading}
-          disabled={confirmDisabled || loading}
-          data-testid="confirm-modal-button"
-          type="submit">{confirmText}</Button
-        >
-      {/if}
+
+    <div class="flex items-center justify-between p-6">
+      <slot name="footer">
+        <div></div>
+      </slot>
+      <div class="flex items-center justify-end space-x-2">
+        {#if !hideCancel}
+          <Button
+            data-testid="cancel-modal-button"
+            variant="ghost"
+            disabled={loading}
+            on:click={closeModal}>{cancelText}</Button
+          >
+        {/if}
+        {#if !hideConfirm}
+          <Button
+            variant={confirmType}
+            {loading}
+            disabled={confirmDisabled || loading}
+            data-testid="confirm-modal-button"
+            type="submit">{confirmText}</Button
+          >
+        {/if}
+      </div>
     </div>
   </form>
 </dialog>
@@ -141,7 +159,11 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer;
+    @apply cursor-pointer bg-black/50 transition-opacity duration-200;
+
+    :global([data-theme='dark']) & {
+      background-color: rgb(var(--color-surface-background) / 50%);
+    }
   }
 
   .body.hightlightNav::backdrop {

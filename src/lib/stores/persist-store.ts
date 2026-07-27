@@ -9,25 +9,45 @@ import {
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
 
+export type PersistedStore<T> = Pick<
+  Writable<T>,
+  'subscribe' | 'set' | 'update'
+> & {
+  hasStoredValue: () => boolean;
+  setInitialValue: (value: T) => void;
+};
+
 export function persistStore<T>(
   name: string,
-  initialValue: T | (() => T) | null = null,
+  initialValue: T | (() => T),
   broadcastToAll = false,
-): Pick<Writable<T | null>, 'subscribe' | 'set' | 'update'> {
+): PersistedStore<T> {
   let initialStoreValue = isFunction<() => T>(initialValue)
     ? initialValue()
     : initialValue;
   let broadcaster: null | BroadcastChannel;
 
+  const getStoredValue = () => window?.localStorage?.getItem(name);
+
+  const hasStoredValue = () => {
+    if (!BROWSER) return false;
+
+    try {
+      return getStoredValue() !== null;
+    } catch {
+      return false;
+    }
+  };
+
   if (BROWSER) {
     try {
-      if (window?.localStorage?.getItem(name)) {
-        initialStoreValue = parseWithBigInt(
-          window?.localStorage?.getItem(name) ?? '',
-        );
+      const storedValue = getStoredValue();
+
+      if (storedValue !== null) {
+        initialStoreValue = parseWithBigInt(storedValue);
       }
-    } catch (_err) {
-      initialStoreValue = null;
+    } catch {
+      // Keep the original initialStoreValue if localStorage parsing fails
     }
   }
 
@@ -39,7 +59,7 @@ export function persistStore<T>(
       broadcaster?.addEventListener('message', (event) => {
         set(event.data);
       });
-    } catch (e) {
+    } catch {
       console.error('Browser does not support BroadcastChannel');
     }
   }
@@ -69,6 +89,11 @@ export function persistStore<T>(
           return updatedValue;
         });
       }
+    },
+    hasStoredValue,
+    setInitialValue: (value: T) => {
+      if (!BROWSER || hasStoredValue()) return;
+      set(value);
     },
   };
 }

@@ -1,11 +1,17 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
 
+  import { page } from '$app/state';
+
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
+  import { DetailListTimestampValue } from '$lib/components/detail-list';
+  import DetailListLabel from '$lib/components/detail-list/detail-list-label.svelte';
+  import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
+  import DetailList from '$lib/components/detail-list/detail-list.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
-  import WorkflowCurrentDetails from '$lib/components/workflow/metadata/workflow-current-details.svelte';
-  import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
+  import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -17,92 +23,142 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
+  import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-  import { has } from '$lib/utilities/has';
+  import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { getSharedFilterParams } from '$lib/utilities/event-filter-params';
+  import {
+    getWorkflowNexusLinksFromHistory,
+    getWorkflowRelationships,
+  } from '$lib/utilities/get-workflow-relationships';
+  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
     routeForEventHistory,
+    routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
-    routeForWorkers,
-    routeForWorkflowMetadata,
+    routeForTimeline,
+    routeForUserMetadata,
+    routeForWorkflow,
+    routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
+    routeForWorkflowSearchAttributes,
+    routeForWorkflowWorkers,
   } from '$lib/utilities/route-for';
+  import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
-  $: ({ namespace, workflow: workflowId, run: runId, id } = $page.params);
-  $: ({ workflow, workers } = $workflowRun);
-
-  $: routeParameters = {
+  const {
     namespace,
     workflow: workflowId,
     run: runId,
-  };
+    id: eventId,
+  } = $derived(page.params);
 
-  $: isRunning = $workflowRun?.workflow?.isRunning;
-  $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow?.status,
+  let { headerSnippet }: { headerSnippet?: Snippet } = $props();
+
+  const { workflow } = $derived($workflowRun);
+  const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
+  const workerDeployment = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
   );
-  $: cancelInProgress = isCancelInProgress(
-    $workflowRun?.workflow?.status,
-    $fullEventHistory,
+  const routeParameters = $derived({
+    namespace,
+    workflow: workflowId,
+    run: runId,
+  });
+
+  const activitiesCanceled = $derived(
+    Boolean(
+      workflow?.status &&
+      ['Terminated', 'TimedOut', 'Canceled'].includes(workflow.status),
+    ),
   );
-  $: workflowHasBeenReset = has($resetWorkflows, runId);
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
+  const cancelInProgress = $derived(
+    Boolean(
+      workflow?.status &&
+      isCancelInProgress(workflow.status, $fullEventHistory),
+    ),
   );
+  const isPaused = $derived(workflow?.isPaused);
+  const resetRunId = $derived(
+    workflow
+      ? workflow.workflowExtendedInfo?.resetRunId ||
+          $resetWorkflows[workflow.runId]
+      : undefined,
+  );
+  const workflowHasBeenReset = $derived(!!resetRunId);
+  const workflowRelationships = $derived(
+    getWorkflowRelationships(workflow, $fullEventHistory, page.data.namespace),
+  );
+  const workflowsHref = $derived(
+    `${routeForWorkflows({
+      namespace,
+    })}?${$workflowsSearchParams}`,
+  );
+  const outboundLinks = $derived(
+    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
+  );
+  const inboundLinks = $derived(
+    getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
+  );
+  const linkCount = $derived(outboundLinks + inboundLinks);
+  const sharedFilterParams = $derived(getSharedFilterParams(page.url));
 </script>
 
-<div class="flex items-center justify-between pb-4">
+<div class="flex items-center justify-between">
   <div class="flex items-center gap-2">
     <Link
-      href={`${routeForWorkflows({
-        namespace,
-      })}?${$workflowsSearchParams}`}
+      href={workflowsHref}
       data-testid="back-to-workflows"
       icon="chevron-left"
     >
-      {id
+      {eventId
         ? translate('common.workflows')
         : translate('workflows.back-to-workflows')}
     </Link>
-    {#if id}
+    {#if eventId}
       <Link
-        href={routeForEventHistory({
+        href={routeForWorkflow({
           ...routeParameters,
         })}
         data-testid="back-to-workflow-execution"
         icon="chevron-left"
       >
-        {workflow?.runId}
+        {runId}
       </Link>
     {/if}
   </div>
 </div>
-<header class="flex flex-col gap-2">
-  <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
+<header class="flex flex-col gap-4">
+  <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
     <div
-      class="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-center"
+      class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
     >
       <div
-        class="flex flex-wrap items-center justify-between gap-4 max-lg:w-full"
+        class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
       >
-        <WorkflowStatus status={workflow?.status} big />
-        <div class="lg:hidden">
+        <WorkflowStatus
+          status={workflow?.status}
+          big
+          announce
+          delayed={workflow ? isWorkflowDelayed(workflow) : false}
+          taskFailure={workflow ? isWorkflowTaskFailure(workflow) : false}
+        />
+        <div class="xl:hidden">
           <WorkflowActions
-            {isRunning}
             {cancelInProgress}
-            {workflow}
+            workflow={workflow!}
             {namespace}
+            first={workflowRelationships.first}
+            next={workflowRelationships.next}
           />
         </div>
       </div>
@@ -114,7 +170,7 @@
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={workflow?.id}
+            content={workflowId}
             clickAllToCopy
             container-class="w-full"
             class="overflow-hidden text-ellipsis text-left"
@@ -122,21 +178,67 @@
         </h1>
       </div>
     </div>
-    <div class="max-lg:hidden">
-      <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
+    <div class="max-xl:hidden">
+      <WorkflowActions
+        {cancelInProgress}
+        workflow={workflow!}
+        {namespace}
+        first={workflowRelationships.first}
+        next={workflowRelationships.next}
+      />
     </div>
   </div>
-  <WorkflowSummaryAndDetails />
-  <WorkflowCurrentDetails />
-  <WorkflowDetails {workflow} />
+  <CodecServerErrorBanner />
+  <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
         icon="info"
         intent="info"
         title={translate('workflows.cancel-request-sent')}
+        class="max-w-screen-lg xl:w-2/3"
       >
         {translate('workflows.cancel-request-sent-description')}
+      </Alert>
+    </div>
+  {/if}
+  {#if isPaused}
+    {@const pauseInfo = workflow?.workflowExtendedInfo.pauseInfo}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        title={translate('workflows.workflow-paused')}
+        class="max-w-screen-lg xl:w-2/3"
+        data-testid="workflow-paused-alert"
+      >
+        <div class="mt-2 flex flex-col gap-2">
+          <p>{translate('workflows.workflow-paused-description')}</p>
+          <ul class="list-disc pl-6">
+            <li>{translate('workflows.workflow-pause-description-item-1')}</li>
+            <li>{translate('workflows.workflow-pause-description-item-2')}</li>
+            <li>{translate('workflows.workflow-pause-description-item-3')}</li>
+          </ul>
+          {#if pauseInfo}
+            <DetailList aria-label="pause details" rowCount={3}>
+              {#if pauseInfo.identity}
+                <DetailListLabel>{translate('common.identity')}</DetailListLabel
+                >
+                <DetailListValue
+                  >{pauseInfo.identity ?? 'test@temporal.io'}</DetailListValue
+                >
+              {/if}
+              <DetailListLabel
+                >{translate('workflows.paused-time')}</DetailListLabel
+              >
+              <DetailListTimestampValue timestamp={pauseInfo.pausedTime} />
+              {#if pauseInfo.reason}
+                <DetailListLabel>{translate('common.reason')}</DetailListLabel>
+                <DetailListValue>{pauseInfo.reason}</DetailListValue>
+              {/if}
+            </DetailList>
+          {/if}
+        </div>
       </Alert>
     </div>
   {/if}
@@ -147,27 +249,52 @@
         intent="info"
         data-testid="workflow-reset-alert"
         title={translate('workflows.reset-success-alert-title')}
+        class="max-w-screen-lg xl:w-2/3"
       >
         You can find the resulting Workflow Execution <Link
-          href={routeForEventHistory({
+          href={routeForWorkflow({
             namespace,
-            workflow: $workflowRun?.workflow?.id,
-            run: $resetWorkflows[$workflowRun?.workflow?.runId],
+            workflow: workflowId,
+            run: resetRunId!,
           })}>here</Link
         >.
       </Alert>
     </div>
   {/if}
+  {#if headerSnippet}
+    {@render headerSnippet()}
+  {/if}
+  <NoWorkersPollingAlert
+    {namespace}
+    taskQueue={workflow?.taskQueue ?? ''}
+    {runningWithNoWorkers}
+    deployment={workerDeployment}
+  />
   <Tabs>
-    <TabList class="flex flex-wrap gap-6 pt-2" label="workflow detail">
+    <TabList label="workflow detail">
+      <Tab
+        label={translate('workflows.timeline-tab')}
+        id="timeline-tab"
+        href={routeForTimeline({
+          ...routeParameters,
+          queryParams: sharedFilterParams,
+        })}
+        active={pathMatches(
+          page.url.pathname,
+          routeForTimeline(routeParameters),
+        )}
+        onClick={() => ($workflowViewPreference = 'timeline')}
+      />
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
         href={routeForEventHistory({
           ...routeParameters,
+          queryParams: sharedFilterParams,
         })}
+        onClick={() => ($workflowViewPreference = 'history')}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForEventHistory({
             ...routeParameters,
           }),
@@ -182,7 +309,7 @@
         id="relationships-tab"
         href={routeForRelationships(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForRelationships(routeParameters),
         )}
       >
@@ -190,25 +317,38 @@
           {workflowRelationships.relationshipCount}
         </Badge></Tab
       >
+      {#if linkCount > 0}
+        <Tab
+          label={translate('workflows.nexus-links-tab')}
+          id="nexus-links-tab"
+          href={routeForNexusLinks(routeParameters)}
+          active={pathMatches(
+            page.url.pathname,
+            routeForNexusLinks(routeParameters),
+          )}
+        >
+          <Badge type="primary" class="px-2 py-0">
+            {linkCount}
+          </Badge>
+        </Tab>
+      {/if}
       <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
-        href={routeForWorkers(routeParameters)}
+        href={routeForWorkflowWorkers(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
-          routeForWorkers(routeParameters),
+          page.url.pathname,
+          routeForWorkflowWorkers(routeParameters),
         )}
       >
-        <Badge type="primary" class="px-2 py-0">
-          {workers?.pollers?.length}
-        </Badge>
+        <!-- TODO: Add Badge with workers count when there is a WorkersCount API available -->
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}
         id="pending-activities-tab"
         href={routeForPendingActivities(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForPendingActivities(routeParameters),
         )}
       >
@@ -217,7 +357,8 @@
           class="px-2 py-0"
         >
           <div class="flex items-center gap-1">
-            {#if activitiesCanceled}<Icon name="canceled" />
+            {#if activitiesCanceled}
+              <Icon name="canceled" />
             {/if}
             {workflow?.pendingActivities?.length}
           </div>
@@ -228,7 +369,7 @@
         id="call-stack-tab"
         href={routeForCallStack(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForCallStack(routeParameters),
         )}
       />
@@ -237,17 +378,35 @@
         id="queries-tab"
         href={routeForWorkflowQuery(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForWorkflowQuery(routeParameters),
         )}
       />
       <Tab
-        label={translate('workflows.metadata-tab')}
-        id="metadata-tab"
-        href={routeForWorkflowMetadata(routeParameters)}
+        label={translate('workflows.user-metadata-tab')}
+        id="user-metadata-tab"
+        href={routeForUserMetadata(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
-          routeForWorkflowMetadata(routeParameters),
+          page.url.pathname,
+          routeForUserMetadata(routeParameters),
+        )}
+      />
+      <Tab
+        label={translate('workflows.search-attributes-tab')}
+        id="search-attributes-tab"
+        href={routeForWorkflowSearchAttributes(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForWorkflowSearchAttributes(routeParameters),
+        )}
+      />
+      <Tab
+        label={translate('workflows.memo-tab')}
+        id="memo-tab"
+        href={routeForWorkflowMemo(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForWorkflowMemo(routeParameters),
         )}
       />
     </TabList>

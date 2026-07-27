@@ -4,7 +4,11 @@ import { persistStore } from '$lib/stores/persist-store';
 import type { DataEncoderStatus } from '$lib/types/global';
 import { has } from '$lib/utilities/has';
 
-export const codecEndpoint = persistStore<string>('endpoint', null, true);
+export const codecEndpoint = persistStore<string | null>(
+  'endpoint',
+  null,
+  true,
+);
 
 export const passAccessToken = persistStore<boolean>(
   'passAccessToken',

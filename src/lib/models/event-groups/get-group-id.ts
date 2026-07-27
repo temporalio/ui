@@ -14,10 +14,15 @@ import {
   isChildWorkflowExecutionTimedOutEvent,
   isExternalWorkflowExecutionSignaledEvent,
   isNexusOperationCanceledEvent,
+  isNexusOperationCancelRequestCompletedEvent,
+  isNexusOperationCancelRequestedEvent,
+  isNexusOperationCancelRequestFailedEvent,
   isNexusOperationCompletedEvent,
   isNexusOperationFailedEvent,
   isNexusOperationStartedEvent,
+  isNexusOperationTimedOutEvent,
   isPureWorkflowTaskFailedEvent,
+  isStartChildWorkflowExecutionFailedEvent,
   isTimerCanceledEvent,
   isTimerFiredEvent,
   isWorkflowExecutionUpdateCompletedEvent,
@@ -88,6 +93,12 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
     );
   }
 
+  if (isStartChildWorkflowExecutionFailedEvent(event)) {
+    return String(
+      event.startChildWorkflowExecutionFailedEventAttributes.initiatedEventId,
+    );
+  }
+
   if (isTimerFiredEvent(event)) {
     return String(event.timerFiredEventAttributes.startedEventId);
   }
@@ -140,6 +151,29 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
 
   if (isNexusOperationCanceledEvent(event)) {
     return String(event.nexusOperationCanceledEventAttributes.scheduledEventId);
+  }
+
+  if (isNexusOperationTimedOutEvent(event)) {
+    return String(event.nexusOperationTimedOutEventAttributes.scheduledEventId);
+  }
+
+  if (isNexusOperationCancelRequestedEvent(event)) {
+    return String(
+      event.nexusOperationCancelRequestedEventAttributes.scheduledEventId,
+    );
+  }
+
+  if (isNexusOperationCancelRequestCompletedEvent(event)) {
+    return String(
+      event.nexusOperationCancelRequestCompletedEventAttributes
+        .scheduledEventId,
+    );
+  }
+
+  if (isNexusOperationCancelRequestFailedEvent(event)) {
+    return String(
+      event.nexusOperationCancelRequestFailedEventAttributes.scheduledEventId,
+    );
   }
 
   return event.id;

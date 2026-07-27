@@ -1,10 +1,11 @@
 import { writable } from 'svelte/store';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { SearchAttributes } from '$lib/types/workflows';
 
 import {
+  formatDateTimeRange,
   formatListFilterValue,
   isBooleanFilter,
   isDateTimeFilter,
@@ -28,6 +29,13 @@ const store = writable<SearchAttributes>({
   CustomB: 'Double',
   CustomC: 'String',
 });
+
+// force GH action runners to use en-US and 12-hour clocks starting at 0:00
+const DateTimeFormat = Intl.DateTimeFormat;
+vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
+  (_, options) =>
+    new DateTimeFormat('en-US', { ...options, hour12: true, hourCycle: 'h11' }),
+);
 
 describe('isStatusFilter', () => {
   it('should return true if the attribute is ExecutionStatus', () => {
@@ -172,5 +180,40 @@ describe('formatListFilterValue', () => {
 
   it('should return an array with the value', () => {
     expect(formatListFilterValue('example')).toStrictEqual(['example']);
+  });
+});
+
+describe('formatDateTimeRange', () => {
+  it('should format a date range between two dates', () => {
+    expect(
+      formatDateTimeRange(
+        'BETWEEN "2025-07-17T12:00:00.000Z" AND "2025-07-17T13:00:00.000Z"',
+        'UTC',
+        false,
+      ),
+    ).toStrictEqual(
+      'between 7/17/25, 12:00:00.00 PM UTC and 7/17/25, 1:00:00.00 PM UTC',
+    );
+    expect(
+      formatDateTimeRange(
+        'BETWEEN 2025-07-17T12:00:00.000Z AND 2025-07-17T13:00:00.000Z',
+        'UTC',
+        false,
+      ),
+    ).toContain(
+      'between 7/17/25, 12:00:00.00 PM UTC and 7/17/25, 1:00:00.00 PM UTC',
+    );
+  });
+
+  it('should format a date range between two dates with a different time format', () => {
+    expect(
+      formatDateTimeRange(
+        'BETWEEN "2025-07-17T00:00:00.000Z" AND "2025-07-17T00:00:00.000Z"',
+        'Greenwich Mean Time',
+        false,
+      ),
+    ).toStrictEqual(
+      'between 7/17/25, 12:00:00.00 AM GMT and 7/17/25, 12:00:00.00 AM GMT',
+    );
   });
 });

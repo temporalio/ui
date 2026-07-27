@@ -2,7 +2,6 @@
   import { writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
-  import { v4 } from 'uuid';
 
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -13,22 +12,28 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { batchTerminateWorkflows } from '$lib/services/batch-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
-  import { getPlacholder } from '$lib/utilities/workflow-actions';
+  import { getPlaceholder } from '$lib/utilities/workflow-actions';
 
   import BatchOperationConfirmationModalBody from './batch-operation-confirmation-form.svelte';
 
-  export let namespace: string;
-  export let open: boolean;
+  interface Props {
+    namespace: string;
+    open: boolean;
+  }
+
+  let { namespace, open = $bindable() }: Props = $props();
+
+  const identity = getIdentity();
   const reason = writable('');
-  const reasonPlaceholder = getPlacholder(Action.Terminate, $authUser.email);
+  const reasonPlaceholder = getPlaceholder(Action.Terminate, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
-  let jobIdPlaceholder = v4();
-  let error = '';
+  let jobIdPlaceholder = $state(crypto.randomUUID());
+  let error = $state('');
 
   const { allSelected, terminableWorkflows } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
@@ -37,17 +42,19 @@
     $reason = '';
     $jobId = '';
     $jobIdValid = true;
-    jobIdPlaceholder = v4();
+    jobIdPlaceholder = crypto.randomUUID();
   };
 
-  $: if (open) resetForm();
+  $effect(() => {
+    if (open) resetForm();
+  });
 
   const terminateWorkflows = async () => {
     error = '';
     try {
       const options = {
         namespace,
-        reason: $reason || reasonPlaceholder,
+        reason: $reason ? $reason : reasonPlaceholder,
         jobId: $jobId || jobIdPlaceholder,
         ...($allSelected
           ? { query: $workflowsQuery }
@@ -61,9 +68,10 @@
         id: 'batch-terminate-success-toast',
       });
     } catch (err) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     }
   };
 </script>
@@ -75,7 +83,7 @@
   data-testid="batch-terminate-confirmation"
   confirmType="destructive"
   cancelText={translate('common.cancel')}
-  confirmDisabled={!jobIdValid}
+  confirmDisabled={!$jobIdValid}
   confirmText={translate('workflows.terminate')}
   on:confirmModal={terminateWorkflows}
 >

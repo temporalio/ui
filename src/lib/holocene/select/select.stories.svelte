@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import { iconNames } from '$lib/holocene/icon';
@@ -29,6 +31,11 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       onChange: { table: { disable: true } },
       value: { table: { disable: true } },
+      position: {
+        name: 'Position',
+        control: 'inline-radio',
+        options: ['left', 'right'],
+      },
     },
   } satisfies Meta<Select<string>>;
 </script>
@@ -53,6 +60,8 @@
 
 <Story name="Disabled" args={{ disabled: true }} />
 
+<Story name="Loading" args={{ loading: true }} />
+
 <Story
   name="Disabled with Icon"
   args={{ disabled: true, leadingIcon: 'regions' }}
@@ -66,3 +75,5 @@
   name="Invalid with error message"
   args={{ valid: false, error: 'This value is invalid' }}
 />
+
+<Story name="Right" args={{ position: 'right' }} />

@@ -22,7 +22,9 @@ import type {
   IterableEvent,
   MarkerRecordedEvent,
   NexusOperationCanceledEvent,
+  NexusOperationCancelRequestCompletedEvent,
   NexusOperationCancelRequestedEvent,
+  NexusOperationCancelRequestFailedEvent,
   NexusOperationCompletedEvent,
   NexusOperationFailedEvent,
   NexusOperationScheduledEvent,
@@ -44,6 +46,7 @@ import type {
   WorkflowExecutionCompletedEvent,
   WorkflowExecutionContinuedAsNewEvent,
   WorkflowExecutionFailedEvent,
+  WorkflowExecutionOptionsUpdatedEvent,
   WorkflowExecutionSignaledEvent,
   WorkflowExecutionStartedEvent,
   WorkflowExecutionTerminatedEvent,
@@ -51,6 +54,7 @@ import type {
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowExecutionUpdateAdmittedEvent,
   WorkflowExecutionUpdateCompletedEvent,
+  WorkflowExecutionUpdateRejectedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
   WorkflowTaskScheduledEvent,
@@ -105,6 +109,8 @@ const nexusEvents = [
   'NexusOperationCanceled',
   'NexusOperationTimedOut',
   'NexusOperationCancelRequested',
+  'NexusOperationCancelRequestCompleted',
+  'NexusOperationCancelRequestFailed',
 ] as const;
 
 export type EventType = (typeof eventTypes)[number];
@@ -142,12 +148,12 @@ export const eventTypes = [
   'WorkflowPropertiesModified',
 ] as const;
 
-export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
+export const eventAttributeKeys: readonly EventAttributeKey[] = [
   'workflowExecutionStartedEventAttributes',
   'workflowExecutionCompletedEventAttributes',
   'workflowExecutionFailedEventAttributes',
   'workflowExecutionTimedOutEventAttributes',
-  'workflowExecutionOptionsUpdatedEventAttributes' as unknown as EventAttributeKey,
+  'workflowExecutionOptionsUpdatedEventAttributes',
   'workflowTaskStartedEventAttributes',
   'workflowTaskScheduledEventAttributes',
   'workflowTaskCompletedEventAttributes',
@@ -195,11 +201,16 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'nexusOperationCanceledEventAttributes',
   'nexusOperationTimedOutEventAttributes',
   'nexusOperationCancelRequestedEventAttributes',
+  'nexusOperationCancelRequestCompletedEventAttributes',
+  'nexusOperationCancelRequestFailedEventAttributes',
+  'workflowExecutionOptionsUpdatedEventAttributes',
   'workflowPropertiesModifiedEventAttributes',
+  'workflowExecutionPausedEventAttributes',
+  'workflowExecutionUnpausedEventAttributes',
 ] as const;
 
-export type ResetEventType = (typeof validResetEventTypes)[number];
-export const validResetEventTypes = [
+export const validResetEventTypes: EventType[] = [
+  'WorkflowTaskStarted',
   'WorkflowTaskCompleted',
   'WorkflowTaskFailed',
   'WorkflowTaskTimedOut',
@@ -229,7 +240,9 @@ export const findAttributesAndKey = (
 
 const hasAttributes =
   <T extends EventWithAttributes<EventAttributeKey>>(key: EventAttributeKey) =>
-  (event: IterableEvent | CommonHistoryEvent | undefined): event is T => {
+  (
+    event: IterableEvent | CommonHistoryEvent | HistoryEvent | undefined,
+  ): event is T => {
     return Boolean(event?.[key]);
   };
 
@@ -330,6 +343,11 @@ export const isTimerCanceledEvent = hasAttributes<TimerCanceledEvent>(
 export const isMarkerRecordedEvent = hasAttributes<MarkerRecordedEvent>(
   'markerRecordedEventAttributes',
 );
+
+export const isWorkflowExecutionOptionsUpdatedEvent =
+  hasAttributes<WorkflowExecutionOptionsUpdatedEvent>(
+    'workflowExecutionOptionsUpdatedEventAttributes',
+  );
 
 export const isWorkflowExecutionSignaledEvent =
   hasAttributes<WorkflowExecutionSignaledEvent>(
@@ -458,6 +476,11 @@ export const isWorkflowExecutionUpdateAcceptedEvent =
     'workflowExecutionUpdateAcceptedEventAttributes',
   );
 
+export const isWorkflowExecutionUpdateRejectedEvent =
+  hasAttributes<WorkflowExecutionUpdateRejectedEvent>(
+    'workflowExecutionUpdateRejectedEventAttributes',
+  );
+
 export const isWorkflowExecutionUpdateAdmittedEvent =
   hasAttributes<WorkflowExecutionUpdateAdmittedEvent>(
     'workflowExecutionUpdateAdmittedEventAttributes',
@@ -509,4 +532,14 @@ export const isNexusOperationTimedOutEvent =
 export const isNexusOperationCancelRequestedEvent =
   hasAttributes<NexusOperationCancelRequestedEvent>(
     'nexusOperationCancelRequestedEventAttributes',
+  );
+
+export const isNexusOperationCancelRequestCompletedEvent =
+  hasAttributes<NexusOperationCancelRequestCompletedEvent>(
+    'nexusOperationCancelRequestCompletedEventAttributes',
+  );
+
+export const isNexusOperationCancelRequestFailedEvent =
+  hasAttributes<NexusOperationCancelRequestFailedEvent>(
+    'nexusOperationCancelRequestFailedEventAttributes',
   );

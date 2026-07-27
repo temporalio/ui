@@ -1,17 +1,26 @@
-<script>
-  import { page } from '$app/stores';
+<script lang="ts">
+  import type { Snippet } from 'svelte';
 
+  import { page } from '$app/state';
+
+  import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import NoWorkflowTaskFailures from '$lib/components/empty-states/no-workflow-task-failures.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
-  import emptyImage from '$lib/vendor/empty-state-dark_2x.png';
-  import noResultsImages from '$lib/vendor/empty-state-light_2x.png';
+  import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
+  import noResultsImages from '$lib/vendor/empty-state.svg';
 
-  export let updating = false;
+  interface Props {
+    cloud?: Snippet;
+  }
 
-  $: query = $page.url.searchParams.get('query');
+  let { cloud }: Props = $props();
+
+  let query = $derived(page.url.searchParams.get('query'));
+
+  let hasTaskFailuresQuery = $derived(query === TASK_FAILURES_QUERY);
 
   const samples = [
     'samples-go',
@@ -20,47 +29,67 @@
     'samples-python',
     'samples-dotnet',
     'samples-php',
+    'samples-ruby',
   ];
 </script>
 
-<svelte:head>
-  <link rel="preload" as="image" href={emptyImage} />
-</svelte:head>
-<div
-  class="flex h-auto w-full flex-col overflow-hidden xl:flex-row"
-  aria-live="polite"
->
+{#if query}
   <div
-    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 border-b border-table p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r"
+    class="flex h-full w-full flex-col items-center justify-center p-4"
+    aria-live="polite"
   >
-    {#if updating}
-      <Loading />
-    {:else}
+    <div class="text-center">
       <h2>
-        {#if query}
-          {translate('workflows.workflow-query-empty-state-title')}
+        {#if $workflowError}
+          {translate('workflows.workflow-query-error-state')}
         {:else}
-          {translate('workflows.workflow-empty-state-title')}
+          {hasTaskFailuresQuery
+            ? translate(
+                'workflows.workflow-task-failures-query-empty-state-title',
+              )
+            : translate('workflows.workflow-query-empty-state-title')}
         {/if}
+      </h2>
+      <p class="text-secondary">
+        {#if $workflowError}
+          {$workflowError}
+        {:else}
+          {hasTaskFailuresQuery
+            ? translate(
+                'workflows.workflow-task-failures-query-empty-state-description',
+              )
+            : translate('workflows.workflow-query-empty-state-description')}
+        {/if}
+      </p>
+      {#if hasTaskFailuresQuery}
+        <NoWorkflowTaskFailures class="m-auto mt-8 text-subtle" />
+      {:else}
+        <NoQueryResults class="m-auto mt-8 text-subtle" />
+      {/if}
+    </div>
+  </div>
+{:else}
+  <div
+    class="h-full w-full overflow-hidden xl:flex xl:flex-row"
+    aria-live="polite"
+  >
+    <div
+      class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
+    >
+      <h2>
+        {translate('workflows.workflow-empty-state-title')}
       </h2>
       {#if $workflowError}
         <Alert
           intent="warning"
           icon="warning"
-          title={translate('workflows.workflow-query-error-state')}
+          title={translate('common.error-occurred')}
           style="overflow-wrap: anywhere"
         >
           {$workflowError}
         </Alert>
-      {:else if query}
-        <p>
-          {translate('workflows.workflow-query-empty-state-preface')}
-        </p>
-        <p>
-          {translate('workflows.workflow-query-empty-state-postface')}
-        </p>
       {:else}
-        <slot name="cloud" />
+        {@render cloud?.()}
         <p>
           {translate('workflows.workflow-empty-state-description')}
           <Link newTab href="https://github.com/temporalio"
@@ -79,13 +108,12 @@
           {/each}
         </ul>
       {/if}
-    {/if}
+    </div>
+    <div class="flex h-full flex-col">
+      <div class="bg-off-white dark:bg-[#0f1725]">
+        <img src={noResultsImages} alt="" class="w-full" />
+      </div>
+      <div class="flex-1 bg-[#818cf8]"></div>
+    </div>
   </div>
-  <div class="bg-[#DDD6FE]">
-    <img
-      src={query ? noResultsImages : emptyImage}
-      alt=""
-      class="aspect-auto"
-    />
-  </div>
-</div>
+{/if}

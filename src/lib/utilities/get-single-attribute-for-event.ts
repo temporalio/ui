@@ -1,14 +1,17 @@
 import { isEvent } from '$lib/models/event-history';
-import type { Payloads } from '$lib/types';
+import type { Payload, Payloads } from '$lib/types';
 import type {
   PendingActivity,
   PendingNexusOperation,
   WorkflowEvent,
 } from '$lib/types/events';
-import type { Payload } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
-import { decodePayload, isSinglePayload } from './decode-payload';
+import {
+  isRawPayload,
+  isRawPayloads,
+  parseRawPayloadToJSON,
+} from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
@@ -20,10 +23,11 @@ import {
   isPendingActivity,
   isPendingNexusOperation,
 } from './is-pending-activity';
+import { stringifyWithBigInt } from './parse-with-big-int';
 
-type SummaryAttribute = {
+export type SummaryAttribute = {
   key: string;
-  value: string | Record<string, unknown> | Payloads;
+  value: string | Payload | Payloads | Record<string, unknown>;
 };
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
@@ -49,6 +53,7 @@ export const shouldDisplayAsPlainText = (key: string): boolean => {
 const keysToOmitIfNoValue: Readonly<Set<string>> = new Set([
   'suggestContinueAsNew',
   'historySizeBytes',
+  'targetWorkerDeploymentVersionChanged',
 ]);
 
 export const shouldDisplayAttribute = (
@@ -124,6 +129,20 @@ export const getCodeBlockValue: Parameters<typeof JSON.stringify>[0] = (
   );
 };
 
+export const formatSummaryAttributeDisplayValue = (value: unknown): string => {
+  let displayValue = getCodeBlockValue(value);
+  if (
+    isObject(value) &&
+    has(value, 'payloads') &&
+    Array.isArray(displayValue)
+  ) {
+    displayValue = displayValue.length ? displayValue[0] : displayValue;
+  }
+  if (typeof displayValue === 'string') return displayValue;
+
+  return stringifyWithBigInt(displayValue) ?? String(displayValue);
+};
+
 export const getStackTrace = (value: unknown) => {
   if (!isObject(value)) return undefined;
   if (has(value, 'stackTrace') && value.stackTrace) return value.stackTrace;
@@ -197,7 +216,7 @@ export const shouldDisplayChildWorkflowLink = (
 ): key is (typeof keysWithChildExecutionLinks)[number] => {
   const workflowLinkAttributesExist = Boolean(
     attributes?.workflowExecutionWorkflowId &&
-      attributes?.workflowExecutionRunId,
+    attributes?.workflowExecutionRunId,
   );
   for (const workflowKey of keysWithChildExecutionLinks) {
     if (key === workflowKey && workflowLinkAttributesExist) return true;
@@ -220,9 +239,12 @@ export const shouldDisplayAsTime = (key: string): boolean => {
   return key?.toLowerCase()?.endsWith('time');
 };
 
-const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
+export const formatSummaryValue = (
+  key: string,
+  value: unknown,
+): SummaryAttribute => {
   if (typeof value === 'object') {
-    if (isSinglePayload(value)) {
+    if (isRawPayload(value)) {
       return { key, value };
     }
     const [firstKey] = Object.keys(value);
@@ -245,6 +267,7 @@ const preferredSummaryKeys = [
   'activityType',
   'signalName',
   'workflowType',
+  'operation',
   'result',
   'failure',
   'input',
@@ -272,9 +295,10 @@ const getFirstDisplayAttribute = ({
   }
 };
 
-const getActivityType = (payload: Payload) => {
+export const getActivityType = (payload: Payload) => {
   if (has(payload, 'ActivityType')) return payload.ActivityType;
   if (has(payload, 'activity_type')) return payload.activity_type;
+  if (typeof payload === 'string') return payload;
 };
 
 const isJavaSDK = (event: WorkflowEvent): boolean => {
@@ -297,7 +321,7 @@ export const getEventSummaryAttribute = (
       ?.payloads ||
       event.markerRecordedEventAttributes?.details?.type?.payloads ||
       []) as unknown as Payload[];
-    const decodedPayloads = payloads.map((p) => decodePayload(p));
+    const decodedPayloads = payloads.map((p) => parseRawPayloadToJSON(p));
     const payload = decodedPayloads?.[0];
     if (isJavaSDK(event) && payload) {
       return formatSummaryValue('ActivityType', payload);

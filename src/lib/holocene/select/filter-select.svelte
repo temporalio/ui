@@ -5,20 +5,35 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import Option from './simple-option.svelte';
-  import Select from './simple-select.svelte';
+  import Select, { type Props as SelectProps } from './simple-select.svelte';
 
-  export let label: string;
-  export let value: SelectOptionValue;
-  export let options: SelectOptionValue[] = [];
-  export let parameter: string = null;
-  export let position: string | undefined = undefined;
+  interface Props extends Omit<SelectProps, 'id'> {
+    label: string;
+    value: SelectOptionValue;
+    options?: SelectOptionValue[];
+    parameter?: string;
+    position?: string;
+  }
 
-  const id = `${parameter || label}-${
-    position ? `${position}-filter` : 'filter'
-  }`;
-  const parameterValue = parameter && $page.url.searchParams.get(parameter);
+  let {
+    label,
+    value,
+    options = [],
+    parameter = null,
+    position = undefined,
+    children,
+    ...rest
+  }: Props = $props();
 
-  let _value = parameterValue || (value && value.toString());
+  const id = $derived(
+    `${parameter || label}-${position ? `${position}-filter` : 'filter'}`,
+  );
+
+  const parameterValue = $derived(
+    parameter && $page.url.searchParams.get(parameter),
+  );
+
+  let _value = $derived(parameterValue || (value && value.toString()));
 
   const onChange = () => {
     updateQueryParameters({
@@ -29,10 +44,12 @@
   };
 </script>
 
-<Select on:change={onChange} {id} bind:value={_value} {label} {...$$props}>
-  <slot>
+<Select onchange={onChange} {id} bind:value={_value} {label} {...rest}>
+  {#if children}
+    {@render children()}
+  {:else}
     {#each options.map((o) => o.toString()) as option}
       <Option value={option} />
     {/each}
-  </slot>
+  {/if}
 </Select>

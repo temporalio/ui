@@ -4,23 +4,47 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
   import { terminateWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
+  import { triggerRefresh as triggerWorkflowRunRefresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let refresh: Writable<number>;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+    refresh?: Writable<number>;
+    first?: string;
+  }
 
-  let reason: string = '';
-  let error: string = '';
-  let loading = false;
+  let {
+    open = $bindable(),
+    workflow,
+    namespace,
+    refresh = undefined,
+    first = undefined,
+  }: Props = $props();
+
+  let reason = $state('');
+  let error = $state('');
+  let loading = $state(false);
+
+  const identity = getIdentity();
 
   const hideModal = () => {
     open = false;
     reason = '';
+  };
+
+  const triggerRefresh = () => {
+    if (refresh) {
+      $refresh = Date.now();
+    } else {
+      triggerWorkflowRunRefresh(Action.Terminate);
+    }
   };
 
   const terminate = async () => {
@@ -31,18 +55,21 @@
         workflow,
         namespace,
         reason,
+        first,
+        identity,
       });
       open = false;
       reason = '';
-      $refresh = Date.now();
+      triggerRefresh();
       toaster.push({
         id: 'workflow-termination-success-toast',
         message: translate('workflows.terminate-success'),
       });
     } catch (err: unknown) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     } finally {
       loading = false;
     }
@@ -70,8 +97,7 @@
       id="workflow-termination-reason"
       class="mt-4"
       placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason-placeholder')}
-      labelHidden
+      label={translate('common.reason-optional')}
       bind:value={reason}
     />
   </div>

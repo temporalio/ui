@@ -14,6 +14,7 @@ import type {
 } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
 import {
+  type CombinedAttributes,
   formatGroupAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
@@ -29,9 +30,9 @@ export type GraphConfig = {
 const baseRadius = 6;
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 5,
+  height: baseRadius * 4,
   gutter: baseRadius * 8,
-  radius: baseRadius * 2,
+  radius: baseRadius * 1.5,
   fontSizeRatio: baseRadius * 4,
 };
 
@@ -49,16 +50,19 @@ export const DetailsConfig: GraphConfig = {
   fontSizeRatio: baseRadius * 4,
 };
 
-export const CategoryIcon: Record<EventTypeCategory, IconName> = {
-  workflow: 'workflow',
-  signal: 'signal',
-  activity: 'activity',
-  nexus: 'nexus',
-  timer: 'retention',
-  'local-activity': 'feather',
-  'child-workflow': 'relationship',
-  update: 'update',
-  other: 'terminal',
+export const CategoryIcon: Record<
+  EventTypeCategory,
+  { name: IconName; title: string }
+> = {
+  workflow: { name: 'workflow', title: 'Workflow' },
+  signal: { name: 'signal', title: 'Signal' },
+  activity: { name: 'activity', title: 'Activity' },
+  nexus: { name: 'nexus', title: 'Nexus' },
+  timer: { name: 'retention', title: 'Timer' },
+  'local-activity': { name: 'feather', title: 'Local Activity' },
+  'child-workflow': { name: 'relationship', title: 'Child Workflow' },
+  update: { name: 'update', title: 'Update' },
+  other: { name: 'terminal', title: 'Other' },
 };
 
 export const timelineTextPosition = (
@@ -123,7 +127,7 @@ export const isMiddleEvent = (
   return ids.indexOf(event.id) === 1 && group.eventList.length === 3;
 };
 
-const pairIsConsecutive = (x: string, y: string) => {
+const pairIsConsecutive = (x: string, y: string): boolean => {
   return parseInt(x) === parseInt(y) - 1;
 };
 
@@ -136,6 +140,7 @@ const isConsecutiveGroup = (group: EventGroup): boolean => {
       pairIsConsecutive(ids[0], ids[1]) && pairIsConsecutive(ids[1], ids[2])
     );
   }
+  return false;
 };
 
 const getOpenGroups = (
@@ -143,6 +148,7 @@ const getOpenGroups = (
   groups: EventGroups,
 ): number => {
   const group = getGroupForEventOrPendingEvent(groups, event);
+  if (!group) return 0;
   if (group.level !== undefined) return group.level;
 
   const pendingGroups = groups
@@ -186,8 +192,10 @@ export const getNextDistanceAndOffset = (
     return { nextDistance, offset };
   }
 
-  const currentIndex = isEvent(event) && group.eventList.indexOf(event);
-  const nextEvent = isEvent(event) && group.eventList[currentIndex + 1];
+  const currentIndex = isEvent(event) ? group.eventList.indexOf(event) : -1;
+  const nextEvent = isEvent(event)
+    ? group.eventList[currentIndex + 1]
+    : undefined;
   if (!isEvent(event) || event.category !== 'workflow') {
     offset = getOpenGroups(event, groups);
   }
@@ -197,7 +205,7 @@ export const getNextDistanceAndOffset = (
   }
 
   let diff = 0;
-  if (nextEvent) {
+  if (nextEvent && isEvent(event)) {
     diff = parseInt(nextEvent.id) - parseInt(event.id);
   } else if (group.isPending && isEvent(event)) {
     diff = history.length - parseInt(event.id) + 2;
@@ -207,63 +215,74 @@ export const getNextDistanceAndOffset = (
   return { nextDistance, offset };
 };
 
-export const getStatusColor = (
-  status: WorkflowStatus | EventClassification | 'Pending' | 'Retrying',
+export const DEFAULT_STROKE_COLOR = 'currentColor';
+
+export const getStatusStrokeColor = (
+  status: WorkflowStatus | EventClassification | 'Delayed',
 ): string => {
   switch (status) {
     case 'Completed':
-      return '#00f37e';
+      return '#1ff1a5';
     case 'Failed':
     case 'Terminated':
-      return '#ff4518';
+      return '#c71607';
     case 'Signaled':
       return '#d300d8';
     case 'Fired':
       return '#f8a208';
     case 'TimedOut':
-      return '#F97316';
+      return '#f97316';
     case 'Canceled':
       return '#fed64b';
     case 'Running':
       return '#3b82f6';
-    case 'Pending':
-      return '#a78bfa';
-    case 'Retrying':
-      return '#FF9B70';
+    case 'Delayed':
+      return '#fbbf24';
     default:
-      return '#ffffff';
+      return DEFAULT_STROKE_COLOR;
   }
 };
 
-export const getCategoryColor = (type: EventTypeCategory): string => {
-  switch (type) {
-    case 'other':
-    case 'local-activity':
-      return '#ebebeb';
+export const getCategoryStrokeColor = (
+  category: EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
+): string => {
+  switch (category) {
     case 'timer':
       return '#fbbf24';
     case 'signal':
-      return '#ec4899';
+      return '#d300d8';
     case 'activity':
       return '#a78bfa';
     case 'workflow':
-      return '#059669';
+    case 'marker':
+    case 'command':
+      return '#ebebeb';
     case 'child-workflow':
-      return '#67e4f9';
+      return '#0899B2';
     case 'update':
       return '#FF9B70';
-    case 'nexus':
-      return '#3b82f6';
+    case 'pending':
+      return '#a78bfa';
+    case 'retry':
+      return '#FF9B70';
     default:
-      return '#ebebeb';
+      return DEFAULT_STROKE_COLOR;
   }
 };
 
-export const mergeEventGroupDetails = (group: EventGroup) => {
+export const mergeEventGroupDetails = (
+  group: EventGroup,
+): CombinedAttributes => {
   const attributes = formatGroupAttributes(group);
-  return group.pendingActivity
-    ? { ...formatPendingAttributes(group.pendingActivity), ...attributes }
-    : attributes;
+
+  if (group.pendingActivity) {
+    return {
+      ...formatPendingAttributes(group.pendingActivity),
+      ...attributes,
+    };
+  }
+
+  return attributes;
 };
 
 export const staticCodeBlockHeight = 200;

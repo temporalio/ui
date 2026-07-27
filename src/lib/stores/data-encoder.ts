@@ -2,7 +2,6 @@ import { derived } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import { authUser } from './auth-user';
 import { lastDataConverterStatus } from './data-converter-config';
 import {
   codecEndpoint,
@@ -16,7 +15,8 @@ type DataEncoder = {
   settingsPassAccessToken: boolean;
   settingsIncludeCredentials: boolean;
   endpoint: string;
-  accessToken?: string;
+  customErrorMessage: string;
+  customErrorLink: string;
   hasNotRequested: boolean;
   hasError: boolean;
   hasSuccess: boolean;
@@ -29,7 +29,6 @@ export const dataEncoder = derived(
     overrideRemoteCodecConfiguration,
     lastDataEncoderStatus,
     lastDataConverterStatus,
-    authUser,
   ],
   ([
     $page,
@@ -37,10 +36,14 @@ export const dataEncoder = derived(
     $overrideRemoteCodecConfiguration,
     $lastDataEncoderStatus,
     $lastDataConverterStatus,
-    $authUser,
   ]): DataEncoder => {
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.data?.settings?.codec?.endpoint;
+    const customErrorMessage =
+      $page?.data?.settings?.codec?.customErrorMessage?.default?.message || '';
+    const customErrorLink =
+      $page?.data?.settings?.codec?.customErrorMessage?.default?.link || '';
+
     const settingsPassAccessToken = Boolean(
       $page?.data?.settings?.codec?.passAccessToken,
     );
@@ -50,7 +53,6 @@ export const dataEncoder = derived(
     const endpoint = $overrideRemoteCodecConfiguration
       ? $codecEndpoint
       : settingsEndpoint || $codecEndpoint;
-    const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
       : $lastDataConverterStatus === 'notRequested';
@@ -67,7 +69,8 @@ export const dataEncoder = derived(
       settingsPassAccessToken,
       settingsIncludeCredentials,
       endpoint,
-      accessToken,
+      customErrorMessage,
+      customErrorLink,
       hasNotRequested,
       hasError,
       hasSuccess,

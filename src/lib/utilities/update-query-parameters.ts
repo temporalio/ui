@@ -28,7 +28,7 @@ export const updateQueryParameters = async ({
   options = gotoOptions,
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
-  const params = {};
+  const params: Record<string, string> = {};
   let replaced = false;
 
   url.searchParams.forEach((value, key) => {

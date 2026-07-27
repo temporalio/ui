@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import { toaster } from '../stores/toaster';
@@ -15,6 +17,7 @@
       duration: 2000,
       variant: 'Primary',
       message: 'This is a toast message.',
+      position: 'bottom-right',
     },
     argTypes: {
       variant: {
@@ -36,6 +39,26 @@
         control: 'text',
         table: { category: 'Accessibility' },
       },
+      position: {
+        name: 'Position',
+        control: 'select',
+        options: [
+          'Top Left',
+          'Top Center',
+          'Top Right',
+          'Bottom Left',
+          'Bottom Center',
+          'Bottom Right',
+        ],
+        mapping: {
+          'Top Left': 'top-left',
+          'Top Center': 'top-center',
+          'Top Right': 'top-right',
+          'Bottom Left': 'bottom-left',
+          'Bottom Center': 'bottom-center',
+          'Bottom Right': 'bottom-right',
+        },
+      },
     },
   } satisfies Meta<Toaster & Toast['variant']>;
 </script>
@@ -53,7 +76,12 @@
       <span class="capitalize">Trigger {variant} toast</span>
     </Button>
 
-    <Toaster {...args} pop={toaster.pop} toasts={toaster.toasts} />
+    <Toaster
+      {...args}
+      position={toaster.position}
+      pop={toaster.pop}
+      toasts={toaster.toasts}
+    />
   </div>
 </Template>
 

@@ -1,9 +1,6 @@
-import { get } from 'svelte/store';
-
 import type { I18nKey } from '$lib/i18n';
 import { translate } from '$lib/i18n/translate';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import { relativeTime, timeFormat } from '$lib/stores/time-format';
 import type {
   EventAttribute,
   EventAttributeKey,
@@ -28,6 +25,8 @@ export type CombinedAttributes = EventAttribute & {
   continuedExecutionRunId?: string;
   newExecutionRunId?: string;
   namespace?: string;
+  principalName?: string;
+  principalType?: string;
 };
 
 const keysToExpand: Readonly<Set<string>> = new Set([
@@ -147,9 +146,7 @@ export const formatPendingAttributes = (
   for (const [key, value] of sortedEntries) {
     const shouldDisplay = shouldDisplayPendingAttribute(key);
     const formattedValue = key.toLowerCase().includes('time')
-      ? formatDate(String(value), get(timeFormat), {
-          relative: get(relativeTime),
-        })
+      ? formatDate(String(value))
       : value;
     if (shouldDisplay) attributes[key] = formattedValue;
     formatNestedAttributes(attributes, key);
@@ -168,7 +165,7 @@ export type AttributeGroup =
   | 'workflow'
   | 'searchAttributes';
 
-const attributeGroupings: Readonly<AttributeGroup[]> = [
+const attributeGroupings: readonly AttributeGroup[] = [
   'summary',
   'parent',
   'activity',

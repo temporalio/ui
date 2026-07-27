@@ -1,6 +1,5 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { cva, type VariantProps } from 'class-variance-authority';
-  import { twMerge as merge } from 'tailwind-merge';
 
   export type BadgeType = VariantProps<typeof types>['type'];
 
@@ -13,6 +12,7 @@
     danger: 'bg-red-200',
     count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
     subtle: 'surface-subtle dark:text-white font-normal select-all',
+    ghost: 'surface-primary text-primary border border-subtle',
   };
 
   const types = cva(
@@ -23,12 +23,11 @@
       'items-center',
       'justify-center',
       'text-nowrap',
-      'break-all',
       'rounded-sm',
       'p-1',
       'text-sm',
       'font-medium',
-      'leading-4',
+      'leading-[1.5]',
       'transition-colors',
       'text-black',
     ],
@@ -46,12 +45,18 @@
 </script>
 
 <script lang="ts">
-  export let type: BadgeType | undefined | null | false = 'default';
+  import type { Snippet } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
-  let className = '';
-  export { className as class };
+  interface Props {
+    type?: BadgeType | null | false;
+    class?: string;
+    children?: Snippet;
+  }
+
+  let { type = 'default', class: className = '', children }: Props = $props();
 </script>
 
 <div class={merge(types({ type: type || 'default' }), className)}>
-  <slot />
+  {@render children?.()}
 </div>

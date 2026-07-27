@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -8,9 +9,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
     formatRetryExpiration,
@@ -20,17 +19,19 @@
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  $: ({ workflow } = $workflowRun);
-  $: pendingActivities = workflow?.pendingActivities;
+  const workflow = $derived($workflowRun.workflow);
+  const pendingActivities = $derived(workflow?.pendingActivities);
 
-  $: href = routeForPendingActivities({
-    namespace: $page.params.namespace,
-    workflow: $page.params.workflow,
-    run: $page.params.run,
-  });
+  const href = $derived(
+    routeForPendingActivities({
+      namespace: page.params.namespace,
+      workflow: page.params.workflow,
+      run: page.params.run,
+    }),
+  );
 
-  $: canceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    workflow?.status,
+  const canceled = $derived(
+    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
   );
 </script>
 
@@ -73,13 +74,7 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.last-heartbeat')}
                     </h4>
-                    {formatDate(
-                      pendingActivity.lastHeartbeatTime,
-                      $timeFormat,
-                      {
-                        relative: $relativeTime,
-                      },
-                    )}
+                    <Timestamp dateTime={pendingActivity.lastHeartbeatTime} />
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
@@ -104,17 +99,20 @@
                     </Badge>
                   </div>
                   {#if failed && pendingActivity.scheduledTime}
-                    <div class="pending-activity-detail">
-                      <h4 class="pending-activity-detail-header">
-                        {translate('workflows.next-retry')}
-                      </h4>
-                      <Badge type={failed ? 'danger' : undefined}>
-                        {toTimeDifference({
-                          date: pendingActivity.scheduledTime,
-                          negativeDefault: 'None',
-                        })}
-                      </Badge>
-                    </div>
+                    {@const timeDifference = toTimeDifference({
+                      date: pendingActivity.scheduledTime,
+                      negativeDefault: '',
+                    })}
+                    {#if timeDifference}
+                      <div class="pending-activity-detail">
+                        <h4 class="pending-activity-detail-header">
+                          {translate('workflows.next-retry')}
+                        </h4>
+                        <Badge type={failed ? 'danger' : undefined}>
+                          {timeDifference}
+                        </Badge>
+                      </div>
+                    {/if}
                   {/if}
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
@@ -142,6 +140,7 @@
                         content={stringifyWithBigInt(
                           pendingActivity.heartbeatDetails,
                         )}
+                        label={translate('workflows.heartbeat-details')}
                         copyIconTitle={translate('common.copy-icon-title')}
                         copySuccessIconTitle={translate(
                           'common.copy-success-icon-title',
@@ -159,6 +158,7 @@
                         content={stringifyWithBigInt(
                           pendingActivity.lastFailure,
                         )}
+                        label={translate('workflows.last-failure')}
                         copyIconTitle={translate('common.copy-icon-title')}
                         copySuccessIconTitle={translate(
                           'common.copy-success-icon-title',

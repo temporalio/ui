@@ -1,6 +1,6 @@
 import { isObject } from './is';
 
-export const has = <K extends Readonly<string[]>, V = unknown>(
+export const has = <K extends readonly string[], V = unknown>(
   target: unknown,
   ...properties: K
 ): target is Record<K[number], V> => {

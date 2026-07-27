@@ -1,10 +1,14 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';
+
+  let { children }: { children?: Snippet } = $props();
 </script>
 
 <section id="event-history">
@@ -26,22 +30,22 @@
     <div id="event-view-toggle" class="surface-primary flex gap-4">
       <ToggleButtons>
         <ToggleButton
-          icon="feed"
+          leadingIcon="feed"
           href={routeForEventHistoryImport($lastUsedNamespace, 'feed')}
           >{translate('workflows.history')}</ToggleButton
         >
         <ToggleButton
-          icon="compact"
+          leadingIcon="compact"
           href={routeForEventHistoryImport($lastUsedNamespace, 'compact')}
           >{translate('workflows.compact')}</ToggleButton
         >
         <ToggleButton
-          icon="json"
+          leadingIcon="json"
           href={routeForEventHistoryImport($lastUsedNamespace, 'json')}
           >{translate('workflows.json')}</ToggleButton
         >
       </ToggleButtons>
     </div>
   </nav>
-  <slot />
+  {@render children?.()}
 </section>

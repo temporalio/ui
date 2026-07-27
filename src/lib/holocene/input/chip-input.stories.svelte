@@ -1,6 +1,9 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
   import { userEvent, within } from '@storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
@@ -20,6 +23,7 @@
       validator: isEmail,
       maxLength: undefined,
       chips: ['tobias@temporal.io'],
+      scrollTo: false,
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
@@ -37,8 +41,9 @@
         control: 'text',
         table: { category: 'Accessibility' },
       },
+      scrollTo: { name: 'Scroll To', control: 'boolean' },
     },
-  } satisfies Meta<ChipInput>;
+  } satisfies Meta<ComponentProps<typeof ChipInput>>;
 </script>
 
 <script lang="ts">
@@ -98,5 +103,16 @@
     const canvas = within(canvasElement);
     const input = canvas.getByTestId(id);
     await userEvent.click(input);
+  }}
+/>
+
+<Story
+  name="Scroll Input Into View"
+  args={{ class: 'max-h-20 w-96', scrollTo: true }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, 'finn@temporal.io');
+    await userEvent.keyboard('{enter}');
   }}
 />

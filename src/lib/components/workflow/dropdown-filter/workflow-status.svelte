@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
@@ -16,21 +16,22 @@
   import { workflowStatusFilters } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
-  $: statusFilters = $workflowFilters.filter(
-    (f) => f.attribute === 'ExecutionStatus',
+  const statusFilters = $derived(
+    $workflowFilters.filter((f) => f.attribute === 'ExecutionStatus'),
   );
 
   function mapStatusToFilter(value: string): SearchAttributeFilter {
-    return {
+    return createFilter({
       attribute: 'ExecutionStatus',
       type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
       value,
       conditional: '=',
-      operator: '',
-      parenthesis: '',
-    };
+    });
   }
 
   function mapStatusesToFilters(filters: SearchAttributeFilter[]) {
@@ -81,7 +82,7 @@
       }
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, true);
+    updateQueryParamsFromFilter(page.url, $workflowFilters, true);
   };
 </script>
 
@@ -92,20 +93,23 @@
     controls="execution-status-filter"
   >
     {translate('common.status')}
-    <Icon name="filter" slot="trailing" />
+    {#snippet trailing()}
+      <Icon name="filter" />
+    {/snippet}
   </MenuButton>
   <Menu keepOpen id="execution-status-filter">
-    {#each workflowStatusFilters as status}
-      <MenuItem on:click={() => onStatusClick(status)}>
-        <Checkbox
-          slot="leading"
-          label={status}
-          labelHidden
-          tabindex={-1}
-          on:click={() => onStatusClick(status)}
-          checked={statusFilters.some((filter) => filter.value === status) ||
-            (!statusFilters.length && status === 'All')}
-        />
+    {#each workflowStatusFilters as status (status)}
+      <MenuItem onclick={() => onStatusClick(status)}>
+        {#snippet leading()}
+          <Checkbox
+            label={status}
+            labelHidden
+            tabindex={-1}
+            on:click={() => onStatusClick(status)}
+            checked={statusFilters.some((filter) => filter.value === status) ||
+              (!statusFilters.length && status === 'All')}
+          />
+        {/snippet}
         {#if status === 'All'}
           <Translate key="workflows.all-statuses" />
         {:else}

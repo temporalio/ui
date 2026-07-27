@@ -36,23 +36,28 @@
   const { name, group } = ctx;
 </script>
 
-<div class="flex flex-col gap-1">
-  <Label {disabled} class={className}>
-    <input
-      bind:group={$group}
-      type="radio"
-      class="surface-primary"
-      aria-describedby={description ? `${id}-description` : null}
-      {name}
-      {value}
-      {id}
-      {disabled}
-      {...omit($$restProps, 'class')}
-    />
-    <span class="label" class:hidden={labelHidden}>
-      {label}
-    </span>
-  </Label>
+<div>
+  <div class="flex items-center">
+    <Label {disabled} class={className}>
+      <input
+        bind:group={$group}
+        type="radio"
+        class="surface-primary"
+        aria-describedby={description ? `${id}-description` : null}
+        data-track-name="radio-input"
+        data-track-intent="select"
+        data-track-text={label}
+        {name}
+        {value}
+        {id}
+        {disabled}
+        {...omit($$restProps, 'class')}
+      />
+      <span class="font-normal" class:hidden={labelHidden}>
+        {label}
+      </span>
+    </Label>
+  </div>
   {#if description}
     <p class="description" id="{id}-description">
       {description}
@@ -62,7 +67,7 @@
 
 <style lang="postcss">
   .description {
-    @apply ml-7 text-xs font-normal text-primary;
+    @apply ml-7 text-sm font-normal text-primary;
   }
 
   input[type='radio'] {

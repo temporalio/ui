@@ -1,6 +1,9 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import WorkflowStatus from './workflow-status.svelte';
 
@@ -25,8 +28,9 @@
           disable: true,
         },
       },
+      delayed: { name: 'Delayed', control: 'boolean' },
     },
-  } satisfies Meta<WorkflowStatus>;
+  } satisfies Meta<ComponentProps<typeof WorkflowStatus>>;
 
   const withCount = { count: 100 };
   const withNewCount = { ...withCount, newCount: 999 };
@@ -67,3 +71,5 @@
 <Story name="Big" args={{ big: true }} />
 
 <Story name="Big with Counts" args={{ big: true, ...withNewCount }} />
+
+<Story name="Delayed" args={{ delayed: true }} />

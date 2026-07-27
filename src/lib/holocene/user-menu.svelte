@@ -1,4 +1,5 @@
 <script lang="ts">
+  import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
   import {
     Menu,
     MenuButton,
@@ -7,26 +8,37 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import { authUser } from '$lib/stores/auth-user';
+  import ziggy from '$lib/vendor/ziggy-full-face.png';
 
   import Icon from './icon/icon.svelte';
+  import MenuDivider from './menu/menu-divider.svelte';
 
-  export let logout: () => void;
+  interface Props {
+    logout: () => void;
+  }
 
-  let showProfilePic = true;
+  let { logout }: Props = $props();
+
+  let showProfilePic = $state(true);
 
   function fixImage() {
     showProfilePic = false;
   }
 </script>
 
-{#if $authUser.accessToken}
-  <MenuContainer>
-    <MenuButton variant="ghost" hasIndicator controls="user-menu">
+<MenuContainer>
+  <MenuButton
+    variant="ghost"
+    hasIndicator
+    data-testid="user-menu-trigger"
+    controls="user-menu"
+  >
+    {#if $authUser.accessToken}
       <img
         src={$authUser?.picture}
         alt={$authUser?.profile ?? translate('common.user-profile')}
         class="h-[24px] w-[24px] cursor-pointer"
-        on:error={fixImage}
+        onerror={fixImage}
         class:hidden={!showProfilePic}
       />
       <div
@@ -39,20 +51,61 @@
           </div>
         {/if}
       </div>
-    </MenuButton>
-    <Menu id="user-menu" position="right">
+    {:else}
+      <img
+        src={ziggy}
+        alt={translate('common.user-profile')}
+        class="h-[24px] w-[24px]"
+      />
+    {/if}
+  </MenuButton>
+  <Menu id="user-menu" position="right" class="w-60">
+    {#if $authUser.accessToken}
       <MenuItem hoverable={false}>
         <div class="flex items-center justify-start gap-4">
           <Icon name="astronaut" />
           <p>{$authUser?.email}</p>
         </div>
       </MenuItem>
-      <MenuItem on:click={logout}>
+      <MenuItem onclick={logout}>
         <div class="flex items-center justify-start gap-4">
           <Icon name="logout" />
           {translate('common.log-out')}
         </div>
       </MenuItem>
-    </Menu>
-  </MenuContainer>
-{/if}
+      <MenuDivider />
+    {:else}
+      <MenuItem disabled>Anonymous Tardigrade</MenuItem>
+      <MenuDivider />
+    {/if}
+    <MenuItem hoverable={false}>
+      {translate('common.theme')}
+      <DarkModeMenu />
+    </MenuItem>
+    <MenuDivider />
+    <MenuItem
+      hoverable={false}
+      class="text-subtle"
+      newTab
+      href="https://t.mp/slack"
+    >
+      {translate('common.slack-community')}
+    </MenuItem>
+    <MenuItem
+      hoverable={false}
+      class="text-subtle"
+      newTab
+      href="https://community.temporal.io/"
+    >
+      {translate('common.community-forum')}
+    </MenuItem>
+    <MenuItem
+      hoverable={false}
+      class="text-subtle"
+      newTab
+      href="https://temporal.io/change-log"
+    >
+      {translate('common.change-log')}
+    </MenuItem>
+  </Menu>
+</MenuContainer>

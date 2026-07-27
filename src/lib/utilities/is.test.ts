@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  isEmptyObject,
   isExecutionStatus,
   isNull,
   isNullConditional,
@@ -352,5 +353,20 @@ describe('isNullConditional', () => {
 
   it('should return false for null', () => {
     expect(isNullConditional(null)).toBe(false);
+  });
+});
+
+describe('isEmptyObject', () => {
+  it('returns true for {} and Object.create(null)', () => {
+    expect(isEmptyObject({})).toBe(true);
+    expect(isEmptyObject(Object.create(null))).toBe(true);
+  });
+
+  it('returns false for strings, numbers, booleans, etc.', () => {
+    expect(isEmptyObject(1)).toBe(false);
+    expect(isEmptyObject('a')).toBe(false);
+    expect(isEmptyObject({ a: 1 })).toBe(false);
+    expect(isEmptyObject(null)).toBe(false);
+    expect(isEmptyObject([])).toBe(false);
   });
 });

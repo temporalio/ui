@@ -1,25 +1,31 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  import { page } from '$app/state';
+
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timeFormat } from '$lib/stores/time-format';
   import type { CallbackState } from '$lib/types';
-  import type { EventLink as Link } from '$lib/types/events';
+  import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { routeForNamespace } from '$lib/utilities/route-for';
+  import { toEventLinkViews } from '$lib/utilities/event-link';
 
   import EventLink from '../event/event-link.svelte';
 
-  export let callback: Callback;
-  export let link: Link | undefined = undefined;
+  let {
+    callback,
+    link,
+    children,
+  }: { callback: Callback; link?: Link; children?: Snippet } = $props();
 
-  $: completedTime = formatDate(callback.lastAttemptCompleteTime, $timeFormat);
-  $: nextTime = formatDate(callback.nextAttemptScheduleTime, $timeFormat);
-  $: failure = callback?.lastAttemptFailure?.message;
-  $: blockedReason = callback?.blockedReason;
-  $: callbackUrl = callback?.callback?.nexus?.url;
+  const completedTime = $derived($timestamp(callback.lastAttemptCompleteTime));
+  const nextTime = $derived($timestamp(callback.nextAttemptScheduleTime));
+  const failure = $derived(callback?.lastAttemptFailure?.message);
+  const blockedReason = $derived(callback?.blockedReason);
+  const callbackUrl = $derived(callback?.callback?.nexus?.url);
 
   const titles = {
     Standby: translate('nexus.callback.standby'),
@@ -30,21 +36,29 @@
   };
 
   const failedState = 'Failed' as unknown as CallbackState;
-  $: failed = callback.state === failedState;
-  $: title = titles[callback.state] || translate('nexus.nexus-callback');
+  const failed = $derived(callback.state === failedState);
+  const title = $derived(
+    titles[callback.state] || translate('nexus.nexus-callback'),
+  );
+  const links = $derived(callback?.callback?.links || []);
+  const showCallbackUrl = $derived(!links.length && !link && callbackUrl);
+  const namespace = $derived(page.params.namespace);
+  const callbackLinks = $derived(links.length ? links : link ? [link] : []);
+  const linkViews = $derived(toEventLinkViews(callbackLinks, { namespace }));
 </script>
+
+{#snippet callbackLink(view)}
+  <EventLink {view} />
+  {#if view.namespace}
+    <EventLink view={view.namespace} />
+  {/if}
+{/snippet}
 
 <Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>
   <div class="flex flex-col gap-2 pt-2">
-    {#if link}
-      <EventLink {link} />
-      <EventLink
-        {link}
-        label={translate('nexus.link-namespace')}
-        value={link.workflowEvent.namespace}
-        href={routeForNamespace({ namespace: link.workflowEvent.namespace })}
-      />
-    {/if}
+    {#each linkViews as view (view.key)}
+      {@render callbackLink(view)}
+    {/each}
     <div class="flex flex-col items-start gap-2 md:flex-row md:items-center">
       <p class="flex items-center gap-2">
         {translate('common.state')}<Badge type="subtle">{callback.state}</Badge>
@@ -68,7 +82,7 @@
         </p>
       {/if}
     </div>
-    {#if !link}
+    {#if showCallbackUrl}
       <p class="flex items-center gap-2">
         {translate('nexus.callback-url')}
         <Badge type="subtle">{callbackUrl}</Badge>
@@ -85,6 +99,7 @@
         <p>{translate('nexus.last-attempt-failure')}</p>
         <CodeBlock
           content={failure}
+          label={translate('workflows.callback-metadata')}
           language="text"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -92,5 +107,5 @@
       </div>
     {/if}
   </div>
-  <slot />
+  {@render children?.()}
 </Alert>

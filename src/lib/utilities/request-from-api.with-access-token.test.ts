@@ -12,7 +12,6 @@ type MockResponse<T = unknown> = {
 };
 
 const options = {
-  credentials: 'include',
   headers: {
     'Caller-Type': 'operator',
   },

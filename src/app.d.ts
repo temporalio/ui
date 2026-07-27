@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 /// <reference types="@sveltejs/kit" />
 
 declare namespace App {
@@ -11,7 +11,6 @@ declare namespace App {
   interface PageData {
     workflow?: import('$types').WorkflowExecution;
     settings?: import('$types').Settings;
-    workers?: import('$types').GetPollersResponse;
     cluster?: import('$types').ClusterInformation;
   }
 }

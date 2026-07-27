@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { searchAttributes } from '$lib/stores/search-attributes';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+import { formatDate } from '$lib/utilities/format-date';
 
 export function isStatusFilter({ attribute }: SearchAttributeFilter) {
   return attribute === 'ExecutionStatus';
@@ -87,13 +88,32 @@ export function getFocusedElementId(filter: SearchAttributeFilter) {
   return '';
 }
 
-export function formatListFilterValue(value: string): string[] {
+export function formatListFilterValue(value: string | null): string[] {
+  if (!value) return [];
   if (value.startsWith('(') && value.endsWith(')')) {
     return value
       .slice(1, -1)
       .split(',')
       .map((v) => v.trim().slice(1, -1));
   }
-  if (value) return [value];
-  return [];
+  return [value];
 }
+
+export const formatDateTimeRange = (
+  value: string,
+  format: string,
+  relative: boolean,
+) => {
+  const [conditon, start, operator, end] = value.split(' ');
+  return `${conditon.toLowerCase()} ${formatDate(
+    start.replace(/"/g, ''),
+    format,
+    {
+      relative,
+      format: 'short',
+    },
+  )} ${operator.toLowerCase()} ${formatDate(end.replace(/"/g, ''), format, {
+    relative,
+    format: 'short',
+  })}`;
+};

@@ -1,4 +1,7 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -7,11 +10,15 @@
   import type { WorkflowEvents } from '$lib/types/events';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  import PayloadDecoder from '../event/payload-decoder.svelte';
+  interface Props {
+    events?: WorkflowEvents;
+    decode?: Snippet;
+  }
 
-  export let events: WorkflowEvents = [];
+  let { events = [], decode }: Props = $props();
 
-  let index = 1;
+  let index = $state(1);
+  let rawEvent = $derived(fromEventToRawEvent(events[index - 1]));
 
   function handleKeydown(event: KeyboardEvent) {
     switch (event.code) {
@@ -52,7 +59,7 @@
       <button
         class="caret"
         disabled={index === 1}
-        on:click={() => {
+        onclick={() => {
           index -= 1;
         }}
         aria-label={translate('common.previous')}
@@ -62,12 +69,12 @@
           class:border-r-slate-900={index !== 1}
           class:border-r-slate-100={index === 1}
           class:dark:border-r-slate-800={index === 1}
-        />
+        ></span>
       </button>
       <button
         class="caret"
         disabled={index === events.length}
-        on:click={() => {
+        onclick={() => {
           index += 1;
         }}
         aria-label={translate('common.next')}
@@ -77,35 +84,24 @@
           class:border-l-slate-100={index === events.length}
           class:border-l-slate-900={index !== events.length}
           class:dark:border-l-slate-800={index === events.length}
-        />
+        ></span>
       </button>
     </div>
   </div>
-  <slot name="decode" />
+  {@render decode?.()}
 </div>
 <div class="min-h-screen py-4">
-  {#if $decodeEventHistory}
-    {#key [index, $decodeEventHistory]}
-      <PayloadDecoder
-        value={fromEventToRawEvent(events[index - 1])}
-        let:decodedValue
-      >
-        <CodeBlock
-          content={decodedValue}
-          testId="event-history-json"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      </PayloadDecoder>
-    {/key}
+  {#if $decodeEventHistory && events.length > 0}
+    <PayloadCodeBlock
+      value={rawEvent}
+      label={translate('common.json')}
+      testId="event-history-json"
+    />
   {:else}
     {#key index}
       <CodeBlock
-        content={stringifyWithBigInt(
-          fromEventToRawEvent(events[index - 1]),
-          undefined,
-          2,
-        )}
+        content={stringifyWithBigInt(rawEvent, undefined, 2)}
+        label={translate('common.json')}
         testId="event-history-json"
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}

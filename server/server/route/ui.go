@@ -76,7 +76,8 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 	if err != nil {
 		return nil, err
 	}
-	if publicPath != "" {
+	hasPublicPath := publicPath != ""
+	if hasPublicPath {
 		indexHTML := string(indexHTMLBytes)
 		indexHTML = strings.ReplaceAll(indexHTML, "base: \"\"", fmt.Sprintf("base: \"%s\"", publicPath))
 		indexHTML = strings.ReplaceAll(indexHTML, "\"/_app/", fmt.Sprintf("\"%s/_app/", publicPath))
@@ -86,8 +87,27 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 	}
 
 	return func(c echo.Context) (err error) {
-		return c.Stream(200, "text/html", bytes.NewBuffer(indexHTMLBytes))
+		reqPath, rawQuery := splitRequestURI(c.Request().RequestURI)
+		if hasPublicPath && !hasPathPrefix(reqPath, publicPath) {
+			target := publicPath + path.Clean(reqPath)
+			if rawQuery != "" {
+				target += "?" + rawQuery
+			}
+			return c.Redirect(http.StatusPermanentRedirect, target)
+		}
+		return c.Stream(http.StatusOK, "text/html", bytes.NewBuffer(indexHTMLBytes))
 	}, nil
+}
+
+func hasPathPrefix(p, prefix string) bool {
+	return p == prefix || strings.HasPrefix(p, prefix+"/")
+}
+
+func splitRequestURI(uri string) (reqPath, rawQuery string) {
+	if i := strings.Index(uri, "?"); i >= 0 {
+		return uri[:i], uri[i+1:]
+	}
+	return uri, ""
 }
 
 func buildUIAssetsHandler(assets fs.FS) echo.HandlerFunc {
@@ -161,6 +181,12 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 	e.GET(renderPath, func(c echo.Context) error {
 		content := c.QueryParam("content")
 		theme := c.QueryParam("theme")
+		overrideTheme := c.QueryParam("overrideTheme")
+
+		finalTheme := theme
+		if theme != "" && overrideTheme != "" {
+			finalTheme = fmt.Sprintf("%s-%s", theme, overrideTheme)
+		}
 
 		// Process markdown to HTML
 		renderedHTML := processMarkdown(content)
@@ -171,12 +197,12 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			Content template.HTML
 			Nonce   string
 			Theme   string
-			CSS     string
+			CSS     template.CSS
 		}{
 			Content: template.HTML(renderedHTML),
 			Nonce:   nonce,
-			Theme:   theme,
-			CSS: `*,
+			Theme:   finalTheme,
+			CSS: template.CSS(`*,
 		body {
 			margin: 0;
 			padding: 0;
@@ -265,10 +291,11 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			border-left-color: #92a4c3;
 			background: #e8efff;
 			color: #121416;
-			p {
-				font-size: 1.25rem;
-				line-height: 1.75rem;
-			}
+		}
+
+		blockquote p {
+			font-size: 1.25rem;
+			line-height: 1.75rem;
 		}
 
 		code {
@@ -288,26 +315,66 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			border-radius: 0.25rem;
 			background: #e8efff;
 			color: #121416;
-			code {
-				padding: 0;
-			}
+		}
+
+		pre code {
+			padding: 0;
 		}
 
 		body[data-theme='light'] {
 			background-color: #fff;
 			color: #121416;
-			a {
-				color: #444ce7;
-			}
+		}
+
+		body[data-theme='light'] a {
+			color: #444ce7;
 		}
 
 		body[data-theme='dark'] {
-  		background-color: #141414;
+			background-color: #141414;
 			color: #f8fafc;
-			a {
-				color: #8098f9;
-			}
-		}`,
+		}
+
+		body[data-theme='dark'] a {
+			color: #8098f9;
+		}
+
+		body[data-theme='light-background'] {
+			background-color: #f8fafc;
+			color: #121416;
+		}
+
+		body[data-theme='light-background'] a {
+			color: #444ce7;
+		}
+
+		body[data-theme='dark-background'] {
+			background-color: #141414;
+			color: #f8fafc;
+		}
+
+		body[data-theme='dark-background'] a {
+			color: #8098f9;
+		}
+
+		body[data-theme='light-primary'] {
+			background-color: #fff;
+			color: #121416;
+		}
+
+		body[data-theme='light-primary'] a {
+			color: #444ce7;
+		}
+
+		body[data-theme='dark-primary'] {
+			background-color: #000;
+			color: #f8fafc;
+		}
+
+		body[data-theme='dark-primary'] a {
+			color: #8098f9;
+		}
+	`),
 		}
 
 		// Set headers

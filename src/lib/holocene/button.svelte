@@ -18,20 +18,22 @@
       'focus-visible:ring-2',
       'whitespace-nowrap',
       'no-underline',
+      'active:scale-[0.98]',
+      'transition-all duration-200',
     ],
     {
       variants: {
         variant: {
           primary:
-            'surface-interactive border-transparent text-white focus-visible:ring-primary/70',
+            'surface-interactive border-transparent text-white focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:bg-subtle data-[active=true]:text-primary',
           secondary:
-            'surface-primary border-subtle focus-visible:ring-primary/70 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary',
+            'surface-primary border-subtle focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary data-[active=true]:bg-subtle',
           destructive:
-            'surface-interactive-danger border-transparent focus-visible:ring-danger/70',
+            'surface-interactive-danger border-transparent focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:surface-interactive-danger',
           ghost:
-            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary/70',
+            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:bg-subtle',
           'table-header':
-            'bg-transparent border-transparent text-off-white focus-visible:ring-primary/70 focus-visible:border-transparent',
+            'bg-transparent border-transparent focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary focus-visible:border-transparent',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -48,6 +50,7 @@
   );
 
   type BaseProps = {
+    active?: boolean;
     disabled?: boolean;
     loading?: boolean;
     leadingIcon?: IconName;
@@ -55,17 +58,27 @@
     count?: number;
     id?: string;
     'data-testid'?: string;
+    class?: string;
+    disableTracking?: boolean;
+  };
+
+  // Prevent Svelte 5 event handler props - use on:click instead
+  type ForbiddenEventProps = {
+    onclick?: never;
+    onkeydown?: never;
   };
 
   export type ButtonStyles = VariantProps<typeof buttonStyles>;
 
   export type ButtonWithoutHrefProps = BaseProps &
     ButtonStyles &
-    HTMLButtonAttributes;
+    Omit<HTMLButtonAttributes, 'onclick' | 'onkeydown'> &
+    ForbiddenEventProps;
 
   export type ButtonWithHrefProps = BaseProps &
     ButtonStyles &
-    HTMLAnchorAttributes & {
+    Omit<HTMLAnchorAttributes, 'onclick'> &
+    ForbiddenEventProps & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
       disabled?: boolean;
@@ -93,12 +106,20 @@
   export let size: ButtonStyles['size'] = 'md';
   export let disabled = false;
   export let loading = false;
+  export let active = false;
   export let leadingIcon: IconName = null;
   export let trailingIcon: IconName = null;
   export let count = 0;
   export let id: string = null;
   export let href: string = null;
   export let target: string = null;
+  export let disableTracking = false;
+
+  let element: HTMLElement;
+
+  export function focus() {
+    element?.focus();
+  }
 
   let className = '';
   export { className as class };
@@ -109,16 +130,29 @@
     e.preventDefault();
     goto(href);
   };
+
+  let dataTrackObj = {};
+  if (!disableTracking) {
+    dataTrackObj = {
+      'data-track-name': 'button',
+      'data-track-intent': variant,
+      'data-track-text': '*textContent*',
+    };
+  }
 </script>
 
 {#if href && !disabled}
   <a
+    bind:this={element}
     {href}
     {id}
     role="button"
     type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
+    data-variant={variant}
+    data-active={active}
+    {...dataTrackObj}
     class={merge(
       buttonStyles({
         variant,
@@ -130,15 +164,18 @@
     tabindex={href ? null : 0}
     {...$$restProps}
   >
-    {#if leadingIcon || loading}
+    {#if leadingIcon || (loading && !trailingIcon)}
       <span class:animate-spin={loading}>
         <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
     <slot />
     {#if trailingIcon}
-      <span>
-        <Icon name={trailingIcon} />
+      <span
+        class:animate-spin={loading && !leadingIcon}
+        class:invisible={loading && leadingIcon}
+      >
+        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
@@ -150,11 +187,15 @@
   </a>
 {:else}
   <button
+    bind:this={element}
     {disabled}
     {id}
     type="button"
     on:click|stopPropagation
     on:keydown|stopPropagation
+    data-variant={variant}
+    data-active={active}
+    {...dataTrackObj}
     class={merge(
       buttonStyles({
         variant,
@@ -164,15 +205,19 @@
     )}
     {...$$restProps}
   >
-    {#if leadingIcon || loading}
+    {#if leadingIcon || (loading && !trailingIcon)}
       <span class:animate-spin={loading}>
         <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
     <slot />
+
     {#if trailingIcon}
-      <span>
-        <Icon name={trailingIcon} />
+      <span
+        class:animate-spin={loading && !leadingIcon}
+        class:invisible={loading && leadingIcon}
+      >
+        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}

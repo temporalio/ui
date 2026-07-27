@@ -1,8 +1,9 @@
 <script lang="ts">
   import Svg from '../svg.svelte';
+  let props = $props();
 </script>
 
-<Svg {...$$props}>
+<Svg {...props}>
   <circle stroke="currentColor" stroke-width="1.5" cx="12" cy="12" r="9" />
   <circle stroke="currentColor" stroke-width="1.5" cx="12" cy="12" r="5" />
   <line

@@ -27,25 +27,39 @@ test.describe('Schedules Page', () => {
     await createScheduleButton.click();
     await expect(page).toHaveURL(/create/);
 
-    await page.getByTestId('name').fill('e2e-schedule-1');
-    await page.getByTestId('workflowType').fill('test-type-e2e');
-    await page.getByTestId('workflowId').fill('e2e-1234');
-    await page.getByTestId('taskQueue').fill('default');
+    await page.getByTestId('schedule-name-input').fill('e2e-schedule-1');
+    await page.getByTestId('schedule-type-input').fill('test-type-e2e');
+    await page.getByTestId('schedule-workflow-id-input').fill('e2e-1234');
+    await page.getByTestId('schedule-task-queue-input').fill('default');
     await page
       .locator('#schedule-payload-input')
       .getByRole('textbox')
-      .fill('abc');
-    await page.getByRole('textbox', { name: 'hrs' }).fill('1');
+      .fill('"abc"');
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
+    await page.getByLabel('Time Interval').fill('90');
     const createSchedule = page.getByRole('button', {
       name: 'Create Schedule',
     });
-    await expect(createSchedule).toBeDisabled();
-
-    await page.locator('#schedule-payload-input').getByRole('textbox').clear();
-    await page
-      .locator('#schedule-payload-input')
-      .getByRole('textbox')
-      .fill('123');
     await expect(createSchedule).toBeEnabled();
+    await createSchedule.click();
+
+    await expect(page).toHaveURL(/schedules$/);
+    const scheduleLink = page.getByRole('link', { name: /e2e-schedule-1/ });
+    await expect(scheduleLink).toBeVisible();
+    await scheduleLink.click();
+
+    await expect(page.getByTestId('schedule-name')).toContainText(
+      'e2e-schedule-1',
+    );
+    await expect(page.getByText('Every 90 minute(s)').first()).toBeVisible();
+
+    await page.getByLabel('Schedule Actions').click();
+    await page.getByTestId('delete-schedule').click();
+    await page
+      .locator('#delete-schedule-modal')
+      .getByTestId('confirm-modal-button')
+      .click();
+    await expect(page).toHaveURL(/schedules$/);
   });
 });

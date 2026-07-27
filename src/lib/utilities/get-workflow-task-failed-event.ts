@@ -1,19 +1,28 @@
 import type { EventSortOrder } from '$lib/stores/event-view';
 import type { WorkflowTaskFailedEventAttributes } from '$lib/types';
 import type {
+  HistoryEvent,
   WorkflowEvent,
   WorkflowEvents,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
+  WorkflowTaskTimedOutEvent,
 } from '$lib/types/events';
 import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
 
+import { isPureWorkflowTaskFailedEvent } from './is-event-type';
 import { toWorkflowTaskFailureReadable } from './screaming-enums';
 
-const isFailedTaskEvent = (
+export const isFailedTaskEvent = (
   event: WorkflowEvent,
 ): event is WorkflowTaskFailedEvent => {
   return event.eventType === 'WorkflowTaskFailed';
+};
+
+export const isTimedOutTaskEvent = (
+  event: WorkflowEvent,
+): event is WorkflowTaskTimedOutEvent => {
+  return event.eventType === 'WorkflowTaskTimedOut';
 };
 
 const isCompletedTaskEvent = (
@@ -22,14 +31,21 @@ const isCompletedTaskEvent = (
   return event.eventType === 'WorkflowTaskCompleted';
 };
 
+export const isWorkflowTaskFailedEventDueToReset = (
+  event: WorkflowEvent | HistoryEvent,
+): boolean =>
+  isPureWorkflowTaskFailedEvent(event) &&
+  getErrorCause(event) === 'ResetWorkflow';
+
 export const getErrorCause = (
-  error: WorkflowTaskFailedEvent,
+  error: WorkflowTaskFailedEvent | WorkflowTaskTimedOutEvent,
 ): WorkflowTaskFailedCause => {
-  const {
-    workflowTaskFailedEventAttributes: { failure, cause },
-  } = error as WorkflowTaskFailedEvent & {
-    workflowTaskFailedEventAttributes: WorkflowTaskFailedEventAttributes;
-  };
+  if (isTimedOutTaskEvent(error)) return 'WorkflowTaskTimedOut';
+
+  const { workflowTaskFailedEventAttributes: { failure, cause } = {} } =
+    error as WorkflowTaskFailedEvent & {
+      workflowTaskFailedEventAttributes: WorkflowTaskFailedEventAttributes;
+    };
 
   if (failure?.applicationFailureInfo?.type === 'workflowTaskHeartbeatError') {
     return 'WorkflowTaskHeartbeatError';
@@ -40,18 +56,22 @@ export const getErrorCause = (
 
 const getFailedWorkflowTask = (
   fullEventHistory: WorkflowEvents,
-): WorkflowTaskFailedEvent | undefined => {
+): WorkflowTaskFailedEvent | WorkflowTaskTimedOutEvent | undefined => {
   const failedWorkflowTaskIndex = fullEventHistory.findIndex(isFailedTaskEvent);
+  const timedOutWorkflowTaskIndex =
+    fullEventHistory.findIndex(isTimedOutTaskEvent);
+  const failedWorkflowIndex =
+    failedWorkflowTaskIndex < 0
+      ? timedOutWorkflowTaskIndex
+      : failedWorkflowTaskIndex;
 
-  if (failedWorkflowTaskIndex < 0) return;
+  if (failedWorkflowIndex < 0) return;
 
   const completedWorkflowTaskIndex =
     fullEventHistory.findIndex(isCompletedTaskEvent);
-
-  const failedWorkflowTask = fullEventHistory.find((event) =>
-    isFailedTaskEvent(event),
-  ) as WorkflowTaskFailedEvent;
-
+  const failedWorkflowTask = fullEventHistory[failedWorkflowIndex] as
+    | WorkflowTaskFailedEvent
+    | WorkflowTaskTimedOutEvent;
   const cause = getErrorCause(failedWorkflowTask);
 
   if (cause === 'ResetWorkflow') return;
@@ -59,7 +79,7 @@ const getFailedWorkflowTask = (
   if (completedWorkflowTaskIndex < 0) return failedWorkflowTask;
 
   // History is sorted in descending order, so index of failed task should be less than index of completed task
-  if (failedWorkflowTaskIndex < completedWorkflowTaskIndex) {
+  if (failedWorkflowIndex < completedWorkflowTaskIndex) {
     return failedWorkflowTask;
   }
 };
@@ -67,7 +87,7 @@ const getFailedWorkflowTask = (
 export const getWorkflowTaskFailedEvent = (
   fullEventHistory: WorkflowEvents,
   sortOrder: EventSortOrder,
-): WorkflowTaskFailedEvent | undefined => {
+): WorkflowTaskFailedEvent | WorkflowTaskTimedOutEvent | undefined => {
   if (sortOrder === 'descending') {
     return getFailedWorkflowTask(fullEventHistory);
   } else {

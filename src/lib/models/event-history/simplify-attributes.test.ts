@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import type { VersioningBehavior } from '$lib/types';
 import type { EventAttributesWithType } from '$lib/types/events';
 
 import {
@@ -126,5 +127,65 @@ describe('canBeSimplified', () => {
   it('should return false if given a boolean', () => {
     expect(canBeSimplified(true)).toBe(false);
     expect(canBeSimplified(false)).toBe(false);
+  });
+});
+
+describe('delete workerVersion if deploymentVersion exists', () => {
+  it('should return only deploymentVersion if both exist', () => {
+    const attributes = {
+      type: 'workflowTaskCompletedEventAttributes',
+      workerVersion: {
+        buildId: 'v46',
+        useVersioning: true,
+      },
+      deploymentVersion: {
+        deploymentName: 'deployment-v1',
+        buildId: 'build-123',
+      },
+    } as EventAttributesWithType<'workflowTaskCompletedEventAttributes'>;
+    expect(simplifyAttributes(attributes)).toStrictEqual({
+      type: 'workflowTaskCompletedEventAttributes',
+      deploymentVersion: {
+        deploymentName: 'deployment-v1',
+        buildId: 'build-123',
+      },
+    });
+  });
+
+  it('should return workerVersion if deploymentVersion does not exist', () => {
+    const attributes = {
+      type: 'workflowTaskCompletedEventAttributes',
+      workerVersion: {
+        buildId: 'v46',
+        useVersioning: true,
+      },
+    } as EventAttributesWithType<'workflowTaskCompletedEventAttributes'>;
+    expect(simplifyAttributes(attributes)).toStrictEqual(attributes);
+  });
+});
+
+describe('fromScreamingEnum versioning behavior', () => {
+  it('should return readable autoupgrade behavior from screaming enum', () => {
+    const attributes = {
+      type: 'workflowTaskCompletedEventAttributes',
+      versioningBehavior:
+        'VERSIONING_BEHAVIOR_AUTO_UPGRADE' as unknown as VersioningBehavior,
+    } as EventAttributesWithType<'workflowTaskCompletedEventAttributes'>;
+    expect(simplifyAttributes(attributes)).toStrictEqual({
+      type: 'workflowTaskCompletedEventAttributes',
+      versioningBehavior: 'AutoUpgrade',
+    });
+  });
+
+  it('should return readable pinned behavior from screaming enum', () => {
+    const attributes = {
+      type: 'workflowTaskCompletedEventAttributes',
+      versioningBehavior:
+        'VERSIONING_BEHAVIOR_PINNED' as unknown as VersioningBehavior,
+    } as EventAttributesWithType<'workflowTaskCompletedEventAttributes'>;
+    expect(simplifyAttributes(attributes)).toStrictEqual({
+      type: 'workflowTaskCompletedEventAttributes',
+      versioningBehavior: 'Pinned',
+    });
   });
 });

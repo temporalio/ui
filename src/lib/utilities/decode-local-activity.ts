@@ -1,0 +1,76 @@
+import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { Payload } from '$lib/types';
+import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
+
+import {
+  decodeEventAttributes,
+  parsePayloadAttributes,
+} from './decode-payload';
+import {
+  formatSummaryValue,
+  getActivityType,
+  type SummaryAttribute,
+} from './get-single-attribute-for-event';
+import { isLocalActivityMarkerEvent } from './is-event-type';
+
+export type DecodedLocalActivity = {
+  details?: {
+    data?: {
+      payloads?: Payload[];
+    };
+    type?: {
+      payloads?: Payload[];
+    };
+  };
+};
+
+export type LocalActivityDecodeOptions = {
+  namespace: string;
+};
+
+export const decodeLocalActivity = async (
+  event: IterableEvent,
+): Promise<SummaryAttribute | undefined> => {
+  if (!('eventType' in event) || !isLocalActivityMarkerEvent(event)) {
+    return undefined;
+  }
+
+  try {
+    const convertedAttributes = await decodeEventAttributes(event.attributes);
+
+    const payloads =
+      event.markerRecordedEventAttributes?.details?.data?.payloads ||
+      event.markerRecordedEventAttributes?.details?.type?.payloads ||
+      [];
+
+    if (!payloads?.length) return undefined;
+
+    const decodedAttributes = parsePayloadAttributes(
+      convertedAttributes,
+    ) as DecodedLocalActivity;
+
+    const payload = (decodedAttributes?.details?.data?.payloads ||
+      decodedAttributes?.details?.type?.payloads)?.[0];
+    const activityType = getActivityType(payload);
+
+    if (activityType) {
+      return formatSummaryValue('ActivityType', activityType);
+    }
+  } catch (err) {
+    console.error('Failed to decode local activity type:', err);
+  }
+
+  return undefined;
+};
+
+export const getLocalActivityMarkerEvent = (
+  eventOrGroup: WorkflowEvent | EventGroup,
+): WorkflowEvent | undefined => {
+  if ('eventList' in eventOrGroup) {
+    return eventOrGroup.eventList.find(isLocalActivityMarkerEvent);
+  } else if (isLocalActivityMarkerEvent(eventOrGroup)) {
+    return eventOrGroup;
+  }
+
+  return undefined;
+};

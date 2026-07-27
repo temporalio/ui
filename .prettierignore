@@ -13,3 +13,4 @@ playwright-report
 dist/**/*
 tests/**/storageState.json
 *.har
+CODEOWNERS
