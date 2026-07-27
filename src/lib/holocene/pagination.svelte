@@ -1,9 +1,10 @@
-<script lang="ts">
+<script lang="ts" generics="T">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
@@ -18,10 +19,16 @@
   import { getFloatStyle } from '$lib/utilities/get-float-style';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  type T = $$Generic;
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  type PaginationScope = {
+    visibleItems: T[];
+    initialItem: T;
+    activeRowIndex: number | undefined;
+    setActiveRowIndex: (index: number) => void;
+  };
+
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
     items: T[];
-    floatId?: string | undefined;
+    floatId?: string;
     startingIndex?: string | number;
     currentPageKey?: string;
     itemsPerPage?: number | null;
@@ -29,50 +36,73 @@
     pageSizeSelectLabel: string;
     previousButtonLabel: string;
     nextButtonLabel: string;
+    actionTopLeft?: Snippet;
+    actionTopCenter?: Snippet;
+    actionTopRight?: Snippet;
+    actionBottomLeft?: Snippet;
+    actionBottomRight?: Snippet;
+    paginationTop?: Snippet;
+    children?: Snippet<[PaginationScope]>;
   }
 
-  export let items: T[];
-  export let floatId: string | undefined = undefined;
-  export let startingIndex: string | number = 0;
-  export let currentPageKey = 'page';
-  export let itemsPerPage: number | null = null;
-  export let updating = false;
-  export let pageSizeSelectLabel: string;
-  export let previousButtonLabel: string;
-  export let nextButtonLabel: string;
+  let {
+    items,
+    floatId,
+    startingIndex = 0,
+    currentPageKey = 'page',
+    itemsPerPage = null,
+    updating = false,
+    pageSizeSelectLabel,
+    previousButtonLabel,
+    nextButtonLabel,
+    actionTopLeft,
+    actionTopCenter,
+    actionTopRight,
+    actionBottomLeft,
+    actionBottomRight,
+    paginationTop,
+    children,
+    ...rest
+  }: Props = $props();
 
-  $: perPage =
+  const perPage = $derived(
     itemsPerPage !== null
       ? String(itemsPerPage)
       : String(
           perPageFromSearchParameter(
-            $page.url.searchParams.get(perPageKey) ?? undefined,
+            page.url.searchParams.get(perPageKey) ?? undefined,
           ),
-        ).toString();
+        ).toString(),
+  );
 
-  $: {
+  $effect(() => {
     if (parseInt(perPage, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
       updateQueryParameters({
         parameter: perPageKey,
         value: MAX_PAGE_SIZE,
-        url: $page.url,
+        url: page.url,
       });
     } else if (!options.includes(perPage)) {
       updateQueryParameters({
         parameter: perPageKey,
         value: defaultItemsPerPage,
-        url: $page.url,
+        url: page.url,
       });
     }
-  }
-  $: store = pagination(items, perPage, startingIndex);
-  $: currentPage =
-    $page.url.searchParams.get(currentPageKey) ?? $store.currentPage;
-  $: store.jumpToPage(currentPage);
+  });
 
-  let screenWidth: number;
-  let width: number | undefined;
-  let height: number | undefined;
+  const store = $derived(pagination(items, perPage, startingIndex));
+  const currentPage = $derived(
+    page.url.searchParams.get(currentPageKey) ?? $store.currentPage,
+  );
+
+  $effect(() => {
+    store.jumpToPage(currentPage);
+  });
+
+  let screenWidth = $state<number>(0);
+  let width = $state<number>();
+  let height = $state<number>(0);
 
   onMount(() => {
     updateWidth();
@@ -86,7 +116,7 @@
     updateQueryParameters({
       parameter: currentPageKey,
       value: $store.currentPage,
-      url: $page.url,
+      url: page.url,
     });
   };
 
@@ -96,7 +126,7 @@
     }
   };
 
-  $: floatStyle = getFloatStyle({ width, height, screenWidth });
+  const floatStyle = $derived(getFloatStyle({ width, height, screenWidth }));
 
   async function handleKeydown(event: KeyboardEvent) {
     switch (event.code) {
@@ -130,8 +160,8 @@
 
 <svelte:window
   bind:innerWidth={screenWidth}
-  on:resize={updateWidth}
-  on:keydown={handleKeydown}
+  onresize={updateWidth}
+  onkeydown={handleKeydown}
 />
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
@@ -139,15 +169,15 @@
     class="flex flex-col items-center justify-between gap-2 md:flex-row md:items-start"
   >
     <div class="w-full">
-      <slot name="action-top-left" />
+      {@render actionTopLeft?.()}
     </div>
     <nav
       style={floatStyle}
       bind:clientHeight={height}
       class="flex min-w-fit flex-col items-end gap-4 md:flex-row"
-      aria-label="{$$restProps['aria-label']} 1"
+      aria-label="{rest['aria-label']} 1"
     >
-      <slot name="action-top-center" />
+      {@render actionTopCenter?.()}
       <div class="flex gap-4">
         {#if !itemsPerPage}
           <FilterSelect
@@ -158,12 +188,14 @@
             position="top"
           />
         {/if}
-        <slot name="pagination-top">
+        {#if paginationTop}
+          {@render paginationTop()}
+        {:else}
           <div class="flex items-center justify-center gap-3">
             <button
               class="caret"
               disabled={!$store.hasPrevious}
-              on:click={() => {
+              onclick={() => {
                 store.previous();
                 handlePageChange();
               }}
@@ -183,7 +215,7 @@
             <button
               class="caret"
               disabled={!$store.hasNext}
-              on:click={() => {
+              onclick={() => {
                 store.next();
                 handlePageChange();
               }}
@@ -192,24 +224,22 @@
               <span class="arrow arrow-right"></span>
             </button>
           </div>
-        </slot>
+        {/if}
       </div>
-      <slot name="action-top-right" />
+      {@render actionTopRight?.()}
     </nav>
   </div>
-  <slot
-    visibleItems={$store.items}
-    initialItem={$store.initialItem}
-    activeRowIndex={$store.activeRowIndex}
-    setActiveRowIndex={store.setActiveRowIndex}
-  />
+  {@render children?.({
+    visibleItems: $store.items,
+    initialItem: $store.initialItem,
+    activeRowIndex: $store.activeRowIndex,
+    setActiveRowIndex: store.setActiveRowIndex,
+  })}
   <nav
-    class={`flex ${
-      $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
-    }`}
-    aria-label="{$$restProps['aria-label']} 2"
+    class={`flex ${actionBottomLeft ? 'justify-between' : 'justify-end'}`}
+    aria-label="{rest['aria-label']} 2"
   >
-    <slot name="action-bottom-left" />
+    {@render actionBottomLeft?.()}
     <div class="flex gap-4">
       {#if !itemsPerPage}
         <FilterSelect
@@ -224,7 +254,7 @@
         <button
           class="caret"
           disabled={!$store.hasPrevious}
-          on:click={() => {
+          onclick={() => {
             store.previous();
             handlePageChange();
           }}
@@ -243,7 +273,7 @@
         <button
           class="caret"
           disabled={!$store.hasNext}
-          on:click={() => {
+          onclick={() => {
             store.next();
             handlePageChange();
           }}
@@ -252,7 +282,7 @@
           <span class="arrow arrow-right"></span>
         </button>
       </div>
-      <slot name="action-bottom-right" />
+      {@render actionBottomRight?.()}
     </div>
   </nav>
 </div>
