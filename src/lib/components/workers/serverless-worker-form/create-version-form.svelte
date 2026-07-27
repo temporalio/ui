@@ -29,6 +29,8 @@
     computeProviders?: readonly ComputeProviderOption[];
     initialProvider?: ComputeProviderOption['value'];
     gcpRegions?: string[];
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
   }
 
   let {
@@ -39,6 +41,8 @@
     computeProviders,
     initialProvider,
     gcpRegions,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
   }: Props = $props();
 
   const superform = superForm(
@@ -136,6 +140,8 @@
           bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
           bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+          {terraformTemplate}
+          {cloudRunTerraformTemplate}
           errors={$errors}
         />
       </ComputeProviderPicker>

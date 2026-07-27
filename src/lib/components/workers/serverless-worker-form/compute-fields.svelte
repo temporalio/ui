@@ -9,9 +9,12 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { interpolateCloudRunTerraformTemplate } from './cloud-run-terraform';
+  import {
+    hasCloudRunImpersonatorPlaceholder,
+    interpolateCloudRunTerraformTemplate,
+  } from './cloud-run-terraform';
   import { GCP_REGIONS } from './gcp-regions';
-  import cloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
+  import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
   import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
   import { interpolateTerraformTemplate } from './shared';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
@@ -37,6 +40,7 @@
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
     errors?: {
       lambdaArn?: string[];
       iamRoleArn?: string[];
@@ -77,6 +81,7 @@
     cfnTemplateUrl,
     cfnTemplate: cfnTemplateProp,
     terraformTemplate,
+    cloudRunTerraformTemplate,
     errors = {},
   }: Props = $props();
 
@@ -91,7 +96,13 @@
     ),
   );
   const resolvedCloudRunTerraformTemplate = $derived(
-    interpolateCloudRunTerraformTemplate(cloudRunTerraformTemplate, gcpProject),
+    interpolateCloudRunTerraformTemplate(
+      cloudRunTerraformTemplate ?? defaultCloudRunTerraformTemplate,
+      gcpProject,
+    ),
+  );
+  const showCloudRunImpersonatorWarning = $derived(
+    hasCloudRunImpersonatorPlaceholder(resolvedCloudRunTerraformTemplate),
   );
 
   const launchStackHref = $derived.by(() => {
@@ -335,14 +346,17 @@
               >{translate('workers.cloud-run-terraform-module-link')}</Link
             >{translate('workers.cloud-run-terraform-description-after')}
           </p>
-          <p class="text-sm text-warning">
-            {translate('workers.cloud-run-impersonator-warning')}
-          </p>
+          {#if showCloudRunImpersonatorWarning}
+            <p class="text-sm text-warning">
+              {translate('workers.cloud-run-impersonator-warning')}
+            </p>
+          {/if}
           <CodeBlock
             content={resolvedCloudRunTerraformTemplate}
             language="text"
             maxHeight={300}
             copyable
+            label={translate('workers.cloud-run-terraform-module-link')}
             copyIconTitle={translate('workers.copy-snippet')}
             copySuccessIconTitle={translate('workers.copied')}
           />

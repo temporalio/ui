@@ -338,9 +338,9 @@ export const Strings = {
   'cloud-run-terraform-description-before': 'Use our Terraform ',
   'cloud-run-terraform-module-link': 'Google Cloud Run Module',
   'cloud-run-terraform-description-after':
-    ' to create the service account Temporal Cloud impersonates to manage your Worker Pool.',
+    ' to create the invoker service account for your Worker Pool.',
   'cloud-run-impersonator-warning':
-    'Before applying, replace the impersonator service account placeholder with the service account email provided by Temporal Cloud.',
+    'Before applying, replace the impersonator service account placeholder with the email of the service account permitted to impersonate the invoker.',
   'cloud-run-invoker-handoff':
     "After applying, copy the module's invoker_email output into the Service Account field above.",
   'hide-defaults': 'Hide Defaults',

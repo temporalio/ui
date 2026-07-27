@@ -33,6 +33,7 @@
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
@@ -44,6 +45,7 @@
     cfnTemplateUrl,
     cfnTemplate,
     terraformTemplate,
+    cloudRunTerraformTemplate,
     computeProviders,
     gcpRegions,
   }: Props = $props();
@@ -170,6 +172,7 @@
         {cfnTemplateUrl}
         {cfnTemplate}
         {terraformTemplate}
+        {cloudRunTerraformTemplate}
         errors={$errors}
       />
     </Card>

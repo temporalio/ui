@@ -5,10 +5,10 @@ module "serverless-worker-cloud-run" {
   project_id         = "__TEMPORAL_GCP_PROJECT_ID__"
   invoker_account_id = "temporal-worker-pool-invoker"
 
-  # REPLACE BEFORE APPLY with the service account email provided by Temporal Cloud.
+  # REPLACE BEFORE APPLY with the email of the service account permitted to impersonate the invoker.
   impersonator_service_account_emails = [
-    "<REPLACE-WITH-TEMPORAL-CLOUD-SERVICE-ACCOUNT-EMAIL>",
+    "<REPLACE-WITH-IMPERSONATOR-SERVICE-ACCOUNT-EMAIL>",
   ]
 }
 
-# Once applied, provide the invoker_email output value to Temporal Cloud.
+# Once applied, use the invoker_email output value as the Service Account for the Worker deployment.

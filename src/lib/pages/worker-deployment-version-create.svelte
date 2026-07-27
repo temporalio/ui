@@ -22,6 +22,8 @@
     onSuccess: () => void;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
   }
 
   let {
@@ -30,6 +32,8 @@
     onSuccess,
     computeProviders,
     gcpRegions,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
   }: Props = $props();
 
   let error = $state<string | undefined>();
@@ -96,6 +100,8 @@
       computeProviders={lockedProvider?.providers ?? computeProviders}
       initialProvider={lockedProvider?.provider}
       {gcpRegions}
+      {terraformTemplate}
+      {cloudRunTerraformTemplate}
       cancelHref={backHref}
       onSubmit={async (data) => {
         error = undefined;
