@@ -9,14 +9,12 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import { interpolateCloudRunTerraformTemplate } from './cloud-run-terraform';
   import { GCP_REGIONS } from './gcp-regions';
   import cloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
   import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
   import { interpolateTerraformTemplate } from './shared';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
-
-  const CLOUD_RUN_PROJECT_TOKEN = '"__TEMPORAL_GCP_PROJECT_ID__"';
-  const CLOUD_RUN_PROJECT_PLACEHOLDER = '<YOUR-GCP-PROJECT-ID>';
 
   interface Props {
     provider?: string;
@@ -93,10 +91,7 @@
     ),
   );
   const resolvedCloudRunTerraformTemplate = $derived(
-    cloudRunTerraformTemplate.replace(
-      CLOUD_RUN_PROJECT_TOKEN,
-      JSON.stringify(gcpProject || CLOUD_RUN_PROJECT_PLACEHOLDER),
-    ),
+    interpolateCloudRunTerraformTemplate(cloudRunTerraformTemplate, gcpProject),
   );
 
   const launchStackHref = $derived.by(() => {
