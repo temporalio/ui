@@ -248,6 +248,29 @@ export const validateWorkerDeploymentVersionComputeConfig = async (
   }).then((response) => response ?? { valid: false });
 };
 
+/**
+ * The validation API has two modes: a submitted scaling-group change is a
+ * candidate-config dry run, while an empty body validates the persisted/current
+ * config and lets the backend persist its connection status asynchronously.
+ */
+export const validateCurrentWorkerDeploymentVersionComputeConfig = async (
+  parameters: DeploymentVersionParameters,
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-version-validate-compute-config',
+    parameters,
+  );
+  await requestFromAPI<void>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({}),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
 export const setCurrentDeploymentVersion = async (
   request: DeploymentVersionParameters,
   onError?: ErrorCallback,

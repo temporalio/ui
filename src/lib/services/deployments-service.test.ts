@@ -17,6 +17,7 @@ import {
   fetchPaginatedDeployments,
   setCurrentDeploymentVersion,
   updateWorkerDeploymentVersionComputeConfig,
+  validateCurrentWorkerDeploymentVersionComputeConfig,
   validateWorkerDeploymentVersionComputeConfig,
 } from './deployments-service';
 import { getApiOrigin } from '../utilities/get-api-origin';
@@ -377,6 +378,30 @@ describe('deployments service', () => {
                 default: { scalingGroup, updateMask: 'provider,scaler' },
               },
             }),
+          }),
+          notifyOnError: false,
+        }),
+      );
+    });
+  });
+
+  describe('validateCurrentWorkerDeploymentVersionComputeConfig', () => {
+    test('calls requestFromAPI with an empty POST body to validate the persisted config', async () => {
+      vi.mocked(requestFromAPI).mockResolvedValueOnce({} as never);
+
+      await validateCurrentWorkerDeploymentVersionComputeConfig({
+        namespace,
+        deploymentName,
+        buildId,
+      });
+
+      expect(requestFromAPI).toHaveBeenCalledOnce();
+      expect(requestFromAPI).toHaveBeenCalledWith(
+        `${origin}${base}/api/v1/namespaces/${encodedNamespace}/worker-deployment-versions/${encodedDeploymentName}/${encodedBuildId}/validate-compute-config`,
+        expect.objectContaining({
+          options: expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify({}),
           }),
           notifyOnError: false,
         }),

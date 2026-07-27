@@ -8,12 +8,11 @@
   import { translate } from '$lib/i18n/translate';
   import {
     deleteWorkerDeploymentVersion,
-    fetchDeploymentVersion,
     removeRampingDeploymentVersion,
     setCurrentDeploymentVersion,
     setRampingDeploymentVersion,
     unsetCurrentDeploymentVersion,
-    validateWorkerDeploymentVersionComputeConfig,
+    validateCurrentWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { toaster } from '$lib/stores/toaster';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
@@ -50,7 +49,9 @@
     namespace: string;
     deploymentName: string;
     conflictToken?: string;
+    showConnectionStatus?: boolean;
     onChange?: () => void;
+    onValidationComplete?: () => void;
   }
   let {
     routingConfig,
@@ -58,7 +59,9 @@
     namespace,
     deploymentName,
     conflictToken,
+    showConnectionStatus = false,
     onChange,
+    onValidationComplete,
   }: Props = $props();
 
   const currentDeploymentName = $derived(
@@ -181,54 +184,34 @@
   let setRampingLoading = $state(false);
   let rampingPercentage = $state(0);
 
-  const newVersionGracePeriodMs = 2 * 60 * 1000;
-
   async function handleValidateConnection() {
+    if (validateLoading) return;
+
     validateResult = null;
     validateLoading = true;
     showValidateModal = true;
-    const versionDetails = await fetchDeploymentVersion({
-      namespace,
-      deploymentName,
-      buildId: versionBuildId,
-    });
-    const computeConfig =
-      versionDetails.workerDeploymentVersionInfo.computeConfig;
-    if (!computeConfig) {
+    try {
+      let errorMessage: string | undefined;
+      await validateCurrentWorkerDeploymentVersionComputeConfig(
+        { namespace, deploymentName, buildId: versionBuildId },
+        (error) => {
+          errorMessage =
+            (error.body as { message?: string })?.message ??
+            translate('deployments.validate-connection-error');
+        },
+      );
+      validateResult = { message: errorMessage };
+
+      // A handled provider error still completes validation and may update the
+      // persisted connection status, so refresh once for either resolved result.
+      onValidationComplete?.();
+    } catch {
       validateResult = {
-        message: translate('deployments.validate-connection-no-config'),
+        message: translate('deployments.validate-connection-error'),
       };
+    } finally {
       validateLoading = false;
-      return;
     }
-    const taskQueueInfos =
-      versionDetails.workerDeploymentVersionInfo.taskQueueInfos;
-    if (!taskQueueInfos?.length) {
-      const createTime = versionDetails.workerDeploymentVersionInfo.createTime;
-      const isNewlyCreated =
-        Date.now() - new Date(String(createTime)).getTime() <
-        newVersionGracePeriodMs;
-      validateResult = {
-        message: translate(
-          isNewlyCreated
-            ? 'deployments.validate-connection-no-task-queue-pending'
-            : 'deployments.validate-connection-no-task-queue',
-        ),
-      };
-      validateLoading = false;
-      return;
-    }
-    let errorMessage: string | undefined;
-    await validateWorkerDeploymentVersionComputeConfig(
-      { namespace, deploymentName, buildId: versionBuildId, computeConfig },
-      (error) => {
-        errorMessage =
-          (error.body as { message?: string })?.message ??
-          translate('deployments.validate-connection-error');
-      },
-    );
-    validateResult = { message: errorMessage };
-    validateLoading = false;
   }
 
   async function handleSetCurrentVersion() {
@@ -389,15 +372,17 @@
       <ComputeBadge type={computeProviderType} />
     </td>
   </CapabilityGuard>
-  <CapabilityGuard capability="serverScaledDeployments">
-    <td class="text-left">
-      {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
-        <ConnectionBadge computeStatus={version.computeStatus} />
-      {:else}
-        <span class="text-secondary">—</span>
-      {/if}
-    </td>
-  </CapabilityGuard>
+  {#if showConnectionStatus}
+    <CapabilityGuard capability="serverScaledDeployments">
+      <td class="text-left">
+        {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
+          <ConnectionBadge computeStatus={version.computeStatus} />
+        {:else}
+          <span class="text-secondary">—</span>
+        {/if}
+      </td>
+    </CapabilityGuard>
+  {/if}
   <Timestamp
     as="td"
     class="whitespace-pre-line break-words text-left"
@@ -422,7 +407,7 @@
 
 {#if expanded}
   <tr class="surface-primary border-y border-subtle">
-    <td colspan={6} class="!p-1">
+    <td colspan={showConnectionStatus ? 6 : 5} class="!p-1">
       <VersionRowDetails
         {namespace}
         {deploymentName}

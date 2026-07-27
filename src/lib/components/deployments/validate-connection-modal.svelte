@@ -39,7 +39,7 @@
   </h3>
   <svelte:fragment slot="footer">
     <div class="flex w-full items-center justify-end gap-2">
-      <Button variant="ghost" on:click={onRetry}
+      <Button variant="ghost" on:click={onRetry} disabled={loading}
         >{translate('common.retry')}</Button
       >
       <Button variant="primary" on:click={onClose}

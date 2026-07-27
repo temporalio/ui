@@ -30,9 +30,15 @@
   interface Props {
     deployment: WorkerDeploymentSummary;
     columns: ConfigurableTableHeader[];
+    showConnectionStatus?: boolean;
     onChange?: () => void;
   }
-  let { deployment, columns, onChange }: Props = $props();
+  let {
+    deployment,
+    columns,
+    showConnectionStatus = false,
+    onChange,
+  }: Props = $props();
 
   const namespace = $derived(page.params.namespace);
   const hasVersions = $derived(
@@ -137,8 +143,9 @@
               {#if currentComputeProviderType}
                 <ComputeBadge
                   type={currentComputeProviderType}
-                  computeStatus={deployment.currentVersionSummary
-                    ?.computeStatus}
+                  computeStatus={showConnectionStatus
+                    ? deployment.currentVersionSummary?.computeStatus
+                    : undefined}
                 />
               {/if}
             </CapabilityGuard>
