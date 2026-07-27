@@ -4,7 +4,7 @@
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';

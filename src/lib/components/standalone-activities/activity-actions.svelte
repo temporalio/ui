@@ -5,7 +5,7 @@
   import ActivityPauseConfirmationModal from '$lib/components/activity/activity-pause-confirmation-modal.svelte';
   import ActivityResetConfirmationModal from '$lib/components/activity/activity-reset-confirmation-modal.svelte';
   import ActivityUnpauseConfirmationModal from '$lib/components/activity/activity-unpause-confirmation-modal.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';

@@ -44,7 +44,7 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from './button-runes.svelte';
+  import Button from './button.svelte';
   import DrawerContent from './drawer-content.svelte';
 
   let open = $state(true);

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from './button-runes.svelte';
+  import Button from './button.svelte';
   import Tooltip from './tooltip.svelte';
 
   export let containerHeight = 600;

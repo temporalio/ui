@@ -6,7 +6,7 @@
 
   import Message from '$lib/components/form/message.svelte';
   import IsOssGuard from '$lib/components/is-oss-guard.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';

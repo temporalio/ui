@@ -5,7 +5,7 @@
 
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,

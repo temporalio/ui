@@ -4,7 +4,7 @@
   import { page } from '$app/state';
 
   import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';

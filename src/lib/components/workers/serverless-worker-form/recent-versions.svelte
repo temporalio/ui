@@ -1,7 +1,7 @@
 <script lang="ts">
   import DeploymentStatus from '$lib/components/deployments/deployment-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     isVersionSummaryNew,

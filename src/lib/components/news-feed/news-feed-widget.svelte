@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { createNewsFeedStore } from '$lib/stores/news-feed';

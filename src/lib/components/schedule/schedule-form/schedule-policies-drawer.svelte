@@ -4,7 +4,7 @@
   import { fieldProxy, superForm, type SuperForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import DurationInput, {

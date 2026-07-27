@@ -6,7 +6,7 @@
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { formatList } from '$lib/i18n/format-list';

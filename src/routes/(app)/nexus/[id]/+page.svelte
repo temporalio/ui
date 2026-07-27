@@ -7,7 +7,7 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import TaskQueueStatus from '$lib/components/task-queue-status.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEndpoint from '$lib/pages/nexus-endpoint.svelte';

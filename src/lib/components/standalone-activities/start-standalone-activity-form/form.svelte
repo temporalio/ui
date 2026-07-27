@@ -10,7 +10,7 @@
   import { page } from '$app/state';
 
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput, {
     DAYS,

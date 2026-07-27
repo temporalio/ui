@@ -8,7 +8,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { setPaginatedTableMaxHeight } from '$lib/holocene/table/paginated-table/context';

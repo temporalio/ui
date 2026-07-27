@@ -28,7 +28,7 @@
     ButtonRadioItem,
     ButtonRadioOption,
   } from '$lib/holocene/button-radio-group.svelte';
-  import Button, { type ButtonStyles } from '$lib/holocene/button-runes.svelte';
+  import Button, { type ButtonStyles } from '$lib/holocene/button.svelte';
 
   type StoryArgs = ComponentProps<
     typeof ButtonRadioGroup<ButtonRadioOption<string>>

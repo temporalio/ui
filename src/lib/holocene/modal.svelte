@@ -4,7 +4,7 @@
   import { type ComponentProps, createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
   import IconButton from './icon-button.svelte';
 

@@ -4,7 +4,7 @@
   import type { Meta } from '@storybook/svelte';
   import type { ComponentProps } from 'svelte';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { iconNames } from '$lib/holocene/icon';
 
   export const meta = {

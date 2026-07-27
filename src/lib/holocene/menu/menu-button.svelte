@@ -3,10 +3,10 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import type { ButtonStyles } from '$lib/holocene/button-runes.svelte';
+  import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import Button, {
     type ButtonWithoutHrefProps,
-  } from '$lib/holocene/button-runes.svelte';
+  } from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     MENU_CONTEXT,

@@ -10,8 +10,8 @@
     ButtonProps,
     ButtonWithHrefProps,
     ButtonWithoutHrefProps,
-  } from '../button-runes.svelte';
-  import Button from '../button-runes.svelte';
+  } from '../button.svelte';
+  import Button from '../button.svelte';
 
   type ToggleBaseProps = {
     group?: boolean;

@@ -6,7 +6,7 @@
 
   import Message from '$lib/components/form/message.svelte';
   import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';

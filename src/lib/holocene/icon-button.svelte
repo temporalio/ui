@@ -6,7 +6,7 @@
 
   import Button, {
     type ButtonWithoutHrefProps,
-  } from '$lib/holocene/button-runes.svelte';
+  } from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
 
   interface Props extends Omit<HTMLButtonAttributes, 'onclick'> {

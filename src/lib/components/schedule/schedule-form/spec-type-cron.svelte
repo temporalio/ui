@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { getWeekdayLabel } from '$lib/i18n/format-date-names';
