@@ -216,7 +216,7 @@
     aria-expanded={expanded}
     aria-controls={expanded ? detailsId : undefined}
     class="h-6 w-6"
-    on:click={(e) => {
+    onclick={(e) => {
       e.stopPropagation();
       onLinkClick(e);
     }}

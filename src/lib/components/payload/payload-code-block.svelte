@@ -209,7 +209,7 @@
         {#snippet headerActions()}
           <IconButton
             icon="retry"
-            on:click={retry}
+            onclick={retry}
             label={translate('common.retry')}
           />
         {/snippet}

@@ -4,23 +4,29 @@
   import type { ComponentProps } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button, {
+    type ButtonWithoutHrefProps,
+  } from '$lib/holocene/button-runes.svelte';
   import type { IconName } from '$lib/holocene/icon';
 
-  interface $$Props extends HTMLButtonAttributes {
+  interface Props extends Omit<HTMLButtonAttributes, 'onclick'> {
     icon: IconName;
     'data-testid'?: string;
     label: string;
     variant?: 'primary' | 'secondary' | 'ghost';
     class?: string;
     size?: ComponentProps<typeof Button>['size'];
+    onclick?: (event: MouseEvent) => void;
   }
 
-  let className = '';
-  export { className as class };
-  export let icon: IconName;
-  export let label: string;
-  export let variant: 'primary' | 'secondary' | 'ghost' = 'ghost';
+  let {
+    class: className = '',
+    icon,
+    label,
+    variant = 'ghost',
+    onclick,
+    ...rest
+  }: Props = $props();
 </script>
 
 <Button
@@ -32,6 +38,6 @@
   data-track-name="icon-button"
   data-track-intent="{variant}-{icon}"
   data-track-text={label}
-  on:click
-  {...$$restProps}
+  {onclick}
+  {...rest as ButtonWithoutHrefProps}
 />

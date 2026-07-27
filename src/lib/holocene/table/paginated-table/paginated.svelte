@@ -148,12 +148,12 @@
       label={previousPageButtonLabel}
       disabled={!$store.hasPrevious}
       icon="arrow-left"
-      on:click={() => handlePageChange($store.currentPage - 1)}
+      onclick={() => handlePageChange($store.currentPage - 1)}
     />
     <IconButton
       label={nextPageButtonLabel}
       disabled={!$store.hasNext}
-      on:click={() => handlePageChange($store.currentPage + 1)}
+      onclick={() => handlePageChange($store.currentPage + 1)}
       icon="arrow-right"
     />
   </nav>
