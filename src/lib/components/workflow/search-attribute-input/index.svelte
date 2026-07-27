@@ -107,7 +107,6 @@
       <NumberInput
         label={translate('common.value')}
         id="attribute-value-{id}"
-        valid={value < Number.MAX_SAFE_INTEGER}
         hintText="Number is too large"
         bind:value
         max={Number.MAX_SAFE_INTEGER}

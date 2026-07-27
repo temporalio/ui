@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { FullAutoFill } from 'svelte/elements';
+  import type { FullAutoFill, HTMLInputAttributes } from 'svelte/elements';
 
   import { twMerge as merge } from 'tailwind-merge';
 
@@ -7,41 +7,55 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
 
-  export let icon: IconName | undefined = undefined;
-  export let id: string;
-  export let value: number;
-  export let label: string;
-  export let labelHidden = false;
-  export let units = '';
-  export let placeholder = '';
-  export let name = id;
-  export let disabled = false;
-  export let required = false;
-  export let hintText = '';
-  export let max: number | undefined = undefined;
-  export let min: number | undefined = undefined;
-  export let step: number = 1;
-  export let search = false;
-  export let autocomplete: FullAutoFill = 'off';
-
-  let valid = true;
-
-  const validate = (val: number) => {
-    if ((min !== undefined && val < min) || (max !== undefined && val > max)) {
-      valid = false;
-    } else {
-      valid = true;
-    }
-  };
-
-  $: {
-    validate(value);
+  interface Props extends Omit<HTMLInputAttributes, 'value' | 'class'> {
+    icon?: IconName;
+    id: string;
+    value: number;
+    label: string;
+    labelHidden?: boolean;
+    units?: string;
+    placeholder?: string;
+    name?: string;
+    disabled?: boolean;
+    required?: boolean;
+    hintText?: string;
+    max?: number;
+    min?: number;
+    step?: number;
+    search?: boolean;
+    autocomplete?: FullAutoFill;
+    class?: string;
   }
 
-  $: errorId = `${id}-error`;
+  let {
+    icon,
+    id,
+    value = $bindable(),
+    label,
+    labelHidden = false,
+    units = '',
+    placeholder = '',
+    name,
+    disabled = false,
+    required = false,
+    hintText = '',
+    max,
+    min,
+    step = 1,
+    search = false,
+    autocomplete = 'off',
+    class: className,
+    ...rest
+  }: Props = $props();
+
+  const resolvedName = $derived(name ?? id);
+  const valid = $derived(
+    !((min !== undefined && value < min) || (max !== undefined && value > max)),
+  );
+  const errorId = $derived(`${id}-error`);
 </script>
 
-<div class={merge('flex flex-col gap-1', $$props.class)}>
+<div class={merge('flex flex-col gap-1', className)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center">
     <div
@@ -65,7 +79,7 @@
         data-1p-ignore="true"
         {placeholder}
         {id}
-        {name}
+        name={resolvedName}
         {step}
         {required}
         aria-invalid={!valid ? 'true' : undefined}
@@ -73,11 +87,7 @@
         {autocomplete}
         spellcheck="false"
         bind:value
-        on:input
-        on:change
-        on:focus
-        on:blur
-        on:keydown
+        {...rest}
       />
     </div>
     {#if units}
