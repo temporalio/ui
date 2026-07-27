@@ -78,14 +78,14 @@
   <ToggleButtons>
     <ToggleButton
       active={selected === View.Workers}
-      on:click={() => (selected = View.Workers)}
+      onclick={() => (selected = View.Workers)}
     >
       {translate('workers.workers')}
     </ToggleButton>
     <ToggleButton
       class="!border-r"
       active={selected === View.Pollers}
-      on:click={() => (selected = View.Pollers)}
+      onclick={() => (selected = View.Pollers)}
     >
       {translate('workers.pollers')}
       {#await pollersPromise then workers}

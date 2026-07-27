@@ -245,7 +245,7 @@
           <ToggleButton
             leadingIcon={reverseSort ? 'descending' : 'ascending'}
             data-testid="zoom-in"
-            on:click={onSort}
+            onclick={onSort}
             size="sm"
           >
             {reverseSort
@@ -259,7 +259,7 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
-          on:click={onAutoRefreshToggle}
+          onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
@@ -274,7 +274,7 @@
           data-testid="download"
           leadingIcon="download"
           size="sm"
-          on:click={() => (showDownloadPrompt = true)}
+          onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}
         </ToggleButton>

@@ -1,61 +1,61 @@
 <script lang="ts">
-  import type { ComponentProps } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import { getAppContext } from '$lib/utilities/get-context';
 
   import type {
-    ButtonWithHrefProps,
+    ButtonProps,
     ButtonWithoutHrefProps,
-  } from '../button.svelte';
-  import Button from '../button.svelte';
+  } from '../button-runes.svelte';
+  import Button from '../button-runes.svelte';
 
-  type BaseProps = {
+  type Props = Omit<ButtonWithoutHrefProps, 'href' | 'target'> & {
     group?: boolean;
     active?: boolean;
+    href?: string | null;
+    base?: string | null;
   };
 
-  type AnchorProps = BaseProps &
-    ButtonWithHrefProps & {
-      base?: string;
-    };
+  let {
+    class: className = '',
+    group = getAppContext('group'),
+    href = null,
+    base = null,
+    active = false,
+    variant = 'secondary',
+    leadingIcon,
+    onclick,
+    children,
+    ...rest
+  }: Props = $props();
 
-  type ButtonProps = BaseProps &
-    ButtonWithoutHrefProps & {
-      base?: never;
-    };
+  const pressed = $derived(
+    href ? page.url.pathname.includes(base ?? href) : active,
+  );
 
-  type $$Props = AnchorProps | ButtonProps;
-
-  let className = '';
-  export { className as class };
-  export let group = getAppContext('group');
-  export let href: string | null = null;
-  export let base: string | null = href;
-  export let active = false;
-  export let variant: ComponentProps<Button>['variant'] = 'secondary';
-
-  $: pressed = href ? $page.url.pathname.includes(base ?? href) : active;
+  const buttonProps = $derived({
+    ...rest,
+    variant,
+    leadingIcon,
+    onclick,
+    'data-track-name': 'toggle-button',
+    'aria-pressed': pressed ? 'true' : 'false',
+    href: href ? href + page.url.search : undefined,
+    class: merge(
+      pressed && 'bg-interactive-secondary-active',
+      group && '[&:not(:last-child)]:border-r-0',
+      className,
+    ),
+  } as ButtonProps);
 </script>
 
-<Button
-  on:click
-  class={merge(
-    pressed && 'bg-interactive-secondary-active',
-    group && '[&:not(:last-child)]:border-r-0',
-    className,
-  )}
-  data-track-name="toggle-button"
-  {variant}
-  href={href ? href + $page.url.search : undefined}
-  aria-pressed={pressed ? 'true' : 'false'}
-  {...$$restProps}
->
-  {#if $$restProps.leadingIcon}
-    <span class="hidden md:block"><slot /></span>
+<Button {...buttonProps}>
+  {#if leadingIcon}
+    <span class="hidden md:block">{@render children?.()}</span>
   {:else}
-    <slot />
+    {@render children?.()}
   {/if}
 </Button>
