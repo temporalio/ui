@@ -80,7 +80,7 @@
       menuLabel={translate('schedules.schedule-actions')}
       id="schedule-actions"
       disabled={editDisabled}
-      on:click={() => openConfirmationModal('pause')}
+      onclick={() => openConfirmationModal('pause')}
     >
       <MenuItem
         data-testid="trigger-schedule"
