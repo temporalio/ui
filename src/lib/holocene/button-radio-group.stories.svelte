@@ -28,7 +28,7 @@
     ButtonRadioItem,
     ButtonRadioOption,
   } from '$lib/holocene/button-radio-group.svelte';
-  import Button, { type ButtonStyles } from '$lib/holocene/button.svelte';
+  import Button, { type ButtonStyles } from '$lib/holocene/button-runes.svelte';
 
   type StoryArgs = ComponentProps<
     typeof ButtonRadioGroup<ButtonRadioOption<string>>
@@ -67,8 +67,8 @@
     {size}
     active={checked}
     {...attrs}
-    on:click={onSelect}
-    on:keydown={onKeydown}
+    onclick={onSelect}
+    onkeydown={onKeydown}
   >
     {option.label}
   </Button>

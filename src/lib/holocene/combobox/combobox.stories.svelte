@@ -54,7 +54,7 @@
   import { action as logAction } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
-  import Button from '../button.svelte';
+  import Button from '../button-runes.svelte';
 
   import AsyncTest from './async-test.svelte';
 </script>
@@ -317,7 +317,7 @@
     >
       {#snippet action()}
         <Button
-          on:click={() => {}}
+          onclick={() => {}}
           variant="ghost"
           size="xs"
           leadingIcon="close"

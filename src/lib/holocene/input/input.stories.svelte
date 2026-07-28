@@ -75,7 +75,7 @@
 <script lang="ts">
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
-  import Button from '../button.svelte';
+  import Button from '../button-runes.svelte';
 </script>
 
 <Template let:args let:context>

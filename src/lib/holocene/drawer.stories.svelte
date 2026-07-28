@@ -44,14 +44,14 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from './button.svelte';
+  import Button from './button-runes.svelte';
   import DrawerContent from './drawer-content.svelte';
 
   let open = $state(true);
 </script>
 
 <Template let:args>
-  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Button onclick={() => (open = !open)}>Toggle Drawer</Button>
   <Drawer bind:open {...args} onClick={action('click')}>
     <DrawerContent title="Drawer Title">
       <p class={merge(args.position === 'right' && 'max-w-80')}>
@@ -74,7 +74,7 @@
 </Template>
 
 <Template id="with-subtitle" let:args>
-  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Button onclick={() => (open = !open)}>Toggle Drawer</Button>
   <Drawer bind:open {...args} onClick={action('click')}>
     <DrawerContent title="Drawer Title">
       <span slot="subtitle">A supporting subtitle line</span>
@@ -86,7 +86,7 @@
 </Template>
 
 <Template id="subtitle-only" let:args>
-  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Button onclick={() => (open = !open)}>Toggle Drawer</Button>
   <Drawer bind:open {...args} onClick={action('click')}>
     <DrawerContent>
       <span slot="subtitle">Subtitle rendered without a title</span>
@@ -98,7 +98,7 @@
 </Template>
 
 <Template id="no-header" let:args>
-  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Button onclick={() => (open = !open)}>Toggle Drawer</Button>
   <Drawer bind:open {...args} onClick={action('click')}>
     <DrawerContent>
       <p class={merge(args.position === 'right' && 'max-w-80')}>

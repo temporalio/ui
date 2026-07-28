@@ -5,7 +5,7 @@
 
   import { toaster } from '../stores/toaster';
 
-  import Button from './button.svelte';
+  import Button from './button-runes.svelte';
   import Toast from './toast.svelte';
   import Toaster from './toaster.svelte';
 
@@ -72,7 +72,7 @@
   <div class="flex max-w-60 flex-col gap-2">
     <Toast id={context.id} {variant} {closeButtonLabel}>{message}</Toast>
 
-    <Button on:click={() => toaster.push({ duration, message, variant })}>
+    <Button onclick={() => toaster.push({ duration, message, variant })}>
       <span class="capitalize">Trigger {variant} toast</span>
     </Button>
 

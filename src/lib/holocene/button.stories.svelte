@@ -2,8 +2,9 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { iconNames } from '$lib/holocene/icon';
 
   export const meta = {
@@ -74,7 +75,7 @@
         },
       },
     },
-  } satisfies Meta<Button>;
+  } satisfies Meta<ComponentProps<typeof Button>>;
 </script>
 
 <script lang="ts">
@@ -87,22 +88,22 @@
 </script>
 
 <Template let:args>
-  <Button {...args} on:click={action('click')}>Click Me</Button>
+  <Button {...args} onclick={action('click')}>Click Me</Button>
 </Template>
 
 <Story name="Primary" args={{}} />
 
 <Story name="With Long Title" let:args>
   <div class="max-w-16">
-    <Button {...args} on:click={action('click')}>Request Cancellation</Button>
+    <Button {...args} onclick={action('click')}>Request Cancellation</Button>
   </div>
 </Story>
 
 <Story name="Button Group" let:args>
   <div class="button-group flex">
-    <Button {...args} on:click={action('click')}>First</Button>
-    <Button {...args} on:click={action('click')}>Middle</Button>
-    <Button {...args} on:click={action('click')}>Last</Button>
+    <Button {...args} onclick={action('click')}>First</Button>
+    <Button {...args} onclick={action('click')}>Middle</Button>
+    <Button {...args} onclick={action('click')}>Last</Button>
   </div>
 </Story>
 
@@ -141,7 +142,7 @@
     {...args}
     leadingIcon="temporal-logo"
     {loading}
-    on:click={() => {
+    onclick={() => {
       loading = true;
       setTimeout(() => {
         loading = false;
@@ -157,7 +158,7 @@
     {...args}
     trailingIcon="temporal-logo"
     {loading}
-    on:click={() => {
+    onclick={() => {
       loading = true;
       setTimeout(() => {
         loading = false;
@@ -172,7 +173,7 @@
     trailingIcon="temporal-logo"
     leadingIcon="temporal-logo"
     {loading}
-    on:click={() => {
+    onclick={() => {
       loading = true;
       setTimeout(() => {
         loading = false;
