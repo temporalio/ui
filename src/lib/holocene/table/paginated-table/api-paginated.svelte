@@ -256,7 +256,7 @@
     <IconButton
       label={previousButtonLabel}
       disabled={!$store.hasPrevious}
-      on:click={handlePreviousPage}
+      onclick={handlePreviousPage}
       icon="arrow-left"
     />
     <div class="flex gap-1">
@@ -272,7 +272,7 @@
     <IconButton
       label={nextButtonLabel}
       disabled={!$store.hasNext || $store.updating}
-      on:click={fetchIndexData}
+      onclick={fetchIndexData}
       icon="arrow-right"
     />
   </nav>

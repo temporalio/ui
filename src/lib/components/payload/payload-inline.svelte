@@ -61,7 +61,7 @@
     <IconButton
       class="h-8 w-8"
       icon="retry"
-      on:click={retry}
+      onclick={retry}
       label={translate('common.retry')}
     />
   {/snippet}
