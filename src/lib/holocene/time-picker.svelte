@@ -68,10 +68,10 @@
   {/if}
   {#if twelveHourClock}
     <ToggleButtons>
-      <ToggleButton active={half === 'AM'} on:click={() => (half = 'AM')}
+      <ToggleButton active={half === 'AM'} onclick={() => (half = 'AM')}
         >AM</ToggleButton
       >
-      <ToggleButton active={half === 'PM'} on:click={() => (half = 'PM')}
+      <ToggleButton active={half === 'PM'} onclick={() => (half = 'PM')}
         >PM</ToggleButton
       >
     </ToggleButtons>

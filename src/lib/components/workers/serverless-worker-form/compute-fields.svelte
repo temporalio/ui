@@ -265,13 +265,13 @@
         <ToggleButtons>
           <ToggleButton
             active={activeRoleHelpTab === 'cloudformation'}
-            on:click={() => (activeRoleHelpTab = 'cloudformation')}
+            onclick={() => (activeRoleHelpTab = 'cloudformation')}
           >
             {translate('workers.cfn-tab')}
           </ToggleButton>
           <ToggleButton
             active={activeRoleHelpTab === 'terraform'}
-            on:click={() => (activeRoleHelpTab = 'terraform')}
+            onclick={() => (activeRoleHelpTab = 'terraform')}
           >
             {translate('workers.terraform-tab')}
           </ToggleButton>

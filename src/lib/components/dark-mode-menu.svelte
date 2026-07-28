@@ -25,7 +25,7 @@
   <ToggleButton
     aria-label={translate('common.system-default')}
     data-testid="system-mode"
-    on:click={() => setDarkModePreference('system')}
+    onclick={() => setDarkModePreference('system')}
     active={$useDarkModePreference === 'system'}
     size="xs"
   >
@@ -34,7 +34,7 @@
   <ToggleButton
     aria-label={translate('common.day')}
     data-testid="day-mode"
-    on:click={() => setDarkModePreference(false)}
+    onclick={() => setDarkModePreference(false)}
     active={$useDarkModePreference === false}
     size="xs"
   >
@@ -43,7 +43,7 @@
   <ToggleButton
     aria-label={translate('common.night')}
     data-testid="night-mode"
-    on:click={() => setDarkModePreference(true)}
+    onclick={() => setDarkModePreference(true)}
     active={$useDarkModePreference === true}
     size="xs"
   >
