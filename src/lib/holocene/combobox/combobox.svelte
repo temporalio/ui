@@ -55,7 +55,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import Badge from '../badge.svelte';
-  import Button from '../button-runes.svelte';
+  import Button from '../button.svelte';
   import Chip from '../chip.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';

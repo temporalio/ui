@@ -11,7 +11,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';

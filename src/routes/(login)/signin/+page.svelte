@@ -7,7 +7,7 @@
 
   import FeedbackButton from '$lib/components/feedback-button.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { routeForAuthentication } from '$lib/utilities/route-for';
   import Logo from '$lib/vendor/logo.svg';
 

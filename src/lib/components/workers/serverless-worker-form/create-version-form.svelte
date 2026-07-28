@@ -4,7 +4,7 @@
   import { zodClient } from 'sveltekit-superforms/adapters';
 
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';

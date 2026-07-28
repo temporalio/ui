@@ -4,7 +4,7 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
 
   interface Props {

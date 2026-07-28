@@ -5,7 +5,7 @@
 
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
   import WorkflowStatus from '$lib/components/execution-status.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';

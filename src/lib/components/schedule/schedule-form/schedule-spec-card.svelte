@@ -4,7 +4,7 @@
   import { tick } from 'svelte';
   import type { SuperForm } from 'sveltekit-superforms';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';

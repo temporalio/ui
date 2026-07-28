@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
   const href = $derived(
     page.data?.settings?.feedbackURL ||

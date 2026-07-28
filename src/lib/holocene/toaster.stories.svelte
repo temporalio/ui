@@ -5,7 +5,7 @@
 
   import { toaster } from '../stores/toaster';
 
-  import Button from './button-runes.svelte';
+  import Button from './button.svelte';
   import Toast from './toast.svelte';
   import Toaster from './toaster.svelte';
 

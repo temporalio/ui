@@ -10,7 +10,7 @@
   import UnpauseConfirmationModal from '$lib/components/workflow/client-actions/unpause-confirmation-modal.svelte';
   import UpdateConfirmationModal from '$lib/components/workflow/client-actions/update-confirmation-modal.svelte';
   import { dismissedWorkflowCommonErrors } from '$lib/components/workflow/workflow-common-errors.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';

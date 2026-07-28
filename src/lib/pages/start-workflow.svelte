@@ -10,7 +10,7 @@
   import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput, {
     DAYS,

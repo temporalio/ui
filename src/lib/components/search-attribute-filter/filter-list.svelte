@@ -5,7 +5,7 @@
 
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';

@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';

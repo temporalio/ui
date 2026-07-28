@@ -4,7 +4,7 @@
   import { page } from '$app/stores';
 
   import PayloadInput from '$lib/components/payload-input.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';

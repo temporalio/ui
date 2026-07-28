@@ -1,7 +1,7 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   interface Props {

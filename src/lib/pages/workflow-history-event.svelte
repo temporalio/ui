@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
 
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
-  import Button from '$lib/holocene/button-runes.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { buildGroupIndex, groupEvents } from '$lib/models/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { fetchAllEvents } from '$lib/services/events-service';
