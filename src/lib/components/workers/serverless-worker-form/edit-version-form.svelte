@@ -43,6 +43,8 @@
     error?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
   }
 
   let {
@@ -53,6 +55,8 @@
     error,
     computeProviders,
     gcpRegions,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
   }: Props = $props();
 
   const superform = superForm(
@@ -128,6 +132,8 @@
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+        {terraformTemplate}
+        {cloudRunTerraformTemplate}
         errors={$errors}
       />
     </Card>

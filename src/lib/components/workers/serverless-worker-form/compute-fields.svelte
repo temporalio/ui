@@ -9,7 +9,12 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import {
+    hasCloudRunImpersonatorPlaceholder,
+    interpolateCloudRunTerraformTemplate,
+  } from './cloud-run-terraform';
   import { GCP_REGIONS } from './gcp-regions';
+  import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
   import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
   import { interpolateTerraformTemplate } from './shared';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
@@ -35,6 +40,7 @@
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
     errors?: {
       lambdaArn?: string[];
       iamRoleArn?: string[];
@@ -75,6 +81,7 @@
     cfnTemplateUrl,
     cfnTemplate: cfnTemplateProp,
     terraformTemplate,
+    cloudRunTerraformTemplate,
     errors = {},
   }: Props = $props();
 
@@ -87,6 +94,15 @@
         lambdaArn,
       },
     ),
+  );
+  const resolvedCloudRunTerraformTemplate = $derived(
+    interpolateCloudRunTerraformTemplate(
+      cloudRunTerraformTemplate ?? defaultCloudRunTerraformTemplate,
+      gcpProject,
+    ),
+  );
+  const showCloudRunImpersonatorWarning = $derived(
+    hasCloudRunImpersonatorPlaceholder(resolvedCloudRunTerraformTemplate),
   );
 
   const launchStackHref = $derived.by(() => {
@@ -106,6 +122,7 @@
   });
 
   let showRoleHelp = $state(false);
+  let showCloudRunHelp = $state(false);
   let showScaling = $state(false);
   let activeRoleHelpTab = $state<'cloudformation' | 'terraform'>(
     'cloudformation',
@@ -302,17 +319,54 @@
     </Accordion>
   </div>
 {:else}
-  <Input
-    bind:value={gcpServiceAccount}
-    id="gcpServiceAccount"
-    name="gcpServiceAccount"
-    label={translate('workers.gcp-service-account-label')}
-    hintText={errors.gcpServiceAccount?.[0] ||
-      translate('workers.gcp-service-account-hint')}
-    error={!!errors.gcpServiceAccount?.[0]}
-    placeholder={translate('workers.gcp-service-account-placeholder')}
-    required
-  />
+  <div class="flex flex-col gap-4">
+    <Input
+      bind:value={gcpServiceAccount}
+      id="gcpServiceAccount"
+      name="gcpServiceAccount"
+      label={translate('workers.gcp-service-account-label')}
+      hintText={errors.gcpServiceAccount?.[0] ||
+        translate('workers.gcp-service-account-hint')}
+      error={!!errors.gcpServiceAccount?.[0]}
+      placeholder={translate('workers.gcp-service-account-placeholder')}
+      required
+    />
+    {#if provider === 'cloud-run'}
+      <Accordion
+        icon="info"
+        title={translate('workers.cloud-run-setup-prompt')}
+        bind:open={showCloudRunHelp}
+        class="[&_h3]:text-sm"
+      >
+        <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+          <p class="text-sm text-secondary">
+            {translate('workers.cloud-run-terraform-description-before')}<Link
+              href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
+              newTab
+              >{translate('workers.cloud-run-terraform-module-link')}</Link
+            >{translate('workers.cloud-run-terraform-description-after')}
+          </p>
+          {#if showCloudRunImpersonatorWarning}
+            <p class="text-sm text-warning">
+              {translate('workers.cloud-run-impersonator-warning')}
+            </p>
+          {/if}
+          <CodeBlock
+            content={resolvedCloudRunTerraformTemplate}
+            language="text"
+            maxHeight={300}
+            copyable
+            label={translate('workers.cloud-run-terraform-module-link')}
+            copyIconTitle={translate('workers.copy-snippet')}
+            copySuccessIconTitle={translate('workers.copied')}
+          />
+          <p class="text-sm text-secondary">
+            {translate('workers.cloud-run-invoker-handoff')}
+          </p>
+        </div>
+      </Accordion>
+    {/if}
+  </div>
 {/if}
 
 <hr class="my-5 border-subtle" />

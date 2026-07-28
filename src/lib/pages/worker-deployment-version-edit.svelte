@@ -27,10 +27,19 @@
     buildId: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
   }
 
-  let { namespace, deployment, buildId, computeProviders, gcpRegions }: Props =
-    $props();
+  let {
+    namespace,
+    deployment,
+    buildId,
+    computeProviders,
+    gcpRegions,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -61,6 +70,8 @@
       {error}
       {computeProviders}
       {gcpRegions}
+      {terraformTemplate}
+      {cloudRunTerraformTemplate}
       initialData={{
         provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',
