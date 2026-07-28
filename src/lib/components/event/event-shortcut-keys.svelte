@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Shortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
@@ -19,7 +19,7 @@
     size="sm"
     variant="secondary"
     leadingIcon="keyboard"
-    on:click={onOpen}
+    onclick={onOpen}
   />
 </div>
 <Drawer

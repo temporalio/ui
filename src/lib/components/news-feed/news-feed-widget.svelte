@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { createNewsFeedStore } from '$lib/stores/news-feed';
@@ -53,7 +53,7 @@
     class="h-9 w-9 shrink-0 p-0"
     data-testid="news-feed-trigger"
     size="sm"
-    on:click={openNewsFeed}
+    onclick={openNewsFeed}
   />
 {/if}
 

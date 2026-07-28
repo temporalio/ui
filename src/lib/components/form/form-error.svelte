@@ -1,6 +1,6 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -48,7 +48,7 @@
             <Button
               variant="secondary"
               size="sm"
-              on:click={handleRetry}
+              onclick={handleRetry}
               disabled={isRetrying}
             >
               <Icon name="retry" />
