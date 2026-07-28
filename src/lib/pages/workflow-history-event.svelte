@@ -1,8 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { page } from '$app/state';
-
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { buildGroupIndex, groupEvents } from '$lib/models/event-groups';
@@ -12,12 +10,14 @@
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  const {
-    id: eventId,
-    namespace,
-    workflow: workflowId,
-    run: runId,
-  } = $derived(page.params);
+  interface Props {
+    eventId: string;
+    namespace: string;
+    workflowId: string;
+    runId: string;
+  }
+
+  const { eventId, namespace, workflowId, runId }: Props = $props();
 
   let ids = $derived([eventId]);
 
