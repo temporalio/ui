@@ -1,3 +1,4 @@
+import { msNumberToTs } from '@temporalio/common';
 import {
   afterAll,
   afterEach,
@@ -19,11 +20,11 @@ import {
 const computeStatuses: Record<string, ComputeStatus> = {
   Pending: { providerValidation: {} },
   Connected: {
-    providerValidation: { lastCheckTime: { seconds: 1, nanos: 0 } },
+    providerValidation: { lastCheckTime: msNumberToTs(1_000) },
   },
   Failed: {
     providerValidation: {
-      lastCheckTime: { seconds: 1, nanos: 0 },
+      lastCheckTime: msNumberToTs(1_000),
       errorMessage: 'Connection failed',
     },
   },

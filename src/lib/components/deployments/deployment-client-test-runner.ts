@@ -1,6 +1,9 @@
 import { Buffer } from 'node:buffer';
 import path from 'node:path';
-import { TextEncoder as NodeTextEncoder } from 'node:util';
+import {
+  TextDecoder as NodeTextDecoder,
+  TextEncoder as NodeTextEncoder,
+} from 'node:util';
 
 import type { ViteDevServer } from 'vite';
 
@@ -8,8 +11,17 @@ type ClientRunner = typeof import('./deployment-client-test-runner-entry');
 
 let viteServer: ViteDevServer | undefined;
 let runner: ClientRunner | undefined;
-let textEncoder: typeof TextEncoder | undefined;
+let textEncoder: PropertyDescriptor | undefined;
+let textDecoder: PropertyDescriptor | undefined;
 let uint8Array: typeof Uint8Array | undefined;
+
+function defineGlobal(name: string, value: unknown) {
+  Object.defineProperty(globalThis, name, {
+    configurable: true,
+    writable: true,
+    value,
+  });
+}
 
 export async function getDeploymentClientTestRunner(): Promise<ClientRunner> {
   if (runner) return runner;
@@ -18,15 +30,19 @@ export async function getDeploymentClientTestRunner(): Promise<ClientRunner> {
   try {
     // Vitest's JSDOM realm supplies a Uint8Array that differs from Node's
     // TextEncoder result. esbuild validates that pair while Vite starts.
-    textEncoder = globalThis.TextEncoder;
+    textEncoder = Object.getOwnPropertyDescriptor(globalThis, 'TextEncoder');
+    textDecoder = Object.getOwnPropertyDescriptor(globalThis, 'TextDecoder');
     uint8Array = globalThis.Uint8Array;
-    globalThis.TextEncoder = NodeTextEncoder;
+    defineGlobal('TextEncoder', NodeTextEncoder);
+    defineGlobal('TextDecoder', NodeTextDecoder);
     globalThis.Uint8Array = Object.getPrototypeOf(Buffer) as typeof Uint8Array;
-    const [{ svelte }, { createRunnableDevEnvironment, createServer }] =
-      await Promise.all([
-        import('@sveltejs/vite-plugin-svelte'),
-        import('vite'),
-      ]);
+    const [
+      { svelte },
+      { createRunnableDevEnvironment, createServer, isRunnableDevEnvironment },
+    ] = await Promise.all([
+      import('@sveltejs/vite-plugin-svelte'),
+      import('vite'),
+    ]);
     viteServer = await createServer({
       root: projectRoot,
       configFile: false,
@@ -35,7 +51,7 @@ export async function getDeploymentClientTestRunner(): Promise<ClientRunner> {
       optimizeDeps: {
         noDiscovery: true,
         exclude: ['svelte'],
-        include: ['json-bigint'],
+        include: ['@temporalio/common', 'json-bigint'],
       },
       resolve: {
         dedupe: ['svelte'],
@@ -88,7 +104,11 @@ export async function getDeploymentClientTestRunner(): Promise<ClientRunner> {
         },
       },
     });
-    runner = (await viteServer.environments.client.runner.import(
+    const clientEnvironment = viteServer.environments.client;
+    if (!isRunnableDevEnvironment(clientEnvironment)) {
+      throw new Error('The Vite client test environment is not runnable');
+    }
+    runner = (await clientEnvironment.runner.import(
       '/src/lib/components/deployments/deployment-client-test-runner-entry.ts',
     )) as ClientRunner;
     await runner.initialize();
@@ -104,8 +124,12 @@ export async function closeDeploymentClientTestRunner() {
   const server = viteServer;
   viteServer = undefined;
   await server?.close();
-  if (textEncoder) globalThis.TextEncoder = textEncoder;
+  if (textEncoder)
+    Object.defineProperty(globalThis, 'TextEncoder', textEncoder);
+  if (textDecoder)
+    Object.defineProperty(globalThis, 'TextDecoder', textDecoder);
   if (uint8Array) globalThis.Uint8Array = uint8Array;
   textEncoder = undefined;
+  textDecoder = undefined;
   uint8Array = undefined;
 }

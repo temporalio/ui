@@ -1,3 +1,4 @@
+import { msNumberToTs } from '@temporalio/common';
 import i18next from 'i18next';
 import { flushSync, mount, unmount } from 'svelte';
 
@@ -111,12 +112,12 @@ function deployment(
 ): WorkerDeploymentSummary {
   return {
     name,
-    createTime: { seconds: 1, nanos: 0 },
+    createTime: msNumberToTs(1_000),
     routingConfig: {},
     currentVersionSummary: {
       version: `${name}.current`,
       deploymentVersion: { deploymentName: name, buildId: 'current' },
-      createTime: { seconds: 1, nanos: 0 },
+      createTime: msNumberToTs(1_000),
       computeConfig: {
         scalingGroups: { default: { provider: { type: 'aws-lambda' } } },
       },
