@@ -177,6 +177,7 @@
     tabindex={href ? null : 0}
     {...rest as HTMLAnchorAttributes}
     onclick={handleLinkClick}
+    onkeydown={handleKeydown}
   >
     {#if leadingIcon || (loading && !trailingIcon)}
       <span class:animate-spin={loading}>
