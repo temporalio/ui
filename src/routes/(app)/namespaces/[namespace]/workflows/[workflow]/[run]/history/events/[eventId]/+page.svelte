@@ -6,13 +6,13 @@
   import WorkflowHistoryEvent from '$lib/pages/workflow-history-event.svelte';
 
   const workflow = $derived(page.params.workflow);
-  const id = $derived(page.params.id);
+  const eventId = $derived(page.params.eventId);
 </script>
 
 <PageTitle
   title={`${translate(
     'workflows.workflow-history',
-  )} | ${workflow} | Event ${id}`}
+  )} | ${workflow} | Event ${eventId}`}
   url={page.url.href}
 />
 <WorkflowHistoryEvent />

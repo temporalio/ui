@@ -13,7 +13,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
 
   const {
-    id: eventId,
+    eventId,
     namespace,
     workflow: workflowId,
     run: runId,
