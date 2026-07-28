@@ -1,5 +1,13 @@
 <script module lang="ts">
+  import type {
+    HTMLAnchorAttributes,
+    HTMLButtonAttributes,
+  } from 'svelte/elements';
+
   import { cva, type VariantProps } from 'class-variance-authority';
+  import type { Snippet } from 'svelte';
+
+  import type { IconName } from '$lib/holocene/icon';
 
   const buttonStyles = cva(
     [
@@ -52,22 +60,6 @@
   );
 
   export type ButtonStyles = VariantProps<typeof buttonStyles>;
-</script>
-
-<script lang="ts">
-  import type {
-    HTMLAnchorAttributes,
-    HTMLButtonAttributes,
-  } from 'svelte/elements';
-
-  import type { Snippet } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
-
-  import { goto } from '$app/navigation';
-
-  import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
 
   interface BaseProps {
     variant?: ButtonStyles['variant'];
@@ -87,19 +79,28 @@
     onkeydown?: (event: KeyboardEvent) => void;
   }
 
-  type ButtonWithoutHrefProps = BaseProps &
+  export type ButtonWithoutHrefProps = BaseProps &
     Omit<HTMLButtonAttributes, 'class' | 'onclick' | 'onkeydown'> & {
       href?: never;
       target?: never;
     };
 
-  type ButtonWithHrefProps = BaseProps &
+  export type ButtonWithHrefProps = BaseProps &
     Omit<HTMLAnchorAttributes, 'class' | 'onclick' | 'onkeydown'> & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
     };
 
-  type Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
+  export type ButtonProps = ButtonWithoutHrefProps | ButtonWithHrefProps;
+</script>
+
+<script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import { goto } from '$app/navigation';
+
+  import Badge from '$lib/holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   let {
     variant = 'primary',
@@ -119,7 +120,7 @@
     onclick,
     onkeydown,
     ...rest
-  }: Props = $props();
+  }: ButtonProps = $props();
 
   let element = $state<HTMLElement>();
 

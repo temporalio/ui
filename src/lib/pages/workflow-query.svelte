@@ -4,7 +4,7 @@
   import { page } from '$app/stores';
 
   import PayloadInput from '$lib/components/payload-input.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -152,7 +152,7 @@
         </div>
         <div class="flex w-full flex-wrap items-end justify-end gap-4">
           <Button
-            on:click={() => query(queryType)}
+            onclick={() => query(queryType)}
             {loading}
             variant={edited ? 'primary' : 'secondary'}
             leadingIcon={edited ? undefined : 'retry'}

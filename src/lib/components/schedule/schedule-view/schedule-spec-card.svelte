@@ -1,6 +1,6 @@
 <script lang="ts">
   import Panel from '$lib/components/panel.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
@@ -33,7 +33,7 @@
       trailingIcon="code"
       aria-expanded={isFullSpecVisible}
       aria-controls={scheduleFullSpecId}
-      on:click={() => (isFullSpecVisible = !isFullSpecVisible)}
+      onclick={() => (isFullSpecVisible = !isFullSpecVisible)}
     >
       {isFullSpecVisible
         ? translate('schedules.hide-full-spec')

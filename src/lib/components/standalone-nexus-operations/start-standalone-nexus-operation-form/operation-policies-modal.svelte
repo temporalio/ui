@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
@@ -205,14 +205,14 @@
         <Button
           type="button"
           variant="ghost"
-          on:click={() => {
+          onclick={() => {
             open = false;
           }}>{translate('common.cancel')}</Button
         >
         <Button
           type="button"
           variant="primary"
-          on:click={() => {
+          onclick={() => {
             open = false;
           }}
           >{translate(

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -32,7 +32,7 @@
   on:cancelModal={() => onCancel?.()}
 >
   {#if onRemove}
-    <Button slot="footer" variant="destructive" size="sm" on:click={onRemove}>
+    <Button slot="footer" variant="destructive" size="sm" onclick={onRemove}>
       {translate('deployments.remove-unversioned-ramping')}
     </Button>
   {/if}

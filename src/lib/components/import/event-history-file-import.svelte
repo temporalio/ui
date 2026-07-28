@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
@@ -73,7 +73,7 @@
     accept=".json"
     onchange={onFileSelect}
   />
-  <Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
+  <Button leadingIcon="file-upload" onclick={onConfirm} disabled={!fileLoaded}
     >{translate('common.import')}</Button
   >
 </div>

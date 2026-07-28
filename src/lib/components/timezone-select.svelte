@@ -5,7 +5,7 @@
   import { onMount } from 'svelte';
 
   import Timestamp from '$lib/components/timestamp.svelte';
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import type { ButtonStyles } from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {

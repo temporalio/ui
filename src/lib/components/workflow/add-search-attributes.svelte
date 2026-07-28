@@ -2,7 +2,7 @@
   import type { ComponentProps } from 'svelte';
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     customSearchAttributes,
@@ -16,7 +16,7 @@
     class?: ClassNameValue;
     attributesToAdd: SearchAttributesSchema;
     buttonCopy?: string;
-    variant?: ComponentProps<Button>['variant'];
+    variant?: ComponentProps<typeof Button>['variant'];
   }
 
   let {
@@ -55,7 +55,7 @@
     leadingIcon="add"
     class="max-sm:w-full"
     data-testid="add-search-attribute-button"
-    on:click={addSearchAttribute}
+    onclick={addSearchAttribute}
     disabled={!searchAttributes.length ||
       attributes.length === searchAttributes.length}>{buttonCopy}</Button
   >

@@ -9,7 +9,7 @@
   import { page } from '$app/state';
 
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Card from '$lib/holocene/card.svelte';
   import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -366,7 +366,7 @@
               <Button
                 class="ml-2.5"
                 variant="secondary"
-                on:click={generateRandomId}
+                onclick={generateRandomId}
                 leadingIcon="retry"
                 >{translate(
                   'standalone-nexus-operations.form-random-uuid',
@@ -480,7 +480,7 @@
           <Button
             type="button"
             variant="secondary"
-            on:click={() => (operationPoliciesModalOpen = true)}
+            onclick={() => (operationPoliciesModalOpen = true)}
           >
             {translate(
               'standalone-nexus-operations.form-edit-operation-policies',
@@ -589,11 +589,11 @@
               type="button"
               variant="ghost"
               leadingIcon="close"
-              on:click={() => removeNexusHeader(index)}
+              onclick={() => removeNexusHeader(index)}
             />
           </div>
         {/each}
-        <Button type="button" variant="secondary" on:click={addNexusHeader}>
+        <Button type="button" variant="secondary" onclick={addNexusHeader}>
           {translate('standalone-nexus-operations.form-add-nexus-header')}
         </Button>
       </Card>

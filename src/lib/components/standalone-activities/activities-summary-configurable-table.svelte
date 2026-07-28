@@ -4,7 +4,7 @@
   import { page } from '$app/state';
 
   import DownloadJsonButton from '$lib/components/download-json-button.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -145,7 +145,7 @@
       <DownloadJsonButton items={visibleItems} {page} filePrefix="activities" />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button
-          on:click={onClickConfigure}
+          onclick={onClickConfigure}
           data-testid="activities-summary-table-configuration-button"
           size="xs"
           variant="ghost"

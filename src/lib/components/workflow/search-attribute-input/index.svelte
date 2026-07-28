@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
@@ -88,7 +88,7 @@
       leadingIcon="close"
       data-testid="search-attribute-close-button"
       class="mt-6 w-10 rounded-full sm:hidden"
-      on:click={() => onRemove(label)}
+      onclick={() => onRemove(label)}
     />
   </div>
   {#if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
@@ -146,6 +146,6 @@
     leadingIcon="close"
     data-testid="search-attribute-close-button"
     class="mt-6 w-10 rounded-full max-sm:hidden"
-    on:click={() => onRemove(label)}
+    onclick={() => onRemove(label)}
   />
 </div>

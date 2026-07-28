@@ -5,7 +5,7 @@
 
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -159,7 +159,7 @@
   <Button
     variant="ghost"
     size="xs"
-    on:click={clearAllFilters}
+    onclick={clearAllFilters}
     data-testid="clear-all-filters-button"
   >
     {translate('common.clear-all')}

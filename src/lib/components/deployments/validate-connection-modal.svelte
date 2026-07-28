@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -39,10 +39,10 @@
   </h3>
   <svelte:fragment slot="footer">
     <div class="flex w-full items-center justify-end gap-2">
-      <Button variant="ghost" on:click={onRetry} disabled={loading}
+      <Button variant="ghost" onclick={onRetry} disabled={loading}
         >{translate('common.retry')}</Button
       >
-      <Button variant="primary" on:click={onClose}
+      <Button variant="primary" onclick={onClose}
         >{translate('common.close')}</Button
       >
     </div>

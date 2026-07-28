@@ -4,7 +4,7 @@
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -75,7 +75,7 @@
           <p>Press for freshness</p>
           <Button
             variant="ghost"
-            on:click={fetchCurrentDetails}
+            onclick={fetchCurrentDetails}
             disabled={loading}
             aria-label={translate('common.refresh')}
           >

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -290,11 +290,7 @@
             >
               {translate('workers.launch-stack')}
             </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              on:click={downloadCfnTemplate}
-            >
+            <Button variant="secondary" size="sm" onclick={downloadCfnTemplate}>
               {translate('workers.download-template')}
             </Button>
           </div>
@@ -385,7 +381,7 @@
     size="sm"
     type="button"
     trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
-    on:click={() => (showScaling = !showScaling)}
+    onclick={() => (showScaling = !showScaling)}
   >
     {showScaling
       ? translate('workers.hide-defaults')

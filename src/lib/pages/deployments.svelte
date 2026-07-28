@@ -4,7 +4,7 @@
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -122,7 +122,7 @@
       <svelte:fragment slot="actions-end-additional">
         <Tooltip text="Configure Columns" top>
           <Button
-            on:click={openCustomizationDrawer}
+            onclick={openCustomizationDrawer}
             data-testid="deployments-table-configuration-button"
             size="xs"
             variant="ghost"

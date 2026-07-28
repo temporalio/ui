@@ -38,7 +38,7 @@
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchWorkflowTaskFailures } from '$lib/services/workflow-counts';

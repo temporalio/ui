@@ -10,7 +10,7 @@
 
 <script lang="ts">
   import CommonErrorList from '$lib/components/common-errors/common-error-list.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fullEventHistory } from '$lib/stores/events';
@@ -47,7 +47,7 @@
           leadingIcon="close"
           size="xs"
           variant="ghost"
-          on:click={dismissCommonErrors}
+          onclick={dismissCommonErrors}
         >
           <span class="sr-only">
             {translate('workflows.dismiss-common-errors')}

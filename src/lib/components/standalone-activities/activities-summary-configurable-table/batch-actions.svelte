@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import {
@@ -74,7 +74,7 @@
       class="focus-visible:border-table"
       data-testid="bulk-cancel-button"
       disabled={!$cancelableActivities.length}
-      on:click={openBatchCancelConfirmationModal}
+      onclick={openBatchCancelConfirmationModal}
       >{translate('standalone-activities.request-cancellation')}</Button
     >
     <Button
@@ -83,7 +83,7 @@
       class="focus-visible:border-table"
       data-testid="bulk-terminate-button"
       disabled={!$terminableActivities.length}
-      on:click={openBatchTerminateConfirmationModal}
+      onclick={openBatchTerminateConfirmationModal}
       >{translate('standalone-activities.terminate')}</Button
     >
   {/if}

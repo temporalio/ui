@@ -7,7 +7,7 @@
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/holocene/button-runes.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -208,7 +208,7 @@
           leadingIcon="namespace-switcher"
           size="xs"
           class="grow text-white"
-          on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+          onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
         >
         <div class="ml-1 h-full w-1 border-l border-subtle"></div>
         <Button
