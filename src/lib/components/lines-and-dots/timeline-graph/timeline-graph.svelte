@@ -6,11 +6,9 @@
   import { activeGroups } from '$lib/stores/active-events';
   import { collapseIdleTime } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
-  import { eventStatusFilter } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
-  import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
   import EndTimeInterval from '../end-time-interval.svelte';
   import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
@@ -130,18 +128,14 @@
     }
   };
 
-  const filteredGroups = $derived(
-    getFailedOrPendingGroups(groups, $eventStatusFilter),
-  );
-
   // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
   // group count, so subtracting the loaded count is correct.
   const pendingGroupCount = $derived.by(() => {
     if (!loading) return 0;
     if (!totalExpectedEvents) {
-      return filteredGroups.length === 0 ? 50 : 0;
+      return groups.length === 0 ? 50 : 0;
     }
-    return Math.max(0, totalExpectedEvents - filteredGroups.length);
+    return Math.max(0, totalExpectedEvents - groups.length);
   });
 
   // Rows mounted beyond the viewport, so edge rows survive small scrolls and
@@ -250,11 +244,9 @@
     (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime,
   );
 
-  const groupIndexMap = $derived(
-    new Map(filteredGroups.map((g, i) => [g.id, i])),
-  );
+  const groupIndexMap = $derived(new Map(groups.map((g, i) => [g.id, i])));
 
-  // Active group's index in filteredGroups (-1 = none). Derived here so the row
+  // Active group's index in groups (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
   const activeIdx = $derived(
     $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
@@ -273,11 +265,11 @@
   }
 
   const descStart = $derived(
-    getDescStart(filteredGroups, descMinId, loading, pendingGroupCount),
+    getDescStart(groups, descMinId, loading, pendingGroupCount),
   );
 
   const totalForY = $derived(
-    getTotalForY(filteredGroups.length, pendingGroupCount, descStart),
+    getTotalForY(groups.length, pendingGroupCount, descStart),
   );
 
   // Widen the mount window by the panel's row span: shiftFor moves rows down but
@@ -289,10 +281,8 @@
   // Full drawn height (rows + axis + detail panel). The container is this tall and
   // scrolls with the page.
   const timelineHeight = $derived(
-    Math.max(
-      ROW_HEIGHT * (filteredGroups.length + pendingGroupCount + 2),
-      120,
-    ) + panelHeight,
+    Math.max(ROW_HEIGHT * (groups.length + pendingGroupCount + 2), 120) +
+      panelHeight,
   );
   const AXIS_LABEL_ZONE = 150;
   const svgHeight = $derived(timelineHeight + AXIS_LABEL_ZONE);
@@ -390,7 +380,7 @@
     return getWindowBounds({
       bandTop,
       bandHeight,
-      total: filteredGroups.length,
+      total: groups.length,
       overscan: windowOverscan,
       reverseSort,
       descStart,
@@ -416,13 +406,13 @@
   // item and re-run the row derived for rows that didn't move.
   let prevSlots: ({ index: number; group: EventGroups[number] } | null)[] = [];
   const pool = $derived.by(() => {
-    const total = filteredGroups.length;
+    const total = groups.length;
     const slots: ({ index: number; group: EventGroups[number] } | null)[] =
       new Array(poolSize).fill(null);
     const end = Math.min(windowEnd, total, windowStart + poolSize);
     for (let index = windowStart; index < end; index++) {
       const slot = index % poolSize;
-      const group = filteredGroups[index];
+      const group = groups[index];
       const prev = prevSlots[slot];
       if (prev && prev.index === index && prev.group === group) {
         slots[slot] = prev;
@@ -555,7 +545,7 @@
         {#if loading && pendingGroupCount > 0}
           {@const rectY = getPendingBlockY({
             descStart,
-            filteredGroupsLength: filteredGroups.length,
+            filteredGroupsLength: groups.length,
             reverseSort,
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
@@ -570,7 +560,7 @@
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
         {#if !readOnly && activeIdx >= 0}
-          {@const activeGroup = filteredGroups[activeIdx]}
+          {@const activeGroup = groups[activeIdx]}
           {#if activeGroup}
             {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
             <GroupDetailsRow

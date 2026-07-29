@@ -50,21 +50,22 @@ test.describe('Timeline collapse idle time', () => {
     test('collapses idle time by default and offers to expand it', async ({
       page,
     }) => {
-      const toggle = page.getByTestId('toggle-idle-time');
-      await expect(toggle).toBeEnabled();
-      await expect(toggle).toContainText('Show idle time');
+      const control = page.getByRole('switch', { name: 'Hide idle time' });
+      await expect(control).toBeEnabled();
+      await expect(control).toBeChecked();
     });
 
     test('expands and re-collapses idle time from the header toggle', async ({
       page,
     }) => {
-      const toggle = page.getByTestId('toggle-idle-time');
+      const toggle = page.getByTestId('timeline-hide-idle-time');
+      const control = page.getByRole('switch', { name: 'Hide idle time' });
 
       await toggle.click();
-      await expect(toggle).toContainText('Hide idle time');
+      await expect(control).not.toBeChecked();
 
       await toggle.click();
-      await expect(toggle).toContainText('Show idle time');
+      await expect(control).toBeChecked();
     });
 
     test('exposes an accessible per-segment toggle reflecting pressed state', async ({
@@ -92,7 +93,9 @@ test.describe('Timeline collapse idle time', () => {
     test('disables the idle-time toggle when nothing is collapsible', async ({
       page,
     }) => {
-      await expect(page.getByTestId('toggle-idle-time')).toBeDisabled();
+      await expect(
+        page.getByRole('switch', { name: 'Hide idle time' }),
+      ).toBeDisabled();
     });
   });
 });

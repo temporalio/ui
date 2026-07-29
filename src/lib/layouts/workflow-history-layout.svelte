@@ -5,7 +5,11 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
-  import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
+  import EventFilter, {
+    type FilterAction,
+    type FilterToggle,
+    type FilterView,
+  } from '$lib/components/lines-and-dots/event-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
@@ -14,13 +18,13 @@
     HISTORY_CTX,
     type HistoryContext,
   } from '$lib/contexts/history-context';
-  import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
-  import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { buildGroupIndex } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
-  import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
+  import {
+    allEventTypeOptions,
+    isCategoryType,
+  } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import {
     enrichGroups,
@@ -31,7 +35,12 @@
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
-  import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
+  import {
+    eventAttributeFilter,
+    eventCategoryFilter,
+    eventClassificationFilter,
+    eventTypeFilter,
+  } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
     IterableEventWithPending,
@@ -43,6 +52,12 @@
     parseEventFilterParams,
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
+  import {
+    countBy,
+    filterableEventClassifications,
+    passesStatusFacet,
+  } from '$lib/utilities/event-group-filters';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
@@ -58,6 +73,12 @@
     const urlParams = parseEventFilterParams(page.url);
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventTypeFilter =
+      urlParams.categories ?? allEventTypeOptions.map(({ value }) => value);
+    $eventClassificationFilter = urlParams.classifications ?? [
+      ...filterableEventClassifications,
+    ];
+    $eventAttributeFilter = urlParams.attributes ?? [];
   });
 
   $effect(() => {
@@ -101,12 +122,34 @@
     };
   });
 
+  const pendingOnly = $derived($eventAttributeFilter.includes('pending'));
+
+  const eventCategoryForCounting = (event: WorkflowEvent) =>
+    isLocalActivityMarkerEvent(event) ? 'local-activity' : event.category;
+
+  const panelCounts = $derived(
+    compact
+      ? undefined
+      : { category: countBy(bufferEvents, eventCategoryForCounting) },
+  );
+
+  const statusFiltering = $derived(
+    $eventClassificationFilter.length < filterableEventClassifications.length,
+  );
+
+  const groupIndex = $derived(
+    pendingOnly || statusFiltering ? buildGroupIndex(bufferGroups) : undefined,
+  );
+
   const filteredGroups = $derived.by(() => {
     const active = $eventTypeFilter;
     const cats = $eventCategoryFilter;
     return bufferGroups.filter((g) => {
       if (!active.includes(g.category)) return false;
       if (cats && cats.length && !cats.includes(g.category)) return false;
+      if (pendingOnly && !g.isPending) return false;
+      if (statusFiltering && !passesStatusFacet(g, $eventClassificationFilter))
+        return false;
       return true;
     });
   });
@@ -115,9 +158,18 @@
     const active = $eventTypeFilter;
     const cats = $eventCategoryFilter;
     return bufferEvents.filter((ev) => {
-      const cat = (ev as WorkflowEvent).category;
+      const cat = eventCategoryForCounting(ev);
       if (!active.includes(cat)) return false;
       if (cats && cats.length && !cats.includes(cat)) return false;
+      if (!groupIndex) return true;
+      const group = groupIndex.get(ev.id);
+      if (!group) return false;
+      if (pendingOnly && !group.isPending) return false;
+      if (
+        statusFiltering &&
+        !passesStatusFacet(group, $eventClassificationFilter)
+      )
+        return false;
       return true;
     });
   });
@@ -193,6 +245,66 @@
   const onJSONClick = () => {
     $eventViewType = 'json';
   };
+
+  const liveUpdatesOn = $derived(!$pauseLiveUpdates && !isNotPending);
+
+  const viewModes = $derived<FilterView[]>([
+    {
+      id: 'feed',
+      label: translate('common.all'),
+      icon: 'feed',
+      active: $eventViewType === 'feed',
+      onSelect: onAllClick,
+    },
+    {
+      id: 'compact',
+      label: translate('events.legend-filter.view-compact'),
+      icon: 'compact',
+      active: compact,
+      onSelect: onCompactClick,
+    },
+    {
+      id: 'json',
+      label: translate('events.legend-filter.view-json'),
+      icon: 'json',
+      active: $eventViewType === 'json',
+      onSelect: onJSONClick,
+    },
+  ]);
+
+  const viewToggles = $derived<FilterToggle[]>([
+    {
+      id: 'history-auto-refresh',
+      label: liveUpdatesOn
+        ? translate('workflows.auto-refresh-on')
+        : translate('workflows.auto-refresh-off'),
+      liveIndicator: true,
+      checked: liveUpdatesOn,
+      disabled: isNotPending,
+      onChange: onAutoRefreshToggle,
+    },
+  ]);
+
+  const viewActions = $derived<FilterAction[]>([
+    ...($eventViewType === 'json'
+      ? []
+      : [
+          {
+            id: 'history-sort-direction',
+            label: reverseSort
+              ? translate('common.descending')
+              : translate('common.ascending'),
+            icon: reverseSort ? 'descending' : 'ascending',
+            onClick: onSort,
+          } as FilterAction,
+        ]),
+    {
+      id: 'history-download',
+      label: translate('common.download'),
+      icon: 'download',
+      onClick: () => (showDownloadPrompt = true),
+    },
+  ]);
 </script>
 
 <InputAndResults />
@@ -209,77 +321,23 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[11] border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2"
   >
-    <div class="items-bottom flex gap-4 pt-2">
-      <h2>
-        {translate('workflows.history-tab')}
-      </h2>
-      <TabButtons class="relative">
-        <TabButton
-          active={$eventViewType === 'feed'}
-          data-testid="feed"
-          icon="feed"
-          class="h-10"
-          on:click={onAllClick}>All</TabButton
-        >
-        <TabButton
-          active={$eventViewType === 'compact'}
-          data-testid="compact"
-          icon="compact"
-          class="h-10"
-          on:click={onCompactClick}>Compact</TabButton
-        >
-        <TabButton
-          active={$eventViewType === 'json'}
-          data-testid="json"
-          icon="json"
-          class="h-10"
-          on:click={onJSONClick}>JSON</TabButton
-        >
-      </TabButtons>
-    </div>
-    <div class="flex items-center gap-2 pb-2">
-      <ToggleButtons>
-        {#if $eventViewType !== 'json'}
-          <ToggleButton
-            leadingIcon={reverseSort ? 'descending' : 'ascending'}
-            data-testid="zoom-in"
-            on:click={onSort}
-            size="sm"
-          >
-            {reverseSort
-              ? translate('common.descending')
-              : translate('common.ascending')}
-          </ToggleButton>
-        {/if}
-        <EventTypeFilter {compact} />
-        <ToggleButton
-          disabled={isNotPending}
-          data-testid="pause"
-          class="border-l-0"
-          size="sm"
-          on:click={onAutoRefreshToggle}
-        >
-          <span
-            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
-          ></span>
-          {$pauseLiveUpdates || isNotPending
-            ? translate('workflows.auto-refresh-off')
-            : translate('workflows.auto-refresh-on')}
-        </ToggleButton>
-        <ToggleButton
-          data-testid="download"
-          leadingIcon="download"
-          size="sm"
-          on:click={() => (showDownloadPrompt = true)}
-        >
-          {translate('common.download')}
-        </ToggleButton>
-      </ToggleButtons>
-    </div>
+    <h2>
+      {translate('workflows.history-tab')}
+    </h2>
+    <EventFilter
+      groups={bufferGroups}
+      facets={$eventViewType === 'json'
+        ? ['event-type']
+        : ['event-type', 'refine']}
+      refineOptions={['pending']}
+      counts={panelCounts}
+      {compact}
+      toggles={viewToggles}
+      actions={viewActions}
+      views={viewModes}
+    />
   </div>
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}
@@ -288,7 +346,7 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {items} {groups} {compact} />
+        <EventSummaryTable {updating} {items} {groups} {compact} {groupIndex} />
       </div>
     {/if}
   </div>

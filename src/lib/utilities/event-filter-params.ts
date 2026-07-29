@@ -1,14 +1,19 @@
 import { goto as navigateTo } from '$app/navigation';
 
+import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
 import type { EventSortOrder } from '$lib/stores/event-view';
-import type { EventTypeCategory } from '$lib/types/events';
+import type { EventClassification, EventTypeCategory } from '$lib/types/events';
 
+import {
+  type EventGroupAttribute,
+  isEventGroupAttribute,
+  isFilterableClassification,
+} from './event-group-filters';
 import { updateMultipleQueryParameters } from './update-query-parameters';
 
 export const SHARED_FILTER_PARAMS = [
   'sort',
   'category',
-  'status',
   'refresh_off',
 ] as const;
 
@@ -21,20 +26,38 @@ export function getSharedFilterParams(url: URL): Record<string, string> {
   return params;
 }
 
-export function sharedFilterParamsToString(
-  params: Record<string, string>,
-): string {
-  return new URLSearchParams(params).toString();
+export const NONE_SELECTED = 'none';
+
+function parseListParam<T extends string>(
+  value: string | null,
+  isValid: (member: string) => member is T,
+): T[] | null {
+  if (!value) return null;
+  if (value === NONE_SELECTED) return [];
+  const members = value.split(',').filter(isValid);
+  return members.length ? members : null;
+}
+
+function serializeListParam(values: string[] | null | undefined) {
+  if (values === null || values === undefined) return undefined;
+  return values.length ? values.join(',') : NONE_SELECTED;
 }
 
 export function parseEventFilterParams(url: URL) {
-  const categoryParam = url.searchParams.get('category');
   return {
     sort: (url.searchParams.get('sort') as EventSortOrder) || 'descending',
-    categories: categoryParam
-      ? (categoryParam.split(',') as EventTypeCategory[])
-      : null,
-    statusFilter: url.searchParams.get('status') === 'pending',
+    categories: parseListParam(
+      url.searchParams.get('category'),
+      isCategoryType,
+    ),
+    classifications: parseListParam(
+      url.searchParams.get('classification'),
+      isFilterableClassification,
+    ),
+    attributes: parseListParam(
+      url.searchParams.get('attribute'),
+      isEventGroupAttribute,
+    ),
     refresh_off: url.searchParams.get('refresh_off') === 'true',
   };
 }
@@ -42,7 +65,8 @@ export function parseEventFilterParams(url: URL) {
 type FilterUpdate = {
   sort?: EventSortOrder;
   categories?: EventTypeCategory[] | null;
-  statusFilter?: boolean;
+  classifications?: EventClassification[] | null;
+  attributes?: EventGroupAttribute[] | null;
   refresh_off?: boolean;
 };
 
@@ -64,16 +88,23 @@ export function updateEventFilterParams(
   if (filters.categories !== undefined) {
     parameters.push({
       parameter: 'category',
-      value: filters.categories?.length
-        ? filters.categories.join(',')
-        : undefined,
+      value: serializeListParam(filters.categories),
     });
   }
 
-  if (filters.statusFilter !== undefined) {
+  if (filters.classifications !== undefined) {
     parameters.push({
-      parameter: 'status',
-      value: filters.statusFilter ? 'pending' : undefined,
+      parameter: 'classification',
+      value: serializeListParam(filters.classifications),
+    });
+  }
+
+  if (filters.attributes !== undefined) {
+    parameters.push({
+      parameter: 'attribute',
+      value: filters.attributes?.length
+        ? filters.attributes.join(',')
+        : undefined,
     });
   }
 

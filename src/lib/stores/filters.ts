@@ -7,6 +7,10 @@ import { allEventTypeOptions } from '$lib/models/event-history/get-event-categor
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { persistStore } from '$lib/stores/persist-store';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
+import {
+  type EventGroupAttribute,
+  filterableEventClassifications,
+} from '$lib/utilities/event-group-filters';
 
 export const query = derived([page], ([$page]) =>
   $page.url.searchParams.get('query'),
@@ -129,20 +133,11 @@ export const eventCategoryFilter = writable<EventTypeCategory[] | undefined>(
   updateEventCategoryFilter,
 );
 
-const updateEventClassificationFilter: StartStopNotifier<
-  EventClassification[] | undefined
-> = (set) => {
-  return parameters.subscribe(({ classification }) => {
-    if (!classification && get(eventClassificationFilter)) {
-      set(undefined);
-    }
-  });
-};
-
-export const eventClassificationFilter = writable<
-  EventClassification[] | undefined
->(undefined, updateEventClassificationFilter);
-
 const defaultOptions = allEventTypeOptions.map(({ value }) => value);
 export const eventTypeFilter = writable<EventTypeCategory[]>(defaultOptions);
-export const eventStatusFilter = writable<boolean>(false);
+
+export const eventClassificationFilter = writable<EventClassification[]>([
+  ...filterableEventClassifications,
+]);
+
+export const eventAttributeFilter = writable<EventGroupAttribute[]>([]);

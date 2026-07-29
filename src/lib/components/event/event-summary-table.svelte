@@ -1,23 +1,23 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import LiveCountAnnouncer from '$lib/components/live-count-announcer.svelte';
   import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import { buildGroupIndex, isEventGroup } from '$lib/models/event-groups';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
-  import { eventStatusFilter } from '$lib/stores/filters';
   import { currentPageKey, perPageKey } from '$lib/stores/pagination';
   import type {
     IterableEventWithPending,
     WorkflowEventWithPending,
   } from '$lib/types/events';
-  import { getFailedOrPendingEvents } from '$lib/utilities/get-failed-or-pending';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -34,6 +34,7 @@
   let {
     items,
     groups = [],
+    groupIndex: providedGroupIndex = undefined,
     updating = false,
     loading = false,
     compact = false,
@@ -42,6 +43,7 @@
   }: {
     items: IterableEventWithPending[];
     groups?: EventGroups;
+    groupIndex?: Map<string, EventGroup>;
     updating?: boolean;
     loading?: boolean;
     compact?: boolean;
@@ -51,18 +53,15 @@
 
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
-  const groupIndex = $derived(buildGroupIndex(groups));
+  const groupIndex = $derived(providedGroupIndex ?? buildGroupIndex(groups));
   const url = $derived(page.url);
   const perPageParam = $derived(url.searchParams.get(perPageKey) ?? '100');
   const currentPageParam = $derived(
     url.searchParams.get(currentPageKey) || '1',
   );
 
-  const filteredForStatus = (items: IterableEventWithPending[]) =>
-    getFailedOrPendingEvents(items, $eventStatusFilter);
-
   const paginatedHistory = (items: IterableEventWithPending[]) => {
-    return filteredForStatus(items).slice(
+    return items.slice(
       (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
       parseInt(currentPageParam) * parseInt(perPageParam),
     ) as WorkflowEventWithPending[];
@@ -101,18 +100,14 @@
     previousPageButtonLabel={translate('common.previous-page')}
     pageButtonLabel={(page) => translate('common.go-to-page', { page })}
     {updating}
-    items={filteredForStatus(items)}
+    {items}
     let:visibleItems
     maxHeight="none"
     class="border-t-0"
   >
     <TableHeaderRow slot="headers" class="!h-8">
       {#each columns as column, i (`${column.label}:${i}`)}
-        <TableHeaderCell {column}>
-          {#if column.label === 'Event Type'}
-            <EventHistoryLegend eventTypesOnly />
-          {/if}
-        </TableHeaderCell>
+        <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
     {#each visibleItems as event, index (iterableKey(event))}

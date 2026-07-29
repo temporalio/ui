@@ -356,8 +356,8 @@ export const Strings = {
   'execution-start': 'Execution Start',
   'workflow-timeout': 'Workflow Timeout',
   'scheduled-by': 'Scheduled By',
-  'auto-refresh-on': 'Auto Refresh On',
-  'auto-refresh-off': 'Auto Refresh Off',
+  'auto-refresh-on': 'Auto refresh on',
+  'auto-refresh-off': 'Auto refresh off',
   minimized: 'Minimized',
   expanded: 'Expanded',
   'timeline-minimized':
