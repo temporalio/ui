@@ -3,7 +3,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { createNewsFeedStore } from '$lib/stores/news-feed';
   import {

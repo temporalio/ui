@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import Textarea from '$lib/holocene/textarea.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';

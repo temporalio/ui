@@ -1,6 +1,6 @@
 <script lang="ts">
   import DeleteConfirmModal from '$lib/components/delete-confirmation-modal.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
 
   interface Props {

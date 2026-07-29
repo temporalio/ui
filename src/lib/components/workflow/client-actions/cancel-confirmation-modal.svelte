@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';
   import { cancelWorkflow } from '$lib/services/workflow-service';

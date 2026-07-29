@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
 
   interface Props {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { terminateActivityExecution } from '$lib/services/standalone-activities';
   import { toaster } from '$lib/stores/toaster';

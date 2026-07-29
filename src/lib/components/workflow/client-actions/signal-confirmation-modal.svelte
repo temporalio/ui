@@ -3,7 +3,7 @@
 
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 

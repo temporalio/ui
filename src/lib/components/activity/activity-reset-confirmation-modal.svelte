@@ -1,6 +1,6 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';

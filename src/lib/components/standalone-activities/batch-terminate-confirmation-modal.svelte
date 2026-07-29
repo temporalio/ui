@@ -4,7 +4,7 @@
   import { getContext } from 'svelte';
 
   import BatchOperationConfirmationForm from '$lib/components/batch/batch-operation-confirmation-form.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';
   import {

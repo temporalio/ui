@@ -6,7 +6,7 @@
 
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Modal from '$lib/holocene/modal-runes.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
