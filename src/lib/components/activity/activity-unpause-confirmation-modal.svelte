@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
@@ -43,15 +43,19 @@
   confirmText={translate('workflows.unpause')}
   cancelText={translate('common.cancel')}
   confirmType="destructive"
-  on:cancelModal={hideModal}
-  on:confirmModal={onActivityUnpause}
+  onCancelModal={hideModal}
+  onConfirmModal={onActivityUnpause}
 >
-  <h3 slot="title">
-    {translate('activities.unpause-modal-confirmation', {
-      activityId,
-    })}
-  </h3>
-  <div slot="content">
-    <p>{translate('activities.unpause-modal-description')}</p>
-  </div>
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('activities.unpause-modal-confirmation', {
+        activityId,
+      })}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>{translate('activities.unpause-modal-description')}</p>
+    </div>
+  {/snippet}
 </Modal>

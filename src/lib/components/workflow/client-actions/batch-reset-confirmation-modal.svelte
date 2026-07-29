@@ -4,7 +4,7 @@
   import { getContext } from 'svelte';
 
   import BatchOperationConfirmationForm from '$lib/components/batch/batch-operation-confirmation-form.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -95,13 +95,15 @@
   bind:error
   bind:open
   id="batch-reset-confirmation-modal"
-  on:confirmModal={resetWorkflows}
+  onConfirmModal={resetWorkflows}
   confirmType="destructive"
 >
-  <h3 slot="title">
-    <Translate key="workflows.batch-reset-modal-title" />
-  </h3>
-  <svelte:fragment slot="content">
+  {#snippet titleSnippet()}
+    <h3>
+      <Translate key="workflows.batch-reset-modal-title" />
+    </h3>
+  {/snippet}
+  {#snippet content()}
     <BatchOperationConfirmationForm
       bind:reason={$reason}
       bind:jobId={$jobId}
@@ -141,5 +143,5 @@
         />
       </RadioGroup>
     </BatchOperationConfirmationForm>
-  </svelte:fragment>
+  {/snippet}
 </Modal>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
@@ -46,20 +46,24 @@
   confirmText={translate('workflows.reset')}
   cancelText={translate('common.cancel')}
   confirmType="destructive"
-  on:cancelModal={hideModal}
-  on:confirmModal={onActivityReset}
+  onCancelModal={hideModal}
+  onConfirmModal={onActivityReset}
 >
-  <h3 slot="title">
-    {translate('activities.reset-modal-confirmation', {
-      activityId,
-    })}
-  </h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <p>{translate('activities.reset-modal-description')}</p>
-    <Checkbox
-      bind:checked={resetHeartbeat}
-      label={translate('activities.reset-heartbeat-details')}
-      data-testid="reset-heartbeat-details"
-    />
-  </div>
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('activities.reset-modal-confirmation', {
+        activityId,
+      })}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      <p>{translate('activities.reset-modal-description')}</p>
+      <Checkbox
+        bind:checked={resetHeartbeat}
+        label={translate('activities.reset-heartbeat-details')}
+        data-testid="reset-heartbeat-details"
+      />
+    </div>
+  {/snippet}
 </Modal>

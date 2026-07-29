@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';
   import { cancelWorkflow } from '$lib/services/workflow-service';
@@ -73,12 +73,14 @@
   bind:open
   {loading}
   confirmType="destructive"
-  on:confirmModal={cancel}
+  onConfirmModal={cancel}
 >
-  <h3 slot="title">{translate('workflows.cancel-modal-title')}</h3>
-  <svelte:fragment slot="content">
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.cancel-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
     <p>
       {translate('workflows.cancel-modal-confirmation')}
     </p>
-  </svelte:fragment>
+  {/snippet}
 </Modal>

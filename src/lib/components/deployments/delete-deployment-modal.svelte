@@ -1,6 +1,6 @@
 <script lang="ts">
   import DeleteConfirmModal from '$lib/components/delete-confirmation-modal.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
 
   interface Props {
@@ -29,14 +29,18 @@
     confirmText=""
     cancelText={translate('common.close')}
     hideConfirm
-    on:cancelModal={() => onCancel?.()}
+    onCancelModal={() => onCancel?.()}
   >
-    <h3 slot="title">{translate('deployments.cannot-delete-deployment')}</h3>
-    <div slot="content">
-      <p class="text-sm">
-        {translate('deployments.cannot-delete-deployment-body')}
-      </p>
-    </div>
+    {#snippet titleSnippet()}
+      <h3>{translate('deployments.cannot-delete-deployment')}</h3>
+    {/snippet}
+    {#snippet content()}
+      <div>
+        <p class="text-sm">
+          {translate('deployments.cannot-delete-deployment-body')}
+        </p>
+      </div>
+    {/snippet}
   </Modal>
 {:else}
   <DeleteConfirmModal

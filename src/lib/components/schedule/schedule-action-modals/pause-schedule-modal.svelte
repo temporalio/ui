@@ -1,6 +1,6 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     actionPending,
@@ -40,8 +40,8 @@
   confirmDisabled={!reason.trim()}
   loading={$actionPending}
   error={$serverError}
-  on:cancelModal={() => closeConfirmationModal('pause')}
-  on:confirmModal={() =>
+  onCancelModal={() => closeConfirmationModal('pause')}
+  onConfirmModal={() =>
     submitPauseSchedule(reason.trim(), {
       identity,
       scheduleId,
@@ -49,30 +49,34 @@
       isPaused: isSchedulePaused ?? false,
     })}
 >
-  <h3 slot="title">
-    {isSchedulePaused
-      ? translate('schedules.unpause-modal-title')
-      : translate('schedules.pause-modal-title')}
-  </h3>
-  <div slot="content">
-    <p>
+  {#snippet titleSnippet()}
+    <h3>
       {isSchedulePaused
-        ? translate('schedules.unpause-modal-confirmation', {
-            schedule: scheduleId,
-          })
-        : translate('schedules.pause-modal-confirmation', {
-            schedule: scheduleId,
-          })}
-    </p>
-    <Input
-      id="pause-reason"
-      bind:value={reason}
-      placeholder={isSchedulePaused
-        ? translate('schedules.unpause-reason')
-        : translate('schedules.pause-reason')}
-      label={translate('common.reason')}
-      required
-      class="mt-4"
-    />
-  </div>
+        ? translate('schedules.unpause-modal-title')
+        : translate('schedules.pause-modal-title')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>
+        {isSchedulePaused
+          ? translate('schedules.unpause-modal-confirmation', {
+              schedule: scheduleId,
+            })
+          : translate('schedules.pause-modal-confirmation', {
+              schedule: scheduleId,
+            })}
+      </p>
+      <Input
+        id="pause-reason"
+        bind:value={reason}
+        placeholder={isSchedulePaused
+          ? translate('schedules.unpause-reason')
+          : translate('schedules.pause-reason')}
+        label={translate('common.reason')}
+        required
+        class="mt-4"
+      />
+    </div>
+  {/snippet}
 </Modal>

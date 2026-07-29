@@ -1,6 +1,6 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import { terminateActivityExecution } from '$lib/services/standalone-activities';
   import { toaster } from '$lib/stores/toaster';
@@ -64,21 +64,25 @@
   bind:open
   {loading}
   confirmType="destructive"
-  on:confirmModal={terminate}
+  onConfirmModal={terminate}
 >
-  <h3 slot="title">
-    {translate('standalone-activities.terminate-modal-title')}
-  </h3>
-  <div class="space-y-2" slot="content">
-    <p>
-      {translate('standalone-activities.terminate-modal-confirmation')}
-    </p>
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('standalone-activities.terminate-modal-title')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="space-y-2">
+      <p>
+        {translate('standalone-activities.terminate-modal-confirmation')}
+      </p>
 
-    <Input
-      id="terminate-activity-execution-reason"
-      label={translate('common.reason-optional')}
-      bind:value={reason}
-      placeholder={translate('common.reason-placeholder')}
-    />
-  </div>
+      <Input
+        id="terminate-activity-execution-reason"
+        label={translate('common.reason-optional')}
+        bind:value={reason}
+        placeholder={translate('common.reason-placeholder')}
+      />
+    </div>
+  {/snippet}
 </Modal>

@@ -3,7 +3,7 @@
 
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -93,38 +93,42 @@
   confirmText={translate('common.submit')}
   cancelText={translate('common.cancel')}
   confirmDisabled={!name || !$encoding}
-  on:cancelModal={hideSignalModal}
-  on:confirmModal={signal}
+  onCancelModal={hideSignalModal}
+  onConfirmModal={signal}
 >
-  <h3 slot="title">{translate('workflows.signal-modal-title')}</h3>
-  <div slot="content" class="flex flex-col gap-4">
-    {#if signalDefinitions && signalDefinitions.length > 0 && !customSignal}
-      <Select
-        id="signal-select"
-        label={translate('workflows.signal-name-label')}
-        class="min-w-fit"
-        bind:value={name}
-        data-testid="signal-select"
-        placeholder="Select a signal"
-        required
-      >
-        <Option
-          onclick={handleCustom}
-          value="custom"
-          description="Input Signal name">{translate('common.custom')}</Option
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.signal-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      {#if signalDefinitions && signalDefinitions.length > 0 && !customSignal}
+        <Select
+          id="signal-select"
+          label={translate('workflows.signal-name-label')}
+          class="min-w-fit"
+          bind:value={name}
+          data-testid="signal-select"
+          placeholder="Select a signal"
+          required
         >
-        {#each signalDefinitions as { name: value, description = '' }}
-          <Option {value} {description}>{value}</Option>
-        {/each}
-      </Select>
-    {:else}
-      <Input
-        id="signal-name"
-        label={translate('workflows.signal-name-label')}
-        required
-        bind:value={name}
-      />
-    {/if}
-    <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
-  </div>
+          <Option
+            onclick={handleCustom}
+            value="custom"
+            description="Input Signal name">{translate('common.custom')}</Option
+          >
+          {#each signalDefinitions as { name: value, description = '' }}
+            <Option {value} {description}>{value}</Option>
+          {/each}
+        </Select>
+      {:else}
+        <Input
+          id="signal-name"
+          label={translate('workflows.signal-name-label')}
+          required
+          bind:value={name}
+        />
+      {/if}
+      <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
+    </div>
+  {/snippet}
 </Modal>

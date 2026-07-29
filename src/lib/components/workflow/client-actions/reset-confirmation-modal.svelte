@@ -3,7 +3,7 @@
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -87,12 +87,14 @@
   bind:error
   bind:open
   {loading}
-  on:confirmModal={reset}
-  on:cancelModal={hideResetModal}
+  onConfirmModal={reset}
+  onCancelModal={hideResetModal}
   confirmDisabled={!$eventId}
 >
-  <h3 slot="title">{translate('workflows.reset-modal-title')}</h3>
-  <svelte:fragment slot="content">
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.reset-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
     <div class="flex w-full flex-col gap-4">
       <Select
         data-testid="workflow-reset-event-id-select"
@@ -135,5 +137,5 @@
         placeholder={translate('common.reason-placeholder')}
       />
     </div>
-  </svelte:fragment>
+  {/snippet}
 </Modal>

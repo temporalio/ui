@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import Textarea from '$lib/holocene/textarea.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';
@@ -64,23 +64,27 @@
   {loading}
   confirmText={translate('workflows.pause-workflow')}
   cancelText={translate('common.cancel')}
-  on:cancelModal={hideModal}
-  on:confirmModal={pause}
+  onCancelModal={hideModal}
+  onConfirmModal={pause}
 >
-  <h3 slot="title">{translate('workflows.pause-workflow')}</h3>
-  <div slot="content">
-    <p>{translate('workflows.workflow-pause-description')}</p>
-    <ul class="mt-4 list-disc pl-6">
-      <li>{translate('workflows.workflow-pause-description-item-1')}</li>
-      <li>{translate('workflows.workflow-pause-description-item-2')}</li>
-      <li>{translate('workflows.workflow-pause-description-item-3')}</li>
-    </ul>
-    <Textarea
-      id="workflow-pause-details"
-      class="mt-4"
-      placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason-optional')}
-      bind:value={reason}
-    />
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.pause-workflow')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>{translate('workflows.workflow-pause-description')}</p>
+      <ul class="mt-4 list-disc pl-6">
+        <li>{translate('workflows.workflow-pause-description-item-1')}</li>
+        <li>{translate('workflows.workflow-pause-description-item-2')}</li>
+        <li>{translate('workflows.workflow-pause-description-item-3')}</li>
+      </ul>
+      <Textarea
+        id="workflow-pause-details"
+        class="mt-4"
+        placeholder={translate('common.reason-placeholder')}
+        label={translate('common.reason-optional')}
+        bind:value={reason}
+      />
+    </div>
+  {/snippet}
 </Modal>

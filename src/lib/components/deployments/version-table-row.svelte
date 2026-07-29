@@ -4,7 +4,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     deleteWorkerDeploymentVersion,
@@ -477,17 +477,23 @@
   open={showUnsetCurrentModal}
   confirmText={translate('common.confirm')}
   cancelText={translate('common.cancel')}
-  on:confirmModal={handleUnsetCurrentVersion}
-  on:cancelModal={() => {
+  onConfirmModal={handleUnsetCurrentVersion}
+  onCancelModal={() => {
     showUnsetCurrentModal = false;
     unsetCurrentError = '';
   }}
 >
-  <h3 slot="title">{translate('deployments.unset-current')}</h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <p class="text-sm">{translate('deployments.unset-current-description')}</p>
-    {#if unsetCurrentError}
-      <p class="text-sm text-danger">{unsetCurrentError}</p>
-    {/if}
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('deployments.unset-current')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      <p class="text-sm">
+        {translate('deployments.unset-current-description')}
+      </p>
+      {#if unsetCurrentError}
+        <p class="text-sm text-danger">{unsetCurrentError}</p>
+      {/if}
+    </div>
+  {/snippet}
 </Modal>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -40,41 +40,45 @@
   confirmType="primary"
   confirmText={translate('common.download')}
   cancelText={translate('common.cancel')}
-  on:confirmModal={() => onDownloadClick()}
-  on:cancelModal={() => (open = false)}
+  onConfirmModal={() => onDownloadClick()}
+  onCancelModal={() => (open = false)}
 >
-  <h3 slot="title">
-    {translate('common.download-event-history-json')}
-  </h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <RadioGroup
-      group={downloadEventHistorySetting}
-      name="decode-setting"
-      class="h-auto overflow-auto"
-    >
-      <RadioInput
-        id="use-encoded-setting"
-        data-testid="use-encoded-setting-input"
-        value="encoded"
-        label={translate('events.encoded')}
-        description={translate('events.encoded-description')}
-      />
-      <RadioInput
-        id="use-decoded-setting"
-        data-testid="use-decoded-setting-input"
-        value="decoded"
-        label={translate('events.decoded')}
-        description={translate('events.decoded-description')}
-      />
-      <RadioInput
-        id="use-readable-setting"
-        data-testid="use-readable-setting-input"
-        value="readable"
-        label={translate('events.readable')}
-        description={translate('events.readable-description')}
-      />
-    </RadioGroup>
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('common.download-event-history-json')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      <RadioGroup
+        group={downloadEventHistorySetting}
+        name="decode-setting"
+        class="h-auto overflow-auto"
+      >
+        <RadioInput
+          id="use-encoded-setting"
+          data-testid="use-encoded-setting-input"
+          value="encoded"
+          label={translate('events.encoded')}
+          description={translate('events.encoded-description')}
+        />
+        <RadioInput
+          id="use-decoded-setting"
+          data-testid="use-decoded-setting-input"
+          value="decoded"
+          label={translate('events.decoded')}
+          description={translate('events.decoded-description')}
+        />
+        <RadioInput
+          id="use-readable-setting"
+          data-testid="use-readable-setting-input"
+          value="readable"
+          label={translate('events.readable')}
+          description={translate('events.readable-description')}
+        />
+      </RadioGroup>
 
-    <WorkflowRawHistoryLink />
-  </div>
+      <WorkflowRawHistoryLink />
+    </div>
+  {/snippet}
 </Modal>

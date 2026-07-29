@@ -4,7 +4,7 @@
   import { getContext } from 'svelte';
 
   import BatchOperationConfirmationModalBody from '$lib/components/batch/batch-operation-confirmation-form.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { Action } from '$lib/models/workflow-actions';
@@ -93,12 +93,14 @@
   cancelText={translate('common.cancel')}
   confirmDisabled={!$jobIdValid}
   confirmText={translate('workflows.terminate')}
-  on:confirmModal={terminateWorkflows}
+  onConfirmModal={terminateWorkflows}
 >
-  <h3 slot="title">
-    <Translate key="workflows.batch-terminate-modal-title" />
-  </h3>
-  <svelte:fragment slot="content">
+  {#snippet titleSnippet()}
+    <h3>
+      <Translate key="workflows.batch-terminate-modal-title" />
+    </h3>
+  {/snippet}
+  {#snippet content()}
     <BatchOperationConfirmationModalBody
       bind:reason={$reason}
       bind:jobId={$jobId}
@@ -121,5 +123,5 @@
         { action: actionText },
       )}
     />
-  </svelte:fragment>
+  {/snippet}
 </Modal>

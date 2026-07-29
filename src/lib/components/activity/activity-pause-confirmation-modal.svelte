@@ -1,7 +1,7 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Modal from '$lib/holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal-runes.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
@@ -47,30 +47,34 @@
   confirmText={translate('workflows.pause')}
   cancelText={translate('common.cancel')}
   confirmType="destructive"
-  on:cancelModal={hideModal}
-  on:confirmModal={onActivityPause}
+  onCancelModal={hideModal}
+  onConfirmModal={onActivityPause}
 >
-  <h3 slot="title">
-    {translate('activities.pause-modal-confirmation', {
-      activityId,
-    })}
-  </h3>
-  <div slot="content">
-    <p>{translate('activities.pause-modal-description')}</p>
-    <Link
-      newTab
-      trailingIcon="book"
-      href="https://docs.temporal.io/activity-operations#important-considerations"
-      class="mt-1"
-    >
-      {translate('activities.pause-modal-docs-link')}
-    </Link>
-    <Input
-      id="activity-pause-reason"
-      class="mt-4"
-      placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason-optional')}
-      bind:value={reason}
-    />
-  </div>
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('activities.pause-modal-confirmation', {
+        activityId,
+      })}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>{translate('activities.pause-modal-description')}</p>
+      <Link
+        newTab
+        trailingIcon="book"
+        href="https://docs.temporal.io/activity-operations#important-considerations"
+        class="mt-1"
+      >
+        {translate('activities.pause-modal-docs-link')}
+      </Link>
+      <Input
+        id="activity-pause-reason"
+        class="mt-4"
+        placeholder={translate('common.reason-placeholder')}
+        label={translate('common.reason-optional')}
+        bind:value={reason}
+      />
+    </div>
+  {/snippet}
 </Modal>
