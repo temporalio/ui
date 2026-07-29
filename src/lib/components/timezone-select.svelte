@@ -167,7 +167,7 @@
         id="relative-toggle"
         bind:checked={$relativeTime}
         labelPosition="left"
-        on:change={handleRelativeToggle}
+        onchange={handleRelativeToggle}
         data-testid="timezones-relative-toggle"
       />
     </div>
