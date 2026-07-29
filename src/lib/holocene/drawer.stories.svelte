@@ -77,7 +77,9 @@
   <Button onclick={() => (open = !open)}>Toggle Drawer</Button>
   <Drawer bind:open {...args} onClick={action('click')}>
     <DrawerContent title="Drawer Title">
-      <span slot="subtitle">A supporting subtitle line</span>
+      {#snippet subtitle()}
+        <span>A supporting subtitle line</span>
+      {/snippet}
       <p class={merge(args.position === 'right' && 'max-w-80')}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
       </p>
@@ -89,7 +91,9 @@
   <Button onclick={() => (open = !open)}>Toggle Drawer</Button>
   <Drawer bind:open {...args} onClick={action('click')}>
     <DrawerContent>
-      <span slot="subtitle">Subtitle rendered without a title</span>
+      {#snippet subtitle()}
+        <span>Subtitle rendered without a title</span>
+      {/snippet}
       <p class={merge(args.position === 'right' && 'max-w-80')}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
       </p>
