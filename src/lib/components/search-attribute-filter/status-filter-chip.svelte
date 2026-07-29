@@ -142,7 +142,7 @@
         >
           {#snippet leading()}
             <Checkbox
-              on:change={() => handleStatusSelect(status)}
+              onChange={() => handleStatusSelect(status)}
               {checked}
               label={status ?? undefined}
               labelHidden
