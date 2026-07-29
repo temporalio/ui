@@ -1,32 +1,54 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import Button from './button.svelte';
   import Tooltip from './tooltip.svelte';
 
-  export let containerHeight = 600;
-  export let initialZoom = 1;
-  export let maxZoomIn = 0.25;
-  export let maxZoomOut = 2.5;
-  export let width = 600;
-  export let height = 400;
-  export let zoomable = true;
-  export let pannable = true;
+  interface Props {
+    containerHeight?: number;
+    initialZoom?: number;
+    maxZoomIn?: number;
+    maxZoomOut?: number;
+    width?: number;
+    height?: number;
+    zoomable?: boolean;
+    pannable?: boolean;
+    class?: string;
+    controls?: Snippet;
+    graph?: Snippet<[{ width: number; height: number; zoomLevel: number }]>;
+  }
 
-  let zoomLevel = initialZoom;
+  let {
+    containerHeight = 600,
+    initialZoom = 1,
+    maxZoomIn = 0.25,
+    maxZoomOut = 2.5,
+    width = $bindable(600),
+    height = $bindable(400),
+    zoomable = true,
+    pannable = true,
+    class: className = '',
+    controls,
+    graph,
+  }: Props = $props();
 
-  let svg: SVGSVGElement;
+  // svelte-ignore state_referenced_locally
+  let zoomLevel = $state(initialZoom);
 
-  $: viewBox = {
+  let svg = $state<SVGSVGElement>();
+
+  let viewBox = $derived({
     x: 0,
     y: 0,
     width,
     height,
-  };
+  });
 
-  let isPanning = false;
-  let startX = 0;
-  let startY = 0;
-  let panOffsetX = 0;
-  let panOffsetY = 0;
+  let isPanning = $state(false);
+  let startX = $state(0);
+  let startY = $state(0);
+  let panOffsetX = $state(0);
+  let panOffsetY = $state(0);
 
   const PAN_STEP_RATIO = 0.1;
   const ZOOM_STEP = 0.1;
@@ -83,7 +105,7 @@
   }
 
   const handleWheel = (event: WheelEvent) => {
-    if (!zoomable) return;
+    if (!zoomable || !svg) return;
     event.preventDefault();
 
     const rect = svg.getBoundingClientRect();
@@ -117,7 +139,7 @@
   }
 
   function handleMouseMove(event: MouseEvent) {
-    if (!isPanning) return;
+    if (!isPanning || !svg) return;
 
     const dx = (startX - event.clientX) * (viewBox.width / svg.clientWidth);
     const dy = (startY - event.clientY) * (viewBox.height / svg.clientHeight);
@@ -143,19 +165,20 @@
   }
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
   class="relative overflow-hidden"
   tabindex="0"
   role="group"
   aria-label="Zoomable workflow graph. Use arrow keys to pan, plus and minus to zoom."
-  on:keydown={handleKeydown}
+  onkeydown={handleKeydown}
   bind:clientWidth={width}
   bind:clientHeight={height}
   style="height: min({containerHeight}px, calc(100dvh - 8rem));"
 >
   <div class="absolute right-4 top-4 z-20 flex items-center gap-2">
-    <slot name="controls" />
+    {@render controls?.()}
   </div>
   <div class="absolute bottom-4 right-4 z-20 flex items-center gap-2">
     {#if pannable}
@@ -237,15 +260,17 @@
     viewBox="{viewBox.x} {viewBox.y} {viewBox.width} {viewBox.height}"
     {width}
     {height}
-    class="relative select-none {$$restProps.class}"
-    class:cursor-grab={pannable}
-    class:active:cursor-grabbing={pannable}
-    on:wheel={handleWheel}
-    on:mousedown={handleMouseDown}
-    on:mousemove={handleMouseMove}
-    on:mouseup={handleMouseUp}
-    on:mouseleave={handleMouseLeave}
+    class={[
+      'relative select-none',
+      pannable && 'cursor-grab active:cursor-grabbing',
+      className,
+    ]}
+    onwheel={handleWheel}
+    onmousedown={handleMouseDown}
+    onmousemove={handleMouseMove}
+    onmouseup={handleMouseUp}
+    onmouseleave={handleMouseLeave}
   >
-    <slot {width} {height} {zoomLevel} />
+    {@render graph?.({ width, height, zoomLevel })}
   </svg>
 </div>
