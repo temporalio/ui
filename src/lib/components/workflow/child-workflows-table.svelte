@@ -47,57 +47,62 @@
 
 <Pagination
   items={formattedAll}
-  let:visibleItems
   aria-label={translate('workflows.child-workflows')}
   pageSizeSelectLabel={translate('common.per-page')}
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
-  <div slot="pagination-top"></div>
-  <Table class="w-full">
-    {#snippet caption()}
-      <caption class="sr-only">{translate('workflows.child-workflows')}</caption
-      >
-    {/snippet}
-    {#snippet headers()}
-      <TableHeaderRow>
-        <th scope="col" class="max-md:hidden">{translate('common.status')}</th>
-        <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
-        <th scope="col">{translate('workflows.child-id')}</th>
-        <th scope="col">{translate('workflows.child-run-id')}</th>
-      </TableHeaderRow>
-    {/snippet}
-    {#each visibleItems as child}
-      <TableRow>
-        <td class="max-md:hidden">
-          <WorkflowStatus status={child.status} />
-        </td>
-        <td class="max-lg:hidden">
-          {child.type}
-        </td>
-        <td class="hover:text-blue-700 hover:underline">
-          <Link
-            href={routeForWorkflow({
-              namespace: child.namespace,
-              workflow: child.workflowId,
-              run: child.runId,
-            })}
+  {#snippet paginationTop()}
+    <div></div>
+  {/snippet}
+  {#snippet children({ visibleItems })}
+    <Table class="w-full">
+      {#snippet caption()}
+        <caption class="sr-only"
+          >{translate('workflows.child-workflows')}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <TableHeaderRow>
+          <th scope="col" class="max-md:hidden">{translate('common.status')}</th
           >
-            {child.workflowId}
-          </Link>
-        </td>
-        <td class="hover:text-blue-700 hover:underline">
-          <Link
-            href={routeForWorkflow({
-              namespace: child.namespace,
-              workflow: child.workflowId,
-              run: child.runId,
-            })}
-          >
-            {child.runId}
-          </Link>
-        </td>
-      </TableRow>
-    {/each}
-  </Table>
+          <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
+          <th scope="col">{translate('workflows.child-id')}</th>
+          <th scope="col">{translate('workflows.child-run-id')}</th>
+        </TableHeaderRow>
+      {/snippet}
+      {#each visibleItems as child}
+        <TableRow>
+          <td class="max-md:hidden">
+            <WorkflowStatus status={child.status} />
+          </td>
+          <td class="max-lg:hidden">
+            {child.type}
+          </td>
+          <td class="hover:text-blue-700 hover:underline">
+            <Link
+              href={routeForWorkflow({
+                namespace: child.namespace,
+                workflow: child.workflowId,
+                run: child.runId,
+              })}
+            >
+              {child.workflowId}
+            </Link>
+          </td>
+          <td class="hover:text-blue-700 hover:underline">
+            <Link
+              href={routeForWorkflow({
+                namespace: child.namespace,
+                workflow: child.workflowId,
+                run: child.runId,
+              })}
+            >
+              {child.runId}
+            </Link>
+          </td>
+        </TableRow>
+      {/each}
+    </Table>
+  {/snippet}
 </Pagination>

@@ -22,33 +22,34 @@
 {#if $namespaces?.length > 0}
   <Pagination
     items={$namespaces}
-    let:visibleItems
     aria-label={translate('common.namespaces')}
     pageSizeSelectLabel={translate('common.per-page')}
     previousButtonLabel={translate('common.previous')}
     nextButtonLabel={translate('common.next')}
   >
-    <Table class="w-full">
-      {#snippet caption()}
-        <caption class="sr-only">{translate('common.namespaces')}</caption>
-      {/snippet}
-      {#snippet headers()}
-        <TableHeaderRow>
-          <th>{translate('common.name')}</th>
-        </TableHeaderRow>
-      {/snippet}
-      {#each visibleItems as namespace (namespace.namespaceInfo?.name)}
-        <TableRow>
-          <td>
-            <Link
-              href={routeForNamespace({
-                namespace: namespace.namespaceInfo?.name ?? '',
-              })}>{namespace.namespaceInfo?.name}</Link
-            >
-          </td>
-        </TableRow>
-      {/each}
-    </Table>
+    {#snippet children({ visibleItems })}
+      <Table class="w-full">
+        {#snippet caption()}
+          <caption class="sr-only">{translate('common.namespaces')}</caption>
+        {/snippet}
+        {#snippet headers()}
+          <TableHeaderRow>
+            <th>{translate('common.name')}</th>
+          </TableHeaderRow>
+        {/snippet}
+        {#each visibleItems as namespace (namespace.namespaceInfo?.name)}
+          <TableRow>
+            <td>
+              <Link
+                href={routeForNamespace({
+                  namespace: namespace.namespaceInfo?.name ?? '',
+                })}>{namespace.namespaceInfo?.name}</Link
+              >
+            </td>
+          </TableRow>
+        {/each}
+      </Table>
+    {/snippet}
   </Pagination>
 {:else}
   <EmptyState
