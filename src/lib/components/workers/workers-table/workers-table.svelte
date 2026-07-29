@@ -40,7 +40,6 @@
 </script>
 
 <PaginatedTable
-  let:visibleItems
   {onFetch}
   {onError}
   aria-label={translate('workers.workers')}
@@ -50,20 +49,26 @@
   emptyStateMessage={translate('workers.empty-state-title')}
   errorMessage={translate('workers.error-message-fetching')}
 >
-  <caption class="sr-only" slot="caption">
-    {translate('workers.workers')}
-  </caption>
+  {#snippet caption()}
+    <caption class="sr-only">
+      {translate('workers.workers')}
+    </caption>
+  {/snippet}
 
-  <tr slot="headers" class="text-left">
-    {#each columns as { label } (label)}
-      <th scope="col">{label}</th>
+  {#snippet headers()}
+    <tr class="text-left">
+      {#each columns as { label } (label)}
+        <th scope="col">{label}</th>
+      {/each}
+    </tr>
+  {/snippet}
+  {#snippet rows({ visibleItems })}
+    {#each visibleItems as worker, i (worker?.workerInstanceKey ?? i)}
+      <WorkersTableRow {worker} {namespace} {filterable} />
     {/each}
-  </tr>
-  {#each visibleItems as worker, i (worker?.workerInstanceKey ?? i)}
-    <WorkersTableRow {worker} {namespace} {filterable} />
-  {/each}
+  {/snippet}
 
-  <svelte:fragment slot="empty">
+  {#snippet empty()}
     <div class="flex h-full flex-col items-center justify-center">
       {#if hasQuery}
         <WorkersQueryEmptyState />
@@ -73,5 +78,5 @@
         <WorkerHeartbeatsSDKAlert />
       {/if}
     </div>
-  </svelte:fragment>
+  {/snippet}
 </PaginatedTable>

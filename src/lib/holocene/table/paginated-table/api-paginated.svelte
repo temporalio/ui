@@ -1,14 +1,15 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type PaginatedRequest<T> = (
     size: number,
     token: string,
   ) => Promise<{ items: T[]; nextPageToken: string }>;
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="T">
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { debounce } from 'es-toolkit';
+  import type { Snippet } from 'svelte';
   import { onMount } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
@@ -26,9 +27,9 @@
   import PaginatedTable from './index.svelte';
 
   type KeyboardHandler = ((event: KeyboardEvent) => void) | undefined;
-  type T = $$Generic;
-  type $$Props = HTMLAttributes<HTMLDivElement> & {
-    id?: string;
+
+  type Props = HTMLAttributes<HTMLDivElement> & {
+    id?: string | null;
     maxHeight?: string;
     onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
@@ -47,55 +48,72 @@
     previousButtonLabel: string;
     nextButtonLabel: string;
     pageSizeOptions?: string[];
+    debounceDelay?: number;
+    caption?: Snippet;
+    headers?: Snippet<[{ visibleItems: T[] }]>;
+    rows?: Snippet<[{ visibleItems: T[] }]>;
+    loading?: Snippet;
+    error?: Snippet;
+    empty?: Snippet;
+    actionsEndAdditional?: Snippet<[{ visibleItems: T[]; page: number }]>;
   };
 
-  export let id: string | null = null;
-  export let maxHeight = '';
-  export let onError: ((error: Error) => void) | undefined = undefined;
-  export let onFetch: () => Promise<PaginatedRequest<T>>;
-  export let onItemsChange: ((items: T[]) => void) | undefined = undefined;
-  export let onLoadingChange: ((loading: boolean) => void) | undefined =
-    undefined;
-  export let onShiftUp: KeyboardHandler = undefined;
-  export let onShiftDown: KeyboardHandler = undefined;
-  export let onSpace: KeyboardHandler = undefined;
+  let {
+    id = null,
+    maxHeight = '',
+    onError,
+    onFetch,
+    onItemsChange,
+    onLoadingChange,
+    onShiftUp,
+    onShiftDown,
+    onSpace,
+    total = '',
+    pageSizeSelectLabel,
+    emptyStateTitle = '',
+    emptyStateMessage = '',
+    errorTitle = '',
+    errorMessage = '',
+    itemsKeyname = 'items',
+    previousButtonLabel,
+    nextButtonLabel,
+    pageSizeOptions = options,
+    debounceDelay = 250,
+    'aria-label': ariaLabel,
+    caption,
+    headers,
+    rows,
+    loading,
+    error,
+    empty,
+    actionsEndAdditional,
+  }: Props = $props();
 
-  export let total: string | number = '';
-  export let pageSizeSelectLabel: string;
-  export let emptyStateTitle = '';
-  export let emptyStateMessage = '';
-  export let errorTitle = '';
-  export let errorMessage = '';
-  export let itemsKeyname = 'items';
-  export let previousButtonLabel: string;
-  export let nextButtonLabel: string;
-  export let pageSizeOptions = options;
-  export let debounceDelay = 250;
-
-  let store: PaginationStore<T> = createPaginationStore(
+  const store: PaginationStore<T> = createPaginationStore(
     pageSizeOptions,
     pageSizeOptions[0],
   );
-  let error: Error | undefined;
-  let paginatedTable: PaginatedTable<T>;
+  let fetchError = $state<Error | undefined>();
+  let paginatedTable = $state<PaginatedTable<T>>();
 
   function clearError() {
-    if (error) error = undefined;
+    if (fetchError) fetchError = undefined;
   }
 
-  $: pageSizeChange =
-    !$store.loading && $store.pageSize !== $store.previousPageSize;
+  const pageSizeChange = $derived(
+    !$store.loading && $store.pageSize !== $store.previousPageSize,
+  );
 
   onMount(() => {
     initalDataFetch();
   });
 
-  $: {
+  $effect(() => {
     if (pageSizeChange) {
       store.resetPageSize($store.pageSize);
       initalDataFetch();
     }
-  }
+  });
 
   async function initalDataFetch() {
     const fetchData = await onFetch();
@@ -106,8 +124,8 @@
         (response as unknown as Record<string, T[]>)[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
-      error = err as Error;
-      if (onError) onError(error);
+      fetchError = err as Error;
+      if (onError) onError(fetchError);
     }
   }
 
@@ -189,19 +207,42 @@
     }
   }
 
-  $: if (onLoadingChange) onLoadingChange($store.loading);
+  $effect(() => {
+    if (onLoadingChange) onLoadingChange($store.loading);
+  });
 
   let previousItems: T[] | undefined;
-  $: if (onItemsChange && $store.visibleItems !== previousItems) {
-    previousItems = $store.visibleItems;
-    onItemsChange($store.visibleItems);
-  }
+  $effect(() => {
+    if (onItemsChange && $store.visibleItems !== previousItems) {
+      previousItems = $store.visibleItems;
+      onItemsChange($store.visibleItems);
+    }
+  });
 
-  $: adjustedTotal =
-    !$store.hasNext && $store.indexEnd !== total ? $store.indexEnd : total;
+  const adjustedTotal = $derived(
+    !$store.hasNext && $store.indexEnd !== total ? $store.indexEnd : total,
+  );
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
+
+{#snippet indexEmpty()}
+  {#if $store.loading}
+    {#if loading}{@render loading()}{:else}<Loading />{/if}
+  {:else if fetchError}
+    {#if error}
+      {@render error()}
+    {:else}
+      <EmptyState title={errorTitle}>
+        <Alert intent="error" title={fetchError?.message ?? errorMessage} />
+      </EmptyState>
+    {/if}
+  {:else if empty}
+    {@render empty()}
+  {:else}
+    <EmptyState title={emptyStateTitle} content={emptyStateMessage} />
+  {/if}
+{/snippet}
 
 <PaginatedTable
   bind:this={paginatedTable}
@@ -210,70 +251,49 @@
   visibleItems={$store.visibleItems}
   {maxHeight}
   {id}
+  {caption}
+  {headers}
+  empty={indexEmpty}
 >
-  <slot name="caption" slot="caption" />
-  <slot name="headers" slot="headers" visibleItems={$store.visibleItems} />
+  {@render rows?.({ visibleItems: $store.visibleItems })}
 
-  <slot visibleItems={$store.visibleItems} />
-
-  <svelte:fragment slot="empty">
-    {#if $store.loading}
-      <slot name="loading">
-        <Loading />
-      </slot>
-    {:else if error}
-      <slot name="error">
-        <EmptyState title={errorTitle}>
-          <Alert intent="error" title={error?.message ?? errorMessage} />
-        </EmptyState>
-      </slot>
-    {:else}
-      <slot name="empty">
-        <EmptyState title={emptyStateTitle} content={emptyStateMessage} />
-      </slot>
-    {/if}
-  </svelte:fragment>
-
-  <svelte:fragment slot="actions-start">
+  {#snippet actionsStart()}
     <FilterSelect
       label={pageSizeSelectLabel}
       parameter={$store.key}
       value={String($store.pageSize)}
       options={pageSizeOptions}
     />
-  </svelte:fragment>
+  {/snippet}
 
-  <nav
-    class="flex shrink-0 items-center gap-2"
-    aria-label={$$restProps['aria-label']}
-    slot="actions-end"
-  >
-    <slot
-      name="actions-end-additional"
-      visibleItems={$store.visibleItems}
-      page={$store.index + 1}
-    />
-    <IconButton
-      label={previousButtonLabel}
-      disabled={!$store.hasPrevious}
-      onclick={handlePreviousPage}
-      icon="arrow-left"
-    />
-    <div class="flex gap-1">
-      <p>
-        {$store.indexStart.toLocaleString()}–{$store.indexEnd.toLocaleString()}
-      </p>
-      {#if adjustedTotal}
+  {#snippet actionsEnd()}
+    <nav class="flex shrink-0 items-center gap-2" aria-label={ariaLabel}>
+      {@render actionsEndAdditional?.({
+        visibleItems: $store.visibleItems,
+        page: $store.index + 1,
+      })}
+      <IconButton
+        label={previousButtonLabel}
+        disabled={!$store.hasPrevious}
+        onclick={handlePreviousPage}
+        icon="arrow-left"
+      />
+      <div class="flex gap-1">
         <p>
-          of {adjustedTotal.toLocaleString()}
+          {$store.indexStart.toLocaleString()}–{$store.indexEnd.toLocaleString()}
         </p>
-      {/if}
-    </div>
-    <IconButton
-      label={nextButtonLabel}
-      disabled={!$store.hasNext || $store.updating}
-      onclick={fetchIndexData}
-      icon="arrow-right"
-    />
-  </nav>
+        {#if adjustedTotal}
+          <p>
+            of {adjustedTotal.toLocaleString()}
+          </p>
+        {/if}
+      </div>
+      <IconButton
+        label={nextButtonLabel}
+        disabled={!$store.hasNext || $store.updating}
+        onclick={fetchIndexData}
+        icon="arrow-right"
+      />
+    </nav>
+  {/snippet}
 </PaginatedTable>

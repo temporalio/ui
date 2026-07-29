@@ -1,7 +1,8 @@
-<script lang="ts">
+<script lang="ts" generics="Item">
+  import type { Snippet } from 'svelte';
   import type { ClassNameValue } from 'tailwind-merge';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
@@ -18,32 +19,61 @@
 
   import PaginatedTable from './index.svelte';
 
-  type Item = $$Generic;
+  interface Props {
+    id?: string | null;
+    items: Item[];
+    loading?: boolean;
+    updating?: boolean;
+    perPageLabel: string;
+    pageButtonLabel: (page: number) => string;
+    nextPageButtonLabel: string;
+    previousPageButtonLabel: string;
+    maxHeight?: string;
+    pageSizeOptions?: string[];
+    fixed?: boolean;
+    class?: ClassNameValue;
+    'aria-label'?: string;
+    caption?: Snippet;
+    headers?: Snippet<[{ visibleItems: Item[] }]>;
+    rows?: Snippet<[{ visibleItems: Item[] }]>;
+    actionsEndAdditional?: Snippet;
+    empty?: Snippet;
+  }
 
-  export let id: string | null = null;
-  export let items: Item[];
-  export let loading = false;
-  export let updating = false;
-  export let perPageLabel: string;
-  export let pageButtonLabel: (page: number) => string;
-  export let nextPageButtonLabel: string;
-  export let previousPageButtonLabel: string;
-  export let maxHeight = '';
-  export let pageSizeOptions: string[] = options;
-  export let fixed = false;
+  let {
+    id = null,
+    items,
+    loading = false,
+    updating = false,
+    perPageLabel,
+    pageButtonLabel,
+    nextPageButtonLabel,
+    previousPageButtonLabel,
+    maxHeight = '',
+    pageSizeOptions = options,
+    fixed = false,
+    class: className = '',
+    'aria-label': ariaLabel,
+    caption,
+    headers,
+    rows,
+    actionsEndAdditional,
+    empty,
+  }: Props = $props();
 
-  let className: ClassNameValue = '';
-  export { className as class };
+  let paginatedTable = $state<PaginatedTable<Item>>();
 
-  let paginatedTable: PaginatedTable<Item>;
-
-  $: url = $page.url;
-  $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
-  $: currentPageParam = url.searchParams.get(currentPageKey) || '1';
-  $: store = pagination(items, perPageParam, currentPageParam);
+  const url = $derived(page.url);
+  const perPageParam = $derived(
+    url.searchParams.get(perPageKey) ?? pageSizeOptions[0],
+  );
+  const currentPageParam = $derived(
+    url.searchParams.get(currentPageKey) || '1',
+  );
+  const store = $derived(pagination(items, perPageParam, currentPageParam));
 
   // keep the 'page-size' url search param within the supported options
-  $: {
+  $effect(() => {
     if (parseInt(perPageParam, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
       updateQueryParameters({
         parameter: perPageKey,
@@ -57,10 +87,10 @@
         url,
       });
     }
-  }
+  });
 
   // Keep the 'page' url search param within 1 and the total number of pages
-  $: {
+  $effect(() => {
     if (
       $store.totalPages &&
       parseInt(currentPageParam, 10) > $store.totalPages
@@ -74,27 +104,19 @@
       currentPageParam === null ||
       parseInt(currentPageParam, 10) < 0
     ) {
-      updateQueryParameters({
-        parameter: currentPageKey,
-        value: '1',
-        url,
-      });
+      updateQueryParameters({ parameter: currentPageKey, value: '1', url });
     }
-  }
+  });
 
   const handlePageChange = (page: number) => {
-    updateQueryParameters({
-      parameter: currentPageKey,
-      value: page,
-      url,
-    });
+    updateQueryParameters({ parameter: currentPageKey, value: page, url });
     paginatedTable?.scrollToTop();
   };
 
-  $: {
+  $effect(() => {
     if (currentPageParam) store.jumpToPage(currentPageParam);
     if (perPageParam) store.adjustPageSize(perPageParam);
-  }
+  });
 </script>
 
 <PaginatedTable
@@ -106,57 +128,56 @@
   {fixed}
   {id}
   class={className}
+  {caption}
+  {headers}
+  {empty}
 >
-  <slot name="caption" slot="caption" />
-  <slot name="headers" slot="headers" visibleItems={$store.items} />
-  <slot visibleItems={$store.items} />
+  {@render rows?.({ visibleItems: $store.items })}
 
-  <svelte:fragment slot="actions-start">
+  {#snippet actionsStart()}
     <FilterSelect
       label={perPageLabel}
       parameter={perPageKey}
       value={perPageParam}
       options={pageSizeOptions}
     />
-  </svelte:fragment>
+  {/snippet}
 
-  <div class="hidden items-center gap-2 md:flex" slot="actions-center">
-    {#each $store.pageShortcuts as page}
-      {#if isNaN(page)}
-        <span class="text-primary">...</span>
-      {:else}
-        <Button
-          variant="ghost"
-          size="sm"
-          class={page === $store.currentPage
-            ? 'bg-interactive-secondary-active'
-            : ''}
-          aria-label={pageButtonLabel(page)}
-          onclick={() => handlePageChange(page)}>{page}</Button
-        >
-      {/if}
-    {/each}
-  </div>
+  {#snippet actionsCenter()}
+    <div class="hidden items-center gap-2 md:flex">
+      {#each $store.pageShortcuts as page}
+        {#if isNaN(page)}
+          <span class="text-primary">...</span>
+        {:else}
+          <Button
+            variant="ghost"
+            size="sm"
+            class={page === $store.currentPage
+              ? 'bg-interactive-secondary-active'
+              : ''}
+            aria-label={pageButtonLabel(page)}
+            onclick={() => handlePageChange(page)}>{page}</Button
+          >
+        {/if}
+      {/each}
+    </div>
+  {/snippet}
 
-  <nav
-    class="flex shrink-0 items-center gap-2"
-    aria-label={$$restProps['aria-label']}
-    slot="actions-end"
-  >
-    <slot name="actions-end-additional" />
-    <IconButton
-      label={previousPageButtonLabel}
-      disabled={!$store.hasPrevious}
-      icon="arrow-left"
-      onclick={() => handlePageChange($store.currentPage - 1)}
-    />
-    <IconButton
-      label={nextPageButtonLabel}
-      disabled={!$store.hasNext}
-      onclick={() => handlePageChange($store.currentPage + 1)}
-      icon="arrow-right"
-    />
-  </nav>
-
-  <slot name="empty" slot="empty" />
+  {#snippet actionsEnd()}
+    <nav class="flex shrink-0 items-center gap-2" aria-label={ariaLabel}>
+      {@render actionsEndAdditional?.()}
+      <IconButton
+        label={previousPageButtonLabel}
+        disabled={!$store.hasPrevious}
+        icon="arrow-left"
+        onclick={() => handlePageChange($store.currentPage - 1)}
+      />
+      <IconButton
+        label={nextPageButtonLabel}
+        disabled={!$store.hasNext}
+        onclick={() => handlePageChange($store.currentPage + 1)}
+        icon="arrow-right"
+      />
+    </nav>
+  {/snippet}
 </PaginatedTable>
