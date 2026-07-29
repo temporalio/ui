@@ -15,6 +15,7 @@ type PaginationMethods<T> = {
   nextPage: () => void;
   previousPage: () => void;
   setUpdating: () => void;
+  finishLoading: () => void;
   reset: () => void;
   resetPageSize: (pageSize: number) => void;
   nextRow: () => void;
@@ -241,6 +242,8 @@ export function createPaginationStore<T>(
     nextPage: () => update((store) => setNextPage(store)),
     previousPage: () => update((store) => setPreviousPage(store)),
     setUpdating: () => update((store) => ({ ...store, updating: true })),
+    finishLoading: () =>
+      update((store) => ({ ...store, loading: false, updating: false })),
     reset: () => set(getDefaultStore<T>()),
     resetPageSize: (pageSize) =>
       update((store) => resetPageSize(store, pageSize)),

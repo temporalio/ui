@@ -125,6 +125,7 @@
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       fetchError = err as Error;
+      store.finishLoading();
       if (onError) onError(fetchError);
     }
   }
@@ -140,9 +141,11 @@
       const items =
         (response as unknown as Record<string, T[]>)[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
-    } catch (error) {
-      if (isError(error) && onError) {
-        onError(error);
+    } catch (err) {
+      fetchError = err as Error;
+      store.finishLoading();
+      if (isError(err) && onError) {
+        onError(err);
       }
     }
   };
