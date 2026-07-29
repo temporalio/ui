@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Link from '$lib/holocene/link.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
@@ -10,11 +10,17 @@
     routeForWorkflow,
   } from '$lib/utilities/route-for';
 
-  export let value: string;
-  export let attributes: CombinedAttributes;
-  export let type: EventLinkType;
+  interface Props {
+    value: string;
+    attributes: CombinedAttributes;
+    type: EventLinkType;
+    class?: string;
+  }
 
-  $: ({ workflow, namespace } = $page.params);
+  let { value, attributes, type, class: className = '' }: Props = $props();
+
+  const namespace = $derived(page.params.namespace);
+  const workflow = $derived(page.params.workflow);
 
   function getHref(
     ns: string,
@@ -40,9 +46,9 @@
     }
   }
 
-  $: href = getHref(namespace, workflow, attributes, value, type);
+  const href = $derived(getHref(namespace, workflow, attributes, value, type));
 </script>
 
-<Link class={$$restProps.class} {href}>
+<Link class={className} {href}>
   {value}
 </Link>
