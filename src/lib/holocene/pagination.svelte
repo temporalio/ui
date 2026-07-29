@@ -23,7 +23,7 @@
     visibleItems: T[];
     initialItem: T;
     activeRowIndex: number | undefined;
-    setActiveRowIndex: (index: number) => void;
+    setActiveRowIndex: (index: number | undefined) => void;
   };
 
   interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
