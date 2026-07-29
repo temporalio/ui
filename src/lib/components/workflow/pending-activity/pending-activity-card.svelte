@@ -224,11 +224,12 @@
     title={activity.lastFailure?.stackTrace
       ? translate('workflows.last-failure-with-stack-trace')
       : translate('workflows.last-failure')}
-    let:open
   >
-    {#if open}
-      {@render failuresCodeBlock()}
-    {/if}
+    {#snippet children(open)}
+      {#if open}
+        {@render failuresCodeBlock()}
+      {/if}
+    {/snippet}
   </Accordion>
 {/snippet}
 

@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
 
@@ -29,11 +30,11 @@
         options: iconNames,
       },
     },
-  } satisfies Meta<Accordion>;
+  } satisfies Meta<ComponentProps<typeof Accordion>>;
 </script>
 
 <script lang="ts">
-  import { action } from '@storybook/addon-actions';
+  import { action as logAction } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import Link from '../link.svelte';
@@ -43,17 +44,17 @@
 
 <Template let:args>
   <div class="flex flex-col gap-2">
-    <Accordion {...args} onToggle={action('onToggle')}>
+    <Accordion {...args} onToggle={logAction('onToggle')}>
       <p>Accordion Content</p>
     </Accordion>
     <AccordionGroup>
-      <Accordion {...args} onToggle={action('onToggle')}>
+      <Accordion {...args} onToggle={logAction('onToggle')}>
         <p>Accordion Content</p>
       </Accordion>
-      <Accordion {...args} onToggle={action('onToggle')}>
+      <Accordion {...args} onToggle={logAction('onToggle')}>
         <p>Accordion Content</p>
       </Accordion>
-      <Accordion {...args} onToggle={action('onToggle')}>
+      <Accordion {...args} onToggle={logAction('onToggle')}>
         <p>Accordion Content</p>
       </Accordion>
     </AccordionGroup>
@@ -77,17 +78,21 @@
     },
   }}
 >
-  <Accordion {...args} onToggle={action('onToggle')}>
+  <Accordion {...args} onToggle={logAction('onToggle')}>
     <p>Accordion Content</p>
-    <Link href="https://docs.temporal.io/" newTab slot="action" icon="book">
-      <span class="sr-only">docs</span>
-    </Link>
+    {#snippet action()}
+      <Link href="https://docs.temporal.io/" newTab icon="book">
+        <span class="sr-only">docs</span>
+      </Link>
+    {/snippet}
   </Accordion>
 </Story>
 
 <Story name="With Summary" let:args>
-  <Accordion {...args} onToggle={action('onToggle')}>
-    <p slot="summary">Accordion Summary</p>
+  <Accordion {...args} onToggle={logAction('onToggle')}>
+    {#snippet summary()}
+      <p>Accordion Summary</p>
+    {/snippet}
     <p>Accordion Content</p>
   </Accordion>
 </Story>
