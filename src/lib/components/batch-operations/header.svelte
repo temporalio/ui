@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
@@ -11,13 +9,10 @@
 
   interface Props {
     operation: BatchOperation;
+    onToggleAutoRefresh?: (detail: { checked: boolean }) => void;
   }
 
-  let { operation }: Props = $props();
-
-  const dispatch = createEventDispatcher<{
-    toggleAutoRefresh: { checked: boolean };
-  }>();
+  let { operation, onToggleAutoRefresh }: Props = $props();
 
   const handleToggleAutoRefresh = (event: Event) => {
     if (!(event.currentTarget instanceof HTMLInputElement)) {
@@ -25,7 +20,7 @@
     }
 
     const { checked } = event.currentTarget;
-    dispatch('toggleAutoRefresh', { checked });
+    onToggleAutoRefresh?.({ checked });
     $autoRefresh = checked;
   };
 
