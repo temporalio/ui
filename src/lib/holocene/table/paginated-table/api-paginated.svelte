@@ -125,7 +125,7 @@
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       fetchError = err as Error;
-      store.finishLoading();
+      store.stopLoading();
       if (onError) onError(fetchError);
     }
   }
@@ -143,7 +143,7 @@
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       fetchError = err as Error;
-      store.finishLoading();
+      store.stopLoading();
       if (isError(err) && onError) {
         onError(err);
       }
