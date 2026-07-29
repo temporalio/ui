@@ -64,6 +64,8 @@ afterAll(async () => {
 });
 
 const projectToken = '"__TEMPORAL_GCP_PROJECT_ID__"';
+const runnerServiceAccountToken =
+  '"__TEMPORAL_GCP_RUNNER_SERVICE_ACCOUNT_EMAIL__"';
 const impersonatorPlaceholder =
   '<REPLACE-WITH-IMPERSONATOR-SERVICE-ACCOUNT-EMAIL>';
 const impersonatorWarning =
@@ -74,6 +76,8 @@ const cloudRunModuleUrl =
 interface ComputeFieldsOptions {
   provider: string;
   gcpProject?: string;
+  gcpServiceAccount?: string;
+  cloudRunRunnerServiceAccountEmail?: string;
   cloudRunTerraformTemplate?: string;
   terraformTemplate?: string;
 }
@@ -81,6 +85,8 @@ interface ComputeFieldsOptions {
 const renderComputeFields = ({
   provider,
   gcpProject = '',
+  gcpServiceAccount = '',
+  cloudRunRunnerServiceAccountEmail = '',
   cloudRunTerraformTemplate,
   terraformTemplate,
 }: ComputeFieldsOptions): string => {
@@ -91,6 +97,8 @@ const renderComputeFields = ({
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject,
+      gcpServiceAccount,
+      cloudRunRunnerServiceAccountEmail,
       cloudRunTerraformTemplate,
       terraformTemplate,
     },
@@ -108,29 +116,55 @@ const getTerraformSnippet = (body: string): string | undefined =>
     .replaceAll('&amp;', '&');
 
 describe('Cloud Run Terraform helpers', () => {
-  it('interpolates every project token and uses the setup placeholder when empty', () => {
-    const template = `first = ${projectToken}\nsecond = ${projectToken}`;
+  it('interpolates every project and runner service account token', () => {
+    const template = `first = ${projectToken}\nsecond = ${projectToken}\nrunner = ${runnerServiceAccountToken}`;
 
-    expect(interpolateCloudRunTerraformTemplate(template, 'my-project')).toBe(
-      'first = "my-project"\nsecond = "my-project"',
-    );
-    expect(interpolateCloudRunTerraformTemplate(projectToken, '')).toBe(
-      '"<YOUR-GCP-PROJECT-ID>"',
-    );
-  });
-
-  it('escapes the project as an HCL string without enabling template interpolation', () => {
     expect(
       interpolateCloudRunTerraformTemplate(
-        `project_id = ${projectToken}`,
-        'project"\\name-${region}-%{if true}',
+        template,
+        'my-project',
+        'runner@example.com',
       ),
-    ).toBe('project_id = "project\\"\\\\name-$${region}-%%{if true}"');
+    ).toBe(
+      'first = "my-project"\nsecond = "my-project"\nrunner = "runner@example.com"',
+    );
   });
 
-  it('preserves JavaScript replacement-pattern characters in the project value', () => {
-    expect(interpolateCloudRunTerraformTemplate(projectToken, "$&-$`-$'")).toBe(
-      '"$&-$`-$\'"',
+  it('uses the setup project placeholder and an empty runner value when blank', () => {
+    expect(
+      interpolateCloudRunTerraformTemplate(
+        `project = ${projectToken}\nrunner = ${runnerServiceAccountToken}`,
+        '',
+        '',
+      ),
+    ).toBe('project = "<YOUR-GCP-PROJECT-ID>"\nrunner = ""');
+  });
+
+  it('escapes values as HCL strings without enabling template interpolation', () => {
+    expect(
+      interpolateCloudRunTerraformTemplate(
+        `project_id = ${projectToken}\nrunner = ${runnerServiceAccountToken}`,
+        'project"\\name-${region}-%{if true}',
+        'runner"\\name-${identity}-%{if true}',
+      ),
+    ).toBe(
+      'project_id = "project\\"\\\\name-$${region}-%%{if true}"\nrunner = "runner\\"\\\\name-$${identity}-%%{if true}"',
+    );
+  });
+
+  it('preserves JavaScript replacement-pattern characters in interpolated values', () => {
+    expect(
+      interpolateCloudRunTerraformTemplate(
+        `${projectToken}\n${runnerServiceAccountToken}`,
+        "$&-$`-$'",
+        "$'-$`-$&",
+      ),
+    ).toBe('"$&-$`-$\'"\n"$\'-$`-$&"');
+  });
+
+  it('includes the quoted runner service account token in the fallback template', () => {
+    expect(defaultCloudRunTerraformTemplate).toContain(
+      `runner_service_account_email = ${runnerServiceAccountToken}`,
     );
   });
 
@@ -159,39 +193,78 @@ describe('ComputeFields server-rendered setup guidance', () => {
     expect(body).toContain('target="_blank"');
     expect(body).toContain('Google Cloud Run Module');
     expect(body).toContain(impersonatorWarning);
+    expect(body).toContain('Worker Pool Service Account');
+    expect(body).toContain(
+      'Leave blank to use the project default Compute Engine service account.',
+    );
     expect(body).toContain(
       "copy the module's invoker_email output into the Service Account field above",
     );
 
     expect(body).toContain('aria-label="Google Cloud Run Module"');
     expect(getTerraformSnippet(body)).toContain(
-      'project_id         = "initial-project"',
+      'project_id                   = "initial-project"',
+    );
+    expect(getTerraformSnippet(body)).toContain(
+      'runner_service_account_email = ""',
     );
   });
 
-  it('reflects project changes at the helper/component boundary', () => {
+  it('reactively reflects project and runner service account changes in the snippet', () => {
     const initial = getTerraformSnippet(
-      renderComputeFields({ provider: 'cloud-run', gcpProject: 'initial' }),
+      renderComputeFields({
+        provider: 'cloud-run',
+        gcpProject: 'initial',
+        cloudRunRunnerServiceAccountEmail: 'initial-runner@example.com',
+      }),
     );
     const updated = getTerraformSnippet(
-      renderComputeFields({ provider: 'cloud-run', gcpProject: 'updated' }),
+      renderComputeFields({
+        provider: 'cloud-run',
+        gcpProject: 'updated',
+        cloudRunRunnerServiceAccountEmail: 'updated-runner@example.com',
+      }),
     );
 
-    expect(initial).toContain('project_id         = "initial"');
-    expect(updated).toContain('project_id         = "updated"');
-    expect(updated).not.toContain('project_id         = "initial"');
+    expect(initial).toContain('project_id                   = "initial"');
+    expect(initial).toContain(
+      'runner_service_account_email = "initial-runner@example.com"',
+    );
+    expect(updated).toContain('project_id                   = "updated"');
+    expect(updated).toContain(
+      'runner_service_account_email = "updated-runner@example.com"',
+    );
+    expect(updated).not.toContain('project_id                   = "initial"');
+    expect(updated).not.toContain('initial-runner@example.com');
+  });
+
+  it('does not conflate the snippet runner identity with the invoker field', () => {
+    const body = renderComputeFields({
+      provider: 'cloud-run',
+      gcpServiceAccount: 'invoker@example.com',
+      cloudRunRunnerServiceAccountEmail: 'runner@example.com',
+    });
+    const snippet = getTerraformSnippet(body);
+
+    expect(body).toContain('value="invoker@example.com"');
+    expect(body).toContain('value="runner@example.com"');
+    expect(snippet).toContain(
+      'runner_service_account_email = "runner@example.com"',
+    );
+    expect(snippet).not.toContain('invoker@example.com');
   });
 
   it('uses a host template and derives its warning from placeholder content', () => {
     const body = renderComputeFields({
       provider: 'cloud-run',
       gcpProject: 'host-project',
-      cloudRunTerraformTemplate: `project_id = ${projectToken}\nprincipal = "${impersonatorPlaceholder}"`,
+      cloudRunRunnerServiceAccountEmail: 'runner@example.com',
+      cloudRunTerraformTemplate: `project_id = ${projectToken}\nrunner = ${runnerServiceAccountToken}\nprincipal = "${impersonatorPlaceholder}"`,
     });
 
     expect(body).toContain(impersonatorWarning);
     expect(getTerraformSnippet(body)).toBe(
-      `project_id = "host-project"\nprincipal = "${impersonatorPlaceholder}"`,
+      `project_id = "host-project"\nrunner = "runner@example.com"\nprincipal = "${impersonatorPlaceholder}"`,
     );
   });
 

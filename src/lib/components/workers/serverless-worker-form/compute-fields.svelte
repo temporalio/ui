@@ -29,6 +29,7 @@
     gcpRegions?: string[];
     gcpWorkerPool?: string;
     gcpServiceAccount?: string;
+    cloudRunRunnerServiceAccountEmail?: string;
     minReplicas?: number;
     maxReplicas?: number;
     initialReplicas?: number;
@@ -70,6 +71,7 @@
     gcpRegions = [...GCP_REGIONS],
     gcpWorkerPool = $bindable(''),
     gcpServiceAccount = $bindable(''),
+    cloudRunRunnerServiceAccountEmail = $bindable(''),
     minReplicas = $bindable(0),
     maxReplicas = $bindable(30),
     initialReplicas = $bindable(0),
@@ -99,6 +101,7 @@
     interpolateCloudRunTerraformTemplate(
       cloudRunTerraformTemplate ?? defaultCloudRunTerraformTemplate,
       gcpProject,
+      cloudRunRunnerServiceAccountEmail,
     ),
   );
   const showCloudRunImpersonatorWarning = $derived(
@@ -347,6 +350,18 @@
               {translate('workers.cloud-run-impersonator-warning')}
             </p>
           {/if}
+          <Input
+            bind:value={cloudRunRunnerServiceAccountEmail}
+            id="cloudRunRunnerServiceAccountEmail"
+            name=""
+            label={translate('workers.cloud-run-runner-service-account-label')}
+            hintText={translate(
+              'workers.cloud-run-runner-service-account-hint',
+            )}
+            placeholder={translate(
+              'workers.cloud-run-runner-service-account-placeholder',
+            )}
+          />
           <CodeBlock
             content={resolvedCloudRunTerraformTemplate}
             language="text"
