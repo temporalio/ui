@@ -37,9 +37,9 @@
 
 <div class="flex flex-col gap-4">
   <OrderableList>
-    <svelte:fragment slot="heading">
+    {#snippet heading()}
       {type} <span class="font-normal">(in view)</span>
-    </svelte:fragment>
+    {/snippet}
     {#each columnsInUse as { label }, index (`${label}:${index}`)}
       <OrderableListItem
         {index}
@@ -69,9 +69,9 @@
     {/each}
   </OrderableList>
   <OrderableList>
-    <svelte:fragment slot="heading">
+    {#snippet heading()}
       Available Columns <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
+    {/snippet}
     {#each $availableColumns as { label } (label)}
       <OrderableListItem
         static
@@ -90,10 +90,10 @@
   </OrderableList>
   {#if table !== TABLE_TYPE.DEPLOYMENTS}
     <OrderableList>
-      <svelte:fragment slot="heading">
+      {#snippet heading()}
         {translate('events.custom-search-attributes')}
         <span class="font-normal">(not in view)</span>
-      </svelte:fragment>
+      {/snippet}
       {#each $availableCustomColumns as { label } (label)}
         <OrderableListItem
           static
