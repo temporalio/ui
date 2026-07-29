@@ -24,6 +24,7 @@
     id,
     value = $bindable(Math.round((min + max) / 2)),
     class: className = '',
+    oninput,
     ...rest
   }: Props = $props();
 
@@ -73,6 +74,13 @@
       event.currentTarget.valueAsNumber <= max;
   };
 
+  const handleRangeInput = (
+    event: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ) => {
+    handleInput(event);
+    oninput?.(event);
+  };
+
   const handleWindowResize = () => {
     outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
   };
@@ -99,11 +107,11 @@
           type="range"
           class="h-0 w-full cursor-pointer appearance-none rounded border-y border-primary"
           bind:value
-          oninput={handleInput}
           {min}
           {max}
           {step}
           {...rest}
+          oninput={handleRangeInput}
         />
         <Label hidden {label} for="{id}-range" />
       </div>
