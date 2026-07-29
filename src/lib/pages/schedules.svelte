@@ -174,7 +174,7 @@
           <th>{label}</th>
         {/each}
       </tr>
-      {#each visibleItems as schedule (schedule.scheduleId)}
+      {#each visibleItems as schedule}
         <SchedulesTableRow {schedule} {columns} />
       {/each}
 
