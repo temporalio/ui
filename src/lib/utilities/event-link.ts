@@ -51,7 +51,7 @@ const namespaceDisplay = (
   if (!isPresent(namespace)) return undefined;
 
   return {
-    label: translate('nexus.link-namespace'),
+    label: translate('nexus.namespace-link'),
     value: namespace,
     href: routeForNamespace({ namespace }),
   };
@@ -153,7 +153,7 @@ export const toEventLinkView = (
     return {
       variant: 'workflowEvent',
       key: `workflowEvent:${namespace ?? ''}:${workflow ?? ''}:${run ?? ''}:${workflowEvent.eventRef?.eventId ?? workflowEvent.requestIdRef?.requestId ?? index ?? ''}`,
-      label: translate('nexus.link'),
+      label: translate('nexus.workflow-link'),
       value,
       href,
       namespace: namespaceDisplay(namespace),
@@ -190,7 +190,7 @@ export const toEventLinkView = (
     return {
       variant: 'workflow',
       key: `workflow:${namespace ?? ''}:${workflow ?? ''}:${run ?? ''}:${workflowLink.reason ?? index ?? ''}`,
-      label: translate('common.workflow-id'),
+      label: translate('nexus.workflow-link'),
       value,
       href,
       namespace: namespaceDisplay(namespace),
@@ -215,7 +215,7 @@ export const toEventLinkView = (
     return {
       variant: 'nexusOperation',
       key: `nexusOperation:${namespace ?? ''}:${operationId ?? ''}:${runId ?? ''}:${index ?? ''}`,
-      label: translate('nexus.nexus-operation'),
+      label: translate('nexus.standalone-nexus-operation-link'),
       value:
         operationId || runId || namespace || translate('nexus.nexus-operation'),
       href,
@@ -241,7 +241,7 @@ export const toEventLinkView = (
     return {
       variant: 'activity',
       key: `activity:${namespace ?? ''}:${activityId ?? ''}:${runId ?? ''}:${index ?? ''}`,
-      label: translate('standalone-activities.activity-id'),
+      label: translate('nexus.standalone-activity-link'),
       value:
         activityId ||
         runId ||
