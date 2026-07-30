@@ -1,28 +1,21 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
   import PillContainer from './pill-container.svelte';
   import Pill from './pill.svelte';
 
-  export const meta: Meta = {
+  const { Story } = defineMeta({
     title: 'Pill Container',
     component: PillContainer,
-    subcomponents: { Pill },
-  };
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template>
+<Story name="Default" asChild>
   <PillContainer>
     <Pill id="A">Pill A</Pill>
     <Pill id="B">Pill B</Pill>
     <Pill id="C">Pill C</Pill>
   </PillContainer>
-</Template>
-
-<Story name="Default" />
+</Story>

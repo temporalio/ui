@@ -1,12 +1,13 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
   import type { ComponentProps } from 'svelte';
 
   import Chip from '$lib/holocene/chip.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Chip',
     component: Chip,
     args: {
@@ -25,19 +26,15 @@
         },
       },
     },
-  } satisfies Meta<ComponentProps<typeof Chip>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof Chip>)}
   <Chip {...args} onremove={action('remove')} onclick={action('click')}>
     ross.edfort@temporal.io
   </Chip>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

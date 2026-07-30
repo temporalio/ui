@@ -1,7 +1,7 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
 
   import { toaster } from '../stores/toaster';
 
@@ -9,7 +9,7 @@
   import Toast from './toast.svelte';
   import Toaster from './toaster.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Toaster',
     component: Toaster,
     args: {
@@ -60,14 +60,14 @@
         },
       },
     },
-  } satisfies Meta<Toaster & Toast['variant']>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: Toaster & Toast['variant'],
+  context: StoryContext<typeof Toaster>,
+)}
   {@const { duration, message, variant, closeButtonLabel } = args}
   <div class="flex max-w-60 flex-col gap-2">
     <Toast id={context.id} {variant} {closeButtonLabel}>{message}</Toast>
@@ -83,7 +83,7 @@
       toasts={toaster.toasts}
     />
   </div>
-</Template>
+{/snippet}
 
 <Story name="Primary" />
 

@@ -1,9 +1,9 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import type { ComponentProps } from 'svelte';
 
   import type { CodecServerFormData } from './types';
 
@@ -55,21 +55,22 @@
     action('onCancel')();
   }
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Forms/Codec Server Form',
     component: CodecServerForm,
     parameters: {
       layout: 'padded',
     },
-  } satisfies Meta<CodecServerForm>;
+    render: template,
+  });
 </script>
 
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof CodecServerForm>)}
   <div class="space-y-6">
     <h1 class="text-sm font-medium">Codec Server for checkout-prod.a2dd6</h1>
     <CodecServerForm {...args} />
   </div>
-</Template>
+{/snippet}
 
 <Story
   name="Default"

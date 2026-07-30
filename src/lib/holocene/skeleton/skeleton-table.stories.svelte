@@ -1,12 +1,12 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
   import SkeletonTable from './table.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Skeleton Table',
     component: SkeletonTable,
     args: {
@@ -17,14 +17,13 @@
       rows: { name: 'Rows', control: 'number' },
       columns: { name: 'Columns', control: 'number' },
     },
-  } satisfies Meta<ComponentProps<typeof SkeletonTable>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
+{#snippet template(
+  args: ComponentProps<typeof SkeletonTable> & { columns: number },
+)}
   {@const columnWidths = Array.from(new Array(args.columns)).fill(
     100 / args.columns,
   )}
@@ -35,6 +34,6 @@
       {/each}
     {/snippet}
   </SkeletonTable>
-</Template>
+{/snippet}
 
 <Story name="Default" args={{ rows: 10, columns: 4 }} />

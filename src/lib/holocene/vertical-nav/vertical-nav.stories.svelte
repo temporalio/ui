@@ -1,22 +1,21 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import VerticalNavItem from './vertical-nav-item.svelte';
   import VerticalNav from './vertical-nav.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Vertical Nav',
     component: VerticalNav,
-  } satisfies Meta<VerticalNav>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
   let activeItemId = $state('overview');
 </script>
 
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof VerticalNav>)}
   <div class="min-h-[400px] w-64 border-r border-subtle p-4">
     <VerticalNav
       aria-label="Settings navigation"
@@ -58,13 +57,13 @@
       />
     </VerticalNav>
   </div>
-</Template>
+{/snippet}
 
-<Story name="Default" args={{ activeItemId: 'overview' }} />
+<Story name="Default" args={{ activeItemId: 'overview' }} {template} />
 
-<Story name="With Active Item" args={{ activeItemId: 'security' }} />
+<Story name="With Active Item" args={{ activeItemId: 'security' }} {template} />
 
-<Story name="With Disabled Items">
+<Story name="With Disabled Items" asChild>
   <div class="min-h-[400px] w-64 border-r border-subtle p-4">
     <VerticalNav aria-label="Settings navigation" activeItemId="overview">
       <VerticalNavItem
@@ -100,7 +99,7 @@
   </div>
 </Story>
 
-<Story name="Interactive">
+<Story name="Interactive" asChild>
   <div class="min-h-[400px] w-64 border-r border-subtle p-4">
     <VerticalNav aria-label="Settings navigation" {activeItemId}>
       <VerticalNavItem
@@ -165,7 +164,7 @@
   </div>
 </Story>
 
-<Story name="With Trailing Icons">
+<Story name="With Trailing Icons" asChild>
   <div class="min-h-[400px] w-64 border-r border-subtle p-4">
     <VerticalNav aria-label="Settings navigation" activeItemId="overview">
       <VerticalNavItem
@@ -195,7 +194,7 @@
   </div>
 </Story>
 
-<Story name="With Content Panels">
+<Story name="With Content Panels" asChild>
   <div class="flex min-h-[500px]">
     <!-- Navigation -->
     <div class="w-64 border-r border-subtle p-4">

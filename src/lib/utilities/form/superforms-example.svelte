@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { action } from '@storybook/addon-actions';
+  import { action } from 'storybook/actions';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod/v3';

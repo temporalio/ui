@@ -1,11 +1,13 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import type { ComponentProps } from 'svelte';
 
   import Modal from './modal.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Modal',
     component: Modal,
     args: {
@@ -87,20 +89,16 @@
 
       toggleModal: { table: { disable: true } },
     },
-  } satisfies Meta<Modal>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof Modal>)}
   <Modal
+    {...args}
     id="modal"
     on:confirmModal={action('confirm')}
     on:cancelModal={action('cancel')}
-    {...args}
   >
     <h3 slot="title">Modal Title</h3>
     <p slot="content">
@@ -118,7 +116,7 @@
       fermentum. Maecenas adipiscing ante non diam sodales hendrerit.
     </p>
   </Modal>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

@@ -1,9 +1,9 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import type { ComponentProps } from 'svelte';
 
   import { translate } from '$lib/i18n/translate';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
@@ -76,23 +76,24 @@
     action('onCancel')();
   }
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Forms/SearchAttributes',
     component: SearchAttributesForm,
     parameters: {
       layout: 'padded',
     },
-  } satisfies Meta<SearchAttributesForm>;
+    render: template,
+  });
 </script>
 
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof SearchAttributesForm>)}
   <div class="space-y-6">
     <h1 class="text-sm font-medium">
       {translate('search-attributes.story-title', { namespace: 'default' })}
     </h1>
     <SearchAttributesForm {...args} />
   </div>
-</Template>
+{/snippet}
 
 <Story
   name="With Existing Attributes"
