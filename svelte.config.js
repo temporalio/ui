@@ -20,6 +20,7 @@ export default {
       postcss: true,
     }),
   ],
+  compilerOptions: { runes: true },
   kit: {
     alias: {
       $lib: 'src/lib',

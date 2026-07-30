@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';

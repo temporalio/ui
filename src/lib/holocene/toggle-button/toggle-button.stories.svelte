@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts" module>
   import type { Meta, StoryContext } from '@storybook/svelte';
   import { expect, userEvent, within } from '@storybook/test';

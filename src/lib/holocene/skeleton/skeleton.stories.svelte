@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 

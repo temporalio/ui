@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts" module>
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
