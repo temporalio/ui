@@ -57,7 +57,7 @@
   let input = $state('');
   let summary = $state('');
   let details = $state('');
-  let encoding = $state<Writable<PayloadInputEncoding>>(writable('json/plain'));
+  const encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let messageType = $state('');
   let workflowStartDelay = $state('');
 
@@ -314,7 +314,7 @@
       label="Workflow Type"
       onblur={(e) => onInputChange(e, 'workflowType')}
     />
-    <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
+    <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
         <div>
