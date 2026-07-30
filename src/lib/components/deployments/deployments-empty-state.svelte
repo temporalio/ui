@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -30,11 +29,9 @@
   </div>
   <div class="flex flex-wrap items-center justify-center gap-4">
     {#if canCreateServerlessDeployment}
-      <CapabilityGuard capability="serverScaledDeployments">
-        <Button variant="secondary" href={createHref}>
-          {translate('deployments.create-serverless-deployment')}
-        </Button>
-      </CapabilityGuard>
+      <Button variant="secondary" href={createHref}>
+        {translate('deployments.create-serverless-deployment')}
+      </Button>
     {/if}
     <Button
       variant="ghost"
