@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import PayloadInput from '$lib/components/payload-input.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -24,33 +24,22 @@
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  const { namespace, workflow: workflowId, run: runId } = $page.params;
+  const { namespace, workflow: workflowId, run: runId } = page.params;
 
   const params = {
     id: workflowId,
     runId,
   };
 
-  let queryType: string;
-  let initialQueryType: string;
-  let input = '';
-  let initialInput = '';
-  let loading = false;
-  let jsonFormatting = true;
+  let queryType = $state('');
+  let initialQueryType = $state('');
+  let input = $state('');
+  let initialInput = $state('');
+  let loading = $state(false);
+  let jsonFormatting = $state(true);
 
-  $: edited = initialQueryType !== queryType || input !== initialInput;
-
-  $: metadataError = $workflowRun.metadata?.error?.message;
-  $: queryTypes = sortByName(
-    $workflowRun?.metadata?.definition?.queryDefinitions?.filter((query) => {
-      return query?.name !== '__stack_trace';
-    }) || [],
-  );
-
-  $: queryType = queryType || queryTypes?.[0]?.name || '';
-
-  let queryResult: Promise<ParsedQuery>;
-  let encodePayloadResult: Promise<Payload[] | null>;
+  let queryResult = $state<Promise<ParsedQuery>>();
+  let encodePayloadResult = $state<Promise<Payload[] | null>>();
 
   const sortByName = (
     list: WorkflowInteractionDefinition[],
@@ -67,6 +56,24 @@
       return aName.localeCompare(bName);
     });
   };
+
+  const metadataError = $derived($workflowRun.metadata?.error?.message);
+  const queryTypes = $derived(
+    sortByName(
+      $workflowRun?.metadata?.definition?.queryDefinitions?.filter((query) => {
+        return query?.name !== '__stack_trace';
+      }) || [],
+    ),
+  );
+  const edited = $derived(
+    initialQueryType !== queryType || input !== initialInput,
+  );
+
+  $effect(() => {
+    if (!queryType) {
+      queryType = queryTypes?.[0]?.name || '';
+    }
+  });
 
   onMount(() => {
     if (!$workflowRun.metadata) {
