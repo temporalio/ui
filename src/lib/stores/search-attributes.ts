@@ -244,6 +244,7 @@ export const activitySearchAttributes: Readable<SearchAttributes> = derived(
     CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
     ExecutionDuration: SEARCH_ATTRIBUTE_TYPE.INT,
     StateTransitionCount: SEARCH_ATTRIBUTE_TYPE.INT,
+    ExecutionTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
     ...$customSearchAttributes,
   }),
 );

@@ -19,7 +19,7 @@
     size="sm"
     variant="secondary"
     leadingIcon="keyboard"
-    on:click={onOpen}
+    onclick={onOpen}
   />
 </div>
 <Drawer

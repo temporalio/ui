@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';

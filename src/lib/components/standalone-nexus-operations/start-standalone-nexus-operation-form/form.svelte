@@ -175,6 +175,7 @@
     );
   }
 
+  // svelte-ignore state_referenced_locally
   const initialData: z.infer<typeof schema> = {
     ...formDefaults,
     input: '',
@@ -365,7 +366,7 @@
               <Button
                 class="ml-2.5"
                 variant="secondary"
-                on:click={generateRandomId}
+                onclick={generateRandomId}
                 leadingIcon="retry"
                 >{translate(
                   'standalone-nexus-operations.form-random-uuid',
@@ -479,7 +480,7 @@
           <Button
             type="button"
             variant="secondary"
-            on:click={() => (operationPoliciesModalOpen = true)}
+            onclick={() => (operationPoliciesModalOpen = true)}
           >
             {translate(
               'standalone-nexus-operations.form-edit-operation-policies',
@@ -588,11 +589,11 @@
               type="button"
               variant="ghost"
               leadingIcon="close"
-              on:click={() => removeNexusHeader(index)}
+              onclick={() => removeNexusHeader(index)}
             />
           </div>
         {/each}
-        <Button type="button" variant="secondary" on:click={addNexusHeader}>
+        <Button type="button" variant="secondary" onclick={addNexusHeader}>
           {translate('standalone-nexus-operations.form-add-nexus-header')}
         </Button>
       </Card>

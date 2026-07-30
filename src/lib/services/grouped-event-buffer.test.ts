@@ -719,6 +719,43 @@ describe('enrichGroups', () => {
     expect(group.pendingActivity?.activityId).toBe('1');
   });
 
+  it('swaps in a fresh group reference when pending state changes', () => {
+    reset(10);
+    processEvent(makeActivityScheduled(1, 'MyActivity'), true);
+    const before = getGroupArray().find((g) => g.id === '1');
+
+    enrichGroups(
+      [
+        { activityId: '1', state: 'Started', activityType: 'MyActivity' },
+      ] as Parameters<typeof enrichGroups>[0],
+      [],
+    );
+
+    const after = getGroupArray().find((g) => g.id === '1');
+    // Reference-tracking views only re-derive when the object identity changes;
+    // a pause/unpause appends no history event, so the ref swap is the signal.
+    expect(after).not.toBe(before);
+    expect(after?.pendingActivity?.activityId).toBe('1');
+    // Clone keeps the prototype-backed getters and shares eventList.
+    expect(after?.isPending).toBe(true);
+    expect(after?.eventList).toBe(before?.eventList);
+  });
+
+  it('reuses the group reference when pending state is unchanged', () => {
+    reset(10);
+    processEvent(makeActivityScheduled(1, 'MyActivity'), true);
+    const pending = [
+      { activityId: '1', state: 'Started', activityType: 'MyActivity' },
+    ] as Parameters<typeof enrichGroups>[0];
+
+    enrichGroups(pending, []);
+    const first = getGroupArray().find((g) => g.id === '1');
+    enrichGroups(pending, []);
+    const second = getGroupArray().find((g) => g.id === '1');
+
+    expect(second).toBe(first);
+  });
+
   it('does not set pendingActivity on a completed activity group (3 events)', async () => {
     reset(10);
     const [s, st, c] = makeActivityGroup(1);

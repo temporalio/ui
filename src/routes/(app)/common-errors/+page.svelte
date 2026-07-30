@@ -35,28 +35,28 @@
   <TabButtons>
     <TabButton
       active={activeFilter === 'all'}
-      on:click={() => {
+      onclick={() => {
         activeFilter = 'all';
       }}>All ({COMMON_ERRORS.length})</TabButton
     >
     <TabButton
       active={activeFilter === 'error'}
       icon="error"
-      on:click={() => {
+      onclick={() => {
         activeFilter = 'error';
       }}>Errors ({errorCount})</TabButton
     >
     <TabButton
       active={activeFilter === 'warning'}
       icon="warning"
-      on:click={() => {
+      onclick={() => {
         activeFilter = 'warning';
       }}>Warnings ({warningCount})</TabButton
     >
     <TabButton
       active={activeFilter === 'info'}
       icon="info"
-      on:click={() => {
+      onclick={() => {
         activeFilter = 'info';
       }}>Info ({infoCount})</TabButton
     >

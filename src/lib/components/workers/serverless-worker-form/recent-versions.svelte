@@ -71,7 +71,7 @@
       {/each}
     </ol>
     {#if hiddenCount > 0}
-      <Button variant="secondary" size="xs" on:click={loadMore}>
+      <Button variant="secondary" size="xs" onclick={loadMore}>
         {translate('workers.recent-versions-more', { count: hiddenCount })}
       </Button>
     {/if}

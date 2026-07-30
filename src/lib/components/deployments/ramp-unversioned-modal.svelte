@@ -32,7 +32,7 @@
   on:cancelModal={() => onCancel?.()}
 >
   {#if onRemove}
-    <Button slot="footer" variant="destructive" size="sm" on:click={onRemove}>
+    <Button slot="footer" variant="destructive" size="sm" onclick={onRemove}>
       {translate('deployments.remove-unversioned-ramping')}
     </Button>
   {/if}

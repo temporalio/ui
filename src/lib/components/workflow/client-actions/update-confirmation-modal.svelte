@@ -149,7 +149,7 @@
         />
         {#if customUpdate}
           <Button
-            on:click={() => {
+            onclick={() => {
               customUpdate = false;
               name = '';
             }}

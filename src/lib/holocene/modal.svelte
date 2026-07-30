@@ -12,7 +12,7 @@
     cancelText: string;
     confirmDisabled?: boolean;
     confirmText: string;
-    confirmType?: ComponentProps<Button>['variant'];
+    confirmType?: ComponentProps<typeof Button>['variant'];
     hideCancel?: boolean;
     hideConfirm?: boolean;
     hightlightNav?: boolean;
@@ -29,7 +29,7 @@
   export let hideConfirm = false;
   export let confirmText: string;
   export let cancelText: string;
-  export let confirmType: ComponentProps<Button>['variant'] = 'primary';
+  export let confirmType: ComponentProps<typeof Button>['variant'] = 'primary';
   export let confirmDisabled = false;
   export let large = false;
   export let loading = false;
@@ -108,7 +108,7 @@
       label={cancelText}
       icon="close"
       class="float-right m-4"
-      on:click={closeModal}
+      onclick={closeModal}
     />
   {/if}
   <div id="modal-title-{id}" class="title">
@@ -136,7 +136,7 @@
             data-testid="cancel-modal-button"
             variant="ghost"
             disabled={loading}
-            on:click={closeModal}>{cancelText}</Button
+            onclick={closeModal}>{cancelText}</Button
           >
         {/if}
         {#if !hideConfirm}

@@ -17,14 +17,17 @@
     removeRampingUnversionedWorkers,
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
+  import type { WorkerDeploymentResponse } from '$lib/types/deployments';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
   interface Props {
     showInstancesLink?: boolean;
+    showConnectionStatus?: boolean;
   }
 
-  let { showInstancesLink = true }: Props = $props();
+  let { showInstancesLink = true, showConnectionStatus = false }: Props =
+    $props();
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
@@ -32,14 +35,36 @@
   // fetchDeployment lives here rather than in +page.ts because it requires a
   // server-relative base URL that isn't available at import time for package
   // consumers.
-  let lastInvalidatedAt = $state(Date.now());
-  const effectiveDeploymentPromise = $derived.by(() => {
-    lastInvalidatedAt; // tracked so updating it re-fetches
-    return fetchDeployment({ namespace, deploymentName });
+  const deploymentRoute = $derived.by(() => {
+    const parameters = { namespace, deploymentName };
+    return {
+      parameters,
+      initialPromise: fetchDeployment(parameters),
+    };
   });
+  let refreshedDeployment = $state.raw<{
+    route: typeof deploymentRoute;
+    deployment: WorkerDeploymentResponse;
+  }>();
+  let refreshError = $state.raw<{
+    route: typeof deploymentRoute;
+    error: unknown;
+  }>();
+  let latestRefresh = 0;
 
-  function reload() {
-    lastInvalidatedAt = Date.now();
+  async function reload() {
+    const request = ++latestRefresh;
+    const route = deploymentRoute;
+
+    try {
+      const deployment = await fetchDeployment(route.parameters);
+      if (request !== latestRefresh || route !== deploymentRoute) return;
+      refreshedDeployment = { route, deployment };
+      refreshError = undefined;
+    } catch (error) {
+      if (request !== latestRefresh || route !== deploymentRoute) return;
+      refreshError = { route, error };
+    }
   }
 
   let showDeleteModal = $state(false);
@@ -93,9 +118,16 @@
   }
 </script>
 
-{#await effectiveDeploymentPromise}
+{#await deploymentRoute.initialPromise}
   <SkeletonTable rows={15} />
-{:then deployment}
+{:then initialDeployment}
+  {@const deployment =
+    refreshedDeployment?.route === deploymentRoute
+      ? refreshedDeployment.deployment
+      : initialDeployment}
+  {#if refreshError?.route === deploymentRoute}
+    <Error error={refreshError.error} />
+  {/if}
   {@const info = deployment.workerDeploymentInfo}
   {@const unversionedRampingPercentage =
     !info.routingConfig?.rampingDeploymentVersion &&
@@ -142,7 +174,9 @@
         <th>{translate('deployments.build-id')}</th>
         <th>{translate('deployments.lifecycle')}</th>
         <th>{translate('deployments.compute')}</th>
-        <th>{translate('deployments.connection')}</th>
+        {#if showConnectionStatus}
+          <th>{translate('deployments.connection')}</th>
+        {/if}
         <th>{translate('deployments.deployed')}</th>
         <th>{translate('deployments.actions')}</th>
       </tr>
@@ -153,7 +187,9 @@
           {namespace}
           {deploymentName}
           conflictToken={deployment.conflictToken}
+          {showConnectionStatus}
           onChange={reload}
+          onValidationComplete={reload}
         />
       {/each}
     </PaginatedTable>

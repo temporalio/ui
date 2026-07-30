@@ -67,8 +67,8 @@
     {size}
     active={checked}
     {...attrs}
-    on:click={onSelect}
-    on:keydown={onKeydown}
+    onclick={onSelect}
+    onkeydown={onKeydown}
   >
     {option.label}
   </Button>

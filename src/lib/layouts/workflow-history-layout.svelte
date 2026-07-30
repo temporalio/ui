@@ -221,21 +221,21 @@
           data-testid="feed"
           icon="feed"
           class="h-10"
-          on:click={onAllClick}>All</TabButton
+          onclick={onAllClick}>All</TabButton
         >
         <TabButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
           icon="compact"
           class="h-10"
-          on:click={onCompactClick}>Compact</TabButton
+          onclick={onCompactClick}>Compact</TabButton
         >
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
           icon="json"
           class="h-10"
-          on:click={onJSONClick}>JSON</TabButton
+          onclick={onJSONClick}>JSON</TabButton
         >
       </TabButtons>
     </div>
@@ -245,7 +245,7 @@
           <ToggleButton
             leadingIcon={reverseSort ? 'descending' : 'ascending'}
             data-testid="zoom-in"
-            on:click={onSort}
+            onclick={onSort}
             size="sm"
           >
             {reverseSort
@@ -259,7 +259,7 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
-          on:click={onAutoRefreshToggle}
+          onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
@@ -274,7 +274,7 @@
           data-testid="download"
           leadingIcon="download"
           size="sm"
-          on:click={() => (showDownloadPrompt = true)}
+          onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}
         </ToggleButton>

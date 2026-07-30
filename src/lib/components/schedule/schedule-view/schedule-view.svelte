@@ -7,8 +7,8 @@
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
   import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -80,7 +80,7 @@
       menuLabel={translate('schedules.schedule-actions')}
       id="schedule-actions"
       disabled={editDisabled}
-      on:click={() => openConfirmationModal('pause')}
+      onclick={() => openConfirmationModal('pause')}
     >
       <MenuItem
         data-testid="trigger-schedule"

@@ -176,6 +176,16 @@ export const Strings = {
   'min-instances-hint': 'Minimum number of worker instances to keep running.',
   'max-instances-label': 'Max Instances',
   'max-instances-hint': 'Maximum number of worker instances to scale to.',
+  'min-replicas-label': 'Min Replicas',
+  'min-replicas-hint': 'Minimum number of Cloud Run replicas to keep running.',
+  'max-replicas-label': 'Max Replicas',
+  'max-replicas-hint': 'Maximum number of Cloud Run replicas to scale to.',
+  'initial-replicas-label': 'Initial Replicas',
+  'initial-replicas-hint':
+    'Number of Cloud Run replicas to assume when creating the worker deployment version.',
+  'utilization-target-label': 'Utilization Target',
+  'utilization-target-hint':
+    'Target average worker utilization across the fleet, from greater than 0 to 1.',
   'compute-provider': 'Compute Provider',
   'compute-provider-description':
     'Select how your worker activities will be executed.',
@@ -324,6 +334,15 @@ export const Strings = {
   'terraform-iam-module-link': 'AWS IAM Role Module',
   'terraform-description-after':
     ' to create the IAM role Temporal Cloud assumes to invoke your Lambda functions.',
+  'cloud-run-setup-prompt': "Don't have a service account yet? Create one",
+  'cloud-run-terraform-description-before': 'Use our Terraform ',
+  'cloud-run-terraform-module-link': 'Google Cloud Run Module',
+  'cloud-run-terraform-description-after':
+    ' to create the invoker service account for your Worker Pool.',
+  'cloud-run-impersonator-warning':
+    'Before applying, replace the impersonator service account placeholder with the email of the service account permitted to impersonate the invoker.',
+  'cloud-run-invoker-handoff':
+    "After applying, copy the module's invoker_email output into the Service Account field above.",
   'hide-defaults': 'Hide Defaults',
   'show-defaults': 'Show Defaults',
   'gcp-project-label': 'Project ID',

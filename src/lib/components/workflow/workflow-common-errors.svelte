@@ -47,7 +47,7 @@
           leadingIcon="close"
           size="xs"
           variant="ghost"
-          on:click={dismissCommonErrors}
+          onclick={dismissCommonErrors}
         >
           <span class="sr-only">
             {translate('workflows.dismiss-common-errors')}

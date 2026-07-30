@@ -22,9 +22,13 @@
 
   interface Props {
     canCreateServerlessDeployment?: boolean;
+    showConnectionStatus?: boolean;
   }
 
-  let { canCreateServerlessDeployment = true }: Props = $props();
+  let {
+    canCreateServerlessDeployment = true,
+    showConnectionStatus = false,
+  }: Props = $props();
 
   let error = $state('');
 
@@ -103,6 +107,7 @@
         <DeploymentTableRow
           {deployment}
           {columns}
+          {showConnectionStatus}
           onChange={() => refresh.update((n) => n + 1)}
         />
       {/each}
@@ -117,7 +122,7 @@
       <svelte:fragment slot="actions-end-additional">
         <Tooltip text="Configure Columns" top>
           <Button
-            on:click={openCustomizationDrawer}
+            onclick={openCustomizationDrawer}
             data-testid="deployments-table-configuration-button"
             size="xs"
             variant="ghost"

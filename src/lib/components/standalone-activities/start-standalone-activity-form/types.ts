@@ -10,6 +10,7 @@ export interface StandaloneActivityFormData {
   startToCloseTimeout: string | undefined;
   scheduleToCloseTimeout: string | undefined;
   scheduleToStartTimeout: string | undefined;
+  startDelay: string | undefined;
   input: string | undefined;
   encoding: PayloadInputEncoding;
   messageType: string | undefined;

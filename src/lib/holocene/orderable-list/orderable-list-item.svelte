@@ -108,14 +108,14 @@
           icon="chevron-up"
           data-testid="orderable-list-item-{label}-move-up-button"
           label={moveUpButtonLabel}
-          on:click={() => dispatch('moveItem', { from: index, to: index - 1 })}
+          onclick={() => dispatch('moveItem', { from: index, to: index - 1 })}
         />
         <IconButton
           disabled={index === totalItems - 1}
           icon="chevron-down"
           data-testid="orderable-list-item-{label}-move-down-button"
           label={moveDownButtonLabel}
-          on:click={() => dispatch('moveItem', { from: index, to: index + 1 })}
+          onclick={() => dispatch('moveItem', { from: index, to: index + 1 })}
         />
       </div>
     {/if}
@@ -127,14 +127,14 @@
         icon="add"
         data-testid="orderable-list-item-{label}-add-button"
         label={addButtonLabel}
-        on:click={() => dispatch('addItem')}
+        onclick={() => dispatch('addItem')}
       />
     {:else}
       <IconButton
         icon="hyphen"
         data-testid="orderable-list-item-{label}-remove-button"
         label={removeButtonLabel}
-        on:click={() => dispatch('removeItem')}
+        onclick={() => dispatch('removeItem')}
       />
     {/if}
   {/if}

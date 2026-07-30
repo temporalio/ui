@@ -222,7 +222,7 @@
     <ToggleButtons>
       <ToggleButton
         size="xs"
-        on:click={() => {
+        onclick={() => {
           autoRefresh = !autoRefresh;
           if (autoRefresh) onrefresh();
         }}

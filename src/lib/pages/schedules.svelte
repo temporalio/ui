@@ -174,7 +174,7 @@
           <th>{label}</th>
         {/each}
       </tr>
-      {#each visibleItems as schedule (schedule.scheduleId)}
+      {#each visibleItems as schedule}
         <SchedulesTableRow {schedule} {columns} />
       {/each}
 
@@ -210,7 +210,7 @@
       <svelte:fragment slot="actions-end-additional">
         <Tooltip text={translate('common.configure-columns')} top>
           <Button
-            on:click={openCustomizationDrawer}
+            onclick={openCustomizationDrawer}
             data-testid="workflows-summary-table-configuration-button"
             size="xs"
             variant="ghost"

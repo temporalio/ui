@@ -144,7 +144,7 @@
                     leadingIcon="download"
                     disabled={!getCodecEndpoint(page.data.settings)}
                     loading={downloadLoading}
-                    on:click={() =>
+                    onclick={() =>
                       downloadExternalPayload(result.originalValue)}
                   >
                     {size}
@@ -209,7 +209,7 @@
         {#snippet headerActions()}
           <IconButton
             icon="retry"
-            on:click={retry}
+            onclick={retry}
             label={translate('common.retry')}
           />
         {/snippet}

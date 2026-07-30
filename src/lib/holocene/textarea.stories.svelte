@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import Textarea from './textarea.svelte';
 
@@ -37,7 +38,7 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       id: { name: 'Id', control: 'text', table: { disable: true } },
     },
-  } satisfies Meta<Textarea>;
+  } satisfies Meta<ComponentProps<typeof Textarea>>;
 </script>
 
 <script lang="ts">
@@ -50,11 +51,11 @@
 
 <Template let:args let:context>
   <Textarea
-    on:input={action('input')}
-    on:blur={action('blue')}
-    on:change={action('change')}
-    on:focus={action('focus')}
-    on:keydown={action('keydown')}
+    oninput={action('input')}
+    onblur={action('blue')}
+    onchange={action('change')}
+    onfocus={action('focus')}
+    onkeydown={action('keydown')}
     id={context.id}
     {...args}
   />

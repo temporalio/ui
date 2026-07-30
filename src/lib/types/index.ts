@@ -3,7 +3,11 @@ import type { google, temporal } from '@temporalio/proto';
 // api.workflowservice
 
 export type DescribeNamespaceResponse =
-  temporal.api.workflowservice.v1.IDescribeNamespaceResponse;
+  temporal.api.workflowservice.v1.IDescribeNamespaceResponse & {
+    namespaceInfo: temporal.api.workflowservice.v1.IDescribeNamespaceResponse['namespaceInfo'] & {
+      capabilities?: NamespaceCapabilities;
+    };
+  };
 export type DescribeWorkflowExecutionResponse =
   temporal.api.workflowservice.v1.IDescribeWorkflowExecutionResponse;
 export type ListNamespacesResponse =
@@ -18,8 +22,12 @@ export type Capabilities =
   };
 
 export type NamespaceCapabilities = NonNullable<
-  DescribeNamespaceResponse['namespaceInfo']
->['capabilities'];
+  temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
+    standaloneActivityStartDelay?: boolean | null;
+    standaloneActivityBatchOperations?: boolean | null;
+    standaloneActivityOperatorCommands?: boolean | null;
+  }
+>;
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
@@ -39,6 +47,12 @@ export type UpdateScheduleRequest =
   temporal.api.workflowservice.v1.IUpdateScheduleRequest;
 export type StartBatchOperationRequest =
   temporal.api.workflowservice.v1.IStartBatchOperationRequest;
+// TODO: Replace with temporal.api.common.v1.Execution
+export type Execution = {
+  type?: ExecutionType;
+  businessId?: string;
+  runId?: string;
+};
 export type CancelWorkflowRequest =
   temporal.api.workflowservice.v1.IRequestCancelWorkflowExecutionRequest;
 export type ResetWorkflowRequest =
@@ -183,7 +197,9 @@ export type ActivityUpdateOptionsRequest =
   temporal.api.workflowservice.v1.IUpdateActivityOptionsRequest;
 export type ActivityUpdateOptionsResponse =
   temporal.api.workflowservice.v1.IUpdateActivityOptionsResponse;
-export type ActivityOptions = temporal.api.activity.v1.IActivityOptions;
+export type ActivityOptions = temporal.api.activity.v1.IActivityOptions & {
+  startDelay?: string;
+};
 
 export type WorkflowPropertiesModifiedEventAttributes =
   temporal.api.history.v1.IWorkflowPropertiesModifiedEventAttributes;
@@ -222,6 +238,13 @@ export enum ResetReapplyType {
   RESET_REAPPLY_TYPE_SIGNAL = 1,
   RESET_REAPPLY_TYPE_NONE = 2,
   RESET_REAPPLY_TYPE_ALL_ELIGIBLE = 3,
+}
+
+// temporal.api.enums.v1.ExecutionType
+export enum ExecutionType {
+  EXECUTION_TYPE_UNSPECIFIED = 0,
+  EXECUTION_TYPE_WORKFLOW = 1,
+  EXECUTION_TYPE_ACTIVITY = 2,
 }
 
 // api.workflow

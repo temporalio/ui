@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import type { Meta, StoryContext } from '@storybook/svelte';
   import { expect, userEvent, within } from '@storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import ToggleButton from './toggle-button.svelte';
   import ToggleButtons from './toggle-buttons.svelte';
@@ -17,7 +18,7 @@
       href: { table: { disable: true } },
       active: { table: { disable: true } },
     },
-  } satisfies Meta<ToggleButton>;
+  } satisfies Meta<ComponentProps<typeof ToggleButton>>;
 </script>
 
 <script lang="ts">
@@ -71,7 +72,7 @@
         {...args}
         data-testid={`toggle-button-${index}`}
         active={$selected === index}
-        on:click={() => select(index)}
+        onclick={() => select(index)}
       >
         {name}
       </ToggleButton>

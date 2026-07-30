@@ -132,7 +132,7 @@
             ? 'bg-interactive-secondary-active'
             : ''}
           aria-label={pageButtonLabel(page)}
-          on:click={() => handlePageChange(page)}>{page}</Button
+          onclick={() => handlePageChange(page)}>{page}</Button
         >
       {/if}
     {/each}
@@ -148,12 +148,12 @@
       label={previousPageButtonLabel}
       disabled={!$store.hasPrevious}
       icon="arrow-left"
-      on:click={() => handlePageChange($store.currentPage - 1)}
+      onclick={() => handlePageChange($store.currentPage - 1)}
     />
     <IconButton
       label={nextPageButtonLabel}
       disabled={!$store.hasNext}
-      on:click={() => handlePageChange($store.currentPage + 1)}
+      onclick={() => handlePageChange($store.currentPage + 1)}
       icon="arrow-right"
     />
   </nav>

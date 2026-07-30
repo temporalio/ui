@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import TabList from './tab-list.svelte';
   import TabPanel from './tab-panel.svelte';
@@ -12,15 +13,7 @@
     title: 'Tabs',
     component: Tabs,
     subcomponents: { TabList, TabPanel, Tab },
-    argTypes: {
-      TABS: {
-        name: 'Tabs',
-        table: {
-          disable: true,
-        },
-      },
-    },
-  } satisfies Meta<Omit<Tabs, 'TABS'>>;
+  } satisfies Meta<ComponentProps<typeof Tabs>>;
 </script>
 
 <script lang="ts">

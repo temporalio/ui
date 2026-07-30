@@ -32,7 +32,7 @@
     class="start-button"
     leadingIcon="lightning-bolt"
     aria-label={translate('workflows.start-workflow-like-this-one')}
-    on:click={() => goto(href)}
+    onclick={() => goto(href)}
     {...$$restProps}
   ></Button>
 </Tooltip>

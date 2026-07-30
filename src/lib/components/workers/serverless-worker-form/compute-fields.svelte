@@ -1,6 +1,5 @@
 <script lang="ts">
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
@@ -10,8 +9,14 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import {
+    hasCloudRunImpersonatorPlaceholder,
+    interpolateCloudRunTerraformTemplate,
+  } from './cloud-run-terraform';
   import { GCP_REGIONS } from './gcp-regions';
+  import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
   import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
+  import { interpolateTerraformTemplate } from './shared';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
 
   interface Props {
@@ -24,6 +29,10 @@
     gcpRegions?: string[];
     gcpWorkerPool?: string;
     gcpServiceAccount?: string;
+    minReplicas?: number;
+    maxReplicas?: number;
+    initialReplicas?: number;
+    utilizationTarget?: number;
     scaleUpCooloffMs?: number;
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
@@ -31,6 +40,7 @@
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
     errors?: {
       lambdaArn?: string[];
       iamRoleArn?: string[];
@@ -39,6 +49,10 @@
       gcpRegion?: string[];
       gcpWorkerPool?: string[];
       gcpServiceAccount?: string[];
+      minReplicas?: string[];
+      maxReplicas?: string[];
+      initialReplicas?: string[];
+      utilizationTarget?: string[];
       scaleUpCooloffMs?: string[];
       scaleUpBacklogThreshold?: string[];
       maxWorkerLifetimeMs?: string[];
@@ -56,6 +70,10 @@
     gcpRegions = [...GCP_REGIONS],
     gcpWorkerPool = $bindable(''),
     gcpServiceAccount = $bindable(''),
+    minReplicas = $bindable(0),
+    maxReplicas = $bindable(30),
+    initialReplicas = $bindable(0),
+    utilizationTarget = $bindable(0.8),
     scaleUpCooloffMs = $bindable(),
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
@@ -63,12 +81,28 @@
     cfnTemplateUrl,
     cfnTemplate: cfnTemplateProp,
     terraformTemplate,
+    cloudRunTerraformTemplate,
     errors = {},
   }: Props = $props();
 
   const resolvedCfnTemplate = $derived(cfnTemplateProp ?? cfnTemplate);
   const resolvedTerraformTemplate = $derived(
-    terraformTemplate ?? defaultTerraformTemplate,
+    interpolateTerraformTemplate(
+      terraformTemplate ?? defaultTerraformTemplate,
+      {
+        externalId: roleExternalId,
+        lambdaArn,
+      },
+    ),
+  );
+  const resolvedCloudRunTerraformTemplate = $derived(
+    interpolateCloudRunTerraformTemplate(
+      cloudRunTerraformTemplate ?? defaultCloudRunTerraformTemplate,
+      gcpProject,
+    ),
+  );
+  const showCloudRunImpersonatorWarning = $derived(
+    hasCloudRunImpersonatorPlaceholder(resolvedCloudRunTerraformTemplate),
   );
 
   const launchStackHref = $derived.by(() => {
@@ -88,6 +122,7 @@
   });
 
   let showRoleHelp = $state(false);
+  let showCloudRunHelp = $state(false);
   let showScaling = $state(false);
   let activeRoleHelpTab = $state<'cloudformation' | 'terraform'>(
     'cloudformation',
@@ -148,27 +183,21 @@
       placeholder={translate('workers.gcp-project-placeholder')}
       required
     />
-    <div class="flex flex-col gap-1.5">
-      <Combobox
-        bind:value={gcpRegion}
-        id="gcpRegion"
-        name="gcpRegion"
-        label={translate('workers.gcp-region-label')}
-        placeholder={translate('workers.gcp-region-placeholder')}
-        options={gcpRegions}
-        noResultsText={translate('common.no-results')}
-        valid={!errors.gcpRegion?.[0]}
-        error={errors.gcpRegion?.[0]}
-        allowCustomValue
-        showChevron
-        required
-      />
-      {#if !errors.gcpRegion?.[0]}
-        <p class="text-xs text-primary">
-          {translate('workers.gcp-region-hint')}
-        </p>
-      {/if}
-    </div>
+    <Combobox
+      bind:value={gcpRegion}
+      id="gcpRegion"
+      name="gcpRegion"
+      label={translate('workers.gcp-region-label')}
+      hintText={translate('workers.gcp-region-hint')}
+      placeholder={translate('workers.gcp-region-placeholder')}
+      options={gcpRegions}
+      noResultsText={translate('common.no-results')}
+      valid={!errors.gcpRegion?.[0]}
+      error={errors.gcpRegion?.[0]}
+      allowCustomValue
+      showChevron
+      required
+    />
     <div class="flex flex-wrap items-end gap-4">
       <Input
         bind:value={gcpWorkerPool}
@@ -236,13 +265,13 @@
         <ToggleButtons>
           <ToggleButton
             active={activeRoleHelpTab === 'cloudformation'}
-            on:click={() => (activeRoleHelpTab = 'cloudformation')}
+            onclick={() => (activeRoleHelpTab = 'cloudformation')}
           >
             {translate('workers.cfn-tab')}
           </ToggleButton>
           <ToggleButton
             active={activeRoleHelpTab === 'terraform'}
-            on:click={() => (activeRoleHelpTab = 'terraform')}
+            onclick={() => (activeRoleHelpTab = 'terraform')}
           >
             {translate('workers.terraform-tab')}
           </ToggleButton>
@@ -261,11 +290,7 @@
             >
               {translate('workers.launch-stack')}
             </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              on:click={downloadCfnTemplate}
-            >
+            <Button variant="secondary" size="sm" onclick={downloadCfnTemplate}>
               {translate('workers.download-template')}
             </Button>
           </div>
@@ -290,31 +315,63 @@
     </Accordion>
   </div>
 {:else}
-  <Input
-    bind:value={gcpServiceAccount}
-    id="gcpServiceAccount"
-    name="gcpServiceAccount"
-    label={translate('workers.gcp-service-account-label')}
-    hintText={errors.gcpServiceAccount?.[0] ||
-      translate('workers.gcp-service-account-hint')}
-    error={!!errors.gcpServiceAccount?.[0]}
-    placeholder={translate('workers.gcp-service-account-placeholder')}
-    required
-  />
+  <div class="flex flex-col gap-4">
+    <Input
+      bind:value={gcpServiceAccount}
+      id="gcpServiceAccount"
+      name="gcpServiceAccount"
+      label={translate('workers.gcp-service-account-label')}
+      hintText={errors.gcpServiceAccount?.[0] ||
+        translate('workers.gcp-service-account-hint')}
+      error={!!errors.gcpServiceAccount?.[0]}
+      placeholder={translate('workers.gcp-service-account-placeholder')}
+      required
+    />
+    {#if provider === 'cloud-run'}
+      <Accordion
+        icon="info"
+        title={translate('workers.cloud-run-setup-prompt')}
+        bind:open={showCloudRunHelp}
+        class="[&_h3]:text-sm"
+      >
+        <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+          <p class="text-sm text-secondary">
+            {translate('workers.cloud-run-terraform-description-before')}<Link
+              href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
+              newTab
+              >{translate('workers.cloud-run-terraform-module-link')}</Link
+            >{translate('workers.cloud-run-terraform-description-after')}
+          </p>
+          {#if showCloudRunImpersonatorWarning}
+            <p class="text-sm text-warning">
+              {translate('workers.cloud-run-impersonator-warning')}
+            </p>
+          {/if}
+          <CodeBlock
+            content={resolvedCloudRunTerraformTemplate}
+            language="text"
+            maxHeight={300}
+            copyable
+            label={translate('workers.cloud-run-terraform-module-link')}
+            copyIconTitle={translate('workers.copy-snippet')}
+            copySuccessIconTitle={translate('workers.copied')}
+          />
+          <p class="text-sm text-secondary">
+            {translate('workers.cloud-run-invoker-handoff')}
+          </p>
+        </div>
+      </Accordion>
+    {/if}
+  </div>
 {/if}
 
 <hr class="my-5 border-subtle" />
 
 <div class="flex flex-wrap items-center justify-between gap-4">
   <div>
-    <div class="flex items-center gap-2">
-      <h2 class="text-base font-medium">
-        {translate('workers.scaling-lifecycle-section')}
-      </h2>
-      {#if provider === 'cloud-run'}
-        <Badge type="secondary">{translate('workers.coming-soon')}</Badge>
-      {/if}
-    </div>
+    <h2 class="text-base font-medium">
+      {translate('workers.scaling-lifecycle-section')}
+    </h2>
     <p class="text-sm text-secondary">
       {translate('workers.scaling-lifecycle-description')}
     </p>
@@ -323,9 +380,8 @@
     variant="secondary"
     size="sm"
     type="button"
-    disabled={provider === 'cloud-run'}
     trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
-    on:click={() => (showScaling = !showScaling)}
+    onclick={() => (showScaling = !showScaling)}
   >
     {showScaling
       ? translate('workers.hide-defaults')
@@ -395,6 +451,77 @@
         translate('workers.metrics-poll-interval-ms-hint')}
       error={!!errors.metricsPollIntervalMs?.[0]}
       placeholder="60000"
+    />
+  </div>
+{:else if showScaling && provider === 'cloud-run'}
+  <div class="mt-4 flex flex-col gap-4">
+    <Input
+      value={String(minReplicas)}
+      onchange={(e) => {
+        minReplicas = Number((e.target as HTMLInputElement).value);
+      }}
+      id="minReplicas"
+      name="minReplicas"
+      type="number"
+      min={0}
+      max={2_147_483_647}
+      step={1}
+      label={translate('workers.min-replicas-label')}
+      hintText={errors.minReplicas?.[0] ||
+        translate('workers.min-replicas-hint')}
+      error={!!errors.minReplicas?.[0]}
+      required
+    />
+    <Input
+      value={String(maxReplicas)}
+      onchange={(e) => {
+        maxReplicas = Number((e.target as HTMLInputElement).value);
+      }}
+      id="maxReplicas"
+      name="maxReplicas"
+      type="number"
+      min={1}
+      max={2_147_483_647}
+      step={1}
+      label={translate('workers.max-replicas-label')}
+      hintText={errors.maxReplicas?.[0] ||
+        translate('workers.max-replicas-hint')}
+      error={!!errors.maxReplicas?.[0]}
+      required
+    />
+    <Input
+      value={String(initialReplicas)}
+      onchange={(e) => {
+        initialReplicas = Number((e.target as HTMLInputElement).value);
+      }}
+      id="initialReplicas"
+      name="initialReplicas"
+      type="number"
+      min={0}
+      max={2_147_483_647}
+      step={1}
+      label={translate('workers.initial-replicas-label')}
+      hintText={errors.initialReplicas?.[0] ||
+        translate('workers.initial-replicas-hint')}
+      error={!!errors.initialReplicas?.[0]}
+      required
+    />
+    <Input
+      value={String(utilizationTarget)}
+      onchange={(e) => {
+        utilizationTarget = Number((e.target as HTMLInputElement).value);
+      }}
+      id="utilizationTarget"
+      name="utilizationTarget"
+      type="number"
+      min={0}
+      max={1}
+      step="any"
+      label={translate('workers.utilization-target-label')}
+      hintText={errors.utilizationTarget?.[0] ||
+        translate('workers.utilization-target-hint')}
+      error={!!errors.utilizationTarget?.[0]}
+      required
     />
   </div>
 {/if}

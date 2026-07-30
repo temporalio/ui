@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import { iconNames } from '$lib/holocene/icon';
@@ -70,7 +71,7 @@
         table: { category: 'Positioning' },
       },
     },
-  } satisfies Meta<Tooltip>;
+  } satisfies Meta<ComponentProps<typeof Tooltip>>;
 </script>
 
 <script lang="ts">
@@ -125,11 +126,13 @@
 
 <Story name="With Content instead of text">
   <Tooltip bottomRight show>
-    <div slot="content">
-      <div>whadup</div>
-      <div>whadup</div>
-      <div>whadup</div>
-    </div>
+    {#snippet content()}
+      <div>
+        <div>whadup</div>
+        <div>whadup</div>
+        <div>whadup</div>
+      </div>
+    {/snippet}
     <Button>Tooltip</Button>
   </Tooltip>
 </Story>

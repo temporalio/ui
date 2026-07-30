@@ -167,7 +167,7 @@
         id="relative-toggle"
         bind:checked={$relativeTime}
         labelPosition="left"
-        on:change={handleRelativeToggle}
+        onchange={handleRelativeToggle}
         data-testid="timezones-relative-toggle"
       />
     </div>
@@ -181,22 +181,22 @@
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'short'}
-            on:click={() => setTimestampFormat('short')}>Short</ToggleButton
+            onclick={() => setTimestampFormat('short')}>Short</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'medium'}
-            on:click={() => setTimestampFormat('medium')}>Default</ToggleButton
+            onclick={() => setTimestampFormat('medium')}>Default</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'long'}
-            on:click={() => setTimestampFormat('long')}>Long</ToggleButton
+            onclick={() => setTimestampFormat('long')}>Long</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'iso'}
-            on:click={() => setTimestampFormat('iso')}>ISO</ToggleButton
+            onclick={() => setTimestampFormat('iso')}>ISO</ToggleButton
           >
         </ToggleButtons>
       </div>
@@ -210,19 +210,19 @@
             size="xs"
             active={$hourFormat === 'system'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('system')}>System</ToggleButton
+            onclick={() => setHourFormat('system')}>System</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '12'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('12')}>12-hour</ToggleButton
+            onclick={() => setHourFormat('12')}>12-hour</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '24'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('24')}>24-hour</ToggleButton
+            onclick={() => setHourFormat('24')}>24-hour</ToggleButton
           >
         </ToggleButtons>
       </div>

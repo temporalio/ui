@@ -191,7 +191,7 @@
               data-testid="delete-schedule-button"
               leadingIcon="trash"
               class="ml-auto hidden sm:inline-flex"
-              on:click={() => openConfirmationModal('delete')}
+              onclick={() => openConfirmationModal('delete')}
             >
               {translate('schedules.delete')}
             </Button>

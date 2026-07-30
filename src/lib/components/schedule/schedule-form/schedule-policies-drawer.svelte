@@ -170,7 +170,7 @@
           description={translate('schedules.pause-schedule-description')}
           checked={$policies.pauseSchedule}
           error={$errors.pauseSchedule?.[0] ?? ''}
-          on:change={() => ($policies.pauseSchedule = !$policies.pauseSchedule)}
+          onChange={() => ($policies.pauseSchedule = !$policies.pauseSchedule)}
         />
       </div>
     </fieldset>
@@ -314,7 +314,7 @@
     {/key}
 
     <div class="ml-auto mt-2 flex gap-4">
-      <Button variant="secondary" on:click={onCancel}
+      <Button variant="secondary" onclick={onCancel}
         >{translate('common.cancel')}</Button
       >
       <Button variant="primary" type="submit"

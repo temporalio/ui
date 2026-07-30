@@ -17,6 +17,6 @@
   };
 </script>
 
-<Button variant="secondary" leadingIcon="retry" on:click={generate} {...rest}>
+<Button variant="secondary" leadingIcon="retry" onclick={generate} {...rest}>
   {translate('common.random-uuid')}
 </Button>

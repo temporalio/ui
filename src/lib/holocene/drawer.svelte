@@ -99,7 +99,7 @@
             icon="close"
             aria-expanded={open}
             aria-controls="navigation-drawer"
-            on:click={onClick}
+            onclick={onClick}
           />
         </slot>
       </div>

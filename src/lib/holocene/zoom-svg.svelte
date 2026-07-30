@@ -165,7 +165,7 @@
           size="sm"
           leadingIcon="chevron-up"
           aria-label="Pan up"
-          on:click={() => panBy(0, -PAN_STEP_RATIO)}
+          onclick={() => panBy(0, -PAN_STEP_RATIO)}
         />
       </Tooltip>
       <Tooltip text="Pan down" bottom>
@@ -174,7 +174,7 @@
           size="sm"
           leadingIcon="chevron-down"
           aria-label="Pan down"
-          on:click={() => panBy(0, PAN_STEP_RATIO)}
+          onclick={() => panBy(0, PAN_STEP_RATIO)}
         />
       </Tooltip>
       <Tooltip text="Pan left" bottom>
@@ -183,7 +183,7 @@
           size="sm"
           leadingIcon="chevron-left"
           aria-label="Pan left"
-          on:click={() => panBy(-PAN_STEP_RATIO, 0)}
+          onclick={() => panBy(-PAN_STEP_RATIO, 0)}
         />
       </Tooltip>
       <Tooltip text="Pan right" bottom>
@@ -192,7 +192,7 @@
           size="sm"
           leadingIcon="chevron-right"
           aria-label="Pan right"
-          on:click={() => panBy(PAN_STEP_RATIO, 0)}
+          onclick={() => panBy(PAN_STEP_RATIO, 0)}
         />
       </Tooltip>
     {/if}
@@ -204,7 +204,7 @@
           leadingIcon="add"
           aria-label="Zoom in"
           disabled={zoomLevel - ZOOM_STEP < maxZoomIn}
-          on:click={() => zoomBy(-ZOOM_STEP)}
+          onclick={() => zoomBy(-ZOOM_STEP)}
         />
       </Tooltip>
       <Tooltip text="Zoom out" bottom>
@@ -214,7 +214,7 @@
           leadingIcon="hyphen"
           aria-label="Zoom out"
           disabled={zoomLevel + ZOOM_STEP > maxZoomOut}
-          on:click={() => zoomBy(ZOOM_STEP)}
+          onclick={() => zoomBy(ZOOM_STEP)}
         />
       </Tooltip>
     {/if}
@@ -225,7 +225,7 @@
         size="sm"
         leadingIcon="target"
         aria-label="Center"
-        on:click={() => {
+        onclick={() => {
           onCenter();
         }}
       />

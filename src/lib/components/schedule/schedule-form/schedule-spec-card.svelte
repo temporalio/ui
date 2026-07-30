@@ -119,7 +119,7 @@
     </div>
 
     <div>
-      <Button variant="secondary" on:click={addSpec}>
+      <Button variant="secondary" onclick={addSpec}>
         {translate('schedules.add-another-spec')}
       </Button>
     </div>

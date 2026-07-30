@@ -62,7 +62,7 @@ export const Strings = {
   'form-activity-type-label': 'Activity Type',
   'form-activity-type-required': 'Activity Type is required.',
   'form-random-uuid': 'Random UUID',
-  'form-timeouts-heading': 'Activity Timeouts',
+  'form-options-heading': 'Activity Options',
   'form-start-to-close-timeout-label': 'Start to Close Timeout',
   'form-start-to-close-timeout-hint':
     'Maximum time an activity is allowed to execute after being picked up by a worker.',
@@ -74,6 +74,9 @@ export const Strings = {
     'Limits time an activity task can stay in a task queue before a worker picks it up. Defaults to "Schedule to Close Timeout" if not specified.',
   'form-timeout-required':
     'Either "Start to Close Timeout" or "Schedule to Close Timeout" is required.',
+  'form-start-delay-label': 'Start Delay',
+  'form-start-delay-hint':
+    'Determines the amount of time to wait before initiating an Activity Execution.',
   'form-search-attributes-heading': 'Custom Search Attributes',
   'form-search-attributes-description':
     'Indexed fields used in a List Filter to filter a list of Standalone Activities.',
@@ -98,10 +101,12 @@ export const Strings = {
   health: 'Health',
   'retry-state': 'Retry State',
   'timeout-configuration': 'Timeout Configuration',
+  'start-delay': 'Start Delay',
   worker: 'Worker',
   'run-state': 'Run State',
   attempt: 'Attempt',
   'schedule-time': 'Schedule Time',
+  'execution-time': 'Execution Time',
   'execution-duration': 'Execution Duration',
   'last-heartbeat': 'Last Heartbeat',
   'heartbeat-timeout': 'Heartbeat Timeout',
@@ -126,4 +131,25 @@ export const Strings = {
   'fairness-weight': 'Fairness Weight',
   'pause-activity': 'Pause Activity',
   'unpause-activity': 'Unpause Activity',
+  'select-all-activities': 'Select all Standalone Activities',
+  'select-activity': 'Select {{activity}}',
+  'n-selected': '{{count, number}} selected',
+  'all-selected': 'All {{count, number}} selected.',
+  'select-all-leading': 'or ',
+  'select-all': 'select all {{count, number}} Standalone Activities',
+  'select-all-trailing': ' matching your query',
+  'batch-cancel-modal-title': 'Cancel Standalone Activities',
+  'batch-terminate-modal-title': 'Terminate Standalone Activities',
+  'batch-confirmation_one':
+    'Are you sure you want to {{action}} one running Standalone Activity?',
+  'batch-confirmation_other':
+    'Are you sure you want to {{action}} {{count, number}} running Standalone Activities?',
+  'batch-operation-confirmation-all':
+    'Are you sure you want to {{action}} all Standalone Activities matching the following query? This action cannot be undone.',
+  'batch-operation-count-disclaimer':
+    'Note: The actual count of Standalone Activities that will be affected is the total number of running Standalone Activities matching this query at the time of clicking "{{action}}".',
+  'batch-cancel-all-success':
+    'The batch cancel request is processing in the background.',
+  'batch-terminate-all-success':
+    'The batch terminate request is processing in the background.',
 } as const;

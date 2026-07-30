@@ -53,7 +53,7 @@
     class="h-9 w-9 shrink-0 p-0"
     data-testid="news-feed-trigger"
     size="sm"
-    on:click={openNewsFeed}
+    onclick={openNewsFeed}
   />
 {/if}
 

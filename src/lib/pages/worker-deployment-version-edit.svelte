@@ -27,10 +27,19 @@
     buildId: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
   }
 
-  let { namespace, deployment, buildId, computeProviders, gcpRegions }: Props =
-    $props();
+  let {
+    namespace,
+    deployment,
+    buildId,
+    computeProviders,
+    gcpRegions,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -61,6 +70,8 @@
       {error}
       {computeProviders}
       {gcpRegions}
+      {terraformTemplate}
+      {cloudRunTerraformTemplate}
       initialData={{
         provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',
@@ -74,6 +85,10 @@
         scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
         maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
         metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
+        minReplicas: scalerDetails.minReplicas,
+        maxReplicas: scalerDetails.maxReplicas,
+        initialReplicas: scalerDetails.initialReplicas,
+        utilizationTarget: scalerDetails.utilizationTarget,
       }}
       cancelHref={backHref}
       onSubmit={async (data) => {
@@ -85,6 +100,12 @@
                 data.gcpRegion,
                 data.gcpWorkerPool,
                 data.gcpServiceAccount,
+                {
+                  minReplicas: data.minReplicas,
+                  maxReplicas: data.maxReplicas,
+                  initialReplicas: data.initialReplicas,
+                  utilizationTarget: data.utilizationTarget,
+                },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {
                 roleExternalId: data.roleExternalId,

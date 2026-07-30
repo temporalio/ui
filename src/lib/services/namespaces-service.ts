@@ -15,7 +15,7 @@ import {
 
 type PaginatedNamespacesResponse = Replace<
   ListNamespacesResponse,
-  { nextPageToken?: NextPageToken }
+  { nextPageToken?: NextPageToken; namespaces?: DescribeNamespaceResponse[] }
 >;
 
 const emptyNamespace: { namespaces: DescribeNamespaceResponse[] } = {

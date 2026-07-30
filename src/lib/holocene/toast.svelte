@@ -61,6 +61,6 @@
     aria-label={dismissLabel}
     class="text-inherit h-6 w-6 shrink-0 p-0"
     disableTracking
-    on:click={handleDismiss}
+    onclick={handleDismiss}
   />
 </div>

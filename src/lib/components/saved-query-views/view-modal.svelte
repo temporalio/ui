@@ -190,7 +190,7 @@
           variant="secondary"
           disabled={!nameValid || maxViewsReached}
           data-testid="create-as-new-button"
-          on:click={onCreateAsNew}
+          onclick={onCreateAsNew}
           size="sm">{name === view.name ? 'Create Copy' : 'Create New'}</Button
         >
       </div>
@@ -202,7 +202,7 @@
     class="flex items-center gap-1 text-sm underline {!onDeleteView
       ? 'invisible'
       : ''}"
-    on:click={onDelete}
+    onclick={onDelete}
   >
     <Icon name="trash" /> Delete this Saved View
   </Button>

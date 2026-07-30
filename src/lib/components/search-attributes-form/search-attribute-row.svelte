@@ -90,7 +90,7 @@
     <Button
       variant="ghost"
       size="xs"
-      on:click={onRemove}
+      onclick={onRemove}
       disabled={submitting}
       leadingIcon="close"
       class="rounded-full"
@@ -104,7 +104,7 @@
       <Button
         variant="ghost"
         size="xs"
-        on:click={onRemove}
+        onclick={onRemove}
         disabled={submitting || isCloud}
         leadingIcon="trash"
       />

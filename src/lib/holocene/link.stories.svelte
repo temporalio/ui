@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import type { IconName } from './icon';
   import { iconNames } from './icon';
@@ -22,7 +23,7 @@
       href: { control: 'text' },
       icon: { control: 'select', options: iconNames },
     },
-  } satisfies Meta<Link>;
+  } satisfies Meta<ComponentProps<typeof Link>>;
 </script>
 
 <script lang="ts">

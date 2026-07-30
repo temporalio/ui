@@ -1,10 +1,11 @@
-import { Action } from '$lib/models/workflow-actions';
-import { getAuthUser } from '$lib/stores/auth-user';
 import { inProgressBatchOperation } from '$lib/stores/batch-operations';
+import { type Execution, ExecutionType } from '$lib/types';
 import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+
+type ActivityBatchAction = 'cancel' | 'terminate';
 
 type CreateActivityBatchOperationOptions = {
   namespace: string;
@@ -12,6 +13,7 @@ type CreateActivityBatchOperationOptions = {
   jobId: string;
   query?: string;
   activities?: ActivityExecutionInfo[];
+  identity?: string;
 };
 
 interface StartActivityBatchOperationRequest {
@@ -19,53 +21,54 @@ interface StartActivityBatchOperationRequest {
   namespace: string;
   reason: string;
   visibilityQuery?: string;
-  executions?: { activityId: string; runId: string }[];
-  cancellationOperation?: { identity: string };
-  terminationOperation?: { identity: string };
+  targetExecutions?: Execution[];
+  cancelActivitiesOperation?: { identity?: string; reason: string };
+  terminateActivitiesOperation?: { identity?: string; reason: string };
 }
 
 const activityActionToOperation = (
-  action: Action,
+  action: ActivityBatchAction,
+  reason: string,
+  identity?: string,
 ): Partial<StartActivityBatchOperationRequest> => {
-  const identity = getAuthUser().email ?? '';
-
   switch (action) {
-    case Action.Cancel:
+    case 'cancel':
       return {
-        cancellationOperation: { identity },
+        cancelActivitiesOperation: { identity, reason },
       };
-    case Action.Terminate:
+    case 'terminate':
       return {
-        terminationOperation: { identity },
+        terminateActivitiesOperation: { identity, reason },
       };
     default:
       return {};
   }
 };
 
-const toActivityExecutionInput = ({
+const toTargetExecution = ({
   activityId,
   runId,
-}: ActivityExecutionInfo): { activityId: string; runId: string } => ({
-  activityId: activityId ?? '',
+}: ActivityExecutionInfo): Execution => ({
+  type: ExecutionType.EXECUTION_TYPE_ACTIVITY,
+  businessId: activityId ?? '',
   runId: runId ?? '',
 });
 
 const createActivityBatchOperationRequest = (
-  action: Action,
+  action: ActivityBatchAction,
   options: CreateActivityBatchOperationOptions,
 ): StartActivityBatchOperationRequest => {
   const body: StartActivityBatchOperationRequest = {
     jobId: options.jobId,
     namespace: options.namespace,
     reason: options.reason,
-    ...activityActionToOperation(action),
+    ...activityActionToOperation(action, options.reason, options.identity),
   };
 
   if (options.activities) {
     return {
       ...body,
-      executions: options.activities.map(toActivityExecutionInput),
+      targetExecutions: options.activities.map(toTargetExecution),
     };
   } else if (options.query) {
     return {
@@ -85,7 +88,7 @@ export async function batchCancelActivities(
     batchJobId: options.jobId,
   });
 
-  const body = createActivityBatchOperationRequest(Action.Cancel, options);
+  const body = createActivityBatchOperationRequest('cancel', options);
 
   await requestFromAPI<null>(route, {
     options: {
@@ -109,7 +112,7 @@ export async function batchTerminateActivities(
     batchJobId: options.jobId,
   });
 
-  const body = createActivityBatchOperationRequest(Action.Terminate, options);
+  const body = createActivityBatchOperationRequest('terminate', options);
 
   await requestFromAPI<null>(route, {
     options: {

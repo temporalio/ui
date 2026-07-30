@@ -38,7 +38,7 @@
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         copied={$copied}
-        on:click={handleCopy}
+        onclick={handleCopy}
         class="absolute left-0"
       />
     </div>

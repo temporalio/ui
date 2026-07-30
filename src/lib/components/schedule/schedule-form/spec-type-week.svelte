@@ -123,8 +123,8 @@
         variant="secondary"
         active={checked}
         {...attrs}
-        on:click={onSelect}
-        on:keydown={onKeydown}
+        onclick={onSelect}
+        onkeydown={onKeydown}
       >
         {option.label}
       </Button>
@@ -144,7 +144,7 @@
           aria-pressed={isSelected}
           variant="secondary"
           active={isSelected}
-          on:click={() => toggleCustomDay(value)}
+          onclick={() => toggleCustomDay(value)}
         >
           {getWeekdayLabel(Number(value))}
         </Button>

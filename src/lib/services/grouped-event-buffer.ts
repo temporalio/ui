@@ -1,5 +1,6 @@
 import {
   addEventToGroup,
+  cloneEventGroup,
   createEventGroup,
   createWorkflowTaskGroup,
 } from '$lib/models/event-groups/create-event-group';
@@ -344,33 +345,42 @@ function absorbLiveGroupIntoPool(poolIdx: number, liveGroup: EventGroup): void {
   invalidateGroupArrayCaches();
 }
 
+// Returns a fresh group reference when pending metadata changed (so
+// reference-tracking Svelte views re-derive — a pause/unpause appends no
+// history event, leaving eventList and the old reference otherwise stable), or
+// the same group when nothing changed.
 function enrichGroup(
   group: EventGroup,
   byActivityId: Map<string, PendingActivity>,
   byNexusScheduledId: Map<string, PendingNexusOperation>,
-): void {
+): EventGroup {
   const initial = group.initialEvent;
 
   if (isActivityTaskScheduledEvent(initial)) {
     const pa = byActivityId.get(
       initial.activityTaskScheduledEventAttributes?.activityId ?? '',
     );
-    if (pa && !hasTerminalActivityEvent(group)) {
-      group.pendingActivity = pa;
-    } else {
-      delete group.pendingActivity;
+    const next = pa && !hasTerminalActivityEvent(group) ? pa : undefined;
+    if (group.pendingActivity === next) {
+      return group;
     }
-    return;
+    const clone = cloneEventGroup(group);
+    clone.pendingActivity = next;
+    return clone;
   }
 
   if (isNexusOperationScheduledEvent(initial)) {
     const pn = byNexusScheduledId.get(group.id);
-    if (pn && !hasTerminalNexusEvent(group)) {
-      group.pendingNexusOperation = pn;
-    } else {
-      delete group.pendingNexusOperation;
+    const next = pn && !hasTerminalNexusEvent(group) ? pn : undefined;
+    if (group.pendingNexusOperation === next) {
+      return group;
     }
+    const clone = cloneEventGroup(group);
+    clone.pendingNexusOperation = next;
+    return clone;
   }
+
+  return group;
 }
 
 function notifyLatestGroupListeners(group: EventGroup): void {
@@ -700,16 +710,27 @@ export function enrichGroups(
     pendingNexusOperations.map((p) => [String(p.scheduledEventId), p]),
   );
 
+  let changed = false;
+
   for (let i = 0; i < poolTop; i++) {
-    const { group } = groupPool[i];
-    if (!group) continue;
-    enrichGroup(group, byActivityId, byNexusScheduledId);
+    const meta = groupPool[i];
+    if (!meta.group) continue;
+    const next = enrichGroup(meta.group, byActivityId, byNexusScheduledId);
+    if (next !== meta.group) {
+      meta.group = next;
+      changed = true;
+    }
   }
 
-  for (const group of liveGroups) {
-    enrichGroup(group, byActivityId, byNexusScheduledId);
+  for (let i = 0; i < liveGroups.length; i++) {
+    const next = enrichGroup(liveGroups[i], byActivityId, byNexusScheduledId);
+    if (next !== liveGroups[i]) {
+      liveGroups[i] = next;
+      changed = true;
+    }
   }
-  invalidateGroupArrayCaches();
+
+  if (changed) invalidateGroupArrayCaches();
 }
 
 /**

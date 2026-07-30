@@ -127,7 +127,7 @@
       <Button
         bind:this={editPoliciesButton}
         variant="secondary"
-        on:click={() => (isEditingPolicies = true)}
+        onclick={() => (isEditingPolicies = true)}
         >{translate('schedules.policies-title')}</Button
       >
     </div>

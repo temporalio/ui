@@ -77,7 +77,7 @@
     <svelte:fragment slot="actions-end-additional">
       <Tooltip text="Configure Columns" top>
         <Button
-          on:click={onClickConfigure}
+          onclick={onClickConfigure}
           data-testid="nexus-operations-summary-table-configuration-button"
           size="xs"
           variant="ghost"

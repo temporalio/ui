@@ -135,6 +135,7 @@ export const ActivityHeaderLabels = [
   'Status',
   'Execution Duration',
   'State Transitions',
+  'Execution Time',
 ] as const;
 
 export type ActivityHeaderLabel = (typeof ActivityHeaderLabels)[number];
@@ -168,6 +169,7 @@ const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Task Queue' },
   { label: 'Execution Duration' },
   { label: 'State Transitions' },
+  { label: 'Execution Time' },
 ];
 
 export const DeploymentHeaderLabels = [

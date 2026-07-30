@@ -24,6 +24,7 @@
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
@@ -39,6 +40,7 @@
     cfnTemplateUrl,
     cfnTemplate,
     terraformTemplate,
+    cloudRunTerraformTemplate,
     computeProviders,
     gcpRegions,
   }: Props = $props();
@@ -95,6 +97,12 @@
         data.gcpRegion,
         data.gcpWorkerPool,
         data.gcpServiceAccount,
+        {
+          minReplicas: data.minReplicas,
+          maxReplicas: data.maxReplicas,
+          initialReplicas: data.initialReplicas,
+          utilizationTarget: data.utilizationTarget,
+        },
       );
     } else {
       computeConfig = buildLambdaComputeConfig(
@@ -212,6 +220,7 @@
   {cfnTemplateUrl}
   {cfnTemplate}
   {terraformTemplate}
+  {cloudRunTerraformTemplate}
   {computeProviders}
   {gcpRegions}
 />

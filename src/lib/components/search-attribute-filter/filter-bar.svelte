@@ -58,7 +58,7 @@
           leadingIcon="json"
           active={viewManualQuery}
           data-testid="toggle-manual-query"
-          on:click={() => (viewManualQuery = !viewManualQuery)}
+          onclick={() => (viewManualQuery = !viewManualQuery)}
         />
       </Tooltip>
     </div>

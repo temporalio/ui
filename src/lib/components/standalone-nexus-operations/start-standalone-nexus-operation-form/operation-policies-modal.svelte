@@ -205,14 +205,14 @@
         <Button
           type="button"
           variant="ghost"
-          on:click={() => {
+          onclick={() => {
             open = false;
           }}>{translate('common.cancel')}</Button
         >
         <Button
           type="button"
           variant="primary"
-          on:click={() => {
+          onclick={() => {
             open = false;
           }}
           >{translate(

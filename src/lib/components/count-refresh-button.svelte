@@ -22,7 +22,7 @@
   size="xs"
   variant="ghost"
   leadingIcon="retry"
-  on:click={() => {
+  onclick={() => {
     $refresh = Date.now();
     onRefresh?.();
   }}

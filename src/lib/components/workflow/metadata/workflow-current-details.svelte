@@ -75,7 +75,7 @@
           <p>Press for freshness</p>
           <Button
             variant="ghost"
-            on:click={fetchCurrentDetails}
+            onclick={fetchCurrentDetails}
             disabled={loading}
             aria-label={translate('common.refresh')}
           >

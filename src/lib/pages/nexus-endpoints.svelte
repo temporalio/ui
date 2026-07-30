@@ -25,7 +25,7 @@
   let {
     endpoints = [],
     searchPlaceholder = translate('common.search'),
-    headers,
+    headers: headersSnippet,
     columns,
     actions,
   }: Props = $props();
@@ -73,12 +73,14 @@
     />
     {#if endpoints.length}
       <Table class="w-full" bordered>
-        <caption class="sr-only" slot="caption">
-          {translate('nexus.endpoints')}
-        </caption>
-        <svelte:fragment slot="headers">
-          {@render headers?.()}
-        </svelte:fragment>
+        {#snippet caption()}
+          <caption class="sr-only">
+            {translate('nexus.endpoints')}
+          </caption>
+        {/snippet}
+        {#snippet headers()}
+          {@render headersSnippet?.()}
+        {/snippet}
         {#each endpoints as endpoint (endpoint.id)}
           {@render columns?.(endpoint)}
         {/each}

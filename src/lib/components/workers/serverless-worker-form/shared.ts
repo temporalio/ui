@@ -16,6 +16,10 @@ const providerFields = {
   gcpRegion: z.string().default(''),
   gcpWorkerPool: z.string().default(''),
   gcpServiceAccount: z.string().default(''),
+  minReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
+  maxReplicas: z.number().int().min(1).max(2_147_483_647).default(30),
+  initialReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
+  utilizationTarget: z.number().gt(0).max(1).default(0.8),
 };
 
 const validateProviderFields = (
@@ -82,6 +86,21 @@ const validateProviderFields = (
         code: z.ZodIssueCode.custom,
         path: ['gcpServiceAccount'],
         message: 'Service Account is required',
+      });
+    if (data.minReplicas > data.maxReplicas)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['minReplicas'],
+        message: 'Min Replicas must be less than or equal to Max Replicas',
+      });
+    if (
+      data.initialReplicas < data.minReplicas ||
+      data.initialReplicas > data.maxReplicas
+    )
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['initialReplicas'],
+        message: 'Initial Replicas must be between Min and Max Replicas',
       });
   }
 };
@@ -154,4 +173,38 @@ export const getInitialComputeProvider = ({
     providers?.find(({ disabled, hidden }) => !disabled && !hidden)?.value ??
     'lambda'
   );
+};
+
+interface TerraformTemplateValues {
+  externalId?: string;
+  lambdaArn?: string;
+}
+
+export const interpolateTerraformTemplate = (
+  template: string,
+  { externalId, lambdaArn }: TerraformTemplateValues,
+): string => {
+  let result = template;
+
+  if (externalId) {
+    result = result.replace(
+      /(external_id\s*=\s*)"[^"]*"/,
+      (_, assignment: string) => `${assignment}"${externalId}"`,
+    );
+  }
+
+  const arns = (lambdaArn ?? '')
+    .split(',')
+    .map((arn) => arn.trim())
+    .filter(Boolean);
+
+  if (arns.length) {
+    const entries = arns.map((arn) => `    "${arn}",`).join('\n');
+    result = result.replace(
+      /(lambda_function_arns\s*=\s*\[)[^\]]*(\])/,
+      (_, open: string, close: string) => `${open}\n${entries}\n  ${close}`,
+    );
+  }
+
+  return result;
 };

@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import IconButton from '$lib/holocene/icon-button.svelte';
 
@@ -21,7 +22,7 @@
         options: iconNames,
       },
     },
-  } satisfies Meta<IconButton>;
+  } satisfies Meta<ComponentProps<typeof IconButton>>;
 </script>
 
 <script lang="ts">
@@ -30,7 +31,7 @@
 </script>
 
 <Template let:args>
-  <IconButton {...args} on:click={action('click')} />
+  <IconButton {...args} onclick={action('click')} />
 </Template>
 
 <Story name="Default" />

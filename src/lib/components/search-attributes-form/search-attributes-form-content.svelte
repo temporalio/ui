@@ -223,7 +223,7 @@
       <Button
         variant="secondary"
         size="sm"
-        on:click={addAttribute}
+        onclick={addAttribute}
         disabled={$submitting}
         type="button"
         leadingIcon="add"
@@ -239,7 +239,7 @@
         <Button
           variant="secondary"
           size="sm"
-          on:click={handleCancel}
+          onclick={handleCancel}
           disabled={$submitting}
           type="button"
         >

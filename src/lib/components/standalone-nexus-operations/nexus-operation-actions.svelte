@@ -44,7 +44,7 @@
 
 <div class="flex items-center gap-2">
   <Button
-    on:click={() => (cancelConfirmationModalOpen = true)}
+    onclick={() => (cancelConfirmationModalOpen = true)}
     disabled={!isRunning || commandsDisabled}
     size="sm"
   >

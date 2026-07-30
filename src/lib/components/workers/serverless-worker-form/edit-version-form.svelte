@@ -28,6 +28,10 @@
       gcpRegion?: string;
       gcpWorkerPool?: string;
       gcpServiceAccount?: string;
+      minReplicas?: number;
+      maxReplicas?: number;
+      initialReplicas?: number;
+      utilizationTarget?: number;
       scaleUpCooloffMs?: number;
       scaleUpBacklogThreshold?: number;
       maxWorkerLifetimeMs?: number;
@@ -39,6 +43,8 @@
     error?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
   }
 
   let {
@@ -49,6 +55,8 @@
     error,
     computeProviders,
     gcpRegions,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
   }: Props = $props();
 
   const superform = superForm(
@@ -64,6 +72,10 @@
       gcpRegion: initialData.gcpRegion ?? '',
       gcpWorkerPool: initialData.gcpWorkerPool ?? '',
       gcpServiceAccount: initialData.gcpServiceAccount ?? '',
+      minReplicas: initialData.minReplicas ?? 0,
+      maxReplicas: initialData.maxReplicas ?? 30,
+      initialReplicas: initialData.initialReplicas ?? 0,
+      utilizationTarget: initialData.utilizationTarget ?? 0.8,
       scaleUpCooloffMs: initialData.scaleUpCooloffMs,
       scaleUpBacklogThreshold: initialData.scaleUpBacklogThreshold,
       maxWorkerLifetimeMs: initialData.maxWorkerLifetimeMs,
@@ -112,10 +124,16 @@
         {gcpRegions}
         bind:gcpWorkerPool={$form.gcpWorkerPool}
         bind:gcpServiceAccount={$form.gcpServiceAccount}
+        bind:minReplicas={$form.minReplicas}
+        bind:maxReplicas={$form.maxReplicas}
+        bind:initialReplicas={$form.initialReplicas}
+        bind:utilizationTarget={$form.utilizationTarget}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+        {terraformTemplate}
+        {cloudRunTerraformTemplate}
         errors={$errors}
       />
     </Card>
@@ -129,7 +147,7 @@
           >{translate('common.cancel')}</Button
         >
       </div>
-      <Button variant="destructive" type="button" on:click={() => onDelete()}>
+      <Button variant="destructive" type="button" onclick={() => onDelete()}>
         {translate('common.delete')}
       </Button>
     </div>

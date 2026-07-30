@@ -100,7 +100,7 @@
     </div>
     <svelte:fragment slot="footer">
       {#if isRamping}
-        <Button variant="destructive" on:click={onRemove}>
+        <Button variant="destructive" onclick={onRemove}>
           {translate('deployments.remove-ramping')}
         </Button>
       {:else}

@@ -159,7 +159,7 @@
   <Button
     variant="ghost"
     size="xs"
-    on:click={clearAllFilters}
+    onclick={clearAllFilters}
     data-testid="clear-all-filters-button"
   >
     {translate('common.clear-all')}

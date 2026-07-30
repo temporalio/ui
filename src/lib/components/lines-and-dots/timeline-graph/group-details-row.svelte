@@ -4,7 +4,7 @@
   import { page } from '$app/stores';
 
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -98,7 +98,7 @@
         {/if}
       </div>
       <div class="flex items-center gap-4">
-        <Button variant="ghost" size="xs" on:click={() => setActiveGroup(group)}
+        <Button variant="ghost" size="xs" onclick={() => setActiveGroup(group)}
           >{translate('common.close')} <Icon name="close" /></Button
         >
       </div>

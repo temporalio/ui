@@ -18,7 +18,9 @@
   let { events = [], decode }: Props = $props();
 
   let index = $state(1);
-  let rawEvent = $derived(fromEventToRawEvent(events[index - 1]));
+  let rawEvent = $derived(
+    events[index - 1] ? fromEventToRawEvent(events[index - 1]) : {},
+  );
 
   function handleKeydown(event: KeyboardEvent) {
     switch (event.code) {

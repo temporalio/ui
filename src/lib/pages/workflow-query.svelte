@@ -152,7 +152,7 @@
         </div>
         <div class="flex w-full flex-wrap items-end justify-end gap-4">
           <Button
-            on:click={() => query(queryType)}
+            onclick={() => query(queryType)}
             {loading}
             variant={edited ? 'primary' : 'secondary'}
             leadingIcon={edited ? undefined : 'retry'}
@@ -174,7 +174,7 @@
               labelPosition="left"
               id="json-formatting"
               checked={jsonFormatting}
-              on:change={() => (jsonFormatting = !jsonFormatting)}
+              onchange={() => (jsonFormatting = !jsonFormatting)}
             />
           </div>
           <CodeBlock
