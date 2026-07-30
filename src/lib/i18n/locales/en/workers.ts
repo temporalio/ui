@@ -341,11 +341,6 @@ export const Strings = {
     ' to create the invoker service account for your Worker Pool.',
   'cloud-run-impersonator-warning':
     'Before applying, replace the impersonator service account placeholder with the email of the service account permitted to impersonate the invoker.',
-  'cloud-run-runner-service-account-label': 'Worker Pool Service Account',
-  'cloud-run-runner-service-account-hint':
-    'The identity the Cloud Run worker pool runs as. Leave blank to use the project default Compute Engine service account. A dedicated least-privilege service account is recommended.',
-  'cloud-run-runner-service-account-placeholder':
-    'worker-pool@my-project.iam.gserviceaccount.com',
   'cloud-run-invoker-handoff':
     "After applying, copy the module's invoker_email output into the Service Account field above.",
   'hide-defaults': 'Hide Defaults',

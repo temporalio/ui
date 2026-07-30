@@ -4,7 +4,7 @@ module "serverless-worker-cloud-run" {
 
   project_id                   = "__TEMPORAL_GCP_PROJECT_ID__"
   invoker_account_id           = "temporal-worker-pool-invoker"
-  runner_service_account_email = "__TEMPORAL_GCP_RUNNER_SERVICE_ACCOUNT_EMAIL__"
+  runner_service_account_email = ""
 
   # REPLACE BEFORE APPLY with the email of the service account permitted to impersonate the invoker.
   impersonator_service_account_emails = [
