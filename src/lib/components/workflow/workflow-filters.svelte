@@ -82,14 +82,14 @@
     {#if searchType === 'advanced'}
       <Link
         href="{$page.url.pathname}?search=basic"
-        on:click={updateSearchType('basic')}
+        onclick={updateSearchType('basic')}
       >
         {translate('workflows.basic-search')}
       </Link>
     {:else}
       <Link
         href="{$page.url.pathname}?search=advanced"
-        on:click={updateSearchType('advanced')}
+        onclick={updateSearchType('advanced')}
       >
         {translate('workflows.advanced-search')}
       </Link>

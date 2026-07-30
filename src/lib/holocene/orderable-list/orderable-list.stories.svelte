@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import OrderableListItem from './orderable-list-item.svelte';
   import OrderableList from './orderable-list.svelte';
@@ -19,13 +20,7 @@
     title: 'Orderable List',
     component: OrderableList,
     subcomponents: { OrderableListItem },
-    argTypes: {
-      items: {
-        name: 'Items',
-        control: { type: 'object' },
-      },
-    },
-  } satisfies Meta<OrderableList>;
+  } satisfies Meta<ComponentProps<typeof OrderableList>>;
 </script>
 
 <script lang="ts">
@@ -39,13 +34,13 @@
 
 <Story name="Heading" let:context>
   <OrderableList>
-    <span slot="heading">{context.name}</span>
+    {#snippet heading()}<span>{context.name}</span>{/snippet}
   </OrderableList>
 </Story>
 
 <Story name="With Items" let:context>
   <OrderableList>
-    <span slot="heading">{context.name}</span>
+    {#snippet heading()}<span>{context.name}</span>{/snippet}
     {#each items as item, index (item.label)}
       <OrderableListItem
         on:moveItem={action('moveItem')}

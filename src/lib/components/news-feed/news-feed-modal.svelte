@@ -116,7 +116,7 @@
       id="news-feed-auto-fetch"
       checked={$newsFeed.autoFetchEnabled}
       label={translate('common.news-feed-auto-fetch')}
-      on:change={(event) => newsFeed.setAutoFetchEnabled(event.detail.checked)}
+      onChange={(event) => newsFeed.setAutoFetchEnabled(event.checked)}
     />
   </div>
 </Modal>

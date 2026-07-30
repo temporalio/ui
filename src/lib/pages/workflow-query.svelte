@@ -174,7 +174,7 @@
               labelPosition="left"
               id="json-formatting"
               checked={jsonFormatting}
-              on:change={() => (jsonFormatting = !jsonFormatting)}
+              onchange={() => (jsonFormatting = !jsonFormatting)}
             />
           </div>
           <CodeBlock

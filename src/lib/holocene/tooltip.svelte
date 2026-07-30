@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { onDestroy } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
@@ -16,14 +17,16 @@
   type BaseProps = {
     text?: string;
     icon?: IconName;
-    hide?: boolean;
-    width?: number;
+    hide?: boolean | null;
+    width?: number | null;
     class?: string;
     tooltipClass?: string;
     show?: boolean;
     usePortal?: boolean;
     portalOffset?: PortalOffset;
     scrollContainer?: string;
+    children?: Snippet;
+    content?: Snippet;
   };
 
   type BasePositionProps = {
@@ -56,48 +59,46 @@
     | OnlyLeft
     | OnlyTopLeft;
 
-  type $$Props = BaseProps & AllUniquePositionProps;
+  type Props = BaseProps & AllUniquePositionProps;
 
-  let className = '';
-  export { className as class };
-  export let text = '';
-  export let icon: IconName | undefined = undefined;
-  /** bottom center of the tooltip aligned to the top center of the wrapper */
-  export let top = false;
-  /** bottom right of the tooltip aligned to the top right of the wrapper */
-  export let topRight = false;
-  /** left center of the tooltip aligned to the right center of the wrapper */
-  export let right = false;
-  /** top center of the tooltip aligned to the bottom center of the wrapper */
-  export let bottom = false;
-  /** top left of the tooltip aligned to the bottom left of the wrapper */
-  export let bottomLeft = false;
-  /** top right of the tooltip aligned to the bottom right of the wrapper */
-  export let bottomRight = false;
-  /** right center of the tooltip aligned to the left center of the wrapper */
-  export let left = false;
-  /** bottom left of the tooltip aligned to the top left of the wrapper   */
-  export let topLeft = false;
-  export let hide: boolean | null = false;
-  export let width: number | null = null;
-  export let tooltipClass = '';
-  export let show = false;
-  export let usePortal = false;
-  export let portalOffset: PortalOffset | undefined = undefined;
-  export let scrollContainer: string | undefined = undefined;
+  let {
+    class: className = '',
+    text = '',
+    icon,
+    top,
+    topRight,
+    right,
+    bottom,
+    bottomLeft,
+    bottomRight,
+    left,
+    topLeft,
+    hide = false,
+    width = null,
+    tooltipClass = '',
+    show = false,
+    usePortal = false,
+    portalOffset,
+    scrollContainer,
+    children,
+    content,
+  }: Props = $props();
 
-  let wrapperElement: HTMLElement | null = null;
-  let isHovered = false;
-  let isFocused = false;
-  let dismissed = false;
+  let wrapperElement = $state<HTMLElement | null>(null);
+  let isHovered = $state(false);
+  let isFocused = $state(false);
+  let dismissed = $state(false);
   let hoverHideTimer: ReturnType<typeof setTimeout> | null = null;
-  const tooltipId = `tooltip-${crypto.randomUUID()}`;
+  const uid = $props.id();
+  const tooltipId = `tooltip-${uid}`;
 
-  $: isOpen = (show || isHovered || isFocused) && !dismissed;
+  const isOpen = $derived((show || isHovered || isFocused) && !dismissed);
 
-  $: if (!isHovered && !isFocused && dismissed) {
-    dismissed = false;
-  }
+  $effect(() => {
+    if (!isHovered && !isFocused && dismissed) {
+      dismissed = false;
+    }
+  });
 
   function cancelHide() {
     if (hoverHideTimer) {
@@ -139,7 +140,7 @@
     cancelHide();
   });
 
-  $: portalPosition = ((): PortalPosition => {
+  const portalPosition = $derived.by((): PortalPosition => {
     if (top) return 'top';
     if (topRight) return 'top-right';
     if (right) return 'right';
@@ -149,25 +150,34 @@
     if (left) return 'left';
     if (topLeft) return 'top-left';
     return 'top';
-  })();
+  });
 </script>
 
-<svelte:window on:keydown|capture={handleWindowKeydown} />
+<svelte:window onkeydowncapture={handleWindowKeydown} />
+
+{#snippet tooltipContent()}
+  {#if content}
+    {@render content()}
+  {:else}
+    {#if icon}<Icon name={icon} class="inline h-4" />{/if}
+    <span>{text}</span>
+  {/if}
+{/snippet}
 
 {#if hide}
-  <slot />
+  {@render children?.()}
 {:else}
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     bind:this={wrapperElement}
     class={merge('wrapper relative inline-block', className)}
     aria-describedby={isOpen ? tooltipId : undefined}
-    on:mouseenter={handleHoverEnter}
-    on:mouseleave={handleHoverLeave}
-    on:focusin={handleFocusIn}
-    on:focusout={handleFocusOut}
+    onmouseenter={handleHoverEnter}
+    onmouseleave={handleHoverLeave}
+    onfocusin={handleFocusIn}
+    onfocusout={handleFocusOut}
   >
-    <slot />
+    {@render children?.()}
 
     {#if usePortal && wrapperElement}
       <Portal
@@ -184,15 +194,12 @@
             'inline-block rounded-md bg-slate-800 px-2 py-2 text-xs text-slate-50',
             tooltipClass,
           )}
-          on:mouseenter={handleHoverEnter}
-          on:mouseleave={handleHoverLeave}
+          onmouseenter={handleHoverEnter}
+          onmouseleave={handleHoverLeave}
           style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
         >
           <div class="flex gap-2">
-            <slot name="content">
-              {#if icon}<Icon name={icon} class="inline h-4" />{/if}
-              <span>{text}</span>
-            </slot>
+            {@render tooltipContent()}
           </div>
         </div>
       </Portal>
@@ -204,8 +211,8 @@
           'tooltip absolute left-0 top-0 z-50 translate-x-12 whitespace-nowrap text-xs transition-all',
           isOpen ? 'inline-block opacity-95' : 'hidden opacity-0',
         )}
-        on:mouseenter={handleHoverEnter}
-        on:mouseleave={handleHoverLeave}
+        onmouseenter={handleHoverEnter}
+        onmouseleave={handleHoverLeave}
         class:left
         class:right
         class:bottom
@@ -223,10 +230,7 @@
           )}
         >
           <div class="flex gap-2">
-            <slot name="content">
-              {#if icon}<Icon name={icon} class="inline h-4" />{/if}
-              <span>{text}</span>
-            </slot>
+            {@render tooltipContent()}
           </div>
         </div>
       </div>

@@ -21,11 +21,11 @@
 <div>
   <TabButtons>
     <TabButton
-      on:click={() => setActiveTab('edit')}
+      onclick={() => setActiveTab('edit')}
       active={activeTab === 'edit'}>Edit</TabButton
     >
     <TabButton
-      on:click={() => setActiveTab('preview')}
+      onclick={() => setActiveTab('preview')}
       active={activeTab === 'preview'}>Preview</TabButton
     >
   </TabButtons>

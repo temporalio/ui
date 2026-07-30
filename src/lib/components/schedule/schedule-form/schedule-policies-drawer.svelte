@@ -170,7 +170,7 @@
           description={translate('schedules.pause-schedule-description')}
           checked={$policies.pauseSchedule}
           error={$errors.pauseSchedule?.[0] ?? ''}
-          on:change={() => ($policies.pauseSchedule = !$policies.pauseSchedule)}
+          onChange={() => ($policies.pauseSchedule = !$policies.pauseSchedule)}
         />
       </div>
     </fieldset>
