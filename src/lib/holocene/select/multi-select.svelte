@@ -110,7 +110,7 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:click={() => onOptionClick(option)}
+            onclick={() => onOptionClick(option)}
             {checked}
             label={option.label}
             labelHidden

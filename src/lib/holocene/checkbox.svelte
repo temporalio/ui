@@ -1,17 +1,14 @@
-<script lang="ts">
+<script lang="ts" generics="T">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
-  import { omit } from 'es-toolkit';
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import Label from './label.svelte';
 
-  type T = $$Generic;
-
-  interface $$Props extends HTMLInputAttributes {
+  interface Props extends HTMLInputAttributes {
     id?: string;
     disabled?: boolean;
     checked?: boolean;
@@ -26,32 +23,41 @@
     error?: string;
     class?: string;
     description?: string;
+    onChange?: (detail: { checked: boolean; value?: T }) => void;
+    flex?: Snippet;
   }
 
-  export let id: string = crypto.randomUUID();
-  export let checked = false;
-  export let label = '';
-  export let labelHidden = false;
-  export let indeterminate = false;
-  export let disabled = false;
-  export let value: T = undefined as T;
-  export let group: T[] | undefined = undefined;
-  export let valid = true;
-  export let error = '';
-  export let required = false;
-  export let description = '';
-
-  let className = '';
-  export { className as class };
+  let {
+    id = crypto.randomUUID(),
+    checked = $bindable(false),
+    label = '',
+    labelHidden = false,
+    indeterminate = false,
+    disabled = false,
+    value = $bindable(),
+    group = $bindable(),
+    valid = true,
+    error = '',
+    required = false,
+    description = '',
+    class: className = '',
+    'data-testid': testId,
+    onclick,
+    onChange,
+    flex,
+    ...rest
+  }: Props = $props();
 
   let inputElement: HTMLInputElement;
-  $: if (inputElement !== undefined) {
-    inputElement.indeterminate = indeterminate;
-  }
+  $effect(() => {
+    if (inputElement !== undefined) {
+      inputElement.indeterminate = indeterminate;
+    }
+  });
 
-  const dispatch = createEventDispatcher<{
-    change: { checked: boolean; value?: T };
-  }>();
+  const displayChecked = $derived(
+    group !== undefined ? group.includes(value as T) : checked,
+  );
 
   const handleChange = (
     event: Event & {
@@ -61,7 +67,7 @@
     const { checked: isChecked } = event.currentTarget;
     if (group !== undefined) {
       if (isChecked) {
-        group = [...group, value];
+        group = [...group, value as T];
       } else {
         group = group.filter((v) => v !== value);
       }
@@ -69,34 +75,33 @@
 
     checked = isChecked;
 
-    dispatch('change', { checked: event.currentTarget.checked, value });
+    onChange?.({ checked: isChecked, value });
   };
 
-  $: checked = group !== undefined ? group.includes(value) : checked;
+  const checkIconName = $derived(
+    indeterminate
+      ? ('hyphen' as const)
+      : displayChecked
+        ? ('checkmark' as const)
+        : null,
+  );
 
-  $: checkIconName = indeterminate
-    ? ('hyphen' as const)
-    : checked
-      ? ('checkmark' as const)
-      : null;
-
-  $: errorId = `${id}-error`;
-  $: showError = !valid && !!error;
+  const errorId = $derived(`${id}-error`);
+  const showError = $derived(!valid && !!error);
 </script>
 
 <div
-  data-testid={$$restProps['data-testid']}
-  on:click|stopPropagation={() => {
-    // applying noop handler because without it on:click handlers get forwarded
+  data-testid={testId}
+  onclick={(event) => {
+    // applying noop handler because without it onclick handlers get forwarded
     // to this div element (in addition to the input checkbox element).
+    event.stopPropagation();
   }}
-  on:keypress|stopPropagation
+  onkeypress={(event) => event.stopPropagation()}
   role="none"
 >
   <Label
-    data-testid={$$restProps['data-testid']
-      ? `${$$restProps['data-testid']}-label`
-      : undefined}
+    data-testid={testId ? `${testId}-label` : undefined}
     class={merge(
       [
         'flex',
@@ -115,8 +120,6 @@
     )}
   >
     <input
-      on:click
-      on:change={handleChange}
       {id}
       {value}
       type="checkbox"
@@ -126,11 +129,13 @@
       data-track-text={label}
       aria-invalid={!valid ? 'true' : undefined}
       aria-describedby={showError ? errorId : undefined}
-      bind:checked
       {disabled}
       {required}
+      {...rest}
+      {onclick}
+      onchange={handleChange}
+      checked={displayChecked}
       bind:this={inputElement}
-      {...omit($$restProps, ['data-testid'])}
     />
 
     <span
@@ -181,7 +186,9 @@
       {/if}
     </span>
 
-    <slot name="flex">
+    {#if flex}
+      {@render flex()}
+    {:else}
       <div>
         <span class="label" class:sr-only={labelHidden}>
           {label}
@@ -190,7 +197,7 @@
           <p class="text-xs font-normal text-secondary">{description}</p>
         {/if}
       </div>
-    </slot>
+    {/if}
   </Label>
   <span id={errorId} role="alert" class="text-xs text-danger">
     {#if showError}{error}{/if}

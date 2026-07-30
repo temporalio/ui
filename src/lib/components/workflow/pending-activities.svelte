@@ -41,17 +41,20 @@
       title={translate('workflows.pending-activities')}
       data-testid="pending-activities"
     >
-      <div slot="summary" class="flex items-center gap-2">
-        <Badge type="count">{pendingActivities.length}</Badge>
-        {#if canceled}
-          <Tooltip
-            bottom
-            text={translate('workflows.pending-activities-canceled')}
-          >
-            <Badge type="warning" class="py-0"><Icon name="canceled" /></Badge>
-          </Tooltip>
-        {/if}
-      </div>
+      {#snippet summary()}
+        <div class="flex items-center gap-2">
+          <Badge type="count">{pendingActivities.length}</Badge>
+          {#if canceled}
+            <Tooltip
+              bottom
+              text={translate('workflows.pending-activities-canceled')}
+            >
+              <Badge type="warning" class="py-0"><Icon name="canceled" /></Badge
+              >
+            </Tooltip>
+          {/if}
+        </div>
+      {/snippet}
       <div>
         {#each pendingActivities as { id, ...pendingActivity } (id)}
           {@const failed = (pendingActivity.attempt ?? 0) > 1}

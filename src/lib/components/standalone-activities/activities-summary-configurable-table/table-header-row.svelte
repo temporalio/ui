@@ -39,8 +39,7 @@
     ACTIVITY_BATCH_OPERATION_CONTEXT,
   );
 
-  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
-    const { checked } = event.detail;
+  const handleCheckboxChange = ({ checked }: { checked: boolean }) => {
     onSelectPage(checked, activities);
   };
 
@@ -57,7 +56,7 @@
         data-testid="batch-actions-checkbox"
         checked={pageSelectionStatus === 'checked'}
         indeterminate={pageSelectionStatus === 'partial'}
-        on:change={handleCheckboxChange}
+        onChange={handleCheckboxChange}
       />
     </th>
   {/if}

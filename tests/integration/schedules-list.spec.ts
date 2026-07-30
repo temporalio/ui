@@ -4,6 +4,10 @@ import {
   mockSchedulesApis,
   SCHEDULES_COUNT_API,
 } from '~/test-utilities/mock-apis';
+import {
+  mockListSchedule,
+  SCHEDULES_API,
+} from '~/test-utilities/mocks/schedules';
 
 const schedulesUrl = '/namespaces/default/schedules';
 
@@ -66,5 +70,21 @@ test.describe('Schedules List with schedules', () => {
 
     const workflowType = page.getByText('run-regularly');
     await expect(workflowType).toBeVisible();
+  });
+
+  test('it remains rendered when schedules share an ID', async ({ page }) => {
+    await page.route(SCHEDULES_API, (route) =>
+      route.fulfill({
+        json: {
+          schedules: [mockListSchedule, mockListSchedule],
+          nextPageToken: null,
+        },
+      }),
+    );
+
+    await page.goto(schedulesUrl);
+
+    await page.waitForResponse(SCHEDULES_COUNT_API);
+    await expect(page.locator('table tbody tr')).toHaveCount(2);
   });
 });

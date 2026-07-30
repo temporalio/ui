@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import SkeletonTable from './table.svelte';
 
@@ -16,7 +17,7 @@
       rows: { name: 'Rows', control: 'number' },
       columns: { name: 'Columns', control: 'number' },
     },
-  } satisfies Meta<SkeletonTable>;
+  } satisfies Meta<ComponentProps<typeof SkeletonTable>>;
 </script>
 
 <script lang="ts">
@@ -28,11 +29,11 @@
     100 / args.columns,
   )}
   <SkeletonTable {columnWidths} {...args}>
-    <svelte:fragment slot="headers">
+    {#snippet headers()}
       {#each Array(args.columns) as _, index}
         <th>Heading {index + 1}</th>
       {/each}
-    </svelte:fragment>
+    {/snippet}
   </SkeletonTable>
 </Template>
 
