@@ -6,10 +6,10 @@ export const getFloatStyle = ({
 }: {
   width?: number;
   height?: number;
-  screenWidth: number;
+  screenWidth?: number;
   breakpoint?: number;
 }): string => {
-  return width && height && screenWidth > breakpoint
+  return width && height && screenWidth && screenWidth > breakpoint
     ? `position: absolute; right: ${width + 20}px; top: -${height}px`
     : '';
 };

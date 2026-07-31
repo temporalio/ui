@@ -21,7 +21,7 @@ const endpoint = '/api/endpoint';
 const responseBody = listWorkflowResponse;
 
 const fetchMock = <T = unknown>(
-  body: T = responseBody,
+  body: T = responseBody as T,
   response: Partial<MockResponse> = {},
 ) =>
   vi.fn(async () => {

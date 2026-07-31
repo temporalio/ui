@@ -11,7 +11,7 @@ describe('getFilePathsFromTypeScriptStackTrace', () => {
     const stackTraceText: string =
       UnixTSStacktraceQueryJson.queryResult.payloads[0].data;
     const result: { filePath: string; codeLine: number; character: number }[] =
-      getFilePathsFromTypeScriptStackTrace(stackTraceText);
+      getFilePathsFromTypeScriptStackTrace(stackTraceText)!;
     expect(result.length).toEqual(5);
     expect(result[0].filePath).toEqual(
       '/Users/user/Desktop/ts-sdk/example/node_modules/@temporalio/workflow/src/worker-interface.ts',
@@ -28,7 +28,7 @@ describe('getFilePathsFromTypeScriptStackTrace', () => {
     const stackTraceText: string =
       WindowsTSStacktraceQueryJson.queryResult.payloads[0].data;
     const result: { filePath: string; codeLine: number; character: number }[] =
-      getFilePathsFromTypeScriptStackTrace(stackTraceText);
+      getFilePathsFromTypeScriptStackTrace(stackTraceText)!;
     expect(result.length).toEqual(5);
     expect(result[0].filePath).toEqual(
       'C:\\Users\\user\\SomeFolder\\samples-typescript\\hello-world\\node_modules\\@temporalio\\workflow\\src\\worker-interface.ts',

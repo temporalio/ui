@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { EventType } from './is-event-type';
+import type { EventType } from './is-event-type';
 import {
   fromScreamingEnum,
   toBatchOperationStateReadable,

@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { isCancelInProgress } from './cancel-in-progress';
+import type { WorkflowEvents } from '$lib/types/events';
+
+import { isCancelInProgress as isCancelInProgressBase } from './cancel-in-progress';
 
 import canceledEvents from '$fixtures/events.canceled.json';
 import failedEvents from '$fixtures/events.failed.json';
+
+const isCancelInProgress = (status: string, history: unknown) =>
+  isCancelInProgressBase(
+    status as Parameters<typeof isCancelInProgressBase>[0],
+    history as WorkflowEvents,
+  );
 
 describe('isCancelInProgress', () => {
   it('should return true if running and not updating and CancelRequested event', () => {

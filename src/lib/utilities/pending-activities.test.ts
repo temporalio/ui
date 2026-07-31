@@ -1,13 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
-import { toEvent } from '$lib/models/event-history';
+import { toEvent as toEventBase } from '$lib/models/event-history';
+import type {
+  HistoryEvent,
+  PendingActivity,
+  WorkflowEvent,
+} from '$lib/types/events';
 
 import {
-  getPendingActivity,
-  isAssociatedPendingActivity,
+  getPendingActivity as getPendingActivityBase,
+  isAssociatedPendingActivity as isAssociatedPendingActivityBase,
 } from './pending-activities';
 
 import pendingActivityWorkflow from '$fixtures/workflow.pending-activities.json';
+
+const toEvent = (event: unknown) => toEventBase(event as HistoryEvent);
+const getPendingActivity = (event: WorkflowEvent, activities: unknown) =>
+  getPendingActivityBase(event, activities as PendingActivity[]);
+const isAssociatedPendingActivity = (event: WorkflowEvent, activity: unknown) =>
+  isAssociatedPendingActivityBase(event, activity as PendingActivity);
 
 const getScheduledEvent = (activityId: string) =>
   toEvent({

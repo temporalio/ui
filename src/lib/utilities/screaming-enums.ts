@@ -39,41 +39,44 @@ export const fromScreamingEnum = <T>(
 };
 
 export const toSearchAttributeTypeReadable = (
-  status: SearchAttributeType,
+  status: SearchAttributeType | string,
 ): SearchAttributeType => {
-  return fromScreamingEnum(status, 'IndexedValueType');
+  return fromScreamingEnum(status, 'IndexedValueType') as SearchAttributeType;
 };
 
 export const toWorkflowStatusReadable = (
-  status: WorkflowExecutionStatus | WorkflowStatus,
+  status: WorkflowExecutionStatus | WorkflowStatus | string,
 ): WorkflowStatus => {
   return fromScreamingEnum(status, 'WorkflowExecutionStatus') as WorkflowStatus;
 };
 
 export const toNamespaceArchivalStateReadable = (
-  status: ArchivalState,
+  status: ArchivalState | string,
 ): ArchivalState => {
-  return fromScreamingEnum(status, 'ArchivalState');
+  return fromScreamingEnum(status, 'ArchivalState') as ArchivalState;
 };
 
 export const toNamespaceStateReadable = (
-  status: NamespaceState,
+  status: NamespaceState | string,
 ): NamespaceState => {
-  return fromScreamingEnum(status, 'NamespaceState');
+  return fromScreamingEnum(status, 'NamespaceState') as NamespaceState;
 };
 
-export const toEventNameReadable = (status: EventType): EventType => {
-  return fromScreamingEnum(status, 'EventType');
+export const toEventNameReadable = (status: EventType | string): EventType => {
+  return fromScreamingEnum(status, 'EventType') as EventType;
 };
 
 export const toBatchOperationStateReadable = (
-  status: BatchOperationState,
+  status: BatchOperationState | string,
 ): BatchOperationState => {
-  return fromScreamingEnum(status, 'BatchOperationState');
+  return fromScreamingEnum(
+    status,
+    'BatchOperationState',
+  ) as BatchOperationState;
 };
 
 export const toBatchOperationTypeReadable = (
-  status: BatchOperationType,
+  status: BatchOperationType | string,
 ): BatchOperationActionType => {
   return fromScreamingEnum(
     status,
@@ -82,10 +85,13 @@ export const toBatchOperationTypeReadable = (
 };
 
 export const toWorkflowTaskFailureReadable = (
-  cause?: WorkflowTaskFailedCause,
+  cause?: WorkflowTaskFailedCause | string,
 ): WorkflowTaskFailedCause => {
   if (!cause) return 'Unspecified';
-  return fromScreamingEnum(cause, 'WorkflowTaskFailedCause');
+  return fromScreamingEnum(
+    cause,
+    'WorkflowTaskFailedCause',
+  ) as WorkflowTaskFailedCause;
 };
 
 export const toPendingActivityStateReadable = (

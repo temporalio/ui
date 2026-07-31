@@ -10,9 +10,12 @@ const versioningInfo = {
 
 const taskQueueStatus = undefined;
 
+const reduce = (responses: unknown) =>
+  reducePollerTypes(responses as Parameters<typeof reducePollerTypes>[0]);
+
 describe('reducePollerTypes', () => {
   it('should return only workflow pollers if only workflow pollers', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       workflowPollers: {
         pollers: [{ identity: '1', lastAccessTime: 1 }],
         versioningInfo,
@@ -38,7 +41,7 @@ describe('reducePollerTypes', () => {
   });
 
   it('should combine activity and workflow pollers with same identity', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       activityPollers: {
         pollers: [{ identity: '1', lastAccessTime: 2 }],
         versioningInfo,
@@ -65,7 +68,7 @@ describe('reducePollerTypes', () => {
   });
 
   it('should combine nexus and workflow pollers with same identity', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       activityPollers: {
         versioningInfo,
       },
@@ -92,7 +95,7 @@ describe('reducePollerTypes', () => {
   });
 
   it('should combine all poller types with same identity', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       activityPollers: {
         pollers: [{ identity: '1', lastAccessTime: 2 }],
         versioningInfo,
@@ -120,7 +123,7 @@ describe('reducePollerTypes', () => {
   });
 
   it('should return an empty array if no pollers are present', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       activityPollers: { versioningInfo },
       nexusPollers: { versioningInfo },
       workflowPollers: { versioningInfo },
@@ -133,7 +136,7 @@ describe('reducePollerTypes', () => {
   });
 
   it('should return separate workers when identities differ', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       workflowPollers: {
         pollers: [
           {
@@ -181,7 +184,7 @@ describe('reducePollerTypes', () => {
   });
 
   it('should handle mix of shared and different identities', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       workflowPollers: {
         pollers: [
           { identity: 'shared@host', lastAccessTime: 1 },
@@ -228,7 +231,7 @@ describe('reducePollerTypes', () => {
   });
 
   it('should return only nexus pollers if only nexus pollers', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       workflowPollers: {
         versioningInfo,
       },
@@ -254,7 +257,7 @@ describe('reducePollerTypes', () => {
   });
 
   it('should combine nexus and activity pollers with same identity', () => {
-    const result = reducePollerTypes({
+    const result = reduce({
       workflowPollers: {
         versioningInfo,
       },

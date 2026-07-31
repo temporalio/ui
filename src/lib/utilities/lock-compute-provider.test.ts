@@ -81,8 +81,11 @@ describe('lockComputeProvider', () => {
 
   it('supports providerType', () => {
     const info = deployment(['aws-lambda']);
+    const summary = info.versionSummaries[0];
     const group =
-      info.versionSummaries[0].computeConfig?.scalingGroups?.default;
+      summary && 'computeConfig' in summary
+        ? summary.computeConfig?.scalingGroups?.default
+        : undefined;
     if (group) {
       group.providerType = 'gcp-cloud-run';
       group.provider = undefined;

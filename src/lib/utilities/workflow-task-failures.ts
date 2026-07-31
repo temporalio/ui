@@ -1,5 +1,3 @@
-import type { WorkflowExecution } from '$lib/types/workflows';
-
 export const TemporalReportedProblems = [
   'category=WorkflowTaskFailed',
   'category=WorkflowTaskTimedOut',
@@ -11,7 +9,12 @@ export const TASK_FAILURES_QUERY =
     ', ',
   )})`;
 
-export const isWorkflowTaskFailure = (workflow: WorkflowExecution): boolean => {
+export const isWorkflowTaskFailure = (workflow: {
+  status?: string | null;
+  searchAttributes?: {
+    indexedFields?: Record<string, unknown>;
+  };
+}): boolean => {
   if (!workflow.searchAttributes || workflow.status !== 'Running') return false;
 
   const reportedProblems = (workflow.searchAttributes?.indexedFields?.[

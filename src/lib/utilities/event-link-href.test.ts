@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import { base } from '$app/paths';
 
-import { getEventLinkHref } from './event-link-href';
+import type { EventLink } from '$lib/types';
+
+import { getEventLinkHref as getEventLinkHrefBase } from './event-link-href';
+
+const getEventLinkHref = (link: unknown) =>
+  getEventLinkHrefBase(link as EventLink);
 
 describe('getEventLinkHref', () => {
   it('should return event history event route when eventId exists', () => {

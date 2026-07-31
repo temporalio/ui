@@ -55,7 +55,9 @@ describe('toaster', () => {
       toaster.push({ variant: 'success', message: 'Everything went well' });
 
       const [toast] = get(toaster);
+      if (!toast) throw new Error('Expected a toast');
       const { id } = toast;
+      if (!id) throw new Error('Expected a toast ID');
 
       toaster.pop(id);
 
@@ -67,7 +69,9 @@ describe('toaster', () => {
       toaster.push({ variant: 'success', message: 'Everything went well' });
 
       const [toast] = get(toaster);
+      if (!toast) throw new Error('Expected a toast');
       const { id } = toast;
+      if (!id) throw new Error('Expected a toast ID');
 
       toaster.pop(id);
 

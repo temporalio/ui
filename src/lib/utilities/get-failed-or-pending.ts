@@ -1,10 +1,7 @@
 import { isEventGroup } from '$lib/models/event-groups';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { isEvent } from '$lib/models/event-history';
-import type {
-  IterableEventWithPending,
-  WorkflowEvent,
-} from '$lib/types/events';
+import type { WorkflowEvent } from '$lib/types/events';
 
 import { isLocalActivityMarkerEvent } from './is-event-type';
 import {
@@ -23,7 +20,7 @@ const isFailedLocalActivityGroup = (group: EventGroup) => {
   return isFailedLocalActivity(group.initialEvent);
 };
 
-const isFailedEvent = (iterable: IterableEventWithPending) => {
+const isFailedEvent = (iterable: unknown) => {
   return (
     isEvent(iterable) &&
     (iterable.classification === 'Failed' ||
@@ -32,11 +29,11 @@ const isFailedEvent = (iterable: IterableEventWithPending) => {
   );
 };
 
-const isPendingEvent = (iterable: IterableEventWithPending) => {
+const isPendingEvent = (iterable: unknown) => {
   return isPendingActivity(iterable) || isPendingNexusOperation(iterable);
 };
 
-const isFailedEventGroup = (iterable: IterableEventWithPending) => {
+const isFailedEventGroup = (iterable: unknown) => {
   return (
     isEventGroup(iterable) &&
     (iterable.classification === 'Failed' ||
@@ -45,12 +42,12 @@ const isFailedEventGroup = (iterable: IterableEventWithPending) => {
   );
 };
 
-const isPendingEventGroup = (iterable: IterableEventWithPending) => {
+const isPendingEventGroup = (iterable: unknown) => {
   return isEventGroup(iterable) && iterable.isPending;
 };
 
-export const getFailedOrPendingEvents = (
-  items: IterableEventWithPending[],
+export const getFailedOrPendingEvents = <T>(
+  items: T[],
   filterForFailedOrPending: boolean,
 ) => {
   if (!filterForFailedOrPending) return items;
@@ -63,8 +60,8 @@ export const getFailedOrPendingEvents = (
   );
 };
 
-export const getFailedOrPendingGroups = (
-  items: EventGroup[],
+export const getFailedOrPendingGroups = <T>(
+  items: T[],
   filterForFailedOrPending: boolean,
 ) => {
   if (!filterForFailedOrPending) return items;

@@ -334,9 +334,10 @@ describe('deployments service', () => {
         computeConfig,
       });
 
-      const body = JSON.parse(
-        vi.mocked(requestFromAPI).mock.calls[0][1].options.body as string,
-      );
+      const requestBody =
+        vi.mocked(requestFromAPI).mock.lastCall?.[1]?.options?.body;
+      expect(requestBody).toEqual(expect.any(String));
+      const body = JSON.parse(requestBody as string);
       expect(body.computeConfigScalingGroups.default.updateMask).toBe(
         'provider,scaler',
       );

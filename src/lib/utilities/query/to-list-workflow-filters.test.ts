@@ -2,6 +2,9 @@ import { parseISO } from 'date-fns';
 import { afterEach } from 'vitest';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+import type { SearchAttributes } from '$lib/types/workflows';
+
 import {
   combineDropdownFilters,
   combineFilters,
@@ -35,7 +38,7 @@ const isEmptyQuery = '`WorkflowType` is null';
 const isNotEmptyQuery = '`StartTime` IS NOT NULL';
 const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
 
-const attributes = {
+const attributes: SearchAttributes = {
   CloseTime: 'Datetime',
   ExecutionStatus: 'Keyword',
   StartTime: 'Datetime',
@@ -48,6 +51,11 @@ const attributes = {
   CustomIntField: 'Int',
   CustomDoubleField: 'Double',
 };
+
+const withFilterIds = (
+  filters: Omit<SearchAttributeFilter, 'id'>[],
+): SearchAttributeFilter[] =>
+  filters.map((filter, index) => ({ ...filter, id: String(index) }));
 
 describe('toListWorkflowFilters', () => {
   afterEach(() => {
@@ -597,7 +605,7 @@ describe('toListWorkflowFilters', () => {
 
 describe('combineDropdownFilters', () => {
   it('should combine two filters', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'WorkflowType',
         type: 'Keyword',
@@ -616,7 +624,7 @@ describe('combineDropdownFilters', () => {
       },
     ];
 
-    const result = combineDropdownFilters(filters);
+    const result = combineDropdownFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'WorkflowId',
@@ -638,7 +646,7 @@ describe('combineDropdownFilters', () => {
   });
 
   it('should combine two filters with a datetime', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'WorkflowType',
         type: 'Keyword',
@@ -657,7 +665,7 @@ describe('combineDropdownFilters', () => {
       },
     ];
 
-    const result = combineDropdownFilters(filters);
+    const result = combineDropdownFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'WorkflowType',
@@ -679,7 +687,7 @@ describe('combineDropdownFilters', () => {
   });
 
   it('should combine three filters', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -706,7 +714,7 @@ describe('combineDropdownFilters', () => {
       },
     ];
 
-    const result = combineDropdownFilters(filters);
+    const result = combineDropdownFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
@@ -736,7 +744,7 @@ describe('combineDropdownFilters', () => {
   });
 
   it('should combine filters with an OR statement', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -779,7 +787,7 @@ describe('combineDropdownFilters', () => {
       },
     ];
 
-    const result = combineDropdownFilters(filters);
+    const result = combineDropdownFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
@@ -827,7 +835,7 @@ describe('combineDropdownFilters', () => {
 
 describe('combineFilters', () => {
   it('should not add an AND operator if there is no previous filter', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'WorkflowType',
         type: 'Keyword',
@@ -838,7 +846,7 @@ describe('combineFilters', () => {
       },
     ];
 
-    const result = combineFilters(filters);
+    const result = combineFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'WorkflowType',
@@ -852,7 +860,7 @@ describe('combineFilters', () => {
   });
 
   it('should not add an AND operator if there is already an operator', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -871,7 +879,7 @@ describe('combineFilters', () => {
       },
     ];
 
-    const result = combineFilters(filters);
+    const result = combineFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
@@ -893,7 +901,7 @@ describe('combineFilters', () => {
   });
 
   it('should clear the filter operator if there is no following filter', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'WorkflowType',
         type: 'Keyword',
@@ -904,7 +912,7 @@ describe('combineFilters', () => {
       },
     ];
 
-    const result = combineFilters(filters);
+    const result = combineFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'WorkflowType',
@@ -918,7 +926,7 @@ describe('combineFilters', () => {
   });
 
   it('should combine two filters', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'WorkflowId',
         type: 'Keyword',
@@ -937,7 +945,7 @@ describe('combineFilters', () => {
       },
     ];
 
-    const result = combineFilters(filters);
+    const result = combineFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'WorkflowId',
@@ -959,7 +967,7 @@ describe('combineFilters', () => {
   });
 
   it('should combine three filters', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -986,7 +994,7 @@ describe('combineFilters', () => {
       },
     ];
 
-    const result = combineFilters(filters);
+    const result = combineFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
@@ -1016,7 +1024,7 @@ describe('combineFilters', () => {
   });
 
   it('should combine filters with an OR statement', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -1059,7 +1067,7 @@ describe('combineFilters', () => {
       },
     ];
 
-    const result = combineFilters(filters);
+    const result = combineFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
@@ -1105,7 +1113,7 @@ describe('combineFilters', () => {
   });
 
   it('should clear parenthesis for filters with an OR statement', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -1132,7 +1140,7 @@ describe('combineFilters', () => {
       },
     ];
 
-    const result = combineFilters(filters);
+    const result = combineFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
@@ -1162,7 +1170,7 @@ describe('combineFilters', () => {
   });
 
   it('should clear parenthesis and OR statement if next filter is not the same attribute', () => {
-    const filters = [
+    const filters: Omit<SearchAttributeFilter, 'id'>[] = [
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -1181,7 +1189,7 @@ describe('combineFilters', () => {
       },
     ];
 
-    const result = combineFilters(filters);
+    const result = combineFilters(withFilterIds(filters));
     expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',

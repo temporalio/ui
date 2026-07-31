@@ -1,12 +1,7 @@
 import { get } from 'svelte/store';
 
-import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-import {
-  SEARCH_ATTRIBUTE_TYPE,
-  type SearchAttributes,
-  type SearchAttributeType,
-} from '$lib/types/workflows';
+import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
 import { isInConditional, isNullConditional, isStartsWith } from '../is';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
@@ -21,6 +16,16 @@ export type QueryKey =
   | 'RunId';
 
 type FilterValue = string | Duration;
+
+type QueryFilter = {
+  attribute: string;
+  type: string;
+  value: FilterValue | null | undefined;
+  operator: string;
+  parenthesis: string;
+  conditional: string;
+  customDate?: boolean;
+};
 
 const filterKeys: Readonly<Record<string, QueryKey>> = {
   workflowId: 'WorkflowId',
@@ -47,7 +52,7 @@ const formatValue = ({
   conditional,
 }: {
   value: string;
-  type: SearchAttributeType;
+  type: string;
   conditional: string;
 }): string | boolean => {
   if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) {
@@ -77,8 +82,8 @@ const getQueryKey = (attribute: string | number) => {
 };
 
 const toFilterQueryStatement = (
-  attribute: keyof SearchAttributes,
-  type: SearchAttributeType,
+  attribute: string,
+  type: string,
   value: FilterValue,
   conditional = '=',
   archived: boolean,
@@ -128,7 +133,7 @@ const toFilterQueryStatement = (
 };
 
 const toQueryStatementsFromFilters = (
-  filters: SearchAttributeFilter[],
+  filters: QueryFilter[],
   archived: boolean,
 ): string[] => {
   return filters
@@ -146,7 +151,7 @@ const toQueryStatementsFromFilters = (
           let statement = toFilterQueryStatement(
             attribute,
             type,
-            value,
+            value as FilterValue,
             conditional,
             archived,
             customDate ?? false,
@@ -167,7 +172,7 @@ const toQueryStatementsFromFilters = (
 };
 
 export const toListWorkflowQueryFromFilters = (
-  filters: SearchAttributeFilter[] = [],
+  filters: QueryFilter[] = [],
   archived = false,
 ): string => {
   return toQueryStatementsFromFilters(filters, archived).join('');

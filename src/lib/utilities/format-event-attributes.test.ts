@@ -1,14 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
 import { translate } from '$lib/i18n/translate';
+import type { IterableEvent } from '$lib/types/events';
 
 import {
-  attributeGroups,
+  attributeGroups as attributeGroupsBase,
+  type CombinedAttributes,
   formatAttemptsLeft,
-  formatAttributes,
+  formatAttributes as formatAttributesBase,
   formatMaximumAttempts,
   formatRetryExpiration,
 } from './format-event-attributes';
+
+const formatAttributes = (event: unknown) =>
+  formatAttributesBase(event as IterableEvent) as CombinedAttributes &
+    Record<string, unknown>;
+const attributeGroups = (event: unknown, attributes: CombinedAttributes) =>
+  attributeGroupsBase(event as IterableEvent, attributes);
 
 const UnlimitedAttempts = translate('workflows.unlimited');
 const NoExpiration = translate('workflows.no-expiration');

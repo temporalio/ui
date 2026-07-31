@@ -13,6 +13,7 @@ const baseFormData: StandaloneActivityFormData = {
   startToCloseTimeout: '',
   scheduleToCloseTimeout: '',
   scheduleToStartTimeout: '',
+  startDelay: '',
   input: '',
   encoding: 'json/plain',
   messageType: '',

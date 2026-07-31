@@ -12,7 +12,7 @@ describe('workflowResetEnabled', () => {
       workflowResetEnabled(
         {
           disableWriteActions: false,
-          worklowResetDisabled: false,
+          workflowResetDisabled: false,
         },
         coreUser,
         'ns-write-enabled',

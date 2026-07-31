@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { getWorkflowTaskFailedEvent } from './get-workflow-task-failed-event';
+import type { WorkflowEvents } from '$lib/types/events';
+
+import { getWorkflowTaskFailedEvent as getWorkflowTaskFailedEventBase } from './get-workflow-task-failed-event';
 
 import runningEventHistory from '$fixtures/events.running.json';
+
+const getWorkflowTaskFailedEvent = (
+  history: unknown,
+  sortOrder: 'ascending' | 'descending',
+) => getWorkflowTaskFailedEventBase(history as WorkflowEvents, sortOrder);
 
 describe('getWorkflowTaskFailedEvent', () => {
   const failedEvent = {

@@ -13,7 +13,7 @@ import {
 } from './common-error-detection';
 
 const makeWorkflow = (
-  overrides: Partial<WorkflowExecution> = {},
+  overrides: Record<string, unknown> = {},
 ): WorkflowExecution =>
   ({
     name: 'test-workflow',
@@ -41,7 +41,7 @@ const makeWorkflow = (
   }) as unknown as WorkflowExecution;
 
 const makeActivity = (
-  overrides: Partial<PendingActivity> = {},
+  overrides: Record<string, unknown> = {},
 ): PendingActivity =>
   ({
     id: '1',
@@ -50,7 +50,7 @@ const makeActivity = (
     ...overrides,
   }) as unknown as PendingActivity;
 
-const makeFirstEvent = (attrs: Record<string, unknown> = {}) =>
+const makeFirstEvent = (attrs: Record<string, unknown> = {}): WorkflowEvent =>
   ({
     eventType: 'WorkflowExecutionStarted',
     workflowExecutionStartedEventAttributes: {
@@ -66,7 +66,7 @@ const makeFirstEvent = (attrs: Record<string, unknown> = {}) =>
     attributes: {
       type: 'workflowExecutionStartedEventAttributes',
     },
-  }) as unknown;
+  }) as unknown as WorkflowEvent;
 
 const makeEvent = (
   eventType: string,

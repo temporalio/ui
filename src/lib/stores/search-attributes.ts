@@ -91,7 +91,7 @@ export const isCustomSearchAttribute = (key: string) => {
 };
 
 export const workflowIncludesSearchAttribute = (
-  workflow: WorkflowExecution,
+  workflow: Partial<Pick<WorkflowExecution, 'searchAttributes'>>,
   searchAttribute: string,
 ): boolean => {
   return searchAttribute in (workflow?.searchAttributes?.indexedFields ?? {});

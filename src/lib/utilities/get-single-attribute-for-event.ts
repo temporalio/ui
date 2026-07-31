@@ -375,9 +375,7 @@ export const getPendingNexusOperationSummaryAttribute = (
   return { key: 'attempt', value: event.attempt.toString() };
 };
 
-export const getSummaryAttribute = (
-  event: WorkflowEvent | PendingActivity | PendingNexusOperation,
-): SummaryAttribute => {
+export const getSummaryAttribute = (event: unknown): SummaryAttribute => {
   if (isEvent(event)) return getEventSummaryAttribute(event);
   if (isPendingActivity(event))
     return getPendingActivitySummaryAttribute(event);
@@ -387,7 +385,7 @@ export const getSummaryAttribute = (
 };
 
 export const getPrimaryAttributeForEvent = (
-  event: WorkflowEvent,
+  event: unknown,
 ): SummaryAttribute => {
   if (!event) return emptyAttribute;
 

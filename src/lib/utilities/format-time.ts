@@ -12,7 +12,12 @@ import type { Timestamp } from '$lib/types';
 import { has } from './has';
 import { fromSeconds } from './to-duration';
 
-export type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
+type TimestampLike = {
+  seconds?: Timestamp['seconds'] | string | number | null;
+  nanos?: number | null;
+};
+
+export type ValidTime = Parameters<typeof parseJSON>[0] | TimestampLike;
 
 // PERF SORT: timestamp strings are stable across a session; re-parsing them on
 // every sort/y-change (N rows × 2 parseJSON calls) was visible in CPUTraceSort.
@@ -31,7 +36,7 @@ function cachedParseJSON(value: ValidTime): Date {
   return parseJSON(value as string | number | Date);
 }
 
-export function timestampToDate(ts: Timestamp): Date {
+export function timestampToDate(ts: TimestampLike): Date {
   if (!isTimestamp(ts)) {
     throw new TypeError('provided value is not a timestamp');
   }
@@ -43,7 +48,7 @@ export function timestampToDate(ts: Timestamp): Date {
   return d;
 }
 
-export function isTimestamp(arg: unknown): arg is Timestamp {
+export function isTimestamp(arg: unknown): arg is TimestampLike {
   if (typeof arg === 'object') {
     return has(arg, 'seconds') && has(arg, 'nanos');
   }

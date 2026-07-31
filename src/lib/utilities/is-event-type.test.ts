@@ -4,9 +4,13 @@
 import { expect } from 'vitest';
 import { describe, it } from 'vitest';
 
+import type { HistoryEvent } from '$lib/types/events';
+
 import type { EventType } from './is-event-type';
 import { isLocalActivityMarkerEvent } from './is-event-type';
-import { toEvent } from '../models/event-history';
+import { toEvent as toEventBase } from '../models/event-history';
+
+const toEvent = (event: unknown) => toEventBase(event as HistoryEvent);
 
 const baseEvent = {
   id: '1',

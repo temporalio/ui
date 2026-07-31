@@ -11,6 +11,11 @@ vi.mock('../stores/toaster', () => ({ toaster: { push: vi.fn() } }));
 vi.mock('../stores/namespaces', () => ({ namespaces: { set: vi.fn() } }));
 
 const origin = getApiOrigin();
+const runtimeEnvironment = (isCloud: boolean) => ({
+  isCloud,
+  isLocal: !isCloud,
+  envOverride: false,
+});
 
 const createSuccessfulRequest = () =>
   vi.fn(() =>
@@ -45,7 +50,10 @@ describe('fetchNamespaces', () => {
   it('should call fetch with the correct route', async () => {
     const request = createSuccessfulRequest();
 
-    await fetchNamespaces({ runtimeEnvironment: { isCloud: false } }, request);
+    await fetchNamespaces(
+      { runtimeEnvironment: runtimeEnvironment(false) },
+      request,
+    );
     expect(request).toHaveBeenCalledWith(
       `${origin}${base}/api/v1/namespaces?`,
       {
@@ -59,7 +67,10 @@ describe('fetchNamespaces', () => {
   it('should return an empty array if the runtime environment is cloud', async () => {
     const request = createSuccessfulRequest();
 
-    await fetchNamespaces({ runtimeEnvironment: { isCloud: true } }, request);
+    await fetchNamespaces(
+      { runtimeEnvironment: runtimeEnvironment(true) },
+      request,
+    );
 
     expect(request).not.toHaveBeenCalled();
     expect(namespaces.set).toHaveBeenCalledWith([]);
@@ -68,7 +79,10 @@ describe('fetchNamespaces', () => {
   it('should return an empty array if the request fails', async () => {
     const request = createUnsuccessfulRequest();
 
-    await fetchNamespaces({ runtimeEnvironment: { isCloud: false } }, request);
+    await fetchNamespaces(
+      { runtimeEnvironment: runtimeEnvironment(false) },
+      request,
+    );
 
     expect(request).toHaveBeenCalled();
     expect(namespaces.set).toHaveBeenCalledWith([]);
@@ -77,7 +91,10 @@ describe('fetchNamespaces', () => {
   it('should display a toast message if the request fails', async () => {
     const request = createUnsuccessfulRequest();
 
-    await fetchNamespaces({ runtimeEnvironment: { isCloud: false } }, request);
+    await fetchNamespaces(
+      { runtimeEnvironment: runtimeEnvironment(false) },
+      request,
+    );
 
     expect(request).toHaveBeenCalled();
     expect(toaster.push).toHaveBeenCalledWith({
@@ -91,7 +108,7 @@ describe('fetchNamespaces', () => {
 
     await fetchNamespaces(
       {
-        runtimeEnvironment: { isCloud: false },
+        runtimeEnvironment: runtimeEnvironment(false),
         showTemporalSystemNamespace: false,
       },
       request,
@@ -107,7 +124,7 @@ describe('fetchNamespaces', () => {
 
     await fetchNamespaces(
       {
-        runtimeEnvironment: { isCloud: false },
+        runtimeEnvironment: runtimeEnvironment(false),
         showTemporalSystemNamespace: true,
       },
       request,

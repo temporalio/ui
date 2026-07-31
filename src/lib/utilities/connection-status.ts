@@ -5,9 +5,12 @@ import { isTimestamp, timestampToDate } from '$lib/utilities/format-time';
 
 export type ConnectionState = 'pending' | 'connected' | 'failed';
 
-export const deriveConnectionStatus = (
-  computeStatus?: ComputeStatus,
-): ConnectionState => {
+export const deriveConnectionStatus = (computeStatus?: {
+  providerValidation?: {
+    lastCheckTime?: unknown;
+    errorMessage?: string | null;
+  } | null;
+}): ConnectionState => {
   const validation = computeStatus?.providerValidation;
   if (!validation?.lastCheckTime) return 'pending';
   return validation.errorMessage ? 'failed' : 'connected';

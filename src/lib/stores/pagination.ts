@@ -20,7 +20,7 @@ type PaginationMethods<T> = {
   findPage: (fn: (item: T) => boolean) => number;
   nextRow: () => void;
   previousRow: () => void;
-  setActiveRowIndex: (activeRowIndex: number | undefined) => void;
+  setActiveRowIndex: (activeRowIndex?: number) => void;
 };
 
 type PaginationStore<T> = PaginationMethods<T> &
@@ -318,7 +318,7 @@ export const pagination = <T>(
 };
 
 export const perPageFromSearchParameter = (
-  perPage: number | string = defaultItemsPerPage,
+  perPage: number | string | null = defaultItemsPerPage,
 ): number => {
   const asNumber = toNumber(perPage);
 
@@ -328,7 +328,7 @@ export const perPageFromSearchParameter = (
   return asNumber;
 };
 
-const toNumber = (perPage: number | string = 0): number => {
+const toNumber = (perPage: number | string | null = 0): number => {
   const asNumber = Number(perPage);
 
   if (isNaN(asNumber)) return 0;

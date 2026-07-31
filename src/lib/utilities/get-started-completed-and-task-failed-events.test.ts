@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { getWorkflowStartedCompletedAndTaskFailedEvents } from './get-started-completed-and-task-failed-events';
+import type { WorkflowEvent } from '$lib/types/events';
+
+import { getWorkflowStartedCompletedAndTaskFailedEvents as getWorkflowStartedCompletedAndTaskFailedEventsBase } from './get-started-completed-and-task-failed-events';
 
 import canceledEventHistory from '$fixtures/events.canceled.json';
 import completedEventHistory from '$fixtures/events.completed.json';
@@ -9,6 +11,11 @@ import failedEventHistory from '$fixtures/events.failed.json';
 import runningEventHistory from '$fixtures/events.running.json';
 import terminatedEventHistory from '$fixtures/events.terminated.json';
 import timedOutEventHistory from '$fixtures/events.timed-out.json';
+
+const getWorkflowStartedCompletedAndTaskFailedEvents = (history: unknown) =>
+  getWorkflowStartedCompletedAndTaskFailedEventsBase(
+    history as WorkflowEvent[],
+  );
 
 describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
   it('should return null if the input is null', () => {

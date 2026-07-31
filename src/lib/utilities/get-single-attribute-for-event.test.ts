@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import type { HistoryEvent } from '$lib/types/events';
+
 import {
   formatSummaryAttributeDisplayValue,
   getCodeBlockValue,
@@ -9,13 +11,15 @@ import {
   shouldDisplayAsTime,
   shouldDisplayAttribute,
 } from './get-single-attribute-for-event';
-import { toEvent } from '../models/event-history';
+import { toEvent as toEventBase } from '../models/event-history';
 
 import dotnetLocalActivity from '$fixtures/local-activities/dotnet_local_activity.json';
 import goLocalActivity from '$fixtures/local-activities/go_local_activity.json';
 import javaLocalActivity from '$fixtures/local-activities/java_local_activity.json';
 import pythonLocalActivity from '$fixtures/local-activities/python_local_activity.json';
 import tsLocalActivity from '$fixtures/local-activities/ts_local_activity.json';
+
+const toEvent = (event: unknown) => toEventBase(event as HistoryEvent);
 
 describe('getPrimaryAttributeForEvent', () => {
   const workflowEvent = {
@@ -132,7 +136,9 @@ describe('getPrimaryAttributeForEvent', () => {
 
   it('should return "input" if the workflow type does not exists', async () => {
     const event = { ...workflowEvent };
-    event.attributes.workflowType = null;
+    event.attributes.workflowType = null as unknown as {
+      name: string;
+    };
     expect(await getPrimaryAttributeForEvent(event)).toStrictEqual({
       key: 'input',
       value: {
@@ -151,7 +157,7 @@ describe('getPrimaryAttributeForEvent', () => {
     event.attributes.workflowType = null as unknown as {
       name: string;
     };
-    event.attributes.input = null;
+    event.attributes.input = null as unknown as typeof event.attributes.input;
 
     expect(await getPrimaryAttributeForEvent(event)).toStrictEqual({
       key: 'taskQueueName',

@@ -1,5 +1,10 @@
-import type { Settings, User } from '$lib/types/global';
+import type { Settings } from '$lib/types/global';
 
-export const isAuthorized = (settings: Settings, user: User): boolean => {
-  return !settings.auth.enabled || Boolean(user?.accessToken);
+export const isAuthorized = (
+  settings: { auth: Pick<Settings['auth'], 'enabled'> },
+  user: object,
+): boolean => {
+  return (
+    !settings.auth.enabled || Boolean('accessToken' in user && user.accessToken)
+  );
 };

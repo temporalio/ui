@@ -10,7 +10,7 @@ import {
 } from './dark-mode';
 
 describe('dark-mode utilities', () => {
-  let matchMediaMock;
+  let matchMediaMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     matchMediaMock = vi.fn();

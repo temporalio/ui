@@ -11,6 +11,7 @@ import {
 const makeFilter = (
   overrides: Partial<SearchAttributeFilter> = {},
 ): SearchAttributeFilter => ({
+  id: '',
   attribute: 'StartTime',
   type: 'Datetime',
   value: '',

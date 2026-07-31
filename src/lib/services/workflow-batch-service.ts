@@ -14,6 +14,8 @@ import type {
 } from '$types';
 import type { WorkflowExecution } from '$types/workflows';
 
+type WorkflowIdentifier = Pick<WorkflowExecution, 'id' | 'runId'>;
+
 // https://github.com/temporalio/api/blob/master/temporal/api/enums/v1/reset.proto
 enum ResetType {
   RESET_TYPE_FIRST_WORKFLOW_TASK = 1,
@@ -25,13 +27,13 @@ type CreateBatchOperationOptions = {
   reason: string;
   jobId: string;
   query?: string;
-  workflows?: WorkflowExecution[];
+  workflows?: WorkflowIdentifier[];
   resetType?: 'first' | 'last';
   identity?: string;
 };
 
 const queryFromWorkflows = (
-  workflowExecutions: WorkflowExecution[],
+  workflowExecutions: WorkflowIdentifier[],
 ): string => {
   const runIds = workflowExecutions.map((wf) => wf.runId);
   return runIds.reduce((queryString, id, index, arr) => {
@@ -85,7 +87,7 @@ const batchActionToOperation = (
 const toWorkflowExecutionInput = ({
   id,
   runId,
-}: WorkflowExecution): WorkflowExecutionInput => ({ workflowId: id, runId });
+}: WorkflowIdentifier): WorkflowExecutionInput => ({ workflowId: id, runId });
 
 const createBatchOperationRequest = (
   action: Action,

@@ -5,12 +5,16 @@ import { searchAttributes } from '$lib/stores/search-attributes';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 import { formatDate } from '$lib/utilities/format-date';
 
-export function isStatusFilter({ attribute }: SearchAttributeFilter) {
+type FilterAttribute = Pick<SearchAttributeFilter, 'attribute'>;
+type TypedFilterAttribute = FilterAttribute &
+  Partial<Pick<SearchAttributeFilter, 'type'>>;
+
+export function isStatusFilter({ attribute }: FilterAttribute) {
   return attribute === 'ExecutionStatus';
 }
 
 export function isTextFilter(
-  filter: SearchAttributeFilter,
+  filter: TypedFilterAttribute,
   attributes = searchAttributes,
 ) {
   const { attribute, type } = filter;
@@ -26,7 +30,7 @@ export function isTextFilter(
 }
 
 export function isListFilter(
-  { attribute, type }: SearchAttributeFilter,
+  { attribute, type }: TypedFilterAttribute,
   attributes = searchAttributes,
 ) {
   if (type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST) return true;
@@ -36,7 +40,7 @@ export function isListFilter(
 }
 
 export function isNumberFilter(
-  { attribute, type }: SearchAttributeFilter,
+  { attribute, type }: TypedFilterAttribute,
   attributes = searchAttributes,
 ) {
   if (type === SEARCH_ATTRIBUTE_TYPE.INT) return true;
@@ -48,12 +52,12 @@ export function isNumberFilter(
   );
 }
 
-export function isDurationFilter({ attribute }: SearchAttributeFilter) {
+export function isDurationFilter({ attribute }: FilterAttribute) {
   return ['ExecutionDuration'].includes(attribute);
 }
 
 export function isDateTimeFilter(
-  { attribute, type }: SearchAttributeFilter,
+  { attribute, type }: TypedFilterAttribute,
   attributes = searchAttributes,
 ) {
   if (type === SEARCH_ATTRIBUTE_TYPE.DATETIME) return true;
@@ -63,7 +67,7 @@ export function isDateTimeFilter(
 }
 
 export function isBooleanFilter(
-  { attribute, type }: SearchAttributeFilter,
+  { attribute, type }: TypedFilterAttribute,
   attributes = searchAttributes,
 ) {
   if (type === SEARCH_ATTRIBUTE_TYPE.BOOL) return true;
@@ -72,7 +76,7 @@ export function isBooleanFilter(
   return searchAttributeType === SEARCH_ATTRIBUTE_TYPE.BOOL;
 }
 
-export function getFocusedElementId(filter: SearchAttributeFilter) {
+export function getFocusedElementId(filter: TypedFilterAttribute) {
   if (isStatusFilter(filter)) return 'status-filter';
 
   if (

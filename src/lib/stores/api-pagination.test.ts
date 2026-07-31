@@ -464,7 +464,7 @@ describe('createPaginationStore with custom pageSizeOptions', () => {
   });
 
   it('should set fallback to default pageSize with no options', () => {
-    const options = [];
+    const options: Parameters<typeof getInitialPageSize>[0] = [];
     const pageSize = getInitialPageSize(options);
     expect(pageSize).toBe(100);
   });

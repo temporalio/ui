@@ -73,9 +73,13 @@ export type EventParameters = Pick<
 >;
 
 export type AuthenticationParameters = {
-  settings: Settings;
+  settings: AuthenticationSettings;
   searchParams?: URLSearchParams;
   originUrl?: string;
+};
+
+type AuthenticationSettings = Pick<Settings, 'baseUrl'> & {
+  auth: Partial<Settings['auth']>;
 };
 
 export interface StartActivityExecutionQueryParams {
@@ -642,7 +646,7 @@ export const routeForLoginPage = (
 };
 
 export const routeForAuthenticationRedirect = (
-  settings: Settings,
+  settings: AuthenticationSettings,
   currentUrl?: URL,
 ): string => {
   if (settings.auth.redirectToProvider) {

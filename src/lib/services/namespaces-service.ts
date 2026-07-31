@@ -18,6 +18,9 @@ type PaginatedNamespacesResponse = Replace<
   { nextPageToken?: NextPageToken; namespaces?: DescribeNamespaceResponse[] }
 >;
 
+type NamespaceSettings = Pick<Settings, 'runtimeEnvironment'> &
+  Partial<Pick<Settings, 'showTemporalSystemNamespace'>>;
+
 const emptyNamespace: { namespaces: DescribeNamespaceResponse[] } = {
   namespaces: [],
 };
@@ -48,7 +51,7 @@ const toNamespaceDetails = (
 };
 
 export async function fetchNamespaces(
-  settings: Settings,
+  settings: NamespaceSettings,
   request = fetch,
 ): Promise<void> {
   const { showTemporalSystemNamespace, runtimeEnvironment } = settings;
@@ -89,7 +92,7 @@ export async function fetchNamespaces(
 
 export async function fetchNamespace(
   namespace: string,
-  settings?: Settings,
+  settings?: Pick<Settings, 'runtimeEnvironment'>,
   request = fetch,
 ): Promise<DescribeNamespaceResponse> {
   const [empty] = emptyNamespace.namespaces;

@@ -3,8 +3,8 @@ import type { BooleanString } from '$lib/types/global';
 
 type DateFilterOptions = {
   compact: boolean;
-  sortOrder: EventSortOrder;
-  showElapsed: BooleanString;
+  sortOrder: EventSortOrder | string;
+  showElapsed: BooleanString | string;
 };
 
 export const getDateFilterValue = ({

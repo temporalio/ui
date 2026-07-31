@@ -449,7 +449,7 @@ export function detectEventHistoryErrors(
 }
 
 export function getApplicableCommonErrors(
-  workflow: WorkflowExecution,
+  workflow: WorkflowExecution | null | undefined,
   firstEvent: WorkflowEvent | undefined,
   eventHistory?: WorkflowEvent[],
 ): CommonError[] {

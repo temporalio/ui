@@ -43,7 +43,7 @@ describe('namespaces', () => {
   });
 
   it('should be able to set a value', () => {
-    namespaces.set([{ name: 'default' }]);
-    expect(get(namespaces)).toEqual([{ name: 'default' }]);
+    namespaces.set([{ namespaceInfo: { name: 'default' } }]);
+    expect(get(namespaces)).toEqual([{ namespaceInfo: { name: 'default' } }]);
   });
 });

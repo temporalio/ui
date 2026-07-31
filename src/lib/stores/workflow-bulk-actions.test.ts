@@ -1,18 +1,23 @@
-import { get, type writable as writableFunc } from 'svelte/store';
+import { get } from 'svelte/store';
 
 import { describe, expect, test, vi } from 'vitest';
 
 import { supportsWorkflowBulkActions } from './workflow-bulk-actions';
 
-const mockedPageStore = await vi.hoisted(async () => {
-  const { writable } = await vi.importActual<{
-    writable: typeof writableFunc;
-  }>('svelte/store');
+const mockedPageStore = vi.hoisted(() => {
+  let value: unknown;
+  const subscribers = new Set<(value: unknown) => void>();
 
-  const writableStore = writable();
   return {
-    subscribe: writableStore.subscribe,
-    mockSetSubscribeValue: (value: unknown): void => writableStore.set(value),
+    subscribe: (subscriber: (value: unknown) => void) => {
+      subscribers.add(subscriber);
+      subscriber(value);
+      return () => subscribers.delete(subscriber);
+    },
+    mockSetSubscribeValue: (nextValue: unknown): void => {
+      value = nextValue;
+      subscribers.forEach((subscriber) => subscriber(value));
+    },
   };
 });
 

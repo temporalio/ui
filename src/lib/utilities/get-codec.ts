@@ -8,8 +8,10 @@ import {
 } from '$lib/stores/data-encoder-config';
 import type { Settings } from '$lib/types/global';
 
+type CodecSettings = { codec?: Settings['codec'] };
+
 export const getCodecEndpoint = (
-  settings: Settings,
+  settings: CodecSettings,
   endpoint = codecEndpoint,
   override = overrideRemoteCodecConfiguration,
 ): string => {
@@ -18,7 +20,7 @@ export const getCodecEndpoint = (
 };
 
 export const getCodecPassAccessToken = (
-  settings: Settings,
+  settings: CodecSettings,
   passToken = passAccessToken,
   endpoint = codecEndpoint,
   override = overrideRemoteCodecConfiguration,
@@ -30,7 +32,7 @@ export const getCodecPassAccessToken = (
 };
 
 export const getCodecIncludeCredentials = (
-  settings: Settings,
+  settings: CodecSettings,
   includeCreds = includeCredentials,
   endpoint = codecEndpoint,
   override = overrideRemoteCodecConfiguration,

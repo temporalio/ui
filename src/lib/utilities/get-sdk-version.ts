@@ -1,6 +1,13 @@
-import type { WorkflowTaskCompletedEvent } from '$lib/types/events';
-
 import { capitalize } from './format-camel-case';
+
+type SDKTask = {
+  attributes?: {
+    sdkMetadata?: {
+      sdkName?: string | null;
+      sdkVersion?: string | null;
+    } | null;
+  } | null;
+};
 
 export const formatSDKName = (sdkName: string | undefined | null): string => {
   let sdk = '';
@@ -16,7 +23,7 @@ export const formatSDKName = (sdkName: string | undefined | null): string => {
 };
 
 export const getSDKandVersion = (
-  tasks: WorkflowTaskCompletedEvent[],
+  tasks: SDKTask[],
 ): { sdk: string; version: string } => {
   let sdk = '';
   let version = '';

@@ -12,7 +12,7 @@ describe('getFilePathsFromStackTrace', () => {
     const stackTraceText: string =
       UnixTSStacktraceQueryJson.queryResult.payloads[0].data;
     const result: { filePath: string; codeLine: number; character: number }[] =
-      getFilePathsFromStackTrace(stackTraceText);
+      getFilePathsFromStackTrace(stackTraceText)!;
     expect(result.length).toEqual(5);
     expect(result[0].filePath).toEqual(
       '/Users/user/Desktop/ts-sdk/example/node_modules/@temporalio/workflow/src/worker-interface.ts',
@@ -29,7 +29,7 @@ describe('getFilePathsFromStackTrace', () => {
     const stackTraceText: string =
       WindowsTSStacktraceQueryJson.queryResult.payloads[0].data;
     const result: { filePath: string; codeLine: number; character: number }[] =
-      getFilePathsFromStackTrace(stackTraceText);
+      getFilePathsFromStackTrace(stackTraceText)!;
     expect(result.length).toEqual(5);
     expect(result[0].filePath).toEqual(
       'C:\\Users\\user\\SomeFolder\\samples-typescript\\hello-world\\node_modules\\@temporalio\\workflow\\src\\worker-interface.ts',
@@ -46,7 +46,7 @@ describe('getFilePathsFromStackTrace', () => {
     const stackTraceText: string =
       UnixGoStacktraceQueryJson.queryResult.payloads[0].data;
     const result: { filePath: string; codeLine: number; character: number }[] =
-      getFilePathsFromStackTrace(stackTraceText);
+      getFilePathsFromStackTrace(stackTraceText)!;
     stackTraceText;
     expect(result.length).toEqual(8);
     expect(result[0].filePath).toEqual(
@@ -64,7 +64,7 @@ describe('getFilePathsFromStackTrace', () => {
     const stackTraceText: string =
       WindowsGoStacktraceQueryJson.queryResult.payloads[0].data;
     const result: { filePath: string; codeLine: number; character: number }[] =
-      getFilePathsFromStackTrace(stackTraceText);
+      getFilePathsFromStackTrace(stackTraceText)!;
     stackTraceText;
     expect(result.length).toEqual(8);
     expect(result[0].filePath).toEqual(

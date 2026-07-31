@@ -8,7 +8,8 @@ import {
   getEventGroupDurationEnd,
 } from './event-group-duration';
 
-const event = (id: string, eventTime: string) => ({ id, eventTime });
+const event = (id: string, eventTime: string) =>
+  ({ id, eventTime }) as unknown as EventGroup['initialEvent'];
 
 const group = ({
   initialEvent = event('1', '2026-04-28T10:00:00Z'),
@@ -42,7 +43,7 @@ describe('eventGroupUsesCurrentDuration', () => {
       isPending: true,
       pendingNexusOperation: {
         scheduledEventId: '1',
-      } as EventGroup['pendingNexusOperation'],
+      } as unknown as EventGroup['pendingNexusOperation'],
     });
 
     expect(eventGroupUsesCurrentDuration(pendingNexusGroup)).toBe(true);
@@ -89,7 +90,7 @@ describe('getEventGroupDurationEnd', () => {
           isPending: true,
           pendingNexusOperation: {
             scheduledEventId: '1',
-          } as EventGroup['pendingNexusOperation'],
+          } as unknown as EventGroup['pendingNexusOperation'],
         }),
         endTime,
       ),

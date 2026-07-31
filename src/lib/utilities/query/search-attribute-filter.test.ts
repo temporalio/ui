@@ -2,7 +2,10 @@ import { writable } from 'svelte/store';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import type { SearchAttributes } from '$lib/types/workflows';
+import type {
+  SearchAttributes,
+  SearchAttributeType,
+} from '$lib/types/workflows';
 
 import {
   formatDateTimeRange,
@@ -27,7 +30,7 @@ const store = writable<SearchAttributes>({
   WorkflowType: 'Keyword',
   CustomA: 'Text',
   CustomB: 'Double',
-  CustomC: 'String',
+  CustomC: 'String' as SearchAttributeType,
 });
 
 // force GH action runners to use en-US and 12-hour clocks starting at 0:00

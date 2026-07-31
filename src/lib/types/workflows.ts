@@ -115,8 +115,8 @@ export type WorkflowType = string | null;
 
 export type FilterParameters = {
   workflowId?: string;
-  workflowType?: string;
-  executionStatus?: WorkflowStatus;
+  workflowType?: string | null;
+  executionStatus?: WorkflowStatus | 'All' | '';
   timeRange?: Duration | string;
   query?: string;
 };

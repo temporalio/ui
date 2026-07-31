@@ -43,7 +43,7 @@ describe('isFunction', () => {
   });
 
   it('should return false if given an array', () => {
-    const fn = [];
+    const fn: unknown[] = [];
     expect(isFunction(fn)).toBe(false);
   });
 });

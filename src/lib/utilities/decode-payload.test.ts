@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
 
 import {
@@ -95,6 +95,12 @@ const JsonObjectEncodedWithConstructor = {
 
 const JsonObjectDecoded = { Transformer: 'OptimusPrime' };
 const JsonObjectDecodedWithConstructor = { ConstructorOutput: 'OptimusPrime' };
+
+type DecodedTestPayloadEvent = {
+  input: unknown;
+  encodedAttributes: unknown;
+  details: { detail1: unknown };
+};
 
 describe('parseRawPayloadToJSON with default returnDataOnly', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
@@ -274,15 +280,17 @@ describe('decodeEventAttributes', () => {
   });
 
   it('Should decode a payload with codec endpoint with encoding json/plain`', async () => {
-    const event = await decodeEventAttributes(getTestPayloadEvent());
+    const event = (await decodeEventAttributes(
+      getTestPayloadEvent(),
+    )) as DecodedTestPayloadEvent;
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual('a test attribute');
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
   });
   it('Should not decode a null payload with codec endpoint with encoding json/plain`', async () => {
-    const event = await decodeEventAttributes(
+    const event = (await decodeEventAttributes(
       getTestPayloadEventWithNullEncodedAttributes(),
-    );
+    )) as DecodedTestPayloadEvent;
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual(null);
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });

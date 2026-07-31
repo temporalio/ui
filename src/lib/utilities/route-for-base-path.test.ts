@@ -85,6 +85,7 @@ describe('routeFor functions should resolve the base path exactly once', () => {
   const nexusOperationParams = {
     namespace: 'default',
     operationId: 'op-1',
+    runId: 'run-1',
   };
 
   const cases: [string, () => string | undefined][] = [
@@ -332,6 +333,7 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
   const nexusOperationParams = {
     namespace: 'default',
     operationId: 'op-1',
+    runId: 'run-1',
   };
 
   afterEach(() => {

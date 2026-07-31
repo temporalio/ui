@@ -40,7 +40,7 @@ const defaultSettings = {
 };
 
 const getSettings = (customSettings: Partial<Settings> = {}): Settings => {
-  return { ...defaultSettings, ...customSettings };
+  return { ...defaultSettings, ...customSettings } as Settings;
 };
 
 const clearLocalStorageAndStores = () => {

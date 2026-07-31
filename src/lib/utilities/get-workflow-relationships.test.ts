@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { toWorkflowExecution } from '$lib/models/workflow-execution';
+import { toWorkflowExecution as toWorkflowExecutionBase } from '$lib/models/workflow-execution';
+import type { DescribeNamespaceResponse } from '$lib/types';
+import type { WorkflowEvents } from '$lib/types/events';
+import type {
+  WorkflowExecution,
+  WorkflowExecutionAPIResponse,
+} from '$lib/types/workflows';
 
-import { parseRawPayloadToJSON } from './decode-payload';
-import { getWorkflowRelationships } from './get-workflow-relationships';
+import { parseRawPayloadToJSON as parseRawPayloadToJSONBase } from './decode-payload';
+import { getWorkflowRelationships as getWorkflowRelationshipsBase } from './get-workflow-relationships';
 
 import childEvents from '$fixtures/events.children.json';
 import completedEvents from '$fixtures/events.completed.json';
@@ -18,6 +24,25 @@ import pendingChildrenWorkflow from '$fixtures/workflow.pending-children.json';
 import runningWorkflow from '$fixtures/workflow.running.json';
 import scheduledWorkflow from '$fixtures/workflow.scheduled.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
+
+const toWorkflowExecution = (workflow: unknown): WorkflowExecution =>
+  toWorkflowExecutionBase(workflow as WorkflowExecutionAPIResponse);
+
+const getWorkflowRelationships = (
+  workflow: WorkflowExecution | null,
+  history: unknown,
+  namespace: unknown,
+) =>
+  getWorkflowRelationshipsBase(
+    workflow,
+    history as WorkflowEvents,
+    namespace as DescribeNamespaceResponse,
+  );
+
+const parseRawPayloadToJSON = (payload: unknown) =>
+  parseRawPayloadToJSONBase(
+    payload as Parameters<typeof parseRawPayloadToJSONBase>[0],
+  );
 
 describe('getWorkflowRelationships', () => {
   it('hasChildren should return true if there are pending children', () => {

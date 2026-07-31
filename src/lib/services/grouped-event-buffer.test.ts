@@ -870,7 +870,7 @@ describe('enrichGroups', () => {
         {
           scheduledEventId: '4',
         },
-      ] as Parameters<typeof enrichGroups>[1],
+      ] as unknown as Parameters<typeof enrichGroups>[1],
     );
 
     const groups = getGroupArray();

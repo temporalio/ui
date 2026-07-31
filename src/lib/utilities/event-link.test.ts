@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { base } from '$app/paths';
 
-import { toEventLinkView } from './event-link';
+import type { EventLink } from '$lib/types';
+
+import { toEventLinkView as toEventLinkViewBase } from './event-link';
+
+const toEventLinkView = (
+  link: unknown,
+  context?: Parameters<typeof toEventLinkViewBase>[1],
+) => toEventLinkViewBase(link as EventLink, context);
 
 describe('toEventLinkView', () => {
   it('returns a workflow event route for event references', () => {

@@ -175,7 +175,16 @@ export const toListWorkflowFilters = (
   }
 };
 
-export const combineDropdownFilters = (filters: SearchAttributeFilter[]) => {
+type CombinableFilter = {
+  attribute: string;
+  value: unknown;
+  operator: string;
+  parenthesis: string;
+};
+
+export const combineDropdownFilters = <T extends CombinableFilter>(
+  filters: T[],
+): T[] => {
   const statusFilters = filters.filter(
     (f) => f.attribute === 'ExecutionStatus' && f.value,
   );
@@ -216,7 +225,9 @@ export const combineDropdownFilters = (filters: SearchAttributeFilter[]) => {
   ];
 };
 
-export const combineFilters = (filters: SearchAttributeFilter[]) => {
+export const combineFilters = <T extends CombinableFilter>(
+  filters: T[],
+): T[] => {
   filters.forEach((filter, index) => {
     const previousFilter = filters[index - 1];
     if (previousFilter && !previousFilter.operator) {

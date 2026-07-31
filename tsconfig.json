@@ -5,7 +5,7 @@
     "strict": true,
     "module": "es2020",
     "lib": ["es2020", "es2023", "dom", "DOM.Iterable"],
-    "target": "es2019",
+    "target": "es2020",
     /**
 			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript
 			to enforce using \`import type\` instead of \`import\` for Types.
@@ -33,10 +33,5 @@
     "temporal/**/*.ts",
     "plugins/**/*.ts"
   ],
-  "exclude": [
-    "src/lib/services/**/*.test.ts",
-    "src/lib/utilities/**/*.test.ts",
-    "src/lib/stores/**/*.test.ts",
-    "tests/**/*.ts"
-  ]
+  "exclude": ["tests/**/*.ts"]
 }

@@ -1,5 +1,4 @@
 import type { NexusOperationExecutionStatus } from '$lib/types/nexus-operation-execution';
-import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
 import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
 
 export type NexusOperationStatus =
@@ -39,13 +38,18 @@ export const toNexusOperationStatus = (
 };
 
 export const getNexusOperationStatusAndCountOfGroup = (
-  groups: CountWorkflowExecutionsResponse['groups'] = [],
+  groups: { count: string; groupValues: unknown[] }[] = [],
 ): { status: NexusOperationStatus; count: number }[] => {
   return groups
     .map((group) => {
-      const rawStatus = parseRawPayloadToJSON(
-        group?.groupValues[0],
-      ) as unknown as NexusOperationStatus;
+      const value = group?.groupValues[0];
+      const rawStatus = (
+        typeof value === 'string'
+          ? value
+          : parseRawPayloadToJSON(
+              value as Parameters<typeof parseRawPayloadToJSON>[0],
+            )
+      ) as NexusOperationStatus;
       const count = parseInt(group.count);
       return { status: rawStatus, count };
     })

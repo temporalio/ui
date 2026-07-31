@@ -53,7 +53,7 @@ describe('updateEventFilterParams', () => {
 
   it('removes refresh_off param when toggling off', async () => {
     const url = new URL('http://localhost/?refresh_off=true');
-    const mockGoto = vi.fn(() => Promise.resolve());
+    const mockGoto = vi.fn((_href: string) => Promise.resolve());
 
     await updateEventFilterParams(
       url,
@@ -68,7 +68,7 @@ describe('updateEventFilterParams', () => {
 
   it('preserves existing query params when updating refresh_off', async () => {
     const url = new URL('http://localhost/?sort=ascending');
-    const mockGoto = vi.fn(() => Promise.resolve());
+    const mockGoto = vi.fn((_href: string) => Promise.resolve());
 
     await updateEventFilterParams(
       url,

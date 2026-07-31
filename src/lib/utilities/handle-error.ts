@@ -19,8 +19,8 @@ interface NetworkErrorWithReport extends NetworkError {
 
 export const handleError = (
   error: unknown,
-  toasts = toaster,
-  errors = networkError,
+  toasts: Pick<typeof toaster, 'push'> = toaster,
+  errors: Pick<typeof networkError, 'set'> = networkError,
   isBrowser = BROWSER,
 ): void => {
   if (error instanceof DOMException && error.name === 'AbortError') {

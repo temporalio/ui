@@ -1,11 +1,9 @@
-import type { Timestamp } from '$lib/types';
-
 export const toTimeDifference = ({
   date,
   now = Date.now(),
   negativeDefault,
 }: {
-  date: Timestamp;
+  date: unknown;
   now?: number;
   negativeDefault?: string;
 }): string => {

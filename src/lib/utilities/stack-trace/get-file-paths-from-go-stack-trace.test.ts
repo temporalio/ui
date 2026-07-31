@@ -11,7 +11,7 @@ describe('getFilePathsFromGoStackTrace', () => {
     const stackTraceText: string =
       UnixGoStacktraceQueryJson.queryResult.payloads[0].data;
     const result: { filePath: string; codeLine: number; character: number }[] =
-      getFilePathsFromGoStackTrace(stackTraceText);
+      getFilePathsFromGoStackTrace(stackTraceText)!;
     expect(result.length).toEqual(8);
     expect(result[0].filePath).toEqual(
       '/Users/user/go/pkg/mod/go.temporal.io/sdk@v1.15.0/internal/internal_workflow.go',
@@ -28,7 +28,7 @@ describe('getFilePathsFromGoStackTrace', () => {
     const stackTraceText: string =
       WindowsGoStacktraceQueryJson.queryResult.payloads[0].data;
     const result: { filePath: string; codeLine: number; character: number }[] =
-      getFilePathsFromGoStackTrace(stackTraceText);
+      getFilePathsFromGoStackTrace(stackTraceText)!;
     expect(result.length).toEqual(8);
     expect(result[0].filePath).toEqual(
       'C:\\Users\\user\\go\\pkg\\mod\\go.temporal.io\\sdk@v1.15.0\\internal\\internal_workflow.go',

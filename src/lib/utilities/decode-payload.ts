@@ -37,6 +37,12 @@ export type ParsedExternalPayload = ParsedPayload & {
   externalPayloads: { sizeBytes: number }[];
 };
 
+type EncodedPayload = {
+  metadata?: Record<string, unknown> | null;
+  data?: unknown;
+  externalPayloads?: { sizeBytes: number }[] | null;
+};
+
 /**
  * Decoding TL;DR
  * Decoding includes either 1 or 2 phases - "parse" and "decode"
@@ -102,10 +108,10 @@ export function base64ParsePayloadMetadata(
  * `payload` unchanged when decoding fails (e.g. encrypted payloads).
  */
 export function parseRawPayloadToJSON(
-  payload: Payload,
+  payload: Payload | EncodedPayload | null,
   returnDataOnly: boolean = true,
   // This could decode to any object. So we either use the payload object passed in or decode it
-): unknown | Payload | null {
+): unknown | Payload | EncodedPayload | null {
   if (payload === null) {
     return payload;
   }
@@ -147,13 +153,15 @@ export function parseRawPayloadToJSON(
  * Mutates the object in place and returns it.
  */
 export const parsePayloadAttributes = <
-  T extends Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>,
+  T extends Optional<
+    PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo
+  >,
 >(
   eventAttribute: T,
   returnDataOnly: boolean = true,
 ): Replace<
   T,
-  Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>
+  Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo>
 > => {
   // Decode Search Attributes
   if (
@@ -405,16 +413,12 @@ const decodeEventAttributesInternal = async (
  * @see decodeEventAttributesForExport for the export / download variant that
  * preserves the full Payload shape.
  */
-export const decodeEventAttributes = (
-  anyAttributes:
-    | PotentiallyDecodable
-    | EventAttribute
-    | WorkflowEvent
-    | Memo
-    | null,
-): Promise<
-  PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
-> => decodeEventAttributesInternal(anyAttributes, 'readable', true);
+export const decodeEventAttributes = <
+  T extends PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null,
+>(
+  anyAttributes: T,
+): Promise<T> =>
+  decodeEventAttributesInternal(anyAttributes, 'readable', true) as Promise<T>;
 
 /**
  * Phase 2 only — async, requires a configured codec endpoint.

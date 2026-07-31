@@ -12,7 +12,7 @@ describe('workflowSignalEnabled', () => {
       workflowSignalEnabled(
         {
           disableWriteActions: false,
-          worklowCancelDisabled: false,
+          workflowSignalDisabled: false,
         },
         coreUser,
         'ns-wriete-enabled',
@@ -26,7 +26,7 @@ describe('workflowSignalEnabled', () => {
         workflowSignalEnabled(
           {
             disableWriteActions: true,
-            workflowCancelDisabled: false,
+            workflowSignalDisabled: false,
           },
           coreUser,
           'ns-wriete-enabled',

@@ -1,6 +1,11 @@
-import type { DescribeNamespaceResponse } from '$lib/types';
+type NamespaceWithClusters = {
+  replicationConfig?: {
+    activeClusterName?: string | null;
+    clusters?: { clusterName?: string | null }[] | null;
+  } | null;
+};
 
-export const getClusters = (namespace: DescribeNamespaceResponse): string => {
+export const getClusters = (namespace: NamespaceWithClusters): string => {
   const clusters = namespace?.replicationConfig?.clusters;
   const activeCluster = namespace?.replicationConfig?.activeClusterName;
   if (clusters?.length) {
