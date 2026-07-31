@@ -202,6 +202,8 @@ export const Strings = {
   'provider-coming-soon-description':
     'Support for additional compute providers is planned.',
   'coming-soon': 'Coming Soon',
+  'public-preview': 'Public Preview',
+  'pre-release': 'Pre-release',
   'setup-guide-title': 'AWS Setup Guide',
   'setup-guide-intro':
     'Before creating a serverless worker, you need a Lambda function and an IAM role in your AWS account.',
