@@ -50,6 +50,8 @@
     }
   };
 
+  const badgeClass = 'px-1.5 py-0 text-xs font-normal leading-5';
+
   const releaseStageLabel = (option: ComputeProviderOption): string => {
     switch (option.releaseStage ?? defaultReleaseStage[option.value]) {
       case 'public-preview':
@@ -106,9 +108,13 @@
       {#snippet labelBadge()}
         <span>
           {#if option.disabled && option.disabledReason}
-            <Badge type="secondary">{option.disabledReason}</Badge>
+            <Badge type="secondary" class={badgeClass}>
+              {option.disabledReason}
+            </Badge>
           {:else if releaseStageLabel(option)}
-            <Badge type="secondary">{releaseStageLabel(option)}</Badge>
+            <Badge type="secondary" class={badgeClass}>
+              {releaseStageLabel(option)}
+            </Badge>
           {/if}
         </span>
       {/snippet}
