@@ -11,7 +11,11 @@
   import { translate } from '$lib/i18n/translate';
   import { hasCapability } from '$lib/utilities/has-capability.svelte';
 
-  import type { ComputeProviderOption, ComputeProviderValue } from './shared';
+  import {
+    type ComputeProviderOption,
+    type ComputeProviderValue,
+    defaultReleaseStage,
+  } from './shared';
 
   interface Props {
     provider?: string;
@@ -43,6 +47,17 @@
         return translate('workers.provider-lambda-description');
       case 'cloud-run':
         return translate('workers.provider-cloud-run-description');
+    }
+  };
+
+  const releaseStageLabel = (option: ComputeProviderOption): string => {
+    switch (option.releaseStage ?? defaultReleaseStage[option.value]) {
+      case 'public-preview':
+        return translate('workers.public-preview');
+      case 'pre-release':
+        return translate('workers.pre-release');
+      case 'generally-available':
+        return '';
     }
   };
 
@@ -92,6 +107,8 @@
         <span>
           {#if option.disabled && option.disabledReason}
             <Badge type="secondary">{option.disabledReason}</Badge>
+          {:else if releaseStageLabel(option)}
+            <Badge type="secondary">{releaseStageLabel(option)}</Badge>
           {/if}
         </span>
       {/snippet}
