@@ -224,6 +224,8 @@ export type NexusOperationIdConflictPolicy =
   keyof typeof temporal.api.enums.v1.NexusOperationIdConflictPolicy;
 export type NexusOperationIdReusePolicy =
   keyof typeof temporal.api.enums.v1.NexusOperationIdReusePolicy;
+export type WorkflowTaskFailedCause =
+  keyof typeof temporal.api.enums.v1.WorkflowTaskFailedCause;
 
 // temporal.api.enums.v1.ResetReapplyExcludeType
 export enum ResetReapplyExcludeType {
