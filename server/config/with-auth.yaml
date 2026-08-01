@@ -40,6 +40,7 @@ auth:
   enabled: true
   redirectToProvider: false
   maxSessionDuration: 2m # Max time before forced re-login (0 = unlimited)
+  refreshTokenLifetime: 168h # Refresh cookie lifetime; match your IdP's refresh token policy (default 7d, max 30d)
   providers:
     - label: Dummy OIDC
       type: oidc # for futureproofing; only oidc is supported today

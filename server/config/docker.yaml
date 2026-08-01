@@ -52,6 +52,7 @@ uiServerTLS:
 auth:
   enabled: {{ env "TEMPORAL_AUTH_ENABLED" | default "false" }}
   redirectToProvider: {{ env "TEMPORAL_AUTH_REDIRECT_TO_PROVIDER" | default "false" }}
+  refreshTokenLifetime: {{ env "TEMPORAL_AUTH_REFRESH_TOKEN_LIFETIME" | default "168h" }}
   providers:
   - label: {{ env "TEMPORAL_AUTH_LABEL" | default "sso" }}
     type: {{ env "TEMPORAL_AUTH_TYPE" | default "oidc" }}

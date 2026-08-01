@@ -24,8 +24,10 @@ package auth_test
 
 import (
 	_ "embed"
+	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -60,18 +62,24 @@ import (
 // }
 
 func TestSetUser(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(echo.GET, "/", nil)
-	rec := httptest.NewRecorder()
+	idToken := &auth.IDToken{
+		RawToken: "MMM.JJJ.NNN",
+		Claims: &auth.Claims{
+			Email:         "test@email.com",
+			EmailVerified: true,
+			Name:          "test-name",
+			Picture:       "test-picture",
+		},
+	}
 
 	tests := map[string]struct {
-		user    auth.User
-		ctx     echo.Context
-		wantErr bool
+		user                 auth.User
+		refreshTokenLifetime time.Duration
+		wantErr              bool
+		wantRefreshMaxAge    int
 	}{
 		"user empty": {
 			user:    auth.User{},
-			ctx:     e.NewContext(req, rec),
 			wantErr: true,
 		},
 		"user set": {
@@ -79,36 +87,84 @@ func TestSetUser(t *testing.T) {
 				OAuth2Token: &oauth2.Token{
 					AccessToken: "XXX.YYY.ZZZ",
 				},
-				IDToken: &auth.IDToken{
-					RawToken: "MMM.JJJ.NNN",
-					Claims: &auth.Claims{
-						Email:         "test@email.com",
-						EmailVerified: true,
-						Name:          "test-name",
-						Picture:       "test-picture",
-					},
-				},
+				IDToken: idToken,
 			},
-			ctx: e.NewContext(req, rec),
+		},
+		"refresh token with default lifetime": {
+			user: auth.User{
+				OAuth2Token: &oauth2.Token{
+					AccessToken:  "XXX.YYY.ZZZ",
+					RefreshToken: "refresh-token",
+					// Expiry reflects the access token's lifetime (expires_in) and
+					// must not influence the refresh cookie's MaxAge.
+					Expiry: time.Now().Add(time.Hour),
+				},
+				IDToken: idToken,
+			},
+			wantRefreshMaxAge: int(auth.DefaultRefreshTokenLifetime.Seconds()),
+		},
+		"refresh token with configured lifetime": {
+			user: auth.User{
+				OAuth2Token: &oauth2.Token{
+					AccessToken:  "XXX.YYY.ZZZ",
+					RefreshToken: "refresh-token",
+					Expiry:       time.Now().Add(time.Hour),
+				},
+				IDToken: idToken,
+			},
+			refreshTokenLifetime: 24 * time.Hour,
+			wantRefreshMaxAge:    int((24 * time.Hour).Seconds()),
+		},
+		"refresh token lifetime capped": {
+			user: auth.User{
+				OAuth2Token: &oauth2.Token{
+					AccessToken:  "XXX.YYY.ZZZ",
+					RefreshToken: "refresh-token",
+				},
+				IDToken: idToken,
+			},
+			refreshTokenLifetime: 90 * 24 * time.Hour,
+			wantRefreshMaxAge:    int(auth.MaxRefreshTokenLifetime.Seconds()),
 		},
 	}
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := auth.SetUser(tt.ctx, &tt.user)
-			cookies := tt.ctx.Cookies()
+			e := echo.New()
+			req := httptest.NewRequest(echo.GET, "/", nil)
+			rec := httptest.NewRecorder()
+			ctx := e.NewContext(req, rec)
+
+			err := auth.SetUser(ctx, &tt.user, tt.refreshTokenLifetime)
 
 			if tt.wantErr {
 				assert.Error(t, err)
-				assert.Empty(t, cookies)
+				assert.Empty(t, rec.Result().Cookies())
 				return
-			} else {
-				assert.NoError(t, err)
-				setCookie := tt.ctx.Response().Header().Get(echo.HeaderSetCookie)
-				assert.Contains(t, setCookie, "user0")
+			}
+
+			assert.NoError(t, err)
+			assert.Contains(t, ctx.Response().Header().Get(echo.HeaderSetCookie), "user0")
+
+			refreshCookie := findCookie(rec.Result().Cookies(), "refresh")
+			if tt.wantRefreshMaxAge == 0 {
+				assert.Nil(t, refreshCookie)
+				return
+			}
+			if assert.NotNil(t, refreshCookie) {
+				assert.Equal(t, tt.wantRefreshMaxAge, refreshCookie.MaxAge)
 			}
 		})
 	}
+}
+
+func findCookie(cookies []*http.Cookie, name string) *http.Cookie {
+	for _, c := range cookies {
+		if c.Name == name {
+			return c
+		}
+	}
+	return nil
 }
 
 func TestValidateAuthHeaderExists(t *testing.T) {

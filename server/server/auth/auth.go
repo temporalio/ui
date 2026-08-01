@@ -46,6 +46,12 @@ const (
 	AuthorizationExtrasHeader = "authorization-extras"
 	cookieLen                 = 4000
 	sessionStartCookie        = "session_start"
+
+	// DefaultRefreshTokenLifetime is used for the refresh token cookie when
+	// auth.refreshTokenLifetime is not configured.
+	DefaultRefreshTokenLifetime = 7 * 24 * time.Hour
+	// MaxRefreshTokenLifetime caps the refresh token cookie lifetime.
+	MaxRefreshTokenLifetime = 30 * 24 * time.Hour
 )
 
 var tokenVerifier *oidc.IDTokenVerifier
@@ -58,7 +64,7 @@ func stripBearerPrefix(token string) string {
 	return strings.TrimPrefix(token, "Bearer ")
 }
 
-func SetUser(c echo.Context, user *User) error {
+func SetUser(c echo.Context, user *User, refreshTokenLifetime time.Duration) error {
 	if user.OAuth2Token == nil {
 		return errors.New("no OAuth2Token")
 	}
@@ -100,32 +106,25 @@ func SetUser(c echo.Context, user *User) error {
 	if rt := user.OAuth2Token.RefreshToken; rt != "" {
 		log.Println("[Auth] Setting refresh token cookie")
 
-		// Calculate MaxAge from OAuth2 token expiry.
-		// IMPORTANT: When a refresh token is issued, oauth2.Token.Expiry typically
-		// reflects the refresh token's lifetime, not the access token's lifetime.
-		// This is standard behavior in OIDC flows with offline_access scope.
-		// See: https://pkg.go.dev/golang.org/x/oauth2#Token
-		var refreshMaxAge int
-		if user.OAuth2Token.Expiry.IsZero() {
-			// Fallback: if IdP doesn't provide expiry, use 7 days
-			refreshMaxAge = int((7 * 24 * time.Hour).Seconds())
-			log.Printf("[Auth] Warning: No refresh token expiry from IdP, using 7-day default")
-		} else {
-			// Use IdP's expiry, capped at 30 days for safety
-			maxAge := time.Until(user.OAuth2Token.Expiry)
-			if maxAge > 30*24*time.Hour {
-				maxAge = 30 * 24 * time.Hour
-				log.Printf("[Auth] Warning: IdP refresh token expiry > 30 days, capping at 30 days")
-			}
-			refreshMaxAge = int(maxAge.Seconds())
-			log.Printf("[Auth] Setting refresh cookie MaxAge to %d seconds (%.1f days) from IdP",
-				refreshMaxAge, maxAge.Hours()/24)
+		// The cookie lifetime cannot be derived from oauth2.Token.Expiry: that
+		// field is populated from the token response's expires_in, which per
+		// RFC 6749 section 5.1 is the ACCESS token's lifetime. OAuth2/OIDC does
+		// not communicate the refresh token's lifetime, so the cookie TTL comes
+		// from configuration (auth.refreshTokenLifetime) instead.
+		lifetime := refreshTokenLifetime
+		if lifetime <= 0 {
+			lifetime = DefaultRefreshTokenLifetime
+			log.Printf("[Auth] refreshTokenLifetime not configured, using %v default", DefaultRefreshTokenLifetime)
+		}
+		if lifetime > MaxRefreshTokenLifetime {
+			log.Printf("[Auth] Warning: refreshTokenLifetime %v exceeds maximum, capping at %v", lifetime, MaxRefreshTokenLifetime)
+			lifetime = MaxRefreshTokenLifetime
 		}
 
 		refreshCookie := &http.Cookie{
 			Name:     "refresh",
 			Value:    rt,
-			MaxAge:   refreshMaxAge,
+			MaxAge:   int(lifetime.Seconds()),
 			Secure:   c.Request().TLS != nil,
 			HttpOnly: true,
 			Path:     "/",

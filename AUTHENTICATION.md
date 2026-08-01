@@ -40,6 +40,7 @@ auth:
 | `enabled`            | boolean  | Enable or disable authentication                                                                                               |
 | `redirectToProvider` | boolean  | Skip the Temporal UI login page and redirect unauthenticated users directly to the configured OIDC provider                    |
 | `maxSessionDuration` | duration | Maximum session duration before forced re-login (e.g., `8h`, `24h`, `168h`). Set to `0` or omit for unlimited session duration |
+| `refreshTokenLifetime` | duration | Lifetime of the refresh token cookie (e.g., `24h`, `168h`). Should match your IdP's refresh token or SSO session policy. Defaults to 7 days; capped at 30 days |
 | `providers`          | array    | List of auth providers (currently only the first is used)                                                                      |
 
 #### Provider Settings
@@ -66,6 +67,8 @@ Temporal UI supports two mechanisms for session management:
 1. **Token Refresh**: When access tokens expire, the UI automatically refreshes them using the refresh token. Users stay logged in seamlessly.
 
 2. **Max Session Duration**: Forces users to re-authenticate after a specified time, regardless of token validity.
+
+The refresh token is stored in an HttpOnly cookie whose lifetime is controlled by `refreshTokenLifetime` (default 7 days). OAuth2 token responses only communicate the access token's lifetime, not the refresh token's, so set `refreshTokenLifetime` to match your IdP's refresh token or SSO session policy.
 
 ### Configuring Max Session Duration
 
@@ -172,7 +175,7 @@ auth:
       callbackUrl: https://temporal-ui.example.com/auth/sso/callback
 ```
 
-Note: Google does not support `offline_access` scope. Token refresh depends on Google's token policies.
+Note: Google does not support the `offline_access` scope. To receive refresh tokens from Google, add `access_type: offline` (and `prompt: consent` to force re-issuance) under the provider's `options`.
 
 ## Security Considerations
 
@@ -219,6 +222,7 @@ Ensure:
 - `offline_access` scope is included and enabled in your IdP
 - Refresh tokens are enabled in your IdP configuration
 - The refresh token hasn't expired (check IdP settings)
+- `refreshTokenLifetime` is not shorter than your access token lifetime; if the `refresh` cookie expires before the first 401-triggered refresh, every refresh fails with `missing_refresh_token`
 
 ### Redirect loop after login
 

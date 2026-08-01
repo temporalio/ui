@@ -113,6 +113,13 @@ type (
 		// forced to re-login after this duration regardless of token validity.
 		// Example values: "8h", "24h", "168h" (1 week). If zero, no max duration is enforced.
 		MaxSessionDuration time.Duration `yaml:"maxSessionDuration"`
+		// RefreshTokenLifetime - optional lifetime of the refresh token cookie.
+		// OAuth2 token responses only communicate the access token's lifetime
+		// (expires_in, RFC 6749 section 5.1); the refresh token's lifetime is not
+		// disclosed, so it must be configured to match the IdP's refresh token or
+		// SSO session policy. Example values: "24h", "168h" (1 week).
+		// Defaults to 7 days if zero; capped at 30 days.
+		RefreshTokenLifetime time.Duration `yaml:"refreshTokenLifetime"`
 	}
 
 	AuthProvider struct {
