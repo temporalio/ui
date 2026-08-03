@@ -52,7 +52,7 @@
     caption?: Snippet;
     headers?: Snippet<[{ visibleItems: T[] }]>;
     rows?: Snippet<[{ visibleItems: T[] }]>;
-    loading?: Snippet;
+    loadingContent?: Snippet;
     error?: Snippet;
     empty?: Snippet;
     actionsEndAdditional?: Snippet<[{ visibleItems: T[]; page: number }]>;
@@ -83,7 +83,7 @@
     caption,
     headers,
     rows,
-    loading,
+    loadingContent,
     error,
     empty,
     actionsEndAdditional,
@@ -116,6 +116,7 @@
   });
 
   async function initalDataFetch() {
+    clearError();
     const fetchData = await onFetch();
     try {
       const response = await fetchData($store.pageSize, '');
@@ -231,7 +232,7 @@
 
 {#snippet indexEmpty()}
   {#if $store.loading}
-    {#if loading}{@render loading()}{:else}<Loading />{/if}
+    {#if loadingContent}{@render loadingContent()}{:else}<Loading />{/if}
   {:else if fetchError}
     {#if error}
       {@render error()}

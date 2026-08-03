@@ -145,18 +145,19 @@
 
   {#snippet actionsCenter()}
     <div class="hidden items-center gap-2 md:flex">
-      {#each $store.pageShortcuts as page}
-        {#if isNaN(page)}
+      {#each $store.pageShortcuts as pageShortcut}
+        {#if isNaN(pageShortcut)}
           <span class="text-primary">...</span>
         {:else}
           <Button
             variant="ghost"
             size="sm"
-            class={page === $store.currentPage
+            class={pageShortcut === $store.currentPage
               ? 'bg-interactive-secondary-active'
               : ''}
-            aria-label={pageButtonLabel(page)}
-            onclick={() => handlePageChange(page)}>{page}</Button
+            aria-label={pageButtonLabel(pageShortcut)}
+            onclick={() => handlePageChange(pageShortcut)}
+            >{pageShortcut}</Button
           >
         {/if}
       {/each}
