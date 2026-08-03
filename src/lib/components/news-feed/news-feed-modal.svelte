@@ -54,69 +54,73 @@
   hideConfirm
   large
 >
-  <h3 slot="title" class="flex items-center gap-2">
-    <Icon name="temporal-logo" class="h-8 w-8" />{translate('common.news')}
-  </h3>
-  <div
-    slot="content"
-    class="flex max-h-[65vh] min-h-0 flex-col gap-5 overflow-y-auto pr-2"
-  >
-    {#if $newsFeed.error}
-      <div
-        class="surface-warning flex items-start gap-2 border border-warning p-3 text-sm"
-        role="alert"
-      >
-        <Icon name="warning" class="mt-0.5" />
-        <p>{$newsFeed.error}</p>
-      </div>
-    {/if}
+  {#snippet titleSnippet()}
+    <h3 class="flex items-center gap-2">
+      <Icon name="temporal-logo" class="h-8 w-8" />{translate('common.news')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex max-h-[65vh] min-h-0 flex-col gap-5 overflow-y-auto pr-2">
+      {#if $newsFeed.error}
+        <div
+          class="surface-warning flex items-start gap-2 border border-warning p-3 text-sm"
+          role="alert"
+        >
+          <Icon name="warning" class="mt-0.5" />
+          <p>{$newsFeed.error}</p>
+        </div>
+      {/if}
 
-    {#if $newsFeed.isLoading && !$newsFeed.items.length}
-      <div class="flex items-center gap-2 text-sm text-subtle">
-        <Icon name="spinner" class="animate-spin" />
-        {translate('common.news-feed-loading')}
-      </div>
-    {:else if $newsFeed.items.length}
-      {#each $newsFeed.items as item (item.id)}
-        <article class="min-h-fit border-b border-subtle py-2 last:border-b-0">
-          <h4>{item.title}</h4>
-          <Markdown
-            frameId="news-feed-{item.id}"
-            fill={false}
-            minHeight={0}
-            overrideTheme="primary"
-            {previewTheme}
-            content={item.content}
-          />
-        </article>
-      {/each}
-    {:else}
-      <p class="text-sm text-subtle">{translate('common.news-feed-empty')}</p>
-    {/if}
-  </div>
-
-  <div
-    slot="footer"
-    class="flex w-full flex-col gap-3 text-sm md:flex-row md:items-center md:justify-between"
-  >
-    <div class="flex items-center gap-3">
-      <Button
-        variant="ghost"
-        size="xs"
-        leadingIcon="retry"
-        loading={$newsFeed.isLoading}
-        onclick={() => newsFeed.refresh({ cache: 'reload' })}
-      >
-        {translate('common.refresh')}
-      </Button>
-      <span class="text-subtle">{lastFetchedLabel}</span>
+      {#if $newsFeed.isLoading && !$newsFeed.items.length}
+        <div class="flex items-center gap-2 text-sm text-subtle">
+          <Icon name="spinner" class="animate-spin" />
+          {translate('common.news-feed-loading')}
+        </div>
+      {:else if $newsFeed.items.length}
+        {#each $newsFeed.items as item (item.id)}
+          <article
+            class="min-h-fit border-b border-subtle py-2 last:border-b-0"
+          >
+            <h4>{item.title}</h4>
+            <Markdown
+              frameId="news-feed-{item.id}"
+              fill={false}
+              minHeight={0}
+              overrideTheme="primary"
+              {previewTheme}
+              content={item.content}
+            />
+          </article>
+        {/each}
+      {:else}
+        <p class="text-sm text-subtle">{translate('common.news-feed-empty')}</p>
+      {/if}
     </div>
+  {/snippet}
 
-    <Checkbox
-      id="news-feed-auto-fetch"
-      checked={$newsFeed.autoFetchEnabled}
-      label={translate('common.news-feed-auto-fetch')}
-      onChange={(event) => newsFeed.setAutoFetchEnabled(event.checked)}
-    />
-  </div>
+  {#snippet footer()}
+    <div
+      class="flex w-full flex-col gap-3 text-sm md:flex-row md:items-center md:justify-between"
+    >
+      <div class="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="xs"
+          leadingIcon="retry"
+          loading={$newsFeed.isLoading}
+          onclick={() => newsFeed.refresh({ cache: 'reload' })}
+        >
+          {translate('common.refresh')}
+        </Button>
+        <span class="text-subtle">{lastFetchedLabel}</span>
+      </div>
+
+      <Checkbox
+        id="news-feed-auto-fetch"
+        checked={$newsFeed.autoFetchEnabled}
+        label={translate('common.news-feed-auto-fetch')}
+        onChange={(event) => newsFeed.setAutoFetchEnabled(event.checked)}
+      />
+    </div>
+  {/snippet}
 </Modal>

@@ -105,29 +105,31 @@
         previousPageButtonLabel={translate('common.previous-page')}
         nextPageButtonLabel={translate('common.next-page')}
         pageButtonLabel={(page) => translate('common.go-to-page', { page })}
-        variant="primary"
         items={allowedCallerNamespaces ?? []}
-        let:visibleItems
         maxHeight="24rem"
       >
-        <caption class="sr-only" slot="caption"
-          >{translate('nexus.allowed-caller-namespaces')}</caption
-        >
-        <TableHeaderRow slot="headers">
-          <th class="w-full">{translate('common.name')}</th>
-        </TableHeaderRow>
-        {#each visibleItems as namespace (namespace)}
-          <TableRow>
-            <td>
-              <Link href={routeForNamespace({ namespace })}>{namespace}</Link>
-            </td>
-          </TableRow>
-        {:else}
-          <EmptyState
-            slot="empty"
-            title={translate('nexus.no-allowed-caller-namespaces')}
-          />
-        {/each}
+        {#snippet caption()}
+          <caption class="sr-only"
+            >{translate('nexus.allowed-caller-namespaces')}</caption
+          >
+        {/snippet}
+        {#snippet headers()}
+          <TableHeaderRow>
+            <th class="w-full">{translate('common.name')}</th>
+          </TableHeaderRow>
+        {/snippet}
+        {#snippet rows({ visibleItems })}
+          {#each visibleItems as namespace (namespace)}
+            <TableRow>
+              <td>
+                <Link href={routeForNamespace({ namespace })}>{namespace}</Link>
+              </td>
+            </TableRow>
+          {/each}
+        {/snippet}
+        {#snippet empty()}
+          <EmptyState title={translate('nexus.no-allowed-caller-namespaces')} />
+        {/snippet}
       </PaginatedTable>
     </div>
   </Card>

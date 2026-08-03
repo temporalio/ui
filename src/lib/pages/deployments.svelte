@@ -84,7 +84,6 @@
 {#key [namespace, $refresh]}
   <div class="flex flex-col gap-4">
     <PaginatedTable
-      let:visibleItems
       {onFetch}
       {onError}
       aria-label={translate('deployments.deployments')}
@@ -94,32 +93,37 @@
       emptyStateMessage={translate('deployments.empty-state-title')}
       errorMessage={translate('deployments.error-message-fetching')}
     >
-      <caption class="sr-only" slot="caption"
-        >{translate('deployments.deployments')}</caption
-      >
-      <tr slot="headers" class="text-left">
-        {#each columns as { label } (label)}
-          <th>{columnLabel(label)}</th>
+      {#snippet caption()}
+        <caption class="sr-only">{translate('deployments.deployments')}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <tr class="text-left">
+          {#each columns as { label } (label)}
+            <th>{columnLabel(label)}</th>
+          {/each}
+          <th>{translate('deployments.actions')}</th>
+        </tr>
+      {/snippet}
+      {#snippet rows({ visibleItems })}
+        {#each visibleItems as deployment}
+          <DeploymentTableRow
+            {deployment}
+            {columns}
+            {showConnectionStatus}
+            onChange={() => refresh.update((n) => n + 1)}
+          />
         {/each}
-        <th>{translate('deployments.actions')}</th>
-      </tr>
-      {#each visibleItems as deployment}
-        <DeploymentTableRow
-          {deployment}
-          {columns}
-          {showConnectionStatus}
-          onChange={() => refresh.update((n) => n + 1)}
-        />
-      {/each}
+      {/snippet}
 
-      <svelte:fragment slot="empty">
+      {#snippet empty()}
         <DeploymentsEmptyState
           {createHref}
           {error}
           {canCreateServerlessDeployment}
         />
-      </svelte:fragment>
-      <svelte:fragment slot="actions-end-additional">
+      {/snippet}
+      {#snippet actionsEndAdditional()}
         <Tooltip text="Configure Columns" top>
           <Button
             onclick={openCustomizationDrawer}
@@ -130,7 +134,7 @@
             <Icon name="settings" />
           </Button>
         </Tooltip>
-      </svelte:fragment>
+      {/snippet}
     </PaginatedTable>
   </div>
 {/key}

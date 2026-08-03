@@ -42,20 +42,24 @@
   cancelText={translate('common.cancel')}
   confirmType="destructive"
   confirmDisabled={deleteInput !== 'DELETE'}
-  on:confirmModal={() => onConfirm?.()}
-  on:cancelModal={() => onCancel?.()}
+  onConfirmModal={() => onConfirm?.()}
+  onCancelModal={() => onCancel?.()}
 >
-  <h3 slot="title">{title}</h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <p class="text-sm">{description}</p>
-    {#if entityName}
-      <p class="font-mono text-sm font-medium">{entityName}</p>
-    {/if}
-    <Input
-      id="{id}-confirm-input"
-      label={translate('deployments.delete-deployment-confirm-instruction')}
-      bind:value={deleteInput}
-      required
-    />
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{title}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      <p class="text-sm">{description}</p>
+      {#if entityName}
+        <p class="font-mono text-sm font-medium">{entityName}</p>
+      {/if}
+      <Input
+        id="{id}-confirm-input"
+        label={translate('deployments.delete-deployment-confirm-instruction')}
+        bind:value={deleteInput}
+        required
+      />
+    </div>
+  {/snippet}
 </Modal>

@@ -155,7 +155,6 @@
 >
   {#key [namespace, query, $schedulesRefresh]}
     <PaginatedTable
-      let:visibleItems
       {onFetch}
       {onError}
       total={$schedulesCount.count}
@@ -166,19 +165,23 @@
       emptyStateMessage={translate('schedules.empty-state-title')}
       errorMessage={translate('schedules.error-message-fetching')}
     >
-      <caption class="sr-only" slot="caption"
-        >{translate('common.schedules')}</caption
-      >
-      <tr slot="headers" class="text-left">
-        {#each columns as { label }, i (`${label}:${i}`)}
-          <th>{label}</th>
+      {#snippet caption()}
+        <caption class="sr-only">{translate('common.schedules')}</caption>
+      {/snippet}
+      {#snippet headers()}
+        <tr class="text-left">
+          {#each columns as { label }, i (`${label}:${i}`)}
+            <th>{label}</th>
+          {/each}
+        </tr>
+      {/snippet}
+      {#snippet rows({ visibleItems })}
+        {#each visibleItems as schedule}
+          <SchedulesTableRow {schedule} {columns} />
         {/each}
-      </tr>
-      {#each visibleItems as schedule}
-        <SchedulesTableRow {schedule} {columns} />
-      {/each}
+      {/snippet}
 
-      <svelte:fragment slot="empty">
+      {#snippet empty()}
         <div class="flex h-full flex-col items-center justify-center">
           {#if error}
             <EmptyState title={translate('schedules.empty-state-title')}>
@@ -206,8 +209,8 @@
             </EmptyState>
           {/if}
         </div>
-      </svelte:fragment>
-      <svelte:fragment slot="actions-end-additional">
+      {/snippet}
+      {#snippet actionsEndAdditional()}
         <Tooltip text={translate('common.configure-columns')} top>
           <Button
             onclick={openCustomizationDrawer}
@@ -219,7 +222,7 @@
             <Icon name="settings" />
           </Button>
         </Tooltip>
-      </svelte:fragment>
+      {/snippet}
     </PaginatedTable>
   {/key}
 </SavedQueryViews>
