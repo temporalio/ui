@@ -87,11 +87,39 @@
   </div>
 </Story>
 
-<Story name="Both enabled (cross-cloud)" asChild>
+<Story
+  name="Both enabled (cross-cloud)"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Public Preview')).toBeInTheDocument();
+    await expect(canvas.getByText('Pre-release')).toBeInTheDocument();
+  }}
+>
   <div class="max-w-[45rem] p-4">
     <ComputeProviderPicker
       provider="lambda"
       providers={[{ value: 'lambda' }, { value: 'cloud-run' }]}
+    />
+  </div>
+</Story>
+
+<Story
+  name="Release stage overridden by caller"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.queryByText('Public Preview')).not.toBeInTheDocument();
+    await expect(canvas.getByText('Pre-release')).toBeInTheDocument();
+  }}
+>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker
+      provider="lambda"
+      providers={[
+        { value: 'lambda', releaseStage: 'generally-available' },
+        { value: 'cloud-run', releaseStage: 'pre-release' },
+      ]}
     />
   </div>
 </Story>

@@ -7,18 +7,33 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let title = '';
-  export let content: string;
-  export let copyable = false;
-  export let filterable = false;
-  export let href: string | undefined = undefined;
-  export let icon: IconName | undefined = undefined;
-  export let tooltip: string = '';
-  export let badge: BadgeType | undefined = undefined;
+  interface Props {
+    title?: string;
+    content: string;
+    copyable?: boolean;
+    filterable?: boolean;
+    href?: string;
+    icon?: IconName;
+    tooltip?: string;
+    badge?: BadgeType;
+    class?: string;
+  }
+
+  let {
+    title = '',
+    content,
+    copyable = false,
+    filterable = false,
+    href,
+    icon,
+    tooltip = '',
+    badge,
+    class: className = '',
+  }: Props = $props();
 </script>
 
 <p
-  class="flex items-center justify-between gap-16 truncate whitespace-nowrap {$$restProps.class}"
+  class="flex items-center justify-between gap-16 truncate whitespace-nowrap {className}"
 >
   {#if title}
     {title}

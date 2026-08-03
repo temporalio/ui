@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import { goto } from '$app/navigation';
 
   import Button from '$lib/holocene/button.svelte';
@@ -6,19 +8,32 @@
   import { translate } from '$lib/i18n/translate';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
 
-  export let namespace: string;
-  export let workflowId: string;
-  export let runId: string;
-  export let taskQueue: string | undefined;
-  export let workflowType: string;
+  type Props = ComponentProps<typeof Button> & {
+    namespace: string;
+    workflowId: string;
+    runId: string;
+    taskQueue: string | undefined;
+    workflowType: string;
+  };
 
-  $: href = routeForWorkflowStart({
+  let {
     namespace,
     workflowId,
     runId,
     taskQueue,
     workflowType,
-  });
+    ...rest
+  }: Props = $props();
+
+  const href = $derived(
+    routeForWorkflowStart({
+      namespace,
+      workflowId,
+      runId,
+      taskQueue,
+      workflowType,
+    }),
+  );
 </script>
 
 <Tooltip
@@ -33,6 +48,6 @@
     leadingIcon="lightning-bolt"
     aria-label={translate('workflows.start-workflow-like-this-one')}
     onclick={() => goto(href)}
-    {...$$restProps}
+    {...rest}
   ></Button>
 </Tooltip>

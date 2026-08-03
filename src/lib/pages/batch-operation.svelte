@@ -20,10 +20,8 @@
   let fetchKey = $state(0);
   let timeout: number;
 
-  const handleToggleAutoRefresh = (
-    event: CustomEvent<{ checked: boolean }>,
-  ) => {
-    if (event.detail.checked) {
+  const handleToggleAutoRefresh = (checked: boolean) => {
+    if (checked) {
       fetchKey += 1;
     } else if (timeout) {
       window.clearTimeout(timeout);
@@ -53,7 +51,7 @@
       <BatchOperationSkeleton />
     {:then operation}
       <BatchOperationHeader
-        on:toggleAutoRefresh={handleToggleAutoRefresh}
+        onToggleAutoRefresh={handleToggleAutoRefresh}
         {operation}
       />
       <Card>

@@ -16,6 +16,7 @@
   interface Props {
     namespace: string;
     deploymentName: string;
+    hasComputeConfig: boolean;
     showInstancesLink?: boolean;
     onDeleteClick: () => void;
     onRampToUnversioned: () => void;
@@ -24,6 +25,7 @@
   let {
     namespace,
     deploymentName,
+    hasComputeConfig,
     showInstancesLink = true,
     onDeleteClick,
     onRampToUnversioned,
@@ -60,14 +62,16 @@
   <div class="flex w-full items-center justify-between">
     <h1>{deploymentName}</h1>
     <div class="flex items-center gap-4">
-      <Button
-        href={routeForWorkerDeploymentVersionCreate({
-          namespace,
-          deployment: deploymentName,
-        })}
-      >
-        {translate('deployments.create-new-version')}
-      </Button>
+      {#if hasComputeConfig}
+        <Button
+          href={routeForWorkerDeploymentVersionCreate({
+            namespace,
+            deployment: deploymentName,
+          })}
+        >
+          {translate('deployments.create-new-version')}
+        </Button>
+      {/if}
       <MenuContainer>
         <MenuButton
           controls="deployment-header-actions"
@@ -80,9 +84,11 @@
           <MenuItem href={workflowHref}>
             {translate('deployments.view-workflows')}
           </MenuItem>
-          <MenuItem onclick={onRampToUnversioned}>
-            {translate('deployments.ramp-to-unversioned')}
-          </MenuItem>
+          {#if hasComputeConfig}
+            <MenuItem onclick={onRampToUnversioned}>
+              {translate('deployments.ramp-to-unversioned')}
+            </MenuItem>
+          {/if}
           <MenuItem onclick={onDeleteClick} destructive>
             {translate('deployments.delete-deployment')}
           </MenuItem>
