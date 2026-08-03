@@ -18,6 +18,7 @@
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import type { WorkerDeploymentResponse } from '$lib/types/deployments';
+  import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
@@ -129,6 +130,7 @@
     <Error error={refreshError.error} />
   {/if}
   {@const info = deployment.workerDeploymentInfo}
+  {@const hasComputeConfig = deploymentHasComputeConfig(info)}
   {@const unversionedRampingPercentage =
     !info.routingConfig?.rampingDeploymentVersion &&
     info.routingConfig?.rampingVersionPercentage != null
@@ -138,6 +140,7 @@
   <DeploymentHeader
     {namespace}
     {deploymentName}
+    {hasComputeConfig}
     {showInstancesLink}
     onDeleteClick={() => (showDeleteModal = true)}
     onRampToUnversioned={() => {
