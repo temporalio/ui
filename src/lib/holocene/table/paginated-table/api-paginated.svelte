@@ -15,7 +15,6 @@
   import Alert from '$lib/holocene/alert.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import {
     createPaginationStore,
@@ -52,7 +51,6 @@
     caption?: Snippet;
     headers?: Snippet<[{ visibleItems: T[] }]>;
     rows?: Snippet<[{ visibleItems: T[] }]>;
-    loadingContent?: Snippet;
     error?: Snippet;
     empty?: Snippet;
     actionsEndAdditional?: Snippet<[{ visibleItems: T[]; page: number }]>;
@@ -83,7 +81,6 @@
     caption,
     headers,
     rows,
-    loadingContent,
     error,
     empty,
     actionsEndAdditional,
@@ -231,9 +228,7 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#snippet indexEmpty()}
-  {#if $store.loading}
-    {#if loadingContent}{@render loadingContent()}{:else}<Loading />{/if}
-  {:else if fetchError}
+  {#if fetchError}
     {#if error}
       {@render error()}
     {:else}
