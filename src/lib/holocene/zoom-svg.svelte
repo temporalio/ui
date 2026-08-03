@@ -9,8 +9,6 @@
     initialZoom?: number;
     maxZoomIn?: number;
     maxZoomOut?: number;
-    width?: number;
-    height?: number;
     zoomable?: boolean;
     pannable?: boolean;
     class?: string;
@@ -23,14 +21,15 @@
     initialZoom = 1,
     maxZoomIn = 0.25,
     maxZoomOut = 2.5,
-    width = $bindable(600),
-    height = $bindable(400),
     zoomable = true,
     pannable = true,
     class: className = '',
     controls,
     graph,
   }: Props = $props();
+
+  let width = $state(600);
+  let height = $state(400);
 
   // svelte-ignore state_referenced_locally
   let zoomLevel = $state(initialZoom);
