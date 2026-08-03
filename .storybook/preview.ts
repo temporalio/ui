@@ -33,7 +33,7 @@ const preview: Preview = {
   ],
   parameters: {
     backgrounds: {
-      disabled: true,
+      disable: true,
     },
     controls: {
       exclude: /^id|name|class|data-\w+|on\w+/,
