@@ -22,15 +22,18 @@ export const fetchPaginatedWorkers = async (
   request = fetch,
 ): Promise<PaginatedWorkerListPromise> => {
   return (pageSize = 100, token = '') => {
-    const route = routeForApi('workers', parameters);
+    const route = routeForApi('workers', {
+      namespace: parameters.namespace ?? '',
+    });
     return requestFromAPI<ListWorkersResponse>(route, {
       request,
       params: {
-        maximumPageSize: String(pageSize),
+        pageSize: String(pageSize),
         nextPageToken: token,
         ...(parameters.query && { query: parameters.query }),
       },
-    }).then(({ workersInfo, workers, nextPageToken }) => {
+    }).then((response) => {
+      const { workersInfo, workers, nextPageToken } = response ?? {};
       return {
         items:
           workers ??
@@ -48,8 +51,13 @@ export async function describeWorker(
   parameters: DescribeWorkerRequest,
   request = fetch,
 ): Promise<DescribeWorkerResponse> {
-  const route = routeForApi('worker', parameters);
-  return await requestFromAPI<DescribeWorkerResponse>(route, {
-    request,
+  const route = routeForApi('worker', {
+    namespace: parameters.namespace ?? '',
+    workerInstanceKey: parameters.workerInstanceKey ?? '',
   });
+  return (
+    (await requestFromAPI<DescribeWorkerResponse>(route, {
+      request,
+    })) ?? {}
+  );
 }

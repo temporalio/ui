@@ -3,11 +3,11 @@ import { writable, type Writable } from 'svelte/store';
 import type { FetchEventsParameters } from '$lib/services/events-service';
 
 const emptyPrevious: FetchEventsParameters = {
-  namespace: null,
-  workflowId: null,
-  runId: null,
-  rawPayloads: null,
-  sort: null,
+  namespace: '',
+  workflowId: '',
+  runId: '',
+  rawPayloads: undefined,
+  sort: undefined,
 };
 
 export const previous: Writable<FetchEventsParameters> =

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import debounce from 'just-debounce';
+  import { debounce } from 'es-toolkit';
   import { createEventDispatcher } from 'svelte';
 
   import { page } from '$app/stores';
@@ -23,10 +23,20 @@
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
-  $: parameters = toListWorkflowParameters(query ?? defaultQuery);
+  $: parameters = normalizeParameters(query ?? defaultQuery);
 
-  const statuses = {
-    All: null,
+  const normalizeParameters = (rawQuery: string) => {
+    const parsed = toListWorkflowParameters(rawQuery);
+    return {
+      ...parsed,
+      workflowId: parsed.workflowId ?? '',
+      workflowType: parsed.workflowType ?? '',
+      executionStatus: parsed.executionStatus ?? undefined,
+    };
+  };
+
+  const statuses: Record<string, string | undefined> = {
+    All: undefined,
     Running: 'Running',
     'Timed Out': 'TimedOut',
     Completed: 'Completed',
@@ -45,7 +55,7 @@
     dispatch('search');
     const data = new FormData(event.target as HTMLFormElement);
     query = String(data.get('query'));
-    parameters = toListWorkflowParameters(query);
+    parameters = normalizeParameters(query);
 
     updateQueryParameters({
       url: $page.url,
@@ -72,14 +82,14 @@
     {#if searchType === 'advanced'}
       <Link
         href="{$page.url.pathname}?search=basic"
-        on:click={updateSearchType('basic')}
+        onclick={updateSearchType('basic')}
       >
         {translate('workflows.basic-search')}
       </Link>
     {:else}
       <Link
         href="{$page.url.pathname}?search=advanced"
-        on:click={updateSearchType('advanced')}
+        onclick={updateSearchType('advanced')}
       >
         {translate('workflows.advanced-search')}
       </Link>
@@ -91,8 +101,8 @@
       icon
       id="advanced-search"
       placeholder={translate('common.query')}
-      value={query}
-      on:submit={updateQuery}
+      value={query ?? undefined}
+      onsubmit={updateQuery}
     />
   {:else}
     <div
@@ -107,7 +117,7 @@
         label={translate('common.workflow-id')}
         labelHidden
         bind:value={parameters.workflowId}
-        on:input={handleParameterChange}
+        oninput={handleParameterChange}
       />
       <Input
         icon="search"
@@ -117,7 +127,7 @@
         label={translate('common.workflow-type')}
         labelHidden
         bind:value={parameters.workflowType}
-        on:input={handleParameterChange}
+        oninput={handleParameterChange}
       />
       <Select
         id="time-range-filter"
@@ -125,7 +135,7 @@
         bind:value={parameters.timeRange}
         onchange={handleParameterChange}
       >
-        <Option value={null}>All</Option>
+        <Option value={undefined}>All</Option>
         {#if parameters.timeRange && !durations.includes(parameters.timeRange)}
           <Option value={parameters.timeRange}>{parameters.timeRange}</Option>
         {/if}

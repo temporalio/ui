@@ -45,6 +45,7 @@
     variant="ghost"
     class="start-button"
     leadingIcon="lightning-bolt"
-    on:click={() => goto(href)}
+    aria-label={translate('standalone-activities.start-activity-like-this-one')}
+    onclick={() => goto(href)}
   ></Button>
 </Tooltip>

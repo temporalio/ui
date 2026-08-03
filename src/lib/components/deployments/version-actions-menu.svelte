@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -12,7 +11,11 @@
     editHref: string;
     workflowHref: string;
     isCurrent: boolean;
+    hasComputeConfig: boolean;
+    isRamping: boolean;
     onSetCurrent: () => void;
+    onSetRamping: () => void;
+    onUnsetCurrent: () => void;
     onValidate: () => void;
     onDelete: () => void;
   }
@@ -22,7 +25,11 @@
     editHref,
     workflowHref,
     isCurrent,
+    hasComputeConfig,
+    isRamping,
     onSetCurrent,
+    onSetRamping,
+    onUnsetCurrent,
     onValidate,
     onDelete,
   }: Props = $props();
@@ -40,27 +47,34 @@
       <Icon name="vertical-ellipsis" class="h-4 w-4" />
     </MenuButton>
     <Menu id="version-actions-{buildId}" position="right" usePortal>
-      <CapabilityGuard capability="serverScaledDeployments">
-        <MenuItem href={editHref}>
-          {translate('deployments.edit')}
-        </MenuItem>
-      </CapabilityGuard>
-      <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-        {translate('deployments.set-as-current')}
+      <MenuItem href={editHref}>
+        {translate('deployments.edit')}
       </MenuItem>
-      <CapabilityGuard capability="serverScaledDeployments">
+      {#if hasComputeConfig}
+        {#if isCurrent}
+          <MenuItem onclick={onUnsetCurrent}>
+            {translate('deployments.unset-current')}
+          </MenuItem>
+        {:else}
+          <MenuItem onclick={onSetCurrent}>
+            {translate('deployments.set-as-current')}
+          </MenuItem>
+        {/if}
+        <MenuItem onclick={onSetRamping} disabled={isCurrent}>
+          {isRamping
+            ? translate('deployments.edit-ramping-percentage')
+            : translate('deployments.set-ramping-version')}
+        </MenuItem>
         <MenuItem onclick={onValidate}>
           {translate('deployments.validate-connection')}
         </MenuItem>
-      </CapabilityGuard>
+      {/if}
       <MenuItem href={workflowHref}>
         {translate('deployments.view-workflows')}
       </MenuItem>
-      <CapabilityGuard capability="serverScaledDeployments">
-        <MenuItem onclick={onDelete} destructive>
-          {translate('common.delete')}
-        </MenuItem>
-      </CapabilityGuard>
+      <MenuItem onclick={onDelete} destructive>
+        {translate('common.delete')}
+      </MenuItem>
     </Menu>
   </MenuContainer>
 </td>

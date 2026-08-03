@@ -74,7 +74,8 @@ export interface NetworkError {
 export type Settings = {
   auth: {
     enabled: boolean;
-    options: string[];
+    options: string[] | null;
+    redirectToProvider: boolean;
   };
   baseUrl: string;
   codec: {
@@ -100,7 +101,9 @@ export type Settings = {
   batchActionsDisabled: boolean;
   activityCommandsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
+  navCollapsedByDefault: boolean;
   feedbackURL: string;
+  disableNewsFetch: boolean;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;

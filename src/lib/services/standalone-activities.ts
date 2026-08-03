@@ -1,12 +1,26 @@
 import type { StandaloneActivityFormData } from '$lib/components/standalone-activities/start-standalone-activity-form/types';
+import {
+  type DefaultUnits,
+  getFirstWholeNumberUnit,
+  HOURS,
+  MILLISECONDS,
+  MINUTES,
+  SECONDS,
+  type Units,
+} from '$lib/holocene/duration-input/duration-input.svelte';
 import { translate } from '$lib/i18n/translate';
+import {
+  isPayloadInputEncodingType,
+  type PayloadInputEncoding,
+} from '$lib/models/payload-encoding';
 import { activityError } from '$lib/stores/activities';
-import type { Payload, SearchAttribute } from '$lib/types';
+import type { ActivityOptions, Payload, SearchAttribute } from '$lib/types';
 import type {
   ActivityExecution,
   ActivityExecutionInfo,
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
+import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
@@ -15,11 +29,42 @@ import {
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
+import { ACTIVITY_OPTIONS_UPDATE_MASK } from './workflow-activities-service';
 import { setSearchAttributes } from './workflow-service';
+
+// Timeout duration inputs on the activity forms; largest-first so
+// getFirstWholeNumberUnit resolves to the coarsest whole unit, defaulting to
+// seconds when there is no value.
+export const TIMEOUT_UNITS: Units<DefaultUnits> = [
+  HOURS,
+  MINUTES,
+  SECONDS,
+  MILLISECONDS,
+];
+
+export const initialTimeoutUnit = (duration: string): DefaultUnits =>
+  getFirstWholeNumberUnit(duration, TIMEOUT_UNITS, SECONDS.label) ??
+  SECONDS.label;
 
 export type ListActivitiesResponse = {
   executions: ActivityExecutionInfo[];
   nextPageToken: string;
+};
+
+const emptyActivityExecutionInfo: ActivityExecutionInfo = {
+  status: 'ACTIVITY_EXECUTION_STATUS_UNSPECIFIED',
+  scheduleToCloseTimeout: '',
+  scheduleToStartTimeout: '',
+  startToCloseTimeout: '',
+  heartbeatTimeout: '',
+  stateTransitionCount: '',
+  currentRetryInterval: '',
+  searchAttributes: {},
+};
+
+const emptyActivityExecution: ActivityExecution = {
+  runId: '',
+  info: emptyActivityExecutionInfo,
 };
 
 export interface StartStandaloneActivityResponse {
@@ -57,7 +102,6 @@ export const fetchPaginatedActivities = async (
       },
       request,
       onError,
-      handleError: onError,
     }).then((response) => {
       const { executions = [], nextPageToken = '' } = response || {};
       return {
@@ -68,13 +112,13 @@ export const fetchPaginatedActivities = async (
   };
 };
 
-const toStartActivityExecutionRequest = async (
+export const toStartActivityExecutionRequest = async (
   activityFormData: StandaloneActivityFormData,
 ): Promise<StartActivityExecutionRequest> => {
   let inputPayloads: Payload[] | null = null;
   let summaryPayload: Payload | null = null;
   let detailsPayload: Payload | null = null;
-  let searchAttributes: SearchAttribute | null = null;
+  let searchAttributes: SearchAttribute | undefined = undefined;
 
   if (activityFormData.input) {
     const { input, encoding, messageType } = activityFormData;
@@ -127,7 +171,7 @@ const toStartActivityExecutionRequest = async (
     };
   }
 
-  return {
+  const request = {
     identity: activityFormData.identity,
     namespace: activityFormData.namespace,
     activityId: activityFormData.activityId,
@@ -149,6 +193,9 @@ const toStartActivityExecutionRequest = async (
     ...(activityFormData.scheduleToStartTimeout && {
       scheduleToStartTimeout: activityFormData.scheduleToStartTimeout,
     }),
+    ...(activityFormData.startDelay && {
+      startDelay: activityFormData.startDelay,
+    }),
     retryPolicy: {
       ...(activityFormData.initialInterval && {
         initialInterval: activityFormData.initialInterval,
@@ -156,14 +203,16 @@ const toStartActivityExecutionRequest = async (
       ...(activityFormData.maximumInterval && {
         maximumInterval: activityFormData.maximumInterval,
       }),
-      ...(activityFormData.maximumAttempts && {
+      ...(activityFormData.maximumAttempts.trim() && {
         maximumAttempts: Number(activityFormData.maximumAttempts),
       }),
-      ...(activityFormData.backoffCoefficient && {
+      ...(activityFormData.backoffCoefficient.trim() && {
         backoffCoefficient: Number(activityFormData.backoffCoefficient),
       }),
     },
-  };
+  } as StartActivityExecutionRequest;
+
+  return request;
 };
 
 export const startStandaloneActivity = async (
@@ -179,12 +228,100 @@ export const startStandaloneActivity = async (
   const startActivityExecutionRequest =
     await toStartActivityExecutionRequest(activity);
 
-  return requestFromAPI(route, {
+  return requestFromAPI<StartStandaloneActivityResponse>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt(startActivityExecutionRequest),
     },
-  });
+  }).then((response) => response ?? { runId: '', started: false });
+};
+
+interface ActivityInputValues {
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
+}
+
+const extractInputValues = async (
+  payloads: Payload[] | null | undefined,
+): Promise<ActivityInputValues> => {
+  const defaults: ActivityInputValues = {
+    input: '',
+    encoding: 'json/plain',
+    messageType: '',
+  };
+
+  const payload = payloads?.[0];
+  if (!payload) return defaults;
+
+  const decoded = await decodePayloadAndParseDataToJSON(payload, false);
+  if (!decoded) return defaults;
+
+  const encodingValue = decoded.metadata?.encoding;
+  return {
+    input: decoded.data ? stringifyWithBigInt(decoded.data) : '',
+    encoding:
+      encodingValue && isPayloadInputEncodingType(encodingValue)
+        ? encodingValue
+        : 'json/plain',
+    messageType: decoded.metadata?.messageType ?? '',
+  };
+};
+
+const extractMetadataString = async (
+  payload: Payload | null | undefined,
+): Promise<string> => {
+  if (!payload) return '';
+  const decoded = await decodePayloadAndParseDataToJSON(payload);
+  return typeof decoded === 'string' ? decoded : '';
+};
+
+export interface ActivityInitialValues {
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
+  summary: string;
+  details: string;
+  searchAttributes: Record<string, string | Payload> | undefined;
+}
+
+export const fetchInitialValuesForStartActivity = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+): Promise<ActivityInitialValues> => {
+  const emptyValues: ActivityInitialValues = {
+    input: '',
+    encoding: 'json/plain',
+    messageType: '',
+    summary: '',
+    details: '',
+    searchAttributes: undefined,
+  };
+
+  try {
+    const activity = await getActivityExecution(namespace, activityId, runId);
+    const { input, encoding, messageType } = await extractInputValues(
+      activity.input?.payloads,
+    );
+    const summary = await extractMetadataString(
+      activity.info.userMetadata?.summary,
+    );
+    const details = await extractMetadataString(
+      activity.info.userMetadata?.details,
+    );
+
+    return {
+      input,
+      encoding,
+      messageType,
+      summary,
+      details,
+      searchAttributes: activity.info.searchAttributes?.indexedFields,
+    };
+  } catch {
+    return emptyValues;
+  }
 };
 
 export const getActivityExecutions = (namespace: string) => {
@@ -206,12 +343,14 @@ export const getActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'true',
     includeOutcome: 'true',
+    includeHeartbeatDetails: 'true',
+    includeLastFailure: 'true',
     runId,
   });
 
-  return requestFromAPI(route, {
+  return requestFromAPI<ActivityExecution>(route, {
     params,
-  });
+  }).then((response) => response ?? emptyActivityExecution);
 };
 
 export const pollActivityExecution = (
@@ -220,7 +359,7 @@ export const pollActivityExecution = (
   runId: string,
   token: string,
   signal: AbortSignal,
-): Promise<ActivityExecution> => {
+): Promise<ActivityExecution | undefined> => {
   const route = routeForApi('standalone-activity', {
     namespace,
     activityId,
@@ -229,11 +368,13 @@ export const pollActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'false',
     includeOutcome: 'true',
+    includeHeartbeatDetails: 'true',
+    includeLastFailure: 'true',
     runId,
     longPollToken: token,
   });
 
-  return requestFromAPI(route, {
+  return requestFromAPI<ActivityExecution>(route, {
     params,
     notifyOnError: false,
     options: { signal },
@@ -287,6 +428,114 @@ export const terminateActivityExecution = async (
       body: stringifyWithBigInt({
         runId,
         reason: reason || '',
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const pauseActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  reason?: string,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.pause', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        requestId: crypto.randomUUID(),
+        ...(reason && { reason }),
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const unpauseActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.unpause', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const resetActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  resetHeartbeat: boolean,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.reset', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        resetHeartbeat,
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const updateActivityExecutionOptions = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  activityOptions: ActivityOptions,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.update-options', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        activityOptions,
+        updateMask: ACTIVITY_OPTIONS_UPDATE_MASK,
         ...(identity && { identity }),
       }),
     },

@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { HTMLButtonAttributes } from 'svelte/elements';
+  import type {
+    HTMLButtonAttributes,
+    MouseEventHandler,
+  } from 'svelte/elements';
 
   import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -7,13 +10,11 @@
   import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { isNull } from '$lib/utilities/is';
 
   import { PILLS, type PillsContext } from './pill-container.svelte';
 
   type Props = HTMLButtonAttributes & {
     id: string;
-    onClick?: () => void;
     disabled?: boolean;
     loading?: boolean;
     active?: boolean;
@@ -25,37 +26,43 @@
 
   const {
     id,
-    onClick = () => {},
+    onclick,
     disabled = false,
     loading = false,
-    active = null,
-    icon = null,
-    count = null,
+    active = undefined,
+    icon = undefined,
+    count = undefined,
     class: className = '',
     children,
+    ...buttonProps
   }: Props = $props();
 
   const { activePill, registerPill, selectPill } =
     getContext<PillsContext>(PILLS);
 
+  // svelte-ignore state_referenced_locally
   registerPill(id, disabled);
 
-  let isActive = $derived(isNull(active) ? $activePill === id : active);
+  let isActive = $derived(active == null ? $activePill === id : active);
 
-  const handleClick = () => {
-    if (disabled) return;
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+    if (disabled) {
+      return;
+    }
+
     selectPill(id);
-    onClick && onClick();
+    onclick?.(e);
   };
 </script>
 
 <button
+  {...buttonProps}
   onclick={(e) => {
     e.stopPropagation();
-    handleClick();
+    handleClick(e);
   }}
   class={merge(
-    'surface-subtle flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',
+    'flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
     isActive && 'bg-interactive text-white',
     className,
@@ -68,7 +75,7 @@
     </span>
   {/if}
   {@render children?.()}
-  {#if !isNull(count)}
+  {#if count != null}
     <Badge type="count">{count}</Badge>
   {/if}
 </button>

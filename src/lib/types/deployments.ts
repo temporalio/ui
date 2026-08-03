@@ -56,6 +56,15 @@ export interface VersionSummaryOld {
   drainageStatus: string;
 }
 
+export interface ProviderValidation {
+  errorMessage?: string;
+  lastCheckTime?: Timestamp;
+}
+
+export interface ComputeStatus {
+  providerValidation?: ProviderValidation;
+}
+
 export interface VersionSummaryNew {
   version: string;
   status?: string;
@@ -72,6 +81,7 @@ export interface VersionSummaryNew {
   firstActivationTime?: Timestamp;
   lastDeactivationTime?: Timestamp;
   computeConfig?: ComputeConfig;
+  computeStatus?: ComputeStatus;
 }
 
 export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {

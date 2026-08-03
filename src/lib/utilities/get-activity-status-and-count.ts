@@ -1,4 +1,3 @@
-import type { Payload } from '$lib/types';
 import type { ActivityExecutionStatus } from '$lib/types/activity-execution';
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
 import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';

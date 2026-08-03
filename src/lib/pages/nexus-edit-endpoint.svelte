@@ -64,7 +64,7 @@
           variant="destructive"
           disabled={submitting}
           class="max-sm:w-full"
-          on:click={() => (deleteConfirmationModalOpen = true)}
+          onclick={() => (deleteConfirmationModalOpen = true)}
           data-testid="delete-endpoint-button"
         >
           {translate('common.delete')}

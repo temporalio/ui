@@ -1,8 +1,9 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import type { Meta, StoryContext } from '@storybook/svelte';
   import { expect, userEvent, within } from '@storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import ToggleButton from './toggle-button.svelte';
   import ToggleButtons from './toggle-buttons.svelte';
@@ -17,7 +18,7 @@
       href: { table: { disable: true } },
       active: { table: { disable: true } },
     },
-  } satisfies Meta<ToggleButton>;
+  } satisfies Meta<ComponentProps<typeof ToggleButton>>;
 </script>
 
 <script lang="ts">
@@ -32,7 +33,13 @@
     action('select')(index);
   };
 
-  const play: Story['play'] = async ({ canvasElement, step }) => {
+  const play = async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: StoryContext['step'];
+  }) => {
     const canvas = within(canvasElement);
     selected.set(0);
     const first = await canvas.findByTestId('toggle-button-0');
@@ -65,7 +72,7 @@
         {...args}
         data-testid={`toggle-button-${index}`}
         active={$selected === index}
-        on:click={() => select(index)}
+        onclick={() => select(index)}
       >
         {name}
       </ToggleButton>

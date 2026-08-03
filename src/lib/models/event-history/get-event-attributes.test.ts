@@ -77,8 +77,6 @@ const historyEvent = {
   },
 } as unknown as HistoryEvent;
 
-const namespace = 'unit-tests';
-
 describe('getEventAttributes', () => {
   beforeEach(() => {
     vi.mock('$lib/utilities/decode-payload', () => {
@@ -154,7 +152,7 @@ describe('toEventHistory', () => {
 
       const [event] = events;
 
-      expect(event[property]).toBeDefined();
+      expect(event[property as keyof typeof event]).toBeDefined();
     });
   }
 });

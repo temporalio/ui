@@ -18,7 +18,9 @@
   let { events = [], decode }: Props = $props();
 
   let index = $state(1);
-  let rawEvent = $derived(fromEventToRawEvent(events[index - 1]));
+  let rawEvent = $derived(
+    events[index - 1] ? fromEventToRawEvent(events[index - 1]) : {},
+  );
 
   function handleKeydown(event: KeyboardEvent) {
     switch (event.code) {
@@ -92,11 +94,16 @@
 </div>
 <div class="min-h-screen py-4">
   {#if $decodeEventHistory && events.length > 0}
-    <PayloadCodeBlock value={rawEvent} testId="event-history-json" />
+    <PayloadCodeBlock
+      value={rawEvent}
+      label={translate('common.json')}
+      testId="event-history-json"
+    />
   {:else}
     {#key index}
       <CodeBlock
         content={stringifyWithBigInt(rawEvent, undefined, 2)}
+        label={translate('common.json')}
         testId="event-history-json"
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}

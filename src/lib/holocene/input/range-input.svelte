@@ -2,40 +2,65 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   import Label from '$lib/holocene/label.svelte';
-  import { omit } from '$lib/utilities/omit';
 
-  interface $$Props extends HTMLInputAttributes {
-    value: number;
+  interface Props extends HTMLInputAttributes {
+    value?: number;
     id: string;
     label: string;
     labelHidden?: boolean;
-    min?: number;
-    max?: number;
+    min: number;
+    max: number;
     step?: number;
+    class?: string;
     'data-testid'?: string;
   }
 
-  export let label: string;
-  export let labelHidden = false;
-  export let min: number = undefined;
-  export let max: number = undefined;
-  export let step: number = undefined;
-  export let id: string = undefined;
-  export let value: number = Math.round((min + max) / 2);
-  let valid = true;
-  let outputElement: HTMLOutputElement;
+  let {
+    label,
+    labelHidden = false,
+    min,
+    max,
+    step,
+    id,
+    value = $bindable(Math.round((min + max) / 2)),
+    class: className = '',
+    oninput,
+    ...rest
+  }: Props = $props();
 
-  $: outputXPos = getOutputXPos({ value, min, max });
-  $: outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
-  $: {
-    if (value) {
-      outputXPos = getOutputXPos({ value, min, max });
-      outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
-    } else {
-      outputXPos = 0;
-      outputXPosOffset = 0;
-    }
-  }
+  let valid = $state(true);
+  let outputElement = $state<HTMLOutputElement>();
+
+  const getOutputXPos = ({
+    value,
+    min,
+    max,
+  }: {
+    value: number;
+    min: number;
+    max: number;
+  }) => {
+    // calculates the value as a percentage to position the output text
+    return ((value - min) * 100) / (max - min);
+  };
+
+  const getOutputXPosOffset = ({
+    outputElement,
+    outputXPos,
+  }: {
+    outputElement: HTMLOutputElement | undefined;
+    outputXPos: number;
+  }) => {
+    // as the output text moves to the right with the slider thumb, it needs to shift left slightly
+    // such that it doesn't overflow the width of the slider track.
+    const offset = outputElement?.clientWidth ?? 15;
+    return Math.floor((outputXPos * offset) / 100);
+  };
+
+  const outputXPos = $derived(value ? getOutputXPos({ value, min, max }) : 0);
+  let outputXPosOffset = $derived(
+    value ? getOutputXPosOffset({ outputElement, outputXPos }) : 0,
+  );
 
   const handleInput = (
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
@@ -49,26 +74,20 @@
       event.currentTarget.valueAsNumber <= max;
   };
 
-  const getOutputXPos = ({ value, min, max }) => {
-    // calculates the value as a percentage to position the output text
-    return ((value - min) * 100) / (max - min);
-  };
-
-  const getOutputXPosOffset = ({ outputElement, outputXPos }) => {
-    // as the output text moves to the right with the slider thumb, it needs to shift left slightly
-    // such that it doesn't overflow the width of the slider track.
-    const offset = outputElement?.clientWidth ?? 15;
-    return Math.floor((outputXPos * offset) / 100);
+  const handleRangeInput = (
+    event: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ) => {
+    handleInput(event);
+    oninput?.(event);
   };
 
   const handleWindowResize = () => {
-    outputXPos = getOutputXPos({ value, min, max });
     outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
   };
 </script>
 
-<svelte:window on:resize={handleWindowResize} />
-<div class="w-full px-1 py-4 {$$props.class}">
+<svelte:window onresize={handleWindowResize} />
+<div class="w-full px-1 py-4 {className}">
   <div class="range-input-container">
     <div class="relative w-auto grow">
       <span class="absolute -bottom-6 left-0 text-xs font-normal">
@@ -88,11 +107,11 @@
           type="range"
           class="h-0 w-full cursor-pointer appearance-none rounded border-y border-primary"
           bind:value
-          on:input={handleInput}
           {min}
           {max}
           {step}
-          {...omit($$restProps, 'class')}
+          {...rest}
+          oninput={handleRangeInput}
         />
         <Label hidden {label} for="{id}-range" />
       </div>
@@ -108,10 +127,10 @@
         type="number"
         inputmode="numeric"
         bind:value
-        on:input={handleInput}
+        oninput={handleInput}
         {min}
         {max}
-        step={$$props.step}
+        {step}
       />
     </div>
     <Label hidden={labelHidden} class="shrink" {label} for={id} />

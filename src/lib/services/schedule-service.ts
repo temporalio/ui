@@ -1,11 +1,10 @@
 import { translate } from '$lib/i18n/translate';
+import type { ListScheduleResponse, ScheduleListEntry } from '$lib/types';
 import type {
-  CreateScheduleRequest,
-  ListScheduleResponse,
-  ScheduleListEntry,
-  UpdateScheduleRequest,
-} from '$lib/types';
-import type { DescribeFullSchedule, OverlapPolicy } from '$lib/types/schedule';
+  DescribeFullSchedule,
+  OverlapPolicy,
+  ScheduleRequestBody,
+} from '$lib/types/schedule';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -45,9 +44,10 @@ export const fetchPaginatedSchedules = async (
       },
       request,
       onError,
-    }).then(({ schedules, nextPageToken }) => {
+    }).then((response) => {
+      const { schedules, nextPageToken } = response ?? {};
       return {
-        items: schedules,
+        items: schedules ?? [],
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });
@@ -72,10 +72,10 @@ export const fetchAllSchedules = async (
       params: {},
       onError,
       request,
-    })) ?? { schedules: [], nextPageToken: '' };
+    })) ?? { schedules: [] as ScheduleListEntry[], nextPageToken: '' };
 
   return {
-    schedules,
+    schedules: schedules ?? [],
     nextPageToken: String(nextPageToken),
     error,
   };
@@ -86,7 +86,12 @@ export async function fetchSchedule(
   request = fetch,
 ): Promise<DescribeFullSchedule> {
   const route = routeForApi('schedule', parameters);
-  return requestFromAPI(route, { request });
+  const response = await requestFromAPI<
+    Omit<DescribeFullSchedule, 'schedule_id'>
+  >(route, { request });
+  // schedule_id is not actually populated by all routes, even though
+  // DescribeFullSchedule says it should, since we know it we can attach it here.
+  return { ...response, schedule_id: parameters.scheduleId };
 }
 
 export async function deleteSchedule(
@@ -110,7 +115,7 @@ export async function deleteSchedule(
 type CreateScheduleOptions = {
   namespace: string;
   scheduleId: string;
-  body: CreateScheduleRequest;
+  body: ScheduleRequestBody;
   identity?: string;
 };
 
@@ -130,7 +135,7 @@ export async function createSchedule({
     namespace,
     scheduleId,
   });
-  const { conflictToken } = await requestFromAPI<{ conflictToken: string }>(
+  const { conflictToken } = (await requestFromAPI<{ conflictToken: string }>(
     route,
     {
       options: {
@@ -143,7 +148,7 @@ export async function createSchedule({
       },
       onError,
     },
-  );
+  )) ?? { conflictToken: '' };
 
   return { conflictToken, error };
 }
@@ -152,7 +157,7 @@ type EditScheduleOptions = {
   namespace: string;
   scheduleId: string;
   request_id: string;
-  body: UpdateScheduleRequest;
+  body: ScheduleRequestBody;
 };
 
 export async function editSchedule({
@@ -170,8 +175,8 @@ export async function editSchedule({
       `Error editing schedule: ${err.status}: ${err.statusText}`);
 
   const route = routeForApi('schedule.edit', {
-    namespace,
-    scheduleId,
+    namespace: namespace ?? '',
+    scheduleId: scheduleId ?? '',
   });
   await requestFromAPI<null>(route, {
     options: {
@@ -211,17 +216,19 @@ export async function pauseSchedule({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...options,
-        request_id: crypto.randomUUID(),
-        ...(identity && { identity }),
-      }),
-    },
-    onError: (error) => console.error(error),
-  });
+  return (
+    (await requestFromAPI<null>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...options,
+          request_id: crypto.randomUUID(),
+          ...(identity && { identity }),
+        }),
+      },
+      onError: (error) => console.error(error),
+    })) ?? null
+  );
 }
 
 type UnpauseScheduleOptions = {
@@ -247,16 +254,18 @@ export async function unpauseSchedule({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...options,
-        request_id: crypto.randomUUID(),
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestFromAPI<null>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...options,
+          request_id: crypto.randomUUID(),
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? null
+  );
 }
 
 type TriggerImmediatelyOptions = {
@@ -284,16 +293,18 @@ export async function triggerImmediately({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...options,
-        request_id: crypto.randomUUID(),
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestFromAPI<null>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...options,
+          request_id: crypto.randomUUID(),
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? null
+  );
 }
 
 type BackfillOptions = TriggerImmediatelyOptions & {
@@ -325,14 +336,16 @@ export async function backfillRequest({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(route, {
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...options,
-        request_id: crypto.randomUUID(),
-        ...(identity && { identity }),
-      }),
-    },
-  });
+  return (
+    (await requestFromAPI<null>(route, {
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...options,
+          request_id: crypto.randomUUID(),
+          ...(identity && { identity }),
+        }),
+      },
+    })) ?? null
+  );
 }

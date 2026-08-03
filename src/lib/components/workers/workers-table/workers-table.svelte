@@ -56,7 +56,7 @@
 
   <tr slot="headers" class="text-left">
     {#each columns as { label } (label)}
-      <th>{label}</th>
+      <th scope="col">{label}</th>
     {/each}
   </tr>
   {#each visibleItems as worker, i (worker?.workerInstanceKey ?? i)}
@@ -64,12 +64,14 @@
   {/each}
 
   <svelte:fragment slot="empty">
-    {#if hasQuery}
-      <WorkersQueryEmptyState />
-    {:else if runningWithNoWorkers}
-      <EmptyState title={translate('workers.empty-state-title')} />
-    {:else}
-      <WorkerHeartbeatsSDKAlert />
-    {/if}
+    <div class="flex h-full flex-col items-center justify-center">
+      {#if hasQuery}
+        <WorkersQueryEmptyState />
+      {:else if runningWithNoWorkers}
+        <EmptyState title={translate('workers.empty-state-title')} />
+      {:else}
+        <WorkerHeartbeatsSDKAlert />
+      {/if}
+    </div>
   </svelte:fragment>
 </PaginatedTable>

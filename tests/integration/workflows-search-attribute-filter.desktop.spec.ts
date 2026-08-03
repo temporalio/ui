@@ -37,10 +37,10 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('toggle-manual-query').click();
   await page
-    .getByTestId('manual-search-input')
+    .getByTestId('workflow-manual-search-input')
     .fill('`CloseTime`>="2025-12-25T12:00:00.000Z"');
 
-  await page.getByTestId('manual-search-button').click();
+  await page.getByTestId('workflow-manual-search-button').click();
 
   await expect
     .poll(() => getQueryParam(page.url()))
@@ -54,7 +54,9 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('toggle-manual-query').click();
 
-  let query = await page.getByTestId('manual-search-input').inputValue();
+  let query = await page
+    .getByTestId('workflow-manual-search-input')
+    .inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 
   await page.getByTestId('timezones-menu-button').click();
@@ -72,7 +74,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('toggle-manual-query').click();
 
-  query = await page.getByTestId('manual-search-input').inputValue();
+  query = await page.getByTestId('workflow-manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 });
 
@@ -163,9 +165,7 @@ test('it should filter by HistoryLength (number)', async ({ page }) => {
     .fill('10');
   await page.getByTestId('apply-filter-button').click();
 
-  await expect
-    .poll(() => getQueryParam(page.url()))
-    .toBe('`HistoryLength`="10"');
+  await expect.poll(() => getQueryParam(page.url())).toBe('`HistoryLength`=10');
 });
 
 test('it should combine filters', async ({ page }) => {
@@ -188,7 +188,7 @@ test('it should combine filters', async ({ page }) => {
 
   await expect
     .poll(() => getQueryParam(page.url()))
-    .toBe('`ExecutionStatus`="Completed" AND `HistoryLength`="10"');
+    .toBe('`ExecutionStatus`="Completed" AND `HistoryLength`=10');
 
   await page.getByTestId('add-filter-button').click();
   await page.getByRole('menuitem', { name: 'WorkflowType Keyword' }).click();
@@ -202,7 +202,7 @@ test('it should combine filters', async ({ page }) => {
   await expect
     .poll(() => getQueryParam(page.url()))
     .toBe(
-      '`ExecutionStatus`="Completed" AND `HistoryLength`="10" AND `WorkflowType`="ExampleWorkflow"',
+      '`ExecutionStatus`="Completed" AND `HistoryLength`=10 AND `WorkflowType`="ExampleWorkflow"',
     );
 });
 
@@ -226,7 +226,7 @@ test('it should combine filters and then clear them all', async ({ page }) => {
 
   await expect
     .poll(() => getQueryParam(page.url()))
-    .toBe('`ExecutionStatus`="Completed" AND `HistoryLength`="10"');
+    .toBe('`ExecutionStatus`="Completed" AND `HistoryLength`=10');
 
   await page.getByTestId('add-filter-button').click();
   await page.getByRole('menuitem', { name: 'WorkflowType Keyword' }).click();
@@ -240,7 +240,7 @@ test('it should combine filters and then clear them all', async ({ page }) => {
   await expect
     .poll(() => getQueryParam(page.url()))
     .toBe(
-      '`ExecutionStatus`="Completed" AND `HistoryLength`="10" AND `WorkflowType`="ExampleWorkflow"',
+      '`ExecutionStatus`="Completed" AND `HistoryLength`=10 AND `WorkflowType`="ExampleWorkflow"',
     );
 
   await page.getByTestId('clear-all-filters-button').click();

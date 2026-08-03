@@ -4,7 +4,6 @@
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';
   import { pauseWorkflow } from '$lib/services/workflow-service';
-  import { pauseLiveUpdates } from '$lib/stores/events';
   import { toaster } from '$lib/stores/toaster';
   import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -49,7 +48,7 @@
       });
     } catch (err: unknown) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;
@@ -80,8 +79,7 @@
       id="workflow-pause-details"
       class="mt-4"
       placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason')}
-      labelHidden
+      label={translate('common.reason-optional')}
       bind:value={reason}
     />
   </div>

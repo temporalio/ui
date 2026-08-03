@@ -57,7 +57,7 @@
   );
 
   const onCancel = () => {
-    endpoint = $codecEndpoint;
+    endpoint = $codecEndpoint ?? '';
     passToken = $passAccessToken;
     includeCreds = $includeCredentials;
     $override = $overrideRemoteCodecConfiguration;

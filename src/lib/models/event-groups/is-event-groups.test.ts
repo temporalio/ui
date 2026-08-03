@@ -16,20 +16,20 @@ describe('isEventGroups', () => {
   });
 
   it('should return false if given an undefined value', () => {
-    expect(isEventGroups(undefined as EventGroups)).toBe(false);
+    expect(isEventGroups(undefined as unknown as EventGroups)).toBe(false);
   });
 
   it('should return false if given null', () => {
-    expect(isEventGroups(null as EventGroups)).toBe(false);
+    expect(isEventGroups(null as unknown as EventGroups)).toBe(false);
   });
 });
 
 describe('isEventGroup', () => {
   it('should return false if given an undefined value', () => {
-    expect(isEventGroup(undefined as EventGroup)).toBe(false);
+    expect(isEventGroup(undefined as unknown as EventGroup)).toBe(false);
   });
 
   it('should return false if given null', () => {
-    expect(isEventGroup(null as EventGroup)).toBe(false);
+    expect(isEventGroup(null as unknown as EventGroup)).toBe(false);
   });
 });

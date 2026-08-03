@@ -73,7 +73,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  const content = {
+  const content: Record<string, string> = {
     'File A': 'console.log("***");',
     'File B': 'console.log("***");',
   };
@@ -82,7 +82,7 @@
   let hidden = $state(true);
 
   let editableContent = $state(
-    stringifyWithBigInt({ hello: 'world' }, null, 2),
+    stringifyWithBigInt({ hello: 'world' }, undefined, 2),
   );
 
   const handleEditableChange = (text: string) => {
@@ -97,7 +97,7 @@
       name: 'Section',
       items: Array.from({ length: 200 }, (_, j) => ({
         index: j,
-        flags: { a: true, b: false, c: null },
+        flags: { a: true, b: false, c: null as boolean | null },
         values: Array.from({ length: 6 }, (_, k) => ({
           k,
           v: `value-${j}-${k}`,
@@ -110,7 +110,7 @@
         notes: 'This is a generated payload for folding test',
       },
     };
-    return stringifyWithBigInt(obj, null, 2);
+    return stringifyWithBigInt(obj, undefined, 2);
   };
 
   const largeJson = createLargeJson();
@@ -131,7 +131,7 @@
 <Story
   name="Default"
   args={{
-    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+    content: stringifyWithBigInt({ hello: 'world' }, undefined, 2),
   }}
 />
 
@@ -147,7 +147,7 @@
   name="Inline"
   args={{
     inline: true,
-    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+    content: stringifyWithBigInt({ hello: 'world' }, undefined, 2),
   }}
 />
 
@@ -155,7 +155,7 @@
   name="Copyable"
   args={{
     copyable: true,
-    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+    content: stringifyWithBigInt({ hello: 'world' }, undefined, 2),
     copyIconTitle: 'Click to copy content',
     copySuccessIconTitle: 'Content copied to clipboard',
   }}
@@ -165,7 +165,7 @@
   name="Minimum Height"
   args={{
     minHeight: 400,
-    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
+    content: stringifyWithBigInt({ hello: 'world' }, undefined, 2),
   }}
 />
 
@@ -175,7 +175,7 @@
     maxHeight: 100,
     content: stringifyWithBigInt(
       Object.getOwnPropertyDescriptors(Array.prototype),
-      null,
+      undefined,
       2,
     ),
   }}
@@ -187,7 +187,7 @@
     maxHeight: 100,
     content: stringifyWithBigInt(
       Object.getOwnPropertyDescriptors(Array.prototype),
-      null,
+      undefined,
       2,
     ),
     copyable: true,
@@ -339,6 +339,7 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
   <CodeBlock
     copyable
     language="typescript"
+    label="Code example"
     tabs={['File A', 'File B']}
     bind:activeTab
     content={hidden
@@ -379,7 +380,13 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
       content<br />
       content
     </p>
-    <CodeBlock copyable language="json" content={largeJson} maxHeight={300} />
+    <CodeBlock
+      copyable
+      language="json"
+      label="JSON content"
+      content={largeJson}
+      maxHeight={300}
+    />
     <p>
       content<br />
       content<br />

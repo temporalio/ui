@@ -34,8 +34,8 @@
     try {
       await terminateActivityExecution(
         namespace,
-        activityExecutionInfo.activityId,
-        activityExecutionInfo.runId,
+        activityExecutionInfo.activityId ?? '',
+        activityExecutionInfo.runId ?? '',
         reason,
         identity,
       );
@@ -47,7 +47,7 @@
       onConfirm();
     } catch (err: unknown) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;
@@ -76,8 +76,7 @@
 
     <Input
       id="terminate-activity-execution-reason"
-      label={translate('common.reason-placeholder')}
-      labelHidden
+      label={translate('common.reason-optional')}
       bind:value={reason}
       placeholder={translate('common.reason-placeholder')}
     />

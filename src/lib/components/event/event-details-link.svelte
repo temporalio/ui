@@ -30,8 +30,8 @@
     } else if (linkType === 'child-workflow') {
       return routeForWorkflow({
         namespace: ns,
-        workflow: attrs.workflowExecutionWorkflowId,
-        run: attrs.workflowExecutionRunId,
+        workflow: attrs.workflowExecutionWorkflowId ?? '',
+        run: attrs.workflowExecutionRunId ?? '',
       });
     } else if (linkType === 'nexus-endpoint') {
       return routeForNexusEndpoint(val);

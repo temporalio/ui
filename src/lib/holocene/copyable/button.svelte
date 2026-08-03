@@ -4,22 +4,24 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
 
-  interface $$Props extends HTMLButtonAttributes {
-    copyIconTitle: string;
-    copySuccessIconTitle: string;
+  interface Props extends HTMLButtonAttributes {
+    copyIconTitle?: string;
+    copySuccessIconTitle?: string;
     copied: boolean;
     'data-testid'?: string;
     'data-theme'?: string;
     class?: string;
   }
 
-  export let copyIconTitle: string;
-  export let copySuccessIconTitle: string;
-  export let copied: boolean;
-
-  let className = '';
-  export { className as class };
+  let {
+    copyIconTitle = translate('common.copy-icon-title'),
+    copySuccessIconTitle = translate('common.copy-success-icon-title'),
+    copied,
+    class: className = '',
+    ...rest
+  }: Props = $props();
 </script>
 
 <button
@@ -30,8 +32,7 @@
   data-track-name="copyable-button"
   data-track-intent="copy"
   data-track-text={copyIconTitle}
-  on:click
-  {...$$restProps}
+  {...rest}
 >
   <Icon
     title={copied ? copySuccessIconTitle : copyIconTitle}

@@ -44,7 +44,6 @@
         }}
         class="copy-or-filter-button"
         class:filtered
-        id="filter-button"
       >
         {#key filtered}
           <Icon title={filterIconTitle} name="filter" class="m-0.5" />
@@ -59,7 +58,6 @@
           e.stopPropagation();
           copy(e, content);
         }}
-        id="copy-button"
       >
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}

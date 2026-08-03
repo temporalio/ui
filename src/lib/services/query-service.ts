@@ -56,7 +56,7 @@ const formatParameters = async (
 async function fetchQuery(
   { workflow, namespace, queryType, queryArgs }: QueryRequestParameters,
   signal?: AbortSignal,
-): Promise<QueryResponse> {
+): Promise<QueryResponse | undefined> {
   workflow = await workflow;
   const parameters = await formatParameters(namespace, workflow, queryType);
   const route = routeForApi('query', parameters);
@@ -95,8 +95,8 @@ export async function getWorkflowMetadata(
     }
     return metadata;
   } catch (e) {
-    if (e.message?.includes('__temporal_workflow_metadata')) {
-      const queryDefinitions = getQueryTypesFromError(e.message);
+    if ((e as Error).message?.includes('__temporal_workflow_metadata')) {
+      const queryDefinitions = getQueryTypesFromError((e as Error).message);
       return {
         definition: {
           queryDefinitions,
@@ -105,7 +105,7 @@ export async function getWorkflowMetadata(
       };
     } else {
       return {
-        error: e,
+        error: e as Error,
         currentDetails: translate('workflows.no-current-details'),
       };
     }
@@ -117,7 +117,9 @@ export async function getQuery(
   signal?: AbortSignal,
 ): Promise<ParsedQuery> {
   return fetchQuery(options, signal).then(async (execution) => {
-    const { queryResult } = execution ?? { queryResult: { payloads: [] } };
+    const { queryResult } = execution ?? {
+      queryResult: { payloads: [] as QueryPayload[] },
+    };
 
     let data: ParsedQuery = queryResult.payloads;
     try {

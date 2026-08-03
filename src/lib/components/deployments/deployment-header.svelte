@@ -1,7 +1,10 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import MenuButton from '$lib/holocene/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
+  import MenuItem from '$lib/holocene/menu/menu-item.svelte';
+  import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     routeForWorkerDeployments,
@@ -13,17 +16,17 @@
   interface Props {
     namespace: string;
     deploymentName: string;
-    hasVersions: boolean;
     showInstancesLink?: boolean;
     onDeleteClick: () => void;
+    onRampToUnversioned: () => void;
   }
 
   let {
     namespace,
     deploymentName,
-    hasVersions,
     showInstancesLink = true,
     onDeleteClick,
+    onRampToUnversioned,
   }: Props = $props();
 
   const workflowHref = $derived(
@@ -57,26 +60,34 @@
   <div class="flex w-full items-center justify-between">
     <h1>{deploymentName}</h1>
     <div class="flex items-center gap-4">
-      <Button variant="secondary" href={workflowHref}>
-        {translate('deployments.view-workflows')}
+      <Button
+        href={routeForWorkerDeploymentVersionCreate({
+          namespace,
+          deployment: deploymentName,
+        })}
+      >
+        {translate('deployments.create-new-version')}
       </Button>
-      <CapabilityGuard capability="serverScaledDeployments">
-        <Button
-          href={routeForWorkerDeploymentVersionCreate({
-            namespace,
-            deployment: deploymentName,
-          })}
+      <MenuContainer>
+        <MenuButton
+          controls="deployment-header-actions"
+          variant="secondary"
+          hasIndicator
         >
-          {translate('deployments.create-new-version')}
-        </Button>
-      </CapabilityGuard>
-      {#if !hasVersions}
-        <CapabilityGuard capability="serverScaledDeployments">
-          <Button variant="destructive" on:click={onDeleteClick}>
+          {translate('deployments.more-actions')}
+        </MenuButton>
+        <Menu id="deployment-header-actions" position="right" usePortal>
+          <MenuItem href={workflowHref}>
+            {translate('deployments.view-workflows')}
+          </MenuItem>
+          <MenuItem onclick={onRampToUnversioned}>
+            {translate('deployments.ramp-to-unversioned')}
+          </MenuItem>
+          <MenuItem onclick={onDeleteClick} destructive>
             {translate('deployments.delete-deployment')}
-          </Button>
-        </CapabilityGuard>
-      {/if}
+          </MenuItem>
+        </Menu>
+      </MenuContainer>
     </div>
   </div>
 </header>

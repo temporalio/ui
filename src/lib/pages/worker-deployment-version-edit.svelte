@@ -3,12 +3,15 @@
 
   import DeleteWorkerModal from '$lib/components/workers/delete-worker-modal.svelte';
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
+  import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    buildGcpCloudRunComputeConfig,
     buildLambdaComputeConfig,
+    decodeGcpCloudRunProviderDetails,
     decodeLambdaProviderDetails,
     decodeScalerDetails,
     deleteWorkerDeploymentVersion,
@@ -22,9 +25,21 @@
     namespace: string;
     deployment: string;
     buildId: string;
+    computeProviders?: readonly ComputeProviderOption[];
+    gcpRegions?: string[];
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
   }
 
-  let { namespace, deployment, buildId }: Props = $props();
+  let {
+    namespace,
+    deployment,
+    buildId,
+    computeProviders,
+    gcpRegions,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -42,6 +57,7 @@
 {:then versionResponse}
   {@const info = versionResponse.workerDeploymentVersionInfo}
   {@const providerDetails = decodeLambdaProviderDetails(info.computeConfig)}
+  {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
   {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
   <div class="flex max-w-[45rem] flex-col gap-4">
     <Link href={backHref} icon="chevron-left">
@@ -52,29 +68,52 @@
     </h1>
     <EditVersionForm
       {error}
+      {computeProviders}
+      {gcpRegions}
+      {terraformTemplate}
+      {cloudRunTerraformTemplate}
       initialData={{
+        provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',
         iamRoleArn: providerDetails.iamRoleArn ?? '',
         roleExternalId: providerDetails.roleExternalId ?? '',
+        gcpProject: gcpDetails.gcpProject,
+        gcpRegion: gcpDetails.gcpRegion,
+        gcpWorkerPool: gcpDetails.gcpWorkerPool,
+        gcpServiceAccount: gcpDetails.gcpServiceAccount,
         scaleUpCooloffMs: scalerDetails.scaleUpCooloffMs,
         scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
         maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
         metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
+        minReplicas: scalerDetails.minReplicas,
+        maxReplicas: scalerDetails.maxReplicas,
+        initialReplicas: scalerDetails.initialReplicas,
+        utilizationTarget: scalerDetails.utilizationTarget,
       }}
       cancelHref={backHref}
       onSubmit={async (data) => {
         error = undefined;
-        const computeConfig = buildLambdaComputeConfig(
-          data.lambdaArn,
-          data.iamRoleArn,
-          {
-            roleExternalId: data.roleExternalId,
-            scaleUpCooloffMs: data.scaleUpCooloffMs,
-            scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-            maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-            metricsPollIntervalMs: data.metricsPollIntervalMs,
-          },
-        );
+        const computeConfig =
+          data.provider === 'cloud-run'
+            ? buildGcpCloudRunComputeConfig(
+                data.gcpProject,
+                data.gcpRegion,
+                data.gcpWorkerPool,
+                data.gcpServiceAccount,
+                {
+                  minReplicas: data.minReplicas,
+                  maxReplicas: data.maxReplicas,
+                  initialReplicas: data.initialReplicas,
+                  utilizationTarget: data.utilizationTarget,
+                },
+              )
+            : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {
+                roleExternalId: data.roleExternalId,
+                scaleUpCooloffMs: data.scaleUpCooloffMs,
+                scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+                maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+                metricsPollIntervalMs: data.metricsPollIntervalMs,
+              });
         await updateWorkerDeploymentVersionComputeConfig(
           { namespace, deploymentName: deployment, buildId, computeConfig },
           (err) => {

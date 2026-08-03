@@ -17,11 +17,9 @@ interface EventGroup extends Pick<
   name: string;
   label: string;
   displayName: string;
-  events: Map<EventId, WorkflowEvent>;
-  eventIds: Set<EventId>;
+  eventList: WorkflowEvent[];
   initialEvent: WorkflowEvent;
   lastEvent: WorkflowEvent;
-  eventList: WorkflowEvent[];
   finalClassification: EventClassification;
   isPending: boolean;
   isFailureOrTimedOut: boolean;

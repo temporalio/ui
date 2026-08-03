@@ -11,7 +11,7 @@
   export let content: string;
   export let copyable = false;
   export let filterable = false;
-  export let href: string = null;
+  export let href: string | undefined = undefined;
   export let icon: IconName | undefined = undefined;
   export let tooltip: string = '';
   export let badge: BadgeType | undefined = undefined;

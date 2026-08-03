@@ -34,17 +34,19 @@ type ActivityCountByStatusOptions = {
 export const fetchActivityCountByStatus = async ({
   namespace,
   query,
-}: ActivityCountByStatusOptions): Promise<CountWorkflowExecutionsResponse> => {
+}: ActivityCountByStatusOptions): Promise<
+  Required<CountWorkflowExecutionsResponse>
+> => {
   const groupByClause = 'GROUP BY ExecutionStatus';
   const countRoute = routeForApi('standalone-activities.count', {
     namespace,
   });
   const { count, groups } =
-    await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
+    (await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
       params: {
         query: query ? `${query} ${groupByClause}` : `${groupByClause}`,
       },
       notifyOnError: false,
-    });
-  return { count: count ?? '0', groups };
+    })) ?? {};
+  return { count: count ?? '0', groups: groups ?? [] };
 };

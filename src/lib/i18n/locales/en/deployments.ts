@@ -19,7 +19,8 @@ export const Strings = {
   'current-version': 'Current Version',
   'deployment-version': 'Deployment Version',
   'build-id': 'Build ID',
-  'latest-version': 'Latest Version (Build ID)',
+  'latest-version': 'Latest Version',
+  'same-as-current': 'Same as Current',
   'versioning-behavior': 'Versioning Behavior',
   created: 'Created At',
   deployed: 'Deployed At',
@@ -28,7 +29,7 @@ export const Strings = {
   workflows: 'Go to Workflows',
   version: 'Version',
   status: 'Status',
-  'build-status': 'Build Status',
+  lifecycle: 'Lifecycle',
   'config-status': 'Config Status',
   current: 'Current',
   latest: 'Latest',
@@ -62,11 +63,14 @@ export const Strings = {
   'edit-version': 'Edit Version',
   'view-workflows': 'View Workflows',
   'create-new-version': 'Create New Version',
-  'delete-deployment': 'Delete Deployment',
+  'delete-deployment': 'Delete Worker Deployment',
   'delete-deployment-description':
-    'This action cannot be undone. The deployment and all its configuration will be permanently deleted.',
+    "Deleting {{ name }} will permanently remove all its versions and configuration. This action can't be undone.",
   'delete-deployment-confirm-instruction': 'Type DELETE to confirm',
   'delete-deployment-confirm-error': 'Failed to delete deployment',
+  'cannot-delete-deployment': 'Cannot Delete Worker Deployment',
+  'cannot-delete-deployment-body':
+    'All Versions must be deleted before this Deployment can be removed. Delete each Version first, then try again.',
   'role-external-id': 'External ID',
   'scale-up-cooloff': 'Scale-up Cooloff',
   'backlog-threshold': 'Backlog Threshold',
@@ -77,14 +81,48 @@ export const Strings = {
   'drainage-last-changed': 'Last Changed',
   'drainage-last-checked': 'Last Checked',
   metadata: 'Metadata',
+  'more-actions': 'More Actions',
+  'ramp-to-unversioned': 'Ramp to Unversioned Workers',
+  'ramp-to-unversioned-description':
+    'This will route a percentage of new traffic to unversioned Workers.',
+  'ramp-to-unversioned-error': 'Failed to set unversioned ramping',
+  'remove-unversioned-ramping': 'Remove Unversioned Ramping',
+  'unversioned-ramping-banner':
+    'Unversioned Workers Ramping at {{ percentage }}%.',
   'set-as-current': 'Set Current Version',
   'set-as-current-error': 'Failed to set version as current',
+  'unset-current': 'Unset Current',
+  'unset-current-description':
+    'This will remove the current version designation from this deployment.',
+  'unset-current-error': 'Failed to unset current version',
   'set-current-version-success': '{{ buildId }} is now the current version',
+  'set-ramping-version': 'Set Ramping Version',
+  'edit-ramping-percentage': 'Edit Ramping Percentage',
+  'remove-ramping': 'Remove Ramping',
+  'set-ramping-no-pollers-title': 'Cannot Set Ramping Version',
+  'set-ramping-no-pollers-body':
+    'This Worker Deployment Version has no active pollers. Ensure Workers are running before setting a ramping percentage',
+  'set-ramping-body':
+    'This will route a percentage of new traffic to Build ID {{ buildId }} for {{ deploymentName }}. The Current Version will continue to receive the remaining traffic.',
+  'set-ramping-existing':
+    'Worker Deployment Version {{ version }} is currently ramping at {{ percentage }}%.',
+  'ramping-percentage-label': 'Ramping Percentage',
+  'set-ramping-success': '{{ buildId }} is now ramping at {{ percentage }}%',
+  'set-ramping-error': 'Failed to set ramping version',
+  'remove-ramping-success': 'Ramping removed from {{ buildId }}',
+  'remove-ramping-error': 'Failed to remove ramping version',
   edit: 'Edit',
   'validate-connection': 'Validate Connection',
+  'validate-connection-for': 'Validate Connection for',
   'validate-connection-error': 'Failed to validate connection',
   'validate-connection-valid': 'Connection is valid',
   'validate-connection-invalid': 'Connection is invalid',
+  'validate-connection-no-task-queue':
+    "This Worker Deployment Version's Task Queue is not registered. The serverless function may be failing after invocation. Check the function for configuration or runtime errors, then re-run it from your cloud provider's console. Alternatively, create a new Version to retry.",
+  'validate-connection-no-task-queue-pending':
+    "This Worker Deployment Version's Task Queue is not registered yet. The version was recently created, so the worker may still be starting up. Wait a moment, then retry.",
+  'validate-connection-no-config':
+    'This version is missing compute configuration. It may have been created outside the UI without the required IAM details.',
   'delete-version': 'Delete Worker Deployment Version',
   'delete-version-description':
     'Deleting any running Workers will finish their current tasks. No new invocations will be made.',
@@ -101,4 +139,14 @@ export const Strings = {
   'invalid-compute-configuration': 'Invalid compute configuration',
   'validation-failed-cleanup-failed':
     'Compute config validation failed and resources could not be cleaned up automatically. Delete the deployment and version manually, then try again.',
+  connection: 'Connection',
+  'connection-connected': 'Connected',
+  'connection-failed': 'Failed',
+  'connection-pending': 'Pending',
+  'connection-tooltip-pending':
+    'Not validated yet. First automatic check runs within 6h.',
+  'connection-tooltip-checked': 'Checked {{ time }}',
+  'connection-checked-recently': 'less than an hour ago',
+  'connection-checked-hour': '{{ hours }} hour ago',
+  'connection-checked-hours': '{{ hours }} hours ago',
 } as const;

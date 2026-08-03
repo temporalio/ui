@@ -12,12 +12,16 @@ export const getInboundNexusLinkEvents = (history: WorkflowEvent[]) => {
     const workflowExecutionOptionsUpdatedEvents = $derived(
       history.filter((event) => isWorkflowExecutionOptionsUpdatedEvent(event)),
     );
-    const matchingEvents = $derived([
-      workflowExecutionStartedEvent,
-      ...workflowExecutionOptionsUpdatedEvents,
-    ]);
+    const matchingEvents: WorkflowEvent[] = $derived(
+      [
+        workflowExecutionStartedEvent,
+        ...workflowExecutionOptionsUpdatedEvents,
+      ].filter((event) => event !== undefined),
+    );
 
-    return matchingEvents.filter(getInboundLinkForEvent);
+    return matchingEvents.filter((event) =>
+      Boolean(getInboundLinkForEvent(event)),
+    );
   } catch {
     return [];
   }

@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { HTMLTextareaAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Label from './label.svelte';
 
-  type $$Props = HTMLTextareaAttributes & {
+  interface Props extends HTMLTextareaAttributes {
     disabled?: boolean;
     error?: string;
     isValid?: boolean;
@@ -20,24 +21,37 @@
     description?: string;
     maxLength?: number;
     class?: string;
+    errorSnippet?: Snippet;
+  }
+
+  let {
+    disabled = false,
+    error = '',
+    isValid = true,
+    placeholder = '',
+    rows = 5,
+    spellcheck,
+    value = $bindable(),
+    label,
+    labelHidden = false,
+    id,
+    required = false,
+    description = '',
+    maxLength = 0,
+    class: className = 'text-primary',
+    onkeydown,
+    errorSnippet,
+    ...rest
+  }: Props = $props();
+
+  const errorId = $derived(`${id}-error`);
+
+  const handleKeydown = (
+    event: KeyboardEvent & { currentTarget: HTMLTextAreaElement },
+  ) => {
+    event.stopPropagation();
+    onkeydown?.(event);
   };
-
-  export let disabled = false;
-  export let error = '';
-  export let isValid = true;
-  export let placeholder = '';
-  export let rows = 5;
-  export let spellcheck: boolean = null;
-  export let value: string;
-  export let label: string;
-  export let labelHidden = false;
-  export let id: string;
-  export let required = false;
-  export let description = '';
-  export let maxLength = 0;
-
-  let className = 'text-primary';
-  export { className as class };
 </script>
 
 <div class={merge('group flex flex-col gap-1', className)}>
@@ -63,27 +77,27 @@
       {placeholder}
       {rows}
       {spellcheck}
-      on:input
-      on:change
-      on:focus
-      on:blur
-      on:keydown|stopPropagation
+      {required}
+      aria-invalid={!isValid ? 'true' : undefined}
+      aria-describedby={!isValid && error ? errorId : undefined}
+      onkeydown={handleKeydown}
       maxlength={maxLength > 0 ? maxLength : undefined}
       data-testid={id}
-      {...$$restProps}
+      {...rest}
     ></textarea>
   </div>
   <div class="flex justify-between gap-2">
     <div
+      id={errorId}
       class="error-msg"
       class:min-width={maxLength}
-      aria-live={isValid ? 'off' : 'assertive'}
+      role="alert"
     >
       {#if !isValid}
         {#if error}
           <p>{error}</p>
         {/if}
-        <slot name="error" />
+        {@render errorSnippet?.()}
       {/if}
     </div>
     {#if maxLength && !disabled}

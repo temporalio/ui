@@ -103,7 +103,7 @@
   <MenuButton
     id="{id}-search-attribute-filter-button"
     controls="{id}-search-attribute-menu"
-    leadingIcon="add"
+    leadingIcon="filter"
     variant="secondary"
     data-testid="add-filter-button"
     disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
@@ -159,7 +159,7 @@
   <Button
     variant="ghost"
     size="xs"
-    on:click={clearAllFilters}
+    onclick={clearAllFilters}
     data-testid="clear-all-filters-button"
   >
     {translate('common.clear-all')}

@@ -4,8 +4,14 @@
   let { class: className }: { class?: ClassNameValue } = $props();
 </script>
 
-<div data-testid="loading" class="flex justify-center">
+<div
+  data-testid="loading"
+  class="flex justify-center"
+  role="status"
+  aria-label="Loading"
+>
   <div
+    aria-hidden="true"
     class={twMerge(
       'w-[45dvw] min-w-fit max-w-[500px] scale-[.30] antialiased',
       className,

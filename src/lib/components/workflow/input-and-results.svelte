@@ -23,7 +23,7 @@
 <div class="flex flex-col gap-4 lg:flex-row" data-testid="input-and-result">
   <InputAndResultsPayload
     title={translate('workflows.input')}
-    content={workflowEvents.input}
+    content={workflowEvents.input ?? undefined}
     {isPending}
     payloadDownloadFilenameData={{
       ...payloadDownloadFilenameData,
@@ -32,7 +32,7 @@
   />
   <InputAndResultsPayload
     title={translate('workflows.result')}
-    content={workflowEvents.results}
+    content={workflowEvents.results ?? undefined}
     {isPending}
     payloadDownloadFilenameData={{
       ...payloadDownloadFilenameData,

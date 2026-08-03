@@ -1,8 +1,9 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import type { Meta, StoryContext } from '@storybook/svelte';
   import { expect, userEvent, within } from '@storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
 
@@ -20,7 +21,7 @@
       href: { table: { disable: true } },
       active: { table: { disable: true } },
     },
-  } satisfies Meta<TabButton>;
+  } satisfies Meta<ComponentProps<typeof TabButton>>;
 </script>
 
 <script lang="ts">
@@ -35,7 +36,13 @@
     action('select')(index);
   };
 
-  const play: Story['play'] = async ({ canvasElement, step }) => {
+  const play = async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: StoryContext['step'];
+  }) => {
     const canvas = within(canvasElement);
 
     selected.set(0);
@@ -74,7 +81,7 @@
         {...args}
         data-testid={`toggle-button-${index}`}
         active={$selected === index}
-        on:click={() => select(index)}
+        onclick={() => select(index)}
       >
         {name}
       </TabButton>

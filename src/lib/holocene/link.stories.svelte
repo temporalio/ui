@@ -2,7 +2,9 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
+  import type { IconName } from './icon';
   import { iconNames } from './icon';
 
   import Link from './link.svelte';
@@ -12,7 +14,7 @@
     component: Link,
     args: {
       href: 'https://temporal.io',
-      icon: undefined,
+      icon: undefined as IconName | undefined,
       active: false,
       newTab: false,
       light: false,
@@ -21,7 +23,7 @@
       href: { control: 'text' },
       icon: { control: 'select', options: iconNames },
     },
-  } satisfies Meta<Link>;
+  } satisfies Meta<ComponentProps<typeof Link>>;
 </script>
 
 <script lang="ts">

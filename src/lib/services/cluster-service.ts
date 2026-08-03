@@ -7,13 +7,13 @@ export const fetchCluster = async (
   settings: Settings,
   request = fetch,
 ): Promise<GetClusterInfoResponse> => {
-  if (settings.runtimeEnvironment.isCloud) return;
+  if (settings.runtimeEnvironment.isCloud) return {};
 
   const route = routeForApi('cluster');
-  return await requestFromAPI(route, {
+  return await requestFromAPI<GetClusterInfoResponse>(route, {
     request,
   }).then((clusterInformation) => {
-    return clusterInformation;
+    return clusterInformation ?? {};
   });
 };
 
@@ -21,12 +21,12 @@ export const fetchSystemInfo = async (
   settings: Settings,
   request = fetch,
 ): Promise<GetSystemInfoResponse> => {
-  if (settings.runtimeEnvironment.isCloud) return;
+  if (settings.runtimeEnvironment.isCloud) return {};
 
   const route = routeForApi('systemInfo');
-  return await requestFromAPI(route, {
+  return await requestFromAPI<GetSystemInfoResponse>(route, {
     request,
   }).then((systemInformation) => {
-    return systemInformation;
+    return systemInformation ?? {};
   });
 };

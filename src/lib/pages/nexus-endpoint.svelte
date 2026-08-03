@@ -95,7 +95,7 @@
   <Card class="flex flex-col gap-4">
     <div class="flex items-center gap-2">
       <h5>{translate('nexus.allowed-caller-namespaces')}</h5>
-      <Badge type="count">{allowedCallerNamespaces.length}</Badge>
+      <Badge type="count">{allowedCallerNamespaces?.length ?? 0}</Badge>
     </div>
     <div class="flex flex-wrap items-center gap-4">
       <PaginatedTable
@@ -106,7 +106,7 @@
         nextPageButtonLabel={translate('common.next-page')}
         pageButtonLabel={(page) => translate('common.go-to-page', { page })}
         variant="primary"
-        items={allowedCallerNamespaces}
+        items={allowedCallerNamespaces ?? []}
         let:visibleItems
         maxHeight="24rem"
       >

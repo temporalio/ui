@@ -43,9 +43,9 @@
     {/if}
     {#if first || previous || next}
       <FirstPreviousNextWorkflowTable
-        {first}
-        {previous}
-        {next}
+        first={first ?? ''}
+        previous={previous ?? ''}
+        next={next ?? ''}
         workflow={workflowId}
         {namespace}
       />
@@ -57,7 +57,7 @@
     {:else if hasChildren}
       <ChildWorkflowsTable
         {children}
-        pendingChildren={$workflowRun.workflow.pendingChildren}
+        pendingChildren={workflow?.pendingChildren}
         namespace={page.params.namespace}
       />
     {/if}

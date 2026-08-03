@@ -5,7 +5,6 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
-  import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
@@ -13,7 +12,7 @@
     cancelText: string;
     confirmDisabled?: boolean;
     confirmText: string;
-    confirmType?: ComponentProps<Button>['variant'];
+    confirmType?: ComponentProps<typeof Button>['variant'];
     hideCancel?: boolean;
     hideConfirm?: boolean;
     hightlightNav?: boolean;
@@ -30,7 +29,7 @@
   export let hideConfirm = false;
   export let confirmText: string;
   export let cancelText: string;
-  export let confirmType: ComponentProps<Button>['variant'] = 'primary';
+  export let confirmType: ComponentProps<typeof Button>['variant'] = 'primary';
   export let confirmDisabled = false;
   export let large = false;
   export let loading = false;
@@ -103,14 +102,13 @@
   aria-labelledby="modal-title-{id}"
   data-testid={$$props['data-testid']}
   {...$$restProps}
-  use:focusTrap={true}
 >
   {#if !loading}
     <IconButton
       label={cancelText}
       icon="close"
       class="float-right m-4"
-      on:click={closeModal}
+      onclick={closeModal}
     />
   {/if}
   <div id="modal-title-{id}" class="title">
@@ -138,7 +136,7 @@
             data-testid="cancel-modal-button"
             variant="ghost"
             disabled={loading}
-            on:click={closeModal}>{cancelText}</Button
+            onclick={closeModal}>{cancelText}</Button
           >
         {/if}
         {#if !hideConfirm}
@@ -161,7 +159,11 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer transition-opacity duration-200;
+    @apply cursor-pointer bg-black/50 transition-opacity duration-200;
+
+    :global([data-theme='dark']) & {
+      background-color: rgb(var(--color-surface-background) / 50%);
+    }
   }
 
   .body.hightlightNav::backdrop {

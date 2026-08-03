@@ -3,9 +3,10 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getEventArray } from '$lib/services/grouped-event-buffer';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { fullEventHistory, sdkInfo } from '$lib/stores/events';
+  import { bufferVersion, sdkInfo } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import {
@@ -79,11 +80,12 @@
       ? formatBytes(parseInt(workflow.historySizeBytes, 10))
       : '',
   );
-  let totalActions = $derived(
-    $fullEventHistory
+  let totalActions = $derived.by(() => {
+    $bufferVersion;
+    return getEventArray()
       .reduce((acc, e) => (e?.billableActions ?? 0) + acc, 0)
-      .toString(),
-  );
+      .toString();
+  });
 
   const { sdk, version: sdkVersion } = $derived($sdkInfo);
 
@@ -117,12 +119,11 @@
   <DetailListLabel>
     {translate('common.duration')}
   </DetailListLabel>
-  <DetailListTextValue class="font-mono" text={elapsedTime} />
+  <DetailListTextValue text={elapsedTime} />
 
   {#if workflow?.workflowExecutionTimeout && workflow?.workflowExecutionTimeout.toString() !== '0s'}
     <DetailListLabel>{translate('workflows.workflow-timeout')}</DetailListLabel>
     <DetailListTextValue
-      class="font-mono"
       text={formatDuration(workflow.workflowExecutionTimeout)}
       tooltipText={formatDuration(workflow.workflowExecutionTimeout)}
     />
@@ -262,7 +263,6 @@
   <DetailListColumn>
     <DetailListLabel>{translate('common.history-size')}</DetailListLabel>
     <DetailListTextValue
-      class="font-mono"
       tooltipText={workflow.externalPayloadCount
         ? translate('workflows.external-payload-tooltip')
         : ''}
@@ -275,26 +275,21 @@
         >{translate('workflows.external-payload-size')}</DetailListLabel
       >
       <DetailListTextValue
-        class="font-mono"
-        text={formatBytes(parseInt(workflow.externalPayloadSizeBytes, 10))}
+        text={formatBytes(
+          parseInt(workflow.externalPayloadSizeBytes ?? '', 10),
+        )}
       />
       <DetailListLabel
         >{translate('workflows.external-payload-count')}</DetailListLabel
       >
-      <DetailListTextValue
-        class="font-mono"
-        text={workflow.externalPayloadCount}
-      />
+      <DetailListTextValue text={workflow.externalPayloadCount} />
     {/if}
 
     {#if !$isCloud}
       <DetailListLabel
         >{translate('workflows.state-transitions')}</DetailListLabel
       >
-      <DetailListTextValue
-        class="font-mono"
-        text={workflow?.stateTransitionCount}
-      />
+      <DetailListTextValue text={workflow?.stateTransitionCount} />
     {:else}
       <Tooltip
         bottomLeft

@@ -101,7 +101,8 @@ describe('tokenize', () => {
       'some workflow',
       'AND',
       'Custom Boolean',
-      '=true',
+      '=',
+      'true',
     ]);
   });
 

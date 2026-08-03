@@ -161,7 +161,7 @@
           message ||
           errorProp ||
           statusText ||
-          (body && JSON.stringify(body)) ||
+          (body ? JSON.stringify(body) : '') ||
           JSON.stringify(error);
       }
 

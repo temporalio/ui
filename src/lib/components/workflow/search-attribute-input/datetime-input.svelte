@@ -28,8 +28,8 @@
     if (!value) updateDatetime();
   });
 
-  const onDateChange = (d: CustomEvent) => {
-    date = startOfDay(d.detail);
+  const onDateChange = (d: Date) => {
+    date = startOfDay(d);
     updateDatetime();
   };
 
@@ -41,7 +41,7 @@
 <div class="flex flex-col gap-2">
   <DatePicker
     label="{translate('common.value')} ({translate('common.utc')})"
-    on:datechange={onDateChange}
+    {onDateChange}
     selected={date}
     todayLabel={translate('common.today')}
     closeLabel={translate('common.close')}

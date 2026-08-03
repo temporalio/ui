@@ -445,7 +445,7 @@ export function detectEventHistoryErrors(
     errorIds.add(30);
   }
 
-  return [...errorIds].map(getCommonErrorById).filter(Boolean);
+  return [...errorIds].map(getCommonErrorById).filter(isDefined);
 }
 
 export function getApplicableCommonErrors(

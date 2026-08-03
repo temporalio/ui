@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
   import { within } from '@storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import DatePicker from '$lib/holocene/date-picker.svelte';
 
@@ -40,7 +41,7 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta<DatePicker>;
+  } satisfies Meta<ComponentProps<typeof DatePicker>>;
 </script>
 
 <script lang="ts">
@@ -50,7 +51,7 @@
   /**
    * Used for the "Focused" story to focus the input.
    */
-  const focus = async ({ canvasElement }) => {
+  const focus = (canvasElement: HTMLElement) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole('textbox');
     input.focus();
@@ -60,10 +61,13 @@
 </script>
 
 <Template let:args>
-  <DatePicker {...args} on:datechange={action('date-change')} />
+  <DatePicker {...args} onDateChange={action('date-change')} />
 </Template>
 
-<Story name="Default" play={focus} />
+<Story
+  name="Default"
+  play={async ({ canvasElement }) => focus(canvasElement)}
+/>
 
 <Story name="Disabled" args={{ disabled: true }} />
 
@@ -75,5 +79,5 @@
     selected: new Date('2012-09-19'),
     isAllowed: disallowSundays,
   }}
-  play={focus}
+  play={async ({ canvasElement }) => focus(canvasElement)}
 />

@@ -1,21 +1,43 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
 
-  export let label: string;
-  export let menuLabel: string;
-  export let icon: IconName | undefined = undefined;
-  export let id: string;
-  export let disabled = false;
-  export let position: 'left' | 'right' = 'left';
-  export let primaryActionDisabled = false;
-  export let href: string | undefined = undefined;
-  export let menuClass: string | undefined = undefined;
+  interface Props {
+    label: string;
+    menuLabel: string;
+    icon?: IconName;
+    id: string;
+    disabled?: boolean;
+    position?: 'left' | 'right';
+    primaryActionDisabled?: boolean;
+    href?: string;
+    menuClass?: string;
+    class?: string;
+    onclick?: (event: MouseEvent) => void;
+    children?: Snippet;
+  }
+
+  let {
+    label,
+    menuLabel,
+    icon,
+    id,
+    disabled = false,
+    position = 'left',
+    primaryActionDisabled = false,
+    href,
+    menuClass,
+    class: className,
+    onclick,
+    children,
+  }: Props = $props();
 </script>
 
-<MenuContainer class={$$props.class}>
+<MenuContainer class={className}>
   <div class="button-group flex h-10 cursor-pointer flex-row gap-[1px]">
     <Button
       disabled={disabled || primaryActionDisabled}
@@ -25,7 +47,7 @@
       data-track-name="split-button"
       data-track-intent="primary"
       data-track-text={label}
-      on:click
+      {onclick}
     >
       {#if icon}
         <Icon name={icon} />
@@ -44,6 +66,6 @@
   </div>
 
   <Menu id="{id}-menu" {position} class={menuClass}>
-    <slot />
+    {@render children?.()}
   </Menu>
 </MenuContainer>

@@ -60,8 +60,12 @@
         {@render actions?.()}
       </div>
     </div>
-    <div class="bg-dark mx-auto mt-8 w-full" class:invert={!$useDarkMode}>
-      <img src={andromeda} alt="Andromeda" />
+    <div
+      class="bg-dark mx-auto mt-8 w-full"
+      class:invert={!$useDarkMode}
+      aria-hidden="true"
+    >
+      <img src={andromeda} alt="" />
     </div>
   </div>
 </div>

@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  mockMonthlyCalendarSchedule,
   mockSchedule,
   mockScheduleApi,
   mockSchedulesApis,
+  mockWeeklyCalendarSchedule,
   SCHEDULES_COUNT_API,
 } from '~/test-utilities/mock-apis';
 
@@ -52,7 +54,9 @@ test.describe('Schedules List with schedules', () => {
     await scheduleLink.click();
 
     await expect(page.getByTestId('schedule-name')).toBeVisible();
-    await expect(page.getByTestId('schedule-name')).toHaveText('test-schedule');
+    await expect(page.getByTestId('schedule-name')).toContainText(
+      'test-schedule',
+    );
 
     const scheduleActions = page.getByLabel('Schedule Actions');
     await expect(scheduleActions).toBeVisible();
@@ -87,6 +91,100 @@ test.describe('Schedules List with schedules', () => {
     await submitButton.click();
   });
 
+  test('applies an overlap policy change made in the drawer on save', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page);
+    await page.goto(scheduleEditUrl);
+    await expect(page.locator('h1')).toHaveText('Edit Schedule');
+
+    await page.getByRole('button', { name: 'Edit Schedule Policies' }).click();
+    await expect(page.getByRole('region')).toBeVisible();
+
+    await page.locator('#overlap-policy-BufferOne').click();
+    await page.getByRole('button', { name: 'Update Policies' }).click();
+
+    // The drawer closes and the form is not remounted/reset, so the change
+    // survives until the schedule is saved.
+    await expect(page.getByRole('region')).toBeHidden();
+
+    const updateRequest = page.waitForRequest(
+      (request) =>
+        request.method() === 'POST' && request.url().includes('/update'),
+    );
+    await page.getByTestId('create-schedule-button').click();
+    const body = (await updateRequest).postDataJSON();
+    expect(body.schedule.policies.overlapPolicy).toBe('BufferOne');
+  });
+
+  test('loads a weekly calendar schedule into a week spec', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, mockWeeklyCalendarSchedule);
+    await page.goto(scheduleEditUrl);
+
+    await expect(page.locator('h1')).toHaveText('Edit Schedule');
+
+    await expect(page.getByText('At 09:30 on weekdays.').first()).toBeVisible();
+  });
+
+  test('loads a monthly calendar schedule into a month spec', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, mockMonthlyCalendarSchedule);
+    await page.goto(scheduleEditUrl);
+
+    await expect(page.locator('h1')).toHaveText('Edit Schedule');
+
+    await expect(
+      page.getByText('At 00:00 on days 1 and 15 of June.').first(),
+    ).toBeVisible();
+  });
+
+  test('preserves spec fields the form does not model on edit', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, {
+      ...mockSchedule,
+      schedule_id: 'test-schedule',
+      schedule: {
+        ...mockSchedule.schedule,
+        spec: {
+          interval: [{ interval: '300s', phase: '0s' }],
+          excludeStructuredCalendar: [{ dayOfWeek: [{ start: 6, end: 6 }] }],
+          startTime: '2024-03-15T18:30:00Z',
+          timezoneName: 'UTC',
+        },
+        state: {
+          // int64 fields arrive as strings from the HTTP API
+          limitedActions: true,
+          remainingActions: '3',
+        },
+      },
+    });
+    await page.goto(scheduleEditUrl);
+
+    await expect(page.locator('h1')).toHaveText('Edit Schedule');
+    await expect(page.locator('#endAfterOccurrences')).toHaveValue('3');
+
+    const updateRequest = page.waitForRequest(
+      (request) =>
+        request.method() === 'POST' && request.url().includes('/update'),
+    );
+    await page.getByTestId('create-schedule-button').click();
+    const body = (await updateRequest).postDataJSON();
+
+    expect(body.schedule.spec.excludeStructuredCalendar).toEqual([
+      { dayOfWeek: [{ start: 6, end: 6 }] },
+    ]);
+    expect(body.schedule.spec.startTime).toBe('2024-03-15T18:30:00Z');
+    expect(body.schedule.spec.interval).toEqual([
+      { interval: '300s', phase: '0s' },
+    ]);
+    expect(body.schedule.state.limitedActions).toBe(true);
+    expect(body.schedule.state.remainingActions).toBe(3);
+  });
+
   test('edits an existing schedule with an object input payload', async ({
     page,
   }) => {
@@ -104,7 +202,7 @@ test.describe('Schedules List with schedules', () => {
       .getByRole('textbox');
     await expect(payloadInput).toContainText('"message"');
 
-    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
 
     await expect(payloadInput).toContainText('"message"');
     expect(pageErrors.map(({ message }) => message).join('\n')).not.toContain(
@@ -125,7 +223,7 @@ test.describe('Schedules List with schedules', () => {
     await expect(payloadInput).toContainText('"hello"');
     await expect(page.getByText('Input must be valid JSON')).toBeHidden();
 
-    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
 
     await expect(payloadInput).toContainText('"hello"');
     await expect(page.getByText('Input must be valid JSON')).toBeHidden();

@@ -5,6 +5,7 @@
 
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadInput from '$lib/components/payload-input.svelte';
+  import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -38,14 +39,16 @@
   let error = $state('');
   let loading = $state(false);
   let failure = $state<
-    UpdateWorkflowResponse['outcome']['failure'] | undefined
+    NonNullable<UpdateWorkflowResponse['outcome']>['failure'] | undefined
   >(undefined);
   let success = $state<
-    UpdateWorkflowResponse['outcome']['success'] | boolean | undefined
+    | NonNullable<UpdateWorkflowResponse['outcome']>['success']
+    | boolean
+    | undefined
   >(undefined);
 
   let name = $state('');
-  let updateId = $state(crypto.randomUUID());
+  let updateId = $state('');
   let input = $state('');
   let customUpdate = $state(false);
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
@@ -53,6 +56,7 @@
   const hideModal = () => {
     open = false;
     name = '';
+    updateId = '';
     input = '';
     customUpdate = false;
     $encoding = defaultEncoding;
@@ -78,7 +82,7 @@
 
       failure = result?.outcome?.failure;
       success = result?.outcome?.success || !failure;
-      updateId = crypto.randomUUID();
+      updateId = '';
 
       if (success) {
         toaster.push({
@@ -89,7 +93,7 @@
       }
     } catch (err) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;
@@ -117,7 +121,7 @@
 >
   <h3 slot="title">{translate('workflows.update-modal-title')}</h3>
   <div class="flex flex-col gap-4" slot="content">
-    {#if updateDefinitions?.length > 0 && !customUpdate}
+    {#if (updateDefinitions?.length ?? 0) > 0 && !customUpdate}
       <Select
         id="update-select"
         label={translate('common.name')}
@@ -126,6 +130,7 @@
         data-testid="update-select"
         placeholder="Select an Update"
         required
+        disabled={loading}
       >
         {#each updateDefinitions as { name: value, description = '' } (value)}
           <Option {value} {description}>{value}</Option>
@@ -140,15 +145,17 @@
           label={translate('common.name')}
           required
           bind:value={name}
+          disabled={loading}
         />
         {#if customUpdate}
           <Button
-            on:click={() => {
+            onclick={() => {
               customUpdate = false;
               name = '';
             }}
             variant="secondary"
             leadingIcon="close"
+            disabled={loading}
           />
         {/if}
       </div>
@@ -156,9 +163,17 @@
     <Input
       id="update-id"
       label={translate('workflows.update-id')}
-      required
       bind:value={updateId}
-    />
+      disabled={loading}
+    >
+      {#snippet afterInput()}
+        <RandomUuidButton
+          class="ml-2.5"
+          bind:value={updateId}
+          disabled={loading}
+        />
+      {/snippet}
+    </Input>
     <PayloadInput bind:input />
     {#if loading}
       <Alert intent="info" title="In Progress"
@@ -171,6 +186,7 @@
           <CodeBlock
             class="mt-4"
             content={failure.stackTrace}
+            label={translate('common.stack-trace')}
             language="text"
           />
         {/if}
@@ -179,7 +195,10 @@
     {#if success && typeof success === 'object'}
       <Alert intent="success" title="Success">
         {#if success?.payloads?.[0] && success.payloads[0].data}
-          <PayloadCodeBlock value={success} />
+          <PayloadCodeBlock
+            value={success}
+            label={translate('workflows.update-result')}
+          />
         {/if}
       </Alert>
     {/if}

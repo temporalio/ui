@@ -72,7 +72,7 @@
   <div class="flex max-w-60 flex-col gap-2">
     <Toast id={context.id} {variant} {closeButtonLabel}>{message}</Toast>
 
-    <Button on:click={() => toaster.push({ duration, message, variant })}>
+    <Button onclick={() => toaster.push({ duration, message, variant })}>
       <span class="capitalize">Trigger {variant} toast</span>
     </Button>
 

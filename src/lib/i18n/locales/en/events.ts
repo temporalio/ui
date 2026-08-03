@@ -57,6 +57,7 @@ export const Strings = {
   attribute: 'attribute',
   'event-group': 'Events related to {{eventName}}',
   'error-event': 'Error Event',
+  'back-to-import': 'Back to Import',
   'import-event-history': 'Import Event History',
   'import-event-history-file-upload':
     'Select an event history JSON file to upload',
@@ -66,6 +67,9 @@ export const Strings = {
   'event-history-import-error': 'Could not create event history from JSON',
   'event-history-load-error': 'Could not parse JSON',
   'event-classification-label': 'Event Classification',
+  'row-accessible-name': 'Event {{eventType}}: {{classification}}',
+  'expand-details': 'Expand details',
+  'collapse-details': 'Collapse details',
   'event-classification': {
     unspecified: 'Unspecified',
     scheduled: 'Scheduled',
@@ -98,4 +102,6 @@ export const Strings = {
   'empty-search-attributes': 'No Search Attributes Found',
   'empty-memo-attributes': 'No Memo Attributes Found',
   'empty-header-attributes': 'No Header Attributes Found',
+  'import-format-1': 'Import Format 1',
+  'import-format-2': 'Import Format 2',
 } as const;

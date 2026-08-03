@@ -12,21 +12,44 @@
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import type { NamespaceListItem, NavLinkItem } from '$lib/types/global';
+  import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
   import ziggy from '$lib/vendor/ziggy-full-face.png';
 
-  import BottomNavLinks from './bottom-nav-links.svelte';
   import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
   import BottomNavSettings from './bottom-nav-settings.svelte';
 
   interface Props {
     namespaceList?: NamespaceListItem[];
-    sections: NavLinkItem[][];
+    linksSnippet: Snippet;
     isCloud?: boolean;
     showNamespacePicker?: boolean;
     children?: Snippet;
     nsPicker?: Snippet<
+      [
+        {
+          open: boolean;
+          closeMenu: () => void;
+        },
+      ]
+    >;
+    centerButton?: Snippet<
+      [
+        {
+          open: boolean;
+          onClick: () => void;
+        },
+      ]
+    >;
+    menuButton?: Snippet<
+      [
+        {
+          open: boolean;
+          onClick: () => void;
+        },
+      ]
+    >;
+    linksContent?: Snippet<
       [
         {
           open: boolean;
@@ -40,11 +63,14 @@
 
   let {
     namespaceList = [],
-    sections,
+    linksSnippet,
     isCloud = false,
     showNamespacePicker = true,
     children,
     nsPicker,
+    centerButton,
+    menuButton,
+    linksContent,
     profilePicture,
     class: className = '',
   }: Props = $props();
@@ -107,7 +133,7 @@
   };
 </script>
 
-<svelte:window onkeypress={escapeHandler} />
+<svelte:window onkeydown={escapeHandler} />
 
 {#if menuIsOpen}
   <div
@@ -122,7 +148,13 @@
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
   >
-    <BottomNavLinks open={viewLinks} {sections} />
+    {#if linksContent}
+      {@render linksContent({ open: viewLinks, closeMenu })}
+    {:else if viewLinks}
+      <div class="flex flex-col gap-6 px-4 py-8">
+        {@render linksSnippet?.()}
+      </div>
+    {/if}
     {#if nsPicker}
       {@render nsPicker({ open: viewNamespaces, closeMenu })}
     {:else}
@@ -145,38 +177,49 @@
   data-testid="top-nav"
   aria-label={translate('common.main')}
 >
-  <button
-    class="nav-button relative"
-    data-testid="nav-menu-button"
-    class:active-shadow={viewLinks}
-    type="button"
-    onclick={onLinksClick}
-  >
-    {#if viewLinks}
-      <Icon name="close" height={32} width={32} />
-    {:else}
-      <Logo height={32} width={32} />
-    {/if}
-  </button>
+  {#if menuButton}
+    {@render menuButton({ open: viewLinks, onClick: onLinksClick })}
+  {:else}
+    <button
+      class="nav-button relative"
+      data-testid="nav-menu-button"
+      class:active-shadow={viewLinks}
+      type="button"
+      onclick={onLinksClick}
+    >
+      {#if viewLinks}
+        <Icon name="close" height={32} width={32} />
+      {:else}
+        <Logo height={32} width={32} />
+      {/if}
+    </button>
+  {/if}
   {#if showNamespacePicker}
-    <div class="namespace-wrapper">
-      <Button
-        variant="ghost"
-        data-testid="namespace-switcher"
-        leadingIcon="namespace-switcher"
-        size="xs"
-        class="grow text-white"
-        on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
-      >
-      <div class="ml-1 h-full w-1 border-l border-subtle"></div>
-      <Button
-        variant="ghost"
-        size="xs"
-        href={routeForNamespace({ namespace })}
-        disabled={!namespaceExists}
-        ><Icon class="text-white" name="external-link" /></Button
-      >
-    </div>
+    {#if centerButton}
+      {@render centerButton({
+        open: viewNamespaces,
+        onClick: onNamespaceClick,
+      })}
+    {:else}
+      <div class="namespace-wrapper">
+        <Button
+          variant="ghost"
+          data-testid="namespace-switcher"
+          leadingIcon="namespace-switcher"
+          size="xs"
+          class="grow text-white"
+          onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+        >
+        <div class="ml-1 h-full w-1 border-l border-subtle"></div>
+        <Button
+          variant="ghost"
+          size="xs"
+          href={routeForNamespace({ namespace })}
+          disabled={!namespaceExists}
+          ><Icon class="text-white" name="external-link" /></Button
+        >
+      </div>
+    {/if}
   {/if}
   <button
     class="nav-button"

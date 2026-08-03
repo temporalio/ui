@@ -36,13 +36,13 @@
 
   let {
     'aria-label': ariaLabel,
-    activeItemId = null,
+    activeItemId = undefined,
     class: className = '',
     children,
     ...restProps
   }: Props = $props();
 
-  const activeItem = writable<string>(activeItemId);
+  const activeItem = writable<string>(activeItemId ?? '');
   const hoveredItem = writable<string | null>(null);
   const itemElements = new Map<string, HTMLElement>();
 
@@ -54,7 +54,7 @@
 
   // Sync activeItemId prop to internal store
   $effect.pre(() => {
-    if (activeItemId !== null) {
+    if (activeItemId != null) {
       activeItem.set(activeItemId);
     }
   });

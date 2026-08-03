@@ -10,10 +10,11 @@ export const fetchNexusEndpoints = async (
   request = fetch,
 ): Promise<NexusEndpoint[]> => {
   const route = routeForApi('nexus-endpoints');
-  const { endpoints } = await requestFromAPI<NexusEndpoints>(route, {
-    request,
-    params: { name: search },
-  });
+  const { endpoints } =
+    (await requestFromAPI<NexusEndpoints>(route, {
+      request,
+      params: { name: search },
+    })) ?? {};
   return endpoints || [];
 };
 
@@ -26,7 +27,7 @@ export const fetchNexusEndpoint = async (
     request,
     notifyOnError: false,
   });
-  return endpoint;
+  return endpoint ?? { endpoint: {} };
 };
 
 export const createNexusEndpoint = async (
@@ -34,16 +35,17 @@ export const createNexusEndpoint = async (
   request = fetch,
 ): Promise<NexusEndpoint> => {
   const route = routeForApi('nexus-endpoints');
-  const endpoint: NexusEndpoint = await requestFromAPI<NexusEndpoint>(route, {
-    request,
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...body,
-      }),
-    },
-    notifyOnError: false,
-  });
+  const endpoint: NexusEndpoint =
+    (await requestFromAPI<NexusEndpoint>(route, {
+      request,
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...body,
+        }),
+      },
+      notifyOnError: false,
+    })) ?? {};
   return endpoint;
 };
 
@@ -53,16 +55,17 @@ export const updateNexusEndpoint = async (
   request = fetch,
 ): Promise<NexusEndpoint> => {
   const route = routeForApi('nexus-endpoint.update', { endpointId: id });
-  const endpoint: NexusEndpoint = await requestFromAPI<NexusEndpoint>(route, {
-    request,
-    options: {
-      method: 'POST',
-      body: stringifyWithBigInt({
-        ...body,
-      }),
-    },
-    notifyOnError: false,
-  });
+  const endpoint: NexusEndpoint =
+    (await requestFromAPI<NexusEndpoint>(route, {
+      request,
+      options: {
+        method: 'POST',
+        body: stringifyWithBigInt({
+          ...body,
+        }),
+      },
+      notifyOnError: false,
+    })) ?? {};
   return endpoint;
 };
 
@@ -72,12 +75,13 @@ export const deleteNexusEndpoint = async (
   request = fetch,
 ): Promise<NexusEndpoint> => {
   const route = routeForApi('nexus-endpoint', { endpointId: id });
-  const endpoint: NexusEndpoint = await requestFromAPI<NexusEndpoint>(route, {
-    request,
-    options: {
-      method: 'DELETE',
-    },
-    params: { version },
-  });
+  const endpoint: NexusEndpoint =
+    (await requestFromAPI<NexusEndpoint>(route, {
+      request,
+      options: {
+        method: 'DELETE',
+      },
+      params: { version },
+    })) ?? {};
   return endpoint;
 };

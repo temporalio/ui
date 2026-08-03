@@ -11,6 +11,7 @@ import * as Nexus from './nexus';
 import * as Schedules from './schedules';
 import * as SearchAttributes from './search-attributes';
 import * as StandaloneActivities from './standalone-activities';
+import * as StandaloneNexusOperations from './standalone-nexus-operations';
 import * as TypedErrors from './typed-errors';
 import * as Workers from './workers';
 import * as Workflows from './workflows';
@@ -33,5 +34,6 @@ export const English = {
   [Nexus.Namespace]: Nexus.Strings,
   [SearchAttributes.Namespace]: SearchAttributes.Strings,
   [StandaloneActivities.Namespace]: StandaloneActivities.Strings,
+  [StandaloneNexusOperations.Namespace]: StandaloneNexusOperations.Strings,
   [Workers.Namespace]: Workers.Strings,
 } as const;

@@ -13,8 +13,8 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import { tableDensity } from '$lib/stores/table-density';
+  import { supportsWorkflowBulkActions } from '$lib/stores/workflow-bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
@@ -70,13 +70,13 @@
   class:child
   class="dense"
 >
-  {#if !empty && $supportsBulkActions}
+  {#if !empty && $supportsWorkflowBulkActions}
     <td class="relative">
       <Checkbox
         data-testid="batch-checkbox"
         {label}
         labelHidden
-        on:click={onClickBatchSelect}
+        onclick={onClickBatchSelect}
         {checked}
         value={workflow}
         disabled={$allSelected}
@@ -104,7 +104,7 @@
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
-            on:click={() => toggleChildrenVisibility(workflow)}
+            onclick={() => toggleChildrenVisibility(workflow)}
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip

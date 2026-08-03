@@ -71,7 +71,7 @@
       hideResetModal();
     } catch (err) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;
@@ -131,8 +131,7 @@
       <Input
         id="reset-reason"
         bind:value={reason}
-        label={translate('common.reason')}
-        labelHidden
+        label={translate('common.reason-optional')}
         placeholder={translate('common.reason-placeholder')}
       />
     </div>

@@ -2,7 +2,7 @@
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "bundler",
-    "strict": false,
+    "strict": true,
     "module": "es2020",
     "lib": ["es2020", "es2023", "dom", "DOM.Iterable"],
     "target": "es2019",

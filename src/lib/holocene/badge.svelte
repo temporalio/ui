@@ -27,7 +27,7 @@
       'p-1',
       'text-sm',
       'font-medium',
-      'leading-4',
+      'leading-[1.5]',
       'transition-colors',
       'text-black',
     ],

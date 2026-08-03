@@ -17,7 +17,7 @@ const defaultParameters = {
   workflowId: '',
   workflowType: '',
   executionStatus: null,
-  timeRange: null,
+  timeRange: undefined,
 };
 
 describe('toListWorkflowParameters', () => {

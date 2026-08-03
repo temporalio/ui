@@ -1,13 +1,17 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    'title' | 'children'
+  > {
     title: string;
     id?: string;
     subtitle?: string;
@@ -18,23 +22,32 @@
     onToggle?: () => void;
     'data-testid'?: string;
     class?: string;
+    summary?: Snippet;
+    action?: Snippet;
+    children?: Snippet<[boolean]>;
   }
 
-  export let title: string;
-  export let id: string = crypto.randomUUID();
-  export let subtitle = '';
-  export let icon = null;
-  export let open = false;
-  export let expandable = true;
-  export let error = '';
-  export let onToggle = () => {};
+  const generatedId = $props.id();
 
-  let className = '';
-  export { className as class };
+  let {
+    title,
+    id = generatedId,
+    subtitle = '',
+    icon,
+    open = $bindable(false),
+    expandable = true,
+    error = '',
+    onToggle,
+    class: className = '',
+    summary,
+    action,
+    children,
+    ...rest
+  }: Props = $props();
 
   const toggleAccordion = () => {
     open = !open;
-    onToggle();
+    onToggle?.();
   };
 </script>
 
@@ -42,65 +55,61 @@
   <div
     data-track-container={title}
     class={merge('surface-primary w-full border border-subtle', className)}
-    {...$$restProps}
+    {...rest}
   >
-    <button
-      id="{id}-trigger"
-      aria-expanded={open}
-      aria-controls="{id}-content"
-      class="flex w-full flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
-      type="button"
-      data-track-name="accordion"
-      data-track-intent="toggle"
-      data-track-text={title}
-      on:click={toggleAccordion}
-    >
-      <div class="flex w-full flex-row items-center justify-between gap-2">
-        <div class="flex w-full items-center gap-2">
-          <h3 class="flex shrink-0 items-center gap-2">
-            {#if icon}<Icon name={icon} />{/if}
-            {title}
-          </h3>
-          <div class="text-secondary max-sm:hidden">
-            <slot name="summary" />
+    <div class="flex w-full flex-row items-center">
+      <button
+        id="{id}-trigger"
+        aria-expanded={open}
+        aria-controls="{id}-content"
+        class="flex grow flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+        type="button"
+        data-track-name="accordion"
+        data-track-intent="toggle"
+        data-track-text={title}
+        onclick={toggleAccordion}
+      >
+        <div class="flex w-full flex-row items-center justify-between gap-2">
+          <div class="flex w-full items-center gap-2">
+            <h3 class="flex shrink-0 items-center gap-2">
+              {#if icon}<Icon name={icon} />{/if}
+              {title}
+            </h3>
+            <div class="text-secondary max-sm:hidden">
+              {@render summary?.()}
+            </div>
           </div>
+          <Icon class="shrink-0" name={open ? 'chevron-up' : 'chevron-down'} />
         </div>
-        <div
-          class="flex flex-row items-center gap-2 pr-2"
-          on:click|stopPropagation
-          on:keyup|stopPropagation
-          role="none"
-        >
-          <slot name="action" />
+        <div class="text-secondary sm:hidden">
+          {@render summary?.()}
         </div>
-        <Icon class="shrink-0" name={open ? 'chevron-up' : 'chevron-down'} />
+        <p class="flex items-center">
+          {#if error}
+            <Badge class="mr-2" type="danger">{error}</Badge>
+          {/if}
+          <span class="text-secondary">{subtitle}</span>
+        </p>
+      </button>
+      <div class="flex shrink-0 flex-row items-center gap-2 pr-2">
+        {@render action?.()}
       </div>
-      <div class="text-secondary sm:hidden">
-        <slot name="summary" />
-      </div>
-      <p class="flex items-center">
-        {#if error}
-          <Badge class="mr-2" type="danger">{error}</Badge>
-        {/if}
-        <span class="text-secondary">{subtitle}</span>
-      </p>
-    </button>
+    </div>
 
     <div
       id="{id}-content"
       aria-labelledby="{id}-trigger"
-      role="textbox"
       class="mt-4 block w-full p-4"
       class:hidden={!open}
     >
-      <slot {open} />
+      {@render children?.(open)}
     </div>
   </div>
 {:else}
   <div
     class="surface-primary w-full border border-subtle p-4"
     data-track-container={title}
-    {...$$restProps}
+    {...rest}
   >
     <div class="flex w-full flex-col">
       <div class="flex w-full flex-row items-center justify-between gap-2">
@@ -110,15 +119,15 @@
             {title}
           </h3>
           <div class="text-secondary max-sm:hidden">
-            <slot name="summary" />
+            {@render summary?.()}
           </div>
         </div>
         <div class="flex flex-row items-center gap-2 pr-2">
-          <slot name="action" />
+          {@render action?.()}
         </div>
       </div>
       <div class="text-secondary sm:hidden">
-        <slot name="summary" />
+        {@render summary?.()}
       </div>
       <p class="flex items-center">
         {#if error}
@@ -129,7 +138,7 @@
     </div>
 
     <div class="mt-6 block w-full" class:hidden={!open}>
-      <slot {open} />
+      {@render children?.(open)}
     </div>
   </div>
 {/if}

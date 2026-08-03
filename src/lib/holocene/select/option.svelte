@@ -38,9 +38,9 @@
   let { value, children, onclick, ...rest }: Props = $props();
 
   let selected = $state(false);
-  let _value: T | string = $state();
+  let _value: T | string | undefined = $state();
   let slotWrapper: HTMLSpanElement;
-  let optionElement: HTMLLIElement;
+  let optionElement: HTMLLIElement | undefined = undefined;
   let label: string;
 
   $effect(() => {
@@ -54,7 +54,11 @@
   onMount(() => {
     if (slotWrapper) {
       label = slotWrapper.textContent;
-      $options.push({ value, label, nativeElement: optionElement });
+      $options.push({
+        value,
+        label,
+        nativeElement: optionElement!,
+      });
     }
   });
 

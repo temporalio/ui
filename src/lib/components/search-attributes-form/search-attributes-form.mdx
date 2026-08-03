@@ -13,6 +13,7 @@ A reusable form component for managing custom search attributes with SuperForms 
 
 - **Promise-Based Loading**: Async data loading with built-in error handling
 - **SuperForms Integration**: Built-in validation with Zod schema and dirty state tracking
+- **Custom Description**: Optional `description` snippet with a localized fallback
 - **Comprehensive Error Handling**: Form state management with proper error display
 - **i18n Support**: Full internationalization with translate() function calls
 - **Accessibility**: Full ARIA support and keyboard navigation
@@ -22,7 +23,7 @@ A reusable form component for managing custom search attributes with SuperForms 
 
 The component uses two main parts:
 
-1. **Parent Component**: Handles async data loading with `#await` pattern
+1. **Parent Component**: Handles async data loading with the `#await` pattern (skeleton, form, and error states)
 2. **Content Component**: Renders the form with SuperForms configuration
 
 ## Props Interface
@@ -32,11 +33,14 @@ The component accepts the following props:
 ```typescript
 interface Props {
   class?: string;
+  description?: Snippet;
   initialAttributesPromise: Promise<SearchAttributeDefinition[]>;
   onSave: (attributes: SearchAttributeDefinition[]) => Promise<void>;
   onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
   onCancel?: () => void;
-  getSupportedTypes: () => SearchAttributeTypeOption[];
+  onRetry?: () => void;
+  hideTainted?: boolean;
+  disableTypeForExisting?: boolean;
 }
 ```
 
@@ -49,8 +53,7 @@ interface Props {
   import { page } from '$app/state';
   import SearchAttributesForm from '$lib/components/search-attributes-form/search-attributes-form.svelte';
   import { fetchSearchAttributesForNamespace } from '$lib/services/search-attributes-service';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
-  import { translate } from '$lib/i18n/translate';
+  import type { SearchAttributeDefinition } from '$lib/components/search-attributes-form/types';
 
   const namespace = $derived(page.params.namespace);
 
@@ -59,6 +62,7 @@ interface Props {
     return Object.entries(response.customAttributes).map(([name, type]) => ({
       name,
       type,
+      isExisting: true,
     }));
   }
 
@@ -79,39 +83,6 @@ interface Props {
     // Navigate back, reset state, etc.
   }
 
-  function getSupportedTypes(): SearchAttributeTypeOption[] {
-    return [
-      {
-        label: translate('search-attributes.type-keyword'),
-        value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      },
-      {
-        label: translate('search-attributes.type-text'),
-        value: SEARCH_ATTRIBUTE_TYPE.TEXT,
-      },
-      {
-        label: translate('search-attributes.type-int'),
-        value: SEARCH_ATTRIBUTE_TYPE.INT,
-      },
-      {
-        label: translate('search-attributes.type-double'),
-        value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
-      },
-      {
-        label: translate('search-attributes.type-bool'),
-        value: SEARCH_ATTRIBUTE_TYPE.BOOL,
-      },
-      {
-        label: translate('search-attributes.type-datetime'),
-        value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-      },
-      {
-        label: translate('search-attributes.type-keywordlist'),
-        value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
-      },
-    ];
-  }
-
   const initialAttributesPromise = fetchAttributes();
 </script>
 
@@ -120,7 +91,6 @@ interface Props {
   onSave={handleSave}
   onSuccess={handleSuccess}
   onCancel={handleCancel}
-  {getSupportedTypes}
 />
 ```
 
@@ -133,12 +103,8 @@ interface Props {
   import SearchAttributesForm from '$lib/components/search-attributes-form/search-attributes-form.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchSearchAttributesForNamespace } from '$lib/services/search-attributes-service';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
-  import type {
-    SearchAttributeDefinition,
-    SearchAttributeTypeOption,
-  } from '$lib/components/search-attributes-form/types';
+  import type { SearchAttributeDefinition } from '$lib/components/search-attributes-form/types';
 
   const namespace = $derived(page.params.namespace);
 
@@ -149,13 +115,11 @@ interface Props {
 
     const response = await fetchSearchAttributesForNamespace(namespace);
     const attributes = Object.entries(response.customAttributes).map(
-      ([name, type]) => ({ name, type }),
+      ([name, type]) => ({ name, type, isExisting: true }),
     );
 
     // Always return at least one empty row for the UI
-    return attributes.length > 0
-      ? attributes
-      : [{ name: '', type: getSupportedTypes()[0]?.value || '' }];
+    return attributes.length > 0 ? attributes : [{ name: '', type: '' }];
   }
 
   async function handleSave(
@@ -175,37 +139,8 @@ interface Props {
     // Add any cancel handling here (navigation, confirmation, etc.)
   }
 
-  function getSupportedTypes(): SearchAttributeTypeOption[] {
-    return [
-      {
-        label: translate('search-attributes.type-keyword'),
-        value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      },
-      {
-        label: translate('search-attributes.type-text'),
-        value: SEARCH_ATTRIBUTE_TYPE.TEXT,
-      },
-      {
-        label: translate('search-attributes.type-int'),
-        value: SEARCH_ATTRIBUTE_TYPE.INT,
-      },
-      {
-        label: translate('search-attributes.type-double'),
-        value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
-      },
-      {
-        label: translate('search-attributes.type-bool'),
-        value: SEARCH_ATTRIBUTE_TYPE.BOOL,
-      },
-      {
-        label: translate('search-attributes.type-datetime'),
-        value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-      },
-      {
-        label: translate('search-attributes.type-keywordlist'),
-        value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
-      },
-    ];
+  function handleRetry() {
+    // Re-run the loader / recreate the promise
   }
 
   const initialAttributesPromise = fetchAttributes();
@@ -228,7 +163,7 @@ interface Props {
     onSave={handleSave}
     onSuccess={handleSuccess}
     onCancel={handleCancel}
-    {getSupportedTypes}
+    onRetry={handleRetry}
   />
 </div>
 ```
@@ -237,14 +172,17 @@ interface Props {
 
 <Markdown>
   {`
-| Prop                    | Type                                                    | Default    | Description                             |
-| ----------------------- | ------------------------------------------------------- | ---------- | --------------------------------------- |
-| initialAttributesPromise | Promise<SearchAttributeDefinition[]>                  | Required   | Promise that resolves to initial data  |
-| onSave                  | (attributes: SearchAttributeDefinition[]) => Promise<void> | Required   | Save handler function                  |
-| onSuccess               | (attributes: SearchAttributeDefinition[]) => void     | () => {}   | Success callback after save            |
-| onCancel                | () => void                                            | () => {}   | Cancel callback                        |
-| getSupportedTypes       | () => SearchAttributeTypeOption[]                     | Required   | Function returning supported types     |
-| class                   | string                                                 | ''         | Additional CSS classes                 |
+| Prop                     | Type                                                       | Default  | Description                                                                 |
+| ------------------------ | ---------------------------------------------------------- | -------- | --------------------------------------------------------------------------- |
+| initialAttributesPromise | Promise<SearchAttributeDefinition[]>                       | Required | Promise that resolves to the initial attribute rows                         |
+| onSave                   | (attributes: SearchAttributeDefinition[]) => Promise<void> | Required | Save handler; throw to surface an error message                             |
+| onSuccess                | (attributes: SearchAttributeDefinition[]) => void          | undefined | Called after a successful save                                             |
+| onCancel                 | () => void                                                 | undefined | Called when the Cancel button is clicked (after the form resets)           |
+| onRetry                  | () => void                                                 | undefined | Called from the error state's retry action                                 |
+| description              | Snippet                                                    | undefined | Custom description content; falls back to the default localized description |
+| hideTainted              | boolean                                                    | false    | Hides the unsaved-changes count badge on the Save button                    |
+| disableTypeForExisting   | boolean                                                    | false    | Disables the type selector for existing (isExisting) attributes             |
+| class                    | string                                                     | ''       | Additional CSS classes                                                      |
   `}
 </Markdown>
 
@@ -254,7 +192,7 @@ The component automatically handles three states:
 
 - **Loading**: Shows skeleton loaders while the promise resolves
 - **Success**: Renders the form with loaded attributes
-- **Error**: Shows error messages with retry functionality
+- **Error**: Shows error messages with retry functionality (`onRetry`)
 
 ## Error Handling
 
@@ -271,9 +209,9 @@ The component provides comprehensive error handling through SuperForms:
 
 ## Dirty State Management
 
-The form automatically tracks unsaved changes using SuperForms `isTainted` function:
+The form automatically tracks unsaved changes using SuperForms `tainted` state:
 
-- **Visual Indicator**: Save button shows a badge when there are unsaved changes
+- **Visual Indicator**: Save button shows a badge when there are unsaved changes (unless `hideTainted` is set)
 - **Real-time Updates**: Badge updates immediately as user makes changes
 - **Form Reset**: Cancel button clears dirty state and resets to initial values
 - **Save Button State**: Disabled when no changes or while submitting
@@ -300,4 +238,3 @@ Form validation is handled by Zod schema with the following rules:
 3. **Composability**: Functions can be shared across different components
 4. **Type Safety**: Direct function signatures provide better TypeScript inference
 5. **Simplicity**: Clean API with direct function props
-6. **Tree Shaking**: Better optimization as unused functions can be eliminated

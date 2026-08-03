@@ -6,7 +6,6 @@
 
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { focusTrap } from '$lib/utilities/focus-trap';
 
   interface Props extends HTMLAttributes<HTMLDialogElement> {
     content: Snippet;
@@ -73,14 +72,13 @@
   aria-modal="true"
   aria-labelledby="modal-title-{id}"
   data-testid={dataTestId}
-  use:focusTrap={true}
 >
   {#if !loading}
     <IconButton
       label={cancelText}
       icon="close"
       class="float-right m-4"
-      on:click={closeModal}
+      onclick={closeModal}
     />
   {/if}
   <div id="modal-content-{id}" class="content">

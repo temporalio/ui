@@ -8,10 +8,7 @@
   import { translate } from '$lib/i18n/translate';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
-  import type {
-    SearchAttributeDefinition,
-    SearchAttributeTypeOption,
-  } from './types';
+  import type { SearchAttributeDefinition } from './types';
 
   import SearchAttributesForm from './search-attributes-form.svelte';
 
@@ -26,16 +23,19 @@
         name: 'CustomerId',
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
         isDeletable: false,
+        isExisting: true,
       },
       {
         name: 'Amount',
         type: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
         isDeletable: false,
+        isExisting: true,
       },
       {
         name: 'ProcessedAt',
         type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
         isDeletable: false,
+        isExisting: true,
       },
     ];
   }
@@ -76,40 +76,6 @@
     action('onCancel')();
   }
 
-  // Get supported types function
-  function getSupportedTypes(): SearchAttributeTypeOption[] {
-    return [
-      {
-        label: translate('search-attributes.type-keyword'),
-        value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      },
-      {
-        label: translate('search-attributes.type-text'),
-        value: SEARCH_ATTRIBUTE_TYPE.TEXT,
-      },
-      {
-        label: translate('search-attributes.type-int'),
-        value: SEARCH_ATTRIBUTE_TYPE.INT,
-      },
-      {
-        label: translate('search-attributes.type-double'),
-        value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
-      },
-      {
-        label: translate('search-attributes.type-bool'),
-        value: SEARCH_ATTRIBUTE_TYPE.BOOL,
-      },
-      {
-        label: translate('search-attributes.type-datetime'),
-        value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-      },
-      {
-        label: translate('search-attributes.type-keywordlist'),
-        value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
-      },
-    ];
-  }
-
   export const meta = {
     title: 'Forms/SearchAttributes',
     component: SearchAttributesForm,
@@ -135,7 +101,6 @@
     onSave: handleSave,
     onSuccess: handleSuccess,
     onCancel: handleCancel,
-    getSupportedTypes,
   }}
   parameters={{
     docs: {
@@ -154,7 +119,6 @@
     onSave: handleSave,
     onSuccess: handleSuccess,
     onCancel: handleCancel,
-    getSupportedTypes,
   }}
   parameters={{
     docs: {
@@ -173,7 +137,6 @@
     onSave: handleSave,
     onSuccess: handleSuccess,
     onCancel: handleCancel,
-    getSupportedTypes,
   }}
   parameters={{
     docs: {

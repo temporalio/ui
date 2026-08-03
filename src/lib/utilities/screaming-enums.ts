@@ -3,11 +3,16 @@ import type {
   ArchivalState,
   CallbackState,
   NamespaceState,
+  NexusOperationCancellationState,
   PendingNexusOperationState,
   WorkerStatus,
   WorkflowExecutionStatus,
 } from '$lib/types';
-import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
+import type {
+  BatchOperationActionType,
+  BatchOperationState,
+  BatchOperationType,
+} from '$lib/types/batch';
 import type { PendingActivityState } from '$lib/types/events';
 import type {
   SearchAttributeType,
@@ -69,8 +74,11 @@ export const toBatchOperationStateReadable = (
 
 export const toBatchOperationTypeReadable = (
   status: BatchOperationType,
-): BatchOperationType => {
-  return fromScreamingEnum(status, 'BatchOperationType');
+): BatchOperationActionType => {
+  return fromScreamingEnum(
+    status,
+    'BatchOperationType',
+  ) as unknown as BatchOperationActionType;
 };
 
 export const toWorkflowTaskFailureReadable = (
@@ -92,6 +100,16 @@ export const toPendingNexusOperationStateReadable = (
 ): PendingNexusOperationState => {
   if (!state) return 'Unspecified' as unknown as PendingNexusOperationState;
   return fromScreamingEnum(state, 'PendingNexusOperationState');
+};
+
+export const toNexusOperationCancellationStateReadable = (
+  state?: NexusOperationCancellationState | null,
+): string => {
+  if (!state) return 'Unspecified';
+  return fromScreamingEnum(
+    state,
+    'NexusOperationCancellationState',
+  ) as unknown as string;
 };
 
 export const toCallbackStateReadable = (

@@ -23,6 +23,8 @@ export const fetchWorkflowTaskFailures = async (
   } catch {
     // Don't fail the workflows call due to count
   }
+
+  return 0;
 };
 
 type WorkflowCountByExecutionStatusOptions = {
@@ -33,19 +35,21 @@ type WorkflowCountByExecutionStatusOptions = {
 export const fetchWorkflowCountByExecutionStatus = async ({
   namespace,
   query,
-}: WorkflowCountByExecutionStatusOptions): Promise<CountWorkflowExecutionsResponse> => {
+}: WorkflowCountByExecutionStatusOptions): Promise<
+  Required<CountWorkflowExecutionsResponse>
+> => {
   const groupByClause = 'GROUP BY ExecutionStatus';
   const countRoute = routeForApi('workflows.count', {
     namespace,
   });
   const { count, groups } =
-    await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
+    (await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
       params: {
         query: query ? `${query} ${groupByClause}` : `${groupByClause}`,
       },
       notifyOnError: false,
-    });
-  return { count: count ?? '0', groups };
+    })) ?? {};
+  return { count: count ?? '0', groups: groups ?? [] };
 };
 
 // Uses the API in a private/unsupported way that will stop working in a future server release.
@@ -59,13 +63,11 @@ const fetchScheduleCountLegacy = async (
     ? `${scheduleFixedQuery} AND ${query}`
     : scheduleFixedQuery;
   const countRoute = routeForApi('workflows.count', { namespace });
-  const { count } = await requestFromAPI<CountWorkflowExecutionsResponse>(
-    countRoute,
-    {
+  const { count } =
+    (await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
       params: { query: fullQuery },
       notifyOnError: false,
-    },
-  );
+    })) ?? {};
   return count ?? '0';
 };
 
@@ -78,10 +80,11 @@ export const fetchScheduleCount = async ({
 }): Promise<string> => {
   try {
     const countRoute = routeForApi('schedules.count', { namespace });
-    const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
-      params: query ? { query } : {},
-      notifyOnError: false,
-    });
+    const { count } =
+      (await requestFromAPI<CountSchedulesResponse>(countRoute, {
+        params: query ? { query } : {},
+        notifyOnError: false,
+      })) ?? {};
     return count ?? '0';
   } catch (error: unknown) {
     if (isNotImplemented(error) || isNotFound(error)) {

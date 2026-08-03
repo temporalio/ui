@@ -14,6 +14,7 @@
     type ConfigurableTableType,
     moveColumn,
     removeColumn,
+    TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
 
   interface Props {
@@ -36,9 +37,9 @@
 
 <div class="flex flex-col gap-4">
   <OrderableList>
-    <svelte:fragment slot="heading">
+    {#snippet heading()}
       {type} <span class="font-normal">(in view)</span>
-    </svelte:fragment>
+    {/snippet}
     {#each columnsInUse as { label }, index (`${label}:${index}`)}
       <OrderableListItem
         {index}
@@ -68,9 +69,9 @@
     {/each}
   </OrderableList>
   <OrderableList>
-    <svelte:fragment slot="heading">
+    {#snippet heading()}
       Available Columns <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
+    {/snippet}
     {#each $availableColumns as { label } (label)}
       <OrderableListItem
         static
@@ -87,22 +88,24 @@
       />
     {/each}
   </OrderableList>
-  <OrderableList>
-    <svelte:fragment slot="heading">
-      {translate('events.custom-search-attributes')}
-      <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
-    {#each $availableCustomColumns as { label } (label)}
-      <OrderableListItem
-        static
-        on:addItem={() => addColumn(label, namespace, table)}
-        addButtonLabel={translate('workflows.add-column-label', {
-          column: label,
-        })}
-        {label}
-      />
-    {:else}
-      <OrderableListItem readonly label="No Custom Search Attributes" />
-    {/each}
-  </OrderableList>
+  {#if table !== TABLE_TYPE.DEPLOYMENTS}
+    <OrderableList>
+      {#snippet heading()}
+        {translate('events.custom-search-attributes')}
+        <span class="font-normal">(not in view)</span>
+      {/snippet}
+      {#each $availableCustomColumns as { label } (label)}
+        <OrderableListItem
+          static
+          on:addItem={() => addColumn(label, namespace, table)}
+          addButtonLabel={translate('workflows.add-column-label', {
+            column: label,
+          })}
+          {label}
+        />
+      {:else}
+        <OrderableListItem readonly label="No Custom Search Attributes" />
+      {/each}
+    </OrderableList>
+  {/if}
 </div>

@@ -48,7 +48,7 @@ export const getEventBillableActions = (
 
     if (isUpsertWorkflowSearchAttributesEvent(event)) {
       const searchAttributeFields = Object.keys(
-        event.attributes.searchAttributes.indexedFields,
+        event.attributes?.searchAttributes?.indexedFields ?? {},
       );
       if (
         searchAttributeFields?.length === 1 &&
@@ -62,7 +62,7 @@ export const getEventBillableActions = (
 
     if (isMarkerRecordedEvent(event)) {
       const nonBillable = ['core_patch', 'Version'];
-      if (nonBillable.includes(event?.attributes?.markerName)) return 0;
+      if (nonBillable.includes(event?.attributes?.markerName ?? '')) return 0;
 
       // Check if any other markers are associated with same workflow task. If so, only charge for one marker, not all of them for the workflow task
       const workflowTaskId = event.attributes?.workflowTaskCompletedEventId;

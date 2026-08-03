@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getContext, onMount } from 'svelte';
+
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -8,32 +10,42 @@
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import {
+    enrichGroups,
+    getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
+    getEventArray,
+    getGroupArray,
+  } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import {
-    currentEventHistory,
-    filteredEventHistory,
-    fullEventHistory,
-    pauseLiveUpdates,
-  } from '$lib/stores/events';
-  import { eventCategoryFilter } from '$lib/stores/filters';
+  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
+  import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { IterableEventWithPending } from '$lib/types/events';
+  import type {
+    IterableEventWithPending,
+    WorkflowEvent,
+    WorkflowTaskFailedEvent,
+    WorkflowTaskTimedOutEvent,
+  } from '$lib/types/events';
   import {
     parseEventFilterParams,
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
-  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
+
+  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
@@ -57,30 +69,77 @@
 
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
-  let updating = $derived(!$fullEventHistory.length);
 
-  let ascendingGroups = $derived(
-    groupEvents(
-      $filteredEventHistory,
-      'ascending',
-      pendingActivities,
-      pendingNexusOperations,
-    ),
-  );
+  let bufferGroups = $state.raw(getGroupArray({ excludeWorkflowTasks: true }));
+  let bufferEvents = $state.raw(getEventArray());
+  let updating = $derived(!historyCtx.fetchComplete);
 
-  const workflowTaskFailedError = $derived(
-    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
-  );
+  onMount(() => {
+    historyCtx.resume();
+    bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+    bufferEvents = getEventArray();
+  });
+
+  $effect(() => {
+    void $bufferVersion;
+
+    const fetchComplete = historyCtx.fetchComplete;
+    const activities = pendingActivities;
+    const nexusOperations = pendingNexusOperations;
+
+    let frame: number | null = requestAnimationFrame(() => {
+      frame = null;
+      if (fetchComplete) {
+        enrichGroups(activities, nexusOperations);
+      }
+      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+      bufferEvents = getEventArray();
+    });
+
+    return () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
+  });
+
+  const filteredGroups = $derived.by(() => {
+    const active = $eventTypeFilter;
+    const cats = $eventCategoryFilter;
+    return bufferGroups.filter((g) => {
+      if (!active.includes(g.category)) return false;
+      if (cats && cats.length && !cats.includes(g.category)) return false;
+      return true;
+    });
+  });
+
+  const filteredEvents = $derived.by(() => {
+    const active = $eventTypeFilter;
+    const cats = $eventCategoryFilter;
+    return bufferEvents.filter((ev) => {
+      const cat = (ev as WorkflowEvent).category;
+      if (!active.includes(cat)) return false;
+      if (cats && cats.length && !cats.includes(cat)) return false;
+      return true;
+    });
+  });
+
+  const workflowTaskFailedError = $derived.by(() => {
+    void $bufferVersion;
+    if (!historyCtx.fetchComplete) return undefined;
+    return getBufferWftFailedEvent() as
+      | WorkflowTaskFailedEvent
+      | WorkflowTaskTimedOutEvent
+      | undefined;
+  });
 
   const isNotPending = $derived(
-    workflow && !workflow.isRunning && !workflow.isPaused,
+    !!workflow && !workflow.isRunning && !workflow.isPaused,
   );
 
   let groups = $derived(
-    reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
+    reverseSort ? [...filteredGroups].reverse() : filteredGroups,
   );
   let history = $derived(
-    reverseSort ? [...$filteredEventHistory].reverse() : $filteredEventHistory,
+    reverseSort ? [...filteredEvents].reverse() : filteredEvents,
   );
 
   let items = $derived(
@@ -150,7 +209,7 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap-reverse items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="items-bottom flex gap-4 pt-2">
       <h2>
@@ -162,21 +221,21 @@
           data-testid="feed"
           icon="feed"
           class="h-10"
-          on:click={onAllClick}>All</TabButton
+          onclick={onAllClick}>All</TabButton
         >
         <TabButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
           icon="compact"
           class="h-10"
-          on:click={onCompactClick}>Compact</TabButton
+          onclick={onCompactClick}>Compact</TabButton
         >
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
           icon="json"
           class="h-10"
-          on:click={onJSONClick}>JSON</TabButton
+          onclick={onJSONClick}>JSON</TabButton
         >
       </TabButtons>
     </div>
@@ -186,7 +245,7 @@
           <ToggleButton
             leadingIcon={reverseSort ? 'descending' : 'ascending'}
             data-testid="zoom-in"
-            on:click={onSort}
+            onclick={onSort}
             size="sm"
           >
             {reverseSort
@@ -200,7 +259,7 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
-          on:click={onAutoRefreshToggle}
+          onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
@@ -215,7 +274,7 @@
           data-testid="download"
           leadingIcon="download"
           size="sm"
-          on:click={() => (showDownloadPrompt = true)}
+          onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}
         </ToggleButton>
@@ -225,7 +284,7 @@
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}
       <div class="border-t border-subtle px-4">
-        <WorkflowHistoryJson />
+        <WorkflowHistoryJson events={filteredEvents} />
       </div>
     {:else}
       <div data-testid="event-summary-table">
@@ -237,6 +296,6 @@
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
   {namespace}
-  workflowId={workflow?.id}
-  runId={workflow?.runId}
+  workflowId={workflow?.id ?? ''}
+  runId={workflow?.runId ?? ''}
 />

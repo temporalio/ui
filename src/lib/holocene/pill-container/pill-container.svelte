@@ -24,7 +24,7 @@
   let { class: className = '', children }: Props = $props();
 
   const pills: { id: string; disabled: boolean }[] = [];
-  const activePill = writable<string>(null);
+  const activePill = writable<string>('');
 
   setContext<PillsContext>(PILLS, {
     registerPill: (pill: string, disabled = false) => {
@@ -40,7 +40,7 @@
 
         activePill.update((current) =>
           current === pill
-            ? (pills.find((p) => p.id !== pill && !p.disabled)?.id ?? null)
+            ? (pills.find((p) => p.id !== pill && !p.disabled)?.id ?? '')
             : current,
         );
       });

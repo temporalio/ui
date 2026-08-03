@@ -8,7 +8,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import debounce from 'just-debounce';
+  import { debounce } from 'es-toolkit';
   import { onMount } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
@@ -33,6 +33,7 @@
     onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onItemsChange?: (items: T[]) => void;
+    onLoadingChange?: ((loading: boolean) => void) | undefined;
     onShiftUp?: KeyboardHandler;
     onShiftDown?: KeyboardHandler;
     onSpace?: KeyboardHandler;
@@ -53,6 +54,8 @@
   export let onError: ((error: Error) => void) | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest<T>>;
   export let onItemsChange: ((items: T[]) => void) | undefined = undefined;
+  export let onLoadingChange: ((loading: boolean) => void) | undefined =
+    undefined;
   export let onShiftUp: KeyboardHandler = undefined;
   export let onShiftDown: KeyboardHandler = undefined;
   export let onSpace: KeyboardHandler = undefined;
@@ -99,7 +102,8 @@
     try {
       const response = await fetchData($store.pageSize, '');
       const { nextPageToken } = response;
-      const items = response[itemsKeyname] || [];
+      const items =
+        (response as unknown as Record<string, T[]>)[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
       error = err as Error;
@@ -115,7 +119,8 @@
         $store.indexData[$store.index].nextToken,
       );
       const { nextPageToken } = response;
-      const items = response[itemsKeyname] || [];
+      const items =
+        (response as unknown as Record<string, T[]>)[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (error) {
       if (isError(error) && onError) {
@@ -184,6 +189,8 @@
     }
   }
 
+  $: if (onLoadingChange) onLoadingChange($store.loading);
+
   let previousItems: T[] | undefined;
   $: if (onItemsChange && $store.visibleItems !== previousItems) {
     previousItems = $store.visibleItems;
@@ -249,7 +256,7 @@
     <IconButton
       label={previousButtonLabel}
       disabled={!$store.hasPrevious}
-      on:click={handlePreviousPage}
+      onclick={handlePreviousPage}
       icon="arrow-left"
     />
     <div class="flex gap-1">
@@ -265,7 +272,7 @@
     <IconButton
       label={nextButtonLabel}
       disabled={!$store.hasNext || $store.updating}
-      on:click={fetchIndexData}
+      onclick={fetchIndexData}
       icon="arrow-right"
     />
   </nav>

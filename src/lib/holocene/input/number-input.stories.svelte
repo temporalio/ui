@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
@@ -36,7 +37,7 @@
       min: { name: 'Maximum Value', control: { type: 'number', min: 0 } },
       search: { name: 'Search', control: 'boolean' },
     },
-  } satisfies Meta<NumberInput>;
+  } satisfies Meta<ComponentProps<typeof NumberInput>>;
 </script>
 
 <script lang="ts">

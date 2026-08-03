@@ -17,6 +17,5 @@
   options={$activitySearchAttributeOptions}
   searchAttributes={$activitySearchAttributes}
   id="activity"
-  statusAttribute="ExecutionStatus"
   {onManualSearch}
 />

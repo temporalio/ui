@@ -19,8 +19,10 @@ const is =
 const getTwoAhead = (tokens: Tokens, index: number): string =>
   tokens[index + 2];
 
-export const getLargestDurationUnit = (duration: Duration): Duration => {
-  if (!duration) return;
+export const getLargestDurationUnit = (
+  duration: Duration,
+): Duration | undefined => {
+  if (!duration) return undefined;
   for (const key of durationKeys) {
     if (duration[key]) {
       return { [key]: duration[key] };
@@ -39,7 +41,7 @@ export const toListWorkflowParameters = (query: string): ParsedParameters => {
     workflowId: '',
     workflowType: '',
     executionStatus: null,
-    timeRange: null,
+    timeRange: undefined,
   };
 
   tokens.forEach((token, index) => {
@@ -61,7 +63,9 @@ export const toListWorkflowParameters = (query: string): ParsedParameters => {
         const duration = fromDate(start);
         const largestUnit = getLargestDurationUnit(duration);
 
-        parameters.timeRange = formatDuration(largestUnit);
+        if (largestUnit) {
+          parameters.timeRange = formatDuration(largestUnit);
+        }
       } catch (error) {
         console.error('Error parsing StartTime from query', error);
       }

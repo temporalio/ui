@@ -59,6 +59,12 @@ const formatValue = ({
   ) {
     return value;
   }
+  if (
+    type === SEARCH_ATTRIBUTE_TYPE.INT ||
+    type === SEARCH_ATTRIBUTE_TYPE.DOUBLE
+  ) {
+    return value;
+  }
   return `"${value}"`;
 };
 
@@ -89,6 +95,14 @@ const toFilterQueryStatement = (
 
   if (isNullConditional(conditional)) {
     return `\`${queryKey}\` ${conditional} null`;
+  }
+
+  if (attribute === 'ExecutionDuration') {
+    const isNanoseconds = /^\d+$/.test(String(value));
+    if (isNanoseconds) {
+      return `\`${queryKey}\`${conditional}${value}`;
+    }
+    return `\`${queryKey}\`${conditional}"${value}"`;
   }
 
   if (isDuration(value) || isDurationString(value)) {
@@ -135,7 +149,7 @@ const toQueryStatementsFromFilters = (
             value,
             conditional,
             archived,
-            customDate,
+            customDate ?? false,
           );
           if (parenthesis === '(') {
             statement = `(${statement}`;
@@ -149,7 +163,7 @@ const toQueryStatementsFromFilters = (
         }
       },
     )
-    .filter(Boolean);
+    .filter((statement): statement is string => Boolean(statement));
 };
 
 export const toListWorkflowQueryFromFilters = (

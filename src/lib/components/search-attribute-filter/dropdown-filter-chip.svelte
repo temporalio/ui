@@ -226,12 +226,12 @@
     return false;
   }
 
-  const onStartDateChange = (d: CustomEvent) => {
-    start.date = startOfDay(d.detail);
+  const onStartDateChange = (d: Date) => {
+    start.date = startOfDay(d);
   };
 
-  const onEndDateChange = (d: CustomEvent) => {
-    end.date = startOfDay(d.detail);
+  const onEndDateChange = (d: Date) => {
+    end.date = startOfDay(d);
   };
 
   const applyTimeChanges = (
@@ -331,9 +331,9 @@
       <ToggleButton
         variant="secondary"
         active={localFilter.conditional === option.value}
-        on:click={() => {
+        onclick={() => {
           if (isNullConditional(option.value)) {
-            localFilter.value = null;
+            localFilter.value = '';
           } else if (isNullFilter) {
             localFilter.value = filter.value;
           }
@@ -377,7 +377,7 @@
               <div class="flex flex-col gap-2">
                 <DatePicker
                   label={translate('common.start')}
-                  on:datechange={onStartDateChange}
+                  onDateChange={onStartDateChange}
                   selected={new Date(start.date)}
                   todayLabel={translate('common.today')}
                   closeLabel={translate('common.close')}
@@ -393,7 +393,7 @@
               <div class="flex flex-col gap-2">
                 <DatePicker
                   label={translate('common.end')}
-                  on:datechange={onEndDateChange}
+                  onDateChange={onEndDateChange}
                   selected={new Date(end.date)}
                   todayLabel={translate('common.today')}
                   closeLabel={translate('common.close')}
@@ -453,9 +453,9 @@
                 />
                 <div class="ml-6 flex flex-col gap-2">
                   <DatePicker
-                    label=""
+                    label={translate('common.start')}
                     labelHidden
-                    on:datechange={onStartDateChange}
+                    onDateChange={onStartDateChange}
                     selected={new Date(start.date)}
                     todayLabel={translate('common.today')}
                     closeLabel={translate('common.close')}
@@ -530,7 +530,7 @@
             <ToggleButtons>
               <ToggleButton
                 variant={localFilter.value === 'true' ? 'primary' : 'secondary'}
-                on:click={() => {
+                onclick={() => {
                   localFilter.conditional = '=';
                   localFilter.value = 'true';
                 }}
@@ -541,7 +541,7 @@
                 variant={localFilter.value === 'false'
                   ? 'primary'
                   : 'secondary'}
-                on:click={() => {
+                onclick={() => {
                   localFilter.conditional = '=';
                   localFilter.value = 'false';
                 }}
@@ -576,7 +576,7 @@
             size="xs"
             data-testid="remove-filter-button"
             type="button"
-            on:click={onRemove}>Remove</Button
+            onclick={onRemove}>Remove</Button
           >
           <Button
             variant="primary"

@@ -78,7 +78,6 @@
     value={$timestamp(worker?.startTime)}
   />
   <WorkersTableCell
-    copyable={false}
     {filterable}
     filters={[
       ...(worker?.sdkName

@@ -9,9 +9,23 @@
 @layer base {
   :root {
     --top-nav-height: 3rem;
+    --banner-height: 0px;
+    --bottom-nav-height: 4rem;
+    --scroll-inset-top: 0px;
+    --scroll-inset-bottom: calc(
+      var(--bottom-nav-height) + var(--banner-height)
+    );
     --panel-collapsed-w: 60px;
     --panel-expanded-w: 240px;
     --panel-h: 73dvh;
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --bottom-nav-height: 0px;
+      --scroll-inset-top: calc(var(--top-nav-height) + var(--banner-height));
+      --scroll-inset-bottom: 0px;
+    }
   }
 
   *,
