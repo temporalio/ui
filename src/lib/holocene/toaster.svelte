@@ -25,10 +25,6 @@
 
   const announcements = toasterStore.announcements;
 
-  const dismissToast = (id: string) => {
-    pop(id);
-  };
-
   const toast = cva(['fixed z-[99999] flex flex-col items-end gap-2'], {
     variants: {
       position: {
@@ -59,7 +55,7 @@ inertBackground walk from re-inerting it as a body-level sibling. -->
       {closeButtonLabel}
       variant={variant ?? 'primary'}
       id={id ?? ''}
-      onDismiss={dismissToast}
+      onDismiss={pop}
     >
       {#if link}
         <Link href={link}>
