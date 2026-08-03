@@ -20,11 +20,11 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'workflowEvent',
-      label: 'Link',
+      label: 'Workflow Link',
       value: 'test-wf/test-run/history/events/42',
       href: `${base}/namespaces/test-ns/workflows/test-wf/test-run/history/events/42`,
       namespace: {
-        label: 'Link Namespace',
+        label: 'Namespace Link',
         value: 'test-ns',
         href: `${base}/namespaces/test-ns`,
       },
@@ -84,11 +84,11 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'workflow',
-      label: 'Workflow ID',
+      label: 'Workflow Link',
       value: 'test-wf/test-run/timeline',
       href: `${base}/namespaces/test-ns/workflows/test-wf/test-run/timeline`,
       namespace: {
-        label: 'Link Namespace',
+        label: 'Namespace Link',
         value: 'test-ns',
         href: `${base}/namespaces/test-ns`,
       },
@@ -107,7 +107,7 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'nexusOperation',
-      label: 'Nexus Operation',
+      label: 'Standalone Nexus Operation Link',
       value: 'operation-1',
       href: `${base}/namespaces/test-ns/nexus-operations/operation-1/run-1/details`,
     });
@@ -124,7 +124,7 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'activity',
-      label: 'Activity ID',
+      label: 'Standalone Activity Link',
       value: 'activity-1',
       href: `${base}/namespaces/test-ns/activities/activity-1/run-1/details`,
     });
@@ -157,7 +157,7 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'nexusOperation',
-      label: 'Nexus Operation',
+      label: 'Standalone Nexus Operation Link',
       value: 'operation-1',
       href: undefined,
     });
@@ -172,7 +172,7 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'workflow',
-      label: 'Workflow ID',
+      label: 'Workflow Link',
       value: 'test-wf',
       href: undefined,
     });
