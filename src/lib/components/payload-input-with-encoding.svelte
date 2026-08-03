@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
+  import type { Snippet } from 'svelte';
+
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
@@ -10,24 +12,45 @@
 
   import PayloadInput from './payload-input.svelte';
 
-  export let id: string = crypto.randomUUID();
-  export let input: string;
-  export let encoding: Writable<PayloadInputEncoding>;
-  export let messageType: string;
-  export let error = false;
-  export let loading = false;
-  export let label = translate('workflows.input');
-  export let editing = true;
-  export let hintText: string | undefined = undefined;
-  export let placeholder: string | undefined = undefined;
-  export let payloadLabel: string | undefined = undefined;
-  export let copyable = false;
+  interface Props {
+    id?: string;
+    input: string;
+    encoding: Writable<PayloadInputEncoding>;
+    messageType: string;
+    error?: boolean;
+    loading?: boolean;
+    label?: string;
+    editing?: boolean;
+    hintText?: string;
+    placeholder?: string;
+    payloadLabel?: string;
+    copyable?: boolean;
+    action?: Snippet;
+  }
 
-  $: {
+  const uid = $props.id();
+
+  let {
+    id = uid,
+    input = $bindable(),
+    encoding = $bindable(),
+    messageType = $bindable(),
+    error = false,
+    loading = $bindable(false),
+    label = translate('workflows.input'),
+    editing = true,
+    hintText,
+    placeholder,
+    payloadLabel,
+    copyable = false,
+    action,
+  }: Props = $props();
+
+  $effect(() => {
     if ($encoding === 'json/plain' && messageType) {
       messageType = '';
     }
-  }
+  });
 </script>
 
 <div>
@@ -72,7 +95,7 @@
           {/if}
         </div>
       {/if}
-      <slot name="action" />
+      {@render action?.()}
     </div>
   </Card>
 </div>
