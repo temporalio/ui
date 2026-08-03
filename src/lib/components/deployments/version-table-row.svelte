@@ -387,8 +387,8 @@
     {workflowHref}
     {isCurrent}
     hasComputeConfig={isVersionSummaryNew(version)
-      ? !!version.computeConfig
-      : true}
+      ? Object.keys(version.computeConfig?.scalingGroups ?? {}).length > 0
+      : false}
     {isRamping}
     onSetCurrent={() => (showSetCurrentModal = true)}
     onSetRamping={openSetRamping}
