@@ -46,36 +46,40 @@
   cancelText={translate('common.cancel')}
   loading={$actionPending}
   error={$serverError}
-  on:confirmModal={() =>
+  onConfirmModal={() =>
     submitTriggerImmediatelySchedule($selectedOverlapPolicy, {
       identity,
       scheduleId,
       namespace,
     })}
-  on:cancelModal={() => {
+  onCancelModal={() => {
     closeConfirmationModal('trigger');
   }}
 >
-  <h3 slot="title">
-    {translate('schedules.trigger-modal-title')}
-  </h3>
-  <div slot="content">
-    <RadioGroup name="overlap-policy" group={selectedOverlapPolicy}>
-      {#each Object.entries(overlapPolicyContent) as [value, content] (value)}
-        <RadioCard
-          id="overlap-policy-{value}"
-          value={value as OverlapPolicy}
-          label={[
-            content.label,
-            value === scheduleOverlapPolicy &&
-              translate('schedules.overlap-schedule-policy-suffix'),
-          ]
-            .filter(Boolean)
-            .join(' ')}
-          description={content.description}
-          labelContainerClass="border-transparent p-0"
-        />
-      {/each}
-    </RadioGroup>
-  </div>
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('schedules.trigger-modal-title')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <RadioGroup name="overlap-policy" group={selectedOverlapPolicy}>
+        {#each Object.entries(overlapPolicyContent) as [value, content] (value)}
+          <RadioCard
+            id="overlap-policy-{value}"
+            value={value as OverlapPolicy}
+            label={[
+              content.label,
+              value === scheduleOverlapPolicy &&
+                translate('schedules.overlap-schedule-policy-suffix'),
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            description={content.description}
+            labelContainerClass="border-transparent p-0"
+          />
+        {/each}
+      </RadioGroup>
+    </div>
+  {/snippet}
 </Modal>

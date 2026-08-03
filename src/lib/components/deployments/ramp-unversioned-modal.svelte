@@ -28,31 +28,39 @@
   {open}
   confirmText={translate('common.confirm')}
   cancelText={translate('common.cancel')}
-  on:confirmModal={() => onConfirm?.(percentage)}
-  on:cancelModal={() => onCancel?.()}
+  onConfirmModal={() => onConfirm?.(percentage)}
+  onCancelModal={() => onCancel?.()}
 >
-  {#if onRemove}
-    <Button slot="footer" variant="destructive" size="sm" onclick={onRemove}>
-      {translate('deployments.remove-unversioned-ramping')}
-    </Button>
-  {/if}
-  <h3 slot="title">{translate('deployments.ramp-to-unversioned')}</h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <p class="text-sm">
-      {translate('deployments.ramp-to-unversioned-description')}
-    </p>
-    <NumberInput
-      id="unversioned-ramping-percentage"
-      label={translate('deployments.ramping-percentage', {
-        percentage: '',
-      }).trim()}
-      bind:value={percentage}
-      min={0}
-      max={100}
-      units="%"
-    />
-    {#if error}
-      <p class="text-sm text-danger">{error}</p>
+  {#snippet footer()}
+    {#if onRemove}
+      <Button variant="destructive" size="sm" onclick={onRemove}>
+        {translate('deployments.remove-unversioned-ramping')}
+      </Button>
+    {:else}
+      <div></div>
     {/if}
-  </div>
+  {/snippet}
+  {#snippet titleSnippet()}
+    <h3>{translate('deployments.ramp-to-unversioned')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      <p class="text-sm">
+        {translate('deployments.ramp-to-unversioned-description')}
+      </p>
+      <NumberInput
+        id="unversioned-ramping-percentage"
+        label={translate('deployments.ramping-percentage', {
+          percentage: '',
+        }).trim()}
+        bind:value={percentage}
+        min={0}
+        max={100}
+        units="%"
+      />
+      {#if error}
+        <p class="text-sm text-danger">{error}</p>
+      {/if}
+    </div>
+  {/snippet}
 </Modal>
