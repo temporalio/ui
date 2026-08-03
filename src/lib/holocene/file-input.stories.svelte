@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { fn } from 'storybook/test';
 
   import FileInput from './file-input.svelte';
 
@@ -11,6 +12,7 @@
     args: {
       id: 'file-input',
       accept: '.json',
+      onUpload: fn(),
     },
     argTypes: {
       id: { control: 'text' },

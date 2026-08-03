@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { action } from 'storybook/actions';
+  import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
@@ -19,6 +20,7 @@
       dark: true,
       closeButtonLabel: 'Close',
       closePadding: true,
+      onClick: fn(),
     },
     argTypes: {
       position: {

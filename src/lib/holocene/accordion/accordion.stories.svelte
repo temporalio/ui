@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { action as logAction } from 'storybook/actions';
+  import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
@@ -21,6 +22,7 @@
       open: false,
       expandable: true,
       error: '',
+      onToggle: fn(),
     },
     argTypes: {
       title: { name: 'Title', control: 'text' },

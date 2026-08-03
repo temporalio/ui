@@ -2,7 +2,7 @@
 
 <script lang="ts" module>
   import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
-  import { expect, userEvent, within } from 'storybook/test';
+  import { expect, fn, userEvent, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
@@ -31,6 +31,7 @@
       hintText: '',
       clearButtonLabel: 'Clear input',
       copyButtonLabel: 'Copy contents',
+      onClear: fn(),
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },

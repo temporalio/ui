@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { action } from 'storybook/actions';
+  import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
@@ -19,6 +20,7 @@
       required: false,
       error: '',
       valid: true,
+      onChange: fn(),
     },
     argTypes: {
       label: { control: 'text' },

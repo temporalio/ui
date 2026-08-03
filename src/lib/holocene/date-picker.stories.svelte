@@ -3,7 +3,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { action } from 'storybook/actions';
-  import { within } from 'storybook/test';
+  import { fn, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -19,6 +19,7 @@
       disabled: false,
       labelHidden: false,
       selected: new Date('2012-09-19T08:03:00-05:00'),
+      onDateChange: fn(),
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },

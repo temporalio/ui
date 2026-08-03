@@ -2,6 +2,7 @@
 
 <script lang="ts" module>
   import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -21,6 +22,7 @@
       leadingIcon: undefined as IconName | undefined,
       labelHidden: false,
       disabled: false,
+      onChange: fn(),
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },

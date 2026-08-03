@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { action } from 'storybook/actions';
+  import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import type { CodecServerFormData } from './types';
@@ -58,6 +59,12 @@
   const { Story } = defineMeta({
     title: 'Forms/Codec Server Form',
     component: CodecServerForm,
+    args: {
+      onSave: fn(),
+      onSuccess: fn(),
+      onCancel: fn(),
+      onRetry: fn(),
+    },
     parameters: {
       layout: 'padded',
     },

@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { action } from 'storybook/actions';
+  import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import { translate } from '$lib/i18n/translate';
@@ -79,6 +80,12 @@
   const { Story } = defineMeta({
     title: 'Forms/SearchAttributes',
     component: SearchAttributesForm,
+    args: {
+      onSave: fn(),
+      onSuccess: fn(),
+      onCancel: fn(),
+      onRetry: fn(),
+    },
     parameters: {
       layout: 'padded',
     },
