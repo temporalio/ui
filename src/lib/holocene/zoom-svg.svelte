@@ -55,8 +55,11 @@
 
   function panBy(dx: number, dy: number) {
     if (!pannable) return;
-    viewBox.x += dx * viewBox.width;
-    viewBox.y += dy * viewBox.height;
+    viewBox = {
+      ...viewBox,
+      x: viewBox.x + dx * viewBox.width,
+      y: viewBox.y + dy * viewBox.height,
+    };
   }
 
   function zoomBy(factor: number) {
@@ -66,10 +69,14 @@
     const centerX = viewBox.x + viewBox.width / 2;
     const centerY = viewBox.y + viewBox.height / 2;
     const zoomRatio = newZoomLevel / zoomLevel;
-    viewBox.width *= zoomRatio;
-    viewBox.height *= zoomRatio;
-    viewBox.x = centerX - viewBox.width / 2;
-    viewBox.y = centerY - viewBox.height / 2;
+    const newWidth = viewBox.width * zoomRatio;
+    const newHeight = viewBox.height * zoomRatio;
+    viewBox = {
+      x: centerX - newWidth / 2,
+      y: centerY - newHeight / 2,
+      width: newWidth,
+      height: newHeight,
+    };
     zoomLevel = newZoomLevel;
   }
 
@@ -121,10 +128,12 @@
     const newWidth = viewBox.width * zoomRatio;
     const newHeight = viewBox.height * zoomRatio;
 
-    viewBox.x = mouseX - (mouseX - viewBox.x) * zoomRatio;
-    viewBox.y = mouseY - (mouseY - viewBox.y) * zoomRatio;
-    viewBox.width = newWidth;
-    viewBox.height = newHeight;
+    viewBox = {
+      x: mouseX - (mouseX - viewBox.x) * zoomRatio,
+      y: mouseY - (mouseY - viewBox.y) * zoomRatio,
+      width: newWidth,
+      height: newHeight,
+    };
 
     zoomLevel = newZoomLevel;
   };
@@ -144,8 +153,7 @@
     const dx = (startX - event.clientX) * (viewBox.width / svg.clientWidth);
     const dy = (startY - event.clientY) * (viewBox.height / svg.clientHeight);
 
-    viewBox.x = panOffsetX + dx;
-    viewBox.y = panOffsetY + dy;
+    viewBox = { ...viewBox, x: panOffsetX + dx, y: panOffsetY + dy };
   }
 
   function handleMouseUp() {
@@ -157,10 +165,7 @@
   }
 
   function onCenter() {
-    viewBox.x = 0;
-    viewBox.y = 0;
-    viewBox.width = width;
-    viewBox.height = height;
+    viewBox = { x: 0, y: 0, width, height };
     zoomLevel = initialZoom;
   }
 </script>
