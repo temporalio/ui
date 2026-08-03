@@ -1,12 +1,12 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import { iconNames } from '$lib/holocene/icon';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Tooltip',
     component: Tooltip,
     args: {
@@ -69,20 +69,20 @@
         table: { category: 'Positioning' },
       },
     },
-  } satisfies Meta<ComponentProps<typeof Tooltip>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: ComponentProps<typeof Tooltip>,
+  context: StoryContext<ComponentProps<typeof Tooltip>>,
+)}
   <div class="flex h-screen w-full items-center justify-center">
     <Tooltip {...args}>
       <Button>{context.name} Tooltip</Button>
     </Tooltip>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Top" args={{ top: true }} />
 
@@ -122,7 +122,7 @@
 
 <Story name="Right with Icon" args={{ right: true, icon: 'trash' }} />
 
-<Story name="With Content instead of text">
+<Story name="With Content instead of text" asChild>
   <Tooltip bottomRight show>
     {#snippet content()}
       <div>
@@ -135,7 +135,7 @@
   </Tooltip>
 </Story>
 
-<Story name="Portal (avoids overflow clipping)">
+<Story name="Portal (avoids overflow clipping)" asChild>
   <div class="overflow-hidden rounded border border-slate-600 p-4">
     <Tooltip top usePortal text="This renders outside the overflow container">
       <Button>Hover me (portal)</Button>

@@ -1,15 +1,13 @@
 <script lang="ts" module>
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
-  import { expect, within } from '@storybook/test';
-  import type { ComponentProps } from 'svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { expect, within } from 'storybook/test';
 
   import type { ComputeStatus } from '$lib/types/deployments';
 
   import ComputeBadge from './compute-badge.svelte';
   import ConnectionBadge from './connection-badge.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Deployments/Compute Badge',
     component: ComputeBadge,
     args: {
@@ -21,7 +19,7 @@
         options: ['aws-lambda', 'gcp-cloud-run', undefined],
       },
     },
-  } satisfies Meta<ComponentProps<typeof ComputeBadge>>;
+  });
 
   const nowSeconds = Math.floor(Date.now() / 1000);
   const connected = {
@@ -38,11 +36,7 @@
   const pending: ComputeStatus = { providerValidation: {} };
 </script>
 
-<Template let:args>
-  <ComputeBadge {...args} />
-</Template>
-
-<Story name="All Scenarios">
+<Story name="All Scenarios" asChild>
   <div class="flex flex-col items-start gap-4 p-4">
     <div class="flex flex-col items-start gap-2">
       <p class="text-sm text-secondary">

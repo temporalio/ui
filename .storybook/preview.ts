@@ -1,5 +1,5 @@
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
-import type { Preview } from '@storybook/svelte';
+import type { Preview } from '@storybook/sveltekit';
 import '../src/app.css';
 import i18next from 'i18next';
 
@@ -32,7 +32,6 @@ const preview: Preview = {
     }),
   ],
   parameters: {
-    actions: { argTypesRegex: '^on[A-Z].*' },
     backgrounds: {
       disable: true,
     },

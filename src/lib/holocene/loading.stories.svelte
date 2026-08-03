@@ -1,26 +1,18 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
   import Loading from './loading.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Loading',
     component: Loading,
     args: {},
     argTypes: {},
-  } satisfies Meta<Loading>;
+  });
 </script>
-
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
-  <Loading {...args} />
-</Template>
 
 <Story name="Default" />
 
-<Story name="Change size of loader">
+<Story name="Change size of loader" asChild>
   <Loading class="w-fit scale-[.70]"></Loading>
 </Story>

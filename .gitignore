@@ -18,6 +18,7 @@ server/ui/assets
 /playwright-report/
 /playwright/.cache/
 /dist
+/storybook-static
 /audits
 go.work
 go.work.sum

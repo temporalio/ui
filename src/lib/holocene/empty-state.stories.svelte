@@ -1,12 +1,11 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
-  import type { ComponentProps } from 'svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
   import { iconNames } from './icon';
 
   import EmptyState from './empty-state.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Empty State',
     component: EmptyState,
     args: {
@@ -27,16 +26,8 @@
         },
       },
     },
-  } satisfies Meta<ComponentProps<typeof EmptyState>>;
+  });
 </script>
-
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
-  <EmptyState {...args} />
-</Template>
 
 <Story name="Default" />
 

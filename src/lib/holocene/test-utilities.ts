@@ -1,13 +1,9 @@
-import type { Story } from '@storybook/addon-svelte-csf';
-import { expect, within } from '@storybook/test';
-
-type PlayFunction = Story['$$prop_def']['play'];
-type PlayFunctionContext = Parameters<NonNullable<PlayFunction>>[0];
+import { expect, within } from 'storybook/test';
 
 export const shouldNotBeTransparent = (
-  fn: (canvas: ReturnType<typeof within>) => PlayFunction,
+  fn: (canvas: ReturnType<typeof within>) => HTMLElement,
 ) => {
-  return ({ canvasElement }: PlayFunctionContext) => {
+  return ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const element = fn(canvas);
     expect(element).not.toHaveStyle({ backgroundColor: 'rgba(0,0,0,0)' });

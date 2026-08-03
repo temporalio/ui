@@ -1,18 +1,14 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
   import SuperFormsExample from './superforms-example.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Forms/SuperForms',
     component: SuperFormsExample,
-  } satisfies Meta<SuperFormsExample>;
+  });
 </script>
 
-<script lang="ts">
-  import { Story } from '@storybook/addon-svelte-csf';
-</script>
-
-<Story name="SuperForms Examples">
+<Story name="SuperForms Examples" asChild>
   <SuperFormsExample />
 </Story>

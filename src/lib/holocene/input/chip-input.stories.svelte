@@ -1,12 +1,12 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
-  import { userEvent, within } from '@storybook/test';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { userEvent, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Chip Input',
     component: ChipInput,
     args: {
@@ -41,16 +41,16 @@
       },
       scrollTo: { name: 'Scroll To', control: 'boolean' },
     },
-  } satisfies Meta<ComponentProps<typeof ChipInput>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: ComponentProps<typeof ChipInput>,
+  context: StoryContext<ComponentProps<typeof ChipInput>>,
+)}
   <ChipInput {...args} id={context.id} />
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

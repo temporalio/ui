@@ -1,5 +1,6 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
   import type { ComponentProps } from 'svelte';
 
   import OrderableListItem from './orderable-list-item.svelte';
@@ -14,43 +15,47 @@
     { label: 'Item F' },
   ];
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Orderable List',
     component: OrderableList,
-    subcomponents: { OrderableListItem },
-  } satisfies Meta<ComponentProps<typeof OrderableList>>;
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story } from '@storybook/addon-svelte-csf';
-</script>
-
-<Story name="Empty">
+<Story name="Empty" asChild>
   <OrderableList />
 </Story>
 
-<Story name="Heading" let:context>
-  <OrderableList>
-    {#snippet heading()}<span>{context.name}</span>{/snippet}
-  </OrderableList>
+<Story name="Heading">
+  {#snippet template(
+    _args: ComponentProps<typeof OrderableList>,
+    context: StoryContext<ComponentProps<typeof OrderableList>>,
+  )}
+    <OrderableList>
+      {#snippet heading()}<span>{context.name}</span>{/snippet}
+    </OrderableList>
+  {/snippet}
 </Story>
 
-<Story name="With Items" let:context>
-  <OrderableList>
-    {#snippet heading()}<span>{context.name}</span>{/snippet}
-    {#each items as item, index (item.label)}
-      <OrderableListItem
-        onMoveItem={action('moveItem')}
-        onRemoveItem={action('removeItem')}
-        addButtonLabel="Add"
-        static={false}
-        label={item.label}
-        moveUpButtonLabel="Move Up"
-        moveDownButtonLabel="Move Down"
-        removeButtonLabel="Remove"
-        {index}
-      />
-    {/each}
-  </OrderableList>
+<Story name="With Items">
+  {#snippet template(
+    _args: ComponentProps<typeof OrderableList>,
+    context: StoryContext<ComponentProps<typeof OrderableList>>,
+  )}
+    <OrderableList>
+      {#snippet heading()}<span>{context.name}</span>{/snippet}
+      {#each items as item, index (item.label)}
+        <OrderableListItem
+          onMoveItem={action('moveItem')}
+          onRemoveItem={action('removeItem')}
+          addButtonLabel="Add"
+          static={false}
+          label={item.label}
+          moveUpButtonLabel="Move Up"
+          moveDownButtonLabel="Move Down"
+          removeButtonLabel="Remove"
+          {index}
+        />
+      {/each}
+    </OrderableList>
+  {/snippet}
 </Story>

@@ -1,19 +1,16 @@
 <script lang="ts" module>
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Progress Bar',
     component: ProgressBar,
-  } as Meta<ProgressBar>;
+  });
 </script>
 
-<Template>
+<Story name="Full" asChild>
   <div class="relative mx-auto p-8">
     <ProgressBar />
   </div>
-</Template>
-
-<Story name="Full" />
+</Story>
