@@ -1,6 +1,7 @@
-<script lang="ts">
+<script lang="ts" generics="Item">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -8,46 +9,65 @@
 
   import { getPaginatedTableMaxHeight } from './context';
 
-  type Item = $$Generic;
-
-  interface $$Props extends Omit<HTMLAttributes<HTMLTableElement>, 'class'> {
+  interface Props extends Omit<HTMLAttributes<HTMLTableElement>, 'class'> {
     visibleItems: Item[];
     loading?: boolean;
     updating?: boolean;
     maxHeight?: string;
     fixed?: boolean;
     class?: ClassNameValue;
+    caption?: Snippet;
+    headers?: Snippet<[{ visibleItems: Item[] }]>;
+    children?: Snippet;
+    loadingContent?: Snippet;
+    actionsStart?: Snippet;
+    actionsCenter?: Snippet;
+    actionsEnd?: Snippet;
+    empty?: Snippet;
   }
 
-  export let visibleItems: Item[];
-  export let loading = false;
-  export let updating = false;
-  export let maxHeight = '';
-  export let fixed = false;
-
-  let className: ClassNameValue = '';
-  export { className as class };
+  let {
+    visibleItems,
+    loading = false,
+    updating = false,
+    maxHeight = '',
+    fixed = false,
+    class: className = '',
+    caption,
+    headers,
+    children,
+    loadingContent,
+    actionsStart,
+    actionsCenter,
+    actionsEnd,
+    empty,
+    ...rest
+  }: Props = $props();
 
   const contextMaxHeight = getPaginatedTableMaxHeight();
 
-  let tableContainer: HTMLDivElement;
-  let footerHeight = 0;
+  let tableContainer = $state<HTMLDivElement>();
+  let footerHeight = $state(0);
 
-  $: tableOffset = tableContainer?.offsetTop
-    ? tableContainer.offsetTop + 32
-    : 0;
+  const tableOffset = $derived(
+    tableContainer?.offsetTop ? tableContainer.offsetTop + 32 : 0,
+  );
 
   export function scrollToTop() {
     tableContainer?.scrollTo({ top: 0, behavior: 'instant' });
   }
 </script>
 
+{#snippet tableHeaders()}
+  {@render headers?.({ visibleItems })}
+{/snippet}
+
 <div
   class={merge(
     'surface-primary min-h-[154px] grow overflow-auto border border-subtle',
     className,
   )}
-  id="{$$restProps['id']}-container"
+  id="{rest['id']}-container"
   bind:this={tableContainer}
   style="max-height: {maxHeight ||
     contextMaxHeight ||
@@ -58,33 +78,34 @@
   --table-header-h: 2.25rem;"
 >
   {#if loading}
-    {#if $$slots.loading}
-      <slot name="loading" />
+    {#if loadingContent}
+      {@render loadingContent()}
     {:else}
       <SkeletonTable bordered={false} rows={25} />
     {/if}
   {:else}
-    <Table bordered={false} {updating} {fixed} {...$$restProps}>
-      {#snippet caption()}
-        <slot name="caption" />
-      {/snippet}
-      {#snippet headers()}
-        <slot name="headers" {visibleItems} />
-      {/snippet}
-      <slot />
+    <Table
+      bordered={false}
+      {updating}
+      {fixed}
+      {caption}
+      headers={tableHeaders}
+      {...rest}
+    >
+      {@render children?.()}
     </Table>
     {#if visibleItems.length}
       <div
         class="surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2"
         bind:clientHeight={footerHeight}
       >
-        <slot name="actions-start" />
-        <slot name="actions-center" />
-        <slot name="actions-end" />
+        {@render actionsStart?.()}
+        {@render actionsCenter?.()}
+        {@render actionsEnd?.()}
       </div>
     {:else}
       <div style="height: calc(100% - var(--table-header-h));">
-        <slot name="empty" />
+        {@render empty?.()}
       </div>
     {/if}
   {/if}
