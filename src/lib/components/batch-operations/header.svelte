@@ -9,7 +9,7 @@
 
   interface Props {
     operation: BatchOperation;
-    onToggleAutoRefresh?: (detail: { checked: boolean }) => void;
+    onToggleAutoRefresh?: (checked: boolean) => void;
   }
 
   let { operation, onToggleAutoRefresh }: Props = $props();
@@ -20,7 +20,7 @@
     }
 
     const { checked } = event.currentTarget;
-    onToggleAutoRefresh?.({ checked });
+    onToggleAutoRefresh?.(checked);
     $autoRefresh = checked;
   };
 

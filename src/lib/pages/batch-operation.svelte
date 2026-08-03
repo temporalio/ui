@@ -20,7 +20,7 @@
   let fetchKey = $state(0);
   let timeout: number;
 
-  const handleToggleAutoRefresh = ({ checked }: { checked: boolean }) => {
+  const handleToggleAutoRefresh = (checked: boolean) => {
     if (checked) {
       fetchKey += 1;
     } else if (timeout) {
