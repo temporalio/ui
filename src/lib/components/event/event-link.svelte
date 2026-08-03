@@ -8,26 +8,47 @@
     toEventLinkView,
   } from '$lib/utilities/event-link';
 
-  export let link: EventLink | undefined = undefined;
-  export let view: EventLinkDisplay | undefined = undefined;
-  export let context: EventLinkContext = {};
-  export let value: string | undefined = undefined;
-  export let label: string | undefined = undefined;
-  export let href: string | undefined = undefined;
+  interface Props {
+    link?: EventLink;
+    view?: EventLinkDisplay;
+    context?: EventLinkContext;
+    value?: string;
+    label?: string;
+    href?: string;
+    class?: string;
+    linkClass?: string;
+  }
 
-  $: linkView = view ?? (link ? toEventLinkView(link, context) : undefined);
-  $: resolvedHref = href ?? linkView?.href;
-  $: resolvedValue = value ?? linkView?.value ?? resolvedHref ?? '';
-  $: resolvedLabel = label ?? linkView?.label ?? translate('nexus.link');
+  let {
+    link,
+    view,
+    context = {},
+    value,
+    label,
+    href,
+    class: className = '',
+    linkClass = '',
+  }: Props = $props();
+
+  const linkView = $derived(
+    view ?? (link ? toEventLinkView(link, context) : undefined),
+  );
+  const resolvedHref = $derived(href ?? linkView?.href);
+  const resolvedValue = $derived(
+    value ?? linkView?.value ?? resolvedHref ?? '',
+  );
+  const resolvedLabel = $derived(
+    label ?? linkView?.label ?? translate('nexus.link'),
+  );
 </script>
 
 <div
-  class="flex flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {$$props.class}"
+  class="flex flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {className}"
 >
   <p class="max-w-fit whitespace-nowrap text-right text-sm">
     {resolvedLabel}
   </p>
-  <div class="overflow-hidden {$$props.linkClass}">
+  <div class="overflow-hidden {linkClass}">
     {#if resolvedHref}
       <Link href={resolvedHref}>
         {resolvedValue}
