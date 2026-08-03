@@ -20,8 +20,8 @@
     }
 
     const { checked } = event.currentTarget;
-    onToggleAutoRefresh?.(checked);
     $autoRefresh = checked;
+    onToggleAutoRefresh?.(checked);
   };
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
