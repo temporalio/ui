@@ -52,6 +52,6 @@
     bind:minute
     bind:second
     twelveHourClock={false}
-    on:timechange={updateDatetime}
+    onTimeChange={updateDatetime}
   />
 </div>

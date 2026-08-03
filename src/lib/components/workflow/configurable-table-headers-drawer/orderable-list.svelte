@@ -45,9 +45,8 @@
         {index}
         {label}
         totalItems={columnsInUse.length}
-        on:moveItem={(event) =>
-          moveColumn(event.detail.from, event.detail.to, namespace, table)}
-        on:removeItem={() => removeColumn(label, namespace, table)}
+        onMoveItem={({ from, to }) => moveColumn(from, to, namespace, table)}
+        onRemoveItem={() => removeColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
@@ -75,7 +74,7 @@
     {#each $availableColumns as { label } (label)}
       <OrderableListItem
         static
-        on:addItem={() => addColumn(label, namespace, table)}
+        onAddItem={() => addColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
@@ -97,7 +96,7 @@
       {#each $availableCustomColumns as { label } (label)}
         <OrderableListItem
           static
-          on:addItem={() => addColumn(label, namespace, table)}
+          onAddItem={() => addColumn(label, namespace, table)}
           addButtonLabel={translate('workflows.add-column-label', {
             column: label,
           })}

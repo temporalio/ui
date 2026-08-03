@@ -17,26 +17,50 @@
 
   import { showFullTree } from '../workflow-relationships.svelte';
 
-  export let root: RootNode;
-  export let width: number;
-  export let height: number;
-  export let zoomLevel: number;
-  export let rootX = 0;
-  export let rootY = 0;
-  export let generation = 1;
-  export let openRuns: Map<number, string>;
-  export let expandAll: boolean;
-  export let onNodeClick: (node: RootNode, generation: number) => void;
-  export let activeWorkflow: WorkflowExecution | undefined = undefined;
+  import WorkflowFamilyNodeTree from './workflow-family-node-tree.svelte';
 
-  $: ({ workflow, run, namespace } = page.params);
-  $: ({ workflow: fullWorkflow } = $workflowRun);
-  $: workflowRelationships = getWorkflowRelationships(
-    fullWorkflow,
-    $fullEventHistory,
-    page.data.namespace,
+  interface Props {
+    root: RootNode;
+    width: number;
+    height: number;
+    zoomLevel: number;
+    rootX?: number;
+    rootY?: number;
+    generation?: number;
+    openRuns: Map<number, string>;
+    expandAll: boolean;
+    onNodeClick: (node: RootNode, generation: number) => void;
+    activeWorkflow?: WorkflowExecution;
+  }
+
+  let {
+    root,
+    width,
+    height,
+    zoomLevel,
+    rootX = 0,
+    rootY = 0,
+    generation = 1,
+    openRuns,
+    expandAll,
+    onNodeClick,
+    activeWorkflow,
+  }: Props = $props();
+
+  const workflow = $derived(page.params.workflow);
+  const run = $derived(page.params.run);
+  const namespace = $derived(page.params.namespace);
+  const fullWorkflow = $derived($workflowRun.workflow);
+  const workflowRelationships = $derived(
+    getWorkflowRelationships(
+      fullWorkflow,
+      $fullEventHistory,
+      page.data.namespace,
+    ),
   );
-  $: ({ first, next, previous } = workflowRelationships);
+  const first = $derived(workflowRelationships.first);
+  const next = $derived(workflowRelationships.next);
+  const previous = $derived(workflowRelationships.previous);
 
   const getPositions = (
     width: number,
@@ -54,9 +78,12 @@
     };
   };
 
-  $: ({ x, y, radius } = getPositions(width, height, rootX, rootY));
+  const positions = $derived(getPositions(width, height, rootX, rootY));
+  const x = $derived(positions.x);
+  const y = $derived(positions.y);
+  const radius = $derived(positions.radius);
 
-  $: getPosition = (index: number) => {
+  const getPosition = (index: number) => {
     const childY = y + 4 * radius;
 
     const getX = () => {
@@ -89,16 +116,16 @@
     }
   };
 
-  $: isExpanded = (node: RootNode) => {
+  const isExpanded = (node: RootNode) => {
     const opened = openRuns.get(generation) === node.workflow.runId;
     return expandAll || opened;
   };
 
-  $: isCurrent = (node: RootNode) => {
+  const isCurrent = (node: RootNode) => {
     return node.workflow.id === workflow && node.workflow.runId === run;
   };
 
-  $: isActive = (node: RootNode) => {
+  const isActive = (node: RootNode) => {
     return node.workflow.runId === activeWorkflow?.runId;
   };
 
@@ -141,7 +168,7 @@
 {#each root?.children as child, index}
   {@const { childX, childY } = getPosition(index)}
   {#if child.children.length && isExpanded(child)}
-    <svelte:self
+    <WorkflowFamilyNodeTree
       root={child}
       {width}
       {height}
@@ -172,8 +199,8 @@
       status: child.workflow.status ?? '',
     })}
     class="outline-none transition-all"
-    on:click={(e) => nodeClick(e, child)}
-    on:keydown={(e) => handleNodeKeydown(e, child)}
+    onclick={(e) => nodeClick(e, child)}
+    onkeydown={(e) => handleNodeKeydown(e, child)}
   >
     {#if child?.children?.length && isExpanded(child)}
       <line
@@ -300,8 +327,8 @@
       id: root.workflow.id,
       status: root.workflow.status ?? '',
     })}
-    on:click={(e) => nodeClick(e, root)}
-    on:keydown={(e) => handleNodeKeydown(e, root)}
+    onclick={(e) => nodeClick(e, root)}
+    onkeydown={(e) => handleNodeKeydown(e, root)}
   >
     {#if root?.scheduleId}
       <line
