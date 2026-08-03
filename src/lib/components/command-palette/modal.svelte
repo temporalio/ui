@@ -61,7 +61,7 @@
   });
 </script>
 
-<svelte:window on:click={handleClick} />
+<svelte:window onclick={handleClick} />
 
 <dialog
   {id}
