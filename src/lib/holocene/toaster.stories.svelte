@@ -58,7 +58,13 @@
         },
       },
     },
-  } satisfies Meta<Toaster & Toast['variant']>;
+  } satisfies Meta<{
+    closeButtonLabel: string;
+    duration: number;
+    variant: string;
+    message: string;
+    position: string;
+  }>;
 </script>
 
 <script lang="ts">
@@ -68,7 +74,9 @@
 <Template let:args let:context>
   {@const { duration, message, variant, closeButtonLabel } = args}
   <div class="flex max-w-60 flex-col gap-2">
-    <Toast id={context.id} {variant} {closeButtonLabel}>{message}</Toast>
+    <Toast id={context.id} {variant} {closeButtonLabel} onDismiss={toaster.pop}
+      >{message}</Toast
+    >
 
     <Button onclick={() => toaster.push({ duration, message, variant })}>
       <span class="capitalize">Trigger {variant} toast</span>

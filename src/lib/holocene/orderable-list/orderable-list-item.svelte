@@ -1,13 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import IconButton from '../icon-button.svelte';
-
-  const dispatch = createEventDispatcher<{
-    addItem: undefined;
-    moveItem: { from: number; to: number };
-    removeItem: undefined;
-  }>();
 
   type ExtendedDragEvent = DragEvent & {
     currentTarget: EventTarget & HTMLLIElement;
@@ -17,6 +9,9 @@
     label: string;
     index?: number;
     totalItems?: number;
+    onMoveItem?: (detail: { from: number; to: number }) => void;
+    onAddItem?: () => void;
+    onRemoveItem?: () => void;
   } & (
     | {
         readonly: true;
@@ -54,6 +49,9 @@
     moveDownButtonLabel = '',
     addButtonLabel = '',
     removeButtonLabel = '',
+    onMoveItem,
+    onAddItem,
+    onRemoveItem,
   }: Props = $props();
 
   const handleDragStart = (event: ExtendedDragEvent, index: number) => {
@@ -66,7 +64,7 @@
     if (!event.dataTransfer) return;
     event.currentTarget.classList.remove('dragging-over');
     const from = parseInt(event.dataTransfer.getData('text/plain'));
-    dispatch('moveItem', { from, to });
+    onMoveItem?.({ from, to });
   };
 
   const handleDragEnter = (event: ExtendedDragEvent) =>
@@ -108,14 +106,14 @@
           icon="chevron-up"
           data-testid="orderable-list-item-{label}-move-up-button"
           label={moveUpButtonLabel}
-          onclick={() => dispatch('moveItem', { from: index, to: index - 1 })}
+          onclick={() => onMoveItem?.({ from: index, to: index - 1 })}
         />
         <IconButton
           disabled={index === totalItems - 1}
           icon="chevron-down"
           data-testid="orderable-list-item-{label}-move-down-button"
           label={moveDownButtonLabel}
-          onclick={() => dispatch('moveItem', { from: index, to: index + 1 })}
+          onclick={() => onMoveItem?.({ from: index, to: index + 1 })}
         />
       </div>
     {/if}
@@ -127,14 +125,14 @@
         icon="add"
         data-testid="orderable-list-item-{label}-add-button"
         label={addButtonLabel}
-        onclick={() => dispatch('addItem')}
+        onclick={() => onAddItem?.()}
       />
     {:else}
       <IconButton
         icon="hyphen"
         data-testid="orderable-list-item-{label}-remove-button"
         label={removeButtonLabel}
-        onclick={() => dispatch('removeItem')}
+        onclick={() => onRemoveItem?.()}
       />
     {/if}
   {/if}

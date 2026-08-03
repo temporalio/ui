@@ -22,32 +22,38 @@
 {#key [namespace, query]}
   <PaginatedTable
     {onFetch}
-    let:visibleItems
     aria-label={translate('common.workflows')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
   >
-    <tr slot="headers">
-      {#each columns as column, i (`${column.label}:${i}`)}
-        <TableHeaderCell {column} />
-      {/each}
-    </tr>
-    {#each visibleItems as workflow (`${workflow.id}:${workflow.runId}`)}
-      <tr data-testid="workflows-summary-configurable-table-row" class="dense">
-        {#each columns as column, i (`${workflow.id}:${workflow.runId}:${column.label}:${i}`)}
-          <TableBodyCell {workflow} {column} archival />
+    {#snippet headers()}
+      <tr>
+        {#each columns as column, i (`${column.label}:${i}`)}
+          <TableHeaderCell {column} />
         {/each}
       </tr>
-    {/each}
-    <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
+    {/snippet}
+    {#snippet rows({ visibleItems })}
+      {#each visibleItems as workflow (`${workflow.id}:${workflow.runId}`)}
+        <tr
+          data-testid="workflows-summary-configurable-table-row"
+          class="dense"
+        >
+          {#each columns as column, i (`${workflow.id}:${workflow.runId}:${column.label}:${i}`)}
+            <TableBodyCell {workflow} {column} archival />
+          {/each}
+        </tr>
+      {/each}
+    {/snippet}
+    {#snippet actionsEndAdditional({ visibleItems, page })}
       <DownloadJsonButton
         items={visibleItems}
         {page}
         filePrefix="workflows"
         testId="export-history-button"
       />
-    </svelte:fragment>
+    {/snippet}
   </PaginatedTable>
 {/key}

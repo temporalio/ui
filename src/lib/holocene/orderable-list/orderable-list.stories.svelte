@@ -41,8 +41,8 @@
     {#snippet heading()}<span>{context.name}</span>{/snippet}
     {#each items as item, index (item.label)}
       <OrderableListItem
-        on:moveItem={action('moveItem')}
-        on:removeItem={action('removeItem')}
+        onMoveItem={action('moveItem')}
+        onRemoveItem={action('removeItem')}
         addButtonLabel="Add"
         static={false}
         label={item.label}

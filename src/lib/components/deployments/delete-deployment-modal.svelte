@@ -29,14 +29,18 @@
     confirmText=""
     cancelText={translate('common.close')}
     hideConfirm
-    on:cancelModal={() => onCancel?.()}
+    onCancelModal={() => onCancel?.()}
   >
-    <h3 slot="title">{translate('deployments.cannot-delete-deployment')}</h3>
-    <div slot="content">
-      <p class="text-sm">
-        {translate('deployments.cannot-delete-deployment-body')}
-      </p>
-    </div>
+    {#snippet titleSnippet()}
+      <h3>{translate('deployments.cannot-delete-deployment')}</h3>
+    {/snippet}
+    {#snippet content()}
+      <div>
+        <p class="text-sm">
+          {translate('deployments.cannot-delete-deployment-body')}
+        </p>
+      </div>
+    {/snippet}
   </Modal>
 {:else}
   <DeleteConfirmModal

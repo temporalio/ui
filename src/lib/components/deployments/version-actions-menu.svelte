@@ -47,24 +47,26 @@
       <Icon name="vertical-ellipsis" class="h-4 w-4" />
     </MenuButton>
     <Menu id="version-actions-{buildId}" position="right" usePortal>
-      <MenuItem href={editHref}>
-        {translate('deployments.edit')}
+      {#if hasComputeConfig}
+        <MenuItem href={editHref}>
+          {translate('deployments.edit')}
+        </MenuItem>
+      {/if}
+      {#if isCurrent}
+        <MenuItem onclick={onUnsetCurrent}>
+          {translate('deployments.unset-current')}
+        </MenuItem>
+      {:else}
+        <MenuItem onclick={onSetCurrent}>
+          {translate('deployments.set-as-current')}
+        </MenuItem>
+      {/if}
+      <MenuItem onclick={onSetRamping} disabled={isCurrent}>
+        {isRamping
+          ? translate('deployments.edit-ramping-percentage')
+          : translate('deployments.set-ramping-version')}
       </MenuItem>
       {#if hasComputeConfig}
-        {#if isCurrent}
-          <MenuItem onclick={onUnsetCurrent}>
-            {translate('deployments.unset-current')}
-          </MenuItem>
-        {:else}
-          <MenuItem onclick={onSetCurrent}>
-            {translate('deployments.set-as-current')}
-          </MenuItem>
-        {/if}
-        <MenuItem onclick={onSetRamping} disabled={isCurrent}>
-          {isRamping
-            ? translate('deployments.edit-ramping-percentage')
-            : translate('deployments.set-ramping-version')}
-        </MenuItem>
         <MenuItem onclick={onValidate}>
           {translate('deployments.validate-connection')}
         </MenuItem>

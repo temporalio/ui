@@ -18,6 +18,7 @@
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import type { WorkerDeploymentResponse } from '$lib/types/deployments';
+  import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
@@ -129,6 +130,7 @@
     <Error error={refreshError.error} />
   {/if}
   {@const info = deployment.workerDeploymentInfo}
+  {@const hasComputeConfig = deploymentHasComputeConfig(info)}
   {@const unversionedRampingPercentage =
     !info.routingConfig?.rampingDeploymentVersion &&
     info.routingConfig?.rampingVersionPercentage != null
@@ -138,6 +140,7 @@
   <DeploymentHeader
     {namespace}
     {deploymentName}
+    {hasComputeConfig}
     {showInstancesLink}
     onDeleteClick={() => (showDeleteModal = true)}
     onRampToUnversioned={() => {
@@ -165,33 +168,38 @@
       pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
       items={info.versionSummaries ?? []}
       maxHeight="fit-content"
-      let:visibleItems
     >
-      <caption class="sr-only" slot="caption">
-        {translate('deployments.deployments')}
-      </caption>
-      <tr slot="headers">
-        <th>{translate('deployments.build-id')}</th>
-        <th>{translate('deployments.lifecycle')}</th>
-        <th>{translate('deployments.compute')}</th>
-        {#if showConnectionStatus}
-          <th>{translate('deployments.connection')}</th>
-        {/if}
-        <th>{translate('deployments.deployed')}</th>
-        <th>{translate('deployments.actions')}</th>
-      </tr>
-      {#each visibleItems as version (version.version)}
-        <VersionTableRow
-          routingConfig={info.routingConfig}
-          {version}
-          {namespace}
-          {deploymentName}
-          conflictToken={deployment.conflictToken}
-          {showConnectionStatus}
-          onChange={reload}
-          onValidationComplete={reload}
-        />
-      {/each}
+      {#snippet caption()}
+        <caption class="sr-only">
+          {translate('deployments.deployments')}
+        </caption>
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th>{translate('deployments.build-id')}</th>
+          <th>{translate('deployments.lifecycle')}</th>
+          <th>{translate('deployments.compute')}</th>
+          {#if showConnectionStatus}
+            <th>{translate('deployments.connection')}</th>
+          {/if}
+          <th>{translate('deployments.deployed')}</th>
+          <th>{translate('deployments.actions')}</th>
+        </tr>
+      {/snippet}
+      {#snippet rows({ visibleItems })}
+        {#each visibleItems as version (version.version)}
+          <VersionTableRow
+            routingConfig={info.routingConfig}
+            {version}
+            {namespace}
+            {deploymentName}
+            conflictToken={deployment.conflictToken}
+            {showConnectionStatus}
+            onChange={reload}
+            onValidationComplete={reload}
+          />
+        {/each}
+      {/snippet}
     </PaginatedTable>
   </div>
 

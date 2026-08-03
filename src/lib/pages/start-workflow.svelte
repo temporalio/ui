@@ -3,7 +3,7 @@
 
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
@@ -47,31 +47,31 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
-  $: ({ namespace } = $page.params);
+  const namespace = $derived(page.params.namespace);
 
   const identity = getIdentity();
 
-  let workflowId = '';
-  let taskQueue = '';
-  let workflowType = '';
-  let input = '';
-  let summary = '';
-  let details = '';
-  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
-  let messageType = '';
-  let workflowStartDelay = '';
+  let workflowId = $state('');
+  let taskQueue = $state('');
+  let workflowType = $state('');
+  let input = $state('');
+  let summary = $state('');
+  let details = $state('');
+  const encoding: Writable<PayloadInputEncoding> = writable('json/plain');
+  let messageType = $state('');
+  let workflowStartDelay = $state('');
 
-  let initialRunId = '';
-  let initialWorkflowId = '';
-  let initialWorkflowType = '';
+  let initialRunId = $state('');
+  let initialWorkflowId = $state('');
+  let initialWorkflowType = $state('');
 
-  let error = '';
-  let pollerCount: undefined | number = undefined;
-  let viewAdvancedOptions = false;
+  let error = $state('');
+  let pollerCount = $state<undefined | number>(undefined);
+  let viewAdvancedOptions = $state(false);
 
-  let searchAttributes: SearchAttributesSchema = [];
+  let searchAttributes = $state<SearchAttributesSchema>([]);
 
-  $: errorWorkflowDetails = extractWorkflowFromError(error);
+  const errorWorkflowDetails = $derived(extractWorkflowFromError(error));
 
   function extractWorkflowFromError(errorMessage: string): {
     workflowId?: string;
@@ -93,15 +93,15 @@
     };
   }
 
-  $: taskQueueParam = $page.url.searchParams.get('taskQueue');
+  const taskQueueParam = $derived(page.url.searchParams.get('taskQueue'));
 
   onMount(() => {
-    workflowId = $page.url.searchParams.get('workflowId') || '';
-    taskQueue = $page.url.searchParams.get('taskQueue') || '';
-    workflowType = $page.url.searchParams.get('workflowType') || '';
-    initialRunId = $page.url.searchParams.get('runId') || '';
-    initialWorkflowId = $page.url.searchParams.get('workflowId') || '';
-    initialWorkflowType = $page.url.searchParams.get('workflowType') || '';
+    workflowId = page.url.searchParams.get('workflowId') || '';
+    taskQueue = page.url.searchParams.get('taskQueue') || '';
+    workflowType = page.url.searchParams.get('workflowType') || '';
+    initialRunId = page.url.searchParams.get('runId') || '';
+    initialWorkflowId = page.url.searchParams.get('workflowId') || '';
+    initialWorkflowType = page.url.searchParams.get('workflowType') || '';
 
     if (initialWorkflowId || initialWorkflowType || initialRunId) {
       getInitialValues({
@@ -153,7 +153,7 @@
     updateQueryParameters({
       parameter: 'workflowId',
       value,
-      url: $page.url,
+      url: page.url,
       allowEmpty: true,
       options: { keepFocus: true, noScroll: true, replaceState: true },
     });
@@ -217,7 +217,7 @@
     updateQueryParameters({
       parameter,
       value,
-      url: $page.url,
+      url: page.url,
       allowEmpty: true,
       options: { keepFocus: true, noScroll: true, replaceState: true },
     });
@@ -232,16 +232,19 @@
     }
   };
 
-  $: inputValid = !input || inputIsJSON(input);
+  const inputValid = $derived(!input || inputIsJSON(input));
 
-  $: enableStart =
+  const enableStart = $derived(
     !!workflowId &&
-    !!taskQueue &&
-    !!workflowType &&
-    !!inputValid &&
-    !workflowCreateDisabled($page);
+      !!taskQueue &&
+      !!workflowType &&
+      !!inputValid &&
+      !workflowCreateDisabled(page),
+  );
 
-  $: checkTaskQueue(taskQueueParam ?? '');
+  $effect(() => {
+    checkTaskQueue(taskQueueParam ?? '');
+  });
 </script>
 
 <div class="flex w-full flex-col gap-4 pb-20">
@@ -311,7 +314,7 @@
       label="Workflow Type"
       onblur={(e) => onInputChange(e, 'workflowType')}
     />
-    <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
+    <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
         <div>

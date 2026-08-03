@@ -387,8 +387,8 @@
     {workflowHref}
     {isCurrent}
     hasComputeConfig={isVersionSummaryNew(version)
-      ? !!version.computeConfig
-      : true}
+      ? Object.keys(version.computeConfig?.scalingGroups ?? {}).length > 0
+      : false}
     {isRamping}
     onSetCurrent={() => (showSetCurrentModal = true)}
     onSetRamping={openSetRamping}
@@ -470,17 +470,23 @@
   open={showUnsetCurrentModal}
   confirmText={translate('common.confirm')}
   cancelText={translate('common.cancel')}
-  on:confirmModal={handleUnsetCurrentVersion}
-  on:cancelModal={() => {
+  onConfirmModal={handleUnsetCurrentVersion}
+  onCancelModal={() => {
     showUnsetCurrentModal = false;
     unsetCurrentError = '';
   }}
 >
-  <h3 slot="title">{translate('deployments.unset-current')}</h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <p class="text-sm">{translate('deployments.unset-current-description')}</p>
-    {#if unsetCurrentError}
-      <p class="text-sm text-danger">{unsetCurrentError}</p>
-    {/if}
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('deployments.unset-current')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      <p class="text-sm">
+        {translate('deployments.unset-current-description')}
+      </p>
+      {#if unsetCurrentError}
+        <p class="text-sm text-danger">{unsetCurrentError}</p>
+      {/if}
+    </div>
+  {/snippet}
 </Modal>

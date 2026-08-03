@@ -46,7 +46,7 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 <div class="flex gap-4 max-sm:flex-col">
   <div class="bg-gray-100 flex w-full gap-4">
     <RangeInput

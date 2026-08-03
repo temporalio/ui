@@ -142,11 +142,25 @@ export type EditVersionFormData = z.infer<typeof editVersionSchema>;
 
 export type ComputeProviderValue = 'lambda' | 'cloud-run';
 
+export type ComputeProviderReleaseStage =
+  | 'public-preview'
+  | 'pre-release'
+  | 'generally-available';
+
 export type ComputeProviderOption = {
   value: ComputeProviderValue;
   disabled?: boolean;
   disabledReason?: string;
   hidden?: boolean;
+  releaseStage?: ComputeProviderReleaseStage;
+};
+
+export const defaultReleaseStage: Record<
+  ComputeProviderValue,
+  ComputeProviderReleaseStage
+> = {
+  lambda: 'public-preview',
+  'cloud-run': 'pre-release',
 };
 
 interface InitialComputeProviderOptions {

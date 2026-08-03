@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import Drawer from './drawer.svelte';
 
@@ -34,7 +35,7 @@
 
       open: { table: { disable: true } },
     },
-  } satisfies Meta<Drawer['$$prop_def'] & { title: string }>;
+  } satisfies Meta<ComponentProps<typeof Drawer> & { title: string }>;
 </script>
 
 <script lang="ts">

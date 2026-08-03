@@ -106,11 +106,15 @@
         id="schedule-payload-input"
         copyable={true}
       >
-        <div slot="action" class:hidden={!showEditActions}>
-          <Button variant="secondary" onclick={handleEdit}>
-            {editInput ? translate('common.cancel') : translate('common.edit')}
-          </Button>
-        </div>
+        {#snippet action()}
+          <div class:hidden={!showEditActions}>
+            <Button variant="secondary" onclick={handleEdit}>
+              {editInput
+                ? translate('common.cancel')
+                : translate('common.edit')}
+            </Button>
+          </div>
+        {/snippet}
       </PayloadInputWithEncoding>
     {/snippet}
   </PayloadDecoder>
