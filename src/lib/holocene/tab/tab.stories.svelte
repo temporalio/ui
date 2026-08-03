@@ -1,7 +1,7 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
   import TabList from './tab-list.svelte';
@@ -9,18 +9,15 @@
   import Tab from './tab.svelte';
   import Tabs from './tabs.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Tabs',
     component: Tabs,
     subcomponents: { TabList, TabPanel, Tab },
-  } satisfies Meta<ComponentProps<typeof Tabs>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof Tabs>)}
   <Tabs {...args}>
     <TabList label="tabs">
       <Tab id="tab-a" panelId="tab-panel-a" label="Tab A" />
@@ -37,6 +34,6 @@
       <p class="py-4">Tab C Content</p>
     </TabPanel>
   </Tabs>
-</Template>
+{/snippet}
 
 <Story name="Default" />

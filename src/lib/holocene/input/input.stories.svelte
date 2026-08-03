@@ -1,15 +1,17 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
-  import { expect, userEvent, within } from '@storybook/test';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { expect, fn, userEvent, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
 
+  import Button from '../button.svelte';
+
   import Input from './input.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Input',
     component: Input,
     args: {
@@ -29,6 +31,7 @@
       hintText: '',
       clearButtonLabel: 'Clear input',
       copyButtonLabel: 'Copy contents',
+      onClear: fn(),
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
@@ -69,18 +72,16 @@
         table: { category: 'Styling (Deprecated)' },
       },
     },
-  } satisfies Meta<ComponentProps<typeof Input>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import Button from '../button.svelte';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: ComponentProps<typeof Input>,
+  context: StoryContext<ComponentProps<typeof Input>>,
+)}
   <Input {...args} id={context.id} data-testid={context.id} />
-</Template>
+{/snippet}
 
 <Story name="Empty" />
 
@@ -141,13 +142,15 @@
   }}
 />
 
-<Story name="With Buttons" let:args let:context>
-  <Input {...args} id={context.id} data-testid={context.id}>
-    {#snippet beforeInput()}
-      <Button type="button">Before</Button>
-    {/snippet}
-    {#snippet afterInput()}
-      <Button type="button">After</Button>
-    {/snippet}
-  </Input>
+<Story name="With Buttons">
+  {#snippet template(args, context)}
+    <Input {...args} id={context.id} data-testid={context.id}>
+      {#snippet beforeInput()}
+        <Button type="button">Before</Button>
+      {/snippet}
+      {#snippet afterInput()}
+        <Button type="button">After</Button>
+      {/snippet}
+    </Input>
+  {/snippet}
 </Story>

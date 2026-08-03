@@ -1,20 +1,18 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import { Story } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
-  import { expect, within } from '@storybook/test';
-  import type { ComponentProps } from 'svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { expect, within } from 'storybook/test';
 
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Workers/Compute Provider Picker',
     component: ComputeProviderPicker,
-  } satisfies Meta<ComponentProps<typeof ComputeProviderPicker>>;
+  });
 </script>
 
-<Story name="Default (self-hosted)">
+<Story name="Default (self-hosted)" asChild>
   <div class="max-w-[45rem] p-4">
     <ComputeProviderPicker provider="lambda" />
   </div>
@@ -22,6 +20,7 @@
 
 <Story
   name="AWS namespace (grey out incompatible)"
+  asChild
   play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
@@ -46,6 +45,7 @@
 
 <Story
   name="GCP namespace (grey out incompatible)"
+  asChild
   play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
@@ -70,6 +70,7 @@
 
 <Story
   name="AWS namespace (hide incompatible)"
+  asChild
   play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText('AWS Lambda')).toBeInTheDocument();
@@ -88,6 +89,7 @@
 
 <Story
   name="Both enabled (cross-cloud)"
+  asChild
   play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText('Public Preview')).toBeInTheDocument();
@@ -104,6 +106,7 @@
 
 <Story
   name="Release stage overridden by caller"
+  asChild
   play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.queryByText('Public Preview')).not.toBeInTheDocument();

@@ -2,12 +2,16 @@
 
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { fn } from 'storybook/test';
 
   import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
 
   const { Story } = defineMeta({
     title: 'Tabs (Primitive)',
     component: Tabs,
+    args: {
+      onSelectedTabChange: fn(),
+    },
     argTypes: {
       tabs: { table: { disable: true } },
       selectedTab: { table: { disable: true } },

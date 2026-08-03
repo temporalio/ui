@@ -1,13 +1,12 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
   import WorkflowStatus from '$lib/components/execution-status.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Execution Status',
     component: WorkflowStatus,
     args: {
@@ -30,13 +29,14 @@
       },
       delayed: { name: 'Delayed', control: 'boolean' },
     },
-  } satisfies Meta<ComponentProps<typeof WorkflowStatus>>;
+    render: template,
+  });
 
   const withCount = { count: 100 };
   const withNewCount = { ...withCount, newCount: 999 };
 </script>
 
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof WorkflowStatus>)}
   <div class="space-y-4 md:columns-2 xl:columns-3">
     <WorkflowStatus {...args} status="Running" />
     <WorkflowStatus {...args} status="TimedOut" />
@@ -56,7 +56,7 @@
     <WorkflowStatus {...args} status="CancelRequested" />
     <WorkflowStatus {...args} status="Signaled" />
   </div>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

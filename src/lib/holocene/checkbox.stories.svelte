@@ -1,11 +1,14 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import { fn } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Checkbox',
     component: Checkbox,
     args: {
@@ -17,6 +20,7 @@
       required: false,
       error: '',
       valid: true,
+      onChange: fn(),
     },
     argTypes: {
       label: { control: 'text' },
@@ -29,22 +33,18 @@
       group: { control: 'object', table: { disable: true } },
       valid: { control: 'boolean' },
     },
-  } satisfies Meta<Checkbox<string>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof Checkbox>)}
   <Checkbox
     {...args}
     onChange={action('change')}
     onclick={action('click')}
     onkeypress={action('keypress')}
   />
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

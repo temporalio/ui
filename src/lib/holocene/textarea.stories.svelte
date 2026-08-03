@@ -1,12 +1,16 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import { userEvent, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
+
+  import { shouldNotBeTransparent } from './test-utilities';
 
   import Textarea from './textarea.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Textarea',
     component: Textarea,
     args: {
@@ -38,28 +42,24 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       id: { name: 'Id', control: 'text', table: { disable: true } },
     },
-  } satisfies Meta<ComponentProps<typeof Textarea>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import { userEvent, within } from '@storybook/test';
-
-  import { shouldNotBeTransparent } from './test-utilities';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: ComponentProps<typeof Textarea>,
+  context: StoryContext<ComponentProps<typeof Textarea>>,
+)}
   <Textarea
+    {...args}
     oninput={action('input')}
     onblur={action('blue')}
     onchange={action('change')}
     onfocus={action('focus')}
     onkeydown={action('keydown')}
     id={context.id}
-    {...args}
   />
-</Template>
+{/snippet}
 
 <Story
   name="Default"

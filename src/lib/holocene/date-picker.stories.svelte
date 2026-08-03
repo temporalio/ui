@@ -1,13 +1,14 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
-  import { within } from '@storybook/test';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import { fn, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import DatePicker from '$lib/holocene/date-picker.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Date Picker',
     component: DatePicker,
     args: {
@@ -18,6 +19,7 @@
       disabled: false,
       labelHidden: false,
       selected: new Date('2012-09-19T08:03:00-05:00'),
+      onDateChange: fn(),
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
@@ -41,12 +43,8 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta<ComponentProps<typeof DatePicker>>;
-</script>
-
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
+    render: template,
+  });
 
   /**
    * Used for the "Focused" story to focus the input.
@@ -60,9 +58,9 @@
   const disallowSundays = (date: Date) => date.getDay() !== 0;
 </script>
 
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof DatePicker>)}
   <DatePicker {...args} onDateChange={action('date-change')} />
-</Template>
+{/snippet}
 
 <Story
   name="Default"

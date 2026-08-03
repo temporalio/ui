@@ -1,15 +1,16 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   import type { IconName } from './icon';
   import { iconNames } from './icon';
 
   import Link from './link.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Link',
     component: Link,
     args: {
@@ -23,19 +24,15 @@
       href: { control: 'text' },
       icon: { control: 'select', options: iconNames },
     },
-  } satisfies Meta<ComponentProps<typeof Link>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import { twMerge } from 'tailwind-merge';
-</script>
-
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof Link>)}
   <div class={twMerge(args.light && 'bg-space-black')}>
     <Link {...args}>This is a link.</Link>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 

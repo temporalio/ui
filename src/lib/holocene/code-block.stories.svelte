@@ -1,10 +1,13 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
 
   import type { Props } from '$lib/holocene/code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Code Block',
     args: {
       editable: false,
@@ -63,16 +66,10 @@
         table: { category: 'Copy Icon' },
       },
     },
-  } satisfies Meta<Props>;
+  });
 </script>
 
 <script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-
   const content: Record<string, string> = {
     'File A': 'console.log("***");',
     'File B': 'console.log("***");',
@@ -116,31 +113,32 @@
   const largeJson = createLargeJson();
 </script>
 
-<Template let:args>
+{#snippet template(args: Props)}
   <CodeBlock {...args} onchange={action('change')} />
-</Template>
+{/snippet}
 
-<Template id="editable" let:args>
+{#snippet editable(args: Props)}
   <CodeBlock
     {...args}
     content={editableContent}
     onchange={handleEditableChange}
   />
-</Template>
+{/snippet}
 
 <Story
   name="Default"
   args={{
     content: stringifyWithBigInt({ hello: 'world' }, undefined, 2),
   }}
+  {template}
 />
 
 <Story
   name="Editable"
-  template="editable"
   args={{
     editable: true,
   }}
+  template={editable}
 />
 
 <Story
@@ -149,6 +147,7 @@
     inline: true,
     content: stringifyWithBigInt({ hello: 'world' }, undefined, 2),
   }}
+  {template}
 />
 
 <Story
@@ -159,6 +158,7 @@
     copyIconTitle: 'Click to copy content',
     copySuccessIconTitle: 'Content copied to clipboard',
   }}
+  {template}
 />
 
 <Story
@@ -167,6 +167,7 @@
     minHeight: 400,
     content: stringifyWithBigInt({ hello: 'world' }, undefined, 2),
   }}
+  {template}
 />
 
 <Story
@@ -179,6 +180,7 @@
       2,
     ),
   }}
+  {template}
 />
 
 <Story
@@ -194,6 +196,7 @@
     copyIconTitle: 'Click to copy content',
     copySuccessIconTitle: 'Content copied to clipboard',
   }}
+  {template}
 />
 
 <Story
@@ -202,6 +205,7 @@
     language: 'shell',
     content: 'echo "Hello, World!"',
   }}
+  {template}
 />
 
 <Story
@@ -213,6 +217,7 @@
     copyIconTitle: 'Click to copy content',
     copySuccessIconTitle: 'Content copied to clipboard',
   }}
+  {template}
 />
 
 <Story
@@ -221,6 +226,7 @@
     language: 'text',
     content: 'Hello, World!',
   }}
+  {template}
 />
 
 <Story
@@ -232,6 +238,7 @@
     copyIconTitle: 'Click to copy content',
     copySuccessIconTitle: 'Content copied to clipboard',
   }}
+  {template}
 />
 
 <Story
@@ -255,6 +262,7 @@
             service, WorkflowClientOptions.newBuilder().setNamespace("<namespace_id>.<account_id>").build());
 `,
   }}
+  {template}
 />
 
 <Story
@@ -273,6 +281,7 @@ const client = new Client({
 });
 `,
   }}
+  {template}
 />
 
 <Story
@@ -287,6 +296,7 @@ client = await Client.connect(
     tls=True,
 )`,
   }}
+  {template}
 />
 
 <Story
@@ -302,6 +312,7 @@ client = Temporalio::Client.connect(
 )
 `,
   }}
+  {template}
 />
 
 <Story
@@ -318,6 +329,7 @@ clientOptions := client.Options{
 c, err := client.Dial(clientOptions)
 `,
   }}
+  {template}
 />
 
 <Story
@@ -333,9 +345,10 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
 });
 `,
   }}
+  {template}
 />
 
-<Story name="With Header">
+<Story name="With Header" asChild>
   <CodeBlock
     copyable
     language="typescript"
@@ -366,9 +379,10 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
     maxHeight: 300,
     copyable: false,
   }}
+  {template}
 />
 
-<Story name="Test page scrolling">
+<Story name="Test page scrolling" asChild>
   <div>
     <p>
       content<br />

@@ -1,14 +1,19 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action as logAction } from 'storybook/actions';
+  import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
 
+  import Link from '../link.svelte';
+
+  import AccordionGroup from './accordion-group.svelte';
   import Accordion from './accordion.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Accordion',
     component: Accordion,
     args: {
@@ -17,6 +22,7 @@
       open: false,
       expandable: true,
       error: '',
+      onToggle: fn(),
     },
     argTypes: {
       title: { name: 'Title', control: 'text' },
@@ -30,19 +36,11 @@
         options: iconNames,
       },
     },
-  } satisfies Meta<ComponentProps<typeof Accordion>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action as logAction } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import Link from '../link.svelte';
-
-  import AccordionGroup from './accordion-group.svelte';
-</script>
-
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof Accordion>)}
   <div class="flex flex-col gap-2">
     <Accordion {...args} onToggle={logAction('onToggle')}>
       <p>Accordion Content</p>
@@ -59,7 +57,7 @@
       </Accordion>
     </AccordionGroup>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Default" args={{ open: false }} />
 
@@ -71,28 +69,31 @@
 
 <Story
   name="With Action"
-  let:args
   parameters={{
     a11y: {
       disable: true,
     },
   }}
 >
-  <Accordion {...args} onToggle={logAction('onToggle')}>
-    <p>Accordion Content</p>
-    {#snippet action()}
-      <Link href="https://docs.temporal.io/" newTab icon="book">
-        <span class="sr-only">docs</span>
-      </Link>
-    {/snippet}
-  </Accordion>
+  {#snippet template(args)}
+    <Accordion {...args} onToggle={logAction('onToggle')}>
+      <p>Accordion Content</p>
+      {#snippet action()}
+        <Link href="https://docs.temporal.io/" newTab icon="book">
+          <span class="sr-only">docs</span>
+        </Link>
+      {/snippet}
+    </Accordion>
+  {/snippet}
 </Story>
 
-<Story name="With Summary" let:args>
-  <Accordion {...args} onToggle={logAction('onToggle')}>
-    {#snippet summary()}
-      <p>Accordion Summary</p>
-    {/snippet}
-    <p>Accordion Content</p>
-  </Accordion>
+<Story name="With Summary">
+  {#snippet template(args)}
+    <Accordion {...args} onToggle={logAction('onToggle')}>
+      {#snippet summary()}
+        <p>Accordion Summary</p>
+      {/snippet}
+      <p>Accordion Content</p>
+    </Accordion>
+  {/snippet}
 </Story>
