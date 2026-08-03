@@ -2,7 +2,12 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { base } from '$app/paths';
 
-import { fetchAllWorkflows, fetchWorkflowForRunId } from './workflow-service';
+import {
+  fetchAllWorkflows,
+  fetchInitialValuesForStartWorkflow,
+  fetchWorkflowForRunId,
+  startWorkflow,
+} from './workflow-service';
 import { getApiOrigin } from '../utilities/get-api-origin';
 import { requestFromAPI } from '../utilities/request-from-api';
 
@@ -16,6 +21,10 @@ vi.mock('../utilities/request-from-api', () => ({
         }),
       ),
   ),
+}));
+
+vi.mock('./events-service', () => ({
+  fetchInitialEvent: vi.fn().mockResolvedValue({ attributes: {} }),
 }));
 
 const origin = getApiOrigin();
@@ -62,6 +71,87 @@ describe('workflow service', () => {
           request: expect.any(Function),
         },
       );
+    });
+  });
+
+  describe('startWorkflow', () => {
+    test('encodes memo fields in the start request', async () => {
+      await startWorkflow({
+        namespace: 'test',
+        workflowId: 'workflow-id',
+        taskQueue: 'task-queue',
+        workflowType: 'workflow-type',
+        input: '',
+        memo: '{"customer":"acme","attempt":3}',
+        encoding: 'json/plain',
+        messageType: '',
+        summary: '',
+        details: '',
+        searchAttributes: [],
+      });
+
+      const requestOptions = vi.mocked(requestFromAPI).mock.calls[0]?.[1];
+      const body = JSON.parse(String(requestOptions?.options?.body));
+
+      expect(body.memo).toEqual({
+        fields: {
+          customer: {
+            metadata: { encoding: 'anNvbi9wbGFpbg==' },
+            data: 'ImFjbWUi',
+          },
+          attempt: {
+            metadata: { encoding: 'anNvbi9wbGFpbg==' },
+            data: 'Mw==',
+          },
+        },
+      });
+    });
+  });
+
+  describe('fetchInitialValuesForStartWorkflow', () => {
+    test('decodes memo fields from the existing workflow', async () => {
+      vi.mocked(requestFromAPI)
+        .mockResolvedValueOnce({
+          executions: [
+            {
+              execution: {
+                workflowId: 'source-workflow',
+                runId: 'source-run',
+              },
+            },
+          ],
+        })
+        .mockResolvedValueOnce({
+          workflowExecutionInfo: {
+            execution: {
+              workflowId: 'source-workflow',
+              runId: 'source-run',
+            },
+            memo: {
+              fields: {
+                customer: {
+                  metadata: { encoding: 'anNvbi9wbGFpbg==' },
+                  data: 'ImFjbWUi',
+                },
+                attempt: {
+                  metadata: { encoding: 'anNvbi9wbGFpbg==' },
+                  data: 'Mw==',
+                },
+              },
+            },
+          },
+        });
+
+      const initialValues = await fetchInitialValuesForStartWorkflow({
+        namespace: 'test',
+        workflowId: 'source-workflow',
+        runId: 'source-run',
+      });
+
+      expect(JSON.parse(initialValues.memo)).toEqual({
+        customer: 'acme',
+        attempt: 3,
+      });
     });
   });
 });

@@ -62,7 +62,10 @@ import {
   isUnauthorized,
 } from '$lib/utilities/handle-error';
 import { paginated } from '$lib/utilities/paginated';
-import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import {
+  parseWithBigInt,
+  stringifyWithBigInt,
+} from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -123,6 +126,7 @@ type StartWorkflowOptions = {
   taskQueue: string;
   workflowType: string;
   input: string;
+  memo: string;
   encoding: PayloadInputEncoding;
   messageType: string;
   summary: string;
@@ -690,6 +694,7 @@ export async function startWorkflow({
   taskQueue,
   workflowType,
   input,
+  memo,
   summary,
   details,
   encoding,
@@ -703,6 +708,7 @@ export async function startWorkflow({
     workflowId,
   });
   let payloads;
+  let memoFields;
   let summaryPayload;
   let detailsPayload;
 
@@ -711,6 +717,32 @@ export async function startWorkflow({
       payloads = await encodePayloads({ input, encoding, messageType });
     } catch {
       throw new Error('Could not encode input for starting workflow');
+    }
+  }
+
+  if (memo) {
+    try {
+      const parsedMemo = parseWithBigInt(memo);
+      if (
+        typeof parsedMemo !== 'object' ||
+        parsedMemo === null ||
+        Array.isArray(parsedMemo)
+      ) {
+        throw new Error('Memo must be an object');
+      }
+
+      const encodedMemoEntries = await Promise.all(
+        Object.entries(parsedMemo).map(async ([key, value]) => {
+          const encodedValue = await encodePayloads({
+            input: stringifyWithBigInt(value),
+            encoding: 'json/plain',
+          });
+          return [key, encodedValue?.[0]] as const;
+        }),
+      );
+      memoFields = Object.fromEntries(encodedMemoEntries);
+    } catch {
+      throw new Error('Could not encode memo for starting workflow');
     }
   }
 
@@ -745,6 +777,7 @@ export async function startWorkflow({
       name: workflowType,
     },
     input: payloads ? { payloads } : null,
+    memo: memoFields ? { fields: memoFields } : null,
     userMetadata: {
       summary: summaryPayload,
       details: detailsPayload,
@@ -776,6 +809,7 @@ export async function startWorkflow({
 
 type InitialValuesForStartWorkflow = {
   input: string;
+  memo: string;
   encoding: PayloadInputEncoding;
   messageType: string;
   searchAttributes: Record<string, string | Payload> | undefined;
@@ -799,6 +833,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
   };
   const emptyValues: InitialValuesForStartWorkflow = {
     input: '',
+    memo: '',
     encoding: 'json/plain' as PayloadInputEncoding,
     messageType: '',
     searchAttributes: undefined,
@@ -863,6 +898,24 @@ export const fetchInitialValuesForStartWorkflow = async ({
       }
     }
 
+    let memo = '';
+    if (
+      workflow?.memo?.fields &&
+      Object.keys(workflow.memo.fields).length > 0
+    ) {
+      const decodedMemoEntries = await Promise.all(
+        Object.entries(workflow.memo.fields).map(async ([key, value]) => [
+          key,
+          await decodePayloadAndParseDataToJSON(value),
+        ]),
+      );
+      memo = stringifyWithBigInt(
+        Object.fromEntries(decodedMemoEntries),
+        undefined,
+        2,
+      );
+    }
+
     let input = '';
     let encoding: PayloadInputEncoding = 'json/plain';
     let messageType = '';
@@ -888,6 +941,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     return {
       input,
+      memo,
       encoding,
       messageType,
       searchAttributes: workflow?.searchAttributes?.indexedFields,

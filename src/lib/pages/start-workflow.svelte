@@ -22,6 +22,7 @@
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
+  import Textarea from '$lib/holocene/textarea.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
@@ -55,6 +56,7 @@
   let taskQueue = '';
   let workflowType = '';
   let input = '';
+  let memo = '';
   let summary = '';
   let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
@@ -121,6 +123,7 @@
         taskQueue,
         workflowType,
         input,
+        memo,
         summary,
         details,
         encoding: $encoding,
@@ -182,6 +185,7 @@
       workflowType,
     });
     input = initialValues.input;
+    memo = initialValues.memo;
     encoding.set(initialValues.encoding);
     messageType = initialValues.messageType;
     summary = initialValues.summary;
@@ -205,6 +209,7 @@
 
     if (
       Object.keys(initialValues?.searchAttributes ?? {}).length ||
+      initialValues?.memo ||
       initialValues?.summary ||
       initialValues?.details
     ) {
@@ -234,11 +239,29 @@
 
   $: inputValid = !input || inputIsJSON(input);
 
+  const memoIsJSONObject = (input: string) => {
+    if (!input) return true;
+
+    try {
+      const parsedMemo = JSON.parse(input);
+      return (
+        typeof parsedMemo === 'object' &&
+        parsedMemo !== null &&
+        !Array.isArray(parsedMemo)
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  $: memoValid = memoIsJSONObject(memo);
+
   $: enableStart =
     !!workflowId &&
     !!taskQueue &&
     !!workflowType &&
     !!inputValid &&
+    !!memoValid &&
     !workflowCreateDisabled($page);
 
   $: checkTaskQueue(taskQueueParam ?? '');
@@ -313,6 +336,19 @@
     />
     <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
     {#if viewAdvancedOptions}
+      <Card class="flex flex-col gap-2">
+        <Textarea
+          id="memo"
+          label={translate('common.memo')}
+          description={translate('workflows.memo-description')}
+          placeholder={'{\n  "key": "value"\n}'}
+          rows={8}
+          bind:value={memo}
+          isValid={memoValid}
+          error={translate('workflows.memo-valid-json-object')}
+          spellcheck={false}
+        />
+      </Card>
       <Card class="flex flex-col gap-2">
         <div>
           <h3>{translate('search-attributes.custom-search-attributes')}</h3>

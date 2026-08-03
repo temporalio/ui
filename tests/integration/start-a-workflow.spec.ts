@@ -46,6 +46,14 @@ test.describe('Start a Workflow', () => {
       await expect(page.locator('#workflowId')).toBeEnabled();
       await expect(page.locator('#taskQueue')).toBeEnabled();
       await expect(page.locator('#workflowType')).toBeEnabled();
+      await page.getByText('More options').click();
+      const memo = page.locator('#memo');
+      await expect(memo).toBeEnabled();
+      await memo.fill('[]');
+      await expect(
+        page.getByText('Memo must be a valid JSON object'),
+      ).toBeVisible();
+      await memo.fill('{"key":"value"}');
       await page.locator('#workflowId').type('test-workflow-id');
       await page.locator('#taskQueue').type('task-queue');
       await mockTaskQueuesApi(page);

@@ -324,6 +324,9 @@ export const Strings = {
   'view-running-workflow': 'View the running workflow',
   encoding: 'Encoding',
   'message-type': 'Message Type',
+  'memo-description':
+    'Non-indexed information stored with the Workflow Execution. Enter memo fields as a JSON object.',
+  'memo-valid-json-object': 'Memo must be a valid JSON object',
   'user-metadata': 'User Metadata',
   'markdown-supported': 'Markdown Supported',
   'markdown-description':
