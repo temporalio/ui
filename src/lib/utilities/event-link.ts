@@ -93,6 +93,20 @@ const unknownLink = (index?: number): EventLinkView => {
   };
 };
 
+export const eventLinkTargetTypeLabel = (
+  variant: EventLinkVariant,
+): string | undefined => {
+  switch (variant) {
+    case 'activity':
+      return translate('nexus.target-type-standalone-activity');
+    case 'workflowEvent':
+    case 'workflow':
+      return translate('nexus.target-type-workflow');
+    default:
+      return undefined;
+  }
+};
+
 export const toEventLinkView = (
   link: EventLink | undefined,
   context: EventLinkContext = {},
