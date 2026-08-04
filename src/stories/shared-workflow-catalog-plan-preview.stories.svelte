@@ -46,6 +46,26 @@
     await expect(
       canvas.getByText(/does not settle the final TypeScript API/),
     ).toBeInTheDocument();
+    await expect(canvas.getByText(/is a closed union/)).toBeInTheDocument();
+    await expect(
+      canvas.getByText(/never worker registration/),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText('Browser-safe catalog')).toBeInTheDocument();
+    await expect(
+      canvas.getByText('Node-only worker bindings'),
+    ).toBeInTheDocument();
+    const interactivePreviewLink = canvas.getByRole('link', {
+      name: '06 · Interactive preview',
+    });
+    await expect(interactivePreviewLink).toHaveAttribute('href', '#experience');
+    await userEvent.click(interactivePreviewLink);
+    await expect(interactivePreviewLink).toHaveAttribute(
+      'aria-current',
+      'location',
+    );
+    await expect(
+      canvasElement.querySelector<HTMLElement>('#experience'),
+    ).toHaveFocus();
     await expect(
       canvas.getByRole('heading', {
         level: 3,

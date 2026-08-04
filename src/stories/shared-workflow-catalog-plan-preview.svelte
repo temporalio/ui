@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import ButtonRadioGroup from '$lib/holocene/button-radio-group.svelte';
@@ -31,6 +33,18 @@
     tone: 'primary' | 'success' | 'warning' | 'danger' | 'subtle';
     icon: IconName;
   };
+
+  const reviewSections = [
+    { id: 'authoring', label: '01 · Plan & authoring' },
+    { id: 'capabilities', label: '02 · Capability proof' },
+    { id: 'boundary', label: '03 · Runtime & hosting' },
+    { id: 'delivery', label: '04 · Delivery' },
+    { id: 'proof', label: '05 · Proof & cuts' },
+    { id: 'experience', label: '06 · Interactive preview' },
+    { id: 'review', label: '07 · Review asks' },
+  ] as const;
+
+  type ReviewSectionId = (typeof reviewSections)[number]['id'];
 
   const catalogEntries: CatalogEntry[] = [
     {
@@ -180,22 +194,38 @@
     'Automatic CI execution',
   ];
 
-  const proposedRegistration = `registerExample({
-  id: 'cross-namespace-hello',
-  title: 'Cross-namespace hello',
-  capabilities: ['Nexus', 'Links'],
-  expectedUiEvidence: ['endpoint readiness', 'linked handler result'],
-  target: { binding: 'catalog', optional: ['nexus-caller', 'nexus-handler'] },
+  const proposedRegistration = `type ExampleExecution =
+  | { kind: 'workflow'; workflowType: string; workflow: Workflow;
+      activities: ActivityBindings; defaults: WorkflowDefaults }
+  | { kind: 'standalone-activity'; activityType: string;
+      activity: ActivityFunction; defaults: ActivityDefaults }
+  | { kind: 'standalone-nexus-operation'; service: NexusService;
+      operation: NexusOperation; handler: NexusHandler;
+      defaults: NexusOperationDefaults };
+
+registerExample({
+  catalog: {
+    id: 'cross-namespace-hello',
+    title: 'Cross-namespace hello',
+    capabilities: ['Nexus', 'Links'],
+    expectedUiEvidence: ['endpoint readiness', 'linked handler result'],
+  },
+  targetId: 'catalog',
   execution: {
     kind: 'workflow',
+    workflowType: 'CrossNamespaceHello',
+    workflow: crossNamespaceHello,
+    activities: { greet },
     defaults: { arguments: ['Temporal'], startOptions: { workflowId: 'nexus-hello' } },
-  },
+  } satisfies ExampleExecution,
   prerequisites: [{ kind: 'nexusEndpoint', createIfMissing: true }],
 });`;
 
   let scope = $state<CatalogScope>('all');
   let selectedId = $state<string | null>(null);
   let configureOpen = $state(false);
+  let activeSection = $state<ReviewSectionId>('authoring');
+  let navigationTarget = $state<ReviewSectionId | null>(null);
   let searchTerm = $state('');
   let argumentJson = $state('[\n  "customer-123",\n  { "attempts": 3 }\n]');
   let startOptionsJson = $state(`{
@@ -259,6 +289,56 @@
     selectedId = id;
     configureOpen = false;
   }
+
+  function navigateToSection(event: MouseEvent, id: ReviewSectionId) {
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    event.preventDefault();
+    activeSection = id;
+    navigationTarget = id;
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+      block: 'start',
+    });
+    window.history.pushState(null, '', `#${id}`);
+  }
+
+  onMount(() => {
+    if (!('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              Math.abs(a.boundingClientRect.top) -
+              Math.abs(b.boundingClientRect.top),
+          );
+        if (navigationTarget) {
+          if (visible.some((entry) => entry.target.id === navigationTarget)) {
+            activeSection = navigationTarget;
+            navigationTarget = null;
+          }
+          return;
+        }
+        const id = visible[0]?.target.id as ReviewSectionId | undefined;
+        if (id) activeSection = id;
+      },
+      { rootMargin: '-15% 0px -70% 0px', threshold: 0 },
+    );
+
+    for (const { id } of reviewSections) {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    }
+
+    return () => observer.disconnect();
+  });
 
   const visibleEntries = $derived(
     catalogEntries.filter((entry) => matchesCatalogFilters(entry)),
@@ -365,39 +445,40 @@
 
     <section class="mx-auto max-w-screen-2xl px-5 py-16 sm:px-8 lg:py-24">
       <div class="grid gap-10 lg:grid-cols-[18rem_minmax(0,1fr)]">
-        <aside class="lg:sticky lg:top-6 lg:h-fit" aria-label="Plan contents">
+        <aside
+          class="lg:sticky lg:top-6 lg:h-fit lg:max-h-[calc(100vh-3rem)] lg:self-start lg:overflow-y-auto"
+          aria-label="Plan contents"
+        >
           <p
             class="body-small-medium mb-3 uppercase tracking-wider text-secondary"
           >
             Review path
           </p>
-          <nav class="flex flex-col border-l border-subtle text-sm">
-            <a class="px-4 py-2.5 hover:text-brand" href="#authoring"
-              >01 · Plan & authoring</a
-            >
-            <a class="px-4 py-2.5 hover:text-brand" href="#capabilities"
-              >02 · Capability proof</a
-            >
-            <a class="px-4 py-2.5 hover:text-brand" href="#boundary"
-              >03 · Runtime & hosting</a
-            >
-            <a class="px-4 py-2.5 hover:text-brand" href="#delivery"
-              >04 · Delivery</a
-            >
-            <a class="px-4 py-2.5 hover:text-brand" href="#proof"
-              >05 · Proof & cuts</a
-            >
-            <a class="px-4 py-2.5 hover:text-brand" href="#experience"
-              >06 · Interactive preview</a
-            >
-            <a class="px-4 py-2.5 hover:text-brand" href="#review"
-              >07 · Review asks</a
-            >
+          <nav
+            class="flex flex-col border-l border-subtle text-sm"
+            aria-label="Review path"
+          >
+            {#each reviewSections as section (section.id)}
+              <a
+                class="-ml-px border-l-2 px-4 py-2.5 transition-colors hover:text-brand {activeSection ===
+                section.id
+                  ? 'surface-subtle border-inverse font-medium text-primary'
+                  : 'border-transparent'}"
+                href={`#${section.id}`}
+                aria-current={activeSection === section.id ? 'location' : null}
+                onclick={(event) => navigateToSection(event, section.id)}
+                >{section.label}</a
+              >
+            {/each}
           </nav>
         </aside>
 
         <div class="flex min-w-0 flex-col gap-24">
-          <section id="authoring" class="order-1 scroll-mt-8">
+          <section
+            id="authoring"
+            class="order-1 scroll-mt-8 focus:outline-none"
+            tabindex="-1"
+          >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
                 01 · Source-controlled authoring
@@ -448,19 +529,66 @@
                   </div>
                   <h3 class="mt-4 text-xl">Register intent beside code.</h3>
                   <p class="mt-3 text-sm leading-6 text-secondary">
-                    This UI-lab declaration names the catalog concepts Temporal
-                    does not: discovery metadata, expected UI evidence, target
-                    binding, registered execution defaults, and optional
-                    prerequisites. It does not settle the final TypeScript API.
+                    One project-owned call co-locates catalog metadata, explicit
+                    dispatch identity, executable bindings, defaults, and
+                    prerequisites. The workflow function supplies typing and
+                    validation; <code>workflowType</code>, never
+                    <code>fn.name</code>, is the worker dispatch identity. This
+                    does not settle the final TypeScript API.
+                  </p>
+                  <p class="mt-3 text-sm leading-6 text-secondary">
+                    <code>execution.kind</code> is a closed union. Workflow registrations
+                    bind type, function, and activities; standalone activity and Nexus
+                    registrations keep their native activity or service, operation,
+                    and handler definitions.
                   </p>
                 </div>
                 <CodeBlock
                   content={proposedRegistration}
                   language="typescript"
                   label="Proposed example registration"
-                  minHeight={300}
-                  maxHeight={420}
+                  minHeight={500}
+                  maxHeight={620}
                 />
+              </div>
+              <div
+                class="mt-6 grid gap-3 border-t border-subtle pt-6 md:grid-cols-[minmax(0,0.8fr)_auto_minmax(0,1fr)] md:items-center"
+                aria-label="Sealed registration projections"
+              >
+                <div class="surface-subtle rounded-sm p-4">
+                  <p
+                    class="body-small-medium uppercase tracking-wider text-secondary"
+                  >
+                    Author once
+                  </p>
+                  <p class="mt-2 font-mono text-sm">registerExample(...)</p>
+                  <p class="body-small mt-2 text-secondary">
+                    Sealing aggregates every registered example per enabled
+                    target before any worker is created.
+                  </p>
+                </div>
+                <Icon
+                  name="arrow-right"
+                  class="mx-auto rotate-90 text-brand md:rotate-0"
+                />
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <div
+                    class="surface-information rounded-sm border border-information p-4"
+                  >
+                    <p class="text-sm font-medium">Browser-safe catalog</p>
+                    <p class="body-small mt-2 text-secondary">
+                      Serializable metadata only
+                    </p>
+                  </div>
+                  <div
+                    class="surface-subtle rounded-sm border border-subtle p-4"
+                  >
+                    <p class="text-sm font-medium">Node-only worker bindings</p>
+                    <p class="body-small mt-2 text-secondary">
+                      Functions, activities, and target ownership
+                    </p>
+                  </div>
+                </div>
               </div>
             </Card>
 
@@ -505,7 +633,11 @@
             </Card>
           </section>
 
-          <section id="capabilities" class="order-2 scroll-mt-8">
+          <section
+            id="capabilities"
+            class="order-2 scroll-mt-8 focus:outline-none"
+            tabindex="-1"
+          >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
                 02 · Capability proof
@@ -597,7 +729,11 @@
             </div>
           </section>
 
-          <section id="boundary" class="order-3 scroll-mt-8">
+          <section
+            id="boundary"
+            class="order-3 scroll-mt-8 focus:outline-none"
+            tabindex="-1"
+          >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
                 03 · Runtime & hosting boundary
@@ -606,9 +742,10 @@
                 Two planes keep examples safe and portable.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                Stable IDs join browser-safe example declarations to executable
-                bindings. Fixture code and credentials never enter the browser
-                bundle; targets own namespace and task queue exactly once.
+                Sealing the project registry aggregates registered examples per
+                enabled target and produces two projections joined by stable
+                IDs. Fixture code and credentials never enter the browser
+                bundle; each target is complete before Worker.create.
               </p>
             </div>
 
@@ -623,7 +760,7 @@
                     height={24}
                     class="text-brand"
                   />
-                  <h3 class="text-xl">Browser plane</h3>
+                  <h3 class="text-xl">Sealed browser projection</h3>
                 </div>
                 <ul class="mt-5 space-y-3 text-sm text-secondary">
                   <li>Serializable descriptors and target records</li>
@@ -661,19 +798,25 @@
                     height={24}
                     class="text-brand"
                   />
-                  <h3 class="text-xl">Worker plane</h3>
+                  <h3 class="text-xl">Sealed Node projection</h3>
                 </div>
                 <ul class="mt-5 space-y-3 text-sm text-secondary">
                   <li>
-                    Workflow functions, activities, and declared Nexus services
+                    Explicit workflow types paired with functions for typing and
+                    validation
                   </li>
-                  <li>Executable bindings and one base catalog entry module</li>
                   <li>
-                    Optional caller and handler modules for the cross-namespace
-                    Nexus example only
+                    Activities unioned per target; conflicting name/function
+                    ownership is rejected
                   </li>
-                  <li>Temporal connection credentials and process lifecycle</li>
-                  <li>Join validation and secret-safe diagnostics</li>
+                  <li>
+                    Target-level <code>workflowsPath</code> or
+                    <code>workflowBundle</code> remains the static SDK workflow mechanism
+                  </li>
+                  <li>
+                    Complete worker options passed once to
+                    <code>Worker.create</code>
+                  </li>
                 </ul>
                 <div
                   class="surface-subtle mt-6 rounded-sm p-3 font-mono text-sm"
@@ -694,6 +837,11 @@
                   <h3 class="mt-2 text-2xl">
                     One small runner, sized for the examples we own.
                   </h3>
+                  <p class="mt-3 max-w-xl text-sm leading-6 text-secondary">
+                    The runner constructs every enabled target from its sealed
+                    aggregate. Selecting a catalog item changes only the launch
+                    UI, never worker registration.
+                  </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                   <Badge type="ghost">Unauthenticated</Badge>
@@ -752,7 +900,11 @@
             </Card>
           </section>
 
-          <section id="delivery" class="order-4 scroll-mt-8">
+          <section
+            id="delivery"
+            class="order-4 scroll-mt-8 focus:outline-none"
+            tabindex="-1"
+          >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
                 04 · Delivery posture
@@ -786,7 +938,11 @@
             </div>
           </section>
 
-          <section id="proof" class="order-5 scroll-mt-8">
+          <section
+            id="proof"
+            class="order-5 scroll-mt-8 focus:outline-none"
+            tabindex="-1"
+          >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
                 05 · Proof strategy
@@ -873,7 +1029,11 @@
             </div>
           </section>
 
-          <section id="experience" class="order-[6] scroll-mt-8">
+          <section
+            id="experience"
+            class="order-[6] scroll-mt-8 focus:outline-none"
+            tabindex="-1"
+          >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
                 06 · Interactive UI preview
@@ -1459,7 +1619,11 @@
             {/if}
           </section>
 
-          <section id="review" class="order-[7] scroll-mt-8 pb-16">
+          <section
+            id="review"
+            class="order-[7] scroll-mt-8 pb-16 focus:outline-none"
+            tabindex="-1"
+          >
             <Card class="surface-inverse border-inverse p-6 sm:p-10">
               <div class="max-w-3xl">
                 <p
