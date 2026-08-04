@@ -46,6 +46,7 @@ test.describe('Standalone Activity Commands', () => {
     await activityCommandsPage.goto({ activityId, runId });
 
     await expect(activityCommandsPage.pauseButton).toBeVisible();
+    await expect(activityCommandsPage.activityStatus).toHaveText('Running');
 
     await activityCommandsPage.pauseButton.click();
     await expect(activityCommandsPage.pauseModal).toBeVisible();
@@ -53,6 +54,7 @@ test.describe('Standalone Activity Commands', () => {
     await activityCommandsPage.pauseConfirmButton.click();
 
     await expect(activityCommandsPage.unpauseButton).toBeVisible();
+    await expect(activityCommandsPage.activityStatus).toHaveText('Paused');
   });
 
   test('should unpause a paused activity', async ({ page }) => {
@@ -68,12 +70,14 @@ test.describe('Standalone Activity Commands', () => {
     await activityCommandsPage.goto({ activityId, runId });
 
     await expect(activityCommandsPage.unpauseButton).toBeVisible();
+    await expect(activityCommandsPage.activityStatus).toHaveText('Paused');
 
     await activityCommandsPage.unpauseButton.click();
     await expect(activityCommandsPage.unpauseModal).toBeVisible();
     await activityCommandsPage.unpauseConfirmButton.click();
 
     await expect(activityCommandsPage.pauseButton).toBeVisible();
+    await expect(activityCommandsPage.activityStatus).toHaveText('Running');
   });
 
   test('should reset a running activity', async ({ page }) => {
