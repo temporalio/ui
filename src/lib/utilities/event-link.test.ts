@@ -36,6 +36,30 @@ describe('toEventLinkView', () => {
     });
   });
 
+  it('uses caller labels for workflow events in the caller perspective', () => {
+    const view = toEventLinkView(
+      {
+        workflowEvent: {
+          namespace: 'caller-ns',
+          workflowId: 'caller-wf',
+          runId: 'caller-run',
+          eventRef: {
+            eventId: '7',
+            eventType: 'EVENT_TYPE_NEXUS_OPERATION_SCHEDULED',
+          },
+        },
+      },
+      { perspective: 'caller' },
+    );
+
+    expect(view.label).toBe('Caller Workflow');
+    expect(view.namespace?.label).toBe('Caller Namespace');
+    expect(view.event?.label).toBe('Caller Event');
+    expect(view.event?.href).toBe(
+      `${base}/namespaces/caller-ns/workflows/caller-wf/caller-run/history/events/7`,
+    );
+  });
+
   it('returns a workflow event route for request ID references', () => {
     const view = toEventLinkView({
       workflowEvent: {

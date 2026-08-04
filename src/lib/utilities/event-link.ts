@@ -33,6 +33,7 @@ export type EventLinkView = EventLinkDisplay & {
 
 export type EventLinkContext = {
   namespace?: string;
+  perspective?: 'caller';
 };
 
 const workflowExecutionStarted = 'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED';
@@ -47,11 +48,12 @@ const workflowValueFromHref = (href: string, fallback: string): string => {
 
 const namespaceDisplay = (
   namespace: string | null | undefined,
+  labelKey: 'nexus.namespace-link' | 'nexus.caller-namespace' = 'nexus.namespace-link',
 ): EventLinkDisplay | undefined => {
   if (!isPresent(namespace)) return undefined;
 
   return {
-    label: translate('nexus.namespace-link'),
+    label: translate(labelKey),
     value: namespace,
     href: routeForNamespace({ namespace }),
   };
@@ -62,6 +64,7 @@ const eventDisplay = (
   eventType: unknown,
   eventId?: unknown,
   requestId?: string | null,
+  labelKey: 'nexus.handler-event' | 'nexus.caller-event' = 'nexus.handler-event',
 ): EventLinkDisplay | undefined => {
   if (eventId === undefined && !requestId && !eventType) {
     return undefined;
@@ -78,7 +81,7 @@ const eventDisplay = (
     .join(' ');
 
   return {
-    label: translate('nexus.handler-event'),
+    label: translate(labelKey),
     value: value || translate('nexus.link'),
     href,
   };
@@ -164,19 +167,25 @@ export const toEventLinkView = (
       ? workflowValueFromHref(href, fallbackValue)
       : fallbackValue;
 
+    const caller = context.perspective === 'caller';
+
     return {
       variant: 'workflowEvent',
       key: `workflowEvent:${namespace ?? ''}:${workflow ?? ''}:${run ?? ''}:${workflowEvent.eventRef?.eventId ?? workflowEvent.requestIdRef?.requestId ?? index ?? ''}`,
-      label: translate('nexus.workflow-link'),
+      label: translate(caller ? 'nexus.caller-workflow' : 'nexus.workflow-link'),
       value,
       href,
-      namespace: namespaceDisplay(namespace),
+      namespace: namespaceDisplay(
+        namespace,
+        caller ? 'nexus.caller-namespace' : 'nexus.namespace-link',
+      ),
       event: eventDisplay(
         href,
         workflowEvent.eventRef?.eventType ??
           workflowEvent.requestIdRef?.eventType,
         workflowEvent.eventRef?.eventId,
         workflowEvent.requestIdRef?.requestId,
+        caller ? 'nexus.caller-event' : 'nexus.handler-event',
       ),
     };
   }

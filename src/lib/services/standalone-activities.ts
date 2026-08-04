@@ -1,3 +1,5 @@
+import type { temporal } from '@temporalio/proto';
+
 import type { StandaloneActivityFormData } from '$lib/components/standalone-activities/start-standalone-activity-form/types';
 import {
   type DefaultUnits,
@@ -20,14 +22,17 @@ import type {
   ActivityExecutionInfo,
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
+import type { Callback } from '$lib/types/nexus';
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 import { encodePayloads } from '$lib/utilities/encode-payload';
+import { isEmptyObject } from '$lib/utilities/is';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
   type ErrorCallback,
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { toCallbackStateReadable } from '$lib/utilities/screaming-enums';
 
 import { ACTIVITY_OPTIONS_UPDATE_MASK } from './workflow-activities-service';
 import { setSearchAttributes } from './workflow-service';
@@ -65,6 +70,26 @@ const emptyActivityExecutionInfo: ActivityExecutionInfo = {
 const emptyActivityExecution: ActivityExecution = {
   runId: '',
   info: emptyActivityExecutionInfo,
+};
+
+type DescribeActivityExecutionResponse = Omit<ActivityExecution, 'callbacks'> & {
+  callbacks?: temporal.api.activity.v1.ICallbackInfo[] | null;
+};
+
+export const toActivityCallbacks = (
+  callbacks?: temporal.api.activity.v1.ICallbackInfo[] | null,
+): Callback[] => {
+  if (!callbacks) return [];
+  return callbacks.reduce<Callback[]>((acc, { info }) => {
+    if (!info) return acc;
+    acc.push({
+      ...info,
+      blockedReason: info.blockedReason ?? undefined,
+      callback: (info.callback ?? undefined) as Callback['callback'],
+      state: toCallbackStateReadable(info.state ?? undefined),
+    });
+    return acc;
+  }, []);
 };
 
 export interface StartStandaloneActivityResponse {
@@ -348,9 +373,13 @@ export const getActivityExecution = (
     runId,
   });
 
-  return requestFromAPI<ActivityExecution>(route, {
+  return requestFromAPI<DescribeActivityExecutionResponse>(route, {
     params,
-  }).then((response) => response ?? emptyActivityExecution);
+  }).then((response) => {
+    if (!response) return emptyActivityExecution;
+    const { callbacks, ...rest } = response;
+    return { ...rest, callbacks: toActivityCallbacks(callbacks) };
+  });
 };
 
 export const pollActivityExecution = (
@@ -374,10 +403,14 @@ export const pollActivityExecution = (
     longPollToken: token,
   });
 
-  return requestFromAPI<ActivityExecution>(route, {
+  return requestFromAPI<DescribeActivityExecutionResponse>(route, {
     params,
     notifyOnError: false,
     options: { signal },
+  }).then((response) => {
+    if (!response || isEmptyObject(response)) return undefined;
+    const { callbacks, ...rest } = response;
+    return { ...rest, callbacks: toActivityCallbacks(callbacks) };
   });
 };
 

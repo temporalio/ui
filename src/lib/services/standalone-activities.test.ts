@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import type { StandaloneActivityFormData } from '$lib/components/standalone-activities/start-standalone-activity-form/types';
 
-import { toStartActivityExecutionRequest } from './standalone-activities';
+import {
+  toActivityCallbacks,
+  toStartActivityExecutionRequest,
+} from './standalone-activities';
 
 const baseFormData: StandaloneActivityFormData = {
   identity: 'test',
@@ -55,5 +58,48 @@ describe('toStartActivityExecutionRequest', () => {
     });
 
     expect(provided.startToCloseTimeout).toBe('30s');
+  });
+});
+
+describe('toActivityCallbacks', () => {
+  const activityCallbacks = [
+    {
+      trigger: {},
+      info: {
+        callback: {
+          nexus: { url: 'http://callback' },
+          links: [
+            {
+              workflowEvent: {
+                namespace: 'caller-ns',
+                workflowId: 'caller-wf',
+                runId: 'caller-run',
+                eventRef: { eventId: '7' },
+              },
+            },
+          ],
+        },
+        state: 'CALLBACK_STATE_SUCCEEDED',
+        attempt: 2,
+      },
+    },
+  ] as unknown as Parameters<typeof toActivityCallbacks>[0];
+
+  it('extracts nested info and makes state readable', () => {
+    const [callback] = toActivityCallbacks(activityCallbacks);
+
+    expect(callback.state).toBe('Succeeded');
+    expect(callback.attempt).toBe(2);
+    expect(callback.callback?.links).toHaveLength(1);
+    expect(callback.callback?.nexus?.url).toBe('http://callback');
+  });
+
+  it('skips callbacks without info and handles empty input', () => {
+    expect(toActivityCallbacks(undefined)).toEqual([]);
+    expect(
+      toActivityCallbacks([
+        {},
+      ] as unknown as Parameters<typeof toActivityCallbacks>[0]),
+    ).toEqual([]);
   });
 });
