@@ -113,14 +113,14 @@
   {#if isRunning}
     {#if commandsDisabled}
       <Button
-        on:click={() => (cancelConfirmationModalOpen = true)}
+        onclick={() => (cancelConfirmationModalOpen = true)}
         disabled={writeActionsDisabled}
         size="sm"
       >
         {translate('standalone-activities.request-cancellation')}
       </Button>
     {:else}
-      <Button on:click={onPause} size="sm">
+      <Button onclick={onPause} size="sm">
         {isPaused
           ? translate('standalone-activities.unpause-activity')
           : translate('standalone-activities.pause-activity')}

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -336,23 +335,21 @@
 <tr>
   <td class="text-left">
     <div class="flex items-center gap-1">
-      <CapabilityGuard capability="serverScaledDeployments">
-        {#if computeProviderType}
-          <button
-            type="button"
-            aria-label={expanded
-              ? translate('common.collapse')
-              : translate('common.expand')}
-            onclick={() => (expanded = !expanded)}
-            class="shrink-0"
-          >
-            <Icon
-              name="chevron-right"
-              class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
-            />
-          </button>
-        {/if}
-      </CapabilityGuard>
+      {#if computeProviderType}
+        <button
+          type="button"
+          aria-label={expanded
+            ? translate('common.collapse')
+            : translate('common.expand')}
+          onclick={() => (expanded = !expanded)}
+          class="shrink-0"
+        >
+          <Icon
+            name="chevron-right"
+            class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
+          />
+        </button>
+      {/if}
       <Copyable
         content={versionBuildId}
         copyIconTitle={translate('common.copy-icon-title')}
@@ -367,21 +364,17 @@
   <td class="text-left">
     <DeploymentStatus {status} label={statusLabel} />
   </td>
-  <CapabilityGuard capability="serverScaledDeployments">
-    <td class="text-left">
-      <ComputeBadge type={computeProviderType} />
-    </td>
-  </CapabilityGuard>
+  <td class="text-left">
+    <ComputeBadge type={computeProviderType} />
+  </td>
   {#if showConnectionStatus}
-    <CapabilityGuard capability="serverScaledDeployments">
-      <td class="text-left">
-        {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
-          <ConnectionBadge computeStatus={version.computeStatus} />
-        {:else}
-          <span class="text-secondary">—</span>
-        {/if}
-      </td>
-    </CapabilityGuard>
+    <td class="text-left">
+      {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
+        <ConnectionBadge computeStatus={version.computeStatus} />
+      {:else}
+        <span class="text-secondary">—</span>
+      {/if}
+    </td>
   {/if}
   <Timestamp
     as="td"
@@ -394,8 +387,8 @@
     {workflowHref}
     {isCurrent}
     hasComputeConfig={isVersionSummaryNew(version)
-      ? !!version.computeConfig
-      : true}
+      ? Object.keys(version.computeConfig?.scalingGroups ?? {}).length > 0
+      : false}
     {isRamping}
     onSetCurrent={() => (showSetCurrentModal = true)}
     onSetRamping={openSetRamping}
@@ -477,17 +470,23 @@
   open={showUnsetCurrentModal}
   confirmText={translate('common.confirm')}
   cancelText={translate('common.cancel')}
-  on:confirmModal={handleUnsetCurrentVersion}
-  on:cancelModal={() => {
+  onConfirmModal={handleUnsetCurrentVersion}
+  onCancelModal={() => {
     showUnsetCurrentModal = false;
     unsetCurrentError = '';
   }}
 >
-  <h3 slot="title">{translate('deployments.unset-current')}</h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <p class="text-sm">{translate('deployments.unset-current-description')}</p>
-    {#if unsetCurrentError}
-      <p class="text-sm text-danger">{unsetCurrentError}</p>
-    {/if}
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('deployments.unset-current')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      <p class="text-sm">
+        {translate('deployments.unset-current-description')}
+      </p>
+      {#if unsetCurrentError}
+        <p class="text-sm text-danger">{unsetCurrentError}</p>
+      {/if}
+    </div>
+  {/snippet}
 </Modal>

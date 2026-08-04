@@ -227,42 +227,47 @@
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
   >
-    <caption class="sr-only" slot="caption">
-      {translate('common.workflows')}
-    </caption>
-    <TableHeaderRow
-      columnsCount={columns.length}
-      empty={visiblePaginatedItems.length === 0}
-      slot="headers"
-      workflows={visiblePaginatedItems}
-      {pageSelectionStatus}
-      onSelectPage={handleSelectPage}
-    >
-      {#each columns as column (column.label)}
-        <TableHeaderCell {column} />
-      {/each}
-    </TableHeaderRow>
-    {#each visibleRows as row, visibleRowIndex (row.value.runId)}
-      {@const isChildRow = row.rowType === 'child'}
-      <TableRow
-        workflow={row.value}
-        {toggleChildrenVisibility}
-        childCount={!isChildRow && row.childCount != null
-          ? row.childCount
-          : undefined}
-        child={isChildRow}
-        onClickBatchSelect={(event) =>
-          handleBatchSelect(event, row, visibleRowIndex)}
+    {#snippet caption()}
+      <caption class="sr-only">
+        {translate('common.workflows')}
+      </caption>
+    {/snippet}
+    {#snippet headers()}
+      <TableHeaderRow
+        columnsCount={columns.length}
+        empty={visiblePaginatedItems.length === 0}
+        workflows={visiblePaginatedItems}
+        {pageSelectionStatus}
+        onSelectPage={handleSelectPage}
       >
         {#each columns as column (column.label)}
-          <TableBodyCell workflow={row.value} {column} truncate={dense} />
+          <TableHeaderCell {column} />
         {/each}
-      </TableRow>
-    {/each}
-    <svelte:fragment slot="empty">
+      </TableHeaderRow>
+    {/snippet}
+    {#snippet rows()}
+      {#each visibleRows as row, visibleRowIndex (row.value.runId)}
+        {@const isChildRow = row.rowType === 'child'}
+        <TableRow
+          workflow={row.value}
+          {toggleChildrenVisibility}
+          childCount={!isChildRow && row.childCount != null
+            ? row.childCount
+            : undefined}
+          child={isChildRow}
+          onClickBatchSelect={(event) =>
+            handleBatchSelect(event, row, visibleRowIndex)}
+        >
+          {#each columns as column (column.label)}
+            <TableBodyCell workflow={row.value} {column} truncate={dense} />
+          {/each}
+        </TableRow>
+      {/each}
+    {/snippet}
+    {#snippet empty()}
       <TableEmptyState {cloud} />
-    </svelte:fragment>
-    <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
+    {/snippet}
+    {#snippet actionsEndAdditional({ visibleItems, page })}
       <Tooltip
         text={dense
           ? translate('common.dense')
@@ -271,7 +276,7 @@
       >
         <FeatureTag feature="tableDensity" />
         <Button
-          on:click={setTableDensity}
+          onclick={setTableDensity}
           data-testid="table-density-button"
           size="xs"
           variant="ghost"
@@ -289,7 +294,7 @@
       />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button
-          on:click={onClickConfigure}
+          onclick={onClickConfigure}
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"
@@ -298,6 +303,6 @@
           <Icon name="settings" />
         </Button>
       </Tooltip>
-    </svelte:fragment>
+    {/snippet}
   </PaginatedTable>
 {/key}

@@ -1,11 +1,15 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import Table from '$lib/holocene/table/table.svelte';
 
-  export const meta = {
+  type TableArgs = Omit<ComponentProps<typeof Table>, 'columns' | 'rows'> & {
+    columns?: number;
+    rows?: number;
+  };
+
+  const { Story } = defineMeta({
     title: 'Table',
     component: Table,
     args: {
@@ -16,16 +20,11 @@
       columns: { control: 'number' },
       rows: { control: 'number' },
     },
-  } satisfies Meta<
-    Omit<Table, 'columns' | 'rows'> & { columns?: number; rows?: number }
-  >;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
+{#snippet template(args: TableArgs, context: StoryContext<TableArgs>)}
   <Table class="w-full" updating={args.updating} data-testid={context.id}>
     {#snippet headers()}
       <tr>
@@ -42,8 +41,8 @@
       </tr>
     {/each}
   </Table>
-</Template>
+{/snippet}
 
-<Story name="Primary" args={{ variant: 'primary' }} />
+<Story name="Primary" args={{}} />
 
-<Story name="Primary, Updating" args={{ updating: true, variant: 'primary' }} />
+<Story name="Primary, Updating" args={{ updating: true }} />

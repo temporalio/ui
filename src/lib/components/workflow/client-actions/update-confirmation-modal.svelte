@@ -116,91 +116,95 @@
   confirmText={translate('common.submit')}
   cancelText={translate('common.cancel')}
   confirmDisabled={!name || !encoding}
-  on:cancelModal={hideModal}
-  on:confirmModal={update}
+  onCancelModal={hideModal}
+  onConfirmModal={update}
 >
-  <h3 slot="title">{translate('workflows.update-modal-title')}</h3>
-  <div class="flex flex-col gap-4" slot="content">
-    {#if (updateDefinitions?.length ?? 0) > 0 && !customUpdate}
-      <Select
-        id="update-select"
-        label={translate('common.name')}
-        class="min-w-fit"
-        bind:value={name}
-        data-testid="update-select"
-        placeholder="Select an Update"
-        required
-        disabled={loading}
-      >
-        {#each updateDefinitions as { name: value, description = '' } (value)}
-          <Option {value} {description}>{value}</Option>
-        {/each}
-        <Option onclick={handleCustom} value="custom">Custom</Option>
-      </Select>
-    {:else}
-      <div class="flex w-full items-end justify-between gap-2">
-        <Input
-          id="update-name"
-          class="w-full"
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.update-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      {#if (updateDefinitions?.length ?? 0) > 0 && !customUpdate}
+        <Select
+          id="update-select"
           label={translate('common.name')}
-          required
+          class="min-w-fit"
           bind:value={name}
+          data-testid="update-select"
+          placeholder="Select an Update"
+          required
           disabled={loading}
-        />
-        {#if customUpdate}
-          <Button
-            on:click={() => {
-              customUpdate = false;
-              name = '';
-            }}
-            variant="secondary"
-            leadingIcon="close"
+        >
+          {#each updateDefinitions as { name: value, description = '' } (value)}
+            <Option {value} {description}>{value}</Option>
+          {/each}
+          <Option onclick={handleCustom} value="custom">Custom</Option>
+        </Select>
+      {:else}
+        <div class="flex w-full items-end justify-between gap-2">
+          <Input
+            id="update-name"
+            class="w-full"
+            label={translate('common.name')}
+            required
+            bind:value={name}
             disabled={loading}
           />
-        {/if}
-      </div>
-    {/if}
-    <Input
-      id="update-id"
-      label={translate('workflows.update-id')}
-      bind:value={updateId}
-      disabled={loading}
-    >
-      {#snippet afterInput()}
-        <RandomUuidButton
-          class="ml-2.5"
-          bind:value={updateId}
-          disabled={loading}
-        />
-      {/snippet}
-    </Input>
-    <PayloadInput bind:input />
-    {#if loading}
-      <Alert intent="info" title="In Progress"
-        >{translate('workflows.update-in-progress')}</Alert
+          {#if customUpdate}
+            <Button
+              onclick={() => {
+                customUpdate = false;
+                name = '';
+              }}
+              variant="secondary"
+              leadingIcon="close"
+              disabled={loading}
+            />
+          {/if}
+        </div>
+      {/if}
+      <Input
+        id="update-id"
+        label={translate('workflows.update-id')}
+        bind:value={updateId}
+        disabled={loading}
       >
-    {/if}
-    {#if failure}
-      <Alert intent="error" title={failure?.message || 'Failure'}>
-        {#if failure?.stackTrace}
-          <CodeBlock
-            class="mt-4"
-            content={failure.stackTrace}
-            label={translate('common.stack-trace')}
-            language="text"
+        {#snippet afterInput()}
+          <RandomUuidButton
+            class="ml-2.5"
+            bind:value={updateId}
+            disabled={loading}
           />
-        {/if}
-      </Alert>
-    {/if}
-    {#if success && typeof success === 'object'}
-      <Alert intent="success" title="Success">
-        {#if success?.payloads?.[0] && success.payloads[0].data}
-          <PayloadCodeBlock
-            value={success}
-            label={translate('workflows.update-result')}
-          />
-        {/if}
-      </Alert>
-    {/if}
-  </div>
+        {/snippet}
+      </Input>
+      <PayloadInput bind:input />
+      {#if loading}
+        <Alert intent="info" title="In Progress"
+          >{translate('workflows.update-in-progress')}</Alert
+        >
+      {/if}
+      {#if failure}
+        <Alert intent="error" title={failure?.message || 'Failure'}>
+          {#if failure?.stackTrace}
+            <CodeBlock
+              class="mt-4"
+              content={failure.stackTrace}
+              label={translate('common.stack-trace')}
+              language="text"
+            />
+          {/if}
+        </Alert>
+      {/if}
+      {#if success && typeof success === 'object'}
+        <Alert intent="success" title="Success">
+          {#if success?.payloads?.[0] && success.payloads[0].data}
+            <PayloadCodeBlock
+              value={success}
+              label={translate('workflows.update-result')}
+            />
+          {/if}
+        </Alert>
+      {/if}
+    </div>
+  {/snippet}
 </Modal>

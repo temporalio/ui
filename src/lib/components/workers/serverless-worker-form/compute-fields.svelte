@@ -265,13 +265,13 @@
         <ToggleButtons>
           <ToggleButton
             active={activeRoleHelpTab === 'cloudformation'}
-            on:click={() => (activeRoleHelpTab = 'cloudformation')}
+            onclick={() => (activeRoleHelpTab = 'cloudformation')}
           >
             {translate('workers.cfn-tab')}
           </ToggleButton>
           <ToggleButton
             active={activeRoleHelpTab === 'terraform'}
-            on:click={() => (activeRoleHelpTab = 'terraform')}
+            onclick={() => (activeRoleHelpTab = 'terraform')}
           >
             {translate('workers.terraform-tab')}
           </ToggleButton>
@@ -290,11 +290,7 @@
             >
               {translate('workers.launch-stack')}
             </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              on:click={downloadCfnTemplate}
-            >
+            <Button variant="secondary" size="sm" onclick={downloadCfnTemplate}>
               {translate('workers.download-template')}
             </Button>
           </div>
@@ -385,7 +381,7 @@
     size="sm"
     type="button"
     trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
-    on:click={() => (showScaling = !showScaling)}
+    onclick={() => (showScaling = !showScaling)}
   >
     {showScaling
       ? translate('workers.hide-defaults')

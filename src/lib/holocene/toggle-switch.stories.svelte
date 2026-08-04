@@ -1,11 +1,10 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Toggle Switch',
     component: ToggleSwitch,
     args: {
@@ -30,16 +29,16 @@
         table: { disable: true },
       },
     },
-  } satisfies Meta<ToggleSwitch>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: ComponentProps<typeof ToggleSwitch>,
+  context: StoryContext<ComponentProps<typeof ToggleSwitch>>,
+)}
   <ToggleSwitch {...args} id={context.id} />
-</Template>
+{/snippet}
 
 <Story name="Unchecked" />
 

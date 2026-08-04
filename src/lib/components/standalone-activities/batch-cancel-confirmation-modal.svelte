@@ -92,12 +92,14 @@
   cancelText={translate('common.cancel')}
   confirmDisabled={!$jobIdValid}
   confirmText={translate('common.confirm')}
-  on:confirmModal={cancelActivities}
+  onConfirmModal={cancelActivities}
 >
-  <h3 slot="title">
-    {translate('standalone-activities.batch-cancel-modal-title')}
-  </h3>
-  <svelte:fragment slot="content">
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('standalone-activities.batch-cancel-modal-title')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
     <BatchOperationConfirmationForm
       bind:reason={$reason}
       bind:jobId={$jobId}
@@ -121,5 +123,5 @@
         { action: actionText },
       )}
     />
-  </svelte:fragment>
+  {/snippet}
 </Modal>

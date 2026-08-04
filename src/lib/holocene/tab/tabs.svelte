@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
+  import type { Writable } from 'svelte/store';
+
   export type TabContext = {
     activeTab: Writable<string>;
     activePanel: Writable<string>;
@@ -12,11 +14,16 @@
 
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { type Writable, writable } from 'svelte/store';
+  import { writable } from 'svelte/store';
 
+  import type { Snippet } from 'svelte';
   import { onDestroy, setContext } from 'svelte';
 
-  type $$Props = HTMLAttributes<HTMLDivElement>;
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+    children?: Snippet;
+  }
+
+  let { children, ...rest }: Props = $props();
 
   const tabs: string[] = [];
   const panels: string[] = [];
@@ -61,6 +68,6 @@
   });
 </script>
 
-<div class="tabs" {...$$restProps}>
-  <slot />
+<div class="tabs" {...rest}>
+  {@render children?.()}
 </div>

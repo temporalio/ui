@@ -62,11 +62,7 @@
           class="mb-4 w-fit"
         />
         <div class="flex items-center gap-2">
-          <Button
-            variant="primary"
-            leadingIcon="retry"
-            on:click={setStackTrace}
-          >
+          <Button variant="primary" leadingIcon="retry" onclick={setStackTrace}>
             {translate('workflows.refresh-call-stack')}
           </Button>
           <p>

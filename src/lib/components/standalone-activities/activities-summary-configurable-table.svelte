@@ -110,42 +110,47 @@
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('standalone-activities.empty-state-title')}
   >
-    <caption class="sr-only" slot="caption">
-      {translate('standalone-activities.standalone-activities')}
-    </caption>
-    <TableHeaderRow
-      slot="headers"
-      activities={visiblePaginatedItems}
-      empty={visiblePaginatedItems.length === 0}
-      columnsCount={columns.length}
-      {showBatchActions}
-      {pageSelectionStatus}
-      onSelectPage={handleSelectPage}
-    >
-      {#each columns as column, i (`${column.label}:${i}`)}
-        <TableHeaderCell {column} />
-      {/each}
-    </TableHeaderRow>
-    {#each visiblePaginatedItems as activity, visibleRowIndex (activityKey(activity))}
-      <TableRow
-        {activity}
+    {#snippet caption()}
+      <caption class="sr-only">
+        {translate('standalone-activities.standalone-activities')}
+      </caption>
+    {/snippet}
+    {#snippet headers()}
+      <TableHeaderRow
+        activities={visiblePaginatedItems}
+        empty={visiblePaginatedItems.length === 0}
+        columnsCount={columns.length}
         {showBatchActions}
-        onClickBatchSelect={(event) =>
-          handleBatchSelect(event, visibleRowIndex)}
+        {pageSelectionStatus}
+        onSelectPage={handleSelectPage}
       >
         {#each columns as column, i (`${column.label}:${i}`)}
-          <TableBodyCell {activity} {column} />
+          <TableHeaderCell {column} />
         {/each}
-      </TableRow>
-    {/each}
-    <svelte:fragment slot="empty">
+      </TableHeaderRow>
+    {/snippet}
+    {#snippet rows()}
+      {#each visiblePaginatedItems as activity, visibleRowIndex (activityKey(activity))}
+        <TableRow
+          {activity}
+          {showBatchActions}
+          onClickBatchSelect={(event) =>
+            handleBatchSelect(event, visibleRowIndex)}
+        >
+          {#each columns as column, i (`${column.label}:${i}`)}
+            <TableBodyCell {activity} {column} />
+          {/each}
+        </TableRow>
+      {/each}
+    {/snippet}
+    {#snippet empty()}
       <TableEmptyState />
-    </svelte:fragment>
-    <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
+    {/snippet}
+    {#snippet actionsEndAdditional({ visibleItems, page })}
       <DownloadJsonButton items={visibleItems} {page} filePrefix="activities" />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button
-          on:click={onClickConfigure}
+          onclick={onClickConfigure}
           data-testid="activities-summary-table-configuration-button"
           size="xs"
           variant="ghost"
@@ -154,6 +159,6 @@
           <Icon name="settings" />
         </Button>
       </Tooltip>
-    </svelte:fragment>
+    {/snippet}
   </PaginatedTable>
 {/key}

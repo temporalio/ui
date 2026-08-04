@@ -67,31 +67,32 @@
       maxZoomOut={8}
       maxZoomIn={0.25}
       containerHeight={280}
-      let:width
-      let:height
-      let:zoomLevel
     >
-      <div class="flex py-4" slot="controls">
-        {#if $showFullTree}
-          <ToggleSwitch
-            label={translate('common.expand-all')}
-            labelPosition="left"
-            id="autorefresh"
-            checked={expandAll}
-            on:change={onExpandAll}
-          />
-        {/if}
-      </div>
-      <WorkflowFamilyNodeTree
-        {root}
-        {width}
-        {height}
-        {zoomLevel}
-        {onNodeClick}
-        {expandAll}
-        {openRuns}
-        {activeWorkflow}
-      />
+      {#snippet controls()}
+        <div class="flex py-4">
+          {#if $showFullTree}
+            <ToggleSwitch
+              label={translate('common.expand-all')}
+              labelPosition="left"
+              id="autorefresh"
+              checked={expandAll}
+              onchange={onExpandAll}
+            />
+          {/if}
+        </div>
+      {/snippet}
+      {#snippet graph({ width, height, zoomLevel })}
+        <WorkflowFamilyNodeTree
+          {root}
+          {width}
+          {height}
+          {zoomLevel}
+          {onNodeClick}
+          {expandAll}
+          {openRuns}
+          {activeWorkflow}
+        />
+      {/snippet}
     </ZoomSvg>
   </div>
   <div

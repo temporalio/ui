@@ -74,7 +74,7 @@
       class="focus-visible:border-table"
       data-testid="bulk-cancel-button"
       disabled={!$cancelableActivities.length}
-      on:click={openBatchCancelConfirmationModal}
+      onclick={openBatchCancelConfirmationModal}
       >{translate('standalone-activities.request-cancellation')}</Button
     >
     <Button
@@ -83,7 +83,7 @@
       class="focus-visible:border-table"
       data-testid="bulk-terminate-button"
       disabled={!$terminableActivities.length}
-      on:click={openBatchTerminateConfirmationModal}
+      onclick={openBatchTerminateConfirmationModal}
       >{translate('standalone-activities.terminate')}</Button
     >
   {/if}

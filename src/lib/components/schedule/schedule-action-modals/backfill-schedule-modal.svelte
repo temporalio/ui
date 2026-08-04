@@ -88,7 +88,7 @@
   loading={$actionPending}
   error={$serverError}
   confirmDisabled={invalidEndTime}
-  on:confirmModal={() =>
+  onConfirmModal={() =>
     submitBackfillSchedule(
       {
         startTime: startTimestamp,
@@ -101,92 +101,96 @@
         namespace,
       },
     )}
-  on:cancelModal={() => {
+  onCancelModal={() => {
     closeConfirmationModal('backfill');
   }}
 >
-  <h3 slot="title">
-    {translate('schedules.schedule')}
-    {translate('schedules.backfill')}
-  </h3>
-  <div slot="content">
-    <div class="flex flex-col gap-6 p-2">
-      <div class="flex w-full flex-col gap-2">
-        <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem),1px)]">
-          <DatePicker
-            id="backfill-start-date"
-            label={translate('common.start')}
-            onDateChange={(d) => (startDate = startOfDay(d))}
-            selected={startDate}
-            todayLabel={translate('common.today')}
-            closeLabel={translate('common.close')}
-            clearLabel={translate('common.clear-input-button-label')}
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('schedules.schedule')}
+      {translate('schedules.backfill')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <div class="flex flex-col gap-6 p-2">
+        <div class="flex w-full flex-col gap-2">
+          <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem),1px)]">
+            <DatePicker
+              id="backfill-start-date"
+              label={translate('common.start')}
+              onDateChange={(d) => (startDate = startOfDay(d))}
+              selected={startDate}
+              todayLabel={translate('common.today')}
+              closeLabel={translate('common.close')}
+              clearLabel={translate('common.clear-input-button-label')}
+            />
+          </div>
+          <TimePicker
+            idPrefix="backfill-start-"
+            bind:hour={startHour}
+            bind:minute={startMinute}
+            bind:second={startSecond}
+            twelveHourClock={false}
           />
         </div>
-        <TimePicker
-          idPrefix="backfill-start-"
-          bind:hour={startHour}
-          bind:minute={startMinute}
-          bind:second={startSecond}
-          twelveHourClock={false}
-        />
-      </div>
-      <div class="flex w-full flex-col gap-2">
-        <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem),1px)]">
-          <DatePicker
-            id="backfill-end-date"
-            label={translate('common.end')}
-            onDateChange={(d) => (endDate = startOfDay(d))}
-            selected={endDate}
-            todayLabel={translate('common.today')}
-            closeLabel={translate('common.close')}
-            clearLabel={translate('common.clear-input-button-label')}
-            isAllowed={(d) => !isBefore(d, startDate)}
+        <div class="flex w-full flex-col gap-2">
+          <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem),1px)]">
+            <DatePicker
+              id="backfill-end-date"
+              label={translate('common.end')}
+              onDateChange={(d) => (endDate = startOfDay(d))}
+              selected={endDate}
+              todayLabel={translate('common.today')}
+              closeLabel={translate('common.close')}
+              clearLabel={translate('common.clear-input-button-label')}
+              isAllowed={(d) => !isBefore(d, startDate)}
+            />
+          </div>
+          <TimePicker
+            idPrefix="backfill-end-"
+            bind:hour={endHour}
+            bind:minute={endMinute}
+            bind:second={endSecond}
+            twelveHourClock={false}
+            error={invalidEndTime}
           />
         </div>
-        <TimePicker
-          idPrefix="backfill-end-"
-          bind:hour={endHour}
-          bind:minute={endMinute}
-          bind:second={endSecond}
-          twelveHourClock={false}
-          error={invalidEndTime}
-        />
+        {#if invalidEndTime}
+          <span class="text-xs text-danger" role="alert">
+            {translate('schedules.backfill-end-before-start')}
+          </span>
+        {/if}
+        <div class="flex w-full flex-row items-center gap-2">
+          <Icon name="clock" aria-hidden="true" />
+          <span class="text-xs font-normal text-slate-500"
+            >{translate('common.based-on-time-preface')}
+            {timezone === 'UTC'
+              ? translate('common.universal-standard-time')
+              : timezone}
+          </span>
+        </div>
       </div>
-      {#if invalidEndTime}
-        <span class="text-xs text-danger" role="alert">
-          {translate('schedules.backfill-end-before-start')}
-        </span>
-      {/if}
-      <div class="flex w-full flex-row items-center gap-2">
-        <Icon name="clock" aria-hidden="true" />
-        <span class="text-xs font-normal text-slate-500"
-          >{translate('common.based-on-time-preface')}
-          {timezone === 'UTC'
-            ? translate('common.universal-standard-time')
-            : timezone}
-        </span>
-      </div>
+
+      <hr tabindex="-1" aria-hidden="true" class="my-4 w-full border-subtle" />
+
+      <RadioGroup name="overlap-policy" group={selectedOverlapPolicy}>
+        {#each Object.entries(overlapPolicyContent) as [value, content] (value)}
+          <RadioCard
+            id="overlap-policy-{value}"
+            value={value as OverlapPolicy}
+            label={[
+              content.label,
+              value === scheduleOverlapPolicy &&
+                translate('schedules.overlap-schedule-policy-suffix'),
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            description={content.description}
+            labelContainerClass="border-transparent p-0"
+          />
+        {/each}
+      </RadioGroup>
     </div>
-
-    <hr tabindex="-1" aria-hidden="true" class="my-4 w-full border-subtle" />
-
-    <RadioGroup name="overlap-policy" group={selectedOverlapPolicy}>
-      {#each Object.entries(overlapPolicyContent) as [value, content] (value)}
-        <RadioCard
-          id="overlap-policy-{value}"
-          value={value as OverlapPolicy}
-          label={[
-            content.label,
-            value === scheduleOverlapPolicy &&
-              translate('schedules.overlap-schedule-policy-suffix'),
-          ]
-            .filter(Boolean)
-            .join(' ')}
-          description={content.description}
-          labelContainerClass="border-transparent p-0"
-        />
-      {/each}
-    </RadioGroup>
-  </div>
+  {/snippet}
 </Modal>

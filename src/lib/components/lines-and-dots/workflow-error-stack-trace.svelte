@@ -15,9 +15,11 @@
 
 {#if failure}
   <Accordion title={translate('common.failure')} class="text-sm">
-    <div class="w-full text-right text-xs" slot="summary">
-      {failure?.message}
-    </div>
+    {#snippet summary()}
+      <div class="w-full text-right text-xs">
+        {failure?.message}
+      </div>
+    {/snippet}
     <div class="flex flex-col gap-2">
       <p>{translate('common.message')}</p>
       <CodeBlock

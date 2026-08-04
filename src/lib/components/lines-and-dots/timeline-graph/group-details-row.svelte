@@ -98,7 +98,7 @@
         {/if}
       </div>
       <div class="flex items-center gap-4">
-        <Button variant="ghost" size="xs" on:click={() => setActiveGroup(group)}
+        <Button variant="ghost" size="xs" onclick={() => setActiveGroup(group)}
           >{translate('common.close')} <Icon name="close" /></Button
         >
       </div>

@@ -106,7 +106,7 @@
 
 {#snippet dot(
   point: [number, number],
-  eventClassification?: EventClassification | 'pending',
+  eventClassification: EventClassification | 'pending' | undefined,
 )}
   {@const colors = dotColors(eventClassification)}
   <rect

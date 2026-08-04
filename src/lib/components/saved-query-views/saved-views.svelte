@@ -357,7 +357,7 @@
           : 'user-query-button'}
         data-track-intent="action"
         data-track-text={view.name}
-        on:click={() => setActiveQueryView(view)}
+        onclick={() => setActiveQueryView(view)}
         class={merge(
           'flex w-full justify-start',
           (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
@@ -416,7 +416,7 @@
               data-track-name="save-view-button"
               data-track-intent="action"
               data-track-text="save"
-              on:click={() => {
+              onclick={() => {
                 onSaveView({
                   ...view,
                   query,
@@ -432,7 +432,7 @@
             data-track-name="edit-view-button"
             data-track-intent="action"
             data-track-text="edit"
-            on:click={() => {
+            onclick={() => {
               editViewModalOpen = true;
             }}>Edit</Button
           >
@@ -446,7 +446,7 @@
             data-track-name="share-view-button"
             data-track-intent="action"
             data-track-text="share"
-            on:click={handleCopy}
+            onclick={handleCopy}
             ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
               >Share</span
             ></Button
@@ -466,7 +466,7 @@
             data-track-name="create-view-button"
             data-track-intent="action"
             data-track-text="create"
-            on:click={() => {
+            onclick={() => {
               saveViewModalOpen = true;
             }}
             ><span

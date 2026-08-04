@@ -147,7 +147,7 @@
           >{translate('common.cancel')}</Button
         >
       </div>
-      <Button variant="destructive" type="button" on:click={() => onDelete()}>
+      <Button variant="destructive" type="button" onclick={() => onDelete()}>
         {translate('common.delete')}
       </Button>
     </div>

@@ -33,20 +33,24 @@
   cancelText={translate('common.cancel')}
   loading={$actionPending}
   error={$serverError}
-  on:cancelModal={() => closeConfirmationModal('delete')}
-  on:confirmModal={() =>
+  onCancelModal={() => closeConfirmationModal('delete')}
+  onConfirmModal={() =>
     submitDeleteSchedule({
       identity,
       scheduleId,
       namespace,
     })}
 >
-  <h3 slot="title">{translate('schedules.delete-modal-title')}</h3>
-  <div slot="content">
-    <p>
-      {translate('schedules.delete-modal-confirmation', {
-        schedule: scheduleId,
-      })}
-    </p>
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('schedules.delete-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>
+        {translate('schedules.delete-modal-confirmation', {
+          schedule: scheduleId,
+        })}
+      </p>
+    </div>
+  {/snippet}
 </Modal>

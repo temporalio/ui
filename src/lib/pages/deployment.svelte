@@ -2,7 +2,6 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
   import DeploymentHeader from '$lib/components/deployments/deployment-header.svelte';
   import RampUnversionedModal from '$lib/components/deployments/ramp-unversioned-modal.svelte';
@@ -19,6 +18,7 @@
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import type { WorkerDeploymentResponse } from '$lib/types/deployments';
+  import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
@@ -130,6 +130,7 @@
     <Error error={refreshError.error} />
   {/if}
   {@const info = deployment.workerDeploymentInfo}
+  {@const hasComputeConfig = deploymentHasComputeConfig(info)}
   {@const unversionedRampingPercentage =
     !info.routingConfig?.rampingDeploymentVersion &&
     info.routingConfig?.rampingVersionPercentage != null
@@ -139,6 +140,7 @@
   <DeploymentHeader
     {namespace}
     {deploymentName}
+    {hasComputeConfig}
     {showInstancesLink}
     onDeleteClick={() => (showDeleteModal = true)}
     onRampToUnversioned={() => {
@@ -148,15 +150,13 @@
   />
 
   {#if unversionedRampingPercentage !== null}
-    <CapabilityGuard capability="serverScaledDeployments">
-      <Alert
-        intent="warning"
-        title={translate('deployments.unversioned-ramping-banner', {
-          percentage: unversionedRampingPercentage,
-        })}
-        class="mt-4"
-      />
-    </CapabilityGuard>
+    <Alert
+      intent="warning"
+      title={translate('deployments.unversioned-ramping-banner', {
+        percentage: unversionedRampingPercentage,
+      })}
+      class="mt-4"
+    />
   {/if}
 
   <div class="mt-4">
@@ -168,37 +168,38 @@
       pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
       items={info.versionSummaries ?? []}
       maxHeight="fit-content"
-      let:visibleItems
     >
-      <caption class="sr-only" slot="caption">
-        {translate('deployments.deployments')}
-      </caption>
-      <tr slot="headers">
-        <th>{translate('deployments.build-id')}</th>
-        <th>{translate('deployments.lifecycle')}</th>
-        <CapabilityGuard capability="serverScaledDeployments">
+      {#snippet caption()}
+        <caption class="sr-only">
+          {translate('deployments.deployments')}
+        </caption>
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th>{translate('deployments.build-id')}</th>
+          <th>{translate('deployments.lifecycle')}</th>
           <th>{translate('deployments.compute')}</th>
-        </CapabilityGuard>
-        {#if showConnectionStatus}
-          <CapabilityGuard capability="serverScaledDeployments">
+          {#if showConnectionStatus}
             <th>{translate('deployments.connection')}</th>
-          </CapabilityGuard>
-        {/if}
-        <th>{translate('deployments.deployed')}</th>
-        <th>{translate('deployments.actions')}</th>
-      </tr>
-      {#each visibleItems as version (version.version)}
-        <VersionTableRow
-          routingConfig={info.routingConfig}
-          {version}
-          {namespace}
-          {deploymentName}
-          conflictToken={deployment.conflictToken}
-          {showConnectionStatus}
-          onChange={reload}
-          onValidationComplete={reload}
-        />
-      {/each}
+          {/if}
+          <th>{translate('deployments.deployed')}</th>
+          <th>{translate('deployments.actions')}</th>
+        </tr>
+      {/snippet}
+      {#snippet rows({ visibleItems })}
+        {#each visibleItems as version (version.version)}
+          <VersionTableRow
+            routingConfig={info.routingConfig}
+            {version}
+            {namespace}
+            {deploymentName}
+            conflictToken={deployment.conflictToken}
+            {showConnectionStatus}
+            onChange={reload}
+            onValidationComplete={reload}
+          />
+        {/each}
+      {/snippet}
     </PaginatedTable>
   </div>
 

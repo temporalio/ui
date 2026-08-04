@@ -85,20 +85,24 @@
   confirmText={translate('workflows.terminate')}
   cancelText={translate('common.cancel')}
   confirmType="destructive"
-  on:cancelModal={hideModal}
-  on:confirmModal={terminate}
+  onCancelModal={hideModal}
+  onConfirmModal={terminate}
 >
-  <h3 slot="title">{translate('workflows.terminate-modal-title')}</h3>
-  <div slot="content">
-    <p>
-      {translate('workflows.terminate-modal-confirmation')}
-    </p>
-    <Input
-      id="workflow-termination-reason"
-      class="mt-4"
-      placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason-optional')}
-      bind:value={reason}
-    />
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.terminate-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>
+        {translate('workflows.terminate-modal-confirmation')}
+      </p>
+      <Input
+        id="workflow-termination-reason"
+        class="mt-4"
+        placeholder={translate('common.reason-placeholder')}
+        label={translate('common.reason-optional')}
+        bind:value={reason}
+      />
+    </div>
+  {/snippet}
 </Modal>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
@@ -10,7 +10,21 @@
   import { translate } from '$lib/i18n/translate';
   import type { ToastVariant } from '$lib/types/holocene';
 
-  const dispatch = createEventDispatcher<{ dismiss: { id: string } }>();
+  interface Props {
+    id: string;
+    variant: ToastVariant;
+    closeButtonLabel?: string;
+    onDismiss: (id: string) => void;
+    children: Snippet;
+  }
+
+  let {
+    id,
+    variant,
+    closeButtonLabel = '',
+    onDismiss,
+    children,
+  }: Props = $props();
 
   const variants: Readonly<Record<ToastVariant, string>> = {
     primary: 'bg-slate-800 text-white',
@@ -28,16 +42,12 @@
     warning: 'warning',
   };
 
-  export let id: string;
-  export let variant: keyof typeof variants;
-  export let closeButtonLabel: string = '';
-
-  $: dismissLabel = closeButtonLabel || translate('common.close');
-  $: icon = variantIcon[variant];
+  const dismissLabel = $derived(closeButtonLabel || translate('common.close'));
+  const icon = $derived(variantIcon[variant]);
 
   const handleDismiss = (e: Event) => {
     e.stopPropagation();
-    dispatch('dismiss', { id });
+    onDismiss(id);
   };
 </script>
 
@@ -53,7 +63,7 @@
     <Icon name={icon} class="shrink-0" />
   {/if}
   <p class="text-sm">
-    <slot />
+    {@render children()}
   </p>
   <Button
     variant="ghost"
@@ -61,6 +71,6 @@
     aria-label={dismissLabel}
     class="text-inherit h-6 w-6 shrink-0 p-0"
     disableTracking
-    on:click={handleDismiss}
+    onclick={handleDismiss}
   />
 </div>

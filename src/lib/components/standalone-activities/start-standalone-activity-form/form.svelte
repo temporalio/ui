@@ -474,7 +474,7 @@
       variant="ghost"
       trailingIcon={advancedOptionsVisible ? 'chevron-up' : 'chevron-down'}
       data-testid="start-standalone-activity-more-options"
-      on:click={() => (advancedOptionsVisible = !advancedOptionsVisible)}
+      onclick={() => (advancedOptionsVisible = !advancedOptionsVisible)}
     >
       {translate('common.more-options')}
     </Button>

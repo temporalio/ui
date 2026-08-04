@@ -96,7 +96,7 @@
         {#if spec.kind === 'interval'}
           <Button
             variant="ghost"
-            on:click={() => (isIntervalExampleModalOpen = true)}
+            onclick={() => (isIntervalExampleModalOpen = true)}
           >
             {translate('schedules.explore-interval-examples')}
           </Button>
@@ -110,7 +110,7 @@
           icon="trash"
           label={translate('common.delete')}
           class="mr-4 mt-[1.625rem] h-10"
-          on:click={onRemove}
+          onclick={onRemove}
         />
       {/if}
     </div>
@@ -148,7 +148,7 @@
         size="sm"
         icon="trash"
         label={translate('common.delete')}
-        on:click={(e) => {
+        onclick={(e) => {
           e.stopPropagation();
           onRemove();
         }}

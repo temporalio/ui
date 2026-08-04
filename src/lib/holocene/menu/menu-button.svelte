@@ -91,8 +91,8 @@
   {id}
   {disabled}
   type="button"
-  on:click={handleClick}
-  on:keydown={handleKeyDown}
+  onclick={handleClick}
+  onkeydown={handleKeyDown}
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={$open}

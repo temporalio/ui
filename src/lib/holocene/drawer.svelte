@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
+  import type { Snippet } from 'svelte';
   import { onDestroy, onMount, setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
@@ -9,32 +10,44 @@
 
   import IconButton from './icon-button.svelte';
 
-  export let open = false;
-  export let position: 'bottom' | 'right' = 'bottom';
-  export let dark = true;
-  export let onClick: (e: MouseEvent | CustomEvent) => void;
-  export let id = 'navigation-drawer';
-  export let closeButtonLabel: string;
-  export let closePadding: boolean = true;
+  interface Props {
+    open?: boolean;
+    position?: 'bottom' | 'right';
+    dark?: boolean;
+    onClick: (e: MouseEvent) => void;
+    id?: string;
+    closeButtonLabel: string;
+    closePadding?: boolean;
+    class?: string;
+    children?: Snippet;
+  }
 
-  let portalElement: HTMLElement | null = null;
+  let {
+    open = $bindable(false),
+    position = 'bottom',
+    dark = true,
+    onClick,
+    id = 'navigation-drawer',
+    closeButtonLabel,
+    closePadding = true,
+    class: className = '',
+    children,
+  }: Props = $props();
 
-  let className = '';
-  export { className as class };
+  let portalElement = $state<HTMLElement | null>(null);
 
-  $: flyParamsIn = {
+  const flyParamsIn = $derived({
     duration: 250,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
-  };
+  });
 
-  $: flyParamsOut = {
+  const flyParamsOut = $derived({
     duration: 150,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
-  };
+  });
 
-  $: {
-    setContext('drawer-pos', position);
-  }
+  // svelte-ignore state_referenced_locally
+  setContext('drawer-pos', position);
 
   onMount(() => {
     portalElement = document.createElement('div');
@@ -88,22 +101,20 @@
   >
     <div class="relative h-full" class:pt-10={closePadding}>
       <div class="absolute right-2 top-2">
-        <slot name="close-button">
-          <IconButton
-            data-testid="drawer-close-button"
-            label={closeButtonLabel}
-            class={merge(
-              dark ? 'text-white' : 'text-primary',
-              'hover:text-primary',
-            )}
-            icon="close"
-            aria-expanded={open}
-            aria-controls="navigation-drawer"
-            on:click={onClick}
-          />
-        </slot>
+        <IconButton
+          data-testid="drawer-close-button"
+          label={closeButtonLabel}
+          class={merge(
+            dark ? 'text-white' : 'text-primary',
+            'hover:text-primary',
+          )}
+          icon="close"
+          aria-expanded={open}
+          aria-controls="navigation-drawer"
+          onclick={onClick}
+        />
       </div>
-      <slot />
+      {@render children?.()}
     </div>
   </aside>
 {/if}

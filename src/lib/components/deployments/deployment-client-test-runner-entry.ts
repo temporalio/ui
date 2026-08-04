@@ -79,6 +79,15 @@ export function expandDetails(target: HTMLElement) {
   );
 }
 
+export function openMenu(controls: string) {
+  const trigger = document.querySelector<HTMLButtonElement>(
+    `[aria-controls="${controls}"]`,
+  );
+  trigger?.click();
+  flushSync();
+  return document.getElementById(controls);
+}
+
 export function renderRows({
   computeStatuses,
   showConnectionStatus = false,

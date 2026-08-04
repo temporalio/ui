@@ -1,15 +1,17 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta, StoryContext } from '@storybook/svelte';
-  import { expect, userEvent, within } from '@storybook/test';
+  import { get, writable } from 'svelte/store';
+
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import { expect, userEvent, within } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
 
   import TabButton from './tab-button.svelte';
   import TabButtons from './tab-buttons.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Tab Button',
     component: TabButton,
     subcomponents: { TabButtons },
@@ -20,28 +22,35 @@
       href: { table: { disable: true } },
       active: { table: { disable: true } },
     },
-  } satisfies Meta<TabButton>;
+  });
 </script>
 
 <script lang="ts">
-  import { get, writable } from 'svelte/store';
-
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
   const selected = writable(0);
   const select = (index: number) => {
     selected.set(index);
     action('select')(index);
   };
+</script>
 
-  const play = async ({
-    canvasElement,
-    step,
-  }: {
-    canvasElement: HTMLElement;
-    step: StoryContext['step'];
-  }) => {
+{#snippet template(args: ComponentProps<typeof TabButton>)}
+  <TabButtons>
+    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index (name)}
+      <TabButton
+        {...args}
+        data-testid={`toggle-button-${index}`}
+        active={$selected === index}
+        onclick={() => select(index)}
+      >
+        {name}
+      </TabButton>
+    {/each}
+  </TabButtons>
+{/snippet}
+
+<Story
+  name="Default"
+  play={async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
     selected.set(0);
@@ -70,22 +79,6 @@
       expect(first).not.toHaveClass('active');
       expect(second).toHaveClass('active');
     });
-  };
-</script>
-
-<Template let:args>
-  <TabButtons>
-    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index (name)}
-      <TabButton
-        {...args}
-        data-testid={`toggle-button-${index}`}
-        active={$selected === index}
-        on:click={() => select(index)}
-      >
-        {name}
-      </TabButton>
-    {/each}
-  </TabButtons>
-</Template>
-
-<Story name="Default" {play} />
+  }}
+  {template}
+/>

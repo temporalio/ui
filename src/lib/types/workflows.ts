@@ -3,6 +3,7 @@ import type {
   Payload,
   PendingWorkflowTaskInfo,
   Priority,
+  WorkflowTaskFailedCause as ScreamingWorkflowTaskFailedCause,
   WorkflowExecutionStatus,
   WorkflowExtendedInfo,
   WorkflowVersionTimpstamp,
@@ -17,6 +18,25 @@ import type {
   PendingNexusOperation,
 } from './events';
 import type { Optional, Replace } from './global';
+
+/**
+ * Type-level equivalent of `fromScreamingEnum`: converts a SCREAMING_SNAKE_CASE
+ * enum key to PascalCase and strips the given prefix.
+ */
+type ScreamingToPascalCase<S extends string> =
+  S extends `${infer Head}_${infer Tail}`
+    ? `${Capitalize<Lowercase<Head>>}${ScreamingToPascalCase<Tail>}`
+    : Capitalize<Lowercase<S>>;
+
+type StripPrefix<
+  S extends string,
+  Prefix extends string,
+> = S extends `${Prefix}${infer Rest}` ? Rest : S;
+
+export type FromScreamingEnum<
+  S extends string,
+  Prefix extends string,
+> = StripPrefix<ScreamingToPascalCase<S>, Prefix>;
 
 /**
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
@@ -204,37 +224,9 @@ export type WorkflowExecution = {
 };
 
 export type WorkflowTaskFailedCause =
-  | 'Unspecified'
-  | 'UnhandledCommand'
-  | 'BadScheduleActivityAttributes'
-  | 'BadRequestCancelActivityAttributes'
-  | 'BadStartTimerAttributes'
-  | 'BadCancelTimerAttributes'
-  | 'BadRecordMarkerAttributes'
-  | 'BadCompleteWorkflowExecutionAttributes'
-  | 'BadFailWorkflowExecutionAttributes'
-  | 'BadCancelWorkflowExecutionAttributes' // correct ?
-  | 'BadRequestCancelExternalAttributes'
-  | 'BadContinueAsNewAttributes'
-  | 'StartTimerDuplicateId'
-  | 'ResetStickyTaskQueue'
-  | 'WorkflowWorkerUnhandledFailure'
-  | 'WorkflowTaskHeartbeatError'
-  | 'BadSignalWorkflowExecutionAttributes'
-  | 'BadStartChildExecutionAttributes'
-  | 'ForceCloseCommand'
-  | 'FailoverCloseCommand'
-  | 'BadSignalInputSize'
-  | 'ResetWorkflow'
-  | 'BadBinary'
-  | 'ScheduleActivityDuplicateId'
-  | 'BadSearchAttributes'
-  | 'NonDeterministicError'
-  | 'BadModifyWorkflowPropertiesAttributes'
-  | 'PendingChildWorkflowsLimitExceeded'
-  | 'PendingActivitiesLimitExceeded'
-  | 'PendingSignalsLimitExceeded'
-  | 'PendingRequestCancelLimitExceeded'
-  | 'BadUpdateWorkflowExecutionMessage'
-  | 'UnhandledUpdate'
-  | 'WorkflowTaskTimedOut';
+  | FromScreamingEnum<
+      ScreamingWorkflowTaskFailedCause,
+      'WorkflowTaskFailedCause'
+    >
+  | 'WorkflowTaskTimedOut'
+  | 'WorkflowTaskHeartbeatError';

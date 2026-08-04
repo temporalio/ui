@@ -41,7 +41,6 @@
   <PaginatedTable
     total={$nexusOperationCount.count}
     {onFetch}
-    let:visibleItems
     aria-label={translate(
       'standalone-nexus-operations.standalone-nexus-operations',
     )}
@@ -55,29 +54,35 @@
       $nexusOperationLoading = loading;
     }}
   >
-    <caption class="sr-only" slot="caption">
-      {translate('standalone-nexus-operations.nexus-operations-table')}
-    </caption>
-    <TableHeaderRow slot="headers">
-      <th></th>
-      {#each columns as column (column.label)}
-        <TableHeaderCell {column} />
-      {/each}
-    </TableHeaderRow>
-    {#each visibleItems as operation (operation.operationId + '-' + operation.runId)}
-      <TableRow {operation}>
+    {#snippet caption()}
+      <caption class="sr-only">
+        {translate('standalone-nexus-operations.nexus-operations-table')}
+      </caption>
+    {/snippet}
+    {#snippet headers()}
+      <TableHeaderRow>
+        <th></th>
         {#each columns as column (column.label)}
-          <TableBodyCell {operation} {column} />
+          <TableHeaderCell {column} />
         {/each}
-      </TableRow>
-    {/each}
-    <svelte:fragment slot="empty">
+      </TableHeaderRow>
+    {/snippet}
+    {#snippet rows({ visibleItems })}
+      {#each visibleItems as operation (operation.operationId + '-' + operation.runId)}
+        <TableRow {operation}>
+          {#each columns as column (column.label)}
+            <TableBodyCell {operation} {column} />
+          {/each}
+        </TableRow>
+      {/each}
+    {/snippet}
+    {#snippet empty()}
       <TableEmptyState />
-    </svelte:fragment>
-    <svelte:fragment slot="actions-end-additional">
+    {/snippet}
+    {#snippet actionsEndAdditional()}
       <Tooltip text="Configure Columns" top>
         <Button
-          on:click={onClickConfigure}
+          onclick={onClickConfigure}
           data-testid="nexus-operations-summary-table-configuration-button"
           size="xs"
           variant="ghost"
@@ -85,6 +90,6 @@
           <Icon name="settings" />
         </Button>
       </Tooltip>
-    </svelte:fragment>
+    {/snippet}
   </PaginatedTable>
 {/key}

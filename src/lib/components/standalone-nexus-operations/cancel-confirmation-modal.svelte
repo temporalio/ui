@@ -60,14 +60,16 @@
   bind:open
   {loading}
   confirmType="destructive"
-  on:confirmModal={cancel}
+  onConfirmModal={cancel}
 >
-  <h3 slot="title">
-    {translate('standalone-nexus-operations.cancel-modal-title')}
-  </h3>
-  <svelte:fragment slot="content">
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('standalone-nexus-operations.cancel-modal-title')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
     <p>
       {translate('standalone-nexus-operations.cancel-modal-confirmation')}
     </p>
-  </svelte:fragment>
+  {/snippet}
 </Modal>

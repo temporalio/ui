@@ -76,7 +76,7 @@
         data-testid="batch-checkbox"
         {label}
         labelHidden
-        on:click={onClickBatchSelect}
+        onclick={onClickBatchSelect}
         {checked}
         value={workflow}
         disabled={$allSelected}
@@ -104,7 +104,7 @@
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
-            on:click={() => toggleChildrenVisibility(workflow)}
+            onclick={() => toggleChildrenVisibility(workflow)}
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip

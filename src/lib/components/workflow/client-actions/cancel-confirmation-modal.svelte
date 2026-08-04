@@ -73,12 +73,14 @@
   bind:open
   {loading}
   confirmType="destructive"
-  on:confirmModal={cancel}
+  onConfirmModal={cancel}
 >
-  <h3 slot="title">{translate('workflows.cancel-modal-title')}</h3>
-  <svelte:fragment slot="content">
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.cancel-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
     <p>
       {translate('workflows.cancel-modal-confirmation')}
     </p>
-  </svelte:fragment>
+  {/snippet}
 </Modal>

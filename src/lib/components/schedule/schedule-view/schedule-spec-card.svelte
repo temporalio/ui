@@ -33,7 +33,7 @@
       trailingIcon="code"
       aria-expanded={isFullSpecVisible}
       aria-controls={scheduleFullSpecId}
-      on:click={() => (isFullSpecVisible = !isFullSpecVisible)}
+      onclick={() => (isFullSpecVisible = !isFullSpecVisible)}
     >
       {isFullSpecVisible
         ? translate('schedules.hide-full-spec')

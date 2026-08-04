@@ -84,55 +84,59 @@
   cancelText={translate('common.cancel')}
   confirmText={translate('common.apply')}
   {confirmDisabled}
-  on:cancelModal={onCancel}
-  on:confirmModal={onConfirm}
+  onCancelModal={onCancel}
+  onConfirmModal={onConfirm}
   large
   data-theme={md.current ? 'dark' : undefined}
 >
-  <h3 slot="title" data-testid="data-encoder-title">
-    {translate('common.codec-server')}
-  </h3>
-  <div slot="content" class="flex w-full flex-col gap-4">
-    <p class="text-sm">
-      {translate('data-encoder.codec-server-description-prefix')}<Link
-        href="https://docs.temporal.io/dataconversion#codec-server"
-        newTab>{translate('common.codec-server')}</Link
-      >
-      {translate('data-encoder.codec-server-description-suffix', {
-        level: namespaceOrCluster,
-      })}
-    </p>
-
-    <RadioGroup name="override" group={override}>
-      <RadioInput
-        id="use-configuration-endpoint-radio"
-        data-testid="use-configuration-endpoint-input"
-        value={false}
-        label={translate('data-encoder.no-browser-override-description', {
+  {#snippet titleSnippet()}
+    <h3 data-testid="data-encoder-title">
+      {translate('common.codec-server')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex w-full flex-col gap-4">
+      <p class="text-sm">
+        {translate('data-encoder.codec-server-description-prefix')}<Link
+          href="https://docs.temporal.io/dataconversion#codec-server"
+          newTab>{translate('common.codec-server')}</Link
+        >
+        {translate('data-encoder.codec-server-description-suffix', {
           level: namespaceOrCluster,
         })}
-        description={clusterOrNamespaceLevelSetting
-          ? clusterOrNamespaceLevelSetting
-          : ''}
-      />
+      </p>
 
-      <RadioInput
-        id="use-local-endpoint-radio"
-        data-testid="use-local-endpoint-input"
-        value={true}
-        label={translate('data-encoder.browser-override-description', {
-          level: namespaceOrCluster,
-        })}
-      />
-    </RadioGroup>
+      <RadioGroup name="override" group={override}>
+        <RadioInput
+          id="use-configuration-endpoint-radio"
+          data-testid="use-configuration-endpoint-input"
+          value={false}
+          label={translate('data-encoder.no-browser-override-description', {
+            level: namespaceOrCluster,
+          })}
+          description={clusterOrNamespaceLevelSetting
+            ? clusterOrNamespaceLevelSetting
+            : ''}
+        />
 
-    {#if $override}
-      <CodecEndpointSettings
-        bind:endpoint
-        bind:passToken
-        bind:includeCreds
-        {error}
-      />
-    {/if}
-  </div>
+        <RadioInput
+          id="use-local-endpoint-radio"
+          data-testid="use-local-endpoint-input"
+          value={true}
+          label={translate('data-encoder.browser-override-description', {
+            level: namespaceOrCluster,
+          })}
+        />
+      </RadioGroup>
+
+      {#if $override}
+        <CodecEndpointSettings
+          bind:endpoint
+          bind:passToken
+          bind:includeCreds
+          {error}
+        />
+      {/if}
+    </div>
+  {/snippet}
 </Modal>

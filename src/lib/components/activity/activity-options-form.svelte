@@ -259,7 +259,7 @@
       <div class="flex items-center justify-end gap-4">
         <Button
           type="button"
-          on:click={closeCustomizationDrawer}
+          onclick={closeCustomizationDrawer}
           variant="ghost"
           size="sm">{translate('common.cancel')}</Button
         >

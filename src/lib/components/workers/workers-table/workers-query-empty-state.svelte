@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
   import { translate } from '$lib/i18n/translate';

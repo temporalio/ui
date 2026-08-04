@@ -69,8 +69,7 @@
       {#each shortcuts as shortcut (shortcut.value)}
         <Button
           variant="secondary"
-          on:click={() => setCronString(shortcut.value)}
-          >{shortcut.label}</Button
+          onclick={() => setCronString(shortcut.value)}>{shortcut.label}</Button
         >
       {/each}
     </div>

@@ -65,17 +65,21 @@
   {loading}
   confirmText={translate('workflows.unpause-workflow')}
   cancelText={translate('common.cancel')}
-  on:cancelModal={hideModal}
-  on:confirmModal={unpause}
+  onCancelModal={hideModal}
+  onConfirmModal={unpause}
 >
-  <h3 slot="title">{translate('workflows.unpause-workflow')}</h3>
-  <div slot="content">
-    <Textarea
-      id="workflow-unpause-details"
-      class="mt-4"
-      placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason-optional')}
-      bind:value={reason}
-    />
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.unpause-workflow')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <Textarea
+        id="workflow-unpause-details"
+        class="mt-4"
+        placeholder={translate('common.reason-placeholder')}
+        label={translate('common.reason-optional')}
+        bind:value={reason}
+      />
+    </div>
+  {/snippet}
 </Modal>

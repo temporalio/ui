@@ -222,7 +222,7 @@
                 type="button"
                 variant="secondary"
                 size="sm"
-                on:click={() => {
+                onclick={() => {
                   showCustomSection = false;
                   $form.customMessage = '';
                   $form.customLink = '';
@@ -241,7 +241,7 @@
           type="button"
           variant="secondary"
           size="sm"
-          on:click={() => (showCustomSection = true)}
+          onclick={() => (showCustomSection = true)}
           disabled={$submitting}
           leadingIcon="add"
         >
@@ -267,7 +267,7 @@
           type="button"
           size="sm"
           variant="secondary"
-          on:click={handleCancel}
+          onclick={handleCancel}
           disabled={$submitting}
         >
           {translate('common.cancel')}

@@ -36,7 +36,7 @@
     <Button
       size="sm"
       leadingIcon="play"
-      on:click={openTriggerConfirmationModal}
+      onclick={openTriggerConfirmationModal}
       variant="ghost"
       class="border border-subtle"
     >
@@ -45,7 +45,7 @@
     <Button
       size="sm"
       leadingIcon="retry"
-      on:click={openBackfillConfirmationModal}
+      onclick={openBackfillConfirmationModal}
       variant="ghost"
       class="border border-subtle"
     >

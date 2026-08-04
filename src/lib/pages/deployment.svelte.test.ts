@@ -27,6 +27,9 @@ const deployment = {
     },
     currentVersionSummary: {
       version: 'deployment.build-id',
+      computeConfig: {
+        scalingGroups: { default: { providerType: 'aws-lambda' } },
+      },
     },
     lastModifierIdentity: 'test',
     versionSummaries: [
@@ -49,6 +52,37 @@ const deployment = {
     ],
   },
 } as unknown as WorkerDeploymentResponse;
+
+const selfHostedDeployment = {
+  ...deployment,
+  workerDeploymentInfo: {
+    ...deployment.workerDeploymentInfo,
+    versionSummaries: [
+      {
+        ...deployment.workerDeploymentInfo.versionSummaries[0],
+        computeConfig: undefined,
+      },
+      {
+        version: 'deployment.build-id-2',
+        deploymentVersion: {
+          deploymentName: 'deployment',
+          buildId: 'build-id-2',
+        },
+        status: 'WORKER_DEPLOYMENT_VERSION_STATUS_INACTIVE',
+        computeConfig: { scalingGroups: {} },
+      },
+    ],
+    currentVersionSummary: {
+      version: 'deployment.build-id',
+    },
+  },
+} as unknown as WorkerDeploymentResponse;
+
+function menuItems(menu: Element | null) {
+  return Array.from(menu?.querySelectorAll('[role="menuitem"]') ?? []).map(
+    (item) => item.textContent?.trim(),
+  );
+}
 
 describe('deployment connection status visibility', () => {
   let client: Awaited<ReturnType<typeof getDeploymentClientTestRunner>>;
@@ -133,5 +167,58 @@ describe('deployment connection status visibility', () => {
     const details = client.expandDetails(target);
     expect(details).not.toBeNull();
     expect(details?.getAttribute('colspan')).toBe('6');
+  });
+
+  test('shows compute-only deployment and version actions for deployments with compute config', async () => {
+    const target = await client.renderDeployment({
+      fetchDeployment: deployment,
+      fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
+      showConnectionStatus: false,
+    });
+
+    expect(target.textContent).toContain('Create New Version');
+    expect(client.openMenu('deployment-header-actions')?.textContent).toContain(
+      'Ramp to Unversioned Workers',
+    );
+
+    const versionMenu = client.openMenu('version-actions-build-id');
+    expect(menuItems(versionMenu)).toEqual([
+      'Edit',
+      'Unset Current',
+      'Set Ramping Version',
+      'Validate Connection',
+      'View Workflows',
+      'Delete',
+    ]);
+  });
+
+  test('hides compute-only actions but retains routing actions for self-hosted deployments', async () => {
+    const target = await client.renderDeployment({
+      fetchDeployment: selfHostedDeployment,
+      fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
+      showConnectionStatus: false,
+    });
+
+    expect(target.textContent).not.toContain('Create New Version');
+    const headerMenu = client.openMenu('deployment-header-actions');
+    expect(headerMenu?.textContent).not.toContain(
+      'Ramp to Unversioned Workers',
+    );
+
+    const versionMenu = client.openMenu('version-actions-build-id');
+    expect(menuItems(versionMenu)).toEqual([
+      'Unset Current',
+      'Set Ramping Version',
+      'View Workflows',
+      'Delete',
+    ]);
+
+    const inactiveVersionMenu = client.openMenu('version-actions-build-id-2');
+    expect(menuItems(inactiveVersionMenu)).toEqual([
+      'Set Current Version',
+      'Set Ramping Version',
+      'View Workflows',
+      'Delete',
+    ]);
   });
 });

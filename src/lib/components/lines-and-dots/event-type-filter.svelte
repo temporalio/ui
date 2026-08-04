@@ -133,7 +133,7 @@
     <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>
       {#snippet leading()}
         <Checkbox
-          on:change={onAllClick}
+          onChange={onAllClick}
           checked={!$eventStatusFilter &&
             $eventTypeFilter.length === defaultOptions.length}
           label={translate('common.all')}
@@ -152,7 +152,7 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:change={onPendingClick}
+            onChange={onPendingClick}
             checked={$eventStatusFilter}
             label={translate('common.all')}
             labelHidden
@@ -165,7 +165,7 @@
     <MenuItem data-testid={translate('common.none')} onclick={onNoneClick}>
       {#snippet leading()}
         <Checkbox
-          on:change={onNoneClick}
+          onChange={onNoneClick}
           checked={!$eventStatusFilter && !$eventTypeFilter.length}
           label={translate('common.none')}
           labelHidden
@@ -186,7 +186,7 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:click={() => onOptionClick(option)}
+            onclick={() => onOptionClick(option)}
             checked={$eventTypeFilter.some((type) => type === option.value)}
             label={option.label}
             labelHidden

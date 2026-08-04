@@ -183,7 +183,7 @@
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
-            on:click={handleClear}
+            onclick={handleClear}
             icon="close"
           />
         </div>

@@ -1,7 +1,6 @@
-<svelte:options runes />
-
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { fn } from 'storybook/test';
 
   import ButtonRadioGroup from '$lib/holocene/button-radio-group.svelte';
 
@@ -10,6 +9,7 @@
     component: ButtonRadioGroup,
     args: {
       label: 'Recurrence',
+      onChange: fn(),
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
@@ -67,8 +67,8 @@
     {size}
     active={checked}
     {...attrs}
-    on:click={onSelect}
-    on:keydown={onKeydown}
+    onclick={onSelect}
+    onkeydown={onKeydown}
   >
     {option.label}
   </Button>

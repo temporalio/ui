@@ -88,7 +88,7 @@
       leadingIcon="close"
       data-testid="search-attribute-close-button"
       class="mt-6 w-10 rounded-full sm:hidden"
-      on:click={() => onRemove(label)}
+      onclick={() => onRemove(label)}
     />
   </div>
   {#if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
@@ -107,7 +107,6 @@
       <NumberInput
         label={translate('common.value')}
         id="attribute-value-{id}"
-        valid={value < Number.MAX_SAFE_INTEGER}
         hintText="Number is too large"
         bind:value
         max={Number.MAX_SAFE_INTEGER}
@@ -146,6 +145,6 @@
     leadingIcon="close"
     data-testid="search-attribute-close-button"
     class="mt-6 w-10 rounded-full max-sm:hidden"
-    on:click={() => onRemove(label)}
+    onclick={() => onRemove(label)}
   />
 </div>

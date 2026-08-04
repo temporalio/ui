@@ -16,7 +16,7 @@
     class?: ClassNameValue;
     attributesToAdd: SearchAttributesSchema;
     buttonCopy?: string;
-    variant?: ComponentProps<Button>['variant'];
+    variant?: ComponentProps<typeof Button>['variant'];
   }
 
   let {
@@ -55,7 +55,7 @@
     leadingIcon="add"
     class="max-sm:w-full"
     data-testid="add-search-attribute-button"
-    on:click={addSearchAttribute}
+    onclick={addSearchAttribute}
     disabled={!searchAttributes.length ||
       attributes.length === searchAttributes.length}>{buttonCopy}</Button
   >

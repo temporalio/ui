@@ -37,17 +37,16 @@
 
 <div class="flex flex-col gap-4">
   <OrderableList>
-    <svelte:fragment slot="heading">
+    {#snippet heading()}
       {type} <span class="font-normal">(in view)</span>
-    </svelte:fragment>
+    {/snippet}
     {#each columnsInUse as { label }, index (`${label}:${index}`)}
       <OrderableListItem
         {index}
         {label}
         totalItems={columnsInUse.length}
-        on:moveItem={(event) =>
-          moveColumn(event.detail.from, event.detail.to, namespace, table)}
-        on:removeItem={() => removeColumn(label, namespace, table)}
+        onMoveItem={({ from, to }) => moveColumn(from, to, namespace, table)}
+        onRemoveItem={() => removeColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
@@ -69,13 +68,13 @@
     {/each}
   </OrderableList>
   <OrderableList>
-    <svelte:fragment slot="heading">
+    {#snippet heading()}
       Available Columns <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
+    {/snippet}
     {#each $availableColumns as { label } (label)}
       <OrderableListItem
         static
-        on:addItem={() => addColumn(label, namespace, table)}
+        onAddItem={() => addColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
@@ -90,14 +89,14 @@
   </OrderableList>
   {#if table !== TABLE_TYPE.DEPLOYMENTS}
     <OrderableList>
-      <svelte:fragment slot="heading">
+      {#snippet heading()}
         {translate('events.custom-search-attributes')}
         <span class="font-normal">(not in view)</span>
-      </svelte:fragment>
+      {/snippet}
       {#each $availableCustomColumns as { label } (label)}
         <OrderableListItem
           static
-          on:addItem={() => addColumn(label, namespace, table)}
+          onAddItem={() => addColumn(label, namespace, table)}
           addButtonLabel={translate('workflows.add-column-label', {
             column: label,
           })}

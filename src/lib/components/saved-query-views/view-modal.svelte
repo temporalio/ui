@@ -98,9 +98,7 @@
     return '';
   });
 
-  const onConfirm = (event: Event) => {
-    event.preventDefault();
-
+  const onConfirm = () => {
     if (!nameValid) return;
 
     if (view && onSaveView) {
@@ -165,45 +163,51 @@
   confirmText={translate('common.save')}
   cancelText={translate('common.close')}
   confirmDisabled={!nameValid || (!view && maxViewsReached)}
-  on:cancelModal={hideModal}
-  on:confirmModal={onConfirm}
+  onCancelModal={hideModal}
+  onConfirmModal={onConfirm}
 >
-  <h3 slot="title">{view ? 'Edit View' : 'Save as New View'}</h3>
-  <div class="flex h-full flex-1 flex-col gap-1" slot="content">
-    <Input
-      id="view-name"
-      label="Name"
-      required
-      maxLength={255}
-      bind:value={name}
-      oninput={() => (touched = true)}
-      valid={!touched || nameValid}
-      hintText={touched && !nameValid ? nameError() : ''}
-      error={touched && !nameValid}
-      placeholder="Name of view"
-      class="w-full"
-      data-testid={`${id}-input`}
-    />
-    {#if view}
-      <div class="flex items-center justify-start gap-2">
-        <Button
-          variant="secondary"
-          disabled={!nameValid || maxViewsReached}
-          data-testid="create-as-new-button"
-          on:click={onCreateAsNew}
-          size="sm">{name === view.name ? 'Create Copy' : 'Create New'}</Button
-        >
-      </div>
-    {/if}
-  </div>
-  <Button
-    variant="ghost"
-    slot="footer"
-    class="flex items-center gap-1 text-sm underline {!onDeleteView
-      ? 'invisible'
-      : ''}"
-    on:click={onDelete}
-  >
-    <Icon name="trash" /> Delete this Saved View
-  </Button>
+  {#snippet titleSnippet()}
+    <h3>{view ? 'Edit View' : 'Save as New View'}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex h-full flex-1 flex-col gap-1">
+      <Input
+        id="view-name"
+        label="Name"
+        required
+        maxLength={255}
+        bind:value={name}
+        oninput={() => (touched = true)}
+        valid={!touched || nameValid}
+        hintText={touched && !nameValid ? nameError() : ''}
+        error={touched && !nameValid}
+        placeholder="Name of view"
+        class="w-full"
+        data-testid={`${id}-input`}
+      />
+      {#if view}
+        <div class="flex items-center justify-start gap-2">
+          <Button
+            variant="secondary"
+            disabled={!nameValid || maxViewsReached}
+            data-testid="create-as-new-button"
+            onclick={onCreateAsNew}
+            size="sm"
+            >{name === view.name ? 'Create Copy' : 'Create New'}</Button
+          >
+        </div>
+      {/if}
+    </div>
+  {/snippet}
+  {#snippet footer()}
+    <Button
+      variant="ghost"
+      class="flex items-center gap-1 text-sm underline {!onDeleteView
+        ? 'invisible'
+        : ''}"
+      onclick={onDelete}
+    >
+      <Icon name="trash" /> Delete this Saved View
+    </Button>
+  {/snippet}
 </Modal>

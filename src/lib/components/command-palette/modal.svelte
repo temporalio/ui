@@ -61,7 +61,7 @@
   });
 </script>
 
-<svelte:window on:click={handleClick} />
+<svelte:window onclick={handleClick} />
 
 <dialog
   {id}
@@ -78,7 +78,7 @@
       label={cancelText}
       icon="close"
       class="float-right m-4"
-      on:click={closeModal}
+      onclick={closeModal}
     />
   {/if}
   <div id="modal-content-{id}" class="content">

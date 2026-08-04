@@ -194,7 +194,7 @@
 
 {#snippet pauseButton()}
   <Button
-    on:click={() => (pauseConfirmationModalOpen = true)}
+    onclick={() => (pauseConfirmationModalOpen = true)}
     disabled={!pauseAuthorized || isDelayed}
     size="sm"
   >
@@ -208,7 +208,7 @@
 
 {#snippet requestCancellationButton()}
   <Button
-    on:click={() => (cancelConfirmationModalOpen = true)}
+    onclick={() => (cancelConfirmationModalOpen = true)}
     disabled={!cancelEnabled || cancelInProgress}
     size="sm"
   >
@@ -218,7 +218,7 @@
 
 {#snippet resetButton()}
   <Button
-    on:click={() => (resetConfirmationModalOpen = true)}
+    onclick={() => (resetConfirmationModalOpen = true)}
     disabled={!resetEnabled}
     size="sm"
   >

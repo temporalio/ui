@@ -1,18 +1,24 @@
-<script>
+<script lang="ts">
   import { page } from '$app/state';
+
+  import type { PageProps } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHistoryEvent from '$lib/pages/workflow-history-event.svelte';
 
-  const workflow = $derived(page.params.workflow);
-  const id = $derived(page.params.id);
+  let { params }: PageProps = $props();
 </script>
 
 <PageTitle
   title={`${translate(
     'workflows.workflow-history',
-  )} | ${workflow} | Event ${id}`}
+  )} | ${params.workflow} | Event ${params.eventId}`}
   url={page.url.href}
 />
-<WorkflowHistoryEvent />
+<WorkflowHistoryEvent
+  eventId={params.eventId}
+  namespace={params.namespace}
+  workflowId={params.workflow}
+  runId={params.run}
+/>

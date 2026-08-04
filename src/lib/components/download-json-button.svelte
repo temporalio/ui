@@ -29,7 +29,7 @@
 
 <Tooltip text={translate('common.download-json')} top>
   <Button
-    on:click={onClick}
+    onclick={onClick}
     data-testid={testId}
     size="xs"
     variant="ghost"
