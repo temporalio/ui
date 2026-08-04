@@ -21,8 +21,14 @@
   let {
     callback,
     link,
+    perspective = 'handler',
     children,
-  }: { callback: Callback; link?: Link; children?: Snippet } = $props();
+  }: {
+    callback: Callback;
+    link?: Link;
+    perspective?: 'caller' | 'handler';
+    children?: Snippet;
+  } = $props();
 
   const completedTime = $derived($timestamp(callback.lastAttemptCompleteTime));
   const nextTime = $derived($timestamp(callback.nextAttemptScheduleTime));
@@ -47,11 +53,20 @@
   const showCallbackUrl = $derived(!links.length && !link && callbackUrl);
   const namespace = $derived(page.params.namespace);
   const callbackLinks = $derived(links.length ? links : link ? [link] : []);
-  const linkViews = $derived(toEventLinkViews(callbackLinks, { namespace }));
+  const linkViews = $derived(
+    toEventLinkViews(callbackLinks, {
+      namespace,
+      perspective: perspective === 'caller' ? 'caller' : undefined,
+    }),
+  );
 </script>
 
 {#snippet callbackLink(view: EventLinkView)}
-  <EventLink {view} />
+  {#if perspective === 'caller' && view.event}
+    <EventLink view={view.event} />
+  {:else}
+    <EventLink {view} />
+  {/if}
   {#if view.namespace}
     <EventLink view={view.namespace} />
   {/if}
