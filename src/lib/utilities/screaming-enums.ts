@@ -7,6 +7,7 @@ import type {
   PendingNexusOperationState,
   WorkerStatus,
   WorkflowExecutionStatus,
+  WorkflowTaskFailedCause,
 } from '$lib/types';
 import type {
   BatchOperationActionType,
@@ -15,9 +16,9 @@ import type {
 } from '$lib/types/batch';
 import type { PendingActivityState } from '$lib/types/events';
 import type {
+  WorkflowTaskFailedCause as ReadableWorkflowTaskFailedCause,
   SearchAttributeType,
   WorkflowStatus,
-  WorkflowTaskFailedCause,
 } from '$lib/types/workflows';
 
 import type { EventType } from './is-event-type';
@@ -83,9 +84,12 @@ export const toBatchOperationTypeReadable = (
 
 export const toWorkflowTaskFailureReadable = (
   cause?: WorkflowTaskFailedCause,
-): WorkflowTaskFailedCause => {
+): ReadableWorkflowTaskFailedCause => {
   if (!cause) return 'Unspecified';
-  return fromScreamingEnum(cause, 'WorkflowTaskFailedCause');
+  return fromScreamingEnum(
+    cause,
+    'WorkflowTaskFailedCause',
+  ) as unknown as ReadableWorkflowTaskFailedCause;
 };
 
 export const toPendingActivityStateReadable = (
