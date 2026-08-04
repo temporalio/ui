@@ -52,10 +52,8 @@ type StartingEvents = {
 };
 
 // Computed fields live on a shared prototype (via `this`) rather than as
-// per-instance getter closures. Every group then has a single hidden class, so
-// property access in the timeline's hot loops stays monomorphic, and
-// cloneEventGroup() can shallow-copy the data fields without re-declaring the
-// accessors or invoking them.
+// per-instance getter closures, so every group has a single hidden class and
+// property access in the timeline's hot loops stays monomorphic.
 const eventGroupProto: ThisType<EventGroup> = {
   get eventTime() {
     return this.eventList[this.eventList.length - 1]?.eventTime;
@@ -79,19 +77,6 @@ const eventGroupProto: ThisType<EventGroup> = {
     );
   },
 };
-
-/**
- * Shallow-clone a group onto the same prototype, sharing its eventList. Copies
- * only own data fields (the accessors live on the prototype, so they are
- * neither copied nor invoked), giving the clone an identical shape to
- * createGroupFor's groups and a fresh reference for reference-tracking Svelte
- * views to re-derive from.
- */
-export const cloneEventGroup = (group: EventGroup): EventGroup =>
-  Object.assign(
-    Object.create(Object.getPrototypeOf(group) as object),
-    group,
-  ) as EventGroup;
 
 const createGroupFor = <K extends keyof StartingEvents>(
   event: StartingEvents[K] & { userMetadata?: { summary: Payload } },

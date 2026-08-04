@@ -17,10 +17,9 @@
   import type { PauseHandle } from '$lib/services/fetch-bidirectional';
   import { fetchBidirectional } from '$lib/services/fetch-bidirectional';
   import {
-    appendLiveEvent,
     enrichGroups,
     getEventArray,
-    processEvent,
+    ingestHistoryEvent,
     reset as resetBuffer,
   } from '$lib/services/grouped-event-buffer';
   import { runLivePoll } from '$lib/services/live-poll';
@@ -155,7 +154,7 @@
       startToken,
       signal: livePollingController.signal,
       onEvent: (ev) => {
-        const isNew = appendLiveEvent(ev);
+        const isNew = ingestHistoryEvent(ev, true);
         if (isNew)
           latestEventId = Math.max(latestEventId, parseInt(ev.eventId));
         return isNew;
@@ -210,8 +209,8 @@
     // Start live poll immediately — concurrent with the bidirectional fetch.
     // Any events that arrive while the fetch is in progress are captured right
     // away rather than waiting for the full history to load first.
-    // appendLiveEvent deduplicates events that the bidirectional fetch also
-    // delivers; getEventArray() filters the live side at read time for safety.
+    // ingestHistoryEvent deduplicates events the bidirectional fetch also
+    // delivers, so the two producers can write into the same store concurrently.
     // Skip if the user has already paused auto-refresh — the pause $effect
     // will restart from _lastPollToken when they unpause.
     if (workflow.isRunning && !$pauseLiveUpdates) {
@@ -239,7 +238,7 @@
       },
       onRawPage: (events, isAscending) => {
         for (const event of events) {
-          processEvent(event, isAscending);
+          ingestHistoryEvent(event, isAscending);
           const id = parseInt(event.eventId);
           if (id > latestEventId) latestEventId = id;
         }

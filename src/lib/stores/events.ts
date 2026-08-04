@@ -68,7 +68,7 @@ export const bufferVersion = writable(0);
 /**
  * Flat view of all workflow events sourced from the grouped-event-buffer.
  * Updated by workflow-run-layout via bufferVersion — elements are the same
- * WorkflowEvent instances held in groupPool (shallow pointer array, not a copy).
+ * WorkflowEvent instances the buffer stores (shallow pointer array, not a copy).
  * Writable so standalone pages (e.g. workflow-history-event) can populate it
  * independently via fetchAllEvents.
  */

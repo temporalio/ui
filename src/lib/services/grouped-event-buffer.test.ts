@@ -4,20 +4,16 @@ import { groupEvents } from '$lib/models/event-groups';
 import { toEventHistory } from '$lib/models/event-history';
 
 import {
-  _debugEventSlots,
-  _debugState,
-  appendLiveEvent,
   enrichGroups,
   getEventArray,
   getGroupArray,
   getWorkflowTaskFailedEvent,
+  ingestHistoryEvent,
   isWorkflowTaskGroup,
-  processEvent,
   reset,
   setFailedEvent,
 } from './grouped-event-buffer';
 import {
-  makeActivityCompleted,
   makeActivityGroup,
   makeActivityScheduled,
   makeActivityStarted,
@@ -43,7 +39,7 @@ import {
 
 /** Load all events ascending (simulates asc-cursor-wins scenario). */
 function loadAll(events: ReturnType<typeof makeSyntheticEvents>) {
-  for (const e of events) processEvent(e, true);
+  for (const e of events) ingestHistoryEvent(e, true);
 }
 
 // ---------------------------------------------------------------------------
@@ -99,12 +95,12 @@ describe('follower before head', () => {
     const [head, started, completed] = makeActivityGroup(1);
 
     // Desc cursor delivers completed & started before head
-    processEvent(completed, false);
-    processEvent(started, false);
+    ingestHistoryEvent(completed, false);
+    ingestHistoryEvent(started, false);
     expect(getGroupArray()).toHaveLength(0);
 
     // Asc cursor delivers the head
-    processEvent(head, true);
+    ingestHistoryEvent(head, true);
 
     const groups = getGroupArray();
     expect(groups).toHaveLength(1);
@@ -117,7 +113,7 @@ describe('follower before head', () => {
 // ---------------------------------------------------------------------------
 
 describe('non-terminal workflow: new events beyond initial historyLength', () => {
-  it('new events extend eventSlots and groupPool beyond initial allocation', () => {
+  it('new events extend the slot arrays beyond the initial allocation', () => {
     const initialEvents = makeSyntheticEvents(9); // 9 events → 3 groups
     reset(9);
     loadAll(initialEvents);
@@ -127,9 +123,9 @@ describe('non-terminal workflow: new events beyond initial historyLength', () =>
 
     // New activity arrives at IDs 10-12
     const [newHead, newStarted, newCompleted] = makeActivityGroup(10);
-    processEvent(newHead, true);
-    processEvent(newStarted, true);
-    processEvent(newCompleted, true);
+    ingestHistoryEvent(newHead, true);
+    ingestHistoryEvent(newStarted, true);
+    ingestHistoryEvent(newCompleted, true);
 
     const groups = getGroupArray();
     expect(groups).toHaveLength(initialGroupCount + 1);
@@ -184,11 +180,11 @@ describe('compact view: getGroupArray excludeWorkflowTasks regression', () => {
   it('returns no WFT groups when excludeWorkflowTasks is true, even with interleaved events', () => {
     reset(30);
     // Interleave WFT groups and activity groups to simulate a real workflow
-    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
-    for (const e of makeActivityGroup(4)) processEvent(e, true);
-    for (const e of makeWorkflowTaskGroup(7)) processEvent(e, true);
-    for (const e of makeActivityGroup(10)) processEvent(e, true);
-    for (const e of makeWorkflowTaskGroup(13)) processEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(1)) ingestHistoryEvent(e, true);
+    for (const e of makeActivityGroup(4)) ingestHistoryEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(7)) ingestHistoryEvent(e, true);
+    for (const e of makeActivityGroup(10)) ingestHistoryEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(13)) ingestHistoryEvent(e, true);
 
     const compactGroups = getGroupArray({ excludeWorkflowTasks: true });
 
@@ -198,8 +194,8 @@ describe('compact view: getGroupArray excludeWorkflowTasks regression', () => {
 
   it('includes WFT groups in unfiltered output (for All events view)', () => {
     reset(20);
-    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
-    for (const e of makeActivityGroup(4)) processEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(1)) ingestHistoryEvent(e, true);
+    for (const e of makeActivityGroup(4)) ingestHistoryEvent(e, true);
 
     const allGroups = getGroupArray();
     const wftGroups = allGroups.filter(isWorkflowTaskGroup);
@@ -217,26 +213,25 @@ describe('boundary dedup', () => {
     reset(10);
     const [head] = makeActivityGroup(1);
 
-    processEvent(head, true); // asc cursor
-    processEvent(head, false); // desc cursor — same event, same slot
+    ingestHistoryEvent(head, true); // asc cursor
+    ingestHistoryEvent(head, false); // desc cursor — same event, same slot
 
     expect(getGroupArray().length).toBe(1);
   });
 
-  it('eventToGroup is set on first write and ignored on second', () => {
+  it('a redelivered head does not corrupt an already-built group', () => {
     reset(10);
     const [head, started, completed] = makeActivityGroup(1);
 
-    processEvent(head, true);
-    processEvent(started, true);
-    processEvent(completed, true);
+    ingestHistoryEvent(head, true);
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
 
     // Simulate boundary overlap: desc cursor also writes the head
-    processEvent(head, false);
+    ingestHistoryEvent(head, false);
 
-    expect(getGroupArray().length).toBe(1);
-    // Group still has all 3 events — the duplicate write didn't corrupt it
-    // (eventToGroup[0] !== 0 → guard fires → second head write skipped)
+    expect(getGroupArray()).toHaveLength(1);
+    expect(getGroupArray()[0].eventList).toHaveLength(3);
   });
 });
 
@@ -247,31 +242,26 @@ describe('boundary dedup', () => {
 describe('solo event orphan cleanup', () => {
   it('WorkflowExecutionStarted is not registered as a group', () => {
     reset(10);
-    processEvent(makeWorkflowStarted(1), true);
+    ingestHistoryEvent(makeWorkflowStarted(1), true);
     expect(getGroupArray().length).toBe(0);
   });
 
   it('WorkflowExecutionCompleted is not registered as a group', () => {
     reset(10);
-    processEvent(makeWorkflowCompleted(5), true);
+    ingestHistoryEvent(makeWorkflowCompleted(5), true);
     expect(getGroupArray().length).toBe(0);
   });
 
-  it('pendingFollowers is empty after solo head arrives for orphaned followers', () => {
+  it('followers of a solo head form no group but stay in the event list', () => {
     reset(10);
 
-    // Inject a follower that references slot 0 (eventId "1") as its head,
-    // but slot 0 will be a WorkflowExecutionStarted (solo, not a group head)
-    const orphanedFollower = makeActivityStarted(2, 1); // scheduledEventId=1
-    processEvent(orphanedFollower, false); // parks in pendingFollowers[0]
+    // A follower that references slot 0 (eventId "1") as its head, where slot 0
+    // turns out to be a WorkflowExecutionStarted — solo, not a group head.
+    ingestHistoryEvent(makeActivityStarted(2, 1), false);
+    ingestHistoryEvent(makeWorkflowStarted(1), true);
 
-    expect(_debugState().pendingFollowersSize).toBe(1);
-
-    // Now the solo head arrives — createEventGroup returns undefined
-    processEvent(makeWorkflowStarted(1), true);
-
-    expect(_debugState().pendingFollowersSize).toBe(0); // orphan discarded
-    expect(getGroupArray().length).toBe(0);
+    expect(getGroupArray()).toHaveLength(0);
+    expect(getEventArray().map((event) => event.id)).toEqual(['1', '2']);
   });
 });
 
@@ -286,7 +276,7 @@ describe('setFailedEvent', () => {
     expect(getGroupArray()).toHaveLength(0);
   });
 
-  it('can be set to a HistoryEvent before processEvent calls', () => {
+  it('can be set to a HistoryEvent before ingestHistoryEvent calls', () => {
     reset(10);
     const events = makeSyntheticEvents(9);
     // Simulate desc first-page hook
@@ -330,9 +320,9 @@ describe('activity group integrity', () => {
   it('group has all 3 events when loaded ascending', async () => {
     reset(10);
     const [scheduled, started, completed] = makeActivityGroup(1);
-    processEvent(scheduled, true);
-    processEvent(started, true);
-    processEvent(completed, true);
+    ingestHistoryEvent(scheduled, true);
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
 
     const [group] = getGroupArray();
     expect(group.eventList.length).toBe(3);
@@ -344,10 +334,10 @@ describe('activity group integrity', () => {
     const [scheduled, started, completed] = makeActivityGroup(1);
 
     // Desc cursor delivers completion and start first
-    processEvent(completed, false);
-    processEvent(started, false);
+    ingestHistoryEvent(completed, false);
+    ingestHistoryEvent(started, false);
     // Asc cursor delivers head
-    processEvent(scheduled, true);
+    ingestHistoryEvent(scheduled, true);
 
     const [group] = getGroupArray();
     expect(group.eventList.length).toBe(3);
@@ -362,9 +352,9 @@ describe('activity group integrity', () => {
     reset(10);
     const [scheduled, started, completed] = makeActivityGroup(1);
 
-    processEvent(scheduled, true); // asc cursor: head arrives first
-    processEvent(completed, false); // desc cursor: Completed arrives before Started
-    processEvent(started, false); // desc cursor: Started arrives last despite lower ID
+    ingestHistoryEvent(scheduled, true); // asc cursor: head arrives first
+    ingestHistoryEvent(completed, false); // desc cursor: Completed arrives before Started
+    ingestHistoryEvent(started, false); // desc cursor: Started arrives last despite lower ID
 
     const [group] = getGroupArray();
     expect(group.eventList.map((e) => e.id)).toEqual([
@@ -381,7 +371,7 @@ describe('activity group integrity', () => {
     const group3Events = makeTimerGroup(7);
 
     for (const e of [...group1Events, ...group2Events, ...group3Events]) {
-      processEvent(e, true);
+      ingestHistoryEvent(e, true);
     }
 
     const groups = getGroupArray();
@@ -401,7 +391,7 @@ describe('activity group integrity', () => {
 describe('enrichGroups', () => {
   it('sets pendingActivity on an in-flight activity group (1 event)', async () => {
     reset(10);
-    processEvent(makeActivityScheduled(1, 'MyActivity'), true);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
 
     const pendingActivities = [
       { activityId: '1', state: 'Started', activityType: 'MyActivity' },
@@ -416,7 +406,7 @@ describe('enrichGroups', () => {
 
   it('swaps in a fresh group reference when pending state changes', () => {
     reset(10);
-    processEvent(makeActivityScheduled(1, 'MyActivity'), true);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
     const before = getGroupArray().find((g) => g.id === '1');
 
     enrichGroups(
@@ -431,14 +421,17 @@ describe('enrichGroups', () => {
     // a pause/unpause appends no history event, so the ref swap is the signal.
     expect(after).not.toBe(before);
     expect(after?.pendingActivity?.activityId).toBe('1');
-    // Clone keeps the prototype-backed getters and shares eventList.
+    // The rebuilt group keeps the prototype-backed getters and owns its own
+    // eventList — the previous reference is a complete, untouched snapshot.
     expect(after?.isPending).toBe(true);
-    expect(after?.eventList).toBe(before?.eventList);
+    expect(after?.eventList).not.toBe(before?.eventList);
+    expect(after?.eventList).toEqual(before?.eventList);
+    expect(before?.pendingActivity).toBeUndefined();
   });
 
   it('reuses the group reference when pending state is unchanged', () => {
     reset(10);
-    processEvent(makeActivityScheduled(1, 'MyActivity'), true);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
     const pending = [
       { activityId: '1', state: 'Started', activityType: 'MyActivity' },
     ] as Parameters<typeof enrichGroups>[0];
@@ -454,9 +447,9 @@ describe('enrichGroups', () => {
   it('does not set pendingActivity on a completed activity group (3 events)', async () => {
     reset(10);
     const [s, st, c] = makeActivityGroup(1);
-    processEvent(s, true);
-    processEvent(st, true);
-    processEvent(c, true);
+    ingestHistoryEvent(s, true);
+    ingestHistoryEvent(st, true);
+    ingestHistoryEvent(c, true);
 
     const pendingActivities = [
       { activityId: '1', state: 'Started', activityType: 'TestActivity' },
@@ -471,9 +464,9 @@ describe('enrichGroups', () => {
   it('clears a previously set pendingActivity when no longer pending', async () => {
     reset(10);
     const [s, st, c] = makeActivityGroup(1);
-    processEvent(s, true);
-    processEvent(st, true);
-    processEvent(c, true);
+    ingestHistoryEvent(s, true);
+    ingestHistoryEvent(st, true);
+    ingestHistoryEvent(c, true);
 
     // First enrichment marks it pending
     const pa = [{ activityId: '1', state: 'Started' }] as Parameters<
@@ -491,8 +484,8 @@ describe('enrichGroups', () => {
   it('clears pendingActivity when live completion extends an existing group', async () => {
     reset(10);
     const [scheduled, started, completed] = makeActivityGroup(1);
-    processEvent(scheduled, true);
-    processEvent(started, true);
+    ingestHistoryEvent(scheduled, true);
+    ingestHistoryEvent(started, true);
 
     enrichGroups(
       [
@@ -509,7 +502,7 @@ describe('enrichGroups', () => {
     expect(group.pendingActivity).toBeDefined();
     expect(group.isPending).toBe(true);
 
-    expect(appendLiveEvent(completed)).toBe(true);
+    expect(ingestHistoryEvent(completed, true)).toBe(true);
 
     [group] = getGroupArray();
     expect(group.eventList).toHaveLength(3);
@@ -520,7 +513,7 @@ describe('enrichGroups', () => {
   it('clears pendingActivity when a live timeout resolves a short activity group', async () => {
     reset(10);
     const [scheduled, timedOut] = makeActivityTimeoutGroup(1);
-    processEvent(scheduled, true);
+    ingestHistoryEvent(scheduled, true);
 
     enrichGroups(
       [
@@ -537,7 +530,7 @@ describe('enrichGroups', () => {
     expect(group.pendingActivity).toBeDefined();
     expect(group.isPending).toBe(true);
 
-    expect(appendLiveEvent(timedOut)).toBe(true);
+    expect(ingestHistoryEvent(timedOut, true)).toBe(true);
 
     [group] = getGroupArray();
     expect(group.eventList.map((event) => event.id)).toEqual(['1', '2']);
@@ -547,8 +540,8 @@ describe('enrichGroups', () => {
 
   it('annotates live-only activity and nexus groups with pending metadata', () => {
     reset(20);
-    appendLiveEvent(makeActivityScheduled(1, 'MyActivity'));
-    appendLiveEvent(makeNexusOperationGroup(4)[0]);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
+    ingestHistoryEvent(makeNexusOperationGroup(4)[0], true);
 
     enrichGroups(
       [
@@ -576,7 +569,7 @@ describe('enrichGroups', () => {
 
   it('ignores activities not in the pending list', async () => {
     reset(10);
-    processEvent(makeActivityScheduled(1, 'MyActivity'), true);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
     enrichGroups([], []);
 
     const [group] = getGroupArray();
@@ -586,8 +579,8 @@ describe('enrichGroups', () => {
   it('does not touch non-activity groups', async () => {
     reset(10);
     const [ts, tf] = makeTimerGroup(1);
-    processEvent(ts, true);
-    processEvent(tf, true);
+    ingestHistoryEvent(ts, true);
+    ingestHistoryEvent(tf, true);
 
     enrichGroups(
       [{ activityId: '1', state: 'Started' }] as Parameters<
@@ -608,22 +601,22 @@ describe('enrichGroups', () => {
 describe('getWorkflowTaskFailedEvent (buffer)', () => {
   it('returns undefined when no WFT groups exist', () => {
     reset(10);
-    processEvent(makeActivityScheduled(1), true);
+    ingestHistoryEvent(makeActivityScheduled(1), true);
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
   });
 
   it('returns undefined when WFT group completed normally', () => {
     reset(10);
-    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(1)) ingestHistoryEvent(e, true);
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
   });
 
   it('returns the failed event when a WFT group has no subsequent completion', () => {
     reset(10);
     // WFT: Scheduled(1), Started(2), Failed(3)
-    processEvent(makeWorkflowTaskScheduled(1), true);
-    processEvent(makeWorkflowTaskStarted(2, 1), true);
-    processEvent(makeWorkflowTaskFailed(3, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(2, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskFailed(3, 1), true);
 
     const failed = getWorkflowTaskFailedEvent();
     expect(failed).toBeDefined();
@@ -633,22 +626,22 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
   it('returns undefined when a later WFT completed after the failure (workflow recovered)', () => {
     reset(20);
     // First WFT: fails
-    processEvent(makeWorkflowTaskScheduled(1), true);
-    processEvent(makeWorkflowTaskStarted(2, 1), true);
-    processEvent(makeWorkflowTaskFailed(3, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(2, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskFailed(3, 1), true);
     // Second WFT: completes successfully (workflow recovered)
-    processEvent(makeWorkflowTaskScheduled(4), true);
-    processEvent(makeWorkflowTaskStarted(5, 4), true);
-    processEvent(makeWorkflowTaskCompleted(6, 4), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(4), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(5, 4), true);
+    ingestHistoryEvent(makeWorkflowTaskCompleted(6, 4), true);
 
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
   });
 
   it('returns undefined for ResetWorkflow cause (not a real failure)', () => {
     reset(10);
-    processEvent(makeWorkflowTaskScheduled(1), true);
-    processEvent(makeWorkflowTaskStarted(2, 1), true);
-    processEvent(makeWorkflowTaskFailed(3, 1, 'ResetWorkflow'), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(2, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskFailed(3, 1, 'ResetWorkflow'), true);
 
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
   });
@@ -656,13 +649,13 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
   it('returns the most recent failure when multiple WFT groups fail', () => {
     reset(20);
     // First WFT fails
-    processEvent(makeWorkflowTaskScheduled(1), true);
-    processEvent(makeWorkflowTaskStarted(2, 1), true);
-    processEvent(makeWorkflowTaskFailed(3, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(2, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskFailed(3, 1), true);
     // Second WFT also fails (eventId 6 > 3)
-    processEvent(makeWorkflowTaskScheduled(4), true);
-    processEvent(makeWorkflowTaskStarted(5, 4), true);
-    processEvent(makeWorkflowTaskFailed(6, 4), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(4), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(5, 4), true);
+    ingestHistoryEvent(makeWorkflowTaskFailed(6, 4), true);
 
     const failed = getWorkflowTaskFailedEvent();
     expect(failed?.eventType).toBe('WorkflowTaskFailed');
@@ -671,11 +664,11 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 
   it('returns a WFT failure whose group arrives entirely via the live poll', () => {
     reset(10);
-    appendLiveEvent(makeWorkflowTaskScheduled(1));
-    appendLiveEvent(makeWorkflowTaskStarted(2, 1));
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(2, 1), true);
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
 
-    expect(appendLiveEvent(makeWorkflowTaskFailed(3, 1))).toBe(true);
+    expect(ingestHistoryEvent(makeWorkflowTaskFailed(3, 1), true)).toBe(true);
 
     const failed = getWorkflowTaskFailedEvent();
     expect(failed?.eventType).toBe('WorkflowTaskFailed');
@@ -684,11 +677,11 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 
   it('returns a live WFT failure appended to a WFT head already in the pool', () => {
     reset(10);
-    processEvent(makeWorkflowTaskScheduled(1), true);
-    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(2, 1), true);
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
 
-    expect(appendLiveEvent(makeWorkflowTaskFailed(3, 1))).toBe(true);
+    expect(ingestHistoryEvent(makeWorkflowTaskFailed(3, 1), true)).toBe(true);
 
     const failed = getWorkflowTaskFailedEvent();
     expect(failed?.eventType).toBe('WorkflowTaskFailed');
@@ -697,15 +690,15 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 
   it('clears the WFT failure when a later WFT completes via the live poll', () => {
     reset(20);
-    processEvent(makeWorkflowTaskScheduled(1), true);
-    processEvent(makeWorkflowTaskStarted(2, 1), true);
-    processEvent(makeWorkflowTaskFailed(3, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(2, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskFailed(3, 1), true);
     expect(getWorkflowTaskFailedEvent()?.id).toBe('3');
 
     // Workflow recovers: a new WFT completes, delivered live.
-    appendLiveEvent(makeWorkflowTaskScheduled(4));
-    appendLiveEvent(makeWorkflowTaskStarted(5, 4));
-    appendLiveEvent(makeWorkflowTaskCompleted(6, 4));
+    ingestHistoryEvent(makeWorkflowTaskScheduled(4), true);
+    ingestHistoryEvent(makeWorkflowTaskStarted(5, 4), true);
+    ingestHistoryEvent(makeWorkflowTaskCompleted(6, 4), true);
 
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
   });
@@ -713,9 +706,9 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
   it('does not double-count a live WFT group once the fetch claims its head', () => {
     reset(10);
     // Failure lands live first, then the bidirectional fetch reaches the head.
-    appendLiveEvent(makeWorkflowTaskScheduled(1));
-    appendLiveEvent(makeWorkflowTaskFailed(3, 1));
-    processEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
+    ingestHistoryEvent(makeWorkflowTaskFailed(3, 1), true);
+    ingestHistoryEvent(makeWorkflowTaskScheduled(1), true);
 
     const failed = getWorkflowTaskFailedEvent();
     expect(failed?.eventType).toBe('WorkflowTaskFailed');
@@ -733,8 +726,8 @@ describe('getGroupArray', () => {
     // Load in non-sequential order (simulates interleaved cursors)
     const [s2, st2, c2] = makeActivityGroup(4);
     const [s1, st1, c1] = makeActivityGroup(1);
-    for (const e of [s2, st2, c2]) processEvent(e, false); // desc cursor
-    for (const e of [s1, st1, c1]) processEvent(e, true); // asc cursor
+    for (const e of [s2, st2, c2]) ingestHistoryEvent(e, false); // desc cursor
+    for (const e of [s1, st1, c1]) ingestHistoryEvent(e, true); // asc cursor
 
     const groups = getGroupArray();
     expect(groups.length).toBe(2);
@@ -743,8 +736,8 @@ describe('getGroupArray', () => {
 
   it('excludeWorkflowTasks filters WFT groups', () => {
     reset(20);
-    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
-    for (const e of makeActivityGroup(4)) processEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(1)) ingestHistoryEvent(e, true);
+    for (const e of makeActivityGroup(4)) ingestHistoryEvent(e, true);
 
     const all = getGroupArray();
     const noWft = getGroupArray({ excludeWorkflowTasks: true });
@@ -755,7 +748,7 @@ describe('getGroupArray', () => {
 
   it('is stable across multiple calls', () => {
     reset(10);
-    for (const e of makeActivityGroup(1)) processEvent(e, true);
+    for (const e of makeActivityGroup(1)) ingestHistoryEvent(e, true);
 
     const a = getGroupArray();
     const b = getGroupArray();
@@ -765,7 +758,7 @@ describe('getGroupArray', () => {
 
   it('returns empty array when no groups loaded', () => {
     reset(10);
-    processEvent(makeWorkflowStarted(1), true);
+    ingestHistoryEvent(makeWorkflowStarted(1), true);
     expect(getGroupArray()).toHaveLength(0);
   });
 });
@@ -775,102 +768,15 @@ describe('getGroupArray', () => {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// Pixi rendering layer — gutter event data (byTrack simulation)
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Option C — eventSlots memory release
+// ingestHistoryEvent — boolean return value (live-poll tight-loop fix)
 //
-// These tests verify that raw HistoryEvent objects stored in eventSlots are
-// nulled out once the event has been fully incorporated into its EventGroup.
-// They FAIL before Option C is implemented and PASS afterwards.
+// Regression: the live poll was firing thousands of requests because ingestion
+// returned void, so the caller always called bufferVersion.update() even for
+// duplicate events returned by the server. The fix: return true for genuinely
+// new events, false for duplicates.
 // ---------------------------------------------------------------------------
 
-describe('Option C — eventSlots are released after grouping', () => {
-  it('[RED] eventSlots entries for head events are null after processEvent returns', () => {
-    const events = makeSyntheticEvents(10);
-    reset(10);
-    for (const e of events) processEvent(e, true);
-
-    const slots = _debugEventSlots();
-    const occupiedAfterProcessing = slots.filter((s) => s != null);
-
-    // After all events have been processed into groups, no slots should remain
-    // populated. This FAILS currently because we never null out eventSlots.
-    expect(occupiedAfterProcessing.length).toBe(0);
-  });
-
-  it('[RED] follower eventSlots are null after they are attached to their group', () => {
-    // Build a proper WFT-then-activity sequence with correct cross-references:
-
-    // 1: WorkflowExecutionStarted (solo head)
-    // 2: WorkflowTaskScheduled   (WFT head)
-    // 3: WorkflowTaskStarted     (follower of 2)
-    // 4: WorkflowTaskCompleted   (follower of 2)
-    // 5: ActivityTaskScheduled   (activity head)
-    // 6: ActivityTaskStarted     (follower of 5)
-    // 7: ActivityTaskCompleted   (follower of 5)
-    reset(10);
-    processEvent(makeWorkflowStarted(1), true);
-    processEvent(makeWorkflowTaskScheduled(2), true);
-    processEvent(makeWorkflowTaskStarted(3, 2), true);
-    processEvent(makeWorkflowTaskCompleted(4, 2), true);
-    processEvent(makeActivityScheduled(5), true);
-    processEvent(makeActivityStarted(6, 5), true);
-    processEvent(makeActivityCompleted(7, 5, 6), true);
-
-    const slots = _debugEventSlots();
-    const followerSlots = slots.slice(0, 7).filter((s) => s != null);
-
-    // All slots (heads + followers) should be null once attached to their group.
-    // FAILS currently because we never null out eventSlots.
-    expect(followerSlots.length).toBe(0);
-  });
-
-  it('[RED] eventSlots remain entirely null-filled after all groups are complete', () => {
-    const events = makeSyntheticEvents(30);
-    reset(30);
-    for (const e of events) processEvent(e, true);
-
-    const slots = _debugEventSlots();
-    const populated = Array.from(slots).filter((s) => s != null);
-
-    // Every slot should be released. FAILS currently.
-    expect(populated.length).toBe(0);
-  });
-
-  it('group count is unaffected by eventSlots nulling', () => {
-    const events = makeSyntheticEvents(20);
-    reset(20);
-    const before = getGroupArray().length;
-    for (const e of events) processEvent(e, true);
-    const after = getGroupArray().length;
-    // Groups still accumulate correctly regardless of slot nulling
-    expect(after).toBeGreaterThan(before);
-  });
-
-  it('groups still expose their full event list after eventSlots are released', () => {
-    const events = makeSyntheticEvents(10);
-    reset(10);
-    for (const e of events) processEvent(e, true);
-
-    for (const group of getGroupArray()) {
-      expect(group.eventList.length).toBeGreaterThan(0);
-      expect(group.initialEvent).toBeDefined();
-    }
-  });
-});
-
-// ---------------------------------------------------------------------------
-// appendLiveEvent — boolean return value (live-poll tight-loop fix)
-//
-// Regression: the live poll was firing thousands of requests because
-// appendLiveEvent returned void, so the caller always called
-// bufferVersion.update() even for duplicate events returned by the server.
-// The fix: return true for genuinely new events, false for duplicates.
-// ---------------------------------------------------------------------------
-
-describe('appendLiveEvent boolean return', () => {
+describe('ingestHistoryEvent boolean return', () => {
   beforeEach(() => {
     reset(10);
   });
@@ -878,46 +784,43 @@ describe('appendLiveEvent boolean return', () => {
   it('returns true for a genuinely new live event', () => {
     // Event 11 was never in the initial fetch — it is a new live event.
     const newEvent = makeWorkflowCompleted(11);
-    expect(appendLiveEvent(newEvent)).toBe(true);
+    expect(ingestHistoryEvent(newEvent, true)).toBe(true);
   });
 
   it('returns false when the same event is appended a second time (duplicate)', () => {
     const ev = makeWorkflowCompleted(11);
-    appendLiveEvent(ev);
+    ingestHistoryEvent(ev, true);
     // Second call with the same eventId must be a no-op.
-    expect(appendLiveEvent(ev)).toBe(false);
+    expect(ingestHistoryEvent(ev, true)).toBe(false);
   });
 
   it('returns false for a different object with the same eventId (duplicate by ID)', () => {
     const ev1 = makeWorkflowCompleted(11);
     const ev2 = makeWorkflowCompleted(11); // distinct object, same ID
-    appendLiveEvent(ev1);
-    expect(appendLiveEvent(ev2)).toBe(false);
+    ingestHistoryEvent(ev1, true);
+    expect(ingestHistoryEvent(ev2, true)).toBe(false);
   });
 
-  it('returns false for a grouped event already processed in the initial fetch', () => {
-    // The eventToGroup guard prevents re-processing grouped events (ActivityScheduled
-    // is the head of a group so eventToGroup gets a non-zero entry for it).
+  it('returns false for a grouped event already seen in the initial fetch', () => {
     const group = makeActivityGroup(2); // eventIds 2, 3, 4
     reset(5);
-    for (const e of group) processEvent(e, true);
+    for (const e of group) ingestHistoryEvent(e, true);
 
-    // ActivityScheduled (eventId=2) is the group head → eventToGroup[1] !== 0.
-    expect(appendLiveEvent(group[0])).toBe(false);
+    expect(ingestHistoryEvent(group[0], true)).toBe(false);
   });
 
   it('only returns true for grouped events that are actually new in a mixed batch', () => {
-    // Use an activity group (events 1-3) as the "already in initial fetch" set.
-    // WorkflowStarted solo events are excluded because the eventToGroup guard
-    // does not cover solo events (they live in soloEvents, not groupPool).
+    // An activity group (events 1-3) stands in for the initial fetch's events.
     const existing = makeActivityGroup(1); // eventIds 1, 2, 3
     reset(6);
-    for (const e of existing) processEvent(e, true);
+    for (const e of existing) ingestHistoryEvent(e, true);
 
     const newEv = makeActivityScheduled(4);
-    const results = [...existing, newEv].map((e) => appendLiveEvent(e));
+    const results = [...existing, newEv].map((e) =>
+      ingestHistoryEvent(e, true),
+    );
 
-    // Events 1-3 are grouped and already in groupPool → all false
+    // Events 1-3 were already ingested → all false
     expect(results.slice(0, 3).every((r) => r === false)).toBe(true);
     // Event 4 is genuinely new → true
     expect(results[3]).toBe(true);
@@ -927,11 +830,10 @@ describe('appendLiveEvent boolean return', () => {
 // ---------------------------------------------------------------------------
 // Concurrent live poll + bidirectional fetch
 //
-// The live poll now starts at the same time as the bidirectional fetch so new
-// events are captured immediately even when the initial load is slow.
-// appendLiveEvent can therefore be called BEFORE processEvent for the same
-// event — both write to separate arrays (liveGroups vs groupPool). Once
-// processEvent claims an event, getEventArray() must not return it twice.
+// The live poll starts at the same time as the bidirectional fetch so new
+// events are captured immediately even when the initial load is slow. Both
+// producers call ingestHistoryEvent, in either order, for overlapping events —
+// the buffer must store each event exactly once.
 // ---------------------------------------------------------------------------
 
 describe('concurrent live poll and bidirectional fetch', () => {
@@ -943,25 +845,19 @@ describe('concurrent live poll and bidirectional fetch', () => {
     // Bidirectional has not started — buffer is empty.
     // Live poll delivers a brand-new event (not in the initial fetch).
     const newEv = makeActivityScheduled(1);
-    appendLiveEvent(newEv);
+    ingestHistoryEvent(newEv, true);
 
     const ids = getEventArray().map((e) => e.id);
     expect(ids).toContain('1');
   });
 
-  it('an event absorbed by processEvent is not double-counted in getEventArray()', () => {
-    // Race: live poll arrives first (event 2 added to liveGroups),
-    // then the bidirectional fetch arrives (processEvent claims event 2 into groupPool).
+  it('an event delivered by both producers is not double-counted in getEventArray()', () => {
     const group = makeActivityGroup(2); // eventIds 2, 3, 4
     reset(5);
 
-    // Step 1 — live poll wins the race
-    for (const ev of group) appendLiveEvent(ev);
-    // All three events are in liveGroups now.
-
-    // Step 2 — bidirectional fetch arrives and claims the same events
-    for (const ev of group) processEvent(ev, true);
-    // Events are now in BOTH groupPool (via processEvent) and liveGroups.
+    // Live poll wins the race, then the bidirectional fetch redelivers.
+    for (const ev of group) ingestHistoryEvent(ev, true);
+    for (const ev of group) ingestHistoryEvent(ev, true);
 
     // getEventArray() must return each event exactly once.
     const allIds = getEventArray().map((e) => e.id);
@@ -987,11 +883,11 @@ describe('concurrent live poll and bidirectional fetch', () => {
       const group = buildGroup();
       reset(10);
 
-      for (const ev of group) appendLiveEvent(ev);
+      for (const ev of group) ingestHistoryEvent(ev, true);
       expect(getGroupArray()).toHaveLength(1);
       expect(getGroupArray()[0].eventList).toHaveLength(group.length);
 
-      processEvent(group[0], true);
+      ingestHistoryEvent(group[0], true);
 
       const groups = getGroupArray();
       expect(groups).toHaveLength(1);
@@ -1015,10 +911,10 @@ describe('concurrent live poll and bidirectional fetch', () => {
       const group = buildGroup();
       reset(10);
 
-      for (const ev of group.slice(1)) appendLiveEvent(ev);
+      for (const ev of group.slice(1)) ingestHistoryEvent(ev, true);
       expect(getGroupArray()).toHaveLength(0);
 
-      processEvent(group[0], true);
+      ingestHistoryEvent(group[0], true);
 
       const groups = getGroupArray();
       expect(groups).toHaveLength(1);
@@ -1042,8 +938,8 @@ describe('concurrent live poll and bidirectional fetch', () => {
       const group = buildGroup();
       reset(10);
 
-      processEvent(group[0], true);
-      for (const ev of group.slice(1)) appendLiveEvent(ev);
+      ingestHistoryEvent(group[0], true);
+      for (const ev of group.slice(1)) ingestHistoryEvent(ev, true);
 
       const groups = getGroupArray();
       expect(groups).toHaveLength(1);
@@ -1059,9 +955,9 @@ describe('concurrent live poll and bidirectional fetch', () => {
     const scheduled = makeActivityScheduled(1);
     const started = makeActivityStarted(100, 1);
 
-    processEvent(scheduled, true);
-    expect(appendLiveEvent(started)).toBe(true);
-    processEvent(started, true);
+    ingestHistoryEvent(scheduled, true);
+    expect(ingestHistoryEvent(started, true)).toBe(true);
+    ingestHistoryEvent(started, true);
 
     const groups = getGroupArray();
     expect(groups).toHaveLength(1);
@@ -1075,10 +971,10 @@ describe('concurrent live poll and bidirectional fetch', () => {
     // Bidirectional loads events 1-6; live poll delivers event 7 (new).
     const existing = makeSyntheticEvents(6);
     reset(8);
-    for (const ev of existing) processEvent(ev, true);
+    for (const ev of existing) ingestHistoryEvent(ev, true);
 
     const newEv = makeActivityScheduled(7);
-    appendLiveEvent(newEv);
+    ingestHistoryEvent(newEv, true);
 
     const ids = getEventArray().map((e) => e.id);
     // Events 1-6 from bidirectional + event 7 from live poll.
@@ -1093,11 +989,11 @@ describe('concurrent live poll and bidirectional fetch', () => {
     const events = makeSyntheticEvents(5);
     reset(5);
 
-    // Live poll wins — all 5 events added to liveGroups.
-    for (const ev of events) appendLiveEvent(ev);
+    // Live poll wins the race and ingests all 5 events.
+    for (const ev of events) ingestHistoryEvent(ev, true);
 
-    // Bidirectional catches up — all 5 events claimed into groupPool.
-    for (const ev of events) processEvent(ev, true);
+    // Bidirectional catches up and redelivers the same 5 events.
+    for (const ev of events) ingestHistoryEvent(ev, true);
 
     const allIds = getEventArray().map((e) => e.id);
     const unique = new Set(allIds);
@@ -1109,13 +1005,13 @@ describe('concurrent live poll and bidirectional fetch', () => {
     // a live-poll batch of [2 (dup), 3 (dup), 4 (new)] should count added=1.
     const group = makeActivityGroup(1); // eventIds 1, 2, 3
     reset(5);
-    for (const ev of group) processEvent(ev, true);
+    for (const ev of group) ingestHistoryEvent(ev, true);
 
     const results = [
-      appendLiveEvent(group[0]), // eventId 1 → duplicate → false
-      appendLiveEvent(group[1]), // eventId 2 → duplicate → false
-      appendLiveEvent(group[2]), // eventId 3 → duplicate → false
-      appendLiveEvent(makeActivityScheduled(4)), // new → true
+      ingestHistoryEvent(group[0], true), // eventId 1 → duplicate → false
+      ingestHistoryEvent(group[1], true), // eventId 2 → duplicate → false
+      ingestHistoryEvent(group[2], true), // eventId 3 → duplicate → false
+      ingestHistoryEvent(makeActivityScheduled(4), true), // new → true
     ];
 
     const added = results.filter(Boolean).length;
@@ -1124,20 +1020,15 @@ describe('concurrent live poll and bidirectional fetch', () => {
 });
 
 // ---------------------------------------------------------------------------
-// livePendingFollowers — unified bidirectional-style park-and-flush for live poll
+// Followers ingested before their head
 //
-// When the live poll delivers a follower event before the head has been
-// processed by either appendLiveEvent or processEvent, the follower is
-// parked invisibly in livePendingFollowers. No group is created and nothing
-// appears in getGroupArray() until the head arrives.
-//
-// Head can arrive two ways:
-//   A. Via appendLiveEvent(head) — head and parked followers form a complete live group.
-//   B. Via processEvent(head) — head enters groupPool; parked followers are
-//      flushed directly into the pool group (no live group needed).
+// A follower can arrive before its head from either producer. Its group record
+// is created immediately but has no head event, so the group stays out of
+// getGroupArray() — nothing partial is ever rendered — and appears complete the
+// moment the head lands, whichever order the remaining events came in.
 // ---------------------------------------------------------------------------
 
-describe('appendLiveEvent — livePendingFollowers (unified bidirectional pattern)', () => {
+describe('followers ingested before their head', () => {
   beforeEach(() => {
     reset(10);
   });
@@ -1145,23 +1036,23 @@ describe('appendLiveEvent — livePendingFollowers (unified bidirectional patter
   it('follower before head: nothing visible in getGroupArray until head arrives', () => {
     const [, started] = makeActivityGroup(1);
     const before = getGroupArray().length;
-    appendLiveEvent(started); // head not yet seen
+    ingestHistoryEvent(started, true); // head not yet seen
     expect(getGroupArray().length).toBe(before); // no partial stub rendered
   });
 
   it('multiple followers before head: still nothing visible', () => {
     const [, started, completed] = makeActivityGroup(1);
     const before = getGroupArray().length;
-    appendLiveEvent(started);
-    appendLiveEvent(completed);
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
     expect(getGroupArray().length).toBe(before);
   });
 
-  it('path A: head arrives via appendLiveEvent — complete live group with all followers', () => {
+  it('head last: group is complete with all followers', () => {
     const [scheduled, started, completed] = makeActivityGroup(1);
-    appendLiveEvent(started);
-    appendLiveEvent(completed);
-    appendLiveEvent(scheduled); // head arrives last
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
+    ingestHistoryEvent(scheduled, true); // head arrives last
 
     const groups = getGroupArray();
     const g = groups.find((g) => g.id === '1');
@@ -1170,21 +1061,21 @@ describe('appendLiveEvent — livePendingFollowers (unified bidirectional patter
     expect(g?.eventList.map((e) => e.id)).toEqual(['1', '2', '3']);
   });
 
-  it('path A: head arrives before followers — followers extend live group normally', () => {
+  it('head first: later followers extend the group', () => {
     const [scheduled, started, completed] = makeActivityGroup(1);
-    appendLiveEvent(scheduled); // head first
-    appendLiveEvent(started);
-    appendLiveEvent(completed);
+    ingestHistoryEvent(scheduled, true); // head first
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
 
     const g = getGroupArray().find((g) => g.id === '1');
     expect(g?.eventList).toHaveLength(3);
   });
 
-  it('path B: head arrives via processEvent — followers flushed into groupPool group', () => {
+  it('head from the fetch cursor: earlier live followers are picked up', () => {
     const [scheduled, started, completed] = makeActivityGroup(1);
-    appendLiveEvent(started);
-    appendLiveEvent(completed);
-    processEvent(scheduled, true); // head enters groupPool, flushes livePendingFollowers
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
+    ingestHistoryEvent(scheduled, false); // head arrives from the desc cursor
 
     const g = getGroupArray().find((g) => g.id === '1');
     expect(g).toBeDefined();
@@ -1192,23 +1083,23 @@ describe('appendLiveEvent — livePendingFollowers (unified bidirectional patter
     expect(g?.eventList.map((e) => e.id)).toEqual(['1', '2', '3']);
   });
 
-  it('path B: option A — follower extends groupPool group when head already there', () => {
+  it('live follower extends a group whose head came from the fetch', () => {
     const [scheduled, started] = makeActivityGroup(1);
-    processEvent(scheduled, true); // head in groupPool
-    appendLiveEvent(started); // follower via live poll
+    ingestHistoryEvent(scheduled, false); // head from the fetch
+    ingestHistoryEvent(started, true); // follower from the live poll
 
     const g = getGroupArray().find((g) => g.id === '1');
     expect(g?.eventList).toHaveLength(2);
     expect(g?.eventList[1].id).toBe('2');
   });
 
-  it('no duplicate events in getEventArray when live poll and bidirectional both deliver followers', () => {
+  it('no duplicate events when both producers deliver the same followers', () => {
     const [scheduled, started, completed] = makeActivityGroup(1);
-    appendLiveEvent(started);
-    appendLiveEvent(completed);
-    processEvent(scheduled, true);
-    processEvent(started, true);
-    processEvent(completed, true);
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
+    ingestHistoryEvent(scheduled, true);
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
 
     const allIds = getEventArray().map((e) => e.id);
     const unique = new Set(allIds);
@@ -1218,13 +1109,168 @@ describe('appendLiveEvent — livePendingFollowers (unified bidirectional patter
     expect(unique.has('3')).toBe(true);
   });
 
-  it('duplicate appendLiveEvent calls for same follower are ignored', () => {
+  it('duplicate calls for the same follower are ignored', () => {
     const [scheduled, started] = makeActivityGroup(1);
-    appendLiveEvent(started);
-    appendLiveEvent(started); // second call for same event
-    appendLiveEvent(scheduled);
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(started, true); // second call for same event
+    ingestHistoryEvent(scheduled, true);
 
     const g = getGroupArray().find((g) => g.id === '1');
     expect(g?.eventList).toHaveLength(2); // not 3
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 17. Group reference identity
+//
+// Group objects are derived and memoized on a per-group version, so identity is
+// a pure function of content: any change a rendered view must see yields a new
+// reference, and anything unchanged reads back as the same object. Consumers
+// depend on both halves — the timeline row pool keys on group identity, so a
+// missed swap leaves a completed activity rendering as in-progress, and a
+// gratuitous swap re-renders every row on every poll.
+// ---------------------------------------------------------------------------
+
+describe('group reference identity', () => {
+  beforeEach(() => {
+    reset(10);
+  });
+
+  it('returns the identical reference for a group that has not changed', () => {
+    ingestHistoryEvent(makeActivityScheduled(1, 'Act'), true);
+    const first = getGroupArray()[0];
+
+    ingestHistoryEvent(makeActivityScheduled(5, 'Other'), true);
+    const second = getGroupArray().find((group) => group.id === '1');
+
+    expect(second).toBe(first);
+  });
+
+  it('hands back a fresh reference when a live completion extends a group', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    ingestHistoryEvent(scheduled, true);
+    ingestHistoryEvent(started, true);
+
+    const before = getGroupArray()[0];
+    expect(before.eventList).toHaveLength(2);
+    expect(before.finalClassification).toBe('Started');
+
+    expect(ingestHistoryEvent(completed, true)).toBe(true);
+
+    const after = getGroupArray()[0];
+    expect(after).not.toBe(before);
+    expect(after.eventList).toHaveLength(3);
+    expect(after.finalClassification).toBe('Completed');
+  });
+
+  it('leaves the previous reference as an intact snapshot of the old state', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    ingestHistoryEvent(scheduled, true);
+    ingestHistoryEvent(started, true);
+    const before = getGroupArray()[0];
+
+    ingestHistoryEvent(completed, true);
+
+    expect(before.eventList).toHaveLength(2);
+    expect(before.finalClassification).toBe('Started');
+  });
+
+  it('hands back a fresh reference when enrich changes pending metadata', () => {
+    ingestHistoryEvent(makeActivityScheduled(1, 'Act'), true);
+    const before = getGroupArray()[0];
+
+    enrichGroups(
+      [
+        { activityId: '1', state: 'Started', activityType: 'Act' },
+      ] as Parameters<typeof enrichGroups>[0],
+      [],
+    );
+
+    const after = getGroupArray()[0];
+    expect(after).not.toBe(before);
+    expect(after.pendingActivity).toBeDefined();
+  });
+
+  it('keeps references stable across repeated reads with no writes', () => {
+    for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
+    for (const event of makeTimerGroup(4)) ingestHistoryEvent(event, true);
+
+    const first = getGroupArray();
+    const second = getGroupArray();
+
+    expect(second).toBe(first);
+    expect(getGroupArray({ excludeWorkflowTasks: true })).toEqual(first);
+  });
+
+  it('swaps only the groups that changed', () => {
+    for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
+    const [scheduled, started, completed] = makeActivityGroup(4);
+    ingestHistoryEvent(scheduled, true);
+    ingestHistoryEvent(started, true);
+
+    const before = getGroupArray();
+    ingestHistoryEvent(completed, true);
+    const after = getGroupArray();
+
+    expect(after[0]).toBe(before[0]);
+    expect(after[1]).not.toBe(before[1]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 18. Arrival-order independence
+//
+// Pending metadata is applied when the group is built rather than written into
+// it on arrival, so a terminal event and a stale pending entry resolve the same
+// way regardless of which lands first.
+// ---------------------------------------------------------------------------
+
+describe('arrival-order independence', () => {
+  const pending = [
+    { activityId: '1', state: 'Started', activityType: 'Act' },
+  ] as Parameters<typeof enrichGroups>[0];
+
+  it('drops pending metadata when the completion arrives after enrich', () => {
+    reset(10);
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    ingestHistoryEvent(scheduled, true);
+    enrichGroups(pending, []);
+    expect(getGroupArray()[0].isPending).toBe(true);
+
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
+
+    const group = getGroupArray()[0];
+    expect(group.pendingActivity).toBeUndefined();
+    expect(group.isPending).toBe(false);
+  });
+
+  it('drops pending metadata when enrich runs after the completion', () => {
+    reset(10);
+    for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
+    enrichGroups(pending, []);
+
+    const group = getGroupArray()[0];
+    expect(group.pendingActivity).toBeUndefined();
+    expect(group.isPending).toBe(false);
+  });
+
+  it('groups events identically whichever cursor delivers them', () => {
+    const group = makeActivityGroup(1);
+
+    reset(10);
+    for (const event of group) ingestHistoryEvent(event, true);
+    const ascending = getGroupArray()[0];
+
+    reset(10);
+    for (const event of [...group].reverse()) ingestHistoryEvent(event, false);
+    const descending = getGroupArray()[0];
+
+    expect(descending.eventList.map((event) => event.id)).toEqual(
+      ascending.eventList.map((event) => event.id),
+    );
+    expect(descending.timestamp).toBe(ascending.timestamp);
+    expect(descending.finalClassification).toBe(ascending.finalClassification);
+    expect(descending.billableActions).toBe(ascending.billableActions);
   });
 });
