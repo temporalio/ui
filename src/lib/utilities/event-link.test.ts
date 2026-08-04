@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { base } from '$app/paths';
 
-import { toEventLinkView } from './event-link';
+import { eventLinkTargetTypeLabel, toEventLinkView } from './event-link';
 
 describe('toEventLinkView', () => {
   it('returns a workflow event route for event references', () => {
@@ -187,5 +187,22 @@ describe('toEventLinkView', () => {
       value: 'Link',
     });
     expect(view.href).toBeUndefined();
+  });
+});
+
+describe('eventLinkTargetTypeLabel', () => {
+  it('labels an activity variant as a Standalone Activity', () => {
+    expect(eventLinkTargetTypeLabel('activity')).toBe('Standalone Activity');
+  });
+
+  it('labels workflow variants as Workflow', () => {
+    expect(eventLinkTargetTypeLabel('workflowEvent')).toBe('Workflow');
+    expect(eventLinkTargetTypeLabel('workflow')).toBe('Workflow');
+  });
+
+  it('returns undefined for variants without a handler target type', () => {
+    expect(eventLinkTargetTypeLabel('nexusOperation')).toBeUndefined();
+    expect(eventLinkTargetTypeLabel('batchJob')).toBeUndefined();
+    expect(eventLinkTargetTypeLabel('unknown')).toBeUndefined();
   });
 });

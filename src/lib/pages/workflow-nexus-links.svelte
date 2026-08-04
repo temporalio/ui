@@ -15,6 +15,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import {
     type EventLinkDisplay,
+    eventLinkTargetTypeLabel,
     toEventLinkView,
   } from '$lib/utilities/event-link';
   import { isNexusOperationScheduledEvent } from '$lib/utilities/is-event-type';
@@ -118,13 +119,14 @@
           <th>{translate('nexus.nexus-service')}</th>
           <th>{translate('nexus.nexus-operation')}</th>
           <th>{translate('nexus.handler-namespace')}</th>
-          <th>{translate('nexus.handler-workflow')}</th>
+          <th>{translate('nexus.handler-target')}</th>
           <th>{translate('nexus.handler-event')}</th>
         </TableHeaderRow>
       {/snippet}
       {#each nexusGroups as group (group.id)}
         {@const link = group.links?.[0]}
         {@const linkView = toEventLinkView(link, { namespace })}
+        {@const targetTypeLabel = eventLinkTargetTypeLabel(linkView.variant)}
         {@const scheduledEvent = group.eventList.find((e) =>
           isNexusOperationScheduledEvent(e),
         )}
@@ -155,6 +157,14 @@
           </td>
           <td class="break-all text-left" data-testid="link-href">
             {@render linkDisplay(linkView)}
+            {#if targetTypeLabel}
+              <p
+                class="text-xs text-secondary/80"
+                data-testid="link-target-type"
+              >
+                {targetTypeLabel}
+              </p>
+            {/if}
           </td>
           <td class="break-all text-left" data-testid="link-href">
             {#if linkView.event}
