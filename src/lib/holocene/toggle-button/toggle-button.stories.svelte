@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts" module>
   import { get, writable } from 'svelte/store';
 

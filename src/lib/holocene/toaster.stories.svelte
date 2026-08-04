@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts" module>
   import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
 

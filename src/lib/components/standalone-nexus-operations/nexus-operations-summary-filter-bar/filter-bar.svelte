@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import { nexusOperationFilters } from '$lib/stores/filters';
