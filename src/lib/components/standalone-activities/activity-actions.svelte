@@ -51,7 +51,7 @@
     activityExecutionInfo.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING',
   );
   let isPaused = $derived(
-    activityExecutionInfo.runState === 'PENDING_ACTIVITY_STATE_PAUSED',
+    activityExecutionInfo.status === 'ACTIVITY_EXECUTION_STATUS_PAUSED',
   );
   const commandsDisabled = $derived(standaloneActivityCommandsDisabled(page));
   const writeActionsDisabled = $derived(
@@ -110,7 +110,7 @@
 </script>
 
 <div class="flex items-center gap-2">
-  {#if isRunning}
+  {#if isRunning || isPaused}
     {#if commandsDisabled}
       <Button
         onclick={() => (cancelConfirmationModalOpen = true)}
@@ -137,7 +137,7 @@
       {translate('workflows.more-actions')}
     </MenuButton>
     <Menu id="activity-execution-actions" position="right" class="w-[16rem]">
-      {#if isRunning}
+      {#if isRunning || isPaused}
         {#if !commandsDisabled}
           <MenuItem
             onclick={() => (cancelConfirmationModalOpen = true)}
