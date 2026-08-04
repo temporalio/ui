@@ -19,15 +19,10 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import {
-    enrichGroups,
-    getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
-    getGroupArray,
-  } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
-  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
+  import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
@@ -61,7 +56,7 @@
 
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  let bufferGroups = $state.raw<EventGroup[]>([]);
+  const bufferGroups = $derived(eventBuffer.groupsWithoutWorkflowTasks);
 
   const filteredBufferGroups = $derived.by(() => {
     const active = $eventTypeFilter;
@@ -78,9 +73,8 @@
   );
 
   const workflowTaskFailedError = $derived.by(() => {
-    void $bufferVersion;
     if (!historyCtx.fetchComplete) return undefined;
-    return getBufferWftFailedEvent() as
+    return eventBuffer.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;
@@ -113,27 +107,6 @@
 
   onMount(() => {
     historyCtx.resume();
-    bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-  });
-
-  $effect(() => {
-    void $bufferVersion;
-    const fetchComplete = historyCtx.fetchComplete;
-    const pendingActivities = $workflowRun.workflow?.pendingActivities ?? [];
-    const pendingNexusOperations =
-      $workflowRun.workflow?.pendingNexusOperations ?? [];
-
-    let frame: number | null = requestAnimationFrame(() => {
-      frame = null;
-      if (fetchComplete) {
-        enrichGroups(pendingActivities, pendingNexusOperations);
-      }
-      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-    });
-
-    return () => {
-      if (frame !== null) cancelAnimationFrame(frame);
-    };
   });
 
   let timeline = $state<Timeline>();

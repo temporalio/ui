@@ -60,6 +60,8 @@ type GroupRecord = {
   cachedVersion: number;
 };
 
+export type ChangeListener = (immediate: boolean) => void;
+
 export type GroupArrayOptions = {
   excludeWorkflowTasks?: boolean;
 };
@@ -89,9 +91,15 @@ let cachedGroupsNoWFTRevision = -1;
 let cachedEvents: WorkflowEvent[] | null = null;
 let cachedEventsRevision = -1;
 
+const changeListeners = new Set<ChangeListener>();
+
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
+
+function notifyChanged(immediate = false): void {
+  for (const listener of changeListeners) listener(immediate);
+}
 
 function grow(slot: number): void {
   if (slot < events.length) return;
@@ -231,6 +239,8 @@ export function reset(historyLength: number): void {
   cachedGroups = null;
   cachedGroupsNoWFT = null;
   cachedEvents = null;
+
+  notifyChanged(true);
 }
 
 /**
@@ -270,6 +280,7 @@ export function ingestHistoryEvent(
   record.version++;
   revision++;
 
+  notifyChanged();
   return true;
 }
 
@@ -291,6 +302,8 @@ export function enrichGroups(
       pending,
     ]),
   );
+
+  let changed = false;
 
   for (const record of records) {
     const head = events[record.headSlot];
@@ -318,7 +331,22 @@ export function enrichGroups(
     record.pendingNexusOperation = pendingNexusOperation;
     record.version++;
     revision++;
+    changed = true;
   }
+
+  if (changed) notifyChanged();
+}
+
+/**
+ * Subscribe to buffer writes. Fires once per ingested event and once per
+ * pending-metadata change, so subscribers are expected to coalesce. `immediate`
+ * is true for reset, which subscribers should apply without coalescing so a
+ * navigation cannot leave the previous run's groups on screen.
+ * Returns an unsubscribe function.
+ */
+export function onChange(listener: ChangeListener): () => void {
+  changeListeners.add(listener);
+  return () => changeListeners.delete(listener);
 }
 
 export function isWorkflowTaskGroup(group: EventGroup): boolean {

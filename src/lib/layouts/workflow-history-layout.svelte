@@ -22,15 +22,10 @@
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
-  import {
-    enrichGroups,
-    getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
-    getEventArray,
-    getGroupArray,
-  } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
+  import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
@@ -70,35 +65,12 @@
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
 
-  let bufferGroups = $state.raw(getGroupArray({ excludeWorkflowTasks: true }));
-  let bufferEvents = $state.raw(getEventArray());
+  const bufferGroups = $derived(eventBuffer.groupsWithoutWorkflowTasks);
+  const bufferEvents = $derived(eventBuffer.events);
   let updating = $derived(!historyCtx.fetchComplete);
 
   onMount(() => {
     historyCtx.resume();
-    bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-    bufferEvents = getEventArray();
-  });
-
-  $effect(() => {
-    void $bufferVersion;
-
-    const fetchComplete = historyCtx.fetchComplete;
-    const activities = pendingActivities;
-    const nexusOperations = pendingNexusOperations;
-
-    let frame: number | null = requestAnimationFrame(() => {
-      frame = null;
-      if (fetchComplete) {
-        enrichGroups(activities, nexusOperations);
-      }
-      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-      bufferEvents = getEventArray();
-    });
-
-    return () => {
-      if (frame !== null) cancelAnimationFrame(frame);
-    };
   });
 
   const filteredGroups = $derived.by(() => {
@@ -123,9 +95,8 @@
   });
 
   const workflowTaskFailedError = $derived.by(() => {
-    void $bufferVersion;
     if (!historyCtx.fetchComplete) return undefined;
-    return getBufferWftFailedEvent() as
+    return eventBuffer.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;

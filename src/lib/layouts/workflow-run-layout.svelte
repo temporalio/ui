@@ -18,10 +18,10 @@
   import { fetchBidirectional } from '$lib/services/fetch-bidirectional';
   import {
     enrichGroups,
-    getEventArray,
     ingestHistoryEvent,
     reset as resetBuffer,
   } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { runLivePoll } from '$lib/services/live-poll';
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
@@ -29,7 +29,6 @@
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import {
-    bufferVersion,
     fullEventHistory,
     pauseLiveUpdates,
     timelineEvents,
@@ -58,9 +57,9 @@
   let workflowId = $derived(page.params.workflow);
   let runId = $derived(page.params.run);
   let showJson = $derived(page.url.searchParams.has('json'));
-  let fullJson = $derived.by(() => {
-    $bufferVersion;
-    return { ...$workflowRun, eventHistory: getEventArray() };
+  let fullJson = $derived({
+    ...$workflowRun,
+    eventHistory: eventBuffer.events,
   });
 
   let workflowError: NetworkError | null = $state(null);
@@ -159,7 +158,6 @@
           latestEventId = Math.max(latestEventId, parseInt(ev.eventId));
         return isNew;
       },
-      onNewEvents: () => bufferVersion.update((v) => v + 1),
     }).then((lastToken) => {
       _lastPollToken = lastToken;
     });
@@ -242,16 +240,10 @@
           const id = parseInt(event.eventId);
           if (id > latestEventId) latestEventId = id;
         }
-        if (events.length) bufferVersion.update((v) => v + 1);
       },
     })
       .then(() => {
-        enrichGroups(
-          $workflowRun.workflow?.pendingActivities ?? [],
-          $workflowRun.workflow?.pendingNexusOperations ?? [],
-        );
         fetchComplete = true;
-        bufferVersion.update((v) => v + 1);
       })
       .catch((e: unknown) => {
         if (e instanceof Error && e.name !== 'AbortError') {
@@ -288,10 +280,19 @@
     livePollingController = null;
   };
 
+  // Pending activity/nexus metadata comes from the workflow run, not the event
+  // history, so the buffer has to be told about it — once the fetch has
+  // registered every group, and again whenever the run refreshes.
   $effect(() => {
-    $bufferVersion;
+    const activities = $workflowRun.workflow?.pendingActivities ?? [];
+    const nexusOperations = $workflowRun.workflow?.pendingNexusOperations ?? [];
+    if (!fetchComplete) return;
+    enrichGroups(activities, nexusOperations);
+  });
+
+  $effect(() => {
+    const events = eventBuffer.events;
     untrack(() => {
-      const events = getEventArray();
       $fullEventHistory = events;
     });
   });
@@ -300,7 +301,6 @@
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $fullEventHistory = [];
-    $bufferVersion = 0;
     workflowError = null;
     fetchComplete = false;
     latestEventId = 0;

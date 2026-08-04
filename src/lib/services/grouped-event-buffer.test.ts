@@ -1000,7 +1000,7 @@ describe('concurrent live poll and bidirectional fetch', () => {
     expect(allIds.length).toBe(unique.size);
   });
 
-  it('only genuinely new events cause onNewEvents to fire', () => {
+  it('only genuinely new events report as added', () => {
     // When the bidirectional fetch has already loaded events 1-3,
     // a live-poll batch of [2 (dup), 3 (dup), 4 (new)] should count added=1.
     const group = makeActivityGroup(1); // eventIds 1, 2, 3
