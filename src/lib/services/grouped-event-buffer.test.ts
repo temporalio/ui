@@ -7,27 +7,13 @@ import {
   _debugEventSlots,
   _debugState,
   appendLiveEvent,
-  assignTrackIndices,
   enrichGroups,
-  getAscGroupCount,
-  getDescGroupCount,
   getEventArray,
   getGroupArray,
-  getGroupCount,
-  getGroupMeta,
-  getLatestEvent,
-  getLatestGroup,
-  getLiveGroupCount,
-  getRows,
-  getVisibleGroupCount,
   getWorkflowTaskFailedEvent,
   isWorkflowTaskGroup,
-  mergeHeads,
-  onLatestGroup,
   processEvent,
   reset,
-  resetLive,
-  setEstimatedGroupCount,
   setFailedEvent,
 } from './grouped-event-buffer';
 import {
@@ -60,11 +46,6 @@ function loadAll(events: ReturnType<typeof makeSyntheticEvents>) {
   for (const e of events) processEvent(e, true);
 }
 
-/** Flush all pending microtasks. */
-function tick() {
-  return Promise.resolve();
-}
-
 // ---------------------------------------------------------------------------
 // Setup / teardown
 // ---------------------------------------------------------------------------
@@ -89,7 +70,7 @@ describe('output equivalence with groupEvents', () => {
 
     const workflowEvents = toEventHistory(events);
     const expected = groupEvents(workflowEvents, 'ascending');
-    const actual = await Promise.all(getRows(0, getGroupCount()));
+    const actual = getGroupArray();
 
     expect(actual.map((g) => g.id)).toEqual(expected.map((g) => g.id));
     expect(actual.map((g) => g.eventList.length)).toEqual(
@@ -102,127 +83,32 @@ describe('output equivalence with groupEvents', () => {
     reset(30);
     loadAll(events);
 
-    const actual = await Promise.all(getRows(0, getGroupCount()));
+    const actual = getGroupArray();
     const wftGroups = actual.filter(isWorkflowTaskGroup);
     expect(wftGroups.length).toBeGreaterThan(0);
   });
 });
 
 // ---------------------------------------------------------------------------
-// 2. Loading & gap cases
+// 2. Follower / head arrival ordering
 // ---------------------------------------------------------------------------
 
-describe('loading and gap cases', () => {
-  it('already-loaded groups resolve synchronously (within one microtask tick)', async () => {
-    const events = makeSyntheticEvents(30);
-    reset(30);
-    loadAll(events);
-
-    let syncCount = 0;
-    const promises = getRows(0, getGroupCount());
-    promises.forEach((p) => p.then(() => syncCount++));
-    await tick();
-    expect(syncCount).toBe(getGroupCount());
-  });
-
-  it('pending promise resolves when the cursor writes the head event', async () => {
-    reset(10);
-    const [head] = makeActivityGroup(1);
-
-    const p = getRows(0, 1)[0];
-    let resolved = false;
-    p.then(() => {
-      resolved = true;
-    });
-
-    await tick();
-    expect(resolved).toBe(false);
-
-    processEvent(head, true);
-    await p;
-    expect(resolved).toBe(true);
-  });
-
-  it('requesting beyond current poolTop yields a promise that resolves later', async () => {
-    const events = makeSyntheticEvents(30);
-    reset(30);
-
-    const farPromise = getRows(5, 6)[0];
-    let didResolve = false;
-    farPromise.then(() => {
-      didResolve = true;
-    });
-
-    // Load only first 9 events — far group not reached yet
-    for (const e of events.slice(0, 9)) processEvent(e, true);
-    await tick();
-    expect(didResolve).toBe(false);
-
-    loadAll(events.slice(9));
-    await farPromise;
-    expect(didResolve).toBe(true);
-  });
-
-  it('concurrent getRows calls for the same unloaded group return the same Promise', () => {
-    reset(10);
-    const p1 = getRows(0, 1)[0];
-    const p2 = getRows(0, 1)[0];
-    expect(p1).toBe(p2);
-  });
-
-  it('desc-cursor follower before asc-cursor head: group resolves with both events', async () => {
+describe('follower before head', () => {
+  it('desc-cursor followers arriving before the asc-cursor head land in the group', () => {
     reset(10);
     const [head, started, completed] = makeActivityGroup(1);
 
     // Desc cursor delivers completed & started before head
     processEvent(completed, false);
     processEvent(started, false);
-    expect(getGroupCount()).toBe(0);
-
-    const p = getRows(0, 1)[0];
-    let resolved = false;
-    p.then(() => {
-      resolved = true;
-    });
-
-    await tick();
-    expect(resolved).toBe(false);
+    expect(getGroupArray()).toHaveLength(0);
 
     // Asc cursor delivers the head
     processEvent(head, true);
-    const group = await p;
 
-    expect(resolved).toBe(true);
-    expect(getGroupCount()).toBe(1);
-    expect(group.eventList.length).toBe(3);
-  });
-
-  it('middle rows in the gap resolve as the ascending cursor advances', async () => {
-    // 30 events → ~8 groups (mix of activities and timers + workflow started)
-    // Load first 3 events (1 group) and last 3 events (1 group)
-    const events = makeSyntheticEvents(30);
-    reset(30);
-
-    // Load asc: events 1-12 (4 groups worth)
-    for (const e of events.slice(0, 12)) processEvent(e, true);
-    // Load desc: events 27-30 (1 activity group, reverse)
-    for (const e of events.slice(26).reverse()) processEvent(e, false);
-
-    const totalAfterPartial = getGroupCount();
-    // Request a group in the gap (if any pending)
-    const gapPromise = getRows(totalAfterPartial, totalAfterPartial + 1)[0];
-    let gapResolved = false;
-    gapPromise.then(() => {
-      gapResolved = true;
-    });
-
-    await tick();
-    expect(gapResolved).toBe(false);
-
-    // Fill the rest ascending
-    for (const e of events.slice(12, 27)) processEvent(e, true);
-    await gapPromise;
-    expect(gapResolved).toBe(true);
+    const groups = getGroupArray();
+    expect(groups).toHaveLength(1);
+    expect(groups[0].eventList).toHaveLength(3);
   });
 });
 
@@ -231,12 +117,12 @@ describe('loading and gap cases', () => {
 // ---------------------------------------------------------------------------
 
 describe('non-terminal workflow: new events beyond initial historyLength', () => {
-  it('new events extend eventSlots and groupPool beyond initial allocation', async () => {
+  it('new events extend eventSlots and groupPool beyond initial allocation', () => {
     const initialEvents = makeSyntheticEvents(9); // 9 events → 3 groups
     reset(9);
     loadAll(initialEvents);
 
-    const initialGroupCount = getGroupCount();
+    const initialGroupCount = getGroupArray().length;
     expect(initialGroupCount).toBeGreaterThan(0);
 
     // New activity arrives at IDs 10-12
@@ -245,176 +131,50 @@ describe('non-terminal workflow: new events beyond initial historyLength', () =>
     processEvent(newStarted, true);
     processEvent(newCompleted, true);
 
-    expect(getGroupCount()).toBe(initialGroupCount + 1);
+    const groups = getGroupArray();
+    expect(groups).toHaveLength(initialGroupCount + 1);
 
-    const [newGroup] = await Promise.all(
-      getRows(initialGroupCount, initialGroupCount + 1),
-    );
+    const newGroup = groups.find((group) => group.id === '10');
     expect(newGroup).toBeDefined();
-    expect(newGroup.eventList.length).toBe(3);
-  });
-
-  it('getLatestEvent reflects the highest-ID event after each write', () => {
-    reset(10);
-    const events = makeSyntheticEvents(10);
-
-    for (let i = 0; i < events.length; i++) {
-      processEvent(events[i], true);
-      const latest = getLatestEvent();
-      expect(Number(latest?.eventId)).toBe(i + 1);
-    }
-  });
-
-  it('getLatestEvent is non-null immediately after desc cursor first page', () => {
-    const events = makeSyntheticEvents(30);
-    reset(30);
-
-    // Desc cursor: deliver last 9 events first
-    for (const e of events.slice(21).reverse()) processEvent(e, false);
-
-    const latest = getLatestEvent();
-    expect(latest).not.toBeNull();
-    expect(Number(latest!.eventId)).toBe(30);
+    expect(newGroup?.eventList).toHaveLength(3);
   });
 });
 
 // ---------------------------------------------------------------------------
-// 4. Most recent result (reactive use case)
+// 4. Navigation reset
 // ---------------------------------------------------------------------------
-
-describe('getLatestGroup', () => {
-  it('returns null when no events have been processed', async () => {
-    reset(10);
-    const result = await getLatestGroup();
-    expect(result).toBeNull();
-  });
-
-  it('returns the last registered group after ascending load', async () => {
-    const events = makeSyntheticEvents(15);
-    reset(15);
-    loadAll(events);
-
-    const latest = await getLatestGroup();
-    expect(latest).not.toBeNull();
-    // The last group should have the highest head event ID
-    const all = await Promise.all(getRows(0, getGroupCount()));
-    const lastGroup = all[all.length - 1];
-    expect(latest!.id).toBe(lastGroup.id);
-  });
-
-  it('updates as new groups are added beyond initial fetch', async () => {
-    const events = makeSyntheticEvents(9);
-    reset(9);
-    loadAll(events);
-
-    const latestBefore = await getLatestGroup();
-
-    // New event arrives
-    const [newHead, newStarted, newCompleted] = makeActivityGroup(10);
-    processEvent(newHead, true);
-    processEvent(newStarted, true);
-    processEvent(newCompleted, true);
-
-    const latestAfter = await getLatestGroup();
-    expect(Number(latestAfter!.id)).toBeGreaterThan(Number(latestBefore!.id));
-  });
-});
-
-describe('onLatestGroup', () => {
-  it('fires for each new group head registered', () => {
-    reset(30);
-    const updates: string[] = [];
-    const unsub = onLatestGroup((g) => updates.push(g.id));
-
-    const events = makeSyntheticEvents(30);
-    loadAll(events);
-
-    unsub();
-    expect(updates.length).toBeGreaterThan(0);
-    // The last notification should be for the highest-ID group
-    const lastNotifiedId = updates[updates.length - 1];
-    expect(Number(lastNotifiedId)).toBeGreaterThan(0);
-  });
-
-  it('unsubscribe stops future notifications', () => {
-    reset(30);
-    const updates: string[] = [];
-    const unsub = onLatestGroup((g) => updates.push(g.id));
-
-    const firstBatch = makeSyntheticEvents(9);
-    loadAll(firstBatch);
-    const countAfterFirst = updates.length;
-
-    unsub();
-
-    const [head] = makeActivityGroup(10);
-    processEvent(head, true);
-
-    expect(updates.length).toBe(countAfterFirst); // no new notifications
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 5. Navigation reset
-// ---------------------------------------------------------------------------
-
 describe('navigation reset', () => {
   it('reset() zeroes pool entries and reuses them for the next workflow', async () => {
     const events1 = makeSyntheticEvents(30);
     reset(30);
     loadAll(events1);
-    const firstGroupCount = getGroupCount();
+    const firstGroupCount = getGroupArray().length;
 
     reset(15);
     const events2 = makeSyntheticEvents(15);
     loadAll(events2);
 
     // Pool was re-used — no double allocation
-    expect(getGroupCount()).toBeLessThanOrEqual(firstGroupCount);
-    expect(getGroupCount()).toBeGreaterThan(0);
+    expect(getGroupArray().length).toBeLessThanOrEqual(firstGroupCount);
+    expect(getGroupArray().length).toBeGreaterThan(0);
   });
 
-  it('promises created before reset() do not resolve after reset', async () => {
+  it('groups from the previous workflow do not survive reset()', () => {
     reset(30);
-    const stalePromise = getRows(10, 11)[0]; // pending
-    let resolved = false;
-    stalePromise.then(() => {
-      resolved = true;
-    });
+    loadAll(makeSyntheticEvents(30));
+    expect(getGroupArray().length).toBeGreaterThan(0);
 
     reset(9); // navigate away
-    const events = makeSyntheticEvents(9);
-    loadAll(events);
+    expect(getGroupArray()).toHaveLength(0);
 
-    await tick();
-    expect(resolved).toBe(false); // stale promise is abandoned
+    loadAll(makeSyntheticEvents(9));
+    const ids = getGroupArray().map((group) => Number(group.id));
+    expect(Math.max(...ids)).toBeLessThanOrEqual(9);
   });
 });
 
 // ---------------------------------------------------------------------------
-// 6. Filtering
-// ---------------------------------------------------------------------------
-
-describe('getRows with excludeWorkflowTasks', () => {
-  it('filters out WorkflowTask groups from the slice', async () => {
-    const events = makeSyntheticEventsWithWorkflowTasks(30);
-    reset(30);
-    loadAll(events);
-
-    const all = await Promise.all(getRows(0, getGroupCount()));
-    const filtered = (
-      await Promise.all(
-        getRows(0, getGroupCount(), { excludeWorkflowTasks: true }),
-      )
-    ).filter(Boolean);
-
-    expect(filtered.length).toBeLessThan(all.length);
-    expect(filtered.every((g) => !isWorkflowTaskGroup(g))).toBe(true);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Compact view regression: WFT groups must not appear in filtered output
+// 5. Compact view regression: WFT groups must not appear in filtered output
 //
 // Regression: workflow-history-layout called getGroupArray() without
 // excludeWorkflowTasks:true, leaking WFT groups into the Compact view.
@@ -449,7 +209,7 @@ describe('compact view: getGroupArray excludeWorkflowTasks regression', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 7. Boundary dedup (cursor overlap)
+// 6. Boundary dedup (cursor overlap)
 // ---------------------------------------------------------------------------
 
 describe('boundary dedup', () => {
@@ -460,7 +220,7 @@ describe('boundary dedup', () => {
     processEvent(head, true); // asc cursor
     processEvent(head, false); // desc cursor — same event, same slot
 
-    expect(getGroupCount()).toBe(1);
+    expect(getGroupArray().length).toBe(1);
   });
 
   it('eventToGroup is set on first write and ignored on second', () => {
@@ -474,27 +234,27 @@ describe('boundary dedup', () => {
     // Simulate boundary overlap: desc cursor also writes the head
     processEvent(head, false);
 
-    expect(getGroupCount()).toBe(1);
+    expect(getGroupArray().length).toBe(1);
     // Group still has all 3 events — the duplicate write didn't corrupt it
     // (eventToGroup[0] !== 0 → guard fires → second head write skipped)
   });
 });
 
 // ---------------------------------------------------------------------------
-// 8. Solo event orphan cleanup
+// 7. Solo event orphan cleanup
 // ---------------------------------------------------------------------------
 
 describe('solo event orphan cleanup', () => {
   it('WorkflowExecutionStarted is not registered as a group', () => {
     reset(10);
     processEvent(makeWorkflowStarted(1), true);
-    expect(getGroupCount()).toBe(0);
+    expect(getGroupArray().length).toBe(0);
   });
 
   it('WorkflowExecutionCompleted is not registered as a group', () => {
     reset(10);
     processEvent(makeWorkflowCompleted(5), true);
-    expect(getGroupCount()).toBe(0);
+    expect(getGroupArray().length).toBe(0);
   });
 
   it('pendingFollowers is empty after solo head arrives for orphaned followers', () => {
@@ -511,51 +271,19 @@ describe('solo event orphan cleanup', () => {
     processEvent(makeWorkflowStarted(1), true);
 
     expect(_debugState().pendingFollowersSize).toBe(0); // orphan discarded
-    expect(getGroupCount()).toBe(0);
+    expect(getGroupArray().length).toBe(0);
   });
 });
 
 // ---------------------------------------------------------------------------
-// 9. mergeHeads ordering
-// ---------------------------------------------------------------------------
-
-describe('mergeHeads', () => {
-  it('merged result is sorted ascending by slot index', () => {
-    const events = makeSyntheticEvents(30);
-    reset(30);
-
-    // Asc: events 1-15
-    for (const e of events.slice(0, 15)) processEvent(e, true);
-    // Desc: events 16-30 in reverse
-    for (const e of events.slice(15).reverse()) processEvent(e, false);
-
-    const merged = mergeHeads();
-    for (let i = 1; i < merged.length; i++) {
-      expect(merged[i]).toBeGreaterThan(merged[i - 1]);
-    }
-  });
-
-  it('merged result contains no duplicate slot indices', () => {
-    const events = makeSyntheticEvents(30);
-    reset(30);
-    for (const e of events.slice(0, 15)) processEvent(e, true);
-    for (const e of events.slice(15).reverse()) processEvent(e, false);
-
-    const merged = mergeHeads();
-    const unique = new Set(merged);
-    expect(unique.size).toBe(merged.length);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 10. setFailedEvent (billableActions context)
+// 8. setFailedEvent (billableActions context)
 // ---------------------------------------------------------------------------
 
 describe('setFailedEvent', () => {
   it('can be set to null without error', () => {
     reset(10);
     setFailedEvent(null);
-    expect(getLatestEvent()).toBeNull();
+    expect(getGroupArray()).toHaveLength(0);
   });
 
   it('can be set to a HistoryEvent before processEvent calls', () => {
@@ -564,12 +292,12 @@ describe('setFailedEvent', () => {
     // Simulate desc first-page hook
     setFailedEvent(null);
     loadAll(events);
-    expect(getGroupCount()).toBeGreaterThan(0);
+    expect(getGroupArray().length).toBeGreaterThan(0);
   });
 });
 
 // ---------------------------------------------------------------------------
-// 11. Heap size smoke test (skipped unless NODE_OPTIONS=--expose-gc)
+// 9. Heap size smoke test (skipped unless NODE_OPTIONS=--expose-gc)
 // ---------------------------------------------------------------------------
 
 describe('memory overhead smoke test', () => {
@@ -582,7 +310,7 @@ describe('memory overhead smoke test', () => {
 
     reset(50_000);
     loadAll(events);
-    await Promise.all(getRows(0, getGroupCount()));
+    getGroupArray();
 
     globalThis.gc();
     const after = process.memoryUsage().heapUsed;
@@ -595,7 +323,7 @@ describe('memory overhead smoke test', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 12. Activity group integrity
+// 10. Activity group integrity
 // ---------------------------------------------------------------------------
 
 describe('activity group integrity', () => {
@@ -606,7 +334,7 @@ describe('activity group integrity', () => {
     processEvent(started, true);
     processEvent(completed, true);
 
-    const [group] = await Promise.all(getRows(0, 1));
+    const [group] = getGroupArray();
     expect(group.eventList.length).toBe(3);
     expect(group.id).toBe('1');
   });
@@ -621,7 +349,7 @@ describe('activity group integrity', () => {
     // Asc cursor delivers head
     processEvent(scheduled, true);
 
-    const [group] = await Promise.all(getRows(0, 1));
+    const [group] = getGroupArray();
     expect(group.eventList.length).toBe(3);
   });
 
@@ -638,7 +366,7 @@ describe('activity group integrity', () => {
     processEvent(completed, false); // desc cursor: Completed arrives before Started
     processEvent(started, false); // desc cursor: Started arrives last despite lower ID
 
-    const [group] = await Promise.all(getRows(0, 1));
+    const [group] = getGroupArray();
     expect(group.eventList.map((e) => e.id)).toEqual([
       String(scheduled.eventId),
       String(started.eventId),
@@ -656,7 +384,7 @@ describe('activity group integrity', () => {
       processEvent(e, true);
     }
 
-    const groups = await Promise.all(getRows(0, getGroupCount()));
+    const groups = getGroupArray();
     expect(groups[0].eventList.length).toBe(3); // activity
     expect(groups[1].eventList.length).toBe(3); // activity
     expect(groups[2].eventList.length).toBe(2); // timer
@@ -664,43 +392,10 @@ describe('activity group integrity', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 13. getGroupCount progression
 // ---------------------------------------------------------------------------
 
-describe('getGroupCount', () => {
-  it('increments as head events are processed', () => {
-    reset(30);
-    expect(getGroupCount()).toBe(0);
-
-    processEvent(makeActivityScheduled(1), true);
-    expect(getGroupCount()).toBe(1);
-
-    processEvent(makeActivityScheduled(4), true);
-    expect(getGroupCount()).toBe(2);
-  });
-
-  it('does not increment for follower events', () => {
-    reset(10);
-    processEvent(makeActivityScheduled(1), true);
-    expect(getGroupCount()).toBe(1);
-
-    processEvent(makeActivityStarted(2, 1), true);
-    expect(getGroupCount()).toBe(1); // still 1
-
-    processEvent(makeActivityCompleted(3, 1, 2), true);
-    expect(getGroupCount()).toBe(1); // still 1
-  });
-
-  it('does not increment for solo (non-group) events', () => {
-    reset(10);
-    processEvent(makeWorkflowStarted(1), true);
-    processEvent(makeWorkflowCompleted(2), true);
-    expect(getGroupCount()).toBe(0);
-  });
-});
-
 // ---------------------------------------------------------------------------
-// 14. enrichGroups — pending activity + nexus annotation
+// 11. enrichGroups — pending activity + nexus annotation
 // ---------------------------------------------------------------------------
 
 describe('enrichGroups', () => {
@@ -714,7 +409,7 @@ describe('enrichGroups', () => {
 
     enrichGroups(pendingActivities, []);
 
-    const [group] = await Promise.all(getRows(0, 1));
+    const [group] = getGroupArray();
     expect(group.pendingActivity).toBeDefined();
     expect(group.pendingActivity?.activityId).toBe('1');
   });
@@ -769,7 +464,7 @@ describe('enrichGroups', () => {
 
     enrichGroups(pendingActivities, []);
 
-    const [group] = await Promise.all(getRows(0, 1));
+    const [group] = getGroupArray();
     expect(group.pendingActivity).toBeUndefined();
   });
 
@@ -789,13 +484,12 @@ describe('enrichGroups', () => {
     // Second enrichment with empty array (activity completed server-side)
     enrichGroups([], []);
 
-    const [group] = await Promise.all(getRows(0, 1));
+    const [group] = getGroupArray();
     expect(group.pendingActivity).toBeUndefined();
   });
 
   it('clears pendingActivity when live completion extends an existing group', async () => {
     reset(10);
-    resetLive();
     const [scheduled, started, completed] = makeActivityGroup(1);
     processEvent(scheduled, true);
     processEvent(started, true);
@@ -811,13 +505,13 @@ describe('enrichGroups', () => {
       [],
     );
 
-    let [group] = await Promise.all(getRows(0, 1));
+    let [group] = getGroupArray();
     expect(group.pendingActivity).toBeDefined();
     expect(group.isPending).toBe(true);
 
     expect(appendLiveEvent(completed)).toBe(true);
 
-    [group] = await Promise.all(getRows(0, 1));
+    [group] = getGroupArray();
     expect(group.eventList).toHaveLength(3);
     expect(group.pendingActivity).toBeUndefined();
     expect(group.isPending).toBe(false);
@@ -825,7 +519,6 @@ describe('enrichGroups', () => {
 
   it('clears pendingActivity when a live timeout resolves a short activity group', async () => {
     reset(10);
-    resetLive();
     const [scheduled, timedOut] = makeActivityTimeoutGroup(1);
     processEvent(scheduled, true);
 
@@ -840,13 +533,13 @@ describe('enrichGroups', () => {
       [],
     );
 
-    let [group] = await Promise.all(getRows(0, 1));
+    let [group] = getGroupArray();
     expect(group.pendingActivity).toBeDefined();
     expect(group.isPending).toBe(true);
 
     expect(appendLiveEvent(timedOut)).toBe(true);
 
-    [group] = await Promise.all(getRows(0, 1));
+    [group] = getGroupArray();
     expect(group.eventList.map((event) => event.id)).toEqual(['1', '2']);
     expect(group.pendingActivity).toBeUndefined();
     expect(group.isPending).toBe(false);
@@ -854,7 +547,6 @@ describe('enrichGroups', () => {
 
   it('annotates live-only activity and nexus groups with pending metadata', () => {
     reset(20);
-    resetLive();
     appendLiveEvent(makeActivityScheduled(1, 'MyActivity'));
     appendLiveEvent(makeNexusOperationGroup(4)[0]);
 
@@ -887,7 +579,7 @@ describe('enrichGroups', () => {
     processEvent(makeActivityScheduled(1, 'MyActivity'), true);
     enrichGroups([], []);
 
-    const [group] = await Promise.all(getRows(0, 1));
+    const [group] = getGroupArray();
     expect(group.pendingActivity).toBeUndefined();
   });
 
@@ -904,13 +596,13 @@ describe('enrichGroups', () => {
       [],
     );
 
-    const [group] = await Promise.all(getRows(0, 1));
+    const [group] = getGroupArray();
     expect(group.pendingActivity).toBeUndefined();
   });
 });
 
 // ---------------------------------------------------------------------------
-// 15. getWorkflowTaskFailedEvent — derives active WFT failure from buffer
+// 12. getWorkflowTaskFailedEvent — derives active WFT failure from buffer
 // ---------------------------------------------------------------------------
 
 describe('getWorkflowTaskFailedEvent (buffer)', () => {
@@ -979,7 +671,6 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 
   it('returns a WFT failure whose group arrives entirely via the live poll', () => {
     reset(10);
-    resetLive();
     appendLiveEvent(makeWorkflowTaskScheduled(1));
     appendLiveEvent(makeWorkflowTaskStarted(2, 1));
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
@@ -993,7 +684,6 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 
   it('returns a live WFT failure appended to a WFT head already in the pool', () => {
     reset(10);
-    resetLive();
     processEvent(makeWorkflowTaskScheduled(1), true);
     processEvent(makeWorkflowTaskStarted(2, 1), true);
     expect(getWorkflowTaskFailedEvent()).toBeUndefined();
@@ -1007,7 +697,6 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 
   it('clears the WFT failure when a later WFT completes via the live poll', () => {
     reset(20);
-    resetLive();
     processEvent(makeWorkflowTaskScheduled(1), true);
     processEvent(makeWorkflowTaskStarted(2, 1), true);
     processEvent(makeWorkflowTaskFailed(3, 1), true);
@@ -1023,7 +712,6 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 
   it('does not double-count a live WFT group once the fetch claims its head', () => {
     reset(10);
-    resetLive();
     // Failure lands live first, then the bidirectional fetch reaches the head.
     appendLiveEvent(makeWorkflowTaskScheduled(1));
     appendLiveEvent(makeWorkflowTaskFailed(3, 1));
@@ -1036,7 +724,7 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 16. getGroupArray — synchronous sorted group access
+// 13. getGroupArray — synchronous sorted group access
 // ---------------------------------------------------------------------------
 
 describe('getGroupArray', () => {
@@ -1083,356 +771,12 @@ describe('getGroupArray', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Pixi rendering layer — track assignment & WFT filtering
-// ---------------------------------------------------------------------------
-
-/**
- * Simulates the renderer's `rebuildByTrack` logic (pure data, no Pixi).
- * Returns a sparse array indexed by trackIndex containing pool indices.
- */
-function simulateByTrack(): number[][] {
-  const byTrack: number[][] = [];
-  const count = getGroupCount();
-  for (let i = 0; i < count; i++) {
-    const meta = getGroupMeta(i);
-    if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK' || meta.trackIndex < 0)
-      continue;
-    (byTrack[meta.trackIndex] ??= []).push(i);
-  }
-  return byTrack;
-}
-
-describe('Pixi track assignment — WFT filtering', () => {
-  it('WFT groups receive trackIndex -1 and are excluded from visible count', () => {
-    const events = makeSyntheticEventsWithWorkflowTasks(25);
-    reset(25);
-    for (const e of events) processEvent(e, true);
-
-    let wftCount = 0;
-    let nonWftCount = 0;
-    for (let i = 0; i < getGroupCount(); i++) {
-      const meta = getGroupMeta(i);
-      if (!meta) continue;
-      if (meta.pixiType === 'GROUP_WORKFLOW_TASK') {
-        expect(meta.trackIndex).toBe(-1);
-        wftCount++;
-      } else {
-        expect(meta.trackIndex).toBeGreaterThanOrEqual(0);
-        nonWftCount++;
-      }
-    }
-    expect(wftCount).toBeGreaterThan(0);
-    expect(getVisibleGroupCount()).toBe(nonWftCount);
-    expect(getGroupCount()).toBe(wftCount + nonWftCount);
-  });
-
-  it('getVisibleGroupCount excludes WFT groups', () => {
-    reset(20);
-    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
-    for (const e of makeActivityGroup(4)) processEvent(e, true);
-    for (const e of makeWorkflowTaskGroup(7)) processEvent(e, true);
-
-    expect(getGroupCount()).toBe(3);
-    expect(getVisibleGroupCount()).toBe(1);
-  });
-
-  it('non-WFT desc groups fill tracks 0..n consecutively', () => {
-    reset(20);
-    for (const e of makeActivityGroup(1)) processEvent(e, false);
-    for (const e of makeActivityGroup(4)) processEvent(e, false);
-    for (const e of makeWorkflowTaskGroup(7)) processEvent(e, false);
-    for (const e of makeActivityGroup(10)) processEvent(e, false);
-
-    const tracks = [];
-    for (let i = 0; i < getGroupCount(); i++) {
-      const meta = getGroupMeta(i);
-      if (meta && meta.pixiType !== 'GROUP_WORKFLOW_TASK') {
-        tracks.push(meta.trackIndex);
-      }
-    }
-    tracks.sort((a, b) => a - b);
-    expect(tracks).toEqual([0, 1, 2]);
-  });
-
-  it('non-WFT asc groups fill from bottom of the estimated total', () => {
-    const EST = 10;
-    reset(20);
-    setEstimatedGroupCount(EST);
-    for (const e of makeActivityGroup(1)) processEvent(e, true);
-    for (const e of makeActivityGroup(4)) processEvent(e, true);
-
-    for (let i = 0; i < getGroupCount(); i++) {
-      const meta = getGroupMeta(i);
-      if (meta && meta.pixiType !== 'GROUP_WORKFLOW_TASK') {
-        expect(meta.trackIndex).toBeGreaterThanOrEqual(EST - 2);
-      }
-    }
-  });
-
-  it('after assignTrackIndices, visible tracks are contiguous with no holes', () => {
-    reset(30);
-    const events = makeSyntheticEventsWithWorkflowTasks(25);
-    // split: first half desc, second half asc
-    const half = Math.floor(events.length / 2);
-    for (const e of events.slice(0, half)) processEvent(e, false);
-    for (const e of events.slice(half)) processEvent(e, true);
-
-    assignTrackIndices();
-
-    const usedTracks = new Set<number>();
-    for (let i = 0; i < getGroupCount(); i++) {
-      const meta = getGroupMeta(i);
-      if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
-      expect(meta.trackIndex).toBeGreaterThanOrEqual(0);
-      usedTracks.add(meta.trackIndex);
-    }
-
-    const sorted = [...usedTracks].sort((a, b) => a - b);
-    const expected = Array.from({ length: sorted.length }, (_, k) => k);
-    expect(sorted).toEqual(expected);
-  });
-
-  it('desc groups always at top (lower indices), asc groups at bottom after assignTrackIndices', () => {
-    reset(20);
-    for (const e of makeActivityGroup(1)) processEvent(e, false);
-    for (const e of makeActivityGroup(4)) processEvent(e, false);
-    for (const e of makeActivityGroup(7)) processEvent(e, true);
-    for (const e of makeActivityGroup(10)) processEvent(e, true);
-
-    assignTrackIndices();
-
-    const descTracks: number[] = [];
-    const ascTracks: number[] = [];
-
-    for (let i = 0; i < getGroupCount(); i++) {
-      const meta = getGroupMeta(i);
-      if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
-    }
-
-    expect(getDescGroupCount()).toBe(2);
-    expect(getAscGroupCount()).toBe(2);
-
-    // desc groups: tracks 0 and 1
-    // asc groups: tracks 2 and 3 (total=4, so total-1-0=3, total-1-1=2)
-    for (let i = 0; i < getGroupCount(); i++) {
-      const meta = getGroupMeta(i);
-      if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
-    }
-
-    // Verify by inspecting raw counts
-    const total = getVisibleGroupCount();
-    expect(total).toBe(4);
-    // desc group 0 → track 0, desc group 1 → track 1
-    // asc group 0 → track 3, asc group 1 → track 2
-    let descSeen = 0;
-    let ascSeen = 0;
-    for (let i = 0; i < getGroupCount(); i++) {
-      const meta = getGroupMeta(i);
-      if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
-      if (descTracks.includes(meta.trackIndex)) descSeen++;
-      if (ascTracks.includes(meta.trackIndex)) ascSeen++;
-    }
-    // Both sections should not overlap
-    expect(new Set([...descTracks, ...ascTracks]).size).toBe(
-      descTracks.length + ascTracks.length,
-    );
-  });
-});
-
-// ---------------------------------------------------------------------------
 // Pixi rendering layer — loading gap / indicator state
 // ---------------------------------------------------------------------------
-
-describe('Pixi loading gap calculation', () => {
-  it('loading gap = 0 when all visible groups are loaded via one cursor', () => {
-    const events = makeSyntheticEvents(20);
-    reset(20);
-    for (const e of events) processEvent(e, true);
-    assignTrackIndices();
-
-    const descCount = getDescGroupCount();
-    const ascCount = getAscGroupCount();
-    const totalRows = getVisibleGroupCount();
-
-    // ascending-only load: all groups in ascGroupHeads, descGroupHeads empty
-    expect(descCount).toBe(0);
-    expect(ascCount).toBe(totalRows);
-
-    const loadingStart = descCount;
-    const loadingEnd = Math.max(descCount, totalRows - ascCount);
-    expect(loadingStart).toBe(loadingEnd); // no gap
-  });
-
-  it('loading gap exists while only desc cursor has loaded', () => {
-    const events = makeSyntheticEvents(12);
-    reset(12);
-    // Only process first 6 events descending
-    for (const e of events.slice(0, 6)) processEvent(e, false);
-
-    const descCount = getDescGroupCount();
-    const ascCount = getAscGroupCount();
-    const estimated = 6; // rough estimate of total visible
-    const totalRows = Math.max(estimated, getVisibleGroupCount());
-
-    const loadingStart = descCount;
-    const loadingEnd = Math.max(descCount, totalRows - ascCount);
-
-    expect(descCount).toBeGreaterThan(0);
-    expect(ascCount).toBe(0);
-    expect(loadingEnd).toBeGreaterThan(loadingStart); // gap present
-  });
-
-  it('loading gap closes when bidirectional cursors cover all tracks', () => {
-    const events = makeSyntheticEvents(20);
-    reset(20);
-
-    const half = Math.floor(events.length / 2);
-    for (const e of events.slice(0, half)) processEvent(e, false);
-    for (const e of events.slice(half)) processEvent(e, true);
-
-    assignTrackIndices();
-
-    const descCount = getDescGroupCount();
-    const ascCount = getAscGroupCount();
-    const totalRows = getVisibleGroupCount();
-
-    expect(descCount + ascCount).toBe(totalRows);
-    const loadingStart = descCount;
-    const loadingEnd = Math.max(descCount, totalRows - ascCount);
-    expect(loadingStart).toBe(loadingEnd);
-  });
-
-  it('poolCount never inflates totalRows for visible group purposes', () => {
-    // Load a mix of WFT and non-WFT; poolCount > getVisibleGroupCount()
-    reset(20);
-    const events = makeSyntheticEventsWithWorkflowTasks(19);
-    for (const e of events) processEvent(e, true);
-    assignTrackIndices();
-
-    const poolCount = getGroupCount();
-    const visibleCount = getVisibleGroupCount();
-
-    expect(poolCount).toBeGreaterThan(visibleCount);
-
-    // The loading gap calculation must use visibleCount, not poolCount
-    const descCount = getDescGroupCount();
-    const ascCount = getAscGroupCount();
-    const totalRowsCorrect = Math.max(visibleCount, visibleCount);
-    const totalRowsWrong = Math.max(visibleCount, poolCount);
-
-    const gapCorrect =
-      Math.max(descCount, totalRowsCorrect - ascCount) - descCount;
-    const gapWrong = Math.max(descCount, totalRowsWrong - ascCount) - descCount;
-
-    // Using poolCount would produce a spurious loading gap
-    expect(gapCorrect).toBe(0);
-    expect(gapWrong).toBeGreaterThan(0);
-  });
-});
 
 // ---------------------------------------------------------------------------
 // Pixi rendering layer — gutter event data (byTrack simulation)
 // ---------------------------------------------------------------------------
-
-describe('Pixi gutter event data (byTrack)', () => {
-  it('byTrack has one entry per visible group, no holes', () => {
-    const events = makeSyntheticEvents(20);
-    reset(20);
-    for (const e of events) processEvent(e, true);
-    assignTrackIndices();
-
-    const byTrack = simulateByTrack();
-    const occupied = byTrack.filter(Boolean);
-
-    expect(occupied.length).toBe(getVisibleGroupCount());
-
-    // No holes: every index 0..visibleCount-1 should be present
-    const visibleCount = getVisibleGroupCount();
-    for (let t = 0; t < visibleCount; t++) {
-      expect(byTrack[t]).toBeDefined();
-    }
-  });
-
-  it('WFT groups are absent from byTrack', () => {
-    reset(25);
-    const events = makeSyntheticEventsWithWorkflowTasks(24);
-    for (const e of events) processEvent(e, true);
-    assignTrackIndices();
-
-    const byTrack = simulateByTrack();
-    for (const poolIdxs of byTrack) {
-      if (!poolIdxs) continue;
-      for (const idx of poolIdxs) {
-        const meta = getGroupMeta(idx);
-        expect(meta?.pixiType).not.toBe('GROUP_WORKFLOW_TASK');
-      }
-    }
-  });
-
-  it('tracks above viewport are identified as top gutter events', () => {
-    reset(20);
-    const events = makeSyntheticEvents(20);
-    for (const e of events) processEvent(e, true);
-    assignTrackIndices();
-
-    const byTrack = simulateByTrack();
-    const visibleCount = getVisibleGroupCount();
-
-    // Simulate viewport showing only tracks 3..6
-    const firstVisible = 3;
-    const lastVisible = 6;
-
-    const above = byTrack.slice(0, firstVisible).filter(Boolean);
-    const below = byTrack.slice(lastVisible + 1, visibleCount).filter(Boolean);
-
-    expect(above.length).toBe(firstVisible); // tracks 0,1,2
-    expect(below.length).toBe(visibleCount - lastVisible - 1);
-
-    // All events in gutter regions have valid pool indices
-    for (const idxs of [...above, ...below]) {
-      for (const idx of idxs) {
-        const meta = getGroupMeta(idx);
-        expect(meta).not.toBeNull();
-        expect(meta?.trackIndex).toBeGreaterThanOrEqual(0);
-      }
-    }
-  });
-
-  it('top gutter events have smaller trackIndex than bottom gutter events', () => {
-    reset(20);
-    const events = makeSyntheticEvents(20);
-    for (const e of events) processEvent(e, true);
-    assignTrackIndices();
-
-    const byTrack = simulateByTrack();
-    const visibleCount = getVisibleGroupCount();
-    const midpoint = Math.floor(visibleCount / 2);
-
-    const topTracks = byTrack
-      .slice(0, midpoint)
-      .flatMap((t) => t ?? [])
-      .map((idx) => getGroupMeta(idx)!.trackIndex);
-    const bottomTracks = byTrack
-      .slice(midpoint)
-      .flatMap((t) => t ?? [])
-      .map((idx) => getGroupMeta(idx)!.trackIndex);
-
-    const maxTop = Math.max(...topTracks);
-    const minBottom = Math.min(...bottomTracks);
-    expect(maxTop).toBeLessThan(minBottom);
-  });
-
-  it('byTrack is empty after reset', () => {
-    reset(20);
-    const events = makeSyntheticEvents(20);
-    for (const e of events) processEvent(e, true);
-    assignTrackIndices();
-
-    reset(0);
-    const byTrack = simulateByTrack();
-    expect(byTrack.filter(Boolean).length).toBe(0);
-  });
-});
 
 // ---------------------------------------------------------------------------
 // Option C — eventSlots memory release
@@ -1495,25 +839,24 @@ describe('Option C — eventSlots are released after grouping', () => {
     expect(populated.length).toBe(0);
   });
 
-  it('getGroupCount is unaffected by eventSlots nulling', () => {
+  it('group count is unaffected by eventSlots nulling', () => {
     const events = makeSyntheticEvents(20);
     reset(20);
-    const before = getGroupCount();
+    const before = getGroupArray().length;
     for (const e of events) processEvent(e, true);
-    const after = getGroupCount();
+    const after = getGroupArray().length;
     // Groups still accumulate correctly regardless of slot nulling
     expect(after).toBeGreaterThan(before);
   });
 
-  it('getGroupMeta still returns correct data after eventSlots are released', () => {
+  it('groups still expose their full event list after eventSlots are released', () => {
     const events = makeSyntheticEvents(10);
     reset(10);
     for (const e of events) processEvent(e, true);
 
-    for (let i = 0; i < getGroupCount(); i++) {
-      const meta = getGroupMeta(i);
-      expect(meta).not.toBeNull();
-      expect(meta!.startMs).toBeGreaterThan(0);
+    for (const group of getGroupArray()) {
+      expect(group.eventList.length).toBeGreaterThan(0);
+      expect(group.initialEvent).toBeDefined();
     }
   });
 });
@@ -1530,7 +873,6 @@ describe('Option C — eventSlots are released after grouping', () => {
 describe('appendLiveEvent boolean return', () => {
   beforeEach(() => {
     reset(10);
-    resetLive();
   });
 
   it('returns true for a genuinely new live event', () => {
@@ -1571,7 +913,6 @@ describe('appendLiveEvent boolean return', () => {
     const existing = makeActivityGroup(1); // eventIds 1, 2, 3
     reset(6);
     for (const e of existing) processEvent(e, true);
-    resetLive();
 
     const newEv = makeActivityScheduled(4);
     const results = [...existing, newEv].map((e) => appendLiveEvent(e));
@@ -1596,7 +937,6 @@ describe('appendLiveEvent boolean return', () => {
 describe('concurrent live poll and bidirectional fetch', () => {
   beforeEach(() => {
     reset(10);
-    resetLive();
   });
 
   it('events only in live poll (genuinely new) appear in getEventArray()', () => {
@@ -1646,7 +986,6 @@ describe('concurrent live poll and bidirectional fetch', () => {
     (_, buildGroup) => {
       const group = buildGroup();
       reset(10);
-      resetLive();
 
       for (const ev of group) appendLiveEvent(ev);
       expect(getGroupArray()).toHaveLength(1);
@@ -1660,7 +999,6 @@ describe('concurrent live poll and bidirectional fetch', () => {
       expect(groups[0].eventList.map((event) => event.id)).toEqual(
         group.map((event) => event.eventId),
       );
-      expect(getLiveGroupCount()).toBe(0);
     },
   );
 
@@ -1676,7 +1014,6 @@ describe('concurrent live poll and bidirectional fetch', () => {
     (_, buildGroup) => {
       const group = buildGroup();
       reset(10);
-      resetLive();
 
       for (const ev of group.slice(1)) appendLiveEvent(ev);
       expect(getGroupArray()).toHaveLength(0);
@@ -1704,7 +1041,6 @@ describe('concurrent live poll and bidirectional fetch', () => {
     (_, buildGroup) => {
       const group = buildGroup();
       reset(10);
-      resetLive();
 
       processEvent(group[0], true);
       for (const ev of group.slice(1)) appendLiveEvent(ev);
@@ -1720,7 +1056,6 @@ describe('concurrent live poll and bidirectional fetch', () => {
 
   it('does not duplicate a far-ahead live follower when history later processes it', () => {
     reset(5);
-    resetLive();
     const scheduled = makeActivityScheduled(1);
     const started = makeActivityStarted(100, 1);
 
@@ -1743,7 +1078,6 @@ describe('concurrent live poll and bidirectional fetch', () => {
     for (const ev of existing) processEvent(ev, true);
 
     const newEv = makeActivityScheduled(7);
-    resetLive();
     appendLiveEvent(newEv);
 
     const ids = getEventArray().map((e) => e.id);
@@ -1776,7 +1110,6 @@ describe('concurrent live poll and bidirectional fetch', () => {
     const group = makeActivityGroup(1); // eventIds 1, 2, 3
     reset(5);
     for (const ev of group) processEvent(ev, true);
-    resetLive();
 
     const results = [
       appendLiveEvent(group[0]), // eventId 1 → duplicate → false
@@ -1807,7 +1140,6 @@ describe('concurrent live poll and bidirectional fetch', () => {
 describe('appendLiveEvent — livePendingFollowers (unified bidirectional pattern)', () => {
   beforeEach(() => {
     reset(10);
-    resetLive();
   });
 
   it('follower before head: nothing visible in getGroupArray until head arrives', () => {

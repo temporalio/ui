@@ -35,18 +35,11 @@ import {
 type GroupMeta = {
   headSlotIdx: number;
   group: EventGroup | null;
-  startMs: number;
-  endMs: number;
-  trackIndex: number;
-  pixiType: string;
-  pixiStatus: string;
 };
 
-export type GetRowsOptions = {
+export type GroupArrayOptions = {
   excludeWorkflowTasks?: boolean;
 };
-
-export type LatestGroupListener = (group: EventGroup) => void;
 
 // ---------------------------------------------------------------------------
 // Module state (reset between workflows via reset())
@@ -57,20 +50,9 @@ let eventToGroup = new Int32Array(0);
 const groupPool: GroupMeta[] = [];
 let poolTop = 0;
 
-const ascGroupHeads: number[] = [];
-const descGroupHeads: number[] = [];
-
-// Used during streaming to assign track indices in the final bidirectional layout
-// (desc events at top, asc events at bottom, loading gap in between).
-let estimatedTotalGroups = 0;
 const pendingFollowers = new Map<number, number[]>();
-const pendingResolvers = new Map<number, ((g: EventGroup) => void)[]>();
-const activePromises = new Map<number, Promise<EventGroup>>();
 
 let failedEvent: HistoryEvent | null = null;
-let latestEventSlotIdx = -1;
-let latestEventRef: HistoryEvent | null = null;
-const latestGroupListeners: LatestGroupListener[] = [];
 
 // Followers from the live poll whose head event has not yet been processed by
 // either appendLiveEvent or processEvent. Keyed by head event id string.
@@ -105,7 +87,6 @@ const soloEventIds = new Set<string>();
 // ---------------------------------------------------------------------------
 
 const liveGroups: EventGroup[] = [];
-const liveGroupListeners: LatestGroupListener[] = [];
 // Tracks event IDs already seen by appendLiveEvent to prevent duplicates when
 // live polling re-sends events that overlap with the initial fetch or prior polls.
 const liveSeenIds = new Set<string>();
@@ -118,94 +99,12 @@ function makeGroupMeta(): GroupMeta {
   return {
     headSlotIdx: -1,
     group: null,
-    startMs: 0,
-    endMs: 0,
-    trackIndex: -1,
-    pixiType: '',
-    pixiStatus: '',
   };
 }
 
-function resetMeta(m: GroupMeta): void {
-  m.headSlotIdx = -1;
-  m.group = null;
-  m.startMs = 0;
-  m.endMs = 0;
-  m.trackIndex = -1;
-  m.pixiType = '';
-  m.pixiStatus = '';
-}
-
-function toMs(t: unknown): number {
-  if (!t) return 0;
-  if (typeof t === 'number') return t;
-  if (t instanceof Date) return t.getTime();
-  if (typeof t === 'object') {
-    const obj = t as Record<string, unknown>;
-    if ('seconds' in obj) {
-      return (
-        Number(obj.seconds ?? 0) * 1000 + Number(obj.nanos ?? 0) / 1_000_000
-      );
-    }
-  }
-  return new Date(t as string).getTime();
-}
-
-function pascalToEventType(name: string): string {
-  return (
-    'EVENT_TYPE_' +
-    name
-      .replace(/([A-Z])/g, '_$1')
-      .toUpperCase()
-      .replace(/^_/, '')
-  );
-}
-
-function groupToPixiType(group: EventGroup): string {
-  switch (group.category) {
-    case 'activity':
-    case 'local-activity':
-      return 'GROUP_ACTIVITY';
-    case 'child-workflow':
-      return 'GROUP_CHILD_WORKFLOW';
-    case 'timer':
-      return 'GROUP_TIMER';
-    default:
-      break;
-  }
-  if (group.initialEvent.eventType === 'WorkflowTaskScheduled') {
-    return 'GROUP_WORKFLOW_TASK';
-  }
-  return pascalToEventType(group.initialEvent.eventType);
-}
-
-function groupToPixiStatus(group: EventGroup): string {
-  if (group.isTerminated) return 'failed';
-  if (group.isFailureOrTimedOut) return 'failed';
-  if (group.isCanceled) return 'canceled';
-  if (group.isPending) return 'started';
-  const c = group.finalClassification ?? group.classification;
-  switch (c) {
-    case 'Completed':
-      return 'completed';
-    case 'Fired':
-      return 'fired';
-    case 'Signaled':
-      return 'signaled';
-    case 'Failed':
-    case 'TimedOut':
-    case 'Terminated':
-      return 'failed';
-    case 'Canceled':
-    case 'CancelRequested':
-      return 'canceled';
-    case 'Started':
-    case 'Open':
-    case 'Running':
-      return 'started';
-    default:
-      return 'scheduled';
-  }
+function resetMeta(meta: GroupMeta): void {
+  meta.headSlotIdx = -1;
+  meta.group = null;
 }
 
 function shouldNotAddBillableAction(event: WorkflowEvent): boolean {
@@ -301,9 +200,6 @@ function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
 
   clearResolvedPendingState(meta.group);
 
-  const followerMs = toMs(event.eventTime);
-  if (followerMs > meta.endMs) meta.endMs = followerMs;
-
   invalidateGroupArrayCaches();
   eventSlots[followerSlotIdx] = null;
 }
@@ -323,8 +219,7 @@ function attachFollower(headSlotIdx: number, followerSlotIdx: number): void {
 }
 
 function absorbLiveGroupIntoPool(poolIdx: number, liveGroup: EventGroup): void {
-  const meta = groupPool[poolIdx];
-  const group = meta.group;
+  const group = groupPool[poolIdx].group;
   if (!group) return;
 
   for (const event of liveGroup.eventList) {
@@ -337,8 +232,6 @@ function absorbLiveGroupIntoPool(poolIdx: number, liveGroup: EventGroup): void {
     group.timestamp = event.timestamp;
     addEventToGroup(group, event);
     eventToGroup[slotIdx] = poolIdx + 1;
-    const eventMs = toMs(event.eventTime);
-    if (eventMs > meta.endMs) meta.endMs = eventMs;
   }
 
   clearResolvedPendingState(group);
@@ -383,12 +276,6 @@ function enrichGroup(
   return group;
 }
 
-function notifyLatestGroupListeners(group: EventGroup): void {
-  for (const cb of latestGroupListeners) {
-    cb(group);
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -408,18 +295,10 @@ export function reset(historyLength: number): void {
   for (let i = 0; i < poolTop; i++) resetMeta(groupPool[i]);
 
   poolTop = 0;
-  ascGroupHeads.length = 0;
-  descGroupHeads.length = 0;
   pendingFollowers.clear();
-  pendingResolvers.clear();
-  activePromises.clear();
   processedWorkflowTaskIds.clear();
   failedEvent = null;
-  latestEventSlotIdx = -1;
-  latestEventRef = null;
-  latestGroupListeners.length = 0;
   liveGroups.length = 0;
-  liveGroupListeners.length = 0;
   soloEvents.length = 0;
   soloEventIds.clear();
   liveSeenIds.clear();
@@ -431,15 +310,6 @@ export function reset(historyLength: number): void {
   _cachedGroupsNoWFT = null;
   _cachedPoolTopNoWFT = -1;
   _cachedLiveVersionNoWFT = -1;
-}
-
-/**
- * Set the estimated total group count so streaming track indices use the
- * correct bidirectional layout (desc at top, asc at bottom).
- * Call this before starting fetchBidirectional, after reset().
- */
-export function setEstimatedGroupCount(n: number): void {
-  estimatedTotalGroups = n;
 }
 
 /**
@@ -464,11 +334,6 @@ export function processEvent(
   growArraysFor(slotIdx);
 
   eventSlots[slotIdx] = raw;
-
-  if (slotIdx > latestEventSlotIdx) {
-    latestEventSlotIdx = slotIdx;
-    latestEventRef = raw;
-  }
 
   const event = toWorkflowEvent(raw, isAscending);
   const gid = getGroupId(event as CommonHistoryEvent);
@@ -512,32 +377,7 @@ export function processEvent(
   meta.headSlotIdx = slotIdx;
   meta.group = group;
 
-  const startMs = toMs(event.eventTime);
-  meta.startMs = startMs;
-  meta.endMs = startMs;
-  meta.trackIndex = poolIdx;
-  meta.pixiType = groupToPixiType(group);
-  meta.pixiStatus = groupToPixiStatus(group);
-
   eventToGroup[slotIdx] = poolIdx + 1;
-
-  if (meta.pixiType === 'GROUP_WORKFLOW_TASK') {
-    // WFT groups are tracked in the pool but not rendered; skip track assignment.
-    meta.trackIndex = -1;
-  } else if (isAscending) {
-    ascGroupHeads.push(slotIdx);
-    // Fill from bottom: first asc group (oldest) → row (estimated - 1), etc.
-    const estTotal =
-      estimatedTotalGroups > 0 ? estimatedTotalGroups : poolTop + 64;
-    meta.trackIndex = Math.max(
-      descGroupHeads.length,
-      estTotal - ascGroupHeads.length,
-    );
-  } else {
-    descGroupHeads.push(slotIdx);
-    // Fill from top: first desc group (newest) → row 0.
-    meta.trackIndex = descGroupHeads.length - 1;
-  }
 
   // Flush any followers that arrived before this head via the bidirectional fetch.
   // attachFollowerToPool nulls each follower slot after processing.
@@ -564,8 +404,6 @@ export function processEvent(
       group.timestamp = follower.timestamp;
       addEventToGroup(group, follower);
       eventToGroup[followerSlotIdx] = poolIdx + 1;
-      const followerMs = toMs(follower.eventTime);
-      if (followerMs > meta.endMs) meta.endMs = followerMs;
     }
     clearResolvedPendingState(group);
     livePendingFollowers.delete(event.id);
@@ -582,111 +420,7 @@ export function processEvent(
   // Release the head slot — its data is now encoded in the EventGroup.
   eventSlots[slotIdx] = null;
 
-  // Resolve any pending getRows() promises for this group
-  const resolvers = pendingResolvers.get(poolIdx);
-  if (resolvers) {
-    for (const resolve of resolvers) resolve(group);
-    pendingResolvers.delete(poolIdx);
-    activePromises.delete(poolIdx);
-  }
-
-  notifyLatestGroupListeners(group);
   return group;
-}
-
-/**
- * Call after both cursors complete to merge the two head lists into the
- * canonical ascending-order group list. Returns the merged array.
- * The internal ascGroupHeads and descGroupHeads are cleared.
- */
-export function mergeHeads(): number[] {
-  const merged = [...ascGroupHeads, ...descGroupHeads.reverse()];
-  ascGroupHeads.length = 0;
-  descGroupHeads.length = 0;
-  return merged;
-}
-
-/** Total number of groups registered so far. */
-export function getGroupCount(): number {
-  return poolTop;
-}
-
-/**
- * Request a slice of EventGroup promises by group index range [start, end).
- * - Already-loaded groups → Promise.resolve(group)
- * - Not-yet-loaded groups → pending Promise that resolves when the cursor
- *   writes the head event for that group index
- * - opts.excludeWorkflowTasks: filter WorkflowTask groups from the slice
- */
-export function getRows(
-  start: number,
-  end: number,
-  opts?: GetRowsOptions,
-): Promise<EventGroup>[] {
-  const result: Promise<EventGroup>[] = [];
-  for (let i = start; i < end; i++) {
-    result.push(getGroupPromise(i, opts));
-  }
-  return result;
-}
-
-function getGroupPromise(
-  poolIdx: number,
-  opts?: GetRowsOptions,
-): Promise<EventGroup> {
-  if (poolIdx < poolTop) {
-    const meta = groupPool[poolIdx];
-    if (meta.group) {
-      const group = meta.group;
-      if (opts?.excludeWorkflowTasks && isWorkflowTaskGroup(group)) {
-        return Promise.resolve(null as unknown as EventGroup);
-      }
-      return Promise.resolve(group);
-    }
-  }
-
-  // Return existing pending promise for this index if one already exists
-  const existing = activePromises.get(poolIdx);
-  if (existing) return existing;
-
-  const promise = new Promise<EventGroup>((resolve) => {
-    const list = pendingResolvers.get(poolIdx);
-    if (list) {
-      list.push(resolve);
-    } else {
-      pendingResolvers.set(poolIdx, [resolve]);
-    }
-  });
-  activePromises.set(poolIdx, promise);
-  return promise;
-}
-
-/** The raw HistoryEvent with the highest eventId seen so far. O(1). */
-export function getLatestEvent(): HistoryEvent | null {
-  return latestEventRef;
-}
-
-/**
- * The EventGroup whose head has the highest eventId seen so far.
- * Resolves immediately if the group is already registered, otherwise
- * waits until the next group head is written.
- */
-export function getLatestGroup(): Promise<EventGroup | null> {
-  if (poolTop === 0) return Promise.resolve(null);
-  return getGroupPromise(poolTop - 1);
-}
-
-/**
- * Subscribe to new group registrations at the tail (highest eventId end).
- * Fires once per new group head written by either cursor.
- * Returns an unsubscribe function.
- */
-export function onLatestGroup(cb: LatestGroupListener): () => void {
-  latestGroupListeners.push(cb);
-  return () => {
-    const idx = latestGroupListeners.indexOf(cb);
-    if (idx !== -1) latestGroupListeners.splice(idx, 1);
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -800,7 +534,7 @@ export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
  * Both variants (all groups and WFT-excluded) are independently cached so
  * the timeline can call with excludeWorkflowTasks:true on the hot path.
  */
-export function getGroupArray(opts?: GetRowsOptions): EventGroup[] {
+export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
   const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
   if (excludeWFT) {
     if (
@@ -861,74 +595,11 @@ export function getGroupArray(opts?: GetRowsOptions): EventGroup[] {
   return result;
 }
 
-/**
- * Direct read-only access to a pool entry's rendering metadata.
- * Returns null if poolIdx is out of range or the group is not yet registered.
- */
-export function getGroupMeta(poolIdx: number): GroupMeta | null {
-  if (poolIdx < 0 || poolIdx >= poolTop) return null;
-  return groupPool[poolIdx];
-}
-
-/** Number of groups loaded by the ascending cursor. */
-export function getAscGroupCount(): number {
-  return ascGroupHeads.length;
-}
-
-/** Number of groups loaded by the descending cursor. */
-export function getDescGroupCount(): number {
-  return descGroupHeads.length;
-}
-
-/**
- * Finalize track indices after the full fetch completes.
- *
- * Layout (top → bottom):
- *   rows 0 .. descCount-1      – descending cursor groups, newest first (row 0)
- *   rows descCount .. total-ascCount-1  – (would be loading gap during streaming)
- *   rows total-ascCount .. total-1 – ascending cursor groups, oldest last (bottom)
- *
- * Also updates pixiStatus now that final classification is known.
- */
-export function assignTrackIndices(): void {
-  // Only non-WFT groups are in the head lists, so this total is the visible track count.
-  const total = descGroupHeads.length + ascGroupHeads.length;
-
-  // Descending groups arrive newest-first, so descGroupHeads[0] = newest event.
-  for (let i = 0; i < descGroupHeads.length; i++) {
-    const poolIdx = eventToGroup[descGroupHeads[i]] - 1;
-    if (poolIdx < 0) continue;
-    const meta = groupPool[poolIdx];
-    meta.trackIndex = i;
-    if (meta.group) meta.pixiStatus = groupToPixiStatus(meta.group);
-  }
-
-  // Ascending groups arrive oldest-first (ascGroupHeads[0] = event 1).
-  // Place them with the oldest at the very bottom and the frontier (newest asc event)
-  // adjacent to the loading gap, so the gap visually shrinks from both sides as data loads.
-  for (let i = 0; i < ascGroupHeads.length; i++) {
-    const poolIdx = eventToGroup[ascGroupHeads[i]] - 1;
-    if (poolIdx < 0) continue;
-    const meta = groupPool[poolIdx];
-    meta.trackIndex = total - 1 - i;
-    if (meta.group) meta.pixiStatus = groupToPixiStatus(meta.group);
-  }
-}
-
-/** Number of visible (non-WFT) groups registered so far. */
-export function getVisibleGroupCount(): number {
-  return descGroupHeads.length + ascGroupHeads.length;
-}
-
 /** Read-only view of internal state for assertions in tests. */
 export function _debugState() {
   return {
     poolTop,
-    ascGroupHeadsLength: ascGroupHeads.length,
-    descGroupHeadsLength: descGroupHeads.length,
     pendingFollowersSize: pendingFollowers.size,
-    pendingResolversSize: pendingResolvers.size,
-    latestEventSlotIdx,
   };
 }
 
@@ -1027,10 +698,6 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
         clearResolvedPendingState(meta.group);
         growArraysFor(slotIdx);
         eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
-        const followerMs = toMs(event.eventTime);
-        if (followerMs > meta.endMs) {
-          meta.endMs = followerMs;
-        }
         invalidateGroupArrayCaches();
       }
       return true;
@@ -1075,37 +742,5 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
   liveGroups.push(group);
   _liveVersion++;
   invalidateGroupArrayCaches();
-  for (const cb of liveGroupListeners) cb(group);
-  for (const cb of latestGroupListeners) cb(group);
   return true;
-}
-
-/** Number of live groups appended since the initial fetch completed. */
-export function getLiveGroupCount(): number {
-  return liveGroups.length;
-}
-
-/**
- * Subscribe to new live group registrations.
- * Returns an unsubscribe function.
- */
-export function onLiveGroup(cb: LatestGroupListener): () => void {
-  liveGroupListeners.push(cb);
-  return () => {
-    const idx = liveGroupListeners.indexOf(cb);
-    if (idx !== -1) liveGroupListeners.splice(idx, 1);
-  };
-}
-
-/** Clear liveGroups on reset so they don't carry over to the next workflow. */
-export function resetLive(): void {
-  liveGroups.length = 0;
-  liveGroupListeners.length = 0;
-  liveSeenIds.clear();
-  livePendingFollowers.clear();
-  _liveVersion = 0;
-  _cachedGroups = null;
-  _cachedGroupsNoWFT = null;
-  _cachedLiveVersion = -1;
-  _cachedLiveVersionNoWFT = -1;
 }
