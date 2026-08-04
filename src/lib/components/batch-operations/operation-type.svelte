@@ -1,10 +1,11 @@
 <script lang="ts">
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type {
-    BatchOperationActionType,
+  import { translate } from '$lib/i18n/translate';
+  import {
+    type BatchOperationActionType,
     BatchOperationExecutionType,
-    BatchOperationType,
+    type BatchOperationType,
   } from '$lib/types/batch';
   import { toBatchOperationTypeReadable } from '$lib/utilities/screaming-enums';
 
@@ -26,8 +27,9 @@
         rawOperationType.endsWith('_UNSPECIFIED')
       )
         return undefined;
-      if (/ACTIVITY/.test(rawOperationType)) return 'Activity';
-      return 'Workflow';
+      if (/ACTIVITY/.test(rawOperationType))
+        return BatchOperationExecutionType.Activity;
+      return BatchOperationExecutionType.Workflow;
     },
   );
 
@@ -58,8 +60,14 @@
     </Badge>
     {#if executionType}
       <span class="flex items-center gap-1">
-        <Icon name={executionType === 'Activity' ? 'activity' : 'workflow'} />
-        {executionType}
+        <Icon
+          name={executionType === BatchOperationExecutionType.Activity
+            ? 'activity'
+            : 'workflow'}
+        />
+        {executionType === BatchOperationExecutionType.Activity
+          ? translate('common.activities-plural', { count: 2 })
+          : translate('common.workflows-plural', { count: 2 })}
       </span>
     {/if}
   {:else}

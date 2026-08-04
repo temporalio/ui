@@ -11,7 +11,10 @@ export type BatchOperationActionType =
   | 'Delete'
   | 'Unspecified';
 
-export type BatchOperationExecutionType = 'Workflow' | 'Activity';
+export enum BatchOperationExecutionType {
+  Workflow = 'Workflow',
+  Activity = 'Activity',
+}
 
 export type BatchOperationState =
   | 'Running'
