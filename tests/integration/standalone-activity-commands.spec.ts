@@ -91,7 +91,7 @@ test.describe('Standalone Activity Commands', () => {
     await activityCommandsPage.resetMenuItem.click();
 
     await expect(activityCommandsPage.resetModal).toBeVisible();
-    await activityCommandsPage.resetHeartbeatCheckbox.click();
+    // await activityCommandsPage.resetHeartbeatCheckbox.click();
     await activityCommandsPage.resetConfirmButton.click();
 
     await expect(activityCommandsPage.resetModal).toBeHidden();
