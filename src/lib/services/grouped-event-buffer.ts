@@ -1007,6 +1007,10 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
       existing.timestamp = event.timestamp;
       addEventToGroup(existing, event);
       clearResolvedPendingState(existing);
+      // Swap in a fresh reference so reference-tracking timeline rows re-point
+      // and re-derive classification/color — the slot pool keys on group
+      // identity, so an in-place mutation alone won't re-render the bar.
+      liveGroups[liveGroups.indexOf(existing)] = cloneEventGroup(existing);
       _liveVersion++;
       invalidateGroupArrayCaches();
       return true;
@@ -1025,6 +1029,10 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
         meta.group.timestamp = event.timestamp;
         addEventToGroup(meta.group, event);
         clearResolvedPendingState(meta.group);
+        // Swap in a fresh reference so reference-tracking timeline rows re-point
+        // and re-derive classification/color — the slot pool keys on group
+        // identity, so an in-place mutation alone won't re-render the bar.
+        meta.group = cloneEventGroup(meta.group);
         growArraysFor(slotIdx);
         eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
         const followerMs = toMs(event.eventTime);
