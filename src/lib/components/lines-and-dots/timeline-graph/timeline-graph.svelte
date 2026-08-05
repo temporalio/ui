@@ -415,14 +415,9 @@
     return Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
   });
 
-  // Slot i%poolSize always holds group i (keyed by slot index below, so the DOM
-  // stays put; span capped at poolSize so slots never collide). Reuse the prior
-  // slot object when unchanged — a fresh object each pass would change the {#each}
-  // item and re-run the row derived for rows that didn't move.
-  //
-  // Compare version too: a lazy group's identity is stable for the whole run,
-  // so without it a group that gained an event would keep its slot object and
-  // the row would never re-read it.
+  // Reuse the prior slot object when nothing changed, or every row re-renders.
+  // Version counts as changed: a lazy group's identity is stable for the whole
+  // run, so identity alone would miss a group that gained an event.
   type Slot = {
     index: number;
     lazy: LazyGroup;
