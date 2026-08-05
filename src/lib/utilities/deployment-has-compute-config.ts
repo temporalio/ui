@@ -1,9 +1,10 @@
 import {
   type ComputeConfig,
+  type DescribeWorkerDeployment,
   isVersionSummaryNew,
+  type ListWorkerDeployment,
   type RoutingConfig,
   type VersionSummary,
-  type WorkerDeploymentInfo,
   type WorkerDeploymentVersion,
 } from '$lib/types/deployments';
 
@@ -51,17 +52,19 @@ const activeVersionComputeConfigs = (
     );
 
 export const deploymentHasComputeConfig = (
-  deployment?: WorkerDeploymentInfo,
+  deployment?: ListWorkerDeployment | DescribeWorkerDeployment,
 ): boolean => {
   if (!deployment) return false;
 
-  return [
-    deployment.computeConfig,
-    deployment.currentVersionSummary?.computeConfig,
-    deployment.rampingVersionSummary?.computeConfig,
-    ...activeVersionComputeConfigs(
+  if ('versionSummaries' in deployment) {
+    return activeVersionComputeConfigs(
       deployment.versionSummaries,
       deployment.routingConfig,
-    ),
+    ).some(hasScalingGroups);
+  }
+
+  return [
+    deployment.currentVersionSummary?.computeConfig,
+    deployment.rampingVersionSummary?.computeConfig,
   ].some(hasScalingGroups);
 };
