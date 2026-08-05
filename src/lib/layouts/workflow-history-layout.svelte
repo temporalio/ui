@@ -19,9 +19,9 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import type { GroupSummary } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
@@ -65,7 +65,10 @@
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
 
-  const bufferGroups = $derived(eventBuffer.groupsWithoutWorkflowTasks);
+  // Summaries are enough to filter, sort and paginate; only the rendered page
+  // is materialized. The feed view still needs full groups for its gutter graph
+  // and event->group index, and reads them lazily via tableGroups below.
+  const bufferGroups = $derived(eventBuffer.summariesWithoutWorkflowTasks);
   const bufferEvents = $derived(eventBuffer.events);
   let updating = $derived(!historyCtx.fetchComplete);
 
@@ -119,8 +122,14 @@
       : reverseSort
         ? [...pendingNexusOperations, ...pendingActivities, ...history]
         : [...history, ...pendingActivities, ...pendingNexusOperations]) as
-      | EventGroups
+      | GroupSummary[]
       | IterableEventWithPending[],
+  );
+
+  // Read only in the feed view, so the compact view never materializes the
+  // whole history.
+  const tableGroups = $derived(
+    compact ? groups : eventBuffer.groupsWithoutWorkflowTasks,
   );
 
   $effect(() => {
@@ -259,7 +268,7 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {items} {groups} {compact} />
+        <EventSummaryTable {updating} {items} groups={tableGroups} {compact} />
       </div>
     {/if}
   </div>

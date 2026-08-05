@@ -7,8 +7,16 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import { buildGroupIndex, isEventGroup } from '$lib/models/event-groups';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
+  import {
+    type GroupSummary,
+    isGroupSummary,
+    materializeGroup,
+  } from '$lib/services/grouped-event-buffer';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
@@ -17,7 +25,10 @@
     IterableEventWithPending,
     WorkflowEventWithPending,
   } from '$lib/types/events';
-  import { getFailedOrPendingEvents } from '$lib/utilities/get-failed-or-pending';
+  import {
+    getFailedOrPendingEvents,
+    getFailedOrPendingGroups,
+  } from '$lib/utilities/get-failed-or-pending';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -40,8 +51,12 @@
     minimized = true,
     hoveredEventId = $bindable(undefined),
   }: {
-    items: IterableEventWithPending[];
-    groups?: EventGroups;
+    items: IterableEventWithPending[] | GroupSummary[];
+    /**
+     * Only read in the feed view, for the gutter graph and the event->group
+     * index; the compact view resolves each rendered row's group itself.
+     */
+    groups?: EventGroups | GroupSummary[];
     updating?: boolean;
     loading?: boolean;
     compact?: boolean;
@@ -51,15 +66,31 @@
 
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
-  const groupIndex = $derived(buildGroupIndex(groups));
+  // Feed view only: the compact view is handed summaries and never renders the
+  // rows that need this index.
+  const groupIndex = $derived(
+    compact
+      ? new Map<string, EventGroup>()
+      : buildGroupIndex(groups as EventGroups),
+  );
   const url = $derived(page.url);
   const perPageParam = $derived(url.searchParams.get(perPageKey) ?? '100');
   const currentPageParam = $derived(
     url.searchParams.get(currentPageKey) || '1',
   );
 
-  const filteredForStatus = (items: IterableEventWithPending[]) =>
-    getFailedOrPendingEvents(items, $eventStatusFilter);
+  // The compact view's items are all groups, so it filters with the group
+  // predicate — getFailedOrPendingEvents routes through isEventGroup, whose
+  // eventList check a summary can't satisfy.
+  const filteredForStatus = (
+    list: IterableEventWithPending[] | GroupSummary[],
+  ) =>
+    compact
+      ? getFailedOrPendingGroups(list as GroupSummary[], $eventStatusFilter)
+      : getFailedOrPendingEvents(
+          list as IterableEventWithPending[],
+          $eventStatusFilter,
+        );
 
   const paginatedHistory = (items: IterableEventWithPending[]) => {
     return filteredForStatus(items).slice(
@@ -76,7 +107,15 @@
     ...($isCloud ? [{ label: 'Billable Actions' }] : []),
   ]);
 
-  const iterableKey = (event: IterableEventWithPending) => {
+  // Matches against summaries or groups, materializing only the one found.
+  const findGroup = (
+    predicate: (group: EventGroup | GroupSummary) => boolean,
+  ) => {
+    const match = groups.find(predicate);
+    return match ? materializeGroup(match) : undefined;
+  };
+
+  const iterableKey = (event: IterableEventWithPending | GroupSummary) => {
     if (isPendingNexusOperation(event))
       return `pending-nexus-${event.scheduledEventId}`;
     if (isPendingActivity(event)) return `pending-activity-${event.id}`;
@@ -92,7 +131,10 @@
 <div class="flex">
   <div class="pt-9">
     {#if showGraph}
-      <HistoryGraph {groups} history={paginatedHistory(items)} />
+      <HistoryGraph
+        groups={groups as EventGroups}
+        history={paginatedHistory(items as IterableEventWithPending[])}
+      />
     {/if}
   </div>
   <Paginated
@@ -101,7 +143,7 @@
     previousPageButtonLabel={translate('common.previous-page')}
     pageButtonLabel={(page) => translate('common.go-to-page', { page })}
     {updating}
-    items={filteredForStatus(items)}
+    items={filteredForStatus(items) as IterableEventWithPending[]}
     maxHeight="none"
     class="border-t-0"
   >
@@ -117,7 +159,10 @@
       </TableHeaderRow>
     {/snippet}
     {#snippet rows({ visibleItems })}
-      {#each visibleItems as event, index (iterableKey(event))}
+      {#each visibleItems as item, index (iterableKey(item))}
+        {@const event = (
+          isGroupSummary(item) ? materializeGroup(item) : item
+        ) as IterableEventWithPending}
         {#if isEventGroup(event)}
           <EventSummaryRow
             bind:hoveredEventId
@@ -131,7 +176,7 @@
           <PendingActivitySummaryRow
             {event}
             {index}
-            group={groups.find(
+            group={findGroup(
               (g) =>
                 isPendingActivity(event) && g?.pendingActivity?.id === event.id,
             )}
@@ -140,7 +185,7 @@
           <PendingNexusSummaryRow
             {event}
             {index}
-            group={groups.find(
+            group={findGroup(
               (g) =>
                 isPendingNexusOperation(event) &&
                 g?.pendingNexusOperation?.scheduledEventId ===

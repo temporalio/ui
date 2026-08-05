@@ -74,6 +74,21 @@ export interface GroupSummary {
   readonly classification: WorkflowEvent['classification'];
   readonly finalClassification: WorkflowEvent['classification'];
   readonly isPending: boolean;
+  readonly pendingActivity: PendingActivity | undefined;
+  readonly pendingNexusOperation: PendingNexusOperation | undefined;
+}
+
+/**
+ * Distinguishes a summary from an already-materialized EventGroup or a plain
+ * event, for views handed a mix of the two.
+ */
+export function isGroupSummary(value: unknown): value is GroupSummary {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'eventCount' in value &&
+    !('eventList' in value)
+  );
 }
 
 /**
