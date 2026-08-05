@@ -126,10 +126,11 @@
       | IterableEventWithPending[],
   );
 
-  // Read only in the feed view, so the compact view never materializes the
-  // whole history.
+  // Feed view only. Compact `items` are groups themselves (above), so nothing
+  // there consults this — and not reading it keeps the compact view from
+  // materializing the whole history.
   const tableGroups = $derived(
-    compact ? lazyGroups : eventBuffer.groupsWithoutWorkflowTasks,
+    compact ? [] : eventBuffer.groupsWithoutWorkflowTasks,
   );
 
   $effect(() => {

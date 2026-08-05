@@ -1,4 +1,3 @@
-import { isEventGroup } from '$lib/models/event-groups';
 import {
   addEventToGroup,
   createEventGroup,
@@ -33,7 +32,6 @@ import {
   isNexusOperationFailedEvent,
   isNexusOperationScheduledEvent,
   isNexusOperationTimedOutEvent,
-  isWorkflowTaskScheduledEvent,
 } from '$lib/utilities/is-event-type';
 
 /**
@@ -87,12 +85,7 @@ export interface LazyGroup {
  * event, for views handed a mix of the two.
  */
 export function isLazyGroup(value: unknown): value is LazyGroup {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'eventCount' in value &&
-    !isEventGroup(value)
-  );
+  return value instanceof GroupRecord;
 }
 
 /**
@@ -115,37 +108,40 @@ class GroupRecord implements LazyGroup {
   cachedVersion = -1;
 
   /**
-   * Pure functions of a head event that never changes, and read once per group
-   * per filter pass — so stored rather than recomputed on each access.
+   * Assigned as events arrive rather than derived per read: `category` and `id`
+   * are read once per group per filter pass, and both event references would
+   * otherwise be a lookup into a nullable array on every access.
+   *
+   * Non-null from the moment the head lands, which is also when `headsGroup`
+   * becomes true — and only records heading a group are ever handed out.
    */
   readonly id: string;
+  initialEvent!: WorkflowEvent;
+  lastEvent!: WorkflowEvent;
   category: WorkflowEvent['category'] = 'workflow';
   headsGroup = false;
+  private lastSlot = -1;
 
   constructor(readonly headSlot: number) {
     this.id = String(headSlot + 1);
   }
 
-  /** Called once, when this record's head event is ingested. */
-  onHeadIngested(head: WorkflowEvent): void {
-    this.category = groupCategory(head);
-    this.headsGroup = isGroupHeadEvent(head as CommonHistoryEvent);
+  addMember(slot: number, event: WorkflowEvent): void {
+    this.slots.push(slot);
+    if (slot > this.lastSlot) {
+      this.lastSlot = slot;
+      this.lastEvent = event;
+    }
+    if (slot === this.headSlot) {
+      this.initialEvent = event;
+      this.category = groupCategory(event);
+      this.headsGroup = isGroupHeadEvent(event as CommonHistoryEvent);
+    }
+    this.version++;
   }
 
   get eventCount(): number {
     return this.slots.length;
-  }
-
-  get initialEvent(): WorkflowEvent {
-    return events[this.headSlot] as WorkflowEvent;
-  }
-
-  get lastEvent(): WorkflowEvent {
-    let latest = -1;
-    for (const slot of this.slots) {
-      if (slot > latest) latest = slot;
-    }
-    return events[latest] as WorkflowEvent;
   }
 
   get classification(): WorkflowEvent['classification'] {
@@ -386,10 +382,7 @@ export function ingestHistoryEvent(
   const headSlot = parsedHeadSlot >= 0 ? parsedHeadSlot : slot;
   grow(headSlot);
 
-  const record = recordFor(headSlot);
-  if (slot === headSlot) record.onHeadIngested(event);
-  record.slots.push(slot);
-  record.version++;
+  recordFor(headSlot).addMember(slot, event);
   revision++;
 
   notifyChanged();
@@ -530,8 +523,10 @@ export function getLazyGroups(opts?: GroupArrayOptions): LazyGroup[] {
  * groupEvents() in graph-widget) without branching at every use site.
  */
 export function materializeGroup(lazy: LazyGroup): EventGroup {
-  if (isEventGroup(lazy)) return lazy;
-  return materializeEventGroup(lazy as GroupRecord) as EventGroup;
+  if (lazy instanceof GroupRecord) {
+    return materializeEventGroup(lazy) as EventGroup;
+  }
+  return lazy as EventGroup;
 }
 
 /**

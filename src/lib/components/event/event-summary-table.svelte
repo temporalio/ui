@@ -7,10 +7,7 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import { buildGroupIndex, isEventGroup } from '$lib/models/event-groups';
-  import type {
-    EventGroup,
-    EventGroups,
-  } from '$lib/models/event-groups/event-groups';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import {
     isLazyGroup,
@@ -53,10 +50,10 @@
   }: {
     items: IterableEventWithPending[] | LazyGroup[];
     /**
-     * Feed view only — the gutter graph and the event->group index. The compact
-     * view materializes each rendered row itself.
+     * Feed view only — the gutter graph and the event->group index. Compact
+     * items are groups themselves, so that view passes none.
      */
-    groups?: EventGroups | LazyGroup[];
+    groups?: EventGroups;
     updating?: boolean;
     loading?: boolean;
     compact?: boolean;
@@ -66,12 +63,7 @@
 
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
-  // Feed view only: the compact view never renders the rows that need this.
-  const groupIndex = $derived(
-    compact
-      ? new Map<string, EventGroup>()
-      : buildGroupIndex(groups as EventGroups),
-  );
+  const groupIndex = $derived(buildGroupIndex(groups));
   const url = $derived(page.url);
   const perPageParam = $derived(url.searchParams.get(perPageKey) ?? '100');
   const currentPageParam = $derived(
@@ -104,12 +96,6 @@
     ...($isCloud ? [{ label: 'Billable Actions' }] : []),
   ]);
 
-  // Matches lazy groups or full groups, materializing only the one found.
-  const findGroup = (predicate: (group: EventGroup | LazyGroup) => boolean) => {
-    const match = groups.find(predicate);
-    return match ? materializeGroup(match) : undefined;
-  };
-
   const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
     if (isPendingNexusOperation(event))
       return `pending-nexus-${event.scheduledEventId}`;
@@ -127,7 +113,7 @@
   <div class="pt-9">
     {#if showGraph}
       <HistoryGraph
-        groups={groups as EventGroups}
+        {groups}
         history={paginatedHistory(items as IterableEventWithPending[])}
       />
     {/if}
@@ -171,7 +157,7 @@
           <PendingActivitySummaryRow
             {event}
             {index}
-            group={findGroup(
+            group={groups.find(
               (g) =>
                 isPendingActivity(event) && g?.pendingActivity?.id === event.id,
             )}
@@ -180,7 +166,7 @@
           <PendingNexusSummaryRow
             {event}
             {index}
-            group={findGroup(
+            group={groups.find(
               (g) =>
                 isPendingNexusOperation(event) &&
                 g?.pendingNexusOperation?.scheduledEventId ===
