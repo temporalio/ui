@@ -2,6 +2,8 @@ import {
   addEventToGroup,
   createEventGroup,
   createWorkflowTaskGroup,
+  groupCategory,
+  groupIsPending,
   isGroupHeadEvent,
 } from '$lib/models/event-groups/create-event-group';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
@@ -21,14 +23,11 @@ import {
   isActivityTaskFailedEvent,
   isActivityTaskScheduledEvent,
   isActivityTaskTimedOutEvent,
-  isLocalActivityMarkerEvent,
   isNexusOperationCanceledEvent,
   isNexusOperationCompletedEvent,
   isNexusOperationFailedEvent,
   isNexusOperationScheduledEvent,
   isNexusOperationTimedOutEvent,
-  isStartChildWorkflowExecutionInitiatedEvent,
-  isTimerStartedEvent,
   isWorkflowTaskScheduledEvent,
 } from '$lib/utilities/is-event-type';
 
@@ -77,6 +76,30 @@ export interface LazyGroup {
   readonly pendingActivity: PendingActivity | undefined;
   readonly pendingNexusOperation: PendingNexusOperation | undefined;
 }
+
+/**
+ * Which LazyGroup fields an EventGroup must agree on. Views filter and sort on
+ * one and render the other, so a divergence shows as the wrong rows on screen.
+ *
+ * The `satisfies` makes TypeScript reject a new field on LazyGroup until it is
+ * classified here, so the agreement test that consumes this cannot silently
+ * stop being exhaustive. It lives here rather than in the test because
+ * src/lib/services/**\/*.test.ts is excluded from `pnpm check`.
+ */
+export const SHARED_WITH_EVENT_GROUP = {
+  id: true,
+  eventCount: true,
+  initialEvent: true,
+  lastEvent: true,
+  category: true,
+  classification: true,
+  finalClassification: true,
+  isPending: true,
+  pendingActivity: true,
+  pendingNexusOperation: true,
+  // Buffer bookkeeping — an EventGroup has no counterpart.
+  version: false,
+} satisfies Record<keyof LazyGroup, boolean>;
 
 /**
  * Distinguishes a lazy group from an already-materialized EventGroup or a plain
@@ -133,8 +156,7 @@ class GroupRecord implements LazyGroup {
   }
 
   get category(): WorkflowEvent['category'] {
-    const head = this.initialEvent;
-    return isLocalActivityMarkerEvent(head) ? 'local-activity' : head.category;
+    return groupCategory(this.initialEvent);
   }
 
   get classification(): WorkflowEvent['classification'] {
@@ -146,13 +168,12 @@ class GroupRecord implements LazyGroup {
   }
 
   get isPending(): boolean {
-    if (this.pendingActivity || this.pendingNexusOperation) return true;
-    const head = this.initialEvent;
-    if (isTimerStartedEvent(head)) return this.slots.length === 1;
-    if (isStartChildWorkflowExecutionInitiatedEvent(head)) {
-      return this.slots.length === 2;
-    }
-    return false;
+    return groupIsPending(
+      this.initialEvent,
+      this.slots.length,
+      this.pendingActivity,
+      this.pendingNexusOperation,
+    );
   }
 }
 

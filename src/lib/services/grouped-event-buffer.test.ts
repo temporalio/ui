@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { groupEvents } from '$lib/models/event-groups';
+import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { toEventHistory } from '$lib/models/event-history';
 import type { HistoryEvent } from '$lib/types/events';
 
@@ -12,9 +13,11 @@ import {
   getWorkflowTaskFailedEvent,
   ingestHistoryEvent,
   isWorkflowTaskGroup,
+  type LazyGroup,
   materializeGroup,
   reset,
   setFailedEvent,
+  SHARED_WITH_EVENT_GROUP,
 } from './grouped-event-buffer';
 import {
   makeActivityGroup,
@@ -1287,6 +1290,10 @@ describe('arrival-order independence', () => {
 // divergence would silently filter one set and draw another.
 // ---------------------------------------------------------------------------
 
+const SHARED_FIELDS = Object.entries(SHARED_WITH_EVENT_GROUP)
+  .filter(([, shared]) => shared)
+  .map(([field]) => field) as (keyof LazyGroup & keyof EventGroup)[];
+
 describe('lazy and materialized group agreement', () => {
   const cases: [string, (start: number) => HistoryEvent[]][] = [
     ['activity', (start) => makeActivityGroup(start)],
@@ -1299,36 +1306,28 @@ describe('lazy and materialized group agreement', () => {
     ['local activity', (start) => makeLocalActivityGroup(start)],
   ];
 
-  it.each(cases)('agrees for a complete %s group', (_, build) => {
-    reset(20);
-    for (const event of build(1)) ingestHistoryEvent(event, true);
-
-    const [lazy] = getLazyGroups();
-    const group = materializeGroup(lazy);
-
-    expect(lazy.id).toBe(group.id);
-    expect(lazy.eventCount).toBe(group.eventList.length);
-    expect(lazy.initialEvent).toBe(group.initialEvent);
-    expect(lazy.lastEvent).toBe(group.lastEvent);
-    expect(lazy.category).toBe(group.category);
-    expect(lazy.classification).toBe(group.classification);
-    expect(lazy.finalClassification).toBe(group.finalClassification);
-    expect(lazy.isPending).toBe(group.isPending);
-  });
-
-  it.each(cases)('agrees for a partially loaded %s group', (_, build) => {
-    reset(20);
+  // Every prefix, not just the complete group: the fetch renders groups from
+  // their head onwards, so the partially loaded states are real.
+  it.each(cases)('agrees at every prefix of a %s group', (_, build) => {
     const events = build(1);
-    // Head only — the state in which pending groups are rendered.
-    ingestHistoryEvent(events[0], true);
 
-    const [lazy] = getLazyGroups();
-    const group = materializeGroup(lazy);
+    for (let count = 1; count <= events.length; count++) {
+      reset(20);
+      for (const event of events.slice(0, count)) {
+        ingestHistoryEvent(event, true);
+      }
 
-    expect(lazy.eventCount).toBe(group.eventList.length);
-    expect(lazy.lastEvent).toBe(group.lastEvent);
-    expect(lazy.finalClassification).toBe(group.finalClassification);
-    expect(lazy.isPending).toBe(group.isPending);
+      const [lazy] = getLazyGroups();
+      const group = materializeGroup(lazy);
+
+      for (const field of SHARED_FIELDS) {
+        expect(
+          lazy[field],
+          `${field} disagreed with ${count} of ${events.length} events loaded`,
+        ).toBe(group[field]);
+      }
+      expect(lazy.eventCount).toBe(count);
+    }
   });
 
   it('agrees on isPending once pending metadata is attached', () => {
