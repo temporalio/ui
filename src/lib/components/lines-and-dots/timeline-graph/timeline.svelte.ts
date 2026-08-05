@@ -16,7 +16,7 @@ const DEFAULT_DURATION_THRESHOLD_RATIO = 0.1;
 interface TimelineInit {
   getFullEventHistory: () => WorkflowEvents;
   getWorkflow: () => WorkflowExecution;
-  getEventGroups: () => GroupSummary[];
+  getGroupSummaries: () => GroupSummary[];
   getCurrentTimeMs: () => number;
   getDurationThresholdRatio?: () => number;
   getLoading?: () => boolean;
@@ -29,7 +29,7 @@ export class Timeline {
 
   private _getFullEventHistory: () => WorkflowEvents;
   private _getWorkflow: () => WorkflowExecution;
-  private _getEventGroups: () => GroupSummary[];
+  private _getGroupSummaries: () => GroupSummary[];
   private _getCurrentTimeMs: () => number;
   private _getDurationThresholdRatio: () => number;
   private _getLoading: () => boolean;
@@ -38,7 +38,7 @@ export class Timeline {
   constructor({
     getFullEventHistory,
     getWorkflow,
-    getEventGroups,
+    getGroupSummaries,
     getCurrentTimeMs,
     getDurationThresholdRatio,
     getLoading,
@@ -46,7 +46,7 @@ export class Timeline {
   }: TimelineInit) {
     this._getFullEventHistory = getFullEventHistory;
     this._getWorkflow = getWorkflow;
-    this._getEventGroups = getEventGroups;
+    this._getGroupSummaries = getGroupSummaries;
     this._getCurrentTimeMs = getCurrentTimeMs;
     this._getDurationThresholdRatio =
       getDurationThresholdRatio ?? (() => DEFAULT_DURATION_THRESHOLD_RATIO);
@@ -66,7 +66,7 @@ export class Timeline {
   }
 
   readonly workflow = $derived.by(() => this._getWorkflow());
-  readonly eventGroups = $derived.by(() => this._getEventGroups());
+  readonly groupSummaries = $derived.by(() => this._getGroupSummaries());
   private readonly _endUnbounded = $derived(!this.workflow.endTime);
 
   private readonly _endMs = $derived.by(() => {
@@ -120,7 +120,7 @@ export class Timeline {
     }
     return buildTimeSegments({
       workflowTimespan: this.workflowTimespan,
-      eventGroups: this.eventGroups,
+      groupSummaries: this.groupSummaries,
     });
   });
 

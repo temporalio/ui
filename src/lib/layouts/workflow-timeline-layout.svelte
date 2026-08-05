@@ -56,16 +56,16 @@
 
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  const bufferGroups = $derived(eventBuffer.summariesWithoutWorkflowTasks);
+  const bufferSummaries = $derived(eventBuffer.summariesWithoutWorkflowTasks);
 
-  const filteredBufferGroups = $derived.by(() => {
+  const filteredBufferSummaries = $derived.by(() => {
     const active = $eventTypeFilter;
-    return bufferGroups.filter((g) => active.includes(g.category));
+    return bufferSummaries.filter((g) => active.includes(g.category));
   });
 
-  const groups = $derived(
+  const groupSummaries = $derived(
     getTimelineGroups(
-      filteredBufferGroups,
+      filteredBufferSummaries,
       reverseSort,
       historyCtx.fetchComplete,
       historyCtx.descMinId,
@@ -100,9 +100,9 @@
   // virtualizes internally via IntersectionObserver, so there's no bounded
   // scroll container, no scroll-offset bridge, and no height plumbing here.
   const estimatedTotalGroups = $derived.by(() => {
-    if (historyCtx.fetchComplete) return groups.length;
+    if (historyCtx.fetchComplete) return groupSummaries.length;
     const totalEvents = historyCtx.totalExpectedEvents ?? 0;
-    return Math.max(groups.length, Math.ceil(totalEvents * 0.5));
+    return Math.max(groupSummaries.length, Math.ceil(totalEvents * 0.5));
   });
 
   onMount(() => {
@@ -211,7 +211,7 @@
   {#if workflow}
     <TimelineGraph
       {workflow}
-      {groups}
+      {groupSummaries}
       {reverseSort}
       loading={!historyCtx.fetchComplete}
       totalExpectedEvents={estimatedTotalGroups}

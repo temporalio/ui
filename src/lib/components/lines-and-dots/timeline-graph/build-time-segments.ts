@@ -44,16 +44,16 @@ function getGroupEndMs(
 
 export function buildTimeSegments({
   workflowTimespan,
-  eventGroups,
+  groupSummaries,
 }: {
   workflowTimespan: Timespan;
-  eventGroups: GroupForSegments[];
+  groupSummaries: GroupForSegments[];
 }): TimeSegment[] {
   const groupTimespans: Timespan[] = [];
 
   let isSorted = true;
   let prevStartTimeMs = -Infinity;
-  for (const group of eventGroups) {
+  for (const group of groupSummaries) {
     const startMs = getGroupStartMs(group);
 
     if (isNullish(startMs)) {

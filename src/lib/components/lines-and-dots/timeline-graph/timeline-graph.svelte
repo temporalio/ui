@@ -38,7 +38,7 @@
     workflow: WorkflowExecution;
     // Summaries, not groups: filtering, sorting and segment layout need no
     // EventGroup, so only the pooled rows below materialize one.
-    groups: GroupSummary[];
+    groupSummaries: GroupSummary[];
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
@@ -51,7 +51,7 @@
 
   let {
     workflow,
-    groups,
+    groupSummaries,
     readOnly = false,
     error = false,
     reverseSort = false,
@@ -104,7 +104,7 @@
   const timeline = new Timeline({
     getFullEventHistory: () => $fullEventHistory,
     getWorkflow: () => workflow,
-    getEventGroups: () => groups,
+    getGroupSummaries: () => groupSummaries,
     getCurrentTimeMs: () => nowMs,
     getLoading: () => loading,
     getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
@@ -135,8 +135,8 @@
     }
   };
 
-  const filteredGroups = $derived(
-    getFailedOrPendingGroups(groups, $eventStatusFilter),
+  const filteredSummaries = $derived(
+    getFailedOrPendingGroups(groupSummaries, $eventStatusFilter),
   );
 
   // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
@@ -144,9 +144,9 @@
   const pendingGroupCount = $derived.by(() => {
     if (!loading) return 0;
     if (!totalExpectedEvents) {
-      return filteredGroups.length === 0 ? 50 : 0;
+      return filteredSummaries.length === 0 ? 50 : 0;
     }
-    return Math.max(0, totalExpectedEvents - filteredGroups.length);
+    return Math.max(0, totalExpectedEvents - filteredSummaries.length);
   });
 
   // Rows mounted beyond the viewport, so edge rows survive small scrolls and
@@ -256,10 +256,10 @@
   );
 
   const groupIndexMap = $derived(
-    new Map(filteredGroups.map((g, i) => [g.id, i])),
+    new Map(filteredSummaries.map((g, i) => [g.id, i])),
   );
 
-  // Active group's index in filteredGroups (-1 = none). Derived here so the row
+  // Active group's index in filteredSummaries (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
   const activeIdx = $derived(
     $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
@@ -278,11 +278,11 @@
   }
 
   const descStart = $derived(
-    getDescStart(filteredGroups, descMinId, loading, pendingGroupCount),
+    getDescStart(filteredSummaries, descMinId, loading, pendingGroupCount),
   );
 
   const totalForY = $derived(
-    getTotalForY(filteredGroups.length, pendingGroupCount, descStart),
+    getTotalForY(filteredSummaries.length, pendingGroupCount, descStart),
   );
 
   // Widen the mount window by the panel's row span: shiftFor moves rows down but
@@ -295,7 +295,7 @@
   // scrolls with the page.
   const timelineHeight = $derived(
     Math.max(
-      ROW_HEIGHT * (filteredGroups.length + pendingGroupCount + 2),
+      ROW_HEIGHT * (filteredSummaries.length + pendingGroupCount + 2),
       120,
     ) + panelHeight,
   );
@@ -395,7 +395,7 @@
     return getWindowBounds({
       bandTop,
       bandHeight,
-      total: filteredGroups.length,
+      total: filteredSummaries.length,
       overscan: windowOverscan,
       reverseSort,
       descStart,
@@ -426,27 +426,27 @@
   // re-read its now-stale group.
   type Slot = {
     index: number;
-    group: GroupSummary;
+    summary: GroupSummary;
     version: number | undefined;
   };
   let prevSlots: (Slot | null)[] = [];
   const pool = $derived.by(() => {
-    const total = filteredGroups.length;
+    const total = filteredSummaries.length;
     const slots: (Slot | null)[] = new Array(poolSize).fill(null);
     const end = Math.min(windowEnd, total, windowStart + poolSize);
     for (let index = windowStart; index < end; index++) {
       const slot = index % poolSize;
-      const group = filteredGroups[index];
+      const summary = filteredSummaries[index];
       const prev = prevSlots[slot];
       if (
         prev &&
         prev.index === index &&
-        prev.group === group &&
-        prev.version === group.version
+        prev.summary === summary &&
+        prev.version === summary.version
       ) {
         slots[slot] = prev;
       } else {
-        slots[slot] = { index, group, version: group.version };
+        slots[slot] = { index, summary, version: summary.version };
       }
     }
     prevSlots = slots;
@@ -560,8 +560,8 @@
             >
               {#if slot}
                 <TimelineGraphRow
-                  group={materializeGroup(slot.group)}
-                  eventCount={slot.group.eventCount}
+                  group={materializeGroup(slot.summary)}
+                  eventCount={slot.summary.eventCount}
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
@@ -574,7 +574,7 @@
         {#if loading && pendingGroupCount > 0}
           {@const rectY = getPendingBlockY({
             descStart,
-            filteredGroupsLength: filteredGroups.length,
+            filteredGroupsLength: filteredSummaries.length,
             reverseSort,
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
@@ -589,12 +589,12 @@
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
         {#if !readOnly && activeIdx >= 0}
-          {@const activeGroup = filteredGroups[activeIdx]}
-          {#if activeGroup}
+          {@const activeSummary = filteredSummaries[activeIdx]}
+          {#if activeSummary}
             {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
             <GroupDetailsRow
               y={panelY}
-              group={materializeGroup(activeGroup)}
+              group={materializeGroup(activeSummary)}
               {canvasWidth}
               endTime={workflow?.endTime ? endTime : nowMs}
               onHeight={(height) => {

@@ -68,7 +68,7 @@
   // Summaries are enough to filter, sort and paginate; only the rendered page
   // is materialized. The feed view still needs full groups for its gutter graph
   // and event->group index, and reads them lazily via tableGroups below.
-  const bufferGroups = $derived(eventBuffer.summariesWithoutWorkflowTasks);
+  const bufferSummaries = $derived(eventBuffer.summariesWithoutWorkflowTasks);
   const bufferEvents = $derived(eventBuffer.events);
   let updating = $derived(!historyCtx.fetchComplete);
 
@@ -76,10 +76,10 @@
     historyCtx.resume();
   });
 
-  const filteredGroups = $derived.by(() => {
+  const filteredSummaries = $derived.by(() => {
     const active = $eventTypeFilter;
     const cats = $eventCategoryFilter;
-    return bufferGroups.filter((g) => {
+    return bufferSummaries.filter((g) => {
       if (!active.includes(g.category)) return false;
       if (cats && cats.length && !cats.includes(g.category)) return false;
       return true;
@@ -109,8 +109,8 @@
     !!workflow && !workflow.isRunning && !workflow.isPaused,
   );
 
-  let groups = $derived(
-    reverseSort ? [...filteredGroups].reverse() : filteredGroups,
+  let groupSummaries = $derived(
+    reverseSort ? [...filteredSummaries].reverse() : filteredSummaries,
   );
   let history = $derived(
     reverseSort ? [...filteredEvents].reverse() : filteredEvents,
@@ -118,7 +118,7 @@
 
   let items = $derived(
     (compact
-      ? orderGroupsByPending(groups, reverseSort)
+      ? orderGroupsByPending(groupSummaries, reverseSort)
       : reverseSort
         ? [...pendingNexusOperations, ...pendingActivities, ...history]
         : [...history, ...pendingActivities, ...pendingNexusOperations]) as
@@ -129,7 +129,7 @@
   // Read only in the feed view, so the compact view never materializes the
   // whole history.
   const tableGroups = $derived(
-    compact ? groups : eventBuffer.groupsWithoutWorkflowTasks,
+    compact ? groupSummaries : eventBuffer.groupsWithoutWorkflowTasks,
   );
 
   $effect(() => {
