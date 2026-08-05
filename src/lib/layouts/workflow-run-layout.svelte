@@ -285,9 +285,11 @@
   // ActivityTaskScheduled can arrive after the refresh that listed it, and
   // enrichGroups skips records whose head is missing. It is idempotent.
   $effect(() => {
+    void eventBuffer.version;
+
     const activities = $workflowRun.workflow?.pendingActivities ?? [];
     const nexusOperations = $workflowRun.workflow?.pendingNexusOperations ?? [];
-    void eventBuffer.version;
+
     if (!fetchComplete) return;
     enrichGroups(activities, nexusOperations);
   });
@@ -315,18 +317,15 @@
     refreshInterval = null;
   };
 
-  $effect(() => {
-    runId;
-    untrack(() => {
-      clearWorkflowData();
-    });
-  });
-
+  // Clearing and refetching were separate effects on the same trigger, so
+  // clear-before-fetch held only because Svelte runs effects in creation order
+  // — reordering the declarations would have wiped each fetch.
   $effect(() => {
     const ns = namespace;
     const wfId = workflowId;
     const rId = runId;
     untrack(() => {
+      clearWorkflowData();
       getWorkflowAndEventHistory(ns, wfId, rId);
     });
   });
