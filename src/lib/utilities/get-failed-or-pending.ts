@@ -19,9 +19,21 @@ const isFailedLocalActivity = (event: WorkflowEvent) => {
   );
 };
 
-const isFailedLocalActivityGroup = (group: FilterableGroup) => {
-  return isFailedLocalActivity(group.initialEvent);
+/**
+ * The fields the group filters read. Satisfied by a full EventGroup and by the
+ * buffer's LazyGroup — deliberately not routed through isEventGroup, whose
+ * `eventList` check a lazy group can't satisfy.
+ */
+type FilterableGroup = {
+  classification: EventGroup['classification'];
+  isPending: boolean;
+  initialEvent: WorkflowEvent;
 };
+
+const isFailedGroup = (group: FilterableGroup) =>
+  group.classification === 'Failed' ||
+  group.classification === 'TimedOut' ||
+  !!isFailedLocalActivity(group.initialEvent);
 
 const isFailedEvent = (iterable: IterableEventWithPending) => {
   return (
@@ -36,14 +48,8 @@ const isPendingEvent = (iterable: IterableEventWithPending) => {
   return isPendingActivity(iterable) || isPendingNexusOperation(iterable);
 };
 
-const isFailedEventGroup = (iterable: IterableEventWithPending) => {
-  return (
-    isEventGroup(iterable) &&
-    (iterable.classification === 'Failed' ||
-      iterable.classification === 'TimedOut' ||
-      isFailedLocalActivityGroup(iterable))
-  );
-};
+const isFailedEventGroup = (iterable: IterableEventWithPending) =>
+  isEventGroup(iterable) && isFailedGroup(iterable);
 
 const isPendingEventGroup = (iterable: IterableEventWithPending) => {
   return isEventGroup(iterable) && iterable.isPending;
@@ -63,27 +69,10 @@ export const getFailedOrPendingEvents = (
   );
 };
 
-/**
- * The fields this filter reads. Satisfied by a full EventGroup and by the
- * buffer's GroupSummary — deliberately not routed through isEventGroup, whose
- * `eventList` check a summary can't satisfy.
- */
-type FilterableGroup = {
-  classification: EventGroup['classification'];
-  isPending: boolean;
-  initialEvent: WorkflowEvent;
-};
-
 export const getFailedOrPendingGroups = <T extends FilterableGroup>(
   items: T[],
   filterForFailedOrPending: boolean,
 ): T[] => {
   if (!filterForFailedOrPending) return items;
-  return items.filter(
-    (item) =>
-      item.classification === 'Failed' ||
-      item.classification === 'TimedOut' ||
-      isFailedLocalActivityGroup(item) ||
-      item.isPending,
-  );
+  return items.filter((item) => isFailedGroup(item) || item.isPending);
 };

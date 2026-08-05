@@ -1,17 +1,5 @@
-import type { EventLink, Payload } from '$lib/types';
-import type {
-  ActivityTaskScheduledEvent,
-  CommonHistoryEvent,
-  MarkerRecordedEvent,
-  NexusOperationScheduledEvent,
-  SignalExternalWorkflowExecutionInitiatedEvent,
-  StartChildWorkflowExecutionInitiatedEvent,
-  TimerStartedEvent,
-  WorkflowEvent,
-  WorkflowExecutionSignaledEvent,
-  WorkflowExecutionUpdateAcceptedEvent,
-  WorkflowTaskScheduledEvent,
-} from '$lib/types/events';
+import type { Payload } from '$lib/types';
+import type { CommonHistoryEvent, WorkflowEvent } from '$lib/types/events';
 import {
   isActivityTaskScheduledEvent,
   isLocalActivityMarkerEvent,
@@ -37,19 +25,6 @@ import {
   getEventGroupLabel,
   getEventGroupName,
 } from './get-group-name';
-
-type StartingEvents = {
-  Activity: ActivityTaskScheduledEvent;
-  ChildWorkflow: StartChildWorkflowExecutionInitiatedEvent;
-  Timer: TimerStartedEvent;
-  Signal: SignalExternalWorkflowExecutionInitiatedEvent;
-  SignalReceived: WorkflowExecutionSignaledEvent;
-  LocalActivity: MarkerRecordedEvent;
-  Marker: MarkerRecordedEvent;
-  Update: WorkflowExecutionUpdateAcceptedEvent;
-  WorkflowTask: WorkflowTaskScheduledEvent;
-  Nexus: NexusOperationScheduledEvent;
-};
 
 /**
  * A group's category, which is its head event's except for local-activity
@@ -107,14 +82,14 @@ const eventGroupProto: ThisType<EventGroup> = {
   },
 };
 
-const createGroupFor = <K extends keyof StartingEvents>(
-  event: StartingEvents[K] & { userMetadata?: { summary: Payload } },
+const createGroupFor = (
+  event: CommonHistoryEvent & { userMetadata?: { summary: Payload } },
 ): EventGroup => {
   const id = getGroupId(event);
   const name = getEventGroupName(event);
   const label = getEventGroupLabel(event);
   const displayName = getEventGroupDisplayName(event);
-  const { timestamp, category, classification } = event;
+  const { timestamp, classification } = event;
 
   // Single flat array — no Map, no Set. Groups have 1–5 events.
   const eventList: EventGroup['eventList'] = [event as never];
@@ -157,11 +132,13 @@ export const addEventToGroup = (group: EventGroup, event: WorkflowEvent) => {
 };
 
 /**
- * Whether `event` starts a group. Single source of truth for the dispatch, so
+ * Whether `event` starts a group, including the WorkflowTask groups that
+ * createWorkflowTaskGroup builds. Single source of truth for the dispatch, so
  * callers that only need to know whether a group exists — the buffer, deciding
- * which records to expose as summaries — can ask without building one.
+ * which records to expose — can ask without building one.
  */
 export const isGroupHeadEvent = (event: CommonHistoryEvent): boolean =>
+  isWorkflowTaskScheduledEvent(event) ||
   isActivityTaskScheduledEvent(event) ||
   isStartChildWorkflowExecutionInitiatedEvent(event) ||
   isTimerStartedEvent(event) ||
@@ -174,16 +151,18 @@ export const isGroupHeadEvent = (event: CommonHistoryEvent): boolean =>
 export const createEventGroup = (
   event: CommonHistoryEvent,
 ): EventGroup | undefined => {
+  // WorkflowTask heads are createWorkflowTaskGroup's, kept separate so callers
+  // can exclude them.
+  if (isWorkflowTaskScheduledEvent(event)) return undefined;
   if (!isGroupHeadEvent(event)) return undefined;
   // createGroupFor derives every field from the event, including the
   // local-activity category split, so the per-type branches only ever differed
   // in their type parameter.
-  return createGroupFor(event as StartingEvents[keyof StartingEvents]);
+  return createGroupFor(event);
 };
 
 export const createWorkflowTaskGroup = (
   event: CommonHistoryEvent,
 ): EventGroup | undefined => {
-  if (isWorkflowTaskScheduledEvent(event))
-    return createGroupFor<'WorkflowTask'>(event);
+  if (isWorkflowTaskScheduledEvent(event)) return createGroupFor(event);
 };

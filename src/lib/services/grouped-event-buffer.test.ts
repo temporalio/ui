@@ -19,6 +19,7 @@ import {
   setFailedEvent,
   SHARED_WITH_EVENT_GROUP,
 } from './grouped-event-buffer';
+import { SHARED_WITH_EVENT_GROUP } from './test-helpers/lazy-group-fields';
 import {
   makeActivityGroup,
   makeActivityScheduled,

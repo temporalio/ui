@@ -29,7 +29,7 @@ export class Timeline {
 
   private _getFullEventHistory: () => WorkflowEvents;
   private _getWorkflow: () => WorkflowExecution;
-  private _getGroupSummaries: () => LazyGroup[];
+  private _getLazyGroups: () => LazyGroup[];
   private _getCurrentTimeMs: () => number;
   private _getDurationThresholdRatio: () => number;
   private _getLoading: () => boolean;
@@ -46,7 +46,7 @@ export class Timeline {
   }: TimelineInit) {
     this._getFullEventHistory = getFullEventHistory;
     this._getWorkflow = getWorkflow;
-    this._getGroupSummaries = getLazyGroups;
+    this._getLazyGroups = getLazyGroups;
     this._getCurrentTimeMs = getCurrentTimeMs;
     this._getDurationThresholdRatio =
       getDurationThresholdRatio ?? (() => DEFAULT_DURATION_THRESHOLD_RATIO);
@@ -66,7 +66,7 @@ export class Timeline {
   }
 
   readonly workflow = $derived.by(() => this._getWorkflow());
-  readonly lazyGroups = $derived.by(() => this._getGroupSummaries());
+  readonly lazyGroups = $derived.by(() => this._getLazyGroups());
   private readonly _endUnbounded = $derived(!this.workflow.endTime);
 
   private readonly _endMs = $derived.by(() => {

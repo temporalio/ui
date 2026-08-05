@@ -1,3 +1,4 @@
+import { isEventGroup } from '$lib/models/event-groups';
 import {
   addEventToGroup,
   createEventGroup,
@@ -16,7 +17,11 @@ import type {
   PendingNexusOperation,
   WorkflowEvent,
 } from '$lib/types/events';
-import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
+import {
+  isFailedTaskEvent,
+  isTimedOutTaskEvent,
+  isWorkflowTaskFailedEventDueToReset,
+} from '$lib/utilities/get-workflow-task-failed-event';
 import {
   isActivityTaskCanceledEvent,
   isActivityTaskCompletedEvent,
@@ -78,30 +83,6 @@ export interface LazyGroup {
 }
 
 /**
- * Which LazyGroup fields an EventGroup must agree on. Views filter and sort on
- * one and render the other, so a divergence shows as the wrong rows on screen.
- *
- * The `satisfies` makes TypeScript reject a new field on LazyGroup until it is
- * classified here, so the agreement test that consumes this cannot silently
- * stop being exhaustive. It lives here rather than in the test because
- * src/lib/services/**\/*.test.ts is excluded from `pnpm check`.
- */
-export const SHARED_WITH_EVENT_GROUP = {
-  id: true,
-  eventCount: true,
-  initialEvent: true,
-  lastEvent: true,
-  category: true,
-  classification: true,
-  finalClassification: true,
-  isPending: true,
-  pendingActivity: true,
-  pendingNexusOperation: true,
-  // Buffer bookkeeping — an EventGroup has no counterpart.
-  version: false,
-} satisfies Record<keyof LazyGroup, boolean>;
-
-/**
  * Distinguishes a lazy group from an already-materialized EventGroup or a plain
  * event, for views handed a mix of the two.
  */
@@ -110,7 +91,7 @@ export function isLazyGroup(value: unknown): value is LazyGroup {
     typeof value === 'object' &&
     value !== null &&
     'eventCount' in value &&
-    !('eventList' in value)
+    !isEventGroup(value)
   );
 }
 
@@ -133,10 +114,25 @@ class GroupRecord implements LazyGroup {
   cached: EventGroup | null = null;
   cachedVersion = -1;
 
-  constructor(readonly headSlot: number) {}
+  /**
+   * Set when the head event lands. These three are pure functions of an event
+   * that never changes, and they are read on the hottest paths there are — the
+   * category filter reads `category` twice per group per pass, and the row pool
+   * reads `id` for every group — so they are computed once rather than derived
+   * on each access.
+   */
+  readonly id: string;
+  category: WorkflowEvent['category'] = 'workflow';
+  headsGroup = false;
 
-  get id(): string {
-    return String(this.headSlot + 1);
+  constructor(readonly headSlot: number) {
+    this.id = String(headSlot + 1);
+  }
+
+  /** Called once, when this record's head event is ingested. */
+  onHeadIngested(head: WorkflowEvent): void {
+    this.category = groupCategory(head);
+    this.headsGroup = isGroupHeadEvent(head as CommonHistoryEvent);
   }
 
   get eventCount(): number {
@@ -153,10 +149,6 @@ class GroupRecord implements LazyGroup {
       if (slot > latest) latest = slot;
     }
     return events[latest] as WorkflowEvent;
-  }
-
-  get category(): WorkflowEvent['category'] {
-    return groupCategory(this.initialEvent);
   }
 
   get classification(): WorkflowEvent['classification'] {
@@ -211,8 +203,14 @@ let cachedLazyGroups: LazyGroup[] | null = null;
 let cachedLazyGroupsRevision = -1;
 let cachedLazyGroupsNoWFT: LazyGroup[] | null = null;
 let cachedLazyGroupsNoWFTRevision = -1;
+let cachedWftFailed: WorkflowEvent | undefined;
+let cachedWftFailedRevision = -1;
 
 const changeListeners = new Set<ChangeListener>();
+
+// Records currently carrying pending metadata, so enrichGroups knows whether
+// there is anything to clear when the pending arrays go empty.
+const enrichedRecords = new Set<GroupRecord>();
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -343,6 +341,7 @@ export function reset(historyLength: number): void {
   events = new Array<null>(size).fill(null);
   headGroup = new Int32Array(size);
   records = [];
+  enrichedRecords.clear();
   maxSlot = -1;
 
   failedEvent = null;
@@ -391,6 +390,7 @@ export function ingestHistoryEvent(
   grow(headSlot);
 
   const record = recordFor(headSlot);
+  if (slot === headSlot) record.onHeadIngested(event);
   record.slots.push(slot);
   record.version++;
   revision++;
@@ -418,6 +418,17 @@ export function enrichGroups(
     ]),
   );
 
+  // Re-driven on every buffer batch so late-arriving heads pick up their
+  // metadata, so the overwhelmingly common case — nothing pending, nothing
+  // previously enriched — must not walk every record.
+  if (
+    pendingActivities.length === 0 &&
+    pendingNexusOperations.length === 0 &&
+    enrichedRecords.size === 0
+  ) {
+    return;
+  }
+
   let changed = false;
 
   for (const record of records) {
@@ -444,6 +455,11 @@ export function enrichGroups(
 
     record.pendingActivity = pendingActivity;
     record.pendingNexusOperation = pendingNexusOperation;
+    if (pendingActivity || pendingNexusOperation) {
+      enrichedRecords.add(record);
+    } else {
+      enrichedRecords.delete(record);
+    }
     record.version++;
     revision++;
     changed = true;
@@ -492,14 +508,7 @@ export function getLazyGroups(opts?: GroupArrayOptions): LazyGroup[] {
     const recordIdx = headGroup[slot];
     if (recordIdx === 0) continue;
     const record = records[recordIdx - 1];
-    const head = events[record.headSlot];
-    if (!head) continue;
-    if (
-      !isGroupHeadEvent(head as CommonHistoryEvent) &&
-      !isWorkflowTaskScheduledEvent(head)
-    ) {
-      continue;
-    }
+    if (!record.headsGroup) continue;
     if (excludeWFT && isWorkflowTaskGroup(record)) continue;
     result[count++] = record;
   }
@@ -524,13 +533,8 @@ export function getLazyGroups(opts?: GroupArrayOptions): LazyGroup[] {
  * groupEvents() in graph-widget) without branching at every use site.
  */
 export function materializeGroup(lazy: LazyGroup): EventGroup {
-  if ('eventList' in lazy) return lazy as unknown as EventGroup;
-
-  const record = lazy as GroupRecord;
-  if (record.cachedVersion === record.version && record.cached) {
-    return record.cached;
-  }
-  return materializeEventGroup(record) as EventGroup;
+  if (isEventGroup(lazy)) return lazy;
+  return materializeEventGroup(lazy as GroupRecord) as EventGroup;
 }
 
 /**
@@ -580,6 +584,8 @@ export function getEventArray(): WorkflowEvent[] {
  * subsequent WorkflowTaskCompleted), or undefined if none.
  */
 export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
+  if (cachedWftFailedRevision === revision) return cachedWftFailed;
+
   let lastFailedEvent: WorkflowEvent | undefined;
   let maxCompletedId = -1;
 
@@ -594,15 +600,17 @@ export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
     }
 
     if (
-      (event.eventType === 'WorkflowTaskFailed' ||
-        event.eventType === 'WorkflowTaskTimedOut') &&
+      (isFailedTaskEvent(event) || isTimedOutTaskEvent(event)) &&
       !isWorkflowTaskFailedEventDueToReset(event)
     ) {
       lastFailedEvent = event;
     }
   }
 
-  if (!lastFailedEvent) return undefined;
-  if (Number(lastFailedEvent.id) < maxCompletedId) return undefined;
-  return lastFailedEvent;
+  cachedWftFailedRevision = revision;
+  cachedWftFailed =
+    lastFailedEvent && Number(lastFailedEvent.id) >= maxCompletedId
+      ? lastFailedEvent
+      : undefined;
+  return cachedWftFailed;
 }
