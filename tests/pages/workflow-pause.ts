@@ -14,7 +14,7 @@ export class WorkflowPausePage {
   readonly unpauseCancelButton: Locator;
   readonly pausedAlert: Locator;
   readonly pausedAlertReason: Locator;
-  readonly pausedStatus: Locator;
+  readonly workflowStatus: Locator;
   readonly moreActionsButton: Locator;
   readonly updateMenuItem: Locator;
   readonly resetMenuItem: Locator;
@@ -56,7 +56,7 @@ export class WorkflowPausePage {
     this.pausedAlertReason = this.pausedAlert.getByText('Reason', {
       exact: true,
     });
-    this.pausedStatus = page.getByTestId('workflow-status');
+    this.workflowStatus = page.getByTestId('execution-status');
     this.moreActionsButton = page.getByRole('button', { name: 'More Actions' });
     this.updateMenuItem = page
       .getByTestId('update-button')
