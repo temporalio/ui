@@ -17,7 +17,6 @@
   type CatalogEntry = {
     id: string;
     name: string;
-    worker: string;
     local: boolean;
     kind: 'Workflow' | 'Standalone activity' | 'Standalone Nexus operation';
     capabilities: string[];
@@ -50,7 +49,6 @@
     {
       id: 'order-lifecycle',
       name: 'Order lifecycle',
-      worker: 'catalog',
       local: false,
       kind: 'Workflow',
       capabilities: ['Ordinary workflow launch'],
@@ -62,7 +60,6 @@
     {
       id: 'priority-lanes',
       name: 'Priority lanes',
-      worker: 'catalog',
       local: true,
       kind: 'Standalone activity',
       capabilities: ['Priority', 'Fairness'],
@@ -75,7 +72,6 @@
     {
       id: 'parent-child',
       name: 'Parent and child',
-      worker: 'catalog',
       local: false,
       kind: 'Workflow',
       capabilities: ['Child workflow relationships'],
@@ -88,7 +84,6 @@
     {
       id: 'linked-executions',
       name: 'Linked executions',
-      worker: 'catalog',
       local: false,
       kind: 'Workflow',
       capabilities: ['Links'],
@@ -100,7 +95,6 @@
     {
       id: 'cross-namespace-hello',
       name: 'Cross-namespace hello',
-      worker: 'catalog',
       local: false,
       kind: 'Workflow',
       capabilities: ['Nexus', 'Cross-namespace calls', 'Links'],
@@ -112,7 +106,6 @@
     {
       id: 'standalone-nexus-greeting',
       name: 'Standalone Nexus greeting',
-      worker: 'catalog',
       local: false,
       kind: 'Standalone Nexus operation',
       capabilities: ['Nexus', 'Standalone operation'],
@@ -151,33 +144,33 @@
   const workUnits = [
     [
       '01',
-      'Choose feature evidence',
-      'Map every example to a feature, execution kind, and expected evidence.',
+      'Author and generate',
+      'Register an example once, then derive the browser descriptor and Node binding.',
     ],
     [
       '02',
-      'Keep authoring in source',
-      'Add a fixture, declaration, and expected evidence in the local overlay.',
+      'Keep local work local',
+      'Use the one ignored overlay in the UI checkout while an example is still private.',
     ],
     [
       '03',
-      'Run examples locally',
-      'Use the opt-in runner and the selected cluster without changing default commands.',
+      'Verify before packaging',
+      'Run the seal command to generate outputs, then verify them; existing package and prepack scripts do not change.',
     ],
     [
       '04',
-      'Inspect the existing UI',
-      'Observe details, priority/fairness, relationships, links, and Nexus readiness.',
+      'Pack and install',
+      'Cloud UI installs the same tgz and uses its browser adapter and Node 22 runner.',
     ],
     [
       '05',
-      'Promote to shared',
-      'Move a local fixture and declaration into the shared example catalog.',
+      'Run and inspect',
+      'Use the catalog to start an example, then follow the existing details UI.',
     ],
     [
       '06',
-      'Share the workbench',
-      'Package the developer-facing surface behind host-controlled visibility.',
+      'Promote deliberately',
+      'Move reviewed source into shared, then run seal, verify, repack, and update Cloud UI.',
     ],
   ] as const;
 
@@ -259,7 +252,7 @@ registerExample({
     const query = searchTerm.trim().toLowerCase();
     return (
       !query ||
-      [entry.name, entry.kind, ...entry.capabilities, entry.worker]
+      [entry.name, entry.kind, ...entry.capabilities]
         .join(' ')
         .toLowerCase()
         .includes(query)
@@ -434,7 +427,7 @@ registerExample({
           </div>
           <Alert intent="info" title="This is a plan preview">
             Browse and disclosure controls are real UI. Execution actions and
-            launch states are illustrative; this page never contacts Temporal.
+            launch states are preview-only; this page never contacts Temporal.
           </Alert>
         </Card>
       </div>
@@ -484,9 +477,9 @@ registerExample({
                 Write an example with the evidence it should produce.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                Add the fixture, declaration, and expected UI evidence together.
-                Local work stays in the ignored overlay until review moves the
-                fixture and declaration into the shared catalog.
+                Add the executable code, its registration, and its expected UI
+                evidence together. Local work stays in one ignored overlay until
+                review moves the source into the shared catalog.
               </p>
             </div>
 
@@ -495,7 +488,7 @@ registerExample({
                 class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
                 aria-label="Example authoring lifecycle"
               >
-                {#each [['1', 'Write locally', 'Fixture code stays beside an ignored local declaration.'], ['2', 'Describe the example', 'Name the feature, kind, target, and UI result to inspect.'], ['3', 'Run locally', 'Use the opt-in runner and catalog without changing normal commands.'], ['4', 'Inspect the existing UI', 'Follow details into the existing workflow, activity, relationship, or links view.'], ['5', 'Promote to shared', 'Move the reviewed fixture and declaration into the shared catalog.']] as step (step[0])}
+                {#each [['1', 'Register once', 'Keep metadata and executable values together in source.'], ['2', 'Generate outputs', 'Run the seal command to generate a browser descriptor and Node binding.'], ['3', 'Run locally', 'Use the opt-in runner and catalog without changing normal commands.'], ['4', 'Inspect the existing UI', 'Follow details into the workflow, activity, relationship, or links view that owns them.'], ['5', 'Promote and repack', 'Move reviewed source into shared, then run seal, verify, and create a new package.']] as step (step[0])}
                   <li
                     class="surface-subtle rounded-sm border border-subtle p-4"
                   >
@@ -513,7 +506,7 @@ registerExample({
                 class="mt-6"
               >
                 Source control is where developers author, review, and promote
-                example fixtures and declarations.
+                example source. The browser never imports registrations.
               </Alert>
             </Card>
 
@@ -521,19 +514,21 @@ registerExample({
               <div class="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
                 <div>
                   <div class="flex flex-wrap gap-2">
-                    <Badge type="primary">Illustrative, nonnormative</Badge>
+                    <Badge type="primary">Example API shape</Badge>
                     <Badge type="subtle">Proposed TypeScript shape</Badge>
                   </div>
                   <h3 class="mt-4 text-xl">
                     Register the example beside its code.
                   </h3>
                   <p class="mt-3 text-sm leading-6 text-secondary">
-                    One project-owned call co-locates catalog metadata, explicit
+                    One project-owned call keeps catalog metadata, explicit
                     dispatch identity, executable bindings, defaults, and
-                    prerequisites. The workflow function supplies typing and
-                    validation; <code>workflowType</code>, never
-                    <code>fn.name</code>, is the worker dispatch identity. This
-                    does not settle the final TypeScript API.
+                    prerequisites together. The workflow function supplies type
+                    information; <code>workflowType</code>, never
+                    <code>fn.name</code>, is the worker dispatch identity.
+                    Kind-specific schemas and adapters validate JSON and build
+                    the native request. This does not settle the final
+                    TypeScript API.
                   </p>
                   <p class="mt-3 text-sm leading-6 text-secondary">
                     <code>execution.kind</code> is a closed union. Workflow registrations
@@ -562,9 +557,9 @@ registerExample({
                   </p>
                   <p class="mt-2 font-mono text-sm">registerExample(...)</p>
                   <p class="body-small mt-2 text-secondary">
-                    Registration collects every example for each enabled target,
-                    then builds browser data and worker configuration before
-                    workers start.
+                    Source for one example. <code>workflow-catalog:seal</code>
+                    generates the outputs and validates them before anything is packaged
+                    or a worker starts.
                   </p>
                 </div>
                 <Icon
@@ -579,7 +574,7 @@ registerExample({
                       Serializable browser catalog
                     </p>
                     <p class="body-small mt-2 text-secondary">
-                      Serializable metadata only
+                      Generated metadata and locked execution intent only
                     </p>
                   </div>
                   <div
@@ -587,7 +582,8 @@ registerExample({
                   >
                     <p class="text-sm font-medium">Node-only worker bindings</p>
                     <p class="body-small mt-2 text-secondary">
-                      Functions, activities, and target ownership
+                      Packaged functions, activities, and resolved target
+                      binding
                     </p>
                   </div>
                 </div>
@@ -595,19 +591,53 @@ registerExample({
             </Card>
 
             <Card class="mt-6 p-6 sm:p-8">
+              <div
+                class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+              >
+                <div>
+                  <p
+                    class="body-small-medium uppercase tracking-wider text-secondary"
+                  >
+                    What targetId means
+                  </p>
+                  <h3 class="mt-2 text-xl">
+                    A worker setup reference, not a category.
+                  </h3>
+                  <p class="mt-3 text-sm leading-6 text-secondary">
+                    <code>targetId</code> points to a project-owned logical worker
+                    group. That record owns the selected connection association, namespace,
+                    task queue, static workflow entry, worker lifecycle, and availability
+                    checks. Several examples can use the same target.
+                  </p>
+                </div>
+                <Alert
+                  intent="info"
+                  title="Resolved before the browser sees it"
+                >
+                  The seal command resolves <code>targetId</code> into a Node binding.
+                  It is not a Cloud or Temporal resource ID, an individual worker,
+                  or a namespace and queue pair. The browser gets locked, serializable
+                  intent; it does not resolve targets.
+                </Alert>
+              </div>
+            </Card>
+
+            <Card class="mt-6 p-6 sm:p-8">
               <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="max-w-2xl">
                   <div class="flex flex-wrap items-center gap-2">
-                    <Badge type="primary">Planned repository Agent Skill</Badge>
-                    <Badge type="subtle">Codex + Claude</Badge>
+                    <Badge type="primary">Planned skills</Badge>
+                    <Badge type="subtle">Not built in this change</Badge>
                   </div>
                   <h3 class="mt-4 text-2xl">
-                    Use the planned Agent Skill from Codex or Claude.
+                    Give Codex and Claude the same local instructions.
                   </h3>
                   <p class="mt-3 leading-7 text-secondary">
-                    The planned repository Agent Skill will guide an agent to
-                    the right example, its execution kind, target, expected UI
-                    evidence, and local authoring path.
+                    <code>temporal-ui-examples</code> will cover UI-side
+                    discovery, the local overlay, the seal command, running,
+                    inspection, and source promotion. It hands Cloud connection
+                    and provisioning work to
+                    <code>temporal-cloud-ui-examples</code> in Cloud UI.
                   </p>
                 </div>
                 <Icon
@@ -619,9 +649,9 @@ registerExample({
               </div>
               <ol
                 class="mt-6 grid gap-3 md:grid-cols-5"
-                aria-label="Planned repository Agent Skill workflow"
+                aria-label="Planned skill workflow"
               >
-                {#each [['Find', 'Locate examples by UI feature or surface.'], ['Add locally', 'Create the fixture, declaration, and UI result to inspect.'], ['Run', 'Start the local example using its execution kind.'], ['Inspect', 'Open the existing UI and confirm the expected result.'], ['Prepare promotion', 'Package the reviewed change for the shared catalog.']] as step (step[0])}
+                {#each [['Find', 'Locate examples by UI feature or surface.'], ['Add locally', 'Use the fixed local overlay in the UI checkout.'], ['Run', 'Start the selected kind with the UI-owned runner.'], ['Inspect', 'Open the existing UI and confirm the expected result.'], ['Hand off Cloud work', 'Use the Cloud skill for login, provisioning, validation, or manual tcld.']] as step (step[0])}
                   <li
                     class="surface-subtle rounded-sm border border-subtle p-3"
                   >
@@ -648,8 +678,8 @@ registerExample({
                 Cross-namespace Nexus requires an endpoint preflight.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                Its declared endpoint prerequisite sits alongside workflow,
-                activity, relationship, and link examples in the same catalog.
+                Its endpoint requirement sits beside workflow, activity,
+                relationship, and link examples in the same flat catalog.
               </p>
             </div>
 
@@ -708,13 +738,14 @@ registerExample({
                   </div>
                 </div>
                 <p class="text-sm leading-6 text-secondary">
-                  Before Cross-namespace hello launches, this one-time preflight
-                  verifies its declared dependencies. It is not continuous
-                  health monitoring. If the endpoint is absent, the preflight
-                  creates it and then evaluates readiness.
+                  Before Cross-namespace hello launches, the host checks its
+                  declared endpoint requirement. It is not continuous health
+                  monitoring. A host may provide an authorized provisioner; if
+                  it cannot, the catalog blocks only this example and gives the
+                  developer exact handoff information.
                 </p>
                 <div class="space-y-3 text-sm">
-                  {#each ['Endpoint exists and matches its declared target', 'Handler worker is polling', 'Caller namespace is authorized', 'Ready to run'] as step (step)}
+                  {#each ['Endpoint matches the declared target and policy', 'Handler worker is polling', 'Caller namespace is authorized', 'Ready to run'] as step (step)}
                     <div
                       class="surface-subtle flex items-center gap-3 rounded-sm p-3"
                     >
@@ -726,6 +757,14 @@ registerExample({
                 <Alert intent="warning" title="Configuration conflict">
                   A conflicting endpoint configuration leaves the existing
                   endpoint unchanged and blocks only this example.
+                </Alert>
+                <Alert
+                  intent="info"
+                  title="Cloud fallback stays outside the browser"
+                >
+                  The UI never starts a CLI. If Cloud UI cannot provision, the
+                  planned Cloud skill can give a developer the exact manual
+                  <code>tcld</code> command and validation steps.
                 </Alert>
               </Card>
             </div>
@@ -741,14 +780,14 @@ registerExample({
                 03 · Runtime & hosting
               </p>
               <h2 class="mt-2 text-3xl sm:text-4xl">
-                Browser data and worker configuration stay separate.
+                One package, two generated outputs, and two host-owned
+                entrypoints.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                Registration collects registered examples for each enabled
-                target, then builds two outputs: browser data and worker
-                configuration, joined by stable IDs. Fixture code and
-                credentials stay out of the browser bundle, and each target is
-                complete before <code>Worker.create</code>.
+                <code>registerExample</code> is the only authored record. The seal
+                command generates a browser descriptor and a packaged Node binding.
+                Browser code does not import worker code, and Cloud UI does not appear
+                in the shared package.
               </p>
             </div>
 
@@ -763,32 +802,31 @@ registerExample({
                     height={24}
                     class="text-brand"
                   />
-                  <h3 class="text-xl">Browser data</h3>
+                  <h3 class="text-xl">Generated browser descriptor</h3>
                 </div>
                 <ul class="mt-5 space-y-3 text-sm text-secondary">
-                  <li>Serializable descriptors and target records</li>
                   <li>
-                    Feature tags, kind-specific input, and expected evidence
+                    Serializable example metadata and locked execution intent
                   </li>
                   <li>
-                    Authorized start, observation, and endpoint preparation
+                    Feature tags, kind-specific input defaults, expected
+                    evidence, and prerequisite declarations
                   </li>
-                  <li>Session-only drafts and recent launches</li>
                 </ul>
                 <div
                   class="surface-subtle mt-6 rounded-sm p-3 font-mono text-sm"
                 >
-                  targetId: catalog
+                  No executable values · no target resolution
                 </div>
               </Card>
 
               <div
                 class="flex items-center justify-center py-2"
-                aria-label="Stable ID join"
+                aria-label="Generated outputs"
               >
                 <div class="flex items-center gap-2 lg:flex-col">
                   <Icon name="arrow-right" class="rotate-90 lg:rotate-0" />
-                  <Badge type="primary">validated ID join</Badge>
+                  <Badge type="primary">seal command</Badge>
                   <Icon name="arrow-left" class="rotate-90 lg:rotate-0" />
                 </div>
               </div>
@@ -801,12 +839,12 @@ registerExample({
                     height={24}
                     class="text-brand"
                   />
-                  <h3 class="text-xl">Worker configuration</h3>
+                  <h3 class="text-xl">Packaged Node binding</h3>
                 </div>
                 <ul class="mt-5 space-y-3 text-sm text-secondary">
                   <li>
-                    Explicit workflow types paired with functions for typing and
-                    validation
+                    Explicit workflow types paired with functions for type
+                    information; schemas and adapters validate launch JSON
                   </li>
                   <li>
                     Activities unioned per target; conflicting name/function
@@ -817,15 +855,42 @@ registerExample({
                     <code>workflowBundle</code> remains the static SDK workflow mechanism
                   </li>
                   <li>
-                    Complete worker options passed once to
-                    <code>Worker.create</code>
+                    Fully resolved <code>targetId</code>, then complete worker
+                    options passed to <code>Worker.create</code>
                   </li>
                 </ul>
                 <div
                   class="surface-subtle mt-6 rounded-sm p-3 font-mono text-sm"
                 >
-                  binding.targetId: catalog
+                  node/target-bindings · executable values stay here
                 </div>
+              </Card>
+            </div>
+
+            <div class="mt-4 grid gap-4 lg:grid-cols-2">
+              <Card class="surface-subtle p-5">
+                <p
+                  class="body-small-medium uppercase tracking-wider text-secondary"
+                >
+                  Supplied by the host at runtime
+                </p>
+                <p class="mt-2 text-sm leading-6 text-secondary">
+                  The route passes the page a closed <code>WorkbenchHost</code> for
+                  start, observation, evidence links, and optional prerequisite checks.
+                  It is not part of a descriptor.
+                </p>
+              </Card>
+              <Card class="surface-subtle p-5">
+                <p
+                  class="body-small-medium uppercase tracking-wider text-secondary"
+                >
+                  Kept in the browser session
+                </p>
+                <p class="mt-2 text-sm leading-6 text-secondary">
+                  Draft JSON, selected example, Configure state, and recent
+                  launches exist only for the current identity and cluster. They
+                  are not registration output.
+                </p>
               </Card>
             </div>
 
@@ -835,22 +900,22 @@ registerExample({
                   <p
                     class="body-small-medium uppercase tracking-wider text-secondary"
                   >
-                    Runtime topology
+                    Worker setup
                   </p>
                   <h3 class="mt-2 text-2xl">
-                    The Node runner starts each enabled target.
+                    The browser and the runner are separate processes.
                   </h3>
                   <p class="mt-3 max-w-xl text-sm leading-6 text-secondary">
-                    The runner uses the completed registration to construct
-                    every enabled target before starting workers. Selecting a
-                    catalog item changes only the launch UI, never worker
-                    registration.
+                    The browser uses the host's authorized APIs. The Node runner
+                    receives a constructed connection and starts enabled
+                    targets. Selecting a catalog item changes only the launch
+                    UI, never worker registration.
                   </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                  <Badge type="ghost">Unauthenticated</Badge>
-                  <Badge type="ghost">API key / Cloud</Badge>
-                  <Badge type="ghost">mTLS</Badge>
+                  <Badge type="ghost">OSS/local entrypoint</Badge>
+                  <Badge type="ghost">Cloud Node 22 entrypoint</Badge>
+                  <Badge type="ghost">one constructed connection</Badge>
                 </div>
               </div>
 
@@ -902,6 +967,72 @@ registerExample({
                 </div>
               </div>
             </Card>
+
+            <Card class="mt-6 overflow-hidden p-0">
+              <div class="border-b border-subtle px-6 py-5 sm:px-8">
+                <p
+                  class="body-small-medium uppercase tracking-wider text-secondary"
+                >
+                  Repository ownership
+                </p>
+                <h3 class="mt-2 text-2xl">
+                  Cloud UI uses the package; it does not change the package.
+                </h3>
+              </div>
+              <div
+                class="grid divide-y divide-subtle lg:grid-cols-2 lg:divide-x lg:divide-y-0"
+              >
+                <div class="p-6 sm:p-8">
+                  <div class="flex items-center gap-2">
+                    <Badge type="primary">@temporalio/ui</Badge>
+                    <span class="text-sm font-medium">Shared and OSS work</span>
+                  </div>
+                  <ul class="mt-4 space-y-2 text-sm leading-6 text-secondary">
+                    <li>
+                      Catalog schema, page, session states, and closed host API.
+                    </li>
+                    <li>
+                      Shared registrations, seal and verify commands, browser
+                      descriptors, Node bindings, and runner kernel.
+                    </li>
+                    <li>OSS route and local/self-hosted runner entrypoint.</li>
+                    <li>Planned <code>temporal-ui-examples</code> skill.</li>
+                  </ul>
+                </div>
+                <div class="p-6 sm:p-8">
+                  <div class="flex items-center gap-2">
+                    <Badge type="success">cloud-ui</Badge>
+                    <span class="text-sm font-medium">Cloud-only work</span>
+                  </div>
+                  <ul class="mt-4 space-y-2 text-sm leading-6 text-secondary">
+                    <li>
+                      Cloud auth, permissions, project and namespace context,
+                      and existing telemetry.
+                    </li>
+                    <li>
+                      Cloud browser adapter, namespace-ID lookup, policy checks,
+                      and endpoint provisioning.
+                    </li>
+                    <li>
+                      Node 22 dev entrypoint using the installed package and API
+                      key or mTLS config.
+                    </li>
+                    <li>
+                      Planned <code>temporal-cloud-ui-examples</code> skill and
+                      manual <code>tcld</code> fallback.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div
+                class="surface-subtle border-t border-subtle px-6 py-4 text-sm text-secondary sm:px-8"
+              >
+                Dependency direction is one way: <code
+                  >cloud-ui → @temporalio/ui</code
+                >. The shared package never imports Cloud types, clients,
+                credentials, or routes.
+              </div>
+            </Card>
           </section>
 
           <section
@@ -914,11 +1045,13 @@ registerExample({
                 04 · Delivery steps
               </p>
               <h2 class="mt-2 text-3xl sm:text-4xl">
-                Move a local fixture into shared examples.
+                Seal, verify, pack, then hand the same package to Cloud UI.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                This plan stays high level. Implementation keeps the package
-                boundary small and ties every new example to a UI feature.
+                The ignored local overlay works only in the UI checkout. It
+                stops at the package boundary: promotion is reviewed source
+                movement followed by the shared seal command, verify, and
+                repack.
               </p>
             </div>
 
@@ -939,6 +1072,65 @@ registerExample({
                 </Card>
               {/each}
             </div>
+
+            <Card class="mt-6 p-6 sm:p-8">
+              <div
+                class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+              >
+                <div>
+                  <p
+                    class="body-small-medium uppercase tracking-wider text-secondary"
+                  >
+                    UI repository handoff
+                  </p>
+                  <ol class="mt-4 space-y-2 text-sm leading-6 text-secondary">
+                    <li>
+                      <code>pnpm workflow-catalog:seal</code> generates current outputs.
+                    </li>
+                    <li>
+                      <code>pnpm workflow-catalog:verify</code> checks hashes, joins,
+                      and boundaries.
+                    </li>
+                    <li>
+                      <code>pnpm package</code> then
+                      <code>pnpm pack --pack-destination packs</code> creates the
+                      normal tarball.
+                    </li>
+                    <li>
+                      Rename or copy it to <code
+                        >packs/temporalio-ui-&lt;git-sha&gt;.tgz</code
+                      >.
+                    </li>
+                  </ol>
+                </div>
+                <div>
+                  <p
+                    class="body-small-medium uppercase tracking-wider text-secondary"
+                  >
+                    Cloud UI handoff
+                  </p>
+                  <ol class="mt-4 space-y-2 text-sm leading-6 text-secondary">
+                    <li>
+                      Update the file reference and lock in a separate Cloud UI
+                      worktree.
+                    </li>
+                    <li>
+                      Browser imports the catalog page from the installed
+                      package.
+                    </li>
+                    <li>
+                      Cloud's <code>pnpm dev:workflow-catalog</code> starts a Node
+                      22 runner from compiled package JavaScript.
+                    </li>
+                    <li>
+                      That runner reads ignored <code
+                        >.env.workflow-catalog.local</code
+                      >; it never reads the UI checkout.
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </Card>
           </section>
 
           <section
@@ -959,10 +1151,10 @@ registerExample({
               <Card class="p-6">
                 <h3 class="text-xl">What each example checks</h3>
                 <Timeline class="mt-6">
-                  <TimelineStep step={1} title="Example contracts">
+                  <TimelineStep step={1} title="Example details">
                     <p class="mt-2 text-sm leading-6 text-secondary">
                       Declarations identify kind, feature, target, expected
-                      evidence, provenance, and local-authoring limits.
+                      evidence, source, and local-authoring limits.
                     </p>
                   </TimelineStep>
                   <TimelineStep step={2} title="Kind-specific paths">
@@ -1045,9 +1237,10 @@ registerExample({
                 Find an example for the UI feature you need to inspect.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                The workbench lists examples we explicitly own. Start with the
-                UI feature you need to inspect, then find its execution surface
-                and expected UI evidence.
+                The plan above explains what is registered, packaged, and owned
+                by each repository. This preview shows the resulting UI: it
+                opens on All examples, with no selected example and Configure
+                closed.
               </p>
             </div>
 
@@ -1082,7 +1275,7 @@ registerExample({
                       class="w-full"
                     />
                     <ButtonRadioGroup
-                      label="Example provenance filter"
+                      label="Example source filter"
                       value={scope}
                       options={[
                         { value: 'all', label: 'All' },
@@ -1191,10 +1384,8 @@ registerExample({
                         <dd class="mt-1 font-mono">catalog-demo</dd>
                       </div>
                       <div class="surface-subtle rounded-sm p-3">
-                        <dt class="body-small text-secondary">
-                          Declared target
-                        </dt>
-                        <dd class="mt-1 font-mono">{selectedEntry.worker}</dd>
+                        <dt class="body-small text-secondary">Routing</dt>
+                        <dd class="mt-1">Locked by the registration</dd>
                       </div>
                     </dl>
 
@@ -1401,7 +1592,7 @@ registerExample({
                                 start options; routing stays locked.
                               </p>
                             </div>
-                            <Badge type="ghost">Illustrative</Badge>
+                            <Badge type="ghost">Preview only</Badge>
                           </div>
                           <div class="mt-4 max-w-3xl">
                             <h5 class="mb-2 text-sm font-medium">
@@ -1431,7 +1622,7 @@ registerExample({
                                 options; routing stays locked.
                               </p>
                             </div>
-                            <Badge type="ghost">Illustrative</Badge>
+                            <Badge type="ghost">Preview only</Badge>
                           </div>
                           <div class="mt-4 max-w-3xl">
                             <h5 class="mb-2 text-sm font-medium">
@@ -1461,7 +1652,7 @@ registerExample({
                                 options; routing stays locked.
                               </p>
                             </div>
-                            <Badge type="ghost">Illustrative</Badge>
+                            <Badge type="ghost">Preview only</Badge>
                           </div>
                           <div class="mt-4 max-w-3xl">
                             <h5 class="mb-2 text-sm font-medium">
@@ -1541,15 +1732,10 @@ registerExample({
                           <p class="body-small mt-3 text-secondary">
                             {entry.kind} · {entry.capabilities.join(' · ')}
                           </p>
-                          <p
-                            class="body-small mt-auto pt-4 font-mono text-secondary"
-                          >
-                            {entry.worker}
-                          </p>
                         </button>
                       {:else}
                         <p class="text-sm text-secondary">
-                          No examples match the current search and provenance
+                          No examples match the current search and source
                           filters.
                         </p>
                       {/each}
@@ -1576,7 +1762,7 @@ registerExample({
                   </div>
                   <ul
                     class="divide-y divide-subtle"
-                    aria-label="Illustrative launch states"
+                    aria-label="Sample launch states"
                   >
                     {#each launchExamples as launch (launch.id)}
                       <li
@@ -1645,7 +1831,7 @@ registerExample({
               </div>
 
               <div class="mt-8 grid gap-4 md:grid-cols-2">
-                {#each [['Experience', 'Can a developer find an example by the UI feature they need to inspect, then understand its execution kind?'], ['Authoring', 'Does the local fixture → declaration → UI result → promotion flow stay clear and source controlled?'], ['Architecture', 'Do the adapters and opt-in Node runner support each execution kind?'], ['Scope', 'Does the catalog present workflow, standalone activity, relationship, link, and Nexus examples with the right level of detail?']] as question (question[0])}
+                {#each [['Experience', 'Can a developer start on All examples, understand an example, and configure only its start options?'], ['Authoring', 'Does one registration, then the seal command, make the browser and Node outputs clear?'], ['Ownership', 'Is it clear what stays in @temporalio/ui and what belongs only in Cloud UI?'], ['Handoff', 'Is the local-overlay → review → seal → verify → repack boundary clear, including the Cloud skill and manual tcld fallback?']] as question (question[0])}
                   <div class="rounded-sm border border-inverse p-5">
                     <p class="font-medium text-inverse">{question[0]}</p>
                     <p class="mt-2 text-sm leading-6 text-inverse">

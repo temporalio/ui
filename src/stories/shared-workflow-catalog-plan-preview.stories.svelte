@@ -34,28 +34,38 @@
     await expect(
       canvas.getByText('This is a plan preview'),
     ).toBeInTheDocument();
-    await expect(
-      canvas.getByText('Planned repository Agent Skill'),
-    ).toBeInTheDocument();
+    await expect(canvas.getByText('Planned skills')).toBeInTheDocument();
     await expect(
       canvas.getByLabelText('Proposed example registration'),
     ).toBeInTheDocument();
-    await expect(
-      canvas.getByText('Illustrative, nonnormative'),
-    ).toBeInTheDocument();
+    await expect(canvas.getByText('Example API shape')).toBeInTheDocument();
     await expect(
       canvas.getByText(/does not settle the final TypeScript API/),
     ).toBeInTheDocument();
     await expect(canvas.getByText(/is a closed union/)).toBeInTheDocument();
+    await expect(canvas.getByText('What targetId means')).toBeInTheDocument();
     await expect(
-      canvas.getByText(/never worker registration/),
+      canvas.getByText('Generated browser descriptor'),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText('Packaged Node binding')).toBeInTheDocument();
+    await expect(
+      canvas.getByText('Supplied by the host at runtime'),
     ).toBeInTheDocument();
     await expect(
-      canvas.getByText('Serializable browser catalog'),
+      canvas.getByText('Kept in the browser session'),
     ).toBeInTheDocument();
     await expect(
-      canvas.getByText('Node-only worker bindings'),
+      canvas.getByText(
+        'Cloud UI uses the package; it does not change the package.',
+      ),
     ).toBeInTheDocument();
+    await expect(
+      canvas.getByText('Cloud Node 22 entrypoint'),
+    ).toBeInTheDocument();
+    await expect(
+      canvas.getByText(/workflow-catalog:verify/),
+    ).toBeInTheDocument();
+    await expect(canvas.getAllByText('tcld')).not.toHaveLength(0);
     const interactivePreviewLink = canvas.getByRole('link', {
       name: '06 · Interactive preview',
     });
@@ -86,11 +96,11 @@
     await expect(
       canvas.getByRole('search', { name: 'Filter example catalog' }),
     ).toBeInTheDocument();
-    const provenanceFilter = within(
-      canvas.getByRole('radiogroup', { name: 'Example provenance filter' }),
+    const sourceFilter = within(
+      canvas.getByRole('radiogroup', { name: 'Example source filter' }),
     );
     await expect(
-      provenanceFilter.getByRole('radio', { name: 'All' }),
+      sourceFilter.getByRole('radio', { name: 'All' }),
     ).toHaveAttribute('aria-checked', 'true');
     const exampleNavigation = within(
       canvas.getByRole('navigation', { name: 'Examples' }),
