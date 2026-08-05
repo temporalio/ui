@@ -36,10 +36,10 @@
 
   const reviewSections = [
     { id: 'authoring', label: '01 · Plan & authoring' },
-    { id: 'capabilities', label: '02 · Capability proof' },
+    { id: 'capabilities', label: '02 · Feature coverage' },
     { id: 'boundary', label: '03 · Runtime & hosting' },
     { id: 'delivery', label: '04 · Delivery' },
-    { id: 'proof', label: '05 · Proof & cuts' },
+    { id: 'proof', label: '05 · Coverage & scope' },
     { id: 'experience', label: '06 · Interactive preview' },
     { id: 'review', label: '07 · Review asks' },
   ] as const;
@@ -54,9 +54,9 @@
       local: false,
       kind: 'Workflow',
       capabilities: ['Ordinary workflow launch'],
-      evidence: 'Run, status, result, and canonical execution details.',
+      evidence: 'Run, status, result, and existing execution details.',
       details:
-        'A straightforward workflow example that proves the normal launch and observation path.',
+        'A straightforward workflow example for the normal launch and observation path.',
       nexus: false,
     },
     {
@@ -80,9 +80,9 @@
       kind: 'Workflow',
       capabilities: ['Child workflow relationships'],
       evidence:
-        'Canonical workflow UI renders parent and child execution relationships.',
+        'The existing workflow UI renders parent and child execution relationships.',
       details:
-        'A workflow fixture with deliberate child executions and an inspectable relationship graph.',
+        'A workflow fixture that starts child executions intentionally and provides an inspectable relationship graph.',
       nexus: false,
     },
     {
@@ -92,8 +92,7 @@
       local: false,
       kind: 'Workflow',
       capabilities: ['Links'],
-      evidence:
-        'Canonical UI renders emitted links and their destinations safely.',
+      evidence: 'The existing UI renders emitted links and their destinations.',
       details:
         'A workflow fixture that gives the existing links experience concrete data to inspect.',
       nexus: false,
@@ -107,8 +106,7 @@
       capabilities: ['Nexus', 'Cross-namespace calls', 'Links'],
       evidence:
         'Endpoint readiness, caller execution, handler result, and links.',
-      details:
-        'An advanced workflow example with optional endpoint prerequisites.',
+      details: 'A workflow example with optional endpoint prerequisites.',
       nexus: true,
     },
     {
@@ -119,9 +117,9 @@
       kind: 'Standalone Nexus operation',
       capabilities: ['Nexus', 'Standalone operation'],
       evidence:
-        'Operation result, handler execution, and canonical Nexus details.',
+        'Operation result, handler execution, and existing Nexus details.',
       details:
-        'A direct Nexus operation example that proves the third supported execution kind without a caller workflow.',
+        'A direct Nexus operation example for the third supported execution kind without a caller workflow.',
       nexus: true,
     },
   ];
@@ -130,7 +128,7 @@
     {
       id: 'sample-order-01',
       status: 'Completed',
-      summary: 'Workflow result available · open canonical details',
+      summary: 'Workflow result available · open execution details',
       tone: 'success',
       icon: 'circle-check-filled',
     },
@@ -154,7 +152,7 @@
     [
       '01',
       'Choose feature evidence',
-      'Map every example to a capability, execution kind, and expected evidence.',
+      'Map every example to a feature, execution kind, and expected evidence.',
     ],
     [
       '02',
@@ -168,12 +166,12 @@
     ],
     [
       '04',
-      'Inspect canonical UI',
-      'Observe details, priority/fairness, relationships, links, and advanced readiness.',
+      'Inspect the existing UI',
+      'Observe details, priority/fairness, relationships, links, and Nexus readiness.',
     ],
     [
       '05',
-      'Promote deliberately',
+      'Promote to shared',
       'Move a local fixture and declaration into the shared example catalog.',
     ],
     [
@@ -355,7 +353,7 @@ registerExample({
   <title>Shared Workflow Catalog · Example lab preview</title>
   <meta
     name="description"
-    content="An immersive, developer-facing preview of a Temporal UI feature example lab."
+    content="A developer-facing preview of a Temporal UI feature example lab."
   />
 </svelte:head>
 
@@ -401,43 +399,42 @@ registerExample({
           <p
             class="body-small-medium mb-4 uppercase tracking-[0.18em] text-brand"
           >
-            Developer tooling · implementation pitch
+            Developer tooling · implementation plan
           </p>
           <h1 class="max-w-3xl text-4xl leading-tight sm:text-5xl lg:text-6xl">
-            Make Temporal UI features easy to prove.
+            Add shared feature examples to Temporal UI.
           </h1>
           <p class="mt-6 max-w-3xl text-lg leading-8 text-secondary">
-            Bring the useful shared-workflow corpus into
+            Move shared workflow examples into
             <code class="body-small-mono surface-subtle rounded-sm px-1.5 py-1"
               >@temporalio/ui</code
             >
-            as a source-controlled workbench for authored examples. Browse ordinary
-            workflows, standalone activities, relationships, links, and advanced scenarios;
-            run them against a real cluster; then inspect the canonical UI that each
-            fixture is meant to prove.
+            as a source-controlled place to author examples. Browse ordinary workflows,
+            standalone activities, relationships, links, and Nexus scenarios. Run
+            them against a real cluster, then inspect the existing UI each fixture
+            exercises.
           </p>
           <div class="mt-8 flex flex-wrap gap-2" aria-label="Plan status">
-            <Badge type="primary">Capability-oriented catalog</Badge>
+            <Badge type="primary">Feature-based catalog</Badge>
             <Badge type="success">Source-controlled authoring</Badge>
             <Badge type="ghost">Existing scripts unchanged</Badge>
-            <Badge type="subtle">Curated verification</Badge>
+            <Badge type="subtle">Expected UI checks</Badge>
           </div>
         </div>
 
         <Card class="flex flex-col justify-between gap-8 p-6 lg:p-8">
           <div>
             <Icon name="target" width={28} height={28} class="text-brand" />
-            <h2 class="mt-5 text-2xl">The decision in one breath</h2>
+            <h2 class="mt-5 text-2xl">What this plan adds</h2>
             <p class="mt-3 leading-7 text-secondary">
-              One packaged workbench. One selected cluster. A small, explicit
-              set of examples that makes existing UI capabilities inspectable
-              and repeatable.
+              One packaged workbench and one selected cluster. A small, explicit
+              set of examples makes existing UI features inspectable and
+              repeatable.
             </p>
           </div>
           <Alert intent="info" title="This is a plan preview">
             Browse and disclosure controls are real UI. Execution actions and
-            launch states are deliberately illustrative; this page never
-            contacts Temporal.
+            launch states are illustrative; this page never contacts Temporal.
           </Alert>
         </Card>
       </div>
@@ -487,9 +484,9 @@ registerExample({
                 Write an example with the evidence it should produce.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                A developer authors the fixture, its declaration, and the UI
-                evidence it should produce. Local work stays in the ignored
-                overlay until it is understandable, runnable, and worth sharing.
+                Add the fixture, declaration, and expected UI evidence together.
+                Local work stays in the ignored overlay until review moves the
+                fixture and declaration into the shared catalog.
               </p>
             </div>
 
@@ -498,7 +495,7 @@ registerExample({
                 class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
                 aria-label="Example authoring lifecycle"
               >
-                {#each [['1', 'Write locally', 'Fixture code stays beside an ignored local declaration.'], ['2', 'Declare intent', 'Name the capability, kind, target, and expected UI evidence.'], ['3', 'Run locally', 'Use the opt-in runner and catalog without changing normal commands.'], ['4', 'Inspect canonical UI', 'Follow details into the existing workflow, activity, relationship, or links view.'], ['5', 'Promote deliberately', 'Move the reviewed fixture and declaration into the shared catalog.']] as step (step[0])}
+                {#each [['1', 'Write locally', 'Fixture code stays beside an ignored local declaration.'], ['2', 'Describe the example', 'Name the feature, kind, target, and UI result to inspect.'], ['3', 'Run locally', 'Use the opt-in runner and catalog without changing normal commands.'], ['4', 'Inspect the existing UI', 'Follow details into the existing workflow, activity, relationship, or links view.'], ['5', 'Promote to shared', 'Move the reviewed fixture and declaration into the shared catalog.']] as step (step[0])}
                   <li
                     class="surface-subtle rounded-sm border border-subtle p-4"
                   >
@@ -527,7 +524,9 @@ registerExample({
                     <Badge type="primary">Illustrative, nonnormative</Badge>
                     <Badge type="subtle">Proposed TypeScript shape</Badge>
                   </div>
-                  <h3 class="mt-4 text-xl">Register intent beside code.</h3>
+                  <h3 class="mt-4 text-xl">
+                    Register the example beside its code.
+                  </h3>
                   <p class="mt-3 text-sm leading-6 text-secondary">
                     One project-owned call co-locates catalog metadata, explicit
                     dispatch identity, executable bindings, defaults, and
@@ -553,7 +552,7 @@ registerExample({
               </div>
               <div
                 class="mt-6 grid gap-3 border-t border-subtle pt-6 md:grid-cols-[minmax(0,0.8fr)_auto_minmax(0,1fr)] md:items-center"
-                aria-label="Sealed registration projections"
+                aria-label="Registration outputs"
               >
                 <div class="surface-subtle rounded-sm p-4">
                   <p
@@ -563,8 +562,9 @@ registerExample({
                   </p>
                   <p class="mt-2 font-mono text-sm">registerExample(...)</p>
                   <p class="body-small mt-2 text-secondary">
-                    Sealing aggregates every registered example per enabled
-                    target before any worker is created.
+                    Registration collects every example for each enabled target,
+                    then builds browser data and worker configuration before
+                    workers start.
                   </p>
                 </div>
                 <Icon
@@ -575,7 +575,9 @@ registerExample({
                   <div
                     class="surface-information rounded-sm border border-information p-4"
                   >
-                    <p class="text-sm font-medium">Browser-safe catalog</p>
+                    <p class="text-sm font-medium">
+                      Serializable browser catalog
+                    </p>
                     <p class="body-small mt-2 text-secondary">
                       Serializable metadata only
                     </p>
@@ -600,7 +602,7 @@ registerExample({
                     <Badge type="subtle">Codex + Claude</Badge>
                   </div>
                   <h3 class="mt-4 text-2xl">
-                    Discover and prepare examples from the tools developers use.
+                    Use the planned Agent Skill from Codex or Claude.
                   </h3>
                   <p class="mt-3 leading-7 text-secondary">
                     The planned repository Agent Skill will guide an agent to
@@ -619,7 +621,7 @@ registerExample({
                 class="mt-6 grid gap-3 md:grid-cols-5"
                 aria-label="Planned repository Agent Skill workflow"
               >
-                {#each [['Find', 'Locate examples by capability or UI surface.'], ['Add locally', 'Create the fixture, declaration, and expected evidence.'], ['Run', 'Start the local example through its native execution flow.'], ['Inspect', 'Open the canonical UI and confirm the expected evidence.'], ['Prepare promotion', 'Package the reviewed change for the shared catalog.']] as step (step[0])}
+                {#each [['Find', 'Locate examples by UI feature or surface.'], ['Add locally', 'Create the fixture, declaration, and UI result to inspect.'], ['Run', 'Start the local example using its execution kind.'], ['Inspect', 'Open the existing UI and confirm the expected result.'], ['Prepare promotion', 'Package the reviewed change for the shared catalog.']] as step (step[0])}
                   <li
                     class="surface-subtle rounded-sm border border-subtle p-3"
                   >
@@ -640,22 +642,21 @@ registerExample({
           >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
-                02 · Capability proof
+                02 · Feature coverage
               </p>
               <h2 class="mt-2 text-3xl sm:text-4xl">
-                Cross-namespace Nexus is an advanced example.
+                Cross-namespace Nexus requires an endpoint preflight.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
                 Its declared endpoint prerequisite sits alongside workflow,
-                activity, relationship, and link examples in the same capability
-                catalog.
+                activity, relationship, and link examples in the same catalog.
               </p>
             </div>
 
             <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
               <Card class="overflow-hidden p-0">
                 <div class="border-b border-subtle px-5 py-4">
-                  <h3 class="text-lg">Capability proof matrix</h3>
+                  <h3 class="text-lg">Feature coverage matrix</h3>
                   <p class="body-small mt-1 text-secondary">
                     Each example names the UI feature a developer should inspect
                     after running it.
@@ -676,7 +677,8 @@ registerExample({
                           >
                           {#if entry.local}<Badge type="secondary">Local</Badge
                             >{/if}
-                          {#if entry.nexus}<Badge type="ghost">Advanced</Badge
+                          {#if entry.nexus}<Badge type="ghost"
+                              >Prerequisites</Badge
                             >{/if}
                         </div>
                       </div>
@@ -736,16 +738,17 @@ registerExample({
           >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
-                03 · Runtime & hosting boundary
+                03 · Runtime & hosting
               </p>
               <h2 class="mt-2 text-3xl sm:text-4xl">
-                Two planes keep examples safe and portable.
+                Browser data and worker configuration stay separate.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                Sealing the project registry aggregates registered examples per
-                enabled target and produces two projections joined by stable
-                IDs. Fixture code and credentials never enter the browser
-                bundle; each target is complete before Worker.create.
+                Registration collects registered examples for each enabled
+                target, then builds two outputs: browser data and worker
+                configuration, joined by stable IDs. Fixture code and
+                credentials stay out of the browser bundle, and each target is
+                complete before <code>Worker.create</code>.
               </p>
             </div>
 
@@ -760,12 +763,12 @@ registerExample({
                     height={24}
                     class="text-brand"
                   />
-                  <h3 class="text-xl">Sealed browser projection</h3>
+                  <h3 class="text-xl">Browser data</h3>
                 </div>
                 <ul class="mt-5 space-y-3 text-sm text-secondary">
                   <li>Serializable descriptors and target records</li>
                   <li>
-                    Capability tags, kind-specific input, and expected evidence
+                    Feature tags, kind-specific input, and expected evidence
                   </li>
                   <li>
                     Authorized start, observation, and endpoint preparation
@@ -798,7 +801,7 @@ registerExample({
                     height={24}
                     class="text-brand"
                   />
-                  <h3 class="text-xl">Sealed Node projection</h3>
+                  <h3 class="text-xl">Worker configuration</h3>
                 </div>
                 <ul class="mt-5 space-y-3 text-sm text-secondary">
                   <li>
@@ -835,12 +838,13 @@ registerExample({
                     Runtime topology
                   </p>
                   <h3 class="mt-2 text-2xl">
-                    One small runner, sized for the examples we own.
+                    The Node runner starts each enabled target.
                   </h3>
                   <p class="mt-3 max-w-xl text-sm leading-6 text-secondary">
-                    The runner constructs every enabled target from its sealed
-                    aggregate. Selecting a catalog item changes only the launch
-                    UI, never worker registration.
+                    The runner uses the completed registration to construct
+                    every enabled target before starting workers. Selecting a
+                    catalog item changes only the launch UI, never worker
+                    registration.
                   </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -907,15 +911,14 @@ registerExample({
           >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
-                04 · Delivery posture
+                04 · Delivery steps
               </p>
               <h2 class="mt-2 text-3xl sm:text-4xl">
-                A deliberate path from local fixture to shared proof.
+                Move a local fixture into shared examples.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                The pitch stays high level: implementation keeps the package
-                boundary small and makes every new example accountable to a UI
-                capability.
+                This plan stays high level. Implementation keeps the package
+                boundary small and ties every new example to a UI feature.
               </p>
             </div>
 
@@ -945,31 +948,31 @@ registerExample({
           >
             <div class="mb-8 max-w-3xl">
               <p class="body-small-medium uppercase tracking-wider text-brand">
-                05 · Proof strategy
+                05 · Coverage and scope
               </p>
               <h2 class="mt-2 text-3xl sm:text-4xl">
-                Demonstrate each capability through curated verification.
+                Verify each feature with the examples we maintain.
               </h2>
             </div>
 
             <div class="grid gap-6 xl:grid-cols-2">
               <Card class="p-6">
-                <h3 class="text-xl">Capability-first proof strategy</h3>
+                <h3 class="text-xl">What each example checks</h3>
                 <Timeline class="mt-6">
                   <TimelineStep step={1} title="Example contracts">
                     <p class="mt-2 text-sm leading-6 text-secondary">
-                      Declarations identify kind, capability, target, expected
-                      evidence, provenance, and safe authoring boundaries.
+                      Declarations identify kind, feature, target, expected
+                      evidence, provenance, and local-authoring limits.
                     </p>
                   </TimelineStep>
                   <TimelineStep step={2} title="Kind-specific paths">
                     <p class="mt-2 text-sm leading-6 text-secondary">
                       Workflow and standalone-activity starts preserve their own
-                      input, identity, observation, and canonical-details
+                      input, identity, observation, and execution-details
                       behavior.
                     </p>
                   </TimelineStep>
-                  <TimelineStep step={3} title="Canonical UI evidence">
+                  <TimelineStep step={3} title="Existing UI checks">
                     <p class="mt-2 text-sm leading-6 text-secondary">
                       Priority/fairness, child relationships, links, and regular
                       launch states are inspected in the UI that already owns
@@ -978,11 +981,11 @@ registerExample({
                   </TimelineStep>
                   <TimelineStep
                     step={4}
-                    title="Cross-namespace Nexus proof"
+                    title="Cross-namespace Nexus coverage"
                     last
                   >
                     <p class="mt-2 text-sm leading-6 text-secondary">
-                      One cross-namespace flow proves readiness, caller
+                      One cross-namespace flow checks readiness, caller
                       execution, handler result, valid reuse, and conflict
                       rejection.
                     </p>
@@ -998,11 +1001,11 @@ registerExample({
                     height={24}
                     class="text-brand"
                   />
-                  <h3 class="text-xl">Deliberate cuts</h3>
+                  <h3 class="text-xl">Out of scope</h3>
                 </div>
                 <p class="mt-3 text-sm leading-6 text-secondary">
-                  These scope decisions keep the workbench focused. Every cut
-                  has a reopen condition in the implementation plan.
+                  These items are not part of this plan. Each one has a reopen
+                  condition in the implementation plan.
                 </p>
                 <p
                   class="surface-subtle mt-4 rounded-sm border border-subtle p-4 text-sm leading-6 text-secondary"
@@ -1039,12 +1042,12 @@ registerExample({
                 06 · Interactive UI preview
               </p>
               <h2 class="mt-2 text-3xl sm:text-4xl">
-                Find the example that makes a UI feature real.
+                Find an example for the UI feature you need to inspect.
               </h2>
               <p class="mt-4 text-base leading-7 text-secondary">
-                The workbench curates examples we explicitly own. It starts with
-                the capability a developer needs to see, then reveals the right
-                execution surface and canonical evidence.
+                The workbench lists examples we explicitly own. Start with the
+                UI feature you need to inspect, then find its execution surface
+                and expected UI evidence.
               </p>
             </div>
 
@@ -1053,7 +1056,7 @@ registerExample({
                 class="surface-subtle flex items-center gap-2 border-b border-subtle px-4 py-3 sm:px-6"
               >
                 <Icon name="workflow" />
-                <h3 class="text-base">Capability example catalog</h3>
+                <h3 class="text-base">Example catalog</h3>
                 <Badge type="subtle">plan preview</Badge>
               </div>
 
@@ -1075,7 +1078,7 @@ registerExample({
                       label="Search examples"
                       labelHidden
                       type="search"
-                      placeholder="Search examples or capabilities"
+                      placeholder="Search examples or features"
                       class="w-full"
                     />
                     <ButtonRadioGroup
@@ -1178,7 +1181,7 @@ registerExample({
                       class="mt-6 grid gap-3 text-sm sm:grid-cols-2 xl:grid-cols-3"
                     >
                       <div class="surface-subtle rounded-sm p-3">
-                        <dt class="body-small text-secondary">Capability</dt>
+                        <dt class="body-small text-secondary">Feature</dt>
                         <dd class="mt-1">
                           {selectedEntry.capabilities.join(' · ')}
                         </dd>
@@ -1203,7 +1206,7 @@ registerExample({
                       >
                         This example alone adds a caller and handler target to
                         the base <code>catalog</code> target for its cross-namespace
-                        proof.
+                        example.
                       </Alert>
                     {/if}
 
@@ -1345,8 +1348,8 @@ registerExample({
                             {selectedEntry.kind === 'Workflow'
                               ? 'Position 1 is a customer ID. Position 2 uses the suggested retry object.'
                               : selectedEntry.kind === 'Standalone activity'
-                                ? 'Priority, fairness, timeouts, and retry policy stay visible in the canonical activity flow.'
-                                : 'Service, operation, and payload stay visible in the canonical Nexus flow.'}
+                                ? 'Priority, fairness, timeouts, and retry policy stay visible in the existing activity flow.'
+                                : 'Service, operation, and payload stay visible in the existing Nexus flow.'}
                           </p>
                         </div>
                       </div>
@@ -1563,10 +1566,10 @@ registerExample({
                     class="flex flex-wrap items-center justify-between gap-3 border-b border-subtle p-4 sm:px-5"
                   >
                     <div>
-                      <h3 class="text-lg">Common session feedback</h3>
+                      <h3 class="text-lg">Session launch status</h3>
                       <p class="body-small mt-1 text-secondary">
-                        One shared session panel gives every supported kind
-                        truthful, session-scoped launch feedback.
+                        One session panel shows launch status for every
+                        supported execution kind.
                       </p>
                     </div>
                     <Badge type="subtle">one click → one attempt</Badge>
@@ -1611,7 +1614,7 @@ registerExample({
                   </ul>
                 </Card>
 
-                <Alert intent="warning" title="Truthful execution feedback">
+                <Alert intent="warning" title="Uncertain acceptance">
                   Acceptance uncertainty preserves the generated identity and
                   observation retry retrieves the state of that same attempt.
                 </Alert>
@@ -1632,17 +1635,17 @@ registerExample({
                   07 · Your review
                 </p>
                 <h2 class="mt-3 text-3xl text-inverse sm:text-4xl">
-                  Does this make the right UI features easy to prove?
+                  Does this cover the examples and execution paths we need?
                 </h2>
                 <p class="mt-4 text-base leading-7 text-inverse">
-                  The pitch is a source-controlled developer workbench inside
-                  the package we already ship: a confident home for UI
-                  capability examples and their native execution flows.
+                  This plan adds a source-controlled developer workbench inside
+                  the package we already ship. It keeps UI examples with the
+                  code that runs them.
                 </p>
               </div>
 
               <div class="mt-8 grid gap-4 md:grid-cols-2">
-                {#each [['Experience', 'Can a developer find an example by the UI capability they need to inspect, then understand its execution kind?'], ['Authoring', 'Does the local fixture → declaration → expected evidence → promotion flow stay clear and source controlled?'], ['Architecture', 'Do kind-specific adapters and one small runner give each native execution flow what it needs?'], ['Scope', 'Does the catalog present workflow, standalone activity, relationship, link, and Nexus examples with the right level of detail?']] as question (question[0])}
+                {#each [['Experience', 'Can a developer find an example by the UI feature they need to inspect, then understand its execution kind?'], ['Authoring', 'Does the local fixture → declaration → UI result → promotion flow stay clear and source controlled?'], ['Architecture', 'Do the adapters and opt-in Node runner support each execution kind?'], ['Scope', 'Does the catalog present workflow, standalone activity, relationship, link, and Nexus examples with the right level of detail?']] as question (question[0])}
                   <div class="rounded-sm border border-inverse p-5">
                     <p class="font-medium text-inverse">{question[0]}</p>
                     <p class="mt-2 text-sm leading-6 text-inverse">

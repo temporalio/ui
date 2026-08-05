@@ -28,7 +28,7 @@
     await expect(
       canvas.getByRole('heading', {
         level: 1,
-        name: 'Make Temporal UI features easy to prove.',
+        name: 'Add shared feature examples to Temporal UI.',
       }),
     ).toBeInTheDocument();
     await expect(
@@ -50,7 +50,9 @@
     await expect(
       canvas.getByText(/never worker registration/),
     ).toBeInTheDocument();
-    await expect(canvas.getByText('Browser-safe catalog')).toBeInTheDocument();
+    await expect(
+      canvas.getByText('Serializable browser catalog'),
+    ).toBeInTheDocument();
     await expect(
       canvas.getByText('Node-only worker bindings'),
     ).toBeInTheDocument();
