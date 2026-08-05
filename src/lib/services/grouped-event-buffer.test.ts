@@ -1896,3 +1896,67 @@ describe('appendLiveEvent — livePendingFollowers (unified bidirectional patter
     expect(g?.eventList).toHaveLength(2); // not 3
   });
 });
+
+// ---------------------------------------------------------------------------
+// Group reference identity
+//
+// The timeline row pool reuses a row while its group reference is unchanged, so
+// every path that adds an event to an already-rendered group must publish a
+// fresh reference. Regression: a running activity's bar and label stayed
+// "in progress" after it completed, until reload.
+// ---------------------------------------------------------------------------
+
+describe('group reference identity', () => {
+  beforeEach(() => {
+    reset(10);
+    resetLive();
+  });
+
+  it('publishes a fresh reference when a live completion extends a fetched group', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    processEvent(scheduled, true);
+    processEvent(started, true);
+
+    const before = getGroupArray().find((g) => g.id === '1');
+    expect(before?.eventList).toHaveLength(2);
+    expect(before?.finalClassification).toBe('Started');
+
+    expect(appendLiveEvent(completed)).toBe(true);
+
+    const after = getGroupArray().find((g) => g.id === '1');
+    expect(after).not.toBe(before);
+    expect(after?.eventList).toHaveLength(3);
+    expect(after?.finalClassification).toBe('Completed');
+  });
+
+  it('publishes a fresh reference when a live follower extends a live group', () => {
+    const [scheduled, started] = makeActivityGroup(1);
+    appendLiveEvent(scheduled);
+
+    const before = getGroupArray().find((g) => g.id === '1');
+    expect(before?.eventList).toHaveLength(1);
+
+    expect(appendLiveEvent(started)).toBe(true);
+
+    const after = getGroupArray().find((g) => g.id === '1');
+    expect(after).not.toBe(before);
+    expect(after?.eventList).toHaveLength(2);
+  });
+
+  it('publishes a fresh reference when a follower arrives in a later fetch page', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    processEvent(scheduled, true);
+    processEvent(started, true);
+
+    const before = getGroupArray().find((g) => g.id === '1');
+    expect(before?.eventList).toHaveLength(2);
+
+    // A group's terminal event can land in the next 1000-event page.
+    processEvent(completed, true);
+
+    const after = getGroupArray().find((g) => g.id === '1');
+    expect(after).not.toBe(before);
+    expect(after?.eventList).toHaveLength(3);
+    expect(after?.finalClassification).toBe('Completed');
+  });
+});
