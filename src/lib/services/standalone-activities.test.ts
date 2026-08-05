@@ -97,9 +97,9 @@ describe('toActivityCallbacks', () => {
   it('skips callbacks without info and handles empty input', () => {
     expect(toActivityCallbacks(undefined)).toEqual([]);
     expect(
-      toActivityCallbacks([
-        {},
-      ] as unknown as Parameters<typeof toActivityCallbacks>[0]),
+      toActivityCallbacks([{}] as unknown as Parameters<
+        typeof toActivityCallbacks
+      >[0]),
     ).toEqual([]);
   });
 });

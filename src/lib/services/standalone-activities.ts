@@ -72,7 +72,10 @@ const emptyActivityExecution: ActivityExecution = {
   info: emptyActivityExecutionInfo,
 };
 
-type DescribeActivityExecutionResponse = Omit<ActivityExecution, 'callbacks'> & {
+type DescribeActivityExecutionResponse = Omit<
+  ActivityExecution,
+  'callbacks'
+> & {
   callbacks?: temporal.api.activity.v1.ICallbackInfo[] | null;
 };
 
