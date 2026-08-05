@@ -143,9 +143,7 @@
     {/snippet}
     {#snippet rows({ visibleItems })}
       {#each visibleItems as item, index (iterableKey(item))}
-        {@const event = (
-          isLazyGroup(item) ? materializeGroup(item) : item
-        ) as IterableEventWithPending}
+        {@const event = isLazyGroup(item) ? materializeGroup(item) : item}
         {#if isEventGroup(event)}
           <EventSummaryRow
             bind:hoveredEventId
