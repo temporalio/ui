@@ -136,6 +136,7 @@ class GroupRecord implements LazyGroup {
       this.initialEvent = event;
       this.category = groupCategory(event);
       this.headsGroup = isGroupHeadEvent(event as CommonHistoryEvent);
+      applyPendingMetadataTo(this);
     }
     this.version++;
   }
@@ -201,9 +202,45 @@ let cachedWftFailedRevision = -1;
 
 const changeListeners = new Set<ChangeListener>();
 
-// Records currently carrying pending metadata, so enrichGroups knows whether
-// there is anything to clear when the pending arrays go empty.
+// Pending metadata from the workflow run, held so a head event arriving later
+// can pick its own up. Records currently carrying some are tracked so a walk is
+// only needed when there is something to set or clear.
+let pendingByActivityId = new Map<string, PendingActivity>();
+let pendingByNexusScheduledId = new Map<string, PendingNexusOperation>();
 const enrichedRecords = new Set<GroupRecord>();
+
+/** Returns whether the record's pending metadata changed. */
+function applyPendingMetadataTo(record: GroupRecord): boolean {
+  const head = record.initialEvent;
+
+  let pendingActivity: PendingActivity | undefined;
+  let pendingNexusOperation: PendingNexusOperation | undefined;
+
+  if (isActivityTaskScheduledEvent(head)) {
+    pendingActivity = pendingByActivityId.get(
+      head.activityTaskScheduledEventAttributes?.activityId ?? '',
+    );
+  } else if (isNexusOperationScheduledEvent(head)) {
+    pendingNexusOperation = pendingByNexusScheduledId.get(head.id);
+  }
+
+  if (
+    record.pendingActivity === pendingActivity &&
+    record.pendingNexusOperation === pendingNexusOperation
+  ) {
+    return false;
+  }
+
+  record.pendingActivity = pendingActivity;
+  record.pendingNexusOperation = pendingNexusOperation;
+  if (pendingActivity || pendingNexusOperation) {
+    enrichedRecords.add(record);
+  } else {
+    enrichedRecords.delete(record);
+  }
+  record.version++;
+  return true;
+}
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -335,6 +372,8 @@ export function reset(historyLength: number): void {
   headGroup = new Int32Array(size);
   records = [];
   enrichedRecords.clear();
+  pendingByActivityId = new Map();
+  pendingByNexusScheduledId = new Map();
   maxSlot = -1;
 
   failedEvent = null;
@@ -394,65 +433,31 @@ export function ingestHistoryEvent(
  * run. Safe to call repeatedly — groups whose pending entry is unchanged keep
  * their existing reference.
  */
-export function enrichGroups(
+export function setPendingMetadata(
   pendingActivities: PendingActivity[],
   pendingNexusOperations: PendingNexusOperation[],
 ): void {
-  const byActivityId = new Map(
+  pendingByActivityId = new Map(
     pendingActivities.map((pending) => [pending.activityId, pending]),
   );
-  const byNexusScheduledId = new Map(
+  pendingByNexusScheduledId = new Map(
     pendingNexusOperations.map((pending) => [
       String(pending.scheduledEventId),
       pending,
     ]),
   );
 
-  // Re-driven on every buffer batch so late-arriving heads pick up their
-  // metadata, so the overwhelmingly common case — nothing pending, nothing
-  // previously enriched — must not walk every record.
-  if (
-    pendingActivities.length === 0 &&
-    pendingNexusOperations.length === 0 &&
-    enrichedRecords.size === 0
-  ) {
-    return;
-  }
+  const nothingPending =
+    pendingByActivityId.size === 0 && pendingByNexusScheduledId.size === 0;
+  if (nothingPending && enrichedRecords.size === 0) return;
 
   let changed = false;
-
   for (const record of records) {
-    const head = events[record.headSlot];
-    if (!head) continue;
-
-    let pendingActivity: PendingActivity | undefined;
-    let pendingNexusOperation: PendingNexusOperation | undefined;
-
-    if (isActivityTaskScheduledEvent(head)) {
-      pendingActivity = byActivityId.get(
-        head.activityTaskScheduledEventAttributes?.activityId ?? '',
-      );
-    } else if (isNexusOperationScheduledEvent(head)) {
-      pendingNexusOperation = byNexusScheduledId.get(head.id);
+    if (!record.headsGroup) continue;
+    if (applyPendingMetadataTo(record)) {
+      revision++;
+      changed = true;
     }
-
-    if (
-      record.pendingActivity === pendingActivity &&
-      record.pendingNexusOperation === pendingNexusOperation
-    ) {
-      continue;
-    }
-
-    record.pendingActivity = pendingActivity;
-    record.pendingNexusOperation = pendingNexusOperation;
-    if (pendingActivity || pendingNexusOperation) {
-      enrichedRecords.add(record);
-    } else {
-      enrichedRecords.delete(record);
-    }
-    record.version++;
-    revision++;
-    changed = true;
   }
 
   if (changed) notifyChanged();

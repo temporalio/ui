@@ -6,7 +6,6 @@ import { toEventHistory } from '$lib/models/event-history';
 import type { HistoryEvent } from '$lib/types/events';
 
 import {
-  enrichGroups,
   getEventArray,
   getGroupArray,
   getLazyGroups,
@@ -17,6 +16,7 @@ import {
   materializeGroup,
   reset,
   setFailedEvent,
+  setPendingMetadata,
   SHARED_WITH_EVENT_GROUP,
 } from './grouped-event-buffer';
 import { SHARED_WITH_EVENT_GROUP } from './test-helpers/lazy-group-fields';
@@ -393,19 +393,19 @@ describe('activity group integrity', () => {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 11. enrichGroups — pending activity + nexus annotation
+// 11. setPendingMetadata — pending activity + nexus annotation
 // ---------------------------------------------------------------------------
 
-describe('enrichGroups', () => {
+describe('setPendingMetadata', () => {
   it('sets pendingActivity on an in-flight activity group (1 event)', async () => {
     reset(10);
     ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
 
     const pendingActivities = [
       { activityId: '1', state: 'Started', activityType: 'MyActivity' },
-    ] as Parameters<typeof enrichGroups>[0];
+    ] as Parameters<typeof setPendingMetadata>[0];
 
-    enrichGroups(pendingActivities, []);
+    setPendingMetadata(pendingActivities, []);
 
     const [group] = getGroupArray();
     expect(group.pendingActivity).toBeDefined();
@@ -417,10 +417,10 @@ describe('enrichGroups', () => {
     ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
     const before = getGroupArray().find((g) => g.id === '1');
 
-    enrichGroups(
+    setPendingMetadata(
       [
         { activityId: '1', state: 'Started', activityType: 'MyActivity' },
-      ] as Parameters<typeof enrichGroups>[0],
+      ] as Parameters<typeof setPendingMetadata>[0],
       [],
     );
 
@@ -442,11 +442,11 @@ describe('enrichGroups', () => {
     ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
     const pending = [
       { activityId: '1', state: 'Started', activityType: 'MyActivity' },
-    ] as Parameters<typeof enrichGroups>[0];
+    ] as Parameters<typeof setPendingMetadata>[0];
 
-    enrichGroups(pending, []);
+    setPendingMetadata(pending, []);
     const first = getGroupArray().find((g) => g.id === '1');
-    enrichGroups(pending, []);
+    setPendingMetadata(pending, []);
     const second = getGroupArray().find((g) => g.id === '1');
 
     expect(second).toBe(first);
@@ -461,9 +461,9 @@ describe('enrichGroups', () => {
 
     const pendingActivities = [
       { activityId: '1', state: 'Started', activityType: 'TestActivity' },
-    ] as Parameters<typeof enrichGroups>[0];
+    ] as Parameters<typeof setPendingMetadata>[0];
 
-    enrichGroups(pendingActivities, []);
+    setPendingMetadata(pendingActivities, []);
 
     const [group] = getGroupArray();
     expect(group.pendingActivity).toBeUndefined();
@@ -478,12 +478,12 @@ describe('enrichGroups', () => {
 
     // First enrichment marks it pending
     const pa = [{ activityId: '1', state: 'Started' }] as Parameters<
-      typeof enrichGroups
+      typeof setPendingMetadata
     >[0];
-    enrichGroups(pa, []);
+    setPendingMetadata(pa, []);
 
     // Second enrichment with empty array (activity completed server-side)
-    enrichGroups([], []);
+    setPendingMetadata([], []);
 
     const [group] = getGroupArray();
     expect(group.pendingActivity).toBeUndefined();
@@ -495,14 +495,14 @@ describe('enrichGroups', () => {
     ingestHistoryEvent(scheduled, true);
     ingestHistoryEvent(started, true);
 
-    enrichGroups(
+    setPendingMetadata(
       [
         {
           activityId: '1',
           state: 'Started',
           activityType: 'TestActivity',
         },
-      ] as Parameters<typeof enrichGroups>[0],
+      ] as Parameters<typeof setPendingMetadata>[0],
       [],
     );
 
@@ -523,14 +523,14 @@ describe('enrichGroups', () => {
     const [scheduled, timedOut] = makeActivityTimeoutGroup(1);
     ingestHistoryEvent(scheduled, true);
 
-    enrichGroups(
+    setPendingMetadata(
       [
         {
           activityId: '1',
           state: 'Started',
           activityType: 'TestActivity',
         },
-      ] as Parameters<typeof enrichGroups>[0],
+      ] as Parameters<typeof setPendingMetadata>[0],
       [],
     );
 
@@ -551,19 +551,19 @@ describe('enrichGroups', () => {
     ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
     ingestHistoryEvent(makeNexusOperationGroup(4)[0], true);
 
-    enrichGroups(
+    setPendingMetadata(
       [
         {
           activityId: '1',
           state: 'Started',
           activityType: 'MyActivity',
         },
-      ] as Parameters<typeof enrichGroups>[0],
+      ] as Parameters<typeof setPendingMetadata>[0],
       [
         {
           scheduledEventId: '4',
         },
-      ] as Parameters<typeof enrichGroups>[1],
+      ] as Parameters<typeof setPendingMetadata>[1],
     );
 
     const groups = getGroupArray();
@@ -578,7 +578,7 @@ describe('enrichGroups', () => {
   it('ignores activities not in the pending list', async () => {
     reset(10);
     ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'), true);
-    enrichGroups([], []);
+    setPendingMetadata([], []);
 
     const [group] = getGroupArray();
     expect(group.pendingActivity).toBeUndefined();
@@ -590,9 +590,9 @@ describe('enrichGroups', () => {
     ingestHistoryEvent(ts, true);
     ingestHistoryEvent(tf, true);
 
-    enrichGroups(
+    setPendingMetadata(
       [{ activityId: '1', state: 'Started' }] as Parameters<
-        typeof enrichGroups
+        typeof setPendingMetadata
       >[0],
       [],
     );
@@ -1186,10 +1186,10 @@ describe('group reference identity', () => {
     ingestHistoryEvent(makeActivityScheduled(1, 'Act'), true);
     const before = getGroupArray()[0];
 
-    enrichGroups(
+    setPendingMetadata(
       [
         { activityId: '1', state: 'Started', activityType: 'Act' },
-      ] as Parameters<typeof enrichGroups>[0],
+      ] as Parameters<typeof setPendingMetadata>[0],
       [],
     );
 
@@ -1235,13 +1235,13 @@ describe('group reference identity', () => {
 describe('arrival-order independence', () => {
   const pending = [
     { activityId: '1', state: 'Started', activityType: 'Act' },
-  ] as Parameters<typeof enrichGroups>[0];
+  ] as Parameters<typeof setPendingMetadata>[0];
 
   it('drops pending metadata when the completion arrives after enrich', () => {
     reset(10);
     const [scheduled, started, completed] = makeActivityGroup(1);
     ingestHistoryEvent(scheduled, true);
-    enrichGroups(pending, []);
+    setPendingMetadata(pending, []);
     expect(getGroupArray()[0].isPending).toBe(true);
 
     ingestHistoryEvent(started, true);
@@ -1252,10 +1252,25 @@ describe('arrival-order independence', () => {
     expect(group.isPending).toBe(false);
   });
 
+  it('applies pending metadata to a head that arrives afterwards', () => {
+    reset(10);
+    // The run refresh can list an activity before its ActivityTaskScheduled has
+    // been ingested; the buffer holds the metadata and applies it on arrival.
+    setPendingMetadata(pending, []);
+    expect(getLazyGroups()).toHaveLength(0);
+
+    ingestHistoryEvent(makeActivityScheduled(1, 'Act'), true);
+
+    const [lazy] = getLazyGroups();
+    expect(lazy.pendingActivity).toBeDefined();
+    expect(lazy.isPending).toBe(true);
+    expect(materializeGroup(lazy).isPending).toBe(true);
+  });
+
   it('drops pending metadata when enrich runs after the completion', () => {
     reset(10);
     for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
-    enrichGroups(pending, []);
+    setPendingMetadata(pending, []);
 
     const group = getGroupArray()[0];
     expect(group.pendingActivity).toBeUndefined();
@@ -1333,10 +1348,10 @@ describe('lazy and materialized group agreement', () => {
   it('agrees on isPending once pending metadata is attached', () => {
     reset(10);
     ingestHistoryEvent(makeActivityScheduled(1, 'Act'), true);
-    enrichGroups(
+    setPendingMetadata(
       [
         { activityId: '1', state: 'Started', activityType: 'Act' },
-      ] as Parameters<typeof enrichGroups>[0],
+      ] as Parameters<typeof setPendingMetadata>[0],
       [],
     );
 

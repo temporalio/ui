@@ -17,9 +17,9 @@
   import type { PauseHandle } from '$lib/services/fetch-bidirectional';
   import { fetchBidirectional } from '$lib/services/fetch-bidirectional';
   import {
-    enrichGroups,
     ingestHistoryEvent,
     reset as resetBuffer,
+    setPendingMetadata,
   } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { runLivePoll } from '$lib/services/live-poll';
@@ -280,18 +280,13 @@
     livePollingController = null;
   };
 
-  // Pending metadata comes from the workflow run, not the history, so the
-  // buffer must be told. Tracks the buffer too: a pending activity's
-  // ActivityTaskScheduled can arrive after the refresh that listed it, and
-  // enrichGroups skips records whose head is missing. It is idempotent.
+  // Pending metadata comes from the workflow run, not the history. The buffer
+  // holds it and applies it as heads arrive, so this only pushes on a refresh.
   $effect(() => {
-    void eventBuffer.version;
-
-    const activities = $workflowRun.workflow?.pendingActivities ?? [];
-    const nexusOperations = $workflowRun.workflow?.pendingNexusOperations ?? [];
-
-    if (!fetchComplete) return;
-    enrichGroups(activities, nexusOperations);
+    setPendingMetadata(
+      $workflowRun.workflow?.pendingActivities ?? [],
+      $workflowRun.workflow?.pendingNexusOperations ?? [],
+    );
   });
 
   $effect(() => {
