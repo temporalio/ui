@@ -75,8 +75,8 @@
     url.searchParams.get(currentPageKey) || '1',
   );
 
-  // Array-of-union, not union-of-arrays: Paginated's generic would otherwise
-  // infer only the first arm.
+  // Array-of-union, not union-of-arrays: Paginated is generic over one Item,
+  // which `LazyGroup[] | IterableEventWithPending[]` gives it no way to pick.
   const filteredItems: (IterableEventWithPending | LazyGroup)[] = $derived(
     compact
       ? getFailedOrPendingGroups(items, $eventStatusFilter)
