@@ -1903,8 +1903,9 @@ describe('appendLiveEvent — livePendingFollowers (unified bidirectional patter
 //
 // The timeline row pool reuses a row while its group reference is unchanged, so
 // every path that adds an event to an already-rendered group must publish a
-// fresh reference. Regression: a running activity's bar and label stayed
-// "in progress" after it completed, until reload.
+// fresh one. Each test below names the symptom; the assertion is the reference
+// change that prevents it, since the colour and label live in components while
+// the invariant that drives them lives here.
 // ---------------------------------------------------------------------------
 
 describe('group reference identity', () => {
@@ -1913,7 +1914,8 @@ describe('group reference identity', () => {
     resetLive();
   });
 
-  it('publishes a fresh reference when a live completion extends a fetched group', () => {
+  // Without a fresh reference the row keeps its in-progress colour and label.
+  it('a fetched group stops showing as in progress once the live poll completes it', () => {
     const [scheduled, started, completed] = makeActivityGroup(1);
     processEvent(scheduled, true);
     processEvent(started, true);
@@ -1930,7 +1932,8 @@ describe('group reference identity', () => {
     expect(after?.finalClassification).toBe('Completed');
   });
 
-  it('publishes a fresh reference when a live follower extends a live group', () => {
+  // Same symptom for a group the live poll created rather than the fetch.
+  it('a live group stops showing as in progress once the live poll completes it', () => {
     const [scheduled, started] = makeActivityGroup(1);
     appendLiveEvent(scheduled);
 
@@ -1944,7 +1947,9 @@ describe('group reference identity', () => {
     expect(after?.eventList).toHaveLength(2);
   });
 
-  it('publishes a fresh reference when a follower arrives in a later fetch page', () => {
+  // Same symptom on histories over 1000 events, where a group can straddle a
+  // page boundary — no live poll involved.
+  it('a group stops showing as in progress when its completion is a page later', () => {
     const [scheduled, started, completed] = makeActivityGroup(1);
     processEvent(scheduled, true);
     processEvent(started, true);
@@ -1960,7 +1965,12 @@ describe('group reference identity', () => {
     expect(after?.eventList).toHaveLength(3);
     expect(after?.finalClassification).toBe('Completed');
   });
-  it('flushes live followers into the group the fetch just published', () => {
+  // Both producers can park a follower before the head exists. Draining the
+  // first queue swaps in the copy, so the second drain must not write to the
+  // reference processEvent captured before it. When it does, addEventToGroup's
+  // flags land on the abandoned object and the activity renders as if it
+  // succeeded — eventList is shared, so the events themselves still appear.
+  it('a timed-out activity keeps its failure state when its head arrives last', () => {
     reset(10);
 
     // A follower parked by the fetch is flushed when the head registers, which
