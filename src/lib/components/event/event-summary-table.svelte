@@ -39,14 +39,7 @@
   import PendingActivitySummaryRow from './pending-activity-summary-row.svelte';
   import PendingNexusSummaryRow from './pending-nexus-summary-row.svelte';
 
-  /**
-   * Discriminated on `compact` so `items` narrows without a cast, and a caller
-   * can't pair the wrong list with the wrong mode. Callers whose mode is
-   * dynamic spread one of these objects rather than passing a boolean.
-   *
-   * `groups` is feed-only — the gutter graph and the event->group index.
-   * Compact items are groups themselves, so that view passes none.
-   */
+  /** Discriminated on `compact` so `items` narrows without a cast. */
   type Props = {
     updating?: boolean;
     loading?: boolean;
@@ -60,9 +53,7 @@
       }
   );
 
-  // const, and no default on `compact`: a default widens the literal and
-  // `let` lets TypeScript assume reassignment, either of which breaks the
-  // narrowing below.
+  // `const` with no default on `compact` — `let` or a default breaks narrowing.
   const {
     items,
     compact,
@@ -72,8 +63,7 @@
     minimized = true,
   }: Props = $props();
 
-  // Cross-row coordination only: a row sets this on hover and its siblings read
-  // it to highlight related activities. Never set from outside the table.
+  // Set by a hovered row, read by its siblings to highlight related activities.
   let hoveredEventId = $state<string | undefined>(undefined);
 
   const showGraph = $derived(!minimized && !compact);
@@ -85,19 +75,15 @@
     url.searchParams.get(currentPageKey) || '1',
   );
 
-  // The compact view's items are all groups, so it filters with the group
-  // predicate — getFailedOrPendingEvents routes through isEventGroup, whose
-  // eventList check a LazyGroup can't satisfy.
-  // Array-of-union, not union-of-arrays: Paginated is generic over its item
-  // type and would otherwise infer only the first arm.
+  // Array-of-union, not union-of-arrays: Paginated's generic would otherwise
+  // infer only the first arm.
   const filteredItems: (IterableEventWithPending | LazyGroup)[] = $derived(
     compact
       ? getFailedOrPendingGroups(items, $eventStatusFilter)
       : getFailedOrPendingEvents(items, $eventStatusFilter),
   );
 
-  // The gutter graph sits outside Paginated, so it re-derives the current page.
-  // Only reachable when showGraph, which is false when compact — hence events.
+  // The gutter graph sits outside Paginated, so it re-derives the page.
   const graphHistory = $derived(
     showGraph
       ? (filteredItems as WorkflowEventWithPending[]).slice(

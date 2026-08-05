@@ -63,9 +63,8 @@
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
 
-  // Lazy groups are enough to filter, sort and paginate; only the rendered page
-  // is materialized. The feed view needs full groups for its gutter graph and
-  // event->group index, and reads them lazily via tableGroups below.
+  // Enough to filter, sort and paginate; only the rendered page is materialized.
+  // The feed view needs full groups, read lazily in tableProps below.
   const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
   const bufferEvents = $derived(eventBuffer.events);
   let updating = $derived(!historyCtx.fetchComplete);
@@ -114,10 +113,8 @@
     reverseSort ? [...filteredEvents].reverse() : filteredEvents,
   );
 
-  // One discriminated object rather than separate props: EventSummaryTable's
-  // props are a union on `compact`, so passing a dynamic boolean alongside a
-  // dynamic list wouldn't satisfy either arm. Building it here also means the
-  // feed view's fully materialized groups are only read on the feed branch.
+  // EventSummaryTable's props are a union on `compact`, so the pair travels as
+  // one object. Keeps the materialized groups on the feed branch too.
   const tableProps = $derived(
     compact
       ? {

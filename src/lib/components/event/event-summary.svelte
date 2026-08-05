@@ -43,8 +43,7 @@
     workflow?.pendingNexusOperations ?? [],
   );
 
-  // EventSummaryTable's props are a union on `compact`, so the pair travels as
-  // one discriminated object rather than two independent props.
+  // Union on `compact` — the pair travels as one object.
   const tableProps = $derived(
     compact
       ? {
