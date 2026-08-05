@@ -96,11 +96,11 @@ export function isLazyGroup(value: unknown): value is LazyGroup {
 }
 
 /**
- * One per group for the lifetime of the run. Holds the member slots rather than
- * the events, and derives LazyGroup from them on demand — every getter is a
- * lookup into `events`, so lazy groups cost no allocation.
+ * One per group for the lifetime of the run. Holds member slots rather than
+ * events, so a LazyGroup costs no allocation — its fields are either stored at
+ * head time or read straight out of `events`.
  *
- * INVARIANT: each getter must agree with the same field on the materialized
+ * INVARIANT: every field must agree with the same field on the materialized
  * EventGroup, or a view will filter on one and render the other. Guarded by
  * grouped-event-buffer.test.ts.
  */
@@ -115,11 +115,8 @@ class GroupRecord implements LazyGroup {
   cachedVersion = -1;
 
   /**
-   * Set when the head event lands. These three are pure functions of an event
-   * that never changes, and they are read on the hottest paths there are — the
-   * category filter reads `category` twice per group per pass, and the row pool
-   * reads `id` for every group — so they are computed once rather than derived
-   * on each access.
+   * Pure functions of a head event that never changes, and read once per group
+   * per filter pass — so stored rather than recomputed on each access.
    */
   readonly id: string;
   category: WorkflowEvent['category'] = 'workflow';
@@ -358,8 +355,8 @@ export function reset(historyLength: number): void {
 }
 
 /**
- * Call from the descending cursor's onFirstDescPage hook to capture the
- * failedEvent used for billableActions calculation.
+ * The reset point past which events stop counting toward billableActions.
+ * Currently unwired — no production caller supplies it.
  */
 export function setFailedEvent(raw: HistoryEvent | null): void {
   failedEvent = raw;

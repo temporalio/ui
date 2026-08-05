@@ -3,9 +3,9 @@ import { expect, test } from '@playwright/test';
 import { mockWorkflowApis } from '~/test-utilities/mock-apis';
 import { mockWorkflow } from '~/test-utilities/mocks/workflow';
 
-// The compact view paginates grouped events. It reads the buffer's group
-// summaries and materializes only the rendered page, so the rows below are the
-// check that filtering on a summary and rendering a materialized group agree.
+// The compact view paginates grouped events, materializing only the rendered
+// page — so these rows check that filtering on a LazyGroup and rendering the
+// materialized EventGroup agree.
 
 const { workflowId, runId } = mockWorkflow.workflowExecutionInfo.execution;
 const historyUrl = `/namespaces/default/workflows/${workflowId}/${runId}/history`;

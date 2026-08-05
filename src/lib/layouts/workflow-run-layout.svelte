@@ -280,11 +280,10 @@
     livePollingController = null;
   };
 
-  // Pending activity/nexus metadata comes from the workflow run, not the event
-  // history, so the buffer has to be told about it. Tracks the buffer too: a
-  // pending activity's ActivityTaskScheduled can be ingested after the run
-  // refresh that listed it, and enrichGroups skips records whose head event has
-  // not arrived yet. enrichGroups is idempotent, so re-running settles.
+  // Pending metadata comes from the workflow run, not the history, so the
+  // buffer must be told. Tracks the buffer too: a pending activity's
+  // ActivityTaskScheduled can arrive after the refresh that listed it, and
+  // enrichGroups skips records whose head is missing. It is idempotent.
   $effect(() => {
     const activities = $workflowRun.workflow?.pendingActivities ?? [];
     const nexusOperations = $workflowRun.workflow?.pendingNexusOperations ?? [];

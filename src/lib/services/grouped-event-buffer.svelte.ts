@@ -17,21 +17,15 @@ const versionStore = writable(0);
 /**
  * Reactive read surface over the grouped-event-buffer.
  *
- * The buffer itself is a plain data structure: it stores events and derives
- * groups, but knows nothing about Svelte. This wraps it so views read a value
- * instead of assembling their own subscribe / throttle / re-read effect —
- * previously duplicated in both workflow layouts, and easy to get subtly wrong
- * (a missed re-read leaves the view showing stale groups).
+ * The buffer knows nothing about Svelte; this wraps it so views read a value
+ * instead of assembling their own subscribe / throttle / re-read effect. Writes
+ * go through the buffer's own functions and notify this automatically, so
+ * producers never announce their own changes.
  *
- * Writes still go through the buffer's own functions; they notify this view
- * automatically, so producers never announce their own changes.
- *
- * Updates are coalesced onto a microtask. A fetch page delivers up to 1000
- * events and the live poll arrives in batches, both ingested in a synchronous
- * loop, so this collapses a batch into one update without deferring past the
- * current task. Deliberately not requestAnimationFrame: that never fires in a
- * hidden tab, which would leave a run opened in a background tab with an empty
- * event history until it was focused.
+ * Updates coalesce onto a microtask: fetch pages and poll batches are ingested
+ * in synchronous loops, so a batch becomes one update. Deliberately not
+ * requestAnimationFrame — that never fires in a hidden tab, which would leave a
+ * run opened in a background tab with an empty event history until focused.
  */
 class EventBufferView {
   private _version = $state(0);

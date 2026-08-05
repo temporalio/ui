@@ -1,9 +1,6 @@
 import { orderGroupsByPending } from './order-groups-by-pending';
 
-/**
- * The fields these sorts read — satisfied by a full EventGroup and by the
- * buffer's LazyGroup, so the timeline can order groups without building them.
- */
+/** Satisfied by both EventGroup and LazyGroup, so neither needs building. */
 type SortableGroup = {
   isPending: boolean;
   initialEvent: { id: string };
@@ -33,8 +30,7 @@ export const sortGroupsDuringLoading = <T extends SortableGroup>(
 ): T[] => {
   if (!descMinId) return groups;
 
-  // Stable partition, not a sort: the key is a boolean and the input is already
-  // in event-ID order, so one pass reads `isPending` once per group.
+  // Partition, not a sort — see orderGroupsByPending.
   const pending: T[] = [];
   const rest: T[] = [];
   for (const group of groups) {

@@ -1,13 +1,8 @@
 /**
  * Moves pending groups to one end, preserving relative order within each side.
- *
- * A stable partition rather than a sort: the key is a boolean and the input is
- * already correctly ordered, so one pass reads `isPending` once per group
- * instead of the ~n log n reads a comparator would. That matters because
- * `isPending` is a getter on the buffer's LazyGroup, and this runs over every
- * group on each update.
- *
- * Accepts anything carrying `isPending` — a full EventGroup or a LazyGroup.
+ * A partition rather than a sort: the key is a boolean over an already-ordered
+ * array, so `isPending` — a getter on LazyGroup — is read once per group
+ * instead of ~n log n times.
  */
 export const orderGroupsByPending = <T extends { isPending: boolean }>(
   groups: T[],

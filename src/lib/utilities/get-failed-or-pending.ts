@@ -20,9 +20,8 @@ const isFailedLocalActivity = (event: WorkflowEvent) => {
 };
 
 /**
- * The fields the group filters read. Satisfied by a full EventGroup and by the
- * buffer's LazyGroup — deliberately not routed through isEventGroup, whose
- * `eventList` check a lazy group can't satisfy.
+ * Satisfied by both EventGroup and LazyGroup. Deliberately not routed through
+ * isEventGroup, whose `eventList` check a LazyGroup can't satisfy.
  */
 type FilterableGroup = {
   classification: EventGroup['classification'];

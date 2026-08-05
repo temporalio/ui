@@ -53,8 +53,8 @@
   }: {
     items: IterableEventWithPending[] | LazyGroup[];
     /**
-     * Only read in the feed view, for the gutter graph and the event->group
-     * index; the compact view resolves each rendered row's group itself.
+     * Feed view only — the gutter graph and the event->group index. The compact
+     * view materializes each rendered row itself.
      */
     groups?: EventGroups | LazyGroup[];
     updating?: boolean;
@@ -66,8 +66,7 @@
 
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
-  // Feed view only: the compact view is handed summaries and never renders the
-  // rows that need this index.
+  // Feed view only: the compact view never renders the rows that need this.
   const groupIndex = $derived(
     compact
       ? new Map<string, EventGroup>()
@@ -81,7 +80,7 @@
 
   // The compact view's items are all groups, so it filters with the group
   // predicate — getFailedOrPendingEvents routes through isEventGroup, whose
-  // eventList check a summary can't satisfy.
+  // eventList check a LazyGroup can't satisfy.
   const filteredForStatus = (list: IterableEventWithPending[] | LazyGroup[]) =>
     compact
       ? getFailedOrPendingGroups(list as LazyGroup[], $eventStatusFilter)
@@ -105,7 +104,7 @@
     ...($isCloud ? [{ label: 'Billable Actions' }] : []),
   ]);
 
-  // Matches against summaries or groups, materializing only the one found.
+  // Matches lazy groups or full groups, materializing only the one found.
   const findGroup = (predicate: (group: EventGroup | LazyGroup) => boolean) => {
     const match = groups.find(predicate);
     return match ? materializeGroup(match) : undefined;

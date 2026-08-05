@@ -5,10 +5,7 @@ import { isNullish } from '$lib/utilities/type-predicates';
 import { Timespan } from './timespan';
 import type { TimeSegment } from './types';
 
-/**
- * The fields segment layout reads — satisfied by a full EventGroup and by the
- * buffer's LazyGroup, so gaps are computed without building groups.
- */
+/** Satisfied by both EventGroup and LazyGroup, so neither needs building. */
 type GroupForSegments = {
   initialEvent: WorkflowEvent;
   lastEvent: WorkflowEvent;

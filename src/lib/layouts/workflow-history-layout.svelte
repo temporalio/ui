@@ -65,9 +65,9 @@
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
 
-  // Summaries are enough to filter, sort and paginate; only the rendered page
-  // is materialized. The feed view still needs full groups for its gutter graph
-  // and event->group index, and reads them lazily via tableGroups below.
+  // Lazy groups are enough to filter, sort and paginate; only the rendered page
+  // is materialized. The feed view needs full groups for its gutter graph and
+  // event->group index, and reads them lazily via tableGroups below.
   const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
   const bufferEvents = $derived(eventBuffer.events);
   let updating = $derived(!historyCtx.fetchComplete);

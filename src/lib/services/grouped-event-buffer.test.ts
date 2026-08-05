@@ -779,9 +779,8 @@ describe('getGroupArray', () => {
 // ingestHistoryEvent — boolean return value (live-poll tight-loop fix)
 //
 // Regression: the live poll was firing thousands of requests because ingestion
-// returned void, so the caller always called bufferVersion.update() even for
-// duplicate events returned by the server. The fix: return true for genuinely
-// new events, false for duplicates.
+// returned void, so the caller treated every response as progress even when the
+// server redelivered events it already had.
 // ---------------------------------------------------------------------------
 
 describe('ingestHistoryEvent boolean return', () => {
@@ -1129,7 +1128,7 @@ describe('followers ingested before their head', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 17. Group reference identity
+// 14. Group reference identity
 //
 // Group objects are derived and memoized on a per-group version, so identity is
 // a pure function of content: any change a rendered view must see yields a new
@@ -1226,7 +1225,7 @@ describe('group reference identity', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 18. Arrival-order independence
+// 15. Arrival-order independence
 //
 // Pending metadata is applied when the group is built rather than written into
 // it on arrival, so a terminal event and a stale pending entry resolve the same
@@ -1284,7 +1283,7 @@ describe('arrival-order independence', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 19. Lazy / materialized group agreement
+// 16. Lazy / materialized group agreement
 //
 // Views filter and sort on LazyGroup but render a materialized EventGroup, so
 // every getter on the record must agree with the same field on the group. A

@@ -36,8 +36,8 @@
 
   interface Props {
     workflow: WorkflowExecution;
-    // Summaries, not groups: filtering, sorting and segment layout need no
-    // EventGroup, so only the pooled rows below materialize one.
+    // Filtering, sorting and segment layout need no EventGroup, so only the
+    // pooled rows below materialize one.
     lazyGroups: LazyGroup[];
     readOnly?: boolean;
     error?: boolean;
@@ -420,10 +420,9 @@
   // slot object when unchanged — a fresh object each pass would change the {#each}
   // item and re-run the row derived for rows that didn't move.
   //
-  // A lazy group's identity is stable for the whole run, so its version has to
-  // be part of the check: without it a group that gained an event would keep its
-  // slot object, the {#each} item wouldn't change, and the row would never
-  // re-read its now-stale group.
+  // Compare version too: a lazy group's identity is stable for the whole run,
+  // so without it a group that gained an event would keep its slot object and
+  // the row would never re-read it.
   type Slot = {
     index: number;
     lazy: LazyGroup;
