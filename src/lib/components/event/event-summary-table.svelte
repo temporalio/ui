@@ -143,42 +143,42 @@
     {/snippet}
     {#snippet rows({ visibleItems })}
       {#each visibleItems as item, index (iterableKey(item))}
-        {@const event = isLazyGroup(item) ? materializeGroup(item) : item}
-        {#if isEventGroup(event)}
+        {@const row = isLazyGroup(item) ? materializeGroup(item) : item}
+        {#if isEventGroup(row)}
           <EventSummaryRow
             bind:hoveredEventId
-            {event}
+            event={row}
             {index}
-            group={event}
+            group={row}
             {compact}
             {initialItem}
           />
-        {:else if isPendingActivity(event)}
+        {:else if isPendingActivity(row)}
           <PendingActivitySummaryRow
-            {event}
+            event={row}
             {index}
             group={groups.find(
               (g) =>
-                isPendingActivity(event) && g?.pendingActivity?.id === event.id,
+                isPendingActivity(row) && g?.pendingActivity?.id === row.id,
             )}
           />
-        {:else if isPendingNexusOperation(event)}
+        {:else if isPendingNexusOperation(row)}
           <PendingNexusSummaryRow
-            {event}
+            event={row}
             {index}
             group={groups.find(
               (g) =>
-                isPendingNexusOperation(event) &&
+                isPendingNexusOperation(row) &&
                 g?.pendingNexusOperation?.scheduledEventId ===
-                  event.scheduledEventId,
+                  row.scheduledEventId,
             )}
           />
         {:else}
           <EventSummaryRow
             bind:hoveredEventId
-            {event}
+            event={row}
             {index}
-            group={isEvent(event) ? groupIndex.get(event.id) : undefined}
+            group={isEvent(row) ? groupIndex.get(row.id) : undefined}
             {compact}
             {initialItem}
           />
