@@ -107,10 +107,10 @@
   );
 
   let lazyGroups = $derived(
-    reverseSort ? [...filteredLazyGroups].reverse() : filteredLazyGroups,
+    reverseSort ? filteredLazyGroups.toReversed() : filteredLazyGroups,
   );
   let history = $derived(
-    reverseSort ? [...filteredEvents].reverse() : filteredEvents,
+    reverseSort ? filteredEvents.toReversed() : filteredEvents,
   );
 
   // EventSummaryTable's props are a union on `compact`, so the pair travels as

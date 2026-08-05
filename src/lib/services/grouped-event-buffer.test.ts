@@ -1270,7 +1270,7 @@ describe('arrival-order independence', () => {
     const ascending = getGroupArray()[0];
 
     reset(10);
-    for (const event of [...group].reverse()) ingestHistoryEvent(event, false);
+    for (const event of group.toReversed()) ingestHistoryEvent(event, false);
     const descending = getGroupArray()[0];
 
     expect(descending.eventList.map((event) => event.id)).toEqual(
