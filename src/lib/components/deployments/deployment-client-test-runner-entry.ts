@@ -9,7 +9,7 @@ import resources from '$lib/i18n/locales';
 import Deployment from '$lib/pages/deployment.svelte';
 import type {
   ComputeStatus,
-  WorkerDeploymentSummary,
+  ListWorkerDeployment,
 } from '$lib/types/deployments';
 
 import { resetDeploymentsServiceMock } from './deployments-service-client-test-double';
@@ -118,7 +118,7 @@ export function renderRows({
 function deployment(
   name: string,
   computeStatus: ComputeStatus,
-): WorkerDeploymentSummary {
+): ListWorkerDeployment {
   return {
     name,
     createTime: msNumberToTs(1_000),

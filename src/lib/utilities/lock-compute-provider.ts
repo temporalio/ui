@@ -4,7 +4,7 @@ import type {
 } from '$lib/components/workers/serverless-worker-form/shared';
 import type {
   ComputeConfig,
-  WorkerDeploymentInfo,
+  DescribeWorkerDeployment,
 } from '$lib/types/deployments';
 
 export type LockedComputeProvider = {
@@ -34,21 +34,17 @@ const providersInConfig = (
 };
 
 export const lockComputeProvider = (
-  deployment: WorkerDeploymentInfo,
+  deployment: DescribeWorkerDeployment,
   configuredProviders?: readonly ComputeProviderOption[],
 ): LockedComputeProvider | undefined => {
   const versionSummaries = deployment.versionSummaries ?? [];
   if (!versionSummaries.length) return;
 
-  const configs = [
-    deployment.computeConfig,
-    computeConfigOf(deployment.latestVersionSummary),
-    computeConfigOf(deployment.currentVersionSummary),
-    computeConfigOf(deployment.rampingVersionSummary),
-    ...versionSummaries.map((version) =>
+  const configs = versionSummaries
+    .map((version) =>
       'computeConfig' in version ? computeConfigOf(version) : undefined,
-    ),
-  ].filter((config): config is ComputeConfig => Boolean(config));
+    )
+    .filter((config): config is ComputeConfig => Boolean(config));
 
   if (!configs.length) return;
 

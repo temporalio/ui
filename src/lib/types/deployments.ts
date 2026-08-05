@@ -1,5 +1,7 @@
 import type { Timestamp } from '@temporalio/common';
 
+type ApiTimestamp = Timestamp | string;
+
 export interface DeploymentParameters {
   namespace: string;
   deploymentName: string;
@@ -20,23 +22,25 @@ export interface RoutingConfig {
   rampingVersion?: string;
   rampingDeploymentVersion?: WorkerDeploymentVersion;
   rampingVersionPercentage?: number;
-  currentVersionChangedTime?: Timestamp;
-  rampingVersionChangedTime?: Timestamp;
-  rampingVersionPercentageChangedTime?: Timestamp;
+  currentVersionChangedTime?: ApiTimestamp;
+  rampingVersionChangedTime?: ApiTimestamp;
+  rampingVersionPercentageChangedTime?: ApiTimestamp;
+  revisionNumber?: string;
 }
 
-export interface WorkerDeploymentSummary {
+/** A deployment returned by ListWorkerDeployments. */
+export interface ListWorkerDeployment {
   name: string;
-  createTime: Timestamp;
+  createTime: ApiTimestamp;
   routingConfig: RoutingConfig;
   latestVersionSummary?: VersionSummaryNew;
-  currentVersionSummary: VersionSummaryNew;
+  currentVersionSummary?: VersionSummaryNew;
   rampingVersionSummary?: VersionSummaryNew;
 }
 
 export interface ListWorkerDeploymentsResponse {
   nextPageToken: string;
-  workerDeployments: WorkerDeploymentSummary[];
+  workerDeployments: ListWorkerDeployment[];
 }
 
 export function isVersionSummaryNew(
@@ -52,13 +56,13 @@ export function isVersionSummaryNew(
 export type VersionSummary = VersionSummaryOld | VersionSummaryNew;
 export interface VersionSummaryOld {
   version: string;
-  createTime: Timestamp;
+  createTime: ApiTimestamp;
   drainageStatus: string;
 }
 
 export interface ProviderValidation {
   errorMessage?: string;
-  lastCheckTime?: Timestamp;
+  lastCheckTime?: ApiTimestamp;
 }
 
 export interface ComputeStatus {
@@ -70,29 +74,34 @@ export interface VersionSummaryNew {
   status?: string;
   drainageStatus?: string;
   deploymentVersion?: WorkerDeploymentVersion;
-  createTime: Timestamp;
+  createTime: ApiTimestamp;
   drainageInfo?: {
-    lastChangedTime?: Timestamp;
-    lastCheckedTime?: Timestamp;
+    lastChangedTime?: ApiTimestamp;
+    lastCheckedTime?: ApiTimestamp;
   };
-  currentSinceTime?: Timestamp;
-  rampingSinceTime?: Timestamp;
-  routingUpdateTime?: Timestamp;
-  firstActivationTime?: Timestamp;
-  lastDeactivationTime?: Timestamp;
+  currentSinceTime?: ApiTimestamp;
+  rampingSinceTime?: ApiTimestamp;
+  routingUpdateTime?: ApiTimestamp;
+  firstActivationTime?: ApiTimestamp;
+  lastDeactivationTime?: ApiTimestamp;
+  lastCurrentTime?: ApiTimestamp;
   computeConfig?: ComputeConfig;
   computeStatus?: ComputeStatus;
 }
 
-export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {
-  lastModifierIdentity: string;
+/** A deployment returned by DescribeWorkerDeployment. */
+export interface DescribeWorkerDeployment {
+  name: string;
+  createTime: ApiTimestamp;
+  routingConfig: RoutingConfig;
+  lastModifierIdentity?: string;
   versionSummaries: VersionSummary[];
-  computeConfig?: ComputeConfig;
+  routingConfigUpdateState?: string;
 }
 
-export interface WorkerDeploymentResponse {
+export interface DescribeWorkerDeploymentResponse {
   conflictToken: string;
-  workerDeploymentInfo: WorkerDeploymentInfo;
+  workerDeploymentInfo: DescribeWorkerDeployment;
 }
 
 export interface TaskQueueInfo {

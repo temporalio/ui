@@ -13,28 +13,24 @@ import {
   closeDeploymentClientTestRunner,
   getDeploymentClientTestRunner,
 } from '$lib/components/deployments/deployment-client-test-runner';
-import type { WorkerDeploymentResponse } from '$lib/types/deployments';
+import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
 
 const deployment = {
   conflictToken: 'token',
   workerDeploymentInfo: {
     name: 'deployment',
+    createTime: '',
     routingConfig: {
       currentDeploymentVersion: {
         deploymentName: 'deployment',
         buildId: 'build-id',
       },
     },
-    currentVersionSummary: {
-      version: 'deployment.build-id',
-      computeConfig: {
-        scalingGroups: { default: { providerType: 'aws-lambda' } },
-      },
-    },
     lastModifierIdentity: 'test',
     versionSummaries: [
       {
         version: 'deployment.build-id',
+        createTime: '',
         deploymentVersion: {
           deploymentName: 'deployment',
           buildId: 'build-id',
@@ -45,25 +41,44 @@ const deployment = {
         },
         computeStatus: {
           providerValidation: {
-            lastCheckTime: { seconds: 1, nanos: 0 },
+            lastCheckTime: '2026-08-04T18:54:10.136859273Z',
           },
         },
       },
     ],
   },
-} as unknown as WorkerDeploymentResponse;
+} satisfies DescribeWorkerDeploymentResponse;
 
 const selfHostedDeployment = {
-  ...deployment,
+  conflictToken: 'token',
   workerDeploymentInfo: {
-    ...deployment.workerDeploymentInfo,
+    name: 'deployment',
+    createTime: '',
+    routingConfig: {
+      currentDeploymentVersion: {
+        deploymentName: 'deployment',
+        buildId: 'build-id',
+      },
+    },
+    lastModifierIdentity: 'test',
     versionSummaries: [
       {
-        ...deployment.workerDeploymentInfo.versionSummaries[0],
-        computeConfig: undefined,
+        version: 'deployment.build-id',
+        createTime: '',
+        deploymentVersion: {
+          deploymentName: 'deployment',
+          buildId: 'build-id',
+        },
+        status: 'WORKER_DEPLOYMENT_VERSION_STATUS_CURRENT',
+        computeStatus: {
+          providerValidation: {
+            lastCheckTime: '2026-08-04T18:54:10.136859273Z',
+          },
+        },
       },
       {
         version: 'deployment.build-id-2',
+        createTime: '',
         deploymentVersion: {
           deploymentName: 'deployment',
           buildId: 'build-id-2',
@@ -72,11 +87,8 @@ const selfHostedDeployment = {
         computeConfig: { scalingGroups: {} },
       },
     ],
-    currentVersionSummary: {
-      version: 'deployment.build-id',
-    },
   },
-} as unknown as WorkerDeploymentResponse;
+} satisfies DescribeWorkerDeploymentResponse;
 
 function menuItems(menu: Element | null) {
   return Array.from(menu?.querySelectorAll('[role="menuitem"]') ?? []).map(

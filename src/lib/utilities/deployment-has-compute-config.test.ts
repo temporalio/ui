@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import type {
   ComputeConfig,
-  WorkerDeploymentInfo,
+  DescribeWorkerDeployment,
+  ListWorkerDeployment,
 } from '$lib/types/deployments';
 
 import { deploymentHasComputeConfig } from './deployment-has-compute-config';
@@ -16,17 +17,22 @@ const computeConfig: ComputeConfig = {
   },
 };
 
-const baseDeployment = {
+const baseDescribe = {
   name: 'loan-underwriting-app',
-  createTime: undefined,
+  createTime: '',
   routingConfig: {},
-  lastModifierIdentity: 'test',
   versionSummaries: [],
+} satisfies DescribeWorkerDeployment;
+
+const baseList = {
+  name: 'loan-underwriting-app',
+  createTime: '',
+  routingConfig: {},
   currentVersionSummary: {
     version: 'loan-underwriting-app.build-1',
-    createTime: undefined,
+    createTime: '',
   },
-} as unknown as WorkerDeploymentInfo;
+} satisfies ListWorkerDeployment;
 
 describe('deploymentHasComputeConfig', () => {
   it('returns false for undefined deployment', () => {
@@ -34,62 +40,52 @@ describe('deploymentHasComputeConfig', () => {
   });
 
   it('returns false when no compute config exists', () => {
-    expect(deploymentHasComputeConfig(baseDeployment)).toBe(false);
+    expect(deploymentHasComputeConfig(baseDescribe)).toBe(false);
   });
 
-  it('returns false when compute config has no scaling groups', () => {
+  it('returns false when a list response has no version summaries', () => {
     expect(
       deploymentHasComputeConfig({
-        ...baseDeployment,
-        computeConfig: { scalingGroups: {} },
+        name: 'loan-underwriting-app',
+        createTime: '',
+        routingConfig: {},
       }),
     ).toBe(false);
   });
 
-  it('returns true when the deployment has a compute config', () => {
-    expect(
-      deploymentHasComputeConfig({ ...baseDeployment, computeConfig }),
-    ).toBe(true);
-  });
-
-  it('returns true when the current version summary has a compute config', () => {
+  it('returns true when a list current version summary has a compute config', () => {
     expect(
       deploymentHasComputeConfig({
-        ...baseDeployment,
+        ...baseList,
         currentVersionSummary: {
-          ...baseDeployment.currentVersionSummary,
+          ...baseList.currentVersionSummary,
           computeConfig,
         },
       }),
     ).toBe(true);
   });
 
-  it('returns true when the ramping version summary has a compute config', () => {
+  it('returns true when a list ramping version summary has a compute config', () => {
     expect(
       deploymentHasComputeConfig({
-        ...baseDeployment,
+        ...baseList,
         rampingVersionSummary: {
           version: 'loan-underwriting-app.build-2',
-          createTime: undefined,
+          createTime: '',
           computeConfig,
         },
       }),
     ).toBe(true);
   });
 
-  it('ignores compute configs on inactive versions', () => {
+  it('ignores compute configs on describe versions that are not routed to', () => {
     expect(
       deploymentHasComputeConfig({
-        ...baseDeployment,
-        latestVersionSummary: {
-          version: 'loan-underwriting-app.build-2',
-          createTime: undefined,
-          computeConfig,
-        },
+        ...baseDescribe,
         versionSummaries: [
           {
             version: 'loan-underwriting-app.build-0',
-            createTime: undefined,
+            createTime: '',
             computeConfig,
           },
         ],
@@ -97,12 +93,10 @@ describe('deploymentHasComputeConfig', () => {
     ).toBe(false);
   });
 
-  // DescribeWorkerDeployment only returns versionSummaries + routingConfig.
   it('returns true when the routed current version summary has a compute config', () => {
     expect(
       deploymentHasComputeConfig({
-        ...baseDeployment,
-        currentVersionSummary: undefined,
+        ...baseDescribe,
         routingConfig: {
           currentDeploymentVersion: {
             deploymentName: 'loan-underwriting-app',
@@ -116,19 +110,18 @@ describe('deploymentHasComputeConfig', () => {
               deploymentName: 'loan-underwriting-app',
               buildId: 'build-1',
             },
-            createTime: undefined,
+            createTime: '',
             computeConfig,
           },
         ],
-      } as unknown as WorkerDeploymentInfo),
+      }),
     ).toBe(true);
   });
 
   it('returns true when the routed ramping version summary has a compute config', () => {
     expect(
       deploymentHasComputeConfig({
-        ...baseDeployment,
-        currentVersionSummary: undefined,
+        ...baseDescribe,
         routingConfig: {
           rampingDeploymentVersion: {
             deploymentName: 'loan-underwriting-app',
@@ -142,17 +135,16 @@ describe('deploymentHasComputeConfig', () => {
               deploymentName: 'loan-underwriting-app',
               buildId: 'build-2',
             },
-            createTime: undefined,
+            createTime: '',
             computeConfig,
           },
         ],
-      } as unknown as WorkerDeploymentInfo),
+      }),
     ).toBe(true);
   });
 
-  // Verbatim DescribeWorkerDeployment payload from Temporal Cloud. Note that it
-  // carries no currentVersionSummary at all — compute config only ever arrives
-  // on versionSummaries, linked by routingConfig.currentDeploymentVersion.
+  // Verbatim DescribeWorkerDeployment payload from Temporal Cloud. Compute
+  // config is only exposed on versionSummaries and linked by routingConfig.
   it('returns true for a real cloud describe response', () => {
     const cloudResponse = {
       name: 'test',
@@ -198,17 +190,15 @@ describe('deploymentHasComputeConfig', () => {
         revisionNumber: '1',
       },
       routingConfigUpdateState: 'ROUTING_CONFIG_UPDATE_STATE_IN_PROGRESS',
-    } as unknown as WorkerDeploymentInfo;
+    } satisfies DescribeWorkerDeployment;
 
-    expect(cloudResponse.currentVersionSummary).toBeUndefined();
     expect(deploymentHasComputeConfig(cloudResponse)).toBe(true);
   });
 
-  it('ignores compute configs on version summaries that are not routed to', () => {
+  it('ignores compute configs on describe versions that are not routed to', () => {
     expect(
       deploymentHasComputeConfig({
-        ...baseDeployment,
-        currentVersionSummary: undefined,
+        ...baseDescribe,
         routingConfig: {
           currentDeploymentVersion: {
             deploymentName: 'loan-underwriting-app',
@@ -222,7 +212,7 @@ describe('deploymentHasComputeConfig', () => {
               deploymentName: 'loan-underwriting-app',
               buildId: 'build-1',
             },
-            createTime: undefined,
+            createTime: '',
           },
           {
             version: 'loan-underwriting-app.build-0',
@@ -230,11 +220,11 @@ describe('deploymentHasComputeConfig', () => {
               deploymentName: 'loan-underwriting-app',
               buildId: 'build-0',
             },
-            createTime: undefined,
+            createTime: '',
             computeConfig,
           },
         ],
-      } as unknown as WorkerDeploymentInfo),
+      }),
     ).toBe(false);
   });
 });

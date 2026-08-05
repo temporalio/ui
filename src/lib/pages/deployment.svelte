@@ -17,7 +17,7 @@
     removeRampingUnversionedWorkers,
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
-  import type { WorkerDeploymentResponse } from '$lib/types/deployments';
+  import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
   import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
@@ -45,7 +45,7 @@
   });
   let refreshedDeployment = $state.raw<{
     route: typeof deploymentRoute;
-    deployment: WorkerDeploymentResponse;
+    deployment: DescribeWorkerDeploymentResponse;
   }>();
   let refreshError = $state.raw<{
     route: typeof deploymentRoute;
