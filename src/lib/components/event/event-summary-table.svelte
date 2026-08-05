@@ -39,27 +39,42 @@
   import PendingActivitySummaryRow from './pending-activity-summary-row.svelte';
   import PendingNexusSummaryRow from './pending-nexus-summary-row.svelte';
 
-  let {
+  /**
+   * Discriminated on `compact` so `items` narrows without a cast, and a caller
+   * can't pair the wrong list with the wrong mode. Callers whose mode is
+   * dynamic spread one of these objects rather than passing a boolean.
+   *
+   * `groups` is feed-only — the gutter graph and the event->group index.
+   * Compact items are groups themselves, so that view passes none.
+   */
+  type Props = {
+    updating?: boolean;
+    loading?: boolean;
+    minimized?: boolean;
+  } & (
+    | { compact: true; items: LazyGroup[]; groups?: never }
+    | {
+        compact?: false;
+        items: IterableEventWithPending[];
+        groups?: EventGroups;
+      }
+  );
+
+  // const, and no default on `compact`: a default widens the literal and
+  // `let` lets TypeScript assume reassignment, either of which breaks the
+  // narrowing below.
+  const {
     items,
+    compact,
     groups = [],
     updating = false,
     loading = false,
-    compact = false,
     minimized = true,
-    hoveredEventId = $bindable(undefined),
-  }: {
-    items: IterableEventWithPending[] | LazyGroup[];
-    /**
-     * Feed view only — the gutter graph and the event->group index. Compact
-     * items are groups themselves, so that view passes none.
-     */
-    groups?: EventGroups;
-    updating?: boolean;
-    loading?: boolean;
-    compact?: boolean;
-    minimized?: boolean;
-    hoveredEventId?: string;
-  } = $props();
+  }: Props = $props();
+
+  // Cross-row coordination only: a row sets this on hover and its siblings read
+  // it to highlight related activities. Never set from outside the table.
+  let hoveredEventId = $state<string | undefined>(undefined);
 
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
@@ -73,13 +88,12 @@
   // The compact view's items are all groups, so it filters with the group
   // predicate — getFailedOrPendingEvents routes through isEventGroup, whose
   // eventList check a LazyGroup can't satisfy.
-  const filteredItems = $derived(
+  // Array-of-union, not union-of-arrays: Paginated is generic over its item
+  // type and would otherwise infer only the first arm.
+  const filteredItems: (IterableEventWithPending | LazyGroup)[] = $derived(
     compact
-      ? getFailedOrPendingGroups(items as LazyGroup[], $eventStatusFilter)
-      : getFailedOrPendingEvents(
-          items as IterableEventWithPending[],
-          $eventStatusFilter,
-        ),
+      ? getFailedOrPendingGroups(items, $eventStatusFilter)
+      : getFailedOrPendingEvents(items, $eventStatusFilter),
   );
 
   // The gutter graph sits outside Paginated, so it re-derives the current page.
@@ -126,7 +140,7 @@
     previousPageButtonLabel={translate('common.previous-page')}
     pageButtonLabel={(page) => translate('common.go-to-page', { page })}
     {updating}
-    items={filteredItems as IterableEventWithPending[]}
+    items={filteredItems}
     maxHeight="none"
     class="border-t-0"
   >

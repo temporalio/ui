@@ -21,7 +21,6 @@
   import { translate } from '$lib/i18n/translate';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
-  import type { LazyGroup } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
@@ -29,7 +28,6 @@
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
-    IterableEventWithPending,
     WorkflowEvent,
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
@@ -116,21 +114,23 @@
     reverseSort ? [...filteredEvents].reverse() : filteredEvents,
   );
 
-  let items = $derived(
-    (compact
-      ? orderGroupsByPending(lazyGroups, reverseSort)
-      : reverseSort
-        ? [...pendingNexusOperations, ...pendingActivities, ...history]
-        : [...history, ...pendingActivities, ...pendingNexusOperations]) as
-      | LazyGroup[]
-      | IterableEventWithPending[],
-  );
-
-  // Feed view only. Compact `items` are groups themselves (above), so nothing
-  // there consults this — and not reading it keeps the compact view from
-  // materializing the whole history.
-  const tableGroups = $derived(
-    compact ? [] : eventBuffer.groupsWithoutWorkflowTasks,
+  // One discriminated object rather than separate props: EventSummaryTable's
+  // props are a union on `compact`, so passing a dynamic boolean alongside a
+  // dynamic list wouldn't satisfy either arm. Building it here also means the
+  // feed view's fully materialized groups are only read on the feed branch.
+  const tableProps = $derived(
+    compact
+      ? {
+          compact: true as const,
+          items: orderGroupsByPending(lazyGroups, reverseSort),
+        }
+      : {
+          compact: false as const,
+          items: reverseSort
+            ? [...pendingNexusOperations, ...pendingActivities, ...history]
+            : [...history, ...pendingActivities, ...pendingNexusOperations],
+          groups: eventBuffer.groupsWithoutWorkflowTasks,
+        },
   );
 
   $effect(() => {
@@ -269,7 +269,7 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {items} groups={tableGroups} {compact} />
+        <EventSummaryTable {updating} {...tableProps} />
       </div>
     {/if}
   </div>
