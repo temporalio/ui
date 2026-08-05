@@ -73,7 +73,7 @@
   // The compact view's items are all groups, so it filters with the group
   // predicate — getFailedOrPendingEvents routes through isEventGroup, whose
   // eventList check a LazyGroup can't satisfy.
-  const visibleItems = $derived(
+  const filteredItems = $derived(
     compact
       ? getFailedOrPendingGroups(items as LazyGroup[], $eventStatusFilter)
       : getFailedOrPendingEvents(
@@ -82,12 +82,16 @@
         ),
   );
 
-  // Rendered under showGraph, which is false when compact — so these are events.
-  const paginatedHistory = () =>
-    (visibleItems as WorkflowEventWithPending[]).slice(
-      (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
-      parseInt(currentPageParam) * parseInt(perPageParam),
-    );
+  // The gutter graph sits outside Paginated, so it re-derives the current page.
+  // Only reachable when showGraph, which is false when compact — hence events.
+  const graphHistory = $derived(
+    showGraph
+      ? (filteredItems as WorkflowEventWithPending[]).slice(
+          (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
+          parseInt(currentPageParam) * parseInt(perPageParam),
+        )
+      : [],
+  );
 
   const columns = $derived([
     { label: 'Event ID' },
@@ -113,7 +117,7 @@
 <div class="flex">
   <div class="pt-9">
     {#if showGraph}
-      <HistoryGraph {groups} history={paginatedHistory()} />
+      <HistoryGraph {groups} history={graphHistory} />
     {/if}
   </div>
   <Paginated
@@ -122,7 +126,7 @@
     previousPageButtonLabel={translate('common.previous-page')}
     pageButtonLabel={(page) => translate('common.go-to-page', { page })}
     {updating}
-    items={visibleItems as IterableEventWithPending[]}
+    items={filteredItems as IterableEventWithPending[]}
     maxHeight="none"
     class="border-t-0"
   >
