@@ -294,10 +294,7 @@
   });
 
   $effect(() => {
-    const events = eventBuffer.events;
-    untrack(() => {
-      $fullEventHistory = events;
-    });
+    $fullEventHistory = eventBuffer.events;
   });
 
   const clearWorkflowData = () => {
