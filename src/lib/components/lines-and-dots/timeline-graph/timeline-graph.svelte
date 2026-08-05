@@ -434,18 +434,18 @@
     const slots: (Slot | null)[] = new Array(poolSize).fill(null);
     const end = Math.min(windowEnd, total, windowStart + poolSize);
     for (let index = windowStart; index < end; index++) {
-      const slot = index % poolSize;
+      const slotIndex = index % poolSize;
       const lazy = filteredLazyGroups[index];
-      const prev = prevSlots[slot];
+      const prev = prevSlots[slotIndex];
       if (
         prev &&
         prev.index === index &&
         prev.lazy === lazy &&
         prev.version === lazy.version
       ) {
-        slots[slot] = prev;
+        slots[slotIndex] = prev;
       } else {
-        slots[slot] = { index, lazy, version: lazy.version };
+        slots[slotIndex] = { index, lazy, version: lazy.version };
       }
     }
     prevSlots = slots;
