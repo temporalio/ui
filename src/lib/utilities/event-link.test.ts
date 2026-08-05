@@ -151,7 +151,13 @@ describe('toEventLinkView', () => {
       label: 'Standalone Activity Link',
       value: 'activity-1',
       href: `${base}/namespaces/test-ns/activities/activity-1/run-1/details`,
+      namespace: {
+        label: 'Namespace Link',
+        value: 'test-ns',
+        href: `${base}/namespaces/test-ns`,
+      },
     });
+    expect(eventLinkTargetTypeLabel(view.variant)).toBe('Standalone Activity');
   });
 
   it('returns a batch operation route when namespace context is available', () => {

@@ -10,7 +10,10 @@
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { toEventLinkView } from '$lib/utilities/event-link';
+  import {
+    eventLinkTargetTypeLabel,
+    toEventLinkView,
+  } from '$lib/utilities/event-link';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
   import { toNexusOperationCancellationStateReadable } from '$lib/utilities/screaming-enums';
@@ -37,6 +40,16 @@
       : null,
   );
   const handlerNamespace = $derived(handlerLink?.namespace ?? null);
+  const handlerTargetType = $derived(
+    handlerLink ? eventLinkTargetTypeLabel(handlerLink.variant) : undefined,
+  );
+  const operationDetailsRowCount = $derived(
+    4 +
+      (info?.blockedReason ? 1 : 0) +
+      (handlerLink ? 1 : 0) +
+      (handlerTargetType ? 1 : 0) +
+      (handlerNamespace ? 1 : 0),
+  );
 
   const endpointFilterLink = $derived(
     info
@@ -146,7 +159,7 @@
         </p>
       {/if}
       <DetailList
-        rowCount={6}
+        rowCount={operationDetailsRowCount}
         aria-label={translate(
           'standalone-nexus-operations.operation-details-section',
         )}
@@ -211,27 +224,8 @@
           >
           <DetailListTextValue text={info.blockedReason} />
         {/if}
-        {#if handlerNamespace}
-          <DetailListLabel
-            >{translate(
-              'standalone-nexus-operations.handler-namespace',
-            )}</DetailListLabel
-          >
-          {#if handlerNamespace.href}
-            <DetailListLinkValue
-              text={handlerNamespace.value}
-              href={handlerNamespace.href}
-            />
-          {:else}
-            <DetailListTextValue text={handlerNamespace.value} />
-          {/if}
-        {/if}
         {#if handlerLink}
-          <DetailListLabel
-            >{translate(
-              'standalone-nexus-operations.handler-operation-link',
-            )}</DetailListLabel
-          >
+          <DetailListLabel>{translate('nexus.handler-target')}</DetailListLabel>
           {#if handlerLink.href}
             <DetailListLinkValue
               text={handlerLink.value}
@@ -239,6 +233,25 @@
             />
           {:else}
             <DetailListTextValue text={handlerLink.value} />
+          {/if}
+          {#if handlerTargetType}
+            <DetailListLabel
+              >{translate('nexus.handler-target-type')}</DetailListLabel
+            >
+            <DetailListTextValue text={handlerTargetType} />
+          {/if}
+          {#if handlerNamespace}
+            <DetailListLabel
+              >{translate('nexus.handler-namespace')}</DetailListLabel
+            >
+            {#if handlerNamespace.href}
+              <DetailListLinkValue
+                text={handlerNamespace.value}
+                href={handlerNamespace.href}
+              />
+            {:else}
+              <DetailListTextValue text={handlerNamespace.value} />
+            {/if}
           {/if}
         {/if}
       </DetailList>
