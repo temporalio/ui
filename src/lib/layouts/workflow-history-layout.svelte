@@ -21,7 +21,7 @@
   import { translate } from '$lib/i18n/translate';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
-  import type { GroupSummary } from '$lib/services/grouped-event-buffer';
+  import type { LazyGroup } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
@@ -68,7 +68,7 @@
   // Summaries are enough to filter, sort and paginate; only the rendered page
   // is materialized. The feed view still needs full groups for its gutter graph
   // and event->group index, and reads them lazily via tableGroups below.
-  const bufferSummaries = $derived(eventBuffer.summariesWithoutWorkflowTasks);
+  const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
   const bufferEvents = $derived(eventBuffer.events);
   let updating = $derived(!historyCtx.fetchComplete);
 
@@ -76,10 +76,10 @@
     historyCtx.resume();
   });
 
-  const filteredSummaries = $derived.by(() => {
+  const filteredLazyGroups = $derived.by(() => {
     const active = $eventTypeFilter;
     const cats = $eventCategoryFilter;
-    return bufferSummaries.filter((g) => {
+    return bufferLazyGroups.filter((g) => {
       if (!active.includes(g.category)) return false;
       if (cats && cats.length && !cats.includes(g.category)) return false;
       return true;
@@ -109,8 +109,8 @@
     !!workflow && !workflow.isRunning && !workflow.isPaused,
   );
 
-  let groupSummaries = $derived(
-    reverseSort ? [...filteredSummaries].reverse() : filteredSummaries,
+  let lazyGroups = $derived(
+    reverseSort ? [...filteredLazyGroups].reverse() : filteredLazyGroups,
   );
   let history = $derived(
     reverseSort ? [...filteredEvents].reverse() : filteredEvents,
@@ -118,18 +118,18 @@
 
   let items = $derived(
     (compact
-      ? orderGroupsByPending(groupSummaries, reverseSort)
+      ? orderGroupsByPending(lazyGroups, reverseSort)
       : reverseSort
         ? [...pendingNexusOperations, ...pendingActivities, ...history]
         : [...history, ...pendingActivities, ...pendingNexusOperations]) as
-      | GroupSummary[]
+      | LazyGroup[]
       | IterableEventWithPending[],
   );
 
   // Read only in the feed view, so the compact view never materializes the
   // whole history.
   const tableGroups = $derived(
-    compact ? groupSummaries : eventBuffer.groupsWithoutWorkflowTasks,
+    compact ? lazyGroups : eventBuffer.groupsWithoutWorkflowTasks,
   );
 
   $effect(() => {

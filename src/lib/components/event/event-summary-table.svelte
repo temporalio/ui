@@ -13,8 +13,8 @@
   } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import {
-    type GroupSummary,
-    isGroupSummary,
+    isLazyGroup,
+    type LazyGroup,
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -51,12 +51,12 @@
     minimized = true,
     hoveredEventId = $bindable(undefined),
   }: {
-    items: IterableEventWithPending[] | GroupSummary[];
+    items: IterableEventWithPending[] | LazyGroup[];
     /**
      * Only read in the feed view, for the gutter graph and the event->group
      * index; the compact view resolves each rendered row's group itself.
      */
-    groups?: EventGroups | GroupSummary[];
+    groups?: EventGroups | LazyGroup[];
     updating?: boolean;
     loading?: boolean;
     compact?: boolean;
@@ -82,11 +82,9 @@
   // The compact view's items are all groups, so it filters with the group
   // predicate — getFailedOrPendingEvents routes through isEventGroup, whose
   // eventList check a summary can't satisfy.
-  const filteredForStatus = (
-    list: IterableEventWithPending[] | GroupSummary[],
-  ) =>
+  const filteredForStatus = (list: IterableEventWithPending[] | LazyGroup[]) =>
     compact
-      ? getFailedOrPendingGroups(list as GroupSummary[], $eventStatusFilter)
+      ? getFailedOrPendingGroups(list as LazyGroup[], $eventStatusFilter)
       : getFailedOrPendingEvents(
           list as IterableEventWithPending[],
           $eventStatusFilter,
@@ -108,14 +106,12 @@
   ]);
 
   // Matches against summaries or groups, materializing only the one found.
-  const findGroup = (
-    predicate: (group: EventGroup | GroupSummary) => boolean,
-  ) => {
+  const findGroup = (predicate: (group: EventGroup | LazyGroup) => boolean) => {
     const match = groups.find(predicate);
     return match ? materializeGroup(match) : undefined;
   };
 
-  const iterableKey = (event: IterableEventWithPending | GroupSummary) => {
+  const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
     if (isPendingNexusOperation(event))
       return `pending-nexus-${event.scheduledEventId}`;
     if (isPendingActivity(event)) return `pending-activity-${event.id}`;
@@ -161,7 +157,7 @@
     {#snippet rows({ visibleItems })}
       {#each visibleItems as item, index (iterableKey(item))}
         {@const event = (
-          isGroupSummary(item) ? materializeGroup(item) : item
+          isLazyGroup(item) ? materializeGroup(item) : item
         ) as IterableEventWithPending}
         {#if isEventGroup(event)}
           <EventSummaryRow

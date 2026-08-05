@@ -58,10 +58,10 @@ import {
  * time-segment layout run over these, so a view only materializes the groups it
  * actually renders — a fixed row pool, or one page of the compact table.
  */
-export interface GroupSummary {
+export interface LazyGroup {
   readonly id: string;
   /**
-   * Bumped whenever the group's content changes. A summary's own identity is
+   * Bumped whenever the group's content changes. A lazy group's own identity is
    * stable for the life of the run, so consumers that cache per group — the
    * timeline's row pool — must compare this too, not just the reference.
    * Absent on groups built outside the buffer, which never change.
@@ -79,10 +79,10 @@ export interface GroupSummary {
 }
 
 /**
- * Distinguishes a summary from an already-materialized EventGroup or a plain
+ * Distinguishes a lazy group from an already-materialized EventGroup or a plain
  * event, for views handed a mix of the two.
  */
-export function isGroupSummary(value: unknown): value is GroupSummary {
+export function isLazyGroup(value: unknown): value is LazyGroup {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -93,14 +93,14 @@ export function isGroupSummary(value: unknown): value is GroupSummary {
 
 /**
  * One per group for the lifetime of the run. Holds the member slots rather than
- * the events, and derives GroupSummary from them on demand — every getter is a
- * lookup into `events`, so summaries cost no allocation.
+ * the events, and derives LazyGroup from them on demand — every getter is a
+ * lookup into `events`, so lazy groups cost no allocation.
  *
  * INVARIANT: each getter must agree with the same field on the materialized
  * EventGroup, or a view will filter on one and render the other. Guarded by
  * grouped-event-buffer.test.ts.
  */
-class GroupRecord implements GroupSummary {
+class GroupRecord implements LazyGroup {
   // Member slots in arrival order — sorted at materialize time. Groups hold 1-5
   // events, so linear scans over this are cheaper than keeping it ordered.
   readonly slots: number[] = [];
@@ -186,10 +186,10 @@ let cachedGroupsNoWFT: EventGroup[] | null = null;
 let cachedGroupsNoWFTRevision = -1;
 let cachedEvents: WorkflowEvent[] | null = null;
 let cachedEventsRevision = -1;
-let cachedSummaries: GroupSummary[] | null = null;
-let cachedSummariesRevision = -1;
-let cachedSummariesNoWFT: GroupSummary[] | null = null;
-let cachedSummariesNoWFTRevision = -1;
+let cachedLazyGroups: LazyGroup[] | null = null;
+let cachedLazyGroupsRevision = -1;
+let cachedLazyGroupsNoWFT: LazyGroup[] | null = null;
+let cachedLazyGroupsNoWFTRevision = -1;
 
 const changeListeners = new Set<ChangeListener>();
 
@@ -331,8 +331,8 @@ export function reset(historyLength: number): void {
   cachedGroups = null;
   cachedGroupsNoWFT = null;
   cachedEvents = null;
-  cachedSummaries = null;
-  cachedSummariesNoWFT = null;
+  cachedLazyGroups = null;
+  cachedLazyGroupsNoWFT = null;
 
   notifyChanged(true);
 }
@@ -443,29 +443,29 @@ export function onChange(listener: ChangeListener): () => void {
   return () => changeListeners.delete(listener);
 }
 
-export function isWorkflowTaskGroup(group: EventGroup | GroupSummary): boolean {
+export function isWorkflowTaskGroup(group: EventGroup | LazyGroup): boolean {
   return group.initialEvent.eventType === 'WorkflowTaskScheduled';
 }
 
 /**
- * Sorted GroupSummary[] in ascending event-id order, without building a single
- * EventGroup. Cached until the next write; summaries are the records themselves,
+ * Sorted LazyGroup[] in ascending event-id order, without building a single
+ * EventGroup. Cached until the next write; lazy groups are the records themselves,
  * so a rebuild allocates only the array.
  */
-export function getGroupSummaries(opts?: GroupArrayOptions): GroupSummary[] {
+export function getLazyGroups(opts?: GroupArrayOptions): LazyGroup[] {
   const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
 
   if (excludeWFT) {
-    if (cachedSummariesNoWFT && cachedSummariesNoWFTRevision === revision) {
-      return cachedSummariesNoWFT;
+    if (cachedLazyGroupsNoWFT && cachedLazyGroupsNoWFTRevision === revision) {
+      return cachedLazyGroupsNoWFT;
     }
-  } else if (cachedSummaries && cachedSummariesRevision === revision) {
-    return cachedSummaries;
+  } else if (cachedLazyGroups && cachedLazyGroupsRevision === revision) {
+    return cachedLazyGroups;
   }
 
   // headGroup is indexed by head slot, so scanning it yields groups already in
   // ascending event-id order — no sort needed.
-  const result: GroupSummary[] = new Array<GroupSummary>(records.length);
+  const result: LazyGroup[] = new Array<LazyGroup>(records.length);
   let count = 0;
   for (let slot = 0; slot <= maxSlot; slot++) {
     const recordIdx = headGroup[slot];
@@ -485,27 +485,27 @@ export function getGroupSummaries(opts?: GroupArrayOptions): GroupSummary[] {
   result.length = count;
 
   if (excludeWFT) {
-    cachedSummariesNoWFT = result;
-    cachedSummariesNoWFTRevision = revision;
+    cachedLazyGroupsNoWFT = result;
+    cachedLazyGroupsNoWFTRevision = revision;
   } else {
-    cachedSummaries = result;
-    cachedSummariesRevision = revision;
+    cachedLazyGroups = result;
+    cachedLazyGroupsRevision = revision;
   }
   return result;
 }
 
 /**
- * The full EventGroup for a summary, memoized on the summary's content version:
- * an unchanged summary returns the identical object, a changed one a new object.
+ * The full EventGroup for a lazy group, memoized on its content version: an
+ * unchanged lazy group returns the identical object, a changed one a new object.
  *
  * Idempotent — an already-materialized EventGroup passes straight through, so
- * views can accept either buffer summaries or groups built elsewhere (e.g.
+ * views can accept either lazy groups or groups built elsewhere (e.g.
  * groupEvents() in graph-widget) without branching at every use site.
  */
-export function materializeGroup(summary: GroupSummary): EventGroup {
-  if ('eventList' in summary) return summary as unknown as EventGroup;
+export function materializeGroup(lazy: LazyGroup): EventGroup {
+  if ('eventList' in lazy) return lazy as unknown as EventGroup;
 
-  const record = summary as GroupRecord;
+  const record = lazy as GroupRecord;
   if (record.cachedVersion === record.version && record.cached) {
     return record.cached;
   }
@@ -514,7 +514,7 @@ export function materializeGroup(summary: GroupSummary): EventGroup {
 
 /**
  * Sorted EventGroup[] in ascending event-id order — materializes every group.
- * Prefer getGroupSummaries + materializeGroup so only rendered groups are built.
+ * Prefer getLazyGroups + materializeGroup so only rendered groups are built.
  */
 export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
   const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
@@ -527,7 +527,7 @@ export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
     return cachedGroups;
   }
 
-  const result = getGroupSummaries(opts).map(materializeGroup);
+  const result = getLazyGroups(opts).map(materializeGroup);
 
   if (excludeWFT) {
     cachedGroupsNoWFT = result;

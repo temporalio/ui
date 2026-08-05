@@ -7,7 +7,7 @@ import type { TimeSegment } from './types';
 
 /**
  * The fields segment layout reads — satisfied by a full EventGroup and by the
- * buffer's GroupSummary, so gaps are computed without building groups.
+ * buffer's LazyGroup, so gaps are computed without building groups.
  */
 type GroupForSegments = {
   initialEvent: WorkflowEvent;
@@ -44,16 +44,16 @@ function getGroupEndMs(
 
 export function buildTimeSegments({
   workflowTimespan,
-  groupSummaries,
+  lazyGroups,
 }: {
   workflowTimespan: Timespan;
-  groupSummaries: GroupForSegments[];
+  lazyGroups: GroupForSegments[];
 }): TimeSegment[] {
   const groupTimespans: Timespan[] = [];
 
   let isSorted = true;
   let prevStartTimeMs = -Infinity;
-  for (const group of groupSummaries) {
+  for (const group of lazyGroups) {
     const startMs = getGroupStartMs(group);
 
     if (isNullish(startMs)) {

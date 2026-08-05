@@ -6,9 +6,9 @@ import type { WorkflowEvent } from '$lib/types/events';
 import {
   getEventArray,
   getGroupArray,
-  getGroupSummaries,
+  getLazyGroups,
   getWorkflowTaskFailedEvent,
-  type GroupSummary,
+  type LazyGroup,
   onChange,
 } from './grouped-event-buffer';
 
@@ -65,17 +65,17 @@ class EventBufferView {
   }
 
   /**
-   * Group summaries with WorkflowTask groups filtered out — enough to filter,
+   * Lazy groups with WorkflowTask groups filtered out — enough to filter,
    * sort and lay out, so callers materialize only what they render.
    */
-  readonly summariesWithoutWorkflowTasks: GroupSummary[] = $derived.by(() => {
+  readonly lazyGroupsWithoutWorkflowTasks: LazyGroup[] = $derived.by(() => {
     void this._version;
-    return getGroupSummaries({ excludeWorkflowTasks: true });
+    return getLazyGroups({ excludeWorkflowTasks: true });
   });
 
   /**
    * Fully materialized groups with WorkflowTask groups filtered out. Prefer
-   * `summariesWithoutWorkflowTasks` — this builds every group in the history.
+   * `lazyGroupsWithoutWorkflowTasks` — this builds every group in the history.
    */
   readonly groupsWithoutWorkflowTasks: EventGroup[] = $derived.by(() => {
     void this._version;

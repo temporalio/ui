@@ -8,7 +8,7 @@ import {
   enrichGroups,
   getEventArray,
   getGroupArray,
-  getGroupSummaries,
+  getLazyGroups,
   getWorkflowTaskFailedEvent,
   ingestHistoryEvent,
   isWorkflowTaskGroup,
@@ -1280,14 +1280,14 @@ describe('arrival-order independence', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 19. Summary / group agreement
+// 19. Lazy / materialized group agreement
 //
-// Views filter and sort on GroupSummary but render a materialized EventGroup, so
+// Views filter and sort on LazyGroup but render a materialized EventGroup, so
 // every getter on the record must agree with the same field on the group. A
 // divergence would silently filter one set and draw another.
 // ---------------------------------------------------------------------------
 
-describe('summary and group agreement', () => {
+describe('lazy and materialized group agreement', () => {
   const cases: [string, (start: number) => HistoryEvent[]][] = [
     ['activity', (start) => makeActivityGroup(start)],
     ['activity timeout', (start) => makeActivityTimeoutGroup(start)],
@@ -1303,17 +1303,17 @@ describe('summary and group agreement', () => {
     reset(20);
     for (const event of build(1)) ingestHistoryEvent(event, true);
 
-    const [summary] = getGroupSummaries();
-    const group = materializeGroup(summary);
+    const [lazy] = getLazyGroups();
+    const group = materializeGroup(lazy);
 
-    expect(summary.id).toBe(group.id);
-    expect(summary.eventCount).toBe(group.eventList.length);
-    expect(summary.initialEvent).toBe(group.initialEvent);
-    expect(summary.lastEvent).toBe(group.lastEvent);
-    expect(summary.category).toBe(group.category);
-    expect(summary.classification).toBe(group.classification);
-    expect(summary.finalClassification).toBe(group.finalClassification);
-    expect(summary.isPending).toBe(group.isPending);
+    expect(lazy.id).toBe(group.id);
+    expect(lazy.eventCount).toBe(group.eventList.length);
+    expect(lazy.initialEvent).toBe(group.initialEvent);
+    expect(lazy.lastEvent).toBe(group.lastEvent);
+    expect(lazy.category).toBe(group.category);
+    expect(lazy.classification).toBe(group.classification);
+    expect(lazy.finalClassification).toBe(group.finalClassification);
+    expect(lazy.isPending).toBe(group.isPending);
   });
 
   it.each(cases)('agrees for a partially loaded %s group', (_, build) => {
@@ -1322,13 +1322,13 @@ describe('summary and group agreement', () => {
     // Head only — the state in which pending groups are rendered.
     ingestHistoryEvent(events[0], true);
 
-    const [summary] = getGroupSummaries();
-    const group = materializeGroup(summary);
+    const [lazy] = getLazyGroups();
+    const group = materializeGroup(lazy);
 
-    expect(summary.eventCount).toBe(group.eventList.length);
-    expect(summary.lastEvent).toBe(group.lastEvent);
-    expect(summary.finalClassification).toBe(group.finalClassification);
-    expect(summary.isPending).toBe(group.isPending);
+    expect(lazy.eventCount).toBe(group.eventList.length);
+    expect(lazy.lastEvent).toBe(group.lastEvent);
+    expect(lazy.finalClassification).toBe(group.finalClassification);
+    expect(lazy.isPending).toBe(group.isPending);
   });
 
   it('agrees on isPending once pending metadata is attached', () => {
@@ -1341,15 +1341,15 @@ describe('summary and group agreement', () => {
       [],
     );
 
-    const [summary] = getGroupSummaries();
-    expect(summary.isPending).toBe(true);
-    expect(summary.isPending).toBe(materializeGroup(summary).isPending);
+    const [lazy] = getLazyGroups();
+    expect(lazy.isPending).toBe(true);
+    expect(lazy.isPending).toBe(materializeGroup(lazy).isPending);
   });
 
-  it('exposes no summary for an event that heads no group', () => {
+  it('exposes no lazy for an event that heads no group', () => {
     reset(10);
     ingestHistoryEvent(makeWorkflowStarted(1), true);
-    expect(getGroupSummaries()).toHaveLength(0);
+    expect(getLazyGroups()).toHaveLength(0);
     expect(getEventArray()).toHaveLength(1);
   });
 
@@ -1359,28 +1359,28 @@ describe('summary and group agreement', () => {
       ingestHistoryEvent(event, true);
     }
 
-    const summaries = getGroupSummaries({ excludeWorkflowTasks: true });
+    const lazyGroups = getLazyGroups({ excludeWorkflowTasks: true });
     const groups = getGroupArray({ excludeWorkflowTasks: true });
 
-    expect(summaries.map((s) => s.id)).toEqual(groups.map((g) => g.id));
-    expect(summaries.map(materializeGroup)).toEqual(groups);
+    expect(lazyGroups.map((lazy) => lazy.id)).toEqual(groups.map((g) => g.id));
+    expect(lazyGroups.map(materializeGroup)).toEqual(groups);
   });
 
   it('passes an already-materialized group straight through', () => {
     reset(10);
     for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
 
-    const group = materializeGroup(getGroupSummaries()[0]);
+    const group = materializeGroup(getLazyGroups()[0]);
     // Views may be handed groups built outside the buffer, which already
-    // satisfy GroupSummary — materializing one again must be a no-op.
+    // satisfy LazyGroup — materializing one again must be a no-op.
     expect(materializeGroup(group)).toBe(group);
   });
 
-  it('returns the identical group for an unchanged summary', () => {
+  it('returns the identical group for an unchanged lazy', () => {
     reset(10);
     for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
 
-    const [summary] = getGroupSummaries();
-    expect(materializeGroup(summary)).toBe(materializeGroup(summary));
+    const [lazy] = getLazyGroups();
+    expect(materializeGroup(lazy)).toBe(materializeGroup(lazy));
   });
 });

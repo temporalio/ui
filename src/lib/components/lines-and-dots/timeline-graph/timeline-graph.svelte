@@ -3,7 +3,7 @@
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import {
-    type GroupSummary,
+    type LazyGroup,
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
   import { activeGroups } from '$lib/stores/active-events';
@@ -38,7 +38,7 @@
     workflow: WorkflowExecution;
     // Summaries, not groups: filtering, sorting and segment layout need no
     // EventGroup, so only the pooled rows below materialize one.
-    groupSummaries: GroupSummary[];
+    lazyGroups: LazyGroup[];
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
@@ -51,7 +51,7 @@
 
   let {
     workflow,
-    groupSummaries,
+    lazyGroups,
     readOnly = false,
     error = false,
     reverseSort = false,
@@ -104,7 +104,7 @@
   const timeline = new Timeline({
     getFullEventHistory: () => $fullEventHistory,
     getWorkflow: () => workflow,
-    getGroupSummaries: () => groupSummaries,
+    getLazyGroups: () => lazyGroups,
     getCurrentTimeMs: () => nowMs,
     getLoading: () => loading,
     getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
@@ -135,8 +135,8 @@
     }
   };
 
-  const filteredSummaries = $derived(
-    getFailedOrPendingGroups(groupSummaries, $eventStatusFilter),
+  const filteredLazyGroups = $derived(
+    getFailedOrPendingGroups(lazyGroups, $eventStatusFilter),
   );
 
   // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
@@ -144,9 +144,9 @@
   const pendingGroupCount = $derived.by(() => {
     if (!loading) return 0;
     if (!totalExpectedEvents) {
-      return filteredSummaries.length === 0 ? 50 : 0;
+      return filteredLazyGroups.length === 0 ? 50 : 0;
     }
-    return Math.max(0, totalExpectedEvents - filteredSummaries.length);
+    return Math.max(0, totalExpectedEvents - filteredLazyGroups.length);
   });
 
   // Rows mounted beyond the viewport, so edge rows survive small scrolls and
@@ -256,10 +256,10 @@
   );
 
   const groupIndexMap = $derived(
-    new Map(filteredSummaries.map((g, i) => [g.id, i])),
+    new Map(filteredLazyGroups.map((g, i) => [g.id, i])),
   );
 
-  // Active group's index in filteredSummaries (-1 = none). Derived here so the row
+  // Active group's index in filteredLazyGroups (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
   const activeIdx = $derived(
     $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
@@ -278,11 +278,11 @@
   }
 
   const descStart = $derived(
-    getDescStart(filteredSummaries, descMinId, loading, pendingGroupCount),
+    getDescStart(filteredLazyGroups, descMinId, loading, pendingGroupCount),
   );
 
   const totalForY = $derived(
-    getTotalForY(filteredSummaries.length, pendingGroupCount, descStart),
+    getTotalForY(filteredLazyGroups.length, pendingGroupCount, descStart),
   );
 
   // Widen the mount window by the panel's row span: shiftFor moves rows down but
@@ -295,7 +295,7 @@
   // scrolls with the page.
   const timelineHeight = $derived(
     Math.max(
-      ROW_HEIGHT * (filteredSummaries.length + pendingGroupCount + 2),
+      ROW_HEIGHT * (filteredLazyGroups.length + pendingGroupCount + 2),
       120,
     ) + panelHeight,
   );
@@ -395,7 +395,7 @@
     return getWindowBounds({
       bandTop,
       bandHeight,
-      total: filteredSummaries.length,
+      total: filteredLazyGroups.length,
       overscan: windowOverscan,
       reverseSort,
       descStart,
@@ -420,33 +420,33 @@
   // slot object when unchanged — a fresh object each pass would change the {#each}
   // item and re-run the row derived for rows that didn't move.
   //
-  // A summary's identity is stable for the whole run, so its version has to be
-  // part of the check: without it a group that gained an event would keep its
+  // A lazy group's identity is stable for the whole run, so its version has to
+  // be part of the check: without it a group that gained an event would keep its
   // slot object, the {#each} item wouldn't change, and the row would never
   // re-read its now-stale group.
   type Slot = {
     index: number;
-    summary: GroupSummary;
+    lazy: LazyGroup;
     version: number | undefined;
   };
   let prevSlots: (Slot | null)[] = [];
   const pool = $derived.by(() => {
-    const total = filteredSummaries.length;
+    const total = filteredLazyGroups.length;
     const slots: (Slot | null)[] = new Array(poolSize).fill(null);
     const end = Math.min(windowEnd, total, windowStart + poolSize);
     for (let index = windowStart; index < end; index++) {
       const slot = index % poolSize;
-      const summary = filteredSummaries[index];
+      const lazy = filteredLazyGroups[index];
       const prev = prevSlots[slot];
       if (
         prev &&
         prev.index === index &&
-        prev.summary === summary &&
-        prev.version === summary.version
+        prev.lazy === lazy &&
+        prev.version === lazy.version
       ) {
         slots[slot] = prev;
       } else {
-        slots[slot] = { index, summary, version: summary.version };
+        slots[slot] = { index, lazy, version: lazy.version };
       }
     }
     prevSlots = slots;
@@ -560,8 +560,8 @@
             >
               {#if slot}
                 <TimelineGraphRow
-                  group={materializeGroup(slot.summary)}
-                  eventCount={slot.summary.eventCount}
+                  group={materializeGroup(slot.lazy)}
+                  eventCount={slot.lazy.eventCount}
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
@@ -574,7 +574,7 @@
         {#if loading && pendingGroupCount > 0}
           {@const rectY = getPendingBlockY({
             descStart,
-            filteredGroupsLength: filteredSummaries.length,
+            filteredGroupsLength: filteredLazyGroups.length,
             reverseSort,
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
@@ -589,12 +589,12 @@
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
         {#if !readOnly && activeIdx >= 0}
-          {@const activeSummary = filteredSummaries[activeIdx]}
-          {#if activeSummary}
+          {@const activeLazyGroup = filteredLazyGroups[activeIdx]}
+          {#if activeLazyGroup}
             {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
             <GroupDetailsRow
               y={panelY}
-              group={materializeGroup(activeSummary)}
+              group={materializeGroup(activeLazyGroup)}
               {canvasWidth}
               endTime={workflow?.endTime ? endTime : nowMs}
               onHeight={(height) => {
