@@ -1,14 +1,21 @@
-import type {
-  EventGroup,
-  EventGroups,
-} from '$lib/models/event-groups/event-groups';
+import type { WorkflowEvent } from '$lib/types/events';
 import { maxDate, validTimeToDate } from '$lib/utilities/format-time';
 import { isNullish } from '$lib/utilities/type-predicates';
 
 import { Timespan } from './timespan';
 import type { TimeSegment } from './types';
 
-function getGroupStartMs(group: EventGroup): number | null {
+/**
+ * The fields segment layout reads — satisfied by a full EventGroup and by the
+ * buffer's GroupSummary, so gaps are computed without building groups.
+ */
+type GroupForSegments = {
+  initialEvent: WorkflowEvent;
+  lastEvent: WorkflowEvent;
+  isPending: boolean;
+};
+
+function getGroupStartMs(group: GroupForSegments): number | null {
   const { eventTime } = group.initialEvent;
 
   if (isNullish(eventTime)) {
@@ -18,7 +25,10 @@ function getGroupStartMs(group: EventGroup): number | null {
   return validTimeToDate(eventTime).getTime();
 }
 
-function getGroupEndMs(group: EventGroup, pendingTimestampMs: number): number {
+function getGroupEndMs(
+  group: GroupForSegments,
+  pendingTimestampMs: number,
+): number {
   const { eventTime } = group.lastEvent;
 
   if (isNullish(eventTime)) {
@@ -37,7 +47,7 @@ export function buildTimeSegments({
   eventGroups,
 }: {
   workflowTimespan: Timespan;
-  eventGroups: EventGroups;
+  eventGroups: GroupForSegments[];
 }): TimeSegment[] {
   const groupTimespans: Timespan[] = [];
 

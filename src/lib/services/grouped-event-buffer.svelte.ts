@@ -6,7 +6,9 @@ import type { WorkflowEvent } from '$lib/types/events';
 import {
   getEventArray,
   getGroupArray,
+  getGroupSummaries,
   getWorkflowTaskFailedEvent,
+  type GroupSummary,
   onChange,
 } from './grouped-event-buffer';
 
@@ -63,8 +65,17 @@ class EventBufferView {
   }
 
   /**
-   * Groups with WorkflowTask groups filtered out — what both the timeline and
-   * the compact history view render.
+   * Group summaries with WorkflowTask groups filtered out — enough to filter,
+   * sort and lay out, so callers materialize only what they render.
+   */
+  readonly summariesWithoutWorkflowTasks: GroupSummary[] = $derived.by(() => {
+    void this._version;
+    return getGroupSummaries({ excludeWorkflowTasks: true });
+  });
+
+  /**
+   * Fully materialized groups with WorkflowTask groups filtered out. Prefer
+   * `summariesWithoutWorkflowTasks` — this builds every group in the history.
    */
   readonly groupsWithoutWorkflowTasks: EventGroup[] = $derived.by(() => {
     void this._version;

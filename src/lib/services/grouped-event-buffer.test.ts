@@ -2,14 +2,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { groupEvents } from '$lib/models/event-groups';
 import { toEventHistory } from '$lib/models/event-history';
+import type { HistoryEvent } from '$lib/types/events';
 
 import {
   enrichGroups,
   getEventArray,
   getGroupArray,
+  getGroupSummaries,
   getWorkflowTaskFailedEvent,
   ingestHistoryEvent,
   isWorkflowTaskGroup,
+  materializeGroup,
   reset,
   setFailedEvent,
 } from './grouped-event-buffer';
@@ -19,6 +22,7 @@ import {
   makeActivityStarted,
   makeActivityTimeoutGroup,
   makeChildWorkflowGroup,
+  makeLocalActivityGroup,
   makeNexusOperationGroup,
   makeSyntheticEvents,
   makeSyntheticEventsWithWorkflowTasks,
@@ -1272,5 +1276,111 @@ describe('arrival-order independence', () => {
     expect(descending.timestamp).toBe(ascending.timestamp);
     expect(descending.finalClassification).toBe(ascending.finalClassification);
     expect(descending.billableActions).toBe(ascending.billableActions);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 19. Summary / group agreement
+//
+// Views filter and sort on GroupSummary but render a materialized EventGroup, so
+// every getter on the record must agree with the same field on the group. A
+// divergence would silently filter one set and draw another.
+// ---------------------------------------------------------------------------
+
+describe('summary and group agreement', () => {
+  const cases: [string, (start: number) => HistoryEvent[]][] = [
+    ['activity', (start) => makeActivityGroup(start)],
+    ['activity timeout', (start) => makeActivityTimeoutGroup(start)],
+    ['timer', (start) => makeTimerGroup(start)],
+    ['child workflow', (start) => makeChildWorkflowGroup(start)],
+    ['workflow task', (start) => makeWorkflowTaskGroup(start)],
+    ['update', (start) => makeWorkflowUpdateGroup(start)],
+    ['nexus', (start) => makeNexusOperationGroup(start)],
+    ['local activity', (start) => makeLocalActivityGroup(start)],
+  ];
+
+  it.each(cases)('agrees for a complete %s group', (_, build) => {
+    reset(20);
+    for (const event of build(1)) ingestHistoryEvent(event, true);
+
+    const [summary] = getGroupSummaries();
+    const group = materializeGroup(summary);
+
+    expect(summary.id).toBe(group.id);
+    expect(summary.eventCount).toBe(group.eventList.length);
+    expect(summary.initialEvent).toBe(group.initialEvent);
+    expect(summary.lastEvent).toBe(group.lastEvent);
+    expect(summary.category).toBe(group.category);
+    expect(summary.classification).toBe(group.classification);
+    expect(summary.finalClassification).toBe(group.finalClassification);
+    expect(summary.isPending).toBe(group.isPending);
+  });
+
+  it.each(cases)('agrees for a partially loaded %s group', (_, build) => {
+    reset(20);
+    const events = build(1);
+    // Head only — the state in which pending groups are rendered.
+    ingestHistoryEvent(events[0], true);
+
+    const [summary] = getGroupSummaries();
+    const group = materializeGroup(summary);
+
+    expect(summary.eventCount).toBe(group.eventList.length);
+    expect(summary.lastEvent).toBe(group.lastEvent);
+    expect(summary.finalClassification).toBe(group.finalClassification);
+    expect(summary.isPending).toBe(group.isPending);
+  });
+
+  it('agrees on isPending once pending metadata is attached', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'Act'), true);
+    enrichGroups(
+      [
+        { activityId: '1', state: 'Started', activityType: 'Act' },
+      ] as Parameters<typeof enrichGroups>[0],
+      [],
+    );
+
+    const [summary] = getGroupSummaries();
+    expect(summary.isPending).toBe(true);
+    expect(summary.isPending).toBe(materializeGroup(summary).isPending);
+  });
+
+  it('exposes no summary for an event that heads no group', () => {
+    reset(10);
+    ingestHistoryEvent(makeWorkflowStarted(1), true);
+    expect(getGroupSummaries()).toHaveLength(0);
+    expect(getEventArray()).toHaveLength(1);
+  });
+
+  it('matches getGroupArray one-for-one', () => {
+    reset(40);
+    for (const event of makeSyntheticEventsWithWorkflowTasks(30)) {
+      ingestHistoryEvent(event, true);
+    }
+
+    const summaries = getGroupSummaries({ excludeWorkflowTasks: true });
+    const groups = getGroupArray({ excludeWorkflowTasks: true });
+
+    expect(summaries.map((s) => s.id)).toEqual(groups.map((g) => g.id));
+    expect(summaries.map(materializeGroup)).toEqual(groups);
+  });
+
+  it('passes an already-materialized group straight through', () => {
+    reset(10);
+    for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
+
+    const group = materializeGroup(getGroupSummaries()[0]);
+    // Views may be handed groups built outside the buffer, which already
+    // satisfy GroupSummary — materializing one again must be a no-op.
+    expect(materializeGroup(group)).toBe(group);
+  });
+
+  it('returns the identical group for an unchanged summary', () => {
+    reset(10);
+    for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
+
+    const [summary] = getGroupSummaries();
+    expect(materializeGroup(summary)).toBe(materializeGroup(summary));
   });
 });

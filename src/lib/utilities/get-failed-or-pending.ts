@@ -19,7 +19,7 @@ const isFailedLocalActivity = (event: WorkflowEvent) => {
   );
 };
 
-const isFailedLocalActivityGroup = (group: EventGroup) => {
+const isFailedLocalActivityGroup = (group: FilterableGroup) => {
   return isFailedLocalActivity(group.initialEvent);
 };
 
@@ -63,12 +63,27 @@ export const getFailedOrPendingEvents = (
   );
 };
 
-export const getFailedOrPendingGroups = (
-  items: EventGroup[],
+/**
+ * The fields this filter reads. Satisfied by a full EventGroup and by the
+ * buffer's GroupSummary — deliberately not routed through isEventGroup, whose
+ * `eventList` check a summary can't satisfy.
+ */
+type FilterableGroup = {
+  classification: EventGroup['classification'];
+  isPending: boolean;
+  initialEvent: WorkflowEvent;
+};
+
+export const getFailedOrPendingGroups = <T extends FilterableGroup>(
+  items: T[],
   filterForFailedOrPending: boolean,
-) => {
+): T[] => {
   if (!filterForFailedOrPending) return items;
   return items.filter(
-    (item) => isFailedEventGroup(item) || isPendingEventGroup(item),
+    (item) =>
+      item.classification === 'Failed' ||
+      item.classification === 'TimedOut' ||
+      isFailedLocalActivityGroup(item) ||
+      item.isPending,
   );
 };

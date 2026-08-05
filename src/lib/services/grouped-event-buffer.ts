@@ -2,6 +2,7 @@ import {
   addEventToGroup,
   createEventGroup,
   createWorkflowTaskGroup,
+  isGroupHeadEvent,
 } from '$lib/models/event-groups/create-event-group';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
@@ -20,11 +21,15 @@ import {
   isActivityTaskFailedEvent,
   isActivityTaskScheduledEvent,
   isActivityTaskTimedOutEvent,
+  isLocalActivityMarkerEvent,
   isNexusOperationCanceledEvent,
   isNexusOperationCompletedEvent,
   isNexusOperationFailedEvent,
   isNexusOperationScheduledEvent,
   isNexusOperationTimedOutEvent,
+  isStartChildWorkflowExecutionInitiatedEvent,
+  isTimerStartedEvent,
+  isWorkflowTaskScheduledEvent,
 } from '$lib/utilities/is-event-type';
 
 /**
@@ -48,17 +53,93 @@ import {
 // Types
 // ---------------------------------------------------------------------------
 
-type GroupRecord = {
-  headSlot: number;
+/**
+ * The read surface of a group that needs no EventGroup. Filtering, sorting and
+ * time-segment layout run over these, so a view only materializes the groups it
+ * actually renders — a fixed row pool, or one page of the compact table.
+ */
+export interface GroupSummary {
+  readonly id: string;
+  /**
+   * Bumped whenever the group's content changes. A summary's own identity is
+   * stable for the life of the run, so consumers that cache per group — the
+   * timeline's row pool — must compare this too, not just the reference.
+   * Absent on groups built outside the buffer, which never change.
+   */
+  readonly version?: number;
+  readonly eventCount: number;
+  readonly initialEvent: WorkflowEvent;
+  readonly lastEvent: WorkflowEvent;
+  readonly category: WorkflowEvent['category'];
+  readonly classification: WorkflowEvent['classification'];
+  readonly finalClassification: WorkflowEvent['classification'];
+  readonly isPending: boolean;
+}
+
+/**
+ * One per group for the lifetime of the run. Holds the member slots rather than
+ * the events, and derives GroupSummary from them on demand — every getter is a
+ * lookup into `events`, so summaries cost no allocation.
+ *
+ * INVARIANT: each getter must agree with the same field on the materialized
+ * EventGroup, or a view will filter on one and render the other. Guarded by
+ * grouped-event-buffer.test.ts.
+ */
+class GroupRecord implements GroupSummary {
   // Member slots in arrival order — sorted at materialize time. Groups hold 1-5
   // events, so linear scans over this are cheaper than keeping it ordered.
-  slots: number[];
+  readonly slots: number[] = [];
   pendingActivity: PendingActivity | undefined;
   pendingNexusOperation: PendingNexusOperation | undefined;
-  version: number;
-  cached: EventGroup | null;
-  cachedVersion: number;
-};
+  version = 0;
+  cached: EventGroup | null = null;
+  cachedVersion = -1;
+
+  constructor(readonly headSlot: number) {}
+
+  get id(): string {
+    return String(this.headSlot + 1);
+  }
+
+  get eventCount(): number {
+    return this.slots.length;
+  }
+
+  get initialEvent(): WorkflowEvent {
+    return events[this.headSlot] as WorkflowEvent;
+  }
+
+  get lastEvent(): WorkflowEvent {
+    let latest = -1;
+    for (const slot of this.slots) {
+      if (slot > latest) latest = slot;
+    }
+    return events[latest] as WorkflowEvent;
+  }
+
+  get category(): WorkflowEvent['category'] {
+    const head = this.initialEvent;
+    return isLocalActivityMarkerEvent(head) ? 'local-activity' : head.category;
+  }
+
+  get classification(): WorkflowEvent['classification'] {
+    return this.initialEvent.classification;
+  }
+
+  get finalClassification(): WorkflowEvent['classification'] {
+    return this.lastEvent.classification;
+  }
+
+  get isPending(): boolean {
+    if (this.pendingActivity || this.pendingNexusOperation) return true;
+    const head = this.initialEvent;
+    if (isTimerStartedEvent(head)) return this.slots.length === 1;
+    if (isStartChildWorkflowExecutionInitiatedEvent(head)) {
+      return this.slots.length === 2;
+    }
+    return false;
+  }
+}
 
 export type ChangeListener = (immediate: boolean) => void;
 
@@ -90,6 +171,10 @@ let cachedGroupsNoWFT: EventGroup[] | null = null;
 let cachedGroupsNoWFTRevision = -1;
 let cachedEvents: WorkflowEvent[] | null = null;
 let cachedEventsRevision = -1;
+let cachedSummaries: GroupSummary[] | null = null;
+let cachedSummariesRevision = -1;
+let cachedSummariesNoWFT: GroupSummary[] | null = null;
+let cachedSummariesNoWFTRevision = -1;
 
 const changeListeners = new Set<ChangeListener>();
 
@@ -131,15 +216,7 @@ function recordFor(headSlot: number): GroupRecord {
   const existing = headGroup[headSlot];
   if (existing !== 0) return records[existing - 1];
 
-  const record: GroupRecord = {
-    headSlot,
-    slots: [],
-    pendingActivity: undefined,
-    pendingNexusOperation: undefined,
-    version: 0,
-    cached: null,
-    cachedVersion: -1,
-  };
+  const record = new GroupRecord(headSlot);
   records.push(record);
   headGroup[headSlot] = records.length;
   return record;
@@ -239,6 +316,8 @@ export function reset(historyLength: number): void {
   cachedGroups = null;
   cachedGroupsNoWFT = null;
   cachedEvents = null;
+  cachedSummaries = null;
+  cachedSummariesNoWFT = null;
 
   notifyChanged(true);
 }
@@ -349,13 +428,78 @@ export function onChange(listener: ChangeListener): () => void {
   return () => changeListeners.delete(listener);
 }
 
-export function isWorkflowTaskGroup(group: EventGroup): boolean {
+export function isWorkflowTaskGroup(group: EventGroup | GroupSummary): boolean {
   return group.initialEvent.eventType === 'WorkflowTaskScheduled';
 }
 
 /**
- * Sorted EventGroup[] in ascending event-id order. Cached until the next write;
- * within a rebuild, groups that have not changed are returned by reference.
+ * Sorted GroupSummary[] in ascending event-id order, without building a single
+ * EventGroup. Cached until the next write; summaries are the records themselves,
+ * so a rebuild allocates only the array.
+ */
+export function getGroupSummaries(opts?: GroupArrayOptions): GroupSummary[] {
+  const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
+
+  if (excludeWFT) {
+    if (cachedSummariesNoWFT && cachedSummariesNoWFTRevision === revision) {
+      return cachedSummariesNoWFT;
+    }
+  } else if (cachedSummaries && cachedSummariesRevision === revision) {
+    return cachedSummaries;
+  }
+
+  // headGroup is indexed by head slot, so scanning it yields groups already in
+  // ascending event-id order — no sort needed.
+  const result: GroupSummary[] = new Array<GroupSummary>(records.length);
+  let count = 0;
+  for (let slot = 0; slot <= maxSlot; slot++) {
+    const recordIdx = headGroup[slot];
+    if (recordIdx === 0) continue;
+    const record = records[recordIdx - 1];
+    const head = events[record.headSlot];
+    if (!head) continue;
+    if (
+      !isGroupHeadEvent(head as CommonHistoryEvent) &&
+      !isWorkflowTaskScheduledEvent(head)
+    ) {
+      continue;
+    }
+    if (excludeWFT && isWorkflowTaskGroup(record)) continue;
+    result[count++] = record;
+  }
+  result.length = count;
+
+  if (excludeWFT) {
+    cachedSummariesNoWFT = result;
+    cachedSummariesNoWFTRevision = revision;
+  } else {
+    cachedSummaries = result;
+    cachedSummariesRevision = revision;
+  }
+  return result;
+}
+
+/**
+ * The full EventGroup for a summary, memoized on the summary's content version:
+ * an unchanged summary returns the identical object, a changed one a new object.
+ *
+ * Idempotent — an already-materialized EventGroup passes straight through, so
+ * views can accept either buffer summaries or groups built elsewhere (e.g.
+ * groupEvents() in graph-widget) without branching at every use site.
+ */
+export function materializeGroup(summary: GroupSummary): EventGroup {
+  if ('eventList' in summary) return summary as unknown as EventGroup;
+
+  const record = summary as GroupRecord;
+  if (record.cachedVersion === record.version && record.cached) {
+    return record.cached;
+  }
+  return materializeEventGroup(record) as EventGroup;
+}
+
+/**
+ * Sorted EventGroup[] in ascending event-id order — materializes every group.
+ * Prefer getGroupSummaries + materializeGroup so only rendered groups are built.
  */
 export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
   const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
@@ -368,23 +512,7 @@ export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
     return cachedGroups;
   }
 
-  // headGroup is indexed by head slot, so scanning it yields groups already in
-  // ascending event-id order — no sort needed.
-  const result: EventGroup[] = new Array<EventGroup>(records.length);
-  let count = 0;
-  for (let slot = 0; slot <= maxSlot; slot++) {
-    const recordIdx = headGroup[slot];
-    if (recordIdx === 0) continue;
-    const record = records[recordIdx - 1];
-    const group =
-      record.cachedVersion === record.version
-        ? record.cached
-        : materializeEventGroup(record);
-    if (!group) continue;
-    if (excludeWFT && isWorkflowTaskGroup(group)) continue;
-    result[count++] = group;
-  }
-  result.length = count;
+  const result = getGroupSummaries(opts).map(materializeGroup);
 
   if (excludeWFT) {
     cachedGroupsNoWFT = result;

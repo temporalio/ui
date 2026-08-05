@@ -2,7 +2,10 @@
   import { twMerge } from 'tailwind-merge';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import {
+    type GroupSummary,
+    materializeGroup,
+  } from '$lib/services/grouped-event-buffer';
   import { activeGroups } from '$lib/stores/active-events';
   import { collapseIdleTime } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -33,7 +36,9 @@
 
   interface Props {
     workflow: WorkflowExecution;
-    groups: EventGroups;
+    // Summaries, not groups: filtering, sorting and segment layout need no
+    // EventGroup, so only the pooled rows below materialize one.
+    groups: GroupSummary[];
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
@@ -414,20 +419,34 @@
   // stays put; span capped at poolSize so slots never collide). Reuse the prior
   // slot object when unchanged — a fresh object each pass would change the {#each}
   // item and re-run the row derived for rows that didn't move.
-  let prevSlots: ({ index: number; group: EventGroups[number] } | null)[] = [];
+  //
+  // A summary's identity is stable for the whole run, so its version has to be
+  // part of the check: without it a group that gained an event would keep its
+  // slot object, the {#each} item wouldn't change, and the row would never
+  // re-read its now-stale group.
+  type Slot = {
+    index: number;
+    group: GroupSummary;
+    version: number | undefined;
+  };
+  let prevSlots: (Slot | null)[] = [];
   const pool = $derived.by(() => {
     const total = filteredGroups.length;
-    const slots: ({ index: number; group: EventGroups[number] } | null)[] =
-      new Array(poolSize).fill(null);
+    const slots: (Slot | null)[] = new Array(poolSize).fill(null);
     const end = Math.min(windowEnd, total, windowStart + poolSize);
     for (let index = windowStart; index < end; index++) {
       const slot = index % poolSize;
       const group = filteredGroups[index];
       const prev = prevSlots[slot];
-      if (prev && prev.index === index && prev.group === group) {
+      if (
+        prev &&
+        prev.index === index &&
+        prev.group === group &&
+        prev.version === group.version
+      ) {
         slots[slot] = prev;
       } else {
-        slots[slot] = { index, group };
+        slots[slot] = { index, group, version: group.version };
       }
     }
     prevSlots = slots;
@@ -541,8 +560,8 @@
             >
               {#if slot}
                 <TimelineGraphRow
-                  group={slot.group}
-                  eventCount={slot.group.eventList.length}
+                  group={materializeGroup(slot.group)}
+                  eventCount={slot.group.eventCount}
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
@@ -575,7 +594,7 @@
             {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
             <GroupDetailsRow
               y={panelY}
-              group={activeGroup}
+              group={materializeGroup(activeGroup)}
               {canvasWidth}
               endTime={workflow?.endTime ? endTime : nowMs}
               onHeight={(height) => {

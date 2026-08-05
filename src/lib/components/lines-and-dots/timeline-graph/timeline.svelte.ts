@@ -1,6 +1,6 @@
 import { SvelteSet } from 'svelte/reactivity';
 
-import type { EventGroups } from '$lib/models/event-groups/event-groups';
+import type { GroupSummary } from '$lib/services/grouped-event-buffer';
 import type { WorkflowEvents } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
@@ -16,7 +16,7 @@ const DEFAULT_DURATION_THRESHOLD_RATIO = 0.1;
 interface TimelineInit {
   getFullEventHistory: () => WorkflowEvents;
   getWorkflow: () => WorkflowExecution;
-  getEventGroups: () => EventGroups;
+  getEventGroups: () => GroupSummary[];
   getCurrentTimeMs: () => number;
   getDurationThresholdRatio?: () => number;
   getLoading?: () => boolean;
@@ -29,7 +29,7 @@ export class Timeline {
 
   private _getFullEventHistory: () => WorkflowEvents;
   private _getWorkflow: () => WorkflowExecution;
-  private _getEventGroups: () => EventGroups;
+  private _getEventGroups: () => GroupSummary[];
   private _getCurrentTimeMs: () => number;
   private _getDurationThresholdRatio: () => number;
   private _getLoading: () => boolean;

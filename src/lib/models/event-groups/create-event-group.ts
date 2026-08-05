@@ -64,6 +64,9 @@ const eventGroupProto: ThisType<EventGroup> = {
   get lastEvent() {
     return this.eventList[this.eventList.length - 1];
   },
+  get eventCount() {
+    return this.eventList.length;
+  },
   get finalClassification() {
     return this.eventList[this.eventList.length - 1].classification;
   },
@@ -127,35 +130,29 @@ export const addEventToGroup = (group: EventGroup, event: WorkflowEvent) => {
   }
 };
 
+/**
+ * Whether `event` starts a group. Single source of truth for the dispatch, so
+ * callers that only need to know whether a group exists — the buffer, deciding
+ * which records to expose as summaries — can ask without building one.
+ */
+export const isGroupHeadEvent = (event: CommonHistoryEvent): boolean =>
+  isActivityTaskScheduledEvent(event) ||
+  isStartChildWorkflowExecutionInitiatedEvent(event) ||
+  isTimerStartedEvent(event) ||
+  isSignalExternalWorkflowExecutionInitiatedEvent(event) ||
+  isWorkflowExecutionSignaledEvent(event) ||
+  isMarkerRecordedEvent(event) ||
+  isWorkflowExecutionUpdateAcceptedEvent(event) ||
+  isNexusOperationScheduledEvent(event);
+
 export const createEventGroup = (
   event: CommonHistoryEvent,
 ): EventGroup | undefined => {
-  if (isActivityTaskScheduledEvent(event))
-    return createGroupFor<'Activity'>(event);
-
-  if (isStartChildWorkflowExecutionInitiatedEvent(event))
-    return createGroupFor<'ChildWorkflow'>(event);
-
-  if (isTimerStartedEvent(event)) return createGroupFor<'Timer'>(event);
-
-  if (isSignalExternalWorkflowExecutionInitiatedEvent(event))
-    return createGroupFor<'Signal'>(event);
-
-  if (isWorkflowExecutionSignaledEvent(event))
-    return createGroupFor<'SignalReceived'>(event);
-
-  if (isMarkerRecordedEvent(event)) {
-    if (isLocalActivityMarkerEvent(event)) {
-      return createGroupFor<'LocalActivity'>(event);
-    }
-    return createGroupFor<'Marker'>(event);
-  }
-
-  if (isWorkflowExecutionUpdateAcceptedEvent(event))
-    return createGroupFor<'Update'>(event);
-
-  if (isNexusOperationScheduledEvent(event))
-    return createGroupFor<'Nexus'>(event);
+  if (!isGroupHeadEvent(event)) return undefined;
+  // createGroupFor derives every field from the event, including the
+  // local-activity category split, so the per-type branches only ever differed
+  // in their type parameter.
+  return createGroupFor(event as StartingEvents[keyof StartingEvents]);
 };
 
 export const createWorkflowTaskGroup = (

@@ -56,7 +56,7 @@
 
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  const bufferGroups = $derived(eventBuffer.groupsWithoutWorkflowTasks);
+  const bufferGroups = $derived(eventBuffer.summariesWithoutWorkflowTasks);
 
   const filteredBufferGroups = $derived.by(() => {
     const active = $eventTypeFilter;

@@ -128,6 +128,17 @@ export function makeTimerFired(
   } as unknown as HistoryEvent;
 }
 
+export function makeLocalActivityMarker(eventId: number): HistoryEvent {
+  return {
+    ...base(eventId, 'MarkerRecorded'),
+    markerRecordedEventAttributes: {
+      markerName: 'LocalActivity',
+      details: {},
+      workflowTaskCompletedEventId: String(eventId - 1),
+    },
+  } as unknown as HistoryEvent;
+}
+
 export function makeWorkflowTaskScheduled(eventId: number): HistoryEvent {
   return {
     ...base(eventId, 'WorkflowTaskScheduled'),
@@ -373,6 +384,11 @@ export function makeNexusOperationGroup(
  * All events have sequential ascending IDs from 1..N.
  * The resulting array is sorted ascending by eventId.
  */
+/** A local-activity marker group — one event, category 'local-activity'. */
+export function makeLocalActivityGroup(startId: number): [HistoryEvent] {
+  return [makeLocalActivityMarker(startId)];
+}
+
 export function makeSyntheticEvents(n: number): HistoryEvent[] {
   const events: HistoryEvent[] = [];
   let id = 1;

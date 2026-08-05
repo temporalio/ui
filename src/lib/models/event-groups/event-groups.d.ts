@@ -18,6 +18,7 @@ interface EventGroup extends Pick<
   label: string;
   displayName: string;
   eventList: WorkflowEvent[];
+  eventCount: number;
   initialEvent: WorkflowEvent;
   lastEvent: WorkflowEvent;
   finalClassification: EventClassification;

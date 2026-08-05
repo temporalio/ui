@@ -1,6 +1,13 @@
-import type { EventGroups } from '$lib/models/event-groups/event-groups';
-
 import { orderGroupsByPending } from './order-groups-by-pending';
+
+/**
+ * The fields these sorts read — satisfied by a full EventGroup and by the
+ * buffer's GroupSummary, so the timeline can order groups without building them.
+ */
+type SortableGroup = {
+  isPending: boolean;
+  initialEvent: { id: string };
+};
 
 /**
  * Produces the ordered groups array for the timeline during **loading**.
@@ -19,11 +26,11 @@ import { orderGroupsByPending } from './order-groups-by-pending';
  * @param descMinId     - lowest event ID seen from the descending cursor;
  *                        0 means no descending page has arrived yet
  */
-export const sortGroupsDuringLoading = (
-  groups: EventGroups,
+export const sortGroupsDuringLoading = <T extends SortableGroup>(
+  groups: T[],
   reverseSort: boolean,
   descMinId: number,
-): EventGroups => {
+): T[] => {
   if (!descMinId) return groups;
 
   return groups.toSorted((a, b) => {
@@ -41,12 +48,12 @@ export const sortGroupsDuringLoading = (
 /**
  * Full groups sort for the timeline — switches strategy based on fetch state.
  */
-export const getTimelineGroups = (
-  groups: EventGroups,
+export const getTimelineGroups = <T extends SortableGroup>(
+  groups: T[],
   reverseSort: boolean,
   fetchComplete: boolean,
   descMinId: number,
-): EventGroups => {
+): T[] => {
   if (fetchComplete) return orderGroupsByPending(groups, !reverseSort);
   return sortGroupsDuringLoading(groups, reverseSort, descMinId);
 };
