@@ -35,6 +35,7 @@ import {
   makeActivityGroup,
   makeActivityScheduled,
   makeActivityStarted,
+  makeActivityTimedOut,
   makeActivityTimeoutGroup,
   makeChildWorkflowGroup,
   makeNexusOperationGroup,
@@ -1958,5 +1959,23 @@ describe('group reference identity', () => {
     expect(after).not.toBe(before);
     expect(after?.eventList).toHaveLength(3);
     expect(after?.finalClassification).toBe('Completed');
+  });
+  it('flushes live followers into the group the fetch just published', () => {
+    reset(10);
+
+    // A follower parked by the fetch is flushed when the head registers, which
+    // replaces meta.group with the copy. A follower parked by the live poll is
+    // flushed straight after, and must land on that copy rather than on the
+    // reference processEvent started with.
+    processEvent(makeActivityStarted(2, 1), false);
+    expect(appendLiveEvent(makeActivityTimedOut(3, 1))).toBe(true);
+
+    processEvent(makeActivityScheduled(1), true);
+
+    const group = getGroupArray().find((g) => g.id === '1');
+    expect(group?.eventList.map((e) => e.id)).toEqual(['1', '2', '3']);
+    // Set by addEventToGroup, which writes to the group it is handed — unlike
+    // eventList, this is not shared with the pre-copy reference.
+    expect(group?.isFailureOrTimedOut).toBe(true);
   });
 });
