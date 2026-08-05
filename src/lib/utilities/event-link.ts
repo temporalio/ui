@@ -48,7 +48,9 @@ const workflowValueFromHref = (href: string, fallback: string): string => {
 
 const namespaceDisplay = (
   namespace: string | null | undefined,
-  labelKey: 'nexus.namespace-link' | 'nexus.caller-namespace' = 'nexus.namespace-link',
+  labelKey:
+    | 'nexus.namespace-link'
+    | 'nexus.caller-namespace' = 'nexus.namespace-link',
 ): EventLinkDisplay | undefined => {
   if (!isPresent(namespace)) return undefined;
 
@@ -64,7 +66,9 @@ const eventDisplay = (
   eventType: unknown,
   eventId?: unknown,
   requestId?: string | null,
-  labelKey: 'nexus.handler-event' | 'nexus.caller-event' = 'nexus.handler-event',
+  labelKey:
+    | 'nexus.handler-event'
+    | 'nexus.caller-event' = 'nexus.handler-event',
 ): EventLinkDisplay | undefined => {
   if (eventId === undefined && !requestId && !eventType) {
     return undefined;
@@ -172,7 +176,9 @@ export const toEventLinkView = (
     return {
       variant: 'workflowEvent',
       key: `workflowEvent:${namespace ?? ''}:${workflow ?? ''}:${run ?? ''}:${workflowEvent.eventRef?.eventId ?? workflowEvent.requestIdRef?.requestId ?? index ?? ''}`,
-      label: translate(caller ? 'nexus.caller-workflow' : 'nexus.workflow-link'),
+      label: translate(
+        caller ? 'nexus.caller-workflow' : 'nexus.workflow-link',
+      ),
       value,
       href,
       namespace: namespaceDisplay(
@@ -235,14 +241,21 @@ export const toEventLinkView = (
         })
       : undefined;
 
+    const caller = context.perspective === 'caller';
+
     return {
       variant: 'nexusOperation',
       key: `nexusOperation:${namespace ?? ''}:${operationId ?? ''}:${runId ?? ''}:${index ?? ''}`,
-      label: translate('nexus.standalone-nexus-operation-link'),
+      label: translate(
+        caller ? 'nexus.caller-event' : 'nexus.standalone-nexus-operation-link',
+      ),
       value:
         operationId || runId || namespace || translate('nexus.nexus-operation'),
       href,
-      namespace: namespaceDisplay(namespace),
+      namespace: namespaceDisplay(
+        namespace,
+        caller ? 'nexus.caller-namespace' : 'nexus.namespace-link',
+      ),
     };
   }
 

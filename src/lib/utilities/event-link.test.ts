@@ -137,6 +137,31 @@ describe('toEventLinkView', () => {
     });
   });
 
+  it('uses caller labels for a Nexus operation in the caller perspective', () => {
+    const view = toEventLinkView(
+      {
+        nexusOperation: {
+          namespace: 'caller-ns',
+          operationId: 'operation-1',
+          runId: 'run-1',
+        },
+      },
+      { perspective: 'caller' },
+    );
+
+    expect(view).toMatchObject({
+      variant: 'nexusOperation',
+      label: 'Caller Event',
+      value: 'operation-1',
+      href: `${base}/namespaces/caller-ns/nexus-operations/operation-1/run-1/details`,
+      namespace: {
+        label: 'Caller Namespace',
+        value: 'caller-ns',
+        href: `${base}/namespaces/caller-ns`,
+      },
+    });
+  });
+
   it('returns a standalone activity route', () => {
     const view = toEventLinkView({
       activity: {
