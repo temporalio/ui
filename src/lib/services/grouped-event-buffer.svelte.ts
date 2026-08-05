@@ -24,48 +24,43 @@ const versionStore = writable(0);
  * Writes still go through the buffer's own functions; they notify this view
  * automatically, so producers never announce their own changes.
  *
- * Updates are coalesced to one per animation frame. A fetch page delivers up to
- * 1000 events and the live poll arrives in batches, so without coalescing every
- * event would invalidate the derived reads.
+ * Updates are coalesced onto a microtask. A fetch page delivers up to 1000
+ * events and the live poll arrives in batches, both ingested in a synchronous
+ * loop, so this collapses a batch into one update without deferring past the
+ * current task. Deliberately not requestAnimationFrame: that never fires in a
+ * hidden tab, which would leave a run opened in a background tab with an empty
+ * event history until it was focused.
  */
 class EventBufferView {
   private _version = $state(0);
-  private frame: number | null = null;
+  private pending = false;
 
   constructor() {
     onChange((immediate) => this.scheduleUpdate(immediate));
   }
 
   private bump(): void {
+    this.pending = false;
     this._version++;
     versionStore.update((current) => current + 1);
   }
 
   private scheduleUpdate(immediate: boolean): void {
-    if (immediate || typeof requestAnimationFrame !== 'function') {
-      if (this.frame !== null) {
-        cancelAnimationFrame(this.frame);
-        this.frame = null;
-      }
+    if (immediate) {
       this.bump();
       return;
     }
-    if (this.frame !== null) return;
-    this.frame = requestAnimationFrame(() => {
-      this.frame = null;
-      this.bump();
+    if (this.pending) return;
+    this.pending = true;
+    queueMicrotask(() => {
+      if (this.pending) this.bump();
     });
   }
 
-  /** Bumped once per frame in which the buffer changed. */
+  /** Bumped once per batch of buffer writes. */
   get version(): number {
     return this._version;
   }
-
-  readonly groups: EventGroup[] = $derived.by(() => {
-    void this._version;
-    return getGroupArray();
-  });
 
   /**
    * Groups with WorkflowTask groups filtered out — what both the timeline and

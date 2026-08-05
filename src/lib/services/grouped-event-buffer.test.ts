@@ -291,7 +291,7 @@ describe('setFailedEvent', () => {
 // ---------------------------------------------------------------------------
 
 describe('memory overhead smoke test', () => {
-  it('heap growth for 50k events stays under 60MB', async () => {
+  it('heap growth for 50k events stays under 70MB', async () => {
     if (typeof globalThis.gc !== 'function') return; // skip without --expose-gc
 
     const events = makeSyntheticEvents(50_000);

@@ -58,6 +58,15 @@ test.describe('Timeline live completion', () => {
   }) => {
     await mockWorkflowApis(page, runningWorkflow);
 
+    // The stale-color bug only shows once the in-progress bar is already on
+    // screen and the completion then lands on the rendered group. The live poll
+    // starts before the initial fetch, so the completion is held until the test
+    // has observed that state — a fixed delay would race initial render.
+    let releaseCompletion: () => void;
+    const completionHeld = new Promise<void>((resolve) => {
+      releaseCompletion = resolve;
+    });
+
     // The live poll long-polls the ascending history route with
     // waitNewEvent=true; deliver the completion on the first such request and
     // nothing thereafter. The initial (non-waitNewEvent) fetch stays in-progress.
@@ -66,10 +75,7 @@ test.describe('Timeline live completion', () => {
       if (route.request().url().includes('waitNewEvent=true')) {
         if (!completionDelivered) {
           completionDelivered = true;
-          // Hold the completion until after the row has rendered in-progress —
-          // the stale-color bug only shows once the blue bar is already on
-          // screen and the completion then lands on the rendered group.
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await completionHeld;
           return route.fulfill({ json: historyPage([completion]) });
         }
         return route.fulfill({ json: historyPage([]) });
@@ -83,17 +89,16 @@ test.describe('Timeline live completion', () => {
     await page.goto(timelineUrl);
 
     // Row renders in progress first (Started, not Completed)...
-    const groupButton = page.getByRole('button', {
-      name: /^Event DeployNetwork:/,
+    const completedButton = page.getByRole('button', {
+      name: 'Event DeployNetwork: Completed',
     });
-    await expect(groupButton).toBeVisible();
     await expect(
-      page.getByRole('button', { name: 'Event DeployNetwork: Completed' }),
-    ).toHaveCount(0);
+      page.getByRole('button', { name: /^Event DeployNetwork:/ }),
+    ).toBeVisible();
+    await expect(completedButton).toHaveCount(0);
 
     // ...then flips to Completed once the live completion arrives — no reload.
-    await expect(
-      page.getByRole('button', { name: 'Event DeployNetwork: Completed' }),
-    ).toBeVisible();
+    releaseCompletion();
+    await expect(completedButton).toBeVisible();
   });
 });

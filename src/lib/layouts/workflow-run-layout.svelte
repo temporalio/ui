@@ -281,11 +281,14 @@
   };
 
   // Pending activity/nexus metadata comes from the workflow run, not the event
-  // history, so the buffer has to be told about it — once the fetch has
-  // registered every group, and again whenever the run refreshes.
+  // history, so the buffer has to be told about it. Tracks the buffer too: a
+  // pending activity's ActivityTaskScheduled can be ingested after the run
+  // refresh that listed it, and enrichGroups skips records whose head event has
+  // not arrived yet. enrichGroups is idempotent, so re-running settles.
   $effect(() => {
     const activities = $workflowRun.workflow?.pendingActivities ?? [];
     const nexusOperations = $workflowRun.workflow?.pendingNexusOperations ?? [];
+    void eventBuffer.version;
     if (!fetchComplete) return;
     enrichGroups(activities, nexusOperations);
   });
