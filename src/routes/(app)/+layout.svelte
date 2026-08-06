@@ -41,7 +41,6 @@
     routeForStandaloneNexusOperations,
     routeForWorkerDeployments,
     routeForWorkers,
-    routeForWorkflowCatalog,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
@@ -59,9 +58,6 @@
   initializeNavDefaults(page.data?.settings?.navCollapsedByDefault);
 
   let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
-  let showWorkflowCatalogNav = $derived(
-    page.data?.settings?.runtimeEnvironment?.isLocal === true,
-  );
   let newsFeedClusterId = $derived(page.data?.cluster?.clusterId ?? '');
   let showNewsFeed = $derived(
     !isCloud && !page.data?.settings?.disableNewsFetch && !!newsFeedClusterId,
@@ -115,7 +111,6 @@
       archivalRoute: routeForArchivalWorkflows({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
-      workflowCatalogRoute: routeForWorkflowCatalog(),
       historyImportRoute: routeForEventHistoryImport(),
     };
   };
@@ -132,7 +127,6 @@
       archivalRoute,
       namespacesRoute,
       nexusRoute,
-      workflowCatalogRoute,
     }: {
       workflowsRoute: string;
       standaloneActivitiesRoute: string;
@@ -144,7 +138,6 @@
       archivalRoute: string;
       namespacesRoute: string;
       nexusRoute: string;
-      workflowCatalogRoute: string;
       historyImportRoute: string;
     },
     inProgressBatch: boolean,
@@ -218,13 +211,6 @@
           const match = path.split('/').find((segment) => segment === 'nexus');
           return !!match;
         },
-      },
-      {
-        href: workflowCatalogRoute,
-        icon: 'workflow',
-        label: 'Workflow catalog',
-        hidden: !showWorkflowCatalogNav,
-        isActive: (path) => path.includes(workflowCatalogRoute),
       },
     ];
   };
