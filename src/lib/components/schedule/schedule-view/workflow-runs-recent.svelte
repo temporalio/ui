@@ -5,10 +5,15 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import { getEpochMilliseconds } from '$lib/utilities/format-time';
+  import {
+    fetchRecentScheduleRunStatuses,
+    toRecentScheduleRuns,
+  } from '$lib/services/schedule-service';
+  import type {
+    DescribeFullSchedule,
+    RecentScheduleRun,
+  } from '$lib/types/schedule';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-  import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
 
   import WorkflowRunsEmpty from './workflow-runs-empty.svelte';
 
@@ -28,20 +33,19 @@
     openTriggerConfirmationModal,
   }: Props = $props();
 
-  const sortedRecentRuns = $derived.by(() => {
-    const runs = schedule?.info?.recentActions ?? [];
-    return runs
-      .filter(Boolean)
-      .sort(
-        (a, b) =>
-          getEpochMilliseconds(b.actualTime) -
-          getEpochMilliseconds(a.actualTime),
-      )
-      .slice(0, 5);
-  });
+  const recordedRuns = $derived(toRecentScheduleRuns(schedule));
+  const runsPromise = $derived(
+    recordedRuns.length
+      ? fetchRecentScheduleRunStatuses({
+          namespace,
+          scheduleId: schedule.schedule_id,
+          runs: recordedRuns,
+        })
+      : Promise.resolve(recordedRuns),
+  );
 </script>
 
-{#if !sortedRecentRuns.length}
+{#if !recordedRuns.length}
   <WorkflowRunsEmpty
     class={className}
     title={translate('schedules.workflow-runs-empty-state-recent-title')}
@@ -52,15 +56,23 @@
     {openTriggerConfirmationModal}
   />
 {:else}
+  {#await runsPromise}
+    {@render runList(recordedRuns)}
+  {:then runs}
+    {@render runList(runs)}
+  {:catch}
+    {@render runList(recordedRuns)}
+  {/await}
+{/if}
+
+{#snippet runList(runs: RecentScheduleRun[])}
   <ul class={twMerge('flex flex-col gap-2', className)}>
-    {#each sortedRecentRuns as run, i (run?.startWorkflowResult?.runId ?? i)}
+    {#each runs as run, i (run.runId || i)}
       <li
         class="grid grid-cols-[max-content_1fr] gap-x-2 gap-y-1 border-b border-subtle py-2 sm:grid-cols-[minmax(max-content,7rem)_1fr_max-content]"
       >
         <div class="col-start-1 row-start-1 flex items-center">
-          <WorkflowStatus
-            status={toWorkflowStatusReadable(run.startWorkflowStatus ?? null)}
-          />
+          <WorkflowStatus status={run.status} />
         </div>
 
         <div
@@ -68,12 +80,12 @@
         >
           <Link
             href={routeForWorkflow({
-              workflow: run.startWorkflowResult?.workflowId ?? '',
-              run: run.startWorkflowResult?.runId ?? '',
+              workflow: run.workflowId,
+              run: run.runId,
               namespace,
             })}
           >
-            {run.startWorkflowResult?.workflowId}
+            {run.workflowId}
           </Link>
         </div>
 
@@ -85,4 +97,4 @@
       </li>
     {/each}
   </ul>
-{/if}
+{/snippet}
