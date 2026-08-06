@@ -24,6 +24,7 @@
 
   import { onMount, setContext, type Snippet } from 'svelte';
 
+  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
@@ -105,6 +106,17 @@
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query, $searchAttributes);
+    }
+  });
+
+  afterNavigate(({ type }) => {
+    // Browser back/forward changes the query param without going through the
+    // filter chip UI, so the pills need to be re-derived from the URL here.
+    if (type === 'popstate') {
+      const currentQuery = page.url.searchParams.get('query') ?? '';
+      $workflowFilters = currentQuery
+        ? toListWorkflowFilters(currentQuery, $searchAttributes)
+        : [];
     }
   });
 

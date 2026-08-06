@@ -31,6 +31,7 @@
   import type { Snippet } from 'svelte';
   import { onMount, setContext } from 'svelte';
 
+  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
@@ -96,6 +97,20 @@
         query,
         $activityExecutionSearchAttributes,
       );
+    }
+  });
+
+  afterNavigate(({ type }) => {
+    // Browser back/forward changes the query param without going through the
+    // filter chip UI, so the pills need to be re-derived from the URL here.
+    if (type === 'popstate') {
+      const currentQuery = page.url.searchParams.get('query') ?? '';
+      $activityFilters = currentQuery
+        ? toListWorkflowFilters(
+            currentQuery,
+            $activityExecutionSearchAttributes,
+          )
+        : [];
     }
   });
 
