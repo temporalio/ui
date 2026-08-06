@@ -69,8 +69,13 @@
   let maximumInterval = $state(
     untrack(() => String(initialOptions?.retryPolicy?.maximumInterval ?? '')),
   );
-  let startDelay = $state(
-    untrack(() => String(initialOptions?.startDelay ?? '')),
+  const initialStartDelay = untrack(() =>
+    String(initialOptions?.startDelay ?? ''),
+  );
+  let startDelay = $state(initialStartDelay);
+
+  const startDelayChanged = $derived(
+    Boolean(startDelay) && startDelay !== initialStartDelay,
   );
 
   const activityOptions = $derived({
@@ -79,7 +84,7 @@
     scheduleToStartTimeout: scheduleToStartTimeout || undefined,
     startToCloseTimeout: startToCloseTimeout || undefined,
     heartbeatTimeout: heartbeatTimeout || undefined,
-    startDelay: startDelay || undefined,
+    ...(startDelayChanged && { startDelay }),
     retryPolicy: {
       maximumAttempts,
       backoffCoefficient,
