@@ -44,7 +44,7 @@ flowchart LR
 
 ---
 
-## Group Assembly: Records, Not Parking
+## Group Assembly: Arrival Order Doesn't Matter
 
 Temporal events arrive out of order. A group (Activity, Timer, Child Workflow, …)
 is 2–5 events where only the **head event** (e.g. `ActivityTaskScheduled`) carries
@@ -55,8 +55,10 @@ Two sources deliver concurrently:
 - **Bidirectional fetch** — ascending cursor from event 1, descending cursor from the last, racing toward the middle.
 - **Live poll** — long-poll at the frontier while a workflow is running.
 
-Both call `ingestHistoryEvent`. There is no parking and no reconciliation: a record
-is created by **whichever member arrives first**, head or follower.
+Both call `ingestHistoryEvent`, which stores the event and notes its slot on a
+record for the group it belongs to. The record is created by **whichever member
+arrives first** — head or follower — so no event ever has to wait somewhere for
+its group to exist.
 
 ```mermaid
 flowchart TD
@@ -75,16 +77,16 @@ A record with no head event yet is simply not listed — `getLazyGroups` skips a
 record whose `headsGroup` is false. **No partial or stub groups are ever rendered**,
 and the order events arrive in does not change the result.
 
-### Why the ordering problem disappeared
+### What this replaced
 
-The previous design needed two park maps (`pendingFollowers` keyed by slot,
-`livePendingFollowers` keyed by event id), a flush at head registration, a
-separate `liveGroups` store, and a reconcile step to merge the two. All of that
-existed to answer "where do I put this event before I can build its group?"
+Because groups used to be built during ingest, an event whose group didn't exist
+yet had nowhere to go. The answer was to hold it: two park maps (`pendingFollowers`
+keyed by slot, `livePendingFollowers` keyed by event id), a flush when the head
+registered, a separate `liveGroups` store for groups the poll created, and a
+reconcile step when the fetch caught up to one.
 
-Because groups are no longer built at ingest, the question doesn't arise: the
-event goes in `events[slot]` and its slot number goes on the record, whenever
-either shows up.
+Deriving groups on read removes the question. The event goes in `events[slot]` and
+its slot number goes on the record, whichever arrives first.
 
 ### Pending activity / nexus metadata
 
