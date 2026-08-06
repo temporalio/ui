@@ -1,5 +1,8 @@
 <script lang="ts">
   import { untrack } from 'svelte';
+  import { superForm } from 'sveltekit-superforms';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import z from 'zod/v3';
 
   import Button from '$lib/holocene/button.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
@@ -7,10 +10,10 @@
   import DurationInput, {
     DAYS,
     DEFAULT_UNITS,
+    parseDuration,
     SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -41,82 +44,146 @@
     delayed = false,
   }: Props = $props();
 
-  // Form fields are seeded from activity.activityOptions once when the drawer
-  // opens. They must NOT reset reactively if the activity prop changes while
-  // the user is mid-edit — untrack() captures the initial value intentionally.
-  let taskQueue = $state(untrack(() => initialOptions?.taskQueue?.name ?? ''));
-  let scheduleToCloseTimeout = $state(
-    untrack(() => String(initialOptions?.scheduleToCloseTimeout ?? '')),
-  );
-  let scheduleToStartTimeout = $state(
-    untrack(() => String(initialOptions?.scheduleToStartTimeout ?? '')),
-  );
-  let startToCloseTimeout = $state(
-    untrack(() => String(initialOptions?.startToCloseTimeout ?? '')),
-  );
-  let heartbeatTimeout = $state(
-    untrack(() => String(initialOptions?.heartbeatTimeout ?? '')),
-  );
-  let maximumAttempts = $state(
-    untrack(() => initialOptions?.retryPolicy?.maximumAttempts ?? 0),
-  );
-  let backoffCoefficient = $state(
-    untrack(() => initialOptions?.retryPolicy?.backoffCoefficient ?? 0),
-  );
-  let initialInterval = $state(
-    untrack(() => String(initialOptions?.retryPolicy?.initialInterval ?? '')),
-  );
-  let maximumInterval = $state(
-    untrack(() => String(initialOptions?.retryPolicy?.maximumInterval ?? '')),
-  );
-  const initialStartDelay = untrack(() =>
-    String(initialOptions?.startDelay ?? ''),
-  );
-  let startDelay = $state(initialStartDelay);
+  const toStringValue = (value: unknown): string =>
+    value === null || value === undefined ? '' : String(value);
 
-  const startDelayChanged = $derived(
-    Boolean(startDelay) && startDelay !== initialStartDelay,
-  );
+  const isWholeNumber = (value: string): boolean =>
+    value.trim() !== '' &&
+    Number.isInteger(Number(value)) &&
+    Number(value) >= 0;
+  const isBackoffCoefficient = (value: string): boolean =>
+    value.trim() !== '' && Number(value) >= 1;
+  const isPositiveDuration = (value: string | undefined): boolean => {
+    const seconds = Number(parseDuration(value ?? ''));
+    return !isNaN(seconds) && seconds > 0;
+  };
 
-  const activityOptions = $derived({
-    taskQueue: { name: taskQueue },
-    scheduleToCloseTimeout: scheduleToCloseTimeout || undefined,
-    scheduleToStartTimeout: scheduleToStartTimeout || undefined,
-    startToCloseTimeout: startToCloseTimeout || undefined,
-    heartbeatTimeout: heartbeatTimeout || undefined,
-    ...(startDelayChanged && { startDelay }),
-    retryPolicy: {
-      maximumAttempts,
-      backoffCoefficient,
-      initialInterval: initialInterval || undefined,
-      maximumInterval: maximumInterval || undefined,
-    },
-  }) as unknown as ActivityOptions;
+  const schema = z
+    .object({
+      taskQueue: z
+        .string()
+        .trim()
+        .min(1, {
+          message: translate('standalone-activities.form-task-queue-required'),
+        }),
+      scheduleToCloseTimeout: z.string().default(''),
+      scheduleToStartTimeout: z.string().default(''),
+      startToCloseTimeout: z.string().default(''),
+      heartbeatTimeout: z.string().default(''),
+      initialInterval: z.string().default(''),
+      maximumInterval: z.string().default(''),
+      startDelay: z.string().default(''),
+      maximumAttempts: z.preprocess(
+        toStringValue,
+        z.string().refine(isWholeNumber, {
+          message: translate('activities.retry-max-attempts-error'),
+        }),
+      ),
+      backoffCoefficient: z.preprocess(
+        toStringValue,
+        z.string().refine(isBackoffCoefficient, {
+          message: translate('activities.retry-backoff-coefficient-error'),
+        }),
+      ),
+    })
+    .superRefine((data, context) => {
+      if (
+        !isPositiveDuration(data.startToCloseTimeout) &&
+        !isPositiveDuration(data.scheduleToCloseTimeout)
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['startToCloseTimeout'],
+          message: translate('standalone-activities.form-timeout-required'),
+        });
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['scheduleToCloseTimeout'],
+          message: translate('standalone-activities.form-timeout-required'),
+        });
+      }
+    });
+
+  // Seeded from activity.activityOptions once when the drawer opens. These must
+  // NOT reset reactively if the activity prop changes while the user is
+  // mid-edit — untrack() captures the initial values intentionally.
+  const initialData: z.infer<typeof schema> = untrack(() => ({
+    taskQueue: initialOptions?.taskQueue?.name ?? '',
+    scheduleToCloseTimeout: String(
+      initialOptions?.scheduleToCloseTimeout ?? '',
+    ),
+    scheduleToStartTimeout: String(
+      initialOptions?.scheduleToStartTimeout ?? '',
+    ),
+    startToCloseTimeout: String(initialOptions?.startToCloseTimeout ?? ''),
+    heartbeatTimeout: String(initialOptions?.heartbeatTimeout ?? ''),
+    initialInterval: String(initialOptions?.retryPolicy?.initialInterval ?? ''),
+    maximumInterval: String(initialOptions?.retryPolicy?.maximumInterval ?? ''),
+    startDelay: String(initialOptions?.startDelay ?? ''),
+    maximumAttempts: String(initialOptions?.retryPolicy?.maximumAttempts ?? 0),
+    backoffCoefficient: String(
+      initialOptions?.retryPolicy?.backoffCoefficient || 2,
+    ),
+  }));
+
+  const toActivityOptions = (data: z.infer<typeof schema>) =>
+    ({
+      taskQueue: { name: data.taskQueue },
+      ...(data.scheduleToCloseTimeout && {
+        scheduleToCloseTimeout: data.scheduleToCloseTimeout,
+      }),
+      ...(data.scheduleToStartTimeout && {
+        scheduleToStartTimeout: data.scheduleToStartTimeout,
+      }),
+      ...(data.startToCloseTimeout && {
+        startToCloseTimeout: data.startToCloseTimeout,
+      }),
+      ...(data.heartbeatTimeout && {
+        heartbeatTimeout: data.heartbeatTimeout,
+      }),
+      ...(data.startDelay &&
+        data.startDelay !== initialData.startDelay && {
+          startDelay: data.startDelay,
+        }),
+      retryPolicy: {
+        maximumAttempts: Number(data.maximumAttempts),
+        backoffCoefficient: Number(data.backoffCoefficient),
+        ...(data.initialInterval && { initialInterval: data.initialInterval }),
+        ...(data.maximumInterval && { maximumInterval: data.maximumInterval }),
+      },
+    }) as unknown as ActivityOptions;
 
   const closeCustomizationDrawer = () => {
     open = false;
   };
 
-  const onUpdate = async (e: SubmitEvent) => {
-    e.preventDefault();
+  const { form, errors, enhance } = superForm(initialData, {
+    SPA: true,
+    dataType: 'json',
+    resetForm: false,
+    invalidateAll: false,
+    validators: zodClient(schema),
+    onUpdate: async ({ form }) => {
+      if (!form.valid) return;
 
-    try {
-      await onSave(activityOptions);
-      toaster.push({
-        variant: 'success',
-        message: `Options for Activity ${activityId} have been updated.`,
-      });
-    } catch (error) {
-      console.error('Error updating activity options:', error);
-      toaster.push({
-        variant: 'error',
-        message: `Options for Activity ${activityId} have been failed to update: ${has(error, 'message') ? error.message : translate('common.unknown-error')}`,
-        duration: 5000,
-      });
-    } finally {
-      closeCustomizationDrawer();
-    }
-  };
+      try {
+        await onSave(toActivityOptions(form.data));
+        toaster.push({
+          variant: 'success',
+          message: `Options for Activity ${activityId} have been updated.`,
+        });
+      } catch (error) {
+        console.error('Error updating activity options:', error);
+        toaster.push({
+          variant: 'error',
+          message: `Options for Activity ${activityId} have been failed to update: ${has(error, 'message') ? error.message : translate('common.unknown-error')}`,
+          duration: 5000,
+        });
+      } finally {
+        closeCustomizationDrawer();
+      }
+    },
+  });
 </script>
 
 <Drawer
@@ -129,7 +196,7 @@
   class="w-screen sm:w-[480px]"
 >
   <DrawerContent title="Update Activity {activityId}">
-    <form onsubmit={onUpdate} class="flex flex-col gap-4">
+    <form use:enhance novalidate class="flex flex-col gap-4">
       <div>
         <Label
           for="maximum-attempts"
@@ -138,11 +205,15 @@
         <p class="mb-1 text-xs text-secondary">
           {translate('activities.retry-max-attempts-description')}
         </p>
-        <NumberInput
+        <Input
           id="maximum-attempts"
+          type="number"
           label={translate('activities.retry-max-attempts')}
           labelHidden
-          bind:value={maximumAttempts}
+          bind:value={$form.maximumAttempts}
+          min={0}
+          error={!!$errors.maximumAttempts}
+          hintText={$errors.maximumAttempts?.[0] ?? ''}
           class="w-24"
         />
       </div>
@@ -154,13 +225,16 @@
         <p class="mb-1 text-xs text-secondary">
           {translate('activities.retry-backoff-coefficient-description')}
         </p>
-        <NumberInput
+        <Input
           id="retry-backoff-coefficient"
+          type="number"
           label={translate('activities.retry-backoff-coefficient')}
           labelHidden
-          bind:value={backoffCoefficient}
+          bind:value={$form.backoffCoefficient}
           step={0.01}
           min={1}
+          error={!!$errors.backoffCoefficient}
+          hintText={$errors.backoffCoefficient?.[0] ?? ''}
           class="w-24"
         />
       </div>
@@ -171,8 +245,8 @@
           'activities.retry-initial-interval-duration-description',
         )}
         inputmode="numeric"
-        bind:value={initialInterval}
-        initialUnit={initialTimeoutUnit(initialInterval)}
+        bind:value={$form.initialInterval}
+        initialUnit={initialTimeoutUnit(initialData.initialInterval)}
         units={TIMEOUT_UNITS}
         min={0}
         class="max-w-80"
@@ -184,8 +258,8 @@
           'activities.schedule-to-start-timeout-duration-description',
         )}
         inputmode="numeric"
-        bind:value={scheduleToStartTimeout}
-        initialUnit={initialTimeoutUnit(scheduleToStartTimeout)}
+        bind:value={$form.scheduleToStartTimeout}
+        initialUnit={initialTimeoutUnit(initialData.scheduleToStartTimeout)}
         units={TIMEOUT_UNITS}
         min={0}
         class="max-w-80"
@@ -197,10 +271,13 @@
           'activities.schedule-to-close-timeout-duration-description',
         )}
         inputmode="numeric"
-        bind:value={scheduleToCloseTimeout}
-        initialUnit={initialTimeoutUnit(scheduleToCloseTimeout)}
+        required={!isPositiveDuration($form.startToCloseTimeout)}
+        bind:value={$form.scheduleToCloseTimeout}
+        initialUnit={initialTimeoutUnit(initialData.scheduleToCloseTimeout)}
         units={TIMEOUT_UNITS}
         min={0}
+        error={!!$errors.scheduleToCloseTimeout}
+        hintText={$errors.scheduleToCloseTimeout?.[0] ?? ''}
         class="max-w-80"
       />
       <DurationInput
@@ -210,10 +287,13 @@
           'activities.start-to-close-timeout-duration-description',
         )}
         inputmode="numeric"
-        bind:value={startToCloseTimeout}
-        initialUnit={initialTimeoutUnit(startToCloseTimeout)}
+        required={!isPositiveDuration($form.scheduleToCloseTimeout)}
+        bind:value={$form.startToCloseTimeout}
+        initialUnit={initialTimeoutUnit(initialData.startToCloseTimeout)}
         units={TIMEOUT_UNITS}
         min={0}
+        error={!!$errors.startToCloseTimeout}
+        hintText={$errors.startToCloseTimeout?.[0] ?? ''}
         class="max-w-80"
       />
       <DurationInput
@@ -223,8 +303,8 @@
           'activities.heartbeat-timeout-duration-description',
         )}
         inputmode="numeric"
-        bind:value={heartbeatTimeout}
-        initialUnit={initialTimeoutUnit(heartbeatTimeout)}
+        bind:value={$form.heartbeatTimeout}
+        initialUnit={initialTimeoutUnit(initialData.heartbeatTimeout)}
         units={TIMEOUT_UNITS}
         min={0}
         class="max-w-80"
@@ -239,7 +319,7 @@
                 'standalone-activities.form-start-delay-hint',
               )}
               inputmode="numeric"
-              bind:value={startDelay}
+              bind:value={$form.startDelay}
               initialUnit={SECONDS.label}
               units={[...DEFAULT_UNITS, DAYS]}
               min={0}
@@ -249,15 +329,13 @@
         </StartDelayGuard>
       {/if}
       <div>
-        <Label
-          for="task-queue-name"
-          label={translate('activities.task-queue-name')}
-        />
         <Input
           id="task-queue-name"
           label={translate('activities.task-queue-name')}
-          labelHidden
-          bind:value={taskQueue}
+          required
+          bind:value={$form.taskQueue}
+          error={!!$errors.taskQueue}
+          hintText={$errors.taskQueue?.[0] ?? ''}
           class="w-full"
         />
       </div>

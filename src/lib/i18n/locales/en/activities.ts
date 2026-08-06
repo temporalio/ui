@@ -19,9 +19,11 @@ export const Strings = {
   'pause-tooltip':
     'Pauses this Activity before its next retry or heartbeat. Timeout deadlines continue while paused.',
   'retry-max-attempts': 'Retry Max Attempts',
+  'retry-max-attempts-error': 'Enter a whole number of 0 or more.',
   'retry-max-attempts-description':
     'Maximum number of attempts. When exceeded the retries stop even if not expired yet. 1 disables retries. 0 means unlimited (up to the timeouts).',
   'retry-backoff-coefficient': 'Retry Backoff Coefficient',
+  'retry-backoff-coefficient-error': 'Enter a number of 1 or more.',
   'retry-backoff-coefficient-description':
     'Coefficient used to calculate the next retry interval. The next retry interval is previous interval multiplied by the coefficient. Must be 1 or larger.',
   'retry-initial-interval-duration': 'Retry Initial Interval Duration',
