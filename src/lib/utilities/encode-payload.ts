@@ -3,7 +3,8 @@ import { get } from 'svelte/store';
 import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
 import { encodePayloadsWithCodec } from '$lib/services/data-encoder';
 import { dataEncoder } from '$lib/stores/data-encoder';
-import type { Payload } from '$lib/types';
+import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
+import type { Payload, SearchAttribute } from '$lib/types';
 import { atob } from '$lib/utilities/atob';
 import { btoa } from '$lib/utilities/btoa';
 import {
@@ -52,6 +53,24 @@ export const setBase64Payload = (
     },
     data: btoa(stringifyWithBigInt(payload)),
   };
+};
+
+export const setSearchAttributes = (
+  attributes: SearchAttributesSchema,
+): NonNullable<SearchAttribute['indexedFields']> => {
+  if (!attributes.length) return {};
+
+  const searchAttributes: Record<
+    string,
+    ReturnType<typeof setBase64Payload>
+  > = {};
+  attributes.forEach((attribute) => {
+    searchAttributes[attribute.label] = setBase64Payload(attribute.value);
+  });
+
+  return searchAttributes as unknown as NonNullable<
+    SearchAttribute['indexedFields']
+  >;
 };
 
 type EncodePayloads = {
