@@ -19,7 +19,6 @@
     workerSearchAttributes,
   } from '$lib/stores/search-attributes';
   import { refresh } from '$lib/stores/workers';
-  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   const { namespace } = $derived(page.params);
@@ -30,13 +29,6 @@
     if (query) {
       $workerFilters = toListWorkflowFilters(query, $workerSearchAttributes);
     }
-  });
-
-  syncFiltersOnPopState({
-    page,
-    filters: workerFilters,
-    parseQuery: (query) =>
-      toListWorkflowFilters(query, $workerSearchAttributes),
   });
 
   const workerHeartbeatsEnabled = $derived(

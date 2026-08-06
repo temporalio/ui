@@ -60,7 +60,6 @@
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
-  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
@@ -107,12 +106,6 @@
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query, $searchAttributes);
     }
-  });
-
-  syncFiltersOnPopState({
-    page,
-    filters: workflowFilters,
-    parseQuery: (query) => toListWorkflowFilters(query, $searchAttributes),
   });
 
   $effect(() => {

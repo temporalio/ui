@@ -37,7 +37,6 @@
     scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
   } from '$lib/stores/search-attributes';
-  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -85,13 +84,6 @@
         $scheduleSearchAttributes,
       );
     }
-  });
-
-  syncFiltersOnPopState({
-    page,
-    filters: scheduleFilters,
-    parseQuery: (query) =>
-      toListWorkflowFilters(query, $scheduleSearchAttributes),
   });
 
   const onError = (err: unknown) => {

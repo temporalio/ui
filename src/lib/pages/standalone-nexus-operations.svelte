@@ -34,7 +34,6 @@
   } from '$lib/stores/saved-queries';
   import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
   import { getNexusOperationStatusAndCountOfGroup } from '$lib/utilities/get-nexus-operation-status-and-count';
-  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   interface Props {
@@ -61,13 +60,6 @@
         $nexusOperationSearchAttributes,
       );
     }
-  });
-
-  syncFiltersOnPopState({
-    page,
-    filters: nexusOperationFilters,
-    parseQuery: (query) =>
-      toListWorkflowFilters(query, $nexusOperationSearchAttributes),
   });
 
   $effect(() => {

@@ -67,7 +67,6 @@
   } from '$lib/stores/saved-queries';
   import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
   import { getActivityStatusAndCountOfGroup } from '$lib/utilities/get-activity-status-and-count';
-  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
   import { standaloneActivityWriteActionsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
@@ -98,13 +97,6 @@
         $activityExecutionSearchAttributes,
       );
     }
-  });
-
-  syncFiltersOnPopState({
-    page,
-    filters: activityFilters,
-    parseQuery: (query) =>
-      toListWorkflowFilters(query, $activityExecutionSearchAttributes),
   });
 
   $effect(() => {
