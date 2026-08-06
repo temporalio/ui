@@ -32,11 +32,30 @@ const { localDescriptor } = vi.hoisted<{
 
 vi.mock('virtual:workflow-catalog-local', () => ({
   localWorkflowCatalog: [localDescriptor],
+  workflowCatalogRouting: {
+    'local-worker': {
+      namespace: 'runtime-namespace',
+      taskQueue: 'runtime-task-queue',
+    },
+  },
 }));
 
 describe('workflow catalog route catalog', () => {
   it('provides the local overlay to the exact app route catalog', () => {
-    expect(routeWorkflowCatalog).toContainEqual(localDescriptor);
+    expect(routeWorkflowCatalog).toContainEqual(
+      expect.objectContaining({ id: localDescriptor.id, source: 'local' }),
+    );
+  });
+
+  it('routes the app catalog with the safe virtual-module overlay', () => {
+    expect(
+      routeWorkflowCatalog.find(({ id }) => id === localDescriptor.id)
+        ?.execution,
+    ).toMatchObject({
+      targetId: 'local-worker',
+      namespace: 'runtime-namespace',
+      taskQueue: 'runtime-task-queue',
+    });
   });
 
   it('merges shared descriptors before local descriptors deterministically', () => {
@@ -49,6 +68,33 @@ describe('workflow catalog route catalog', () => {
     expect(
       mergeWorkflowCatalogDescriptors([sharedDescriptor], [localDescriptor]),
     ).toEqual([sharedDescriptor, localDescriptor]);
+  });
+
+  it('applies runtime routing after merging shared and local descriptors', () => {
+    const sharedDescriptor = {
+      ...localDescriptor,
+      id: 'shared-order',
+      source: 'shared' as const,
+      execution: {
+        ...localDescriptor.execution,
+        targetId: 'shared-workflows',
+        namespace: 'registered-namespace',
+        taskQueue: 'registered-task-queue',
+      },
+    };
+
+    expect(
+      mergeWorkflowCatalogDescriptors([sharedDescriptor], [], {
+        'shared-workflows': {
+          namespace: 'runtime-namespace',
+          taskQueue: 'runtime-task-queue',
+        },
+      })[0]?.execution,
+    ).toMatchObject({
+      targetId: 'shared-workflows',
+      namespace: 'runtime-namespace',
+      taskQueue: 'runtime-task-queue',
+    });
   });
 
   it('rejects duplicate stable IDs instead of shadowing a descriptor', () => {

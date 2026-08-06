@@ -1,0 +1,283 @@
+import type { WorkflowExampleRegistration } from '../registry.js';
+import * as activities from './activities.js';
+import { exampleInputs, workflowStartOptions } from './schemas.js';
+import {
+  childWorkflowTest,
+  heartbeatWorkflow,
+  hello,
+  highEventCountWorkflow,
+  localActivityWorkflow,
+  longActivity,
+  parallelActivities,
+  patchWorkflow,
+  retryWorkflow,
+  scheduleWorkflow,
+  sequentialActivities,
+  signalCollector,
+  signalWorkflow,
+  timeoutWorkflow,
+} from './workflows.js';
+
+const targetId = 'shared-workflows';
+
+export const sharedWorkflowExamples: WorkflowExampleRegistration[] = [
+  {
+    id: 'hello',
+    title: 'Hello activity',
+    description: 'Runs one activity and returns its greeting.',
+    targetId,
+    capabilityTags: ['activities', 'terminal-outcome'],
+    expectedEvidence: [
+      'One completed activity and a completed workflow result.',
+    ],
+    input: exampleInputs.hello,
+    startOptions: workflowStartOptions('hello'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'hello',
+      workflow: hello,
+      activities: { greet: activities.greet },
+    },
+  },
+  {
+    id: 'parallel-activities',
+    title: 'Parallel activities',
+    description: 'Runs three activity commands concurrently.',
+    targetId,
+    capabilityTags: ['activities', 'concurrency'],
+    expectedEvidence: [
+      'Three overlapping activity executions and one combined result.',
+    ],
+    input: exampleInputs.parallelActivities,
+    startOptions: workflowStartOptions('parallel-activities'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'parallelActivities',
+      workflow: parallelActivities,
+      activities: { processData: activities.processData },
+    },
+  },
+  {
+    id: 'sequential-activities',
+    title: 'Sequential activities',
+    description: 'Runs three activity commands one after another.',
+    targetId,
+    capabilityTags: ['activities', 'sequencing'],
+    expectedEvidence: [
+      'Three non-overlapping activity executions in deterministic order.',
+    ],
+    input: exampleInputs.sequentialActivities,
+    startOptions: workflowStartOptions('sequential-activities'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'sequentialActivities',
+      workflow: sequentialActivities,
+      activities: { processData: activities.processData },
+    },
+  },
+  {
+    id: 'long-activity',
+    title: 'Long-running activity',
+    description: 'Waits inside an activity before returning a result.',
+    targetId,
+    capabilityTags: ['activities', 'long-running'],
+    expectedEvidence: [
+      'An activity remains running for the configured delay and then completes.',
+    ],
+    input: exampleInputs.longActivity,
+    startOptions: workflowStartOptions('long-activity'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'longActivity',
+      workflow: longActivity,
+      activities: { processLongData: activities.processLongData },
+    },
+  },
+  {
+    id: 'activity-timeout',
+    title: 'Activity timeout',
+    description: 'Demonstrates a start-to-close activity timeout.',
+    targetId,
+    capabilityTags: ['activities', 'timeouts'],
+    expectedEvidence: [
+      'A timed-out activity attempt and a workflow result that identifies the timeout.',
+    ],
+    input: exampleInputs.timeoutWorkflow,
+    startOptions: workflowStartOptions('activity-timeout'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'timeoutWorkflow',
+      workflow: timeoutWorkflow,
+      activities: { timeoutActivity: activities.timeoutActivity },
+    },
+  },
+  {
+    id: 'activity-retry',
+    title: 'Activity retry',
+    description: 'Fails deterministic activity attempts before succeeding.',
+    targetId,
+    capabilityTags: ['activities', 'retries'],
+    expectedEvidence: [
+      'Failed activity attempts followed by success within the retry policy.',
+    ],
+    input: exampleInputs.retryWorkflow,
+    startOptions: workflowStartOptions('activity-retry'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'retryWorkflow',
+      workflow: retryWorkflow,
+      activities: { retryActivity: activities.retryActivity },
+    },
+  },
+  {
+    id: 'signal-handlers',
+    title: 'Bounded signal handlers',
+    description: 'Handles data and completion signals with bounded waits.',
+    targetId,
+    capabilityTags: ['signals', 'queries', 'timeouts'],
+    expectedEvidence: [
+      'Signal events, queryable state changes, and completion or timeout evidence.',
+    ],
+    input: exampleInputs.signalWorkflow,
+    startOptions: workflowStartOptions('signal-handlers'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'signalWorkflow',
+      workflow: signalWorkflow,
+      activities: { signalActivity: activities.signalActivity },
+    },
+  },
+  {
+    id: 'activity-heartbeat',
+    title: 'Activity heartbeats',
+    description: 'Reports progress while an activity processes several steps.',
+    targetId,
+    capabilityTags: ['activities', 'heartbeats'],
+    expectedEvidence: [
+      'Heartbeat details advance through the configured number of steps.',
+    ],
+    input: exampleInputs.heartbeatWorkflow,
+    startOptions: workflowStartOptions('activity-heartbeat'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'heartbeatWorkflow',
+      workflow: heartbeatWorkflow,
+      activities: { heartbeatActivity: activities.heartbeatActivity },
+    },
+  },
+  {
+    id: 'timer-driven-repetition',
+    title: 'Timer-driven repeated activities',
+    description: 'Uses durable timers between repeated activity commands.',
+    targetId,
+    capabilityTags: ['timers', 'activities'],
+    expectedEvidence: [
+      'Timer events separate each repeated activity execution.',
+    ],
+    input: exampleInputs.scheduleWorkflow,
+    startOptions: workflowStartOptions('timer-driven-repetition'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'scheduleWorkflow',
+      workflow: scheduleWorkflow,
+      activities: { processData: activities.processData },
+    },
+  },
+  {
+    id: 'high-event-count',
+    title: 'High event count',
+    description: 'Runs many concurrent activities to produce a dense history.',
+    targetId,
+    capabilityTags: ['event-history', 'concurrency'],
+    expectedEvidence: [
+      'A dense group of concurrent activity events in workflow history.',
+    ],
+    input: exampleInputs.highEventCountWorkflow,
+    startOptions: workflowStartOptions('high-event-count'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'highEventCountWorkflow',
+      workflow: highEventCountWorkflow,
+      activities: { processData: activities.processData },
+    },
+  },
+  {
+    id: 'child-workflows',
+    title: 'Child workflows',
+    description: 'Starts and joins three child workflow executions.',
+    targetId,
+    capabilityTags: ['child-workflows', 'concurrency'],
+    expectedEvidence: [
+      'Three child workflow relationships and one joined parent result.',
+    ],
+    input: exampleInputs.childWorkflowTest,
+    startOptions: workflowStartOptions('child-workflows'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'childWorkflowTest',
+      workflow: childWorkflowTest,
+      activities: {
+        greet: activities.greet,
+        processData: activities.processData,
+      },
+    },
+  },
+  {
+    id: 'local-activity',
+    title: 'Local activity',
+    description: 'Runs activity code in the workflow worker process.',
+    targetId,
+    capabilityTags: ['local-activities', 'activities'],
+    expectedEvidence: [
+      'A local activity marker and completed workflow result.',
+    ],
+    input: exampleInputs.localActivityWorkflow,
+    startOptions: workflowStartOptions('local-activity'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'localActivityWorkflow',
+      workflow: localActivityWorkflow,
+      activities: { processData: activities.processData },
+    },
+  },
+  {
+    id: 'workflow-patching',
+    title: 'Workflow patching',
+    description: 'Records patch markers around versioned workflow behavior.',
+    targetId,
+    capabilityTags: ['patching', 'versioning'],
+    expectedEvidence: [
+      'Patch markers and version-specific result sections in history.',
+    ],
+    input: exampleInputs.patchWorkflow,
+    startOptions: workflowStartOptions('workflow-patching'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'patchWorkflow',
+      workflow: patchWorkflow,
+      activities: { processData: activities.processData },
+    },
+  },
+  {
+    id: 'signal-collector',
+    title: 'Signal collector',
+    description:
+      'Collects signaled items before processing and summarizing them.',
+    targetId,
+    capabilityTags: ['signals', 'activities', 'timeouts'],
+    expectedEvidence: [
+      'Item signals followed by activity processing and a completion reason.',
+    ],
+    input: exampleInputs.signalCollector,
+    startOptions: workflowStartOptions('signal-collector'),
+    execution: {
+      kind: 'workflow',
+      workflowType: 'signalCollector',
+      workflow: signalCollector,
+      activities: {
+        generateSummary: activities.generateSummary,
+        processItem: activities.processItem,
+      },
+    },
+  },
+];
