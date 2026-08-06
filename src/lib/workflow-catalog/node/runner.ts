@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import type { ServiceHandler } from 'nexus-rpc';
@@ -107,13 +108,23 @@ export const startWorkflowCatalogRunner = async <
     for (const binding of bindings) {
       emit({ type: 'target-creating', targetId: binding.target.id });
       try {
+        const packagedWorkflowsPath = fileURLToPath(
+          new URL(binding.target.workflowsPath, import.meta.url),
+        );
+        const sourceWorkflowsPath = packagedWorkflowsPath.replace(
+          /\.js$/,
+          '.ts',
+        );
         const worker = await createWorker({
           connection,
           namespace: binding.target.namespace,
           taskQueue: binding.target.taskQueue,
-          workflowsPath: fileURLToPath(
-            new URL(binding.target.workflowsPath, import.meta.url),
-          ),
+          workflowsPath:
+            binding.target.workflowsPath === './workflows.js' &&
+            !existsSync(packagedWorkflowsPath) &&
+            existsSync(sourceWorkflowsPath)
+              ? sourceWorkflowsPath
+              : packagedWorkflowsPath,
           activities: binding.activities,
           nexusServices: binding.nexusServices,
         });

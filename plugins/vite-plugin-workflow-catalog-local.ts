@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import * as nodeUtil from 'node:util';
 
 import type { Plugin, ResolvedConfig } from 'vite';
 
@@ -7,10 +8,15 @@ import type {
   BrowserWorkflowCatalogArtifact,
   BrowserWorkflowCatalogDescriptor,
 } from '../src/lib/workflow-catalog/browser/types';
+import { workflowCatalogRoutingFromEnvironment } from '../src/lib/workflow-catalog/node/routing-config';
 
 const publicModuleId = 'virtual:workflow-catalog-local';
 const resolvedModuleId = `\0${publicModuleId}`;
 const localArtifactPath = '.workflow-catalog/local.generated.json';
+const localEnvironmentPath = '.env.workflow-catalog.local';
+const parseEnvironmentFile = Reflect.get(nodeUtil, 'parseEnv') as (
+  content: string,
+) => Record<string, string>;
 
 const isMissingFile = (error: unknown): error is NodeJS.ErrnoException =>
   error instanceof Error && 'code' in error && error.code === 'ENOENT';
@@ -57,7 +63,29 @@ export const loadLocalWorkflowCatalogDescriptors = async (
   }
 };
 
-export const workflowCatalogLocalPlugin = (): Plugin => {
+export const loadLocalWorkflowCatalogRouting = async (
+  rootDirectory: string,
+  environment: Record<string, string | undefined> = process.env,
+) => {
+  let fileEnvironment: Record<string, string> = {};
+
+  try {
+    fileEnvironment = parseEnvironmentFile(
+      await readFile(join(rootDirectory, localEnvironmentPath), 'utf8'),
+    );
+  } catch (error) {
+    if (!isMissingFile(error)) throw error;
+  }
+
+  return workflowCatalogRoutingFromEnvironment({
+    ...fileEnvironment,
+    ...environment,
+  });
+};
+
+export const workflowCatalogLocalPlugin = (
+  environment: Record<string, string | undefined> = process.env,
+): Plugin => {
   let rootDirectory = process.cwd();
 
   return {
@@ -66,11 +94,14 @@ export const workflowCatalogLocalPlugin = (): Plugin => {
       rootDirectory = config.root;
     },
     configureServer(server) {
-      const artifact = join(rootDirectory, localArtifactPath);
-      server.watcher.add(artifact);
+      const watchedPaths = [
+        join(rootDirectory, localArtifactPath),
+        join(rootDirectory, localEnvironmentPath),
+      ];
+      for (const path of watchedPaths) server.watcher.add(path);
 
       const reloadLocalCatalog = (changedPath: string) => {
-        if (changedPath !== artifact) return;
+        if (!watchedPaths.includes(changedPath)) return;
         const module = server.moduleGraph.getModuleById(resolvedModuleId);
         if (module) server.moduleGraph.invalidateModule(module);
         server.ws.send({ type: 'full-reload' });
@@ -86,9 +117,14 @@ export const workflowCatalogLocalPlugin = (): Plugin => {
     async load(id) {
       if (id !== resolvedModuleId) return;
 
-      const descriptors =
-        await loadLocalWorkflowCatalogDescriptors(rootDirectory);
-      return `export const localWorkflowCatalog = ${JSON.stringify(descriptors)};`;
+      const [descriptors, routing] = await Promise.all([
+        loadLocalWorkflowCatalogDescriptors(rootDirectory),
+        loadLocalWorkflowCatalogRouting(rootDirectory, environment),
+      ]);
+      return [
+        `export const localWorkflowCatalog = ${JSON.stringify(descriptors)};`,
+        `export const workflowCatalogRouting = ${JSON.stringify(routing)};`,
+      ].join('\n');
     },
   };
 };

@@ -1,6 +1,5 @@
 import { execFile } from 'node:child_process';
 import {
-  access,
   cp,
   mkdir,
   mkdtemp,
@@ -14,6 +13,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 
+import { format } from 'prettier';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -147,6 +147,64 @@ describe('workflow catalog artifacts', () => {
     ).resolves.toBe(generatedContent);
   });
 
+  it('loads node bindings with runtime routing applied to the requested target', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const workflow = () => undefined;
+    const sharedSource = {
+      sourceFiles: ['shared-registration.ts'],
+      register: (
+        registry: ReturnType<typeof createWorkflowCatalogRegistry>,
+      ) => {
+        registry.registerTarget({
+          id: 'shared-workflows',
+          namespace: 'registered-namespace',
+          taskQueue: 'registered-task-queue',
+          workflowsPath: './workflows',
+          workflowExports: { workflow },
+        });
+        registry.registerExample({
+          id: 'shared-example',
+          title: 'Shared example',
+          description: 'Runs a shared workflow.',
+          targetId: 'shared-workflows',
+          capabilityTags: [],
+          expectedEvidence: [],
+          input: { defaultValue: [], schema: {} },
+          startOptions: { defaultValue: {}, schema: {} },
+          execution: {
+            kind: 'workflow' as const,
+            workflowType: 'workflow',
+            workflow,
+            activities: {},
+          },
+        });
+      },
+    };
+
+    const bindings = await loadWorkflowCatalogNodeBindings(
+      {
+        rootDirectory,
+        sharedSource,
+        sharedArtifactPath: 'shared.generated.json',
+        localModulePath: 'missing-local-registration.ts',
+        localFallback: localRegistrationFallback,
+        localArtifactPath: 'local.generated.json',
+      },
+      {
+        'shared-workflows': {
+          namespace: 'runtime-namespace',
+          taskQueue: 'runtime-task-queue',
+        },
+      },
+    );
+
+    expect(bindings[0]?.target).toMatchObject({
+      id: 'shared-workflows',
+      namespace: 'runtime-namespace',
+      taskQueue: 'runtime-task-queue',
+    });
+  });
+
   it('generates an empty shared registry to a deterministic hashed browser artifact', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const sourcePath = 'shared-registrations.ts';
@@ -184,6 +242,59 @@ describe('workflow catalog artifacts', () => {
       sourceHash: expect.stringMatching(/^[a-f0-9]{64}$/),
       descriptors: [],
     });
+  });
+
+  it('formats a nonempty generated JSON artifact with the repository Prettier settings', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const sourcePath = 'shared-registrations.ts';
+    const artifactPath = 'catalog.generated.json';
+    const workflow = () => 'hello';
+    const registry = createWorkflowCatalogRegistry();
+    await writeFile(
+      join(rootDirectory, sourcePath),
+      'export const populated = true;\n',
+    );
+    registry.registerTarget({
+      id: 'catalog',
+      namespace: 'default',
+      taskQueue: 'workflow-catalog',
+      workflowsPath: './workflows',
+      workflowExports: { workflow },
+    });
+    registry.registerExample({
+      id: 'hello',
+      title: 'Hello',
+      description: 'Returns a greeting.',
+      targetId: 'catalog',
+      capabilityTags: ['activities', 'terminal-outcome'],
+      expectedEvidence: ['A completed result'],
+      input: { defaultValue: ['Temporal'], schema: { type: 'array' } },
+      startOptions: {
+        defaultValue: { workflowId: 'hello' },
+        schema: { type: 'object' },
+      },
+      execution: {
+        kind: 'workflow',
+        workflowType: 'workflow',
+        workflow,
+        activities: {},
+      },
+    });
+
+    await generateWorkflowCatalogArtifact({
+      rootDirectory,
+      sourceFiles: [sourcePath],
+      artifactPath,
+      registry,
+    });
+    const generatedContent = await readFile(
+      join(rootDirectory, artifactPath),
+      'utf8',
+    );
+
+    expect(generatedContent).toBe(
+      await format(generatedContent, { parser: 'json' }),
+    );
   });
 
   it('writes only browser descriptors while retaining executable bindings in memory', async () => {
@@ -1014,8 +1125,12 @@ registry.registerExample({
         [
           "import { fileURLToPath } from 'node:url';",
           "import { startWorkflowCatalogRunner } from '@temporalio/ui/workflow-catalog/node/runner';",
+          "import { workflowCatalogRegistrationSource } from '@temporalio/ui/workflow-catalog/node/shared-registrations';",
+          "import { hello } from '@temporalio/ui/workflow-catalog/node/workflows';",
           "const workflowsPath = import.meta.resolve('@temporalio/ui/workflow-catalog/node/workflows');",
           "if (typeof startWorkflowCatalogRunner !== 'function') throw new Error('Missing runner kernel');",
+          "if (typeof workflowCatalogRegistrationSource.register !== 'function') throw new Error('Missing shared workflow registration source');",
+          "if (typeof hello !== 'function') throw new Error('Missing shared workflow export');",
           "if (!workflowsPath.endsWith('/workflow-catalog/node/workflows.js')) throw new Error(`Unexpected workflows path: ${workflowsPath}`);",
           'const workerOptions = [];',
           'const runner = await startWorkflowCatalogRunner({',
@@ -1036,8 +1151,11 @@ registry.registerExample({
         join(consumerDirectory, 'browser-catalog.mjs'),
         [
           "import { workflowCatalog } from '@temporalio/ui/workflow-catalog/browser/catalog';",
+          "import { resolveWorkflowCatalogRouting } from '@temporalio/ui/workflow-catalog/browser/routing';",
           "if (!Array.isArray(workflowCatalog)) throw new Error('Expected a workflow catalog descriptor array');",
           "if (!workflowCatalog.every((descriptor) => typeof descriptor.id === 'string' && typeof descriptor.title === 'string')) throw new Error('Expected valid workflow catalog descriptor data');",
+          "const [target] = resolveWorkflowCatalogRouting([{ targetId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
+          "if (target.namespace !== 'runtime' || target.taskQueue !== 'runtime') throw new Error('Expected injectable workflow catalog routing');",
         ].join('\n'),
       );
       await writeFile(
@@ -1057,9 +1175,12 @@ registry.registerExample({
         join(consumerDirectory, 'src/main.js'),
         [
           "import { workflowCatalog } from '@temporalio/ui/workflow-catalog/browser/catalog';",
+          "import { resolveWorkflowCatalogRouting } from '@temporalio/ui/workflow-catalog/browser/routing';",
           "import Workbench from '@temporalio/ui/workflow-catalog/browser/workbench.svelte';",
+          "const [target] = resolveWorkflowCatalogRouting([{ targetId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
           'document.body.dataset.workflowCatalogSize = String(workflowCatalog.length);',
           'document.body.dataset.workflowCatalogWorkbench = typeof Workbench;',
+          'document.body.dataset.workflowCatalogNamespace = target.namespace;',
         ].join('\n'),
       );
 
@@ -1136,18 +1257,15 @@ registry.registerExample({
   });
 
   it('exposes an additive development command that reports its first preflight failure clearly', async () => {
-    const localRegistrationPath = '.workflow-catalog/local-registration.ts';
-    let localRegistrationExists = true;
-    try {
-      await access(localRegistrationPath);
-    } catch {
-      localRegistrationExists = false;
-    }
     let commandFailure: unknown;
 
     try {
       await execFileAsync('pnpm', ['dev:workflow-catalog'], {
-        env: { ...process.env, TEMPORAL_ADDRESS: '' },
+        env: {
+          ...process.env,
+          TEMPORAL_ADDRESS: '',
+          TEMPORAL_NAMESPACE: '',
+        },
       });
     } catch (error) {
       commandFailure = error;
@@ -1158,11 +1276,7 @@ registry.registerExample({
       `${(commandFailure as { stdout?: string }).stdout ?? ''}${
         (commandFailure as { stderr?: string }).stderr ?? ''
       }`,
-    ).toContain(
-      localRegistrationExists
-        ? 'TEMPORAL_ADDRESS is required'
-        : 'Workflow catalog has no runnable targets; register an example before starting the development runner',
-    );
+    ).toContain('TEMPORAL_NAMESPACE is required');
   });
 
   it('rejects stale artifacts before development can load or rewrite them', async () => {

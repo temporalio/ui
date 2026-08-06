@@ -1,3 +1,4 @@
+import type { WorkflowCatalogRouting } from '../../src/lib/workflow-catalog/browser/routing';
 import { workflowCatalogRegistrationSource as localFallback } from '../../src/lib/workflow-catalog/node/local-registration-fallback';
 import { workflowCatalogRegistrationSource as sharedSource } from '../../src/lib/workflow-catalog/node/shared-registrations';
 import { getProjectRoot } from '../get-project-root';
@@ -22,6 +23,7 @@ const projectOptions = {
 const projectBoundaryOptions = {
   rootDirectory: projectOptions.rootDirectory,
   browserFiles: [
+    'src/lib/workflow-catalog/browser/routing.ts',
     'src/lib/workflow-catalog/browser/types.ts',
     'src/lib/workflow-catalog/browser/workbench-host.ts',
     'src/lib/workflow-catalog/browser/execution-log.ts',
@@ -45,8 +47,9 @@ const projectBoundaryOptions = {
 export const generateProjectWorkflowCatalog = () =>
   generateWorkflowCatalogArtifacts(projectOptions);
 
-export const loadProjectWorkflowCatalogNodeBindings = () =>
-  loadWorkflowCatalogNodeBindings(projectOptions);
+export const loadProjectWorkflowCatalogNodeBindings = (
+  routing: WorkflowCatalogRouting = {},
+) => loadWorkflowCatalogNodeBindings(projectOptions, routing);
 
 export const verifyProjectWorkflowCatalog = async () => {
   await verifyWorkflowCatalogArtifacts(projectOptions);

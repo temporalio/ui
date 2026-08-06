@@ -4,6 +4,7 @@ import { NativeConnection, Runtime, Worker } from '@temporalio/worker';
 
 import { parseWorkflowCatalogConnectionConfig } from '../../src/lib/workflow-catalog/node/connection-config';
 import { runWorkflowCatalogDevelopment } from '../../src/lib/workflow-catalog/node/development';
+import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/node/routing-config';
 import type { WorkflowCatalogRunnerEvent } from '../../src/lib/workflow-catalog/node/runner';
 import { getProjectRoot } from '../get-project-root';
 import {
@@ -37,7 +38,8 @@ try {
 
 try {
   await verifyProjectWorkflowCatalog();
-  const nodeBindings = await loadProjectWorkflowCatalogNodeBindings();
+  const routing = requireWorkflowCatalogRoutingFromEnvironment(process.env);
+  const nodeBindings = await loadProjectWorkflowCatalogNodeBindings(routing);
   await runWorkflowCatalogDevelopment({
     bindings: nodeBindings,
     connectionFactory: () =>

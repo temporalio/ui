@@ -4,7 +4,11 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { loadLocalWorkflowCatalogDescriptors } from './vite-plugin-workflow-catalog-local';
+import {
+  loadLocalWorkflowCatalogDescriptors,
+  loadLocalWorkflowCatalogRouting,
+  workflowCatalogLocalPlugin,
+} from './vite-plugin-workflow-catalog-local';
 
 const temporaryDirectories: string[] = [];
 
@@ -63,5 +67,84 @@ describe('local workflow catalog Vite boundary', () => {
     await expect(
       loadLocalWorkflowCatalogDescriptors(rootDirectory),
     ).resolves.toMatchObject([{ id: 'local-order', source: 'local' }]);
+  });
+
+  it('loads only non-secret routing from the local workflow catalog environment', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    await writeFile(
+      join(rootDirectory, '.env.workflow-catalog.local'),
+      [
+        'TEMPORAL_NAMESPACE=runtime-namespace',
+        'TEMPORAL_ADDRESS=private.example:7233',
+        'TEMPORAL_API_KEY=secret',
+        'TEMPORAL_TLS_CERT=certificate',
+        'TEMPORAL_TLS_KEY=private-key',
+      ].join('\n'),
+    );
+
+    await expect(
+      loadLocalWorkflowCatalogRouting(rootDirectory, {}),
+    ).resolves.toEqual({
+      'shared-workflows': {
+        namespace: 'runtime-namespace',
+        taskQueue: 'ui-workflow-catalog',
+      },
+    });
+  });
+
+  it('keeps committed browser routing when no local namespace exists', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+
+    await expect(
+      loadLocalWorkflowCatalogRouting(rootDirectory, {}),
+    ).resolves.toEqual({});
+  });
+
+  it('exposes safe runtime routing through the local catalog virtual module', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    await writeFile(
+      join(rootDirectory, '.env.workflow-catalog.local'),
+      ['TEMPORAL_NAMESPACE=runtime-namespace', 'TEMPORAL_API_KEY=secret'].join(
+        '\n',
+      ),
+    );
+    const plugin = workflowCatalogLocalPlugin({});
+    const configure = plugin.configResolved as (config: {
+      root: string;
+    }) => void;
+    const load = plugin.load as (id: string) => Promise<string | undefined>;
+
+    configure({ root: rootDirectory });
+    const source = await load('\0virtual:workflow-catalog-local');
+
+    expect(source).toContain(
+      'export const workflowCatalogRouting = {"shared-workflows":{"namespace":"runtime-namespace","taskQueue":"ui-workflow-catalog"}};',
+    );
+    expect(source).not.toContain('secret');
+  });
+
+  it('watches local descriptors and routing for development reloads', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const watchedPaths: string[] = [];
+    const plugin = workflowCatalogLocalPlugin({});
+    const configure = plugin.configResolved as (config: {
+      root: string;
+    }) => void;
+    const configureServer = plugin.configureServer as (server: unknown) => void;
+
+    configure({ root: rootDirectory });
+    configureServer({
+      watcher: {
+        add: (path: string) => watchedPaths.push(path),
+        on: () => undefined,
+      },
+      moduleGraph: { getModuleById: () => undefined },
+      ws: { send: () => undefined },
+    });
+
+    expect(watchedPaths).toEqual([
+      join(rootDirectory, '.workflow-catalog/local.generated.json'),
+      join(rootDirectory, '.env.workflow-catalog.local'),
+    ]);
   });
 });

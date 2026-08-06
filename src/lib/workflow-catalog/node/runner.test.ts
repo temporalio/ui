@@ -1,3 +1,5 @@
+import { existsSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { operation, service, serviceHandler } from 'nexus-rpc';
@@ -8,6 +10,8 @@ import {
   generateWorkflowCatalog,
 } from './registry';
 import { startWorkflowCatalogRunner } from './runner';
+
+vi.mock('node:fs', { spy: true });
 
 const createNexusHandler = (name: string) => {
   const definition = service(name, {
@@ -150,6 +154,55 @@ describe('workflow catalog runner', () => {
         workflowsPath: fileURLToPath(new URL(workflowsPath, import.meta.url)),
       }),
     );
+  });
+
+  it('uses the source workflows module only when the canonical packaged path is absent', async () => {
+    const packagedWorkflowsPath = resolve(
+      'src/lib/workflow-catalog/node/workflows.js',
+    );
+    const sourceWorkflowsPath = resolve(
+      'src/lib/workflow-catalog/node/workflows.ts',
+    );
+    const connection = { close: vi.fn(async () => undefined) };
+    const createWorker = vi.fn(async () => ({
+      run: async () => undefined,
+      shutdown: vi.fn(),
+    }));
+    const bindings = createActivityBindings('catalog').map((binding) => ({
+      ...binding,
+      target: { ...binding.target, workflowsPath: './workflows.js' },
+    }));
+
+    expect(statSync(sourceWorkflowsPath).isFile()).toBe(true);
+    vi.mocked(existsSync).mockImplementation(
+      (path) => path === sourceWorkflowsPath,
+    );
+    try {
+      const sourceRunner = await startWorkflowCatalogRunner({
+        bindings,
+        connection,
+        createWorker,
+      });
+      await sourceRunner.completion;
+
+      expect(createWorker).toHaveBeenLastCalledWith(
+        expect.objectContaining({ workflowsPath: sourceWorkflowsPath }),
+      );
+
+      vi.mocked(existsSync).mockReturnValue(true);
+      const packagedRunner = await startWorkflowCatalogRunner({
+        bindings,
+        connection,
+        createWorker,
+      });
+      await packagedRunner.completion;
+
+      expect(createWorker).toHaveBeenLastCalledWith(
+        expect.objectContaining({ workflowsPath: packagedWorkflowsPath }),
+      );
+    } finally {
+      vi.mocked(existsSync).mockRestore();
+    }
   });
 
   it('constructs every target worker before any worker begins running', async () => {

@@ -5,6 +5,10 @@ import { pathToFileURL } from 'node:url';
 
 import { format } from 'prettier';
 
+import {
+  resolveWorkflowCatalogRouting,
+  type WorkflowCatalogRouting,
+} from '../../src/lib/workflow-catalog/browser/routing';
 import type {
   BrowserWorkflowCatalogArtifact,
   BrowserWorkflowCatalogSource,
@@ -43,7 +47,7 @@ type WorkflowCatalogProjectBoundaryOptions = {
 };
 
 const serializeArtifact = (artifact: BrowserWorkflowCatalogArtifact) =>
-  `${JSON.stringify(artifact, null, 2)}\n`;
+  format(JSON.stringify(artifact), { parser: 'json' });
 
 const typeScriptArtifactPrefix =
   "import type { BrowserWorkflowCatalogArtifact } from './types';\n\n" +
@@ -52,13 +56,10 @@ const typeScriptArtifactPrefix =
 const serializeTypeScriptArtifact = async (
   artifact: BrowserWorkflowCatalogArtifact,
 ) =>
-  format(
-    `${typeScriptArtifactPrefix}${serializeArtifact(artifact).trim()};\n`,
-    {
-      parser: 'typescript',
-      singleQuote: true,
-    },
-  );
+  format(`${typeScriptArtifactPrefix}${JSON.stringify(artifact)};\n`, {
+    parser: 'typescript',
+    singleQuote: true,
+  });
 
 const isExplicitRelativePath = (path: string) =>
   path.length > 0 &&
@@ -127,7 +128,7 @@ export const generateWorkflowCatalogArtifact = async (
   const outputPath = join(rootDirectory, artifactPath);
 
   await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, serializeArtifact(generated.artifact));
+  await writeFile(outputPath, await serializeArtifact(generated.artifact));
 
   return generated;
 };
@@ -156,7 +157,7 @@ export const verifyWorkflowCatalogArtifact = async (
     );
   }
 
-  if (currentContent !== serializeArtifact(expected.artifact)) {
+  if (currentContent !== (await serializeArtifact(expected.artifact))) {
     throw new Error(
       `Workflow catalog artifact "${options.artifactPath}" has generated output drift`,
     );
@@ -384,7 +385,27 @@ const createArtifactOptions = async (
 
 export const loadWorkflowCatalogNodeBindings = async (
   options: WorkflowCatalogArtifactsOptions,
-) => (await createArtifactOptions(options)).nodeBindings;
+  routing: WorkflowCatalogRouting = {},
+) => {
+  const { nodeBindings } = await createArtifactOptions(options);
+  const resolvedTargets = resolveWorkflowCatalogRouting(
+    nodeBindings.map(({ target }) => ({
+      targetId: target.id,
+      namespace: target.namespace,
+      taskQueue: target.taskQueue,
+    })),
+    routing,
+  );
+
+  return nodeBindings.map((binding, index) => ({
+    ...binding,
+    target: {
+      ...binding.target,
+      namespace: resolvedTargets[index].namespace,
+      taskQueue: resolvedTargets[index].taskQueue,
+    },
+  }));
+};
 
 export const verifyWorkflowCatalogArtifacts = async (
   options: WorkflowCatalogArtifactsOptions,
