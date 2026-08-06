@@ -247,3 +247,52 @@ test('it should combine filters and then clear them all', async ({ page }) => {
 
   await expect.poll(() => getQueryParam(page.url())).toBe('');
 });
+
+test('it should resync the filter pills on back and forward navigation', async ({
+  page,
+}) => {
+  await page.getByTestId('add-filter-button').click();
+  await page.getByRole('menuitem', { name: 'WorkflowType Keyword' }).click();
+
+  await page
+    .getByTestId('dropdown-filter-chip-WorkflowType-0-text')
+    .fill('ExampleWorkflow');
+  await page.getByTestId('apply-filter-button').click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="ExampleWorkflow"');
+
+  await page.getByTestId('add-filter-button').click();
+  await page.getByRole('menuitem', { name: 'HistoryLength Int' }).click();
+
+  await page
+    .getByTestId('dropdown-filter-chip-HistoryLength-1-number')
+    .fill('10');
+  await page.getByTestId('apply-filter-button').last().click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="ExampleWorkflow" AND `HistoryLength`=10');
+
+  await page.goBack();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="ExampleWorkflow"');
+  await expect(
+    page.getByRole('button', { name: 'WorkflowType = "ExampleWorkflow"' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'HistoryLength = 10' }),
+  ).toBeHidden();
+
+  await page.goForward();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="ExampleWorkflow" AND `HistoryLength`=10');
+  await expect(
+    page.getByRole('button', { name: 'HistoryLength = 10' }),
+  ).toBeVisible();
+});
