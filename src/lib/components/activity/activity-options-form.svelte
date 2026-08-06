@@ -170,13 +170,20 @@
         await onSave(toActivityOptions(form.data));
         toaster.push({
           variant: 'success',
-          message: `Options for Activity ${activityId} have been updated.`,
+          message: translate('activities.update-options-success', {
+            activityId,
+          }),
         });
       } catch (error) {
         console.error('Error updating activity options:', error);
         toaster.push({
           variant: 'error',
-          message: `Options for Activity ${activityId} have been failed to update: ${has(error, 'message') ? error.message : translate('common.unknown-error')}`,
+          message: translate('activities.update-options-error', {
+            activityId,
+            error: has(error, 'message')
+              ? String(error.message)
+              : translate('common.unknown-error'),
+          }),
           duration: 5000,
         });
       } finally {
