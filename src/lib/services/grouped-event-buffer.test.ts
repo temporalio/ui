@@ -24,6 +24,7 @@ import {
   makeActivityGroup,
   makeActivityScheduled,
   makeActivityStarted,
+  makeActivityTimedOut,
   makeActivityTimeoutGroup,
   makeChildWorkflowGroup,
   makeLocalActivityGroup,
@@ -1275,6 +1276,23 @@ describe('arrival-order independence', () => {
     const group = getGroupArray()[0];
     expect(group.pendingActivity).toBeUndefined();
     expect(group.isPending).toBe(false);
+  });
+
+  // Ported from #3787, where it guarded a stale local reference during the
+  // park-and-flush. There is no parking here, but the behaviour it asserts —
+  // followers landing before their head still produce the right failure state —
+  // is the same guarantee.
+  it('keeps a timed-out activity failed when its head arrives last', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityStarted(2, 1), false);
+    ingestHistoryEvent(makeActivityTimedOut(3, 1), true);
+    ingestHistoryEvent(makeActivityScheduled(1), true);
+
+    const [lazy] = getLazyGroups();
+    const group = materializeGroup(lazy);
+    expect(group.eventList.map((event) => event.id)).toEqual(['1', '2', '3']);
+    expect(group.isFailureOrTimedOut).toBe(true);
+    expect(lazy.finalClassification).toBe('TimedOut');
   });
 
   it('groups events identically whichever cursor delivers them', () => {

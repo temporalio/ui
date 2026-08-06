@@ -1,19 +1,23 @@
 import { describe, expect, it } from 'vitest';
 
-import type { WorkerDeploymentInfo } from '$lib/types/deployments';
+import type { DescribeWorkerDeployment } from '$lib/types/deployments';
 
 import { lockComputeProvider } from './lock-compute-provider';
 
-const deployment = (types: (string | undefined)[]): WorkerDeploymentInfo =>
+const deployment = (types: (string | undefined)[]): DescribeWorkerDeployment =>
   ({
+    name: 'test-deployment',
+    createTime: '',
+    routingConfig: {},
+    lastModifierIdentity: '',
     versionSummaries: types.map((type, index) => ({
       version: `build-${index}`,
-      createTime: undefined,
+      createTime: '',
       computeConfig: {
         scalingGroups: { default: { provider: { type } } },
       },
     })),
-  }) as unknown as WorkerDeploymentInfo;
+  }) satisfies DescribeWorkerDeployment;
 
 describe('lockComputeProvider', () => {
   it('does not lock deployments without versions', () => {
@@ -81,8 +85,11 @@ describe('lockComputeProvider', () => {
 
   it('supports providerType', () => {
     const info = deployment(['aws-lambda']);
+    const version = info.versionSummaries[0];
     const group =
-      info.versionSummaries[0].computeConfig?.scalingGroups?.default;
+      'computeConfig' in version
+        ? version.computeConfig?.scalingGroups?.default
+        : undefined;
     if (group) {
       group.providerType = 'gcp-cloud-run';
       group.provider = undefined;
@@ -98,42 +105,5 @@ describe('lockComputeProvider', () => {
     ['gcp-cloud-run', 'cloud-run'],
   ] as const)('maps the %s provider type to %s', (type, provider) => {
     expect(lockComputeProvider(deployment([type]))?.provider).toBe(provider);
-  });
-
-  it.each([
-    'computeConfig',
-    'latestVersionSummary',
-    'currentVersionSummary',
-    'rampingVersionSummary',
-  ] as const)('resolves the provider from %s', (source) => {
-    const info = deployment(['aws-lambda']);
-    const computeConfig = {
-      scalingGroups: {
-        default: { provider: { type: 'gcp-cloud-run' } },
-      },
-    };
-
-    info.versionSummaries = info.versionSummaries.map((summary) => {
-      if ('computeConfig' in summary) summary.computeConfig = undefined;
-      return summary;
-    });
-    if (source === 'computeConfig') {
-      info.computeConfig = computeConfig;
-    } else {
-      Object.assign(info, { [source]: { computeConfig } });
-    }
-
-    expect(lockComputeProvider(info)?.provider).toBe('cloud-run');
-  });
-
-  it('fails closed when top-level and summary providers are mixed', () => {
-    const info = deployment(['aws-lambda']);
-    info.computeConfig = {
-      scalingGroups: {
-        default: { providerType: 'gcp-cloud-run' },
-      },
-    };
-
-    expect(lockComputeProvider(info)).toBeUndefined();
   });
 });

@@ -507,7 +507,8 @@ export const resetActivityExecution = async (
         namespace,
         activityId,
         runId,
-        resetHeartbeat,
+        // TODO: re-enable once API supports resetHeartbeat
+        // resetHeartbeat,
         ...(identity && { identity }),
       }),
     },

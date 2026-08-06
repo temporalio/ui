@@ -2,6 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 
 export class StandaloneActivityCommandsPage {
   readonly page: Page;
+  readonly activityStatus: Locator;
   readonly pauseButton: Locator;
   readonly unpauseButton: Locator;
   readonly moreActionsButton: Locator;
@@ -22,6 +23,7 @@ export class StandaloneActivityCommandsPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.activityStatus = page.getByTestId('execution-status');
     this.pauseButton = page
       .getByRole('button', { name: 'Pause Activity', exact: true })
       .first();
