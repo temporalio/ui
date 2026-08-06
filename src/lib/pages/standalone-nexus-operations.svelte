@@ -2,7 +2,6 @@
   import type { Snippet } from 'svelte';
   import { onMount } from 'svelte';
 
-  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
@@ -35,6 +34,7 @@
   } from '$lib/stores/saved-queries';
   import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
   import { getNexusOperationStatusAndCountOfGroup } from '$lib/utilities/get-nexus-operation-status-and-count';
+  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   interface Props {
@@ -63,15 +63,11 @@
     }
   });
 
-  afterNavigate(({ type }) => {
-    // Browser back/forward changes the query param without going through the
-    // filter chip UI, so the pills need to be re-derived from the URL here.
-    if (type === 'popstate') {
-      const currentQuery = page.url.searchParams.get('query') ?? '';
-      $nexusOperationFilters = currentQuery
-        ? toListWorkflowFilters(currentQuery, $nexusOperationSearchAttributes)
-        : [];
-    }
+  syncFiltersOnPopState({
+    page,
+    filters: nexusOperationFilters,
+    parseQuery: (query) =>
+      toListWorkflowFilters(query, $nexusOperationSearchAttributes),
   });
 
   $effect(() => {

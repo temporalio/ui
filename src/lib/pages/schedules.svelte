@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
@@ -38,6 +37,7 @@
     scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
   } from '$lib/stores/search-attributes';
+  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -87,15 +87,11 @@
     }
   });
 
-  afterNavigate(({ type }) => {
-    // Browser back/forward changes the query param without going through the
-    // filter chip UI, so the pills need to be re-derived from the URL here.
-    if (type === 'popstate') {
-      const currentQuery = page.url.searchParams.get('query') ?? '';
-      $scheduleFilters = currentQuery
-        ? toListWorkflowFilters(currentQuery, $scheduleSearchAttributes)
-        : [];
-    }
+  syncFiltersOnPopState({
+    page,
+    filters: scheduleFilters,
+    parseQuery: (query) =>
+      toListWorkflowFilters(query, $scheduleSearchAttributes),
   });
 
   const onError = (err: unknown) => {

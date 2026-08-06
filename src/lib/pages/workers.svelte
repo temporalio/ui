@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
@@ -20,6 +19,7 @@
     workerSearchAttributes,
   } from '$lib/stores/search-attributes';
   import { refresh } from '$lib/stores/workers';
+  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   const { namespace } = $derived(page.params);
@@ -32,15 +32,11 @@
     }
   });
 
-  afterNavigate(({ type }) => {
-    // Browser back/forward changes the query param without going through the
-    // filter chip UI, so the pills need to be re-derived from the URL here.
-    if (type === 'popstate') {
-      const currentQuery = page.url.searchParams.get('query') ?? '';
-      $workerFilters = currentQuery
-        ? toListWorkflowFilters(currentQuery, $workerSearchAttributes)
-        : [];
-    }
+  syncFiltersOnPopState({
+    page,
+    filters: workerFilters,
+    parseQuery: (query) =>
+      toListWorkflowFilters(query, $workerSearchAttributes),
   });
 
   const workerHeartbeatsEnabled = $derived(

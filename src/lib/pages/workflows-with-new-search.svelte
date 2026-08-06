@@ -24,7 +24,6 @@
 
   import { onMount, setContext, type Snippet } from 'svelte';
 
-  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
@@ -61,6 +60,7 @@
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
+  import { syncFiltersOnPopState } from '$lib/utilities/query/sync-filters-on-popstate';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
@@ -109,15 +109,10 @@
     }
   });
 
-  afterNavigate(({ type }) => {
-    // Browser back/forward changes the query param without going through the
-    // filter chip UI, so the pills need to be re-derived from the URL here.
-    if (type === 'popstate') {
-      const currentQuery = page.url.searchParams.get('query') ?? '';
-      $workflowFilters = currentQuery
-        ? toListWorkflowFilters(currentQuery, $searchAttributes)
-        : [];
-    }
+  syncFiltersOnPopState({
+    page,
+    filters: workflowFilters,
+    parseQuery: (query) => toListWorkflowFilters(query, $searchAttributes),
   });
 
   $effect(() => {
