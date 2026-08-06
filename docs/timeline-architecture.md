@@ -6,6 +6,13 @@ All event data lives in a **single module-level singleton** (`grouped-event-buff
 Events are stored once, in a flat array indexed by `eventId - 1`. Groups are not
 stored at all — they are described by lightweight records and built on demand.
 
+The flat array works because Temporal event IDs are a gapless sequence from 1, so
+the ID _is_ the position. That buys more than storage: a follower references its
+head by event ID (`scheduledEventId`, `startedEventId`, …), so the same arithmetic
+resolves it to `headGroup[headSlot]` in one array read, with no index to maintain.
+Were the IDs ever sparse the array would simply have holes — every read already
+skips empty slots — costing memory rather than correctness.
+
 ```mermaid
 flowchart LR
     API["Bidirectional fetch<br/>+ live poll"] -->|ingestHistoryEvent| BUF
