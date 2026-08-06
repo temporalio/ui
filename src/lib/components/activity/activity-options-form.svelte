@@ -141,10 +141,9 @@
       ...(data.heartbeatTimeout && {
         heartbeatTimeout: data.heartbeatTimeout,
       }),
-      ...(data.startDelay &&
-        data.startDelay !== initialData.startDelay && {
-          startDelay: data.startDelay,
-        }),
+      ...(data.startDelay !== initialData.startDelay && {
+        startDelay: data.startDelay || '0s',
+      }),
       retryPolicy: {
         maximumAttempts: Number(data.maximumAttempts),
         backoffCoefficient: Number(data.backoffCoefficient),
