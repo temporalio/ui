@@ -15,32 +15,55 @@ vi.mock('$app/navigation', () => ({
   },
 }));
 
+const executionStatusFilter = (value: string) =>
+  createFilter({
+    attribute: 'ExecutionStatus',
+    type: 'Keyword',
+    conditional: '=',
+    value,
+  });
+
+const workflowTypeFilter = (value: string) =>
+  createFilter({
+    attribute: 'WorkflowType',
+    type: 'Keyword',
+    conditional: '=',
+    value,
+  });
+
 describe('syncFiltersOnPopState', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('re-derives filters from the URL query on a popstate navigation', () => {
-    const staleFilter = createFilter({ attribute: 'Stale' });
-    const freshFilter = createFilter({ attribute: 'Fresh' });
-    const filters = writable([staleFilter]);
-    const parseQuery = vi.fn().mockReturnValue([freshFilter]);
+    const staleFilters = [
+      executionStatusFilter('Running'),
+      workflowTypeFilter('SomeWorkflow'),
+    ];
+    const freshFilters = [executionStatusFilter('Running')];
+    const filters = writable(staleFilters);
+    const parseQuery = vi.fn().mockReturnValue(freshFilters);
 
     syncFiltersOnPopState({
-      page: { url: new URL('https://example.com?query=Fresh') },
+      page: {
+        url: new URL(
+          'https://example.com?query=ExecutionStatus%20%3D%20%22Running%22',
+        ),
+      },
       filters,
       parseQuery,
     });
 
     navigationCallback({ type: 'popstate' });
 
-    expect(parseQuery).toHaveBeenCalledWith('Fresh');
-    expect(get(filters)).toEqual([freshFilter]);
+    expect(parseQuery).toHaveBeenCalledWith('ExecutionStatus = "Running"');
+    expect(get(filters)).toEqual(freshFilters);
   });
 
   it('clears filters on a popstate navigation with no query param', () => {
-    const staleFilter = createFilter({ attribute: 'Stale' });
-    const filters = writable([staleFilter]);
+    const staleFilters = [executionStatusFilter('Running')];
+    const filters = writable(staleFilters);
     const parseQuery = vi.fn();
 
     syncFiltersOnPopState({
@@ -56,12 +79,16 @@ describe('syncFiltersOnPopState', () => {
   });
 
   it('leaves filters untouched on non-popstate navigations', () => {
-    const staleFilter = createFilter({ attribute: 'Stale' });
-    const filters = writable([staleFilter]);
+    const staleFilters = [executionStatusFilter('Running')];
+    const filters = writable(staleFilters);
     const parseQuery = vi.fn();
 
     syncFiltersOnPopState({
-      page: { url: new URL('https://example.com?query=Fresh') },
+      page: {
+        url: new URL(
+          'https://example.com?query=ExecutionStatus%20%3D%20%22Running%22%20and%20WorkflowType%20%3D%20%22SomeWorkflow%22',
+        ),
+      },
       filters,
       parseQuery,
     });
@@ -69,6 +96,6 @@ describe('syncFiltersOnPopState', () => {
     navigationCallback({ type: 'goto' });
 
     expect(parseQuery).not.toHaveBeenCalled();
-    expect(get(filters)).toEqual([staleFilter]);
+    expect(get(filters)).toEqual(staleFilters);
   });
 });
