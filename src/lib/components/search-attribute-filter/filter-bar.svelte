@@ -20,7 +20,7 @@
   interface Props {
     filters: Writable<SearchAttributeFilter[]>;
     options: SearchAttributeOption[];
-    searchAttributes?: SearchAttributes;
+    searchAttributes: SearchAttributes;
     id: string;
     statusAttribute?: StatusAttribute;
     onManualSearch?: (query: string) => void;
