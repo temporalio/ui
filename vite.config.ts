@@ -6,9 +6,11 @@ import { defineConfig } from 'vite';
 import { oidcServerPlugin } from './plugins/vite-plugin-oidc-server';
 import { temporalServer } from './plugins/vite-plugin-temporal-server';
 import { uiServerPlugin } from './plugins/vite-plugin-ui-server';
+import { workflowCatalogLocalPlugin } from './plugins/vite-plugin-workflow-catalog-local';
 
 export default defineConfig({
   plugins: [
+    workflowCatalogLocalPlugin(),
     sveltekit(),
     oidcServerPlugin(),
     temporalServer(),

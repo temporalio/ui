@@ -34,3 +34,6 @@ go.work.sum
 !.claude/skills/
 .sisyphus/*
 .omc
+
+/.workflow-catalog/
+/.env.workflow-catalog.local

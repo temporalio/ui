@@ -11,3 +11,9 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
   readonly vitest: Vitest;
 }
+
+declare module 'virtual:workflow-catalog-local' {
+  import type { BrowserWorkflowCatalogDescriptor } from '$lib/workflow-catalog/browser/types';
+
+  export const localWorkflowCatalog: BrowserWorkflowCatalogDescriptor[];
+}
