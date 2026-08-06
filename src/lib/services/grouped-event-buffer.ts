@@ -267,6 +267,26 @@ function clearResolvedPendingState(group: EventGroup): void {
   }
 }
 
+/**
+ * Returns a copy of `group` with `event` added. Callers must store the returned
+ * reference back over the old one: the timeline row pool reuses a row when its
+ * group reference is unchanged (timeline-graph.svelte), so extending a rendered
+ * group in place leaves the row showing its old classification — a completed
+ * activity keeps rendering as in-progress until reload.
+ *
+ * The copy is shallow and shares `eventList` and `links` with the original, so
+ * the pre-copy reference is left inconsistent and must be treated as dead once
+ * the caller has stored the new one.
+ */
+function withAddedEvent(group: EventGroup, event: WorkflowEvent): EventGroup {
+  const next = cloneEventGroup(group);
+  insertEventById(next.eventList, event);
+  next.timestamp = event.timestamp;
+  addEventToGroup(next, event);
+  clearResolvedPendingState(next);
+  return next;
+}
+
 function growArrays(newSize: number): void {
   if (newSize <= eventSlots.length) return;
   eventSlots.length = newSize;
@@ -293,13 +313,9 @@ function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
   if (!raw || !meta.group) return;
 
   const event = toWorkflowEvent(raw, false);
-  insertEventById(meta.group.eventList, event);
-  meta.group.timestamp = event.timestamp;
-  addEventToGroup(meta.group, event);
+  meta.group = withAddedEvent(meta.group, event);
 
   eventToGroup[followerSlotIdx] = poolIdx + 1;
-
-  clearResolvedPendingState(meta.group);
 
   const followerMs = toMs(event.eventTime);
   if (followerMs > meta.endMs) meta.endMs = followerMs;
@@ -483,7 +499,7 @@ export function processEvent(
   }
 
   // Try both group dispatchers — createWorkflowTaskGroup handles WFT events
-  const group =
+  let group =
     createEventGroup(event as CommonHistoryEvent) ??
     createWorkflowTaskGroup(event as CommonHistoryEvent);
 
@@ -547,6 +563,9 @@ export function processEvent(
       attachFollowerToPool(poolIdx, followerSlotIdx);
     }
     pendingFollowers.delete(slotIdx);
+    // attachFollowerToPool replaced meta.group — re-sync the local ref so the
+    // flushes below, and the group this call publishes, aren't stale.
+    group = meta.group ?? group;
   }
 
   // Flush any followers that arrived before this head via the live poll.
@@ -1001,12 +1020,9 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
 
   if (!isHead) {
     // Option A: head already in a live group — extend it directly.
-    const existing = liveGroups.find((g) => g.id === gid);
-    if (existing) {
-      insertEventById(existing.eventList, event);
-      existing.timestamp = event.timestamp;
-      addEventToGroup(existing, event);
-      clearResolvedPendingState(existing);
+    const existingIdx = liveGroups.findIndex((g) => g.id === gid);
+    if (existingIdx !== -1) {
+      liveGroups[existingIdx] = withAddedEvent(liveGroups[existingIdx], event);
       _liveVersion++;
       invalidateGroupArrayCaches();
       return true;
@@ -1021,10 +1037,7 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
     ) {
       const meta = groupPool[eventToGroup[headSlotIdx] - 1];
       if (meta?.group) {
-        insertEventById(meta.group.eventList, event);
-        meta.group.timestamp = event.timestamp;
-        addEventToGroup(meta.group, event);
-        clearResolvedPendingState(meta.group);
+        meta.group = withAddedEvent(meta.group, event);
         growArraysFor(slotIdx);
         eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
         const followerMs = toMs(event.eventTime);

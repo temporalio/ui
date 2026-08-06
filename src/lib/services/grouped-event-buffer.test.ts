@@ -35,6 +35,7 @@ import {
   makeActivityGroup,
   makeActivityScheduled,
   makeActivityStarted,
+  makeActivityTimedOut,
   makeActivityTimeoutGroup,
   makeChildWorkflowGroup,
   makeNexusOperationGroup,
@@ -1894,5 +1895,97 @@ describe('appendLiveEvent — livePendingFollowers (unified bidirectional patter
 
     const g = getGroupArray().find((g) => g.id === '1');
     expect(g?.eventList).toHaveLength(2); // not 3
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Group reference identity
+//
+// The timeline row pool reuses a row while its group reference is unchanged, so
+// every path that adds an event to an already-rendered group must publish a
+// fresh one. Each test below names the symptom; the assertion is the reference
+// change that prevents it, since the colour and label live in components while
+// the invariant that drives them lives here.
+// ---------------------------------------------------------------------------
+
+describe('group reference identity', () => {
+  beforeEach(() => {
+    reset(10);
+    resetLive();
+  });
+
+  // Without a fresh reference the row keeps its in-progress colour and label.
+  it('a fetched group stops showing as in progress once the live poll completes it', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    processEvent(scheduled, true);
+    processEvent(started, true);
+
+    const before = getGroupArray().find((g) => g.id === '1');
+    expect(before?.eventList).toHaveLength(2);
+    expect(before?.finalClassification).toBe('Started');
+
+    expect(appendLiveEvent(completed)).toBe(true);
+
+    const after = getGroupArray().find((g) => g.id === '1');
+    expect(after).not.toBe(before);
+    expect(after?.eventList).toHaveLength(3);
+    expect(after?.finalClassification).toBe('Completed');
+  });
+
+  // Same symptom for a group the live poll created rather than the fetch.
+  it('a live group stops showing as in progress once the live poll completes it', () => {
+    const [scheduled, started] = makeActivityGroup(1);
+    appendLiveEvent(scheduled);
+
+    const before = getGroupArray().find((g) => g.id === '1');
+    expect(before?.eventList).toHaveLength(1);
+
+    expect(appendLiveEvent(started)).toBe(true);
+
+    const after = getGroupArray().find((g) => g.id === '1');
+    expect(after).not.toBe(before);
+    expect(after?.eventList).toHaveLength(2);
+  });
+
+  // Same symptom on histories over 1000 events, where a group can straddle a
+  // page boundary — no live poll involved.
+  it('a group stops showing as in progress when its completion is a page later', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    processEvent(scheduled, true);
+    processEvent(started, true);
+
+    const before = getGroupArray().find((g) => g.id === '1');
+    expect(before?.eventList).toHaveLength(2);
+
+    // A group's terminal event can land in the next 1000-event page.
+    processEvent(completed, true);
+
+    const after = getGroupArray().find((g) => g.id === '1');
+    expect(after).not.toBe(before);
+    expect(after?.eventList).toHaveLength(3);
+    expect(after?.finalClassification).toBe('Completed');
+  });
+  // Both producers can park a follower before the head exists. Draining the
+  // first queue swaps in the copy, so the second drain must not write to the
+  // reference processEvent captured before it. When it does, addEventToGroup's
+  // flags land on the abandoned object and the activity renders as if it
+  // succeeded — eventList is shared, so the events themselves still appear.
+  it('a timed-out activity keeps its failure state when its head arrives last', () => {
+    reset(10);
+
+    // A follower parked by the fetch is flushed when the head registers, which
+    // replaces meta.group with the copy. A follower parked by the live poll is
+    // flushed straight after, and must land on that copy rather than on the
+    // reference processEvent started with.
+    processEvent(makeActivityStarted(2, 1), false);
+    expect(appendLiveEvent(makeActivityTimedOut(3, 1))).toBe(true);
+
+    processEvent(makeActivityScheduled(1), true);
+
+    const group = getGroupArray().find((g) => g.id === '1');
+    expect(group?.eventList.map((e) => e.id)).toEqual(['1', '2', '3']);
+    // Set by addEventToGroup, which writes to the group it is handed — unlike
+    // eventList, this is not shared with the pre-copy reference.
+    expect(group?.isFailureOrTimedOut).toBe(true);
   });
 });
