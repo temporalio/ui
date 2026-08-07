@@ -9,7 +9,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { searchAttributes as defaultSearchAttributes } from '$lib/stores/search-attributes';
   import type { SearchAttributes } from '$lib/types/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
@@ -17,17 +16,12 @@
 
   interface Props {
     filters: Writable<SearchAttributeFilter[]>;
-    searchAttributes?: SearchAttributes;
+    searchAttributes: SearchAttributes;
     id: string;
     onSearch?: (query: string) => void;
   }
 
-  let {
-    filters,
-    searchAttributes = $defaultSearchAttributes,
-    id,
-    onSearch,
-  }: Props = $props();
+  let { filters, searchAttributes, id, onSearch }: Props = $props();
 
   let manualSearchString = $state('');
 
