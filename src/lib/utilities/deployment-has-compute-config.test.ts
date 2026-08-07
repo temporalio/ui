@@ -11,7 +11,6 @@ import { deploymentHasComputeConfig } from './deployment-has-compute-config';
 const computeConfig: ComputeConfig = {
   scalingGroups: {
     default: {
-      taskQueueTypes: ['TASK_QUEUE_TYPE_WORKFLOW', 'TASK_QUEUE_TYPE_ACTIVITY'],
       provider: { type: 'aws-lambda' },
     },
   },
@@ -164,10 +163,6 @@ describe('deploymentHasComputeConfig', () => {
           computeConfig: {
             scalingGroups: {
               default: {
-                taskQueueTypes: [
-                  'TASK_QUEUE_TYPE_WORKFLOW',
-                  'TASK_QUEUE_TYPE_ACTIVITY',
-                ],
                 providerType: 'aws-lambda',
               },
             },
