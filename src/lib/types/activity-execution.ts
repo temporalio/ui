@@ -1,5 +1,7 @@
 import type { temporal } from '@temporalio/proto';
 
+import type { Callback } from '$lib/types/nexus';
+
 import type { Failure, Payloads } from '.';
 import type { WorkflowSearchAttributes } from './workflows';
 
@@ -86,6 +88,7 @@ export interface ActivityExecution {
   info: ActivityExecutionInfo;
   input?: Payloads;
   outcome?: ActivityExecutionOutcome;
+  callbacks?: Callback[];
   longPollToken?: string;
 }
 
