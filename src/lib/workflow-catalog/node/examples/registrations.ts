@@ -4,15 +4,11 @@ import { exampleInputs, workflowStartOptions } from './schemas.js';
 import {
   childWorkflowTest,
   heartbeatWorkflow,
-  hello,
   highEventCountWorkflow,
   localActivityWorkflow,
-  longActivity,
-  parallelActivities,
   patchWorkflow,
   retryWorkflow,
   scheduleWorkflow,
-  sequentialActivities,
   signalCollector,
   signalWorkflow,
   timeoutWorkflow,
@@ -21,78 +17,6 @@ import {
 const targetId = 'shared-workflows';
 
 export const sharedWorkflowExamples: WorkflowCatalogExampleRegistration[] = [
-  {
-    id: 'hello',
-    title: 'Hello activity',
-    description: 'Runs one activity and returns its greeting.',
-    targetId,
-    capabilityTags: ['activities', 'terminal-outcome'],
-    expectedEvidence: [
-      'One completed activity and a completed workflow result.',
-    ],
-    input: exampleInputs.hello,
-    startOptions: workflowStartOptions('hello'),
-    execution: {
-      kind: 'workflow',
-      workflowType: 'hello',
-      workflow: hello,
-      activities: { greet: activities.greet },
-    },
-  },
-  {
-    id: 'parallel-activities',
-    title: 'Parallel activities',
-    description: 'Runs three activity commands concurrently.',
-    targetId,
-    capabilityTags: ['activities', 'concurrency'],
-    expectedEvidence: [
-      'Three overlapping activity executions and one combined result.',
-    ],
-    input: exampleInputs.parallelActivities,
-    startOptions: workflowStartOptions('parallel-activities'),
-    execution: {
-      kind: 'workflow',
-      workflowType: 'parallelActivities',
-      workflow: parallelActivities,
-      activities: { processData: activities.processData },
-    },
-  },
-  {
-    id: 'sequential-activities',
-    title: 'Sequential activities',
-    description: 'Runs three activity commands one after another.',
-    targetId,
-    capabilityTags: ['activities', 'sequencing'],
-    expectedEvidence: [
-      'Three non-overlapping activity executions in deterministic order.',
-    ],
-    input: exampleInputs.sequentialActivities,
-    startOptions: workflowStartOptions('sequential-activities'),
-    execution: {
-      kind: 'workflow',
-      workflowType: 'sequentialActivities',
-      workflow: sequentialActivities,
-      activities: { processData: activities.processData },
-    },
-  },
-  {
-    id: 'long-activity',
-    title: 'Long-running activity',
-    description: 'Waits inside an activity before returning a result.',
-    targetId,
-    capabilityTags: ['activities', 'long-running'],
-    expectedEvidence: [
-      'An activity remains running for the configured delay and then completes.',
-    ],
-    input: exampleInputs.longActivity,
-    startOptions: workflowStartOptions('long-activity'),
-    execution: {
-      kind: 'workflow',
-      workflowType: 'longActivity',
-      workflow: longActivity,
-      activities: { processLongData: activities.processLongData },
-    },
-  },
   {
     id: 'activity-timeout',
     title: 'Activity timeout',

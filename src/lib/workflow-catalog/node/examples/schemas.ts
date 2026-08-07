@@ -40,19 +40,6 @@ const booleanArgument = (title: string): JsonObject => ({
 });
 
 export const exampleInputs = {
-  hello: positionalInput(['Temporal'], [stringArgument('Name')]),
-  parallelActivities: positionalInput(
-    ['catalog-parallel'],
-    [stringArgument('Data ID')],
-  ),
-  sequentialActivities: positionalInput(
-    ['catalog-sequential'],
-    [stringArgument('Data ID')],
-  ),
-  longActivity: positionalInput(
-    [5000],
-    [integerArgument('Delay in milliseconds', 1, 25000)],
-  ),
   timeoutWorkflow: positionalInput(
     [true],
     [booleanArgument('Force the activity to time out')],

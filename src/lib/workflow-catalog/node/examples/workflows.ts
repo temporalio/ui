@@ -13,14 +13,14 @@ import {
 } from '@temporalio/workflow';
 
 import type * as activities from './activities.js';
+import { hello } from './hello/workflow.js';
+import { parallelActivities } from './parallel-activities/workflow.js';
 
 const {
   generateSummary,
-  greet,
   heartbeatActivity,
   processData,
   processItem,
-  processLongData,
   signalActivity,
 } = proxyActivities<typeof activities>({
   startToCloseTimeout: '30 seconds',
@@ -74,36 +74,6 @@ const hasFailureName = (error: unknown, expectedName: string): boolean => {
 
   return false;
 };
-
-export async function hello(name = 'Temporal'): Promise<string> {
-  return greet(name);
-}
-
-export async function parallelActivities(
-  dataId = `data_${Date.now()}`,
-): Promise<string> {
-  const [resultA, resultB, resultC] = await Promise.all([
-    processData(dataId, 1000, 3),
-    processData(dataId, 1500, 2),
-    processData(dataId, 2000, 1),
-  ]);
-
-  return `Parallel activities completed for ${dataId}: A=${resultA}, B=${resultB}, C=${resultC}`;
-}
-
-export async function sequentialActivities(
-  dataId = `seq_data_${Date.now()}`,
-): Promise<string> {
-  const resultA = await processData(dataId, 1000, 3);
-  const resultB = await processData(dataId, 1500, 2);
-  const resultC = await processData(dataId, 2000, 1);
-
-  return `Sequential activities completed for ${dataId}: A=${resultA}, B=${resultB}, C=${resultC}`;
-}
-
-export async function longActivity(delay = 5000): Promise<string> {
-  return processLongData(delay);
-}
 
 export async function timeoutWorkflow(shouldTimeout = true): Promise<string> {
   const startedAt = Date.now();

@@ -2,11 +2,24 @@ import type {
   WorkflowCatalogExampleRegistration,
   WorkflowImplementation,
 } from '../registry.js';
+import { helloExample, helloSourceFiles } from './hello/example.js';
+import {
+  longActivityExample,
+  longActivitySourceFiles,
+} from './long-activity/example.js';
+import {
+  parallelActivitiesExample,
+  parallelActivitiesSourceFiles,
+} from './parallel-activities/example.js';
 import {
   priorityFairnessExample,
   priorityFairnessSourceFiles,
 } from './priority-fairness/example.js';
 import { sharedWorkflowExamples as registeredWorkflowExamples } from './registrations.js';
+import {
+  sequentialActivitiesExample,
+  sequentialActivitiesSourceFiles,
+} from './sequential-activities/example.js';
 import {
   standaloneActivityExample,
   standaloneActivitySourceFiles,
@@ -30,6 +43,16 @@ const assertUniqueEntries = (entries: readonly string[], label: string) => {
 };
 
 const sharedWorkflowDefinitions: readonly WorkflowExampleDefinition[] = [
+  { example: helloExample, sourceFiles: helloSourceFiles },
+  {
+    example: parallelActivitiesExample,
+    sourceFiles: parallelActivitiesSourceFiles,
+  },
+  {
+    example: sequentialActivitiesExample,
+    sourceFiles: sequentialActivitiesSourceFiles,
+  },
+  { example: longActivityExample, sourceFiles: longActivitySourceFiles },
   ...registeredWorkflowExamples.map((example) => ({
     example,
     sourceFiles: [],
@@ -77,6 +100,7 @@ export const sharedWorkflowExports: Readonly<
 
 export const sharedWorkflowSourceFiles = [
   'src/lib/workflow-catalog/node/examples/index.ts',
+  'src/lib/workflow-catalog/node/examples/shared-activities.ts',
   'src/lib/workflow-catalog/node/examples/activities.ts',
   'src/lib/workflow-catalog/node/examples/registrations.ts',
   'src/lib/workflow-catalog/node/examples/schemas.ts',
