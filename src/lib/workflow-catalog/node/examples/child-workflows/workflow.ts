@@ -1,8 +1,8 @@
 import { startChild, workflowInfo } from '@temporalio/workflow';
 
-import { hello } from './hello/workflow.js';
-import { highEventCountWorkflow } from './high-event-count/workflow.js';
-import { parallelActivities } from './parallel-activities/workflow.js';
+import { hello } from '../hello/workflow.js';
+import { highEventCountWorkflow } from '../high-event-count/workflow.js';
+import { parallelActivities } from '../parallel-activities/workflow.js';
 
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);

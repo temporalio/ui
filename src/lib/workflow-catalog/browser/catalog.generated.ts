@@ -2,7 +2,7 @@ import type { BrowserWorkflowCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
   sourceHash:
-    '7d5feef1d028c0c516877b779433faf984b09763b27ec7378b4c23293ef1cffc',
+    '0673ba382d19c47ea9a30e9e2cfd31ef5428095f6b9c843f88e35e2a95bcd674',
   descriptors: [
     {
       id: 'hello',

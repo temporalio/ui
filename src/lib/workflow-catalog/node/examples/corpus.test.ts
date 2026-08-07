@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { greet } from './activities.js';
 import { sharedWorkflowCorpusInventory } from './inventory.js';
 import { priorityFairnessWorkflow } from './priority-fairness/workflow.js';
+import { greet } from './shared-activities.js';
 import validateJsonSchema from '../../browser/schema-validator.js';
 import {
   createWorkflowCatalogRegistry,
@@ -456,10 +456,6 @@ describe('shared workflow corpus', () => {
       'src/lib/workflow-catalog/node/examples/inventory.ts',
       'src/lib/workflow-catalog/node/examples/index.ts',
       'src/lib/workflow-catalog/node/examples/shared-activities.ts',
-      'src/lib/workflow-catalog/node/examples/activities.ts',
-      'src/lib/workflow-catalog/node/examples/registrations.ts',
-      'src/lib/workflow-catalog/node/examples/schemas.ts',
-      'src/lib/workflow-catalog/node/examples/workflows.ts',
       'src/lib/workflow-catalog/node/examples/hello/example.ts',
       'src/lib/workflow-catalog/node/examples/hello/workflow.ts',
       'src/lib/workflow-catalog/node/examples/parallel-activities/example.ts',
@@ -485,6 +481,8 @@ describe('shared workflow corpus', () => {
       'src/lib/workflow-catalog/node/examples/timer-driven-repetition/workflow.ts',
       'src/lib/workflow-catalog/node/examples/high-event-count/example.ts',
       'src/lib/workflow-catalog/node/examples/high-event-count/workflow.ts',
+      'src/lib/workflow-catalog/node/examples/child-workflows/example.ts',
+      'src/lib/workflow-catalog/node/examples/child-workflows/workflow.ts',
       'src/lib/workflow-catalog/node/examples/local-activity/example.ts',
       'src/lib/workflow-catalog/node/examples/local-activity/workflow.ts',
       'src/lib/workflow-catalog/node/examples/workflow-patching/example.ts',

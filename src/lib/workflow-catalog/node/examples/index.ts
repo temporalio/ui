@@ -14,6 +14,10 @@ import {
   activityTimeoutExample,
   activityTimeoutSourceFiles,
 } from './activity-timeout/example.js';
+import {
+  childWorkflowsExample,
+  childWorkflowsSourceFiles,
+} from './child-workflows/example.js';
 import { helloExample, helloSourceFiles } from './hello/example.js';
 import {
   highEventCountExample,
@@ -35,7 +39,6 @@ import {
   priorityFairnessExample,
   priorityFairnessSourceFiles,
 } from './priority-fairness/example.js';
-import { sharedWorkflowExamples as registeredWorkflowExamples } from './registrations.js';
 import {
   sequentialActivitiesExample,
   sequentialActivitiesSourceFiles,
@@ -101,10 +104,7 @@ const sharedWorkflowDefinitions: readonly WorkflowExampleDefinition[] = [
     sourceFiles: timerDrivenRepetitionSourceFiles,
   },
   { example: highEventCountExample, sourceFiles: highEventCountSourceFiles },
-  ...registeredWorkflowExamples.map((example) => ({
-    example,
-    sourceFiles: [],
-  })),
+  { example: childWorkflowsExample, sourceFiles: childWorkflowsSourceFiles },
   { example: localActivityExample, sourceFiles: localActivitySourceFiles },
   {
     example: workflowPatchingExample,
@@ -155,10 +155,6 @@ export const sharedWorkflowExports: Readonly<
 export const sharedWorkflowSourceFiles = [
   'src/lib/workflow-catalog/node/examples/index.ts',
   'src/lib/workflow-catalog/node/examples/shared-activities.ts',
-  'src/lib/workflow-catalog/node/examples/activities.ts',
-  'src/lib/workflow-catalog/node/examples/registrations.ts',
-  'src/lib/workflow-catalog/node/examples/schemas.ts',
-  'src/lib/workflow-catalog/node/examples/workflows.ts',
   ...sharedWorkflowDefinitions.flatMap(({ sourceFiles }) => sourceFiles),
 ] as const;
 

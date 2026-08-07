@@ -1,6 +1,6 @@
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
 import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
-import { greet } from '../activities.js';
+import { greet } from '../shared-activities.js';
 import { priorityFairnessWorkflow } from './workflow.js';
 
 const input: RuntimeJsonDocument = {
