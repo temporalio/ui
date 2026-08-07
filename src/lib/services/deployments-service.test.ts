@@ -284,7 +284,6 @@ describe('deployments service', () => {
       vi.mocked(requestFromAPI).mockResolvedValueOnce(undefined as never);
 
       const scalingGroup = {
-        taskQueueTypes: ['TASK_QUEUE_TYPE_WORKFLOW'],
         provider: {
           type: 'aws-lambda',
           details: { data: 'abc', metadata: { encoding: 'xyz' } },
@@ -324,7 +323,7 @@ describe('deployments service', () => {
       vi.mocked(requestFromAPI).mockResolvedValueOnce(undefined as never);
 
       const computeConfig = {
-        scalingGroups: { default: { taskQueueTypes: [] } },
+        scalingGroups: { default: {} },
       };
 
       await updateWorkerDeploymentVersionComputeConfig({
@@ -348,7 +347,6 @@ describe('deployments service', () => {
       vi.mocked(requestFromAPI).mockResolvedValueOnce({ valid: true } as never);
 
       const scalingGroup = {
-        taskQueueTypes: ['TASK_QUEUE_TYPE_ACTIVITY'],
         provider: {
           type: 'aws-lambda',
           details: { data: 'abc', metadata: { encoding: 'xyz' } },
@@ -438,10 +436,6 @@ describe('deployments service', () => {
 
       const scalingGroup = result.scalingGroups?.['default'];
       expect(scalingGroup).toBeDefined();
-      expect(scalingGroup?.taskQueueTypes).toEqual([
-        'TASK_QUEUE_TYPE_WORKFLOW',
-        'TASK_QUEUE_TYPE_ACTIVITY',
-      ]);
       expect(scalingGroup?.provider?.type).toBe('aws-lambda');
 
       const providerData = scalingGroup?.provider?.details?.data;
@@ -552,7 +546,7 @@ describe('deployments service', () => {
     });
 
     test('returns empty object when provider data is missing', () => {
-      const config = { scalingGroups: { default: { taskQueueTypes: [] } } };
+      const config = { scalingGroups: { default: {} } };
       expect(decodeLambdaProviderDetails(config)).toEqual({});
     });
   });
@@ -580,7 +574,7 @@ describe('deployments service', () => {
     });
 
     test('returns empty object when scaler data is missing', () => {
-      const config = { scalingGroups: { default: { taskQueueTypes: [] } } };
+      const config = { scalingGroups: { default: {} } };
       expect(decodeScalerDetails(config)).toEqual({});
     });
 
