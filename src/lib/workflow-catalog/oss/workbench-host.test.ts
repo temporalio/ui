@@ -6,7 +6,7 @@ import type { StartCommand } from '../browser/workbench-host';
 
 const workflowDescriptor: BrowserWorkflowCatalogDescriptor = {
   id: 'order-lifecycle',
-  source: 'shared',
+  source: { id: 'oss', label: 'OSS' },
   title: 'Order lifecycle',
   description: 'Runs the order workflow.',
   capabilityTags: [],

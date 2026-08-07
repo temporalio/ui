@@ -7,6 +7,7 @@ import type { WorkflowCatalogRegistrationSource } from './registration-source.js
 
 export const workflowCatalogRegistrationSource: WorkflowCatalogRegistrationSource =
   {
+    source: { id: 'oss', label: 'OSS' },
     sourceFiles: [
       'src/lib/workflow-catalog/node/shared-registrations.ts',
       'src/lib/workflow-catalog/node/workflows.ts',

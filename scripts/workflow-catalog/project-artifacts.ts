@@ -23,11 +23,15 @@ const projectOptions = {
 const projectBoundaryOptions = {
   rootDirectory: projectOptions.rootDirectory,
   browserFiles: [
+    'src/lib/workflow-catalog/browser/catalog-detail.svelte',
+    'src/lib/workflow-catalog/browser/catalog-list.svelte',
     'src/lib/workflow-catalog/browser/routing.ts',
+    'src/lib/workflow-catalog/browser/readiness-loader.ts',
+    'src/lib/workflow-catalog/browser/session-presentation.ts',
+    'src/lib/workflow-catalog/browser/start-example.ts',
     'src/lib/workflow-catalog/browser/types.ts',
     'src/lib/workflow-catalog/browser/workbench-host.ts',
     'src/lib/workflow-catalog/browser/execution-log.ts',
-    'src/lib/workflow-catalog/browser/workbench.svelte',
     'src/lib/workflow-catalog/browser/catalog.ts',
     'src/lib/workflow-catalog/browser/catalog.generated.json',
     'src/lib/workflow-catalog/browser/catalog.generated.ts',

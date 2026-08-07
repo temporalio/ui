@@ -29,8 +29,8 @@
     </Link>
     <div class="mt-3 flex flex-wrap items-center gap-2">
       <h1>{descriptor.title}</h1>
-      <Badge type={descriptor.source === 'local' ? 'warning' : 'subtle'}>
-        {descriptor.source === 'local' ? 'Local' : 'Shared'}
+      <Badge type={descriptor.source.id === 'local' ? 'warning' : 'subtle'}>
+        {descriptor.source.label}
       </Badge>
     </div>
     <p class="mt-1 max-w-3xl text-sm text-secondary">

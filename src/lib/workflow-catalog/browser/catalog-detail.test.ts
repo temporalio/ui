@@ -89,7 +89,7 @@ afterAll(async () => closeViteServer?.());
 
 const descriptor: BrowserWorkflowCatalogDescriptor = {
   id: 'order-lifecycle',
-  source: 'shared',
+  source: { id: 'oss', label: 'OSS' },
   title: 'Order lifecycle',
   description: 'Start and inspect an order workflow.',
   capabilityTags: ['Workflow', 'Links'],

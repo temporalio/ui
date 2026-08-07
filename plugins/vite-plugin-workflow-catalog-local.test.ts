@@ -45,7 +45,7 @@ describe('local workflow catalog Vite boundary', () => {
         descriptors: [
           {
             id: 'local-order',
-            source: 'local',
+            source: { id: 'local', label: 'Local' },
             title: 'Local order',
             description: 'Runs a local order workflow.',
             capabilityTags: [],
@@ -66,7 +66,12 @@ describe('local workflow catalog Vite boundary', () => {
 
     await expect(
       loadLocalWorkflowCatalogDescriptors(rootDirectory),
-    ).resolves.toMatchObject([{ id: 'local-order', source: 'local' }]);
+    ).resolves.toMatchObject([
+      {
+        id: 'local-order',
+        source: { id: 'local', label: 'Local' },
+      },
+    ]);
   });
 
   it('loads only non-secret routing from the local workflow catalog environment', async () => {

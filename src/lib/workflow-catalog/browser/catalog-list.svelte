@@ -10,39 +10,41 @@
   import { routeForWorkflowCatalogExample } from '$lib/utilities/route-for';
 
   import { changePendingRunCount } from './catalog-list-state';
+  import { workflowCatalogSources } from './catalog-sources';
+  import { terminalStatusPresentation } from './session-presentation';
   import type {
     WorkflowCatalogSessionState,
     WorkflowCatalogSessionStore,
   } from './session-store';
-  import type {
-    BrowserWorkflowCatalogDescriptor,
-    BrowserWorkflowCatalogSource,
-  } from './types';
+  import { startWithDefaults } from './start-example';
+  import type { BrowserWorkflowCatalogDescriptor } from './types';
   import type { WorkbenchHost } from './workbench-host';
 
-  import {
-    startWithDefaults,
-    terminalStatusPresentation,
-  } from './workbench.svelte';
-
-  type SourceFilter = 'all' | BrowserWorkflowCatalogSource;
+  type SourceFilter = 'all' | string;
 
   interface Props {
     descriptors: readonly BrowserWorkflowCatalogDescriptor[];
     host: WorkbenchHost;
     sessionStore: WorkflowCatalogSessionStore;
+    exampleHref?: (exampleId: string) => string;
   }
 
-  let { descriptors, host, sessionStore }: Props = $props();
+  let {
+    descriptors,
+    host,
+    sessionStore,
+    exampleHref = routeForWorkflowCatalogExample,
+  }: Props = $props();
 
   let query = $state('');
   let filter = $state<SourceFilter>('all');
   let runError = $state('');
   let pendingRunCounts = $state<Record<string, number>>({});
   let sessions = $derived($sessionStore.sessions);
+  let sources = $derived(workflowCatalogSources(descriptors));
   let visibleDescriptors = $derived(
     descriptors.filter((descriptor) => {
-      const matchesFilter = filter === 'all' || descriptor.source === filter;
+      const matchesFilter = filter === 'all' || descriptor.source.id === filter;
       const searchable = [
         descriptor.title,
         descriptor.description,
@@ -139,14 +141,20 @@
       role="group"
       aria-label="Example source filter"
     >
-      {#each ['all', 'shared', 'local'] as value (value)}
+      <Button
+        size="xs"
+        variant="secondary"
+        active={filter === 'all'}
+        aria-pressed={filter === 'all'}
+        onclick={() => (filter = 'all')}>All</Button
+      >
+      {#each sources as source (source.id)}
         <Button
           size="xs"
           variant="secondary"
-          active={filter === value}
-          aria-pressed={filter === value}
-          onclick={() => (filter = value as SourceFilter)}
-          >{value[0]?.toUpperCase()}{value.slice(1)}</Button
+          active={filter === source.id}
+          aria-pressed={filter === source.id}
+          onclick={() => (filter = source.id)}>{source.label}</Button
         >
       {/each}
     </div>
@@ -182,7 +190,7 @@
             <td class="min-w-0 py-2">
               <Link
                 class="table-link block truncate text-sm font-medium text-primary"
-                href={routeForWorkflowCatalogExample(descriptor.id)}
+                href={exampleHref(descriptor.id)}
               >
                 {descriptor.title}
               </Link>
@@ -192,10 +200,10 @@
             </td>
             <td>
               <Badge
-                type={descriptor.source === 'local' ? 'warning' : 'subtle'}
+                type={descriptor.source.id === 'local' ? 'warning' : 'subtle'}
                 class="px-1 py-0.5 text-xs leading-none"
               >
-                {descriptor.source === 'local' ? 'Local' : 'Shared'}
+                {descriptor.source.label}
               </Badge>
             </td>
             <td class="hidden truncate font-mono text-xs lg:table-cell">
@@ -234,7 +242,7 @@
             >
               <div class="flex items-center justify-end gap-1 sm:gap-2">
                 <Button
-                  href={routeForWorkflowCatalogExample(descriptor.id)}
+                  href={exampleHref(descriptor.id)}
                   aria-label="Configure"
                   leadingIcon="settings"
                   size="xs"

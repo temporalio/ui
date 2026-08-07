@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 
 import { format } from 'prettier';
 
+import { assertWorkflowCatalogSource } from '../../src/lib/workflow-catalog/browser/catalog-sources';
 import {
   resolveWorkflowCatalogRouting,
   type WorkflowCatalogRouting,
@@ -25,7 +26,7 @@ type WorkflowCatalogArtifactOptions = {
   sourceFiles: string[];
   artifactPath: string;
   registry: WorkflowCatalogRegistry;
-  source?: BrowserWorkflowCatalogSource;
+  source: BrowserWorkflowCatalogSource;
 };
 
 type WorkflowCatalogArtifactsOptions = {
@@ -105,8 +106,9 @@ const buildWorkflowCatalogArtifact = async ({
   rootDirectory,
   sourceFiles,
   registry,
-  source = 'shared',
+  source,
 }: WorkflowCatalogArtifactOptions) => {
+  assertWorkflowCatalogSource(source);
   const { browserDescriptors, nodeBindings } =
     generateWorkflowCatalog(registry);
   const artifact: BrowserWorkflowCatalogArtifact = {
@@ -184,12 +186,14 @@ const verifyWorkflowCatalogTypeScriptArtifact = async ({
   sourceFiles,
   artifactPath,
   registry,
+  source,
 }: WorkflowCatalogArtifactOptions) => {
   const expected = await buildWorkflowCatalogArtifact({
     rootDirectory,
     sourceFiles,
     artifactPath,
     registry,
+    source,
   });
   const currentContent = await readFile(
     join(rootDirectory, artifactPath),
@@ -333,6 +337,17 @@ const createArtifactOptions = async (
   const localSource = hasLocalModule
     ? await importLocalRegistrationSource(localModuleAbsolutePath)
     : options.localFallback;
+
+  if (
+    hasLocalModule &&
+    (localSource.source?.id !== options.localFallback.source.id ||
+      localSource.source?.label !== options.localFallback.source.label)
+  ) {
+    throw new Error(
+      `Local workflow catalog registration source must declare source ${JSON.stringify(options.localFallback.source)}`,
+    );
+  }
+
   const sharedRegistry = createWorkflowCatalogRegistry();
   const localRegistry = createWorkflowCatalogRegistry();
   const combinedRegistry = createWorkflowCatalogRegistry();
@@ -366,7 +381,7 @@ const createArtifactOptions = async (
       sourceFiles: options.sharedSource.sourceFiles,
       artifactPath: options.sharedArtifactPath,
       registry: sharedRegistry,
-      source: 'shared' as const,
+      source: options.sharedSource.source,
     },
     local: {
       rootDirectory: options.rootDirectory,
@@ -378,7 +393,7 @@ const createArtifactOptions = async (
       ].sort(),
       artifactPath: options.localArtifactPath,
       registry: localProjectionRegistry,
-      source: 'local' as const,
+      source: localSource.source,
     },
   };
 };

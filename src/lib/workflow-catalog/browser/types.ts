@@ -57,7 +57,10 @@ export type BrowserWorkflowCatalogExecution =
   | BrowserStandaloneNexusOperationExecution
   | BrowserWorkflowExecution;
 
-export type BrowserWorkflowCatalogSource = 'local' | 'shared';
+export type BrowserWorkflowCatalogSource = {
+  id: string;
+  label: string;
+};
 
 export type BrowserWorkflowCatalogDescriptor =
   BrowserWorkflowCatalogMetadata & {

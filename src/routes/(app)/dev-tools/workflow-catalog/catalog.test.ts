@@ -13,7 +13,7 @@ const { localDescriptor } = vi.hoisted<{
 }>(() => ({
   localDescriptor: {
     id: 'local-order',
-    source: 'local',
+    source: { id: 'local', label: 'Local' },
     title: 'Local order',
     description: 'Runs a local order workflow.',
     capabilityTags: [],
@@ -43,7 +43,10 @@ vi.mock('virtual:workflow-catalog-local', () => ({
 describe('workflow catalog route catalog', () => {
   it('provides the local overlay to the exact app route catalog', () => {
     expect(routeWorkflowCatalog).toContainEqual(
-      expect.objectContaining({ id: localDescriptor.id, source: 'local' }),
+      expect.objectContaining({
+        id: localDescriptor.id,
+        source: { id: 'local', label: 'Local' },
+      }),
     );
   });
 
@@ -62,7 +65,7 @@ describe('workflow catalog route catalog', () => {
     const sharedDescriptor = {
       ...localDescriptor,
       id: 'shared-order',
-      source: 'shared' as const,
+      source: { id: 'oss', label: 'OSS' },
     };
 
     expect(
@@ -74,7 +77,7 @@ describe('workflow catalog route catalog', () => {
     const sharedDescriptor = {
       ...localDescriptor,
       id: 'shared-order',
-      source: 'shared' as const,
+      source: { id: 'oss', label: 'OSS' },
       execution: {
         ...localDescriptor.execution,
         targetId: 'shared-workflows',
@@ -100,12 +103,50 @@ describe('workflow catalog route catalog', () => {
   it('rejects duplicate stable IDs instead of shadowing a descriptor', () => {
     const sharedDescriptor = {
       ...localDescriptor,
-      source: 'shared' as const,
+      source: { id: 'oss', label: 'OSS' },
     };
 
     expect(() =>
       mergeWorkflowCatalogDescriptors([sharedDescriptor], [localDescriptor]),
     ).toThrow('Duplicate workflow catalog descriptor ID "local-order"');
+  });
+
+  it('rejects conflicting labels for the same source ID', () => {
+    const cloudDescriptor = {
+      ...localDescriptor,
+      id: 'cloud-order',
+      source: { id: 'cloud', label: 'Cloud' },
+    };
+    const renamedCloudDescriptor = {
+      ...cloudDescriptor,
+      id: 'cloud-order-renamed',
+      source: { id: 'cloud', label: 'Temporal Cloud' },
+    };
+
+    expect(() =>
+      mergeWorkflowCatalogDescriptors(
+        [cloudDescriptor],
+        [renamedCloudDescriptor],
+      ),
+    ).toThrow(
+      'Workflow catalog source "cloud" has conflicting labels "Cloud" and "Temporal Cloud"',
+    );
+  });
+
+  it.each([
+    [{ id: '', label: 'Cloud' }, 'a non-empty id'],
+    [{ id: 'all', label: 'All' }, 'the reserved id "all"'],
+    [{ id: 'cloud', label: '' }, 'a non-empty label'],
+  ])('rejects a source without %s', (source, expectedMessage) => {
+    const descriptor = {
+      ...localDescriptor,
+      id: 'invalid-source',
+      source,
+    };
+
+    expect(() => mergeWorkflowCatalogDescriptors([descriptor], [])).toThrow(
+      expectedMessage,
+    );
   });
 
   it('finds a literal percent-escape ID from an already-decoded route parameter', () => {

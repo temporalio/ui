@@ -4,6 +4,7 @@ import {
 } from 'virtual:workflow-catalog-local';
 
 import { workflowCatalog } from '$lib/workflow-catalog/browser/catalog';
+import { workflowCatalogSources } from '$lib/workflow-catalog/browser/catalog-sources';
 import {
   resolveWorkflowCatalogRouting,
   type WorkflowCatalogRouting,
@@ -27,6 +28,8 @@ export const mergeWorkflowCatalogDescriptors = (
 
     descriptorIds.add(descriptor.id);
   }
+
+  workflowCatalogSources(merged);
 
   const resolvedExecutions = resolveWorkflowCatalogRouting(
     merged.map(({ execution }) => execution),

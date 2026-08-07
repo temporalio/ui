@@ -57,7 +57,7 @@ afterAll(async () => closeViteServer?.());
 
 const descriptor: BrowserWorkflowCatalogDescriptor = {
   id: 'order-lifecycle',
-  source: 'shared',
+  source: { id: 'oss', label: 'OSS' },
   title: 'Order lifecycle',
   description: 'Start and inspect an order workflow.',
   capabilityTags: ['Workflow'],
@@ -117,7 +117,7 @@ describe('WorkflowCatalogList', () => {
     expect(body).toContain('Order lifecycle');
     expect(body).toContain('Start and inspect an order workflow.');
     expect(body).toMatch(
-      /class="[^"]*px-1[^"]*py-0\.5[^"]*text-xs[^"]*leading-none[^"]*"[^>]*><!---->Shared/,
+      /class="[^"]*px-1[^"]*py-0\.5[^"]*text-xs[^"]*leading-none[^"]*"[^>]*><!---->OSS/,
     );
     expect(body).toContain('catalog-tasks');
     expect(body).toContain('Not run');
@@ -126,6 +126,22 @@ describe('WorkflowCatalogList', () => {
     expect(body).toContain('sticky right-0');
     expect(body).toContain('w-36 !text-right sm:w-60');
     expect(body).toContain('hidden sm:inline');
+  });
+
+  it('uses the host-provided href for the workflow title link', () => {
+    const sessionStore = createWorkflowCatalogSessionStore(host);
+    const { body } = renderComponent(catalogList, {
+      props: {
+        descriptors: [descriptor],
+        host,
+        sessionStore,
+        exampleHref: (exampleId: string) => `/cloud/catalog/${exampleId}`,
+      },
+    });
+
+    expect(body).toMatch(
+      /<a[^>]*href="\/cloud\/catalog\/order-lifecycle"[^>]*>[\s\S]*?Order lifecycle[\s\S]*?<\/a>/,
+    );
   });
 
   it('shows a quick run from the shared session store in its workflow row', async () => {
@@ -203,15 +219,20 @@ describe('WorkflowCatalogList', () => {
     expect(body).not.toContain('>launch-rejected<');
   });
 
-  it('keeps the base catalog flat while running descriptor defaults', () => {
+  it('derives source filter controls and source labels from supplied descriptors', () => {
     const source = readFileSync(
       resolve('src/lib/workflow-catalog/browser/catalog-list.svelte'),
       'utf8',
     );
 
     expect(source).toContain('workflow-catalog-search');
-    expect(source).toContain("['all', 'shared', 'local']");
-    expect(source).toContain('routeForWorkflowCatalogExample(descriptor.id)');
+    expect(source).toContain('descriptor.source.id');
+    expect(source).toContain('descriptor.source.label');
+    expect(source).not.toContain("['all', 'shared', 'local']");
+    expect(source).toContain('exampleHref = routeForWorkflowCatalogExample');
+    expect(
+      source.match(/href=\{exampleHref\(descriptor\.id\)\}/g),
+    ).toHaveLength(2);
     expect(source).toContain('startWithDefaults');
     expect(source).toContain('sessionStore.latest');
     expect(source).not.toContain('Textarea');
@@ -240,7 +261,7 @@ describe('WorkflowCatalogList', () => {
 
     expect(source).toContain("import Link from '$lib/holocene/link.svelte';");
     expect(source).toContain(
-      '<Link\n                class="table-link block truncate text-sm font-medium text-primary"\n                href={routeForWorkflowCatalogExample(descriptor.id)}',
+      '<Link\n                class="table-link block truncate text-sm font-medium text-primary"\n                href={exampleHref(descriptor.id)}',
     );
   });
 

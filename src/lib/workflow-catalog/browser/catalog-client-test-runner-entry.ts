@@ -13,7 +13,7 @@ import CatalogList from './catalog-list.svelte';
 
 const descriptor: BrowserWorkflowCatalogDescriptor = {
   id: 'order-lifecycle',
-  source: 'shared',
+  source: { id: 'oss', label: 'OSS' },
   title: 'Order lifecycle',
   description: 'Start and inspect an order workflow.',
   capabilityTags: ['Workflow'],
@@ -41,7 +41,7 @@ const descriptor: BrowserWorkflowCatalogDescriptor = {
 const localDescriptor: BrowserWorkflowCatalogDescriptor = {
   ...descriptor,
   id: 'payment-reminder',
-  source: 'local',
+  source: { id: 'local', label: 'Local' },
   title: 'Payment reminder',
   description: 'Send a local payment reminder.',
   execution: {
@@ -51,6 +51,14 @@ const localDescriptor: BrowserWorkflowCatalogDescriptor = {
     taskQueue: 'catalog-tasks',
     workflowType: 'PaymentReminder',
   },
+};
+
+const cloudDescriptor: BrowserWorkflowCatalogDescriptor = {
+  ...descriptor,
+  id: 'cloud-example',
+  source: { id: 'cloud', label: 'Cloud' },
+  title: 'Cloud example',
+  description: 'Runs a Cloud example.',
 };
 
 const mounted: ReturnType<typeof mount>[] = [];
@@ -156,7 +164,11 @@ export async function resolveReadiness(checks: ReadinessCheck[]) {
   flushSvelte();
 }
 
-export async function renderList() {
+export async function renderList({
+  exampleHref,
+}: {
+  exampleHref?: (exampleId: string) => string;
+} = {}) {
   readinessCallCount = 0;
   prepareStartPromise();
   const host = createHost(async () => {
@@ -175,9 +187,10 @@ export async function renderList() {
     mount(CatalogList, {
       target,
       props: {
-        descriptors: [descriptor, localDescriptor],
+        descriptors: [descriptor, localDescriptor, cloudDescriptor],
         host,
         sessionStore: createWorkflowCatalogSessionStore(host),
+        exampleHref,
       },
     }),
   );

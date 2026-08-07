@@ -111,19 +111,16 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
+  import { createReadinessLoader } from './readiness-loader';
+  import { terminalStatusPresentation } from './session-presentation';
   import {
     type WorkflowCatalogSessionState,
     type WorkflowCatalogSessionStore,
     workflowCatalogTargetFingerprint,
   } from './session-store';
+  import { startFromEditors } from './start-example';
   import type { BrowserWorkflowCatalogDescriptor, JsonValue } from './types';
   import type { ReadinessCheck, WorkbenchHost } from './workbench-host';
-
-  import {
-    createReadinessLoader,
-    startFromEditors,
-    terminalStatusPresentation,
-  } from './workbench.svelte';
 
   interface Props {
     descriptor: BrowserWorkflowCatalogDescriptor;

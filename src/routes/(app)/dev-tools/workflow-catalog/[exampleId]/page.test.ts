@@ -18,7 +18,8 @@ describe('/dev-tools/workflow-catalog/[exampleId]', () => {
     expect(source).toContain('<Link href={routeForWorkflowCatalog()}');
     expect(source).toContain('{descriptor.title}');
     expect(source).toContain('{descriptor.description}');
-    expect(source).toContain("descriptor.source === 'local'");
+    expect(source).toContain("descriptor.source.id === 'local'");
+    expect(source).toContain('{descriptor.source.label}');
     expect(source).not.toContain('Permalink');
     expect(source).not.toContain('routeForWorkflowCatalogExample(');
   });

@@ -13,7 +13,7 @@ vi.mock('$lib/utilities/encode-payload', () => ({
 
 const descriptor: BrowserWorkflowCatalogDescriptor = {
   id: 'order-lifecycle',
-  source: 'shared',
+  source: { id: 'oss', label: 'OSS' },
   title: 'Order lifecycle',
   description: 'Runs the order workflow.',
   capabilityTags: [],

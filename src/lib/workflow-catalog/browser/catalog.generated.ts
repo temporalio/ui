@@ -2,7 +2,7 @@ import type { BrowserWorkflowCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
   sourceHash:
-    '0673ba382d19c47ea9a30e9e2cfd31ef5428095f6b9c843f88e35e2a95bcd674',
+    '7ffa600819dd5eb90085830b13651284f7177b1ae31d7634611543e7070b6c66',
   descriptors: [
     {
       id: 'hello',
@@ -35,7 +35,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'hello',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'parallel-activities',
@@ -68,7 +68,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'parallelActivities',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'sequential-activities',
@@ -101,7 +101,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'sequentialActivities',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'long-activity',
@@ -141,7 +141,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'longActivity',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'activity-timeout',
@@ -176,7 +176,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'timeoutWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'activity-retry',
@@ -216,7 +216,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'retryWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'signal-handlers',
@@ -256,7 +256,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'signalWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'activity-heartbeat',
@@ -303,7 +303,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'heartbeatWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'timer-driven-repetition',
@@ -344,7 +344,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'scheduleWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'high-event-count',
@@ -391,7 +391,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'highEventCountWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'child-workflows',
@@ -419,7 +419,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'childWorkflowTest',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'local-activity',
@@ -452,7 +452,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'localActivityWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'workflow-patching',
@@ -485,7 +485,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'patchWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'signal-collector',
@@ -529,7 +529,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'signalCollector',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'priority-fairness',
@@ -581,7 +581,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         taskQueue: 'ui-workflow-catalog',
         workflowType: 'priorityFairnessWorkflow',
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
     {
       id: 'standalone-activity',
@@ -613,7 +613,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         timeouts: { scheduleToCloseTimeout: '60s', startToCloseTimeout: '30s' },
         policies: { retryPolicy: { maximumAttempts: 3 } },
       },
-      source: 'shared',
+      source: { id: 'oss', label: 'OSS' },
     },
   ],
 };

@@ -37,7 +37,11 @@ const parseLocalArtifact = (
       !descriptor ||
       typeof descriptor !== 'object' ||
       typeof descriptor.id !== 'string' ||
-      descriptor.source !== 'local'
+      typeof descriptor.source !== 'object' ||
+      descriptor.source === null ||
+      descriptor.source.id !== 'local' ||
+      typeof descriptor.source.label !== 'string' ||
+      descriptor.source.label.length === 0
     ) {
       throw new Error(
         `Workflow catalog artifact "${localArtifactPath}" contains an invalid local descriptor`,

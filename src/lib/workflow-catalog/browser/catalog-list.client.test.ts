@@ -23,10 +23,24 @@ describe('WorkflowCatalogList client interactions', () => {
         (candidate) => candidate.textContent?.trim() === label,
       );
 
-    button('Shared')?.click();
+    button('OSS')?.click();
     client.flushSync();
     expect(target.textContent).toContain('Order lifecycle');
     expect(target.textContent).not.toContain('Payment reminder');
+    expect(target.textContent).not.toContain('Cloud example');
+
+    button('Cloud')?.click();
+    client.flushSync();
+    expect(target.textContent).toContain('Cloud example');
+    expect(target.textContent).not.toContain('Order lifecycle');
+
+    button('Local')?.click();
+    client.flushSync();
+    expect(target.textContent).toContain('Payment reminder');
+    expect(target.textContent).not.toContain('Cloud example');
+
+    button('OSS')?.click();
+    client.flushSync();
 
     const search = target.querySelector<HTMLInputElement>(
       '#workflow-catalog-search',
@@ -58,5 +72,20 @@ describe('WorkflowCatalogList client interactions', () => {
     });
     await client.flush();
     expect(target.textContent).toContain('Completed');
+  });
+
+  it('uses the host-provided href for the Configure action', async () => {
+    const target = await client.renderList({
+      exampleHref: (exampleId: string) => `/cloud/catalog/${exampleId}`,
+    });
+    await client.flush();
+
+    const configure = target.querySelector<HTMLAnchorElement>(
+      'a[aria-label="Configure"]',
+    );
+
+    expect(configure?.getAttribute('href')).toBe(
+      '/cloud/catalog/order-lifecycle',
+    );
   });
 });

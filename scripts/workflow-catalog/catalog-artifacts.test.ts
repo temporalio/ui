@@ -67,10 +67,12 @@ describe('workflow catalog artifacts', () => {
     const sharedTypeScriptArtifactPath = 'catalog.generated.ts';
     const localSourcePath = 'local-registration.ts';
     const sharedSource = {
+      source: { id: 'oss', label: 'OSS' },
       sourceFiles: [sharedSourcePath],
       register: () => undefined,
     };
     const localFallback = {
+      source: { id: 'local', label: 'Local' },
       sourceFiles: [localSourcePath],
       register: () => undefined,
     };
@@ -117,10 +119,12 @@ describe('workflow catalog artifacts', () => {
     const sharedSourcePath = 'shared-registration.ts';
     const localSourcePath = 'local-registration.ts';
     const sharedSource = {
+      source: { id: 'oss', label: 'OSS' },
       sourceFiles: [sharedSourcePath],
       register: () => undefined,
     };
     const localFallback = {
+      source: { id: 'local', label: 'Local' },
       sourceFiles: [localSourcePath],
       register: () => undefined,
     };
@@ -151,6 +155,7 @@ describe('workflow catalog artifacts', () => {
     const rootDirectory = await createTemporaryDirectory();
     const workflow = () => undefined;
     const sharedSource = {
+      source: { id: 'oss', label: 'OSS' },
       sourceFiles: ['shared-registration.ts'],
       register: (
         registry: ReturnType<typeof createWorkflowCatalogRegistry>,
@@ -220,6 +225,7 @@ describe('workflow catalog artifacts', () => {
       sourceFiles: [sourcePath],
       artifactPath,
       registry,
+      source: { id: 'oss', label: 'OSS' },
     });
     const firstContent = await readFile(
       join(rootDirectory, artifactPath),
@@ -231,6 +237,7 @@ describe('workflow catalog artifacts', () => {
       sourceFiles: [sourcePath],
       artifactPath,
       registry,
+      source: { id: 'oss', label: 'OSS' },
     });
     const secondContent = await readFile(
       join(rootDirectory, artifactPath),
@@ -286,6 +293,7 @@ describe('workflow catalog artifacts', () => {
       sourceFiles: [sourcePath],
       artifactPath,
       registry,
+      source: { id: 'oss', label: 'OSS' },
     });
     const generatedContent = await readFile(
       join(rootDirectory, artifactPath),
@@ -337,6 +345,7 @@ describe('workflow catalog artifacts', () => {
       sourceFiles: [sourcePath],
       artifactPath,
       registry,
+      source: { id: 'oss', label: 'OSS' },
     });
     const artifactContent = await readFile(
       join(rootDirectory, artifactPath),
@@ -363,6 +372,7 @@ describe('workflow catalog artifacts', () => {
       sourceFiles: [sourcePath],
       artifactPath,
       registry,
+      source: { id: 'oss', label: 'OSS' },
     };
     await writeFile(
       join(rootDirectory, sourcePath),
@@ -417,6 +427,7 @@ describe('workflow catalog artifacts', () => {
     const options = {
       rootDirectory,
       sharedSource: {
+        source: { id: 'oss', label: 'OSS' },
         sourceFiles: [sharedSourcePath],
         register: () => undefined,
       },
@@ -462,6 +473,7 @@ describe('workflow catalog artifacts', () => {
     await writeFile(
       join(rootDirectory, options.localModulePath),
       `export const workflowCatalogRegistrationSource = {
+  source: { id: 'local', label: 'Local' },
   sourceFiles: ['workflow-catalog.local/registration.ts'],
   register() {},
 };
@@ -496,6 +508,7 @@ describe('workflow catalog artifacts', () => {
       join(rootDirectory, localModulePath),
       `const activity = () => 'local';
 export const workflowCatalogRegistrationSource = {
+  source: { id: 'local', label: 'Local' },
   sourceFiles: ['workflow-catalog.local/registration.ts'],
   register(registry) {
     registry.registerTarget({
@@ -530,6 +543,7 @@ export const workflowCatalogRegistrationSource = {
     await generateWorkflowCatalogArtifacts({
       rootDirectory,
       sharedSource: {
+        source: { id: 'oss', label: 'OSS' },
         sourceFiles: [sharedSourcePath],
         register: () => undefined,
       },
@@ -564,6 +578,70 @@ export const workflowCatalogRegistrationSource = {
     );
   });
 
+  it.each([
+    {
+      sourceDeclaration: '',
+      sourceDescription: 'missing',
+    },
+    {
+      sourceDeclaration: "source: { id: 'oss', label: 'OSS' },",
+      sourceDescription: 'mismatched',
+    },
+  ])(
+    'rejects a $sourceDescription local registration source before artifact verification',
+    async ({ sourceDeclaration }) => {
+      const rootDirectory = await createTemporaryDirectory();
+      const sharedSourcePath = 'shared-registrations.ts';
+      const sharedArtifactPath = 'catalog.generated.json';
+      const localModulePath = 'workflow-catalog.local/registration.ts';
+      const localArtifactPath = 'workflow-catalog.local/catalog.generated.json';
+      const sharedRegistry = createWorkflowCatalogRegistry();
+      const sharedSource = {
+        source: { id: 'oss', label: 'OSS' },
+        sourceFiles: [sharedSourcePath],
+        register: () => undefined,
+      };
+
+      await writeFile(join(rootDirectory, sharedSourcePath), 'export {};\n');
+      await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
+        recursive: true,
+      });
+      await writeFile(
+        join(rootDirectory, localModulePath),
+        `export const workflowCatalogRegistrationSource = {
+  ${sourceDeclaration}
+  sourceFiles: ['workflow-catalog.local/registration.ts'],
+  register() {},
+};
+`,
+      );
+      await writeFile(
+        join(rootDirectory, localArtifactPath),
+        '{"sourceHash":"stale","descriptors":[]}\n',
+      );
+      await generateWorkflowCatalogArtifact({
+        rootDirectory,
+        sourceFiles: sharedSource.sourceFiles,
+        artifactPath: sharedArtifactPath,
+        registry: sharedRegistry,
+        source: sharedSource.source,
+      });
+
+      await expect(
+        verifyWorkflowCatalogArtifacts({
+          rootDirectory,
+          sharedSource,
+          sharedArtifactPath,
+          localModulePath,
+          localFallback: localRegistrationFallback,
+          localArtifactPath,
+        }),
+      ).rejects.toThrow(
+        'Local workflow catalog registration source must declare source {"id":"local","label":"Local"}',
+      );
+    },
+  );
+
   it('validates shared and local registrations together while emitting separate descriptors', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const sharedSourcePath = 'shared-registrations.ts';
@@ -588,6 +666,7 @@ export const workflowCatalogRegistrationSource = {
       join(rootDirectory, localModulePath),
       `const activity = () => 'local';
 export const workflowCatalogRegistrationSource = {
+  source: { id: 'local', label: 'Local' },
   sourceFiles: ['workflow-catalog.local/registration.ts'],
   register(registry) {
     registry.registerExample({
@@ -615,6 +694,7 @@ export const workflowCatalogRegistrationSource = {
     await generateWorkflowCatalogArtifacts({
       rootDirectory,
       sharedSource: {
+        source: { id: 'oss', label: 'OSS' },
         sourceFiles: [sharedSourcePath],
         register: (registry) =>
           registry.registerTarget({
@@ -645,11 +725,21 @@ export const workflowCatalogRegistrationSource = {
           join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
           'utf8',
         ),
-      ).descriptors.map(({ id, source }: { id: string; source?: string }) => ({
-        id,
-        source,
-      })),
-    ).toEqual([{ id: 'local-on-shared-target', source: 'local' }]);
+      ).descriptors.map(
+        ({
+          id,
+          source,
+        }: {
+          id: string;
+          source?: { id: string; label: string };
+        }) => ({ id, source }),
+      ),
+    ).toEqual([
+      {
+        id: 'local-on-shared-target',
+        source: { id: 'local', label: 'Local' },
+      },
+    ]);
   });
 
   it('classifies shared routing changes used by local descriptors as registration-source drift', async () => {
@@ -660,6 +750,7 @@ export const workflowCatalogRegistrationSource = {
       'src/lib/workflow-catalog/node/local-registration-fallback.ts';
     let sharedTaskQueue = 'shared-catalog-v1';
     const sharedSource = {
+      source: { id: 'oss', label: 'OSS' },
       sourceFiles: [sharedSourcePath],
       register: (registry: ReturnType<typeof createWorkflowCatalogRegistry>) =>
         registry.registerTarget({
@@ -688,6 +779,7 @@ export const workflowCatalogRegistrationSource = {
       join(rootDirectory, localModulePath),
       `const activity = () => 'local';
 export const workflowCatalogRegistrationSource = {
+  source: { id: 'local', label: 'Local' },
   sourceFiles: ['workflow-catalog.local/registration.ts'],
   register(registry) {
     registry.registerExample({
@@ -736,6 +828,7 @@ export const workflowCatalogRegistrationSource = {
       sourceFiles: sharedSource.sourceFiles,
       artifactPath: options.sharedArtifactPath,
       registry: updatedSharedRegistry,
+      source: sharedSource.source,
     });
 
     await expect(verifyWorkflowCatalogArtifacts(options)).rejects.toThrowError(
@@ -772,6 +865,7 @@ export const workflowCatalogRegistrationSource = {
       await writeFile(
         join(rootDirectory, localModulePath),
         `export const workflowCatalogRegistrationSource = {
+  source: { id: 'local', label: 'Local' },
   sourceFiles: ['workflow-catalog.local/registration.ts'],
   register(registry) {
     ${localRegistration}
@@ -784,6 +878,7 @@ export const workflowCatalogRegistrationSource = {
         generateWorkflowCatalogArtifacts({
           rootDirectory,
           sharedSource: {
+            source: { id: 'oss', label: 'OSS' },
             sourceFiles: [sharedSourcePath],
             register: (registry) => {
               registry.registerTarget({
@@ -1220,10 +1315,12 @@ registry.registerExample({
         [
           "import { workflowCatalog } from '@temporalio/ui/workflow-catalog/browser/catalog';",
           "import { resolveWorkflowCatalogRouting } from '@temporalio/ui/workflow-catalog/browser/routing';",
-          "import Workbench from '@temporalio/ui/workflow-catalog/browser/workbench.svelte';",
+          "import CatalogDetail from '@temporalio/ui/workflow-catalog/browser/catalog-detail.svelte';",
+          "import CatalogList from '@temporalio/ui/workflow-catalog/browser/catalog-list.svelte';",
           "const [target] = resolveWorkflowCatalogRouting([{ targetId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
           'document.body.dataset.workflowCatalogSize = String(workflowCatalog.length);',
-          'document.body.dataset.workflowCatalogWorkbench = typeof Workbench;',
+          'document.body.dataset.workflowCatalogDetail = typeof CatalogDetail;',
+          'document.body.dataset.workflowCatalogList = typeof CatalogList;',
           'document.body.dataset.workflowCatalogNamespace = target.namespace;',
         ].join('\n'),
       );
