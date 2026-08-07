@@ -29,6 +29,7 @@ import { createWorkflowCatalogRegistry } from '../../src/lib/workflow-catalog/no
 
 const temporaryDirectories: string[] = [];
 const execFileAsync = promisify(execFile);
+const workflowCatalogCommandTestTimeoutMs = 30_000;
 const packageConsumerTest =
   process.env.WORKFLOW_CATALOG_PACKAGE_TEST === '1' ? it : it.skip;
 
@@ -1396,64 +1397,72 @@ registry.registerExample({
     120_000,
   );
 
-  it('exposes generate and verify pnpm commands with correct exit status', async () => {
-    const sharedArtifactPath =
-      'src/lib/workflow-catalog/browser/catalog.generated.json';
+  it(
+    'exposes generate and verify pnpm commands with correct exit status',
+    async () => {
+      const sharedArtifactPath =
+        'src/lib/workflow-catalog/browser/catalog.generated.json';
 
-    await execFileAsync('pnpm', ['workflow-catalog:generate']);
+      await execFileAsync('pnpm', ['workflow-catalog:generate']);
 
-    try {
-      await expect(
-        execFileAsync('pnpm', ['workflow-catalog:verify']),
-      ).resolves.toMatchObject({ stderr: '' });
-
-      const artifact = JSON.parse(await readFile(sharedArtifactPath, 'utf8'));
-      artifact.descriptors.push({ manuallyEdited: true });
-      await writeFile(
-        sharedArtifactPath,
-        `${JSON.stringify(artifact, null, 2)}\n`,
-      );
-
-      let verifyFailure: unknown;
       try {
-        await execFileAsync('pnpm', ['workflow-catalog:verify']);
+        await expect(
+          execFileAsync('pnpm', ['workflow-catalog:verify']),
+        ).resolves.toMatchObject({ stderr: '' });
+
+        const artifact = JSON.parse(await readFile(sharedArtifactPath, 'utf8'));
+        artifact.descriptors.push({ manuallyEdited: true });
+        await writeFile(
+          sharedArtifactPath,
+          `${JSON.stringify(artifact, null, 2)}\n`,
+        );
+
+        let verifyFailure: unknown;
+        try {
+          await execFileAsync('pnpm', ['workflow-catalog:verify']);
+        } catch (error) {
+          verifyFailure = error;
+        }
+
+        expect(verifyFailure).toMatchObject({ code: 1 });
+        expect(
+          `${(verifyFailure as { stdout?: string }).stdout ?? ''}${
+            (verifyFailure as { stderr?: string }).stderr ?? ''
+          }`,
+        ).toContain('has generated output drift');
+      } finally {
+        await execFileAsync('pnpm', ['workflow-catalog:generate']);
+      }
+    },
+    workflowCatalogCommandTestTimeoutMs,
+  );
+
+  it(
+    'exposes a separate workflow catalog worker development command that reports its first preflight failure clearly',
+    async () => {
+      let commandFailure: unknown;
+
+      try {
+        await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
+          env: {
+            ...process.env,
+            TEMPORAL_ADDRESS: '',
+            TEMPORAL_NAMESPACE: '',
+          },
+        });
       } catch (error) {
-        verifyFailure = error;
+        commandFailure = error;
       }
 
-      expect(verifyFailure).toMatchObject({ code: 1 });
+      expect(commandFailure).toMatchObject({ code: 1 });
       expect(
-        `${(verifyFailure as { stdout?: string }).stdout ?? ''}${
-          (verifyFailure as { stderr?: string }).stderr ?? ''
+        `${(commandFailure as { stdout?: string }).stdout ?? ''}${
+          (commandFailure as { stderr?: string }).stderr ?? ''
         }`,
-      ).toContain('has generated output drift');
-    } finally {
-      await execFileAsync('pnpm', ['workflow-catalog:generate']);
-    }
-  });
-
-  it('exposes a separate workflow catalog worker development command that reports its first preflight failure clearly', async () => {
-    let commandFailure: unknown;
-
-    try {
-      await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
-        env: {
-          ...process.env,
-          TEMPORAL_ADDRESS: '',
-          TEMPORAL_NAMESPACE: '',
-        },
-      });
-    } catch (error) {
-      commandFailure = error;
-    }
-
-    expect(commandFailure).toMatchObject({ code: 1 });
-    expect(
-      `${(commandFailure as { stdout?: string }).stdout ?? ''}${
-        (commandFailure as { stderr?: string }).stderr ?? ''
-      }`,
-    ).toContain('TEMPORAL_NAMESPACE is required');
-  });
+      ).toContain('TEMPORAL_NAMESPACE is required');
+    },
+    workflowCatalogCommandTestTimeoutMs,
+  );
 
   it('reports an unknown selected development target before connecting', async () => {
     let commandFailure: unknown;
@@ -1479,40 +1488,47 @@ registry.registerExample({
     ).toContain('Workflow catalog target "missing-target" was not found');
   });
 
-  it('rejects stale artifacts before development can load or rewrite them', async () => {
-    const sharedSourcePath =
-      'src/lib/workflow-catalog/node/shared-registrations.ts';
-    const sharedArtifactPath =
-      'src/lib/workflow-catalog/browser/catalog.generated.json';
-    const originalSource = await readFile(sharedSourcePath, 'utf8');
+  it(
+    'rejects stale artifacts before development can load or rewrite them',
+    async () => {
+      const sharedSourcePath =
+        'src/lib/workflow-catalog/node/shared-registrations.ts';
+      const sharedArtifactPath =
+        'src/lib/workflow-catalog/browser/catalog.generated.json';
+      const originalSource = await readFile(sharedSourcePath, 'utf8');
 
-    await execFileAsync('pnpm', ['workflow-catalog:generate']);
-    const generatedArtifactContent = await readFile(sharedArtifactPath, 'utf8');
-    await writeFile(sharedSourcePath, `${originalSource}\n`);
-
-    try {
-      let commandFailure: unknown;
+      await execFileAsync('pnpm', ['workflow-catalog:generate']);
+      const generatedArtifactContent = await readFile(
+        sharedArtifactPath,
+        'utf8',
+      );
+      await writeFile(sharedSourcePath, `${originalSource}\n`);
 
       try {
-        await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
-          env: { ...process.env, TEMPORAL_ADDRESS: '' },
-        });
-      } catch (error) {
-        commandFailure = error;
-      }
+        let commandFailure: unknown;
 
-      expect(commandFailure).toMatchObject({ code: 1 });
-      expect(
-        `${(commandFailure as { stdout?: string }).stdout ?? ''}${
-          (commandFailure as { stderr?: string }).stderr ?? ''
-        }`,
-      ).toContain('is stale because registration sources changed');
-      await expect(readFile(sharedArtifactPath, 'utf8')).resolves.toBe(
-        generatedArtifactContent,
-      );
-    } finally {
-      await writeFile(sharedSourcePath, originalSource);
-      await execFileAsync('pnpm', ['workflow-catalog:generate']);
-    }
-  });
+        try {
+          await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
+            env: { ...process.env, TEMPORAL_ADDRESS: '' },
+          });
+        } catch (error) {
+          commandFailure = error;
+        }
+
+        expect(commandFailure).toMatchObject({ code: 1 });
+        expect(
+          `${(commandFailure as { stdout?: string }).stdout ?? ''}${
+            (commandFailure as { stderr?: string }).stderr ?? ''
+          }`,
+        ).toContain('is stale because registration sources changed');
+        await expect(readFile(sharedArtifactPath, 'utf8')).resolves.toBe(
+          generatedArtifactContent,
+        );
+      } finally {
+        await writeFile(sharedSourcePath, originalSource);
+        await execFileAsync('pnpm', ['workflow-catalog:generate']);
+      }
+    },
+    workflowCatalogCommandTestTimeoutMs,
+  );
 });
