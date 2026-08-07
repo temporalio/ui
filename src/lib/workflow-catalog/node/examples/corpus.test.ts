@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { sharedWorkflowCorpusInventory } from './inventory';
-import validateJsonSchema from '../../browser/schema-validator';
+import { greet } from './activities.js';
+import { sharedWorkflowCorpusInventory } from './inventory.js';
+import { priorityFairnessWorkflow } from './priority-fairness/workflow.js';
+import validateJsonSchema from '../../browser/schema-validator.js';
 import {
   createWorkflowCatalogRegistry,
   generateWorkflowCatalog,
-} from '../registry';
-import { workflowCatalogRegistrationSource } from '../shared-registrations';
+} from '../registry.js';
+import { workflowCatalogRegistrationSource } from '../shared-registrations.js';
 
-const exampleIds = [
+const migratedExampleIds = [
   'hello',
   'parallel-activities',
   'sequential-activities',
@@ -25,7 +27,7 @@ const exampleIds = [
   'signal-collector',
 ] as const;
 
-const workflowTypes = [
+const migratedWorkflowTypes = [
   'hello',
   'parallelActivities',
   'sequentialActivities',
@@ -41,6 +43,8 @@ const workflowTypes = [
   'patchWorkflow',
   'signalCollector',
 ] as const;
+
+const proofExampleIds = ['priority-fairness', 'standalone-activity'] as const;
 
 describe('shared workflow corpus', () => {
   it('registers one shared-workflows target with committed default routing', () => {
@@ -58,22 +62,29 @@ describe('shared workflow corpus', () => {
     ]);
   });
 
-  it('exposes the approved canary workflows as executable examples with positional input documents', () => {
+  it('distinguishes migrated workflows from net-new proof examples', () => {
     const registry = createWorkflowCatalogRegistry();
 
     workflowCatalogRegistrationSource.register(registry);
     const generated = generateWorkflowCatalog(registry);
 
-    expect(generated.browserDescriptors.map(({ id }) => id)).toEqual(
-      exampleIds,
+    const migratedDescriptors = generated.browserDescriptors.slice(
+      0,
+      migratedExampleIds.length,
     );
+    const proofDescriptors = generated.browserDescriptors.slice(
+      migratedExampleIds.length,
+    );
+
+    expect(migratedDescriptors.map(({ id }) => id)).toEqual(migratedExampleIds);
+    expect(proofDescriptors.map(({ id }) => id)).toEqual(proofExampleIds);
     expect(
-      generated.browserDescriptors.map(({ execution }) =>
-        execution.kind === 'workflow' ? execution.workflowType : execution.kind,
+      migratedDescriptors.map(({ execution }) =>
+        execution.kind === 'workflow' ? execution.workflowType : undefined,
       ),
-    ).toEqual(workflowTypes);
+    ).toEqual(migratedWorkflowTypes);
     expect(
-      generated.browserDescriptors.every(
+      migratedDescriptors.every(
         ({ capabilityTags, expectedEvidence, input, startOptions }) =>
           capabilityTags.length > 0 &&
           expectedEvidence.length > 0 &&
@@ -92,9 +103,11 @@ describe('shared workflow corpus', () => {
     ).toBe('Timer-driven repeated activities');
 
     const target = registry.targets[0];
-    expect(Object.keys(target?.workflowExports ?? {})).toEqual(workflowTypes);
+    expect(Object.keys(target?.workflowExports ?? {})).toEqual([
+      ...migratedWorkflowTypes,
+      'priorityFairnessWorkflow',
+    ]);
     for (const example of registry.examples) {
-      expect(example.execution.kind).toBe('workflow');
       if (example.execution.kind !== 'workflow' || !target) continue;
       expect(target.workflowExports[example.execution.workflowType]).toBe(
         example.execution.workflow,
@@ -102,17 +115,230 @@ describe('shared workflow corpus', () => {
     }
   });
 
-  it('leaves workflow IDs unset so Quick Run can create a new execution each time', () => {
+  it('exposes priority and fairness settings that the greeting activity inherits', async () => {
+    const registry = createWorkflowCatalogRegistry();
+
+    workflowCatalogRegistrationSource.register(registry);
+    const generated = generateWorkflowCatalog(registry);
+    const example = generated.browserDescriptors.find(
+      ({ id }) => id === 'priority-fairness',
+    );
+    const target = registry.targets[0];
+    const binding = generated.nodeBindings[0];
+
+    expect(example).toMatchObject({
+      id: 'priority-fairness',
+      title: 'Priority and fairness',
+      capabilityTags: ['priority-fairness', 'activities'],
+      expectedEvidence: [
+        'Workflow details show priority and fairness fields; the scheduled activity attributes show inherited priority.',
+      ],
+      input: {
+        defaultValue: [],
+        schema: { type: 'array', items: false, maxItems: 0 },
+      },
+      startOptions: {
+        defaultValue: {
+          priority: {
+            priorityKey: 1,
+            fairnessKey: 'workflow-catalog',
+            fairnessWeight: 2,
+          },
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            workflowId: { type: 'string', minLength: 1 },
+            priority: {
+              type: 'object',
+              properties: {
+                priorityKey: { type: 'integer', minimum: 1 },
+                fairnessKey: { type: 'string', minLength: 1 },
+                fairnessWeight: {
+                  type: 'number',
+                  minimum: 0.001,
+                  maximum: 1000,
+                },
+              },
+              required: ['priorityKey', 'fairnessKey', 'fairnessWeight'],
+              additionalProperties: false,
+            },
+          },
+          required: ['priority'],
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        workflowType: 'priorityFairnessWorkflow',
+      },
+    });
+    await expect(
+      validateJsonSchema(example!.input.schema, example!.input.defaultValue),
+    ).resolves.toBe(true);
+    await expect(
+      validateJsonSchema(
+        example!.startOptions.schema,
+        example!.startOptions.defaultValue,
+      ),
+    ).resolves.toBe(true);
+    await expect(
+      validateJsonSchema(example!.startOptions.schema, {
+        priority: {
+          priorityKey: 1,
+          fairnessKey: 'workflow-catalog',
+          fairnessWeight: 2,
+        },
+        workflowId: 'generated-workflow-id',
+      }),
+    ).resolves.toBe(true);
+    await expect(
+      validateJsonSchema(example!.startOptions.schema, {
+        priority: {
+          priorityKey: 6,
+          fairnessKey: 'workflow-catalog',
+          fairnessWeight: 0.001,
+        },
+      }),
+    ).resolves.toBe(true);
+    await expect(
+      validateJsonSchema(example!.startOptions.schema, {
+        priority: {
+          priorityKey: 6,
+          fairnessKey: 'workflow-catalog',
+          fairnessWeight: 1000,
+        },
+      }),
+    ).resolves.toBe(true);
+    await expect(
+      validateJsonSchema(example!.startOptions.schema, {
+        priority: {
+          priorityKey: 6,
+          fairnessKey: 'workflow-catalog',
+          fairnessWeight: 0.0009,
+        },
+      }),
+    ).resolves.toBe(false);
+    await expect(
+      validateJsonSchema(example!.startOptions.schema, {
+        priority: {
+          priorityKey: 6,
+          fairnessKey: 'workflow-catalog',
+          fairnessWeight: 1000.1,
+        },
+      }),
+    ).resolves.toBe(false);
+    await expect(
+      validateJsonSchema(example!.startOptions.schema, {
+        priority: {
+          priorityKey: 1,
+          fairnessKey: 'workflow-catalog',
+          fairnessWeight: 2,
+        },
+        memo: { fields: {} },
+      }),
+    ).resolves.toBe(true);
+    expect(target?.workflowExports.priorityFairnessWorkflow).toBe(
+      priorityFairnessWorkflow,
+    );
+    expect(binding?.activities.greet).toBe(greet);
+  });
+
+  it('exposes a directly executable standalone activity without a workflow execution', async () => {
+    const registry = createWorkflowCatalogRegistry();
+
+    workflowCatalogRegistrationSource.register(registry);
+    const generated = generateWorkflowCatalog(registry);
+    const example = generated.browserDescriptors.find(
+      ({ id }) => id === 'standalone-activity',
+    );
+    const registration = registry.examples.find(
+      ({ id }) => id === 'standalone-activity',
+    );
+    const binding = generated.nodeBindings[0];
+
+    expect(example).toMatchObject({
+      id: 'standalone-activity',
+      title: 'Standalone activity',
+      expectedEvidence: [
+        'Standalone Activity details and result are available without a Workflow execution.',
+      ],
+      input: {
+        defaultValue: { name: 'Temporal' },
+        schema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', minLength: 1 },
+          },
+          required: ['name'],
+          additionalProperties: false,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      execution: {
+        kind: 'standalone-activity',
+        activityType: 'standalone-activity',
+        timeouts: {
+          scheduleToCloseTimeout: '60s',
+          startToCloseTimeout: '30s',
+        },
+        policies: { retryPolicy: { maximumAttempts: 3 } },
+      },
+    });
+    await expect(
+      validateJsonSchema(example!.input.schema, example!.input.defaultValue),
+    ).resolves.toBe(true);
+    await expect(
+      validateJsonSchema(example!.input.schema, { name: '' }),
+    ).resolves.toBe(false);
+    await expect(
+      validateJsonSchema(example!.input.schema, {
+        name: 'Temporal',
+        unexpected: true,
+      }),
+    ).resolves.toBe(false);
+    await expect(
+      validateJsonSchema(
+        example!.startOptions.schema,
+        example!.startOptions.defaultValue,
+      ),
+    ).resolves.toBe(true);
+    await expect(
+      validateJsonSchema(example!.startOptions.schema, {
+        priority: { priorityKey: 1 },
+        summary: 'standalone catalog activity',
+      }),
+    ).resolves.toBe(true);
+    expect(registration?.execution.kind).toBe('standalone-activity');
+    if (registration?.execution.kind !== 'standalone-activity') return;
+    await expect(
+      registration.execution.activity({ name: 'Temporal' } as never),
+    ).resolves.toBe('Guten tag Temporal!');
+    expect(
+      binding?.examples.find(({ id }) => id === 'standalone-activity')
+        ?.execution,
+    ).toBe(registration.execution);
+    expect(binding?.activities['standalone-activity']).toBe(
+      registration.execution.activity,
+    );
+  });
+
+  it('leaves migrated workflow IDs unset so Quick Run can create a new execution each time', () => {
     const registry = createWorkflowCatalogRegistry();
 
     workflowCatalogRegistrationSource.register(registry);
     const generated = generateWorkflowCatalog(registry);
 
     expect(
-      generated.browserDescriptors.map(
-        ({ startOptions }) => startOptions.defaultValue,
-      ),
-    ).toEqual(exampleIds.map(() => ({})));
+      generated.browserDescriptors
+        .slice(0, migratedExampleIds.length)
+        .map(({ startOptions }) => startOptions.defaultValue),
+    ).toEqual(migratedExampleIds.map(() => ({})));
   });
 
   it('generates a valid zero-argument schema for child workflows', async () => {
@@ -227,12 +453,16 @@ describe('shared workflow corpus', () => {
     expect(workflowCatalogRegistrationSource.sourceFiles).toEqual([
       'src/lib/workflow-catalog/node/shared-registrations.ts',
       'src/lib/workflow-catalog/node/workflows.ts',
+      'src/lib/workflow-catalog/node/examples/inventory.ts',
       'src/lib/workflow-catalog/node/examples/index.ts',
       'src/lib/workflow-catalog/node/examples/activities.ts',
-      'src/lib/workflow-catalog/node/examples/inventory.ts',
       'src/lib/workflow-catalog/node/examples/registrations.ts',
       'src/lib/workflow-catalog/node/examples/schemas.ts',
       'src/lib/workflow-catalog/node/examples/workflows.ts',
+      'src/lib/workflow-catalog/node/examples/priority-fairness/example.ts',
+      'src/lib/workflow-catalog/node/examples/priority-fairness/workflow.ts',
+      'src/lib/workflow-catalog/node/examples/standalone-activity/example.ts',
+      'src/lib/workflow-catalog/node/examples/standalone-activity/activity.ts',
     ]);
   });
 });

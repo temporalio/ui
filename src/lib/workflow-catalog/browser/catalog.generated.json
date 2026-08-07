@@ -1,5 +1,5 @@
 {
-  "sourceHash": "e2b8466ade066ee741bcd057131c320ee296695f1671d67fed52099e6916df7a",
+  "sourceHash": "cce283ddedba882e58e7cbc5b1d2c01c46a6a18d36ce1a6d2d9c6f6641085786",
   "descriptors": [
     {
       "id": "hello",
@@ -541,6 +541,92 @@
         "namespace": "default",
         "taskQueue": "ui-workflow-catalog",
         "workflowType": "signalCollector"
+      },
+      "source": "shared"
+    },
+    {
+      "id": "priority-fairness",
+      "title": "Priority and fairness",
+      "description": "Starts a prioritized workflow whose activity inherits its priority.",
+      "capabilityTags": ["priority-fairness", "activities"],
+      "expectedEvidence": [
+        "Workflow details show priority and fairness fields; the scheduled activity attributes show inherited priority."
+      ],
+      "input": {
+        "defaultValue": [],
+        "schema": { "type": "array", "items": false, "maxItems": 0 }
+      },
+      "startOptions": {
+        "defaultValue": {
+          "priority": {
+            "priorityKey": 1,
+            "fairnessKey": "workflow-catalog",
+            "fairnessWeight": 2
+          }
+        },
+        "schema": {
+          "type": "object",
+          "properties": {
+            "workflowId": { "type": "string", "minLength": 1 },
+            "priority": {
+              "type": "object",
+              "properties": {
+                "priorityKey": { "type": "integer", "minimum": 1 },
+                "fairnessKey": { "type": "string", "minLength": 1 },
+                "fairnessWeight": {
+                  "type": "number",
+                  "minimum": 0.001,
+                  "maximum": 1000
+                }
+              },
+              "required": ["priorityKey", "fairnessKey", "fairnessWeight"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["priority"]
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-workflow-catalog",
+        "workflowType": "priorityFairnessWorkflow"
+      },
+      "source": "shared"
+    },
+    {
+      "id": "standalone-activity",
+      "title": "Standalone activity",
+      "description": "Runs an Activity directly without a Workflow execution.",
+      "capabilityTags": ["activities", "standalone", "terminal-outcome"],
+      "expectedEvidence": [
+        "Standalone Activity details and result are available without a Workflow execution."
+      ],
+      "input": {
+        "defaultValue": { "name": "Temporal" },
+        "schema": {
+          "type": "object",
+          "properties": { "name": { "type": "string", "minLength": 1 } },
+          "required": ["name"],
+          "additionalProperties": false
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": { "type": "object", "properties": {} }
+      },
+      "execution": {
+        "kind": "standalone-activity",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-workflow-catalog",
+        "activityType": "standalone-activity",
+        "timeouts": {
+          "scheduleToCloseTimeout": "60s",
+          "startToCloseTimeout": "30s"
+        },
+        "policies": { "retryPolicy": { "maximumAttempts": 3 } }
       },
       "source": "shared"
     }

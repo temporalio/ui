@@ -1,4 +1,4 @@
-import type { WorkflowExampleRegistration } from '../registry.js';
+import type { WorkflowCatalogExampleRegistration } from '../registry.js';
 import * as activities from './activities.js';
 import { exampleInputs, workflowStartOptions } from './schemas.js';
 import {
@@ -20,7 +20,7 @@ import {
 
 const targetId = 'shared-workflows';
 
-export const sharedWorkflowExamples: WorkflowExampleRegistration[] = [
+export const sharedWorkflowExamples: WorkflowCatalogExampleRegistration[] = [
   {
     id: 'hello',
     title: 'Hello activity',

@@ -14,3 +14,4 @@ export {
   patchWorkflow,
   signalCollector,
 } from './examples/workflows.js';
+export { priorityFairnessWorkflow } from './examples/priority-fairness/workflow.js';
