@@ -42,9 +42,10 @@ export type DescribeFullSchedule = DescribeScheduleResponse & {
 };
 
 /**
- * A row in the schedule's recent runs list. `status` starts out as the status
- * recorded on the action and is replaced by the live one once visibility
- * answers.
+ * A row in the schedule's recent runs list. `status` and `runId` start out as
+ * the ones recorded on the action; once visibility answers they are replaced
+ * by the matching execution's, which for a continue-as-new chain is the latest
+ * run rather than the one the schedule started.
  */
 export type RecentScheduleRun = {
   workflowId: string;

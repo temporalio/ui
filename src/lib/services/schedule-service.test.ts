@@ -27,8 +27,12 @@ const action = (
 const scheduleWith = (actions: unknown[]) =>
   ({ info: { recentActions: actions } }) as unknown as DescribeFullSchedule;
 
-const execution = (id: string, startTime: string, status: string) =>
-  ({ id, startTime, status }) as unknown as WorkflowExecution;
+const execution = (
+  id: string,
+  startTime: string,
+  status: string,
+  runId = `${id}-run`,
+) => ({ id, runId, startTime, status }) as unknown as WorkflowExecution;
 
 describe('toRecentScheduleRuns', () => {
   test('sorts by actual time descending and caps the list', () => {
@@ -105,12 +109,26 @@ describe('withLatestWorkflowStatuses', () => {
 
   test('uses the newest execution of a continue-as-new chain', () => {
     const merged = withLatestWorkflowStatuses(runs, [
-      execution('a', '2026-08-01T00:00:00Z', 'ContinuedAsNew'),
-      execution('a', '2026-08-05T00:00:00Z', 'Failed'),
-      execution('a', '2026-08-03T00:00:00Z', 'ContinuedAsNew'),
+      execution('a', '2026-08-01T00:00:00Z', 'ContinuedAsNew', 'a-run-1'),
+      execution('a', '2026-08-05T00:00:00Z', 'Failed', 'a-run-3'),
+      execution('a', '2026-08-03T00:00:00Z', 'ContinuedAsNew', 'a-run-2'),
     ]);
 
-    expect(merged.find((run) => run.workflowId === 'a')?.status).toBe('Failed');
+    expect(merged.find((run) => run.workflowId === 'a')).toMatchObject({
+      status: 'Failed',
+      runId: 'a-run-3',
+    });
+  });
+
+  test('keeps the recorded run id when the execution has none', () => {
+    const merged = withLatestWorkflowStatuses(runs, [
+      execution('a', '2026-08-01T00:00:00Z', 'Completed', ''),
+    ]);
+
+    expect(merged.find((run) => run.workflowId === 'a')).toMatchObject({
+      status: 'Completed',
+      runId: 'a-run',
+    });
   });
 
   test('leaves runs untouched when visibility returns nothing', () => {

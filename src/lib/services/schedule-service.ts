@@ -141,7 +141,11 @@ export const withLatestWorkflowStatuses = (
     if (!workflow) {
       return run;
     }
-    return { ...run, status: workflow.status };
+    return {
+      ...run,
+      status: workflow.status,
+      runId: workflow.runId || run.runId,
+    };
   });
 };
 
