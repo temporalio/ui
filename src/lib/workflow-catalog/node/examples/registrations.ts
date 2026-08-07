@@ -3,92 +3,16 @@ import * as activities from './activities.js';
 import { exampleInputs, workflowStartOptions } from './schemas.js';
 import {
   childWorkflowTest,
-  heartbeatWorkflow,
   highEventCountWorkflow,
   localActivityWorkflow,
   patchWorkflow,
-  retryWorkflow,
   scheduleWorkflow,
   signalCollector,
-  signalWorkflow,
-  timeoutWorkflow,
 } from './workflows.js';
 
 const targetId = 'shared-workflows';
 
 export const sharedWorkflowExamples: WorkflowCatalogExampleRegistration[] = [
-  {
-    id: 'activity-timeout',
-    title: 'Activity timeout',
-    description: 'Demonstrates a start-to-close activity timeout.',
-    targetId,
-    capabilityTags: ['activities', 'timeouts'],
-    expectedEvidence: [
-      'A timed-out activity attempt and a workflow result that identifies the timeout.',
-    ],
-    input: exampleInputs.timeoutWorkflow,
-    startOptions: workflowStartOptions('activity-timeout'),
-    execution: {
-      kind: 'workflow',
-      workflowType: 'timeoutWorkflow',
-      workflow: timeoutWorkflow,
-      activities: { timeoutActivity: activities.timeoutActivity },
-    },
-  },
-  {
-    id: 'activity-retry',
-    title: 'Activity retry',
-    description: 'Fails deterministic activity attempts before succeeding.',
-    targetId,
-    capabilityTags: ['activities', 'retries'],
-    expectedEvidence: [
-      'Failed activity attempts followed by success within the retry policy.',
-    ],
-    input: exampleInputs.retryWorkflow,
-    startOptions: workflowStartOptions('activity-retry'),
-    execution: {
-      kind: 'workflow',
-      workflowType: 'retryWorkflow',
-      workflow: retryWorkflow,
-      activities: { retryActivity: activities.retryActivity },
-    },
-  },
-  {
-    id: 'signal-handlers',
-    title: 'Bounded signal handlers',
-    description: 'Handles data and completion signals with bounded waits.',
-    targetId,
-    capabilityTags: ['signals', 'queries', 'timeouts'],
-    expectedEvidence: [
-      'Signal events, queryable state changes, and completion or timeout evidence.',
-    ],
-    input: exampleInputs.signalWorkflow,
-    startOptions: workflowStartOptions('signal-handlers'),
-    execution: {
-      kind: 'workflow',
-      workflowType: 'signalWorkflow',
-      workflow: signalWorkflow,
-      activities: { signalActivity: activities.signalActivity },
-    },
-  },
-  {
-    id: 'activity-heartbeat',
-    title: 'Activity heartbeats',
-    description: 'Reports progress while an activity processes several steps.',
-    targetId,
-    capabilityTags: ['activities', 'heartbeats'],
-    expectedEvidence: [
-      'Heartbeat details advance through the configured number of steps.',
-    ],
-    input: exampleInputs.heartbeatWorkflow,
-    startOptions: workflowStartOptions('activity-heartbeat'),
-    execution: {
-      kind: 'workflow',
-      workflowType: 'heartbeatWorkflow',
-      workflow: heartbeatWorkflow,
-      activities: { heartbeatActivity: activities.heartbeatActivity },
-    },
-  },
   {
     id: 'timer-driven-repetition',
     title: 'Timer-driven repeated activities',

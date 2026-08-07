@@ -2,6 +2,18 @@ import type {
   WorkflowCatalogExampleRegistration,
   WorkflowImplementation,
 } from '../registry.js';
+import {
+  activityHeartbeatExample,
+  activityHeartbeatSourceFiles,
+} from './activity-heartbeat/example.js';
+import {
+  activityRetryExample,
+  activityRetrySourceFiles,
+} from './activity-retry/example.js';
+import {
+  activityTimeoutExample,
+  activityTimeoutSourceFiles,
+} from './activity-timeout/example.js';
 import { helloExample, helloSourceFiles } from './hello/example.js';
 import {
   longActivityExample,
@@ -20,6 +32,10 @@ import {
   sequentialActivitiesExample,
   sequentialActivitiesSourceFiles,
 } from './sequential-activities/example.js';
+import {
+  signalHandlersExample,
+  signalHandlersSourceFiles,
+} from './signal-handlers/example.js';
 import {
   standaloneActivityExample,
   standaloneActivitySourceFiles,
@@ -53,6 +69,13 @@ const sharedWorkflowDefinitions: readonly WorkflowExampleDefinition[] = [
     sourceFiles: sequentialActivitiesSourceFiles,
   },
   { example: longActivityExample, sourceFiles: longActivitySourceFiles },
+  { example: activityTimeoutExample, sourceFiles: activityTimeoutSourceFiles },
+  { example: activityRetryExample, sourceFiles: activityRetrySourceFiles },
+  { example: signalHandlersExample, sourceFiles: signalHandlersSourceFiles },
+  {
+    example: activityHeartbeatExample,
+    sourceFiles: activityHeartbeatSourceFiles,
+  },
   ...registeredWorkflowExamples.map((example) => ({
     example,
     sourceFiles: [],

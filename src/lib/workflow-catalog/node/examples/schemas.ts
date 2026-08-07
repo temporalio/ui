@@ -34,31 +34,7 @@ const integerArgument = (
   maximum,
 });
 
-const booleanArgument = (title: string): JsonObject => ({
-  title,
-  type: 'boolean',
-});
-
 export const exampleInputs = {
-  timeoutWorkflow: positionalInput(
-    [true],
-    [booleanArgument('Force the activity to time out')],
-  ),
-  retryWorkflow: positionalInput(
-    [2],
-    [integerArgument('Failures before success', 0, 4)],
-  ),
-  signalWorkflow: positionalInput(
-    [30],
-    [integerArgument('Signal wait timeout in seconds', 1, 300)],
-  ),
-  heartbeatWorkflow: positionalInput(
-    [5, 1000],
-    [
-      integerArgument('Heartbeat steps', 1, 25),
-      integerArgument('Step delay in milliseconds', 1, 1000),
-    ],
-  ),
   scheduleWorkflow: positionalInput(
     [2, 3],
     [

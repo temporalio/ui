@@ -1,6 +1,5 @@
 import {
   condition,
-  defineQuery,
   defineSignal,
   deprecatePatch,
   patched,
@@ -16,13 +15,9 @@ import type * as activities from './activities.js';
 import { hello } from './hello/workflow.js';
 import { parallelActivities } from './parallel-activities/workflow.js';
 
-const {
-  generateSummary,
-  heartbeatActivity,
-  processData,
-  processItem,
-  signalActivity,
-} = proxyActivities<typeof activities>({
+const { generateSummary, processData, processItem } = proxyActivities<
+  typeof activities
+>({
   startToCloseTimeout: '30 seconds',
   retry: {
     maximumAttempts: 20,
@@ -32,129 +27,17 @@ const {
   },
 });
 
-const { timeoutActivity } = proxyActivities<typeof activities>({
-  startToCloseTimeout: '1 second',
-  scheduleToStartTimeout: '1 second',
-  retry: { maximumAttempts: 1 },
-});
-
-const { retryActivity } = proxyActivities<typeof activities>({
-  startToCloseTimeout: '10 seconds',
-  retry: {
-    maximumAttempts: 5,
-    initialInterval: '1 second',
-    maximumInterval: '5 seconds',
-    backoffCoefficient: 2,
-  },
-});
-
 const { processData: processLocalData } = proxyLocalActivities<
   typeof activities
 >({
   startToCloseTimeout: '5 seconds',
 });
 
-const testSignal = defineSignal<[string]>('test-signal');
-const completeSignal = defineSignal<[boolean]>('complete-signal');
-const getStateQuery = defineQuery<string>('get-state');
-const getCounterQuery = defineQuery<number>('get-counter');
 const addItemSignal = defineSignal<[string]>('addItem');
 const collectorCompleteSignal = defineSignal('complete');
 
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
-
-const hasFailureName = (error: unknown, expectedName: string): boolean => {
-  let current = error;
-
-  while (current instanceof Error) {
-    if (current.name === expectedName) return true;
-    current = current.cause;
-  }
-
-  return false;
-};
-
-export async function timeoutWorkflow(shouldTimeout = true): Promise<string> {
-  const startedAt = Date.now();
-
-  try {
-    const result = await timeoutActivity(startedAt, shouldTimeout);
-    return shouldTimeout
-      ? `ERROR: Expected timeout but activity completed: ${result}`
-      : `SUCCESS: Activity completed as expected: ${result}`;
-  } catch (error) {
-    if (shouldTimeout && hasFailureName(error, 'TimeoutFailure')) {
-      return `SUCCESS: Activity timed out as expected after ${Date.now() - startedAt}ms`;
-    }
-
-    return `ERROR: Activity failed unexpectedly: ${errorMessage(error)}`;
-  }
-}
-
-export async function retryWorkflow(
-  failuresBeforeSuccess = 2,
-): Promise<string> {
-  try {
-    return `SUCCESS: ${await retryActivity(failuresBeforeSuccess)}`;
-  } catch (error) {
-    return `FAILURE: Activity exhausted retries: ${errorMessage(error)}`;
-  }
-}
-
-export async function signalWorkflow(timeoutSeconds = 30): Promise<string> {
-  let state = 'waiting';
-  let signalReceived = '';
-  let completionRequested: boolean | undefined;
-  let counter = 0;
-
-  setHandler(testSignal, (value) => {
-    signalReceived = value;
-    state = 'signal-received';
-    counter += 1;
-  });
-  setHandler(completeSignal, (shouldComplete) => {
-    completionRequested = shouldComplete;
-    state = shouldComplete ? 'completed' : 'cancelled';
-  });
-  setHandler(getStateQuery, () => state);
-  setHandler(getCounterQuery, () => counter);
-
-  const firstSignalReceived = await condition(
-    () => signalReceived !== '',
-    `${timeoutSeconds} seconds`,
-  );
-  if (!firstSignalReceived) {
-    return `TIMEOUT: No signal received after ${timeoutSeconds}s. State: ${state}, Signals received: ${counter}`;
-  }
-
-  await signalActivity(
-    workflowInfo().workflowId,
-    'test-signal',
-    signalReceived,
-  );
-
-  const completionSignalReceived = await condition(
-    () => completionRequested !== undefined,
-    `${timeoutSeconds} seconds`,
-  );
-  if (!completionSignalReceived) {
-    return `TIMEOUT: No completion signal received after ${timeoutSeconds}s. State: ${state}, Signals received: ${counter}`;
-  }
-
-  return `${completionRequested ? 'SUCCESS' : 'CANCELLED'}: Workflow ${state}. Signals received: ${counter}, Last signal value: ${signalReceived}`;
-}
-
-export async function heartbeatWorkflow(
-  steps = 5,
-  stepDelay = 1000,
-): Promise<string> {
-  try {
-    return `SUCCESS: ${await heartbeatActivity(steps, stepDelay)}`;
-  } catch (error) {
-    return `FAILURE: Heartbeat workflow failed: ${errorMessage(error)}`;
-  }
-}
 
 export async function scheduleWorkflow(
   intervalSeconds = 10,

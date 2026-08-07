@@ -1,0 +1,46 @@
+import { timeoutActivity } from './activity.js';
+import { timeoutWorkflow } from './workflow.js';
+import type { RuntimeJsonDocument } from '../../../browser/types.js';
+import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+
+const input: RuntimeJsonDocument = {
+  defaultValue: [true],
+  schema: {
+    type: 'array',
+    prefixItems: [{ title: 'Force the activity to time out', type: 'boolean' }],
+    items: false,
+    maxItems: 1,
+  },
+};
+const startOptions: RuntimeJsonDocument = {
+  defaultValue: {},
+  schema: {
+    type: 'object',
+    properties: { workflowId: { type: 'string', minLength: 1 } },
+  },
+};
+
+export const activityTimeoutExample: WorkflowCatalogExampleRegistration = {
+  id: 'activity-timeout',
+  title: 'Activity timeout',
+  description: 'Demonstrates a start-to-close activity timeout.',
+  targetId: 'shared-workflows',
+  capabilityTags: ['activities', 'timeouts'],
+  expectedEvidence: [
+    'A timed-out activity attempt and a workflow result that identifies the timeout.',
+  ],
+  input,
+  startOptions,
+  execution: {
+    kind: 'workflow',
+    workflowType: 'timeoutWorkflow',
+    workflow: timeoutWorkflow,
+    activities: { timeoutActivity },
+  },
+};
+
+export const activityTimeoutSourceFiles = [
+  'src/lib/workflow-catalog/node/examples/activity-timeout/example.ts',
+  'src/lib/workflow-catalog/node/examples/activity-timeout/workflow.ts',
+  'src/lib/workflow-catalog/node/examples/activity-timeout/activity.ts',
+] as const;
