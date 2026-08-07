@@ -68,6 +68,9 @@ type (
 		HideWorkflowQueryErrors bool `yaml:"hideWorkflowQueryErrors"`
 		// Whether to disable refreshing workflow counts in UI
 		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
+		// Whether to enable sorting the Workflows table by column. Requires an Elasticsearch
+		// Visibility store with the server's system.visibilityDisableOrderByClause set to false.
+		WorkflowSortingEnabled bool `yaml:"workflowSortingEnabled"`
 		// Whether to disable activity commands in the UI
 		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
