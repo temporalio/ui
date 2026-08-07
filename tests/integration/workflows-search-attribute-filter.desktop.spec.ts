@@ -38,13 +38,13 @@ test('it should update the datetime filter based on the selected timezone', asyn
   await page.getByTestId('toggle-manual-query').click();
   await page
     .getByTestId('workflow-manual-search-input')
-    .fill('`CloseTime`>="2025-12-25T12:00:00.000Z"');
+    .fill('`CloseTime`>="2026-12-25T12:00:00.000Z"');
 
   await page.getByTestId('workflow-manual-search-button').click();
 
   await expect
     .poll(() => getQueryParam(page.url()))
-    .toBe('`CloseTime`>="2025-12-25T12:00:00.000Z"');
+    .toBe('`CloseTime`>="2026-12-25T12:00:00.000Z"');
 
   await expect(
     page.getByRole('button', {
