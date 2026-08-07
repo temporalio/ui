@@ -1,0 +1,44 @@
+name: Storybook A11y
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, 'codefreeze-*']
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  storybook-a11y:
+    runs-on: ubuntu-latest
+    # Report-only for now: runs axe over every Holocene story and surfaces
+    # violations WITHOUT blocking merge, while the known baseline is burned down
+    # (see the PR description). Make it a hard gate by removing `continue-on-error`
+    # once the baseline is clean.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/setup-node
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Build Storybook
+        run: pnpm stories:build
+      - name: Run axe accessibility checks over stories
+        run: |
+          pnpm dlx concurrently -k -s first -n SB,AXE \
+            "pnpm dlx http-server storybook-static -p 6006 -a 127.0.0.1 --silent" \
+            "pnpm dlx wait-on tcp:127.0.0.1:6006 && pnpm stories:test --url http://127.0.0.1:6006"
