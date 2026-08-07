@@ -16,6 +16,14 @@ import {
 } from './activity-timeout/example.js';
 import { helloExample, helloSourceFiles } from './hello/example.js';
 import {
+  highEventCountExample,
+  highEventCountSourceFiles,
+} from './high-event-count/example.js';
+import {
+  localActivityExample,
+  localActivitySourceFiles,
+} from './local-activity/example.js';
+import {
   longActivityExample,
   longActivitySourceFiles,
 } from './long-activity/example.js';
@@ -33,6 +41,10 @@ import {
   sequentialActivitiesSourceFiles,
 } from './sequential-activities/example.js';
 import {
+  signalCollectorExample,
+  signalCollectorSourceFiles,
+} from './signal-collector/example.js';
+import {
   signalHandlersExample,
   signalHandlersSourceFiles,
 } from './signal-handlers/example.js';
@@ -40,6 +52,14 @@ import {
   standaloneActivityExample,
   standaloneActivitySourceFiles,
 } from './standalone-activity/example.js';
+import {
+  timerDrivenRepetitionExample,
+  timerDrivenRepetitionSourceFiles,
+} from './timer-driven-repetition/example.js';
+import {
+  workflowPatchingExample,
+  workflowPatchingSourceFiles,
+} from './workflow-patching/example.js';
 
 type WorkflowExampleDefinition = {
   example: WorkflowCatalogExampleRegistration;
@@ -76,10 +96,21 @@ const sharedWorkflowDefinitions: readonly WorkflowExampleDefinition[] = [
     example: activityHeartbeatExample,
     sourceFiles: activityHeartbeatSourceFiles,
   },
+  {
+    example: timerDrivenRepetitionExample,
+    sourceFiles: timerDrivenRepetitionSourceFiles,
+  },
+  { example: highEventCountExample, sourceFiles: highEventCountSourceFiles },
   ...registeredWorkflowExamples.map((example) => ({
     example,
     sourceFiles: [],
   })),
+  { example: localActivityExample, sourceFiles: localActivitySourceFiles },
+  {
+    example: workflowPatchingExample,
+    sourceFiles: workflowPatchingSourceFiles,
+  },
+  { example: signalCollectorExample, sourceFiles: signalCollectorSourceFiles },
   {
     example: priorityFairnessExample,
     sourceFiles: priorityFairnessSourceFiles,
