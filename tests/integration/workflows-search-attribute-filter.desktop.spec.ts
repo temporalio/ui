@@ -48,7 +48,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await expect(
     page.getByRole('button', {
-      name: 'CloseTime >= 12/25/25, 6:00:00.00 AM CST',
+      name: 'CloseTime >= 12/25/26, 6:00:00.00 AM CST',
     }),
   ).toBeVisible();
 
@@ -68,7 +68,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await expect(
     page.getByRole('button', {
-      name: 'CloseTime >= 12/25/25, 12:00:00.00 PM GMT',
+      name: 'CloseTime >= 12/25/26, 12:00:00.00 PM GMT',
     }),
   ).toBeVisible();
 
