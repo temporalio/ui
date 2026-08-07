@@ -12,7 +12,7 @@ import { workflowCatalogRoutingFromEnvironment } from '../src/lib/workflow-catal
 
 const publicModuleId = 'virtual:workflow-catalog-local';
 const resolvedModuleId = `\0${publicModuleId}`;
-const localArtifactPath = '.workflow-catalog/local.generated.json';
+const localArtifactPath = 'workflow-catalog.local/catalog.generated.json';
 const localEnvironmentPath = '.env.workflow-catalog.local';
 const parseEnvironmentFile = Reflect.get(nodeUtil, 'parseEnv') as (
   content: string,

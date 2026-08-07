@@ -245,7 +245,7 @@ export const verifyWorkflowCatalogProjectBoundaries = async ({
     const content = await readFile(join(rootDirectory, browserFile), 'utf8');
 
     if (
-      /(?:node:|\/node\/|\.workflow-catalog|local\.generated|local-registration)/.test(
+      /(?:node:|\/node\/|workflow-catalog\.local\/(?:registration\.ts|workflows\.ts|catalog\.generated\.json))/.test(
         content,
       )
     ) {

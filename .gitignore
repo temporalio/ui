@@ -35,5 +35,5 @@ go.work.sum
 .sisyphus/*
 .omc
 
-/.workflow-catalog/
+/workflow-catalog.local/
 /.env.workflow-catalog.local

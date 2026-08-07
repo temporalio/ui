@@ -421,14 +421,16 @@ describe('workflow catalog artifacts', () => {
         register: () => undefined,
       },
       sharedArtifactPath: 'catalog.generated.json',
-      localModulePath: '.workflow-catalog/local-registration.ts',
+      localModulePath: 'workflow-catalog.local/registration.ts',
       localFallback: {
         ...localRegistrationFallback,
         sourceFiles: [fallbackSourcePath],
       },
-      localArtifactPath: '.workflow-catalog/local.generated.json',
+      localArtifactPath: 'workflow-catalog.local/catalog.generated.json',
     };
-    await mkdir(join(rootDirectory, '.workflow-catalog'), { recursive: true });
+    await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
+      recursive: true,
+    });
     await writeFile(
       join(rootDirectory, options.localArtifactPath),
       '{"stale":true}\n',
@@ -460,7 +462,7 @@ describe('workflow catalog artifacts', () => {
     await writeFile(
       join(rootDirectory, options.localModulePath),
       `export const workflowCatalogRegistrationSource = {
-  sourceFiles: ['.workflow-catalog/local-registration.ts'],
+  sourceFiles: ['workflow-catalog.local/registration.ts'],
   register() {},
 };
 `,
@@ -473,14 +475,16 @@ describe('workflow catalog artifacts', () => {
   it('generates a present fixed local module only to the ignored local overlay', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const sharedSourcePath = 'shared-registrations.ts';
-    const localModulePath = '.workflow-catalog/local-registration.ts';
+    const localModulePath = 'workflow-catalog.local/registration.ts';
     const fallbackSourcePath =
       'src/lib/workflow-catalog/node/local-registration-fallback.ts';
     await writeFile(
       join(rootDirectory, sharedSourcePath),
       'export const shared = true;\n',
     );
-    await mkdir(join(rootDirectory, '.workflow-catalog'), { recursive: true });
+    await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
+      recursive: true,
+    });
     await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
       recursive: true,
     });
@@ -492,7 +496,7 @@ describe('workflow catalog artifacts', () => {
       join(rootDirectory, localModulePath),
       `const activity = () => 'local';
 export const workflowCatalogRegistrationSource = {
-  sourceFiles: ['.workflow-catalog/local-registration.ts'],
+  sourceFiles: ['workflow-catalog.local/registration.ts'],
   register(registry) {
     registry.registerTarget({
       id: 'local',
@@ -535,7 +539,7 @@ export const workflowCatalogRegistrationSource = {
         ...localRegistrationFallback,
         sourceFiles: [fallbackSourcePath],
       },
-      localArtifactPath: '.workflow-catalog/local.generated.json',
+      localArtifactPath: 'workflow-catalog.local/catalog.generated.json',
     });
 
     const sharedArtifact = JSON.parse(
@@ -543,7 +547,7 @@ export const workflowCatalogRegistrationSource = {
     );
     const localArtifact = JSON.parse(
       await readFile(
-        join(rootDirectory, '.workflow-catalog/local.generated.json'),
+        join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
         'utf8',
       ),
     );
@@ -553,22 +557,26 @@ export const workflowCatalogRegistrationSource = {
     expect(
       localArtifact.descriptors.map(({ id }: { id: string }) => id),
     ).toEqual(['local-example']);
-    expect(gitignore).toContain('/.workflow-catalog/');
-    expect(gitignore).not.toContain('/.workflow-catalog/local-registration.ts');
-    expect(gitignore).not.toContain('/.workflow-catalog/local.generated.json');
+    expect(gitignore).toContain('/workflow-catalog.local/');
+    expect(gitignore).not.toContain('/workflow-catalog.local/registration.ts');
+    expect(gitignore).not.toContain(
+      '/workflow-catalog.local/catalog.generated.json',
+    );
   });
 
   it('validates shared and local registrations together while emitting separate descriptors', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const sharedSourcePath = 'shared-registrations.ts';
-    const localModulePath = '.workflow-catalog/local-registration.ts';
+    const localModulePath = 'workflow-catalog.local/registration.ts';
     const fallbackSourcePath =
       'src/lib/workflow-catalog/node/local-registration-fallback.ts';
     await writeFile(
       join(rootDirectory, sharedSourcePath),
       'export const shared = true;\n',
     );
-    await mkdir(join(rootDirectory, '.workflow-catalog'), { recursive: true });
+    await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
+      recursive: true,
+    });
     await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
       recursive: true,
     });
@@ -580,7 +588,7 @@ export const workflowCatalogRegistrationSource = {
       join(rootDirectory, localModulePath),
       `const activity = () => 'local';
 export const workflowCatalogRegistrationSource = {
-  sourceFiles: ['.workflow-catalog/local-registration.ts'],
+  sourceFiles: ['workflow-catalog.local/registration.ts'],
   register(registry) {
     registry.registerExample({
       id: 'local-on-shared-target',
@@ -623,7 +631,7 @@ export const workflowCatalogRegistrationSource = {
         ...localRegistrationFallback,
         sourceFiles: [fallbackSourcePath],
       },
-      localArtifactPath: '.workflow-catalog/local.generated.json',
+      localArtifactPath: 'workflow-catalog.local/catalog.generated.json',
     });
 
     expect(
@@ -634,7 +642,7 @@ export const workflowCatalogRegistrationSource = {
     expect(
       JSON.parse(
         await readFile(
-          join(rootDirectory, '.workflow-catalog/local.generated.json'),
+          join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
           'utf8',
         ),
       ).descriptors.map(({ id, source }: { id: string; source?: string }) => ({
@@ -647,7 +655,7 @@ export const workflowCatalogRegistrationSource = {
   it('classifies shared routing changes used by local descriptors as registration-source drift', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const sharedSourcePath = 'shared-registrations.ts';
-    const localModulePath = '.workflow-catalog/local-registration.ts';
+    const localModulePath = 'workflow-catalog.local/registration.ts';
     const fallbackSourcePath =
       'src/lib/workflow-catalog/node/local-registration-fallback.ts';
     let sharedTaskQueue = 'shared-catalog-v1';
@@ -666,7 +674,9 @@ export const workflowCatalogRegistrationSource = {
       join(rootDirectory, sharedSourcePath),
       'export const taskQueue = "shared-catalog-v1";\n',
     );
-    await mkdir(join(rootDirectory, '.workflow-catalog'), { recursive: true });
+    await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
+      recursive: true,
+    });
     await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
       recursive: true,
     });
@@ -678,7 +688,7 @@ export const workflowCatalogRegistrationSource = {
       join(rootDirectory, localModulePath),
       `const activity = () => 'local';
 export const workflowCatalogRegistrationSource = {
-  sourceFiles: ['.workflow-catalog/local-registration.ts'],
+  sourceFiles: ['workflow-catalog.local/registration.ts'],
   register(registry) {
     registry.registerExample({
       id: 'local-on-shared-target',
@@ -710,7 +720,7 @@ export const workflowCatalogRegistrationSource = {
         ...localRegistrationFallback,
         sourceFiles: [fallbackSourcePath],
       },
-      localArtifactPath: '.workflow-catalog/local.generated.json',
+      localArtifactPath: 'workflow-catalog.local/catalog.generated.json',
     };
     await generateWorkflowCatalogArtifacts(options);
 
@@ -729,7 +739,7 @@ export const workflowCatalogRegistrationSource = {
     });
 
     await expect(verifyWorkflowCatalogArtifacts(options)).rejects.toThrowError(
-      'Workflow catalog artifact ".workflow-catalog/local.generated.json" is stale because registration sources changed',
+      'Workflow catalog artifact "workflow-catalog.local/catalog.generated.json" is stale because registration sources changed',
     );
   });
 
@@ -741,7 +751,7 @@ export const workflowCatalogRegistrationSource = {
     ) => {
       const rootDirectory = await createTemporaryDirectory();
       const sharedSourcePath = 'shared-registrations.ts';
-      const localModulePath = '.workflow-catalog/local-registration.ts';
+      const localModulePath = 'workflow-catalog.local/registration.ts';
       const fallbackSourcePath =
         'src/lib/workflow-catalog/node/local-registration-fallback.ts';
       const sharedActivity = () => 'shared';
@@ -749,7 +759,7 @@ export const workflowCatalogRegistrationSource = {
         join(rootDirectory, sharedSourcePath),
         'export const shared = true;\n',
       );
-      await mkdir(join(rootDirectory, '.workflow-catalog'), {
+      await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
         recursive: true,
       });
       await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
@@ -762,7 +772,7 @@ export const workflowCatalogRegistrationSource = {
       await writeFile(
         join(rootDirectory, localModulePath),
         `export const workflowCatalogRegistrationSource = {
-  sourceFiles: ['.workflow-catalog/local-registration.ts'],
+  sourceFiles: ['workflow-catalog.local/registration.ts'],
   register(registry) {
     ${localRegistration}
   },
@@ -810,7 +820,7 @@ export const workflowCatalogRegistrationSource = {
             ...localRegistrationFallback,
             sourceFiles: [fallbackSourcePath],
           },
-          localArtifactPath: '.workflow-catalog/local.generated.json',
+          localArtifactPath: 'workflow-catalog.local/catalog.generated.json',
         }),
       ).rejects.toThrowError(expectedMessage);
     };
@@ -909,8 +919,9 @@ registry.registerExample({
       declaredSourceFiles: [sharedSourcePath],
       packageJsonPath,
       localPaths: [
-        '.workflow-catalog/local-registration.ts',
-        '.workflow-catalog/local.generated.json',
+        'workflow-catalog.local/registration.ts',
+        'workflow-catalog.local/workflows.ts',
+        'workflow-catalog.local/catalog.generated.json',
       ],
     };
 
@@ -932,6 +943,32 @@ registry.registerExample({
       join(rootDirectory, browserModulePath),
       'export type BrowserOnly = string;\n',
     );
+    await writeFile(
+      join(rootDirectory, browserModulePath),
+      "import 'workflow-catalog.local/registration.ts';\n",
+    );
+    await expect(
+      verifyWorkflowCatalogProjectBoundaries(options),
+    ).rejects.toThrowError(
+      'Browser workflow catalog files cannot reference Node catalog code or local output',
+    );
+    await writeFile(
+      join(rootDirectory, browserModulePath),
+      'export type BrowserOnly = string;\n',
+    );
+    await writeFile(
+      join(rootDirectory, browserModulePath),
+      "import 'workflow-catalog.local/workflows.ts';\n",
+    );
+    await expect(
+      verifyWorkflowCatalogProjectBoundaries(options),
+    ).rejects.toThrowError(
+      'Browser workflow catalog files cannot reference Node catalog code or local output',
+    );
+    await writeFile(
+      join(rootDirectory, browserModulePath),
+      'export type BrowserOnly = string;\n',
+    );
     await expect(
       verifyWorkflowCatalogProjectBoundaries({
         ...options,
@@ -949,7 +986,7 @@ registry.registerExample({
 
     await writeFile(
       join(rootDirectory, packageJsonPath),
-      '{"files":["dist/**/*",".workflow-catalog/**/*"]}\n',
+      '{"files":["dist/**/*","workflow-catalog.local/**/*"]}\n',
     );
     await expect(
       verifyWorkflowCatalogProjectBoundaries(options),
@@ -967,7 +1004,7 @@ registry.registerExample({
     await mkdir(join(packageDirectory, 'dist/workflow-catalog/node'), {
       recursive: true,
     });
-    await mkdir(join(packageDirectory, '.workflow-catalog'), {
+    await mkdir(join(packageDirectory, 'workflow-catalog.local'), {
       recursive: true,
     });
     await mkdir(packDirectory);
@@ -1002,11 +1039,15 @@ registry.registerExample({
       'export {};\n',
     );
     await writeFile(
-      join(packageDirectory, '.workflow-catalog/local-registration.ts'),
+      join(packageDirectory, 'workflow-catalog.local/registration.ts'),
       'export const localSource = true;\n',
     );
     await writeFile(
-      join(packageDirectory, '.workflow-catalog/local.generated.json'),
+      join(packageDirectory, 'workflow-catalog.local/workflows.ts'),
+      'export const localWorkflow = true;\n',
+    );
+    await writeFile(
+      join(packageDirectory, 'workflow-catalog.local/catalog.generated.json'),
       '{"local":true}\n',
     );
 
@@ -1036,9 +1077,12 @@ registry.registerExample({
     expect(listing).toContain(
       'package/dist/workflow-catalog/node/workflows.js',
     );
-    expect(listing).not.toContain('.workflow-catalog');
-    expect(listing).not.toContain('local-registration');
-    expect(listing).not.toContain('local.generated');
+    expect(listing).not.toContain('workflow-catalog.local');
+    expect(listing).not.toContain('workflow-catalog.local/registration.ts');
+    expect(listing).not.toContain('workflow-catalog.local/workflows.ts');
+    expect(listing).not.toContain(
+      'workflow-catalog.local/catalog.generated.json',
+    );
   });
 
   packageConsumerTest(

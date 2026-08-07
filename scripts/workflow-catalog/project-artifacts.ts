@@ -15,9 +15,9 @@ const projectOptions = {
   sharedArtifactPath: 'src/lib/workflow-catalog/browser/catalog.generated.json',
   sharedTypeScriptArtifactPath:
     'src/lib/workflow-catalog/browser/catalog.generated.ts',
-  localModulePath: '.workflow-catalog/local-registration.ts',
+  localModulePath: 'workflow-catalog.local/registration.ts',
   localFallback,
-  localArtifactPath: '.workflow-catalog/local.generated.json',
+  localArtifactPath: 'workflow-catalog.local/catalog.generated.json',
 };
 
 const projectBoundaryOptions = {

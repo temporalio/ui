@@ -37,9 +37,9 @@ describe('local workflow catalog Vite boundary', () => {
 
   it('loads browser-safe descriptors from the generated local artifact', async () => {
     const rootDirectory = await createTemporaryDirectory();
-    await mkdir(join(rootDirectory, '.workflow-catalog'));
+    await mkdir(join(rootDirectory, 'workflow-catalog.local'));
     await writeFile(
-      join(rootDirectory, '.workflow-catalog/local.generated.json'),
+      join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
       JSON.stringify({
         sourceHash: 'local-source',
         descriptors: [
@@ -143,7 +143,7 @@ describe('local workflow catalog Vite boundary', () => {
     });
 
     expect(watchedPaths).toEqual([
-      join(rootDirectory, '.workflow-catalog/local.generated.json'),
+      join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
       join(rootDirectory, '.env.workflow-catalog.local'),
     ]);
   });
