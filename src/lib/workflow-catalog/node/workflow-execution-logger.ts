@@ -1,5 +1,4 @@
 import type { Logger, LogLevel, LogMetadata } from '@temporalio/common';
-import { DefaultLogger } from '@temporalio/worker';
 
 type WorkflowExecutionStatus =
   | 'started'
@@ -34,14 +33,14 @@ const workflowExecutionMetadata = (metadata?: LogMetadata) => {
 };
 
 export const createWorkflowCatalogExecutionLogger = (
-  defaultLogger: Logger = new DefaultLogger('INFO'),
+  fallbackLogger: Logger,
 ): Logger => {
   const log = (level: LogLevel, message: string, metadata?: LogMetadata) => {
     const status =
       metadata?.sdkComponent === 'worker'
         ? workflowExecutionStatuses[message]
         : undefined;
-    if (!status) return defaultLogger.log(level, message, metadata);
+    if (!status) return fallbackLogger.log(level, message, metadata);
 
     console.info(
       JSON.stringify({

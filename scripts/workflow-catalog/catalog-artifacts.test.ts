@@ -1204,13 +1204,36 @@ registry.registerExample({
           'src/lib/holocene/icon-button.svelte',
           'src/lib/holocene/input/input.svelte',
           'src/lib/holocene/label.svelte',
+          'src/lib/holocene/link.svelte',
+          'src/lib/holocene/portal',
+          'src/lib/holocene/progress-bar.svelte',
+          'src/lib/holocene/table/table-header-row.svelte',
+          'src/lib/holocene/table/table-row.svelte',
+          'src/lib/holocene/table/table.svelte',
           'src/lib/holocene/textarea.svelte',
+          'src/lib/holocene/tooltip.svelte',
           'src/lib/i18n/index.ts',
           'src/lib/i18n/locales',
           'src/lib/i18n/translate.ts',
+          'src/lib/stores/event-view.ts',
+          'src/lib/stores/persist-store.ts',
           'src/lib/svelte-mocks/app/navigation.ts',
+          'src/lib/svelte-mocks/app/paths.ts',
+          'src/lib/types/events.ts',
           'src/lib/types/global.ts',
+          'src/lib/types/index.ts',
           'src/lib/utilities/copy-to-clipboard.ts',
+          'src/lib/utilities/core-provider.ts',
+          'src/lib/utilities/encode-uri.ts',
+          'src/lib/utilities/format-time.ts',
+          'src/lib/utilities/has.ts',
+          'src/lib/utilities/is-function.ts',
+          'src/lib/utilities/is.ts',
+          'src/lib/utilities/parse-with-big-int.ts',
+          'src/lib/utilities/pluralize.ts',
+          'src/lib/utilities/route-for.ts',
+          'src/lib/utilities/to-duration.ts',
+          'src/lib/utilities/to-url.ts',
           'src/lib/workflow-catalog',
         ].map((sourcePath) =>
           cp(
@@ -1263,11 +1286,23 @@ registry.registerExample({
         join(consumerDirectory, 'runner.mjs'),
         [
           "import { fileURLToPath } from 'node:url';",
+          "import { resolveWorkflowCatalogRouting } from '@temporalio/ui/workflow-catalog/browser/routing';",
+          "import { parseWorkflowCatalogConnectionConfig } from '@temporalio/ui/workflow-catalog/node/connection-config';",
+          "import { createWorkflowCatalogExecutionLogger } from '@temporalio/ui/workflow-catalog/node/workflow-execution-logger';",
+          "import { runWorkflowCatalogDevelopment } from '@temporalio/ui/workflow-catalog/node/development';",
+          "import { createWorkflowCatalogRegistry, generateWorkflowCatalog } from '@temporalio/ui/workflow-catalog/node/registry';",
           "import { startWorkflowCatalogRunner } from '@temporalio/ui/workflow-catalog/node/runner';",
+          "import { requireWorkflowCatalogRoutingFromEnvironment } from '@temporalio/ui/workflow-catalog/node/routing-config';",
           "import { workflowCatalogRegistrationSource } from '@temporalio/ui/workflow-catalog/node/shared-registrations';",
           "import { hello } from '@temporalio/ui/workflow-catalog/node/workflows';",
           "const workflowsPath = import.meta.resolve('@temporalio/ui/workflow-catalog/node/workflows');",
           "if (typeof startWorkflowCatalogRunner !== 'function') throw new Error('Missing runner kernel');",
+          "if (typeof resolveWorkflowCatalogRouting !== 'function') throw new Error('Missing routing resolver');",
+          "if (typeof parseWorkflowCatalogConnectionConfig !== 'function') throw new Error('Missing connection configuration parser');",
+          "if (typeof createWorkflowCatalogExecutionLogger !== 'function') throw new Error('Missing workflow execution logger factory');",
+          "if (typeof runWorkflowCatalogDevelopment !== 'function') throw new Error('Missing development runner');",
+          "if (typeof createWorkflowCatalogRegistry !== 'function' || typeof generateWorkflowCatalog !== 'function') throw new Error('Missing registry generation API');",
+          "if (typeof requireWorkflowCatalogRoutingFromEnvironment !== 'function') throw new Error('Missing routing configuration parser');",
           "if (typeof workflowCatalogRegistrationSource.register !== 'function') throw new Error('Missing shared workflow registration source');",
           "if (typeof hello !== 'function') throw new Error('Missing shared workflow export');",
           "if (!workflowsPath.endsWith('/workflow-catalog/node/workflows.js')) throw new Error(`Unexpected workflows path: ${workflowsPath}`);",
@@ -1418,6 +1453,30 @@ registry.registerExample({
         (commandFailure as { stderr?: string }).stderr ?? ''
       }`,
     ).toContain('TEMPORAL_NAMESPACE is required');
+  });
+
+  it('reports an unknown selected development target before connecting', async () => {
+    let commandFailure: unknown;
+
+    try {
+      await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
+        env: {
+          ...process.env,
+          TEMPORAL_ADDRESS: 'localhost:7233',
+          TEMPORAL_NAMESPACE: 'default',
+          WORKFLOW_CATALOG_TARGET_ID: 'missing-target',
+        },
+      });
+    } catch (error) {
+      commandFailure = error;
+    }
+
+    expect(commandFailure).toMatchObject({ code: 1 });
+    expect(
+      `${(commandFailure as { stdout?: string }).stdout ?? ''}${
+        (commandFailure as { stderr?: string }).stderr ?? ''
+      }`,
+    ).toContain('Workflow catalog target "missing-target" was not found');
   });
 
   it('rejects stale artifacts before development can load or rewrite them', async () => {

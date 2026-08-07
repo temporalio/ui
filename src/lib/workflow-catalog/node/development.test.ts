@@ -5,6 +5,80 @@ import { describe, expect, it, vi } from 'vitest';
 import { runWorkflowCatalogDevelopment } from './development';
 
 describe('runWorkflowCatalogDevelopment', () => {
+  it('runs only the explicitly selected workflow catalog target', async () => {
+    const createdTaskQueues: string[] = [];
+
+    await runWorkflowCatalogDevelopment({
+      bindings: [
+        {
+          target: {
+            id: 'shared-workflows',
+            namespace: 'staging-namespace',
+            taskQueue: 'ui-workflow-catalog',
+            workflowsPath: './shared-workflows.js',
+            workflowExports: {},
+          },
+          examples: [],
+          activities: {},
+          nexusServices: [],
+        },
+        {
+          target: {
+            id: 'local-catalog',
+            namespace: 'default',
+            taskQueue: 'workflow-catalog',
+            workflowsPath: './local-workflows.js',
+            workflowExports: {},
+          },
+          examples: [],
+          activities: {},
+          nexusServices: [],
+        },
+      ],
+      targetId: 'shared-workflows',
+      connectionFactory: async () => ({ close: async () => undefined }),
+      createWorker: async ({ taskQueue }) => {
+        createdTaskQueues.push(taskQueue);
+        return { run: async () => undefined, shutdown: () => undefined };
+      },
+      signals: new EventEmitter(),
+    });
+
+    expect(createdTaskQueues).toEqual(['ui-workflow-catalog']);
+  });
+
+  it('rejects an unknown workflow catalog target before connecting', async () => {
+    const connectionFactory = vi.fn(async () => ({
+      close: async () => undefined,
+    }));
+
+    await expect(
+      runWorkflowCatalogDevelopment({
+        bindings: [
+          {
+            target: {
+              id: 'shared-workflows',
+              namespace: 'staging-namespace',
+              taskQueue: 'ui-workflow-catalog',
+              workflowsPath: './shared-workflows.js',
+              workflowExports: {},
+            },
+            examples: [],
+            activities: {},
+            nexusServices: [],
+          },
+        ],
+        targetId: 'missing-target',
+        connectionFactory,
+        createWorker: vi.fn(),
+        signals: new EventEmitter(),
+      }),
+    ).rejects.toThrowError(
+      'Workflow catalog target "missing-target" was not found; available targets: shared-workflows',
+    );
+    expect(connectionFactory).not.toHaveBeenCalled();
+  });
+
   it('shuts down after workers complete normally so an owned connection closes', async () => {
     const connection = { close: vi.fn(async () => undefined) };
     const shutdown = vi.fn();
