@@ -15,6 +15,7 @@
     SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -45,15 +46,6 @@
     delayed = false,
   }: Props = $props();
 
-  const toStringValue = (value: unknown): string =>
-    value === null || value === undefined ? '' : String(value);
-
-  const isWholeNumber = (value: string): boolean =>
-    value.trim() !== '' &&
-    Number.isInteger(Number(value)) &&
-    Number(value) >= 0;
-  const isBackoffCoefficient = (value: string): boolean =>
-    value.trim() !== '' && Number(value) >= 1;
   const isPositiveDuration = (value: string | undefined): boolean => {
     const seconds = Number(parseDuration(value ?? ''));
     return !isNaN(seconds) && seconds > 0;
@@ -67,25 +59,26 @@
         .min(1, {
           message: translate('standalone-activities.form-task-queue-required'),
         }),
-      scheduleToCloseTimeout: z.string().default(''),
-      scheduleToStartTimeout: z.string().default(''),
-      startToCloseTimeout: z.string().default(''),
-      heartbeatTimeout: z.string().default(''),
-      initialInterval: z.string().default(''),
-      maximumInterval: z.string().default(''),
-      startDelay: z.string().default(''),
-      maximumAttempts: z.preprocess(
-        toStringValue,
-        z.string().refine(isWholeNumber, {
-          message: translate('activities.retry-max-attempts-error'),
-        }),
-      ),
-      backoffCoefficient: z.preprocess(
-        toStringValue,
-        z.string().refine(isBackoffCoefficient, {
-          message: translate('activities.retry-backoff-coefficient-error'),
-        }),
-      ),
+      scheduleToCloseTimeout: z.string(),
+      scheduleToStartTimeout: z.string(),
+      startToCloseTimeout: z.string(),
+      heartbeatTimeout: z.string(),
+      initialInterval: z.string(),
+      maximumInterval: z.string(),
+      startDelay: z.string(),
+      maximumAttempts: z
+        .number({
+          invalid_type_error: translate('activities.retry-max-attempts-error'),
+        })
+        .int(translate('activities.retry-max-attempts-error'))
+        .min(0, translate('activities.retry-max-attempts-error')),
+      backoffCoefficient: z
+        .number({
+          invalid_type_error: translate(
+            'activities.retry-backoff-coefficient-error',
+          ),
+        })
+        .min(1, translate('activities.retry-backoff-coefficient-error')),
     })
     .superRefine((data, context) => {
       if (
@@ -121,10 +114,8 @@
     initialInterval: String(initialOptions?.retryPolicy?.initialInterval ?? ''),
     maximumInterval: String(initialOptions?.retryPolicy?.maximumInterval ?? ''),
     startDelay: String(initialOptions?.startDelay ?? ''),
-    maximumAttempts: String(initialOptions?.retryPolicy?.maximumAttempts ?? 0),
-    backoffCoefficient: String(
-      initialOptions?.retryPolicy?.backoffCoefficient || 2,
-    ),
+    maximumAttempts: initialOptions?.retryPolicy?.maximumAttempts ?? 0,
+    backoffCoefficient: initialOptions?.retryPolicy?.backoffCoefficient || 2,
   }));
 
   const toActivityOptions = (data: z.infer<typeof schema>) =>
@@ -146,8 +137,8 @@
         startDelay: data.startDelay || '0s',
       }),
       retryPolicy: {
-        maximumAttempts: Number(data.maximumAttempts),
-        backoffCoefficient: Number(data.backoffCoefficient),
+        maximumAttempts: data.maximumAttempts,
+        backoffCoefficient: data.backoffCoefficient,
         ...(data.initialInterval && { initialInterval: data.initialInterval }),
         ...(data.maximumInterval && { maximumInterval: data.maximumInterval }),
       },
@@ -211,14 +202,13 @@
         <p class="mb-1 text-xs text-secondary">
           {translate('activities.retry-max-attempts-description')}
         </p>
-        <Input
+        <NumberInput
           id="maximum-attempts"
-          type="number"
           label={translate('activities.retry-max-attempts')}
           labelHidden
           bind:value={$form.maximumAttempts}
           min={0}
-          error={!!$errors.maximumAttempts?.[0]}
+          invalid={!!$errors.maximumAttempts?.[0]}
           hintText={$errors.maximumAttempts?.[0] ?? ''}
           class="w-24"
         />
@@ -231,15 +221,14 @@
         <p class="mb-1 text-xs text-secondary">
           {translate('activities.retry-backoff-coefficient-description')}
         </p>
-        <Input
+        <NumberInput
           id="retry-backoff-coefficient"
-          type="number"
           label={translate('activities.retry-backoff-coefficient')}
           labelHidden
           bind:value={$form.backoffCoefficient}
           step={0.01}
           min={1}
-          error={!!$errors.backoffCoefficient?.[0]}
+          invalid={!!$errors.backoffCoefficient?.[0]}
           hintText={$errors.backoffCoefficient?.[0] ?? ''}
           class="w-24"
         />

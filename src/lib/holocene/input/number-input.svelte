@@ -18,6 +18,7 @@
     name?: string;
     disabled?: boolean;
     required?: boolean;
+    invalid?: boolean;
     hintText?: string;
     max?: number;
     min?: number;
@@ -38,6 +39,7 @@
     name,
     disabled = false,
     required = false,
+    invalid = false,
     hintText = '',
     max,
     min,
@@ -50,7 +52,11 @@
 
   const resolvedName = $derived(name ?? id);
   const valid = $derived(
-    !((min !== undefined && value < min) || (max !== undefined && value > max)),
+    !invalid &&
+      !(
+        (min !== undefined && value < min) ||
+        (max !== undefined && value > max)
+      ),
   );
   const errorId = $derived(`${id}-error`);
 </script>
