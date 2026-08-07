@@ -137,14 +137,15 @@ export const withLatestWorkflowStatuses = (
   }
 
   return runs.map((run) => {
-    const workflow = latest.get(run.workflowId);
-    if (!workflow) {
+    const latestWorkflow = latest.get(run.workflowId);
+    if (!latestWorkflow) {
       return run;
     }
     return {
-      ...run,
-      status: workflow.status,
-      runId: workflow.runId || run.runId,
+      actualTime: run.actualTime,
+      workflowId: latestWorkflow.id || run.workflowId,
+      status: latestWorkflow.status || run.status,
+      runId: latestWorkflow.runId || run.runId,
     };
   });
 };
