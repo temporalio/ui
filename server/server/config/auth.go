@@ -53,7 +53,7 @@ func (c *AuthProvider) validate() error {
 	}
 
 	if c.ProviderURL == "" {
-		return errors.New("auth provider url is not")
+		return errors.New("auth provider url is not set")
 	}
 
 	if c.ClientID == "" {
@@ -62,6 +62,14 @@ func (c *AuthProvider) validate() error {
 
 	if c.CallbackURL == "" {
 		return errors.New("auth callback url is not set")
+	}
+
+	if c.AllowedClaimKey != "" && len(c.AllowedClaimValues) == 0 {
+		return errors.New("auth allowedClaimValues must be set when allowedClaimKey is configured")
+	}
+
+	if c.AllowedClaimKey == "" && len(c.AllowedClaimValues) > 0 {
+		return errors.New("auth allowedClaimKey must be set when allowedClaimValues is configured")
 	}
 
 	return nil

@@ -44,18 +44,20 @@ auth:
 
 #### Provider Settings
 
-| Field                | Type    | Description                                                     |
-| -------------------- | ------- | --------------------------------------------------------------- |
-| `label`              | string  | Display name for the provider                                   |
-| `type`               | string  | Provider type. Only `oidc` is supported                         |
-| `providerUrl`        | string  | OIDC discovery URL (e.g., `https://accounts.google.com/`)       |
-| `issuerUrl`          | string  | Optional. Set only if issuer differs from provider URL          |
-| `clientId`           | string  | OAuth2 client ID                                                |
-| `clientSecret`       | string  | OAuth2 client secret                                            |
-| `scopes`             | array   | OAuth2 scopes. Include `offline_access` to enable token refresh |
-| `callbackUrl`        | string  | OAuth2 callback URL for your deployment                         |
-| `options`            | object  | Additional URL parameters for the auth redirect                 |
-| `useIdTokenAsBearer` | boolean | Use ID token instead of access token in Authorization header    |
+| Field                | Type    | Description                                                                  |
+| -------------------- | ------- | ---------------------------------------------------------------------------- |
+| `label`              | string  | Display name for the provider                                                |
+| `type`               | string  | Provider type. Only `oidc` is supported                                      |
+| `providerUrl`        | string  | OIDC discovery URL (e.g., `https://accounts.google.com/`)                    |
+| `issuerUrl`          | string  | Optional. Set only if issuer differs from provider URL                       |
+| `clientId`           | string  | OAuth2 client ID                                                             |
+| `clientSecret`       | string  | OAuth2 client secret                                                         |
+| `scopes`             | array   | OAuth2 scopes. Include `offline_access` to enable token refresh              |
+| `callbackUrl`        | string  | OAuth2 callback URL for your deployment                                      |
+| `options`            | object  | Additional URL parameters for the auth redirect                              |
+| `useIdTokenAsBearer` | boolean | Use ID token instead of access token in Authorization header                 |
+| `allowedClaimKey`    | string  | ID token claim to check for authorization (e.g., `groups`, `roles`). See [Claim-Based Authorization](#claim-based-authorization) |
+| `allowedClaimValues` | array   | List of acceptable values for the claim. User is allowed if ANY value matches |
 
 ## Session Duration Management
 
@@ -174,6 +176,129 @@ auth:
 
 Note: Google does not support `offline_access` scope. Token refresh depends on Google's token policies.
 
+## Claim-Based Authorization
+
+By default, the Temporal UI allows **any user** who can authenticate with your OIDC provider to access the UI. This can be a security risk when the UI is externally exposed and your OIDC provider serves a large tenant (e.g., an entire Azure AD / Entra ID directory).
+
+Claim-based authorization lets you restrict UI access to users whose ID token contains specific claim values, such as a group membership or role assignment.
+
+### How It Works
+
+1. After the OIDC token exchange succeeds, the server inspects the ID token's payload
+2. It looks for the claim specified by `allowedClaimKey` (supports nested claims via dot notation)
+3. It checks if the claim value (string or array) contains any value from `allowedClaimValues`
+4. If no match is found, the login is rejected with HTTP 403 Forbidden
+
+If `allowedClaimKey` is not set, all authenticated users are allowed (backward compatible).
+
+### Examples
+
+#### Azure AD / Entra ID (groups claim)
+
+```yaml
+auth:
+  enabled: true
+  providers:
+    - label: Azure AD
+      type: oidc
+      providerUrl: https://login.microsoftonline.com/{tenant-id}/v2.0
+      clientId: your-client-id
+      clientSecret: your-client-secret
+      scopes:
+        - openid
+        - profile
+        - email
+        - offline_access
+      callbackUrl: https://temporal-ui.example.com/auth/sso/callback
+      allowedClaimKey: groups
+      allowedClaimValues:
+        - "a1b2c3d4-e5f6-..."  # Object ID of your Entra ID group
+```
+
+> **Note:** Entra ID emits group **Object IDs** (GUIDs) in the `groups` claim by default, not display names. You can configure your app registration to emit group names instead.
+
+#### Keycloak (realm roles)
+
+```yaml
+auth:
+  enabled: true
+  providers:
+    - label: Keycloak
+      type: oidc
+      providerUrl: https://keycloak.example.com/realms/myrealm
+      clientId: your-client-id
+      clientSecret: your-client-secret
+      scopes:
+        - openid
+        - profile
+        - email
+      callbackUrl: https://temporal-ui.example.com/auth/sso/callback
+      allowedClaimKey: realm_access.roles  # dot notation for nested claims
+      allowedClaimValues:
+        - temporal-admin
+        - temporal-operator
+```
+
+#### Auth0 (custom roles claim)
+
+```yaml
+auth:
+  enabled: true
+  providers:
+    - label: Auth0
+      type: oidc
+      providerUrl: https://your-tenant.auth0.com/
+      clientId: your-client-id
+      clientSecret: your-client-secret
+      scopes:
+        - openid
+        - profile
+        - email
+      callbackUrl: https://temporal-ui.example.com/auth/sso/callback
+      allowedClaimKey: https://myapp.example.com/roles  # custom namespace claim
+      allowedClaimValues:
+        - temporal-admin
+```
+
+#### AWS Cognito (cognito:groups)
+
+```yaml
+auth:
+  enabled: true
+  providers:
+    - label: Cognito
+      type: oidc
+      providerUrl: https://cognito-idp.{region}.amazonaws.com/{user-pool-id}
+      clientId: your-client-id
+      clientSecret: your-client-secret
+      scopes:
+        - openid
+        - profile
+        - email
+      callbackUrl: https://temporal-ui.example.com/auth/sso/callback
+      allowedClaimKey: "cognito:groups"  # colon-containing key (treated as literal)
+      allowedClaimValues:
+        - temporal-admins
+```
+
+### Docker / Environment Variable Configuration
+
+When using the Docker image, set these environment variables:
+
+```bash
+TEMPORAL_AUTH_ALLOWED_CLAIM_KEY=groups
+TEMPORAL_AUTH_ALLOWED_CLAIM_VALUES=myApp-Admin,myApp-Ops
+```
+
+Multiple allowed values are comma-separated.
+
+### Important Notes
+
+- **Claim check happens at login only.** If a user is removed from a group mid-session, they retain access until their session expires or they log out. Use `maxSessionDuration` to bound this window.
+- **Both `allowedClaimKey` and `allowedClaimValues` must be set together.** Setting one without the other is a configuration error.
+- **Claim matching is exact.** Values are compared as exact strings — no wildcards or regex.
+- **Config changes require a server restart.** Changes to `allowedClaimKey` and `allowedClaimValues` (like other provider settings) take effect only after restarting the UI server.
+
 ## Security Considerations
 
 ### Callback URL
@@ -235,6 +360,16 @@ Check:
 - Token hasn't expired and refresh failed
 - `maxSessionDuration` hasn't been exceeded
 - Network allows communication with the IdP for token refresh
+
+### 403 Forbidden after OIDC login
+
+This means authentication succeeded but claim-based authorization failed. Check:
+
+- The user's ID token contains the claim specified by `allowedClaimKey`
+- The claim value matches one of the `allowedClaimValues` (exact string match)
+- For Entra ID: ensure the `groups` claim is configured in your app registration's token configuration
+- For Keycloak: verify the role mapper is configured to include roles in the ID token
+- Check server logs for `[Auth] Authorization denied` messages which include the specific error
 
 ## Testing Authentication Locally
 
