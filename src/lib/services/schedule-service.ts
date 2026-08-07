@@ -172,8 +172,13 @@ export const fetchRecentScheduleRunStatuses = async (
     return runs;
   }
 
+  // Backslashes first: the query tokenizer treats them as escape characters, so
+  // an unescaped one swallows the character after it.
   const ids = workflowIds
-    .map((workflowId) => `"${workflowId.replace(/"/g, '\\"')}"`)
+    .map(
+      (workflowId) =>
+        `"${workflowId.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`,
+    )
     .join(', ');
   const query =
     `TemporalScheduledById="${scheduleId}"` +

@@ -35,13 +35,11 @@
 
   const recordedRuns = $derived(toRecentScheduleRuns(schedule));
   const runsPromise = $derived(
-    recordedRuns.length
-      ? fetchRecentScheduleRunStatuses({
-          namespace,
-          scheduleId: schedule.schedule_id,
-          runs: recordedRuns,
-        })
-      : Promise.resolve(recordedRuns),
+    fetchRecentScheduleRunStatuses({
+      namespace,
+      scheduleId: schedule.schedule_id,
+      runs: recordedRuns,
+    }),
   );
 </script>
 

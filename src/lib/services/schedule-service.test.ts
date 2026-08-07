@@ -161,6 +161,30 @@ describe('fetchRecentScheduleRunStatuses', () => {
     expect(queryFor().query).toContain('WorkflowId in ("say \\"hi\\"")');
   });
 
+  test('escapes backslashes in workflow ids', async () => {
+    await fetchRecentScheduleRunStatuses({
+      namespace: 'default',
+      scheduleId: 'daily',
+      runs: toRecentScheduleRuns(
+        scheduleWith([action('back\\slash', '2026-08-01T00:00:00Z')]),
+      ),
+    });
+
+    expect(queryFor().query).toContain('WorkflowId in ("back\\\\slash")');
+  });
+
+  test('escapes a trailing backslash so it cannot escape the closing quote', async () => {
+    await fetchRecentScheduleRunStatuses({
+      namespace: 'default',
+      scheduleId: 'daily',
+      runs: toRecentScheduleRuns(
+        scheduleWith([action('trailing\\', '2026-08-01T00:00:00Z')]),
+      ),
+    });
+
+    expect(queryFor().query).toContain('WorkflowId in ("trailing\\\\")');
+  });
+
   test('does not call the API when there are no runs', async () => {
     const result = await fetchRecentScheduleRunStatuses({
       namespace: 'default',
