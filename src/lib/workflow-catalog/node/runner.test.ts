@@ -1,6 +1,6 @@
 import { existsSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { operation, service, serviceHandler } from 'nexus-rpc';
 import { describe, expect, it, vi } from 'vitest';
@@ -153,6 +153,33 @@ describe('workflow catalog runner', () => {
       expect.objectContaining({
         workflowsPath: fileURLToPath(new URL(workflowsPath, import.meta.url)),
       }),
+    );
+  });
+
+  it('passes a file URL workflow path to a worker as its absolute filesystem path', async () => {
+    const workflowsPath = '/tmp/workflow-catalog/workflows.ts';
+    const connection = { close: vi.fn(async () => undefined) };
+    const createWorker = vi.fn(async () => ({
+      run: async () => undefined,
+      shutdown: vi.fn(),
+    }));
+    const bindings = createActivityBindings('catalog').map((binding) => ({
+      ...binding,
+      target: {
+        ...binding.target,
+        workflowsPath: pathToFileURL(workflowsPath).href,
+      },
+    }));
+
+    const runner = await startWorkflowCatalogRunner({
+      bindings,
+      connection,
+      createWorker,
+    });
+    await runner.completion;
+
+    expect(createWorker).toHaveBeenCalledWith(
+      expect.objectContaining({ workflowsPath }),
     );
   });
 
