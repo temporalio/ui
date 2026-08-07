@@ -62,7 +62,7 @@
     "package:minor": "pnpm version minor && svelte-package",
     "package:major": "pnpm version major && svelte-package",
     "prepack": "svelte-package && node scripts/generate-exports.mjs",
-    "dev:workflow-catalog": "esno scripts/workflow-catalog/dev.ts",
+    "dev:workflow-catalog-worker": "esno scripts/workflow-catalog/dev.ts",
     "workflow-catalog:generate": "esno scripts/workflow-catalog/generate.ts",
     "workflow-catalog:verify": "esno scripts/workflow-catalog/verify.ts",
     "workflow-catalog:test-package": "WORKFLOW_CATALOG_PACKAGE_TEST=1 TZ=UTC vitest run scripts/workflow-catalog/catalog-artifacts.test.ts -t 'clean consumer' --pool=forks --maxWorkers=1",

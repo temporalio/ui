@@ -1256,11 +1256,11 @@ registry.registerExample({
     }
   });
 
-  it('exposes an additive development command that reports its first preflight failure clearly', async () => {
+  it('exposes a separate workflow catalog worker development command that reports its first preflight failure clearly', async () => {
     let commandFailure: unknown;
 
     try {
-      await execFileAsync('pnpm', ['dev:workflow-catalog'], {
+      await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
         env: {
           ...process.env,
           TEMPORAL_ADDRESS: '',
@@ -1294,7 +1294,7 @@ registry.registerExample({
       let commandFailure: unknown;
 
       try {
-        await execFileAsync('pnpm', ['dev:workflow-catalog'], {
+        await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
           env: { ...process.env, TEMPORAL_ADDRESS: '' },
         });
       } catch (error) {
