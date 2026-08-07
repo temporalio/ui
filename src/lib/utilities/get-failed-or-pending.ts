@@ -19,9 +19,20 @@ const isFailedLocalActivity = (event: WorkflowEvent) => {
   );
 };
 
-const isFailedLocalActivityGroup = (group: EventGroup) => {
-  return isFailedLocalActivity(group.initialEvent);
+/**
+ * Satisfied by both EventGroup and LazyGroup. Deliberately not routed through
+ * isEventGroup, whose `eventList` check a LazyGroup can't satisfy.
+ */
+type FilterableGroup = {
+  classification: EventGroup['classification'];
+  isPending: boolean;
+  initialEvent: WorkflowEvent;
 };
+
+const isFailedGroup = (group: FilterableGroup) =>
+  group.classification === 'Failed' ||
+  group.classification === 'TimedOut' ||
+  !!isFailedLocalActivity(group.initialEvent);
 
 const isFailedEvent = (iterable: IterableEventWithPending) => {
   return (
@@ -36,14 +47,8 @@ const isPendingEvent = (iterable: IterableEventWithPending) => {
   return isPendingActivity(iterable) || isPendingNexusOperation(iterable);
 };
 
-const isFailedEventGroup = (iterable: IterableEventWithPending) => {
-  return (
-    isEventGroup(iterable) &&
-    (iterable.classification === 'Failed' ||
-      iterable.classification === 'TimedOut' ||
-      isFailedLocalActivityGroup(iterable))
-  );
-};
+const isFailedEventGroup = (iterable: IterableEventWithPending) =>
+  isEventGroup(iterable) && isFailedGroup(iterable);
 
 const isPendingEventGroup = (iterable: IterableEventWithPending) => {
   return isEventGroup(iterable) && iterable.isPending;
@@ -63,12 +68,10 @@ export const getFailedOrPendingEvents = (
   );
 };
 
-export const getFailedOrPendingGroups = (
-  items: EventGroup[],
+export const getFailedOrPendingGroups = <T extends FilterableGroup>(
+  items: T[],
   filterForFailedOrPending: boolean,
-) => {
+): T[] => {
   if (!filterForFailedOrPending) return items;
-  return items.filter(
-    (item) => isFailedEventGroup(item) || isPendingEventGroup(item),
-  );
+  return items.filter((item) => isFailedGroup(item) || item.isPending);
 };

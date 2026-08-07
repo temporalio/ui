@@ -1,17 +1,5 @@
-import type { EventLink, Payload } from '$lib/types';
-import type {
-  ActivityTaskScheduledEvent,
-  CommonHistoryEvent,
-  MarkerRecordedEvent,
-  NexusOperationScheduledEvent,
-  SignalExternalWorkflowExecutionInitiatedEvent,
-  StartChildWorkflowExecutionInitiatedEvent,
-  TimerStartedEvent,
-  WorkflowEvent,
-  WorkflowExecutionSignaledEvent,
-  WorkflowExecutionUpdateAcceptedEvent,
-  WorkflowTaskScheduledEvent,
-} from '$lib/types/events';
+import type { Payload } from '$lib/types';
+import type { CommonHistoryEvent, WorkflowEvent } from '$lib/types/events';
 import {
   isActivityTaskScheduledEvent,
   isLocalActivityMarkerEvent,
@@ -38,24 +26,36 @@ import {
   getEventGroupName,
 } from './get-group-name';
 
-type StartingEvents = {
-  Activity: ActivityTaskScheduledEvent;
-  ChildWorkflow: StartChildWorkflowExecutionInitiatedEvent;
-  Timer: TimerStartedEvent;
-  Signal: SignalExternalWorkflowExecutionInitiatedEvent;
-  SignalReceived: WorkflowExecutionSignaledEvent;
-  LocalActivity: MarkerRecordedEvent;
-  Marker: MarkerRecordedEvent;
-  Update: WorkflowExecutionUpdateAcceptedEvent;
-  WorkflowTask: WorkflowTaskScheduledEvent;
-  Nexus: NexusOperationScheduledEvent;
-};
+/**
+ * A group's category, which is its head event's except for local-activity
+ * markers. Shared with the buffer's LazyGroup so both derive it identically —
+ * views filter on one and render the other.
+ */
+export const groupCategory = (
+  head: WorkflowEvent,
+): WorkflowEvent['category'] =>
+  isLocalActivityMarkerEvent(head) ? 'local-activity' : head.category;
+
+/**
+ * Whether a group is still open. Depends only on its head event, how many of
+ * its events have loaded, and any pending metadata — so the buffer can answer
+ * it from a LazyGroup without building the group. Shared for the same reason
+ * as groupCategory.
+ */
+export const groupIsPending = (
+  head: WorkflowEvent,
+  eventCount: number,
+  pendingActivity: EventGroup['pendingActivity'],
+  pendingNexusOperation: EventGroup['pendingNexusOperation'],
+): boolean =>
+  !!pendingActivity ||
+  !!pendingNexusOperation ||
+  (isTimerStartedEvent(head) && eventCount === 1) ||
+  (isStartChildWorkflowExecutionInitiatedEvent(head) && eventCount === 2);
 
 // Computed fields live on a shared prototype (via `this`) rather than as
-// per-instance getter closures. Every group then has a single hidden class, so
-// property access in the timeline's hot loops stays monomorphic, and
-// cloneEventGroup() can shallow-copy the data fields without re-declaring the
-// accessors or invoking them.
+// per-instance getter closures, so every group has a single hidden class and
+// property access in the timeline's hot loops stays monomorphic.
 const eventGroupProto: ThisType<EventGroup> = {
   get eventTime() {
     return this.eventList[this.eventList.length - 1]?.eventTime;
@@ -66,41 +66,30 @@ const eventGroupProto: ThisType<EventGroup> = {
   get lastEvent() {
     return this.eventList[this.eventList.length - 1];
   },
+  get eventCount() {
+    return this.eventList.length;
+  },
   get finalClassification() {
     return this.eventList[this.eventList.length - 1].classification;
   },
   get isPending() {
-    return (
-      !!this.pendingActivity ||
-      !!this.pendingNexusOperation ||
-      (isTimerStartedEvent(this.initialEvent) && this.eventList.length === 1) ||
-      (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&
-        this.eventList.length === 2)
+    return groupIsPending(
+      this.initialEvent,
+      this.eventList.length,
+      this.pendingActivity,
+      this.pendingNexusOperation,
     );
   },
 };
 
-/**
- * Shallow-clone a group onto the same prototype, sharing its eventList. Copies
- * only own data fields (the accessors live on the prototype, so they are
- * neither copied nor invoked), giving the clone an identical shape to
- * createGroupFor's groups and a fresh reference for reference-tracking Svelte
- * views to re-derive from.
- */
-export const cloneEventGroup = (group: EventGroup): EventGroup =>
-  Object.assign(
-    Object.create(Object.getPrototypeOf(group) as object),
-    group,
-  ) as EventGroup;
-
-const createGroupFor = <K extends keyof StartingEvents>(
-  event: StartingEvents[K] & { userMetadata?: { summary: Payload } },
+const createGroupFor = (
+  event: CommonHistoryEvent & { userMetadata?: { summary: Payload } },
 ): EventGroup => {
   const id = getGroupId(event);
   const name = getEventGroupName(event);
   const label = getEventGroupLabel(event);
   const displayName = getEventGroupDisplayName(event);
-  const { timestamp, category, classification } = event;
+  const { timestamp, classification } = event;
 
   // Single flat array — no Map, no Set. Groups have 1–5 events.
   const eventList: EventGroup['eventList'] = [event as never];
@@ -115,7 +104,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     eventList,
     initialEvent: event,
     timestamp,
-    category: isLocalActivityMarkerEvent(event) ? 'local-activity' : category,
+    category: groupCategory(event),
     classification,
     level: undefined,
     pendingActivity: undefined,
@@ -142,40 +131,38 @@ export const addEventToGroup = (group: EventGroup, event: WorkflowEvent) => {
   }
 };
 
+/**
+ * Whether `event` starts a group, including the WorkflowTask groups that
+ * createWorkflowTaskGroup builds. Single source of truth for the dispatch, so
+ * callers that only need to know whether a group exists — the buffer, deciding
+ * which records to expose — can ask without building one.
+ */
+export const isGroupHeadEvent = (event: CommonHistoryEvent): boolean =>
+  isWorkflowTaskScheduledEvent(event) ||
+  isActivityTaskScheduledEvent(event) ||
+  isStartChildWorkflowExecutionInitiatedEvent(event) ||
+  isTimerStartedEvent(event) ||
+  isSignalExternalWorkflowExecutionInitiatedEvent(event) ||
+  isWorkflowExecutionSignaledEvent(event) ||
+  isMarkerRecordedEvent(event) ||
+  isWorkflowExecutionUpdateAcceptedEvent(event) ||
+  isNexusOperationScheduledEvent(event);
+
 export const createEventGroup = (
   event: CommonHistoryEvent,
 ): EventGroup | undefined => {
-  if (isActivityTaskScheduledEvent(event))
-    return createGroupFor<'Activity'>(event);
-
-  if (isStartChildWorkflowExecutionInitiatedEvent(event))
-    return createGroupFor<'ChildWorkflow'>(event);
-
-  if (isTimerStartedEvent(event)) return createGroupFor<'Timer'>(event);
-
-  if (isSignalExternalWorkflowExecutionInitiatedEvent(event))
-    return createGroupFor<'Signal'>(event);
-
-  if (isWorkflowExecutionSignaledEvent(event))
-    return createGroupFor<'SignalReceived'>(event);
-
-  if (isMarkerRecordedEvent(event)) {
-    if (isLocalActivityMarkerEvent(event)) {
-      return createGroupFor<'LocalActivity'>(event);
-    }
-    return createGroupFor<'Marker'>(event);
-  }
-
-  if (isWorkflowExecutionUpdateAcceptedEvent(event))
-    return createGroupFor<'Update'>(event);
-
-  if (isNexusOperationScheduledEvent(event))
-    return createGroupFor<'Nexus'>(event);
+  // WorkflowTask heads are createWorkflowTaskGroup's, kept separate so callers
+  // can exclude them.
+  if (isWorkflowTaskScheduledEvent(event)) return undefined;
+  if (!isGroupHeadEvent(event)) return undefined;
+  // createGroupFor derives every field from the event, including the
+  // local-activity category split, so the per-type branches only ever differed
+  // in their type parameter.
+  return createGroupFor(event);
 };
 
 export const createWorkflowTaskGroup = (
   event: CommonHistoryEvent,
 ): EventGroup | undefined => {
-  if (isWorkflowTaskScheduledEvent(event))
-    return createGroupFor<'WorkflowTask'>(event);
+  if (isWorkflowTaskScheduledEvent(event)) return createGroupFor(event);
 };

@@ -9,6 +9,11 @@
   import { buildGroupIndex, isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
+  import {
+    isLazyGroup,
+    type LazyGroup,
+    materializeGroup,
+  } from '$lib/services/grouped-event-buffer';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
@@ -17,7 +22,10 @@
     IterableEventWithPending,
     WorkflowEventWithPending,
   } from '$lib/types/events';
-  import { getFailedOrPendingEvents } from '$lib/utilities/get-failed-or-pending';
+  import {
+    getFailedOrPendingEvents,
+    getFailedOrPendingGroups,
+  } from '$lib/utilities/get-failed-or-pending';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -31,23 +39,32 @@
   import PendingActivitySummaryRow from './pending-activity-summary-row.svelte';
   import PendingNexusSummaryRow from './pending-nexus-summary-row.svelte';
 
-  let {
+  /** Discriminated on `compact` so `items` narrows without a cast. */
+  type Props = {
+    updating?: boolean;
+    loading?: boolean;
+    minimized?: boolean;
+  } & (
+    | { compact: true; items: LazyGroup[]; groups?: never }
+    | {
+        compact?: false;
+        items: IterableEventWithPending[];
+        groups?: EventGroups;
+      }
+  );
+
+  // `const` with no default on `compact` — `let` or a default breaks narrowing.
+  const {
     items,
+    compact,
     groups = [],
     updating = false,
     loading = false,
-    compact = false,
     minimized = true,
-    hoveredEventId = $bindable(undefined),
-  }: {
-    items: IterableEventWithPending[];
-    groups?: EventGroups;
-    updating?: boolean;
-    loading?: boolean;
-    compact?: boolean;
-    minimized?: boolean;
-    hoveredEventId?: string;
-  } = $props();
+  }: Props = $props();
+
+  // Set by a hovered row, read by its siblings to highlight related activities.
+  let hoveredEventId = $state<string | undefined>(undefined);
 
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
@@ -58,15 +75,23 @@
     url.searchParams.get(currentPageKey) || '1',
   );
 
-  const filteredForStatus = (items: IterableEventWithPending[]) =>
-    getFailedOrPendingEvents(items, $eventStatusFilter);
+  // Array-of-union, not union-of-arrays: Paginated is generic over one Item,
+  // which `LazyGroup[] | IterableEventWithPending[]` gives it no way to pick.
+  const filteredItems: (IterableEventWithPending | LazyGroup)[] = $derived(
+    compact
+      ? getFailedOrPendingGroups(items, $eventStatusFilter)
+      : getFailedOrPendingEvents(items, $eventStatusFilter),
+  );
 
-  const paginatedHistory = (items: IterableEventWithPending[]) => {
-    return filteredForStatus(items).slice(
-      (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
-      parseInt(currentPageParam) * parseInt(perPageParam),
-    ) as WorkflowEventWithPending[];
-  };
+  // The gutter graph sits outside Paginated, so it re-derives the page.
+  const graphHistory = $derived(
+    showGraph
+      ? (filteredItems as WorkflowEventWithPending[]).slice(
+          (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
+          parseInt(currentPageParam) * parseInt(perPageParam),
+        )
+      : [],
+  );
 
   const columns = $derived([
     { label: 'Event ID' },
@@ -76,7 +101,7 @@
     ...($isCloud ? [{ label: 'Billable Actions' }] : []),
   ]);
 
-  const iterableKey = (event: IterableEventWithPending) => {
+  const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
     if (isPendingNexusOperation(event))
       return `pending-nexus-${event.scheduledEventId}`;
     if (isPendingActivity(event)) return `pending-activity-${event.id}`;
@@ -92,7 +117,7 @@
 <div class="flex">
   <div class="pt-9">
     {#if showGraph}
-      <HistoryGraph {groups} history={paginatedHistory(items)} />
+      <HistoryGraph {groups} history={graphHistory} />
     {/if}
   </div>
   <Paginated
@@ -101,7 +126,7 @@
     previousPageButtonLabel={translate('common.previous-page')}
     pageButtonLabel={(page) => translate('common.go-to-page', { page })}
     {updating}
-    items={filteredForStatus(items)}
+    items={filteredItems}
     maxHeight="none"
     class="border-t-0"
   >
@@ -117,42 +142,43 @@
       </TableHeaderRow>
     {/snippet}
     {#snippet rows({ visibleItems })}
-      {#each visibleItems as event, index (iterableKey(event))}
-        {#if isEventGroup(event)}
+      {#each visibleItems as item, index (iterableKey(item))}
+        {@const row = isLazyGroup(item) ? materializeGroup(item) : item}
+        {#if isEventGroup(row)}
           <EventSummaryRow
             bind:hoveredEventId
-            {event}
+            event={row}
             {index}
-            group={event}
+            group={row}
             {compact}
             {initialItem}
           />
-        {:else if isPendingActivity(event)}
+        {:else if isPendingActivity(row)}
           <PendingActivitySummaryRow
-            {event}
+            event={row}
             {index}
             group={groups.find(
               (g) =>
-                isPendingActivity(event) && g?.pendingActivity?.id === event.id,
+                isPendingActivity(row) && g?.pendingActivity?.id === row.id,
             )}
           />
-        {:else if isPendingNexusOperation(event)}
+        {:else if isPendingNexusOperation(row)}
           <PendingNexusSummaryRow
-            {event}
+            event={row}
             {index}
             group={groups.find(
               (g) =>
-                isPendingNexusOperation(event) &&
+                isPendingNexusOperation(row) &&
                 g?.pendingNexusOperation?.scheduledEventId ===
-                  event.scheduledEventId,
+                  row.scheduledEventId,
             )}
           />
         {:else}
           <EventSummaryRow
             bind:hoveredEventId
-            {event}
+            event={row}
             {index}
-            group={isEvent(event) ? groupIndex.get(event.id) : undefined}
+            group={isEvent(row) ? groupIndex.get(row.id) : undefined}
             {compact}
             {initialItem}
           />

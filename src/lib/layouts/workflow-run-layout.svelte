@@ -17,12 +17,11 @@
   import type { PauseHandle } from '$lib/services/fetch-bidirectional';
   import { fetchBidirectional } from '$lib/services/fetch-bidirectional';
   import {
-    appendLiveEvent,
-    enrichGroups,
-    getEventArray,
-    processEvent,
+    ingestHistoryEvent,
     reset as resetBuffer,
+    setPendingMetadata,
   } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { runLivePoll } from '$lib/services/live-poll';
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
@@ -30,7 +29,6 @@
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import {
-    bufferVersion,
     fullEventHistory,
     pauseLiveUpdates,
     timelineEvents,
@@ -59,9 +57,9 @@
   let workflowId = $derived(page.params.workflow);
   let runId = $derived(page.params.run);
   let showJson = $derived(page.url.searchParams.has('json'));
-  let fullJson = $derived.by(() => {
-    $bufferVersion;
-    return { ...$workflowRun, eventHistory: getEventArray() };
+  let fullJson = $derived({
+    ...$workflowRun,
+    eventHistory: eventBuffer.events,
   });
 
   let workflowError: NetworkError | null = $state(null);
@@ -155,12 +153,11 @@
       startToken,
       signal: livePollingController.signal,
       onEvent: (ev) => {
-        const isNew = appendLiveEvent(ev);
+        const isNew = ingestHistoryEvent(ev, true);
         if (isNew)
           latestEventId = Math.max(latestEventId, parseInt(ev.eventId));
         return isNew;
       },
-      onNewEvents: () => bufferVersion.update((v) => v + 1),
     }).then((lastToken) => {
       _lastPollToken = lastToken;
     });
@@ -210,8 +207,8 @@
     // Start live poll immediately — concurrent with the bidirectional fetch.
     // Any events that arrive while the fetch is in progress are captured right
     // away rather than waiting for the full history to load first.
-    // appendLiveEvent deduplicates events that the bidirectional fetch also
-    // delivers; getEventArray() filters the live side at read time for safety.
+    // ingestHistoryEvent deduplicates events the bidirectional fetch also
+    // delivers, so the two producers can write into the same store concurrently.
     // Skip if the user has already paused auto-refresh — the pause $effect
     // will restart from _lastPollToken when they unpause.
     if (workflow.isRunning && !$pauseLiveUpdates) {
@@ -239,20 +236,14 @@
       },
       onRawPage: (events, isAscending) => {
         for (const event of events) {
-          processEvent(event, isAscending);
+          ingestHistoryEvent(event, isAscending);
           const id = parseInt(event.eventId);
           if (id > latestEventId) latestEventId = id;
         }
-        if (events.length) bufferVersion.update((v) => v + 1);
       },
     })
       .then(() => {
-        enrichGroups(
-          $workflowRun.workflow?.pendingActivities ?? [],
-          $workflowRun.workflow?.pendingNexusOperations ?? [],
-        );
         fetchComplete = true;
-        bufferVersion.update((v) => v + 1);
       })
       .catch((e: unknown) => {
         if (e instanceof Error && e.name !== 'AbortError') {
@@ -289,19 +280,23 @@
     livePollingController = null;
   };
 
+  // Pending metadata comes from the workflow run, not the history. The buffer
+  // holds it and applies it as heads arrive, so this only pushes on a refresh.
   $effect(() => {
-    $bufferVersion;
-    untrack(() => {
-      const events = getEventArray();
-      $fullEventHistory = events;
-    });
+    setPendingMetadata(
+      $workflowRun.workflow?.pendingActivities ?? [],
+      $workflowRun.workflow?.pendingNexusOperations ?? [],
+    );
+  });
+
+  $effect(() => {
+    $fullEventHistory = eventBuffer.events;
   });
 
   const clearWorkflowData = () => {
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $fullEventHistory = [];
-    $bufferVersion = 0;
     workflowError = null;
     fetchComplete = false;
     latestEventId = 0;
@@ -317,18 +312,15 @@
     refreshInterval = null;
   };
 
-  $effect(() => {
-    runId;
-    untrack(() => {
-      clearWorkflowData();
-    });
-  });
-
+  // Clearing and refetching were separate effects on the same trigger, so
+  // clear-before-fetch held only because Svelte runs effects in creation order
+  // — reordering the declarations would have wiped each fetch.
   $effect(() => {
     const ns = namespace;
     const wfId = workflowId;
     const rId = runId;
     untrack(() => {
+      clearWorkflowData();
       getWorkflowAndEventHistory(ns, wfId, rId);
     });
   });
