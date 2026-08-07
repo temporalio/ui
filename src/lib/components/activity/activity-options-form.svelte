@@ -4,6 +4,7 @@
   import { zodClient } from 'sveltekit-superforms/adapters';
   import z from 'zod/v3';
 
+  import Message from '$lib/components/form/message.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
@@ -156,13 +157,13 @@
     open = false;
   };
 
-  const { form, errors, enhance } = superForm(initialData, {
+  const { form, errors, message, enhance } = superForm(initialData, {
     SPA: true,
     dataType: 'json',
     resetForm: false,
     invalidateAll: false,
     validators: zodClient(schema),
-    onUpdate: async ({ form }) => {
+    onUpdate: async ({ form, cancel }) => {
       if (!form.valid) return;
 
       try {
@@ -173,20 +174,19 @@
             activityId,
           }),
         });
+        closeCustomizationDrawer();
       } catch (error) {
-        console.error('Error updating activity options:', error);
-        toaster.push({
-          variant: 'error',
-          message: translate('activities.update-options-error', {
+        message.set({
+          intent: 'error',
+          title: translate('common.error-occurred'),
+          text: translate('activities.update-options-error', {
             activityId,
             error: has(error, 'message')
               ? String(error.message)
               : translate('common.unknown-error'),
           }),
-          duration: 5000,
         });
-      } finally {
-        closeCustomizationDrawer();
+        cancel();
       }
     },
   });
@@ -218,7 +218,7 @@
           labelHidden
           bind:value={$form.maximumAttempts}
           min={0}
-          error={!!$errors.maximumAttempts}
+          error={!!$errors.maximumAttempts?.[0]}
           hintText={$errors.maximumAttempts?.[0] ?? ''}
           class="w-24"
         />
@@ -239,7 +239,7 @@
           bind:value={$form.backoffCoefficient}
           step={0.01}
           min={1}
-          error={!!$errors.backoffCoefficient}
+          error={!!$errors.backoffCoefficient?.[0]}
           hintText={$errors.backoffCoefficient?.[0] ?? ''}
           class="w-24"
         />
@@ -282,7 +282,7 @@
         initialUnit={initialTimeoutUnit(initialData.scheduleToCloseTimeout)}
         units={TIMEOUT_UNITS}
         min={0}
-        error={!!$errors.scheduleToCloseTimeout}
+        error={!!$errors.scheduleToCloseTimeout?.[0]}
         hintText={$errors.scheduleToCloseTimeout?.[0] ?? ''}
         class="max-w-80"
       />
@@ -298,7 +298,7 @@
         initialUnit={initialTimeoutUnit(initialData.startToCloseTimeout)}
         units={TIMEOUT_UNITS}
         min={0}
-        error={!!$errors.startToCloseTimeout}
+        error={!!$errors.startToCloseTimeout?.[0]}
         hintText={$errors.startToCloseTimeout?.[0] ?? ''}
         class="max-w-80"
       />
@@ -340,11 +340,12 @@
           label={translate('activities.task-queue-name')}
           required
           bind:value={$form.taskQueue}
-          error={!!$errors.taskQueue}
+          error={!!$errors.taskQueue?.[0]}
           hintText={$errors.taskQueue?.[0] ?? ''}
           class="w-full"
         />
       </div>
+      <Message value={$message} />
       <div class="flex items-center justify-end gap-4">
         <Button
           type="button"
