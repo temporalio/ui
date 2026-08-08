@@ -71,16 +71,19 @@ describe('routeFor', () => {
     expect(path).toBe(`${base}/namespaces/default/workflows`);
   });
 
-  it('should route to the workflow catalog without a namespace', () => {
-    expect(routeForWorkflowCatalog()).toBe(
-      `${base}/dev-tools/workflow-catalog`,
+  it('should route to the workflow catalog within a namespace', () => {
+    expect(routeForWorkflowCatalog({ namespace: 'default' })).toBe(
+      `${base}/namespaces/default/workflow-catalog`,
     );
   });
 
   it('should encode a workflow catalog example ID', () => {
-    expect(routeForWorkflowCatalogExample('release/2026 #1')).toBe(
-      `${base}/dev-tools/workflow-catalog/release%2F2026%20%231`,
-    );
+    expect(
+      routeForWorkflowCatalogExample({
+        namespace: 'default',
+        exampleId: 'release/2026 #1',
+      }),
+    ).toBe(`${base}/namespaces/default/workflow-catalog/release%2F2026%20%231`);
   });
 
   it('should route to archival workflows', () => {

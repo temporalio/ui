@@ -94,9 +94,13 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     ['routeForNexus', () => routeForNexus()],
     [
       'routeForWorkflowCatalogExample',
-      () => routeForWorkflowCatalogExample('example-id'),
+      () =>
+        routeForWorkflowCatalogExample({
+          ...namespaceParams,
+          exampleId: 'example-id',
+        }),
     ],
-    ['routeForWorkflowCatalog', () => routeForWorkflowCatalog()],
+    ['routeForWorkflowCatalog', () => routeForWorkflowCatalog(namespaceParams)],
     ['routeForNexusEndpoint', () => routeForNexusEndpoint('ep-1')],
     ['routeForNexusEndpointEdit', () => routeForNexusEndpointEdit('ep-1')],
     ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],

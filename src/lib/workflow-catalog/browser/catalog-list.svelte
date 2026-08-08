@@ -7,7 +7,6 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { routeForWorkflowCatalogExample } from '$lib/utilities/route-for';
 
   import { changePendingRunCount } from './catalog-list-state';
   import { workflowCatalogSources } from './catalog-sources';
@@ -26,15 +25,10 @@
     descriptors: readonly BrowserWorkflowCatalogDescriptor[];
     host: WorkbenchHost;
     sessionStore: WorkflowCatalogSessionStore;
-    exampleHref?: (exampleId: string) => string;
+    exampleHref: (exampleId: string) => string;
   }
 
-  let {
-    descriptors,
-    host,
-    sessionStore,
-    exampleHref = routeForWorkflowCatalogExample,
-  }: Props = $props();
+  let { descriptors, host, sessionStore, exampleHref }: Props = $props();
 
   let query = $state('');
   let filter = $state<SourceFilter>('all');

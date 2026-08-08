@@ -4,19 +4,34 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { coreUserStore } from '$lib/stores/core-user';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { routeForWorkflowCatalog } from '$lib/utilities/route-for';
   import WorkflowCatalogDetail from '$lib/workflow-catalog/browser/catalog-detail.svelte';
 
   import {
     findRouteWorkflowDescriptor,
-    routeWorkflowCatalog,
+    resolveWorkflowCatalogForNamespace,
   } from '../catalog';
-  import { getWorkflowCatalogContext } from '../context';
+  import { getWorkflowCatalogServices } from '../services';
 
-  const context = getWorkflowCatalogContext();
+  const coreUser = coreUserStore();
+  const identity = getIdentity();
+  const namespace = $derived(page.params.namespace);
   const exampleId = $derived(page.params.exampleId);
   const descriptor = $derived(
-    findRouteWorkflowDescriptor(routeWorkflowCatalog, exampleId),
+    findRouteWorkflowDescriptor(
+      resolveWorkflowCatalogForNamespace(namespace),
+      exampleId,
+    ),
+  );
+  const services = $derived(
+    getWorkflowCatalogServices({
+      namespace,
+      getIdentity: () => identity,
+      namespaceWriteDisabled: (candidate) =>
+        $coreUser.namespaceWriteDisabled(candidate),
+    }),
   );
 </script>
 
@@ -24,7 +39,10 @@
   <PageTitle title={`${descriptor.title} | Workflow catalog`} />
 
   <header class="mb-6">
-    <Link href={routeForWorkflowCatalog()} leadingIcon="chevron-left">
+    <Link
+      href={routeForWorkflowCatalog({ namespace })}
+      leadingIcon="chevron-left"
+    >
       Back to workflow catalog
     </Link>
     <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -40,8 +58,8 @@
 
   <WorkflowCatalogDetail
     {descriptor}
-    host={context.host}
-    sessionStore={context.sessionStore}
+    host={services.host}
+    sessionStore={services.sessionStore}
   />
 {:else}
   <PageTitle title="Workflow example not found" />
@@ -54,7 +72,10 @@
     <p class="text-secondary">
       No workflow catalog example matches <code>{exampleId}</code>.
     </p>
-    <a class="text-primary underline" href={routeForWorkflowCatalog()}>
+    <a
+      class="text-primary underline"
+      href={routeForWorkflowCatalog({ namespace })}
+    >
       Back to workflow catalog
     </a>
   </section>

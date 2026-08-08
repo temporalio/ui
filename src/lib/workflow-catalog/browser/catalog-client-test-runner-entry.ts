@@ -165,7 +165,7 @@ export async function resolveReadiness(checks: ReadinessCheck[]) {
 }
 
 export async function renderList({
-  exampleHref,
+  exampleHref = (exampleId: string) => `/examples/${exampleId}`,
 }: {
   exampleHref?: (exampleId: string) => string;
 } = {}) {

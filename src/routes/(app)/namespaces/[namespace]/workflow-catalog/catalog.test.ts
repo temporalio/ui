@@ -5,6 +5,7 @@ import type { BrowserWorkflowCatalogDescriptor } from '$lib/workflow-catalog/bro
 import {
   findRouteWorkflowDescriptor,
   mergeWorkflowCatalogDescriptors,
+  resolveWorkflowCatalogForNamespace,
   routeWorkflowCatalog,
 } from './catalog';
 
@@ -147,6 +148,27 @@ describe('workflow catalog route catalog', () => {
     expect(() => mergeWorkflowCatalogDescriptors([descriptor], [])).toThrow(
       expectedMessage,
     );
+  });
+
+  it('retargets every catalog example to the requested namespace', () => {
+    const resolved = resolveWorkflowCatalogForNamespace('feature-namespace');
+
+    expect(resolved).toHaveLength(routeWorkflowCatalog.length);
+    for (const descriptor of resolved) {
+      expect(descriptor.execution.namespace).toBe('feature-namespace');
+    }
+  });
+
+  it('keeps runtime-routed task queues when retargeting namespaces', () => {
+    const resolved = resolveWorkflowCatalogForNamespace('feature-namespace');
+
+    expect(
+      resolved.find(({ id }) => id === localDescriptor.id)?.execution,
+    ).toMatchObject({
+      targetId: 'local-worker',
+      namespace: 'feature-namespace',
+      taskQueue: 'runtime-task-queue',
+    });
   });
 
   it('finds a literal percent-escape ID from an already-decoded route parameter', () => {

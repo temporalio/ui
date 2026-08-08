@@ -86,11 +86,13 @@ const host: WorkbenchHost = {
   evidenceLink: vi.fn(),
 };
 
+const exampleHref = (exampleId: string) => `/examples/${exampleId}`;
+
 describe('WorkflowCatalogList', () => {
   it('keeps an empty filtered result inside the bounded workflow table', () => {
     const sessionStore = createWorkflowCatalogSessionStore(host);
     const { body } = renderComponent(catalogList, {
-      props: { descriptors: [], host, sessionStore },
+      props: { descriptors: [], host, sessionStore, exampleHref },
     });
 
     expect(body).toContain('<table');
@@ -102,7 +104,7 @@ describe('WorkflowCatalogList', () => {
   it('renders catalog examples in a compact native table with fixed actions', () => {
     const sessionStore = createWorkflowCatalogSessionStore(host);
     const { body } = renderComponent(catalogList, {
-      props: { descriptors: [descriptor], host, sessionStore },
+      props: { descriptors: [descriptor], host, sessionStore, exampleHref },
     });
 
     expect(body).toContain('<table');
@@ -176,7 +178,12 @@ describe('WorkflowCatalogList', () => {
     });
     await Promise.resolve();
     const { body } = renderComponent(catalogList, {
-      props: { descriptors: [descriptor], host: sessionHost, sessionStore },
+      props: {
+        descriptors: [descriptor],
+        host: sessionHost,
+        sessionStore,
+        exampleHref,
+      },
     });
 
     expect(body).toContain('Completed');
@@ -212,7 +219,12 @@ describe('WorkflowCatalogList', () => {
       startOptions: descriptor.startOptions.defaultValue,
     });
     const { body } = renderComponent(catalogList, {
-      props: { descriptors: [descriptor], host: sessionHost, sessionStore },
+      props: {
+        descriptors: [descriptor],
+        host: sessionHost,
+        sessionStore,
+        exampleHref,
+      },
     });
 
     expect(body).toContain('Launch rejected');
@@ -229,7 +241,8 @@ describe('WorkflowCatalogList', () => {
     expect(source).toContain('descriptor.source.id');
     expect(source).toContain('descriptor.source.label');
     expect(source).not.toContain("['all', 'shared', 'local']");
-    expect(source).toContain('exampleHref = routeForWorkflowCatalogExample');
+    expect(source).toContain('exampleHref: (exampleId: string) => string;');
+    expect(source).not.toContain('routeForWorkflowCatalogExample');
     expect(
       source.match(/href=\{exampleHref\(descriptor\.id\)\}/g),
     ).toHaveLength(2);

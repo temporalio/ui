@@ -41,11 +41,10 @@
     routeForStandaloneNexusOperations,
     routeForWorkerDeployments,
     routeForWorkers,
+    routeForWorkflowCatalog,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
-
-  import WorkflowCatalogProvider from './dev-tools/workflow-catalog/workflow-catalog-provider.svelte';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
@@ -109,6 +108,7 @@
       workersRoute: routeForWorkers({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
       archivalRoute: routeForArchivalWorkflows({ namespace }),
+      workflowCatalogRoute: routeForWorkflowCatalog({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
       historyImportRoute: routeForEventHistoryImport(),
@@ -270,6 +270,7 @@
     archivalRoute,
     standaloneActivitiesRoute,
     standaloneNexusOperationsRoute,
+    workflowCatalogRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
@@ -281,6 +282,7 @@
       archivalRoute,
       standaloneActivitiesRoute,
       standaloneNexusOperationsRoute,
+      workflowCatalogRoute,
     ].some((route) => page.url.href.includes(route)),
   );
 
@@ -309,6 +311,10 @@
       {
         subPath: 'workers',
         fullRoute: routeForWorkers({ namespace }),
+      },
+      {
+        subPath: 'workflow-catalog',
+        fullRoute: routeForWorkflowCatalog({ namespace }),
       },
     ];
 
@@ -407,11 +413,9 @@
     </TopNavigation>
     {#snippet main()}
       <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
-        <WorkflowCatalogProvider>
-          <ErrorBoundary>
-            {@render children()}
-          </ErrorBoundary>
-        </WorkflowCatalogProvider>
+        <ErrorBoundary>
+          {@render children()}
+        </ErrorBoundary>
       </div>
     {/snippet}
     {#snippet footer()}

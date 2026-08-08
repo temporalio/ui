@@ -53,3 +53,28 @@ export const routeWorkflowCatalog = mergeWorkflowCatalogDescriptors(
   localWorkflowCatalog,
   workflowCatalogRouting,
 );
+
+const routingForNamespace = (
+  descriptors: readonly BrowserWorkflowCatalogDescriptor[],
+  namespace: string,
+): WorkflowCatalogRouting =>
+  Object.fromEntries(
+    descriptors.map(({ execution }) => [
+      execution.targetId,
+      { namespace, taskQueue: execution.taskQueue },
+    ]),
+  );
+
+export const resolveWorkflowCatalogForNamespace = (
+  namespace: string,
+): BrowserWorkflowCatalogDescriptor[] => {
+  const resolvedExecutions = resolveWorkflowCatalogRouting(
+    routeWorkflowCatalog.map(({ execution }) => execution),
+    routingForNamespace(routeWorkflowCatalog, namespace),
+  );
+
+  return routeWorkflowCatalog.map((descriptor, index) => ({
+    ...descriptor,
+    execution: resolvedExecutions[index] ?? descriptor.execution,
+  }));
+};
