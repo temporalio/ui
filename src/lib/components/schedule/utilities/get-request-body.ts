@@ -1,7 +1,9 @@
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
-import { setSearchAttributes } from '$lib/services/workflow-service';
 import type { Payload } from '$lib/types';
-import { encodePayloads } from '$lib/utilities/encode-payload';
+import {
+  encodePayloads,
+  setSearchAttributes,
+} from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import { isValidCronString } from './cron';

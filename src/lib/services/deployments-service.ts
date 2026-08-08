@@ -439,10 +439,6 @@ export const buildLambdaComputeConfig = (
   return {
     scalingGroups: {
       default: {
-        taskQueueTypes: [
-          'TASK_QUEUE_TYPE_WORKFLOW',
-          'TASK_QUEUE_TYPE_ACTIVITY',
-        ],
         provider: {
           type: 'aws-lambda',
           details: { metadata: { encoding }, data: providerData },
@@ -489,10 +485,6 @@ export const buildGcpCloudRunComputeConfig = (
   return {
     scalingGroups: {
       default: {
-        taskQueueTypes: [
-          'TASK_QUEUE_TYPE_WORKFLOW',
-          'TASK_QUEUE_TYPE_ACTIVITY',
-        ],
         provider: {
           type: 'gcp-cloud-run',
           details: { metadata: { encoding }, data: providerData },

@@ -10,6 +10,7 @@ import type {
   ActivityUpdateOptionsRequest,
   ActivityUpdateOptionsResponse,
 } from '$lib/types';
+import { activityOptionsUpdateMask } from '$lib/utilities/activity-options-update-mask';
 import { isNotFound, isNotImplemented } from '$lib/utilities/handle-error';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -128,9 +129,6 @@ export const resetActivity = async ({
   );
 };
 
-export const ACTIVITY_OPTIONS_UPDATE_MASK =
-  'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts,startDelay';
-
 export const updateActivityOptions = async ({
   namespace,
   execution,
@@ -152,7 +150,7 @@ export const updateActivityOptions = async ({
           id,
           type,
           activityOptions,
-          updateMask: ACTIVITY_OPTIONS_UPDATE_MASK,
+          updateMask: activityOptionsUpdateMask(activityOptions),
           ...(identity && { identity }),
         }),
       },
