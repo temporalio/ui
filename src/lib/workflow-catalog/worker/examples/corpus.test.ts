@@ -44,7 +44,11 @@ const migratedWorkflowTypes = [
   'signalCollector',
 ] as const;
 
-const proofExampleIds = ['priority-fairness', 'standalone-activity'] as const;
+const proofExampleIds = [
+  'priority-fairness',
+  'standalone-activity',
+  'nexus-greeting',
+] as const;
 
 describe('shared workflow corpus', () => {
   it('registers one shared-workflows target with committed default routing', () => {
@@ -494,6 +498,8 @@ describe('shared workflow corpus', () => {
       'src/lib/workflow-catalog/worker/examples/priority-fairness/workflow.ts',
       'src/lib/workflow-catalog/worker/examples/standalone-activity/example.ts',
       'src/lib/workflow-catalog/worker/examples/standalone-activity/activity.ts',
+      'src/lib/workflow-catalog/worker/examples/nexus-greeting/example.ts',
+      'src/lib/workflow-catalog/worker/examples/nexus-greeting/service.ts',
     ]);
   });
 });

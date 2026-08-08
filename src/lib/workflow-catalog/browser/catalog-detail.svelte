@@ -98,11 +98,23 @@
           : 'Nexus endpoint status couldn’t be checked.',
     };
   };
+
+  export const nexusEndpointCreateCommand = ({
+    endpoint,
+    namespace,
+    taskQueue,
+  }: {
+    endpoint: string;
+    namespace: string;
+    taskQueue: string;
+  }): string =>
+    `temporal operator nexus endpoint create --name ${endpoint} --target-namespace ${namespace} --target-task-queue ${taskQueue}`;
 </script>
 
 <script lang="ts">
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -591,6 +603,20 @@
                   </Tooltip>
                   <span>{presentation.label}</span>
                 </div>
+                {#if check.kind === 'nexus-endpoint' && check.state === 'unavailable' && descriptor.execution.kind === 'standalone-nexus-operation'}
+                  <p class="mt-2 text-xs text-secondary">
+                    Create the declared endpoint, then run the example again:
+                  </p>
+                  <Copyable
+                    visible
+                    clickAllToCopy
+                    content={nexusEndpointCreateCommand(descriptor.execution)}
+                    copyIconTitle="Copy the endpoint create command"
+                    copySuccessIconTitle="Copied the endpoint create command"
+                    container-class="mt-1"
+                    class="font-mono text-xs"
+                  />
+                {/if}
               </div>
             {/each}
           {/if}

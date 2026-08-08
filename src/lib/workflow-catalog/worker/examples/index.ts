@@ -32,6 +32,10 @@ import {
   longActivitySourceFiles,
 } from './long-activity/example.js';
 import {
+  nexusGreetingExample,
+  nexusGreetingSourceFiles,
+} from './nexus-greeting/example.js';
+import {
   parallelActivitiesExample,
   parallelActivitiesSourceFiles,
 } from './parallel-activities/example.js';
@@ -119,6 +123,7 @@ const sharedWorkflowDefinitions: readonly WorkflowExampleDefinition[] = [
     example: standaloneActivityExample,
     sourceFiles: standaloneActivitySourceFiles,
   },
+  { example: nexusGreetingExample, sourceFiles: nexusGreetingSourceFiles },
 ];
 
 export const sharedWorkflowExamples: readonly WorkflowCatalogExampleRegistration[] =

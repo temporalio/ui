@@ -44,6 +44,11 @@ let readinessPresentation: (config: {
   label: string;
   tooltip: string;
 };
+let nexusEndpointCreateCommand: (config: {
+  endpoint: string;
+  namespace: string;
+  taskQueue: string;
+}) => string;
 
 beforeAll(async () => {
   const projectRoot = process.cwd();
@@ -71,6 +76,7 @@ beforeAll(async () => {
       return {
         catalogDetail: module.default,
         isCurrentCatalogDetailRequest: module.isCurrentCatalogDetailRequest,
+        nexusEndpointCreateCommand: module.nexusEndpointCreateCommand,
         readinessPresentation: module.readinessPresentation,
         renderComponent: (await server.ssrLoadModule('svelte/server')).render,
       };
@@ -80,6 +86,7 @@ beforeAll(async () => {
   ({
     catalogDetail,
     isCurrentCatalogDetailRequest,
+    nexusEndpointCreateCommand,
     renderComponent,
     readinessPresentation,
   } = lifecycle.value);
@@ -296,6 +303,31 @@ describe('WorkflowCatalogDetail', () => {
         ...expected,
       });
     }
+  });
+
+  it('hands off the exact endpoint create command when the Nexus endpoint is unavailable', () => {
+    expect(
+      nexusEndpointCreateCommand({
+        endpoint: 'ui-workflow-catalog',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+      }),
+    ).toBe(
+      'temporal operator nexus endpoint create --name ui-workflow-catalog --target-namespace default --target-task-queue ui-workflow-catalog',
+    );
+
+    const source = readFileSync(
+      resolve('src/lib/workflow-catalog/browser/catalog-detail.svelte'),
+      'utf8',
+    );
+
+    expect(source).toContain(
+      "check.kind === 'nexus-endpoint' && check.state === 'unavailable'",
+    );
+    expect(source).toContain(
+      'content={nexusEndpointCreateCommand(descriptor.execution)}',
+    );
+    expect(source).toContain('Create the declared endpoint');
   });
 
   it('loads worker availability on detail changes and supports manual refresh', () => {

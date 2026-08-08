@@ -2,7 +2,7 @@ import type { BrowserWorkflowCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
   sourceHash:
-    '78b364b17b061ede5dde549760c00230831db273bf9c37961f7b02d24b6658ef',
+    '7b371eb40a832ff262d560d18fa1a0e15edb5f7fae7a7e35ebe6fd3662d7180b',
   descriptors: [
     {
       id: 'hello',
@@ -612,6 +612,43 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         activityType: 'standalone-activity',
         timeouts: { scheduleToCloseTimeout: '60s', startToCloseTimeout: '30s' },
         policies: { retryPolicy: { maximumAttempts: 3 } },
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'nexus-greeting',
+      title: 'Nexus greeting operation',
+      description:
+        'Runs a standalone Nexus operation through a declared Nexus endpoint.',
+      capabilityTags: ['nexus', 'standalone', 'terminal-outcome'],
+      expectedEvidence: [
+        'A completed standalone Nexus operation with its returned greeting.',
+      ],
+      input: {
+        defaultValue: { name: 'Temporal' },
+        schema: {
+          type: 'object',
+          properties: { name: { type: 'string', minLength: 1 } },
+          required: ['name'],
+          additionalProperties: false,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { operationId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'standalone-nexus-operation',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        endpoint: 'ui-workflow-catalog',
+        service: 'workflow-catalog-greeting',
+        operation: 'greet',
+        policies: { scheduleToClose: '60s' },
       },
       source: { id: 'oss', label: 'OSS' },
     },
