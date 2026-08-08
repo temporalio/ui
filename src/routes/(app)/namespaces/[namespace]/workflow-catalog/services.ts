@@ -8,7 +8,7 @@ import {
   type WorkbenchHost,
   workflowCatalogStartAllowed,
 } from '$lib/workflow-catalog/browser/workbench-host';
-import { createOssUiWorkbenchHost } from '$lib/workflow-catalog/oss/ui-services';
+import { createApiWorkbenchHost } from '$lib/workflow-catalog/host/ui-services';
 
 import { resolveWorkflowCatalogForNamespace } from './catalog';
 
@@ -32,7 +32,7 @@ const createWorkflowCatalogServices = ({
   namespaceWriteDisabled,
   getIdentity,
 }: WorkflowCatalogServiceOptions): WorkflowCatalogServices => {
-  const host = createOssUiWorkbenchHost({
+  const host = createApiWorkbenchHost({
     descriptors: resolveWorkflowCatalogForNamespace(namespace),
     getIdentity,
   });

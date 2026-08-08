@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  OssObservationError,
+  ApiObservationError,
   toActivityObservation,
   toNexusObservation,
   toWorkflowObservation,
@@ -160,7 +160,7 @@ describe('OSS workflow catalog observation', () => {
     ).toThrowError(
       expect.objectContaining({
         reason: 'invalid-response',
-      } satisfies Partial<OssObservationError>),
+      } satisfies Partial<ApiObservationError>),
     );
   });
 });

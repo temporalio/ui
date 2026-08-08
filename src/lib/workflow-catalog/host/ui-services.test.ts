@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Payload } from '$lib/types';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 
-import { createOssUiWorkbenchHost } from './ui-services';
+import { createApiWorkbenchHost } from './ui-services';
 import type { BrowserWorkflowCatalogDescriptor } from '../browser/types';
 import type { AcceptedLaunchOutcome } from '../browser/workbench-host';
 
@@ -64,10 +64,10 @@ const jsonResponse = (body: unknown, status = 200) =>
     headers: { 'content-type': 'application/json' },
   });
 
-describe('createOssUiWorkbenchHost', () => {
+describe('createApiWorkbenchHost', () => {
   it('starts a workflow through the authenticated UI REST route with locked routing', async () => {
     const request = vi.fn().mockResolvedValue(jsonResponse({ runId: 'run-1' }));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
       encodeInput: vi.fn().mockResolvedValue([{ data: 'encoded' }]),
@@ -114,7 +114,7 @@ describe('createOssUiWorkbenchHost', () => {
     const request = vi
       .fn()
       .mockResolvedValue(jsonResponse({ runId: 'run-json-plain' }));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
       getIdentity: () => 'developer@example.com',
@@ -164,7 +164,7 @@ describe('createOssUiWorkbenchHost', () => {
 
       return 'developer@example.com';
     });
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
       encodeInput,
@@ -195,7 +195,7 @@ describe('createOssUiWorkbenchHost', () => {
 
   it('starts an activity with registered policy and locked routing', async () => {
     const request = vi.fn().mockResolvedValue(jsonResponse({ runId: 'run-2' }));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [activityDescriptor],
       request,
       encodeInput: vi.fn().mockResolvedValue([{ data: 'encoded' }]),
@@ -235,7 +235,7 @@ describe('createOssUiWorkbenchHost', () => {
 
   it('starts a Nexus operation with registered policy and locked routing', async () => {
     const request = vi.fn().mockResolvedValue(jsonResponse({ runId: 'run-3' }));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [nexusDescriptor],
       request,
       encodeInput: vi.fn().mockResolvedValue([{ data: 'encoded' }]),
@@ -277,7 +277,7 @@ describe('createOssUiWorkbenchHost', () => {
     const request = vi
       .fn()
       .mockResolvedValue(jsonResponse({ pollers: [{ identity: 'worker' }] }));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
     });
@@ -297,7 +297,7 @@ describe('createOssUiWorkbenchHost', () => {
 
   it('checks activity readiness with task queue type 2', async () => {
     const request = vi.fn().mockResolvedValue(jsonResponse({ pollers: [] }));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [activityDescriptor],
       request,
     });
@@ -316,7 +316,7 @@ describe('createOssUiWorkbenchHost', () => {
         endpoints: [{ spec: { name: 'greeting-endpoint' } }],
       });
     });
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [nexusDescriptor],
       request,
     });
@@ -345,7 +345,7 @@ describe('createOssUiWorkbenchHost', () => {
   });
 
   it('classifies a known HTTP conflict as rejected', async () => {
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request: vi
         .fn()
@@ -364,7 +364,7 @@ describe('createOssUiWorkbenchHost', () => {
   });
 
   it('classifies an unauthorized response as forbidden', async () => {
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request: vi
         .fn()
@@ -390,7 +390,7 @@ describe('createOssUiWorkbenchHost', () => {
   ] as const)(
     'classifies launch HTTP %s as a known rejection',
     async (status, reason) => {
-      const host = createOssUiWorkbenchHost({
+      const host = createApiWorkbenchHost({
         descriptors: [descriptor],
         request: vi
           .fn()
@@ -416,7 +416,7 @@ describe('createOssUiWorkbenchHost', () => {
     const request = vi
       .fn()
       .mockResolvedValue(jsonResponse({ message: 'try later' }, 429));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
       encodeInput: vi.fn().mockResolvedValue([]),
@@ -440,7 +440,7 @@ describe('createOssUiWorkbenchHost', () => {
     const request = vi
       .fn()
       .mockResolvedValue(jsonResponse({ message: 'unavailable' }, 503));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
       encodeInput: vi.fn().mockResolvedValue([]),
@@ -464,7 +464,7 @@ describe('createOssUiWorkbenchHost', () => {
     const request = vi
       .fn()
       .mockResolvedValue(jsonResponse({ message: 'timeout' }, 408));
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
       encodeInput: vi.fn().mockResolvedValue([]),
@@ -485,7 +485,7 @@ describe('createOssUiWorkbenchHost', () => {
   });
 
   it('leaves a transport failure uncertain', async () => {
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request: vi.fn().mockRejectedValue(new TypeError('fetch failed')),
       encodeInput: vi.fn().mockResolvedValue([]),
@@ -505,7 +505,7 @@ describe('createOssUiWorkbenchHost', () => {
   });
 
   it('leaves a malformed success run ID uncertain', async () => {
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request: vi.fn().mockResolvedValue(jsonResponse({ runId: 42 })),
       encodeInput: vi.fn().mockResolvedValue([]),
@@ -529,7 +529,7 @@ describe('createOssUiWorkbenchHost', () => {
 
   it('rejects input encoding failure before dispatch', async () => {
     const request = vi.fn();
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
       encodeInput: vi.fn().mockRejectedValue(new Error('invalid input')),
@@ -553,7 +553,7 @@ describe('createOssUiWorkbenchHost', () => {
   });
 
   it('links an accepted workflow to its existing details page', () => {
-    const host = createOssUiWorkbenchHost({ descriptors: [descriptor] });
+    const host = createApiWorkbenchHost({ descriptors: [descriptor] });
     const outcome: AcceptedLaunchOutcome = {
       status: 'accepted',
       reference: {
@@ -588,7 +588,7 @@ describe('createOssUiWorkbenchHost', () => {
   ])(
     'links an accepted $kind to its existing details page',
     ({ kind, expected }) => {
-      const host = createOssUiWorkbenchHost({ descriptors: [descriptor] });
+      const host = createApiWorkbenchHost({ descriptors: [descriptor] });
       const outcome: AcceptedLaunchOutcome = {
         status: 'accepted',
         reference: {
@@ -616,7 +616,7 @@ describe('createOssUiWorkbenchHost', () => {
         },
       }),
     );
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
     });
@@ -660,7 +660,7 @@ describe('createOssUiWorkbenchHost', () => {
         longPollToken: 'next-activity-cursor',
       }),
     );
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [activityDescriptor],
       request,
     });
@@ -705,7 +705,7 @@ describe('createOssUiWorkbenchHost', () => {
         longPollToken: 'first-activity-cursor',
       }),
     );
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [activityDescriptor],
       request,
     });
@@ -743,7 +743,7 @@ describe('createOssUiWorkbenchHost', () => {
         info: { status: 'NEXUS_OPERATION_EXECUTION_STATUS_COMPLETED' },
       }),
     );
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [nexusDescriptor],
       request,
     });
@@ -790,7 +790,7 @@ describe('createOssUiWorkbenchHost', () => {
         },
       }),
     );
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
     });
@@ -830,7 +830,7 @@ describe('createOssUiWorkbenchHost', () => {
   it('stops a delayed workflow observation when it is aborted', async () => {
     vi.useFakeTimers();
     const request = vi.fn();
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request,
     });
@@ -863,7 +863,7 @@ describe('createOssUiWorkbenchHost', () => {
   });
 
   it('pauses observation safely when the server forbids a request', async () => {
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request: vi
         .fn()
@@ -891,7 +891,7 @@ describe('createOssUiWorkbenchHost', () => {
         new AbortController().signal,
       ),
     ).rejects.toMatchObject({
-      name: 'OssObservationError',
+      name: 'ApiObservationError',
       reason: 'forbidden',
       message: 'Observation paused',
     });
@@ -904,7 +904,7 @@ describe('createOssUiWorkbenchHost', () => {
   ] as const)(
     'pauses observation safely for HTTP %s',
     async (status, reason) => {
-      const host = createOssUiWorkbenchHost({
+      const host = createApiWorkbenchHost({
         descriptors: [descriptor],
         request: vi
           .fn()
@@ -931,12 +931,12 @@ describe('createOssUiWorkbenchHost', () => {
           },
           new AbortController().signal,
         ),
-      ).rejects.toMatchObject({ name: 'OssObservationError', reason });
+      ).rejects.toMatchObject({ name: 'ApiObservationError', reason });
     },
   );
 
   it('pauses observation safely after a transport failure', async () => {
-    const host = createOssUiWorkbenchHost({
+    const host = createApiWorkbenchHost({
       descriptors: [descriptor],
       request: vi.fn().mockRejectedValue(new TypeError('sensitive failure')),
     });
@@ -962,7 +962,7 @@ describe('createOssUiWorkbenchHost', () => {
         new AbortController().signal,
       ),
     ).rejects.toMatchObject({
-      name: 'OssObservationError',
+      name: 'ApiObservationError',
       reason: 'transport-failure',
       message: 'Observation paused',
     });

@@ -4,7 +4,7 @@ import type {
   ExecutionTerminalStatus,
 } from '../browser/workbench-host';
 
-export type OssObservationErrorReason =
+export type ApiObservationErrorReason =
   | 'forbidden'
   | 'invalid-response'
   | 'not-found'
@@ -12,12 +12,12 @@ export type OssObservationErrorReason =
   | 'server-error'
   | 'transport-failure';
 
-export class OssObservationError extends Error {
-  reason: OssObservationErrorReason;
+export class ApiObservationError extends Error {
+  reason: ApiObservationErrorReason;
 
-  constructor(reason: OssObservationErrorReason) {
+  constructor(reason: ApiObservationErrorReason) {
     super('Observation paused');
-    this.name = 'OssObservationError';
+    this.name = 'ApiObservationError';
     this.reason = reason;
   }
 }
@@ -75,7 +75,7 @@ export const toWorkflowObservation = (
     };
   }
 
-  throw new OssObservationError('invalid-response');
+  throw new ApiObservationError('invalid-response');
 };
 
 const toLongPollObservation = (
@@ -104,7 +104,7 @@ const toLongPollObservation = (
     return { state: 'terminal', status: terminalStatus, snapshot };
   }
 
-  throw new OssObservationError('invalid-response');
+  throw new ApiObservationError('invalid-response');
 };
 
 export const toActivityObservation = (

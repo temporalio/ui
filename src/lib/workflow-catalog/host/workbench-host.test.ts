@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createOssWorkbenchHost } from './workbench-host';
+import { assembleWorkbenchHost } from './workbench-host';
 import type { BrowserWorkflowCatalogDescriptor } from '../browser/types';
 import type { StartCommand } from '../browser/workbench-host';
 
@@ -64,7 +64,7 @@ describe('OSS WorkbenchHost', () => {
       status: 'accepted',
       runId: 'run-1',
     });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -110,7 +110,7 @@ describe('OSS WorkbenchHost', () => {
       status: 'accepted',
       runId: 'run-1',
     });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -139,7 +139,7 @@ describe('OSS WorkbenchHost', () => {
       status: 'accepted',
       runId: 'run-1',
     });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [descriptor],
       launch,
       checkWorker: vi.fn(),
@@ -166,7 +166,7 @@ describe('OSS WorkbenchHost', () => {
 
   it('keeps the submitted attempt identity in the launch result', async () => {
     const submittedCommand = structuredClone(command);
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn().mockResolvedValue({ status: 'accepted', runId: 'run-1' }),
       checkWorker: vi.fn(),
@@ -184,7 +184,7 @@ describe('OSS WorkbenchHost', () => {
     const launch = vi
       .fn()
       .mockResolvedValue({ status: 'accepted', runId: 'run-1' });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [nexusDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -209,7 +209,7 @@ describe('OSS WorkbenchHost', () => {
     const launch = vi
       .fn()
       .mockResolvedValue({ status: 'accepted', runId: 'run-nexus' });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [nexusDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -234,7 +234,7 @@ describe('OSS WorkbenchHost', () => {
     const launch = vi
       .fn()
       .mockResolvedValue({ status: 'accepted', runId: 'run-activity' });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [activityDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -259,7 +259,7 @@ describe('OSS WorkbenchHost', () => {
     const launch = vi
       .fn()
       .mockResolvedValue({ status: 'accepted', runId: 'run-activity' });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [activityDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -289,7 +289,7 @@ describe('OSS WorkbenchHost', () => {
   });
 
   it('reports an accepted response without a run ID as uncertain', async () => {
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn().mockResolvedValue({ status: 'accepted' }),
       checkWorker: vi.fn(),
@@ -314,7 +314,7 @@ describe('OSS WorkbenchHost', () => {
   });
 
   it('reports a truthy non-string run ID as uncertain', async () => {
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn().mockResolvedValue({ status: 'accepted', runId: 42 }),
       checkWorker: vi.fn(),
@@ -333,7 +333,7 @@ describe('OSS WorkbenchHost', () => {
       status: 'rejected',
       reason: 'conflict',
     });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -353,7 +353,7 @@ describe('OSS WorkbenchHost', () => {
 
   it('reports a transport failure as uncertain without retrying', async () => {
     const launch = vi.fn().mockRejectedValue(new TypeError('fetch failed'));
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -375,7 +375,7 @@ describe('OSS WorkbenchHost', () => {
     const launch = vi.fn();
     const controller = new AbortController();
     controller.abort();
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -397,7 +397,7 @@ describe('OSS WorkbenchHost', () => {
 
   it('rejects a missing attempt identity before dispatch', async () => {
     const launch = vi.fn();
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch,
       checkWorker: vi.fn(),
@@ -419,7 +419,7 @@ describe('OSS WorkbenchHost', () => {
 
   it('reports an abort after dispatch as uncertain', async () => {
     const controller = new AbortController();
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn().mockImplementation(async () => {
         controller.abort();
@@ -443,7 +443,7 @@ describe('OSS WorkbenchHost', () => {
 
   it('builds an evidence link for an accepted launch', async () => {
     const createEvidenceHref = vi.fn().mockReturnValue('/workflow/run-1');
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn().mockResolvedValue({
         status: 'accepted',
@@ -466,7 +466,7 @@ describe('OSS WorkbenchHost', () => {
 
   it('reports a missing workflow poller as advisory readiness', async () => {
     const checkWorker = vi.fn().mockResolvedValue(false);
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn(),
       checkWorker,
@@ -494,7 +494,7 @@ describe('OSS WorkbenchHost', () => {
 
   it('checks a required Nexus endpoint separately from its advisory worker', async () => {
     const checkNexusEndpoint = vi.fn().mockResolvedValue(false);
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [nexusDescriptor],
       launch: vi.fn(),
       checkWorker: vi.fn().mockResolvedValue(true),
@@ -527,7 +527,7 @@ describe('OSS WorkbenchHost', () => {
       snapshot: { status: 'running' },
       continuation: { kind: 'delay', afterMs: 1_000 },
     });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn(),
       observe,
@@ -566,7 +566,7 @@ describe('OSS WorkbenchHost', () => {
       snapshot: { status: 'running' },
       continuation: { kind: 'delay', afterMs: 1_000 },
     });
-    const host = createOssWorkbenchHost({
+    const host = assembleWorkbenchHost({
       descriptors: [workflowDescriptor],
       launch: vi.fn(),
       observe,

@@ -35,7 +35,7 @@ const projectBoundaryOptions = {
     'src/lib/workflow-catalog/browser/catalog.ts',
     'src/lib/workflow-catalog/browser/catalog.generated.json',
     'src/lib/workflow-catalog/browser/catalog.generated.ts',
-    'src/lib/workflow-catalog/oss/workbench-host.ts',
+    'src/lib/workflow-catalog/host/workbench-host.ts',
   ],
   declaredSourceFiles: [
     ...sharedSource.sourceFiles,

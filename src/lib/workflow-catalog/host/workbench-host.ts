@@ -1,4 +1,4 @@
-import { OssObservationError } from './observation';
+import { ApiObservationError } from './observation';
 import type {
   BrowserWorkflowCatalogDescriptor,
   BrowserWorkflowCatalogExecution,
@@ -20,7 +20,7 @@ type LaunchRequestBase = {
   startOptions: JsonValue;
 };
 
-export type OssLaunchRequest =
+export type ApiLaunchRequest =
   | (LaunchRequestBase & {
       kind: 'workflow';
       workflowType: string;
@@ -42,19 +42,19 @@ export type OssLaunchRequest =
       policies: JsonValue;
     });
 
-export type OssLaunchResult =
+export type ApiLaunchResult =
   | { status: 'accepted'; runId?: string }
   | {
       status: 'rejected';
       reason: 'conflict' | 'forbidden' | 'invalid-request' | 'not-found';
     };
 
-export type OssWorkbenchHostDependencies = {
+export type WorkbenchHostDependencies = {
   descriptors: readonly BrowserWorkflowCatalogDescriptor[];
   launch: (
-    request: OssLaunchRequest,
+    request: ApiLaunchRequest,
     signal?: AbortSignal,
-  ) => Promise<OssLaunchResult>;
+  ) => Promise<ApiLaunchResult>;
   observe?: WorkbenchHost['observe'];
   checkWorker: (
     request: {
@@ -108,7 +108,7 @@ const launchRequestFor = (
   descriptor: BrowserWorkflowCatalogDescriptor,
   command: StartCommand,
   executionId: string,
-): OssLaunchRequest => {
+): ApiLaunchRequest => {
   const { execution } = descriptor;
   const base = {
     target: targetFor(execution),
@@ -147,14 +147,14 @@ const launchRequestFor = (
   };
 };
 
-export const createOssWorkbenchHost = ({
+export const assembleWorkbenchHost = ({
   descriptors,
   launch,
   observe,
   checkWorker,
   checkNexusEndpoint,
   createEvidenceHref,
-}: OssWorkbenchHostDependencies): WorkbenchHost => {
+}: WorkbenchHostDependencies): WorkbenchHost => {
   const descriptorsById = new Map(
     descriptors.map((descriptor) => {
       const snapshot = structuredClone(descriptor);
@@ -192,7 +192,7 @@ export const createOssWorkbenchHost = ({
         return { status: 'rejected', reason: 'aborted', reference };
       }
 
-      let result: OssLaunchResult;
+      let result: ApiLaunchResult;
 
       try {
         result = await launch(
@@ -303,7 +303,7 @@ export const createOssWorkbenchHost = ({
       return checks;
     },
     observe: async (request, signal) => {
-      if (!observe) throw new OssObservationError('invalid-response');
+      if (!observe) throw new ApiObservationError('invalid-response');
 
       const descriptor = descriptorsById.get(request.reference.exampleId);
       const expectedTarget = descriptor
@@ -321,7 +321,7 @@ export const createOssWorkbenchHost = ({
         target.namespace !== expectedTarget?.namespace ||
         target.taskQueue !== expectedTarget?.taskQueue
       ) {
-        throw new OssObservationError('invalid-response');
+        throw new ApiObservationError('invalid-response');
       }
 
       return observe(request, signal);

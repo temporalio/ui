@@ -25,7 +25,7 @@ describe('/namespaces/[namespace]/workflow-catalog', () => {
     );
     expect(source).toMatch(/<WorkflowCatalogList\s/);
     expect(source).toContain('sessionStore={services.sessionStore}');
-    expect(source).not.toContain('createOssUiWorkbenchHost');
+    expect(source).not.toContain('createApiWorkbenchHost');
     expect(source).not.toContain('getWorkflowCatalogContext');
     expect(source).not.toContain('NamespacePicker');
   });

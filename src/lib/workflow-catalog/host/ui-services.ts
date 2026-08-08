@@ -10,15 +10,15 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import {
-  OssObservationError,
+  ApiObservationError,
   toActivityObservation,
   toNexusObservation,
   toWorkflowObservation,
 } from './observation';
 import {
-  createOssWorkbenchHost,
-  type OssLaunchRequest,
-  type OssLaunchResult,
+  type ApiLaunchRequest,
+  type ApiLaunchResult,
+  assembleWorkbenchHost,
 } from './workbench-host';
 import type {
   BrowserWorkflowCatalogDescriptor,
@@ -35,7 +35,7 @@ type EncodeInput = (
   positional: boolean,
 ) => Promise<Payload[]>;
 
-type OssUiWorkbenchHostOptions = {
+type ApiWorkbenchHostOptions = {
   descriptors: readonly BrowserWorkflowCatalogDescriptor[];
   request?: typeof fetch;
   encodeInput?: EncodeInput;
@@ -72,7 +72,7 @@ const observationCursor = (
   const cursor = record?.value;
 
   if (record?.kind !== 'cursor' || typeof cursor !== 'string' || !cursor) {
-    throw new OssObservationError('invalid-response');
+    throw new ApiObservationError('invalid-response');
   }
 
   return cursor;
@@ -93,7 +93,7 @@ const waitForObservationDelay = async (
     !Number.isFinite(afterMs) ||
     afterMs < 0
   ) {
-    throw new OssObservationError('invalid-response');
+    throw new ApiObservationError('invalid-response');
   }
 
   await new Promise<void>((resolve, reject) => {
@@ -118,8 +118,8 @@ const waitForObservationDelay = async (
 const safeObservationError = (
   error: unknown,
   signal: AbortSignal,
-): OssObservationError | unknown => {
-  if (error instanceof OssObservationError) return error;
+): ApiObservationError | unknown => {
+  if (error instanceof ApiObservationError) return error;
 
   if (
     signal.aborted ||
@@ -131,18 +131,18 @@ const safeObservationError = (
   const statusCode = (error as { statusCode?: unknown })?.statusCode;
 
   if (statusCode === 401 || statusCode === 403) {
-    return new OssObservationError('forbidden');
+    return new ApiObservationError('forbidden');
   }
-  if (statusCode === 404) return new OssObservationError('not-found');
-  if (statusCode === 429) return new OssObservationError('rate-limited');
+  if (statusCode === 404) return new ApiObservationError('not-found');
+  if (statusCode === 429) return new ApiObservationError('rate-limited');
   if (typeof statusCode === 'number' && statusCode >= 500) {
-    return new OssObservationError('server-error');
+    return new ApiObservationError('server-error');
   }
   if (typeof statusCode === 'number') {
-    return new OssObservationError('invalid-response');
+    return new ApiObservationError('invalid-response');
   }
 
-  return new OssObservationError('transport-failure');
+  return new ApiObservationError('transport-failure');
 };
 
 const withoutRouting = (
@@ -166,7 +166,7 @@ const withoutRouting = (
   return editable;
 };
 
-const knownRejection = (error: unknown): OssLaunchResult | undefined => {
+const knownRejection = (error: unknown): ApiLaunchResult | undefined => {
   const statusCode = (error as { statusCode?: unknown })?.statusCode;
 
   if (statusCode === 401 || statusCode === 403) {
@@ -210,13 +210,13 @@ const evidenceHref = (
   });
 };
 
-export const createOssUiWorkbenchHost = ({
+export const createApiWorkbenchHost = ({
   descriptors,
   request = fetch,
   encodeInput = defaultEncodeInput,
   getIdentity = () => undefined,
   createRequestId = () => crypto.randomUUID(),
-}: OssUiWorkbenchHostOptions) => {
+}: ApiWorkbenchHostOptions) => {
   const identity = getIdentity();
   const requestMetadata = () => ({
     identity,
@@ -224,9 +224,9 @@ export const createOssUiWorkbenchHost = ({
   });
 
   const launch = async (
-    launchRequest: OssLaunchRequest,
+    launchRequest: ApiLaunchRequest,
     signal?: AbortSignal,
-  ): Promise<OssLaunchResult> => {
+  ): Promise<ApiLaunchResult> => {
     const startOptions = asRecord(launchRequest.startOptions);
 
     if (!startOptions) {
@@ -392,7 +392,7 @@ export const createOssUiWorkbenchHost = ({
       return toNexusObservation(response ?? null);
     }
 
-    throw new OssObservationError('invalid-response');
+    throw new ApiObservationError('invalid-response');
   };
 
   const observe = async (
@@ -406,7 +406,7 @@ export const createOssUiWorkbenchHost = ({
     }
   };
 
-  return createOssWorkbenchHost({
+  return assembleWorkbenchHost({
     descriptors,
     launch,
     observe,
