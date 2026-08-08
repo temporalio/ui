@@ -24,7 +24,10 @@ Runtime.install({
 });
 
 const rootDirectory = getProjectRoot();
-const environmentPath = join(rootDirectory, '.env.workflow-catalog.local');
+const environmentPaths = [
+  join(rootDirectory, '.env.workflow-catalog.local'),
+  join(rootDirectory, '.env.workflow-catalog'),
+];
 const loadEnvironment = (
   process as NodeJS.Process & { loadEnvFile: (path: string) => void }
 ).loadEnvFile;
@@ -37,10 +40,12 @@ const emitWorkflowCatalogEvent = ({
   );
 };
 
-try {
-  loadEnvironment(environmentPath);
-} catch (error) {
-  if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+for (const environmentPath of environmentPaths) {
+  try {
+    loadEnvironment(environmentPath);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+  }
 }
 
 try {
