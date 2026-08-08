@@ -7,14 +7,14 @@ import {
   Worker,
 } from '@temporalio/worker';
 
-import { parseWorkflowCatalogConnectionConfig } from '../../src/lib/workflow-catalog/node/connection-config';
-import { runWorkflowCatalogDevelopment } from '../../src/lib/workflow-catalog/node/development';
-import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/node/routing-config';
-import type { WorkflowCatalogRunnerEvent } from '../../src/lib/workflow-catalog/node/runner';
-import { createWorkflowCatalogExecutionLogger } from '../../src/lib/workflow-catalog/node/workflow-execution-logger.js';
+import { parseWorkflowCatalogConnectionConfig } from '../../src/lib/workflow-catalog/worker/connection-config';
+import { runWorkflowCatalogDevelopment } from '../../src/lib/workflow-catalog/worker/development';
+import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/worker/routing-config';
+import type { WorkflowCatalogRunnerEvent } from '../../src/lib/workflow-catalog/worker/runner';
+import { createWorkflowCatalogExecutionLogger } from '../../src/lib/workflow-catalog/worker/workflow-execution-logger.js';
 import { getProjectRoot } from '../get-project-root';
 import {
-  loadProjectWorkflowCatalogNodeBindings,
+  loadProjectWorkflowCatalogWorkerBindings,
   verifyProjectWorkflowCatalog,
 } from './project-artifacts';
 import { createWorkflowCatalogWorkerFactory } from './worker-factory';
@@ -50,11 +50,12 @@ for (const environmentPath of environmentPaths) {
 
 try {
   await verifyProjectWorkflowCatalog();
-  const nodeBindings = await loadProjectWorkflowCatalogNodeBindings((targets) =>
-    requireWorkflowCatalogRoutingFromEnvironment(process.env, targets),
+  const workerBindings = await loadProjectWorkflowCatalogWorkerBindings(
+    (targets) =>
+      requireWorkflowCatalogRoutingFromEnvironment(process.env, targets),
   );
   await runWorkflowCatalogDevelopment({
-    bindings: nodeBindings,
+    bindings: workerBindings,
     targetId: process.env.WORKFLOW_CATALOG_TARGET_ID,
     connectionFactory: () =>
       NativeConnection.connect(

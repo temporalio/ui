@@ -15,12 +15,12 @@ import type {
   BrowserWorkflowCatalogArtifact,
   BrowserWorkflowCatalogSource,
 } from '../../src/lib/workflow-catalog/browser/types';
-import type { WorkflowCatalogRegistrationSource } from '../../src/lib/workflow-catalog/node/registration-source';
+import type { WorkflowCatalogRegistrationSource } from '../../src/lib/workflow-catalog/worker/registration-source';
 import {
   createWorkflowCatalogRegistry,
   generateWorkflowCatalog,
   type WorkflowCatalogRegistry,
-} from '../../src/lib/workflow-catalog/node/registry';
+} from '../../src/lib/workflow-catalog/worker/registry';
 
 type WorkflowCatalogArtifactOptions = {
   rootDirectory: string;
@@ -110,7 +110,7 @@ const buildWorkflowCatalogArtifact = async ({
   source,
 }: WorkflowCatalogArtifactOptions) => {
   assertWorkflowCatalogSource(source);
-  const { browserDescriptors, nodeBindings } =
+  const { browserDescriptors, workerBindings } =
     generateWorkflowCatalog(registry);
   const artifact: BrowserWorkflowCatalogArtifact = {
     sourceHash: await calculateSourceHash(rootDirectory, sourceFiles),
@@ -120,7 +120,7 @@ const buildWorkflowCatalogArtifact = async ({
     })),
   };
 
-  return { artifact, nodeBindings };
+  return { artifact, workerBindings };
 };
 
 export const generateWorkflowCatalogArtifact = async (
@@ -250,7 +250,7 @@ export const verifyWorkflowCatalogProjectBoundaries = async ({
     const content = await readFile(join(rootDirectory, browserFile), 'utf8');
 
     if (
-      /(?:node:|\/node\/|workflow-catalog\.local\/(?:registration\.ts|workflows\.ts|catalog\.generated\.json))/.test(
+      /(?:node:|\/worker\/|workflow-catalog\.local\/(?:registration\.ts|workflows\.ts|catalog\.generated\.json))/.test(
         content,
       )
     ) {
@@ -290,7 +290,7 @@ const importLocalRegistrationSource = async (absolutePath: string) => {
 export const generateWorkflowCatalogArtifacts = async (
   options: WorkflowCatalogArtifactsOptions,
 ) => {
-  const { shared, local, hasLocalModule, nodeBindings } =
+  const { shared, local, hasLocalModule, workerBindings } =
     await createArtifactOptions(options);
   const generateSharedArtifacts = async () => {
     const generatedShared = await generateWorkflowCatalogArtifact(shared);
@@ -315,7 +315,7 @@ export const generateWorkflowCatalogArtifacts = async (
       buildWorkflowCatalogArtifact(local),
     ]);
 
-    return { shared: generatedShared, local: generatedLocal, nodeBindings };
+    return { shared: generatedShared, local: generatedLocal, workerBindings };
   }
 
   const [generatedShared, generatedLocal] = await Promise.all([
@@ -323,7 +323,7 @@ export const generateWorkflowCatalogArtifacts = async (
     generateWorkflowCatalogArtifact(local),
   ]);
 
-  return { shared: generatedShared, local: generatedLocal, nodeBindings };
+  return { shared: generatedShared, local: generatedLocal, workerBindings };
 };
 
 const createArtifactOptions = async (
@@ -364,7 +364,7 @@ const createArtifactOptions = async (
     }
   }
 
-  const { nodeBindings } = generateWorkflowCatalog(combinedRegistry);
+  const { workerBindings } = generateWorkflowCatalog(combinedRegistry);
 
   const localProjectionRegistry = createWorkflowCatalogRegistry();
   for (const target of combinedRegistry.targets) {
@@ -376,7 +376,7 @@ const createArtifactOptions = async (
 
   return {
     hasLocalModule,
-    nodeBindings,
+    workerBindings,
     shared: {
       rootDirectory: options.rootDirectory,
       sourceFiles: options.sharedSource.sourceFiles,
@@ -405,12 +405,12 @@ export type WorkflowCatalogRoutingInput =
       targets: readonly WorkflowCatalogRoutableTarget[],
     ) => WorkflowCatalogRouting);
 
-export const loadWorkflowCatalogNodeBindings = async (
+export const loadWorkflowCatalogWorkerBindings = async (
   options: WorkflowCatalogArtifactsOptions,
   routing: WorkflowCatalogRoutingInput = {},
 ) => {
-  const { nodeBindings } = await createArtifactOptions(options);
-  const targets = nodeBindings.map(({ target }) => ({
+  const { workerBindings } = await createArtifactOptions(options);
+  const targets = workerBindings.map(({ target }) => ({
     targetId: target.id,
     namespace: target.namespace,
     taskQueue: target.taskQueue,
@@ -420,7 +420,7 @@ export const loadWorkflowCatalogNodeBindings = async (
     typeof routing === 'function' ? routing(targets) : routing,
   );
 
-  return nodeBindings.map((binding, index) => ({
+  return workerBindings.map((binding, index) => ({
     ...binding,
     target: {
       ...binding.target,

@@ -19,14 +19,14 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   generateWorkflowCatalogArtifact,
   generateWorkflowCatalogArtifacts,
-  loadWorkflowCatalogNodeBindings,
+  loadWorkflowCatalogWorkerBindings,
   verifyWorkflowCatalogArtifact,
   verifyWorkflowCatalogArtifacts,
   verifyWorkflowCatalogProjectBoundaries,
 } from './catalog-artifacts';
-import { workflowCatalogRegistrationSource as localRegistrationFallback } from '../../src/lib/workflow-catalog/node/local-registration-fallback';
-import { createWorkflowCatalogRegistry } from '../../src/lib/workflow-catalog/node/registry';
-import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/node/routing-config';
+import { workflowCatalogRegistrationSource as localRegistrationFallback } from '../../src/lib/workflow-catalog/worker/local-registration-fallback';
+import { createWorkflowCatalogRegistry } from '../../src/lib/workflow-catalog/worker/registry';
+import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/worker/routing-config';
 
 const temporaryDirectories: string[] = [];
 const execFileAsync = promisify(execFile);
@@ -114,7 +114,7 @@ describe('workflow catalog artifacts', () => {
     expect(typeScriptArtifact).toContain('descriptors: []');
   });
 
-  it('loads generated node bindings without rewriting browser artifacts', async () => {
+  it('loads generated worker bindings without rewriting browser artifacts', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const sharedArtifactPath = 'shared.generated.json';
     const localArtifactPath = 'local.generated.json';
@@ -147,13 +147,15 @@ describe('workflow catalog artifacts', () => {
       'utf8',
     );
 
-    await expect(loadWorkflowCatalogNodeBindings(options)).resolves.toEqual([]);
+    await expect(loadWorkflowCatalogWorkerBindings(options)).resolves.toEqual(
+      [],
+    );
     await expect(
       readFile(join(rootDirectory, sharedArtifactPath), 'utf8'),
     ).resolves.toBe(generatedContent);
   });
 
-  it('loads node bindings with runtime routing applied to the requested target', async () => {
+  it('loads worker bindings with runtime routing applied to the requested target', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const workflow = () => undefined;
     const sharedSource = {
@@ -188,7 +190,7 @@ describe('workflow catalog artifacts', () => {
       },
     };
 
-    const bindings = await loadWorkflowCatalogNodeBindings(
+    const bindings = await loadWorkflowCatalogWorkerBindings(
       {
         rootDirectory,
         sharedSource,
@@ -247,7 +249,7 @@ describe('workflow catalog artifacts', () => {
       },
     };
 
-    const bindings = await loadWorkflowCatalogNodeBindings(
+    const bindings = await loadWorkflowCatalogWorkerBindings(
       {
         rootDirectory,
         sharedSource,
@@ -415,9 +417,9 @@ describe('workflow catalog artifacts', () => {
     expect(artifactContent).not.toContain('executable-marker');
     expect(JSON.parse(artifactContent).descriptors).toHaveLength(1);
     expect(
-      generated.nodeBindings[0]?.target.workflowExports.greetingWorkflow,
+      generated.workerBindings[0]?.target.workflowExports.greetingWorkflow,
     ).toBe(workflow);
-    expect(generated.nodeBindings[0]?.activities.greetingActivity).toBe(
+    expect(generated.workerBindings[0]?.activities.greetingActivity).toBe(
       activity,
     );
   });
@@ -471,12 +473,12 @@ describe('workflow catalog artifacts', () => {
     const rootDirectory = await createTemporaryDirectory();
     const sharedSourcePath = 'shared-registrations.ts';
     const fallbackSourcePath =
-      'src/lib/workflow-catalog/node/local-registration-fallback.ts';
+      'src/lib/workflow-catalog/worker/local-registration-fallback.ts';
     await writeFile(
       join(rootDirectory, sharedSourcePath),
       'export const shared = true;\n',
     );
-    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
+    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/worker'), {
       recursive: true,
     });
     await writeFile(
@@ -549,7 +551,7 @@ describe('workflow catalog artifacts', () => {
     const sharedSourcePath = 'shared-registrations.ts';
     const localModulePath = 'workflow-catalog.local/registration.ts';
     const fallbackSourcePath =
-      'src/lib/workflow-catalog/node/local-registration-fallback.ts';
+      'src/lib/workflow-catalog/worker/local-registration-fallback.ts';
     await writeFile(
       join(rootDirectory, sharedSourcePath),
       'export const shared = true;\n',
@@ -557,7 +559,7 @@ describe('workflow catalog artifacts', () => {
     await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
       recursive: true,
     });
-    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
+    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/worker'), {
       recursive: true,
     });
     await writeFile(
@@ -707,7 +709,7 @@ export const workflowCatalogRegistrationSource = {
     const sharedSourcePath = 'shared-registrations.ts';
     const localModulePath = 'workflow-catalog.local/registration.ts';
     const fallbackSourcePath =
-      'src/lib/workflow-catalog/node/local-registration-fallback.ts';
+      'src/lib/workflow-catalog/worker/local-registration-fallback.ts';
     await writeFile(
       join(rootDirectory, sharedSourcePath),
       'export const shared = true;\n',
@@ -715,7 +717,7 @@ export const workflowCatalogRegistrationSource = {
     await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
       recursive: true,
     });
-    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
+    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/worker'), {
       recursive: true,
     });
     await writeFile(
@@ -807,7 +809,7 @@ export const workflowCatalogRegistrationSource = {
     const sharedSourcePath = 'shared-registrations.ts';
     const localModulePath = 'workflow-catalog.local/registration.ts';
     const fallbackSourcePath =
-      'src/lib/workflow-catalog/node/local-registration-fallback.ts';
+      'src/lib/workflow-catalog/worker/local-registration-fallback.ts';
     let sharedTaskQueue = 'shared-catalog-v1';
     const sharedSource = {
       source: { id: 'oss', label: 'OSS' },
@@ -828,7 +830,7 @@ export const workflowCatalogRegistrationSource = {
     await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
       recursive: true,
     });
-    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
+    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/worker'), {
       recursive: true,
     });
     await writeFile(
@@ -906,7 +908,7 @@ export const workflowCatalogRegistrationSource = {
       const sharedSourcePath = 'shared-registrations.ts';
       const localModulePath = 'workflow-catalog.local/registration.ts';
       const fallbackSourcePath =
-        'src/lib/workflow-catalog/node/local-registration-fallback.ts';
+        'src/lib/workflow-catalog/worker/local-registration-fallback.ts';
       const sharedActivity = () => 'shared';
       await writeFile(
         join(rootDirectory, sharedSourcePath),
@@ -915,7 +917,7 @@ export const workflowCatalogRegistrationSource = {
       await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
         recursive: true,
       });
-      await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
+      await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/worker'), {
         recursive: true,
       });
       await writeFile(
@@ -1031,12 +1033,12 @@ registry.registerExample({
     const browserTypeScriptArtifactPath =
       'src/lib/workflow-catalog/browser/catalog.generated.ts';
     const sharedSourcePath =
-      'src/lib/workflow-catalog/node/shared-registrations.ts';
+      'src/lib/workflow-catalog/worker/shared-registrations.ts';
     const packageJsonPath = 'package.json';
     await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/browser'), {
       recursive: true,
     });
-    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/node'), {
+    await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/worker'), {
       recursive: true,
     });
     await writeFile(
@@ -1086,7 +1088,7 @@ registry.registerExample({
 
     await writeFile(
       join(rootDirectory, browserModulePath),
-      "import '../../node/registry';\n",
+      "import '../../worker/registry';\n",
     );
     await expect(
       verifyWorkflowCatalogProjectBoundaries(options),
@@ -1127,14 +1129,14 @@ registry.registerExample({
     await expect(
       verifyWorkflowCatalogProjectBoundaries({
         ...options,
-        declaredSourceFiles: ['src/lib/workflow-catalog/node/*.ts'],
+        declaredSourceFiles: ['src/lib/workflow-catalog/worker/*.ts'],
       }),
     ).rejects.toThrowError('Workflow catalog source paths must be explicit');
     await expect(
       verifyWorkflowCatalogProjectBoundaries({
         ...options,
         declaredSourceFiles: [
-          'src/lib/workflow-catalog/node/missing-registration.ts',
+          'src/lib/workflow-catalog/worker/missing-registration.ts',
         ],
       }),
     ).rejects.toThrowError('Declared workflow catalog source does not exist');
@@ -1156,7 +1158,7 @@ registry.registerExample({
     await mkdir(join(packageDirectory, 'dist/workflow-catalog/browser'), {
       recursive: true,
     });
-    await mkdir(join(packageDirectory, 'dist/workflow-catalog/node'), {
+    await mkdir(join(packageDirectory, 'dist/workflow-catalog/worker'), {
       recursive: true,
     });
     await mkdir(join(packageDirectory, 'workflow-catalog.local'), {
@@ -1182,15 +1184,15 @@ registry.registerExample({
       'export const catalogArtifact = { shared: true };\n',
     );
     await writeFile(
-      join(packageDirectory, 'dist/workflow-catalog/node/registry.js'),
+      join(packageDirectory, 'dist/workflow-catalog/worker/registry.js'),
       'export const sharedBinding = true;\n',
     );
     await writeFile(
-      join(packageDirectory, 'dist/workflow-catalog/node/runner.js'),
+      join(packageDirectory, 'dist/workflow-catalog/worker/runner.js'),
       'export const runnerKernel = true;\n',
     );
     await writeFile(
-      join(packageDirectory, 'dist/workflow-catalog/node/workflows.js'),
+      join(packageDirectory, 'dist/workflow-catalog/worker/workflows.js'),
       'export {};\n',
     );
     await writeFile(
@@ -1227,10 +1229,12 @@ registry.registerExample({
     expect(listing).toContain(
       'package/dist/workflow-catalog/browser/catalog.generated.js',
     );
-    expect(listing).toContain('package/dist/workflow-catalog/node/registry.js');
-    expect(listing).toContain('package/dist/workflow-catalog/node/runner.js');
     expect(listing).toContain(
-      'package/dist/workflow-catalog/node/workflows.js',
+      'package/dist/workflow-catalog/worker/registry.js',
+    );
+    expect(listing).toContain('package/dist/workflow-catalog/worker/runner.js');
+    expect(listing).toContain(
+      'package/dist/workflow-catalog/worker/workflows.js',
     );
     expect(listing).not.toContain('workflow-catalog.local');
     expect(listing).not.toContain('workflow-catalog.local/registration.ts');
@@ -1347,15 +1351,15 @@ registry.registerExample({
         [
           "import { fileURLToPath } from 'node:url';",
           "import { resolveWorkflowCatalogRouting } from '@temporalio/ui/workflow-catalog/browser/routing';",
-          "import { parseWorkflowCatalogConnectionConfig } from '@temporalio/ui/workflow-catalog/node/connection-config';",
-          "import { createWorkflowCatalogExecutionLogger } from '@temporalio/ui/workflow-catalog/node/workflow-execution-logger';",
-          "import { runWorkflowCatalogDevelopment } from '@temporalio/ui/workflow-catalog/node/development';",
-          "import { createWorkflowCatalogRegistry, generateWorkflowCatalog } from '@temporalio/ui/workflow-catalog/node/registry';",
-          "import { startWorkflowCatalogRunner } from '@temporalio/ui/workflow-catalog/node/runner';",
-          "import { requireWorkflowCatalogRoutingFromEnvironment } from '@temporalio/ui/workflow-catalog/node/routing-config';",
-          "import { workflowCatalogRegistrationSource } from '@temporalio/ui/workflow-catalog/node/shared-registrations';",
-          "import { hello } from '@temporalio/ui/workflow-catalog/node/workflows';",
-          "const workflowsPath = import.meta.resolve('@temporalio/ui/workflow-catalog/node/workflows');",
+          "import { parseWorkflowCatalogConnectionConfig } from '@temporalio/ui/workflow-catalog/worker/connection-config';",
+          "import { createWorkflowCatalogExecutionLogger } from '@temporalio/ui/workflow-catalog/worker/workflow-execution-logger';",
+          "import { runWorkflowCatalogDevelopment } from '@temporalio/ui/workflow-catalog/worker/development';",
+          "import { createWorkflowCatalogRegistry, generateWorkflowCatalog } from '@temporalio/ui/workflow-catalog/worker/registry';",
+          "import { startWorkflowCatalogRunner } from '@temporalio/ui/workflow-catalog/worker/runner';",
+          "import { requireWorkflowCatalogRoutingFromEnvironment } from '@temporalio/ui/workflow-catalog/worker/routing-config';",
+          "import { workflowCatalogRegistrationSource } from '@temporalio/ui/workflow-catalog/worker/shared-registrations';",
+          "import { hello } from '@temporalio/ui/workflow-catalog/worker/workflows';",
+          "const workflowsPath = import.meta.resolve('@temporalio/ui/workflow-catalog/worker/workflows');",
           "if (typeof startWorkflowCatalogRunner !== 'function') throw new Error('Missing runner kernel');",
           "if (typeof resolveWorkflowCatalogRouting !== 'function') throw new Error('Missing routing resolver');",
           "if (typeof parseWorkflowCatalogConnectionConfig !== 'function') throw new Error('Missing connection configuration parser');",
@@ -1365,7 +1369,7 @@ registry.registerExample({
           "if (typeof requireWorkflowCatalogRoutingFromEnvironment !== 'function') throw new Error('Missing routing configuration parser');",
           "if (typeof workflowCatalogRegistrationSource.register !== 'function') throw new Error('Missing shared workflow registration source');",
           "if (typeof hello !== 'function') throw new Error('Missing shared workflow export');",
-          "if (!workflowsPath.endsWith('/workflow-catalog/node/workflows.js')) throw new Error(`Unexpected workflows path: ${workflowsPath}`);",
+          "if (!workflowsPath.endsWith('/workflow-catalog/worker/workflows.js')) throw new Error(`Unexpected workflows path: ${workflowsPath}`);",
           'const workerOptions = [];',
           'const runner = await startWorkflowCatalogRunner({',
           "  bindings: [{ target: { id: 'catalog', namespace: 'default', taskQueue: 'catalog', workflowsPath: './workflows.js', workflowExports: {} }, examples: [], activities: {}, nexusServices: [] }],",
@@ -1451,7 +1455,7 @@ registry.registerExample({
       );
 
       expect(bundles.join('\n')).not.toContain('node:');
-      expect(bundles.join('\n')).not.toContain('workflow-catalog/node');
+      expect(bundles.join('\n')).not.toContain('workflow-catalog/worker');
     },
     120_000,
   );
@@ -1551,7 +1555,7 @@ registry.registerExample({
     'rejects stale artifacts before development can load or rewrite them',
     async () => {
       const sharedSourcePath =
-        'src/lib/workflow-catalog/node/shared-registrations.ts';
+        'src/lib/workflow-catalog/worker/shared-registrations.ts';
       const sharedArtifactPath =
         'src/lib/workflow-catalog/browser/catalog.generated.json';
       const originalSource = await readFile(sharedSourcePath, 'utf8');

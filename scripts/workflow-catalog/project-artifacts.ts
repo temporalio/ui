@@ -1,9 +1,9 @@
-import { workflowCatalogRegistrationSource as localFallback } from '../../src/lib/workflow-catalog/node/local-registration-fallback';
-import { workflowCatalogRegistrationSource as sharedSource } from '../../src/lib/workflow-catalog/node/shared-registrations';
+import { workflowCatalogRegistrationSource as localFallback } from '../../src/lib/workflow-catalog/worker/local-registration-fallback';
+import { workflowCatalogRegistrationSource as sharedSource } from '../../src/lib/workflow-catalog/worker/shared-registrations';
 import { getProjectRoot } from '../get-project-root';
 import {
   generateWorkflowCatalogArtifacts,
-  loadWorkflowCatalogNodeBindings,
+  loadWorkflowCatalogWorkerBindings,
   verifyWorkflowCatalogArtifacts,
   verifyWorkflowCatalogProjectBoundaries,
   type WorkflowCatalogRoutingInput,
@@ -51,9 +51,9 @@ const projectBoundaryOptions = {
 export const generateProjectWorkflowCatalog = () =>
   generateWorkflowCatalogArtifacts(projectOptions);
 
-export const loadProjectWorkflowCatalogNodeBindings = (
+export const loadProjectWorkflowCatalogWorkerBindings = (
   routing: WorkflowCatalogRoutingInput = {},
-) => loadWorkflowCatalogNodeBindings(projectOptions, routing);
+) => loadWorkflowCatalogWorkerBindings(projectOptions, routing);
 
 export const verifyProjectWorkflowCatalog = async () => {
   await verifyWorkflowCatalogArtifacts(projectOptions);

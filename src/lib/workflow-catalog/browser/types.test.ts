@@ -25,7 +25,7 @@ describe('browser workflow catalog types', () => {
     );
 
     expect(source).not.toMatch(/from ['"]node:/);
-    expect(source).not.toMatch(/from ['"][^'"]*\/node\//);
+    expect(source).not.toMatch(/from ['"][^'"]*\/worker\//);
   });
 
   it('types standalone execution options as JSON objects', () => {
