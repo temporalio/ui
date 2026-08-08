@@ -1,0 +1,40 @@
+export const Namespace = 'workflow-catalog' as const;
+
+export const Strings = {
+  title: 'Workflow catalog',
+  'filter-examples': 'Filter example catalog',
+  'search-examples': 'Search examples',
+  'source-filter': 'Example source filter',
+  all: 'All',
+  shared: 'Shared',
+  local: 'Local',
+  workflow: 'Workflow',
+  'standalone-activity': 'Standalone activity',
+  'standalone-nexus-operation': 'Standalone Nexus operation',
+  examples: 'Examples',
+  'no-examples': 'No examples match the current filters.',
+  'all-examples': 'All examples',
+  target: 'Target',
+  'expected-evidence': 'Expected evidence',
+  'edit-input': 'Edit input JSON',
+  'input-description': 'The JSON payload passed to this example.',
+  'edit-start-options': 'Edit start options JSON',
+  'start-options-description': 'Options are scoped to this registered example.',
+  'configure-example': 'Configure example',
+  'run-example': 'Run example',
+  'choose-example': 'Choose an example to run and inspect.',
+  'choose-example-description':
+    'Select a registered example to review its routing, edit its JSON input, and begin an independent run session.',
+  'invalid-json': 'Input and start options must contain valid JSON.',
+  'input-schema-mismatch': 'Input does not match this example’s schema.',
+  'unsupported-start-options':
+    'Start options contain fields this example does not support.',
+  'unable-to-start': 'Unable to start this example.',
+  'run-sessions': 'Run sessions',
+  'run-sessions-description':
+    'Each Run creates a separate attempt and retains its outcome.',
+  starting: 'Starting',
+  accepted: 'Accepted',
+  rejected: 'Rejected',
+  uncertain: 'Uncertain',
+} as const;

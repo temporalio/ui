@@ -57,6 +57,8 @@ import {
   routeForWorkers,
   routeForWorkersWithQuery,
   routeForWorkflow,
+  routeForWorkflowCatalog,
+  routeForWorkflowCatalogExample,
   routeForWorkflowMemo,
   routeForWorkflowQuery,
   routeForWorkflows,
@@ -90,6 +92,15 @@ describe('routeFor functions should resolve the base path exactly once', () => {
   const cases: [string, () => string | undefined][] = [
     ['routeForNamespaces', () => routeForNamespaces()],
     ['routeForNexus', () => routeForNexus()],
+    [
+      'routeForWorkflowCatalogExample',
+      () =>
+        routeForWorkflowCatalogExample({
+          ...namespaceParams,
+          exampleId: 'example-id',
+        }),
+    ],
+    ['routeForWorkflowCatalog', () => routeForWorkflowCatalog(namespaceParams)],
     ['routeForNexusEndpoint', () => routeForNexusEndpoint('ep-1')],
     ['routeForNexusEndpointEdit', () => routeForNexusEndpointEdit('ep-1')],
     ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],

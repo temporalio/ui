@@ -84,12 +84,21 @@ importers:
       '@fontsource/noto-sans-mono':
         specifier: ^5.0.9
         version: 5.2.10
+      '@hyperjump/json-schema':
+        specifier: ^1.17.8
+        version: 1.17.8(@hyperjump/browser@1.5.0)
       '@lezer/highlight':
         specifier: ^1.1.3
         version: 1.2.3
       '@sveltejs/package':
         specifier: ^2.3.10
         version: 2.5.8(svelte@5.55.7(@typescript-eslint/types@8.62.0))(typescript@6.0.3)
+      '@temporalio/activity':
+        specifier: 1.21.1
+        version: 1.21.1
+      '@temporalio/workflow':
+        specifier: 1.21.1
+        version: 1.21.1
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.1
@@ -211,9 +220,6 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^6.2.4
         version: 6.2.4(svelte@5.55.7(@typescript-eslint/types@8.62.0))(vite@6.4.3(@types/node@18.19.130)(jiti@1.21.7)(terser@5.46.1)(yaml@2.8.3))
-      '@temporalio/activity':
-        specifier: 1.21.1
-        version: 1.21.1
       '@temporalio/client':
         specifier: 1.21.1
         version: 1.21.1
@@ -226,9 +232,6 @@ importers:
       '@temporalio/worker':
         specifier: 1.21.1
         version: 1.21.1(cssnano@5.1.15(postcss@8.5.16))(esbuild@0.25.12)(postcss@8.5.16)
-      '@temporalio/workflow':
-        specifier: 1.21.1
-        version: 1.21.1
       '@types/cors':
         specifier: ^2.8.13
         version: 2.8.19
@@ -337,6 +340,9 @@ importers:
       nanoid:
         specifier: ^5.1.5
         version: 5.1.16
+      nexus-rpc:
+        specifier: 0.0.2
+        version: 0.0.2
       node-fetch:
         specifier: ^3.3.0
         version: 3.3.2
@@ -1057,6 +1063,27 @@ packages:
   '@humanwhocodes/retry@0.4.3':
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
+
+  '@hyperjump/browser@1.5.0':
+    resolution: {integrity: sha512-h+fGXfmMOAxYjd2aZ4Y5jpP2WRi0TAkBmKNtoNJKcJLOahNrurwHEUgd1/jO2Hs2j/b/G1EhX0edX8ntXkH2MA==}
+    engines: {node: '>=18.0.0'}
+
+  '@hyperjump/json-pointer@1.1.2':
+    resolution: {integrity: sha512-zPNgu1zdhtjQHFNLGzvEsLDsLOEvhRj6u6ktIQmlz7YPESv5uF8SnAe3Dq0oL6gZ6OGWSLq2n7pphRNF6Hpg6w==}
+
+  '@hyperjump/json-schema-formats@1.0.4':
+    resolution: {integrity: sha512-EuP4W0jN1hnpoVF6zLtcTFs4pKyfq7dBkMli0WV7KgqKuLsdvQGEtXqJB7QT7AjXZRWeAlou5EyFAKK2xcN9iw==}
+
+  '@hyperjump/json-schema@1.17.8':
+    resolution: {integrity: sha512-XOqbR9GRNHaH4JEXHdbsm7xfYwudZG7HVDq3qPZUb1gi+ZQPklgNvhMi6zf0Plf433qR61MK+xeeprUwUUvGPg==}
+    peerDependencies:
+      '@hyperjump/browser': ^1.1.0
+
+  '@hyperjump/pact@1.4.0':
+    resolution: {integrity: sha512-01Q7VY6BcAkp9W31Fv+ciiZycxZHGlR2N6ba9BifgyclHYHdbaZgITo0U6QMhYRlem4k8pf8J31/tApxvqAz8A==}
+
+  '@hyperjump/uri@1.3.4':
+    resolution: {integrity: sha512-aUVWwu2GtC/cU4DwdTM+b+5jjboM6wft6vNg1+7pUTk/nNRNaBYcYhaEnCir9eRLBbkcGPkiEO7XRUlcDkxj4Q==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -4516,6 +4543,9 @@ packages:
     resolution: {integrity: sha512-im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==}
     engines: {node: '>=0.10.0'}
 
+  idn-hostname@15.1.10:
+    resolution: {integrity: sha512-/mSXWRhVasTJ7Z4z18523rTA6CmStYN29yDt+oXi9fe1/M0SO2Un1BgUr3v28aAZG5hWicyUtIamC/juXt3nZQ==}
+
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
@@ -4918,6 +4948,10 @@ packages:
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
 
+  json-stringify-deterministic@1.0.16:
+    resolution: {integrity: sha512-barjhF/wL0ot1i7AVA3gDDfuBIS1Iz7dlYmO6fZnVDUXtB/EJKjqREA/FUndo+kCGYLI67jH3hXKQMwuTFhbpQ==}
+    engines: {node: '>= 4'}
+
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
@@ -4940,6 +4974,9 @@ packages:
   junit-report-builder@5.1.1:
     resolution: {integrity: sha512-ZNOIIGMzqCGcHQEA2Q4rIQQ3Df6gSIfne+X9Rly9Bc2y55KxAZu8iGv+n2pP0bLf0XAOctJZgeloC54hWzCahQ==}
     engines: {node: '>=16'}
+
+  just-curry-it@5.3.0:
+    resolution: {integrity: sha512-silMIRiFjUWlfaDhkgSzpuAyQ6EX/o09Eu8ZBfmFwQMbax7+LQzeIU2CBrICT6Ne4l86ITCGvUCBpCubWYy0Yw==}
 
   jwa@2.0.1:
     resolution: {integrity: sha512-hRF04fqJIP8Abbkq5NKGN0Bbr3JxlQ+qhZufXVr0DvujKy93ZCbXZMHDL4EOtodSbCWxOqR8MS1tXA5hwqCXDg==}
@@ -8333,6 +8370,36 @@ snapshots:
   '@humanwhocodes/module-importer@1.0.1': {}
 
   '@humanwhocodes/retry@0.4.3': {}
+
+  '@hyperjump/browser@1.5.0':
+    dependencies:
+      '@hyperjump/json-pointer': 1.1.2
+      '@hyperjump/uri': 1.3.4
+      content-type: 1.0.5
+      just-curry-it: 5.3.0
+
+  '@hyperjump/json-pointer@1.1.2': {}
+
+  '@hyperjump/json-schema-formats@1.0.4':
+    dependencies:
+      '@hyperjump/uri': 1.3.4
+      idn-hostname: 15.1.10
+
+  '@hyperjump/json-schema@1.17.8(@hyperjump/browser@1.5.0)':
+    dependencies:
+      '@hyperjump/browser': 1.5.0
+      '@hyperjump/json-pointer': 1.1.2
+      '@hyperjump/json-schema-formats': 1.0.4
+      '@hyperjump/pact': 1.4.0
+      '@hyperjump/uri': 1.3.4
+      content-type: 1.0.5
+      json-stringify-deterministic: 1.0.16
+      just-curry-it: 5.3.0
+      uuid: 11.1.1
+
+  '@hyperjump/pact@1.4.0': {}
+
+  '@hyperjump/uri@1.3.4': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -12065,6 +12132,10 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
+  idn-hostname@15.1.10:
+    dependencies:
+      punycode: 2.3.1
+
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
@@ -12692,6 +12763,8 @@ snapshots:
 
   json-stable-stringify-without-jsonify@1.0.1: {}
 
+  json-stringify-deterministic@1.0.16: {}
+
   json5@2.2.3: {}
 
   jsonc-parser@3.3.1: {}
@@ -12722,6 +12795,8 @@ snapshots:
       lodash: 4.18.1
       make-dir: 3.1.0
       xmlbuilder: 15.1.1
+
+  just-curry-it@5.3.0: {}
 
   jwa@2.0.1:
     dependencies:

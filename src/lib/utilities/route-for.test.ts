@@ -35,6 +35,8 @@ import {
   routeForWorkerDeploymentCreate,
   routeForWorkerDeploymentVersionCreate,
   routeForWorkerDeploymentVersionEdit,
+  routeForWorkflowCatalog,
+  routeForWorkflowCatalogExample,
   routeForWorkflowQuery,
   routeForWorkflows,
   routeForWorkflowsWithQuery,
@@ -67,6 +69,21 @@ describe('routeFor', () => {
   it('should route to "workflows"', () => {
     const path = routeForWorkflows({ namespace: 'default' });
     expect(path).toBe(`${base}/namespaces/default/workflows`);
+  });
+
+  it('should route to the workflow catalog within a namespace', () => {
+    expect(routeForWorkflowCatalog({ namespace: 'default' })).toBe(
+      `${base}/namespaces/default/workflow-catalog`,
+    );
+  });
+
+  it('should encode a workflow catalog example ID', () => {
+    expect(
+      routeForWorkflowCatalogExample({
+        namespace: 'default',
+        exampleId: 'release/2026 #1',
+      }),
+    ).toBe(`${base}/namespaces/default/workflow-catalog/release%2F2026%20%231`);
   });
 
   it('should route to archival workflows', () => {

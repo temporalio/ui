@@ -41,6 +41,7 @@
     routeForStandaloneNexusOperations,
     routeForWorkerDeployments,
     routeForWorkers,
+    routeForWorkflowCatalog,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
@@ -107,6 +108,7 @@
       workersRoute: routeForWorkers({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
       archivalRoute: routeForArchivalWorkflows({ namespace }),
+      workflowCatalogRoute: routeForWorkflowCatalog({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
       historyImportRoute: routeForEventHistoryImport(),
@@ -268,6 +270,7 @@
     archivalRoute,
     standaloneActivitiesRoute,
     standaloneNexusOperationsRoute,
+    workflowCatalogRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
@@ -279,6 +282,7 @@
       archivalRoute,
       standaloneActivitiesRoute,
       standaloneNexusOperationsRoute,
+      workflowCatalogRoute,
     ].some((route) => page.url.href.includes(route)),
   );
 
@@ -307,6 +311,10 @@
       {
         subPath: 'workers',
         fullRoute: routeForWorkers({ namespace }),
+      },
+      {
+        subPath: 'workflow-catalog',
+        fullRoute: routeForWorkflowCatalog({ namespace }),
       },
     ];
 
