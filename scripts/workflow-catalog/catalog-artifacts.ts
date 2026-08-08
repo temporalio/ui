@@ -8,6 +8,7 @@ import { format } from 'prettier';
 import { assertWorkflowCatalogSource } from '../../src/lib/workflow-catalog/browser/catalog-sources';
 import {
   resolveWorkflowCatalogRouting,
+  type WorkflowCatalogRoutableTarget,
   type WorkflowCatalogRouting,
 } from '../../src/lib/workflow-catalog/browser/routing';
 import type {
@@ -398,18 +399,25 @@ const createArtifactOptions = async (
   };
 };
 
+export type WorkflowCatalogRoutingInput =
+  | WorkflowCatalogRouting
+  | ((
+      targets: readonly WorkflowCatalogRoutableTarget[],
+    ) => WorkflowCatalogRouting);
+
 export const loadWorkflowCatalogNodeBindings = async (
   options: WorkflowCatalogArtifactsOptions,
-  routing: WorkflowCatalogRouting = {},
+  routing: WorkflowCatalogRoutingInput = {},
 ) => {
   const { nodeBindings } = await createArtifactOptions(options);
+  const targets = nodeBindings.map(({ target }) => ({
+    targetId: target.id,
+    namespace: target.namespace,
+    taskQueue: target.taskQueue,
+  }));
   const resolvedTargets = resolveWorkflowCatalogRouting(
-    nodeBindings.map(({ target }) => ({
-      targetId: target.id,
-      namespace: target.namespace,
-      taskQueue: target.taskQueue,
-    })),
-    routing,
+    targets,
+    typeof routing === 'function' ? routing(targets) : routing,
   );
 
   return nodeBindings.map((binding, index) => ({

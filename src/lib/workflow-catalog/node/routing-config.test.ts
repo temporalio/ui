@@ -6,7 +6,7 @@ import {
 } from './routing-config';
 
 describe('workflowCatalogRoutingFromEnvironment', () => {
-  it('routes shared workflows to the configured namespace and default task queue', () => {
+  it('routes the shared target to the configured namespace by default', () => {
     expect(
       workflowCatalogRoutingFromEnvironment({
         TEMPORAL_NAMESPACE: 'runtime-namespace',
@@ -19,36 +19,34 @@ describe('workflowCatalogRoutingFromEnvironment', () => {
     });
   });
 
-  it('routes shared workflows to an explicitly configured task queue', () => {
+  it('routes every registered target to the configured namespace with its registered task queue', () => {
     expect(
-      workflowCatalogRoutingFromEnvironment({
-        TEMPORAL_NAMESPACE: 'runtime-namespace',
-        TEMPORAL_TASK_QUEUE: 'runtime-task-queue',
-      }),
-    ).toEqual({
-      'shared-workflows': {
-        namespace: 'runtime-namespace',
-        taskQueue: 'runtime-task-queue',
-      },
-    });
-  });
-
-  it('uses the default task queue when the configured task queue is empty', () => {
-    expect(
-      workflowCatalogRoutingFromEnvironment({
-        TEMPORAL_NAMESPACE: 'runtime-namespace',
-        TEMPORAL_TASK_QUEUE: '',
-      }),
+      workflowCatalogRoutingFromEnvironment(
+        { TEMPORAL_NAMESPACE: 'runtime-namespace' },
+        [
+          { targetId: 'shared-workflows', taskQueue: 'ui-workflow-catalog' },
+          { targetId: 'local-workflows', taskQueue: 'local-queue' },
+        ],
+      ),
     ).toEqual({
       'shared-workflows': {
         namespace: 'runtime-namespace',
         taskQueue: 'ui-workflow-catalog',
+      },
+      'local-workflows': {
+        namespace: 'runtime-namespace',
+        taskQueue: 'local-queue',
       },
     });
   });
 
   it('keeps registered routing when no runtime namespace is configured', () => {
     expect(workflowCatalogRoutingFromEnvironment({})).toEqual({});
+    expect(
+      workflowCatalogRoutingFromEnvironment({}, [
+        { targetId: 'local-workflows', taskQueue: 'local-queue' },
+      ]),
+    ).toEqual({});
   });
 
   it('requires a runtime namespace for the workflow catalog worker', () => {

@@ -33,12 +33,6 @@ const { localDescriptor } = vi.hoisted<{
 
 vi.mock('virtual:workflow-catalog-local', () => ({
   localWorkflowCatalog: [localDescriptor],
-  workflowCatalogRouting: {
-    'local-worker': {
-      namespace: 'runtime-namespace',
-      taskQueue: 'runtime-task-queue',
-    },
-  },
 }));
 
 describe('workflow catalog route catalog', () => {
@@ -51,14 +45,14 @@ describe('workflow catalog route catalog', () => {
     );
   });
 
-  it('routes the app catalog with the safe virtual-module overlay', () => {
+  it('keeps the local overlay execution exactly as registered', () => {
     expect(
       routeWorkflowCatalog.find(({ id }) => id === localDescriptor.id)
         ?.execution,
     ).toMatchObject({
       targetId: 'local-worker',
-      namespace: 'runtime-namespace',
-      taskQueue: 'runtime-task-queue',
+      namespace: 'default',
+      taskQueue: 'local-orders',
     });
   });
 
@@ -72,33 +66,6 @@ describe('workflow catalog route catalog', () => {
     expect(
       mergeWorkflowCatalogDescriptors([sharedDescriptor], [localDescriptor]),
     ).toEqual([sharedDescriptor, localDescriptor]);
-  });
-
-  it('applies runtime routing after merging shared and local descriptors', () => {
-    const sharedDescriptor = {
-      ...localDescriptor,
-      id: 'shared-order',
-      source: { id: 'oss', label: 'OSS' },
-      execution: {
-        ...localDescriptor.execution,
-        targetId: 'shared-workflows',
-        namespace: 'registered-namespace',
-        taskQueue: 'registered-task-queue',
-      },
-    };
-
-    expect(
-      mergeWorkflowCatalogDescriptors([sharedDescriptor], [], {
-        'shared-workflows': {
-          namespace: 'runtime-namespace',
-          taskQueue: 'runtime-task-queue',
-        },
-      })[0]?.execution,
-    ).toMatchObject({
-      targetId: 'shared-workflows',
-      namespace: 'runtime-namespace',
-      taskQueue: 'runtime-task-queue',
-    });
   });
 
   it('rejects duplicate stable IDs instead of shadowing a descriptor', () => {
@@ -159,7 +126,7 @@ describe('workflow catalog route catalog', () => {
     }
   });
 
-  it('keeps runtime-routed task queues when retargeting namespaces', () => {
+  it('keeps registered task queues when retargeting namespaces', () => {
     const resolved = resolveWorkflowCatalogForNamespace('feature-namespace');
 
     expect(
@@ -167,7 +134,7 @@ describe('workflow catalog route catalog', () => {
     ).toMatchObject({
       targetId: 'local-worker',
       namespace: 'feature-namespace',
-      taskQueue: 'runtime-task-queue',
+      taskQueue: 'local-orders',
     });
   });
 

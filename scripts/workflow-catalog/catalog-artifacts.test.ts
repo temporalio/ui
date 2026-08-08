@@ -26,6 +26,7 @@ import {
 } from './catalog-artifacts';
 import { workflowCatalogRegistrationSource as localRegistrationFallback } from '../../src/lib/workflow-catalog/node/local-registration-fallback';
 import { createWorkflowCatalogRegistry } from '../../src/lib/workflow-catalog/node/registry';
+import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/node/routing-config';
 
 const temporaryDirectories: string[] = [];
 const execFileAsync = promisify(execFile);
@@ -208,6 +209,64 @@ describe('workflow catalog artifacts', () => {
       id: 'shared-workflows',
       namespace: 'runtime-namespace',
       taskQueue: 'runtime-task-queue',
+    });
+  });
+
+  it('relocates every discovered target through target-aware environment routing', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const workflow = () => undefined;
+    const sharedSource = {
+      source: { id: 'oss', label: 'OSS' },
+      sourceFiles: ['shared-registration.ts'],
+      register: (
+        registry: ReturnType<typeof createWorkflowCatalogRegistry>,
+      ) => {
+        registry.registerTarget({
+          id: 'shared-workflows',
+          namespace: 'registered-namespace',
+          taskQueue: 'registered-task-queue',
+          workflowsPath: './workflows',
+          workflowExports: { workflow },
+        });
+        registry.registerExample({
+          id: 'shared-example',
+          title: 'Shared example',
+          description: 'Runs a shared workflow.',
+          targetId: 'shared-workflows',
+          capabilityTags: [],
+          expectedEvidence: [],
+          input: { defaultValue: [], schema: {} },
+          startOptions: { defaultValue: {}, schema: {} },
+          execution: {
+            kind: 'workflow' as const,
+            workflowType: 'workflow',
+            workflow,
+            activities: {},
+          },
+        });
+      },
+    };
+
+    const bindings = await loadWorkflowCatalogNodeBindings(
+      {
+        rootDirectory,
+        sharedSource,
+        sharedArtifactPath: 'shared.generated.json',
+        localModulePath: 'missing-local-registration.ts',
+        localFallback: localRegistrationFallback,
+        localArtifactPath: 'local.generated.json',
+      },
+      (targets) =>
+        requireWorkflowCatalogRoutingFromEnvironment(
+          { TEMPORAL_NAMESPACE: 'runtime-namespace' },
+          targets,
+        ),
+    );
+
+    expect(bindings[0]?.target).toMatchObject({
+      id: 'shared-workflows',
+      namespace: 'runtime-namespace',
+      taskQueue: 'registered-task-queue',
     });
   });
 

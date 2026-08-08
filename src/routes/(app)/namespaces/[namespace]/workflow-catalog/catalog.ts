@@ -1,7 +1,4 @@
-import {
-  localWorkflowCatalog,
-  workflowCatalogRouting,
-} from 'virtual:workflow-catalog-local';
+import { localWorkflowCatalog } from 'virtual:workflow-catalog-local';
 
 import { workflowCatalog } from '$lib/workflow-catalog/browser/catalog';
 import { workflowCatalogSources } from '$lib/workflow-catalog/browser/catalog-sources';
@@ -14,7 +11,6 @@ import type { BrowserWorkflowCatalogDescriptor } from '$lib/workflow-catalog/bro
 export const mergeWorkflowCatalogDescriptors = (
   sharedDescriptors: readonly BrowserWorkflowCatalogDescriptor[],
   localDescriptors: readonly BrowserWorkflowCatalogDescriptor[],
-  routing: WorkflowCatalogRouting = {},
 ): BrowserWorkflowCatalogDescriptor[] => {
   const merged = [...sharedDescriptors, ...localDescriptors];
   const descriptorIds = new Set<string>();
@@ -31,15 +27,7 @@ export const mergeWorkflowCatalogDescriptors = (
 
   workflowCatalogSources(merged);
 
-  const resolvedExecutions = resolveWorkflowCatalogRouting(
-    merged.map(({ execution }) => execution),
-    routing,
-  );
-
-  return merged.map((descriptor, index) => ({
-    ...descriptor,
-    execution: resolvedExecutions[index] ?? descriptor.execution,
-  }));
+  return merged;
 };
 
 export const findRouteWorkflowDescriptor = (
@@ -51,7 +39,6 @@ export const findRouteWorkflowDescriptor = (
 export const routeWorkflowCatalog = mergeWorkflowCatalogDescriptors(
   workflowCatalog,
   localWorkflowCatalog,
-  workflowCatalogRouting,
 );
 
 const routingForNamespace = (

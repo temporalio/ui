@@ -1,4 +1,3 @@
-import type { WorkflowCatalogRouting } from '../../src/lib/workflow-catalog/browser/routing';
 import { workflowCatalogRegistrationSource as localFallback } from '../../src/lib/workflow-catalog/node/local-registration-fallback';
 import { workflowCatalogRegistrationSource as sharedSource } from '../../src/lib/workflow-catalog/node/shared-registrations';
 import { getProjectRoot } from '../get-project-root';
@@ -7,6 +6,7 @@ import {
   loadWorkflowCatalogNodeBindings,
   verifyWorkflowCatalogArtifacts,
   verifyWorkflowCatalogProjectBoundaries,
+  type WorkflowCatalogRoutingInput,
 } from './catalog-artifacts';
 
 const projectOptions = {
@@ -52,7 +52,7 @@ export const generateProjectWorkflowCatalog = () =>
   generateWorkflowCatalogArtifacts(projectOptions);
 
 export const loadProjectWorkflowCatalogNodeBindings = (
-  routing: WorkflowCatalogRouting = {},
+  routing: WorkflowCatalogRoutingInput = {},
 ) => loadWorkflowCatalogNodeBindings(projectOptions, routing);
 
 export const verifyProjectWorkflowCatalog = async () => {

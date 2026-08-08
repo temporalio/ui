@@ -50,8 +50,9 @@ for (const environmentPath of environmentPaths) {
 
 try {
   await verifyProjectWorkflowCatalog();
-  const routing = requireWorkflowCatalogRoutingFromEnvironment(process.env);
-  const nodeBindings = await loadProjectWorkflowCatalogNodeBindings(routing);
+  const nodeBindings = await loadProjectWorkflowCatalogNodeBindings((targets) =>
+    requireWorkflowCatalogRoutingFromEnvironment(process.env, targets),
+  );
   await runWorkflowCatalogDevelopment({
     bindings: nodeBindings,
     targetId: process.env.WORKFLOW_CATALOG_TARGET_ID,

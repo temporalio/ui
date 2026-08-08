@@ -13,9 +13,7 @@ interface ImportMeta {
 }
 
 declare module 'virtual:workflow-catalog-local' {
-  import type { WorkflowCatalogRouting } from '$lib/workflow-catalog/browser/routing';
   import type { BrowserWorkflowCatalogDescriptor } from '$lib/workflow-catalog/browser/types';
 
   export const localWorkflowCatalog: BrowserWorkflowCatalogDescriptor[];
-  export const workflowCatalogRouting: WorkflowCatalogRouting;
 }

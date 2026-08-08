@@ -7,7 +7,6 @@ import { getWorkflowCatalogServices } from './services';
 
 vi.mock('virtual:workflow-catalog-local', () => ({
   localWorkflowCatalog: [],
-  workflowCatalogRouting: {},
 }));
 
 describe('workflow catalog services', () => {
