@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 
+import { Connection } from '@temporalio/client';
 import {
   DefaultLogger,
   NativeConnection,
@@ -8,7 +9,9 @@ import {
 } from '@temporalio/worker';
 
 import { parseWorkflowCatalogConnectionConfig } from '../../src/lib/workflow-catalog/worker/connection-config';
+import { connectWithRetry } from '../../src/lib/workflow-catalog/worker/connection-retry';
 import { runWorkflowCatalogDevelopment } from '../../src/lib/workflow-catalog/worker/development';
+import { ensureDeclaredNexusEndpoints } from '../../src/lib/workflow-catalog/worker/endpoint-provisioning';
 import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/worker/routing-config';
 import type { WorkflowCatalogRunnerEvent } from '../../src/lib/workflow-catalog/worker/runner';
 import { createWorkflowCatalogExecutionLogger } from '../../src/lib/workflow-catalog/worker/workflow-execution-logger.js';
@@ -77,13 +80,66 @@ try {
       `Browse the catalog (with pnpm dev running) at ${catalogUrls.join(' or ')}`,
     ].join('\n'),
   );
+  const connectionConfig = parseWorkflowCatalogConnectionConfig(process.env);
+
+  if (!connectionConfig.apiKey && !connectionConfig.tls) {
+    const client = await connectWithRetry({
+      connect: () => Connection.connect({ address: connectionConfig.address }),
+      onWaiting: ({ attempt }) =>
+        console.info(
+          `Waiting for the Temporal server at ${connectionConfig.address}… (attempt ${attempt})`,
+        ),
+    });
+
+    try {
+      await ensureDeclaredNexusEndpoints({
+        bindings: selectedBindings,
+        listEndpointNames: async () => {
+          const response = await client.operatorService.listNexusEndpoints({
+            pageSize: 100,
+          });
+          return (response.endpoints ?? [])
+            .map((endpoint) => endpoint.spec?.name ?? '')
+            .filter(Boolean);
+        },
+        createEndpoint: async ({ name, namespace, taskQueue }) => {
+          await client.operatorService.createNexusEndpoint({
+            spec: { name, target: { worker: { namespace, taskQueue } } },
+          });
+        },
+        onEndpoint: (event) => {
+          if (event.state === 'created') {
+            console.info(
+              `Created Nexus endpoint "${event.endpoint}" targeting ${event.namespace}/${event.taskQueue}.`,
+            );
+          } else if (event.state === 'exists') {
+            console.info(`Nexus endpoint "${event.endpoint}" already exists.`);
+          } else {
+            console.info(
+              [
+                `Cannot create Nexus endpoint "${event.endpoint}" from here; create it manually:`,
+                `  temporal operator nexus endpoint create --name ${event.endpoint} --target-namespace ${event.namespace} --target-task-queue ${event.taskQueue} --address ${connectionConfig.address}`,
+              ].join('\n'),
+            );
+          }
+        },
+      });
+    } finally {
+      await client.close();
+    }
+  }
+
   await runWorkflowCatalogDevelopment({
     bindings: workerBindings,
     targetId: process.env.WORKFLOW_CATALOG_TARGET_ID,
     connectionFactory: () =>
-      NativeConnection.connect(
-        parseWorkflowCatalogConnectionConfig(process.env),
-      ),
+      connectWithRetry({
+        connect: () => NativeConnection.connect(connectionConfig),
+        onWaiting: ({ attempt }) =>
+          console.info(
+            `Waiting for the Temporal server at ${connectionConfig.address}… (attempt ${attempt})`,
+          ),
+      }),
     createWorker: createWorkflowCatalogWorkerFactory(Worker),
     events: emitWorkflowCatalogEvent,
     signals: process,

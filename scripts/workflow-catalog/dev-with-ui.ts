@@ -45,7 +45,24 @@ if (
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   const { stop } = superviseCatalogDevelopment({
-    start: (command, args) => spawn(command, [...args], { stdio: 'inherit' }),
+    start: (command, args) => {
+      const child = spawn(command, [...args], {
+        stdio: 'inherit',
+        detached: true,
+      });
+
+      return {
+        kill: (signal) => {
+          if (!child.pid) return;
+          try {
+            process.kill(-child.pid, signal);
+          } catch {
+            child.kill(signal);
+          }
+        },
+        on: (event, listener) => child.on(event, listener),
+      };
+    },
     onExit: (code) => {
       process.exitCode = code;
     },
