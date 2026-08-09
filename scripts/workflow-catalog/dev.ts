@@ -8,19 +8,27 @@ import {
   Worker,
 } from '@temporalio/worker';
 
-import { parseWorkflowCatalogConnectionConfig } from '../../src/lib/workflow-catalog/worker/connection-config';
-import { connectWithRetry } from '../../src/lib/workflow-catalog/worker/connection-retry';
-import { runWorkflowCatalogDevelopment } from '../../src/lib/workflow-catalog/worker/development';
-import { ensureDeclaredNexusEndpoints } from '../../src/lib/workflow-catalog/worker/endpoint-provisioning';
-import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/worker/routing-config';
-import type { WorkflowCatalogRunnerEvent } from '../../src/lib/workflow-catalog/worker/runner';
-import { createWorkflowCatalogExecutionLogger } from '../../src/lib/workflow-catalog/worker/workflow-execution-logger.js';
-import { getProjectRoot } from '../get-project-root';
 import {
   loadProjectWorkflowCatalogWorkerBindings,
   verifyProjectWorkflowCatalog,
 } from './project-artifacts';
 import { createWorkflowCatalogWorkerFactory } from './worker-factory';
+import { parseWorkflowCatalogConnectionConfig } from '../../src/lib/workflow-catalog/worker/connection-config';
+import { connectWithRetry } from '../../src/lib/workflow-catalog/worker/connection-retry';
+import { runWorkflowCatalogDevelopment } from '../../src/lib/workflow-catalog/worker/development';
+import {
+  declaredNexusEndpoints,
+  ensureDeclaredNexusEndpoints,
+} from '../../src/lib/workflow-catalog/worker/endpoint-provisioning';
+import type { WorkflowCatalogTarget } from '../../src/lib/workflow-catalog/worker/registry';
+import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/worker/routing-config';
+import type { WorkflowCatalogRunnerEvent } from '../../src/lib/workflow-catalog/worker/runner';
+import {
+  formatWorkflowCatalogBanner,
+  supportsAnsiColor,
+} from '../../src/lib/workflow-catalog/worker/startup-banner';
+import { createWorkflowCatalogExecutionLogger } from '../../src/lib/workflow-catalog/worker/workflow-execution-logger.js';
+import { getProjectRoot } from '../get-project-root';
 
 Runtime.install({
   logger: createWorkflowCatalogExecutionLogger(new DefaultLogger('INFO')),
@@ -34,12 +42,31 @@ const environmentPaths = [
 const loadEnvironment = (
   process as NodeJS.Process & { loadEnvFile: (path: string) => void }
 ).loadEnvFile;
+const runningTargetIds = new Set<string>();
+let announcedTargets: readonly { target: WorkflowCatalogTarget }[] = [];
+
 const emitWorkflowCatalogEvent = ({
   type,
   ...details
 }: WorkflowCatalogRunnerEvent) => {
   console.info(
     JSON.stringify({ component: 'workflow-catalog', event: type, ...details }),
+  );
+
+  if (type !== 'target-running') return;
+
+  runningTargetIds.add((details as { targetId: string }).targetId);
+
+  if (runningTargetIds.size !== announcedTargets.length) return;
+
+  console.info(
+    formatWorkflowCatalogBanner({
+      targets: announcedTargets.map(({ target }) => target),
+      color: supportsAnsiColor({
+        isTTY: Boolean(process.stdout.isTTY),
+        environment: process.env,
+      }),
+    }),
   );
 };
 
@@ -62,27 +89,14 @@ try {
         ({ target }) => target.id === process.env.WORKFLOW_CATALOG_TARGET_ID,
       )
     : workerBindings;
-  const catalogUrls = [
-    ...new Set(
-      selectedBindings.map(
-        ({ target }) =>
-          `http://localhost:3000/namespaces/${target.namespace}/workflow-catalog`,
-      ),
-    ),
-  ];
-  console.info(
-    [
-      'Workflow catalog worker starting with these targets:',
-      ...selectedBindings.map(
-        ({ target }) =>
-          `  ${target.id} — namespace "${target.namespace}", task queue "${target.taskQueue}"`,
-      ),
-      `Browse the catalog (with pnpm dev running) at ${catalogUrls.join(' or ')}`,
-    ].join('\n'),
-  );
+  announcedTargets = selectedBindings;
   const connectionConfig = parseWorkflowCatalogConnectionConfig(process.env);
 
-  if (!connectionConfig.apiKey && !connectionConfig.tls) {
+  if (
+    declaredNexusEndpoints(selectedBindings).length > 0 &&
+    !connectionConfig.apiKey &&
+    !connectionConfig.tls
+  ) {
     const client = await connectWithRetry({
       connect: () => Connection.connect({ address: connectionConfig.address }),
       onWaiting: ({ attempt }) =>
