@@ -23,6 +23,7 @@ export type BrowserWorkflowCatalogMetadata = {
   expectedEvidence: string[];
   input: RuntimeJsonDocument;
   startOptions: RuntimeJsonDocument;
+  setupMarkdown?: string;
 };
 
 export type BrowserExecutionTarget = {
@@ -34,6 +35,7 @@ export type BrowserExecutionTarget = {
 export type BrowserWorkflowExecution = BrowserExecutionTarget & {
   kind: 'workflow';
   workflowType: string;
+  nexusEndpoints?: string[];
 };
 
 export type BrowserStandaloneActivityExecution = BrowserExecutionTarget & {

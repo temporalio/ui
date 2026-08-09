@@ -45,11 +45,21 @@ describe('WorkflowCatalogDetail client interactions', () => {
       readinessResponses: [
         [
           workerReady,
-          { kind: 'nexus-endpoint', required: true, state: 'unavailable' },
+          {
+            kind: 'nexus-endpoint',
+            required: true,
+            state: 'unavailable',
+            endpoint: 'greeting-endpoint',
+          },
         ],
         [
           workerReady,
-          { kind: 'nexus-endpoint', required: true, state: 'ready' },
+          {
+            kind: 'nexus-endpoint',
+            required: true,
+            state: 'ready',
+            endpoint: 'greeting-endpoint',
+          },
         ],
       ],
     });

@@ -110,6 +110,7 @@ describe('shared workflow corpus', () => {
     expect(Object.keys(target?.workflowExports ?? {})).toEqual([
       ...migratedWorkflowTypes,
       'priorityFairnessWorkflow',
+      'nexusGreeting',
     ]);
     for (const example of registry.examples) {
       if (example.execution.kind !== 'workflow' || !target) continue;
@@ -499,7 +500,9 @@ describe('shared workflow corpus', () => {
       'src/lib/workflow-catalog/worker/examples/standalone-activity/example.ts',
       'src/lib/workflow-catalog/worker/examples/standalone-activity/activity.ts',
       'src/lib/workflow-catalog/worker/examples/nexus-greeting/example.ts',
+      'src/lib/workflow-catalog/worker/examples/nexus-greeting/workflow.ts',
       'src/lib/workflow-catalog/worker/examples/nexus-greeting/service.ts',
+      'src/lib/workflow-catalog/worker/examples/nexus-greeting/handler.ts',
     ]);
   });
 });

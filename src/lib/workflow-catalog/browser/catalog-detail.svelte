@@ -116,6 +116,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
@@ -617,14 +618,18 @@
                   </Tooltip>
                   <span>{presentation.label}</span>
                 </div>
-                {#if check.kind === 'nexus-endpoint' && check.state === 'unavailable' && descriptor.execution.kind === 'standalone-nexus-operation'}
+                {#if check.kind === 'nexus-endpoint' && check.state === 'unavailable'}
                   <p class="mt-2 text-xs text-secondary">
                     Create the declared endpoint, then run the example again:
                   </p>
                   <Copyable
                     visible
                     clickAllToCopy
-                    content={nexusEndpointCreateCommand(descriptor.execution)}
+                    content={nexusEndpointCreateCommand({
+                      endpoint: check.endpoint,
+                      namespace: descriptor.execution.namespace,
+                      taskQueue: descriptor.execution.taskQueue,
+                    })}
                     copyIconTitle="Copy the endpoint create command"
                     copySuccessIconTitle="Copied the endpoint create command"
                     container-class="mt-1"
@@ -636,6 +641,20 @@
           {/if}
         </div>
       </section>
+      {#if descriptor.setupMarkdown}
+        <section
+          class="surface-primary rounded-sm border border-subtle p-4"
+          aria-label="Setup"
+        >
+          <h2 class="text-base">Setup</h2>
+          <Markdown
+            frameId={`workflow-catalog-setup-${descriptor.id}`}
+            class="mt-2"
+            overrideTheme="primary"
+            content={descriptor.setupMarkdown}
+          />
+        </section>
+      {/if}
       <section
         class="surface-primary rounded-sm border border-subtle p-4"
         aria-label="What to verify"

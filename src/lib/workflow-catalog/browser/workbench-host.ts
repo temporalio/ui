@@ -97,6 +97,7 @@ export type NexusEndpointReadinessCheck = {
   kind: 'nexus-endpoint';
   required: true;
   state: ReadinessState;
+  endpoint: string;
 };
 
 export type ReadinessCheck = NexusEndpointReadinessCheck | WorkerReadinessCheck;

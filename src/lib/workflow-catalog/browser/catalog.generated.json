@@ -1,5 +1,5 @@
 {
-  "sourceHash": "7b371eb40a832ff262d560d18fa1a0e15edb5f7fae7a7e35ebe6fd3662d7180b",
+  "sourceHash": "bf2767991abb4f6c24758a13d25f7d5a9ca29cc031531a2f01e4100da044fdd2",
   "descriptors": [
     {
       "id": "hello",
@@ -632,37 +632,38 @@
     },
     {
       "id": "nexus-greeting",
-      "title": "Nexus greeting operation",
-      "description": "Runs a standalone Nexus operation through a declared Nexus endpoint.",
-      "capabilityTags": ["nexus", "standalone", "terminal-outcome"],
+      "title": "Nexus greeting",
+      "description": "Calls a Nexus operation from a workflow through a declared Nexus endpoint.",
+      "capabilityTags": ["nexus", "terminal-outcome"],
       "expectedEvidence": [
-        "A completed standalone Nexus operation with its returned greeting."
+        "A completed workflow whose result is the greeting returned by the Nexus operation."
       ],
       "input": {
-        "defaultValue": { "name": "Temporal" },
+        "defaultValue": ["Temporal"],
         "schema": {
-          "type": "object",
-          "properties": { "name": { "type": "string", "minLength": 1 } },
-          "required": ["name"],
-          "additionalProperties": false
+          "type": "array",
+          "prefixItems": [
+            { "title": "Name", "type": "string", "minLength": 1 }
+          ],
+          "items": false,
+          "maxItems": 1
         }
       },
       "startOptions": {
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "operationId": { "type": "string", "minLength": 1 } }
+          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
         }
       },
+      "setupMarkdown": "The workflow calls the `greet` operation on the `workflow-catalog-greeting` service through the `ui-workflow-catalog` Nexus endpoint.\n\n- **Local development:** the catalog worker creates the endpoint automatically when it starts.\n- **Other environments:** create the endpoint yourself before running, adjusting the address for your server:\n\n```\ntemporal operator nexus endpoint create --name ui-workflow-catalog --target-namespace <namespace> --target-task-queue ui-workflow-catalog\n```",
       "execution": {
-        "kind": "standalone-nexus-operation",
+        "kind": "workflow",
         "targetId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-workflow-catalog",
-        "endpoint": "ui-workflow-catalog",
-        "service": "workflow-catalog-greeting",
-        "operation": "greet",
-        "policies": { "scheduleToClose": "60s" }
+        "workflowType": "nexusGreeting",
+        "nexusEndpoints": ["ui-workflow-catalog"]
       },
       "source": { "id": "oss", "label": "OSS" }
     }

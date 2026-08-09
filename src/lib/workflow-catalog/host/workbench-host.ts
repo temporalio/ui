@@ -276,14 +276,21 @@ export const assembleWorkbenchHost = ({
         { kind: 'worker', required: false, state, taskQueueType },
       ];
 
-      if (descriptor.execution.kind === 'standalone-nexus-operation') {
+      const declaredEndpoints =
+        descriptor.execution.kind === 'standalone-nexus-operation'
+          ? [descriptor.execution.endpoint]
+          : descriptor.execution.kind === 'workflow'
+            ? (descriptor.execution.nexusEndpoints ?? [])
+            : [];
+
+      for (const endpoint of declaredEndpoints) {
         let endpointState: ReadinessCheck['state'];
 
         try {
           endpointState = (await checkNexusEndpoint(
             {
               namespace: descriptor.execution.namespace,
-              endpoint: descriptor.execution.endpoint,
+              endpoint,
             },
             signal,
           ))
@@ -297,6 +304,7 @@ export const assembleWorkbenchHost = ({
           kind: 'nexus-endpoint',
           required: true,
           state: endpointState,
+          endpoint,
         });
       }
 

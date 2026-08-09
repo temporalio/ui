@@ -163,7 +163,12 @@ describe('workflow catalog example start', () => {
   it('blocks a required unavailable prerequisite before dispatch', async () => {
     const catalogHost = host({
       readiness: [
-        { kind: 'nexus-endpoint', required: true, state: 'unavailable' },
+        {
+          kind: 'nexus-endpoint',
+          required: true,
+          state: 'unavailable',
+          endpoint: 'greeting-endpoint',
+        },
       ],
     });
 

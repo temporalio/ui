@@ -513,6 +513,7 @@ describe('OSS WorkbenchHost', () => {
         kind: 'nexus-endpoint',
         required: true,
         state: 'unavailable',
+        endpoint: 'greeting-endpoint',
       },
     ]);
     expect(checkNexusEndpoint).toHaveBeenCalledWith(

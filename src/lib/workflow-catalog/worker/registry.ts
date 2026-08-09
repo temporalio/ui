@@ -35,6 +35,8 @@ type WorkflowExecution = {
   workflowType: string;
   workflow: WorkflowImplementation;
   activities: Readonly<Record<string, ActivityImplementation>>;
+  nexusEndpoints?: readonly string[];
+  nexusServices?: readonly ServiceHandler[];
 };
 
 type StandaloneActivityExecution = {
@@ -251,6 +253,7 @@ const exampleFields = new Set([
   'expectedEvidence',
   'input',
   'startOptions',
+  'setupMarkdown',
   'execution',
 ]);
 
@@ -267,6 +270,8 @@ const workflowExecutionFields = new Set([
   'workflowType',
   'workflow',
   'activities',
+  'nexusEndpoints',
+  'nexusServices',
 ]);
 
 const standaloneActivityExecutionFields = new Set([
@@ -376,7 +381,9 @@ export const generateWorkflowCatalog = (registry: WorkflowCatalogRegistry) => {
       !isStringArray(example.capabilityTags) ||
       !isStringArray(example.expectedEvidence) ||
       !isRuntimeJsonDocument(example.input) ||
-      !isRuntimeJsonDocument(example.startOptions)
+      !isRuntimeJsonDocument(example.startOptions) ||
+      (example.setupMarkdown !== undefined &&
+        !isNonEmptyString(example.setupMarkdown))
     ) {
       throw new Error(
         `Workflow catalog example "${example.id}" has invalid metadata fields`,
@@ -476,6 +483,30 @@ export const generateWorkflowCatalog = (registry: WorkflowCatalogRegistry) => {
 
     if (
       example.execution.kind === 'workflow' &&
+      example.execution.nexusEndpoints !== undefined &&
+      (!Array.isArray(example.execution.nexusEndpoints) ||
+        example.execution.nexusEndpoints.length === 0 ||
+        !example.execution.nexusEndpoints.every(isNonEmptyString))
+    ) {
+      throw new Error(
+        `Workflow catalog workflow execution for example "${example.id}" declares invalid Nexus endpoints`,
+      );
+    }
+
+    if (
+      example.execution.kind === 'workflow' &&
+      example.execution.nexusServices !== undefined &&
+      (!Array.isArray(example.execution.nexusServices) ||
+        example.execution.nexusServices.length === 0 ||
+        !example.execution.nexusServices.every(isNexusHandler))
+    ) {
+      throw new Error(
+        `Workflow catalog workflow execution for example "${example.id}" declares invalid Nexus services`,
+      );
+    }
+
+    if (
+      example.execution.kind === 'workflow' &&
       !hasOnlyEnumerableDataProperties(example.execution.activities)
     ) {
       throw new Error(
@@ -556,6 +587,22 @@ export const generateWorkflowCatalog = (registry: WorkflowCatalogRegistry) => {
         activities[activityType] = implementation;
       };
 
+      const addNexusService = (handler: ServiceHandler) => {
+        const { name } = handler.definition;
+        const existing = nexusServiceHandlers.get(name);
+
+        if (existing && existing !== handler) {
+          throw new Error(
+            `Workflow catalog Nexus service "${name}" has conflicting handlers on target "${target.id}"`,
+          );
+        }
+
+        if (!existing) {
+          nexusServiceHandlers.set(name, handler);
+          nexusServices.push(handler);
+        }
+      };
+
       for (const { execution } of examples) {
         if (execution.kind === 'workflow') {
           for (const [activityType, implementation] of Object.entries(
@@ -563,22 +610,14 @@ export const generateWorkflowCatalog = (registry: WorkflowCatalogRegistry) => {
           )) {
             addActivity(activityType, implementation);
           }
+
+          for (const handler of execution.nexusServices ?? []) {
+            addNexusService(handler);
+          }
         } else if (execution.kind === 'standalone-activity') {
           addActivity(execution.activityType, execution.activity);
         } else {
-          const { name } = execution.handler.definition;
-          const existing = nexusServiceHandlers.get(name);
-
-          if (existing && existing !== execution.handler) {
-            throw new Error(
-              `Workflow catalog Nexus service "${name}" has conflicting handlers on target "${target.id}"`,
-            );
-          }
-
-          if (!existing) {
-            nexusServiceHandlers.set(name, execution.handler);
-            nexusServices.push(execution.handler);
-          }
+          addNexusService(execution.handler);
         }
       }
 
@@ -633,6 +672,9 @@ export const generateWorkflowCatalog = (registry: WorkflowCatalogRegistry) => {
           namespace: target.namespace,
           taskQueue: target.taskQueue,
           workflowType: execution.workflowType,
+          ...(execution.nexusEndpoints?.length
+            ? { nexusEndpoints: [...execution.nexusEndpoints] }
+            : {}),
         },
       };
     });

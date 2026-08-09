@@ -1,47 +1,61 @@
-import { greetingServiceHandler } from './service.js';
+import { greetingServiceHandler } from './handler.js';
+import { greetingEndpoint } from './service.js';
+import { nexusGreeting } from './workflow.js';
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
 import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
 
 const input: RuntimeJsonDocument = {
-  defaultValue: { name: 'Temporal' },
+  defaultValue: ['Temporal'],
   schema: {
-    type: 'object',
-    properties: { name: { type: 'string', minLength: 1 } },
-    required: ['name'],
-    additionalProperties: false,
+    type: 'array',
+    prefixItems: [{ title: 'Name', type: 'string', minLength: 1 }],
+    items: false,
+    maxItems: 1,
   },
 };
 const startOptions: RuntimeJsonDocument = {
   defaultValue: {},
   schema: {
     type: 'object',
-    properties: { operationId: { type: 'string', minLength: 1 } },
+    properties: { workflowId: { type: 'string', minLength: 1 } },
   },
 };
 
 export const nexusGreetingExample: WorkflowCatalogExampleRegistration = {
   id: 'nexus-greeting',
-  title: 'Nexus greeting operation',
+  title: 'Nexus greeting',
   description:
-    'Runs a standalone Nexus operation through a declared Nexus endpoint.',
+    'Calls a Nexus operation from a workflow through a declared Nexus endpoint.',
   targetId: 'shared-workflows',
-  capabilityTags: ['nexus', 'standalone', 'terminal-outcome'],
+  capabilityTags: ['nexus', 'terminal-outcome'],
   expectedEvidence: [
-    'A completed standalone Nexus operation with its returned greeting.',
+    'A completed workflow whose result is the greeting returned by the Nexus operation.',
   ],
   input,
   startOptions,
+  setupMarkdown: [
+    'The workflow calls the `greet` operation on the `workflow-catalog-greeting` service through the `ui-workflow-catalog` Nexus endpoint.',
+    '',
+    '- **Local development:** the catalog worker creates the endpoint automatically when it starts.',
+    '- **Other environments:** create the endpoint yourself before running, adjusting the address for your server:',
+    '',
+    '```',
+    'temporal operator nexus endpoint create --name ui-workflow-catalog --target-namespace <namespace> --target-task-queue ui-workflow-catalog',
+    '```',
+  ].join('\n'),
   execution: {
-    kind: 'standalone-nexus-operation',
-    endpoint: 'ui-workflow-catalog',
-    service: 'workflow-catalog-greeting',
-    operation: 'greet',
-    handler: greetingServiceHandler,
-    policies: { scheduleToClose: '60s' },
+    kind: 'workflow',
+    workflowType: 'nexusGreeting',
+    workflow: nexusGreeting,
+    activities: {},
+    nexusEndpoints: [greetingEndpoint],
+    nexusServices: [greetingServiceHandler],
   },
 };
 
 export const nexusGreetingSourceFiles = [
   'src/lib/workflow-catalog/worker/examples/nexus-greeting/example.ts',
+  'src/lib/workflow-catalog/worker/examples/nexus-greeting/workflow.ts',
   'src/lib/workflow-catalog/worker/examples/nexus-greeting/service.ts',
+  'src/lib/workflow-catalog/worker/examples/nexus-greeting/handler.ts',
 ] as const;

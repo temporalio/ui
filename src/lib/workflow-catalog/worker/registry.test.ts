@@ -1479,4 +1479,49 @@ describe('generateWorkflowCatalog', () => {
       expect(() => generateWorkflowCatalog(registry)).toThrowError(error);
     }
   });
+
+  it('carries optional setup instructions into the browser descriptor', () => {
+    const workflow = () => undefined;
+    const registerSetupExample = (setupMarkdown?: string) => {
+      const registry = createWorkflowCatalogRegistry();
+
+      registry.registerTarget({
+        id: 'catalog',
+        namespace: 'default',
+        taskQueue: 'workflow-catalog',
+        workflowsPath: './workflows',
+        workflowExports: { setupWorkflow: workflow },
+      });
+      registry.registerExample({
+        id: 'setup-example',
+        title: 'Setup example',
+        description: 'Shows setup instructions.',
+        targetId: 'catalog',
+        capabilityTags: [],
+        expectedEvidence: [],
+        input: { defaultValue: [], schema: {} },
+        startOptions: { defaultValue: {}, schema: {} },
+        ...(setupMarkdown === undefined ? {} : { setupMarkdown }),
+        execution: {
+          kind: 'workflow',
+          workflowType: 'setupWorkflow',
+          workflow,
+          activities: {},
+        },
+      });
+
+      return registry;
+    };
+
+    expect(
+      generateWorkflowCatalog(registerSetupExample('Run `make setup` first.'))
+        .browserDescriptors[0]?.setupMarkdown,
+    ).toBe('Run `make setup` first.');
+    expect(
+      generateWorkflowCatalog(registerSetupExample()).browserDescriptors[0],
+    ).not.toHaveProperty('setupMarkdown');
+    expect(() => generateWorkflowCatalog(registerSetupExample(''))).toThrow(
+      'invalid metadata fields',
+    );
+  });
 });

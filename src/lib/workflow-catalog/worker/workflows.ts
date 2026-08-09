@@ -6,6 +6,7 @@ export { hello } from './examples/hello/workflow.js';
 export { highEventCountWorkflow } from './examples/high-event-count/workflow.js';
 export { localActivityWorkflow } from './examples/local-activity/workflow.js';
 export { longActivity } from './examples/long-activity/workflow.js';
+export { nexusGreeting } from './examples/nexus-greeting/workflow.js';
 export { parallelActivities } from './examples/parallel-activities/workflow.js';
 export { priorityFairnessWorkflow } from './examples/priority-fairness/workflow.js';
 export { sequentialActivities } from './examples/sequential-activities/workflow.js';

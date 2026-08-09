@@ -332,6 +332,7 @@ describe('createApiWorkbenchHost', () => {
         kind: 'nexus-endpoint',
         required: true,
         state: 'ready',
+        endpoint: 'greeting-endpoint',
       },
     ]);
     expect(request.mock.calls.map(([url]) => url)).toEqual([

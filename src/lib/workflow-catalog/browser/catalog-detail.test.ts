@@ -61,6 +61,10 @@ beforeAll(async () => {
       plugins: [svelte({ hot: false })],
       resolve: {
         alias: {
+          '$lib/holocene/markdown-editor/preview.svelte': path.resolve(
+            projectRoot,
+            'src/lib/workflow-catalog/browser/markdown-preview-test-double.svelte',
+          ),
           $lib: path.resolve(projectRoot, 'src/lib'),
           $types: path.resolve(projectRoot, 'src/types'),
           $app: path.resolve(projectRoot, 'src/lib/svelte-mocks/app'),
@@ -225,6 +229,31 @@ describe('WorkflowCatalogDetail', () => {
     });
   });
 
+  it('renders declared setup instructions and omits the section otherwise', () => {
+    const { body } = renderComponent(catalogDetail, {
+      props: {
+        descriptor,
+        host,
+        sessionStore: createWorkflowCatalogSessionStore(host),
+      },
+    });
+    expect(body).not.toContain('aria-label="Setup"');
+
+    const { body: withSetup } = renderComponent(catalogDetail, {
+      props: {
+        descriptor: {
+          ...descriptor,
+          setupMarkdown: 'Run `make setup` first.',
+        },
+        host,
+        sessionStore: createWorkflowCatalogSessionStore(host),
+      },
+    });
+    expect(withSetup).toContain('aria-label="Setup"');
+    expect(withSetup).toContain('Setup</h2>');
+    expect(withSetup).toContain('Run `make setup` first.');
+  });
+
   it('presents no polling worker as advisory without disabling Run', () => {
     const sessionStore = createWorkflowCatalogSessionStore(host);
     const { body } = renderComponent(catalogDetail, {
@@ -324,9 +353,8 @@ describe('WorkflowCatalogDetail', () => {
     expect(source).toContain(
       "check.kind === 'nexus-endpoint' && check.state === 'unavailable'",
     );
-    expect(source).toContain(
-      'content={nexusEndpointCreateCommand(descriptor.execution)}',
-    );
+    expect(source).toContain('content={nexusEndpointCreateCommand({');
+    expect(source).toContain('endpoint: check.endpoint,');
     expect(source).toContain('Create the declared endpoint');
   });
 
