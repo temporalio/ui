@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -11,6 +12,10 @@ import type {
 const publicModuleId = 'virtual:workflow-catalog-local';
 const resolvedModuleId = `\0${publicModuleId}`;
 const localArtifactPath = 'workflow-catalog.local/catalog.generated.json';
+const localSourcePaths = [
+  'workflow-catalog.local/registration.ts',
+  'workflow-catalog.local/workflows.ts',
+];
 
 const isMissingFile = (error: unknown): error is NodeJS.ErrnoException =>
   error instanceof Error && 'code' in error && error.code === 'ENOENT';
@@ -61,7 +66,28 @@ export const loadLocalWorkflowCatalogDescriptors = async (
   }
 };
 
-export const workflowCatalogLocalPlugin = (): Plugin => {
+const spawnLocalCatalogGeneration = (rootDirectory: string) =>
+  new Promise<void>((settle) => {
+    const child = spawn('pnpm', ['workflow-catalog:generate'], {
+      cwd: rootDirectory,
+      stdio: 'inherit',
+    });
+    child.on('close', () => settle());
+    child.on('error', (error) => {
+      console.error(
+        `Workflow catalog generation failed to start: ${error.message}`,
+      );
+      settle();
+    });
+  });
+
+export type WorkflowCatalogLocalPluginOptions = {
+  regenerate?: (rootDirectory: string) => Promise<void>;
+};
+
+export const workflowCatalogLocalPlugin = ({
+  regenerate = spawnLocalCatalogGeneration,
+}: WorkflowCatalogLocalPluginOptions = {}): Plugin => {
   let rootDirectory = process.cwd();
 
   return {
@@ -70,11 +96,40 @@ export const workflowCatalogLocalPlugin = (): Plugin => {
       rootDirectory = config.root;
     },
     configureServer(server) {
-      const watchedPaths = [join(rootDirectory, localArtifactPath)];
+      const artifactPath = join(rootDirectory, localArtifactPath);
+      const sourcePaths = localSourcePaths.map((path) =>
+        join(rootDirectory, path),
+      );
+      const watchedPaths = [artifactPath, ...sourcePaths];
       for (const path of watchedPaths) server.watcher.add(path);
 
+      let regenerating = false;
+      let regenerationQueued = false;
+      const regenerateLocalCatalog = async () => {
+        if (regenerating) {
+          regenerationQueued = true;
+          return;
+        }
+
+        regenerating = true;
+        try {
+          await regenerate(rootDirectory);
+        } finally {
+          regenerating = false;
+          if (regenerationQueued) {
+            regenerationQueued = false;
+            void regenerateLocalCatalog();
+          }
+        }
+      };
+
       const reloadLocalCatalog = (changedPath: string) => {
-        if (!watchedPaths.includes(changedPath)) return;
+        if (sourcePaths.includes(changedPath)) {
+          void regenerateLocalCatalog();
+          return;
+        }
+
+        if (changedPath !== artifactPath) return;
         const module = server.moduleGraph.getModuleById(resolvedModuleId);
         if (module) server.moduleGraph.invalidateModule(module);
         server.ws.send({ type: 'full-reload' });

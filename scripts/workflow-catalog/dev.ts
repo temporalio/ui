@@ -54,6 +54,29 @@ try {
     (targets) =>
       requireWorkflowCatalogRoutingFromEnvironment(process.env, targets),
   );
+  const selectedBindings = process.env.WORKFLOW_CATALOG_TARGET_ID
+    ? workerBindings.filter(
+        ({ target }) => target.id === process.env.WORKFLOW_CATALOG_TARGET_ID,
+      )
+    : workerBindings;
+  const catalogUrls = [
+    ...new Set(
+      selectedBindings.map(
+        ({ target }) =>
+          `http://localhost:3000/namespaces/${target.namespace}/workflow-catalog`,
+      ),
+    ),
+  ];
+  console.info(
+    [
+      'Workflow catalog worker starting with these targets:',
+      ...selectedBindings.map(
+        ({ target }) =>
+          `  ${target.id} — namespace "${target.namespace}", task queue "${target.taskQueue}"`,
+      ),
+      `Browse the catalog (with pnpm dev running) at ${catalogUrls.join(' or ')}`,
+    ].join('\n'),
+  );
   await runWorkflowCatalogDevelopment({
     bindings: workerBindings,
     targetId: process.env.WORKFLOW_CATALOG_TARGET_ID,

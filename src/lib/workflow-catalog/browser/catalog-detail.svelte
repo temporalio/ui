@@ -82,7 +82,7 @@
         label,
         tooltip:
           kind === 'worker'
-            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue.`
+            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm dev:workflow-catalog-worker" to start one.`
             : 'Nexus endpoint is unavailable.',
       };
     }
@@ -577,6 +577,20 @@
               </Tooltip>
               <span>{workerPresentation.label}</span>
             </div>
+            {#if !readinessLoading && workerReadinessState === 'unavailable'}
+              <p class="mt-2 text-xs text-secondary">
+                Start a catalog worker, then run the example:
+              </p>
+              <Copyable
+                visible
+                clickAllToCopy
+                content="pnpm dev:workflow-catalog-worker"
+                copyIconTitle="Copy the worker start command"
+                copySuccessIconTitle="Copied the worker start command"
+                container-class="mt-1"
+                class="font-mono text-xs"
+              />
+            {/if}
           </div>
           {#if !readinessLoading}
             {#each prerequisiteReadiness as check, index (`${check.kind}-${index}`)}

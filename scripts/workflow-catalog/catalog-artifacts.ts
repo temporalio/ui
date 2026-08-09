@@ -150,19 +150,19 @@ export const verifyWorkflowCatalogArtifact = async (
     currentArtifact = JSON.parse(currentContent);
   } catch {
     throw new Error(
-      `Workflow catalog artifact "${options.artifactPath}" has generated output drift`,
+      `Workflow catalog artifact "${options.artifactPath}" has generated output drift; run "pnpm workflow-catalog:generate" to rewrite it`,
     );
   }
 
   if (currentArtifact.sourceHash !== expected.artifact.sourceHash) {
     throw new Error(
-      `Workflow catalog artifact "${options.artifactPath}" is stale because registration sources changed`,
+      `Workflow catalog artifact "${options.artifactPath}" is stale because registration sources changed; run "pnpm workflow-catalog:generate" to refresh it`,
     );
   }
 
   if (currentContent !== (await serializeArtifact(expected.artifact))) {
     throw new Error(
-      `Workflow catalog artifact "${options.artifactPath}" has generated output drift`,
+      `Workflow catalog artifact "${options.artifactPath}" has generated output drift; run "pnpm workflow-catalog:generate" to rewrite it`,
     );
   }
 };
@@ -206,13 +206,13 @@ const verifyWorkflowCatalogTypeScriptArtifact = async ({
 
   if (!currentSourceHash) {
     throw new Error(
-      `Workflow catalog artifact "${artifactPath}" has generated output drift`,
+      `Workflow catalog artifact "${artifactPath}" has generated output drift; run "pnpm workflow-catalog:generate" to rewrite it`,
     );
   }
 
   if (currentSourceHash !== expected.artifact.sourceHash) {
     throw new Error(
-      `Workflow catalog artifact "${artifactPath}" is stale because registration sources changed`,
+      `Workflow catalog artifact "${artifactPath}" is stale because registration sources changed; run "pnpm workflow-catalog:generate" to refresh it`,
     );
   }
 
@@ -220,7 +220,7 @@ const verifyWorkflowCatalogTypeScriptArtifact = async ({
     currentContent !== (await serializeTypeScriptArtifact(expected.artifact))
   ) {
     throw new Error(
-      `Workflow catalog artifact "${artifactPath}" has generated output drift`,
+      `Workflow catalog artifact "${artifactPath}" has generated output drift; run "pnpm workflow-catalog:generate" to rewrite it`,
     );
   }
 };
@@ -440,7 +440,7 @@ export const verifyWorkflowCatalogArtifacts = async (
 
   if (hasLocalModule && !hasLocalArtifact) {
     throw new Error(
-      'Local workflow catalog registration source exists without its generated artifact',
+      'Local workflow catalog registration source exists without its generated artifact; run "pnpm workflow-catalog:generate" to create it',
     );
   }
 

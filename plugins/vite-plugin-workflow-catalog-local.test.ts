@@ -95,10 +95,12 @@ describe('local workflow catalog Vite boundary', () => {
     expect(source).not.toContain('secret');
   });
 
-  it('watches local descriptors for development reloads', async () => {
+  it('watches local descriptors and sources for development reloads', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const watchedPaths: string[] = [];
-    const plugin = workflowCatalogLocalPlugin();
+    const plugin = workflowCatalogLocalPlugin({
+      regenerate: async () => undefined,
+    });
     const configure = plugin.configResolved as (config: {
       root: string;
     }) => void;
@@ -116,6 +118,58 @@ describe('local workflow catalog Vite boundary', () => {
 
     expect(watchedPaths).toEqual([
       join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
+      join(rootDirectory, 'workflow-catalog.local/registration.ts'),
+      join(rootDirectory, 'workflow-catalog.local/workflows.ts'),
     ]);
+  });
+
+  it('regenerates the local catalog when workspace sources change', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const regenerated: string[] = [];
+    const reloads: unknown[] = [];
+    const handlers: ((path: string) => void)[] = [];
+    let releaseRegeneration = () => undefined as void;
+    const plugin = workflowCatalogLocalPlugin({
+      regenerate: (root) => {
+        regenerated.push(root);
+        return new Promise((resolveDone) => {
+          releaseRegeneration = () => resolveDone();
+        });
+      },
+    });
+    const configure = plugin.configResolved as (config: {
+      root: string;
+    }) => void;
+    const configureServer = plugin.configureServer as (server: unknown) => void;
+
+    configure({ root: rootDirectory });
+    configureServer({
+      watcher: {
+        add: () => undefined,
+        on: (_event: string, handler: (path: string) => void) =>
+          handlers.push(handler),
+      },
+      moduleGraph: { getModuleById: () => undefined },
+      ws: { send: (payload: unknown) => reloads.push(payload) },
+    });
+
+    const change = handlers[0];
+    change(join(rootDirectory, 'workflow-catalog.local/registration.ts'));
+    change(join(rootDirectory, 'workflow-catalog.local/workflows.ts'));
+    expect(regenerated).toEqual([rootDirectory]);
+
+    releaseRegeneration();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(regenerated).toEqual([rootDirectory, rootDirectory]);
+    releaseRegeneration();
+
+    change(
+      join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
+    );
+    expect(reloads).toEqual([{ type: 'full-reload' }]);
+
+    change(join(rootDirectory, 'unrelated.ts'));
+    expect(reloads).toEqual([{ type: 'full-reload' }]);
   });
 });
