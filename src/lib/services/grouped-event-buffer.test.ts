@@ -1267,11 +1267,9 @@ describe('arrival-order independence', () => {
     expect(materializeGroup(lazy).isPending).toBe(true);
   });
 
-  // Regression: the record kept the run's pending entry after the completion
-  // landed, so the lazy isPending said true while the materialized group said
-  // false — and sorting reads the lazy one, so a finished activity was hoisted
-  // to the top as pending. No re-enrich happens here on purpose; a closed run
-  // stops refreshing, so nothing would have corrected it.
+  // Sorting reads the lazy value and the row renders the materialized one, so a
+  // disagreement hoists a finished activity to the top. Nothing re-enriches
+  // here on purpose — a closed run stops refreshing.
   it('agrees on isPending when the completion lands after the metadata', () => {
     reset(10);
     const [scheduled, started, completed] = makeActivityGroup(1);

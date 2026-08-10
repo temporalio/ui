@@ -13,12 +13,6 @@ import {
 } from '~/test-utilities/mocks/event-history';
 import { mockWorkflow } from '~/test-utilities/mocks/workflow';
 
-// Regression: a compact row renders a materialized group, but the {#each} item
-// is the lazy group, whose identity is stable as it gains events. Keyed on id
-// alone the block was reused, the {@const} never re-ran, and the row kept its
-// stale group until the view remounted. The row lists its event ids, so a
-// missing id is the visible symptom.
-
 const { workflowId, runId } = mockWorkflow.workflowExecutionInfo.execution;
 const historyUrl = `/namespaces/default/workflows/${workflowId}/${runId}/history`;
 
@@ -80,8 +74,7 @@ test.describe('Workflow History compact view, live updates', () => {
     const row = page.getByTestId('event-summary-row').first();
     await expect(row).toContainText('DeployNetwork');
 
-    // The row opens with its event ids. textContent runs them together, so read
-    // innerText, which keeps the layout whitespace.
+    // innerText, not textContent — the latter runs the ids together.
     const ids = () =>
       row.evaluate((el) =>
         (el as HTMLElement).innerText.replace(/\s+/g, ' ').trim(),
@@ -92,7 +85,7 @@ test.describe('Workflow History compact view, live updates', () => {
 
     releaseCompletion();
 
-    // The completion joins the same group — no reload, no remount.
+    // Same group, no reload, no remount.
     await expect.poll(ids).toMatch(/^2 3 4 /);
   });
 });

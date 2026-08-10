@@ -111,9 +111,8 @@
     }
 
     if (isLazyGroup(event)) {
-      // A lazy group keeps its identity as it gains events, so the version has to
-      // be part of the key — otherwise the keyed block is reused, the {@const}
-      // below never re-runs, and the row renders a stale materialized group.
+      // Version, because a lazy group keeps its identity as it gains events —
+      // key on id alone and the row below renders a stale materialized group.
       return `group-${event.id}-${event.version}`;
     }
 

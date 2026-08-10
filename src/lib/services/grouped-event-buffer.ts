@@ -120,12 +120,6 @@ class GroupRecord implements LazyGroup {
   lastEvent!: WorkflowEvent;
   category: WorkflowEvent['category'] = 'workflow';
   headsGroup = false;
-  /**
-   * Whether a terminal event has landed. Pending metadata from the run can
-   * outlive the completion that resolves it, so both the lazy `isPending` and
-   * the materialized group have to discount it — which means the record, not
-   * the built group, has to know.
-   */
   hasTerminalActivity = false;
   hasTerminalNexus = false;
   private lastSlot = -1;
@@ -147,8 +141,7 @@ class GroupRecord implements LazyGroup {
       this.category = groupCategory(event);
       this.headsGroup = isGroupHeadEvent(event as CommonHistoryEvent);
     }
-    // Re-run on every member: a head arriving picks metadata up, a terminal
-    // event arriving drops it.
+    // A head arriving picks pending metadata up; a terminal event drops it.
     applyPendingMetadataTo(this);
     this.version++;
   }
@@ -230,7 +223,8 @@ function applyPendingMetadataTo(record: GroupRecord): boolean {
   let pendingNexusOperation: PendingNexusOperation | undefined;
 
   // The run can still list an activity the history has already resolved, so a
-  // terminal event wins over whatever the run reports.
+  // terminal event wins. This is the only writer of the record's pending
+  // fields, so gating here covers the lazy and materialized readings alike.
   if (!record.hasTerminalActivity && isActivityTaskScheduledEvent(head)) {
     pendingActivity = pendingByActivityId.get(
       head.activityTaskScheduledEventAttributes?.activityId ?? '',
@@ -323,8 +317,7 @@ function isTerminalNexusEvent(event: WorkflowEvent): boolean {
 // group, so a terminal event and a stale pending entry can arrive in either
 // order without leaving the group reporting isPending alongside a completion.
 function applyPendingMetadata(group: EventGroup, record: GroupRecord): void {
-  // The record already discounts metadata resolved by a terminal event, so this
-  // copies rather than re-deciding — one source of truth for both readings.
+  // Copies rather than re-deciding — the record is already correct.
   group.pendingActivity = record.pendingActivity;
   group.pendingNexusOperation = record.pendingNexusOperation;
 }
