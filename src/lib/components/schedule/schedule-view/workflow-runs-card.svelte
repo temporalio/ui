@@ -57,11 +57,9 @@
         query: workflowQuery,
       }) ?? ''}
     >
-      {$workflowCount.count
-        ? translate('common.view-all-runs-count', {
-            count: $workflowCount.count,
-          })
-        : translate('common.view-all-runs')}
+      {translate('common.view-all-runs-count', {
+        count: $workflowCount.count,
+      })}
     </Link>
   </header>
 
