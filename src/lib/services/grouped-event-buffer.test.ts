@@ -27,6 +27,7 @@ import {
   makeActivityTimeoutGroup,
   makeChildWorkflowGroup,
   makeLocalActivityGroup,
+  makeLocalActivityMarker,
   makeNexusOperationGroup,
   makeSyntheticEvents,
   makeSyntheticEventsWithWorkflowTasks,
@@ -295,7 +296,55 @@ describe('setFailedEvent', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 9. Heap size smoke test (skipped unless NODE_OPTIONS=--expose-gc)
+// 9. Marker billable-action dedup
+//
+// Several markers can share one workflow task, which bills once. The cursors
+// exist only to fetch in parallel, so which one delivered a marker must not
+// change the total.
+// ---------------------------------------------------------------------------
+
+describe('marker billable actions', () => {
+  const totalBillableActions = () =>
+    getEventArray().reduce(
+      (sum, event) => sum + (event.billableActions ?? 0),
+      0,
+    );
+
+  // IDs 11-13, all emitted by the workflow task completed at event 10.
+  const markers = [11, 12, 13].map((id) => makeLocalActivityMarker(id, 10));
+
+  it('bills one workflow task once on the ascending cursor', () => {
+    reset(20);
+    for (const marker of markers) ingestHistoryEvent(marker, true);
+    expect(totalBillableActions()).toBe(1);
+  });
+
+  it('bills one workflow task once on the descending cursor', () => {
+    reset(20);
+    for (const marker of markers.toReversed()) {
+      ingestHistoryEvent(marker, false);
+    }
+    expect(totalBillableActions()).toBe(1);
+  });
+
+  it('bills one workflow task once when the cursors split its markers', () => {
+    reset(20);
+    ingestHistoryEvent(markers[2], false);
+    ingestHistoryEvent(markers[0], true);
+    ingestHistoryEvent(markers[1], true);
+    expect(totalBillableActions()).toBe(1);
+  });
+
+  it('bills distinct workflow tasks separately', () => {
+    reset(20);
+    ingestHistoryEvent(makeLocalActivityMarker(11, 10), true);
+    ingestHistoryEvent(makeLocalActivityMarker(13, 12), false);
+    expect(totalBillableActions()).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10. Heap size smoke test (skipped unless NODE_OPTIONS=--expose-gc)
 // ---------------------------------------------------------------------------
 
 describe('memory overhead smoke test', () => {
@@ -321,7 +370,7 @@ describe('memory overhead smoke test', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 10. Activity group integrity
+// 11. Activity group integrity
 // ---------------------------------------------------------------------------
 
 describe('activity group integrity', () => {
@@ -393,7 +442,7 @@ describe('activity group integrity', () => {
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// 11. setPendingMetadata — pending activity + nexus annotation
+// 12. setPendingMetadata — pending activity + nexus annotation
 // ---------------------------------------------------------------------------
 
 describe('setPendingMetadata', () => {
@@ -603,7 +652,7 @@ describe('setPendingMetadata', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 12. getWorkflowTaskFailedEvent — derives active WFT failure from buffer
+// 13. getWorkflowTaskFailedEvent — derives active WFT failure from buffer
 // ---------------------------------------------------------------------------
 
 describe('getWorkflowTaskFailedEvent (buffer)', () => {
@@ -725,7 +774,7 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 13. getGroupArray — synchronous sorted group access
+// 14. getGroupArray — synchronous sorted group access
 // ---------------------------------------------------------------------------
 
 describe('getGroupArray', () => {
@@ -1128,7 +1177,7 @@ describe('followers ingested before their head', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 14. Group reference identity
+// 15. Group reference identity
 //
 // Group objects are derived and memoized on a per-group version, so identity is
 // a pure function of content: any change a rendered view must see yields a new
@@ -1225,7 +1274,7 @@ describe('group reference identity', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 15. Arrival-order independence
+// 16. Arrival-order independence
 //
 // Pending metadata is applied when the group is built rather than written into
 // it on arrival, so a terminal event and a stale pending entry resolve the same
@@ -1346,7 +1395,7 @@ describe('arrival-order independence', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 16. Lazy / materialized group agreement
+// 17. Lazy / materialized group agreement
 //
 // Views filter and sort on LazyGroup but render a materialized EventGroup, so
 // every getter on the record must agree with the same field on the group. A

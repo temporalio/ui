@@ -128,13 +128,21 @@ export function makeTimerFired(
   } as unknown as HistoryEvent;
 }
 
-export function makeLocalActivityMarker(eventId: number): HistoryEvent {
+/**
+ * A local-activity marker. Markers emitted by one workflow task bill once
+ * between them, so tests that care about that pass a shared
+ * workflowTaskCompletedEventId.
+ */
+export function makeLocalActivityMarker(
+  eventId: number,
+  workflowTaskCompletedEventId = eventId - 1,
+): HistoryEvent {
   return {
     ...base(eventId, 'MarkerRecorded'),
     markerRecordedEventAttributes: {
       markerName: 'LocalActivity',
       details: {},
-      workflowTaskCompletedEventId: String(eventId - 1),
+      workflowTaskCompletedEventId: String(workflowTaskCompletedEventId),
     },
   } as unknown as HistoryEvent;
 }

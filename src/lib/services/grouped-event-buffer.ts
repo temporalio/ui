@@ -185,7 +185,9 @@ let maxSlot = -1;
 
 let failedEvent: HistoryEvent | null = null;
 
-// Accumulated WFT IDs for marker billable-action dedup (ascending cursor only)
+// Accumulated WFT IDs for marker billable-action dedup. Shared by both cursors
+// and the live poll — the direction an event arrives from is a fetch detail,
+// and one workflow task's markers bill once however they were loaded.
 const processedWorkflowTaskIds = new Set<string>();
 
 // Bumped by every write. Read caches hold the revision they were built at, so
@@ -273,15 +275,10 @@ function shouldNotAddBillableAction(event: WorkflowEvent): boolean {
   return Number(event.id) < Number(failedEvent.eventId);
 }
 
-function toWorkflowEvent(
-  raw: HistoryEvent,
-  isAscending: boolean,
-): WorkflowEvent {
+function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
   return toEvent(raw, {
     shouldNotAddBillableAction,
-    processedWorkflowTaskIds: isAscending
-      ? processedWorkflowTaskIds
-      : undefined,
+    processedWorkflowTaskIds,
   });
 }
 
@@ -403,7 +400,6 @@ export function setFailedEvent(raw: HistoryEvent | null): void {
 
 /**
  * Add one raw HistoryEvent from either fetch cursor or the live poll.
- * isAscending selects the ascending cursor's workflow-task dedup context.
  * Returns false when the event was already present.
  */
 export function ingestHistoryEvent(
@@ -416,7 +412,7 @@ export function ingestHistoryEvent(
   grow(slot);
   if (events[slot]) return false;
 
-  const event = toWorkflowEvent(raw, isAscending);
+  const event = toWorkflowEvent(raw);
   events[slot] = event;
   if (slot > maxSlot) maxSlot = slot;
 
