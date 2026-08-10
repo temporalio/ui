@@ -7,6 +7,11 @@
   import TabPanels from '$lib/holocene/tabs-primitive/tab-panels.svelte';
   import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    toRecentScheduleRuns,
+    toUpcomingScheduleRuns,
+  } from '$lib/services/schedule-service';
+  import { workflowCount } from '$lib/stores/workflows';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
 
@@ -31,10 +36,11 @@
 
   const id = $props.id();
 
-  const recentRuns = $derived(schedule?.info?.recentActions);
+  const recentRunCount = $derived(toRecentScheduleRuns(schedule).length);
+  const upcomingRunCount = $derived(toUpcomingScheduleRuns(schedule).length);
 
   type View = 'recent' | 'upcoming';
-  let view: View = $derived(recentRuns?.length ? 'recent' : 'upcoming');
+  let view: View = $derived(recentRunCount ? 'recent' : 'upcoming');
   function handleViewClick(nextView: View) {
     view = nextView;
   }
@@ -51,7 +57,11 @@
         query: workflowQuery,
       }) ?? ''}
     >
-      {translate('common.view-all-runs')}
+      {$workflowCount.count
+        ? translate('common.view-all-runs-count', {
+            count: $workflowCount.count,
+          })
+        : translate('common.view-all-runs')}
     </Link>
   </header>
 
@@ -67,11 +77,13 @@
             active={isSelected}
             id={`${id}-${tab}`}
           >
-            {translate(
-              tab === 'recent'
-                ? 'schedules.recent-runs'
-                : 'schedules.upcoming-runs',
-            )}
+            {tab === 'recent'
+              ? translate('schedules.recent-runs-count', {
+                  count: recentRunCount,
+                })
+              : translate('schedules.upcoming-runs-count', {
+                  count: upcomingRunCount,
+                })}
           </Pill>
         {/snippet}
       </TabButtonList>

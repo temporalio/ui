@@ -205,6 +205,8 @@ export const Strings = {
   'view-more': 'View More...',
   'view-all': 'View All',
   'view-all-runs': 'View All Runs',
+  'view-all-runs-count_one': 'View All {{count, number}} Run',
+  'view-all-runs-count_other': 'View All {{count, number}} Runs',
   'more-options': 'More options',
   download: 'Download',
   duration: 'Duration',

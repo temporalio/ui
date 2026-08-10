@@ -21,6 +21,8 @@ export const Strings = {
   'error-message-fetching': 'Error fetching schedules',
   'workflow-runs': 'Workflow Runs',
   'recent-runs': 'Recent Runs',
+  'recent-runs-count_one': '{{count, number}} Recent Run',
+  'recent-runs-count_other': '{{count, number}} Recent Runs',
   'recent-runs-empty-state-title': 'No Recent Runs',
   'workflow-runs-empty-state-recent-title':
     'This Schedule hasn’t triggered any Workflow Execution runs yet.',
@@ -31,6 +33,8 @@ export const Strings = {
   'workflow-runs-empty-state-upcoming-description':
     'Upcoming runs will apear here once available.',
   'upcoming-runs': 'Upcoming Runs',
+  'upcoming-runs-count_one': '{{count, number}} Upcoming Run',
+  'upcoming-runs-count_other': '{{count, number}} Upcoming Runs',
   'upcoming-runs-empty-state-title': 'No Upcoming Runs',
   loading: 'Loading Schedule...',
   deleting: 'Deleting Schedule...',
@@ -272,4 +276,5 @@ export const Strings = {
   'add-another-spec': '+ Add another schedule spec',
   'run-time-based-on-timezone':
     'Based on the specified timezone ({{- timezoneName}})',
+  'total-workflows-all-time': 'Total Workflows (All Time)',
 } as const;
