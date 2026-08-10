@@ -195,6 +195,20 @@ export const Strings = {
     description:
       'A Workflow Task failed because its payloads exceeded the maximum allowed size.',
   },
+  ExternalStorageFailure: {
+    title: 'External Storage Failure',
+    description: 'A Workflow Task failed due to an external storage failure.',
+  },
+  WorkflowPauseRequestedBeforeTaskStarted: {
+    title: 'Workflow Pause Requested Before Task Started',
+    description:
+      'A Workflow Task failed because a pause was requested for the Workflow before the task started.',
+  },
+  RequestTooLarge: {
+    title: 'Request Too Large',
+    description:
+      'A Workflow Task failed because the request exceeded the maximum allowed size.',
+  },
   WorkflowTaskTimedOut: {
     title: 'Workflow Task Timed Out',
     description: 'The Workflow Task encountered a timeout.',
