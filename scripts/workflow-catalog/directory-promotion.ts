@@ -19,9 +19,10 @@ import {
   isCallExpression,
   isExportDeclaration,
   isExternalModuleReference,
+  isIdentifier,
   isImportDeclaration,
   isImportEqualsDeclaration,
-  isStringLiteralLike,
+  isStringLiteral,
   type Node,
   ScriptKind,
   ScriptTarget,
@@ -55,6 +56,49 @@ const pathExists = async (path: string) => {
   } catch {
     return false;
   }
+};
+
+export const parseWorkflowCatalogTypeScriptModuleSpecifiers = ({
+  filePath,
+  source,
+}: {
+  filePath: string;
+  source: string;
+}) => {
+  const sourceFile = createSourceFile(
+    filePath,
+    source,
+    ScriptTarget.Latest,
+    true,
+    filePath.endsWith('.tsx') ? ScriptKind.TSX : ScriptKind.TS,
+  );
+  const moduleSpecifiers: string[] = [];
+  const collectModuleSpecifiers = (node: Node) => {
+    let specifier: Node | undefined;
+    let moduleLoadingCall = false;
+    if (isImportDeclaration(node) || isExportDeclaration(node)) {
+      specifier = node.moduleSpecifier;
+    } else if (
+      isImportEqualsDeclaration(node) &&
+      isExternalModuleReference(node.moduleReference)
+    ) {
+      specifier = node.moduleReference.expression;
+    } else if (isCallExpression(node)) {
+      moduleLoadingCall =
+        node.expression.kind === SyntaxKind.ImportKeyword ||
+        (isIdentifier(node.expression) && node.expression.text === 'require');
+      if (moduleLoadingCall) specifier = node.arguments[0];
+    }
+    if (moduleLoadingCall && (!specifier || !isStringLiteral(specifier))) {
+      throw new Error(`${filePath} module loading must use a string literal`);
+    }
+    if (specifier && isStringLiteral(specifier)) {
+      moduleSpecifiers.push(specifier.text);
+    }
+    forEachChild(node, collectModuleSpecifiers);
+  };
+  collectModuleSpecifiers(sourceFile);
+  return moduleSpecifiers;
 };
 
 export const withWorkflowCatalogMutationLock = async <Result>({
@@ -240,38 +284,10 @@ const validateAuthoredTree = async (
 
   for (const file of files) {
     const source = await readFile(file, 'utf8');
-    const sourceFile = createSourceFile(
-      file,
+    const moduleSpecifiers = parseWorkflowCatalogTypeScriptModuleSpecifiers({
+      filePath: file,
       source,
-      ScriptTarget.Latest,
-      true,
-      file.endsWith('.tsx') ? ScriptKind.TSX : ScriptKind.TS,
-    );
-    const moduleSpecifiers: string[] = [];
-    const collectModuleSpecifiers = (node: Node) => {
-      let specifier: Node | undefined;
-
-      if (isImportDeclaration(node) || isExportDeclaration(node)) {
-        specifier = node.moduleSpecifier;
-      } else if (
-        isImportEqualsDeclaration(node) &&
-        isExternalModuleReference(node.moduleReference)
-      ) {
-        specifier = node.moduleReference.expression;
-      } else if (
-        isCallExpression(node) &&
-        node.expression.kind === SyntaxKind.ImportKeyword
-      ) {
-        specifier = node.arguments[0];
-      }
-
-      if (specifier && isStringLiteralLike(specifier)) {
-        moduleSpecifiers.push(specifier.text);
-      }
-
-      forEachChild(node, collectModuleSpecifiers);
-    };
-    collectModuleSpecifiers(sourceFile);
+    });
 
     for (const importPath of moduleSpecifiers) {
       if (!importPath.startsWith('.')) continue;

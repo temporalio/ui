@@ -20,6 +20,7 @@ import {
   generateWorkflowCatalogArtifact,
   generateWorkflowCatalogArtifacts,
   loadWorkflowCatalogWorkerBindings,
+  renderWorkflowCatalogArtifacts,
   verifyWorkflowCatalogArtifact,
   verifyWorkflowCatalogArtifacts,
   verifyWorkflowCatalogProjectBoundaries,
@@ -62,6 +63,80 @@ afterEach(async () => {
 });
 
 describe('workflow catalog artifacts', () => {
+  it('renders every artifact without writing and generation preserves those bytes', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const sharedSourcePath = 'shared-registrations.ts';
+    const localSourcePath = 'local-registration.ts';
+    const sharedArtifactPath = 'catalog.generated.json';
+    const sharedTypeScriptArtifactPath = 'catalog.generated.ts';
+    const localArtifactPath = 'workflow-catalog.local/catalog.generated.json';
+    const options = {
+      rootDirectory,
+      sharedSource: {
+        source: { id: 'oss', label: 'OSS' },
+        sourceFiles: [sharedSourcePath],
+        register: () => undefined,
+      },
+      sharedArtifactPath,
+      sharedTypeScriptArtifactPath,
+      localModulePath: 'workflow-catalog.local/registration.ts',
+      localSource: null,
+      localFallback: {
+        source: { id: 'local', label: 'Local' },
+        sourceFiles: [localSourcePath],
+        register: () => undefined,
+      },
+      localArtifactPath,
+    };
+
+    await writeFile(join(rootDirectory, sharedSourcePath), 'export {};\n');
+    await writeFile(join(rootDirectory, localSourcePath), 'export {};\n');
+    await mkdir(join(rootDirectory, 'workflow-catalog.local'), {
+      recursive: true,
+    });
+    await writeFile(
+      join(rootDirectory, options.localModulePath),
+      'this would fail if the renderer imported it\n',
+    );
+    await writeFile(join(rootDirectory, sharedArtifactPath), 'stale shared\n');
+    await writeFile(
+      join(rootDirectory, sharedTypeScriptArtifactPath),
+      'stale TypeScript\n',
+    );
+    await writeFile(join(rootDirectory, localArtifactPath), 'stale local\n');
+
+    const rendered = await renderWorkflowCatalogArtifacts(options);
+
+    expect(rendered.artifacts).toEqual([
+      expect.objectContaining({ artifactPath: sharedArtifactPath }),
+      expect.objectContaining({ artifactPath: sharedTypeScriptArtifactPath }),
+      { artifactPath: localArtifactPath, content: null },
+    ]);
+    await expect(
+      readFile(join(rootDirectory, sharedArtifactPath), 'utf8'),
+    ).resolves.toBe('stale shared\n');
+    await expect(
+      readFile(join(rootDirectory, sharedTypeScriptArtifactPath), 'utf8'),
+    ).resolves.toBe('stale TypeScript\n');
+    await expect(
+      readFile(join(rootDirectory, localArtifactPath), 'utf8'),
+    ).resolves.toBe('stale local\n');
+
+    await generateWorkflowCatalogArtifacts(options);
+
+    for (const artifact of rendered.artifacts) {
+      if (artifact.content === null) {
+        await expect(
+          readFile(join(rootDirectory, artifact.artifactPath), 'utf8'),
+        ).rejects.toMatchObject({ code: 'ENOENT' });
+      } else {
+        await expect(
+          readFile(join(rootDirectory, artifact.artifactPath), 'utf8'),
+        ).resolves.toBe(artifact.content);
+      }
+    }
+  });
+
   it('emits a browser TypeScript artifact alongside the shared JSON artifact', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const sharedSourcePath = 'shared-registrations.ts';
@@ -1264,11 +1339,13 @@ registry.registerExample({
           'src/lib/holocene/badge.svelte',
           'src/lib/holocene/button.svelte',
           'src/lib/holocene/card.svelte',
+          'src/lib/holocene/copyable',
           'src/lib/holocene/icon',
           'src/lib/holocene/icon-button.svelte',
           'src/lib/holocene/input/input.svelte',
           'src/lib/holocene/label.svelte',
           'src/lib/holocene/link.svelte',
+          'src/lib/holocene/markdown-editor/preview.svelte',
           'src/lib/holocene/portal',
           'src/lib/holocene/progress-bar.svelte',
           'src/lib/holocene/table/table-header-row.svelte',
@@ -1283,11 +1360,13 @@ registry.registerExample({
           'src/lib/stores/persist-store.ts',
           'src/lib/svelte-mocks/app/navigation.ts',
           'src/lib/svelte-mocks/app/paths.ts',
+          'src/lib/svelte-mocks/app/state.ts',
           'src/lib/types/events.ts',
           'src/lib/types/global.ts',
           'src/lib/types/index.ts',
           'src/lib/utilities/copy-to-clipboard.ts',
           'src/lib/utilities/core-provider.ts',
+          'src/lib/utilities/dark-mode',
           'src/lib/utilities/encode-uri.ts',
           'src/lib/utilities/format-time.ts',
           'src/lib/utilities/has.ts',
@@ -1350,6 +1429,7 @@ registry.registerExample({
         join(consumerDirectory, 'runner.mjs'),
         [
           "import { fileURLToPath } from 'node:url';",
+          "import { createWorkflowCatalogAuthoring } from '@temporalio/ui/workflow-catalog/authoring';",
           "import { resolveWorkflowCatalogRouting } from '@temporalio/ui/workflow-catalog/browser/routing';",
           "import { parseWorkflowCatalogConnectionConfig } from '@temporalio/ui/workflow-catalog/worker/connection-config';",
           "import { createWorkflowCatalogExecutionLogger } from '@temporalio/ui/workflow-catalog/worker/workflow-execution-logger';",
@@ -1360,6 +1440,18 @@ registry.registerExample({
           "import { workflowCatalogRegistrationSource } from '@temporalio/ui/workflow-catalog/worker/shared-registrations';",
           "import { hello } from '@temporalio/ui/workflow-catalog/worker/workflows';",
           "const workflowsPath = import.meta.resolve('@temporalio/ui/workflow-catalog/worker/workflows');",
+          'const cloudAuthoring = createWorkflowCatalogAuthoring({',
+          '  rootDirectory: process.cwd(),',
+          "  localExamplesPath: 'local-examples',",
+          "  trackedExamplesPath: 'tracked-examples',",
+          "  generatedPaths: ['generated/catalog.json'],",
+          "  graph: { boundaries: { browserPaths: ['generated/catalog.json'], packageJsonPath: 'package.json', workerPaths: ['generated/registration.ts', 'generated/workflows.ts'] }, outputs: [{ consumers: ['browser'], path: 'generated/catalog.json' }, { consumers: ['worker'], path: 'generated/registration.ts' }, { consumers: ['worker'], path: 'generated/workflows.ts' }], sources: [{ examplesPath: 'tracked-examples', id: 'cloud', label: 'Cloud', registrationOutputPath: 'generated/registration.ts', registrationTypePath: 'generated/registration-source.ts' }], targets: [{ defaultNamespace: 'default', defaultTaskQueue: 'cloud-catalog', id: 'cloud-catalog', sourceId: 'cloud', workflowsModulePath: 'generated/workflows.ts' }] },",
+          '  loadExamples: () => [],',
+          '  parseModuleSpecifiers: () => [],',
+          '  scaffold: ({ exampleId }) => [{ path: `local-examples/${exampleId}/example.ts`, content: `export const id = ${JSON.stringify(exampleId)};\\n` }],',
+          "  generate: () => [{ path: 'generated/catalog.json', content: '{}\\n' }],",
+          '});',
+          "if (typeof cloudAuthoring.scaffold !== 'function' || typeof cloudAuthoring.promote !== 'function') throw new Error('Missing authoring lifecycle');",
           "if (typeof startWorkflowCatalogRunner !== 'function') throw new Error('Missing runner kernel');",
           "if (typeof resolveWorkflowCatalogRouting !== 'function') throw new Error('Missing routing resolver');",
           "if (typeof parseWorkflowCatalogConnectionConfig !== 'function') throw new Error('Missing connection configuration parser');",

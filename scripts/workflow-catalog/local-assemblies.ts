@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import {
   access,
   readdir,
@@ -7,8 +8,12 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { format, resolveConfig } from 'prettier';
+
+import type { WorkflowCatalogRegistrationSource } from '../../src/lib/workflow-catalog/worker/registration-source.js';
+import type { WorkflowCatalogExampleDefinition } from '../../src/lib/workflow-catalog/worker/registry.js';
 
 const generatedHeader = '// GENERATED FILE. DO NOT EDIT.\n';
 const localExamplesPath = 'workflow-catalog.local/examples';
@@ -195,6 +200,58 @@ ${registrations}
       singleQuote: true,
       trailingComma: 'all',
     }),
+  };
+};
+
+export const loadLocalWorkflowCatalogRegistrationSource = async (
+  rootDirectory: string,
+): Promise<WorkflowCatalogRegistrationSource | undefined> => {
+  const examples = await readLocalExamples(rootDirectory);
+  if (examples.length === 0) return;
+  const definitions = await Promise.all(
+    examples.map(async ({ id }) => {
+      const module = (await import(
+        `${pathToFileURL(join(rootDirectory, localExamplesPath, id, 'example.ts')).href}?workflow-catalog=${randomUUID()}`
+      )) as { workflowCatalogExample?: unknown };
+      if (!module.workflowCatalogExample) {
+        throw new Error(
+          `${localExamplesPath}/${id}/example.ts must export workflowCatalogExample`,
+        );
+      }
+      return module.workflowCatalogExample as WorkflowCatalogExampleDefinition;
+    }),
+  );
+  const workflowExports = Object.fromEntries(
+    definitions.flatMap((definition) =>
+      definition.execution.kind === 'workflow'
+        ? [[definition.execution.workflowType, definition.execution.workflow]]
+        : [],
+    ),
+  );
+  return {
+    source: { id: 'local', label: 'Local' },
+    sourceFiles: [
+      'workflow-catalog.local/registration.ts',
+      'workflow-catalog.local/workflows.ts',
+      ...new Set(examples.flatMap(({ sourceFiles }) => sourceFiles)),
+    ],
+    register: (registry) => {
+      registry.registerTarget({
+        id: 'local-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog-local',
+        workflowsPath: pathToFileURL(
+          join(rootDirectory, 'workflow-catalog.local/workflows.ts'),
+        ).href,
+        workflowExports,
+      });
+      for (const definition of definitions) {
+        registry.registerExample({
+          ...definition,
+          targetId: 'local-workflows',
+        });
+      }
+    },
   };
 };
 

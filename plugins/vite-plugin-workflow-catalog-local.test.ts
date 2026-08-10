@@ -120,10 +120,11 @@ describe('local workflow catalog Vite boundary', () => {
       join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
       join(rootDirectory, 'workflow-catalog.local/registration.ts'),
       join(rootDirectory, 'workflow-catalog.local/workflows.ts'),
+      join(rootDirectory, 'workflow-catalog.local/examples'),
     ]);
   });
 
-  it('regenerates the local catalog when workspace sources change', async () => {
+  it('regenerates the local catalog when workspace sources or local example files change', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const regenerated: string[] = [];
     const reloads: unknown[] = [];
@@ -153,7 +154,7 @@ describe('local workflow catalog Vite boundary', () => {
       ws: { send: (payload: unknown) => reloads.push(payload) },
     });
 
-    const change = handlers[0];
+    const [add, change, unlink] = handlers;
     change(join(rootDirectory, 'workflow-catalog.local/registration.ts'));
     change(join(rootDirectory, 'workflow-catalog.local/workflows.ts'));
     expect(regenerated).toEqual([rootDirectory]);
@@ -162,6 +163,50 @@ describe('local workflow catalog Vite boundary', () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(regenerated).toEqual([rootDirectory, rootDirectory]);
+    releaseRegeneration();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    add(
+      join(
+        rootDirectory,
+        'workflow-catalog.local/examples/order-lifecycle/new-workflow.ts',
+      ),
+    );
+    expect(regenerated).toEqual([rootDirectory, rootDirectory, rootDirectory]);
+    releaseRegeneration();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    change(
+      join(
+        rootDirectory,
+        'workflow-catalog.local/examples/order-lifecycle/workflow.ts',
+      ),
+    );
+    expect(regenerated).toEqual([
+      rootDirectory,
+      rootDirectory,
+      rootDirectory,
+      rootDirectory,
+    ]);
+    releaseRegeneration();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    unlink(
+      join(
+        rootDirectory,
+        'workflow-catalog.local/examples/order-lifecycle/example.ts',
+      ),
+    );
+    expect(regenerated).toEqual([
+      rootDirectory,
+      rootDirectory,
+      rootDirectory,
+      rootDirectory,
+      rootDirectory,
+    ]);
     releaseRegeneration();
 
     change(

@@ -160,8 +160,10 @@ export const scaffoldDirectoryWorkflowCatalog = async ({
   rootDirectory: string;
   exampleId: string;
 }) => {
-  validateExampleId(exampleId, rootDirectory);
-
+  const artifacts = renderDirectoryWorkflowCatalogScaffold({
+    exampleId,
+    rootDirectory,
+  });
   const exampleDirectory = join(
     rootDirectory,
     'workflow-catalog.local/examples',
@@ -175,20 +177,35 @@ export const scaffoldDirectoryWorkflowCatalog = async ({
   }
 
   await assertLocalWorkflowCatalogAssembliesWritable(rootDirectory);
-
-  const workflowName = workflowNameFor(exampleId);
   await mkdir(exampleDirectory, { recursive: true });
-  await Promise.all([
-    writeFile(
-      join(exampleDirectory, 'workflow.ts'),
-      `export async function ${workflowName}(message = 'ping'): Promise<string> {
+  await Promise.all(
+    artifacts.map((artifact) =>
+      writeFile(join(rootDirectory, artifact.path), artifact.content),
+    ),
+  );
+  await writeLocalWorkflowCatalogAssemblies(rootDirectory);
+};
+
+export const renderDirectoryWorkflowCatalogScaffold = ({
+  rootDirectory,
+  exampleId,
+}: {
+  rootDirectory: string;
+  exampleId: string;
+}) => {
+  validateExampleId(exampleId, rootDirectory);
+  const workflowName = workflowNameFor(exampleId);
+  return [
+    {
+      path: `workflow-catalog.local/examples/${exampleId}/workflow.ts`,
+      content: `export async function ${workflowName}(message = 'ping'): Promise<string> {
   return message;
 }
 `,
-    ),
-    writeFile(
-      join(exampleDirectory, 'example.ts'),
-      `import { ${workflowName} } from './workflow.js';
+    },
+    {
+      path: `workflow-catalog.local/examples/${exampleId}/example.ts`,
+      content: `import { ${workflowName} } from './workflow.js';
 
 export const workflowCatalogExample = {
   id: '${exampleId}',
@@ -206,7 +223,6 @@ export const workflowCatalogExample = {
   },
 };
 `,
-    ),
-  ]);
-  await writeLocalWorkflowCatalogAssemblies(rootDirectory);
+    },
+  ];
 };

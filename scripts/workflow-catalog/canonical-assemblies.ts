@@ -1,7 +1,12 @@
+import { randomUUID } from 'node:crypto';
 import { readdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { format, resolveConfig } from 'prettier';
+
+import type { WorkflowCatalogRegistrationSource } from '../../src/lib/workflow-catalog/worker/registration-source.js';
+import type { WorkflowCatalogExampleDefinition } from '../../src/lib/workflow-catalog/worker/registry.js';
 
 const examplesPath = 'src/lib/workflow-catalog/worker/examples';
 const indexPath = `${examplesPath}/index.ts`;
@@ -229,6 +234,58 @@ export { sharedWorkflowCorpusInventory } from './inventory.js';
       path: workflowsPath,
     },
   ];
+};
+
+export const loadCanonicalWorkflowCatalogRegistrationSource = async (
+  rootDirectory: string,
+): Promise<WorkflowCatalogRegistrationSource> => {
+  const examples = await readCanonicalExamples(rootDirectory);
+  const definitions = await Promise.all(
+    examples.map(async ({ id }) => {
+      const module = (await import(
+        `${pathToFileURL(join(rootDirectory, examplesPath, id, 'example.ts')).href}?workflow-catalog=${randomUUID()}`
+      )) as { workflowCatalogExample?: unknown };
+      if (!module.workflowCatalogExample) {
+        throw new Error(
+          `${examplesPath}/${id}/example.ts must export workflowCatalogExample`,
+        );
+      }
+      return module.workflowCatalogExample as WorkflowCatalogExampleDefinition;
+    }),
+  );
+  const workflowExports = Object.fromEntries(
+    definitions.flatMap((definition) =>
+      definition.execution.kind === 'workflow'
+        ? [[definition.execution.workflowType, definition.execution.workflow]]
+        : [],
+    ),
+  );
+  return {
+    source: { id: 'oss', label: 'OSS' },
+    sourceFiles: [
+      'src/lib/workflow-catalog/worker/shared-registrations.ts',
+      workflowsPath,
+      `${examplesPath}/inventory.ts`,
+      indexPath,
+      `${examplesPath}/shared-activities.ts`,
+      ...new Set(examples.flatMap(({ sourceFiles }) => sourceFiles)),
+    ],
+    register: (registry) => {
+      registry.registerTarget({
+        id: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowsPath: pathToFileURL(join(rootDirectory, workflowsPath)).href,
+        workflowExports,
+      });
+      for (const definition of definitions) {
+        registry.registerExample({
+          ...definition,
+          targetId: 'shared-workflows',
+        });
+      }
+    },
+  };
 };
 
 export const writeCanonicalWorkflowCatalogAssemblies = async (

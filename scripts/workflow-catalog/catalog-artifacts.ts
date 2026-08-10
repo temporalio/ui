@@ -30,14 +30,20 @@ type WorkflowCatalogArtifactOptions = {
   source: BrowserWorkflowCatalogSource;
 };
 
-type WorkflowCatalogArtifactsOptions = {
+export type WorkflowCatalogArtifactsOptions = {
   rootDirectory: string;
   sharedSource: WorkflowCatalogRegistrationSource;
   sharedArtifactPath: string;
   sharedTypeScriptArtifactPath?: string;
   localModulePath: string;
   localFallback: WorkflowCatalogRegistrationSource;
+  localSource?: WorkflowCatalogRegistrationSource | null;
   localArtifactPath: string;
+};
+
+export type WorkflowCatalogRenderedArtifact = {
+  artifactPath: string;
+  content: string | null;
 };
 
 type WorkflowCatalogProjectBoundaryOptions = {
@@ -126,14 +132,25 @@ const buildWorkflowCatalogArtifact = async ({
 export const generateWorkflowCatalogArtifact = async (
   options: WorkflowCatalogArtifactOptions,
 ) => {
-  const { rootDirectory, artifactPath } = options;
+  const rendered = await renderWorkflowCatalogArtifact(options);
+
+  await writeWorkflowCatalogArtifact(options.rootDirectory, rendered.output);
+
+  return rendered.generated;
+};
+
+export const renderWorkflowCatalogArtifact = async (
+  options: WorkflowCatalogArtifactOptions,
+) => {
   const generated = await buildWorkflowCatalogArtifact(options);
-  const outputPath = join(rootDirectory, artifactPath);
 
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, await serializeArtifact(generated.artifact));
-
-  return generated;
+  return {
+    generated,
+    output: {
+      artifactPath: options.artifactPath,
+      content: await serializeArtifact(generated.artifact),
+    } satisfies WorkflowCatalogRenderedArtifact,
+  };
 };
 
 export const verifyWorkflowCatalogArtifact = async (
@@ -167,20 +184,17 @@ export const verifyWorkflowCatalogArtifact = async (
   }
 };
 
-const generateWorkflowCatalogTypeScriptArtifact = async ({
-  rootDirectory,
+const renderWorkflowCatalogTypeScriptArtifact = async ({
   artifactPath,
   artifact,
 }: {
-  rootDirectory: string;
   artifactPath: string;
   artifact: BrowserWorkflowCatalogArtifact;
-}) => {
-  const outputPath = join(rootDirectory, artifactPath);
-
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, await serializeTypeScriptArtifact(artifact));
-};
+}) =>
+  ({
+    artifactPath,
+    content: await serializeTypeScriptArtifact(artifact),
+  }) satisfies WorkflowCatalogRenderedArtifact;
 
 const verifyWorkflowCatalogTypeScriptArtifact = async ({
   rootDirectory,
@@ -287,43 +301,81 @@ const importLocalRegistrationSource = async (absolutePath: string) => {
   return registrationModule.workflowCatalogRegistrationSource as WorkflowCatalogRegistrationSource;
 };
 
-export const generateWorkflowCatalogArtifacts = async (
+export const writeWorkflowCatalogArtifact = async (
+  rootDirectory: string,
+  artifact: WorkflowCatalogRenderedArtifact,
+) => {
+  const outputPath = join(rootDirectory, artifact.artifactPath);
+
+  if (artifact.content === null) {
+    await rm(outputPath, { force: true });
+    return;
+  }
+
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, artifact.content);
+};
+
+export const writeWorkflowCatalogArtifacts = async (
+  rootDirectory: string,
+  artifacts: readonly WorkflowCatalogRenderedArtifact[],
+) => {
+  await Promise.all(
+    artifacts.map((artifact) =>
+      writeWorkflowCatalogArtifact(rootDirectory, artifact),
+    ),
+  );
+};
+
+export const renderWorkflowCatalogArtifacts = async (
   options: WorkflowCatalogArtifactsOptions,
 ) => {
   const { shared, local, hasLocalModule, workerBindings } =
     await createArtifactOptions(options);
-  const generateSharedArtifacts = async () => {
-    const generatedShared = await generateWorkflowCatalogArtifact(shared);
+  const [renderedShared, renderedLocal] = await Promise.all([
+    renderWorkflowCatalogArtifact(shared),
+    renderWorkflowCatalogArtifact(local),
+  ]);
+  const artifacts: WorkflowCatalogRenderedArtifact[] = [renderedShared.output];
 
-    if (options.sharedTypeScriptArtifactPath) {
-      await generateWorkflowCatalogTypeScriptArtifact({
-        rootDirectory: options.rootDirectory,
+  if (options.sharedTypeScriptArtifactPath) {
+    artifacts.push(
+      await renderWorkflowCatalogTypeScriptArtifact({
         artifactPath: options.sharedTypeScriptArtifactPath,
-        artifact: generatedShared.artifact,
-      });
-    }
-
-    return generatedShared;
-  };
-
-  if (!hasLocalModule) {
-    await rm(join(options.rootDirectory, options.localArtifactPath), {
-      force: true,
-    });
-    const [generatedShared, generatedLocal] = await Promise.all([
-      generateSharedArtifacts(),
-      buildWorkflowCatalogArtifact(local),
-    ]);
-
-    return { shared: generatedShared, local: generatedLocal, workerBindings };
+        artifact: renderedShared.generated.artifact,
+      }),
+    );
   }
 
-  const [generatedShared, generatedLocal] = await Promise.all([
-    generateSharedArtifacts(),
-    generateWorkflowCatalogArtifact(local),
-  ]);
+  artifacts.push(
+    hasLocalModule
+      ? renderedLocal.output
+      : { artifactPath: options.localArtifactPath, content: null },
+  );
 
-  return { shared: generatedShared, local: generatedLocal, workerBindings };
+  return {
+    shared: renderedShared.generated,
+    local: renderedLocal.generated,
+    workerBindings,
+    artifacts,
+  };
+};
+
+export const generateWorkflowCatalogArtifacts = async (
+  options: WorkflowCatalogArtifactsOptions,
+) => {
+  const rendered = await renderWorkflowCatalogArtifacts(options);
+
+  await writeWorkflowCatalogArtifacts(
+    options.rootDirectory,
+    rendered.artifacts,
+  );
+
+  return {
+    shared: rendered.shared,
+    local: rendered.local,
+    workerBindings: rendered.workerBindings,
+  };
 };
 
 const createArtifactOptions = async (
@@ -333,11 +385,17 @@ const createArtifactOptions = async (
     options.rootDirectory,
     options.localModulePath,
   );
-  const hasLocalModule = await pathExists(localModuleAbsolutePath);
+  const hasLocalModule =
+    options.localSource === undefined
+      ? await pathExists(localModuleAbsolutePath)
+      : options.localSource !== null;
 
-  const localSource = hasLocalModule
-    ? await importLocalRegistrationSource(localModuleAbsolutePath)
-    : options.localFallback;
+  const localSource =
+    options.localSource === undefined
+      ? hasLocalModule
+        ? await importLocalRegistrationSource(localModuleAbsolutePath)
+        : options.localFallback
+      : (options.localSource ?? options.localFallback);
 
   if (
     hasLocalModule &&

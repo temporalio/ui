@@ -267,7 +267,7 @@ describe('directory workflow catalog promotion', () => {
       {
         example:
           "void import(`../outside.js`);\nexport const workflowCatalogExample = { id: 'order-lifecycle', execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n",
-        expected: 'must stay within its example directory',
+        expected: 'module loading must use a string literal',
       },
       {
         example:
