@@ -29,9 +29,9 @@ export const Strings = {
   'workflow-runs-empty-state-recent-description':
     'Runs will appear here once triggered.',
   'workflow-runs-empty-state-upcoming-title':
-    'This Schedule does not have upcoming runs.',
+    'This Schedule has no upcoming runs scheduled.',
   'workflow-runs-empty-state-upcoming-description':
-    'Upcoming runs will apear here once available.',
+    'To schedule runs, update the Schedule Spec to include future run timestamps.',
   'upcoming-runs': 'Upcoming Runs',
   'upcoming-runs-count_one': '{{count, number}} Upcoming Run',
   'upcoming-runs-count_other': '{{count, number}} Upcoming Runs',
