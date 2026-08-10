@@ -120,6 +120,14 @@ class GroupRecord implements LazyGroup {
   lastEvent!: WorkflowEvent;
   category: WorkflowEvent['category'] = 'workflow';
   headsGroup = false;
+  /**
+   * Whether a terminal event has landed. Pending metadata from the run can
+   * outlive the completion that resolves it, so both the lazy `isPending` and
+   * the materialized group have to discount it — which means the record, not
+   * the built group, has to know.
+   */
+  hasTerminalActivity = false;
+  hasTerminalNexus = false;
   private lastSlot = -1;
 
   constructor(readonly headSlot: number) {
@@ -132,12 +140,16 @@ class GroupRecord implements LazyGroup {
       this.lastSlot = slot;
       this.lastEvent = event;
     }
+    if (isTerminalActivityEvent(event)) this.hasTerminalActivity = true;
+    if (isTerminalNexusEvent(event)) this.hasTerminalNexus = true;
     if (slot === this.headSlot) {
       this.initialEvent = event;
       this.category = groupCategory(event);
       this.headsGroup = isGroupHeadEvent(event as CommonHistoryEvent);
-      applyPendingMetadataTo(this);
     }
+    // Re-run on every member: a head arriving picks metadata up, a terminal
+    // event arriving drops it.
+    applyPendingMetadataTo(this);
     this.version++;
   }
 
@@ -212,15 +224,18 @@ const enrichedRecords = new Set<GroupRecord>();
 /** Returns whether the record's pending metadata changed. */
 function applyPendingMetadataTo(record: GroupRecord): boolean {
   const head = record.initialEvent;
+  if (!head) return false;
 
   let pendingActivity: PendingActivity | undefined;
   let pendingNexusOperation: PendingNexusOperation | undefined;
 
-  if (isActivityTaskScheduledEvent(head)) {
+  // The run can still list an activity the history has already resolved, so a
+  // terminal event wins over whatever the run reports.
+  if (!record.hasTerminalActivity && isActivityTaskScheduledEvent(head)) {
     pendingActivity = pendingByActivityId.get(
       head.activityTaskScheduledEventAttributes?.activityId ?? '',
     );
-  } else if (isNexusOperationScheduledEvent(head)) {
+  } else if (!record.hasTerminalNexus && isNexusOperationScheduledEvent(head)) {
     pendingNexusOperation = pendingByNexusScheduledId.get(head.id);
   }
 
@@ -286,23 +301,21 @@ function recordFor(headSlot: number): GroupRecord {
   return record;
 }
 
-function hasTerminalActivityEvent(group: EventGroup): boolean {
-  return group.eventList.some(
-    (event) =>
-      isActivityTaskCompletedEvent(event) ||
-      isActivityTaskFailedEvent(event) ||
-      isActivityTaskCanceledEvent(event) ||
-      isActivityTaskTimedOutEvent(event),
+function isTerminalActivityEvent(event: WorkflowEvent): boolean {
+  return (
+    isActivityTaskCompletedEvent(event) ||
+    isActivityTaskFailedEvent(event) ||
+    isActivityTaskCanceledEvent(event) ||
+    isActivityTaskTimedOutEvent(event)
   );
 }
 
-function hasTerminalNexusEvent(group: EventGroup): boolean {
-  return group.eventList.some(
-    (event) =>
-      isNexusOperationCompletedEvent(event) ||
-      isNexusOperationFailedEvent(event) ||
-      isNexusOperationCanceledEvent(event) ||
-      isNexusOperationTimedOutEvent(event),
+function isTerminalNexusEvent(event: WorkflowEvent): boolean {
+  return (
+    isNexusOperationCompletedEvent(event) ||
+    isNexusOperationFailedEvent(event) ||
+    isNexusOperationCanceledEvent(event) ||
+    isNexusOperationTimedOutEvent(event)
   );
 }
 
@@ -310,12 +323,10 @@ function hasTerminalNexusEvent(group: EventGroup): boolean {
 // group, so a terminal event and a stale pending entry can arrive in either
 // order without leaving the group reporting isPending alongside a completion.
 function applyPendingMetadata(group: EventGroup, record: GroupRecord): void {
-  if (record.pendingActivity && !hasTerminalActivityEvent(group)) {
-    group.pendingActivity = record.pendingActivity;
-  }
-  if (record.pendingNexusOperation && !hasTerminalNexusEvent(group)) {
-    group.pendingNexusOperation = record.pendingNexusOperation;
-  }
+  // The record already discounts metadata resolved by a terminal event, so this
+  // copies rather than re-deciding — one source of truth for both readings.
+  group.pendingActivity = record.pendingActivity;
+  group.pendingNexusOperation = record.pendingNexusOperation;
 }
 
 /**

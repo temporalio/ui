@@ -17,7 +17,6 @@ import {
   reset,
   setFailedEvent,
   setPendingMetadata,
-  SHARED_WITH_EVENT_GROUP,
 } from './grouped-event-buffer';
 import { SHARED_WITH_EVENT_GROUP } from './test-helpers/lazy-group-fields';
 import {
@@ -1266,6 +1265,39 @@ describe('arrival-order independence', () => {
     expect(lazy.pendingActivity).toBeDefined();
     expect(lazy.isPending).toBe(true);
     expect(materializeGroup(lazy).isPending).toBe(true);
+  });
+
+  // Regression: the record kept the run's pending entry after the completion
+  // landed, so the lazy isPending said true while the materialized group said
+  // false — and sorting reads the lazy one, so a finished activity was hoisted
+  // to the top as pending. No re-enrich happens here on purpose; a closed run
+  // stops refreshing, so nothing would have corrected it.
+  it('agrees on isPending when the completion lands after the metadata', () => {
+    reset(10);
+    const [scheduled, started, completed] = makeActivityGroup(1);
+
+    ingestHistoryEvent(scheduled, true);
+    setPendingMetadata(pending, []);
+    expect(getLazyGroups()[0].isPending).toBe(true);
+
+    ingestHistoryEvent(started, true);
+    ingestHistoryEvent(completed, true);
+
+    const [lazy] = getLazyGroups();
+    expect(lazy.isPending).toBe(false);
+    expect(lazy.isPending).toBe(materializeGroup(lazy).isPending);
+    expect(lazy.pendingActivity).toBeUndefined();
+  });
+
+  it('ignores a stale pending entry for an already-completed activity', () => {
+    reset(10);
+    for (const event of makeActivityGroup(1)) ingestHistoryEvent(event, true);
+    // The run still lists it — the history says otherwise and wins.
+    setPendingMetadata(pending, []);
+
+    const [lazy] = getLazyGroups();
+    expect(lazy.isPending).toBe(false);
+    expect(materializeGroup(lazy).isPending).toBe(false);
   });
 
   it('drops pending metadata when enrich runs after the completion', () => {

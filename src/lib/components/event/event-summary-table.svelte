@@ -102,9 +102,21 @@
   ]);
 
   const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
-    if (isPendingNexusOperation(event))
+    if (isPendingNexusOperation(event)) {
       return `pending-nexus-${event.scheduledEventId}`;
-    if (isPendingActivity(event)) return `pending-activity-${event.id}`;
+    }
+
+    if (isPendingActivity(event)) {
+      return `pending-activity-${event.id}`;
+    }
+
+    if (isLazyGroup(event)) {
+      // A lazy group keeps its identity as it gains events, so the version has to
+      // be part of the key — otherwise the keyed block is reused, the {@const}
+      // below never re-runs, and the row renders a stale materialized group.
+      return `group-${event.id}-${event.version}`;
+    }
+
     return `event-${event.id}`;
   };
 </script>
