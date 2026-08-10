@@ -47,18 +47,6 @@ describe('workflow catalog CLI', () => {
   });
 
   it('returns a nonzero exit and performs no command for an unknown entrypoint command', async () => {
-    const stableStatus = (status: string) =>
-      status
-        .split('\n')
-        .filter((line) => !line.endsWith('.workflow-catalog.lock'))
-        .join('\n');
-    const before = stableStatus(
-      (
-        await execFileAsync('git', ['status', '--short'], {
-          cwd: process.cwd(),
-        })
-      ).stdout,
-    );
     const error = await execFileAsync(
       'pnpm',
       [
@@ -78,29 +66,35 @@ describe('workflow catalog CLI', () => {
       error.stderr.match(/Unknown workflow catalog command "unknown"/g),
     ).toHaveLength(1);
     expect(error.stderr).toContain('Usage: workflow-catalog <command>');
-    const after = stableStatus(
-      (
-        await execFileAsync('git', ['status', '--short'], {
-          cwd: process.cwd(),
-        })
-      ).stdout,
-    );
-    expect(after).toBe(before);
   });
 
   it('rejects an unknown command with canonical help', async () => {
+    const generate = vi.fn();
+    const verify = vi.fn();
+    const scaffold = vi.fn();
+    const promote = vi.fn();
+    const dev = vi.fn();
+    const worker = vi.fn();
+    const help = vi.fn();
     const writeError = vi.fn();
 
     await expect(
       runWorkflowCatalogCommand({
         arguments: ['unknown'],
-        commands: {},
+        commands: { generate, verify, scaffold, promote, dev, worker, help },
         writeError,
         writeOutput: vi.fn(),
       }),
     ).rejects.toThrow('Unknown workflow catalog command "unknown"');
 
     expect(writeError).toHaveBeenCalledWith(expect.stringContaining('Usage:'));
+    expect(generate).not.toHaveBeenCalled();
+    expect(verify).not.toHaveBeenCalled();
+    expect(scaffold).not.toHaveBeenCalled();
+    expect(promote).not.toHaveBeenCalled();
+    expect(dev).not.toHaveBeenCalled();
+    expect(worker).not.toHaveBeenCalled();
+    expect(help).not.toHaveBeenCalled();
   });
 
   it('rejects invalid arguments with the command error and canonical help', async () => {
