@@ -153,7 +153,7 @@
       startToken,
       signal: livePollingController.signal,
       onEvent: (ev) => {
-        const isNew = ingestHistoryEvent(ev, true);
+        const isNew = ingestHistoryEvent(ev);
         if (isNew)
           latestEventId = Math.max(latestEventId, parseInt(ev.eventId));
         return isNew;
@@ -234,9 +234,9 @@
           _pauseHandle = handle;
         }
       },
-      onRawPage: (events, isAscending) => {
+      onRawPage: (events) => {
         for (const event of events) {
-          ingestHistoryEvent(event, isAscending);
+          ingestHistoryEvent(event);
           const id = parseInt(event.eventId);
           if (id > latestEventId) latestEventId = id;
         }

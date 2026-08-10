@@ -402,10 +402,7 @@ export function setFailedEvent(raw: HistoryEvent | null): void {
  * Add one raw HistoryEvent from either fetch cursor or the live poll.
  * Returns false when the event was already present.
  */
-export function ingestHistoryEvent(
-  raw: HistoryEvent,
-  isAscending: boolean,
-): boolean {
+export function ingestHistoryEvent(raw: HistoryEvent): boolean {
   const slot = parseInt(raw.eventId) - 1;
   if (!(slot >= 0)) return false;
 
