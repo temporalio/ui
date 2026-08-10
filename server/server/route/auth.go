@@ -110,8 +110,8 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 
 	api := e.Group("/auth")
 	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration)) // compatibility with UI v1
+	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, providerCfg))
+	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, providerCfg)) // compatibility with UI v1
 	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
 	api.GET("/logout", logout())
 }
@@ -154,11 +154,23 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, providerCfg config.AuthProvider) func(echo.Context) error {
 	return func(c echo.Context) error {
 		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
 		if err != nil {
 			return err
+		}
+
+		// Claim-based authorization check: verify the user has required claim values
+		if providerCfg.AllowedClaimKey != "" && user.IDToken != nil {
+			if err := auth.ValidateAllowedClaims(
+				user.IDToken.RawToken,
+				providerCfg.AllowedClaimKey,
+				providerCfg.AllowedClaimValues,
+			); err != nil {
+				log.Printf("[Auth] Authorization denied for user: %v", err)
+				return echo.NewHTTPError(http.StatusForbidden, "access denied: insufficient permissions")
+			}
 		}
 
 		err = auth.SetUser(c, user)
@@ -224,6 +236,9 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 		user.OAuth2Token = newTok
 
 		// Try to capture a new ID token if provided and verify it
+		// TODO: Consider re-validating allowedClaimKey/allowedClaimValues on refresh
+		// in a future iteration. Most IdPs don't update group claims on token refresh,
+		// so this would only be effective after a full re-authentication.
 		if raw, ok := newTok.Extra("id_token").(string); ok && raw != "" {
 			oidcConfig := &oidc.Config{ClientID: oauthCfg.ClientID}
 			verifier := provider.Verifier(oidcConfig)
