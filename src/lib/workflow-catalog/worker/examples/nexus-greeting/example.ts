@@ -2,7 +2,7 @@ import { greetingServiceHandler } from './handler.js';
 import { greetingEndpoint } from './service.js';
 import { nexusGreeting } from './workflow.js';
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 
 const input: RuntimeJsonDocument = {
   defaultValue: ['Temporal'],
@@ -21,12 +21,11 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const nexusGreetingExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'nexus-greeting',
   title: 'Nexus greeting',
   description:
     'Calls a Nexus operation from a workflow through a declared Nexus endpoint.',
-  targetId: 'shared-workflows',
   capabilityTags: ['nexus', 'terminal-outcome'],
   expectedEvidence: [
     'A completed workflow whose result is the greeting returned by the Nexus operation.',
@@ -52,10 +51,3 @@ export const nexusGreetingExample: WorkflowCatalogExampleRegistration = {
     nexusServices: [greetingServiceHandler],
   },
 };
-
-export const nexusGreetingSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/nexus-greeting/example.ts',
-  'src/lib/workflow-catalog/worker/examples/nexus-greeting/workflow.ts',
-  'src/lib/workflow-catalog/worker/examples/nexus-greeting/service.ts',
-  'src/lib/workflow-catalog/worker/examples/nexus-greeting/handler.ts',
-] as const;

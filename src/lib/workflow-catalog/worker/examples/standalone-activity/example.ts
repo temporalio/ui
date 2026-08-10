@@ -1,6 +1,6 @@
 import { standaloneActivity } from './activity.js';
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 
 const input: RuntimeJsonDocument = {
   defaultValue: { name: 'Temporal' },
@@ -16,11 +16,10 @@ const startOptions: RuntimeJsonDocument = {
   schema: { type: 'object', properties: {} },
 };
 
-export const standaloneActivityExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'standalone-activity',
   title: 'Standalone activity',
   description: 'Runs an Activity directly without a Workflow execution.',
-  targetId: 'shared-workflows',
   capabilityTags: ['activities', 'standalone', 'terminal-outcome'],
   expectedEvidence: [
     'Standalone Activity details and result are available without a Workflow execution.',
@@ -35,8 +34,3 @@ export const standaloneActivityExample: WorkflowCatalogExampleRegistration = {
     policies: { retryPolicy: { maximumAttempts: 3 } },
   },
 };
-
-export const standaloneActivitySourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/standalone-activity/example.ts',
-  'src/lib/workflow-catalog/worker/examples/standalone-activity/activity.ts',
-] as const;

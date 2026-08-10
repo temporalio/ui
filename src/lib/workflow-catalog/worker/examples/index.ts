@@ -1,138 +1,60 @@
+// GENERATED FILE. DO NOT EDIT.
 import type {
+  WorkflowCatalogExampleDefinition,
   WorkflowCatalogExampleRegistration,
   WorkflowImplementation,
 } from '../registry.js';
-import {
-  activityHeartbeatExample,
-  activityHeartbeatSourceFiles,
-} from './activity-heartbeat/example.js';
-import {
-  activityRetryExample,
-  activityRetrySourceFiles,
-} from './activity-retry/example.js';
-import {
-  activityTimeoutExample,
-  activityTimeoutSourceFiles,
-} from './activity-timeout/example.js';
-import {
-  childWorkflowsExample,
-  childWorkflowsSourceFiles,
-} from './child-workflows/example.js';
-import { helloExample, helloSourceFiles } from './hello/example.js';
-import {
-  highEventCountExample,
-  highEventCountSourceFiles,
-} from './high-event-count/example.js';
-import {
-  localActivityExample,
-  localActivitySourceFiles,
-} from './local-activity/example.js';
-import {
-  longActivityExample,
-  longActivitySourceFiles,
-} from './long-activity/example.js';
-import {
-  nexusGreetingExample,
-  nexusGreetingSourceFiles,
-} from './nexus-greeting/example.js';
-import {
-  parallelActivitiesExample,
-  parallelActivitiesSourceFiles,
-} from './parallel-activities/example.js';
-import {
-  priorityFairnessExample,
-  priorityFairnessSourceFiles,
-} from './priority-fairness/example.js';
-import {
-  sequentialActivitiesExample,
-  sequentialActivitiesSourceFiles,
-} from './sequential-activities/example.js';
-import {
-  signalCollectorExample,
-  signalCollectorSourceFiles,
-} from './signal-collector/example.js';
-import {
-  signalHandlersExample,
-  signalHandlersSourceFiles,
-} from './signal-handlers/example.js';
-import {
-  standaloneActivityExample,
-  standaloneActivitySourceFiles,
-} from './standalone-activity/example.js';
-import {
-  timerDrivenRepetitionExample,
-  timerDrivenRepetitionSourceFiles,
-} from './timer-driven-repetition/example.js';
-import {
-  workflowPatchingExample,
-  workflowPatchingSourceFiles,
-} from './workflow-patching/example.js';
+import { workflowCatalogExample as example0 } from './activity-heartbeat/example.js';
+import { workflowCatalogExample as example1 } from './activity-retry/example.js';
+import { workflowCatalogExample as example2 } from './activity-timeout/example.js';
+import { workflowCatalogExample as example3 } from './child-workflows/example.js';
+import { workflowCatalogExample as example4 } from './hello/example.js';
+import { workflowCatalogExample as example5 } from './high-event-count/example.js';
+import { workflowCatalogExample as example6 } from './local-activity/example.js';
+import { workflowCatalogExample as example7 } from './long-activity/example.js';
+import { workflowCatalogExample as example8 } from './nexus-greeting/example.js';
+import { workflowCatalogExample as example9 } from './parallel-activities/example.js';
+import { workflowCatalogExample as example10 } from './priority-fairness/example.js';
+import { workflowCatalogExample as example11 } from './sequential-activities/example.js';
+import { workflowCatalogExample as example12 } from './signal-collector/example.js';
+import { workflowCatalogExample as example13 } from './signal-handlers/example.js';
+import { workflowCatalogExample as example14 } from './standalone-activity/example.js';
+import { workflowCatalogExample as example15 } from './timer-driven-repetition/example.js';
+import { workflowCatalogExample as example16 } from './workflow-patching/example.js';
 
-type WorkflowExampleDefinition = {
-  example: WorkflowCatalogExampleRegistration;
-  sourceFiles: readonly string[];
-};
-
-const assertUniqueEntries = (entries: readonly string[], label: string) => {
-  const seen = new Set<string>();
-
-  for (const entry of entries) {
-    if (seen.has(entry)) {
-      throw new Error(`Duplicate workflow catalog ${label} "${entry}"`);
-    }
-
-    seen.add(entry);
-  }
-};
-
-const sharedWorkflowDefinitions: readonly WorkflowExampleDefinition[] = [
-  { example: helloExample, sourceFiles: helloSourceFiles },
-  {
-    example: parallelActivitiesExample,
-    sourceFiles: parallelActivitiesSourceFiles,
-  },
-  {
-    example: sequentialActivitiesExample,
-    sourceFiles: sequentialActivitiesSourceFiles,
-  },
-  { example: longActivityExample, sourceFiles: longActivitySourceFiles },
-  { example: activityTimeoutExample, sourceFiles: activityTimeoutSourceFiles },
-  { example: activityRetryExample, sourceFiles: activityRetrySourceFiles },
-  { example: signalHandlersExample, sourceFiles: signalHandlersSourceFiles },
-  {
-    example: activityHeartbeatExample,
-    sourceFiles: activityHeartbeatSourceFiles,
-  },
-  {
-    example: timerDrivenRepetitionExample,
-    sourceFiles: timerDrivenRepetitionSourceFiles,
-  },
-  { example: highEventCountExample, sourceFiles: highEventCountSourceFiles },
-  { example: childWorkflowsExample, sourceFiles: childWorkflowsSourceFiles },
-  { example: localActivityExample, sourceFiles: localActivitySourceFiles },
-  {
-    example: workflowPatchingExample,
-    sourceFiles: workflowPatchingSourceFiles,
-  },
-  { example: signalCollectorExample, sourceFiles: signalCollectorSourceFiles },
-  {
-    example: priorityFairnessExample,
-    sourceFiles: priorityFairnessSourceFiles,
-  },
-  {
-    example: standaloneActivityExample,
-    sourceFiles: standaloneActivitySourceFiles,
-  },
-  { example: nexusGreetingExample, sourceFiles: nexusGreetingSourceFiles },
-];
+const sharedWorkflowDefinitions = [
+  example0,
+  example1,
+  example2,
+  example3,
+  example4,
+  example5,
+  example6,
+  example7,
+  example8,
+  example9,
+  example10,
+  example11,
+  example12,
+  example13,
+  example14,
+  example15,
+  example16,
+] satisfies readonly WorkflowCatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly WorkflowCatalogExampleRegistration[] =
-  sharedWorkflowDefinitions.map(({ example }) => example);
+  sharedWorkflowDefinitions.map((example) => ({
+    ...example,
+    targetId: 'shared-workflows',
+  }));
 
-assertUniqueEntries(
-  sharedWorkflowExamples.map(({ id }) => id),
-  'example id',
-);
+const seenExampleIds = new Set<string>();
+for (const example of sharedWorkflowExamples) {
+  if (seenExampleIds.has(example.id)) {
+    throw new Error(`Duplicate workflow catalog example id "${example.id}"`);
+  }
+  seenExampleIds.add(example.id);
+}
 
 export const sharedWorkflowExports: Readonly<
   Record<string, WorkflowImplementation>
@@ -141,7 +63,6 @@ export const sharedWorkflowExports: Readonly<
 
   for (const example of sharedWorkflowExamples) {
     if (example.execution.kind !== 'workflow') continue;
-
     const existing = workflowExports[example.execution.workflowType];
 
     if (existing && existing !== example.execution.workflow) {
@@ -160,9 +81,48 @@ export const sharedWorkflowExports: Readonly<
 export const sharedWorkflowSourceFiles = [
   'src/lib/workflow-catalog/worker/examples/index.ts',
   'src/lib/workflow-catalog/worker/examples/shared-activities.ts',
-  ...sharedWorkflowDefinitions.flatMap(({ sourceFiles }) => sourceFiles),
+  'src/lib/workflow-catalog/worker/examples/activity-heartbeat/activity.ts',
+  'src/lib/workflow-catalog/worker/examples/activity-heartbeat/example.ts',
+  'src/lib/workflow-catalog/worker/examples/activity-heartbeat/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/activity-retry/activity.ts',
+  'src/lib/workflow-catalog/worker/examples/activity-retry/example.ts',
+  'src/lib/workflow-catalog/worker/examples/activity-retry/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/activity-timeout/activity.ts',
+  'src/lib/workflow-catalog/worker/examples/activity-timeout/example.ts',
+  'src/lib/workflow-catalog/worker/examples/activity-timeout/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/child-workflows/example.ts',
+  'src/lib/workflow-catalog/worker/examples/child-workflows/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/hello/example.ts',
+  'src/lib/workflow-catalog/worker/examples/hello/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/high-event-count/example.ts',
+  'src/lib/workflow-catalog/worker/examples/high-event-count/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/local-activity/example.ts',
+  'src/lib/workflow-catalog/worker/examples/local-activity/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/long-activity/activity.ts',
+  'src/lib/workflow-catalog/worker/examples/long-activity/example.ts',
+  'src/lib/workflow-catalog/worker/examples/long-activity/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/nexus-greeting/example.ts',
+  'src/lib/workflow-catalog/worker/examples/nexus-greeting/handler.ts',
+  'src/lib/workflow-catalog/worker/examples/nexus-greeting/service.ts',
+  'src/lib/workflow-catalog/worker/examples/nexus-greeting/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/parallel-activities/example.ts',
+  'src/lib/workflow-catalog/worker/examples/parallel-activities/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/priority-fairness/example.ts',
+  'src/lib/workflow-catalog/worker/examples/priority-fairness/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/sequential-activities/example.ts',
+  'src/lib/workflow-catalog/worker/examples/sequential-activities/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/signal-collector/activity.ts',
+  'src/lib/workflow-catalog/worker/examples/signal-collector/example.ts',
+  'src/lib/workflow-catalog/worker/examples/signal-collector/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/signal-handlers/activity.ts',
+  'src/lib/workflow-catalog/worker/examples/signal-handlers/example.ts',
+  'src/lib/workflow-catalog/worker/examples/signal-handlers/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/standalone-activity/activity.ts',
+  'src/lib/workflow-catalog/worker/examples/standalone-activity/example.ts',
+  'src/lib/workflow-catalog/worker/examples/timer-driven-repetition/example.ts',
+  'src/lib/workflow-catalog/worker/examples/timer-driven-repetition/workflow.ts',
+  'src/lib/workflow-catalog/worker/examples/workflow-patching/example.ts',
+  'src/lib/workflow-catalog/worker/examples/workflow-patching/workflow.ts',
 ] as const;
-
-assertUniqueEntries(sharedWorkflowSourceFiles, 'source file');
 
 export { sharedWorkflowCorpusInventory } from './inventory.js';

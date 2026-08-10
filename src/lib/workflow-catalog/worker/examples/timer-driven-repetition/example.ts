@@ -1,5 +1,5 @@
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 import { processData } from '../shared-activities.js';
 import { scheduleWorkflow } from './workflow.js';
 
@@ -28,26 +28,18 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const timerDrivenRepetitionExample: WorkflowCatalogExampleRegistration =
-  {
-    id: 'timer-driven-repetition',
-    title: 'Timer-driven repeated activities',
-    description: 'Uses durable timers between repeated activity commands.',
-    targetId: 'shared-workflows',
-    capabilityTags: ['timers', 'activities'],
-    expectedEvidence: [
-      'Timer events separate each repeated activity execution.',
-    ],
-    input,
-    startOptions,
-    execution: {
-      kind: 'workflow',
-      workflowType: 'scheduleWorkflow',
-      workflow: scheduleWorkflow,
-      activities: { processData },
-    },
-  };
-export const timerDrivenRepetitionSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/timer-driven-repetition/example.ts',
-  'src/lib/workflow-catalog/worker/examples/timer-driven-repetition/workflow.ts',
-] as const;
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
+  id: 'timer-driven-repetition',
+  title: 'Timer-driven repeated activities',
+  description: 'Uses durable timers between repeated activity commands.',
+  capabilityTags: ['timers', 'activities'],
+  expectedEvidence: ['Timer events separate each repeated activity execution.'],
+  input,
+  startOptions,
+  execution: {
+    kind: 'workflow',
+    workflowType: 'scheduleWorkflow',
+    workflow: scheduleWorkflow,
+    activities: { processData },
+  },
+};

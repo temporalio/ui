@@ -1,19 +1,34 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { workflowCatalog } from '../../src/lib/workflow-catalog/browser/catalog';
+import {
+  assertLocalWorkflowCatalogAssembliesWritable,
+  writeLocalWorkflowCatalogAssemblies,
+} from './local-assemblies.js';
 
 const exampleIdPattern = /^[a-z][a-z0-9-]*[a-z0-9]$/;
 
-export const validateExampleId = (exampleId: string): void => {
+export const validateExampleId = (
+  exampleId: string,
+  rootDirectory = process.cwd(),
+): void => {
   if (!exampleIdPattern.test(exampleId) || exampleId.includes('--')) {
     throw new Error(
       `Workflow catalog example IDs use lowercase words separated by single dashes, like "order-lifecycle"; received "${exampleId}"`,
     );
   }
 
-  if (workflowCatalog.some(({ id }) => id === exampleId)) {
+  const sharedExamplesDirectory = join(
+    rootDirectory,
+    'src/lib/workflow-catalog/worker/examples',
+  );
+  if (
+    existsSync(sharedExamplesDirectory) &&
+    readdirSync(sharedExamplesDirectory, { withFileTypes: true }).some(
+      (entry) => entry.isDirectory() && entry.name === exampleId,
+    )
+  ) {
     throw new Error(
       `Workflow catalog example "${exampleId}" already exists in the shared catalog; pick another ID`,
     );
@@ -119,7 +134,7 @@ export const scaffoldLocalWorkflowCatalog = async ({
   rootDirectory: string;
   exampleId: string;
 }): Promise<{ registrationPath: string; workflowsPath: string }> => {
-  validateExampleId(exampleId);
+  validateExampleId(exampleId, rootDirectory);
 
   const workspace = join(rootDirectory, 'workflow-catalog.local');
   const registrationPath = join(workspace, 'registration.ts');
@@ -136,4 +151,62 @@ export const scaffoldLocalWorkflowCatalog = async ({
   await writeFile(registrationPath, scaffoldRegistrationModule(exampleId));
 
   return { registrationPath, workflowsPath };
+};
+
+export const scaffoldDirectoryWorkflowCatalog = async ({
+  rootDirectory,
+  exampleId,
+}: {
+  rootDirectory: string;
+  exampleId: string;
+}) => {
+  validateExampleId(exampleId, rootDirectory);
+
+  const exampleDirectory = join(
+    rootDirectory,
+    'workflow-catalog.local/examples',
+    exampleId,
+  );
+
+  if (existsSync(exampleDirectory)) {
+    throw new Error(
+      `Local workflow catalog example already exists: ${exampleId}`,
+    );
+  }
+
+  await assertLocalWorkflowCatalogAssembliesWritable(rootDirectory);
+
+  const workflowName = workflowNameFor(exampleId);
+  await mkdir(exampleDirectory, { recursive: true });
+  await Promise.all([
+    writeFile(
+      join(exampleDirectory, 'workflow.ts'),
+      `export async function ${workflowName}(message = 'ping'): Promise<string> {
+  return message;
+}
+`,
+    ),
+    writeFile(
+      join(exampleDirectory, 'example.ts'),
+      `import { ${workflowName} } from './workflow.js';
+
+export const workflowCatalogExample = {
+  id: '${exampleId}',
+  title: '${titleFor(exampleId)}',
+  description: 'Runs a local workflow example.',
+  capabilityTags: ['terminal-outcome'],
+  expectedEvidence: ['A completed workflow result.'],
+  input: { defaultValue: ['ping'], schema: { type: 'array' } },
+  startOptions: { defaultValue: {}, schema: { type: 'object' } },
+  execution: {
+    kind: 'workflow' as const,
+    workflowType: '${workflowName}',
+    workflow: ${workflowName},
+    activities: {},
+  },
+};
+`,
+    ),
+  ]);
+  await writeLocalWorkflowCatalogAssemblies(rootDirectory);
 };

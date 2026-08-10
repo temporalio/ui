@@ -1,3 +1,4 @@
+// GENERATED FILE. DO NOT EDIT.
 export { heartbeatWorkflow } from './examples/activity-heartbeat/workflow.js';
 export { retryWorkflow } from './examples/activity-retry/workflow.js';
 export { timeoutWorkflow } from './examples/activity-timeout/workflow.js';

@@ -1,5 +1,5 @@
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 import { processData } from '../shared-activities.js';
 import { localActivityWorkflow } from './workflow.js';
 
@@ -19,11 +19,10 @@ const startOptions: RuntimeJsonDocument = {
     properties: { workflowId: { type: 'string', minLength: 1 } },
   },
 };
-export const localActivityExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'local-activity',
   title: 'Local activity',
   description: 'Runs activity code in the workflow worker process.',
-  targetId: 'shared-workflows',
   capabilityTags: ['local-activities', 'activities'],
   expectedEvidence: ['A local activity marker and completed workflow result.'],
   input,
@@ -35,7 +34,3 @@ export const localActivityExample: WorkflowCatalogExampleRegistration = {
     activities: { processData },
   },
 };
-export const localActivitySourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/local-activity/example.ts',
-  'src/lib/workflow-catalog/worker/examples/local-activity/workflow.ts',
-] as const;

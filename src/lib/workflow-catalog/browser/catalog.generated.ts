@@ -2,262 +2,8 @@ import type { BrowserWorkflowCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
   sourceHash:
-    'bf2767991abb4f6c24758a13d25f7d5a9ca29cc031531a2f01e4100da044fdd2',
+    '55d14ad9c2acae192249dbd8878a0bfbd10676d58e969a407fd663ad87062762',
   descriptors: [
-    {
-      id: 'hello',
-      title: 'Hello activity',
-      description: 'Runs one activity and returns its greeting.',
-      capabilityTags: ['activities', 'terminal-outcome'],
-      expectedEvidence: [
-        'One completed activity and a completed workflow result.',
-      ],
-      input: {
-        defaultValue: ['Temporal'],
-        schema: {
-          type: 'array',
-          prefixItems: [{ title: 'Name', type: 'string', minLength: 1 }],
-          items: false,
-          maxItems: 1,
-        },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'hello',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
-    {
-      id: 'parallel-activities',
-      title: 'Parallel activities',
-      description: 'Runs three activity commands concurrently.',
-      capabilityTags: ['activities', 'concurrency'],
-      expectedEvidence: [
-        'Three overlapping activity executions and one combined result.',
-      ],
-      input: {
-        defaultValue: ['catalog-parallel'],
-        schema: {
-          type: 'array',
-          prefixItems: [{ title: 'Data ID', type: 'string', minLength: 1 }],
-          items: false,
-          maxItems: 1,
-        },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'parallelActivities',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
-    {
-      id: 'sequential-activities',
-      title: 'Sequential activities',
-      description: 'Runs three activity commands one after another.',
-      capabilityTags: ['activities', 'sequencing'],
-      expectedEvidence: [
-        'Three non-overlapping activity executions in deterministic order.',
-      ],
-      input: {
-        defaultValue: ['catalog-sequential'],
-        schema: {
-          type: 'array',
-          prefixItems: [{ title: 'Data ID', type: 'string', minLength: 1 }],
-          items: false,
-          maxItems: 1,
-        },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'sequentialActivities',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
-    {
-      id: 'long-activity',
-      title: 'Long-running activity',
-      description: 'Waits inside an activity before returning a result.',
-      capabilityTags: ['activities', 'long-running'],
-      expectedEvidence: [
-        'An activity remains running for the configured delay and then completes.',
-      ],
-      input: {
-        defaultValue: [5000],
-        schema: {
-          type: 'array',
-          prefixItems: [
-            {
-              title: 'Delay in milliseconds',
-              type: 'integer',
-              minimum: 1,
-              maximum: 25000,
-            },
-          ],
-          items: false,
-          maxItems: 1,
-        },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'longActivity',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
-    {
-      id: 'activity-timeout',
-      title: 'Activity timeout',
-      description: 'Demonstrates a start-to-close activity timeout.',
-      capabilityTags: ['activities', 'timeouts'],
-      expectedEvidence: [
-        'A timed-out activity attempt and a workflow result that identifies the timeout.',
-      ],
-      input: {
-        defaultValue: [true],
-        schema: {
-          type: 'array',
-          prefixItems: [
-            { title: 'Force the activity to time out', type: 'boolean' },
-          ],
-          items: false,
-          maxItems: 1,
-        },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'timeoutWorkflow',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
-    {
-      id: 'activity-retry',
-      title: 'Activity retry',
-      description: 'Fails deterministic activity attempts before succeeding.',
-      capabilityTags: ['activities', 'retries'],
-      expectedEvidence: [
-        'Failed activity attempts followed by success within the retry policy.',
-      ],
-      input: {
-        defaultValue: [2],
-        schema: {
-          type: 'array',
-          prefixItems: [
-            {
-              title: 'Failures before success',
-              type: 'integer',
-              minimum: 0,
-              maximum: 4,
-            },
-          ],
-          items: false,
-          maxItems: 1,
-        },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'retryWorkflow',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
-    {
-      id: 'signal-handlers',
-      title: 'Bounded signal handlers',
-      description: 'Handles data and completion signals with bounded waits.',
-      capabilityTags: ['signals', 'queries', 'timeouts'],
-      expectedEvidence: [
-        'Signal events, queryable state changes, and completion or timeout evidence.',
-      ],
-      input: {
-        defaultValue: [30],
-        schema: {
-          type: 'array',
-          prefixItems: [
-            {
-              title: 'Signal wait timeout in seconds',
-              type: 'integer',
-              minimum: 1,
-              maximum: 300,
-            },
-          ],
-          items: false,
-          maxItems: 1,
-        },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'signalWorkflow',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
     {
       id: 'activity-heartbeat',
       title: 'Activity heartbeats',
@@ -306,28 +52,27 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
       source: { id: 'oss', label: 'OSS' },
     },
     {
-      id: 'timer-driven-repetition',
-      title: 'Timer-driven repeated activities',
-      description: 'Uses durable timers between repeated activity commands.',
-      capabilityTags: ['timers', 'activities'],
+      id: 'activity-retry',
+      title: 'Activity retry',
+      description: 'Fails deterministic activity attempts before succeeding.',
+      capabilityTags: ['activities', 'retries'],
       expectedEvidence: [
-        'Timer events separate each repeated activity execution.',
+        'Failed activity attempts followed by success within the retry policy.',
       ],
       input: {
-        defaultValue: [2, 3],
+        defaultValue: [2],
         schema: {
           type: 'array',
           prefixItems: [
             {
-              title: 'Timer interval in seconds',
+              title: 'Failures before success',
               type: 'integer',
-              minimum: 1,
-              maximum: 300,
+              minimum: 0,
+              maximum: 4,
             },
-            { title: 'Run count', type: 'integer', minimum: 1, maximum: 25 },
           ],
           items: false,
-          maxItems: 2,
+          maxItems: 1,
         },
       },
       startOptions: {
@@ -342,7 +87,103 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         targetId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-workflow-catalog',
-        workflowType: 'scheduleWorkflow',
+        workflowType: 'retryWorkflow',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'activity-timeout',
+      title: 'Activity timeout',
+      description: 'Demonstrates a start-to-close activity timeout.',
+      capabilityTags: ['activities', 'timeouts'],
+      expectedEvidence: [
+        'A timed-out activity attempt and a workflow result that identifies the timeout.',
+      ],
+      input: {
+        defaultValue: [true],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            { title: 'Force the activity to time out', type: 'boolean' },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'timeoutWorkflow',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'child-workflows',
+      title: 'Child workflows',
+      description: 'Starts and joins three child workflow executions.',
+      capabilityTags: ['child-workflows', 'concurrency'],
+      expectedEvidence: [
+        'Three child workflow relationships and one joined parent result.',
+      ],
+      input: {
+        defaultValue: [],
+        schema: { type: 'array', items: false, maxItems: 0 },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'childWorkflowTest',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'hello',
+      title: 'Hello activity',
+      description: 'Runs one activity and returns its greeting.',
+      capabilityTags: ['activities', 'terminal-outcome'],
+      expectedEvidence: [
+        'One completed activity and a completed workflow result.',
+      ],
+      input: {
+        defaultValue: ['Temporal'],
+        schema: {
+          type: 'array',
+          prefixItems: [{ title: 'Name', type: 'string', minLength: 1 }],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'hello',
       },
       source: { id: 'oss', label: 'OSS' },
     },
@@ -394,34 +235,6 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
       source: { id: 'oss', label: 'OSS' },
     },
     {
-      id: 'child-workflows',
-      title: 'Child workflows',
-      description: 'Starts and joins three child workflow executions.',
-      capabilityTags: ['child-workflows', 'concurrency'],
-      expectedEvidence: [
-        'Three child workflow relationships and one joined parent result.',
-      ],
-      input: {
-        defaultValue: [],
-        schema: { type: 'array', items: false, maxItems: 0 },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'childWorkflowTest',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
-    {
       id: 'local-activity',
       title: 'Local activity',
       description: 'Runs activity code in the workflow worker process.',
@@ -455,15 +268,92 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
       source: { id: 'oss', label: 'OSS' },
     },
     {
-      id: 'workflow-patching',
-      title: 'Workflow patching',
-      description: 'Records patch markers around versioned workflow behavior.',
-      capabilityTags: ['patching', 'versioning'],
+      id: 'long-activity',
+      title: 'Long-running activity',
+      description: 'Waits inside an activity before returning a result.',
+      capabilityTags: ['activities', 'long-running'],
       expectedEvidence: [
-        'Patch markers and version-specific result sections in history.',
+        'An activity remains running for the configured delay and then completes.',
       ],
       input: {
-        defaultValue: ['catalog-patch'],
+        defaultValue: [5000],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Delay in milliseconds',
+              type: 'integer',
+              minimum: 1,
+              maximum: 25000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'longActivity',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'nexus-greeting',
+      title: 'Nexus greeting',
+      description:
+        'Calls a Nexus operation from a workflow through a declared Nexus endpoint.',
+      capabilityTags: ['nexus', 'terminal-outcome'],
+      expectedEvidence: [
+        'A completed workflow whose result is the greeting returned by the Nexus operation.',
+      ],
+      input: {
+        defaultValue: ['Temporal'],
+        schema: {
+          type: 'array',
+          prefixItems: [{ title: 'Name', type: 'string', minLength: 1 }],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      setupMarkdown:
+        'The workflow calls the `greet` operation on the `workflow-catalog-greeting` service through the `ui-workflow-catalog` Nexus endpoint.\n\n- **Local development:** the catalog worker creates the endpoint automatically when it starts.\n- **Other environments:** create the endpoint yourself before running, adjusting the address for your server:\n\n```\ntemporal operator nexus endpoint create --name ui-workflow-catalog --target-namespace <namespace> --target-task-queue ui-workflow-catalog\n```',
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'nexusGreeting',
+        nexusEndpoints: ['ui-workflow-catalog'],
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'parallel-activities',
+      title: 'Parallel activities',
+      description: 'Runs three activity commands concurrently.',
+      capabilityTags: ['activities', 'concurrency'],
+      expectedEvidence: [
+        'Three overlapping activity executions and one combined result.',
+      ],
+      input: {
+        defaultValue: ['catalog-parallel'],
         schema: {
           type: 'array',
           prefixItems: [{ title: 'Data ID', type: 'string', minLength: 1 }],
@@ -483,51 +373,7 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         targetId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-workflow-catalog',
-        workflowType: 'patchWorkflow',
-      },
-      source: { id: 'oss', label: 'OSS' },
-    },
-    {
-      id: 'signal-collector',
-      title: 'Signal collector',
-      description:
-        'Collects signaled items before processing and summarizing them.',
-      capabilityTags: ['signals', 'activities', 'timeouts'],
-      expectedEvidence: [
-        'Item signals followed by activity processing and a completion reason.',
-      ],
-      input: {
-        defaultValue: [{ timeoutSeconds: 30, maxItems: 3 }],
-        schema: {
-          type: 'array',
-          prefixItems: [
-            {
-              title: 'Collector configuration',
-              type: 'object',
-              properties: {
-                timeoutSeconds: { type: 'integer', minimum: 1, maximum: 300 },
-                maxItems: { type: 'integer', minimum: 1, maximum: 100 },
-              },
-              additionalProperties: false,
-            },
-          ],
-          items: false,
-          maxItems: 1,
-        },
-      },
-      startOptions: {
-        defaultValue: {},
-        schema: {
-          type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
-        },
-      },
-      execution: {
-        kind: 'workflow',
-        targetId: 'shared-workflows',
-        namespace: 'default',
-        taskQueue: 'ui-workflow-catalog',
-        workflowType: 'signalCollector',
+        workflowType: 'parallelActivities',
       },
       source: { id: 'oss', label: 'OSS' },
     },
@@ -584,6 +430,123 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
       source: { id: 'oss', label: 'OSS' },
     },
     {
+      id: 'sequential-activities',
+      title: 'Sequential activities',
+      description: 'Runs three activity commands one after another.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'Three non-overlapping activity executions in deterministic order.',
+      ],
+      input: {
+        defaultValue: ['catalog-sequential'],
+        schema: {
+          type: 'array',
+          prefixItems: [{ title: 'Data ID', type: 'string', minLength: 1 }],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'sequentialActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'signal-collector',
+      title: 'Signal collector',
+      description:
+        'Collects signaled items before processing and summarizing them.',
+      capabilityTags: ['signals', 'activities', 'timeouts'],
+      expectedEvidence: [
+        'Item signals followed by activity processing and a completion reason.',
+      ],
+      input: {
+        defaultValue: [{ timeoutSeconds: 30, maxItems: 3 }],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Collector configuration',
+              type: 'object',
+              properties: {
+                timeoutSeconds: { type: 'integer', minimum: 1, maximum: 300 },
+                maxItems: { type: 'integer', minimum: 1, maximum: 100 },
+              },
+              additionalProperties: false,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'signalCollector',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'signal-handlers',
+      title: 'Bounded signal handlers',
+      description: 'Handles data and completion signals with bounded waits.',
+      capabilityTags: ['signals', 'queries', 'timeouts'],
+      expectedEvidence: [
+        'Signal events, queryable state changes, and completion or timeout evidence.',
+      ],
+      input: {
+        defaultValue: [30],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Signal wait timeout in seconds',
+              type: 'integer',
+              minimum: 1,
+              maximum: 300,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'signalWorkflow',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
       id: 'standalone-activity',
       title: 'Standalone activity',
       description: 'Runs an Activity directly without a Workflow execution.',
@@ -616,19 +579,59 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
       source: { id: 'oss', label: 'OSS' },
     },
     {
-      id: 'nexus-greeting',
-      title: 'Nexus greeting',
-      description:
-        'Calls a Nexus operation from a workflow through a declared Nexus endpoint.',
-      capabilityTags: ['nexus', 'terminal-outcome'],
+      id: 'timer-driven-repetition',
+      title: 'Timer-driven repeated activities',
+      description: 'Uses durable timers between repeated activity commands.',
+      capabilityTags: ['timers', 'activities'],
       expectedEvidence: [
-        'A completed workflow whose result is the greeting returned by the Nexus operation.',
+        'Timer events separate each repeated activity execution.',
       ],
       input: {
-        defaultValue: ['Temporal'],
+        defaultValue: [2, 3],
         schema: {
           type: 'array',
-          prefixItems: [{ title: 'Name', type: 'string', minLength: 1 }],
+          prefixItems: [
+            {
+              title: 'Timer interval in seconds',
+              type: 'integer',
+              minimum: 1,
+              maximum: 300,
+            },
+            { title: 'Run count', type: 'integer', minimum: 1, maximum: 25 },
+          ],
+          items: false,
+          maxItems: 2,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: { workflowId: { type: 'string', minLength: 1 } },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-workflow-catalog',
+        workflowType: 'scheduleWorkflow',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'workflow-patching',
+      title: 'Workflow patching',
+      description: 'Records patch markers around versioned workflow behavior.',
+      capabilityTags: ['patching', 'versioning'],
+      expectedEvidence: [
+        'Patch markers and version-specific result sections in history.',
+      ],
+      input: {
+        defaultValue: ['catalog-patch'],
+        schema: {
+          type: 'array',
+          prefixItems: [{ title: 'Data ID', type: 'string', minLength: 1 }],
           items: false,
           maxItems: 1,
         },
@@ -640,15 +643,12 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
           properties: { workflowId: { type: 'string', minLength: 1 } },
         },
       },
-      setupMarkdown:
-        'The workflow calls the `greet` operation on the `workflow-catalog-greeting` service through the `ui-workflow-catalog` Nexus endpoint.\n\n- **Local development:** the catalog worker creates the endpoint automatically when it starts.\n- **Other environments:** create the endpoint yourself before running, adjusting the address for your server:\n\n```\ntemporal operator nexus endpoint create --name ui-workflow-catalog --target-namespace <namespace> --target-task-queue ui-workflow-catalog\n```',
       execution: {
         kind: 'workflow',
         targetId: 'shared-workflows',
         namespace: 'default',
         taskQueue: 'ui-workflow-catalog',
-        workflowType: 'nexusGreeting',
-        nexusEndpoints: ['ui-workflow-catalog'],
+        workflowType: 'patchWorkflow',
       },
       source: { id: 'oss', label: 'OSS' },
     },

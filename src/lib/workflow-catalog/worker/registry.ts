@@ -73,6 +73,13 @@ export type WorkflowCatalogExampleRegistration =
   | StandaloneNexusOperationExampleRegistration
   | WorkflowExampleRegistration;
 
+export type WorkflowCatalogExampleDefinition =
+  WorkflowCatalogExampleRegistration extends infer Registration
+    ? Registration extends { targetId: string }
+      ? Omit<Registration, 'targetId'>
+      : never
+    : never;
+
 export type WorkflowCatalogRegistry = {
   registerTarget: (target: WorkflowCatalogTarget) => void;
   registerExample: (example: WorkflowCatalogExampleRegistration) => void;

@@ -1,7 +1,7 @@
 import { generateSummary, processItem } from './activity.js';
 import { signalCollector } from './workflow.js';
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 
 const input: RuntimeJsonDocument = {
   defaultValue: [{ timeoutSeconds: 30, maxItems: 3 }],
@@ -29,12 +29,11 @@ const startOptions: RuntimeJsonDocument = {
     properties: { workflowId: { type: 'string', minLength: 1 } },
   },
 };
-export const signalCollectorExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'signal-collector',
   title: 'Signal collector',
   description:
     'Collects signaled items before processing and summarizing them.',
-  targetId: 'shared-workflows',
   capabilityTags: ['signals', 'activities', 'timeouts'],
   expectedEvidence: [
     'Item signals followed by activity processing and a completion reason.',
@@ -48,8 +47,3 @@ export const signalCollectorExample: WorkflowCatalogExampleRegistration = {
     activities: { generateSummary, processItem },
   },
 };
-export const signalCollectorSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/signal-collector/example.ts',
-  'src/lib/workflow-catalog/worker/examples/signal-collector/workflow.ts',
-  'src/lib/workflow-catalog/worker/examples/signal-collector/activity.ts',
-] as const;

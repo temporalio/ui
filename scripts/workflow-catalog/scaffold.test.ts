@@ -1,10 +1,18 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import {
+  access,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  writeFile,
+} from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  scaffoldDirectoryWorkflowCatalog,
   scaffoldLocalWorkflowCatalog,
   scaffoldRegistrationModule,
   scaffoldWorkflowsModule,
@@ -113,5 +121,50 @@ describe('workflow catalog scaffolding', () => {
         exampleId: 'order-lifecycle',
       }),
     ).rejects.toThrow('already exists; add the example to that file');
+  });
+
+  it('scaffolds an authored example directory and its local assemblies', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+
+    await scaffoldDirectoryWorkflowCatalog({
+      exampleId: 'order-lifecycle',
+      rootDirectory,
+    });
+
+    await expect(
+      readFile(
+        join(
+          rootDirectory,
+          'workflow-catalog.local/examples/order-lifecycle/example.ts',
+        ),
+        'utf8',
+      ),
+    ).resolves.toContain('workflowCatalogExample');
+    await expect(
+      readFile(
+        join(rootDirectory, 'workflow-catalog.local/registration.ts'),
+        'utf8',
+      ),
+    ).resolves.toContain('./examples/order-lifecycle/example.js');
+  });
+
+  it('rejects a legacy flat overlay before creating an authored directory', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const localDirectory = join(rootDirectory, 'workflow-catalog.local');
+    await mkdir(localDirectory, { recursive: true });
+    await Promise.all([
+      writeFile(join(localDirectory, 'registration.ts'), 'customized\n'),
+      writeFile(join(localDirectory, 'workflows.ts'), 'customized\n'),
+    ]);
+
+    await expect(
+      scaffoldDirectoryWorkflowCatalog({
+        exampleId: 'order-lifecycle',
+        rootDirectory,
+      }),
+    ).rejects.toThrow('migrate the legacy flat local overlay manually');
+    await expect(
+      access(join(localDirectory, 'examples/order-lifecycle')),
+    ).rejects.toThrow();
   });
 });

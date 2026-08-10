@@ -1,5 +1,5 @@
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 import { greet } from '../shared-activities.js';
 import { priorityFairnessWorkflow } from './workflow.js';
 
@@ -34,12 +34,11 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const priorityFairnessExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'priority-fairness',
   title: 'Priority and fairness',
   description:
     'Starts a prioritized workflow whose activity inherits its priority.',
-  targetId: 'shared-workflows',
   capabilityTags: ['priority-fairness', 'activities'],
   expectedEvidence: [
     'Workflow details show priority and fairness fields; the scheduled activity attributes show inherited priority.',
@@ -53,8 +52,3 @@ export const priorityFairnessExample: WorkflowCatalogExampleRegistration = {
     activities: { greet },
   },
 };
-
-export const priorityFairnessSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/priority-fairness/example.ts',
-  'src/lib/workflow-catalog/worker/examples/priority-fairness/workflow.ts',
-] as const;

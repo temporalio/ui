@@ -1,7 +1,7 @@
 import { retryActivity } from './activity.js';
 import { retryWorkflow } from './workflow.js';
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 
 const input: RuntimeJsonDocument = {
   defaultValue: [2],
@@ -27,11 +27,10 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const activityRetryExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'activity-retry',
   title: 'Activity retry',
   description: 'Fails deterministic activity attempts before succeeding.',
-  targetId: 'shared-workflows',
   capabilityTags: ['activities', 'retries'],
   expectedEvidence: [
     'Failed activity attempts followed by success within the retry policy.',
@@ -45,9 +44,3 @@ export const activityRetryExample: WorkflowCatalogExampleRegistration = {
     activities: { retryActivity },
   },
 };
-
-export const activityRetrySourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/activity-retry/example.ts',
-  'src/lib/workflow-catalog/worker/examples/activity-retry/workflow.ts',
-  'src/lib/workflow-catalog/worker/examples/activity-retry/activity.ts',
-] as const;

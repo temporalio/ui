@@ -1,7 +1,7 @@
 import { heartbeatActivity } from './activity.js';
 import { heartbeatWorkflow } from './workflow.js';
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 
 const input: RuntimeJsonDocument = {
   defaultValue: [5, 1000],
@@ -33,11 +33,10 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const activityHeartbeatExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'activity-heartbeat',
   title: 'Activity heartbeats',
   description: 'Reports progress while an activity processes several steps.',
-  targetId: 'shared-workflows',
   capabilityTags: ['activities', 'heartbeats'],
   expectedEvidence: [
     'Heartbeat details advance through the configured number of steps.',
@@ -51,9 +50,3 @@ export const activityHeartbeatExample: WorkflowCatalogExampleRegistration = {
     activities: { heartbeatActivity },
   },
 };
-
-export const activityHeartbeatSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/activity-heartbeat/example.ts',
-  'src/lib/workflow-catalog/worker/examples/activity-heartbeat/workflow.ts',
-  'src/lib/workflow-catalog/worker/examples/activity-heartbeat/activity.ts',
-] as const;

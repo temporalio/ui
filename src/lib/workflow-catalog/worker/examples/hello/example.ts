@@ -1,5 +1,5 @@
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 import { greet } from '../shared-activities.js';
 import { hello } from './workflow.js';
 
@@ -20,11 +20,10 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const helloExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'hello',
   title: 'Hello activity',
   description: 'Runs one activity and returns its greeting.',
-  targetId: 'shared-workflows',
   capabilityTags: ['activities', 'terminal-outcome'],
   expectedEvidence: ['One completed activity and a completed workflow result.'],
   input,
@@ -36,8 +35,3 @@ export const helloExample: WorkflowCatalogExampleRegistration = {
     activities: { greet },
   },
 };
-
-export const helloSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/hello/example.ts',
-  'src/lib/workflow-catalog/worker/examples/hello/workflow.ts',
-] as const;

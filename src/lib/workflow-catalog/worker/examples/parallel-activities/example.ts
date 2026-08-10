@@ -1,5 +1,5 @@
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 import { processData } from '../shared-activities.js';
 import { parallelActivities } from './workflow.js';
 
@@ -20,11 +20,10 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const parallelActivitiesExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'parallel-activities',
   title: 'Parallel activities',
   description: 'Runs three activity commands concurrently.',
-  targetId: 'shared-workflows',
   capabilityTags: ['activities', 'concurrency'],
   expectedEvidence: [
     'Three overlapping activity executions and one combined result.',
@@ -38,8 +37,3 @@ export const parallelActivitiesExample: WorkflowCatalogExampleRegistration = {
     activities: { processData },
   },
 };
-
-export const parallelActivitiesSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/parallel-activities/example.ts',
-  'src/lib/workflow-catalog/worker/examples/parallel-activities/workflow.ts',
-] as const;

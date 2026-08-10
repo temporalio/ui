@@ -72,32 +72,38 @@ describe('shared workflow corpus', () => {
     workflowCatalogRegistrationSource.register(registry);
     const generated = generateWorkflowCatalog(registry);
 
-    const migratedDescriptors = generated.browserDescriptors.slice(
-      0,
-      migratedExampleIds.length,
+    const migratedDescriptors = migratedExampleIds.map((id) =>
+      generated.browserDescriptors.find((descriptor) => descriptor.id === id),
     );
-    const proofDescriptors = generated.browserDescriptors.slice(
-      migratedExampleIds.length,
+    const proofDescriptors = proofExampleIds.map((id) =>
+      generated.browserDescriptors.find((descriptor) => descriptor.id === id),
     );
 
-    expect(migratedDescriptors.map(({ id }) => id)).toEqual(migratedExampleIds);
-    expect(proofDescriptors.map(({ id }) => id)).toEqual(proofExampleIds);
+    expect(migratedDescriptors.map((descriptor) => descriptor?.id)).toEqual(
+      migratedExampleIds,
+    );
+    expect(proofDescriptors.map((descriptor) => descriptor?.id)).toEqual(
+      proofExampleIds,
+    );
     expect(
-      migratedDescriptors.map(({ execution }) =>
-        execution.kind === 'workflow' ? execution.workflowType : undefined,
+      migratedDescriptors.map((descriptor) =>
+        descriptor?.execution.kind === 'workflow'
+          ? descriptor.execution.workflowType
+          : undefined,
       ),
     ).toEqual(migratedWorkflowTypes);
     expect(
       migratedDescriptors.every(
-        ({ capabilityTags, expectedEvidence, input, startOptions }) =>
-          capabilityTags.length > 0 &&
-          expectedEvidence.length > 0 &&
-          Array.isArray(input.defaultValue) &&
-          input.schema !== true &&
-          input.schema !== false &&
-          input.schema.type === 'array' &&
-          !Array.isArray(startOptions.defaultValue) &&
-          startOptions.defaultValue !== null,
+        (descriptor) =>
+          descriptor &&
+          descriptor.capabilityTags.length > 0 &&
+          descriptor.expectedEvidence.length > 0 &&
+          Array.isArray(descriptor.input.defaultValue) &&
+          descriptor.input.schema !== true &&
+          descriptor.input.schema !== false &&
+          descriptor.input.schema.type === 'array' &&
+          !Array.isArray(descriptor.startOptions.defaultValue) &&
+          descriptor.startOptions.defaultValue !== null,
       ),
     ).toBe(true);
     expect(
@@ -107,11 +113,13 @@ describe('shared workflow corpus', () => {
     ).toBe('Timer-driven repeated activities');
 
     const target = registry.targets[0];
-    expect(Object.keys(target?.workflowExports ?? {})).toEqual([
-      ...migratedWorkflowTypes,
-      'priorityFairnessWorkflow',
-      'nexusGreeting',
-    ]);
+    expect(Object.keys(target?.workflowExports ?? {}).sort()).toEqual(
+      [
+        ...migratedWorkflowTypes,
+        'priorityFairnessWorkflow',
+        'nexusGreeting',
+      ].sort(),
+    );
     for (const example of registry.examples) {
       if (example.execution.kind !== 'workflow' || !target) continue;
       expect(target.workflowExports[example.execution.workflowType]).toBe(
@@ -340,9 +348,12 @@ describe('shared workflow corpus', () => {
     const generated = generateWorkflowCatalog(registry);
 
     expect(
-      generated.browserDescriptors
-        .slice(0, migratedExampleIds.length)
-        .map(({ startOptions }) => startOptions.defaultValue),
+      migratedExampleIds.map(
+        (id) =>
+          generated.browserDescriptors.find(
+            (descriptor) => descriptor.id === id,
+          )?.startOptions.defaultValue,
+      ),
     ).toEqual(migratedExampleIds.map(() => ({})));
   });
 
@@ -455,54 +466,56 @@ describe('shared workflow corpus', () => {
   });
 
   it('declares every catalog-owned corpus source so generated artifact verification catches drift', () => {
-    expect(workflowCatalogRegistrationSource.sourceFiles).toEqual([
-      'src/lib/workflow-catalog/worker/shared-registrations.ts',
-      'src/lib/workflow-catalog/worker/workflows.ts',
-      'src/lib/workflow-catalog/worker/examples/inventory.ts',
-      'src/lib/workflow-catalog/worker/examples/index.ts',
-      'src/lib/workflow-catalog/worker/examples/shared-activities.ts',
-      'src/lib/workflow-catalog/worker/examples/hello/example.ts',
-      'src/lib/workflow-catalog/worker/examples/hello/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/parallel-activities/example.ts',
-      'src/lib/workflow-catalog/worker/examples/parallel-activities/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/sequential-activities/example.ts',
-      'src/lib/workflow-catalog/worker/examples/sequential-activities/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/long-activity/example.ts',
-      'src/lib/workflow-catalog/worker/examples/long-activity/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/long-activity/activity.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-timeout/example.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-timeout/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-timeout/activity.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-retry/example.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-retry/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-retry/activity.ts',
-      'src/lib/workflow-catalog/worker/examples/signal-handlers/example.ts',
-      'src/lib/workflow-catalog/worker/examples/signal-handlers/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/signal-handlers/activity.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-heartbeat/example.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-heartbeat/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/activity-heartbeat/activity.ts',
-      'src/lib/workflow-catalog/worker/examples/timer-driven-repetition/example.ts',
-      'src/lib/workflow-catalog/worker/examples/timer-driven-repetition/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/high-event-count/example.ts',
-      'src/lib/workflow-catalog/worker/examples/high-event-count/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/child-workflows/example.ts',
-      'src/lib/workflow-catalog/worker/examples/child-workflows/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/local-activity/example.ts',
-      'src/lib/workflow-catalog/worker/examples/local-activity/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/workflow-patching/example.ts',
-      'src/lib/workflow-catalog/worker/examples/workflow-patching/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/signal-collector/example.ts',
-      'src/lib/workflow-catalog/worker/examples/signal-collector/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/signal-collector/activity.ts',
-      'src/lib/workflow-catalog/worker/examples/priority-fairness/example.ts',
-      'src/lib/workflow-catalog/worker/examples/priority-fairness/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/standalone-activity/example.ts',
-      'src/lib/workflow-catalog/worker/examples/standalone-activity/activity.ts',
-      'src/lib/workflow-catalog/worker/examples/nexus-greeting/example.ts',
-      'src/lib/workflow-catalog/worker/examples/nexus-greeting/workflow.ts',
-      'src/lib/workflow-catalog/worker/examples/nexus-greeting/service.ts',
-      'src/lib/workflow-catalog/worker/examples/nexus-greeting/handler.ts',
-    ]);
+    expect([...workflowCatalogRegistrationSource.sourceFiles].sort()).toEqual(
+      [
+        'src/lib/workflow-catalog/worker/shared-registrations.ts',
+        'src/lib/workflow-catalog/worker/workflows.ts',
+        'src/lib/workflow-catalog/worker/examples/inventory.ts',
+        'src/lib/workflow-catalog/worker/examples/index.ts',
+        'src/lib/workflow-catalog/worker/examples/shared-activities.ts',
+        'src/lib/workflow-catalog/worker/examples/hello/example.ts',
+        'src/lib/workflow-catalog/worker/examples/hello/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/parallel-activities/example.ts',
+        'src/lib/workflow-catalog/worker/examples/parallel-activities/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/sequential-activities/example.ts',
+        'src/lib/workflow-catalog/worker/examples/sequential-activities/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/long-activity/example.ts',
+        'src/lib/workflow-catalog/worker/examples/long-activity/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/long-activity/activity.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-timeout/example.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-timeout/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-timeout/activity.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-retry/example.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-retry/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-retry/activity.ts',
+        'src/lib/workflow-catalog/worker/examples/signal-handlers/example.ts',
+        'src/lib/workflow-catalog/worker/examples/signal-handlers/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/signal-handlers/activity.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-heartbeat/example.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-heartbeat/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/activity-heartbeat/activity.ts',
+        'src/lib/workflow-catalog/worker/examples/timer-driven-repetition/example.ts',
+        'src/lib/workflow-catalog/worker/examples/timer-driven-repetition/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/high-event-count/example.ts',
+        'src/lib/workflow-catalog/worker/examples/high-event-count/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/child-workflows/example.ts',
+        'src/lib/workflow-catalog/worker/examples/child-workflows/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/local-activity/example.ts',
+        'src/lib/workflow-catalog/worker/examples/local-activity/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/workflow-patching/example.ts',
+        'src/lib/workflow-catalog/worker/examples/workflow-patching/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/signal-collector/example.ts',
+        'src/lib/workflow-catalog/worker/examples/signal-collector/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/signal-collector/activity.ts',
+        'src/lib/workflow-catalog/worker/examples/priority-fairness/example.ts',
+        'src/lib/workflow-catalog/worker/examples/priority-fairness/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/standalone-activity/example.ts',
+        'src/lib/workflow-catalog/worker/examples/standalone-activity/activity.ts',
+        'src/lib/workflow-catalog/worker/examples/nexus-greeting/example.ts',
+        'src/lib/workflow-catalog/worker/examples/nexus-greeting/workflow.ts',
+        'src/lib/workflow-catalog/worker/examples/nexus-greeting/service.ts',
+        'src/lib/workflow-catalog/worker/examples/nexus-greeting/handler.ts',
+      ].sort(),
+    );
   });
 });

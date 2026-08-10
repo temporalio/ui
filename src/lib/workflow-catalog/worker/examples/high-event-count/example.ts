@@ -1,5 +1,5 @@
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 import { processData } from '../shared-activities.js';
 import { highEventCountWorkflow } from './workflow.js';
 
@@ -33,11 +33,10 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const highEventCountExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'high-event-count',
   title: 'High event count',
   description: 'Runs many concurrent activities to produce a dense history.',
-  targetId: 'shared-workflows',
   capabilityTags: ['event-history', 'concurrency'],
   expectedEvidence: [
     'A dense group of concurrent activity events in workflow history.',
@@ -51,7 +50,3 @@ export const highEventCountExample: WorkflowCatalogExampleRegistration = {
     activities: { processData },
   },
 };
-export const highEventCountSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/high-event-count/example.ts',
-  'src/lib/workflow-catalog/worker/examples/high-event-count/workflow.ts',
-] as const;

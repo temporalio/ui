@@ -1,7 +1,7 @@
 import { signalActivity } from './activity.js';
 import { signalWorkflow } from './workflow.js';
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 
 const input: RuntimeJsonDocument = {
   defaultValue: [30],
@@ -27,11 +27,10 @@ const startOptions: RuntimeJsonDocument = {
   },
 };
 
-export const signalHandlersExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'signal-handlers',
   title: 'Bounded signal handlers',
   description: 'Handles data and completion signals with bounded waits.',
-  targetId: 'shared-workflows',
   capabilityTags: ['signals', 'queries', 'timeouts'],
   expectedEvidence: [
     'Signal events, queryable state changes, and completion or timeout evidence.',
@@ -45,9 +44,3 @@ export const signalHandlersExample: WorkflowCatalogExampleRegistration = {
     activities: { signalActivity },
   },
 };
-
-export const signalHandlersSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/signal-handlers/example.ts',
-  'src/lib/workflow-catalog/worker/examples/signal-handlers/workflow.ts',
-  'src/lib/workflow-catalog/worker/examples/signal-handlers/activity.ts',
-] as const;

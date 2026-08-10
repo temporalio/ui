@@ -1,5 +1,5 @@
 import type { RuntimeJsonDocument } from '../../../browser/types.js';
-import type { WorkflowCatalogExampleRegistration } from '../../registry.js';
+import type { WorkflowCatalogExampleDefinition } from '../../registry.js';
 import { greet, processData } from '../shared-activities.js';
 import { childWorkflowTest } from './workflow.js';
 
@@ -14,11 +14,10 @@ const startOptions: RuntimeJsonDocument = {
     properties: { workflowId: { type: 'string', minLength: 1 } },
   },
 };
-export const childWorkflowsExample: WorkflowCatalogExampleRegistration = {
+export const workflowCatalogExample: WorkflowCatalogExampleDefinition = {
   id: 'child-workflows',
   title: 'Child workflows',
   description: 'Starts and joins three child workflow executions.',
-  targetId: 'shared-workflows',
   capabilityTags: ['child-workflows', 'concurrency'],
   expectedEvidence: [
     'Three child workflow relationships and one joined parent result.',
@@ -32,7 +31,3 @@ export const childWorkflowsExample: WorkflowCatalogExampleRegistration = {
     activities: { greet, processData },
   },
 };
-export const childWorkflowsSourceFiles = [
-  'src/lib/workflow-catalog/worker/examples/child-workflows/example.ts',
-  'src/lib/workflow-catalog/worker/examples/child-workflows/workflow.ts',
-] as const;
