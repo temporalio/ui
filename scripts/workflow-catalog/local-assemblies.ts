@@ -1,12 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import {
-  access,
-  readdir,
-  readFile,
-  rename,
-  rm,
-  writeFile,
-} from 'node:fs/promises';
+import { readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -30,32 +23,6 @@ const writeAtomically = async (path: string, content: string) => {
   const temporaryPath = `${path}.tmp`;
   await writeFile(temporaryPath, content);
   await rename(temporaryPath, path);
-};
-
-const pathExists = async (path: string) => {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-export const assertLocalWorkflowCatalogAssembliesWritable = async (
-  rootDirectory: string,
-) => {
-  const registrationPath = join(
-    rootDirectory,
-    'workflow-catalog.local/registration.ts',
-  );
-  if (!(await pathExists(registrationPath))) return;
-  const currentRegistration = await readFile(registrationPath, 'utf8');
-
-  if (!currentRegistration.startsWith(generatedHeader)) {
-    throw new Error(
-      'Cannot overwrite a legacy flat local overlay; migrate the legacy flat local overlay manually before scaffolding directory examples',
-    );
-  }
 };
 
 const regularFilesRecursively = async (
@@ -290,8 +257,6 @@ export const writeLocalWorkflowCatalogAssemblies = async (
 
     return;
   }
-
-  await assertLocalWorkflowCatalogAssembliesWritable(rootDirectory);
 
   await Promise.all([
     writeAtomically(registrationPath, rendered.registration),

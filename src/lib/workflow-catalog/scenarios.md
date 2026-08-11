@@ -90,12 +90,6 @@ Moves the example into the shared catalog, then regenerates and verifies.
 
 **Unverified.** Covered by tests but not exercised by hand.
 
-### Legacy flat overlay
-
-A `workflow-catalog.local/` containing `registration.ts` and `workflows.ts` at its root, rather than `examples/<id>/` directories, predates the current layout. Scaffolding refuses to touch it and asks for a manual migration.
-
-**Verified** that it is refused. There is no migration command; the practical fix is to delete the overlay and scaffold again.
-
 ## Prerequisites
 
 ### Automatic endpoint provisioning

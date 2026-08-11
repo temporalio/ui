@@ -64,37 +64,6 @@ describe('local workflow catalog assemblies', () => {
     ).resolves.toContain('./examples/zeta/workflow.js');
   });
 
-  it('refuses to overwrite an existing non-generated flat local overlay', async () => {
-    const rootDirectory = await createTemporaryDirectory();
-    const examplesDirectory = join(
-      rootDirectory,
-      'workflow-catalog.local/examples/alpha',
-    );
-    await mkdir(examplesDirectory, { recursive: true });
-    await Promise.all([
-      writeFile(
-        join(examplesDirectory, 'example.ts'),
-        "export const workflowCatalogExample = { execution: { kind: 'workflow', workflowType: 'alphaWorkflow' } };\n",
-      ),
-      writeFile(
-        join(examplesDirectory, 'workflow.ts'),
-        'export async function alphaWorkflow() {}\n',
-      ),
-      writeFile(
-        join(rootDirectory, 'workflow-catalog.local/registration.ts'),
-        'export const customizedRegistration = true;\n',
-      ),
-      writeFile(
-        join(rootDirectory, 'workflow-catalog.local/workflows.ts'),
-        'export const customizedWorkflow = true;\n',
-      ),
-    ]);
-
-    await expect(
-      writeLocalWorkflowCatalogAssemblies(rootDirectory),
-    ).rejects.toThrow('migrate the legacy flat local overlay manually');
-  });
-
   it('derives every support source and omits workflow exports for standalone examples', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const examplesDirectory = join(

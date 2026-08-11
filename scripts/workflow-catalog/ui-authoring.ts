@@ -17,7 +17,6 @@ import {
   planDirectoryWorkflowCatalogPromotion,
 } from './directory-promotion.js';
 import {
-  assertLocalWorkflowCatalogAssembliesWritable,
   loadLocalWorkflowCatalogRegistrationSource,
   renderLocalWorkflowCatalogAssemblies,
 } from './local-assemblies.js';
@@ -187,19 +186,8 @@ export const createUiWorkflowCatalogAuthoring = (
       planDirectoryWorkflowCatalogPromotion({ exampleId, rootDirectory }),
     generate: async () => {
       const local = await renderLocalWorkflowCatalogAssemblies(rootDirectory);
-      const currentLocalRegistration = await readFile(
-        join(rootDirectory, 'workflow-catalog.local/registration.ts'),
-        'utf8',
-      ).catch((error) => {
-        if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
-        throw error;
-      });
-      const generatedHeader = '// GENERATED FILE. DO NOT EDIT.\n';
       const localSource =
         await loadLocalWorkflowCatalogRegistrationSource(rootDirectory);
-      const hasLegacyLocalRegistration =
-        currentLocalRegistration !== undefined &&
-        !currentLocalRegistration.startsWith(generatedHeader);
       const localAssemblies = localSource
         ? [
             defineWorkflowCatalogArtifact(
@@ -211,30 +199,21 @@ export const createUiWorkflowCatalogAuthoring = (
               local.workflows,
             ),
           ]
-        : hasLegacyLocalRegistration
-          ? []
-          : [
-              deleteWorkflowCatalogArtifact(
-                'workflow-catalog.local/registration.ts',
-              ),
-              deleteWorkflowCatalogArtifact(
-                'workflow-catalog.local/workflows.ts',
-              ),
-            ];
-      if (localSource) {
-        await assertLocalWorkflowCatalogAssembliesWritable(rootDirectory);
-      }
+        : [
+            deleteWorkflowCatalogArtifact(
+              'workflow-catalog.local/registration.ts',
+            ),
+            deleteWorkflowCatalogArtifact(
+              'workflow-catalog.local/workflows.ts',
+            ),
+          ];
       const [canonicalAssemblies, sharedSource] = await Promise.all([
         renderCanonicalWorkflowCatalogAssemblies(rootDirectory),
         loadCanonicalWorkflowCatalogRegistrationSource(rootDirectory),
       ]);
       const project = await renderProjectWorkflowCatalogArtifacts({
         sharedSource,
-        ...(localSource
-          ? { localSource }
-          : hasLegacyLocalRegistration
-            ? {}
-            : { localSource: null }),
+        ...(localSource ? { localSource } : { localSource: null }),
       });
       return composeWorkflowCatalogArtifacts(
         localAssemblies,

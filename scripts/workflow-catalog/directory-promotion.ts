@@ -330,7 +330,7 @@ export const planDirectoryWorkflowCatalogPromotion = async ({
     !(await pathExists(join(sourcePath, 'workflow.ts')))
   ) {
     throw new Error(
-      `${sourceDirectory} must contain example.ts and workflow.ts; migrate the legacy flat local registration manually before promotion`,
+      `${sourceDirectory} must contain example.ts and workflow.ts`,
     );
   }
 
