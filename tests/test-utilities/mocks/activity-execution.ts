@@ -68,6 +68,7 @@ export const mockPausedActivityExecution: ActivityExecution = {
   longPollToken: 'long-poll-token',
   info: {
     ...baseActivityExecutionInfo,
+    status: 'ACTIVITY_EXECUTION_STATUS_PAUSED',
     runState: 'PENDING_ACTIVITY_STATE_PAUSED',
     pauseInfo: {
       manual: {

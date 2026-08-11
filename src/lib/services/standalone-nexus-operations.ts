@@ -18,15 +18,16 @@ import type {
   StartNexusOperationRequest,
 } from '$lib/types/nexus-operation-execution';
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
-import { encodePayloads } from '$lib/utilities/encode-payload';
+import {
+  encodePayloads,
+  setSearchAttributes,
+} from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
   type ErrorCallback,
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-
-import { setSearchAttributes } from './workflow-service';
 
 export type ListNexusOperationsResponse = {
   operations: NexusOperationExecutionListInfo[];

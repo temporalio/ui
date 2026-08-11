@@ -6,9 +6,9 @@ import type {
   CreateWorkerDeploymentVersionRequest,
   DeploymentParameters,
   DeploymentVersionParameters,
+  DescribeWorkerDeploymentResponse,
+  ListWorkerDeployment,
   ListWorkerDeploymentsResponse,
-  WorkerDeploymentResponse,
-  WorkerDeploymentSummary,
   WorkerDeploymentVersionResponse,
 } from '$lib/types/deployments';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -19,21 +19,18 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 type PaginatedDeploymentsPromise = (
   pageSize: number,
   token: string,
-) => Promise<{ items: WorkerDeploymentSummary[]; nextPageToken: string }>;
+) => Promise<{ items: ListWorkerDeployment[]; nextPageToken: string }>;
 
-const emptyVersionSummary = { version: '', createTime: {} };
-
-const emptyWorkerDeploymentResponse: WorkerDeploymentResponse = {
+const emptyWorkerDeploymentResponse = {
   conflictToken: '',
   workerDeploymentInfo: {
     name: '',
     createTime: {},
     routingConfig: {},
-    currentVersionSummary: emptyVersionSummary,
     lastModifierIdentity: '',
     versionSummaries: [],
   },
-};
+} satisfies DescribeWorkerDeploymentResponse;
 
 const emptyWorkerDeploymentVersionResponse: WorkerDeploymentVersionResponse = {
   workerDeploymentVersionInfo: {
@@ -108,9 +105,9 @@ export const fetchDeployment = async (
   onError?: ErrorCallback,
   notifyOnError = true,
   signal?: AbortSignal,
-): Promise<WorkerDeploymentResponse> => {
+): Promise<DescribeWorkerDeploymentResponse> => {
   const route = routeForApi('worker-deployment', parameters);
-  return requestFromAPI<WorkerDeploymentResponse>(route, {
+  return requestFromAPI<DescribeWorkerDeploymentResponse>(route, {
     request,
     onError,
     notifyOnError,
@@ -442,10 +439,6 @@ export const buildLambdaComputeConfig = (
   return {
     scalingGroups: {
       default: {
-        taskQueueTypes: [
-          'TASK_QUEUE_TYPE_WORKFLOW',
-          'TASK_QUEUE_TYPE_ACTIVITY',
-        ],
         provider: {
           type: 'aws-lambda',
           details: { metadata: { encoding }, data: providerData },
@@ -492,10 +485,6 @@ export const buildGcpCloudRunComputeConfig = (
   return {
     scalingGroups: {
       default: {
-        taskQueueTypes: [
-          'TASK_QUEUE_TYPE_WORKFLOW',
-          'TASK_QUEUE_TYPE_ACTIVITY',
-        ],
         provider: {
           type: 'gcp-cloud-run',
           details: { metadata: { encoding }, data: providerData },

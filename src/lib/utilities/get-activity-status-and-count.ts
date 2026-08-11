@@ -4,6 +4,7 @@ import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
 
 export type ActivityStatus =
   | 'Running'
+  | 'Paused'
   | 'Completed'
   | 'Failed'
   | 'Canceled'
@@ -24,6 +25,7 @@ const executionStatusToActivityStatus: Record<
   ActivityStatus
 > = {
   ACTIVITY_EXECUTION_STATUS_UNSPECIFIED: 'Running',
+  ACTIVITY_EXECUTION_STATUS_PAUSED: 'Paused',
   ACTIVITY_EXECUTION_STATUS_RUNNING: 'Running',
   ACTIVITY_EXECUTION_STATUS_COMPLETED: 'Completed',
   ACTIVITY_EXECUTION_STATUS_FAILED: 'Failed',

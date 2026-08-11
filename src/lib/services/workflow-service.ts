@@ -28,7 +28,6 @@ import {
   ResetReapplyExcludeType,
   ResetReapplyType,
   type ResetWorkflowRequest,
-  type SearchAttribute,
   type UnpauseWorkflowRequest,
   type UpdateWorkflowResponse,
 } from '$lib/types';
@@ -54,7 +53,7 @@ import type {
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 import {
   encodePayloads,
-  setBase64Payload,
+  setSearchAttributes,
 } from '$lib/utilities/encode-payload';
 import {
   handleUnauthorizedOrForbiddenError,
@@ -206,6 +205,30 @@ export const fetchAllWorkflows = async (
     nextPageToken: String(nextPageToken),
     error,
   };
+};
+
+type WorkflowsForQueryParams = {
+  namespace: string;
+  query: string;
+  pageSize?: number;
+};
+
+export const fetchWorkflowsForQuery = async (
+  { namespace, query, pageSize = 100 }: WorkflowsForQueryParams,
+  request = fetch,
+): Promise<WorkflowExecution[]> => {
+  const route = routeForApi('workflows', { namespace });
+  const { executions } = (await requestFromAPI<ListWorkflowExecutionsResponse>(
+    route,
+    {
+      params: { query, pageSize: String(pageSize) },
+      request,
+      // Rejects rather than raising a toast, so callers decide how a failure surfaces.
+      notifyOnError: false,
+    },
+  )) ?? { executions: [] };
+
+  return toWorkflowExecutions({ executions });
 };
 
 type WorkflowForRunIdParams = {
@@ -664,25 +687,6 @@ export async function fetchAllChildWorkflows(
     return [];
   }
 }
-
-export const setSearchAttributes = (
-  attributes: SearchAttributesSchema,
-): NonNullable<SearchAttribute['indexedFields']> => {
-  if (!attributes.length) return {};
-
-  const searchAttributes: Record<
-    string,
-    ReturnType<typeof setBase64Payload>
-  > = {};
-  attributes.forEach((attribute) => {
-    searchAttributes[attribute.label] = setBase64Payload(attribute.value);
-  });
-
-  // Payloads are base64 strings over REST; the proto type expects Uint8Array.
-  return searchAttributes as unknown as NonNullable<
-    SearchAttribute['indexedFields']
-  >;
-};
 
 export async function startWorkflow({
   namespace,

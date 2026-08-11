@@ -15,7 +15,7 @@
     fetchDeployment,
   } from '$lib/services/deployments-service';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
-  import type { WorkerDeploymentSummary } from '$lib/types/deployments';
+  import type { ListWorkerDeployment } from '$lib/types/deployments';
   import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
     routeForWorkerDeployment,
@@ -27,7 +27,7 @@
   import DeploymentStatus from './deployment-status.svelte';
 
   interface Props {
-    deployment: WorkerDeploymentSummary;
+    deployment: ListWorkerDeployment;
     columns: ConfigurableTableHeader[];
     showConnectionStatus?: boolean;
     onChange?: () => void;

@@ -23,9 +23,12 @@ import type {
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
 import type { Callback } from '$lib/types/nexus';
+import { activityOptionsUpdateMask } from '$lib/utilities/activity-options-update-mask';
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
-import { encodePayloads } from '$lib/utilities/encode-payload';
-import { isEmptyObject } from '$lib/utilities/is';
+import {
+  encodePayloads,
+  setSearchAttributes,
+} from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
   type ErrorCallback,
@@ -33,9 +36,6 @@ import {
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toCallbackStateReadable } from '$lib/utilities/screaming-enums';
-
-import { ACTIVITY_OPTIONS_UPDATE_MASK } from './workflow-activities-service';
-import { setSearchAttributes } from './workflow-service';
 
 // Timeout duration inputs on the activity forms; largest-first so
 // getFirstWholeNumberUnit resolves to the coarsest whole unit, defaulting to
@@ -543,7 +543,8 @@ export const resetActivityExecution = async (
         namespace,
         activityId,
         runId,
-        resetHeartbeat,
+        // TODO: re-enable once API supports resetHeartbeat
+        // resetHeartbeat,
         ...(identity && { identity }),
       }),
     },
@@ -571,7 +572,7 @@ export const updateActivityExecutionOptions = async (
         activityId,
         runId,
         activityOptions,
-        updateMask: ACTIVITY_OPTIONS_UPDATE_MASK,
+        updateMask: activityOptionsUpdateMask(activityOptions),
         ...(identity && { identity }),
       }),
     },
