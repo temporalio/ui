@@ -1,5 +1,5 @@
 ---
-name: temporal-ui-examples
+name: workflow-catalog
 description: Find, run, inspect, author, and promote Temporal Workflow Catalog examples in the temporalio/ui repository. Use when asked to add or change a workflow example, run the catalog locally, debug a catalog example that will not start, promote a local example into the shared catalog, or explain how catalog namespaces, task queues, and prerequisites are configured.
 ---
 
