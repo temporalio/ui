@@ -352,7 +352,7 @@ listener never sees Escape pressed inside the snapshot's filter field -->
                 <span class="w-16 shrink-0 font-medium"
                   >Page {loadedPage.page}</span
                 >
-                <span class="text-info shrink-0 font-mono">
+                <span class="shrink-0 font-mono text-information">
                   {loadedPage.token}
                 </span>
                 <span class="truncate font-mono text-secondary">
@@ -396,7 +396,7 @@ listener never sees Escape pressed inside the snapshot's filter field -->
           captured {new Date(capturedAt).toLocaleTimeString()} · {ageLabel}
         </span>
         <span
-          class="surface-warning rounded-sm border border-warning px-2 py-0.5 text-xs font-medium"
+          class="rounded-sm border border-warning bg-warning px-2 py-0.5 text-xs font-medium text-warning"
         >
           Capped — {notLoaded.toLocaleString()} not loaded
         </span>

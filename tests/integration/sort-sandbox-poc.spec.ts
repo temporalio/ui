@@ -121,4 +121,57 @@ test.describe('Sort sandbox POC', () => {
       .click();
     await expect(drawer).toBeHidden();
   });
+
+  test('snapshot stage reads correctly in dark mode', async ({ page }) => {
+    test.setTimeout(90_000);
+
+    await mockWorkflowsApis(page);
+    await mockClusterApi(page, {
+      visibilityStore: 'elasticsearch',
+      persistenceStore: 'postgres,elasticsearch',
+    });
+    await page.addInitScript(() =>
+      window.localStorage.setItem('dark mode', 'true'),
+    );
+
+    await page.goto('/namespaces/default/workflows?mock');
+    await page.getByTestId('workflows-sort-sandbox-button').click();
+
+    const drawer = page.locator('#workflows-sort-sandbox-drawer');
+    await expect(drawer.getByText('20 pages × 500 rows')).toBeVisible();
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: `${SHOTS}/dark-1-prepare.png` });
+
+    await drawer.getByRole('button', { name: /Load 10,000 workflows/ }).click();
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: `${SHOTS}/dark-2-loading.png` });
+
+    await expect(drawer.getByText('10,000 of 12,347 matching')).toBeVisible({
+      timeout: 20_000,
+    });
+    await drawer.getByRole('button', { name: 'Sort by Status' }).click();
+    await drawer
+      .getByRole('button', { name: 'Sort by Type' })
+      .click({ modifiers: ['Shift'] });
+    await page.screenshot({ path: `${SHOTS}/dark-3-snapshot.png` });
+
+    // the capped chip must not be dark-on-dark
+    const chip = drawer.getByText('Capped — 2,347 not loaded');
+    await expect(chip).toBeVisible();
+    const contrast = await chip.evaluate((el) => {
+      const luminance = (color: string) => {
+        const [r, g, b] = color.match(/\d+/g).map(Number);
+        const channel = (c: number) => {
+          const s = c / 255;
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        };
+        return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+      };
+      const style = getComputedStyle(el);
+      const a = luminance(style.color);
+      const b = luminance(style.backgroundColor);
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    });
+    expect(contrast).toBeGreaterThan(4.5);
+  });
 });
