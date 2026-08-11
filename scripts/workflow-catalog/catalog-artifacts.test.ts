@@ -1619,29 +1619,33 @@ registry.registerExample({
     workflowCatalogCommandTestTimeoutMs,
   );
 
-  it('reports an unknown selected development target before connecting', async () => {
-    let commandFailure: unknown;
+  it(
+    'reports an unknown selected development target before connecting',
+    async () => {
+      let commandFailure: unknown;
 
-    try {
-      await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
-        env: {
-          ...process.env,
-          TEMPORAL_ADDRESS: 'localhost:7233',
-          TEMPORAL_NAMESPACE: 'default',
-          WORKFLOW_CATALOG_TARGET_ID: 'missing-target',
-        },
-      });
-    } catch (error) {
-      commandFailure = error;
-    }
+      try {
+        await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
+          env: {
+            ...process.env,
+            TEMPORAL_ADDRESS: 'localhost:7233',
+            TEMPORAL_NAMESPACE: 'default',
+            WORKFLOW_CATALOG_TARGET_ID: 'missing-target',
+          },
+        });
+      } catch (error) {
+        commandFailure = error;
+      }
 
-    expect(commandFailure).toMatchObject({ code: 1 });
-    expect(
-      `${(commandFailure as { stdout?: string }).stdout ?? ''}${
-        (commandFailure as { stderr?: string }).stderr ?? ''
-      }`,
-    ).toContain('Workflow catalog target "missing-target" was not found');
-  });
+      expect(commandFailure).toMatchObject({ code: 1 });
+      expect(
+        `${(commandFailure as { stdout?: string }).stdout ?? ''}${
+          (commandFailure as { stderr?: string }).stderr ?? ''
+        }`,
+      ).toContain('Workflow catalog target "missing-target" was not found');
+    },
+    workflowCatalogCommandTestTimeoutMs,
+  );
 
   it(
     'rejects stale artifacts before development can load or rewrite them',
