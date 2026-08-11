@@ -108,15 +108,43 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 		Scopes:       providerCfg.Scopes,
 	}
 
+	secure, err := cookieSecureForCallbackURL(providerCfg.CallbackURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	api := e.Group("/auth")
-	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration)) // compatibility with UI v1
-	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
-	api.GET("/logout", logout())
+	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins, secure))
+	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, secure))
+	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, secure)) // compatibility with UI v1
+	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, secure))
+	api.GET("/logout", logout(secure))
 }
 
-func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string) func(echo.Context) error {
+// cookieSecureForCallbackURL reports whether the auth cookies may carry the Secure
+// attribute, based on the scheme of the OIDC callback URL. That URL is the
+// browser-facing address the identity provider redirects back to, so it is the
+// authoritative record of how a browser reaches this deployment.
+//
+// An unrecognized scheme is an error rather than a false return, so that a malformed
+// callback URL fails loudly at startup.
+func cookieSecureForCallbackURL(callbackURL string) (bool, error) {
+	u, err := url.Parse(callbackURL)
+	if err != nil {
+		return false, fmt.Errorf("unable to parse auth callback url: %w", err)
+	}
+
+	switch u.Scheme {
+	case "https":
+		return true, nil
+	case "http":
+		return false, nil
+	default:
+		return false, fmt.Errorf("auth callback url must use http or https, got %q", callbackURL)
+	}
+}
+
+func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string, secure bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		state, err := randString()
 		if err != nil {
@@ -126,8 +154,8 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
-		setCallbackCookie(c, "state", state)
-		setCallbackCookie(c, "nonce", nonce)
+		setCallbackCookie(c, "state", state, secure)
+		setCallbackCookie(c, "nonce", nonce, secure)
 
 		opts := []oauth2.AuthCodeOption{
 			oidc.Nonce(nonce),
@@ -154,20 +182,20 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, secure bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
 		if err != nil {
 			return err
 		}
 
-		err = auth.SetUser(c, user)
+		err = auth.SetUser(c, user, secure)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set user: "+err.Error())
 		}
 
 		// Set session start time for max session duration enforcement
-		auth.SetSessionStart(c, maxSessionDuration)
+		auth.SetSessionStart(c, maxSessionDuration, secure)
 
 		nonceS, err := c.Request().Cookie("nonce")
 		if err != nil {
@@ -189,7 +217,7 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 
 // refreshTokens exchanges a refresh token (stored in an HttpOnly cookie) for a new access token
 // and optionally a new ID token. It resets the cookies using auth.SetUser and returns 200.
-func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
+func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, secure bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		startTime := time.Now()
 		clientIP := c.RealIP()
@@ -239,7 +267,7 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 			}
 		}
 
-		if err := auth.SetUser(c, &user); err != nil {
+		if err := auth.SetUser(c, &user, secure); err != nil {
 			duration := time.Since(startTime).Milliseconds()
 			log.Printf("token_refresh_failed reason=set_user_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set refreshed user: "+err.Error())
@@ -254,22 +282,22 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 }
 
 // logout clears authentication cookies and redirects to root
-func logout() func(echo.Context) error {
+func logout(secure bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		log.Printf("[Auth] User logout initiated from %s", c.RealIP())
 
 		// Clear refresh token cookie
-		clearCookie(c, "refresh")
+		clearCookie(c, "refresh", secure)
 		log.Printf("[Auth] Cleared refresh token cookie")
 
 		// Clear session start cookie
-		clearCookie(c, "session_start")
+		clearCookie(c, "session_start", secure)
 
 		// Clear user data cookies (user0, user1, etc.)
 		// We don't know how many chunks exist, so clear up to 10
 		for i := 0; i < 10; i++ {
 			cookieName := "user" + strconv.Itoa(i)
-			clearCookie(c, cookieName)
+			clearCookie(c, cookieName, secure)
 		}
 		log.Printf("[Auth] Cleared user data cookies")
 
@@ -279,27 +307,27 @@ func logout() func(echo.Context) error {
 }
 
 // clearCookie sets a cookie with MaxAge=-1 to delete it
-func clearCookie(c echo.Context, name string) {
+func clearCookie(c echo.Context, name string, secure bool) {
 	cookie := &http.Cookie{
 		Name:     name,
 		Value:    "",
 		MaxAge:   -1, // Instructs browser to delete cookie
 		Path:     "/",
-		Secure:   c.Request().TLS != nil,
+		Secure:   secure,
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	}
 	c.SetCookie(cookie)
 }
 
-func setCallbackCookie(c echo.Context, name, value string) {
+func setCallbackCookie(c echo.Context, name, value string, secure bool) {
 	// Explicitly expire pre v2.8.0 state and nonce cookies.
 	// As they had different path, they were not being cleared and in some cases result in "state did not match" error.
 	cookiePreV280 := &http.Cookie{
 		Name:     name,
 		Value:    "",
 		MaxAge:   -1,
-		Secure:   c.Request().TLS != nil,
+		Secure:   secure,
 		Path:     "",
 		HttpOnly: true,
 	}
@@ -309,7 +337,7 @@ func setCallbackCookie(c echo.Context, name, value string) {
 		Name:     name,
 		Value:    value,
 		MaxAge:   int(time.Hour.Seconds()),
-		Secure:   c.Request().TLS != nil,
+		Secure:   secure,
 		Path:     "/",
 		HttpOnly: true,
 	}
