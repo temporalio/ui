@@ -37,6 +37,11 @@
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
+  import SortSandboxDrawer from '$lib/components/workflow/sort-sandbox/index.svelte';
+  import {
+    isMockLiveTableEnabled,
+    MOCK_TOTAL,
+  } from '$lib/components/workflow/sort-sandbox/mock-live-table';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -134,6 +139,13 @@
   });
 
   let customizationDrawerOpen = $state(false);
+  let sortSandboxOpen = $state(false);
+
+  // POC: keep the header count consistent with the mocked table
+  const useMockWorkflows = $derived(isMockLiveTableEnabled(page.url));
+  const displayCount = $derived(
+    useMockWorkflows ? MOCK_TOTAL : $workflowCount.count,
+  );
 
   let batchTerminateConfirmationModalOpen = $state(false);
   let batchCancelConfirmationModalOpen = $state(false);
@@ -234,12 +246,9 @@
                 class="flex items-center gap-2"
               >
                 <span data-testid="workflow-count"
-                  >{$workflowCount.count.toLocaleString()}</span
+                  >{displayCount.toLocaleString()}</span
                 >
-                <Translate
-                  key="common.workflows-plural"
-                  count={$workflowCount.count}
-                />
+                <Translate key="common.workflows-plural" count={displayCount} />
               </span>
             {:else}
               <Translate key="workflows.recent-workflows" />
@@ -277,6 +286,7 @@
 >
   <WorkflowsSummaryConfigurableTable
     onClickConfigure={openCustomizationDrawer}
+    onClickSortSandbox={() => (sortSandboxOpen = true)}
     {cloud}
   />
 </SavedQueryViews>
@@ -286,3 +296,4 @@
   type={translate('common.columns')}
   title={translate('common.workflows-table')}
 />
+<SortSandboxDrawer bind:open={sortSandboxOpen} {query} />

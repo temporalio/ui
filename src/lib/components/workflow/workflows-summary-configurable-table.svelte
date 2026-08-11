@@ -32,6 +32,12 @@
     type PageSelectionStatus,
   } from '$lib/utilities/batch-selection';
 
+  import {
+    isMockLiveTableEnabled,
+    MOCK_TOTAL,
+    mockPaginatedWorkflows,
+  } from './sort-sandbox/mock-live-table';
+
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
   import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
@@ -39,10 +45,11 @@
 
   interface Props {
     onClickConfigure: () => void;
+    onClickSortSandbox?: () => void;
     cloud?: Snippet;
   }
 
-  let { onClickConfigure, cloud }: Props = $props();
+  let { onClickConfigure, onClickSortSandbox, cloud }: Props = $props();
 
   const { allSelected, selectedWorkflows, selectWorkflows } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
@@ -116,7 +123,15 @@
     }
   };
 
-  const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
+  // POC: ?mock on the URL swaps the visibility API for seeded fake workflows so
+  // the sort sandbox can be demoed without a cluster.
+  const useMockWorkflows = $derived(isMockLiveTableEnabled(page.url));
+  const onFetch = $derived(() =>
+    useMockWorkflows
+      ? mockPaginatedWorkflows(namespace)
+      : fetchPaginatedWorkflows(namespace, query),
+  );
+  const total = $derived(useMockWorkflows ? MOCK_TOTAL : $workflowCount.count);
 
   const dense = $derived($tableDensity === 'dense');
 
@@ -214,9 +229,9 @@
   });
 </script>
 
-{#key [namespace, query, $refresh]}
+{#key [namespace, query, $refresh, useMockWorkflows]}
   <PaginatedTable
-    total={$workflowCount.count}
+    {total}
     {onFetch}
     onItemsChange={(items) => {
       visiblePaginatedItems = items;
@@ -268,6 +283,17 @@
       <TableEmptyState {cloud} />
     {/snippet}
     {#snippet actionsEndAdditional({ visibleItems, page })}
+      {#if onClickSortSandbox}
+        <Button
+          onclick={onClickSortSandbox}
+          data-testid="workflows-sort-sandbox-button"
+          size="xs"
+          variant="secondary"
+          leadingIcon="descending"
+        >
+          Sort all results
+        </Button>
+      {/if}
       <Tooltip
         text={dense
           ? translate('common.dense')
