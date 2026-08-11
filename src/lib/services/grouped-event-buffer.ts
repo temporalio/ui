@@ -91,7 +91,9 @@ let _cachedLiveVersionNoWFT = -1;
 // Incremented each time liveGroups is modified so getGroupArray knows to bust.
 let _liveVersion = 0;
 
-// Accumulated WFT IDs for marker billable-action dedup (ascending cursor only)
+// Accumulated WFT IDs for marker billable-action dedup. Shared by both cursors
+// and the live poll — the direction an event arrives from is a fetch detail,
+// and one workflow task's markers bill once however they were loaded.
 const processedWorkflowTaskIds = new Set<string>();
 
 // Solo events that don't form groups (e.g. WorkflowExecutionStarted/Completed).
@@ -213,15 +215,10 @@ function shouldNotAddBillableAction(event: WorkflowEvent): boolean {
   return Number(event.id) < Number(failedEvent.eventId);
 }
 
-function toWorkflowEvent(
-  raw: HistoryEvent,
-  isAscending: boolean,
-): WorkflowEvent {
+function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
   return toEvent(raw, {
     shouldNotAddBillableAction,
-    processedWorkflowTaskIds: isAscending
-      ? processedWorkflowTaskIds
-      : undefined,
+    processedWorkflowTaskIds,
   });
 }
 
@@ -312,7 +309,7 @@ function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
   const raw = eventSlots[followerSlotIdx];
   if (!raw || !meta.group) return;
 
-  const event = toWorkflowEvent(raw, false);
+  const event = toWorkflowEvent(raw);
   meta.group = withAddedEvent(meta.group, event);
 
   eventToGroup[followerSlotIdx] = poolIdx + 1;
@@ -486,7 +483,7 @@ export function processEvent(
     latestEventRef = raw;
   }
 
-  const event = toWorkflowEvent(raw, isAscending);
+  const event = toWorkflowEvent(raw);
   const gid = getGroupId(event as CommonHistoryEvent);
   const isHead = gid === event.id;
 
@@ -1014,7 +1011,7 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
   if (slotIdx < eventToGroup.length && eventToGroup[slotIdx] !== 0)
     return false;
 
-  const event = toWorkflowEvent(raw, true);
+  const event = toWorkflowEvent(raw);
   const gid = getGroupId(event as CommonHistoryEvent);
   const isHead = gid === event.id;
 

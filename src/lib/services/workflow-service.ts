@@ -207,6 +207,30 @@ export const fetchAllWorkflows = async (
   };
 };
 
+type WorkflowsForQueryParams = {
+  namespace: string;
+  query: string;
+  pageSize?: number;
+};
+
+export const fetchWorkflowsForQuery = async (
+  { namespace, query, pageSize = 100 }: WorkflowsForQueryParams,
+  request = fetch,
+): Promise<WorkflowExecution[]> => {
+  const route = routeForApi('workflows', { namespace });
+  const { executions } = (await requestFromAPI<ListWorkflowExecutionsResponse>(
+    route,
+    {
+      params: { query, pageSize: String(pageSize) },
+      request,
+      // Rejects rather than raising a toast, so callers decide how a failure surfaces.
+      notifyOnError: false,
+    },
+  )) ?? { executions: [] };
+
+  return toWorkflowExecutions({ executions });
+};
+
 type WorkflowForRunIdParams = {
   namespace: string;
   workflowId: string;

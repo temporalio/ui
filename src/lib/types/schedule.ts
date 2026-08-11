@@ -5,12 +5,14 @@ import type {
   Duration,
   IntervalSpec,
   Schedule,
+  ScheduleActionResult,
   SchedulePolicies,
   ScheduleSpec,
   ScheduleState,
   SearchAttribute,
   StructuredCalendarSpec,
 } from '$lib/types';
+import type { WorkflowStatus } from '$lib/types/workflows';
 
 type Override<T, U> = Omit<T, keyof U> & U;
 
@@ -37,6 +39,19 @@ export type ScheduleResponse = Override<
 export type DescribeFullSchedule = DescribeScheduleResponse & {
   schedule_id: string;
   schedule?: ScheduleResponse;
+};
+
+/**
+ * A row in the schedule's recent runs list. `status` and `runId` start out as
+ * the ones recorded on the action; once visibility answers they are replaced
+ * by the matching execution's, which for a continue-as-new chain is the latest
+ * run rather than the one the schedule started.
+ */
+export type RecentScheduleRun = {
+  workflowId: string;
+  runId: string;
+  actualTime: ScheduleActionResult['actualTime'];
+  status: WorkflowStatus;
 };
 
 /**
