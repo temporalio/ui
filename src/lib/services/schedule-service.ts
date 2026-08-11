@@ -101,6 +101,7 @@ export async function fetchSchedule(
 }
 
 const RECENT_RUN_COUNT = 5;
+const UPCOMING_RUN_COUNT = 5;
 
 export const toRecentScheduleRuns = (
   schedule: DescribeFullSchedule,
@@ -119,6 +120,15 @@ export const toRecentScheduleRuns = (
       actualTime: action.actualTime,
       status: toWorkflowStatusReadable(action.startWorkflowStatus ?? null),
     }));
+
+export const toUpcomingScheduleRuns = (
+  schedule: DescribeFullSchedule,
+  limit = UPCOMING_RUN_COUNT,
+) =>
+  (schedule?.info?.futureActionTimes ?? [])
+    .filter(Boolean)
+    .sort((a, b) => getEpochMilliseconds(a) - getEpochMilliseconds(b))
+    .slice(0, limit);
 
 export const withLatestWorkflowStatuses = (
   runs: RecentScheduleRun[],
