@@ -1,0 +1,1869 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sort sandbox — Workflows list POC</title>
+    <style>
+      :root {
+        --ink: #16161a;
+        --ink-2: #3d3f47;
+        --muted: #6e7180;
+        --line: #16161a;
+        --hair: #d9dbe3;
+        --surface: #ffffff;
+        --page: #fbfbfd;
+        --accent: #4b47c9;
+        --accent-soft: #ecebfa;
+        --amber: #a1600b;
+        --amber-bg: #fdf3dd;
+        --amber-line: #e4be74;
+        --drawer-bg: #eef1f7;
+        --drawer-surface: #ffffff;
+        --radius: 4px;
+        --mono:
+          ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+        --sans:
+          Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui,
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--sans);
+        font-size: 13px;
+        color: var(--ink);
+        background: var(--page);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .mono {
+        font-family: var(--mono);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition:
+          box-shadow 120ms ease,
+          transform 120ms ease;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        box-shadow: 3px 3px 0 var(--line);
+        transform: translate(-1px, -1px);
+      }
+      .btn:active {
+        box-shadow: 1px 1px 0 var(--line);
+        transform: translate(0, 0);
+      }
+      .btn[disabled] {
+        opacity: 0.45;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        font-weight: 500;
+      }
+      .btn-primary:hover {
+        box-shadow: 3px 3px 0 var(--line);
+      }
+
+      .btn-ghost {
+        border-color: var(--hair);
+      }
+
+      /* ---------- app shell ---------- */
+
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .rail {
+        width: 210px;
+        flex: 0 0 210px;
+        border-right: 1px solid var(--line);
+        background: var(--surface);
+        padding: 14px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .logo .mark {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--ink);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .ns-select {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 6px 8px;
+        background: var(--surface);
+        width: 100%;
+      }
+      .ns-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--muted);
+        margin-bottom: 5px;
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .nav a {
+        display: block;
+        padding: 6px 8px;
+        border-radius: var(--radius);
+        color: var(--ink-2);
+        text-decoration: none;
+        border: 1px solid transparent;
+      }
+      .nav a:hover {
+        background: #f2f2f6;
+      }
+      .nav a.active {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+        font-weight: 500;
+      }
+
+      .main {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 22px 26px 60px;
+      }
+
+      .page-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .page-head h1 {
+        font-size: 21px;
+        margin: 0;
+        letter-spacing: -0.015em;
+      }
+      .count {
+        color: var(--muted);
+      }
+
+      .query-bar {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .query-box {
+        flex: 1 1 420px;
+        min-width: 260px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        padding: 7px 10px;
+        overflow-x: auto;
+      }
+      .query-box .kicker {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        border-right: 1px solid var(--hair);
+        padding-right: 8px;
+        flex: none;
+      }
+      .query-box code {
+        font-family: var(--mono);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .table-wrap {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        overflow-x: auto;
+      }
+
+      table.live {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 900px;
+      }
+      table.live th,
+      table.live td {
+        text-align: left;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--hair);
+        vertical-align: top;
+      }
+      table.live thead th {
+        background: #f6f6f9;
+        font-weight: 500;
+        font-size: 12px;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+      }
+      table.live tbody tr:last-child td {
+        border-bottom: 0;
+      }
+      table.live tbody tr:hover {
+        background: #fafaff;
+      }
+
+      .th-sortable {
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 500;
+      }
+      .th-sortable .arrow {
+        color: var(--accent);
+        font-size: 10px;
+      }
+      .th-sortable:hover {
+        text-decoration: underline;
+      }
+
+      .th-locked {
+        color: var(--muted);
+        text-decoration: underline dotted;
+        text-underline-offset: 3px;
+        cursor: help;
+        font-weight: 400;
+      }
+
+      .tip {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 8px;
+        z-index: 40;
+        width: 268px;
+        background: var(--ink);
+        color: #f4f4f7;
+        padding: 9px 11px;
+        border-radius: var(--radius);
+        font-size: 11.5px;
+        line-height: 1.45;
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 110ms ease;
+      }
+      .tip b {
+        color: #fff;
+      }
+      th:hover .tip,
+      th:focus-within .tip {
+        opacity: 1;
+      }
+
+      .wid {
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+      .rid {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        display: block;
+        margin-top: 2px;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+        border: 1px solid;
+        white-space: nowrap;
+      }
+      .s-Running {
+        background: #e8f0ff;
+        border-color: #7b9ee6;
+        color: #23458f;
+      }
+      .s-Completed {
+        background: #e6f5ec;
+        border-color: #6fb98c;
+        color: #1d6b42;
+      }
+      .s-Failed {
+        background: #fdeaea;
+        border-color: #dd8b8b;
+        color: #a02a2a;
+      }
+      .s-TimedOut {
+        background: #fdf1e2;
+        border-color: #e0ac6c;
+        color: #8a5411;
+      }
+      .s-Canceled {
+        background: #f0f0f3;
+        border-color: #b9bac4;
+        color: #55575f;
+      }
+      .s-Terminated {
+        background: #f6e7ef;
+        border-color: #cf8fb2;
+        color: #8b2d5c;
+      }
+      .s-ContinuedAsNew {
+        background: #efeafb;
+        border-color: #a795e0;
+        color: #543a9c;
+      }
+
+      .table-note {
+        margin-top: 9px;
+        font-size: 12px;
+        color: var(--ink-2);
+        line-height: 1.5;
+        max-width: 760px;
+        border-left: 2px solid var(--hair);
+        padding-left: 10px;
+      }
+
+      .list-footer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .list-footer .token {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--ink-2);
+      }
+      .list-footer .spacer {
+        flex: 1 1 auto;
+      }
+
+      /* ---------- drawer ---------- */
+
+      .scrim {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background: rgba(18, 18, 26, 0.42);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease;
+      }
+      .scrim.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 60;
+        width: min(1120px, 96vw);
+        background: var(--drawer-bg);
+        border-left: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        transform: translateX(101%);
+        transition: transform 220ms cubic-bezier(0.22, 0.7, 0.3, 1);
+        box-shadow: -18px 0 40px rgba(20, 20, 35, 0.16);
+      }
+      .drawer.open {
+        transform: translateX(0);
+      }
+
+      .hatch {
+        height: 9px;
+        flex: none;
+        background-image: repeating-linear-gradient(
+          -45deg,
+          var(--ink) 0 5px,
+          transparent 5px 11px
+        );
+        border-bottom: 1px solid var(--line);
+        opacity: 0.8;
+      }
+
+      .drawer-head {
+        flex: none;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        background: var(--drawer-bg);
+      }
+      .drawer-head h2 {
+        margin: 0 0 3px;
+        font-size: 16px;
+        letter-spacing: -0.01em;
+      }
+      .drawer-head .sub {
+        color: var(--ink-2);
+        font-size: 12px;
+        max-width: 74ch;
+        line-height: 1.5;
+      }
+      .drawer-head .grow {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .x-btn {
+        flex: none;
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        cursor: pointer;
+      }
+      .x-btn:hover {
+        box-shadow: 2px 2px 0 var(--line);
+      }
+
+      .stage {
+        display: none;
+        flex: 1 1 auto;
+        min-height: 0;
+        flex-direction: column;
+      }
+      .stage.active {
+        display: flex;
+      }
+
+      .pad {
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .card {
+        background: var(--drawer-surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        max-width: 760px;
+      }
+
+      .dl {
+        display: grid;
+        grid-template-columns: 190px 1fr;
+        gap: 9px 16px;
+        margin: 14px 0 0;
+      }
+      .dl dt {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .dl dd {
+        margin: 0;
+      }
+      .dl dd code {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        word-break: break-word;
+      }
+
+      .note-amber {
+        margin-top: 16px;
+        background: var(--amber-bg);
+        border: 1px solid var(--amber-line);
+        border-radius: var(--radius);
+        padding: 10px 12px;
+        color: var(--amber);
+        font-size: 12px;
+        line-height: 1.55;
+        max-width: 760px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+
+      /* loading */
+      .bar {
+        height: 8px;
+        background: #dfe2ec;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        overflow: hidden;
+        max-width: 760px;
+      }
+      .bar > i {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: var(--accent);
+        transition: width 150ms linear;
+      }
+
+      .load-meta {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin: 10px 0 0;
+        font-size: 12.5px;
+      }
+      .load-meta .k {
+        color: var(--muted);
+      }
+
+      .stream {
+        margin-top: 16px;
+        max-width: 760px;
+        height: 250px;
+        overflow: hidden;
+        border: 1px solid var(--hair);
+        border-radius: var(--radius);
+        background: var(--drawer-surface);
+        -webkit-mask-image: linear-gradient(
+          to bottom,
+          #000 0%,
+          #000 62%,
+          transparent 100%
+        );
+        mask-image: linear-gradient(
+          to bottom,
+          #000 0%,
+          #000 62%,
+          transparent 100%
+        );
+      }
+      .stream .row {
+        padding: 7px 11px;
+        border-bottom: 1px solid #eceef4;
+        font-size: 11.5px;
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+      }
+      .stream .row .pg {
+        font-weight: 600;
+        flex: none;
+        width: 62px;
+      }
+      .stream .row .tok {
+        font-family: var(--mono);
+        color: var(--accent);
+        flex: none;
+      }
+      .stream .row .last {
+        font-family: var(--mono);
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .seq-note {
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--ink-2);
+        max-width: 70ch;
+        line-height: 1.5;
+      }
+
+      /* snapshot */
+      .snap-bar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 10px 20px;
+        background: var(--drawer-surface);
+        border-bottom: 1px solid var(--line);
+      }
+      .frozen {
+        width: 24px;
+        height: 24px;
+        flex: none;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #e8f0ff;
+        color: #23458f;
+      }
+      .snap-bar .headline {
+        font-weight: 600;
+      }
+      .snap-bar .age {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .snap-bar .age.stale {
+        color: var(--amber);
+        font-weight: 500;
+      }
+      .chip-amber {
+        background: var(--amber-bg);
+        border: 1px solid var(--amber-line);
+        color: var(--amber);
+        padding: 2px 9px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 500;
+      }
+      .snap-bar .spacer {
+        flex: 1 1 auto;
+      }
+
+      .filters {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 10px 20px;
+        border-bottom: 1px solid var(--line);
+        background: var(--drawer-bg);
+      }
+      .filters input[type='search'],
+      .filters select {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 5px 9px;
+        background: var(--surface);
+      }
+      .filters input[type='search'] {
+        width: 230px;
+      }
+      .facets {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .facet {
+        border: 1px solid var(--hair);
+        background: var(--surface);
+        border-radius: 999px;
+        padding: 3px 11px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      .facet:hover {
+        border-color: var(--line);
+      }
+      .facet[aria-pressed='true'] {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+
+      /* virtual grid — scoped hard so it never touches table.live */
+      .vgrid {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        margin: 0 20px;
+        border: 1px solid var(--line);
+        border-top: 0;
+        background: var(--drawer-surface);
+        overflow: hidden;
+      }
+      .vgrid .vhead {
+        display: flex;
+        flex: none;
+        background: #f6f6f9;
+        border-bottom: 1px solid var(--line);
+        min-width: 940px;
+      }
+      .vgrid .vhead button {
+        flex: none;
+        text-align: left;
+        background: none;
+        border: 0;
+        border-right: 1px solid var(--hair);
+        padding: 8px 11px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .vgrid .vhead button:hover {
+        background: #ecedf4;
+      }
+      .vgrid .vhead button .arrow {
+        color: var(--accent);
+        font-size: 10px;
+      }
+      .vgrid .vhead button .ord {
+        display: inline-grid;
+        place-items: center;
+        min-width: 15px;
+        height: 15px;
+        padding: 0 3px;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 3px;
+        font-size: 9.5px;
+        font-weight: 700;
+      }
+      .vgrid .vscroll {
+        flex: 1 1 auto;
+        overflow: auto;
+        position: relative;
+      }
+      .vgrid .vspacer {
+        position: relative;
+        min-width: 940px;
+      }
+      .vgrid .vrow {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #eef0f5;
+        min-width: 940px;
+      }
+      .vgrid .vrow:hover {
+        background: #fafaff;
+      }
+      .vgrid .vrow > span,
+      .vgrid .vhead button {
+        overflow: hidden;
+      }
+      .vgrid .vrow > span {
+        flex: none;
+        padding: 0 11px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 12px;
+      }
+      .vgrid .c-status {
+        width: 130px;
+      }
+      .vgrid .c-id {
+        width: 300px;
+      }
+      .vgrid .c-type {
+        width: 220px;
+      }
+      .vgrid .c-start {
+        width: 160px;
+      }
+      .vgrid .c-end {
+        width: 160px;
+      }
+      .vgrid .c-queue {
+        width: 150px;
+      }
+      .vgrid .c-id .rid {
+        display: inline;
+        margin-left: 7px;
+      }
+      .vgrid .num {
+        font-variant-numeric: tabular-nums;
+        font-family: var(--mono);
+        font-size: 11.5px;
+      }
+
+      .vempty {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 30px;
+        text-align: center;
+        color: var(--ink-2);
+        line-height: 1.6;
+      }
+      .vempty strong {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 6px;
+        color: var(--ink);
+      }
+      .vempty p {
+        margin: 0 auto;
+        max-width: 52ch;
+        font-size: 12.5px;
+      }
+
+      .grid-footer {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 9px 20px 16px;
+        font-size: 12px;
+        color: var(--ink-2);
+      }
+      .grid-footer .sortdesc {
+        color: var(--muted);
+      }
+      .grid-footer .hint {
+        margin-left: auto;
+        color: var(--muted);
+      }
+
+      /* confirm */
+      .confirm-scrim {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        background: rgba(18, 18, 26, 0.35);
+        display: none;
+        place-items: center;
+        padding: 20px;
+      }
+      .confirm-scrim.open {
+        display: grid;
+      }
+      .confirm {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px;
+        width: min(460px, 100%);
+        box-shadow: 6px 6px 0 var(--line);
+      }
+      .confirm h3 {
+        margin: 0 0 8px;
+        font-size: 15px;
+      }
+      .confirm p {
+        margin: 0;
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--ink-2);
+      }
+
+      @media (max-width: 900px) {
+        .rail {
+          display: none;
+        }
+        .main {
+          padding: 16px;
+        }
+        .dl {
+          grid-template-columns: 1fr;
+          gap: 3px 0;
+        }
+        .dl dt {
+          margin-top: 8px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition-duration: 1ms !important;
+          animation-duration: 1ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <nav class="rail" aria-label="Primary">
+        <div class="logo"><span class="mark">T</span> Temporal</div>
+        <div>
+          <div class="ns-label">Namespace</div>
+          <select class="ns-select" aria-label="Namespace">
+            <option>default</option>
+            <option>payments-prod</option>
+            <option>fulfillment-prod</option>
+          </select>
+        </div>
+        <div class="nav">
+          <a href="#" class="active" aria-current="page">Workflows</a>
+          <a href="#">Schedules</a>
+          <a href="#">Batch operations</a>
+          <a href="#">Task queues</a>
+          <a href="#">Nexus</a>
+          <a href="#">Archive</a>
+        </div>
+      </nav>
+
+      <main class="main">
+        <div class="page-head">
+          <h1>Workflows</h1>
+          <span class="count" id="liveCount">12,347 matching</span>
+        </div>
+
+        <div class="query-bar">
+          <div class="query-box">
+            <span class="kicker">Query</span>
+            <code id="queryText"
+              >StartTime &gt; "2026-08-03T00:00:00Z" AND TaskQueue IN
+              ("default", "payments-tq", "batch-processing")</code
+            >
+          </div>
+          <button class="btn" type="button">Edit query</button>
+          <button class="btn btn-primary" type="button" id="openSandbox">
+            Sort all results
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="live">
+            <thead>
+              <tr>
+                <th data-col="status">
+                  <span class="th-locked" tabindex="0">Status</span>
+                  <span class="tip" role="tooltip"
+                    >The visibility store can't order by <b>Status</b>. Sorting
+                    here would only reorder the 20 rows on this page. Use
+                    <b>Sort all results</b> to load a snapshot and sort
+                    it.</span
+                  >
+                </th>
+                <th data-col="workflowId">
+                  <span class="th-locked" tabindex="0">Workflow ID</span>
+                  <span class="tip" role="tooltip"
+                    >The visibility store can't order by <b>Workflow ID</b>.
+                    Sorting here would only reorder the 20 rows on this page.
+                    Use <b>Sort all results</b> to load a snapshot and sort
+                    it.</span
+                  >
+                </th>
+                <th data-col="type">
+                  <span class="th-locked" tabindex="0">Type</span>
+                  <span class="tip" role="tooltip"
+                    >The visibility store can't order by <b>Type</b>. Sorting
+                    here would only reorder the 20 rows on this page. Use
+                    <b>Sort all results</b> to load a snapshot and sort
+                    it.</span
+                  >
+                </th>
+                <th data-col="start">
+                  <button class="th-sortable" type="button" data-sort="start">
+                    Start <span class="arrow" id="arrStart">▼</span>
+                  </button>
+                </th>
+                <th data-col="end">
+                  <button class="th-sortable" type="button" data-sort="end">
+                    End <span class="arrow" id="arrEnd"></span>
+                  </button>
+                </th>
+                <th data-col="taskQueue">
+                  <span class="th-locked" tabindex="0">Task queue</span>
+                  <span class="tip" role="tooltip"
+                    >The visibility store can't order by <b>Task queue</b>.
+                    Sorting here would only reorder the 20 rows on this page.
+                    Use <b>Sort all results</b> to load a snapshot and sort
+                    it.</span
+                  >
+                </th>
+              </tr>
+            </thead>
+            <tbody id="liveBody"></tbody>
+          </table>
+        </div>
+
+        <p class="table-note">
+          Only <b>Start</b> and <b>End</b> are sortable here, because those are
+          the only fields this visibility store can order by. Clicking them
+          re-runs the query against the server, so you get the true first page
+          of the whole result set. Every other column would sort just the rows
+          already in your browser — so it isn't offered.
+        </p>
+
+        <div class="list-footer">
+          <span>1–20 of 12,347</span>
+          <span class="token">next_page_token: eyJwYWdlIjoxLCJvIjo</span>
+          <span class="spacer"></span>
+          <button class="btn btn-ghost" type="button" disabled>Previous</button>
+          <button class="btn btn-ghost" type="button">Next</button>
+        </div>
+      </main>
+    </div>
+
+    <div class="scrim" id="scrim"></div>
+
+    <aside
+      class="drawer"
+      id="drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="drawerTitle"
+      aria-hidden="true"
+    >
+      <div class="hatch" aria-hidden="true"></div>
+
+      <div class="drawer-head">
+        <div class="grow">
+          <h2 id="drawerTitle">Sort sandbox</h2>
+          <div class="sub" id="drawerSub">
+            A separate workspace. Nothing you do in here changes the live list
+            or runs another query against the server.
+          </div>
+        </div>
+        <button
+          class="x-btn"
+          type="button"
+          id="closeDrawer"
+          aria-label="Close sort sandbox"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- ===== stage: prepare ===== -->
+      <section class="stage active pad" id="stagePrepare">
+        <div class="card">
+          <p style="margin: 0; line-height: 1.6">
+            The server can only order by <b>Start</b> and <b>End</b>. To sort by
+            anything else — or by more than one column at a time — the rows have
+            to be in your browser first. This pulls a snapshot down so you can
+            sort and filter it locally.
+          </p>
+
+          <dl class="dl">
+            <dt>Query</dt>
+            <dd>
+              <code
+                >StartTime &gt; "2026-08-03T00:00:00Z" AND TaskQueue IN
+                ("default", "payments-tq", "batch-processing")</code
+              >
+            </dd>
+            <dt>Matching workflows</dt>
+            <dd>~12,347</dd>
+            <dt>Will load</dt>
+            <dd>10,000 <span style="color: var(--muted)">(maximum)</span></dd>
+            <dt>Request shape</dt>
+            <dd class="mono">20 pages × 500 rows</dd>
+            <dt>Estimated time</dt>
+            <dd>about 4 seconds</dd>
+          </dl>
+
+          <div class="note-amber">
+            This is a <b>snapshot</b>. It is frozen at the moment it finishes
+            loading, it lives only in this browser tab, and it is discarded when
+            you close the sandbox. Workflows that start, complete, or fail after
+            that point won't appear until you reload it.
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" type="button" id="startLoad">
+              Load 10,000 workflows
+            </button>
+            <button class="btn" type="button" id="cancelPrepare">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== stage: loading ===== -->
+      <section class="stage pad" id="stageLoading">
+        <div class="bar"><i id="progBar"></i></div>
+        <div class="load-meta">
+          <span
+            ><span class="k">Progress</span>
+            <b id="progText">Page 0 of 20 · 0 rows</b></span
+          >
+          <span
+            ><span class="k">Elapsed</span>
+            <b class="mono" id="elapsed">0.0s</b></span
+          >
+        </div>
+
+        <div class="stream" id="stream" aria-live="off"></div>
+
+        <p class="seq-note">
+          Pages are fetched one after another because each response carries the
+          token for the next one. They can't be requested in parallel.
+        </p>
+
+        <div class="actions">
+          <button class="btn" type="button" id="stopLoad">Stop loading</button>
+        </div>
+      </section>
+
+      <!-- ===== stage: snapshot ===== -->
+      <section class="stage" id="stageSnapshot">
+        <div class="snap-bar">
+          <span class="frozen" aria-hidden="true">❙❙</span>
+          <span class="headline" id="snapCount">10,000 of 12,347 matching</span>
+          <span class="age" id="snapAge">captured —</span>
+          <span class="chip-amber">Capped — 2,347 not loaded</span>
+          <span class="spacer"></span>
+          <button class="btn" type="button" id="reloadSnap">Reload</button>
+        </div>
+
+        <div class="filters">
+          <input
+            type="search"
+            id="txtFilter"
+            placeholder="Filter loaded rows…"
+            aria-label="Filter loaded rows"
+          />
+          <div
+            class="facets"
+            id="facets"
+            role="group"
+            aria-label="Status facets"
+          >
+            <button
+              class="facet"
+              type="button"
+              data-status="Running"
+              aria-pressed="false"
+            >
+              Running
+            </button>
+            <button
+              class="facet"
+              type="button"
+              data-status="Completed"
+              aria-pressed="false"
+            >
+              Completed
+            </button>
+            <button
+              class="facet"
+              type="button"
+              data-status="Failed"
+              aria-pressed="false"
+            >
+              Failed
+            </button>
+            <button
+              class="facet"
+              type="button"
+              data-status="TimedOut"
+              aria-pressed="false"
+            >
+              Timed Out
+            </button>
+          </div>
+          <select id="typeFilter" aria-label="Workflow type">
+            <option value="">All types</option>
+          </select>
+          <button class="btn btn-ghost" type="button" id="exportCsv">
+            Export CSV
+          </button>
+        </div>
+
+        <div class="vgrid">
+          <div class="vhead" id="vhead" role="row"></div>
+          <div class="vscroll" id="vscroll">
+            <div class="vspacer" id="vspacer"></div>
+          </div>
+        </div>
+
+        <div class="grid-footer">
+          <span id="gridCount">Showing 0 of 0 loaded</span>
+          <span class="sortdesc" id="sortDesc"></span>
+          <span class="hint"
+            >Shift-click a header to add a tiebreaker (up to 3)</span
+          >
+        </div>
+      </section>
+    </aside>
+
+    <div
+      class="confirm-scrim"
+      id="confirmScrim"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirmTitle"
+    >
+      <div class="confirm">
+        <h3 id="confirmTitle">Discard this snapshot?</h3>
+        <p>
+          These 10,000 rows exist only in this browser tab. Closing the sandbox
+          throws them away, and you'll need to load them again — about 4 seconds
+          — to sort them.
+        </p>
+        <div class="actions">
+          <button class="btn btn-primary" type="button" id="keepSorting">
+            Keep sorting
+          </button>
+          <button class="btn" type="button" id="discardClose">
+            Discard and close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        'use strict';
+
+        /* ---------------- seeded data ---------------- */
+
+        function mulberry32(a) {
+          return function () {
+            a |= 0;
+            a = (a + 0x6d2b79f5) | 0;
+            let t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+
+        const rnd = mulberry32(20260810);
+
+        const TYPES = [
+          'OrderFulfillmentWorkflow',
+          'PaymentProcessingWorkflow',
+          'UserOnboardingWorkflow',
+          'InventorySyncWorkflow',
+          'EmailNotificationWorkflow',
+          'DataExportWorkflow',
+          'SubscriptionRenewalWorkflow',
+          'FraudReviewWorkflow',
+        ];
+        const QUEUES = ['default', 'payments-tq', 'batch-processing'];
+        const STATUS_W = [
+          ['Running', 34],
+          ['Completed', 29],
+          ['Failed', 14],
+          ['TimedOut', 8],
+          ['Canceled', 6],
+          ['Terminated', 5],
+          ['ContinuedAsNew', 4],
+        ];
+        const STATUS_TOTAL = STATUS_W.reduce((s, x) => s + x[1], 0);
+
+        const TOTAL_MATCHING = 12347;
+        const LOAD_CAP = 10000;
+        const PAGE_SIZE = 500;
+        const PAGES = LOAD_CAP / PAGE_SIZE;
+
+        const kebab = (t) =>
+          t
+            .replace(/Workflow$/, '')
+            .replace(/([a-z])([A-Z])/g, '$1-$2')
+            .toLowerCase();
+        const hex = (n) =>
+          Array.from(
+            { length: n },
+            () => '0123456789abcdef'[(rnd() * 16) | 0],
+          ).join('');
+
+        function pickStatus() {
+          let r = rnd() * STATUS_TOTAL;
+          for (const [s, w] of STATUS_W) {
+            r -= w;
+            if (r <= 0) return s;
+          }
+          return 'Running';
+        }
+
+        const NOW = new Date('2026-08-10T14:07:00Z').getTime();
+        const WEEK = 7 * 24 * 3600 * 1000;
+
+        const ALL = new Array(TOTAL_MATCHING);
+        for (let i = 0; i < TOTAL_MATCHING; i++) {
+          const type = TYPES[(rnd() * TYPES.length) | 0];
+          const status = pickStatus();
+          const start = NOW - Math.floor(rnd() * WEEK);
+          const dur = 1000 + Math.floor(rnd() * rnd() * 2 * 3600 * 1000);
+          const end = status === 'Running' ? null : Math.min(NOW, start + dur);
+          ALL[i] = {
+            status,
+            workflowId: kebab(type) + '-' + hex(8),
+            runId:
+              hex(8) +
+              '-' +
+              hex(4) +
+              '-4' +
+              hex(3) +
+              '-a' +
+              hex(3) +
+              '-' +
+              hex(12),
+            type,
+            start,
+            end,
+            taskQueue: QUEUES[(rnd() * QUEUES.length) | 0],
+          };
+        }
+        ALL.sort((a, b) => b.start - a.start);
+
+        const TOKENS = Array.from({ length: PAGES }, () => 'ey' + hex(14));
+
+        /* ---------------- formatting ---------------- */
+
+        const nf = (n) => n.toLocaleString('en-US');
+        const pad = (n) => String(n).padStart(2, '0');
+        function fmtTs(ms) {
+          if (ms == null) return '—';
+          const d = new Date(ms);
+          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        }
+        const esc = (s) =>
+          String(s).replace(
+            /[&<>"]/g,
+            (c) =>
+              ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c],
+          );
+
+        const $ = (id) => document.getElementById(id);
+
+        /* ---------------- live list ---------------- */
+
+        const liveSort = { key: 'start', dir: 'desc' };
+
+        function renderLive() {
+          const rows = ALL.slice()
+            .sort((a, b) => {
+              const k = liveSort.key;
+              const av = a[k],
+                bv = b[k];
+              if (av == null && bv == null) return 0;
+              if (av == null) return 1;
+              if (bv == null) return -1;
+              return liveSort.dir === 'asc' ? av - bv : bv - av;
+            })
+            .slice(0, 20);
+
+          $('liveBody').innerHTML = rows
+            .map(
+              (w) => `
+      <tr>
+        <td><span class="pill s-${w.status}">${w.status}</span></td>
+        <td><span class="wid">${esc(w.workflowId)}</span><span class="rid">${w.runId}</span></td>
+        <td>${w.type}</td>
+        <td class="mono" style="font-size:11.5px">${fmtTs(w.start)}</td>
+        <td class="mono" style="font-size:11.5px">${fmtTs(w.end)}</td>
+        <td>${w.taskQueue}</td>
+      </tr>`,
+            )
+            .join('');
+
+          $('arrStart').textContent =
+            liveSort.key === 'start'
+              ? liveSort.dir === 'asc'
+                ? '▲'
+                : '▼'
+              : '';
+          $('arrEnd').textContent =
+            liveSort.key === 'end' ? (liveSort.dir === 'asc' ? '▲' : '▼') : '';
+        }
+
+        document.querySelectorAll('[data-sort]').forEach((b) => {
+          b.addEventListener('click', () => {
+            const k = b.dataset.sort;
+            if (liveSort.key === k)
+              liveSort.dir = liveSort.dir === 'asc' ? 'desc' : 'asc';
+            else {
+              liveSort.key = k;
+              liveSort.dir = 'desc';
+            }
+            renderLive();
+          });
+        });
+
+        renderLive();
+
+        /* ---------------- drawer plumbing ---------------- */
+
+        const drawer = $('drawer');
+        const scrim = $('scrim');
+        const confirmScrim = $('confirmScrim');
+        let stage = 'prepare';
+        let drawerOpen = false;
+        let lastFocus = null;
+
+        function setStage(next) {
+          stage = next;
+          ['Prepare', 'Loading', 'Snapshot'].forEach((s) => {
+            $('stage' + s).classList.toggle('active', s.toLowerCase() === next);
+          });
+          $('drawerSub').textContent =
+            next === 'snapshot'
+              ? 'You are sorting a snapshot held in this tab. The live list behind this drawer has not changed.'
+              : 'A separate workspace. Nothing you do in here changes the live list or runs another query against the server.';
+        }
+
+        function openDrawer() {
+          lastFocus = document.activeElement;
+          drawerOpen = true;
+          drawer.classList.add('open');
+          drawer.setAttribute('aria-hidden', 'false');
+          scrim.classList.add('open');
+          setStage('prepare');
+          $('startLoad').focus();
+        }
+
+        function closeDrawer() {
+          drawerOpen = false;
+          stopLoading();
+          stopSnapshotClock();
+          drawer.classList.remove('open');
+          drawer.setAttribute('aria-hidden', 'true');
+          scrim.classList.remove('open');
+          setStage('prepare');
+          if (lastFocus) lastFocus.focus();
+        }
+
+        function requestClose() {
+          if (stage === 'snapshot') openConfirm();
+          else closeDrawer();
+        }
+
+        function openConfirm() {
+          confirmScrim.classList.add('open');
+          $('keepSorting').focus();
+        }
+        function closeConfirm() {
+          confirmScrim.classList.remove('open');
+        }
+
+        $('openSandbox').addEventListener('click', openDrawer);
+        $('closeDrawer').addEventListener('click', requestClose);
+        scrim.addEventListener('click', requestClose);
+        $('cancelPrepare').addEventListener('click', closeDrawer);
+        $('keepSorting').addEventListener('click', () => {
+          closeConfirm();
+          $('closeDrawer').focus();
+        });
+        $('discardClose').addEventListener('click', () => {
+          closeConfirm();
+          closeDrawer();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key !== 'Escape') return;
+          if (confirmScrim.classList.contains('open')) {
+            e.preventDefault();
+            closeConfirm();
+            $('closeDrawer').focus();
+            return;
+          }
+          if (drawerOpen) {
+            e.preventDefault();
+            requestClose();
+          }
+        });
+
+        /* ---------------- loading stage ---------------- */
+
+        let loadTimer = null,
+          tickTimer = null,
+          page = 0,
+          t0 = 0;
+
+        function stopLoading() {
+          if (loadTimer) clearInterval(loadTimer);
+          if (tickTimer) clearInterval(tickTimer);
+          loadTimer = tickTimer = null;
+        }
+
+        function startLoading() {
+          setStage('loading');
+          page = 0;
+          t0 = performance.now();
+          $('stream').innerHTML = '';
+          $('progBar').style.width = '0%';
+          $('progText').textContent = 'Page 0 of 20 · 0 rows';
+          $('elapsed').textContent = '0.0s';
+          $('stopLoad').focus();
+
+          tickTimer = setInterval(() => {
+            $('elapsed').textContent =
+              ((performance.now() - t0) / 1000).toFixed(1) + 's';
+          }, 100);
+
+          loadTimer = setInterval(() => {
+            page++;
+            const rows = page * PAGE_SIZE;
+            $('progBar').style.width = (page / PAGES) * 100 + '%';
+            $('progText').textContent =
+              `Page ${page} of ${PAGES} · ${nf(rows)} rows`;
+
+            const last = ALL[rows - 1];
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.innerHTML =
+              `<span class="pg">Page ${page}</span>` +
+              `<span class="tok">${TOKENS[page - 1]}</span>` +
+              `<span class="last">last: ${esc(last.workflowId)} · ${fmtTs(last.start)}</span>`;
+            $('stream').prepend(row);
+            while ($('stream').childElementCount > 14)
+              $('stream').lastElementChild.remove();
+
+            if (page >= PAGES) {
+              stopLoading();
+              capture();
+            }
+          }, 190);
+        }
+
+        $('startLoad').addEventListener('click', startLoading);
+        $('stopLoad').addEventListener('click', () => {
+          stopLoading();
+          setStage('prepare');
+          $('startLoad').focus();
+        });
+        $('reloadSnap').addEventListener('click', () => {
+          stopSnapshotClock();
+          setStage('prepare');
+          $('startLoad').focus();
+        });
+
+        /* ---------------- snapshot ---------------- */
+
+        let loaded = [];
+        let capturedAt = 0;
+        let clockTimer = null;
+
+        function stopSnapshotClock() {
+          if (clockTimer) clearInterval(clockTimer);
+          clockTimer = null;
+        }
+
+        function capture() {
+          loaded = ALL.slice(0, LOAD_CAP);
+          capturedAt = Date.now();
+          sortSpec = [{ key: 'start', dir: 'desc' }];
+          $('txtFilter').value = '';
+          activeStatuses.clear();
+          document
+            .querySelectorAll('.facet')
+            .forEach((f) => f.setAttribute('aria-pressed', 'false'));
+          $('typeFilter').value = '';
+          $('snapCount').textContent =
+            `${nf(LOAD_CAP)} of ${nf(TOTAL_MATCHING)} matching`;
+          setStage('snapshot');
+          updateAge();
+          clockTimer = setInterval(updateAge, 1000);
+          renderHead();
+          applyView();
+          $('txtFilter').focus();
+        }
+
+        function updateAge() {
+          const secs = Math.max(
+            0,
+            Math.round((Date.now() - capturedAt) / 1000),
+          );
+          const time = new Date(capturedAt).toLocaleTimeString('en-US');
+          const ago =
+            secs < 60
+              ? `${secs}s ago`
+              : `${Math.floor(secs / 60)}m ${secs % 60}s ago`;
+          const el = $('snapAge');
+          el.textContent = `captured ${time} · ${ago}`;
+          el.classList.toggle('stale', secs > 120);
+        }
+
+        const COLS = [
+          { key: 'status', label: 'Status', cls: 'c-status', type: 'text' },
+          {
+            key: 'workflowId',
+            label: 'Workflow ID',
+            cls: 'c-id',
+            type: 'text',
+          },
+          { key: 'type', label: 'Type', cls: 'c-type', type: 'text' },
+          { key: 'start', label: 'Start', cls: 'c-start', type: 'time' },
+          { key: 'end', label: 'End', cls: 'c-end', type: 'time' },
+          {
+            key: 'taskQueue',
+            label: 'Task queue',
+            cls: 'c-queue',
+            type: 'text',
+          },
+        ];
+
+        let sortSpec = [{ key: 'start', dir: 'desc' }];
+        const activeStatuses = new Set();
+        let view = [];
+        let sortMs = 0;
+
+        function renderHead() {
+          $('vhead').innerHTML = COLS.map((c) => {
+            const i = sortSpec.findIndex((s) => s.key === c.key);
+            const s = i >= 0 ? sortSpec[i] : null;
+            const arrow = s ? (s.dir === 'asc' ? '▲' : '▼') : '';
+            const ord =
+              sortSpec.length > 1 && i >= 0
+                ? `<span class="ord">${i + 1}</span>`
+                : '';
+            return `<button type="button" class="${c.cls}" data-key="${c.key}">${c.label}<span class="arrow">${arrow}</span>${ord}</button>`;
+          }).join('');
+        }
+
+        $('vhead').addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-key]');
+          if (!btn) return;
+          const key = btn.dataset.key;
+          const col = COLS.find((c) => c.key === key);
+          const defDir = col.type === 'time' ? 'desc' : 'asc';
+          const idx = sortSpec.findIndex((s) => s.key === key);
+
+          if (e.shiftKey) {
+            if (idx >= 0)
+              sortSpec[idx].dir = sortSpec[idx].dir === 'asc' ? 'desc' : 'asc';
+            else if (sortSpec.length < 3) sortSpec.push({ key, dir: defDir });
+          } else if (idx === 0 && sortSpec.length === 1) {
+            sortSpec[0].dir = sortSpec[0].dir === 'asc' ? 'desc' : 'asc';
+          } else {
+            sortSpec = [{ key, dir: defDir }];
+          }
+          renderHead();
+          applyView();
+        });
+
+        function cmpFactory(spec) {
+          const parts = spec.map((s) => {
+            const col = COLS.find((c) => c.key === s.key);
+            const sign = s.dir === 'asc' ? 1 : -1;
+            if (col.type === 'time') {
+              return (a, b) => {
+                const av = a[s.key],
+                  bv = b[s.key];
+                if (av == null && bv == null) return 0;
+                if (av == null) return 1;
+                if (bv == null) return -1;
+                return (av - bv) * sign;
+              };
+            }
+            return (a, b) =>
+              (a[s.key] < b[s.key] ? -1 : a[s.key] > b[s.key] ? 1 : 0) * sign;
+          });
+          return (a, b) => {
+            for (const p of parts) {
+              const r = p(a, b);
+              if (r) return r;
+            }
+            return 0;
+          };
+        }
+
+        function applyView() {
+          const q = $('txtFilter').value.trim().toLowerCase();
+          const type = $('typeFilter').value;
+
+          let rows = loaded;
+          if (q || type || activeStatuses.size) {
+            rows = loaded.filter((w) => {
+              if (activeStatuses.size && !activeStatuses.has(w.status))
+                return false;
+              if (type && w.type !== type) return false;
+              if (
+                q &&
+                !(
+                  w.workflowId.includes(q) ||
+                  w.type.toLowerCase().includes(q) ||
+                  w.taskQueue.includes(q) ||
+                  w.runId.includes(q)
+                )
+              )
+                return false;
+              return true;
+            });
+          } else {
+            rows = loaded.slice();
+          }
+          if (rows === loaded) rows = loaded.slice();
+
+          const t = performance.now();
+          rows.sort(cmpFactory(sortSpec));
+          sortMs = performance.now() - t;
+
+          view = rows;
+          $('vspacer').style.height = view.length * ROW_H + 'px';
+          $('vscroll').scrollTop = 0;
+          renderWindow();
+          renderFooter();
+        }
+
+        const ROW_H = 38;
+        const BUFFER = 6;
+
+        function renderWindow() {
+          const sc = $('vscroll');
+          const spacer = $('vspacer');
+
+          if (!view.length) {
+            spacer.innerHTML = `
+        <div class="vempty">
+          <div>
+            <strong>No loaded workflows match these filters</strong>
+            <p>Clear the text filter, or turn off a status chip, to bring rows back.
+            Filtering happens inside the snapshot — it never hits the server, so nothing
+            here will find workflows that weren't loaded.</p>
+          </div>
+        </div>`;
+            spacer.style.height = Math.max(240, sc.clientHeight) + 'px';
+            return;
+          }
+
+          const top = sc.scrollTop;
+          const count = Math.ceil(sc.clientHeight / ROW_H) + BUFFER * 2;
+          const first = Math.max(0, Math.floor(top / ROW_H) - BUFFER);
+          const last = Math.min(view.length, first + count);
+
+          let html = '';
+          for (let i = first; i < last; i++) {
+            const w = view[i];
+            html +=
+              `<div class="vrow" style="top:${i * ROW_H}px">` +
+              `<span class="c-status"><span class="pill s-${w.status}">${w.status}</span></span>` +
+              `<span class="c-id"><span class="wid">${esc(w.workflowId)}</span><span class="rid">${w.runId.slice(0, 8)}…</span></span>` +
+              `<span class="c-type">${w.type}</span>` +
+              `<span class="c-start num">${fmtTs(w.start)}</span>` +
+              `<span class="c-end num">${fmtTs(w.end)}</span>` +
+              `<span class="c-queue">${w.taskQueue}</span>` +
+              `</div>`;
+          }
+          spacer.innerHTML = html;
+        }
+
+        $('vscroll').addEventListener(
+          'scroll',
+          () => {
+            if (view.length) renderWindow();
+          },
+          { passive: true },
+        );
+
+        function describeSort() {
+          const words = sortSpec.map((s) => {
+            const col = COLS.find((c) => c.key === s.key);
+            if (col.type === 'time')
+              return `${col.label} ${s.dir === 'desc' ? 'newest first' : 'oldest first'}`;
+            return `${col.label} ${s.dir === 'asc' ? 'A→Z' : 'Z→A'}`;
+          });
+          return 'Sorted by ' + words.join(', then ') + '.';
+        }
+
+        function renderFooter() {
+          $('gridCount').textContent =
+            `Showing ${nf(view.length)} of ${nf(loaded.length)} loaded · sorted in ${sortMs < 1 ? '<1' : Math.round(sortMs)}ms`;
+          $('sortDesc').textContent = describeSort();
+        }
+
+        /* filters */
+        $('txtFilter').addEventListener('input', applyView);
+        $('typeFilter').addEventListener('change', applyView);
+        $('facets').addEventListener('click', (e) => {
+          const f = e.target.closest('.facet');
+          if (!f) return;
+          const s = f.dataset.status;
+          const on = f.getAttribute('aria-pressed') === 'true';
+          f.setAttribute('aria-pressed', on ? 'false' : 'true');
+          if (on) activeStatuses.delete(s);
+          else activeStatuses.add(s);
+          applyView();
+        });
+
+        TYPES.forEach((t) => {
+          const o = document.createElement('option');
+          o.value = t;
+          o.textContent = t;
+          $('typeFilter').appendChild(o);
+        });
+
+        /* csv */
+        $('exportCsv').addEventListener('click', () => {
+          const head = 'Status,WorkflowId,RunId,Type,Start,End,TaskQueue';
+          const body = view
+            .map((w) =>
+              [
+                w.status,
+                w.workflowId,
+                w.runId,
+                w.type,
+                fmtTs(w.start),
+                w.end == null ? '' : fmtTs(w.end),
+                w.taskQueue,
+              ].join(','),
+            )
+            .join('\n');
+          const blob = new Blob([head + '\n' + body], {
+            type: 'text/csv;charset=utf-8',
+          });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'workflow-snapshot.csv';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            URL.revokeObjectURL(a.href);
+            a.remove();
+          }, 0);
+        });
+
+        window.addEventListener('resize', () => {
+          if (stage === 'snapshot' && view.length) renderWindow();
+        });
+      })();
+    </script>
+  </body>
+</html>
