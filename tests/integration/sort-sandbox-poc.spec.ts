@@ -40,25 +40,30 @@ test.describe('Sort sandbox POC', () => {
     await entry.click();
     const drawer = page.locator('#workflows-sort-sandbox-drawer');
     await expect(drawer).toBeVisible();
-    await expect(drawer.getByText('20 pages × 500 rows')).toBeVisible();
+    await expect(drawer.getByText('25 pages × 500 rows')).toBeVisible();
+    await expect(
+      drawer.getByText('No filter — this loads the whole namespace'),
+    ).toBeVisible();
     await page.screenshot({ path: `${SHOTS}/3-prepare.png` });
 
     // 3. loading stage
-    await drawer.getByRole('button', { name: /Load 10,000 workflows/ }).click();
-    await expect(drawer.getByText(/Page \d+ of 20/)).toBeVisible();
+    await drawer.getByRole('button', { name: /Load 12,347 workflows/ }).click();
+    await expect(drawer.getByText(/Page \d+ of 25/)).toBeVisible();
     await page.waitForTimeout(1500);
     await page.screenshot({ path: `${SHOTS}/4-loading.png` });
 
     // 4. snapshot stage
-    await expect(drawer.getByText('10,000 of 12,347 matching')).toBeVisible({
-      timeout: 20_000,
+    await expect(drawer.getByText('12,347 of 12,347 matching')).toBeVisible({
+      timeout: 30_000,
     });
-    await expect(drawer.getByText('Capped — 2,347 not loaded')).toBeVisible();
+    // nothing is capped any more — the whole match set is loaded
+    await expect(drawer.getByText(/Capped/)).toBeHidden();
+    await expect(drawer.getByText('complete — nothing skipped')).toBeVisible();
     await expect(
       drawer.getByText('Sorted by Start newest first.'),
     ).toBeVisible();
     await expect(
-      drawer.getByText(/Showing 10,000 of 10,000\s+loaded · sorted in/),
+      drawer.getByText(/Showing 12,347 of 12,347\s+loaded · sorted in/),
     ).toBeVisible();
     await page.screenshot({ path: `${SHOTS}/5-snapshot.png` });
 
@@ -89,7 +94,7 @@ test.describe('Sort sandbox POC', () => {
     // 7. filtering inside the snapshot
     await drawer.getByRole('button', { name: 'Failed', exact: true }).click();
     await expect(
-      drawer.getByText(/Showing 1,\d{3} of 10,000\s+loaded/),
+      drawer.getByText(/Showing 1,\d{3} of 12,347\s+loaded/),
     ).toBeVisible();
     await page.screenshot({ path: `${SHOTS}/7-filtered.png` });
 
@@ -138,16 +143,19 @@ test.describe('Sort sandbox POC', () => {
     await page.getByTestId('workflows-sort-sandbox-button').click();
 
     const drawer = page.locator('#workflows-sort-sandbox-drawer');
-    await expect(drawer.getByText('20 pages × 500 rows')).toBeVisible();
+    await expect(drawer.getByText('25 pages × 500 rows')).toBeVisible();
+    await expect(
+      drawer.getByText('No filter — this loads the whole namespace'),
+    ).toBeVisible();
     await page.waitForTimeout(400);
     await page.screenshot({ path: `${SHOTS}/dark-1-prepare.png` });
 
-    await drawer.getByRole('button', { name: /Load 10,000 workflows/ }).click();
+    await drawer.getByRole('button', { name: /Load 12,347 workflows/ }).click();
     await page.waitForTimeout(1200);
     await page.screenshot({ path: `${SHOTS}/dark-2-loading.png` });
 
-    await expect(drawer.getByText('10,000 of 12,347 matching')).toBeVisible({
-      timeout: 20_000,
+    await expect(drawer.getByText('12,347 of 12,347 matching')).toBeVisible({
+      timeout: 30_000,
     });
     await drawer.getByRole('button', { name: 'Sort by Status' }).click();
     await drawer
@@ -155,8 +163,9 @@ test.describe('Sort sandbox POC', () => {
       .click({ modifiers: ['Shift'] });
     await page.screenshot({ path: `${SHOTS}/dark-3-snapshot.png` });
 
-    // the capped chip must not be dark-on-dark
-    const chip = drawer.getByText('Capped — 2,347 not loaded');
+    // amber-on-dark must stay readable; the warning Alert is the remaining case
+    await drawer.getByRole('button', { name: 'Reload' }).click();
+    const chip = drawer.getByText('No filter — this loads the whole namespace');
     await expect(chip).toBeVisible();
     const contrast = await chip.evaluate((el) => {
       const luminance = (color: string) => {
@@ -199,14 +208,14 @@ test.describe('Sort sandbox POC', () => {
     await expect(drawer.getByText('Matching status is Failed.')).toBeVisible();
 
     // a narrow filter fits under the cap, so nothing is left behind
-    await expect(drawer.getByText('Your filter fits')).toBeVisible();
+    await expect(drawer.getByText('Sorting every match')).toBeVisible();
     const loadButton = drawer.getByRole('button', {
       name: /^Load [\d,]+ workflows$/,
     });
     const label = (await loadButton.textContent()) ?? '';
     const willLoad = Number(label.replace(/\D/g, ''));
     expect(willLoad).toBeGreaterThan(0);
-    expect(willLoad).toBeLessThan(10_000);
+    expect(willLoad).toBeLessThan(12_347);
 
     await loadButton.click();
 

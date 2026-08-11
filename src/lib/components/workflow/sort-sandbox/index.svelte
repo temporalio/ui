@@ -12,7 +12,6 @@
   import {
     getMockPageTokens,
     getMockWorkflows,
-    LOAD_CAP,
     PAGE_DELAY_MS,
     PAGE_SIZE,
     type SandboxWorkflow,
@@ -71,9 +70,10 @@
   const matchingCount = $derived(
     query.trim() ? scopedRows.length : TOTAL_MATCHING,
   );
-  const willLoad = $derived(Math.min(LOAD_CAP, matchingCount));
-  const capped = $derived(matchingCount > LOAD_CAP);
-  const notLoaded = $derived(Math.max(0, matchingCount - LOAD_CAP));
+  // No cap. Everything matching the query gets loaded, and the cost of that is
+  // stated up front rather than hidden behind a truncation the user never asked
+  // for. Filtering is the only lever, which is the honest thing to say.
+  const willLoad = $derived(matchingCount);
   const pageCount = $derived(Math.max(1, Math.ceil(willLoad / PAGE_SIZE)));
   const estimatedSeconds = $derived(
     Math.max(1, Math.round((pageCount * PAGE_DELAY_MS) / 1000)),
@@ -177,7 +177,7 @@
 
   const capture = (workflows: SandboxWorkflow[]) => {
     clearTimers();
-    loadedRows = workflows.slice(0, LOAD_CAP);
+    loadedRows = workflows;
     capturedAt = Date.now();
     nowTick = capturedAt;
     textFilter = '';
@@ -314,13 +314,7 @@ listener never sees Escape pressed inside the snapshot's filter field -->
             <dt class="text-secondary">Will load</dt>
             <dd>
               {willLoad.toLocaleString()}
-              {#if capped}
-                <span class="text-warning"
-                  >— capped, {notLoaded.toLocaleString()} left behind</span
-                >
-              {:else}
-                <span class="text-secondary">— all of them</span>
-              {/if}
+              <span class="text-secondary">— all of them, nothing skipped</span>
             </dd>
 
             <dt class="text-secondary">Request shape</dt>
@@ -334,28 +328,21 @@ listener never sees Escape pressed inside the snapshot's filter field -->
           </dl>
 
           {#if !query.trim()}
-            <Alert intent="info" title="No filters applied" class="mt-6">
-              This will load the {LOAD_CAP.toLocaleString()} most recent workflows
-              out of {TOTAL_MATCHING.toLocaleString()}, and the rest stay
-              behind. Close this, filter the list down to what you actually care
-              about, and reopen — the snapshot will be smaller, faster, and
-              complete.
-            </Alert>
-          {:else if capped}
             <Alert
               intent="warning"
-              title="Your filter is still too broad"
+              title="No filter — this loads the whole namespace"
               class="mt-6"
             >
-              {matchingCount.toLocaleString()} workflows match, and only {LOAD_CAP.toLocaleString()}
-              can be loaded. Sorting will be accurate for what you load, but
-              {notLoaded.toLocaleString()} matching workflows will not be in it. Narrow
-              the filter to get a complete snapshot.
+              All {matchingCount.toLocaleString()} workflows will be loaded, which
+              takes about {estimatedSeconds}s and holds them all in this tab.
+              Nothing is skipped, so the sort will be complete either way —
+              filtering first just makes the wait shorter.
             </Alert>
           {:else}
-            <Alert intent="success" title="Your filter fits" class="mt-6">
-              All {matchingCount.toLocaleString()} matching workflows will be loaded,
-              so the sort covers every row that matches — not just the first page.
+            <Alert intent="success" title="Sorting every match" class="mt-6">
+              All {matchingCount.toLocaleString()} workflows matching your filter
+              will be loaded, so the sort covers every row that matches — not just
+              the first page.
             </Alert>
           {/if}
 
@@ -469,6 +456,7 @@ listener never sees Escape pressed inside the snapshot's filter field -->
           {loadedRows.length.toLocaleString()} of {matchingCount.toLocaleString()}
           matching
         </span>
+        <span class="text-xs text-secondary">complete — nothing skipped</span>
         <span
           class="text-xs {ageSeconds > STALE_AFTER_SECONDS
             ? 'font-medium text-warning'
@@ -476,13 +464,7 @@ listener never sees Escape pressed inside the snapshot's filter field -->
         >
           captured {new Date(capturedAt).toLocaleTimeString()} · {ageLabel}
         </span>
-        {#if capped}
-          <span
-            class="rounded-sm border border-warning bg-warning px-2 py-0.5 text-xs font-medium text-warning"
-          >
-            Capped — {notLoaded.toLocaleString()} not loaded
-          </span>
-        {/if}
+
         <span class="grow"></span>
         <Button size="xs" variant="secondary" onclick={resetToPrepare}>
           Reload

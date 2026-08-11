@@ -24,9 +24,8 @@ export type SandboxWorkflow = {
 };
 
 export const TOTAL_MATCHING = 12347;
-export const LOAD_CAP = 10000;
 export const PAGE_SIZE = 500;
-export const PAGE_COUNT = LOAD_CAP / PAGE_SIZE;
+export const PAGE_COUNT = Math.ceil(TOTAL_MATCHING / PAGE_SIZE);
 
 /**
  * Deliberately not fast. The wait is what teaches "these rows came down to my
