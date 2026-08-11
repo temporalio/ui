@@ -23,6 +23,10 @@ import {
   verifyWorkflowCatalogArtifact,
   verifyWorkflowCatalogProjectBoundaries,
 } from './catalog-artifacts';
+import {
+  runWorkflowCatalogWorkerDevelopment,
+  workflowCatalogWorkerEntry,
+} from './workflow-catalog-cli';
 import { workflowCatalogRegistrationSource as localRegistrationFallback } from '../../src/lib/workflow-catalog/worker/local-registration-fallback';
 import { createWorkflowCatalogRegistry } from '../../src/lib/workflow-catalog/worker/registry';
 import { requireWorkflowCatalogRoutingFromEnvironment } from '../../src/lib/workflow-catalog/worker/routing-config';
@@ -1731,19 +1735,50 @@ registry.registerExample({
     workflowCatalogCommandTestTimeoutMs,
   );
 
+  it('restarts the worker development entry when the modules it loaded change', async () => {
+    const spawned: { args: readonly string[]; command: string }[] = [];
+    const listeners = new Map<string, (value: never) => void>();
+    const development = runWorkflowCatalogWorkerDevelopment((command, args) => {
+      spawned.push({ args, command });
+      return {
+        once: (event: string, listener: (value: never) => void) =>
+          listeners.set(event, listener),
+      } as never;
+    });
+
+    listeners.get('exit')?.(0 as never);
+    await expect(development).resolves.toBeUndefined();
+    expect(spawned).toEqual([
+      {
+        command: 'pnpm',
+        args: [
+          'exec',
+          'esno',
+          '--watch',
+          '--watch-preserve-output',
+          workflowCatalogWorkerEntry,
+        ],
+      },
+    ]);
+  });
+
   it(
-    'exposes a separate workflow catalog worker development command that reports its first preflight failure clearly',
+    'reports the first worker development preflight failure clearly',
     async () => {
       let commandFailure: unknown;
 
       try {
-        await execFileAsync('pnpm', ['workflow-catalog', 'worker'], {
-          env: {
-            ...process.env,
-            TEMPORAL_ADDRESS: '',
-            TEMPORAL_NAMESPACE: '',
+        await execFileAsync(
+          'pnpm',
+          ['exec', 'esno', workflowCatalogWorkerEntry],
+          {
+            env: {
+              ...process.env,
+              TEMPORAL_ADDRESS: '',
+              TEMPORAL_NAMESPACE: '',
+            },
           },
-        });
+        );
       } catch (error) {
         commandFailure = error;
       }
@@ -1764,14 +1799,18 @@ registry.registerExample({
       let commandFailure: unknown;
 
       try {
-        await execFileAsync('pnpm', ['workflow-catalog', 'worker'], {
-          env: {
-            ...process.env,
-            TEMPORAL_ADDRESS: 'localhost:7233',
-            TEMPORAL_NAMESPACE: 'default',
-            WORKFLOW_CATALOG_TARGET_ID: 'missing-target',
+        await execFileAsync(
+          'pnpm',
+          ['exec', 'esno', workflowCatalogWorkerEntry],
+          {
+            env: {
+              ...process.env,
+              TEMPORAL_ADDRESS: 'localhost:7233',
+              TEMPORAL_NAMESPACE: 'default',
+              WORKFLOW_CATALOG_TARGET_ID: 'missing-target',
+            },
           },
-        });
+        );
       } catch (error) {
         commandFailure = error;
       }

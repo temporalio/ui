@@ -35,7 +35,7 @@ pnpm workflow-catalog worker        # terminal 2
 WORKFLOW_CATALOG_TARGET_ID=shared-workflows pnpm workflow-catalog worker
 ```
 
-An unknown id fails in about a second, listing the available targets, without attempting a connection.
+An unknown id fails in about a second, listing the available targets, without attempting a connection. Because the worker runs under Node's watch mode, a runtime preflight failure like this one reports and then waits for a file change instead of exiting the command; stop it with a signal. Stale artifacts still exit right away, because the command verifies them before starting the worker.
 
 **Verified**, including the unknown-id path.
 
@@ -78,6 +78,12 @@ pnpm workflow-catalog scaffold order-lifecycle
 Creates the example and its assemblies, regenerates, and prints where to see it. Saving the example files while `dev` is running regenerates and reloads without a manual step.
 
 **Verified** from a completely empty workspace, including a second scaffold alongside the first, and running the scaffolded workflow to completion.
+
+### Reloading a running worker
+
+Both `dev` and `worker` run the worker entry under Node's watch mode, so it restarts whenever a catalog module it loaded changes. A worker started before an example existed picks that example up on its own.
+
+**Verified** against a live server: scaffolding while the worker ran restarted it, both targets came back, the new workflow ran to completion, and a later edit to its `workflow.ts` restarted the worker again with the new code.
 
 ### Promotion
 

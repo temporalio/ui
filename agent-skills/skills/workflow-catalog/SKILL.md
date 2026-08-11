@@ -38,6 +38,8 @@ pnpm workflow-catalog dev                      # UI plus worker
 pnpm workflow-catalog worker                   # worker only
 ```
 
+Both commands run the worker under Node's watch mode, so it restarts whenever a catalog module it loaded changes. Scaffolding, promoting, demoting, or editing an example reaches the running worker without stopping it.
+
 `promote` and `demote` accept `--dry-run` to preview without moving anything.
 
 ## Find an example
@@ -55,7 +57,7 @@ The generated `src/lib/workflow-catalog/browser/catalog.generated.json` lists ev
 pnpm workflow-catalog scaffold order-lifecycle
 ```
 
-This creates `workflow-catalog.local/examples/order-lifecycle/` with `example.ts` and `workflow.ts`, regenerates artifacts, and prints where to see it. Edit those two files to shape the example. While `pnpm workflow-catalog dev` is running, saving them regenerates the catalog and reloads the browser; there is no manual step.
+This creates `workflow-catalog.local/examples/order-lifecycle/` with `example.ts` and `workflow.ts`, regenerates artifacts, and prints where to see it. Edit those two files to shape the example. Scaffolding while the worker is running restarts it, so the new example is runnable without touching the terminal. Saving the files while `pnpm workflow-catalog dev` is running regenerates the catalog, reloads the browser, and restarts the worker; there is no manual step.
 
 `example.ts` exports `workflowCatalogExample`, which declares the id, title, description, capability tags, expected evidence, input and start-option schemas, and the execution. Registration is validated: unknown fields, empty required strings, and non-serializable values are rejected at generation time with a message naming the example.
 

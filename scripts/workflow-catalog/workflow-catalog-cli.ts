@@ -20,11 +20,46 @@ const isReportedWorkflowCatalogCliError = (error: unknown) => {
   ].some((prefix) => error.message.startsWith(prefix));
 };
 
-const runCatalogDevelopmentEntry = (script: string) =>
+export const workflowCatalogWorkerEntry = 'scripts/workflow-catalog/dev.ts';
+
+/**
+ * Node restarts the worker whenever a module it loaded changes, so scaffolding,
+ * promoting, demoting, or editing an example reaches the running worker.
+ */
+export const workflowCatalogWorkerWatchArguments = [
+  '--watch',
+  '--watch-preserve-output',
+] as const;
+
+type CatalogDevelopmentChild = {
+  once: {
+    (event: 'error', listener: (error: Error) => void): unknown;
+    (event: 'exit', listener: (code: number | null) => void): unknown;
+  };
+};
+
+export type SpawnCatalogDevelopmentProcess = (
+  command: string,
+  args: readonly string[],
+) => CatalogDevelopmentChild;
+
+const spawnCatalogDevelopmentProcess: SpawnCatalogDevelopmentProcess = (
+  command,
+  args,
+) => spawn(command, [...args], { stdio: 'inherit' });
+
+const runCatalogDevelopmentEntry = (
+  script: string,
+  nodeArguments: readonly string[] = [],
+  spawnProcess: SpawnCatalogDevelopmentProcess = spawnCatalogDevelopmentProcess,
+) =>
   new Promise<void>((resolve, reject) => {
-    const child = spawn('pnpm', ['exec', 'esno', script], {
-      stdio: 'inherit',
-    });
+    const child = spawnProcess('pnpm', [
+      'exec',
+      'esno',
+      ...nodeArguments,
+      script,
+    ]);
 
     child.once('error', reject);
     child.once('exit', (code) => {
@@ -34,15 +69,25 @@ const runCatalogDevelopmentEntry = (script: string) =>
     });
   });
 
+export const runWorkflowCatalogWorkerDevelopment = (
+  spawnProcess?: SpawnCatalogDevelopmentProcess,
+) =>
+  runCatalogDevelopmentEntry(
+    workflowCatalogWorkerEntry,
+    workflowCatalogWorkerWatchArguments,
+    spawnProcess,
+  );
+
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   const arguments_ = process.argv.slice(2);
+  const authoring = createUiWorkflowCatalogAuthoring();
 
   try {
     await runWorkflowCatalogCli({
-      authoring: createUiWorkflowCatalogAuthoring(),
+      authoring,
       argv: arguments_,
       io: {
         writeError: (message) => console.error(message),
@@ -50,8 +95,10 @@ if (
       },
       dev: () =>
         runCatalogDevelopmentEntry('scripts/workflow-catalog/dev-with-ui.ts'),
-      worker: () =>
-        runCatalogDevelopmentEntry('scripts/workflow-catalog/dev.ts'),
+      worker: async () => {
+        await authoring.verify();
+        await runWorkflowCatalogWorkerDevelopment();
+      },
     });
   } catch (error) {
     if (!isReportedWorkflowCatalogCliError(error)) {
