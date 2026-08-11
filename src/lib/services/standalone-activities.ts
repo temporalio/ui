@@ -29,6 +29,7 @@ import {
   encodePayloads,
   setSearchAttributes,
 } from '$lib/utilities/encode-payload';
+import { isEmptyObject } from '$lib/utilities/is';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
   type ErrorCallback,
