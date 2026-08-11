@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  localWorkflowCatalogSourceFiles,
   verifyLocalWorkflowCatalogAssemblies,
   writeLocalWorkflowCatalogAssemblies,
 } from './local-assemblies';
@@ -141,6 +142,32 @@ describe('local workflow catalog assemblies', () => {
     );
     expect(workflows).toContain('./examples/alpha-workflow/workflow.js');
     expect(workflows).not.toContain('zeta-activity');
+    // A module namespace object is rejected by the registry, which requires
+    // plain enumerable data properties, so the barrel must be spread.
+    expect(registration).toContain('workflowExports: { ...workflows }');
+  });
+
+  it('declares only authored files as sources, so a first example generates before its assemblies exist', () => {
+    const sourceFiles = localWorkflowCatalogSourceFiles([
+      {
+        id: 'alpha',
+        sourceFiles: [
+          'workflow-catalog.local/examples/alpha/example.ts',
+          'workflow-catalog.local/examples/alpha/workflow.ts',
+        ],
+      },
+      {
+        id: 'beta',
+        sourceFiles: ['workflow-catalog.local/examples/alpha/example.ts'],
+      },
+    ]);
+
+    expect(sourceFiles).toEqual([
+      'workflow-catalog.local/examples/alpha/example.ts',
+      'workflow-catalog.local/examples/alpha/workflow.ts',
+    ]);
+    expect(sourceFiles).not.toContain('workflow-catalog.local/registration.ts');
+    expect(sourceFiles).not.toContain('workflow-catalog.local/workflows.ts');
   });
 
   it('removes generated local outputs after the last authored example leaves', async () => {

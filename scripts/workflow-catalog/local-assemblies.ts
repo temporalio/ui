@@ -131,6 +131,15 @@ const readLocalExamples = async (
   return examples;
 };
 
+/**
+ * Authored files only. The generated assemblies (registration.ts and
+ * workflows.ts) are outputs, not sources; declaring them here would require
+ * them to exist before the first example could be generated.
+ */
+export const localWorkflowCatalogSourceFiles = (
+  examples: readonly LocalExample[],
+): string[] => [...new Set(examples.flatMap(({ sourceFiles }) => sourceFiles))];
+
 export const renderLocalWorkflowCatalogAssemblies = async (
   rootDirectory: string,
 ) => {
@@ -156,8 +165,7 @@ export const renderLocalWorkflowCatalogAssemblies = async (
         `    registry.registerExample({ ...example${index}, targetId: 'local-workflows' });`,
     )
     .join('\n');
-  const sourceFiles = examples
-    .flatMap(({ sourceFiles: files }) => files)
+  const sourceFiles = localWorkflowCatalogSourceFiles(examples)
     .map((path) => `    '${path}',`)
     .join('\n');
   const registration = `${generatedHeader}${registrationImports}
@@ -167,8 +175,6 @@ import * as workflows from './workflows.js';
 export const workflowCatalogRegistrationSource: WorkflowCatalogRegistrationSource = {
   source: { id: 'local', label: 'Local' },
   sourceFiles: [
-    'workflow-catalog.local/registration.ts',
-    'workflow-catalog.local/workflows.ts',
 ${sourceFiles}
   ],
   register: (registry) => {
@@ -177,7 +183,7 @@ ${sourceFiles}
       namespace: 'default',
       taskQueue: 'ui-workflow-catalog-local',
       workflowsPath: new URL('./workflows.ts', import.meta.url).href,
-      workflowExports: workflows,
+      workflowExports: { ...workflows },
     });
 ${registrations}
   },
@@ -230,11 +236,7 @@ export const loadLocalWorkflowCatalogRegistrationSource = async (
   );
   return {
     source: { id: 'local', label: 'Local' },
-    sourceFiles: [
-      'workflow-catalog.local/registration.ts',
-      'workflow-catalog.local/workflows.ts',
-      ...new Set(examples.flatMap(({ sourceFiles }) => sourceFiles)),
-    ],
+    sourceFiles: localWorkflowCatalogSourceFiles(examples),
     register: (registry) => {
       registry.registerTarget({
         id: 'local-workflows',
