@@ -38,6 +38,7 @@ import {
   makeActivityTimedOut,
   makeActivityTimeoutGroup,
   makeChildWorkflowGroup,
+  makeLocalActivityMarker,
   makeNexusOperationGroup,
   makeSyntheticEvents,
   makeSyntheticEventsWithWorkflowTasks,
@@ -566,6 +567,52 @@ describe('setFailedEvent', () => {
     setFailedEvent(null);
     loadAll(events);
     expect(getGroupCount()).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10b. Marker billable-action dedup
+//
+// Several markers can share one workflow task, which bills once. The cursors
+// exist only to fetch in parallel, so which one delivered a marker must not
+// change the total.
+// ---------------------------------------------------------------------------
+
+describe('marker billable actions', () => {
+  const totalBillableActions = () =>
+    getEventArray().reduce(
+      (sum, event) => sum + (event.billableActions ?? 0),
+      0,
+    );
+
+  // IDs 11-13, all emitted by the workflow task completed at event 10.
+  const markers = [11, 12, 13].map((id) => makeLocalActivityMarker(id, 10));
+
+  it('bills one workflow task once on the ascending cursor', () => {
+    reset(20);
+    for (const marker of markers) processEvent(marker, true);
+    expect(totalBillableActions()).toBe(1);
+  });
+
+  it('bills one workflow task once on the descending cursor', () => {
+    reset(20);
+    for (const marker of markers.toReversed()) processEvent(marker, false);
+    expect(totalBillableActions()).toBe(1);
+  });
+
+  it('bills one workflow task once when the cursors split its markers', () => {
+    reset(20);
+    processEvent(markers[2], false);
+    processEvent(markers[0], true);
+    processEvent(markers[1], true);
+    expect(totalBillableActions()).toBe(1);
+  });
+
+  it('bills distinct workflow tasks separately', () => {
+    reset(20);
+    processEvent(makeLocalActivityMarker(11, 10), true);
+    processEvent(makeLocalActivityMarker(13, 12), false);
+    expect(totalBillableActions()).toBe(2);
   });
 });
 
