@@ -148,6 +148,27 @@ describe('workflow catalog scaffolding', () => {
     ).resolves.toContain('./examples/order-lifecycle/example.js');
   });
 
+  it('shows authors the optional setup instructions field without rendering an empty card', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+
+    await scaffoldDirectoryWorkflowCatalog({
+      exampleId: 'order-lifecycle',
+      rootDirectory,
+    });
+
+    const example = await readFile(
+      join(
+        rootDirectory,
+        'workflow-catalog.local/examples/order-lifecycle/example.ts',
+      ),
+      'utf8',
+    );
+
+    expect(example).toContain('setupMarkdown');
+    expect(example).toMatch(/\/\/\s*setupMarkdown:/);
+    expect(example).not.toMatch(/^\s{2}setupMarkdown:/m);
+  });
+
   it('rejects a legacy flat overlay before creating an authored directory', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const localDirectory = join(rootDirectory, 'workflow-catalog.local');

@@ -124,6 +124,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
+  import { launchOutcomeExplanation } from './launch-outcome-presentation';
   import { createReadinessLoader } from './readiness-loader';
   import { terminalStatusPresentation } from './session-presentation';
   import {
@@ -457,9 +458,15 @@
                         >{status.label}</Badge
                       >
                     {:else}
+                      {@const explanation =
+                        launchOutcomeExplanation(session.outcome) ??
+                        session.error}
                       <Badge type="subtle" class="px-1.5 py-0 text-xs leading-5"
                         >{sessionStateLabels[session.state]}</Badge
                       >
+                      {#if explanation}
+                        <p class="mt-1 text-xs text-secondary">{explanation}</p>
+                      {/if}
                     {/if}
                   </td>
                   <td>

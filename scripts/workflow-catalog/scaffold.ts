@@ -99,6 +99,9 @@ export const workflowCatalogRegistrationSource: WorkflowCatalogRegistrationSourc
         expectedEvidence: [
           'One completed activity and a completed workflow result.',
         ],
+        // Optional. Markdown shown in a Setup card on the example page, for
+        // manual steps the catalog cannot check for you. Uncomment to use it.
+        // setupMarkdown: 'Create the \`orders\` namespace before running this example.',
         input: {
           defaultValue: ['ping'],
           schema: {
@@ -213,6 +216,9 @@ export const workflowCatalogExample = {
   description: 'Runs a local workflow example.',
   capabilityTags: ['terminal-outcome'],
   expectedEvidence: ['A completed workflow result.'],
+  // Optional. Markdown shown in a Setup card on the example page, for manual
+  // steps the catalog cannot check for you. Uncomment to use it.
+  // setupMarkdown: 'Create the \`orders\` namespace before running this example.',
   input: { defaultValue: ['ping'], schema: { type: 'array' } },
   startOptions: { defaultValue: {}, schema: { type: 'object' } },
   execution: {

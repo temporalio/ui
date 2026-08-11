@@ -254,6 +254,40 @@ describe('WorkflowCatalogDetail', () => {
     expect(withSetup).toContain('Run `make setup` first.');
   });
 
+  it('explains why a run was rejected instead of only saying it failed', async () => {
+    const rejectingHost: WorkbenchHost = {
+      start: vi.fn(async (command) => ({
+        status: 'rejected' as const,
+        reason: 'not-found' as const,
+        reference: {
+          exampleId: command.exampleId,
+          kind: descriptor.execution.kind,
+          attempt: command.attempt,
+          target: descriptor.execution,
+        },
+      })),
+      checkReadiness: vi.fn(async () => []),
+      observe: vi.fn(),
+      evidenceLink: vi.fn(),
+    };
+    const sessionStore = createWorkflowCatalogSessionStore(rejectingHost, {
+      createId: () => 'attempt-1',
+    });
+
+    await sessionStore.start({
+      descriptor,
+      input: descriptor.input.defaultValue,
+      startOptions: descriptor.startOptions.defaultValue,
+    });
+    const { body } = renderComponent(catalogDetail, {
+      props: { descriptor, host: rejectingHost, sessionStore },
+    });
+
+    expect(body).toContain('Start failed');
+    expect(body).toContain('This server does not support that execution');
+    expect(body).not.toContain('not-found');
+  });
+
   it('presents no polling worker as advisory without disabling Run', () => {
     const sessionStore = createWorkflowCatalogSessionStore(host);
     const { body } = renderComponent(catalogDetail, {

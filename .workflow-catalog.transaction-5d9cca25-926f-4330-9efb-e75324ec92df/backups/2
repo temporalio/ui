@@ -1,0 +1,40 @@
+{
+  "sourceHash": "7b195b3eec1018a42b0d890ff62fcee4e797b69de0e737863f4d76ea614abc56",
+  "descriptors": [
+    {
+      "id": "local-echo",
+      "title": "Local echo",
+      "description": "Runs a locally registered activity and echoes the message back.",
+      "capabilityTags": ["activities", "terminal-outcome"],
+      "expectedEvidence": [
+        "One completed activity and a completed workflow result."
+      ],
+      "input": {
+        "defaultValue": ["ping"],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            { "title": "Message", "type": "string", "minLength": 1 }
+          ],
+          "items": false,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "local-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-workflow-catalog-local",
+        "workflowType": "localEcho"
+      },
+      "source": { "id": "local", "label": "Local" }
+    }
+  ]
+}
