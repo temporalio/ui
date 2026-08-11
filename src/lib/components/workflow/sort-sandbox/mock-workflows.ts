@@ -23,9 +23,17 @@ export type SandboxWorkflow = {
   taskQueue: string;
 };
 
-export const TOTAL_MATCHING = 12347;
+/** Headline namespace size. The sandbox really does load this many. */
+export const TOTAL_MATCHING = 12_000_000;
+
+/**
+ * The live list is paginated, so it only ever needs enough rows to page
+ * through. Generating 12M objects here would OOM the tab — that is the whole
+ * reason the sandbox uses a columnar store instead.
+ */
+export const LIVE_TABLE_ROWS = 20_000;
 export const PAGE_SIZE = 500;
-export const PAGE_COUNT = Math.ceil(TOTAL_MATCHING / PAGE_SIZE);
+export const PAGE_COUNT = Math.ceil(LIVE_TABLE_ROWS / PAGE_SIZE);
 
 /**
  * Deliberately not fast. The wait is what teaches "these rows came down to my
@@ -99,9 +107,9 @@ const generate = () => {
   };
 
   const now = Date.now();
-  const workflows: SandboxWorkflow[] = new Array(TOTAL_MATCHING);
+  const workflows: SandboxWorkflow[] = new Array(LIVE_TABLE_ROWS);
 
-  for (let i = 0; i < TOTAL_MATCHING; i++) {
+  for (let i = 0; i < LIVE_TABLE_ROWS; i++) {
     const type = WORKFLOW_TYPES[Math.floor(random() * WORKFLOW_TYPES.length)];
     const status = pickStatus();
     const startTime = now - Math.floor(random() * WEEK_MS);

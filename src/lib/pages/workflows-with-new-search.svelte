@@ -143,8 +143,13 @@
 
   // POC: keep the header count consistent with the mocked table
   const useMockWorkflows = $derived(isMockLiveTableEnabled(page.url));
+  const mockRowsOverride = $derived(
+    Number(page.url.searchParams.get('rows')) || undefined,
+  );
   const displayCount = $derived(
-    useMockWorkflows ? mockCountForQuery(query) : $workflowCount.count,
+    useMockWorkflows
+      ? mockCountForQuery(query, mockRowsOverride)
+      : $workflowCount.count,
   );
 
   let batchTerminateConfirmationModalOpen = $state(false);
@@ -296,4 +301,8 @@
   type={translate('common.columns')}
   title={translate('common.workflows-table')}
 />
-<SortSandboxDrawer bind:open={sortSandboxOpen} {query} />
+<SortSandboxDrawer
+  bind:open={sortSandboxOpen}
+  {query}
+  totalRows={mockRowsOverride}
+/>

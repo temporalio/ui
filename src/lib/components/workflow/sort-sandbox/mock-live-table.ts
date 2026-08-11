@@ -15,7 +15,7 @@ import {
   type SandboxWorkflow,
   TOTAL_MATCHING,
 } from './mock-workflows';
-import { filterByQuery } from './query-filter';
+import { estimateMatching, filterByQuery } from './query-filter';
 
 export const MOCK_PARAM = 'mock';
 
@@ -57,10 +57,12 @@ const toWorkflowExecution = (
     workflowExtendedInfo: {},
   }) as WorkflowExecution;
 
-export const mockCountForQuery = (query: string): number =>
-  query.trim()
-    ? filterByQuery(getMockWorkflows(), query).length
-    : TOTAL_MATCHING;
+// Counting is a cheap server call; loading is not. The list reports the real
+// namespace-scale count even though it only pages through a small mock set.
+export const mockCountForQuery = (
+  query: string,
+  total = TOTAL_MATCHING,
+): number => estimateMatching(query, total);
 
 export const mockPaginatedWorkflows = async (
   namespace: string,

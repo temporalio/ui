@@ -19,11 +19,26 @@ export type SortKey =
 
 export type SortTerm = { key: SortKey; direction: SortDirection };
 
+export type QueryPredicate = {
+  field: 'ExecutionStatus' | 'WorkflowType' | 'TaskQueue';
+  operator: '=' | '!=';
+  value: string;
+};
+
 export type LoadProgress = {
   loaded: number;
+  scanned: number;
   total: number;
   elapsedMs: number;
 };
+
+/**
+ * Svelte 5 reactive values are Proxies, and postMessage cannot structured-clone
+ * a Proxy. Everything crossing into the worker gets flattened here so no caller
+ * has to remember.
+ */
+const plain = <T extends Record<string, unknown>>(items: T[]): T[] =>
+  items.map((item) => ({ ...item }));
 
 type Pending = {
   resolve: (value: unknown) => void;
@@ -69,24 +84,30 @@ export class SnapshotClient {
   load(
     rows: number,
     rowsPerSecond: number,
+    predicates: QueryPredicate[],
     onProgress: (progress: LoadProgress) => void,
   ) {
     return this.send<{ count: number; bytes: number; elapsedMs: number }>(
-      { type: 'load', rows, rowsPerSecond },
+      {
+        type: 'load',
+        rows,
+        rowsPerSecond,
+        predicates: plain(predicates),
+      },
       onProgress,
     );
   }
 
   sort(terms: SortTerm[]) {
-    return this.send<{ ms: number }>({ type: 'sort', terms });
+    return this.send<{ ms: number }>({ type: 'sort', terms: plain(terms) });
   }
 
   filter(text: string, statuses: string[], workflowType: string) {
     return this.send<{ count: number; ms: number }>({
       type: 'filter',
-      text,
-      statuses,
-      workflowType,
+      text: String(text),
+      statuses: statuses.map(String),
+      workflowType: String(workflowType),
     });
   }
 

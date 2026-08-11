@@ -1,6 +1,10 @@
 <script lang="ts" module>
   const ROW_HEIGHT = 38;
-  const BUFFER_ROWS = 6;
+
+  // Browsers clamp element height near 33.5M px. At 38px a spacer sized to
+  // content stops scrolling around 880k rows and then renders nothing, so the
+  // scroll range is compressed and mapped onto the row range instead.
+  const MAX_SPACER_PX = 12_000_000;
 
   const STATUS_COLORS: Record<string, string> = {
     Running: 'bg-blue-300',
@@ -17,7 +21,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import type { SandboxWorkflow } from './mock-workflows';
+  import type { DisplayRow } from './columnar/store';
   import {
     GRID_MIN_WIDTH,
     SANDBOX_COLUMNS,
@@ -26,52 +30,62 @@
   } from './sorting';
 
   interface Props {
-    rows: SandboxWorkflow[];
+    rows: DisplayRow[];
+    windowOffset: number;
+    total: number;
     sortTerms: SortTerm[];
+    sorting?: boolean;
     onSort: (key: SortKey, additive: boolean) => void;
+    onWindowChange: (start: number, size: number) => void;
     formatTime: (value: number | null) => string;
   }
 
-  let { rows, sortTerms, onSort, formatTime }: Props = $props();
+  let {
+    rows,
+    windowOffset,
+    total,
+    sortTerms,
+    sorting = false,
+    onSort,
+    onWindowChange,
+    formatTime,
+  }: Props = $props();
 
   let scroller = $state<HTMLDivElement>();
   let headerScroller = $state<HTMLDivElement>();
   let scrollTop = $state(0);
   let viewportHeight = $state(600);
 
-  const firstIndex = $derived(
-    Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - BUFFER_ROWS),
-  );
-  const lastIndex = $derived(
-    Math.min(
-      rows.length,
-      firstIndex + Math.ceil(viewportHeight / ROW_HEIGHT) + BUFFER_ROWS * 2,
-    ),
-  );
-
-  const windowedRows = $derived(
-    rows.slice(firstIndex, lastIndex).map((workflow, offset) => ({
-      workflow,
-      index: firstIndex + offset,
-    })),
-  );
+  const totalPx = $derived(total * ROW_HEIGHT);
+  const spacerPx = $derived(Math.min(totalPx, MAX_SPACER_PX));
+  const scale = $derived(totalPx / Math.max(1, spacerPx));
 
   const sortIndexFor = (key: SortKey) =>
     sortTerms.findIndex((term) => term.key === key);
 
+  const requestWindow = () => {
+    const size = Math.ceil(viewportHeight / ROW_HEIGHT) + 4;
+    const virtualTop = scrollTop * scale;
+    const start = Math.min(
+      Math.max(0, Math.floor(virtualTop / ROW_HEIGHT)),
+      Math.max(0, total - size),
+    );
+    onWindowChange(start, size);
+  };
+
   const handleScroll = () => {
     if (!scroller) return;
     scrollTop = scroller.scrollTop;
-    // header lives outside the scroll container so the rows can be windowed,
-    // so its horizontal offset has to be mirrored by hand
     if (headerScroller) headerScroller.scrollLeft = scroller.scrollLeft;
+    requestWindow();
   };
 
-  // jump back to the top whenever the result set changes out from under us
   $effect(() => {
-    void rows;
+    void total;
+    void viewportHeight;
     if (scroller) scroller.scrollTop = 0;
     scrollTop = 0;
+    requestWindow();
   });
 </script>
 
@@ -117,10 +131,19 @@
   <div
     bind:this={scroller}
     bind:clientHeight={viewportHeight}
-    class="min-h-0 flex-1 overflow-auto"
+    class="relative min-h-0 flex-1 overflow-auto"
     onscroll={handleScroll}
+    data-testid="snapshot-grid"
   >
-    {#if rows.length === 0}
+    {#if sorting}
+      <div
+        class="absolute inset-0 z-10 flex items-start justify-center pt-10 text-sm text-secondary"
+      >
+        Sorting…
+      </div>
+    {/if}
+
+    {#if total === 0}
       <EmptyState title="No loaded workflows match these filters" icon="search">
         <p class="max-w-prose text-center text-sm text-secondary">
           Clear the text filter, or turn off a status chip, to bring rows back.
@@ -131,49 +154,53 @@
     {:else}
       <div
         class="relative"
-        style="height: {rows.length *
-          ROW_HEIGHT}px; min-width: {GRID_MIN_WIDTH}px"
+        style="height: {spacerPx}px; min-width: {GRID_MIN_WIDTH}px"
+        class:opacity-40={sorting}
       >
-        {#each windowedRows as { workflow, index } (workflow.runId)}
-          <div
-            class="absolute inset-x-0 flex items-center border-b border-subtle text-xs"
-            style="top: {index * ROW_HEIGHT}px; height: {ROW_HEIGHT}px"
-            role="row"
-          >
-            <span class="shrink-0 px-3" style="width: 120px">
-              <span
-                class="inline-block rounded-sm px-1 py-0.5 text-xs font-medium text-black {STATUS_COLORS[
-                  workflow.status
-                ]}"
-              >
-                {workflow.status}
+        <!-- the rendered window rides with the viewport: past ~880k rows a true
+        absolute offset no longer exists once the scroll range is compressed -->
+        <div class="absolute inset-x-0" style="top: {scrollTop}px">
+          {#each rows as row (row.runId)}
+            <div
+              class="flex items-center border-b border-subtle text-xs"
+              style="height: {ROW_HEIGHT}px"
+              role="row"
+            >
+              <span class="shrink-0 px-3" style="width: 120px">
+                <span
+                  class="inline-block rounded-sm px-1 py-0.5 text-xs font-medium text-black {STATUS_COLORS[
+                    row.status
+                  ] ?? 'bg-slate-100'}"
+                >
+                  {row.status}
+                </span>
               </span>
-            </span>
-            <span
-              class="flex shrink-0 items-baseline gap-2 overflow-hidden px-3"
-              style="width: 260px"
-            >
-              <span class="truncate">{workflow.workflowId}</span>
-              <span class="shrink-0 text-[10px] text-subtle"
-                >{workflow.runId.slice(0, 8)}…</span
+              <span
+                class="flex shrink-0 items-baseline gap-2 overflow-hidden px-3"
+                style="width: 260px"
               >
-            </span>
-            <span class="shrink-0 truncate px-3" style="width: 200px"
-              >{workflow.type}</span
-            >
-            <span
-              class="shrink-0 truncate px-3 tabular-nums"
-              style="width: 160px">{formatTime(workflow.startTime)}</span
-            >
-            <span
-              class="shrink-0 truncate px-3 tabular-nums text-secondary"
-              style="width: 160px">{formatTime(workflow.endTime)}</span
-            >
-            <span class="shrink-0 truncate px-3" style="width: 140px"
-              >{workflow.taskQueue}</span
-            >
-          </div>
-        {/each}
+                <span class="truncate">{row.workflowId}</span>
+                <span class="shrink-0 text-[10px] text-subtle"
+                  >{row.runId.slice(0, 8)}…</span
+                >
+              </span>
+              <span class="shrink-0 truncate px-3" style="width: 200px"
+                >{row.type}</span
+              >
+              <span
+                class="shrink-0 truncate px-3 tabular-nums"
+                style="width: 160px">{formatTime(row.startTime)}</span
+              >
+              <span
+                class="shrink-0 truncate px-3 tabular-nums text-secondary"
+                style="width: 160px">{formatTime(row.endTime)}</span
+              >
+              <span class="shrink-0 truncate px-3" style="width: 140px"
+                >{row.taskQueue}</span
+              >
+            </div>
+          {/each}
+        </div>
       </div>
     {/if}
   </div>

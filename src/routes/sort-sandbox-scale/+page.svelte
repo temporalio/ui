@@ -21,7 +21,12 @@
   let client: SnapshotClient | null = null;
 
   let phase = $state<'idle' | 'loading' | 'ready'>('idle');
-  let progress = $state<LoadProgress>({ loaded: 0, total: 0, elapsedMs: 0 });
+  let progress = $state<LoadProgress>({
+    loaded: 0,
+    scanned: 0,
+    total: 0,
+    elapsedMs: 0,
+  });
   let loadedCount = $state(0);
   let storeBytes = $state(0);
   let loadMs = $state(0);
@@ -94,7 +99,7 @@
     sortMs = null;
     filterMs = null;
 
-    const result = await client.load(rowCount, ROWS_PER_SECOND, (p) => {
+    const result = await client.load(rowCount, ROWS_PER_SECOND, [], (p) => {
       progress = p;
     });
 
@@ -238,7 +243,7 @@
         <!-- the rendered window rides with the viewport rather than sitting at
         its true offset, which no longer exists once the range is compressed -->
         <div class="absolute inset-x-0" style="top: {scrollTop}px">
-          {#each rows as row, i (windowOffset + i)}
+          {#each rows as row (row.runId)}
             <div
               class="flex items-center gap-4 border-b border-subtle px-3 text-xs"
               style="height: {ROW_HEIGHT}px"

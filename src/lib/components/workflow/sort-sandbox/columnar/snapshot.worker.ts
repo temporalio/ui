@@ -35,8 +35,20 @@ type SortKey =
 
 type SortTerm = { key: SortKey; direction: SortDirection };
 
+type QueryPredicate = {
+  field: 'ExecutionStatus' | 'WorkflowType' | 'TaskQueue';
+  operator: '=' | '!=';
+  value: string;
+};
+
 type Request =
-  | { id: number; type: 'load'; rows: number; rowsPerSecond: number }
+  | {
+      id: number;
+      type: 'load';
+      rows: number;
+      rowsPerSecond: number;
+      predicates: QueryPredicate[];
+    }
   | { id: number; type: 'sort'; terms: SortTerm[] }
   | {
       id: number;
@@ -106,7 +118,12 @@ const hexOf = (value: number, length: number) => {
  * and the load can be paced to the throughput a sharded fetch actually
  * achieves. The wait is the honest part of this feature, not an artifact.
  */
-const load = async (rows: number, rowsPerSecond: number, id: number) => {
+const load = async (
+  rows: number,
+  rowsPerSecond: number,
+  predicates: QueryPredicate[],
+  id: number,
+) => {
   const cols = allocate(rows);
   columns = cols;
   const rowOrder = new Uint32Array(rows);
@@ -117,14 +134,26 @@ const load = async (rows: number, rowsPerSecond: number, id: number) => {
   for (const name of WORKFLOW_TYPES) intern(cols.typeNames, name);
   for (const name of TASK_QUEUES) intern(cols.queueNames, name);
 
+  // The query is applied while generating, so a filtered snapshot really is
+  // smaller and faster rather than being trimmed after paying for everything.
+  const statusFilter = predicates.filter((p) => p.field === 'ExecutionStatus');
+  const typeFilter = predicates.filter((p) => p.field === 'WorkflowType');
+  const queueFilter = predicates.filter((p) => p.field === 'TaskQueue');
+
+  const passes = (filters: QueryPredicate[], value: string): boolean =>
+    filters.every((p) =>
+      p.operator === '=' ? value === p.value : value !== p.value,
+    );
+
   const now = Date.now();
   const CHUNK = 50_000;
   const startedAt = performance.now();
   let written = 0;
+  let scanned = 0;
 
-  while (written < rows) {
-    const limit = Math.min(written + CHUNK, rows);
-    for (let i = written; i < limit; i++) {
+  while (scanned < rows) {
+    const limit = Math.min(scanned + CHUNK, rows);
+    for (let i = scanned; i < limit; i++) {
       const h1 = hash32(i);
       const h2 = hash32(i ^ 0x9e3779b9);
       const h3 = hash32(i + 0x7f4a7c15);
@@ -140,37 +169,48 @@ const load = async (rows: number, rowsPerSecond: number, id: number) => {
         }
       }
 
+      const queueIndex = h2 % TASK_QUEUES.length;
+
+      if (
+        !passes(statusFilter, STATUSES[statusIndex][0]) ||
+        !passes(typeFilter, WORKFLOW_TYPES[typeIndex]) ||
+        !passes(queueFilter, TASK_QUEUES[queueIndex])
+      ) {
+        continue;
+      }
+
+      const slot = written++;
       const startTime = now - ((h1 >>> 2) % WINDOW_MS);
-      cols.status[i] = statusIndex;
-      cols.type[i] = typeIndex;
-      cols.queue[i] = h2 % TASK_QUEUES.length;
-      cols.start[i] = startTime;
-      cols.end[i] =
+      cols.status[slot] = statusIndex;
+      cols.type[slot] = typeIndex;
+      cols.queue[slot] = queueIndex;
+      cols.start[slot] = startTime;
+      cols.end[slot] =
         statusIndex === 0
           ? 0
           : Math.min(now, startTime + 1000 + (h2 % 7_200_000));
 
       writePacked(
         cols.workflowId,
-        i,
+        slot,
         ID_WIDTH,
         `${PREFIXES[typeIndex]}-${hexOf(h1, 8)}${hexOf(h2, 4)}`,
       );
       writePacked(
         cols.runId,
-        i,
+        slot,
         RUN_WIDTH,
         `${hexOf(h1, 8)}-${hexOf(h2, 4)}-4${hexOf(h2 >>> 4, 3)}-a${hexOf(h3, 3)}-${hexOf(h3, 8)}${hexOf(i, 4)}`,
       );
 
-      rowOrder[i] = i;
+      rowOrder[slot] = slot;
     }
-    written = limit;
+    scanned = limit;
     cols.count = written;
 
     // pace to the measured sharded-fetch throughput so the wait reflects what
     // pulling this many rows actually costs
-    const targetMs = (written / rowsPerSecond) * 1000;
+    const targetMs = (scanned / rowsPerSecond) * 1000;
     const elapsed = performance.now() - startedAt;
     if (elapsed < targetMs) {
       await new Promise((resolve) =>
@@ -182,12 +222,13 @@ const load = async (rows: number, rowsPerSecond: number, id: number) => {
       id,
       type: 'progress',
       loaded: written,
+      scanned,
       total: rows,
       elapsedMs: performance.now() - startedAt,
     });
   }
 
-  view = rowOrder.slice();
+  view = rowOrder.slice(0, written);
   post({
     id,
     type: 'loaded',
@@ -317,7 +358,12 @@ const window_ = (offset: number, limit: number, id: number) => {
 self.onmessage = (event: MessageEvent<Request>) => {
   const request = event.data;
   if (request.type === 'load') {
-    void load(request.rows, request.rowsPerSecond, request.id);
+    void load(
+      request.rows,
+      request.rowsPerSecond,
+      request.predicates ?? [],
+      request.id,
+    );
   } else if (request.type === 'sort') {
     sort(request.terms, request.id);
   } else if (request.type === 'filter') {

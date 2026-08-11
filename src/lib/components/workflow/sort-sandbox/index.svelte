@@ -10,22 +10,23 @@
   import SimpleSelect from '$lib/holocene/select/simple-select.svelte';
 
   import {
-    getMockPageTokens,
-    getMockWorkflows,
-    PAGE_DELAY_MS,
-    PAGE_SIZE,
-    type SandboxWorkflow,
-    TOTAL_MATCHING,
-    WORKFLOW_TYPES,
-  } from './mock-workflows';
-  import { describeQuery, filterByQuery, parseQuery } from './query-filter';
+    type LoadProgress,
+    SnapshotClient,
+    type SortTerm,
+  } from './columnar/client';
+  import type { DisplayRow } from './columnar/store';
+  import { PAGE_SIZE, TOTAL_MATCHING, WORKFLOW_TYPES } from './mock-workflows';
   import {
-    comparatorFor,
+    describeQuery,
+    estimateMatching,
+    parseQuery,
+    workerPredicates,
+  } from './query-filter';
+  import {
     describeSort,
     MAX_SORT_TERMS,
     nextSort,
     type SortKey,
-    type SortTerm,
   } from './sorting';
 
   import SnapshotGrid from './snapshot-grid.svelte';
@@ -33,15 +34,21 @@
   interface Props {
     open: boolean;
     query?: string;
+    totalRows?: number;
   }
 
-  let { open = $bindable(), query = '' }: Props = $props();
+  let { open = $bindable(), query = '', totalRows }: Props = $props();
+
+  // Demo lever: ?rows= on the workflows URL sets the namespace size.
+  const namespaceSize = $derived(totalRows ?? TOTAL_MATCHING);
 
   type Stage = 'prepare' | 'loading' | 'snapshot';
   type LoadedPage = { page: number; token: string; lastRow: string };
 
   const FACET_STATUSES = ['Running', 'Completed', 'Failed', 'TimedOut'];
   const STALE_AFTER_SECONDS = 120;
+  const ROWS_PER_SECOND = 301_000;
+  const SHARD_ROWS = 500_000;
 
   let stage = $state<Stage>('prepare');
   let confirmOpen = $state(false);
@@ -50,7 +57,15 @@
   let pagesFetched = $state(0);
   let elapsedMs = $state(0);
 
-  let loadedRows = $state<SandboxWorkflow[]>([]);
+  // The snapshot lives in a worker as columnar typed arrays. The main thread
+  // holds only the window it is rendering, which is what makes millions of
+  // rows possible at all — the same data as objects is ~560 B/row.
+  let client: SnapshotClient | null = null;
+  let loadedCount = $state(0);
+  let storeBytes = $state(0);
+  let visibleCount = $state(0);
+  let sortMs = $state(0);
+  let filterMs = $state(0);
   let capturedAt = $state(0);
   let nowTick = $state(Date.now());
 
@@ -66,17 +81,17 @@
   // The sandbox loads the query the user is already looking at. Filtering
   // first is the cheapest way to make the snapshot smaller, so the prepare
   // stage is built to make that obvious.
-  const scopedRows = $derived(filterByQuery(getMockWorkflows(), query));
-  const matchingCount = $derived(
-    query.trim() ? scopedRows.length : TOTAL_MATCHING,
-  );
+  const predicates = $derived(workerPredicates(query));
+  const matchingCount = $derived(estimateMatching(query, namespaceSize));
   // No cap. Everything matching the query gets loaded, and the cost of that is
   // stated up front rather than hidden behind a truncation the user never asked
   // for. Filtering is the only lever, which is the honest thing to say.
   const willLoad = $derived(matchingCount);
   const pageCount = $derived(Math.max(1, Math.ceil(willLoad / PAGE_SIZE)));
+  // Measured: a sharded parallel pull sustains ~301k rows/s at the browser's
+  // real limit of 6 connections. The estimate and the wait both use it.
   const estimatedSeconds = $derived(
-    Math.max(1, Math.round((pageCount * PAGE_DELAY_MS) / 1000)),
+    Math.max(1, Math.round(willLoad / ROWS_PER_SECOND)),
   );
   const unsupportedTerms = $derived(parseQuery(query).unsupportedTerms);
   const queryLabel = $derived(query.trim() || 'No filters applied');
@@ -97,26 +112,12 @@
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   };
 
-  const view = $derived.by(() => {
-    const needle = textFilter.trim().toLowerCase();
-    const rows = loadedRows.filter((workflow) => {
-      if (activeStatuses.size && !activeStatuses.has(workflow.status)) {
-        return false;
-      }
-      if (typeFilter && workflow.type !== typeFilter) return false;
-      if (!needle) return true;
-      return (
-        workflow.workflowId.includes(needle) ||
-        workflow.runId.includes(needle) ||
-        workflow.type.toLowerCase().includes(needle) ||
-        workflow.taskQueue.includes(needle)
-      );
-    });
-
-    const started = performance.now();
-    rows.sort(comparatorFor(sortTerms));
-    return { rows, durationMs: performance.now() - started };
-  });
+  let rows = $state<DisplayRow[]>([]);
+  let windowOffset = $state(0);
+  let windowSeq = 0;
+  let windowStart = $state(0);
+  let windowSize = $state(40);
+  let sorting = $state(false);
 
   const ageSeconds = $derived(
     capturedAt ? Math.max(0, Math.round((nowTick - capturedAt) / 1000)) : 0,
@@ -137,47 +138,74 @@
 
   const resetToPrepare = () => {
     clearTimers();
+    client?.dispose();
+    client = null;
+    rows = [];
+    loadedCount = 0;
+    visibleCount = 0;
     stage = 'prepare';
     loadedPages = [];
     pagesFetched = 0;
     elapsedMs = 0;
   };
 
-  const startLoading = () => {
-    const workflows = scopedRows;
-    const tokens = getMockPageTokens();
-    capturedQuery = query;
+  const refreshWindow = async () => {
+    if (!client || stage !== 'snapshot') return;
+    const seq = ++windowSeq;
+    const result = await client.window(windowStart, windowSize);
+    if (seq !== windowSeq) return;
+    windowOffset = result.offset;
+    rows = result.rows;
+  };
 
+  const applyFilters = async () => {
+    if (!client) return;
+    const result = await client.filter(
+      textFilter,
+      [...activeStatuses],
+      typeFilter,
+    );
+    filterMs = result.ms;
+    visibleCount = result.count;
+    windowStart = 0;
+    await refreshWindow();
+  };
+
+  const startLoading = async () => {
+    client?.dispose();
+    client = new SnapshotClient();
+    capturedQuery = query;
     stage = 'loading';
     loadedPages = [];
     pagesFetched = 0;
     elapsedMs = 0;
 
-    const startedAt = performance.now();
-    elapsedTimer = setInterval(() => {
-      elapsedMs = performance.now() - startedAt;
-    }, 100);
+    const result = await client.load(
+      namespaceSize,
+      ROWS_PER_SECOND,
+      predicates,
+      (progress) => {
+        elapsedMs = progress.elapsedMs;
+        pagesFetched = Math.ceil(progress.loaded / PAGE_SIZE);
+        loadedCount = progress.loaded;
+        const shard = Math.ceil(progress.scanned / SHARD_ROWS);
+        loadedPages = [
+          {
+            page: shard,
+            token: `ey${(progress.scanned >>> 0).toString(16).padStart(10, '0')}`,
+            lastRow: `${progress.loaded.toLocaleString()} rows kept · ${Math.round(
+              progress.loaded / Math.max(0.001, progress.elapsedMs / 1000),
+            ).toLocaleString()}/s`,
+          },
+          ...loadedPages,
+        ].slice(0, 14);
+      },
+    );
 
-    pageTimer = setInterval(() => {
-      pagesFetched += 1;
-      const lastRow =
-        workflows[Math.min(pagesFetched * PAGE_SIZE, workflows.length) - 1];
-      loadedPages = [
-        {
-          page: pagesFetched,
-          token: tokens[pagesFetched - 1],
-          lastRow: `${lastRow.workflowId} · ${formatTime(lastRow.startTime)}`,
-        },
-        ...loadedPages,
-      ].slice(0, 14);
+    if (stage !== 'loading') return; // stopped while in flight
 
-      if (pagesFetched >= pageCount) capture(workflows);
-    }, PAGE_DELAY_MS);
-  };
-
-  const capture = (workflows: SandboxWorkflow[]) => {
-    clearTimers();
-    loadedRows = workflows;
+    loadedCount = result.count;
+    storeBytes = result.bytes;
     capturedAt = Date.now();
     nowTick = capturedAt;
     textFilter = '';
@@ -186,22 +214,37 @@
     sortTerms = [{ key: 'startTime', direction: 'desc' }];
     stage = 'snapshot';
     ageTimer = setInterval(() => (nowTick = Date.now()), 1000);
+
+    const sorted = await client.sort(sortTerms);
+    sortMs = sorted.ms;
+    await applyFilters();
   };
 
-  const handleSort = (key: SortKey, additive: boolean) => {
+  const handleSort = async (key: SortKey, additive: boolean) => {
     sortTerms = nextSort(sortTerms, key, additive);
+    if (!client) return;
+    sorting = true;
+    const sorted = await client.sort(sortTerms);
+    sortMs = sorted.ms;
+    await applyFilters();
+    sorting = false;
   };
 
-  const toggleStatus = (status: string) => {
+  const toggleStatus = async (status: string) => {
     if (activeStatuses.has(status)) activeStatuses.delete(status);
     else activeStatuses.add(status);
+    await applyFilters();
   };
 
   const closeDrawer = () => {
     clearTimers();
+    client?.dispose();
+    client = null;
     confirmOpen = false;
     stage = 'prepare';
-    loadedRows = [];
+    loadedCount = 0;
+    visibleCount = 0;
+    rows = [];
     loadedPages = [];
     open = false;
   };
@@ -222,9 +265,14 @@
     requestClose();
   };
 
-  const exportCsv = () => {
+  const exportCsv = async () => {
+    if (!client) return;
+    // pull the visible set out of the worker in one window rather than keeping
+    // a second copy on the main thread
+    const exported = await client.window(0, Math.min(visibleCount, 50_000));
+    const exportRows = exported.rows;
     const header = 'Status,WorkflowId,RunId,Type,Start,End,TaskQueue';
-    const body = view.rows
+    const body = exportRows
       .map((workflow) =>
         [
           workflow.status,
@@ -453,7 +501,7 @@ listener never sees Escape pressed inside the snapshot's filter field -->
           <Icon name="pause" />
         </span>
         <span class="font-medium">
-          {loadedRows.length.toLocaleString()} of {matchingCount.toLocaleString()}
+          {loadedCount.toLocaleString()} of {matchingCount.toLocaleString()}
           matching
         </span>
         <span class="text-xs text-secondary">complete — nothing skipped</span>
@@ -537,7 +585,15 @@ listener never sees Escape pressed inside the snapshot's filter field -->
 
       <div class="flex min-h-0 flex-1 flex-col px-6 pt-4">
         <SnapshotGrid
-          rows={view.rows}
+          {rows}
+          {windowOffset}
+          {sorting}
+          total={visibleCount}
+          onWindowChange={(start: number, size: number) => {
+            windowStart = start;
+            windowSize = size;
+            void refreshWindow();
+          }}
           {sortTerms}
           onSort={handleSort}
           {formatTime}
@@ -548,10 +604,10 @@ listener never sees Escape pressed inside the snapshot's filter field -->
         class="flex shrink-0 flex-wrap items-center gap-4 px-6 py-3 text-xs text-secondary"
       >
         <span>
-          Showing {view.rows.length.toLocaleString()} of {loadedRows.length.toLocaleString()}
-          loaded · sorted in {view.durationMs < 1
-            ? '<1'
-            : Math.round(view.durationMs)}ms
+          Showing {visibleCount.toLocaleString()} of {loadedCount.toLocaleString()}
+          loaded · sorted in {Math.round(sortMs).toLocaleString()}ms · filtered
+          in
+          {Math.round(filterMs)}ms · {(storeBytes / 1048576).toFixed(0)} MB
         </span>
         <span>{describeSort(sortTerms)}</span>
         <span class="ml-auto">
@@ -574,9 +630,9 @@ listener never sees Escape pressed inside the snapshot's filter field -->
     {/snippet}
     {#snippet content()}
       <p class="text-sm">
-        These {loadedRows.length.toLocaleString()} rows exist only in this browser
-        tab. Nothing is cached, so closing throws them away and coming back means
-        loading all {willLoad.toLocaleString()} again — about {estimatedSeconds}s.
+        These {loadedCount.toLocaleString()} rows exist only in this browser tab.
+        Nothing is cached, so closing throws them away and coming back means loading
+        all {willLoad.toLocaleString()} again — about {estimatedSeconds}s.
       </p>
       <p class="mt-3 text-sm text-secondary">
         Your sort and filters inside the sandbox are discarded too. The list
