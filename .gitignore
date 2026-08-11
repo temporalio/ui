@@ -37,3 +37,7 @@ go.work.sum
 
 /workflow-catalog.local/
 /.env.workflow-catalog.local
+/.workflow-catalog.lock
+/.workflow-catalog.lock.recovery
+/.workflow-catalog.journal.json
+/.workflow-catalog.transaction-*/
