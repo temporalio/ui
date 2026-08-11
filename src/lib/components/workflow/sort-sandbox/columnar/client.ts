@@ -27,8 +27,38 @@ export type QueryPredicate = {
 
 export type LoadProgress = {
   loaded: number;
-  scanned: number;
   total: number;
+  shardsDone: number;
+  shardCount: number;
+  requests: number;
+  throttled: number;
+  wireBytes: number;
+  elapsedMs: number;
+};
+
+export type ShardDone = {
+  index: number;
+  of: number;
+  rows: number;
+  from: string;
+  to: string;
+  elapsedMs: number;
+};
+
+export type LoadPlan = {
+  shards: number;
+  matching: number;
+  requests: number;
+  elapsedMs: number;
+};
+
+export type LoadResult = {
+  count: number;
+  bytes: number;
+  requests: number;
+  throttled: number;
+  wireBytes: number;
+  shards: number;
   elapsedMs: number;
 };
 
@@ -43,6 +73,8 @@ const plain = <T extends Record<string, unknown>>(items: T[]): T[] =>
 type Pending = {
   resolve: (value: unknown) => void;
   onProgress?: (progress: LoadProgress) => void;
+  onPlan?: (plan: LoadPlan) => void;
+  onShard?: (shard: ShardDone) => void;
 };
 
 export class SnapshotClient {
@@ -61,6 +93,14 @@ export class SnapshotClient {
         entry.onProgress?.(event.data);
         return;
       }
+      if (type === 'planned') {
+        entry.onPlan?.(event.data);
+        return;
+      }
+      if (type === 'shard') {
+        entry.onShard?.(event.data);
+        return;
+      }
 
       this.pending.delete(id);
       entry.resolve(event.data);
@@ -70,12 +110,16 @@ export class SnapshotClient {
   private send<T>(
     message: Record<string, unknown>,
     onProgress?: (progress: LoadProgress) => void,
+    onPlan?: (plan: LoadPlan) => void,
+    onShard?: (shard: ShardDone) => void,
   ): Promise<T> {
     const id = this.nextId++;
     return new Promise<T>((resolve) => {
       this.pending.set(id, {
         resolve: resolve as (value: unknown) => void,
         onProgress,
+        onPlan,
+        onShard,
       });
       this.worker.postMessage({ ...message, id });
     });
@@ -83,18 +127,16 @@ export class SnapshotClient {
 
   load(
     rows: number,
-    rowsPerSecond: number,
-    predicates: QueryPredicate[],
+    query: string,
     onProgress: (progress: LoadProgress) => void,
+    onPlan: (plan: LoadPlan) => void,
+    onShard: (shard: ShardDone) => void,
   ) {
-    return this.send<{ count: number; bytes: number; elapsedMs: number }>(
-      {
-        type: 'load',
-        rows,
-        rowsPerSecond,
-        predicates: plain(predicates),
-      },
+    return this.send<LoadResult>(
+      { type: 'load', rows, query: String(query) },
       onProgress,
+      onPlan,
+      onShard,
     );
   }
 

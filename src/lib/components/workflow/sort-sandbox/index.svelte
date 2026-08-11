@@ -118,6 +118,13 @@
   let windowStart = $state(0);
   let windowSize = $state(40);
   let sorting = $state(false);
+  let shardCount = $state(0);
+  let shardsDone = $state(0);
+  let requestCount = $state(0);
+  let throttled = $state(0);
+  let wireBytes = $state(0);
+  let planMs = $state(0);
+  let planRequests = $state(0);
 
   const ageSeconds = $derived(
     capturedAt ? Math.max(0, Math.round((nowTick - capturedAt) / 1000)) : 0,
@@ -179,23 +186,46 @@
     loadedPages = [];
     pagesFetched = 0;
     elapsedMs = 0;
+    shardCount = 0;
+    shardsDone = 0;
+    requestCount = 0;
+    throttled = 0;
+    wireBytes = 0;
+    loadedCount = 0;
 
     const result = await client.load(
       namespaceSize,
-      ROWS_PER_SECOND,
-      predicates,
+      query,
       (progress) => {
         elapsedMs = progress.elapsedMs;
-        pagesFetched = Math.ceil(progress.loaded / PAGE_SIZE);
         loadedCount = progress.loaded;
-        const shard = Math.ceil(progress.scanned / SHARD_ROWS);
+        shardsDone = progress.shardsDone;
+        shardCount = progress.shardCount;
+        requestCount = progress.requests;
+        throttled = progress.throttled;
+        wireBytes = progress.wireBytes;
+        pagesFetched = Math.ceil(progress.loaded / PAGE_SIZE);
+      },
+      (plan) => {
+        shardCount = plan.shards;
+        planMs = plan.elapsedMs;
+        planRequests = plan.requests;
         loadedPages = [
           {
-            page: shard,
-            token: `ey${(progress.scanned >>> 0).toString(16).padStart(10, '0')}`,
-            lastRow: `${progress.loaded.toLocaleString()} rows kept · ${Math.round(
-              progress.loaded / Math.max(0.001, progress.elapsedMs / 1000),
-            ).toLocaleString()}/s`,
+            page: 0,
+            token: `${plan.shards} shards`,
+            lastRow: `planned from ${plan.requests} count calls in ${Math.round(plan.elapsedMs)}ms`,
+          },
+        ];
+      },
+      (shard) => {
+        loadedPages = [
+          {
+            page: shard.index,
+            token: `${shard.rows.toLocaleString()} rows`,
+            lastRow: `${shard.from.slice(0, 16).replace('T', ' ')} → ${shard.to
+              .slice(0, 16)
+              .replace('T', ' ')}`,
           },
           ...loadedPages,
         ].slice(0, 14);
@@ -205,7 +235,16 @@
     if (stage !== 'loading') return; // stopped while in flight
 
     loadedCount = result.count;
+    // everything is visible until the first filter runs; without this the
+    // footer reads "Showing 0" for the moment the opening sort is in flight
+    visibleCount = result.count;
     storeBytes = result.bytes;
+    requestCount = result.requests;
+    throttled = result.throttled;
+    wireBytes = result.wireBytes;
+    shardCount = result.shards;
+    shardsDone = result.shards;
+    elapsedMs = result.elapsedMs;
     capturedAt = Date.now();
     nowTick = capturedAt;
     textFilter = '';
@@ -435,18 +474,38 @@ listener never sees Escape pressed inside the snapshot's filter field -->
           >
             <div
               class="surface-interactive h-full transition-all duration-150"
-              style="width: {(pagesFetched / pageCount) * 100}%"
+              style="width: {Math.min(
+                100,
+                (loadedCount / Math.max(1, willLoad)) * 100,
+              )}%"
             ></div>
           </div>
 
           <div class="mt-3 flex flex-wrap gap-6 text-sm">
             <span>
-              <span class="text-secondary">Progress</span>
+              <span class="text-secondary">Rows</span>
               <strong>
-                Page {pagesFetched} of {pageCount} · {Math.min(
-                  pagesFetched * PAGE_SIZE,
-                  willLoad,
-                ).toLocaleString()} rows
+                {loadedCount.toLocaleString()} of {willLoad.toLocaleString()}
+              </strong>
+            </span>
+            <span>
+              <span class="text-secondary">Shards</span>
+              <strong>{shardsDone} / {shardCount}</strong>
+              <span class="text-secondary">· 6 in parallel</span>
+            </span>
+            <span>
+              <span class="text-secondary">Requests</span>
+              <strong>{requestCount.toLocaleString()}</strong>
+              {#if throttled}
+                <span class="text-warning">· {throttled} throttled</span>
+              {/if}
+            </span>
+            <span>
+              <span class="text-secondary">Rate</span>
+              <strong class="tabular-nums">
+                {Math.round(
+                  loadedCount / Math.max(0.001, elapsedMs / 1000),
+                ).toLocaleString()}/s
               </strong>
             </span>
             <span>
@@ -464,9 +523,11 @@ listener never sees Escape pressed inside the snapshot's filter field -->
               <div
                 class="flex items-baseline gap-3 border-b border-subtle px-3 py-2 text-xs"
               >
-                <span class="w-16 shrink-0 font-medium"
-                  >Page {loadedPage.page}</span
-                >
+                <span class="w-24 shrink-0 font-medium">
+                  {loadedPage.page === 0
+                    ? 'Plan'
+                    : `Shard ${loadedPage.page}/${shardCount}`}
+                </span>
                 <span class="shrink-0 font-mono text-information">
                   {loadedPage.token}
                 </span>
@@ -478,8 +539,10 @@ listener never sees Escape pressed inside the snapshot's filter field -->
           </div>
 
           <p class="mt-3 max-w-prose text-xs text-secondary">
-            Pages are fetched one after another because each response carries
-            the token for the next one. They cannot be requested in parallel.
+            One query is a single token chain and cannot be parallelised, so the
+            range is split into shards by count, each with its own chain. Six
+            run at a time — the most a browser will open to one origin over
+            HTTP/1.1.
           </p>
 
           <div class="mt-6">

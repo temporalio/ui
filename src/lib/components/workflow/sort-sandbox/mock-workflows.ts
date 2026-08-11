@@ -32,7 +32,8 @@ export const TOTAL_MATCHING = 12_000_000;
  * reason the sandbox uses a columnar store instead.
  */
 export const LIVE_TABLE_ROWS = 20_000;
-export const PAGE_SIZE = 500;
+/** What the server actually clamps to — measured against a real frontend. */
+export const PAGE_SIZE = 1000;
 export const PAGE_COUNT = Math.ceil(LIVE_TABLE_ROWS / PAGE_SIZE);
 
 /**

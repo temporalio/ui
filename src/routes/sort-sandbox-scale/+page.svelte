@@ -7,9 +7,6 @@
   import type { DisplayRow } from '$lib/components/workflow/sort-sandbox/columnar/store';
   import Button from '$lib/holocene/button.svelte';
 
-  // Measured: a sharded parallel pull sustains ~301k rows/s at the browser's
-  // real concurrency limit of 6. Pacing the load to that keeps the wait honest.
-  const ROWS_PER_SECOND = 301_000;
   const ROW_HEIGHT = 34;
   // Browsers clamp element height near 33.5M px. 12M rows at 34px would need
   // 408M px, so past ~980k rows a spacer-sized-to-content silently stops
@@ -23,10 +20,15 @@
   let phase = $state<'idle' | 'loading' | 'ready'>('idle');
   let progress = $state<LoadProgress>({
     loaded: 0,
-    scanned: 0,
     total: 0,
+    shardsDone: 0,
+    shardCount: 0,
+    requests: 0,
+    throttled: 0,
+    wireBytes: 0,
     elapsedMs: 0,
   });
+  let shardCount = $state(0);
   let loadedCount = $state(0);
   let storeBytes = $state(0);
   let loadMs = $state(0);
@@ -99,9 +101,17 @@
     sortMs = null;
     filterMs = null;
 
-    const result = await client.load(rowCount, ROWS_PER_SECOND, [], (p) => {
-      progress = p;
-    });
+    const result = await client.load(
+      rowCount,
+      '',
+      (p) => {
+        progress = p;
+      },
+      (plan) => {
+        shardCount = plan.shards;
+      },
+      () => {},
+    );
 
     loadedCount = result.count;
     storeBytes = result.bytes;
@@ -189,7 +199,8 @@
         ></div>
       </div>
       <p class="mt-2 text-sm tabular-nums">
-        {n(progress.loaded)} / {n(progress.total)} ·
+        {n(progress.loaded)} / {n(progress.total)} · shard {progress.shardsDone}/{shardCount}
+        · {n(progress.requests)} requests ·
         {(progress.elapsedMs / 1000).toFixed(1)}s
       </p>
     </div>
@@ -243,7 +254,7 @@
         <!-- the rendered window rides with the viewport rather than sitting at
         its true offset, which no longer exists once the range is compressed -->
         <div class="absolute inset-x-0" style="top: {scrollTop}px">
-          {#each rows as row (row.runId)}
+          {#each rows as row}
             <div
               class="flex items-center gap-4 border-b border-subtle px-3 text-xs"
               style="height: {ROW_HEIGHT}px"

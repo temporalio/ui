@@ -18,6 +18,8 @@
 </script>
 
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
@@ -80,12 +82,17 @@
     requestWindow();
   };
 
+  // Reset to the top whenever the result set or viewport changes. The body is
+  // untracked because it both reads and writes scrollTop, and an effect that
+  // depends on what it writes re-runs forever and pegs the main thread.
   $effect(() => {
     void total;
-    void viewportHeight;
-    if (scroller) scroller.scrollTop = 0;
-    scrollTop = 0;
-    requestWindow();
+    const height = viewportHeight;
+    untrack(() => {
+      if (scroller) scroller.scrollTop = 0;
+      scrollTop = 0;
+      onWindowChange(0, Math.ceil(height / ROW_HEIGHT) + 4);
+    });
   });
 </script>
 
@@ -160,7 +167,7 @@
         <!-- the rendered window rides with the viewport: past ~880k rows a true
         absolute offset no longer exists once the scroll range is compressed -->
         <div class="absolute inset-x-0" style="top: {scrollTop}px">
-          {#each rows as row (row.runId)}
+          {#each rows as row}
             <div
               class="flex items-center border-b border-subtle text-xs"
               style="height: {ROW_HEIGHT}px"

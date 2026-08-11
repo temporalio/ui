@@ -42,13 +42,7 @@ type QueryPredicate = {
 };
 
 type Request =
-  | {
-      id: number;
-      type: 'load';
-      rows: number;
-      rowsPerSecond: number;
-      predicates: QueryPredicate[];
-    }
+  | { id: number; type: 'load'; rows: number; query: string }
   | { id: number; type: 'sort'; terms: SortTerm[] }
   | {
       id: number;
@@ -113,120 +107,240 @@ const hexOf = (value: number, length: number) => {
   return out;
 };
 
+const BASE = '/mock-visibility/namespaces/default';
+const PAGE_SIZE = 1000; // the server clamps to this anyway
+const CONCURRENCY = 6; // browsers allow 6 connections per origin on HTTP/1.1
+const SHARD_TARGET = 60_000;
+
+const iso = (ms: number) => new Date(ms).toISOString();
+const rangeClause = (lo: number, hi: number) =>
+  `StartTime >= "${iso(lo)}" AND StartTime < "${iso(hi)}"`;
+
+let requestCount = 0;
+let throttledCount = 0;
+let wireBytes = 0;
+
+const getJson = async (url: string): Promise<Record<string, never>> => {
+  for (let attempt = 0; ; attempt++) {
+    requestCount++;
+    const response = await fetch(url);
+    const text = await response.text();
+    wireBytes += text.length;
+
+    if (response.status === 429) {
+      // a client that ignores ResourceExhausted is not a client, it is an outage
+      throttledCount++;
+      const backoff = Math.min(2000, 25 * 2 ** attempt) * (0.5 + Math.random());
+      await new Promise((resolve) => setTimeout(resolve, backoff));
+      continue;
+    }
+    if (!response.ok) throw new Error(text.slice(0, 200));
+    return JSON.parse(text);
+  }
+};
+
+const countFor = async (total: number, query: string) => {
+  const params = new URLSearchParams({ total: String(total) });
+  if (query) params.set('query', query);
+  const body = await getJson(`${BASE}/workflow-count?${params}`);
+  return Number((body as { count?: string }).count ?? 0);
+};
+
+type Shard = { lo: number; hi: number; rows: number };
+
 /**
- * Fills the store in chunks, yielding between them so progress can be reported
- * and the load can be paced to the throughput a sharded fetch actually
- * achieves. The wait is the honest part of this feature, not an artifact.
+ * Start times are lumpy, so an even split of time is not an even split of rows.
+ * Count calls are cheap and paging is not, so bisect on counts.
  */
-const load = async (
+const planShards = async (
+  total: number,
+  baseQuery: string,
+  lo: number,
+  hi: number,
   rows: number,
-  rowsPerSecond: number,
-  predicates: QueryPredicate[],
-  id: number,
+  shards: Shard[],
+  depth = 0,
 ) => {
-  const cols = allocate(rows);
+  if (rows <= SHARD_TARGET || depth > 24 || hi - lo <= 2) {
+    if (rows > 0) shards.push({ lo, hi, rows });
+    return;
+  }
+  const mid = Math.floor((lo + hi) / 2);
+  const left = await countFor(
+    total,
+    [baseQuery, rangeClause(lo, mid)].filter(Boolean).join(' AND '),
+  );
+  await planShards(total, baseQuery, lo, mid, left, shards, depth + 1);
+  await planShards(total, baseQuery, mid, hi, rows - left, shards, depth + 1);
+};
+
+/** Re-assigns dictionary ids in alphabetical order and rewrites the column. */
+const normalizeDictionary = (
+  names: string[],
+  column: Uint8Array,
+  count: number,
+) => {
+  const ranked = names
+    .map((name, id) => ({ name, id }))
+    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+
+  const remap = new Uint8Array(Math.max(1, names.length));
+  ranked.forEach((entry, rank) => {
+    remap[entry.id] = rank;
+  });
+  for (let i = 0; i < count; i++) column[i] = remap[column[i]];
+
+  names.length = 0;
+  for (const entry of ranked) names.push(entry.name);
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  WORKFLOW_EXECUTION_STATUS_RUNNING: 'Running',
+  WORKFLOW_EXECUTION_STATUS_COMPLETED: 'Completed',
+  WORKFLOW_EXECUTION_STATUS_FAILED: 'Failed',
+  WORKFLOW_EXECUTION_STATUS_TIMED_OUT: 'TimedOut',
+  WORKFLOW_EXECUTION_STATUS_CANCELED: 'Canceled',
+  WORKFLOW_EXECUTION_STATUS_TERMINATED: 'Terminated',
+  WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW: 'ContinuedAsNew',
+};
+
+/**
+ * Pulls every matching row over HTTP, sharded so the token chains run in
+ * parallel, writing each page straight into the columns and dropping the JSON.
+ * Peak memory tracks page size x workers rather than total rows, so the object
+ * array that would OOM the tab never exists at any point.
+ */
+const load = async (total: number, baseQuery: string, id: number) => {
+  requestCount = 0;
+  throttledCount = 0;
+  wireBytes = 0;
+  const startedAt = performance.now();
+
+  const matching = await countFor(total, baseQuery);
+  const capacity = Math.ceil(matching * 1.05) + 1000;
+
+  const cols = allocate(capacity);
   columns = cols;
-  const rowOrder = new Uint32Array(rows);
+  const rowOrder = new Uint32Array(capacity);
   order = rowOrder;
-  scratch = new Uint32Array(rows);
-
-  for (const [name] of STATUSES) intern(cols.statusNames, name);
-  for (const name of WORKFLOW_TYPES) intern(cols.typeNames, name);
-  for (const name of TASK_QUEUES) intern(cols.queueNames, name);
-
-  // The query is applied while generating, so a filtered snapshot really is
-  // smaller and faster rather than being trimmed after paying for everything.
-  const statusFilter = predicates.filter((p) => p.field === 'ExecutionStatus');
-  const typeFilter = predicates.filter((p) => p.field === 'WorkflowType');
-  const queueFilter = predicates.filter((p) => p.field === 'TaskQueue');
-
-  const passes = (filters: QueryPredicate[], value: string): boolean =>
-    filters.every((p) =>
-      p.operator === '=' ? value === p.value : value !== p.value,
-    );
+  scratch = new Uint32Array(capacity);
 
   const now = Date.now();
-  const CHUNK = 50_000;
-  const startedAt = performance.now();
+  const windowMs = 720 * 3600_000;
+  const shards: Shard[] = [];
+  await planShards(
+    total,
+    baseQuery,
+    now - windowMs,
+    now + 60_000,
+    matching,
+    shards,
+  );
+
+  post({
+    id,
+    type: 'planned',
+    shards: shards.length,
+    matching,
+    requests: requestCount,
+    elapsedMs: performance.now() - startedAt,
+  });
+
   let written = 0;
-  let scanned = 0;
+  let shardsDone = 0;
+  let lastPost = 0;
 
-  while (scanned < rows) {
-    const limit = Math.min(scanned + CHUNK, rows);
-    for (let i = scanned; i < limit; i++) {
-      const h1 = hash32(i);
-      const h2 = hash32(i ^ 0x9e3779b9);
-      const h3 = hash32(i + 0x7f4a7c15);
+  const drain = async (shard: Shard) => {
+    const query = [baseQuery, rangeClause(shard.lo, shard.hi)]
+      .filter(Boolean)
+      .join(' AND ');
+    let token = '';
+    do {
+      const params = new URLSearchParams({
+        total: String(total),
+        pageSize: String(PAGE_SIZE),
+        query,
+      });
+      if (token) params.set('nextPageToken', token);
+      const body = (await getJson(
+        `${BASE}/workflows?${params}`,
+      )) as unknown as {
+        executions: {
+          execution: { workflowId: string; runId: string };
+          type: { name: string };
+          startTime: string;
+          closeTime?: string;
+          status: string;
+          taskQueue: string;
+        }[];
+        nextPageToken: string;
+      };
 
-      const typeIndex = h1 % WORKFLOW_TYPES.length;
-      let roll = (h3 / 4294967296) * STATUS_TOTAL;
-      let statusIndex = 0;
-      for (let s = 0; s < STATUSES.length; s++) {
-        roll -= STATUSES[s][1];
-        if (roll <= 0) {
-          statusIndex = s;
-          break;
-        }
+      for (const row of body.executions) {
+        if (written >= capacity) break;
+        const slot = written++;
+        cols.status[slot] = intern(
+          cols.statusNames,
+          STATUS_LABEL[row.status] ?? 'Unspecified',
+        );
+        cols.type[slot] = intern(cols.typeNames, row.type.name);
+        cols.queue[slot] = intern(cols.queueNames, row.taskQueue);
+        cols.start[slot] = Date.parse(row.startTime);
+        cols.end[slot] = row.closeTime ? Date.parse(row.closeTime) : 0;
+        writePacked(cols.workflowId, slot, ID_WIDTH, row.execution.workflowId);
+        writePacked(cols.runId, slot, RUN_WIDTH, row.execution.runId);
+        rowOrder[slot] = slot;
       }
+      cols.count = written;
+      token = body.nextPageToken || '';
 
-      const queueIndex = h2 % TASK_QUEUES.length;
-
-      if (
-        !passes(statusFilter, STATUSES[statusIndex][0]) ||
-        !passes(typeFilter, WORKFLOW_TYPES[typeIndex]) ||
-        !passes(queueFilter, TASK_QUEUES[queueIndex])
-      ) {
-        continue;
+      const elapsedMs = performance.now() - startedAt;
+      if (elapsedMs - lastPost > 120) {
+        lastPost = elapsedMs;
+        post({
+          id,
+          type: 'progress',
+          loaded: written,
+          scanned: written,
+          total: matching,
+          shardsDone,
+          shardCount: shards.length,
+          requests: requestCount,
+          throttled: throttledCount,
+          wireBytes,
+          elapsedMs,
+        });
       }
-
-      const slot = written++;
-      const startTime = now - ((h1 >>> 2) % WINDOW_MS);
-      cols.status[slot] = statusIndex;
-      cols.type[slot] = typeIndex;
-      cols.queue[slot] = queueIndex;
-      cols.start[slot] = startTime;
-      cols.end[slot] =
-        statusIndex === 0
-          ? 0
-          : Math.min(now, startTime + 1000 + (h2 % 7_200_000));
-
-      writePacked(
-        cols.workflowId,
-        slot,
-        ID_WIDTH,
-        `${PREFIXES[typeIndex]}-${hexOf(h1, 8)}${hexOf(h2, 4)}`,
-      );
-      writePacked(
-        cols.runId,
-        slot,
-        RUN_WIDTH,
-        `${hexOf(h1, 8)}-${hexOf(h2, 4)}-4${hexOf(h2 >>> 4, 3)}-a${hexOf(h3, 3)}-${hexOf(h3, 8)}${hexOf(i, 4)}`,
-      );
-
-      rowOrder[slot] = slot;
-    }
-    scanned = limit;
-    cols.count = written;
-
-    // pace to the measured sharded-fetch throughput so the wait reflects what
-    // pulling this many rows actually costs
-    const targetMs = (scanned / rowsPerSecond) * 1000;
-    const elapsed = performance.now() - startedAt;
-    if (elapsed < targetMs) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, Math.min(120, targetMs - elapsed)),
-      );
-    }
-
+      // body goes out of scope here; nothing accumulates
+    } while (token);
+    shardsDone++;
     post({
       id,
-      type: 'progress',
-      loaded: written,
-      scanned,
-      total: rows,
+      type: 'shard',
+      index: shardsDone,
+      of: shards.length,
+      rows: shard.rows,
+      from: iso(shard.lo),
+      to: iso(shard.hi),
       elapsedMs: performance.now() - startedAt,
     });
-  }
+  };
+
+  // a fixed pool, sized to what the browser will actually run in parallel
+  let next = 0;
+  const workers = Array.from({ length: CONCURRENCY }, async () => {
+    while (next < shards.length) await drain(shards[next++]);
+  });
+  await Promise.all(workers);
+
+  cols.count = written;
+
+  // Counting sort orders by dictionary id, and ids are handed out in the order
+  // values first arrive from the API — which is arrival order, not alphabetical.
+  // Without this, "Status A→Z" sorts by whatever turned up first.
+  normalizeDictionary(cols.statusNames, cols.status, written);
+  normalizeDictionary(cols.typeNames, cols.type, written);
+  normalizeDictionary(cols.queueNames, cols.queue, written);
 
   view = rowOrder.slice(0, written);
   post({
@@ -234,6 +348,10 @@ const load = async (
     type: 'loaded',
     count: written,
     bytes: bytesUsed(cols),
+    requests: requestCount,
+    throttled: throttledCount,
+    wireBytes,
+    shards: shards.length,
     elapsedMs: performance.now() - startedAt,
   });
 };
@@ -358,12 +476,7 @@ const window_ = (offset: number, limit: number, id: number) => {
 self.onmessage = (event: MessageEvent<Request>) => {
   const request = event.data;
   if (request.type === 'load') {
-    void load(
-      request.rows,
-      request.rowsPerSecond,
-      request.predicates ?? [],
-      request.id,
-    );
+    void load(request.rows, request.query ?? '', request.id);
   } else if (request.type === 'sort') {
     sort(request.terms, request.id);
   } else if (request.type === 'filter') {
