@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('esm-env', () => ({ DEV: true }));
+
+import * as layoutModule from './+layout';
 import { load } from './+layout';
+import { isWorkflowCatalogRouteAvailable } from './availability';
 
 const loadWith = (isLocal: boolean) =>
   load({
@@ -8,6 +12,23 @@ const loadWith = (isLocal: boolean) =>
   } as never);
 
 describe('/namespaces/[namespace]/workflow-catalog layout', () => {
+  it('keeps availability helpers out of the SvelteKit route module exports', () => {
+    expect(
+      Object.keys(layoutModule).filter(
+        (exportName) => !exportName.startsWith('_'),
+      ),
+    ).toEqual(['load']);
+  });
+
+  it('is unavailable in production when the host runtime policy permits local catalogs', () => {
+    expect(
+      isWorkflowCatalogRouteAvailable({
+        isDevelopment: false,
+        runtimePolicyAllowsLocalCatalog: true,
+      }),
+    ).toBe(false);
+  });
+
   it('responds with a 404 outside local development', async () => {
     await expect(loadWith(false)).rejects.toMatchObject({ status: 404 });
   });
@@ -20,5 +41,14 @@ describe('/namespaces/[namespace]/workflow-catalog layout', () => {
 
   it('loads the catalog during local development', async () => {
     await expect(loadWith(true)).resolves.toBeUndefined();
+  });
+
+  it('is available during development when the host runtime policy permits local catalogs', () => {
+    expect(
+      isWorkflowCatalogRouteAvailable({
+        isDevelopment: true,
+        runtimePolicyAllowsLocalCatalog: true,
+      }),
+    ).toBe(true);
   });
 });
