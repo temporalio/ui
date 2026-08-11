@@ -12,7 +12,7 @@ export const catalogDevelopmentCommands: readonly {
   args: readonly string[];
 }[] = [
   { label: 'ui', command: 'pnpm', args: ['dev'] },
-  { label: 'worker', command: 'pnpm', args: ['dev:workflow-catalog-worker'] },
+  { label: 'worker', command: 'pnpm', args: ['workflow-catalog', 'worker'] },
 ];
 
 export const superviseCatalogDevelopment = ({

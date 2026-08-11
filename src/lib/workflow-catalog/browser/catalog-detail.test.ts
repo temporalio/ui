@@ -306,7 +306,7 @@ describe('WorkflowCatalogDetail', () => {
       iconLabel: 'Worker readiness is unavailable',
       label: 'Handler worker is polling',
       tooltip:
-        'This run will wait for a Worker to poll the catalog-tasks Task Queue. Run "pnpm dev:workflow-catalog-worker" to start one.',
+        'This run will wait for a Worker to poll the catalog-tasks Task Queue. Run "pnpm workflow-catalog worker" to start one.',
     });
     expect(body).toMatch(
       /<button(?=[^>]*data-variant="primary")(?![^>]*\sdisabled(?:=""|="true"|(?=\s|>)))[^>]*>[\s\S]*?Run/,
@@ -401,7 +401,7 @@ describe('WorkflowCatalogDetail', () => {
     expect(source).toContain(
       "{#if !readinessLoading && workerReadinessState === 'unavailable'}",
     );
-    expect(source).toContain('content="pnpm dev:workflow-catalog-worker"');
+    expect(source).toContain('content="pnpm workflow-catalog worker"');
     expect(source).toContain('Start a catalog worker');
   });
 

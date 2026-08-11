@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -17,12 +17,6 @@ type LocalExample = {
   id: string;
   sourceFiles: string[];
   workflowType?: string;
-};
-
-const writeAtomically = async (path: string, content: string) => {
-  const temporaryPath = `${path}.tmp`;
-  await writeFile(temporaryPath, content);
-  await rename(temporaryPath, path);
 };
 
 const regularFilesRecursively = async (
@@ -222,105 +216,4 @@ export const loadLocalWorkflowCatalogRegistrationSource = async (
       }
     },
   };
-};
-
-export const writeLocalWorkflowCatalogAssemblies = async (
-  rootDirectory: string,
-) => {
-  const rendered = await renderLocalWorkflowCatalogAssemblies(rootDirectory);
-  const registrationPath = join(
-    rootDirectory,
-    'workflow-catalog.local/registration.ts',
-  );
-  const workflowsPath = join(
-    rootDirectory,
-    'workflow-catalog.local/workflows.ts',
-  );
-
-  if (rendered.examples.length === 0) {
-    const currentRegistration = await readFile(registrationPath, 'utf8').catch(
-      () => '',
-    );
-
-    if (currentRegistration.startsWith(generatedHeader)) {
-      await Promise.all([
-        rm(registrationPath, { force: true }),
-        rm(workflowsPath, { force: true }),
-        rm(
-          join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
-          {
-            force: true,
-          },
-        ),
-      ]);
-    }
-
-    return;
-  }
-
-  await Promise.all([
-    writeAtomically(registrationPath, rendered.registration),
-    writeAtomically(workflowsPath, rendered.workflows),
-  ]);
-};
-
-export const verifyLocalWorkflowCatalogAssemblies = async (
-  rootDirectory: string,
-) => {
-  const rendered = await renderLocalWorkflowCatalogAssemblies(rootDirectory);
-  if (rendered.examples.length === 0) {
-    const localPaths = [
-      'workflow-catalog.local/registration.ts',
-      'workflow-catalog.local/workflows.ts',
-      'workflow-catalog.local/catalog.generated.json',
-    ];
-    const localOutputs = await Promise.all(
-      localPaths.map(async (path) => ({
-        content: await readFile(join(rootDirectory, path), 'utf8').catch(
-          (error) => {
-            if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-              return undefined;
-            }
-            throw error;
-          },
-        ),
-        path,
-      })),
-    );
-
-    const [registration, workflows, artifact] = localOutputs;
-    const generatedAssemblyExists = [registration, workflows].some(
-      ({ content }) => content?.startsWith(generatedHeader),
-    );
-    const orphanedArtifactExists =
-      artifact?.content !== undefined && registration?.content === undefined;
-
-    if (generatedAssemblyExists || orphanedArtifactExists) {
-      throw new Error(
-        'Generated local workflow catalog outputs are stale; run ' +
-          '"pnpm workflow-catalog generate"',
-      );
-    }
-
-    return;
-  }
-  const expected = [
-    {
-      content: rendered.registration,
-      path: 'workflow-catalog.local/registration.ts',
-    },
-    {
-      content: rendered.workflows,
-      path: 'workflow-catalog.local/workflows.ts',
-    },
-  ];
-
-  for (const { content, path } of expected) {
-    const actual = await readFile(join(rootDirectory, path), 'utf8').catch(
-      () => '',
-    );
-    if (actual !== content) {
-      throw new Error(`${path} is stale; run "pnpm workflow-catalog generate"`);
-    }
-  }
 };

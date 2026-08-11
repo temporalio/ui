@@ -9,11 +9,9 @@ import {
 import type { BrowserWorkflowCatalogDescriptor } from '../src/lib/workflow-catalog/browser/types';
 
 const localArtifactPath = 'workflow-catalog.local/catalog.generated.json';
-const localSourcePaths = [
-  'workflow-catalog.local/registration.ts',
-  'workflow-catalog.local/workflows.ts',
-];
 const localSourceRootPaths = ['workflow-catalog.local/examples'];
+const resolvedLocalCatalogModuleId = '\0virtual:workflow-catalog-local';
+const emptyLocalCatalogModule = 'export const localWorkflowCatalog = [];';
 
 const isLocalDescriptor = (
   descriptor: unknown,
@@ -42,18 +40,48 @@ export const loadLocalWorkflowCatalogDescriptors = async (
     validateDescriptor: isLocalDescriptor,
   })) as BrowserWorkflowCatalogDescriptor[];
 
-const spawnLocalCatalogGeneration = (rootDirectory: string) =>
-  new Promise<void>((settle) => {
-    const child = spawn('pnpm', ['workflow-catalog:generate'], {
+type AuthoringCommandChild = {
+  once(
+    event: 'close',
+    listener: (code: number | null, signal: NodeJS.Signals | null) => void,
+  ): unknown;
+  once(event: 'error', listener: (error: Error) => void): unknown;
+};
+
+type StartAuthoringCommand = (
+  command: string,
+  args: string[],
+  options: { cwd: string; stdio: 'inherit' },
+) => AuthoringCommandChild;
+
+export const runAuthoringCommand = (
+  rootDirectory: string,
+  start: StartAuthoringCommand = spawn,
+) =>
+  new Promise<void>((resolve, reject) => {
+    const child = start('pnpm', ['workflow-catalog', 'generate'], {
       cwd: rootDirectory,
       stdio: 'inherit',
     });
-    child.on('close', () => settle());
-    child.on('error', (error) => {
-      console.error(
-        `Workflow catalog generation failed to start: ${error.message}`,
+    child.once('error', reject);
+    child.once('close', (code, signal) => {
+      if (code === 0) {
+        resolve();
+        return;
+      }
+      if (signal) {
+        reject(
+          new Error(
+            `Workflow catalog generation terminated by signal ${signal}`,
+          ),
+        );
+        return;
+      }
+      reject(
+        new Error(
+          `Workflow catalog generation exited with status ${code ?? 'unknown'}`,
+        ),
       );
-      settle();
     });
   });
 
@@ -62,12 +90,31 @@ export type WorkflowCatalogLocalPluginOptions = {
 };
 
 export const workflowCatalogLocalPlugin = ({
-  regenerate = spawnLocalCatalogGeneration,
-}: WorkflowCatalogLocalPluginOptions = {}): Plugin =>
-  createWorkflowCatalogLocalArtifactVitePlugin({
+  regenerate = runAuthoringCommand,
+}: WorkflowCatalogLocalPluginOptions = {}): Plugin => {
+  const localArtifactPlugin = createWorkflowCatalogLocalArtifactVitePlugin({
     artifactPath: localArtifactPath,
     regenerate,
-    sourcePaths: localSourcePaths,
     sourceRootPaths: localSourceRootPaths,
     validateDescriptor: isLocalDescriptor,
-  }) as Plugin;
+  });
+  let isDevelopment = false;
+
+  return {
+    ...localArtifactPlugin,
+    configResolved(config) {
+      isDevelopment = config.command === 'serve';
+      localArtifactPlugin.configResolved(config);
+    },
+    configureServer(server) {
+      if (!isDevelopment) return;
+      localArtifactPlugin.configureServer(server);
+    },
+    async load(id) {
+      if (!isDevelopment && id === resolvedLocalCatalogModuleId) {
+        return emptyLocalCatalogModule;
+      }
+      return localArtifactPlugin.load(id);
+    },
+  } as Plugin;
+};

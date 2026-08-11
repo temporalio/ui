@@ -6,6 +6,7 @@ import {
   createWorkflowCatalogAuthoring,
   defineWorkflowCatalogArtifact,
   deleteWorkflowCatalogArtifact,
+  type WorkflowCatalogAuthoringArtifact,
 } from '../../src/lib/workflow-catalog/authoring.js';
 import { getProjectRoot } from '../get-project-root.js';
 import {
@@ -38,8 +39,11 @@ export const uiWorkflowCatalogGeneratedPaths = [
 
 export const createUiWorkflowCatalogAuthoring = (
   rootDirectory = getProjectRoot(),
-) =>
-  createWorkflowCatalogAuthoring({
+) => {
+  let renderGenerated: () => Promise<
+    readonly WorkflowCatalogAuthoringArtifact[]
+  >;
+  return createWorkflowCatalogAuthoring({
     graph: {
       boundaries: {
         browserPaths: [
@@ -123,13 +127,6 @@ export const createUiWorkflowCatalogAuthoring = (
           sourceId: 'local',
           workflowsModulePath: 'workflow-catalog.local/workflows.ts',
         },
-        {
-          defaultNamespace: 'default',
-          defaultTaskQueue: 'workflow-catalog',
-          id: 'local-catalog',
-          sourceId: 'local',
-          workflowsModulePath: 'workflow-catalog.local/workflows.ts',
-        },
       ],
     },
     rootDirectory,
@@ -184,7 +181,7 @@ export const createUiWorkflowCatalogAuthoring = (
     },
     validatePromotion: ({ exampleId }) =>
       planDirectoryWorkflowCatalogPromotion({ exampleId, rootDirectory }),
-    generate: async () => {
+    generate: (renderGenerated = async () => {
       const local = await renderLocalWorkflowCatalogAssemblies(rootDirectory);
       const localSource =
         await loadLocalWorkflowCatalogRegistrationSource(rootDirectory);
@@ -211,8 +208,18 @@ export const createUiWorkflowCatalogAuthoring = (
         renderCanonicalWorkflowCatalogAssemblies(rootDirectory),
         loadCanonicalWorkflowCatalogRegistrationSource(rootDirectory),
       ]);
+      const sourceContentOverrides = new Map([
+        ...localAssemblies.flatMap((artifact) =>
+          artifact.delete ? [] : [[artifact.path, artifact.content] as const],
+        ),
+        ...canonicalAssemblies.map(
+          ({ content, path }) => [path, content] as const,
+        ),
+      ]);
       const project = await renderProjectWorkflowCatalogArtifacts({
+        rootDirectory,
         sharedSource,
+        sourceContentOverrides,
         ...(localSource ? { localSource } : { localSource: null }),
       });
       return composeWorkflowCatalogArtifacts(
@@ -226,6 +233,57 @@ export const createUiWorkflowCatalogAuthoring = (
             : defineWorkflowCatalogArtifact(artifactPath, content),
         ),
       );
+    }),
+    verifyGenerated: async () => {
+      const artifacts = await renderGenerated();
+      for (const artifact of artifacts) {
+        const actual = await readFile(join(rootDirectory, artifact.path)).catch(
+          (error) => {
+            if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
+            throw error;
+          },
+        );
+        if (
+          artifact.delete
+            ? actual === undefined
+            : actual?.equals(Buffer.from(artifact.content))
+        ) {
+          continue;
+        }
+        if (!artifact.delete && actual) {
+          const expectedSourceHash =
+            /["']?sourceHash["']?\s*:\s*["']([a-f0-9]+)["']/.exec(
+              artifact.content.toString(),
+            )?.[1];
+          const actualSourceHash =
+            /["']?sourceHash["']?\s*:\s*["']([a-f0-9]+)["']/.exec(
+              actual.toString(),
+            )?.[1];
+          if (
+            expectedSourceHash &&
+            actualSourceHash &&
+            expectedSourceHash !== actualSourceHash
+          ) {
+            throw new Error(
+              `Workflow catalog artifact "${artifact.path}" is stale because registration sources changed`,
+            );
+          }
+        }
+        throw new Error(
+          `Workflow catalog artifact "${artifact.path}" has generated output drift`,
+        );
+      }
     },
-    verify: () => verifyProjectWorkflowCatalogBoundaries(),
+    verify: async () => {
+      const [sharedSource, localSource] = await Promise.all([
+        loadCanonicalWorkflowCatalogRegistrationSource(rootDirectory),
+        loadLocalWorkflowCatalogRegistrationSource(rootDirectory),
+      ]);
+      await verifyProjectWorkflowCatalogBoundaries({
+        rootDirectory,
+        sharedSource,
+        localSource: localSource ?? null,
+      });
+    },
   });
+};

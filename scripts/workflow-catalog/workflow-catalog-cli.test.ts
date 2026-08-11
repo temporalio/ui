@@ -5,10 +5,7 @@ import { promisify } from 'node:util';
 
 import { describe, expect, it } from 'vitest';
 
-import {
-  workflowCatalogCommandAliases,
-  workflowCatalogHelp,
-} from './workflow-catalog-cli';
+import { workflowCatalogHelp } from './workflow-catalog-cli';
 
 const execFileAsync = promisify(execFile);
 
@@ -21,6 +18,9 @@ describe('workflow catalog CLI', () => {
     expect(workflowCatalogHelp).toContain('workflow-catalog verify');
     expect(workflowCatalogHelp).toContain(
       'workflow-catalog promote <example-id> [--dry-run]',
+    );
+    expect(workflowCatalogHelp).toContain(
+      'workflow-catalog demote <example-id> [--dry-run]',
     );
     expect(workflowCatalogHelp).toContain('workflow-catalog dev');
     expect(workflowCatalogHelp).toContain('workflow-catalog worker');
@@ -42,6 +42,9 @@ describe('workflow catalog CLI', () => {
     expect(stdout).toContain('workflow-catalog scaffold <example-id>');
     expect(stdout).toContain(
       'workflow-catalog promote <example-id> [--dry-run]',
+    );
+    expect(stdout).toContain(
+      'workflow-catalog demote <example-id> [--dry-run]',
     );
   });
 
@@ -92,12 +95,29 @@ describe('workflow catalog CLI', () => {
     expect(error.stderr).toContain('Usage: workflow-catalog <command>');
   });
 
-  it('keeps dev and worker as supported legacy aliases', () => {
-    expect(workflowCatalogCommandAliases).toEqual({
-      new: 'scaffold',
-      'dev:catalog': 'dev',
-      'dev:workflow-catalog-worker': 'worker',
-    });
+  it('prints invalid demotion usage only once through the executable entrypoint', async () => {
+    const error = await execFileAsync(
+      'pnpm',
+      [
+        'exec',
+        'esno',
+        'scripts/workflow-catalog/workflow-catalog-cli.ts',
+        'demote',
+        'example-id',
+        '--move',
+      ],
+      { cwd: process.cwd() },
+    ).catch((cause: NodeJS.ErrnoException & { stderr: string }) => cause);
+
+    expect(error.code).toBe(1);
+    expect(error.stderr).toContain(
+      'Usage: workflow-catalog demote <example-id> [--dry-run]',
+    );
+    expect(
+      error.stderr.match(
+        /Usage: workflow-catalog demote <example-id> \[--dry-run\]/g,
+      ),
+    ).toHaveLength(1);
   });
 
   it('exposes the unified dispatcher through the workflow-catalog package script', async () => {
@@ -108,14 +128,10 @@ describe('workflow catalog CLI', () => {
     expect(packageJson.scripts['workflow-catalog']).toBe(
       'esno scripts/workflow-catalog/workflow-catalog-cli.ts',
     );
-    expect(packageJson.scripts['workflow-catalog:new']).toBe(
-      'pnpm workflow-catalog scaffold',
-    );
-    expect(packageJson.scripts['dev:catalog']).toBe(
-      'pnpm workflow-catalog dev',
-    );
-    expect(packageJson.scripts['dev:workflow-catalog-worker']).toBe(
-      'pnpm workflow-catalog worker',
+    expect(packageJson.scripts).not.toHaveProperty('workflow-catalog:new');
+    expect(packageJson.scripts).not.toHaveProperty('dev:catalog');
+    expect(packageJson.scripts).not.toHaveProperty(
+      'dev:workflow-catalog-worker',
     );
   });
 });

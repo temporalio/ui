@@ -22,7 +22,6 @@ import {
   createWorkflowCatalogAuthoring as createWorkflowCatalogAuthoringSdk,
   createWorkflowCatalogLocalArtifactVitePlugin,
   defineWorkflowCatalogArtifact,
-  renderWorkflowCatalogAssembly,
   renderWorkflowCatalogSourceAssembly,
   runWorkflowCatalogCli,
   validateWorkflowCatalogAuthoringGraph,
@@ -189,6 +188,10 @@ describe('workflow catalog authoring', () => {
         'generated/catalog.json',
         'generated/workflows.ts',
       ]),
+      moved: {
+        from: 'cloud-catalog.local/examples/cloud-hello',
+        to: 'src/cloud-catalog/examples/cloud-hello',
+      },
     });
     await expect(authoring.verify()).resolves.toBeUndefined();
     await expect(
@@ -290,6 +293,266 @@ describe('workflow catalog authoring', () => {
     ).rejects.toMatchObject({ code: 'ENOENT' });
   });
 
+  it('plans demotion from tracked to local without changing the filesystem', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const trackedExample = join(
+      rootDirectory,
+      'tracked/examples/dry-run-example',
+    );
+    await mkdir(trackedExample, { recursive: true });
+    await writeFile(
+      join(trackedExample, 'example.ts'),
+      'export const example = true;\n',
+    );
+    const authoring = createWorkflowCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(authoring.planDemote('dry-run-example')).resolves.toEqual({
+      operations: [
+        {
+          from: 'tracked/examples/dry-run-example',
+          kind: 'move-directory',
+          to: 'local/examples/dry-run-example',
+        },
+        { kind: 'generate' },
+        { kind: 'verify' },
+      ],
+    });
+    await expect(
+      readFile(join(trackedExample, 'example.ts'), 'utf8'),
+    ).resolves.toBe('export const example = true;\n');
+    await expect(
+      access(join(rootDirectory, 'local/examples/dry-run-example')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('demotes a tracked example and regenerates and verifies in one transaction', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const trackedExample = join(
+      rootDirectory,
+      'tracked/examples/transaction-example',
+    );
+    await mkdir(trackedExample, { recursive: true });
+    await writeFile(
+      join(trackedExample, 'example.ts'),
+      'export const example = true;\n',
+    );
+    const listExampleIds = async (path: string) =>
+      (
+        await readdir(join(rootDirectory, path), {
+          withFileTypes: true,
+        }).catch(() => [])
+      )
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name)
+        .sort();
+    const authoring = createWorkflowCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: ['generated/catalog.json'],
+      scaffold: () => [],
+      generate: async () => [
+        {
+          path: 'generated/catalog.json',
+          content: `${JSON.stringify({
+            local: await listExampleIds('local/examples'),
+            tracked: await listExampleIds('tracked/examples'),
+          })}\n`,
+        },
+      ],
+      verify: ({ exampleIds }) => {
+        expect(exampleIds).toEqual({
+          local: ['transaction-example'],
+          tracked: [],
+        });
+      },
+    });
+
+    await expect(authoring.demote('transaction-example')).resolves.toEqual({
+      changedPaths: [
+        'tracked/examples/transaction-example',
+        'local/examples/transaction-example',
+        'generated/catalog.json',
+      ],
+      moved: {
+        from: 'tracked/examples/transaction-example',
+        to: 'local/examples/transaction-example',
+      },
+    });
+    await expect(
+      access(join(rootDirectory, 'tracked/examples/transaction-example')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(
+      readFile(
+        join(rootDirectory, 'local/examples/transaction-example/example.ts'),
+        'utf8',
+      ),
+    ).resolves.toBe('export const example = true;\n');
+    await expect(
+      readFile(join(rootDirectory, 'generated/catalog.json'), 'utf8'),
+    ).resolves.toBe('{"local":["transaction-example"],"tracked":[]}\n');
+  });
+
+  it.each(['generation', 'verification'] as const)(
+    'rolls back demotion source and generated outputs when %s fails',
+    async (failure) => {
+      const rootDirectory = await createTemporaryDirectory();
+      const trackedExample = join(
+        rootDirectory,
+        'tracked/examples/rollback-demotion',
+      );
+      await mkdir(trackedExample, { recursive: true });
+      await mkdir(join(rootDirectory, 'generated'), { recursive: true });
+      await writeFile(
+        join(trackedExample, 'example.ts'),
+        'export const example = true;\n',
+      );
+      await writeFile(
+        join(rootDirectory, 'generated/catalog.json'),
+        'before demotion\n',
+      );
+      const authoring = createWorkflowCatalogAuthoring({
+        rootDirectory,
+        localExamplesPath: 'local/examples',
+        trackedExamplesPath: 'tracked/examples',
+        generatedPaths: ['generated/catalog.json'],
+        scaffold: () => [],
+        generate: async () => {
+          if (failure === 'generation') {
+            await writeFile(
+              join(rootDirectory, 'generated/catalog.json'),
+              'partial demotion\n',
+            );
+            throw new Error('demotion generation failed');
+          }
+          return [
+            {
+              path: 'generated/catalog.json',
+              content: 'generated during demotion\n',
+            },
+          ];
+        },
+        verify: () => {
+          if (failure === 'verification') {
+            throw new Error('demotion verification failed');
+          }
+        },
+      });
+
+      await expect(authoring.demote('rollback-demotion')).rejects.toThrow(
+        `demotion ${failure} failed`,
+      );
+      await expect(
+        readFile(join(trackedExample, 'example.ts'), 'utf8'),
+      ).resolves.toBe('export const example = true;\n');
+      await expect(
+        access(join(rootDirectory, 'local/examples/rollback-demotion')),
+      ).rejects.toMatchObject({ code: 'ENOENT' });
+      await expect(
+        readFile(join(rootDirectory, 'generated/catalog.json'), 'utf8'),
+      ).resolves.toBe('before demotion\n');
+      await expect(
+        access(join(rootDirectory, '.workflow-catalog.journal.json')),
+      ).rejects.toMatchObject({ code: 'ENOENT' });
+    },
+  );
+
+  it('refuses to demote an unknown tracked example', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const authoring = createWorkflowCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(authoring.demote('unknown-example')).rejects.toThrow(
+      'Tracked workflow catalog example does not exist: tracked/examples/unknown-example',
+    );
+    await expect(
+      access(join(rootDirectory, 'local/examples/unknown-example')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('refuses to overwrite an existing local example during demotion', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const trackedExample = join(
+      rootDirectory,
+      'tracked/examples/occupied-example',
+    );
+    const localExample = join(rootDirectory, 'local/examples/occupied-example');
+    await Promise.all([
+      mkdir(trackedExample, { recursive: true }),
+      mkdir(localExample, { recursive: true }),
+    ]);
+    await Promise.all([
+      writeFile(join(trackedExample, 'example.ts'), 'tracked source\n'),
+      writeFile(join(localExample, 'example.ts'), 'local source\n'),
+    ]);
+    const authoring = createWorkflowCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(authoring.demote('occupied-example')).rejects.toThrow(
+      'Demotion destination already exists: local/examples/occupied-example',
+    );
+    await expect(
+      readFile(join(trackedExample, 'example.ts'), 'utf8'),
+    ).resolves.toBe('tracked source\n');
+    await expect(
+      readFile(join(localExample, 'example.ts'), 'utf8'),
+    ).resolves.toBe('local source\n');
+  });
+
+  it('keeps a tracked example in place when an external dependency prevents automatic demotion', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const trackedExample = join(
+      rootDirectory,
+      'tracked/examples/dependent-example',
+    );
+    await mkdir(trackedExample, { recursive: true });
+    await writeFile(
+      join(trackedExample, 'example.ts'),
+      "export { shared } from '../shared.js';\n",
+    );
+    await writeFile(
+      join(rootDirectory, 'tracked/examples/shared.ts'),
+      'export const shared = true;\n',
+    );
+    const authoring = createWorkflowCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(authoring.demote('dependent-example')).rejects.toThrow(
+      'cannot be demoted automatically because tracked/examples/dependent-example/example.ts imports outside its example directory',
+    );
+    await expect(
+      readFile(join(trackedExample, 'example.ts'), 'utf8'),
+    ).resolves.toBe("export { shared } from '../shared.js';\n");
+    await expect(
+      access(join(rootDirectory, 'local/examples/dependent-example')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
   it('preserves the journal and backups when rollback is incomplete', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const externalDirectory = await createTemporaryDirectory();
@@ -346,6 +609,28 @@ describe('workflow catalog authoring', () => {
     });
 
     await expect(authoring.generate()).resolves.toEqual([]);
+    await expect(
+      access(join(rootDirectory, '.workflow-catalog.lock')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('recovers a stale authoring lock before public verification', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    await writeFile(
+      join(rootDirectory, '.workflow-catalog.lock'),
+      `${JSON.stringify({ createdAt: 0, pid: 999_999 })}\n`,
+    );
+    const authoring = createWorkflowCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      lockStaleAfterMs: 1,
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(authoring.verify()).resolves.toBeUndefined();
     await expect(
       access(join(rootDirectory, '.workflow-catalog.lock')),
     ).rejects.toMatchObject({ code: 'ENOENT' });
@@ -619,6 +904,9 @@ try {
       );
       expect(scaffoldCalls).toBe(0);
       await expect(authoring.planPromote(exampleId)).rejects.toThrow(
+        'Workflow catalog example IDs must use lowercase kebab-case',
+      );
+      await expect(authoring.planDemote(exampleId)).rejects.toThrow(
         'Workflow catalog example IDs must use lowercase kebab-case',
       );
     },
@@ -905,28 +1193,174 @@ try {
     );
   });
 
-  it('routes the legacy new CLI alias through the scaffold transaction', async () => {
-    const scaffolded: string[] = [];
+  it('rejects removed CLI aliases', async () => {
+    const authoring: ReturnType<typeof createWorkflowCatalogAuthoring> = {
+      demote: async () => ({
+        changedPaths: [],
+        moved: { from: '', to: '' },
+      }),
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async () => ({ operations: [] }),
+      planPromote: async () => ({ operations: [] }),
+      promote: async () => ({
+        changedPaths: [],
+        moved: { from: '', to: '' },
+      }),
+    };
+
+    await expect(
+      runWorkflowCatalogCli({
+        authoring,
+        argv: ['new', 'aliased-example'],
+        io: {
+          writeError: () => undefined,
+          writeOutput: () => undefined,
+        },
+      }),
+    ).rejects.toThrow('Unknown workflow catalog command "new"');
+  });
+
+  it('dispatches demotion dry-run to the planner without mutating', async () => {
+    const calls: string[] = [];
     const output: string[] = [];
-    const authoring = {
-      scaffold: async (exampleId: string) => {
-        scaffolded.push(exampleId);
+    const expectedPlan = {
+      operations: [
+        {
+          from: 'tracked/examples/cli-example',
+          kind: 'move-directory' as const,
+          to: 'local/examples/cli-example',
+        },
+        { kind: 'generate' as const },
+        { kind: 'verify' as const },
+      ],
+    };
+    const authoring: ReturnType<typeof createWorkflowCatalogAuthoring> = {
+      demote: async () => {
+        calls.push('demote');
+        return { changedPaths: [], moved: { from: '', to: '' } };
       },
-    } as ReturnType<typeof createWorkflowCatalogAuthoring>;
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async (exampleId) => {
+        calls.push(`plan:${exampleId}`);
+        return expectedPlan;
+      },
+      planPromote: async () => ({ operations: [] }),
+      promote: async () => ({
+        changedPaths: [],
+        moved: { from: '', to: '' },
+      }),
+    };
 
     await runWorkflowCatalogCli({
       authoring,
-      argv: ['new', 'aliased-example'],
+      argv: ['demote', 'cli-example', '--dry-run'],
       io: {
         writeError: () => undefined,
         writeOutput: (message) => output.push(message),
       },
     });
 
-    expect(scaffolded).toEqual(['aliased-example']);
+    expect(calls).toEqual(['plan:cli-example']);
+    expect(output).toEqual([JSON.stringify(expectedPlan, null, 2)]);
+  });
+
+  it('reports promotion as a concise shared-catalog handoff', async () => {
+    const output: string[] = [];
+    const authoring: ReturnType<typeof createWorkflowCatalogAuthoring> = {
+      demote: async () => ({
+        changedPaths: [],
+        moved: { from: '', to: '' },
+      }),
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async () => ({ operations: [] }),
+      planPromote: async () => ({ operations: [] }),
+      promote: async () => ({
+        changedPaths: [
+          'local/examples/cli-example',
+          'tracked/examples/cli-example',
+        ],
+        moved: {
+          from: 'local/examples/cli-example',
+          to: 'tracked/examples/cli-example',
+        },
+      }),
+    };
+
+    await runWorkflowCatalogCli({
+      authoring,
+      argv: ['promote', 'cli-example'],
+      io: {
+        writeError: () => undefined,
+        writeOutput: (message) => output.push(message),
+      },
+    });
+
     expect(output).toEqual([
-      'Created local workflow catalog example "aliased-example". Edit its files, then run "pnpm workflow-catalog dev".',
+      [
+        'Promoted "cli-example" to the shared workflow catalog.',
+        'Moved:',
+        '  local/examples/cli-example → tracked/examples/cli-example',
+        'Regenerated workflow catalog artifacts.',
+        'Next: review the tracked changes with git status, then commit them when ready.',
+      ].join('\n'),
     ]);
+  });
+
+  it('reports a demoted example as local and ignored by Git without calling it deleted', async () => {
+    const calls: string[] = [];
+    const output: string[] = [];
+    const authoring: ReturnType<typeof createWorkflowCatalogAuthoring> = {
+      demote: async (exampleId) => {
+        calls.push(`demote:${exampleId}`);
+        return {
+          changedPaths: [
+            `tracked/examples/${exampleId}`,
+            `local/examples/${exampleId}`,
+          ],
+          moved: {
+            from: `tracked/examples/${exampleId}`,
+            to: `local/examples/${exampleId}`,
+          },
+        };
+      },
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async () => ({ operations: [] }),
+      planPromote: async () => ({ operations: [] }),
+      promote: async () => ({
+        changedPaths: [],
+        moved: { from: '', to: '' },
+      }),
+    };
+
+    await runWorkflowCatalogCli({
+      authoring,
+      argv: ['demote', 'cli-example'],
+      io: {
+        writeError: () => undefined,
+        writeOutput: (message) => output.push(message),
+      },
+    });
+
+    expect(calls).toEqual(['demote:cli-example']);
+    expect(output).toEqual([
+      [
+        'Demoted "cli-example" to the local workflow catalog.',
+        'Moved:',
+        '  tracked/examples/cli-example → local/examples/cli-example',
+        'Regenerated workflow catalog artifacts.',
+        'The local example is ignored by Git.',
+        'Next: review the tracked changes with git status, then commit the tracked removal only if the shared example was already committed.',
+      ].join('\n'),
+    ]);
+    expect(output[0]).not.toMatch(/deleted?/i);
   });
 
   it('loads and watches a configurable local artifact through Vite', async () => {
@@ -973,22 +1407,16 @@ try {
   });
 
   it('composes deterministic generated artifacts without repository tooling', () => {
-    const assembly = renderWorkflowCatalogAssembly({
-      header: '// GENERATED',
-      imports: [
-        "import { beta } from './beta.js';",
-        "import { alpha } from './alpha.js';",
-      ],
-      statements: ['export const examples = [beta, alpha];'],
-    });
     const artifacts = composeWorkflowCatalogArtifacts(
-      [defineWorkflowCatalogArtifact('generated/z.ts', assembly)],
+      [
+        defineWorkflowCatalogArtifact(
+          'generated/z.ts',
+          'export const z = 1;\n',
+        ),
+      ],
       [defineWorkflowCatalogArtifact('generated/a.json', '{}\n')],
     );
 
-    expect(assembly).toBe(
-      "// GENERATED\nimport { alpha } from './alpha.js';\nimport { beta } from './beta.js';\n\nexport const examples = [beta, alpha];\n",
-    );
     expect(artifacts.map(({ path }) => path)).toEqual([
       'generated/a.json',
       'generated/z.ts',

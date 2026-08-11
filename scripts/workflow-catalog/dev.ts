@@ -8,10 +8,8 @@ import {
   Worker,
 } from '@temporalio/worker';
 
-import {
-  loadProjectWorkflowCatalogWorkerBindings,
-  verifyProjectWorkflowCatalog,
-} from './project-artifacts';
+import { loadProjectWorkflowCatalogWorkerBindings } from './project-artifacts';
+import { createUiWorkflowCatalogAuthoring } from './ui-authoring';
 import { createWorkflowCatalogWorkerFactory } from './worker-factory';
 import { parseWorkflowCatalogConnectionConfig } from '../../src/lib/workflow-catalog/worker/connection-config';
 import { connectWithRetry } from '../../src/lib/workflow-catalog/worker/connection-retry';
@@ -79,7 +77,7 @@ for (const environmentPath of environmentPaths) {
 }
 
 try {
-  await verifyProjectWorkflowCatalog();
+  await createUiWorkflowCatalogAuthoring(rootDirectory).verify();
   const workerBindings = await loadProjectWorkflowCatalogWorkerBindings(
     (targets) =>
       requireWorkflowCatalogRoutingFromEnvironment(process.env, targets),

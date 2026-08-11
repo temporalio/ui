@@ -14,7 +14,6 @@ import * as StandaloneActivities from './standalone-activities';
 import * as StandaloneNexusOperations from './standalone-nexus-operations';
 import * as TypedErrors from './typed-errors';
 import * as Workers from './workers';
-import * as WorkflowCatalog from './workflow-catalog';
 import * as Workflows from './workflows';
 
 export const EN = 'en' as const;
@@ -37,5 +36,4 @@ export const English = {
   [StandaloneActivities.Namespace]: StandaloneActivities.Strings,
   [StandaloneNexusOperations.Namespace]: StandaloneNexusOperations.Strings,
   [Workers.Namespace]: Workers.Strings,
-  [WorkflowCatalog.Namespace]: WorkflowCatalog.Strings,
 } as const;

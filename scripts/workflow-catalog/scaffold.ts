@@ -1,8 +1,5 @@
 import { existsSync, readdirSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-
-import { writeLocalWorkflowCatalogAssemblies } from './local-assemblies.js';
 
 const exampleIdPattern = /^[a-z][a-z0-9-]*[a-z0-9]$/;
 
@@ -43,38 +40,6 @@ export const workflowNameFor = (exampleId: string): string =>
 export const titleFor = (exampleId: string): string => {
   const words = exampleId.split('-').join(' ');
   return `${words[0].toUpperCase()}${words.slice(1)}`;
-};
-
-export const scaffoldDirectoryWorkflowCatalog = async ({
-  rootDirectory,
-  exampleId,
-}: {
-  rootDirectory: string;
-  exampleId: string;
-}) => {
-  const artifacts = renderDirectoryWorkflowCatalogScaffold({
-    exampleId,
-    rootDirectory,
-  });
-  const exampleDirectory = join(
-    rootDirectory,
-    'workflow-catalog.local/examples',
-    exampleId,
-  );
-
-  if (existsSync(exampleDirectory)) {
-    throw new Error(
-      `Local workflow catalog example already exists: ${exampleId}`,
-    );
-  }
-
-  await mkdir(exampleDirectory, { recursive: true });
-  await Promise.all(
-    artifacts.map((artifact) =>
-      writeFile(join(rootDirectory, artifact.path), artifact.content),
-    ),
-  );
-  await writeLocalWorkflowCatalogAssemblies(rootDirectory);
 };
 
 export const renderDirectoryWorkflowCatalogScaffold = ({

@@ -11,10 +11,7 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import {
-  verifyCanonicalWorkflowCatalogAssemblies,
-  writeCanonicalWorkflowCatalogAssemblies,
-} from './canonical-assemblies';
+import { renderCanonicalWorkflowCatalogAssemblies } from './canonical-assemblies';
 
 const directories: string[] = [];
 
@@ -27,39 +24,7 @@ afterEach(async () => {
 });
 
 describe('canonical workflow catalog assemblies', () => {
-  it('generates deterministic index and workflow barrels from canonical example directories', async () => {
-    const rootDirectory = await mkdtemp(join(tmpdir(), 'canonical-catalog-'));
-    directories.push(rootDirectory);
-    const exampleDirectory = join(
-      rootDirectory,
-      'src/lib/workflow-catalog/worker/examples/hello',
-    );
-    await mkdir(exampleDirectory, { recursive: true });
-    await Promise.all([
-      writeFile(
-        join(exampleDirectory, 'example.ts'),
-        "export const workflowCatalogExample = { execution: { kind: 'workflow', workflowType: 'hello' } };\n",
-      ),
-      writeFile(
-        join(exampleDirectory, 'workflow.ts'),
-        'export async function hello() {}\n',
-      ),
-    ]);
-
-    await writeCanonicalWorkflowCatalogAssemblies(rootDirectory);
-
-    await expect(
-      readFile(
-        join(
-          rootDirectory,
-          'src/lib/workflow-catalog/worker/examples/index.ts',
-        ),
-        'utf8',
-      ),
-    ).resolves.toContain('workflowCatalogExample as example0');
-  });
-
-  it('derives sorted recursive source files and exports workflows only for workflow examples', async () => {
+  it('renders deterministic index and workflow barrels from canonical examples', async () => {
     const rootDirectory = await mkdtemp(join(tmpdir(), 'canonical-catalog-'));
     directories.push(rootDirectory);
     const examplesDirectory = join(
@@ -89,26 +54,30 @@ describe('canonical workflow catalog assemblies', () => {
       writeFile(join(activityDirectory, 'activity.ts'), 'export {};\n'),
     ]);
 
-    await writeCanonicalWorkflowCatalogAssemblies(rootDirectory);
+    const assemblies =
+      await renderCanonicalWorkflowCatalogAssemblies(rootDirectory);
+    const index = assemblies.find(({ path }) =>
+      path.endsWith('/index.ts'),
+    )?.content;
+    const workflows = assemblies.find(({ path }) =>
+      path.endsWith('/workflows.ts'),
+    )?.content;
 
-    const index = await readFile(join(examplesDirectory, 'index.ts'), 'utf8');
-    const workflows = await readFile(
-      join(examplesDirectory, '../workflows.ts'),
-      'utf8',
-    );
+    expect(index).toContain('workflowCatalogExample as example0');
     expect(index).toContain(
       "'src/lib/workflow-catalog/worker/examples/alpha-workflow/activity.ts'",
     );
-    expect(index.indexOf('alpha-workflow')).toBeLessThan(
-      index.indexOf('zeta-activity'),
+    expect(index?.indexOf('alpha-workflow')).toBeLessThan(
+      index?.indexOf('zeta-activity') ?? Infinity,
     );
     expect(workflows).toContain(
       "export { alphaWorkflow } from './examples/alpha-workflow/workflow.js';",
     );
     expect(workflows).not.toContain('zeta-activity');
+    expect(index).not.toContain('sharedWorkflowCorpusInventory');
   });
 
-  it('requires every tracked example definition to export the canonical environment-neutral name', async () => {
+  it('requires every tracked example definition to use the canonical environment-neutral shape', async () => {
     const examplesDirectory = join(
       process.cwd(),
       'src/lib/workflow-catalog/worker/examples',
@@ -126,36 +95,5 @@ describe('canonical workflow catalog assemblies', () => {
       expect(source).not.toMatch(/\btargetId\s*:/);
       expect(source).not.toContain('SourceFiles');
     }
-  });
-
-  it('reports generated assembly drift without rewriting the stale file', async () => {
-    const rootDirectory = await mkdtemp(join(tmpdir(), 'canonical-catalog-'));
-    directories.push(rootDirectory);
-    const exampleDirectory = join(
-      rootDirectory,
-      'src/lib/workflow-catalog/worker/examples/hello',
-    );
-    await mkdir(exampleDirectory, { recursive: true });
-    await Promise.all([
-      writeFile(
-        join(exampleDirectory, 'example.ts'),
-        "export const workflowCatalogExample = { execution: { kind: 'workflow', workflowType: 'hello' } };\n",
-      ),
-      writeFile(
-        join(exampleDirectory, 'workflow.ts'),
-        'export async function hello() {}\n',
-      ),
-    ]);
-    await writeCanonicalWorkflowCatalogAssemblies(rootDirectory);
-    const indexPath = join(
-      rootDirectory,
-      'src/lib/workflow-catalog/worker/examples/index.ts',
-    );
-    await writeFile(indexPath, 'stale\n');
-
-    await expect(
-      verifyCanonicalWorkflowCatalogAssemblies(rootDirectory),
-    ).rejects.toThrow('run "pnpm workflow-catalog generate"');
-    await expect(readFile(indexPath, 'utf8')).resolves.toBe('stale\n');
   });
 });

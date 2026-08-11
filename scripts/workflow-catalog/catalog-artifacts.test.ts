@@ -17,12 +17,10 @@ import { format } from 'prettier';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
-  generateWorkflowCatalogArtifact,
-  generateWorkflowCatalogArtifacts,
   loadWorkflowCatalogWorkerBindings,
+  renderWorkflowCatalogArtifact,
   renderWorkflowCatalogArtifacts,
   verifyWorkflowCatalogArtifact,
-  verifyWorkflowCatalogArtifacts,
   verifyWorkflowCatalogProjectBoundaries,
 } from './catalog-artifacts';
 import { workflowCatalogRegistrationSource as localRegistrationFallback } from '../../src/lib/workflow-catalog/worker/local-registration-fallback';
@@ -61,6 +59,93 @@ afterEach(async () => {
     ),
   );
 });
+
+const installRenderedArtifact = async (
+  rootDirectory: string,
+  artifact: { artifactPath: string; content: string | null },
+) => {
+  const path = join(rootDirectory, artifact.artifactPath);
+  if (artifact.content === null) {
+    await rm(path, { force: true });
+    return;
+  }
+  await mkdir(join(path, '..'), { recursive: true });
+  await writeFile(path, artifact.content);
+};
+
+const renderAndInstallArtifact = async (
+  options: Parameters<typeof renderWorkflowCatalogArtifact>[0],
+) => {
+  const rendered = await renderWorkflowCatalogArtifact(options);
+  await installRenderedArtifact(options.rootDirectory, rendered.output);
+  return rendered.generated;
+};
+
+const renderAndInstallArtifacts = async (
+  options: Parameters<typeof renderWorkflowCatalogArtifacts>[0],
+) => {
+  const rendered = await renderWorkflowCatalogArtifacts(options);
+  await Promise.all(
+    rendered.artifacts.map((artifact) =>
+      installRenderedArtifact(options.rootDirectory, artifact),
+    ),
+  );
+  return rendered;
+};
+
+const verifyRenderedArtifacts = async (
+  options: Parameters<typeof renderWorkflowCatalogArtifacts>[0],
+) => {
+  const localModulePath = join(options.rootDirectory, options.localModulePath);
+  const localArtifactPath = join(
+    options.rootDirectory,
+    options.localArtifactPath,
+  );
+  const [hasLocalModule, hasLocalArtifact] = await Promise.all([
+    readFile(localModulePath)
+      .then(() => true)
+      .catch(() => false),
+    readFile(localArtifactPath)
+      .then(() => true)
+      .catch(() => false),
+  ]);
+  if (hasLocalModule && !hasLocalArtifact) {
+    throw new Error(
+      'Local workflow catalog registration source exists without its generated artifact',
+    );
+  }
+  if (!hasLocalModule && hasLocalArtifact) {
+    throw new Error(
+      'Local workflow catalog artifact exists without its registration source',
+    );
+  }
+  const rendered = await renderWorkflowCatalogArtifacts(options);
+  for (const artifact of rendered.artifacts) {
+    const current = await readFile(
+      join(options.rootDirectory, artifact.artifactPath),
+      'utf8',
+    ).catch(() => undefined);
+    if (
+      artifact.content === null
+        ? current === undefined
+        : current === artifact.content
+    ) {
+      continue;
+    }
+    if (artifact.content !== null && current) {
+      const expectedSourceHash = JSON.parse(artifact.content).sourceHash;
+      const actualSourceHash = JSON.parse(current).sourceHash;
+      if (expectedSourceHash !== actualSourceHash) {
+        throw new Error(
+          `Workflow catalog artifact "${artifact.artifactPath}" is stale because registration sources changed`,
+        );
+      }
+    }
+    throw new Error(
+      `Workflow catalog artifact "${artifact.artifactPath}" has generated output drift`,
+    );
+  }
+};
 
 describe('workflow catalog artifacts', () => {
   it('renders every artifact without writing and generation preserves those bytes', async () => {
@@ -122,7 +207,7 @@ describe('workflow catalog artifacts', () => {
       readFile(join(rootDirectory, localArtifactPath), 'utf8'),
     ).resolves.toBe('stale local\n');
 
-    await generateWorkflowCatalogArtifacts(options);
+    await renderAndInstallArtifacts(options);
 
     for (const artifact of rendered.artifacts) {
       if (artifact.content === null) {
@@ -157,7 +242,7 @@ describe('workflow catalog artifacts', () => {
     await writeFile(join(rootDirectory, sharedSourcePath), 'export {};\n');
     await writeFile(join(rootDirectory, localSourcePath), 'export {};\n');
 
-    await generateWorkflowCatalogArtifacts({
+    await renderAndInstallArtifacts({
       rootDirectory,
       sharedSource,
       sharedArtifactPath,
@@ -216,7 +301,7 @@ describe('workflow catalog artifacts', () => {
 
     await writeFile(join(rootDirectory, sharedSourcePath), 'export {};\n');
     await writeFile(join(rootDirectory, localSourcePath), 'export {};\n');
-    await generateWorkflowCatalogArtifacts(options);
+    await renderAndInstallArtifacts(options);
     const generatedContent = await readFile(
       join(rootDirectory, sharedArtifactPath),
       'utf8',
@@ -357,7 +442,7 @@ describe('workflow catalog artifacts', () => {
       'export const empty = true;\n',
     );
 
-    await generateWorkflowCatalogArtifact({
+    await renderAndInstallArtifact({
       rootDirectory,
       sourceFiles: [sourcePath],
       artifactPath,
@@ -369,7 +454,7 @@ describe('workflow catalog artifacts', () => {
       'utf8',
     );
 
-    await generateWorkflowCatalogArtifact({
+    await renderAndInstallArtifact({
       rootDirectory,
       sourceFiles: [sourcePath],
       artifactPath,
@@ -425,7 +510,7 @@ describe('workflow catalog artifacts', () => {
       },
     });
 
-    await generateWorkflowCatalogArtifact({
+    await renderAndInstallArtifact({
       rootDirectory,
       sourceFiles: [sourcePath],
       artifactPath,
@@ -477,7 +562,7 @@ describe('workflow catalog artifacts', () => {
       },
     });
 
-    const generated = await generateWorkflowCatalogArtifact({
+    const generated = await renderAndInstallArtifact({
       rootDirectory,
       sourceFiles: [sourcePath],
       artifactPath,
@@ -515,7 +600,7 @@ describe('workflow catalog artifacts', () => {
       join(rootDirectory, sourcePath),
       'export const version = 1;\n',
     );
-    await generateWorkflowCatalogArtifact(options);
+    await renderAndInstallArtifact(options);
 
     await expect(
       verifyWorkflowCatalogArtifact(options),
@@ -529,7 +614,7 @@ describe('workflow catalog artifacts', () => {
       'Workflow catalog artifact "catalog.generated.json" is stale because registration sources changed',
     );
 
-    await generateWorkflowCatalogArtifact(options);
+    await renderAndInstallArtifact(options);
     const generated = JSON.parse(
       await readFile(join(rootDirectory, artifactPath), 'utf8'),
     );
@@ -542,6 +627,62 @@ describe('workflow catalog artifacts', () => {
     await expect(verifyWorkflowCatalogArtifact(options)).rejects.toThrowError(
       'Workflow catalog artifact "catalog.generated.json" has generated output drift',
     );
+  });
+
+  it('renders source hashes from prospective generated content and verifies installed bytes', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const sourcePath = 'generated/registration.ts';
+    const artifactPath = 'catalog.generated.json';
+    const registry = createWorkflowCatalogRegistry();
+    await mkdir(join(rootDirectory, 'generated'));
+    await writeFile(
+      join(rootDirectory, sourcePath),
+      'export const old = true;\n',
+    );
+
+    const rendered = await renderWorkflowCatalogArtifacts({
+      rootDirectory,
+      sharedSource: {
+        source: { id: 'oss', label: 'OSS' },
+        sourceFiles: [sourcePath],
+        register: () => undefined,
+      },
+      sharedArtifactPath: artifactPath,
+      localModulePath: 'workflow-catalog.local/registration.ts',
+      localFallback: { ...localRegistrationFallback, sourceFiles: [] },
+      localArtifactPath: 'workflow-catalog.local/catalog.generated.json',
+      sourceContentOverrides: new Map([
+        [sourcePath, 'export const current = true;\n'],
+      ]),
+    });
+
+    await writeFile(
+      join(rootDirectory, sourcePath),
+      'export const current = true;\n',
+    );
+    await writeFile(
+      join(rootDirectory, artifactPath),
+      rendered.artifacts[0]?.content ?? '',
+    );
+
+    const verificationOptions = {
+      rootDirectory,
+      sourceFiles: [sourcePath],
+      artifactPath,
+      registry,
+      source: { id: 'oss', label: 'OSS' },
+    };
+    await expect(
+      verifyWorkflowCatalogArtifact(verificationOptions),
+    ).resolves.toBeUndefined();
+
+    await writeFile(
+      join(rootDirectory, sourcePath),
+      'export const drift = true;\n',
+    );
+    await expect(
+      verifyWorkflowCatalogArtifact(verificationOptions),
+    ).rejects.toThrow('is stale because registration sources changed');
   });
 
   it('keeps clean checkouts local-artifact-free and rejects one-sided local state', async () => {
@@ -584,7 +725,7 @@ describe('workflow catalog artifacts', () => {
       '{"stale":true}\n',
     );
 
-    await generateWorkflowCatalogArtifacts(options);
+    await renderAndInstallArtifacts(options);
 
     expect(
       JSON.parse(
@@ -594,15 +735,13 @@ describe('workflow catalog artifacts', () => {
     await expect(
       readFile(join(rootDirectory, options.localArtifactPath), 'utf8'),
     ).rejects.toMatchObject({ code: 'ENOENT' });
-    await expect(
-      verifyWorkflowCatalogArtifacts(options),
-    ).resolves.toBeUndefined();
+    await expect(verifyRenderedArtifacts(options)).resolves.toBeUndefined();
 
     await writeFile(
       join(rootDirectory, options.localArtifactPath),
       '{"unexpected":true}\n',
     );
-    await expect(verifyWorkflowCatalogArtifacts(options)).rejects.toThrowError(
+    await expect(verifyRenderedArtifacts(options)).rejects.toThrowError(
       'Local workflow catalog artifact exists without its registration source',
     );
 
@@ -616,7 +755,7 @@ describe('workflow catalog artifacts', () => {
 };
 `,
     );
-    await expect(verifyWorkflowCatalogArtifacts(options)).rejects.toThrowError(
+    await expect(verifyRenderedArtifacts(options)).rejects.toThrowError(
       'Local workflow catalog registration source exists without its generated artifact',
     );
   });
@@ -677,7 +816,7 @@ export const workflowCatalogRegistrationSource = {
 `,
     );
 
-    await generateWorkflowCatalogArtifacts({
+    await renderAndInstallArtifacts({
       rootDirectory,
       sharedSource: {
         source: { id: 'oss', label: 'OSS' },
@@ -756,7 +895,7 @@ export const workflowCatalogRegistrationSource = {
         join(rootDirectory, localArtifactPath),
         '{"sourceHash":"stale","descriptors":[]}\n',
       );
-      await generateWorkflowCatalogArtifact({
+      await renderAndInstallArtifact({
         rootDirectory,
         sourceFiles: sharedSource.sourceFiles,
         artifactPath: sharedArtifactPath,
@@ -765,7 +904,7 @@ export const workflowCatalogRegistrationSource = {
       });
 
       await expect(
-        verifyWorkflowCatalogArtifacts({
+        verifyRenderedArtifacts({
           rootDirectory,
           sharedSource,
           sharedArtifactPath,
@@ -828,7 +967,7 @@ export const workflowCatalogRegistrationSource = {
 `,
     );
 
-    await generateWorkflowCatalogArtifacts({
+    await renderAndInstallArtifacts({
       rootDirectory,
       sharedSource: {
         source: { id: 'oss', label: 'OSS' },
@@ -951,7 +1090,7 @@ export const workflowCatalogRegistrationSource = {
       },
       localArtifactPath: 'workflow-catalog.local/catalog.generated.json',
     };
-    await generateWorkflowCatalogArtifacts(options);
+    await renderAndInstallArtifacts(options);
 
     sharedTaskQueue = 'shared-catalog-v2';
     await writeFile(
@@ -960,7 +1099,7 @@ export const workflowCatalogRegistrationSource = {
     );
     const updatedSharedRegistry = createWorkflowCatalogRegistry();
     sharedSource.register(updatedSharedRegistry);
-    await generateWorkflowCatalogArtifact({
+    await renderAndInstallArtifact({
       rootDirectory,
       sourceFiles: sharedSource.sourceFiles,
       artifactPath: options.sharedArtifactPath,
@@ -968,7 +1107,7 @@ export const workflowCatalogRegistrationSource = {
       source: sharedSource.source,
     });
 
-    await expect(verifyWorkflowCatalogArtifacts(options)).rejects.toThrowError(
+    await expect(verifyRenderedArtifacts(options)).rejects.toThrowError(
       'Workflow catalog artifact "workflow-catalog.local/catalog.generated.json" is stale because registration sources changed',
     );
   });
@@ -1012,7 +1151,7 @@ export const workflowCatalogRegistrationSource = {
       );
 
       await expect(
-        generateWorkflowCatalogArtifacts({
+        renderAndInstallArtifacts({
           rootDirectory,
           sharedSource: {
             source: { id: 'oss', label: 'OSS' },
@@ -1558,11 +1697,11 @@ registry.registerExample({
       const sharedArtifactPath =
         'src/lib/workflow-catalog/browser/catalog.generated.json';
 
-      await execFileAsync('pnpm', ['workflow-catalog:generate']);
+      await execFileAsync('pnpm', ['workflow-catalog', 'generate']);
 
       try {
         await expect(
-          execFileAsync('pnpm', ['workflow-catalog:verify']),
+          execFileAsync('pnpm', ['workflow-catalog', 'verify']),
         ).resolves.toMatchObject({ stderr: '' });
 
         const artifact = JSON.parse(await readFile(sharedArtifactPath, 'utf8'));
@@ -1574,7 +1713,7 @@ registry.registerExample({
 
         let verifyFailure: unknown;
         try {
-          await execFileAsync('pnpm', ['workflow-catalog:verify']);
+          await execFileAsync('pnpm', ['workflow-catalog', 'verify']);
         } catch (error) {
           verifyFailure = error;
         }
@@ -1586,7 +1725,7 @@ registry.registerExample({
           }`,
         ).toContain('has generated output drift');
       } finally {
-        await execFileAsync('pnpm', ['workflow-catalog:generate']);
+        await execFileAsync('pnpm', ['workflow-catalog', 'generate']);
       }
     },
     workflowCatalogCommandTestTimeoutMs,
@@ -1598,7 +1737,7 @@ registry.registerExample({
       let commandFailure: unknown;
 
       try {
-        await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
+        await execFileAsync('pnpm', ['workflow-catalog', 'worker'], {
           env: {
             ...process.env,
             TEMPORAL_ADDRESS: '',
@@ -1625,7 +1764,7 @@ registry.registerExample({
       let commandFailure: unknown;
 
       try {
-        await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
+        await execFileAsync('pnpm', ['workflow-catalog', 'worker'], {
           env: {
             ...process.env,
             TEMPORAL_ADDRESS: 'localhost:7233',
@@ -1656,7 +1795,7 @@ registry.registerExample({
         'src/lib/workflow-catalog/browser/catalog.generated.json';
       const originalSource = await readFile(sharedSourcePath, 'utf8');
 
-      await execFileAsync('pnpm', ['workflow-catalog:generate']);
+      await execFileAsync('pnpm', ['workflow-catalog', 'generate']);
       const generatedArtifactContent = await readFile(
         sharedArtifactPath,
         'utf8',
@@ -1667,7 +1806,7 @@ registry.registerExample({
         let commandFailure: unknown;
 
         try {
-          await execFileAsync('pnpm', ['dev:workflow-catalog-worker'], {
+          await execFileAsync('pnpm', ['workflow-catalog', 'worker'], {
             env: { ...process.env, TEMPORAL_ADDRESS: '' },
           });
         } catch (error) {
@@ -1685,7 +1824,7 @@ registry.registerExample({
         );
       } finally {
         await writeFile(sharedSourcePath, originalSource);
-        await execFileAsync('pnpm', ['workflow-catalog:generate']);
+        await execFileAsync('pnpm', ['workflow-catalog', 'generate']);
       }
     },
     workflowCatalogCommandTestTimeoutMs,

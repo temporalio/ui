@@ -82,7 +82,7 @@
         label,
         tooltip:
           kind === 'worker'
-            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm dev:workflow-catalog-worker" to start one.`
+            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm workflow-catalog worker" to start one.`
             : 'Nexus endpoint is unavailable.',
       };
     }
@@ -592,7 +592,7 @@
               <Copyable
                 visible
                 clickAllToCopy
-                content="pnpm dev:workflow-catalog-worker"
+                content="pnpm workflow-catalog worker"
                 copyIconTitle="Copy the worker start command"
                 copySuccessIconTitle="Copied the worker start command"
                 container-class="mt-1"

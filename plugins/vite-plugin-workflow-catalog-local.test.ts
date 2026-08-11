@@ -1,11 +1,13 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { EventEmitter } from 'node:events';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   loadLocalWorkflowCatalogDescriptors,
+  runAuthoringCommand,
   workflowCatalogLocalPlugin,
 } from './vite-plugin-workflow-catalog-local';
 
@@ -18,6 +20,7 @@ const createTemporaryDirectory = async () => {
 };
 
 afterEach(async () => {
+  vi.restoreAllMocks();
   await Promise.all(
     temporaryDirectories
       .splice(0)
@@ -26,6 +29,71 @@ afterEach(async () => {
 });
 
 describe('local workflow catalog Vite boundary', () => {
+  it('exposes an empty local catalog without reading or watching authoring files in production', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    await mkdir(join(rootDirectory, 'workflow-catalog.local'));
+    await writeFile(
+      join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
+      'production must not read this local artifact',
+    );
+    const watchedPaths: string[] = [];
+    const regenerate = vi.fn(async () => undefined);
+    const plugin = workflowCatalogLocalPlugin({ regenerate });
+    const configure = plugin.configResolved as (config: {
+      command: 'build';
+      root: string;
+    }) => void;
+    const configureServer = plugin.configureServer as (server: unknown) => void;
+    const load = plugin.load as (id: string) => Promise<string | undefined>;
+
+    configure({ command: 'build', root: rootDirectory });
+    configureServer({
+      watcher: {
+        add: (path: string) => watchedPaths.push(path),
+        on: () => undefined,
+      },
+      moduleGraph: { getModuleById: () => undefined },
+      ws: { send: () => undefined },
+    });
+
+    await expect(load('\0virtual:workflow-catalog-local')).resolves.toBe(
+      'export const localWorkflowCatalog = [];',
+    );
+    expect(watchedPaths).toEqual([]);
+    expect(regenerate).not.toHaveBeenCalled();
+  });
+
+  it('rejects a nonzero authoring command exit', async () => {
+    const child = new EventEmitter();
+    const command = runAuthoringCommand('/catalog', () => child);
+
+    child.emit('close', 2, null);
+
+    await expect(command).rejects.toThrow(
+      'Workflow catalog generation exited with status 2',
+    );
+  });
+
+  it('rejects an authoring command terminated by a signal', async () => {
+    const child = new EventEmitter();
+    const command = runAuthoringCommand('/catalog', () => child);
+
+    child.emit('close', null, 'SIGTERM');
+
+    await expect(command).rejects.toThrow(
+      'Workflow catalog generation terminated by signal SIGTERM',
+    );
+  });
+
+  it('rejects an authoring command that fails to spawn', async () => {
+    const child = new EventEmitter();
+    const command = runAuthoringCommand('/catalog', () => child);
+
+    child.emit('error', new Error('spawn pnpm ENOENT'));
+
+    await expect(command).rejects.toThrow('spawn pnpm ENOENT');
+  });
+
   it('returns an empty descriptor list when the local artifact is absent', async () => {
     const rootDirectory = await createTemporaryDirectory();
 
@@ -83,11 +151,12 @@ describe('local workflow catalog Vite boundary', () => {
     );
     const plugin = workflowCatalogLocalPlugin();
     const configure = plugin.configResolved as (config: {
+      command: 'serve';
       root: string;
     }) => void;
     const load = plugin.load as (id: string) => Promise<string | undefined>;
 
-    configure({ root: rootDirectory });
+    configure({ command: 'serve', root: rootDirectory });
     const source = await load('\0virtual:workflow-catalog-local');
 
     expect(source).toBe('export const localWorkflowCatalog = [];');
@@ -95,18 +164,19 @@ describe('local workflow catalog Vite boundary', () => {
     expect(source).not.toContain('secret');
   });
 
-  it('watches local descriptors and sources for development reloads', async () => {
+  it('watches the artifact and authored examples without watching generated sources', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const watchedPaths: string[] = [];
     const plugin = workflowCatalogLocalPlugin({
       regenerate: async () => undefined,
     });
     const configure = plugin.configResolved as (config: {
+      command: 'serve';
       root: string;
     }) => void;
     const configureServer = plugin.configureServer as (server: unknown) => void;
 
-    configure({ root: rootDirectory });
+    configure({ command: 'serve', root: rootDirectory });
     configureServer({
       watcher: {
         add: (path: string) => watchedPaths.push(path),
@@ -118,16 +188,15 @@ describe('local workflow catalog Vite boundary', () => {
 
     expect(watchedPaths).toEqual([
       join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
-      join(rootDirectory, 'workflow-catalog.local/registration.ts'),
-      join(rootDirectory, 'workflow-catalog.local/workflows.ts'),
       join(rootDirectory, 'workflow-catalog.local/examples'),
     ]);
   });
 
-  it('regenerates the local catalog when workspace sources or local example files change', async () => {
+  it('regenerates for authored examples and reloads once for an artifact event', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const regenerated: string[] = [];
     const reloads: unknown[] = [];
+    const invalidated: unknown[] = [];
     const handlers: ((path: string) => void)[] = [];
     let releaseRegeneration = () => undefined as void;
     const plugin = workflowCatalogLocalPlugin({
@@ -139,11 +208,79 @@ describe('local workflow catalog Vite boundary', () => {
       },
     });
     const configure = plugin.configResolved as (config: {
+      command: 'serve';
       root: string;
     }) => void;
     const configureServer = plugin.configureServer as (server: unknown) => void;
 
-    configure({ root: rootDirectory });
+    configure({ command: 'serve', root: rootDirectory });
+    configureServer({
+      watcher: {
+        add: () => undefined,
+        on: (_event: string, handler: (path: string) => void) =>
+          handlers.push(handler),
+      },
+      moduleGraph: {
+        getModuleById: () => 'local-catalog-module',
+        invalidateModule: (module: unknown) => invalidated.push(module),
+      },
+      ws: { send: (payload: unknown) => reloads.push(payload) },
+    });
+
+    const [add, change, unlink] = handlers;
+    change(join(rootDirectory, 'workflow-catalog.local/registration.ts'));
+    change(join(rootDirectory, 'workflow-catalog.local/workflows.ts'));
+    expect(regenerated).toEqual([]);
+    add(
+      join(
+        rootDirectory,
+        'workflow-catalog.local/examples/order-lifecycle/new-workflow.ts',
+      ),
+    );
+    expect(regenerated).toEqual([rootDirectory]);
+    releaseRegeneration();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    unlink(join(rootDirectory, 'unrelated.ts'));
+
+    change(
+      join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
+    );
+    expect(invalidated).toEqual(['local-catalog-module']);
+    expect(reloads).toEqual([{ type: 'full-reload' }]);
+
+    change(join(rootDirectory, 'unrelated.ts'));
+    expect(invalidated).toEqual(['local-catalog-module']);
+    expect(reloads).toEqual([{ type: 'full-reload' }]);
+  });
+
+  it('reports failed regeneration, retains the last artifact, and retries later', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const artifactPath = join(
+      rootDirectory,
+      'workflow-catalog.local/catalog.generated.json',
+    );
+    await mkdir(join(rootDirectory, 'workflow-catalog.local'));
+    await writeFile(artifactPath, 'last successful artifact\n');
+    const errors: string[] = [];
+    vi.spyOn(console, 'error').mockImplementation((message) =>
+      errors.push(String(message)),
+    );
+    let attempts = 0;
+    const handlers: ((path: string) => void)[] = [];
+    const plugin = workflowCatalogLocalPlugin({
+      regenerate: async () => {
+        attempts += 1;
+        if (attempts === 1) throw new Error('generation failed');
+      },
+    });
+    const configure = plugin.configResolved as (config: {
+      command: 'serve';
+      root: string;
+    }) => void;
+    const configureServer = plugin.configureServer as (server: unknown) => void;
+    configure({ command: 'serve', root: rootDirectory });
     configureServer({
       watcher: {
         add: () => undefined,
@@ -151,70 +288,28 @@ describe('local workflow catalog Vite boundary', () => {
           handlers.push(handler),
       },
       moduleGraph: { getModuleById: () => undefined },
-      ws: { send: (payload: unknown) => reloads.push(payload) },
+      ws: { send: () => undefined },
     });
-
-    const [add, change, unlink] = handlers;
-    change(join(rootDirectory, 'workflow-catalog.local/registration.ts'));
-    change(join(rootDirectory, 'workflow-catalog.local/workflows.ts'));
-    expect(regenerated).toEqual([rootDirectory]);
-
-    releaseRegeneration();
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(regenerated).toEqual([rootDirectory, rootDirectory]);
-    releaseRegeneration();
-
-    await Promise.resolve();
-    await Promise.resolve();
-    add(
-      join(
-        rootDirectory,
-        'workflow-catalog.local/examples/order-lifecycle/new-workflow.ts',
-      ),
+    const [, change] = handlers;
+    const examplePath = join(
+      rootDirectory,
+      'workflow-catalog.local/examples/retry/example.ts',
     );
-    expect(regenerated).toEqual([rootDirectory, rootDirectory, rootDirectory]);
-    releaseRegeneration();
 
+    change(examplePath);
     await Promise.resolve();
     await Promise.resolve();
-    change(
-      join(
-        rootDirectory,
-        'workflow-catalog.local/examples/order-lifecycle/workflow.ts',
-      ),
-    );
-    expect(regenerated).toEqual([
-      rootDirectory,
-      rootDirectory,
-      rootDirectory,
-      rootDirectory,
+
+    expect(errors).toEqual([
+      'Workflow catalog generation failed: generation failed',
     ]);
-    releaseRegeneration();
+    await expect(readFile(artifactPath, 'utf8')).resolves.toBe(
+      'last successful artifact\n',
+    );
 
+    change(examplePath);
     await Promise.resolve();
     await Promise.resolve();
-    unlink(
-      join(
-        rootDirectory,
-        'workflow-catalog.local/examples/order-lifecycle/example.ts',
-      ),
-    );
-    expect(regenerated).toEqual([
-      rootDirectory,
-      rootDirectory,
-      rootDirectory,
-      rootDirectory,
-      rootDirectory,
-    ]);
-    releaseRegeneration();
-
-    change(
-      join(rootDirectory, 'workflow-catalog.local/catalog.generated.json'),
-    );
-    expect(reloads).toEqual([{ type: 'full-reload' }]);
-
-    change(join(rootDirectory, 'unrelated.ts'));
-    expect(reloads).toEqual([{ type: 'full-reload' }]);
+    expect(attempts).toBe(2);
   });
 });

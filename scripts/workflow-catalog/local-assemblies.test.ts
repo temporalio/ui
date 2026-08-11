@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -6,29 +6,23 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   localWorkflowCatalogSourceFiles,
-  verifyLocalWorkflowCatalogAssemblies,
-  writeLocalWorkflowCatalogAssemblies,
+  renderLocalWorkflowCatalogAssemblies,
 } from './local-assemblies';
 
-const temporaryDirectories: string[] = [];
-
-const createTemporaryDirectory = async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'workflow-catalog-assembly-'));
-  temporaryDirectories.push(directory);
-  return directory;
-};
+const directories: string[] = [];
 
 afterEach(async () => {
   await Promise.all(
-    temporaryDirectories
+    directories
       .splice(0)
       .map((directory) => rm(directory, { force: true, recursive: true })),
   );
 });
 
 describe('local workflow catalog assemblies', () => {
-  it('writes sorted explicit local registration and workflow barrels from example directories', async () => {
-    const rootDirectory = await createTemporaryDirectory();
+  it('renders sorted registration and workflow barrels from authored examples', async () => {
+    const rootDirectory = await mkdtemp(join(tmpdir(), 'local-catalog-'));
+    directories.push(rootDirectory);
     const examplesDirectory = join(
       rootDirectory,
       'workflow-catalog.local/examples',
@@ -48,24 +42,18 @@ describe('local workflow catalog assemblies', () => {
       ]);
     }
 
-    await writeLocalWorkflowCatalogAssemblies(rootDirectory);
+    const rendered = await renderLocalWorkflowCatalogAssemblies(rootDirectory);
 
-    await expect(
-      readFile(
-        join(rootDirectory, 'workflow-catalog.local/registration.ts'),
-        'utf8',
-      ),
-    ).resolves.toContain('./examples/alpha/example.js');
-    await expect(
-      readFile(
-        join(rootDirectory, 'workflow-catalog.local/workflows.ts'),
-        'utf8',
-      ),
-    ).resolves.toContain('./examples/zeta/workflow.js');
+    expect(rendered.registration).toContain('./examples/alpha/example.js');
+    expect(rendered.workflows).toContain('./examples/zeta/workflow.js');
+    expect(rendered.registration).toContain(
+      'workflowExports: { ...workflows }',
+    );
   });
 
-  it('derives every support source and omits workflow exports for standalone examples', async () => {
-    const rootDirectory = await createTemporaryDirectory();
+  it('renders every support source while omitting standalone examples from workflow exports', async () => {
+    const rootDirectory = await mkdtemp(join(tmpdir(), 'local-catalog-'));
+    directories.push(rootDirectory);
     const examplesDirectory = join(
       rootDirectory,
       'workflow-catalog.local/examples',
@@ -93,30 +81,21 @@ describe('local workflow catalog assemblies', () => {
       writeFile(join(standaloneDirectory, 'activity.ts'), 'export {};\n'),
     ]);
 
-    await writeLocalWorkflowCatalogAssemblies(rootDirectory);
+    const rendered = await renderLocalWorkflowCatalogAssemblies(rootDirectory);
 
-    const registration = await readFile(
-      join(rootDirectory, 'workflow-catalog.local/registration.ts'),
-      'utf8',
-    );
-    const workflows = await readFile(
-      join(rootDirectory, 'workflow-catalog.local/workflows.ts'),
-      'utf8',
-    );
-    expect(registration).toContain(
+    expect(rendered.registration).toContain(
       "'workflow-catalog.local/examples/alpha-workflow/activity.ts'",
     );
-    expect(registration).toContain(
+    expect(rendered.registration).toContain(
       "'workflow-catalog.local/examples/zeta-activity/activity.ts'",
     );
-    expect(workflows).toContain('./examples/alpha-workflow/workflow.js');
-    expect(workflows).not.toContain('zeta-activity');
-    // A module namespace object is rejected by the registry, which requires
-    // plain enumerable data properties, so the barrel must be spread.
-    expect(registration).toContain('workflowExports: { ...workflows }');
+    expect(rendered.workflows).toContain(
+      './examples/alpha-workflow/workflow.js',
+    );
+    expect(rendered.workflows).not.toContain('zeta-activity');
   });
 
-  it('declares only authored files as sources, so a first example generates before its assemblies exist', () => {
+  it('declares authored example files only', () => {
     const sourceFiles = localWorkflowCatalogSourceFiles([
       {
         id: 'alpha',
@@ -135,77 +114,5 @@ describe('local workflow catalog assemblies', () => {
       'workflow-catalog.local/examples/alpha/example.ts',
       'workflow-catalog.local/examples/alpha/workflow.ts',
     ]);
-    expect(sourceFiles).not.toContain('workflow-catalog.local/registration.ts');
-    expect(sourceFiles).not.toContain('workflow-catalog.local/workflows.ts');
-  });
-
-  it('removes generated local outputs after the last authored example leaves', async () => {
-    const rootDirectory = await createTemporaryDirectory();
-    const exampleDirectory = join(
-      rootDirectory,
-      'workflow-catalog.local/examples/alpha-workflow',
-    );
-    await mkdir(exampleDirectory, { recursive: true });
-    await Promise.all([
-      writeFile(
-        join(exampleDirectory, 'example.ts'),
-        "export const workflowCatalogExample = { execution: { kind: 'workflow', workflowType: 'alphaWorkflow' } };\n",
-      ),
-      writeFile(
-        join(exampleDirectory, 'workflow.ts'),
-        'export async function alphaWorkflow() {}\n',
-      ),
-    ]);
-    await writeLocalWorkflowCatalogAssemblies(rootDirectory);
-    const localDirectory = join(rootDirectory, 'workflow-catalog.local');
-    await Promise.all([
-      rm(exampleDirectory, { recursive: true }),
-      writeFile(join(localDirectory, 'catalog.generated.json'), '{}\n'),
-    ]);
-
-    await writeLocalWorkflowCatalogAssemblies(rootDirectory);
-
-    await expect(
-      Promise.all([
-        readFile(join(localDirectory, 'registration.ts'), 'utf8'),
-        readFile(join(localDirectory, 'workflows.ts'), 'utf8'),
-        readFile(join(localDirectory, 'catalog.generated.json'), 'utf8'),
-      ]),
-    ).rejects.toThrow();
-  });
-
-  it('reports stale generated local outputs when no authored examples remain', async () => {
-    const rootDirectory = await createTemporaryDirectory();
-    const localDirectory = join(rootDirectory, 'workflow-catalog.local');
-    await mkdir(localDirectory, { recursive: true });
-    await Promise.all([
-      writeFile(
-        join(localDirectory, 'registration.ts'),
-        '// GENERATED FILE. DO NOT EDIT.\nstale\n',
-      ),
-      writeFile(
-        join(localDirectory, 'workflows.ts'),
-        '// GENERATED FILE. DO NOT EDIT.\nstale\n',
-      ),
-    ]);
-
-    await expect(
-      verifyLocalWorkflowCatalogAssemblies(rootDirectory),
-    ).rejects.toThrow('run "pnpm workflow-catalog generate"');
-
-    const artifactOnlyRoot = await createTemporaryDirectory();
-    const artifactOnlyDirectory = join(
-      artifactOnlyRoot,
-      'workflow-catalog.local',
-    );
-    await mkdir(artifactOnlyDirectory, { recursive: true });
-    await writeFile(
-      join(artifactOnlyDirectory, 'catalog.generated.json'),
-      '{}\n',
-    );
-
-    await expect(
-      verifyLocalWorkflowCatalogAssemblies(artifactOnlyRoot),
-    ).rejects.toThrow('run "pnpm workflow-catalog generate"');
   });
 });

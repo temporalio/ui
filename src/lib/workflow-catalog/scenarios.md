@@ -90,6 +90,17 @@ Moves the example into the shared catalog, then regenerates and verifies.
 
 **Unverified.** Covered by tests but not exercised by hand.
 
+### Demotion
+
+```bash
+pnpm workflow-catalog demote order-lifecycle --dry-run
+pnpm workflow-catalog demote order-lifecycle
+```
+
+Moves a self-contained shared example back to `workflow-catalog.local/examples/`, regenerates, and verifies. The result is local and ignored by Git, not deleted. An occupied local destination or an import outside the example directory is refused without moving the tracked source. Generation and verification failures roll back the move and generated outputs.
+
+**Unverified.** The successful move and both rollback phases are covered by automated tests but have not been exercised by hand.
+
 ## Prerequisites
 
 ### Automatic endpoint provisioning

@@ -33,11 +33,12 @@ pnpm workflow-catalog scaffold <example-id>    # create a local example
 pnpm workflow-catalog generate                 # rebuild generated artifacts
 pnpm workflow-catalog verify                   # check artifacts and boundaries
 pnpm workflow-catalog promote <example-id>     # move a local example into the shared catalog
+pnpm workflow-catalog demote <example-id>      # move a shared example back to the local catalog
 pnpm workflow-catalog dev                      # UI plus worker
 pnpm workflow-catalog worker                   # worker only
 ```
 
-`promote` accepts `--dry-run` to preview without moving anything.
+`promote` and `demote` accept `--dry-run` to preview without moving anything.
 
 ## Find an example
 
@@ -96,6 +97,19 @@ pnpm workflow-catalog promote order-lifecycle
 ```
 
 This moves `workflow-catalog.local/examples/<id>/` to `src/lib/workflow-catalog/worker/examples/<id>/`, then regenerates and verifies. After promoting, the example is committed to the repository and ships to every consumer, so review its input schema, expected evidence, and setup instructions before promoting.
+
+## Demote a shared example into the local catalog
+
+Demotion reverses a deliberate promotion:
+
+```bash
+pnpm workflow-catalog demote order-lifecycle --dry-run
+pnpm workflow-catalog demote order-lifecycle
+```
+
+This moves `src/lib/workflow-catalog/worker/examples/<id>/` back to `workflow-catalog.local/examples/<id>/`, then regenerates and verifies through the same journaled transaction as promotion. The example is now local and ignored by Git; it is not deleted. The command never overwrites an existing local example, and a generation or verification failure restores the tracked source and generated outputs.
+
+Only self-contained examples can move between the two roots. If an older shared example imports files outside its own directory, demotion refuses it with an explanation and leaves it tracked; make the example self-contained before trying again.
 
 ## Configuration
 

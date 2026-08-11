@@ -194,25 +194,6 @@ export const composeWorkflowCatalogArtifacts = (
   );
 };
 
-export const renderWorkflowCatalogAssembly = ({
-  header,
-  imports,
-  statements,
-}: {
-  header?: string;
-  imports?: readonly string[];
-  statements: readonly string[];
-}) => {
-  const preamble = [
-    header?.trim(),
-    imports && [...imports].sort().join('\n'),
-  ].filter((section): section is string => Boolean(section));
-  return [preamble.join('\n'), statements.join('\n')]
-    .filter(Boolean)
-    .join('\n\n')
-    .concat('\n');
-};
-
 export const validateWorkflowCatalogAuthoringGraph = (
   graph: WorkflowCatalogAuthoringGraph,
   examples: readonly WorkflowCatalogComposedExample[],
@@ -1023,11 +1004,22 @@ export const createWorkflowCatalogAuthoring = (
       }
     }
   };
-  const planPromote = async (exampleId: string) => {
+  const planDirectoryMove = async ({
+    destinationKind,
+    exampleId,
+    fromRoot,
+    sourceKind,
+    toRoot,
+  }: {
+    destinationKind: string;
+    exampleId: string;
+    fromRoot: string;
+    sourceKind: string;
+    toRoot: string;
+  }) => {
     assertExampleId(exampleId);
-    const root = await rootDirectory;
-    const from = `${adapter.localExamplesPath}/${exampleId}`;
-    const to = `${adapter.trackedExamplesPath}/${exampleId}`;
+    const from = `${fromRoot}/${exampleId}`;
+    const to = `${toRoot}/${exampleId}`;
     const sourceMetadata = await lstat(await safeAbsolutePath(from)).catch(
       (error) => {
         if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
@@ -1035,13 +1027,30 @@ export const createWorkflowCatalogAuthoring = (
       },
     );
     if (!sourceMetadata) {
-      throw new Error(`Local workflow catalog example does not exist: ${from}`);
+      throw new Error(
+        `${sourceKind} workflow catalog example does not exist: ${from}`,
+      );
     }
     if (!sourceMetadata.isDirectory() || sourceMetadata.isSymbolicLink()) {
       throw new Error(
         `${from} must be a real directory, not a link or special file`,
       );
     }
+    if (await pathExists(await safeAbsolutePath(to))) {
+      throw new Error(`${destinationKind} destination already exists: ${to}`);
+    }
+    return { from, sourcePath: await safeAbsolutePath(from), to };
+  };
+  const validateSelfContainedExample = async ({
+    absoluteImportError,
+    relativeImportError,
+    sourcePath,
+  }: {
+    absoluteImportError: (filePath: string) => string;
+    relativeImportError: (filePath: string) => string;
+    sourcePath: string;
+  }) => {
+    const root = await rootDirectory;
     const validateDirectory = async (directory: string): Promise<string[]> => {
       const entries = await readdir(directory, { withFileTypes: true });
       const files: string[] = [];
@@ -1060,7 +1069,6 @@ export const createWorkflowCatalogAuthoring = (
       }
       return files;
     };
-    const sourcePath = await safeAbsolutePath(from);
     const authoredFiles = await validateDirectory(sourcePath);
     const resolvedSourcePath = resolve(sourcePath);
     for (const file of authoredFiles) {
@@ -1070,10 +1078,9 @@ export const createWorkflowCatalogAuthoring = (
         source,
       });
       for (const importPath of moduleSpecifiers) {
+        const filePath = relative(root, file);
         if (isAbsolute(importPath) || /^file:/i.test(importPath)) {
-          throw new Error(
-            `${relative(root, file)} imports cannot use absolute paths or file URLs`,
-          );
+          throw new Error(absoluteImportError(filePath));
         }
         if (!importPath.startsWith('.')) continue;
         const resolvedImport = resolve(dirname(file), importPath);
@@ -1081,15 +1088,26 @@ export const createWorkflowCatalogAuthoring = (
           resolvedImport !== resolvedSourcePath &&
           !resolvedImport.startsWith(`${resolvedSourcePath}${sep}`)
         ) {
-          throw new Error(
-            `${relative(root, file)} relative imports must stay within its example directory`,
-          );
+          throw new Error(relativeImportError(filePath));
         }
       }
     }
-    if (await pathExists(await safeAbsolutePath(to))) {
-      throw new Error(`Promotion destination already exists: ${to}`);
-    }
+  };
+  const planPromote = async (exampleId: string) => {
+    const { from, sourcePath, to } = await planDirectoryMove({
+      destinationKind: 'Promotion',
+      exampleId,
+      fromRoot: adapter.localExamplesPath,
+      sourceKind: 'Local',
+      toRoot: adapter.trackedExamplesPath,
+    });
+    await validateSelfContainedExample({
+      absoluteImportError: (filePath) =>
+        `${filePath} imports cannot use absolute paths or file URLs`,
+      relativeImportError: (filePath) =>
+        `${filePath} relative imports must stay within its example directory`,
+      sourcePath,
+    });
     await adapter.validatePromotion?.({ exampleId });
     return {
       operations: [
@@ -1099,8 +1117,64 @@ export const createWorkflowCatalogAuthoring = (
       ],
     };
   };
+  const planDemote = async (exampleId: string) => {
+    const { from, sourcePath, to } = await planDirectoryMove({
+      destinationKind: 'Demotion',
+      exampleId,
+      fromRoot: adapter.trackedExamplesPath,
+      sourceKind: 'Tracked',
+      toRoot: adapter.localExamplesPath,
+    });
+    await validateSelfContainedExample({
+      absoluteImportError: (filePath) =>
+        `Workflow catalog example "${exampleId}" cannot be demoted automatically because ${filePath} imports outside its example directory`,
+      relativeImportError: (filePath) =>
+        `Workflow catalog example "${exampleId}" cannot be demoted automatically because ${filePath} imports outside its example directory`,
+      sourcePath,
+    });
+    return {
+      operations: [
+        { from, kind: 'move-directory' as const, to },
+        { kind: 'generate' as const },
+        { kind: 'verify' as const },
+      ],
+    };
+  };
+  const executePlannedMove = async (
+    plan: Awaited<ReturnType<typeof planDemote>>,
+    operation: string,
+  ) => {
+    const move = plan.operations[0];
+    if (!move || move.kind !== 'move-directory') {
+      throw new Error(`${operation} plan has no directory move`);
+    }
+    return withJournaledFiles(
+      adapter.generatedPaths,
+      async (transactionPath) => {
+        const sourcePath = await safeAbsolutePath(move.from);
+        const destinationPath = await safeAbsolutePath(move.to);
+        await ensureSafeParent(move.to);
+        await rename(sourcePath, destinationPath);
+        await generateUnlocked(transactionPath);
+        await verifyUnlocked();
+        return {
+          changedPaths: [move.from, move.to, ...adapter.generatedPaths],
+          moved: { from: move.from, to: move.to },
+        };
+      },
+      move,
+    );
+  };
 
   return {
+    demote: async (exampleId: string) => {
+      assertExampleId(exampleId);
+      return withLock(() =>
+        planDemote(exampleId).then((plan) =>
+          executePlannedMove(plan, 'Demotion'),
+        ),
+      );
+    },
     scaffold: async (exampleId: string) => {
       assertExampleId(exampleId);
       return withLock(async () => {
@@ -1137,32 +1211,16 @@ export const createWorkflowCatalogAuthoring = (
       withLock(() =>
         withJournaledFiles(adapter.generatedPaths, generateUnlocked),
       ),
-    verify: verifyUnlocked,
+    verify: () => withLock(verifyUnlocked),
+    planDemote,
     planPromote,
     promote: async (exampleId: string) => {
       assertExampleId(exampleId);
-      return withLock(async () => {
-        const plan = await planPromote(exampleId);
-        const move = plan.operations[0];
-        if (!move || move.kind !== 'move-directory') {
-          throw new Error('Promotion plan has no directory move');
-        }
-        return withJournaledFiles(
-          adapter.generatedPaths,
-          async (transactionPath) => {
-            const sourcePath = await safeAbsolutePath(move.from);
-            const destinationPath = await safeAbsolutePath(move.to);
-            await ensureSafeParent(move.to);
-            await rename(sourcePath, destinationPath);
-            await generateUnlocked(transactionPath);
-            await verifyUnlocked();
-            return {
-              changedPaths: [move.from, move.to, ...adapter.generatedPaths],
-            };
-          },
-          move,
-        );
-      });
+      return withLock(() =>
+        planPromote(exampleId).then((plan) =>
+          executePlannedMove(plan, 'Promotion'),
+        ),
+      );
     },
   };
 };
@@ -1176,14 +1234,32 @@ Commands:
   workflow-catalog verify                 Verify workflow catalog artifacts and boundaries.
   workflow-catalog promote <example-id> [--dry-run]
                                            Promote or preview a directory-backed local example.
+  workflow-catalog demote <example-id> [--dry-run]
+                                           Move or preview a tracked example into the local, Git-ignored catalog.
   workflow-catalog dev                    Start the catalog UI and worker.
   workflow-catalog worker                 Start the catalog worker.`;
 
-export const workflowCatalogCommandAliases = {
-  new: 'scaffold',
-  'dev:catalog': 'dev',
-  'dev:workflow-catalog-worker': 'worker',
-} as const;
+const formatCatalogMoveSuccess = ({
+  exampleId,
+  headline,
+  moved,
+  notices = [],
+  nextStep,
+}: {
+  exampleId: string;
+  headline: (exampleId: string) => string;
+  moved: { from: string; to: string };
+  notices?: readonly string[];
+  nextStep: string;
+}) =>
+  [
+    headline(exampleId),
+    'Moved:',
+    `  ${moved.from} → ${moved.to}`,
+    'Regenerated workflow catalog artifacts.',
+    ...notices,
+    `Next: ${nextStep}.`,
+  ].join('\n');
 
 export const runWorkflowCatalogCli = async ({
   authoring,
@@ -1205,11 +1281,7 @@ export const runWorkflowCatalogCli = async ({
     io.writeOutput(workflowCatalogHelp);
     return;
   }
-  const requestedCommand = argv[0] as string;
-  const command: string =
-    workflowCatalogCommandAliases[
-      requestedCommand as keyof typeof workflowCatalogCommandAliases
-    ] ?? requestedCommand;
+  const command = argv[0] as string;
   const fail = (message: string): never => {
     io.writeError(`${message}\n\n${workflowCatalogHelp}`);
     throw new Error(message);
@@ -1236,6 +1308,30 @@ export const runWorkflowCatalogCli = async ({
     io.writeOutput('Workflow catalog artifacts verified.');
     return;
   }
+  if (command === 'demote' && (argv.length === 2 || argv.length === 3)) {
+    if (argv.length === 3 && argv[2] !== '--dry-run') {
+      fail('Usage: workflow-catalog demote <example-id> [--dry-run]');
+    }
+    if (argv[2] === '--dry-run') {
+      io.writeOutput(
+        JSON.stringify(await authoring.planDemote(argv[1]), null, 2),
+      );
+      return;
+    }
+    const result = await authoring.demote(argv[1]);
+    io.writeOutput(
+      formatCatalogMoveSuccess({
+        exampleId: argv[1],
+        headline: (exampleId) =>
+          `Demoted "${exampleId}" to the local workflow catalog.`,
+        moved: result.moved,
+        notices: ['The local example is ignored by Git.'],
+        nextStep:
+          'review the tracked changes with git status, then commit the tracked removal only if the shared example was already committed',
+      }),
+    );
+    return;
+  }
   if (command === 'promote' && (argv.length === 2 || argv.length === 3)) {
     if (argv.length === 3 && argv[2] !== '--dry-run') {
       fail('Usage: workflow-catalog promote <example-id> [--dry-run]');
@@ -1248,11 +1344,14 @@ export const runWorkflowCatalogCli = async ({
     }
     const result = await authoring.promote(argv[1]);
     io.writeOutput(
-      [
-        'Workflow catalog example promoted. Changed paths:',
-        ...result.changedPaths.map((path) => `  ${path}`),
-        'Review and commit these changes manually.',
-      ].join('\n'),
+      formatCatalogMoveSuccess({
+        exampleId: argv[1],
+        headline: (exampleId) =>
+          `Promoted "${exampleId}" to the shared workflow catalog.`,
+        moved: result.moved,
+        nextStep:
+          'review the tracked changes with git status, then commit them when ready',
+      }),
     );
     return;
   }
@@ -1265,13 +1364,19 @@ export const runWorkflowCatalogCli = async ({
     return;
   }
   if (
-    ['dev', 'generate', 'help', 'scaffold', 'verify', 'worker'].includes(
-      command,
-    )
+    [
+      'demote',
+      'dev',
+      'generate',
+      'help',
+      'scaffold',
+      'verify',
+      'worker',
+    ].includes(command)
   ) {
     fail(`Invalid arguments for workflow catalog command "${command}"`);
   }
-  fail(`Unknown workflow catalog command "${requestedCommand}"`);
+  fail(`Unknown workflow catalog command "${command}"`);
 };
 
 export type WorkflowCatalogLocalArtifactVitePluginOptions = {
@@ -1369,6 +1474,12 @@ export const createWorkflowCatalogLocalArtifactVitePlugin = ({
         regenerating = true;
         try {
           await regenerate(rootDirectory);
+        } catch (error) {
+          console.error(
+            `Workflow catalog generation failed: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          );
         } finally {
           regenerating = false;
           if (regenerationQueued) {

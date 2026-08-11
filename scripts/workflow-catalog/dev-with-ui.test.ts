@@ -43,7 +43,7 @@ describe('catalog development supervisor', () => {
       'ui',
       'worker',
     ]);
-    expect(started).toEqual(['pnpm dev', 'pnpm dev:workflow-catalog-worker']);
+    expect(started).toEqual(['pnpm dev', 'pnpm workflow-catalog worker']);
   });
 
   it('stops every process and reports the exit code when one exits', () => {

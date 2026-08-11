@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { readdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -26,12 +26,6 @@ type CanonicalExample = {
 type CatalogAssembly = {
   content: string;
   path: string;
-};
-
-const writeAtomically = async (path: string, content: string) => {
-  const temporaryPath = `${path}.tmp`;
-  await writeFile(temporaryPath, content);
-  await rename(temporaryPath, path);
 };
 
 const regularFilesRecursively = async (
@@ -209,7 +203,6 @@ export const sharedWorkflowSourceFiles = [
 ${sourceFiles}
 ] as const;
 
-export { sharedWorkflowCorpusInventory } from './inventory.js';
 `;
   const prettierConfig =
     (await resolveConfig(join(rootDirectory, 'package.json'))) ?? {};
@@ -286,33 +279,4 @@ export const loadCanonicalWorkflowCatalogRegistrationSource = async (
       }
     },
   };
-};
-
-export const writeCanonicalWorkflowCatalogAssemblies = async (
-  rootDirectory: string,
-) => {
-  const assemblies =
-    await renderCanonicalWorkflowCatalogAssemblies(rootDirectory);
-  await Promise.all(
-    assemblies.map(({ content, path }) =>
-      writeAtomically(join(rootDirectory, path), content),
-    ),
-  );
-};
-
-export const verifyCanonicalWorkflowCatalogAssemblies = async (
-  rootDirectory: string,
-) => {
-  const assemblies =
-    await renderCanonicalWorkflowCatalogAssemblies(rootDirectory);
-
-  for (const { content, path } of assemblies) {
-    const actual = await readFile(join(rootDirectory, path), 'utf8').catch(
-      () => '',
-    );
-
-    if (actual !== content) {
-      throw new Error(`${path} is stale; run "pnpm workflow-catalog generate"`);
-    }
-  }
 };

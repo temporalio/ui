@@ -83,6 +83,19 @@ pnpm workflow-catalog verify     # check for staleness and drift
 
 Verification hashes the declared source files, so an artifact that no longer matches its sources fails with a message naming the command that fixes it. Run `verify` before committing catalog changes; it is also what the worker runs as a preflight.
 
+## Moving examples between shared and local catalogs
+
+Preview either source move before applying it:
+
+```bash
+pnpm workflow-catalog promote order-lifecycle --dry-run
+pnpm workflow-catalog demote order-lifecycle --dry-run
+```
+
+`promote` moves a self-contained example from `workflow-catalog.local/examples/` into the tracked shared catalog. `demote` reverses that move into the Git-ignored local catalog; it does not delete the example. Both commands regenerate and verify through one journaled transaction, refuse to overwrite the destination, and restore the source plus generated outputs if the transaction fails.
+
+Examples must keep their imports inside their own directory to move safely between roots. An older shared example with cross-directory imports cannot be demoted automatically; the command explains the dependency and leaves the tracked source untouched.
+
 ## Scenarios
 
 [Configuration scenarios](./scenarios.md) records the supported configurations, how to reproduce each one, and what has been verified.

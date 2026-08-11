@@ -2,7 +2,6 @@ import {
   access,
   mkdir,
   mkdtemp,
-  readFile,
   rm,
   symlink,
   writeFile,
@@ -13,43 +12,42 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
-  executeDirectoryWorkflowCatalogPromotion,
+  parseWorkflowCatalogTypeScriptModuleSpecifiers,
   planDirectoryWorkflowCatalogPromotion,
 } from './directory-promotion';
 
-const temporaryDirectories: string[] = [];
+const directories: string[] = [];
 
 const createTemporaryDirectory = async () => {
-  const directory = await mkdtemp(
-    join(tmpdir(), 'workflow-catalog-directory-'),
-  );
-  temporaryDirectories.push(directory);
+  const directory = await mkdtemp(join(tmpdir(), 'directory-catalog-'));
+  directories.push(directory);
   return directory;
 };
 
 afterEach(async () => {
   await Promise.all(
-    temporaryDirectories
+    directories
       .splice(0)
       .map((directory) => rm(directory, { force: true, recursive: true })),
   );
 });
 
-describe('directory workflow catalog promotion', () => {
-  it('plans the exact directory move and regeneration without creating staging files', async () => {
-    const rootDirectory = await createTemporaryDirectory();
-    const sourceDirectory = join(
+describe('directory workflow catalog promotion planning', () => {
+  it('plans the authored directory move followed by generation and verification', async () => {
+    const rootDirectory = await mkdtemp(join(tmpdir(), 'directory-catalog-'));
+    directories.push(rootDirectory);
+    const directory = join(
       rootDirectory,
       'workflow-catalog.local/examples/order-lifecycle',
     );
-    await mkdir(sourceDirectory, { recursive: true });
+    await mkdir(directory, { recursive: true });
     await Promise.all([
       writeFile(
-        join(sourceDirectory, 'example.ts'),
+        join(directory, 'example.ts'),
         "export const workflowCatalogExample = { id: 'order-lifecycle', execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n",
       ),
       writeFile(
-        join(sourceDirectory, 'workflow.ts'),
+        join(directory, 'workflow.ts'),
         'export async function orderLifecycle() {}\n',
       ),
     ]);
@@ -72,182 +70,22 @@ describe('directory workflow catalog promotion', () => {
     });
   });
 
-  it('rolls back the directory move when post-move verification fails', async () => {
-    const rootDirectory = await createTemporaryDirectory();
-    const sourceDirectory = join(
-      rootDirectory,
-      'workflow-catalog.local/examples/order-lifecycle',
-    );
-    await mkdir(sourceDirectory, { recursive: true });
-    await Promise.all([
-      writeFile(
-        join(sourceDirectory, 'example.ts'),
-        "export const workflowCatalogExample = { id: 'order-lifecycle', execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n",
-      ),
-      writeFile(
-        join(sourceDirectory, 'workflow.ts'),
-        'export async function orderLifecycle() {}\n',
-      ),
-    ]);
-    const calls: string[] = [];
-
-    await expect(
-      executeDirectoryWorkflowCatalogPromotion({
-        exampleId: 'order-lifecycle',
-        generate: async () => calls.push('generate'),
-        rootDirectory,
-        verify: async () => {
-          calls.push('verify');
-          throw new Error('verify failed');
-        },
+  it('collects static module specifiers and rejects computed loading', () => {
+    expect(
+      parseWorkflowCatalogTypeScriptModuleSpecifiers({
+        filePath: 'example.ts',
+        source: "import './activity.js'; export { value } from './value.js';",
       }),
-    ).rejects.toThrow('verify failed');
-
-    await expect(
-      Promise.all([
-        readFile(join(sourceDirectory, 'example.ts'), 'utf8'),
-        readFile(
-          join(
-            rootDirectory,
-            'src/lib/workflow-catalog/worker/examples/order-lifecycle/example.ts',
-          ),
-          'utf8',
-        ),
-      ]),
-    ).rejects.toThrow();
-    expect(calls).toEqual(['generate', 'verify']);
+    ).toEqual(['./activity.js', './value.js']);
+    expect(() =>
+      parseWorkflowCatalogTypeScriptModuleSpecifiers({
+        filePath: 'example.ts',
+        source: 'import(path);',
+      }),
+    ).toThrow('module loading must use a string literal');
   });
 
-  it('moves authored sources byte-for-byte, generates, verifies, and reports changed paths', async () => {
-    const rootDirectory = await createTemporaryDirectory();
-    const sourceDirectory = join(
-      rootDirectory,
-      'workflow-catalog.local/examples/order-lifecycle',
-    );
-    await mkdir(sourceDirectory, { recursive: true });
-    const exampleSource =
-      "export const workflowCatalogExample = { id: 'order-lifecycle', execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n";
-    const workflowSource =
-      'export async function orderLifecycle() { return "ok"; }\n';
-    await Promise.all([
-      writeFile(join(sourceDirectory, 'example.ts'), exampleSource),
-      writeFile(join(sourceDirectory, 'workflow.ts'), workflowSource),
-    ]);
-    const calls: string[] = [];
-    const generatedIndexPath = join(
-      rootDirectory,
-      'src/lib/workflow-catalog/worker/examples/index.ts',
-    );
-    const generatedCatalogPath = join(
-      rootDirectory,
-      'src/lib/workflow-catalog/browser/catalog.generated.json',
-    );
-
-    await expect(
-      executeDirectoryWorkflowCatalogPromotion({
-        exampleId: 'order-lifecycle',
-        generate: async () => {
-          calls.push('generate');
-          await mkdir(join(rootDirectory, 'src/lib/workflow-catalog/browser'), {
-            recursive: true,
-          });
-          await Promise.all([
-            writeFile(generatedIndexPath, 'generated index\n'),
-            writeFile(generatedCatalogPath, 'generated catalog\n'),
-          ]);
-        },
-        rootDirectory,
-        verify: async () => calls.push('verify'),
-      }),
-    ).resolves.toEqual({
-      changedPaths: [
-        'workflow-catalog.local/examples/order-lifecycle',
-        'src/lib/workflow-catalog/worker/examples/order-lifecycle',
-        'src/lib/workflow-catalog/worker/examples/index.ts',
-        'src/lib/workflow-catalog/browser/catalog.generated.json',
-      ],
-    });
-
-    const destinationDirectory = join(
-      rootDirectory,
-      'src/lib/workflow-catalog/worker/examples/order-lifecycle',
-    );
-    await expect(
-      Promise.all([
-        readFile(join(destinationDirectory, 'example.ts'), 'utf8'),
-        readFile(join(destinationDirectory, 'workflow.ts'), 'utf8'),
-      ]),
-    ).resolves.toEqual([exampleSource, workflowSource]);
-    await expect(access(sourceDirectory)).rejects.toThrow();
-    await expect(
-      access(join(rootDirectory, '.workflow-catalog.lock')),
-    ).rejects.toThrow();
-    expect(calls).toEqual(['generate', 'verify']);
-  });
-
-  it('restores generated artifacts and authored sources when a later stage fails', async () => {
-    const rootDirectory = await createTemporaryDirectory();
-    const sourceDirectory = join(
-      rootDirectory,
-      'workflow-catalog.local/examples/order-lifecycle',
-    );
-    const sharedDirectory = join(
-      rootDirectory,
-      'src/lib/workflow-catalog/worker/examples',
-    );
-    const browserDirectory = join(
-      rootDirectory,
-      'src/lib/workflow-catalog/browser',
-    );
-    await Promise.all([
-      mkdir(sourceDirectory, { recursive: true }),
-      mkdir(sharedDirectory, { recursive: true }),
-      mkdir(browserDirectory, { recursive: true }),
-    ]);
-    const exampleSource =
-      "export const workflowCatalogExample = { id: 'order-lifecycle', execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n";
-    const indexPath = join(sharedDirectory, 'index.ts');
-    const artifactPath = join(browserDirectory, 'catalog.generated.json');
-    await Promise.all([
-      writeFile(join(sourceDirectory, 'example.ts'), exampleSource),
-      writeFile(
-        join(sourceDirectory, 'workflow.ts'),
-        'export async function orderLifecycle() {}\n',
-      ),
-      writeFile(indexPath, 'original index\n'),
-      writeFile(artifactPath, 'original artifact\n'),
-    ]);
-
-    await expect(
-      executeDirectoryWorkflowCatalogPromotion({
-        exampleId: 'order-lifecycle',
-        generate: async () => {
-          await Promise.all([
-            writeFile(indexPath, 'generated index\n'),
-            writeFile(artifactPath, 'generated artifact\n'),
-          ]);
-        },
-        rootDirectory,
-        verify: async () => {
-          throw new Error('verify failed');
-        },
-      }),
-    ).rejects.toThrow('verify failed');
-
-    await expect(
-      Promise.all([
-        readFile(join(sourceDirectory, 'example.ts'), 'utf8'),
-        readFile(indexPath, 'utf8'),
-        readFile(artifactPath, 'utf8'),
-      ]),
-    ).resolves.toEqual([
-      exampleSource,
-      'original index\n',
-      'original artifact\n',
-    ]);
-  });
-
-  it('rejects mismatched IDs, escaping imports, and links before mutation', async () => {
+  it('rejects mismatched IDs, escaping imports, and links', async () => {
     const cases = [
       {
         example:
@@ -337,10 +175,12 @@ describe('directory workflow catalog promotion', () => {
       linkedDirectoryRoot,
       'workflow-catalog.local/examples/order-lifecycle',
     );
-    await mkdir(realDirectory, { recursive: true });
-    await mkdir(join(linkedDirectoryRoot, 'workflow-catalog.local/examples'), {
-      recursive: true,
-    });
+    await Promise.all([
+      mkdir(realDirectory, { recursive: true }),
+      mkdir(join(linkedDirectoryRoot, 'workflow-catalog.local/examples'), {
+        recursive: true,
+      }),
+    ]);
     await Promise.all([
       writeFile(
         join(realDirectory, 'example.ts'),
@@ -430,39 +270,5 @@ describe('directory workflow catalog promotion', () => {
         rootDirectory: danglingDestinationRoot,
       }),
     ).rejects.toThrow('Promotion destination already exists');
-  });
-
-  it('refuses a concurrent mutation without moving or generating', async () => {
-    const rootDirectory = await createTemporaryDirectory();
-    const sourceDirectory = join(
-      rootDirectory,
-      'workflow-catalog.local/examples/order-lifecycle',
-    );
-    await mkdir(sourceDirectory, { recursive: true });
-    await Promise.all([
-      writeFile(
-        join(sourceDirectory, 'example.ts'),
-        "export const workflowCatalogExample = { id: 'order-lifecycle', execution: { kind: 'workflow', workflowType: 'orderLifecycle' } };\n",
-      ),
-      writeFile(
-        join(sourceDirectory, 'workflow.ts'),
-        'export async function orderLifecycle() {}\n',
-      ),
-      writeFile(join(rootDirectory, '.workflow-catalog.lock'), 'busy\n'),
-    ]);
-    let generated = false;
-
-    await expect(
-      executeDirectoryWorkflowCatalogPromotion({
-        exampleId: 'order-lifecycle',
-        generate: async () => {
-          generated = true;
-        },
-        rootDirectory,
-        verify: async () => undefined,
-      }),
-    ).rejects.toThrow('already in progress');
-    expect(generated).toBe(false);
-    await expect(access(sourceDirectory)).resolves.toBeUndefined();
   });
 });

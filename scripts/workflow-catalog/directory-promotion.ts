@@ -1,16 +1,4 @@
-import {
-  access,
-  lstat,
-  mkdir,
-  open,
-  readdir,
-  readFile,
-  rename,
-  rm,
-  stat,
-  unlink,
-  writeFile,
-} from 'node:fs/promises';
+import { access, lstat, readdir, readFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import {
@@ -33,22 +21,6 @@ import { validateExampleId } from './scaffold.js';
 
 const localExamplesPath = 'workflow-catalog.local/examples';
 const sharedExamplesPath = 'src/lib/workflow-catalog/worker/examples';
-const generatedPaths = [
-  'workflow-catalog.local/registration.ts',
-  'workflow-catalog.local/workflows.ts',
-  'workflow-catalog.local/catalog.generated.json',
-  'src/lib/workflow-catalog/worker/examples/index.ts',
-  'src/lib/workflow-catalog/worker/workflows.ts',
-  'src/lib/workflow-catalog/browser/catalog.generated.json',
-  'src/lib/workflow-catalog/browser/catalog.generated.ts',
-] as const;
-
-type FileSnapshot = {
-  content?: Buffer;
-  mode?: number;
-  path: string;
-};
-
 const pathExists = async (path: string) => {
   try {
     await access(path);
@@ -100,92 +72,6 @@ export const parseWorkflowCatalogTypeScriptModuleSpecifiers = ({
   collectModuleSpecifiers(sourceFile);
   return moduleSpecifiers;
 };
-
-export const withWorkflowCatalogMutationLock = async <Result>({
-  action,
-  rootDirectory,
-}: {
-  action: () => Promise<Result>;
-  rootDirectory: string;
-}): Promise<Result> => {
-  const lockPath = join(rootDirectory, '.workflow-catalog.lock');
-  const lock = await open(lockPath, 'wx').catch((error) => {
-    if ((error as NodeJS.ErrnoException).code === 'EEXIST') {
-      throw new Error(
-        'Another workflow catalog mutation is already in progress',
-      );
-    }
-    throw error;
-  });
-
-  try {
-    return await action();
-  } finally {
-    await lock.close();
-    await unlink(lockPath).catch(() => undefined);
-  }
-};
-
-const snapshotGeneratedFiles = async (
-  rootDirectory: string,
-): Promise<FileSnapshot[]> =>
-  Promise.all(
-    generatedPaths.map(async (path) => {
-      const absolutePath = join(rootDirectory, path);
-
-      if (!(await pathExists(absolutePath))) return { path };
-      const [content, metadata] = await Promise.all([
-        readFile(absolutePath),
-        stat(absolutePath),
-      ]);
-      return { content, mode: metadata.mode, path };
-    }),
-  );
-
-const restoreGeneratedFiles = async (
-  rootDirectory: string,
-  snapshots: FileSnapshot[],
-) => {
-  for (const snapshot of snapshots) {
-    const path = join(rootDirectory, snapshot.path);
-
-    if (!snapshot.content) {
-      await rm(path, { force: true });
-      continue;
-    }
-
-    const temporaryPath = `${path}.rollback`;
-    await mkdir(dirname(path), { recursive: true });
-    await writeFile(temporaryPath, snapshot.content, { mode: snapshot.mode });
-    await rename(temporaryPath, path);
-  }
-};
-
-const changedGeneratedPaths = async (
-  rootDirectory: string,
-  snapshots: FileSnapshot[],
-) =>
-  (
-    await Promise.all(
-      snapshots.map(async (snapshot) => {
-        const currentContent = await readFile(
-          join(rootDirectory, snapshot.path),
-        ).catch((error) => {
-          if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-            return undefined;
-          }
-          throw error;
-        });
-        const unchanged =
-          snapshot.content === undefined
-            ? currentContent === undefined
-            : currentContent !== undefined &&
-              snapshot.content.equals(currentContent);
-
-        return unchanged ? undefined : snapshot.path;
-      }),
-    )
-  ).filter((path): path is string => path !== undefined);
 
 const validateAuthoredTree = async (
   rootDirectory: string,
@@ -360,69 +246,4 @@ export const planDirectoryWorkflowCatalogPromotion = async ({
       { kind: 'verify' as const },
     ],
   };
-};
-
-export const executeDirectoryWorkflowCatalogPromotion = async ({
-  generate,
-  verify,
-  ...options
-}: {
-  rootDirectory: string;
-  exampleId: string;
-  generate: () => Promise<void>;
-  verify: () => Promise<void>;
-}) => {
-  const plan = await planDirectoryWorkflowCatalogPromotion(options);
-  const move = plan.operations[0];
-
-  if (!move || move.kind !== 'move-directory') {
-    throw new Error('Promotion plan has no directory move');
-  }
-
-  const sourcePath = join(options.rootDirectory, move.from);
-  const destinationPath = join(options.rootDirectory, move.to);
-  return withWorkflowCatalogMutationLock({
-    action: async () => {
-      const snapshots = await snapshotGeneratedFiles(options.rootDirectory);
-      await mkdir(dirname(destinationPath), { recursive: true });
-      await rename(sourcePath, destinationPath);
-
-      try {
-        await generate();
-        await verify();
-      } catch (error) {
-        const rollbackErrors: unknown[] = [];
-
-        try {
-          await restoreGeneratedFiles(options.rootDirectory, snapshots);
-        } catch (rollbackError) {
-          rollbackErrors.push(rollbackError);
-        }
-
-        try {
-          await rename(destinationPath, sourcePath);
-        } catch (rollbackError) {
-          rollbackErrors.push(rollbackError);
-        }
-
-        if (rollbackErrors.length > 0) {
-          throw new AggregateError(
-            [error, ...rollbackErrors],
-            'Workflow catalog promotion failed and rollback was incomplete',
-          );
-        }
-
-        throw error;
-      }
-
-      return {
-        changedPaths: [
-          move.from,
-          move.to,
-          ...(await changedGeneratedPaths(options.rootDirectory, snapshots)),
-        ],
-      };
-    },
-    rootDirectory: options.rootDirectory,
-  });
 };

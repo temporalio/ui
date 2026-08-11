@@ -124,5 +124,3 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/workflow-catalog/worker/examples/workflow-patching/example.ts',
   'src/lib/workflow-catalog/worker/examples/workflow-patching/workflow.ts',
 ] as const;
-
-export { sharedWorkflowCorpusInventory } from './inventory.js';

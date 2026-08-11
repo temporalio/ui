@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
-import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, join, posix } from 'node:path';
+import { access, readFile } from 'node:fs/promises';
+import { isAbsolute, join, posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { format } from 'prettier';
@@ -22,9 +22,15 @@ import {
   type WorkflowCatalogRegistry,
 } from '../../src/lib/workflow-catalog/worker/registry';
 
+export type WorkflowCatalogSourceContentOverrides = ReadonlyMap<
+  string,
+  string | Uint8Array
+>;
+
 type WorkflowCatalogArtifactOptions = {
   rootDirectory: string;
   sourceFiles: string[];
+  sourceContentOverrides?: WorkflowCatalogSourceContentOverrides;
   artifactPath: string;
   registry: WorkflowCatalogRegistry;
   source: BrowserWorkflowCatalogSource;
@@ -39,6 +45,7 @@ export type WorkflowCatalogArtifactsOptions = {
   localFallback: WorkflowCatalogRegistrationSource;
   localSource?: WorkflowCatalogRegistrationSource | null;
   localArtifactPath: string;
+  sourceContentOverrides?: WorkflowCatalogSourceContentOverrides;
 };
 
 export type WorkflowCatalogRenderedArtifact = {
@@ -78,13 +85,17 @@ const isExplicitRelativePath = (path: string) =>
 const verifyDeclaredSourceFiles = async (
   rootDirectory: string,
   sourceFiles: string[],
+  sourceContentOverrides?: WorkflowCatalogSourceContentOverrides,
 ) => {
   if (sourceFiles.some((path) => !isExplicitRelativePath(path))) {
     throw new Error('Workflow catalog source paths must be explicit');
   }
 
   for (const sourceFile of sourceFiles) {
-    if (!(await pathExists(join(rootDirectory, sourceFile)))) {
+    if (
+      !sourceContentOverrides?.has(sourceFile) &&
+      !(await pathExists(join(rootDirectory, sourceFile)))
+    ) {
       throw new Error(
         `Declared workflow catalog source does not exist: "${sourceFile}"`,
       );
@@ -95,14 +106,22 @@ const verifyDeclaredSourceFiles = async (
 const calculateSourceHash = async (
   rootDirectory: string,
   sourceFiles: string[],
+  sourceContentOverrides?: WorkflowCatalogSourceContentOverrides,
 ) => {
-  await verifyDeclaredSourceFiles(rootDirectory, sourceFiles);
+  await verifyDeclaredSourceFiles(
+    rootDirectory,
+    sourceFiles,
+    sourceContentOverrides,
+  );
   const hash = createHash('sha256');
 
   for (const sourceFile of [...sourceFiles].sort()) {
     hash.update(sourceFile);
     hash.update('\0');
-    hash.update(await readFile(join(rootDirectory, sourceFile)));
+    hash.update(
+      sourceContentOverrides?.get(sourceFile) ??
+        (await readFile(join(rootDirectory, sourceFile))),
+    );
     hash.update('\0');
   }
 
@@ -112,6 +131,7 @@ const calculateSourceHash = async (
 const buildWorkflowCatalogArtifact = async ({
   rootDirectory,
   sourceFiles,
+  sourceContentOverrides,
   registry,
   source,
 }: WorkflowCatalogArtifactOptions) => {
@@ -119,7 +139,11 @@ const buildWorkflowCatalogArtifact = async ({
   const { browserDescriptors, workerBindings } =
     generateWorkflowCatalog(registry);
   const artifact: BrowserWorkflowCatalogArtifact = {
-    sourceHash: await calculateSourceHash(rootDirectory, sourceFiles),
+    sourceHash: await calculateSourceHash(
+      rootDirectory,
+      sourceFiles,
+      sourceContentOverrides,
+    ),
     descriptors: browserDescriptors.map((descriptor) => ({
       ...descriptor,
       source,
@@ -127,16 +151,6 @@ const buildWorkflowCatalogArtifact = async ({
   };
 
   return { artifact, workerBindings };
-};
-
-export const generateWorkflowCatalogArtifact = async (
-  options: WorkflowCatalogArtifactOptions,
-) => {
-  const rendered = await renderWorkflowCatalogArtifact(options);
-
-  await writeWorkflowCatalogArtifact(options.rootDirectory, rendered.output);
-
-  return rendered.generated;
 };
 
 export const renderWorkflowCatalogArtifact = async (
@@ -167,19 +181,19 @@ export const verifyWorkflowCatalogArtifact = async (
     currentArtifact = JSON.parse(currentContent);
   } catch {
     throw new Error(
-      `Workflow catalog artifact "${options.artifactPath}" has generated output drift; run "pnpm workflow-catalog:generate" to rewrite it`,
+      `Workflow catalog artifact "${options.artifactPath}" has generated output drift; run "pnpm workflow-catalog generate" to rewrite it`,
     );
   }
 
   if (currentArtifact.sourceHash !== expected.artifact.sourceHash) {
     throw new Error(
-      `Workflow catalog artifact "${options.artifactPath}" is stale because registration sources changed; run "pnpm workflow-catalog:generate" to refresh it`,
+      `Workflow catalog artifact "${options.artifactPath}" is stale because registration sources changed; run "pnpm workflow-catalog generate" to refresh it`,
     );
   }
 
   if (currentContent !== (await serializeArtifact(expected.artifact))) {
     throw new Error(
-      `Workflow catalog artifact "${options.artifactPath}" has generated output drift; run "pnpm workflow-catalog:generate" to rewrite it`,
+      `Workflow catalog artifact "${options.artifactPath}" has generated output drift; run "pnpm workflow-catalog generate" to rewrite it`,
     );
   }
 };
@@ -195,49 +209,6 @@ const renderWorkflowCatalogTypeScriptArtifact = async ({
     artifactPath,
     content: await serializeTypeScriptArtifact(artifact),
   }) satisfies WorkflowCatalogRenderedArtifact;
-
-const verifyWorkflowCatalogTypeScriptArtifact = async ({
-  rootDirectory,
-  sourceFiles,
-  artifactPath,
-  registry,
-  source,
-}: WorkflowCatalogArtifactOptions) => {
-  const expected = await buildWorkflowCatalogArtifact({
-    rootDirectory,
-    sourceFiles,
-    artifactPath,
-    registry,
-    source,
-  });
-  const currentContent = await readFile(
-    join(rootDirectory, artifactPath),
-    'utf8',
-  );
-  const currentSourceHash = /sourceHash:\s*'([a-f0-9]+)'/.exec(
-    currentContent,
-  )?.[1];
-
-  if (!currentSourceHash) {
-    throw new Error(
-      `Workflow catalog artifact "${artifactPath}" has generated output drift; run "pnpm workflow-catalog:generate" to rewrite it`,
-    );
-  }
-
-  if (currentSourceHash !== expected.artifact.sourceHash) {
-    throw new Error(
-      `Workflow catalog artifact "${artifactPath}" is stale because registration sources changed; run "pnpm workflow-catalog:generate" to refresh it`,
-    );
-  }
-
-  if (
-    currentContent !== (await serializeTypeScriptArtifact(expected.artifact))
-  ) {
-    throw new Error(
-      `Workflow catalog artifact "${artifactPath}" has generated output drift; run "pnpm workflow-catalog:generate" to rewrite it`,
-    );
-  }
-};
 
 const pathExists = async (path: string) => {
   try {
@@ -301,32 +272,6 @@ const importLocalRegistrationSource = async (absolutePath: string) => {
   return registrationModule.workflowCatalogRegistrationSource as WorkflowCatalogRegistrationSource;
 };
 
-export const writeWorkflowCatalogArtifact = async (
-  rootDirectory: string,
-  artifact: WorkflowCatalogRenderedArtifact,
-) => {
-  const outputPath = join(rootDirectory, artifact.artifactPath);
-
-  if (artifact.content === null) {
-    await rm(outputPath, { force: true });
-    return;
-  }
-
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, artifact.content);
-};
-
-export const writeWorkflowCatalogArtifacts = async (
-  rootDirectory: string,
-  artifacts: readonly WorkflowCatalogRenderedArtifact[],
-) => {
-  await Promise.all(
-    artifacts.map((artifact) =>
-      writeWorkflowCatalogArtifact(rootDirectory, artifact),
-    ),
-  );
-};
-
 export const renderWorkflowCatalogArtifacts = async (
   options: WorkflowCatalogArtifactsOptions,
 ) => {
@@ -358,23 +303,6 @@ export const renderWorkflowCatalogArtifacts = async (
     local: renderedLocal.generated,
     workerBindings,
     artifacts,
-  };
-};
-
-export const generateWorkflowCatalogArtifacts = async (
-  options: WorkflowCatalogArtifactsOptions,
-) => {
-  const rendered = await renderWorkflowCatalogArtifacts(options);
-
-  await writeWorkflowCatalogArtifacts(
-    options.rootDirectory,
-    rendered.artifacts,
-  );
-
-  return {
-    shared: rendered.shared,
-    local: rendered.local,
-    workerBindings: rendered.workerBindings,
   };
 };
 
@@ -438,6 +366,7 @@ const createArtifactOptions = async (
     shared: {
       rootDirectory: options.rootDirectory,
       sourceFiles: options.sharedSource.sourceFiles,
+      sourceContentOverrides: options.sourceContentOverrides,
       artifactPath: options.sharedArtifactPath,
       registry: sharedRegistry,
       source: options.sharedSource.source,
@@ -450,6 +379,7 @@ const createArtifactOptions = async (
           ...localSource.sourceFiles,
         ]),
       ].sort(),
+      sourceContentOverrides: options.sourceContentOverrides,
       artifactPath: options.localArtifactPath,
       registry: localProjectionRegistry,
       source: localSource.source,
@@ -486,51 +416,4 @@ export const loadWorkflowCatalogWorkerBindings = async (
       taskQueue: resolvedTargets[index].taskQueue,
     },
   }));
-};
-
-export const verifyWorkflowCatalogArtifacts = async (
-  options: WorkflowCatalogArtifactsOptions,
-) => {
-  const [hasLocalModule, hasLocalArtifact] = await Promise.all([
-    pathExists(join(options.rootDirectory, options.localModulePath)),
-    pathExists(join(options.rootDirectory, options.localArtifactPath)),
-  ]);
-
-  if (hasLocalModule && !hasLocalArtifact) {
-    throw new Error(
-      'Local workflow catalog registration source exists without its generated artifact; run "pnpm workflow-catalog:generate" to create it',
-    );
-  }
-
-  if (!hasLocalModule && hasLocalArtifact) {
-    throw new Error(
-      'Local workflow catalog artifact exists without its registration source',
-    );
-  }
-
-  const { shared, local } = await createArtifactOptions(options);
-
-  if (!hasLocalModule) {
-    await verifyWorkflowCatalogArtifact(shared);
-    if (options.sharedTypeScriptArtifactPath) {
-      await verifyWorkflowCatalogTypeScriptArtifact({
-        ...shared,
-        artifactPath: options.sharedTypeScriptArtifactPath,
-      });
-    }
-    return;
-  }
-
-  await Promise.all([
-    verifyWorkflowCatalogArtifact(shared),
-    verifyWorkflowCatalogArtifact(local),
-    ...(options.sharedTypeScriptArtifactPath
-      ? [
-          verifyWorkflowCatalogTypeScriptArtifact({
-            ...shared,
-            artifactPath: options.sharedTypeScriptArtifactPath,
-          }),
-        ]
-      : []),
-  ]);
 };

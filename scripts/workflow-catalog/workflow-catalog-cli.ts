@@ -4,11 +4,10 @@ import { pathToFileURL } from 'node:url';
 import { createUiWorkflowCatalogAuthoring } from './ui-authoring.js';
 import {
   runWorkflowCatalogCli,
-  workflowCatalogCommandAliases,
   workflowCatalogHelp,
 } from '../../src/lib/workflow-catalog/authoring.js';
 
-export { workflowCatalogCommandAliases, workflowCatalogHelp };
+export { workflowCatalogHelp };
 
 const isReportedWorkflowCatalogCliError = (error: unknown) => {
   if (!(error instanceof Error)) return false;
@@ -16,6 +15,7 @@ const isReportedWorkflowCatalogCliError = (error: unknown) => {
   return [
     'Unknown workflow catalog command',
     'Invalid arguments for workflow catalog command',
+    'Usage: workflow-catalog demote',
     'Usage: workflow-catalog promote',
   ].some((prefix) => error.message.startsWith(prefix));
 };

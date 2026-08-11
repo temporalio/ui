@@ -1,10 +1,11 @@
-import type { WorkflowCatalogRoutingInput } from './catalog-artifacts';
+import type {
+  WorkflowCatalogRoutingInput,
+  WorkflowCatalogSourceContentOverrides,
+} from './catalog-artifacts';
 import {
   loadWorkflowCatalogWorkerBindings,
   renderWorkflowCatalogArtifacts,
-  verifyWorkflowCatalogArtifacts,
   verifyWorkflowCatalogProjectBoundaries,
-  writeWorkflowCatalogArtifacts,
 } from './catalog-artifacts';
 import { workflowCatalogRegistrationSource as localFallback } from '../../src/lib/workflow-catalog/worker/local-registration-fallback';
 import type { WorkflowCatalogRegistrationSource } from '../../src/lib/workflow-catalog/worker/registration-source';
@@ -39,10 +40,6 @@ const projectBoundaryOptions = {
     'src/lib/workflow-catalog/browser/catalog.generated.ts',
     'src/lib/workflow-catalog/host/workbench-host.ts',
   ],
-  declaredSourceFiles: [
-    ...sharedSource.sourceFiles,
-    ...localFallback.sourceFiles,
-  ],
   packageJsonPath: 'package.json',
   localPaths: [
     projectOptions.localModulePath,
@@ -51,44 +48,45 @@ const projectBoundaryOptions = {
 };
 
 export type ProjectWorkflowCatalogArtifactsOptions = {
+  rootDirectory?: string;
   sharedSource?: WorkflowCatalogRegistrationSource;
   localSource?: WorkflowCatalogRegistrationSource | null;
+  sourceContentOverrides?: WorkflowCatalogSourceContentOverrides;
 };
+
+export type ProjectWorkflowCatalogBoundaryOptions = Pick<
+  ProjectWorkflowCatalogArtifactsOptions,
+  'localSource' | 'rootDirectory' | 'sharedSource'
+>;
 
 export const renderProjectWorkflowCatalogArtifacts = async (
   options: ProjectWorkflowCatalogArtifactsOptions = {},
 ) =>
   renderWorkflowCatalogArtifacts({
     ...projectOptions,
+    rootDirectory: options.rootDirectory ?? projectOptions.rootDirectory,
     sharedSource: options.sharedSource ?? sharedSource,
+    sourceContentOverrides: options.sourceContentOverrides,
     ...(Object.hasOwn(options, 'localSource')
       ? { localSource: options.localSource }
       : {}),
   });
 
-export const generateProjectWorkflowCatalog = async () => {
-  const rendered = await renderProjectWorkflowCatalogArtifacts();
-
-  await writeWorkflowCatalogArtifacts(
-    projectOptions.rootDirectory,
-    rendered.artifacts,
-  );
-
-  return {
-    shared: rendered.shared,
-    local: rendered.local,
-    workerBindings: rendered.workerBindings,
-  };
-};
-
 export const loadProjectWorkflowCatalogWorkerBindings = (
   routing: WorkflowCatalogRoutingInput = {},
 ) => loadWorkflowCatalogWorkerBindings(projectOptions, routing);
 
-export const verifyProjectWorkflowCatalogBoundaries = () =>
-  verifyWorkflowCatalogProjectBoundaries(projectBoundaryOptions);
-
-export const verifyProjectWorkflowCatalog = async () => {
-  await verifyWorkflowCatalogArtifacts(projectOptions);
-  await verifyProjectWorkflowCatalogBoundaries();
-};
+export const verifyProjectWorkflowCatalogBoundaries = (
+  options: ProjectWorkflowCatalogBoundaryOptions = {},
+) =>
+  verifyWorkflowCatalogProjectBoundaries({
+    ...projectBoundaryOptions,
+    rootDirectory: options.rootDirectory ?? projectOptions.rootDirectory,
+    declaredSourceFiles: [
+      ...new Set([
+        ...(options.sharedSource ?? sharedSource).sourceFiles,
+        ...localFallback.sourceFiles,
+        ...(options.localSource?.sourceFiles ?? []),
+      ]),
+    ],
+  });
