@@ -13,13 +13,13 @@
     getMockPageTokens,
     getMockWorkflows,
     LOAD_CAP,
-    PAGE_COUNT,
     PAGE_DELAY_MS,
     PAGE_SIZE,
     type SandboxWorkflow,
     TOTAL_MATCHING,
     WORKFLOW_TYPES,
   } from './mock-workflows';
+  import { describeQuery, filterByQuery, parseQuery } from './query-filter';
   import {
     comparatorFor,
     describeSort,
@@ -64,7 +64,30 @@
   let elapsedTimer: ReturnType<typeof setInterval> | undefined;
   let ageTimer: ReturnType<typeof setInterval> | undefined;
 
-  const notLoaded = TOTAL_MATCHING - LOAD_CAP;
+  // The sandbox loads the query the user is already looking at. Filtering
+  // first is the cheapest way to make the snapshot smaller, so the prepare
+  // stage is built to make that obvious.
+  const scopedRows = $derived(filterByQuery(getMockWorkflows(), query));
+  const matchingCount = $derived(
+    query.trim() ? scopedRows.length : TOTAL_MATCHING,
+  );
+  const willLoad = $derived(Math.min(LOAD_CAP, matchingCount));
+  const capped = $derived(matchingCount > LOAD_CAP);
+  const notLoaded = $derived(Math.max(0, matchingCount - LOAD_CAP));
+  const pageCount = $derived(Math.max(1, Math.ceil(willLoad / PAGE_SIZE)));
+  const estimatedSeconds = $derived(
+    Math.max(1, Math.round((pageCount * PAGE_DELAY_MS) / 1000)),
+  );
+  const unsupportedTerms = $derived(parseQuery(query).unsupportedTerms);
+  const queryLabel = $derived(query.trim() || 'No filters applied');
+
+  // What the snapshot actually holds, captured at load time. The live list can
+  // be re-filtered behind the drawer, and when it is, the snapshot is stale
+  // against it — that has to be visible, not inferred.
+  let capturedQuery = $state('');
+  const queryDrifted = $derived(
+    stage === 'snapshot' && capturedQuery !== query,
+  );
 
   const pad = (value: number) => String(value).padStart(2, '0');
 
@@ -121,8 +144,9 @@
   };
 
   const startLoading = () => {
-    const workflows = getMockWorkflows();
+    const workflows = scopedRows;
     const tokens = getMockPageTokens();
+    capturedQuery = query;
 
     stage = 'loading';
     loadedPages = [];
@@ -136,7 +160,8 @@
 
     pageTimer = setInterval(() => {
       pagesFetched += 1;
-      const lastRow = workflows[pagesFetched * PAGE_SIZE - 1];
+      const lastRow =
+        workflows[Math.min(pagesFetched * PAGE_SIZE, workflows.length) - 1];
       loadedPages = [
         {
           page: pagesFetched,
@@ -146,7 +171,7 @@
         ...loadedPages,
       ].slice(0, 14);
 
-      if (pagesFetched >= PAGE_COUNT) capture(workflows);
+      if (pagesFetched >= pageCount) capture(workflows);
     }, PAGE_DELAY_MS);
   };
 
@@ -267,45 +292,99 @@ listener never sees Escape pressed inside the snapshot's filter field -->
             The server can only order by <strong>Start</strong> and
             <strong>End</strong>. To sort by anything else — or by more than one
             column at once — the rows have to be in your browser first. This
-            pulls a snapshot down so you can sort and filter it locally.
+            loads <strong>the filter you already have applied</strong>, so
+            narrowing the list first is the cheapest way to make the snapshot
+            smaller.
           </p>
 
           <dl
             class="mt-6 grid grid-cols-[minmax(0,180px)_1fr] gap-x-4 gap-y-3 text-sm"
           >
-            <dt class="text-secondary">Query</dt>
-            <dd class="break-words font-mono text-xs">
-              {query || 'All workflows in this namespace'}
+            <dt class="text-secondary">Loading your filter</dt>
+            <dd>
+              <div class="break-words font-mono text-xs">{queryLabel}</div>
+              <div class="mt-1 text-xs text-secondary">
+                Matching {describeQuery(query)}.
+              </div>
             </dd>
 
             <dt class="text-secondary">Matching workflows</dt>
-            <dd>~{TOTAL_MATCHING.toLocaleString()}</dd>
+            <dd>{matchingCount.toLocaleString()}</dd>
 
             <dt class="text-secondary">Will load</dt>
             <dd>
-              {LOAD_CAP.toLocaleString()}
-              <span class="text-secondary">(maximum)</span>
+              {willLoad.toLocaleString()}
+              {#if capped}
+                <span class="text-warning"
+                  >— capped, {notLoaded.toLocaleString()} left behind</span
+                >
+              {:else}
+                <span class="text-secondary">— all of them</span>
+              {/if}
             </dd>
 
             <dt class="text-secondary">Request shape</dt>
             <dd class="font-mono text-xs">
-              {PAGE_COUNT} pages × {PAGE_SIZE} rows
+              {pageCount}
+              {pageCount === 1 ? 'page' : 'pages'} × {PAGE_SIZE} rows
             </dd>
 
             <dt class="text-secondary">Estimated time</dt>
-            <dd>about 4 seconds</dd>
+            <dd>about {estimatedSeconds}s</dd>
           </dl>
 
-          <Alert intent="warning" title="This is a snapshot" class="mt-6">
-            It is frozen at the moment it finishes loading, it lives only in
-            this browser tab, and it is discarded when you close the sandbox.
-            Workflows that start, complete, or fail after that point will not
-            appear until you reload it.
+          {#if !query.trim()}
+            <Alert intent="info" title="No filters applied" class="mt-6">
+              This will load the {LOAD_CAP.toLocaleString()} most recent workflows
+              out of {TOTAL_MATCHING.toLocaleString()}, and the rest stay
+              behind. Close this, filter the list down to what you actually care
+              about, and reopen — the snapshot will be smaller, faster, and
+              complete.
+            </Alert>
+          {:else if capped}
+            <Alert
+              intent="warning"
+              title="Your filter is still too broad"
+              class="mt-6"
+            >
+              {matchingCount.toLocaleString()} workflows match, and only {LOAD_CAP.toLocaleString()}
+              can be loaded. Sorting will be accurate for what you load, but
+              {notLoaded.toLocaleString()} matching workflows will not be in it. Narrow
+              the filter to get a complete snapshot.
+            </Alert>
+          {:else}
+            <Alert intent="success" title="Your filter fits" class="mt-6">
+              All {matchingCount.toLocaleString()} matching workflows will be loaded,
+              so the sort covers every row that matches — not just the first page.
+            </Alert>
+          {/if}
+
+          {#if unsupportedTerms.length}
+            <Alert
+              intent="warning"
+              title="Part of your query was ignored"
+              class="mt-4"
+            >
+              This POC can't evaluate {unsupportedTerms.join(', ')} locally, so the
+              snapshot may be broader than the list behind it.
+            </Alert>
+          {/if}
+
+          <Alert
+            intent="warning"
+            title="It is discarded when you close"
+            class="mt-4"
+          >
+            The snapshot is frozen when loading finishes and lives only in this
+            browser tab. <strong>Closing the sandbox throws it away</strong> —
+            coming back means loading all {willLoad.toLocaleString()} rows again,
+            another
+            {estimatedSeconds}s. Nothing is cached.
           </Alert>
 
           <div class="mt-6 flex flex-wrap gap-3">
             <Button onclick={startLoading}>
-              Load {LOAD_CAP.toLocaleString()} workflows
+              Load {willLoad.toLocaleString()} workflows
             </Button>
             <Button variant="ghost" onclick={closeDrawer}>Cancel</Button>
           </div>
@@ -321,7 +400,7 @@ listener never sees Escape pressed inside the snapshot's filter field -->
           >
             <div
               class="surface-interactive h-full transition-all duration-150"
-              style="width: {(pagesFetched / PAGE_COUNT) * 100}%"
+              style="width: {(pagesFetched / pageCount) * 100}%"
             ></div>
           </div>
 
@@ -329,8 +408,9 @@ listener never sees Escape pressed inside the snapshot's filter field -->
             <span>
               <span class="text-secondary">Progress</span>
               <strong>
-                Page {pagesFetched} of {PAGE_COUNT} · {(
-                  pagesFetched * PAGE_SIZE
+                Page {pagesFetched} of {pageCount} · {Math.min(
+                  pagesFetched * PAGE_SIZE,
+                  willLoad,
                 ).toLocaleString()} rows
               </strong>
             </span>
@@ -386,7 +466,8 @@ listener never sees Escape pressed inside the snapshot's filter field -->
           <Icon name="pause" />
         </span>
         <span class="font-medium">
-          {LOAD_CAP.toLocaleString()} of {TOTAL_MATCHING.toLocaleString()} matching
+          {loadedRows.length.toLocaleString()} of {matchingCount.toLocaleString()}
+          matching
         </span>
         <span
           class="text-xs {ageSeconds > STALE_AFTER_SECONDS
@@ -395,15 +476,35 @@ listener never sees Escape pressed inside the snapshot's filter field -->
         >
           captured {new Date(capturedAt).toLocaleTimeString()} · {ageLabel}
         </span>
-        <span
-          class="rounded-sm border border-warning bg-warning px-2 py-0.5 text-xs font-medium text-warning"
-        >
-          Capped — {notLoaded.toLocaleString()} not loaded
-        </span>
+        {#if capped}
+          <span
+            class="rounded-sm border border-warning bg-warning px-2 py-0.5 text-xs font-medium text-warning"
+          >
+            Capped — {notLoaded.toLocaleString()} not loaded
+          </span>
+        {/if}
         <span class="grow"></span>
         <Button size="xs" variant="secondary" onclick={resetToPrepare}>
           Reload
         </Button>
+      </div>
+
+      <div
+        class="flex shrink-0 flex-wrap items-center gap-2 border-b border-subtle px-6 py-2 text-xs"
+      >
+        <span class="text-secondary">Snapshot of</span>
+        <span class="font-mono">{capturedQuery.trim() || 'all workflows'}</span>
+        {#if queryDrifted}
+          <span
+            class="rounded-sm border border-warning bg-warning px-2 py-0.5 font-medium text-warning"
+          >
+            The list behind this drawer has been re-filtered — this snapshot
+            still holds the old filter
+          </span>
+          <Button size="xs" variant="secondary" onclick={resetToPrepare}>
+            Load the new filter
+          </Button>
+        {/if}
       </div>
 
       <div
@@ -492,8 +593,12 @@ listener never sees Escape pressed inside the snapshot's filter field -->
     {#snippet content()}
       <p class="text-sm">
         These {loadedRows.length.toLocaleString()} rows exist only in this browser
-        tab. Closing the sandbox throws them away, and you will need to load them
-        again — about 4 seconds — to sort them.
+        tab. Nothing is cached, so closing throws them away and coming back means
+        loading all {willLoad.toLocaleString()} again — about {estimatedSeconds}s.
+      </p>
+      <p class="mt-3 text-sm text-secondary">
+        Your sort and filters inside the sandbox are discarded too. The list
+        behind this drawer is unaffected either way.
       </p>
     {/snippet}
   </Modal>

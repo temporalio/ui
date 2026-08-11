@@ -174,4 +174,58 @@ test.describe('Sort sandbox POC', () => {
     });
     expect(contrast).toBeGreaterThan(4.5);
   });
+
+  test('scopes the snapshot to the query already on the list', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+
+    await mockWorkflowsApis(page);
+    await mockClusterApi(page, {
+      visibilityStore: 'elasticsearch',
+      persistenceStore: 'postgres,elasticsearch',
+    });
+
+    const query = 'ExecutionStatus = "Failed"';
+    await page.goto(
+      `/namespaces/default/workflows?mock&query=${encodeURIComponent(query)}`,
+    );
+
+    await page.getByTestId('workflows-sort-sandbox-button').click();
+    const drawer = page.locator('#workflows-sort-sandbox-drawer');
+
+    // the filter, not the whole namespace, is what gets loaded
+    await expect(drawer.getByText(query)).toBeVisible();
+    await expect(drawer.getByText('Matching status is Failed.')).toBeVisible();
+
+    // a narrow filter fits under the cap, so nothing is left behind
+    await expect(drawer.getByText('Your filter fits')).toBeVisible();
+    const loadButton = drawer.getByRole('button', {
+      name: /^Load [\d,]+ workflows$/,
+    });
+    const label = (await loadButton.textContent()) ?? '';
+    const willLoad = Number(label.replace(/\D/g, ''));
+    expect(willLoad).toBeGreaterThan(0);
+    expect(willLoad).toBeLessThan(10_000);
+
+    await loadButton.click();
+
+    const n = willLoad.toLocaleString('en-US');
+    await expect(drawer.getByText(`${n} of ${n} matching`)).toBeVisible({
+      timeout: 20_000,
+    });
+
+    // the snapshot names the filter it holds, and nothing is capped
+    await expect(drawer.getByText('Snapshot of')).toBeVisible();
+    await expect(drawer.getByText(/Capped —/)).toBeHidden();
+
+    // every rendered row really does match the filter
+    const gridText = await drawer.locator('[role="row"]').allTextContents();
+    const body = gridText.join(' ');
+    expect(body).toContain('Failed');
+    expect(body).not.toContain('Completed');
+    expect(body).not.toContain('Running');
+
+    await page.screenshot({ path: `${SHOTS}/10-query-scoped.png` });
+  });
 });

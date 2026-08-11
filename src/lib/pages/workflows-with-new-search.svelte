@@ -40,7 +40,7 @@
   import SortSandboxDrawer from '$lib/components/workflow/sort-sandbox/index.svelte';
   import {
     isMockLiveTableEnabled,
-    MOCK_TOTAL,
+    mockCountForQuery,
   } from '$lib/components/workflow/sort-sandbox/mock-live-table';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -144,7 +144,7 @@
   // POC: keep the header count consistent with the mocked table
   const useMockWorkflows = $derived(isMockLiveTableEnabled(page.url));
   const displayCount = $derived(
-    useMockWorkflows ? MOCK_TOTAL : $workflowCount.count,
+    useMockWorkflows ? mockCountForQuery(query) : $workflowCount.count,
   );
 
   let batchTerminateConfirmationModalOpen = $state(false);

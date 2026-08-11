@@ -15,6 +15,7 @@ import {
   type SandboxWorkflow,
   TOTAL_MATCHING,
 } from './mock-workflows';
+import { filterByQuery } from './query-filter';
 
 export const MOCK_PARAM = 'mock';
 
@@ -56,10 +57,16 @@ const toWorkflowExecution = (
     workflowExtendedInfo: {},
   }) as WorkflowExecution;
 
+export const mockCountForQuery = (query: string): number =>
+  query.trim()
+    ? filterByQuery(getMockWorkflows(), query).length
+    : TOTAL_MATCHING;
+
 export const mockPaginatedWorkflows = async (
   namespace: string,
+  query = '',
 ): Promise<PaginatedRequest<WorkflowExecution>> => {
-  const workflows = getMockWorkflows();
+  const workflows = filterByQuery(getMockWorkflows(), query);
 
   return async (pageSize = 100, token = '') => {
     // fake latency so the table's loading state still reads as a fetch

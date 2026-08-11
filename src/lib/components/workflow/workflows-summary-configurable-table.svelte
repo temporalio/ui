@@ -34,7 +34,7 @@
 
   import {
     isMockLiveTableEnabled,
-    MOCK_TOTAL,
+    mockCountForQuery,
     mockPaginatedWorkflows,
   } from './sort-sandbox/mock-live-table';
 
@@ -128,10 +128,12 @@
   const useMockWorkflows = $derived(isMockLiveTableEnabled(page.url));
   const onFetch = $derived(() =>
     useMockWorkflows
-      ? mockPaginatedWorkflows(namespace)
+      ? mockPaginatedWorkflows(namespace, query)
       : fetchPaginatedWorkflows(namespace, query),
   );
-  const total = $derived(useMockWorkflows ? MOCK_TOTAL : $workflowCount.count);
+  const total = $derived(
+    useMockWorkflows ? mockCountForQuery(query) : $workflowCount.count,
+  );
 
   const dense = $derived($tableDensity === 'dense');
 
