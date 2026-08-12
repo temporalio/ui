@@ -14,6 +14,7 @@
         other: 'border-slate-700 bg-slate-800/80',
         nexus: 'border-indigo-700 bg-indigo-800/80',
         'local-activity': 'border-slate-700 bg-slate-800/80',
+        'event-group': 'border-purple-700 bg-purple-900/80',
         default: 'border-purple-700 bg-purple-900/80',
       },
     },
@@ -24,7 +25,13 @@
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import {
+    getEventGroupMarkerKey,
+    getEventGroupMarkerPresentation,
+    isTimelineEventMarkerGroup,
+  } from '$lib/models/event-marker-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
+  import type { WorkflowEvent } from '$lib/types/events';
   import {
     decodeLocalActivity,
     getLocalActivityMarkerEvent,
@@ -38,7 +45,12 @@
   } from '$lib/utilities/is-event-type';
 
   import { dotBox, lineBox } from './primitives';
-  import { type DotColors, dotColors, strokeColor } from '../colors';
+  import {
+    type DotColors,
+    dotColors,
+    EVENT_GROUP_COLOR,
+    strokeColor,
+  } from '../colors';
   import { CategoryIcon, type TimelineIconName } from '../constants';
   import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
   import { timelineTextPosition } from './timeline-positioning';
@@ -48,6 +60,7 @@
     canvasWidth: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
+    onSelect?: (group: EventGroup) => void;
     // Reactive event count so the row recomputes on streamed appends (eventList
     // is mutated in place) and on pooled re-point.
     eventCount?: number;
@@ -58,10 +71,12 @@
     canvasWidth,
     project,
     readOnly = false,
+    onSelect,
     eventCount = 0,
   }: Props = $props();
 
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
+  const isEventMarkerGroup = $derived(isTimelineEventMarkerGroup(group));
   const pendingActivity = $derived(group?.pendingActivity);
 
   // Reactive (not untrack) so a re-pointed pooled row relabels for its new group.
@@ -114,8 +129,15 @@
     // Loop to `count` (not events.map) to depend on eventCount without allocating.
     const points: number[] = [];
     const pointCount = Math.min(count, events.length);
-    for (let idx = 0; idx < pointCount; idx++) {
-      points.push(Math.round(project(events[idx].eventTime)));
+    if (isEventMarkerGroup && pointCount > 0) {
+      points.push(Math.round(project(events[0].eventTime)));
+      if (pointCount > 1) {
+        points.push(Math.round(project(events[pointCount - 1].eventTime)));
+      }
+    } else {
+      for (let idx = 0; idx < pointCount; idx++) {
+        points.push(Math.round(project(events[idx].eventTime)));
+      }
     }
     if (pauseTime) {
       points.push(Math.round(project(pauseTime)));
@@ -135,7 +157,11 @@
 
   const onClick = () => {
     if (readOnly) return;
-    setActiveGroup(group);
+    if (onSelect) {
+      onSelect(group);
+    } else {
+      setActiveGroup(group);
+    }
   };
 
   // Only activity groups carry an ActivityTaskStarted event; guard so other
@@ -150,11 +176,23 @@
   );
   const retried = $derived(retryAttempt > 1);
 
+  const hasValidEventGroupMarker = (event: WorkflowEvent | undefined) =>
+    event?.eventGroupMarkers?.some((marker) =>
+      Boolean(getEventGroupMarkerKey(marker)),
+    ) ?? false;
+
+  const eventMarkerOriginIcon = $derived.by(() => {
+    if (!isTimelineEventMarkerGroup(group)) return;
+    return getEventGroupMarkerPresentation(group.eventGroupMarker)?.icon;
+  });
+
   const lineColor = $derived(
-    strokeColor({
-      category: group.category,
-      classification: group.lastEvent.classification,
-    }),
+    isEventMarkerGroup
+      ? strokeColor({ category: 'event-group' })
+      : strokeColor({
+          category: group.category,
+          classification: group.lastEvent.classification,
+        }),
   );
   const showRetryGradient = $derived(
     retried && group.lastEvent.classification === 'Completed',
@@ -219,6 +257,7 @@
   pointX: number,
   colors: DotColors,
   icon: TimelineIconName | undefined,
+  hasEventGroups = false,
 )}
   {@const bounds = dotBox(pointX, spanCy)}
   <!-- transform (not left/top) so streaming/live reprojection composites the dot
@@ -228,6 +267,9 @@
     style:transform="translate({bounds.left}px, {bounds.top}px)"
     style:border-color={colors.stroke}
     style:background={colors.fill}
+    style:box-shadow={hasEventGroups
+      ? `0 0 0 3px ${EVENT_GROUP_COLOR}`
+      : undefined}
   >
     {#if icon}
       <svg
@@ -251,49 +293,76 @@
     onclick={onClick}
   >
     <div
-      class="highlight {groupHover({ category: group.category })}"
+      class="highlight {groupHover({
+        category: isEventMarkerGroup ? 'event-group' : group.category,
+      })}"
       style:border-radius="{highlightRadius}px"
     ></div>
-    {#each points as pointX, index (index)}
-      {@const localX = pointX - spanLeft}
-      {@const nextPoint = points[index + 1]}
-      {#if nextPoint}
-        {@render connector(localX, nextPoint - spanLeft, lineColor, {
-          gradient: showRetryGradient,
-          dim: scheduling && index === 0 ? 0.35 : undefined,
-        })}
-      {/if}
-      {#if !nextPoint && group.isPending && !pauseTime}
+    {#if isEventMarkerGroup}
+      {#if points.length > 1}
         {@render connector(
-          localX,
-          canvasWidth - GUTTER - spanLeft,
-          pendingLineColor,
-          {
-            dashed: true,
-            animate: true,
-          },
-        )}
-        {@render dot(
-          localX,
-          dotColors(group.lastEvent.classification),
-          'retry',
+          points[0] - spanLeft,
+          points[points.length - 1] - spanLeft,
+          lineColor,
+          {},
         )}
       {/if}
       {@render dot(
-        localX,
-        dotColors(group.eventList[index]?.classification),
-        pauseTime && index !== 0
-          ? 'pause'
-          : decodedLocalActivity
-            ? CategoryIcon['local-activity'].name
-            : CategoryIcon[group.category].name,
+        points[0] - spanLeft,
+        dotColors(undefined, 'event-group'),
+        'compact',
       )}
-    {/each}
+      {#if points.length > 1}
+        {@render dot(
+          points[points.length - 1] - spanLeft,
+          dotColors(undefined, 'event-group'),
+          'compact',
+        )}
+      {/if}
+    {:else}
+      {#each points as pointX, index (index)}
+        {@const localX = pointX - spanLeft}
+        {@const nextPoint = points[index + 1]}
+        {#if nextPoint}
+          {@render connector(localX, nextPoint - spanLeft, lineColor, {
+            gradient: showRetryGradient,
+            dim: scheduling && index === 0 ? 0.35 : undefined,
+          })}
+        {/if}
+        {#if !nextPoint && group.isPending && !pauseTime}
+          {@render connector(
+            localX,
+            canvasWidth - GUTTER - spanLeft,
+            pendingLineColor,
+            {
+              dashed: true,
+              animate: true,
+            },
+          )}
+          {@render dot(
+            localX,
+            dotColors(group.lastEvent.classification),
+            'retry',
+          )}
+        {/if}
+        {@render dot(
+          localX,
+          dotColors(group.eventList[index]?.classification),
+          pauseTime && index !== 0
+            ? 'pause'
+            : decodedLocalActivity
+              ? CategoryIcon['local-activity'].name
+              : CategoryIcon[group.category].name,
+          hasValidEventGroupMarker(group.eventList[index]),
+        )}
+      {/each}
+    {/if}
     <!-- Inside the button so hovering/clicking the label hits the same target;
          positioned button-local (offset by spanLeft), may overflow the box. -->
     <PayloadSummary
       value={group?.userMetadata?.summary}
-      prefix={isActivityTaskScheduledEvent(group.initialEvent)
+      prefix={!isEventMarkerGroup &&
+      isActivityTaskScheduledEvent(group.initialEvent)
         ? group?.displayName
         : ''}
       fallback={decodedLocalActivity
@@ -302,9 +371,10 @@
     >
       {#snippet children(decodedValue)}
         {@const iconName =
-          (pendingActivity && !pendingActivity.paused) || retried
+          eventMarkerOriginIcon ??
+          ((pendingActivity && !pendingActivity.paused) || retried
             ? 'retry'
-            : undefined}
+            : undefined)}
         <div
           class="pointer-events-auto absolute flex select-none items-center gap-1 whitespace-nowrap text-[13px] leading-none {textAnchor ===
           'end'

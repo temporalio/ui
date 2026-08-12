@@ -20,13 +20,20 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import type { TimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
   import {
     enrichGroups,
     getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
+    getEventMarkerGroupArray,
     getGroupArray,
+    hasEventMarkerGroups,
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
-  import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
+  import {
+    collapseIdleTime,
+    eventFilterSort,
+    eventGroupsEnabled,
+  } from '$lib/stores/event-view';
   import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -62,15 +69,30 @@
   const reverseSort = $derived($eventFilterSort === 'descending');
 
   let bufferGroups = $state.raw<EventGroup[]>([]);
+  let markerGroups = $state.raw<TimelineEventMarkerGroup[]>([]);
+  let hasMarkerGroups = $state(hasEventMarkerGroups());
 
   const filteredBufferGroups = $derived.by(() => {
     const active = $eventTypeFilter;
     return bufferGroups.filter((g) => active.includes(g.category));
   });
 
+  const visibleGroups = $derived(
+    $eventGroupsEnabled && markerGroups.length
+      ? markerGroups
+      : filteredBufferGroups,
+  );
+
+  $effect(() => {
+    if (historyCtx.fetchComplete && !hasMarkerGroups && $eventGroupsEnabled) {
+      clearActives();
+      $eventGroupsEnabled = false;
+    }
+  });
+
   const groups = $derived(
     getTimelineGroups(
-      filteredBufferGroups,
+      visibleGroups,
       reverseSort,
       historyCtx.fetchComplete,
       historyCtx.descMinId,
@@ -101,6 +123,13 @@
     updateEventFilterParams(page.url, { sort: newSort }, goto);
   };
 
+  const onEventGroupsToggle = () => {
+    clearActives();
+    const enabled = !$eventGroupsEnabled;
+    $eventGroupsEnabled = enabled;
+    markerGroups = enabled ? getEventMarkerGroupArray() : [];
+  };
+
   // The timeline renders in normal page flow: the page (#content-wrapper)
   // scrolls it and the controls bar sticks to the top-nav. TimelineGraph
   // virtualizes internally via IntersectionObserver, so there's no bounded
@@ -114,11 +143,14 @@
   onMount(() => {
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+    hasMarkerGroups = hasEventMarkerGroups();
+    markerGroups = $eventGroupsEnabled ? getEventMarkerGroupArray() : [];
   });
 
   $effect(() => {
     void $bufferVersion;
     const fetchComplete = historyCtx.fetchComplete;
+    const showEventGroups = $eventGroupsEnabled;
     const pendingActivities = $workflowRun.workflow?.pendingActivities ?? [];
     const pendingNexusOperations =
       $workflowRun.workflow?.pendingNexusOperations ?? [];
@@ -129,6 +161,9 @@
         enrichGroups(pendingActivities, pendingNexusOperations);
       }
       bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+      hasMarkerGroups = hasEventMarkerGroups();
+      markerGroups =
+        showEventGroups && hasMarkerGroups ? getEventMarkerGroupArray() : [];
     });
 
     return () => {
@@ -172,9 +207,9 @@
   this block). The controls bar sticks below the top-nav while the page scrolls
   the timeline past it; the timeline virtualizes itself via IntersectionObserver.
 -->
-<div>
+<div class="relative isolate z-0">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[60] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="flex items-center gap-2">
       <h2>{translate('workflows.timeline-tab')}</h2>
@@ -203,9 +238,21 @@
         </ToggleButton>
         <EventTypeFilter compact={false} />
         <ToggleButton
+          active={$eventGroupsEnabled}
+          data-testid="event-groups"
+          disabled={!hasMarkerGroups}
+          leadingIcon="compact"
+          size="sm"
+          onclick={onEventGroupsToggle}
+          class="border-l-0"
+        >
+          {$eventGroupsEnabled
+            ? translate('workflows.hide-event-groups')
+            : translate('workflows.show-event-groups')}
+        </ToggleButton>
+        <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
-          class="border-l-0"
           size="sm"
           onclick={onAutoRefreshToggle}
         >

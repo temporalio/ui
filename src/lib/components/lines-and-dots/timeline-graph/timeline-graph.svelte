@@ -2,7 +2,11 @@
   import { twMerge } from 'tailwind-merge';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
+  import { isTimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
   import { activeGroups } from '$lib/stores/active-events';
   import { collapseIdleTime } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -21,6 +25,7 @@
     getTotalForY,
   } from './timeline-positioning';
 
+  import EventMarkerGroupDetailsRow from './event-marker-group-details-row.svelte';
   import GroupDetailsRow from './group-details-row.svelte';
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineCollapsedLayer from './timeline-collapsed-layer.svelte';
@@ -41,6 +46,8 @@
     totalExpectedEvents?: number;
     descMinId?: number;
     panelHeight?: number;
+    embeddedSelection?: boolean;
+    selectedGroup?: EventGroup;
     onTimelineInit?: (timeline: Timeline) => void;
   }
 
@@ -54,6 +61,8 @@
     totalExpectedEvents = 0,
     descMinId = 0,
     panelHeight = $bindable(0),
+    embeddedSelection = false,
+    selectedGroup = $bindable<EventGroup | undefined>(undefined),
     onTimelineInit,
   }: Props = $props();
 
@@ -130,9 +139,12 @@
     }
   };
 
-  const filteredGroups = $derived(
-    getFailedOrPendingGroups(groups, $eventStatusFilter),
-  );
+  const filteredGroups = $derived.by(() => {
+    if (groups.length && groups.every(isTimelineEventMarkerGroup)) {
+      return groups;
+    }
+    return getFailedOrPendingGroups(groups, $eventStatusFilter);
+  });
 
   // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
   // group count, so subtracting the loaded count is correct.
@@ -256,13 +268,21 @@
 
   // Active group's index in filteredGroups (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
+  const activeGroupId = $derived(
+    embeddedSelection ? selectedGroup?.id : $activeGroups[0],
+  );
+
   const activeIdx = $derived(
-    $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
+    activeGroupId ? (groupIndexMap.get(activeGroupId) ?? -1) : -1,
   );
 
   $effect(() => {
-    if ($activeGroups.length === 0) panelHeight = 0;
+    if (!activeGroupId) panelHeight = 0;
   });
+
+  const selectEmbeddedGroup = (group: EventGroup) => {
+    selectedGroup = selectedGroup?.id === group.id ? undefined : group;
+  };
 
   // Open detail panel pushes rows below the active one down by panelHeight.
   // reverseSort flips "below" to i < activeIdx.
@@ -407,7 +427,9 @@
   const poolSize = $derived.by(() => {
     const band = visibleBand;
     const bandHeight = band ? band[1] - band[0] : Math.min(svgHeight, 1000);
-    return Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
+    const desired =
+      Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
+    return Math.max(1, Math.min(filteredGroups.length, desired));
   });
 
   // Slot i%poolSize always holds group i (keyed by slot index below, so the DOM
@@ -463,7 +485,7 @@
     {#snippet children({ endTime })}
       <div
         class="pointer-events-none sticky top-[120px]"
-        class:invisible={!!$activeGroups.length}
+        class:invisible={activeIdx >= 0}
       >
         <div class="flex w-full justify-between text-xs">
           <p class="w-60 -translate-x-24 rotate-90">
@@ -546,6 +568,7 @@
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
+                  onSelect={embeddedSelection ? selectEmbeddedGroup : undefined}
                 />
               {/if}
             </li>
@@ -573,15 +596,33 @@
           {@const activeGroup = filteredGroups[activeIdx]}
           {#if activeGroup}
             {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
-            <GroupDetailsRow
-              y={panelY}
-              group={activeGroup}
-              {canvasWidth}
-              endTime={workflow?.endTime ? endTime : nowMs}
-              onHeight={(height) => {
-                panelHeight = height;
-              }}
-            />
+            {#if isTimelineEventMarkerGroup(activeGroup)}
+              <EventMarkerGroupDetailsRow
+                y={panelY}
+                group={activeGroup}
+                {canvasWidth}
+                {workflow}
+                endTime={workflow?.endTime ? endTime : nowMs}
+                onHeight={(height) => {
+                  panelHeight = height;
+                }}
+              />
+            {:else}
+              <GroupDetailsRow
+                y={panelY}
+                group={activeGroup}
+                {canvasWidth}
+                endTime={workflow?.endTime ? endTime : nowMs}
+                onClose={embeddedSelection
+                  ? () => {
+                      selectedGroup = undefined;
+                    }
+                  : undefined}
+                onHeight={(height) => {
+                  panelHeight = height;
+                }}
+              />
+            {/if}
           {/if}
         {/if}
       </div>

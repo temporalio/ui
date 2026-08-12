@@ -1,3 +1,5 @@
+import { readonly, writable } from 'svelte/store';
+
 import {
   addEventToGroup,
   cloneEventGroup,
@@ -7,8 +9,17 @@ import {
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
 import { toEvent } from '$lib/models/event-history';
+import {
+  createTimelineEventMarkerGroups,
+  type EventGroupMarkerPresentation,
+  type EventMarkerAttribution,
+  getEventGroupMarkerKey,
+  getEventGroupMarkerPresentation,
+  type TimelineEventMarkerGroup,
+} from '$lib/models/event-marker-groups';
 import type {
   CommonHistoryEvent,
+  EventGroupMarker,
   HistoryEvent,
   PendingActivity,
   PendingNexusOperation,
@@ -88,6 +99,7 @@ let _cachedLiveVersion = -1;
 let _cachedGroupsNoWFT: EventGroup[] | null = null;
 let _cachedPoolTopNoWFT = -1;
 let _cachedLiveVersionNoWFT = -1;
+let _cachedEventMarkerGroups: TimelineEventMarkerGroup[] | null = null;
 // Incremented each time liveGroups is modified so getGroupArray knows to bust.
 let _liveVersion = 0;
 
@@ -95,6 +107,18 @@ let _liveVersion = 0;
 // and the live poll — the direction an event arrives from is a fetch detail,
 // and one workflow task's markers bill once however they were loaded.
 const processedWorkflowTaskIds = new Set<string>();
+const eventGroupMarkerPresentationLabels = new Map<string, string>();
+const eventGroupMarkerPresentations = new Map<
+  string,
+  EventGroupMarkerPresentation
+>();
+const eventMarkerAttributions = new Map<string, EventMarkerAttribution>();
+const markerReferencedLifecycleGroupIds = new Set<string>();
+const eventMarkerPresentationVersionStore = writable(0);
+
+export const eventMarkerPresentationVersion = readonly(
+  eventMarkerPresentationVersionStore,
+);
 
 // Solo events that don't form groups (e.g. WorkflowExecutionStarted/Completed).
 // Kept separately so getEventArray() can return a complete flat event list.
@@ -215,11 +239,221 @@ function shouldNotAddBillableAction(event: WorkflowEvent): boolean {
   return Number(event.id) < Number(failedEvent.eventId);
 }
 
+function formatEventGroupMarkerPresentationLabel(
+  name: string,
+  id: string,
+): string {
+  return `${name} (${id})`;
+}
+
+type EventGroupMarkerPresentationLabel = {
+  markerKey: string;
+  presentationLabel: string;
+};
+
+function getEventGroupMarkerPresentationLabelFromEvent(
+  event: WorkflowEvent,
+): EventGroupMarkerPresentationLabel | undefined {
+  if (event.eventType === 'WorkflowExecutionStarted') {
+    return {
+      markerKey: `event:${event.id}`,
+      presentationLabel: formatEventGroupMarkerPresentationLabel(
+        event.eventType,
+        event.id,
+      ),
+    };
+  }
+
+  const attributes = event.attributes as unknown as Record<string, unknown>;
+  if (event.eventType === 'WorkflowExecutionSignaled') {
+    const signalName = attributes.signalName;
+    return {
+      markerKey: `event:${event.id}`,
+      presentationLabel: formatEventGroupMarkerPresentationLabel(
+        typeof signalName === 'string' && signalName
+          ? signalName
+          : event.eventType,
+        event.id,
+      ),
+    };
+  }
+
+  if (event.eventType === 'WorkflowExecutionUpdateAdmitted') {
+    const request = attributes.request as
+      | {
+          meta?: { updateId?: unknown };
+          input?: { name?: unknown };
+        }
+      | undefined;
+    const updateId = request?.meta?.updateId;
+    if (typeof updateId !== 'string' || !updateId) return;
+
+    const updateName = request?.input?.name;
+    return {
+      markerKey: `update:${updateId}`,
+      presentationLabel: formatEventGroupMarkerPresentationLabel(
+        typeof updateName === 'string' && updateName
+          ? updateName
+          : event.eventType,
+        updateId,
+      ),
+    };
+  }
+
+  if (event.eventType === 'WorkflowExecutionUpdateAccepted') {
+    const acceptedRequest = attributes.acceptedRequest as
+      | {
+          meta?: { updateId?: unknown };
+          input?: { name?: unknown };
+        }
+      | undefined;
+    const protocolInstanceId = attributes.protocolInstanceId;
+    const updateId =
+      typeof acceptedRequest?.meta?.updateId === 'string'
+        ? acceptedRequest.meta.updateId
+        : typeof protocolInstanceId === 'string'
+          ? protocolInstanceId
+          : undefined;
+    if (!updateId) return;
+
+    const updateName = acceptedRequest?.input?.name;
+    const markerKey = `update:${updateId}`;
+    if (
+      !(typeof updateName === 'string' && updateName) &&
+      eventGroupMarkerPresentationLabels.has(markerKey)
+    ) {
+      return;
+    }
+    return {
+      markerKey,
+      presentationLabel: formatEventGroupMarkerPresentationLabel(
+        typeof updateName === 'string' && updateName
+          ? updateName
+          : event.eventType,
+        updateId,
+      ),
+    };
+  }
+}
+
+function indexEventGroupMarkerPresentationLabel(event: WorkflowEvent): void {
+  const presentation = getEventGroupMarkerPresentationLabelFromEvent(event);
+  if (!presentation) return;
+
+  if (
+    eventGroupMarkerPresentationLabels.get(presentation.markerKey) ===
+    presentation.presentationLabel
+  ) {
+    return;
+  }
+  eventGroupMarkerPresentationLabels.set(
+    presentation.markerKey,
+    presentation.presentationLabel,
+  );
+  if (refreshEventGroupMarkerPresentation(presentation.markerKey)?.changed) {
+    _cachedEventMarkerGroups = null;
+  }
+}
+
+function refreshEventGroupMarkerPresentation(
+  key: string,
+  marker?: EventGroupMarker,
+  notify = true,
+):
+  | { presentation: EventGroupMarkerPresentation; changed: boolean }
+  | undefined {
+  const sourceMarker =
+    marker ?? eventMarkerAttributions.get(key)?.eventGroupMarker;
+  if (!sourceMarker) return;
+
+  const presentation = getEventGroupMarkerPresentation(
+    sourceMarker,
+    eventGroupMarkerPresentationLabels,
+  );
+  if (!presentation) return;
+
+  const previous = eventGroupMarkerPresentations.get(key);
+  if (
+    previous?.displayName === presentation.displayName &&
+    previous.icon === presentation.icon &&
+    previous.label === presentation.label
+  ) {
+    return { presentation: previous, changed: false };
+  }
+
+  eventGroupMarkerPresentations.set(key, presentation);
+  if (notify)
+    eventMarkerPresentationVersionStore.update((version) => version + 1);
+  return { presentation, changed: true };
+}
+
 function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
-  return toEvent(raw, {
+  const event = toEvent(raw, {
     shouldNotAddBillableAction,
     processedWorkflowTaskIds,
   });
+  indexEventGroupMarkerPresentationLabel(event);
+  return event;
+}
+
+function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
+  let changed = false;
+  for (const marker of event.eventGroupMarkers ?? []) {
+    const key = getEventGroupMarkerKey(marker);
+    if (!key) continue;
+
+    let attribution = eventMarkerAttributions.get(key);
+    let shouldRefreshPresentation = false;
+    if (!attribution) {
+      attribution = {
+        key,
+        eventGroupMarker: marker,
+        eventsById: new Map(),
+      };
+      eventMarkerAttributions.set(key, attribution);
+      shouldRefreshPresentation = true;
+    } else if (
+      marker.label?.label &&
+      !attribution.eventGroupMarker.label?.label
+    ) {
+      attribution.eventGroupMarker = marker;
+      shouldRefreshPresentation = true;
+    }
+
+    if (shouldRefreshPresentation) {
+      refreshEventGroupMarkerPresentation(key, attribution.eventGroupMarker);
+    }
+    const previousAttribution = attribution.eventsById.get(event.id);
+    if (
+      !previousAttribution ||
+      previousAttribution.lifecycleGroupId !== groupId
+    ) {
+      attribution.eventsById.set(event.id, {
+        event,
+        lifecycleGroupId: groupId,
+      });
+      markerReferencedLifecycleGroupIds.add(groupId);
+      changed = true;
+    }
+    if (shouldRefreshPresentation) changed = true;
+  }
+  if (changed) _cachedEventMarkerGroups = null;
+}
+
+export function getEventMarkerPresentation(
+  marker: EventGroupMarker,
+): EventGroupMarkerPresentation | undefined {
+  const key = getEventGroupMarkerKey(marker);
+  if (!key) return;
+
+  return (
+    eventGroupMarkerPresentations.get(key) ??
+    refreshEventGroupMarkerPresentation(key, marker, false)?.presentation
+  );
+}
+
+export function hasEventMarkerGroups(): boolean {
+  return eventMarkerAttributions.size > 0;
 }
 
 function insertEventById(list: WorkflowEvent[], event: WorkflowEvent): void {
@@ -232,6 +466,13 @@ function insertEventById(list: WorkflowEvent[], event: WorkflowEvent): void {
 function invalidateGroupArrayCaches(): void {
   _cachedGroups = null;
   _cachedGroupsNoWFT = null;
+}
+
+function invalidateLifecycleGroupCaches(groupId: string): void {
+  invalidateGroupArrayCaches();
+  if (markerReferencedLifecycleGroupIds.has(groupId)) {
+    _cachedEventMarkerGroups = null;
+  }
 }
 
 function hasTerminalActivityEvent(group: EventGroup): boolean {
@@ -311,13 +552,14 @@ function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
 
   const event = toWorkflowEvent(raw);
   meta.group = withAddedEvent(meta.group, event);
+  attributeEventMarkers(event, meta.group.id);
 
   eventToGroup[followerSlotIdx] = poolIdx + 1;
 
   const followerMs = toMs(event.eventTime);
   if (followerMs > meta.endMs) meta.endMs = followerMs;
 
-  invalidateGroupArrayCaches();
+  invalidateLifecycleGroupCaches(meta.group.id);
   eventSlots[followerSlotIdx] = null;
 }
 
@@ -355,7 +597,7 @@ function absorbLiveGroupIntoPool(poolIdx: number, liveGroup: EventGroup): void {
   }
 
   clearResolvedPendingState(group);
-  invalidateGroupArrayCaches();
+  invalidateLifecycleGroupCaches(group.id);
 }
 
 // Returns a fresh group reference when pending metadata changed (so
@@ -427,6 +669,13 @@ export function reset(historyLength: number): void {
   pendingResolvers.clear();
   activePromises.clear();
   processedWorkflowTaskIds.clear();
+  eventGroupMarkerPresentationLabels.clear();
+  if (eventGroupMarkerPresentations.size) {
+    eventGroupMarkerPresentations.clear();
+    eventMarkerPresentationVersionStore.update((version) => version + 1);
+  }
+  eventMarkerAttributions.clear();
+  markerReferencedLifecycleGroupIds.clear();
   failedEvent = null;
   latestEventSlotIdx = -1;
   latestEventRef = null;
@@ -444,6 +693,7 @@ export function reset(historyLength: number): void {
   _cachedGroupsNoWFT = null;
   _cachedPoolTopNoWFT = -1;
   _cachedLiveVersionNoWFT = -1;
+  _cachedEventMarkerGroups = null;
 }
 
 /**
@@ -485,6 +735,7 @@ export function processEvent(
 
   const event = toWorkflowEvent(raw);
   const gid = getGroupId(event as CommonHistoryEvent);
+  attributeEventMarkers(event, gid);
   const isHead = gid === event.id;
 
   if (!isHead) {
@@ -524,6 +775,10 @@ export function processEvent(
   resetMeta(meta);
   meta.headSlotIdx = slotIdx;
   meta.group = group;
+  // A newly available lifecycle head may replace standalone marker-event rows.
+  if (markerReferencedLifecycleGroupIds.has(group.id)) {
+    _cachedEventMarkerGroups = null;
+  }
 
   const startMs = toMs(event.eventTime);
   meta.startMs = startMs;
@@ -585,7 +840,7 @@ export function processEvent(
     }
     clearResolvedPendingState(group);
     livePendingFollowers.delete(event.id);
-    invalidateGroupArrayCaches();
+    invalidateLifecycleGroupCaches(group.id);
   }
 
   const liveGroupIdx = liveGroups.findIndex((g) => g.id === event.id);
@@ -727,6 +982,7 @@ export function enrichGroups(
   );
 
   let changed = false;
+  let referencedMarkerGroupChanged = false;
 
   for (let i = 0; i < poolTop; i++) {
     const meta = groupPool[i];
@@ -735,6 +991,9 @@ export function enrichGroups(
     if (next !== meta.group) {
       meta.group = next;
       changed = true;
+      if (markerReferencedLifecycleGroupIds.has(next.id)) {
+        referencedMarkerGroupChanged = true;
+      }
     }
   }
 
@@ -743,10 +1002,14 @@ export function enrichGroups(
     if (next !== liveGroups[i]) {
       liveGroups[i] = next;
       changed = true;
+      if (markerReferencedLifecycleGroupIds.has(next.id)) {
+        referencedMarkerGroupChanged = true;
+      }
     }
   }
 
   if (changed) invalidateGroupArrayCaches();
+  if (referencedMarkerGroupChanged) _cachedEventMarkerGroups = null;
 }
 
 /**
@@ -875,6 +1138,22 @@ export function getGroupArray(opts?: GetRowsOptions): EventGroup[] {
     _cachedLiveVersion = _liveVersion;
   }
   return result;
+}
+
+/**
+ * Event Group timeline rows built from marker attribution captured while raw
+ * events are processed.
+ */
+export function getEventMarkerGroupArray(): TimelineEventMarkerGroup[] {
+  if (_cachedEventMarkerGroups) return _cachedEventMarkerGroups;
+
+  const lifecycleGroups = getGroupArray({ excludeWorkflowTasks: true });
+  _cachedEventMarkerGroups = createTimelineEventMarkerGroups(
+    eventMarkerAttributions.values(),
+    lifecycleGroups,
+    eventGroupMarkerPresentations,
+  );
+  return _cachedEventMarkerGroups;
 }
 
 /**
@@ -1013,6 +1292,7 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
 
   const event = toWorkflowEvent(raw);
   const gid = getGroupId(event as CommonHistoryEvent);
+  attributeEventMarkers(event, gid);
   const isHead = gid === event.id;
 
   if (!isHead) {
@@ -1021,7 +1301,7 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
     if (existingIdx !== -1) {
       liveGroups[existingIdx] = withAddedEvent(liveGroups[existingIdx], event);
       _liveVersion++;
-      invalidateGroupArrayCaches();
+      invalidateLifecycleGroupCaches(gid);
       return true;
     }
 
@@ -1041,7 +1321,7 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
         if (followerMs > meta.endMs) {
           meta.endMs = followerMs;
         }
-        invalidateGroupArrayCaches();
+        invalidateLifecycleGroupCaches(meta.group.id);
       }
       return true;
     }
@@ -1084,7 +1364,7 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
 
   liveGroups.push(group);
   _liveVersion++;
-  invalidateGroupArrayCaches();
+  invalidateLifecycleGroupCaches(group.id);
   for (const cb of liveGroupListeners) cb(group);
   for (const cb of latestGroupListeners) cb(group);
   return true;
@@ -1109,6 +1389,11 @@ export function onLiveGroup(cb: LatestGroupListener): () => void {
 
 /** Clear liveGroups on reset so they don't carry over to the next workflow. */
 export function resetLive(): void {
+  if (
+    liveGroups.some((group) => markerReferencedLifecycleGroupIds.has(group.id))
+  ) {
+    _cachedEventMarkerGroups = null;
+  }
   liveGroups.length = 0;
   liveGroupListeners.length = 0;
   liveSeenIds.clear();

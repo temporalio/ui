@@ -30,6 +30,7 @@
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
+  import EventGroupMarkerBadges from './event-group-marker-badges.svelte';
 
   let { event, lazy = false }: { event: WorkflowEvent; lazy?: boolean } =
     $props();
@@ -111,6 +112,9 @@
       {#each linkFields as [key, value] (key)}
         {@render link(key, value)}
       {/each}
+      {#if event.eventGroupMarkers?.length}
+        <EventGroupMarkerBadges markers={event.eventGroupMarkers} />
+      {/if}
     </div>
     {#if payloadFields.length}
       <div class="flex w-full flex-col gap-1 xl:w-1/2">

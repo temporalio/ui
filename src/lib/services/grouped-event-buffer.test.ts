@@ -1,7 +1,10 @@
+import { get } from 'svelte/store';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { groupEvents } from '$lib/models/event-groups';
 import { toEventHistory } from '$lib/models/event-history';
+import type { HistoryEvent } from '$lib/types/events';
 
 import {
   _debugEventSlots,
@@ -9,9 +12,12 @@ import {
   appendLiveEvent,
   assignTrackIndices,
   enrichGroups,
+  eventMarkerPresentationVersion,
   getAscGroupCount,
   getDescGroupCount,
   getEventArray,
+  getEventMarkerGroupArray,
+  getEventMarkerPresentation,
   getGroupArray,
   getGroupCount,
   getGroupMeta,
@@ -21,6 +27,7 @@ import {
   getRows,
   getVisibleGroupCount,
   getWorkflowTaskFailedEvent,
+  hasEventMarkerGroups,
   isWorkflowTaskGroup,
   mergeHeads,
   onLatestGroup,
@@ -50,6 +57,7 @@ import {
   makeWorkflowTaskGroup,
   makeWorkflowTaskScheduled,
   makeWorkflowTaskStarted,
+  makeWorkflowUpdateAccepted,
   makeWorkflowUpdateGroup,
 } from './test-helpers/synthetic-events';
 
@@ -107,6 +115,202 @@ describe('output equivalence with groupEvents', () => {
     const actual = await Promise.all(getRows(0, getGroupCount()));
     const wftGroups = actual.filter(isWorkflowTaskGroup);
     expect(wftGroups.length).toBeGreaterThan(0);
+  });
+
+  it('builds event marker groups while processing lifecycle events', () => {
+    const events = makeActivityGroup(1);
+    events[0].eventGroupMarkers = [
+      {
+        label: {
+          id: 'checkout',
+          label: {
+            metadata: { encoding: new TextEncoder().encode('json/plain') },
+            data: new TextEncoder().encode('"Checkout"'),
+          },
+        },
+      },
+    ];
+    for (const event of events.slice(1)) {
+      event.eventGroupMarkers = [{ label: { id: 'checkout' } }];
+    }
+
+    loadAll(events);
+
+    const [markerGroup] = getEventMarkerGroupArray();
+    expect(markerGroup.markerKey).toBe('label:checkout');
+    expect(markerGroup.eventList).toHaveLength(events.length);
+    expect(markerGroup.lifecycleGroups).toHaveLength(1);
+    expect(markerGroup.lifecycleGroups[0].id).toBe('1');
+    expect(
+      getEventMarkerPresentation({ label: { id: 'checkout' } })?.label,
+    ).toEqual(events[0].eventGroupMarkers?.[0].label?.label);
+  });
+
+  it('preserves materialized event marker groups for unrelated lifecycle changes', () => {
+    const markedEvents = makeActivityGroup(1);
+    markedEvents[0].eventGroupMarkers = [{ label: { id: 'checkout' } }];
+    loadAll(markedEvents);
+
+    const initialMarkerGroups = getEventMarkerGroupArray();
+    loadAll(makeActivityGroup(4));
+
+    expect(getEventMarkerGroupArray()).toBe(initialMarkerGroups);
+  });
+
+  it('rebuilds event marker groups when a referenced lifecycle changes', () => {
+    const [scheduled, started] = makeActivityGroup(1);
+    scheduled.eventGroupMarkers = [{ label: { id: 'checkout' } }];
+    processEvent(scheduled, true);
+
+    const initialMarkerGroups = getEventMarkerGroupArray();
+    expect(initialMarkerGroups[0].lifecycleGroups[0].eventList).toHaveLength(1);
+
+    processEvent(started, true);
+
+    const updatedMarkerGroups = getEventMarkerGroupArray();
+    expect(updatedMarkerGroups).not.toBe(initialMarkerGroups);
+    expect(updatedMarkerGroups[0].lifecycleGroups[0].eventList).toHaveLength(2);
+  });
+
+  it('indexes markers on solo events', () => {
+    const event = makeWorkflowCompleted(1);
+    event.eventGroupMarkers = [{ label: { id: 'checkout' } }];
+
+    processEvent(event, true);
+
+    expect(hasEventMarkerGroups()).toBe(true);
+    const [markerGroup] = getEventMarkerGroupArray();
+    expect(markerGroup.eventList.map(({ id }) => id)).toEqual(['1']);
+    expect(markerGroup.lifecycleGroups[0].initialEvent.id).toBe('1');
+  });
+
+  it('indexes a follower before its lifecycle head is loaded', () => {
+    const events = makeActivityGroup(1);
+    events[1].eventGroupMarkers = [{ label: { id: 'checkout' } }];
+
+    processEvent(events[1], false);
+
+    expect(hasEventMarkerGroups()).toBe(true);
+    const [markerGroup] = getEventMarkerGroupArray();
+    expect(markerGroup.eventList.map(({ id }) => id)).toEqual(['2']);
+    expect(markerGroup.lifecycleGroups[0].initialEvent.id).toBe('2');
+  });
+
+  it('uses source names or event types with ids as presentation labels', () => {
+    const signal = {
+      eventId: '1',
+      eventTime: '2024-01-01T00:00:00.000000000Z',
+      eventType: 'WorkflowExecutionSignaled',
+      version: '0',
+      taskId: '10',
+      workflowExecutionSignaledEventAttributes: {
+        signalName: 'paymentReceived',
+        input: null,
+        identity: 'test',
+      },
+      links: [],
+      eventGroupMarkers: [{ inboundEvent: { inboundEventId: '1' } }],
+    } as unknown as HistoryEvent;
+    const update = {
+      ...makeWorkflowUpdateAccepted(2),
+      workflowExecutionUpdateAcceptedEventAttributes: {
+        protocolInstanceId: 'update-2',
+        acceptedRequest: {
+          meta: { updateId: 'update-2' },
+          input: { name: 'set-to-account' },
+        },
+        acceptedRequestSequencingEventId: '1',
+      },
+      eventGroupMarkers: [{ inboundUpdate: { inboundUpdateId: 'update-2' } }],
+    } as unknown as HistoryEvent;
+    const workflowStarted = {
+      ...makeWorkflowStarted(3),
+      eventGroupMarkers: [{ inboundEvent: { inboundEventId: '3' } }],
+    } as HistoryEvent;
+
+    processEvent(signal, true);
+    processEvent(update, true);
+    processEvent(workflowStarted, true);
+
+    const presentationLabels = new Map(
+      getEventMarkerGroupArray().map((group) => [
+        group.markerKey,
+        group.displayName,
+      ]),
+    );
+    expect(presentationLabels.get('event:1')).toBe('paymentReceived (1)');
+    expect(presentationLabels.get('update:update-2')).toBe(
+      'set-to-account (update-2)',
+    );
+    expect(presentationLabels.get('event:3')).toBe(
+      'WorkflowExecutionStarted (3)',
+    );
+  });
+
+  it('uses an admitted update name when the accepted event omits its request', () => {
+    const admitted = {
+      eventId: '1',
+      eventTime: '2024-01-01T00:00:00.000000000Z',
+      eventType: 'WorkflowExecutionUpdateAdmitted',
+      version: '0',
+      taskId: '10',
+      workflowExecutionUpdateAdmittedEventAttributes: {
+        request: {
+          meta: { updateId: 'update-1' },
+          input: { name: 'adjustTip' },
+        },
+      },
+      links: [],
+    } as unknown as HistoryEvent;
+    const accepted = {
+      ...makeWorkflowUpdateAccepted(2),
+      workflowExecutionUpdateAcceptedEventAttributes: {
+        protocolInstanceId: 'update-1',
+        acceptedRequestSequencingEventId: '1',
+      },
+      eventGroupMarkers: [{ inboundUpdate: { inboundUpdateId: 'update-1' } }],
+    } as unknown as HistoryEvent;
+
+    processEvent(admitted, true);
+    processEvent(accepted, true);
+
+    expect(getEventMarkerGroupArray()[0].displayName).toBe(
+      'adjustTip (update-1)',
+    );
+  });
+
+  it('notifies presentation consumers only when a source label changes', () => {
+    const marker = { inboundEvent: { inboundEventId: '10' } };
+    const [scheduled] = makeActivityGroup(1);
+    scheduled.eventGroupMarkers = [marker];
+    processEvent(scheduled, true);
+
+    const versionBeforeSource = get(eventMarkerPresentationVersion);
+    expect(getEventMarkerPresentation(marker)?.displayName).toBe('10');
+
+    const signal = {
+      eventId: '10',
+      eventTime: '2024-01-01T00:00:00.000000000Z',
+      eventType: 'WorkflowExecutionSignaled',
+      version: '0',
+      taskId: '10',
+      workflowExecutionSignaledEventAttributes: {
+        signalName: 'paymentReceived',
+        input: null,
+        identity: 'test',
+      },
+      links: [],
+    } as unknown as HistoryEvent;
+
+    processEvent(signal, true);
+    const versionAfterSource = get(eventMarkerPresentationVersion);
+    expect(versionAfterSource).toBe(versionBeforeSource + 1);
+    expect(getEventMarkerPresentation(marker)?.displayName).toBe(
+      'paymentReceived (10)',
+    );
+
+    processEvent(signal, false);
+    expect(get(eventMarkerPresentationVersion)).toBe(versionAfterSource);
   });
 });
 

@@ -9,30 +9,42 @@
 
   import TimelineGraph from './timeline-graph.svelte';
 
+  type TimelineSnapshot = {
+    workflow: WorkflowExecution;
+    groups: EventGroups;
+  };
+
   interface Props {
-    namespace: string;
+    namespace?: string;
     workflowId?: string | null;
     runId?: string | null;
     eventCount?: number;
     viewportHeight?: number;
+    snapshot?: TimelineSnapshot;
+    readOnly?: boolean;
     onLoad?: () => void;
     class?: string;
   }
 
   let {
-    namespace,
+    namespace = '',
     workflowId,
     runId = '',
     eventCount = 0,
     viewportHeight = 360,
+    snapshot,
+    readOnly = true,
     onLoad = () => {},
     class: className = '',
   }: Props = $props();
 
-  let snapshot = $state<{ workflow: WorkflowExecution; groups: EventGroups }>();
+  let fetchedSnapshot = $state<TimelineSnapshot>();
+  let selectedGroup = $state<EventGroups[number]>();
+
+  const resolvedSnapshot = $derived(snapshot ?? fetchedSnapshot);
 
   const getWorkflowAndEventHistory = async () => {
-    if (!workflowId || !runId) return;
+    if (!namespace || !workflowId || !runId) return;
 
     const [{ workflow }, history] = await Promise.all([
       fetchWorkflow({ namespace, workflowId, runId }),
@@ -53,30 +65,44 @@
 
   $effect(() => {
     void fetchKey;
+    if (snapshot) return;
     let cancelled = false;
     untrack(() => getWorkflowAndEventHistory()).then((next) => {
       if (cancelled) return;
-      snapshot = next;
+      fetchedSnapshot = next;
       onLoad();
     });
     return () => {
       cancelled = true;
     };
   });
+
+  $effect(() => {
+    if (
+      selectedGroup &&
+      !resolvedSnapshot?.groups.some((group) => group.id === selectedGroup?.id)
+    ) {
+      selectedGroup = undefined;
+    }
+  });
 </script>
 
-{#if snapshot}
+{#if resolvedSnapshot}
   <!-- Bounded scroll box for the child-workflow mini-timeline; the graph
        virtualizes against this scroll parent (our TimelineGraph takes no
        viewportHeight prop). -->
   <div
     class="cursor-pointer overflow-auto {className}"
-    style:max-height="{viewportHeight}px"
+    style:max-height={selectedGroup && !readOnly
+      ? 'none'
+      : `${viewportHeight}px`}
   >
     <TimelineGraph
-      workflow={snapshot.workflow}
-      groups={snapshot.groups}
-      readOnly
+      workflow={resolvedSnapshot.workflow}
+      groups={resolvedSnapshot.groups}
+      {readOnly}
+      embeddedSelection={!readOnly}
+      bind:selectedGroup
     />
   </div>
 {/if}
