@@ -13,6 +13,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
 
+import { catalogHarnessSetupTimeoutMs } from './catalog-harness-timeout';
 import { createWorkflowCatalogSessionStore } from './session-store';
 import type { BrowserWorkflowCatalogDescriptor } from './types';
 import type { WorkbenchHost } from './workbench-host';
@@ -65,9 +66,16 @@ beforeAll(async () => {
             projectRoot,
             'src/lib/workflow-catalog/browser/markdown-preview-test-double.svelte',
           ),
-          // The search attribute inputs reach date-fns-tz, whose CommonJS entry
-          // this bare SSR runner cannot evaluate. Its ESM build works as-is.
-          'date-fns-tz': 'date-fns-tz/esm',
+          // These two ship CommonJS this bare SSR runner cannot evaluate, and
+          // processing them costs more setup time than the hook allows.
+          'date-fns-tz': path.resolve(
+            projectRoot,
+            'src/lib/workflow-catalog/browser/date-fns-tz-test-double.ts',
+          ),
+          'tailwindcss/colors': path.resolve(
+            projectRoot,
+            'src/lib/workflow-catalog/browser/tailwind-colors-test-double.ts',
+          ),
           $lib: path.resolve(projectRoot, 'src/lib'),
           $types: path.resolve(projectRoot, 'src/types'),
           $app: path.resolve(projectRoot, 'src/lib/svelte-mocks/app'),
@@ -97,7 +105,7 @@ beforeAll(async () => {
     renderComponent,
     readinessPresentation,
   } = lifecycle.value);
-});
+}, catalogHarnessSetupTimeoutMs);
 
 afterAll(async () => closeViteServer?.());
 

@@ -13,6 +13,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
 
+import { catalogHarnessSetupTimeoutMs } from './catalog-harness-timeout';
 import { changePendingRunCount } from './catalog-list-state';
 import { createWorkflowCatalogSessionStore } from './session-store';
 import type { BrowserWorkflowCatalogDescriptor } from './types';
@@ -51,7 +52,7 @@ beforeAll(async () => {
   );
   closeViteServer = lifecycle.close;
   ({ catalogList, renderComponent } = lifecycle.value);
-});
+}, catalogHarnessSetupTimeoutMs);
 
 afterAll(async () => closeViteServer?.());
 

@@ -51,10 +51,7 @@ export async function getCatalogClientTestRunner(): Promise<ClientRunner> {
         optimizeDeps: {
           noDiscovery: true,
           exclude: ['svelte'],
-          // The search attribute inputs reach date-fns-tz, and the catalog
-          // editors reach tailwindcss/colors; both ship CommonJS that this
-          // runner can only evaluate once Vite has pre-bundled it.
-          include: ['date-fns-tz', 'json-bigint', 'tailwindcss/colors'],
+          include: ['json-bigint'],
         },
         resolve: {
           dedupe: ['svelte'],
@@ -71,6 +68,22 @@ export async function getCatalogClientTestRunner(): Promise<ClientRunner> {
               replacement: path.resolve(
                 projectRoot,
                 'src/lib/components/deployments/vite-client-test-double.ts',
+              ),
+            },
+            // These two ship CommonJS, and pre-bundling them cost more setup
+            // time than this harness's hook allows. Neither value is asserted.
+            {
+              find: /^date-fns-tz$/,
+              replacement: path.resolve(
+                projectRoot,
+                'src/lib/workflow-catalog/browser/date-fns-tz-test-double.ts',
+              ),
+            },
+            {
+              find: /^tailwindcss\/colors$/,
+              replacement: path.resolve(
+                projectRoot,
+                'src/lib/workflow-catalog/browser/tailwind-colors-test-double.ts',
               ),
             },
             {

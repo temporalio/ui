@@ -4,13 +4,14 @@ import {
   closeCatalogClientTestRunner,
   getCatalogClientTestRunner,
 } from './catalog-client-test-runner';
+import { catalogHarnessSetupTimeoutMs } from './catalog-harness-timeout';
 
 describe('WorkflowCatalogList client interactions', () => {
   let client: Awaited<ReturnType<typeof getCatalogClientTestRunner>>;
 
   beforeAll(async () => {
     client = await getCatalogClientTestRunner();
-  });
+  }, catalogHarnessSetupTimeoutMs);
 
   afterEach(async () => client.cleanup());
   afterAll(closeCatalogClientTestRunner);
