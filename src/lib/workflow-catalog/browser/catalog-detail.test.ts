@@ -196,7 +196,7 @@ describe('WorkflowCatalogDetail', () => {
       /class="[^"]*flex-wrap[^"]*justify-between[^"]*"[\s\S]*>Start options<[\s\S]*>Run</,
     );
     expect(source).toMatch(
-      /{#if configureOpen}[\s\S]*aria-label="Start options"[\s\S]*{\/if}[\s\S]*class="surface-primary sticky bottom-0 flex flex-wrap items-center justify-between/,
+      /aria-label="Start options"[\s\S]*hidden={!configureOpen}[\s\S]*class="surface-primary sticky bottom-0 flex flex-wrap items-center justify-between/,
     );
   });
 
@@ -705,7 +705,7 @@ describe('WorkflowCatalogDetail', () => {
     expect(source).toContain('sessionStore.getDraft(descriptor.id)');
     expect(source).toContain('sessionStore.setDraft(descriptor.id');
     expect(source).toContain('workflowCatalogTargetFingerprint');
-    expect(source).toContain('Textarea');
+    expect(source).toContain('PayloadInput');
     expect(source).toContain('workflow-catalog-start-options');
     expect(source).toContain('sticky bottom-0');
     expect(source).toContain('configureOpen = false');

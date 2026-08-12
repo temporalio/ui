@@ -92,6 +92,28 @@ describe('WorkflowCatalogDetail client interactions', () => {
     );
   });
 
+  it('keeps start options after the section is collapsed and reopened', async () => {
+    const target = await client.renderDetail();
+    await client.flush();
+    const button = (label: string) =>
+      Array.from(target.querySelectorAll('button')).find(
+        (candidate) => candidate.textContent?.trim() === label,
+      );
+
+    button('Start options')?.click();
+    client.flushSync();
+    button('Start options')?.click();
+    client.flushSync();
+    button('Start options')?.click();
+    client.flushSync();
+
+    button('Run')?.click();
+
+    expect(await client.waitForStart()).toMatchObject({
+      startOptions: { workflowId: 'order-lifecycle-01' },
+    });
+  });
+
   it('supports configuration, dispatch, readiness refresh, and keyboard tooltip access', async () => {
     const target = await client.renderDetail();
     await client.flush();
@@ -128,7 +150,9 @@ describe('WorkflowCatalogDetail client interactions', () => {
     );
     readinessIcon?.focus();
     client.flushSync();
-    const tooltip = target.querySelector('[role="tooltip"]');
+    const tooltip = readinessIcon
+      ?.closest('.wrapper')
+      ?.querySelector('[role="tooltip"]');
 
     expect(document.activeElement).toBe(readinessIcon);
     expect(tooltip?.textContent).toContain('A Worker is polling.');

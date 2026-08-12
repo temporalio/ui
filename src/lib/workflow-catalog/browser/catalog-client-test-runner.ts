@@ -51,7 +51,7 @@ export async function getCatalogClientTestRunner(): Promise<ClientRunner> {
         optimizeDeps: {
           noDiscovery: true,
           exclude: ['svelte'],
-          include: ['json-bigint'],
+          include: ['json-bigint', 'tailwindcss/colors'],
         },
         resolve: {
           dedupe: ['svelte'],

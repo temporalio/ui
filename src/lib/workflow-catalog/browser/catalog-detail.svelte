@@ -112,6 +112,7 @@
 </script>
 
 <script lang="ts">
+  import PayloadInput from '$lib/components/payload-input.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -120,7 +121,6 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
-  import Textarea from '$lib/holocene/textarea.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
@@ -146,6 +146,7 @@
 
   let inputEditor = $state('');
   let startOptionsEditor = $state('');
+  let inputMalformed = $state(false);
   let configureOpen = $state(false);
   let editorError = $state('');
   let readiness = $state<ReadinessCheck[]>([]);
@@ -370,30 +371,31 @@
         aria-label="Configuration"
       >
         <h2 class="text-lg">Configuration</h2>
-        <Textarea
+        <PayloadInput
           id="workflow-catalog-input"
-          bind:value={inputEditor}
+          bind:input={inputEditor}
+          bind:error={inputMalformed}
           label="Input JSON"
-          description="JSON passed to the example when it starts."
-          rows={10}
-          spellcheck={false}
+          hintText="JSON passed to the example when it starts."
         />
 
-        {#if configureOpen}
-          <section
-            class="surface-subtle rounded-sm border border-subtle p-3"
-            aria-label="Start options"
-          >
-            <Textarea
-              id="workflow-catalog-start-options"
-              bind:value={startOptionsEditor}
-              label="Start options JSON"
-              description="These options apply only when you start this example."
-              rows={8}
-              spellcheck={false}
-            />
-          </section>
-        {/if}
+        <!--
+          Kept mounted rather than conditionally rendered: PayloadInput clears
+          its bound value when it is destroyed, which would discard the start
+          options every time this section collapsed.
+        -->
+        <section
+          class="surface-subtle rounded-sm border border-subtle p-3"
+          aria-label="Start options"
+          hidden={!configureOpen}
+        >
+          <PayloadInput
+            id="workflow-catalog-start-options"
+            bind:input={startOptionsEditor}
+            label="Start options JSON"
+            hintText="These options apply only when you start this example."
+          />
+        </section>
 
         {#if editorError}
           <p class="text-sm text-danger" role="alert">{editorError}</p>
@@ -410,7 +412,11 @@
             onclick={() => (configureOpen = !configureOpen)}
             >Start options</Button
           >
-          <Button leadingIcon="play" disabled={running} onclick={run}>
+          <Button
+            leadingIcon="play"
+            disabled={running || inputMalformed}
+            onclick={run}
+          >
             {running ? 'Running…' : 'Run'}
           </Button>
         </div>
