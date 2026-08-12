@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -21,17 +22,28 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
+  import {
+    eventMatchesEventGroupFilter,
+    lifecycleGroupMatchesEventGroupFilter,
+    type TimelineEventMarkerGroup,
+  } from '$lib/models/event-marker-groups';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import {
     enrichGroups,
     getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
     getEventArray,
+    getEventMarkerGroupArray,
     getGroupArray,
+    hasEventMarkerGroups,
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
-  import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
+  import {
+    eventCategoryFilter,
+    eventGroupFilter,
+    eventTypeFilter,
+  } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
     IterableEventWithPending,
@@ -58,6 +70,7 @@
     const urlParams = parseEventFilterParams(page.url);
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventGroupFilter = urlParams.eventGroups;
   });
 
   $effect(() => {
@@ -72,12 +85,16 @@
 
   let bufferGroups = $state.raw(getGroupArray({ excludeWorkflowTasks: true }));
   let bufferEvents = $state.raw(getEventArray());
+  let markerGroups = $state.raw<TimelineEventMarkerGroup[]>([]);
   let updating = $derived(!historyCtx.fetchComplete);
+
+  const selectedMarkerKeys = $derived(new Set($eventGroupFilter));
 
   onMount(() => {
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
     bufferEvents = getEventArray();
+    markerGroups = hasEventMarkerGroups() ? getEventMarkerGroupArray() : [];
   });
 
   $effect(() => {
@@ -94,6 +111,7 @@
       }
       bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
       bufferEvents = getEventArray();
+      markerGroups = hasEventMarkerGroups() ? getEventMarkerGroupArray() : [];
     });
 
     return () => {
@@ -107,6 +125,9 @@
     return bufferGroups.filter((g) => {
       if (!active.includes(g.category)) return false;
       if (cats && cats.length && !cats.includes(g.category)) return false;
+      if (!lifecycleGroupMatchesEventGroupFilter(g, selectedMarkerKeys)) {
+        return false;
+      }
       return true;
     });
   });
@@ -118,6 +139,7 @@
       const cat = (ev as WorkflowEvent).category;
       if (!active.includes(cat)) return false;
       if (cats && cats.length && !cats.includes(cat)) return false;
+      if (!eventMatchesEventGroupFilter(ev, selectedMarkerKeys)) return false;
       return true;
     });
   });
@@ -146,10 +168,16 @@
     (compact
       ? orderGroupsByPending(groups, reverseSort)
       : reverseSort
-        ? [...pendingNexusOperations, ...pendingActivities, ...history]
-        : [...history, ...pendingActivities, ...pendingNexusOperations]) as
-      | EventGroups
-      | IterableEventWithPending[],
+        ? [
+            ...(selectedMarkerKeys.size ? [] : pendingNexusOperations),
+            ...(selectedMarkerKeys.size ? [] : pendingActivities),
+            ...history,
+          ]
+        : [
+            ...history,
+            ...(selectedMarkerKeys.size ? [] : pendingActivities),
+            ...(selectedMarkerKeys.size ? [] : pendingNexusOperations),
+          ]) as EventGroups | IterableEventWithPending[],
   );
 
   $effect(() => {
@@ -254,6 +282,7 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
+        <EventGroupFilter groups={markerGroups} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"

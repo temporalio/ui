@@ -4,6 +4,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter.svelte';
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
@@ -20,7 +21,10 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import type { TimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
+  import {
+    lifecycleGroupMatchesEventGroupFilter,
+    type TimelineEventMarkerGroup,
+  } from '$lib/models/event-marker-groups';
   import {
     enrichGroups,
     getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
@@ -35,7 +39,7 @@
     eventGroupsEnabled,
   } from '$lib/stores/event-view';
   import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
-  import { eventTypeFilter } from '$lib/stores/filters';
+  import { eventGroupFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
     WorkflowTaskFailedEvent,
@@ -56,6 +60,7 @@
   $effect(() => {
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventGroupFilter = urlParams.eventGroups;
   });
 
   const onAutoRefreshToggle = () => {
@@ -72,15 +77,25 @@
   let markerGroups = $state.raw<TimelineEventMarkerGroup[]>([]);
   let hasMarkerGroups = $state(hasEventMarkerGroups());
 
+  const selectedMarkerKeys = $derived(new Set($eventGroupFilter));
+
   const filteredBufferGroups = $derived.by(() => {
     const active = $eventTypeFilter;
-    return bufferGroups.filter((g) => active.includes(g.category));
+    return bufferGroups.filter(
+      (group) =>
+        active.includes(group.category) &&
+        lifecycleGroupMatchesEventGroupFilter(group, selectedMarkerKeys),
+    );
   });
 
+  const filteredMarkerGroups = $derived(
+    selectedMarkerKeys.size
+      ? markerGroups.filter((group) => selectedMarkerKeys.has(group.markerKey))
+      : markerGroups,
+  );
+
   const visibleGroups = $derived(
-    $eventGroupsEnabled && markerGroups.length
-      ? markerGroups
-      : filteredBufferGroups,
+    $eventGroupsEnabled ? filteredMarkerGroups : filteredBufferGroups,
   );
 
   $effect(() => {
@@ -127,7 +142,7 @@
     clearActives();
     const enabled = !$eventGroupsEnabled;
     $eventGroupsEnabled = enabled;
-    markerGroups = enabled ? getEventMarkerGroupArray() : [];
+    markerGroups = enabled ? getEventMarkerGroupArray() : markerGroups;
   };
 
   // The timeline renders in normal page flow: the page (#content-wrapper)
@@ -144,13 +159,12 @@
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
     hasMarkerGroups = hasEventMarkerGroups();
-    markerGroups = $eventGroupsEnabled ? getEventMarkerGroupArray() : [];
+    markerGroups = hasMarkerGroups ? getEventMarkerGroupArray() : [];
   });
 
   $effect(() => {
     void $bufferVersion;
     const fetchComplete = historyCtx.fetchComplete;
-    const showEventGroups = $eventGroupsEnabled;
     const pendingActivities = $workflowRun.workflow?.pendingActivities ?? [];
     const pendingNexusOperations =
       $workflowRun.workflow?.pendingNexusOperations ?? [];
@@ -162,8 +176,7 @@
       }
       bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
       hasMarkerGroups = hasEventMarkerGroups();
-      markerGroups =
-        showEventGroups && hasMarkerGroups ? getEventMarkerGroupArray() : [];
+      markerGroups = hasMarkerGroups ? getEventMarkerGroupArray() : [];
     });
 
     return () => {
@@ -237,8 +250,8 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
+        <EventGroupFilter groups={markerGroups} />
         <ToggleButton
-          active={$eventGroupsEnabled}
           data-testid="event-groups"
           disabled={!hasMarkerGroups}
           leadingIcon="compact"

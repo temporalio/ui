@@ -9,8 +9,10 @@ import type { EventGroupMarker, WorkflowEvent } from '$lib/types/events';
 import {
   createTimelineEventMarkerGroups,
   type EventMarkerAttribution,
+  eventMatchesEventGroupFilter,
   getEventGroupMarkerKey,
   getEventGroupMarkerPresentation,
+  lifecycleGroupMatchesEventGroupFilter,
 } from './event-marker-groups';
 
 const createEvent = (
@@ -101,6 +103,31 @@ const presentationsByMarkerKey = new Map(
 );
 
 describe('createTimelineEventMarkerGroups', () => {
+  it('matches events and lifecycle groups against any selected marker', () => {
+    const checkout = createEvent('1', [{ label: { id: 'checkout' } }]);
+    const payment = createEvent('2', [{ label: { id: 'payment' } }]);
+    const lifecycleGroup = createLifecycleGroup('1', [checkout, payment]);
+
+    expect(
+      eventMatchesEventGroupFilter(
+        checkout,
+        new Set(['label:checkout', 'label:other']),
+      ),
+    ).toBe(true);
+    expect(
+      eventMatchesEventGroupFilter(checkout, new Set(['label:other'])),
+    ).toBe(false);
+    expect(
+      lifecycleGroupMatchesEventGroupFilter(
+        lifecycleGroup,
+        new Set(['label:payment']),
+      ),
+    ).toBe(true);
+    expect(
+      lifecycleGroupMatchesEventGroupFilter(lifecycleGroup, new Set()),
+    ).toBe(true);
+  });
+
   it('uses consistent icons and fallback labels for marker kinds', () => {
     expect(
       getEventGroupMarkerKey({ inboundEvent: { inboundEventId: null } }),

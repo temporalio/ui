@@ -228,3 +228,26 @@ export const isTimelineEventMarkerGroup = (
   group: EventGroup,
 ): group is TimelineEventMarkerGroup =>
   'eventMarker' in group && group.eventMarker === true;
+
+export const eventMatchesEventGroupFilter = (
+  event: WorkflowEvent,
+  markerKeys: ReadonlySet<string>,
+): boolean => {
+  if (!markerKeys.size) return true;
+  return Boolean(
+    event.eventGroupMarkers?.some((marker) => {
+      const key = getEventGroupMarkerKey(marker);
+      return key ? markerKeys.has(key) : false;
+    }),
+  );
+};
+
+export const lifecycleGroupMatchesEventGroupFilter = (
+  group: EventGroup,
+  markerKeys: ReadonlySet<string>,
+): boolean => {
+  if (!markerKeys.size) return true;
+  return group.eventList.some((event) =>
+    eventMatchesEventGroupFilter(event, markerKeys),
+  );
+};
