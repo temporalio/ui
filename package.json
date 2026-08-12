@@ -1,6 +1,10 @@
 {
   "name": "@temporalio/ui",
   "version": "2.53.2",
+  "sideEffects": [
+    "**/stores/batch-operations.*",
+    "**/stores/configurable-table-columns.*"
+  ],
   "engines": {
     "pnpm": ">=10.10.0",
     "node": ">=22.14.0"
