@@ -76,8 +76,6 @@ export const Strings = {
   'endpoint-name': 'Endpoint Name',
   'service-name': 'Service Name',
   'operation-name': 'Operation Name',
-  'handler-namespace': 'Handler Namespace',
-  'handler-operation-link': 'Handler Operation Link',
   'handler-namespace-note':
     'Note: Links will only work if your account has access permissions to the handler namespace.',
   'request-cancellation': 'Request Cancellation',

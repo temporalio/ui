@@ -13,6 +13,7 @@
   import type { WorkflowEvent } from '$lib/types/events';
   import {
     type EventLinkDisplay,
+    eventLinkTargetTypeLabel,
     toEventLinkViews,
   } from '$lib/utilities/event-link';
   import {
@@ -100,7 +101,11 @@
   <div class="flex flex-col gap-1 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if event?.links?.length}
-        {@render eventLinks(event.links)}
+        {#if event.category === 'nexus'}
+          {@render nexusHandlerLinks(event.links)}
+        {:else}
+          {@render eventLinks(event.links)}
+        {/if}
       {/if}
       {#if event?.userMetadata?.summary}
         {@render eventSummary(event.userMetadata.summary)}
@@ -146,6 +151,30 @@
     {@render eventLink(view)}
     {#if view.namespace}
       {@render eventLink(view.namespace)}
+    {/if}
+  {/each}
+{/snippet}
+
+{#snippet nexusHandlerLinks(links: ELink[])}
+  {#each toEventLinkViews(links, { namespace }) as view (view.key)}
+    {@const targetType = eventLinkTargetTypeLabel(view.variant)}
+    {@render eventLink({
+      label: translate('nexus.handler-target'),
+      value: view.value,
+      href: view.href,
+    })}
+    {#if targetType}
+      {@render eventLink({
+        label: translate('nexus.handler-target-type'),
+        value: targetType,
+      })}
+    {/if}
+    {#if view.namespace}
+      {@render eventLink({
+        label: translate('nexus.handler-namespace'),
+        value: view.namespace.value,
+        href: view.namespace.href,
+      })}
     {/if}
   {/each}
 {/snippet}

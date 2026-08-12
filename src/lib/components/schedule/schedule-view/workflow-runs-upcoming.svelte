@@ -3,8 +3,8 @@
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { toUpcomingScheduleRuns } from '$lib/services/schedule-service';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import { getEpochMilliseconds } from '$lib/utilities/format-time';
 
   import WorkflowRunsEmpty from './workflow-runs-empty.svelte';
 
@@ -22,13 +22,7 @@
     openTriggerConfirmationModal,
   }: Props = $props();
 
-  const sortedUpcomingRuns = $derived.by(() => {
-    const runs = schedule?.info?.futureActionTimes ?? [];
-    return runs
-      .filter(Boolean)
-      .sort((a, b) => getEpochMilliseconds(a) - getEpochMilliseconds(b))
-      .slice(0, 5);
-  });
+  const sortedUpcomingRuns = $derived(toUpcomingScheduleRuns(schedule));
 </script>
 
 {#if !sortedUpcomingRuns.length}

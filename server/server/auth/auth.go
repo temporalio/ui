@@ -58,7 +58,7 @@ func stripBearerPrefix(token string) string {
 	return strings.TrimPrefix(token, "Bearer ")
 }
 
-func SetUser(c echo.Context, user *User) error {
+func SetUser(c echo.Context, user *User, secure bool) error {
 	if user.OAuth2Token == nil {
 		return errors.New("no OAuth2Token")
 	}
@@ -89,7 +89,7 @@ func SetUser(c echo.Context, user *User) error {
 			Name:     "user" + strconv.Itoa(i),
 			Value:    p,
 			MaxAge:   int(time.Minute.Seconds()),
-			Secure:   c.Request().TLS != nil,
+			Secure:   secure,
 			HttpOnly: false,
 			Path:     "/",
 			SameSite: http.SameSiteStrictMode,
@@ -126,7 +126,7 @@ func SetUser(c echo.Context, user *User) error {
 			Name:     "refresh",
 			Value:    rt,
 			MaxAge:   refreshMaxAge,
-			Secure:   c.Request().TLS != nil,
+			Secure:   secure,
 			HttpOnly: true,
 			Path:     "/",
 			SameSite: http.SameSiteStrictMode,
@@ -141,7 +141,7 @@ func SetUser(c echo.Context, user *User) error {
 
 // SetSessionStart sets a cookie with the current timestamp to track when the session began.
 // This should only be called on initial login, NOT on token refresh.
-func SetSessionStart(c echo.Context, maxSessionDuration time.Duration) {
+func SetSessionStart(c echo.Context, maxSessionDuration time.Duration, secure bool) {
 	if maxSessionDuration <= 0 {
 		return
 	}
@@ -150,7 +150,7 @@ func SetSessionStart(c echo.Context, maxSessionDuration time.Duration) {
 		Name:     sessionStartCookie,
 		Value:    strconv.FormatInt(time.Now().Unix(), 10),
 		MaxAge:   int(maxSessionDuration.Seconds()),
-		Secure:   c.Request().TLS != nil,
+		Secure:   secure,
 		HttpOnly: true,
 		Path:     "/",
 		SameSite: http.SameSiteStrictMode,

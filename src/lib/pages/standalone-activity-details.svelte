@@ -9,6 +9,7 @@
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
+  import WorkflowCallback from '$lib/components/workflow/workflow-callback.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -76,6 +77,12 @@
 {/snippet}
 
 {#if $activityExecution}
+  {#if $activityExecution.callbacks?.length}
+    <WorkflowCallback
+      callback={$activityExecution.callbacks[0]}
+      perspective="caller"
+    />
+  {/if}
   <ActivityExecutionInputAndOutcome
     input={$activityExecution.input}
     outcome={$activityExecution.outcome}
