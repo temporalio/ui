@@ -209,7 +209,6 @@
     bind:open={resetConfirmationModalOpen}
     {activityId}
     onConfirm={onConfirmReset}
-    hideResetHeartbeatOption // TODO: remove once API supports resetHeartbeat
   />
   {#key optionsUpdateDrawerOpen}
     <ActivityOptionsUpdateDrawer
