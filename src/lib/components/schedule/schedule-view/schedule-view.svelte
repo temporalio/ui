@@ -14,6 +14,7 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import {
     openConfirmationModal,
@@ -56,7 +57,7 @@
 </script>
 
 <header class="mb-2 flex flex-col gap-4">
-  <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+  <Link href={routeForSchedules({ namespace })} LeadingIcon={IconChevronLeft}>
     {translate('schedules.back-to-schedules')}
   </Link>
   <div class="flex items-start justify-between gap-4">

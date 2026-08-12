@@ -5,8 +5,8 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { IconJson } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import type { SearchAttributes } from '$lib/types/workflows';
@@ -70,7 +70,7 @@
         <Button
           variant="ghost"
           size="xs"
-          leadingIcon="json"
+          LeadingIcon={IconJson}
           active={viewManualQuery}
           data-testid="toggle-manual-query"
           onclick={() => (viewManualQuery = !viewManualQuery)}

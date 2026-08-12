@@ -8,6 +8,7 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClose } from '$lib/io/icon';
   import type { ToastVariant } from '$lib/types/holocene';
 
   interface Props {
@@ -67,7 +68,7 @@
   </p>
   <Button
     variant="ghost"
-    leadingIcon="close"
+    LeadingIcon={IconClose}
     aria-label={dismissLabel}
     class="text-inherit h-6 w-6 shrink-0 p-0"
     disableTracking

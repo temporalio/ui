@@ -5,10 +5,10 @@
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalSettings } from '$lib/io/icon';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import {
     availableDeploymentColumns,
@@ -131,7 +131,7 @@
             size="xs"
             variant="ghost"
           >
-            <Icon name="settings" />
+            <IconTemporalSettings />
           </Button>
         </Tooltip>
       {/snippet}

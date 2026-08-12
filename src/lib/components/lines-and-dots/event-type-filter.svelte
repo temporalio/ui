@@ -5,13 +5,13 @@
   import { page } from '$app/state';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import {
     allEventTypeOptions,
     compactEventTypeOptions,
@@ -116,10 +116,7 @@
         class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
         class:bg-interactive={filterActive}
       >
-        <Icon
-          name="filter"
-          class={filterActive ? 'pt-0.5 text-white' : undefined}
-        />
+        <IconFilter class={filterActive ? 'pt-0.5 text-white' : undefined} />
       </div>
     {/snippet}
     <span class="hidden text-sm md:block">{translate('common.filter')}</span>

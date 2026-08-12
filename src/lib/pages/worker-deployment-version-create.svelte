@@ -4,6 +4,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import {
     buildGcpCloudRunComputeConfig,
     buildLambdaComputeConfig,
@@ -83,7 +84,7 @@
 </script>
 
 <div class="flex max-w-[45rem] flex-col gap-4">
-  <Link href={backHref} icon="chevron-left">
+  <Link href={backHref} LeadingIcon={IconChevronLeft}>
     {translate('workers.back-to-deployment', { deployment })}
   </Link>
   <h1>

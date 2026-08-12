@@ -14,6 +14,7 @@
   import { setPaginatedTableMaxHeight } from '$lib/holocene/table/paginated-table/context';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCheckmark, IconCopy } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -437,7 +438,7 @@
             }}>Edit</Button
           >
           <Button
-            leadingIcon={$copied ? 'checkmark' : 'copy'}
+            LeadingIcon={$copied ? IconCheckmark : IconCopy}
             aria-label="Share"
             size="xs"
             class="w-full opacity-80"

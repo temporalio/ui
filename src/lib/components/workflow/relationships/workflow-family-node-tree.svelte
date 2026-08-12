@@ -3,8 +3,8 @@
 
   import { page } from '$app/state';
 
-  import Icon from '$lib/holocene/icon';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalSchedules } from '$lib/io/icon';
   import type { RootNode } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -347,7 +347,7 @@
         stroke-dasharray="3 2"
         class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
       />
-      <Icon x={x - 9.25 * radius} y={y - 4.15 * radius} name="schedules" />
+      <IconTemporalSchedules x={x - 9.25 * radius} y={y - 4.15 * radius} />
       <text
         x={x - 5.25 * radius}
         y={y - 3.5 * radius}

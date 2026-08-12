@@ -1,3 +1,5 @@
+export type { IconComponent, IconProps } from './types';
+
 export { default as IconAdd } from './icons/add.svelte';
 export { default as IconAddSquare } from './icons/add-square.svelte';
 export { default as IconApple } from './icons/apple.svelte';
@@ -42,6 +44,7 @@ export { default as IconClaude } from './icons/claude.svelte';
 export { default as IconClock } from './icons/clock.svelte';
 export { default as IconClose } from './icons/close.svelte';
 export { default as IconCodex } from './icons/codex.svelte';
+export { default as IconCollapse } from './icons/collapse.svelte';
 export { default as IconComet } from './icons/comet.svelte';
 export { default as IconCometSolid } from './icons/comet-solid.svelte';
 export { default as IconCompact } from './icons/compact.svelte';
@@ -153,6 +156,7 @@ export { default as IconSwiftColor } from './icons/swift-color.svelte';
 export { default as IconSwiftColorblock } from './icons/swift-colorblock.svelte';
 export { default as IconSystemWindow } from './icons/system-window.svelte';
 export { default as IconTable } from './icons/table.svelte';
+export { default as IconTableDense } from './icons/table-dense.svelte';
 export { default as IconTag } from './icons/tag.svelte';
 export { default as IconTarget } from './icons/target.svelte';
 export { default as IconTemporal } from './icons/temporal.svelte';

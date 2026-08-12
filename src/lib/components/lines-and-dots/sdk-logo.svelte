@@ -1,6 +1,7 @@
 <script lang="ts">
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { IconBook } from '$lib/io/icon';
   import dotNet from '$lib/vendor/sdk-logos/dotnet-colorblock.svg';
   import go from '$lib/vendor/sdk-logos/go-colorblock.svg';
   import java from '$lib/vendor/sdk-logos/java-colorblock.svg';
@@ -59,6 +60,6 @@
     </span>
   </Tooltip>
   {#if href && !hideDocsLink}
-    <Link trailingIcon="book" {href} newTab>Docs</Link>
+    <Link TrailingIcon={IconBook} {href} newTab>Docs</Link>
   {/if}
 </p>

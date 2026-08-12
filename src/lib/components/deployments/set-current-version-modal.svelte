@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconArrowRight } from '$lib/io/icon';
 
   interface Props {
     buildId: string;
@@ -53,7 +53,7 @@
             >
             <span class="flex items-center gap-2 font-mono font-medium">
               <span class="text-secondary">{currentBuildId}</span>
-              <Icon name="arrow-right" class="h-3.5 w-3.5 text-secondary" />
+              <IconArrowRight class="h-3.5 w-3.5 text-secondary" />
               <span>{buildId}</span>
             </span>
           </div>

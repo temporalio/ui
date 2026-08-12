@@ -7,6 +7,7 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import { IconClose } from '$lib/io/icon';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   import IconButton from '../icon-button.svelte';
@@ -184,7 +185,7 @@
           <IconButton
             label={clearButtonLabel}
             onclick={handleClear}
-            icon="close"
+            Icon={IconClose}
           />
         </div>
       {/if}

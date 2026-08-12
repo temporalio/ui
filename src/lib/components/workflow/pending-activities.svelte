@@ -5,10 +5,10 @@
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCanceled, IconRetry } from '$lib/io/icon';
   import { workflowRun } from '$lib/stores/workflow-run';
   import {
     formatAttemptsLeft,
@@ -49,8 +49,7 @@
               bottom
               text={translate('workflows.pending-activities-canceled')}
             >
-              <Badge type="warning" class="py-0"><Icon name="canceled" /></Badge
-              >
+              <Badge type="warning" class="py-0"><IconCanceled /></Badge>
             </Tooltip>
           {/if}
         </div>
@@ -85,7 +84,7 @@
                     </h4>
                     <Badge type={failed ? 'danger' : undefined}>
                       {#if failed}
-                        <Icon name="retry" />
+                        <IconRetry />
                       {/if}
                       {pendingActivity.attempt}
                     </Badge>

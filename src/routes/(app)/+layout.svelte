@@ -12,13 +12,13 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconSupport } from '$lib/io/icon';
   import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
@@ -398,7 +398,7 @@
           class="flex items-center hover:text-white"
           aria-label="Support"
         >
-          <Icon name="support" />
+          <IconSupport />
         </a>
       {/if}
       <UserMenu {logout} />

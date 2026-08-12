@@ -8,6 +8,11 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconChevronDown,
+    IconChevronUp,
+    IconExternalLink,
+  } from '$lib/io/icon';
 
   import {
     hasCloudRunImpersonatorPlaceholder,
@@ -166,7 +171,7 @@
       type="button"
       href="https://console.aws.amazon.com/lambda"
       target="_blank"
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLink}
     >
       {translate('workers.open-lambda-console')}
     </Button>
@@ -215,7 +220,7 @@
         type="button"
         href="https://console.cloud.google.com/run/worker-pools"
         target="_blank"
-        trailingIcon="external-link"
+        TrailingIcon={IconExternalLink}
       >
         {translate('workers.open-cloud-run-console')}
       </Button>
@@ -286,7 +291,7 @@
               size="sm"
               href={launchStackHref}
               target="_blank"
-              trailingIcon="external-link"
+              TrailingIcon={IconExternalLink}
             >
               {translate('workers.launch-stack')}
             </Button>
@@ -380,7 +385,7 @@
     variant="secondary"
     size="sm"
     type="button"
-    trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
+    TrailingIcon={showScaling ? IconChevronUp : IconChevronDown}
     onclick={() => (showScaling = !showScaling)}
   >
     {showScaling

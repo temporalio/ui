@@ -19,6 +19,11 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconArrowAscending,
+    IconArrowDescending,
+    IconDownload,
+  } from '$lib/io/icon';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
@@ -243,7 +248,7 @@
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
           <ToggleButton
-            leadingIcon={reverseSort ? 'descending' : 'ascending'}
+            LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
             data-testid="zoom-in"
             onclick={onSort}
             size="sm"
@@ -272,7 +277,7 @@
         </ToggleButton>
         <ToggleButton
           data-testid="download"
-          leadingIcon="download"
+          LeadingIcon={IconDownload}
           size="sm"
           onclick={() => (showDownloadPrompt = true)}
         >

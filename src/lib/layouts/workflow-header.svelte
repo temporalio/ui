@@ -17,12 +17,12 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCanceled, IconChevronLeft } from '$lib/io/icon';
   import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -118,7 +118,7 @@
     <Link
       href={workflowsHref}
       data-testid="back-to-workflows"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {eventId
         ? translate('common.workflows')
@@ -130,7 +130,7 @@
           ...routeParameters,
         })}
         data-testid="back-to-workflow-execution"
-        icon="chevron-left"
+        LeadingIcon={IconChevronLeft}
       >
         {runId}
       </Link>
@@ -358,7 +358,7 @@
         >
           <div class="flex items-center gap-1">
             {#if activitiesCanceled}
-              <Icon name="canceled" />
+              <IconCanceled />
             {/if}
             {workflow?.pendingActivities?.length}
           </div>

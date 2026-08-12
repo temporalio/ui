@@ -8,6 +8,7 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClose } from '$lib/io/icon';
   import {
     customSearchAttributeOptions,
     customSearchAttributes,
@@ -85,7 +86,7 @@
     </div>
     <Button
       variant="ghost"
-      leadingIcon="close"
+      LeadingIcon={IconClose}
       data-testid="search-attribute-close-button"
       class="mt-6 w-10 rounded-full sm:hidden"
       onclick={() => onRemove(label)}
@@ -142,7 +143,7 @@
   {/if}
   <Button
     variant="ghost"
-    leadingIcon="close"
+    LeadingIcon={IconClose}
     data-testid="search-attribute-close-button"
     class="mt-6 w-10 rounded-full max-sm:hidden"
     onclick={() => onRemove(label)}

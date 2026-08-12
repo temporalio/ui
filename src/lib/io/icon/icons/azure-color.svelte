@@ -1,12 +1,8 @@
 <script lang="ts">
-  import type { ComponentProps } from 'svelte';
-
   import IconSvgWrapper from '../icon-svg-wrapper.svelte';
+  import type { IconProps } from '../types';
 
-  const props: Omit<
-    ComponentProps<typeof IconSvgWrapper>,
-    'children'
-  > = $props();
+  const props: IconProps = $props();
 
   const id = $props.id();
 </script>

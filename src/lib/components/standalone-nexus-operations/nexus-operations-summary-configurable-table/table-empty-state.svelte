@@ -3,9 +3,9 @@
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconGithub } from '$lib/io/icon';
   import { nexusOperationError } from '$lib/stores/nexus-operations';
   import noResultsImages from '$lib/vendor/empty-state.svg';
 
@@ -118,7 +118,7 @@
           <ul class="flex flex-col gap-2">
             {#each codeSamples as sample (sample.label)}
               <li class="flex items-center gap-2">
-                <Icon name="github" class="h-5 w-5 shrink-0" />
+                <IconGithub class="h-5 w-5 shrink-0" />
                 <Link href={sample.href} newTab>
                   {sample.label}
                 </Link>

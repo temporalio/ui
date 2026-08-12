@@ -1,10 +1,17 @@
 <script lang="ts">
   import { cva } from 'class-variance-authority';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconAdd,
+    IconArrowTrendingDown,
+    IconArrowTrendingUp,
+    type IconComponent,
+    IconDrained,
+    IconHeartbeat,
+    IconInactive,
+  } from '$lib/io/icon';
   import type { DeploymentStatus } from '$lib/types/deployments';
 
   interface Props {
@@ -13,13 +20,13 @@
   }
   let { status, label }: Props = $props();
 
-  const icon: Partial<Record<DeploymentStatus, IconName>> = {
-    Current: 'heartbeat',
-    Ramping: 'trending-up',
-    Draining: 'trending-down',
-    Drained: 'drained',
-    Inactive: 'inactive',
-    Created: 'add',
+  const icon: Partial<Record<DeploymentStatus, IconComponent>> = {
+    Current: IconHeartbeat,
+    Ramping: IconArrowTrendingUp,
+    Draining: IconArrowTrendingDown,
+    Drained: IconDrained,
+    Inactive: IconInactive,
+    Created: IconAdd,
   };
 
   const tooltip: Partial<Record<DeploymentStatus, string>> = {
@@ -53,6 +60,10 @@
 
 <Tooltip text={tooltip[status]} topLeft width={250} usePortal>
   <p class={deploymentStatus({ status })}>
-    {#if icon[status]}<Icon name={icon[status]!} />{/if}{label}
+    {#if icon[status]}
+      {@const StatusIcon = icon[status]}
+      <StatusIcon />
+    {/if}
+    {label}
   </p>
 </Tooltip>

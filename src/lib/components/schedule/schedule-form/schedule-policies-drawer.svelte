@@ -10,12 +10,12 @@
   import DurationInput, {
     getFirstWholeNumberUnit,
   } from '$lib/holocene/duration-input/duration-input.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconInfo } from '$lib/io/icon';
 
   import {
     DEFAULT_CATCHUP_WINDOW,
@@ -241,7 +241,7 @@
               width={250}
               text={translate('schedules.catchup-window-tooltip')}
             >
-              <Icon name="square-info" class="h-3 w-3" />
+              <IconInfo class="h-3 w-3" />
             </Tooltip>
           {/snippet}
         </DurationInput>

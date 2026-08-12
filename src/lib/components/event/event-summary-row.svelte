@@ -13,6 +13,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronDown, IconChevronUp } from '$lib/io/icon';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -209,7 +210,7 @@
 
 {#snippet expandButton()}
   <IconButton
-    icon={expanded ? 'chevron-up' : 'chevron-down'}
+    Icon={expanded ? IconChevronUp : IconChevronDown}
     label={expanded
       ? translate('events.collapse-details')
       : translate('events.expand-details')}

@@ -5,6 +5,7 @@
   import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
+  import { IconBook } from '$lib/io/icon';
 
   import Link from '../link.svelte';
 
@@ -77,7 +78,7 @@
     <Accordion {...args} onToggle={logAction('onToggle')}>
       <p>Accordion Content</p>
       {#snippet action()}
-        <Link href="https://docs.temporal.io/" newTab icon="book">
+        <Link href="https://docs.temporal.io/" newTab LeadingIcon={IconBook}>
           <span class="sr-only">docs</span>
         </Link>
       {/snippet}

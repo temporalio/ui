@@ -14,7 +14,7 @@ Each icon is its own component. There is no code generation — adding one is a 
 <IconAdd title="Add workflow" />
 ```
 
-Icons size at `1em`, so they scale with the surrounding `font-size`, and inherit `color` through `currentColor`. Both are overridable via `class`.
+Icons render at `1rem` (16px) and inherit `color` through `currentColor`. Size is set with attributes, so any sizing class overrides it.
 
 They are decorative by default (`aria-hidden`). Pass `title` only when the icon carries meaning no nearby text conveys.
 
@@ -85,17 +85,20 @@ export default {
 
 ```svelte
 <script lang="ts">
-  import type { ComponentProps } from 'svelte';
-
   import IconSvgWrapper from '../icon-svg-wrapper.svelte';
+  import type { IconProps } from '../types';
 
-  const props: Omit<ComponentProps<typeof IconSvgWrapper>, 'children'> = $props();
+  const props: IconProps = $props();
 </script>
 
 <IconSvgWrapper {...props}>
   <path fill="currentColor" d="…" />
 </IconSvgWrapper>
 ```
+
+Annotate with `IconProps`, not an inline `Omit<ComponentProps<typeof IconSvgWrapper>, …>`. The
+wrapper's `Props` interface isn't exported, so an inline reference to it can't be named during
+declaration emit and `svelte-package` silently skips the `.d.ts` — the icon ships untyped.
 
 Then one line in `index.ts`, alphabetically:
 

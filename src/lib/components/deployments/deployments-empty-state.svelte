@@ -1,8 +1,8 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconExternalLink, IconTemporalWorker } from '$lib/io/icon';
 
   interface Props {
     createHref: string;
@@ -18,7 +18,7 @@
 </script>
 
 <div class="flex flex-col items-center gap-4 py-16">
-  <Icon name="workers" class="h-20 w-20 text-blue-200" />
+  <IconTemporalWorker class="h-20 w-20 text-blue-200" />
   <div class="flex flex-col items-center gap-2">
     <p class="text-base font-medium">
       {translate('deployments.empty-state-title')}
@@ -37,7 +37,7 @@
       variant="ghost"
       href="https://docs.temporal.io/worker-deployments"
       target="_blank"
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLink}
     >
       {translate('deployments.self-managed-deployment')}
     </Button>

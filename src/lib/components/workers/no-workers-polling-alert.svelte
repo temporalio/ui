@@ -1,8 +1,8 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconArrowRight } from '$lib/io/icon';
   import { fetchDeployment } from '$lib/services/deployments-service';
   import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
@@ -71,7 +71,7 @@
       class="mt-2 flex items-center gap-1"
     >
       {translate('workflows.view-worker-deployment')}
-      <Icon name="arrow-right" />
+      <IconArrowRight />
     </Link>
   </Alert>
 {:else}
@@ -92,7 +92,7 @@
       class="mt-2 flex items-center gap-1"
     >
       {translate('workers.troubleshooting-workers-link')}
-      <Icon name="arrow-right" />
+      <IconArrowRight />
     </Link>
   </Alert>
 {/if}

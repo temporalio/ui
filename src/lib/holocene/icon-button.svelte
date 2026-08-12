@@ -7,10 +7,10 @@
   import Button, {
     type ButtonWithoutHrefProps,
   } from '$lib/holocene/button.svelte';
-  import type { IconName } from '$lib/holocene/icon';
+  import type { IconComponent } from '$lib/io/icon';
 
   interface Props extends Omit<HTMLButtonAttributes, 'onclick'> {
-    icon: IconName;
+    Icon: IconComponent;
     'data-testid'?: string;
     label: string;
     variant?: 'primary' | 'secondary' | 'ghost';
@@ -21,7 +21,7 @@
 
   let {
     class: className = '',
-    icon,
+    Icon,
     label,
     variant = 'ghost',
     onclick,
@@ -31,12 +31,12 @@
 
 <Button
   {variant}
-  leadingIcon={icon}
+  LeadingIcon={Icon}
   class={merge('h-9 w-9 shrink-0 p-0', className)}
   aria-label={label}
   disableTracking={true}
   data-track-name="icon-button"
-  data-track-intent="{variant}-{icon}"
+  data-track-intent="{variant}-{label}"
   data-track-text={label}
   {onclick}
   {...rest as ButtonWithoutHrefProps}

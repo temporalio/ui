@@ -24,6 +24,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconExternalLink } from '$lib/io/icon';
   import type {
     WorkerInfo,
     WorkerPollerInfo,
@@ -380,7 +381,7 @@
           {translate('workers.zero-slots-configured')}
         </p>
         <Link
-          trailingIcon="external-link"
+          TrailingIcon={IconExternalLink}
           href="https://docs.temporal.io/develop/worker-performance#custom-slot-implementation"
           newTab
         >
@@ -418,7 +419,7 @@
   <Alert intent="warning" title={translate('workers.go-dependency-warning')}>
     <p class="mb-1">{translate('workers.go-dependency-warning-description')}</p>
     <Link
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLink}
       href="https://docs.temporal.io/cloud/worker-health#enable-host-resource-reporting"
       newTab
     >
@@ -488,7 +489,7 @@
       </div>
     </dl>
     <Link
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLink}
       href="https://docs.temporal.io/develop/worker-performance#workflow-cache-tuning"
       newTab
       class="mt-4"
