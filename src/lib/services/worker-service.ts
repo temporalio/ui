@@ -53,7 +53,9 @@ export const fetchWorkerCount = async (
 ): Promise<{ count: number }> => {
   let count = 0;
   try {
-    const route = routeForApi('workers.count', { namespace });
+    const route = routeForApi('workers.count', {
+      namespace: namespace ?? '',
+    });
     const result = await requestFromAPI<{ count: string }>(route, {
       params: query ? { query } : {},
       onError: () => {},
