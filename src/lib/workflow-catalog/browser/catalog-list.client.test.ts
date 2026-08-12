@@ -88,4 +88,27 @@ describe('WorkflowCatalogList client interactions', () => {
       '/cloud/catalog/order-lifecycle',
     );
   });
+
+  it('links the latest run badge to the workflow details page for that run', async () => {
+    const target = await client.renderList();
+    await client.flush();
+    const evidenceLink = () =>
+      target.querySelector<HTMLAnchorElement>(
+        'a[aria-label="Workflow details"]',
+      );
+    const run = Array.from(target.querySelectorAll('button')).find(
+      (candidate) => candidate.textContent?.trim() === 'Run',
+    );
+
+    expect(evidenceLink()).toBeNull();
+
+    run?.click();
+    await client.waitForStart();
+    await client.flush();
+
+    expect(evidenceLink()?.textContent).toContain('Completed');
+    expect(evidenceLink()?.getAttribute('href')).toBe(
+      '/workflows/order-lifecycle/run-1',
+    );
+  });
 });

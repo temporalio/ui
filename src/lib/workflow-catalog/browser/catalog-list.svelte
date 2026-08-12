@@ -12,14 +12,18 @@
   import { workflowCatalogSources } from './catalog-sources';
   import { terminalStatusPresentation } from './session-presentation';
   import type {
+    WorkflowCatalogSession,
     WorkflowCatalogSessionState,
     WorkflowCatalogSessionStore,
   } from './session-store';
   import { startWithDefaults } from './start-example';
   import type { BrowserWorkflowCatalogDescriptor } from './types';
-  import type { WorkbenchHost } from './workbench-host';
+  import type { EvidenceLink, WorkbenchHost } from './workbench-host';
 
   type SourceFilter = 'all' | string;
+  type RunBadgeType =
+    | ReturnType<typeof terminalStatusPresentation>['type']
+    | 'subtle';
 
   interface Props {
     descriptors: readonly BrowserWorkflowCatalogDescriptor[];
@@ -113,6 +117,50 @@
   };
 </script>
 
+{#snippet sourceBadge(descriptor: BrowserWorkflowCatalogDescriptor)}
+  <Badge
+    type={descriptor.source.id === 'local' ? 'warning' : 'subtle'}
+    class="px-1 py-0.5 text-xs leading-none"
+  >
+    {descriptor.source.label}
+  </Badge>
+{/snippet}
+
+{#snippet runBadge(
+  type: RunBadgeType,
+  label: string,
+  evidence: EvidenceLink | undefined,
+)}
+  {#if evidence}
+    <Link
+      href={evidence.href}
+      aria-label={evidence.label}
+      class="!no-underline"
+    >
+      <Badge {type} class="px-1 py-0.5 text-xs leading-none">{label}</Badge>
+    </Link>
+  {:else}
+    <Badge {type} class="px-1 py-0.5 text-xs leading-none">{label}</Badge>
+  {/if}
+{/snippet}
+
+{#snippet latestRun(latest: WorkflowCatalogSession | undefined)}
+  {@const evidence =
+    latest?.outcome?.status === 'accepted'
+      ? host.evidenceLink(latest.outcome)
+      : undefined}
+  {#if latest?.state === 'execution-terminal'}
+    {@const status = terminalStatusPresentation(latest.terminalStatus!)}
+    {@render runBadge(status.type, status.label, evidence)}
+    <span class="text-secondary">{relativeRunTime(latest.createdAt)}</span>
+  {:else if latest}
+    {@render runBadge('subtle', sessionStateLabels[latest.state], evidence)}
+    <span class="text-secondary">{relativeRunTime(latest.createdAt)}</span>
+  {:else}
+    <span class="text-secondary">Not run</span>
+  {/if}
+{/snippet}
+
 <div class="space-y-4">
   <div
     role="search"
@@ -166,9 +214,9 @@
       {#snippet headers()}
         <TableHeaderRow>
           <th scope="col" class="w-auto">Workflow</th>
-          <th scope="col" class="w-20">Source</th>
+          <th scope="col" class="hidden w-20 sm:table-cell">Source</th>
           <th scope="col" class="hidden w-44 lg:table-cell">Task queue</th>
-          <th scope="col" class="w-36">Latest run</th>
+          <th scope="col" class="hidden w-36 sm:table-cell">Latest run</th>
           <th
             scope="col"
             class="surface-table-header sticky right-0 z-20 w-36 !text-right sm:w-60"
@@ -183,7 +231,7 @@
           <TableRow>
             <td class="min-w-0 py-2">
               <Link
-                class="table-link block truncate text-sm font-medium text-primary"
+                class="table-link block break-words text-sm font-medium text-primary"
                 href={exampleHref(descriptor.id)}
               >
                 {descriptor.title}
@@ -191,45 +239,23 @@
               <p class="hidden truncate text-xs text-secondary sm:block">
                 {descriptor.description}
               </p>
-            </td>
-            <td>
-              <Badge
-                type={descriptor.source.id === 'local' ? 'warning' : 'subtle'}
-                class="px-1 py-0.5 text-xs leading-none"
+              <div
+                class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:hidden"
               >
-                {descriptor.source.label}
-              </Badge>
+                {@render sourceBadge(descriptor)}
+                {@render latestRun(latest)}
+              </div>
+            </td>
+            <td class="hidden sm:table-cell">
+              {@render sourceBadge(descriptor)}
             </td>
             <td class="hidden truncate font-mono text-xs lg:table-cell">
               {descriptor.execution.taskQueue}
             </td>
-            <td class="text-xs">
-              {#if latest?.state === 'execution-terminal'}
-                {@const status = terminalStatusPresentation(
-                  latest.terminalStatus!,
-                )}
-                <div class="flex flex-col items-start gap-0.5">
-                  <Badge
-                    type={status.type}
-                    class="px-1 py-0.5 text-xs leading-none"
-                    >{status.label}</Badge
-                  >
-                  <span class="text-secondary"
-                    >{relativeRunTime(latest.createdAt)}</span
-                  >
-                </div>
-              {:else if latest}
-                <div class="flex flex-col items-start gap-0.5">
-                  <Badge type="subtle" class="px-1 py-0.5 text-xs leading-none"
-                    >{sessionStateLabels[latest.state]}</Badge
-                  >
-                  <span class="text-secondary"
-                    >{relativeRunTime(latest.createdAt)}</span
-                  >
-                </div>
-              {:else}
-                <span class="text-secondary">Not run</span>
-              {/if}
+            <td class="hidden text-xs sm:table-cell">
+              <div class="flex flex-col items-start gap-0.5">
+                {@render latestRun(latest)}
+              </div>
             </td>
             <td
               class="catalog-actions-cell surface-primary sticky right-0 z-[5]"

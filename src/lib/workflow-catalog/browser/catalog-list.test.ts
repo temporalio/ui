@@ -130,6 +130,39 @@ describe('WorkflowCatalogList', () => {
     expect(body).toContain('hidden sm:inline');
   });
 
+  it('keeps the workflow name readable on small screens', () => {
+    const sessionStore = createWorkflowCatalogSessionStore(host);
+    const { body } = renderComponent(catalogList, {
+      props: { descriptors: [descriptor], host, sessionStore, exampleHref },
+    });
+    const source = readFileSync(
+      resolve('src/lib/workflow-catalog/browser/catalog-list.svelte'),
+      'utf8',
+    );
+
+    expect(body).toMatch(
+      /<a[^>]*class="[^"]*break-words[^"]*"[^>]*>[\s\S]*?Order lifecycle[\s\S]*?<\/a>/,
+    );
+    expect(body).not.toMatch(/<a[^>]*class="[^"]*table-link[^"]*truncate/);
+    expect(source).toContain(
+      '<th scope="col" class="hidden w-20 sm:table-cell"',
+    );
+    expect(source).toContain(
+      '<th scope="col" class="hidden w-36 sm:table-cell">Latest run</th>',
+    );
+    expect(source).toContain('sm:hidden');
+  });
+
+  it('repeats the source and latest run beside the name only on small screens', () => {
+    const sessionStore = createWorkflowCatalogSessionStore(host);
+    const { body } = renderComponent(catalogList, {
+      props: { descriptors: [descriptor], host, sessionStore, exampleHref },
+    });
+
+    expect(body.match(/OSS/g)?.length).toBeGreaterThan(1);
+    expect(body.match(/Not run/g)).toHaveLength(2);
+  });
+
   it('uses the host-provided href for the workflow title link', () => {
     const sessionStore = createWorkflowCatalogSessionStore(host);
     const { body } = renderComponent(catalogList, {
@@ -274,7 +307,7 @@ describe('WorkflowCatalogList', () => {
 
     expect(source).toContain("import Link from '$lib/holocene/link.svelte';");
     expect(source).toContain(
-      '<Link\n                class="table-link block truncate text-sm font-medium text-primary"\n                href={exampleHref(descriptor.id)}',
+      '<Link\n                class="table-link block break-words text-sm font-medium text-primary"\n                href={exampleHref(descriptor.id)}',
     );
   });
 
