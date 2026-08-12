@@ -103,7 +103,7 @@ describe('WorkflowCatalogDetail client interactions', () => {
     expect(before).toBeTruthy();
 
     Array.from(target.querySelectorAll('button'))
-      .find((candidate) => candidate.textContent?.trim() === 'Run')
+      .find((candidate) => candidate.textContent?.trim() === 'Start')
       ?.click();
     await client.waitForStart();
     await client.flush();
@@ -127,7 +127,7 @@ describe('WorkflowCatalogDetail client interactions', () => {
     button('Start options')?.click();
     client.flushSync();
 
-    button('Run')?.click();
+    button('Start')?.click();
 
     expect(await client.waitForStart()).toMatchObject({
       startOptions: { workflowId: 'order-lifecycle-01' },
@@ -153,7 +153,7 @@ describe('WorkflowCatalogDetail client interactions', () => {
     await client.flush();
     expect(client.getReadinessCallCount()).toBe(readinessCalls + 1);
 
-    const runButton = button('Run');
+    const runButton = button('Start');
     expect(runButton).toBeInstanceOf(HTMLButtonElement);
     expect((runButton as HTMLButtonElement | undefined)?.disabled).toBe(false);
     runButton?.click();

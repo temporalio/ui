@@ -63,7 +63,7 @@ describe('WorkflowCatalogList client interactions', () => {
     client.flushSync();
     expect(target.textContent).toContain('Order lifecycle');
 
-    button('Run')?.click();
+    button('Start')?.click();
     const command = await client.waitForStart();
     expect(command).toMatchObject({
       exampleId: 'order-lifecycle',
@@ -97,7 +97,7 @@ describe('WorkflowCatalogList client interactions', () => {
         'a[aria-label="Workflow details"]',
       );
     const run = Array.from(target.querySelectorAll('button')).find(
-      (candidate) => candidate.textContent?.trim() === 'Run',
+      (candidate) => candidate.textContent?.trim() === 'Start',
     );
 
     expect(evidenceLink()).toBeNull();
@@ -106,9 +106,10 @@ describe('WorkflowCatalogList client interactions', () => {
     await client.waitForStart();
     await client.flush();
 
-    expect(evidenceLink()?.textContent).toContain('Completed');
+    expect(evidenceLink()?.querySelector('svg')).not.toBeNull();
     expect(evidenceLink()?.getAttribute('href')).toBe(
       '/workflows/order-lifecycle/run-1',
     );
+    expect(target.textContent).toContain('Completed');
   });
 });

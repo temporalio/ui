@@ -35,7 +35,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -75,7 +81,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -110,7 +122,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -138,7 +156,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -173,7 +197,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -219,7 +249,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -254,7 +290,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -294,7 +336,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -329,7 +377,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "setupMarkdown": "The workflow calls the `greet` operation on the `workflow-catalog-greeting` service through the `ui-workflow-catalog` Nexus endpoint.\n\n- **Local development:** the catalog worker creates the endpoint automatically when it starts.\n- **Other environments:** create the endpoint yourself before running, adjusting the address for your server:\n\n```\ntemporal operator nexus endpoint create --name ui-workflow-catalog --target-namespace <namespace> --target-task-queue ui-workflow-catalog\n```",
@@ -366,7 +420,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -401,6 +461,10 @@
         "schema": {
           "type": "object",
           "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
             "workflowId": { "type": "string", "minLength": 1 },
             "priority": {
               "type": "object",
@@ -452,7 +516,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -499,7 +569,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -539,7 +615,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -620,7 +702,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {
@@ -655,7 +743,13 @@
         "defaultValue": {},
         "schema": {
           "type": "object",
-          "properties": { "workflowId": { "type": "string", "minLength": 1 } }
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
         }
       },
       "execution": {

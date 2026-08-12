@@ -2,6 +2,7 @@ import { isDeepStrictEqual, types as nodeTypes } from 'node:util';
 
 import type { ServiceHandler } from 'nexus-rpc';
 
+import { withSharedWorkflowCatalogStartOptions } from '../browser/start-options';
 import type {
   BrowserWorkflowCatalogDescriptor,
   BrowserWorkflowCatalogMetadata,
@@ -673,6 +674,12 @@ export const generateWorkflowCatalog = (registry: WorkflowCatalogRegistry) => {
 
       return {
         ...metadata,
+        startOptions: {
+          ...metadata.startOptions,
+          schema: withSharedWorkflowCatalogStartOptions(
+            metadata.startOptions.schema,
+          ),
+        },
         execution: {
           kind: execution.kind,
           targetId: target.id,

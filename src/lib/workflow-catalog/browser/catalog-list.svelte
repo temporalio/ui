@@ -1,6 +1,7 @@
 <script lang="ts">
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -131,17 +132,18 @@
   label: string,
   evidence: EvidenceLink | undefined,
 )}
-  {#if evidence}
-    <Link
-      href={evidence.href}
-      aria-label={evidence.label}
-      class="!no-underline"
-    >
-      <Badge {type} class="px-1 py-0.5 text-xs leading-none">{label}</Badge>
-    </Link>
-  {:else}
+  <span class="inline-flex items-center gap-1">
     <Badge {type} class="px-1 py-0.5 text-xs leading-none">{label}</Badge>
-  {/if}
+    {#if evidence}
+      <Link
+        href={evidence.href}
+        aria-label={evidence.label}
+        class="inline-flex items-center !no-underline"
+      >
+        <Icon name="external-link" class="h-3.5 w-3.5" />
+      </Link>
+    {/if}
+  </span>
 {/snippet}
 
 {#snippet latestRun(latest: WorkflowCatalogSession | undefined)}
@@ -274,8 +276,10 @@
                   <Button
                     size="xs"
                     leadingIcon="play"
-                    aria-label={pending ? `Run (${pending} pending)` : 'Run'}
-                    onclick={() => runDefaults(descriptor)}>Run</Button
+                    aria-label={pending
+                      ? `Start (${pending} pending)`
+                      : 'Start'}
+                    onclick={() => runDefaults(descriptor)}>Start</Button
                   >
                   {#if pending}
                     <span

@@ -123,7 +123,7 @@ describe('WorkflowCatalogList', () => {
     );
     expect(body).toContain('catalog-tasks');
     expect(body).toContain('Not run');
-    expect(body).toContain('>Run<');
+    expect(body).toContain('>Start<');
     expect(body).toContain('Configure');
     expect(body).toContain('sticky right-0');
     expect(body).toContain('w-36 !text-right sm:w-60');
@@ -334,9 +334,7 @@ describe('WorkflowCatalogList', () => {
     });
     expect(source).toContain('pendingRunCount(descriptor.id)');
     expect(source).toContain('pointer-events-none absolute');
-    expect(source).toContain(
-      "aria-label={pending ? `Run (${pending} pending)` : 'Run'}",
-    );
+    expect(source).toContain('Start (${pending} pending)');
     expect(source).not.toContain('disabled={runningExampleId');
   });
 

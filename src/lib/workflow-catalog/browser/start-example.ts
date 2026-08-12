@@ -1,7 +1,13 @@
+import {
+  encodePayloads,
+  setSearchAttributes,
+} from '$lib/utilities/encode-payload';
+
 import validateJsonSchema from './schema-validator';
 import type { WorkflowCatalogSessionStore } from './session-store';
 import type {
   BrowserWorkflowCatalogDescriptor,
+  JsonObject,
   JsonSchema,
   JsonValue,
 } from './types';
@@ -205,11 +211,59 @@ const matchesStartOptionsSchema = async (
   return matches && Object.keys(value).every((key) => declared.includes(key));
 };
 
+/**
+ * Turns the shared start options into the shapes the start request expects.
+ * Both hosts spread start options straight into that request, so the mapping
+ * belongs here rather than in either host.
+ */
+export const encodeSharedStartOptions = async (
+  startOptions: JsonValue,
+): Promise<JsonValue> => {
+  if (!isJsonObject(startOptions)) return startOptions;
+
+  const { details, searchAttributes, summary, ...rest } = startOptions;
+  const encoded: Record<string, JsonValue> = { ...rest };
+
+  if (isJsonObject(searchAttributes) && Object.keys(searchAttributes).length) {
+    encoded.searchAttributes = {
+      indexedFields: setSearchAttributes(
+        Object.entries(searchAttributes).map(([label, value]) => ({
+          label,
+          value,
+        })) as never,
+      ) as unknown as JsonValue,
+    };
+  }
+
+  const [summaryPayload, detailsPayload] = await Promise.all(
+    [summary, details].map(async (value) =>
+      typeof value === 'string' && value
+        ? ((
+            await encodePayloads({
+              input: JSON.stringify(value),
+              encoding: 'json/plain',
+            })
+          )?.[0] as JsonValue | undefined)
+        : undefined,
+    ),
+  );
+
+  if (summaryPayload || detailsPayload) {
+    encoded.userMetadata = {
+      ...(summaryPayload ? { summary: summaryPayload } : {}),
+      ...(detailsPayload ? { details: detailsPayload } : {}),
+    };
+  }
+
+  return encoded;
+};
+
 export const startFromEditors = async ({
   descriptor,
   host,
   inputEditor,
   startOptionsEditor,
+  sharedStartOptions,
   executionId,
   onReadiness,
   sessionStore,
@@ -218,6 +272,8 @@ export const startFromEditors = async ({
   host: WorkbenchHost;
   inputEditor: string;
   startOptionsEditor: string;
+  /** Values collected from the shared start option controls, not the editor. */
+  sharedStartOptions?: JsonObject;
   executionId?: string;
   onReadiness?: (checks: ReadinessCheck[]) => void;
   sessionStore: Pick<WorkflowCatalogSessionStore, 'start'>;
@@ -227,7 +283,11 @@ export const startFromEditors = async ({
 
   try {
     input = parseJson(inputEditor);
-    startOptions = parseJson(startOptionsEditor);
+    const editorStartOptions = parseJson(startOptionsEditor);
+    startOptions =
+      sharedStartOptions && isJsonObject(editorStartOptions)
+        ? { ...editorStartOptions, ...sharedStartOptions }
+        : editorStartOptions;
   } catch {
     return { error: 'invalid-json' };
   }
@@ -276,7 +336,7 @@ export const startFromEditors = async ({
   const session = await sessionStore.start({
     descriptor,
     input,
-    startOptions,
+    startOptions: await encodeSharedStartOptions(startOptions),
     executionId,
   });
 

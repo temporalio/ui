@@ -51,7 +51,10 @@ export async function getCatalogClientTestRunner(): Promise<ClientRunner> {
         optimizeDeps: {
           noDiscovery: true,
           exclude: ['svelte'],
-          include: ['json-bigint', 'tailwindcss/colors'],
+          // The search attribute inputs reach date-fns-tz, and the catalog
+          // editors reach tailwindcss/colors; both ship CommonJS that this
+          // runner can only evaluate once Vite has pre-bundled it.
+          include: ['date-fns-tz', 'json-bigint', 'tailwindcss/colors'],
         },
         resolve: {
           dedupe: ['svelte'],

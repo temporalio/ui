@@ -65,6 +65,9 @@ beforeAll(async () => {
             projectRoot,
             'src/lib/workflow-catalog/browser/markdown-preview-test-double.svelte',
           ),
+          // The search attribute inputs reach date-fns-tz, whose CommonJS entry
+          // this bare SSR runner cannot evaluate. Its ESM build works as-is.
+          'date-fns-tz': 'date-fns-tz/esm',
           $lib: path.resolve(projectRoot, 'src/lib'),
           $types: path.resolve(projectRoot, 'src/types'),
           $app: path.resolve(projectRoot, 'src/lib/svelte-mocks/app'),
@@ -140,7 +143,7 @@ describe('WorkflowCatalogDetail', () => {
       /aria-label="Configure and run"[\s\S]*aria-label="Configuration"[\s\S]*aria-label="Runs"[\s\S]*aria-label="Execution details"/,
     );
     expect(body).toContain('data-testid="run-sessions-region"');
-    expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Attempt ID<\/th>/);
+    expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Workflow ID<\/th>/);
     expect(body).toContain('Runs appear here until you refresh the page.');
     expect(body).not.toContain('Run sessions');
   });
@@ -161,7 +164,7 @@ describe('WorkflowCatalogDetail', () => {
     expect(body).toContain('Input JSON');
     expect(body).toContain('catalog-tasks');
     expect(body).toContain('Workflow details');
-    expect(body).toContain('>Run<');
+    expect(body).toContain('>Start<');
   });
 
   it('uses plain language for input and start options', () => {
@@ -193,7 +196,7 @@ describe('WorkflowCatalogDetail', () => {
     );
 
     expect(body).toMatch(
-      /class="[^"]*flex-wrap[^"]*justify-between[^"]*"[\s\S]*>Start options<[\s\S]*>Run</,
+      /class="[^"]*flex-wrap[^"]*justify-between[^"]*"[\s\S]*>Start options<[\s\S]*>Start</,
     );
     expect(source).toMatch(
       /aria-label="Start options"[\s\S]*hidden={!configureOpen}[\s\S]*class="surface-primary sticky bottom-0 flex flex-wrap items-center justify-between/,
@@ -554,7 +557,7 @@ describe('WorkflowCatalogDetail', () => {
     expect(body).toMatch(
       /data-testid="run-sessions-region"[^>]*class="[^"]*max-h-96[^"]*overflow-auto/,
     );
-    expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Attempt ID<\/th>/);
+    expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Workflow ID<\/th>/);
     expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Started<\/th>/);
     expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Status<\/th>/);
     expect(body).toMatch(/<th[^>]*scope="col"[^>]*>Actions<\/th>/);

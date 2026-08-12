@@ -39,7 +39,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -79,7 +85,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -114,7 +126,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -142,7 +160,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -175,7 +199,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -222,7 +252,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -255,7 +291,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -295,7 +337,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -329,7 +377,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       setupMarkdown:
@@ -365,7 +419,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -401,6 +461,10 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         schema: {
           type: 'object',
           properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
             workflowId: { type: 'string', minLength: 1 },
             priority: {
               type: 'object',
@@ -450,7 +514,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -494,7 +564,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -534,7 +610,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -607,7 +689,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {
@@ -640,7 +728,13 @@ export const catalogArtifact: BrowserWorkflowCatalogArtifact = {
         defaultValue: {},
         schema: {
           type: 'object',
-          properties: { workflowId: { type: 'string', minLength: 1 } },
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
         },
       },
       execution: {

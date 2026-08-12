@@ -155,9 +155,17 @@ describe('generateWorkflowCatalog', () => {
         },
         startOptions: {
           defaultValue: { workflowId: 'catalog-greeting' },
+          // Workflow examples inherit the shared start options; authors only
+          // declare what is specific to their example.
           schema: {
             type: 'object',
-            properties: { workflowId: { type: 'string' } },
+            properties: {
+              details: { type: 'string' },
+              searchAttributes: { type: 'object' },
+              summary: { type: 'string' },
+              workflowStartDelay: { type: 'string' },
+              workflowId: { type: 'string' },
+            },
           },
         },
         execution: {

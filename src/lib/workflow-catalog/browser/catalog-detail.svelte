@@ -113,16 +113,25 @@
 
 <script lang="ts">
   import PayloadInput from '$lib/components/payload-input.svelte';
+  import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import DurationInput, {
+    DAYS,
+    DEFAULT_UNITS,
+    SECONDS,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import Label from '$lib/holocene/label.svelte';
+  import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { launchOutcomeExplanation } from './launch-outcome-presentation';
@@ -134,6 +143,7 @@
     workflowCatalogTargetFingerprint,
   } from './session-store';
   import { declaredExecutionId, startFromEditors } from './start-example';
+  import { workflowCatalogSharedStartOptionNames } from './start-options';
   import type { BrowserWorkflowCatalogDescriptor, JsonValue } from './types';
   import type { ReadinessCheck, WorkbenchHost } from './workbench-host';
 
@@ -163,10 +173,52 @@
    * use.
    */
   let plannedExecutionId = $state('');
+  let searchAttributes = $state<SearchAttributesSchema>([]);
+  let workflowStartDelay = $state('');
+  let summary = $state('');
+  let details = $state('');
+  /**
+   * The shared controls only appear for examples whose generated schema
+   * declares them, which keeps activity and Nexus examples free of options
+   * their start request cannot carry.
+   */
+  let sharedStartOptionsDeclared = $derived.by(() => {
+    const schema = descriptor.startOptions.schema;
+    const properties =
+      typeof schema === 'object' &&
+      schema !== null &&
+      typeof schema.properties === 'object' &&
+      schema.properties !== null
+        ? Object.keys(schema.properties)
+        : [];
+
+    return workflowCatalogSharedStartOptionNames.every((name) =>
+      properties.includes(name),
+    );
+  });
+  let sharedStartOptions = $derived({
+    ...(searchAttributes.length
+      ? {
+          searchAttributes: Object.fromEntries(
+            searchAttributes.map(({ label, value }) => [label, value]),
+          ),
+        }
+      : {}),
+    ...(workflowStartDelay ? { workflowStartDelay } : {}),
+    ...(summary ? { summary } : {}),
+    ...(details ? { details } : {}),
+  });
   /**
    * The catalog pins these per example, so they are shown the way the start
    * workflow page shows them, populated and not editable.
    */
+  let executionIdLabel = $derived(
+    descriptor.execution.kind === 'workflow'
+      ? 'Workflow ID'
+      : descriptor.execution.kind === 'standalone-activity'
+        ? 'Activity ID'
+        : 'Operation ID',
+  );
   let fixedExecutionFields: FixedExecutionField[] = $derived.by(() => {
     const execution = descriptor.execution;
     const pinnedId = declaredExecutionId(
@@ -175,12 +227,7 @@
     );
     const identity: FixedExecutionField = {
       id: 'workflow-catalog-execution-id',
-      label:
-        execution.kind === 'workflow'
-          ? 'Workflow ID'
-          : execution.kind === 'standalone-activity'
-            ? 'Activity ID'
-            : 'Operation ID',
+      label: executionIdLabel,
       value: pinnedId ?? plannedExecutionId,
       placeholder: pinnedId ? undefined : 'Generated for each run',
       hint: pinnedId ? undefined : 'Generated for the next run.',
@@ -406,6 +453,9 @@
       inputEditor,
       startOptionsEditor,
       executionId: startedExecutionId || undefined,
+      sharedStartOptions: sharedStartOptionsDeclared
+        ? sharedStartOptions
+        : undefined,
       sessionStore,
       onReadiness: (checks) => {
         if (
@@ -491,16 +541,73 @@
           options every time this section collapsed.
         -->
         <section
-          class="surface-subtle rounded-sm border border-subtle p-3"
+          class="space-y-4"
           aria-label="Start options"
           hidden={!configureOpen}
         >
-          <PayloadInput
-            id="workflow-catalog-start-options"
-            bind:input={startOptionsEditor}
-            label="Start options JSON"
-            hintText="These options apply only when you start this example."
-          />
+          <div class="rounded-sm border border-subtle p-3">
+            <PayloadInput
+              id="workflow-catalog-start-options"
+              bind:input={startOptionsEditor}
+              label="Start options JSON"
+              hintText="These options apply only when you start this example."
+            />
+          </div>
+
+          {#if sharedStartOptionsDeclared}
+            <div class="space-y-2 rounded-sm border border-subtle p-3">
+              <div>
+                <h3 class="text-sm font-medium">Custom Search Attributes</h3>
+                <p class="text-xs text-secondary">
+                  Indexed fields used in a List Filter to filter a list of
+                  Workflow Executions.
+                </p>
+              </div>
+              <AddSearchAttributes
+                bind:attributesToAdd={searchAttributes}
+                buttonCopy="Add"
+                variant="secondary"
+              />
+            </div>
+
+            <div class="space-y-2 rounded-sm border border-subtle p-3">
+              <div>
+                <Label
+                  for="workflow-catalog-start-delay"
+                  label="Workflow Start Delay"
+                  class="text-sm"
+                />
+                <p class="text-xs text-secondary">
+                  Time to wait before dispatching the first workflow task.
+                </p>
+              </div>
+              <DurationInput
+                id="workflow-catalog-start-delay"
+                label="Workflow Start Delay"
+                labelHidden
+                inputmode="numeric"
+                bind:value={workflowStartDelay}
+                units={[...DEFAULT_UNITS, DAYS]}
+                initialUnit={SECONDS.label}
+                min={0}
+                class="max-w-80"
+              />
+            </div>
+
+            <div class="space-y-2 rounded-sm border border-subtle p-3">
+              <div>
+                <h3 class="text-sm font-medium">User Metadata</h3>
+                <p class="text-xs text-secondary">
+                  Add context to the Workflow Execution to help identify and
+                  understand its operations. Markdown supported.
+                </p>
+              </div>
+              <Label label="Summary" for="workflow-catalog-summary" />
+              <MarkdownEditor bind:content={summary} />
+              <Label label="Details" for="workflow-catalog-details" />
+              <MarkdownEditor bind:content={details} />
+            </div>
+          {/if}
         </section>
 
         {#if editorError}
@@ -523,7 +630,7 @@
             disabled={running || inputMalformed}
             onclick={run}
           >
-            {running ? 'Running…' : 'Run'}
+            {running ? 'Starting…' : 'Start'}
           </Button>
         </div>
       </section>
@@ -540,7 +647,7 @@
             {/snippet}
             {#snippet headers()}
               <TableHeaderRow>
-                <th scope="col">Attempt ID</th>
+                <th scope="col">{executionIdLabel}</th>
                 <th scope="col" class="w-32">Started</th>
                 <th scope="col" class="w-36">Status</th>
                 <th scope="col" class="w-60 !text-right">Actions</th>
@@ -554,7 +661,7 @@
                     : undefined}
                 <TableRow>
                   <td class="truncate py-2 font-mono text-xs text-secondary">
-                    {session.id}
+                    {session.reference.attempt.executionId}
                   </td>
                   <td class="text-xs text-secondary">
                     {relativeSessionTime(session.createdAt)}
