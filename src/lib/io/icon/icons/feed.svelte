@@ -1,0 +1,17 @@
+<script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
+  import IconSvgWrapper from '../icon-svg-wrapper.svelte';
+
+  const props: Omit<
+    ComponentProps<typeof IconSvgWrapper>,
+    'children'
+  > = $props();
+</script>
+
+<IconSvgWrapper {...props}>
+  <path
+    fill="currentColor"
+    d="M13.793 2.483H0v1.655h13.793zM16 7.172H2.207v1.656H16zm-2.207 4.69H0v1.655h13.793z"
+  />
+</IconSvgWrapper>
