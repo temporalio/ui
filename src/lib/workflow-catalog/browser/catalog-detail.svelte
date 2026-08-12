@@ -117,6 +117,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -132,9 +133,17 @@
     type WorkflowCatalogSessionStore,
     workflowCatalogTargetFingerprint,
   } from './session-store';
-  import { startFromEditors } from './start-example';
+  import { declaredExecutionId, startFromEditors } from './start-example';
   import type { BrowserWorkflowCatalogDescriptor, JsonValue } from './types';
   import type { ReadinessCheck, WorkbenchHost } from './workbench-host';
+
+  type FixedExecutionField = {
+    id: string;
+    label: string;
+    value: string;
+    placeholder?: string;
+    hint?: string;
+  };
 
   interface Props {
     descriptor: BrowserWorkflowCatalogDescriptor;
@@ -148,6 +157,84 @@
   let startOptionsEditor = $state('');
   let inputMalformed = $state(false);
   let configureOpen = $state(false);
+  /**
+   * Rendered empty on the server so the id shown is the one the browser will
+   * actually send; the run pins it so the page never shows a value it did not
+   * use.
+   */
+  let plannedExecutionId = $state('');
+  /**
+   * The catalog pins these per example, so they are shown the way the start
+   * workflow page shows them, populated and not editable.
+   */
+  let fixedExecutionFields: FixedExecutionField[] = $derived.by(() => {
+    const execution = descriptor.execution;
+    const pinnedId = declaredExecutionId(
+      descriptor,
+      descriptor.startOptions.defaultValue,
+    );
+    const identity: FixedExecutionField = {
+      id: 'workflow-catalog-execution-id',
+      label:
+        execution.kind === 'workflow'
+          ? 'Workflow ID'
+          : execution.kind === 'standalone-activity'
+            ? 'Activity ID'
+            : 'Operation ID',
+      value: pinnedId ?? plannedExecutionId,
+      placeholder: pinnedId ? undefined : 'Generated for each run',
+      hint: pinnedId ? undefined : 'Generated for the next run.',
+    };
+    const taskQueue: FixedExecutionField = {
+      id: 'workflow-catalog-task-queue',
+      label: 'Task Queue',
+      value: execution.taskQueue,
+    };
+
+    if (execution.kind === 'workflow') {
+      return [
+        identity,
+        taskQueue,
+        {
+          id: 'workflow-catalog-workflow-type',
+          label: 'Workflow Type',
+          value: execution.workflowType,
+        },
+      ];
+    }
+
+    if (execution.kind === 'standalone-activity') {
+      return [
+        identity,
+        taskQueue,
+        {
+          id: 'workflow-catalog-activity-type',
+          label: 'Activity Type',
+          value: execution.activityType,
+        },
+      ];
+    }
+
+    return [
+      identity,
+      taskQueue,
+      {
+        id: 'workflow-catalog-endpoint',
+        label: 'Endpoint',
+        value: execution.endpoint,
+      },
+      {
+        id: 'workflow-catalog-service',
+        label: 'Service',
+        value: execution.service,
+      },
+      {
+        id: 'workflow-catalog-operation',
+        label: 'Operation',
+        value: execution.operation,
+      },
+    ];
+  });
   let editorError = $state('');
   let readiness = $state<ReadinessCheck[]>([]);
   let readinessError = $state(false);
@@ -297,6 +384,7 @@
       configureOpen = false;
       editorError = '';
       readiness = [];
+      plannedExecutionId = crypto.randomUUID();
     }
 
     sessionStore.setDraft(descriptor.id, { inputEditor, startOptionsEditor });
@@ -311,11 +399,13 @@
     readinessLoading = true;
     running = true;
     editorError = '';
+    const startedExecutionId = plannedExecutionId;
     const result = await startFromEditors({
       descriptor: runDescriptor,
       host,
       inputEditor,
       startOptionsEditor,
+      executionId: startedExecutionId || undefined,
       sessionStore,
       onReadiness: (checks) => {
         if (
@@ -345,7 +435,13 @@
     readinessLoading = false;
     running = false;
 
-    if (!('error' in result)) return;
+    if (!('error' in result)) {
+      // The shown id has been used, so the field moves on to the next one.
+      if (plannedExecutionId === startedExecutionId) {
+        plannedExecutionId = crypto.randomUUID();
+      }
+      return;
+    }
 
     editorError =
       result.error === 'invalid-json'
@@ -371,6 +467,16 @@
         aria-label="Configuration"
       >
         <h2 class="text-lg">Configuration</h2>
+        {#each fixedExecutionFields as field (field.id)}
+          <Input
+            id={field.id}
+            label={field.label}
+            value={field.value}
+            placeholder={field.placeholder ?? ''}
+            hintText={field.hint ?? ''}
+            disabled
+          />
+        {/each}
         <PayloadInput
           id="workflow-catalog-input"
           bind:input={inputEditor}
@@ -479,30 +585,38 @@
                     <div
                       class="flex flex-nowrap items-center justify-end gap-1 sm:gap-2"
                     >
-                      {#if evidence}
-                        <Button
-                          href={evidence.href}
-                          size="xs"
-                          variant="secondary"
-                          class="h-7 px-1.5">{evidence.label}</Button
-                        >
-                      {/if}
+                      <!--
+                        The observation controls come and go while a run is
+                        watched, so they sit ahead of the link in this
+                        right-aligned row and stay icon sized. That keeps the
+                        link anchored to the same spot for every row.
+                      -->
                       {#if session.state === 'observation-paused'}
                         <Button
                           size="xs"
-                          variant="secondary"
+                          variant="ghost"
                           class="h-7 px-1.5"
+                          leadingIcon="play"
+                          aria-label="Resume checking"
                           onclick={() => sessionStore.resume(session.id)}
-                          >Resume checking</Button
-                        >
+                        />
                       {/if}
                       {#if session.state === 'observing' || session.state === 'observation-paused'}
                         <Button
                           size="xs"
                           variant="ghost"
                           class="h-7 px-1.5"
+                          leadingIcon="close"
+                          aria-label="Stop checking"
                           onclick={() => sessionStore.stop(session.id)}
-                          >Stop checking</Button
+                        />
+                      {/if}
+                      {#if evidence}
+                        <Button
+                          href={evidence.href}
+                          size="xs"
+                          variant="secondary"
+                          class="h-7 px-1.5">{evidence.label}</Button
                         >
                       {/if}
                     </div>
@@ -542,12 +656,6 @@
           <div class="py-2 first:pt-0">
             <dt class="body-small text-secondary">Namespace</dt>
             <dd class="mt-0.5">{descriptor.execution.namespace}</dd>
-          </div>
-          <div class="py-2">
-            <dt class="body-small text-secondary">Task queue</dt>
-            <dd class="mt-0.5 break-all font-mono text-xs">
-              {descriptor.execution.taskQueue}
-            </dd>
           </div>
           <div class="py-2 last:pb-0">
             <dt class="body-small text-secondary">Target</dt>

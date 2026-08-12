@@ -112,6 +112,7 @@ export async function cleanup() {
 
 export async function renderDetail({
   deferReadiness = false,
+  pinExecutionId = true,
   readinessResponses = [
     [
       {
@@ -124,6 +125,7 @@ export async function renderDetail({
   ],
 }: {
   deferReadiness?: boolean;
+  pinExecutionId?: boolean;
   readinessResponses?: ReadinessCheck[][];
 } = {}) {
   readinessCallCount = 0;
@@ -146,7 +148,12 @@ export async function renderDetail({
     mount(CatalogDetail, {
       target,
       props: {
-        descriptor,
+        descriptor: pinExecutionId
+          ? descriptor
+          : {
+              ...descriptor,
+              startOptions: { ...descriptor.startOptions, defaultValue: {} },
+            },
         host,
         sessionStore: createWorkflowCatalogSessionStore(host),
       },

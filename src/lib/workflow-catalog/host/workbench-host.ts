@@ -1,4 +1,5 @@
 import { ApiObservationError } from './observation';
+import { declaredExecutionId } from '../browser/start-example';
 import type {
   BrowserWorkflowCatalogDescriptor,
   BrowserWorkflowCatalogExecution,
@@ -81,28 +82,7 @@ const targetFor = (
   taskQueue: execution.taskQueue,
 });
 
-const configuredExecutionId = (
-  descriptor: BrowserWorkflowCatalogDescriptor,
-  startOptions: JsonValue,
-): string | undefined => {
-  if (
-    typeof startOptions !== 'object' ||
-    startOptions === null ||
-    Array.isArray(startOptions)
-  ) {
-    return undefined;
-  }
-
-  const optionName =
-    descriptor.execution.kind === 'workflow'
-      ? 'workflowId'
-      : descriptor.execution.kind === 'standalone-activity'
-        ? 'activityId'
-        : 'operationId';
-  const value = startOptions[optionName];
-
-  return typeof value === 'string' && value ? value : undefined;
-};
+const configuredExecutionId = declaredExecutionId;
 
 const launchRequestFor = (
   descriptor: BrowserWorkflowCatalogDescriptor,

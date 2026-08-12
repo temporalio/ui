@@ -23,6 +23,30 @@ const parseJson = (source: string): JsonValue =>
 const isJsonObject = (value: JsonValue): value is Record<string, JsonValue> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+export const executionIdOptionName = (
+  kind: BrowserWorkflowCatalogDescriptor['execution']['kind'],
+): 'activityId' | 'operationId' | 'workflowId' =>
+  kind === 'workflow'
+    ? 'workflowId'
+    : kind === 'standalone-activity'
+      ? 'activityId'
+      : 'operationId';
+
+/**
+ * The execution id an example pins in its start options. Examples that leave it
+ * out get a fresh id per attempt, so there is nothing fixed to show or reuse.
+ */
+export const declaredExecutionId = (
+  descriptor: Pick<BrowserWorkflowCatalogDescriptor, 'execution'>,
+  startOptions: JsonValue,
+): string | undefined => {
+  if (!isJsonObject(startOptions)) return undefined;
+
+  const value = startOptions[executionIdOptionName(descriptor.execution.kind)];
+
+  return typeof value === 'string' && value ? value : undefined;
+};
+
 const assertSynchronousSchema = (schema: JsonSchema): void => {
   if (isJsonObject(schema) && schema.$async === true) {
     throw new Error('Async JSON Schema validation is not supported');
@@ -186,6 +210,7 @@ export const startFromEditors = async ({
   host,
   inputEditor,
   startOptionsEditor,
+  executionId,
   onReadiness,
   sessionStore,
 }: {
@@ -193,6 +218,7 @@ export const startFromEditors = async ({
   host: WorkbenchHost;
   inputEditor: string;
   startOptionsEditor: string;
+  executionId?: string;
   onReadiness?: (checks: ReadinessCheck[]) => void;
   sessionStore: Pick<WorkflowCatalogSessionStore, 'start'>;
 }): Promise<StartFromEditorsResult> => {
@@ -247,7 +273,12 @@ export const startFromEditors = async ({
     return { error: 'required-readiness-unavailable' };
   }
 
-  const session = await sessionStore.start({ descriptor, input, startOptions });
+  const session = await sessionStore.start({
+    descriptor,
+    input,
+    startOptions,
+    executionId,
+  });
 
   if (!session?.outcome) return { error: 'unable-to-start' };
 

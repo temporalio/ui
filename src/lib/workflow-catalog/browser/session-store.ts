@@ -56,6 +56,11 @@ export type WorkflowCatalogSessionStartRequest = {
   descriptor: BrowserWorkflowCatalogDescriptor;
   input: JsonValue;
   startOptions: JsonValue;
+  /**
+   * Pins the execution id the attempt will use. Callers that show the id before
+   * a run pass the value they displayed so the run matches what was on screen.
+   */
+  executionId?: string;
 };
 
 export type WorkflowCatalogSessionStore =
@@ -222,10 +227,12 @@ export const createWorkflowCatalogSessionStore = (
     descriptor,
     input,
     startOptions,
+    executionId,
   }) => {
     if (disposed || !startAllowed(descriptor)) return;
 
-    const attempt = createAttemptIdentity(createId);
+    const generated = createAttemptIdentity(createId);
+    const attempt = executionId ? { ...generated, executionId } : generated;
     const reference = {
       exampleId: descriptor.id,
       kind: descriptor.execution.kind,

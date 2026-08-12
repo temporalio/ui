@@ -92,6 +92,26 @@ describe('WorkflowCatalogDetail client interactions', () => {
     );
   });
 
+  it('runs the execution id it shows and then shows the next one', async () => {
+    const target = await client.renderDetail({ pinExecutionId: false });
+    await client.flush();
+    const shownId = () =>
+      target.querySelector<HTMLInputElement>('#workflow-catalog-execution-id')
+        ?.value;
+    const before = shownId();
+
+    expect(before).toBeTruthy();
+
+    Array.from(target.querySelectorAll('button'))
+      .find((candidate) => candidate.textContent?.trim() === 'Run')
+      ?.click();
+    await client.waitForStart();
+    await client.flush();
+
+    expect(shownId()).not.toBe(before);
+    expect(shownId()).not.toBe('');
+  });
+
   it('keeps start options after the section is collapsed and reopened', async () => {
     const target = await client.renderDetail();
     await client.flush();

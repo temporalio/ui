@@ -489,8 +489,10 @@ describe('WorkflowCatalogDetail', () => {
       /<section class="[^"]*surface-primary[^"]*border border-subtle[^"]*" aria-label="What to verify"/,
     );
     expect(body).toMatch(
-      /aria-label="Execution details"[\s\S]*Workflow[\s\S]*catalog-tasks/,
+      /aria-label="Execution details"[\s\S]*Workflow[\s\S]*catalog/,
     );
+    // The task queue belongs to the Configuration fields now, not both places.
+    expect(body.match(/catalog-tasks/g)).toHaveLength(1);
     expect(body).toMatch(/aria-label="What to verify"[\s\S]*Workflow details/);
   });
 
@@ -696,6 +698,52 @@ describe('WorkflowCatalogDetail', () => {
     expect(body).not.toContain('>launch-rejected<');
   });
 
+  it('keeps the run link anchored while observation controls come and go', () => {
+    const source = readFileSync(
+      resolve('src/lib/workflow-catalog/browser/catalog-detail.svelte'),
+      'utf8',
+    );
+    const actionsRow = source.slice(
+      source.indexOf('flex flex-nowrap items-center justify-end'),
+    );
+
+    expect(actionsRow.indexOf('aria-label="Resume checking"')).toBeLessThan(
+      actionsRow.indexOf('aria-label="Stop checking"'),
+    );
+    expect(actionsRow.indexOf('aria-label="Stop checking"')).toBeLessThan(
+      actionsRow.indexOf('{evidence.label}'),
+    );
+  });
+
+  it('shows the pinned execution identity as populated, uneditable fields', () => {
+    const sessionStore = createWorkflowCatalogSessionStore(host);
+    const { body } = renderComponent(catalogDetail, {
+      props: { descriptor, host, sessionStore },
+    });
+
+    expect(body).toMatch(
+      /Workflow ID[\s\S]*value="order-lifecycle-01"[\s\S]*disabled/,
+    );
+    expect(body).toMatch(/Task Queue[\s\S]*value="catalog-tasks"/);
+    expect(body).toMatch(/Workflow Type[\s\S]*value="OrderLifecycle"/);
+  });
+
+  it('marks a generated execution id instead of showing an empty field', () => {
+    const sessionStore = createWorkflowCatalogSessionStore(host);
+    const { body } = renderComponent(catalogDetail, {
+      props: {
+        descriptor: {
+          ...descriptor,
+          startOptions: { defaultValue: {}, schema: { type: 'object' } },
+        },
+        host,
+        sessionStore,
+      },
+    });
+
+    expect(body).toContain('Generated for each run');
+  });
+
   it('keeps drafts and sessions scoped to the selected example and target', () => {
     const source = readFileSync(
       resolve('src/lib/workflow-catalog/browser/catalog-detail.svelte'),
@@ -788,8 +836,8 @@ describe('WorkflowCatalogDetail', () => {
     expect(source).toContain("'launch-uncertain': 'Start not confirmed'");
     expect(source).toContain("'observation-paused': 'Status checks paused'");
     expect(source).toContain("stopped: 'Status checks stopped'");
-    expect(source).toContain('>Resume checking</Button');
-    expect(source).toContain('>Stop checking</Button');
+    expect(source).toContain('aria-label="Resume checking"');
+    expect(source).toContain('aria-label="Stop checking"');
     expect(source).toContain(
       'A required service is unavailable. Check Readiness and try again.',
     );
