@@ -97,10 +97,13 @@ export const fetchUiExtensions = async (
 ): Promise<IframeExtension[]> => {
   try {
     const route = routeForApi('ui-extensions');
-    const customUIResponse: CustomUIResponse = await requestFromAPI(route, {
-      request,
-      notifyOnError: false,
-    });
+    const customUIResponse: CustomUIResponse | undefined = await requestFromAPI(
+      route,
+      {
+        request,
+        notifyOnError: false,
+      },
+    );
     if (!customUIResponse?.Enabled) return [];
     return mapIframeExtensions(customUIResponse);
   } catch {
