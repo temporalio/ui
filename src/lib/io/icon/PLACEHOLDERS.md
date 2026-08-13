@@ -7,12 +7,13 @@ each is a candidate for replacement with a proper Io drawing.
 To swap one out, replace the `d` attribute in the listed component. Nothing else
 changes — the export name and every call site stay as they are.
 
+Already replaced by design: `microchip` (node `2224:84384`).
+
 ## Derived from holocene's retired icon set
 
-| Icon        | Source               | How it was made                                                                                                                               |
-| ----------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invite`    | holocene `invite`    | 24→16 viewBox, uniform 2/3 scale baked into the coordinates. Person + plus. Used by cloud-ui's "Invite" buttons; Io had no person-plus glyph. |
-| `microchip` | holocene `microchip` | 24→16, uniform 2/3 scale. Used by ui's worker details.                                                                                        |
+| Icon     | Source            | How it was made                                                                                                                               |
+| -------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `invite` | holocene `invite` | 24→16 viewBox, uniform 2/3 scale baked into the coordinates. Person + plus. Used by cloud-ui's "Invite" buttons; Io had no person-plus glyph. |
 
 ## Derived from cloud-ui's static assets
 
