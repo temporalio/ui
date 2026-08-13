@@ -69,6 +69,8 @@
     active?: boolean;
     LeadingIcon?: IconComponent;
     TrailingIcon?: IconComponent;
+    leadingIconClass?: string;
+    trailingIconClass?: string;
     count?: number;
     id?: string;
     disableTracking?: boolean;
@@ -110,6 +112,8 @@
     active = false,
     LeadingIcon,
     TrailingIcon,
+    leadingIconClass,
+    trailingIconClass,
     count = 0,
     id,
     href,
@@ -183,7 +187,7 @@
     {#if LeadingIcon || (loading && !TrailingIcon)}
       {@const LeadingGlyph = loading ? IconSpinner : LeadingIcon!}
       <span class:animate-spin={loading}>
-        <LeadingGlyph />
+        <LeadingGlyph class={leadingIconClass} />
       </span>
     {/if}
     {@render children?.()}
@@ -194,7 +198,7 @@
         class:animate-spin={loading && !LeadingIcon}
         class:invisible={loading && LeadingIcon}
       >
-        <TrailingGlyph />
+        <TrailingGlyph class={trailingIconClass} />
       </span>
     {/if}
     {#if count > 0}
@@ -221,7 +225,7 @@
     {#if LeadingIcon || (loading && !TrailingIcon)}
       {@const LeadingGlyph = loading ? IconSpinner : LeadingIcon!}
       <span class:animate-spin={loading}>
-        <LeadingGlyph />
+        <LeadingGlyph class={leadingIconClass} />
       </span>
     {/if}
     {@render children?.()}
@@ -233,7 +237,7 @@
         class:animate-spin={loading && !LeadingIcon}
         class:invisible={loading && LeadingIcon}
       >
-        <TrailingGlyph />
+        <TrailingGlyph class={trailingIconClass} />
       </span>
     {/if}
     {#if count > 0}
