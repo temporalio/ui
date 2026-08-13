@@ -228,7 +228,7 @@
                   $form.customLink = '';
                 }}
               >
-                <IconTrash class="h-4 w-4" />
+                <IconTrash />
                 {translate('codec-server.remove-custom-button')}
               </Button>
             </div>

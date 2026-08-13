@@ -414,7 +414,7 @@
               })}
               class="inline-flex items-center gap-1"
             >
-              <IconExternalLink class="h-4 w-4" />
+              <IconExternalLink />
               {translate('workflows.view-running-workflow')}
             </Link>
           </div>
