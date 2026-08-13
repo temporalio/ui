@@ -38,7 +38,7 @@
   class={twMerge('shrink-0', className)}
   {...rest}
 >
-  {#if title}
+  {#if title && !ariaLabel}
     <title>{title}</title>
   {/if}
   {@render children?.()}
