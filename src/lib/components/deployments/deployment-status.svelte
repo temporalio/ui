@@ -8,9 +8,9 @@
     IconArrowTrendingDown,
     IconArrowTrendingUp,
     type IconComponent,
-    IconDrainedOptical,
+    IconDrained,
     IconHeartbeat,
-    IconInactiveOptical,
+    IconInactive,
   } from '$lib/io/icon';
   import type { DeploymentStatus } from '$lib/types/deployments';
 
@@ -24,8 +24,8 @@
     Current: IconHeartbeat,
     Ramping: IconArrowTrendingUp,
     Draining: IconArrowTrendingDown,
-    Drained: IconDrainedOptical,
-    Inactive: IconInactiveOptical,
+    Drained: IconDrained,
+    Inactive: IconInactive,
     Created: IconAdd,
   };
 
