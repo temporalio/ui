@@ -5,7 +5,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconGithub } from '$lib/io/icon';
+  import { IconGithub, IconWarning } from '$lib/io/icon';
   import { nexusOperationError } from '$lib/stores/nexus-operations';
   import noResultsImages from '$lib/vendor/empty-state.svg';
 
@@ -74,7 +74,7 @@
       {#if $nexusOperationError}
         <Alert
           intent="warning"
-          icon="warning"
+          Icon={IconWarning}
           title={translate('common.error-occurred')}
           style="overflow-wrap: anywhere"
         >

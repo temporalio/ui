@@ -5,10 +5,15 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconClose } from '$lib/io/icon';
+  import {
+    IconCheckmark,
+    IconClose,
+    type IconComponent,
+    IconExclamationCircle,
+    IconInfo,
+    IconWarning,
+  } from '$lib/io/icon';
   import type { ToastVariant } from '$lib/types/holocene';
 
   interface Props {
@@ -35,16 +40,16 @@
     warning: 'bg-warning',
   };
 
-  const variantIcon: Readonly<Record<ToastVariant, IconName | null>> = {
+  const variantIcon: Readonly<Record<ToastVariant, IconComponent | null>> = {
     primary: null,
-    success: 'success',
-    error: 'error',
-    info: 'info',
-    warning: 'warning',
+    success: IconCheckmark,
+    error: IconExclamationCircle,
+    info: IconInfo,
+    warning: IconWarning,
   };
 
   const dismissLabel = $derived(closeButtonLabel || translate('common.close'));
-  const icon = $derived(variantIcon[variant]);
+  const Icon = $derived(variantIcon[variant]);
 
   const handleDismiss = (e: Event) => {
     e.stopPropagation();
@@ -60,8 +65,8 @@
   )}
   transition:fly={{ x: 250 }}
 >
-  {#if icon}
-    <Icon name={icon} class="shrink-0" />
+  {#if Icon}
+    <Icon class="shrink-0" />
   {/if}
   <p class="text-sm">
     {@render children()}

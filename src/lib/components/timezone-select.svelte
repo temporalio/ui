@@ -18,7 +18,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconClock } from '$lib/io/icon';
+  import { IconClock, IconSearch } from '$lib/io/icon';
   import {
     hourFormat,
     relativeTime,
@@ -155,7 +155,7 @@
       id="timezone-search"
       noBorder
       bind:value={search}
-      icon="search"
+      Icon={IconSearch}
       placeholder={translate('common.search')}
     />
 

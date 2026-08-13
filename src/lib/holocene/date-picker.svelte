@@ -3,6 +3,7 @@
 
   import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
+  import { IconCalendarPlus } from '$lib/io/icon';
   import { getMonthName } from '$lib/utilities/calendar';
   import {
     DATE_PICKER_INPUT_FORMAT,
@@ -108,7 +109,7 @@
     {label}
     {afterLabel}
     {labelHidden}
-    icon="calendar-plus"
+    Icon={IconCalendarPlus}
     type="text"
     onfocus={onFocus}
     onblur={onBlur}

@@ -4,9 +4,15 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import type { IconName } from './icon';
+  import {
+    IconCheckmark,
+    type IconComponent,
+    IconExclamationCircle,
+    IconInfo,
+    IconNexus,
+    IconTranscoderError,
+    IconWarning,
+  } from '$lib/io/icon';
 
   type Intent =
     | 'warning'
@@ -15,12 +21,19 @@
     | 'info'
     | 'nexus'
     | 'transcoder-error';
-  type AlertIcon = Extract<IconName, Intent>;
+  const intentIcon: Readonly<Record<Intent, IconComponent>> = {
+    warning: IconWarning,
+    error: IconExclamationCircle,
+    success: IconCheckmark,
+    info: IconInfo,
+    nexus: IconNexus,
+    'transcoder-error': IconTranscoderError,
+  };
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     intent: Intent;
     title?: string;
-    icon?: AlertIcon;
+    Icon?: IconComponent;
     'data-testid'?: string;
     hidden?: boolean;
     class?: string;
@@ -30,7 +43,7 @@
   let {
     intent,
     title = '',
-    icon = intent,
+    Icon = intentIcon[intent],
     hidden = false,
     class: className = '',
     children,
@@ -60,7 +73,7 @@
   {role}
   {...rest}
 >
-  <Icon name={icon} class="mt-0.5 shrink-0" />
+  <Icon class="mt-0.5 shrink-0" />
   <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}

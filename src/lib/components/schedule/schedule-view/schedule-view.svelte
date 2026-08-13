@@ -14,7 +14,7 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconChevronLeft } from '$lib/io/icon';
+  import { IconChevronLeft, IconFilter } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import {
     openConfirmationModal,
@@ -126,7 +126,7 @@
         ].join(' AND '),
       }) ?? ''}
       text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name ?? ''}
-      iconName="filter"
+      Icon={IconFilter}
       copyable={Boolean(
         schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
       )}

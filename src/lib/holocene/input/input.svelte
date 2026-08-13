@@ -4,10 +4,14 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
-  import { IconClose } from '$lib/io/icon';
+  import {
+    IconCheckmark,
+    IconClose,
+    type IconComponent,
+    IconCopy,
+    IconLock,
+  } from '$lib/io/icon';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   import IconButton from '../icon-button.svelte';
@@ -18,7 +22,7 @@
     label: string;
     afterLabel?: Snippet;
     labelHidden?: boolean;
-    icon?: IconName;
+    Icon?: IconComponent;
     suffix?: string;
     prefix?: string;
     valid?: boolean;
@@ -47,7 +51,7 @@
     label,
     afterLabel,
     labelHidden = false,
-    icon = undefined,
+    Icon,
     placeholder = '',
     suffix = '',
     prefix = '',
@@ -125,9 +129,9 @@
       class:noBorder
       class:invalid={!valid}
     >
-      {#if icon}
+      {#if Icon}
         <span class="icon-container">
-          <Icon name={icon} />
+          <Icon />
         </span>
       {:else if prefix}
         <p class="prefix">{prefix}</p>
@@ -170,15 +174,15 @@
             onclick={(e) => copy(e, value)}
           >
             {#if $copied}
-              <Icon name="checkmark" />
+              <IconCheckmark />
             {:else}
-              <Icon name="copy" />
+              <IconCopy />
             {/if}
           </button>
         </div>
       {:else if isDisabled}
         <div class="disabled-icon-container">
-          <Icon name="lock" />
+          <IconLock />
         </div>
       {:else if clearable && value}
         <div class="clear-icon-container" data-testid="clear-input">
@@ -268,15 +272,15 @@
     @apply ml-2 flex items-center justify-center;
   }
 
-  .copy-icon-container {
+  .copy-Icon-container {
     @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
   }
 
-  .disabled-icon-container {
+  .disabled-Icon-container {
     @apply flex h-full w-9 items-center justify-center px-1;
   }
 
-  .clear-icon-container {
+  .clear-Icon-container {
     @apply mr-2 flex w-6 cursor-pointer items-center justify-center;
   }
 

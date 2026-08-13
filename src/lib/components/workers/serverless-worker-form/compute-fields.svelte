@@ -12,6 +12,7 @@
     IconChevronDown,
     IconChevronUp,
     IconExternalLink,
+    IconInfo,
   } from '$lib/io/icon';
 
   import {
@@ -261,7 +262,7 @@
       required
     />
     <Accordion
-      icon="info"
+      Icon={IconInfo}
       title={translate('workers.no-role-prompt')}
       bind:open={showRoleHelp}
       class="[&_h3]:text-sm"
@@ -334,7 +335,7 @@
     />
     {#if provider === 'cloud-run'}
       <Accordion
-        icon="info"
+        Icon={IconInfo}
         title={translate('workers.cloud-run-setup-prompt')}
         bind:open={showCloudRunHelp}
         class="[&_h3]:text-sm"

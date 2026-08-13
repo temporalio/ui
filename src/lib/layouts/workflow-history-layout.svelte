@@ -22,7 +22,10 @@
   import {
     IconArrowAscending,
     IconArrowDescending,
+    IconCompact,
     IconDownload,
+    IconFeed,
+    IconJson,
   } from '$lib/io/icon';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
@@ -224,21 +227,21 @@
         <TabButton
           active={$eventViewType === 'feed'}
           data-testid="feed"
-          icon="feed"
+          Icon={IconFeed}
           class="h-10"
           onclick={onAllClick}>All</TabButton
         >
         <TabButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
-          icon="compact"
+          Icon={IconCompact}
           class="h-10"
           onclick={onCompactClick}>Compact</TabButton
         >
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
-          icon="json"
+          Icon={IconJson}
           class="h-10"
           onclick={onJSONClick}>JSON</TabButton
         >

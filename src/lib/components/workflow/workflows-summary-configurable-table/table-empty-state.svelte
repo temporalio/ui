@@ -8,7 +8,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconGithub } from '$lib/io/icon';
+  import { IconGithub, IconWarning } from '$lib/io/icon';
   import { workflowError } from '$lib/stores/workflows';
   import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
   import noResultsImages from '$lib/vendor/empty-state.svg';
@@ -83,7 +83,7 @@
       {#if $workflowError}
         <Alert
           intent="warning"
-          icon="warning"
+          Icon={IconWarning}
           title={translate('common.error-occurred')}
           style="overflow-wrap: anywhere"
         >

@@ -8,12 +8,16 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconChevronDown, IconChevronUp } from '$lib/io/icon';
+  import {
+    IconChevronDown,
+    IconChevronUp,
+    IconPause,
+    IconRetry,
+  } from '$lib/io/icon';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -206,6 +210,8 @@
       primaryLocalAttribute = await decodeLocalActivity(event.initialEvent);
     }
   });
+
+  const CategoryGlyph = $derived(CategoryIcon[event.category].Icon);
 </script>
 
 {#snippet expandButton()}
@@ -304,8 +310,7 @@
   </td>
   <td class="truncate">
     <p class={eventTypeStyle({ category: event.category })}>
-      <Icon
-        name={CategoryIcon[event.category].name}
+      <CategoryGlyph
         title={CategoryIcon[event.category].title}
         class={merge(
           'mr-1 inline',
@@ -328,13 +333,13 @@
               ? 'danger'
               : 'default'}
         >
-          <Icon
+          {@const Glyph = isPausedPendingActivity ? IconPause : IconRetry}
+          <Glyph
             class={merge(
               'mr-1 inline',
               pendingAttempt > 1 && 'font-bold text-red-400',
               isPausedPendingActivity && 'font-bold text-yellow-700',
             )}
-            name={isPausedPendingActivity ? 'pause' : 'retry'}
           />
           {translate('workflows.attempt')}
           {pendingAttempt}

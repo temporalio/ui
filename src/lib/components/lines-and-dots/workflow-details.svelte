@@ -3,6 +3,7 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter, IconInfo } from '$lib/io/icon';
   import { getEventArray } from '$lib/services/grouped-event-buffer';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -146,7 +147,7 @@
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
       }) ?? ''}
-      iconName="filter"
+      Icon={IconFilter}
     />
 
     {#if workflow?.taskQueue}
@@ -200,7 +201,7 @@
                 query: `TemporalWorkerDeploymentVersion="${deploymentVersion}"`,
               }) ?? '')
             : ''}
-          iconName={deploymentVersion ? 'filter' : undefined}
+          Icon={deploymentVersion ? IconFilter : undefined}
         />
       {/if}
 
@@ -216,7 +217,7 @@
             namespace,
             query: `TemporalWorkflowVersioningBehavior="${versioningBehavior}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
     </DetailListColumn>
@@ -266,7 +267,7 @@
       tooltipText={workflow.externalPayloadCount
         ? translate('workflows.external-payload-tooltip')
         : ''}
-      iconName={workflow.externalPayloadCount ? 'square-info' : undefined}
+      Icon={workflow.externalPayloadCount ? IconInfo : undefined}
       iconPosition="trailing"
       text={historySizeFormatted}
     />

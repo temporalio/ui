@@ -22,7 +22,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconCanceled, IconChevronLeft } from '$lib/io/icon';
+  import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
   import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -193,7 +193,7 @@
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
-        icon="info"
+        Icon={IconInfo}
         intent="info"
         title={translate('workflows.cancel-request-sent')}
         class="max-w-screen-lg xl:w-2/3"
@@ -206,7 +206,7 @@
     {@const pauseInfo = workflow?.workflowExtendedInfo.pauseInfo}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
-        icon="info"
+        Icon={IconInfo}
         intent="info"
         title={translate('workflows.workflow-paused')}
         class="max-w-screen-lg xl:w-2/3"
@@ -245,7 +245,7 @@
   {#if workflowHasBeenReset}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
-        icon="info"
+        Icon={IconInfo}
         intent="info"
         data-testid="workflow-reset-alert"
         title={translate('workflows.reset-success-alert-title')}

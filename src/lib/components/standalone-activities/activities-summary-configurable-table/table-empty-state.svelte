@@ -6,6 +6,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconWarning } from '$lib/io/icon';
   import { activityError } from '$lib/stores/activities';
   import noResultsImages from '$lib/vendor/empty-state.svg';
 
@@ -75,7 +76,7 @@
         </h2>
         <Alert
           intent="warning"
-          icon="warning"
+          Icon={IconWarning}
           title={translate('common.error-occurred')}
           style="overflow-wrap: anywhere"
         >

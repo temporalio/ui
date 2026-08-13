@@ -2,10 +2,11 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import { iconNames } from '$lib/holocene/icon';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
+  import * as ioIcons from '$lib/io/icon';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Split Button',
@@ -14,7 +15,7 @@
       label: 'Split Button',
       menuLabel: 'Actions',
       position: 'left',
-      icon: undefined as IconName | undefined,
+      Icon: undefined,
       disabled: false,
       primaryActionDisabled: false,
       href: 'https://caniuse.com',
@@ -34,7 +35,12 @@
         },
       },
 
-      icon: { name: 'Icon', control: 'select', options: iconNames },
+      Icon: {
+        name: 'Icon',
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
       disabled: { name: 'Disabled', control: 'boolean' },
       primaryActionDisabled: {
         name: 'Primary Action Disabled',
@@ -56,6 +62,6 @@
 
 <Story name="Default" />
 
-<Story name="With Icon" args={{ icon: 'trash' }} />
+<Story name="With Icon" args={{ Icon: ioIcons.IconTrash }} />
 
 <Story name="Disabled" args={{ disabled: true }} />

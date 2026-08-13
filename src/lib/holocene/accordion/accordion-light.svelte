@@ -3,15 +3,18 @@
 
   import type { Snippet } from 'svelte';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import {
+    IconArrowDown,
+    IconArrowRight,
+    type IconComponent,
+  } from '$lib/io/icon';
 
   interface Props extends Omit<
     HTMLAttributes<HTMLDivElement>,
     'title' | 'children'
   > {
     id?: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     open?: boolean;
     expandable?: boolean;
     error?: string;
@@ -28,7 +31,7 @@
     id = crypto.randomUUID(),
     open = $bindable(false),
     onToggle,
-    icon,
+    Icon,
     class: className,
     title,
     description,
@@ -44,6 +47,8 @@
       open = !open;
     }
   };
+
+  const Glyph = $derived(Icon ? Icon : open ? IconArrowDown : IconArrowRight);
 </script>
 
 <div class="w-full {className}">
@@ -59,7 +64,7 @@
       <div class="flex w-full flex-row items-center justify-between gap-2 pr-4">
         {@render title?.()}
         {@render description?.()}
-        <Icon name={icon ? icon : open ? 'arrow-down' : 'arrow-right'} />
+        <Glyph />
       </div>
     </button>
     <div class="flex shrink-0 items-center gap-4 pr-4">

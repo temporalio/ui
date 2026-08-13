@@ -18,7 +18,20 @@
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconSupport } from '$lib/io/icon';
+  import {
+    IconArchive,
+    IconBook,
+    IconFeedback,
+    IconImport,
+    IconSupport,
+    IconTemporalActivity,
+    IconTemporalBatch,
+    IconTemporalNamespaces,
+    IconTemporalNexus,
+    IconTemporalSchedules,
+    IconTemporalWorker,
+    IconTemporalWorkflow,
+  } from '$lib/io/icon';
   import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
@@ -143,7 +156,8 @@
     return [
       {
         href: namespacesRoute,
-        icon: 'namespace',
+        Icon: IconTemporalNamespaces,
+        testId: 'namespace-button',
         label: translate('common.namespaces'),
         isActive: (path) =>
           path.includes(namespacesRoute) &&
@@ -158,20 +172,23 @@
       },
       {
         href: workflowsRoute,
-        icon: 'workflow',
+        Icon: IconTemporalWorkflow,
+        testId: 'workflow-button',
         label: translate('common.workflows'),
         isActive: (path) => path.includes(workflowsRoute),
       },
       {
         href: standaloneActivitiesRoute,
-        icon: 'activity',
+        Icon: IconTemporalActivity,
+        testId: 'activity-button',
         label: translate('standalone-activities.standalone-activities'),
         isActive: (path) => path.includes(standaloneActivitiesRoute),
         hidden: !minimumVersionRequired('1.30.0', $temporalVersion),
       },
       {
         href: standaloneNexusOperationsRoute,
-        icon: 'nexus',
+        Icon: IconTemporalNexus,
+        testId: 'nexus-button',
         label: translate(
           'standalone-nexus-operations.standalone-nexus-operations',
         ),
@@ -180,13 +197,15 @@
       },
       {
         href: schedulesRoute,
-        icon: 'schedules',
+        Icon: IconTemporalSchedules,
+        testId: 'schedules-button',
         label: translate('common.schedules'),
         isActive: (path) => path.includes(schedulesRoute),
       },
       {
         href: batchOperationsRoute,
-        icon: 'batch-operation',
+        Icon: IconTemporalBatch,
+        testId: 'batch-operation-button',
         label: translate('batch.nav-title'),
         tooltip: translate('batch.list-page-title'),
         animate: inProgressBatch,
@@ -194,7 +213,8 @@
       },
       {
         href: workersRoute,
-        icon: 'workers',
+        Icon: IconTemporalWorker,
+        testId: 'workers-button',
         label: translate('workers.workers'),
         tooltip: translate('workers.workers'),
         isActive: (path) =>
@@ -202,7 +222,8 @@
       },
       {
         href: nexusRoute,
-        icon: 'nexus',
+        Icon: IconTemporalNexus,
+        testId: 'nexus-button',
         label: translate('nexus.nexus'),
         hidden: !page.data?.systemInfo?.capabilities?.nexus,
         isActive: (path) => {
@@ -233,19 +254,22 @@
     return [
       {
         href: archivalRoute,
-        icon: 'archives',
+        Icon: IconArchive,
+        testId: 'archives-button',
         label: translate('common.archive'),
         isActive: (path) => path.includes(archivalRoute),
       },
       {
         href: historyImportRoute,
-        icon: 'import',
+        Icon: IconImport,
+        testId: 'import-button',
         label: translate('common.import'),
         isActive: (path) => path.includes(historyImportRoute),
       },
       {
         href: 'http://docs.temporal.io',
-        icon: 'book',
+        Icon: IconBook,
+        testId: 'book-button',
         label: translate('common.docs'),
         external: true,
       },
@@ -366,7 +390,7 @@
             link={page.data?.settings?.feedbackURL ||
               'https://github.com/temporalio/ui/issues/new/choose'}
             label={translate('common.feedback')}
-            icon="feedback"
+            Icon={IconFeedback}
             tooltip={translate('common.feedback')}
             external
           />

@@ -2,7 +2,11 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconExternalLink, IconTemporalWorker } from '$lib/io/icon';
+  import {
+    IconExternalLink,
+    IconTemporalWorker,
+    IconWarning,
+  } from '$lib/io/icon';
 
   interface Props {
     createHref: string;
@@ -43,7 +47,7 @@
     </Button>
   </div>
   {#if error}
-    <Alert intent="warning" icon="warning" class="max-w-lg">
+    <Alert intent="warning" Icon={IconWarning} class="max-w-lg">
       {error}
     </Alert>
   {/if}

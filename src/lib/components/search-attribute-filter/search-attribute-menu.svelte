@@ -14,7 +14,7 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
-  import { IconFilter } from '$lib/io/icon';
+  import { IconFilter, IconSearch } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import {
@@ -128,7 +128,7 @@
         id="{id}-filter-search"
         noBorder
         bind:value={searchAttributeValue}
-        icon="search"
+        Icon={IconSearch}
         placeholder={translate('common.search')}
         class="w-full min-w-[300px]"
       />

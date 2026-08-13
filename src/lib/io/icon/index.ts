@@ -107,6 +107,7 @@ export { default as IconLinux } from './icons/linux.svelte';
 export { default as IconLock } from './icons/lock.svelte';
 export { default as IconLogout } from './icons/logout.svelte';
 export { default as IconMegaphone } from './icons/megaphone.svelte';
+export { default as IconMicrochip } from './icons/microchip.svelte';
 export { default as IconMerge } from './icons/merge.svelte';
 export { default as IconMicrosoft } from './icons/microsoft.svelte';
 export { default as IconMicrosoftColor } from './icons/microsoft-color.svelte';

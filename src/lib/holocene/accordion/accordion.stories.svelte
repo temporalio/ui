@@ -4,13 +4,15 @@
   import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
   import { IconBook } from '$lib/io/icon';
 
   import Link from '../link.svelte';
 
   import AccordionGroup from './accordion-group.svelte';
   import Accordion from './accordion.svelte';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Accordion',
@@ -29,10 +31,11 @@
       open: { name: 'Open', control: 'boolean' },
       expandable: { name: 'Expandable', control: 'boolean' },
       error: { name: 'Error', control: 'text' },
-      icon: {
+      Icon: {
         name: 'Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
       },
     },
     render: template,
@@ -64,7 +67,7 @@
 
 <Story name="With Error" args={{ error: 'Error' }} />
 
-<Story name="With Icon" args={{ icon: 'workflow' }} />
+<Story name="With Icon" args={{ Icon: ioIcons.IconTemporalWorkflow }} />
 
 <Story
   name="With Action"
