@@ -91,6 +91,7 @@ export { default as IconHyphen } from './icons/hyphen.svelte';
 export { default as IconImport } from './icons/import.svelte';
 export { default as IconInactive } from './icons/inactive.svelte';
 export { default as IconInfo } from './icons/info.svelte';
+export { default as IconInvite } from './icons/invite.svelte';
 export { default as IconJava } from './icons/java.svelte';
 export { default as IconJavaColor } from './icons/java-color.svelte';
 export { default as IconJavaColorblock } from './icons/java-colorblock.svelte';
