@@ -13,7 +13,7 @@
   import { getContext, type Snippet } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
-  import { IconCheckmark, IconExternalLink } from '$lib/io/icon';
+  import { IconCheckmark, IconExternalLinkOptical } from '$lib/io/icon';
 
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
@@ -155,7 +155,7 @@
       {@render children?.()}
     </div>
     {#if newTab}
-      <IconExternalLink height={14} width={14} />
+      <IconExternalLinkOptical height={20} width={20} />
     {/if}
   </a>
 {:else}
