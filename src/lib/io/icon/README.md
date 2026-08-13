@@ -20,6 +20,10 @@ They are decorative by default (`aria-hidden`). Pass `title` only when the icon 
 
 There is no `<Icon name="…" />` lookup. To swap icons on state, use an `{#if}` or a small local map of just those icons — never a map of the whole set, which defeats tree-shaking.
 
+Some icons in here are placeholders derived from older artwork rather than drawn
+by design — see [PLACEHOLDERS.md](./PLACEHOLDERS.md), which also lists the glyphs
+we still lack.
+
 ## Preparing an SVG
 
 ### 1. Normalise the viewBox to `0 0 16 16`
