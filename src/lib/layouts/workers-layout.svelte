@@ -5,6 +5,7 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -97,7 +98,13 @@
         id="workers-tab"
         href={workersHref}
         active={page.url.pathname.endsWith('/workers')}
-      ></Tab>
+      >
+        {#if countEnabled}
+          <Badge type="primary" class="px-2 py-0">
+            {$workerCount.count}
+          </Badge>
+        {/if}
+      </Tab>
       <Tab
         label={translate('deployments.deployments')}
         id="deployments-tab"
