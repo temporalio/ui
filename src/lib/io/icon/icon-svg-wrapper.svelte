@@ -27,8 +27,8 @@
 </script>
 
 <svg
-  width="1rem"
-  height="1rem"
+  width="1.143em"
+  height="1.143em"
   viewBox="0 0 16 16"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
