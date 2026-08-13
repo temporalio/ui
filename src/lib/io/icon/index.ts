@@ -64,6 +64,7 @@ export { default as IconEllipsisVertical } from './icons/ellipsis-vertical.svelt
 export { default as IconExclamationCircle } from './icons/exclamation-circle.svelte';
 export { default as IconExclamationOctagon } from './icons/exclamation-octagon.svelte';
 export { default as IconExternalLink } from './icons/external-link.svelte';
+export { default as IconExternalLinkOptical } from './icons-optical/external-link.svelte';
 export { default as IconEyeHide } from './icons/eye-hide.svelte';
 export { default as IconEyeShow } from './icons/eye-show.svelte';
 export { default as IconFeather } from './icons/feather.svelte';

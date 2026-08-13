@@ -25,7 +25,7 @@
   import { translate } from '$lib/i18n/translate';
   import {
     IconChevronLeft,
-    IconExternalLink,
+    IconExternalLinkOptical,
     IconFilter,
     IconMicrochip,
     IconSpinner,
@@ -387,7 +387,7 @@
           {translate('workers.zero-slots-configured')}
         </p>
         <Link
-          TrailingIcon={IconExternalLink}
+          TrailingIcon={IconExternalLinkOptical}
           href="https://docs.temporal.io/develop/worker-performance#custom-slot-implementation"
           newTab
         >
@@ -425,7 +425,7 @@
   <Alert intent="warning" title={translate('workers.go-dependency-warning')}>
     <p class="mb-1">{translate('workers.go-dependency-warning-description')}</p>
     <Link
-      TrailingIcon={IconExternalLink}
+      TrailingIcon={IconExternalLinkOptical}
       href="https://docs.temporal.io/cloud/worker-health#enable-host-resource-reporting"
       newTab
     >
@@ -495,7 +495,7 @@
       </div>
     </dl>
     <Link
-      TrailingIcon={IconExternalLink}
+      TrailingIcon={IconExternalLinkOptical}
       href="https://docs.temporal.io/develop/worker-performance#workflow-cache-tuning"
       newTab
       class="mt-4"

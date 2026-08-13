@@ -1,7 +1,7 @@
 <script lang="ts">
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconExternalLink } from '$lib/io/icon';
+  import { IconExternalLinkOptical } from '$lib/io/icon';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { parameters } from '$lib/stores/events';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -22,7 +22,7 @@
 {#if !$isCloud}
   <div class="flex items-center space-x-4">
     <Link
-      LeadingIcon={IconExternalLink}
+      LeadingIcon={IconExternalLinkOptical}
       class="whitespace-nowrap"
       href={jsonHref}
       newTab={true}

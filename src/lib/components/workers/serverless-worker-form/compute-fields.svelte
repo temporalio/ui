@@ -11,7 +11,7 @@
   import {
     IconChevronDown,
     IconChevronUp,
-    IconExternalLink,
+    IconExternalLinkOptical,
     IconInfo,
   } from '$lib/io/icon';
 
@@ -172,7 +172,7 @@
       type="button"
       href="https://console.aws.amazon.com/lambda"
       target="_blank"
-      TrailingIcon={IconExternalLink}
+      TrailingIcon={IconExternalLinkOptical}
     >
       {translate('workers.open-lambda-console')}
     </Button>
@@ -221,7 +221,7 @@
         type="button"
         href="https://console.cloud.google.com/run/worker-pools"
         target="_blank"
-        TrailingIcon={IconExternalLink}
+        TrailingIcon={IconExternalLinkOptical}
       >
         {translate('workers.open-cloud-run-console')}
       </Button>
@@ -292,7 +292,7 @@
               size="sm"
               href={launchStackHref}
               target="_blank"
-              TrailingIcon={IconExternalLink}
+              TrailingIcon={IconExternalLinkOptical}
             >
               {translate('workers.launch-stack')}
             </Button>

@@ -3,7 +3,7 @@
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    IconExternalLink,
+    IconExternalLinkOptical,
     IconTemporalWorker,
     IconWarning,
   } from '$lib/io/icon';
@@ -41,7 +41,7 @@
       variant="ghost"
       href="https://docs.temporal.io/worker-deployments"
       target="_blank"
-      TrailingIcon={IconExternalLink}
+      TrailingIcon={IconExternalLinkOptical}
     >
       {translate('deployments.self-managed-deployment')}
     </Button>

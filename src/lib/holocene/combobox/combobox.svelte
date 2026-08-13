@@ -57,7 +57,7 @@
     IconAdd,
     IconChevronDown,
     type IconComponent,
-    IconExternalLink,
+    IconExternalLinkOptical,
     IconSpinner,
   } from '$lib/io/icon';
 
@@ -608,7 +608,7 @@
                 size="xs"
                 {href}
                 disabled={hrefDisabled}
-                LeadingIcon={IconExternalLink}
+                LeadingIcon={IconExternalLinkOptical}
               />
             </Tooltip>
           {:else}
@@ -617,7 +617,7 @@
               size="xs"
               {href}
               disabled={hrefDisabled}
-              LeadingIcon={IconExternalLink}
+              LeadingIcon={IconExternalLinkOptical}
             />
           {/if}
         </div>
