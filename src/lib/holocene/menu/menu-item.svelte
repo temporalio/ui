@@ -155,7 +155,7 @@
       {@render children?.()}
     </div>
     {#if newTab}
-      <IconExternalLink height={20} width={20} />
+      <IconExternalLink height={14} width={14} />
     {/if}
   </a>
 {:else}
