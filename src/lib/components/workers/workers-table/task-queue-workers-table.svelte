@@ -22,6 +22,7 @@
     useFallback?: boolean;
     searchAttributes?: Record<string, string>;
     taskQueue: string;
+    total?: number;
   }
 
   let {
@@ -29,22 +30,24 @@
     useFallback = false,
     searchAttributes,
     taskQueue,
+    total: providedTotal,
   }: Props = $props();
 
   const query = $derived(`TaskQueue="${taskQueue}"`);
   const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));
 
-  let total = $state<number | undefined>();
+  let fetchedTotal = $state<number | undefined>();
+  const total = $derived(providedTotal ?? fetchedTotal);
   $effect(() => {
-    if (useFallback || !$workerCountEnabled) {
-      total = undefined;
+    if (providedTotal !== undefined || useFallback || !$workerCountEnabled) {
+      fetchedTotal = undefined;
       return;
     }
     const controller = new AbortController();
     fetchWorkerCount({ namespace, query }, (input, init) =>
       fetch(input, { ...init, signal: controller.signal }),
     ).then(({ count }) => {
-      if (!controller.signal.aborted) total = count;
+      if (!controller.signal.aborted) fetchedTotal = count;
     });
     return () => controller.abort();
   });

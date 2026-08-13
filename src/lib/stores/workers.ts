@@ -15,5 +15,5 @@ export const workerCount = writable({
 export const workerCountEnabled = derived(
   [isCloud, temporalVersion],
   ([$isCloud, $temporalVersion]) =>
-    $isCloud || minimumVersionRequired('1.31.2', $temporalVersion),
+    $isCloud || minimumVersionRequired('1.32.0', $temporalVersion),
 );

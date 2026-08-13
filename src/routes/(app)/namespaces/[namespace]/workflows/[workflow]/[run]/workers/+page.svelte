@@ -8,6 +8,7 @@
 
   const { namespace, workflow: workflowId } = $derived(page.params);
   const taskQueue = $derived($workflowRun?.workflow?.taskQueue ?? '');
+  const total = $derived($workflowRun?.workerCount);
   const workerHeartbeatsEnabled = $derived(
     !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
   );
@@ -17,4 +18,9 @@
   title={`${translate('workflows.workers-tab')} | ${workflowId}`}
   url={page.url.href}
 />
-<WorkersTable {namespace} {taskQueue} useFallback={!workerHeartbeatsEnabled} />
+<WorkersTable
+  {namespace}
+  {taskQueue}
+  {total}
+  useFallback={!workerHeartbeatsEnabled}
+/>
