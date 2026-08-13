@@ -272,15 +272,15 @@
     @apply ml-2 flex items-center justify-center;
   }
 
-  .copy-Icon-container {
+  .copy-icon-container {
     @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
   }
 
-  .disabled-Icon-container {
+  .disabled-icon-container {
     @apply flex h-full w-9 items-center justify-center px-1;
   }
 
-  .clear-Icon-container {
+  .clear-icon-container {
     @apply mr-2 flex w-6 cursor-pointer items-center justify-center;
   }
 
