@@ -15,7 +15,15 @@
     class?: string;
   }
 
-  const { title, class: className, children, ...rest }: Props = $props();
+  const {
+    title,
+    'aria-label': ariaLabel,
+    class: className,
+    children,
+    ...rest
+  }: Props = $props();
+
+  const labelled = $derived(Boolean(title || ariaLabel));
 </script>
 
 <svg
@@ -24,8 +32,9 @@
   viewBox="0 0 16 16"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
-  role={title ? 'img' : undefined}
-  aria-hidden={title ? undefined : true}
+  role={labelled ? 'img' : undefined}
+  aria-hidden={labelled ? undefined : true}
+  aria-label={ariaLabel}
   class={twMerge('shrink-0', className)}
   {...rest}
 >
