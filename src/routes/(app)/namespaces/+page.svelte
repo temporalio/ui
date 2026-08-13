@@ -11,6 +11,7 @@
   import { translate } from '$lib/i18n/translate';
   import { namespaces } from '$lib/stores/namespaces';
   import { routeForNamespace } from '$lib/utilities/route-for';
+  import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
@@ -33,6 +34,8 @@
         {#snippet headers()}
           <TableHeaderRow>
             <th>{translate('common.name')}</th>
+            <th>{translate('namespaces.owner')}</th>
+            <th>{translate('namespaces.retention-period')}</th>
           </TableHeaderRow>
         {/snippet}
         {#each visibleItems as namespace (namespace.namespaceInfo?.name)}
@@ -44,6 +47,8 @@
                 })}>{namespace.namespaceInfo?.name}</Link
               >
             </td>
+            <td>{namespace.namespaceInfo?.ownerEmail ?? '')}</td>
+            <td>{fromSecondsToDaysOrHours(namespace.config?.workflowExecutionRetentionTtl.toString())}</td>
           </TableRow>
         {/each}
       </Table>
