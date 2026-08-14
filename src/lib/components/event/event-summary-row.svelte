@@ -117,8 +117,16 @@
 
   const systemNexus = $derived(
     !isEventGroup(event)
-      ? getSystemNexusEventDisplay(event as WorkflowEvent, namespace)
+      ? getSystemNexusEventDisplay(event as WorkflowEvent, {
+          namespace,
+          workflow,
+          run,
+        })
       : null,
+  );
+
+  const systemNexusSummaryLink = $derived(
+    systemNexus?.extraLinks?.find((link) => link.kind === 'target-execution'),
   );
 
   const displayName = $derived.by(() => {
@@ -383,10 +391,19 @@
           <PayloadSummary value={currentEvent.userMetadata.summary} />
         </div>
       {/if}
-      {#if systemNexus?.extraLinks?.length}
-        {#each systemNexus.extraLinks as extraLink (extraLink.label)}
-          <EventLink view={extraLink} class="max-w-xl" linkClass="truncate" />
-        {/each}
+      {#if systemNexus?.summaryAttribute}
+        <EventDetailsRow
+          key={systemNexus.summaryAttribute.key}
+          value={systemNexus.summaryAttribute.value}
+          {attributes}
+        />
+      {:else if systemNexusSummaryLink}
+        <EventLink
+          view={systemNexusSummaryLink}
+          class="max-w-xl"
+          linkClass="truncate"
+          labelClass="text-xs"
+        />
       {:else if currentEvent?.links?.length && !systemNexus}
         {@const callerPerspective =
           isWorkflowExecutionSignaledEvent(currentEvent)}
@@ -400,6 +417,7 @@
             : linkView}
           class="max-w-xl"
           linkClass="truncate"
+          labelClass="text-xs"
         />
       {/if}
       {#if nonPendingActivityAttempt}

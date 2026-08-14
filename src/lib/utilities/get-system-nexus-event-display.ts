@@ -13,6 +13,7 @@ import {
   type NexusTargetExecution,
 } from '$lib/utilities/nexus-operation-registry';
 import {
+  routeForEventHistoryEvent,
   routeForWorkflow,
   routeForWorkflowsWithQuery,
 } from '$lib/utilities/route-for';
@@ -29,6 +30,7 @@ const NEXUS_STATE_VERBS: Record<string, string> = {
 const HIDDEN_FIELDS = ['endpoint', 'service', 'operation', 'requestId'];
 
 export type SystemNexusEventLink = {
+  kind: 'target-execution' | 'initiated-event';
   label: string;
   value: string;
   href?: string;
@@ -39,6 +41,13 @@ export type SystemNexusEventDisplay = {
   hiddenFields: string[];
   extraAttributes?: Record<string, string>;
   extraLinks?: SystemNexusEventLink[];
+  summaryAttribute?: { key: string; value: string };
+};
+
+export type SystemNexusContext = {
+  namespace?: string;
+  workflow?: string;
+  run?: string;
 };
 
 const targetFromEventLinks = (
@@ -73,8 +82,9 @@ const targetExecutionLink = (
   const workflow = target.workflowId;
   if (!workflow) return null;
 
+  const kind = 'target-execution' as const;
   const label = translate('nexus.target-execution');
-  if (!namespace) return { label, value: workflow };
+  if (!namespace) return { kind, label, value: workflow };
 
   const href = target.runId
     ? routeForWorkflow({ namespace, workflow, run: target.runId })
@@ -83,13 +93,15 @@ const targetExecutionLink = (
         query: `WorkflowId="${workflow}"`,
       });
 
-  return { label, value: workflow, href };
+  return { kind, label, value: workflow, href };
 };
 
 export const getSystemNexusEventDisplay = (
   event: WorkflowEvent,
-  fallbackNamespace?: string,
+  context: SystemNexusContext = {},
 ): SystemNexusEventDisplay | null => {
+  const fallbackNamespace = context.namespace;
+
   if (isNexusOperationScheduledEvent(event)) {
     const attrs = event.nexusOperationScheduledEventAttributes;
     if (String(attrs?.endpoint ?? '') !== '__temporal_system') return null;
@@ -126,6 +138,11 @@ export const getSystemNexusEventDisplay = (
         ? extraAttributes
         : undefined,
       extraLinks: link ? [link] : undefined,
+      // The collapsed history row leads with the signal name on the Initiated
+      // event; Target Execution leads on Delivered.
+      summaryAttribute: descriptor?.signalName
+        ? { key: 'signalName', value: descriptor.signalName }
+        : undefined,
     };
   }
 
@@ -137,23 +154,39 @@ export const getSystemNexusEventDisplay = (
     const descriptor = describeNexusResponse(result as Payload);
     if (!descriptor) return null;
 
-    const extraAttributes: Record<string, string> = {};
-    if (
-      attrs?.scheduledEventId !== undefined &&
-      attrs?.scheduledEventId !== null
-    )
-      extraAttributes.initiatedEventId = String(attrs.scheduledEventId);
+    const links: SystemNexusEventLink[] = [];
+
+    const initiatedEventId =
+      attrs?.scheduledEventId === undefined || attrs?.scheduledEventId === null
+        ? undefined
+        : String(attrs.scheduledEventId);
+
+    if (initiatedEventId) {
+      const { namespace, workflow, run } = context;
+      links.push({
+        kind: 'initiated-event',
+        label: translate('nexus.initiated-event-id'),
+        value: initiatedEventId,
+        href:
+          namespace && workflow && run
+            ? routeForEventHistoryEvent({
+                namespace,
+                workflow,
+                run,
+                eventId: initiatedEventId,
+              })
+            : undefined,
+      });
+    }
 
     const target = descriptor.target ?? targetFromEventLinks(event);
     const link = target ? targetExecutionLink(target, fallbackNamespace) : null;
+    if (link) links.push(link);
 
     return {
       displayName: `${descriptor.label} ${stateFor(event)}`,
       hiddenFields: [...HIDDEN_FIELDS, 'scheduledEventId'],
-      extraAttributes: Object.keys(extraAttributes).length
-        ? extraAttributes
-        : undefined,
-      extraLinks: link ? [link] : undefined,
+      extraLinks: links.length ? links : undefined,
     };
   }
 

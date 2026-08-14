@@ -46,7 +46,9 @@
     $props();
   const { namespace, workflow, run } = $derived(page.params);
 
-  const systemNexus = $derived(getSystemNexusEventDisplay(event, namespace));
+  const systemNexus = $derived(
+    getSystemNexusEventDisplay(event, { namespace, workflow, run }),
+  );
 
   const attributes = $derived.by(() => {
     const attrs = formatAttributes(event);
