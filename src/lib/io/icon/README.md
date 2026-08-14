@@ -14,15 +14,11 @@ Each icon is its own component. There is no code generation — adding one is a 
 <IconAdd title="Add workflow" />
 ```
 
-Icons render at `1rem` (16px) and inherit `color` through `currentColor`. Size is set with attributes, so any sizing class overrides it.
+Icons render at `1.143em`, so they scale with the surrounding text — 16px against the app's 14px body size, 12px in a `text-xs` container. They inherit `color` through `currentColor`. Size is set with attributes, so any sizing class overrides it; reach for one only where the icon has no adjacent text to relate to.
 
-They are decorative by default (`aria-hidden`). Pass `title` only when the icon carries meaning no nearby text conveys.
+They are decorative by default (`aria-hidden`). Pass `title` — or `aria-label`, which wins when both are given — only when the icon carries meaning no nearby text conveys.
 
 There is no `<Icon name="…" />` lookup. To swap icons on state, use an `{#if}` or a small local map of just those icons — never a map of the whole set, which defeats tree-shaking.
-
-Some icons in here are placeholders derived from older artwork rather than drawn
-by design — see [PLACEHOLDERS.md](./PLACEHOLDERS.md), which also lists the glyphs
-we still lack.
 
 ## Preparing an SVG
 
