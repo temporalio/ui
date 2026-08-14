@@ -1,6 +1,6 @@
 import type { Payload } from '$lib/types';
 import type { WorkflowEvent } from '$lib/types/events';
-import { atob } from '$lib/utilities/atob';
+import { binaryProtobufMessageType } from '$lib/utilities/decode-binary-protobuf';
 import {
   isNexusOperationCompletedEvent,
   isNexusOperationScheduledEvent,
@@ -33,12 +33,22 @@ const byRequestMessageType = new Map(
   OPERATIONS.map((operation) => [operation.requestMessageType, operation]),
 );
 
-const messageTypeOf = (payload: Payload): string | null => {
-  const encoding = atob(String(payload?.metadata?.encoding ?? ''));
-  const messageType = atob(String(payload?.metadata?.messageType ?? ''));
-  if (encoding !== 'binary/protobuf' || !messageType) return null;
-  return messageType;
-};
+const messageTypeOf = binaryProtobufMessageType;
+
+/**
+ * Every proto schema any registered operation can decode, keyed by message
+ * type. The generic payload decoder resolves schemas through this, so the
+ * registry stays the single place an operation is declared.
+ */
+const SCHEMAS_BY_MESSAGE_TYPE = new Map(
+  OPERATIONS.flatMap((operation) => [
+    [operation.requestMessageType, operation.requestSchema] as const,
+    [operation.responseMessageType, operation.responseSchema] as const,
+  ]),
+);
+
+export const schemaForMessageType = (messageType: string) =>
+  SCHEMAS_BY_MESSAGE_TYPE.get(messageType) ?? null;
 
 const isSystemEndpoint = (event: WorkflowEvent): boolean =>
   String(event.nexusOperationScheduledEventAttributes?.endpoint ?? '') ===

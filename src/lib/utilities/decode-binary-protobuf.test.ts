@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { requestSchema } from '$lib/system-nexus-endpoints/signal-with-start-workflow/schemas';
+
 import { decodeBinaryProtobuf } from './decode-binary-protobuf';
 
 const SignalWithStartBinaryProtobuf = {
@@ -17,7 +19,10 @@ describe('decodeBinaryProtobuf', () => {
   });
 
   it('decodes a valid binary/protobuf payload', () => {
-    const result = decodeBinaryProtobuf(SignalWithStartBinaryProtobuf) as {
+    const result = decodeBinaryProtobuf(
+      SignalWithStartBinaryProtobuf,
+      requestSchema,
+    ) as {
       data: Record<string, unknown>;
     } | null;
     expect(result).not.toBeNull();
@@ -27,56 +32,54 @@ describe('decodeBinaryProtobuf', () => {
 
   it('accepts a recurse callback and does not call it when no nested payloads are present', () => {
     const recurse = vi.fn((p) => p);
-    const result = decodeBinaryProtobuf(SignalWithStartBinaryProtobuf, recurse);
+    const result = decodeBinaryProtobuf(
+      SignalWithStartBinaryProtobuf,
+      requestSchema,
+      recurse,
+    );
     expect(result).not.toBeNull();
     expect(recurse).not.toHaveBeenCalled();
-  });
-
-  it('returns null and does NOT warn when messageType does not resolve to a known type', () => {
-    const warnSpy = vi
-      .spyOn(console, 'warn')
-      .mockImplementation(() => undefined);
-    const result = decodeBinaryProtobuf({
-      metadata: {
-        encoding: 'YmluYXJ5L3Byb3RvYnVm',
-        messageType: btoa('not.a.real.MessageType'),
-      },
-      data: 'CgVoZWxsbw==',
-    });
-    expect(result).toBeNull();
-    expect(warnSpy).not.toHaveBeenCalled();
   });
 
   it('returns null and DOES warn when fromBinary throws on corrupt data', () => {
     const warnSpy = vi
       .spyOn(console, 'warn')
       .mockImplementation(() => undefined);
-    const result = decodeBinaryProtobuf({
-      metadata: {
-        encoding: 'YmluYXJ5L3Byb3RvYnVm',
-        messageType:
-          'dGVtcG9yYWwuYXBpLndvcmtmbG93c2VydmljZS52MS5TaWduYWxXaXRoU3RhcnRXb3JrZmxvd0V4ZWN1dGlvblJlcXVlc3Q=',
+    const result = decodeBinaryProtobuf(
+      {
+        metadata: {
+          encoding: 'YmluYXJ5L3Byb3RvYnVm',
+          messageType:
+            'dGVtcG9yYWwuYXBpLndvcmtmbG93c2VydmljZS52MS5TaWduYWxXaXRoU3RhcnRXb3JrZmxvd0V4ZWN1dGlvblJlcXVlc3Q=',
+        },
+        data: btoa('this is not valid protobuf binary data!!!'),
       },
-      data: btoa('this is not valid protobuf binary data!!!'),
-    });
+      requestSchema,
+    );
     expect(result).toBeNull();
     expect(warnSpy).toHaveBeenCalledOnce();
     expect(warnSpy.mock.calls[0][0]).toContain('binary/protobuf');
   });
 
   it('returns null when encoding is not binary/protobuf', () => {
-    const result = decodeBinaryProtobuf({
-      metadata: { encoding: 'anNvbi9wbGFpbg==', messageType: btoa('foo') },
-      data: 'dGVzdA==',
-    });
+    const result = decodeBinaryProtobuf(
+      {
+        metadata: { encoding: 'anNvbi9wbGFpbg==', messageType: btoa('foo') },
+        data: 'dGVzdA==',
+      },
+      requestSchema,
+    );
     expect(result).toBeNull();
   });
 
   it('returns null when messageType is missing', () => {
-    const result = decodeBinaryProtobuf({
-      metadata: { encoding: 'YmluYXJ5L3Byb3RvYnVm' },
-      data: 'CgVoZWxsbw==',
-    });
+    const result = decodeBinaryProtobuf(
+      {
+        metadata: { encoding: 'YmluYXJ5L3Byb3RvYnVm' },
+        data: 'CgVoZWxsbw==',
+      },
+      requestSchema,
+    );
     expect(result).toBeNull();
   });
 });

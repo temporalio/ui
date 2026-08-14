@@ -4,11 +4,14 @@
   import { decodeBinaryProtobuf } from '$lib/utilities/decode-binary-protobuf';
 
   import type { SystemNexusInputRendererProps } from '../types';
+  import { requestSchema } from './schemas';
 
   let { payload, maxHeight }: SystemNexusInputRendererProps = $props();
 
   const decoded = $derived(
-    decodeBinaryProtobuf(payload)?.data as Record<string, unknown> | undefined,
+    decodeBinaryProtobuf(payload, requestSchema)?.data as
+      | Record<string, unknown>
+      | undefined,
   );
 
   const payloadsFrom = (value: unknown): Payload[] | null => {

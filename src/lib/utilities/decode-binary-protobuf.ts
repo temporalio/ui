@@ -1,7 +1,3 @@
-import {
-  SignalWithStartWorkflowExecutionRequestSchema,
-  SignalWithStartWorkflowExecutionResponseSchema,
-} from '@buf/temporalio_api.bufbuild_es/temporal/api/workflowservice/v1/request_response_pb.js';
 import { type DescMessage, fromBinary, toJson } from '@bufbuild/protobuf';
 
 import type { Payload } from '$lib/types';
@@ -9,16 +5,13 @@ import type { Payload } from '$lib/types';
 import { atob } from './atob';
 import { isObject } from './is';
 
-const SCHEMA_REGISTRY = new Map<string, DescMessage>([
-  [
-    'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest',
-    SignalWithStartWorkflowExecutionRequestSchema,
-  ],
-  [
-    'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse',
-    SignalWithStartWorkflowExecutionResponseSchema,
-  ],
-]);
+/** The fully-qualified proto message type of a binary/protobuf payload. */
+export const binaryProtobufMessageType = (payload: Payload): string | null => {
+  const encoding = atob(String(payload?.metadata?.encoding ?? ''));
+  const messageType = atob(String(payload?.metadata?.messageType ?? ''));
+  if (encoding !== 'binary/protobuf' || !messageType) return null;
+  return messageType;
+};
 
 const base64ToUint8Array = (b64: string): Uint8Array => {
   // The local `./atob` does UTF-8 decoding via decodeURIComponent — fine for
@@ -59,14 +52,11 @@ const recursivelyDecodeNestedPayloads = (
 
 export const decodeBinaryProtobuf = (
   payload: Payload,
+  schema: DescMessage,
   recurse: (p: Payload) => unknown = (p) => p,
 ): { data: unknown } | null => {
-  const rawEncoding = atob(String(payload?.metadata?.encoding ?? ''));
-  const rawMessageType = atob(String(payload?.metadata?.messageType ?? ''));
-  if (rawEncoding !== 'binary/protobuf' || !rawMessageType) return null;
-
-  const schema = SCHEMA_REGISTRY.get(rawMessageType);
-  if (!schema) return null;
+  const rawMessageType = binaryProtobufMessageType(payload);
+  if (!rawMessageType) return null;
 
   try {
     const bytes = base64ToUint8Array(String(payload?.data ?? ''));

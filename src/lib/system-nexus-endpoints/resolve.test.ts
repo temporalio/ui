@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { WorkflowEvent } from '$lib/types/events';
 
-import { resolveSystemNexusEvent } from './index';
+import { resolveSystemNexusEvent, schemaForMessageType } from './index';
 
 const toBinaryPayload = (
   schema: DescMessage,
@@ -247,5 +247,24 @@ describe('resolveSystemNexusEvent', () => {
     expect(link?.label).toBe('Target Execution');
     expect(link?.value).toBe('system-nexus-workflow-id');
     expect(link?.href).toContain('target-run-id');
+  });
+});
+
+describe('schemaForMessageType', () => {
+  it('resolves schemas for every registered operation payload', () => {
+    expect(
+      schemaForMessageType(
+        'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest',
+      ),
+    ).not.toBeNull();
+    expect(
+      schemaForMessageType(
+        'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse',
+      ),
+    ).not.toBeNull();
+  });
+
+  it('returns null for a message type no operation declares', () => {
+    expect(schemaForMessageType('not.a.real.MessageType')).toBeNull();
   });
 });

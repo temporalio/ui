@@ -1,3 +1,4 @@
+import type { DescMessage } from '@bufbuild/protobuf';
 import type { Component } from 'svelte';
 
 import type { EventTypeCategory } from '$lib/models/event-history/get-event-categorization';
@@ -70,6 +71,10 @@ export type SystemNexusOperationDefinition = {
   /** Fully-qualified proto message types for the operation's request/response. */
   requestMessageType: string;
   responseMessageType: string;
+  /** Schemas used to decode those payloads. Registered here so adding an
+   * operation never means editing a second table elsewhere. */
+  requestSchema: DescMessage;
+  responseSchema: DescMessage;
   /** Human label, e.g. "Signal With Start Workflow Execution". */
   label: string;
   /** Event-name suffix remapping, e.g. Scheduled -> Initiated. */

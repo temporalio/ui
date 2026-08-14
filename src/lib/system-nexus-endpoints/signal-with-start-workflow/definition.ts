@@ -1,7 +1,8 @@
+import type { DescMessage } from '@bufbuild/protobuf';
+
 import type { Payload } from '$lib/types';
 import type { WorkflowEvent } from '$lib/types/events';
 import { decodeBinaryProtobuf } from '$lib/utilities/decode-binary-protobuf';
-import { isRawPayload } from '$lib/utilities/decode-payload';
 import {
   isNexusOperationCompletedEvent,
   isNexusOperationScheduledEvent,
@@ -19,13 +20,14 @@ import type {
   SystemNexusOperationDefinition,
   SystemNexusTarget,
 } from '../types';
+import {
+  REQUEST_MESSAGE_TYPE,
+  requestSchema,
+  RESPONSE_MESSAGE_TYPE,
+  responseSchema,
+} from './schemas';
 
 import InputRenderer from './input-renderer.svelte';
-
-const REQUEST_MESSAGE_TYPE =
-  'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest';
-const RESPONSE_MESSAGE_TYPE =
-  'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse';
 
 const LABEL = 'Signal With Start Workflow Execution';
 
@@ -44,8 +46,8 @@ type Decoded = Record<string, unknown>;
 const getString = (v: unknown): string | undefined =>
   typeof v === 'string' && v ? v : undefined;
 
-const decode = (payload: Payload): Decoded | null =>
-  (decodeBinaryProtobuf(payload)?.data as Decoded) ?? null;
+const decodeWith = (payload: Payload, schema: DescMessage) =>
+  (decodeBinaryProtobuf(payload, schema)?.data as Decoded) ?? null;
 
 const targetFromSignalLink = (
   signalLink: unknown,
@@ -72,6 +74,8 @@ export const signalWithStartWorkflow: SystemNexusOperationDefinition = {
   operationName: 'SignalWithStartWorkflowExecution',
   requestMessageType: REQUEST_MESSAGE_TYPE,
   responseMessageType: RESPONSE_MESSAGE_TYPE,
+  requestSchema,
+  responseSchema,
   label: LABEL,
   stateVerbs: STATE_VERBS,
   hiddenFields: HIDDEN_FIELDS,
@@ -84,7 +88,7 @@ export const signalWithStartWorkflow: SystemNexusOperationDefinition = {
   describeInitiated: (event: WorkflowEvent, context: SystemNexusContext) => {
     if (!isNexusOperationScheduledEvent(event)) return null;
     const input = event.nexusOperationScheduledEventAttributes?.input;
-    const decoded = isRawPayload(input) ? decode(input as Payload) : null;
+    const decoded = input ? decodeWith(input as Payload, requestSchema) : null;
 
     const attributes: Record<string, string> = {};
     const signalName = getString(decoded?.signalName);
@@ -119,9 +123,10 @@ export const signalWithStartWorkflow: SystemNexusOperationDefinition = {
     if (!isNexusOperationCompletedEvent(event)) return null;
     const attrs = event.nexusOperationCompletedEventAttributes;
     const result = attrs?.result;
-    if (!isRawPayload(result)) return null;
+    if (!result) return null;
 
-    const decoded = decode(result as Payload);
+    const decoded = decodeWith(result as Payload, responseSchema);
+    if (!decoded) return null;
     const links: SystemNexusLink[] = [];
 
     const initiatedEventId =
