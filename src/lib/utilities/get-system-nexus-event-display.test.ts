@@ -58,10 +58,12 @@ const scheduledEvent = (
 const completedEvent = (
   init: Record<string, unknown>,
   scheduledEventId = '5',
+  links?: unknown[],
 ) =>
   ({
     id: '6',
     name: 'NexusOperationCompleted',
+    links,
     nexusOperationCompletedEventAttributes: {
       scheduledEventId,
       result: responsePayload(init),
@@ -187,5 +189,25 @@ describe('getSystemNexusEventDisplay', () => {
       completedEvent({ runId: 'target-run-id', started: true }),
     );
     expect(display?.extraLinks).toBeUndefined();
+  });
+
+  it('falls back to event links when the response carries no signalLink', () => {
+    const display = getSystemNexusEventDisplay(
+      completedEvent({ runId: 'target-run-id', started: true }, '5', [
+        {
+          workflowEvent: {
+            namespace: 'default',
+            workflowId: 'system-nexus-workflow-id',
+            runId: 'target-run-id',
+            requestIdRef: { requestId: 'b580d786' },
+          },
+        },
+      ]),
+    );
+
+    const link = display?.extraLinks?.[0];
+    expect(link?.label).toBe('Target Execution');
+    expect(link?.value).toBe('system-nexus-workflow-id');
+    expect(link?.href).toContain('target-run-id');
   });
 });

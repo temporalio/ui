@@ -41,6 +41,25 @@ export type SystemNexusEventDisplay = {
   extraLinks?: SystemNexusEventLink[];
 };
 
+const targetFromEventLinks = (
+  event: WorkflowEvent,
+): NexusTargetExecution | undefined => {
+  const workflowEvent = event.links?.find(
+    (link) => link?.workflowEvent,
+  )?.workflowEvent;
+  if (!workflowEvent) return undefined;
+
+  return {
+    namespace: workflowEvent.namespace ?? undefined,
+    workflowId: workflowEvent.workflowId ?? undefined,
+    runId: workflowEvent.runId ?? undefined,
+    eventId:
+      workflowEvent.eventRef?.eventId === undefined
+        ? undefined
+        : String(workflowEvent.eventRef.eventId),
+  };
+};
+
 const stateFor = (event: WorkflowEvent): string => {
   const rawState = event.name.replace('NexusOperation', '');
   return NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
@@ -125,12 +144,8 @@ export const getSystemNexusEventDisplay = (
     )
       extraAttributes.initiatedEventId = String(attrs.scheduledEventId);
 
-    const link = descriptor.target
-      ? targetExecutionLink(
-          { ...descriptor.target, runId: descriptor.target.runId },
-          fallbackNamespace,
-        )
-      : null;
+    const target = descriptor.target ?? targetFromEventLinks(event);
+    const link = target ? targetExecutionLink(target, fallbackNamespace) : null;
 
     return {
       displayName: `${descriptor.label} ${stateFor(event)}`,

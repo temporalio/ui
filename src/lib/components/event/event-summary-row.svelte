@@ -23,7 +23,6 @@
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
-  import { isRawPayload } from '$lib/utilities/decode-payload';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { toEventLinkView } from '$lib/utilities/event-link';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -38,6 +37,7 @@
   import {
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
+    isWorkflowExecutionSignaledEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
@@ -117,7 +117,7 @@
 
   const systemNexus = $derived(
     !isEventGroup(event)
-      ? getSystemNexusEventDisplay(event as WorkflowEvent)
+      ? getSystemNexusEventDisplay(event as WorkflowEvent, namespace)
       : null,
   );
 
@@ -383,9 +383,21 @@
           <PayloadSummary value={currentEvent.userMetadata.summary} />
         </div>
       {/if}
-      {#if currentEvent?.links?.length}
+      {#if systemNexus?.extraLinks?.length}
+        {#each systemNexus.extraLinks as extraLink (extraLink.label)}
+          <EventLink view={extraLink} class="max-w-xl" linkClass="truncate" />
+        {/each}
+      {:else if currentEvent?.links?.length && !systemNexus}
+        {@const callerPerspective =
+          isWorkflowExecutionSignaledEvent(currentEvent)}
+        {@const linkView = toEventLinkView(currentEvent.links[0], {
+          namespace,
+          ...(callerPerspective && { perspective: 'caller' as const }),
+        })}
         <EventLink
-          view={toEventLinkView(currentEvent.links[0], { namespace })}
+          view={callerPerspective
+            ? { ...linkView, label: translate('nexus.caller-execution') }
+            : linkView}
           class="max-w-xl"
           linkClass="truncate"
         />

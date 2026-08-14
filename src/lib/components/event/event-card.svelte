@@ -130,7 +130,7 @@
   </div>
   <div class="flex flex-col gap-1 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
-      {#if event?.links?.length}
+      {#if event?.links?.length && !systemNexus}
         {#if event.category === 'nexus'}
           {@render nexusHandlerLinks(event.links)}
         {:else if isWorkflowExecutionSignaledEvent(event)}
