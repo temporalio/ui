@@ -407,9 +407,10 @@ pnpm validate:versions
 `weekly-oncall-review.yml` creates one Slack thread in `#oncall-frontend` and
 fans out to small, independently callable review modules. It runs every Monday
 at 14:00 UTC and can also be started from **Actions → Weekly On-Call Review**.
-The scheduled run uses `apply` mode and notifications. Manual runs default to
-`dry-run`; choose `apply` only when the generated dependency remediation draft
-PR may be updated. Manual notifications default to `C0BPXR260DA`
+The scheduled run uses `dry-run` mode and notifications. Until the Claude
+resolver is integrated, it does not update the generated dependency remediation
+draft PR. Manual runs also default to `dry-run`; choose `apply` only when the
+generated dependency remediation draft PR may be updated. Manual notifications default to `C0BPXR260DA`
 (`#other-ross-tests-stuff`) so test runs do not post to the on-call channel.
 The `slack_channel` input accepts another Slack channel ID when needed.
 Scheduled runs ignore that input and always use

@@ -57,7 +57,7 @@ jobs:
           slack_channel="$REQUESTED_SLACK_CHANNEL"
 
           if [ "$EVENT_NAME" = 'schedule' ]; then
-            mode='apply'
+            mode='dry-run'
             notify='true'
             slack_channel="$SCHEDULED_SLACK_CHANNEL"
           fi
@@ -117,7 +117,7 @@ jobs:
     with:
       mode: ${{ needs.resolve-inputs.outputs.mode }}
       notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
-      slack_channel: ${{ needs.resolve-inputs.outputs.slack_channel }}
+      slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
       thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -130,7 +130,7 @@ jobs:
     uses: ./.github/workflows/weekly-vln-review.yml
     with:
       notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
-      slack_channel: ${{ needs.resolve-inputs.outputs.slack_channel }}
+      slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
       thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -141,7 +141,7 @@ jobs:
     uses: ./.github/workflows/weekly-external-contributor-review.yml
     with:
       notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
-      slack_channel: ${{ needs.resolve-inputs.outputs.slack_channel }}
+      slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
       thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
