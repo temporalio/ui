@@ -65,6 +65,60 @@ jobs:
           echo "last-tag=$LAST_TAG" >> $GITHUB_OUTPUT
           echo "Last version tag: $LAST_TAG"
 
+      - name: Check for go.temporal.io/api upgrade
+        id: check-api-upgrade
+        if: inputs.mode == 'auto' || inputs.mode == 'dry-run'
+        env:
+          LAST_TAG: ${{ steps.last-tag.outputs.last-tag }}
+        run: |
+          api_version() {
+            awk '$1 == "go.temporal.io/api" { print $2; exit }'
+          }
+
+          # v1.63.5, v1.64.0-rc1 and v1.63.5-0.20240101-abc all reduce to "1 63 5"
+          version_core() {
+            printf '%s' "${1#v}" | sed -E 's/[-+].*$//' | tr '.' ' '
+          }
+
+          # Succeeds when $2 is a higher version than $1
+          is_upgrade() {
+            local -a previous current
+            read -r -a previous <<<"$(version_core "$1")"
+            read -r -a current <<<"$(version_core "$2")"
+            local i p c
+            for i in 0 1 2; do
+              p=${previous[$i]:-0}
+              c=${current[$i]:-0}
+              [[ "$p" =~ ^[0-9]+$ ]] || p=0
+              [[ "$c" =~ ^[0-9]+$ ]] || c=0
+              (( c > p )) && return 0
+              (( c < p )) && return 1
+            done
+            return 1
+          }
+
+          CURRENT=$(api_version < server/go.mod)
+          if [[ -z "$CURRENT" ]]; then
+            echo "⚠️ No go.temporal.io/api require found in server/go.mod, skipping check"
+          fi
+
+          if PREVIOUS_MOD=$(git show "$LAST_TAG:server/go.mod" 2>/dev/null); then
+            PREVIOUS=$(printf '%s\n' "$PREVIOUS_MOD" | api_version)
+            if [[ -z "$PREVIOUS" ]]; then
+              echo "⚠️ No go.temporal.io/api require found in server/go.mod at $LAST_TAG, skipping check"
+            fi
+          else
+            PREVIOUS=""
+            echo "⚠️ Could not read server/go.mod at $LAST_TAG"
+          fi
+
+          if [[ -n "$PREVIOUS" && -n "$CURRENT" ]] && is_upgrade "$PREVIOUS" "$CURRENT"; then
+            echo "✨ go.temporal.io/api upgraded from $PREVIOUS to $CURRENT since $LAST_TAG"
+            echo "upgraded=true" >> $GITHUB_OUTPUT
+          else
+            echo "upgraded=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Analyze merged PRs since last version
         id: analyze-prs
         if: inputs.mode == 'auto' || inputs.mode == 'dry-run'
@@ -72,6 +126,23 @@ jobs:
         with:
           from-ref: ${{ steps.last-tag.outputs.last-tag }}
           to-ref: HEAD
+
+      - name: Resolve bump type
+        id: resolve-bump
+        if: inputs.mode == 'auto' || inputs.mode == 'dry-run'
+        env:
+          ANALYZED_BUMP_TYPE: ${{ steps.analyze-prs.outputs.bump-type }}
+          API_UPGRADED: ${{ steps.check-api-upgrade.outputs.upgraded }}
+        run: |
+          BUMP_TYPE="$ANALYZED_BUMP_TYPE"
+
+          if [[ "$API_UPGRADED" == "true" && "$BUMP_TYPE" == "patch" ]]; then
+            echo "⬆️ go.temporal.io/api was upgraded, raising patch to minor"
+            BUMP_TYPE="minor"
+          fi
+
+          echo "Resolved bump type: $BUMP_TYPE (from commits: $ANALYZED_BUMP_TYPE)"
+          echo "bump-type=$BUMP_TYPE" >> $GITHUB_OUTPUT
 
       - name: Get HEAD SHA for changelog
         id: get-head-sha
@@ -93,7 +164,7 @@ jobs:
         uses: temporalio/pack-dependency-actions/calculate-semantic-version@bf23e855ebebec9a0be45eff67c88a4189210c55 # v1.5.0
         with:
           current-version: ${{ steps.validate-sync.outputs.current-version }}
-          bump-type: ${{ inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type }}
+          bump-type: ${{ inputs.mode == 'manual' && inputs.version_type || steps.resolve-bump.outputs.bump-type }}
           specific-version: ${{ inputs.specific_version }}
 
       - name: Dry run summary
@@ -103,7 +174,8 @@ jobs:
           NEW_VERSION: ${{ steps.calculate-version.outputs.new-version }}
           SPECIFIC_VERSION: ${{ inputs.specific_version }}
           INPUT_MODE: ${{ inputs.mode }}
-          BUMP_TYPE: ${{ steps.analyze-prs.outputs.bump-type }}
+          BUMP_TYPE: ${{ steps.resolve-bump.outputs.bump-type }}
+          API_UPGRADED: ${{ steps.check-api-upgrade.outputs.upgraded }}
           VERSION_CHANGED: ${{ steps.calculate-version.outputs.version-changed }}
           CHANGELOG: ${{ steps.generate-changelog.outputs.changelog }}
         run: |
@@ -121,6 +193,9 @@ jobs:
             fi
             echo "**Version Source:** $VERSION_SOURCE"
             echo "**Bump Type:** $BUMP_TYPE"
+            if [[ "$API_UPGRADED" == "true" ]]; then
+              echo "**go.temporal.io/api:** upgraded since last version (minimum minor)"
+            fi
           fi
           echo "**Version Changed:** $VERSION_CHANGED"
           echo ""
@@ -164,7 +239,8 @@ jobs:
 
             Auto-generated version bump from ${{ steps.validate-sync.outputs.current-version }} to ${{ steps.calculate-version.outputs.new-version }}
 
-            ${{ inputs.specific_version && format('Specific version: {0}', inputs.specific_version) || format('Bump type: {0}', inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type) }}
+            ${{ inputs.specific_version && format('Specific version: {0}', inputs.specific_version) || format('Bump type: {0}', inputs.mode == 'manual' && inputs.version_type || steps.resolve-bump.outputs.bump-type) }}
+            ${{ steps.check-api-upgrade.outputs.upgraded == 'true' && 'go.temporal.io/api: upgraded since last version (minimum minor)' || '' }}
 
             Changes included:
             ${{ steps.generate-changelog.outputs.changelog || 'No commits since last version' }}
@@ -179,7 +255,8 @@ jobs:
             - `server/server/version/version.go`
 
             ### 📝 Bump Details
-            ${{ inputs.specific_version && format('- **Version Source:** Specific version override\n- **Specified Version:** {0}', inputs.specific_version) || format('- **Bump Type:** {0}', inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type) }}
+            ${{ inputs.specific_version && format('- **Version Source:** Specific version override\n- **Specified Version:** {0}', inputs.specific_version) || format('- **Bump Type:** {0}', inputs.mode == 'manual' && inputs.version_type || steps.resolve-bump.outputs.bump-type) }}
+            ${{ steps.check-api-upgrade.outputs.upgraded == 'true' && '- **go.temporal.io/api:** upgraded since last version (minimum minor)' || '' }}
             - **Mode:** ${{ inputs.mode }}
 
             ### 📖 Changes Since Last Version
