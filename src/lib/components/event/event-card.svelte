@@ -25,7 +25,10 @@
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { getSystemNexusEventDisplay } from '$lib/utilities/get-system-nexus-event-display';
+  import {
+    getSystemNexusEventDisplay,
+    type SystemNexusEventLink,
+  } from '$lib/utilities/get-system-nexus-event-display';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { describeNexusOperation } from '$lib/utilities/nexus-operation-registry';
   import {
@@ -38,7 +41,7 @@
   let { event }: { event: WorkflowEvent } = $props();
   const { namespace, workflow, run } = $derived(page.params);
 
-  const systemNexus = $derived(getSystemNexusEventDisplay(event));
+  const systemNexus = $derived(getSystemNexusEventDisplay(event, namespace));
 
   const attributes = $derived.by(() => {
     const attrs = formatAttributes(event);
@@ -128,6 +131,9 @@
       {#if event?.userMetadata?.summary}
         {@render eventSummary(event.userMetadata.summary)}
       {/if}
+      {#each systemNexus?.extraLinks ?? [] as extraLink (extraLink.label)}
+        {@render systemNexusLink(extraLink)}
+      {/each}
       {#each detailFields as [key, value] (key)}
         {@render details(key, value)}
       {/each}
@@ -251,6 +257,27 @@
       />
     </div>
   {/if}
+{/snippet}
+
+{#snippet systemNexusLink(nexusLink: SystemNexusEventLink)}
+  <div class="flex items-start gap-4">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {nexusLink.label}
+    </p>
+    <Copyable
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      content={nexusLink.value}
+    >
+      {#if nexusLink.href}
+        <Link href={nexusLink.href} class="whitespace-pre-line"
+          >{nexusLink.value}</Link
+        >
+      {:else}
+        <p class="whitespace-pre-line text-sm">{nexusLink.value}</p>
+      {/if}
+    </Copyable>
+  </div>
 {/snippet}
 
 {#snippet link(key, value)}

@@ -1,3 +1,4 @@
+import { translate } from '$lib/i18n/translate';
 import type { Payload } from '$lib/types';
 import type { WorkflowEvent } from '$lib/types/events';
 import { isRawPayload } from '$lib/utilities/decode-payload';
@@ -8,8 +9,13 @@ import {
 } from '$lib/utilities/is-event-type';
 import {
   describeNexusOperation,
-  getSystemNexusLabelFromResponsePayload,
+  describeNexusResponse,
+  type NexusTargetExecution,
 } from '$lib/utilities/nexus-operation-registry';
+import {
+  routeForWorkflow,
+  routeForWorkflowsWithQuery,
+} from '$lib/utilities/route-for';
 
 const SYSTEM_NEXUS_LABELS: Record<string, string> = {
   SignalWithStartWorkflowExecution: 'Signal With Start Workflow Execution',
@@ -22,14 +28,48 @@ const NEXUS_STATE_VERBS: Record<string, string> = {
 
 const HIDDEN_FIELDS = ['endpoint', 'service', 'operation', 'requestId'];
 
+export type SystemNexusEventLink = {
+  label: string;
+  value: string;
+  href?: string;
+};
+
 export type SystemNexusEventDisplay = {
   displayName: string;
   hiddenFields: string[];
   extraAttributes?: Record<string, string>;
+  extraLinks?: SystemNexusEventLink[];
+};
+
+const stateFor = (event: WorkflowEvent): string => {
+  const rawState = event.name.replace('NexusOperation', '');
+  return NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
+};
+
+const targetExecutionLink = (
+  target: NexusTargetExecution,
+  fallbackNamespace?: string,
+): SystemNexusEventLink | null => {
+  const namespace = target.namespace || fallbackNamespace;
+  const workflow = target.workflowId;
+  if (!workflow) return null;
+
+  const label = translate('nexus.target-execution');
+  if (!namespace) return { label, value: workflow };
+
+  const href = target.runId
+    ? routeForWorkflow({ namespace, workflow, run: target.runId })
+    : routeForWorkflowsWithQuery({
+        namespace,
+        query: `WorkflowId="${workflow}"`,
+      });
+
+  return { label, value: workflow, href };
 };
 
 export const getSystemNexusEventDisplay = (
   event: WorkflowEvent,
+  fallbackNamespace?: string,
 ): SystemNexusEventDisplay | null => {
   if (isNexusOperationScheduledEvent(event)) {
     const attrs = event.nexusOperationScheduledEventAttributes;
@@ -39,44 +79,63 @@ export const getSystemNexusEventDisplay = (
     const baseLabel = SYSTEM_NEXUS_LABELS[op];
     if (!baseLabel) return null;
 
-    const rawState = event.name.replace('NexusOperation', '');
-    const state =
-      NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
-
     const input = attrs.input;
     const descriptor = isRawPayload(input)
       ? describeNexusOperation(input as Payload)
       : null;
 
     const extraAttributes: Record<string, string> = {};
-    if (descriptor?.workflowId)
-      extraAttributes.workflowId = descriptor.workflowId;
     if (descriptor?.signalName)
       extraAttributes.signalName = descriptor.signalName;
+    if (descriptor?.identity) extraAttributes.identity = descriptor.identity;
+    if (descriptor?.control) extraAttributes.control = descriptor.control;
+
+    const link = descriptor?.workflowId
+      ? targetExecutionLink(
+          {
+            namespace: descriptor.namespace,
+            workflowId: descriptor.workflowId,
+          },
+          fallbackNamespace,
+        )
+      : null;
 
     return {
-      displayName: `${baseLabel} ${state}`,
+      displayName: `${baseLabel} ${stateFor(event)}`,
       hiddenFields: HIDDEN_FIELDS,
       extraAttributes: Object.keys(extraAttributes).length
         ? extraAttributes
         : undefined,
+      extraLinks: link ? [link] : undefined,
     };
   }
 
   if (isNexusOperationCompletedEvent(event)) {
-    const result = event.nexusOperationCompletedEventAttributes.result;
+    const attrs = event.nexusOperationCompletedEventAttributes;
+    const result = attrs.result;
     if (!isRawPayload(result)) return null;
 
-    const baseLabel = getSystemNexusLabelFromResponsePayload(result as Payload);
-    if (!baseLabel) return null;
+    const descriptor = describeNexusResponse(result as Payload);
+    if (!descriptor) return null;
 
-    const rawState = event.name.replace('NexusOperation', '');
-    const state =
-      NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
+    const extraAttributes: Record<string, string> = {};
+    if (attrs.scheduledEventId !== undefined && attrs.scheduledEventId !== null)
+      extraAttributes.initiatedEventId = String(attrs.scheduledEventId);
+
+    const link = descriptor.target
+      ? targetExecutionLink(
+          { ...descriptor.target, runId: descriptor.target.runId },
+          fallbackNamespace,
+        )
+      : null;
 
     return {
-      displayName: `${baseLabel} ${state}`,
-      hiddenFields: HIDDEN_FIELDS,
+      displayName: `${descriptor.label} ${stateFor(event)}`,
+      hiddenFields: [...HIDDEN_FIELDS, 'scheduledEventId'],
+      extraAttributes: Object.keys(extraAttributes).length
+        ? extraAttributes
+        : undefined,
+      extraLinks: link ? [link] : undefined,
     };
   }
 

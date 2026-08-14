@@ -75,6 +75,7 @@ export const Strings = {
   'nexus-service': 'Nexus Service',
   'nexus-endpoint-simple': 'Nexus Endpoint',
   'nexus-operation': 'Nexus Operation',
+  'target-execution': 'Target Execution',
   'caller-event': 'Caller Event',
   'caller-link': 'Caller Link',
   'caller-workflow': 'Caller Workflow',
