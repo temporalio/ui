@@ -1,110 +1,119 @@
 ---
 name: system-nexus-operation
-description: How the UI renders system Nexus endpoint operations, and how to add a new one. Use when asked to add, scaffold, or change rendering for a `__temporal_system` Nexus operation such as SignalWithStart, StartWorkflow, SignalWorkflow, or QueryWorkflow — or when event history shows a raw "Nexus Operation Scheduled" card that should read as a friendlier operation.
+description: How the UI shows system Nexus endpoint operations, and how to add a new one. Use this skill when a person adds, scaffolds, or changes the display of a `__temporal_system` Nexus operation such as SignalWithStart, StartWorkflow, SignalWorkflow, or QueryWorkflow. Also use it when the event history shows a raw "Nexus Operation Scheduled" card that must show the operation.
 ---
 
-# System Nexus Operations
+# System Nexus operations
 
-Temporal exposes a built-in `__temporal_system` Nexus endpoint. A workflow calling
-it produces ordinary `NexusOperationScheduled` / `NexusOperationCompleted` events
-whose payloads are `binary/protobuf` workflowservice request/response messages.
+Temporal has a system Nexus endpoint with the name `__temporal_system`. A workflow
+calls this endpoint to do an operation on a different workflow.
 
-Left alone, the UI renders those as raw Nexus wrapper events. This module decodes
-the payload and presents the operation the user actually invoked.
+The call makes two usual events: `NexusOperationScheduled` and
+`NexusOperationCompleted`. The payload of each event is a workflowservice message
+in `binary/protobuf` format.
 
-## Where it lives
+Without this module, the UI shows the Nexus transport. This module decodes the
+payload and shows the operation.
+
+## Where the code is
 
 ```
 src/lib/system-nexus-endpoints/
-├── index.ts                        registry + the public API
-├── types.ts                        SystemNexusOperationDefinition contract
-├── shared.ts                       link/target/state helpers
+├── index.ts                        the registry and the public functions
+├── types.ts                        the SystemNexusOperationDefinition contract
+├── shared.ts                       helpers for links, targets, and states
 └── <operation-kind>/
-    ├── schemas.ts                  proto message types + bufbuild schemas
-    ├── definition.ts               everything about this operation
-    └── input-renderer.svelte       how its input payload renders
+    ├── schemas.ts                  the proto message types and schemas
+    ├── definition.ts               all the data about this operation
+    └── input-renderer.svelte       the display of its input payload
 ```
 
-**All per-operation knowledge belongs in a definition.** Host components must
-never branch on an operation. If you find yourself adding
-`if (operation === 'SignalWithStart')` to a component, it belongs in a definition
-instead.
+**Put all the data about an operation in its definition.** A component must not
+test for an operation. If you write `if (operation === 'SignalWithStart')` in a
+component, move that code to a definition.
 
-## The public API
+## The public functions
 
-Host components consume exactly four functions:
+The components use four functions only:
 
 | Function                              | Used by                                                                       |
 | ------------------------------------- | ----------------------------------------------------------------------------- |
 | `resolveSystemNexusEvent(event, ctx)` | `event-card`, `event-summary-row`, `event-details-full`, `timeline-graph-row` |
 | `systemNexusInputRenderer(payload)`   | `event-card`, `input-and-results-payload`                                     |
 | `systemNexusGroupLabel(event)`        | `get-group-name`                                                              |
-| `schemaForMessageType(messageType)`   | `decode-payload` (generic binary/protobuf decode)                             |
+| `schemaForMessageType(messageType)`   | `decode-payload`, for all binary protobuf payloads                            |
 
-`resolveSystemNexusEvent` returns `null` for anything that is not a registered
-operation, so callers fall through to normal event rendering.
+`resolveSystemNexusEvent` gives `null` for an operation that is not in the
+registry. Thus the other events keep their usual display.
 
-## Adding an operation
+## How to add an operation
 
-Scaffold it:
+Use the generator:
 
 ```bash
 pnpm system-nexus-operation:new StartWorkflowExecution --kind start-workflow --category workflow
 ```
 
-| Flag           | Meaning                               | Default                     |
-| -------------- | ------------------------------------- | --------------------------- |
-| _(positional)_ | Proto operation name, PascalCase      | required                    |
-| `--kind`       | Directory name + kind slug            | kebab-case of the operation |
-| `--category`   | Timeline category (colour + icon)     | `nexus`                     |
-| `--grouped`    | Expand the whole event group together | off (one event at a time)   |
+| Flag           | Function                               | Default                          |
+| -------------- | -------------------------------------- | -------------------------------- |
+| _(positional)_ | The proto operation name in PascalCase | necessary                        |
+| `--kind`       | The directory name and the kind slug   | the operation name in kebab case |
+| `--category`   | The timeline color and icon            | `nexus`                          |
+| `--grouped`    | Open all the events in the group       | off, thus the UI opens one event |
 
-That writes the three files, widens the `SystemNexusOperationKind` union, and adds
-the definition to `OPERATIONS`. The generated code compiles and lints as-is.
+The generator writes the three files. It adds the new kind to the
+`SystemNexusOperationKind` union. It also adds the definition to `OPERATIONS`.
+The new code compiles, and it obeys the lint rules.
 
-Then fill in the two TODOs:
+Then complete the two TODO comments:
 
-1. **`definition.ts` → `describeInitiated` / `describeTerminal`** — pull the fields
-   this operation should surface off the decoded payload and return
+1. **`definition.ts`, in `describeInitiated` and `describeTerminal`** — read the
+   necessary fields from the decoded payload. Give back
    `{ displayName, hiddenFields, attributes?, links, summaryAttribute? }`.
-2. **`input-renderer.svelte`** — render the payload panels the design calls for.
+2. **`input-renderer.svelte`** — show the payload panels from the design.
 
-Finally: `pnpm lint && pnpm check && pnpm test -- --run`.
+At the end, do this command: `pnpm lint && pnpm check && pnpm test -- --run`.
 
-## Definition fields worth thinking about
+## Important fields in a definition
 
-- **`operationName`** must exactly match the `operation` field on
-  `NexusOperationScheduled`. A typo is not a compile error — the operation silently
-  falls through to default Nexus rendering.
-- **`stateVerbs`** remaps the event-name suffix, e.g. `Scheduled → Initiated`,
-  `Completed → Delivered`.
-- **`hiddenFields`** suppresses raw Nexus wrapper fields (`endpoint`, `service`,
-  `operation`, `requestId`) so the card reads as the operation, not as Nexus.
-- **`expandsIndividually`** — `true` when the paired events carry near-identical
-  fields (synchronous operations like SignalWithStart), so expanding one does not
-  open both. `false` restores the normal grouped expansion.
-- **`summaryAttribute`** is what the collapsed history row leads with when there is
-  no link to show.
+- **`operationName`** must be the same as the `operation` field on
+  `NexusOperationScheduled`. The compiler does not find an error in this string.
+  If the string is not correct, the UI shows the usual Nexus display.
+- **`stateVerbs`** changes the last part of the event name. Example:
+  `Scheduled` becomes `Initiated`, and `Completed` becomes `Delivered`.
+- **`hiddenFields`** removes the Nexus transport fields from the card:
+  `endpoint`, `service`, `operation`, and `requestId`.
+- **`expandsIndividually`** controls the display of a group. Set it to `true` if
+  the two events show almost the same fields. Then the UI opens one card only.
+  Set it to `false` to keep the usual group behavior.
+- **`summaryAttribute`** is the first item in the collapsed history row, if the
+  row has no link.
 
-## Testing
+## How to test
 
-`src/lib/system-nexus-endpoints/resolve.test.ts` builds fixtures with `create()`
-and `toBinary()` from the real bufbuild schemas rather than hand-rolled base64.
-Copy that pattern — it catches message-type and field-name drift that hand-written
-fixtures hide.
+The file `src/lib/system-nexus-endpoints/resolve.test.ts` makes its test data with
+`create()` and `toBinary()` from the true bufbuild schemas. Do not write the
+base64 data manually.
 
-## Known limitation
+Use the same method. It finds a change in a message type or a field name. Manual
+test data hides these changes.
 
-Terminal events other than `Completed` — `NexusOperationFailed`, `TimedOut`,
-`Canceled` — cannot currently be resolved. Their attributes carry only
-`scheduled_event_id`, `failure`, and `request_id`; there is no `endpoint` or
-`operation`, so the event cannot identify itself without its Scheduled sibling.
-`stateVerbs` already carries labels for them; wiring it up requires passing the
-event group into `resolveSystemNexusEvent`.
+## A known limit
 
-## Exercising it locally
+The module cannot resolve the `NexusOperationFailed`, `NexusOperationTimedOut`,
+and `NexusOperationCanceled` events.
 
-The operation only appears if the Temporal server supports it. See the
-`local-temporal` skill for running against a local server build, and note that
-`history.enableChasm` and `history.enableSignalWithStartFromWorkflow` must be
-enabled in dynamic config.
+These events have only `scheduled_event_id`, `failure`, and `request_id`. They do
+not have an `endpoint` field or an `operation` field. Thus the event cannot
+identify itself without its related Scheduled event.
+
+`stateVerbs` has the labels for these events. To complete this function, send the
+event group to `resolveSystemNexusEvent`.
+
+## How to see the display on your computer
+
+The Temporal server must support the operation. Read the `local-temporal` skill
+for the procedure to run a local server build.
+
+You must also enable `history.enableChasm` and
+`history.enableSignalWithStartFromWorkflow` in the dynamic configuration.
