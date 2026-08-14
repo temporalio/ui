@@ -135,6 +135,7 @@ export const Strings = {
   'form-nexus-header-key-placeholder': 'Key',
   'form-nexus-header-value-placeholder': 'Value',
   'form-add-nexus-header': 'Add Header',
+  'form-remove-nexus-header': 'Remove Header',
   'form-search-attributes-heading': 'Search Attributes',
   'form-search-attributes-description':
     'Custom fields used to filter Nexus Operations in tables and lists.',

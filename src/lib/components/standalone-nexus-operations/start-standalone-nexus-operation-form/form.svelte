@@ -589,6 +589,9 @@
               type="button"
               variant="ghost"
               leadingIcon="close"
+              aria-label={translate(
+                'standalone-nexus-operations.form-remove-nexus-header',
+              )}
               onclick={() => removeNexusHeader(index)}
             />
           </div>

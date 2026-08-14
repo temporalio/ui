@@ -158,6 +158,7 @@
               }}
               variant="secondary"
               leadingIcon="close"
+              aria-label={translate('workflows.clear-custom-update-name')}
               disabled={loading}
             />
           {/if}

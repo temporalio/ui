@@ -88,6 +88,9 @@
       leadingIcon="close"
       data-testid="search-attribute-close-button"
       class="mt-6 w-10 rounded-full sm:hidden"
+      aria-label={translate('workflows.remove-filter-label', {
+        attribute: label,
+      })}
       onclick={() => onRemove(label)}
     />
   </div>
@@ -145,6 +148,9 @@
     leadingIcon="close"
     data-testid="search-attribute-close-button"
     class="mt-6 w-10 rounded-full max-sm:hidden"
+    aria-label={translate('workflows.remove-filter-label', {
+      attribute: label,
+    })}
     onclick={() => onRemove(label)}
   />
 </div>

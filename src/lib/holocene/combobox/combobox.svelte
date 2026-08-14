@@ -604,6 +604,7 @@
                 {href}
                 disabled={hrefDisabled}
                 leadingIcon="external-link"
+                aria-label={actionTooltip}
               />
             </Tooltip>
           {:else}
@@ -613,6 +614,7 @@
               {href}
               disabled={hrefDisabled}
               leadingIcon="external-link"
+              aria-label={translate('common.view-label', { label })}
             />
           {/if}
         </div>

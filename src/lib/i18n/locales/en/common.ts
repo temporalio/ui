@@ -91,6 +91,7 @@ export const Strings = {
   delete: 'Delete',
   discard: 'Discard',
   view: 'View',
+  'view-label': 'View {{label}}',
   memo: 'Memo',
   notes: 'Notes',
   news: 'Temporal News',

@@ -120,6 +120,7 @@ export const Strings = {
   'signal-payload-input-label': 'Data',
   'signal-payload-input-label-hint': 'Single JSON payload supported.',
   'update-modal-title': 'Send an Update',
+  'clear-custom-update-name': 'Clear custom Update name',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
     "The request to cancel this Workflow Execution has been sent. If the Workflow uses the cancellation API, it'll cancel at the next available opportunity.",
