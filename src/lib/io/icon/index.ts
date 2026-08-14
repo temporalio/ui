@@ -99,7 +99,6 @@ export { default as IconJavaColorblock } from './icons/java-colorblock.svelte';
 export { default as IconJson } from './icons/json.svelte';
 export { default as IconKey } from './icons/key.svelte';
 export { default as IconKeyboard } from './icons/keyboard.svelte';
-export { default as IconLabs } from './icons/labs.svelte';
 export { default as IconLaptopCode } from './icons/laptop-code.svelte';
 export { default as IconLightningBolt } from './icons/lightning-bolt.svelte';
 export { default as IconLink } from './icons/link.svelte';
