@@ -1,0 +1,147 @@
+import type { Payload } from '$lib/types';
+import type { WorkflowEvent } from '$lib/types/events';
+import { decodeBinaryProtobuf } from '$lib/utilities/decode-binary-protobuf';
+import { isRawPayload } from '$lib/utilities/decode-payload';
+import {
+  isNexusOperationCompletedEvent,
+  isNexusOperationScheduledEvent,
+} from '$lib/utilities/is-event-type';
+
+import {
+  initiatedEventLink,
+  stateFor,
+  targetExecutionLink,
+  targetFromEventLinks,
+} from '../shared';
+import type {
+  SystemNexusContext,
+  SystemNexusLink,
+  SystemNexusOperationDefinition,
+  SystemNexusTarget,
+} from '../types';
+
+import InputRenderer from './input-renderer.svelte';
+
+const REQUEST_MESSAGE_TYPE =
+  'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest';
+const RESPONSE_MESSAGE_TYPE =
+  'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse';
+
+const LABEL = 'Signal With Start Workflow Execution';
+
+const STATE_VERBS: Record<string, string> = {
+  Scheduled: 'Initiated',
+  Completed: 'Delivered',
+  Failed: 'Failed',
+  TimedOut: 'Timed Out',
+  Canceled: 'Canceled',
+};
+
+const HIDDEN_FIELDS = ['endpoint', 'service', 'operation', 'requestId'];
+
+type Decoded = Record<string, unknown>;
+
+const getString = (v: unknown): string | undefined =>
+  typeof v === 'string' && v ? v : undefined;
+
+const decode = (payload: Payload): Decoded | null =>
+  (decodeBinaryProtobuf(payload)?.data as Decoded) ?? null;
+
+const targetFromSignalLink = (
+  signalLink: unknown,
+): SystemNexusTarget | undefined => {
+  if (!signalLink || typeof signalLink !== 'object') return undefined;
+  const workflowEvent = (signalLink as Record<string, unknown>).workflowEvent;
+  if (!workflowEvent || typeof workflowEvent !== 'object') return undefined;
+
+  const w = workflowEvent as Record<string, unknown>;
+  const eventRef = (w.eventRef ?? {}) as Record<string, unknown>;
+  const target: SystemNexusTarget = {
+    namespace: getString(w.namespace),
+    workflowId: getString(w.workflowId),
+    runId: getString(w.runId),
+    eventId:
+      eventRef.eventId === undefined ? undefined : String(eventRef.eventId),
+  };
+
+  return Object.values(target).some(Boolean) ? target : undefined;
+};
+
+export const signalWithStartWorkflow: SystemNexusOperationDefinition = {
+  kind: 'signal-with-start-workflow',
+  operationName: 'SignalWithStartWorkflowExecution',
+  requestMessageType: REQUEST_MESSAGE_TYPE,
+  responseMessageType: RESPONSE_MESSAGE_TYPE,
+  label: LABEL,
+  stateVerbs: STATE_VERBS,
+  hiddenFields: HIDDEN_FIELDS,
+  timelineCategory: 'signal',
+  // Synchronous: the Initiated/Delivered pair carries nearly identical fields,
+  // so opening one should not open both.
+  expandsIndividually: true,
+  InputRenderer,
+
+  describeInitiated: (event: WorkflowEvent, context: SystemNexusContext) => {
+    if (!isNexusOperationScheduledEvent(event)) return null;
+    const input = event.nexusOperationScheduledEventAttributes?.input;
+    const decoded = isRawPayload(input) ? decode(input as Payload) : null;
+
+    const attributes: Record<string, string> = {};
+    const signalName = getString(decoded?.signalName);
+    const identity = getString(decoded?.identity);
+    const control = getString(decoded?.control);
+    if (signalName) attributes.signalName = signalName;
+    if (identity) attributes.identity = identity;
+    if (control) attributes.control = control;
+
+    const workflowId = getString(decoded?.workflowId);
+    const link = workflowId
+      ? targetExecutionLink(
+          { namespace: getString(decoded?.namespace), workflowId },
+          context,
+        )
+      : null;
+
+    return {
+      displayName: `${LABEL} ${stateFor(event, STATE_VERBS)}`,
+      hiddenFields: HIDDEN_FIELDS,
+      attributes: Object.keys(attributes).length ? attributes : undefined,
+      links: link ? [link] : [],
+      // The collapsed row leads with the signal name here; Target Execution
+      // leads on the terminal event.
+      summaryAttribute: signalName
+        ? { key: 'signalName', value: signalName }
+        : undefined,
+    };
+  },
+
+  describeTerminal: (event: WorkflowEvent, context: SystemNexusContext) => {
+    if (!isNexusOperationCompletedEvent(event)) return null;
+    const attrs = event.nexusOperationCompletedEventAttributes;
+    const result = attrs?.result;
+    if (!isRawPayload(result)) return null;
+
+    const decoded = decode(result as Payload);
+    const links: SystemNexusLink[] = [];
+
+    const initiatedEventId =
+      attrs?.scheduledEventId === undefined || attrs?.scheduledEventId === null
+        ? undefined
+        : String(attrs.scheduledEventId);
+    if (initiatedEventId)
+      links.push(initiatedEventLink(initiatedEventId, context));
+
+    // Newer servers put the target on the response; older ones attach it as a
+    // handler link on the event instead.
+    const target =
+      targetFromSignalLink(decoded?.signalLink) ?? targetFromEventLinks(event);
+    const link = target ? targetExecutionLink(target, context) : null;
+    if (link) links.push(link);
+
+    return {
+      displayName: `${LABEL} ${stateFor(event, STATE_VERBS)}`,
+      hiddenFields: [...HIDDEN_FIELDS, 'scheduledEventId'],
+      links,
+    };
+  },
+};

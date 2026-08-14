@@ -25,6 +25,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
+  import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import {
     decodeLocalActivity,
     getLocalActivityMarkerEvent,
@@ -35,7 +36,6 @@
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
-    isNexusOperationScheduledEvent,
   } from '$lib/utilities/is-event-type';
 
   import { dotBox, lineBox } from './primitives';
@@ -151,15 +151,10 @@
   );
   const retried = $derived(retryAttempt > 1);
 
-  const systemNexusCategory = $derived.by((): typeof group.category | null => {
-    if (!isNexusOperationScheduledEvent(group.initialEvent)) return null;
-    const attrs = group.initialEvent.nexusOperationScheduledEventAttributes;
-    if (String(attrs?.endpoint ?? '') !== '__temporal_system') return null;
-    if (attrs?.operation === 'SignalWithStartWorkflowExecution') return 'signal';
-    return null;
-  });
-
-  const effectiveCategory = $derived(systemNexusCategory ?? group.category);
+  const effectiveCategory = $derived(
+    resolveSystemNexusEvent(group.initialEvent)?.timelineCategory ??
+      group.category,
+  );
 
   const lineColor = $derived(
     strokeColor({

@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { WorkflowEvent } from '$lib/types/events';
 
-import { getSystemNexusEventDisplay } from './get-system-nexus-event-display';
+import { resolveSystemNexusEvent } from './index';
 
 const toBinaryPayload = (
   schema: DescMessage,
@@ -70,17 +70,17 @@ const completedEvent = (
     },
   }) as unknown as WorkflowEvent;
 
-describe('getSystemNexusEventDisplay', () => {
+describe('resolveSystemNexusEvent', () => {
   it('returns null for a Nexus operation on a non-system endpoint', () => {
     const event = scheduledEvent(
       { workflowId: 'target-workflow-id' },
       'my-endpoint',
     );
-    expect(getSystemNexusEventDisplay(event)).toBeNull();
+    expect(resolveSystemNexusEvent(event)).toBeNull();
   });
 
   it('renames the scheduled event to Initiated', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       scheduledEvent({ workflowId: 'target-workflow-id' }),
     );
     expect(display?.displayName).toBe(
@@ -89,7 +89,7 @@ describe('getSystemNexusEventDisplay', () => {
   });
 
   it('renames the completed event to Delivered', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }),
     );
     expect(display?.displayName).toBe(
@@ -98,7 +98,7 @@ describe('getSystemNexusEventDisplay', () => {
   });
 
   it('surfaces signalName, identity and control on the initiated event', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       scheduledEvent({
         namespace: 'default',
         workflowId: 'target-workflow-id',
@@ -108,7 +108,7 @@ describe('getSystemNexusEventDisplay', () => {
       }),
     );
 
-    expect(display?.extraAttributes).toEqual({
+    expect(display?.attributes).toEqual({
       signalName: 'test-signal',
       identity: 'test-identity',
       control: 'test-control',
@@ -116,32 +116,32 @@ describe('getSystemNexusEventDisplay', () => {
   });
 
   it('omits identity and control when the request does not carry them', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       scheduledEvent({
         workflowId: 'target-workflow-id',
         signalName: 'test-signal',
       }),
     );
 
-    expect(display?.extraAttributes).toEqual({ signalName: 'test-signal' });
+    expect(display?.attributes).toEqual({ signalName: 'test-signal' });
   });
 
   it('links the initiated event to the target execution by workflow id', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       scheduledEvent({
         namespace: 'target-namespace',
         workflowId: 'target-workflow-id',
       }),
     );
 
-    const link = display?.extraLinks?.[0];
+    const link = display?.links?.[0];
     expect(link?.label).toBe('Target Execution');
     expect(link?.value).toBe('target-workflow-id');
     expect(link?.href).toContain('target-namespace');
   });
 
   it('hides the raw Nexus wrapper fields', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       scheduledEvent({ workflowId: 'target-workflow-id' }),
     );
 
@@ -151,12 +151,12 @@ describe('getSystemNexusEventDisplay', () => {
   });
 
   it('surfaces scheduledEventId as a linked Initiated Event ID', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }, '5'),
       { namespace: 'default', workflow: 'caller-wf', run: 'caller-run' },
     );
 
-    const link = display?.extraLinks?.find((l) => l.kind === 'initiated-event');
+    const link = display?.links?.find((l) => l.kind === 'initiated-event');
     expect(link?.label).toBe('Initiated Event ID');
     expect(link?.value).toBe('5');
     expect(link?.href).toContain('caller-wf');
@@ -165,17 +165,17 @@ describe('getSystemNexusEventDisplay', () => {
   });
 
   it('leaves the Initiated Event ID unlinked without caller context', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }, '5'),
     );
 
-    const link = display?.extraLinks?.find((l) => l.kind === 'initiated-event');
+    const link = display?.links?.find((l) => l.kind === 'initiated-event');
     expect(link?.value).toBe('5');
     expect(link?.href).toBeUndefined();
   });
 
   it('leads the collapsed row with the signal name on the initiated event', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       scheduledEvent({
         workflowId: 'target-workflow-id',
         signalName: 'test-signal',
@@ -189,14 +189,14 @@ describe('getSystemNexusEventDisplay', () => {
   });
 
   it('leaves the delivered event without a summary attribute', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }),
     );
     expect(display?.summaryAttribute).toBeUndefined();
   });
 
   it('links the delivered event to the exact target run from signalLink', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       completedEvent({
         runId: 'target-run-id',
         started: true,
@@ -207,32 +207,30 @@ describe('getSystemNexusEventDisplay', () => {
               namespace: 'target-namespace',
               workflowId: 'target-workflow-id',
               runId: 'target-run-id',
-              reference: { case: 'eventRef', value: { eventId: 7n } },
+              reference: { case: 'eventRef', value: { eventId: BigInt(7) } },
             },
           },
         },
       }),
     );
 
-    const link = display?.extraLinks?.find(
-      (l) => l.kind === 'target-execution',
-    );
+    const link = display?.links?.find((l) => l.kind === 'target-execution');
     expect(link?.label).toBe('Target Execution');
     expect(link?.value).toBe('target-workflow-id');
     expect(link?.href).toContain('target-run-id');
   });
 
   it('omits the target execution link when signalLink is absent', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }),
     );
     expect(
-      display?.extraLinks?.find((l) => l.kind === 'target-execution'),
+      display?.links?.find((l) => l.kind === 'target-execution'),
     ).toBeUndefined();
   });
 
   it('falls back to event links when the response carries no signalLink', () => {
-    const display = getSystemNexusEventDisplay(
+    const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }, '5', [
         {
           workflowEvent: {
@@ -245,9 +243,7 @@ describe('getSystemNexusEventDisplay', () => {
       ]),
     );
 
-    const link = display?.extraLinks?.find(
-      (l) => l.kind === 'target-execution',
-    );
+    const link = display?.links?.find((l) => l.kind === 'target-execution');
     expect(link?.label).toBe('Target Execution');
     expect(link?.value).toBe('system-nexus-workflow-id');
     expect(link?.href).toContain('target-run-id');

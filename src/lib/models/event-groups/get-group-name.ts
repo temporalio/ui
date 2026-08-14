@@ -1,3 +1,4 @@
+import { systemNexusGroupLabel } from '$lib/system-nexus-endpoints';
 import type { CommonHistoryEvent } from '$lib/types/events';
 import { formatDurationAbbreviated } from '$lib/utilities/format-time';
 import { getSummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
@@ -13,10 +14,6 @@ import {
   isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/utilities/is-event-type';
-
-const SYSTEM_NEXUS_OPERATION_LABELS: Record<string, string> = {
-  SignalWithStartWorkflowExecution: 'Signal With Start Workflow Execution',
-};
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return '';
@@ -71,14 +68,7 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
       .filter(Boolean)
       .join('.');
 
-    if (String(attrs?.endpoint ?? '') === '__temporal_system') {
-      return (
-        SYSTEM_NEXUS_OPERATION_LABELS[String(attrs?.operation ?? '')] ??
-        fallback
-      );
-    }
-
-    return fallback;
+    return systemNexusGroupLabel(event) ?? fallback;
   }
 
   return '';

@@ -3,12 +3,16 @@
 
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
-  import SystemNexusOperationRenderer from '$lib/components/payload/system-nexus-operation-renderer.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    resolveSystemNexusEvent,
+    systemNexusInputRenderer,
+    type SystemNexusLink,
+  } from '$lib/system-nexus-endpoints';
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
@@ -30,14 +34,9 @@
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import {
-    getSystemNexusEventDisplay,
-    type SystemNexusEventLink,
-  } from '$lib/utilities/get-system-nexus-event-display';
-  import {
     isLocalActivityMarkerEvent,
     isWorkflowExecutionSignaledEvent,
   } from '$lib/utilities/is-event-type';
-  import { describeNexusOperation } from '$lib/utilities/nexus-operation-registry';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
@@ -47,16 +46,16 @@
   const { namespace, workflow, run } = $derived(page.params);
 
   const systemNexus = $derived(
-    getSystemNexusEventDisplay(event, { namespace, workflow, run }),
+    resolveSystemNexusEvent(event, { namespace, workflow, run }),
   );
 
   const attributes = $derived.by(() => {
     const attrs = formatAttributes(event);
     if (event?.principal?.name) attrs.principalName = event.principal.name;
     if (event?.principal?.type) attrs.principalType = event.principal.type;
-    if (systemNexus?.extraAttributes) {
+    if (systemNexus?.attributes) {
       const extra = attrs as Record<string, unknown>;
-      Object.assign(extra, systemNexus.extraAttributes);
+      Object.assign(extra, systemNexus.attributes);
     }
     return attrs;
   });
@@ -144,7 +143,7 @@
       {#if event?.userMetadata?.summary}
         {@render eventSummary(event.userMetadata.summary)}
       {/if}
-      {#each systemNexus?.extraLinks ?? [] as extraLink (extraLink.label)}
+      {#each systemNexus?.links ?? [] as extraLink (extraLink.label)}
         {@render systemNexusLink(extraLink)}
       {/each}
       {#each detailFields as [key, value] (key)}
@@ -246,15 +245,15 @@
 {#snippet payloads(key: string, value: Record<string, unknown>)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
-  {@const nexusDescriptor = isRawPayload(codeBlockValue)
-    ? describeNexusOperation(codeBlockValue as RawPayload)
+  {@const NexusInputRenderer = isRawPayload(codeBlockValue)
+    ? systemNexusInputRenderer(codeBlockValue as RawPayload)
     : null}
   <div>
     <p class="mb-1 min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
-    {#if nexusDescriptor}
-      <SystemNexusOperationRenderer
+    {#if NexusInputRenderer}
+      <NexusInputRenderer
         payload={codeBlockValue as RawPayload}
         maxHeight={384}
       />
@@ -304,7 +303,7 @@
   {/if}
 {/snippet}
 
-{#snippet systemNexusLink(nexusLink: SystemNexusEventLink)}
+{#snippet systemNexusLink(nexusLink: SystemNexusLink)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {nexusLink.label}

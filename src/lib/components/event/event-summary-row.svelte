@@ -21,6 +21,7 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
@@ -33,7 +34,6 @@
     getPrimaryAttributeForEvent,
     getSecondaryAttributeForEvent,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { getSystemNexusEventDisplay } from '$lib/utilities/get-system-nexus-event-display';
   import {
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
@@ -117,7 +117,7 @@
 
   const systemNexus = $derived(
     !isEventGroup(event)
-      ? getSystemNexusEventDisplay(event as WorkflowEvent, {
+      ? resolveSystemNexusEvent(event as WorkflowEvent, {
           namespace,
           workflow,
           run,
@@ -126,7 +126,7 @@
   );
 
   const systemNexusSummaryLink = $derived(
-    systemNexus?.extraLinks?.find((link) => link.kind === 'target-execution'),
+    systemNexus?.links?.find((link) => link.kind === 'target-execution'),
   );
 
   const displayName = $derived.by(() => {
@@ -151,11 +151,7 @@
   );
 
   const effectiveCategory = $derived(
-    systemNexus
-      ? 'signal'
-      : isEventGroup(event)
-        ? event.category
-        : event.category,
+    systemNexus?.timelineCategory ?? event.category,
   );
 
   const secondaryAttribute = $derived(

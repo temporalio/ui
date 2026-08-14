@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import type { WorkflowEvent } from '$lib/types/events';
 
   import PendingActivityCard from '../workflow/pending-activity/pending-activity-card.svelte';
@@ -16,8 +17,14 @@
   const pendingEvent = $derived(
     group?.pendingActivity || group?.pendingNexusOperation,
   );
+  const expandsIndividually = $derived(
+    resolveSystemNexusEvent(event)?.expandsIndividually ?? false,
+  );
+
   const showEventGroup = $derived(
-    group && (group.eventList.length > 1 || pendingEvent),
+    group &&
+      !expandsIndividually &&
+      (group.eventList.length > 1 || pendingEvent),
   );
 </script>
 
