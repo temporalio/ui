@@ -198,14 +198,17 @@
 
     workflowRunController = new AbortController();
 
-    if (workerCountEnabledForNamespace && taskQueue) {
+    const onWorkersRoute = page.url.pathname.endsWith('/workers');
+
+    if (workerCountEnabledForNamespace && taskQueue && !onWorkersRoute) {
       const countController = workflowRunController;
       fetchWorkerCount(
         { namespace: ns, query: `TaskQueue="${taskQueue}"` },
         (input, init) =>
           fetch(input, { ...init, signal: countController.signal }),
       ).then(({ count }) => {
-        if (!countController.signal.aborted) $workflowRun.workerCount = count;
+        if (!countController.signal.aborted && count !== undefined)
+          $workflowRun.workerCount = count;
       });
     }
 

@@ -8,7 +8,6 @@
 
   const { namespace, workflow: workflowId } = $derived(page.params);
   const taskQueue = $derived($workflowRun?.workflow?.taskQueue ?? '');
-  const total = $derived($workflowRun?.workerCount);
   const workerHeartbeatsEnabled = $derived(
     !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
   );
@@ -21,6 +20,6 @@
 <WorkersTable
   {namespace}
   {taskQueue}
-  {total}
   useFallback={!workerHeartbeatsEnabled}
+  onCount={(count) => ($workflowRun.workerCount = count)}
 />

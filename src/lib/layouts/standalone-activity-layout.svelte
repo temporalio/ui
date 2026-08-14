@@ -5,6 +5,7 @@
 
   import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import ErrorComponent from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
@@ -12,7 +13,12 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getActivityPollers } from '$lib/services/pollers-service';
-  import { activitiesSearchParams } from '$lib/stores/activities';
+  import { fetchWorkerCount } from '$lib/services/worker-service';
+  import {
+    activitiesSearchParams,
+    activityWorkerCount,
+  } from '$lib/stores/activities';
+  import { workerCountEnabled } from '$lib/stores/workers';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForStandaloneActivities,
@@ -86,6 +92,35 @@
     });
   });
 
+  const workerHeartbeatsEnabled = $derived(
+    !!page.data?.namespace?.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
+  const workerCountEnabledForNamespace = $derived(
+    workerHeartbeatsEnabled && $workerCountEnabled,
+  );
+  const onWorkersRoute = $derived(pathMatches(page.url.pathname, workersRoute));
+  const taskQueue = $derived($activityExecution?.info?.taskQueue);
+
+  $effect(() => {
+    if (!workerCountEnabledForNamespace || !taskQueue) {
+      $activityWorkerCount = undefined;
+      return;
+    }
+
+    if (onWorkersRoute) return;
+
+    const controller = new AbortController();
+    fetchWorkerCount(
+      { namespace, query: `TaskQueue="${taskQueue}"` },
+      (input, init) => fetch(input, { ...init, signal: controller.signal }),
+    ).then(({ count }) => {
+      if (!controller.signal.aborted && count !== undefined)
+        $activityWorkerCount = count;
+    });
+
+    return () => controller.abort();
+  });
+
   onMount(async () => {
     poller.start();
   });
@@ -93,6 +128,7 @@
   onDestroy(() => {
     poller.abort();
     $activityExecution = undefined;
+    $activityWorkerCount = undefined;
   });
 </script>
 
@@ -126,7 +162,13 @@
           id="activity-execution-workers-tab"
           href={workersRoute}
           active={pathMatches(page.url.pathname, workersRoute)}
-        />
+        >
+          {#if $activityWorkerCount !== undefined}
+            <Badge type="primary" class="px-2 py-0">
+              {$activityWorkerCount}
+            </Badge>
+          {/if}
+        </Tab>
         <Tab
           label={translate(
             'standalone-activities.layout-search-attributes-tab',

@@ -51,6 +51,8 @@
   );
   const countEnabled = $derived(workerHeartbeatsEnabled && $workerCountEnabled);
 
+  let countLoaded = $state(false);
+
   const countPoller = createCountPoller({
     getStore: () => workerCount,
     fetch: ({ signal }) =>
@@ -58,14 +60,21 @@
         ? fetchWorkerCount({ namespace, query }, (input, init) =>
             fetch(input, { ...init, signal }),
           )
-        : Promise.resolve({ count: 0 }),
-    transform: (response) => response.count,
+        : Promise.resolve({ count: undefined }),
+    transform: (response) => response.count ?? $workerCount.count,
     disabled: () => !countEnabled,
     watch() {
       void namespace;
       void query;
       void countEnabled;
       void $refresh;
+    },
+    onReset: () => {
+      countLoaded = false;
+      workerCount.update((s) => ({ ...s, count: 0 }));
+    },
+    onInitialFetch: (_count, response) => {
+      countLoaded = response.count !== undefined;
     },
   });
 
@@ -99,7 +108,7 @@
         href={workersHref}
         active={page.url.pathname.endsWith('/workers')}
       >
-        {#if countEnabled}
+        {#if countEnabled && countLoaded}
           <Badge type="primary" class="px-2 py-0">
             {$workerCount.count}
           </Badge>

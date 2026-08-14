@@ -50,24 +50,23 @@ export const fetchPaginatedWorkers = async (
 export const fetchWorkerCount = async (
   { namespace, query }: ListWorkersRequest,
   request = fetch,
-): Promise<{ count: number }> => {
-  let count = 0;
+): Promise<{ count: number | undefined }> => {
   try {
     const route = routeForApi('workers.count', {
       namespace: namespace ?? '',
     });
     const result = await requestFromAPI<{ count: string }>(route, {
       params: query ? { query } : {},
-      onError: () => {},
       handleError: () => {},
       request,
     });
-    count = parseInt(result?.count || '0');
-  } catch {
-    // Don't fail the workers view due to count
-  }
+    if (result?.count === undefined) return { count: undefined };
 
-  return { count };
+    const count = parseInt(result.count);
+    return { count: Number.isNaN(count) ? undefined : count };
+  } catch {
+    return { count: undefined };
+  }
 };
 
 export async function describeWorker(

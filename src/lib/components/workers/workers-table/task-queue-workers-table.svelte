@@ -22,7 +22,7 @@
     useFallback?: boolean;
     searchAttributes?: Record<string, string>;
     taskQueue: string;
-    total?: number;
+    onCount?: (count: number) => void;
   }
 
   let {
@@ -30,27 +30,11 @@
     useFallback = false,
     searchAttributes,
     taskQueue,
-    total: providedTotal,
+    onCount,
   }: Props = $props();
 
   const query = $derived(`TaskQueue="${taskQueue}"`);
   const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));
-
-  let fetchedTotal = $state<number | undefined>();
-  const total = $derived(providedTotal ?? fetchedTotal);
-  $effect(() => {
-    if (providedTotal !== undefined || useFallback || !$workerCountEnabled) {
-      fetchedTotal = undefined;
-      return;
-    }
-    const controller = new AbortController();
-    fetchWorkerCount({ namespace, query }, (input, init) =>
-      fetch(input, { ...init, signal: controller.signal }),
-    ).then(({ count }) => {
-      if (!controller.signal.aborted) fetchedTotal = count;
-    });
-    return () => controller.abort();
-  });
 
   const View = {
     Workers: 'workers',
@@ -59,6 +43,25 @@
   type View = (typeof View)[keyof typeof View];
 
   let selected = $state<View>(View.Workers);
+
+  let total = $state<number | undefined>();
+  $effect(() => {
+    if (useFallback || !$workerCountEnabled) {
+      total = undefined;
+      return;
+    }
+    if (selected !== View.Workers) return;
+    const controller = new AbortController();
+    fetchWorkerCount({ namespace, query }, (input, init) =>
+      fetch(input, { ...init, signal: controller.signal }),
+    ).then(({ count }) => {
+      if (!controller.signal.aborted && count !== undefined) {
+        total = count;
+        onCount?.(count);
+      }
+    });
+    return () => controller.abort();
+  });
 
   const pollersPromise = $derived(getPollers({ queue: taskQueue, namespace }));
 </script>
