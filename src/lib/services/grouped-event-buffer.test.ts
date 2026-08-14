@@ -2,8 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { groupEvents } from '$lib/models/event-groups';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import { toEventHistory } from '$lib/models/event-history';
+import { toEvent, toEventHistory } from '$lib/models/event-history';
 import type { HistoryEvent } from '$lib/types/events';
+
+vi.mock('$lib/models/event-history', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('$lib/models/event-history')>();
+  return { ...actual, toEvent: vi.fn(actual.toEvent) };
+});
 
 import {
   getEventArray,
@@ -304,6 +310,8 @@ describe('setFailedEvent', () => {
 // ---------------------------------------------------------------------------
 
 describe('marker billable actions', () => {
+  const toEventSpy = vi.mocked(toEvent);
+
   const totalBillableActions = () =>
     getEventArray().reduce(
       (sum, event) => sum + (event.billableActions ?? 0),
@@ -340,6 +348,32 @@ describe('marker billable actions', () => {
     ingestHistoryEvent(makeLocalActivityMarker(11, 10));
     ingestHistoryEvent(makeLocalActivityMarker(13, 12));
     expect(totalBillableActions()).toBe(2);
+  });
+
+  // Both cursors can deliver the same event. Conversion is what charges, so the
+  // write-once guard has to reject a redelivery before toWorkflowEvent runs.
+  it('converts a redelivered event once, so it bills once', () => {
+    reset(20);
+    toEventSpy.mockClear();
+    const scheduled = makeActivityScheduled(1, 'Act');
+
+    expect(ingestHistoryEvent(scheduled)).toBe(true);
+    expect(ingestHistoryEvent(scheduled)).toBe(false);
+
+    expect(toEventSpy).toHaveBeenCalledTimes(1);
+    expect(totalBillableActions()).toBe(1);
+  });
+
+  it('converts a redelivered marker once, so its task stays charged', () => {
+    reset(20);
+    toEventSpy.mockClear();
+
+    ingestHistoryEvent(markers[0]);
+    ingestHistoryEvent(markers[0]);
+    ingestHistoryEvent(markers[1]);
+
+    expect(toEventSpy).toHaveBeenCalledTimes(2);
+    expect(totalBillableActions()).toBe(1);
   });
 });
 
