@@ -3,9 +3,11 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { base } from '$app/paths';
 
 import {
+  buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
   createWorkerDeployment,
   createWorkerDeploymentVersion,
+  decodeGcpCloudRunProviderDetails,
   decodeLambdaProviderDetails,
   decodeScalerDetails,
   deleteWorkerDeployment,
@@ -15,6 +17,7 @@ import {
   fetchPaginatedDeployments,
   setCurrentDeploymentVersion,
   updateWorkerDeploymentVersionComputeConfig,
+  validateCurrentWorkerDeploymentVersionComputeConfig,
   validateWorkerDeploymentVersionComputeConfig,
 } from './deployments-service';
 import { getApiOrigin } from '../utilities/get-api-origin';
@@ -281,7 +284,6 @@ describe('deployments service', () => {
       vi.mocked(requestFromAPI).mockResolvedValueOnce(undefined as never);
 
       const scalingGroup = {
-        taskQueueTypes: ['TASK_QUEUE_TYPE_WORKFLOW'],
         provider: {
           type: 'aws-lambda',
           details: { data: 'abc', metadata: { encoding: 'xyz' } },
@@ -308,12 +310,34 @@ describe('deployments service', () => {
             method: 'POST',
             body: JSON.stringify({
               computeConfigScalingGroups: {
-                default: { scalingGroup },
+                default: { scalingGroup, updateMask: 'provider,scaler' },
               },
             }),
           }),
           notifyOnError: false,
         }),
+      );
+    });
+
+    test('includes an update mask so edits to an existing version persist', async () => {
+      vi.mocked(requestFromAPI).mockResolvedValueOnce(undefined as never);
+
+      const computeConfig = {
+        scalingGroups: { default: {} },
+      };
+
+      await updateWorkerDeploymentVersionComputeConfig({
+        namespace,
+        deploymentName,
+        buildId,
+        computeConfig,
+      });
+
+      const body = JSON.parse(
+        vi.mocked(requestFromAPI).mock.calls[0][1].options.body as string,
+      );
+      expect(body.computeConfigScalingGroups.default.updateMask).toBe(
+        'provider,scaler',
       );
     });
   });
@@ -323,7 +347,6 @@ describe('deployments service', () => {
       vi.mocked(requestFromAPI).mockResolvedValueOnce({ valid: true } as never);
 
       const scalingGroup = {
-        taskQueueTypes: ['TASK_QUEUE_TYPE_ACTIVITY'],
         provider: {
           type: 'aws-lambda',
           details: { data: 'abc', metadata: { encoding: 'xyz' } },
@@ -350,9 +373,33 @@ describe('deployments service', () => {
             method: 'POST',
             body: JSON.stringify({
               computeConfigScalingGroups: {
-                default: { scalingGroup },
+                default: { scalingGroup, updateMask: 'provider,scaler' },
               },
             }),
+          }),
+          notifyOnError: false,
+        }),
+      );
+    });
+  });
+
+  describe('validateCurrentWorkerDeploymentVersionComputeConfig', () => {
+    test('calls requestFromAPI with an empty POST body to validate the persisted config', async () => {
+      vi.mocked(requestFromAPI).mockResolvedValueOnce({} as never);
+
+      await validateCurrentWorkerDeploymentVersionComputeConfig({
+        namespace,
+        deploymentName,
+        buildId,
+      });
+
+      expect(requestFromAPI).toHaveBeenCalledOnce();
+      expect(requestFromAPI).toHaveBeenCalledWith(
+        `${origin}${base}/api/v1/namespaces/${encodedNamespace}/worker-deployment-versions/${encodedDeploymentName}/${encodedBuildId}/validate-compute-config`,
+        expect.objectContaining({
+          options: expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify({}),
           }),
           notifyOnError: false,
         }),
@@ -389,10 +436,6 @@ describe('deployments service', () => {
 
       const scalingGroup = result.scalingGroups?.['default'];
       expect(scalingGroup).toBeDefined();
-      expect(scalingGroup?.taskQueueTypes).toEqual([
-        'TASK_QUEUE_TYPE_WORKFLOW',
-        'TASK_QUEUE_TYPE_ACTIVITY',
-      ]);
       expect(scalingGroup?.provider?.type).toBe('aws-lambda');
 
       const providerData = scalingGroup?.provider?.details?.data;
@@ -428,6 +471,62 @@ describe('deployments service', () => {
     });
   });
 
+  describe('buildGcpCloudRunComputeConfig', () => {
+    test('builds rate-based scaler details with replica defaults', () => {
+      const result = buildGcpCloudRunComputeConfig(
+        'test-project',
+        'us-central1',
+        'test-pool',
+        'worker@test-project.iam.gserviceaccount.com',
+      );
+      const scalingGroup = result.scalingGroups?.['default'];
+
+      expect(scalingGroup?.provider?.type).toBe('gcp-cloud-run');
+      expect(scalingGroup?.scaler?.type).toBe('rate-based');
+      expect(
+        JSON.parse(atob(scalingGroup?.scaler?.details?.data ?? '')),
+      ).toEqual({
+        min_count: 0,
+        max_count: 30,
+        initial_count: 0,
+        utilization_target: 0.8,
+      });
+    });
+
+    test('round-trips custom provider and replica details', () => {
+      const config = buildGcpCloudRunComputeConfig(
+        'test-project',
+        'us-east1',
+        'worker-pool',
+        'worker@example.com',
+        {
+          minReplicas: 4,
+          maxReplicas: 12,
+          initialReplicas: 6,
+          utilizationTarget: 0.65,
+        },
+      );
+
+      expect(decodeGcpCloudRunProviderDetails(config)).toEqual({
+        gcpProject: 'test-project',
+        gcpRegion: 'us-east1',
+        gcpWorkerPool: 'worker-pool',
+        gcpServiceAccount: 'worker@example.com',
+      });
+      expect(decodeScalerDetails(config)).toMatchObject({
+        minReplicas: 4,
+        maxReplicas: 12,
+        initialReplicas: 6,
+        utilizationTarget: 0.65,
+      });
+      expect(
+        JSON.parse(
+          atob(config.scalingGroups?.['default']?.scaler?.details?.data ?? ''),
+        ),
+      ).toMatchObject({ initial_count: 6, utilization_target: 0.65 });
+    });
+  });
+
   describe('decodeLambdaProviderDetails', () => {
     test('returns empty object when no computeConfig provided', () => {
       expect(decodeLambdaProviderDetails(undefined)).toEqual({});
@@ -447,7 +546,7 @@ describe('deployments service', () => {
     });
 
     test('returns empty object when provider data is missing', () => {
-      const config = { scalingGroups: { default: { taskQueueTypes: [] } } };
+      const config = { scalingGroups: { default: {} } };
       expect(decodeLambdaProviderDetails(config)).toEqual({});
     });
   });
@@ -475,7 +574,7 @@ describe('deployments service', () => {
     });
 
     test('returns empty object when scaler data is missing', () => {
-      const config = { scalingGroups: { default: { taskQueueTypes: [] } } };
+      const config = { scalingGroups: { default: {} } };
       expect(decodeScalerDetails(config)).toEqual({});
     });
 

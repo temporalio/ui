@@ -35,17 +35,34 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await expect(
         page.locator('#batch-terminate-success-toast'),
       ).toBeVisible();
+      await expect(
+        page.locator('[data-testid="toast-live-region-polite"]'),
+      ).toBeAttached();
+      await expect(
+        page.locator('[data-testid="toast-live-region-assertive"]'),
+      ).toBeAttached();
+      const politeRegion = page.locator(
+        '[data-testid="toast-live-region-polite"]',
+      );
+      await expect(politeRegion).toContainText(
+        'The batch terminate request is processing in the background.',
+      );
+      await expect(
+        page.locator('[data-testid="toast-live-region-assertive"]'),
+      ).not.toContainText(
+        'The batch terminate request is processing in the background.',
+      );
     });
 
     test('allows running workflows to be terminated by a query', async ({
       page,
     }) => {
-      await page.locator('#search-attribute-filter-button').click();
+      await page.locator('#workflow-search-attribute-filter-button').click();
       await page.getByTestId('toggle-manual-query').click();
       await page
-        .getByTestId('manual-search-input')
+        .getByTestId('workflow-manual-search-input')
         .fill('ExecutionStatus="Running"');
-      await page.getByTestId('manual-search-button').click();
+      await page.getByTestId('workflow-manual-search-button').click();
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-terminate-button"]');
@@ -83,12 +100,12 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     test('allows running workflows to be cancelled by a query', async ({
       page,
     }) => {
-      await page.locator('#search-attribute-filter-button').click();
+      await page.locator('#workflow-search-attribute-filter-button').click();
       await page.getByTestId('toggle-manual-query').click();
       await page
-        .getByTestId('manual-search-input')
+        .getByTestId('workflow-manual-search-input')
         .fill('ExecutionStatus="Running"');
-      await page.getByTestId('manual-search-button').click();
+      await page.getByTestId('workflow-manual-search-button').click();
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-cancel-button"]');

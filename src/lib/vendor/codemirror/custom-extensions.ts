@@ -8,6 +8,7 @@ import { typescript } from '@codemirror/legacy-modes/mode/javascript';
 import { python } from '@codemirror/legacy-modes/mode/python';
 import { ruby } from '@codemirror/legacy-modes/mode/ruby';
 import { shell } from '@codemirror/legacy-modes/mode/shell';
+import type { Extension } from '@codemirror/state';
 import type { DecorationSet, ViewUpdate } from '@codemirror/view';
 import {
   Decoration,
@@ -58,7 +59,7 @@ const baseTheme = {
   },
 };
 
-const headerStyles = (header: boolean) =>
+const headerStyles = (header: boolean): Record<string, string> =>
   header
     ? {}
     : {
@@ -66,7 +67,7 @@ const headerStyles = (header: boolean) =>
         borderColor: css('--color-border-subtle'),
       };
 
-export const getEditorTheme = (isDark: boolean, header) =>
+export const getEditorTheme = (isDark: boolean, header: boolean) =>
   EditorView.theme(
     {
       ...baseTheme,
@@ -153,7 +154,7 @@ const lineBreakDecorator = new MatchDecorator({
   decoration: Decoration.replace({ widget: new LineBreakWidget() }),
 });
 
-export const getLineBreakExtension = (editable: boolean) => {
+export const getLineBreakExtension = (editable: boolean): Extension => {
   if (editable) return [];
 
   return ViewPlugin.fromClass(
@@ -174,14 +175,16 @@ export const getLineBreakExtension = (editable: boolean) => {
 };
 
 export const getLanguageExtension = (language: EditorLanguage) =>
-  ({
-    json: json(),
-    java: java(),
-    go: go(),
-    php: php(),
-    python: StreamLanguage.define(python),
-    shell: StreamLanguage.define(shell),
-    dotnet: StreamLanguage.define(csharp),
-    ruby: StreamLanguage.define(ruby),
-    typescript: StreamLanguage.define(typescript),
-  })[language] ?? undefined;
+  (
+    ({
+      json: json(),
+      java: java(),
+      go: go(),
+      php: php(),
+      python: StreamLanguage.define(python),
+      shell: StreamLanguage.define(shell),
+      dotnet: StreamLanguage.define(csharp),
+      ruby: StreamLanguage.define(ruby),
+      typescript: StreamLanguage.define(typescript),
+    }) as Partial<Record<EditorLanguage, Extension>>
+  )[language] ?? undefined;

@@ -7,7 +7,7 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { supportsWorkflowBulkActions } from '$lib/stores/workflow-bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import BatchActions from './batch-actions.svelte';
@@ -34,15 +34,14 @@
     BATCH_OPERATION_CONTEXT,
   );
 
-  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
-    const { checked } = event.detail;
+  const handleCheckboxChange = ({ checked }: { checked: boolean }) => {
     onSelectPage(checked, workflows);
   };
   const label = translate('workflows.select-all-workflows');
 </script>
 
 <tr>
-  {#if !empty && $supportsBulkActions}
+  {#if !empty && $supportsWorkflowBulkActions}
     <th scope="col" class="batch-actions-checkbox-table-cell">
       <Checkbox
         {label}
@@ -51,12 +50,12 @@
         data-testid="batch-actions-checkbox"
         checked={pageSelectionStatus === 'checked'}
         indeterminate={pageSelectionStatus === 'partial'}
-        on:change={handleCheckboxChange}
+        onChange={handleCheckboxChange}
       />
     </th>
   {/if}
   <th scope="col" class="w-6"></th>
-  {#if $supportsBulkActions && $batchActionsVisible}
+  {#if $supportsWorkflowBulkActions && $batchActionsVisible}
     <th scope="col" class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
     </th>

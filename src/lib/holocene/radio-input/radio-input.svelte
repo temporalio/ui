@@ -1,61 +1,61 @@
-<script lang="ts">
-  import { writable, type Writable } from 'svelte/store';
+<script lang="ts" generics="T">
+  import { writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
 
   import Label from '$lib/holocene/label.svelte';
-  import { omit } from '$lib/utilities/omit';
 
   import type { RadioGroupContext, RadioInputProps } from './types';
 
   import { RADIO_GROUP_CONTEXT } from './radio-group.svelte';
 
-  type T = $$Generic;
-
-  type $$Props = RadioInputProps<T>;
-  export let value: T;
-  export let id: string;
-  export let label: string;
-  export let description: string | undefined = undefined;
-  export let labelHidden = false;
-  export let disabled = false;
-
-  let internalGroup: Writable<T> = writable(value);
-  let internalName: string = '';
-  let className: string | undefined = undefined;
-
-  export { internalGroup as group };
-  export { internalName as name };
-  export { className as class };
+  let {
+    value,
+    id,
+    label,
+    description = undefined,
+    labelHidden = false,
+    disabled = false,
+    group: internalGroup = writable(value),
+    name: internalName = '',
+    class: className = undefined,
+    ...rest
+  }: RadioInputProps<T> = $props();
 
   const ctx = getContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT) ?? {
-    name: internalName,
-    group: internalGroup,
+    get name() {
+      return internalName;
+    },
+    get group() {
+      return internalGroup;
+    },
   };
 
   const { name, group } = ctx;
 </script>
 
 <div>
-  <Label {disabled} class={className}>
-    <input
-      bind:group={$group}
-      type="radio"
-      class="surface-primary"
-      aria-describedby={description ? `${id}-description` : null}
-      data-track-name="radio-input"
-      data-track-intent="select"
-      data-track-text={label}
-      {name}
-      {value}
-      {id}
-      {disabled}
-      {...omit($$restProps, 'class')}
-    />
-    <span class="label" class:hidden={labelHidden}>
-      {label}
-    </span>
-  </Label>
+  <div class="flex items-center">
+    <Label {disabled} class={className}>
+      <input
+        bind:group={$group}
+        type="radio"
+        class="surface-primary"
+        aria-describedby={description ? `${id}-description` : null}
+        data-track-name="radio-input"
+        data-track-intent="select"
+        data-track-text={label}
+        {name}
+        {value}
+        {id}
+        {disabled}
+        {...rest}
+      />
+      <span class="font-normal" class:hidden={labelHidden}>
+        {label}
+      </span>
+    </Label>
+  </div>
   {#if description}
     <p class="description" id="{id}-description">
       {description}

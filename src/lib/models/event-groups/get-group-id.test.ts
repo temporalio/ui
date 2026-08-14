@@ -6,7 +6,10 @@ import { getGroupId } from './get-group-id';
 
 import allEventTypesFixture from '$fixtures/all-event-types.json';
 
-const events = allEventTypesFixture as unknown as CommonHistoryEvent[];
+const events = allEventTypesFixture as unknown as Record<
+  string,
+  CommonHistoryEvent
+>;
 
 describe('getGroupId', () => {
   it('should get the correct ID for WorkflowExecutionCanceled events', () => {

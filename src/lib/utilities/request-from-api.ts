@@ -37,7 +37,7 @@ type RequestFromAPIOptions = {
   token?: string;
   onError?: ErrorCallback;
   notifyOnError?: boolean;
-  handleError?: typeof handleRequestError;
+  handleError?: ErrorCallback;
   isBrowser?: boolean;
   signal?: AbortController['signal'];
 };
@@ -63,7 +63,7 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
 export const requestFromAPI = async <T>(
   endpoint: toURLParams[0],
   init: RequestFromAPIOptions = {},
-): Promise<T> => {
+): Promise<T | undefined> => {
   const {
     params = {},
     request = fetch,
@@ -154,11 +154,14 @@ export const requestFromAPI = async <T>(
     return body;
   } catch (error: unknown) {
     if (notifyOnError) {
-      handleError(error);
+      handleError(error as APIErrorResponse);
     } else {
       throw error;
     }
   }
+
+  // Handled-error path (notifyOnError) resolves without a body.
+  return undefined;
 };
 
 const withCallerType = (

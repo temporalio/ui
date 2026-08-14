@@ -26,7 +26,16 @@ const generateNonce = (): string => crypto.randomBytes(16).toString('hex');
  * @returns
  */
 const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
-  return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; sandbox allow-same-origin allow-popups allow-popups-to-escape-sandbox;`;
+  const sandbox = [
+    'sandbox',
+    'allow-same-origin',
+    'allow-popups',
+    'allow-popups-to-escape-sandbox',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; ${sandbox};`;
 };
 
 /**
@@ -74,20 +83,23 @@ export const GET = async (req: Request) => {
   if (content === null) return new Response('Not found', { status: 404 });
 
   const nonce = generateNonce();
+  const html = createPage(await process(content), {
+    nonce,
+    host,
+    theme,
+    overrideTheme,
+  });
 
-  const response = new Response(
-    createPage(await process(content), { nonce, host, theme, overrideTheme }),
-    {
-      headers: {
-        'Content-Type': 'text/html',
-        'Content-Security-Policy': generateContentSecurityPolicy({
-          nonce,
-          host,
-          overrideTheme,
-        }),
-      },
+  const response = new Response(html, {
+    headers: {
+      'Content-Type': 'text/html',
+      'Content-Security-Policy': generateContentSecurityPolicy({
+        nonce,
+        host,
+        overrideTheme,
+      }),
     },
-  );
+  });
 
   return response;
 };

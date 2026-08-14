@@ -81,6 +81,7 @@
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
+    hintText?: string;
     error?: string;
     valid?: boolean;
     actionTooltip?: string;
@@ -152,15 +153,16 @@
     disabled = false,
     labelHidden = false,
     options,
-    placeholder = null,
+    placeholder = undefined,
     readonly = false,
     required = false,
-    leadingIcon = null,
+    leadingIcon = undefined,
     showChevron = false,
-    optionValueKey = null,
+    optionValueKey = undefined,
     optionLabelKey = optionValueKey,
     minSize = 0,
     maxSize = 120,
+    hintText = '',
     error = '',
     valid = true,
     open = writable(false),
@@ -242,19 +244,19 @@
     if ($open) return;
     $open = true;
     filterValue = '';
-    inputElement.focus();
-    inputElement.select();
+    inputElement?.focus();
+    inputElement?.select();
   };
 
   const closeList = () => {
     if (!$open) return;
     $open = false;
-    onclose?.(selectedOption);
+    onclose?.(selectedOption as string | T);
     resetValueAndOptions();
   };
 
   const handleMenuClose = () => {
-    onclose?.(selectedOption);
+    onclose?.(selectedOption as string | T);
     resetValueAndOptions();
   };
 
@@ -275,7 +277,9 @@
     }
     handleSelectOption(trimmedFilterValue);
     filterValue = '';
-    displayValue = '';
+    if (multiselect) {
+      displayValue = '';
+    }
   };
 
   const isStringOption = (option: string | T): option is string => {
@@ -291,8 +295,8 @@
     if (typeof option !== 'object') return false;
 
     return (
-      optionValueKey !== null &&
-      optionLabelKey !== null &&
+      optionValueKey != null &&
+      optionLabelKey != null &&
       optionValueKey in option &&
       optionLabelKey in option
     );
@@ -312,8 +316,10 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      return String(option[optionLabelKey]);
+      return String(option[optionLabelKey!]);
     }
+
+    return '';
   }
 
   function getSelectedOption(options: (string | T)[]) {
@@ -323,7 +329,7 @@
       }
 
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return option[optionValueKey] === value;
+        return option[optionValueKey!] === value;
       }
     });
   }
@@ -347,7 +353,7 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      const opt = String(option[optionValueKey]);
+      const opt = String(option[optionValueKey!]);
       if (isArrayValue(value)) {
         if (value.includes(opt)) {
           value = value.filter((o) => o !== opt);
@@ -379,7 +385,7 @@
 
     value = list.map((option) => {
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return String(option[optionValueKey]);
+        return String(option[optionValueKey!]);
       } else if (isStringOption(option)) {
         return option;
       }
@@ -391,7 +397,7 @@
   };
 
   const focusFirstOption = () => {
-    const listItemElement: HTMLLIElement = menuElement.querySelector(
+    const listItemElement = menuElement?.querySelector<HTMLLIElement>(
       'li[role="option"]:not([aria-disabled="true"])',
     );
 
@@ -455,12 +461,16 @@
       }
 
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return String(option[optionLabelKey])
+        return String(option[optionLabelKey!])
           .toLowerCase()
           .includes(value.toLowerCase());
       }
     });
   }
+
+  const errorId = $derived(`${id}-error`);
+  const hintId = $derived(`${id}-hint`);
+  const showError = $derived(!!error && !valid);
 
   const handleInputClick: MouseEventHandler<HTMLInputElement> = (event) => {
     event.stopPropagation();
@@ -480,7 +490,7 @@
     option: string | T,
     value: string | string[],
   ): boolean => {
-    if (isObjectOption(option)) {
+    if (isObjectOption(option) && optionValueKey != null) {
       const o = String(option[optionValueKey]);
       return isArrayValue(value) ? value.includes(o) : value === o;
     } else if (isStringOption(option)) {
@@ -492,7 +502,7 @@
 </script>
 
 <MenuContainer {open} onclose={handleMenuClose}>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1.5">
     <Label hidden={labelHidden} {required} {label} for={id} />
     <div
       class={merge(
@@ -556,6 +566,8 @@
           aria-controls="{id}-listbox"
           aria-expanded={$open}
           aria-required={required}
+          aria-invalid={!valid ? 'true' : undefined}
+          aria-describedby={showError ? errorId : hintText ? hintId : undefined}
           aria-autocomplete="list"
           onfocus={handleFocus}
           onblur={handleBlur}
@@ -580,7 +592,12 @@
       {:else if href}
         <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
           {#if actionTooltip}
-            <Tooltip text={actionTooltip} right>
+            <Tooltip
+              text={actionTooltip}
+              right
+              usePortal
+              portalOffset={{ x: 6 }}
+            >
               <Button
                 variant="ghost"
                 size="xs"
@@ -618,6 +635,19 @@
           />
         </button>
       {/if}
+    </div>
+    <div class="inline-flex" class:hidden={!hintText && !showError}>
+      <span
+        id={errorId}
+        role="alert"
+        class="hint-text error"
+        class:hidden={!showError}
+      >
+        {#if showError}{error}{/if}
+      </span>
+      <span id={hintId} class="hint-text" class:hidden={showError}>
+        {#if !showError}{hintText}{/if}
+      </span>
     </div>
   </div>
 
@@ -679,19 +709,19 @@
       </ComboboxOption>
     {/if}
   </Menu>
-
-  {#if error && !valid}
-    <span class="error">{error}</span>
-  {/if}
 </MenuContainer>
 
 <style lang="postcss">
-  .error {
-    @apply text-xs text-danger;
+  .hint-text {
+    @apply text-xs text-primary;
+
+    &.error {
+      @apply text-danger;
+    }
   }
 
   .input-wrapper {
-    @apply flex w-full flex-wrap items-center;
+    @apply flex grow flex-wrap items-center;
   }
 
   .combobox-input {

@@ -5,7 +5,6 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -52,7 +51,7 @@
 <header class="flex flex-col gap-2">
   <div class="flex min-h-10 flex-wrap items-center justify-between gap-2">
     <div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-start gap-2">
         <h1 class="leading-7" data-cy="workers-title">
           {translate('workers.workers')}
         </h1>
@@ -74,9 +73,7 @@
         id="workers-tab"
         href={workersHref}
         active={page.url.pathname.endsWith('/workers')}
-      >
-        <Badge type="secondary" class="shrink-0">Preview</Badge>
-      </Tab>
+      ></Tab>
       <Tab
         label={translate('deployments.deployments')}
         id="deployments-tab"

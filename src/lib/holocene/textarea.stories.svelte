@@ -1,11 +1,14 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import { userEvent, within } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
+
+  import { shouldNotBeTransparent } from './test-utilities';
 
   import Textarea from './textarea.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Textarea',
     component: Textarea,
     args: {
@@ -19,7 +22,7 @@
       isValid: true,
       rows: 5,
       spellcheck: false,
-      maxLength: undefined,
+      maxLength: undefined as number | undefined,
       labelHidden: false,
     },
     argTypes: {
@@ -37,28 +40,24 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       id: { name: 'Id', control: 'text', table: { disable: true } },
     },
-  } satisfies Meta<Textarea>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import { userEvent, within } from '@storybook/test';
-
-  import { shouldNotBeTransparent } from './test-utilities';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: ComponentProps<typeof Textarea>,
+  context: StoryContext<ComponentProps<typeof Textarea>>,
+)}
   <Textarea
-    on:input={action('input')}
-    on:blur={action('blue')}
-    on:change={action('change')}
-    on:focus={action('focus')}
-    on:keydown={action('keydown')}
-    id={context.id}
     {...args}
+    oninput={action('input')}
+    onblur={action('blue')}
+    onchange={action('change')}
+    onfocus={action('focus')}
+    onkeydown={action('keydown')}
+    id={context.id}
   />
-</Template>
+{/snippet}
 
 <Story
   name="Default"

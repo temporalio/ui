@@ -1,8 +1,11 @@
 <script lang="ts">
   import { type Readable, type Writable } from 'svelte/store';
 
+  import { twMerge } from 'tailwind-merge';
+
   import { page } from '$app/state';
 
+  import WorkflowCountStatus from '$lib/components/execution-status.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
@@ -28,8 +31,6 @@
   } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import WorkflowCountStatus from './workflow-status.svelte';
-
   type Status = WorkflowStatus | ActivityStatus;
   type StatusCount = { status: Status; count: number };
 
@@ -48,6 +49,7 @@
     ) => StatusCount[];
     'data-testid'?: string;
     disableRefresh?: Readable<boolean>;
+    class?: string;
   }
 
   let {
@@ -60,6 +62,7 @@
     getStatusAndCount = getStatusAndCountOfGroup,
     'data-testid': testId = 'workflow-status',
     disableRefresh = disableWorkflowCountsRefresh,
+    class: className,
   }: Props = $props();
 
   const queryParam = $derived(page.url.searchParams.get('query'));
@@ -134,7 +137,13 @@
   };
 </script>
 
-<div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
+<div
+  class={twMerge(
+    'flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5',
+    className,
+  )}
+  aria-busy={countPoller.loading}
+>
   {#each allStatusGroups as { count, status } (status)}
     {#if !countPoller.loading}
       {@const group = newStatusGroups.find((g) => g.status === status)}

@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
+  import type { Snippet } from 'svelte';
+
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
@@ -10,26 +12,61 @@
 
   import PayloadInput from './payload-input.svelte';
 
-  export let id: string = crypto.randomUUID();
-  export let input: string;
-  export let encoding: Writable<PayloadInputEncoding>;
-  export let messageType: string;
-  export let error = false;
-  export let loading = false;
-  export let label = translate('workflows.input');
-  export let editing = true;
+  interface Props {
+    id?: string;
+    input: string;
+    encoding: Writable<PayloadInputEncoding>;
+    messageType: string;
+    error?: boolean;
+    loading?: boolean;
+    label?: string;
+    editing?: boolean;
+    hintText?: string;
+    placeholder?: string;
+    payloadLabel?: string;
+    copyable?: boolean;
+    action?: Snippet;
+  }
 
-  $: {
+  const uid = $props.id();
+
+  let {
+    id = uid,
+    input = $bindable(),
+    encoding = $bindable(),
+    messageType = $bindable(),
+    error = false,
+    loading = $bindable(false),
+    label = translate('workflows.input'),
+    editing = true,
+    hintText,
+    placeholder,
+    payloadLabel,
+    copyable = false,
+    action,
+  }: Props = $props();
+
+  $effect(() => {
     if ($encoding === 'json/plain' && messageType) {
       messageType = '';
     }
-  }
+  });
 </script>
 
 <div>
   <h5 class="pb-1 text-sm font-medium">{label}</h5>
-  <Card class="flex flex-col gap-2">
-    <PayloadInput bind:input bind:loading {error} {id} {editing} />
+  <Card class="flex flex-col gap-4">
+    <PayloadInput
+      bind:input
+      bind:loading
+      {error}
+      {id}
+      {editing}
+      {placeholder}
+      label={payloadLabel}
+      {hintText}
+      {copyable}
+    />
     <div
       class="flex items-end gap-2 {editing ? 'justify-between' : 'justify-end'}"
     >
@@ -39,6 +76,7 @@
             description={translate('workflows.encoding')}
             group={encoding}
             name="encoding"
+            class="p-0"
           >
             <RadioInput id="json/plain" value="json/plain" label="json/plain" />
             <RadioInput
@@ -57,7 +95,7 @@
           {/if}
         </div>
       {/if}
-      <slot name="action" />
+      {@render action?.()}
     </div>
   </Card>
 </div>

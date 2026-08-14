@@ -1,7 +1,7 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+
+  import type { ToastVariant } from '$lib/types/holocene';
 
   import { toaster } from '../stores/toaster';
 
@@ -9,7 +9,15 @@
   import Toast from './toast.svelte';
   import Toaster from './toaster.svelte';
 
-  export const meta = {
+  type ToasterArgs = {
+    closeButtonLabel: string;
+    duration: number;
+    variant: string;
+    message: string;
+    position: string;
+  };
+
+  const { Story } = defineMeta({
     title: 'Toaster',
     component: Toaster,
     args: {
@@ -60,30 +68,30 @@
         },
       },
     },
-  } satisfies Meta<Toaster & Toast['variant']>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
-  {@const { duration, message, variant, closeButtonLabel } = args}
+{#snippet template(args: ToasterArgs, context: StoryContext<ToasterArgs>)}
+  {@const { duration, message, closeButtonLabel } = args}
+  {@const variant = args.variant as ToastVariant}
   <div class="flex max-w-60 flex-col gap-2">
-    <Toast id={context.id} {variant} {closeButtonLabel}>{message}</Toast>
+    <Toast id={context.id} {variant} {closeButtonLabel} onDismiss={toaster.pop}
+      >{message}</Toast
+    >
 
-    <Button on:click={() => toaster.push({ duration, message, variant })}>
+    <Button onclick={() => toaster.push({ duration, message, variant })}>
       <span class="capitalize">Trigger {variant} toast</span>
     </Button>
 
     <Toaster
-      {...args}
+      {closeButtonLabel}
       position={toaster.position}
       pop={toaster.pop}
       toasts={toaster.toasts}
     />
   </div>
-</Template>
+{/snippet}
 
 <Story name="Primary" />
 

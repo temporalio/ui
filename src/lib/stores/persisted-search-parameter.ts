@@ -25,7 +25,7 @@ const getFromSearchParameters = (parameter: string): string | undefined => {
 
 const saveToSearchParameters = (
   parameter: string,
-  value: SearchParameterValue,
+  value: SearchParameterValue | undefined,
 ) => {
   if (BROWSER) {
     const url = new URL(window?.location?.href);
@@ -47,7 +47,7 @@ const getFromLocalStorage = (
 
 const saveToLocalStorage = (
   parameter: string,
-  value: SearchParameterValue,
+  value: SearchParameterValue | undefined,
   persist: boolean,
 ) => {
   if (BROWSER && persist) {
@@ -85,7 +85,7 @@ const getValue = (
 
 const setValue = (
   parameter: string,
-  value: SearchParameterValue,
+  value: SearchParameterValue | undefined,
   persist: boolean,
 ) => {
   saveToLocalStorage(parameter, value, persist);

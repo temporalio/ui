@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import PayloadInput from '$lib/components/payload-input.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -19,52 +19,61 @@
     type ParsedQuery,
   } from '$lib/services/query-service';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { Payloads } from '$lib/types';
+  import type { Payload } from '$lib/types';
   import type { WorkflowInteractionDefinition } from '$lib/types/workflows';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  const { namespace, workflow: workflowId, run: runId } = $page.params;
+  const { namespace, workflow: workflowId, run: runId } = page.params;
 
   const params = {
     id: workflowId,
     runId,
   };
 
-  let queryType: string;
-  let initialQueryType: string;
-  let input = '';
-  let initialInput = '';
-  let loading = false;
-  let jsonFormatting = true;
+  let queryType = $state('');
+  let initialQueryType = $state('');
+  let input = $state('');
+  let initialInput = $state('');
+  let loading = $state(false);
+  let jsonFormatting = $state(true);
 
-  $: edited = initialQueryType !== queryType || input !== initialInput;
-
-  $: metadataError = $workflowRun.metadata?.error?.message;
-  $: queryTypes = sortByName(
-    $workflowRun?.metadata?.definition?.queryDefinitions?.filter((query) => {
-      return query?.name !== '__stack_trace';
-    }) || [],
-  );
-
-  $: queryType = queryType || queryTypes?.[0]?.name;
-
-  let queryResult: Promise<ParsedQuery>;
-  let encodePayloadResult: Promise<Payloads>;
+  let queryResult = $state<Promise<ParsedQuery>>();
+  let encodePayloadResult = $state<Promise<Payload[] | null>>();
 
   const sortByName = (
     list: WorkflowInteractionDefinition[],
   ): WorkflowInteractionDefinition[] => {
     return [...list].sort((a, b) => {
-      const aStartsWithDunder = a.name.startsWith('__');
-      const bStartsWithDunder = b.name.startsWith('__');
+      const aName = a.name ?? '';
+      const bName = b.name ?? '';
+      const aStartsWithDunder = aName.startsWith('__');
+      const bStartsWithDunder = bName.startsWith('__');
 
       if (aStartsWithDunder && !bStartsWithDunder) return 1;
       if (!aStartsWithDunder && bStartsWithDunder) return -1;
 
-      return a.name.localeCompare(b.name);
+      return aName.localeCompare(bName);
     });
   };
+
+  const metadataError = $derived($workflowRun.metadata?.error?.message);
+  const queryTypes = $derived(
+    sortByName(
+      $workflowRun?.metadata?.definition?.queryDefinitions?.filter((query) => {
+        return query?.name !== '__stack_trace';
+      }) || [],
+    ),
+  );
+  const edited = $derived(
+    initialQueryType !== queryType || input !== initialInput,
+  );
+
+  $effect(() => {
+    if (!queryType) {
+      queryType = queryTypes?.[0]?.name || '';
+    }
+  });
 
   onMount(() => {
     if (!$workflowRun.metadata) {
@@ -111,7 +120,7 @@
       namespace,
       workflow: params,
       queryType,
-      queryArgs: payloads ? { payloads } : null,
+      queryArgs: payloads ? { payloads } : undefined,
     }).finally(() => {
       reset();
     });
@@ -150,10 +159,10 @@
         </div>
         <div class="flex w-full flex-wrap items-end justify-end gap-4">
           <Button
-            on:click={() => query(queryType)}
+            onclick={() => query(queryType)}
             {loading}
             variant={edited ? 'primary' : 'secondary'}
-            leadingIcon={edited ? null : 'retry'}
+            leadingIcon={edited ? undefined : 'retry'}
             disabled={loading}
           >
             {edited
@@ -172,16 +181,17 @@
               labelPosition="left"
               id="json-formatting"
               checked={jsonFormatting}
-              on:change={() => (jsonFormatting = !jsonFormatting)}
+              onchange={() => (jsonFormatting = !jsonFormatting)}
             />
           </div>
           <CodeBlock
             {content}
             language={jsonFormatting ? 'json' : 'text'}
+            label={translate('workflows.query-result')}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             testId="query-result"
-            class={edited && 'opacity-50'}
+            class={edited ? 'opacity-50' : undefined}
           />
         {:catch _error}
           <EmptyState

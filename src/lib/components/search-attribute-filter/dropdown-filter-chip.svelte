@@ -331,9 +331,9 @@
       <ToggleButton
         variant="secondary"
         active={localFilter.conditional === option.value}
-        on:click={() => {
+        onclick={() => {
           if (isNullConditional(option.value)) {
-            localFilter.value = null;
+            localFilter.value = '';
           } else if (isNullFilter) {
             localFilter.value = filter.value;
           }
@@ -453,7 +453,7 @@
                 />
                 <div class="ml-6 flex flex-col gap-2">
                   <DatePicker
-                    label=""
+                    label={translate('common.start')}
                     labelHidden
                     onDateChange={onStartDateChange}
                     selected={new Date(start.date)}
@@ -530,7 +530,7 @@
             <ToggleButtons>
               <ToggleButton
                 variant={localFilter.value === 'true' ? 'primary' : 'secondary'}
-                on:click={() => {
+                onclick={() => {
                   localFilter.conditional = '=';
                   localFilter.value = 'true';
                 }}
@@ -541,7 +541,7 @@
                 variant={localFilter.value === 'false'
                   ? 'primary'
                   : 'secondary'}
-                on:click={() => {
+                onclick={() => {
                   localFilter.conditional = '=';
                   localFilter.value = 'false';
                 }}
@@ -576,7 +576,7 @@
             size="xs"
             data-testid="remove-filter-button"
             type="button"
-            on:click={onRemove}>Remove</Button
+            onclick={onRemove}>Remove</Button
           >
           <Button
             variant="primary"

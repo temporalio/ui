@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -10,67 +11,73 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  import WorkflowStatus from '../workflow-status.svelte';
-
   interface Props {
     children?: WorkflowExecution[];
   }
 
-  let { children = [] }: Props = $props();
+  let { children: childWorkflows = [] }: Props = $props();
 
   const namespace = $derived(page.params.namespace);
 </script>
 
 <Pagination
-  items={children}
-  let:visibleItems
+  items={childWorkflows}
   aria-label={translate('workflows.child-workflows')}
   pageSizeSelectLabel={translate('common.per-page')}
   previousButtonLabel={translate('common.previous')}
   nextButtonLabel={translate('common.next')}
 >
-  <div slot="pagination-top"></div>
-  <Table class="w-full">
-    <caption class="sr-only" slot="caption"
-      >{translate('workflows.child-workflows')}</caption
-    >
-    <TableHeaderRow slot="headers">
-      <th scope="col" class="max-md:hidden">{translate('common.status')}</th>
-      <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
-      <th scope="col">{translate('workflows.child-id')}</th>
-      <th scope="col">{translate('workflows.child-run-id')}</th>
-    </TableHeaderRow>
-    {#each visibleItems as child}
-      <TableRow>
-        <td class="max-md:hidden">
-          <WorkflowStatus status={child.status} />
-        </td>
-        <td class="max-lg:hidden">
-          {child.name}
-        </td>
-        <td class="hover:text-blue-700 hover:underline">
-          <Link
-            href={routeForWorkflow({
-              namespace,
-              workflow: child.id,
-              run: child.runId,
-            })}
+  {#snippet paginationTop()}
+    <div></div>
+  {/snippet}
+  {#snippet children({ visibleItems })}
+    <Table class="w-full">
+      {#snippet caption()}
+        <caption class="sr-only"
+          >{translate('workflows.child-workflows')}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <TableHeaderRow>
+          <th scope="col" class="max-md:hidden">{translate('common.status')}</th
           >
-            {child.id}
-          </Link>
-        </td>
-        <td class="hover:text-blue-700 hover:underline">
-          <Link
-            href={routeForWorkflow({
-              namespace,
-              workflow: child.id,
-              run: child.runId,
-            })}
-          >
-            {child.runId}
-          </Link>
-        </td>
-      </TableRow>
-    {/each}
-  </Table>
+          <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
+          <th scope="col">{translate('workflows.child-id')}</th>
+          <th scope="col">{translate('workflows.child-run-id')}</th>
+        </TableHeaderRow>
+      {/snippet}
+      {#each visibleItems as child}
+        <TableRow>
+          <td class="max-md:hidden">
+            <WorkflowStatus status={child.status} />
+          </td>
+          <td class="max-lg:hidden">
+            {child.name}
+          </td>
+          <td class="hover:text-blue-700 hover:underline">
+            <Link
+              href={routeForWorkflow({
+                namespace,
+                workflow: child.id,
+                run: child.runId,
+              })}
+            >
+              {child.id}
+            </Link>
+          </td>
+          <td class="hover:text-blue-700 hover:underline">
+            <Link
+              href={routeForWorkflow({
+                namespace,
+                workflow: child.id,
+                run: child.runId,
+              })}
+            >
+              {child.runId}
+            </Link>
+          </td>
+        </TableRow>
+      {/each}
+    </Table>
+  {/snippet}
 </Pagination>

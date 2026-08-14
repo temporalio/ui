@@ -13,7 +13,11 @@
   import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
   import { isRawPayload } from '$lib/utilities/decode-payload';
-  import { getEventLinkHref } from '$lib/utilities/event-link-href';
+  import {
+    type EventLinkDisplay,
+    eventLinkTargetTypeLabel,
+    toEventLinkViews,
+  } from '$lib/utilities/event-link';
   import {
     format,
     spaceBetweenCapitalLetters,
@@ -31,14 +35,12 @@
   } from '$lib/utilities/get-system-nexus-event-display';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { describeNexusOperation } from '$lib/utilities/nexus-operation-registry';
-  import {
-    routeForEventHistoryEvent,
-    routeForNamespace,
-  } from '$lib/utilities/route-for';
+  import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
 
-  let { event }: { event: WorkflowEvent } = $props();
+  let { event, lazy = false }: { event: WorkflowEvent; lazy?: boolean } =
+    $props();
   const { namespace, workflow, run } = $derived(page.params);
 
   const systemNexus = $derived(getSystemNexusEventDisplay(event, namespace));
@@ -126,7 +128,11 @@
   <div class="flex flex-col gap-1 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if event?.links?.length}
-        {@render eventLinks(event.links)}
+        {#if event.category === 'nexus'}
+          {@render nexusHandlerLinks(event.links)}
+        {:else}
+          {@render eventLinks(event.links)}
+        {/if}
       {/if}
       {#if event?.userMetadata?.summary}
         {@render eventSummary(event.userMetadata.summary)}
@@ -151,45 +157,55 @@
   </div>
 </div>
 
-{#snippet eventLink(link: ELink)}
-  {@const href = getEventLinkHref(link)}
-  {@const value = href.split('workflows/')?.[1] || href}
+{#snippet eventLink(view: EventLinkDisplay)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
-      {translate('nexus.link')}
+      {view.label}
     </p>
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      content={value}
+      content={view.value}
     >
-      <Link {href} class="whitespace-pre-line">{value}</Link>
-    </Copyable>
-  </div>
-{/snippet}
-
-{#snippet eventNamespaceLink(link: ELink)}
-  {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
-      {translate('nexus.link-namespace')}
-    </p>
-    <Copyable
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      content={link.workflowEvent.namespace}
-    >
-      <Link {href} class="whitespace-pre-line"
-        >{link.workflowEvent.namespace}</Link
-      >
+      {#if view.href}
+        <Link href={view.href} class="whitespace-pre-line">{view.value}</Link>
+      {:else}
+        <span class="whitespace-pre-line">{view.value}</span>
+      {/if}
     </Copyable>
   </div>
 {/snippet}
 
 {#snippet eventLinks(links: ELink[])}
-  {#each links as link (link)}
-    {@render eventLink(link)}
-    {@render eventNamespaceLink(link)}
+  {#each toEventLinkViews(links, { namespace }) as view (view.key)}
+    {@render eventLink(view)}
+    {#if view.namespace}
+      {@render eventLink(view.namespace)}
+    {/if}
+  {/each}
+{/snippet}
+
+{#snippet nexusHandlerLinks(links: ELink[])}
+  {#each toEventLinkViews(links, { namespace }) as view (view.key)}
+    {@const targetType = eventLinkTargetTypeLabel(view.variant)}
+    {@render eventLink({
+      label: translate('nexus.handler-target'),
+      value: view.value,
+      href: view.href,
+    })}
+    {#if targetType}
+      {@render eventLink({
+        label: translate('nexus.handler-target-type'),
+        value: targetType,
+      })}
+    {/if}
+    {#if view.namespace}
+      {@render eventLink({
+        label: translate('nexus.handler-namespace'),
+        value: view.namespace.value,
+        href: view.namespace.href,
+      })}
+    {/if}
   {/each}
 {/snippet}
 
@@ -204,7 +220,7 @@
   </div>
 {/snippet}
 
-{#snippet payloads(key, value)}
+{#snippet payloads(key: string, value: Record<string, unknown>)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   {@const nexusDescriptor = isRawPayload(codeBlockValue)
@@ -227,8 +243,10 @@
           eventId: event.id,
           type: key,
         }}
+        label={format(key)}
         {value}
         maxHeight={384}
+        {lazy}
       />
     {:else}
       <PayloadCodeBlock
@@ -238,8 +256,10 @@
           eventId: event.id,
           type: key,
         }}
+        label={format(key)}
         value={codeBlockValue}
         maxHeight={384}
+        {lazy}
       />
     {/if}
   </div>
@@ -252,8 +272,10 @@
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         content={stackTrace}
+        label={translate('workflows.call-stack-tab')}
         language="text"
         maxHeight={384}
+        {lazy}
       />
     </div>
   {/if}
@@ -280,7 +302,7 @@
   </div>
 {/snippet}
 
-{#snippet link(key, value)}
+{#snippet link(key: string, value: string | number)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
@@ -300,7 +322,7 @@
   </div>
 {/snippet}
 
-{#snippet details(key, value)}
+{#snippet details(key: string, value: string | number)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}

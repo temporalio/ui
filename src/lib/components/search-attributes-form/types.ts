@@ -2,6 +2,7 @@ export interface SearchAttributeDefinition {
   name?: string;
   type?: string;
   isDeletable?: boolean;
+  isExisting?: boolean;
   initialName?: string;
 }
 
@@ -18,7 +19,6 @@ export interface SearchAttributesAdapter {
   fetchAttributes(): Promise<SearchAttributeDefinition[]>;
   upsertAttributes(attributes: SearchAttributeDefinition[]): Promise<void>;
   deleteAttribute(attributeName: string): Promise<void>;
-  getSupportedTypes(): SearchAttributeTypeOption[];
   onSuccess?: (attributes: SearchAttributeDefinition[]) => Promise<void>;
   onCancel?: () => void;
 }

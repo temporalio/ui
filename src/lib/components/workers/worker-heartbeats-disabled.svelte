@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -32,6 +30,10 @@
         {translate('workers.worker-heartbeats-enablement')}
       </p>
     </div>
-    <CodeBlock copyable {content} />
+    <CodeBlock
+      copyable
+      {content}
+      label={translate('workers.heartbeat-config')}
+    />
   </div>
 </Card>

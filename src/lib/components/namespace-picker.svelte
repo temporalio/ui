@@ -32,9 +32,10 @@
     value ? routeForNamespace({ namespace: value }) : undefined,
   );
 
-  const handleNamespaceSelect = (namespaceListItem: NamespaceListItem) => {
-    $lastUsedNamespace = namespaceListItem.namespace;
-    namespaceListItem?.onClick(namespaceListItem.namespace);
+  const handleNamespaceSelect = (value: string | NamespaceListItem) => {
+    if (typeof value === 'string') return;
+    $lastUsedNamespace = value.namespace;
+    value?.onClick(value.namespace);
   };
 
   let sortedNamespaceList = $derived(

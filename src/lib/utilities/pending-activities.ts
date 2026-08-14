@@ -58,18 +58,21 @@ export const getPendingNexusOperation = (
 };
 
 export const getGroupForEventOrPendingEvent = (
-  groups: EventGroup[],
+  groups: EventGroup[] | Map<string, EventGroup>,
   event: WorkflowEventWithPending,
 ): EventGroup | undefined => {
-  return groups.find((g) => {
-    if (isEvent(event)) {
-      return g.eventIds.has(event.id);
-    } else if (isPendingActivity(event)) {
-      return g.pendingActivity?.id === event.id;
-    } else if (isPendingNexusOperation(event)) {
-      return (
-        g?.pendingNexusOperation?.scheduledEventId === event?.scheduledEventId
-      );
-    }
-  });
+  if (isEvent(event)) {
+    if (groups instanceof Map) return groups.get(event.id);
+    return groups.find((g) => g.eventList.some((e) => e.id === event.id));
+  }
+  if (groups instanceof Map) return undefined;
+  if (isPendingActivity(event)) {
+    return groups.find((g) => g.pendingActivity?.id === event.id);
+  }
+  if (isPendingNexusOperation(event)) {
+    return groups.find(
+      (g) =>
+        g?.pendingNexusOperation?.scheduledEventId === event?.scheduledEventId,
+    );
+  }
 };

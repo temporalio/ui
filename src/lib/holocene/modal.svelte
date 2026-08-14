@@ -1,52 +1,59 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import { type ComponentProps, createEventDispatcher } from 'svelte';
+  import type { ComponentProps, Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
-  import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLDialogElement> {
+  interface Props extends HTMLAttributes<HTMLDialogElement> {
     cancelText: string;
     confirmDisabled?: boolean;
     confirmText: string;
-    confirmType?: ComponentProps<Button>['variant'];
+    confirmType?: ComponentProps<typeof Button>['variant'];
     hideCancel?: boolean;
     hideConfirm?: boolean;
     hightlightNav?: boolean;
     id: string;
     large?: boolean;
     loading?: boolean;
-    'data-testid'?: string;
     open: boolean;
     error?: string;
     class?: string;
+    titleSnippet?: Snippet;
+    content?: Snippet;
+    footer?: Snippet;
+    onCancelModal?: () => void;
+    onConfirmModal?: () => void;
   }
 
-  export let hideCancel = false;
-  export let hideConfirm = false;
-  export let confirmText: string;
-  export let cancelText: string;
-  export let confirmType: ComponentProps<Button>['variant'] = 'primary';
-  export let confirmDisabled = false;
-  export let large = false;
-  export let loading = false;
-  export let hightlightNav = false;
-  export let id: string;
-  export let open: boolean;
-  export let error = '';
+  let {
+    hideCancel = false,
+    hideConfirm = false,
+    confirmText,
+    cancelText,
+    confirmType = 'primary',
+    confirmDisabled = false,
+    large = false,
+    loading = false,
+    hightlightNav = false,
+    id,
+    open = $bindable(),
+    error = $bindable(''),
+    class: className = '',
+    titleSnippet,
+    content,
+    footer,
+    onCancelModal,
+    onConfirmModal,
+    ...rest
+  }: Props = $props();
 
-  let className = '';
-  export { className as class };
+  let modalElement = $state<HTMLDialogElement>();
 
-  let modalElement: HTMLDialogElement;
-
-  $: toggleModal(open, modalElement);
-
-  export const toggleModal = (open: boolean, modal: HTMLDialogElement) => {
+  const toggleModal = (open: boolean, modal: HTMLDialogElement | undefined) => {
     if (open) {
       modal?.showModal();
     } else {
@@ -54,41 +61,43 @@
     }
   };
 
-  const dispatch = createEventDispatcher<{
-    cancelModal: undefined;
-    confirmModal: undefined;
-  }>();
+  $effect(() => {
+    toggleModal(open, modalElement);
+  });
 
-  const handleCancel = () => {
-    dispatch('cancelModal');
-    open = false;
+  // Escape, backdrop, the close icon, the cancel button and the parent flipping
+  // `open` all end up here via the dialog's native close event.
+  const handleClose = () => {
     error = '';
+    if (!open) return; // the parent already closed us, the user did not cancel
+    open = false;
+    onCancelModal?.();
   };
 
   const confirmModal = () => {
-    dispatch('confirmModal');
+    onConfirmModal?.();
   };
 
   const closeModal = () => {
-    open = false;
+    modalElement?.close();
   };
 
   const handleClick = (event: MouseEvent) => {
     if (event.target === modalElement) closeModal();
   };
 
-  $: {
+  $effect(() => {
     if (open && modalElement) {
       modalElement.focus();
     }
-  }
+  });
 </script>
 
-<svelte:window on:click={handleClick} />
+<svelte:window onclick={handleClick} />
 
 <dialog
   {id}
-  on:close={handleCancel}
+  onclose={handleClose}
   bind:this={modalElement}
   class={merge(
     'body',
@@ -101,24 +110,28 @@
   class:hightlightNav
   aria-modal="true"
   aria-labelledby="modal-title-{id}"
-  data-testid={$$props['data-testid']}
-  {...$$restProps}
-  use:focusTrap={true}
+  {...rest}
 >
   {#if !loading}
     <IconButton
       label={cancelText}
       icon="close"
       class="float-right m-4"
-      on:click={closeModal}
+      onclick={closeModal}
     />
   {/if}
   <div id="modal-title-{id}" class="title">
-    <slot name="title" />
+    {@render titleSnippet?.()}
   </div>
-  <form on:submit|preventDefault={confirmModal} method="dialog">
+  <form
+    onsubmit={(event) => {
+      event.preventDefault();
+      confirmModal();
+    }}
+    method="dialog"
+  >
     <div id="modal-content-{id}" class="content">
-      <slot name="content" />
+      {@render content?.()}
       <p
         class="mt-2 text-sm font-normal text-danger"
         class:hidden={!error}
@@ -129,16 +142,18 @@
     </div>
 
     <div class="flex items-center justify-between p-6">
-      <slot name="footer">
+      {#if footer}
+        {@render footer()}
+      {:else}
         <div></div>
-      </slot>
+      {/if}
       <div class="flex items-center justify-end space-x-2">
         {#if !hideCancel}
           <Button
             data-testid="cancel-modal-button"
             variant="ghost"
             disabled={loading}
-            on:click={closeModal}>{cancelText}</Button
+            onclick={closeModal}>{cancelText}</Button
           >
         {/if}
         {#if !hideConfirm}

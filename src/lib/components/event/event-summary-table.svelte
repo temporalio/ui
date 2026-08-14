@@ -2,10 +2,11 @@
   import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
+  import LiveCountAnnouncer from '$lib/components/live-count-announcer.svelte';
   import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { isEventGroup } from '$lib/models/event-groups';
+  import { buildGroupIndex, isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -22,7 +23,7 @@
     isPendingNexusOperation,
   } from '$lib/utilities/is-pending-activity';
 
-  import HistoryGraph from '../lines-and-dots/svg/history-graph.svelte';
+  import HistoryGraph from '../lines-and-dots/history-graph/history-graph.svelte';
   import TableHeaderCell from '../workflow/workflows-summary-configurable-table/table-header-cell.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
@@ -50,6 +51,7 @@
 
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
+  const groupIndex = $derived(buildGroupIndex(groups));
   const url = $derived(page.url);
   const perPageParam = $derived(url.searchParams.get(perPageKey) ?? '100');
   const currentPageParam = $derived(
@@ -82,6 +84,11 @@
   };
 </script>
 
+<LiveCountAnnouncer
+  count={items.length}
+  getMessage={(count) =>
+    translate('workflows.new-events-announcement', { count })}
+/>
 <div class="flex">
   <div class="pt-9">
     {#if showGraph}
@@ -95,61 +102,64 @@
     pageButtonLabel={(page) => translate('common.go-to-page', { page })}
     {updating}
     items={filteredForStatus(items)}
-    let:visibleItems
     maxHeight="none"
     class="border-t-0"
   >
-    <TableHeaderRow slot="headers" class="!h-8">
-      {#each columns as column, i (`${column.label}:${i}`)}
-        <TableHeaderCell {column}>
-          {#if column.label === 'Event Type'}
-            <EventHistoryLegend eventTypesOnly />
-          {/if}
-        </TableHeaderCell>
-      {/each}
-    </TableHeaderRow>
-    {#each visibleItems as event, index (iterableKey(event))}
-      {#if isEventGroup(event)}
-        <EventSummaryRow
-          bind:hoveredEventId
-          {event}
-          {index}
-          group={event}
-          {compact}
-          {initialItem}
-        />
-      {:else if isPendingActivity(event)}
-        <PendingActivitySummaryRow
-          {event}
-          {index}
-          group={groups.find(
-            (g) =>
-              isPendingActivity(event) && g?.pendingActivity?.id === event.id,
-          )}
-        />
-      {:else if isPendingNexusOperation(event)}
-        <PendingNexusSummaryRow
-          {event}
-          {index}
-          group={groups.find(
-            (g) =>
-              isPendingNexusOperation(event) &&
-              g?.pendingNexusOperation?.scheduledEventId ===
-                event.scheduledEventId,
-          )}
-        />
+    {#snippet headers()}
+      <TableHeaderRow class="!h-8">
+        {#each columns as column, i (`${column.label}:${i}`)}
+          <TableHeaderCell {column}>
+            {#if column.label === 'Event Type'}
+              <EventHistoryLegend eventTypesOnly />
+            {/if}
+          </TableHeaderCell>
+        {/each}
+      </TableHeaderRow>
+    {/snippet}
+    {#snippet rows({ visibleItems })}
+      {#each visibleItems as event, index (iterableKey(event))}
+        {#if isEventGroup(event)}
+          <EventSummaryRow
+            bind:hoveredEventId
+            {event}
+            {index}
+            group={event}
+            {compact}
+            {initialItem}
+          />
+        {:else if isPendingActivity(event)}
+          <PendingActivitySummaryRow
+            {event}
+            {index}
+            group={groups.find(
+              (g) =>
+                isPendingActivity(event) && g?.pendingActivity?.id === event.id,
+            )}
+          />
+        {:else if isPendingNexusOperation(event)}
+          <PendingNexusSummaryRow
+            {event}
+            {index}
+            group={groups.find(
+              (g) =>
+                isPendingNexusOperation(event) &&
+                g?.pendingNexusOperation?.scheduledEventId ===
+                  event.scheduledEventId,
+            )}
+          />
+        {:else}
+          <EventSummaryRow
+            bind:hoveredEventId
+            {event}
+            {index}
+            group={isEvent(event) ? groupIndex.get(event.id) : undefined}
+            {compact}
+            {initialItem}
+          />
+        {/if}
       {:else}
-        <EventSummaryRow
-          bind:hoveredEventId
-          {event}
-          {index}
-          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
-          {compact}
-          {initialItem}
-        />
-      {/if}
-    {:else}
-      <EventEmptyRow loading={!$fullEventHistory.length || loading} />
-    {/each}
+        <EventEmptyRow loading={!$fullEventHistory.length || loading} />
+      {/each}
+    {/snippet}
   </Paginated>
 </div>

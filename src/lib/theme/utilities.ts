@@ -23,6 +23,8 @@ export const toColor = (name: ColorName): RGB => {
     if (isShade(shade)) return rgb(color[shade]);
     return rgb(color.DEFAULT);
   }
+
+  return '0 0 0';
 };
 
 export const isHexColor = (color: unknown): color is HexColor => {

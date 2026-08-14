@@ -123,7 +123,7 @@
     {/each}
 
     {#if hasMoreFilters}
-      <Button variant="secondary" size="xs" on:click={viewMoreFilters}>
+      <Button variant="secondary" size="xs" onclick={viewMoreFilters}>
         {translate('common.view-more')}
       </Button>
     {/if}

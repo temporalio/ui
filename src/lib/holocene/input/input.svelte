@@ -46,7 +46,7 @@
     label,
     afterLabel,
     labelHidden = false,
-    icon = null,
+    icon = undefined,
     placeholder = '',
     suffix = '',
     prefix = '',
@@ -59,7 +59,7 @@
     hintText = '',
     maxLength = 0,
     hideCount = false,
-    spellcheck = null,
+    spellcheck = undefined,
     noBorder = false,
     autoFocus = false,
     error = false,
@@ -79,6 +79,9 @@
 
   const isDisabled = $derived(disabled || copyable);
   const testId = $derived(dataTestId || id);
+  const errorId = $derived(`${id}-error`);
+  const hintId = $derived(`${id}-hint`);
+  const showError = $derived(error || !valid);
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
@@ -93,8 +96,19 @@
 </script>
 
 <div class={merge('group flex flex-col gap-1', className)}>
-  <div class="flex items-center justify-start gap-2">
-    <Label class="grow-0" {required} {label} hidden={labelHidden} for={id} />
+  <div
+    class={merge(
+      'flex items-center justify-start gap-2',
+      !afterLabel && 'contents',
+    )}
+  >
+    <Label
+      class="grow-0"
+      required={required ?? false}
+      {label}
+      hidden={labelHidden}
+      for={id}
+    />
     {@render afterLabel?.()}
   </div>
   <div class="input-group flex">
@@ -129,6 +143,8 @@
         {name}
         {spellcheck}
         {required}
+        aria-invalid={showError ? 'true' : undefined}
+        aria-describedby={hintText ? (showError ? errorId : hintId) : undefined}
         {autocomplete}
         bind:value
         onclick={(e) => {
@@ -167,7 +183,7 @@
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
-            on:click={handleClear}
+            onclick={handleClear}
             icon="close"
           />
         </div>
@@ -186,12 +202,15 @@
     class:hidden={!hintText && (!maxLength || isDisabled || hideCount)}
   >
     <span
-      class="hint-text inline-block"
-      class:invalid={!valid}
-      class:error
-      role={error ? 'alert' : null}
+      id={errorId}
+      role="alert"
+      class="hint-text error inline-block"
+      class:hidden={!showError}
     >
-      {hintText}
+      {#if showError}{hintText}{/if}
+    </span>
+    <span id={hintId} class="hint-text inline-block" class:hidden={showError}>
+      {#if !showError}{hintText}{/if}
     </span>
     {#if maxLength && !isDisabled && !hideCount}
       <span

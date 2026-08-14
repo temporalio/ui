@@ -15,7 +15,7 @@ import {
 const isFailedLocalActivity = (event: WorkflowEvent) => {
   return (
     isLocalActivityMarkerEvent(event) &&
-    event.markerRecordedEventAttributes.failure
+    event.markerRecordedEventAttributes?.failure
   );
 };
 

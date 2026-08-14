@@ -1,0 +1,86 @@
+<script lang="ts">
+  import Input from '$lib/holocene/input/input.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { terminateNexusOperationExecution } from '$lib/services/standalone-nexus-operations';
+  import { toaster } from '$lib/stores/toaster';
+  import { getIdentity } from '$lib/utilities/core-context';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
+
+  interface Props {
+    open: boolean;
+    operationId: string;
+    namespace: string;
+    onConfirm: () => void;
+  }
+
+  let {
+    open = $bindable(),
+    operationId,
+    namespace,
+    onConfirm,
+  }: Props = $props();
+
+  let loading = $state(false);
+  let error = $state('');
+  let reason = $state('');
+
+  const identity = getIdentity();
+
+  const terminate = async () => {
+    error = '';
+    loading = true;
+    try {
+      await terminateNexusOperationExecution(
+        namespace,
+        operationId,
+        reason,
+        identity,
+      );
+      open = false;
+      toaster.push({
+        id: 'nexus-operation-terminate-success-toast',
+        message: translate('standalone-nexus-operations.terminate-success'),
+      });
+      onConfirm();
+    } catch (err: unknown) {
+      error = isNetworkError(err)
+        ? (err.message ?? translate('common.unknown-error'))
+        : translate('common.unknown-error');
+    } finally {
+      loading = false;
+    }
+  };
+</script>
+
+<Modal
+  id="terminate-confirmation-modal"
+  data-testid="terminate-confirmation-modal"
+  confirmText={translate('standalone-nexus-operations.terminate')}
+  cancelText={translate('common.cancel')}
+  bind:error
+  bind:open
+  {loading}
+  confirmType="destructive"
+  onConfirmModal={terminate}
+>
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('standalone-nexus-operations.terminate-modal-title')}
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="space-y-2">
+      <p>
+        {translate('standalone-nexus-operations.terminate-modal-confirmation')}
+      </p>
+      <Input
+        id="terminate-nexus-operation-reason"
+        label={translate('common.reason-placeholder')}
+        labelHidden
+        bind:value={reason}
+        placeholder={translate('common.reason-placeholder')}
+      />
+    </div>
+  {/snippet}
+</Modal>

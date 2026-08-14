@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   import { page } from '$app/state';
 
   import Skeleton from '$lib/components/workers/worker-details/skeleton.svelte';
@@ -7,13 +9,37 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { describeWorker } from '$lib/services/worker-service';
+  import type { WorkerInfo } from '$lib/types';
+  import type { NetworkError } from '$lib/types/global';
   import { routeForWorkers } from '$lib/utilities/route-for';
 
   const { namespace, workerInstanceKey } = $derived(page.params);
-  let refresh = $state(Date.now());
-  const workerDetailsPromise = $derived.by(() => {
-    void refresh;
-    return describeWorker({ namespace, workerInstanceKey });
+
+  let worker = $state<WorkerInfo | null | undefined>();
+  let error = $state<NetworkError | null>(null);
+  let refreshing = $state(false);
+
+  async function loadWorker() {
+    if (worker) refreshing = true;
+    try {
+      const data = await describeWorker({ namespace, workerInstanceKey });
+      worker = data.workerInfo;
+      error = null;
+    } catch (e) {
+      error = e as NetworkError;
+    } finally {
+      refreshing = false;
+    }
+  }
+
+  $effect(() => {
+    void namespace;
+    void workerInstanceKey;
+    untrack(() => {
+      worker = undefined;
+      error = null;
+      loadWorker();
+    });
   });
 </script>
 
@@ -27,15 +53,11 @@
   </Link>
 {/snippet}
 
-{#await workerDetailsPromise}
-  <Skeleton {breadcrumb} />
-{:then data}
-  <WorkerDetails
-    worker={data.workerInfo}
-    {breadcrumb}
-    onrefresh={() => (refresh = Date.now())}
-  />
-{:catch error}
+{#if error}
   {@render breadcrumb()}
   <Error {error} status={error.statusCode} />
-{/await}
+{:else if worker === undefined}
+  <Skeleton {breadcrumb} />
+{:else}
+  <WorkerDetails {worker} {breadcrumb} onrefresh={loadWorker} {refreshing} />
+{/if}

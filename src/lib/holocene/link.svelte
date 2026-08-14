@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { goto } from '$app/navigation';
@@ -9,29 +10,43 @@
 
   import Icon from './icon/icon.svelte';
 
-  type $$Props = HTMLAnchorAttributes & {
+  interface Props extends Omit<HTMLAnchorAttributes, 'class' | 'onclick'> {
     href: string;
     active?: boolean;
     interactive?: boolean;
     newTab?: boolean;
     class?: string;
+    /** @deprecated Use `leadingIcon` */
     icon?: IconName;
+    leadingIcon?: IconName;
+    trailingIcon?: IconName;
     text?: string;
     light?: boolean;
     gotoParams?: Parameters<typeof goto>[1];
     'data-testid'?: string;
-  };
+    children?: Snippet;
+    onclick?: (event: MouseEvent) => void;
+  }
 
-  let className = '';
-  export { className as class };
-  export let href: string;
-  export let active = false;
-  export let interactive = false;
-  export let newTab = false;
-  export let icon: IconName = null;
-  export let text: string = '';
-  export let light = false;
-  export let gotoParams = {};
+  let {
+    class: className = '',
+    href,
+    active = false,
+    interactive = false,
+    newTab = false,
+    icon,
+    leadingIcon,
+    trailingIcon,
+    text = '',
+    light = false,
+    gotoParams = {},
+    children,
+    onclick,
+    ...rest
+  }: Props = $props();
+
+  const effectiveLeading = $derived(leadingIcon ?? icon);
+  const hasIcon = $derived(!!(effectiveLeading || trailingIcon));
 
   const onLinkClick = (e: MouseEvent) => {
     if (e.button === 1 || newTab || e.metaKey || e.ctrlKey || e.shiftKey)
@@ -40,30 +55,34 @@
     e.preventDefault();
     goto(href, gotoParams);
   };
+
+  const handleClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    onLinkClick(event);
+    onclick?.(event);
+  };
 </script>
 
 <a
   {href}
   target={newTab ? '_blank' : null}
   rel={newTab ? 'noreferrer noopener' : null}
-  class={merge('link', icon ? 'inline-flex' : 'inline', className)}
+  class={merge('link', hasIcon ? 'inline-flex' : 'inline', className)}
   class:active
   class:interactive
   class:light
   data-track-name="link"
   data-track-intent="navigate"
   data-track-text={text || '*textContent*'}
-  on:click|stopPropagation={onLinkClick}
   tabindex={href ? null : 0}
-  {...$$restProps}
+  {...rest}
+  onclick={handleClick}
 >
-  {#if icon}
-    <Icon class="mt-0.5" name={icon} />
+  {#if effectiveLeading}
+    <Icon class="mt-0.5" name={effectiveLeading} />
+  {/if}{#if text}{text}{/if}{@render children?.()}{#if trailingIcon}
+    <Icon class="mt-0.5" name={trailingIcon} />
   {/if}
-  {#if text}
-    {text}
-  {/if}
-  <slot />
 </a>
 
 <style lang="postcss">

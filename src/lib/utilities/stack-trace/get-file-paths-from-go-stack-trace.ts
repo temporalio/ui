@@ -9,7 +9,7 @@ import { parseWithBigInt } from '../parse-with-big-int';
 
 export const getFilePathsFromGoStackTrace = (
   stackTraceText: string,
-): { filePath: string; codeLine: number; character: number }[] => {
+): { filePath: string; codeLine: number; character: number }[] | undefined => {
   const pattern = new RegExp(/(\w:|\/)(.)+.go:([\d])+/g);
   if (isFromGoSDK(stackTraceText)) {
     const paths: { filePath: string; codeLine: number; character: number }[] =

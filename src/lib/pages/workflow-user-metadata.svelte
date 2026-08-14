@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script>
   import UserMetadata from '$lib/components/user-metadata.svelte';
   import WorkflowCurrentDetails from '$lib/components/workflow/metadata/workflow-current-details.svelte';

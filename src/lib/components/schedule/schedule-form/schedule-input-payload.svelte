@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
+  import { get, type Writable, writable } from 'svelte/store';
 
   import PayloadDecoder, {
     type DecodedPayloadResult,
@@ -21,7 +21,7 @@
   interface Props {
     input: string;
     editInput: boolean;
-    encoding: Writable<PayloadInputEncoding>;
+    encoding?: PayloadInputEncoding;
     messageType: string;
     payloads: Payloads | undefined;
     showEditActions?: boolean;
@@ -30,11 +30,20 @@
   let {
     input = $bindable(),
     editInput = $bindable(),
-    encoding,
+    encoding = $bindable('json/plain'),
     messageType = $bindable(),
     payloads,
     showEditActions = false,
   }: Props = $props();
+
+  const encodingStore: Writable<PayloadInputEncoding> = writable(encoding);
+  $effect(() => {
+    if (get(encodingStore) !== encoding) encodingStore.set(encoding);
+  });
+  $effect(() => {
+    const val = $encodingStore;
+    if (val !== encoding) encoding = val;
+  });
 
   let initialInput = $state('');
   let initialEncoding = $state<PayloadInputEncoding>('json/plain');
@@ -59,8 +68,8 @@
       }
 
       if (isPayloadInputEncodingType(currentEncoding)) {
-        $encoding = currentEncoding;
-        initialEncoding = $encoding;
+        encoding = currentEncoding;
+        initialEncoding = encoding;
         if (currentEncoding === 'json/protobuf' && currentMessageType) {
           messageType = currentMessageType;
           initialMessageType = currentMessageType;
@@ -75,7 +84,7 @@
     if (editInput) {
       editInput = false;
       input = initialInput;
-      $encoding = initialEncoding;
+      encoding = initialEncoding;
       messageType = initialMessageType;
     } else {
       editInput = true;
@@ -84,21 +93,28 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <PayloadDecoder value={payloads} onDecode={setInitialInput}>
+  <PayloadDecoder value={payloads ?? {}} onDecode={setInitialInput}>
     {#snippet children(_decodedValue)}
       <PayloadInputWithEncoding
         bind:input
-        {encoding}
+        encoding={encodingStore}
         bind:messageType
         bind:loading
         editing={editInput}
+        payloadLabel="JSON Data"
+        placeholder={'{"key": "value"}'}
         id="schedule-payload-input"
+        copyable={true}
       >
-        <div slot="action" class:hidden={!showEditActions}>
-          <Button variant="secondary" on:click={handleEdit}>
-            {editInput ? translate('common.cancel') : translate('common.edit')}
-          </Button>
-        </div>
+        {#snippet action()}
+          <div class:hidden={!showEditActions}>
+            <Button variant="secondary" onclick={handleEdit}>
+              {editInput
+                ? translate('common.cancel')
+                : translate('common.edit')}
+            </Button>
+          </div>
+        {/snippet}
       </PayloadInputWithEncoding>
     {/snippet}
   </PayloadDecoder>

@@ -25,6 +25,7 @@ package auth_test
 import (
 	_ "embed"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -95,7 +96,7 @@ func TestSetUser(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := auth.SetUser(tt.ctx, &tt.user)
+			err := auth.SetUser(tt.ctx, &tt.user, true)
 			cookies := tt.ctx.Cookies()
 
 			if tt.wantErr {
@@ -106,6 +107,34 @@ func TestSetUser(t *testing.T) {
 				assert.NoError(t, err)
 				setCookie := tt.ctx.Response().Header().Get(echo.HeaderSetCookie)
 				assert.Contains(t, setCookie, "user0")
+			}
+		})
+	}
+}
+
+// TestSetUserSecureFlag asserts that the auth cookies carry Secure according to the
+// `secure` argument passed to SetUser.
+func TestSetUserSecureFlag(t *testing.T) {
+	for name, secure := range map[string]bool{"secure=true": true, "secure=false": false} {
+		t.Run(name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(echo.GET, "/auth/sso/callback", nil)
+			c := e.NewContext(req, httptest.NewRecorder())
+			user := auth.User{OAuth2Token: &oauth2.Token{AccessToken: "AAA", RefreshToken: "RRR"}}
+
+			a := assert.New(t)
+			a.NoError(auth.SetUser(c, &user, secure))
+
+			for _, sc := range c.Response().Header()[echo.HeaderSetCookie] {
+				cookieName := strings.SplitN(sc, "=", 2)[0]
+				if !strings.HasPrefix(cookieName, "user") && cookieName != "refresh" {
+					continue
+				}
+				if secure {
+					a.Contains(sc, "Secure", "%s must be Secure", cookieName)
+				} else {
+					a.NotContains(sc, "Secure", "%s must not be Secure", cookieName)
+				}
 			}
 		})
 	}

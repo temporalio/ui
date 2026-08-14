@@ -133,7 +133,7 @@
   };
 </script>
 
-<svelte:window onkeypress={escapeHandler} />
+<svelte:window onkeydown={escapeHandler} />
 
 {#if menuIsOpen}
   <div
@@ -150,10 +150,8 @@
   >
     {#if linksContent}
       {@render linksContent({ open: viewLinks, closeMenu })}
-    {:else}
-      <div
-        class="flex h-full flex-col justify-end gap-6 overflow-auto px-4 py-8"
-      >
+    {:else if viewLinks}
+      <div class="flex flex-col gap-6 px-4 py-8">
         {@render linksSnippet?.()}
       </div>
     {/if}
@@ -210,7 +208,7 @@
           leadingIcon="namespace-switcher"
           size="xs"
           class="grow text-white"
-          on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+          onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
         >
         <div class="ml-1 h-full w-1 border-l border-subtle"></div>
         <Button

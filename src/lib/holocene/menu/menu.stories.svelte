@@ -1,18 +1,25 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import type { ComponentProps } from 'svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import MenuButton, {
-    type Props as MenuButtonProps,
-  } from './menu-button.svelte';
+  import { shouldNotBeTransparent } from '../test-utilities';
+
+  import MenuButton from './menu-button.svelte';
   import MenuContainer from './menu-container.svelte';
   import MenuItem from './menu-item.svelte';
-  import Menu, { type Props as MenuProps } from './menu.svelte';
+  import Menu from './menu.svelte';
 
-  export const meta = {
+  type MenuArgs = {
+    variant?: ComponentProps<typeof MenuButton>['variant'];
+    keepOpen?: ComponentProps<typeof Menu>['keepOpen'];
+    position?: ComponentProps<typeof Menu>['position'];
+    menuElement?: ComponentProps<typeof Menu>['menuElement'];
+  };
+
+  const { Story } = defineMeta({
     title: 'Menu',
     component: MenuButton,
     subcomponents: { MenuButton, MenuContainer, MenuItem },
@@ -43,17 +50,11 @@
         },
       },
     },
-  } satisfies Meta<Pick<MenuButtonProps, 'variant'> | MenuProps>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import { shouldNotBeTransparent } from '../test-utilities';
-</script>
-
-<Template let:args let:context>
+{#snippet template(args: MenuArgs, context: StoryContext<MenuArgs>)}
   <div class="flex items-center justify-center">
     <MenuContainer>
       <MenuButton hasIndicator variant={args.variant} controls={context.id}>
@@ -62,7 +63,12 @@
         {/snippet}
         Menu
       </MenuButton>
-      <Menu id={context.id} class="w-64" {...args}>
+      <Menu
+        id={context.id}
+        class="w-64"
+        keepOpen={args.keepOpen}
+        position={args.position}
+      >
         <MenuItem href="https://temporal.io" newTab onclick={action('click')}>
           Link
         </MenuItem>
@@ -81,7 +87,7 @@
       </Menu>
     </MenuContainer>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Primary" args={{ variant: 'primary' }} />
 

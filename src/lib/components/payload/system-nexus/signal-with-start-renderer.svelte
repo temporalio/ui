@@ -23,6 +23,6 @@
       <PayloadCodeBlock value={descriptor.workflowInput} {maxHeight} />
     {/if}
   {:else}
-    <PayloadCodeBlock value={null} {maxHeight} />
+    <PayloadCodeBlock value={{ payloads: [] }} {maxHeight} />
   {/if}
 </div>

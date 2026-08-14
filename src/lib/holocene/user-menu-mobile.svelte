@@ -14,7 +14,7 @@
   <div class="border-b border-subtle"></div>
   <NavigationButton
     tooltip={$authUser.email}
-    label={$authUser.email}
+    label={$authUser.email ?? ''}
     icon="astronaut"
     data-testid="email"
     disabled

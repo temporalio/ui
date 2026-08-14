@@ -7,11 +7,7 @@ import type {
 } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
-import {
-  isRawPayload,
-  isRawPayloads,
-  parseRawPayloadToJSON,
-} from './decode-payload';
+import { isRawPayload, parseRawPayloadToJSON } from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
@@ -143,9 +139,11 @@ export const formatSummaryAttributeDisplayValue = (value: unknown): string => {
   return stringifyWithBigInt(displayValue) ?? String(displayValue);
 };
 
-export const getStackTrace = (value: unknown) => {
+export const getStackTrace = (value: unknown): string | undefined => {
   if (!isObject(value)) return undefined;
-  if (has(value, 'stackTrace') && value.stackTrace) return value.stackTrace;
+  if (has(value, 'stackTrace') && value.stackTrace) {
+    return value.stackTrace as string;
+  }
 
   for (const key in value) {
     if (isObject(value[key])) {
@@ -243,20 +241,29 @@ export const formatSummaryValue = (
   key: string,
   value: unknown,
 ): SummaryAttribute => {
-  if (typeof value === 'object') {
+  if (typeof value === 'object' && value !== null) {
     if (isRawPayload(value)) {
       return { key, value };
     }
-    const [firstKey] = Object.keys(value);
+    const record = value as Record<string, unknown>;
+    const [firstKey] = Object.keys(record);
     if (!firstKey) {
       return { key, value: {} };
     }
     if (firstKey === 'payloads') {
       return { key, value };
     }
-    return { key: key + capitalize(firstKey), value: value[firstKey] };
+    const firstValue = record[firstKey];
+    return {
+      key: key + capitalize(firstKey),
+      value: firstValue as
+        | string
+        | Payload
+        | Payloads
+        | Record<string, unknown>,
+    };
   } else {
-    return { key, value: value.toString() };
+    return { key, value: value === undefined ? '' : String(value) };
   }
 };
 
@@ -287,8 +294,8 @@ const preferredSummaryKeys = [
  */
 const getFirstDisplayAttribute = ({
   attributes,
-}: WorkflowEvent): SummaryAttribute => {
-  for (const [key, value] of Object.entries(attributes)) {
+}: WorkflowEvent): SummaryAttribute | undefined => {
+  for (const [key, value] of Object.entries(attributes ?? {})) {
     if (shouldDisplayAttribute(key, value)) {
       return formatSummaryValue(key, value);
     }
@@ -326,7 +333,9 @@ export const getEventSummaryAttribute = (
     if (isJavaSDK(event) && payload) {
       return formatSummaryValue('ActivityType', payload);
     }
-    const activityType = getActivityType(payload);
+    const activityType = payload
+      ? getActivityType(payload as Payload)
+      : undefined;
     if (activityType) {
       return formatSummaryValue('ActivityType', activityType);
     }
@@ -342,7 +351,7 @@ export const getEventSummaryAttribute = (
   }
 
   for (const preferredKey of preferredSummaryKeys) {
-    for (const [key, value] of Object.entries(event.attributes)) {
+    for (const [key, value] of Object.entries(event.attributes ?? {})) {
       if (key === preferredKey && shouldDisplayAttribute(key, value)) {
         return formatSummaryValue(key, value);
       }
@@ -355,6 +364,7 @@ export const getEventSummaryAttribute = (
 export const getPendingActivitySummaryAttribute = (
   event: PendingActivity,
 ): SummaryAttribute => {
+  if (!event.attempt) return emptyAttribute;
   return { key: 'attempt', value: event.attempt.toString() };
 };
 

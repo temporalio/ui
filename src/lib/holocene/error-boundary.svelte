@@ -8,7 +8,7 @@
 
 <svelte:boundary>
   {@render children?.()}
-  {#snippet failed(error, reset)}
+  {#snippet failed(error: unknown, reset: () => void)}
     <Error {reset} {error} />
   {/snippet}
 </svelte:boundary>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -8,9 +7,14 @@
   interface Props {
     createHref: string;
     error?: string;
+    canCreateServerlessDeployment?: boolean;
   }
 
-  let { createHref, error = '' }: Props = $props();
+  let {
+    createHref,
+    error = '',
+    canCreateServerlessDeployment = true,
+  }: Props = $props();
 </script>
 
 <div class="flex flex-col items-center gap-4 py-16">
@@ -24,11 +28,11 @@
     </p>
   </div>
   <div class="flex flex-wrap items-center justify-center gap-4">
-    <CapabilityGuard capability="serverScaledDeployments">
+    {#if canCreateServerlessDeployment}
       <Button variant="secondary" href={createHref}>
         {translate('deployments.create-serverless-deployment')}
       </Button>
-    </CapabilityGuard>
+    {/if}
     <Button
       variant="ghost"
       href="https://docs.temporal.io/worker-deployments"

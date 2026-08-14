@@ -48,7 +48,7 @@
             <Button
               variant="secondary"
               size="sm"
-              on:click={handleRetry}
+              onclick={handleRetry}
               disabled={isRetrying}
             >
               <Icon name="retry" />

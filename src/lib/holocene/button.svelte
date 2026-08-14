@@ -1,4 +1,14 @@
-<script context="module" lang="ts">
+<script module lang="ts">
+  import type {
+    HTMLAnchorAttributes,
+    HTMLButtonAttributes,
+  } from 'svelte/elements';
+
+  import { cva, type VariantProps } from 'class-variance-authority';
+  import type { Snippet } from 'svelte';
+
+  import type { IconName } from '$lib/holocene/icon';
+
   const buttonStyles = cva(
     [
       'relative',
@@ -49,120 +59,133 @@
     },
   );
 
-  type BaseProps = {
-    active?: boolean;
+  export type ButtonStyles = VariantProps<typeof buttonStyles>;
+
+  interface BaseProps {
+    variant?: ButtonStyles['variant'];
+    size?: ButtonStyles['size'];
     disabled?: boolean;
     loading?: boolean;
+    active?: boolean;
     leadingIcon?: IconName;
     trailingIcon?: IconName;
     count?: number;
     id?: string;
-    'data-testid'?: string;
-    class?: string;
     disableTracking?: boolean;
-  };
-
-  // Prevent Svelte 5 event handler props - use on:click instead
-  type ForbiddenEventProps = {
-    onclick?: never;
-    onkeydown?: never;
-  };
-
-  export type ButtonStyles = VariantProps<typeof buttonStyles>;
+    class?: string;
+    'data-testid'?: string;
+    children?: Snippet;
+    onclick?: (event: MouseEvent) => void;
+    onkeydown?: (event: KeyboardEvent) => void;
+  }
 
   export type ButtonWithoutHrefProps = BaseProps &
-    ButtonStyles &
-    Omit<HTMLButtonAttributes, 'onclick' | 'onkeydown'> &
-    ForbiddenEventProps;
+    Omit<HTMLButtonAttributes, 'class' | 'onclick' | 'onkeydown'> & {
+      href?: never;
+      target?: never;
+    };
 
   export type ButtonWithHrefProps = BaseProps &
-    ButtonStyles &
-    Omit<HTMLAnchorAttributes, 'onclick'> &
-    ForbiddenEventProps & {
+    Omit<HTMLAnchorAttributes, 'class' | 'onclick' | 'onkeydown'> & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
-      disabled?: boolean;
     };
+
+  export type ButtonProps = ButtonWithoutHrefProps | ButtonWithHrefProps;
 </script>
 
 <script lang="ts">
-  import type {
-    HTMLAnchorAttributes,
-    HTMLButtonAttributes,
-  } from 'svelte/elements';
-
-  import { cva, type VariantProps } from 'class-variance-authority';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { goto } from '$app/navigation';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  type $$Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
+  let {
+    variant = 'primary',
+    size = 'md',
+    disabled = false,
+    loading = false,
+    active = false,
+    leadingIcon,
+    trailingIcon,
+    count = 0,
+    id,
+    href,
+    target,
+    disableTracking = false,
+    class: className = '',
+    children,
+    onclick,
+    onkeydown,
+    ...rest
+  }: ButtonProps = $props();
 
-  export let variant: ButtonStyles['variant'] = 'primary';
-  export let size: ButtonStyles['size'] = 'md';
-  export let disabled = false;
-  export let loading = false;
-  export let active = false;
-  export let leadingIcon: IconName = null;
-  export let trailingIcon: IconName = null;
-  export let count = 0;
-  export let id: string = null;
-  export let href: string = null;
-  export let target: string = null;
-  export let disableTracking = false;
+  let element = $state<HTMLElement>();
 
-  let className = '';
-  export { className as class };
+  export function focus() {
+    element?.focus();
+  }
 
-  const onLinkClick = (e: MouseEvent) => {
+  const onLinkClick = (event: MouseEvent) => {
     // Skip if middle mouse click or new tab
-    if (e.button === 1 || target || e.metaKey) return;
-    e.preventDefault();
+    if (event.button === 1 || target || event.metaKey) return;
+    if (!href) return;
+    event.preventDefault();
     goto(href);
   };
 
-  let dataTrackObj = {};
-  if (!disableTracking) {
-    dataTrackObj = {
-      'data-track-name': 'button',
-      'data-track-intent': variant,
-      'data-track-text': '*textContent*',
-    };
-  }
+  const handleLinkClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    onLinkClick(event);
+    onclick?.(event);
+  };
+
+  const handleClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    onclick?.(event);
+  };
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    event.stopPropagation();
+    onkeydown?.(event);
+  };
+
+  const dataTrackObj = $derived(
+    disableTracking
+      ? {}
+      : {
+          'data-track-name': 'button',
+          'data-track-intent': variant,
+          'data-track-text': '*textContent*',
+        },
+  );
 </script>
 
 {#if href && !disabled}
   <a
+    bind:this={element}
     {href}
     {id}
     role="button"
-    type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
     data-variant={variant}
     data-active={active}
     {...dataTrackObj}
-    class={merge(
-      buttonStyles({
-        variant,
-        size,
-      }),
-      className,
-    )}
-    on:click|stopPropagation={onLinkClick}
+    class={merge(buttonStyles({ variant, size }), className)}
     tabindex={href ? null : 0}
-    {...$$restProps}
+    {...rest as HTMLAnchorAttributes}
+    onclick={handleLinkClick}
+    onkeydown={handleKeydown}
   >
     {#if leadingIcon || (loading && !trailingIcon)}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+        <Icon name={loading ? 'spinner' : leadingIcon!} />
       </span>
     {/if}
-    <slot />
+    {@render children?.()}
     {#if trailingIcon}
       <span
         class:animate-spin={loading && !leadingIcon}
@@ -180,29 +203,24 @@
   </a>
 {:else}
   <button
+    bind:this={element}
     {disabled}
     {id}
     type="button"
-    on:click|stopPropagation
-    on:keydown|stopPropagation
     data-variant={variant}
     data-active={active}
     {...dataTrackObj}
-    class={merge(
-      buttonStyles({
-        variant,
-        size,
-      }),
-      className,
-    )}
-    {...$$restProps}
+    class={merge(buttonStyles({ variant, size }), className)}
+    {...rest as HTMLButtonAttributes}
+    onclick={handleClick}
+    onkeydown={handleKeydown}
   >
     {#if leadingIcon || (loading && !trailingIcon)}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+        <Icon name={loading ? 'spinner' : leadingIcon!} />
       </span>
     {/if}
-    <slot />
+    {@render children?.()}
 
     {#if trailingIcon}
       <span

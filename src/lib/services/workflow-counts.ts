@@ -43,12 +43,12 @@ export const fetchWorkflowCountByExecutionStatus = async ({
     namespace,
   });
   const { count, groups } =
-    await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
+    (await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
       params: {
         query: query ? `${query} ${groupByClause}` : `${groupByClause}`,
       },
       notifyOnError: false,
-    });
+    })) ?? {};
   return { count: count ?? '0', groups: groups ?? [] };
 };
 
@@ -63,13 +63,11 @@ const fetchScheduleCountLegacy = async (
     ? `${scheduleFixedQuery} AND ${query}`
     : scheduleFixedQuery;
   const countRoute = routeForApi('workflows.count', { namespace });
-  const { count } = await requestFromAPI<CountWorkflowExecutionsResponse>(
-    countRoute,
-    {
+  const { count } =
+    (await requestFromAPI<CountWorkflowExecutionsResponse>(countRoute, {
       params: { query: fullQuery },
       notifyOnError: false,
-    },
-  );
+    })) ?? {};
   return count ?? '0';
 };
 
@@ -82,10 +80,11 @@ export const fetchScheduleCount = async ({
 }): Promise<string> => {
   try {
     const countRoute = routeForApi('schedules.count', { namespace });
-    const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
-      params: query ? { query } : {},
-      notifyOnError: false,
-    });
+    const { count } =
+      (await requestFromAPI<CountSchedulesResponse>(countRoute, {
+        params: query ? { query } : {},
+        notifyOnError: false,
+      })) ?? {};
     return count ?? '0';
   } catch (error: unknown) {
     if (isNotImplemented(error) || isNotFound(error)) {

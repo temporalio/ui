@@ -3,14 +3,20 @@
 
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
+  import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
+  import DurationInput, {
+    DAYS,
+    DEFAULT_UNITS,
+    SECONDS,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -27,14 +33,11 @@
   import {
     customSearchAttributes,
     type SearchAttributeInput,
+    type SearchAttributesSchema,
   } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
-  import {
-    formatSecondsAbbreviated,
-    fromNumberToDuration,
-  } from '$lib/utilities/format-time';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForTaskQueue,
@@ -44,31 +47,31 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
-  $: ({ namespace } = $page.params);
+  const namespace = $derived(page.params.namespace);
 
   const identity = getIdentity();
 
-  let workflowId = '';
-  let taskQueue = '';
-  let workflowType = '';
-  let input = '';
-  let summary = '';
-  let details = '';
-  let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
-  let messageType = '';
-  let workflowStartDelay = '';
+  let workflowId = $state('');
+  let taskQueue = $state('');
+  let workflowType = $state('');
+  let input = $state('');
+  let summary = $state('');
+  let details = $state('');
+  const encoding: Writable<PayloadInputEncoding> = writable('json/plain');
+  let messageType = $state('');
+  let workflowStartDelay = $state('');
 
-  let initialRunId = '';
-  let initialWorkflowId = '';
-  let initialWorkflowType = '';
+  let initialRunId = $state('');
+  let initialWorkflowId = $state('');
+  let initialWorkflowType = $state('');
 
-  let error = '';
-  let pollerCount: undefined | number = undefined;
-  let viewAdvancedOptions = false;
+  let error = $state('');
+  let pollerCount = $state<undefined | number>(undefined);
+  let viewAdvancedOptions = $state(false);
 
-  let searchAttributes: SearchAttributeInput[] = [];
+  let searchAttributes = $state<SearchAttributesSchema>([]);
 
-  $: errorWorkflowDetails = extractWorkflowFromError(error);
+  const errorWorkflowDetails = $derived(extractWorkflowFromError(error));
 
   function extractWorkflowFromError(errorMessage: string): {
     workflowId?: string;
@@ -90,15 +93,15 @@
     };
   }
 
-  $: taskQueueParam = $page.url.searchParams.get('taskQueue');
+  const taskQueueParam = $derived(page.url.searchParams.get('taskQueue'));
 
   onMount(() => {
-    workflowId = $page.url.searchParams.get('workflowId') || '';
-    taskQueue = $page.url.searchParams.get('taskQueue') || '';
-    workflowType = $page.url.searchParams.get('workflowType') || '';
-    initialRunId = $page.url.searchParams.get('runId') || '';
-    initialWorkflowId = $page.url.searchParams.get('workflowId') || '';
-    initialWorkflowType = $page.url.searchParams.get('workflowType') || '';
+    workflowId = page.url.searchParams.get('workflowId') || '';
+    taskQueue = page.url.searchParams.get('taskQueue') || '';
+    workflowType = page.url.searchParams.get('workflowType') || '';
+    initialRunId = page.url.searchParams.get('runId') || '';
+    initialWorkflowId = page.url.searchParams.get('workflowId') || '';
+    initialWorkflowType = page.url.searchParams.get('workflowType') || '';
 
     if (initialWorkflowId || initialWorkflowType || initialRunId) {
       getInitialValues({
@@ -122,9 +125,9 @@
         details,
         encoding: $encoding,
         messageType,
-        searchAttributes,
+        searchAttributes: searchAttributes as SearchAttributeInput[],
         identity,
-        workflowStartDelay: fromNumberToDuration(workflowStartDelay),
+        workflowStartDelay: workflowStartDelay || undefined,
       });
       toaster.push({
         variant: 'success',
@@ -137,7 +140,8 @@
         }),
       });
     } catch (e) {
-      error = e?.message || translate('workflows.start-workflow-error');
+      error =
+        (e as Error)?.message || translate('workflows.start-workflow-error');
       toaster.push({
         variant: 'error',
         message: translate('workflows.start-workflow-error'),
@@ -145,12 +149,11 @@
     }
   };
 
-  const generateRandomWorkflowId = () => {
-    workflowId = crypto.randomUUID();
+  const syncWorkflowId = (value: string) => {
     updateQueryParameters({
       parameter: 'workflowId',
-      value: workflowId,
-      url: $page.url,
+      value,
+      url: page.url,
       allowEmpty: true,
       options: { keepFocus: true, noScroll: true, replaceState: true },
     });
@@ -159,7 +162,7 @@
   const checkTaskQueue = async (queue: string) => {
     if (queue) {
       const { pollers } = await getPollers({ namespace, queue });
-      pollerCount = pollers.length;
+      pollerCount = pollers?.length ?? 0;
     }
   };
 
@@ -194,7 +197,7 @@
               label: key,
               value,
               type: $customSearchAttributes[key],
-            } as SearchAttributeInput,
+            },
           ];
         }
       });
@@ -214,7 +217,7 @@
     updateQueryParameters({
       parameter,
       value,
-      url: $page.url,
+      url: page.url,
       allowEmpty: true,
       options: { keepFocus: true, noScroll: true, replaceState: true },
     });
@@ -229,16 +232,19 @@
     }
   };
 
-  $: inputValid = !input || inputIsJSON(input);
+  const inputValid = $derived(!input || inputIsJSON(input));
 
-  $: enableStart =
+  const enableStart = $derived(
     !!workflowId &&
-    !!taskQueue &&
-    !!workflowType &&
-    !!inputValid &&
-    !workflowCreateDisabled($page);
+      !!taskQueue &&
+      !!workflowType &&
+      !!inputValid &&
+      !workflowCreateDisabled(page),
+  );
 
-  $: checkTaskQueue(taskQueueParam);
+  $effect(() => {
+    checkTaskQueue(taskQueueParam ?? '');
+  });
 </script>
 
 <div class="flex w-full flex-col gap-4 pb-20">
@@ -266,12 +272,11 @@
         class="w-full grow"
         onblur={(e) => onInputChange(e, 'workflowId')}
       />
-      <Button
+      <RandomUuidButton
         class="mt-0 md:mt-6"
-        variant="secondary"
-        leadingIcon="retry"
-        on:click={generateRandomWorkflowId}>Random UUID</Button
-      >
+        bind:value={workflowId}
+        onGenerate={syncWorkflowId}
+      />
     </div>
     <div class="flex w-full items-center justify-between gap-4">
       <Input
@@ -309,7 +314,7 @@
       label="Workflow Type"
       onblur={(e) => onInputChange(e, 'workflowType')}
     />
-    <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
+    <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
         <div>
@@ -336,20 +341,17 @@
             Time to wait before dispatching the first workflow task.
           </p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="workflow-start-delay"
-            label={translate('workflows.workflow-start-delay')}
-            labelHidden
-            bind:value={workflowStartDelay}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(workflowStartDelay))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(workflowStartDelay)}
-          </p>
-        </div>
+        <DurationInput
+          id="workflow-start-delay"
+          label={translate('workflows.workflow-start-delay')}
+          labelHidden
+          inputmode="numeric"
+          bind:value={workflowStartDelay}
+          units={[...DEFAULT_UNITS, DAYS]}
+          initialUnit={SECONDS.label}
+          min={0}
+          class="max-w-80"
+        />
       </Card>
       <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">
@@ -384,12 +386,12 @@
         variant="ghost"
         class="max-sm:w-full"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
-        on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
+        onclick={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
       >
       <Button
         disabled={!enableStart}
-        on:click={onWorkflowStart}
+        onclick={onWorkflowStart}
         data-testid="start-workflow-button"
         class="max-sm:w-full">{translate('workflows.start-workflow')}</Button
       >

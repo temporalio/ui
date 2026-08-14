@@ -9,11 +9,40 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 
 export const isCloudMatch = /(tmprl\.cloud|tmprl-test\.cloud)$/;
 
+const emptySettingsResponse: SettingsResponse = {
+  Auth: {
+    Enabled: false,
+    Options: null,
+  },
+  Codec: {
+    Endpoint: '',
+  },
+  DefaultNamespace: '',
+  DisableWriteActions: false,
+  WorkflowTerminateDisabled: false,
+  WorkflowCancelDisabled: false,
+  WorkflowSignalDisabled: false,
+  WorkflowUpdateDisabled: false,
+  WorkflowResetDisabled: false,
+  WorkflowPauseDisabled: false,
+  BatchActionsDisabled: false,
+  StartWorkflowDisabled: false,
+  HideWorkflowQueryErrors: false,
+  RefreshWorkflowCountsDisabled: false,
+  ActivityCommandsDisabled: false,
+  ShowTemporalSystemNamespace: false,
+  NavCollapsedByDefault: false,
+  FeedbackURL: '',
+  DisableNewsFetch: false,
+  Version: '',
+};
+
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
   const route = routeForApi('settings');
-  const settingsResponse: SettingsResponse = await requestFromAPI(route, {
-    request,
-  });
+  const settingsResponse: SettingsResponse =
+    (await requestFromAPI<SettingsResponse>(route, {
+      request,
+    })) ?? emptySettingsResponse;
 
   const EnvironmentOverride = getEnvironment();
 
@@ -21,8 +50,9 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     auth: {
       enabled: !!settingsResponse?.Auth?.Enabled,
       options: settingsResponse?.Auth?.Options,
+      redirectToProvider: !!settingsResponse?.Auth?.RedirectToProvider,
     },
-    baseUrl: getApiOrigin(),
+    baseUrl: getApiOrigin() ?? '',
     codec: {
       endpoint: settingsResponse?.Codec?.Endpoint,
       passAccessToken: settingsResponse?.Codec?.PassAccessToken,
@@ -50,7 +80,9 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
+    navCollapsedByDefault: !!settingsResponse?.NavCollapsedByDefault,
     feedbackURL: settingsResponse?.FeedbackURL,
+    disableNewsFetch: !!settingsResponse?.DisableNewsFetch,
     runtimeEnvironment: {
       get isCloud() {
         if (EnvironmentOverride) {

@@ -51,7 +51,7 @@ export const Strings = {
     description:
       'The Workflow Task failed because of an unset attribute on CancelWorkflowExecution.',
   },
-  BadRequestCancelExternalAttributes: {
+  BadRequestCancelExternalWorkflowExecutionAttributes: {
     title: 'Bad Request Cancel External Attributes',
     description:
       'The Workflow Task failed due to an invalid attribute on a request to cancel an external Workflow. Check the Failure Message for more details.',
@@ -189,6 +189,25 @@ export const Strings = {
     title: 'gRPC Message Too Large',
     description:
       'A Workflow Task failed because the gRPC message exceeded the maximum allowed size.',
+  },
+  PayloadsTooLarge: {
+    title: 'Payloads Too Large',
+    description:
+      'A Workflow Task failed because its payloads exceeded the maximum allowed size.',
+  },
+  ExternalStorageFailure: {
+    title: 'External Storage Failure',
+    description: 'A Workflow Task failed due to an external storage failure.',
+  },
+  WorkflowPauseRequestedBeforeTaskStarted: {
+    title: 'Workflow Pause Requested Before Task Started',
+    description:
+      'A Workflow Task failed because a pause was requested for the Workflow before the task started.',
+  },
+  RequestTooLarge: {
+    title: 'Request Too Large',
+    description:
+      'A Workflow Task failed because the request exceeded the maximum allowed size.',
   },
   WorkflowTaskTimedOut: {
     title: 'Workflow Task Timed Out',

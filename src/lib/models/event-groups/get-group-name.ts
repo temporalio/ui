@@ -22,7 +22,7 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return '';
 
   if (isActivityTaskScheduledEvent(event)) {
-    return event.activityTaskScheduledEventAttributes?.activityType?.name;
+    return event.activityTaskScheduledEventAttributes?.activityType?.name ?? '';
   }
 
   if (isTimerStartedEvent(event)) {
@@ -34,41 +34,54 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
-    return event.signalExternalWorkflowExecutionInitiatedEventAttributes
-      ?.signalName;
+    return (
+      event.signalExternalWorkflowExecutionInitiatedEventAttributes
+        ?.signalName ?? ''
+    );
   }
 
   if (isWorkflowExecutionSignaledEvent(event)) {
-    return event.workflowExecutionSignaledEventAttributes?.signalName;
+    return event.workflowExecutionSignaledEventAttributes?.signalName ?? '';
   }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
       return 'Local Activity';
     }
-    return event.markerRecordedEventAttributes?.markerName;
+    return event.markerRecordedEventAttributes?.markerName ?? '';
   }
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
-    return event.startChildWorkflowExecutionInitiatedEventAttributes
-      ?.workflowType?.name;
+    return (
+      event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType
+        ?.name ?? ''
+    );
   }
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    return event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
-      ?.input?.name;
+    return (
+      event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
+        ?.input?.name ?? ''
+    );
   }
 
   if (isNexusOperationScheduledEvent(event)) {
     const attrs = event.nexusOperationScheduledEventAttributes;
-    if (String(attrs.endpoint ?? '') === '__temporal_system') {
+    const fallback = [attrs?.service, attrs?.operation]
+      .filter(Boolean)
+      .join('.');
+
+    if (String(attrs?.endpoint ?? '') === '__temporal_system') {
       return (
-        SYSTEM_NEXUS_OPERATION_LABELS[String(attrs.operation ?? '')] ??
-        `${attrs.service}.${attrs.operation}`
+        SYSTEM_NEXUS_OPERATION_LABELS[String(attrs?.operation ?? '')] ??
+        fallback
       );
     }
-    return `${attrs.service}.${attrs.operation}`;
+
+    return fallback;
   }
+
+  return '';
 };
 
 export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
@@ -112,6 +125,8 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
   ) {
     return 'Nexus Operation';
   }
+
+  return '';
 };
 
 export const getEventGroupDisplayName = (event: CommonHistoryEvent): string => {

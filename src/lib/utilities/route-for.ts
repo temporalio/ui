@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import { BROWSER } from 'esm-env';
 
-import { base, resolve } from '$app/paths';
+import { resolve } from '$app/paths';
 import type { ResolvedPathname } from '$app/types';
 
 import {
@@ -84,6 +84,14 @@ export interface StartActivityExecutionQueryParams {
   taskQueue: string;
   startToCloseTimeout: string;
   scheduleToCloseTimeout: string;
+  runId: string;
+}
+
+export interface StartNexusOperationQueryParams {
+  operationId: string;
+  endpoint: string;
+  service: string;
+  operation: string;
   runId: string;
 }
 
@@ -187,6 +195,64 @@ export const routeForStandaloneActivityMetadata = (
   parameters: NamespaceParameter & { activityId: string; runId: string },
 ): ResolvedPathname => {
   return `${routeForStandaloneActivityBase(parameters)}/metadata`;
+};
+
+export const routeForStandaloneNexusOperations = (
+  parameters: NamespaceParameter,
+): ResolvedPathname => {
+  return `${routeForNamespace(parameters)}/nexus-operations`;
+};
+
+export const routeForStandaloneNexusOperationsWithQuery = (
+  parameters: NamespaceParameter,
+  queryString: string,
+): ResolvedPathname => {
+  const params = new URLSearchParams();
+  params.set('query', queryString);
+
+  return toURL(routeForStandaloneNexusOperations(parameters), params);
+};
+
+export const routeForStartStandaloneNexusOperation = (
+  parameters: NamespaceParameter & Partial<StartNexusOperationQueryParams>,
+): ResolvedPathname => {
+  const params = {
+    operationId: parameters.operationId ?? '',
+    endpoint: parameters.endpoint ?? '',
+    service: parameters.service ?? '',
+    operation: parameters.operation ?? '',
+    runId: parameters.runId ?? '',
+  };
+  return toURL(
+    `${routeForStandaloneNexusOperations(parameters)}/start`,
+    params,
+  );
+};
+
+const routeForStandaloneNexusOperationBase = (
+  parameters: NamespaceParameter & { operationId: string; runId: string },
+): ResolvedPathname => {
+  const operationId = encodeURIForSvelte(parameters.operationId);
+
+  return `${routeForStandaloneNexusOperations(parameters)}/${operationId}/${parameters.runId}`;
+};
+
+export const routeForStandaloneNexusOperationDetails = (
+  parameters: NamespaceParameter & { operationId: string; runId: string },
+): ResolvedPathname => {
+  return `${routeForStandaloneNexusOperationBase(parameters)}/details`;
+};
+
+export const routeForStandaloneNexusOperationSearchAttributes = (
+  parameters: NamespaceParameter & { operationId: string; runId: string },
+): ResolvedPathname => {
+  return `${routeForStandaloneNexusOperationBase(parameters)}/search-attributes`;
+};
+
+export const routeForStandaloneNexusOperationMetadata = (
+  parameters: NamespaceParameter & { operationId: string; runId: string },
+): ResolvedPathname => {
+  return `${routeForStandaloneNexusOperationBase(parameters)}/metadata`;
 };
 
 type StartWorkflowParameters = NamespaceParameter &
@@ -573,6 +639,21 @@ export const routeForLoginPage = (
   }
 
   return resolve('/login', {});
+};
+
+export const routeForAuthenticationRedirect = (
+  settings: Settings,
+  currentUrl?: URL,
+): string => {
+  if (settings.auth.redirectToProvider) {
+    return routeForAuthentication({
+      settings,
+      searchParams: currentUrl?.searchParams,
+      originUrl: currentUrl?.href,
+    });
+  }
+
+  return routeForLoginPage();
 };
 
 export const routeForEventHistoryImport = (

@@ -10,4 +10,7 @@
   let { descriptor, maxHeight }: Props = $props();
 </script>
 
-<PayloadCodeBlock value={descriptor.embeddedInput} {maxHeight} />
+<PayloadCodeBlock
+  value={descriptor.embeddedInput ?? { payloads: [] }}
+  {maxHeight}
+/>

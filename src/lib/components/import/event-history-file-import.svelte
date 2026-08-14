@@ -42,7 +42,7 @@
   const onConfirm = async () => {
     try {
       const events = await toEventHistory(
-        Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
+        Array.isArray(rawEvents) ? rawEvents : (rawEvents?.events ?? []),
       );
       const eventGroups = groupEvents(events);
       importEvents.set(events);
@@ -73,7 +73,7 @@
     accept=".json"
     onchange={onFileSelect}
   />
-  <Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
+  <Button leadingIcon="file-upload" onclick={onConfirm} disabled={!fileLoaded}
     >{translate('common.import')}</Button
   >
 </div>

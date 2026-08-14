@@ -1,30 +1,99 @@
+import type { temporal } from '@temporalio/proto';
+
 import type { StandaloneActivityFormData } from '$lib/components/standalone-activities/start-standalone-activity-form/types';
+import {
+  type DefaultUnits,
+  getFirstWholeNumberUnit,
+  HOURS,
+  MILLISECONDS,
+  MINUTES,
+  SECONDS,
+  type Units,
+} from '$lib/holocene/duration-input/duration-input.svelte';
 import { translate } from '$lib/i18n/translate';
 import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
 import { activityError } from '$lib/stores/activities';
-import type { Payload, SearchAttribute } from '$lib/types';
+import type { ActivityOptions, Payload, SearchAttribute } from '$lib/types';
 import type {
   ActivityExecution,
   ActivityExecutionInfo,
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
+import type { Callback } from '$lib/types/nexus';
+import { activityOptionsUpdateMask } from '$lib/utilities/activity-options-update-mask';
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
-import { encodePayloads } from '$lib/utilities/encode-payload';
+import {
+  encodePayloads,
+  setSearchAttributes,
+} from '$lib/utilities/encode-payload';
+import { isEmptyObject } from '$lib/utilities/is';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
   type ErrorCallback,
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { toCallbackStateReadable } from '$lib/utilities/screaming-enums';
 
-import { setSearchAttributes } from './workflow-service';
+// Timeout duration inputs on the activity forms; largest-first so
+// getFirstWholeNumberUnit resolves to the coarsest whole unit, defaulting to
+// seconds when there is no value.
+export const TIMEOUT_UNITS: Units<DefaultUnits> = [
+  HOURS,
+  MINUTES,
+  SECONDS,
+  MILLISECONDS,
+];
+
+export const initialTimeoutUnit = (duration: string): DefaultUnits =>
+  getFirstWholeNumberUnit(duration, TIMEOUT_UNITS, SECONDS.label) ??
+  SECONDS.label;
 
 export type ListActivitiesResponse = {
   executions: ActivityExecutionInfo[];
   nextPageToken: string;
+};
+
+const emptyActivityExecutionInfo: ActivityExecutionInfo = {
+  status: 'ACTIVITY_EXECUTION_STATUS_UNSPECIFIED',
+  scheduleToCloseTimeout: '',
+  scheduleToStartTimeout: '',
+  startToCloseTimeout: '',
+  heartbeatTimeout: '',
+  stateTransitionCount: '',
+  currentRetryInterval: '',
+  searchAttributes: {},
+};
+
+const emptyActivityExecution: ActivityExecution = {
+  runId: '',
+  info: emptyActivityExecutionInfo,
+};
+
+type DescribeActivityExecutionResponse = Omit<
+  ActivityExecution,
+  'callbacks'
+> & {
+  callbacks?: temporal.api.activity.v1.ICallbackInfo[] | null;
+};
+
+export const toActivityCallbacks = (
+  callbacks?: temporal.api.activity.v1.ICallbackInfo[] | null,
+): Callback[] => {
+  if (!callbacks) return [];
+  return callbacks.reduce<Callback[]>((acc, { info }) => {
+    if (!info) return acc;
+    acc.push({
+      ...info,
+      blockedReason: info.blockedReason ?? undefined,
+      callback: (info.callback ?? undefined) as Callback['callback'],
+      state: toCallbackStateReadable(info.state ?? undefined),
+    });
+    return acc;
+  }, []);
 };
 
 export interface StartStandaloneActivityResponse {
@@ -72,7 +141,7 @@ export const fetchPaginatedActivities = async (
   };
 };
 
-const toStartActivityExecutionRequest = async (
+export const toStartActivityExecutionRequest = async (
   activityFormData: StandaloneActivityFormData,
 ): Promise<StartActivityExecutionRequest> => {
   let inputPayloads: Payload[] | null = null;
@@ -131,7 +200,7 @@ const toStartActivityExecutionRequest = async (
     };
   }
 
-  return {
+  const request = {
     identity: activityFormData.identity,
     namespace: activityFormData.namespace,
     activityId: activityFormData.activityId,
@@ -153,6 +222,9 @@ const toStartActivityExecutionRequest = async (
     ...(activityFormData.scheduleToStartTimeout && {
       scheduleToStartTimeout: activityFormData.scheduleToStartTimeout,
     }),
+    ...(activityFormData.startDelay && {
+      startDelay: activityFormData.startDelay,
+    }),
     retryPolicy: {
       ...(activityFormData.initialInterval && {
         initialInterval: activityFormData.initialInterval,
@@ -160,14 +232,16 @@ const toStartActivityExecutionRequest = async (
       ...(activityFormData.maximumInterval && {
         maximumInterval: activityFormData.maximumInterval,
       }),
-      ...(activityFormData.maximumAttempts && {
+      ...(activityFormData.maximumAttempts.trim() && {
         maximumAttempts: Number(activityFormData.maximumAttempts),
       }),
-      ...(activityFormData.backoffCoefficient && {
+      ...(activityFormData.backoffCoefficient.trim() && {
         backoffCoefficient: Number(activityFormData.backoffCoefficient),
       }),
     },
-  };
+  } as StartActivityExecutionRequest;
+
+  return request;
 };
 
 export const startStandaloneActivity = async (
@@ -183,12 +257,12 @@ export const startStandaloneActivity = async (
   const startActivityExecutionRequest =
     await toStartActivityExecutionRequest(activity);
 
-  return requestFromAPI(route, {
+  return requestFromAPI<StartStandaloneActivityResponse>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt(startActivityExecutionRequest),
     },
-  });
+  }).then((response) => response ?? { runId: '', started: false });
 };
 
 interface ActivityInputValues {
@@ -298,11 +372,17 @@ export const getActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'true',
     includeOutcome: 'true',
+    includeHeartbeatDetails: 'true',
+    includeLastFailure: 'true',
     runId,
   });
 
-  return requestFromAPI(route, {
+  return requestFromAPI<DescribeActivityExecutionResponse>(route, {
     params,
+  }).then((response) => {
+    if (!response) return emptyActivityExecution;
+    const { callbacks, ...rest } = response;
+    return { ...rest, callbacks: toActivityCallbacks(callbacks) };
   });
 };
 
@@ -312,7 +392,7 @@ export const pollActivityExecution = (
   runId: string,
   token: string,
   signal: AbortSignal,
-): Promise<ActivityExecution> => {
+): Promise<ActivityExecution | undefined> => {
   const route = routeForApi('standalone-activity', {
     namespace,
     activityId,
@@ -321,14 +401,20 @@ export const pollActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'false',
     includeOutcome: 'true',
+    includeHeartbeatDetails: 'true',
+    includeLastFailure: 'true',
     runId,
     longPollToken: token,
   });
 
-  return requestFromAPI(route, {
+  return requestFromAPI<DescribeActivityExecutionResponse>(route, {
     params,
     notifyOnError: false,
     options: { signal },
+  }).then((response) => {
+    if (!response || isEmptyObject(response)) return undefined;
+    const { callbacks, ...rest } = response;
+    return { ...rest, callbacks: toActivityCallbacks(callbacks) };
   });
 };
 
@@ -379,6 +465,114 @@ export const terminateActivityExecution = async (
       body: stringifyWithBigInt({
         runId,
         reason: reason || '',
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const pauseActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  reason?: string,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.pause', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        requestId: crypto.randomUUID(),
+        ...(reason && { reason }),
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const unpauseActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.unpause', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const resetActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  resetHeartbeat: boolean,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.reset', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        ...(resetHeartbeat && { resetHeartbeat }),
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const updateActivityExecutionOptions = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  activityOptions: ActivityOptions,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.update-options', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        activityOptions,
+        updateMask: activityOptionsUpdateMask(activityOptions),
         ...(identity && { identity }),
       }),
     },

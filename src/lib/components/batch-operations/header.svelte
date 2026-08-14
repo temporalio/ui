@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -10,20 +9,19 @@
 
   interface Props {
     operation: BatchOperation;
+    onToggleAutoRefresh?: (checked: boolean) => void;
   }
 
-  let { operation }: Props = $props();
+  let { operation, onToggleAutoRefresh }: Props = $props();
 
-  const dispatch = createEventDispatcher<{
-    toggleAutoRefresh: { checked: boolean };
-  }>();
+  const handleToggleAutoRefresh = (event: Event) => {
+    if (!(event.currentTarget instanceof HTMLInputElement)) {
+      return;
+    }
 
-  const handleToggleAutoRefresh = (
-    event: Event & { target: EventTarget & HTMLInputElement },
-  ) => {
-    const { checked } = event.target;
-    dispatch('toggleAutoRefresh', { checked });
+    const { checked } = event.currentTarget;
     $autoRefresh = checked;
+    onToggleAutoRefresh?.(checked);
   };
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
@@ -40,13 +38,18 @@
       <h1>
         {translate('batch.describe-page-title')}
       </h1>
-      <Badge type={jobStateToBadgeType[operation.state]}>
+      <Badge
+        type={jobStateToBadgeType[operation.state]}
+        class="h-8 px-4 text-lg"
+      >
         {operation.state}
       </Badge>
     </div>
-    <p>
-      {operation.jobId}
-    </p>
+    <Copyable
+      content={operation.jobId}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    />
   </div>
   {#if operation.state === 'Running'}
     <Tooltip
@@ -58,7 +61,7 @@
         label={translate('common.auto-refresh')}
         labelPosition="left"
         checked={$autoRefresh}
-        on:change={handleToggleAutoRefresh}
+        onchange={handleToggleAutoRefresh}
       />
     </Tooltip>
   {/if}

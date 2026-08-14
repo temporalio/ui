@@ -3,11 +3,17 @@
 
   import { page } from '$app/state';
 
+  import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
+  import {
+    DEFAULT_WORKER_SYSTEM_VIEW,
+    savedWorkerQueries,
+    systemWorkerViews,
+  } from '$lib/stores/saved-queries';
   import {
     workerSearchAttributeOptions,
     workerSearchAttributes,
@@ -40,13 +46,22 @@
     includeNullConditions={false}
   />
 
-  {#key [namespace, query, $refresh]}
-    <WorkersTable
-      {namespace}
-      onFetch={() => fetchPaginatedWorkers({ namespace, query })}
-      filterable
-    />
-  {/key}
+  <SavedQueryViews
+    filters={workerFilters}
+    savedQueries={savedWorkerQueries}
+    systemViews={systemWorkerViews}
+    defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
+    searchAttributes={workerSearchAttributes}
+    id="worker"
+  >
+    {#key [namespace, query, $refresh]}
+      <WorkersTable
+        {namespace}
+        onFetch={() => fetchPaginatedWorkers({ namespace, query })}
+        filterable
+      />
+    {/key}
+  </SavedQueryViews>
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}

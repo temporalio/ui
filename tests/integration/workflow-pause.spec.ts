@@ -94,8 +94,8 @@ test.describe('Workflow Pause', () => {
       await mockWorkflowApis(workflowPausePage.page, mockPausedWorkflow);
       await mockNamespaceWithPauseCapability(workflowPausePage.page);
 
-      await expect(workflowPausePage.pausedStatus).toBeVisible();
-      await expect(workflowPausePage.pausedStatus).toContainText('Paused');
+      await expect(workflowPausePage.workflowStatus).toBeVisible();
+      await expect(workflowPausePage.workflowStatus).toContainText('Paused');
     });
 
     test('should show unpause button when workflow is paused', async () => {

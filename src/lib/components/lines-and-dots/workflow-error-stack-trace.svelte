@@ -15,13 +15,16 @@
 
 {#if failure}
   <Accordion title={translate('common.failure')} class="text-sm">
-    <div class="w-full text-right text-xs" slot="summary">
-      {failure?.message}
-    </div>
+    {#snippet summary()}
+      <div class="w-full text-right text-xs">
+        {failure?.message}
+      </div>
+    {/snippet}
     <div class="flex flex-col gap-2">
       <p>{translate('common.message')}</p>
       <CodeBlock
         content={failure?.message || ''}
+        label={translate('common.message')}
         language="text"
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -30,6 +33,7 @@
         <p>{translate('common.source')}</p>
         <CodeBlock
           content={failure.source}
+          label={translate('common.source')}
           language="text"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -39,6 +43,7 @@
         <p>{translate('common.stack-trace')}</p>
         <CodeBlock
           content={failure.stackTrace}
+          label={translate('common.stack-trace')}
           language="text"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}

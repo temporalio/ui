@@ -22,11 +22,15 @@
 
   let refreshDate = $state<string>();
 
-  const getStackTrace = () =>
-    getWorkflowStackTrace({
+  const getStackTrace = () => {
+    if (!workflow) {
+      return undefined;
+    }
+    return getWorkflowStackTrace({
       workflow,
       namespace,
     });
+  };
 
   const setStackTrace = () => {
     stackTrace = getStackTrace();
@@ -43,7 +47,7 @@
 </script>
 
 <section>
-  {#if workflow?.isRunning && workers?.pollers?.length > 0}
+  {#if workflow?.isRunning && (workers?.pollers?.length ?? 0) > 0}
     {#await stackTrace}
       <div class="flex flex-col gap-2">
         <Skeleton class="h-16 w-1/3 rounded-sm" />
@@ -58,11 +62,7 @@
           class="mb-4 w-fit"
         />
         <div class="flex items-center gap-2">
-          <Button
-            variant="primary"
-            leadingIcon="retry"
-            on:click={setStackTrace}
-          >
+          <Button variant="primary" leadingIcon="retry" onclick={setStackTrace}>
             {translate('workflows.refresh-call-stack')}
           </Button>
           <p>
@@ -74,6 +74,7 @@
           <CodeBlock
             content={result}
             language="text"
+            label={translate('workflows.call-stack-tab')}
             testId="query-call-stack"
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -106,7 +107,7 @@
           >
             {translate('workflows.call-stack-link')}</Link
           >{translate('workflows.call-stack-link-postface', {
-            taskQueue: workflow?.taskQueue,
+            taskQueue: workflow?.taskQueue ?? '',
           })}
         </p>
       {/if}

@@ -10,17 +10,19 @@ export interface StandaloneActivityFormData {
   startToCloseTimeout: string | undefined;
   scheduleToCloseTimeout: string | undefined;
   scheduleToStartTimeout: string | undefined;
+  startDelay: string | undefined;
   input: string | undefined;
   encoding: PayloadInputEncoding;
   messageType: string | undefined;
   searchAttributes: SearchAttributesSchema;
   summary: string | undefined;
   details: string | undefined;
-  // retry policy
+  // retry policy; numeric fields are held as strings (bound to number inputs)
+  // and coerced when the request is built.
   initialInterval: string;
-  backoffCoefficient: number | null | undefined;
+  backoffCoefficient: string;
   maximumInterval: string;
-  maximumAttempts: number | null | undefined;
+  maximumAttempts: string;
 }
 
 export type StandaloneActivityFormDefaults = Pick<
@@ -31,6 +33,7 @@ export type StandaloneActivityFormDefaults = Pick<
   | 'activityId'
   | 'activityType'
   | 'taskQueue'
-  | 'startToCloseTimeout'
-  | 'scheduleToCloseTimeout'
->;
+> & {
+  startToCloseTimeout: string;
+  scheduleToCloseTimeout: string;
+};

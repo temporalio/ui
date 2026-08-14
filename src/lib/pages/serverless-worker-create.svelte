@@ -1,8 +1,12 @@
 <script lang="ts">
   import ServerlessWorkerCreateForm from '$lib/components/workers/serverless-worker-form/serverless-worker-create-form.svelte';
-  import type { CreateDeploymentFormData } from '$lib/components/workers/serverless-worker-form/shared';
+  import type {
+    ComputeProviderOption,
+    CreateDeploymentFormData,
+  } from '$lib/components/workers/serverless-worker-form/shared';
   import { translate } from '$lib/i18n/translate';
   import {
+    buildGcpCloudRunComputeConfig,
     buildLambdaComputeConfig,
     createWorkerDeployment,
     createWorkerDeploymentVersion,
@@ -11,21 +15,35 @@
     setCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
+  import type { ComputeConfig } from '$lib/types/deployments';
   import { routeForWorkers } from '$lib/utilities/route-for';
 
   interface Props {
     namespace: string;
     onSuccess: () => void;
+    cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
+    computeProviders?: readonly ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
   interface SubmitFieldErrors {
     lambdaArn?: string[];
     iamRoleArn?: string[];
-    roleExternalId?: string[];
   }
 
-  let { namespace, onSuccess, cfnTemplate }: Props = $props();
+  let {
+    namespace,
+    onSuccess,
+    cfnTemplateUrl,
+    cfnTemplate,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
+    computeProviders,
+    gcpRegions,
+  }: Props = $props();
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -72,17 +90,33 @@
     );
     if (deploymentError) throw new Error(deploymentError);
 
-    const computeConfig = buildLambdaComputeConfig(
-      data.lambdaArn,
-      data.iamRoleArn,
-      {
-        roleExternalId: data.roleExternalId,
-        scaleUpCooloffMs: data.scaleUpCooloffMs,
-        scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-        maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-        metricsPollIntervalMs: data.metricsPollIntervalMs,
-      },
-    );
+    let computeConfig: ComputeConfig;
+    if (data.provider === 'cloud-run') {
+      computeConfig = buildGcpCloudRunComputeConfig(
+        data.gcpProject,
+        data.gcpRegion,
+        data.gcpWorkerPool,
+        data.gcpServiceAccount,
+        {
+          minReplicas: data.minReplicas,
+          maxReplicas: data.maxReplicas,
+          initialReplicas: data.initialReplicas,
+          utilizationTarget: data.utilizationTarget,
+        },
+      );
+    } else {
+      computeConfig = buildLambdaComputeConfig(
+        data.lambdaArn,
+        data.iamRoleArn,
+        {
+          roleExternalId: data.roleExternalId,
+          scaleUpCooloffMs: data.scaleUpCooloffMs,
+          scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+          maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+          metricsPollIntervalMs: data.metricsPollIntervalMs,
+        },
+      );
+    }
 
     let versionError: string | undefined;
     await createWorkerDeploymentVersion(
@@ -169,18 +203,24 @@
         translate('deployments.validation-failed-cleanup-failed'),
       );
 
-    const lower = message.toLowerCase();
-    if (lower.includes('lambda')) return { lambdaArn: [message] };
-    if (lower.includes('iam') || lower.includes('role'))
-      return { iamRoleArn: [message] };
+    if (data.provider === 'lambda') {
+      const lower = message.toLowerCase();
+      if (lower.includes('lambda')) return { lambdaArn: [message] };
+      if (lower.includes('iam') || lower.includes('role'))
+        return { iamRoleArn: [message] };
+    }
     throw new Error(message);
   }
 </script>
 
 <ServerlessWorkerCreateForm
-  submitButtonText={translate('common.save')}
   cancelHref={routeForWorkers({ namespace })}
   {onSuccess}
-  {cfnTemplate}
   onSubmit={handleCreate}
+  {cfnTemplateUrl}
+  {cfnTemplate}
+  {terraformTemplate}
+  {cloudRunTerraformTemplate}
+  {computeProviders}
+  {gcpRegions}
 />

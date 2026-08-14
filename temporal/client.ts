@@ -116,6 +116,8 @@ export const startWorkflows = async (
   if (config?.waitForResult) {
     return Promise.all(workflows.map((wf) => wf.result()));
   }
+
+  return [];
 };
 
 export const stopWorkflows = (): Promise<void[]> => {

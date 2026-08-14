@@ -73,13 +73,13 @@ export const getSystemNexusEventDisplay = (
 ): SystemNexusEventDisplay | null => {
   if (isNexusOperationScheduledEvent(event)) {
     const attrs = event.nexusOperationScheduledEventAttributes;
-    if (String(attrs.endpoint ?? '') !== '__temporal_system') return null;
+    if (String(attrs?.endpoint ?? '') !== '__temporal_system') return null;
 
-    const op = String(attrs.operation ?? '');
+    const op = String(attrs?.operation ?? '');
     const baseLabel = SYSTEM_NEXUS_LABELS[op];
     if (!baseLabel) return null;
 
-    const input = attrs.input;
+    const input = attrs?.input;
     const descriptor = isRawPayload(input)
       ? describeNexusOperation(input as Payload)
       : null;
@@ -112,14 +112,17 @@ export const getSystemNexusEventDisplay = (
 
   if (isNexusOperationCompletedEvent(event)) {
     const attrs = event.nexusOperationCompletedEventAttributes;
-    const result = attrs.result;
+    const result = attrs?.result;
     if (!isRawPayload(result)) return null;
 
     const descriptor = describeNexusResponse(result as Payload);
     if (!descriptor) return null;
 
     const extraAttributes: Record<string, string> = {};
-    if (attrs.scheduledEventId !== undefined && attrs.scheduledEventId !== null)
+    if (
+      attrs?.scheduledEventId !== undefined &&
+      attrs?.scheduledEventId !== null
+    )
       extraAttributes.initiatedEventId = String(attrs.scheduledEventId);
 
     const link = descriptor.target

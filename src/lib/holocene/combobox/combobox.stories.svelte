@@ -1,13 +1,31 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
-  import { expect, userEvent, waitFor, within } from '@storybook/test';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { action as logAction } from 'storybook/actions';
+  import { expect, userEvent, waitFor, within } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { iconNames } from '$lib/holocene/icon';
 
-  export const meta = {
+  import Button from '../button.svelte';
+
+  import AsyncTest from './async-test.svelte';
+
+  type ComboboxArgs = Omit<
+    Partial<ComponentProps<typeof Combobox>>,
+    'options' | 'value' | 'optionLabelKey' | 'optionValueKey' | 'multiselect'
+  > & {
+    options?: readonly (string | Record<string, unknown>)[];
+    optionLabelKey?: string;
+    optionValueKey?: string;
+    multiselect?: boolean;
+    allowCustomValue?: boolean;
+    showChevron?: boolean;
+    variant?: string;
+    value?: unknown;
+  };
+
+  const { Story } = defineMeta({
     title: 'Combobox',
     component: Combobox,
     args: {
@@ -19,6 +37,7 @@
       disabled: false,
       valid: true,
       error: '',
+      hintText: '',
       leadingIcon: 'search',
       labelHidden: false,
     },
@@ -30,6 +49,7 @@
       required: { name: 'Required', control: 'boolean' },
       disabled: { name: 'Disabled', control: 'boolean' },
       error: { name: 'Error', control: 'text' },
+      hintText: { name: 'Hint Text', control: 'text' },
       valid: { name: 'Valid', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       minSize: { name: 'Minimum Size', control: 'number' },
@@ -45,26 +65,18 @@
 
       options: { table: { disable: true } },
     },
-  } satisfies Meta<Combobox<unknown>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import Button from '../button.svelte';
-
-  import AsyncTest from './async-test.svelte';
-</script>
-
-<Template let:args let:context>
+{#snippet template(args: ComboboxArgs, context: StoryContext<ComboboxArgs>)}
   <Combobox
+    {...args as unknown as ComponentProps<typeof Combobox>}
     id={context.id}
     data-testid={context.id}
-    onchange={action('change')}
-    {...args}
+    onchange={logAction('change')}
   />
-</Template>
+{/snippet}
 
 <Story
   name="String Options"
@@ -75,6 +87,44 @@
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
     await userEvent.type(combobox, 'English');
+  }}
+/>
+
+<Story
+  name="With Hint Text"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+    hintText: 'Choose the language used for this workflow.',
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    expect(combobox).toHaveAccessibleDescription(
+      'Choose the language used for this workflow.',
+    );
+  }}
+/>
+
+<Story
+  name="Error Overrides Hint Text"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+    hintText: 'Choose the language used for this workflow.',
+    error: 'Select a language.',
+    valid: false,
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    expect(combobox).toHaveAccessibleDescription('Select a language.');
+    expect(combobox).not.toHaveAccessibleDescription(
+      'Choose the language used for this workflow.',
+    );
+    expect(
+      canvas.queryByText('Choose the language used for this workflow.'),
+    ).not.toBeInTheDocument();
   }}
 />
 
@@ -185,9 +235,10 @@
       );
     });
   }}
-  let:context
 >
-  <AsyncTest id={context.id}></AsyncTest>
+  {#snippet template(_args, context)}
+    <AsyncTest id={context.id}></AsyncTest>
+  {/snippet}
 </Story>
 
 <Story
@@ -246,43 +297,44 @@
 
 <Story
   name="With Action"
-  let:args
-  let:context
   play={async ({ canvasElement, id }) => {
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
     await userEvent.type(combobox, 'E');
   }}
 >
-  <div class="w-64">
-    <Combobox
-      id={context.id}
-      data-testid={context.id}
-      onchange={action('change')}
-      leadingIcon="search"
-      options={[
-        'English',
-        'English (UK)',
-        'German',
-        'French',
-        'Japanese',
-        'Spanish',
-        'Portuguese',
-        'Mandarin',
-        'Hindi',
-        'Russian',
-        'Italian',
-      ]}
-      {...args}
-    >
-      <Button
-        on:click={() => {}}
-        slot="action"
-        variant="ghost"
-        size="xs"
-        leadingIcon="close"
-        aria-label="clear"
-      />
-    </Combobox>
-  </div>
+  {#snippet template(args, context)}
+    <div class="w-64">
+      <Combobox
+        {...args as unknown as ComponentProps<typeof Combobox>}
+        id={context.id}
+        data-testid={context.id}
+        onchange={logAction('change')}
+        leadingIcon="search"
+        options={[
+          'English',
+          'English (UK)',
+          'German',
+          'French',
+          'Japanese',
+          'Spanish',
+          'Portuguese',
+          'Mandarin',
+          'Hindi',
+          'Russian',
+          'Italian',
+        ]}
+      >
+        {#snippet action()}
+          <Button
+            onclick={() => {}}
+            variant="ghost"
+            size="xs"
+            leadingIcon="close"
+            aria-label="clear"
+          />
+        {/snippet}
+      </Combobox>
+    </div>
+  {/snippet}
 </Story>

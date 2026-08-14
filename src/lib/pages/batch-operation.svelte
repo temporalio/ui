@@ -2,6 +2,7 @@
   import BatchOperationDetails from '$lib/components/batch-operations/details.svelte';
   import BatchOperationHeader from '$lib/components/batch-operations/header.svelte';
   import BatchOperationResults from '$lib/components/batch-operations/results.svelte';
+  import BatchOperationSkeleton from '$lib/components/batch-operations/skeleton.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -19,10 +20,8 @@
   let fetchKey = $state(0);
   let timeout: number;
 
-  const handleToggleAutoRefresh = (
-    event: CustomEvent<{ checked: boolean }>,
-  ) => {
-    if (event.detail.checked) {
+  const handleToggleAutoRefresh = (checked: boolean) => {
+    if (checked) {
       fetchKey += 1;
     } else if (timeout) {
       window.clearTimeout(timeout);
@@ -48,9 +47,11 @@
     </Link>
   </div>
   {#key fetchKey}
-    {#await fetchBatchOperation() then operation}
+    {#await fetchBatchOperation()}
+      <BatchOperationSkeleton />
+    {:then operation}
       <BatchOperationHeader
-        on:toggleAutoRefresh={handleToggleAutoRefresh}
+        onToggleAutoRefresh={handleToggleAutoRefresh}
         {operation}
       />
       <Card>

@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import Skeleton from './index.svelte';
 </script>

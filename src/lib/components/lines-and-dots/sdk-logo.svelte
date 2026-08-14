@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import dotNet from '$lib/vendor/sdk-logos/dotnet-colorblock.svg';
@@ -60,7 +59,6 @@
     </span>
   </Tooltip>
   {#if href && !hideDocsLink}
-    <Link {href} newTab>Docs</Link>
-    <Icon name="book" />
+    <Link trailingIcon="book" {href} newTab>Docs</Link>
   {/if}
 </p>

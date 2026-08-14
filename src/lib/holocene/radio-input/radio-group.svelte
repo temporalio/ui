@@ -1,41 +1,47 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const RADIO_GROUP_CONTEXT = 'radio-group-ctx';
 </script>
 
-<script lang="ts">
-  import type { Writable } from 'svelte/store';
-
-  import { setContext } from 'svelte';
+<script lang="ts" generics="T">
+  import { setContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { RadioGroupContext, RadioGroupProps } from './types';
 
-  type T = $$Generic;
-  type $$Props = RadioGroupProps<T> & { class?: string };
+  type Props = RadioGroupProps<T> & {
+    class?: string;
+    children?: Snippet;
+  };
 
-  let className: string = '';
-
-  export { className as class };
-  export let name: string;
-  export let group: Writable<T>;
-  export let description = '';
-
-  $: descriptionId = description ? `${name}-description` : undefined;
-
-  setContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT, {
+  let {
     name,
     group,
+    description = '',
+    class: className = '',
+    children,
+    ...rest
+  }: Props = $props();
+
+  const labelId = $props.id();
+
+  setContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT, {
+    get name() {
+      return name;
+    },
+    get group() {
+      return group;
+    },
   });
 </script>
 
 <div
-  role="radiogroup"
-  aria-labelledby={descriptionId}
   class={merge('flex flex-col gap-4 p-1', className)}
-  {...$$restProps}
+  role="radiogroup"
+  aria-labelledby={description ? labelId : undefined}
+  {...rest}
 >
   {#if description}
-    <p id={descriptionId} class="text-sm font-medium">{description}</p>
+    <p id={labelId} class="text-sm font-medium">{description}</p>
   {/if}
-  <slot />
+  {@render children?.()}
 </div>

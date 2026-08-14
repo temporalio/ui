@@ -5,6 +5,7 @@
 
   import { page } from '$app/state';
 
+  import DownloadJsonButton from '$lib/components/download-json-button.svelte';
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
@@ -25,7 +26,11 @@
   import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { exportWorkflows } from '$lib/utilities/export-workflows';
+  import {
+    getBatchSelectionTargets,
+    getPageSelectionStatus,
+    type PageSelectionStatus,
+  } from '$lib/utilities/batch-selection';
 
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from './workflows-summary-configurable-table/table-header-cell.svelte';
@@ -156,29 +161,13 @@
 
   let prevClickedRow = $state<VisibleRow | null>(null);
 
-  type PageSelectionStatus = 'checked' | 'unchecked' | 'partial';
-
-  const pageSelectionStatus: PageSelectionStatus = $derived.by(() => {
-    const selectedRunIdSet = new Set($selectedWorkflows.map((w) => w.runId));
-
-    if ($allSelected) {
-      return 'checked';
-    }
-
-    const visibleItemsNotSelected = visiblePaginatedItems.filter(
-      (i) => !selectedRunIdSet.has(i.runId),
-    );
-
-    if (visibleItemsNotSelected.length === visiblePaginatedItems.length) {
-      return 'unchecked';
-    }
-
-    if (visibleItemsNotSelected.length === 0) {
-      return 'checked';
-    }
-
-    return 'partial';
-  });
+  const pageSelectionStatus: PageSelectionStatus = $derived(
+    getPageSelectionStatus(
+      visiblePaginatedItems.map((i) => i.runId),
+      new Set($selectedWorkflows.map((w) => w.runId)),
+      $allSelected,
+    ),
+  );
 
   const handleSelectPage = (
     isSelected: boolean,
@@ -190,6 +179,32 @@
     if (!isSelected) {
       allSelected.set(false);
     }
+  };
+
+  const handleBatchSelect = (
+    event: MouseEvent,
+    row: VisibleRow,
+    visibleRowIndex: number,
+  ) => {
+    // child rows are inserted and removed dynamically, so re-derive the index
+    // of the previously clicked row by runId rather than caching a number.
+    const prevClickedRowIndex = visibleRows.findIndex(
+      (r) => r.value.runId === prevClickedRow?.value.runId,
+    );
+
+    const selection = getBatchSelectionTargets(
+      event,
+      visibleRows,
+      visibleRowIndex,
+      prevClickedRowIndex,
+    );
+    if (!selection) return;
+
+    selectWorkflows(
+      selection.isChecked,
+      selection.targeted.map((r) => r.value),
+    );
+    prevClickedRow = row;
   };
 
   $effect(() => {
@@ -211,113 +226,83 @@
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
-    maxHeight="var(--panel-h)"
   >
-    <caption class="sr-only" slot="caption">
-      {translate('common.workflows')}
-    </caption>
-    <TableHeaderRow
-      columnsCount={columns.length}
-      empty={visiblePaginatedItems.length === 0}
-      slot="headers"
-      workflows={visiblePaginatedItems}
-      {pageSelectionStatus}
-      onSelectPage={handleSelectPage}
-    >
-      {#each columns as column (column.label)}
-        <TableHeaderCell {column} />
-      {/each}
-    </TableHeaderRow>
-    {#each visibleRows as row, visibleRowIndex (row.value.runId)}
-      {@const isChildRow = row.rowType === 'child'}
-      <TableRow
-        workflow={row.value}
-        {toggleChildrenVisibility}
-        childCount={!isChildRow && row.childCount != null
-          ? row.childCount
-          : undefined}
-        child={isChildRow}
-        onClickBatchSelect={(event) => {
-          // this is required due to how the underlying Checkbox component
-          // gets its onclick type from svelte event forwarding. It does not
-          // know what the current event target type is a checkbox input
-          if (!(event.currentTarget instanceof HTMLInputElement)) {
-            return;
-          }
-
-          const isChecked = event.currentTarget.checked;
-
-          let targetedWorkflows = [row.value];
-
-          const prevClickedRowIndex = visibleRows.findIndex(
-            (r) => r.value.runId === prevClickedRow?.value.runId,
-          );
-
-          if (event.shiftKey && prevClickedRowIndex >= 0) {
-            const rangeStartInclusive = Math.min(
-              prevClickedRowIndex,
-              visibleRowIndex,
-            );
-            const rangeEndInclusive = Math.max(
-              prevClickedRowIndex,
-              visibleRowIndex,
-            );
-
-            // end of the slice range is exclusive, so add 1 to include the full range
-            targetedWorkflows = visibleRows
-              .slice(rangeStartInclusive, rangeEndInclusive + 1)
-              .map((r) => r.value);
-          }
-
-          selectWorkflows(isChecked, targetedWorkflows);
-
-          prevClickedRow = row;
-        }}
+    {#snippet caption()}
+      <caption class="sr-only">
+        {translate('common.workflows')}
+      </caption>
+    {/snippet}
+    {#snippet headers()}
+      <TableHeaderRow
+        columnsCount={columns.length}
+        empty={visiblePaginatedItems.length === 0}
+        workflows={visiblePaginatedItems}
+        {pageSelectionStatus}
+        onSelectPage={handleSelectPage}
       >
         {#each columns as column (column.label)}
-          <TableBodyCell workflow={row.value} {column} truncate={dense} />
+          <TableHeaderCell {column} />
         {/each}
-      </TableRow>
-    {/each}
-    <svelte:fragment slot="empty">
+      </TableHeaderRow>
+    {/snippet}
+    {#snippet rows()}
+      {#each visibleRows as row, visibleRowIndex (row.value.runId)}
+        {@const isChildRow = row.rowType === 'child'}
+        <TableRow
+          workflow={row.value}
+          {toggleChildrenVisibility}
+          childCount={!isChildRow && row.childCount != null
+            ? row.childCount
+            : undefined}
+          child={isChildRow}
+          onClickBatchSelect={(event) =>
+            handleBatchSelect(event, row, visibleRowIndex)}
+        >
+          {#each columns as column (column.label)}
+            <TableBodyCell workflow={row.value} {column} truncate={dense} />
+          {/each}
+        </TableRow>
+      {/each}
+    {/snippet}
+    {#snippet empty()}
       <TableEmptyState {cloud} />
-    </svelte:fragment>
-    <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
+    {/snippet}
+    {#snippet actionsEndAdditional({ visibleItems, page })}
       <Tooltip
         text={dense
           ? translate('common.dense')
           : translate('common.comfortable')}
         top
       >
-        <FeatureTag feature="tableDensity" alpha />
+        <FeatureTag feature="tableDensity" />
         <Button
-          on:click={setTableDensity}
+          onclick={setTableDensity}
           data-testid="table-density-button"
           size="xs"
           variant="ghost"
           leadingIcon={dense ? 'table-dense' : 'table-comfy'}
+          aria-label={dense
+            ? translate('common.dense')
+            : translate('common.comfortable')}
         ></Button>
       </Tooltip>
-      <Tooltip text={translate('common.download-json')} top>
+      <DownloadJsonButton
+        items={visibleItems}
+        {page}
+        filePrefix="workflows"
+        testId="export-history-button"
+      />
+      <Tooltip text={translate('common.configure-columns')} top>
         <Button
-          on:click={() => exportWorkflows(visibleItems, page)}
-          data-testid="export-history-button"
-          size="xs"
-          variant="ghost"
-        >
-          <Icon name="download" />
-        </Button>
-      </Tooltip>
-      <Tooltip text="Configure Columns" top>
-        <Button
-          on:click={onClickConfigure}
+          onclick={onClickConfigure}
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"
+          aria-label={translate('common.configure-columns')}
         >
           <Icon name="settings" />
         </Button>
       </Tooltip>
-    </svelte:fragment>
+    {/snippet}
   </PaginatedTable>
 {/key}

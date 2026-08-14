@@ -1,4 +1,8 @@
+import { get } from 'svelte/store';
+
 import { BROWSER } from 'esm-env';
+
+import { page } from '$app/stores';
 
 import { networkError } from '$lib/stores/error';
 import { toaster } from '$lib/stores/toaster';
@@ -7,7 +11,7 @@ import type { NetworkError } from '$lib/types/global';
 import { has } from './has';
 import { isNetworkError } from './is-network-error';
 import type { APIErrorResponse, TemporalAPIError } from './request-from-api';
-import { routeForLoginPage } from './route-for';
+import { routeForAuthenticationRedirect, routeForLoginPage } from './route-for';
 
 interface NetworkErrorWithReport extends NetworkError {
   report?: boolean;
@@ -34,11 +38,11 @@ export const handleError = (
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForCurrentAuthSettings());
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForCurrentAuthSettings());
   }
 
   if (isNetworkError(error)) {
@@ -58,12 +62,12 @@ export const handleUnauthorizedOrForbiddenError = (
   isBrowser = BROWSER,
 ): void => {
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForCurrentAuthSettings());
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForCurrentAuthSettings());
     return;
   }
 };
@@ -97,4 +101,14 @@ const hasStatusCode = (
   }
 
   return false;
+};
+
+const routeForCurrentAuthSettings = (): string => {
+  const settings = get(page)?.data?.settings;
+  if (!settings) return routeForLoginPage();
+
+  return routeForAuthenticationRedirect(
+    settings,
+    new URL(window.location.href),
+  );
 };

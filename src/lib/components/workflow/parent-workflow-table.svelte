@@ -15,29 +15,34 @@
   }
 
   let { parent, parentNamespaceName, namespace }: Props = $props();
+
+  const workflowId = $derived(parent.workflowId ?? '');
+  const runId = $derived(parent.runId ?? '');
 </script>
 
 <Table class="w-full">
-  <caption class="sr-only" slot="caption"
-    >{translate('workflows.parent-workflow')}</caption
-  >
-  <TableHeaderRow slot="headers">
-    <th scope="col">{translate('workflows.parent-id')}</th>
-    <th scope="col">{translate('workflows.parent-run-id')}</th>
-  </TableHeaderRow>
+  {#snippet caption()}
+    <caption class="sr-only">{translate('workflows.parent-workflow')}</caption>
+  {/snippet}
+  {#snippet headers()}
+    <TableHeaderRow>
+      <th scope="col">{translate('workflows.parent-id')}</th>
+      <th scope="col">{translate('workflows.parent-run-id')}</th>
+    </TableHeaderRow>
+  {/snippet}
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>
       <Link
         href={routeForWorkflow({
           namespace: parentNamespaceName ?? namespace,
-          workflow: parent.workflowId,
-          run: parent.runId,
+          workflow: workflowId,
+          run: runId,
         })}
       >
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={parent.workflowId}
+          content={workflowId}
           visible
         />
       </Link>
@@ -46,14 +51,14 @@
       <Link
         href={routeForWorkflow({
           namespace: parentNamespaceName ?? namespace,
-          workflow: parent.workflowId,
-          run: parent.runId,
+          workflow: workflowId,
+          run: runId,
         })}
       >
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={parent.runId}
+          content={runId}
           visible
         />
       </Link>
