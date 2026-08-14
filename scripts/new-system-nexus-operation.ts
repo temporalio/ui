@@ -1,8 +1,8 @@
 /**
  * Scaffolds a new system Nexus operation.
  *
- *   pnpm nexus:new StartWorkflowExecution
- *   pnpm nexus:new StartWorkflowExecution --kind start-workflow --category workflow
+ *   pnpm system-nexus-operation:new StartWorkflowExecution
+ *   pnpm system-nexus-operation:new StartWorkflowExecution --kind start-workflow --category workflow
  *
  * Creates src/lib/system-nexus-endpoints/<kind>/{schemas,definition}.ts and an
  * input renderer, then registers the operation in types.ts and index.ts.
@@ -36,7 +36,7 @@ const flag = (name: string): string | undefined => {
 const operationName = positional[0];
 if (!operationName) {
   fail(
-    'Usage: pnpm nexus:new <OperationName> [--kind <slug>] [--category <timeline-category>] [--grouped]',
+    'Usage: pnpm system-nexus-operation:new <OperationName> [--kind <slug>] [--category <timeline-category>] [--grouped]',
   );
 }
 if (!/^[A-Z][A-Za-z0-9]*$/.test(operationName)) {

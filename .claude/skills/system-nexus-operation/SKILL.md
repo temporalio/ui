@@ -49,7 +49,7 @@ operation, so callers fall through to normal event rendering.
 Scaffold it:
 
 ```bash
-pnpm nexus:new StartWorkflowExecution --kind start-workflow --category workflow
+pnpm system-nexus-operation:new StartWorkflowExecution --kind start-workflow --category workflow
 ```
 
 | Flag           | Meaning                               | Default                     |

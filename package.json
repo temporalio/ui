@@ -49,7 +49,7 @@
     "lint": "pnpm prettier; pnpm eslint; pnpm stylelint",
     "lint:ci": "pnpm prettier && pnpm eslint && pnpm stylelint",
     "format": "pnpm prettier:fix; pnpm eslint:fix; pnpm stylelint:fix",
-    "nexus:new": "esno scripts/new-system-nexus-operation.ts",
+    "system-nexus-operation:new": "esno scripts/new-system-nexus-operation.ts",
     "check": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --tsgo --incremental",
     "check:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --tsgo --incremental --watch",
     "prettier": "prettier --check --plugin prettier-plugin-svelte --plugin prettier-plugin-tailwindcss .",
