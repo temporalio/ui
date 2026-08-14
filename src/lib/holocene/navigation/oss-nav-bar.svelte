@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { resolve } from '$app/paths';
+  import { base } from '$app/paths';
 
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -32,7 +32,7 @@
   class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
 >
   <div class="flex w-fit items-center gap-1 text-nowrap">
-    <a href={resolve('', {})} class="flex items-center">
+    <a href={base || '/'} class="flex items-center">
       <Logo height={24} width={24} class="m-1" />
     </a>
     {#if subtitleHref}

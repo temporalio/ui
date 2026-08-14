@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { resolve } from '$app/paths';
+  import { base } from '$app/paths';
 
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -35,7 +35,7 @@
   <div
     class="flex flex-row items-center justify-start group-data-[nav=closed]:hidden"
   >
-    <a href={resolve('', {})} class="text-inherit flex items-center">
+    <a href={base || '/'} class="text-inherit flex items-center">
       <Logo
         height={24}
         width={24}
