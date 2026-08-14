@@ -88,4 +88,57 @@ test.describe('Workflow History compact view, live updates', () => {
     // Same group, no reload, no remount.
     await expect.poll(ids).toMatch(/^2 3 4 /);
   });
+
+  test('keeps a row expanded when its group gains an event', async ({
+    page,
+  }) => {
+    let releaseCompletion: () => void;
+    const completionHeld = new Promise<void>((resolve) => {
+      releaseCompletion = resolve;
+    });
+
+    await mockWorkflowApis(page, runningWorkflow);
+    let completionDelivered = false;
+    await page.route(EVENT_HISTORY_API, async (route) => {
+      if (route.request().url().includes('waitNewEvent=true')) {
+        if (!completionDelivered) {
+          completionDelivered = true;
+          await completionHeld;
+          return route.fulfill({ json: historyPage([completion]) });
+        }
+        return route.fulfill({ json: historyPage([]) });
+      }
+      return route.fulfill({ json: historyPage(inProgress) });
+    });
+    await page.route(EVENT_HISTORY_API_REVERSE, (route) =>
+      route.fulfill({ json: historyPage([...inProgress].reverse()) }),
+    );
+
+    await page.goto(historyUrl);
+    await expect(page.getByTestId('event-summary-table')).toBeVisible();
+    await page.getByTestId('compact').click();
+
+    const row = page.getByTestId('event-summary-row').first();
+    await expect(row).toContainText('DeployNetwork');
+
+    await row
+      .getByRole('button', { name: /expand|collapse/i })
+      .first()
+      .click();
+    const details = page.getByTestId('event-summary-row-expanded').first();
+    await expect(details).toBeVisible();
+
+    releaseCompletion();
+
+    // The completion lands, so the row must re-render — without remounting and
+    // dropping the expansion the user opened.
+    await expect
+      .poll(() =>
+        row.evaluate((el) =>
+          (el as HTMLElement).innerText.replace(/\s+/g, ' ').trim(),
+        ),
+      )
+      .toMatch(/^2 3 4 /);
+    await expect(details).toBeVisible();
+  });
 });

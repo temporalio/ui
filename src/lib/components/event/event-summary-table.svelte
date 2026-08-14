@@ -14,6 +14,7 @@
     type LazyGroup,
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
@@ -101,6 +102,13 @@
     ...($isCloud ? [{ label: 'Billable Actions' }] : []),
   ]);
 
+  const materializeRowReactive = (
+    item: IterableEventWithPending | LazyGroup,
+  ) => {
+    void eventBuffer.version;
+    return isLazyGroup(item) ? materializeGroup(item) : item;
+  };
+
   const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
     if (isPendingNexusOperation(event)) {
       return `pending-nexus-${event.scheduledEventId}`;
@@ -111,9 +119,7 @@
     }
 
     if (isLazyGroup(event)) {
-      // Version, because a lazy group keeps its identity as it gains events —
-      // key on id alone and the row below renders a stale materialized group.
-      return `group-${event.id}-${event.version}`;
+      return `group-${event.id}`;
     }
 
     return `event-${event.id}`;
@@ -154,7 +160,7 @@
     {/snippet}
     {#snippet rows({ visibleItems })}
       {#each visibleItems as item, index (iterableKey(item))}
-        {@const row = isLazyGroup(item) ? materializeGroup(item) : item}
+        {@const row = materializeRowReactive(item)}
         {#if isEventGroup(row)}
           <EventSummaryRow
             bind:hoveredEventId
