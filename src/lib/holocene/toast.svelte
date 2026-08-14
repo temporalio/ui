@@ -73,6 +73,7 @@
   </p>
   <Button
     variant="ghost"
+    size="sm"
     LeadingIcon={IconClose}
     aria-label={dismissLabel}
     class="text-inherit h-6 w-6 shrink-0 p-0"
