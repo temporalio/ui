@@ -229,6 +229,39 @@ describe('resolveSystemNexusEvent', () => {
     ).toBeUndefined();
   });
 
+  it('falls back to event links when signalLink is present but incomplete', () => {
+    // A signalLink missing workflowId cannot build a link. The event links can,
+    // so the fallback must still run.
+    const display = resolveSystemNexusEvent(
+      completedEvent(
+        {
+          runId: 'target-run-id',
+          started: true,
+          signalLink: {
+            variant: {
+              case: 'workflowEvent',
+              value: { namespace: 'target-namespace' },
+            },
+          },
+        },
+        '5',
+        [
+          {
+            workflowEvent: {
+              namespace: 'default',
+              workflowId: 'system-nexus-workflow-id',
+              runId: 'target-run-id',
+              requestIdRef: { requestId: 'b580d786' },
+            },
+          },
+        ],
+      ),
+    );
+
+    const link = display?.links?.find((l) => l.kind === 'target-execution');
+    expect(link?.value).toBe('system-nexus-workflow-id');
+  });
+
   it('falls back to event links when the response carries no signalLink', () => {
     const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }, '5', [

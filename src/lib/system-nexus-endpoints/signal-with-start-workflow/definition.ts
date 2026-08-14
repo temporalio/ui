@@ -66,7 +66,9 @@ const targetFromSignalLink = (
       eventRef.eventId === undefined ? undefined : String(eventRef.eventId),
   };
 
-  return Object.values(target).some(Boolean) ? target : undefined;
+  // Without a workflow ID the target cannot build a link, so report nothing and
+  // let the caller fall back to the event links.
+  return target.workflowId ? target : undefined;
 };
 
 export const signalWithStartWorkflow: SystemNexusOperationDefinition = {
