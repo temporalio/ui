@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import { ResetReapplyExcludeType, ResetReapplyType } from '$src/lib/types';
 import {
@@ -329,6 +329,49 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await page.getByRole('button', { name: 'More Actions' }).click();
 
       await expect(page.getByTestId('terminate-button')).toBeHidden();
+    });
+  });
+
+  test.describe('Modal dismissal', () => {
+    test.beforeEach(async ({ page }) => {
+      await mockWorkflowApis(page, mockCompletedWorkflow);
+      await mockClusterApi(page, { serverVersion: '1.24.0' });
+      await mockWorkflowResetApi(page);
+      await page.goto(workflowUrl);
+    });
+
+    const openResetModal = (page: Page) =>
+      page.getByRole('button', { name: 'Reset' }).click();
+
+    const visibleResetModal = (page: Page) =>
+      page.getByTestId('reset-confirmation-modal').locator('visible=true');
+
+    test('reopens after being dismissed with Escape', async ({ page }) => {
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
+
+      await openResetModal(page);
+      await expect(visibleResetModal(page)).toHaveCount(1);
+
+      await page.keyboard.press('Escape');
+      await expect(visibleResetModal(page)).toHaveCount(0);
+
+      await openResetModal(page);
+      await expect(visibleResetModal(page)).toHaveCount(1);
+    });
+
+    test('reopens after being dismissed with the cancel button', async ({
+      page,
+    }) => {
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
+
+      await openResetModal(page);
+      await expect(visibleResetModal(page)).toHaveCount(1);
+
+      await visibleResetModal(page).getByTestId('cancel-modal-button').click();
+      await expect(visibleResetModal(page)).toHaveCount(0);
+
+      await openResetModal(page);
+      await expect(visibleResetModal(page)).toHaveCount(1);
     });
   });
 });

@@ -33,6 +33,7 @@ export type EventLinkView = EventLinkDisplay & {
 
 export type EventLinkContext = {
   namespace?: string;
+  perspective?: 'caller';
 };
 
 const workflowExecutionStarted = 'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED';
@@ -47,11 +48,14 @@ const workflowValueFromHref = (href: string, fallback: string): string => {
 
 const namespaceDisplay = (
   namespace: string | null | undefined,
+  labelKey:
+    | 'nexus.namespace-link'
+    | 'nexus.caller-namespace' = 'nexus.namespace-link',
 ): EventLinkDisplay | undefined => {
   if (!isPresent(namespace)) return undefined;
 
   return {
-    label: translate('nexus.link-namespace'),
+    label: translate(labelKey),
     value: namespace,
     href: routeForNamespace({ namespace }),
   };
@@ -62,6 +66,9 @@ const eventDisplay = (
   eventType: unknown,
   eventId?: unknown,
   requestId?: string | null,
+  labelKey:
+    | 'nexus.handler-event'
+    | 'nexus.caller-event' = 'nexus.handler-event',
 ): EventLinkDisplay | undefined => {
   if (eventId === undefined && !requestId && !eventType) {
     return undefined;
@@ -78,7 +85,7 @@ const eventDisplay = (
     .join(' ');
 
   return {
-    label: translate('nexus.handler-event'),
+    label: translate(labelKey),
     value: value || translate('nexus.link'),
     href,
   };
@@ -91,6 +98,20 @@ const unknownLink = (index?: number): EventLinkView => {
     label: translate('nexus.link'),
     value: translate('nexus.link'),
   };
+};
+
+export const eventLinkTargetTypeLabel = (
+  variant: EventLinkVariant,
+): string | undefined => {
+  switch (variant) {
+    case 'activity':
+      return translate('nexus.target-type-standalone-activity');
+    case 'workflowEvent':
+    case 'workflow':
+      return translate('nexus.target-type-workflow');
+    default:
+      return undefined;
+  }
 };
 
 export const toEventLinkView = (
@@ -150,19 +171,27 @@ export const toEventLinkView = (
       ? workflowValueFromHref(href, fallbackValue)
       : fallbackValue;
 
+    const caller = context.perspective === 'caller';
+
     return {
       variant: 'workflowEvent',
       key: `workflowEvent:${namespace ?? ''}:${workflow ?? ''}:${run ?? ''}:${workflowEvent.eventRef?.eventId ?? workflowEvent.requestIdRef?.requestId ?? index ?? ''}`,
-      label: translate('nexus.link'),
+      label: translate(
+        caller ? 'nexus.caller-workflow' : 'nexus.workflow-link',
+      ),
       value,
       href,
-      namespace: namespaceDisplay(namespace),
+      namespace: namespaceDisplay(
+        namespace,
+        caller ? 'nexus.caller-namespace' : 'nexus.namespace-link',
+      ),
       event: eventDisplay(
         href,
         workflowEvent.eventRef?.eventType ??
           workflowEvent.requestIdRef?.eventType,
         workflowEvent.eventRef?.eventId,
         workflowEvent.requestIdRef?.requestId,
+        caller ? 'nexus.caller-event' : 'nexus.handler-event',
       ),
     };
   }
@@ -190,7 +219,7 @@ export const toEventLinkView = (
     return {
       variant: 'workflow',
       key: `workflow:${namespace ?? ''}:${workflow ?? ''}:${run ?? ''}:${workflowLink.reason ?? index ?? ''}`,
-      label: translate('common.workflow-id'),
+      label: translate('nexus.workflow-link'),
       value,
       href,
       namespace: namespaceDisplay(namespace),
@@ -212,14 +241,21 @@ export const toEventLinkView = (
         })
       : undefined;
 
+    const caller = context.perspective === 'caller';
+
     return {
       variant: 'nexusOperation',
       key: `nexusOperation:${namespace ?? ''}:${operationId ?? ''}:${runId ?? ''}:${index ?? ''}`,
-      label: translate('nexus.nexus-operation'),
+      label: translate(
+        caller ? 'nexus.caller-event' : 'nexus.standalone-nexus-operation-link',
+      ),
       value:
         operationId || runId || namespace || translate('nexus.nexus-operation'),
       href,
-      namespace: namespaceDisplay(namespace),
+      namespace: namespaceDisplay(
+        namespace,
+        caller ? 'nexus.caller-namespace' : 'nexus.namespace-link',
+      ),
     };
   }
 
@@ -241,7 +277,7 @@ export const toEventLinkView = (
     return {
       variant: 'activity',
       key: `activity:${namespace ?? ''}:${activityId ?? ''}:${runId ?? ''}:${index ?? ''}`,
-      label: translate('standalone-activities.activity-id'),
+      label: translate('nexus.standalone-activity-link'),
       value:
         activityId ||
         runId ||
