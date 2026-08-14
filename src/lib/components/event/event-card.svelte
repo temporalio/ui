@@ -33,7 +33,10 @@
     getSystemNexusEventDisplay,
     type SystemNexusEventLink,
   } from '$lib/utilities/get-system-nexus-event-display';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import {
+    isLocalActivityMarkerEvent,
+    isWorkflowExecutionSignaledEvent,
+  } from '$lib/utilities/is-event-type';
   import { describeNexusOperation } from '$lib/utilities/nexus-operation-registry';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
@@ -130,6 +133,8 @@
       {#if event?.links?.length}
         {#if event.category === 'nexus'}
           {@render nexusHandlerLinks(event.links)}
+        {:else if isWorkflowExecutionSignaledEvent(event)}
+          {@render callerLinks(event.links)}
         {:else}
           {@render eventLinks(event.links)}
         {/if}
@@ -179,6 +184,22 @@
 {#snippet eventLinks(links: ELink[])}
   {#each toEventLinkViews(links, { namespace }) as view (view.key)}
     {@render eventLink(view)}
+    {#if view.namespace}
+      {@render eventLink(view.namespace)}
+    {/if}
+  {/each}
+{/snippet}
+
+{#snippet callerLinks(links: ELink[])}
+  {#each toEventLinkViews( links, { namespace, perspective: 'caller' }, ) as view (view.key)}
+    {@render eventLink({
+      label: translate('nexus.caller-execution'),
+      value: view.value,
+      href: view.href,
+    })}
+    {#if view.event}
+      {@render eventLink(view.event)}
+    {/if}
     {#if view.namespace}
       {@render eventLink(view.namespace)}
     {/if}
