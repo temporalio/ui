@@ -116,13 +116,10 @@
   const terminated = $derived(eventOrGroupIsTerminated(event));
 
   const systemNexus = $derived(
-    !isEventGroup(event)
-      ? resolveSystemNexusEvent(event as WorkflowEvent, {
-          namespace,
-          workflow,
-          run,
-        })
-      : null,
+    resolveSystemNexusEvent(
+      isEventGroup(event) ? event.initialEvent : (event as WorkflowEvent),
+      { namespace, workflow, run },
+    ),
   );
 
   const systemNexusSummaryLink = $derived(
@@ -183,6 +180,7 @@
 
   const showSecondaryAttribute = $derived(
     compact &&
+      !systemNexus &&
       secondaryAttribute?.key &&
       secondaryAttribute?.key !== primaryAttribute?.key &&
       !currentEvent?.userMetadata?.summary,

@@ -113,7 +113,7 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
     isNexusOperationScheduledEvent(event) ||
     isNexusOperationStartedEvent(event)
   ) {
-    return 'Nexus Operation';
+    return systemNexusGroupLabel(event) ?? 'Nexus Operation';
   }
 
   return '';
