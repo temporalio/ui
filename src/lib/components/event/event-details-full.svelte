@@ -12,13 +12,24 @@
     group = undefined,
     event = undefined,
     lazy = false,
-  }: { group?: EventGroup; event?: WorkflowEvent; lazy?: boolean } = $props();
+    groupRow = false,
+  }: {
+    group?: EventGroup;
+    event?: WorkflowEvent;
+    lazy?: boolean;
+    /** The row that opened this represents the whole group, not one event. */
+    groupRow?: boolean;
+  } = $props();
 
   const pendingEvent = $derived(
     group?.pendingActivity || group?.pendingNexusOperation,
   );
+
+  // An operation can ask that opening one of its events opens only that event.
+  // That applies to a row for a single event; a row for the group itself was an
+  // explicit request for the group, so it always opens every card.
   const expandsIndividually = $derived(
-    resolveSystemNexusEvent(event)?.expandsIndividually ?? false,
+    !groupRow && (resolveSystemNexusEvent(event)?.expandsIndividually ?? false),
   );
 
   const showEventGroup = $derived(
@@ -35,7 +46,7 @@
     {:else if group?.pendingNexusOperation}
       <PendingNexusOperationCard operation={group.pendingNexusOperation} />
     {/if}
-    {#each group?.eventList ?? [] as groupEvent}
+    {#each group?.eventList ?? [] as groupEvent (groupEvent.id)}
       <EventCard event={groupEvent} {lazy} />
     {/each}
   </div>

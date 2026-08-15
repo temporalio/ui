@@ -450,7 +450,11 @@
     data-testid="event-summary-row-expanded"
   >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
-      <EventDetailsFull {group} event={currentEvent} />
+      <EventDetailsFull
+        {group}
+        event={currentEvent}
+        groupRow={isEventGroup(event)}
+      />
     </td>
   </tr>
 {/if}
