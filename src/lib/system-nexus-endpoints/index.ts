@@ -55,22 +55,40 @@ const isSystemEndpoint = (event: WorkflowEvent): boolean =>
   SYSTEM_NEXUS_ENDPOINT;
 
 /** Resolves the operation an event belongs to, or null if it is not one of ours. */
-const operationFor = (
+const operationForScheduled = (
   event: WorkflowEvent,
 ): SystemNexusOperationDefinition | undefined => {
-  if (isNexusOperationScheduledEvent(event)) {
-    if (!isSystemEndpoint(event)) return undefined;
-    const name = String(
-      event.nexusOperationScheduledEventAttributes?.operation ?? '',
-    );
-    return byOperationName.get(name);
-  }
+  if (!isNexusOperationScheduledEvent(event)) return undefined;
+  if (!isSystemEndpoint(event)) return undefined;
+  const name = String(
+    event.nexusOperationScheduledEventAttributes?.operation ?? '',
+  );
+  return byOperationName.get(name);
+};
+
+const operationFor = (
+  event: WorkflowEvent,
+  context: SystemNexusContext,
+): SystemNexusOperationDefinition | undefined => {
+  if (isNexusOperationScheduledEvent(event))
+    return operationForScheduled(event);
 
   if (isNexusOperationCompletedEvent(event)) {
     const result = event.nexusOperationCompletedEventAttributes?.result;
     if (!result) return undefined;
     const messageType = messageTypeOf(result as Payload);
-    return messageType ? byResponseMessageType.get(messageType) : undefined;
+    const operation = messageType
+      ? byResponseMessageType.get(messageType)
+      : undefined;
+    if (!operation) return undefined;
+
+    // The payload's own messageType is authored by the handler, so it cannot
+    // establish that this came from the system endpoint. Only the initiating
+    // event can.
+    const initiating = context.initiatingEvent;
+    return initiating && operationForScheduled(initiating) === operation
+      ? operation
+      : undefined;
   }
 
   return undefined;
@@ -86,7 +104,7 @@ export const resolveSystemNexusEvent = (
 ): SystemNexusPresentation | null => {
   if (!event) return null;
 
-  const operation = operationFor(event);
+  const operation = operationFor(event, context);
   if (!operation) return null;
 
   const described = isNexusOperationScheduledEvent(event)
@@ -104,7 +122,7 @@ export const resolveSystemNexusEvent = (
 
 /** The group label for a system Nexus operation, or null to use the default. */
 export const systemNexusGroupLabel = (event: WorkflowEvent): string | null =>
-  operationFor(event)?.label ?? null;
+  operationForScheduled(event)?.label ?? null;
 
 /**
  * The component rendering an operation's input payload, resolved from the

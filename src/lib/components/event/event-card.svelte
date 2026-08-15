@@ -41,12 +41,25 @@
 
   import EventDetailsLink from './event-details-link.svelte';
 
-  let { event, lazy = false }: { event: WorkflowEvent; lazy?: boolean } =
-    $props();
+  let {
+    event,
+    lazy = false,
+    initiatingEvent = undefined,
+  }: {
+    event: WorkflowEvent;
+    lazy?: boolean;
+    /** The operation's NexusOperationScheduled event, when this is part of a group. */
+    initiatingEvent?: WorkflowEvent;
+  } = $props();
   const { namespace, workflow, run } = $derived(page.params);
 
   const systemNexus = $derived(
-    resolveSystemNexusEvent(event, { namespace, workflow, run }),
+    resolveSystemNexusEvent(event, {
+      namespace,
+      workflow,
+      run,
+      initiatingEvent,
+    }),
   );
 
   const attributes = $derived.by(() => {

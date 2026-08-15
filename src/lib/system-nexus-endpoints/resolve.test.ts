@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import type { WorkflowEvent } from '$lib/types/events';
 
 import { resolveSystemNexusEvent, schemaForMessageType } from './index';
+import { escapeQueryValue } from './shared';
 
 const toBinaryPayload = (
   schema: DescMessage,
@@ -55,6 +56,12 @@ const scheduledEvent = (
     },
   }) as unknown as WorkflowEvent;
 
+const initiatingEvent = scheduledEvent({
+  namespace: 'default',
+  workflowId: 'system-nexus-workflow-id',
+  signalName: 'test-signal',
+});
+
 const completedEvent = (
   init: Record<string, unknown>,
   scheduledEventId = '5',
@@ -91,6 +98,7 @@ describe('resolveSystemNexusEvent', () => {
   it('renames the completed event to Delivered', () => {
     const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }),
+      { initiatingEvent },
     );
     expect(display?.displayName).toBe(
       'Signal With Start Workflow Execution Delivered',
@@ -153,7 +161,12 @@ describe('resolveSystemNexusEvent', () => {
   it('surfaces scheduledEventId as a linked Initiated Event ID', () => {
     const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }, '5'),
-      { namespace: 'default', workflow: 'caller-wf', run: 'caller-run' },
+      {
+        namespace: 'default',
+        workflow: 'caller-wf',
+        run: 'caller-run',
+        initiatingEvent,
+      },
     );
 
     const link = display?.links?.find((l) => l.kind === 'initiated-event');
@@ -167,6 +180,7 @@ describe('resolveSystemNexusEvent', () => {
   it('leaves the Initiated Event ID unlinked without caller context', () => {
     const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }, '5'),
+      { initiatingEvent },
     );
 
     const link = display?.links?.find((l) => l.kind === 'initiated-event');
@@ -191,6 +205,7 @@ describe('resolveSystemNexusEvent', () => {
   it('leaves the delivered event without a summary attribute', () => {
     const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }),
+      { initiatingEvent },
     );
     expect(display?.summaryAttribute).toBeUndefined();
   });
@@ -212,6 +227,7 @@ describe('resolveSystemNexusEvent', () => {
           },
         },
       }),
+      { initiatingEvent },
     );
 
     const link = display?.links?.find((l) => l.kind === 'target-execution');
@@ -223,6 +239,7 @@ describe('resolveSystemNexusEvent', () => {
   it('omits the target execution link when signalLink is absent', () => {
     const display = resolveSystemNexusEvent(
       completedEvent({ runId: 'target-run-id', started: true }),
+      { initiatingEvent },
     );
     expect(
       display?.links?.find((l) => l.kind === 'target-execution'),
@@ -256,6 +273,7 @@ describe('resolveSystemNexusEvent', () => {
           },
         ],
       ),
+      { initiatingEvent },
     );
 
     const link = display?.links?.find((l) => l.kind === 'target-execution');
@@ -274,6 +292,7 @@ describe('resolveSystemNexusEvent', () => {
           },
         },
       ]),
+      { initiatingEvent },
     );
 
     const link = display?.links?.find((l) => l.kind === 'target-execution');
@@ -299,5 +318,63 @@ describe('schemaForMessageType', () => {
 
   it('returns null for a message type no operation declares', () => {
     expect(schemaForMessageType('not.a.real.MessageType')).toBeNull();
+  });
+});
+
+describe('escapeQueryValue', () => {
+  it('escapes a quote so it cannot close the query literal', () => {
+    expect(escapeQueryValue('a" or WorkflowType="b')).toBe(
+      'a\\" or WorkflowType=\\"b',
+    );
+  });
+
+  it('escapes a backslash before it can escape the escape', () => {
+    expect(escapeQueryValue('a\\"b')).toBe('a\\\\\\"b');
+  });
+
+  it('leaves an ordinary workflow id untouched', () => {
+    expect(escapeQueryValue('system-nexus-workflow-id')).toBe(
+      'system-nexus-workflow-id',
+    );
+  });
+});
+
+describe('endpoint trust', () => {
+  it('builds the target search with the quote escaped', () => {
+    const display = resolveSystemNexusEvent(
+      scheduledEvent({
+        namespace: 'default',
+        workflowId: 'a" or WorkflowType="b',
+      }),
+    );
+
+    const link = display?.links?.find((l) => l.kind === 'target-execution');
+    const query = decodeURIComponent(
+      (link?.href ?? '').split('query=')[1] ?? '',
+    );
+    // Exactly the two quotes that delimit the literal.
+    expect(query.match(/(?<!\\)"/g)?.length).toBe(2);
+  });
+
+  it('refuses a terminal event whose initiating event is a foreign endpoint', () => {
+    const foreign = scheduledEvent(
+      { workflowId: 'target-workflow-id' },
+      'attacker-endpoint',
+    );
+
+    const display = resolveSystemNexusEvent(
+      completedEvent({ runId: 'target-run-id', started: true }),
+      { initiatingEvent: foreign },
+    );
+
+    expect(display).toBeNull();
+  });
+
+  it('refuses a terminal event with no initiating event to vouch for it', () => {
+    const display = resolveSystemNexusEvent(
+      completedEvent({ runId: 'target-run-id', started: true }),
+    );
+
+    expect(display).toBeNull();
   });
 });

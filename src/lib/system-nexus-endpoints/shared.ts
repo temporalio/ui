@@ -13,6 +13,14 @@ import type {
   SystemNexusTarget,
 } from './types';
 
+/**
+ * Escapes a value for use inside a double-quoted visibility query literal.
+ * Workflow IDs reach here from a decoded payload authored by the caller, so an
+ * unescaped quote would close the literal and change the query.
+ */
+export const escapeQueryValue = (value: string): string =>
+  value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
 /** Remaps a Nexus event-name suffix (Scheduled, Completed, Failed) to a verb. */
 export const stateFor = (
   event: WorkflowEvent,
@@ -63,7 +71,7 @@ export const targetExecutionLink = (
     ? routeForWorkflow({ namespace, workflow, run: target.runId })
     : routeForWorkflowsWithQuery({
         namespace,
-        query: `WorkflowId="${workflow}"`,
+        query: `WorkflowId="${escapeQueryValue(workflow)}"`,
       });
 
   return { kind, label, value: workflow, href };

@@ -118,7 +118,7 @@
   const systemNexus = $derived(
     resolveSystemNexusEvent(
       isEventGroup(event) ? event.initialEvent : (event as WorkflowEvent),
-      { namespace, workflow, run },
+      { namespace, workflow, run, initiatingEvent: group?.initialEvent },
     ),
   );
 

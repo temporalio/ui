@@ -13,6 +13,12 @@ export type SystemNexusContext = {
   namespace?: string;
   workflow?: string;
   run?: string;
+  /**
+   * The operation's NexusOperationScheduled event. A terminal event carries no
+   * endpoint of its own, so this is how it is confirmed to belong to the system
+   * endpoint rather than to a tenant's own Nexus endpoint.
+   */
+  initiatingEvent?: WorkflowEvent;
 };
 
 export type SystemNexusLinkKind = 'target-execution' | 'initiated-event';

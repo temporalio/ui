@@ -29,7 +29,11 @@
   // That applies to a row for a single event; a row for the group itself was an
   // explicit request for the group, so it always opens every card.
   const expandsIndividually = $derived(
-    !groupRow && (resolveSystemNexusEvent(event)?.expandsIndividually ?? false),
+    !groupRow &&
+      (resolveSystemNexusEvent(event, {
+        initiatingEvent: group?.initialEvent,
+      })?.expandsIndividually ??
+        false),
   );
 
   const showEventGroup = $derived(
@@ -47,9 +51,13 @@
       <PendingNexusOperationCard operation={group.pendingNexusOperation} />
     {/if}
     {#each group?.eventList ?? [] as groupEvent (groupEvent.id)}
-      <EventCard event={groupEvent} {lazy} />
+      <EventCard
+        event={groupEvent}
+        initiatingEvent={group?.initialEvent}
+        {lazy}
+      />
     {/each}
   </div>
 {:else if event}
-  <EventCard {event} {lazy} />
+  <EventCard {event} initiatingEvent={group?.initialEvent} {lazy} />
 {/if}
