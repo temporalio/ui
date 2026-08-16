@@ -11,7 +11,13 @@
     group = undefined,
     event = undefined,
     lazy = false,
-  }: { group?: EventGroup; event?: WorkflowEvent; lazy?: boolean } = $props();
+    showDetails = true,
+  }: {
+    group?: EventGroup;
+    event?: WorkflowEvent;
+    lazy?: boolean;
+    showDetails?: boolean;
+  } = $props();
 
   const pendingEvent = $derived(
     group?.pendingActivity || group?.pendingNexusOperation,
@@ -28,10 +34,10 @@
     {:else if group?.pendingNexusOperation}
       <PendingNexusOperationCard operation={group.pendingNexusOperation} />
     {/if}
-    {#each group?.eventList ?? [] as groupEvent}
-      <EventCard event={groupEvent} {lazy} />
+    {#each group?.eventList ?? [] as groupEvent (groupEvent.id)}
+      <EventCard event={groupEvent} {lazy} {showDetails} />
     {/each}
   </div>
 {:else if event}
-  <EventCard {event} {lazy} />
+  <EventCard {event} {lazy} {showDetails} />
 {/if}

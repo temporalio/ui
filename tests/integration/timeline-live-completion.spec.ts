@@ -24,11 +24,15 @@ import { mockWorkflow } from '~/test-utilities/mocks/workflow';
 const { workflowId, runId } = mockWorkflow.workflowExecutionInfo.execution;
 const timelineUrl = `/namespaces/default/workflows/${workflowId}/${runId}/timeline`;
 
-// Activity scheduled + started, not yet completed.
+// Activity scheduled + started on a retry, not yet completed.
+const retriedStart = makeActivityStarted(3, 2);
+if (retriedStart.activityTaskStartedEventAttributes) {
+  retriedStart.activityTaskStartedEventAttributes.attempt = 2;
+}
 const inProgress = [
   makeWorkflowStarted(1),
   makeActivityScheduled(2, 'DeployNetwork'),
-  makeActivityStarted(3, 2),
+  retriedStart,
 ];
 const completion = makeActivityCompleted(4, 2, 3);
 
@@ -100,5 +104,11 @@ test.describe('Timeline live completion', () => {
     // ...then flips to Completed once the live completion arrives — no reload.
     releaseCompletion();
     await expect(completedButton).toBeVisible();
+
+    const attemptBadge = completedButton.getByTestId('timeline-attempt-badge');
+    const retryIcon = 'use[href="#ti-retry"]';
+    await expect(attemptBadge).toContainText('2');
+    await expect(completedButton.locator(retryIcon)).toHaveCount(1);
+    await expect(attemptBadge.locator(retryIcon)).toHaveCount(1);
   });
 });

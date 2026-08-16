@@ -171,6 +171,13 @@
       classification: group.lastEvent.classification,
     }),
   );
+  const retryIconColor = $derived(
+    pendingActivity
+      ? pendingLineColor
+      : showRetryGradient
+        ? 'rgb(var(--color-border-warning))'
+        : lineColor,
+  );
 
   // The button spans just the dots + connectors; its coords are button-local
   // (offset by spanLeft). Hover/focus highlight is CSS-only (no JS state).
@@ -301,10 +308,6 @@
         : group?.displayName}
     >
       {#snippet children(decodedValue)}
-        {@const iconName =
-          (pendingActivity && !pendingActivity.paused) || retried
-            ? 'retry'
-            : undefined}
         <div
           class="pointer-events-auto absolute flex select-none items-center gap-1 whitespace-nowrap text-[13px] leading-none {textAnchor ===
           'end'
@@ -313,16 +316,23 @@
           style:left="{textPosition[0] - spanLeft}px"
           style:top="{spanCy}px"
         >
-          {#if iconName}
-            <svg class="h-[14px] w-[14px] text-current" viewBox="0 0 24 24">
-              <use href="#ti-{iconName}" />
-            </svg>
-          {/if}
           <span
-            class="inline-flex min-h-[var(--dot)] items-center rounded-control border border-subtle bg-[rgb(var(--color-surface-primary))] px-1.5 font-mono text-[11px] text-current shadow-raised"
+            class="inline-flex min-h-[var(--dot)] items-center gap-1 rounded-control border border-subtle bg-[rgb(var(--color-surface-primary))] px-1.5 font-mono text-[11px] text-current shadow-raised"
+            data-testid={pendingActivity || retried
+              ? 'timeline-attempt-badge'
+              : undefined}
           >
+            {#if pendingActivity || retried}
+              <svg
+                class="h-[14px] w-[14px] shrink-0"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                style:color={retryIconColor}
+              >
+                <use href="#ti-retry" />
+              </svg>
+            {/if}
             {#if pendingActivity}
-              {translate('workflows.attempt')}
               {pendingActivity.attempt} / {pendingActivity.maximumAttempts ||
                 '∞'}
               •&nbsp;{decodedValue}

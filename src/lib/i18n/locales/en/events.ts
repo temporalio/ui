@@ -70,6 +70,9 @@ export const Strings = {
   'row-accessible-name': 'Event {{eventType}}: {{classification}}',
   'expand-details': 'Expand details',
   'collapse-details': 'Collapse details',
+  'event-details-toggle': 'Event details',
+  'show-event-details': 'Show event details',
+  'show-payloads-only': 'Show payloads only',
   'event-classification': {
     unspecified: 'Unspecified',
     scheduled: 'Scheduled',

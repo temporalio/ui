@@ -32,9 +32,24 @@
 
   import EventDetailsLink from './event-details-link.svelte';
 
-  let { event, lazy = false }: { event: WorkflowEvent; lazy?: boolean } =
-    $props();
+  let {
+    event,
+    lazy = false,
+    showDetails = true,
+  }: {
+    event: WorkflowEvent;
+    lazy?: boolean;
+    showDetails?: boolean;
+  } = $props();
   const { namespace, workflow, run } = $derived(page.params);
+
+  const hasStructuredContent = (value: unknown): boolean => {
+    if (Array.isArray(value)) return value.some(hasStructuredContent);
+    if (typeof value !== 'object' || value === null) {
+      return value !== null && value !== undefined && value !== '';
+    }
+    return Object.values(value).some(hasStructuredContent);
+  };
 
   const displayName = $derived(
     isLocalActivityMarkerEvent(event)
@@ -51,9 +66,10 @@
   const payloadFields = $derived(
     fields.filter(
       ([_key, value]) =>
-        typeof value === 'object' && Object.keys(value).length > 0,
+        typeof value === 'object' && hasStructuredContent(value),
     ),
   );
+  const hasPayloadFields = $derived(payloadFields.length > 0);
   const linkFields = $derived(
     fields.filter(
       ([key, _value]) => displayLinkType(key, attributes) !== 'none',
@@ -80,7 +96,13 @@
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle {hasPayloadFields
+    ? 'p-4'
+    : 'p-3'}"
+  data-testid="event-card"
+  data-event-id={event.id}
+  data-layout={hasPayloadFields ? 'payload' : 'attributes'}
+  data-details-visible={showDetails}
 >
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div class="flex min-w-0 items-center gap-2 text-base">
@@ -103,33 +125,49 @@
       dateTime={event.eventTime}
     />
   </div>
-  <div class="grid min-w-0 grid-cols-1 gap-3 xl:grid-cols-2">
-    <div class="flex min-w-0 flex-col gap-1.5">
-      {#if event?.links?.length}
-        {#if event.category === 'nexus'}
-          {@render nexusHandlerLinks(event.links)}
-        {:else}
-          {@render eventLinks(event.links)}
-        {/if}
+  {#if showDetails || hasPayloadFields}
+    <div
+      class="grid min-w-0 grid-cols-1 gap-3 {showDetails && hasPayloadFields
+        ? 'xl:grid-cols-2'
+        : ''}"
+    >
+      {#if showDetails}
+        <div
+          class="min-w-0 {hasPayloadFields
+            ? 'flex flex-col gap-1.5'
+            : 'event-attribute-grid grid items-start gap-x-6 gap-y-2'}"
+          data-testid="event-card-details"
+        >
+          {#if event?.links?.length}
+            {#if event.category === 'nexus'}
+              {@render nexusHandlerLinks(event.links)}
+            {:else}
+              {@render eventLinks(event.links)}
+            {/if}
+          {/if}
+          {#if event?.userMetadata?.summary}
+            {@render eventSummary(event.userMetadata.summary)}
+          {/if}
+          {#each detailFields as [key, value] (key)}
+            {@render details(key, value)}
+          {/each}
+          {#each linkFields as [key, value] (key)}
+            {@render link(key, value)}
+          {/each}
+        </div>
       {/if}
-      {#if event?.userMetadata?.summary}
-        {@render eventSummary(event.userMetadata.summary)}
+      {#if hasPayloadFields}
+        <div
+          class="flex min-w-0 flex-col gap-2"
+          data-testid="event-card-payloads"
+        >
+          {#each payloadFields as [key, value] (key)}
+            {@render payloads(key, value)}
+          {/each}
+        </div>
       {/if}
-      {#each detailFields as [key, value] (key)}
-        {@render details(key, value)}
-      {/each}
-      {#each linkFields as [key, value] (key)}
-        {@render link(key, value)}
-      {/each}
     </div>
-    {#if payloadFields.length}
-      <div class="flex min-w-0 flex-col gap-2">
-        {#each payloadFields as [key, value] (key)}
-          {@render payloads(key, value)}
-        {/each}
-      </div>
-    {/if}
-  </div>
+  {/if}
 </div>
 
 {#snippet eventLink(view: EventLinkDisplay)}
@@ -292,3 +330,14 @@
     </p>
   </div>
 {/snippet}
+
+<style lang="postcss">
+  .event-attribute-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .event-attribute-grid > :global(*) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+</style>

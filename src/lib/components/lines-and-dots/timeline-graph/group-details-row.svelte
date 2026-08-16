@@ -7,9 +7,11 @@
   import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
+  import { timelineShowEventDetails } from '$lib/stores/timeline-preferences';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
@@ -53,6 +55,12 @@
 
   const namespace = $derived($page.params.namespace);
   const title = $derived(group.displayName);
+  const showEventDetails = $derived($timelineShowEventDetails);
+  const detailsToggleTooltip = $derived(
+    showEventDetails
+      ? translate('events.show-payloads-only')
+      : translate('events.show-event-details'),
+  );
 
   const childWorkflowStartedEvent = $derived(
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent),
@@ -77,6 +85,7 @@
 
 <div
   class="panel"
+  data-testid="timeline-group-details"
   style:left="{x}px"
   style:top="{y}px"
   style:width="{canvasWidth}px"
@@ -97,14 +106,33 @@
           </div>
         {/if}
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex shrink-0 items-center gap-1 pr-1">
+        <Tooltip text={detailsToggleTooltip} bottomRight usePortal>
+          <Button
+            variant="ghost"
+            size="xs"
+            class="aspect-square px-0 {showEventDetails
+              ? 'bg-interactive-secondary-active'
+              : ''}"
+            leadingIcon={showEventDetails ? 'eye-hide' : 'eye-show'}
+            aria-label={translate('events.event-details-toggle')}
+            aria-pressed={showEventDetails}
+            data-testid="timeline-event-details-toggle"
+            onclick={() => timelineShowEventDetails.set(!showEventDetails)}
+          ></Button>
+        </Tooltip>
         <Button variant="ghost" size="xs" onclick={() => setActiveGroup(group)}
           >{translate('common.close')} <Icon name="close" /></Button
         >
       </div>
     </div>
     <div class="surface-primary">
-      <EventDetailsFull {group} event={group.initialEvent} lazy={true} />
+      <EventDetailsFull
+        {group}
+        event={group.initialEvent}
+        lazy={true}
+        showDetails={showEventDetails}
+      />
     </div>
     {#if childWorkflowStartedEvent}
       <div class="surface-primary p-3">
