@@ -8,14 +8,13 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
+  import CommandRail from '$lib/holocene/command-rail.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import IconButton from '$lib/holocene/icon-button.svelte';
   import { setPaginatedTableMaxHeight } from '$lib/holocene/table/paginated-table/context';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     MAX_SAVED_QUERIES,
@@ -37,6 +36,7 @@
     maxQueries?: number;
     searchAttributes: Readable<SearchAttributes>;
     id: string;
+    filterBar?: Snippet;
     children: Snippet;
   }
 
@@ -48,6 +48,7 @@
     maxQueries = MAX_SAVED_QUERIES,
     searchAttributes,
     id,
+    filterBar,
     children,
   }: Props = $props();
 
@@ -207,116 +208,79 @@
   };
 </script>
 
-<div class="flex min-w-0 flex-col overflow-hidden lg:flex-row">
-  <div
+<div class="flex min-w-0 flex-col" data-testid="{id}-filter-view-stack">
+  {#if filterBar}
+    {@render filterBar()}
+  {/if}
+
+  <nav
+    aria-label={translate('common.saved-views')}
+    data-testid="{id}-saved-views"
     class={merge(
-      'surface-primary relative flex w-full min-w-0 max-w-full overflow-x-auto border border-b-0 border-subtle',
-      'lg:block lg:h-auto lg:max-h-[var(--panel-h)] lg:min-h-[var(--panel-h)] lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)] lg:overflow-auto lg:border-b lg:border-r-0 lg:transition-[width,min-width,max-width] lg:duration-normal lg:ease-standard',
-      $savedQueryNavOpen
-        ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
-        : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
+      'surface-primary flex min-w-0 items-stretch border border-subtle px-1.5',
+      filterBar && 'border-t-0',
     )}
   >
-    <div
-      class="flex min-h-control-sm shrink-0 items-center justify-center gap-2 border-r border-subtle px-2 text-center lg:border-b lg:border-r-0 lg:py-[.47rem]"
+    <CommandRail
+      label={translate('common.saved-views')}
+      role="group"
+      class="min-w-0 flex-1"
+      viewportClass="flex min-h-control-sm items-center gap-1 py-1"
+      controlClass="surface-primary"
+      id="{id}-saved-views-rail-viewport"
+      data-testid="{id}-saved-views-rail"
     >
-      <div
-        class={merge(
-          'flex w-full items-center justify-between',
-          $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
-        )}
-      >
-        {#if $savedQueryNavOpen}
-          <p
-            class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
-          >
-            Saved Views
-          </p>
-        {/if}
-        <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
-        <IconButton
-          class="hidden lg:inline-flex"
-          icon="collapse"
-          label={$savedQueryNavOpen
-            ? 'Collapse saved views'
-            : 'Expand saved views'}
-          title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
-          size="xs"
-          onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
-        />
-      </div>
-    </div>
-
-    <div
-      class="flex min-w-max items-center gap-1 p-1 lg:block lg:min-w-0 lg:space-y-2 lg:p-1.5"
-    >
-      <div class="text-center lg:pb-2">
-        <div class="flex gap-1 lg:block lg:space-y-1">
-          {#each systemViews as view (view.id)}
-            {@render queryButton({
-              ...view,
-              active: query === view.query,
-            })}
-          {/each}
-        </div>
-      </div>
-
-      {#if $savedQueryNavOpen}
-        <p
-          class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
-        >
-          {translate('common.custom-views')}
-          {@render queryBadge({
-            className: 'font-mono',
-            content: `${namespaceSavedQueries.length}/${maxQueries}`,
+      <div class="flex shrink-0 items-center gap-1">
+        {#each systemViews as view (view.id)}
+          {@render queryButton({
+            ...view,
+            active: query === view.query,
+            iconOnly: true,
           })}
-        </p>
-      {/if}
+        {/each}
+      </div>
 
-      <div
-        class="mx-1 h-6 border-l border-subtle lg:mx-0 lg:h-auto lg:border-l-0 lg:border-t"
-      ></div>
+      <div aria-hidden="true" class="mx-1 h-5 border-l border-subtle"></div>
+
+      <Tooltip
+        text={translate('common.custom-views')}
+        bottom
+        usePortal
+        class="shrink-0"
+      >
+        {@render queryBadge({
+          className: 'font-mono',
+          content: `${namespaceSavedQueries.length}/${maxQueries}`,
+        })}
+      </Tooltip>
 
       {#if unsavedQuery}
         {@render queryButton(unsaveView)}
       {/if}
 
       {#if namespaceSavedQueries.length > 0}
-        <div class="text-center">
-          <div class="flex gap-1 lg:block lg:space-y-1">
-            {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
-              {@render queryButton({
-                ...savedQuery,
-                active: savedQuery.id === activeQueryView?.id,
-                badge:
-                  savedQuery.id === activeQueryView?.id &&
-                  savedQuery.query !== query
-                    ? 'Unsaved'
-                    : undefined,
-              })}
-            {/each}
-          </div>
+        <div class="flex shrink-0 items-center gap-1">
+          {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
+            {@render queryButton({
+              ...savedQuery,
+              active: savedQuery.id === activeQueryView?.id,
+              badge:
+                savedQuery.id === activeQueryView?.id &&
+                savedQuery.query !== query
+                  ? 'Unsaved'
+                  : undefined,
+            })}
+          {/each}
         </div>
+      {:else if !unsavedQuery}
+        <span class="shrink-0 px-1.5 text-xs text-secondary">
+          {translate('common.no-custom-views')}
+        </span>
       {/if}
+    </CommandRail>
+  </nav>
 
-      {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
-        <p
-          class={merge(
-            'hidden pl-1 text-center text-secondary lg:block lg:pl-4 lg:text-left',
-            !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
-          )}
-        >
-          No Views
-        </p>
-      {/if}
-    </div>
-  </div>
-  <div
-    class={merge(
-      'flex w-full min-w-0 shrink flex-col lg:w-[calc(100%-var(--panel-expanded-w))] lg:transition-[width] lg:duration-normal lg:ease-standard',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-    )}
-  >
+  <div class="mt-4 flex w-full min-w-0 flex-col">
     {@render children()}
   </div>
 </div>
@@ -338,19 +302,21 @@
   {maxQueries}
 />
 
-{#snippet queryButton(view: SavedQuery)}
-  <Tooltip
-    text={view.count != undefined ? `${view.name} • ${view.count}` : view.name}
-    right
-    usePortal
-    hide={$savedQueryNavOpen}
-    class="shrink-0 lg:w-full"
-    tooltipClass="max-w-[280px]"
-  >
-    <div class="w-auto lg:w-full">
+{#snippet queryButton(view: SavedQuery & { iconOnly?: boolean })}
+  <div class="flex shrink-0 items-center gap-1">
+    <Tooltip
+      text={view.count != undefined
+        ? `${view.name} • ${view.count}`
+        : view.name}
+      bottom
+      usePortal
+      class="shrink-0"
+      tooltipClass="max-w-[280px]"
+    >
       <Button
         variant="ghost"
         aria-label={view.name}
+        aria-pressed={view.active}
         data-testid={view.type === 'system'
           ? view.id
           : view.name.toLowerCase().replace(/\s+/g, '-')}
@@ -361,7 +327,9 @@
         data-track-text={view.name}
         onclick={() => setActiveQueryView(view)}
         class={merge(
-          'flex w-auto justify-start lg:w-full',
+          'max-w-48 justify-start',
+          view.iconOnly &&
+            'min-w-[var(--control-height-sm)] justify-center px-3',
           (view.count ?? 0) > 0 && 'text-danger',
         )}
         active={view.active}
@@ -370,116 +338,91 @@
       >
         <Icon
           name={view.icon || 'bookmark'}
-          class={merge(
-            'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-            $savedQueryNavOpen ? 'lg:hidden' : '',
-          )}
+          class="h-3.5 w-3.5 flex-shrink-0 transition-colors duration-fast"
         />
-
-        {#if $savedQueryNavOpen}
-          <span
-            class="hidden truncate text-left text-sm font-normal lg:inline-block"
-            >{view.name}</span
+        {#if !view.iconOnly}
+          <span class="truncate text-left text-xs font-normal">{view.name}</span
           >
-          {#if view.badge}
-            {@render queryBadge({
-              className: 'italic',
-              content: view.badge,
-            })}
-          {/if}
-          {#if view.count != undefined}
-            {@render queryBadge({
-              className: `font-mono ${view.count > 0 ? 'bg-danger text-danger' : 'surface-subtle text-information'}`,
-              content: view.count,
-              icon: view.count > 0 ? 'exclamation-octagon' : 'happy-lappy',
-              iconClass:
-                view.count > 0
-                  ? 'surface-danger text-danger'
-                  : 'surface-subtle text-information',
-            })}
-          {/if}
+        {/if}
+        {#if view.badge}
+          {@render queryBadge({
+            className: 'italic',
+            content: view.badge,
+          })}
+        {/if}
+        {#if view.count != undefined}
+          {@render queryBadge({
+            className: `font-mono ${view.count > 0 ? 'surface-danger text-danger' : 'surface-subtle text-information'}`,
+            content: view.count,
+            icon: view.count > 0 ? 'exclamation-octagon' : 'happy-lappy',
+            iconClass:
+              view.count > 0
+                ? 'surface-danger text-danger'
+                : 'surface-subtle text-information',
+          })}
         {/if}
       </Button>
+    </Tooltip>
 
-      {#if activeQueryView?.id === view.id && view.type === 'user'}
-        <div
-          class={merge(
-            'flex items-center gap-1 pt-0.5 lg:flex-col',
-            $savedQueryNavOpen && 'lg:flex-row',
-          )}
+    {#if activeQueryView?.id === view.id && view.type === 'user'}
+      <div class="flex shrink-0 items-center gap-1">
+        {#if view.id === activeQueryView?.id && view.query !== query}
+          <Button
+            size="xs"
+            variant="primary"
+            data-testid="save-view-button"
+            data-track-name="save-view-button"
+            data-track-intent="action"
+            data-track-text="save"
+            onclick={() => {
+              onSaveView({
+                ...view,
+                query,
+              });
+            }}>Save</Button
+          >
+        {/if}
+        <Button
+          size="xs"
+          variant="secondary"
+          data-testid="edit-view-button"
+          data-track-name="edit-view-button"
+          data-track-intent="action"
+          data-track-text="edit"
+          onclick={() => {
+            editViewModalOpen = true;
+          }}>Edit</Button
         >
-          {#if view.id === activeQueryView?.id && view.query !== query}
-            <Button
-              size="xs"
-              class="w-full"
-              variant="primary"
-              data-testid="save-view-button"
-              data-track-name="save-view-button"
-              data-track-intent="action"
-              data-track-text="save"
-              onclick={() => {
-                onSaveView({
-                  ...view,
-                  query,
-                });
-              }}>Save</Button
-            >
-          {/if}
-          <Button
-            size="xs"
-            class="w-full"
-            variant="secondary"
-            data-testid="edit-view-button"
-            data-track-name="edit-view-button"
-            data-track-intent="action"
-            data-track-text="edit"
-            onclick={() => {
-              editViewModalOpen = true;
-            }}>Edit</Button
-          >
-          <Button
-            leadingIcon={$copied ? 'checkmark' : 'copy'}
-            aria-label="Share"
-            size="xs"
-            class="w-full opacity-80"
-            variant="ghost"
-            data-testid="share-view-button"
-            data-track-name="share-view-button"
-            data-track-intent="action"
-            data-track-text="share"
-            onclick={handleCopy}
-            ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-              >Share</span
-            ></Button
-          >
-        </div>
-      {:else if unsavedQuery && view.id === 'unsaved'}
-        <div class="flex items-center gap-1 overflow-hidden pt-0.5">
-          <Button
-            size="xs"
-            class="w-full break-all"
-            variant="secondary"
-            disabled={maxViewsReached}
-            data-testid="create-view-button"
-            data-track-name="create-view-button"
-            data-track-intent="action"
-            data-track-text="create"
-            onclick={() => {
-              saveViewModalOpen = true;
-            }}
-            ><span
-              class={merge(
-                'inline lg:hidden',
-                !$savedQueryNavOpen && 'lg:inline',
-              )}>New</span
-            ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-              >Save as New</span
-            ></Button
-          >
-        </div>
-      {/if}
-    </div>
-  </Tooltip>
+        <Button
+          leadingIcon={$copied ? 'checkmark' : 'copy'}
+          aria-label="Share"
+          size="xs"
+          class="opacity-80"
+          variant="ghost"
+          data-testid="share-view-button"
+          data-track-name="share-view-button"
+          data-track-intent="action"
+          data-track-text="share"
+          onclick={handleCopy}>Share</Button
+        >
+      </div>
+    {:else if unsavedQuery && view.id === 'unsaved'}
+      <div class="flex shrink-0 items-center gap-1">
+        <Button
+          size="xs"
+          variant="secondary"
+          disabled={maxViewsReached}
+          data-testid="create-view-button"
+          data-track-name="create-view-button"
+          data-track-intent="action"
+          data-track-text="create"
+          onclick={() => {
+            saveViewModalOpen = true;
+          }}>Save as New</Button
+        >
+      </div>
+    {/if}
+  </div>
 {/snippet}
 
 {#snippet queryBadge({
@@ -495,7 +438,7 @@
 })}
   <span
     class={merge(
-      'surface-subtle right-2 top-2 hidden items-center rounded-full px-1.5 py-0.5 text-xs font-medium lg:static lg:ml-auto lg:flex',
+      'surface-subtle inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 text-xs font-medium',
       icon && 'gap-1 p-0.5 pl-1.5',
       className,
     )}

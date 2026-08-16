@@ -123,7 +123,6 @@
   </div>
 </header>
 
-<FilterBar />
 <SavedQueryViews
   filters={nexusOperationFilters}
   savedQueries={savedNexusQueries}
@@ -132,6 +131,9 @@
   searchAttributes={nexusOperationSearchAttributes}
   id="nexus"
 >
+  {#snippet filterBar()}
+    <FilterBar />
+  {/snippet}
   <NexusOperationsSummaryConfigurableTable
     onClickConfigure={openCustomizationDrawer}
   />

@@ -126,13 +126,22 @@
     }
   }
 
-  function handleFocusIn() {
-    isFocused = true;
+  function handleFocusIn(event: FocusEvent) {
+    const focusedElement = event.target;
+    isFocused =
+      focusedElement instanceof HTMLElement &&
+      focusedElement.matches(':focus-visible');
   }
 
   function handleFocusOut(event: FocusEvent) {
     const next = event.relatedTarget as HTMLElement | null;
     if (next && wrapperElement?.contains(next)) return;
+    isFocused = false;
+  }
+
+  function handlePointerDown() {
+    // Pointer focus should not pin a hover tooltip open after the pointer
+    // leaves. Keyboard focus remains discoverable through :focus-visible.
     isFocused = false;
   }
 
@@ -174,6 +183,7 @@
     aria-describedby={isOpen ? tooltipId : undefined}
     onmouseenter={handleHoverEnter}
     onmouseleave={handleHoverLeave}
+    onpointerdown={handlePointerDown}
     onfocusin={handleFocusIn}
     onfocusout={handleFocusOut}
   >

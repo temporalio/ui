@@ -14,6 +14,7 @@
     HISTORY_CTX,
     type HistoryContext,
   } from '$lib/contexts/history-context';
+  import CommandRail from '$lib/holocene/command-rail.svelte';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -209,50 +210,63 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-nowrap items-center gap-4 overflow-x-auto border-b border-subtle py-1 md:top-[var(--top-nav-height)]"
+    class="surface-background sticky top-[var(--target-size)] z-sticky flex h-target min-w-0 items-center gap-3 border-b border-subtle md:top-[calc(var(--top-nav-height)+var(--control-height-sm))] md:h-[calc(var(--control-height-sm)+0.5rem)]"
   >
-    <div class="flex shrink-0 items-end gap-3">
-      <h2>
-        {translate('workflows.history-tab')}
-      </h2>
-      <TabButtons class="relative">
+    <h2 class="shrink-0">
+      {translate('workflows.history-tab')}
+    </h2>
+    <CommandRail
+      label={translate('workflows.event-history-controls')}
+      role="group"
+      class="h-full min-w-0 flex-1"
+      viewportClass="flex h-full items-center gap-3"
+      id="event-history-command-rail-viewport"
+      data-testid="event-history-command-rail"
+    >
+      <TabButtons class="relative shrink-0">
         <TabButton
           active={$eventViewType === 'feed'}
           data-testid="feed"
           icon="feed"
+          showLabelOnSmallScreens
           onclick={onAllClick}>All</TabButton
         >
         <TabButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
           icon="compact"
+          showLabelOnSmallScreens
           onclick={onCompactClick}>Compact</TabButton
         >
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
           icon="json"
+          showLabelOnSmallScreens
           onclick={onJSONClick}>JSON</TabButton
         >
       </TabButtons>
-    </div>
-    <div class="ml-auto flex shrink-0 items-center gap-2">
-      <ToggleButtons>
+      <ToggleButtons class="ml-auto shrink-0">
         {#if $eventViewType !== 'json'}
           <ToggleButton
             leadingIcon={reverseSort ? 'descending' : 'ascending'}
             data-testid="zoom-in"
             onclick={onSort}
             size="sm"
+            showLabelOnSmallScreens
           >
             {reverseSort
               ? translate('common.descending')
               : translate('common.ascending')}
           </ToggleButton>
         {/if}
-        <EventTypeFilter {compact} />
+        <EventTypeFilter {compact} showLabelOnSmallScreens />
         <ToggleButton
           disabled={isNotPending}
+          active={!$pauseLiveUpdates && !isNotPending}
+          aria-label={$pauseLiveUpdates || isNotPending
+            ? translate('workflows.auto-refresh-off')
+            : translate('workflows.auto-refresh-on')}
           data-testid="pause"
           class="border-l-0"
           size="sm"
@@ -264,20 +278,23 @@
               ? 'border-subtle bg-subtle'
               : 'border-success bg-success'}"
           ></span>
-          {$pauseLiveUpdates || isNotPending
-            ? translate('workflows.auto-refresh-off')
-            : translate('workflows.auto-refresh-on')}
+          {isNotPending
+            ? translate('workflows.auto-refresh-unavailable')
+            : $pauseLiveUpdates
+              ? translate('workflows.auto-refresh-paused')
+              : translate('workflows.auto-refresh-live')}
         </ToggleButton>
         <ToggleButton
           data-testid="download"
           leadingIcon="download"
           size="sm"
+          showLabelOnSmallScreens
           onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}
         </ToggleButton>
       </ToggleButtons>
-    </div>
+    </CommandRail>
   </div>
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}

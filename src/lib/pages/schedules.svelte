@@ -139,12 +139,6 @@
   </div>
 </header>
 
-<FilterBar
-  filters={scheduleFilters}
-  options={$scheduleSearchAttributeOptions}
-  searchAttributes={$scheduleSearchAttributes}
-  id="schedules"
-/>
 <SavedQueryViews
   filters={scheduleFilters}
   savedQueries={savedScheduleQueries}
@@ -153,6 +147,14 @@
   searchAttributes={scheduleSearchAttributes}
   id="schedule"
 >
+  {#snippet filterBar()}
+    <FilterBar
+      filters={scheduleFilters}
+      options={$scheduleSearchAttributeOptions}
+      searchAttributes={$scheduleSearchAttributes}
+      id="schedules"
+    />
+  {/snippet}
   {#key [namespace, query, $schedulesRefresh]}
     <PaginatedTable
       {onFetch}

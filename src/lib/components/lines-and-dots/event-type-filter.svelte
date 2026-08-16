@@ -28,9 +28,10 @@
 
   interface Props {
     compact?: boolean;
+    showLabelOnSmallScreens?: boolean;
   }
 
-  let { compact = false }: Props = $props();
+  let { compact = false, showLabelOnSmallScreens = false }: Props = $props();
 
   const open = writable(false);
 
@@ -122,7 +123,10 @@
         />
       </div>
     {/snippet}
-    <span class="hidden text-sm md:block">{translate('common.filter')}</span>
+    <span
+      class={showLabelOnSmallScreens ? 'text-sm' : 'hidden text-sm md:block'}
+      >{translate('common.filter')}</span
+    >
   </MenuButton>
   <Menu
     id="event-type-menu"

@@ -300,6 +300,7 @@ const temporal = plugin(
           'control-sm': 'var(--control-height-sm)',
           control: 'var(--control-height)',
           row: 'var(--row-height)',
+          target: 'var(--target-size)',
         },
         minHeight: {
           'control-xs': 'var(--control-height-xs)',

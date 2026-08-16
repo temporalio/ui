@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { expect, userEvent, waitFor, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
@@ -121,6 +122,61 @@
 <Story name="Right" args={{ right: true }} />
 
 <Story name="Right with Icon" args={{ right: true, icon: 'trash' }} />
+
+<Story
+  name="Focus Origin Interactions"
+  args={{ show: false, text: 'Focus origin tooltip', top: true }}
+  play={async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const beforeTrigger = canvas.getByRole('button', {
+      name: 'Before tooltip',
+    });
+    const trigger = canvas.getByRole('button', { name: 'Tooltip trigger' });
+
+    await step('Pointer focus does not pin the tooltip open', async () => {
+      expect(canvas.queryByRole('tooltip')).not.toBeInTheDocument();
+
+      await userEvent.hover(trigger);
+      await waitFor(() => expect(canvas.getByRole('tooltip')).toBeVisible());
+
+      await userEvent.click(trigger);
+      expect(trigger).toHaveFocus();
+      await userEvent.unhover(trigger);
+
+      await waitFor(() =>
+        expect(canvas.queryByRole('tooltip')).not.toBeInTheDocument(),
+      );
+      expect(trigger).toHaveFocus();
+    });
+
+    await step(
+      'Keyboard focus opens and Escape dismisses the tooltip',
+      async () => {
+        beforeTrigger.focus();
+        expect(beforeTrigger).toHaveFocus();
+
+        await userEvent.tab();
+        expect(trigger).toHaveFocus();
+        await waitFor(() => expect(canvas.getByRole('tooltip')).toBeVisible());
+
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() =>
+          expect(canvas.queryByRole('tooltip')).not.toBeInTheDocument(),
+        );
+        expect(trigger).toHaveFocus();
+      },
+    );
+  }}
+>
+  {#snippet template(args)}
+    <div class="flex items-center gap-3">
+      <Button variant="secondary">Before tooltip</Button>
+      <Tooltip {...args}>
+        <Button>Tooltip trigger</Button>
+      </Tooltip>
+    </div>
+  {/snippet}
+</Story>
 
 <Story name="With Content instead of text" asChild>
   <Tooltip bottomRight show>

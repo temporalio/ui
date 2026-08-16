@@ -22,6 +22,7 @@
     disabled?: boolean;
     'data-testid'?: string;
     tooltip?: string;
+    showLabelOnSmallScreens?: boolean;
     class?: string;
     onclick?: (event: MouseEvent) => void;
     children?: Snippet;
@@ -49,6 +50,7 @@
     base,
     active = false,
     tooltip = '',
+    showLabelOnSmallScreens = false,
     disabled,
     onclick,
     children,
@@ -56,13 +58,18 @@
   }: Props = $props();
 
   const resolvedBase = $derived(base ?? href);
+  const pressed = $derived(
+    href ? page.url.pathname.includes(resolvedBase) : active,
+  );
 </script>
 
 <svelte:element
   this={href ? 'a' : 'button'}
   class={merge('toggle-button', className)}
   class:group
-  class:active={href ? page.url.pathname.includes(resolvedBase) : active}
+  class:active={pressed}
+  aria-pressed={href ? undefined : pressed}
+  aria-current={href && pressed ? 'page' : undefined}
   href={href ? href + page.url.search : null}
   class:disabled
   data-track-name="tab-button"
@@ -80,7 +87,9 @@
       <div class="flex items-center gap-2">
         <Icon name={icon} />
         {#if children}
-          <span class="hidden md:block">{@render children()}</span>
+          <span class={showLabelOnSmallScreens ? undefined : 'hidden md:block'}
+            >{@render children()}</span
+          >
         {/if}
       </div>
     {:else}

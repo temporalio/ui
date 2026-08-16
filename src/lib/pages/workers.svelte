@@ -37,15 +37,6 @@
 </script>
 
 {#if workerHeartbeatsEnabled}
-  <FilterBar
-    filters={workerFilters}
-    options={$workerSearchAttributeOptions}
-    searchAttributes={$workerSearchAttributes}
-    id="worker"
-    statusAttribute="WorkerStatus"
-    includeNullConditions={false}
-  />
-
   <SavedQueryViews
     filters={workerFilters}
     savedQueries={savedWorkerQueries}
@@ -54,6 +45,16 @@
     searchAttributes={workerSearchAttributes}
     id="worker"
   >
+    {#snippet filterBar()}
+      <FilterBar
+        filters={workerFilters}
+        options={$workerSearchAttributeOptions}
+        searchAttributes={$workerSearchAttributes}
+        id="worker"
+        statusAttribute="WorkerStatus"
+        includeNullConditions={false}
+      />
+    {/snippet}
     {#key [namespace, query, $refresh]}
       <WorkersTable
         {namespace}

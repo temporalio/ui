@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
@@ -16,6 +15,7 @@
   type ToggleBaseProps = {
     group?: boolean;
     active?: boolean;
+    showLabelOnSmallScreens?: boolean;
   };
 
   type AnchorProps = ToggleBaseProps &
@@ -36,6 +36,7 @@
     href,
     base,
     active = false,
+    showLabelOnSmallScreens = false,
     variant = 'secondary',
     leadingIcon,
     onclick,
@@ -65,7 +66,9 @@
 
 <Button {...buttonProps}>
   {#if leadingIcon}
-    <span class="hidden md:block">{@render children?.()}</span>
+    <span class={showLabelOnSmallScreens ? undefined : 'hidden md:block'}
+      >{@render children?.()}</span
+    >
   {:else}
     {@render children?.()}
   {/if}
