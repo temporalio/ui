@@ -3,7 +3,6 @@
 
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { useDarkMode } from '$lib/utilities/dark-mode';
   import andromeda from '$lib/vendor/andromeda.png';
 
   type Props = {
@@ -13,19 +12,21 @@
   let { actions }: Props = $props();
 </script>
 
-<div class="flex min-h-screen flex-col gap-8 p-10">
-  <div class="flex flex-col gap-4 lg:flex-row">
-    <div>
-      <div class="mb-8 flex items-center gap-4">
+<div class="w-full py-4">
+  <div
+    class="surface-primary grid overflow-hidden rounded-panel border border-subtle lg:grid-cols-[minmax(0,1fr)_minmax(18rem,36%)]"
+  >
+    <div class="min-w-0 p-4 sm:p-5">
+      <div class="mb-3 flex items-center gap-2">
         <h1
           data-testid="namespace-selector-title"
-          class="text-marketingGreen font-mono uppercase"
+          class="font-mono uppercase tracking-[0.04em]"
         >
           {translate('nexus.endpoints')}
         </h1>
       </div>
-      <div class="flex w-full flex-col gap-4 pr-8 md:pr-24">
-        <h2 class="text-4xl">Get Started</h2>
+      <div class="flex max-w-[72ch] flex-col gap-3">
+        <h2>Get Started</h2>
 
         <p>
           <Link href="https://docs.temporal.io/evaluate/nexus" newTab
@@ -61,17 +62,14 @@
       </div>
     </div>
     <div
-      class="bg-dark mx-auto mt-8 w-full"
-      class:invert={!$useDarkMode}
+      class="surface-secondary hidden items-center border-l border-subtle p-5 lg:flex"
       aria-hidden="true"
     >
-      <img src={andromeda} alt="" />
+      <img
+        src={andromeda}
+        alt=""
+        class="w-full opacity-60 grayscale dark:invert"
+      />
     </div>
   </div>
 </div>
-
-<style>
-  .invert {
-    filter: invert(1);
-  }
-</style>

@@ -82,7 +82,7 @@
     data-track-text={label}
     class={merge(
       'group relative flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
       isActive && 'text-primary',
       !isActive && 'text-secondary hover:text-primary',
       disabled && 'cursor-not-allowed opacity-50 hover:text-secondary',

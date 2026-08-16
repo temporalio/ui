@@ -91,9 +91,11 @@
   };
 </script>
 
-<Card class="w-full">
-  <h2 class="text-2xl font-medium">{translate('schedules.schedule-spec')}</h2>
-  <div class="mt-4 flex flex-col gap-4">
+<Card
+  class="w-full rounded-none border-0 border-b border-subtle px-0 py-4 last:border-b-0"
+>
+  <h2 class="text-lg font-semibold">{translate('schedules.schedule-spec')}</h2>
+  <div class="mt-3 flex flex-col gap-3">
     <p class="text-sm text-secondary">
       {translate('schedules.spec-description')}
       <Link href="https://docs.temporal.io/schedule#spec" newTab>
@@ -101,7 +103,7 @@
       </Link>
     </p>
 
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3">
       {#each $form.specs as _, i (i)}
         {@const isExpanded = expandedIndex === i}
         <ScheduleSpecItem

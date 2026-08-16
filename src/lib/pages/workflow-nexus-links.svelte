@@ -158,10 +158,7 @@
           <td class="break-all text-left" data-testid="link-href">
             {@render linkDisplay(linkView)}
             {#if targetTypeLabel}
-              <p
-                class="text-xs text-secondary/80"
-                data-testid="link-target-type"
-              >
+              <p class="text-xs text-secondary" data-testid="link-target-type">
                 {targetTypeLabel}
               </p>
             {/if}

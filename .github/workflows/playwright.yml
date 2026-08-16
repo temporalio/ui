@@ -38,6 +38,83 @@ jobs:
             ./playwright-report/
             ./test-results/
           retention-days: 30
+  route-accessibility-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/setup-node
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run route accessibility tests
+        run: pnpm test:accessibility
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: playwright-report-accessibility
+          path: |
+            ./playwright-report/
+            ./test-results/
+          retention-days: 30
+  redesign-visual-tests:
+    timeout-minutes: 30
+    # The job becomes blocking once the first reviewed PNG baselines are committed.
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/setup-node
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run redesign visual tests
+        run: pnpm test:visual
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: playwright-report-visual
+          path: |
+            ./playwright-report/
+            ./test-results/
+          retention-days: 30
+  redesign-cross-browser-smoke-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/setup-node
+      - name: Install cross-browser engines
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: Run blocking cross-browser redesign smoke tests
+        run: pnpm test:redesign-smoke
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: playwright-report-redesign-smoke
+          path: |
+            ./playwright-report/
+            ./test-results/
+          retention-days: 30
+  storybook-accessibility-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/setup-node
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Build Storybook
+        run: pnpm stories:build
+      - name: Run Storybook interaction and accessibility tests
+        run: |
+          pnpm exec vite preview --host 127.0.0.1 --port 6006 --strictPort --outDir storybook-static &
+          storybook_server_pid=$!
+          trap 'kill "$storybook_server_pid"' EXIT
+          pnpm exec wait-port -t 120000 127.0.0.1:6006
+          pnpm stories:test --url http://127.0.0.1:6006 --ci
   e2e-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest

@@ -185,7 +185,7 @@
         <div class="flex h-full flex-col items-center justify-center">
           {#if error}
             <EmptyState title={translate('schedules.empty-state-title')}>
-              <Alert intent="warning" icon="warning" class="mx-12">
+              <Alert intent="warning" icon="warning" class="mx-4 max-w-xl">
                 {error}
               </Alert>
             </EmptyState>

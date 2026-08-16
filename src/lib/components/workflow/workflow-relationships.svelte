@@ -69,8 +69,8 @@
   };
 </script>
 
-<div class="pb-12">
-  <div class="flex w-full flex-col justify-center gap-4">
+<div class="pb-4">
+  <div class="flex w-full flex-col justify-center gap-3">
     {#if initialWorkflow}
       {#await fetchWorkflowsForTree()}
         <Loading />
@@ -84,7 +84,7 @@
         <WorkflowRelationshipsOld />
       {/await}
     {:else}
-      <h4 class="px-8 py-4">{translate('workflows.no-relationships')}</h4>
+      <h4 class="px-3 py-4">{translate('workflows.no-relationships')}</h4>
     {/if}
   </div>
 </div>

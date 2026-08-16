@@ -13,7 +13,7 @@
 <div class="space-y-6 {className}">
   <Card class="space-y-3">
     <div
-      class="text-gray-700 grid grid-cols-[1fr_140px_40px] gap-3 border-b border-subtle pb-2 text-sm font-medium"
+      class="grid grid-cols-[1fr_140px_40px] gap-3 border-b border-subtle pb-2 text-sm font-medium text-secondary"
     >
       <div>{translate('search-attributes.column-attribute')}</div>
       <div>{translate('search-attributes.column-type')}</div>

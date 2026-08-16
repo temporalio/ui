@@ -7,49 +7,68 @@ import { dark, light } from './variables';
 const textStyles = plugin(({ addBase, theme }) => {
   addBase({
     h1: {
-      fontSize: theme('fontSize.3xl'),
-      fontWeight: theme('fontWeight.medium'),
+      fontSize: '1.5rem',
+      fontWeight: theme('fontWeight.semibold'),
+      letterSpacing: '-0.02em',
+      lineHeight: '1.875rem',
+      textWrap: 'balance',
     },
     h2: {
-      fontSize: theme('fontSize.2xl'),
-      fontWeight: theme('fontWeight.medium'),
+      fontSize: '1.25rem',
+      fontWeight: theme('fontWeight.semibold'),
+      letterSpacing: '-0.015em',
+      lineHeight: '1.625rem',
+      textWrap: 'balance',
     },
     h3: {
-      fontSize: theme('fontSize.xl'),
-      fontWeight: theme('fontWeight.medium'),
+      fontSize: theme('fontSize.base'),
+      fontWeight: theme('fontWeight.semibold'),
+      letterSpacing: '-0.01em',
+      lineHeight: '1.375rem',
     },
     h4: {
-      fontSize: theme('fontSize.lg'),
-      fontWeight: theme('fontWeight.medium'),
+      fontSize: theme('fontSize.sm'),
+      fontWeight: theme('fontWeight.semibold'),
+      lineHeight: '1.25rem',
     },
     h5: {
-      fontSize: theme('fontSize.base'),
-      fontWeight: theme('fontWeight.medium'),
+      fontSize: '0.8125rem',
+      fontWeight: theme('fontWeight.semibold'),
+      lineHeight: '1.125rem',
     },
     h6: {
-      fontSize: theme('fontSize.sm'),
-      fontWeight: theme('fontWeight.medium'),
+      fontSize: theme('fontSize.xs'),
+      fontWeight: theme('fontWeight.semibold'),
+      letterSpacing: '0.04em',
+      lineHeight: '1rem',
+      textTransform: 'uppercase',
     },
     '.body-normal': {
       fontSize: theme('fontSize.sm'),
       fontWeight: theme('fontWeight.normal'),
+      lineHeight: '1.25rem',
     },
     '.body-medium': {
       fontSize: theme('fontSize.sm'),
       fontWeight: theme('fontWeight.medium'),
+      lineHeight: '1.25rem',
     },
     '.body-small': {
       fontSize: theme('fontSize.xs'),
       fontWeight: theme('fontWeight.normal'),
+      lineHeight: '1rem',
     },
     '.body-small-medium': {
       fontSize: theme('fontSize.xs'),
       fontWeight: theme('fontWeight.medium'),
+      lineHeight: '1rem',
     },
     '.body-small-mono': {
       fontFamily: theme('fontFamily.mono'),
       fontSize: theme('fontSize.xs'),
       fontWeight: theme('fontWeight.normal'),
+      fontVariantNumeric: 'tabular-nums',
+      lineHeight: '1rem',
     },
   });
 });
@@ -102,7 +121,7 @@ const temporal = plugin(
       },
       '.surface-interactive-danger': {
         backgroundColor: css('--color-interactive-danger-surface'),
-        color: css('--color-text-black'),
+        color: css('--color-text-white'),
         '&:focus-visible': {
           backgroundColor: css('--color-interactive-danger-hover'),
         },
@@ -147,8 +166,8 @@ const temporal = plugin(
         color: css('--color-text-primary'),
       },
       '.surface-warning': {
-        backgroundColor: css('--color-surface-subtle'),
-        color: css('--color-text-black'),
+        backgroundColor: css('--color-surface-warning'),
+        color: css('--color-text-primary'),
       },
       '.surface-danger': {
         backgroundColor: css('--color-surface-danger'),
@@ -169,10 +188,27 @@ const temporal = plugin(
       colors: {
         ...colors,
         brand: css('--color-surface-brand'),
+        'status-information': css('--color-border-information'),
+        'status-success': css('--color-border-success'),
+        'status-warning': css('--color-border-warning'),
+        'status-danger': css('--color-border-danger'),
+        'status-muted': css('--color-workflow-relationship-connector'),
+        'workflow-relationship-connector': css(
+          '--color-workflow-relationship-connector',
+        ),
+        'workflow-relationship-current': css(
+          '--color-workflow-relationship-current',
+        ),
+        'workflow-relationship-placeholder': css(
+          '--color-workflow-relationship-placeholder',
+        ),
       },
       backgroundColor: ({ theme }) => ({
         ...theme('colors'),
 
+        canvas: css('--color-surface-background'),
+        'surface-1': css('--color-surface-primary'),
+        'surface-2': css('--color-surface-secondary'),
         primary: css('--color-surface-primary'),
         secondary: css('--color-surface-secondary'),
         inverse: css('--color-surface-inverse'),
@@ -201,6 +237,8 @@ const temporal = plugin(
       }),
       borderColor: ({ theme }) => ({
         ...theme('colors'),
+        hairline: css('--color-border-subtle'),
+        strong: css('--color-border-primary'),
         primary: css('--color-border-primary'),
         secondary: css('--color-border-secondary'),
         subtle: css('--color-border-subtle'),
@@ -225,6 +263,9 @@ const temporal = plugin(
       }),
       textColor: ({ theme }) => ({
         ...theme('colors'),
+        fg: css('--color-text-primary'),
+        'fg-muted': css('--color-text-secondary'),
+        'fg-subtle': css('--color-text-subtle'),
         primary: css('--color-text-primary'),
         secondary: css('--color-text-secondary'),
         subtle: css('--color-text-subtle'),
@@ -244,11 +285,51 @@ const temporal = plugin(
         danger: css('--color-text-danger'),
       }),
       extend: {
+        borderRadius: {
+          control: 'var(--radius-control)',
+          panel: 'var(--radius-panel)',
+          overlay: 'var(--radius-overlay)',
+        },
+        boxShadow: {
+          raised: 'var(--shadow-raised)',
+          floating: 'var(--shadow-floating)',
+          modal: 'var(--shadow-modal)',
+        },
+        height: {
+          'control-xs': 'var(--control-height-xs)',
+          'control-sm': 'var(--control-height-sm)',
+          control: 'var(--control-height)',
+          row: 'var(--row-height)',
+        },
+        minHeight: {
+          'control-xs': 'var(--control-height-xs)',
+          'control-sm': 'var(--control-height-sm)',
+          control: 'var(--control-height)',
+          target: 'var(--target-size)',
+        },
         transitionProperty: {
           width: 'width',
           height: 'height',
           left: 'left',
           right: 'right',
+        },
+        transitionDuration: {
+          instant: 'var(--duration-instant)',
+          fast: 'var(--duration-fast)',
+          normal: 'var(--duration-normal)',
+        },
+        transitionTimingFunction: {
+          standard: 'var(--ease-standard)',
+          enter: 'var(--ease-enter)',
+          exit: 'var(--ease-exit)',
+        },
+        zIndex: {
+          dropdown: 'var(--z-dropdown)',
+          sticky: 'var(--z-sticky)',
+          backdrop: 'var(--z-backdrop)',
+          modal: 'var(--z-modal)',
+          toast: 'var(--z-toast)',
+          tooltip: 'var(--z-tooltip)',
         },
       },
     },

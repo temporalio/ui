@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Readable, Writable } from 'svelte/store';
-  import { slide } from 'svelte/transition';
 
   import { onMount, type Snippet } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
@@ -11,6 +10,7 @@
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import { setPaginatedTableMaxHeight } from '$lib/holocene/table/paginated-table/context';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -207,18 +207,18 @@
   };
 </script>
 
-<div class="flex overflow-auto">
+<div class="flex min-w-0 flex-col overflow-hidden lg:flex-row">
   <div
     class={merge(
-      'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
+      'surface-primary relative flex w-full min-w-0 max-w-full overflow-x-auto border border-b-0 border-subtle',
+      'lg:block lg:h-auto lg:max-h-[var(--panel-h)] lg:min-h-[var(--panel-h)] lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)] lg:overflow-auto lg:border-b lg:border-r-0 lg:transition-[width,min-width,max-width] lg:duration-normal lg:ease-standard',
       $savedQueryNavOpen
         ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
         : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
     )}
-    style="will-change: width"
   >
     <div
-      class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
+      class="flex min-h-control-sm shrink-0 items-center justify-center gap-2 border-r border-subtle px-2 text-center lg:border-b lg:border-r-0 lg:py-[.47rem]"
     >
       <div
         class={merge(
@@ -229,28 +229,29 @@
         {#if $savedQueryNavOpen}
           <p
             class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
-            in:slide
           >
             Saved Views
           </p>
         {/if}
         <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
-        <button
-          class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
-          aria-label={$savedQueryNavOpen
+        <IconButton
+          class="hidden lg:inline-flex"
+          icon="collapse"
+          label={$savedQueryNavOpen
             ? 'Collapse saved views'
             : 'Expand saved views'}
           title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
+          size="xs"
           onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
-        >
-          <Icon name="collapse" />
-        </button>
+        />
       </div>
     </div>
 
-    <div class="space-y-2 p-1.5">
-      <div class="pb-2 text-center">
-        <div class="space-y-1">
+    <div
+      class="flex min-w-max items-center gap-1 p-1 lg:block lg:min-w-0 lg:space-y-2 lg:p-1.5"
+    >
+      <div class="text-center lg:pb-2">
+        <div class="flex gap-1 lg:block lg:space-y-1">
           {#each systemViews as view (view.id)}
             {@render queryButton({
               ...view,
@@ -263,7 +264,6 @@
       {#if $savedQueryNavOpen}
         <p
           class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
-          in:slide
         >
           {translate('common.custom-views')}
           {@render queryBadge({
@@ -273,7 +273,9 @@
         </p>
       {/if}
 
-      <div class="border-t border-subtle"></div>
+      <div
+        class="mx-1 h-6 border-l border-subtle lg:mx-0 lg:h-auto lg:border-l-0 lg:border-t"
+      ></div>
 
       {#if unsavedQuery}
         {@render queryButton(unsaveView)}
@@ -281,7 +283,7 @@
 
       {#if namespaceSavedQueries.length > 0}
         <div class="text-center">
-          <div class="space-y-1">
+          <div class="flex gap-1 lg:block lg:space-y-1">
             {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
               {@render queryButton({
                 ...savedQuery,
@@ -300,7 +302,7 @@
       {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
         <p
           class={merge(
-            ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
+            'hidden pl-1 text-center text-secondary lg:block lg:pl-4 lg:text-left',
             !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
           )}
         >
@@ -311,7 +313,7 @@
   </div>
   <div
     class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
+      'flex w-full min-w-0 shrink flex-col lg:w-[calc(100%-var(--panel-expanded-w))] lg:transition-[width] lg:duration-normal lg:ease-standard',
       !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
     )}
   >
@@ -342,10 +344,10 @@
     right
     usePortal
     hide={$savedQueryNavOpen}
-    class="w-full"
+    class="shrink-0 lg:w-full"
     tooltipClass="max-w-[280px]"
   >
-    <div class="w-full" role="menuitem" tabindex="-1">
+    <div class="w-auto lg:w-full">
       <Button
         variant="ghost"
         aria-label={view.name}
@@ -359,8 +361,8 @@
         data-track-text={view.name}
         onclick={() => setActiveQueryView(view)}
         class={merge(
-          'flex w-full justify-start',
-          (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
+          'flex w-auto justify-start lg:w-full',
+          (view.count ?? 0) > 0 && 'text-danger',
         )}
         active={view.active}
         disabled={view.disabled}
@@ -377,7 +379,7 @@
         {#if $savedQueryNavOpen}
           <span
             class="hidden truncate text-left text-sm font-normal lg:inline-block"
-            in:slide>{view.name}</span
+            >{view.name}</span
           >
           {#if view.badge}
             {@render queryBadge({
@@ -387,13 +389,13 @@
           {/if}
           {#if view.count != undefined}
             {@render queryBadge({
-              className: `font-mono ${view.count > 0 ? 'bg-red-50 dark:bg-red-900 text-red-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-600 text-blue-900 dark:text-white'}`,
+              className: `font-mono ${view.count > 0 ? 'bg-danger text-danger' : 'surface-subtle text-information'}`,
               content: view.count,
               icon: view.count > 0 ? 'exclamation-octagon' : 'happy-lappy',
               iconClass:
                 view.count > 0
-                  ? 'bg-red-200 dark:bg-red-700 text-red-900 dark:text-white'
-                  : 'surface-subtle',
+                  ? 'surface-danger text-danger'
+                  : 'surface-subtle text-information',
             })}
           {/if}
         {/if}
@@ -401,9 +403,8 @@
 
       {#if activeQueryView?.id === view.id && view.type === 'user'}
         <div
-          in:slide
           class={merge(
-            'flex flex-col items-center gap-1 pt-0.5 transition-all',
+            'flex items-center gap-1 pt-0.5 lg:flex-col',
             $savedQueryNavOpen && 'lg:flex-row',
           )}
         >
@@ -453,13 +454,10 @@
           >
         </div>
       {:else if unsavedQuery && view.id === 'unsaved'}
-        <div
-          class="flex items-center gap-1 overflow-hidden pt-0.5"
-          transition:slide
-        >
+        <div class="flex items-center gap-1 overflow-hidden pt-0.5">
           <Button
             size="xs"
-            class="w-full break-all transition-all"
+            class="w-full break-all"
             variant="secondary"
             disabled={maxViewsReached}
             data-testid="create-view-button"
@@ -497,11 +495,10 @@
 })}
   <span
     class={merge(
-      'surface-subtle right-2 top-2 hidden items-center rounded-full px-2 py-1 text-xs font-medium lg:static lg:ml-auto lg:flex',
-      icon && 'gap-1.5 p-0.5 pl-2',
+      'surface-subtle right-2 top-2 hidden items-center rounded-full px-1.5 py-0.5 text-xs font-medium lg:static lg:ml-auto lg:flex',
+      icon && 'gap-1 p-0.5 pl-1.5',
       className,
     )}
-    in:slide
   >
     <span class="max-w-16 truncate">{content}</span>
     {#if icon}

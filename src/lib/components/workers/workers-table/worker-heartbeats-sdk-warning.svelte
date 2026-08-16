@@ -46,12 +46,14 @@
 </script>
 
 <div
-  class="my-12 flex w-full flex-col items-center justify-start gap-4"
+  class="my-6 flex w-full flex-col items-center justify-start gap-3"
   data-testid="worker-heartbeats-sdk-warning"
   aria-live="polite"
 >
-  <span class="flex h-20 w-20 items-center justify-center rounded-full">
-    <Icon name="heartbeat" class="block h-full w-full text-blue-200" />
+  <span
+    class="flex h-10 w-10 items-center justify-center rounded-panel bg-information"
+  >
+    <Icon name="heartbeat" class="block h-6 w-6 text-information" />
   </span>
   <div class="text-center">
     <h5>{translate('workers.no-worker-heartbeats')}</h5>
@@ -71,7 +73,7 @@
         {translate('workers.worker-heartbeats-sdk-list-preface')}
       </p>
       <div
-        class="mt-4 flex flex-row flex-wrap items-center justify-center gap-4"
+        class="mt-3 flex flex-row flex-wrap items-center justify-center gap-2"
       >
         {#each supportedVersions as { href, sdk, version } (`${sdk}:${version}`)}
           <Link newTab {href}>

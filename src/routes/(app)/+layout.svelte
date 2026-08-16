@@ -351,14 +351,14 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex h-dvh w-screen flex-row">
+<div class="flex h-dvh w-full max-w-full flex-row overflow-hidden">
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
     position={toaster.position}
   />
-  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
+  <div class="sticky top-0 z-30 hidden h-dvh w-auto shrink-0 md:block">
     <SideNavigation sections={[linkList, linkListForSecondGroup]} {isCloud}>
       {#snippet bottom()}
         {#if !isCloud}
@@ -395,7 +395,7 @@
             'https://support.temporal.io'}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center hover:text-white"
+          class="flex h-11 w-11 items-center justify-center text-secondary transition-colors duration-fast hover:text-primary"
           aria-label="Support"
         >
           <Icon name="support" />
@@ -404,7 +404,9 @@
       <UserMenu {logout} />
     </TopNavigation>
     {#snippet main()}
-      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+      <div
+        class="flex min-h-[calc(100%_-_var(--bottom-nav-height))] w-full min-w-0 flex-col gap-4 px-[var(--page-gutter)] py-4 md:min-h-[calc(100%_-_var(--top-nav-height))]"
+      >
         <ErrorBoundary>
           {@render children()}
         </ErrorBoundary>

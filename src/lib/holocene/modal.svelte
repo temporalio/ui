@@ -101,7 +101,7 @@
   bind:this={modalElement}
   class={merge(
     'body',
-    'transition-all duration-200 ease-out',
+    'transition-[opacity,transform] duration-normal ease-standard',
     open && 'scale-100 opacity-100',
     !open && 'scale-95 opacity-0',
     className,
@@ -116,7 +116,7 @@
     <IconButton
       label={cancelText}
       icon="close"
-      class="float-right m-4"
+      class="float-right m-3"
       onclick={closeModal}
     />
   {/if}
@@ -141,7 +141,9 @@
       </p>
     </div>
 
-    <div class="flex items-center justify-between p-6">
+    <div
+      class="flex items-center justify-between gap-3 border-t border-subtle px-4 py-3 sm:px-5"
+    >
       {#if footer}
         {@render footer()}
       {:else}
@@ -172,11 +174,13 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto border border-secondary p-0 text-primary shadow-xl md:h-max;
+    @apply surface-primary z-modal w-[calc(100%_-_2rem)] max-w-lg overflow-y-auto rounded-overlay border border-subtle p-0 text-primary shadow-modal md:h-max;
+
+    max-height: calc(100dvh - 2rem);
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-black/50 transition-opacity duration-200;
+    @apply cursor-pointer bg-slate-950/60 transition-opacity duration-normal;
 
     :global([data-theme='dark']) & {
       background-color: rgb(var(--color-surface-background) / 50%);
@@ -192,10 +196,10 @@
   }
 
   .title {
-    @apply surface-primary px-8 pb-0 pt-8 text-2xl;
+    @apply surface-primary px-4 pb-0 pt-4 text-lg font-semibold tracking-tight sm:px-5 sm:pt-5;
   }
 
   .content {
-    @apply whitespace-normal p-8;
+    @apply whitespace-normal px-4 pb-4 pt-3 sm:px-5 sm:pb-5;
   }
 </style>

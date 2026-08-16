@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<Card class="space-y-6">
+<Card class="space-y-4">
   <Skeleton class="h-5 w-52 rounded-sm" />
 
   <div class="space-y-4">

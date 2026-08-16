@@ -26,6 +26,7 @@
   class={merge('fill-current', className)}
   {...rest}
 >
+  <title>Temporal</title>
   <path
     fill-rule="evenodd"
     clip-rule="evenodd"

@@ -192,7 +192,11 @@
   );
 </script>
 
-<form class="flex w-full flex-col gap-4 xl:w-1/2" use:enhance novalidate>
+<form
+  class="surface-primary flex w-full max-w-3xl flex-col gap-3 rounded-panel border border-subtle p-4"
+  use:enhance
+  novalidate
+>
   <Input
     bind:value={$form.name}
     required
@@ -275,7 +279,7 @@
       {translate('nexus.description-hint')}
     </p>
   </div>
-  <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
+  <div class="flex w-full flex-col items-center gap-2 sm:flex-row">
     <Button
       type="submit"
       disabled={$submitting || (endpoint && !isTainted($tainted))}

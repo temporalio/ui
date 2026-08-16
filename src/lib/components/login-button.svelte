@@ -5,18 +5,8 @@
 </script>
 
 <button
-  class="login-button min-w-min"
+  class="login-button h-control min-w-min rounded-control border border-transparent bg-interactive px-4 text-sm font-medium text-white shadow-raised transition-colors duration-fast hover:bg-interactive-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-surface-primary))]"
   onclick={() => goto(routeForLoginPage())}
 >
   Login
 </button>
-
-<style lang="postcss">
-  .login-button {
-    @apply flex items-center justify-center px-4 py-2 text-sm text-white;
-  }
-
-  .login-button:hover {
-    @apply rounded-md bg-purple-100 text-primary;
-  }
-</style>

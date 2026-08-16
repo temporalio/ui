@@ -38,7 +38,7 @@
   <Label {required} {label} hidden for={id} />
   <select
     class={merge(
-      'inline h-10 w-full border border-secondary bg-transparent px-2 text-base text-primary outline-none dark:surface-primary focus-visible:outline focus-visible:outline-blue-700',
+      'surface-primary inline h-control w-full rounded-control border border-primary px-3 text-sm text-primary outline-none transition-colors duration-fast hover:border-interactive focus-visible:border-interactive focus-visible:ring-2 focus-visible:ring-primary',
       arrow && 'h-8 appearance-none py-1 pl-3 text-sm',
       className,
     )}

@@ -52,14 +52,14 @@
   <div class="flex flex-1 flex-wrap justify-between gap-2">
     <div class="flex flex-wrap items-center space-x-3">
       <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
-      <h4>{activity.activityType}</h4>
+      <p class="font-medium">{activity.activityType}</p>
     </div>
     {#if showActivityCommands}
       <ActivityCommands {activity} class="justify-end" />
     {/if}
   </div>
-  <div class="flex flex-1 flex-col gap-4 xl:flex-row">
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+  <div class="grid min-w-0 flex-1 grid-cols-1 gap-3 xl:grid-cols-2">
+    <div class="flex min-w-0 flex-col gap-1.5">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {#if activity.paused && activity.pauseInfo}
         {@render detail(
@@ -138,7 +138,7 @@
         {/if}
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
+    <div class="flex min-w-0 flex-col gap-3">
       {#if failed}
         {#if (totalPending ?? 0) > 20}
           {@render failuresAccordion()}
@@ -154,11 +154,13 @@
 </div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)] sm:gap-3"
+  >
+    <p class="text-xs font-medium leading-5 text-secondary">
       {label}
     </p>
-    <p class="w-full whitespace-pre-line">
+    <p class="min-w-0 whitespace-pre-line break-words text-sm leading-5">
       {#if typeof value === 'string' || typeof value === 'number'}
         {value}
       {:else}
@@ -170,7 +172,7 @@
 
 {#snippet heartbeat()}
   <div>
-    <p class="text-sm text-secondary/80">
+    <p class="text-xs font-medium leading-5 text-secondary">
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
@@ -189,7 +191,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if activity.lastFailure}
-        <p class="text-sm text-secondary/80">
+        <p class="text-xs font-medium leading-5 text-secondary">
           {translate('workflows.last-failure')}
         </p>
         {#key activity.attempt}
@@ -203,7 +205,7 @@
     </div>
     {#if activity.lastFailure?.stackTrace}
       <div>
-        <p class="text-sm text-secondary/80">
+        <p class="text-xs font-medium leading-5 text-secondary">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock
@@ -234,11 +236,15 @@
 {/snippet}
 
 {#snippet nextRetry(timeDifference: string)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)] sm:gap-3"
+  >
+    <p class="text-xs font-medium leading-5 text-secondary">
       {translate('workflows.next-retry')}
     </p>
-    <p class="flex w-full items-center gap-1 whitespace-pre-line">
+    <p
+      class="flex min-w-0 items-center gap-1 whitespace-pre-line text-sm leading-5"
+    >
       {$timestamp(activity.scheduledTime, { relativeLabel: '' })}
       <strong>({timeDifference})</strong>
     </p>
@@ -248,7 +254,7 @@
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
     <Badge type={failed ? 'danger' : 'default'}>
-      <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
+      <Icon class="mr-1 {failed && 'font-bold text-danger'}" name="retry" />
       {activity.attempt ?? 0} of {formatMaximumAttempts(
         activity.maximumAttempts ?? null,
       )}

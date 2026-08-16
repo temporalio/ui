@@ -113,7 +113,7 @@
   };
 </script>
 
-<div class="flex flex-col gap-2 pb-24" data-testid="event-summary-log">
+<div class="flex flex-col gap-2 pb-4" data-testid="event-summary-log">
   <Button
     variant="secondary"
     size="xs"

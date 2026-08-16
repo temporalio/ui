@@ -21,7 +21,7 @@
       variants: {
         variant: {
           default:
-            'border-subtle focus-within:border-interactive focus-within:ring-primary/70',
+            'border-subtle focus-within:border-interactive focus-within:ring-primary',
           ghost:
             'bg-transparent border-transparent focus-within:border-transparent focus-within:ring-transparent focus-within:bg-transparent hover:surface-interactive-secondary',
         },
@@ -509,7 +509,7 @@
         comboboxStyles({ variant }),
         !valid &&
           variant === 'default' &&
-          'border border-danger text-danger focus-within:ring-danger/70',
+          'border border-danger text-danger focus-within:ring-danger',
         disabled && 'opacity-50',
         className,
       )}
@@ -602,6 +602,7 @@
                 variant="ghost"
                 size="xs"
                 {href}
+                aria-label={actionTooltip}
                 disabled={hrefDisabled}
                 leadingIcon="external-link"
               />
@@ -611,6 +612,7 @@
               variant="ghost"
               size="xs"
               {href}
+              aria-label="Open link"
               disabled={hrefDisabled}
               leadingIcon="external-link"
             />
@@ -620,7 +622,7 @@
       {#if showChevron}
         <button
           type="button"
-          class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
+          class="flex h-full items-center rounded-control pr-2 transition-colors duration-fast hover:bg-interactive-secondary-hover focus:outline-none"
           onclick={handleChevronClick}
           aria-label={$open ? 'Close options' : 'Open options'}
           tabindex="-1"
@@ -628,7 +630,7 @@
           <Icon
             name="chevron-down"
             class={merge(
-              'transition-transform duration-200',
+              'transition-transform duration-fast',
               $open && 'rotate-180',
               !$open && 'rotate-0',
             )}

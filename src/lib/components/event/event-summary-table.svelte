@@ -89,8 +89,8 @@
   getMessage={(count) =>
     translate('workflows.new-events-announcement', { count })}
 />
-<div class="flex">
-  <div class="pt-9">
+<div class="flex min-w-0">
+  <div class="shrink-0 pt-9">
     {#if showGraph}
       <HistoryGraph {groups} history={paginatedHistory(items)} />
     {/if}
@@ -103,7 +103,7 @@
     {updating}
     items={filteredForStatus(items)}
     maxHeight="none"
-    class="border-t-0"
+    class="min-w-0 border-t-0"
   >
     {#snippet headers()}
       <TableHeaderRow class="!h-8">

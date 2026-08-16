@@ -18,7 +18,6 @@ import {
   WidgetType,
 } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
-import colors from 'tailwindcss/colors';
 
 import { css } from '$lib/theme/utilities';
 
@@ -39,19 +38,31 @@ const baseTheme = {
     color: css('--color-text-primary'),
     backgroundColor: css('--color-surface-code-block'),
     height: '100%',
+    borderRadius: 'var(--radius-panel, 8px)',
+    overflow: 'hidden',
   },
   '.cm-scroller': {
-    fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+    fontFamily:
+      '"Noto Sans Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+    fontVariantNumeric: 'tabular-nums',
     // Ensure inner scroller reliably captures wheel/touchpad scroll,
     // especially on Firefox with mouse wheels.
     overflow: 'auto',
   },
   '.cm-content': {
     caretColor: css('--color-text-primary'),
-    fontSize: '0.875em',
+    fontSize: '0.75rem',
+    lineHeight: '1.25rem',
   },
   '.cm-editor&.cm-focused': {
-    outline: `2px solid ${colors.indigo['600']}`,
+    outline: `2px solid ${css('--color-border-focus-info')}`,
+    outlineOffset: '-2px',
+  },
+  '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
+    backgroundColor: `${css('--color-surface-information')} !important`,
+  },
+  '.cm-activeLine': {
+    backgroundColor: css('--color-surface-secondary'),
   },
   '.cm-gutters': {
     backgroundColor: 'transparent',
@@ -77,7 +88,7 @@ export const getEditorTheme = (isDark: boolean, header: boolean) =>
       },
       '.cm-scroller': {
         ...baseTheme['.cm-scroller'],
-        padding: '0.5rem',
+        padding: '0.5rem 0.625rem',
       },
     },
     { dark: isDark },
@@ -129,19 +140,16 @@ export const getHeightTheme = ({
     },
   });
 
-export const highlightStyles = HighlightStyle.define(
-  [
-    { tag: tags.punctuation, color: css('--color-text-primary') },
-    { tag: tags.string, color: css('--color-text-primary') },
-    { tag: tags.propertyName, color: css('--color-text-brand') },
-    { tag: tags.bool, color: css('--color-text-primary') },
-    { tag: tags.number, color: css('--color-text-primary') },
-    { tag: tags.operator, color: css('--color-text-pink') },
-    { tag: tags.comment, color: css('--color-text-subtle') },
-    { tag: tags.variableName, color: css('--color-text-pink') },
-  ],
-  { themeType: 'light' },
-);
+export const highlightStyles = HighlightStyle.define([
+  { tag: tags.punctuation, color: css('--color-text-primary') },
+  { tag: tags.string, color: css('--color-text-primary') },
+  { tag: tags.propertyName, color: css('--color-text-brand') },
+  { tag: tags.bool, color: css('--color-text-primary') },
+  { tag: tags.number, color: css('--color-text-primary') },
+  { tag: tags.operator, color: css('--color-text-pink') },
+  { tag: tags.comment, color: css('--color-text-subtle') },
+  { tag: tags.variableName, color: css('--color-text-pink') },
+]);
 
 class LineBreakWidget extends WidgetType {
   toDOM() {

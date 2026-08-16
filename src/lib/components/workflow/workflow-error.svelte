@@ -35,12 +35,14 @@
     </Link>
   </div>
 </header>
-<div class="text-center align-middle">
-  <h1 class="leading-0 text-[12rem] font-semibold">
+<div
+  class="mx-auto flex max-w-xl flex-col items-center rounded-panel border border-danger bg-danger/5 px-5 py-8 text-center align-middle"
+>
+  <h1 class="font-mono text-5xl font-semibold tracking-tight text-danger">
     {error?.statusCode ?? '500'}
   </h1>
-  <p class="-mt-12 text-lg">{title}</p>
-  <p class="text-2xl font-bold text-red-700">
+  <p class="mt-2 text-base font-semibold">{title}</p>
+  <p class="mt-2 text-sm text-danger">
     {error?.statusText ?? ''}
   </p>
 </div>

@@ -192,9 +192,9 @@
   {/if}
   <div
     class={twMerge(
-      'surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50',
+      'surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand',
       inputClass,
-      error && 'border-danger focus-within:ring-danger/50',
+      error && 'border-danger focus-within:ring-danger',
       disabled && 'cursor-not-allowed opacity-50',
     )}
   >

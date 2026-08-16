@@ -62,9 +62,10 @@
     handleClick(e);
   }}
   class={merge(
-    'flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
-    isActive && 'bg-interactive text-white',
+    'flex h-control-xs items-center justify-center gap-1.5 rounded-control border border-transparent px-2.5 text-xs font-medium text-secondary transition-colors duration-fast',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50',
+    isActive && 'surface-primary border-subtle text-primary shadow-raised',
+    !isActive && !disabled && 'hover:text-primary',
     className,
   )}
   {disabled}

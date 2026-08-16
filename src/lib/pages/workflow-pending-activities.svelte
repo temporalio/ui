@@ -14,9 +14,9 @@
   );
 </script>
 
-<div class="pb-16">
+<div class="pb-4">
   {#if pendingActivities.length}
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
       {#each pendingActivities as activity (activity.id)}
         <PendingActivityCard
           {activity}

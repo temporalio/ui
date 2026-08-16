@@ -73,11 +73,11 @@
 </script>
 
 {#if expanded}
-  <div bind:this={containerEl} tabindex="-1" class="flex flex-col gap-4">
+  <div bind:this={containerEl} tabindex="-1" class="flex flex-col gap-3">
     <div
-      class="flex items-start justify-between gap-4 border border-transparent"
+      class="flex items-start justify-between gap-3 border border-transparent"
     >
-      <div class="flex flex-col items-end gap-4 sm:flex-row">
+      <div class="flex flex-col items-end gap-3 sm:flex-row">
         <Select
           id="spec-type-{uuid}"
           data-testid="spec-type-{index}"
@@ -109,7 +109,7 @@
           size="sm"
           icon="trash"
           label={translate('common.delete')}
-          class="mr-4 mt-[1.625rem] h-10"
+          class="mr-2 mt-[1.625rem]"
           onclick={onRemove}
         />
       {/if}
@@ -129,10 +129,10 @@
   {@const rawValue = getRawValue(spec)}
   <div
     bind:this={containerEl}
-    class="surface-background relative flex min-h-16 w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
+    class="surface-secondary relative flex min-h-12 w-full justify-between gap-3 border border-subtle px-3 py-2 text-left transition-colors"
   >
     <div
-      class="grid w-full grid-cols-1 items-center gap-2 text-sm md:grid-cols-[minmax(8rem,max-content)_4fr_minmax(max-content,1fr)] md:gap-4"
+      class="grid w-full min-w-0 grid-cols-1 items-center gap-1.5 text-sm md:grid-cols-[minmax(7rem,max-content)_4fr_minmax(max-content,1fr)] md:gap-3"
     >
       <span class="font-semibold">{typeLabel}</span>
       <span class="flex-1 flex-wrap text-xs text-secondary">

@@ -329,12 +329,18 @@
   };
 </script>
 
-<form class="space-y-4" use:enhance novalidate>
+<form class="space-y-3" use:enhance novalidate>
   <Message value={$message} />
 
-  <div class="flex items-start gap-6">
-    <div class="min-w-0 flex-1 space-y-4">
-      <Card class="space-y-4">
+  <div
+    class="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,24rem)]"
+  >
+    <div
+      class="surface-primary min-w-0 space-y-0 overflow-hidden rounded-panel border border-subtle px-4"
+    >
+      <Card
+        class="space-y-3 rounded-none border-0 border-b border-subtle px-0 py-4 last:border-b-0"
+      >
         <h5>
           {translate(
             'standalone-nexus-operations.form-nexus-operation-details-heading',
@@ -364,7 +370,7 @@
           >
             {#snippet afterInput()}
               <Button
-                class="ml-2.5"
+                class="ml-2"
                 variant="secondary"
                 onclick={generateRandomId}
                 leadingIcon="retry"
@@ -470,7 +476,9 @@
         />
       </Card>
 
-      <Card class="space-y-4">
+      <Card
+        class="space-y-3 rounded-none border-0 border-b border-subtle px-0 py-4 last:border-b-0"
+      >
         <div class="flex items-center justify-between">
           <h5>
             {translate(
@@ -502,13 +510,15 @@
           </Link>
         </p>
         <dl class="flex flex-col gap-2 text-sm">
-          <div class="flex items-center gap-6">
-            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+          <div
+            class="grid grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(10rem,13rem)_minmax(0,1fr)] sm:gap-3"
+          >
+            <dt class="font-medium text-secondary">
               {translate(
                 'standalone-nexus-operations.form-closed-operation-id-reuse-label',
               )}
             </dt>
-            <dd>
+            <dd class="min-w-0">
               {$form.idReusePolicy
                 ? fromScreamingEnum(
                     $form.idReusePolicy,
@@ -519,13 +529,15 @@
                   )}
             </dd>
           </div>
-          <div class="flex items-center gap-6">
-            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+          <div
+            class="grid grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(10rem,13rem)_minmax(0,1fr)] sm:gap-3"
+          >
+            <dt class="font-medium text-secondary">
               {translate(
                 'standalone-nexus-operations.form-running-operation-id-conflict-label',
               )}
             </dt>
-            <dd>
+            <dd class="min-w-0">
               {$form.idConflictPolicy
                 ? fromScreamingEnum(
                     $form.idConflictPolicy,
@@ -536,13 +548,15 @@
                   )}
             </dd>
           </div>
-          <div class="flex items-center gap-6">
-            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+          <div
+            class="grid grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(10rem,13rem)_minmax(0,1fr)] sm:gap-3"
+          >
+            <dt class="font-medium text-secondary">
               {translate(
                 'standalone-nexus-operations.form-timeouts-summary-label',
               )}
             </dt>
-            <dd>
+            <dd class="min-w-0">
               {isPositiveDuration($form.startToCloseTimeout) ||
               isPositiveDuration($form.scheduleToCloseTimeout) ||
               isPositiveDuration($form.scheduleToStartTimeout)
@@ -561,12 +575,16 @@
         </dl>
       </Card>
 
-      <Card class="space-y-4">
+      <Card
+        class="space-y-3 rounded-none border-0 border-b border-subtle px-0 py-4 last:border-b-0"
+      >
         <h5>
           {translate('standalone-nexus-operations.form-nexus-header-heading')}
         </h5>
         {#each $form.nexusHeader as _, index (index)}
-          <div class="flex items-center gap-2">
+          <div
+            class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2"
+          >
             <Input
               id="nexus-header-key-{index}"
               label=""
@@ -599,16 +617,16 @@
       </Card>
 
       <Card
-        class="space-y-4"
+        class="space-y-3 rounded-none border-0 border-b border-subtle px-0 py-4 last:border-b-0"
         data-testid="start-standalone-nexus-operation-add-search-attributes"
       >
-        <div class="space-y-2">
+        <div class="space-y-1">
           <h5>
             {translate(
               'standalone-nexus-operations.form-search-attributes-heading',
             )}
           </h5>
-          <p class="text-secondary">
+          <p class="text-sm text-secondary">
             {translate(
               'standalone-nexus-operations.form-search-attributes-description',
             )}
@@ -621,16 +639,16 @@
       </Card>
 
       <Card
-        class="space-y-4"
+        class="space-y-3 rounded-none border-0 border-subtle px-0 py-4"
         data-testid="start-standalone-nexus-operation-add-metadata"
       >
-        <div class="space-y-2">
+        <div class="space-y-1">
           <h5>
             {translate(
               'standalone-nexus-operations.form-user-metadata-heading',
             )}
           </h5>
-          <p class="text-secondary">
+          <p class="text-sm text-secondary">
             {translate(
               'standalone-nexus-operations.form-user-metadata-description',
             )}
@@ -646,7 +664,7 @@
         </div>
       </Card>
 
-      <div class="flex justify-end">
+      <div class="flex justify-end border-t border-subtle py-4">
         <Button
           data-testid="start-standalone-nexus-operation-submit-button"
           type="submit"
@@ -658,7 +676,9 @@
       </div>
     </div>
 
-    <Card class="sticky top-16 w-[440px] shrink-0 space-y-4">
+    <Card
+      class="w-full space-y-3 xl:sticky xl:top-[calc(var(--top-nav-height)+1rem)] xl:self-start"
+    >
       <h5>
         {translate('standalone-nexus-operations.operation-summary-heading')}
       </h5>
@@ -669,7 +689,9 @@
               'standalone-nexus-operations.operation-summary-start-date',
             )}
           </dt>
-          <dd>{startDate}</dd>
+          <dd class="min-w-0 text-right font-mono tabular-nums">
+            {startDate}
+          </dd>
         </div>
         <div class="flex justify-between gap-4">
           <dt class="text-secondary">
@@ -677,7 +699,9 @@
               'standalone-nexus-operations.operation-summary-target-endpoint',
             )}
           </dt>
-          <dd class="text-right">{$form.endpoint || '—'}</dd>
+          <dd class="min-w-0 break-words text-right">
+            {$form.endpoint || '—'}
+          </dd>
         </div>
         <div class="flex justify-between gap-4">
           <dt class="text-secondary">
@@ -685,7 +709,9 @@
               'standalone-nexus-operations.operation-summary-service-name',
             )}
           </dt>
-          <dd class="text-right">{$form.service || '—'}</dd>
+          <dd class="min-w-0 break-words text-right">
+            {$form.service || '—'}
+          </dd>
         </div>
         <div class="flex justify-between gap-4">
           <dt class="text-secondary">
@@ -693,7 +719,9 @@
               'standalone-nexus-operations.operation-summary-operation-name',
             )}
           </dt>
-          <dd class="text-right">{$form.operation || '—'}</dd>
+          <dd class="min-w-0 break-words text-right">
+            {$form.operation || '—'}
+          </dd>
         </div>
       </dl>
     </Card>

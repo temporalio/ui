@@ -16,8 +16,8 @@
       xmlns:xlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width="30px"
-      height="18px"
+      width="20px"
+      height="14px"
       viewBox="0 0 150 73"
       enable-background="new 0 0 150 73"
       xml:space="preserve"
@@ -26,7 +26,7 @@
     >
       <polyline
         fill="none"
-        stroke="#000000"
+        stroke="currentColor"
         stroke-width="3"
         stroke-miterlimit="10"
         points="0,45.486 18.514,45.486 24.595,33.324 32.676,45.486 37.771,45.486 42.838,55.622 51.959,18 56.067,45 60.067,60.729 63.122,45.486 77.297,45.486 83.379,41.419 90.473,45.486 100,45.486"
@@ -40,90 +40,49 @@
 
 <style lang="postcss">
   .heart-beat {
-    @apply relative flex items-center justify-center bg-blue-300 text-center;
+    @apply relative flex items-center justify-center bg-transparent text-center text-information;
   }
 
   .heart-rate {
     @apply relative;
 
-    width: 20px;
-    height: 18px;
+    width: 18px;
+    height: 14px;
     margin: 0;
   }
 
-  .fade-in {
-    @apply absolute right-0 top-0 h-full w-full bg-blue-300;
-
-    transform-origin: right;
-    animation: heartRateIn 2s linear infinite;
-    animation-delay: var(--animation-delay, 0);
-    will-change: transform;
-  }
-
-  .fade-out {
-    position: absolute;
-    height: 100%;
+  .heart-rate svg {
+    display: block;
     width: 100%;
-    top: 0;
-    left: 0;
-    transform-origin: left;
-    animation: heartRateOut 2s linear infinite;
+    height: 100%;
+    animation: heartRate 1.8s var(--ease-standard, ease-in-out) infinite;
     animation-delay: var(--animation-delay, 0);
-    will-change: transform;
-    background: rgb(147 187 253);
-    background: linear-gradient(
-      to left,
-      rgb(147 187 253) 50%,
-      rgb(147 187 253) 50%,
-      rgb(255 255 255 / 0%) 100%
-    );
-    background: linear-gradient(
-      to left,
-      rgb(147 187 253) 0%,
-      rgb(147 187 253) 50%,
-      rgb(255 255 255 / 0%) 100%
-    );
-    background: linear-gradient(
-      to left,
-      rgb(147 187 253) 0%,
-      rgb(147 187 253) 50%,
-      rgb(255 255 255 / 0%) 100%
-    );
-    background: linear-gradient(
-      to left,
-      rgb(147 187 253) 0%,
-      rgb(147 187 253) 50%,
-      rgb(255 255 255 / 0%) 100%
-    );
-    background: linear-gradient(
-      to right,
-      rgb(147 187 253) 0%,
-      rgb(147 187 253) 80%,
-      rgb(255 255 255 / 0%) 100%
-    );
   }
 
-  @keyframes heartRateIn {
+  .fade-in,
+  .fade-out {
+    display: none;
+  }
+
+  @keyframes heartRate {
     0% {
-      transform: scaleX(1);
+      opacity: 0.45;
     }
 
-    50% {
-      transform: scaleX(0);
+    18% {
+      opacity: 1;
     }
 
+    36%,
     100% {
-      transform: scaleX(0);
+      opacity: 0.45;
     }
   }
 
-  @keyframes heartRateOut {
-    0% {
-      transform: scaleX(0);
-    }
-
-    100% {
-      transform: scaleX(1);
+  @media (prefers-reduced-motion: reduce) {
+    .heart-rate svg {
+      animation: none;
+      opacity: 1;
     }
   }
 </style>

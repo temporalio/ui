@@ -4,15 +4,16 @@
   export type BadgeType = VariantProps<typeof types>['type'];
 
   const type = {
-    primary: 'bg-blue-300',
-    secondary: 'bg-purple-200 dark:bg-purple-800 dark:text-white',
-    default: 'bg-slate-100',
-    warning: 'bg-yellow-200',
-    success: 'bg-green-200',
-    danger: 'bg-red-200',
-    count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
-    subtle: 'surface-subtle dark:text-white font-normal select-all',
-    ghost: 'surface-primary text-primary border border-subtle',
+    primary: 'bg-information text-information border-information',
+    secondary: 'surface-subtle text-primary border-subtle',
+    default: 'surface-subtle text-primary border-subtle',
+    warning: 'bg-warning text-warning border-warning',
+    success: 'bg-success text-success border-success',
+    danger: 'bg-danger text-danger border-danger',
+    count:
+      'h-5 min-w-5 rounded-full bg-interactive px-1.5 text-white border-transparent',
+    subtle: 'surface-subtle font-normal select-all border-subtle',
+    ghost: 'surface-primary text-primary border-subtle',
   };
 
   const types = cva(
@@ -23,13 +24,15 @@
       'items-center',
       'justify-center',
       'text-nowrap',
-      'rounded-sm',
-      'p-1',
-      'text-sm',
+      'rounded-control',
+      'border',
+      'px-1.5',
+      'py-0.5',
+      'text-xs',
       'font-medium',
-      'leading-[1.5]',
+      'leading-4',
       'transition-colors',
-      'text-black',
+      'duration-fast',
     ],
     {
       variants: {

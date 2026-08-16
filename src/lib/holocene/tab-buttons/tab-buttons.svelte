@@ -8,6 +8,6 @@
     $props();
 </script>
 
-<div class={merge('flex', className)} role="tablist">
+<div class={merge('flex', className)} role="group">
   {@render children?.()}
 </div>

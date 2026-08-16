@@ -87,7 +87,9 @@
   }
 </script>
 
-<div class="flex shrink flex-wrap items-center justify-start gap-2">
+<div
+  class="flex min-w-max shrink-0 flex-nowrap items-center justify-start gap-1.5"
+>
   <DropdownFilterList {filters} {statusAttribute} />
   <SearchAttributeMenu {options} {filters} {statusAttribute} />
 </div>

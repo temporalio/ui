@@ -77,7 +77,7 @@
     <IconButton
       label={cancelText}
       icon="close"
-      class="float-right m-4"
+      class="float-right m-3"
       onclick={closeModal}
     />
   {/if}
@@ -95,7 +95,9 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full overflow-y-auto rounded-sm border border-secondary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
+    @apply surface-primary z-modal w-[calc(100%_-_2rem)] overflow-y-auto rounded-overlay border border-subtle p-0 text-primary shadow-modal md:h-max lg:max-w-4xl;
+
+    max-height: calc(100dvh - 2rem);
   }
 
   .body::backdrop {
@@ -107,7 +109,7 @@
   }
 
   .title {
-    @apply surface-primary px-8 pb-0 pt-8 text-2xl;
+    @apply surface-primary px-4 pb-0 pt-4 text-lg font-semibold;
   }
 
   .content {

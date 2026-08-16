@@ -23,10 +23,19 @@
 
 <button
   class={merge(
-    'surface-interactive-secondary m-1 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    'maximizable-button surface-interactive-secondary m-1 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
     className,
   )}
   {onclick}
 >
   <Icon title={iconTitle} name={svgName} />
 </button>
+
+<style>
+  @media (pointer: coarse) {
+    .maximizable-button {
+      min-width: var(--target-size);
+      min-height: var(--target-size);
+    }
+  }
+</style>

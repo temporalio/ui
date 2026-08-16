@@ -54,7 +54,9 @@
       />
     </th>
   {/if}
-  <th scope="col" class="w-6"></th>
+  <th scope="col" class="w-6">
+    <span class="sr-only">Actions</span>
+  </th>
   {#if $supportsWorkflowBulkActions && $batchActionsVisible}
     <th scope="col" class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />

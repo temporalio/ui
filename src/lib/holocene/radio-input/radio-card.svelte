@@ -51,15 +51,17 @@
 <div class={merge('flex flex-col', className)}>
   <div
     class={merge(
-      'flex items-start gap-3 border p-4',
+      'relative flex items-start gap-2 overflow-hidden rounded-panel border p-3 transition-colors duration-fast',
       'border-subtle',
+      selected &&
+        'rounded-b-none border-primary bg-interactive-secondary-hover before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-interactive',
       labelContainerClass,
       disabled && 'opacity-50',
     )}
   >
     <label
       class={merge(
-        'flex flex-1 cursor-pointer items-start gap-3',
+        'flex min-w-0 flex-1 cursor-pointer items-start gap-2.5',
         disabled && 'cursor-not-allowed',
       )}
       for={id}
@@ -67,7 +69,7 @@
       <input
         bind:group={$group}
         type="radio"
-        class="radio-card-input surface-primary mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border border-secondary"
+        class="radio-card-input surface-primary mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border border-primary"
         {name}
         {value}
         {id}
@@ -91,7 +93,9 @@
   </div>
 
   {#if selected && children}
-    <div class="surface-background border border-t-0 border-subtle p-5">
+    <div
+      class="surface-background rounded-b-panel border border-t-0 border-subtle p-3"
+    >
       {@render children()}
     </div>
   {/if}
@@ -102,13 +106,15 @@
     @apply box-border cursor-pointer outline-none;
 
     &:checked {
-      @apply bg-interactive shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
+      @apply bg-interactive;
+
+      box-shadow: inset 0 0 0 1px rgb(var(--color-surface-primary));
     }
 
     &:enabled {
       &:focus-visible,
       &:hover {
-        @apply bg-interactive-active ring-2 ring-primary/70;
+        @apply bg-interactive-active ring-2 ring-primary;
 
         &:not(:active) {
           @apply border-inverse;

@@ -120,7 +120,7 @@
   });
 </script>
 
-<div class="flex flex-col gap-4 pb-10">
+<div class="flex flex-col gap-3 pb-4">
   {#if $loading}
     <Loading />
   {:else}
@@ -131,9 +131,11 @@
 
     <form novalidate use:enhance oninput={onInput}>
       <div
-        class="relative grid grid-cols-1 gap-6 xl:grid-cols-[minmax(min-content,54rem),minmax(19rem,23rem)]"
+        class="relative grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,54rem)_minmax(19rem,23rem)]"
       >
-        <div class="flex w-full flex-col gap-6">
+        <div
+          class="surface-primary flex w-full flex-col gap-0 overflow-hidden rounded-panel border border-subtle px-4"
+        >
           <ScheduleDetailsCard {form} errors={formErrors} {schedule} />
           <ScheduleSpecCard
             {form}
@@ -148,7 +150,9 @@
           <SchedulePoliciesCard {form} />
         </div>
 
-        <div class="w-full xl:col-start-2 xl:row-start-1">
+        <div
+          class="w-full xl:sticky xl:top-[calc(var(--top-nav-height)+1rem)] xl:col-start-2 xl:row-start-1 xl:self-start"
+        >
           <ScheduleSummarySidebar {form} />
         </div>
 
@@ -167,7 +171,7 @@
           </ul>
         </Alert>
         <div
-          class="flex flex-row items-center gap-4 max-sm:flex-col xl:col-start-1"
+          class="flex flex-row items-center gap-2 max-sm:flex-col xl:col-start-1"
         >
           <Button
             disabled={$submitting || !writeActionsAreAllowed()}

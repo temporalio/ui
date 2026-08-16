@@ -27,9 +27,9 @@
 </script>
 
 {#snippet defaultTitleSnippet()}
-  <h3 class="flex items-center gap-2 text-xs text-secondary">
+  <p class="flex items-center gap-2 text-xs text-secondary">
     {title}
-  </h3>
+  </p>
 {/snippet}
 
 <div class="flex w-full grow flex-col gap-2">

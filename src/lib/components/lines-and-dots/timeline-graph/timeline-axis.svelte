@@ -101,7 +101,7 @@
   .grid-line {
     position: absolute;
     width: 1px;
-    opacity: 0.3;
+    opacity: 0.14;
 
     /* Solid fill, not a dashed border or gradient: the timeline can be tens of
        thousands of px tall. A dashed border makes Chromium rasterize thousands
@@ -114,7 +114,9 @@
   .tick-label {
     position: absolute;
     font-size: 12px;
+    font-family: 'Noto Sans Mono', ui-monospace, monospace;
     line-height: 1;
+    color: rgb(var(--color-text-secondary));
     white-space: nowrap;
     transform: rotate(45deg);
     transform-origin: left center;

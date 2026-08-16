@@ -83,7 +83,7 @@
     result={$nexusOperationExecution.result ?? undefined}
     failure={$nexusOperationExecution.failure ?? undefined}
   />
-  <Card class="space-y-6">
+  <Card class="space-y-4">
     <h5>{translate('standalone-nexus-operations.operation-event-history')}</h5>
 
     <div class="space-y-4">

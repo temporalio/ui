@@ -42,7 +42,7 @@
   text={tooltip}
   right
   class="block"
-  tooltipClass="rounded-none text-white ml-4 group-data-[nav=open]:hidden"
+  tooltipClass="ml-3 group-data-[nav=open]:hidden"
 >
   <div
     role="button"
@@ -54,18 +54,30 @@
     data-track-intent="action"
     data-track-text={label}
     class={merge(
-      'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+      'navigation-button relative mb-1 flex min-h-8 items-center gap-0 whitespace-nowrap rounded-control px-1 text-[0.8125rem] text-secondary transition-colors hover:bg-interactive-secondary-hover hover:text-primary active:bg-interactive-secondary-active group-data-[nav=open]:gap-2 group-data-[nav=open]:px-2',
+      active &&
+        'bg-interactive-secondary-active font-medium text-primary before:absolute before:inset-y-1 before:-left-2 before:w-0.5 before:bg-interactive',
       disabled && 'pointer-events-none cursor-not-allowed opacity-50',
       className,
     )}
   >
     {#if icon}
-      <div class="flex h-6 w-6 items-center">
+      <div class="flex h-6 w-6 shrink-0 items-center justify-center">
         <Icon name={icon} {animate} {active} />
       </div>
     {/if}
-    <div class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100">
+    <div
+      class="min-w-0 truncate opacity-0 transition-opacity group-data-[nav=open]:opacity-100"
+    >
       {label}
     </div>
   </div>
 </Tooltip>
+
+<style lang="postcss">
+  @media (pointer: coarse) {
+    .navigation-button {
+      @apply min-h-target;
+    }
+  }
+</style>

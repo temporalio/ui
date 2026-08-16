@@ -229,8 +229,8 @@
       >
         <span
           class="h-1.5 w-1.5 rounded-full {autoRefresh
-            ? 'bg-green-600'
-            : 'bg-slate-300'}"
+            ? 'bg-status-success'
+            : 'bg-status-muted'}"
         ></span>
         {autoRefresh
           ? translate('workers.auto-refresh-on')
@@ -239,7 +239,7 @@
     </ToggleButtons>
     {#if refreshing}
       <p class="flex items-center gap-1">
-        <Icon name="spinner" class="animate-spin text-indigo-600" />
+        <Icon name="spinner" class="animate-spin text-information" />
         {translate('workers.pulling-latest-snapshot')}
       </p>
     {:else}
@@ -403,10 +403,10 @@
     aria-valuenow={value}
     aria-valuemin={0}
     aria-valuemax={maxValue}
-    class="relative h-2 w-full overflow-hidden rounded bg-indigo-100"
+    class="relative h-2 w-full overflow-hidden rounded bg-subtle"
   >
     <div
-      class="absolute left-0 h-full bg-indigo-600"
+      class="absolute left-0 h-full bg-brand"
       style="width:{maxValue > 0
         ? Math.min((value / maxValue) * 100, 100)
         : 0}%;"

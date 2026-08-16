@@ -1,28 +1,38 @@
 <!doctype html>
-<html lang="en">
+<html
+  lang="en"
+  data-theme="light"
+  data-density="compact"
+  data-visual-version="v2"
+  data-visual-default="%sveltekit.env.VITE_TEMPORAL_UI_VISUAL_VERSION%"
+>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <meta name="color-scheme" content="light dark" />
+    %sveltekit.head%
+    <!-- Keep this single-line script in sync with PREPAINT_CSP_HASH in svelte.config.js. -->
+    <!-- prettier-ignore -->
+    <script data-prepaint>(()=>{const root=document.documentElement;const read=(key)=>{try{return localStorage.getItem(key)}catch{return null}};const validVersion=(value)=>value==='legacy'||value==='v2';const query=new URLSearchParams(location.search).get('visual');const rawVersion=read('visual version');let storedVersion=rawVersion;try{storedVersion=JSON.parse(rawVersion??'null')}catch{}const configured=root.dataset.visualDefault;root.dataset.visualVersion=validVersion(query)?query:validVersion(storedVersion)?storedVersion:validVersion(configured)?configured:'v2';const rawTheme=read('dark mode');let preference='system';try{const parsed=JSON.parse(rawTheme??'null');if(parsed===true||parsed===false||parsed==='system')preference=parsed}catch{}const dark=preference===true||(preference==='system'&&(window.matchMedia?.('(prefers-color-scheme: dark)')?.matches??false));root.dataset.theme=dark?'dark':'light'})();</script>
     <style>
       html {
-        background-color: #f8fafc;
-        color: #141414;
+        background-color: #f5f7fa;
+        color: #171a22;
       }
       body {
         margin: 0;
-        background-color: #f8fafc;
-        color: #141414;
+        background-color: #f5f7fa;
+        color: #171a22;
       }
-      @media (prefers-color-scheme: dark) {
-        html,
-        body {
-          background-color: #141414;
-          color: #f8fafc;
-        }
+      html[data-theme='dark'],
+      html[data-theme='dark'] body {
+        background-color: #0c0f14;
+        color: #edf1f7;
       }
     </style>
-    %sveltekit.head%
   </head>
 
   <body>

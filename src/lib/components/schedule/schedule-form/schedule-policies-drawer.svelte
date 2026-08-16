@@ -115,15 +115,15 @@
   closeButtonLabel={translate('schedules.policies-drawer-close')}
   class="w-[35.5rem] max-w-full "
 >
-  <form use:enhance class="flex flex-col gap-4 p-4 pt-0">
-    <h2 class="text-3xl font-medium">
+  <form use:enhance class="flex flex-col gap-3 p-4 pt-0">
+    <h2 class="text-xl font-semibold">
       {translate('schedules.policies-title')}
     </h2>
 
-    <fieldset class="flex flex-col gap-4">
+    <fieldset class="flex flex-col gap-3">
       <legend class="contents">
         <hgroup>
-          <h3 class="text-2xl font-medium">
+          <h3 class="text-lg font-semibold">
             {translate('schedules.overlap-policy')}
           </h3>
           <p class="mt-1 text-secondary">
@@ -150,10 +150,10 @@
       </RadioGroup>
     </fieldset>
 
-    <fieldset class="flex flex-col gap-4">
+    <fieldset class="flex flex-col gap-3">
       <legend class="contents">
         <hgroup>
-          <h3 class="text-2xl font-medium">
+          <h3 class="text-lg font-semibold">
             {translate('schedules.on-start-behavior')}
           </h3>
           <p class="mt-1 text-secondary">
@@ -175,10 +175,10 @@
       </div>
     </fieldset>
 
-    <fieldset class="flex flex-col gap-4">
+    <fieldset class="flex flex-col gap-3">
       <legend class="contents">
         <hgroup>
-          <h3 class="text-2xl font-medium">
+          <h3 class="text-lg font-semibold">
             {translate('schedules.pause-on-failure')}
           </h3>
           <p class="mt-1 text-secondary">
@@ -200,10 +200,10 @@
       </RadioGroup>
     </fieldset>
 
-    <fieldset class="flex flex-col gap-4">
+    <fieldset class="flex flex-col gap-3">
       <legend class="contents">
         <hgroup>
-          <h3 class="text-2xl font-medium">
+          <h3 class="text-lg font-semibold">
             {translate('schedules.catchup-window-policy')}
           </h3>
           <p class="mt-1 text-secondary">
@@ -249,7 +249,7 @@
     </fieldset>
 
     <hgroup>
-      <h3 class="text-2xl font-medium">{translate('schedules.timeouts')}</h3>
+      <h3 class="text-lg font-semibold">{translate('schedules.timeouts')}</h3>
       <p class="mt-1 text-secondary">
         {translate('schedules.timeouts-description')}
       </p>
@@ -313,7 +313,7 @@
       />
     {/key}
 
-    <div class="ml-auto mt-2 flex gap-4">
+    <div class="ml-auto mt-2 flex gap-2">
       <Button variant="secondary" onclick={onCancel}
         >{translate('common.cancel')}</Button
       >

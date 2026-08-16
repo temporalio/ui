@@ -58,17 +58,15 @@
           {translate('standalone-activities.empty-state-description')}
         {/if}
       </p>
-      <NoQueryResults class="m-auto mt-8 text-subtle" />
+      <NoQueryResults class="m-auto mt-4 text-subtle" />
     </div>
   </div>
 {:else}
   <div
-    class="h-full w-full overflow-y-auto xl:flex xl:flex-row xl:overflow-hidden"
+    class="surface-primary h-full w-full overflow-y-auto rounded-panel border border-subtle xl:flex xl:flex-row xl:overflow-hidden"
     aria-live="polite"
   >
-    <div
-      class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
-    >
+    <div class="surface-primary flex min-w-0 flex-1 flex-col gap-3 p-4 sm:p-5">
       {#if $activityError}
         <h2>
           {translate('standalone-activities.empty-state-title')}
@@ -113,11 +111,13 @@
         {/each}
       {/if}
     </div>
-    <div class="flex h-full flex-col max-xl:hidden">
-      <div class="bg-off-white dark:bg-[#0f1725]">
-        <img src={noResultsImages} alt="" class="w-full" />
+    <div
+      class="surface-secondary flex h-full w-[38%] flex-col border-l border-subtle max-xl:hidden"
+    >
+      <div>
+        <img src={noResultsImages} alt="" class="w-full opacity-70 grayscale" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-subtle"></div>
     </div>
   </div>
 {/if}

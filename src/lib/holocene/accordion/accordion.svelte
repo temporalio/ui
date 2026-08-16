@@ -54,7 +54,10 @@
 {#if expandable}
   <div
     data-track-container={title}
-    class={merge('surface-primary w-full border border-subtle', className)}
+    class={merge(
+      'surface-primary w-full overflow-hidden rounded-panel border border-subtle',
+      className,
+    )}
     {...rest}
   >
     <div class="flex w-full flex-row items-center">
@@ -62,7 +65,7 @@
         id="{id}-trigger"
         aria-expanded={open}
         aria-controls="{id}-content"
-        class="flex grow flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+        class="flex min-h-[var(--row-height)] grow flex-col justify-center px-3 py-2 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
         type="button"
         data-track-name="accordion"
         data-track-intent="toggle"
@@ -99,7 +102,7 @@
     <div
       id="{id}-content"
       aria-labelledby="{id}-trigger"
-      class="mt-4 block w-full p-4"
+      class="block w-full border-t border-subtle p-3"
       class:hidden={!open}
     >
       {@render children?.(open)}
@@ -107,7 +110,7 @@
   </div>
 {:else}
   <div
-    class="surface-primary w-full border border-subtle p-4"
+    class="surface-primary w-full rounded-panel border border-subtle p-3"
     data-track-container={title}
     {...rest}
   >
@@ -137,7 +140,10 @@
       </p>
     </div>
 
-    <div class="mt-6 block w-full" class:hidden={!open}>
+    <div
+      class="mt-3 block w-full border-t border-subtle pt-3"
+      class:hidden={!open}
+    >
       {@render children?.(open)}
     </div>
   </div>

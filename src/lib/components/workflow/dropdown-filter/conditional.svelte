@@ -6,14 +6,22 @@
   let { conditional = $bindable('=') }: Props = $props();
 </script>
 
-<div class="mt-2 transition-all hover:cursor-pointer">
-  <button class="flex items-center" onclick={() => (conditional = '=')}>
-    <div class="ml-4 mr-2 p-1 text-primary" class:active={conditional === '='}>
+<div
+  class="surface-subtle mt-2 inline-flex gap-1 rounded-panel border border-subtle p-1"
+>
+  <button
+    class="flex min-h-[var(--control-height-sm)] items-center rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+    onclick={() => (conditional = '=')}
+  >
+    <div class="px-2 py-1 text-primary" class:active={conditional === '='}>
       Is
     </div>
   </button>
-  <button class="flex items-center" onclick={() => (conditional = '!=')}>
-    <div class="ml-4 mr-2 p-1 text-primary" class:active={conditional === '!='}>
+  <button
+    class="flex min-h-[var(--control-height-sm)] items-center rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+    onclick={() => (conditional = '!=')}
+  >
+    <div class="px-2 py-1 text-primary" class:active={conditional === '!='}>
       Is Not
     </div>
   </button>
@@ -21,6 +29,6 @@
 
 <style lang="postcss">
   .active {
-    @apply bg-black text-white;
+    @apply surface-primary rounded-control border border-subtle font-medium shadow-raised;
   }
 </style>

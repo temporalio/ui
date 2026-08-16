@@ -139,11 +139,11 @@
 
 <style lang="postcss">
   .range-input-container {
-    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap text-primary;
+    @apply inline-flex w-full flex-row items-center gap-2 whitespace-nowrap text-primary;
   }
 
   .numeric-input {
-    @apply h-10 w-10 border border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply h-control w-12 rounded-control border border-primary bg-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary;
 
     appearance: textfield;
   }
@@ -155,11 +155,11 @@
   }
 
   .numeric-input.invalid {
-    @apply border-danger bg-red-100 text-danger;
+    @apply border-danger bg-danger text-danger;
   }
 
   .numeric-input:focus {
-    @apply outline ring-2 ring-primary/70;
+    @apply outline ring-2 ring-primary;
   }
 
   .floating-value {
@@ -171,7 +171,7 @@
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply h-4 w-8 rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
+    @apply h-4 w-8 rounded-full border border-solid border-primary bg-information shadow-none;
   }
 
   input[type='range']:focus {
@@ -179,10 +179,10 @@
   }
 
   input[type='range']:focus::-webkit-slider-thumb {
-    @apply border border-primary ring-2 ring-primary/70;
+    @apply border border-primary ring-2 ring-primary;
   }
 
   input[type='range']:focus::-moz-range-thumb {
-    @apply border border-primary ring-2 ring-primary/70;
+    @apply border border-primary ring-2 ring-primary;
   }
 </style>

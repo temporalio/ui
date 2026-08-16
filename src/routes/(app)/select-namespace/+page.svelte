@@ -42,11 +42,11 @@
   title={translate('namespaces.namespace-select-header')}
   url={page.url.href}
 />
-<div class="w-full p-8 xl:w-1/2">
-  <h1 class="my-4">
+<div class="w-full max-w-2xl py-4">
+  <h1 class="mb-1">
     {translate('namespaces.select-namespace-welcome')}
   </h1>
-  <p class="mb-8">{translate('namespaces.select-namespace')}</p>
+  <p class="mb-4 text-secondary">{translate('namespaces.select-namespace')}</p>
   <NamespacePicker
     {namespaceList}
     namespace=""

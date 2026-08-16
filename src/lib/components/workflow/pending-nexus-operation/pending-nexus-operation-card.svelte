@@ -26,8 +26,8 @@
     </div>
   </div>
 
-  <div class="flex flex-1 flex-col gap-4 xl:flex-row">
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+  <div class="grid min-w-0 flex-1 grid-cols-1 gap-3 xl:grid-cols-2">
+    <div class="flex min-w-0 flex-col gap-1.5">
       {#if operation.endpoint}
         {@render detail(translate('nexus.endpoint'), operation.endpoint)}
       {/if}
@@ -90,13 +90,13 @@
         )}
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
+    <div class="flex min-w-0 flex-col gap-3">
       {#if failed}
         {@render failures()}
       {/if}
       {#if operation.blockedReason}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="text-xs font-medium leading-5 text-secondary">
             {translate('nexus.blocked-reason')}
           </p>
           <CodeBlock
@@ -110,7 +110,7 @@
       {/if}
       {#if Object.keys(operation.cancellationInfo ?? {}).length > 0}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="text-xs font-medium leading-5 text-secondary">
             {translate('nexus.cancellation-info')}
           </p>
           <CodeBlock
@@ -127,11 +127,15 @@
 </div>
 
 {#snippet nextRetry(timeDifference: string)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)] sm:gap-3"
+  >
+    <p class="text-xs font-medium leading-5 text-secondary">
       {translate('workflows.next-retry')}
     </p>
-    <p class="flex w-full items-center gap-1 whitespace-pre-line">
+    <p
+      class="flex min-w-0 items-center gap-1 whitespace-pre-line text-sm leading-5"
+    >
       {$timestamp(operation.nextAttemptScheduleTime, { relativeLabel: '' })}
       <strong>({timeDifference})</strong>
     </p>
@@ -139,11 +143,13 @@
 {/snippet}
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)] sm:gap-3"
+  >
+    <p class="text-xs font-medium leading-5 text-secondary">
       {label}
     </p>
-    <p class="w-full whitespace-pre-line">
+    <p class="min-w-0 whitespace-pre-line break-words text-sm leading-5">
       {#if typeof value === 'string' || typeof value === 'number'}
         {value}
       {:else}
@@ -155,7 +161,7 @@
 
 {#snippet attempts()}
   <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
-    <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
+    <Icon class="mr-1 {failed && 'font-bold text-danger'}" name="retry" />
     {operation.attempt ?? 0}
   </Badge>
 {/snippet}
@@ -164,7 +170,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if operation.lastAttemptFailure}
-        <p class="text-sm text-secondary/80">
+        <p class="text-xs font-medium leading-5 text-secondary">
           {translate('workflows.last-failure')}
         </p>
         <CodeBlock
@@ -180,7 +186,7 @@
     </div>
     <div class="flex flex-1 flex-col">
       {#if operation.lastAttemptFailure?.stackTrace}
-        <p class="text-sm text-secondary/80">
+        <p class="text-xs font-medium leading-5 text-secondary">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock

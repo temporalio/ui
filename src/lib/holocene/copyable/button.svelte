@@ -26,7 +26,7 @@
 
 <button
   class={merge(
-    'surface-interactive-secondary h-6 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    'copyable-button surface-interactive-secondary h-6 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
     className,
   )}
   data-track-name="copyable-button"
@@ -39,3 +39,12 @@
     name={copied ? 'checkmark' : 'copy'}
   />
 </button>
+
+<style>
+  @media (pointer: coarse) {
+    .copyable-button {
+      min-width: var(--target-size);
+      min-height: var(--target-size);
+    }
+  }
+</style>

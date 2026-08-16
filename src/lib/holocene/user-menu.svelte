@@ -37,16 +37,16 @@
       <img
         src={$authUser?.picture}
         alt={$authUser?.profile ?? translate('common.user-profile')}
-        class="h-[24px] w-[24px] cursor-pointer"
+        class="h-6 w-6 cursor-pointer rounded-control object-cover"
         onerror={fixImage}
         class:hidden={!showProfilePic}
       />
       <div
-        class="aspect-square h-full w-[24px] bg-blue-200 p-0.5"
+        class="aspect-square h-6 w-6 rounded-control bg-information p-0.5"
         class:hidden={showProfilePic}
       >
         {#if $authUser?.name}
-          <div class="text-center text-sm text-black">
+          <div class="text-center text-xs font-semibold text-primary">
             {$authUser?.name.trim().charAt(0)}
           </div>
         {/if}
@@ -55,20 +55,20 @@
       <img
         src={ziggy}
         alt={translate('common.user-profile')}
-        class="h-[24px] w-[24px]"
+        class="h-6 w-6 rounded-control object-cover"
       />
     {/if}
   </MenuButton>
   <Menu id="user-menu" position="right" class="w-60">
     {#if $authUser.accessToken}
       <MenuItem hoverable={false}>
-        <div class="flex items-center justify-start gap-4">
+        <div class="flex min-w-0 items-center justify-start gap-2">
           <Icon name="astronaut" />
-          <p>{$authUser?.email}</p>
+          <p class="truncate">{$authUser?.email}</p>
         </div>
       </MenuItem>
       <MenuItem onclick={logout}>
-        <div class="flex items-center justify-start gap-4">
+        <div class="flex items-center justify-start gap-2">
           <Icon name="logout" />
           {translate('common.log-out')}
         </div>

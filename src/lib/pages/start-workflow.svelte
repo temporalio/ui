@@ -247,7 +247,7 @@
   });
 </script>
 
-<div class="flex w-full flex-col gap-4 pb-20">
+<div class="flex w-full flex-col gap-3 pb-4">
   <Link
     href={`${routeForWorkflows({
       namespace,
@@ -257,12 +257,10 @@
   >
     {translate('workflows.back-to-workflows')}
   </Link>
-  <h1 class="mb-4 overflow-hidden" data-testid="start-workflow">
-    Start Workflow
-  </h1>
-  <Card class="flex w-full flex-col gap-4 xl:w-3/4 2xl:w-1/2">
+  <h1 class="overflow-hidden" data-testid="start-workflow">Start Workflow</h1>
+  <Card class="flex w-full max-w-4xl flex-col gap-3">
     <div
-      class="flex w-full flex-col justify-between gap-2 sm:items-center md:flex-row md:gap-4"
+      class="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-end"
     >
       <Input
         id="workflowId"
@@ -273,7 +271,7 @@
         onblur={(e) => onInputChange(e, 'workflowId')}
       />
       <RandomUuidButton
-        class="mt-0 md:mt-6"
+        class="shrink-0"
         bind:value={workflowId}
         onGenerate={syncWorkflowId}
       />
@@ -316,9 +314,13 @@
     />
     <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
     {#if viewAdvancedOptions}
-      <Card class="flex flex-col gap-2">
+      <Card
+        class="flex flex-col gap-2 rounded-none border-0 border-t border-subtle px-0 py-3"
+      >
         <div>
-          <h3>{translate('search-attributes.custom-search-attributes')}</h3>
+          <h3 class="text-base font-semibold">
+            {translate('search-attributes.custom-search-attributes')}
+          </h3>
           <p class="text-xs text-secondary">
             Indexed fields used in a List Filter to filter a list of Workflow
             Executions.
@@ -330,12 +332,14 @@
           variant="secondary"
         />
       </Card>
-      <Card class="flex flex-col gap-2">
+      <Card
+        class="flex flex-col gap-2 rounded-none border-0 border-t border-subtle px-0 py-3"
+      >
         <div>
           <Label
             for="workflow-start-delay"
             label={translate('workflows.workflow-start-delay')}
-            class="text-xl"
+            class="text-base font-semibold"
           />
           <p class="text-xs text-secondary">
             Time to wait before dispatching the first workflow task.
@@ -353,10 +357,14 @@
           class="max-w-80"
         />
       </Card>
-      <Card class="flex flex-col gap-2">
+      <Card
+        class="flex flex-col gap-2 rounded-none border-0 border-t border-subtle px-0 py-3"
+      >
         <div class="flex flex-wrap justify-between">
           <div>
-            <h3>{translate('workflows.user-metadata')}</h3>
+            <h3 class="text-base font-semibold">
+              {translate('workflows.user-metadata')}
+            </h3>
             <p class="text-xs text-secondary">
               Add context to Workflow Execution to help identity and understand
               its operations.
@@ -380,7 +388,7 @@
       </Card>
     {/if}
     <div
-      class="mt-4 flex w-full flex-row justify-between gap-4 max-sm:flex-col"
+      class="mt-2 flex w-full flex-row justify-between gap-2 max-sm:flex-col"
     >
       <Button
         variant="ghost"

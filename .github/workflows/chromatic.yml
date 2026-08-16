@@ -27,7 +27,7 @@ jobs:
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           autoAcceptChanges: 'main'
-          exitZeroOnChanges: true
-          exitOnceUploaded: true
-          onlyChanged: true
+          exitZeroOnChanges: false
+          exitOnceUploaded: false
+          onlyChanged: false
           skip: 'dependabot/**'

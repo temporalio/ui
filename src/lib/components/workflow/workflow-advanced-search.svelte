@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
   import { fade, fly } from 'svelte/transition';
 
   import { page } from '$app/state';
@@ -16,6 +17,7 @@
 
   const query = $derived(page.url.searchParams.get('query'));
   let manualSearchString = $derived(query ?? '');
+  const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)');
 
   const onSearch = () => {
     if (!manualSearchString) {
@@ -50,14 +52,17 @@
   }
 </script>
 
-<div class="w-full" in:fade>
+<div class="w-full" in:fade={{ duration: reducedMotion.current ? 0 : 140 }}>
   <form
     onsubmit={(e) => {
       e.preventDefault();
       onSearch();
     }}
     class="flex gap-0"
-    in:fly={{ x: -100, duration: 150 }}
+    in:fly={{
+      x: reducedMotion.current ? 0 : -16,
+      duration: reducedMotion.current ? 0 : 140,
+    }}
     role="search"
   >
     <Input

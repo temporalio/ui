@@ -25,6 +25,19 @@ const BroadcastChannelMock = vi.fn(() => ({
 
 vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
 
+const matchMediaMock = vi.fn((query: string) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  dispatchEvent: vi.fn(() => false),
+}));
+
+vi.stubGlobal('matchMedia', matchMediaMock);
+
 const cryptoMock = {
   randomUUID: () => 'test-uuid-' + Math.random().toString(36).substring(2, 9),
 };

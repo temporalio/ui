@@ -291,8 +291,8 @@
 {#snippet tab(title: string)}
   <button
     class={twMerge(
-      'h-full border-b-2 border-transparent py-2',
-      title === activeTab ? 'border-brand' : '',
+      'h-control-sm border-b-2 border-transparent px-1 text-xs font-medium text-secondary transition-colors duration-fast ease-standard',
+      title === activeTab ? 'border-brand text-primary' : 'hover:text-primary',
     )}
     onclick={() => (activeTab = title)}
   >
@@ -301,24 +301,27 @@
 {/snippet}
 
 <div
-  class={twMerge('min-w-[80px] grow', hasHeader && ['border border-subtle'])}
+  class={twMerge(
+    'min-w-[80px] grow overflow-hidden rounded-panel',
+    hasHeader && ['border border-subtle'],
+  )}
 >
   {#if tabs && tabs.length > 0}
     <div
-      class="flex flex-row items-center justify-between border-b border-subtle bg-code-block px-3"
+      class="flex min-h-control-sm flex-row items-center justify-between border-b border-subtle bg-code-block px-2"
     >
-      <div class="flex flex-row items-center gap-4">
+      <div class="flex flex-row items-center gap-3">
         {#each tabs as title (title)}
           {@render tab(title)}
         {/each}
       </div>
-      <div class="flex flex-row items-center gap-4">
+      <div class="flex flex-row items-center gap-2">
         {@render headerActions?.()}
         {#if copyable}
           <CopyButton
             {copyIconTitle}
             {copySuccessIconTitle}
-            class="m-0 rounded-full text-secondary"
+            class="m-0 rounded-control text-secondary"
             onclick={handleCopy}
             copied={!!$copied}
           />
@@ -333,9 +336,10 @@
       identical, minimising ResizeObserver churn when the real editor swaps in.
     -->
     <pre
-      class="overflow-auto border border-subtle bg-code-block p-2 text-primary"
-      style:font-family="Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace"
-      style:font-size="0.875em"
+      class={merge(
+        'overflow-auto rounded-panel border border-subtle bg-code-block p-2.5 font-mono text-xs leading-5 text-primary',
+        hasHeader && 'rounded-none border-0',
+      )}
       style:max-height={maxHeight ? `${maxHeight}px` : undefined}
       style:white-space="pre-wrap"
       style:word-break="break-all">{format(content, language, inline)}</pre>
@@ -358,7 +362,7 @@
           <CopyButton
             {copyIconTitle}
             {copySuccessIconTitle}
-            class="m-0 rounded-full text-secondary"
+            class="m-0 rounded-control text-secondary"
             onclick={handleCopy}
             copied={$copied}
           />

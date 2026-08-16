@@ -24,7 +24,9 @@
     <NavSection navItems={section} />
     {#if isNotLastItem(section, i)}
       <hr
-        class="border-black border-opacity-25 group-data-[nav=closed]:hidden"
+        aria-hidden="true"
+        role="presentation"
+        class="my-1 border-subtle group-data-[nav=closed]:hidden"
       />
     {/if}
   {/each}

@@ -116,7 +116,7 @@
     <div
       class={merge(
         'input-container',
-        'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        'surface-primary relative box-border inline-flex h-control w-full items-center rounded-control border border-primary text-sm transition-colors duration-fast ease-standard focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary hover:border-interactive',
         inputContainerClass,
       )}
       class:disabled={isDisabled}
@@ -235,7 +235,7 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-danger focus-within:ring-danger/70;
+      @apply border-danger focus-within:ring-danger;
 
       > .input {
         @apply caret-danger;
@@ -248,15 +248,15 @@
   }
 
   .input {
-    @apply m-2 h-full w-full bg-transparent focus:text-brand focus:outline-none;
+    @apply h-full w-full min-w-0 bg-transparent px-3 focus:outline-none;
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
+    @apply flex h-full w-fit items-center border-r border-subtle px-3 text-secondary;
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
+    @apply flex h-full w-fit items-center rounded-r-control border-l border-subtle bg-subtle px-3;
   }
 
   .noBorder {
@@ -264,11 +264,15 @@
   }
 
   .icon-container {
-    @apply ml-2 flex items-center justify-center;
+    @apply ml-2.5 flex items-center justify-center text-secondary;
   }
 
   .copy-icon-container {
     @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
+
+    > button {
+      @apply flex h-full w-full items-center justify-center;
+    }
   }
 
   .disabled-icon-container {
@@ -290,5 +294,11 @@
 
   input[type='search']::-webkit-search-cancel-button {
     @apply hidden;
+  }
+
+  @media (pointer: coarse) {
+    .copy-icon-container {
+      width: var(--target-size);
+    }
   }
 </style>

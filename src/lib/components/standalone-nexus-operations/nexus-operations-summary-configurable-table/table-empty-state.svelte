@@ -57,17 +57,15 @@
           {translate('standalone-nexus-operations.empty-state-description')}
         {/if}
       </p>
-      <NoQueryResults class="m-auto mt-8 text-subtle" />
+      <NoQueryResults class="m-auto mt-4 text-subtle" />
     </div>
   </div>
 {:else}
   <div
-    class="h-full w-full overflow-hidden xl:flex xl:flex-row"
+    class="surface-primary h-full w-full overflow-hidden rounded-panel border border-subtle xl:flex xl:flex-row"
     aria-live="polite"
   >
-    <div
-      class="surface-primary flex w-auto min-w-[280px] flex-col gap-6 p-8 xl:min-w-[520px] xl:flex-1"
-    >
+    <div class="surface-primary flex min-w-0 flex-1 flex-col gap-3 p-4 sm:p-5">
       <h2>
         {translate('standalone-nexus-operations.empty-state-no-data-title')}
       </h2>
@@ -128,11 +126,13 @@
         </div>
       {/if}
     </div>
-    <div class="flex h-full flex-col">
-      <div class="bg-off-white dark:bg-[#0f1725]">
-        <img src={noResultsImages} alt="" class="w-full" />
+    <div
+      class="surface-secondary hidden h-full w-[38%] flex-col border-l border-subtle xl:flex"
+    >
+      <div>
+        <img src={noResultsImages} alt="" class="w-full opacity-70 grayscale" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-subtle"></div>
     </div>
   </div>
 {/if}

@@ -353,7 +353,7 @@
     >
   </MenuButton>
 
-  <Menu id={controlsId} class="max-h-fit w-64 p-4 lg:max-w-fit">
+  <Menu id={controlsId} class="max-h-fit w-64 p-4 lg:max-w-fit" usePortal>
     <form onsubmit={applyChanges}>
       <div class="space-y-4">
         <div class="flex items-center justify-between">

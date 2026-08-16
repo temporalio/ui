@@ -5,6 +5,10 @@
 
   import { iconNames } from '$lib/holocene/icon';
 
+  import {
+    redesignForcedColorsParameters,
+    redesignVisualParameters,
+  } from '../../../../.storybook/visual-modes';
   import Button from '../button.svelte';
 
   import Input from './input.svelte';
@@ -81,13 +85,16 @@
   <Input {...args} id={context.id} data-testid={context.id} />
 {/snippet}
 
-<Story name="Empty" />
+<Story name="Empty" parameters={redesignVisualParameters} />
 
 <Story name="Disabled" args={{ disabled: true }} />
 
 <Story name="Required" args={{ required: true }} />
 
-<Story name="Error" args={{ error: true }} />
+<Story
+  name="Error"
+  args={{ error: true, hintText: 'Enter a valid workflow identifier.' }}
+/>
 
 <Story name="Invalid" args={{ valid: false }} />
 
@@ -98,6 +105,44 @@
 <Story name="With Prefix" args={{ prefix: 'prefix' }} />
 
 <Story name="With Hint Text" args={{ hintText: 'Hint Text' }} />
+
+<Story
+  name="Long Label"
+  args={{
+    label: 'Workflow identifier used to reconcile delayed customer orders',
+    value: 'customer-order-reconciliation-2026-08-15',
+  }}
+/>
+
+<Story
+  name="Interaction States"
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const keyboardInput = canvas.getByLabelText('Keyboard focus');
+    const hoverInput = canvas.getByLabelText('Pointer hover');
+
+    await userEvent.tab();
+    expect(keyboardInput).toHaveFocus();
+    await userEvent.hover(hoverInput);
+  }}
+>
+  {#snippet template(args, context)}
+    <div class="grid max-w-xl gap-3">
+      <Input
+        {...args}
+        id={`${context.id}-keyboard`}
+        label="Keyboard focus"
+        placeholder="Type a workflow identifier"
+      />
+      <Input
+        {...args}
+        id={`${context.id}-hover`}
+        label="Pointer hover"
+        placeholder="Hover this field"
+      />
+    </div>
+  {/snippet}
+</Story>
 
 <Story
   name="Max Length"
@@ -150,5 +195,32 @@
         <Button type="button">After</Button>
       {/snippet}
     </Input>
+  {/snippet}
+</Story>
+
+<Story name="Forced Colors" parameters={redesignForcedColorsParameters}>
+  {#snippet template(args, context)}
+    <div class="grid max-w-xl gap-3">
+      <Input
+        {...args}
+        id={`${context.id}-default`}
+        label="Workflow identifier"
+        value="customer-order-reconciliation"
+      />
+      <Input
+        {...args}
+        id={`${context.id}-error`}
+        label="Invalid workflow identifier"
+        error={true}
+        hintText="Enter a valid workflow identifier."
+      />
+      <Input
+        {...args}
+        id={`${context.id}-disabled`}
+        label="Unavailable workflow identifier"
+        disabled={true}
+        value="archived-workflow"
+      />
+    </div>
   {/snippet}
 </Story>

@@ -30,7 +30,7 @@
 >
   <DrawerContent title={translate('common.keyboard-shortcuts')}>
     <div
-      class="grid grid-cols-1 gap-8 text-slate-500 md:grid-cols-2 xl:grid-cols-4 dark:text-slate-400"
+      class="grid grid-cols-1 gap-4 text-secondary md:grid-cols-2 xl:grid-cols-4"
     >
       <div class="cell">
         {translate('common.next-page')}
@@ -78,7 +78,7 @@
   }
 
   .cell {
-    @apply flex items-center justify-center gap-8 text-white;
+    @apply flex items-center justify-center gap-3 text-primary;
   }
 
   .shortcut {

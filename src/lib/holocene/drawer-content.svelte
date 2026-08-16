@@ -35,13 +35,13 @@
   </div>
 {/if}
 
-<div class={twMerge('content', position, !hasHeader && 'pt-6', className)}>
+<div class={twMerge('content', position, !hasHeader && 'pt-4', className)}>
   {@render children?.()}
 </div>
 
 <style lang="postcss">
   .title-wrapper {
-    @apply flex flex-col justify-center gap-2 p-6;
+    @apply flex flex-col justify-center gap-1 border-b border-subtle px-4 py-3;
 
     &.bottom {
       @apply items-start;
@@ -53,6 +53,6 @@
   }
 
   .content {
-    @apply whitespace-normal px-6 pb-6;
+    @apply whitespace-normal px-4 pb-4 pt-3;
   }
 </style>

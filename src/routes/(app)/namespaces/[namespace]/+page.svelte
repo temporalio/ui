@@ -71,9 +71,13 @@
 <h1 data-testid="namespace-title">
   {translate('namespaces.namespace')}: {namespace?.namespaceInfo?.name}
 </h1>
-<h2 data-testid="namespace-description">
-  {namespace?.namespaceInfo?.description || ''}
-</h2>
+{#if namespace?.namespaceInfo?.description}
+  <h2 data-testid="namespace-description">
+    {namespace.namespaceInfo.description}
+  </h2>
+{:else}
+  <h2 class="sr-only">{translate('common.details')}</h2>
+{/if}
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
     <Table>

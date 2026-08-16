@@ -12,17 +12,14 @@
 >
   <div
     aria-hidden="true"
-    class={twMerge(
-      'w-[45dvw] min-w-fit max-w-[500px] scale-[.30] antialiased',
-      className,
-    )}
+    class={twMerge('h-10 w-10 shrink-0 antialiased', className)}
   >
     <svg
       width="400"
       height="400"
       viewBox="0 0 400 400"
       xmlns="http://www.w3.org/2000/svg"
-      class="animate-infinite"
+      class="animate-infinite h-full w-full"
       id="loading-anim"
       shape-rendering="geometricPrecision"
     >
@@ -64,7 +61,7 @@
 
       /* Drop Shadow  */
       --ellipse-shadow: rgb(var(--color-text-primary) / 15%);
-      --ellipse-drop-shadow: drop-shadow(0 4px 12px var(--ellipse-shadow));
+      --ellipse-drop-shadow: drop-shadow(0 1px 3px var(--ellipse-shadow));
       --stroke-color: rgb(var(--color-text-primary));
     }
 
@@ -277,6 +274,16 @@
       66.67%,
       100% {
         transform: rotate(0deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-infinite .vertical-ellipse,
+      .animate-infinite .horizontal-ellipse {
+        animation: none;
+        filter: none;
+        stroke-dasharray: 420 430;
+        stroke-dashoffset: 0;
       }
     }
   </style>

@@ -52,7 +52,7 @@
 
 {#if open}
   <div
-    class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8"
+    class="flex h-full flex-col justify-start gap-4 overflow-auto px-4 py-4"
     data-theme="dark"
   >
     <div class="flex items-center justify-between">

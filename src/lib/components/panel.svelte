@@ -20,7 +20,7 @@
 <svelte:element
   this={as}
   class={twMerge(
-    'surface-primary border p-8 dark:border-subtle',
+    'surface-primary rounded-panel border border-subtle p-[var(--panel-inset)]',
     className,
     error && 'border-danger bg-danger',
   )}

@@ -33,8 +33,8 @@
   const scheduleId = $derived(workflowRelationships.scheduleId);
 </script>
 
-<div class="flex flex-col gap-4 px-4 py-4 xl:px-8">
-  <div class="flex w-full flex-wrap gap-4">
+<div class="flex flex-col gap-3 py-3">
+  <div class="flex w-full flex-wrap gap-3">
     {#if scheduleId}
       <SchedulerTable {scheduleId} {namespace} />
     {/if}

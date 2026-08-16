@@ -20,14 +20,14 @@
 
   const workerStatus = cva(
     [
-      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap text-black gap-1 font-medium',
+      'flex h-5 items-center gap-1 whitespace-nowrap rounded-control border border-l-2 px-1.5 py-0.5 font-medium transition-colors duration-fast ease-standard',
     ],
     {
       variants: {
         status: {
-          Unspecified: 'bg-slate-100',
-          Running: 'bg-blue-300',
-          ShuttingDown: 'bg-yellow-200',
+          Unspecified: 'border-subtle bg-subtle text-secondary',
+          Running: 'border-information bg-information text-information',
+          ShuttingDown: 'border-warning bg-warning text-warning',
         },
       },
     },

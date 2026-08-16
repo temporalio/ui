@@ -174,13 +174,13 @@
 -->
 <div>
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[11] flex flex-nowrap items-center gap-4 overflow-x-auto border-b border-subtle py-1 md:top-[var(--top-nav-height)]"
   >
-    <div class="flex items-center gap-2">
+    <div class="flex shrink-0 items-center gap-2">
       <h2>{translate('workflows.timeline-tab')}</h2>
       <EventHistoryLegend />
     </div>
-    <div class="flex items-center gap-2">
+    <div class="ml-auto flex shrink-0 items-center gap-2">
       <ToggleButtons>
         <ToggleButton
           leadingIcon={reverseSort ? 'descending' : 'ascending'}
@@ -210,9 +210,10 @@
           onclick={onAutoRefreshToggle}
         >
           <span
-            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
+            class="h-1.5 w-1.5 rounded-full border {$pauseLiveUpdates ||
+            isNotPending
+              ? 'border-subtle bg-subtle'
+              : 'border-success bg-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')

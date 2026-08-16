@@ -164,7 +164,7 @@
   onkeydown={handleKeydown}
 />
 
-<div class="pagination relative mb-8 flex flex-col gap-4">
+<div class="pagination relative mb-4 flex flex-col gap-3">
   <div
     class="flex flex-col items-center justify-between gap-2 md:flex-row md:items-start"
   >
@@ -174,11 +174,11 @@
     <nav
       style={floatStyle}
       bind:clientHeight={height}
-      class="flex min-w-fit flex-col items-end gap-4 md:flex-row"
+      class="flex min-w-fit flex-col items-end gap-2 md:flex-row"
       aria-label="{rest['aria-label']} 1"
     >
       {@render actionTopCenter?.()}
-      <div class="flex gap-4">
+      <div class="flex gap-2">
         {#if !itemsPerPage}
           <FilterSelect
             label={pageSizeSelectLabel}
@@ -191,7 +191,9 @@
         {#if paginationTop}
           {@render paginationTop()}
         {:else}
-          <div class="flex items-center justify-center gap-3">
+          <div
+            class="flex items-center justify-center gap-2 text-xs text-secondary"
+          >
             <button
               class="caret"
               disabled={!$store.hasPrevious}
@@ -240,7 +242,7 @@
     aria-label="{rest['aria-label']} 2"
   >
     {@render actionBottomLeft?.()}
-    <div class="flex gap-4">
+    <div class="flex gap-2">
       {#if !itemsPerPage}
         <FilterSelect
           label={pageSizeSelectLabel}
@@ -250,7 +252,9 @@
           position="bottom"
         />
       {/if}
-      <div class="flex items-center justify-center gap-3">
+      <div
+        class="flex items-center justify-center gap-2 text-xs text-secondary"
+      >
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -289,10 +293,10 @@
 
 <style lang="postcss">
   .caret {
-    @apply inline-flex items-center justify-center;
+    @apply inline-flex h-control-xs items-center justify-center rounded-control border border-transparent transition-colors duration-fast hover:bg-interactive-secondary-hover focus-visible:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary;
 
-    width: 24px;
-    height: 24px;
+    width: var(--control-height-xs);
+    height: var(--control-height-xs);
   }
 
   .caret:disabled {
@@ -303,17 +307,16 @@
     @apply h-0 w-0;
 
     border-style: solid;
-    border-width: 6px 12px 6px 0;
   }
 
   .arrow-left {
-    border-width: 6px 12px 6px 0;
+    border-width: 4px 7px 4px 0;
 
     @apply border-b-transparent border-l-transparent border-r-primary border-t-transparent;
   }
 
   .arrow-right {
-    border-width: 6px 0 6px 12px;
+    border-width: 4px 0 4px 7px;
 
     @apply border-b-transparent border-l-primary border-r-transparent border-t-transparent;
   }

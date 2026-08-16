@@ -49,9 +49,11 @@
   };
 </script>
 
-<Card class="w-full">
-  <h2 class="text-2xl font-medium">{translate('schedules.details-title')}</h2>
-  <div class="mt-4 flex flex-col gap-4">
+<Card
+  class="w-full rounded-none border-0 border-b border-subtle px-0 py-4 last:border-b-0"
+>
+  <h2 class="text-lg font-semibold">{translate('schedules.details-title')}</h2>
+  <div class="mt-3 flex flex-col gap-3">
     <Input
       id="name"
       bind:value={$form.name}
@@ -181,7 +183,7 @@
     </RadioGroup>
 
     <div
-      class="grid grid-cols-[minmax(100%,27rem)] gap-4 md:grid-cols-[minmax(14rem,4fr)_minmax(14rem,3fr)]"
+      class="grid grid-cols-[minmax(100%,27rem)] gap-3 md:grid-cols-[minmax(14rem,4fr)_minmax(14rem,3fr)]"
     >
       <Combobox
         id="timezoneName"

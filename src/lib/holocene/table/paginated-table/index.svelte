@@ -64,18 +64,18 @@
 
 <div
   class={merge(
-    'surface-primary min-h-[154px] grow overflow-auto border border-subtle',
+    'surface-primary min-h-[154px] grow overflow-auto rounded-panel border border-subtle',
     className,
   )}
   id="{rest['id']}-container"
   bind:this={tableContainer}
   style="max-height: {maxHeight ||
     contextMaxHeight ||
-    `calc(100vh - ${tableOffset}px)`};
-  scroll-padding-top: var(--table-header-h, 2.25rem);
+    `calc(100dvh - ${tableOffset}px)`};
+  scroll-padding-top: var(--table-header-h, 2rem);
   scroll-padding-bottom: {footerHeight}px;
 
-  --table-header-h: 2.25rem;"
+  --table-header-h: 2rem;"
 >
   {#if loading}
     {#if loadingContent}
@@ -96,7 +96,7 @@
     </Table>
     {#if visibleItems.length}
       <div
-        class="surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2"
+        class="surface-primary sticky bottom-0 left-0 flex min-h-control w-full grow items-center justify-between gap-2 border-t border-subtle px-3 py-1.5"
         bind:clientHeight={footerHeight}
       >
         {@render actionsStart?.()}

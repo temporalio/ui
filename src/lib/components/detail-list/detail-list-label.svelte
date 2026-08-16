@@ -13,7 +13,12 @@
   const { children, href, class: className = '' }: Props = $props();
 </script>
 
-<dt class={twMerge('col-[1] text-secondary', className)}>
+<dt
+  class={twMerge(
+    'col-[1] self-start text-xs font-medium leading-5 text-secondary',
+    className,
+  )}
+>
   {#if href}
     <Link {href} newTab>{@render children()}</Link>
   {:else}

@@ -134,7 +134,7 @@
     role="menuitem"
     class={merge(
       'menu-item',
-      'm-1 px-3 py-2',
+      'mx-1 my-0.5 min-h-[var(--row-height)] rounded-control px-2.5 py-1.5',
       'flex items-center gap-2',
       centered ? 'justify-center' : 'justify-between',
       className,
@@ -163,7 +163,7 @@
     role="menuitem"
     class={merge(
       'menu-item',
-      'm-1 px-3 py-2',
+      'mx-1 my-0.5 min-h-[var(--row-height)] rounded-control px-2.5 py-1.5',
       'flex items-center gap-2',
       className,
     )}
@@ -202,7 +202,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer border border-transparent text-sm focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply cursor-pointer border border-transparent text-sm focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:focus-visible:border-interactive;
 
     &.active {
       @apply bg-interactive-secondary-hover;

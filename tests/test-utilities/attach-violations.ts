@@ -12,10 +12,15 @@ export const attachViolations = async (
     for (const node of violation.nodes) {
       const element = await page.$(node.target.join(' '));
 
-      if (element) {
-        const screenshot = await element.screenshot();
-        (node as WithScreenshot<typeof node>).screenshot =
-          screenshot.toString('base64');
+      if (element && (await element.isVisible())) {
+        const screenshot = await element
+          .screenshot({ timeout: 2_000 })
+          .catch(() => null);
+
+        if (screenshot) {
+          (node as WithScreenshot<typeof node>).screenshot =
+            screenshot.toString('base64');
+        }
       }
     }
   }

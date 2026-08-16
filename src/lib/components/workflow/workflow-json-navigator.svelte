@@ -3,6 +3,7 @@
 
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fromEventToRawEvent } from '$lib/models/event-history';
@@ -47,8 +48,10 @@
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
-<div class="flex gap-4 max-sm:flex-col">
-  <div class="bg-gray-100 flex w-full gap-4">
+<div class="flex gap-3 max-sm:flex-col">
+  <div
+    class="surface-primary flex w-full min-w-0 items-center gap-3 rounded-panel border border-subtle p-2"
+  >
     <RangeInput
       label={translate('common.event')}
       labelHidden
@@ -57,42 +60,30 @@
       max={events.length}
       bind:value={index}
     />
-    <div class="flex items-center justify-center gap-3">
-      <button
-        class="caret"
+    <div class="flex shrink-0 items-center justify-center gap-1">
+      <IconButton
+        icon="chevron-left"
+        label={translate('common.previous')}
+        size="xs"
         disabled={index === 1}
         onclick={() => {
           index -= 1;
         }}
-        aria-label={translate('common.previous')}
-      >
-        <span
-          class="arrow arrow-left border-b-transparent border-t-transparent dark:border-r-white"
-          class:border-r-slate-900={index !== 1}
-          class:border-r-slate-100={index === 1}
-          class:dark:border-r-slate-800={index === 1}
-        ></span>
-      </button>
-      <button
-        class="caret"
+      />
+      <IconButton
+        icon="chevron-right"
+        label={translate('common.next')}
+        size="xs"
         disabled={index === events.length}
         onclick={() => {
           index += 1;
         }}
-        aria-label={translate('common.next')}
-      >
-        <span
-          class="arrow arrow-right border-b-transparent border-t-transparent dark:border-l-white"
-          class:border-l-slate-100={index === events.length}
-          class:border-l-slate-900={index !== events.length}
-          class:dark:border-l-slate-800={index === events.length}
-        ></span>
-      </button>
+      />
     </div>
   </div>
   {@render decode?.()}
 </div>
-<div class="min-h-screen py-4">
+<div class="min-h-dvh py-4">
   {#if $decodeEventHistory && events.length > 0}
     <PayloadCodeBlock
       value={rawEvent}
@@ -111,31 +102,3 @@
     {/key}
   {/if}
 </div>
-
-<style lang="postcss">
-  .caret {
-    @apply relative;
-
-    width: 12px;
-    height: 12px;
-  }
-
-  .caret:disabled {
-    @apply cursor-not-allowed text-slate-400;
-  }
-
-  .arrow {
-    @apply absolute left-0 top-0 h-0 w-0;
-
-    border-style: solid;
-    border-width: 6px 12px 6px 0;
-  }
-
-  .arrow-left {
-    border-width: 6px 12px 6px 0;
-  }
-
-  .arrow-right {
-    border-width: 6px 0 6px 12px;
-  }
-</style>

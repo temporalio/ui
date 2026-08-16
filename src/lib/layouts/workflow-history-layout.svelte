@@ -209,9 +209,9 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[11] flex flex-nowrap items-center gap-4 overflow-x-auto border-b border-subtle py-1 md:top-[var(--top-nav-height)]"
   >
-    <div class="items-bottom flex gap-4 pt-2">
+    <div class="flex shrink-0 items-end gap-3">
       <h2>
         {translate('workflows.history-tab')}
       </h2>
@@ -220,26 +220,23 @@
           active={$eventViewType === 'feed'}
           data-testid="feed"
           icon="feed"
-          class="h-10"
           onclick={onAllClick}>All</TabButton
         >
         <TabButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
           icon="compact"
-          class="h-10"
           onclick={onCompactClick}>Compact</TabButton
         >
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
           icon="json"
-          class="h-10"
           onclick={onJSONClick}>JSON</TabButton
         >
       </TabButtons>
     </div>
-    <div class="flex items-center gap-2 pb-2">
+    <div class="ml-auto flex shrink-0 items-center gap-2">
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
           <ToggleButton
@@ -262,9 +259,10 @@
           onclick={onAutoRefreshToggle}
         >
           <span
-            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
+            class="h-1.5 w-1.5 rounded-full border {$pauseLiveUpdates ||
+            isNotPending
+              ? 'border-subtle bg-subtle'
+              : 'border-success bg-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -283,7 +281,7 @@
   </div>
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}
-      <div class="border-t border-subtle px-4">
+      <div class="border-t border-subtle">
         <WorkflowHistoryJson events={filteredEvents} />
       </div>
     {:else}

@@ -110,10 +110,10 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton controls="status-menu" size="sm">
+  <MenuButton controls="event-type-menu" size="sm">
     {#snippet leading()}
       <div
-        class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
+        class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-normal"
         class:bg-interactive={filterActive}
       >
         <Icon
@@ -129,6 +129,7 @@
     keepOpen
     position="right"
     class="w-[220px] md:w-[360px]"
+    usePortal
   >
     <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>
       {#snippet leading()}

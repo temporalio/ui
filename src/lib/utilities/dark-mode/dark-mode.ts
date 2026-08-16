@@ -26,11 +26,11 @@ export const getNextDarkModePreference = (value: DarkModePreference) =>
   value == 'system' ? true : value == true ? false : 'system';
 
 export const darkMode = (node: HTMLElement) => {
-  useDarkMode.subscribe((value) => {
-    if (value) {
-      node.dataset.theme = 'dark';
-    } else {
-      node.dataset.theme = 'light';
-    }
+  const unsubscribe = useDarkMode.subscribe((value) => {
+    const theme = value ? 'dark' : 'light';
+    node.dataset.theme = theme;
+    document.documentElement.dataset.theme = theme;
   });
+
+  return { destroy: unsubscribe };
 };

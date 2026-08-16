@@ -17,7 +17,8 @@
     'surface-primary',
     'border',
     'border-subtle',
-    'p-4',
+    'rounded-panel',
+    'p-[var(--panel-inset)]',
     className,
   )}
   {...rest}

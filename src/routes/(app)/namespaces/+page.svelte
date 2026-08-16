@@ -14,7 +14,7 @@
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
-<h1 data-testid="namespace-selector-title" class="mb-8">
+<h1 data-testid="namespace-selector-title" class="mb-4">
   {translate('common.namespaces')}
 </h1>
 {#if $namespaces?.length > 0}

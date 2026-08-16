@@ -53,7 +53,7 @@
 
 <style lang="postcss">
   .holocene-table {
-    @apply surface-primary table-auto;
+    @apply surface-primary table-auto text-[0.8125rem];
 
     &.bordered {
       @apply border border-subtle;
@@ -88,7 +88,7 @@
     }
 
     :global(tr > th) {
-      @apply h-9 border-b border-subtle px-2 text-left text-sm font-medium;
+      @apply h-control-sm border-b border-subtle px-2.5 text-left text-xs font-semibold uppercase tracking-[0.025em] text-secondary;
     }
   }
 
@@ -101,20 +101,16 @@
       @apply w-full hover:bg-primary;
     }
 
-    :global(tr:nth-of-type(odd)) {
-      @apply surface-background;
-    }
-
     :global(tr > td) {
-      @apply px-2;
+      @apply px-2.5;
     }
 
     :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
+      @apply hover:text-brand hover:underline hover:decoration-brand;
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-row border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
   }
 </style>

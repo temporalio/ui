@@ -9,7 +9,8 @@
     'border',
     'border-subtle',
     'text-primary',
-    'shadow',
+    'rounded-overlay',
+    'shadow-floating',
     'w-full',
   ];
 
@@ -17,11 +18,11 @@
     [
       ...sharedMenuStyles,
       'absolute',
-      'z-20',
+      'z-dropdown',
       'mt-1',
-      'transition-all',
-      'duration-100',
-      'ease-out',
+      'transition-[opacity,transform]',
+      'duration-fast',
+      'ease-standard',
     ],
     {
       variants: {

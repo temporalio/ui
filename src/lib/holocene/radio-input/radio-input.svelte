@@ -36,7 +36,12 @@
 
 <div>
   <div class="flex items-center">
-    <Label {disabled} class={className}>
+    <Label
+      {disabled}
+      class={className
+        ? `radio-input-hit-target ${className}`
+        : 'radio-input-hit-target'}
+    >
       <input
         bind:group={$group}
         type="radio"
@@ -69,7 +74,7 @@
   }
 
   input[type='radio'] {
-    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-secondary outline-none;
+    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-primary outline-none;
 
     &:checked {
       @apply bg-interactive;
@@ -78,7 +83,7 @@
     &:enabled {
       &:focus-visible,
       &:hover {
-        @apply bg-interactive-active ring-2 ring-primary/70;
+        @apply bg-interactive-active ring-2 ring-primary;
 
         &:checked {
           &:not(:active) {
@@ -94,11 +99,17 @@
 
     &:checked,
     &:active {
-      @apply shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
+      box-shadow: inset 0 0 0 1px rgb(var(--color-surface-primary));
     }
 
     &:disabled {
       @apply cursor-not-allowed opacity-50;
+    }
+  }
+
+  @media (pointer: coarse) {
+    :global(.radio-input-hit-target) {
+      min-height: var(--target-size);
     }
   }
 </style>

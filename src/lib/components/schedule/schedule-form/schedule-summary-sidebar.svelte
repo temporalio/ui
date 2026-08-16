@@ -65,7 +65,7 @@
 
 <Card class="w-full">
   <h2 class="text-lg font-semibold">{translate('schedules.summary-title')}</h2>
-  <dl class="mt-4 flex flex-col gap-3">
+  <dl class="mt-3 flex flex-col gap-2.5">
     <div>
       <dt class="text-xs text-secondary">
         {translate('schedules.name-input-label')}

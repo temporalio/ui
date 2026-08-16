@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
   import type { Writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
@@ -15,7 +16,8 @@
 
   let { count, refresh, onRefresh }: Props = $props();
 
-  const duration = 300;
+  const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)');
+  const duration = $derived(reducedMotion.current ? 0 : 140);
 </script>
 
 <Button
@@ -30,7 +32,7 @@
   {translate('common.refresh')}
   <span
     class={merge(
-      'inline-grid overflow-hidden rounded-sm bg-slate-50 px-1 py-0.5 dark:bg-slate-600',
+      'inline-grid overflow-hidden rounded-sm bg-subtle px-1 py-0.5',
       !count && 'bg-transparent p-0',
     )}
   >

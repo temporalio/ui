@@ -43,7 +43,7 @@
   </h1>
   <p>
     {translate('workflows.archival-link-preface')}<a
-      class="text-blue-700 underline"
+      class="text-brand underline"
       href="https://docs.temporal.io/clusters#archival"
       target="_blank"
       rel="noreferrer">{translate('workflows.archival-link')}</a
@@ -73,7 +73,7 @@
   {#if !visibilityArchivalEnabled}
     <p>
       {translate('workflows.archival-link-preface')}<a
-        class="text-blue-700 underline"
+        class="text-brand underline"
         href="https://docs.temporal.io/clusters#archival"
         target="_blank"
         rel="noreferrer">{translate('workflows.archival-link')}</a

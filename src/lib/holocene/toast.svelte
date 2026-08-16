@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
   import { fly } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
@@ -27,11 +28,11 @@
   }: Props = $props();
 
   const variants: Readonly<Record<ToastVariant, string>> = {
-    primary: 'bg-slate-800 text-white',
-    success: 'bg-success',
-    error: 'bg-danger',
-    info: 'bg-information',
-    warning: 'bg-warning',
+    primary: 'surface-inverse border-subtle',
+    success: 'surface-primary border-success',
+    error: 'surface-primary border-danger',
+    info: 'surface-primary border-information',
+    warning: 'surface-primary border-warning',
   };
 
   const variantIcon: Readonly<Record<ToastVariant, IconName | null>> = {
@@ -44,6 +45,7 @@
 
   const dismissLabel = $derived(closeButtonLabel || translate('common.close'));
   const icon = $derived(variantIcon[variant]);
+  const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)');
 
   const handleDismiss = (e: Event) => {
     e.stopPropagation();
@@ -54,10 +56,13 @@
 <div
   {id}
   class={merge(
-    'flex grow-0 items-center justify-between gap-4 rounded-md px-3 py-2.5 shadow',
+    'flex grow-0 items-center justify-between gap-3 rounded-overlay border-l-2 px-3 py-2 shadow-floating',
     variants[variant],
   )}
-  transition:fly={{ x: 250 }}
+  transition:fly={{
+    x: reducedMotion.current ? 0 : 16,
+    duration: reducedMotion.current ? 0 : 140,
+  }}
 >
   {#if icon}
     <Icon name={icon} class="shrink-0" />

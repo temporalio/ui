@@ -1,7 +1,13 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { action } from 'storybook/actions';
+  import { expect, userEvent, waitFor, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
+
+  import {
+    redesignForcedColorsParameters,
+    redesignVisualParameters,
+  } from '../../../.storybook/visual-modes';
 
   import Modal from './modal.svelte';
 
@@ -97,28 +103,62 @@
     onCancelModal={action('cancel')}
   >
     {#snippet titleSnippet()}
-      <h3>Modal Title</h3>
+      <h3>Confirm workflow action</h3>
     {/snippet}
     {#snippet content()}
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
-        Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies
-        sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius
-        a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy
-        molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat.
-        Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium
-        a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra
-        tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede.
-        Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit
-        sodales. Vestibulum ante ipsum primis in faucibus orci luctus et
-        ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede
-        pellentesque fermentum. Maecenas adipiscing ante non diam sodales
-        hendrerit.
+        This action updates
+        <span class="font-mono">customer-order-reconciliation</span>
+        immediately. Review the current execution state before continuing.
+      </p>
+      <p class="mt-2 text-secondary">
+        Workflow history remains available for diagnosis after the action
+        completes.
       </p>
     {/snippet}
   </Modal>
 {/snippet}
 
-<Story name="Default" />
+<Story name="Default" parameters={redesignVisualParameters} />
 
 <Story name="With Error" args={{ error: 'This is an error message.' }} />
+
+<Story name="Loading" args={{ loading: true }} />
+
+<Story name="Confirm Disabled" args={{ confirmDisabled: true }} />
+
+<Story
+  name="Long Action Labels"
+  args={{
+    confirmText: 'Terminate workflow and all child executions',
+    cancelText: 'Keep workflow running',
+  }}
+/>
+
+<Story
+  name="Keyboard and Hover States"
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = canvas.getByRole('dialog');
+    const [closeButton, cancelButton] = canvas.getAllByRole('button', {
+      name: 'Cancel',
+    });
+    const confirmButton = canvas.getByTestId('confirm-modal-button');
+
+    await waitFor(() => expect(dialog).toHaveFocus());
+    await userEvent.tab();
+    expect(closeButton).toHaveFocus();
+    await userEvent.tab();
+    expect(cancelButton).toHaveFocus();
+    await userEvent.hover(confirmButton);
+  }}
+/>
+
+<Story
+  name="Forced Colors"
+  args={{
+    confirmType: 'destructive',
+    error: 'The workflow state changed. Review it before continuing.',
+  }}
+  parameters={redesignForcedColorsParameters}
+/>

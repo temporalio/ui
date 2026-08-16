@@ -135,9 +135,11 @@
       error={$workflowRun.metadata?.error?.message}
     />
   {:else if !queryTypes.length}
-    <div class="text-center">
+    <div class="flex flex-col items-center gap-2 py-6 text-center">
       <Loading />
-      <p class="-mt-10">{translate('workflows.no-workers-failure-message')}</p>
+      <p class="text-secondary">
+        {translate('workflows.no-workers-failure-message')}
+      </p>
     </div>
   {:else}
     <div class="flex w-3/4 gap-4 max-2xl:w-full max-lg:flex-col">

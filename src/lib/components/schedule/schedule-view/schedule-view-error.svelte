@@ -13,12 +13,12 @@
   let { namespace, scheduleId, errorMessage }: Props = $props();
 </script>
 
-<header class="mb-8">
+<header class="mb-4">
   <div class="relative flex flex-col gap-1">
     <Link href={routeForSchedules({ namespace })} icon="chevron-left">
       {translate('schedules.back-to-schedules')}
     </Link>
-    <h1 class="mt-8 select-all" data-testid="schedule-name">
+    <h1 class="mt-3 select-all" data-testid="schedule-name">
       {scheduleId}
     </h1>
     <p class="text-sm">

@@ -55,19 +55,21 @@
   );
 </script>
 
-<header class="mb-2 flex flex-col gap-4">
+<header class="mb-2 flex min-w-0 flex-col gap-3">
   <Link href={routeForSchedules({ namespace })} icon="chevron-left">
     {translate('schedules.back-to-schedules')}
   </Link>
-  <div class="flex items-start justify-between gap-4">
+  <div
+    class="flex min-w-0 flex-col items-start justify-between gap-3 sm:flex-row"
+  >
     <h1
-      class="flex flex-wrap items-center gap-2 text-3xl"
+      class="flex min-w-0 flex-wrap items-center gap-2"
       data-testid="schedule-name"
     >
       <WorkflowStatus
         status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
       />
-      <span class="select-all">
+      <span class="min-w-0 break-words font-mono text-[0.95em] font-semibold">
         {scheduleId}
       </span>
     </h1>
@@ -166,7 +168,7 @@
   </dl>
 </header>
 <CodecServerErrorBanner />
-<div class="flex flex-col gap-4 pb-24">
+<div class="flex flex-col gap-3 pb-4">
   {#if schedule?.info?.invalidScheduleError}
     <div class="w-full xl:w-1/2">
       <Alert intent="error">
@@ -177,8 +179,8 @@
       </Alert>
     </div>
   {/if}
-  <div class="flex flex-col gap-4 xl:flex-row">
-    <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
+  <div class="flex flex-col gap-3 xl:flex-row">
+    <div class="flex w-full flex-col items-start gap-3 xl:w-2/3">
       <WorkflowRunsCard
         {namespace}
         {schedule}
@@ -190,7 +192,7 @@
       <CustomSearchAttributesCard {schedule} />
     </div>
 
-    <div class="flex w-full flex-col gap-4 xl:w-1/3">
+    <div class="flex w-full flex-col gap-3 xl:w-1/3">
       <WorkflowInputCard
         {scheduleId}
         input={schedule?.schedule?.action?.startWorkflow?.input ?? undefined}

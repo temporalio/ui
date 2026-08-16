@@ -83,8 +83,9 @@
   class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
   <div class="flex flex-wrap items-center justify-between gap-2">
-    <div class="flex items-center gap-2 text-base">
+    <div class="flex min-w-0 items-center gap-2 text-base">
       <Link
+        class="shrink-0 font-mono tabular-nums"
         href={routeForEventHistoryEvent({
           eventId: event.id,
           run,
@@ -92,14 +93,18 @@
           namespace,
         })}>{event.id}</Link
       >
-      <p class="font-medium">
+      <p class="truncate font-medium">
         {displayName}
       </p>
     </div>
-    <Timestamp as="p" class="text-sm" dateTime={event.eventTime} />
+    <Timestamp
+      as="p"
+      class="shrink-0 font-mono text-xs tabular-nums"
+      dateTime={event.eventTime}
+    />
   </div>
-  <div class="flex flex-col gap-1 xl:flex-row">
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+  <div class="grid min-w-0 grid-cols-1 gap-3 xl:grid-cols-2">
+    <div class="flex min-w-0 flex-col gap-1.5">
       {#if event?.links?.length}
         {#if event.category === 'nexus'}
           {@render nexusHandlerLinks(event.links)}
@@ -118,7 +123,7 @@
       {/each}
     </div>
     {#if payloadFields.length}
-      <div class="flex w-full flex-col gap-1 xl:w-1/2">
+      <div class="flex min-w-0 flex-col gap-2">
         {#each payloadFields as [key, value] (key)}
           {@render payloads(key, value)}
         {/each}
@@ -128,14 +133,17 @@
 </div>
 
 {#snippet eventLink(view: EventLinkDisplay)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)] sm:gap-3"
+  >
+    <p class="text-xs font-medium leading-5 text-secondary">
       {view.label}
     </p>
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={view.value}
+      container-class="min-w-0"
     >
       {#if view.href}
         <Link href={view.href} class="whitespace-pre-line">{view.value}</Link>
@@ -180,8 +188,10 @@
 {/snippet}
 
 {#snippet eventSummary(value: RawPayload)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">Summary</p>
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)] sm:gap-3"
+  >
+    <p class="text-xs font-medium leading-5 text-secondary">Summary</p>
     <PayloadSummary
       class="whitespace-pre-line"
       {value}
@@ -193,8 +203,8 @@
 {#snippet payloads(key: string, value: Record<string, unknown>)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
-  <div>
-    <p class="mb-1 min-w-56 text-sm text-secondary/80">
+  <div class="min-w-0">
+    <p class="mb-1 text-xs font-medium leading-5 text-secondary">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -226,8 +236,8 @@
     {/if}
   </div>
   {#if stackTrace}
-    <div>
-      <p class="mb-1 min-w-56 text-sm text-secondary/80">
+    <div class="min-w-0">
+      <p class="mb-1 text-xs font-medium leading-5 text-secondary">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock
@@ -244,14 +254,17 @@
 {/snippet}
 
 {#snippet link(key: string, value: string | number)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)] sm:gap-3"
+  >
+    <p class="text-xs font-medium leading-5 text-secondary">
       {format(key)}
     </p>
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={String(value)}
+      container-class="min-w-0"
     >
       <EventDetailsLink
         value={String(value)}
@@ -264,11 +277,13 @@
 {/snippet}
 
 {#snippet details(key: string, value: string | number)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div
+    class="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-[minmax(7rem,9rem)_minmax(0,1fr)] sm:gap-3"
+  >
+    <p class="text-xs font-medium leading-5 text-secondary">
       {format(key)}
     </p>
-    <p class="whitespace-pre-line break-all">
+    <p class="min-w-0 whitespace-pre-line break-all text-sm leading-5">
       {#if shouldDisplayAsTime(key)}
         <Timestamp dateTime={value} />
       {:else}

@@ -35,11 +35,9 @@
 
 <nav
   class={merge(
-    'group grid min-h-full grid-cols-[2rem] grid-rows-[fit-content(1.5rem)] gap-2 border-r border-subtle px-2 py-4 transition-width data-[nav=closed]:w-[calc(3rem_+_1px)] data-[nav=open]:w-[16rem] data-[nav=open]:grid-cols-[100%] motion-reduce:transition-none',
-    'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary/70 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70',
-    isCloud
-      ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
-      : 'surface-black',
+    'group grid h-full min-h-full w-12 grid-cols-[2rem] grid-rows-[auto_minmax(0,1fr)_auto] gap-2 overflow-hidden border-r border-subtle px-2 py-2 transition-[width] duration-normal data-[nav=open]:w-56 data-[nav=open]:grid-cols-[100%] motion-reduce:transition-none',
+    'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary',
+    'surface-secondary text-primary',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
   data-testid="navigation-header"

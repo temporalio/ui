@@ -560,7 +560,7 @@
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
           <div
-            class="absolute animate-pulse rounded bg-slate-400/30"
+            class="absolute animate-pulse rounded-control bg-subtle"
             style:left="{GUTTER}px"
             style:top="{rectY}px"
             style:width="{canvasWidth - GUTTER * 2}px"
@@ -607,7 +607,7 @@
   }
 
   .canvas :global(.tl-line--gradient) {
-    background-image: linear-gradient(255deg, #1ff1a5 0%, #f55 100%);
+    background-color: rgb(var(--color-border-warning));
   }
 
   .canvas :global(.tl-line--dashed) {
@@ -644,6 +644,14 @@
   @keyframes tl-line-dash {
     to {
       transform: translateX(-6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .canvas :global(.tl-line--dashed.tl-line--animate)::after {
+      animation: none;
+      transform: none;
+      will-change: auto;
     }
   }
 </style>

@@ -41,7 +41,7 @@
       href={link}
       {rel}
       {target}
-      class="relative flex cursor-pointer items-center border border-white/10 bg-white/5 text-white hover:bg-white hover:text-black group-data-[nav=closed]:p-1 group-data-[nav=open]:px-2.5 group-data-[nav=open]:py-2"
+      class="navigation-badge relative flex min-h-8 cursor-pointer items-center rounded-control border border-subtle bg-subtle text-primary transition-colors hover:bg-interactive-secondary-hover active:bg-interactive-secondary-active group-data-[nav=closed]:p-1 group-data-[nav=open]:px-2.5 group-data-[nav=open]:py-1"
     >
       <div
         class="flex h-6 w-6 items-center whitespace-nowrap group-data-[nav=open]:hidden group-data-[nav=closed]:justify-center"
@@ -58,3 +58,11 @@
     </a>
   </Tooltip>
 </div>
+
+<style lang="postcss">
+  @media (pointer: coarse) {
+    .navigation-badge {
+      @apply min-h-target;
+    }
+  }
+</style>

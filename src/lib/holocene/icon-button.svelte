@@ -24,6 +24,7 @@
     icon,
     label,
     variant = 'ghost',
+    size = 'sm',
     onclick,
     ...rest
   }: Props = $props();
@@ -31,8 +32,9 @@
 
 <Button
   {variant}
+  {size}
   leadingIcon={icon}
-  class={merge('h-9 w-9 shrink-0 p-0', className)}
+  class={merge('icon-button aspect-square shrink-0 p-0', className)}
   aria-label={label}
   disableTracking={true}
   data-track-name="icon-button"

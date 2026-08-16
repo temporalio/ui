@@ -64,35 +64,32 @@
   };
 </script>
 
-<div class="flex items-center justify-end gap-4 pt-4 lg:pt-8">
-  <div class="flex items-center gap-2 px-4">
+<div class="flex items-center justify-end gap-3 pt-3">
+  <div class="flex items-center gap-2">
     <TabButtons>
       <TabButton
         active={$eventViewType === 'feed'}
         data-testid="feed"
         icon="feed"
-        class="h-10"
         onclick={onAllClick}>All</TabButton
       >
       <TabButton
         active={$eventViewType === 'compact'}
         data-testid="compact"
         icon="compact"
-        class="h-10"
         onclick={onCompactClick}>Compact</TabButton
       >
       <TabButton
         active={$eventViewType === 'json'}
         data-testid="json"
         icon="json"
-        class="h-10"
         onclick={onJSONClick}>JSON</TabButton
       >
     </TabButtons>
   </div>
 </div>
 {#if $eventViewType === 'json'}
-  <div class="border-t border-subtle px-4">
+  <div class="border-t border-subtle">
     <WorkflowHistoryJson />
   </div>
 {:else}

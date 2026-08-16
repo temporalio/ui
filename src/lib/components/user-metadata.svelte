@@ -25,7 +25,7 @@
         content={summary}
       />
     {:else}
-      <div class="py-6 pl-6 text-secondary/70">
+      <div class="py-6 pl-6 text-secondary">
         <p class="text-sm italic">
           {translate('workflows.no-summary-available')}
         </p>
@@ -46,7 +46,7 @@
         content={details}
       />
     {:else}
-      <div class="py-6 pl-6 text-secondary/70">
+      <div class="py-6 pl-6 text-secondary">
         <p class="text-sm italic">
           {translate('workflows.no-details-available')}
         </p>

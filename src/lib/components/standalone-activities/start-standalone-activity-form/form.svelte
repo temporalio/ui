@@ -250,7 +250,11 @@
   };
 </script>
 
-<form class="max-w-[45rem] space-y-4" use:enhance novalidate>
+<form
+  class="surface-primary max-w-[45rem] space-y-3 rounded-panel border border-subtle p-4"
+  use:enhance
+  novalidate
+>
   <Message value={$message} />
 
   <Input
@@ -263,7 +267,7 @@
     hintText={$errors?.activityId?.[0]}
   >
     {#snippet afterInput()}
-      <RandomUuidButton class="ml-2.5" bind:value={$form.activityId} />
+      <RandomUuidButton class="ml-2" bind:value={$form.activityId} />
     {/snippet}
   </Input>
 
@@ -310,7 +314,7 @@
 
   <Card
     class={twMerge(
-      'space-y-4',
+      'space-y-3 rounded-none border-0 border-t border-subtle px-0 py-4',
       $errors.startToCloseTimeout ? 'border-danger' : '',
     )}
   >
@@ -377,14 +381,14 @@
 
   {#if advancedOptionsVisible}
     <Card
-      class="space-y-4"
+      class="space-y-3 rounded-none border-0 border-t border-subtle px-0 py-4"
       data-testid="start-standalone-activity-add-search-attributes"
     >
-      <div class="space-y-2">
+      <div class="space-y-1">
         <h5>
           {translate('standalone-activities.form-search-attributes-heading')}
         </h5>
-        <p class="text-secondary">
+        <p class="text-sm text-secondary">
           {translate(
             'standalone-activities.form-search-attributes-description',
           )}
@@ -397,12 +401,12 @@
     </Card>
 
     <Card
-      class="space-y-4"
+      class="space-y-3 rounded-none border-0 border-t border-subtle px-0 py-4"
       data-testid="start-standalone-activity-add-metadata"
     >
-      <div class="space-y-2">
+      <div class="space-y-1">
         <h5>{translate('standalone-activities.form-user-metadata-heading')}</h5>
-        <p class="text-secondary">
+        <p class="text-sm text-secondary">
           {translate('standalone-activities.form-user-metadata-description')}
         </p>
       </div>
@@ -416,7 +420,9 @@
       </div>
     </Card>
 
-    <Card class="space-y-4">
+    <Card
+      class="space-y-3 rounded-none border-0 border-t border-subtle px-0 py-4"
+    >
       <h5>{translate('standalone-activities.form-retry-policy-heading')}</h5>
       <RetryPolicyInput
         bind:initialInterval={$form.initialInterval}
@@ -426,7 +432,7 @@
       />
     </Card>
 
-    <Card>
+    <Card class="rounded-none border-0 border-t border-subtle px-0 py-4">
       <DurationInput
         id="heartbeatTimeout"
         label={translate('standalone-activities.form-heartbeat-timeout-label')}
@@ -439,7 +445,9 @@
       />
     </Card>
 
-    <Card class="space-y-4">
+    <Card
+      class="space-y-3 rounded-none border-0 border-t border-subtle px-0 py-4"
+    >
       <h5>{translate('standalone-activities.form-id-policies-heading')}</h5>
 
       <Select
@@ -468,18 +476,25 @@
     </Card>
   {/if}
 
-  <div class="flex items-center justify-between">
+  <div
+    class="flex flex-col-reverse items-stretch justify-between gap-2 sm:flex-row sm:items-center"
+  >
     <Button
       type="button"
       variant="ghost"
       trailingIcon={advancedOptionsVisible ? 'chevron-up' : 'chevron-down'}
       data-testid="start-standalone-activity-more-options"
+      class="max-sm:w-full"
       onclick={() => (advancedOptionsVisible = !advancedOptionsVisible)}
     >
       {translate('common.more-options')}
     </Button>
 
-    <Button data-testid="start-standalone-activity-submit-button" type="submit">
+    <Button
+      data-testid="start-standalone-activity-submit-button"
+      type="submit"
+      class="max-sm:w-full"
+    >
       {translate('standalone-activities.start-standalone-activity')}
     </Button>
   </div>

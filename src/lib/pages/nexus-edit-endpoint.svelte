@@ -39,7 +39,7 @@
   let confirmDeleteInput = $state('');
 </script>
 
-<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-4">
   <div class="flex flex-col gap-1">
     <h1 data-testid="namespace-selector-title">
       {endpoint.spec?.name || ''}

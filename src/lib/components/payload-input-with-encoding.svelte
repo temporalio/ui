@@ -54,7 +54,7 @@
 </script>
 
 <div>
-  <h5 class="pb-1 text-sm font-medium">{label}</h5>
+  <p class="pb-1 text-sm font-medium">{label}</p>
   <Card class="flex flex-col gap-4">
     <PayloadInput
       bind:input

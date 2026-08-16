@@ -36,7 +36,7 @@
     id = undefined,
     label = undefined,
     variant = 'secondary',
-    size = 'md',
+    size = 'sm',
     onclick,
     leading,
     trailing,
@@ -114,7 +114,10 @@
     <div class="flex">
       <Icon
         name="chevron-down"
-        class={merge('transition-transform', $open && 'rotate-180')}
+        class={merge(
+          'transition-transform duration-fast',
+          $open && 'rotate-180',
+        )}
       />
     </div>
   {/if}

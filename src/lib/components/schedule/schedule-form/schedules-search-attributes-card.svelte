@@ -19,14 +19,16 @@
   }: Props = $props();
 </script>
 
-<Card class="w-full">
-  <Tabs class="flex flex-col gap-4">
-    <h2 class="text-2xl font-medium">
+<Card
+  class="w-full rounded-none border-0 border-b border-subtle px-0 py-4 last:border-b-0"
+>
+  <Tabs class="flex min-w-0 flex-col gap-3">
+    <h2 class="text-lg font-semibold">
       {translate('schedules.search-attributes-title')}
     </h2>
     <TabList
       label={translate('schedules.add-schedule-attr')}
-      class="flex flex-wrap gap-4 text-secondary"
+      class="flex-nowrap gap-4 overflow-x-auto text-secondary"
     >
       <Tab
         label={translate('schedules.schedule')}
@@ -44,7 +46,7 @@
       />
     </TabList>
 
-    <div class="flex w-full flex-wrap gap-4">
+    <div class="flex w-full flex-wrap gap-3">
       <TabPanel
         id="schedule-panel"
         tabId="schedule-tab"

@@ -10,6 +10,7 @@ process.env.TAILWIND_MODE = dev ? 'watch' : 'build';
 const ci = !!process.env.VERCEL;
 
 const buildPath = process.env.BUILD_PATH || 'build';
+const PREPAINT_CSP_HASH = 'sha256-nWvpefk/iitnC82J06Y0NUlbc3ZpkP48tIeiXgM1TNc=';
 
 /** @type {import('@sveltejs/kit').Config} */
 export default {
@@ -25,6 +26,11 @@ export default {
       filename.includes('node_modules') ? undefined : true,
   },
   kit: {
+    env: {
+      // Vite-prefixed values are already client-public; this also makes the
+      // visual-version build default available to the pre-paint app template.
+      publicPrefix: 'VITE_',
+    },
     alias: {
       $lib: 'src/lib',
       '$lib/*': 'src/lib/*',
@@ -46,7 +52,11 @@ export default {
     },
     csp: {
       mode: 'auto',
-      directives: { 'script-src': ['strict-dynamic'] },
+      directives: {
+        // Hash of the data-prepaint script in src/app.html. A nonce placeholder
+        // cannot be used because adapter-static must generate a fallback page.
+        'script-src': ['strict-dynamic', PREPAINT_CSP_HASH],
+      },
     },
   },
 };

@@ -132,26 +132,36 @@
   const workflowStatus = cva(['stroke-2'], {
     variants: {
       status: {
-        Running: 'fill-blue-300 stroke-blue-500',
-        TimedOut: 'fill-orange-200 stroke-orange-400',
-        Completed: 'fill-green-200 stroke-green-400',
-        Failed: 'fill-red-200 stroke-red-400',
-        ContinuedAsNew: 'fill-purple-200 stroke-purple-400',
-        Canceled: 'fill-slate-100 stroke-slate-300',
-        Terminated: 'fill-yellow-200 stroke-yellow-400',
-        Paused: 'fill-yellow-200 stroke-yellow-400',
-        Unspecified: 'fill-slate-100 stroke-slate-300',
-        Scheduled: 'fill-blue-300 stroke-blue-500',
-        Started: 'fill-blue-300 stroke-blue-500',
-        Open: 'fill-green-200 stroke-green-400',
-        New: 'fill-blue-300 stroke-blue-500',
-        Initiated: 'fill-blue-300 stroke-blue-500',
-        Fired: 'fill-pink-200 stroke-pink-400',
-        CancelRequested: 'fill-yellow-200 stroke-yellow-400',
-        Signaled: 'fill-pink-200 stroke-pink-400',
+        Running: 'fill-status-information/20 stroke-status-information',
+        TimedOut: 'fill-status-warning/20 stroke-status-warning',
+        Completed: 'fill-status-success/20 stroke-status-success',
+        Failed: 'fill-status-danger/20 stroke-status-danger',
+        ContinuedAsNew: 'fill-brand/20 stroke-brand',
+        Canceled: 'fill-status-muted/20 stroke-status-muted',
+        Terminated: 'fill-status-danger/20 stroke-status-danger',
+        Paused: 'fill-status-warning/20 stroke-status-warning',
+        Unspecified: 'fill-status-muted/20 stroke-status-muted',
+        Scheduled: 'fill-status-information/20 stroke-status-information',
+        Started: 'fill-status-information/20 stroke-status-information',
+        Open: 'fill-status-success/20 stroke-status-success',
+        New: 'fill-status-information/20 stroke-status-information',
+        Initiated: 'fill-status-information/20 stroke-status-information',
+        Fired: 'fill-brand/20 stroke-brand',
+        CancelRequested: 'fill-status-warning/20 stroke-status-warning',
+        Signaled: 'fill-brand/20 stroke-brand',
       },
     },
   });
+
+  const statusMarker = (status?: string) => {
+    if (status === 'Completed' || status === 'Open') return '✓';
+    if (status === 'Failed' || status === 'Terminated') return '×';
+    if (status === 'Paused') return 'Ⅱ';
+    if (status === 'Canceled' || status === 'CancelRequested') return '—';
+    if (status === 'TimedOut') return '!';
+    if (status === 'ContinuedAsNew' || status === 'Signaled') return '↻';
+    return '•';
+  };
 </script>
 
 {#if root?.children.length}
@@ -160,9 +170,11 @@
     y1={getPosition(0).childY - 1.5 * radius}
     x2={getPosition(root?.children.length - 1).childX}
     y2={getPosition(0).childY - 1.5 * radius}
-    class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-      ? 'stroke-indigo-700'
-      : 'stroke-slate-100 dark:stroke-slate-800'}"
+    class="stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard {isActive(
+      root,
+    )
+      ? 'stroke-brand'
+      : 'stroke-workflow-relationship-connector'}"
   />
 {/if}
 {#each root?.children as child, index}
@@ -187,9 +199,11 @@
     y1={childY - 1.5 * radius}
     x2={childX}
     y2={childY}
-    class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-      ? 'stroke-indigo-700'
-      : 'stroke-slate-100 dark:stroke-slate-800'}"
+    class="stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard {isActive(
+      root,
+    )
+      ? 'stroke-brand'
+      : 'stroke-workflow-relationship-connector'}"
   />
   <g
     role="button"
@@ -198,19 +212,29 @@
       id: child.workflow.id,
       status: child.workflow.status ?? '',
     })}
-    class="outline-none transition-all"
+    class="workflow-node outline-none transition-[opacity,transform] duration-fast"
     onclick={(e) => nodeClick(e, child)}
     onkeydown={(e) => handleNodeKeydown(e, child)}
   >
+    <circle
+      class="node-hit-area"
+      cx={childX}
+      cy={childY}
+      r={22}
+      fill="transparent"
+    />
+    <circle class="node-focus-ring" cx={childX} cy={childY} r={23} />
     {#if child?.children?.length && isExpanded(child)}
       <line
         x1={childX}
         y1={childY}
         x2={childX}
         y2={childY + 2.5 * radius}
-        class="stroke-2 duration-300 ease-in-out {isActive(child)
-          ? 'stroke-indigo-700'
-          : 'stroke-slate-100 dark:stroke-slate-800'}"
+        class="stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard {isActive(
+          child,
+        )
+          ? 'stroke-brand'
+          : 'stroke-workflow-relationship-connector'}"
       />
     {/if}
     {#if isActive(child)}
@@ -218,7 +242,7 @@
         cx={childX}
         cy={childY}
         r={radius}
-        class="fill-indigo-700"
+        class="fill-brand"
         fill-opacity=".95"
       />
     {/if}
@@ -227,7 +251,7 @@
         cx={childX}
         cy={childY}
         r={radius}
-        class="fill-indigo-200"
+        class="fill-workflow-relationship-current"
         fill-opacity=".75"
       />
     {/if}
@@ -241,6 +265,15 @@
       height={radius}
       cursor="pointer"
     />
+    <text
+      x={childX}
+      y={childY}
+      class="pointer-events-none text-[10px] font-semibold"
+      style:fill="rgb(var(--color-text-primary))"
+      text-anchor="middle"
+      dominant-baseline="central"
+      aria-hidden="true">{statusMarker(child.workflow.status)}</text
+    >
     {#if child?.children?.length && !isExpanded(child)}
       <text
         x={childX}
@@ -270,10 +303,10 @@
       y1={y}
       x2={x - 4 * radius}
       y2={y}
-      class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
+      class="stroke-workflow-relationship-connector stroke-2 duration-normal ease-standard"
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="fill-workflow-relationship-placeholder stroke-workflow-relationship-connector"
       x={x - 3 * radius - radius / 2}
       y={y - radius / 4}
       cx={radius / 2}
@@ -282,7 +315,7 @@
       height={radius / 2}
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="fill-workflow-relationship-placeholder stroke-workflow-relationship-connector"
       x={x - 1.5 * radius - radius / 2}
       y={y - radius / 4}
       cx={radius / 2}
@@ -295,10 +328,10 @@
       y1={y}
       x2={x + 4 * radius}
       y2={y}
-      class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
+      class="stroke-workflow-relationship-connector stroke-2 duration-normal ease-standard"
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="fill-workflow-relationship-placeholder stroke-workflow-relationship-connector"
       x={x + 1.5 * radius}
       y={y - radius / 4}
       cx={radius / 2}
@@ -307,7 +340,7 @@
       height={radius / 2}
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="fill-workflow-relationship-placeholder stroke-workflow-relationship-connector"
       x={x + 3 * radius}
       y={y - radius / 4}
       cx={radius / 2}
@@ -321,7 +354,7 @@
 {#if generation === 1}
   <g
     role="button"
-    class="outline-none"
+    class="workflow-node outline-none"
     tabindex="0"
     aria-label={translate('workflows.family-node-label', {
       id: root.workflow.id,
@@ -330,6 +363,8 @@
     onclick={(e) => nodeClick(e, root)}
     onkeydown={(e) => handleNodeKeydown(e, root)}
   >
+    <circle class="node-hit-area" cx={x} cy={y} r={22} fill="transparent" />
+    <circle class="node-focus-ring" cx={x} cy={y} r={23} />
     {#if root?.scheduleId}
       <line
         x1={x}
@@ -337,7 +372,7 @@
         x2={x}
         y2={y - 2.5 * radius}
         stroke-dasharray="3 2"
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-workflow-relationship-connector stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard"
       />
       <line
         x1={x - 5 * radius}
@@ -345,7 +380,7 @@
         x2={x}
         y2={y - 2.5 * radius}
         stroke-dasharray="3 2"
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-workflow-relationship-connector stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard"
       />
       <Icon x={x - 9.25 * radius} y={y - 4.15 * radius} name="schedules" />
       <text
@@ -372,7 +407,7 @@
         y1={y}
         x2={x + 4 * radius}
         y2={y}
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-workflow-relationship-connector stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard"
       />
       <text
         x={x + 4.25 * radius}
@@ -398,7 +433,7 @@
         y1={y}
         x2={x - 4 * radius}
         y2={y}
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-workflow-relationship-connector stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard"
       />
       <text
         x={x - 4.25 * radius}
@@ -427,7 +462,7 @@
         x2={radius}
         y2={y}
         stroke-dasharray="3 2"
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-workflow-relationship-connector stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard"
       />
       <text
         x={radius}
@@ -453,9 +488,11 @@
         y1={y}
         x2={x}
         y2={y + 2.5 * radius}
-        class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-          ? 'stroke-indigo-700'
-          : 'stroke-slate-100 dark:stroke-slate-800'}"
+        class="stroke-2 transition-[stroke,opacity,transform] duration-normal ease-standard {isActive(
+          root,
+        )
+          ? 'stroke-brand'
+          : 'stroke-workflow-relationship-connector'}"
       />
     {/if}
     {#if isCurrent(root)}
@@ -463,18 +500,12 @@
         cx={x}
         cy={y}
         r={radius}
-        class="fill-indigo-200"
+        class="fill-workflow-relationship-current"
         fill-opacity=".75"
       />
     {/if}
     {#if isActive(root)}
-      <circle
-        cx={x}
-        cy={y}
-        r={radius}
-        class="fill-indigo-700"
-        fill-opacity=".95"
-      />
+      <circle cx={x} cy={y} r={radius} class="fill-brand" fill-opacity=".95" />
     {/if}
     <rect
       class={workflowStatus({ status: root.workflow.status })}
@@ -485,6 +516,15 @@
       cx={radius / 2}
       cy={radius / 2}
     />
+    <text
+      {x}
+      {y}
+      class="pointer-events-none text-[10px] font-semibold"
+      style:fill="rgb(var(--color-text-primary))"
+      text-anchor="middle"
+      dominant-baseline="central"
+      aria-hidden="true">{statusMarker(root.workflow.status)}</text
+    >
     {#if root?.children?.length}
       <text
         {x}
@@ -498,3 +538,20 @@
     {/if}
   </g>
 {/if}
+
+<style>
+  .node-hit-area {
+    pointer-events: all;
+  }
+
+  .node-focus-ring {
+    fill: none;
+    stroke: rgb(var(--color-border-focus-info));
+    stroke-width: 2;
+    opacity: 0;
+  }
+
+  .workflow-node:focus-visible .node-focus-ring {
+    opacity: 1;
+  }
+</style>

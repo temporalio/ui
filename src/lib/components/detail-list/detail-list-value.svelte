@@ -26,7 +26,7 @@
   };
 </script>
 
-<dd class={twMerge('col-[2] flex', className)}>
+<dd class={twMerge('col-[2] flex min-w-0 text-sm leading-5', className)}>
   {@render children()}
   {#if copyable}
     <!-- 

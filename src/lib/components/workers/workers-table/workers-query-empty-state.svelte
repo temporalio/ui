@@ -4,7 +4,7 @@
 </script>
 
 <div
-  class="my-12 flex w-full flex-col items-center justify-start gap-2"
+  class="my-6 flex w-full flex-col items-center justify-start gap-2"
   aria-live="polite"
 >
   <div class="text-center">
@@ -15,5 +15,5 @@
       {translate('workers.worker-query-empty-state-description')}
     </p>
   </div>
-  <NoQueryResults class="m-auto mt-8 text-subtle" />
+  <NoQueryResults class="m-auto mt-4 text-subtle" />
 </div>

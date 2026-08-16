@@ -193,4 +193,10 @@
       stroke-dashoffset: 0;
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-line {
+      animation: none;
+    }
+  }
 </style>

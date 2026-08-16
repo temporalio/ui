@@ -20,7 +20,7 @@
 
 <div
   class={merge(
-    'flex flex-wrap gap-x-4 gap-y-1 border-b border-subtle',
+    'flex flex-nowrap gap-x-4 overflow-x-auto border-b border-subtle [scrollbar-width:thin]',
     className,
   )}
   role="tablist"

@@ -17,44 +17,45 @@
       'items-center',
       'justify-center',
       'border',
-      'gap-2',
+      'rounded-control',
+      'gap-1.5',
       'disabled:opacity-50',
       'disabled:cursor-not-allowed',
       'border-box',
-      'transition-colors',
-      'transition-shadow',
+      'transition-[color,background-color,border-color,text-decoration-color,fill,stroke,box-shadow,transform]',
+      'duration-fast',
+      'ease-standard',
       'focus-visible:outline-none',
-      'focus-visible:border-inverse',
+      'focus-visible:border-strong',
       'focus-visible:ring-2',
       'whitespace-nowrap',
       'no-underline',
       'active:scale-[0.98]',
-      'transition-all duration-200',
     ],
     {
       variants: {
         variant: {
           primary:
-            'surface-interactive border-transparent text-white focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:bg-subtle data-[active=true]:text-primary',
+            'surface-interactive border-transparent text-white shadow-raised focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-surface-primary))] data-[active=true]:bg-subtle data-[active=true]:text-primary data-[active=true]:shadow-none',
           secondary:
-            'surface-primary border-subtle focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary data-[active=true]:bg-subtle',
+            'surface-primary border-primary focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-surface-primary))] hover:surface-interactive-secondary focus-visible:surface-interactive-secondary data-[active=true]:bg-subtle',
           destructive:
-            'surface-interactive-danger border-transparent focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:surface-interactive-danger',
+            'surface-interactive-danger border-transparent focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-surface-primary))] data-[active=true]:surface-interactive-danger',
           ghost:
-            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:bg-subtle',
+            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-surface-primary))] data-[active=true]:bg-subtle',
           'table-header':
-            'bg-transparent border-transparent focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary focus-visible:border-transparent',
+            'bg-transparent border-transparent focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--color-surface-primary))] focus-visible:border-transparent',
         },
         size: {
-          xs: 'h-8 text-xs px-2 py-1',
-          sm: 'h-9 text-sm px-4 py-1.5',
-          md: 'h-10 text-base px-4 py-2',
-          lg: 'h-11 text-lg px-5 py-2.5',
+          xs: 'h-control-xs px-2 text-xs',
+          sm: 'h-control-sm px-3 text-sm',
+          md: 'h-control px-3.5 text-sm',
+          lg: 'h-10 px-4 text-base',
         },
       },
       defaultVariants: {
         variant: 'primary',
-        size: 'md',
+        size: 'sm',
       },
     },
   );
@@ -104,7 +105,7 @@
 
   let {
     variant = 'primary',
-    size = 'md',
+    size = 'sm',
     disabled = false,
     loading = false,
     active = false,

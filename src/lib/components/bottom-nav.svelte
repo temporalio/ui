@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
   import { slide } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
@@ -64,7 +65,6 @@
   let {
     namespaceList = [],
     linksSnippet,
-    isCloud = false,
     showNamespacePicker = true,
     children,
     nsPicker,
@@ -124,6 +124,7 @@
   }
 
   const menuIsOpen = $derived(viewLinks || viewNamespaces || viewSettings);
+  const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)');
 
   const truncateNamespace = (namespace: string) => {
     if (namespace.length > 16) {
@@ -138,20 +139,18 @@
 {#if menuIsOpen}
   <div
     class={merge(
-      'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden',
-      'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary/70 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70',
-      isCloud
-        ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
-        : 'surface-black',
+      'group surface-primary fixed inset-x-0 top-0 z-50 w-full min-w-0 overflow-auto border-t border-subtle text-primary md:hidden',
+      'bottom-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom))]',
+      'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary',
     )}
     data-nav="open"
-    in:slide={{ duration: 200, delay: 0 }}
-    out:slide={{ duration: 200, delay: 0 }}
+    in:slide={{ duration: reducedMotion.current ? 0 : 220, delay: 0 }}
+    out:slide={{ duration: reducedMotion.current ? 0 : 140, delay: 0 }}
   >
     {#if linksContent}
       {@render linksContent({ open: viewLinks, closeMenu })}
     {:else if viewLinks}
-      <div class="flex flex-col gap-6 px-4 py-8">
+      <div class="flex flex-col gap-2 px-4 py-4">
         {@render linksSnippet?.()}
       </div>
     {/if}
@@ -167,11 +166,9 @@
 {/if}
 <nav
   class={merge(
-    'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 px-4 py-2 transition-colors md:hidden',
-    'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70 focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-primary/70',
-    isCloud
-      ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-off-white focus-visible:[&_a]:ring-success focus-visible:[&_button]:ring-success'
-      : 'surface-black border-t border-subtle',
+    'bottom-navigation surface-secondary fixed bottom-0 z-40 flex w-full min-w-0 flex-row items-center justify-between gap-2 border-t border-subtle pt-2 text-primary transition-colors md:hidden',
+    'h-[calc(var(--bottom-nav-height)+env(safe-area-inset-bottom))] pb-[calc(0.5rem+env(safe-area-inset-bottom))]',
+    'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-primary',
     className,
   )}
   data-testid="top-nav"
@@ -207,7 +204,7 @@
           data-testid="namespace-switcher"
           leadingIcon="namespace-switcher"
           size="xs"
-          class="grow text-white"
+          class="h-full grow text-primary"
           onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
         >
         <div class="ml-1 h-full w-1 border-l border-subtle"></div>
@@ -215,8 +212,10 @@
           variant="ghost"
           size="xs"
           href={routeForNamespace({ namespace })}
+          aria-label={`Open ${namespace} namespace overview`}
           disabled={!namespaceExists}
-          ><Icon class="text-white" name="external-link" /></Button
+          class="h-full min-w-11 px-2"
+          ><Icon class="text-primary" name="external-link" /></Button
         >
       </div>
     {/if}
@@ -250,10 +249,35 @@
 
 <style lang="postcss">
   .namespace-wrapper {
-    @apply surface-black flex h-10 w-full grow flex-row items-center border border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply surface-primary flex h-11 w-full min-w-0 grow flex-row items-center border border-subtle px-0.5 text-sm focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary;
   }
 
   .nav-button {
-    @apply relative select-none p-1 text-center align-middle text-xs font-medium uppercase transition-all;
+    @apply relative flex h-11 w-11 shrink-0 select-none items-center justify-center rounded-control p-1 text-center align-middle text-xs font-medium uppercase transition-colors;
+  }
+
+  .bottom-navigation {
+    padding-inline: max(var(--page-gutter), env(safe-area-inset-left))
+      max(var(--page-gutter), env(safe-area-inset-right));
+  }
+
+  .nav-button.active-shadow {
+    @apply bg-interactive-secondary-hover;
+  }
+
+  .nav-button.active-shadow::before {
+    position: absolute;
+    inset-inline: 0.5rem;
+    top: -0.5rem;
+    height: 0.125rem;
+    content: '';
+
+    @apply bg-interactive;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-button:hover {
+      @apply bg-interactive-secondary-hover;
+    }
   }
 </style>

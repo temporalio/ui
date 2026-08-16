@@ -1,12 +1,17 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { action } from 'storybook/actions';
+  import { expect, userEvent, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import { iconNames } from '$lib/holocene/icon';
 
   import { shouldNotBeTransparent } from './test-utilities';
+  import {
+    redesignForcedColorsParameters,
+    redesignVisualParameters,
+  } from '../../../.storybook/visual-modes';
 
   const { Story } = defineMeta({
     title: 'Button',
@@ -87,7 +92,12 @@
   <Button {...args} onclick={action('click')}>Click Me</Button>
 {/snippet}
 
-<Story name="Primary" args={{}} {template} />
+<Story
+  name="Primary"
+  args={{}}
+  parameters={redesignVisualParameters}
+  {template}
+/>
 
 <Story name="With Long Title">
   {#snippet template(args)}
@@ -130,6 +140,32 @@
 
 <Story name="Active" args={{ active: true }} {template} />
 
+<Story
+  name="Interaction States"
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const keyboardButton = canvas.getByRole('button', {
+      name: 'Keyboard focus',
+    });
+    const hoverButton = canvas.getByRole('button', { name: 'Pointer hover' });
+
+    await userEvent.tab();
+    expect(keyboardButton).toHaveFocus();
+    await userEvent.hover(hoverButton);
+  }}
+>
+  {#snippet template(args)}
+    <div class="flex flex-wrap items-center gap-3">
+      <Button {...args} onclick={action('keyboard-click')}>
+        Keyboard focus
+      </Button>
+      <Button {...args} variant="secondary" onclick={action('pointer-click')}>
+        Pointer hover
+      </Button>
+    </div>
+  {/snippet}
+</Story>
+
 <Story name="With Count" args={{ count: 5 }} {template} />
 
 <Story name="With Leading Icon" args={{ leadingIcon: 'workflow' }} {template} />
@@ -141,6 +177,21 @@
 />
 
 <Story name="With Link" args={{ href: 'https://example.com' }} {template} />
+
+<Story name="Forced Colors" parameters={redesignForcedColorsParameters}>
+  {#snippet template(args)}
+    <div class="flex flex-wrap items-center gap-3">
+      <Button {...args} onclick={action('run')}>Run workflow</Button>
+      <Button {...args} variant="secondary" onclick={action('view')}>
+        View history
+      </Button>
+      <Button {...args} variant="destructive" onclick={action('terminate')}>
+        Terminate
+      </Button>
+      <Button {...args} disabled>Unavailable</Button>
+    </div>
+  {/snippet}
+</Story>
 
 <Story name="With Leading Icon & Loading">
   {#snippet template(args)}

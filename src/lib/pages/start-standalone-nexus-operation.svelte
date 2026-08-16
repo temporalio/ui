@@ -16,7 +16,7 @@
   );
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-3 pb-4">
   <div class="flex items-center gap-2">
     <Link
       href={nexusOperationsHref}
@@ -29,7 +29,7 @@
   <h1>
     {translate('standalone-nexus-operations.start-standalone-nexus-operation')}
   </h1>
-  <p class="text-secondary">
+  <p class="max-w-[75ch] text-secondary">
     {translate('standalone-nexus-operations.form-page-description')}
   </p>
   <p class="text-sm text-secondary">

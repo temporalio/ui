@@ -63,11 +63,13 @@
   });
 </script>
 
-<Card class="w-full">
-  <h2 class="text-2xl font-medium">
+<Card
+  class="w-full rounded-none border-0 border-b border-subtle px-0 py-4 last:border-b-0"
+>
+  <h2 class="text-lg font-semibold">
     {translate('schedules.policies-heading')}
   </h2>
-  <div class="mt-4 flex flex-col gap-4">
+  <div class="mt-3 flex flex-col gap-3">
     <p class="text-sm text-secondary">
       {translate('schedules.policies-description')}
       <Link href="https://docs.temporal.io/schedule#policies" newTab>
@@ -76,51 +78,51 @@
     </p>
 
     <dl
-      class="flex flex-col gap-y-4 lg:grid lg:grid-cols-[max-content,1fr] lg:grid-rows-none lg:gap-x-6 lg:gap-y-2"
+      class="flex flex-col gap-y-2 sm:grid sm:grid-cols-[minmax(7rem,10rem)_minmax(0,1fr)] sm:grid-rows-none sm:gap-x-3 sm:gap-y-2"
     >
-      <div class="lg:contents">
-        <dt class="text-xs text-secondary lg:text-sm">
+      <div class="sm:contents">
+        <dt class="text-xs font-medium leading-5 text-secondary">
           {translate('schedules.overlap-policy')}
         </dt>
-        <dd>
+        <dd class="min-w-0 text-sm leading-5">
           {overlapPolicyContent[$form.overlapPolicy].label}
         </dd>
       </div>
 
-      <div class="lg:contents">
-        <dt class="text-xs text-secondary lg:text-sm">
+      <div class="sm:contents">
+        <dt class="text-xs font-medium leading-5 text-secondary">
           {translate('schedules.on-start-behavior')}
         </dt>
-        <dd>{onStartBehavior}</dd>
+        <dd class="min-w-0 text-sm leading-5">{onStartBehavior}</dd>
       </div>
 
-      <div class="lg:contents">
-        <dt class="text-xs text-secondary lg:text-sm">
+      <div class="sm:contents">
+        <dt class="text-xs font-medium leading-5 text-secondary">
           {translate('schedules.catchup-window-policy')}
         </dt>
-        <dd>
+        <dd class="min-w-0 text-sm leading-5">
           {$form.catchupWindow
             ? formatDuration($form.catchupWindow)
             : translate('schedules.catchup-window-default')}
         </dd>
       </div>
 
-      <div class="lg:contents">
-        <dt class="text-xs text-secondary lg:text-sm">
+      <div class="sm:contents">
+        <dt class="text-xs font-medium leading-5 text-secondary">
           {translate('schedules.pause-on-failure-question')}
         </dt>
-        <dd>
+        <dd class="min-w-0 text-sm leading-5">
           {$form.pauseOnFailure
             ? translate('common.yes')
             : translate('common.no')}
         </dd>
       </div>
 
-      <div class="lg:contents">
-        <dt class="text-xs text-secondary lg:text-sm">
+      <div class="sm:contents">
+        <dt class="text-xs font-medium leading-5 text-secondary">
           {translate('schedules.timeouts')}
         </dt>
-        <dd>{timeoutsSummary}</dd>
+        <dd class="min-w-0 text-sm leading-5">{timeoutsSummary}</dd>
       </div>
     </dl>
     <div class="mr-auto mt-2">

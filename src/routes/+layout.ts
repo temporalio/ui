@@ -5,10 +5,13 @@ import type { LayoutData, LayoutLoad } from './$types';
 
 import { i18nNamespaces } from '$lib/i18n';
 import resources from '$lib/i18n/locales';
+import { applyVisualVersion } from '$lib/utilities/visual-version';
 
 export const ssr = false;
 
 export const load: LayoutLoad = async function (): LayoutData {
+  applyVisualVersion();
+
   i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
     load: 'languageOnly',

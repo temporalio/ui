@@ -26,18 +26,20 @@
 </script>
 
 <div
-  class="my-12 flex w-full flex-col items-center justify-start gap-2 text-primary {className}"
+  class="my-6 flex w-full flex-col items-center justify-start gap-2 text-primary {className}"
   data-testid={testId}
 >
-  <span class="flex h-16 w-16 items-center justify-center rounded-full">
+  <span class="flex h-10 w-10 items-center justify-center text-secondary">
     <Icon name={icon} class="block h-full w-full" /></span
   >
-  <p class="text-xl font-medium">{title}</p>
+  <p class="text-base font-semibold">{title}</p>
   {#if content}
-    <p class="text-center">{content}</p>
+    <p class="max-w-prose text-center text-sm text-secondary">{content}</p>
   {/if}
   {#if error}
-    <p class="border border-danger bg-danger p-5 text-center">
+    <p
+      class="rounded-panel border border-danger bg-danger p-3 text-center text-sm"
+    >
       {error}
     </p>
   {/if}

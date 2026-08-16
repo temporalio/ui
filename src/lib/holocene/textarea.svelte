@@ -61,7 +61,7 @@
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full border border-subtle focus-within:border-information focus-within:ring-2 focus-within:ring-primary/70',
+      'relative box-border inline-flex w-full rounded-control border border-primary transition-colors duration-fast ease-standard focus-within:border-information focus-within:ring-2 focus-within:ring-primary hover:border-interactive',
       !isValid && 'error',
       !disabled && 'hover:border-information',
     )}
@@ -69,7 +69,7 @@
     <textarea
       bind:value
       class={merge(
-        'surface-primary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-none',
+        'surface-primary min-h-fit w-full rounded-control px-3 py-2 text-sm leading-5 focus-visible:outline-none',
         disabled && 'cursor-not-allowed opacity-50',
       )}
       {id}
@@ -114,7 +114,7 @@
 
 <style lang="postcss">
   .error {
-    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
+    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger;
   }
 
   .error-msg {

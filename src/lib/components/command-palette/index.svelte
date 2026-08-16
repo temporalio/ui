@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
+
   import type { Snippet } from 'svelte';
 
   import { goto } from '$app/navigation';
@@ -6,6 +8,7 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     routeForArchivalWorkflows,
@@ -31,6 +34,7 @@
   let searchQuery = $state('');
   let selectedIndex = $state(0);
   let ActiveComponent: Snippet | undefined = $state();
+  const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)');
 
   interface CommandItem {
     id: string;
@@ -220,7 +224,7 @@
       );
       if (selectedButton) {
         selectedButton.scrollIntoView({
-          behavior: 'smooth',
+          behavior: reducedMotion.current ? 'auto' : 'smooth',
           block: 'nearest',
           inline: 'nearest',
         });
@@ -290,36 +294,36 @@
 </script>
 
 {#snippet keyboardShortcuts()}
-  <div class="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
+  <div class="hidden gap-3 text-xs text-secondary md:flex">
     <span class="flex items-center gap-1.5">
       {#if ActiveComponent}
         <kbd
-          class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+          class="surface-secondary rounded-control border border-subtle px-1.5 py-0.5 font-mono text-[0.6875rem]"
           >←</kbd
         >
       {/if}
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="surface-secondary rounded-control border border-subtle px-1.5 py-0.5 font-mono text-[0.6875rem]"
         >↑</kbd
       ><kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="surface-secondary rounded-control border border-subtle px-1.5 py-0.5 font-mono text-[0.6875rem]"
         >↓</kbd
       >
-      <span class="text-slate-400">navigate</span>
+      <span class="text-subtle">navigate</span>
     </span>
     <span class="flex items-center gap-1.5">
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="surface-secondary rounded-control border border-subtle px-1.5 py-0.5 font-mono text-[0.6875rem]"
         >⏎</kbd
       >
-      <span class="text-slate-400">select</span>
+      <span class="text-subtle">select</span>
     </span>
     <span class="flex items-center gap-1.5">
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="surface-secondary rounded-control border border-subtle px-1.5 py-0.5 font-mono text-[0.6875rem]"
         >Esc</kbd
       >
-      <span class="text-slate-400">close</span>
+      <span class="text-subtle">close</span>
     </span>
   </div>
 {/snippet}
@@ -328,25 +332,25 @@
   {#each filteredCommands as command, index (command.id)}
     <button
       type="button"
-      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-slate-50 hover:shadow-sm dark:hover:bg-slate-800"
+      class="relative flex min-h-12 w-full items-center justify-between overflow-hidden rounded-control border border-transparent px-3 py-2 text-left transition-colors duration-fast hover:bg-interactive-secondary-hover"
       class:selected={index === selectedIndex}
       onclick={() => handleCommandClick(command)}
       onmouseenter={() => (selectedIndex = index)}
       role="option"
       aria-selected={index === selectedIndex}
     >
-      <div class="flex items-center gap-4">
+      <div class="flex min-w-0 items-center gap-2.5">
         {#if command.icon}
           <div class="h-6 w-6 flex-shrink-0 text-secondary">
             <Icon name={command.icon} />
           </div>
         {/if}
-        <div class="flex flex-col gap-1">
-          <div class="text-lg font-semibold text-secondary">
+        <div class="flex min-w-0 flex-col">
+          <div class="truncate text-sm font-medium text-primary">
             {command.title}
           </div>
           {#if command.subtitle}
-            <div class="text-sm text-secondary">
+            <div class="truncate text-xs text-secondary">
               {command.subtitle}
             </div>
           {/if}
@@ -354,7 +358,7 @@
       </div>
       {#if command.category}
         <div
-          class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+          class="surface-secondary ml-2 shrink-0 rounded-control border border-subtle px-1.5 py-0.5 text-[0.6875rem] font-medium text-secondary"
         >
           {command.category}
         </div>
@@ -362,7 +366,7 @@
     </button>
   {:else}
     <div
-      class="flex min-h-96 flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400"
+      class="flex min-h-48 flex-col items-center justify-center py-8 text-secondary"
     >
       <Icon name="search" />
       <h3 class="mt-2 text-secondary">No commands found</h3>
@@ -374,7 +378,7 @@
 <Modal
   {open}
   onclose={close}
-  class="command-palette-modal h-[70vh] max-h-[600px] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
+  class="command-palette-modal h-[min(70dvh,36rem)] w-[calc(100vw-2rem)] max-w-3xl [&_.modal-content]:p-0"
   id="command-palette"
   cancelText="Close"
   loading={true}
@@ -382,31 +386,30 @@
   {#snippet content()}
     <div class="flex h-full flex-1 flex-col">
       <div
-        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
+        class="surface-primary sticky top-0 z-sticky border-b border-subtle pb-3 pt-2"
       >
-        <div class="flex items-center justify-between px-6 py-3">
+        <div class="flex items-center justify-between px-4 py-2">
           <div
-            class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
+            class="flex items-center gap-2 text-sm font-semibold text-primary"
           >
-            <div class="h-5 w-5 text-indigo-600 dark:text-indigo-400">
+            <div class="h-4 w-4 text-brand">
               <Icon name="search" />
             </div>
             Command Palette
           </div>
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
             {@render keyboardShortcuts()}
-            <button
-              type="button"
+            <IconButton
+              icon="close"
+              label="Close"
+              size="xs"
               onclick={close}
-              class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-              aria-label="Close"
-            >
-              <Icon name="close" class="h-4 w-4" />
-            </button>
+              class="text-secondary hover:text-primary"
+            />
           </div>
         </div>
         {#if !ActiveComponent}
-          <div class="px-6">
+          <div class="px-4">
             <Input
               id="action-search"
               bind:value={searchQuery}
@@ -422,7 +425,7 @@
       </div>
 
       <!-- Scrollable Content -->
-      <div class="flex-1 overflow-y-auto px-6 py-4" role="listbox">
+      <div class="flex-1 overflow-y-auto p-2" role="listbox">
         {#if ActiveComponent}
           <ActiveComponent {onBack} />
         {:else}
@@ -435,17 +438,16 @@
 
 <style lang="postcss">
   .selected {
-    @apply border-indigo-200 bg-indigo-50 shadow-sm;
+    @apply border-subtle bg-interactive-secondary-active before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:bg-interactive;
   }
 
-  :global(.body::backdrop) {
-    background: rgb(15 23 42 / 75%);
-    backdrop-filter: blur(4px);
+  :global(.command-palette-modal::backdrop) {
+    background: rgb(12 15 20 / 64%);
     opacity: 0;
-    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity var(--duration-normal) var(--ease-standard);
   }
 
-  :global(.body[open]::backdrop) {
+  :global(.command-palette-modal[open]::backdrop) {
     opacity: 1;
   }
 </style>

@@ -5,7 +5,6 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
@@ -53,7 +52,7 @@
 
 <div>
   <div
-    class="flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
+    class="flex w-full min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto border border-subtle bg-primary p-1.5"
   >
     <Filter
       {filters}
@@ -62,16 +61,18 @@
       {statusAttribute}
       {includeNullConditions}
     />
-    <div class="flex items-center gap-1">
+    <div class="ml-auto flex shrink-0 items-center gap-1">
       <Tooltip
         text={viewManualQuery ? 'Hide raw query' : 'View raw query'}
         left
+        usePortal
       >
         <Button
           variant="ghost"
           size="xs"
           leadingIcon="json"
           active={viewManualQuery}
+          aria-label={viewManualQuery ? 'Hide raw query' : 'View raw query'}
           data-testid="toggle-manual-query"
           onclick={() => (viewManualQuery = !viewManualQuery)}
         />

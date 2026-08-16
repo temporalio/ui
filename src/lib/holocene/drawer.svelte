@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
   import { fly } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
@@ -35,15 +36,16 @@
   }: Props = $props();
 
   let portalElement = $state<HTMLElement | null>(null);
+  const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)');
 
   const flyParamsIn = $derived({
-    duration: 250,
-    ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
+    duration: reducedMotion.current ? 0 : 220,
+    ...(position === 'bottom' ? { y: 96 } : { x: 64 }),
   });
 
   const flyParamsOut = $derived({
-    duration: 150,
-    ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
+    duration: reducedMotion.current ? 0 : 140,
+    ...(position === 'bottom' ? { y: 96 } : { x: 64 }),
   });
 
   // svelte-ignore state_referenced_locally
@@ -84,11 +86,12 @@
   <aside
     {id}
     class={merge(
-      'surface-primary fixed z-[55] h-auto overflow-y-auto border-subtle text-primary',
-      position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
+      'surface-primary fixed z-modal h-auto overflow-y-auto border-subtle text-primary shadow-modal',
+      position === 'bottom' &&
+        'bottom-0 left-0 right-0 max-h-[calc(100dvh-1rem)] rounded-t-overlay border-t',
       position === 'right' &&
         'right-0 top-0 h-full w-screen border-l sm:max-w-fit',
-      dark && 'bg-black text-off-white',
+      dark && 'surface-black',
       className,
     )}
     in:fly={flyParamsIn}
@@ -99,8 +102,8 @@
     use:focusTrap={true}
     use:clickoutside={onClick}
   >
-    <div class="relative h-full" class:pt-10={closePadding}>
-      <div class="absolute right-2 top-2">
+    <div class="relative h-full" class:pt-9={closePadding}>
+      <div class="absolute right-1.5 top-1.5">
         <IconButton
           data-testid="drawer-close-button"
           label={closeButtonLabel}

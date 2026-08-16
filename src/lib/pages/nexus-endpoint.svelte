@@ -137,7 +137,7 @@
 
 <div
   class={merge(
-    'flex flex-col gap-8',
+    'flex flex-col gap-4',
     !allowedCallerNamespaces && 'w-full xl:w-3/4 2xl:w-1/2',
   )}
 >
@@ -153,11 +153,11 @@
   </div>
   <div
     class={merge(
-      'flex flex-col gap-8',
+      'flex flex-col gap-4',
       allowedCallerNamespaces && 'xl:flex-row',
     )}
   >
-    <div class="flex h-fit grow flex-col gap-8">
+    <div class="flex h-fit grow flex-col gap-4">
       {@render target()}
       {#if allowedCallerNamespaces}
         {@render allowedCallerNamespacesTable()}

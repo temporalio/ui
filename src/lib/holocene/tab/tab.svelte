@@ -40,6 +40,8 @@
 
   const { registerTab, selectTab, activeTab } = getContext<TabContext>(TABS);
 
+  let tabElement = $state<HTMLElement>();
+
   registerTab(id);
 
   const isActive = $derived(active == null ? $activeTab === id : active);
@@ -47,16 +49,39 @@
   const handleClick = () => {
     if (disabled) return;
     selectTab(id);
-    onClick && onClick();
+    onClick();
   };
+
+  $effect(function keepActiveTabVisible() {
+    if (!isActive || !tabElement) return;
+
+    const tabList = tabElement.closest<HTMLElement>('[role="tablist"]');
+    if (!tabList) return;
+
+    requestAnimationFrame(() => {
+      if (!tabElement || !tabList) return;
+
+      const tabStart = tabElement.offsetLeft;
+      const tabEnd = tabStart + tabElement.offsetWidth;
+      const visibleStart = tabList.scrollLeft;
+      const visibleEnd = visibleStart + tabList.clientWidth;
+
+      if (tabStart < visibleStart) {
+        tabList.scrollLeft = tabStart;
+      } else if (tabEnd > visibleEnd) {
+        tabList.scrollLeft = tabEnd - tabList.clientWidth;
+      }
+    });
+  });
 </script>
 
 <svelte:element
   this={href ? 'a' : 'button'}
   type={href ? undefined : 'button'}
   role="tab"
+  bind:this={tabElement}
   class={merge(
-    'mb-[-1px] flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 border-transparent text-sm font-medium leading-8 outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    'mb-[-1px] flex h-control-sm shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 border-transparent px-0.5 text-xs font-medium outline-none transition-colors duration-fast focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
     className,
     isActive && 'border-brand text-brand',
     disabled && 'cursor-not-allowed opacity-50',

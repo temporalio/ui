@@ -68,7 +68,7 @@
   />
   <input
     id="import-event-history-file-upload"
-    class="import-input block border border-slate-200 p-2"
+    class="import-input surface-primary block h-control max-w-full cursor-pointer rounded-control border border-subtle text-sm text-secondary transition-colors duration-fast file:mr-3 file:h-full file:cursor-pointer file:border-0 file:border-r file:border-subtle file:bg-secondary file:px-3 file:text-sm file:font-medium file:text-primary hover:border-interactive hover:file:bg-interactive-secondary-hover focus:outline-none focus:ring-2 focus:ring-primary"
     type="file"
     accept=".json"
     onchange={onFileSelect}

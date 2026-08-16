@@ -3,6 +3,7 @@ import type { Preview } from '@storybook/sveltekit';
 import '../src/app.css';
 import i18next from 'i18next';
 
+import { redesignViewports } from './visual-modes';
 import { i18nNamespaces } from '../src/lib/i18n';
 import resources from '../src/lib/i18n/locales';
 
@@ -41,6 +42,13 @@ const preview: Preview = {
         color: /(background|color)$/i,
         date: /Date$/,
       },
+    },
+    chromatic: {
+      pauseAnimationAtEnd: true,
+      prefersReducedMotion: 'reduce',
+    },
+    viewport: {
+      options: redesignViewports,
     },
   },
 };

@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
   import type { Writable } from 'svelte/store';
-  import { fade, slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   import { page } from '$app/state';
 
@@ -22,6 +23,7 @@
   }
 
   let { filters, searchAttributes, id, onSearch }: Props = $props();
+  const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)');
 
   let manualSearchString = $state('');
 
@@ -64,13 +66,11 @@
   }
 </script>
 
-<div class="w-full border border-t-0 border-subtle" in:fade>
-  <form
-    onsubmit={handleSearch}
-    class="flex gap-0"
-    transition:slide
-    role="search"
-  >
+<div
+  class="surface-information w-full border border-t-0 border-subtle"
+  in:fade={{ duration: reducedMotion.current ? 0 : 140 }}
+>
+  <form onsubmit={handleSearch} class="flex gap-0" role="search">
     <Input
       id="query"
       type="search"
@@ -78,7 +78,7 @@
       labelHidden
       placeholder={translate('workflows.search-placeholder')}
       icon="search"
-      class="grow  [&_*]:border-0"
+      class="min-w-0 grow [&_*]:border-0"
       inputContainerClass="surface-information !border-r border-subtle"
       clearable
       copyButtonLabel={translate('common.copy-icon-title')}

@@ -1,6 +1,9 @@
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist/wght-italic.css';
 
-@import '@fontsource/noto-sans-mono';
+@import '@fontsource/noto-sans-mono/400.css';
+@import '@fontsource/noto-sans-mono/500.css';
+@import '@fontsource/noto-sans-mono/600.css';
 
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
@@ -8,6 +11,44 @@
 
 @layer base {
   :root {
+    --space-0-5: 0.125rem;
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-12: 3rem;
+    --page-gutter: var(--space-4);
+    --panel-inset: var(--space-3);
+    --section-gap: var(--space-4);
+    --control-height-xs: 1.75rem;
+    --control-height-sm: 2rem;
+    --control-height: 2.25rem;
+    --row-height: 2rem;
+    --target-size: 2.75rem;
+    --radius-control: 0.375rem;
+    --radius-panel: 0.5rem;
+    --radius-overlay: 0.75rem;
+    --shadow-raised: 0 1px 2px rgb(12 15 20 / 5%);
+    --shadow-floating:
+      0 12px 28px -12px rgb(12 15 20 / 18%), 0 4px 10px -6px rgb(12 15 20 / 12%);
+    --shadow-modal:
+      0 24px 64px -20px rgb(12 15 20 / 32%),
+      0 8px 24px -12px rgb(12 15 20 / 18%);
+    --duration-instant: 80ms;
+    --duration-fast: 140ms;
+    --duration-normal: 220ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+    --ease-exit: cubic-bezier(0.3, 0, 1, 0.3);
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-backdrop: 300;
+    --z-modal: 400;
+    --z-toast: 500;
+    --z-tooltip: 600;
     --top-nav-height: 3rem;
     --banner-height: 0px;
     --bottom-nav-height: 4rem;
@@ -15,38 +56,105 @@
     --scroll-inset-bottom: calc(
       var(--bottom-nav-height) + var(--banner-height)
     );
-    --panel-collapsed-w: 60px;
-    --panel-expanded-w: 240px;
+    --panel-collapsed-w: 2.5rem;
+    --panel-expanded-w: 13rem;
     --panel-h: 73dvh;
+  }
+
+  :root[data-visual-version='legacy'] {
+    --page-gutter: var(--space-8);
+    --panel-inset: var(--space-4);
+    --section-gap: var(--space-6);
+    --control-height-xs: 2rem;
+    --control-height-sm: 2.25rem;
+    --control-height: 2.5rem;
+    --row-height: 2rem;
+    --radius-control: 0;
+    --radius-panel: 0;
+    --radius-overlay: 0;
   }
 
   @media (min-width: 768px) {
     :root {
+      --page-gutter: var(--space-5);
       --bottom-nav-height: 0px;
       --scroll-inset-top: calc(var(--top-nav-height) + var(--banner-height));
       --scroll-inset-bottom: 0px;
     }
   }
 
+  html {
+    @apply box-border h-full;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
   *,
-  html,
-  body {
-    @apply box-border;
+  *::before,
+  *::after {
+    box-sizing: inherit;
   }
 
   body {
-    @apply body-normal surface-background relative overscroll-none;
+    @apply body-normal surface-background relative min-h-full overscroll-none font-sans antialiased;
+    font-feature-settings:
+      'cv02' 1,
+      'cv03' 1,
+      'cv04' 1,
+      'cv11' 1;
+    font-variant-numeric: tabular-nums;
   }
 
-  body[data-theme='light'] {
+  :is(button, input, select, textarea) {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--color-border-focus-info));
+    outline-offset: 2px;
+  }
+
+  :is(html, body)[data-theme='light'] {
     color-scheme: light;
   }
 
-  body[data-theme='dark'] {
+  :is(html, body)[data-theme='dark'] {
     color-scheme: dark;
   }
 
   input[type='search']::-webkit-search-cancel-button {
     @apply hidden;
+  }
+
+  @media (pointer: coarse) {
+    :root {
+      --control-height-xs: 2.75rem;
+      --control-height-sm: 2.75rem;
+      --control-height: 2.75rem;
+      --row-height: 2.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duration-instant: 0ms;
+      --duration-fast: 0ms;
+      --duration-normal: 0ms;
+    }
+
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline-color: Highlight;
+    }
   }
 }

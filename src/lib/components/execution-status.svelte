@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-
   import { cva } from 'class-variance-authority';
   import { twMerge as merge } from 'tailwind-merge';
 
@@ -40,30 +38,30 @@
 
   const workflowStatus = cva(
     [
-      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap text-black gap-0.5 font-medium',
+      'flex h-5 items-center gap-1 whitespace-nowrap rounded-control border border-l-2 px-1.5 py-0.5 font-medium tabular-nums transition-colors duration-fast ease-standard',
     ],
     {
       variants: {
         status: {
-          Running: 'bg-blue-300',
-          TimedOut: 'bg-orange-200',
-          Completed: 'bg-green-200',
-          Failed: 'bg-red-200',
-          ContinuedAsNew: 'bg-purple-200',
-          Canceled: 'bg-slate-100',
-          Terminated: 'bg-yellow-200',
-          Paused: 'bg-yellow-200',
-          Unspecified: 'bg-slate-100',
-          Scheduled: 'bg-blue-300',
-          Started: 'bg-blue-300',
-          Open: 'bg-green-200',
-          New: 'bg-blue-300',
-          Initiated: 'bg-blue-300',
-          Fired: 'bg-pink-200',
-          CancelRequested: 'bg-yellow-200',
-          Signaled: 'bg-pink-200',
-          Pending: 'bg-purple-200',
-          Retrying: 'bg-red-200',
+          Running: 'border-information bg-information text-information',
+          TimedOut: 'border-warning bg-warning text-warning',
+          Completed: 'border-success bg-success text-success',
+          Failed: 'border-danger bg-danger text-danger',
+          ContinuedAsNew: 'border-information bg-information text-information',
+          Canceled: 'border-subtle bg-subtle text-secondary',
+          Terminated: 'border-danger bg-danger text-danger',
+          Paused: 'border-warning bg-warning text-warning',
+          Unspecified: 'border-subtle bg-subtle text-secondary',
+          Scheduled: 'border-information bg-information text-information',
+          Started: 'border-information bg-information text-information',
+          Open: 'border-success bg-success text-success',
+          New: 'border-information bg-information text-information',
+          Initiated: 'border-information bg-information text-information',
+          Fired: 'border-warning bg-warning text-warning',
+          CancelRequested: 'border-warning bg-warning text-warning',
+          Signaled: 'border-information bg-information text-information',
+          Pending: 'border-information bg-information text-information',
+          Retrying: 'border-danger bg-danger text-danger',
         },
       },
     },
@@ -99,7 +97,7 @@
           status,
         }),
         (newCount || delayed || taskFailure) && 'rounded-r-none',
-        big && 'h-8 px-4',
+        big && 'h-control-sm px-3 text-sm',
       )}
     >
       {#if loading}
@@ -119,9 +117,9 @@
           workflowStatus({
             status: 'Paused',
           }),
-          'rounded-l-none',
+          '-ml-px rounded-l-none',
           (newCount || taskFailure) && 'rounded-r-none',
-          big && 'h-8 px-2',
+          big && 'h-control-sm px-2',
         )}
       >
         <Icon name="clock" class={merge(!big && 'px-0.5')} />
@@ -130,11 +128,10 @@
     {#if taskFailure}
       <span
         class={merge(
-          workflowStatus(),
-          'bg-red-200 text-red-900 dark:bg-red-700 dark:text-white',
-          'rounded-l-none',
+          workflowStatus({ status: 'Failed' }),
+          '-ml-px rounded-l-none',
           newCount && 'rounded-r-none',
-          big && 'h-8 px-2',
+          big && 'h-control-sm px-2',
         )}
       >
         <Icon name="exclamation-octagon" class={merge(!big && 'px-0.5')} />
@@ -144,13 +141,32 @@
     {#if newCount}
       <span
         class={merge(
-          'font-base surface-primary rounded-r-sm px-1 py-0.5',
-          big && 'px-2',
+          'new-count surface-primary flex h-5 items-center rounded-r-control border border-l-0 border-subtle px-1.5 py-0.5 font-mono text-[11px] font-medium tabular-nums text-secondary',
+          big && 'h-control-sm px-2 text-xs',
         )}
-        in:fade
       >
         {#if newCount > 0}+{/if}{newCount}
       </span>
     {/if}
   </div>
 </Tooltip>
+
+<style lang="postcss">
+  .new-count {
+    animation: status-count-enter var(--duration-fast, 140ms)
+      var(--ease-standard, ease-out);
+  }
+
+  @keyframes status-count-enter {
+    from {
+      opacity: 0;
+      transform: translateX(-2px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .new-count {
+      animation: none;
+    }
+  }
+</style>

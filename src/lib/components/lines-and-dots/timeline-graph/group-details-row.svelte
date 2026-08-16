@@ -83,9 +83,9 @@
 >
   <div bind:this={contentEl} class="flex flex-col">
     <div
-      class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
+      class="surface-secondary relative flex min-h-control-sm items-center justify-between border-b border-subtle text-sm"
     >
-      <div class="flex h-full items-center gap-4 px-2">
+      <div class="flex h-full items-center gap-2 px-2">
         {#if status}
           <WorkflowStatus {status} />
         {/if}
@@ -97,7 +97,7 @@
           </div>
         {/if}
       </div>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
         <Button variant="ghost" size="xs" onclick={() => setActiveGroup(group)}
           >{translate('common.close')} <Icon name="close" /></Button
         >
@@ -107,7 +107,7 @@
       <EventDetailsFull {group} event={group.initialEvent} lazy={true} />
     </div>
     {#if childWorkflowStartedEvent}
-      <div class="surface-primary p-4">
+      <div class="surface-primary p-3">
         <div class="font-medium leading-4 text-secondary">Child Workflow</div>
         {#key group.eventList.length}
           {#if childWorkflowStartedEvent.attributes.workflowExecution?.workflowId}
@@ -131,5 +131,9 @@
   .panel {
     position: absolute;
     z-index: 50;
+    overflow: hidden;
+    border: 1px solid rgb(var(--color-border-subtle));
+    border-radius: var(--radius-panel, 8px);
+    box-shadow: var(--shadow-floating, 0 8px 24px rgb(0 0 0 / 12%));
   }
 </style>

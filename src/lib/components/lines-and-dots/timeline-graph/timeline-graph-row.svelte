@@ -5,16 +5,16 @@
   const groupHover = cva(['h-full w-full border-2'], {
     variants: {
       category: {
-        workflow: 'border-blue-700 bg-blue-800/80 ',
-        activity: 'border-purple-700 bg-purple-800/80 ',
-        'child-workflow': 'border-cyan-600  bg-cyan-600/80 ',
-        timer: 'border-yellow-700 bg-yellow-800/80',
-        signal: 'border-pink-700 bg-pink-800/80',
-        update: 'border-blue-700 bg-blue-800/80',
-        other: 'border-slate-700 bg-slate-800/80',
-        nexus: 'border-indigo-700 bg-indigo-800/80',
-        'local-activity': 'border-slate-700 bg-slate-800/80',
-        default: 'border-purple-700 bg-purple-900/80',
+        workflow: 'border-information bg-information',
+        activity: 'border-strong bg-subtle',
+        'child-workflow': 'border-success bg-success',
+        timer: 'border-warning bg-warning',
+        signal: 'border-information bg-information',
+        update: 'border-information bg-information',
+        other: 'border-strong bg-subtle',
+        nexus: 'border-information bg-information',
+        'local-activity': 'border-strong bg-subtle',
+        default: 'border-strong bg-subtle',
       },
     },
   });
@@ -231,7 +231,7 @@
   >
     {#if icon}
       <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
+        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-primary"
         viewBox="0 0 24 24"><use href="#ti-{icon}" /></svg
       >
     {/if}
@@ -319,7 +319,7 @@
             </svg>
           {/if}
           <span
-            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-current"
+            class="inline-flex min-h-[var(--dot)] items-center rounded-control border border-subtle bg-[rgb(var(--color-surface-primary))] px-1.5 font-mono text-[11px] text-current shadow-raised"
           >
             {#if pendingActivity}
               {translate('workflows.attempt')}
@@ -363,10 +363,18 @@
     inset: 0;
     opacity: 0;
     pointer-events: none;
+    transition: opacity var(--duration-fast, 140ms)
+      var(--ease-standard, ease-out);
   }
 
   .event:not(:disabled):hover .highlight,
   .event:not(:disabled):focus-visible .highlight {
     opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .highlight {
+      transition: none;
+    }
   }
 </style>

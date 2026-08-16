@@ -15,8 +15,8 @@
 
   // Animation constants
   const HOVER_EXIT_DELAY_MS = 100;
-  const ACTIVE_TRANSITION_DURATION = 'duration-300';
-  const HOVER_TRANSITION_DURATION = 'duration-300';
+  const ACTIVE_TRANSITION_DURATION = 'duration-normal';
+  const HOVER_TRANSITION_DURATION = 'duration-fast';
 </script>
 
 <script lang="ts">
@@ -201,7 +201,7 @@
 
 <nav
   bind:this={navElement}
-  class={merge('relative flex flex-col gap-1', className)}
+  class={merge('relative flex flex-col gap-0.5', className)}
   aria-label={ariaLabel}
   {...restProps}
 >
@@ -210,7 +210,7 @@
     style:transform={activeBackgroundStyles.transform}
     style:height={activeBackgroundStyles.height}
     style:opacity={activeBackgroundStyles.opacity}
-    class={`pointer-events-none absolute left-0 w-full bg-interactive-secondary-active transition-all ${ACTIVE_TRANSITION_DURATION} ease-out`}
+    class={`pointer-events-none absolute left-0 w-full rounded-control border-l-2 border-interactive bg-interactive-secondary-active transition-[height,opacity,transform] ${ACTIVE_TRANSITION_DURATION} ease-standard`}
     aria-hidden="true"
   ></div>
 
@@ -220,10 +220,10 @@
       style:transform={hoverBackgroundStyles.transform}
       style:height={hoverBackgroundStyles.height}
       style:opacity={showHoverOpacity ? '1' : '0'}
-      class={`pointer-events-none absolute left-0 w-full bg-interactive-secondary-hover ${
+      class={`pointer-events-none absolute left-0 w-full rounded-control bg-interactive-secondary-hover ${
         enableTransitions
-          ? `transition-all ${HOVER_TRANSITION_DURATION} ease-out`
-          : `transition-opacity ${HOVER_TRANSITION_DURATION} ease-in`
+          ? `transition-[height,opacity,transform] ${HOVER_TRANSITION_DURATION} ease-standard`
+          : `transition-opacity ${HOVER_TRANSITION_DURATION} ease-standard`
       }`}
       aria-hidden="true"
     ></div>

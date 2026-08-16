@@ -17,8 +17,8 @@
   }: Props = $props();
 </script>
 
-<div class="flex flex-col items-center gap-4 py-16">
-  <Icon name="workers" class="h-20 w-20 text-blue-200" />
+<div class="flex flex-col items-center gap-3 py-8">
+  <Icon name="workers" class="h-10 w-10 text-subtle" />
   <div class="flex flex-col items-center gap-2">
     <p class="text-base font-medium">
       {translate('deployments.empty-state-title')}
@@ -27,7 +27,7 @@
       {translate('deployments.empty-state-description')}
     </p>
   </div>
-  <div class="flex flex-wrap items-center justify-center gap-4">
+  <div class="flex flex-wrap items-center justify-center gap-2">
     {#if canCreateServerlessDeployment}
       <Button variant="secondary" href={createHref}>
         {translate('deployments.create-serverless-deployment')}

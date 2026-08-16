@@ -163,7 +163,7 @@
         {/if}
         <div class="flex w-full flex-row items-center gap-2">
           <Icon name="clock" aria-hidden="true" />
-          <span class="text-xs font-normal text-slate-500"
+          <span class="text-xs font-normal text-secondary"
             >{translate('common.based-on-time-preface')}
             {timezone === 'UTC'
               ? translate('common.universal-standard-time')

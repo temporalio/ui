@@ -1,5 +1,6 @@
 <script lang="ts">
   import { on } from 'svelte/events';
+  import { MediaQuery } from 'svelte/reactivity';
   import { scale } from 'svelte/transition';
 
   import { untrack } from 'svelte';
@@ -29,6 +30,10 @@
   let anchorElement = $state<HTMLElement | null>(null);
   let scrollContainerElement = $state<HTMLElement | Window>(window);
   let rafId = $state<number | null>(null);
+  const reducedMotion =
+    typeof window.matchMedia === 'function'
+      ? new MediaQuery('(prefers-reduced-motion: reduce)')
+      : { current: false };
 
   const shouldShowPortal = $derived(
     open && anchorElement && (!hideWhenAnchorHidden || isVisible),
@@ -187,7 +192,11 @@
   >
     <div
       class={merge(className)}
-      transition:scale={{ duration: 100, start: 0.95, opacity: 0 }}
+      transition:scale={{
+        duration: reducedMotion.current ? 0 : 140,
+        start: reducedMotion.current ? 1 : 0.95,
+        opacity: 0,
+      }}
     >
       {@render children()}
     </div>

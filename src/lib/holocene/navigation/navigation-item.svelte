@@ -41,7 +41,7 @@
     text={tooltip}
     right
     class="block"
-    tooltipClass="rounded-none text-white ml-4 group-data-[nav=open]:hidden"
+    tooltipClass="ml-3 group-data-[nav=open]:hidden"
   >
     <a
       href={link}
@@ -55,24 +55,32 @@
       data-track-intent="navigate"
       data-track-text={label}
       class={merge(
-        'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm',
-        'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+        'navigation-item-link relative mb-1 flex min-h-8 items-center gap-0 whitespace-nowrap rounded-control px-1 text-[0.8125rem] text-secondary transition-colors group-data-[nav=open]:gap-2 group-data-[nav=open]:px-2',
+        'hover:bg-interactive-secondary-hover hover:text-primary active:bg-interactive-secondary-active',
         active &&
-          'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
+          'bg-interactive-secondary-active font-medium text-primary before:absolute before:inset-y-1 before:-left-2 before:w-0.5 before:bg-interactive',
         disabled && 'pointer-events-none cursor-not-allowed opacity-50',
       )}
       class:text-disabled={disabled}
     >
       {#if icon}
-        <div class="flex h-6 w-6 items-center">
+        <div class="flex h-6 w-6 shrink-0 items-center justify-center">
           <Icon name={icon} {animate} />
         </div>
       {/if}
       <div
-        class="opacity-0 transition-opacity group-data-[nav=closed]:pointer-events-none group-data-[nav=open]:opacity-100 group-data-[nav=open]:delay-75 group-data-[nav=closed]:duration-75 group-data-[nav=open]:duration-150 group-data-[nav=closed]:ease-out group-data-[nav=open]:ease-linear motion-reduce:transition-none"
+        class="min-w-0 truncate opacity-0 transition-opacity group-data-[nav=closed]:pointer-events-none group-data-[nav=open]:opacity-100 group-data-[nav=open]:delay-75 group-data-[nav=closed]:duration-75 group-data-[nav=open]:duration-150 group-data-[nav=closed]:ease-out group-data-[nav=open]:ease-linear motion-reduce:transition-none"
       >
         {label}
       </div>
     </a>
   </Tooltip>
 </div>
+
+<style lang="postcss">
+  @media (pointer: coarse) {
+    .navigation-item-link {
+      @apply min-h-target;
+    }
+  }
+</style>

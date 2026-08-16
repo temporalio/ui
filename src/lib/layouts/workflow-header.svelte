@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
   import { fly } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
@@ -63,6 +64,7 @@
   } = $derived(page.params);
 
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
+  const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)');
 
   const { workflow } = $derived($workflowRun);
   const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
@@ -113,8 +115,8 @@
   const sharedFilterParams = $derived(getSharedFilterParams(page.url));
 </script>
 
-<div class="flex items-center justify-between">
-  <div class="flex items-center gap-2">
+<div class="min-w-0 overflow-x-auto">
+  <div class="flex w-max items-center gap-2">
     <Link
       href={workflowsHref}
       data-testid="back-to-workflows"
@@ -137,13 +139,13 @@
     {/if}
   </div>
 </div>
-<header class="flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
+<header class="flex min-w-0 flex-col gap-3">
+  <div class="flex flex-col items-center justify-between gap-3 xl:flex-row">
     <div
-      class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
+      class="flex w-full min-w-0 flex-col items-start gap-3 xl:flex-row xl:items-center"
     >
       <div
-        class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
+        class="order-2 flex flex-wrap items-center justify-between gap-3 max-xl:w-full xl:order-1"
       >
         <WorkflowStatus
           status={workflow?.status}
@@ -162,7 +164,7 @@
           />
         </div>
       </div>
-      <div class="flex flex-col flex-wrap gap-0">
+      <div class="order-1 flex min-w-0 flex-col flex-wrap gap-0 xl:order-2">
         <h1
           data-testid="workflow-id-heading"
           class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
@@ -191,7 +193,12 @@
   <CodecServerErrorBanner />
   <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
   {#if cancelInProgress}
-    <div in:fly={{ duration: 200, delay: 100 }}>
+    <div
+      in:fly={{
+        duration: reducedMotion.current ? 0 : 140,
+        delay: reducedMotion.current ? 0 : 80,
+      }}
+    >
       <Alert
         icon="info"
         intent="info"
@@ -204,7 +211,12 @@
   {/if}
   {#if isPaused}
     {@const pauseInfo = workflow?.workflowExtendedInfo.pauseInfo}
-    <div in:fly={{ duration: 200, delay: 100 }}>
+    <div
+      in:fly={{
+        duration: reducedMotion.current ? 0 : 140,
+        delay: reducedMotion.current ? 0 : 80,
+      }}
+    >
       <Alert
         icon="info"
         intent="info"
@@ -214,7 +226,7 @@
       >
         <div class="mt-2 flex flex-col gap-2">
           <p>{translate('workflows.workflow-paused-description')}</p>
-          <ul class="list-disc pl-6">
+          <ul class="list-disc pl-5">
             <li>{translate('workflows.workflow-pause-description-item-1')}</li>
             <li>{translate('workflows.workflow-pause-description-item-2')}</li>
             <li>{translate('workflows.workflow-pause-description-item-3')}</li>
@@ -243,7 +255,12 @@
     </div>
   {/if}
   {#if workflowHasBeenReset}
-    <div in:fly={{ duration: 200, delay: 100 }}>
+    <div
+      in:fly={{
+        duration: reducedMotion.current ? 0 : 140,
+        delay: reducedMotion.current ? 0 : 80,
+      }}
+    >
       <Alert
         icon="info"
         intent="info"
@@ -270,8 +287,11 @@
     {runningWithNoWorkers}
     deployment={workerDeployment}
   />
-  <Tabs>
-    <TabList label="workflow detail">
+  <Tabs class="min-w-0 overflow-hidden">
+    <TabList
+      label="workflow detail"
+      class="flex-nowrap gap-x-4 overflow-x-auto overflow-y-hidden"
+    >
       <Tab
         label={translate('workflows.timeline-tab')}
         id="timeline-tab"

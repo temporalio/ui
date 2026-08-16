@@ -30,7 +30,7 @@
     { status: 'Completed' },
     {
       status: 'Completed with retries',
-      style: `background: linear-gradient(255deg, ${getStatusStrokeColor('Completed')} 0%, #F55 100%)`,
+      style: `background-color: ${getCategoryStrokeColor('retry')}`,
     },
     { status: 'Failed' },
     { status: 'Fired' },
@@ -50,7 +50,7 @@
 </script>
 
 {#snippet term(label: string)}
-  <dt class="mb-2 font-medium">{label}</dt>
+  <dt class="mb-1.5 font-medium text-primary">{label}</dt>
 {/snippet}
 
 {#snippet statusKey({
@@ -62,9 +62,9 @@
   status: Status;
   style?: string;
 })}
-  <dd class="mt-0.5 flex items-center gap-2">
+  <dd class="mt-1 flex items-center gap-1.5 text-secondary">
     <span
-      class="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+      class="inline-block h-2.5 w-2.5 shrink-0 rounded-control border border-subtle"
       style={status !== 'Completed with retries' && !style
         ? `background-color: ${getStatusStrokeColor(status)}`
         : style}
@@ -77,7 +77,7 @@
   label: string;
   category: 'pending' | 'retry';
 })}
-  <dd class="mt-0.5 flex items-center gap-2">
+  <dd class="mt-1 flex items-center gap-1.5 text-secondary">
     <svg class="h-2.5 w-5 shrink-0" viewBox="0 0 15 10">
       <line
         class="animate-dash"
@@ -97,7 +97,7 @@
 {#snippet eventCategoryKey(category: EventTypeCategory)}
   {@const { name, title } = CategoryIcon[category]}
   <dd
-    class="mt-1 flex items-center gap-2 {eventCategoryColor({
+    class="mt-1 flex items-center gap-1.5 {eventCategoryColor({
       category,
     })}"
   >
@@ -113,7 +113,7 @@
   usePortal
 >
   {#snippet content()}
-    <div class="flex gap-6 whitespace-normal p-2 text-xs max-sm:flex-col">
+    <div class="flex gap-5 whitespace-normal p-1 text-xs max-sm:flex-col">
       {#if !eventTypesOnly}
         <dl>
           {@render term(translate('common.status'))}

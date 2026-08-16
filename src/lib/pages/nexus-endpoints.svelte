@@ -53,7 +53,7 @@
     {/snippet}
   </NexusEmptyState>
 {:else}
-  <div class="mb-8 flex items-center justify-between">
+  <div class="mb-4 flex items-center justify-between gap-3">
     <h1 data-testid="namespace-selector-title">
       {translate('nexus.endpoints')}
     </h1>

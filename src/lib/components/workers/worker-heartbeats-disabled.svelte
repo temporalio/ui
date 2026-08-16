@@ -10,14 +10,16 @@
 
 <Card>
   <div
-    class="my-12 flex w-full flex-col items-center justify-start gap-4"
+    class="my-6 flex w-full flex-col items-center justify-start gap-3"
     data-testid="worker-heartbeats-disabled"
     aria-live="polite"
   >
-    <span class="flex h-20 w-20 items-center justify-center rounded-full">
+    <span
+      class="flex h-10 w-10 items-center justify-center rounded-panel bg-information"
+    >
       <Icon
         name="heartbeat"
-        class="block h-full w-full text-blue-200"
+        class="block h-6 w-6 text-information"
         height={20}
         width={20}
       />

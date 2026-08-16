@@ -100,7 +100,7 @@
 </script>
 
 {#if visibleFilters.length > 0}
-  <div class="flex flex-wrap items-center gap-2">
+  <div class="flex flex-nowrap items-center gap-1.5">
     {#each visibleFilters as filterItem, i (filterItem.id)}
       {#if statusAttribute && isStatusFilter(filterItem) && i === firstExecutionStatusIndex}
         <StatusFilterChip
