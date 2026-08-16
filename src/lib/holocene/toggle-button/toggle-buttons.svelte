@@ -14,6 +14,6 @@
   let { class: className = '', children, ...rest }: Props = $props();
 </script>
 
-<div class={twMerge('flex', className)} {...rest}>
+<div class={twMerge('flex gap-0.5', className)} {...rest}>
   {@render children()}
 </div>

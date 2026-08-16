@@ -442,7 +442,7 @@
   }
 
   :global(.command-palette-modal::backdrop) {
-    background: rgb(12 15 20 / 64%);
+    background: rgb(var(--color-surface-black) / 64%);
     opacity: 0;
     transition: opacity var(--duration-normal) var(--ease-standard);
   }

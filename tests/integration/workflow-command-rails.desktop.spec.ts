@@ -146,6 +146,61 @@ const expectApproximately = (
   expect(Math.abs(actual - expected), message).toBeLessThanOrEqual(1);
 };
 
+const paintOrderAtIntersection = (
+  page: Page,
+  overlaySelector: string,
+  underlaySelectors: string[],
+) =>
+  page.evaluate(
+    ({ overlaySelector, underlaySelectors }) => {
+      const overlay = Array.from(
+        document.querySelectorAll<HTMLElement>(overlaySelector),
+      ).find((element) => element.getClientRects().length > 0);
+      const underlays = underlaySelectors
+        .map((selector) => document.querySelector<HTMLElement>(selector))
+        .filter((element): element is HTMLElement => Boolean(element));
+
+      if (!overlay || underlays.length === 0) return null;
+
+      const overlayBounds = overlay.getBoundingClientRect();
+
+      for (const underlay of underlays) {
+        const underlayBounds = underlay.getBoundingClientRect();
+        const intersection = {
+          bottom: Math.min(overlayBounds.bottom, underlayBounds.bottom),
+          left: Math.max(overlayBounds.left, underlayBounds.left),
+          right: Math.min(overlayBounds.right, underlayBounds.right),
+          top: Math.max(overlayBounds.top, underlayBounds.top),
+        };
+
+        if (
+          intersection.right <= intersection.left ||
+          intersection.bottom <= intersection.top
+        ) {
+          continue;
+        }
+
+        const elements = document.elementsFromPoint(
+          (intersection.left + intersection.right) / 2,
+          (intersection.top + intersection.bottom) / 2,
+        );
+
+        return {
+          intersects: true,
+          overlayIndex: elements.findIndex(
+            (element) => element === overlay || overlay.contains(element),
+          ),
+          underlayIndex: elements.findIndex(
+            (element) => element === underlay || underlay.contains(element),
+          ),
+        };
+      }
+
+      return { intersects: false, overlayIndex: -1, underlayIndex: -1 };
+    },
+    { overlaySelector, underlaySelectors },
+  );
+
 const stickyStackMetrics = async (page: Page, commandRailTestId: string) =>
   page.evaluate((secondaryRailTestId) => {
     const contentWrapper =
@@ -302,6 +357,76 @@ for (const scenario of stickyStackRoutes) {
     });
   }
 }
+
+test('the user menu renders above sticky workflow navigation', async ({
+  page,
+}) => {
+  await expectStickyStack(page, stickyStackRoutes[1], stickyStackViewports[1]);
+
+  const userMenuTrigger = page.getByTestId('user-menu-trigger');
+  await userMenuTrigger.click();
+  await expect(userMenuTrigger).toHaveAttribute('aria-expanded', 'true');
+
+  const userMenu = page.locator('#user-menu');
+  await expect(userMenu).toBeVisible();
+
+  const stackingOrder = await paintOrderAtIntersection(page, '#user-menu', [
+    '[data-testid="workflow-detail-command-rail"]',
+  ]);
+
+  expect(
+    stackingOrder,
+    'the menu and sticky rail should render',
+  ).not.toBeNull();
+  expect(
+    stackingOrder?.intersects,
+    'the regression must exercise the overlapping surfaces',
+  ).toBe(true);
+  expect(stackingOrder?.overlayIndex).toBeGreaterThanOrEqual(0);
+  expect(stackingOrder?.underlayIndex).toBeGreaterThanOrEqual(0);
+  expect(
+    stackingOrder?.overlayIndex,
+    'the user menu should be painted above the sticky workflow rail',
+  ).toBeLessThan(stackingOrder?.underlayIndex ?? -1);
+});
+
+test('the workflow actions menu renders above sticky workflow navigation', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto(historyUrl);
+
+  const actionsTrigger = page.getByRole('button', { name: 'More Actions' });
+  await actionsTrigger.click();
+  await expect(actionsTrigger).toHaveAttribute('aria-expanded', 'true');
+
+  const actionsMenu = page.locator('#workflow-actions:visible');
+  await expect(actionsMenu).toBeVisible();
+
+  const stackingOrder = await paintOrderAtIntersection(
+    page,
+    '#workflow-actions',
+    [
+      '[data-testid="workflow-detail-command-rail"]',
+      '[data-testid="event-history-command-rail"]',
+    ],
+  );
+
+  expect(
+    stackingOrder,
+    'the menu and sticky rails should render',
+  ).not.toBeNull();
+  expect(
+    stackingOrder?.intersects,
+    'the regression must exercise the overlapping surfaces',
+  ).toBe(true);
+  expect(stackingOrder?.overlayIndex).toBeGreaterThanOrEqual(0);
+  expect(stackingOrder?.underlayIndex).toBeGreaterThanOrEqual(0);
+  expect(
+    stackingOrder?.overlayIndex,
+    'the workflow actions menu should be painted above sticky workflow rails',
+  ).toBeLessThan(stackingOrder?.underlayIndex ?? -1);
+});
 
 test('History and Timeline keep their command labels visible at 375px', async ({
   page,

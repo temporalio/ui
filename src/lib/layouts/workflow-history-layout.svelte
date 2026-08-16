@@ -268,7 +268,6 @@
             ? translate('workflows.auto-refresh-off')
             : translate('workflows.auto-refresh-on')}
           data-testid="pause"
-          class="border-l-0"
           size="sm"
           onclick={onAutoRefreshToggle}
         >

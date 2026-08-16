@@ -30,7 +30,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof ToggleButton>)}
-  <ToggleButtons>
+  <ToggleButtons data-testid="toggle-button-group">
     {#each ['John', 'Paul', 'George', 'Ringo'] as name, index (name)}
       <ToggleButton
         {...args}
@@ -53,6 +53,15 @@
     const second = await canvas.findByTestId('toggle-button-1');
     const third = await canvas.findByTestId('toggle-button-2');
     const fourth = await canvas.findByTestId('toggle-button-3');
+    const group = await canvas.findByTestId('toggle-button-group');
+    await step(
+      'Separate grouped controls while keeping complete borders',
+      () => {
+        expect(group).toHaveClass('gap-0.5');
+        expect(first).toHaveClass('border', 'rounded-control');
+        expect(first.className).not.toContain('border-r-0');
+      },
+    );
     await step('Validate that the selected toggle is active', async () => {
       const selectedToggle = await canvas.findByTestId(
         `toggle-button-${get(selected)}`,

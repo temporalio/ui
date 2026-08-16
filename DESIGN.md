@@ -7,9 +7,13 @@ default_density: compact
 fonts:
   ui: Geist Variable
   mono: Noto Sans Mono
-themes:
+color_modes:
   - light
   - dark
+palettes:
+  - precision
+  - ember
+  - vaporwave
 breakpoints:
   audit: [375, 768, 1440]
 tokens:
@@ -53,6 +57,12 @@ danger, and information colors are semantic exceptions; they use low-chroma
 background tints with a label or icon and never communicate through color
 alone.
 
+Precision is the default cool graphite and indigo palette. Ember is the
+optional warm graphite and copper palette. Vaporwave is the deliberately
+expressive violet, magenta, and cyan palette. All palettes provide complete
+light and dark semantic color maps; palette identity and color mode are
+independent preferences.
+
 Workflow relationship diagrams use dedicated semantic connector, current-node,
 and placeholder tokens. Their connector and muted-status strokes maintain at
 least 3:1 contrast against both theme surfaces; application components never
@@ -64,8 +74,16 @@ than ten percent of a normal product screen.
 **The Layer Rule.** Dark-mode elevation is always lighter than the canvas;
 shadow never substitutes for surface hierarchy.
 
+**The Palette Contract.** A palette may override only semantic `--color-*`
+tokens, including shadow color. It never changes typography, spacing,
+dimensions, positioning, overflow, motion, markup, or component behavior.
+Application components never branch on palette identity.
+
 Audit test: if a screen reads as blue or purple at a glance, accent dosage is
 too high.
+
+Palette audit test: switching palettes must leave every measured element in
+the same position and size.
 
 ## Typography
 
@@ -142,6 +160,8 @@ is incomplete.
 - No giant radii, floating islands of cards, nested cards, or blanket shadows.
 - No raw palette utilities in application components when a semantic token
   exists.
+- No layout or component selectors in a palette definition; new palettes are
+  complete typed semantic color maps only.
 - No `transition-all`, hover-only functionality, or layout-property animation.
 - No pure black or pure white as the dominant product canvas.
 - No shrinking tables below readable density or cardifying rows on mobile.
@@ -160,3 +180,8 @@ the application template applies that precedence and the persisted/system
 theme before render. Its hash is explicit because the static-adapter fallback
 cannot safely use a runtime nonce; an automated test keeps the script and CSP
 hash synchronized.
+
+The orthogonal root `data-palette` attribute selects the color palette and is
+persisted under the local-storage key `color palette`. Precision is the
+fallback. Palette restoration happens in the same pre-paint initializer so a
+saved palette never flashes through the default palette during startup.

@@ -35,4 +35,32 @@ test.describe('Dark Mode Dropdown on Mobile', () => {
     await dayModeButton.click();
     await expect(page).toHaveLocalStorageItem(localStorageKey, false);
   });
+
+  test('user can select and persist a color palette', async ({ page }) => {
+    const emberPaletteButton = page.getByTestId('palette-ember');
+    await expect(emberPaletteButton).toHaveAccessibleName('Ember palette');
+
+    await emberPaletteButton.click();
+
+    await expect(page).toHaveLocalStorageItem('color palette', 'ember');
+    await expect(page.locator('html')).toHaveAttribute('data-palette', 'ember');
+    await expect(page.locator('body')).toHaveAttribute('data-palette', 'ember');
+
+    const vaporwavePaletteButton = page.getByTestId('palette-vaporwave');
+    await expect(vaporwavePaletteButton).toHaveAccessibleName(
+      'Vaporwave palette',
+    );
+
+    await vaporwavePaletteButton.click();
+
+    await expect(page).toHaveLocalStorageItem('color palette', 'vaporwave');
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-palette',
+      'vaporwave',
+    );
+    await expect(page.locator('body')).toHaveAttribute(
+      'data-palette',
+      'vaporwave',
+    );
+  });
 });

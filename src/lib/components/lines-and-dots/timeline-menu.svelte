@@ -168,6 +168,7 @@
 {#if usePortal && anchorElement}
   <Portal
     anchor={anchorElement}
+    layer="dropdown"
     open={$open}
     position={portalPosition}
     {scrollContainer}

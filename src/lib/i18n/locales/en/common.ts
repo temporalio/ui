@@ -255,6 +255,13 @@ export const Strings = {
   'retry-support-message':
     'Please refresh the page or contact support if the problem persists.',
   theme: 'Theme',
+  palette: 'Palette',
+  precision: 'Precision',
+  ember: 'Ember',
+  vaporwave: 'Vaporwave',
+  'precision-palette': 'Precision palette',
+  'ember-palette': 'Ember palette',
+  'vaporwave-palette': 'Vaporwave palette',
   'slack-community': 'Slack Community',
   'community-forum': 'Community Forum',
   'change-log': 'Change Log',

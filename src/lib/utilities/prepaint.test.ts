@@ -4,6 +4,8 @@ import { resolve } from 'node:path';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { defaultPalette } from '$lib/theme/palettes';
+
 const appTemplate = readFileSync(
   resolve(process.cwd(), 'src/app.html'),
   'utf8',
@@ -26,6 +28,8 @@ describe('pre-paint theme and visual version', () => {
     window.localStorage.clear();
     window.history.replaceState({}, '', '/');
     document.documentElement.dataset.theme = 'light';
+    delete document.documentElement.dataset.palette;
+    document.documentElement.dataset.paletteDefault = 'precision';
     document.documentElement.dataset.visualVersion = 'v2';
     document.documentElement.dataset.visualDefault = '';
     Object.defineProperty(window, 'matchMedia', {
@@ -53,6 +57,7 @@ describe('pre-paint theme and visual version', () => {
       appTemplate.indexOf('<script data-prepaint>'),
     );
     expect(appTemplate).not.toContain('%sveltekit.nonce%');
+    expect(appTemplate).toContain(`data-palette-default="${defaultPalette}"`);
   });
 
   it('applies query, storage, and build defaults in rollback order', () => {
@@ -84,5 +89,22 @@ describe('pre-paint theme and visual version', () => {
     } as MediaQueryList);
     runPrepaint();
     expect(document.documentElement.dataset.theme).toBe('dark');
+  });
+
+  it('applies a safe persisted palette slug before app startup', () => {
+    window.localStorage.setItem('color palette', '"future-palette"');
+
+    runPrepaint();
+
+    expect(document.documentElement.dataset.palette).toBe('future-palette');
+  });
+
+  it('uses the configured default palette for missing or unsafe preferences', () => {
+    runPrepaint();
+    expect(document.documentElement.dataset.palette).toBe('precision');
+
+    window.localStorage.setItem('color palette', '"../../unsafe"');
+    runPrepaint();
+    expect(document.documentElement.dataset.palette).toBe('precision');
   });
 });

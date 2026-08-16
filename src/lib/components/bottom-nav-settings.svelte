@@ -2,10 +2,12 @@
   import { onDestroy, type Snippet } from 'svelte';
 
   import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
+  import PaletteMenu from '$lib/components/palette-menu.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { dataEncoder } from '$lib/stores/data-encoder';
+  import { usePalettePreference } from '$lib/utilities/palette';
 
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
 
@@ -54,6 +56,7 @@
   <div
     class="flex h-full flex-col justify-start gap-4 overflow-auto px-4 py-4"
     data-theme="dark"
+    data-palette={$usePalettePreference}
   >
     <div class="flex items-center justify-between">
       <p>Timezone</p>
@@ -62,6 +65,10 @@
     <div class="flex items-center justify-between">
       <p>{translate('common.theme')}</p>
       <DarkModeMenu />
+    </div>
+    <div class="flex items-center justify-between">
+      <p>{translate('common.palette')}</p>
+      <PaletteMenu />
     </div>
     <hr class="border-subtle" />
     <NavigationButton

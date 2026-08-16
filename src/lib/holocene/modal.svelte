@@ -180,7 +180,9 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-slate-950/60 transition-opacity duration-normal;
+    @apply cursor-pointer transition-opacity duration-normal;
+
+    background-color: rgb(var(--color-surface-black) / 60%);
 
     :global([data-theme='dark']) & {
       background-color: rgb(var(--color-surface-background) / 50%);

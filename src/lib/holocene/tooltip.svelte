@@ -193,6 +193,7 @@
       <Portal
         offset={portalOffset}
         anchor={wrapperElement}
+        layer="tooltip"
         open={isOpen}
         position={portalPosition}
         {scrollContainer}

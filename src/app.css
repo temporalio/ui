@@ -31,20 +31,22 @@
     --radius-control: 0.375rem;
     --radius-panel: 0.5rem;
     --radius-overlay: 0.75rem;
-    --shadow-raised: 0 1px 2px rgb(12 15 20 / 5%);
+    --shadow-raised: 0 1px 2px rgb(var(--color-shadow) / 5%);
     --shadow-floating:
-      0 12px 28px -12px rgb(12 15 20 / 18%), 0 4px 10px -6px rgb(12 15 20 / 12%);
+      0 12px 28px -12px rgb(var(--color-shadow) / 18%),
+      0 4px 10px -6px rgb(var(--color-shadow) / 12%);
     --shadow-modal:
-      0 24px 64px -20px rgb(12 15 20 / 32%),
-      0 8px 24px -12px rgb(12 15 20 / 18%);
+      0 24px 64px -20px rgb(var(--color-shadow) / 32%),
+      0 8px 24px -12px rgb(var(--color-shadow) / 18%);
     --duration-instant: 80ms;
     --duration-fast: 140ms;
     --duration-normal: 220ms;
     --ease-standard: cubic-bezier(0.2, 0, 0, 1);
     --ease-enter: cubic-bezier(0, 0, 0.2, 1);
     --ease-exit: cubic-bezier(0.3, 0, 1, 0.3);
-    --z-dropdown: 100;
     --z-sticky: 200;
+    --z-dropdown: 225;
+    --z-navigation: 250;
     --z-backdrop: 300;
     --z-modal: 400;
     --z-toast: 500;

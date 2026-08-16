@@ -23,7 +23,7 @@
   <nav
     class={merge(
       'surface-primary',
-      'sticky top-0 z-40',
+      'sticky top-0 z-navigation',
       'flex',
       'h-[var(--top-nav-height)] min-h-[var(--top-nav-height)]',
       'w-full min-w-0',

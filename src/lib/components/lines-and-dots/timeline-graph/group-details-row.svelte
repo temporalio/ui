@@ -162,6 +162,9 @@
     overflow: hidden;
     border: 1px solid rgb(var(--color-border-subtle));
     border-radius: var(--radius-panel, 8px);
-    box-shadow: var(--shadow-floating, 0 8px 24px rgb(0 0 0 / 12%));
+    box-shadow: var(
+      --shadow-floating,
+      0 8px 24px rgb(var(--color-shadow, 0 0 0) / 12%)
+    );
   }
 </style>

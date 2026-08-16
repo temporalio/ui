@@ -8,10 +8,18 @@
 
   import { portal } from './portal-action';
   import { calculatePosition, getElementRect } from './position-calculator';
-  import type { PortalProps } from './types';
+  import type { PortalLayer, PortalProps } from './types';
+
+  const portalLayerStyles: Record<PortalLayer, string> = {
+    dropdown: 'z-dropdown',
+    modal: 'z-modal',
+    toast: 'z-toast',
+    tooltip: 'z-tooltip',
+  };
 
   let {
     anchor,
+    layer = 'dropdown',
     open = true,
     position = 'bottom',
     offset = {},
@@ -186,7 +194,10 @@
     bind:this={portalElement}
     use:portal={target}
     {@attach setupPositioning}
-    class="pointer-events-auto fixed left-0 top-0 z-100"
+    class={merge(
+      'pointer-events-auto fixed left-0 top-0',
+      portalLayerStyles[layer],
+    )}
     style:transform="translate({positionX}px, {positionY}px)"
     style:will-change="transform"
   >

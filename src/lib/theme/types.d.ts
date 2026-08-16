@@ -4,10 +4,10 @@ type Palette = import('./colors').Palette;
 type RGB = `${number} ${number} ${number}`;
 type HexColor = `#${string}`;
 
-type CSSVariable = `--${string}`;
-type ColorVariables = Readonly<
-  Record<CSSVariable, { light: ColorName; dark: ColorName }>
->;
+type ColorCSSVariable = `--color-${string}`;
+type ColorScheme = 'light' | 'dark';
+type ColorVariableValue = Readonly<Record<ColorScheme, ColorName>>;
+type ColorVariables = Readonly<Record<ColorCSSVariable, ColorVariableValue>>;
 
 type Shade =
   | 50

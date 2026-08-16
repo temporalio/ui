@@ -22,6 +22,7 @@
   } from '$lib/stores/data-encoder-config';
   import { triggerRefresh } from '$lib/stores/workflow-run';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
+  import { usePalettePreference } from '$lib/utilities/palette';
   import { trimTrailingSlash } from '$lib/utilities/trim-trailing-slash';
 
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
@@ -88,6 +89,7 @@
   onConfirmModal={onConfirm}
   large
   data-theme={md.current ? 'dark' : undefined}
+  data-palette={$usePalettePreference}
 >
   {#snippet titleSnippet()}
     <h3 data-testid="data-encoder-title">

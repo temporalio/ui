@@ -1,5 +1,6 @@
 <script lang="ts">
   import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
+  import PaletteMenu from '$lib/components/palette-menu.svelte';
   import {
     Menu,
     MenuButton,
@@ -59,7 +60,7 @@
       />
     {/if}
   </MenuButton>
-  <Menu id="user-menu" position="right" class="w-60">
+  <Menu id="user-menu" position="right" class="w-80">
     {#if $authUser.accessToken}
       <MenuItem hoverable={false}>
         <div class="flex min-w-0 items-center justify-start gap-2">
@@ -81,6 +82,10 @@
     <MenuItem hoverable={false}>
       {translate('common.theme')}
       <DarkModeMenu />
+    </MenuItem>
+    <MenuItem hoverable={false}>
+      {translate('common.palette')}
+      <PaletteMenu />
     </MenuItem>
     <MenuDivider />
     <MenuItem

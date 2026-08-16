@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import { useDarkMode } from '$lib/utilities/dark-mode';
+  import { usePalettePreference } from '$lib/utilities/palette';
 
   interface Props {
     content: string;
@@ -105,7 +106,7 @@
   );
   const previewPath = $derived(
     resolve(
-      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}`,
+      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&palette=${$usePalettePreference}`,
       {},
     ),
   );

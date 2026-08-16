@@ -100,7 +100,7 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex h-control-sm items-center justify-center rounded-control border border-transparent px-3 text-xs font-medium leading-4 text-secondary transition-colors duration-fast focus-visible:outline-none;
+    @apply flex h-control-sm items-center justify-center rounded-control border border-subtle px-3 text-xs font-medium leading-4 text-secondary transition-colors duration-fast focus-visible:outline-none;
 
     &:not(.disabled) {
       @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-2 focus-visible:ring-primary;

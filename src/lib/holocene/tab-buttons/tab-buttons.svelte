@@ -8,6 +8,6 @@
     $props();
 </script>
 
-<div class={merge('flex', className)} role="group">
+<div class={merge('flex gap-0.5', className)} role="group">
   {@render children?.()}
 </div>

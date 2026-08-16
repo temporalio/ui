@@ -1,8 +1,25 @@
 import plugin from 'tailwindcss/plugin';
 
 import { colors } from './colors';
+import { defaultPalette, paletteNames } from './palettes';
 import { css } from './utilities';
-import { dark, light } from './variables';
+import { paletteCSSVariables } from './variables';
+
+const defaultPaletteVariables = paletteCSSVariables[defaultPalette];
+const alternatePaletteVariables = Object.fromEntries(
+  paletteNames
+    .filter((palette) => palette !== defaultPalette)
+    .flatMap((palette) => [
+      [
+        `:root[data-palette="${palette}"], [data-palette="${palette}"][data-theme="light"]`,
+        paletteCSSVariables[palette].light,
+      ],
+      [
+        `[data-palette="${palette}"][data-theme="dark"]`,
+        paletteCSSVariables[palette].dark,
+      ],
+    ]),
+);
 
 const textStyles = plugin(({ addBase, theme }) => {
   addBase({
@@ -76,8 +93,9 @@ const textStyles = plugin(({ addBase, theme }) => {
 const temporal = plugin(
   ({ addComponents, addBase }) => {
     addBase({
-      ':root': light,
-      '[data-theme="dark"]': dark,
+      ':root': defaultPaletteVariables.light,
+      '[data-theme="dark"]': defaultPaletteVariables.dark,
+      ...alternatePaletteVariables,
     });
 
     addComponents({
@@ -327,6 +345,7 @@ const temporal = plugin(
         zIndex: {
           dropdown: 'var(--z-dropdown)',
           sticky: 'var(--z-sticky)',
+          navigation: 'var(--z-navigation)',
           backdrop: 'var(--z-backdrop)',
           modal: 'var(--z-modal)',
           toast: 'var(--z-toast)',

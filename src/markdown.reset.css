@@ -1,13 +1,5 @@
 :root {
   color-scheme: light;
-  --md-canvas: #fbfcfe;
-  --md-surface: #f4f6fa;
-  --md-code: #f4f6fa;
-  --md-text: #0c0f14;
-  --md-muted: #545e6d;
-  --md-border: #d8dee8;
-  --md-accent: #5159e8;
-  --md-accent-soft: #f0f1ff;
 }
 
 *,
@@ -24,6 +16,15 @@
 }
 
 body {
+  --md-canvas: rgb(var(--color-surface-primary));
+  --md-surface: rgb(var(--color-surface-secondary));
+  --md-code: rgb(var(--color-surface-code-block));
+  --md-text: rgb(var(--color-text-primary));
+  --md-muted: rgb(var(--color-text-secondary));
+  --md-border: rgb(var(--color-border-subtle));
+  --md-accent: rgb(var(--color-text-brand));
+  --md-accent-soft: rgb(var(--color-surface-information));
+
   overscroll-behavior: none;
   position: relative;
   padding: 0.75rem;
@@ -189,30 +190,27 @@ pre code {
 }
 
 body[data-theme='light-background'] {
-  --md-canvas: #f5f7fa;
+  --md-canvas: rgb(var(--color-surface-background));
 }
 
 body[data-theme='light-primary'] {
-  --md-canvas: #fbfcfe;
+  --md-canvas: rgb(var(--color-surface-primary));
 }
 
 body[data-theme='dark'],
 body[data-theme='dark-background'],
 body[data-theme='dark-primary'] {
   color-scheme: dark;
-  --md-canvas: #0c0f14;
-  --md-surface: #181d26;
-  --md-code: #10141b;
-  --md-text: #f5f7fa;
-  --md-muted: #9aa5b5;
-  --md-border: #384150;
-  --md-accent: #a9afff;
-  --md-accent-soft: #1f2554;
+  --md-canvas: rgb(var(--color-surface-background));
 }
 
 body[data-theme='dark'],
 body[data-theme='dark-primary'] {
-  --md-canvas: #12161d;
+  --md-canvas: rgb(var(--color-surface-primary));
+}
+
+body[data-theme='dark-background'] {
+  --md-canvas: rgb(var(--color-surface-background));
 }
 
 @media (min-width: 48rem) {

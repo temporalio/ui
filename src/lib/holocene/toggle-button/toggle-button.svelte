@@ -58,7 +58,7 @@
     href: href ? href + page.url.search : undefined,
     class: merge(
       pressed && 'bg-interactive-secondary-active',
-      group && '[&:not(:last-child)]:border-r-0',
+      group && 'border rounded-control',
       className,
     ),
   } as ButtonProps);

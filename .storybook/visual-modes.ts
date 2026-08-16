@@ -18,26 +18,57 @@ export const redesignViewports = {
 
 export const redesignVisualModes = {
   '375px light': {
+    palette: 'precision',
     theme: 'light',
     viewport: { value: 'redesignMobile', isRotated: false },
   },
   '375px dark': {
+    palette: 'precision',
+    theme: 'dark',
+    viewport: { value: 'redesignMobile', isRotated: false },
+  },
+  '375px vaporwave dark': {
+    palette: 'vaporwave',
     theme: 'dark',
     viewport: { value: 'redesignMobile', isRotated: false },
   },
   '768px light': {
+    palette: 'precision',
     theme: 'light',
     viewport: { value: 'redesignTablet', isRotated: false },
   },
   '768px dark': {
+    palette: 'precision',
     theme: 'dark',
     viewport: { value: 'redesignTablet', isRotated: false },
   },
   '1440px light': {
+    palette: 'precision',
     theme: 'light',
     viewport: { value: 'redesignDesktop', isRotated: false },
   },
   '1440px dark': {
+    palette: 'precision',
+    theme: 'dark',
+    viewport: { value: 'redesignDesktop', isRotated: false },
+  },
+  '1440px ember light': {
+    palette: 'ember',
+    theme: 'light',
+    viewport: { value: 'redesignDesktop', isRotated: false },
+  },
+  '1440px ember dark': {
+    palette: 'ember',
+    theme: 'dark',
+    viewport: { value: 'redesignDesktop', isRotated: false },
+  },
+  '1440px vaporwave light': {
+    palette: 'vaporwave',
+    theme: 'light',
+    viewport: { value: 'redesignDesktop', isRotated: false },
+  },
+  '1440px vaporwave dark': {
+    palette: 'vaporwave',
     theme: 'dark',
     viewport: { value: 'redesignDesktop', isRotated: false },
   },

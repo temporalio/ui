@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { useDarkMode } from '$lib/utilities/dark-mode';
-
   interface Props {
     class?: string;
   }
 
   let { class: className = '' }: Props = $props();
 
-  let fill = $derived($useDarkMode ? 'black' : 'white');
+  const fill = 'rgb(var(--color-surface-primary))';
 </script>
 
 <svg

@@ -11,6 +11,8 @@ export type PortalPosition =
   | 'bottom-left'
   | 'bottom-right';
 
+export type PortalLayer = 'dropdown' | 'modal' | 'toast' | 'tooltip';
+
 export interface PortalOffset {
   x?: number;
   y?: number;
@@ -18,6 +20,7 @@ export interface PortalOffset {
 
 export interface PortalProps {
   anchor: HTMLElement | string;
+  layer?: PortalLayer;
   open?: boolean;
   position?: PortalPosition;
   offset?: PortalOffset;

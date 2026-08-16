@@ -10,7 +10,7 @@ process.env.TAILWIND_MODE = dev ? 'watch' : 'build';
 const ci = !!process.env.VERCEL;
 
 const buildPath = process.env.BUILD_PATH || 'build';
-const PREPAINT_CSP_HASH = 'sha256-nWvpefk/iitnC82J06Y0NUlbc3ZpkP48tIeiXgM1TNc=';
+const PREPAINT_CSP_HASH = 'sha256-dufDOSB3s4aUvaQ5GDvfIVYOUZ4vDKt/WuBI8cbjuBk=';
 
 /** @type {import('@sveltejs/kit').Config} */
 export default {

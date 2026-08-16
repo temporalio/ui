@@ -30,6 +30,7 @@
   import DarkMode from '$lib/utilities/dark-mode';
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
+  import Palette from '$lib/utilities/palette';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
@@ -349,6 +350,7 @@
 </script>
 
 <DarkMode />
+<Palette />
 <SkipNavigation />
 
 <div class="flex h-dvh w-full max-w-full flex-row overflow-hidden">

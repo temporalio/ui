@@ -59,6 +59,12 @@
     const second = await canvas.findByTestId('toggle-button-1');
     const third = await canvas.findByTestId('toggle-button-2');
     const fourth = await canvas.findByTestId('toggle-button-3');
+    const group = await canvas.findByRole('group');
+
+    await step('Separate grouped controls while keeping complete radii', () => {
+      expect(group).toHaveClass('gap-0.5');
+      expect(first).toHaveClass('toggle-button');
+    });
 
     await step('Validate that the selected toggle is active', async () => {
       const selectedToggle = await canvas.findByTestId(

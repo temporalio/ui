@@ -1,11 +1,16 @@
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
-import type { Preview } from '@storybook/sveltekit';
+import type { Decorator, Preview } from '@storybook/sveltekit';
 import '../src/app.css';
 import i18next from 'i18next';
 
 import { redesignViewports } from './visual-modes';
 import { i18nNamespaces } from '../src/lib/i18n';
 import resources from '../src/lib/i18n/locales';
+import {
+  defaultPalette,
+  isPaletteName,
+  paletteNames,
+} from '../src/lib/theme/palettes';
 
 i18next.init({
   fallbackLng: 'en',
@@ -21,8 +26,23 @@ i18next.init({
   resources,
 });
 
+const paletteTitle = (palette: string) =>
+  `${palette.charAt(0).toUpperCase()}${palette.slice(1)}`;
+
+const withPalette: Decorator = (Story, context) => {
+  const palette = isPaletteName(context.globals.palette)
+    ? context.globals.palette
+    : defaultPalette;
+
+  document.documentElement.dataset.palette = palette;
+  document.body.dataset.palette = palette;
+
+  return Story();
+};
+
 const preview: Preview = {
   decorators: [
+    withPalette,
     withThemeByDataAttribute({
       defaultTheme: 'light',
       themes: {
@@ -32,6 +52,22 @@ const preview: Preview = {
       attributeName: 'data-theme',
     }),
   ],
+  globalTypes: {
+    palette: {
+      description: 'Semantic color palette',
+      toolbar: {
+        dynamicTitle: true,
+        icon: 'paintbrush',
+        items: paletteNames.map((palette) => ({
+          title: paletteTitle(palette),
+          value: palette,
+        })),
+      },
+    },
+  },
+  initialGlobals: {
+    palette: defaultPalette,
+  },
   parameters: {
     backgrounds: {
       disable: true,

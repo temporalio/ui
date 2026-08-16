@@ -94,11 +94,21 @@
     }
 
     &.interactive {
-      @apply text-white hover:text-indigo-200 focus-visible:text-indigo-200;
+      color: rgb(var(--color-text-white));
+
+      &:hover,
+      &:focus-visible {
+        color: rgb(var(--color-text-white) / 80%);
+      }
     }
 
     &.light {
-      @apply text-off-white hover:text-indigo-400;
+      color: rgb(var(--color-text-white));
+
+      &:hover,
+      &:focus-visible {
+        color: rgb(var(--color-text-white) / 80%);
+      }
     }
   }
 
