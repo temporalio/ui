@@ -45,6 +45,11 @@
     }
   };
 
+  const clickOutsideOptions = {
+    handler: closeMenu,
+    include: () => [$menuElement],
+  };
+
   setContext<MenuContext>(MENU_CONTEXT, {
     open: open,
     keepOpen: keepOpen,
@@ -53,7 +58,7 @@
 </script>
 
 <div
-  use:clickoutside={closeMenu}
+  use:clickoutside={clickOutsideOptions}
   class={merge('relative', className)}
   {...rest}
 >

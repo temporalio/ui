@@ -118,7 +118,13 @@
   const lastMenuItem = $derived(menuItems[menuItems.length - 1]);
 
   const handleFocusOut = (e: FocusEvent) => {
-    if (!$keepOpenCtx && e.target === lastMenuItem) $open = false;
+    const nextTarget = e.relatedTarget;
+    const focusRemainsInMenu =
+      nextTarget instanceof Node && menuElement?.contains(nextTarget);
+
+    if (!$keepOpenCtx && e.target === lastMenuItem && !focusRemainsInMenu) {
+      $open = false;
+    }
   };
 
   const handleClick = (e: MouseEvent) => {

@@ -5,12 +5,12 @@
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
   import NoWorkflowTaskFailures from '$lib/components/empty-states/no-workflow-task-failures.svelte';
+  import TableEmptyStateArtwork from '$lib/components/empty-states/table-empty-state-artwork.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
   import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
-  import noResultsImages from '$lib/vendor/empty-state.svg';
 
   interface Props {
     cloud?: Snippet;
@@ -107,13 +107,6 @@
         </ul>
       {/if}
     </div>
-    <div
-      class="surface-secondary hidden h-full w-[38%] flex-col border-l border-subtle xl:flex"
-    >
-      <div>
-        <img src={noResultsImages} alt="" class="w-full opacity-70 grayscale" />
-      </div>
-      <div class="flex-1 bg-subtle"></div>
-    </div>
+    <TableEmptyStateArtwork />
   </div>
 {/if}

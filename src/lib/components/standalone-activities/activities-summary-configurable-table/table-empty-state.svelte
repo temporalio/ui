@@ -2,12 +2,12 @@
   import { page } from '$app/state';
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import TableEmptyStateArtwork from '$lib/components/empty-states/table-empty-state-artwork.svelte';
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { activityError } from '$lib/stores/activities';
-  import noResultsImages from '$lib/vendor/empty-state.svg';
 
   let query = $derived(page.url.searchParams.get('query'));
   const SDK_LINKS = [
@@ -111,13 +111,6 @@
         {/each}
       {/if}
     </div>
-    <div
-      class="surface-secondary flex h-full w-[38%] flex-col border-l border-subtle max-xl:hidden"
-    >
-      <div>
-        <img src={noResultsImages} alt="" class="w-full opacity-70 grayscale" />
-      </div>
-      <div class="flex-1 bg-subtle"></div>
-    </div>
+    <TableEmptyStateArtwork />
   </div>
 {/if}

@@ -125,11 +125,22 @@ test('it should filter by RunId', async ({ page }) => {
 
 test('it should filter by WorkflowType', async ({ page }) => {
   await page.getByTestId('add-filter-button').click();
+  const searchInput = page.locator('#workflow-filter-search');
+  await searchInput.click();
+  await expect(searchInput).toBeFocused();
+  await expect(page.locator('#workflow-search-attribute-menu')).toBeVisible();
+  await searchInput.fill('WorkflowType');
   await page.getByRole('menuitem', { name: 'WorkflowType Keyword' }).click();
 
-  await page
-    .getByTestId('dropdown-filter-chip-WorkflowType-0-text')
-    .fill('ExampleWorkflow');
+  const workflowTypeInput = page.getByTestId(
+    'dropdown-filter-chip-WorkflowType-0-text',
+  );
+  await workflowTypeInput.click();
+  await expect(workflowTypeInput).toBeFocused();
+  await expect(
+    page.locator('#dropdown-filter-chip-WorkflowType-0'),
+  ).toBeVisible();
+  await workflowTypeInput.fill('ExampleWorkflow');
 
   await page.getByTestId('apply-filter-button').click();
 

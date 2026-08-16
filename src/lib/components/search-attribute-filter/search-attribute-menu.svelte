@@ -113,7 +113,7 @@
   >
     Add Filter
   </MenuButton>
-  <Menu id="{id}-search-attribute-menu" usePortal>
+  <Menu id="{id}-search-attribute-menu" keepOpen usePortal>
     <MenuItem
       class="p-0"
       hoverable={false}

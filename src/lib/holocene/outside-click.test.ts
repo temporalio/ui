@@ -66,6 +66,53 @@ describe('clickoutside', () => {
     action.destroy();
   });
 
+  it('treats included portaled content as inside while preserving outside dismissal', async () => {
+    const { node, handler, outside, action: baseAction } = await setup();
+    baseAction.destroy();
+    const portal = document.createElement('div');
+    const portalInput = document.createElement('input');
+    portal.appendChild(portalInput);
+    document.body.appendChild(portal);
+
+    const action = clickoutside(node, {
+      handler,
+      include: () => [portal],
+    });
+    await Promise.resolve();
+
+    dispatch(portalInput, 'pointerdown');
+    portalInput.focus();
+    dispatch(portalInput, 'click');
+
+    expect(document.activeElement).toBe(portalInput);
+    expect(handler).not.toHaveBeenCalled();
+
+    dispatch(outside, 'pointerdown');
+    dispatch(outside, 'click');
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    action.destroy();
+  });
+
+  it('reads included portal boundaries lazily', async () => {
+    const { node, handler, action: baseAction } = await setup();
+    baseAction.destroy();
+    let portal: Element | null = null;
+    const action = clickoutside(node, {
+      handler,
+      include: () => [portal],
+    });
+    await Promise.resolve();
+
+    portal = document.createElement('div');
+    document.body.appendChild(portal);
+    dispatch(portal, 'pointerdown');
+    dispatch(portal, 'click');
+
+    expect(handler).not.toHaveBeenCalled();
+    action.destroy();
+  });
+
   it('does not call the handler when a drag starts inside the node and releases outside', async () => {
     const { handler, inside, action } = await setup();
 

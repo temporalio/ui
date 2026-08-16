@@ -84,6 +84,13 @@
         break;
       case ' ':
       case 'Enter':
+        if (event.currentTarget instanceof HTMLAnchorElement) {
+          if (event.key === ' ') {
+            event.preventDefault();
+            event.currentTarget.click();
+          }
+          break;
+        }
         onclick?.();
         if (!$keepOpen) $open = false;
         break;
@@ -149,6 +156,7 @@
     data-track-intent="navigate"
     data-track-text="*textContent*"
     onkeydown={handleKeydown}
+    onclick={handleClick}
     {...rest as HTMLAnchorAttributes}
   >
     <div>
