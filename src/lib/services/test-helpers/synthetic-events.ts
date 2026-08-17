@@ -128,6 +128,25 @@ export function makeTimerFired(
   } as unknown as HistoryEvent;
 }
 
+/**
+ * A local-activity marker. Markers emitted by one workflow task bill once
+ * between them, so tests that care about that pass a shared
+ * workflowTaskCompletedEventId.
+ */
+export function makeLocalActivityMarker(
+  eventId: number,
+  workflowTaskCompletedEventId = eventId - 1,
+): HistoryEvent {
+  return {
+    ...base(eventId, 'MarkerRecorded'),
+    markerRecordedEventAttributes: {
+      markerName: 'LocalActivity',
+      details: {},
+      workflowTaskCompletedEventId: String(workflowTaskCompletedEventId),
+    },
+  } as unknown as HistoryEvent;
+}
+
 export function makeWorkflowTaskScheduled(eventId: number): HistoryEvent {
   return {
     ...base(eventId, 'WorkflowTaskScheduled'),
@@ -289,25 +308,6 @@ export function makeNexusOperationCompleted(
   } as unknown as HistoryEvent;
 }
 
-/**
- * A local-activity marker. Markers emitted by one workflow task bill once
- * between them, so tests that care about that pass a shared
- * workflowTaskCompletedEventId.
- */
-export function makeLocalActivityMarker(
-  eventId: number,
-  workflowTaskCompletedEventId: number,
-): HistoryEvent {
-  return {
-    ...base(eventId, 'MarkerRecorded'),
-    markerRecordedEventAttributes: {
-      markerName: 'LocalActivity',
-      details: {},
-      workflowTaskCompletedEventId: String(workflowTaskCompletedEventId),
-    },
-  } as unknown as HistoryEvent;
-}
-
 // ---------------------------------------------------------------------------
 // Composite group builders (return events in ascending ID order)
 // ---------------------------------------------------------------------------
@@ -392,6 +392,11 @@ export function makeNexusOperationGroup(
  * All events have sequential ascending IDs from 1..N.
  * The resulting array is sorted ascending by eventId.
  */
+/** A local-activity marker group — one event, category 'local-activity'. */
+export function makeLocalActivityGroup(startId: number): [HistoryEvent] {
+  return [makeLocalActivityMarker(startId)];
+}
+
 export function makeSyntheticEvents(n: number): HistoryEvent[] {
   const events: HistoryEvent[] = [];
   let id = 1;
