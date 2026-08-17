@@ -1,57 +1,32 @@
 <script lang="ts">
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Failure } from '$lib/types';
 
-  import Self from './workflow-error-stack-trace.svelte';
+  import { formatWorkflowFailureDiagnostic } from './workflow-failure-diagnostic';
 
   interface Props {
     failure?: Failure | undefined;
   }
 
   let { failure = undefined }: Props = $props();
+
+  let diagnostic = $derived(formatWorkflowFailureDiagnostic(failure));
 </script>
 
-{#if failure}
-  <Accordion title={translate('common.failure')} class="text-sm">
-    {#snippet summary()}
-      <div class="w-full text-right text-xs">
-        {failure?.message}
-      </div>
-    {/snippet}
-    <div class="flex flex-col gap-2">
-      <p>{translate('common.message')}</p>
-      <CodeBlock
-        content={failure?.message || ''}
-        label={translate('common.message')}
-        language="text"
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
-      {#if failure?.source}
-        <p>{translate('common.source')}</p>
-        <CodeBlock
-          content={failure.source}
-          label={translate('common.source')}
-          language="text"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      {/if}
-      {#if failure?.stackTrace}
-        <p>{translate('common.stack-trace')}</p>
-        <CodeBlock
-          content={failure.stackTrace}
-          label={translate('common.stack-trace')}
-          language="text"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      {/if}
-    </div>
-  </Accordion>
-{/if}
-{#if failure?.cause}
-  <Self failure={failure.cause} />
+{#if diagnostic.transcript}
+  <div>
+    <h3 class="mb-2 text-xs font-medium text-secondary">
+      {translate('common.failure-diagnostic')}
+    </h3>
+    <CodeBlock
+      content={diagnostic.transcript}
+      label={translate('common.failure-diagnostic')}
+      language="text"
+      maxHeight={384}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      testId="workflow-task-failure-diagnostic"
+    />
+  </div>
 {/if}

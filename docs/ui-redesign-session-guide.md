@@ -1,6 +1,6 @@
 # Precision Console UI Redesign: Session Guide
 
-This document reconstructs the UI redesign on the `reskin` branch from the
+This document reconstructs the UI redesign on the `ui-overhaul` branch from the
 user-authored prompt transcript and the commits that actually landed. It is
 both a provenance log and a practical guide for reviewing or recreating the
 work.
@@ -26,12 +26,12 @@ execution, data operations, or business behavior.
 
 | Item                          | Recorded value                                                                |
 | ----------------------------- | ----------------------------------------------------------------------------- |
-| Repository branch             | `reskin`                                                                      |
+| Repository branch             | `ui-overhaul`                                                                 |
 | Starting commit               | `7a5684a5e` — `Check if api has been upgraded for minimum minor bump (#3823)` |
-| Last implementation commit    | `c99dffebb` — `Make standalone activities list header consistent mt-2`        |
-| Session date                  | August 16, 2026, America/Chicago                                              |
-| User inputs recorded          | 37                                                                            |
-| Session commits               | 6                                                                             |
+| Last implementation commit    | `385a4f29a` — `Make art for empty state 50%, make sdk logos flex`             |
+| Session dates                 | August 16–17, 2026, America/Chicago                                           |
+| User inputs recorded          | 49                                                                            |
+| Session commits               | 8                                                                             |
 | Aggregate implementation diff | 286 files changed, 7,631 insertions, 2,004 deletions                          |
 | Model                         | OpenAI Codex, GPT-5-based                                                     |
 | UI plugin/skill               | `designer-skill:designer-skill` 0.14.0                                        |
@@ -45,8 +45,11 @@ audit before editing, preserve one functional DOM, centralize semantic tokens,
 check 375/768/1440px layouts, preserve 44px coarse-pointer targets, and treat
 focus, contrast, reduced motion, and forced colors as part of visual quality.
 No image-generation plugin was used. The screenshots were supplied by the user
-and inspected as references. No web research or Temporal-development plugin was
-used for this work.
+and inspected as references. The `temporal:temporal-developer` skill was used
+to distinguish the Standalone Nexus Operations server capability from a UI
+preference and later to keep the pending Workflow Task state conversion aligned
+with the repository's Temporal enum helpers. The redesign implementation did
+not depend on web research.
 
 Git, `rg`, Svelte tooling, Vitest, Playwright, Storybook, Chromatic, and parallel
 read-only code audits were tools in the workflow, not plugins. This log contains
@@ -90,6 +93,8 @@ The authoritative current design contract is in [`DESIGN.md`](../DESIGN.md).
 | 17–26              | `86c1cc2ce` | 22 files, +1,789/−407    | Adaptive command rails, horizontal Saved Views for five products, and tooltip hardening                               |
 | 27–36              | `9c7b2307c` | 50 files, +1,434/−79     | Precision/Ember/Vaporwave palettes, palette preference UI, semantic z-index layers, and globally spaced button groups |
 | Associated cleanup | `c99dffebb` | 1 file, +1/−1            | Standalone Activities refresh metadata aligned to the shared 8px rhythm                                               |
+| 37–38              | `ad8ad35a6` | 1 file, +1,063/−0        | Added this review, provenance, and reconstruction guide                                                               |
+| 40 (partial)       | `385a4f29a` | 2 files, +9/−7           | Balanced the split empty-state artwork and allowed SDK resource links to wrap                                         |
 
 The final one-line cleanup did not have a separate user prompt. It was committed
 43 seconds after `9c7b2307c` and belongs to the same final polish phase, but it
@@ -472,8 +477,165 @@ controls`). A one-line rhythm correction followed as `c99dffebb`.
 > guide that gives a story of all the changes made within this session
 
 - **Result:** created this provenance, review, and reproduction guide.
-- **Landed in:** documentation work after `c99dffebb`; no implementation commit
-  is claimed here.
+- **Landed in:** `ad8ad35a6`.
+
+#### 38. Save the guide
+
+> commit this
+
+- **Result:** committed the first complete version of this session guide as
+  `ad8ad35a6` (`docs: add UI redesign session guide`).
+- **Landed in:** `ad8ad35a6`.
+
+#### 39. Keep the guide current
+
+> Make sure to continue to update that redesign session guide after every new
+> prompt
+
+- **Result:** established this document as a living session log. Later prompts
+  are recorded even when they lead only to analysis or guidance.
+- **Landed in:** this guide; no product implementation change.
+
+### Phase 7 — Continue empty-state and capability exploration
+
+#### 40. Standardize table empty states
+
+> I want to standardize on a single, cohesive empty state message for all
+> tables. [Four screenshots attached.]
+
+- **Result:** audited the table-empty states across the product and designed a
+  shared table-specific shell with canonical anatomy and copy, while keeping
+  errors, permissions, and positive states distinct. The branch commit made a
+  smaller interim adjustment: the existing onboarding artwork now occupies
+  half of the split layout and SDK resource links wrap responsively. A complete
+  cross-product migration was not committed.
+- **Landed in:** partially in `385a4f29a`.
+
+#### 41. Enable Standalone Nexus Operations
+
+> How do i turn on standalone nexus operations?
+
+- **Result:** explained that this is controlled by the Temporal Server
+  `nexus.enableStandaloneOperation` dynamic configuration and the namespace
+  capability returned to the UI, not by a UI theme or environment toggle. This
+  used the Temporal developer skill.
+- **Landed in:** no repository change; explanatory guidance only.
+
+### Phase 8 — Explore a visible execution action palette
+
+#### 42. Replace the hidden workflow action menu
+
+> [Screenshot attached.] I want to explore better ways to surface these
+> actions. I don't want to hide them behind a menu, but rather make them an
+> action pallette that easily allows users to trigger the action if they have
+> the permissions to do so. Think through the design of that and ask me any
+> questions
+
+- **Result:** audited the existing actions, permissions, workflow states,
+  confirmation flows, and responsive contracts. Recommended a persistent,
+  grouped action surface below execution identity rather than an overflow menu.
+- **Landed in:** no committed repository change; design exploration only.
+
+#### 43. Confirm the shared action-palette policy
+
+> Remain visible and locked
+>
+> Yes use that assumed order
+>
+> Shared
+
+- **Result:** resolved that permission-denied actions remain visible and locked,
+  Workflow actions use the proposed operational order, and the pattern should
+  be shared across Workflow Executions, Standalone Activities, and Standalone
+  Nexus Operations while each domain retains its own handlers and state rules.
+- **Landed in:** no repository change; product decisions only.
+
+#### 44. Implement the shared action palette
+
+> Implement
+
+- **Result:** built a shared ActionPalette presentation layer and migrated the
+  three domain action controllers in the working tree, including discoverable
+  permission reasons, responsive ordering, and focused regression coverage.
+  The production build passed. Before the work was committed, its focused
+  browser run was blocked by the sandbox's local preview binding and the
+  interrupted turn discarded the uncommitted implementation; it is therefore
+  recorded as attempted work, not as a branch capability.
+- **Landed in:** no surviving repository change.
+
+### Phase 9 — Redesign Workflow Task failure diagnostics
+
+#### 45. Simplify the Workflow Task alert
+
+> [Screenshot attached.] I want to redesign our Workflow Task alert. There's
+> too much repeated information and I don't like the accordions. I want the
+> full stack trace message (combined if nested failure messages to give complete
+> message) and make the info formatted like event details (remove badges). Think
+> through the best possible UX for that important error and how to best surface
+> it
+
+- **Result:** audited the Workflow Task failure selection, nested Temporal
+  Failure chain, warning/event/accordion composition, and EventCard metadata
+  pattern. Recommended one flat diagnostic panel with one semantic severity,
+  concise cause and recovery guidance, an always-visible deduplicated
+  outer-to-inner failure narrative, complete copyable stack content, and a
+  responsive label/value metadata grid. The proposal removes nested colored
+  containers, accordions, badges, and repeated event titles while retaining all
+  diagnostic data.
+- **Landed in:** this guide; design exploration only.
+
+#### 46. Implement the Workflow Task diagnostic
+
+> Implement this
+
+- **Result:** replaced the nested warning, event card, failure accordions, and
+  pending-task badges with one cause-first diagnostic surface. A pure formatter
+  safely walks the complete Temporal Failure cause chain, removes only exact
+  repeated diagnostic values, and produces one ordered copyable transcript.
+  The shared History/Timeline renderer now exposes that transcript in one
+  bounded, maximizable CodeBlock; timeout-only failures omit the empty
+  diagnostic; recovery guidance follows the exact error; and current Workflow
+  Task state uses a responsive semantic label/value grid. Focused unit,
+  Storybook, integration, responsive-overflow, and scoped Axe coverage were
+  added alongside the implementation.
+- **Landed in:** uncommitted working tree after `385a4f29a`.
+
+#### 47. Normalize pending Workflow Task state
+
+> Lets update the state to use fromScreamingEnum so it shows Started instead of
+> PENDING_WORKFLOW_TASK_STATE_STARTED
+
+- **Result:** passed the server's pending Workflow Task state through the
+  repository's existing `fromScreamingEnum` helper with the
+  `PendingWorkflowTaskState` prefix. The UI now renders readable values such as
+  `Started` while still accepting already-readable state values; Storybook and
+  browser fixtures use the raw server enum to guard the conversion.
+- **Landed in:** uncommitted working tree after `385a4f29a`.
+
+#### 48. Strengthen the Workflow Task error signal
+
+> Can we make the alert stand out a little more that it's an error and needs
+> attention? it doesn't quite grab the eye
+
+- **Result:** promoted the diagnostic's single outer severity signal from
+  warning to danger. The alert now uses a stronger semantic danger rail and
+  frame plus a restrained danger-tinted header, danger icon, and emphasized
+  cause title; the detailed transcript, guidance, and pending-task metadata
+  remain on a neutral surface for sustained readability. This keeps the error
+  conspicuous without restoring nested red cards, badges, or repeated alert
+  copy.
+- **Landed in:** uncommitted working tree after `385a4f29a`.
+
+#### 49. Save the Workflow Task diagnostic redesign
+
+> commit this
+
+- **Result:** committed the flat Workflow Task failure diagnostic, complete
+  causal transcript, readable pending-state enum formatting, stronger danger
+  treatment, focused Storybook/browser/unit coverage, and the corresponding
+  living-guide entries together as one cohesive implementation change.
+- **Landed in:** this implementation commit (`Redesign Workflow Task failure
+diagnostics`).
 
 ## Commit-by-commit review guide
 
@@ -846,6 +1008,28 @@ The refresh-time paragraph under the Standalone Activities heading changed from
 presentation-only cleanup associated with the final polish phase. There is no
 separate user prompt or dedicated test run recorded for this one-line commit.
 
+### 7. `ad8ad35a6` — Session review and reconstruction guide
+
+- **Parent:** `c99dffebb`
+- **Commit time:** 2026-08-16 14:31:40 CDT
+- **Scope:** 1 file, 1,063 insertions
+
+This documentation commit reconstructed the redesign from the user-authored
+prompt record and Git history. It recorded model and plugin provenance,
+prompt-to-commit mappings, validation evidence, known limitations, and a safer
+sequence for recreating the work in smaller reviewable changes.
+
+### 8. `385a4f29a` — Interim empty-state balance
+
+- **Parent:** `ad8ad35a6`
+- **Commit time:** 2026-08-16 20:51:12 CDT
+- **Scope:** 2 files, 9 insertions, 7 deletions
+
+This focused follow-up balanced the existing onboarding empty state by giving
+its artwork half of the split layout and allowing the SDK resource links to
+wrap. It did not complete the later-requested canonical empty-state migration
+across every table.
+
 ## How to recreate the work
 
 The historical branch used one very large first commit. For a fresh
@@ -1016,13 +1200,15 @@ single `base..HEAD` diff:
 7. Review the typed palette maps, pre-paint integration, Portal layers, and
    palette tests in `9c7b2307c`.
 8. Inspect `c99dffebb` as the final one-line cleanup.
-9. Compare the branch at the three audit breakpoints in Precision, Ember, and
-   Vaporwave, in both light and dark.
+9. Read `ad8ad35a6` as provenance, then inspect the focused empty-state
+   adjustment in `385a4f29a`.
+10. Compare the branch at the three audit breakpoints in Precision, Ember, and
+    Vaporwave, in both light and dark.
 
 Useful Git commands:
 
 ```sh
-git log --reverse --oneline 7a5684a5e..c99dffebb
+git log --reverse --oneline 7a5684a5e..385a4f29a
 git show --stat 059b93e15
 git diff 7a5684a5e..059b93e15 -- src/lib/theme src/app.css DESIGN.md
 git show c70fd3cff
@@ -1030,6 +1216,7 @@ git show 505df799c
 git show 86c1cc2ce -- src/lib/holocene/command-rail.svelte
 git show 86c1cc2ce -- src/lib/components/saved-query-views/saved-views.svelte
 git show 9c7b2307c -- src/lib/theme src/lib/utilities/palette src/app.html
+git show 385a4f29a
 ```
 
 ## Validation ledger and honest limitations

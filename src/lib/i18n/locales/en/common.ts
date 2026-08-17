@@ -227,10 +227,12 @@ export const Strings = {
   value: 'Value',
   table: 'Table',
   failure: 'Failure',
+  'failure-diagnostic': 'Failure diagnostic',
   'pending-and-failed': 'Pending and Failed',
   'pending-and-failed-description':
     'View only Pending, Failed, and Timed Out events',
   'stack-trace': 'Stack Trace',
+  'timeout-type': 'Timeout Type',
   source: 'Source',
   url: 'URL',
   state: 'State',

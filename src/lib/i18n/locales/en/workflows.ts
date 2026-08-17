@@ -319,6 +319,7 @@ export const Strings = {
   'unsupported-attribute': 'Unsupported attribute type',
   'add-search-attribute': 'Add a Search Attribute',
   'pending-workflow-task': 'Pending Workflow Task',
+  'workflow-task-failure-details': 'Workflow task failure details',
   'original-scheduled-time': 'Original Scheduled Time',
   'started-time': 'Started Time',
   'start-workflow-success': 'Workflow started successfully',

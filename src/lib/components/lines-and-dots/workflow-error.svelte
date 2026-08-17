@@ -1,7 +1,5 @@
 <script lang="ts">
   import Timestamp from '$lib/components/timestamp.svelte';
-  import AccordionGroup from '$lib/holocene/accordion/accordion-group.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -18,7 +16,7 @@
     isTimedOutTaskEvent,
   } from '$lib/utilities/get-workflow-task-failed-event';
 
-  import { CategoryIcon } from './constants';
+  import { formatWorkflowFailureDiagnostic } from './workflow-failure-diagnostic';
 
   import WorkflowErrorStackTrace from './workflow-error-stack-trace.svelte';
   import WorkflowPendingTask from './workflow-pending-task.svelte';
@@ -31,64 +29,103 @@
   let { error, pendingTask }: Props = $props();
 
   let cause: WorkflowTaskFailedCause = $derived(getErrorCause(error));
-  let failure = $derived(isFailedTaskEvent(error) && error.attributes?.failure);
-  let timeoutType = $derived(
-    isTimedOutTaskEvent(error) && error.attributes?.timeoutType,
+  let failure = $derived(
+    isFailedTaskEvent(error)
+      ? (error.attributes?.failure ?? undefined)
+      : undefined,
   );
+  let timeoutType = $derived(
+    isTimedOutTaskEvent(error)
+      ? (error.attributes?.timeoutType ?? undefined)
+      : undefined,
+  );
+  let diagnostic = $derived(formatWorkflowFailureDiagnostic(failure));
 </script>
 
 {#if cause && cause !== 'ResetWorkflow'}
-  <Alert
-    icon="warning"
-    intent="warning"
-    title={translate(`typed-errors.${cause}.title`)}
+  <section
+    class="surface-primary min-w-0 overflow-hidden rounded-panel border border-l-4 border-danger text-primary"
+    aria-labelledby="workflow-task-alert-title"
+    data-testid="workflow-task-alert"
   >
-    <p>
-      {translate(`typed-errors.${cause}.description`)}
-    </p>
-    {#if cause === 'NonDeterministicError' || cause === 'BadSearchAttributes'}
-      <p>
-        {translate('typed-errors.link-preface')}<Link
-          newTab
-          href={translate(`typed-errors.${cause}.link`)}
-          >{translate(`typed-errors.${cause}.action`)}</Link
-        >.
-      </p>
-    {/if}
     <div
-      class="mt-2 flex w-full flex-col gap-0 overflow-hidden border border-danger"
+      class="surface-danger flex min-w-0 items-start gap-2 border-b border-danger px-3 py-3 sm:px-4"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
     >
-      <div class="flex items-center justify-between gap-2 bg-danger px-2 py-2">
-        <div class="flex items-center gap-2">
-          {error.id}
-          <Icon
-            name={CategoryIcon[error.category].name}
-            title={CategoryIcon[error.category].title}
+      <Icon
+        name="warning"
+        class="mt-0.5 size-5 shrink-0 text-danger"
+        aria-hidden="true"
+      />
+      <div class="min-w-0">
+        <h2
+          id="workflow-task-alert-title"
+          class="text-sm font-semibold leading-5 text-danger"
+        >
+          {translate(`typed-errors.${cause}.title`)}
+        </h2>
+        <div
+          class="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs leading-5 text-secondary"
+        >
+          <span>{spaceBetweenCapitalLetters(error.name)}</span>
+          <span aria-hidden="true">·</span>
+          <span>{translate('common.event')} {error.id}</span>
+          <span aria-hidden="true">·</span>
+          <Timestamp
+            as="span"
+            class="font-mono tabular-nums"
+            dateTime={error.eventTime}
           />
-          <span class="font-semibold text-danger"
-            >{spaceBetweenCapitalLetters(error?.name)}</span
-          >
         </div>
-        <Timestamp dateTime={error?.eventTime} />
-      </div>
-      <div class="flex flex-col gap-2 bg-primary p-4">
-        {#if timeoutType}
-          <p>
-            <span class="mr-2 text-secondary">Timeout Type</span>
-            {timeoutType}
-          </p>
-        {/if}
-        {#if failure || pendingTask}
-          <AccordionGroup>
-            {#if failure}
-              <WorkflowErrorStackTrace {failure} />
-            {/if}
-            {#if pendingTask}
-              <WorkflowPendingTask {pendingTask} />
-            {/if}
-          </AccordionGroup>
-        {/if}
       </div>
     </div>
-  </Alert>
+
+    <div class="flex min-w-0 flex-col">
+      {#if diagnostic.transcript}
+        <div class="min-w-0 px-3 py-3 sm:px-4">
+          <WorkflowErrorStackTrace {failure} />
+        </div>
+      {/if}
+
+      {#if timeoutType}
+        <dl
+          class="px-3 py-3 sm:px-4"
+          class:border-t={!!diagnostic.transcript}
+          class:border-subtle={!!diagnostic.transcript}
+        >
+          <div class="min-w-0">
+            <dt class="text-xs font-medium leading-5 text-secondary">
+              {translate('common.timeout-type')}
+            </dt>
+            <dd class="min-w-0 break-words text-sm leading-5">
+              {timeoutType}
+            </dd>
+          </div>
+        </dl>
+      {/if}
+
+      <div
+        class="px-3 py-3 text-sm leading-5 text-secondary sm:px-4"
+        class:border-t={!!diagnostic.transcript || !!timeoutType}
+        class:border-subtle={!!diagnostic.transcript || !!timeoutType}
+      >
+        <p>{translate(`typed-errors.${cause}.description`)}</p>
+        {#if cause === 'NonDeterministicError' || cause === 'BadSearchAttributes'}
+          <p class="mt-1">
+            {translate('typed-errors.link-preface')}<Link
+              newTab
+              href={translate(`typed-errors.${cause}.link`)}
+              >{translate(`typed-errors.${cause}.action`)}</Link
+            >.
+          </p>
+        {/if}
+      </div>
+
+      {#if pendingTask}
+        <WorkflowPendingTask {pendingTask} />
+      {/if}
+    </div>
+  </section>
 {/if}
