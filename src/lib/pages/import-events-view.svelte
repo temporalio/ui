@@ -5,7 +5,7 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconCompact, IconFeed, IconJson } from '$lib/io/icon';
+  import { IconCode, IconCompact, IconFeed } from '$lib/io/icon';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';
 
@@ -41,7 +41,7 @@
           >{translate('workflows.compact')}</ToggleButton
         >
         <ToggleButton
-          LeadingIcon={IconJson}
+          LeadingIcon={IconCode}
           href={routeForEventHistoryImport($lastUsedNamespace, 'json')}
           >{translate('workflows.json')}</ToggleButton
         >

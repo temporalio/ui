@@ -3,7 +3,7 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconJson } from '$lib/io/icon';
+  import { IconCode } from '$lib/io/icon';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
 
   import { getFormSpecFromSpec } from '../utilities/get-form-spec';
@@ -31,7 +31,7 @@
     <Button
       variant="secondary"
       size="sm"
-      TrailingIcon={IconJson}
+      TrailingIcon={IconCode}
       aria-expanded={isFullSpecVisible}
       aria-controls={scheduleFullSpecId}
       onclick={() => (isFullSpecVisible = !isFullSpecVisible)}

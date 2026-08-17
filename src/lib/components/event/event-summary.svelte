@@ -4,7 +4,7 @@
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
-  import { IconCompact, IconFeed, IconJson } from '$lib/io/icon';
+  import { IconCode, IconCompact, IconFeed } from '$lib/io/icon';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
@@ -85,7 +85,7 @@
       <TabButton
         active={$eventViewType === 'json'}
         data-testid="json"
-        Icon={IconJson}
+        Icon={IconCode}
         class="h-10"
         onclick={onJSONClick}>JSON</TabButton
       >

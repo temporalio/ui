@@ -22,10 +22,10 @@
   import {
     IconArrowAscending,
     IconArrowDescending,
+    IconCode,
     IconCompact,
     IconDownload,
     IconFeed,
-    IconJson,
   } from '$lib/io/icon';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
@@ -241,7 +241,7 @@
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
-          Icon={IconJson}
+          Icon={IconCode}
           class="h-10"
           onclick={onJSONClick}>JSON</TabButton
         >
