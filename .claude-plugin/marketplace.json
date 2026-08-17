@@ -5,13 +5,13 @@
     "url": "https://github.com/temporalio/ui"
   },
   "metadata": {
-    "description": "Skills for developing the Temporal UI, starting with the Workflow Catalog."
+    "description": "Skills for developing the Temporal UI, starting with the Catalog."
   },
   "plugins": [
     {
       "name": "temporal-ui",
       "source": "./agent-skills",
-      "description": "Author, run, inspect, and promote Temporal Workflow Catalog examples.",
+      "description": "Author, run, inspect, and promote Temporal Catalog examples.",
       "version": "0.1.0"
     }
   ]

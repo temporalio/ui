@@ -21,6 +21,8 @@ import {
   routeForAuthentication,
   routeForAuthenticationRedirect,
   routeForCallStack,
+  routeForCatalog,
+  routeForCatalogExample,
   routeForEventHistory,
   routeForEventHistoryImport,
   routeForLoginPage,
@@ -35,8 +37,6 @@ import {
   routeForWorkerDeploymentCreate,
   routeForWorkerDeploymentVersionCreate,
   routeForWorkerDeploymentVersionEdit,
-  routeForWorkflowCatalog,
-  routeForWorkflowCatalogExample,
   routeForWorkflowQuery,
   routeForWorkflows,
   routeForWorkflowsWithQuery,
@@ -71,19 +71,19 @@ describe('routeFor', () => {
     expect(path).toBe(`${base}/namespaces/default/workflows`);
   });
 
-  it('should route to the workflow catalog within a namespace', () => {
-    expect(routeForWorkflowCatalog({ namespace: 'default' })).toBe(
-      `${base}/namespaces/default/workflow-catalog`,
+  it('should route to the catalog within a namespace', () => {
+    expect(routeForCatalog({ namespace: 'default' })).toBe(
+      `${base}/namespaces/default/catalog`,
     );
   });
 
-  it('should encode a workflow catalog example ID', () => {
+  it('should encode a catalog example ID', () => {
     expect(
-      routeForWorkflowCatalogExample({
+      routeForCatalogExample({
         namespace: 'default',
         exampleId: 'release/2026 #1',
       }),
-    ).toBe(`${base}/namespaces/default/workflow-catalog/release%2F2026%20%231`);
+    ).toBe(`${base}/namespaces/default/catalog/release%2F2026%20%231`);
   });
 
   it('should route to archival workflows', () => {

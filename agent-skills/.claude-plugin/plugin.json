@@ -1,7 +1,7 @@
 {
   "name": "temporal-ui",
   "version": "0.1.0",
-  "description": "Skills for developing the Temporal UI. Includes the Workflow Catalog authoring workflow: find, add a local example, run, inspect, promote, and hand off declared prerequisites.",
+  "description": "Skills for developing the Temporal UI. Includes the Catalog authoring workflow: find, add a local example, run, inspect, promote, and hand off declared prerequisites.",
   "author": {
     "name": "Temporal Technologies",
     "url": "https://temporal.io"

@@ -3,14 +3,14 @@ import path from 'path';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
+import { catalogLocalPlugin } from './plugins/vite-plugin-catalog-local';
 import { oidcServerPlugin } from './plugins/vite-plugin-oidc-server';
 import { temporalServer } from './plugins/vite-plugin-temporal-server';
 import { uiServerPlugin } from './plugins/vite-plugin-ui-server';
-import { workflowCatalogLocalPlugin } from './plugins/vite-plugin-workflow-catalog-local';
 
 export default defineConfig({
   plugins: [
-    workflowCatalogLocalPlugin(),
+    catalogLocalPlugin(),
     sveltekit(),
     oidcServerPlugin(),
     temporalServer(),

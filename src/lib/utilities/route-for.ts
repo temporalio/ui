@@ -103,19 +103,19 @@ export const routeForNexus = (): ResolvedPathname => {
   return withPrefix('/nexus', {});
 };
 
-export const routeForWorkflowCatalog = ({
+export const routeForCatalog = ({
   namespace,
 }: NamespaceParameter): ResolvedPathname => {
-  return withPrefix('/namespaces/[namespace]/workflow-catalog', {
+  return withPrefix('/namespaces/[namespace]/catalog', {
     namespace,
   });
 };
 
-export const routeForWorkflowCatalogExample = ({
+export const routeForCatalogExample = ({
   namespace,
   exampleId,
 }: NamespaceParameter & { exampleId: string }): ResolvedPathname => {
-  return withPrefix('/namespaces/[namespace]/workflow-catalog/[exampleId]', {
+  return withPrefix('/namespaces/[namespace]/catalog/[exampleId]', {
     namespace,
     exampleId: encodeURIForSvelte(exampleId),
   });

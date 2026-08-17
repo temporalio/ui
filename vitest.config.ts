@@ -4,10 +4,10 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 
-import { workflowCatalogLocalPlugin } from './plugins/vite-plugin-workflow-catalog-local';
+import { catalogLocalPlugin } from './plugins/vite-plugin-catalog-local';
 
 export default defineConfig({
-  plugins: [workflowCatalogLocalPlugin(), svelte({ hot: false })],
+  plugins: [catalogLocalPlugin(), svelte({ hot: false })],
   resolve: {
     alias: {
       $lib: path.resolve(__dirname, './src/lib'),

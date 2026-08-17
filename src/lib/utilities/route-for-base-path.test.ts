@@ -12,6 +12,8 @@ import {
   routeForBatchOperation,
   routeForBatchOperations,
   routeForCallStack,
+  routeForCatalog,
+  routeForCatalogExample,
   routeForCommonErrors,
   routeForEventHistory,
   routeForEventHistoryEvent,
@@ -57,8 +59,6 @@ import {
   routeForWorkers,
   routeForWorkersWithQuery,
   routeForWorkflow,
-  routeForWorkflowCatalog,
-  routeForWorkflowCatalogExample,
   routeForWorkflowMemo,
   routeForWorkflowQuery,
   routeForWorkflows,
@@ -93,14 +93,14 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     ['routeForNamespaces', () => routeForNamespaces()],
     ['routeForNexus', () => routeForNexus()],
     [
-      'routeForWorkflowCatalogExample',
+      'routeForCatalogExample',
       () =>
-        routeForWorkflowCatalogExample({
+        routeForCatalogExample({
           ...namespaceParams,
           exampleId: 'example-id',
         }),
     ],
-    ['routeForWorkflowCatalog', () => routeForWorkflowCatalog(namespaceParams)],
+    ['routeForCatalog', () => routeForCatalog(namespaceParams)],
     ['routeForNexusEndpoint', () => routeForNexusEndpoint('ep-1')],
     ['routeForNexusEndpointEdit', () => routeForNexusEndpointEdit('ep-1')],
     ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],
