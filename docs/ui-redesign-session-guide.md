@@ -28,11 +28,11 @@ execution, data operations, or business behavior.
 | ----------------------------- | ----------------------------------------------------------------------------- |
 | Repository branch             | `ui-overhaul`                                                                 |
 | Starting commit               | `7a5684a5e` — `Check if api has been upgraded for minimum minor bump (#3823)` |
-| Last implementation commit    | `385a4f29a` — `Make art for empty state 50%, make sdk logos flex`             |
+| Last implementation commit    | `46eed3b8a` — `Prevent event detail label overlap`                            |
 | Session dates                 | August 16–17, 2026, America/Chicago                                           |
-| User inputs recorded          | 49                                                                            |
-| Session commits               | 8                                                                             |
-| Aggregate implementation diff | 286 files changed, 7,631 insertions, 2,004 deletions                          |
+| User inputs recorded          | 58                                                                            |
+| Session commits               | 12                                                                            |
+| Aggregate implementation diff | 295 files changed, 10,464 insertions, 2,183 deletions                         |
 | Model                         | OpenAI Codex, GPT-5-based                                                     |
 | UI plugin/skill               | `designer-skill:designer-skill` 0.14.0                                        |
 
@@ -637,6 +637,122 @@ controls`). A one-line rhythm correction followed as `c99dffebb`.
 - **Landed in:** this implementation commit (`Redesign Workflow Task failure
 diagnostics`).
 
+### Phase 10 — Make Event History filtering visible
+
+#### 50. Rethink Event History filtering
+
+> How might you improve the Event History filtering? It feels too hidden behind
+> a menu, and you have to scroll to see all the events. It's also lacking the
+> event icons to tie them to the timline/table. What might be the best
+> improvement around this important filtering ability that many users miss?
+
+- **Result:** recommended replacing the constrained filter menu with a visible,
+  responsive filter shelf directly beneath the Event History controls. The
+  proposed facets reuse Timeline/table category icons, expose attention state
+  separately from event type, compose filters, report the filtered result
+  count, preserve URL state, and remain keyboard and screen-reader operable
+  without an internally scrolling menu.
+- **Landed in:** this guide; design exploration only.
+
+#### 51. Implement the visible filter shelf
+
+> Implement
+
+- **Result:** implemented a shared responsive shelf and its URL/state plumbing
+  in the working tree, then removed it in response to prompt 53. This attempt
+  did not land; the original event-type dropdown and filtering behavior remain.
+- **Landed in:** superseded in the same uncommitted working session.
+
+### Phase 11 — Unify Event History category color
+
+#### 52. Align History colors with the Timeline
+
+> [Screenshot attached.] Review the colors for this events. They feel too
+> similar and don't correctly map to the colors in the Timeline
+
+- **Result:** audited the separate category-color definitions used by the Event
+  History table, legend, and Timeline. The implementation consolidates those
+  consumers around one semantic category presentation map so each event
+  family keeps the same recognizable color and icon wherever it appears,
+  without pinning components or tests to theme-specific RGB values.
+- **Landed in:** uncommitted working tree after `0168c5ba7`.
+
+#### 53. Restore the dropdown filter
+
+> Remove all filter updates, go back to the dropdown
+
+- **Result:** removed the visible shelf, its controller, new URL/state helpers,
+  responsive browser spec, and layout integration, then restored the original
+  Event History and Timeline dropdown filter unchanged. The separate shared
+  category-color alignment from prompt 52 remains because it affects how event
+  identity is rendered consistently across the legend, History rows, and
+  Timeline—not how filtering works.
+- **Landed in:** uncommitted working tree after `0168c5ba7`.
+
+### Phase 12 — Diagnose the post-rollback development error
+
+#### 54. Check the 500 and console errors
+
+> [Screenshot attached.] Check errors
+
+- **Result:** verified that the missing `eventCategorySetsEqual` export is not
+  referenced anywhere in the current source, generated Svelte output, or Vite
+  cache. The browser retained the removed filter-controller module while an
+  older Vite process continued serving the restored dependency, producing a
+  mixed hot-module graph after prompt 53. The additional `Internal Error` JSON
+  exception is secondary console noise: the error route attempts to parse any
+  error message as JSON, catches the plain-text parse failure, and still renders
+  the original 500 status. Restarting the existing development server and
+  reloading the tab restores a coherent module graph; no filter source or cache
+  deletion is required.
+- **Landed in:** this guide; diagnostic only, with no application source change.
+
+#### 55. Commit the restored-filter and category-color work
+
+> commit changes
+
+- **Result:** committed the semantic category-color alignment while keeping the
+  original Event History dropdown restored. History rows, pending rows, the
+  legend, and Timeline glyph/hover channels now consume the same nine category
+  tokens; Timeline status dots and connectors retain their separate status
+  colors. The abandoned filter shelf was not included.
+- **Landed in:** `1c9522d2c` — `Align event category colors across views`.
+
+### Phase 13 — Prevent payload-detail label collisions
+
+#### 56. Fix overlapping payload-side event details
+
+> [Screenshot attached.] Lets fix the overlapping of data on the left when
+> payloads are in the event details
+
+- **Result:** traced the collision to the History table's inherited
+  `white-space: nowrap`, which forced long labels to paint across the value
+  track inside payload-bearing EventCards. The EventCard details boundary now
+  explicitly restores normal wrapping while retaining the existing two-pane
+  payload layout and the compact no-payload grid. A focused 375/1440px geometry
+  regression uses rendered text bounds to ensure long labels never intersect
+  their values.
+- **Landed in:** `46eed3b8a` — `Prevent event detail label overlap`.
+
+#### 57. Inspect the working tree
+
+> git status
+
+- **Result:** reported branch `ui-overhaul` with three modified files: the
+  living session guide, EventCard, and its focused layout regression. No files
+  were staged at that checkpoint.
+- **Landed in:** this guide; read-only status request.
+
+#### 58. Commit the payload-detail wrapping fix
+
+> commit this
+
+- **Result:** committed the EventCard whitespace-boundary fix and its 375/1440px
+  rendered-text geometry regression as a focused implementation change, then
+  updated the living guide with the exact commit provenance.
+- **Landed in:** `46eed3b8a` for the implementation and this guide update for
+  the session record.
+
 ## Commit-by-commit review guide
 
 ### 1. `059b93e15` — Precision Console foundation
@@ -1030,6 +1146,51 @@ its artwork half of the split layout and allowing the SDK resource links to
 wrap. It did not complete the later-requested canonical empty-state migration
 across every table.
 
+### 9. `0168c5ba7` — Workflow Task failure diagnostics
+
+- **Parent:** `385a4f29a`
+- **Commit time:** 2026-08-17 09:34:00 CDT
+- **Scope:** 10 files, 1,330 insertions, 133 deletions
+
+This commit replaced the nested Workflow Task failure accordions with one
+always-visible diagnostic surface. A pure formatter walks the full failure
+cause chain, removes exact repeated messages, and produces one copyable causal
+transcript containing every available message, source, and stack trace. The
+pending Workflow Task moved from badges into a semantic label/value grid with
+readable enum values. Timeout-only and missing-value states remain explicit,
+and a focused danger rail/header makes the failure conspicuous without turning
+the entire diagnostic into a red card.
+
+Unit, Storybook, and browser coverage exercise nested causes, long traces,
+copy/maximize behavior, timeout-only failures, pending-task semantics, mobile
+containment, History/Timeline rendering, and accessibility.
+
+### 10. `1c9522d2c` — Shared Event History and Timeline category colors
+
+- **Parent:** `0168c5ba7`
+- **Commit time:** 2026-08-17 10:36:18 CDT
+- **Scope:** 11 files, 233 insertions, 96 deletions
+
+This commit separated event identity from event status. It introduced nine
+semantic category tokens, routed History rows, pending rows, the legend, and
+Timeline glyph/hover states through one shared resolver, and kept status-driven
+dot fills, strokes, and connectors independent. The original dropdown filter
+remains unchanged. A focused token/consumer contract prevents the views from
+drifting back to separate category mappings.
+
+### 11. `46eed3b8a` — Prevent event detail label overlap
+
+- **Parent:** `1c9522d2c`
+- **Commit time:** 2026-08-17 10:52:11 CDT
+- **Scope:** 2 files, 86 insertions, 1 deletion
+
+This commit fixed payload-bearing EventCards inside the Event History table.
+The table's nowrap rule previously inherited into the left details pane, so
+long labels painted across their values. EventCard now restores normal wrapping
+at the details boundary without changing its payload columns or no-payload
+density. A focused Playwright fixture measures rendered label text against its
+value at 375px and 1440px to prevent recurrence.
+
 ## How to recreate the work
 
 The historical branch used one very large first commit. For a fresh
@@ -1202,13 +1363,19 @@ single `base..HEAD` diff:
 8. Inspect `c99dffebb` as the final one-line cleanup.
 9. Read `ad8ad35a6` as provenance, then inspect the focused empty-state
    adjustment in `385a4f29a`.
-10. Compare the branch at the three audit breakpoints in Precision, Ember, and
+10. Review the failure formatter, flat diagnostic UI, and focused tests in
+    `0168c5ba7`.
+11. Review the category token map and its History/Timeline consumers in
+    `1c9522d2c`.
+12. Review the focused whitespace boundary and geometry regression in
+    `46eed3b8a`.
+13. Compare the branch at the three audit breakpoints in Precision, Ember, and
     Vaporwave, in both light and dark.
 
 Useful Git commands:
 
 ```sh
-git log --reverse --oneline 7a5684a5e..385a4f29a
+git log --reverse --oneline 7a5684a5e..0168c5ba7
 git show --stat 059b93e15
 git diff 7a5684a5e..059b93e15 -- src/lib/theme src/app.css DESIGN.md
 git show c70fd3cff
@@ -1217,6 +1384,9 @@ git show 86c1cc2ce -- src/lib/holocene/command-rail.svelte
 git show 86c1cc2ce -- src/lib/components/saved-query-views/saved-views.svelte
 git show 9c7b2307c -- src/lib/theme src/lib/utilities/palette src/app.html
 git show 385a4f29a
+git show 0168c5ba7
+git show 1c9522d2c
+git show 46eed3b8a
 ```
 
 ## Validation ledger and honest limitations
