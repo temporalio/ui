@@ -6,7 +6,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconRetry, IconTemporalNexus } from '$lib/io/icon';
+  import { IconRetry } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { PendingNexusOperation } from '$lib/types/events';

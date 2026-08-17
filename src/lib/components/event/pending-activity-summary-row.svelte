@@ -8,7 +8,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconPause, IconRetry, IconTemporalActivity } from '$lib/io/icon';
+  import { IconPause, IconRetry } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { PendingActivity } from '$lib/types/events';
