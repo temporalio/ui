@@ -38,7 +38,7 @@ jobs:
         run: npm install --no-save --no-audit --no-fund --silent js-yaml@^4
 
       - name: Triage and label
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
