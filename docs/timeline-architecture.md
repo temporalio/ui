@@ -1,169 +1,177 @@
 # Timeline & Event History Architecture
 
-## Core Principle: One Copy, One Truth
+## Core Principle: Events Are Canonical, Groups Are Derived
 
 All event data lives in a **single module-level singleton** (`grouped-event-buffer.ts`).
-Consumers read it via `getEventArray()` / `getGroupArray()`. A thin `bufferVersion`
-signal and `fullEventHistory` store expose it to Svelte, but they carry references
-to the same objects — never copies.
+Events are stored once, in a flat array indexed by `eventId - 1`. Groups are not
+stored at all — they are described by lightweight records and built on demand.
+
+The flat array works because Temporal event IDs are a gapless sequence from 1, so
+the ID _is_ the position. That buys more than storage: a follower references its
+head by event ID (`scheduledEventId`, `startedEventId`, …), so the same arithmetic
+resolves it to `headGroup[headSlot]` in one array read, with no index to maintain.
+Were the IDs ever sparse the array would simply have holes — every read already
+skips empty slots — costing memory rather than correctness.
 
 ```mermaid
 flowchart LR
-    API["API / live stream"] -->|processEvent| BUF
+    API["Bidirectional fetch<br/>+ live poll"] -->|ingestHistoryEvent| BUF
 
-    subgraph BUF["grouped-event-buffer.ts (singleton)"]
+    subgraph BUF["grouped-event-buffer.ts (singleton, plain TS)"]
         direction TB
-        EV["events[]<br/>one array, no copies"]
-        GR["groups[]<br/>metadata only — stores IDs + refs"]
-        SO["soloEvents[]<br/>WorkflowExecutionStarted etc."]
-        ID["liveSeenIds Set<br/>dedup guard"]
+        EV["events[]<br/>slot = eventId - 1, one copy"]
+        HG["headGroup: Int32Array<br/>head slot → record"]
+        GR["records[]<br/>member slots + pending metadata"]
     end
 
-    BUF -->|getEventArray| TL["Timeline layout"]
-    BUF -->|getGroupArray| HL["History layout"]
-    BUF -->|getEventArray| WD["Workflow Details"]
+    BUF -->|getLazyGroups| VIEW["Views: filter, sort, lay out"]
+    VIEW -->|materializeGroup| ROW["Rendered rows only"]
+    BUF -->|getEventArray| FLAT["Flat event consumers"]
 
-    BUF -->|bufferVersion signal| TL
-    BUF -->|onLatestGroup callback| HL
+    BUF -->|onChange| FACADE["grouped-event-buffer.svelte.ts"]
+    FACADE -->|eventBuffer.*| VIEW
 ```
 
 ### Key tenets
 
-| Tenet                        | How                                                                                                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **No second data structure** | `EventGroup` is a metadata envelope — it stores event IDs and a reference to the head event; it does not copy field values                              |
-| **No duplicate objects**     | `liveSeenIds` rejects any event ID seen before; `appendLiveEvent` and `processEvent` both gate on this set                                              |
-| **Lazy detail rendering**    | Raw event payload is read from the existing array entry only when a detail panel opens — not on every group build                                       |
-| **Solo events included**     | `WorkflowExecutionStarted` events that don't belong to a group live in `soloEvents[]` and are merged into `getEventArray()` at read time                |
-| **Reactive signal is cheap** | `bufferVersion` is a plain Svelte `writable(0)` incremented on each buffer flush; consumers `$derived` off it to re-read without diffing the full array |
+| Tenet                           | How                                                                                                                                                 |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **One store, one copy**         | `events[slot]` holds the only converted `WorkflowEvent`; records reference it by slot index                                                         |
+| **Groups cost nothing to list** | A `LazyGroup` _is_ the record — `id`, `category`, `isPending`, head/last event. Enough to filter, sort and lay out without building an `EventGroup` |
+| **Materialize what renders**    | `materializeGroup` builds the full `EventGroup`, memoized on the record's version — ~54 pooled timeline rows, or one 100-row compact page           |
+| **One dedup check**             | `if (events[slot]) return false` — both producers write through the same guard                                                                      |
+| **Identity tracks content**     | An unchanged group returns the identical object; a changed one always returns a new object                                                          |
 
 ---
 
-## Group Assembly: Park-and-Flush Pattern
+## Group Assembly: Arrival Order Doesn't Matter
 
-Temporal events arrive out of order. A group (Activity, Timer, Child Workflow, …) is made up of 2–5 events where only the **head event** (e.g. `ActivityTaskScheduled`) carries the group identity. Followers (Started, Completed) reference the head by ID.
+Temporal events arrive out of order. A group (Activity, Timer, Child Workflow, …)
+is 2–5 events where only the **head event** (e.g. `ActivityTaskScheduled`) carries
+the group identity; followers reference the head by ID.
 
-Two separate sources can deliver events concurrently:
+Two sources deliver concurrently:
 
-- **Bidirectional fetch** — ascending cursor from event 1, descending cursor from the last event, racing toward the middle.
+- **Bidirectional fetch** — ascending cursor from event 1, descending cursor from the last, racing toward the middle.
 - **Live poll** — long-poll at the frontier while a workflow is running.
 
-Both use the same core pattern: **park followers invisibly until the head arrives, then flush them into the group in one shot.**
+Both call `ingestHistoryEvent`, which stores the event and notes its slot on a
+record for the group it belongs to. The record is created by **whichever member
+arrives first** — head or follower — so no event ever has to wait somewhere for
+its group to exist.
 
 ```mermaid
 flowchart TD
-    subgraph SOURCES["Event sources"]
-        ASC["Ascending cursor\n(processEvent)"]
-        DESC["Descending cursor\n(processEvent)"]
-        LIVE["Live poll\n(appendLiveEvent)"]
-    end
-
-    ASC & DESC --> PE["processEvent(event)"]
-    LIVE --> ALE["appendLiveEvent(event)"]
-
-    PE -->|isHead = true| POOL["groupPool slot\neventToGroup[slot] = poolIdx+1"]
-    PE -->|isHead = false| ATF["attachFollower(headSlotIdx, followerSlotIdx)"]
-
-    ATF -->|head already in pool| ATFP["attachFollowerToPool\n→ insertEventById into group\n→ eventSlots[slot] = null"]
-    ATF -->|head not yet in pool| PF["pendingFollowers.set(headSlot, followerSlots[])"]
-
-    POOL -->|flush| PF_FLUSH["flush pendingFollowers\n→ attachFollowerToPool × N"]
-    POOL -->|flush| LPF_FLUSH["flush livePendingFollowers\n→ insertEventById × N\n→ eventToGroup[slot] = poolIdx+1"]
-
-    ALE -->|isHead = true| LG["liveGroups entry\n+ flush livePendingFollowers"]
-    ALE -->|head in liveGroups| LG_EXT["extend live group directly"]
-    ALE -->|head in groupPool| POOL_EXT["extend pool group directly\n(Option B)"]
-    ALE -->|head unknown| LPF["livePendingFollowers.set(headId, events[])"]
+    ANY["Ascending / descending cursor, or live poll"] --> ING["ingestHistoryEvent(raw, isAscending)"]
+    ING --> DEDUP{"events[slot] set?"}
+    DEDUP -- yes --> DROP["return false"]
+    DEDUP -- no --> STORE["events[slot] = toEvent(raw)"]
+    STORE --> REC["recordFor(headSlot)<br/>create if absent"]
+    REC --> ADD["record.addMember(slot, event)"]
+    ADD --> HEAD{"is this the head?"}
+    HEAD -- yes --> META["store id, category, headsGroup,<br/>apply pending metadata"]
+    HEAD -- no --> BUMP["record.version++"]
 ```
 
-### Four resolution paths for a follower event
+A record with no head event yet is simply not listed — `getLazyGroups` skips any
+record whose `headsGroup` is false. **No partial or stub groups are ever rendered**,
+and the order events arrive in does not change the result.
 
-| Source                   | Head already where? | Action                                                                                  |
-| ------------------------ | ------------------- | --------------------------------------------------------------------------------------- |
-| `processEvent` (bidir)   | groupPool           | `attachFollowerToPool` — inserts immediately, nulls raw slot                            |
-| `processEvent` (bidir)   | Nowhere yet         | `pendingFollowers` map — parks slot index; flushed when head arrives                    |
-| `appendLiveEvent` (live) | liveGroups          | Extends live group's `eventList` in place                                               |
-| `appendLiveEvent` (live) | groupPool           | Extends pool group's `eventList` directly; marks `eventToGroup[followerSlot]`           |
-| `appendLiveEvent` (live) | Nowhere yet         | `livePendingFollowers` map — parks converted `WorkflowEvent`; flushed when head arrives |
+### What this replaced
 
-**A group only becomes visible in `getGroupArray()` once its head has been processed.** No partial or stub groups are rendered.
+Because groups used to be built during ingest, an event whose group didn't exist
+yet had nowhere to go. The answer was to hold it: two park maps (`pendingFollowers`
+keyed by slot, `livePendingFollowers` keyed by event id), a flush when the head
+registered, a separate `liveGroups` store for groups the poll created, and a
+reconcile step when the fetch caught up to one.
 
-### What each map stores
+Deriving groups on read removes the question. The event goes in `events[slot]` and
+its slot number goes on the record, whichever arrives first.
 
-```
-pendingFollowers:    Map<headSlotIdx: number, followerSlotIdx[]: number[]>
-                     ↑ slot indices only — raw HistoryEvent stays in eventSlots[]
+### Pending activity / nexus metadata
 
-livePendingFollowers: Map<headEventId: string, WorkflowEvent[]>
-                      ↑ already-converted events — appendLiveEvent never writes to eventSlots
-```
+This is the one input that isn't in the history. The workflow run reports it, so
+`setPendingMetadata` hands the buffer the two lookup maps; the buffer applies them
+when a head event lands and re-applies on refresh. Callers don't have to know the
+ordering rule — a head that arrives after the refresh listing it still picks its
+own up.
 
-One copy of each event exists at any time — either waiting in a park map, or committed inside `group.eventList`.
-
-### Dedup when both sources deliver the same event
-
-`attachFollowerToPool` guards with:
-
-```
-if (eventToGroup[followerSlotIdx] !== 0) { null the slot; return; }
-```
-
-If `livePendingFollowers` already claimed a slot (by writing `eventToGroup[followerSlotIdx]` during flush), the bidirectional cursor's delivery of the same event is silently discarded.
-
-### Live groups in `getGroupArray()`
-
-Complete live groups (head delivered by live poll) are included alongside pool groups. Once `processEvent` claims the head (`eventToGroup[headSlot] !== 0`) the live group is excluded — the pool group takes over with an identical or superset `eventList`.
+It is applied when a group is **built**, gated on the group not already holding a
+terminal event, so a stale pending entry and a completion resolve the same way in
+either arrival order.
 
 ---
 
-## Reactivity: Events and Callbacks, Not Svelte Primitives
+## Reactivity: A Plain Buffer Behind a Thin Reactive Facade
 
-The buffer is **plain TypeScript** — no `$state`, no `$derived`, no stores inside the module.
-Svelte's reactive graph is only entered at the outermost boundary, via two narrow escape hatches.
-
-```mermaid
-flowchart TD
-    subgraph NEW["✅ New approach (buffer + narrow signals)"]
-        direction LR
-        N1["Plain TS array mutated<br/>in-place — no reactive cost"] -->|batch complete| N2["bufferVersion.set(v+1)<br/>one integer write"]
-        N2 -->|$derived reads version| N3["Consumer calls getEventArray()<br/>reads already-built array — O(1)"]
-        N1 -->|group head appended| N4["onLatestGroup() fires<br/>registered callback"]
-        N4 --> N5["Layout calls getGroupArray()<br/>reads cached sorted slice — O(1)"]
-    end
-```
+The buffer is **plain TypeScript** — no `$state`, no `$derived`, no stores inside
+the module, so it unit-tests without a component runtime. Svelte is entered in
+exactly one place: `grouped-event-buffer.svelte.ts`.
 
 ```mermaid
 flowchart TD
-    subgraph OLD["❌ Old approach (stores)"]
-        direction LR
-        O1["Svelte writable store<br/>holds full WorkflowEvent[]"] -->|every push triggers| O2["$derived chains re-run<br/>across all subscribers"]
-        O2 --> O3["Full array diff + re-render<br/>at 50k events = jank"]
-    end
+    W["ingestHistoryEvent / setPendingMetadata / reset"] -->|notifyChanged| OC["onChange listeners"]
+    OC --> FV["EventBufferView.scheduleUpdate()"]
+    FV -->|coalesce onto a microtask| VER["_version++ ($state)"]
+    VER --> D1["eventBuffer.lazyGroupsWithoutWorkflowTasks"]
+    VER --> D2["eventBuffer.events"]
+    VER --> D3["bufferVersion store (legacy derived stores)"]
 ```
 
-### Why this matters at scale
-
-|                  | Svelte store approach                           | Buffer + signal approach                                                  |
-| ---------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
-| 10 k event push  | Re-runs every `$derived` chain for each push    | Mutates array silently; one `bufferVersion` tick at end                   |
-| Subscriber count | Every component watching the store re-evaluates | Only components that read `bufferVersion` or register via `onLatestGroup` |
-| Memory per event | Two copies — one in store, one in group         | One copy in `events[]`; group holds a reference to the same object        |
-| Render trigger   | Svelte decides (potentially every frame)        | Explicit: either a version bump or a callback — nothing else              |
-
-### The two signal types
-
-**`bufferVersion`** — a plain `writable(0)`. Consumers write:
+Consumers read a value:
 
 ```svelte
-let rows = $derived.by(() => {
-  $bufferVersion;           // subscribe to the tick
-  return getEventArray();   // read the already-built array
-});
+const lazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
 ```
 
-No array is passed through the signal. The signal carries only the intent to re-read.
+No subscribe / throttle / re-read effect at the call site, and **producers never
+announce their own writes** — the buffer reports them.
 
-**`onLatestGroup(cb)`** — a callback registration (pub/sub, not Svelte reactive). Layouts register on mount and receive a teardown function. The buffer calls every registered callback synchronously after appending a new group head. No Svelte primitive involved — the callback fires imperative code that then reassigns a `$state` variable once, queueing exactly one Svelte flush.
+- **Coalescing is a microtask, deliberately not `requestAnimationFrame`.** Fetch
+  pages and poll batches are ingested in synchronous loops, so a batch collapses
+  into one update either way — but rAF never fires in a hidden tab, which would
+  leave a run opened in a background tab with an empty history until focused.
+- **`reset` propagates immediately** rather than coalescing, so navigating between
+  runs cannot leave the previous run's groups on screen for a tick.
+- **`bufferVersion`** survives as a store mirror of `eventBuffer.version`, for the
+  pre-runes `derived()` stores in `$lib/stores/events`. Prefer `eventBuffer` in new code.
+
+### The identity invariant
+
+`materializeGroup` is memoized on the record's version, so group identity is a pure
+function of content. That is what the timeline row pool depends on: it reuses a row
+while the group is unchanged, so a group extended **in place** would leave a
+completed activity rendering as still in progress. Making identity structural
+removes a convention every call site otherwise has to remember.
+
+The corollary: a `LazyGroup`'s own identity is stable for the whole run, so anything
+caching per group must compare `version` too, not just the reference.
+
+---
+
+## Deriving on Read: What Gets Materialized
+
+Nothing upstream of a rendered row needs a full `EventGroup`:
+
+| Consumer                           | Reads                            |
+| ---------------------------------- | -------------------------------- |
+| Event-type filter (both layouts)   | `category`                       |
+| `sort-timeline-groups`             | `isPending`, `initialEvent.id`   |
+| `get-failed-or-pending`            | `classification`, `initialEvent` |
+| `build-time-segments` (gap layout) | head and last event times        |
+| Row pool index map                 | `id`                             |
+
+So those run over `LazyGroup[]`, and only the rendered rows call `materializeGroup`.
+Opening a view on a large history used to build every group in it.
+
+A `LazyGroup` and its materialized `EventGroup` **must agree field for field**, or a
+view filters on one and renders the other. `isPending` and `category` share one
+implementation so they cannot diverge; the rest are compared at every prefix of
+every group type, over a field list that TypeScript forces to stay exhaustive.
+
+The **feed view is the exception** and still takes full groups: its gutter graph does
+cross-group layout needing `eventList`, `level`, and reverse event→group lookups
+(`history-graph`, `positioning`).
 
 ---
 
@@ -202,6 +210,9 @@ flowchart TD
   you scroll, each slot re-points to a new group — the `<li>` and its component
   instance stay mounted and only props update. This removed the `cloneNode` /
   insert / effect-teardown churn that was tripping frequent major-GC pauses.
+- **Slots hold `LazyGroup`s** and materialize per rendered row. A slot is reused
+  when its index, group **and version** all match; identity alone is not enough,
+  since a lazy group keeps its identity across content changes.
 
 ### Positioning math (`timeline-graph/timeline-positioning.ts`)
 

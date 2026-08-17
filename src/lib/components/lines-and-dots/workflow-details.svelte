@@ -4,10 +4,10 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconFilter, IconInfo } from '$lib/io/icon';
-  import { getEventArray } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { bufferVersion, sdkInfo } from '$lib/stores/events';
+  import { sdkInfo } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import {
@@ -81,12 +81,11 @@
       ? formatBytes(parseInt(workflow.historySizeBytes, 10))
       : '',
   );
-  let totalActions = $derived.by(() => {
-    $bufferVersion;
-    return getEventArray()
-      .reduce((acc, e) => (e?.billableActions ?? 0) + acc, 0)
-      .toString();
-  });
+  let totalActions = $derived(
+    eventBuffer.events
+      .reduce((acc, event) => (event?.billableActions ?? 0) + acc, 0)
+      .toString(),
+  );
 
   const { sdk, version: sdkVersion } = $derived($sdkInfo);
 

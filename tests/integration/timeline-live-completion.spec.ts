@@ -16,10 +16,10 @@ import { mockWorkflow } from '~/test-utilities/mocks/workflow';
 // Regression for: a running group's timeline bar/label stayed "in progress"
 // after it completed, until reload. The completion arrives via the live poll,
 // which used to extend the group in place — the row pool keys on group identity,
-// so a stable reference meant no re-render. The buffer now copy-on-writes the
-// group, handing the row a fresh reference. The accessible name
-// ("Event <type>: <classification>") is the robust, non-brittle proxy for the
-// recolor — with the bug it stays non-Completed.
+// so a stable reference meant no re-render. Groups are now rebuilt on read and
+// memoized per content version, so a changed group always reads back as a new
+// object. The accessible name ("Event <type>: <classification>") is the robust
+// proxy for the recolor — with the bug it stays non-Completed.
 
 const { workflowId, runId } = mockWorkflow.workflowExecutionInfo.execution;
 const timelineUrl = `/namespaces/default/workflows/${workflowId}/${runId}/timeline`;

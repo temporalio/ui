@@ -25,15 +25,10 @@
     IconCollapse,
     IconDownload,
   } from '$lib/io/icon';
-  import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import {
-    enrichGroups,
-    getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
-    getGroupArray,
-  } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
-  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
+  import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
@@ -67,16 +62,16 @@
 
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  let bufferGroups = $state.raw<EventGroup[]>([]);
+  const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
 
-  const filteredBufferGroups = $derived.by(() => {
+  const filteredBufferLazyGroups = $derived.by(() => {
     const active = $eventTypeFilter;
-    return bufferGroups.filter((g) => active.includes(g.category));
+    return bufferLazyGroups.filter((g) => active.includes(g.category));
   });
 
-  const groups = $derived(
+  const lazyGroups = $derived(
     getTimelineGroups(
-      filteredBufferGroups,
+      filteredBufferLazyGroups,
       reverseSort,
       historyCtx.fetchComplete,
       historyCtx.descMinId,
@@ -84,9 +79,8 @@
   );
 
   const workflowTaskFailedError = $derived.by(() => {
-    void $bufferVersion;
     if (!historyCtx.fetchComplete) return undefined;
-    return getBufferWftFailedEvent() as
+    return eventBuffer.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;
@@ -112,34 +106,13 @@
   // virtualizes internally via IntersectionObserver, so there's no bounded
   // scroll container, no scroll-offset bridge, and no height plumbing here.
   const estimatedTotalGroups = $derived.by(() => {
-    if (historyCtx.fetchComplete) return groups.length;
+    if (historyCtx.fetchComplete) return lazyGroups.length;
     const totalEvents = historyCtx.totalExpectedEvents ?? 0;
-    return Math.max(groups.length, Math.ceil(totalEvents * 0.5));
+    return Math.max(lazyGroups.length, Math.ceil(totalEvents * 0.5));
   });
 
   onMount(() => {
     historyCtx.resume();
-    bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-  });
-
-  $effect(() => {
-    void $bufferVersion;
-    const fetchComplete = historyCtx.fetchComplete;
-    const pendingActivities = $workflowRun.workflow?.pendingActivities ?? [];
-    const pendingNexusOperations =
-      $workflowRun.workflow?.pendingNexusOperations ?? [];
-
-    let frame: number | null = requestAnimationFrame(() => {
-      frame = null;
-      if (fetchComplete) {
-        enrichGroups(pendingActivities, pendingNexusOperations);
-      }
-      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-    });
-
-    return () => {
-      if (frame !== null) cancelAnimationFrame(frame);
-    };
   });
 
   let timeline = $state<Timeline>();
@@ -244,7 +217,7 @@
   {#if workflow}
     <TimelineGraph
       {workflow}
-      {groups}
+      {lazyGroups}
       {reverseSort}
       loading={!historyCtx.fetchComplete}
       totalExpectedEvents={estimatedTotalGroups}
