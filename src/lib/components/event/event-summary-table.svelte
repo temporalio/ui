@@ -144,7 +144,6 @@
     pageButtonLabel={(page) => translate('common.go-to-page', { page })}
     {updating}
     items={filteredItems}
-    maxHeight="none"
     class="border-t-0"
   >
     {#snippet headers()}

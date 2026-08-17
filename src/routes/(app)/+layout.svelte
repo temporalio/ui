@@ -404,7 +404,7 @@
       <UserMenu {logout} />
     </TopNavigation>
     {#snippet main()}
-      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+      <div class="flex w-full flex-col gap-4 p-4 md:p-8">
         <ErrorBoundary>
           {@render children()}
         </ErrorBoundary>
