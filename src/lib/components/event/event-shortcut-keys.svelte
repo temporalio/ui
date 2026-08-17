@@ -20,6 +20,7 @@
     variant="secondary"
     leadingIcon="keyboard"
     onclick={onOpen}
+    aria-label={translate('common.keyboard-shortcuts')}
   />
 </div>
 <Drawer

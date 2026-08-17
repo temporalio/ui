@@ -130,6 +130,7 @@
             data-testid="deployments-table-configuration-button"
             size="xs"
             variant="ghost"
+            aria-label={translate('common.configure-columns')}
           >
             <Icon name="settings" />
           </Button>

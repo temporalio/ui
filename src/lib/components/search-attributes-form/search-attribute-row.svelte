@@ -93,6 +93,7 @@
       onclick={onRemove}
       disabled={submitting}
       leadingIcon="close"
+      aria-label={translate('search-attributes.remove-attribute-button')}
       class="rounded-full"
     />
   {:else if isDeletable}
@@ -107,6 +108,7 @@
         onclick={onRemove}
         disabled={submitting || isCloud}
         leadingIcon="trash"
+        aria-label={translate('search-attributes.delete-attribute-button')}
       />
     </Tooltip>
   {/if}

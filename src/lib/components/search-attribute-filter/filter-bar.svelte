@@ -73,6 +73,7 @@
           leadingIcon="json"
           active={viewManualQuery}
           data-testid="toggle-manual-query"
+          aria-label={viewManualQuery ? 'Hide raw query' : 'View raw query'}
           onclick={() => (viewManualQuery = !viewManualQuery)}
         />
       </Tooltip>

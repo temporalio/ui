@@ -216,6 +216,7 @@
           size="xs"
           href={routeForNamespace({ namespace })}
           disabled={!namespaceExists}
+          aria-label={translate('namespaces.go-to-namespace')}
           ><Icon class="text-white" name="external-link" /></Button
         >
       </div>

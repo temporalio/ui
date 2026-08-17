@@ -17,6 +17,8 @@ export const Strings = {
 
   // Buttons
   'add-attribute-button': 'Add New Custom Search Attribute',
+  'remove-attribute-button': 'Remove Custom Search Attribute',
+  'delete-attribute-button': 'Delete Custom Search Attribute',
   'save-button': 'Save',
   'saving-button': 'Saving...',
   'cancel-button': 'Cancel',
