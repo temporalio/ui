@@ -21,6 +21,8 @@ import {
   routeForAuthentication,
   routeForAuthenticationRedirect,
   routeForCallStack,
+  routeForCatalog,
+  routeForCatalogExample,
   routeForEventHistory,
   routeForEventHistoryImport,
   routeForLoginPage,
@@ -67,6 +69,21 @@ describe('routeFor', () => {
   it('should route to "workflows"', () => {
     const path = routeForWorkflows({ namespace: 'default' });
     expect(path).toBe(`${base}/namespaces/default/workflows`);
+  });
+
+  it('should route to the catalog within a namespace', () => {
+    expect(routeForCatalog({ namespace: 'default' })).toBe(
+      `${base}/namespaces/default/catalog`,
+    );
+  });
+
+  it('should encode a catalog example ID', () => {
+    expect(
+      routeForCatalogExample({
+        namespace: 'default',
+        exampleId: 'release/2026 #1',
+      }),
+    ).toBe(`${base}/namespaces/default/catalog/release%2F2026%20%231`);
   });
 
   it('should route to archival workflows', () => {

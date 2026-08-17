@@ -6,8 +6,10 @@ import type { render } from 'svelte/server';
 
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import type { Component } from 'svelte';
-import { createServer, type ViteDevServer } from 'vite';
+import { createServer } from 'vite';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
 
 import {
   hasCloudRunImpersonatorPlaceholder,
@@ -17,50 +19,57 @@ import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?r
 
 let computeFields: Component<Record<string, unknown>>;
 let renderComponent: typeof render;
-let viteServer: ViteDevServer;
+let closeViteServer: (() => Promise<void>) | undefined;
 
 beforeAll(async () => {
   const projectRoot = process.cwd();
-  viteServer = await createServer({
-    root: projectRoot,
-    configFile: false,
-    appType: 'custom',
-    plugins: [svelte({ hot: false })],
-    resolve: {
-      alias: [
-        {
-          find: '$lib/holocene/code-block.svelte',
-          replacement: path.resolve(
-            projectRoot,
-            'src/lib/components/workers/serverless-worker-form/compute-fields-code-block-test-double.svelte',
-          ),
-        },
-        {
-          find: '$lib',
-          replacement: path.resolve(projectRoot, 'src/lib'),
-        },
-        {
-          find: '$types',
-          replacement: path.resolve(projectRoot, 'src/types'),
-        },
-        {
-          find: '$app',
-          replacement: path.resolve(projectRoot, 'src/lib/svelte-mocks/app'),
-        },
-      ],
+  const lifecycle = await startIsolatedViteServer(
+    createServer,
+    {
+      root: projectRoot,
+      configFile: false,
+      appType: 'custom',
+      plugins: [svelte({ hot: false })],
+      resolve: {
+        alias: [
+          {
+            find: '$lib/holocene/code-block.svelte',
+            replacement: path.resolve(
+              projectRoot,
+              'src/lib/components/workers/serverless-worker-form/compute-fields-code-block-test-double.svelte',
+            ),
+          },
+          {
+            find: '$lib',
+            replacement: path.resolve(projectRoot, 'src/lib'),
+          },
+          {
+            find: '$types',
+            replacement: path.resolve(projectRoot, 'src/types'),
+          },
+          {
+            find: '$app',
+            replacement: path.resolve(projectRoot, 'src/lib/svelte-mocks/app'),
+          },
+        ],
+      },
+      server: { middlewareMode: true },
     },
-    server: { middlewareMode: true },
-  });
-  computeFields = (
-    await viteServer.ssrLoadModule(
-      '/src/lib/components/workers/serverless-worker-form/compute-fields.svelte',
-    )
-  ).default;
-  renderComponent = (await viteServer.ssrLoadModule('svelte/server')).render;
+    async (server) => ({
+      computeFields: (
+        await server.ssrLoadModule(
+          '/src/lib/components/workers/serverless-worker-form/compute-fields.svelte',
+        )
+      ).default,
+      renderComponent: (await server.ssrLoadModule('svelte/server')).render,
+    }),
+  );
+  closeViteServer = lifecycle.close;
+  ({ computeFields, renderComponent } = lifecycle.value);
 });
 
 afterAll(async () => {
-  await viteServer?.close();
+  await closeViteServer?.();
 });
 
 const projectToken = '"__TEMPORAL_GCP_PROJECT_ID__"';

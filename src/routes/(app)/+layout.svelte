@@ -33,6 +33,7 @@
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
+    routeForCatalog,
     routeForEventHistoryImport,
     routeForNamespaces,
     routeForNexus,
@@ -107,6 +108,7 @@
       workersRoute: routeForWorkers({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
       archivalRoute: routeForArchivalWorkflows({ namespace }),
+      catalogRoute: routeForCatalog({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
       historyImportRoute: routeForEventHistoryImport(),
@@ -268,6 +270,7 @@
     archivalRoute,
     standaloneActivitiesRoute,
     standaloneNexusOperationsRoute,
+    catalogRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
@@ -279,6 +282,7 @@
       archivalRoute,
       standaloneActivitiesRoute,
       standaloneNexusOperationsRoute,
+      catalogRoute,
     ].some((route) => page.url.href.includes(route)),
   );
 
@@ -307,6 +311,10 @@
       {
         subPath: 'workers',
         fullRoute: routeForWorkers({ namespace }),
+      },
+      {
+        subPath: 'catalog',
+        fullRoute: routeForCatalog({ namespace }),
       },
     ];
 
