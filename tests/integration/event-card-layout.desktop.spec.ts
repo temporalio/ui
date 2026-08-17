@@ -19,6 +19,7 @@ const eventUrl = (eventId: string) =>
 
 const events = structuredClone(completedEvents.slice(0, 5)) as FixtureEvent[];
 const scheduledEvent = events.find(({ eventId }) => eventId === '5');
+const payloadEventId = '50';
 
 if (!scheduledEvent?.activityTaskScheduledEventAttributes) {
   throw new Error('ActivityTaskScheduled fixture is missing its attributes');
@@ -26,6 +27,21 @@ if (!scheduledEvent?.activityTaskScheduledEventAttributes) {
 
 // Keep the empty structural header in the fixture: it must not turn an event
 // with no user data into a payload-bearing card.
+
+const payloadScheduledEvent = structuredClone(scheduledEvent);
+payloadScheduledEvent.eventId = payloadEventId;
+payloadScheduledEvent.activityTaskScheduledEventAttributes = {
+  ...payloadScheduledEvent.activityTaskScheduledEventAttributes,
+  input: {
+    payloads: [
+      {
+        metadata: { encoding: 'anNvbi9wbGFpbg==' },
+        data: 'InJlZ3Jlc3Npb24i',
+      },
+    ],
+  },
+};
+events.push(payloadScheduledEvent);
 
 const history = {
   history: { events },
@@ -65,6 +81,45 @@ const boxesFor = (locator: Locator) =>
 
 const distinctPositions = (positions: number[]) =>
   new Set(positions.map((position) => Math.round(position / 2) * 2)).size;
+
+const labelValueGeometryFor = (details: Locator) =>
+  details.locator(':scope > *').evaluateAll((fields) =>
+    fields.flatMap((field) => {
+      const [label, value] = field.children;
+      if (!label || !value) return [];
+
+      const labelRange = document.createRange();
+      labelRange.selectNodeContents(label);
+      const labelBox = labelRange.getBoundingClientRect();
+      const valueBox = value.getBoundingClientRect();
+
+      return [
+        {
+          label: label.textContent?.trim() ?? '',
+          labelBox: {
+            top: labelBox.top,
+            right: labelBox.right,
+            bottom: labelBox.bottom,
+            left: labelBox.left,
+          },
+          valueBox: {
+            top: valueBox.top,
+            right: valueBox.right,
+            bottom: valueBox.bottom,
+            left: valueBox.left,
+          },
+        },
+      ];
+    }),
+  );
+
+const boxesOverlap = (
+  first: { top: number; right: number; bottom: number; left: number },
+  second: { top: number; right: number; bottom: number; left: number },
+) =>
+  Math.min(first.right, second.right) - Math.max(first.left, second.left) >
+    0.5 &&
+  Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top) > 0.5;
 
 test.beforeEach(async ({ page }) => {
   await mockEventCards(page);
@@ -159,3 +214,33 @@ test('payload events retain the existing two-pane layout', async ({ page }) => {
   expect(payloadsBox!.x).toBeGreaterThan(detailsBox!.x);
   expect(payloadsBox!.width).toBeGreaterThan(detailsBox!.width * 0.9);
 });
+
+for (const width of [375, 1440]) {
+  test(`payload detail labels do not overlap their values at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(eventUrl(payloadEventId));
+
+    const card = page.locator(
+      `[data-testid="event-card"][data-event-id="${payloadEventId}"]`,
+    );
+    const details = card.getByTestId('event-card-details');
+
+    await expect(card).toHaveAttribute('data-layout', 'payload');
+    await expect(card.getByTestId('event-card-payloads')).toBeVisible();
+    await expect(details).toBeVisible();
+
+    const geometries = await labelValueGeometryFor(details);
+    expect(geometries.length).toBeGreaterThan(4);
+    expect(geometries.map(({ label }) => label)).toContain(
+      'Workflow Task Completed Event ID',
+    );
+
+    const overlappingLabels = geometries
+      .filter(({ labelBox, valueBox }) => boxesOverlap(labelBox, valueBox))
+      .map(({ label }) => label);
+
+    expect(overlappingLabels).toEqual([]);
+  });
+}

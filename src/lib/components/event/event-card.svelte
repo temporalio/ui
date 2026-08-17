@@ -133,7 +133,7 @@
     >
       {#if showDetails}
         <div
-          class="min-w-0 {hasPayloadFields
+          class="min-w-0 whitespace-normal {hasPayloadFields
             ? 'flex flex-col gap-1.5'
             : 'event-attribute-grid grid items-start gap-x-6 gap-y-2'}"
           data-testid="event-card-details"
