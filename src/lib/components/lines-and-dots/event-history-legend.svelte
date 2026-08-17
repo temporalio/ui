@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { eventCategoryColor } from '$lib/components/event/event-styles';
   import {
     getCategoryStrokeColor,
     getStatusStrokeColor,
@@ -96,12 +95,14 @@
 
 {#snippet eventCategoryKey(category: EventTypeCategory)}
   {@const { name, title } = CategoryIcon[category]}
-  <dd
-    class="mt-1 flex items-center gap-1.5 {eventCategoryColor({
-      category,
-    })}"
-  >
-    <Icon {name} class="h-3.5 w-3.5 shrink-0" />
+  <dd class="mt-1 flex items-center gap-1.5 text-secondary">
+    <span
+      aria-hidden="true"
+      class="shrink-0"
+      style:color={getCategoryStrokeColor(category)}
+    >
+      <Icon {name} class="h-3.5 w-3.5" />
+    </span>
     {title}
   </dd>
 {/snippet}

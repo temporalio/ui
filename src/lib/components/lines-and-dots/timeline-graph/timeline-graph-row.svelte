@@ -1,25 +1,3 @@
-<script module lang="ts">
-  import { cva } from 'class-variance-authority';
-
-  // Module scope so the variant config is built once, not per mounted row.
-  const groupHover = cva(['h-full w-full border-2'], {
-    variants: {
-      category: {
-        workflow: 'border-information bg-information',
-        activity: 'border-strong bg-subtle',
-        'child-workflow': 'border-success bg-success',
-        timer: 'border-warning bg-warning',
-        signal: 'border-information bg-information',
-        update: 'border-information bg-information',
-        other: 'border-strong bg-subtle',
-        nexus: 'border-information bg-information',
-        'local-activity': 'border-strong bg-subtle',
-        default: 'border-strong bg-subtle',
-      },
-    },
-  });
-</script>
-
 <script lang="ts">
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -38,7 +16,12 @@
   } from '$lib/utilities/is-event-type';
 
   import { dotBox, lineBox } from './primitives';
-  import { type DotColors, dotColors, strokeColor } from '../colors';
+  import {
+    type DotColors,
+    dotColors,
+    getCategoryStrokeColor,
+    strokeColor,
+  } from '../colors';
   import { CategoryIcon, type TimelineIconName } from '../constants';
   import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
   import { timelineTextPosition } from './timeline-positioning';
@@ -178,6 +161,11 @@
         ? 'rgb(var(--color-border-warning))'
         : lineColor,
   );
+  const categoryColor = $derived(
+    getCategoryStrokeColor(
+      decodedLocalActivity ? 'local-activity' : group.category,
+    ),
+  );
 
   // The button spans just the dots + connectors; its coords are button-local
   // (offset by spanLeft). Hover/focus highlight is CSS-only (no JS state).
@@ -226,6 +214,7 @@
   pointX: number,
   colors: DotColors,
   icon: TimelineIconName | undefined,
+  iconColor: string = colors.stroke,
 )}
   {@const bounds = dotBox(pointX, spanCy)}
   <!-- transform (not left/top) so streaming/live reprojection composites the dot
@@ -238,7 +227,8 @@
   >
     {#if icon}
       <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-primary"
+        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2"
+        style:color={iconColor}
         viewBox="0 0 24 24"><use href="#ti-{icon}" /></svg
       >
     {/if}
@@ -258,7 +248,9 @@
     onclick={onClick}
   >
     <div
-      class="highlight {groupHover({ category: group.category })}"
+      class="highlight h-full w-full border-2"
+      style:--event-category-color={categoryColor}
+      style:border-color={categoryColor}
       style:border-radius="{highlightRadius}px"
     ></div>
     {#each points as pointX, index (index)}
@@ -282,18 +274,20 @@
         )}
         {@render dot(
           localX,
-          dotColors(group.lastEvent.classification),
+          dotColors(group.lastEvent.classification, group.category),
           'retry',
+          pendingLineColor,
         )}
       {/if}
       {@render dot(
         localX,
-        dotColors(group.eventList[index]?.classification),
+        dotColors(group.eventList[index]?.classification, group.category),
         pauseTime && index !== 0
           ? 'pause'
           : decodedLocalActivity
             ? CategoryIcon['local-activity'].name
             : CategoryIcon[group.category].name,
+        categoryColor,
       )}
     {/each}
     <!-- Inside the button so hovering/clicking the label hits the same target;
@@ -373,6 +367,11 @@
     inset: 0;
     opacity: 0;
     pointer-events: none;
+    background: color-mix(
+      in srgb,
+      var(--event-category-color) 16%,
+      transparent
+    );
     transition: opacity var(--duration-fast, 140ms)
       var(--ease-standard, ease-out);
   }

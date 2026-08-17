@@ -6,7 +6,7 @@
 
   import { GUTTER, ROW_HEIGHT } from './constants';
   import { dotBox, lineBox } from './primitives';
-  import { dotColors, strokeColor } from '../colors';
+  import { dotColors, getCategoryStrokeColor, strokeColor } from '../colors';
 
   interface Props {
     workflow: WorkflowExecution;
@@ -66,7 +66,8 @@
       style:background={colors.fill}
     >
       <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-primary"
+        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2"
+        style:color={getCategoryStrokeColor('workflow')}
         viewBox="0 0 24 24"><use href="#ti-workflow" /></svg
       >
     </div>

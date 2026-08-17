@@ -1,7 +1,47 @@
 import { type PaletteName, paletteNames } from './palettes';
 import { toColor } from './utilities';
 
+const eventCategoryVariables = {
+  '--color-event-category-workflow': {
+    light: 'blue.700',
+    dark: 'blue.300',
+  },
+  '--color-event-category-activity': {
+    light: 'purple.700',
+    dark: 'purple.300',
+  },
+  '--color-event-category-child-workflow': {
+    light: 'cyan.700',
+    dark: 'cyan.300',
+  },
+  '--color-event-category-timer': {
+    light: 'yellow.700',
+    dark: 'yellow.200',
+  },
+  '--color-event-category-signal': {
+    light: 'pink.700',
+    dark: 'pink.300',
+  },
+  '--color-event-category-update': {
+    light: 'green.700',
+    dark: 'green.300',
+  },
+  '--color-event-category-nexus': {
+    light: 'indigo.700',
+    dark: 'indigo.300',
+  },
+  '--color-event-category-local-activity': {
+    light: 'orange.900',
+    dark: 'orange.400',
+  },
+  '--color-event-category-other': {
+    light: 'slate.600',
+    dark: 'slate.300',
+  },
+} as const satisfies ColorVariables;
+
 const precisionVariables = {
+  ...eventCategoryVariables,
   // Text
   '--color-text-black': {
     light: 'space-black',
@@ -241,6 +281,7 @@ type ResolvedPalette = Readonly<Record<ColorScheme, ResolvedPaletteVariables>>;
 type ResolvedPaletteRegistry = Readonly<Record<PaletteName, ResolvedPalette>>;
 
 const emberVariables = {
+  ...eventCategoryVariables,
   // Text
   '--color-text-black': {
     light: 'stone.950',
@@ -473,6 +514,7 @@ const emberVariables = {
 } as const satisfies PaletteVariables;
 
 const vaporwaveVariables = {
+  ...eventCategoryVariables,
   // Text
   '--color-text-black': {
     light: 'violet-neutral.950',

@@ -16,6 +16,7 @@
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { eventTypeStyle } from './event-styles';
+  import { getCategoryStrokeColor } from '../lines-and-dots/colors';
   import { CategoryIcon } from '../lines-and-dots/constants';
 
   import EventDetailsFull from './event-details-full.svelte';
@@ -99,12 +100,16 @@
     {/if}
   </td>
   <td class="">
-    <p class={eventTypeStyle({ category: 'activity' })}>
-      <Icon
-        name={CategoryIcon['activity'].name}
-        title={CategoryIcon['activity'].title}
-        class="mr-1 inline animate-pulse"
-      />
+    <p class={eventTypeStyle()}>
+      <span
+        class="mr-1 inline-flex animate-pulse"
+        style:color={getCategoryStrokeColor('activity')}
+      >
+        <Icon
+          name={CategoryIcon['activity'].name}
+          title={CategoryIcon['activity'].title}
+        />
+      </span>
       {translate('workflows.pending-activity')}
     </p>
   </td>

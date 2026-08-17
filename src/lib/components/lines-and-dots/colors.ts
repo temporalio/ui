@@ -13,6 +13,9 @@ const BRAND = semanticColor('--color-surface-brand');
 const SECONDARY = semanticColor('--color-text-secondary');
 const PRIMARY = semanticColor('--color-text-primary');
 
+const eventCategoryColor = (category: EventTypeCategory): string =>
+  semanticColor(`--color-event-category-${category}`);
+
 const STATUS_STROKE_COLORS: Record<
   NonNullable<WorkflowStatus> | EventClassification | 'Delayed',
   string
@@ -45,19 +48,19 @@ const CATEGORY_STROKE_COLORS: Record<
   EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
   string
 > = {
-  timer: WARNING,
-  signal: BRAND,
-  activity: SECONDARY,
-  workflow: INFORMATION,
+  timer: eventCategoryColor('timer'),
+  signal: eventCategoryColor('signal'),
+  activity: eventCategoryColor('activity'),
+  workflow: eventCategoryColor('workflow'),
   marker: SECONDARY,
   command: SECONDARY,
-  'child-workflow': SUCCESS,
-  update: INFORMATION,
+  'child-workflow': eventCategoryColor('child-workflow'),
+  update: eventCategoryColor('update'),
   pending: INFORMATION,
   retry: DANGER,
-  'local-activity': DEFAULT_STROKE_COLOR,
-  nexus: DEFAULT_STROKE_COLOR,
-  other: DEFAULT_STROKE_COLOR,
+  'local-activity': eventCategoryColor('local-activity'),
+  nexus: eventCategoryColor('nexus'),
+  other: eventCategoryColor('other'),
 };
 
 export const getCategoryStrokeColor = (
@@ -113,17 +116,9 @@ const CLASSIFICATION_DOT_COLORS: Record<string, DotColors> = {
 const CATEGORY_DOT_COLORS: Record<string, DotColors> = {
   marker: DOT_DEFAULT,
   command: DOT_DEFAULT,
-  timer: {
-    fill: semanticColor('--color-surface-warning'),
-    stroke: WARNING,
-  },
-  signal: {
-    fill: semanticColor('--color-surface-information'),
-    stroke: BRAND,
-  },
   activity: {
     fill: semanticColor('--color-surface-secondary'),
-    stroke: SECONDARY,
+    stroke: eventCategoryColor('activity'),
   },
   pending: {
     fill: semanticColor('--color-surface-information'),
@@ -131,15 +126,35 @@ const CATEGORY_DOT_COLORS: Record<string, DotColors> = {
   },
   'child-workflow': {
     fill: semanticColor('--color-surface-success'),
-    stroke: SUCCESS,
+    stroke: eventCategoryColor('child-workflow'),
   },
   update: {
     fill: semanticColor('--color-surface-information'),
-    stroke: INFORMATION,
+    stroke: eventCategoryColor('update'),
   },
   workflow: {
     fill: semanticColor('--color-surface-information'),
-    stroke: INFORMATION,
+    stroke: eventCategoryColor('workflow'),
+  },
+  timer: {
+    fill: semanticColor('--color-surface-warning'),
+    stroke: eventCategoryColor('timer'),
+  },
+  signal: {
+    fill: semanticColor('--color-surface-information'),
+    stroke: eventCategoryColor('signal'),
+  },
+  nexus: {
+    fill: semanticColor('--color-surface-secondary'),
+    stroke: eventCategoryColor('nexus'),
+  },
+  'local-activity': {
+    fill: semanticColor('--color-surface-secondary'),
+    stroke: eventCategoryColor('local-activity'),
+  },
+  other: {
+    fill: semanticColor('--color-surface-secondary'),
+    stroke: eventCategoryColor('other'),
   },
 };
 

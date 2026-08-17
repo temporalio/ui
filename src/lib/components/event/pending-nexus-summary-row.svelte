@@ -14,6 +14,7 @@
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { eventTypeStyle } from './event-styles';
+  import { getCategoryStrokeColor } from '../lines-and-dots/colors';
   import { CategoryIcon } from '../lines-and-dots/constants';
 
   import EventDetailsFull from './event-details-full.svelte';
@@ -96,12 +97,16 @@
   >
     <div class="flex">
       <div class="flex w-full items-center gap-2">
-        <p class={eventTypeStyle({ category: 'nexus' })}>
-          <Icon
-            name={CategoryIcon['nexus'].name}
-            title={CategoryIcon['nexus'].title}
-            class="mr-1 inline animate-pulse"
-          />
+        <p class={eventTypeStyle()}>
+          <span
+            class="mr-1 inline-flex animate-pulse"
+            style:color={getCategoryStrokeColor('nexus')}
+          >
+            <Icon
+              name={CategoryIcon['nexus'].name}
+              title={CategoryIcon['nexus'].title}
+            />
+          </span>
           {translate('workflows.pending-nexus-operation')}
         </p>
         {#if event.attempt}

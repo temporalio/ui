@@ -41,6 +41,7 @@
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { eventTypeStyle } from './event-styles';
+  import { getCategoryStrokeColor } from '../lines-and-dots/colors';
   import { CategoryIcon } from '../lines-and-dots/constants';
 
   import EventDetailsFull from './event-details-full.svelte';
@@ -305,15 +306,19 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p class={eventTypeStyle({ category: event.category })}>
-      <Icon
-        name={CategoryIcon[event.category].name}
-        title={CategoryIcon[event.category].title}
+    <p class={eventTypeStyle()}>
+      <span
         class={merge(
-          'mr-1 inline',
+          'mr-1 inline-flex',
           isEventGroup(event) && event.isPending && 'animate-pulse',
         )}
-      />
+        style:color={getCategoryStrokeColor(event.category)}
+      >
+        <Icon
+          name={CategoryIcon[event.category].name}
+          title={CategoryIcon[event.category].title}
+        />
+      </span>
       {displayName}
     </p>
   </td>

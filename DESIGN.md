@@ -68,6 +68,13 @@ and placeholder tokens. Their connector and muted-status strokes maintain at
 least 3:1 contrast against both theme surfaces; application components never
 reach into the raw slate or indigo palette for these states.
 
+Event categories use one dedicated semantic color each. The same category
+token colors the glyph in the History table, legend, and Timeline, while event
+names remain neutral. Timeline status fills, connectors, and badges continue
+to communicate completion, failure, retry, and pending state independently.
+Category identity is always reinforced by a distinct icon and text label, never
+color alone.
+
 **The Signal Rule.** Accent means action or active state and occupies no more
 than ten percent of a normal product screen.
 
