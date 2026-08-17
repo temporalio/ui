@@ -65,10 +65,13 @@
     toggleModal(open, modalElement);
   });
 
-  const handleCancel = () => {
-    onCancelModal?.();
-    open = false;
+  // Escape, backdrop, the close icon, the cancel button and the parent flipping
+  // `open` all end up here via the dialog's native close event.
+  const handleClose = () => {
     error = '';
+    if (!open) return; // the parent already closed us, the user did not cancel
+    open = false;
+    onCancelModal?.();
   };
 
   const confirmModal = () => {
@@ -76,7 +79,7 @@
   };
 
   const closeModal = () => {
-    open = false;
+    modalElement?.close();
   };
 
   const handleClick = (event: MouseEvent) => {
@@ -94,7 +97,7 @@
 
 <dialog
   {id}
-  onclose={handleCancel}
+  onclose={handleClose}
   bind:this={modalElement}
   class={merge(
     'body',

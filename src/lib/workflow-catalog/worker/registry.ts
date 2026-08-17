@@ -2,7 +2,7 @@ import { isDeepStrictEqual, types as nodeTypes } from 'node:util';
 
 import type { ServiceHandler } from 'nexus-rpc';
 
-import { withSharedWorkflowCatalogStartOptions } from '../browser/start-options';
+import { withSharedWorkflowCatalogStartOptions } from '../browser/start-options.js';
 import type {
   BrowserWorkflowCatalogDescriptor,
   BrowserWorkflowCatalogMetadata,

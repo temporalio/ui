@@ -7,16 +7,10 @@
   type Props = {
     open: boolean;
     activityId: string;
-    hideResetHeartbeatOption?: boolean;
     onConfirm: (resetHeartbeat: boolean) => Promise<void>;
   };
 
-  let {
-    hideResetHeartbeatOption = false,
-    open = $bindable(),
-    activityId,
-    onConfirm,
-  }: Props = $props();
+  let { open = $bindable(), activityId, onConfirm }: Props = $props();
 
   let error = $state('');
   let loading = $state(false);
@@ -65,13 +59,11 @@
   {#snippet content()}
     <div class="flex flex-col gap-4">
       <p>{translate('activities.reset-modal-description')}</p>
-      {#if !hideResetHeartbeatOption}
-        <Checkbox
-          bind:checked={resetHeartbeat}
-          label={translate('activities.reset-heartbeat-details')}
-          data-testid="reset-heartbeat-details"
-        />
-      {/if}
+      <Checkbox
+        bind:checked={resetHeartbeat}
+        label={translate('activities.reset-heartbeat-details')}
+        data-testid="reset-heartbeat-details"
+      />
     </div>
   {/snippet}
 </Modal>

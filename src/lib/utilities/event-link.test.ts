@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { base } from '$app/paths';
 
-import { toEventLinkView } from './event-link';
+import { eventLinkTargetTypeLabel, toEventLinkView } from './event-link';
 
 describe('toEventLinkView', () => {
   it('returns a workflow event route for event references', () => {
@@ -20,11 +20,11 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'workflowEvent',
-      label: 'Link',
+      label: 'Workflow Link',
       value: 'test-wf/test-run/history/events/42',
       href: `${base}/namespaces/test-ns/workflows/test-wf/test-run/history/events/42`,
       namespace: {
-        label: 'Link Namespace',
+        label: 'Namespace Link',
         value: 'test-ns',
         href: `${base}/namespaces/test-ns`,
       },
@@ -34,6 +34,30 @@ describe('toEventLinkView', () => {
         href: `${base}/namespaces/test-ns/workflows/test-wf/test-run/history/events/42`,
       },
     });
+  });
+
+  it('uses caller labels for workflow events in the caller perspective', () => {
+    const view = toEventLinkView(
+      {
+        workflowEvent: {
+          namespace: 'caller-ns',
+          workflowId: 'caller-wf',
+          runId: 'caller-run',
+          eventRef: {
+            eventId: '7',
+            eventType: 'EVENT_TYPE_NEXUS_OPERATION_SCHEDULED',
+          },
+        },
+      },
+      { perspective: 'caller' },
+    );
+
+    expect(view.label).toBe('Caller Workflow');
+    expect(view.namespace?.label).toBe('Caller Namespace');
+    expect(view.event?.label).toBe('Caller Event');
+    expect(view.event?.href).toBe(
+      `${base}/namespaces/caller-ns/workflows/caller-wf/caller-run/history/events/7`,
+    );
   });
 
   it('returns a workflow event route for request ID references', () => {
@@ -84,11 +108,11 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'workflow',
-      label: 'Workflow ID',
+      label: 'Workflow Link',
       value: 'test-wf/test-run/timeline',
       href: `${base}/namespaces/test-ns/workflows/test-wf/test-run/timeline`,
       namespace: {
-        label: 'Link Namespace',
+        label: 'Namespace Link',
         value: 'test-ns',
         href: `${base}/namespaces/test-ns`,
       },
@@ -107,9 +131,34 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'nexusOperation',
-      label: 'Nexus Operation',
+      label: 'Standalone Nexus Operation Link',
       value: 'operation-1',
       href: `${base}/namespaces/test-ns/nexus-operations/operation-1/run-1/details`,
+    });
+  });
+
+  it('uses caller labels for a Nexus operation in the caller perspective', () => {
+    const view = toEventLinkView(
+      {
+        nexusOperation: {
+          namespace: 'caller-ns',
+          operationId: 'operation-1',
+          runId: 'run-1',
+        },
+      },
+      { perspective: 'caller' },
+    );
+
+    expect(view).toMatchObject({
+      variant: 'nexusOperation',
+      label: 'Caller Event',
+      value: 'operation-1',
+      href: `${base}/namespaces/caller-ns/nexus-operations/operation-1/run-1/details`,
+      namespace: {
+        label: 'Caller Namespace',
+        value: 'caller-ns',
+        href: `${base}/namespaces/caller-ns`,
+      },
     });
   });
 
@@ -124,10 +173,16 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'activity',
-      label: 'Activity ID',
+      label: 'Standalone Activity Link',
       value: 'activity-1',
       href: `${base}/namespaces/test-ns/activities/activity-1/run-1/details`,
+      namespace: {
+        label: 'Namespace Link',
+        value: 'test-ns',
+        href: `${base}/namespaces/test-ns`,
+      },
     });
+    expect(eventLinkTargetTypeLabel(view.variant)).toBe('Standalone Activity');
   });
 
   it('returns a batch operation route when namespace context is available', () => {
@@ -157,7 +212,7 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'nexusOperation',
-      label: 'Nexus Operation',
+      label: 'Standalone Nexus Operation Link',
       value: 'operation-1',
       href: undefined,
     });
@@ -172,7 +227,7 @@ describe('toEventLinkView', () => {
 
     expect(view).toMatchObject({
       variant: 'workflow',
-      label: 'Workflow ID',
+      label: 'Workflow Link',
       value: 'test-wf',
       href: undefined,
     });
@@ -187,5 +242,22 @@ describe('toEventLinkView', () => {
       value: 'Link',
     });
     expect(view.href).toBeUndefined();
+  });
+});
+
+describe('eventLinkTargetTypeLabel', () => {
+  it('labels an activity variant as a Standalone Activity', () => {
+    expect(eventLinkTargetTypeLabel('activity')).toBe('Standalone Activity');
+  });
+
+  it('labels workflow variants as Workflow', () => {
+    expect(eventLinkTargetTypeLabel('workflowEvent')).toBe('Workflow');
+    expect(eventLinkTargetTypeLabel('workflow')).toBe('Workflow');
+  });
+
+  it('returns undefined for variants without a handler target type', () => {
+    expect(eventLinkTargetTypeLabel('nexusOperation')).toBeUndefined();
+    expect(eventLinkTargetTypeLabel('batchJob')).toBeUndefined();
+    expect(eventLinkTargetTypeLabel('unknown')).toBeUndefined();
   });
 });

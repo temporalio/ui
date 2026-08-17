@@ -1501,9 +1501,7 @@ registry.registerExample({
           'src/lib/i18n/translate.ts',
           'src/lib/stores/event-view.ts',
           'src/lib/stores/persist-store.ts',
-          'src/lib/svelte-mocks/app/navigation.ts',
-          'src/lib/svelte-mocks/app/paths.ts',
-          'src/lib/svelte-mocks/app/state.ts',
+          'src/lib/svelte-mocks/app',
           'src/lib/types/events.ts',
           'src/lib/types/global.ts',
           'src/lib/types/index.ts',
@@ -1530,6 +1528,59 @@ registry.registerExample({
             },
           ),
         ),
+      );
+      const testDoublesDirectory = join(packageDirectory, 'test-doubles');
+      await mkdir(testDoublesDirectory);
+      const componentTestDouble = join(
+        testDoublesDirectory,
+        'component-test-double.svelte',
+      );
+      await writeFile(
+        componentTestDouble,
+        [
+          '<script module lang="ts">',
+          "  export const DAYS = { label: 'day(s)', convert: (value: number) => value * 86_400 };",
+          "  export const SECONDS = { label: 'second(s)', convert: (value: number) => value };",
+          '  export const DEFAULT_UNITS = [DAYS];',
+          '</script>',
+          '',
+          '<script lang="ts">',
+          "  let { attributesToAdd = $bindable([]), content = $bindable(''), input = $bindable(''), value = $bindable('') } = $props();",
+          '</script>',
+          '',
+          '<span data-testid="workflow-catalog-component-test-double">{content}{input}{value}{attributesToAdd.length}</span>',
+          '',
+        ].join('\n'),
+      );
+      const payloadEncodingTestDouble = join(
+        testDoublesDirectory,
+        'payload-encoding-test-double.ts',
+      );
+      await writeFile(
+        payloadEncodingTestDouble,
+        [
+          'export const encodePayloads = async () => null;',
+          'export const setSearchAttributes = () => ({});',
+          '',
+        ].join('\n'),
+      );
+      await Promise.all(
+        [
+          'src/lib/components/payload-input.svelte',
+          'src/lib/components/workflow/add-search-attributes.svelte',
+          'src/lib/holocene/duration-input/duration-input.svelte',
+          'src/lib/holocene/markdown-editor/markdown-editor.svelte',
+        ].map((targetPath) =>
+          mkdir(join(packageDirectory, targetPath, '..'), {
+            recursive: true,
+          }).then(() =>
+            cp(componentTestDouble, join(packageDirectory, targetPath)),
+          ),
+        ),
+      );
+      await cp(
+        payloadEncodingTestDouble,
+        join(packageDirectory, 'src/lib/utilities/encode-payload.ts'),
       );
       const packageJson = JSON.parse(
         await readFile(join(packageDirectory, 'package.json'), 'utf8'),
