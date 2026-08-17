@@ -440,7 +440,11 @@
           {#each [...linkListForSecondGroup]
             .filter((item) => !item.hidden)
             .reverse() as link, i (i)}
-            <NavigationItem {...link} link={link.href} />
+            <NavigationItem
+              {...link}
+              link={link.href}
+              data-testid={link.testId}
+            />
           {/each}
 
           <hr class="border-subtle" />
@@ -448,7 +452,11 @@
           {#each [...linkList]
             .filter((item) => !item.hidden)
             .reverse() as link, i (i)}
-            <NavigationItem {...link} link={link.href} />
+            <NavigationItem
+              {...link}
+              link={link.href}
+              data-testid={link.testId}
+            />
           {/each}
         {/snippet}
         {#if showNewsFeed}
