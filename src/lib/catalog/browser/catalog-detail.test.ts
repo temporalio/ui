@@ -11,7 +11,12 @@ import type { Component } from 'svelte';
 import { createServer } from 'vite';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { IconCheckCircle, IconQuestionCircle, IconWarning } from '$lib/io/icon';
+import {
+  IconCheckCircle,
+  type IconComponent,
+  IconQuestionCircle,
+  IconWarning,
+} from '$lib/io/icon';
 import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
 
 import { catalogHarnessSetupTimeoutMs } from './catalog-harness-timeout';
@@ -19,6 +24,9 @@ import { createCatalogSessionStore } from './session-store';
 import type { BrowserCatalogDescriptor } from './types';
 import type { WorkbenchHost } from './workbench-host';
 
+// The component is loaded through an isolated Vite server, so the icon
+// components it returns are different objects than the ones imported here.
+// Compare by compiled component name rather than by reference.
 const iconNamed = (icon: { name: string }) => ({
   asymmetricMatch: (actual: unknown) =>
     typeof actual === 'function' &&
@@ -47,7 +55,7 @@ let readinessPresentation: (config: {
     | 'unavailable';
   taskQueue: string;
 }) => {
-  Icon: unknown;
+  Icon: IconComponent;
   iconClass: string;
   iconLabel: string;
   label: string;
