@@ -5,11 +5,12 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
 
   interface BaseProps {
-    label: string;
+    label?: string;
     class?: ClassNameValue;
     onclick?: () => void;
     leading?: Snippet;
     trailing?: Snippet;
+    children?: Snippet;
   }
 
   interface EnabledProps extends BaseProps {
@@ -30,11 +31,12 @@
     active = false,
     selected = false,
     disabled = false,
-    label,
+    label = '',
     class: className = '',
     onclick,
     leading,
     trailing,
+    children,
   }: Props = $props();
 </script>
 
@@ -50,5 +52,9 @@
   {leading}
   {trailing}
 >
-  {label}
+  {#if children}
+    {@render children()}
+  {:else}
+    {label}
+  {/if}
 </MenuItem>
