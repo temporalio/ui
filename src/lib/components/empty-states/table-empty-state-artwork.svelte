@@ -3,7 +3,7 @@
 </script>
 
 <div
-  class="surface-secondary hidden h-full w-[38%] overflow-hidden border-l border-subtle xl:block"
+  class="surface-secondary hidden h-full w-[50%] overflow-hidden border-l border-subtle xl:block"
   data-testid="table-empty-state-artwork"
 >
   <img

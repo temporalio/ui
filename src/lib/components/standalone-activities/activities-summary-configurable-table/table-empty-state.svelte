@@ -101,14 +101,16 @@
         <p>
           {translate('standalone-activities.no-activities-description-part-3')}
         </p>
-        <h3>
+        <h3 class="mt-4">
           {translate('standalone-activities.get-started-title')}
         </h3>
-        {#each SDK_LINKS as { sdk, href } (sdk)}
-          <Link newTab {href}>
-            <SdkLogo {sdk} version="" hideDocsLink />
-          </Link>
-        {/each}
+        <div class="flex flex-wrap gap-2">
+          {#each SDK_LINKS as { sdk, href } (sdk)}
+            <Link newTab {href}>
+              <SdkLogo {sdk} version="" hideDocsLink />
+            </Link>
+          {/each}
+        </div>
       {/if}
     </div>
     <TableEmptyStateArtwork />
