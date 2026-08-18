@@ -1,9 +1,6 @@
 name: Weekly On-Call Review
 
 on:
-  schedule:
-    # 10:00 Eastern during daylight saving time; runs in the morning on Mondays year-round.
-    - cron: '0 14 * * 1'
   workflow_dispatch:
     inputs:
       mode:
@@ -57,7 +54,7 @@ jobs:
           slack_channel="$REQUESTED_SLACK_CHANNEL"
 
           if [ "$EVENT_NAME" = 'schedule' ]; then
-            mode='apply'
+            mode='dry-run'
             notify='true'
             slack_channel="$SCHEDULED_SLACK_CHANNEL"
           fi

@@ -405,17 +405,16 @@ pnpm validate:versions
 ## Weekly Frontend On-Call Review
 
 `weekly-oncall-review.yml` creates one Slack thread in `#oncall-frontend` and
-fans out to small, independently callable review modules. It runs every Monday
-at 14:00 UTC and can also be started from **Actions → Weekly On-Call Review**.
-The scheduled run uses `apply` mode and notifications, so Claude can author a
-minimal dependency-security candidate and the workflow can update its draft PR.
-Manual runs default to `dry-run`; choose `apply` only when the
-generated dependency remediation draft PR may be updated. Manual notifications default to `C0BPXR260DA`
+fans out to small, independently callable review modules. Scheduling is
+intentionally disabled pending enablement; start it from **Actions → Weekly
+On-Call Review** when needed. Manual runs default to `dry-run`; choose `apply`
+only when the generated dependency remediation draft PR may be updated. Manual
+notifications default to `C0BPXR260DA`
 (`#other-ross-tests-stuff`) so test runs do not post to the on-call channel.
 The `slack_channel` input accepts another Slack channel ID when needed.
-Scheduled runs ignore that input and always use
-`ONCALL_FRONTEND_SLACK_CHANNEL`. `notify: false` runs the audits without
-posting to Slack.
+If scheduling is reintroduced, the dormant schedule fallback remains
+fail-safe: it uses `dry-run` mode and `ONCALL_FRONTEND_SLACK_CHANNEL`.
+`notify: false` runs the audits without posting to Slack.
 
 A separate `weekly-oncall-review-pr-test.yml` workflow validates internal pull
 requests that change the on-call workflows, their dependency-security scripts
