@@ -70,6 +70,32 @@ export type CatalogComposedExample = {
   workflowType?: string;
 };
 
+export type CatalogAuthoringFile = {
+  content: string;
+  editable: boolean;
+  mode: number;
+  path: string;
+  removed?: true;
+};
+
+export type CatalogAuthoringLimits = {
+  maxDepth: number;
+  maxFileBytes: number;
+  maxFiles: number;
+  maxTotalBytes: number;
+};
+
+export type CatalogLoadedExample = Omit<
+  CatalogComposedExample,
+  'sourceFiles'
+> & {
+  sourceFiles: readonly CatalogAuthoringFile[];
+  sourceSnapshot: {
+    baseRevision: string;
+    limits: CatalogAuthoringLimits;
+  };
+};
+
 export type CatalogSavedState =
   | { durability: 'durable'; status: 'saved' }
   | { status: 'dirty' | 'failed' | 'stale' };
@@ -287,6 +313,86 @@ export type CatalogAuthoringAdapter = {
   }) => void | Promise<void>;
   verifyGenerated?: () => void | Promise<void>;
 };
+
+export type CatalogEditorAdapter = CatalogAuthoringAdapter & {
+  editor: {
+    limits: CatalogAuthoringLimits;
+    loadExamples: () =>
+      | readonly CatalogLoadedExample[]
+      | Promise<readonly CatalogLoadedExample[]>;
+  };
+};
+
+type CatalogAuthoringPlan = {
+  operations: (
+    | { from: string; kind: 'move-directory'; to: string }
+    | { kind: 'generate' | 'verify' }
+  )[];
+};
+
+type CatalogPromotionDescription = ReturnType<
+  NonNullable<CatalogAuthoringAdapter['describePromotion']>
+>;
+
+export type CatalogPromotionPreview =
+  | {
+      reason:
+        | 'preview-not-supported'
+        | 'save-failed'
+        | 'saved-revision-stale'
+        | 'unsaved-changes';
+      status: 'unavailable';
+    }
+  | (CatalogPromotionDescription & {
+      checks?: readonly {
+        id: string;
+        label: string;
+        severity: 'advisory' | 'blocking';
+        status: 'pending';
+      }[];
+      exampleId: string;
+      revision: string;
+      status: 'available';
+    });
+
+export type CatalogAuthoring = {
+  confirmPromote: (options: {
+    exampleId: string;
+    revision: string;
+    saveState: CatalogSavedState;
+  }) => Promise<CatalogMutationOutcome>;
+  demote: (exampleId: string) => Promise<CatalogMutationMoveResult>;
+  generate: () => Promise<readonly CatalogAuthoringArtifact[]>;
+  planDemote: (exampleId: string) => Promise<CatalogAuthoringPlan>;
+  planPromote: (exampleId: string) => Promise<CatalogAuthoringPlan>;
+  previewPromote: (options: {
+    exampleId: string;
+    saveState: CatalogSavedState;
+  }) => Promise<CatalogPromotionPreview>;
+  promote: (exampleId: string) => Promise<CatalogMutationMoveResult>;
+  scaffold: (exampleId: string) => Promise<void>;
+  verify: () => Promise<void>;
+};
+
+export type CatalogEditor = {
+  addFile: (
+    example: CatalogLoadedExample,
+    file: Pick<CatalogAuthoringFile, 'content' | 'path'>,
+  ) => CatalogLoadedExample;
+  loadExamples: () => Promise<readonly CatalogLoadedExample[]>;
+  removeFile: (
+    example: CatalogLoadedExample,
+    path: string,
+  ) => CatalogLoadedExample;
+  restoreFile: (
+    example: CatalogLoadedExample,
+    path: string,
+  ) => CatalogLoadedExample;
+};
+
+type CatalogAuthoringFor<Adapter> = Adapter extends CatalogEditorAdapter
+  ? CatalogAuthoring & CatalogEditor
+  : CatalogAuthoring;
 
 const pathExists = async (path: string) => {
   try {
@@ -585,7 +691,9 @@ export const renderCatalogSourceAssembly = ({
   ]);
 };
 
-export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
+export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
+  adapter: Adapter,
+): CatalogAuthoringFor<Adapter> => {
   validateCatalogAuthoringGraph(adapter.graph, []);
   const declaredOutputs = new Set(
     adapter.graph.outputs.map((output) => output.path),
@@ -1615,7 +1723,97 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
     };
   };
 
-  return {
+  const editor =
+    'editor' in adapter ? (adapter as CatalogEditorAdapter).editor : undefined;
+  const editorLimits = editor ? Object.freeze({ ...editor.limits }) : undefined;
+  const assertRetainedAggregateLimits = (
+    files: readonly CatalogAuthoringFile[],
+  ) => {
+    if (!editorLimits) return;
+    const retainedFiles = files.filter(({ removed }) => !removed);
+    if (retainedFiles.length > editorLimits.maxFiles) {
+      throw new Error(
+        `Catalog editable fileset exceeds maximum file count of ${editorLimits.maxFiles}`,
+      );
+    }
+    const totalBytes = retainedFiles.reduce(
+      (total, file) => total + Buffer.byteLength(file.content),
+      0,
+    );
+    if (totalBytes > editorLimits.maxTotalBytes) {
+      throw new Error(
+        `Catalog editable fileset exceeds maximum total size of ${editorLimits.maxTotalBytes} bytes`,
+      );
+    }
+  };
+  const editorAuthoring: CatalogEditor | undefined = editor
+    ? {
+        addFile: (
+          example: CatalogLoadedExample,
+          file: Pick<CatalogAuthoringFile, 'content' | 'path'>,
+        ): CatalogLoadedExample => {
+          assertExplicitRelativePath(file.path);
+          if (posix.basename(file.path).includes('.generated.')) {
+            throw new Error(
+              `Catalog editable fileset cannot include a generated file: ${file.path}`,
+            );
+          }
+          if (file.content.includes('\0')) {
+            throw new Error(
+              `Catalog editable fileset cannot include binary content: ${file.path}`,
+            );
+          }
+          const limits = editorLimits!;
+          if (file.path.split('/').length > limits.maxDepth) {
+            throw new Error(
+              `Catalog editable fileset exceeds maximum depth of ${limits.maxDepth}: ${file.path}`,
+            );
+          }
+          const fileBytes = Buffer.byteLength(file.content);
+          if (fileBytes > limits.maxFileBytes) {
+            throw new Error(
+              `Catalog editable fileset exceeds maximum file size of ${limits.maxFileBytes} bytes: ${file.path}`,
+            );
+          }
+          if (example.sourceFiles.some(({ path }) => path === file.path)) {
+            throw new Error(`Catalog file already exists: ${file.path}`);
+          }
+          const addedFile = { ...file, editable: true, mode: 0o644 };
+          assertRetainedAggregateLimits([...example.sourceFiles, addedFile]);
+          return {
+            ...example,
+            sourceFiles: [...example.sourceFiles, addedFile].sort(
+              (left, right) =>
+                left.path < right.path ? -1 : left.path > right.path ? 1 : 0,
+            ),
+          };
+        },
+        loadExamples: () =>
+          withLock(() => Promise.resolve(editor.loadExamples())),
+        removeFile: (
+          example: CatalogLoadedExample,
+          path: string,
+        ): CatalogLoadedExample => ({
+          ...example,
+          sourceFiles: example.sourceFiles.map((file) =>
+            file.path === path ? { ...file, removed: true } : file,
+          ),
+        }),
+        restoreFile: (
+          example: CatalogLoadedExample,
+          path: string,
+        ): CatalogLoadedExample => {
+          const sourceFiles = example.sourceFiles.map((file) => {
+            if (file.path !== path) return file;
+            const { removed: _, ...restored } = file;
+            return restored;
+          });
+          assertRetainedAggregateLimits(sourceFiles);
+          return { ...example, sourceFiles };
+        },
+      }
+    : undefined;
+  const authoring: CatalogAuthoring = {
     demote: async (exampleId: string) => {
       assertExampleId(exampleId);
       return withLock(() =>
@@ -1897,6 +2095,9 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
       };
     },
   };
+  return (
+    editorAuthoring ? { ...authoring, ...editorAuthoring } : authoring
+  ) as CatalogAuthoringFor<Adapter>;
 };
 
 export const catalogHelp = `Usage: catalog <command>

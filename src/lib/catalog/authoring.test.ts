@@ -17,10 +17,11 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, expectTypeOf, it } from 'vitest';
 
 import {
   type CatalogAuthoringAdapter,
+  type CatalogComposedExample,
   composeCatalogArtifacts,
   createCatalogAuthoring as createCatalogAuthoringSdk,
   createCatalogLocalArtifactVitePlugin,
@@ -2941,5 +2942,68 @@ try {
         [example],
       ),
     ).toThrow('browser boundary must declare a browser consumer');
+  });
+
+  it('preserves mutable dry-run plan operations for existing consumers', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    await mkdir(join(rootDirectory, 'local/examples/mutable-plan'), {
+      recursive: true,
+    });
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    const plan = await authoring.planPromote('mutable-plan');
+
+    expectTypeOf(plan.operations).toEqualTypeOf<
+      (
+        | { from: string; kind: 'move-directory'; to: string }
+        | { kind: 'generate' | 'verify' }
+      )[]
+    >();
+    plan.operations.push({ kind: 'verify' });
+    expect(plan.operations.at(-1)).toEqual({ kind: 'verify' });
+  });
+
+  it('does not expose rename or folder management in the v1 authoring contract', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    expectTypeOf(authoring).not.toHaveProperty('renameFile');
+    expectTypeOf(authoring).not.toHaveProperty('createFolder');
+    expect(authoring).not.toHaveProperty('renameFile');
+    expect(authoring).not.toHaveProperty('createFolder');
+  });
+
+  it('keeps editor operations off the base authoring contract', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    expectTypeOf(authoring).not.toHaveProperty('loadExamples');
+    expectTypeOf(authoring).not.toHaveProperty('addFile');
+    expectTypeOf<
+      Awaited<ReturnType<CatalogAuthoringAdapter['loadExamples']>>
+    >().toEqualTypeOf<readonly CatalogComposedExample[]>();
+    expect(authoring).not.toHaveProperty('loadExamples');
+    expect(authoring).not.toHaveProperty('addFile');
   });
 });
