@@ -1,78 +1,153 @@
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-function* walk(dir) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) yield* walk(full);
-    else yield full;
-  }
-}
+import { publicExportTargets } from './public-exports.mjs';
 
-const distPath = new URL('../dist', import.meta.url).pathname;
-const pkgUrl = new URL('../package.json', import.meta.url);
-const pkg = JSON.parse(readFileSync(pkgUrl));
-const pkgName = pkg.name;
+const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+const libRoot = join(repoRoot, 'src/lib');
+const packagePath = join(repoRoot, 'package.json');
 
-const allFiles = new Set(
-  [...walk(distPath)].map((f) => relative(distPath, f).replace(/\\/g, '/')),
-);
+const resolveEntry = (source) => {
+  if (source.endsWith('.svelte')) {
+    if (!existsSync(join(libRoot, source))) return null;
 
-const isTestOrSpec = (rel) => /\.(test|spec)\./.test(rel);
-
-const exports = {};
-
-for (const rel of allFiles) {
-  if (isTestOrSpec(rel)) continue;
-
-  if (rel.endsWith('.svelte') && !rel.includes('.d.ts')) {
-    exports[`./${rel}`] = {
-      types: `./dist/${rel.replace(/\.svelte$/, '.svelte.d.ts')}`,
-      svelte: `./dist/${rel}`,
-      default: `./dist/${rel}`,
-    };
-  } else if (rel.endsWith('.svelte.js')) {
-    const svelteCounterpart = rel.replace(/\.js$/, '');
-    if (!allFiles.has(svelteCounterpart)) {
-      const key = `./${rel.replace(/\.js$/, '')}`;
-      exports[key] = {
-        types: `./dist/${rel.replace(/\.js$/, '.d.ts')}`,
-        import: `./dist/${rel}`,
-        default: `./dist/${rel}`,
-      };
-    }
-  } else if (rel.endsWith('.js') && !rel.includes('.svelte.')) {
-    const base = rel.replace(/\.js$/, '');
-    exports[`./${base}`] = {
-      types: `./dist/${base}.d.ts`,
-      import: `./dist/${rel}`,
-      default: `./dist/${rel}`,
+    return {
+      types: `./dist/${source}.d.ts`,
+      svelte: `./dist/${source}`,
+      default: `./dist/${source}`,
     };
   }
-}
 
-exports['./package.json'] = './package.json';
-
-for (const rel of allFiles) {
-  if (!rel.endsWith('.svelte') || rel.includes('.d.ts')) continue;
-
-  const file = join(distPath, rel);
-  const dir = dirname(file);
-  let code = readFileSync(file, 'utf-8');
-
-  const rewritten = code.replace(
-    /from '(\.[^']+\.svelte)'/g,
-    (_, relImport) => {
-      const abs = resolve(dir, relImport);
-      const pkgRel = relative(distPath, abs).replace(/\\/g, '/');
-      return `from '${pkgName}/${pkgRel}'`;
+  const candidates = [
+    {
+      source: `${source}.ts`,
+      output: `${source}.js`,
+      types: `${source}.d.ts`,
     },
-  );
+    {
+      source: `${source}.js`,
+      output: `${source}.js`,
+      types: `${source}.d.ts`,
+    },
+    {
+      source: `${source}.svelte.ts`,
+      output: `${source}.svelte.js`,
+      types: `${source}.svelte.d.ts`,
+    },
+    {
+      source: `${source}.svelte.js`,
+      output: `${source}.svelte.js`,
+      types: `${source}.svelte.d.ts`,
+    },
+    {
+      source: `${source}/index.ts`,
+      output: `${source}/index.js`,
+      types: `${source}/index.d.ts`,
+    },
+    {
+      source: `${source}/index.js`,
+      output: `${source}/index.js`,
+      types: `${source}/index.d.ts`,
+    },
+  ];
 
-  if (rewritten !== code) writeFileSync(file, rewritten);
+  for (const candidate of candidates) {
+    if (!existsSync(join(libRoot, candidate.source))) continue;
+
+    return {
+      types: `./dist/${candidate.types}`,
+      import: `./dist/${candidate.output}`,
+      default: `./dist/${candidate.output}`,
+    };
+  }
+
+  return null;
+};
+
+const createPackageExports = () => {
+  const packageExports = {};
+  const unresolved = [];
+
+  for (const [subpath, source] of Object.entries(publicExportTargets).sort()) {
+    const entry = resolveEntry(source);
+    if (!entry) {
+      unresolved.push(`${subpath} -> ${source}`);
+      continue;
+    }
+    packageExports[subpath] = entry;
+  }
+
+  if (unresolved.length) {
+    console.error(
+      `Could not resolve ${unresolved.length} public export(s) in src/lib:`,
+    );
+    for (const entry of unresolved) console.error(`  - ${entry}`);
+    process.exit(1);
+  }
+
+  packageExports['./package.json'] = './package.json';
+  return packageExports;
+};
+
+const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+const packageExports = createPackageExports();
+const serializedExports = JSON.stringify(packageExports);
+const exportsAreCurrent =
+  JSON.stringify(packageJson.exports) === serializedExports;
+const mode = process.argv[2];
+
+if (
+  process.argv.length > 3 ||
+  ![undefined, '--check', '--validate-dist'].includes(mode)
+) {
+  console.error(
+    'Usage: node scripts/generate-exports.mjs [--check|--validate-dist]',
+  );
+  process.exit(1);
 }
 
-pkg.exports = exports;
-writeFileSync(pkgUrl, JSON.stringify(pkg, null, 2) + '\n');
+if (mode === '--check') {
+  if (!exportsAreCurrent) {
+    console.error('package.json exports are stale. Run pnpm generate:exports.');
+    process.exit(1);
+  }
+  console.log(`Verified ${Object.keys(packageExports).length} package exports`);
+  process.exit(0);
+}
 
-console.log(`Generated ${Object.keys(exports).length} explicit export entries`);
+if (mode === '--validate-dist') {
+  if (!exportsAreCurrent) {
+    console.error('package.json exports are stale. Run pnpm generate:exports.');
+    process.exit(1);
+  }
+
+  const missingTargets = new Set();
+  for (const entry of Object.values(packageExports)) {
+    const targets = typeof entry === 'string' ? [entry] : Object.values(entry);
+    for (const target of targets) {
+      if (!existsSync(join(repoRoot, target))) missingTargets.add(target);
+    }
+  }
+
+  if (missingTargets.size) {
+    console.error(`Missing ${missingTargets.size} package export target(s):`);
+    for (const target of [...missingTargets].sort())
+      console.error(`  - ${target}`);
+    process.exit(1);
+  }
+
+  console.log(
+    `Validated ${Object.keys(packageExports).length} package exports`,
+  );
+  process.exit(0);
+}
+
+if (exportsAreCurrent) {
+  console.log('package.json exports are already up to date');
+  process.exit(0);
+}
+
+packageJson.exports = packageExports;
+writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+console.log(`Generated ${Object.keys(packageExports).length} package exports`);
