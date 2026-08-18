@@ -111,6 +111,14 @@ export const routeForCatalog = ({
   });
 };
 
+export const routeForCatalogCreate = ({
+  namespace,
+}: NamespaceParameter): ResolvedPathname => {
+  return withPrefix('/namespaces/[namespace]/catalog/create', {
+    namespace,
+  });
+};
+
 export const routeForCatalogExample = ({
   namespace,
   exampleId,

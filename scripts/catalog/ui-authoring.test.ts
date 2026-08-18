@@ -1,7 +1,8 @@
-import { execFile } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 import {
   chmod,
   cp,
+  lstat,
   mkdir,
   mkdtemp,
   readdir,
@@ -21,7 +22,10 @@ import {
   createUiCatalogAuthoring,
   uiCatalogAuthoringLimits,
 } from './ui-authoring';
-import type { CatalogLoadedExample } from '../../src/lib/catalog/authoring';
+import type {
+  CatalogLoadedExample,
+  CatalogSaveProgressEvent,
+} from '../../src/lib/catalog/authoring';
 
 const temporaryDirectories: string[] = [];
 const execFileAsync = promisify(execFile);
@@ -219,6 +223,387 @@ describe('UI catalog authoring adapter', () => {
         workflowType: 'snapshotExample',
       },
     ]);
+  });
+
+  it('saves one complete Local tree with edits, additions, removals, preserved modes, and a new revision', async () => {
+    const rootDirectory = await createIsolatedCatalogRoot();
+    const authoring = createUiCatalogAuthoring(rootDirectory);
+    await authoring.scaffold('save-complete-tree');
+    const exampleDirectory = join(
+      rootDirectory,
+      'catalog.local/examples/save-complete-tree',
+    );
+    const workflowPath = join(exampleDirectory, 'workflow.ts');
+    await chmod(workflowPath, 0o640);
+    await writeFile(join(exampleDirectory, 'scratch.md'), 'remove me\n');
+    const loaded = (await authoring.loadExamples()).find(
+      ({ id }) => id === 'save-complete-tree',
+    )!;
+    const withAddition = authoring.addFile(loaded, {
+      content: 'Saved notes.\n',
+      path: 'nested/notes.md',
+    });
+    const withRemoval = authoring.removeFile(withAddition, 'scratch.md');
+    const edited = {
+      ...withRemoval,
+      sourceFiles: withRemoval.sourceFiles.map((file) =>
+        file.path === 'workflow.ts'
+          ? {
+              ...file,
+              content: `${file.content}\nexport const saved = true;\n`,
+            }
+          : file,
+      ),
+    };
+
+    const events: CatalogSaveProgressEvent[] = [];
+    const terminal = await authoring.save(
+      {
+        baseRevision: loaded.sourceSnapshot.baseRevision,
+        exampleId: loaded.id,
+        files: edited.sourceFiles.map(({ content, path, removed }) => ({
+          content,
+          path,
+          ...(removed ? { removed } : {}),
+        })),
+        operationId: 'save-complete-tree-operation',
+      },
+      (event) => {
+        events.push(event);
+        if (event.kind === 'check' && event.step === 'regen') {
+          throw new Error('disconnected Save observer');
+        }
+      },
+    );
+
+    expect(terminal).toMatchObject({
+      kind: 'terminal',
+      operationId: 'save-complete-tree-operation',
+      outcome: {
+        commit: 'durable',
+        exampleId: 'save-complete-tree',
+        generatedOutputs: expect.arrayContaining([
+          {
+            gitEffect: 'ignored-update',
+            path: 'catalog.local/registration.ts',
+          },
+          {
+            gitEffect: 'tracked-update',
+            path: 'src/lib/catalog/browser/catalog.generated.ts',
+          },
+        ]),
+        status: 'succeeded',
+      },
+      ownership: 'released',
+      reload: 'publish',
+    });
+    expect(
+      terminal.outcome.status === 'succeeded' && terminal.outcome.baseRevision,
+    ).not.toBe(loaded.sourceSnapshot.baseRevision);
+    await expect(readFile(workflowPath, 'utf8')).resolves.toContain(
+      'export const saved = true;',
+    );
+    await expect(
+      lstat(workflowPath).then(({ mode }) => mode & 0o777),
+    ).resolves.toBe(0o640);
+    await expect(
+      lstat(join(exampleDirectory, 'nested/notes.md')).then(
+        ({ mode }) => mode & 0o777,
+      ),
+    ).resolves.toBe(0o644);
+    await expect(
+      readFile(join(exampleDirectory, 'scratch.md'), 'utf8'),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+    if (terminal.outcome.status === 'succeeded') {
+      expect(terminal.outcome.generatedOutputs).toEqual([
+        {
+          gitEffect: 'ignored-update',
+          path: 'catalog.local/registration.ts',
+        },
+        {
+          gitEffect: 'ignored-update',
+          path: 'catalog.local/workflows.ts',
+        },
+        {
+          gitEffect: 'ignored-update',
+          path: 'catalog.local/catalog.generated.json',
+        },
+        {
+          gitEffect: 'tracked-update',
+          path: 'src/lib/catalog/worker/examples/index.ts',
+        },
+        {
+          gitEffect: 'tracked-update',
+          path: 'src/lib/catalog/worker/workflows.ts',
+        },
+        {
+          gitEffect: 'tracked-update',
+          path: 'src/lib/catalog/browser/catalog.generated.json',
+        },
+        {
+          gitEffect: 'tracked-update',
+          path: 'src/lib/catalog/browser/catalog.generated.ts',
+        },
+      ]);
+      expect(terminal.outcome.generatedOutputs).not.toContainEqual({
+        gitEffect: expect.anything(),
+        path: 'src/lib/catalog/worker/shared-registrations.ts',
+      });
+    }
+    expect(
+      events.map((event) =>
+        event.kind === 'check'
+          ? [event.sequence, event.step, event.state]
+          : [event.sequence, event.kind, event.outcome.status],
+      ),
+    ).toEqual([
+      [1, 'write_files', 'started'],
+      [2, 'write_files', 'passed'],
+      [3, 'regen', 'started'],
+      [4, 'regen', 'passed'],
+      [5, 'verify', 'started'],
+      [6, 'verify', 'passed'],
+      [7, 'terminal', 'succeeded'],
+    ]);
+    expect(
+      events.every(({ operationId }) => operationId === terminal.operationId),
+    ).toBe(true);
+    expect(events.at(-1)).toBe(terminal);
+
+    const replayed: CatalogSaveProgressEvent[] = [];
+    const unsubscribe = authoring.subscribeSaveOperation(
+      terminal.operationId,
+      (event) => replayed.push(event),
+    );
+    expect(replayed).toEqual(events);
+    unsubscribe();
+    await expect(
+      authoring.inspectSaveOperation(terminal.operationId),
+    ).resolves.toMatchObject({
+      events,
+      operationId: terminal.operationId,
+      ownership: 'released',
+      status: 'terminal',
+      terminal,
+    });
+    await expect(
+      createUiCatalogAuthoring(rootDirectory).inspectSaveOperation(
+        terminal.operationId,
+      ),
+    ).resolves.toMatchObject({
+      events: [terminal],
+      operationId: terminal.operationId,
+      ownership: 'released',
+      status: 'terminal',
+      terminal,
+    });
+  });
+
+  it('refuses a Save before writing when a static revision input changed after load', async () => {
+    const rootDirectory = await createIsolatedCatalogRoot();
+    const authoring = createUiCatalogAuthoring(rootDirectory);
+    await authoring.scaffold('stale-static-input');
+    const loaded = (await authoring.loadExamples()).find(
+      ({ id }) => id === 'stale-static-input',
+    )!;
+    const workflowPath = join(
+      rootDirectory,
+      'catalog.local/examples/stale-static-input/workflow.ts',
+    );
+    const originalWorkflow = await readFile(workflowPath, 'utf8');
+    const staticInputPath = join(
+      rootDirectory,
+      'src/lib/catalog/worker/shared-registrations.ts',
+    );
+    await writeFile(
+      staticInputPath,
+      `${await readFile(staticInputPath, 'utf8')}\n`,
+    );
+
+    const terminal = await authoring.save({
+      baseRevision: loaded.sourceSnapshot.baseRevision,
+      exampleId: loaded.id,
+      files: loaded.sourceFiles.map(({ content, path }) => ({
+        content:
+          path === 'workflow.ts'
+            ? `${content}\nexport const unseenOverwrite = true;\n`
+            : content,
+        path,
+      })),
+      operationId: 'stale-static-input-operation',
+    });
+
+    expect(terminal).toMatchObject({
+      outcome: { reason: 'stale-revision', status: 'refused' },
+      ownership: 'released',
+      reload: 'none',
+    });
+    await expect(readFile(workflowPath, 'utf8')).resolves.toBe(
+      originalWorkflow,
+    );
+    await expect(
+      createUiCatalogAuthoring(rootDirectory).inspectSaveOperation(
+        terminal.operationId,
+      ),
+    ).resolves.toMatchObject({
+      events: [terminal],
+      ownership: 'released',
+      status: 'terminal',
+      terminal,
+    });
+    expect(
+      JSON.parse(
+        await readFile(join(rootDirectory, '.catalog.journal.json'), 'utf8'),
+      ),
+    ).not.toHaveProperty('snapshots');
+  });
+
+  it('preserves an external in-place edit made after Save revision validation', async () => {
+    const rootDirectory = await createIsolatedCatalogRoot();
+    const authoring = createUiCatalogAuthoring(rootDirectory);
+    await authoring.scaffold('external-save-race');
+    const loaded = (await authoring.loadExamples()).find(
+      ({ id }) => id === 'external-save-race',
+    )!;
+    const workflowPath = join(
+      rootDirectory,
+      'catalog.local/examples/external-save-race/workflow.ts',
+    );
+    const externalContent = `${await readFile(workflowPath, 'utf8')}\nexport const externalEdit = true;\n`;
+    const events: CatalogSaveProgressEvent[] = [];
+    let externalEditWritten = false;
+
+    const terminal = await authoring.save(
+      {
+        baseRevision: loaded.sourceSnapshot.baseRevision,
+        exampleId: loaded.id,
+        files: loaded.sourceFiles.map(({ content, path }) => ({
+          content:
+            path === 'workflow.ts'
+              ? `${content}\nexport const browserEdit = true;\n`
+              : content,
+          path,
+        })),
+        operationId: 'external-save-race-operation',
+      },
+      (event) => {
+        events.push(event);
+        if (
+          !externalEditWritten &&
+          event.kind === 'check' &&
+          event.state === 'started' &&
+          event.step === 'write_files'
+        ) {
+          execFileSync(process.execPath, [
+            '-e',
+            "require('node:fs').writeFileSync(process.argv[1], process.argv[2])",
+            workflowPath,
+            externalContent,
+          ]);
+          externalEditWritten = true;
+        }
+      },
+    );
+
+    expect(externalEditWritten).toBe(true);
+    expect(terminal).toMatchObject({
+      outcome: { reason: 'stale-revision', status: 'refused' },
+      ownership: 'released',
+      reload: 'none',
+    });
+    await expect(readFile(workflowPath, 'utf8')).resolves.toBe(externalContent);
+    expect(
+      events.map((event) =>
+        event.kind === 'check'
+          ? [event.sequence, event.step, event.state]
+          : [event.sequence, event.kind, event.outcome.status],
+      ),
+    ).toEqual([
+      [1, 'write_files', 'started'],
+      [2, 'write_files', 'failed'],
+      [3, 'regen', 'not-reached'],
+      [4, 'verify', 'not-reached'],
+      [5, 'terminal', 'refused'],
+    ]);
+    expect(
+      events.every(({ operationId }) => operationId === terminal.operationId),
+    ).toBe(true);
+    expect(events.at(-1)).toBe(terminal);
+  });
+
+  it('refuses an omitted loaded file instead of treating the omission as deletion', async () => {
+    const rootDirectory = await createIsolatedCatalogRoot();
+    const authoring = createUiCatalogAuthoring(rootDirectory);
+    await authoring.scaffold('complete-declaration');
+    const loaded = (await authoring.loadExamples()).find(
+      ({ id }) => id === 'complete-declaration',
+    )!;
+    const workflowPath = join(
+      rootDirectory,
+      'catalog.local/examples/complete-declaration/workflow.ts',
+    );
+    const originalWorkflow = await readFile(workflowPath, 'utf8');
+
+    const terminal = await authoring.save({
+      baseRevision: loaded.sourceSnapshot.baseRevision,
+      exampleId: loaded.id,
+      files: loaded.sourceFiles
+        .filter(({ path }) => path !== 'example.ts')
+        .map(({ content, path }) => ({
+          content: `${content}\nexport const mustNotBeWritten = true;\n`,
+          path,
+        })),
+      operationId: 'complete-declaration-operation',
+    });
+
+    expect(terminal).toMatchObject({
+      outcome: {
+        detail: expect.stringContaining('must declare every loaded file'),
+        reason: 'invalid-fileset',
+        status: 'refused',
+      },
+      reload: 'none',
+    });
+    await expect(readFile(workflowPath, 'utf8')).resolves.toBe(
+      originalWorkflow,
+    );
+  });
+
+  it('refuses a client-supplied mode before writing', async () => {
+    const rootDirectory = await createIsolatedCatalogRoot();
+    const authoring = createUiCatalogAuthoring(rootDirectory);
+    await authoring.scaffold('server-owned-modes');
+    const loaded = (await authoring.loadExamples()).find(
+      ({ id }) => id === 'server-owned-modes',
+    )!;
+    const workflowPath = join(
+      rootDirectory,
+      'catalog.local/examples/server-owned-modes/workflow.ts',
+    );
+    const originalWorkflow = await readFile(workflowPath, 'utf8');
+
+    const terminal = await authoring.save({
+      baseRevision: loaded.sourceSnapshot.baseRevision,
+      exampleId: loaded.id,
+      files: loaded.sourceFiles.map(({ content, path }) => ({
+        content: `${content}\nexport const modeMustNotBeWritten = true;\n`,
+        mode: 0o600,
+        path,
+      })),
+      operationId: 'server-owned-modes-operation',
+    });
+
+    expect(terminal).toMatchObject({
+      outcome: {
+        detail: expect.stringContaining('mode'),
+        reason: 'invalid-fileset',
+        status: 'refused',
+      },
+      reload: 'none',
+    });
+    await expect(readFile(workflowPath, 'utf8')).resolves.toBe(
+      originalWorkflow,
+    );
   });
 
   it('derives a stable revision from file paths, contents, and modes', async () => {
@@ -749,6 +1134,46 @@ describe('UI catalog authoring adapter', () => {
     await expect(authoring.loadExamples()).rejects.toThrow(
       'maximum file size of 262144 bytes',
     );
+  });
+
+  it('rejects a same-inode source mutation while reading a revision snapshot', async () => {
+    const rootDirectory = await createIsolatedCatalogRoot();
+    const exampleDirectory = join(
+      rootDirectory,
+      'src/lib/catalog/worker/examples/mutating-source',
+    );
+    const sourcePath = join(exampleDirectory, 'workflow.ts');
+    await mkdir(exampleDirectory, { recursive: true });
+    await writeFile(sourcePath, 'export const stable = true;\n');
+    await writeFile(
+      join(rootDirectory, 'src/lib/catalog/browser/catalog.generated.json'),
+      JSON.stringify({
+        descriptors: [
+          {
+            execution: { targetId: 'shared-workflows' },
+            id: 'mutating-source',
+            source: { id: 'oss' },
+          },
+        ],
+      }),
+    );
+    let externalEditWritten = false;
+    const authoring = createUiCatalogAuthoring(rootDirectory, {
+      afterReadSourceFile: (path) => {
+        if (path !== sourcePath) return;
+        execFileSync(process.execPath, [
+          '-e',
+          "require('node:fs').writeFileSync(process.argv[1], 'export const stable = null;\\n')",
+          sourcePath,
+        ]);
+        externalEditWritten = true;
+      },
+    });
+
+    await expect(authoring.loadExamples()).rejects.toThrow(
+      'source tree changed while loading',
+    );
+    expect(externalEditWritten).toBe(true);
   });
 
   it('rejects editable trees that exceed the declared snapshot limits', async () => {

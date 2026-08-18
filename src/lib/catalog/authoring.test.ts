@@ -1,6 +1,8 @@
 import { execFile } from 'node:child_process';
 import {
   access,
+  chmod,
+  lstat,
   mkdir,
   mkdtemp,
   readdir,
@@ -22,6 +24,7 @@ import { afterEach, describe, expect, expectTypeOf, it } from 'vitest';
 import {
   type CatalogAuthoringAdapter,
   type CatalogComposedExample,
+  type CatalogSaveProgressEvent,
   composeCatalogArtifacts,
   createCatalogAuthoring as createCatalogAuthoringSdk,
   createCatalogLocalArtifactVitePlugin,
@@ -123,6 +126,118 @@ const createTemporaryDirectory = async () => {
   return directory;
 };
 
+const createSaveAuthoring = async ({
+  afterLoadExamples,
+  exampleId,
+  generate,
+  rootDirectory,
+  transactionFilesystem,
+}: {
+  afterLoadExamples?: (loadCount: number) => void | Promise<void>;
+  exampleId: string;
+  generate: CatalogAuthoringAdapter['generate'];
+  rootDirectory: string;
+  transactionFilesystem?: CatalogAuthoringAdapter['transactionFilesystem'];
+}) => {
+  const exampleDirectory = join(rootDirectory, `local/examples/${exampleId}`);
+  let loadCount = 0;
+  const loadExamples = async () => {
+    const content = await readFile(
+      join(exampleDirectory, 'workflow.ts'),
+      'utf8',
+    );
+    const mode = await lstat(join(exampleDirectory, 'workflow.ts')).then(
+      (metadata) => metadata.mode & 0o777,
+    );
+    const examples = [
+      {
+        id: exampleId,
+        sourceFiles: [{ content, editable: true, mode, path: 'workflow.ts' }],
+        sourceId: 'local',
+        sourceSnapshot: {
+          baseRevision: content,
+          limits: {
+            maxDepth: 8,
+            maxFileBytes: 1024,
+            maxFiles: 8,
+            maxTotalBytes: 4096,
+          },
+        },
+        targetId: 'local-target',
+      },
+    ];
+    await afterLoadExamples?.(++loadCount);
+    return examples;
+  };
+  return createCatalogAuthoringSdk({
+    editor: {
+      limits: {
+        maxDepth: 8,
+        maxFileBytes: 1024,
+        maxFiles: 8,
+        maxTotalBytes: 4096,
+      },
+      loadExamples,
+    },
+    generatedPaths: ['generated/catalog.json'],
+    graph: {
+      boundaries: {
+        browserPaths: [],
+        packageJsonPath: 'package.json',
+        workerPaths: [],
+      },
+      outputs: [
+        { consumers: ['authoring'], path: 'generated/catalog.json' },
+        { consumers: ['authoring'], path: 'local-registration.ts' },
+        { consumers: ['authoring'], path: 'local-workflows.ts' },
+        { consumers: ['authoring'], path: 'tracked-registration.ts' },
+        { consumers: ['authoring'], path: 'tracked-workflows.ts' },
+      ],
+      sources: [
+        {
+          examplesPath: 'local/examples',
+          id: 'local',
+          label: 'Local',
+          registrationOutputPath: 'local-registration.ts',
+          registrationTypePath: 'registration-source.ts',
+        },
+        {
+          examplesPath: 'tracked/examples',
+          id: 'tracked',
+          label: 'Tracked',
+          registrationOutputPath: 'tracked-registration.ts',
+          registrationTypePath: 'registration-source.ts',
+        },
+      ],
+      targets: [
+        {
+          defaultNamespace: 'default',
+          defaultTaskQueue: 'local',
+          id: 'local-target',
+          sourceId: 'local',
+          workflowsModulePath: 'local-workflows.ts',
+        },
+        {
+          defaultNamespace: 'default',
+          defaultTaskQueue: 'tracked',
+          id: 'tracked-target',
+          sourceId: 'tracked',
+          workflowsModulePath: 'tracked-workflows.ts',
+        },
+      ],
+    },
+    loadExamples: () => [],
+    localExamplesPath: 'local/examples',
+    parseModuleSpecifiers: () => [],
+    rootDirectory,
+    scaffold: () => [],
+    trackedExamplesPath: 'tracked/examples',
+    generate,
+    transactionFilesystem,
+    verify: () => undefined,
+  });
+};
+
 afterEach(async () => {
   await Promise.all(
     temporaryDirectories
@@ -132,6 +247,490 @@ afterEach(async () => {
 });
 
 describe('catalog authoring', () => {
+  it('binds the transaction backup to the expected revision before writing', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const exampleId = 'transaction-revision-race';
+    const exampleDirectory = join(rootDirectory, `local/examples/${exampleId}`);
+    const workflowPath = join(exampleDirectory, 'workflow.ts');
+    await mkdir(exampleDirectory, { recursive: true });
+    await writeFile(workflowPath, 'before\n');
+    const externalContent = 'external\n';
+    const authoring = await createSaveAuthoring({
+      afterLoadExamples: async (loadCount) => {
+        if (loadCount === 3) await writeFile(workflowPath, externalContent);
+      },
+      exampleId,
+      generate: () => [],
+      rootDirectory,
+    });
+    const [loaded] = await authoring.loadExamples();
+
+    const terminal = await authoring.save({
+      baseRevision: loaded!.sourceSnapshot.baseRevision,
+      exampleId,
+      files: [{ content: 'browser\n', path: 'workflow.ts' }],
+      operationId: 'transaction-revision-race-operation',
+    });
+
+    expect(terminal).toMatchObject({
+      outcome: { reason: 'stale-revision', status: 'refused' },
+      ownership: 'released',
+      reload: 'none',
+    });
+    await expect(readFile(workflowPath, 'utf8')).resolves.toBe(externalContent);
+  });
+
+  it('retains an incomplete Save rollback map until restart recovery succeeds', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const externalDirectory = await createTemporaryDirectory();
+    const exampleId = 'incomplete-save-recovery';
+    const exampleDirectory = join(rootDirectory, `local/examples/${exampleId}`);
+    const generatedDirectory = join(rootDirectory, 'generated');
+    await mkdir(exampleDirectory, { recursive: true });
+    await mkdir(generatedDirectory, { recursive: true });
+    await writeFile(join(exampleDirectory, 'workflow.ts'), 'before\n');
+    await writeFile(join(generatedDirectory, 'catalog.json'), 'before\n');
+    let obstructRollback = true;
+    const generate = async () => {
+      if (!obstructRollback) return [];
+      await rm(generatedDirectory, { force: true, recursive: true });
+      await symlink(externalDirectory, generatedDirectory, 'dir');
+      throw new Error('generation and rollback fail');
+    };
+    const authoring = await createSaveAuthoring({
+      exampleId,
+      generate,
+      rootDirectory,
+    });
+    const [loaded] = await authoring.loadExamples();
+
+    const terminal = await authoring.save({
+      baseRevision: loaded!.sourceSnapshot.baseRevision,
+      exampleId,
+      files: [{ content: 'after\n', path: 'workflow.ts' }],
+      operationId: 'incomplete-save-recovery-operation',
+    });
+
+    expect(terminal).toMatchObject({
+      outcome: {
+        reason: 'recovery-incomplete',
+        recovery: 'incomplete',
+        status: 'failed',
+      },
+      ownership: 'retained',
+    });
+    const journal = JSON.parse(
+      await readFile(join(rootDirectory, '.catalog.journal.json'), 'utf8'),
+    ) as {
+      operationTerminal?: unknown;
+      snapshots?: { backupPath?: string }[];
+      transactionPath?: string;
+    };
+    expect(journal).toMatchObject({
+      operationTerminal: terminal,
+      snapshots: expect.any(Array),
+      transactionPath: expect.stringMatching(/^\.catalog\.transaction-/),
+    });
+    await expect(
+      access(join(rootDirectory, journal.snapshots![0]!.backupPath!)),
+    ).resolves.toBeUndefined();
+
+    await rm(generatedDirectory, { force: true, recursive: true });
+    await mkdir(generatedDirectory);
+    obstructRollback = false;
+    let failJournalUnlink = true;
+    const cleanupFailedRestart = await createSaveAuthoring({
+      exampleId,
+      generate,
+      rootDirectory,
+      transactionFilesystem: {
+        rm,
+        unlink: async (path) => {
+          if (failJournalUnlink && path.endsWith('.catalog.journal.json')) {
+            failJournalUnlink = false;
+            throw new Error('journal cleanup failed');
+          }
+          await unlink(path);
+        },
+      },
+    });
+    await expect(cleanupFailedRestart.loadExamples()).rejects.toThrow(
+      'journal cleanup failed',
+    );
+    expect(
+      JSON.parse(
+        await readFile(join(rootDirectory, '.catalog.journal.json'), 'utf8'),
+      ),
+    ).toMatchObject({ operationTerminal: terminal, state: 'restored' });
+    expect(
+      JSON.parse(
+        await readFile(
+          join(rootDirectory, '.catalog.journal.terminal.pending.json'),
+          'utf8',
+        ),
+      ),
+    ).toMatchObject({ state: 'terminal', terminal });
+
+    // Simulate interruption after journal unlink but before staged replacement.
+    await unlink(join(rootDirectory, '.catalog.journal.json'));
+
+    const finalizedRestart = await createSaveAuthoring({
+      exampleId,
+      generate,
+      rootDirectory,
+    });
+    await finalizedRestart.loadExamples();
+
+    await expect(
+      readFile(join(generatedDirectory, 'catalog.json'), 'utf8'),
+    ).resolves.toBe('before\n');
+    await expect(
+      access(join(rootDirectory, journal.transactionPath!)),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(
+      finalizedRestart.inspectSaveOperation(terminal.operationId),
+    ).resolves.toMatchObject({
+      events: [terminal],
+      ownership: 'retained',
+      status: 'terminal',
+      terminal,
+    });
+  });
+
+  it('retains committed Save cleanup evidence until restart finalization succeeds', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const exampleId = 'committed-save-recovery';
+    const exampleDirectory = join(rootDirectory, `local/examples/${exampleId}`);
+    const generatedDirectory = join(rootDirectory, 'generated');
+    await mkdir(exampleDirectory, { recursive: true });
+    await mkdir(generatedDirectory, { recursive: true });
+    await writeFile(join(exampleDirectory, 'workflow.ts'), 'before\n');
+    await writeFile(join(generatedDirectory, 'catalog.json'), 'before\n');
+    let failCleanup = true;
+    const generate = () => [
+      { content: 'generated after\n', path: 'generated/catalog.json' },
+    ];
+    const authoring = await createSaveAuthoring({
+      exampleId,
+      generate,
+      rootDirectory,
+      transactionFilesystem: {
+        rm: async (path, options) => {
+          if (failCleanup && path.includes('.catalog.transaction-')) {
+            failCleanup = false;
+            throw new Error('transaction cleanup failed');
+          }
+          await rm(path, options);
+        },
+        unlink,
+      },
+    });
+    const [loaded] = await authoring.loadExamples();
+
+    const terminal = await authoring.save({
+      baseRevision: loaded!.sourceSnapshot.baseRevision,
+      exampleId,
+      files: [{ content: 'after\n', path: 'workflow.ts' }],
+      operationId: 'committed-save-recovery-operation',
+    });
+
+    expect(terminal).toMatchObject({
+      outcome: {
+        reason: 'finalization-failed',
+        recovery: 'committed',
+        status: 'failed',
+      },
+      ownership: 'retained',
+    });
+    const journal = JSON.parse(
+      await readFile(join(rootDirectory, '.catalog.journal.json'), 'utf8'),
+    ) as {
+      operationTerminal?: unknown;
+      snapshots?: unknown[];
+      state?: string;
+      transactionPath?: string;
+    };
+    expect(journal).toMatchObject({
+      operationTerminal: terminal,
+      snapshots: expect.any(Array),
+      state: 'committed',
+      transactionPath: expect.stringMatching(/^\.catalog\.transaction-/),
+    });
+
+    const restarted = await createSaveAuthoring({
+      exampleId,
+      generate,
+      rootDirectory,
+    });
+    await restarted.loadExamples();
+
+    await expect(
+      readFile(join(exampleDirectory, 'workflow.ts'), 'utf8'),
+    ).resolves.toBe('after\n');
+    await expect(
+      readFile(join(generatedDirectory, 'catalog.json'), 'utf8'),
+    ).resolves.toBe('generated after\n');
+    await expect(
+      access(join(rootDirectory, journal.transactionPath!)),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(
+      restarted.inspectSaveOperation(terminal.operationId),
+    ).resolves.toMatchObject({
+      events: [terminal],
+      ownership: 'retained',
+      status: 'terminal',
+      terminal,
+    });
+  });
+
+  it('emits verification as not reached after Save regeneration fails', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const exampleId = 'regeneration-progress';
+    const exampleDirectory = join(rootDirectory, `local/examples/${exampleId}`);
+    await mkdir(exampleDirectory, { recursive: true });
+    await writeFile(join(exampleDirectory, 'workflow.ts'), 'before\n');
+    const authoring = await createSaveAuthoring({
+      exampleId,
+      generate: () => {
+        throw new Error('regeneration failed');
+      },
+      rootDirectory,
+    });
+    const [loaded] = await authoring.loadExamples();
+    const events: CatalogSaveProgressEvent[] = [];
+
+    const terminal = await authoring.save(
+      {
+        baseRevision: loaded!.sourceSnapshot.baseRevision,
+        exampleId,
+        files: [{ content: 'after\n', path: 'workflow.ts' }],
+        operationId: 'regeneration-progress-operation',
+      },
+      (event) => events.push(event),
+    );
+
+    expect(terminal).toMatchObject({
+      outcome: { reason: 'check-failed', status: 'failed' },
+      ownership: 'released',
+      reload: 'publish',
+    });
+    expect(
+      events.map((event) =>
+        event.kind === 'check'
+          ? [event.sequence, event.step, event.state]
+          : [event.sequence, event.kind, event.outcome.status],
+      ),
+    ).toEqual([
+      [1, 'write_files', 'started'],
+      [2, 'write_files', 'passed'],
+      [3, 'regen', 'started'],
+      [4, 'regen', 'failed'],
+      [5, 'verify', 'not-reached'],
+      [6, 'terminal', 'failed'],
+    ]);
+    expect(
+      events.every(({ operationId }) => operationId === terminal.operationId),
+    ).toBe(true);
+    expect(events.at(-1)).toBe(terminal);
+    await expect(
+      readFile(join(exampleDirectory, 'workflow.ts'), 'utf8'),
+    ).resolves.toBe('before\n');
+  });
+
+  it('restores complete-tree edits, additions, removals, modes, and generated output after a blocking Save check fails', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const exampleDirectory = join(
+      rootDirectory,
+      'local/examples/rollback-save',
+    );
+    await mkdir(exampleDirectory, { recursive: true });
+    await mkdir(join(rootDirectory, 'generated'), { recursive: true });
+    await writeFile(join(exampleDirectory, 'keep.ts'), 'before\n');
+    await chmod(join(exampleDirectory, 'keep.ts'), 0o640);
+    await writeFile(join(exampleDirectory, 'remove.ts'), 'remove before\n');
+    await writeFile(join(rootDirectory, 'generated/catalog.json'), 'before\n');
+    await writeFile(join(rootDirectory, 'static-input.ts'), 'static\n');
+    let journalPaths: string[] = [];
+    const loadExamples = async () => [
+      {
+        id: 'rollback-save',
+        sourceFiles: [
+          {
+            content: await readFile(join(exampleDirectory, 'keep.ts'), 'utf8'),
+            editable: true,
+            mode: 0o640,
+            path: 'keep.ts',
+          },
+          {
+            content: await readFile(
+              join(exampleDirectory, 'remove.ts'),
+              'utf8',
+            ),
+            editable: true,
+            mode: 0o644,
+            path: 'remove.ts',
+          },
+        ],
+        sourceId: 'local',
+        sourceSnapshot: {
+          baseRevision: 'rollback-save-revision',
+          limits: {
+            maxDepth: 8,
+            maxFileBytes: 1024,
+            maxFiles: 8,
+            maxTotalBytes: 4096,
+          },
+        },
+        targetId: 'local-target',
+      },
+    ];
+    const authoring = createCatalogAuthoringSdk({
+      editor: {
+        limits: {
+          maxDepth: 8,
+          maxFileBytes: 1024,
+          maxFiles: 8,
+          maxTotalBytes: 4096,
+        },
+        loadExamples,
+      },
+      generatedPaths: ['generated/catalog.json'],
+      graph: {
+        boundaries: {
+          browserPaths: [],
+          packageJsonPath: 'package.json',
+          workerPaths: [],
+        },
+        outputs: [
+          { consumers: ['authoring'], path: 'generated/catalog.json' },
+          { consumers: ['authoring'], path: 'local-registration.ts' },
+          { consumers: ['authoring'], path: 'local-workflows.ts' },
+          { consumers: ['authoring'], path: 'tracked-registration.ts' },
+          { consumers: ['authoring'], path: 'tracked-workflows.ts' },
+          { consumers: ['authoring'], path: 'static-input.ts' },
+        ],
+        sources: [
+          {
+            examplesPath: 'local/examples',
+            id: 'local',
+            label: 'Local',
+            registrationOutputPath: 'local-registration.ts',
+            registrationTypePath: 'registration-source.ts',
+          },
+          {
+            examplesPath: 'tracked/examples',
+            id: 'tracked',
+            label: 'Tracked',
+            registrationOutputPath: 'tracked-registration.ts',
+            registrationTypePath: 'registration-source.ts',
+          },
+        ],
+        targets: [
+          {
+            defaultNamespace: 'default',
+            defaultTaskQueue: 'local',
+            id: 'local-target',
+            sourceId: 'local',
+            workflowsModulePath: 'local-workflows.ts',
+          },
+          {
+            defaultNamespace: 'default',
+            defaultTaskQueue: 'tracked',
+            id: 'tracked-target',
+            sourceId: 'tracked',
+            workflowsModulePath: 'tracked-workflows.ts',
+          },
+        ],
+      },
+      loadExamples: () => [],
+      localExamplesPath: 'local/examples',
+      parseModuleSpecifiers: () => [],
+      rootDirectory,
+      scaffold: () => [],
+      trackedExamplesPath: 'tracked/examples',
+      generate: async () => {
+        const journal = JSON.parse(
+          await readFile(join(rootDirectory, '.catalog.journal.json'), 'utf8'),
+        ) as { snapshots: { path: string }[] };
+        journalPaths = journal.snapshots.map(({ path }) => path).sort();
+        return [
+          {
+            content: 'generated during save\n',
+            path: 'generated/catalog.json',
+          },
+        ];
+      },
+      verify: () => {
+        throw new Error('blocking verification failed');
+      },
+    });
+
+    const events: CatalogSaveProgressEvent[] = [];
+    const terminal = await authoring.save(
+      {
+        baseRevision: 'rollback-save-revision',
+        exampleId: 'rollback-save',
+        files: [
+          { content: 'after\n', path: 'keep.ts' },
+          { content: 'remove before\n', path: 'remove.ts', removed: true },
+          { content: 'added\n', path: 'added.ts' },
+        ],
+        operationId: 'rollback-save-operation',
+      },
+      (event) => events.push(event),
+    );
+
+    expect(terminal).toMatchObject({
+      outcome: {
+        filesystem: 'restored',
+        reason: 'check-failed',
+        recovery: 'rolled-back',
+        status: 'failed',
+      },
+      ownership: 'released',
+      reload: 'publish',
+    });
+    await expect(
+      readFile(join(exampleDirectory, 'keep.ts'), 'utf8'),
+    ).resolves.toBe('before\n');
+    await expect(
+      lstat(join(exampleDirectory, 'keep.ts')).then(({ mode }) => mode & 0o777),
+    ).resolves.toBe(0o640);
+    await expect(
+      readFile(join(exampleDirectory, 'remove.ts'), 'utf8'),
+    ).resolves.toBe('remove before\n');
+    await expect(
+      access(join(exampleDirectory, 'added.ts')),
+    ).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
+    await expect(
+      readFile(join(rootDirectory, 'generated/catalog.json'), 'utf8'),
+    ).resolves.toBe('before\n');
+    expect(journalPaths).toEqual([
+      'generated/catalog.json',
+      'local/examples/rollback-save/added.ts',
+      'local/examples/rollback-save/keep.ts',
+      'local/examples/rollback-save/remove.ts',
+    ]);
+    expect(journalPaths).not.toContain('static-input.ts');
+    expect(
+      events.map((event) =>
+        event.kind === 'check'
+          ? [event.sequence, event.step, event.state]
+          : [event.sequence, event.kind, event.outcome.status],
+      ),
+    ).toEqual([
+      [1, 'write_files', 'started'],
+      [2, 'write_files', 'passed'],
+      [3, 'regen', 'started'],
+      [4, 'regen', 'passed'],
+      [5, 'verify', 'started'],
+      [6, 'verify', 'failed'],
+      [7, 'terminal', 'failed'],
+    ]);
+  });
+
   it('confirms a saved Local promotion with the same result as Promote', async () => {
     const createPromotionFixture = async () => {
       const rootDirectory = await createTemporaryDirectory();
@@ -3000,10 +3599,16 @@ try {
 
     expectTypeOf(authoring).not.toHaveProperty('loadExamples');
     expectTypeOf(authoring).not.toHaveProperty('addFile');
+    expectTypeOf(authoring).not.toHaveProperty('save');
+    expectTypeOf(authoring).not.toHaveProperty('inspectSaveOperation');
+    expectTypeOf(authoring).not.toHaveProperty('subscribeSaveOperation');
     expectTypeOf<
       Awaited<ReturnType<CatalogAuthoringAdapter['loadExamples']>>
     >().toEqualTypeOf<readonly CatalogComposedExample[]>();
     expect(authoring).not.toHaveProperty('loadExamples');
     expect(authoring).not.toHaveProperty('addFile');
+    expect(authoring).not.toHaveProperty('save');
+    expect(authoring).not.toHaveProperty('inspectSaveOperation');
+    expect(authoring).not.toHaveProperty('subscribeSaveOperation');
   });
 });

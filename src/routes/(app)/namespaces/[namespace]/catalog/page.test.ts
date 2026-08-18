@@ -18,6 +18,8 @@ describe('/namespaces/[namespace]/catalog', () => {
     );
     expect(source).toContain('<PageTitle title="Catalog" />');
     expect(source).toContain('<h1>Catalog</h1>');
+    expect(source).toContain('routeForCatalogCreate({ namespace })');
+    expect(source).toContain('Create Local example');
     expect(source).toContain(
       'Browse and run catalog examples for local development.',
     );

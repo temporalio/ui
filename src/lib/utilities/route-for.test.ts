@@ -22,6 +22,7 @@ import {
   routeForAuthenticationRedirect,
   routeForCallStack,
   routeForCatalog,
+  routeForCatalogCreate,
   routeForCatalogExample,
   routeForEventHistory,
   routeForEventHistoryImport,
@@ -74,6 +75,12 @@ describe('routeFor', () => {
   it('should route to the catalog within a namespace', () => {
     expect(routeForCatalog({ namespace: 'default' })).toBe(
       `${base}/namespaces/default/catalog`,
+    );
+  });
+
+  it('should route to catalog creation within a namespace', () => {
+    expect(routeForCatalogCreate({ namespace: 'default' })).toBe(
+      `${base}/namespaces/default/catalog/create`,
     );
   });
 

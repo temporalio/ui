@@ -3,9 +3,13 @@
 
   import CatalogList from '$lib/catalog/browser/catalog-list.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import { getIdentity } from '$lib/utilities/core-context';
-  import { routeForCatalogExample } from '$lib/utilities/route-for';
+  import {
+    routeForCatalogCreate,
+    routeForCatalogExample,
+  } from '$lib/utilities/route-for';
 
   import { resolveCatalogForNamespace } from './catalog';
   import { getCatalogServices } from './services';
@@ -26,11 +30,16 @@
 
 <PageTitle title="Catalog" />
 
-<header class="mb-4">
-  <h1>Catalog</h1>
-  <p class="mt-1 text-sm text-secondary">
-    Browse and run catalog examples for local development.
-  </p>
+<header class="mb-4 flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <h1>Catalog</h1>
+    <p class="mt-1 text-sm text-secondary">
+      Browse and run catalog examples for local development.
+    </p>
+  </div>
+  <Button href={routeForCatalogCreate({ namespace })}>
+    Create Local example
+  </Button>
 </header>
 
 <CatalogList

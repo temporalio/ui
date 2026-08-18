@@ -27,7 +27,12 @@ import {
 } from 'node:path';
 
 export type CatalogAuthoringArtifact =
-  | { content: string | Uint8Array; delete?: false; path: string }
+  | {
+      content: string | Uint8Array;
+      delete?: false;
+      mode?: number;
+      path: string;
+    }
   | { content?: never; delete: true; path: string };
 
 export type CatalogAuthoringSource = {
@@ -99,6 +104,88 @@ export type CatalogLoadedExample = Omit<
 export type CatalogSavedState =
   | { durability: 'durable'; status: 'saved' }
   | { status: 'dirty' | 'failed' | 'stale' };
+
+export type CatalogGeneratedOutput = {
+  gitEffect: 'ignored-update' | 'tracked-update';
+  path: string;
+};
+
+export type CatalogSaveSourceFile = Pick<
+  CatalogAuthoringFile,
+  'content' | 'path' | 'removed'
+>;
+
+export type CatalogSaveRequest = {
+  baseRevision: string;
+  exampleId: string;
+  files: readonly CatalogSaveSourceFile[];
+  operationId: string;
+};
+
+export type CatalogSaveOutcome =
+  | {
+      baseRevision: string;
+      changedPaths: string[];
+      commit: 'durable';
+      exampleId: string;
+      generatedOutputs: readonly CatalogGeneratedOutput[];
+      status: 'succeeded';
+    }
+  | {
+      detail?: string;
+      reason: 'catalog-busy' | 'invalid-fileset' | 'stale-revision';
+      status: 'refused';
+    }
+  | {
+      filesystem: 'changed' | 'may-have-changed' | 'restored' | 'unknown';
+      reason:
+        | 'check-failed'
+        | 'finalization-failed'
+        | 'outcome-unknown'
+        | 'recovery-incomplete';
+      recovery: 'committed' | 'incomplete' | 'rolled-back' | 'unknown';
+      recoveryEvidence?: { journal: string; transaction: string };
+      status: 'failed';
+    };
+
+export type CatalogSaveCheckProgressEvent = {
+  kind: 'check';
+  operationId: string;
+  reason?: string;
+  sequence: number;
+  severity: 'advisory' | 'blocking';
+  sourceLocation?: { column?: number; line?: number; path: string };
+  state: 'failed' | 'not-reached' | 'passed' | 'started';
+  step: string;
+};
+
+export type CatalogSaveTerminalEvent = {
+  kind: 'terminal';
+  operationId: string;
+  outcome: CatalogSaveOutcome;
+  ownership: 'released' | 'retained';
+  reload: 'none' | 'publish';
+  sequence: number;
+};
+
+export type CatalogSaveProgressEvent =
+  | CatalogSaveCheckProgressEvent
+  | CatalogSaveTerminalEvent;
+
+export type CatalogSaveOperationInspection =
+  | {
+      events: readonly CatalogSaveProgressEvent[];
+      operationId: string;
+      ownership: 'retained';
+      status: 'running';
+    }
+  | {
+      events: readonly CatalogSaveProgressEvent[];
+      operationId: string;
+      ownership: CatalogSaveTerminalEvent['ownership'];
+      status: 'terminal';
+      terminal: CatalogSaveTerminalEvent;
+    };
 
 export type CatalogMutationDirection = 'demote' | 'promote';
 
@@ -174,6 +261,8 @@ class CatalogCommittedFinalizationError extends Error {
     super('Committed catalog mutation cleanup failed', { cause });
   }
 }
+
+class CatalogSaveStaleRevisionError extends Error {}
 
 const isIndeterminateFilesystemError = (error: unknown): boolean => {
   if ((error as NodeJS.ErrnoException | undefined)?.code === 'EIO') return true;
@@ -279,6 +368,7 @@ export type CatalogAuthoringAdapter = {
     source: { id: string; path: string };
   };
   generatedPaths: readonly string[];
+  generatedOutputs?: readonly CatalogGeneratedOutput[];
   graph: CatalogAuthoringGraph;
   generate: () =>
     | readonly CatalogAuthoringArtifact[]
@@ -317,6 +407,7 @@ export type CatalogAuthoringAdapter = {
 export type CatalogEditorAdapter = CatalogAuthoringAdapter & {
   editor: {
     limits: CatalogAuthoringLimits;
+    localSourceId?: string;
     loadExamples: () =>
       | readonly CatalogLoadedExample[]
       | Promise<readonly CatalogLoadedExample[]>;
@@ -380,6 +471,9 @@ export type CatalogEditor = {
     file: Pick<CatalogAuthoringFile, 'content' | 'path'>,
   ) => CatalogLoadedExample;
   loadExamples: () => Promise<readonly CatalogLoadedExample[]>;
+  inspectSaveOperation: (
+    operationId: string,
+  ) => Promise<CatalogSaveOperationInspection | undefined>;
   removeFile: (
     example: CatalogLoadedExample,
     path: string,
@@ -388,6 +482,14 @@ export type CatalogEditor = {
     example: CatalogLoadedExample,
     path: string,
   ) => CatalogLoadedExample;
+  save: (
+    request: CatalogSaveRequest,
+    onProgress?: (event: CatalogSaveProgressEvent) => void,
+  ) => Promise<CatalogSaveTerminalEvent>;
+  subscribeSaveOperation: (
+    operationId: string,
+    observer: (event: CatalogSaveProgressEvent) => void,
+  ) => () => void;
 };
 
 type CatalogAuthoringFor<Adapter> = Adapter extends CatalogEditorAdapter
@@ -423,13 +525,30 @@ type FileSnapshot = {
   path: string;
 };
 
+type ExpectedFileSnapshot = {
+  content?: string;
+  existed: boolean;
+  mode?: number;
+};
+
 type TransactionJournal = {
   id: string;
   move?: { from: string; marker?: string; to: string };
+  operationId?: string;
+  operationTerminal?: CatalogSaveTerminalEvent;
   snapshots: FileSnapshot[];
-  state: 'committed' | 'pending';
+  state: 'committed' | 'pending' | 'restored';
   transactionPath: string;
 };
+
+type TerminalOperationJournal = {
+  id: string;
+  operationId: string;
+  state: 'terminal';
+  terminal: CatalogSaveTerminalEvent;
+};
+
+type CatalogJournal = TerminalOperationJournal | TransactionJournal;
 
 const assertExplicitRelativePath = (path: string) => {
   if (
@@ -772,6 +891,9 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
         await writeFile(await safeAbsolutePath(stagedPath), content, {
           flag: 'wx',
         });
+        if (artifact.mode !== undefined) {
+          await chmod(await safeAbsolutePath(stagedPath), artifact.mode);
+        }
         return { artifact, stagedPath };
       }),
     );
@@ -829,6 +951,44 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
       }),
     );
   };
+  const assertExpectedFileSnapshots = async (
+    snapshots: readonly FileSnapshot[],
+    expectedSnapshots?: ReadonlyMap<string, ExpectedFileSnapshot>,
+  ) => {
+    if (!expectedSnapshots) return;
+    const snapshotsByPath = new Map(
+      snapshots.map((snapshot) => [snapshot.path, snapshot]),
+    );
+    for (const [path, expected] of expectedSnapshots) {
+      const snapshot = snapshotsByPath.get(path);
+      if (!snapshot || snapshot.existed !== expected.existed) {
+        throw new CatalogSaveStaleRevisionError(
+          'Catalog Save revision changed before transaction snapshot',
+        );
+      }
+      if (!expected.existed) continue;
+      if (
+        !snapshot.backupPath ||
+        snapshot.mode === undefined ||
+        expected.mode === undefined ||
+        (snapshot.mode & 0o777) !== expected.mode
+      ) {
+        throw new CatalogSaveStaleRevisionError(
+          'Catalog Save revision changed before transaction snapshot',
+        );
+      }
+      const expectedContent = Buffer.from(expected.content ?? '');
+      const backupPath = await safeAbsolutePath(snapshot.backupPath);
+      if (
+        (await lstat(backupPath)).size !== expectedContent.byteLength ||
+        !(await readFile(backupPath)).equals(expectedContent)
+      ) {
+        throw new CatalogSaveStaleRevisionError(
+          'Catalog Save revision changed before transaction snapshot',
+        );
+      }
+    }
+  };
   const removeEmptyParents = async (path: string) => {
     const root = await rootDirectory;
     let directory = dirname(await safeAbsolutePath(path));
@@ -865,17 +1025,21 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
     }
   };
   const journalRelativePath = '.catalog.journal.json';
+  const stagedTerminalJournalRelativePath =
+    '.catalog.journal.terminal.pending.json';
   const transactionFilesystem = adapter.transactionFilesystem ?? {
     rename,
     rm,
     unlink,
   };
   const recoveryRename = transactionFilesystem.rename ?? rename;
-  const cleanupRecoveryEvidence = async (transactionPath: string) => {
+  const cleanupTransactionEvidence = async (transactionPath: string) => {
     await transactionFilesystem.rm(await safeAbsolutePath(transactionPath), {
       force: true,
       recursive: true,
     });
+  };
+  const cleanupRecoveryJournal = async () => {
     await transactionFilesystem.unlink(
       await safeAbsolutePath(journalRelativePath),
     );
@@ -892,6 +1056,48 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
       await safeAbsolutePath(journalRelativePath),
     );
   };
+  const writeTerminalOperationJournal = async (
+    terminal: CatalogSaveTerminalEvent,
+  ) => {
+    const journal: TerminalOperationJournal = {
+      id: randomUUID(),
+      operationId: terminal.operationId,
+      state: 'terminal',
+      terminal,
+    };
+    const temporaryPath = `.catalog.journal.${journal.id}.terminal.tmp`;
+    await writeFile(
+      await safeAbsolutePath(temporaryPath),
+      `${JSON.stringify(journal, null, 2)}\n`,
+      { flag: 'wx' },
+    );
+    await rename(
+      await safeAbsolutePath(temporaryPath),
+      await safeAbsolutePath(journalRelativePath),
+    );
+  };
+  const replaceRecoveryJournalWithTerminal = async (
+    terminal: CatalogSaveTerminalEvent,
+  ) => {
+    const journal: TerminalOperationJournal = {
+      id: randomUUID(),
+      operationId: terminal.operationId,
+      state: 'terminal',
+      terminal,
+    };
+    const temporaryPath = `.catalog.journal.${journal.id}.terminal.tmp`;
+    const stagedPath = await safeAbsolutePath(
+      stagedTerminalJournalRelativePath,
+    );
+    await writeFile(
+      await safeAbsolutePath(temporaryPath),
+      `${JSON.stringify(journal, null, 2)}\n`,
+      { flag: 'wx' },
+    );
+    await rename(await safeAbsolutePath(temporaryPath), stagedPath);
+    await cleanupRecoveryJournal();
+    await rename(stagedPath, await safeAbsolutePath(journalRelativePath));
+  };
   const markJournalCommitted = async (journal: TransactionJournal) => {
     const temporaryPath = `.catalog.journal.${journal.id}.committed.tmp`;
     await writeFile(
@@ -904,29 +1110,66 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
       await safeAbsolutePath(journalRelativePath),
     );
   };
-  const readJournal = async (): Promise<TransactionJournal | undefined> => {
+  const markJournalRestored = async (journal: TransactionJournal) => {
+    await writeJournal({ ...journal, state: 'restored' });
+  };
+  const readJournal = async (): Promise<CatalogJournal | undefined> => {
     const path = await safeAbsolutePath(journalRelativePath);
-    const metadata = await lstat(path).catch((error) => {
+    let metadata = await lstat(path).catch((error) => {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
       throw error;
     });
+    if (!metadata) {
+      const stagedPath = await safeAbsolutePath(
+        stagedTerminalJournalRelativePath,
+      );
+      const stagedMetadata = await lstat(stagedPath).catch((error) => {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
+        throw error;
+      });
+      if (stagedMetadata) {
+        if (!stagedMetadata.isFile() || stagedMetadata.isSymbolicLink()) {
+          throw new Error('Catalog transaction journal must be a regular file');
+        }
+        await rename(stagedPath, path);
+        metadata = await lstat(path);
+      }
+    }
     if (!metadata) return;
     if (!metadata.isFile() || metadata.isSymbolicLink()) {
       throw new Error('Catalog transaction journal must be a regular file');
     }
-    const journal = JSON.parse(await readFile(path, 'utf8')) as Omit<
-      TransactionJournal,
-      'state'
-    > & {
-      state?: TransactionJournal['state'];
-    };
+    const journal = JSON.parse(await readFile(path, 'utf8')) as Partial<
+      Omit<TransactionJournal, 'state'> &
+        Omit<TerminalOperationJournal, 'state'>
+    > & { state?: CatalogJournal['state'] };
+    if (journal.state === 'terminal') {
+      if (
+        typeof journal.id !== 'string' ||
+        typeof journal.operationId !== 'string' ||
+        !journal.terminal ||
+        journal.terminal.kind !== 'terminal' ||
+        journal.terminal.operationId !== journal.operationId ||
+        !Number.isSafeInteger(journal.terminal.sequence) ||
+        journal.terminal.sequence < 1 ||
+        !['released', 'retained'].includes(journal.terminal.ownership) ||
+        !['none', 'publish'].includes(journal.terminal.reload) ||
+        !journal.terminal.outcome ||
+        !['failed', 'refused', 'succeeded'].includes(
+          journal.terminal.outcome.status,
+        )
+      ) {
+        throw new Error('Catalog transaction journal is invalid');
+      }
+      return journal as TerminalOperationJournal;
+    }
     if (
       !journal ||
       typeof journal.id !== 'string' ||
       journal.transactionPath !== `.catalog.transaction-${journal.id}` ||
       !Array.isArray(journal.snapshots) ||
       (journal.state !== undefined &&
-        !['committed', 'pending'].includes(journal.state))
+        !['committed', 'pending', 'restored'].includes(journal.state))
     ) {
       throw new Error('Catalog transaction journal is invalid');
     }
@@ -964,16 +1207,78 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
         assertExplicitRelativePath(journal.move.from);
         assertExplicitRelativePath(journal.move.to);
       }
+      if (
+        (journal.operationId !== undefined &&
+          typeof journal.operationId !== 'string') ||
+        (journal.operationTerminal !== undefined &&
+          (journal.operationTerminal.kind !== 'terminal' ||
+            journal.operationTerminal.operationId !== journal.operationId))
+      ) {
+        throw new Error('invalid operation');
+      }
     } catch {
       throw new Error('Catalog transaction journal is invalid');
     }
-    return { ...journal, state: journal.state ?? 'pending' };
+    return {
+      ...(journal as TransactionJournal),
+      state: journal.state ?? 'pending',
+    };
+  };
+  const persistTerminalOperation = async (
+    terminal: CatalogSaveTerminalEvent,
+  ) => {
+    const journal = await readJournal();
+    if (
+      journal &&
+      journal.state !== 'terminal' &&
+      journal.operationId === terminal.operationId
+    ) {
+      const journalWithTerminal = { ...journal, operationTerminal: terminal };
+      await writeJournal(journalWithTerminal);
+      if (
+        journal.state !== 'pending' &&
+        !(await pathExists(await safeAbsolutePath(journal.transactionPath)))
+      ) {
+        await replaceRecoveryJournalWithTerminal(terminal);
+      }
+      return;
+    }
+    await writeTerminalOperationJournal(terminal);
   };
   const recoverJournal = async () => {
     const journal = await readJournal();
     if (!journal) return;
-    if (journal.state === 'committed') {
-      await cleanupRecoveryEvidence(journal.transactionPath);
+    if (journal.state === 'terminal') return;
+    if (journal.state === 'committed' || journal.state === 'restored') {
+      const operationTerminal = journal.operationTerminal;
+      await cleanupTransactionEvidence(journal.transactionPath);
+      if (journal.operationId) {
+        await replaceRecoveryJournalWithTerminal(
+          operationTerminal ?? {
+            kind: 'terminal',
+            operationId: journal.operationId,
+            outcome:
+              journal.state === 'committed'
+                ? {
+                    filesystem: 'changed',
+                    reason: 'finalization-failed',
+                    recovery: 'committed',
+                    status: 'failed',
+                  }
+                : {
+                    filesystem: 'restored',
+                    reason: 'check-failed',
+                    recovery: 'rolled-back',
+                    status: 'failed',
+                  },
+            ownership: journal.state === 'committed' ? 'retained' : 'released',
+            reload: journal.state === 'committed' ? 'none' : 'publish',
+            sequence: 1,
+          },
+        );
+      } else {
+        await cleanupRecoveryJournal();
+      }
       return;
     }
     const rollbackErrors: unknown[] = [];
@@ -1024,25 +1329,75 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
       }
     }
     if (rollbackErrors.length > 0) {
+      if (journal.operationId && !journal.operationTerminal) {
+        const operationTerminal: CatalogSaveTerminalEvent = {
+          kind: 'terminal',
+          operationId: journal.operationId,
+          outcome: {
+            filesystem: 'may-have-changed',
+            reason: 'recovery-incomplete',
+            recovery: 'incomplete',
+            status: 'failed',
+          },
+          ownership: 'retained',
+          reload: 'none',
+          sequence: 1,
+        };
+        await writeJournal({ ...journal, operationTerminal });
+      }
       throw new AggregateError(
         rollbackErrors,
         'Catalog crash recovery was incomplete',
       );
     }
-    await cleanupRecoveryEvidence(journal.transactionPath);
+    const restoredJournal = { ...journal, state: 'restored' as const };
+    await markJournalRestored(restoredJournal);
+    await cleanupTransactionEvidence(journal.transactionPath);
+    if (journal.operationId) {
+      await replaceRecoveryJournalWithTerminal(
+        journal.operationTerminal ?? {
+          kind: 'terminal',
+          operationId: journal.operationId,
+          outcome: {
+            filesystem: 'restored',
+            reason: 'check-failed',
+            recovery: 'rolled-back',
+            status: 'failed',
+          },
+          ownership: 'released',
+          reload: 'publish',
+          sequence: 1,
+        },
+      );
+    } else {
+      await cleanupRecoveryJournal();
+    }
   };
   const withJournaledFiles = async <Result>(
     paths: readonly string[],
     action: (transactionPath: string, transactionId: string) => Promise<Result>,
     move?: { from: string; to: string },
+    operationId?: string,
+    expectedSnapshots?: ReadonlyMap<string, ExpectedFileSnapshot>,
   ) => {
     const id = randomUUID();
     const transactionPath = `.catalog.transaction-${id}`;
     await ensureSafeDirectory(transactionPath);
-    const snapshots = await snapshotFiles(paths, transactionPath);
+    let snapshots: FileSnapshot[];
+    try {
+      snapshots = await snapshotFiles(paths, transactionPath);
+      await assertExpectedFileSnapshots(snapshots, expectedSnapshots);
+    } catch (error) {
+      await rm(await safeAbsolutePath(transactionPath), {
+        force: true,
+        recursive: true,
+      });
+      throw error;
+    }
     const journal: TransactionJournal = {
       id,
       move: move ? { ...move, marker: `.catalog-move-owner-${id}` } : undefined,
+      operationId,
       snapshots,
       state: 'pending',
       transactionPath,
@@ -1071,7 +1426,9 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
             }
           }
         }
-        await cleanupRecoveryEvidence(transactionPath);
+        await markJournalRestored({ ...journal, state: 'restored' });
+        await cleanupTransactionEvidence(transactionPath);
+        if (!operationId) await cleanupRecoveryJournal();
       } catch (rollbackError) {
         throw new AggregateError(
           [error, rollbackError],
@@ -1081,7 +1438,8 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
       throw error;
     }
     try {
-      await cleanupRecoveryEvidence(transactionPath);
+      await cleanupTransactionEvidence(transactionPath);
+      if (!operationId) await cleanupRecoveryJournal();
     } catch (error) {
       throw new CatalogCommittedFinalizationError(
         { journal: journalRelativePath, transaction: transactionPath },
@@ -1726,6 +2084,78 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
   const editor =
     'editor' in adapter ? (adapter as CatalogEditorAdapter).editor : undefined;
   const editorLimits = editor ? Object.freeze({ ...editor.limits }) : undefined;
+  const generatedOutputs = Object.freeze(
+    (
+      adapter.generatedOutputs ??
+      adapter.generatedPaths.map((path) => ({
+        gitEffect: 'tracked-update' as const,
+        path,
+      }))
+    ).map((output) => Object.freeze({ ...output })),
+  );
+  if (
+    generatedOutputs.length !== adapter.generatedPaths.length ||
+    generatedOutputs.some(
+      ({ path }, index) => path !== adapter.generatedPaths[index],
+    )
+  ) {
+    throw new Error(
+      'Catalog generated output disclosure must match generated paths',
+    );
+  }
+  const saveOperationRecords = new Map<
+    string,
+    {
+      events: CatalogSaveProgressEvent[];
+      terminal?: CatalogSaveTerminalEvent;
+    }
+  >();
+  const saveOperationObservers = new Map<
+    string,
+    Set<(event: CatalogSaveProgressEvent) => void>
+  >();
+  const inspectRecordedSaveOperation = (
+    operationId: string,
+  ): CatalogSaveOperationInspection | undefined => {
+    const record = saveOperationRecords.get(operationId);
+    if (!record) return;
+    const events = [...record.events];
+    if (record.terminal) {
+      return {
+        events,
+        operationId,
+        ownership: record.terminal.ownership,
+        status: 'terminal',
+        terminal: record.terminal,
+      };
+    }
+    return { events, operationId, ownership: 'retained', status: 'running' };
+  };
+  const recordSaveEvent = (event: CatalogSaveProgressEvent) => {
+    const record = saveOperationRecords.get(event.operationId) ?? {
+      events: [],
+    };
+    record.events.push(event);
+    if (record.events.length > 64) record.events.splice(0, 1);
+    if (event.kind === 'terminal') record.terminal = event;
+    saveOperationRecords.delete(event.operationId);
+    saveOperationRecords.set(event.operationId, record);
+    if (saveOperationRecords.size > 32) {
+      const evictable = [...saveOperationRecords].find(
+        ([operationId, candidate]) =>
+          operationId !== event.operationId && candidate.terminal,
+      );
+      if (evictable) saveOperationRecords.delete(evictable[0]);
+    }
+    for (const observer of saveOperationObservers.get(event.operationId) ??
+      []) {
+      try {
+        observer(event);
+      } catch {
+        // Save observers cannot alter operation ownership or outcome.
+      }
+    }
+  };
   const assertRetainedAggregateLimits = (
     files: readonly CatalogAuthoringFile[],
   ) => {
@@ -1746,35 +2176,39 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
       );
     }
   };
+  const assertEditableSourceFile = (
+    file: Pick<CatalogAuthoringFile, 'content' | 'path'>,
+  ) => {
+    assertExplicitRelativePath(file.path);
+    if (posix.basename(file.path).includes('.generated.')) {
+      throw new Error(
+        `Catalog editable fileset cannot include a generated file: ${file.path}`,
+      );
+    }
+    if (file.content.includes('\0')) {
+      throw new Error(
+        `Catalog editable fileset cannot include binary content: ${file.path}`,
+      );
+    }
+    const limits = editorLimits!;
+    if (file.path.split('/').length > limits.maxDepth) {
+      throw new Error(
+        `Catalog editable fileset exceeds maximum depth of ${limits.maxDepth}: ${file.path}`,
+      );
+    }
+    if (Buffer.byteLength(file.content) > limits.maxFileBytes) {
+      throw new Error(
+        `Catalog editable fileset exceeds maximum file size of ${limits.maxFileBytes} bytes: ${file.path}`,
+      );
+    }
+  };
   const editorAuthoring: CatalogEditor | undefined = editor
     ? {
         addFile: (
           example: CatalogLoadedExample,
           file: Pick<CatalogAuthoringFile, 'content' | 'path'>,
         ): CatalogLoadedExample => {
-          assertExplicitRelativePath(file.path);
-          if (posix.basename(file.path).includes('.generated.')) {
-            throw new Error(
-              `Catalog editable fileset cannot include a generated file: ${file.path}`,
-            );
-          }
-          if (file.content.includes('\0')) {
-            throw new Error(
-              `Catalog editable fileset cannot include binary content: ${file.path}`,
-            );
-          }
-          const limits = editorLimits!;
-          if (file.path.split('/').length > limits.maxDepth) {
-            throw new Error(
-              `Catalog editable fileset exceeds maximum depth of ${limits.maxDepth}: ${file.path}`,
-            );
-          }
-          const fileBytes = Buffer.byteLength(file.content);
-          if (fileBytes > limits.maxFileBytes) {
-            throw new Error(
-              `Catalog editable fileset exceeds maximum file size of ${limits.maxFileBytes} bytes: ${file.path}`,
-            );
-          }
+          assertEditableSourceFile(file);
           if (example.sourceFiles.some(({ path }) => path === file.path)) {
             throw new Error(`Catalog file already exists: ${file.path}`);
           }
@@ -1790,6 +2224,31 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
         },
         loadExamples: () =>
           withLock(() => Promise.resolve(editor.loadExamples())),
+        inspectSaveOperation: async (operationId) => {
+          const recorded = inspectRecordedSaveOperation(operationId);
+          if (recorded) return recorded;
+          const journal = await readJournal();
+          if (!journal || journal.operationId !== operationId) return;
+          const terminal =
+            journal.state === 'terminal'
+              ? journal.terminal
+              : journal.operationTerminal;
+          if (terminal) {
+            return {
+              events: [terminal],
+              operationId,
+              ownership: terminal.ownership,
+              status: 'terminal',
+              terminal,
+            };
+          }
+          return {
+            events: [],
+            operationId,
+            ownership: 'retained',
+            status: 'running',
+          };
+        },
         removeFile: (
           example: CatalogLoadedExample,
           path: string,
@@ -1810,6 +2269,339 @@ export const createCatalogAuthoring = <Adapter extends CatalogAuthoringAdapter>(
           });
           assertRetainedAggregateLimits(sourceFiles);
           return { ...example, sourceFiles };
+        },
+        save: async (request, onProgress) => {
+          assertExampleId(request.exampleId);
+          if (!request.operationId.trim()) {
+            throw new Error('Catalog Save operation ID is required');
+          }
+          saveOperationRecords.set(request.operationId, { events: [] });
+          let sequence = 0;
+          const notify = (event: CatalogSaveProgressEvent) => {
+            recordSaveEvent(event);
+            try {
+              onProgress?.(event);
+            } catch {
+              // Progress observers do not own or control the Save transaction.
+            }
+          };
+          const finish = async (
+            outcome: CatalogSaveOutcome,
+            ownership: CatalogSaveTerminalEvent['ownership'],
+            reload: CatalogSaveTerminalEvent['reload'],
+            persist = true,
+          ) => {
+            let terminal: CatalogSaveTerminalEvent = {
+              kind: 'terminal',
+              operationId: request.operationId,
+              outcome,
+              ownership,
+              reload,
+              sequence: ++sequence,
+            };
+            if (persist) {
+              try {
+                await persistTerminalOperation(terminal);
+              } catch {
+                terminal = {
+                  ...terminal,
+                  outcome: {
+                    filesystem: 'unknown',
+                    reason: 'outcome-unknown',
+                    recovery: 'unknown',
+                    status: 'failed',
+                  },
+                  ownership: 'retained',
+                  reload: 'none',
+                };
+              }
+            }
+            notify(terminal);
+            return terminal;
+          };
+          const saveSteps = ['write_files', 'regen', 'verify'] as const;
+          let activeStep: (typeof saveSteps)[number] | undefined;
+          const emitCheck = (
+            step: (typeof saveSteps)[number],
+            state: CatalogSaveCheckProgressEvent['state'],
+            reason?: string,
+          ) => {
+            if (state === 'started') activeStep = step;
+            if (state === 'failed' || state === 'passed')
+              activeStep = undefined;
+            notify({
+              kind: 'check',
+              operationId: request.operationId,
+              ...(reason ? { reason } : {}),
+              sequence: ++sequence,
+              severity: 'blocking',
+              state,
+              step,
+            });
+          };
+          const loadSaveExample = async () =>
+            (await editor.loadExamples()).find(
+              ({ id, sourceId }) =>
+                id === request.exampleId &&
+                sourceId === (editor.localSourceId ?? 'local'),
+            );
+          try {
+            return await withLock(async () => {
+              const current = await loadSaveExample();
+              if (!current) {
+                return finish(
+                  {
+                    detail: `Local catalog example does not exist: ${request.exampleId}`,
+                    reason: 'invalid-fileset',
+                    status: 'refused',
+                  },
+                  'released',
+                  'none',
+                );
+              }
+              if (
+                current.sourceSnapshot.baseRevision !== request.baseRevision
+              ) {
+                return finish(
+                  { reason: 'stale-revision', status: 'refused' },
+                  'released',
+                  'none',
+                );
+              }
+              const currentByPath = new Map(
+                current.sourceFiles.map((file) => [file.path, file]),
+              );
+              const submittedByPath = new Map<string, CatalogSaveSourceFile>();
+              for (const file of request.files) {
+                assertEditableSourceFile(file);
+                if (submittedByPath.has(file.path)) {
+                  throw new Error(
+                    `Catalog Save contains duplicate path: ${file.path}`,
+                  );
+                }
+                if ('mode' in file) {
+                  throw new Error('Catalog Save cannot change file modes');
+                }
+                if (file.removed && !currentByPath.has(file.path)) {
+                  throw new Error(
+                    `Catalog Save cannot remove an unknown file: ${file.path}`,
+                  );
+                }
+                submittedByPath.set(file.path, file);
+              }
+              for (const path of currentByPath.keys()) {
+                if (!submittedByPath.has(path)) {
+                  throw new Error(
+                    `Catalog Save must declare every loaded file: ${path}`,
+                  );
+                }
+              }
+              assertRetainedAggregateLimits(
+                request.files.map((file) => ({
+                  ...file,
+                  editable: true,
+                  mode: currentByPath.get(file.path)?.mode ?? 0o644,
+                })),
+              );
+              const examplePrefix = `${adapter.localExamplesPath}/${request.exampleId}`;
+              const sourceArtifacts: CatalogAuthoringArtifact[] =
+                request.files.map((file) => {
+                  const path = `${examplePrefix}/${file.path}`;
+                  return file.removed
+                    ? deleteCatalogArtifact(path)
+                    : {
+                        content: file.content,
+                        mode: currentByPath.get(file.path)?.mode ?? 0o644,
+                        path,
+                      };
+                });
+              try {
+                emitCheck('write_files', 'started');
+                const transactionCurrent = await loadSaveExample();
+                if (
+                  transactionCurrent?.sourceSnapshot.baseRevision !==
+                  request.baseRevision
+                ) {
+                  throw new CatalogSaveStaleRevisionError(
+                    'Catalog Save revision changed before transaction write',
+                  );
+                }
+                const transactionCurrentByPath = new Map(
+                  transactionCurrent.sourceFiles.map((file) => [
+                    file.path,
+                    file,
+                  ]),
+                );
+                const expectedSnapshots = new Map<string, ExpectedFileSnapshot>(
+                  request.files.map((file) => {
+                    const currentFile = transactionCurrentByPath.get(file.path);
+                    return [
+                      `${examplePrefix}/${file.path}`,
+                      currentFile
+                        ? {
+                            content: currentFile.content,
+                            existed: true,
+                            mode: currentFile.mode,
+                          }
+                        : { existed: false },
+                    ];
+                  }),
+                );
+                await withJournaledFiles(
+                  [
+                    ...sourceArtifacts.map(({ path }) => path),
+                    ...adapter.generatedPaths,
+                  ],
+                  async (transactionPath) => {
+                    await writeArtifacts(sourceArtifacts, transactionPath);
+                    emitCheck('write_files', 'passed');
+                    emitCheck('regen', 'started');
+                    await generateUnlocked(transactionPath);
+                    emitCheck('regen', 'passed');
+                    emitCheck('verify', 'started');
+                    await verifyUnlocked();
+                    emitCheck('verify', 'passed');
+                  },
+                  undefined,
+                  request.operationId,
+                  expectedSnapshots,
+                );
+              } catch (error) {
+                if (activeStep) {
+                  const failedStep = activeStep;
+                  emitCheck(
+                    failedStep,
+                    'failed',
+                    error instanceof Error ? error.message : String(error),
+                  );
+                  for (const step of saveSteps.slice(
+                    saveSteps.indexOf(failedStep) + 1,
+                  )) {
+                    emitCheck(step, 'not-reached');
+                  }
+                }
+                if (error instanceof CatalogCommittedFinalizationError) {
+                  return finish(
+                    {
+                      filesystem: 'changed',
+                      reason: 'finalization-failed',
+                      recovery: 'committed',
+                      recoveryEvidence: error.recoveryEvidence,
+                      status: 'failed',
+                    },
+                    'retained',
+                    'none',
+                  );
+                }
+                if (error instanceof CatalogSaveStaleRevisionError) {
+                  return finish(
+                    { reason: 'stale-revision', status: 'refused' },
+                    'released',
+                    'none',
+                  );
+                }
+                if (
+                  error instanceof AggregateError &&
+                  error.message.includes('rollback was incomplete')
+                ) {
+                  return finish(
+                    {
+                      filesystem: 'may-have-changed',
+                      reason: 'recovery-incomplete',
+                      recovery: 'incomplete',
+                      status: 'failed',
+                    },
+                    'retained',
+                    'none',
+                  );
+                }
+                return finish(
+                  {
+                    filesystem: 'restored',
+                    reason: 'check-failed',
+                    recovery: 'rolled-back',
+                    status: 'failed',
+                  },
+                  'released',
+                  'publish',
+                );
+              }
+              const saved = (await editor.loadExamples()).find(
+                ({ id, sourceId }) =>
+                  id === request.exampleId &&
+                  sourceId === (editor.localSourceId ?? 'local'),
+              );
+              if (!saved) {
+                return finish(
+                  {
+                    filesystem: 'unknown',
+                    reason: 'outcome-unknown',
+                    recovery: 'unknown',
+                    status: 'failed',
+                  },
+                  'retained',
+                  'none',
+                );
+              }
+              return finish(
+                {
+                  baseRevision: saved.sourceSnapshot.baseRevision,
+                  changedPaths: [
+                    ...sourceArtifacts.map(({ path }) => path),
+                    ...adapter.generatedPaths,
+                  ],
+                  commit: 'durable',
+                  exampleId: request.exampleId,
+                  generatedOutputs,
+                  status: 'succeeded',
+                },
+                'released',
+                'publish',
+              );
+            });
+          } catch (error) {
+            if (
+              error instanceof Error &&
+              error.message ===
+                'Another catalog mutation is already in progress'
+            ) {
+              return finish(
+                { reason: 'catalog-busy', status: 'refused' },
+                'released',
+                'none',
+                false,
+              );
+            }
+            return finish(
+              {
+                detail: error instanceof Error ? error.message : String(error),
+                reason: 'invalid-fileset',
+                status: 'refused',
+              },
+              'released',
+              'none',
+              false,
+            );
+          }
+        },
+        subscribeSaveOperation: (operationId, observer) => {
+          const observers =
+            saveOperationObservers.get(operationId) ?? new Set();
+          observers.add(observer);
+          saveOperationObservers.set(operationId, observers);
+          for (const event of inspectRecordedSaveOperation(operationId)
+            ?.events ?? []) {
+            try {
+              observer(event);
+            } catch {
+              // Replay observers are isolated from the operation record.
+            }
+          }
+          return () => {
+            observers.delete(observer);
+            if (observers.size === 0)
+              saveOperationObservers.delete(operationId);
+          };
         },
       }
     : undefined;

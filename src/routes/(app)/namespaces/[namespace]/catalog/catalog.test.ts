@@ -4,7 +4,9 @@ import type { BrowserCatalogDescriptor } from '$lib/catalog/browser/types';
 
 import {
   findRouteCatalogDescriptor,
+  installCatalogLocalRefresh,
   mergeCatalogDescriptors,
+  replaceRouteLocalCatalog,
   resolveCatalogForNamespace,
   routeCatalog,
 } from './catalog';
@@ -143,5 +145,77 @@ describe('catalog route catalog', () => {
     expect(
       findRouteCatalogDescriptor([descriptor], 'literal/sequence'),
     ).toBeUndefined();
+  });
+
+  it('replaces the validated local overlay in place for later route resolution', () => {
+    const routeCatalogReference = routeCatalog;
+    const savedDescriptor = {
+      ...localDescriptor,
+      id: 'saved-local',
+      title: 'Saved local',
+    };
+
+    try {
+      replaceRouteLocalCatalog({ descriptors: [savedDescriptor] });
+
+      expect(routeCatalog).toBe(routeCatalogReference);
+      expect(routeCatalog).not.toContainEqual(
+        expect.objectContaining({ id: localDescriptor.id }),
+      );
+      expect(
+        findRouteCatalogDescriptor(
+          resolveCatalogForNamespace('later-namespace'),
+          savedDescriptor.id,
+        ),
+      ).toMatchObject({
+        id: savedDescriptor.id,
+        execution: { namespace: 'later-namespace' },
+      });
+    } finally {
+      replaceRouteLocalCatalog({ descriptors: [localDescriptor] });
+    }
+  });
+
+  it('rejects malformed or non-local refresh payloads without changing the overlay', () => {
+    const previous = [...routeCatalog];
+    const invalidPayloads = [
+      null,
+      { descriptors: {} },
+      {
+        descriptors: [{ ...localDescriptor, title: 42 }],
+      },
+      {
+        descriptors: [
+          { ...localDescriptor, source: { id: 'oss', label: 'OSS' } },
+        ],
+      },
+    ];
+
+    for (const payload of invalidPayloads) {
+      expect(() => replaceRouteLocalCatalog(payload as never)).toThrow();
+      expect(routeCatalog).toEqual(previous);
+    }
+  });
+
+  it('installs the exact HMR event as a full local-overlay replacement', () => {
+    let eventName = '';
+    let listener: ((payload: unknown) => void) | undefined;
+    const refreshedDescriptor = { ...localDescriptor, id: 'hot-local' };
+
+    installCatalogLocalRefresh({
+      on: (event, callback) => {
+        eventName = event;
+        listener = callback;
+      },
+    });
+
+    try {
+      listener?.({ descriptors: [refreshedDescriptor] });
+      expect(eventName).toBe('catalog-local:refresh');
+      expect(routeCatalog).toContainEqual(refreshedDescriptor);
+      expect(routeCatalog).not.toContainEqual(localDescriptor);
+    } finally {
+      replaceRouteLocalCatalog({ descriptors: [localDescriptor] });
+    }
   });
 });

@@ -1,5 +1,19 @@
+import { EditorView } from '@codemirror/view';
 import { flushSync as flushSvelte, mount, tick, unmount } from 'svelte';
 
+import {
+  getGotoCalls as getMockGotoCalls,
+  resetNavigationMocks,
+  triggerBeforeNavigate as triggerMockBeforeNavigate,
+} from '$lib/svelte-mocks/app/navigation';
+
+import type { CatalogAuthoringHost } from './catalog-authoring-host';
+import type {
+  CatalogPromotionOutcome,
+  CatalogPromotionPreview,
+  CatalogSaveRequest,
+  CatalogSaveTerminalOutcome,
+} from './catalog-authoring-host';
 import { createCatalogSessionStore } from './session-store';
 import type { BrowserCatalogDescriptor } from './types';
 import type {
@@ -8,6 +22,7 @@ import type {
   WorkbenchHost,
 } from './workbench-host';
 
+import CatalogCreate from './catalog-create.svelte';
 import CatalogDetail from './catalog-detail.svelte';
 import CatalogList from './catalog-list.svelte';
 
@@ -66,6 +81,129 @@ let resolvePendingReadiness: ((checks: ReadinessCheck[]) => void) | undefined;
 let readinessCallCount = 0;
 let startPromise: Promise<StartCommand> | undefined;
 let resolveStart: ((command: StartCommand) => void) | undefined;
+let scaffoldedIds: string[] = [];
+let loadedIds: string[] = [];
+let saveRequests: CatalogSaveRequest[] = [];
+let promotionPreviewInputs: Parameters<
+  CatalogAuthoringHost['previewPromote']
+>[0][] = [];
+let promotionConfirmInputs: Parameters<
+  CatalogAuthoringHost['confirmPromote']
+>[0][] = [];
+let inspectedOperationIds: string[] = [];
+
+const authoringExample = {
+  id: 'payment-reminder',
+  sourceFiles: [
+    {
+      content: 'export const workflow = true;\n',
+      editable: true,
+      mode: 0o644,
+      path: 'workflow.ts',
+    },
+    {
+      content: 'export const example = true;\n',
+      editable: true,
+      mode: 0o644,
+      path: 'example.ts',
+    },
+  ],
+  sourceSnapshot: {
+    baseRevision: 'revision-1',
+    limits: {
+      maxDepth: 8,
+      maxFileBytes: 262144,
+      maxFiles: 64,
+      maxTotalBytes: 1048576,
+    },
+  },
+} satisfies Awaited<ReturnType<CatalogAuthoringHost['load']>>;
+
+const createAuthoringHost = (
+  saveOutcome?: CatalogSaveTerminalOutcome,
+  promotionPreview?: CatalogPromotionPreview,
+  promotionOutcome?: CatalogPromotionOutcome,
+): CatalogAuthoringHost => ({
+  available: true,
+  scaffold: async (exampleId) => {
+    scaffoldedIds.push(exampleId);
+  },
+  load: async (exampleId) => {
+    loadedIds.push(exampleId);
+    return { ...authoringExample, id: exampleId };
+  },
+  save: (request, onEvent) => {
+    saveRequests.push(request);
+    if (saveOutcome) {
+      const terminal = {
+        kind: 'terminal' as const,
+        operationId: request.operationId,
+        sequence: 1,
+        outcome: saveOutcome,
+        ownership: 'released' as const,
+        reload: 'none' as const,
+      };
+      onEvent(terminal);
+      return Promise.resolve(terminal);
+    }
+    onEvent({
+      kind: 'check',
+      operationId: request.operationId,
+      sequence: 1,
+      step: 'write_files',
+      severity: 'blocking',
+      state: 'passed',
+      reason: 'Files written.',
+    });
+    onEvent({
+      kind: 'check',
+      operationId: request.operationId,
+      sequence: 2,
+      step: 'verify',
+      severity: 'blocking',
+      state: 'not-reached',
+      reason: 'An earlier check failed.',
+    });
+    return new Promise(() => undefined);
+  },
+  inspectSaveOperation: async (operationId) => {
+    inspectedOperationIds.push(operationId);
+    return undefined;
+  },
+  subscribeSaveOperation: () => () => undefined,
+  previewPromote: async (input) => {
+    promotionPreviewInputs.push(input);
+    return (
+      promotionPreview ?? { status: 'unavailable', reason: 'unsaved-changes' }
+    );
+  },
+  confirmPromote: async (input) => {
+    promotionConfirmInputs.push(input);
+    return (
+      promotionOutcome ?? {
+        status: 'refused',
+        direction: 'promote',
+        reason: 'save-state-changed',
+        detail: 'Not saved.',
+      }
+    );
+  },
+});
+
+const ensureDialogMethods = () => {
+  const prototype = HTMLDialogElement.prototype;
+  if (!prototype.showModal) {
+    prototype.showModal = function () {
+      this.open = true;
+    };
+  }
+  if (!prototype.close) {
+    prototype.close = function () {
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    };
+  }
+};
 
 const prepareStartPromise = () => {
   startPromise = new Promise((resolve) => {
@@ -107,7 +245,77 @@ export async function cleanup() {
   readinessCallCount = 0;
   startPromise = undefined;
   resolveStart = undefined;
+  scaffoldedIds = [];
+  loadedIds = [];
+  saveRequests = [];
+  promotionPreviewInputs = [];
+  promotionConfirmInputs = [];
+  inspectedOperationIds = [];
+  resetNavigationMocks();
   document.body.replaceChildren();
+}
+
+export async function renderCreate({
+  exampleHref,
+  promotionOutcome,
+  promotionPreview,
+  saveOutcome,
+}: {
+  exampleHref?: string;
+  promotionOutcome?: CatalogPromotionOutcome;
+  promotionPreview?: CatalogPromotionPreview;
+  saveOutcome?: CatalogSaveTerminalOutcome;
+} = {}) {
+  ensureDialogMethods();
+  const target = document.body.appendChild(document.createElement('div'));
+  mounted.push(
+    mount(CatalogCreate, {
+      target,
+      props: {
+        exampleHref,
+        host: createAuthoringHost(
+          saveOutcome,
+          promotionPreview,
+          promotionOutcome,
+        ),
+      },
+    }),
+  );
+  flushSvelte();
+  await Promise.resolve();
+  return target;
+}
+
+export function getScaffoldedIds() {
+  return [...scaffoldedIds];
+}
+
+export function getLoadedIds() {
+  return [...loadedIds];
+}
+
+export function getInspectedOperationIds() {
+  return [...inspectedOperationIds];
+}
+
+export function getSaveRequests() {
+  return structuredClone(saveRequests);
+}
+
+export function getPromotionPreviewInputs() {
+  return structuredClone(promotionPreviewInputs);
+}
+
+export function getPromotionConfirmInputs() {
+  return structuredClone(promotionConfirmInputs);
+}
+
+export function triggerNavigation(to: string) {
+  return triggerMockBeforeNavigate(to);
+}
+
+export function getNavigationCalls() {
+  return getMockGotoCalls();
 }
 
 export async function renderDetail({
@@ -213,6 +421,20 @@ export async function flush() {
 }
 
 export function flushSync() {
+  flushSvelte();
+}
+
+export function replaceEditorContent(
+  target: HTMLElement,
+  label: string,
+  content: string,
+) {
+  const editor = target.querySelector<HTMLElement>(`[aria-label="${label}"]`);
+  const view = editor ? EditorView.findFromDOM(editor) : null;
+  if (!view) throw new Error(`Editor not found: ${label}`);
+  view.dispatch({
+    changes: { from: 0, to: view.state.doc.length, insert: content },
+  });
   flushSvelte();
 }
 

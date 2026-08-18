@@ -1,6 +1,6 @@
 import { isUtf8 } from 'node:buffer';
 import { createHash } from 'node:crypto';
-import { constants } from 'node:fs';
+import { constants, type Stats } from 'node:fs';
 import {
   type FileHandle,
   lstat,
@@ -37,16 +37,12 @@ import {
   verifyProjectCatalogBoundaries,
 } from './project-artifacts.js';
 import { renderDirectoryCatalogScaffold } from './scaffold.js';
+import { uiCatalogGeneratedPaths } from './ui-authoring-generated-paths.js';
 
-export const uiCatalogGeneratedPaths = [
-  'catalog.local/registration.ts',
-  'catalog.local/workflows.ts',
-  'catalog.local/catalog.generated.json',
-  'src/lib/catalog/worker/examples/index.ts',
-  'src/lib/catalog/worker/workflows.ts',
-  'src/lib/catalog/browser/catalog.generated.json',
-  'src/lib/catalog/browser/catalog.generated.ts',
-] as const;
+export { uiCatalogGeneratedPaths } from './ui-authoring-generated-paths.js';
+
+export const uiCatalogStaticRevisionInputPath =
+  'src/lib/catalog/worker/shared-registrations.ts';
 
 export const uiCatalogAuthoringLimits = Object.freeze({
   maxDepth: 8,
@@ -160,7 +156,7 @@ const readAtMost = async (handle: FileHandle, maxBytes: number) => {
       buffer,
       offset,
       buffer.byteLength - offset,
-      null,
+      offset,
     );
     if (bytesRead === 0) break;
     offset += bytesRead;
@@ -168,12 +164,21 @@ const readAtMost = async (handle: FileHandle, maxBytes: number) => {
   return buffer.subarray(0, offset);
 };
 
+const isSameFileState = (left: Stats, right: Stats) =>
+  left.dev === right.dev &&
+  left.ino === right.ino &&
+  left.mode === right.mode &&
+  left.size === right.size &&
+  left.mtimeMs === right.mtimeMs &&
+  left.ctimeMs === right.ctimeMs;
+
 const loadExampleSourceFiles = async (
   directory: string,
   relativeDirectory = '',
   totals = { bytes: 0, files: 0 },
   beforeOpenSourceFile?: (path: string) => void | Promise<void>,
   beforeReadSourceFile?: (path: string) => void | Promise<void>,
+  afterReadSourceFile?: (path: string) => void | Promise<void>,
   ancestorIdentities: readonly DirectoryIdentity[] = [],
   limits: CatalogAuthoringLimits = uiCatalogAuthoringLimits,
 ): Promise<CatalogAuthoringFile[]> => {
@@ -207,6 +212,7 @@ const loadExampleSourceFiles = async (
           totals,
           beforeOpenSourceFile,
           beforeReadSourceFile,
+          afterReadSourceFile,
           directoryIdentities,
           limits,
         )),
@@ -240,31 +246,44 @@ const loadExampleSourceFiles = async (
           );
         }
         await beforeReadSourceFile?.(path);
-        return {
-          buffer: await readAtMost(handle, limits.maxFileBytes),
-          metadata,
-        };
+        const buffer = await readAtMost(handle, limits.maxFileBytes);
+        if (buffer.byteLength > limits.maxFileBytes)
+          return { buffer, metadata };
+        await afterReadSourceFile?.(path);
+        const verificationMetadata = await handle.stat();
+        const verificationBuffer = await readAtMost(
+          handle,
+          limits.maxFileBytes,
+        );
+        const finalMetadata = await handle.stat();
+        if (
+          !buffer.equals(verificationBuffer) ||
+          !isSameFileState(metadata, verificationMetadata) ||
+          !isSameFileState(verificationMetadata, finalMetadata)
+        ) {
+          throw new Error('Catalog source tree changed while loading');
+        }
+        return { buffer, metadata: finalMetadata };
       } finally {
         await handle.close();
       }
     })();
+    if (buffer && buffer.byteLength > limits.maxFileBytes) {
+      throw new Error(
+        `Catalog editable tree exceeds maximum file size of ${limits.maxFileBytes} bytes: ${relativePath}`,
+      );
+    }
     await assertUnchangedDirectoryChain(directoryIdentities);
     if (!buffer) continue;
     const currentFileMetadata = await lstat(path).catch(() => undefined);
     if (
       !currentFileMetadata?.isFile() ||
       currentFileMetadata.isSymbolicLink() ||
-      currentFileMetadata.dev !== metadata.dev ||
-      currentFileMetadata.ino !== metadata.ino
+      !isSameFileState(currentFileMetadata, metadata)
     ) {
       throw new Error('Catalog source tree changed while loading');
     }
     if (!isUtf8(buffer) || buffer.includes(0)) continue;
-    if (buffer.byteLength > limits.maxFileBytes) {
-      throw new Error(
-        `Catalog editable tree exceeds maximum file size of ${limits.maxFileBytes} bytes: ${relativePath}`,
-      );
-    }
     totals.files += 1;
     if (totals.files > limits.maxFiles) {
       throw new Error(
@@ -291,6 +310,7 @@ const loadExampleSourceFiles = async (
 export const createUiCatalogAuthoring = (
   rootDirectory = getProjectRoot(),
   hooks: {
+    afterReadSourceFile?: (path: string) => void | Promise<void>;
     beforeOpenSourceFile?: (path: string) => void | Promise<void>;
     beforeReadSourceFile?: (path: string) => void | Promise<void>;
   } = {},
@@ -298,6 +318,32 @@ export const createUiCatalogAuthoring = (
   const loaderLimits = Object.freeze({
     ...uiCatalogAuthoringLimits,
   });
+  const createEditorBaseRevision = async (
+    sourceFiles: readonly CatalogAuthoringFile[],
+  ) => {
+    const staticInputPath = join(
+      rootDirectory,
+      uiCatalogStaticRevisionInputPath,
+    );
+    const metadata = await lstat(staticInputPath);
+    if (!metadata.isFile() || metadata.isSymbolicLink()) {
+      throw new Error('Catalog static revision input must be a regular file');
+    }
+    return createHash('sha256')
+      .update(
+        JSON.stringify({
+          sourceFiles,
+          staticInput: {
+            contentHash: createHash('sha256')
+              .update(await readFile(staticInputPath))
+              .digest('hex'),
+            mode: metadata.mode & 0o777,
+            path: uiCatalogStaticRevisionInputPath,
+          },
+        }),
+      )
+      .digest('hex');
+  };
   const sources = [
     {
       examplesPath: 'src/lib/catalog/worker/examples',
@@ -449,6 +495,12 @@ export const createUiCatalogAuthoring = (
     localExamplesPath: 'catalog.local/examples',
     trackedExamplesPath: 'src/lib/catalog/worker/examples',
     generatedPaths: uiCatalogGeneratedPaths,
+    generatedOutputs: uiCatalogGeneratedPaths.map((path) => ({
+      gitEffect: path.startsWith('catalog.local/')
+        ? ('ignored-update' as const)
+        : ('tracked-update' as const),
+      path,
+    })),
     scaffold: ({ exampleId }) =>
       renderDirectoryCatalogScaffold({ exampleId, rootDirectory }),
     loadExamples: async () =>
@@ -477,6 +529,7 @@ export const createUiCatalogAuthoring = (
                 { bytes: 0, files: 0 },
                 hooks.beforeOpenSourceFile,
                 hooks.beforeReadSourceFile,
+                hooks.afterReadSourceFile,
                 sourceRootIdentities,
                 loaderLimits,
               );
@@ -485,9 +538,7 @@ export const createUiCatalogAuthoring = (
                 sourceFiles,
                 sourceId,
                 sourceSnapshot: {
-                  baseRevision: createHash('sha256')
-                    .update(JSON.stringify(sourceFiles))
-                    .digest('hex'),
+                  baseRevision: await createEditorBaseRevision(sourceFiles),
                   limits: { ...loaderLimits },
                 },
                 targetId,
@@ -497,8 +548,9 @@ export const createUiCatalogAuthoring = (
           ),
         ),
     },
-    validatePromotion: ({ exampleId }) =>
-      planDirectoryCatalogPromotion({ exampleId, rootDirectory }),
+    validatePromotion: async ({ exampleId }) => {
+      await planDirectoryCatalogPromotion({ exampleId, rootDirectory });
+    },
     generate: (renderGenerated = async () => {
       const local = await renderLocalCatalogAssemblies(rootDirectory);
       const localSource =
