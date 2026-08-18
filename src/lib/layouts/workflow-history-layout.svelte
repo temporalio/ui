@@ -20,22 +20,15 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
-  import {
-    enrichGroups,
-    getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
-    getEventArray,
-    getGroupArray,
-  } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
+  import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
-    IterableEventWithPending,
     WorkflowEvent,
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
@@ -71,41 +64,20 @@
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
 
-  let bufferGroups = $state.raw(getGroupArray({ excludeWorkflowTasks: true }));
-  let bufferEvents = $state.raw(getEventArray());
+  // Enough to filter, sort and paginate; only the rendered page is materialized.
+  // The feed view needs full groups, read lazily in tableProps below.
+  const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
+  const bufferEvents = $derived(eventBuffer.events);
   let updating = $derived(!historyCtx.fetchComplete);
 
   onMount(() => {
     historyCtx.resume();
-    bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-    bufferEvents = getEventArray();
   });
 
-  $effect(() => {
-    void $bufferVersion;
-
-    const fetchComplete = historyCtx.fetchComplete;
-    const activities = pendingActivities;
-    const nexusOperations = pendingNexusOperations;
-
-    let frame: number | null = requestAnimationFrame(() => {
-      frame = null;
-      if (fetchComplete) {
-        enrichGroups(activities, nexusOperations);
-      }
-      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-      bufferEvents = getEventArray();
-    });
-
-    return () => {
-      if (frame !== null) cancelAnimationFrame(frame);
-    };
-  });
-
-  const filteredGroups = $derived.by(() => {
+  const filteredLazyGroups = $derived.by(() => {
     const active = $eventTypeFilter;
     const cats = $eventCategoryFilter;
-    return bufferGroups.filter((g) => {
+    return bufferLazyGroups.filter((g) => {
       if (!active.includes(g.category)) return false;
       if (cats && cats.length && !cats.includes(g.category)) return false;
       return true;
@@ -124,9 +96,8 @@
   });
 
   const workflowTaskFailedError = $derived.by(() => {
-    void $bufferVersion;
     if (!historyCtx.fetchComplete) return undefined;
-    return getBufferWftFailedEvent() as
+    return eventBuffer.workflowTaskFailedEvent as
       | WorkflowTaskFailedEvent
       | WorkflowTaskTimedOutEvent
       | undefined;
@@ -136,21 +107,28 @@
     !!workflow && !workflow.isRunning && !workflow.isPaused,
   );
 
-  let groups = $derived(
-    reverseSort ? [...filteredGroups].reverse() : filteredGroups,
+  let lazyGroups = $derived(
+    reverseSort ? filteredLazyGroups.toReversed() : filteredLazyGroups,
   );
   let history = $derived(
-    reverseSort ? [...filteredEvents].reverse() : filteredEvents,
+    reverseSort ? filteredEvents.toReversed() : filteredEvents,
   );
 
-  let items = $derived(
-    (compact
-      ? orderGroupsByPending(groups, reverseSort)
-      : reverseSort
-        ? [...pendingNexusOperations, ...pendingActivities, ...history]
-        : [...history, ...pendingActivities, ...pendingNexusOperations]) as
-      | EventGroups
-      | IterableEventWithPending[],
+  // EventSummaryTable's props are a union on `compact`, so the pair travels as
+  // one object. Keeps the materialized groups on the feed branch too.
+  const tableProps = $derived(
+    compact
+      ? {
+          compact: true as const,
+          items: orderGroupsByPending(lazyGroups, reverseSort),
+        }
+      : {
+          compact: false as const,
+          items: reverseSort
+            ? [...pendingNexusOperations, ...pendingActivities, ...history]
+            : [...history, ...pendingActivities, ...pendingNexusOperations],
+          groups: eventBuffer.groupsWithoutWorkflowTasks,
+        },
   );
 
   $effect(() => {
@@ -302,7 +280,7 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {items} {groups} {compact} />
+        <EventSummaryTable {updating} {...tableProps} />
       </div>
     {/if}
   </div>

@@ -97,6 +97,7 @@ export const createTemporalServer = async ({
     { flag: 'history.enableChasm', value: 'true' },
     { flag: 'history.externalPayloadsEnabled', value: 'true' },
     { flag: 'activity.enableStandalone', value: 'true' },
+    { flag: 'nexusoperation.enableStandalone', value: 'true' },
   ].forEach(({ flag, value }) => {
     flags.push('--dynamic-config-value');
     flags.push(`${flag}=${value}`);

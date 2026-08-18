@@ -156,31 +156,86 @@ blockquote {
 }
 
 code {
-  padding: 0.125rem 0.3rem;
-  border: 1px solid var(--md-border);
-  border-radius: 0.375rem;
-  background: var(--md-code);
-  color: var(--md-text);
-  font-family:
-    'Noto Sans Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    monospace;
-  font-size: 0.75rem;
+  font-family: monospace;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+}
+body[data-theme='light-background'] code {
+  font-family: monospace;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+}
+pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+body[data-theme='dark-background'] code {
+  font-family: monospace;
+  border-radius: 0.25rem;
+  background: #292d3e;
+  color: #f8fafc;
+}
+body[data-theme='light-primary'] code {
+  font-family: monospace;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+}
+body[data-theme='dark-primary'] code {
+  font-family: monospace;
+  border-radius: 0.25rem;
+  background: #292d3e;
+  color: #f8fafc;
+}
+
+body[data-theme='light-background'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border-color: #aebed9;
+  background: #e8efff;
+  color: #141414;
+}
+body[data-theme='dark-background'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border-color: #1e293b;
+  background: #292d3e;
+  color: #f8fafc;
+}
+
+body[data-theme='light-primary'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+}
+body[data-theme='dark-primary'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: #292d3e;
+  color: #f8fafc;
 }
 
 pre {
-  overflow: auto;
-  margin-block: 0.75rem;
-  padding: 0.625rem;
-  border: 1px solid var(--md-border);
-  border-radius: 0.5rem;
-  background: var(--md-code);
-  color: var(--md-text);
-  font-family:
-    'Noto Sans Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    monospace;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+  overflow-x: auto;
+  white-space: pre;
+  code {
+    padding: 0;
+  }
 }
 
 pre code {

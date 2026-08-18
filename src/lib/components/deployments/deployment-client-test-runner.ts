@@ -5,11 +5,11 @@ import {
   TextEncoder as NodeTextEncoder,
 } from 'node:util';
 
-import type { ViteDevServer } from 'vite';
+import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
 
 type ClientRunner = typeof import('./deployment-client-test-runner-entry');
 
-let viteServer: ViteDevServer | undefined;
+let closeViteServer: (() => Promise<void>) | undefined;
 let runner: ClientRunner | undefined;
 let textEncoder: PropertyDescriptor | undefined;
 let textDecoder: PropertyDescriptor | undefined;
@@ -43,75 +43,89 @@ export async function getDeploymentClientTestRunner(): Promise<ClientRunner> {
       import('@sveltejs/vite-plugin-svelte'),
       import('vite'),
     ]);
-    viteServer = await createServer({
-      root: projectRoot,
-      configFile: false,
-      appType: 'custom',
-      plugins: [svelte({ hot: false, prebundleSvelteLibraries: false })],
-      optimizeDeps: {
-        noDiscovery: true,
-        exclude: ['svelte'],
-        include: ['@temporalio/common', 'json-bigint'],
-      },
-      resolve: {
-        dedupe: ['svelte'],
-        alias: [
-          {
-            find: '/@vite/client',
-            replacement: path.resolve(
-              projectRoot,
-              'src/lib/components/deployments/vite-client-test-double.ts',
-            ),
-          },
-          {
-            find: '$lib/services/deployments-service',
-            replacement: path.resolve(
-              projectRoot,
-              'src/lib/components/deployments/deployments-service-client-test-double.ts',
-            ),
-          },
-          {
-            find: '$lib/components/timestamp.svelte',
-            replacement: path.resolve(
-              projectRoot,
-              'src/lib/components/deployments/timestamp-client-test-double.svelte',
-            ),
-          },
-          { find: '$lib', replacement: path.resolve(projectRoot, 'src/lib') },
-          {
-            find: '$types',
-            replacement: path.resolve(projectRoot, 'src/types'),
-          },
-          {
-            find: '$app',
-            replacement: path.resolve(projectRoot, 'src/lib/svelte-mocks/app'),
-          },
-        ],
-      },
-      server: { middlewareMode: true, hmr: false },
-      environments: {
-        client: {
-          consumer: 'client',
-          dev: {
-            createEnvironment: (name, config, context) =>
-              createRunnableDevEnvironment(name, config, {
-                ...context,
-                hot: false,
-                runnerOptions: { hmr: false },
-              }),
-            moduleRunnerTransform: true,
+    const lifecycle = await startIsolatedViteServer(
+      createServer,
+      {
+        root: projectRoot,
+        configFile: false,
+        appType: 'custom',
+        plugins: [svelte({ hot: false, prebundleSvelteLibraries: false })],
+        optimizeDeps: {
+          noDiscovery: true,
+          exclude: ['svelte'],
+          include: ['@temporalio/common', 'json-bigint'],
+        },
+        resolve: {
+          dedupe: ['svelte'],
+          alias: [
+            {
+              find: '/@vite/client',
+              replacement: path.resolve(
+                projectRoot,
+                'src/lib/components/deployments/vite-client-test-double.ts',
+              ),
+            },
+            {
+              find: '$lib/services/deployments-service',
+              replacement: path.resolve(
+                projectRoot,
+                'src/lib/components/deployments/deployments-service-client-test-double.ts',
+              ),
+            },
+            {
+              find: '$lib/components/timestamp.svelte',
+              replacement: path.resolve(
+                projectRoot,
+                'src/lib/components/deployments/timestamp-client-test-double.svelte',
+              ),
+            },
+            {
+              find: '$lib',
+              replacement: path.resolve(projectRoot, 'src/lib'),
+            },
+            {
+              find: '$types',
+              replacement: path.resolve(projectRoot, 'src/types'),
+            },
+            {
+              find: '$app',
+              replacement: path.resolve(
+                projectRoot,
+                'src/lib/svelte-mocks/app',
+              ),
+            },
+          ],
+        },
+        server: { middlewareMode: true, hmr: false },
+        environments: {
+          client: {
+            consumer: 'client',
+            dev: {
+              createEnvironment: (name, config, context) =>
+                createRunnableDevEnvironment(name, config, {
+                  ...context,
+                  hot: false,
+                  runnerOptions: { hmr: false },
+                }),
+              moduleRunnerTransform: true,
+            },
           },
         },
       },
-    });
-    const clientEnvironment = viteServer.environments.client;
-    if (!isRunnableDevEnvironment(clientEnvironment)) {
-      throw new Error('The Vite client test environment is not runnable');
-    }
-    runner = (await clientEnvironment.runner.import(
-      '/src/lib/components/deployments/deployment-client-test-runner-entry.ts',
-    )) as ClientRunner;
-    await runner.initialize();
+      async (server) => {
+        const clientEnvironment = server.environments.client;
+        if (!isRunnableDevEnvironment(clientEnvironment)) {
+          throw new Error('The Vite client test environment is not runnable');
+        }
+        const clientRunner = (await clientEnvironment.runner.import(
+          '/src/lib/components/deployments/deployment-client-test-runner-entry.ts',
+        )) as ClientRunner;
+        await clientRunner.initialize();
+        return clientRunner;
+      },
+    );
+    closeViteServer = lifecycle.close;
+    runner = lifecycle.value;
     return runner;
   } catch (error) {
     await closeDeploymentClientTestRunner();
@@ -121,9 +135,9 @@ export async function getDeploymentClientTestRunner(): Promise<ClientRunner> {
 
 export async function closeDeploymentClientTestRunner() {
   runner = undefined;
-  const server = viteServer;
-  viteServer = undefined;
-  await server?.close();
+  const closeServer = closeViteServer;
+  closeViteServer = undefined;
+  await closeServer?.();
   if (textEncoder)
     Object.defineProperty(globalThis, 'TextEncoder', textEncoder);
   if (textDecoder)

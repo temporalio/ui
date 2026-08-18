@@ -9,6 +9,17 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 
 export const isCloudMatch = /(tmprl\.cloud|tmprl-test\.cloud)$/;
 
+export const isLocalRuntimeEnvironment = ({
+  environmentOverride,
+  hostname,
+}: {
+  environmentOverride: string | null;
+  hostname: string;
+}) => {
+  if (environmentOverride) return environmentOverride === 'local';
+  return !isCloudMatch.test(hostname);
+};
+
 const emptySettingsResponse: SettingsResponse = {
   Auth: {
     Enabled: false,
@@ -92,11 +103,10 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
         return isCloudMatch.test(BROWSER ? window.location.hostname : '');
       },
       get isLocal() {
-        if (EnvironmentOverride) {
-          return EnvironmentOverride === 'local';
-        }
-
-        return isCloudMatch.test(BROWSER ? window.location.hostname : '');
+        return isLocalRuntimeEnvironment({
+          environmentOverride: EnvironmentOverride,
+          hostname: BROWSER ? window.location.hostname : '',
+        });
       },
       envOverride: Boolean(EnvironmentOverride),
     },

@@ -1,6 +1,10 @@
-import type { EventGroups } from '$lib/models/event-groups/event-groups';
-
 import { orderGroupsByPending } from './order-groups-by-pending';
+
+/** Satisfied by both EventGroup and LazyGroup, so neither needs building. */
+type SortableGroup = {
+  isPending: boolean;
+  initialEvent: { id: string };
+};
 
 /**
  * Produces the ordered groups array for the timeline during **loading**.
@@ -19,34 +23,37 @@ import { orderGroupsByPending } from './order-groups-by-pending';
  * @param descMinId     - lowest event ID seen from the descending cursor;
  *                        0 means no descending page has arrived yet
  */
-export const sortGroupsDuringLoading = (
-  groups: EventGroups,
+export const sortGroupsDuringLoading = <T extends SortableGroup>(
+  groups: T[],
   reverseSort: boolean,
   descMinId: number,
-): EventGroups => {
+): T[] => {
   if (!descMinId) return groups;
 
-  return groups.toSorted((a, b) => {
-    const aPending = a.isPending && Number(a.initialEvent.id) >= descMinId;
-    const bPending = b.isPending && Number(b.initialEvent.id) >= descMinId;
-    if (aPending === bPending) return 0;
-    // Mirror orderGroupsByPending(groups, !reverseSort):
-    //   reverseSort=true  (descending) → pending to END   (top of screen) → return  1
-    //   reverseSort=false (ascending)  → pending to START (top of screen) → return -1
-    if (aPending) return !reverseSort ? -1 : 1;
-    return !reverseSort ? 1 : -1;
-  });
+  // Partition, not a sort — see orderGroupsByPending.
+  const pending: T[] = [];
+  const rest: T[] = [];
+  for (const group of groups) {
+    const isActivePending =
+      group.isPending && Number(group.initialEvent.id) >= descMinId;
+    (isActivePending ? pending : rest).push(group);
+  }
+
+  // Mirror orderGroupsByPending(groups, !reverseSort):
+  //   reverseSort=true  (descending) → pending to END   (top of screen)
+  //   reverseSort=false (ascending)  → pending to START (top of screen)
+  return reverseSort ? [...rest, ...pending] : [...pending, ...rest];
 };
 
 /**
  * Full groups sort for the timeline — switches strategy based on fetch state.
  */
-export const getTimelineGroups = (
-  groups: EventGroups,
+export const getTimelineGroups = <T extends SortableGroup>(
+  groups: T[],
   reverseSort: boolean,
   fetchComplete: boolean,
   descMinId: number,
-): EventGroups => {
+): T[] => {
   if (fetchComplete) return orderGroupsByPending(groups, !reverseSort);
   return sortGroupsDuringLoading(groups, reverseSort, descMinId);
 };
