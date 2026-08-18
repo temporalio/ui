@@ -1,0 +1,19 @@
+{
+  "name": "temporal-ui-catalog",
+  "version": "0.1.0",
+  "description": "Tools for authoring, running, inspecting, and promoting Temporal Catalog examples.",
+  "author": {
+    "name": "Temporal Technologies",
+    "url": "https://temporal.io"
+  },
+  "homepage": "https://github.com/temporalio/ui#readme",
+  "repository": "https://github.com/temporalio/ui",
+  "license": "MIT",
+  "keywords": [
+    "temporal",
+    "ui",
+    "catalog",
+    "workflow-examples",
+    "developer-tools"
+  ]
+}
