@@ -6,8 +6,10 @@ import {
   readdir,
   readFile,
   realpath,
+  rename,
   rm,
   symlink,
+  unlink,
   writeFile,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -22,6 +24,7 @@ import {
   composeCatalogArtifacts,
   createCatalogAuthoring as createCatalogAuthoringSdk,
   createCatalogLocalArtifactVitePlugin,
+  createCatalogMutationRevision,
   defineCatalogArtifact,
   renderCatalogSourceAssembly,
   runCatalogCli,
@@ -36,12 +39,12 @@ const temporaryDirectories: string[] = [];
 const createCatalogAuthoring = (
   adapter: Omit<
     CatalogAuthoringAdapter,
-    'graph' | 'loadExamples' | 'parseModuleSpecifiers'
+    'describePromotion' | 'graph' | 'loadExamples' | 'parseModuleSpecifiers'
   > &
     Partial<
       Pick<
         CatalogAuthoringAdapter,
-        'graph' | 'loadExamples' | 'parseModuleSpecifiers'
+        'describePromotion' | 'graph' | 'loadExamples' | 'parseModuleSpecifiers'
       >
     >,
 ) => {
@@ -52,6 +55,19 @@ const createCatalogAuthoring = (
     '.catalog-test/tracked-workflows.ts',
   ];
   return createCatalogAuthoringSdk({
+    describePromotion: ({ from, to }) => ({
+      authoredSource: from,
+      destination: { id: 'tracked', path: to },
+      generatedOutputs: adapter.generatedPaths.map((path) => ({
+        gitEffect: 'tracked-update' as const,
+        path,
+      })),
+      gitEffects: {
+        destination: 'tracked-addition' as const,
+        source: 'ignored-removal' as const,
+      },
+      source: { id: 'local', path: from },
+    }),
     graph: {
       boundaries: {
         browserPaths: [],
@@ -115,6 +131,1262 @@ afterEach(async () => {
 });
 
 describe('catalog authoring', () => {
+  it('confirms a saved Local promotion with the same result as Promote', async () => {
+    const createPromotionFixture = async () => {
+      const rootDirectory = await createTemporaryDirectory();
+      const authoring = createCatalogAuthoring({
+        rootDirectory,
+        localExamplesPath: 'local/examples',
+        trackedExamplesPath: 'tracked/examples',
+        generatedPaths: ['generated/catalog.json'],
+        scaffold: ({ exampleId }) => [
+          {
+            path: `local/examples/${exampleId}/example.ts`,
+            content: 'export const example = true;\n',
+          },
+        ],
+        generate: async () => {
+          const tracked = await readdir(
+            join(rootDirectory, 'tracked/examples'),
+          ).catch(() => []);
+          return [
+            {
+              path: 'generated/catalog.json',
+              content: `${JSON.stringify(tracked.sort())}\n`,
+            },
+          ];
+        },
+      });
+      await authoring.scaffold('saved-example');
+      return { authoring, rootDirectory };
+    };
+    const confirmedFixture = await createPromotionFixture();
+    const directFixture = await createPromotionFixture();
+
+    const preview = await confirmedFixture.authoring.previewPromote({
+      exampleId: 'saved-example',
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    expect(preview.status).toBe('available');
+    if (preview.status !== 'available') throw new Error('preview unavailable');
+    const confirmed = await confirmedFixture.authoring.confirmPromote({
+      exampleId: 'saved-example',
+      revision: preview.revision,
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    const direct = await directFixture.authoring.promote('saved-example');
+
+    expect(confirmed).toEqual({
+      commit: 'durable',
+      direction: 'promote',
+      result: direct,
+      status: 'succeeded',
+    });
+    await expect(
+      readFile(
+        join(confirmedFixture.rootDirectory, 'generated/catalog.json'),
+        'utf8',
+      ),
+    ).resolves.toBe(
+      await readFile(
+        join(directFixture.rootDirectory, 'generated/catalog.json'),
+        'utf8',
+      ),
+    );
+  });
+
+  it('makes Promote available only for a durable Save and explains each unavailable state', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const localExample = join(rootDirectory, 'local/examples/save-state');
+    await mkdir(localExample, { recursive: true });
+    await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(
+      authoring.previewPromote({
+        exampleId: 'save-state',
+        saveState: { status: 'dirty' },
+      }),
+    ).resolves.toEqual({ reason: 'unsaved-changes', status: 'unavailable' });
+    await expect(
+      authoring.previewPromote({
+        exampleId: 'save-state',
+        saveState: { status: 'stale' },
+      }),
+    ).resolves.toEqual({
+      reason: 'saved-revision-stale',
+      status: 'unavailable',
+    });
+    await expect(
+      authoring.previewPromote({
+        exampleId: 'save-state',
+        saveState: { status: 'failed' },
+      }),
+    ).resolves.toEqual({ reason: 'save-failed', status: 'unavailable' });
+    await expect(
+      authoring.previewPromote({
+        exampleId: 'save-state',
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toMatchObject({ status: 'available' });
+  });
+
+  it('keeps legacy adapters usable when promotion preview effects are not configured', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const legacyAdapter = {
+      generatedPaths: [],
+      generate: () => [],
+      graph: {
+        boundaries: {
+          browserPaths: [],
+          packageJsonPath: 'package.json',
+          workerPaths: [],
+        },
+        outputs: [],
+        sources: [],
+        targets: [],
+      },
+      loadExamples: () => [],
+      localExamplesPath: 'local/examples',
+      parseModuleSpecifiers: () => [],
+      rootDirectory,
+      scaffold: () => [],
+      trackedExamplesPath: 'tracked/examples',
+    } satisfies CatalogAuthoringAdapter;
+    const authoring = createCatalogAuthoringSdk(legacyAdapter);
+
+    await expect(
+      authoring.previewPromote({
+        exampleId: 'legacy-adapter',
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      reason: 'preview-not-supported',
+      status: 'unavailable',
+    });
+    await expect(authoring.verify()).resolves.toBeUndefined();
+  });
+
+  it('changes its deterministic opaque revision for every source and destination change', async () => {
+    const revision = (
+      overrides: {
+        destination?: {
+          contentHash?: string;
+          entries?: {
+            contentHash: string;
+            mode: number;
+            path: string;
+            type: 'directory' | 'file';
+          }[];
+          mode?: number;
+          path?: string;
+          state: 'absent' | 'directory' | 'file';
+        };
+        source?: {
+          contentHash: string;
+          mode: number;
+          path: string;
+          type: 'directory' | 'file';
+        }[];
+        sourceRoot?: { identity: string; mode: number; path: string };
+      } = {},
+    ) =>
+      createCatalogMutationRevision({
+        destination: overrides.destination
+          ? { path: '/repo/tracked/example', ...overrides.destination }
+          : { path: '/repo/tracked/example', state: 'absent' },
+        source: overrides.source ?? [
+          {
+            contentHash: 'first',
+            mode: 0o644,
+            path: 'example.ts',
+            type: 'file',
+          },
+        ],
+        sourceRoot: overrides.sourceRoot ?? {
+          identity: 'source-root-1',
+          mode: 0o755,
+          path: '/repo/local/example',
+        },
+      });
+    const original = revision();
+    const variants = [
+      revision({
+        source: [
+          {
+            contentHash: 'first',
+            mode: 0o644,
+            path: 'example.ts',
+            type: 'file',
+          },
+          {
+            contentHash: 'added',
+            mode: 0o644,
+            path: 'workflow.ts',
+            type: 'file',
+          },
+        ],
+      }),
+      revision({ source: [] }),
+      revision({
+        source: [
+          {
+            contentHash: 'changed',
+            mode: 0o644,
+            path: 'example.ts',
+            type: 'file',
+          },
+        ],
+      }),
+      revision({
+        source: [
+          {
+            contentHash: 'first',
+            mode: 0o755,
+            path: 'example.ts',
+            type: 'file',
+          },
+        ],
+      }),
+      revision({
+        source: [
+          {
+            contentHash: 'first',
+            mode: 0o644,
+            path: 'example.ts',
+            type: 'directory',
+          },
+        ],
+      }),
+      revision({
+        sourceRoot: {
+          identity: 'source-root-1',
+          mode: 0o700,
+          path: '/repo/local/example',
+        },
+      }),
+      revision({
+        destination: {
+          contentHash: 'destination-one',
+          mode: 0o644,
+          path: '/repo/tracked/example',
+          state: 'file',
+        },
+      }),
+      revision({
+        destination: {
+          contentHash: 'destination-two',
+          mode: 0o644,
+          path: '/repo/tracked/example',
+          state: 'file',
+        },
+      }),
+      revision({
+        destination: {
+          contentHash: 'destination-one',
+          mode: 0o600,
+          path: '/repo/tracked/example',
+          state: 'file',
+        },
+      }),
+      revision({
+        destination: {
+          entries: [],
+          mode: 0o755,
+          path: '/repo/tracked/example',
+          state: 'directory',
+        },
+      }),
+      revision({
+        destination: {
+          path: '/repo/tracked/renamed-example',
+          state: 'absent',
+        },
+      }),
+    ];
+
+    expect(original).toMatch(/^[a-f0-9]{64}$/);
+    expect(new Set(variants).size).toBe(variants.length);
+    expect(variants).not.toContain(original);
+    expect(
+      revision({
+        source: [
+          {
+            contentHash: 'added',
+            mode: 0o644,
+            path: 'workflow.ts',
+            type: 'file',
+          },
+          {
+            contentHash: 'first',
+            mode: 0o644,
+            path: 'example.ts',
+            type: 'file',
+          },
+        ],
+      }),
+    ).toBe(variants[0]);
+    expect(original).not.toContain('example.ts');
+    expect(original).not.toContain('first');
+  });
+
+  it('refuses a stale confirmation before moving a changed source', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const localExample = join(rootDirectory, 'local/examples/stale-preview');
+    await mkdir(localExample, { recursive: true });
+    await writeFile(
+      join(localExample, 'example.ts'),
+      'export const value = 1;\n',
+    );
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+    const preview = await authoring.previewPromote({
+      exampleId: 'stale-preview',
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    if (preview.status !== 'available') throw new Error('preview unavailable');
+    await writeFile(
+      join(localExample, 'example.ts'),
+      'export const value = 2;\n',
+    );
+
+    await expect(
+      authoring.confirmPromote({
+        exampleId: 'stale-preview',
+        revision: preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      reason: 'stale-preview',
+      status: 'refused',
+    });
+    await expect(
+      readFile(join(localExample, 'example.ts'), 'utf8'),
+    ).resolves.toContain('value = 2');
+    await expect(
+      access(join(rootDirectory, 'tracked/examples/stale-preview')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('returns a named refusal with a repository-relative detail for invalid source', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const exampleId = 'invalid-source';
+    const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+    await mkdir(localExample, { recursive: true });
+    await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+    const preview = await authoring.previewPromote({
+      exampleId,
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    if (preview.status !== 'available') throw new Error('preview unavailable');
+    await writeFile(
+      join(localExample, 'example.ts'),
+      "import '../../outside';\n",
+    );
+
+    const result = await authoring.confirmPromote({
+      exampleId,
+      revision: preview.revision,
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    expect(result).toEqual({
+      detail:
+        'local/examples/invalid-source/example.ts relative imports must stay within its example directory',
+      direction: 'promote',
+      reason: 'source-invalid',
+      status: 'refused',
+    });
+    expect(JSON.stringify(result)).not.toContain(rootDirectory);
+  });
+
+  it('returns a named refusal when the previewed source disappears', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const exampleId = 'missing-source';
+    const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+    await mkdir(localExample, { recursive: true });
+    await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+    const preview = await authoring.previewPromote({
+      exampleId,
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    if (preview.status !== 'available') throw new Error('preview unavailable');
+    await rm(localExample, { recursive: true });
+
+    await expect(
+      authoring.confirmPromote({
+        exampleId,
+        revision: preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      detail:
+        'Local catalog example does not exist: local/examples/missing-source',
+      direction: 'promote',
+      reason: 'source-invalid',
+      status: 'refused',
+    });
+  });
+
+  it('returns typed destination and lock refusals before moving the source', async () => {
+    const createFixture = async (exampleId: string) => {
+      const rootDirectory = await createTemporaryDirectory();
+      const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+      await mkdir(localExample, { recursive: true });
+      await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+      const authoring = createCatalogAuthoring({
+        rootDirectory,
+        localExamplesPath: 'local/examples',
+        trackedExamplesPath: 'tracked/examples',
+        generatedPaths: [],
+        scaffold: () => [],
+        generate: () => [],
+      });
+      const preview = await authoring.previewPromote({
+        exampleId,
+        saveState: { durability: 'durable', status: 'saved' },
+      });
+      if (preview.status !== 'available')
+        throw new Error('preview unavailable');
+      return { authoring, localExample, preview, rootDirectory };
+    };
+    const conflict = await createFixture('destination-conflict');
+    await mkdir(
+      join(conflict.rootDirectory, 'tracked/examples/destination-conflict'),
+      { recursive: true },
+    );
+    await expect(
+      conflict.authoring.confirmPromote({
+        exampleId: 'destination-conflict',
+        revision: conflict.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      reason: 'destination-conflict',
+      status: 'refused',
+    });
+    await expect(access(conflict.localExample)).resolves.toBeUndefined();
+
+    const busy = await createFixture('busy-catalog');
+    await writeFile(
+      join(busy.rootDirectory, '.catalog.lock'),
+      `${JSON.stringify({ createdAt: Date.now(), pid: process.pid })}\n`,
+    );
+    await expect(
+      busy.authoring.confirmPromote({
+        exampleId: 'busy-catalog',
+        revision: busy.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      reason: 'catalog-busy',
+      status: 'refused',
+    });
+    await expect(access(busy.localExample)).resolves.toBeUndefined();
+
+    const recovery = await createFixture('recovery-refusal');
+    await writeFile(
+      join(recovery.rootDirectory, '.catalog.lock'),
+      `${JSON.stringify({ createdAt: 0, pid: 999_999_999 })}\n`,
+    );
+    await writeFile(
+      join(recovery.rootDirectory, '.catalog.lock.recovery'),
+      'not a directory\n',
+    );
+    await expect(
+      recovery.authoring.confirmPromote({
+        exampleId: 'recovery-refusal',
+        revision: recovery.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      reason: 'recovery-refused',
+      status: 'refused',
+    });
+    await expect(access(recovery.localExample)).resolves.toBeUndefined();
+  });
+
+  it('replans and completes all validation under the mutation lock before durable success', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const localExample = join(rootDirectory, 'local/examples/checked-confirm');
+    await mkdir(localExample, { recursive: true });
+    await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+    const calls: string[] = [];
+    let expectLock = false;
+    const record = async (name: string) => {
+      if (expectLock) {
+        await expect(
+          access(join(rootDirectory, '.catalog.lock')),
+        ).resolves.toBeUndefined();
+      }
+      calls.push(name);
+    };
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: async () => {
+        await record('generate');
+        return [];
+      },
+      parseModuleSpecifiers: async () => {
+        await record('self-containment');
+        return [];
+      },
+      validatePromotion: async () => record('promotion-policy'),
+      verifyGenerated: async () => record('verify-generated'),
+      verify: async () => record('verify-all'),
+    });
+    const preview = await authoring.previewPromote({
+      exampleId: 'checked-confirm',
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    if (preview.status !== 'available') throw new Error('preview unavailable');
+    calls.length = 0;
+    expectLock = true;
+
+    await expect(
+      authoring.confirmPromote({
+        exampleId: 'checked-confirm',
+        revision: preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toMatchObject({ status: 'succeeded' });
+    expect(calls).toEqual([
+      'self-containment',
+      'promotion-policy',
+      'generate',
+      'self-containment',
+      'promotion-policy',
+      'generate',
+      'verify-generated',
+      'verify-all',
+    ]);
+  });
+
+  it('runs server-owned peer checks in order, stops on blocking failure, and continues after advisory failure', async () => {
+    const createFixture = async (
+      exampleId: string,
+      checks: CatalogAuthoringAdapter['promotionChecks'],
+    ) => {
+      const rootDirectory = await createTemporaryDirectory();
+      const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+      await mkdir(localExample, { recursive: true });
+      await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+      const authoring = createCatalogAuthoring({
+        rootDirectory,
+        localExamplesPath: 'local/examples',
+        trackedExamplesPath: 'tracked/examples',
+        generatedPaths: [],
+        scaffold: () => [],
+        generate: () => [],
+        promotionChecks: checks,
+      });
+      const preview = await authoring.previewPromote({
+        exampleId,
+        saveState: { durability: 'durable', status: 'saved' },
+      });
+      if (preview.status !== 'available')
+        throw new Error('preview unavailable');
+      return { authoring, localExample, preview };
+    };
+    const blockingCalls: string[] = [];
+    const blocking = await createFixture('blocking-check', [
+      {
+        id: 'first',
+        label: 'First check',
+        run: async () => {
+          blockingCalls.push('first');
+          return { status: 'passed' as const };
+        },
+        severity: 'blocking',
+      },
+      {
+        id: 'blocked',
+        label: 'Blocking check',
+        run: async () => {
+          blockingCalls.push('blocked');
+          return { detail: 'fix the peer', status: 'failed' as const };
+        },
+        severity: 'blocking',
+      },
+      {
+        id: 'later',
+        label: 'Later check',
+        run: async () => {
+          blockingCalls.push('later');
+          return { status: 'passed' as const };
+        },
+        severity: 'advisory',
+      },
+    ]);
+    expect(blocking.preview).not.toHaveProperty('replayPolicy');
+    await expect(
+      blocking.authoring.confirmPromote({
+        exampleId: 'blocking-check',
+        revision: blocking.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      checks: [
+        {
+          id: 'first',
+          label: 'First check',
+          severity: 'blocking',
+          status: 'passed',
+        },
+        {
+          detail: 'fix the peer',
+          id: 'blocked',
+          label: 'Blocking check',
+          severity: 'blocking',
+          status: 'failed',
+        },
+        {
+          id: 'later',
+          label: 'Later check',
+          severity: 'advisory',
+          status: 'not-reached',
+        },
+      ],
+      direction: 'promote',
+      reason: 'check-blocked',
+      status: 'refused',
+    });
+    expect(blockingCalls).toEqual(['first', 'blocked']);
+    await expect(access(blocking.localExample)).resolves.toBeUndefined();
+
+    const advisoryCalls: string[] = [];
+    const advisory = await createFixture('advisory-check', [
+      {
+        id: 'advisory',
+        label: 'Advisory check',
+        run: async () => {
+          advisoryCalls.push('advisory');
+          return { detail: 'informational', status: 'failed' as const };
+        },
+        severity: 'advisory',
+      },
+      {
+        id: 'after-advisory',
+        label: 'After advisory',
+        run: async () => {
+          advisoryCalls.push('after-advisory');
+          return { status: 'passed' as const };
+        },
+        severity: 'blocking',
+      },
+    ]);
+    await expect(
+      advisory.authoring.confirmPromote({
+        exampleId: 'advisory-check',
+        revision: advisory.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toMatchObject({
+      checks: [
+        {
+          detail: 'informational',
+          id: 'advisory',
+          label: 'Advisory check',
+          severity: 'advisory',
+          status: 'failed',
+        },
+        {
+          id: 'after-advisory',
+          label: 'After advisory',
+          severity: 'blocking',
+          status: 'passed',
+        },
+      ],
+      status: 'succeeded',
+    });
+    expect(advisoryCalls).toEqual(['advisory', 'after-advisory']);
+  });
+
+  it('revalidates source and destination after slow peer checks before moving', async () => {
+    const createFixture = async (
+      exampleId: string,
+      duringCheck: (context: {
+        localExample: string;
+        rootDirectory: string;
+      }) => Promise<void>,
+    ) => {
+      const rootDirectory = await createTemporaryDirectory();
+      const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+      await mkdir(localExample, { recursive: true });
+      await writeFile(
+        join(localExample, 'example.ts'),
+        'export const value = 1;\n',
+      );
+      const authoring = createCatalogAuthoring({
+        rootDirectory,
+        localExamplesPath: 'local/examples',
+        trackedExamplesPath: 'tracked/examples',
+        generatedPaths: [],
+        scaffold: () => [],
+        generate: () => [],
+        promotionChecks: [
+          {
+            id: 'slow-peer',
+            label: 'Slow peer',
+            run: async () => {
+              await duringCheck({ localExample, rootDirectory });
+              return { status: 'passed' as const };
+            },
+            severity: 'blocking',
+          },
+        ],
+      });
+      const preview = await authoring.previewPromote({
+        exampleId,
+        saveState: { durability: 'durable', status: 'saved' },
+      });
+      if (preview.status !== 'available')
+        throw new Error('preview unavailable');
+      return { authoring, localExample, preview, rootDirectory };
+    };
+
+    const edited = await createFixture(
+      'edited-during-check',
+      async ({ localExample }) => {
+        await writeFile(
+          join(localExample, 'example.ts'),
+          'export const value = 2;\n',
+        );
+      },
+    );
+    await expect(
+      edited.authoring.confirmPromote({
+        exampleId: 'edited-during-check',
+        revision: edited.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toMatchObject({
+      direction: 'promote',
+      reason: 'stale-preview',
+      status: 'refused',
+    });
+    await expect(
+      readFile(join(edited.localExample, 'example.ts'), 'utf8'),
+    ).resolves.toContain('value = 2');
+
+    const conflicted = await createFixture(
+      'created-during-check',
+      async ({ rootDirectory }) => {
+        await mkdir(
+          join(rootDirectory, 'tracked/examples/created-during-check'),
+          { recursive: true },
+        );
+      },
+    );
+    await expect(
+      conflicted.authoring.confirmPromote({
+        exampleId: 'created-during-check',
+        revision: conflicted.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toMatchObject({
+      direction: 'promote',
+      reason: 'destination-conflict',
+      status: 'refused',
+    });
+    await expect(access(conflicted.localExample)).resolves.toBeUndefined();
+  });
+
+  it('does not replace a destination created after the final promotion plan', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const exampleId = 'late-destination';
+    const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+    const destination = join(rootDirectory, `tracked/examples/${exampleId}`);
+    await mkdir(localExample, { recursive: true });
+    await writeFile(join(localExample, 'example.ts'), 'export {}\n');
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: async () => {
+        await mkdir(destination, { recursive: true });
+        return [];
+      },
+    });
+    const preview = await authoring.previewPromote({
+      exampleId,
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    if (preview.status !== 'available') throw new Error('preview unavailable');
+
+    await expect(
+      authoring.confirmPromote({
+        exampleId,
+        revision: preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toMatchObject({
+      direction: 'promote',
+      reason: 'destination-conflict',
+      status: 'refused',
+    });
+    await expect(access(localExample)).resolves.toBeUndefined();
+    await expect(readdir(destination)).resolves.toEqual([]);
+  });
+
+  it('reports truthful direction-neutral mutation lifecycle outcomes', async () => {
+    const createFixture = async ({
+      exampleId,
+      finalizePromotion,
+      generate,
+      generatedPaths = [],
+      promotionChecks,
+    }: {
+      exampleId: string;
+      finalizePromotion?: CatalogAuthoringAdapter['finalizePromotion'];
+      generate: CatalogAuthoringAdapter['generate'];
+      generatedPaths?: string[];
+      promotionChecks?: CatalogAuthoringAdapter['promotionChecks'];
+    }) => {
+      const rootDirectory = await createTemporaryDirectory();
+      const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+      await mkdir(localExample, { recursive: true });
+      await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+      const authoring = createCatalogAuthoring({
+        rootDirectory,
+        localExamplesPath: 'local/examples',
+        trackedExamplesPath: 'tracked/examples',
+        generatedPaths,
+        scaffold: () => [],
+        generate,
+        finalizePromotion,
+        promotionChecks,
+      });
+      const preview = await authoring.previewPromote({
+        exampleId,
+        saveState: { durability: 'durable', status: 'saved' },
+      });
+      if (preview.status !== 'available')
+        throw new Error('preview unavailable');
+      return { authoring, localExample, preview, rootDirectory };
+    };
+    let cleanGenerationCalls = 0;
+    const cleanRollback = await createFixture({
+      exampleId: 'clean-rollback',
+      generatedPaths: ['generated/catalog.json'],
+      generate: () => {
+        cleanGenerationCalls += 1;
+        if (cleanGenerationCalls === 1) {
+          return [{ content: 'after\n', path: 'generated/catalog.json' }];
+        }
+        throw new Error('generation failed after move');
+      },
+    });
+    await mkdir(join(cleanRollback.rootDirectory, 'generated'), {
+      recursive: true,
+    });
+    await writeFile(
+      join(cleanRollback.rootDirectory, 'generated/catalog.json'),
+      'before\n',
+    );
+    const refused = await createFixture({
+      exampleId: 'save-state-refusal',
+      generate: () => [],
+    });
+    await expect(
+      refused.authoring.confirmPromote({
+        exampleId: 'save-state-refusal',
+        revision: refused.preview.revision,
+        saveState: { status: 'dirty' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      reason: 'save-state-changed',
+      status: 'refused',
+    });
+    await expect(access(refused.localExample)).resolves.toBeUndefined();
+
+    await expect(
+      cleanRollback.authoring.confirmPromote({
+        exampleId: 'clean-rollback',
+        revision: cleanRollback.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      filesystem: 'restored',
+      reason: 'execution-failed',
+      recovery: 'rolled-back',
+      status: 'failed',
+    });
+    await expect(access(cleanRollback.localExample)).resolves.toBeUndefined();
+    await expect(
+      access(
+        join(cleanRollback.rootDirectory, 'tracked/examples/clean-rollback'),
+      ),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(
+      readFile(
+        join(cleanRollback.rootDirectory, 'generated/catalog.json'),
+        'utf8',
+      ),
+    ).resolves.toBe('before\n');
+
+    let incompleteRoot = '';
+    let incompleteGenerationCalls = 0;
+    const incomplete = await createFixture({
+      exampleId: 'incomplete-rollback',
+      generatedPaths: ['generated/catalog.json'],
+      generate: async () => {
+        incompleteGenerationCalls += 1;
+        if (incompleteGenerationCalls === 1) {
+          return [{ content: 'after\n', path: 'generated/catalog.json' }];
+        }
+        await rm(join(incompleteRoot, 'generated'), {
+          force: true,
+          recursive: true,
+        });
+        await symlink(
+          await createTemporaryDirectory(),
+          join(incompleteRoot, 'generated'),
+          'dir',
+        );
+        throw new Error('generation and rollback fail');
+      },
+    });
+    incompleteRoot = incomplete.rootDirectory;
+    await mkdir(join(incompleteRoot, 'generated'), { recursive: true });
+    await writeFile(join(incompleteRoot, 'generated/catalog.json'), 'before\n');
+    await expect(
+      incomplete.authoring.confirmPromote({
+        exampleId: 'incomplete-rollback',
+        revision: incomplete.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      filesystem: 'may-have-changed',
+      reason: 'recovery-incomplete',
+      recovery: 'incomplete',
+      status: 'failed',
+    });
+
+    let finalizedUnderLock = false;
+    const finalization = await createFixture({
+      exampleId: 'finalization-failure',
+      finalizePromotion: async () => {
+        finalizedUnderLock = await access(
+          join(finalization.rootDirectory, '.catalog.lock'),
+        )
+          .then(() => true)
+          .catch(() => false);
+        throw new Error('finalization failed');
+      },
+      generate: () => [],
+    });
+    await expect(
+      finalization.authoring.confirmPromote({
+        exampleId: 'finalization-failure',
+        revision: finalization.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      filesystem: 'changed',
+      reason: 'finalization-failed',
+      recovery: 'committed',
+      status: 'failed',
+    });
+    expect(finalizedUnderLock).toBe(true);
+    await expect(access(finalization.localExample)).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
+
+    const unknown = await createFixture({
+      exampleId: 'unknown-outcome',
+      generate: () => [],
+      promotionChecks: [
+        {
+          id: 'unknown',
+          label: 'Unknown outcome',
+          run: () => {
+            throw new Error('peer disappeared');
+          },
+          severity: 'blocking',
+        },
+      ],
+    });
+    await expect(
+      unknown.authoring.confirmPromote({
+        exampleId: 'unknown-outcome',
+        revision: unknown.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      detail: 'unknown: peer disappeared',
+      direction: 'promote',
+      reason: 'check-failed',
+      status: 'refused',
+    });
+
+    const policyRoot = await createTemporaryDirectory();
+    const policyExample = join(policyRoot, 'local/examples/policy-refusal');
+    await mkdir(policyExample, { recursive: true });
+    await writeFile(join(policyExample, 'example.ts'), 'export {};\n');
+    let policyCalls = 0;
+    const policy = createCatalogAuthoring({
+      rootDirectory: policyRoot,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+      validatePromotion: () => {
+        policyCalls += 1;
+        if (policyCalls > 1) throw new Error('repository policy rejected it');
+      },
+    });
+    const policyPreview = await policy.previewPromote({
+      exampleId: 'policy-refusal',
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    if (policyPreview.status !== 'available')
+      throw new Error('preview unavailable');
+    await expect(
+      policy.confirmPromote({
+        exampleId: 'policy-refusal',
+        revision: policyPreview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      detail: 'repository policy rejected it',
+      direction: 'promote',
+      reason: 'policy-rejected',
+      status: 'refused',
+    });
+
+    const durable = await createFixture({
+      exampleId: 'durable-success',
+      generate: () => [],
+    });
+    await expect(
+      durable.authoring.confirmPromote({
+        exampleId: 'durable-success',
+        revision: durable.preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toMatchObject({ commit: 'durable', status: 'succeeded' });
+    await mkdir(join(durable.rootDirectory, '.catalog.transaction-committed'), {
+      recursive: true,
+    });
+    await writeFile(
+      join(durable.rootDirectory, '.catalog.journal.json'),
+      `${JSON.stringify({
+        id: 'committed',
+        move: {
+          from: 'local/examples/durable-success',
+          marker: '.catalog-move-owner-committed',
+          to: 'tracked/examples/durable-success',
+        },
+        snapshots: [],
+        state: 'committed',
+        transactionPath: '.catalog.transaction-committed',
+      })}\n`,
+    );
+    await durable.authoring.verify();
+    await expect(access(durable.localExample)).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
+    await expect(
+      access(
+        join(
+          durable.rootDirectory,
+          'tracked/examples/durable-success/example.ts',
+        ),
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it.each(['unlink', 'rm'] as const)(
+    'retains committed recovery evidence when transaction %s cleanup fails',
+    async (failedOperation) => {
+      const rootDirectory = await createTemporaryDirectory();
+      const exampleId = `cleanup-${failedOperation}`;
+      const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+      await mkdir(localExample, { recursive: true });
+      await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+      let failOnce = true;
+      const authoring = createCatalogAuthoring({
+        rootDirectory,
+        localExamplesPath: 'local/examples',
+        trackedExamplesPath: 'tracked/examples',
+        generatedPaths: [],
+        scaffold: () => [],
+        generate: () => [],
+        transactionFilesystem: {
+          rm: async (path, options) => {
+            if (
+              failedOperation === 'rm' &&
+              failOnce &&
+              path.includes('.catalog.transaction-')
+            ) {
+              failOnce = false;
+              throw new Error('transaction rm failed');
+            }
+            await rm(path, options);
+          },
+          unlink: async (path) => {
+            if (
+              failedOperation === 'unlink' &&
+              failOnce &&
+              path.endsWith('.catalog.journal.json')
+            ) {
+              failOnce = false;
+              throw new Error('journal unlink failed');
+            }
+            await unlink(path);
+          },
+        },
+      });
+      const preview = await authoring.previewPromote({
+        exampleId,
+        saveState: { durability: 'durable', status: 'saved' },
+      });
+      if (preview.status !== 'available')
+        throw new Error('preview unavailable');
+
+      await expect(
+        authoring.confirmPromote({
+          exampleId,
+          revision: preview.revision,
+          saveState: { durability: 'durable', status: 'saved' },
+        }),
+      ).resolves.toMatchObject({
+        direction: 'promote',
+        filesystem: 'changed',
+        reason: 'committed-finalization-failed',
+        recovery: 'committed',
+        recoveryEvidence: {
+          journal: '.catalog.journal.json',
+          transaction: expect.stringMatching(/^\.catalog\.transaction-/),
+        },
+        status: 'failed',
+      });
+      await expect(access(localExample)).rejects.toMatchObject({
+        code: 'ENOENT',
+      });
+      await expect(
+        access(join(rootDirectory, '.catalog.journal.json')),
+      ).resolves.toBeUndefined();
+
+      await authoring.verify();
+      await expect(
+        access(join(rootDirectory, '.catalog.journal.json')),
+      ).rejects.toMatchObject({ code: 'ENOENT' });
+      await expect(
+        access(join(rootDirectory, `tracked/examples/${exampleId}/example.ts`)),
+      ).resolves.toBeUndefined();
+    },
+  );
+
+  it('reports outcome unknown when rollback loses the result of its move', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const exampleId = 'unknown-rollback';
+    const localExample = join(rootDirectory, `local/examples/${exampleId}`);
+    await mkdir(localExample, { recursive: true });
+    await writeFile(join(localExample, 'example.ts'), 'export {};\n');
+    let generationCalls = 0;
+    let loseRollbackResponse = true;
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => {
+        generationCalls += 1;
+        if (generationCalls === 2) throw new Error('fail after move');
+        return [];
+      },
+      transactionFilesystem: {
+        rename: async (from, to) => {
+          await rename(from, to);
+          if (
+            loseRollbackResponse &&
+            to.endsWith(`/local/examples/${exampleId}`)
+          ) {
+            loseRollbackResponse = false;
+            throw Object.assign(new Error('rollback response lost'), {
+              code: 'EIO',
+            });
+          }
+        },
+        rm,
+        unlink,
+      },
+    });
+    const preview = await authoring.previewPromote({
+      exampleId,
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+    if (preview.status !== 'available') throw new Error('preview unavailable');
+
+    await expect(
+      authoring.confirmPromote({
+        exampleId,
+        revision: preview.revision,
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toEqual({
+      direction: 'promote',
+      filesystem: 'unknown',
+      reason: 'outcome-unknown',
+      recovery: 'unknown',
+      status: 'failed',
+    });
+    await expect(
+      access(join(rootDirectory, '.catalog.journal.json')),
+    ).resolves.toBeUndefined();
+    await authoring.verify();
+    await expect(readdir(localExample)).resolves.toEqual(['example.ts']);
+    await expect(
+      access(join(rootDirectory, '.catalog.journal.json')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
   it('runs one configured example through scaffold, generation, dry-run promotion, and verification', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const listExampleIds = async (path: string) =>
@@ -1055,6 +2327,139 @@ try {
     ).rejects.toMatchObject({ code: 'ENOENT' });
   });
 
+  it('refuses a journal move marker that can escape its destination', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const victim = join(rootDirectory, 'victim');
+    await writeFile(victim, 'keep me\n');
+    await mkdir(join(rootDirectory, 'tracked/examples/hostile-marker'), {
+      recursive: true,
+    });
+    await mkdir(join(rootDirectory, '.catalog.transaction-hostile'), {
+      recursive: true,
+    });
+    await writeFile(
+      join(rootDirectory, '.catalog.journal.json'),
+      `${JSON.stringify({
+        id: 'hostile',
+        move: {
+          from: 'local/examples/hostile-marker',
+          marker: '../../../victim',
+          to: 'tracked/examples/hostile-marker',
+        },
+        snapshots: [],
+        state: 'pending',
+        transactionPath: '.catalog.transaction-hostile',
+      })}\n`,
+    );
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(authoring.verify()).rejects.toThrow(
+      'Catalog transaction journal is invalid',
+    );
+    await expect(readFile(victim, 'utf8')).resolves.toBe('keep me\n');
+    await expect(
+      access(join(rootDirectory, '.catalog.journal.json')),
+    ).resolves.toBeUndefined();
+  });
+
+  it('refuses a move journal without its exact owner marker', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    await mkdir(join(rootDirectory, '.catalog.transaction-markerless'), {
+      recursive: true,
+    });
+    await writeFile(
+      join(rootDirectory, '.catalog.journal.json'),
+      `${JSON.stringify({
+        id: 'markerless',
+        move: {
+          from: 'local/examples/markerless',
+          to: 'tracked/examples/markerless',
+        },
+        snapshots: [],
+        state: 'pending',
+        transactionPath: '.catalog.transaction-markerless',
+      })}\n`,
+    );
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(authoring.verify()).rejects.toThrow(
+      'Catalog transaction journal is invalid',
+    );
+    await expect(
+      access(join(rootDirectory, '.catalog.journal.json')),
+    ).resolves.toBeUndefined();
+  });
+
+  it('preserves ambiguous recovery evidence when a crash precedes the owner marker', async () => {
+    const rootDirectory = await createTemporaryDirectory();
+    const source = join(rootDirectory, 'local/examples/unowned-destination');
+    const destination = join(
+      rootDirectory,
+      'tracked/examples/unowned-destination',
+    );
+    const transaction = join(rootDirectory, '.catalog.transaction-unowned');
+    await mkdir(source, { recursive: true });
+    await writeFile(join(source, 'example.ts'), 'export {};\n');
+    await mkdir(destination, { recursive: true });
+    await mkdir(transaction, { recursive: true });
+    await writeFile(
+      join(rootDirectory, '.catalog.journal.json'),
+      `${JSON.stringify({
+        id: 'unowned',
+        move: {
+          from: 'local/examples/unowned-destination',
+          marker: '.catalog-move-owner-unowned',
+          to: 'tracked/examples/unowned-destination',
+        },
+        snapshots: [],
+        state: 'pending',
+        transactionPath: '.catalog.transaction-unowned',
+      })}\n`,
+    );
+    const authoring = createCatalogAuthoring({
+      rootDirectory,
+      localExamplesPath: 'local/examples',
+      trackedExamplesPath: 'tracked/examples',
+      generatedPaths: [],
+      scaffold: () => [],
+      generate: () => [],
+    });
+
+    await expect(
+      authoring.confirmPromote({
+        exampleId: 'unowned-destination',
+        revision: 'preview-revision',
+        saveState: { durability: 'durable', status: 'saved' },
+      }),
+    ).resolves.toMatchObject({
+      direction: 'promote',
+      filesystem: 'may-have-changed',
+      reason: 'recovery-incomplete',
+      recovery: 'incomplete',
+      status: 'failed',
+    });
+    await expect(access(source)).resolves.toBeUndefined();
+    await expect(access(destination)).resolves.toBeUndefined();
+    await expect(access(transaction)).resolves.toBeUndefined();
+    await expect(
+      access(join(rootDirectory, '.catalog.journal.json')),
+    ).resolves.toBeUndefined();
+  });
+
   it('rejects a symlink or special file inside an authored example', async () => {
     const rootDirectory = await createTemporaryDirectory();
     const externalDirectory = await createTemporaryDirectory();
@@ -1191,7 +2596,7 @@ try {
   });
 
   it('rejects removed CLI aliases', async () => {
-    const authoring: ReturnType<typeof createCatalogAuthoring> = {
+    const authoring: Parameters<typeof runCatalogCli>[0]['authoring'] = {
       demote: async () => ({
         changedPaths: [],
         moved: { from: '', to: '' },
@@ -1233,7 +2638,7 @@ try {
         { kind: 'verify' as const },
       ],
     };
-    const authoring: ReturnType<typeof createCatalogAuthoring> = {
+    const authoring: Parameters<typeof runCatalogCli>[0]['authoring'] = {
       demote: async () => {
         calls.push('demote');
         return { changedPaths: [], moved: { from: '', to: '' } };
@@ -1265,9 +2670,55 @@ try {
     expect(output).toEqual([JSON.stringify(expectedPlan, null, 2)]);
   });
 
+  it('dispatches promotion dry-run to planPromote without mutating or changing its JSON', async () => {
+    const calls: string[] = [];
+    const output: string[] = [];
+    const expectedPlan = {
+      operations: [
+        {
+          from: 'local/examples/cli-example',
+          kind: 'move-directory' as const,
+          to: 'tracked/examples/cli-example',
+        },
+        { kind: 'generate' as const },
+        { kind: 'verify' as const },
+      ],
+    };
+    const authoring: Parameters<typeof runCatalogCli>[0]['authoring'] = {
+      demote: async () => ({
+        changedPaths: [],
+        moved: { from: '', to: '' },
+      }),
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async () => ({ operations: [] }),
+      planPromote: async (exampleId) => {
+        calls.push(`plan:${exampleId}`);
+        return expectedPlan;
+      },
+      promote: async () => {
+        calls.push('promote');
+        return { changedPaths: [], moved: { from: '', to: '' } };
+      },
+    };
+
+    await runCatalogCli({
+      authoring,
+      argv: ['promote', 'cli-example', '--dry-run'],
+      io: {
+        writeError: () => undefined,
+        writeOutput: (message) => output.push(message),
+      },
+    });
+
+    expect(calls).toEqual(['plan:cli-example']);
+    expect(output).toEqual([JSON.stringify(expectedPlan, null, 2)]);
+  });
+
   it('reports promotion as a concise shared-catalog handoff', async () => {
     const output: string[] = [];
-    const authoring: ReturnType<typeof createCatalogAuthoring> = {
+    const authoring: Parameters<typeof runCatalogCli>[0]['authoring'] = {
       demote: async () => ({
         changedPaths: [],
         moved: { from: '', to: '' },
@@ -1312,7 +2763,7 @@ try {
   it('reports a demoted example as local and ignored by Git without calling it deleted', async () => {
     const calls: string[] = [];
     const output: string[] = [];
-    const authoring: ReturnType<typeof createCatalogAuthoring> = {
+    const authoring: Parameters<typeof runCatalogCli>[0]['authoring'] = {
       demote: async (exampleId) => {
         calls.push(`demote:${exampleId}`);
         return {

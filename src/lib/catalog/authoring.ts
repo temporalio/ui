@@ -1,8 +1,9 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import {
   access,
   chmod,
   copyFile,
+  cp,
   lstat,
   mkdir,
   open,
@@ -69,6 +70,149 @@ export type CatalogComposedExample = {
   workflowType?: string;
 };
 
+export type CatalogSavedState =
+  | { durability: 'durable'; status: 'saved' }
+  | { status: 'dirty' | 'failed' | 'stale' };
+
+export type CatalogMutationDirection = 'demote' | 'promote';
+
+export type CatalogMutationCheckResult = {
+  detail?: string;
+  id: string;
+  label: string;
+  severity: 'advisory' | 'blocking';
+  status: 'failed' | 'not-reached' | 'passed';
+};
+
+export type CatalogMutationMoveResult = {
+  changedPaths: string[];
+  moved: { from: string; to: string };
+};
+
+export type CatalogMutationOutcome<Result = CatalogMutationMoveResult> =
+  | {
+      checks?: CatalogMutationCheckResult[];
+      commit: 'durable';
+      direction: CatalogMutationDirection;
+      result: Result;
+      status: 'succeeded';
+    }
+  | {
+      checks?: CatalogMutationCheckResult[];
+      detail?: string;
+      direction: CatalogMutationDirection;
+      reason:
+        | 'catalog-busy'
+        | 'check-blocked'
+        | 'destination-conflict'
+        | 'check-failed'
+        | 'generation-failed'
+        | 'policy-rejected'
+        | 'recovery-refused'
+        | 'save-state-changed'
+        | 'source-invalid'
+        | 'stale-preview';
+      status: 'refused';
+    }
+  | {
+      direction: CatalogMutationDirection;
+      filesystem: 'changed' | 'may-have-changed' | 'restored' | 'unknown';
+      reason:
+        | 'committed-finalization-failed'
+        | 'execution-failed'
+        | 'finalization-failed'
+        | 'outcome-unknown'
+        | 'recovery-incomplete';
+      recovery: 'committed' | 'incomplete' | 'rolled-back' | 'unknown';
+      recoveryEvidence?: { journal: string; transaction: string };
+      status: 'failed';
+    };
+
+class CatalogMutationRefusalError extends Error {
+  constructor(
+    readonly reason: Extract<
+      CatalogMutationOutcome,
+      { status: 'refused' }
+    >['reason'],
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+class CatalogCommittedFinalizationError extends Error {
+  constructor(
+    readonly recoveryEvidence: { journal: string; transaction: string },
+    cause: unknown,
+  ) {
+    super('Committed catalog mutation cleanup failed', { cause });
+  }
+}
+
+const isIndeterminateFilesystemError = (error: unknown): boolean => {
+  if ((error as NodeJS.ErrnoException | undefined)?.code === 'EIO') return true;
+  return (
+    error instanceof AggregateError &&
+    error.errors.some(isIndeterminateFilesystemError)
+  );
+};
+
+export type CatalogMutationRevisionInput = {
+  destination: {
+    contentHash?: string;
+    entries?: readonly {
+      contentHash: string;
+      mode: number;
+      path: string;
+      type: 'directory' | 'file';
+    }[];
+    mode?: number;
+    path: string;
+    state: 'absent' | 'directory' | 'file';
+  };
+  source: readonly {
+    contentHash: string;
+    mode: number;
+    path: string;
+    type: 'directory' | 'file';
+  }[];
+  sourceRoot: { identity: string; mode: number; path: string };
+};
+
+export const createCatalogMutationRevision = ({
+  destination,
+  source,
+  sourceRoot,
+}: CatalogMutationRevisionInput) => {
+  const hash = createHash('sha256');
+  const append = (value: string) => {
+    hash.update(String(Buffer.byteLength(value)));
+    hash.update(':');
+    hash.update(value);
+  };
+  const appendEntries = (entries: CatalogMutationRevisionInput['source']) => {
+    for (const entry of [...entries].sort((left, right) =>
+      left.path < right.path ? -1 : left.path > right.path ? 1 : 0,
+    )) {
+      append(entry.path);
+      append(entry.type);
+      append(entry.mode.toString(8));
+      append(entry.contentHash);
+    }
+  };
+  append('catalog-mutation-revision-v2');
+  append(sourceRoot.path);
+  append(sourceRoot.identity);
+  append(sourceRoot.mode.toString(8));
+  append(destination.path);
+  append(destination.state);
+  append(destination.mode?.toString(8) ?? '');
+  append(destination.contentHash ?? '');
+  appendEntries(destination.entries ?? []);
+  appendEntries(source);
+  return hash.digest('hex');
+};
+
 export type CatalogAssemblyExample = CatalogComposedExample & {
   definitionImportPath: string;
   workflowExport?: string;
@@ -76,6 +220,38 @@ export type CatalogAssemblyExample = CatalogComposedExample & {
 };
 
 export type CatalogAuthoringAdapter = {
+  finalizePromotion?: (context: {
+    direction: 'promote';
+    exampleId: string;
+  }) => void | Promise<void>;
+  promotionChecks?: readonly {
+    id: string;
+    label: string;
+    run: (context: {
+      direction: 'promote';
+      exampleId: string;
+    }) =>
+      | { detail?: string; status: 'failed' | 'passed' }
+      | Promise<{ detail?: string; status: 'failed' | 'passed' }>;
+    severity: 'advisory' | 'blocking';
+  }[];
+  describePromotion?: (context: {
+    exampleId: string;
+    from: string;
+    to: string;
+  }) => {
+    authoredSource: string;
+    destination: { id: string; path: string };
+    generatedOutputs: readonly {
+      gitEffect: 'ignored-update' | 'tracked-update';
+      path: string;
+    }[];
+    gitEffects: {
+      destination: 'tracked-addition';
+      source: 'ignored-removal';
+    };
+    source: { id: string; path: string };
+  };
   generatedPaths: readonly string[];
   graph: CatalogAuthoringGraph;
   generate: () =>
@@ -97,6 +273,14 @@ export type CatalogAuthoringAdapter = {
     | readonly CatalogAuthoringArtifact[]
     | Promise<readonly CatalogAuthoringArtifact[]>;
   trackedExamplesPath: string;
+  transactionFilesystem?: {
+    rename?: (from: string, to: string) => Promise<void>;
+    rm: (
+      path: string,
+      options: { force: boolean; recursive: boolean },
+    ) => Promise<void>;
+    unlink: (path: string) => Promise<void>;
+  };
   validatePromotion?: (context: { exampleId: string }) => void | Promise<void>;
   verify?: (context: {
     exampleIds: { local: string[]; tracked: string[] };
@@ -135,8 +319,9 @@ type FileSnapshot = {
 
 type TransactionJournal = {
   id: string;
-  move?: { from: string; to: string };
+  move?: { from: string; marker?: string; to: string };
   snapshots: FileSnapshot[];
+  state: 'committed' | 'pending';
   transactionPath: string;
 };
 
@@ -572,11 +757,38 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
     }
   };
   const journalRelativePath = '.catalog.journal.json';
+  const transactionFilesystem = adapter.transactionFilesystem ?? {
+    rename,
+    rm,
+    unlink,
+  };
+  const recoveryRename = transactionFilesystem.rename ?? rename;
+  const cleanupRecoveryEvidence = async (transactionPath: string) => {
+    await transactionFilesystem.rm(await safeAbsolutePath(transactionPath), {
+      force: true,
+      recursive: true,
+    });
+    await transactionFilesystem.unlink(
+      await safeAbsolutePath(journalRelativePath),
+    );
+  };
   const writeJournal = async (journal: TransactionJournal) => {
     const temporaryPath = `.catalog.journal.${journal.id}.tmp`;
     await writeFile(
       await safeAbsolutePath(temporaryPath),
       `${JSON.stringify(journal, null, 2)}\n`,
+      { flag: 'wx' },
+    );
+    await rename(
+      await safeAbsolutePath(temporaryPath),
+      await safeAbsolutePath(journalRelativePath),
+    );
+  };
+  const markJournalCommitted = async (journal: TransactionJournal) => {
+    const temporaryPath = `.catalog.journal.${journal.id}.committed.tmp`;
+    await writeFile(
+      await safeAbsolutePath(temporaryPath),
+      `${JSON.stringify({ ...journal, state: 'committed' }, null, 2)}\n`,
       { flag: 'wx' },
     );
     await rename(
@@ -594,36 +806,68 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
     if (!metadata.isFile() || metadata.isSymbolicLink()) {
       throw new Error('Catalog transaction journal must be a regular file');
     }
-    const journal = JSON.parse(
-      await readFile(path, 'utf8'),
-    ) as TransactionJournal;
+    const journal = JSON.parse(await readFile(path, 'utf8')) as Omit<
+      TransactionJournal,
+      'state'
+    > & {
+      state?: TransactionJournal['state'];
+    };
     if (
       !journal ||
       typeof journal.id !== 'string' ||
       journal.transactionPath !== `.catalog.transaction-${journal.id}` ||
-      !Array.isArray(journal.snapshots)
+      !Array.isArray(journal.snapshots) ||
+      (journal.state !== undefined &&
+        !['committed', 'pending'].includes(journal.state))
     ) {
       throw new Error('Catalog transaction journal is invalid');
     }
-    assertExplicitRelativePath(journal.transactionPath);
-    for (const snapshot of journal.snapshots) {
-      assertExplicitRelativePath(snapshot.path);
-      if (
-        snapshot.backupPath &&
-        !snapshot.backupPath.startsWith(`${journal.transactionPath}/backups/`)
-      ) {
-        throw new Error('Catalog transaction journal is invalid');
+    try {
+      assertExplicitRelativePath(journal.transactionPath);
+      for (const snapshot of journal.snapshots) {
+        if (
+          !snapshot ||
+          typeof snapshot !== 'object' ||
+          typeof snapshot.existed !== 'boolean' ||
+          typeof snapshot.path !== 'string' ||
+          (snapshot.mode !== undefined && typeof snapshot.mode !== 'number') ||
+          (snapshot.backupPath !== undefined &&
+            typeof snapshot.backupPath !== 'string')
+        ) {
+          throw new Error('invalid snapshot');
+        }
+        assertExplicitRelativePath(snapshot.path);
+        if (
+          snapshot.backupPath &&
+          !snapshot.backupPath.startsWith(`${journal.transactionPath}/backups/`)
+        ) {
+          throw new Error('invalid backup');
+        }
       }
+      if (journal.move) {
+        if (
+          typeof journal.move !== 'object' ||
+          typeof journal.move.from !== 'string' ||
+          typeof journal.move.to !== 'string' ||
+          journal.move.marker !== `.catalog-move-owner-${journal.id}`
+        ) {
+          throw new Error('invalid move');
+        }
+        assertExplicitRelativePath(journal.move.from);
+        assertExplicitRelativePath(journal.move.to);
+      }
+    } catch {
+      throw new Error('Catalog transaction journal is invalid');
     }
-    if (journal.move) {
-      assertExplicitRelativePath(journal.move.from);
-      assertExplicitRelativePath(journal.move.to);
-    }
-    return journal;
+    return { ...journal, state: journal.state ?? 'pending' };
   };
   const recoverJournal = async () => {
     const journal = await readJournal();
     if (!journal) return;
+    if (journal.state === 'committed') {
+      await cleanupRecoveryEvidence(journal.transactionPath);
+      return;
+    }
     const rollbackErrors: unknown[] = [];
     try {
       await restoreFiles(journal.snapshots);
@@ -637,10 +881,35 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
         pathExists(sourcePath),
         pathExists(destinationPath),
       ]);
-      if (!sourceExists && destinationExists) {
+      const markerPath = journal.move.marker
+        ? join(destinationPath, journal.move.marker)
+        : undefined;
+      const ownsDestination = markerPath
+        ? await readFile(markerPath, 'utf8')
+            .then((owner) => owner.trim() === journal.id)
+            .catch(() => false)
+        : false;
+      if (sourceExists && destinationExists && ownsDestination) {
+        try {
+          await rm(destinationPath, { force: true, recursive: true });
+        } catch (error) {
+          rollbackErrors.push(error);
+        }
+      } else if (sourceExists && destinationExists) {
+        rollbackErrors.push(
+          new Error(
+            'Catalog move recovery cannot establish destination ownership',
+          ),
+        );
+      } else if (!sourceExists && destinationExists) {
         try {
           await ensureSafeParent(journal.move.from);
-          await rename(destinationPath, sourcePath);
+          await recoveryRename(destinationPath, sourcePath);
+          if (journal.move.marker) {
+            await unlink(join(sourcePath, journal.move.marker)).catch(
+              () => undefined,
+            );
+          }
         } catch (error) {
           rollbackErrors.push(error);
         }
@@ -652,28 +921,29 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
         'Catalog crash recovery was incomplete',
       );
     }
-    await unlink(await safeAbsolutePath(journalRelativePath));
-    await rm(await safeAbsolutePath(journal.transactionPath), {
-      force: true,
-      recursive: true,
-    });
+    await cleanupRecoveryEvidence(journal.transactionPath);
   };
   const withJournaledFiles = async <Result>(
     paths: readonly string[],
-    action: (transactionPath: string) => Promise<Result>,
+    action: (transactionPath: string, transactionId: string) => Promise<Result>,
     move?: { from: string; to: string },
   ) => {
     const id = randomUUID();
     const transactionPath = `.catalog.transaction-${id}`;
     await ensureSafeDirectory(transactionPath);
     const snapshots = await snapshotFiles(paths, transactionPath);
-    const journal = { id, move, snapshots, transactionPath };
+    const journal: TransactionJournal = {
+      id,
+      move: move ? { ...move, marker: `.catalog-move-owner-${id}` } : undefined,
+      snapshots,
+      state: 'pending',
+      transactionPath,
+    };
     await writeJournal(journal);
-    let cleanupRecoveryData = false;
+    let result: Result;
     try {
-      const result = await action(transactionPath);
-      cleanupRecoveryData = true;
-      return result;
+      result = await action(transactionPath, id);
+      await markJournalCommitted(journal);
     } catch (error) {
       try {
         await restoreFiles(snapshots);
@@ -685,10 +955,15 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
             (await pathExists(destinationPath))
           ) {
             await ensureSafeParent(move.from);
-            await rename(destinationPath, sourcePath);
+            await recoveryRename(destinationPath, sourcePath);
+            if (journal.move?.marker) {
+              await unlink(join(sourcePath, journal.move.marker)).catch(
+                () => undefined,
+              );
+            }
           }
         }
-        cleanupRecoveryData = true;
+        await cleanupRecoveryEvidence(transactionPath);
       } catch (rollbackError) {
         throw new AggregateError(
           [error, rollbackError],
@@ -696,17 +971,16 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
         );
       }
       throw error;
-    } finally {
-      if (cleanupRecoveryData) {
-        await unlink(await safeAbsolutePath(journalRelativePath)).catch(
-          () => undefined,
-        );
-        await rm(await safeAbsolutePath(transactionPath), {
-          force: true,
-          recursive: true,
-        }).catch(() => undefined);
-      }
     }
+    try {
+      await cleanupRecoveryEvidence(transactionPath);
+    } catch (error) {
+      throw new CatalogCommittedFinalizationError(
+        { journal: journalRelativePath, transaction: transactionPath },
+        error,
+      );
+    }
+    return result;
   };
   const generateUnlocked = async (transactionPath: string) => {
     const artifacts = await renderGeneratedArtifacts();
@@ -1062,21 +1336,50 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
     }
   };
   const planPromote = async (exampleId: string) => {
-    const { from, sourcePath, to } = await planDirectoryMove({
-      destinationKind: 'Promotion',
-      exampleId,
-      fromRoot: adapter.localExamplesPath,
-      sourceKind: 'Local',
-      toRoot: adapter.trackedExamplesPath,
-    });
-    await validateSelfContainedExample({
-      absoluteImportError: (filePath) =>
-        `${filePath} imports cannot use absolute paths or file URLs`,
-      relativeImportError: (filePath) =>
-        `${filePath} relative imports must stay within its example directory`,
-      sourcePath,
-    });
-    await adapter.validatePromotion?.({ exampleId });
+    let move: Awaited<ReturnType<typeof planDirectoryMove>>;
+    try {
+      move = await planDirectoryMove({
+        destinationKind: 'Promotion',
+        exampleId,
+        fromRoot: adapter.localExamplesPath,
+        sourceKind: 'Local',
+        toRoot: adapter.trackedExamplesPath,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      if (message.startsWith('Promotion destination already exists:')) {
+        throw error;
+      }
+      throw new CatalogMutationRefusalError(
+        'source-invalid',
+        message || 'Source validation failed',
+      );
+    }
+    const { from, sourcePath, to } = move;
+    try {
+      await validateSelfContainedExample({
+        absoluteImportError: (filePath) =>
+          `${filePath} imports cannot use absolute paths or file URLs`,
+        relativeImportError: (filePath) =>
+          `${filePath} relative imports must stay within its example directory`,
+        sourcePath,
+      });
+    } catch (error) {
+      throw new CatalogMutationRefusalError(
+        'source-invalid',
+        error instanceof Error ? error.message : 'Source validation failed',
+      );
+    }
+    try {
+      await adapter.validatePromotion?.({ exampleId });
+    } catch (error) {
+      throw new CatalogMutationRefusalError(
+        'policy-rejected',
+        error instanceof Error
+          ? error.message
+          : 'Repository policy rejected it',
+      );
+    }
     return {
       operations: [
         { from, kind: 'move-directory' as const, to },
@@ -1108,6 +1411,90 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
       ],
     };
   };
+  const promotionRevision = async (move: { from: string; to: string }) => {
+    const sourceRoot = await safeAbsolutePath(move.from);
+    const collectTree = async (
+      directory: string,
+      relativeDirectory = '',
+    ): Promise<CatalogMutationRevisionInput['source'][number][]> => {
+      const entries = await readdir(directory, { withFileTypes: true });
+      const records: CatalogMutationRevisionInput['source'][number][] = [];
+      for (const entry of entries.sort((left, right) =>
+        left.name < right.name ? -1 : left.name > right.name ? 1 : 0,
+      )) {
+        const path = join(directory, entry.name);
+        const relativePath = relativeDirectory
+          ? `${relativeDirectory}/${entry.name}`
+          : entry.name;
+        const metadata = await lstat(path);
+        if (metadata.isSymbolicLink()) {
+          throw new Error(
+            `Catalog example sources must be regular files: ${relativePath}`,
+          );
+        }
+        if (metadata.isDirectory()) {
+          records.push({
+            contentHash: '',
+            mode: metadata.mode & 0o7777,
+            path: relativePath,
+            type: 'directory',
+          });
+          records.push(...(await collectTree(path, relativePath)));
+          continue;
+        }
+        if (!metadata.isFile()) {
+          throw new Error(
+            `Catalog example sources must be regular files: ${relativePath}`,
+          );
+        }
+        records.push({
+          contentHash: createHash('sha256')
+            .update(await readFile(path))
+            .digest('hex'),
+          mode: metadata.mode & 0o7777,
+          path: relativePath,
+          type: 'file',
+        });
+      }
+      return records;
+    };
+    const sourceRootMetadata = await lstat(sourceRoot);
+    const destinationPath = await safeAbsolutePath(move.to);
+    const destinationMetadata = await lstat(destinationPath).catch((error) => {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
+      throw error;
+    });
+    return createCatalogMutationRevision({
+      destination: {
+        ...(destinationMetadata
+          ? {
+              mode: destinationMetadata.mode & 0o7777,
+              ...(destinationMetadata.isDirectory()
+                ? { entries: await collectTree(destinationPath) }
+                : destinationMetadata.isFile()
+                  ? {
+                      contentHash: createHash('sha256')
+                        .update(await readFile(destinationPath))
+                        .digest('hex'),
+                    }
+                  : {}),
+            }
+          : {}),
+        path: destinationPath,
+        state: destinationMetadata
+          ? destinationMetadata.isDirectory()
+            ? 'directory'
+            : 'file'
+          : 'absent',
+      },
+      source: await collectTree(sourceRoot),
+      sourceRoot: {
+        identity: `${sourceRootMetadata.dev}:${sourceRootMetadata.ino}`,
+        mode: sourceRootMetadata.mode & 0o7777,
+        path: sourceRoot,
+      },
+    });
+  };
   const executePlannedMove = async (
     plan: Awaited<ReturnType<typeof planDemote>>,
     operation: string,
@@ -1118,11 +1505,53 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
     }
     return withJournaledFiles(
       adapter.generatedPaths,
-      async (transactionPath) => {
+      async (transactionPath, transactionId) => {
         const sourcePath = await safeAbsolutePath(move.from);
         const destinationPath = await safeAbsolutePath(move.to);
         await ensureSafeParent(move.to);
-        await rename(sourcePath, destinationPath);
+        if (operation === 'Promotion') {
+          const marker = `.catalog-move-owner-${transactionId}`;
+          try {
+            await mkdir(destinationPath);
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code === 'EEXIST') {
+              throw new Error(
+                `Promotion destination already exists: ${move.to}`,
+              );
+            }
+            throw error;
+          }
+          let sourceMoved = false;
+          try {
+            await writeFile(join(destinationPath, marker), transactionId, {
+              flag: 'wx',
+            });
+            const sourceMetadata = await lstat(sourcePath);
+            for (const entry of await readdir(sourcePath)) {
+              await cp(join(sourcePath, entry), join(destinationPath, entry), {
+                errorOnExist: true,
+                force: false,
+                preserveTimestamps: true,
+                recursive: true,
+              });
+            }
+            await chmod(destinationPath, sourceMetadata.mode & 0o7777);
+            const stagedSource = await safeAbsolutePath(
+              `${transactionPath}/promoted-source`,
+            );
+            await rename(sourcePath, stagedSource);
+            sourceMoved = true;
+            await rm(stagedSource, { force: true, recursive: true });
+            await unlink(join(destinationPath, marker));
+          } catch (error) {
+            if (!sourceMoved) {
+              await rm(destinationPath, { force: true, recursive: true });
+            }
+            throw error;
+          }
+        } else {
+          await rename(sourcePath, destinationPath);
+        }
         await generateUnlocked(transactionPath);
         await verifyUnlocked();
         return {
@@ -1132,6 +1561,58 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
       },
       move,
     );
+  };
+
+  const previewPromote = async ({
+    exampleId,
+    saveState,
+  }: {
+    exampleId: string;
+    saveState: CatalogSavedState;
+  }) => {
+    assertExampleId(exampleId);
+    if (saveState.status !== 'saved') {
+      const reasons = {
+        dirty: 'unsaved-changes',
+        failed: 'save-failed',
+        stale: 'saved-revision-stale',
+      } as const;
+      return {
+        reason: reasons[saveState.status],
+        status: 'unavailable' as const,
+      };
+    }
+    if (!adapter.describePromotion) {
+      return {
+        reason: 'preview-not-supported' as const,
+        status: 'unavailable' as const,
+      };
+    }
+    const plan = await planPromote(exampleId);
+    const move = plan.operations[0];
+    if (!move || move.kind !== 'move-directory') {
+      throw new Error('Promotion plan has no directory move');
+    }
+    return {
+      ...adapter.describePromotion({
+        exampleId,
+        from: move.from,
+        to: move.to,
+      }),
+      exampleId,
+      ...(adapter.promotionChecks?.length
+        ? {
+            checks: adapter.promotionChecks.map(({ id, label, severity }) => ({
+              id,
+              label,
+              severity,
+              status: 'pending' as const,
+            })),
+          }
+        : {}),
+      revision: await promotionRevision(move),
+      status: 'available' as const,
+    };
   };
 
   return {
@@ -1180,6 +1661,7 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
     verify: () => withLock(verifyUnlocked),
     planDemote,
     planPromote,
+    previewPromote,
     promote: async (exampleId: string) => {
       assertExampleId(exampleId);
       return withLock(() =>
@@ -1187,6 +1669,232 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
           executePlannedMove(plan, 'Promotion'),
         ),
       );
+    },
+    confirmPromote: async ({
+      exampleId,
+      revision,
+      saveState,
+    }: {
+      exampleId: string;
+      revision: string;
+      saveState: CatalogSavedState;
+    }): Promise<CatalogMutationOutcome> => {
+      assertExampleId(exampleId);
+      if (saveState.status !== 'saved' || saveState.durability !== 'durable') {
+        return {
+          direction: 'promote' as const,
+          reason: 'save-state-changed' as const,
+          status: 'refused' as const,
+        };
+      }
+      let confirmation:
+        | {
+            checks: CatalogMutationCheckResult[];
+            kind: 'blocked';
+          }
+        | {
+            checks: CatalogMutationCheckResult[];
+            kind: 'finalization-failed';
+          }
+        | {
+            checks: CatalogMutationCheckResult[];
+            kind: 'moved';
+            result: Awaited<ReturnType<typeof executePlannedMove>>;
+          }
+        | undefined;
+      let mutationStarted = false;
+      try {
+        confirmation = await withLock(async () => {
+          const plan = await planPromote(exampleId);
+          const move = plan.operations[0];
+          if (!move || move.kind !== 'move-directory') {
+            throw new Error('Promotion plan has no directory move');
+          }
+          if ((await promotionRevision(move)) !== revision) {
+            return undefined;
+          }
+          const checks: NonNullable<typeof confirmation>['checks'] = [];
+          const declaredChecks = adapter.promotionChecks ?? [];
+          for (const [index, check] of declaredChecks.entries()) {
+            let outcome: Awaited<ReturnType<typeof check.run>>;
+            try {
+              outcome = await check.run({
+                direction: 'promote',
+                exampleId,
+              });
+            } catch (error) {
+              throw new CatalogMutationRefusalError(
+                'check-failed',
+                `${check.id}: ${error instanceof Error ? error.message : 'check failed'}`,
+              );
+            }
+            checks.push({
+              ...outcome,
+              id: check.id,
+              label: check.label,
+              severity: check.severity,
+            });
+            if (outcome.status === 'failed' && check.severity === 'blocking') {
+              checks.push(
+                ...declaredChecks
+                  .slice(index + 1)
+                  .map(({ id, label, severity }) => ({
+                    id,
+                    label,
+                    severity,
+                    status: 'not-reached' as const,
+                  })),
+              );
+              return { checks, kind: 'blocked' as const };
+            }
+          }
+          try {
+            await renderGeneratedArtifacts();
+          } catch (error) {
+            throw new CatalogMutationRefusalError(
+              'generation-failed',
+              error instanceof Error ? error.message : 'Generation failed',
+            );
+          }
+          const currentPlan = await planPromote(exampleId);
+          const currentMove = currentPlan.operations[0];
+          if (!currentMove || currentMove.kind !== 'move-directory') {
+            throw new Error('Promotion plan has no directory move');
+          }
+          if (await pathExists(await safeAbsolutePath(currentMove.to))) {
+            throw new Error(
+              `Promotion destination already exists: ${currentMove.to}`,
+            );
+          }
+          if ((await promotionRevision(currentMove)) !== revision) {
+            return undefined;
+          }
+          mutationStarted = true;
+          const result = await executePlannedMove(currentPlan, 'Promotion');
+          try {
+            await adapter.finalizePromotion?.({
+              direction: 'promote',
+              exampleId,
+            });
+          } catch {
+            return { checks, kind: 'finalization-failed' as const };
+          }
+          return { checks, kind: 'moved' as const, result };
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '';
+        if (error instanceof CatalogCommittedFinalizationError) {
+          return {
+            direction: 'promote' as const,
+            filesystem: 'changed' as const,
+            reason: 'committed-finalization-failed' as const,
+            recovery: 'committed' as const,
+            recoveryEvidence: error.recoveryEvidence,
+            status: 'failed' as const,
+          };
+        }
+        if (error instanceof CatalogMutationRefusalError) {
+          return {
+            detail: message.replaceAll(await rootDirectory, '<repository>'),
+            direction: 'promote' as const,
+            reason: error.reason,
+            status: 'refused' as const,
+          };
+        }
+        const fileError = error as NodeJS.ErrnoException & { dest?: string };
+        const reason = message.startsWith(
+          'Promotion destination already exists:',
+        )
+          ? 'destination-conflict'
+          : message === 'Another catalog mutation is already in progress'
+            ? 'catalog-busy'
+            : message.includes('recovery lock') ||
+                (fileError.code === 'ENOTDIR' &&
+                  `${fileError.path ?? ''}${fileError.dest ?? ''}`.includes(
+                    '.catalog.lock.recovery',
+                  ))
+              ? 'recovery-refused'
+              : undefined;
+        if (reason) {
+          return {
+            direction: 'promote' as const,
+            reason,
+            status: 'refused' as const,
+          };
+        }
+        if (message === 'Catalog crash recovery was incomplete') {
+          return {
+            direction: 'promote' as const,
+            filesystem: 'may-have-changed' as const,
+            reason: 'recovery-incomplete' as const,
+            recovery: 'incomplete' as const,
+            status: 'failed' as const,
+          };
+        }
+        if (mutationStarted) {
+          if (isIndeterminateFilesystemError(error)) {
+            return {
+              direction: 'promote' as const,
+              filesystem: 'unknown' as const,
+              reason: 'outcome-unknown' as const,
+              recovery: 'unknown' as const,
+              status: 'failed' as const,
+            };
+          }
+          const recoveryIncomplete = message.includes(
+            'rollback was incomplete',
+          );
+          return {
+            direction: 'promote' as const,
+            filesystem: recoveryIncomplete ? 'may-have-changed' : 'restored',
+            reason: recoveryIncomplete
+              ? ('recovery-incomplete' as const)
+              : ('execution-failed' as const),
+            recovery: recoveryIncomplete
+              ? ('incomplete' as const)
+              : ('rolled-back' as const),
+            status: 'failed' as const,
+          };
+        }
+        return {
+          direction: 'promote' as const,
+          filesystem: 'unknown' as const,
+          reason: 'outcome-unknown' as const,
+          recovery: 'unknown' as const,
+          status: 'failed' as const,
+        };
+      }
+      if (!confirmation) {
+        return {
+          direction: 'promote' as const,
+          reason: 'stale-preview' as const,
+          status: 'refused' as const,
+        };
+      }
+      if (confirmation.kind === 'blocked') {
+        return {
+          checks: confirmation.checks,
+          direction: 'promote' as const,
+          reason: 'check-blocked' as const,
+          status: 'refused' as const,
+        };
+      }
+      if (confirmation.kind === 'finalization-failed') {
+        return {
+          direction: 'promote' as const,
+          filesystem: 'changed' as const,
+          reason: 'finalization-failed' as const,
+          recovery: 'committed' as const,
+          status: 'failed' as const,
+        };
+      }
+      return {
+        ...(confirmation.checks.length ? { checks: confirmation.checks } : {}),
+        direction: 'promote' as const,
+        commit: 'durable' as const,
+        result: confirmation.result,
+        status: 'succeeded' as const,
+      };
     },
   };
 };
@@ -1234,7 +1942,16 @@ export const runCatalogCli = async ({
   dev,
   worker,
 }: {
-  authoring: ReturnType<typeof createCatalogAuthoring>;
+  authoring: Pick<
+    ReturnType<typeof createCatalogAuthoring>,
+    | 'demote'
+    | 'generate'
+    | 'planDemote'
+    | 'planPromote'
+    | 'promote'
+    | 'scaffold'
+    | 'verify'
+  >;
   argv: readonly string[];
   io: {
     writeError: (message: string) => void;

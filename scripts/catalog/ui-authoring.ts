@@ -124,6 +124,21 @@ export const createUiCatalogAuthoring = (rootDirectory = getProjectRoot()) => {
       ],
     },
     rootDirectory,
+    describePromotion: ({ from, to }) => ({
+      authoredSource: from,
+      destination: { id: 'oss', path: to },
+      generatedOutputs: uiCatalogGeneratedPaths.map((path) => ({
+        gitEffect: path.startsWith('catalog.local/')
+          ? ('ignored-update' as const)
+          : ('tracked-update' as const),
+        path,
+      })),
+      gitEffects: {
+        destination: 'tracked-addition',
+        source: 'ignored-removal',
+      },
+      source: { id: 'local', path: from },
+    }),
     parseModuleSpecifiers: parseCatalogTypeScriptModuleSpecifiers,
     localExamplesPath: 'catalog.local/examples',
     trackedExamplesPath: 'src/lib/catalog/worker/examples',

@@ -69,6 +69,84 @@ afterEach(async () => {
 });
 
 describe('UI catalog authoring adapter', () => {
+  it('previews the exact repository effects without mutating or reserving the example', async () => {
+    const rootDirectory = await createIsolatedCatalogRoot();
+    const authoring = createUiCatalogAuthoring(rootDirectory);
+    await authoring.scaffold('preview-effects');
+
+    const preview = await authoring.previewPromote({
+      exampleId: 'preview-effects',
+      saveState: { durability: 'durable', status: 'saved' },
+    });
+
+    expect(preview).toEqual({
+      authoredSource: 'catalog.local/examples/preview-effects',
+      destination: {
+        id: 'oss',
+        path: 'src/lib/catalog/worker/examples/preview-effects',
+      },
+      exampleId: 'preview-effects',
+      generatedOutputs: [
+        { gitEffect: 'ignored-update', path: 'catalog.local/registration.ts' },
+        { gitEffect: 'ignored-update', path: 'catalog.local/workflows.ts' },
+        {
+          gitEffect: 'ignored-update',
+          path: 'catalog.local/catalog.generated.json',
+        },
+        {
+          gitEffect: 'tracked-update',
+          path: 'src/lib/catalog/worker/examples/index.ts',
+        },
+        {
+          gitEffect: 'tracked-update',
+          path: 'src/lib/catalog/worker/workflows.ts',
+        },
+        {
+          gitEffect: 'tracked-update',
+          path: 'src/lib/catalog/browser/catalog.generated.json',
+        },
+        {
+          gitEffect: 'tracked-update',
+          path: 'src/lib/catalog/browser/catalog.generated.ts',
+        },
+      ],
+      gitEffects: {
+        destination: 'tracked-addition',
+        source: 'ignored-removal',
+      },
+      revision: expect.any(String),
+      source: {
+        id: 'local',
+        path: 'catalog.local/examples/preview-effects',
+      },
+      status: 'available',
+    });
+    expect(preview.status === 'available' && preview.revision).not.toContain(
+      rootDirectory,
+    );
+    await expect(
+      readFile(
+        join(
+          rootDirectory,
+          'catalog.local/examples/preview-effects/example.ts',
+        ),
+        'utf8',
+      ),
+    ).resolves.toContain("id: 'preview-effects'");
+    await expect(
+      readFile(join(rootDirectory, '.catalog.lock'), 'utf8'),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(
+      readFile(
+        join(
+          rootDirectory,
+          'src/lib/catalog/worker/examples/preview-effects/example.ts',
+        ),
+        'utf8',
+      ),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
   it('regenerates and verifies the canonical UI catalog', async () => {
     const rootDirectory = await createIsolatedCatalogRoot();
     const authoring = createUiCatalogAuthoring(rootDirectory);
