@@ -129,7 +129,7 @@
 
 <MenuContainer
   {open}
-  class="text-sm font-medium text-primary max-md:w-full max-md:justify-items-end"
+  class="text-sm text-primary max-md:w-full max-md:justify-items-end"
 >
   <MenuButton
     label={translate('common.timezone', { timezone })}
