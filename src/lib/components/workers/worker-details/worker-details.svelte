@@ -309,8 +309,8 @@
               {:else}
                 {slots?.currentUsedSlots ?? 0}
               {/if}
-            </span>{#if slots?.currentAvailableSlots}
-              /{slots.currentAvailableSlots - (slots?.currentUsedSlots ?? 0)}
+            </span>{#if slots?.currentAvailableSlots && slots.currentAvailableSlots >= 0}
+              /{slots.currentAvailableSlots + (slots?.currentUsedSlots ?? 0)}
             {/if}
           </p>
           {#if slots?.slotSupplierKind}
