@@ -8,7 +8,7 @@
   import Table from '$lib/holocene/table/table.svelte';
   import {
     IconExternalLink,
-    IconPlay,
+    IconPlaySolid,
     IconSearch,
     IconTemporalSettings,
   } from '$lib/io/icon';
@@ -280,7 +280,7 @@
                 <div class="relative">
                   <Button
                     size="xs"
-                    LeadingIcon={IconPlay}
+                    LeadingIcon={IconPlaySolid}
                     aria-label={pending
                       ? `Start (${pending} pending)`
                       : 'Start'}

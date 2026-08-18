@@ -3,7 +3,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconHeartbeat, IconPlay, IconRetry } from '$lib/io/icon';
+  import { IconHeartbeat, IconPlaySolid, IconRetry } from '$lib/io/icon';
   interface Props {
     class?: string;
     title?: string;
@@ -35,7 +35,7 @@
   <div class="flex flex-col items-center gap-4 sm:flex-row">
     <Button
       size="sm"
-      LeadingIcon={IconPlay}
+      LeadingIcon={IconPlaySolid}
       onclick={openTriggerConfirmationModal}
       variant="ghost"
       class="border border-subtle"

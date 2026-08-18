@@ -6,7 +6,12 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconPause, IconPencil, IconPlay, IconRetry } from '$lib/io/icon';
+  import {
+    IconPause,
+    IconPencil,
+    IconPlaySolid,
+    IconRetry,
+  } from '$lib/io/icon';
   import { Action } from '$lib/models/activity-actions';
   import {
     pauseActivity,
@@ -108,7 +113,7 @@
     <Button
       variant="secondary"
       size="sm"
-      LeadingIcon={activity.paused ? IconPlay : IconPause}
+      LeadingIcon={activity.paused ? IconPlaySolid : IconPause}
       onclick={onPause}
     >
       {activity.paused

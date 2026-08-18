@@ -12,7 +12,7 @@
     type IconComponent,
     IconImport,
     IconMerge,
-    IconPlay,
+    IconPlaySolid,
     IconSearch,
     IconTemporalBatch,
     IconTemporalNamespaces,
@@ -64,7 +64,7 @@
         id: 'start-workflow',
         title: 'Start Workflow',
         subtitle: 'Create a new workflow execution',
-        Icon: IconPlay,
+        Icon: IconPlaySolid,
         category: 'Navigation',
         action: () => {
           goto(routeForWorkflowStart({ namespace }));

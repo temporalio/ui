@@ -134,7 +134,7 @@
     IconChevronUp,
     IconClose,
     type IconComponent,
-    IconPlay,
+    IconPlaySolid,
     IconQuestionCircle,
     IconSpinner,
     IconWarning,
@@ -634,7 +634,7 @@
             >Start options</Button
           >
           <Button
-            LeadingIcon={IconPlay}
+            LeadingIcon={IconPlaySolid}
             disabled={running || inputMalformed}
             onclick={run}
           >
@@ -711,7 +711,7 @@
                           size="xs"
                           variant="ghost"
                           class="h-7 px-1.5"
-                          LeadingIcon={IconPlay}
+                          LeadingIcon={IconPlaySolid}
                           aria-label="Resume checking"
                           onclick={() => sessionStore.resume(session.id)}
                         />
