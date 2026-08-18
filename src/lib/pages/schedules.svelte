@@ -211,7 +211,7 @@
         </div>
       {/snippet}
       {#snippet actionsEndAdditional()}
-        <Tooltip text={translate('common.configure-columns')} top>
+        <Tooltip text={translate('common.configure-columns')} top usePortal>
           <Button
             onclick={openCustomizationDrawer}
             data-testid="workflows-summary-table-configuration-button"

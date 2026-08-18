@@ -12,6 +12,9 @@
     --banner-height: 0px;
     --bottom-nav-height: 4rem;
     --scroll-inset-top: 0px;
+    /* viewport-relative inset for fixed chrome; sticky elements measure from
+       the scrollport instead, which embedding shells may offset differently */
+    --sticky-inset-top: var(--scroll-inset-top);
     --scroll-inset-bottom: calc(
       var(--bottom-nav-height) + var(--banner-height)
     );

@@ -217,6 +217,8 @@
 {#key [namespace, query, $refresh]}
   <PaginatedTable
     total={$workflowCount.count}
+    stickyHeader
+    stickyActions
     {onFetch}
     onItemsChange={(items) => {
       visiblePaginatedItems = items;
@@ -273,6 +275,7 @@
           ? translate('common.dense')
           : translate('common.comfortable')}
         top
+        usePortal
       >
         <FeatureTag feature="tableDensity" />
         <Button
@@ -292,7 +295,7 @@
         filePrefix="workflows"
         testId="export-history-button"
       />
-      <Tooltip text={translate('common.configure-columns')} top>
+      <Tooltip text={translate('common.configure-columns')} top usePortal>
         <Button
           onclick={onClickConfigure}
           data-testid="workflows-summary-table-configuration-button"

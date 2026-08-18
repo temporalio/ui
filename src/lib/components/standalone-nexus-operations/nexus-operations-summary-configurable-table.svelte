@@ -80,7 +80,7 @@
       <TableEmptyState />
     {/snippet}
     {#snippet actionsEndAdditional()}
-      <Tooltip text="Configure Columns" top>
+      <Tooltip text="Configure Columns" top usePortal>
         <Button
           onclick={onClickConfigure}
           data-testid="nexus-operations-summary-table-configuration-button"

@@ -207,10 +207,10 @@
   };
 </script>
 
-<div class="flex overflow-auto">
+<div class="flex h-full">
   <div
     class={merge(
-      'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
+      'surface-primary relative w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
       $savedQueryNavOpen
         ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
         : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
@@ -218,100 +218,106 @@
     style="will-change: width"
   >
     <div
-      class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
+      class="sticky top-[var(--sticky-inset-top,0px)] max-h-[calc(100dvh-var(--scroll-inset-top))] overflow-auto"
     >
       <div
-        class={merge(
-          'flex w-full items-center justify-between',
-          $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
-        )}
+        class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
       >
-        {#if $savedQueryNavOpen}
-          <p
-            class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
-            in:slide
-          >
+        <div
+          class={merge(
+            'flex w-full items-center justify-between',
+            $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
+          )}
+        >
+          {#if $savedQueryNavOpen}
+            <p
+              class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
+              in:slide
+            >
+              Saved Views
+            </p>
+          {/if}
+          <p class="block text-xs font-medium leading-3 lg:hidden">
             Saved Views
           </p>
-        {/if}
-        <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
-        <button
-          class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
-          aria-label={$savedQueryNavOpen
-            ? 'Collapse saved views'
-            : 'Expand saved views'}
-          title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
-          onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
-        >
-          <Icon name="collapse" />
-        </button>
-      </div>
-    </div>
-
-    <div class="space-y-2 p-1.5">
-      <div class="pb-2 text-center">
-        <div class="space-y-1">
-          {#each systemViews as view (view.id)}
-            {@render queryButton({
-              ...view,
-              active: query === view.query,
-            })}
-          {/each}
+          <button
+            class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
+            aria-label={$savedQueryNavOpen
+              ? 'Collapse saved views'
+              : 'Expand saved views'}
+            title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
+            onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
+          >
+            <Icon name="collapse" />
+          </button>
         </div>
       </div>
 
-      {#if $savedQueryNavOpen}
-        <p
-          class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
-          in:slide
-        >
-          {translate('common.custom-views')}
-          {@render queryBadge({
-            className: 'font-mono',
-            content: `${namespaceSavedQueries.length}/${maxQueries}`,
-          })}
-        </p>
-      {/if}
-
-      <div class="border-t border-subtle"></div>
-
-      {#if unsavedQuery}
-        {@render queryButton(unsaveView)}
-      {/if}
-
-      {#if namespaceSavedQueries.length > 0}
-        <div class="text-center">
+      <div class="space-y-2 p-1.5">
+        <div class="pb-2 text-center">
           <div class="space-y-1">
-            {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
+            {#each systemViews as view (view.id)}
               {@render queryButton({
-                ...savedQuery,
-                active: savedQuery.id === activeQueryView?.id,
-                badge:
-                  savedQuery.id === activeQueryView?.id &&
-                  savedQuery.query !== query
-                    ? 'Unsaved'
-                    : undefined,
+                ...view,
+                active: query === view.query,
               })}
             {/each}
           </div>
         </div>
-      {/if}
 
-      {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
-        <p
-          class={merge(
-            ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
-            !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
-          )}
-        >
-          No Views
-        </p>
-      {/if}
+        {#if $savedQueryNavOpen}
+          <p
+            class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
+            in:slide
+          >
+            {translate('common.custom-views')}
+            {@render queryBadge({
+              className: 'font-mono',
+              content: `${namespaceSavedQueries.length}/${maxQueries}`,
+            })}
+          </p>
+        {/if}
+
+        <div class="border-t border-subtle"></div>
+
+        {#if unsavedQuery}
+          {@render queryButton(unsaveView)}
+        {/if}
+
+        {#if namespaceSavedQueries.length > 0}
+          <div class="text-center">
+            <div class="space-y-1">
+              {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
+                {@render queryButton({
+                  ...savedQuery,
+                  active: savedQuery.id === activeQueryView?.id,
+                  badge:
+                    savedQuery.id === activeQueryView?.id &&
+                    savedQuery.query !== query
+                      ? 'Unsaved'
+                      : undefined,
+                })}
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
+          <p
+            class={merge(
+              ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
+              !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
+            )}
+          >
+            No Views
+          </p>
+        {/if}
+      </div>
     </div>
   </div>
   <div
     class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
+      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all duration-300 ease-in-out lg:w-[calc(100%-var(--panel-expanded-w))]',
       !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
     )}
   >

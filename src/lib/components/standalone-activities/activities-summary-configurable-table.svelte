@@ -148,7 +148,7 @@
     {/snippet}
     {#snippet actionsEndAdditional({ visibleItems, page })}
       <DownloadJsonButton items={visibleItems} {page} filePrefix="activities" />
-      <Tooltip text={translate('common.configure-columns')} top>
+      <Tooltip text={translate('common.configure-columns')} top usePortal>
         <Button
           onclick={onClickConfigure}
           data-testid="activities-summary-table-configuration-button"

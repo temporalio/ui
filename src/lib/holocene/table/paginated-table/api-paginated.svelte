@@ -30,6 +30,9 @@
   type Props = HTMLAttributes<HTMLDivElement> & {
     id?: string | null;
     maxHeight?: string;
+    stickyHeader?: boolean;
+    stickyHeaderOffset?: string;
+    stickyActions?: boolean;
     onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onItemsChange?: (items: T[]) => void;
@@ -59,6 +62,9 @@
   let {
     id = null,
     maxHeight = '',
+    stickyHeader = false,
+    stickyHeaderOffset,
+    stickyActions = false,
     onError,
     onFetch,
     onItemsChange,
@@ -249,6 +255,9 @@
   updating={$store.updating}
   visibleItems={$store.visibleItems}
   {maxHeight}
+  {stickyHeader}
+  {stickyHeaderOffset}
+  {stickyActions}
   {id}
   {caption}
   {headers}

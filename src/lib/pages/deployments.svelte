@@ -124,7 +124,7 @@
         />
       {/snippet}
       {#snippet actionsEndAdditional()}
-        <Tooltip text="Configure Columns" top>
+        <Tooltip text="Configure Columns" top usePortal>
           <Button
             onclick={openCustomizationDrawer}
             data-testid="deployments-table-configuration-button"

@@ -27,7 +27,7 @@
   };
 </script>
 
-<Tooltip text={translate('common.download-json')} top>
+<Tooltip text={translate('common.download-json')} top usePortal>
   <Button
     onclick={onClick}
     data-testid={testId}
