@@ -4,8 +4,8 @@
     IconPause,
     IconRelationship,
     IconRetry,
+    IconStopwatch,
     IconTemporalActivity,
-    IconTemporalArchival,
     IconTemporalNexus,
     IconTemporalSignal,
     IconTemporalUpdate,
@@ -50,7 +50,7 @@
     </symbol>
 
     <symbol id="ti-retention" viewBox="0 0 16 16">
-      <IconTemporalArchival width="100%" height="100%" />
+      <IconStopwatch width="100%" height="100%" />
     </symbol>
 
     <symbol id="ti-feather" viewBox="0 0 16 16">

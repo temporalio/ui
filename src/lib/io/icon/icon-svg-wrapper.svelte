@@ -17,13 +17,14 @@
 
   const {
     title,
+    'aria-labelledby': ariaLabelledBy,
     'aria-label': ariaLabel,
     class: className,
     children,
     ...rest
   }: Props = $props();
 
-  const labelled = $derived(Boolean(title || ariaLabel));
+  const labelled = $derived(Boolean(title || ariaLabel || ariaLabelledBy));
 </script>
 
 <svg
@@ -35,10 +36,11 @@
   role={labelled ? 'img' : undefined}
   aria-hidden={labelled ? undefined : true}
   aria-label={ariaLabel}
+  aria-labelledby={ariaLabelledBy}
   class={twMerge('shrink-0', className)}
   {...rest}
 >
-  {#if title && !ariaLabel}
+  {#if title && !ariaLabel && !ariaLabelledBy}
     <title>{title}</title>
   {/if}
   {@render children?.()}

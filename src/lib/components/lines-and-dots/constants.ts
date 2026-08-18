@@ -2,8 +2,8 @@ import {
   type IconComponent,
   IconFeather,
   IconRelationship,
+  IconStopwatch,
   IconTemporalActivity,
-  IconTemporalArchival,
   IconTemporalNexus,
   IconTemporalSignal,
   IconTemporalUpdate,
@@ -35,7 +35,7 @@ export const CategoryIcon: Record<
   signal: { name: 'signal', Icon: IconTemporalSignal, title: 'Signal' },
   activity: { name: 'activity', Icon: IconTemporalActivity, title: 'Activity' },
   nexus: { name: 'nexus', Icon: IconTemporalNexus, title: 'Nexus' },
-  timer: { name: 'retention', Icon: IconTemporalArchival, title: 'Timer' },
+  timer: { name: 'retention', Icon: IconStopwatch, title: 'Timer' },
   'local-activity': {
     name: 'feather',
     Icon: IconFeather,

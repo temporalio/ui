@@ -50,8 +50,8 @@ for (const rel of allFiles) {
     };
     exports[`./${base}`] = entry;
 
-    // `exports` has no directory-index resolution, so a barrel is only reachable
-    // as `pkg/io/icon/index` unless we also map the directory itself
+    // `exports` has no directory-index resolution, so alias each barrel's
+    // `/index` path to its directory
     if (base.endsWith('/index')) {
       exports[`./${base.slice(0, -'/index'.length)}`] = entry;
     }
