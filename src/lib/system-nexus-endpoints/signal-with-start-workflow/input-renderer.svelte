@@ -37,6 +37,6 @@
       <PayloadCodeBlock value={workflowInput} {maxHeight} />
     {/if}
   {:else}
-    <PayloadCodeBlock value={{ payloads: [] }} {maxHeight} />
+    <PayloadCodeBlock value={payload} {maxHeight} />
   {/if}
 </div>

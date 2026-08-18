@@ -26,7 +26,7 @@ const argv = process.argv.slice(2);
 const positional = argv.filter((a) => !a.startsWith('--'));
 const flag = (name: string): string | undefined => {
   const match = argv.find((a) => a.startsWith(`--${name}=`));
-  if (match) return match.split('=')[1];
+  if (match) return match.slice(`--${name}=`.length);
   const idx = argv.indexOf(`--${name}`);
   return idx !== -1 && argv[idx + 1] && !argv[idx + 1].startsWith('--')
     ? argv[idx + 1]
@@ -50,6 +50,17 @@ const kebab = (value: string) =>
 const camel = (value: string) =>
   value.replace(/-([a-z0-9])/g, (_, c: string) => c.toUpperCase());
 const words = (value: string) => value.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+const supportedTimelineCategories = new Set([
+  'activity',
+  'child-workflow',
+  'local-activity',
+  'nexus',
+  'signal',
+  'timer',
+  'update',
+  'workflow',
+  'other',
+]);
 
 const kind = flag('kind') ?? kebab(operationName);
 const timelineCategory = flag('category') ?? 'nexus';
@@ -57,6 +68,19 @@ const expandsIndividually = !argv.includes('--grouped');
 const label = words(operationName);
 const definitionExport = camel(kind);
 const dir = path.join(MODULE_DIR, kind);
+
+if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(kind)) {
+  fail(
+    `Kind must be a kebab-case path segment, e.g. start-workflow (got "${kind}")`,
+  );
+}
+if (!supportedTimelineCategories.has(timelineCategory)) {
+  fail(`Unsupported timeline category "${timelineCategory}"`);
+}
+const outputPath = path.relative(MODULE_DIR, dir);
+if (outputPath.startsWith('..') || path.isAbsolute(outputPath)) {
+  fail(`Kind resolves outside ${path.relative(ROOT, MODULE_DIR)}`);
+}
 
 if (existsSync(dir)) fail(`${path.relative(ROOT, dir)} already exists`);
 
