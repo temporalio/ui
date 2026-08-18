@@ -57,7 +57,7 @@ jobs:
           slack_channel="$REQUESTED_SLACK_CHANNEL"
 
           if [ "$EVENT_NAME" = 'schedule' ]; then
-            mode='dry-run'
+            mode='apply'
             notify='true'
             slack_channel="$SCHEDULED_SLACK_CHANNEL"
           fi
@@ -120,6 +120,7 @@ jobs:
       slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
       thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
     secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       TEMPORAL_CICD_APP_ID: ${{ secrets.TEMPORAL_CICD_APP_ID }}
       TEMPORAL_CICD_PRIVATE_KEY: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}

@@ -22,6 +22,8 @@ on:
         default: main
         type: string
     secrets:
+      ANTHROPIC_API_KEY:
+        required: false
       SLACK_BOT_TOKEN:
         required: false
       TEMPORAL_CICD_APP_ID:
@@ -48,8 +50,10 @@ jobs:
       artifact_name: ${{ steps.artifact.outputs.name }}
       base_sha: ${{ steps.verified.outputs.base_sha }}
       changed: ${{ steps.changes.outputs.changed }}
+      audit_sha256: ${{ steps.verified.outputs.audit_sha256 }}
       package_json_sha256: ${{ steps.verified.outputs.package_json_sha256 }}
       pnpm_lock_sha256: ${{ steps.verified.outputs.pnpm_lock_sha256 }}
+      remediation_report_sha256: ${{ steps.verified.outputs.remediation_report_sha256 }}
     # This is the only job that installs or executes package code. It has a
     # read-only GITHUB_TOKEN and receives neither App nor Slack credentials.
     permissions:
@@ -98,25 +102,93 @@ jobs:
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_RUN_ID: ${{ github.run_id }}
 
-      - name: Plan manifest-only remediation
-        if: inputs.mode == 'dry-run'
+      - name: Plan manifest-only remediation evidence
         run: >-
           node .github/scripts/apply-weekly-dependency-remediation.mjs
           --audit weekly-dependency-security-audit.json
           --package-json package.json
           --report weekly-dependency-remediation.json
 
-      - name: Apply manifest-only remediation
+      - id: audited-base
+        name: Record the audited source revision
         if: inputs.mode == 'apply'
-        run: >-
-          node .github/scripts/apply-weekly-dependency-remediation.mjs
-          --audit weekly-dependency-security-audit.json
-          --package-json package.json
-          --report weekly-dependency-remediation.json
-          --apply
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo 'ANTHROPIC_API_KEY is required in apply mode.' >&2
+            exit 1
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "audit_sha256=$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          echo "remediation_sha256=$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+
+      - name: Ask Claude to author the manifest remediation
+        if: inputs.mode == 'apply'
+        uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b # v1.0.183
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          show_full_output: false
+          display_report: false
+          prompt: |
+            You are preparing the smallest safe dependency-security remediation for this repository.
+
+            Read `weekly-dependency-security-audit.json`,
+            `weekly-dependency-remediation.json`, and the existing `package.json`.
+            Apply exactly the actions already authorized in
+            `weekly-dependency-remediation.json`. Do not address alerts classified as
+            manual or unsupported, and do not perform unrelated upgrades, configuration,
+            script, or formatting changes. If the plan has no actions, leave package.json
+            byte-for-byte unchanged.
+
+            You may edit only the existing `package.json`. Do not create files, edit the
+            lockfile, run commands, use the network, commit, push, comment, or open a pull
+            request. The trusted workflow will regenerate the lockfile, test the candidate,
+            attest it, and publish it through a separate credentialed job.
+          claude_args: |
+            --allowedTools "Read,Edit"
+            --disallowedTools "Bash,Write,WebFetch,WebSearch"
+            --max-turns 10
+
+      - id: claude-candidate
+        name: Reject out-of-scope Claude changes and record resolver evidence
+        if: inputs.mode == 'apply'
+        env:
+          AUDITED_BASE_SHA: ${{ steps.audited-base.outputs.sha }}
+          AUDIT_SHA256: ${{ steps.audited-base.outputs.audit_sha256 }}
+          REMEDIATION_SHA256: ${{ steps.audited-base.outputs.remediation_sha256 }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$AUDITED_BASE_SHA"
+          git diff --cached --quiet
+
+          test -f weekly-dependency-security-audit.json
+          test -f weekly-dependency-remediation.json
+          test "$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)" = "$AUDIT_SHA256"
+          test "$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)" = "$REMEDIATION_SHA256"
+
+          unexpected_untracked="$(git ls-files --others --exclude-standard | grep -vE '^weekly-dependency-(security-audit|remediation)\.json$' || true)"
+          if [ -n "$unexpected_untracked" ]; then
+            echo "Claude created unexpected files:" >&2
+            echo "$unexpected_untracked" >&2
+            exit 1
+          fi
+
+          unexpected="$(git diff --name-only | grep -vE '^package\.json$' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "Claude changed files outside package.json:" >&2
+            echo "$unexpected" >&2
+            exit 1
+          fi
+          git show "${AUDITED_BASE_SHA}:package.json" > "$RUNNER_TEMP/weekly-dependency-base-package.json"
+          node .github/scripts/validate-claude-dependency-remediation.mjs \
+            --base "$RUNNER_TEMP/weekly-dependency-base-package.json" \
+            --candidate package.json \
+            --report weekly-dependency-remediation.json \
+            --github-output "$GITHUB_OUTPUT"
 
       - name: Resolve the lockfile without lifecycle scripts
-        if: inputs.mode == 'apply'
+        if: inputs.mode == 'apply' && steps.claude-candidate.outputs.changed == 'true'
         run: pnpm install --lockfile-only --ignore-scripts
         env:
           HUSKY: '0'
@@ -130,18 +202,21 @@ jobs:
         name: Attest the audited base and candidate dependency files
         run: |
           base_sha="$(git rev-parse HEAD)"
+          audit_hash="$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
           package_hash="$(sha256sum package.json | cut -d ' ' -f 1)"
           lockfile_hash="$(sha256sum pnpm-lock.yaml | cut -d ' ' -f 1)"
 
           echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          echo "audit_sha256=$audit_hash" >> "$GITHUB_OUTPUT"
           echo "package_json_sha256=$package_hash" >> "$GITHUB_OUTPUT"
           echo "pnpm_lock_sha256=$lockfile_hash" >> "$GITHUB_OUTPUT"
 
           jq -n \
             --arg baseSha "$base_sha" \
+            --arg auditSha256 "$audit_hash" \
             --arg packageJsonSha256 "$package_hash" \
             --arg pnpmLockSha256 "$lockfile_hash" \
-            '{schemaVersion: 1, baseSha: $baseSha, packageJsonSha256: $packageJsonSha256, pnpmLockSha256: $pnpmLockSha256}' \
+            '{schemaVersion: 1, baseSha: $baseSha, auditSha256: $auditSha256, packageJsonSha256: $packageJsonSha256, pnpmLockSha256: $pnpmLockSha256}' \
             > weekly-dependency-candidate-attestation.json
 
           jq \
@@ -150,6 +225,8 @@ jobs:
             weekly-dependency-remediation.json \
             > weekly-dependency-remediation.with-candidate.json
           mv weekly-dependency-remediation.with-candidate.json weekly-dependency-remediation.json
+          report_hash="$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)"
+          echo "remediation_report_sha256=$report_hash" >> "$GITHUB_OUTPUT"
 
       - name: Generate SvelteKit build metadata
         run: pnpm exec svelte-kit sync
@@ -162,7 +239,7 @@ jobs:
       - name: Reject changes outside the approved dependency files
         if: inputs.mode == 'apply'
         run: |
-          unexpected="$(git diff --name-only --diff-filter=ACMRTUXB | grep -vE '^(package\.json|pnpm-lock\.yaml)$' || true)"
+          unexpected="$(git diff --name-only | grep -vE '^(package\.json|pnpm-lock\.yaml)$' || true)"
           if [ -n "$unexpected" ]; then
             echo "Unexpected file changes:" >&2
             echo "$unexpected" >&2
@@ -191,19 +268,26 @@ jobs:
         name: Verify package execution did not change the candidate
         env:
           EXPECTED_BASE_SHA: ${{ steps.attest.outputs.base_sha }}
+          EXPECTED_AUDIT_HASH: ${{ steps.attest.outputs.audit_sha256 }}
           EXPECTED_PACKAGE_HASH: ${{ steps.attest.outputs.package_json_sha256 }}
           EXPECTED_LOCKFILE_HASH: ${{ steps.attest.outputs.pnpm_lock_sha256 }}
+          EXPECTED_REPORT_HASH: ${{ steps.attest.outputs.remediation_report_sha256 }}
         run: |
+          actual_audit_hash="$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
           actual_package_hash="$(sha256sum package.json | cut -d ' ' -f 1)"
           actual_lockfile_hash="$(sha256sum pnpm-lock.yaml | cut -d ' ' -f 1)"
+          actual_report_hash="$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)"
 
+          test "$actual_audit_hash" = "$EXPECTED_AUDIT_HASH"
           test "$actual_package_hash" = "$EXPECTED_PACKAGE_HASH"
           test "$actual_lockfile_hash" = "$EXPECTED_LOCKFILE_HASH"
+          test "$actual_report_hash" = "$EXPECTED_REPORT_HASH"
           jq --exit-status \
             --arg baseSha "$EXPECTED_BASE_SHA" \
+            --arg auditSha256 "$EXPECTED_AUDIT_HASH" \
             --arg packageJsonSha256 "$EXPECTED_PACKAGE_HASH" \
             --arg pnpmLockSha256 "$EXPECTED_LOCKFILE_HASH" \
-            '.baseSha == $baseSha and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256' \
+            '.baseSha == $baseSha and .auditSha256 == $auditSha256 and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256' \
             weekly-dependency-candidate-attestation.json \
             > /dev/null
           jq --exit-status \
@@ -213,8 +297,10 @@ jobs:
             > /dev/null
 
           echo "base_sha=$EXPECTED_BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "audit_sha256=$EXPECTED_AUDIT_HASH" >> "$GITHUB_OUTPUT"
           echo "package_json_sha256=$EXPECTED_PACKAGE_HASH" >> "$GITHUB_OUTPUT"
           echo "pnpm_lock_sha256=$EXPECTED_LOCKFILE_HASH" >> "$GITHUB_OUTPUT"
+          echo "remediation_report_sha256=$EXPECTED_REPORT_HASH" >> "$GITHUB_OUTPUT"
 
       - name: Upload reports and approved candidate
         if: always()
@@ -262,26 +348,36 @@ jobs:
       - name: Verify and stage only the approved candidate files
         env:
           TRUSTED_BASE_SHA: ${{ needs.audit-and-remediate.outputs.base_sha }}
+          TRUSTED_AUDIT_HASH: ${{ needs.audit-and-remediate.outputs.audit_sha256 }}
           TRUSTED_PACKAGE_HASH: ${{ needs.audit-and-remediate.outputs.package_json_sha256 }}
           TRUSTED_LOCKFILE_HASH: ${{ needs.audit-and-remediate.outputs.pnpm_lock_sha256 }}
+          TRUSTED_REPORT_HASH: ${{ needs.audit-and-remediate.outputs.remediation_report_sha256 }}
         run: |
+          test -f candidate/weekly-dependency-security-audit.json
           test -f candidate/package.json
           test -f candidate/pnpm-lock.yaml
           test -f candidate/weekly-dependency-remediation.json
           test -f candidate/weekly-dependency-candidate-attestation.json
-          jq --exit-status '.applied == true' candidate/weekly-dependency-remediation.json > /dev/null
-          jq empty candidate/package.json
-
+          actual_audit_hash="$(sha256sum candidate/weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
           actual_package_hash="$(sha256sum candidate/package.json | cut -d ' ' -f 1)"
           actual_lockfile_hash="$(sha256sum candidate/pnpm-lock.yaml | cut -d ' ' -f 1)"
+          actual_report_hash="$(sha256sum candidate/weekly-dependency-remediation.json | cut -d ' ' -f 1)"
 
+          test "$actual_audit_hash" = "$TRUSTED_AUDIT_HASH"
           test "$actual_package_hash" = "$TRUSTED_PACKAGE_HASH"
           test "$actual_lockfile_hash" = "$TRUSTED_LOCKFILE_HASH"
+          test "$actual_report_hash" = "$TRUSTED_REPORT_HASH"
+          jq --exit-status \
+            '.applied == true and .resolver == "claude-code" and (.actions | type == "array" and length > 0)' \
+            candidate/weekly-dependency-remediation.json \
+            > /dev/null
+          jq empty candidate/package.json
           jq --exit-status \
             --arg baseSha "$TRUSTED_BASE_SHA" \
+            --arg auditSha256 "$TRUSTED_AUDIT_HASH" \
             --arg packageJsonSha256 "$TRUSTED_PACKAGE_HASH" \
             --arg pnpmLockSha256 "$TRUSTED_LOCKFILE_HASH" \
-            '.baseSha == $baseSha and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256' \
+            '.baseSha == $baseSha and .auditSha256 == $auditSha256 and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256' \
             candidate/weekly-dependency-candidate-attestation.json \
             > /dev/null
           jq --exit-status \
@@ -299,7 +395,7 @@ jobs:
           cp candidate/package.json package.json
           cp candidate/pnpm-lock.yaml pnpm-lock.yaml
 
-          unexpected="$(git diff --name-only --diff-filter=ACMRTUXB | grep -vE '^(package\.json|pnpm-lock\.yaml)$' || true)"
+          unexpected="$(git diff --name-only | grep -vE '^(package\.json|pnpm-lock\.yaml)$' || true)"
           if [ -n "$unexpected" ]; then
             echo "Refusing to publish unexpected changes:" >&2
             echo "$unexpected" >&2
@@ -350,7 +446,7 @@ jobs:
             git push --force-with-lease origin "HEAD:refs/heads/${BRANCH}"
           fi
 
-          body="This draft is maintained by the weekly dependency-security review.\n\nIt contains only package.json and pnpm-lock.yaml changes produced by the minimal remediation planner. The workflow does not dismiss Dependabot alerts; merging this PR is the resolution path.\n\nWorkflow evidence: ${RUN_URL}"
+          body="This draft is maintained by the weekly dependency-security review.\n\nClaude authored the package.json remediation from read-only Dependabot evidence. The trusted workflow regenerated pnpm-lock.yaml, rejected changes outside those two files, and passed the candidate through the full validation and hash-attestation boundary before this separate publishing job received write credentials. The workflow does not dismiss Dependabot alerts; merging this PR is the resolution path.\n\nWorkflow evidence: ${RUN_URL}"
           pr_url="$(gh pr list --repo "$REPOSITORY" --head "$BRANCH" --base main --state open --json url --jq '.[0].url')"
           if [ -n "$pr_url" ]; then
             gh pr edit "$pr_url" --repo "$REPOSITORY" --title 'fix: weekly Dependabot security remediation' --body "$body"
@@ -392,10 +488,22 @@ jobs:
           PUBLISH_RESULT: ${{ needs.publish.result }}
           CHANNEL: ${{ inputs.slack_channel }}
           REMEDIATION_PR_URL: ${{ needs.publish.outputs.pr_url }}
+          TRUSTED_AUDIT_HASH: ${{ needs.audit-and-remediate.outputs.audit_sha256 }}
+          TRUSTED_REPORT_HASH: ${{ needs.audit-and-remediate.outputs.remediation_report_sha256 }}
           THREAD_TS: ${{ inputs.thread_ts }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          if [ -f evidence/weekly-dependency-security-audit.json ]; then
+          evidence_valid=false
+          if [ -n "$TRUSTED_AUDIT_HASH" ] && \
+             [ -n "$TRUSTED_REPORT_HASH" ] && \
+             [ -f evidence/weekly-dependency-security-audit.json ] && \
+             [ -f evidence/weekly-dependency-remediation.json ] && \
+             [ "$(sha256sum evidence/weekly-dependency-security-audit.json | cut -d ' ' -f 1)" = "$TRUSTED_AUDIT_HASH" ] && \
+             [ "$(sha256sum evidence/weekly-dependency-remediation.json | cut -d ' ' -f 1)" = "$TRUSTED_REPORT_HASH" ]; then
+            evidence_valid=true
+          fi
+
+          if [ "$evidence_valid" = true ]; then
             case "$PUBLISH_RESULT" in
               success)
                 if [ -n "$REMEDIATION_PR_URL" ]; then
@@ -417,9 +525,7 @@ jobs:
               --publish-status "$publish_status"
               --run-url "$RUN_URL"
             )
-            if [ -f evidence/weekly-dependency-remediation.json ]; then
-              args+=(--remediation evidence/weekly-dependency-remediation.json)
-            fi
+            args+=(--remediation evidence/weekly-dependency-remediation.json)
             if [ -n "$REMEDIATION_PR_URL" ]; then
               args+=(--remediation-pr-url "$REMEDIATION_PR_URL")
             fi

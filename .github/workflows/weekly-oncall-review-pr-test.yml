@@ -13,6 +13,8 @@ on:
       - .github/scripts/weekly-dependency-security-audit.test.mjs
       - .github/scripts/apply-weekly-dependency-remediation.mjs
       - .github/scripts/apply-weekly-dependency-remediation.test.mjs
+      - .github/scripts/validate-claude-dependency-remediation.mjs
+      - .github/scripts/validate-claude-dependency-remediation.test.mjs
       - .github/scripts/weekly-dependency-security-digest.mjs
       - .github/scripts/weekly-dependency-security-digest.test.mjs
       - package.json

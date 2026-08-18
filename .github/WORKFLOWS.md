@@ -407,9 +407,9 @@ pnpm validate:versions
 `weekly-oncall-review.yml` creates one Slack thread in `#oncall-frontend` and
 fans out to small, independently callable review modules. It runs every Monday
 at 14:00 UTC and can also be started from **Actions → Weekly On-Call Review**.
-The scheduled run uses `dry-run` mode and notifications. Until the Claude
-resolver is integrated, it does not update the generated dependency remediation
-draft PR. Manual runs also default to `dry-run`; choose `apply` only when the
+The scheduled run uses `apply` mode and notifications, so Claude can author a
+minimal dependency-security candidate and the workflow can update its draft PR.
+Manual runs default to `dry-run`; choose `apply` only when the
 generated dependency remediation draft PR may be updated. Manual notifications default to `C0BPXR260DA`
 (`#other-ross-tests-stuff`) so test runs do not post to the on-call channel.
 The `slack_channel` input accepts another Slack channel ID when needed.
@@ -432,8 +432,9 @@ After merging, use a manual `dry-run` dispatch to the default test channel
 The coordinator owns the root Slack post and a final status reply. Modules add
 their own replies in the same thread:
 
-- `weekly-dependency-security-review.yml` audits Dependabot alerts, produces a
-  minimal package remediation candidate, and reports its evidence.
+- `weekly-dependency-security-review.yml` audits Dependabot alerts, asks Claude
+  to produce a minimal package remediation candidate in `apply` mode, and
+  reports its evidence.
 - `weekly-vln-review.yml` reports open VLN remediation PRs.
 - `weekly-external-contributor-review.yml` reports active, non-bot PRs from
   external forks. It groups the top five review-ready, triage, and
@@ -452,17 +453,29 @@ credential. That job is the only one that runs `pnpm` or project code. It:
 1. tests the automation scripts;
 2. reads Dependabot alerts using the narrow `vulnerability-alerts: read`
    permission and writes JSON evidence;
-3. applies the manifest plan and resolves its lockfile before performing a
-   fresh frozen install, with lifecycle scripts and Husky disabled;
-4. permits only `package.json` and `pnpm-lock.yaml` changes;
-5. records the audited source revision SHA and SHA-256 hashes for both
+3. in `apply` mode, records the audited source SHA and snapshots hashes for the
+   audit and deterministic remediation plan before giving Claude only the
+   `Read` and `Edit` tools;
+4. immediately proves Claude did not move `HEAD`, stage or create files, tamper
+   with either evidence file, or change anything except the existing
+   `package.json`;
+5. reconstructs the immutable base manifest from that verified source SHA after
+   Claude runs, accepts Claude's manifest only when its bytes exactly match applying
+   the trusted deterministic plan's authorized actions to that base, and
+   records Claude as the resolver only for that exact non-empty result; manual
+   and ambiguous findings remain reported rather than changed;
+6. resolves `pnpm-lock.yaml` in the trusted workflow and performs a fresh frozen
+   install, with lifecycle scripts and Husky disabled;
+7. permits only `package.json` and `pnpm-lock.yaml` changes;
+8. records the audited source revision SHA and SHA-256 hashes for both
    candidate files in the remediation report and a separate attestation before
    package executables run;
-6. runs `svelte-kit sync` explicitly to generate the ignored `.svelte-kit`
+9. runs `svelte-kit sync` explicitly to generate the ignored `.svelte-kit`
    metadata normally produced by the disabled lifecycle hook, then runs Vitest
    with one worker, `pnpm check`, and `pnpm build:server`;
-7. verifies that none of that package execution changed either candidate file,
-   and only then exports the trusted hashes as verified job outputs.
+10. verifies that none of that package execution changed either candidate file
+    or the audit and final remediation evidence, and only then exports all four
+    trusted hashes as verified job outputs.
 
 The VLN and external-contributor modules pass narrower audit scopes. They do
 not request vulnerability-alert permissions and do not query Dependabot.
@@ -472,7 +485,10 @@ job. That job does **not** run a package manager or repository package code. It
 validates the candidate artifact and its hashes against the audit job's
 out-of-band verified outputs, and requires both its checkout and the current
 remote `main` to exactly match the audited base SHA. The artifact cannot vouch
-for its own integrity. A newer `main` aborts the publish step so the next run
+for its own integrity. The publisher verifies the audit and final remediation
+report hashes before trusting report fields, and the notifier likewise refuses
+to digest evidence that does not match those verified outputs. A newer `main`
+aborts the publish step so the next run
 can regenerate and retest the candidate. The publisher then uses the existing
 `TEMPORAL_CICD_APP_ID` and
 `TEMPORAL_CICD_PRIVATE_KEY` GitHub App credentials with only contents and pull
@@ -481,7 +497,8 @@ draft branch `automation/weekly-dependency-security`.
 
 Premerge PR runs cannot reach the publishing path: they call the dependency
 module with `mode: dry-run`, and its publishing job is additionally blocked
-for every `pull_request` event.
+for every `pull_request` event. Dry runs do not invoke Claude and require no
+Anthropic, Slack, or GitHub App secret.
 
 The draft PR is therefore idempotent: one open PR accumulates the current
 week's minimal safe fixes. The workflow never dismisses Dependabot alerts;
@@ -500,6 +517,8 @@ URL.
 
 Repository secrets:
 
+- `ANTHROPIC_API_KEY` — passed only to Claude in the read-only audit/remediation
+  job when `mode: apply`; Claude receives no GitHub App or Slack credential.
 - `SLACK_BOT_TOKEN` — used only by the root and module notification jobs.
 - `TEMPORAL_CICD_APP_ID` and `TEMPORAL_CICD_PRIVATE_KEY` — used only by the
   dependency publishing job to update the draft PR.
