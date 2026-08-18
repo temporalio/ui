@@ -12,6 +12,8 @@ import {
   routeForBatchOperation,
   routeForBatchOperations,
   routeForCallStack,
+  routeForCatalog,
+  routeForCatalogExample,
   routeForCommonErrors,
   routeForEventHistory,
   routeForEventHistoryEvent,
@@ -90,6 +92,15 @@ describe('routeFor functions should resolve the base path exactly once', () => {
   const cases: [string, () => string | undefined][] = [
     ['routeForNamespaces', () => routeForNamespaces()],
     ['routeForNexus', () => routeForNexus()],
+    [
+      'routeForCatalogExample',
+      () =>
+        routeForCatalogExample({
+          ...namespaceParams,
+          exampleId: 'example-id',
+        }),
+    ],
+    ['routeForCatalog', () => routeForCatalog(namespaceParams)],
     ['routeForNexusEndpoint', () => routeForNexusEndpoint('ep-1')],
     ['routeForNexusEndpointEdit', () => routeForNexusEndpointEdit('ep-1')],
     ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],

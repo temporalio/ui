@@ -1,0 +1,19 @@
+{
+  "name": "temporalio-ui",
+  "interface": {
+    "displayName": "Temporal UI"
+  },
+  "plugins": [
+    {
+      "name": "temporal-ui",
+      "source": {
+        "source": "local",
+        "path": "./agent-skills"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

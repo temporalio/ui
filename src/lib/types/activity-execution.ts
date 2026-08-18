@@ -9,8 +9,7 @@ import type { WorkflowSearchAttributes } from './workflows';
 // string unions of the proto enum keys (not the numeric proto enum). Keying off
 // the generated proto enums ties them to the current API so they can't drift.
 export type ActivityExecutionStatus =
-  | keyof typeof import('@temporalio/proto').temporal.api.enums.v1.ActivityExecutionStatus
-  | 'ACTIVITY_EXECUTION_STATUS_PAUSED'; // TODO: Remove ACTIVITY_EXECUTION_STATUS_PAUSED once it is added to the proto enum
+  keyof typeof import('@temporalio/proto').temporal.api.enums.v1.ActivityExecutionStatus;
 
 export type ActivityIdReusePolicy =
   keyof typeof import('@temporalio/proto').temporal.api.enums.v1.ActivityIdReusePolicy;
@@ -65,6 +64,7 @@ export interface ActivityExecutionInfo extends Omit<
   | 'executionDuration'
   | 'stateTransitionCount'
   | 'currentRetryInterval'
+  | 'executionTime'
   | 'startDelay'
 > {
   status: ActivityExecutionStatus;

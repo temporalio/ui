@@ -75,7 +75,7 @@
   >
     <TimelineGraph
       workflow={snapshot.workflow}
-      groups={snapshot.groups}
+      lazyGroups={snapshot.groups}
       readOnly
     />
   </div>

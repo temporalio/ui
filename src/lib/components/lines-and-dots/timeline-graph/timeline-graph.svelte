@@ -2,7 +2,10 @@
   import { twMerge } from 'tailwind-merge';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import {
+    type LazyGroup,
+    materializeGroup,
+  } from '$lib/services/grouped-event-buffer';
   import { activeGroups } from '$lib/stores/active-events';
   import { collapseIdleTime } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -33,7 +36,9 @@
 
   interface Props {
     workflow: WorkflowExecution;
-    groups: EventGroups;
+    // Filtering, sorting and segment layout need no EventGroup, so only the
+    // pooled rows below materialize one.
+    lazyGroups: LazyGroup[];
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
@@ -46,7 +51,7 @@
 
   let {
     workflow,
-    groups,
+    lazyGroups,
     readOnly = false,
     error = false,
     reverseSort = false,
@@ -99,7 +104,7 @@
   const timeline = new Timeline({
     getFullEventHistory: () => $fullEventHistory,
     getWorkflow: () => workflow,
-    getEventGroups: () => groups,
+    getLazyGroups: () => lazyGroups,
     getCurrentTimeMs: () => nowMs,
     getLoading: () => loading,
     getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
@@ -130,8 +135,8 @@
     }
   };
 
-  const filteredGroups = $derived(
-    getFailedOrPendingGroups(groups, $eventStatusFilter),
+  const filteredLazyGroups = $derived(
+    getFailedOrPendingGroups(lazyGroups, $eventStatusFilter),
   );
 
   // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
@@ -139,9 +144,9 @@
   const pendingGroupCount = $derived.by(() => {
     if (!loading) return 0;
     if (!totalExpectedEvents) {
-      return filteredGroups.length === 0 ? 50 : 0;
+      return filteredLazyGroups.length === 0 ? 50 : 0;
     }
-    return Math.max(0, totalExpectedEvents - filteredGroups.length);
+    return Math.max(0, totalExpectedEvents - filteredLazyGroups.length);
   });
 
   // Rows mounted beyond the viewport, so edge rows survive small scrolls and
@@ -251,10 +256,10 @@
   );
 
   const groupIndexMap = $derived(
-    new Map(filteredGroups.map((g, i) => [g.id, i])),
+    new Map(filteredLazyGroups.map((g, i) => [g.id, i])),
   );
 
-  // Active group's index in filteredGroups (-1 = none). Derived here so the row
+  // Active group's index in filteredLazyGroups (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
   const activeIdx = $derived(
     $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
@@ -273,11 +278,11 @@
   }
 
   const descStart = $derived(
-    getDescStart(filteredGroups, descMinId, loading, pendingGroupCount),
+    getDescStart(filteredLazyGroups, descMinId, loading, pendingGroupCount),
   );
 
   const totalForY = $derived(
-    getTotalForY(filteredGroups.length, pendingGroupCount, descStart),
+    getTotalForY(filteredLazyGroups.length, pendingGroupCount, descStart),
   );
 
   // Widen the mount window by the panel's row span: shiftFor moves rows down but
@@ -290,7 +295,7 @@
   // scrolls with the page.
   const timelineHeight = $derived(
     Math.max(
-      ROW_HEIGHT * (filteredGroups.length + pendingGroupCount + 2),
+      ROW_HEIGHT * (filteredLazyGroups.length + pendingGroupCount + 2),
       120,
     ) + panelHeight,
   );
@@ -390,7 +395,7 @@
     return getWindowBounds({
       bandTop,
       bandHeight,
-      total: filteredGroups.length,
+      total: filteredLazyGroups.length,
       overscan: windowOverscan,
       reverseSort,
       descStart,
@@ -410,24 +415,32 @@
     return Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
   });
 
-  // Slot i%poolSize always holds group i (keyed by slot index below, so the DOM
-  // stays put; span capped at poolSize so slots never collide). Reuse the prior
-  // slot object when unchanged — a fresh object each pass would change the {#each}
-  // item and re-run the row derived for rows that didn't move.
-  let prevSlots: ({ index: number; group: EventGroups[number] } | null)[] = [];
+  // Reuse the prior slot object when nothing changed, or every row re-renders.
+  // Version counts as changed: a lazy group's identity is stable for the whole
+  // run, so identity alone would miss a group that gained an event.
+  type Slot = {
+    index: number;
+    lazy: LazyGroup;
+    version: number | undefined;
+  };
+  let prevSlots: (Slot | null)[] = [];
   const pool = $derived.by(() => {
-    const total = filteredGroups.length;
-    const slots: ({ index: number; group: EventGroups[number] } | null)[] =
-      new Array(poolSize).fill(null);
+    const total = filteredLazyGroups.length;
+    const slots: (Slot | null)[] = new Array(poolSize).fill(null);
     const end = Math.min(windowEnd, total, windowStart + poolSize);
     for (let index = windowStart; index < end; index++) {
-      const slot = index % poolSize;
-      const group = filteredGroups[index];
-      const prev = prevSlots[slot];
-      if (prev && prev.index === index && prev.group === group) {
-        slots[slot] = prev;
+      const slotIndex = index % poolSize;
+      const lazy = filteredLazyGroups[index];
+      const prev = prevSlots[slotIndex];
+      if (
+        prev &&
+        prev.index === index &&
+        prev.lazy === lazy &&
+        prev.version === lazy.version
+      ) {
+        slots[slotIndex] = prev;
       } else {
-        slots[slot] = { index, group };
+        slots[slotIndex] = { index, lazy, version: lazy.version };
       }
     }
     prevSlots = slots;
@@ -541,8 +554,8 @@
             >
               {#if slot}
                 <TimelineGraphRow
-                  group={slot.group}
-                  eventCount={slot.group.eventList.length}
+                  group={materializeGroup(slot.lazy)}
+                  eventCount={slot.lazy.eventCount}
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
@@ -555,7 +568,7 @@
         {#if loading && pendingGroupCount > 0}
           {@const rectY = getPendingBlockY({
             descStart,
-            filteredGroupsLength: filteredGroups.length,
+            filteredGroupsLength: filteredLazyGroups.length,
             reverseSort,
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
@@ -570,12 +583,12 @@
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
         {#if !readOnly && activeIdx >= 0}
-          {@const activeGroup = filteredGroups[activeIdx]}
-          {#if activeGroup}
+          {@const activeLazyGroup = filteredLazyGroups[activeIdx]}
+          {#if activeLazyGroup}
             {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
             <GroupDetailsRow
               y={panelY}
-              group={activeGroup}
+              group={materializeGroup(activeLazyGroup)}
               {canvasWidth}
               endTime={workflow?.endTime ? endTime : nowMs}
               onHeight={(height) => {

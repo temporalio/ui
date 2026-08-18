@@ -17,17 +17,10 @@ export type GetClusterInfoResponse =
 export type GetSystemInfoResponse =
   temporal.api.workflowservice.v1.IGetSystemInfoResponse;
 export type Capabilities =
-  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
-    serverScaledProviderCloudRun?: boolean | null;
-  };
+  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities;
 
-export type NamespaceCapabilities = NonNullable<
-  temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
-    standaloneActivityStartDelay?: boolean | null;
-    standaloneActivityBatchOperations?: boolean | null;
-    standaloneActivityOperatorCommands?: boolean | null;
-  }
->;
+export type NamespaceCapabilities =
+  NonNullable<temporal.api.namespace.v1.NamespaceInfo.ICapabilities>;
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
@@ -47,12 +40,7 @@ export type UpdateScheduleRequest =
   temporal.api.workflowservice.v1.IUpdateScheduleRequest;
 export type StartBatchOperationRequest =
   temporal.api.workflowservice.v1.IStartBatchOperationRequest;
-// TODO: Replace with temporal.api.common.v1.Execution
-export type Execution = {
-  type?: ExecutionType;
-  businessId?: string;
-  runId?: string;
-};
+export type Execution = temporal.api.common.v1.IExecution;
 export type CancelWorkflowRequest =
   temporal.api.workflowservice.v1.IRequestCancelWorkflowExecutionRequest;
 export type ResetWorkflowRequest =
@@ -197,9 +185,7 @@ export type ActivityUpdateOptionsRequest =
   temporal.api.workflowservice.v1.IUpdateActivityOptionsRequest;
 export type ActivityUpdateOptionsResponse =
   temporal.api.workflowservice.v1.IUpdateActivityOptionsResponse;
-export type ActivityOptions = temporal.api.activity.v1.IActivityOptions & {
-  startDelay?: string;
-};
+export type ActivityOptions = temporal.api.activity.v1.IActivityOptions;
 
 export type WorkflowPropertiesModifiedEventAttributes =
   temporal.api.history.v1.IWorkflowPropertiesModifiedEventAttributes;
@@ -327,9 +313,7 @@ export type EventLink = temporal.api.common.v1.ILink;
 export type Failure = temporal.api.failure.v1.IFailure;
 
 // api.worker
-export type WorkerHostInfo = temporal.api.worker.v1.IWorkerHostInfo & {
-  workerGroupingKey?: string;
-};
+export type WorkerHostInfo = temporal.api.worker.v1.IWorkerHostInfo;
 export type WorkerHeartbeat = temporal.api.worker.v1.IWorkerHeartbeat;
 export type WorkerPollerInfo = temporal.api.worker.v1.IWorkerPollerInfo;
 export type WorkerSlotsInfo = temporal.api.worker.v1.IWorkerSlotsInfo;
