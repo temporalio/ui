@@ -1,16 +1,16 @@
 {
-  "name": "temporalio-ui",
+  "name": "temporal-ui",
   "owner": {
     "name": "Temporal Technologies",
     "url": "https://github.com/temporalio/ui"
   },
   "metadata": {
-    "description": "Skills for developing the Temporal UI, starting with the Catalog."
+    "description": "Temporal UI Catalog tools for authoring, running, inspecting, and promoting workflow examples."
   },
   "plugins": [
     {
-      "name": "temporal-ui",
-      "source": "./agent-skills",
+      "name": "temporal-ui-catalog",
+      "source": "./agent-plugins/temporal-ui-catalog",
       "description": "Author, run, inspect, and promote Temporal Catalog examples.",
       "version": "0.1.0"
     }
