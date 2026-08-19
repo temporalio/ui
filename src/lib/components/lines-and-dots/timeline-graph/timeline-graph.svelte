@@ -466,8 +466,8 @@
 <div
   id="event-history-timeline-graph"
   class={twMerge(
-    'relative overflow-hidden border border-t-0 border-subtle bg-primary',
-    error && 'bg-danger',
+    'relative overflow-hidden border border-t-0 border-io-border-primary bg-io-background-primary',
+    error && 'bg-io-surface-danger',
   )}
   style:height="{svgHeight}px"
   bind:this={containerEl}

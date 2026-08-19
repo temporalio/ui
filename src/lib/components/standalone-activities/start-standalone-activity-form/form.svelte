@@ -311,7 +311,7 @@
   <Card
     class={twMerge(
       'space-y-4',
-      $errors.startToCloseTimeout ? 'border-danger' : '',
+      $errors.startToCloseTimeout ? 'border-io-border-danger' : '',
     )}
   >
     <h5>{translate('standalone-activities.form-options-heading')}</h5>
