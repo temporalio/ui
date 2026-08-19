@@ -64,7 +64,7 @@
     if (state === 'ready') {
       return {
         icon: 'circle-check',
-        iconClass: 'text-success',
+        iconClass: 'text-io-content-success',
         iconLabel: `${iconSubject} is ready`,
         label,
         tooltip:
@@ -77,7 +77,7 @@
     if (state === 'unavailable') {
       return {
         icon: 'warning',
-        iconClass: 'text-warning',
+        iconClass: 'text-io-content-warning',
         iconLabel: `${iconSubject} is unavailable`,
         label,
         tooltip:
@@ -611,7 +611,9 @@
         </section>
 
         {#if editorError}
-          <p class="text-sm text-danger" role="alert">{editorError}</p>
+          <p class="text-sm text-io-content-danger" role="alert">
+            {editorError}
+          </p>
         {/if}
 
         <div

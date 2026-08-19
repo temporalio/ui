@@ -205,7 +205,7 @@
   </div>
 
   {#if runError}
-    <p class="text-sm text-danger" role="alert">{runError}</p>
+    <p class="text-sm text-io-content-danger" role="alert">{runError}</p>
   {/if}
 
   <div class="catalog-table-region w-full overflow-x-auto">

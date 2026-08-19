@@ -485,7 +485,7 @@
         {translate('deployments.unset-current-description')}
       </p>
       {#if unsetCurrentError}
-        <p class="text-sm text-danger">{unsetCurrentError}</p>
+        <p class="text-sm text-io-content-danger">{unsetCurrentError}</p>
       {/if}
     </div>
   {/snippet}

@@ -63,14 +63,14 @@
           <Icon
             name={isValid ? 'circle-check-filled' : 'warning'}
             class="mt-0.5 h-4 w-4 shrink-0 {isValid
-              ? 'text-success'
-              : 'text-danger'}"
+              ? 'text-io-content-success'
+              : 'text-io-content-danger'}"
           />
           <div class="flex flex-col gap-1">
             <p
               class="text-sm font-medium {isValid
-                ? 'text-success'
-                : 'text-danger'}"
+                ? 'text-io-content-success'
+                : 'text-io-content-danger'}"
             >
               {isValid
                 ? translate('deployments.validate-connection-valid')

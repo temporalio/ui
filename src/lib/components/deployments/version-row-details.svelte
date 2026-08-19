@@ -36,7 +36,7 @@
   {/if}
 {:catch err}
   <div class="flex items-center gap-2 py-2 text-xs">
-    <span class="text-danger"
+    <span class="text-io-content-danger"
       >{err?.message ?? translate('deployments.version-load-error')}</span
     >
     <button
