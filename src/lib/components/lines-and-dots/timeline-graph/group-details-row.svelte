@@ -104,7 +104,12 @@
       </div>
     </div>
     <div class="surface-primary">
-      <EventDetailsFull {group} event={group.initialEvent} lazy={true} />
+      <EventDetailsFull
+        {group}
+        event={group.initialEvent}
+        lazy={true}
+        groupRow={true}
+      />
     </div>
     {#if childWorkflowStartedEvent}
       <div class="surface-primary p-4">

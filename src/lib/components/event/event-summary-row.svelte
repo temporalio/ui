@@ -21,6 +21,7 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
@@ -36,6 +37,7 @@
   import {
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
+    isWorkflowExecutionSignaledEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
@@ -113,24 +115,40 @@
   const canceled = $derived(eventOrGroupIsCanceled(event));
   const terminated = $derived(eventOrGroupIsTerminated(event));
 
-  const displayName = $derived(
-    isEventGroup(event)
-      ? event.pendingActivity
-        ? translate('workflows.pending-activity')
-        : event.pendingNexusOperation
-          ? translate('workflows.pending-nexus-operation')
-          : event.label
-      : isLocalActivityMarkerEvent(event)
-        ? translate('events.category.local-activity')
-        : spaceBetweenCapitalLetters(event.name),
+  const systemNexus = $derived(
+    resolveSystemNexusEvent(
+      isEventGroup(event) ? event.initialEvent : (event as WorkflowEvent),
+      { namespace, workflow, run, initiatingEvent: group?.initialEvent },
+    ),
   );
 
+  const systemNexusSummaryLink = $derived(
+    systemNexus?.links?.find((link) => link.kind === 'target-execution'),
+  );
+
+  const displayName = $derived.by(() => {
+    if (isEventGroup(event)) {
+      if (event.pendingActivity) return translate('workflows.pending-activity');
+      if (event.pendingNexusOperation)
+        return translate('workflows.pending-nexus-operation');
+      return event.label;
+    }
+    if (isLocalActivityMarkerEvent(event))
+      return translate('events.category.local-activity');
+    if (systemNexus?.displayName) return systemNexus.displayName;
+    return spaceBetweenCapitalLetters(event.name);
+  });
+
   const primaryAttribute = $derived(
-    !isLocalActivityMarkerEvent(event)
+    !isLocalActivityMarkerEvent(event) && !systemNexus
       ? getPrimaryAttributeForEvent(
           isEventGroup(event) ? event.initialEvent : event,
         )
       : undefined,
+  );
+
+  const effectiveCategory = $derived(
+    systemNexus?.timelineCategory ?? event.category,
   );
 
   const secondaryAttribute = $derived(
@@ -162,6 +180,7 @@
 
   const showSecondaryAttribute = $derived(
     compact &&
+      !systemNexus &&
       secondaryAttribute?.key &&
       secondaryAttribute?.key !== primaryAttribute?.key &&
       !currentEvent?.userMetadata?.summary,
@@ -302,10 +321,10 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p class={eventTypeStyle({ category: event.category })}>
+    <p class={eventTypeStyle({ category: effectiveCategory })}>
       <Icon
-        name={CategoryIcon[event.category].name}
-        title={CategoryIcon[event.category].title}
+        name={CategoryIcon[effectiveCategory].name}
+        title={CategoryIcon[effectiveCategory].title}
         class={merge(
           'mr-1 inline',
           isEventGroup(event) && event.isPending && 'animate-pulse',
@@ -366,11 +385,33 @@
           <PayloadSummary value={currentEvent.userMetadata.summary} />
         </div>
       {/if}
-      {#if currentEvent?.links?.length}
+      {#if systemNexus?.summaryAttribute}
+        <EventDetailsRow
+          key={systemNexus.summaryAttribute.key}
+          value={systemNexus.summaryAttribute.value}
+          {attributes}
+        />
+      {:else if systemNexusSummaryLink}
         <EventLink
-          view={toEventLinkView(currentEvent.links[0], { namespace })}
+          view={systemNexusSummaryLink}
           class="max-w-xl"
           linkClass="truncate"
+          labelClass="text-xs"
+        />
+      {:else if currentEvent?.links?.length && !systemNexus}
+        {@const callerPerspective =
+          isWorkflowExecutionSignaledEvent(currentEvent)}
+        {@const linkView = toEventLinkView(currentEvent.links[0], {
+          namespace,
+          ...(callerPerspective && { perspective: 'caller' as const }),
+        })}
+        <EventLink
+          view={callerPerspective
+            ? { ...linkView, label: translate('nexus.caller-execution') }
+            : linkView}
+          class="max-w-xl"
+          linkClass="truncate"
+          labelClass="text-xs"
         />
       {/if}
       {#if nonPendingActivityAttempt}
@@ -409,7 +450,11 @@
     data-testid="event-summary-row-expanded"
   >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
-      <EventDetailsFull {group} event={currentEvent} />
+      <EventDetailsFull
+        {group}
+        event={currentEvent}
+        groupRow={isEventGroup(event)}
+      />
     </td>
   </tr>
 {/if}

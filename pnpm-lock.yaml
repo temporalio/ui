@@ -179,6 +179,12 @@ importers:
       '@babel/core':
         specifier: ^7.20.12
         version: 7.29.7
+      '@buf/temporalio_api.bufbuild_es':
+        specifier: 2.12.0-20260602195324-874c8d65f615.1
+        version: 2.12.0-20260602195324-874c8d65f615.1(@bufbuild/protobuf@2.14.0)
+      '@bufbuild/protobuf':
+        specifier: ^2.12.0
+        version: 2.14.0
       '@chromatic-com/storybook':
         specifier: ^5.2.1
         version: 5.2.1(storybook@10.5.5(@types/react@19.2.7)(prettier@3.8.1)(react@18.3.1))
@@ -639,6 +645,24 @@ packages:
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
+
+  '@buf/googleapis_googleapis.bufbuild_es@2.12.0-20251126203132-004180b77378.1':
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/googleapis_googleapis.bufbuild_es/-/googleapis_googleapis.bufbuild_es-2.12.0-20251126203132-004180b77378.1.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.12.0
+
+  '@buf/temporalio_api.bufbuild_es@2.12.0-20260602195324-874c8d65f615.1':
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/temporalio_api.bufbuild_es/-/temporalio_api.bufbuild_es-2.12.0-20260602195324-874c8d65f615.1.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.12.0
+
+  '@buf/temporalio_nexus-annotations.bufbuild_es@2.12.0-20260325201330-599b78404fbe.1':
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/temporalio_nexus-annotations.bufbuild_es/-/temporalio_nexus-annotations.bufbuild_es-2.12.0-20260325201330-599b78404fbe.1.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.12.0
+
+  '@bufbuild/protobuf@2.14.0':
+    resolution: {integrity: sha512-C3UGsiCwSprE2NKIIFA3hCDlpXTMCAXRZuEVp88L1GY36Y41+rYL5fryE+nOFhp4p4JPQvdV8PQ4DWgHgeTE+w==}
 
   '@cacheable/memory@2.2.0':
     resolution: {integrity: sha512-CTLKqLItRCEixEAewD3/j9DB3/o96gpTPD4eJ1v+DGOlxZRZncRQkGYqqnAGCscYd6RNeXfGeiuCphsPtqyIfQ==}
@@ -7835,6 +7859,22 @@ snapshots:
   '@bcoe/v8-coverage@0.2.3': {}
 
   '@bcoe/v8-coverage@1.0.2': {}
+
+  '@buf/googleapis_googleapis.bufbuild_es@2.12.0-20251126203132-004180b77378.1(@bufbuild/protobuf@2.14.0)':
+    dependencies:
+      '@bufbuild/protobuf': 2.14.0
+
+  '@buf/temporalio_api.bufbuild_es@2.12.0-20260602195324-874c8d65f615.1(@bufbuild/protobuf@2.14.0)':
+    dependencies:
+      '@buf/googleapis_googleapis.bufbuild_es': 2.12.0-20251126203132-004180b77378.1(@bufbuild/protobuf@2.14.0)
+      '@buf/temporalio_nexus-annotations.bufbuild_es': 2.12.0-20260325201330-599b78404fbe.1(@bufbuild/protobuf@2.14.0)
+      '@bufbuild/protobuf': 2.14.0
+
+  '@buf/temporalio_nexus-annotations.bufbuild_es@2.12.0-20260325201330-599b78404fbe.1(@bufbuild/protobuf@2.14.0)':
+    dependencies:
+      '@bufbuild/protobuf': 2.14.0
+
+  '@bufbuild/protobuf@2.14.0': {}
 
   '@cacheable/memory@2.2.0':
     dependencies:
