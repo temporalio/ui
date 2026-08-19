@@ -45,7 +45,7 @@ jobs:
 
       - id: artifact
         name: Name the contributor audit artifact
-        run: echo "name=weekly-external-contributor-audit-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+        run: echo "name=weekly-external-contributor-audit-${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_OUTPUT"
 
       - name: Identify active external-contributor pull requests
         run: >-

@@ -161,9 +161,15 @@ const unresolvedItems = ({ audit, remediation }) => {
   if (unresolved.length > 0) {
     return {
       lines: unresolved.slice(0, DEFAULT_UNRESOLVED_LIMIT).map((item) => {
+        const name = item.package ?? item.packageName ?? item.title ?? null;
+        const alertReference = item.number
+          ? `#${item.number}`
+          : Array.isArray(item.alertIds) && item.alertIds.length > 0
+            ? item.alertIds.map((id) => `#${id}`).join(', ')
+            : null;
         const label = item.number
-          ? `#${item.number} ${item.package ?? item.packageName ?? item.title ?? 'alert'}`
-          : (item.package ?? item.packageName ?? item.title ?? String(item));
+          ? `${alertReference} ${name ?? 'alert'}`
+          : (name ?? alertReference ?? 'unidentified alert');
         const reason = item.reason ? ` — ${item.reason}` : '';
         return `• ${escapeSlackMrkdwn(truncateText(label))}${escapeSlackMrkdwn(truncateText(reason))}`;
       }),

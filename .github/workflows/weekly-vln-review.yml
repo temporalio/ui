@@ -45,7 +45,7 @@ jobs:
 
       - id: artifact
         name: Name the audit artifact
-        run: echo "name=weekly-vln-audit-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+        run: echo "name=weekly-vln-audit-${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_OUTPUT"
 
       - name: Audit open VLN pull requests
         run: >-

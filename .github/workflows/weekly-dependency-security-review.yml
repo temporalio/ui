@@ -102,7 +102,7 @@ jobs:
 
       - id: artifact
         name: Name the candidate artifact
-        run: echo "name=weekly-dependency-security-candidate-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+        run: echo "name=weekly-dependency-security-candidate-${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_OUTPUT"
 
       - name: Audit open Dependabot alerts and VLN pull requests
         run: >-

@@ -234,3 +234,24 @@ test('bounds every VLN and external Slack section and reports omitted PRs', () =
     assert.ok(reply.blocks.every((block) => block.text.text.length <= 3_000));
   }
 });
+
+test('labels an unresolved classification that names no package', () => {
+  const reply = buildDependencySecurityReply({
+    audit: { ...audit, remediation: null },
+    remediation: {
+      summary: { actions: 0, manual: 1, unsupported: 0 },
+      applied: false,
+      classifications: [
+        {
+          status: 'manual',
+          packageName: null,
+          alertIds: [77],
+          reason: 'Alert did not identify an npm package.',
+        },
+      ],
+    },
+  });
+
+  assert.doesNotMatch(reply.text, /\[object Object\]/);
+  assert.match(reply.text, /#77/);
+});
