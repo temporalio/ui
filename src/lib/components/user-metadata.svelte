@@ -10,9 +10,14 @@
   let { summary, details }: Props = $props();
 </script>
 
-<div data-testid="user-metadata" class="flex h-full flex-1 flex-col bg-primary">
+<div
+  data-testid="user-metadata"
+  class="flex h-full flex-1 flex-col bg-io-background-primary"
+>
   <div>
-    <div class="surface-information w-full px-6 py-2">
+    <div
+      class="w-full bg-io-surface-information px-6 py-2 text-io-content-primary"
+    >
       <h3 data-testid="user-metadata-summary-heading">
         {translate('workflows.summary')}
       </h3>
@@ -20,12 +25,11 @@
     {#if summary}
       <Markdown
         frameId="user-metadata-summary"
-        class="p-3"
         overrideTheme="primary"
         content={summary}
       />
     {:else}
-      <div class="py-6 pl-6 text-secondary/70">
+      <div class="py-6 pl-6 text-io-content-tertiary">
         <p class="text-sm italic">
           {translate('workflows.no-summary-available')}
         </p>
@@ -33,7 +37,9 @@
     {/if}
   </div>
   <div>
-    <div class="surface-information w-full px-6 py-2">
+    <div
+      class="w-full bg-io-surface-information px-6 py-2 text-io-content-primary"
+    >
       <h3 data-testid="user-metadata-summary-heading">
         {translate('workflows.details')}
       </h3>
@@ -41,12 +47,11 @@
     {#if details}
       <Markdown
         frameId="user-metadata-details"
-        class="p-3"
         overrideTheme="primary"
         content={details}
       />
     {:else}
-      <div class="py-6 pl-6 text-secondary/70">
+      <div class="py-6 pl-6 text-io-content-tertiary">
         <p class="text-sm italic">
           {translate('workflows.no-details-available')}
         </p>
