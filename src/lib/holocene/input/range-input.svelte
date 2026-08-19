@@ -155,7 +155,7 @@
   }
 
   .numeric-input.invalid {
-    @apply border-danger bg-red-100 text-danger;
+    @apply border-io-border-danger bg-io-surface-danger text-io-content-danger;
   }
 
   .numeric-input:focus {

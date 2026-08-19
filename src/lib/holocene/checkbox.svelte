@@ -174,7 +174,9 @@
           'peer-focus-visible:ring-offset-[var(--color-surface-primary)]',
         ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
-        valid ? 'border-secondary' : 'border-danger peer-checked:border-danger',
+        valid
+          ? 'border-io-border-secondary'
+          : 'border-io-border-danger peer-checked:border-io-border-danger',
       )}
     >
       {#if checkIconName}

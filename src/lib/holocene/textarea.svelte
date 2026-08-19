@@ -114,11 +114,11 @@
 
 <style lang="postcss">
   .error {
-    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
+    @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-2 focus-within:ring-io-border-danger;
   }
 
   .error-msg {
-    @apply min-h-[1.25rem] break-words border-danger text-xs text-io-content-danger;
+    @apply min-h-[1.25rem] break-words border-io-border-danger text-xs text-io-content-danger;
   }
 
   .error-msg.min-width {

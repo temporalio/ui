@@ -202,7 +202,7 @@
 
 <style lang="postcss">
   .invalid {
-    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
+    @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-2 focus-within:ring-io-border-danger;
   }
 
   input {

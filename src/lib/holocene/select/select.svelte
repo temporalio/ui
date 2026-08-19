@@ -133,7 +133,11 @@
     <Label {label} hidden={labelHidden} for={id} {required} />
     {#key $labelCtx}
       <MenuButton
-        class={merge('w-full', !valid && 'border-danger', menuButtonClass)}
+        class={merge(
+          'w-full',
+          !valid && 'border-io-border-danger',
+          menuButtonClass,
+        )}
         hasIndicator={!disabled}
         disabled={disabled || loading}
         controls="{id}-select"

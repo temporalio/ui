@@ -235,10 +235,10 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-danger focus-within:ring-danger/70;
+      @apply border-io-border-danger focus-within:ring-io-border-danger;
 
       > .input {
-        @apply caret-danger;
+        @apply caret-io-content-danger;
       }
     }
 
