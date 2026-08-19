@@ -166,6 +166,15 @@ jobs:
             --disallowedTools "Bash,Write,WebFetch,WebSearch"
             --max-turns 10
 
+      - name: Keep the Claude execution log for diagnosis
+        if: inputs.mode == 'apply' && !inputs.publish && failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: claude-execution-log-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: warn
+          retention-days: 3
+          path: ${{ runner.temp }}/claude-execution-output.json
+
       - id: claude-candidate
         name: Reject out-of-scope Claude changes and record resolver evidence
         if: inputs.mode == 'apply'
