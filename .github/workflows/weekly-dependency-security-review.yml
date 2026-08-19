@@ -198,6 +198,14 @@ jobs:
         env:
           HUSKY: '0'
 
+      - name: Verify that the candidate resolves every remediated alert
+        if: inputs.mode == 'apply'
+        run: >-
+          node .github/scripts/verify-weekly-dependency-remediation.mjs
+          --audit weekly-dependency-security-audit.json
+          --report weekly-dependency-remediation.json
+          --lockfile pnpm-lock.yaml
+
       - id: attest
         name: Attest the audited base and candidate dependency files
         run: |
@@ -368,7 +376,7 @@ jobs:
           test "$actual_lockfile_hash" = "$TRUSTED_LOCKFILE_HASH"
           test "$actual_report_hash" = "$TRUSTED_REPORT_HASH"
           jq --exit-status \
-            '.applied == true and .resolver == "claude-code" and (.actions | type == "array" and length > 0)' \
+            '.applied == true and .resolver == "claude-code" and .verification.verified == true and (.actions | type == "array" and length > 0)' \
             candidate/weekly-dependency-remediation.json \
             > /dev/null
           jq empty candidate/package.json
