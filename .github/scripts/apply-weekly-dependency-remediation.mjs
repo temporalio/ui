@@ -10,7 +10,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-const ROOT_MANIFEST = '/package.json';
+const REMEDIABLE_MANIFESTS = new Set(['package.json', 'pnpm-lock.yaml']);
 const DIRECT_DEPENDENCY_SECTIONS = ['dependencies', 'devDependencies'];
 const VERSION =
   /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
@@ -52,6 +52,37 @@ export function isVersionAtLeast(version, floor) {
   );
 }
 
+const RANGE_CONSTRAINT = /^(>=|<=|>|<|=)?\s*(.+)$/;
+
+function satisfiesConstraint(comparison, operator) {
+  if (operator === '<') return comparison < 0;
+  if (operator === '<=') return comparison <= 0;
+  if (operator === '>') return comparison > 0;
+  if (operator === '>=') return comparison >= 0;
+  return comparison === 0;
+}
+
+export function isVersionVulnerable(version, range) {
+  const target = parseSemver(version);
+  if (!target || typeof range !== 'string') return true;
+  const constraints = range
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (constraints.length === 0) return true;
+
+  for (const constraint of constraints) {
+    const match = RANGE_CONSTRAINT.exec(constraint);
+    if (!match) return true;
+    const bound = parseSemver(match[2]);
+    if (!bound) return true;
+    if (!satisfiesConstraint(compareSemver(target, bound), match[1] ?? '=')) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function rangeLowerBound(range) {
   if (typeof range !== 'string') return null;
   const match = VERSION_IN_RANGE.exec(range.trim());
@@ -67,6 +98,78 @@ function isSimpleRange(range) {
   return /^(?:\^|~|>=|>|=)?\s*\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(
     range.trim(),
   );
+}
+
+const COMPOUND_RANGE =
+  /^(?<lowerOperator>>=|>)\s*(?<lower>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?)\s+(?<upperOperator><=|<)\s*(?<upper>(?:0|[1-9]\d*)(?:\.\d+){0,2})$/;
+
+function parseOverrideRange(range) {
+  if (typeof range !== 'string') return null;
+  if (isSimpleRange(range)) {
+    const bound = rangeLowerBound(range);
+    return bound ? { ...bound, upper: null } : null;
+  }
+  const match = COMPOUND_RANGE.exec(range.trim());
+  if (!match?.groups) return null;
+  return {
+    operator: match.groups.lowerOperator,
+    version: match.groups.lower,
+    upper: {
+      operator: match.groups.upperOperator,
+      version: match.groups.upper,
+    },
+  };
+}
+
+function satisfiesUpperBound(version, upper) {
+  const parts = upper.version.split('.');
+  while (parts.length < 3) parts.push('0');
+  const ceiling = parseSemver(parts.join('.'));
+  const target = parseSemver(version);
+  if (!ceiling || !target) return false;
+  const comparison = compareSemver(target, ceiling);
+  return upper.operator === '<=' ? comparison <= 0 : comparison < 0;
+}
+
+function raisedRange(bound, patched) {
+  if (!bound.upper) return `${bound.operator}${patched}`;
+  return `${bound.operator}${patched} ${bound.upper.operator}${bound.upper.version}`;
+}
+
+const LOCKFILE_PACKAGE_KEY = /^ {2}('?)(?<entry>[^'\s]+)\1:\s*$/;
+
+export function parseLockfileVersions(lockfileText) {
+  const versions = new Map();
+  if (typeof lockfileText !== 'string') return versions;
+
+  let insidePackages = false;
+  for (const line of lockfileText.split('\n')) {
+    if (/^\S/.test(line)) {
+      insidePackages = line.trimEnd() === 'packages:';
+      continue;
+    }
+    if (!insidePackages) continue;
+
+    const match = LOCKFILE_PACKAGE_KEY.exec(line);
+    if (!match?.groups) continue;
+
+    const entry = match.groups.entry.replace(/\(.*\)$/, '');
+    const separator = entry.lastIndexOf('@');
+    if (separator <= 0) continue;
+
+    const name = entry.slice(0, separator);
+    const version = entry.slice(separator + 1);
+    if (!parseSemver(version)) continue;
+
+    const found = versions.get(name) ?? [];
+    if (!found.includes(version)) found.push(version);
+    versions.set(name, found);
+  }
+
+  for (const found of versions.values()) {
+    found.sort((left, right) => compareSemver(left, right));
+  }
+  return versions;
 }
 
 function flattenAlerts(audit) {
@@ -124,16 +227,29 @@ export function normalizeAlerts(audit) {
         normalizedPackageName ??
         alert?.packageName,
       patchedVersion: firstPatched,
+      vulnerableRange:
+        vulnerability.vulnerable_version_range ??
+        vulnerability.vulnerableVersionRange ??
+        alert?.vulnerableRange ??
+        null,
     };
   });
 }
 
-function classification({ packageName, alertIds, status, reason, action }) {
+function classification({
+  packageName,
+  alertIds,
+  status,
+  reason,
+  action,
+  resolvedVersions,
+}) {
   return {
     packageName: packageName ?? null,
     alertIds,
     status,
     reason,
+    ...(resolvedVersions ? { resolvedVersions } : {}),
     ...(action ? { action } : {}),
   };
 }
@@ -146,9 +262,20 @@ function findDirectDependency(packageJson, packageName) {
   return null;
 }
 
+function overrideSelectorTarget(selector) {
+  let target = selector;
+  for (let index = 1; index < selector.length; index += 1) {
+    if (selector[index] !== '>') continue;
+    if (selector[index - 1] === '@') continue;
+    if (selector[index + 1] === '=') continue;
+    target = selector.slice(index + 1);
+  }
+  return target.trim();
+}
+
 function overrideTargetsPackage(selector, packageName) {
-  const target = selector.split('>').at(-1)?.trim();
-  return target === packageName || target?.startsWith(`${packageName}@`);
+  const target = overrideSelectorTarget(selector);
+  return target === packageName || target.startsWith(`${packageName}@`);
 }
 
 function findOverrides(packageJson, packageName) {
@@ -190,8 +317,8 @@ function incompatibleRangeReason({ kind, bound, patched }) {
 }
 
 function classifyOverride({ packageName, alertIds, patched, override }) {
-  const bound = rangeLowerBound(override.version);
-  if (!bound || !isSimpleRange(override.version)) {
+  const bound = parseOverrideRange(override.version);
+  if (!bound) {
     return classification({
       packageName,
       alertIds,
@@ -207,7 +334,15 @@ function classifyOverride({ packageName, alertIds, patched, override }) {
       reason: `Existing override lower bound ${bound.version} already meets ${patched}.`,
     });
   }
-  if (!isRangeCompatible(bound, patched)) {
+  if (bound.upper && !satisfiesUpperBound(patched, bound.upper)) {
+    return classification({
+      packageName,
+      alertIds,
+      status: 'manual',
+      reason: `Override remediation to ${patched} exceeds the pinned upper bound ${bound.upper.operator}${bound.upper.version}.`,
+    });
+  }
+  if (!bound.upper && !isRangeCompatible(bound, patched)) {
     return classification({
       packageName,
       alertIds,
@@ -229,7 +364,7 @@ function classifyOverride({ packageName, alertIds, patched, override }) {
       type: 'pnpm-override',
       selector: override.selector,
       from: override.version,
-      to: `${bound.operator}${patched}`,
+      to: raisedRange(bound, patched),
     },
   });
 }
@@ -242,7 +377,13 @@ function highestPatchedVersion(alerts) {
   );
 }
 
-function classifyPackage(alerts, packageJson) {
+function classifyPackage(alerts, packageJson, resolvedVersions) {
+  const result = classifyPackageStatus(alerts, packageJson, resolvedVersions);
+  if (!resolvedVersions?.length || result.resolvedVersions) return result;
+  return { ...result, resolvedVersions };
+}
+
+function classifyPackageStatus(alerts, packageJson, resolvedVersions) {
   const packageName = alerts[0]?.packageName;
   const alertIds = alerts.map((alert) => alert.id);
   const patched = highestPatchedVersion(alerts);
@@ -275,6 +416,19 @@ function classifyPackage(alerts, packageJson) {
       status: 'manual',
       reason:
         'Alerts require patched versions across multiple major versions; dependency cascade is ambiguous.',
+    });
+  }
+
+  const vulnerableResolved = (resolvedVersions ?? []).filter((version) =>
+    alerts.some((item) => isVersionVulnerable(version, item.vulnerableRange)),
+  );
+  if (resolvedVersions?.length && vulnerableResolved.length === 0) {
+    return classification({
+      packageName,
+      alertIds,
+      status: 'alreadySafe',
+      reason: `The lockfile resolves ${packageName} to ${resolvedVersions.join(', ')}, which the advisory does not cover.`,
+      resolvedVersions,
     });
   }
 
@@ -337,6 +491,15 @@ function classifyPackage(alerts, packageJson) {
           .join(', ')}; a direct-only bump could be superseded.`,
       });
     }
+    if (vulnerableResolved.length > 1) {
+      return classification({
+        packageName,
+        alertIds,
+        status: 'manual',
+        reason: `The lockfile resolves ${packageName} to ${vulnerableResolved.join(', ')}; a direct dependency bump cannot reach every vulnerable copy.`,
+        resolvedVersions,
+      });
+    }
 
     return classification({
       packageName,
@@ -383,8 +546,9 @@ function classifyPackage(alerts, packageJson) {
  * Return a deterministic, manifest-only remediation plan.
  * Unsupported alerts are intentionally not mixed with npm remediation groups.
  */
-export function planRemediation({ audit, packageJson }) {
+export function planRemediation({ audit, packageJson, lockfile }) {
   const normalized = normalizeAlerts(audit);
+  const resolved = parseLockfileVersions(lockfile);
   const unsupported = [];
   const npmByPackage = new Map();
 
@@ -400,7 +564,7 @@ export function planRemediation({ audit, packageJson }) {
       );
       continue;
     }
-    if (alert.manifestPath !== ROOT_MANIFEST) {
+    if (!REMEDIABLE_MANIFESTS.has(alert.manifestPath)) {
       unsupported.push(
         classification({
           packageName: alert.packageName,
@@ -420,7 +584,11 @@ export function planRemediation({ audit, packageJson }) {
     ...[...npmByPackage.keys()]
       .sort((a, b) => String(a).localeCompare(String(b)))
       .map((packageName) =>
-        classifyPackage(npmByPackage.get(packageName), packageJson),
+        classifyPackage(
+          npmByPackage.get(packageName),
+          packageJson,
+          resolved.get(packageName),
+        ),
       ),
     ...unsupported.sort((a, b) =>
       String(a.packageName).localeCompare(String(b.packageName)),
@@ -439,6 +607,9 @@ export function planRemediation({ audit, packageJson }) {
     sourceAlertCount: normalized.length,
     summary: {
       safe: classifications.filter((item) => item.status === 'safe').length,
+      alreadySafe: classifications.filter(
+        (item) => item.status === 'alreadySafe',
+      ).length,
       manual: classifications.filter((item) => item.status === 'manual').length,
       unsupported: classifications.filter(
         (item) => item.status === 'unsupported',
@@ -484,13 +655,20 @@ export function applyRemediation(packageJson, plan) {
 }
 
 function parseCliArguments(args) {
-  const options = { packageJson: 'package.json', apply: false };
+  const options = {
+    packageJson: 'package.json',
+    lockfile: 'pnpm-lock.yaml',
+    apply: false,
+  };
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === '--apply') options.apply = true;
     else if (arg === '--audit') options.audit = args[++index];
     else if (arg === '--package-json') options.packageJson = args[++index];
-    else if (arg === '--report') options.report = args[++index];
+    else if (arg === '--lockfile') {
+      options.lockfile = args[++index];
+      options.lockfileRequired = true;
+    } else if (arg === '--report') options.report = args[++index];
     else if (arg === '--help') options.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -501,7 +679,7 @@ export async function runCli(args = process.argv.slice(2)) {
   const options = parseCliArguments(args);
   if (options.help) {
     console.log(
-      'Usage: node apply-weekly-dependency-remediation.mjs --audit audit.json [--package-json package.json] [--report remediation.json] [--apply]',
+      'Usage: node apply-weekly-dependency-remediation.mjs --audit audit.json [--package-json package.json] [--lockfile pnpm-lock.yaml] [--report remediation.json] [--apply]',
     );
     return { exitCode: 0 };
   }
@@ -511,9 +689,16 @@ export async function runCli(args = process.argv.slice(2)) {
     readFile(options.audit, 'utf8'),
     readFile(options.packageJson, 'utf8'),
   ]);
+  const lockfileText = await readFile(options.lockfile, 'utf8').catch(
+    (error) => {
+      if (options.lockfileRequired) throw error;
+      return undefined;
+    },
+  );
   const plan = planRemediation({
     audit: JSON.parse(auditText),
     packageJson: JSON.parse(packageJsonText),
+    lockfile: lockfileText,
   });
   const report = {
     ...plan,
