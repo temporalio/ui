@@ -53,6 +53,8 @@ jobs:
       audit_sha256: ${{ steps.verified.outputs.audit_sha256 }}
       package_json_sha256: ${{ steps.verified.outputs.package_json_sha256 }}
       pnpm_lock_sha256: ${{ steps.verified.outputs.pnpm_lock_sha256 }}
+      go_mod_sha256: ${{ steps.verified.outputs.go_mod_sha256 }}
+      go_sum_sha256: ${{ steps.verified.outputs.go_sum_sha256 }}
       remediation_report_sha256: ${{ steps.verified.outputs.remediation_report_sha256 }}
     # This is the only job that installs or executes package code. It has a
     # read-only GITHUB_TOKEN and receives neither App nor Slack credentials.
@@ -87,6 +89,12 @@ jobs:
           node-version: '^22.23.1'
           cache: pnpm
 
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+
       - id: artifact
         name: Name the candidate artifact
         run: echo "name=weekly-dependency-security-candidate-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
@@ -107,6 +115,8 @@ jobs:
           node .github/scripts/apply-weekly-dependency-remediation.mjs
           --audit weekly-dependency-security-audit.json
           --package-json package.json
+          --lockfile pnpm-lock.yaml
+          --go-mod server/go.mod
           --report weekly-dependency-remediation.json
 
       - id: audited-base
@@ -187,6 +197,24 @@ jobs:
             --report weekly-dependency-remediation.json \
             --github-output "$GITHUB_OUTPUT"
 
+      - id: go-candidate
+        name: Apply the authorized Go module remediation
+        if: inputs.mode == 'apply'
+        run: |
+          modules="$(jq -r '[.actions[] | select(.type == "go-module")][] | "\(.packageName)@\(.to)"' weekly-dependency-remediation.json)"
+          if [ -z "$modules" ]; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          cd server
+          while IFS= read -r module; do
+            [ -n "$module" ] || continue
+            echo "Updating $module"
+            go get "$module"
+          done <<< "$modules"
+          go mod tidy
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
       - name: Resolve the lockfile without lifecycle scripts
         if: inputs.mode == 'apply' && steps.claude-candidate.outputs.changed == 'true'
         run: pnpm install --lockfile-only --ignore-scripts
@@ -205,6 +233,7 @@ jobs:
           --audit weekly-dependency-security-audit.json
           --report weekly-dependency-remediation.json
           --lockfile pnpm-lock.yaml
+          --go-mod server/go.mod
 
       - id: attest
         name: Attest the audited base and candidate dependency files
@@ -213,18 +242,24 @@ jobs:
           audit_hash="$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
           package_hash="$(sha256sum package.json | cut -d ' ' -f 1)"
           lockfile_hash="$(sha256sum pnpm-lock.yaml | cut -d ' ' -f 1)"
+          go_mod_hash="$(sha256sum server/go.mod | cut -d ' ' -f 1)"
+          go_sum_hash="$(sha256sum server/go.sum | cut -d ' ' -f 1)"
 
           echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
           echo "audit_sha256=$audit_hash" >> "$GITHUB_OUTPUT"
           echo "package_json_sha256=$package_hash" >> "$GITHUB_OUTPUT"
           echo "pnpm_lock_sha256=$lockfile_hash" >> "$GITHUB_OUTPUT"
+          echo "go_mod_sha256=$go_mod_hash" >> "$GITHUB_OUTPUT"
+          echo "go_sum_sha256=$go_sum_hash" >> "$GITHUB_OUTPUT"
 
           jq -n \
             --arg baseSha "$base_sha" \
             --arg auditSha256 "$audit_hash" \
             --arg packageJsonSha256 "$package_hash" \
             --arg pnpmLockSha256 "$lockfile_hash" \
-            '{schemaVersion: 1, baseSha: $baseSha, auditSha256: $auditSha256, packageJsonSha256: $packageJsonSha256, pnpmLockSha256: $pnpmLockSha256}' \
+            --arg goModSha256 "$go_mod_hash" \
+            --arg goSumSha256 "$go_sum_hash" \
+            '{schemaVersion: 1, baseSha: $baseSha, auditSha256: $auditSha256, packageJsonSha256: $packageJsonSha256, pnpmLockSha256: $pnpmLockSha256, goModSha256: $goModSha256, goSumSha256: $goSumSha256}' \
             > weekly-dependency-candidate-attestation.json
 
           jq \
@@ -247,7 +282,7 @@ jobs:
       - name: Reject changes outside the approved dependency files
         if: inputs.mode == 'apply'
         run: |
-          unexpected="$(git diff --name-only | grep -vE '^(package\.json|pnpm-lock\.yaml)$' || true)"
+          unexpected="$(git diff --name-only | grep -vE '^(package\.json|pnpm-lock\.yaml|server/go\.mod|server/go\.sum)$' || true)"
           if [ -n "$unexpected" ]; then
             echo "Unexpected file changes:" >&2
             echo "$unexpected" >&2
@@ -257,7 +292,7 @@ jobs:
       - id: changes
         name: Record whether an approved candidate exists
         run: |
-          if git diff --quiet -- package.json pnpm-lock.yaml; then
+          if git diff --quiet -- package.json pnpm-lock.yaml server/go.mod server/go.sum; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
           else
             echo 'changed=true' >> "$GITHUB_OUTPUT"
@@ -279,23 +314,31 @@ jobs:
           EXPECTED_AUDIT_HASH: ${{ steps.attest.outputs.audit_sha256 }}
           EXPECTED_PACKAGE_HASH: ${{ steps.attest.outputs.package_json_sha256 }}
           EXPECTED_LOCKFILE_HASH: ${{ steps.attest.outputs.pnpm_lock_sha256 }}
+          EXPECTED_GO_MOD_HASH: ${{ steps.attest.outputs.go_mod_sha256 }}
+          EXPECTED_GO_SUM_HASH: ${{ steps.attest.outputs.go_sum_sha256 }}
           EXPECTED_REPORT_HASH: ${{ steps.attest.outputs.remediation_report_sha256 }}
         run: |
           actual_audit_hash="$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
           actual_package_hash="$(sha256sum package.json | cut -d ' ' -f 1)"
           actual_lockfile_hash="$(sha256sum pnpm-lock.yaml | cut -d ' ' -f 1)"
+          actual_go_mod_hash="$(sha256sum server/go.mod | cut -d ' ' -f 1)"
+          actual_go_sum_hash="$(sha256sum server/go.sum | cut -d ' ' -f 1)"
           actual_report_hash="$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)"
 
           test "$actual_audit_hash" = "$EXPECTED_AUDIT_HASH"
           test "$actual_package_hash" = "$EXPECTED_PACKAGE_HASH"
           test "$actual_lockfile_hash" = "$EXPECTED_LOCKFILE_HASH"
+          test "$actual_go_mod_hash" = "$EXPECTED_GO_MOD_HASH"
+          test "$actual_go_sum_hash" = "$EXPECTED_GO_SUM_HASH"
           test "$actual_report_hash" = "$EXPECTED_REPORT_HASH"
           jq --exit-status \
             --arg baseSha "$EXPECTED_BASE_SHA" \
             --arg auditSha256 "$EXPECTED_AUDIT_HASH" \
             --arg packageJsonSha256 "$EXPECTED_PACKAGE_HASH" \
             --arg pnpmLockSha256 "$EXPECTED_LOCKFILE_HASH" \
-            '.baseSha == $baseSha and .auditSha256 == $auditSha256 and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256' \
+            --arg goModSha256 "$EXPECTED_GO_MOD_HASH" \
+            --arg goSumSha256 "$EXPECTED_GO_SUM_HASH" \
+            '.baseSha == $baseSha and .auditSha256 == $auditSha256 and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256 and .goModSha256 == $goModSha256 and .goSumSha256 == $goSumSha256' \
             weekly-dependency-candidate-attestation.json \
             > /dev/null
           jq --exit-status \
@@ -308,6 +351,8 @@ jobs:
           echo "audit_sha256=$EXPECTED_AUDIT_HASH" >> "$GITHUB_OUTPUT"
           echo "package_json_sha256=$EXPECTED_PACKAGE_HASH" >> "$GITHUB_OUTPUT"
           echo "pnpm_lock_sha256=$EXPECTED_LOCKFILE_HASH" >> "$GITHUB_OUTPUT"
+          echo "go_mod_sha256=$EXPECTED_GO_MOD_HASH" >> "$GITHUB_OUTPUT"
+          echo "go_sum_sha256=$EXPECTED_GO_SUM_HASH" >> "$GITHUB_OUTPUT"
           echo "remediation_report_sha256=$EXPECTED_REPORT_HASH" >> "$GITHUB_OUTPUT"
 
       - name: Upload reports and approved candidate
@@ -323,6 +368,8 @@ jobs:
             weekly-dependency-candidate-attestation.json
             package.json
             pnpm-lock.yaml
+            server/go.mod
+            server/go.sum
 
   publish:
     needs: audit-and-remediate
@@ -359,24 +406,35 @@ jobs:
           TRUSTED_AUDIT_HASH: ${{ needs.audit-and-remediate.outputs.audit_sha256 }}
           TRUSTED_PACKAGE_HASH: ${{ needs.audit-and-remediate.outputs.package_json_sha256 }}
           TRUSTED_LOCKFILE_HASH: ${{ needs.audit-and-remediate.outputs.pnpm_lock_sha256 }}
+          TRUSTED_GO_MOD_HASH: ${{ needs.audit-and-remediate.outputs.go_mod_sha256 }}
+          TRUSTED_GO_SUM_HASH: ${{ needs.audit-and-remediate.outputs.go_sum_sha256 }}
           TRUSTED_REPORT_HASH: ${{ needs.audit-and-remediate.outputs.remediation_report_sha256 }}
         run: |
           test -f candidate/weekly-dependency-security-audit.json
           test -f candidate/package.json
           test -f candidate/pnpm-lock.yaml
+          test -f candidate/server/go.mod
+          test -f candidate/server/go.sum
           test -f candidate/weekly-dependency-remediation.json
           test -f candidate/weekly-dependency-candidate-attestation.json
           actual_audit_hash="$(sha256sum candidate/weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
           actual_package_hash="$(sha256sum candidate/package.json | cut -d ' ' -f 1)"
           actual_lockfile_hash="$(sha256sum candidate/pnpm-lock.yaml | cut -d ' ' -f 1)"
+          actual_go_mod_hash="$(sha256sum candidate/server/go.mod | cut -d ' ' -f 1)"
+          actual_go_sum_hash="$(sha256sum candidate/server/go.sum | cut -d ' ' -f 1)"
           actual_report_hash="$(sha256sum candidate/weekly-dependency-remediation.json | cut -d ' ' -f 1)"
 
           test "$actual_audit_hash" = "$TRUSTED_AUDIT_HASH"
           test "$actual_package_hash" = "$TRUSTED_PACKAGE_HASH"
           test "$actual_lockfile_hash" = "$TRUSTED_LOCKFILE_HASH"
+          test "$actual_go_mod_hash" = "$TRUSTED_GO_MOD_HASH"
+          test "$actual_go_sum_hash" = "$TRUSTED_GO_SUM_HASH"
           test "$actual_report_hash" = "$TRUSTED_REPORT_HASH"
           jq --exit-status \
-            '.applied == true and .resolver == "claude-code" and .verification.verified == true and (.actions | type == "array" and length > 0)' \
+            '.verification.verified == true
+             and (.actions | type == "array" and length > 0)
+             and ((.actions | map(select(.type != "go-module")) | length) == 0
+                  or (.applied == true and .resolver == "claude-code"))' \
             candidate/weekly-dependency-remediation.json \
             > /dev/null
           jq empty candidate/package.json
@@ -385,7 +443,9 @@ jobs:
             --arg auditSha256 "$TRUSTED_AUDIT_HASH" \
             --arg packageJsonSha256 "$TRUSTED_PACKAGE_HASH" \
             --arg pnpmLockSha256 "$TRUSTED_LOCKFILE_HASH" \
-            '.baseSha == $baseSha and .auditSha256 == $auditSha256 and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256' \
+            --arg goModSha256 "$TRUSTED_GO_MOD_HASH" \
+            --arg goSumSha256 "$TRUSTED_GO_SUM_HASH" \
+            '.baseSha == $baseSha and .auditSha256 == $auditSha256 and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256 and .goModSha256 == $goModSha256 and .goSumSha256 == $goSumSha256' \
             candidate/weekly-dependency-candidate-attestation.json \
             > /dev/null
           jq --exit-status \
@@ -402,15 +462,17 @@ jobs:
 
           cp candidate/package.json package.json
           cp candidate/pnpm-lock.yaml pnpm-lock.yaml
+          cp candidate/server/go.mod server/go.mod
+          cp candidate/server/go.sum server/go.sum
 
-          unexpected="$(git diff --name-only | grep -vE '^(package\.json|pnpm-lock\.yaml)$' || true)"
+          unexpected="$(git diff --name-only | grep -vE '^(package\.json|pnpm-lock\.yaml|server/go\.mod|server/go\.sum)$' || true)"
           if [ -n "$unexpected" ]; then
             echo "Refusing to publish unexpected changes:" >&2
             echo "$unexpected" >&2
             exit 1
           fi
 
-          git add -- package.json pnpm-lock.yaml
+          git add -- package.json pnpm-lock.yaml server/go.mod server/go.sum
           if git diff --cached --quiet; then
             echo 'Candidate artifact did not contain a dependency change.' >&2
             exit 1

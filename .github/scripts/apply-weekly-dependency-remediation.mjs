@@ -11,6 +11,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const REMEDIABLE_MANIFESTS = new Set(['package.json', 'pnpm-lock.yaml']);
+const GO_MANIFESTS = new Set(['server/go.mod', 'server/go.sum']);
 const DIRECT_DEPENDENCY_SECTIONS = ['dependencies', 'devDependencies'];
 const VERSION =
   /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
@@ -170,6 +171,49 @@ export function parseLockfileVersions(lockfileText) {
     found.sort((left, right) => compareSemver(left, right));
   }
   return versions;
+}
+
+const GO_REQUIREMENT =
+  /^(?<module>[^\s()]+)\s+(?<version>v[^\s]+)(?<indirect>\s+\/\/\s*indirect)?$/;
+
+export function parseGoRequirements(goModText) {
+  const requirements = new Map();
+  if (typeof goModText !== 'string') return requirements;
+
+  let insideBlock = false;
+  for (const raw of goModText.split('\n')) {
+    const line = raw.trim();
+    if (line.startsWith('require (')) {
+      insideBlock = true;
+      continue;
+    }
+    if (insideBlock && line === ')') {
+      insideBlock = false;
+      continue;
+    }
+
+    const candidate = insideBlock
+      ? line
+      : line.startsWith('require ')
+        ? line.slice('require '.length).trim()
+        : null;
+    if (!candidate) continue;
+
+    const match = GO_REQUIREMENT.exec(candidate);
+    if (!match?.groups) continue;
+    requirements.set(match.groups.module, {
+      version: match.groups.version,
+      indirect: Boolean(match.groups.indirect),
+    });
+  }
+  return requirements;
+}
+
+function goSemver(version) {
+  if (typeof version !== 'string' || !version.startsWith('v')) return null;
+  const bare = version.slice(1);
+  if (bare.includes('-')) return null;
+  return parseSemver(bare);
 }
 
 function flattenAlerts(audit) {
@@ -542,18 +586,90 @@ function classifyPackageStatus(alerts, packageJson, resolvedVersions) {
   });
 }
 
+function classifyGoModule(alerts) {
+  const moduleName = alerts[0]?.moduleName;
+  const alertIds = alerts.map((alert) => alert.id);
+  const patched = highestPatchedVersion(alerts);
+  const requirement = alerts[0]?.requirement;
+
+  if (!patched) {
+    return classification({
+      packageName: moduleName,
+      alertIds,
+      status: 'manual',
+      reason: 'No concrete first patched version is available.',
+    });
+  }
+  if (!requirement) {
+    return classification({
+      packageName: moduleName,
+      alertIds,
+      status: 'manual',
+      reason: `server/go.mod does not require ${moduleName}.`,
+    });
+  }
+
+  const current = goSemver(requirement.version);
+  if (!current) {
+    return classification({
+      packageName: moduleName,
+      alertIds,
+      status: 'manual',
+      reason: `server/go.mod pins ${moduleName} to ${requirement.version}, which is not a comparable release.`,
+    });
+  }
+  if (isVersionAtLeast(current.version, patched)) {
+    return classification({
+      packageName: moduleName,
+      alertIds,
+      status: 'safe',
+      reason: `server/go.mod already requires ${moduleName} at ${requirement.version}.`,
+    });
+  }
+
+  const target = parseSemver(patched);
+  if (current.major !== target.major) {
+    return classification({
+      packageName: moduleName,
+      alertIds,
+      status: 'manual',
+      reason: `Remediation moves ${moduleName} from ${requirement.version} to v${patched}. A major upgrade changes the module path.`,
+    });
+  }
+
+  return classification({
+    packageName: moduleName,
+    alertIds,
+    status: 'safe',
+    reason: `Update ${moduleName} to the highest patched version v${patched}.`,
+    action: {
+      type: 'go-module',
+      from: requirement.version,
+      to: `v${patched}`,
+    },
+  });
+}
+
 /**
  * Return a deterministic, manifest-only remediation plan.
  * Unsupported alerts are intentionally not mixed with npm remediation groups.
  */
-export function planRemediation({ audit, packageJson, lockfile }) {
+export function planRemediation({ audit, packageJson, lockfile, goMod }) {
   const normalized = normalizeAlerts(audit);
   const resolved = parseLockfileVersions(lockfile);
+  const goRequirements = parseGoRequirements(goMod);
   const unsupported = [];
   const npmByPackage = new Map();
+  const goByModule = new Map();
 
   for (const alert of normalized) {
-    if (alert.ecosystem !== 'npm') {
+    const manifests =
+      alert.ecosystem === 'npm'
+        ? REMEDIABLE_MANIFESTS
+        : alert.ecosystem === 'go'
+          ? GO_MANIFESTS
+          : null;
+    if (!manifests) {
       unsupported.push(
         classification({
           packageName: alert.packageName,
@@ -564,7 +680,7 @@ export function planRemediation({ audit, packageJson, lockfile }) {
       );
       continue;
     }
-    if (!REMEDIABLE_MANIFESTS.has(alert.manifestPath)) {
+    if (!manifests.has(alert.manifestPath)) {
       unsupported.push(
         classification({
           packageName: alert.packageName,
@@ -575,9 +691,19 @@ export function planRemediation({ audit, packageJson, lockfile }) {
       );
       continue;
     }
-    const group = npmByPackage.get(alert.packageName) ?? [];
-    group.push(alert);
-    npmByPackage.set(alert.packageName, group);
+
+    const grouped = alert.ecosystem === 'go' ? goByModule : npmByPackage;
+    const group = grouped.get(alert.packageName) ?? [];
+    group.push(
+      alert.ecosystem === 'go'
+        ? {
+            ...alert,
+            moduleName: alert.packageName,
+            requirement: goRequirements.get(alert.packageName),
+          }
+        : alert,
+    );
+    grouped.set(alert.packageName, group);
   }
 
   const classifications = [
@@ -590,6 +716,9 @@ export function planRemediation({ audit, packageJson, lockfile }) {
           resolved.get(packageName),
         ),
       ),
+    ...[...goByModule.keys()]
+      .sort((a, b) => String(a).localeCompare(String(b)))
+      .map((moduleName) => classifyGoModule(goByModule.get(moduleName))),
     ...unsupported.sort((a, b) =>
       String(a.packageName).localeCompare(String(b.packageName)),
     ),
@@ -639,6 +768,7 @@ export function applyRemediation(packageJson, plan) {
       next[action.section][action.packageName] = action.to;
       continue;
     }
+    if (action.type === 'go-module') continue;
     if (action.type === 'pnpm-override') {
       const current = next.pnpm?.overrides?.[action.selector];
       if (current !== action.from) {
@@ -658,6 +788,7 @@ function parseCliArguments(args) {
   const options = {
     packageJson: 'package.json',
     lockfile: 'pnpm-lock.yaml',
+    goMod: 'server/go.mod',
     apply: false,
   };
   for (let index = 0; index < args.length; index += 1) {
@@ -668,6 +799,9 @@ function parseCliArguments(args) {
     else if (arg === '--lockfile') {
       options.lockfile = args[++index];
       options.lockfileRequired = true;
+    } else if (arg === '--go-mod') {
+      options.goMod = args[++index];
+      options.goModRequired = true;
     } else if (arg === '--report') options.report = args[++index];
     else if (arg === '--help') options.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
@@ -679,7 +813,7 @@ export async function runCli(args = process.argv.slice(2)) {
   const options = parseCliArguments(args);
   if (options.help) {
     console.log(
-      'Usage: node apply-weekly-dependency-remediation.mjs --audit audit.json [--package-json package.json] [--lockfile pnpm-lock.yaml] [--report remediation.json] [--apply]',
+      'Usage: node apply-weekly-dependency-remediation.mjs --audit audit.json [--package-json package.json] [--lockfile pnpm-lock.yaml] [--go-mod server/go.mod] [--report remediation.json] [--apply]',
     );
     return { exitCode: 0 };
   }
@@ -695,10 +829,15 @@ export async function runCli(args = process.argv.slice(2)) {
       return undefined;
     },
   );
+  const goModText = await readFile(options.goMod, 'utf8').catch((error) => {
+    if (options.goModRequired) throw error;
+    return undefined;
+  });
   const plan = planRemediation({
     audit: JSON.parse(auditText),
     packageJson: JSON.parse(packageJsonText),
     lockfile: lockfileText,
+    goMod: goModText,
   });
   const report = {
     ...plan,

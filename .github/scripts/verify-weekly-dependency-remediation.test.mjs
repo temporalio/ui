@@ -295,3 +295,160 @@ test('requires the lockfile', async () => {
     /ENOENT/,
   );
 });
+
+const goAlert = ({ number, name, vulnerable, patched }) => ({
+  number,
+  dependency: {
+    manifest_path: 'server/go.mod',
+    package: { ecosystem: 'go', name },
+  },
+  security_vulnerability: {
+    package: { ecosystem: 'go', name },
+    first_patched_version: { identifier: patched },
+    vulnerable_version_range: vulnerable,
+  },
+});
+
+const goModText = (requirements) =>
+  `module github.com/temporalio/ui-server/v2
+
+go 1.26.5
+
+require (
+${requirements.map((line) => `\t${line}`).join('\n')}
+)
+`;
+
+const goReport = () =>
+  report({
+    actions: [
+      {
+        packageName: 'golang.org/x/crypto',
+        alertIds: [335],
+        type: 'go-module',
+        from: 'v0.51.0',
+        to: 'v0.52.0',
+      },
+    ],
+  });
+
+test('confirms a remediated Go alert when go.mod escapes its range', () => {
+  const result = verifyRemediation({
+    audit: [
+      goAlert({
+        number: 335,
+        name: 'golang.org/x/crypto',
+        vulnerable: '< 0.52.0',
+        patched: '0.52.0',
+      }),
+    ],
+    report: goReport(),
+    lockfileText: lockfile(['unrelated@1.0.0']),
+    goModText: goModText(['golang.org/x/crypto v0.52.0']),
+  });
+
+  assert.equal(result.verified, true);
+  assert.deepEqual(result.report.verification.alerts, [
+    {
+      alertId: 335,
+      packageName: 'golang.org/x/crypto',
+      resolvedVersions: ['0.52.0'],
+    },
+  ]);
+});
+
+test('rejects a remediated Go alert when go.mod stays vulnerable', () => {
+  const result = verifyRemediation({
+    audit: [
+      goAlert({
+        number: 335,
+        name: 'golang.org/x/crypto',
+        vulnerable: '< 0.52.0',
+        patched: '0.52.0',
+      }),
+    ],
+    report: goReport(),
+    lockfileText: lockfile(['unrelated@1.0.0']),
+    goModText: goModText(['golang.org/x/crypto v0.51.0']),
+  });
+
+  assert.equal(result.verified, false);
+  assert.match(result.failures[0].reason, /server\/go\.mod requires/);
+});
+
+test('accepts a Go version above the authorized one', () => {
+  const result = verifyRemediation({
+    audit: [
+      goAlert({
+        number: 335,
+        name: 'golang.org/x/crypto',
+        vulnerable: '< 0.52.0',
+        patched: '0.52.0',
+      }),
+    ],
+    report: goReport(),
+    lockfileText: lockfile(['unrelated@1.0.0']),
+    goModText: goModText(['golang.org/x/crypto v0.53.0']),
+  });
+
+  assert.equal(result.verified, true);
+});
+
+test('rejects a remediated Go module that go.mod pins to a pseudo-version', () => {
+  const result = verifyRemediation({
+    audit: [
+      goAlert({
+        number: 335,
+        name: 'golang.org/x/crypto',
+        vulnerable: '< 0.52.0',
+        patched: '0.52.0',
+      }),
+    ],
+    report: goReport(),
+    lockfileText: lockfile(['unrelated@1.0.0']),
+    goModText: goModText([
+      'golang.org/x/crypto v0.0.0-20260411013819-759bbc3e3207',
+    ]),
+  });
+
+  assert.equal(result.verified, false);
+  assert.match(result.failures[0].reason, /comparable version/);
+});
+
+test('reads go.mod from the command line', async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'weekly-verify-go-'));
+  const auditPath = path.join(directory, 'audit.json');
+  const reportPath = path.join(directory, 'remediation.json');
+  const lockfilePath = path.join(directory, 'pnpm-lock.yaml');
+  const goModPath = path.join(directory, 'go.mod');
+
+  await writeFile(
+    auditPath,
+    JSON.stringify([
+      goAlert({
+        number: 335,
+        name: 'golang.org/x/crypto',
+        vulnerable: '< 0.52.0',
+        patched: '0.52.0',
+      }),
+    ]),
+  );
+  await writeFile(reportPath, JSON.stringify(goReport()));
+  await writeFile(lockfilePath, lockfile(['unrelated@1.0.0']));
+  await writeFile(goModPath, goModText(['golang.org/x/crypto v0.52.0']));
+
+  const result = await runCli([
+    '--audit',
+    auditPath,
+    '--report',
+    reportPath,
+    '--lockfile',
+    lockfilePath,
+    '--go-mod',
+    goModPath,
+  ]);
+
+  assert.equal(result.exitCode, 0);
+  const written = JSON.parse(await readFile(reportPath, 'utf8'));
+  assert.deepEqual(written.verification.alerts[0].resolvedVersions, ['0.52.0']);
+});

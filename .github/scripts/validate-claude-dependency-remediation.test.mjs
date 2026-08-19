@@ -101,3 +101,23 @@ test('rejects a candidate change when no action is authorized', () => {
     /does not exactly match/,
   );
 });
+
+test('accepts an unchanged package.json for a Go-only remediation', () => {
+  const result = validateClaudeRemediation({
+    baseText: text(base),
+    candidateText: text(base),
+    report: report([
+      {
+        packageName: 'golang.org/x/crypto',
+        alertIds: [335],
+        type: 'go-module',
+        from: 'v0.51.0',
+        to: 'v0.52.0',
+      },
+    ]),
+  });
+
+  assert.equal(result.changed, false);
+  assert.equal(result.report.applied, false);
+  assert.equal(result.report.resolver, undefined);
+});

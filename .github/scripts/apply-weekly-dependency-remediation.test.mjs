@@ -34,6 +34,21 @@ function alert({
   };
 }
 
+function goMod({ direct = [], indirect = [] } = {}) {
+  return `module github.com/temporalio/ui-server/v2
+
+go 1.26.5
+
+require (
+${direct.map((line) => `\t${line}`).join('\n')}
+)
+
+require (
+${indirect.map((line) => `\t${line} // indirect`).join('\n')}
+)
+`;
+}
+
 function manifest({ dependencies, devDependencies, overrides } = {}) {
   return {
     name: 'fixture',
@@ -289,11 +304,17 @@ test('marks missing patched versions and unsupported manifests as non-automatabl
         name: 'nested',
         manifestPath: 'packages/nested/package.json',
       }),
-      alert({ number: 6, name: 'go-module', ecosystem: 'go' }),
+      alert({ number: 6, name: 'rubygem', ecosystem: 'rubygems' }),
       alert({
         number: 9,
         name: 'npm-shrinkwrapped',
         manifestPath: 'package-lock.json',
+      }),
+      alert({
+        number: 10,
+        name: 'golang.org/x/net',
+        ecosystem: 'go',
+        manifestPath: 'package.json',
       }),
     ],
     packageJson: manifest(),
@@ -301,14 +322,15 @@ test('marks missing patched versions and unsupported manifests as non-automatabl
 
   assert.equal(plan.actions.length, 0);
   assert.equal(plan.summary.manual, 1);
-  assert.equal(plan.summary.unsupported, 3);
+  assert.equal(plan.summary.unsupported, 4);
 
   const unsupported = plan.classifications.filter(
     (item) => item.status === 'unsupported',
   );
   assert.deepEqual(unsupported.map((item) => item.reason).sort(), [
-    'Unsupported ecosystem: go.',
+    'Unsupported ecosystem: rubygems.',
     'Unsupported manifest: package-lock.json.',
+    'Unsupported manifest: package.json.',
     'Unsupported manifest: packages/nested/package.json.',
   ]);
 });
@@ -693,4 +715,207 @@ packages:
   ]);
 
   assert.deepEqual(report.classifications[0].resolvedVersions, ['7.5.8']);
+});
+
+test('plans a version bump for a direct Go requirement', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 354,
+        name: 'google.golang.org/grpc',
+        ecosystem: 'go',
+        patched: '1.82.1',
+        vulnerable: '< 1.82.1',
+        manifestPath: 'server/go.mod',
+      }),
+    ],
+    packageJson: manifest(),
+    goMod: goMod({ direct: ['google.golang.org/grpc v1.79.3'] }),
+  });
+
+  assert.equal(plan.summary.unsupported, 0);
+  assert.deepEqual(plan.actions, [
+    {
+      packageName: 'google.golang.org/grpc',
+      alertIds: [354],
+      type: 'go-module',
+      from: 'v1.79.3',
+      to: 'v1.82.1',
+    },
+  ]);
+});
+
+test('plans a version bump for an indirect Go requirement', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 335,
+        name: 'golang.org/x/crypto',
+        ecosystem: 'go',
+        patched: '0.52.0',
+        vulnerable: '< 0.52.0',
+        manifestPath: 'server/go.mod',
+      }),
+    ],
+    packageJson: manifest(),
+    goMod: goMod({ indirect: ['golang.org/x/crypto v0.51.0'] }),
+  });
+
+  assert.deepEqual(plan.actions, [
+    {
+      packageName: 'golang.org/x/crypto',
+      alertIds: [335],
+      type: 'go-module',
+      from: 'v0.51.0',
+      to: 'v0.52.0',
+    },
+  ]);
+});
+
+test('refuses a Go bump that changes the major version', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 400,
+        name: 'example.com/lib',
+        ecosystem: 'go',
+        patched: '2.0.0',
+        manifestPath: 'server/go.mod',
+      }),
+    ],
+    packageJson: manifest(),
+    goMod: goMod({ direct: ['example.com/lib v1.4.0'] }),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.match(plan.classifications[0].reason, /changes the module path/);
+});
+
+test('refuses a Go module pinned to a pseudo-version', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 401,
+        name: 'github.com/gomarkdown/markdown',
+        ecosystem: 'go',
+        patched: '0.1.0',
+        manifestPath: 'server/go.mod',
+      }),
+    ],
+    packageJson: manifest(),
+    goMod: goMod({
+      direct: [
+        'github.com/gomarkdown/markdown v0.0.0-20260411013819-759bbc3e3207',
+      ],
+    }),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.match(plan.classifications[0].reason, /not a comparable release/);
+});
+
+test('reports a Go module that go.mod does not require as manual', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 402,
+        name: 'example.com/absent',
+        ecosystem: 'go',
+        patched: '1.1.0',
+        manifestPath: 'server/go.mod',
+      }),
+    ],
+    packageJson: manifest(),
+    goMod: goMod({ direct: ['example.com/other v1.0.0'] }),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.match(plan.classifications[0].reason, /does not require/);
+});
+
+test('reports a Go requirement that already meets the patched version as safe', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 403,
+        name: 'golang.org/x/net',
+        ecosystem: 'go',
+        patched: '0.55.0',
+        manifestPath: 'server/go.mod',
+      }),
+    ],
+    packageJson: manifest(),
+    goMod: goMod({ direct: ['golang.org/x/net v0.55.0'] }),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'safe');
+  assert.match(plan.classifications[0].reason, /already requires/);
+});
+
+test('leaves package.json unchanged for a plan that holds only Go actions', () => {
+  const packageJson = manifest({ dependencies: { lodash: '^4.17.20' } });
+  const plan = {
+    actions: [
+      {
+        packageName: 'golang.org/x/crypto',
+        alertIds: [335],
+        type: 'go-module',
+        from: 'v0.51.0',
+        to: 'v0.52.0',
+      },
+    ],
+  };
+
+  assert.deepEqual(applyRemediation(packageJson, plan), packageJson);
+});
+
+test('plans a Go remediation from the command line', async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'weekly-go-plan-'));
+  const auditPath = path.join(directory, 'audit.json');
+  const packageJsonPath = path.join(directory, 'package.json');
+  const goModPath = path.join(directory, 'go.mod');
+
+  await writeFile(
+    auditPath,
+    JSON.stringify([
+      alert({
+        number: 354,
+        name: 'google.golang.org/grpc',
+        ecosystem: 'go',
+        patched: '1.82.1',
+        vulnerable: '< 1.82.1',
+        manifestPath: 'server/go.mod',
+      }),
+    ]),
+  );
+  await writeFile(packageJsonPath, JSON.stringify(manifest()));
+  await writeFile(
+    goModPath,
+    goMod({ direct: ['google.golang.org/grpc v1.79.3'] }),
+  );
+
+  const { report } = await runCli([
+    '--audit',
+    auditPath,
+    '--package-json',
+    packageJsonPath,
+    '--go-mod',
+    goModPath,
+    '--report',
+    path.join(directory, 'remediation.json'),
+  ]);
+
+  assert.deepEqual(report.actions, [
+    {
+      packageName: 'google.golang.org/grpc',
+      alertIds: [354],
+      type: 'go-module',
+      from: 'v1.79.3',
+      to: 'v1.82.1',
+    },
+  ]);
 });

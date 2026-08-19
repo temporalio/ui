@@ -11,11 +11,21 @@ import { readFile, writeFile } from 'node:fs/promises';
 import {
   isVersionVulnerable,
   normalizeAlerts,
+  parseGoRequirements,
   parseLockfileVersions,
 } from './apply-weekly-dependency-remediation.mjs';
 
-export function verifyRemediation({ audit, report, lockfileText }) {
+function goResolvedVersions(requirements, moduleName) {
+  const requirement = requirements.get(moduleName);
+  if (!requirement?.version?.startsWith('v')) return [];
+  const bare = requirement.version.slice(1);
+  if (bare.includes('-')) return [];
+  return [bare];
+}
+
+export function verifyRemediation({ audit, report, lockfileText, goModText }) {
   const resolved = parseLockfileVersions(lockfileText);
+  const goRequirements = parseGoRequirements(goModText);
   const remediatedIds = new Set(
     (report?.actions ?? []).flatMap((action) => action.alertIds ?? []),
   );
@@ -25,7 +35,10 @@ export function verifyRemediation({ audit, report, lockfileText }) {
   for (const item of normalizeAlerts(audit)) {
     if (!remediatedIds.has(item.id)) continue;
 
-    const resolvedVersions = resolved.get(item.packageName) ?? [];
+    const resolvedVersions =
+      item.ecosystem === 'go'
+        ? goResolvedVersions(goRequirements, item.packageName)
+        : (resolved.get(item.packageName) ?? []);
     evidence.push({
       alertId: item.id,
       packageName: item.packageName,
@@ -37,7 +50,10 @@ export function verifyRemediation({ audit, report, lockfileText }) {
         alertId: item.id,
         packageName: item.packageName,
         resolvedVersions,
-        reason: `The lockfile does not contain ${item.packageName}, so the remediation cannot be confirmed.`,
+        reason:
+          item.ecosystem === 'go'
+            ? `server/go.mod does not require ${item.packageName} at a comparable version, so the remediation cannot be confirmed.`
+            : `The lockfile does not contain ${item.packageName}, so the remediation cannot be confirmed.`,
       });
       continue;
     }
@@ -50,7 +66,7 @@ export function verifyRemediation({ audit, report, lockfileText }) {
         alertId: item.id,
         packageName: item.packageName,
         resolvedVersions: stillVulnerable,
-        reason: `The lockfile resolves ${item.packageName} to ${stillVulnerable.join(', ')}, which the advisory range ${item.vulnerableRange} still covers.`,
+        reason: `${item.ecosystem === 'go' ? 'server/go.mod requires' : 'The lockfile resolves'} ${item.packageName} at ${stillVulnerable.join(', ')}, which the advisory range ${item.vulnerableRange} still covers.`,
       });
     }
   }
@@ -74,6 +90,7 @@ function parseArguments(args) {
     if (argument === '--audit') options.audit = args[++index];
     else if (argument === '--report') options.report = args[++index];
     else if (argument === '--lockfile') options.lockfile = args[++index];
+    else if (argument === '--go-mod') options.goMod = args[++index];
     else throw new Error(`Unknown argument: ${argument}`);
   }
   for (const required of ['audit', 'report', 'lockfile']) {
@@ -89,11 +106,15 @@ export async function runCli(args = process.argv.slice(2)) {
     readFile(options.report, 'utf8'),
     readFile(options.lockfile, 'utf8'),
   ]);
+  const goModText = options.goMod
+    ? await readFile(options.goMod, 'utf8')
+    : undefined;
 
   const result = verifyRemediation({
     audit: JSON.parse(auditText),
     report: JSON.parse(reportText),
     lockfileText,
+    goModText,
   });
 
   await writeFile(
