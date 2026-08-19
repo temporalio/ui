@@ -4,15 +4,18 @@
   export type BadgeType = VariantProps<typeof types>['type'];
 
   const type = {
-    primary: 'bg-blue-300',
-    secondary: 'bg-purple-200 dark:bg-purple-800 dark:text-white',
-    default: 'bg-slate-100',
-    warning: 'bg-yellow-200',
-    success: 'bg-green-200',
-    danger: 'bg-red-200',
-    count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
-    subtle: 'surface-subtle dark:text-white font-normal select-all',
-    ghost: 'surface-primary text-primary border border-subtle',
+    primary: 'bg-io-surface-status-blue text-io-content-information',
+    secondary: 'bg-io-alpha-purple-30 text-io-content-primary',
+    default: 'bg-io-surface-status-neutral text-io-content-primary',
+    warning: 'bg-io-surface-status-amber text-io-content-warning',
+    success: 'bg-io-surface-status-green text-io-content-success',
+    danger: 'bg-io-surface-status-red text-io-content-danger',
+    count:
+      'h-6 w-6 min-w-max rounded-full bg-io-surface-status-blue text-io-content-information',
+    subtle:
+      'bg-io-surface-tertiary text-io-content-secondary font-normal select-all',
+    ghost:
+      'bg-io-surface-primary text-io-content-primary border border-io-border-tertiary',
   };
 
   const types = cva(
@@ -29,7 +32,6 @@
       'font-medium',
       'leading-[1.5]',
       'transition-colors',
-      'text-black',
     ],
     {
       variants: {
