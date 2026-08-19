@@ -248,7 +248,10 @@
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
     <Badge type={failed ? 'danger' : 'default'}>
-      <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
+      <Icon
+        class="mr-1 {failed && 'font-bold text-io-content-danger'}"
+        name="retry"
+      />
       {activity.attempt ?? 0} of {formatMaximumAttempts(
         activity.maximumAttempts ?? null,
       )}

@@ -64,7 +64,7 @@
   >
   <DetailListValue>
     <Badge type={badgeType} class="flex items-center gap-2">
-      <Icon name="retry" class={failed ? 'text-red-400' : ''} />
+      <Icon name="retry" class={failed ? 'text-io-content-danger' : ''} />
       <span>{attempt} of {formatMaximumAttempts(maximumAttempts)}</span>
     </Badge>
 

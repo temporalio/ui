@@ -155,7 +155,10 @@
 
 {#snippet attempts()}
   <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
-    <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
+    <Icon
+      class="mr-1 {failed && 'font-bold text-io-content-danger'}"
+      name="retry"
+    />
     {operation.attempt ?? 0}
   </Badge>
 {/snippet}
