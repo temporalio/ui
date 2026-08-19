@@ -133,7 +133,7 @@
     <div id="modal-content-{id}" class="content">
       {@render content?.()}
       <p
-        class="mt-2 text-sm font-normal text-danger"
+        class="mt-2 text-sm font-normal text-io-content-danger"
         class:hidden={!error}
         role="alert"
       >

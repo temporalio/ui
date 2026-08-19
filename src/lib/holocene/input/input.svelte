@@ -218,9 +218,9 @@
       >
         <span
           class={merge(
-            maxLength - value?.length > 5 && 'text-success',
-            maxLength - value?.length <= 5 && 'text-warning',
-            maxLength === value?.length && 'text-danger',
+            maxLength - value?.length > 5 && 'text-io-content-success',
+            maxLength - value?.length <= 5 && 'text-io-content-warning',
+            maxLength === value?.length && 'text-io-content-danger',
           )}
         >
           {value?.length ?? 0}

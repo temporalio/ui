@@ -173,7 +173,7 @@
     {#if maxLength && !disabled}
       <span class="count">
         <span
-          class="text-information"
+          class="text-io-content-information"
           class:warn={maxLength - chips.length <= 5}
           class:error={maxLength === chips?.length}
         >
@@ -210,7 +210,7 @@
   }
 
   .error-msg {
-    @apply break-words text-sm text-danger;
+    @apply break-words text-sm text-io-content-danger;
   }
 
   .error-msg.min-width {
@@ -222,10 +222,10 @@
   }
 
   .count > .warn {
-    @apply text-warning;
+    @apply text-io-content-warning;
   }
 
   .count > .error {
-    @apply text-danger;
+    @apply text-io-content-danger;
   }
 </style>

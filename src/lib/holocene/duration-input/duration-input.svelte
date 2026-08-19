@@ -220,7 +220,12 @@
     </select>
   </div>
   {#if hintText}
-    <p class={twMerge('text-xs text-secondary', error && 'text-danger')}>
+    <p
+      class={twMerge(
+        'text-xs text-secondary',
+        error && 'text-io-content-danger',
+      )}
+    >
       {hintText}
     </p>
   {/if}

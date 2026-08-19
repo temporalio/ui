@@ -509,7 +509,7 @@
         comboboxStyles({ variant }),
         !valid &&
           variant === 'default' &&
-          'border border-danger text-danger focus-within:ring-danger/70',
+          'border border-danger text-io-content-danger focus-within:ring-danger/70',
         disabled && 'opacity-50',
         className,
       )}

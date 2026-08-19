@@ -108,7 +108,7 @@
 <span
   id={errorId}
   role="alert"
-  class="text-xs text-danger"
+  class="text-xs text-io-content-danger"
   class:mt-1={!valid && !!hintText}
 >
   {#if !valid && hintText}{hintText}{/if}

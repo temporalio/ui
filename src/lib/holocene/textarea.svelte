@@ -103,7 +103,7 @@
     {#if maxLength && !disabled}
       <span class="count">
         <span
-          class="text-information"
+          class="text-io-content-information"
           class:warn={maxLength - value?.length <= 5}
           class:error={maxLength === value?.length}>{value?.length ?? 0}</span
         >&nbsp;/&nbsp;{maxLength}
@@ -118,7 +118,7 @@
   }
 
   .error-msg {
-    @apply min-h-[1.25rem] break-words border-danger text-xs text-danger;
+    @apply min-h-[1.25rem] break-words border-danger text-xs text-io-content-danger;
   }
 
   .error-msg.min-width {
@@ -130,10 +130,10 @@
   }
 
   .count > .warn {
-    @apply text-warning;
+    @apply text-io-content-warning;
   }
 
   .count > .error {
-    @apply text-danger;
+    @apply text-io-content-danger;
   }
 </style>

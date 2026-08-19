@@ -199,7 +199,7 @@
       </div>
     {/if}
   </Label>
-  <span id={errorId} role="alert" class="text-xs text-danger">
+  <span id={errorId} role="alert" class="text-xs text-io-content-danger">
     {#if showError}{error}{/if}
   </span>
 </div>
