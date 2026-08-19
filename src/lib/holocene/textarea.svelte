@@ -38,7 +38,7 @@
     required = false,
     description = '',
     maxLength = 0,
-    class: className = 'text-primary',
+    class: className = 'text-io-content-primary',
     onkeydown,
     errorSnippet,
     ...rest
@@ -61,15 +61,15 @@
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full border border-subtle focus-within:border-information focus-within:ring-2 focus-within:ring-primary/70',
+      'relative box-border inline-flex w-full border border-io-border-primary focus-within:border-io-border-information focus-within:ring-2 focus-within:ring-io-border-information',
       !isValid && 'error',
-      !disabled && 'hover:border-information',
+      !disabled && 'hover:border-io-border-information',
     )}
   >
     <textarea
       bind:value
       class={merge(
-        'surface-primary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-none',
+        'min-h-fit w-full bg-io-background-primary px-3 py-2 text-sm text-io-content-primary focus-visible:outline-none',
         disabled && 'cursor-not-allowed opacity-50',
       )}
       {id}
@@ -126,7 +126,7 @@
   }
 
   .count {
-    @apply invisible text-right text-xs text-primary group-focus-within:visible;
+    @apply invisible text-right text-xs text-io-content-primary group-focus-within:visible;
   }
 
   .count > .warn {
