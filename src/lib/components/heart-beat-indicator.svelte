@@ -1,129 +1,58 @@
 <script lang="ts">
-  // Heart rate animation
-  // https://codepen.io/jupa8712/pen/XmbyXE?js-preprocessor=none
-
-  const text = '';
   let { delay = 0 }: { delay?: number } = $props();
 
   const cssVarStyles = $derived(`--animation-delay:${delay}ms;`);
 </script>
 
 <div class="heart-beat" style={cssVarStyles} aria-hidden="true">
-  <div class="heart-rate">
-    <svg
-      version="1.0"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-      x="0px"
-      y="0px"
-      width="30px"
-      height="18px"
-      viewBox="0 0 150 73"
-      enable-background="new 0 0 150 73"
-      xml:space="preserve"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <polyline
-        fill="none"
-        stroke="#000000"
-        stroke-width="3"
-        stroke-miterlimit="10"
-        points="0,45.486 18.514,45.486 24.595,33.324 32.676,45.486 37.771,45.486 42.838,55.622 51.959,18 56.067,45 60.067,60.729 63.122,45.486 77.297,45.486 83.379,41.419 90.473,45.486 100,45.486"
-      />
-    </svg>
-    <div class="fade-in"></div>
-    <div class="fade-out"></div>
-  </div>
-  {text}
+  <svg
+    version="1.0"
+    xmlns="http://www.w3.org/2000/svg"
+    x="0px"
+    y="0px"
+    width="30px"
+    height="18px"
+    viewBox="0 0 150 73"
+    xml:space="preserve"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <polyline
+      class="heart-rate-line"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-miterlimit="10"
+      pathLength="1"
+      points="0,45.486 18.514,45.486 24.595,33.324 32.676,45.486 37.771,45.486 42.838,55.622 51.959,18 56.067,45 60.067,60.729 63.122,45.486 77.297,45.486 83.379,41.419 90.473,45.486 100,45.486"
+    />
+  </svg>
 </div>
 
 <style lang="postcss">
   .heart-beat {
-    @apply relative flex items-center justify-center bg-blue-300 text-center;
+    @apply relative flex w-5 items-center justify-center text-center;
   }
 
-  .heart-rate {
-    @apply relative;
-
-    width: 20px;
-    height: 18px;
-    margin: 0;
+  .heart-rate-line {
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    animation: heartRate 2s linear infinite;
+    animation-delay: var(--animation-delay, 0ms);
+    will-change: stroke-dashoffset;
   }
 
-  .fade-in {
-    @apply absolute right-0 top-0 h-full w-full bg-blue-300;
-
-    transform-origin: right;
-    animation: heartRateIn 2s linear infinite;
-    animation-delay: var(--animation-delay, 0);
-    will-change: transform;
-  }
-
-  .fade-out {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    left: 0;
-    transform-origin: left;
-    animation: heartRateOut 2s linear infinite;
-    animation-delay: var(--animation-delay, 0);
-    will-change: transform;
-    background: rgb(147 187 253);
-    background: linear-gradient(
-      to left,
-      rgb(147 187 253) 50%,
-      rgb(147 187 253) 50%,
-      rgb(255 255 255 / 0%) 100%
-    );
-    background: linear-gradient(
-      to left,
-      rgb(147 187 253) 0%,
-      rgb(147 187 253) 50%,
-      rgb(255 255 255 / 0%) 100%
-    );
-    background: linear-gradient(
-      to left,
-      rgb(147 187 253) 0%,
-      rgb(147 187 253) 50%,
-      rgb(255 255 255 / 0%) 100%
-    );
-    background: linear-gradient(
-      to left,
-      rgb(147 187 253) 0%,
-      rgb(147 187 253) 50%,
-      rgb(255 255 255 / 0%) 100%
-    );
-    background: linear-gradient(
-      to right,
-      rgb(147 187 253) 0%,
-      rgb(147 187 253) 80%,
-      rgb(255 255 255 / 0%) 100%
-    );
-  }
-
-  @keyframes heartRateIn {
+  @keyframes heartRate {
     0% {
-      transform: scaleX(1);
+      stroke-dashoffset: 1;
     }
 
     50% {
-      transform: scaleX(0);
+      stroke-dashoffset: 0;
     }
 
     100% {
-      transform: scaleX(0);
-    }
-  }
-
-  @keyframes heartRateOut {
-    0% {
-      transform: scaleX(0);
-    }
-
-    100% {
-      transform: scaleX(1);
+      stroke-dashoffset: -1;
     }
   }
 </style>
