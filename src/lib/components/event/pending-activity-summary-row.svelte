@@ -121,8 +121,8 @@
         <Icon
           class={merge(
             'mr-1 inline',
-            (event.attempt ?? 0) > 1 && 'font-bold text-red-400',
-            event.paused && 'font-bold text-yellow-700',
+            (event.attempt ?? 0) > 1 && 'font-bold text-io-content-danger',
+            event.paused && 'font-bold text-io-content-warning',
           )}
           name={event.paused ? 'pause' : 'retry'}
         />

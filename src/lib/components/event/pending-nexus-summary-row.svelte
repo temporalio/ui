@@ -108,7 +108,7 @@
           <Badge class="mx-1" type={event.attempt > 1 ? 'danger' : 'default'}>
             <Icon
               class="mr-1 inline {event.attempt > 1 &&
-                'font-bold text-red-400'}"
+                'font-bold text-io-content-danger'}"
               name="retry"
             />
             {translate('workflows.attempt')}

@@ -226,9 +226,9 @@
 <tr
   class={merge(
     'hover:cursor-pointer',
-    failure && '!bg-red-400/40 hover:!bg-red-400/60',
-    canceled && '!bg-yellow-400/30 hover:!bg-yellow-400/50',
-    terminated && '!bg-pink-700/30 hover:!bg-pink-700/50',
+    failure && '!bg-io-alpha-red-40 hover:!bg-io-alpha-red-60',
+    canceled && '!bg-io-alpha-amber-30 hover:!bg-io-alpha-amber-50',
+    terminated && '!bg-io-alpha-red-30 hover:!bg-io-alpha-red-50',
     hasRelatedActivities(group, hoveredEventId) && 'active',
   )}
   id={`${event.id}-${index}`}
@@ -330,8 +330,8 @@
           <Icon
             class={merge(
               'mr-1 inline',
-              pendingAttempt > 1 && 'font-bold text-red-400',
-              isPausedPendingActivity && 'font-bold text-yellow-700',
+              pendingAttempt > 1 && 'font-bold text-io-content-danger',
+              isPausedPendingActivity && 'font-bold text-io-content-warning',
             )}
             name={isPausedPendingActivity ? 'pause' : 'retry'}
           />
