@@ -303,11 +303,14 @@ jobs:
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Run Vitest with one worker
-        run: pnpm test -- --run --minWorkers=1 --maxWorkers=1
+      - name: Run unit tests as the pull request checks run them
+        run: pnpm test -- --run
 
       - name: Run type checks
-        run: pnpm check
+        run: pnpm run check
+
+      - name: Lint the candidate
+        run: pnpm run --if-present lint:ci
 
       - name: Build the server bundle
         run: pnpm build:server
