@@ -34,3 +34,20 @@ go.work.sum
 !.claude/skills/
 .sisyphus/*
 .omc
+
+/catalog.local/
+/.env.catalog.local
+/.catalog.lock
+/.catalog.lock.recovery
+/.catalog.journal.json
+/.catalog.transaction-*/
+
+# Legacy Catalog state stays ignored so upgrades cannot expose credentials or
+# abandoned mutation state. The CLI migrates only local content and credentials;
+# old locks and journals are deliberately not resumed under canonical names.
+/workflow-catalog.local/
+/.env.workflow-catalog.local
+/.workflow-catalog.lock
+/.workflow-catalog.lock.recovery
+/.workflow-catalog.journal.json
+/.workflow-catalog.transaction-*/

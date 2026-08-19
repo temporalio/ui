@@ -43,12 +43,20 @@
     workflow?.pendingNexusOperations ?? [],
   );
 
-  const items = $derived(
+  // Union on `compact` — the pair travels as one object.
+  const tableProps = $derived(
     compact
-      ? orderGroupsByPending(groups, reverseSort)
-      : reverseSort
-        ? [...pendingNexusOperations, ...pendingActivities, ...history]
-        : [...history, ...pendingActivities, ...pendingNexusOperations],
+      ? {
+          compact: true as const,
+          items: orderGroupsByPending(groups, reverseSort),
+        }
+      : {
+          compact: false as const,
+          items: reverseSort
+            ? [...pendingNexusOperations, ...pendingActivities, ...history]
+            : [...history, ...pendingActivities, ...pendingNexusOperations],
+          groups,
+        },
   );
 
   const onAllClick = () => {
@@ -97,6 +105,6 @@
   </div>
 {:else}
   <div data-testid="event-summary-table">
-    <EventSummaryTable {updating} {items} {groups} {compact} {minimized} />
+    <EventSummaryTable {updating} {minimized} {...tableProps} />
   </div>
 {/if}

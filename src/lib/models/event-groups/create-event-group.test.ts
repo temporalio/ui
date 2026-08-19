@@ -6,7 +6,11 @@ import type {
   WorkflowEvent,
 } from '$lib/types/events';
 
-import { createEventGroup } from './create-event-group';
+import {
+  createEventGroup,
+  groupCategory,
+  groupIsPending,
+} from './create-event-group';
 
 const scheduledEvent = {
   id: '5',
@@ -143,5 +147,67 @@ describe('createEventGroup', () => {
 
   it('should ignore an event that should not create an event group', () => {
     expect(createEventGroup(completedEvent)).toBeUndefined();
+  });
+});
+
+// The buffer's LazyGroup and the materialized EventGroup both derive isPending
+// from this, so the agreement tests can no longer catch a wrong rule here —
+// they would move together. These assert the rule itself.
+describe('groupIsPending', () => {
+  const head = (event: Partial<WorkflowEvent>) => event as WorkflowEvent;
+
+  it('is true while a timer has only its started event', () => {
+    const timer = head({
+      eventType: 'TimerStarted',
+      timerStartedEventAttributes: {},
+    });
+    expect(groupIsPending(timer, 1, undefined, undefined)).toBe(true);
+    expect(groupIsPending(timer, 2, undefined, undefined)).toBe(false);
+  });
+
+  it('is true while a child workflow has only initiated and started', () => {
+    const child = head({
+      eventType: 'StartChildWorkflowExecutionInitiated',
+      startChildWorkflowExecutionInitiatedEventAttributes: {},
+    });
+    expect(groupIsPending(child, 1, undefined, undefined)).toBe(false);
+    expect(groupIsPending(child, 2, undefined, undefined)).toBe(true);
+    expect(groupIsPending(child, 3, undefined, undefined)).toBe(false);
+  });
+
+  it('is true whenever pending metadata is attached, whatever the count', () => {
+    const activity = head({
+      eventType: 'ActivityTaskScheduled',
+      activityTaskScheduledEventAttributes: {},
+    });
+    expect(groupIsPending(activity, 3, undefined, undefined)).toBe(false);
+    expect(
+      groupIsPending(activity, 3, { activityId: '1' } as never, undefined),
+    ).toBe(true);
+    expect(
+      groupIsPending(activity, 3, undefined, {
+        scheduledEventId: '1',
+      } as never),
+    ).toBe(true);
+  });
+});
+
+describe('groupCategory', () => {
+  it('reports local-activity for a local-activity marker', () => {
+    const marker = {
+      eventType: 'MarkerRecorded',
+      category: 'marker',
+      markerRecordedEventAttributes: { markerName: 'LocalActivity' },
+    } as unknown as WorkflowEvent;
+    expect(groupCategory(marker)).toBe('local-activity');
+  });
+
+  it('reports the head event category otherwise', () => {
+    const marker = {
+      eventType: 'MarkerRecorded',
+      category: 'marker',
+      markerRecordedEventAttributes: { markerName: 'Version' },
+    } as unknown as WorkflowEvent;
+    expect(groupCategory(marker)).toBe('marker');
   });
 });

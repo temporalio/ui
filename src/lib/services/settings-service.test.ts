@@ -3,7 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SettingsResponse } from '$lib/types';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 
-import { fetchSettings, isCloudMatch } from './settings-service';
+import {
+  fetchSettings,
+  isCloudMatch,
+  isLocalRuntimeEnvironment,
+} from './settings-service';
 
 vi.mock('$lib/utilities/get-api-origin', () => ({
   getApiOrigin: () => 'http://localhost:8080',
@@ -64,6 +68,41 @@ describe('isCloudMatch', () => {
     expect(isCloudMatch.test(undefined as unknown as string)).toBe(false);
     expect(isCloudMatch.test('xxx.xxx')).toBe(false);
     expect(isCloudMatch.test('localhost:3000')).toBe(false);
+  });
+});
+
+describe('isLocalRuntimeEnvironment', () => {
+  it('uses an explicit environment override instead of the hostname', () => {
+    expect(
+      isLocalRuntimeEnvironment({
+        environmentOverride: 'local',
+        hostname: 'account.tmprl.cloud',
+      }),
+    ).toBe(true);
+    expect(
+      isLocalRuntimeEnvironment({
+        environmentOverride: 'cloud',
+        hostname: 'localhost',
+      }),
+    ).toBe(false);
+  });
+
+  it('treats an unoverridden local UI host as local', () => {
+    expect(
+      isLocalRuntimeEnvironment({
+        environmentOverride: null,
+        hostname: 'localhost',
+      }),
+    ).toBe(true);
+  });
+
+  it('treats an unoverridden Temporal Cloud hostname as non-local', () => {
+    expect(
+      isLocalRuntimeEnvironment({
+        environmentOverride: null,
+        hostname: 'account.tmprl.cloud',
+      }),
+    ).toBe(false);
   });
 });
 

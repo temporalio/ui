@@ -1,8 +1,10 @@
 import {
   addEventToGroup,
-  cloneEventGroup,
   createEventGroup,
   createWorkflowTaskGroup,
+  groupCategory,
+  groupIsPending,
+  isGroupHeadEvent,
 } from '$lib/models/event-groups/create-event-group';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
@@ -14,7 +16,11 @@ import type {
   PendingNexusOperation,
   WorkflowEvent,
 } from '$lib/types/events';
-import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
+import {
+  isFailedTaskEvent,
+  isTimedOutTaskEvent,
+  isWorkflowTaskFailedEventDueToReset,
+} from '$lib/utilities/get-workflow-task-failed-event';
 import {
   isActivityTaskCanceledEvent,
   isActivityTaskCompletedEvent,
@@ -28,186 +34,240 @@ import {
   isNexusOperationTimedOutEvent,
 } from '$lib/utilities/is-event-type';
 
+/**
+ * Event store for a single workflow run, shared by the history and timeline
+ * views.
+ *
+ * Events are canonical; groups are derived. `ingestHistoryEvent` writes a
+ * converted event into a flat slot array (slot = eventId - 1) and records its
+ * slot on the GroupRecord for its head event — integer bookkeeping only.
+ * EventGroup objects are built on read by `materializeEventGroup` and memoized
+ * against the record's version.
+ *
+ * That inversion is what keeps reference-tracking Svelte views correct: a group
+ * object's identity is a pure function of its content version, so an unchanged
+ * group always reads back as the same reference (the timeline row pool keys on
+ * identity) and a changed group always reads back as a new one. There is no
+ * mutable published group to forget to replace.
+ */
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type GroupMeta = {
-  headSlotIdx: number;
-  group: EventGroup | null;
-  startMs: number;
-  endMs: number;
-  trackIndex: number;
-  pixiType: string;
-  pixiStatus: string;
-};
+/**
+ * The read surface of a group that needs no EventGroup. Filtering, sorting and
+ * time-segment layout run over these, so a view only materializes the groups it
+ * actually renders — a fixed row pool, or one page of the compact table.
+ */
+export interface LazyGroup {
+  readonly id: string;
+  /**
+   * Bumped whenever the group's content changes. A lazy group's own identity is
+   * stable for the life of the run, so consumers that cache per group — the
+   * timeline's row pool — must compare this too, not just the reference.
+   * Absent on groups built outside the buffer, which never change.
+   */
+  readonly version?: number;
+  readonly eventCount: number;
+  readonly initialEvent: WorkflowEvent;
+  readonly lastEvent: WorkflowEvent;
+  readonly category: WorkflowEvent['category'];
+  readonly classification: WorkflowEvent['classification'];
+  readonly finalClassification: WorkflowEvent['classification'];
+  readonly isPending: boolean;
+  readonly pendingActivity: PendingActivity | undefined;
+  readonly pendingNexusOperation: PendingNexusOperation | undefined;
+}
 
-export type GetRowsOptions = {
+/**
+ * Distinguishes a lazy group from an already-materialized EventGroup or a plain
+ * event, for views handed a mix of the two.
+ */
+export function isLazyGroup(value: unknown): value is LazyGroup {
+  return value instanceof GroupRecord;
+}
+
+/**
+ * One per group for the lifetime of the run. Holds member slots rather than
+ * events, so a LazyGroup costs no allocation — its fields are either stored at
+ * head time or read straight out of `events`.
+ *
+ * INVARIANT: every field must agree with the same field on the materialized
+ * EventGroup, or a view will filter on one and render the other. Guarded by
+ * grouped-event-buffer.test.ts.
+ */
+class GroupRecord implements LazyGroup {
+  // Member slots in arrival order — sorted at materialize time. Groups hold 1-5
+  // events, so linear scans over this are cheaper than keeping it ordered.
+  readonly slots: number[] = [];
+  pendingActivity: PendingActivity | undefined;
+  pendingNexusOperation: PendingNexusOperation | undefined;
+  version = 0;
+  cached: EventGroup | null = null;
+  cachedVersion = -1;
+
+  /**
+   * Assigned as events arrive rather than derived per read: `category` and `id`
+   * are read once per group per filter pass, and both event references would
+   * otherwise be a lookup into a nullable array on every access.
+   *
+   * Non-null from the moment the head lands, which is also when `headsGroup`
+   * becomes true — and only records heading a group are ever handed out.
+   */
+  readonly id: string;
+  initialEvent!: WorkflowEvent;
+  lastEvent!: WorkflowEvent;
+  category: WorkflowEvent['category'] = 'workflow';
+  headsGroup = false;
+  hasTerminalActivity = false;
+  hasTerminalNexus = false;
+  private lastSlot = -1;
+
+  constructor(readonly headSlot: number) {
+    this.id = String(headSlot + 1);
+  }
+
+  addMember(slot: number, event: WorkflowEvent): void {
+    this.slots.push(slot);
+    if (slot > this.lastSlot) {
+      this.lastSlot = slot;
+      this.lastEvent = event;
+    }
+    if (isTerminalActivityEvent(event)) this.hasTerminalActivity = true;
+    if (isTerminalNexusEvent(event)) this.hasTerminalNexus = true;
+    if (slot === this.headSlot) {
+      this.initialEvent = event;
+      this.category = groupCategory(event);
+      this.headsGroup = isGroupHeadEvent(event as CommonHistoryEvent);
+    }
+    // A head arriving picks pending metadata up; a terminal event drops it.
+    applyPendingMetadataTo(this);
+    this.version++;
+  }
+
+  get eventCount(): number {
+    return this.slots.length;
+  }
+
+  get classification(): WorkflowEvent['classification'] {
+    return this.initialEvent.classification;
+  }
+
+  get finalClassification(): WorkflowEvent['classification'] {
+    return this.lastEvent.classification;
+  }
+
+  get isPending(): boolean {
+    return groupIsPending(
+      this.initialEvent,
+      this.slots.length,
+      this.pendingActivity,
+      this.pendingNexusOperation,
+    );
+  }
+}
+
+export type ChangeListener = (immediate: boolean) => void;
+
+export type GroupArrayOptions = {
   excludeWorkflowTasks?: boolean;
 };
-
-export type LatestGroupListener = (group: EventGroup) => void;
 
 // ---------------------------------------------------------------------------
 // Module state (reset between workflows via reset())
 // ---------------------------------------------------------------------------
 
-let eventSlots: (HistoryEvent | null)[] = [];
-let eventToGroup = new Int32Array(0);
-const groupPool: GroupMeta[] = [];
-let poolTop = 0;
-
-const ascGroupHeads: number[] = [];
-const descGroupHeads: number[] = [];
-
-// Used during streaming to assign track indices in the final bidirectional layout
-// (desc events at top, asc events at bottom, loading gap in between).
-let estimatedTotalGroups = 0;
-const pendingFollowers = new Map<number, number[]>();
-const pendingResolvers = new Map<number, ((g: EventGroup) => void)[]>();
-const activePromises = new Map<number, Promise<EventGroup>>();
+let events: (WorkflowEvent | null)[] = [];
+let headGroup = new Int32Array(0); // head slot -> record index + 1 (0 = none)
+let records: GroupRecord[] = [];
+let maxSlot = -1;
 
 let failedEvent: HistoryEvent | null = null;
-let latestEventSlotIdx = -1;
-let latestEventRef: HistoryEvent | null = null;
-const latestGroupListeners: LatestGroupListener[] = [];
-
-// Followers from the live poll whose head event has not yet been processed by
-// either appendLiveEvent or processEvent. Keyed by head event id string.
-// Mirrors pendingFollowers (slot-index map) but stores WorkflowEvents directly
-// because appendLiveEvent converts immediately and never writes to eventSlots.
-const livePendingFollowers = new Map<string, WorkflowEvent[]>();
-
-// Cache for getGroupArray() — invalidated whenever poolTop or liveGroups change.
-// Avoids the 200KB+ slice+sort allocation on every call when the pool is
-// stable (i.e. after fetch completes).
-let _cachedGroups: EventGroup[] | null = null;
-let _cachedPoolTop = -1;
-let _cachedLiveVersion = -1;
-// Separate cache for the WFT-excluded variant (used by the timeline).
-let _cachedGroupsNoWFT: EventGroup[] | null = null;
-let _cachedPoolTopNoWFT = -1;
-let _cachedLiveVersionNoWFT = -1;
-// Incremented each time liveGroups is modified so getGroupArray knows to bust.
-let _liveVersion = 0;
 
 // Accumulated WFT IDs for marker billable-action dedup. Shared by both cursors
 // and the live poll — the direction an event arrives from is a fetch detail,
 // and one workflow task's markers bill once however they were loaded.
 const processedWorkflowTaskIds = new Set<string>();
 
-// Solo events that don't form groups (e.g. WorkflowExecutionStarted/Completed).
-// Kept separately so getEventArray() can return a complete flat event list.
-const soloEvents: WorkflowEvent[] = [];
-const soloEventIds = new Set<string>();
+// Bumped by every write. Read caches hold the revision they were built at, so
+// invalidation is a single counter rather than scattered cache-busting calls.
+let revision = 0;
 
-// ---------------------------------------------------------------------------
-// Live-event state (separate from pre-allocated initial buffer)
-// New events for running workflows are appended here — no reset of eventSlots.
-// ---------------------------------------------------------------------------
+let cachedGroups: EventGroup[] | null = null;
+let cachedGroupsRevision = -1;
+let cachedGroupsNoWFT: EventGroup[] | null = null;
+let cachedGroupsNoWFTRevision = -1;
+let cachedEvents: WorkflowEvent[] | null = null;
+let cachedEventsRevision = -1;
+let cachedLazyGroups: LazyGroup[] | null = null;
+let cachedLazyGroupsRevision = -1;
+let cachedLazyGroupsNoWFT: LazyGroup[] | null = null;
+let cachedLazyGroupsNoWFTRevision = -1;
+let cachedWftFailed: WorkflowEvent | undefined;
+let cachedWftFailedRevision = -1;
 
-const liveGroups: EventGroup[] = [];
-const liveGroupListeners: LatestGroupListener[] = [];
-// Tracks event IDs already seen by appendLiveEvent to prevent duplicates when
-// live polling re-sends events that overlap with the initial fetch or prior polls.
-const liveSeenIds = new Set<string>();
+const changeListeners = new Set<ChangeListener>();
+
+// Pending metadata from the workflow run, held so a head event arriving later
+// can pick its own up. Records currently carrying some are tracked so a walk is
+// only needed when there is something to set or clear.
+let pendingByActivityId = new Map<string, PendingActivity>();
+let pendingByNexusScheduledId = new Map<string, PendingNexusOperation>();
+const enrichedRecords = new Set<GroupRecord>();
+
+/** Returns whether the record's pending metadata changed. */
+function applyPendingMetadataTo(record: GroupRecord): boolean {
+  const head = record.initialEvent;
+  if (!head) return false;
+
+  let pendingActivity: PendingActivity | undefined;
+  let pendingNexusOperation: PendingNexusOperation | undefined;
+
+  // The run can still list an activity the history has already resolved, so a
+  // terminal event wins. This is the only writer of the record's pending
+  // fields, so gating here covers the lazy and materialized readings alike.
+  if (!record.hasTerminalActivity && isActivityTaskScheduledEvent(head)) {
+    pendingActivity = pendingByActivityId.get(
+      head.activityTaskScheduledEventAttributes?.activityId ?? '',
+    );
+  } else if (!record.hasTerminalNexus && isNexusOperationScheduledEvent(head)) {
+    pendingNexusOperation = pendingByNexusScheduledId.get(head.id);
+  }
+
+  if (
+    record.pendingActivity === pendingActivity &&
+    record.pendingNexusOperation === pendingNexusOperation
+  ) {
+    return false;
+  }
+
+  record.pendingActivity = pendingActivity;
+  record.pendingNexusOperation = pendingNexusOperation;
+  if (pendingActivity || pendingNexusOperation) {
+    enrichedRecords.add(record);
+  } else {
+    enrichedRecords.delete(record);
+  }
+  record.version++;
+  return true;
+}
 
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-function makeGroupMeta(): GroupMeta {
-  return {
-    headSlotIdx: -1,
-    group: null,
-    startMs: 0,
-    endMs: 0,
-    trackIndex: -1,
-    pixiType: '',
-    pixiStatus: '',
-  };
+function notifyChanged(immediate = false): void {
+  for (const listener of changeListeners) listener(immediate);
 }
 
-function resetMeta(m: GroupMeta): void {
-  m.headSlotIdx = -1;
-  m.group = null;
-  m.startMs = 0;
-  m.endMs = 0;
-  m.trackIndex = -1;
-  m.pixiType = '';
-  m.pixiStatus = '';
-}
-
-function toMs(t: unknown): number {
-  if (!t) return 0;
-  if (typeof t === 'number') return t;
-  if (t instanceof Date) return t.getTime();
-  if (typeof t === 'object') {
-    const obj = t as Record<string, unknown>;
-    if ('seconds' in obj) {
-      return (
-        Number(obj.seconds ?? 0) * 1000 + Number(obj.nanos ?? 0) / 1_000_000
-      );
-    }
-  }
-  return new Date(t as string).getTime();
-}
-
-function pascalToEventType(name: string): string {
-  return (
-    'EVENT_TYPE_' +
-    name
-      .replace(/([A-Z])/g, '_$1')
-      .toUpperCase()
-      .replace(/^_/, '')
-  );
-}
-
-function groupToPixiType(group: EventGroup): string {
-  switch (group.category) {
-    case 'activity':
-    case 'local-activity':
-      return 'GROUP_ACTIVITY';
-    case 'child-workflow':
-      return 'GROUP_CHILD_WORKFLOW';
-    case 'timer':
-      return 'GROUP_TIMER';
-    default:
-      break;
-  }
-  if (group.initialEvent.eventType === 'WorkflowTaskScheduled') {
-    return 'GROUP_WORKFLOW_TASK';
-  }
-  return pascalToEventType(group.initialEvent.eventType);
-}
-
-function groupToPixiStatus(group: EventGroup): string {
-  if (group.isTerminated) return 'failed';
-  if (group.isFailureOrTimedOut) return 'failed';
-  if (group.isCanceled) return 'canceled';
-  if (group.isPending) return 'started';
-  const c = group.finalClassification ?? group.classification;
-  switch (c) {
-    case 'Completed':
-      return 'completed';
-    case 'Fired':
-      return 'fired';
-    case 'Signaled':
-      return 'signaled';
-    case 'Failed':
-    case 'TimedOut':
-    case 'Terminated':
-      return 'failed';
-    case 'Canceled':
-    case 'CancelRequested':
-      return 'canceled';
-    case 'Started':
-    case 'Open':
-    case 'Running':
-      return 'started';
-    default:
-      return 'scheduled';
-  }
+function grow(slot: number): void {
+  if (slot < events.length) return;
+  const size = slot + Math.ceil(slot * 0.25) + 16;
+  events.length = size;
+  const grown = new Int32Array(size);
+  grown.set(headGroup);
+  headGroup = grown;
 }
 
 function shouldNotAddBillableAction(event: WorkflowEvent): boolean {
@@ -222,184 +282,80 @@ function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
   });
 }
 
-function insertEventById(list: WorkflowEvent[], event: WorkflowEvent): void {
-  const id = Number(event.id);
-  let i = list.length;
-  while (i > 0 && Number(list[i - 1].id) > id) i--;
-  list.splice(i, 0, event);
+function recordFor(headSlot: number): GroupRecord {
+  const existing = headGroup[headSlot];
+  if (existing !== 0) return records[existing - 1];
+
+  const record = new GroupRecord(headSlot);
+  records.push(record);
+  headGroup[headSlot] = records.length;
+  return record;
 }
 
-function invalidateGroupArrayCaches(): void {
-  _cachedGroups = null;
-  _cachedGroupsNoWFT = null;
-}
-
-function hasTerminalActivityEvent(group: EventGroup): boolean {
-  return group.eventList.some(
-    (event) =>
-      isActivityTaskCompletedEvent(event) ||
-      isActivityTaskFailedEvent(event) ||
-      isActivityTaskCanceledEvent(event) ||
-      isActivityTaskTimedOutEvent(event),
+function isTerminalActivityEvent(event: WorkflowEvent): boolean {
+  return (
+    isActivityTaskCompletedEvent(event) ||
+    isActivityTaskFailedEvent(event) ||
+    isActivityTaskCanceledEvent(event) ||
+    isActivityTaskTimedOutEvent(event)
   );
 }
 
-function hasTerminalNexusEvent(group: EventGroup): boolean {
-  return group.eventList.some(
-    (event) =>
-      isNexusOperationCompletedEvent(event) ||
-      isNexusOperationFailedEvent(event) ||
-      isNexusOperationCanceledEvent(event) ||
-      isNexusOperationTimedOutEvent(event),
+function isTerminalNexusEvent(event: WorkflowEvent): boolean {
+  return (
+    isNexusOperationCompletedEvent(event) ||
+    isNexusOperationFailedEvent(event) ||
+    isNexusOperationCanceledEvent(event) ||
+    isNexusOperationTimedOutEvent(event)
   );
 }
 
-function clearResolvedPendingState(group: EventGroup): void {
-  if (group.pendingActivity && hasTerminalActivityEvent(group)) {
-    delete group.pendingActivity;
-  }
-
-  if (group.pendingNexusOperation && hasTerminalNexusEvent(group)) {
-    delete group.pendingNexusOperation;
-  }
+// Pending metadata is applied as a derived read rather than stored on the
+// group, so a terminal event and a stale pending entry can arrive in either
+// order without leaving the group reporting isPending alongside a completion.
+function applyPendingMetadata(group: EventGroup, record: GroupRecord): void {
+  // Copies rather than re-deciding — the record is already correct.
+  group.pendingActivity = record.pendingActivity;
+  group.pendingNexusOperation = record.pendingNexusOperation;
 }
 
 /**
- * Returns a copy of `group` with `event` added. Callers must store the returned
- * reference back over the old one: the timeline row pool reuses a row when its
- * group reference is unchanged (timeline-graph.svelte), so extending a rendered
- * group in place leaves the row showing its old classification — a completed
- * activity keeps rendering as in-progress until reload.
- *
- * The copy is shallow and shares `eventList` and `links` with the original, so
- * the pre-copy reference is left inconsistent and must be treated as dead once
- * the caller has stored the new one.
+ * Build the EventGroup for a record, or null when it has no head event yet or
+ * its head event doesn't form a group (e.g. WorkflowExecutionStarted).
+ * Memoized on the record's version — callers may rely on an unchanged record
+ * returning the identical object.
  */
-function withAddedEvent(group: EventGroup, event: WorkflowEvent): EventGroup {
-  const next = cloneEventGroup(group);
-  insertEventById(next.eventList, event);
-  next.timestamp = event.timestamp;
-  addEventToGroup(next, event);
-  clearResolvedPendingState(next);
-  return next;
-}
+function materializeEventGroup(record: GroupRecord): EventGroup | null {
+  if (record.cachedVersion === record.version) return record.cached;
+  record.cachedVersion = record.version;
+  record.cached = null;
 
-function growArrays(newSize: number): void {
-  if (newSize <= eventSlots.length) return;
-  eventSlots.length = newSize;
-  const grown = new Int32Array(newSize);
-  grown.set(eventToGroup);
-  eventToGroup = grown;
-}
+  const head = events[record.headSlot];
+  if (!head) return null;
 
-// Grow the slot arrays so `slotIdx` is addressable, with ~25% headroom.
-function growArraysFor(slotIdx: number): void {
-  if (slotIdx < eventSlots.length) return;
-  growArrays(slotIdx + Math.ceil(slotIdx * 0.25) + 16);
-}
+  const group =
+    createEventGroup(head as CommonHistoryEvent) ??
+    createWorkflowTaskGroup(head as CommonHistoryEvent);
+  if (!group) return null;
 
-function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
-  // Guard: already claimed (e.g. livePendingFollowers flush already added this event).
-  if (eventToGroup[followerSlotIdx] !== 0) {
-    eventSlots[followerSlotIdx] = null;
-    return;
+  const followers: WorkflowEvent[] = [];
+  for (const slot of record.slots) {
+    if (slot === record.headSlot) continue;
+    const event = events[slot];
+    if (event) followers.push(event);
   }
+  followers.sort((a, b) => Number(a.id) - Number(b.id));
 
-  const meta = groupPool[poolIdx];
-  const raw = eventSlots[followerSlotIdx];
-  if (!raw || !meta.group) return;
-
-  const event = toWorkflowEvent(raw);
-  meta.group = withAddedEvent(meta.group, event);
-
-  eventToGroup[followerSlotIdx] = poolIdx + 1;
-
-  const followerMs = toMs(event.eventTime);
-  if (followerMs > meta.endMs) meta.endMs = followerMs;
-
-  invalidateGroupArrayCaches();
-  eventSlots[followerSlotIdx] = null;
-}
-
-function attachFollower(headSlotIdx: number, followerSlotIdx: number): void {
-  const poolIdx = eventToGroup[headSlotIdx];
-  if (poolIdx !== 0) {
-    attachFollowerToPool(poolIdx - 1, followerSlotIdx);
-  } else {
-    const pending = pendingFollowers.get(headSlotIdx);
-    if (pending) {
-      pending.push(followerSlotIdx);
-    } else {
-      pendingFollowers.set(headSlotIdx, [followerSlotIdx]);
-    }
-  }
-}
-
-function absorbLiveGroupIntoPool(poolIdx: number, liveGroup: EventGroup): void {
-  const meta = groupPool[poolIdx];
-  const group = meta.group;
-  if (!group) return;
-
-  for (const event of liveGroup.eventList) {
-    const slotIdx = parseInt(event.id) - 1;
-    growArraysFor(slotIdx);
-    if (eventToGroup[slotIdx] !== 0) continue;
-    if (group.eventList.some((existing) => existing.id === event.id)) continue;
-
-    insertEventById(group.eventList, event);
+  for (const event of followers) {
+    group.eventList.push(event);
     group.timestamp = event.timestamp;
     addEventToGroup(group, event);
-    eventToGroup[slotIdx] = poolIdx + 1;
-    const eventMs = toMs(event.eventTime);
-    if (eventMs > meta.endMs) meta.endMs = eventMs;
   }
 
-  clearResolvedPendingState(group);
-  invalidateGroupArrayCaches();
-}
+  applyPendingMetadata(group, record);
 
-// Returns a fresh group reference when pending metadata changed (so
-// reference-tracking Svelte views re-derive — a pause/unpause appends no
-// history event, leaving eventList and the old reference otherwise stable), or
-// the same group when nothing changed.
-function enrichGroup(
-  group: EventGroup,
-  byActivityId: Map<string, PendingActivity>,
-  byNexusScheduledId: Map<string, PendingNexusOperation>,
-): EventGroup {
-  const initial = group.initialEvent;
-
-  if (isActivityTaskScheduledEvent(initial)) {
-    const pa = byActivityId.get(
-      initial.activityTaskScheduledEventAttributes?.activityId ?? '',
-    );
-    const next = pa && !hasTerminalActivityEvent(group) ? pa : undefined;
-    if (group.pendingActivity === next) {
-      return group;
-    }
-    const clone = cloneEventGroup(group);
-    clone.pendingActivity = next;
-    return clone;
-  }
-
-  if (isNexusOperationScheduledEvent(initial)) {
-    const pn = byNexusScheduledId.get(group.id);
-    const next = pn && !hasTerminalNexusEvent(group) ? pn : undefined;
-    if (group.pendingNexusOperation === next) {
-      return group;
-    }
-    const clone = cloneEventGroup(group);
-    clone.pendingNexusOperation = next;
-    return clone;
-  }
-
+  record.cached = group;
   return group;
-}
-
-function notifyLatestGroupListeners(group: EventGroup): void {
-  for (const cb of latestGroupListeners) {
-    cb(group);
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -407,715 +363,248 @@ function notifyLatestGroupListeners(group: EventGroup): void {
 // ---------------------------------------------------------------------------
 
 /**
- * (Re)initialise the buffer for a new workflow fetch.
- * Call before starting fetchAllEventsBidirectional.
+ * (Re)initialise the buffer for a new workflow run.
+ * Call before starting the bidirectional fetch.
  */
 export function reset(historyLength: number): void {
-  const N = Math.max(historyLength + 16, 16);
+  const size = Math.max(historyLength + 16, 16);
 
-  eventSlots = new Array<null>(N).fill(null);
-  eventToGroup = new Int32Array(N);
+  events = new Array<null>(size).fill(null);
+  headGroup = new Int32Array(size);
+  records = [];
+  enrichedRecords.clear();
+  pendingByActivityId = new Map();
+  pendingByNexusScheduledId = new Map();
+  maxSlot = -1;
 
-  const maxGroups = Math.ceil(N / 1.5);
-  while (groupPool.length < maxGroups) groupPool.push(makeGroupMeta());
-  for (let i = 0; i < poolTop; i++) resetMeta(groupPool[i]);
-
-  poolTop = 0;
-  ascGroupHeads.length = 0;
-  descGroupHeads.length = 0;
-  pendingFollowers.clear();
-  pendingResolvers.clear();
-  activePromises.clear();
-  processedWorkflowTaskIds.clear();
   failedEvent = null;
-  latestEventSlotIdx = -1;
-  latestEventRef = null;
-  latestGroupListeners.length = 0;
-  liveGroups.length = 0;
-  liveGroupListeners.length = 0;
-  soloEvents.length = 0;
-  soloEventIds.clear();
-  liveSeenIds.clear();
-  livePendingFollowers.clear();
-  _liveVersion = 0;
-  _cachedGroups = null;
-  _cachedPoolTop = -1;
-  _cachedLiveVersion = -1;
-  _cachedGroupsNoWFT = null;
-  _cachedPoolTopNoWFT = -1;
-  _cachedLiveVersionNoWFT = -1;
+  processedWorkflowTaskIds.clear();
+
+  revision++;
+  cachedGroups = null;
+  cachedGroupsNoWFT = null;
+  cachedEvents = null;
+  cachedLazyGroups = null;
+  cachedLazyGroupsNoWFT = null;
+
+  notifyChanged(true);
 }
 
 /**
- * Set the estimated total group count so streaming track indices use the
- * correct bidirectional layout (desc at top, asc at bottom).
- * Call this before starting fetchBidirectional, after reset().
- */
-export function setEstimatedGroupCount(n: number): void {
-  estimatedTotalGroups = n;
-}
-
-/**
- * Call from the descending cursor's onFirstDescPage hook to capture the
- * failedEvent used for billableActions calculation.
+ * The reset point past which events stop counting toward billableActions.
+ * Currently unwired — no production caller supplies it.
  */
 export function setFailedEvent(raw: HistoryEvent | null): void {
   failedEvent = raw;
 }
 
 /**
- * Process a single raw HistoryEvent from either cursor.
- * isAscending: true = ascending cursor, false = descending cursor.
- * Returns the EventGroup when a new group HEAD is registered, null otherwise.
+ * Add one raw HistoryEvent from either fetch cursor or the live poll.
+ * Returns false when the event was already present.
  */
-export function processEvent(
-  raw: HistoryEvent,
-  isAscending: boolean,
-): EventGroup | null {
-  const slotIdx = parseInt(raw.eventId) - 1;
+export function ingestHistoryEvent(raw: HistoryEvent): boolean {
+  const slot = parseInt(raw.eventId) - 1;
+  if (!(slot >= 0)) return false;
 
-  growArraysFor(slotIdx);
-
-  eventSlots[slotIdx] = raw;
-
-  if (slotIdx > latestEventSlotIdx) {
-    latestEventSlotIdx = slotIdx;
-    latestEventRef = raw;
-  }
+  grow(slot);
+  if (events[slot]) return false;
 
   const event = toWorkflowEvent(raw);
-  const gid = getGroupId(event as CommonHistoryEvent);
-  const isHead = gid === event.id;
+  events[slot] = event;
+  if (slot > maxSlot) maxSlot = slot;
 
-  if (!isHead) {
-    const headSlotIdx = parseInt(gid) - 1;
-    attachFollower(headSlotIdx, slotIdx);
-    // If the head already existed, attachFollowerToPool already nulled this slot.
-    // If not, the slot stays live until the head arrives and flushes it.
-    return null;
-  }
+  // An event whose head is unknown (malformed attributes) heads its own group.
+  const parsedHeadSlot = parseInt(getGroupId(event as CommonHistoryEvent)) - 1;
+  const headSlot = parsedHeadSlot >= 0 ? parsedHeadSlot : slot;
+  grow(headSlot);
 
-  // Try both group dispatchers — createWorkflowTaskGroup handles WFT events
-  let group =
-    createEventGroup(event as CommonHistoryEvent) ??
-    createWorkflowTaskGroup(event as CommonHistoryEvent);
+  recordFor(headSlot).addMember(slot, event);
+  revision++;
 
-  if (!group) {
-    pendingFollowers.delete(slotIdx);
-    if (!soloEventIds.has(event.id)) {
-      soloEvents.push(event);
-      soloEventIds.add(event.id);
-    }
-    eventSlots[slotIdx] = null;
-    return null;
-  }
-
-  // Write-once guard: prevents double-registration at cursor boundary overlap
-  if (eventToGroup[slotIdx] !== 0) {
-    eventSlots[slotIdx] = null;
-    return null;
-  }
-
-  if (poolTop >= groupPool.length) {
-    groupPool.push(makeGroupMeta());
-  }
-  const poolIdx = poolTop++;
-  const meta = groupPool[poolIdx];
-  resetMeta(meta);
-  meta.headSlotIdx = slotIdx;
-  meta.group = group;
-
-  const startMs = toMs(event.eventTime);
-  meta.startMs = startMs;
-  meta.endMs = startMs;
-  meta.trackIndex = poolIdx;
-  meta.pixiType = groupToPixiType(group);
-  meta.pixiStatus = groupToPixiStatus(group);
-
-  eventToGroup[slotIdx] = poolIdx + 1;
-
-  if (meta.pixiType === 'GROUP_WORKFLOW_TASK') {
-    // WFT groups are tracked in the pool but not rendered; skip track assignment.
-    meta.trackIndex = -1;
-  } else if (isAscending) {
-    ascGroupHeads.push(slotIdx);
-    // Fill from bottom: first asc group (oldest) → row (estimated - 1), etc.
-    const estTotal =
-      estimatedTotalGroups > 0 ? estimatedTotalGroups : poolTop + 64;
-    meta.trackIndex = Math.max(
-      descGroupHeads.length,
-      estTotal - ascGroupHeads.length,
-    );
-  } else {
-    descGroupHeads.push(slotIdx);
-    // Fill from top: first desc group (newest) → row 0.
-    meta.trackIndex = descGroupHeads.length - 1;
-  }
-
-  // Flush any followers that arrived before this head via the bidirectional fetch.
-  // attachFollowerToPool nulls each follower slot after processing.
-  const pending = pendingFollowers.get(slotIdx);
-  if (pending) {
-    for (const followerSlotIdx of pending) {
-      attachFollowerToPool(poolIdx, followerSlotIdx);
-    }
-    pendingFollowers.delete(slotIdx);
-    // attachFollowerToPool replaced meta.group — re-sync the local ref so the
-    // flushes below, and the group this call publishes, aren't stale.
-    group = meta.group ?? group;
-  }
-
-  // Flush any followers that arrived before this head via the live poll.
-  // They are already converted WorkflowEvents — just insert and claim their slots.
-  const liveFollowers = livePendingFollowers.get(event.id);
-  if (liveFollowers) {
-    for (const follower of liveFollowers) {
-      const followerSlotIdx = parseInt(follower.id) - 1;
-      if (followerSlotIdx >= eventToGroup.length) {
-        growArrays(followerSlotIdx + 1);
-      }
-      // Guard: bidirectional flush may have already claimed this slot.
-      if (eventToGroup[followerSlotIdx] !== 0) continue;
-      insertEventById(group.eventList, follower);
-      group.timestamp = follower.timestamp;
-      addEventToGroup(group, follower);
-      eventToGroup[followerSlotIdx] = poolIdx + 1;
-      const followerMs = toMs(follower.eventTime);
-      if (followerMs > meta.endMs) meta.endMs = followerMs;
-    }
-    clearResolvedPendingState(group);
-    livePendingFollowers.delete(event.id);
-    invalidateGroupArrayCaches();
-  }
-
-  const liveGroupIdx = liveGroups.findIndex((g) => g.id === event.id);
-  if (liveGroupIdx !== -1) {
-    const [liveGroup] = liveGroups.splice(liveGroupIdx, 1);
-    absorbLiveGroupIntoPool(poolIdx, liveGroup);
-    _liveVersion++;
-  }
-
-  // Release the head slot — its data is now encoded in the EventGroup.
-  eventSlots[slotIdx] = null;
-
-  // Resolve any pending getRows() promises for this group
-  const resolvers = pendingResolvers.get(poolIdx);
-  if (resolvers) {
-    for (const resolve of resolvers) resolve(group);
-    pendingResolvers.delete(poolIdx);
-    activePromises.delete(poolIdx);
-  }
-
-  notifyLatestGroupListeners(group);
-  return group;
+  notifyChanged();
+  return true;
 }
 
 /**
- * Call after both cursors complete to merge the two head lists into the
- * canonical ascending-order group list. Returns the merged array.
- * The internal ascGroupHeads and descGroupHeads are cleared.
+ * Annotate activity and nexus groups with pending metadata from the workflow
+ * run. Safe to call repeatedly — groups whose pending entry is unchanged keep
+ * their existing reference.
  */
-export function mergeHeads(): number[] {
-  const merged = [...ascGroupHeads, ...descGroupHeads.reverse()];
-  ascGroupHeads.length = 0;
-  descGroupHeads.length = 0;
-  return merged;
-}
+export function setPendingMetadata(
+  pendingActivities: PendingActivity[],
+  pendingNexusOperations: PendingNexusOperation[],
+): void {
+  pendingByActivityId = new Map(
+    pendingActivities.map((pending) => [pending.activityId, pending]),
+  );
+  pendingByNexusScheduledId = new Map(
+    pendingNexusOperations.map((pending) => [
+      String(pending.scheduledEventId),
+      pending,
+    ]),
+  );
 
-/** Total number of groups registered so far. */
-export function getGroupCount(): number {
-  return poolTop;
-}
+  const nothingPending =
+    pendingByActivityId.size === 0 && pendingByNexusScheduledId.size === 0;
+  if (nothingPending && enrichedRecords.size === 0) return;
 
-/**
- * Request a slice of EventGroup promises by group index range [start, end).
- * - Already-loaded groups → Promise.resolve(group)
- * - Not-yet-loaded groups → pending Promise that resolves when the cursor
- *   writes the head event for that group index
- * - opts.excludeWorkflowTasks: filter WorkflowTask groups from the slice
- */
-export function getRows(
-  start: number,
-  end: number,
-  opts?: GetRowsOptions,
-): Promise<EventGroup>[] {
-  const result: Promise<EventGroup>[] = [];
-  for (let i = start; i < end; i++) {
-    result.push(getGroupPromise(i, opts));
-  }
-  return result;
-}
-
-function getGroupPromise(
-  poolIdx: number,
-  opts?: GetRowsOptions,
-): Promise<EventGroup> {
-  if (poolIdx < poolTop) {
-    const meta = groupPool[poolIdx];
-    if (meta.group) {
-      const group = meta.group;
-      if (opts?.excludeWorkflowTasks && isWorkflowTaskGroup(group)) {
-        return Promise.resolve(null as unknown as EventGroup);
-      }
-      return Promise.resolve(group);
+  let changed = false;
+  for (const record of records) {
+    if (!record.headsGroup) continue;
+    if (applyPendingMetadataTo(record)) {
+      revision++;
+      changed = true;
     }
   }
 
-  // Return existing pending promise for this index if one already exists
-  const existing = activePromises.get(poolIdx);
-  if (existing) return existing;
-
-  const promise = new Promise<EventGroup>((resolve) => {
-    const list = pendingResolvers.get(poolIdx);
-    if (list) {
-      list.push(resolve);
-    } else {
-      pendingResolvers.set(poolIdx, [resolve]);
-    }
-  });
-  activePromises.set(poolIdx, promise);
-  return promise;
-}
-
-/** The raw HistoryEvent with the highest eventId seen so far. O(1). */
-export function getLatestEvent(): HistoryEvent | null {
-  return latestEventRef;
+  if (changed) notifyChanged();
 }
 
 /**
- * The EventGroup whose head has the highest eventId seen so far.
- * Resolves immediately if the group is already registered, otherwise
- * waits until the next group head is written.
- */
-export function getLatestGroup(): Promise<EventGroup | null> {
-  if (poolTop === 0) return Promise.resolve(null);
-  return getGroupPromise(poolTop - 1);
-}
-
-/**
- * Subscribe to new group registrations at the tail (highest eventId end).
- * Fires once per new group head written by either cursor.
+ * Subscribe to buffer writes. Fires once per ingested event and once per
+ * pending-metadata change, so subscribers are expected to coalesce. `immediate`
+ * is true for reset, which subscribers should apply without coalescing so a
+ * navigation cannot leave the previous run's groups on screen.
  * Returns an unsubscribe function.
  */
-export function onLatestGroup(cb: LatestGroupListener): () => void {
-  latestGroupListeners.push(cb);
-  return () => {
-    const idx = latestGroupListeners.indexOf(cb);
-    if (idx !== -1) latestGroupListeners.splice(idx, 1);
-  };
+export function onChange(listener: ChangeListener): () => void {
+  changeListeners.add(listener);
+  return () => changeListeners.delete(listener);
 }
 
-// ---------------------------------------------------------------------------
-// Internal helpers (exported for testing)
-// ---------------------------------------------------------------------------
-
-export function isWorkflowTaskGroup(group: EventGroup): boolean {
+export function isWorkflowTaskGroup(group: EventGroup | LazyGroup): boolean {
   return group.initialEvent.eventType === 'WorkflowTaskScheduled';
 }
 
 /**
- * Post-fetch: annotate activity and nexus groups with pending metadata from
- * the workflow run. Call once after fetchBidirectional resolves.
+ * Sorted LazyGroup[] in ascending event-id order, without building a single
+ * EventGroup. Cached until the next write; lazy groups are the records themselves,
+ * so a rebuild allocates only the array.
  */
-export function enrichGroups(
-  pendingActivities: PendingActivity[],
-  pendingNexusOperations: PendingNexusOperation[],
-): void {
-  const byActivityId = new Map(pendingActivities.map((p) => [p.activityId, p]));
-  const byNexusScheduledId = new Map(
-    pendingNexusOperations.map((p) => [String(p.scheduledEventId), p]),
-  );
+export function getLazyGroups(opts?: GroupArrayOptions): LazyGroup[] {
+  const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
 
-  let changed = false;
-
-  for (let i = 0; i < poolTop; i++) {
-    const meta = groupPool[i];
-    if (!meta.group) continue;
-    const next = enrichGroup(meta.group, byActivityId, byNexusScheduledId);
-    if (next !== meta.group) {
-      meta.group = next;
-      changed = true;
+  if (excludeWFT) {
+    if (cachedLazyGroupsNoWFT && cachedLazyGroupsNoWFTRevision === revision) {
+      return cachedLazyGroupsNoWFT;
     }
+  } else if (cachedLazyGroups && cachedLazyGroupsRevision === revision) {
+    return cachedLazyGroups;
   }
 
-  for (let i = 0; i < liveGroups.length; i++) {
-    const next = enrichGroup(liveGroups[i], byActivityId, byNexusScheduledId);
-    if (next !== liveGroups[i]) {
-      liveGroups[i] = next;
-      changed = true;
-    }
+  // headGroup is indexed by head slot, so scanning it yields groups already in
+  // ascending event-id order — no sort needed.
+  const result: LazyGroup[] = new Array<LazyGroup>(records.length);
+  let count = 0;
+  for (let slot = 0; slot <= maxSlot; slot++) {
+    const recordIdx = headGroup[slot];
+    if (recordIdx === 0) continue;
+    const record = records[recordIdx - 1];
+    if (!record.headsGroup) continue;
+    if (excludeWFT && isWorkflowTaskGroup(record)) continue;
+    result[count++] = record;
   }
+  result.length = count;
 
-  if (changed) invalidateGroupArrayCaches();
+  if (excludeWFT) {
+    cachedLazyGroupsNoWFT = result;
+    cachedLazyGroupsNoWFTRevision = revision;
+  } else {
+    cachedLazyGroups = result;
+    cachedLazyGroupsRevision = revision;
+  }
+  return result;
 }
 
 /**
- * Returns the WorkflowTaskFailed/TimedOut event that is currently active
- * (i.e. has no subsequent WorkflowTaskCompleted), or undefined if none.
- * Mirrors the logic of getWorkflowTaskFailedEvent() but operates on buffer
- * groups instead of a flat event array.
+ * The full EventGroup for a lazy group, memoized on its content version: an
+ * unchanged lazy group returns the identical object, a changed one a new object.
+ *
+ * Idempotent — an already-materialized EventGroup passes straight through, so
+ * views can accept either lazy groups or groups built elsewhere (e.g.
+ * groupEvents() in graph-widget) without branching at every use site.
+ */
+export function materializeGroup(lazy: LazyGroup): EventGroup {
+  if (lazy instanceof GroupRecord) {
+    return materializeEventGroup(lazy) as EventGroup;
+  }
+  return lazy as EventGroup;
+}
+
+/**
+ * Sorted EventGroup[] in ascending event-id order — materializes every group.
+ * Prefer getLazyGroups + materializeGroup so only rendered groups are built.
+ */
+export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
+  const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
+
+  if (excludeWFT) {
+    if (cachedGroupsNoWFT && cachedGroupsNoWFTRevision === revision) {
+      return cachedGroupsNoWFT;
+    }
+  } else if (cachedGroups && cachedGroupsRevision === revision) {
+    return cachedGroups;
+  }
+
+  const result = getLazyGroups(opts).map(materializeGroup);
+
+  if (excludeWFT) {
+    cachedGroupsNoWFT = result;
+    cachedGroupsNoWFTRevision = revision;
+  } else {
+    cachedGroups = result;
+    cachedGroupsRevision = revision;
+  }
+  return result;
+}
+
+/** Flat WorkflowEvent[] in ascending event-id order. */
+export function getEventArray(): WorkflowEvent[] {
+  if (cachedEvents && cachedEventsRevision === revision) return cachedEvents;
+
+  const result: WorkflowEvent[] = [];
+  for (let slot = 0; slot <= maxSlot; slot++) {
+    const event = events[slot];
+    if (event) result.push(event);
+  }
+
+  cachedEvents = result;
+  cachedEventsRevision = revision;
+  return result;
+}
+
+/**
+ * The WorkflowTaskFailed/TimedOut event that is currently active (i.e. has no
+ * subsequent WorkflowTaskCompleted), or undefined if none.
  */
 export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
+  if (cachedWftFailedRevision === revision) return cachedWftFailed;
+
   let lastFailedEvent: WorkflowEvent | undefined;
   let maxCompletedId = -1;
 
-  const scanGroup = (group: EventGroup): void => {
-    for (const event of group.eventList) {
-      if (event.eventType === 'WorkflowTaskCompleted') {
-        const id = Number(event.id);
-        if (id > maxCompletedId) maxCompletedId = id;
-      }
-      if (
-        (event.eventType === 'WorkflowTaskFailed' ||
-          event.eventType === 'WorkflowTaskTimedOut') &&
-        !isWorkflowTaskFailedEventDueToReset(event)
-      ) {
-        if (!lastFailedEvent || Number(event.id) > Number(lastFailedEvent.id)) {
-          lastFailedEvent = event;
-        }
-      }
-    }
-  };
+  for (let slot = 0; slot <= maxSlot; slot++) {
+    const event = events[slot];
+    if (!event) continue;
 
-  for (let i = 0; i < poolTop; i++) {
-    const { group } = groupPool[i];
-    if (!group || !isWorkflowTaskGroup(group)) continue;
-    scanGroup(group);
-  }
-
-  // Live WFT groups whose head slot has not yet been claimed by the pool —
-  // covers workflow-task failures that arrive via the live poll after the
-  // initial fetch completes.
-  for (const group of liveGroups) {
-    if (!isWorkflowTaskGroup(group)) continue;
-    const headSlotIdx = parseInt(group.id) - 1;
-    if (
-      headSlotIdx >= 0 &&
-      headSlotIdx < eventToGroup.length &&
-      eventToGroup[headSlotIdx] !== 0
-    ) {
+    if (event.eventType === 'WorkflowTaskCompleted') {
+      const id = Number(event.id);
+      if (id > maxCompletedId) maxCompletedId = id;
       continue;
     }
-    scanGroup(group);
-  }
 
-  if (!lastFailedEvent) return undefined;
-  if (Number(lastFailedEvent.id) < maxCompletedId) return undefined;
-  return lastFailedEvent;
-}
-
-/**
- * Synchronous sorted EventGroup[] after the fetch is complete.
- * Groups are ordered by ascending eventId (headSlotIdx sort).
- *
- * The result is cached per poolTop value.  During streaming, poolTop grows on
- * every new group so the cache misses every call — but the rAF throttle in the
- * layout already limits this to once per frame.  After the fetch completes,
- * poolTop is stable, so every subsequent call is O(1) with zero allocation.
- *
- * Both variants (all groups and WFT-excluded) are independently cached so
- * the timeline can call with excludeWorkflowTasks:true on the hot path.
- */
-export function getGroupArray(opts?: GetRowsOptions): EventGroup[] {
-  const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
-  if (excludeWFT) {
     if (
-      _cachedGroupsNoWFT !== null &&
-      _cachedPoolTopNoWFT === poolTop &&
-      _cachedLiveVersionNoWFT === _liveVersion
+      (isFailedTaskEvent(event) || isTimedOutTaskEvent(event)) &&
+      !isWorkflowTaskFailedEventDueToReset(event)
     ) {
-      return _cachedGroupsNoWFT;
-    }
-  } else {
-    if (
-      _cachedGroups !== null &&
-      _cachedPoolTop === poolTop &&
-      _cachedLiveVersion === _liveVersion
-    ) {
-      return _cachedGroups;
+      lastFailedEvent = event;
     }
   }
 
-  const metas = groupPool
-    .slice(0, poolTop)
-    .sort((a, b) => a.headSlotIdx - b.headSlotIdx);
-  const result: EventGroup[] = [];
-  for (const meta of metas) {
-    if (!meta.group) continue;
-    if (excludeWFT && isWorkflowTaskGroup(meta.group)) continue;
-    result.push(meta.group);
-  }
-
-  // Include live groups whose head slot is not yet claimed by groupPool.
-  // Once processEvent claims the head, eventToGroup[slot] becomes non-zero
-  // and the live group is excluded here to avoid duplicates.
-  for (const g of liveGroups) {
-    const headSlotIdx = parseInt(g.id) - 1;
-    if (
-      headSlotIdx >= 0 &&
-      headSlotIdx < eventToGroup.length &&
-      eventToGroup[headSlotIdx] !== 0
-    ) {
-      continue; // head claimed by groupPool — skip to avoid duplicate
-    }
-    if (excludeWFT && isWorkflowTaskGroup(g)) continue;
-    result.push(g);
-  }
-
-  // Re-sort: live groups can sit anywhere in the event sequence.
-  result.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-
-  if (excludeWFT) {
-    _cachedGroupsNoWFT = result;
-    _cachedPoolTopNoWFT = poolTop;
-    _cachedLiveVersionNoWFT = _liveVersion;
-  } else {
-    _cachedGroups = result;
-    _cachedPoolTop = poolTop;
-    _cachedLiveVersion = _liveVersion;
-  }
-  return result;
-}
-
-/**
- * Direct read-only access to a pool entry's rendering metadata.
- * Returns null if poolIdx is out of range or the group is not yet registered.
- */
-export function getGroupMeta(poolIdx: number): GroupMeta | null {
-  if (poolIdx < 0 || poolIdx >= poolTop) return null;
-  return groupPool[poolIdx];
-}
-
-/** Number of groups loaded by the ascending cursor. */
-export function getAscGroupCount(): number {
-  return ascGroupHeads.length;
-}
-
-/** Number of groups loaded by the descending cursor. */
-export function getDescGroupCount(): number {
-  return descGroupHeads.length;
-}
-
-/**
- * Finalize track indices after the full fetch completes.
- *
- * Layout (top → bottom):
- *   rows 0 .. descCount-1      – descending cursor groups, newest first (row 0)
- *   rows descCount .. total-ascCount-1  – (would be loading gap during streaming)
- *   rows total-ascCount .. total-1 – ascending cursor groups, oldest last (bottom)
- *
- * Also updates pixiStatus now that final classification is known.
- */
-export function assignTrackIndices(): void {
-  // Only non-WFT groups are in the head lists, so this total is the visible track count.
-  const total = descGroupHeads.length + ascGroupHeads.length;
-
-  // Descending groups arrive newest-first, so descGroupHeads[0] = newest event.
-  for (let i = 0; i < descGroupHeads.length; i++) {
-    const poolIdx = eventToGroup[descGroupHeads[i]] - 1;
-    if (poolIdx < 0) continue;
-    const meta = groupPool[poolIdx];
-    meta.trackIndex = i;
-    if (meta.group) meta.pixiStatus = groupToPixiStatus(meta.group);
-  }
-
-  // Ascending groups arrive oldest-first (ascGroupHeads[0] = event 1).
-  // Place them with the oldest at the very bottom and the frontier (newest asc event)
-  // adjacent to the loading gap, so the gap visually shrinks from both sides as data loads.
-  for (let i = 0; i < ascGroupHeads.length; i++) {
-    const poolIdx = eventToGroup[ascGroupHeads[i]] - 1;
-    if (poolIdx < 0) continue;
-    const meta = groupPool[poolIdx];
-    meta.trackIndex = total - 1 - i;
-    if (meta.group) meta.pixiStatus = groupToPixiStatus(meta.group);
-  }
-}
-
-/** Number of visible (non-WFT) groups registered so far. */
-export function getVisibleGroupCount(): number {
-  return descGroupHeads.length + ascGroupHeads.length;
-}
-
-/** Read-only view of internal state for assertions in tests. */
-export function _debugState() {
-  return {
-    poolTop,
-    ascGroupHeadsLength: ascGroupHeads.length,
-    descGroupHeadsLength: descGroupHeads.length,
-    pendingFollowersSize: pendingFollowers.size,
-    pendingResolversSize: pendingResolvers.size,
-    latestEventSlotIdx,
-  };
-}
-
-/** Test-only: exposes raw eventSlots so tests can assert Option-C nulling. */
-export function _debugEventSlots(): readonly (HistoryEvent | null)[] {
-  return eventSlots;
-}
-
-// ---------------------------------------------------------------------------
-// getEventArray — flat WorkflowEvent[] built lazily from groupPool
-// Used by EventSummaryTable which needs a flat sorted event list.
-// ---------------------------------------------------------------------------
-
-/**
- * Returns a flat WorkflowEvent[] of all events in ascending eventId order,
- * built by concatenating each group's eventList in head-slot order.
- * Includes live events appended via appendLiveEvent().
- */
-export function getEventArray(): WorkflowEvent[] {
-  const result: WorkflowEvent[] = [];
-  const sorted = groupPool
-    .slice(0, poolTop)
-    .sort((a, b) => a.headSlotIdx - b.headSlotIdx);
-  for (const meta of sorted) {
-    if (meta.group) {
-      for (const ev of meta.group.eventList) result.push(ev);
-    }
-  }
-  // When the live poll runs concurrently with the bidirectional fetch an event
-  // can land in liveGroups before processEvent writes it into groupPool. Once
-  // processEvent claims it (eventToGroup[slotIdx] !== 0) we skip it here so it
-  // is not counted twice.
-  for (const g of liveGroups) {
-    for (const ev of g.eventList) {
-      const slotIdx = parseInt(ev.id) - 1;
-      if (slotIdx < eventToGroup.length && eventToGroup[slotIdx] !== 0)
-        continue;
-      result.push(ev);
-    }
-  }
-  for (const ev of soloEvents) result.push(ev);
-  result.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-  return result;
-}
-
-// ---------------------------------------------------------------------------
-// Live-event API — append new events for running workflows after initial fetch
-// ---------------------------------------------------------------------------
-
-/**
- * Append a single new event from the live ascending long-poll.
- * Creates or extends a group using the same logic as processEvent, but stores
- * the result in liveGroups rather than the pre-allocated groupPool.
- * Does NOT call growArrays or touch eventSlots.
- */
-/** Returns true if the event was new and added, false if it was a duplicate. */
-export function appendLiveEvent(raw: HistoryEvent): boolean {
-  if (liveSeenIds.has(raw.eventId)) return false;
-  liveSeenIds.add(raw.eventId);
-
-  // If this event was already processed into groupPool during the initial fetch,
-  // skip it — otherwise getEventArray() would return it from both groupPool and liveGroups.
-  const slotIdx = parseInt(raw.eventId) - 1;
-  if (slotIdx < eventToGroup.length && eventToGroup[slotIdx] !== 0)
-    return false;
-
-  const event = toWorkflowEvent(raw);
-  const gid = getGroupId(event as CommonHistoryEvent);
-  const isHead = gid === event.id;
-
-  if (!isHead) {
-    // Option A: head already in a live group — extend it directly.
-    const existingIdx = liveGroups.findIndex((g) => g.id === gid);
-    if (existingIdx !== -1) {
-      liveGroups[existingIdx] = withAddedEvent(liveGroups[existingIdx], event);
-      _liveVersion++;
-      invalidateGroupArrayCaches();
-      return true;
-    }
-
-    // Option B: head already in groupPool — extend the real group directly.
-    const headSlotIdx = parseInt(gid) - 1;
-    if (
-      headSlotIdx >= 0 &&
-      headSlotIdx < eventToGroup.length &&
-      eventToGroup[headSlotIdx] !== 0
-    ) {
-      const meta = groupPool[eventToGroup[headSlotIdx] - 1];
-      if (meta?.group) {
-        meta.group = withAddedEvent(meta.group, event);
-        growArraysFor(slotIdx);
-        eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
-        const followerMs = toMs(event.eventTime);
-        if (followerMs > meta.endMs) {
-          meta.endMs = followerMs;
-        }
-        invalidateGroupArrayCaches();
-      }
-      return true;
-    }
-
-    // Head not yet loaded — park this follower until the head arrives (via
-    // appendLiveEvent or processEvent). Mirrors the bidirectional pendingFollowers
-    // pattern: no group is created, no UI update until we have the head.
-    const parked = livePendingFollowers.get(gid);
-    if (parked) {
-      parked.push(event);
-    } else {
-      livePendingFollowers.set(gid, [event]);
-    }
-    return true;
-  }
-
-  // This event is the head of a group.
-  const group =
-    createEventGroup(event as CommonHistoryEvent) ??
-    createWorkflowTaskGroup(event as CommonHistoryEvent);
-  if (!group) {
-    if (!soloEventIds.has(event.id)) {
-      soloEvents.push(event);
-      soloEventIds.add(event.id);
-    }
-    return true;
-  }
-
-  // Flush any followers that parked while waiting for this head.
-  const parked = livePendingFollowers.get(event.id);
-  if (parked) {
-    for (const follower of parked) {
-      insertEventById(group.eventList, follower);
-      group.timestamp = follower.timestamp;
-      addEventToGroup(group, follower);
-    }
-    clearResolvedPendingState(group);
-    livePendingFollowers.delete(event.id);
-  }
-
-  liveGroups.push(group);
-  _liveVersion++;
-  invalidateGroupArrayCaches();
-  for (const cb of liveGroupListeners) cb(group);
-  for (const cb of latestGroupListeners) cb(group);
-  return true;
-}
-
-/** Number of live groups appended since the initial fetch completed. */
-export function getLiveGroupCount(): number {
-  return liveGroups.length;
-}
-
-/**
- * Subscribe to new live group registrations.
- * Returns an unsubscribe function.
- */
-export function onLiveGroup(cb: LatestGroupListener): () => void {
-  liveGroupListeners.push(cb);
-  return () => {
-    const idx = liveGroupListeners.indexOf(cb);
-    if (idx !== -1) liveGroupListeners.splice(idx, 1);
-  };
-}
-
-/** Clear liveGroups on reset so they don't carry over to the next workflow. */
-export function resetLive(): void {
-  liveGroups.length = 0;
-  liveGroupListeners.length = 0;
-  liveSeenIds.clear();
-  livePendingFollowers.clear();
-  _liveVersion = 0;
-  _cachedGroups = null;
-  _cachedGroupsNoWFT = null;
-  _cachedLiveVersion = -1;
-  _cachedLiveVersionNoWFT = -1;
+  cachedWftFailedRevision = revision;
+  cachedWftFailed =
+    lastFailedEvent && Number(lastFailedEvent.id) >= maxCompletedId
+      ? lastFailedEvent
+      : undefined;
+  return cachedWftFailed;
 }
