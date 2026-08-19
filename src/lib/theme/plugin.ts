@@ -1,8 +1,59 @@
 import plugin from 'tailwindcss/plugin';
 
 import { colors } from './colors';
+import { colorAlphaScales } from './io/color-alpha-scales';
+import { colorScales } from './io/color-scales';
+import { type SemanticColor, semanticColors } from './io/semantic-colors';
 import { css } from './utilities';
 import { dark, light } from './variables';
+
+type SemanticColorGroup = Readonly<Record<string, SemanticColor>>;
+
+const { status: surfaceStatusColors, ...surfaceColors } =
+  semanticColors.surface;
+
+const referenceColorGroup = (group: string, colors: SemanticColorGroup) =>
+  Object.fromEntries(
+    Object.keys(colors).map((name) => [
+      name,
+      `var(--color-io-${group}-${name})`,
+    ]),
+  );
+
+const resolveColorGroup = (
+  group: string,
+  colors: SemanticColorGroup,
+  mode: keyof SemanticColor,
+) =>
+  Object.fromEntries(
+    Object.entries(colors).map(([name, color]) => [
+      `--color-io-${group}-${name}`,
+      color[mode],
+    ]),
+  );
+
+const resolveSemanticColors = (mode: keyof SemanticColor) => ({
+  ...resolveColorGroup('background', semanticColors.background, mode),
+  ...resolveColorGroup('content', semanticColors.content, mode),
+  ...resolveColorGroup('surface', surfaceColors, mode),
+  ...resolveColorGroup('surface-status', surfaceStatusColors, mode),
+  ...resolveColorGroup('border', semanticColors.border, mode),
+});
+
+const ioColors = {
+  ...colorScales,
+  alpha: colorAlphaScales,
+  background: referenceColorGroup('background', semanticColors.background),
+  content: referenceColorGroup('content', semanticColors.content),
+  surface: {
+    ...referenceColorGroup('surface', surfaceColors),
+    status: referenceColorGroup('surface-status', surfaceStatusColors),
+  },
+  border: referenceColorGroup('border', semanticColors.border),
+};
+
+const ioLight = resolveSemanticColors('light');
+const ioDark = resolveSemanticColors('dark');
 
 const textStyles = plugin(({ addBase, theme }) => {
   addBase({
@@ -57,8 +108,8 @@ const textStyles = plugin(({ addBase, theme }) => {
 const temporal = plugin(
   ({ addComponents, addBase }) => {
     addBase({
-      ':root': light,
-      '[data-theme="dark"]': dark,
+      ':root': { ...light, ...ioLight },
+      '[data-theme="dark"]': { ...dark, ...ioDark },
     });
 
     addComponents({
@@ -168,6 +219,7 @@ const temporal = plugin(
     theme: {
       colors: {
         ...colors,
+        io: ioColors,
         brand: css('--color-surface-brand'),
       },
       backgroundColor: ({ theme }) => ({
