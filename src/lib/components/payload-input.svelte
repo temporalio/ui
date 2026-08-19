@@ -86,7 +86,9 @@
     {/if}
   </div>
   <span
-    class="text-xs {error ? 'text-danger' : 'text-primary'} inline-block"
+    class="text-xs {error
+      ? 'text-io-content-danger'
+      : 'text-io-content-primary'} inline-block"
     class:hidden={!hintText && !error}
     role={error ? 'alert' : null}
   >

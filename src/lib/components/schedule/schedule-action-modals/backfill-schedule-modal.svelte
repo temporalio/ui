@@ -157,7 +157,7 @@
           />
         </div>
         {#if invalidEndTime}
-          <span class="text-xs text-danger" role="alert">
+          <span class="text-xs text-io-content-danger" role="alert">
             {translate('schedules.backfill-end-before-start')}
           </span>
         {/if}

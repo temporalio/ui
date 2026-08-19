@@ -343,7 +343,7 @@
             >{translate('workers.cloud-run-terraform-description-after')}
           </p>
           {#if showCloudRunImpersonatorWarning}
-            <p class="text-sm text-warning">
+            <p class="text-sm text-io-content-warning">
               {translate('workers.cloud-run-impersonator-warning')}
             </p>
           {/if}

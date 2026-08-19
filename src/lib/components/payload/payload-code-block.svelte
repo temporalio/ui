@@ -153,7 +153,7 @@
               {/snippet}
             </CodeBlock>
             {#if downloadError}
-              <div class="flex items-start gap-2 text-danger">
+              <div class="flex items-start gap-2 text-io-content-danger">
                 <Icon width={16} height={16} name="exclamation-octagon" />
                 <p class="leading-4">{downloadError}</p>
               </div>
@@ -214,7 +214,7 @@
           />
         {/snippet}
       </CodeBlock>
-      <div class="flex items-start gap-2 text-danger">
+      <div class="flex items-start gap-2 text-io-content-danger">
         <Icon width={16} height={16} name="exclamation-octagon" />
         <p class="leading-4">
           {#if isNetworkError(error)}

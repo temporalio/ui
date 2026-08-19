@@ -113,7 +113,7 @@
 </div>
 
 {#if error}
-  <div class="col-span-2 mt-1 text-xs text-danger">
+  <div class="col-span-2 mt-1 text-xs text-io-content-danger">
     {error}
   </div>
 {/if}
