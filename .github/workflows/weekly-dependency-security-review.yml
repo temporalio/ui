@@ -10,6 +10,11 @@ on:
       notify:
         required: true
         type: boolean
+      publish:
+        description: 'Allow the credentialed job to update the draft PR. Set false to rehearse.'
+        required: false
+        default: true
+        type: boolean
       slack_channel:
         required: false
         type: string
@@ -201,8 +206,8 @@ jobs:
         name: Apply the authorized Go module remediation
         if: inputs.mode == 'apply'
         run: |
-          modules="$(jq -r '[.actions[] | select(.type == "go-module")][] | "\(.packageName)@\(.to)"' weekly-dependency-remediation.json)"
-          if [ -z "$modules" ]; then
+          go_modules="$(jq -r '[.actions[] | select(.type == "go-module")][] | "\(.packageName)@\(.to)"' weekly-dependency-remediation.json)"
+          if [ -z "$go_modules" ]; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -211,7 +216,7 @@ jobs:
             [ -n "$module" ] || continue
             echo "Updating $module"
             go get "$module"
-          done <<< "$modules"
+          done <<< "$go_modules"
           go mod tidy
           echo 'changed=true' >> "$GITHUB_OUTPUT"
 
@@ -375,6 +380,7 @@ jobs:
     needs: audit-and-remediate
     if: >-
       github.event_name != 'pull_request' &&
+      inputs.publish &&
       inputs.mode == 'apply' &&
       needs.audit-and-remediate.outputs.changed == 'true' &&
       needs.audit-and-remediate.result == 'success'
