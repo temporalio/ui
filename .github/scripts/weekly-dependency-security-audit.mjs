@@ -261,9 +261,15 @@ export const classifyVln = (pullRequest) => {
 export const isRemediationPullRequest = (
   pullRequest,
   remediationBranch = DEFAULT_REMEDIATION_BRANCH,
-) =>
-  pullRequest.head?.ref === remediationBranch ||
-  /weekly dependency[- ]security/i.test(pullRequest.title ?? '');
+) => {
+  const headRef = pullRequest.headRef ?? pullRequest.head?.ref ?? null;
+  return (
+    headRef === remediationBranch ||
+    /weekly (?:dependabot|dependency)[- ]security/i.test(
+      pullRequest.title ?? '',
+    )
+  );
+};
 
 export const isExternalContributorPullRequest = (pullRequest) => {
   const author = pullRequest.user ?? {};

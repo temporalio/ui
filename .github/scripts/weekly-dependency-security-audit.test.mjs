@@ -6,6 +6,7 @@ import {
   collectWeeklySecurityAudit,
   githubRetryMetadata,
   isExternalContributorPullRequest,
+  isRemediationPullRequest,
   mapWithConcurrency,
   normalizeDependabotAlert,
   normalizePullRequest,
@@ -508,4 +509,44 @@ test('retries a bounded number of times while honoring server-directed delays', 
   );
   assert.equal(boundedAttempts, 2);
   assert.deepEqual(boundedDelays, [9_000]);
+});
+
+test('recognizes the remediation pull request from a normalized object', () => {
+  const raw = pullRequest({
+    title: 'fix: weekly Dependabot security remediation',
+    head: {
+      ref: 'automation/weekly-dependency-security',
+      sha: 'abc',
+      repo: { full_name: 'temporalio/ui' },
+    },
+  });
+
+  assert.equal(isRemediationPullRequest(raw), true);
+  assert.equal(isRemediationPullRequest(normalizePullRequest(raw)), true);
+});
+
+test('reports the remediation pull request in a dependency-scope audit', async () => {
+  const raw = pullRequest({
+    number: 3815,
+    title: 'fix: weekly Dependabot security remediation',
+    draft: true,
+    head: {
+      ref: 'automation/weekly-dependency-security',
+      sha: 'abc',
+      repo: { full_name: 'temporalio/ui' },
+    },
+    base: { repo: { full_name: 'temporalio/ui' } },
+  });
+
+  const audit = await collectWeeklySecurityAudit({
+    repository: 'temporalio/ui',
+    scope: 'dependency-security',
+    listDependabotAlerts: async () => [],
+    listPullRequests: async () => [raw],
+    getPullRequest: async () => raw,
+    listReviews: async () => [],
+    listCheckRuns: async () => [],
+  });
+
+  assert.equal(audit.remediation?.number, 3815);
 });

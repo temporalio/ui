@@ -16,7 +16,7 @@ const DIRECT_DEPENDENCY_SECTIONS = ['dependencies', 'devDependencies'];
 const VERSION =
   /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 const VERSION_IN_RANGE =
-  /(?<operator>\^|~|>=|>|=)?\s*(?<version>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?/;
+  /(?<operator>\^|~|>=|>|=)?\s*(?<version>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?<prerelease>-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?/;
 
 export function parseSemver(version) {
   if (typeof version !== 'string') return null;
@@ -88,10 +88,16 @@ function rangeLowerBound(range) {
   if (typeof range !== 'string') return null;
   const match = VERSION_IN_RANGE.exec(range.trim());
   if (!match?.groups) return null;
+  const prerelease = match.groups.prerelease ?? '';
   return {
     operator: match.groups.operator ?? '',
-    version: `${match.groups.version}.${match.groups.minor}.${match.groups.patch}`,
+    version: `${match.groups.version}.${match.groups.minor}.${match.groups.patch}${prerelease}`,
+    prerelease: Boolean(prerelease),
   };
+}
+
+function prereleaseBoundReason(kind, bound) {
+  return `${kind} lower bound ${bound.version} carries a prerelease tag, which this planner does not order.`;
 }
 
 function isSimpleRange(range) {
@@ -370,6 +376,14 @@ function classifyOverride({ packageName, alertIds, patched, override }) {
       reason: `Existing pnpm override ${override.selector} uses an unsupported range: ${String(override.version)}.`,
     });
   }
+  if (bound.prerelease) {
+    return classification({
+      packageName,
+      alertIds,
+      status: 'manual',
+      reason: prereleaseBoundReason('Override', bound),
+    });
+  }
   if (isVersionAtLeast(bound.version, patched)) {
     return classification({
       packageName,
@@ -486,6 +500,14 @@ function classifyPackageStatus(alerts, packageJson, resolvedVersions) {
         alertIds,
         status: 'manual',
         reason: `Direct dependency uses an unsupported range: ${direct.version}.`,
+      });
+    }
+    if (bound.prerelease) {
+      return classification({
+        packageName,
+        alertIds,
+        status: 'manual',
+        reason: prereleaseBoundReason('Direct dependency', bound),
       });
     }
     const interactingOverrides = findOverrides(packageJson, packageName);

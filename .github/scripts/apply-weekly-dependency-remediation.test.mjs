@@ -919,3 +919,41 @@ test('plans a Go remediation from the command line', async () => {
     },
   ]);
 });
+
+test('refuses a direct dependency whose lower bound carries a prerelease', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 51,
+        name: 'thing',
+        patched: '1.2.3',
+        vulnerable: '< 1.2.3',
+      }),
+    ],
+    packageJson: manifest({ dependencies: { thing: '^1.2.3-beta.1' } }),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.match(plan.classifications[0].reason, /1\.2\.3-beta\.1/);
+  assert.match(plan.classifications[0].reason, /prerelease/);
+});
+
+test('refuses an override whose lower bound carries a prerelease', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 52,
+        name: 'thing',
+        patched: '1.2.3',
+        vulnerable: '< 1.2.3',
+        manifestPath: 'pnpm-lock.yaml',
+      }),
+    ],
+    packageJson: manifest({ overrides: { thing: '>=1.2.3-rc.1' } }),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.match(plan.classifications[0].reason, /prerelease/);
+});
