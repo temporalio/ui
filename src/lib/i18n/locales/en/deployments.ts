@@ -144,7 +144,7 @@ export const Strings = {
   'connection-failed': 'Failed',
   'connection-pending': 'Pending',
   'connection-tooltip-pending':
-    'Not validated yet. First automatic check runs within 6h.',
+    'Not validated yet. The first automatic check runs within 6h. To check now, use Validate Connection.',
   'connection-tooltip-checked': 'Checked {{ time }}',
   'connection-checked-recently': 'less than an hour ago',
   'connection-checked-hour': '{{ hours }} hour ago',
