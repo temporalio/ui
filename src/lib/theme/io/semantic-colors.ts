@@ -20,6 +20,8 @@ type ContentColors = Readonly<{
   primary: SemanticColor;
   secondary: SemanticColor;
   tertiary: SemanticColor;
+  'code-block': SemanticColor;
+  'code-block-accent': SemanticColor;
   brand: SemanticColor;
   information: SemanticColor;
   success: SemanticColor;
@@ -45,6 +47,8 @@ type SurfaceColors = Readonly<{
   primary: SemanticColor;
   secondary: SemanticColor;
   tertiary: SemanticColor;
+  'table-header': SemanticColor;
+  'code-block': SemanticColor;
   brand: SemanticColor;
   information: SemanticColor;
   success: SemanticColor;
@@ -145,6 +149,14 @@ export const semanticColors: SemanticColors = {
       light: colorScales.slate[8],
       dark: colorScales.neutral[4],
     },
+    'code-block': {
+      light: colorScales.slate[12],
+      dark: colorScales.slate[1],
+    },
+    'code-block-accent': {
+      light: colorScales['dark-magenta'][9],
+      dark: colorScales['dark-magenta'][8],
+    },
     brand: {
       light: colorScales.indigo[9],
       dark: colorScales.indigo[8],
@@ -200,6 +212,14 @@ export const semanticColors: SemanticColors = {
       15,
       surfacePrimary,
     ),
+    'table-header': {
+      light: colorScales.slate[3],
+      dark: colorScales.neutral[9],
+    },
+    'code-block': {
+      light: colorScales.slate[2],
+      dark: colorScales.neutral[10],
+    },
     brand: compositeSemanticColor(
       colorScales.indigo[9],
       colorScales.indigo[9],

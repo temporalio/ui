@@ -23,6 +23,23 @@ describe('precomposited semantic colors', () => {
       light: '#cfe5f5',
       dark: '#1d3241',
     });
+    expect(semanticColors.surface['table-header']).toEqual({
+      light: colorScales.slate[3],
+      dark: colorScales.neutral[9],
+    });
+    expect(semanticColors.surface['code-block']).toEqual({
+      light: colorScales.slate[2],
+      dark: colorScales.neutral[10],
+    });
+    expect(semanticColors.content['code-block']).toEqual({
+      light: colorScales.slate[12],
+      dark: colorScales.slate[1],
+    });
+    expect(semanticColors.content['code-block-accent']).toEqual({
+      light: colorScales['dark-magenta'][9],
+      dark: colorScales['dark-magenta'][8],
+    });
+
     expect(semanticColors.interactive['primary-press'].dark).toBe('#4d61ab');
   });
 });

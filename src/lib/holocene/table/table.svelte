@@ -84,7 +84,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-table-header;
+      @apply bg-io-surface-table-header text-io-content-primary;
     }
 
     :global(tr > th) {
@@ -94,15 +94,15 @@
 
   :where(.holocene-table-body) {
     :global(tr) {
-      @apply border-b border-io-border-primary last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-b border-io-border-primary last-of-type:border-0 hover:bg-io-interactive-secondary-hover hover:bg-fixed;
     }
 
     :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
+      @apply w-full hover:bg-io-surface-primary;
     }
 
     :global(tr:nth-of-type(odd)) {
-      @apply surface-background;
+      @apply bg-io-background-primary text-io-content-primary;
     }
 
     :global(tr > td) {
@@ -114,7 +114,7 @@
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-io-border-primary last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-8 border-b border-io-border-primary last-of-type:border-0 hover:bg-io-interactive-secondary-hover hover:bg-fixed;
     }
   }
 </style>

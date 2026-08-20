@@ -83,7 +83,7 @@
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-interactive/50 text-io-content-primary;
+    @apply cursor-not-allowed bg-io-surface-tertiary text-io-content-tertiary;
   }
 
   .highlight {

@@ -41,10 +41,10 @@
         <button
           type="button"
           {...getAttributes({
-            class: `cursor-pointer rounded-md border px-3 py-1.5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+            class: `cursor-pointer rounded-md border px-3 py-1.5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary ${
               isSelected
-                ? 'border-blue-600 bg-blue-600 text-white'
-                : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+                ? 'border-io-interactive-primary bg-io-interactive-primary text-io-content-white'
+                : 'border-io-border-tertiary bg-io-surface-primary text-io-content-primary hover:bg-io-actions-hover-overlay'
             }`,
           })}
         >
@@ -57,7 +57,7 @@
         <div
           {...getAttributes({
             class:
-              'mt-4 rounded-md border border-slate-200 p-4 text-sm text-slate-700',
+              'mt-4 rounded-md border border-io-border-tertiary p-4 text-sm text-io-content-primary',
           })}
         >
           {tab} content
