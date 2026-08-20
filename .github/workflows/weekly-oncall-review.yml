@@ -21,6 +21,11 @@ on:
         required: true
         default: C0BPXR260DA
         type: string
+      source_ref:
+        description: 'Revision the modules check out. Leave empty to use the revision this run was dispatched from.'
+        required: false
+        default: ''
+        type: string
 
 # The GitHub App token is scoped to the publishing job in the called workflow.
 # The workflow GITHUB_TOKEN never needs write access.
@@ -40,6 +45,7 @@ jobs:
       mode: ${{ steps.inputs.outputs.mode }}
       notify: ${{ steps.inputs.outputs.notify }}
       slack_channel: ${{ steps.inputs.outputs.slack_channel }}
+      source_ref: ${{ steps.inputs.outputs.source_ref }}
     steps:
       - id: inputs
         env:
@@ -47,6 +53,8 @@ jobs:
           REQUESTED_MODE: ${{ inputs.mode }}
           REQUESTED_NOTIFY: ${{ inputs.notify }}
           REQUESTED_SLACK_CHANNEL: ${{ inputs.slack_channel }}
+          REQUESTED_SOURCE_REF: ${{ inputs.source_ref }}
+          DISPATCH_REF: ${{ github.ref_name }}
           SCHEDULED_SLACK_CHANNEL: ${{ vars.ONCALL_FRONTEND_SLACK_CHANNEL }}
         run: |
           mode="$REQUESTED_MODE"
@@ -74,6 +82,11 @@ jobs:
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
           echo "notify=$notify" >> "$GITHUB_OUTPUT"
           echo "slack_channel=$slack_channel" >> "$GITHUB_OUTPUT"
+
+          # A run tests the revision it was dispatched from unless told otherwise.
+          source_ref="${REQUESTED_SOURCE_REF:-$DISPATCH_REF}"
+          if [ "$EVENT_NAME" = 'schedule' ]; then source_ref='main'; fi
+          echo "source_ref=$source_ref" >> "$GITHUB_OUTPUT"
 
   start-thread:
     needs: resolve-inputs
@@ -112,6 +125,7 @@ jobs:
     if: always() && needs.resolve-inputs.result == 'success'
     uses: ./.github/workflows/weekly-dependency-security-review.yml
     with:
+      source_ref: ${{ needs.resolve-inputs.outputs.source_ref }}
       mode: ${{ needs.resolve-inputs.outputs.mode }}
       notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
       slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
@@ -126,6 +140,7 @@ jobs:
     if: always() && needs.resolve-inputs.result == 'success'
     uses: ./.github/workflows/weekly-vln-review.yml
     with:
+      source_ref: ${{ needs.resolve-inputs.outputs.source_ref }}
       notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
       slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
       thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
@@ -137,6 +152,7 @@ jobs:
     if: always() && needs.resolve-inputs.result == 'success'
     uses: ./.github/workflows/weekly-external-contributor-review.yml
     with:
+      source_ref: ${{ needs.resolve-inputs.outputs.source_ref }}
       notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
       slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
       thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
