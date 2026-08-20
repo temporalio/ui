@@ -29,9 +29,13 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Chip>)}
-  <Chip {...args} onremove={action('remove')} onclick={action('click')}>
-    ross.edfort@temporal.io
-  </Chip>
+  <div
+    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+  >
+    <Chip {...args} onremove={action('remove')} onclick={action('click')}>
+      ross.edfort@temporal.io
+    </Chip>
+  </div>
 {/snippet}
 
 <Story name="Default" />
