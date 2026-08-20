@@ -546,3 +546,61 @@ test('names the published pull request by number when only its URL is known', ()
     /view draft remediation PR/,
   );
 });
+
+const longTitlePullRequests = Array.from({ length: 9 }, (_, index) =>
+  pullRequest(
+    4000 + index,
+    `feat: Add "Contains" filter option to workflow search UI for substring matching in WorkflowId and WorkflowType fields ${index}`,
+  ),
+);
+
+test('keeps every list section short enough for Slack to render inline', () => {
+  const reply = buildExternalContributorReply({
+    audit: {
+      ...audit,
+      externalContributors: {
+        reviewReady: [],
+        triage: longTitlePullRequests,
+        triageCount: 20,
+        authorFollowup: longTitlePullRequests,
+        authorFollowupCount: 20,
+        staleCount: 3,
+      },
+    },
+    runUrl: RUN,
+  });
+
+  // Slack hides the URL of a link, so measure what a reader sees.
+  const visible = (text) => text.replaceAll(/<[^|>]+\|([^>]*)>/g, '$1');
+
+  for (const block of reply.blocks) {
+    if (block.type !== 'section') continue;
+    const shown = visible(block.text.text);
+    assert.ok(shown.length <= 600, `section shows ${shown.length} characters`);
+    for (const line of shown.split('\n')) {
+      assert.ok(line.length <= 120, `line shows ${line.length} characters`);
+    }
+  }
+});
+
+test('folds the omitted count into the group it belongs to', () => {
+  const reply = buildExternalContributorReply({
+    audit: {
+      ...audit,
+      externalContributors: {
+        reviewReady: [],
+        triage: longTitlePullRequests,
+        triageCount: 20,
+        authorFollowup: [],
+        staleCount: 0,
+      },
+    },
+    runUrl: RUN,
+  });
+
+  const withCount = reply.blocks.filter(
+    (block) => block.type === 'section' && /more/.test(block.text.text),
+  );
+  assert.equal(withCount.length, 1);
+  assert.match(withCount[0].text.text, /Needs triage/);
+});

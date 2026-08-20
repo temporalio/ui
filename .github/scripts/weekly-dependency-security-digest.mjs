@@ -5,6 +5,10 @@ import { escapeSlackMrkdwn } from './slack-utils.mjs';
 
 const DEFAULT_VLN_LIMIT = 10;
 const DEFAULT_UNRESOLVED_LIMIT = 10;
+// A list line must fit one row in Slack, and a group must stay short enough
+// that the client renders it without a Show more control.
+const LIST_TITLE_LIMIT = 72;
+const LIST_GROUP_LIMIT = 3;
 const SLACK_SECTION_TEXT_LIMIT = 3_000;
 const SLACK_DYNAMIC_TEXT_LIMIT = 800;
 const PUBLISH_STATUSES = new Set(['success', 'failure', 'skipped']);
@@ -20,6 +24,19 @@ const slackLink = (url, label) =>
 const omittedLine = (count, runUrl) => {
   const suffix = runUrl ? `; ${slackLink(runUrl, 'see workflow run')}` : '';
   return `• …and ${count} more${suffix}`;
+};
+
+/** One section per group: a heading, a few items, then the omitted count. */
+const groupSection = (heading, pullRequests, totalCount, limit) => {
+  const visible = pullRequests.slice(0, limit);
+  if (visible.length === 0) return [];
+  const lines = [heading, ...visible.map(renderPullRequest)];
+  const omitted = Math.max(
+    (totalCount ?? pullRequests.length) - visible.length,
+    0,
+  );
+  if (omitted > 0) lines.push(`• …and ${omitted} more`);
+  return sectionBlocks(lines.join('\n'));
 };
 
 export const splitSlackSectionText = (
@@ -74,7 +91,13 @@ const statusText = (pullRequest) => {
 };
 
 const renderPullRequest = (pullRequest) =>
-  `• ${slackLink(pullRequest.url, `#${pullRequest.number}: ${pullRequest.title}`)}${statusText(pullRequest)}`;
+  `• ${slackLink(
+    pullRequest.url,
+    truncateText(
+      `#${pullRequest.number}: ${pullRequest.title}`,
+      LIST_TITLE_LIMIT,
+    ),
+  )}${statusText(pullRequest)}`;
 
 const remediationActionCount = (result) =>
   result?.summary?.actions ?? result?.actions?.length ?? null;
@@ -209,21 +232,24 @@ const vlnBlocks = ({ audit, vlnLimit, runUrl }) => {
   const needsTriage = audit.vln?.needsTriage ?? [];
   const blocks = [headerBlock('VLN review')];
 
-  const group = (heading, pullRequests) => {
-    const visible = pullRequests.slice(0, vlnLimit);
-    if (visible.length === 0) return;
-    blocks.push(
-      ...sectionBlocks(
-        [`*${heading}*`, ...visible.map(renderPullRequest)].join('\n'),
-      ),
-    );
-    const omitted = pullRequests.length - visible.length;
-    if (omitted > 0) blocks.push(...sectionBlocks(omittedLine(omitted, null)));
-  };
-
-  group('Pending VLN PRs', pending);
-  if (pending.length > 0 && needsTriage.length > 0) blocks.push(dividerBlock());
-  group('Needs triage', needsTriage);
+  const limit = Math.min(vlnLimit, LIST_GROUP_LIMIT);
+  const pendingGroup = groupSection(
+    '*Pending VLN PRs*',
+    pending,
+    pending.length,
+    limit,
+  );
+  const triageGroup = groupSection(
+    '*Needs triage*',
+    needsTriage,
+    needsTriage.length,
+    limit,
+  );
+  blocks.push(...pendingGroup);
+  if (pendingGroup.length > 0 && triageGroup.length > 0) {
+    blocks.push(dividerBlock());
+  }
+  blocks.push(...triageGroup);
 
   if (pending.length === 0 && needsTriage.length === 0) {
     blocks.push(...sectionBlocks('No pending VLN pull request.'));
@@ -477,19 +503,16 @@ export const buildExternalContributorReply = ({
   const blocks = [headerBlock('External contributor PRs')];
   let firstGroup = true;
   for (const [heading, pullRequests, totalCount] of sections) {
-    if (pullRequests.length === 0) continue;
+    const group = groupSection(
+      heading,
+      pullRequests,
+      totalCount,
+      LIST_GROUP_LIMIT,
+    );
+    if (group.length === 0) continue;
     if (!firstGroup) blocks.push(dividerBlock());
     firstGroup = false;
-    blocks.push(
-      ...sectionBlocks(
-        [heading, ...pullRequests.map(renderPullRequest)].join('\n'),
-      ),
-    );
-    const omitted = Math.max(
-      (totalCount ?? pullRequests.length) - pullRequests.length,
-      0,
-    );
-    if (omitted > 0) blocks.push(...sectionBlocks(omittedLine(omitted, null)));
+    blocks.push(...group);
   }
   if (firstGroup) {
     blocks.push(...sectionBlocks('No eligible external contributor PR.'));
