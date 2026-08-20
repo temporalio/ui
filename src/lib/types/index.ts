@@ -366,6 +366,7 @@ export type SettingsResponse = {
   HideWorkflowQueryErrors: boolean;
   RefreshWorkflowCountsDisabled: boolean;
   ActivityCommandsDisabled: boolean;
+  WorkflowSortingEnabled: boolean;
   ShowTemporalSystemNamespace: boolean;
   NavCollapsedByDefault: boolean;
   FeedbackURL: string;
