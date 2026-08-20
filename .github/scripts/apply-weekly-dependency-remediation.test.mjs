@@ -1013,3 +1013,72 @@ test('names no resolver when a plan holds no action', async () => {
   assert.equal(report.applied, false);
   assert.equal(report.resolver, undefined);
 });
+
+const vulnerableLockfile = (entry) => `lockfileVersion: '9.0'
+
+packages:
+
+  ${entry}:
+    resolution: {integrity: sha512-aaa}
+`;
+
+test('refuses an override whose floor meets the patch while the lockfile stays vulnerable', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 61,
+        name: 'cookie',
+        patched: '0.7.0',
+        vulnerable: '< 0.7.0',
+        manifestPath: 'pnpm-lock.yaml',
+      }),
+    ],
+    packageJson: manifest({ overrides: { cookie: '>=0.7.0' } }),
+    lockfile: vulnerableLockfile('cookie@0.6.0'),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.deepEqual(plan.classifications[0].resolvedVersions, ['0.6.0']);
+  assert.match(plan.classifications[0].reason, /0\.6\.0/);
+  assert.match(plan.classifications[0].reason, /does not take effect/);
+});
+
+test('refuses a direct dependency whose floor meets the patch while the lockfile stays vulnerable', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 62,
+        name: 'axios',
+        patched: '1.7.0',
+        vulnerable: '< 1.7.0',
+        manifestPath: 'package.json',
+      }),
+    ],
+    packageJson: manifest({ dependencies: { axios: '^1.8.0' } }),
+    lockfile: vulnerableLockfile('axios@1.6.0'),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.match(plan.classifications[0].reason, /1\.6\.0/);
+});
+
+test('still reports an already patched tree as already safe', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 63,
+        name: 'cookie',
+        patched: '0.7.0',
+        vulnerable: '< 0.7.0',
+        manifestPath: 'pnpm-lock.yaml',
+      }),
+    ],
+    packageJson: manifest({ overrides: { cookie: '>=0.7.0' } }),
+    lockfile: vulnerableLockfile('cookie@0.7.0'),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'alreadySafe');
+});
