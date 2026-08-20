@@ -367,7 +367,7 @@
         onclick={() => setActiveQueryView(view)}
         class={merge(
           'flex w-full justify-start',
-          (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
+          (view.count ?? 0) > 0 && 'text-io-content-error',
         )}
         active={view.active}
         disabled={view.disabled}
@@ -394,13 +394,13 @@
           {/if}
           {#if view.count != undefined}
             {@render queryBadge({
-              className: `font-mono ${view.count > 0 ? 'bg-red-50 dark:bg-red-900 text-red-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-600 text-blue-900 dark:text-white'}`,
+              className: `font-mono ${view.count > 0 ? 'bg-io-surface-status-persimmon text-io-content-error' : 'bg-io-surface-status-neutral text-io-content-primary'}`,
               content: view.count,
               Icon: view.count > 0 ? IconExclamationOctagon : IconHappyLappy,
               iconClass:
                 view.count > 0
-                  ? 'bg-red-200 dark:bg-red-700 text-red-900 dark:text-white'
-                  : 'bg-io-surface-status-neutral text-io-content-primary',
+                  ? 'bg-io-surface-error text-io-content-error'
+                  : 'bg-io-surface-tertiary text-io-content-primary',
             })}
           {/if}
         {/if}

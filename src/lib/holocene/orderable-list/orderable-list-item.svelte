@@ -159,6 +159,6 @@
   }
 
   :global(.orderable-item.dragging-over:not(.locked)) {
-    @apply bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply bg-io-surface-brand;
   }
 </style>

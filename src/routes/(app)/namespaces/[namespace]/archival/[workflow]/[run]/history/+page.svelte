@@ -50,7 +50,7 @@
       {error?.statusCode ?? '500'}
     </h1>
     <p class="-mt-12 text-lg">{translate('workflows.workflow-error-title')}</p>
-    <p class="text-2xl font-bold text-red-700">
+    <p class="text-2xl font-bold text-io-content-error">
       {error?.statusText ?? ''}
     </p>
   </div>

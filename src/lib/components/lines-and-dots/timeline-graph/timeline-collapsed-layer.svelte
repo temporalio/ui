@@ -153,6 +153,6 @@
 
 <style lang="postcss">
   .zigzag-path {
-    stroke: rgb(var(--color-text-secondary));
+    stroke: var(--color-io-content-secondary);
   }
 </style>

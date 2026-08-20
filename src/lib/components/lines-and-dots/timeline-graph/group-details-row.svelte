@@ -83,7 +83,7 @@
 >
   <div bind:this={contentEl} class="flex flex-col">
     <div
-      class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
+      class="relative flex h-full items-center justify-between bg-io-surface-secondary text-sm"
     >
       <div class="flex h-full items-center gap-4 px-2">
         {#if status}
