@@ -417,13 +417,20 @@ fail-safe: it uses `dry-run` mode and `ONCALL_FRONTEND_SLACK_CHANNEL`.
 `notify: false` runs the audits without posting to Slack.
 
 A separate `weekly-oncall-review-pr-test.yml` workflow validates internal pull
-requests that change the on-call workflows, their dependency-security scripts
-or tests, `package.json`, or `pnpm-lock.yaml`. It checks out the PR head SHA and
-runs the dependency module in `dry-run` mode plus the VLN and external-review
-audits. Fork and Dependabot pull requests are skipped. The PR workflow passes
-no stored repository secrets and disables every notification path, so it
-validates the audit and remediation logic without posting to Slack or
-publishing changes.
+requests that change the on-call workflows or the scripts and tests they use. It
+does not run for a change to `package.json` or `pnpm-lock.yaml`, because
+`lint-and-test.yml` and `playwright.yml` already validate a dependency change on
+every pull request. It checks out the PR head SHA and runs the dependency module
+in `dry-run` mode plus the VLN and external-review audits. Fork and Dependabot
+pull requests are skipped. The PR workflow passes no stored repository secrets
+and disables every notification path, so it validates the audit and remediation
+logic without posting to Slack or publishing changes.
+
+The same workflow also holds a manual rehearsal. A `workflow_dispatch` run
+starts the dependency module in the mode you choose, including `apply`, and sets
+the `publish` input to false. The job that holds the GitHub App token therefore
+does not run, and no pull request is touched. The publish job also refuses a
+`pull_request` event, so the rehearsal has two independent guards.
 
 After merging, use a manual `dry-run` dispatch to the default test channel
 `C0BPXR260DA` when Slack delivery itself needs validation.
