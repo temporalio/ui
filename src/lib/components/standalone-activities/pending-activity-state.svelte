@@ -6,15 +6,9 @@
   import type { PendingActivityState } from '$lib/types/activity-execution';
 
   interface Props {
-    state: PendingActivityState | undefined;
+    runState: PendingActivityState | undefined;
     class?: ClassNameValue;
   }
-
-  let {
-    state = 'PENDING_ACTIVITY_STATE_UNSPECIFIED',
-    class: className,
-    ...rest
-  }: Props = $props();
 
   const stateLabelKeys: Record<PendingActivityState, I18nKey> = {
     PENDING_ACTIVITY_STATE_UNSPECIFIED:
@@ -37,6 +31,14 @@
     PENDING_ACTIVITY_STATE_PAUSED: 'bg-yellow-200',
     PENDING_ACTIVITY_STATE_PAUSE_REQUESTED: 'bg-yellow-200',
   };
+
+  let { runState, class: className, ...rest }: Props = $props();
+
+  const state: PendingActivityState = $derived(
+    runState && runState in stateLabelKeys
+      ? runState
+      : 'PENDING_ACTIVITY_STATE_UNSPECIFIED',
+  );
 </script>
 
 <span

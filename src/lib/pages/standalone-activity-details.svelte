@@ -105,7 +105,7 @@
               >
               <DetailListValue>
                 <PendingActivityState
-                  state={$activityExecution.info.runState}
+                  runState={$activityExecution.info.runState}
                 />
               </DetailListValue>
               {@render activityExecutionAttemptsBadge(
