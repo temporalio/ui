@@ -26,8 +26,33 @@ const omittedLine = (count, runUrl) => {
   return `• …and ${count} more${suffix}`;
 };
 
+/**
+ * The last line of a group. It links to the page that holds the whole list, so
+ * a reader is never left at a dead end.
+ */
+const omittedLink = (count, url) => {
+  const text = `…and ${count} more`;
+  return `• ${url ? slackLink(url, text) : text}`;
+};
+
+/** Where a reader sees the full list for each module. */
+const moreUrl = {
+  pullRequests: (repository) =>
+    repository
+      ? `https://github.com/${repository}/pulls?q=is%3Apr+is%3Aopen`
+      : null,
+  vlnPullRequests: (repository) =>
+    repository
+      ? `https://github.com/${repository}/pulls?q=is%3Apr+is%3Aopen+VLN`
+      : null,
+  alerts: (repository) =>
+    repository
+      ? `https://github.com/${repository}/security/dependabot?q=is%3Aopen`
+      : null,
+};
+
 /** One section per group: a heading, a few items, then the omitted count. */
-const groupSection = (heading, pullRequests, totalCount, limit) => {
+const groupSection = (heading, pullRequests, totalCount, limit, url = null) => {
   const visible = pullRequests.slice(0, limit);
   if (visible.length === 0) return [];
   const lines = [heading, ...visible.map(renderPullRequest)];
@@ -35,7 +60,7 @@ const groupSection = (heading, pullRequests, totalCount, limit) => {
     (totalCount ?? pullRequests.length) - visible.length,
     0,
   );
-  if (omitted > 0) lines.push(`• …and ${omitted} more`);
+  if (omitted > 0) lines.push(omittedLink(omitted, url));
   return sectionBlocks(lines.join('\n'));
 };
 
@@ -228,17 +253,20 @@ const vlnBlocks = ({ audit, vlnLimit, runUrl }) => {
   const blocks = [headerBlock('VLN review')];
 
   const limit = Math.min(vlnLimit, LIST_GROUP_LIMIT);
+  const vlnUrl = moreUrl.vlnPullRequests(audit.repository);
   const pendingGroup = groupSection(
     '*Pending VLN PRs*',
     pending,
     pending.length,
     limit,
+    vlnUrl,
   );
   const triageGroup = groupSection(
     '*Needs triage*',
     needsTriage,
     needsTriage.length,
     limit,
+    vlnUrl,
   );
   blocks.push(...pendingGroup);
   if (pendingGroup.length > 0 && triageGroup.length > 0) {
@@ -503,7 +531,11 @@ export const buildDependencySecurityReply = ({
     blocks.push(fieldsBlock(pairs));
   }
   if (actions.length > 3) {
-    blocks.push(...sectionBlocks(`• …and ${actions.length - 3} more changes`));
+    blocks.push(
+      ...sectionBlocks(
+        omittedLink(actions.length - 3, moreUrl.alerts(audit.repository)),
+      ),
+    );
   }
   if (actions.length === 0) {
     const changes = changeLines(result);
@@ -524,7 +556,14 @@ export const buildDependencySecurityReply = ({
       : '*Needs a decision*';
     blocks.push(...sectionBlocks([heading, ...unresolved.lines].join('\n')));
     if (unresolved.omittedCount > 0) {
-      blocks.push(...sectionBlocks(omittedLine(unresolved.omittedCount, null)));
+      blocks.push(
+        ...sectionBlocks(
+          omittedLink(
+            unresolved.omittedCount,
+            moreUrl.alerts(audit.repository),
+          ),
+        ),
+      );
     }
   }
   if (runUrl) {
@@ -628,6 +667,7 @@ export const buildExternalContributorReply = ({
       pullRequests,
       totalCount,
       LIST_GROUP_LIMIT,
+      moreUrl.pullRequests(audit.repository),
     );
     if (group.length === 0) continue;
     if (!firstGroup) blocks.push(dividerBlock());

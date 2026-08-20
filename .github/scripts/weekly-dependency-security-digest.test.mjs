@@ -786,3 +786,52 @@ test('still escapes formatting inside a package name', () => {
     .join('\n');
   assert.match(rendered, /\u200B\*/);
 });
+
+test('links the omitted items to where a reader can see them', () => {
+  const external = buildExternalContributorReply({
+    audit: {
+      ...audit,
+      repository: 'temporalio/ui',
+      externalContributors: {
+        reviewReady: [],
+        triage: longTitlePullRequests,
+        triageCount: 20,
+        authorFollowup: [],
+        staleCount: 0,
+      },
+    },
+    runUrl: RUN,
+  });
+  const externalText = JSON.stringify(external.blocks);
+  assert.match(externalText, /temporalio\/ui\/pulls/);
+  assert.match(externalText, /and 17 more/);
+
+  const vln = buildVlnReviewReply({
+    audit: {
+      ...audit,
+      repository: 'temporalio/ui',
+      vln: { pending: longTitlePullRequests, needsTriage: [] },
+    },
+    runUrl: RUN,
+  });
+  assert.match(JSON.stringify(vln.blocks), /temporalio\/ui\/pulls\?q=/);
+
+  const dependency = buildDependencySecurityReply({
+    audit: auditWithAlerts,
+    remediation: {
+      summary: { actions: 0, manual: 12, unsupported: 0, alreadySafe: 0 },
+      applied: false,
+      actions: [],
+      classifications: Array.from({ length: 12 }, (_, index) => ({
+        packageName: `package-${index}`,
+        alertIds: [index],
+        status: 'manual',
+        reason: 'needs a person',
+      })),
+    },
+  });
+  assert.match(
+    JSON.stringify(dependency.blocks),
+    /security\/dependabot\?q=is%3Aopen/,
+  );
+});
