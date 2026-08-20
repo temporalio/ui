@@ -72,6 +72,7 @@
     "stylelint:fix": "stylelint --fix \"src/**/*.{css,postcss,svelte}\"",
     "generate:locales": "esno scripts/generate-locales.ts",
     "generate:proto": "esno scripts/generate-temporal-proto.ts",
+    "demo": "esno utilities/demo/demo-cli.ts",
     "run-workflows": "esno scripts/run-workflows.ts",
     "run-workflows:long-running": "esno scripts/start-long-running.ts",
     "audit:tailwind": "esno scripts/audit-tailwind-colors",
