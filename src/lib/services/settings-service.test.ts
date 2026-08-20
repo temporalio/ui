@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { SettingsResponse } from '$lib/types';
+import type { CustomUIResponse, SettingsResponse } from '$lib/types';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 
 import {
   fetchSettings,
+  fetchUiExtensions,
   isCloudMatch,
   isLocalRuntimeEnvironment,
 } from './settings-service';
@@ -18,7 +19,7 @@ vi.mock('$lib/utilities/request-from-api', () => ({
 }));
 
 vi.mock('$lib/utilities/route-for-api', () => ({
-  routeForApi: () => '/api/v1/settings',
+  routeForApi: (route: string) => `/api/v1/${route}`,
 }));
 
 const settingsResponse = (
@@ -43,6 +44,9 @@ const settingsResponse = (
   HideWorkflowQueryErrors: false,
   RefreshWorkflowCountsDisabled: false,
   ActivityCommandsDisabled: false,
+  CustomUI: {
+    Enabled: false,
+  },
   ShowTemporalSystemNamespace: false,
   NavCollapsedByDefault: false,
   FeedbackURL: '',
@@ -170,5 +174,128 @@ describe('fetchSettings', () => {
     const settings = await fetchSettings();
 
     expect(settings.auth.redirectToProvider).toBe(false);
+  });
+
+  it('exposes only the custom UI feature flag from public settings', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({
+        CustomUI: {
+          Enabled: true,
+        },
+      }),
+    );
+
+    const settings = await fetchSettings();
+
+    expect(settings.customUi).toEqual({
+      enabled: true,
+      iframeExtensions: [],
+    });
+  });
+});
+
+describe('fetchUiExtensions', () => {
+  it('loads and maps definitions from the private registry endpoint', async () => {
+    const registry: CustomUIResponse = {
+      Enabled: true,
+      IframeExtensions: [
+        {
+          ID: 'incident-panel',
+          Title: 'Incident Panel',
+          Slot: 'workflow.header.after-details',
+          Src: 'https://extensions.example.com/workflow-header.html',
+          AllowedOrigin: 'https://extensions.example.com',
+          RoutePatterns: ['/namespaces/:namespace/workflows/:workflow/:run/*'],
+          Sandbox: {
+            AllowPopups: true,
+            AllowSameOrigin: true,
+          },
+          Sizing: {
+            DefaultHeight: 160,
+            MinHeight: 0,
+            MaxHeight: 480,
+            DefaultWidth: 0,
+            MinWidth: 0,
+            MaxWidth: 0,
+          },
+          Permissions: ['context:workflow'],
+        },
+        {
+          ID: 'invalid-slot',
+          Slot: 'arbitrary.dom.selector',
+          Src: 'https://extensions.example.com/invalid.html',
+          AllowedOrigin: 'https://extensions.example.com',
+        },
+      ],
+    };
+    vi.mocked(requestFromAPI).mockResolvedValue(registry);
+    const request = vi.fn<typeof fetch>();
+
+    const extensions = await fetchUiExtensions(request);
+
+    expect(requestFromAPI).toHaveBeenCalledWith('/api/v1/ui-extensions', {
+      request,
+      notifyOnError: false,
+    });
+    expect(extensions).toEqual([
+      {
+        id: 'incident-panel',
+        title: 'Incident Panel',
+        slot: 'workflow.header.after-details',
+        src: 'https://extensions.example.com/workflow-header.html',
+        allowedOrigin: 'https://extensions.example.com',
+        routePatterns: ['/namespaces/:namespace/workflows/:workflow/:run/*'],
+        sandbox: {
+          allowDownloads: false,
+          allowForms: false,
+          allowModals: false,
+          allowPopups: true,
+          allowSameOrigin: true,
+        },
+        sizing: {
+          defaultHeight: 160,
+          minHeight: undefined,
+          maxHeight: 480,
+          defaultWidth: undefined,
+          minWidth: undefined,
+          maxWidth: undefined,
+        },
+        permissions: ['context:workflow'],
+      },
+    ]);
+  });
+
+  it('returns no extensions when the registry is disabled or unavailable', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValueOnce({
+      Enabled: false,
+      IframeExtensions: [],
+    });
+    await expect(fetchUiExtensions()).resolves.toEqual([]);
+
+    vi.mocked(requestFromAPI).mockRejectedValueOnce(new Error('unavailable'));
+    await expect(fetchUiExtensions()).resolves.toEqual([]);
+  });
+
+  it('drops definitions containing unknown slots or permissions', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue({
+      Enabled: true,
+      IframeExtensions: [
+        {
+          ID: 'unknown-permission',
+          Slot: 'app.top-nav.actions.after',
+          Src: 'https://extensions.example.com/status.html',
+          AllowedOrigin: 'https://extensions.example.com',
+          Permissions: ['context:user'],
+        },
+        {
+          ID: 'unknown-slot',
+          Slot: 'app.anywhere',
+          Src: 'https://extensions.example.com/status.html',
+          AllowedOrigin: 'https://extensions.example.com',
+        },
+      ],
+    });
+
+    await expect(fetchUiExtensions()).resolves.toEqual([]);
   });
 });

@@ -127,7 +127,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 				panic(err)
 			}
 		}
-		route.SetUIRoutes(e, cfg.PublicPath, assets)
+		route.SetUIRoutes(e, cfg.PublicPath, assets, cfgProvider)
 		route.SetRenderRoute(e, cfg.PublicPath)
 	}
 

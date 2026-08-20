@@ -14,7 +14,7 @@ type DataEncoder = {
   settingsEndpoint?: string;
   settingsPassAccessToken: boolean;
   settingsIncludeCredentials: boolean;
-  endpoint: string;
+  endpoint: string | null;
   customErrorMessage: string;
   customErrorLink: string;
   hasNotRequested: boolean;

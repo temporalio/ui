@@ -1,3 +1,7 @@
+import type {
+  TemporalExtensionPermission,
+  TemporalExtensionSlot,
+} from '$lib/extensions/types';
 import type { IconName } from '$lib/holocene/icon';
 
 export type NamespaceListItem = {
@@ -71,6 +75,40 @@ export interface NetworkError {
   message?: string;
 }
 
+export type IframeExtensionSandbox = {
+  allowDownloads: boolean;
+  allowForms: boolean;
+  allowModals: boolean;
+  allowPopups: boolean;
+  allowSameOrigin: boolean;
+};
+
+export type IframeExtensionSizing = {
+  defaultHeight?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  defaultWidth?: number;
+  minWidth?: number;
+  maxWidth?: number;
+};
+
+export type IframeExtension = {
+  id: string;
+  title: string;
+  slot: TemporalExtensionSlot;
+  src: string;
+  allowedOrigin: string;
+  routePatterns: string[];
+  sandbox: IframeExtensionSandbox;
+  sizing: IframeExtensionSizing;
+  permissions: TemporalExtensionPermission[];
+};
+
+export type CustomUISettings = {
+  enabled: boolean;
+  iframeExtensions: IframeExtension[];
+};
+
 export type Settings = {
   auth: {
     enabled: boolean;
@@ -99,11 +137,15 @@ export type Settings = {
   workflowPauseDisabled: boolean;
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
+  startWorkflowDisabled: boolean;
+  refreshWorkflowCountsDisabled: boolean;
   activityCommandsDisabled: boolean;
+  customUi: CustomUISettings;
   showTemporalSystemNamespace: boolean;
   navCollapsedByDefault: boolean;
   feedbackURL: string;
   disableNewsFetch: boolean;
+  supportURL?: string;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;
