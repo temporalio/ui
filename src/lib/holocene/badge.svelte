@@ -4,14 +4,19 @@
   export type BadgeType = VariantProps<typeof types>['type'];
 
   const type = {
-    primary: 'bg-io-surface-status-blue text-io-content-information',
+    primary:
+      'border border-io-border-information bg-io-surface-status-blue text-io-content-information',
     secondary: 'bg-io-alpha-purple-30 text-io-content-primary',
-    default: 'bg-io-surface-status-neutral text-io-content-primary',
-    warning: 'bg-io-surface-status-amber text-io-content-warning',
-    success: 'bg-io-surface-status-green text-io-content-success',
-    danger: 'bg-io-surface-status-red text-io-content-danger',
+    default:
+      'border border-io-border-tertiary bg-io-surface-status-neutral text-io-content-primary',
+    warning:
+      'border border-io-border-warning bg-io-surface-status-amber text-io-content-warning',
+    success:
+      'border border-io-border-success bg-io-surface-status-green text-io-content-success',
+    danger:
+      'border border-io-border-danger bg-io-surface-status-red text-io-content-danger',
     count:
-      'h-6 w-6 min-w-max rounded-full border border-io-border-tertiary bg-io-surface-status-neutral text-io-content-primary',
+      'h-6 w-6 min-w-max rounded-full border border-io-border-information bg-io-surface-status-blue text-io-content-information',
     subtle:
       'bg-io-surface-tertiary text-io-content-secondary font-normal select-all',
     ghost:

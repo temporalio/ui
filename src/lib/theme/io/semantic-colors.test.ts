@@ -2,7 +2,30 @@ import { describe, expect, it } from 'vitest';
 
 import { colorAlphaScales } from './color-alpha-scales';
 import { colorScales } from './color-scales';
+import { compositeColor } from './composite-color';
 import { semanticColors } from './semantic-colors';
+
+const OPAQUE_HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
+describe('color compositing', () => {
+  it('precomposites a foreground color over an opaque background', () => {
+    expect(compositeColor('#000000', 50, '#ffffff')).toBe('#808080');
+  });
+});
+
+describe('precomposited semantic colors', () => {
+  it('matches representative final Figma colors', () => {
+    expect(semanticColors.surface.primary).toEqual({
+      light: '#f4f4f3',
+      dark: '#22211f',
+    });
+    expect(semanticColors.surface.status.blue).toEqual({
+      light: '#cfe5f5',
+      dark: '#1d3241',
+    });
+    expect(semanticColors.interactive['primary-press'].dark).toBe('#4d61ab');
+  });
+});
 
 describe('interactive semantic colors', () => {
   it('matches the Figma interactive tokens', () => {
@@ -17,19 +40,19 @@ describe('interactive semantic colors', () => {
       },
       'primary-press': {
         light: colorScales.indigo[11],
-        dark: colorAlphaScales.slate[40],
+        dark: '#4d61ab',
       },
       secondary: {
         light: colorScales.slate[1],
         dark: colorScales.slate[12],
       },
       'secondary-hover': {
-        light: colorAlphaScales.indigo[10],
-        dark: colorAlphaScales.indigo[5],
+        light: '#e8ecf7',
+        dark: '#202125',
       },
       'secondary-press': {
-        light: colorAlphaScales.indigo[15],
-        dark: colorAlphaScales.indigo[20],
+        light: '#dfe4f6',
+        dark: '#242b42',
       },
       danger: {
         light: colorScales.red[9],
@@ -44,6 +67,34 @@ describe('interactive semantic colors', () => {
         dark: colorScales.red[9],
       },
     });
+  });
+});
+
+describe('semantic color opacity', () => {
+  it('uses opaque values for replacement fills', () => {
+    const { status, ...surfaceColors } = semanticColors.surface;
+    const replacementFills = [
+      ...Object.values(surfaceColors),
+      ...Object.values(status),
+      ...Object.values(semanticColors.interactive),
+    ];
+
+    for (const color of replacementFills) {
+      expect(color.light).toMatch(OPAQUE_HEX_COLOR);
+      expect(color.dark).toMatch(OPAQUE_HEX_COLOR);
+    }
+  });
+
+  it('preserves translucency for compositing tokens', () => {
+    const compositingColors = [
+      ...Object.values(semanticColors.border),
+      ...Object.values(semanticColors.actions),
+    ];
+
+    for (const color of compositingColors) {
+      expect(color.light).toContain('color-mix');
+      expect(color.dark).toContain('color-mix');
+    }
   });
 });
 

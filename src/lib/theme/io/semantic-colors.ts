@@ -1,9 +1,15 @@
-import { colorAlphaScales } from './color-alpha-scales';
+import { type ColorAlpha, colorAlphaScales } from './color-alpha-scales';
 import { colorScales } from './color-scales';
+import { compositeColor } from './composite-color';
 
 export type SemanticColor = Readonly<{
   light: string;
   dark: string;
+}>;
+
+type OpaqueSemanticColor = Readonly<{
+  light: HexColor;
+  dark: HexColor;
 }>;
 
 type BackgroundColors = Readonly<{
@@ -87,12 +93,39 @@ type SemanticColors = Readonly<{
   actions: ActionColors;
 }>;
 
+const backgroundPrimary: OpaqueSemanticColor = {
+  light: colorScales.slate[1],
+  dark: colorScales.slate[12],
+};
+
+const surfacePrimary: OpaqueSemanticColor = {
+  light: compositeColor(colorScales.slate[9], 5, backgroundPrimary.light),
+  dark: compositeColor(colorScales.slate[9], 5, backgroundPrimary.dark),
+};
+
+const compositeSemanticColor = (
+  light: HexColor,
+  dark: HexColor,
+  alpha: ColorAlpha,
+  background: OpaqueSemanticColor,
+): OpaqueSemanticColor => ({
+  light: compositeColor(light, alpha, background.light),
+  dark: compositeColor(dark, alpha, background.dark),
+});
+
+const interactivePrimary: OpaqueSemanticColor = {
+  light: colorScales.indigo[9],
+  dark: colorScales.indigo[10],
+};
+
+const interactiveSecondary: OpaqueSemanticColor = {
+  light: colorScales.slate[1],
+  dark: colorScales.slate[12],
+};
+
 export const semanticColors: SemanticColors = {
   background: {
-    primary: {
-      light: colorScales.slate[1],
-      dark: colorScales.slate[12],
-    },
+    primary: backgroundPrimary,
   },
   content: {
     primary: {
@@ -149,67 +182,92 @@ export const semanticColors: SemanticColors = {
     },
   },
   surface: {
-    primary: {
-      light: colorAlphaScales.slate[5],
-      dark: colorAlphaScales.slate[5],
-    },
-    secondary: {
-      light: colorAlphaScales.slate[10],
-      dark: colorAlphaScales.slate[10],
-    },
-    tertiary: {
-      light: colorAlphaScales.slate[15],
-      dark: colorAlphaScales.slate[15],
-    },
-    brand: {
-      light: colorAlphaScales.indigo[20],
-      dark: colorAlphaScales.indigo[20],
-    },
-    information: {
-      light: colorAlphaScales.blue[20],
-      dark: colorAlphaScales.blue[20],
-    },
-    success: {
-      light: colorAlphaScales.green[20],
-      dark: colorAlphaScales.green[20],
-    },
-    warning: {
-      light: colorAlphaScales.amber[20],
-      dark: colorAlphaScales.amber[20],
-    },
-    danger: {
-      light: colorAlphaScales.red[20],
-      dark: colorAlphaScales.red[20],
-    },
-    error: {
-      light: colorAlphaScales.persimmon[20],
-      dark: colorAlphaScales.persimmon[20],
-    },
+    primary: surfacePrimary,
+    secondary: compositeSemanticColor(
+      colorScales.slate[9],
+      colorScales.slate[9],
+      10,
+      surfacePrimary,
+    ),
+    tertiary: compositeSemanticColor(
+      colorScales.slate[9],
+      colorScales.slate[9],
+      15,
+      surfacePrimary,
+    ),
+    brand: compositeSemanticColor(
+      colorScales.indigo[9],
+      colorScales.indigo[9],
+      20,
+      surfacePrimary,
+    ),
+    information: compositeSemanticColor(
+      colorScales.blue[9],
+      colorScales.blue[9],
+      20,
+      surfacePrimary,
+    ),
+    success: compositeSemanticColor(
+      colorScales.green[9],
+      colorScales.green[9],
+      20,
+      surfacePrimary,
+    ),
+    warning: compositeSemanticColor(
+      colorScales.amber[9],
+      colorScales.amber[9],
+      20,
+      surfacePrimary,
+    ),
+    danger: compositeSemanticColor(
+      colorScales.red[9],
+      colorScales.red[9],
+      20,
+      surfacePrimary,
+    ),
+    error: compositeSemanticColor(
+      colorScales.persimmon[9],
+      colorScales.persimmon[9],
+      20,
+      surfacePrimary,
+    ),
     status: {
-      blue: {
-        light: colorAlphaScales.blue[15],
-        dark: colorAlphaScales.blue[15],
-      },
-      green: {
-        light: colorAlphaScales.green[15],
-        dark: colorAlphaScales.green[15],
-      },
-      red: {
-        light: colorAlphaScales.red[15],
-        dark: colorAlphaScales.red[15],
-      },
-      persimmon: {
-        light: colorAlphaScales.persimmon[15],
-        dark: colorAlphaScales.persimmon[15],
-      },
-      amber: {
-        light: colorAlphaScales.amber[15],
-        dark: colorAlphaScales.amber[15],
-      },
-      neutral: {
-        light: colorAlphaScales.neutral[15],
-        dark: `color-mix(in srgb, ${colorScales.neutral[4]} 15%, transparent)`,
-      },
+      blue: compositeSemanticColor(
+        colorScales.blue[9],
+        colorScales.blue[9],
+        15,
+        surfacePrimary,
+      ),
+      green: compositeSemanticColor(
+        colorScales.green[9],
+        colorScales.green[9],
+        15,
+        surfacePrimary,
+      ),
+      red: compositeSemanticColor(
+        colorScales.red[9],
+        colorScales.red[9],
+        15,
+        surfacePrimary,
+      ),
+      persimmon: compositeSemanticColor(
+        colorScales.persimmon[9],
+        colorScales.persimmon[9],
+        15,
+        surfacePrimary,
+      ),
+      amber: compositeSemanticColor(
+        colorScales.amber[9],
+        colorScales.amber[9],
+        15,
+        surfacePrimary,
+      ),
+      neutral: compositeSemanticColor(
+        colorScales.neutral[9],
+        colorScales.neutral[4],
+        15,
+        surfacePrimary,
+      ),
     },
   },
   border: {
@@ -251,29 +309,35 @@ export const semanticColors: SemanticColors = {
     },
   },
   interactive: {
-    primary: {
-      light: colorScales.indigo[9],
-      dark: colorScales.indigo[10],
-    },
+    primary: interactivePrimary,
     'primary-hover': {
       light: colorScales.indigo[10],
       dark: colorScales.indigo[9],
     },
     'primary-press': {
       light: colorScales.indigo[11],
-      dark: colorAlphaScales.slate[40],
+      dark: compositeColor(colorScales.slate[9], 40, interactivePrimary.dark),
     },
-    secondary: {
-      light: colorScales.slate[1],
-      dark: colorScales.slate[12],
-    },
+    secondary: interactiveSecondary,
     'secondary-hover': {
-      light: colorAlphaScales.indigo[10],
-      dark: colorAlphaScales.indigo[5],
+      light: compositeColor(
+        colorScales.indigo[9],
+        10,
+        interactiveSecondary.light,
+      ),
+      dark: compositeColor(colorScales.indigo[9], 5, interactiveSecondary.dark),
     },
     'secondary-press': {
-      light: colorAlphaScales.indigo[15],
-      dark: colorAlphaScales.indigo[20],
+      light: compositeColor(
+        colorScales.indigo[9],
+        15,
+        interactiveSecondary.light,
+      ),
+      dark: compositeColor(
+        colorScales.indigo[9],
+        20,
+        interactiveSecondary.dark,
+      ),
     },
     danger: {
       light: colorScales.red[9],
