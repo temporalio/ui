@@ -8,8 +8,10 @@ Commands:
   demo help                      Show this help text.
   demo list                      List the feature definitions.
   demo show <definition>         Show a definition with its defaults applied.
-  demo start <definition> [--skip <stage>] [--only <stage>] [--no-keep-alive]
-                                 Start the stages the definition declares.
+  demo start <definition> [--skip <stage>] [--only <stage>] [--once]
+                                 Start the stages the definition declares and
+                                 leave them running. --once tears them down
+                                 again before returning.
                                  Stages: ${STAGES.join(', ')}.
                                  Repeat --skip or --only to name more than one.
   demo stop [<definition>]       Stop what an earlier start left running.
@@ -42,7 +44,7 @@ const KNOWN_COMMANDS = [
 ] as const;
 
 const START_USAGE =
-  'Usage: demo start <definition> [--skip <stage>] [--only <stage>] [--no-keep-alive]';
+  'Usage: demo start <definition> [--skip <stage>] [--only <stage>] [--once]';
 
 const formatDefinitions = (definitions: readonly DefinitionSummary[]) => {
   if (!definitions.length) {
@@ -70,13 +72,13 @@ export const parseStartOptions = (
 ): StartOptions => {
   const skip: Stage[] = [];
   const only: Stage[] = [];
-  let keepAlive = true;
+  let once = false;
 
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
 
-    if (argument === '--no-keep-alive') {
-      keepAlive = false;
+    if (argument === '--once') {
+      once = true;
       continue;
     }
 
@@ -94,7 +96,7 @@ export const parseStartOptions = (
     index += 1;
   }
 
-  return { skip, only, keepAlive };
+  return { skip, only, once };
 };
 
 export const runDemoCli = async ({

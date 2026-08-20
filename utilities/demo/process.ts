@@ -33,6 +33,29 @@ export const stopPid = async (pid: number) => {
  * `pnpm exec vite` would otherwise leave its real work running when only the
  * wrapper is signalled, and `demo stop` needs one pid it can rely on.
  */
+/** Whatever still listens on a port, so a stop is not limited to known pids. */
+export const listenersOn = async (port: number): Promise<number[]> => {
+  const { execFile } = await import('node:child_process');
+  const { promisify } = await import('node:util');
+
+  try {
+    const { stdout } = await promisify(execFile)('lsof', [
+      '-nP',
+      `-iTCP:${port}`,
+      '-sTCP:LISTEN',
+      '-t',
+    ]);
+
+    return stdout
+      .split('\n')
+      .map((line) => Number.parseInt(line.trim(), 10))
+      .filter((pid) => Number.isInteger(pid) && pid > 0);
+  } catch {
+    // lsof exits non-zero when nothing is listening.
+    return [];
+  }
+};
+
 export const startDetached = (
   label: string,
   command: string,

@@ -15,7 +15,7 @@ pnpm demo scenarios                                # the scenarios a definition 
 pnpm demo show system-nexus-signal-with-start      # the definition with its defaults applied
 pnpm demo start system-nexus-signal-with-start     # run every stage
 pnpm demo start system-nexus-signal-with-start --skip ui
-pnpm demo start system-nexus-signal-with-start --only scenarios --no-keep-alive
+pnpm demo start system-nexus-signal-with-start --only scenarios --once
 pnpm demo stop                                     # stop what an earlier start left running
 pnpm demo new my-feature                           # a definition to edit
 ```
@@ -25,15 +25,26 @@ pnpm demo new my-feature                           # a definition to edit
 | `list`                   | Every scenario, with its stages and the examples it names         |
 | `scenarios`              | The scenario registry, with what each one does                     |
 | `show <definition>`      | The definition after defaults are applied, which runs nothing      |
-| `start <definition>`     | Runs the stages, prints the reviewer summary, holds the run open   |
+| `start <definition>`     | Runs the stages, prints the reviewer summary, and exits            |
 | `stop [<definition>]`    | Stops the processes a `start` recorded, all runs or one            |
 | `new <name> [example-id...]` | Writes a definition naming those catalog examples            |
 | `help`                   | The command list                                                   |
 
-`start` holds every process open until Ctrl-C and writes the reviewer summary to
-`.feature-demo/<name>/summary.md`. It also records the process ids in
-`.feature-demo/<name>/run.json`, which is what `stop` reads. Each stage writes
-its own log beside them, so a stage that fails to come up says where to look.
+`start` runs the stages, prints the reviewer summary, and exits. The processes it
+started are detached, so they keep running: `stop` is how they end. `--once`
+tears them down again before returning, which is what a one-shot check wants.
+
+Starting a scenario that is already recorded as running stops that run first, so
+a stale stack cannot be reused by accident. Anything unrecorded on a port belongs
+to somebody else and is reused as before.
+
+The summary lands in `.feature-demo/<name>/summary.md`, the process ids and the
+ports the run owns in `.feature-demo/<name>/run.json`, and each stage writes its
+own log beside them, so a stage that fails to come up says where to look. `stop`
+kills the recorded pids and then sweeps those ports, so a child that outlives its
+record still goes. A child that holds no port, such as the catalog worker, is
+reachable only through its recorded pid, because a sweep by process name would
+also catch a worker you started yourself.
 
 Repeat `--skip` or `--only` to name more than one stage.
 

@@ -100,7 +100,7 @@ describe('demo show', () => {
 });
 
 describe('demo start', () => {
-  it('keeps every stage and holds the run open by default', async () => {
+  it('keeps every stage and leaves the run up by default', async () => {
     const { commands, run } = setup();
 
     await run('start', 'system-nexus-signal-with-start');
@@ -110,7 +110,7 @@ describe('demo start', () => {
       {
         skip: [],
         only: [],
-        keepAlive: true,
+        once: false,
       },
     );
   });
@@ -125,7 +125,7 @@ describe('demo start', () => {
       'ui',
       '--skip',
       'scenarios',
-      '--no-keep-alive',
+      '--once',
     );
 
     expect(commands.start).toHaveBeenCalledWith(
@@ -133,7 +133,7 @@ describe('demo start', () => {
       {
         skip: ['ui', 'scenarios'],
         only: [],
-        keepAlive: false,
+        once: true,
       },
     );
   });
@@ -148,7 +148,7 @@ describe('demo start', () => {
       {
         skip: ['worker'],
         only: [],
-        keepAlive: true,
+        once: false,
       },
     );
   });
@@ -163,7 +163,7 @@ describe('demo start', () => {
       {
         skip: [],
         only: ['server'],
-        keepAlive: true,
+        once: false,
       },
     );
   });

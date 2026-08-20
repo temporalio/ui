@@ -11,7 +11,7 @@ import {
 } from './definition';
 import { startCatalogExamples } from './examples';
 import { WORK_DIR } from './paths';
-import { stopPid, type Supervised } from './process';
+import { listenersOn, stopPid, type Supervised } from './process';
 import type { Scenario, StartedWorkflow } from './scenario';
 import { startServer } from './stages/server';
 import { startUi } from './stages/ui';
@@ -57,7 +57,8 @@ export type DemoIo = {
 export type StartOptions = {
   skip: Stage[];
   only: Stage[];
-  keepAlive: boolean;
+  /** Tear the run down before returning, rather than leaving it up. */
+  once: boolean;
 };
 
 const stageState = (
@@ -78,37 +79,6 @@ const stageState = (
   return { run: true, reason: undefined };
 };
 
-const holdUntilInterrupted = async (io: DemoIo, stop: () => Promise<void>) => {
-  io.writeOutput(
-    chalk.bold('\nHolding everything open. Press Ctrl-C to shut it all down.'),
-  );
-
-  await new Promise<void>((resolve) => {
-    let stopping = false;
-    // Signal handlers alone do not keep the event loop alive, and the child
-    // processes are unref'd, so Node would report an unsettled top-level await.
-    const keepAlive = setInterval(() => {}, 60_000);
-
-    const finish = () => {
-      // A second Ctrl-C means the person is done waiting.
-      if (stopping) {
-        io.writeOutput(chalk.yellow('\nLeaving the rest to "pnpm demo stop".'));
-        process.exit(130);
-      }
-
-      stopping = true;
-      io.writeOutput(chalk.dim('\nShutting down…'));
-      void stop().then(() => {
-        clearInterval(keepAlive);
-        resolve();
-      });
-    };
-
-    process.on('SIGINT', finish);
-    process.on('SIGTERM', finish);
-  });
-};
-
 export const startFeatureDemo = async (
   target: string,
   options: StartOptions,
@@ -118,8 +88,21 @@ export const startFeatureDemo = async (
   const log = (message: string) =>
     io.writeOutput(`${chalk.dim('·')} ${message}`);
 
+  // A recorded run of this scenario is stale by definition: starting again means
+  // wanting a fresh one. Anything unrecorded on a port is somebody else's and is
+  // reused by the stages instead.
+  const replaced = await stopFeatureDemo(definition.name, io, { quiet: true });
+
+  if (replaced) {
+    log(
+      `Stopped the previous run of this scenario (${replaced} process(es)), so this one is fresh.`,
+    );
+  }
+
   const outcomes: StageOutcome[] = [];
   const processes: Supervised[] = [];
+  /** Ports this run started, as opposed to ports it reused. */
+  const ownedPorts: number[] = [];
   const teardown: (() => Promise<void>)[] = [];
   const workflows: StartedWorkflow[] = [];
   const observations: string[] = [];
@@ -128,16 +111,19 @@ export const startFeatureDemo = async (
   let bundledUiUrl: string | undefined;
   let webUrl: string | undefined;
 
-  const stopEverything = async () => {
-    // A worker with a long activity in flight can take minutes to drain, and
-    // Ctrl-C must not leave the ports bound that long. Scenarios get a moment
-    // to finish, then the processes holding the ports go regardless.
+  // A worker with a long activity in flight can take minutes to drain, so a
+  // scenario gets a moment and then the run continues regardless.
+  const stopScenarios = async () => {
     await Promise.race([
       Promise.all(teardown.map((shutdown) => shutdown().catch(() => {}))),
       new Promise((resolve) => {
         setTimeout(resolve, TEARDOWN_GRACE_MS).unref();
       }),
     ]);
+  };
+
+  const stopEverything = async () => {
+    await stopScenarios();
 
     for (const child of processes) await child.stop().catch(() => {});
 
@@ -177,17 +163,27 @@ export const startFeatureDemo = async (
       startedAt: new Date().toISOString(),
       address,
       webUrl,
-      supervisorPid: options.keepAlive ? process.pid : undefined,
+      ports: ownedPorts,
       processes: processes.map(({ label, pid }) => ({ label, pid })),
     });
   }
 
-  if (!options.keepAlive || (!processes.length && !teardown.length)) {
+  if (options.once) {
     await stopEverything();
     return;
   }
 
-  await holdUntilInterrupted(io, stopEverything);
+  // The processes are detached and outlive this command, so it exits rather than
+  // holding a terminal to own something it does not.
+  await stopScenarios();
+
+  if (processes.length) {
+    io.writeOutput(
+      chalk.bold(
+        `\nStill running. Stop it with "pnpm demo stop ${definition.name}".`,
+      ),
+    );
+  }
 
   async function runStages() {
     const server = stageState('server', definition.server.enabled, options);
@@ -201,7 +197,15 @@ export const startFeatureDemo = async (
 
       address = provisioned.address;
       bundledUiUrl = provisioned.bundledUiUrl;
-      if (provisioned.process) processes.push(provisioned.process);
+
+      if (provisioned.process) {
+        processes.push(provisioned.process);
+        ownedPorts.push(
+          definition.server.port,
+          definition.server.uiPort,
+          definition.server.httpPort ?? definition.server.port + 1,
+        );
+      }
 
       outcomes.push({
         stage: 'server',
@@ -272,6 +276,11 @@ export const startFeatureDemo = async (
 
       webUrl = running.webUrl;
       processes.push(...running.processes);
+
+      for (const child of running.processes) {
+        if (child.label === 'ui-server') ownedPorts.push(definition.ui.apiPort);
+        if (child.label === 'ui') ownedPorts.push(definition.ui.webPort);
+      }
 
       outcomes.push({
         stage: 'ui',
@@ -357,39 +366,53 @@ const recordedRunNames = (): string[] => {
     .sort();
 };
 
-export const stopFeatureDemo = async (name: string | undefined, io: DemoIo) => {
+export const stopFeatureDemo = async (
+  name: string | undefined,
+  io: DemoIo,
+  { quiet = false }: { quiet?: boolean } = {},
+): Promise<number> => {
   const names = name ? [name] : recordedRunNames();
   let stopped = 0;
+  const say = (message: string) => {
+    if (!quiet) io.writeOutput(message);
+  };
 
   for (const candidate of names) {
     const state = await readState(candidate);
 
     if (!state) continue;
 
-    // The supervisor shuts its own children down, so it is asked first. Any
-    // child that outlives it is stopped directly below.
-    if (state.supervisorPid && isRunning(state.supervisorPid)) {
-      await stopPid(state.supervisorPid);
-      io.writeOutput(`Stopped the run holding ${candidate} open.`);
-      stopped += 1;
-    }
-
     for (const child of state.processes) {
       if (!isRunning(child.pid)) continue;
 
       await stopPid(child.pid);
-      io.writeOutput(`Stopped ${child.label} (pid ${child.pid}).`);
+      say(`Stopped ${child.label} (pid ${child.pid}).`);
       stopped += 1;
+    }
+
+    // A child that outlived its record still holds its port, and a pid list
+    // cannot see that. The ports this run started are swept as a backstop. A
+    // child that holds no port, such as the catalog worker, is reachable only
+    // through its recorded pid: a sweep by process name would also catch a
+    // worker somebody started themselves.
+    for (const port of state.ports ?? []) {
+      for (const pid of await listenersOn(port)) {
+        await stopPid(pid);
+        say(`Stopped whatever still held port ${port} (pid ${pid}).`);
+        stopped += 1;
+      }
     }
 
     await clearState(candidate);
   }
 
   if (!stopped) {
-    io.writeOutput(
+    say(
       name
         ? `Nothing recorded as running for "${name}".`
         : 'Nothing recorded as running.',
     );
   }
+
+  return stopped;
 };

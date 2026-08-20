@@ -9,8 +9,8 @@ export type RunState = {
   startedAt: string;
   address: string;
   webUrl?: string;
-  /** The `demo start` process holding the run open, if it is still attached. */
-  supervisorPid?: number;
+  /** Ports this run started, so a stop can sweep what outlived its pid. */
+  ports: number[];
   processes: { label: string; pid: number }[];
 };
 
