@@ -56,23 +56,6 @@ export function getRowY(
     : (i + 2 + offset) * ROW_HEIGHT;
 }
 
-// y (px) for the top of the pending-gap rectangle — just below whichever rows sit
-// at the top of the graph (ascending rows, or descending rows when reverseSort).
-export function getPendingBlockY({
-  descStart,
-  filteredGroupsLength,
-  reverseSort,
-}: {
-  descStart: number;
-  filteredGroupsLength: number;
-  reverseSort: boolean;
-}): number {
-  const topSectionRows = reverseSort
-    ? filteredGroupsLength - descStart
-    : descStart;
-  return (topSectionRows + 2) * ROW_HEIGHT - RADIUS;
-}
-
 export const timelineTextPosition = (
   points: number[],
   y: number,

@@ -41,6 +41,35 @@ const mockIdleTimeline = async (page: Page) => {
 };
 
 test.describe('Timeline collapse idle time', () => {
+  test('does not show an expanded gray band while history initially loads', async ({
+    page,
+  }) => {
+    let releaseHistory: () => void;
+    const historyHeld = new Promise<void>((resolve) => {
+      releaseHistory = resolve;
+    });
+
+    await mockWorkflowApis(page, runningWorkflow);
+    await page.route(EVENT_HISTORY_API, async (route) => {
+      await historyHeld;
+      return route.fulfill({ json: idleHistory });
+    });
+    await page.route(EVENT_HISTORY_API_REVERSE, async (route) => {
+      await historyHeld;
+      return route.fulfill({
+        json: { ...idleHistory, history: { events: [...events].reverse() } },
+      });
+    });
+
+    await page.goto(timelineUrl);
+
+    const timeline = page.locator('#event-history-timeline-graph');
+    await expect(timeline).toBeVisible();
+    await expect(timeline.locator('.animate-pulse.bg-subtle')).toHaveCount(0);
+
+    releaseHistory();
+  });
+
   test.describe('with collapsible idle gaps', () => {
     test.beforeEach(async ({ page }) => {
       await mockIdleTimeline(page);

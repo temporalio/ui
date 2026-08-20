@@ -1,15 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  getDescStart,
-  getPendingBlockY,
-  getRowY,
-  getTotalForY,
-} from './timeline-positioning';
+import { getDescStart, getRowY, getTotalForY } from './timeline-positioning';
 
-// Real constants from TimelineConfig: height = baseRadius * 4 = 24, radius = baseRadius * 1.5 = 9
+// Real row height from TimelineConfig: baseRadius * 4 = 24
 const H = 24;
-const R = 9;
 
 function makeGroups(ids: number[]) {
   return ids.map((id) => ({ initialEvent: { id: String(id) } }));
@@ -151,47 +145,6 @@ describe('getRowY — descending sort', () => {
 });
 
 // ---------------------------------------------------------------------------
-// getPendingBlockY
-// ---------------------------------------------------------------------------
-
-describe('getPendingBlockY', () => {
-  it('ascending: gap starts at row descStart+2 minus radius', () => {
-    // Last asc row center at y = (descStart+1)*H = 4H.
-    // Block starts at (descStart+2)*H - R = 5H - R = 111px.
-    // That is H-R px below last asc row center — safely below its circle (radius R).
-    const y = getPendingBlockY({
-      descStart: 3,
-      filteredGroupsLength: 6,
-      reverseSort: false,
-    });
-    expect(y).toBe(5 * H - R);
-  });
-
-  it('descending: gap starts at row N2+2 minus radius (symmetrical)', () => {
-    // N2 = filteredGroupsLength - descStart = 3.
-    // Oldest desc row center at y = (N2+1)*H = 4H.
-    // Block starts at (N2+2)*H - R = 5H - R = 111px.
-    const y = getPendingBlockY({
-      descStart: 3,
-      filteredGroupsLength: 6,
-      reverseSort: true,
-    });
-    expect(y).toBe(5 * H - R);
-  });
-
-  it('ascending with only asc events (descStart = filteredGroupsLength): block is below all rows', () => {
-    const y = getPendingBlockY({
-      descStart: 3,
-      filteredGroupsLength: 3,
-      reverseSort: false,
-    });
-    // Same formula: (3+2)*H - R = 5H - R. The last row is at 4H so block is below it.
-    expect(y).toBe(5 * H - R);
-    expect(y).toBeGreaterThan(4 * H); // last row center
-  });
-});
-
-// ---------------------------------------------------------------------------
 // No-overlap invariants — ascending sort
 // ---------------------------------------------------------------------------
 
@@ -208,28 +161,6 @@ describe('no overlap: ascending sort', () => {
     totalForY,
     reverseSort: false,
   };
-  const blockY = getPendingBlockY({
-    descStart,
-    filteredGroupsLength: fLen,
-    reverseSort: false,
-  });
-  const blockH = pending * H + R;
-
-  it('pending block is NOT at the top (y > 2*H)', () => {
-    expect(blockY).toBeGreaterThan(2 * H);
-  });
-
-  it('pending block starts below the last ascending row', () => {
-    const lastAscY = getRowY(N1 - 1, cfg);
-    // Block top must be below last asc row bottom edge (center + radius)
-    expect(blockY).toBeGreaterThanOrEqual(lastAscY + R);
-  });
-
-  it('pending block ends at or before the first descending row', () => {
-    const firstDescY = getRowY(N1, cfg);
-    // Block bottom must be at or before first desc row top edge (center - radius)
-    expect(blockY + blockH).toBeLessThanOrEqual(firstDescY + R);
-  });
 
   it('ascending events are strictly above descending events (no direct adjacency)', () => {
     const lastAscY = getRowY(N1 - 1, cfg);
@@ -255,29 +186,9 @@ describe('no overlap: descending sort', () => {
     totalForY,
     reverseSort: true,
   };
-  const blockY = getPendingBlockY({
-    descStart,
-    filteredGroupsLength: fLen,
-    reverseSort: true,
-  });
-  const blockH = pending * H + R;
-
-  it('pending block is NOT at the very top (y > 2*H)', () => {
-    expect(blockY).toBeGreaterThan(2 * H);
-  });
 
   it('descending events are at the top (newest desc row y = 2*H)', () => {
     expect(getRowY(fLen - 1, cfg)).toBe(2 * H);
-  });
-
-  it('pending block starts below the oldest descending row', () => {
-    const oldestDescY = getRowY(N1, cfg); // first desc-cursor group index
-    expect(blockY).toBeGreaterThanOrEqual(oldestDescY + R);
-  });
-
-  it('pending block ends at or before the newest ascending row', () => {
-    const newestAscY = getRowY(N1 - 1, cfg); // last asc-cursor group index
-    expect(blockY + blockH).toBeLessThanOrEqual(newestAscY + R);
   });
 
   it('ascending events are strictly below descending events', () => {
@@ -295,7 +206,6 @@ describe('no overlap: descending sort', () => {
 // ---------------------------------------------------------------------------
 // Edge case: only ascending cursor loaded (descStart = filteredGroupsLength)
 // This is the state after onFirstPage fires but before onFirstDescPage arrives.
-// The pending block must NOT be at the top.
 // ---------------------------------------------------------------------------
 
 describe('edge case: only ascending events loaded', () => {
@@ -315,16 +225,6 @@ describe('edge case: only ascending events loaded', () => {
     expect(getRowY(0, cfg)).toBe(2 * H);
     expect(getRowY(1, cfg)).toBe(3 * H);
     expect(getRowY(2, cfg)).toBe(4 * H);
-  });
-
-  it('pending block is below all loaded rows, NOT at the top', () => {
-    const blockY = getPendingBlockY({
-      descStart,
-      filteredGroupsLength: fLen,
-      reverseSort: false,
-    });
-    expect(blockY).toBeGreaterThan(2 * H); // NOT at top
-    expect(blockY).toBeGreaterThan(getRowY(fLen - 1, cfg)); // below last row
   });
 });
 
@@ -351,16 +251,6 @@ describe('edge case: only descending events loaded (desc page arrived first)', (
   it('ascending sort: first desc group is shifted down by pendingGroupCount', () => {
     // i=0, offset=100: y = (0 + 2 + 100) * H = 102H
     expect(getRowY(0, cfgDesc)).toBe(102 * H);
-  });
-
-  it('ascending sort: pending block is at the very top (before desc events)', () => {
-    const blockY = getPendingBlockY({
-      descStart: 0,
-      filteredGroupsLength: fLen,
-      reverseSort: false,
-    });
-    // descStart=0: blockY = (0+2)*H - R = 2H - R = 39px
-    expect(blockY).toBe(2 * H - R);
   });
 
   it('descending sort: newest desc group (i = fLen-1) appears at top', () => {

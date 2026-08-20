@@ -17,12 +17,7 @@
 
   import EndTimeInterval from '../end-time-interval.svelte';
   import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
-  import {
-    getDescStart,
-    getPendingBlockY,
-    getRowY,
-    getTotalForY,
-  } from './timeline-positioning';
+  import { getDescStart, getRowY, getTotalForY } from './timeline-positioning';
 
   import GroupDetailsRow from './group-details-row.svelte';
   import TimelineAxis from './timeline-axis.svelte';
@@ -139,8 +134,8 @@
     getFailedOrPendingGroups(lazyGroups, $eventStatusFilter),
   );
 
-  // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
-  // group count, so subtracting the loaded count is correct.
+  // Unfetched rows. totalExpectedEvents is already a density-adjusted group
+  // count, so subtracting the loaded count is correct.
   const pendingGroupCount = $derived.by(() => {
     if (!loading) return 0;
     if (!totalExpectedEvents) {
@@ -564,22 +559,6 @@
             </li>
           {/each}
         </ul>
-
-        {#if loading && pendingGroupCount > 0}
-          {@const rectY = getPendingBlockY({
-            descStart,
-            filteredGroupsLength: filteredLazyGroups.length,
-            reverseSort,
-          })}
-          {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
-          <div
-            class="absolute animate-pulse rounded-control bg-subtle"
-            style:left="{GUTTER}px"
-            style:top="{rectY}px"
-            style:width="{canvasWidth - GUTTER * 2}px"
-            style:height="{rectH}px"
-          ></div>
-        {/if}
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
         {#if !readOnly && activeIdx >= 0}

@@ -218,7 +218,6 @@ flowchart TD
 
 - `getRowY(i, …)` — y (px) for the group at index `i`; descending-cursor rows
   shift down by `pendingGroupCount` to open the loading gap.
-- `getPendingBlockY(…)` — top of the skeleton gap rectangle.
 - `getDescStart` / `getTotalForY` — locate the cursor split and the descending-sort
   denominator.
 - Row height and dot radius come from `timeline-graph/constants.ts`
