@@ -140,7 +140,7 @@
 
 <style lang="postcss">
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between border-b border-subtle p-2 text-sm font-medium last-of-type:border-b-0;
+    @apply flex select-none list-none flex-row items-center justify-between border-b border-io-border-primary p-2 text-sm font-medium last-of-type:border-b-0;
   }
 
   .orderable-item[draggable='true'] {
@@ -148,7 +148,7 @@
   }
 
   .orderable-item.readonly {
-    @apply surface-secondary;
+    @apply bg-io-surface-secondary text-io-content-primary;
   }
 
   :global(.orderable-item.dragging-over:not(.locked)) {

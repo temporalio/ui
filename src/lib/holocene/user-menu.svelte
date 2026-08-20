@@ -85,7 +85,7 @@
     <MenuDivider />
     <MenuItem
       hoverable={false}
-      class="text-subtle"
+      class="text-io-content-tertiary"
       newTab
       href="https://t.mp/slack"
     >
@@ -93,7 +93,7 @@
     </MenuItem>
     <MenuItem
       hoverable={false}
-      class="text-subtle"
+      class="text-io-content-tertiary"
       newTab
       href="https://community.temporal.io/"
     >
@@ -101,7 +101,7 @@
     </MenuItem>
     <MenuItem
       hoverable={false}
-      class="text-subtle"
+      class="text-io-content-tertiary"
       newTab
       href="https://temporal.io/change-log"
     >

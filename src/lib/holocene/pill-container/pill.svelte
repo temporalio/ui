@@ -62,9 +62,10 @@
     handleClick(e);
   }}
   class={merge(
-    'flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
-    isActive && 'bg-interactive text-white',
+    'flex items-center justify-center gap-2 rounded-full bg-transparent px-3 py-1 text-sm text-io-content-primary hover:bg-io-actions-hover-overlay active:bg-io-actions-press-overlay',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary',
+    isActive &&
+      'bg-io-interactive-primary text-io-content-white hover:bg-io-interactive-primary-hover active:bg-io-interactive-primary-press',
     className,
   )}
   {disabled}

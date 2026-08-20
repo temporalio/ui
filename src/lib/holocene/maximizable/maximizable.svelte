@@ -117,7 +117,7 @@
   class={merge(
     'relative',
     maximized &&
-      'fixed left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-white dark:bg-black',
+      'fixed left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-io-background-primary text-io-content-primary',
     className,
   )}
   tabindex="-1"
@@ -136,7 +136,7 @@
     {@render actions?.()}
     {#if enabled}
       <MaximizeButton
-        class="m-0 rounded-full text-secondary"
+        class="m-0 rounded-full text-io-content-secondary"
         onclick={handleClick}
         {maximized}
       />

@@ -42,7 +42,7 @@
   text={tooltip}
   right
   class="block"
-  tooltipClass="rounded-none text-white ml-4 group-data-[nav=open]:hidden"
+  tooltipClass="rounded-none text-io-content-white ml-4 group-data-[nav=open]:hidden"
 >
   <div
     role="button"

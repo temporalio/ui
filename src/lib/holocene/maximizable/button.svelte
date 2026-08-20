@@ -23,7 +23,7 @@
 
 <button
   class={merge(
-    'surface-interactive-secondary m-1 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    'm-1 border border-transparent bg-transparent p-1 text-io-content-primary hover:bg-io-actions-hover-overlay focus-visible:bg-io-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary active:bg-io-actions-press-overlay',
     className,
   )}
   {onclick}

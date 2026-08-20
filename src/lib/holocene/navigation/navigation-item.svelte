@@ -41,7 +41,7 @@
     text={tooltip}
     right
     class="block"
-    tooltipClass="rounded-none text-white ml-4 group-data-[nav=open]:hidden"
+    tooltipClass="rounded-none text-io-content-white ml-4 group-data-[nav=open]:hidden"
   >
     <a
       href={link}
@@ -61,7 +61,7 @@
           'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
         disabled && 'pointer-events-none cursor-not-allowed opacity-50',
       )}
-      class:text-disabled={disabled}
+      class:text-io-content-tertiary={disabled}
     >
       {#if icon}
         <div class="flex h-6 w-6 items-center">

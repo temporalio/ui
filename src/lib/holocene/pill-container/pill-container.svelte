@@ -54,7 +54,7 @@
 
 <div
   class={merge(
-    'surface-subtle inline-flex flex-col items-center justify-start gap-2 rounded-md px-2 py-2 md:flex-row md:rounded-full',
+    'inline-flex flex-col items-center justify-start gap-2 rounded-md bg-io-surface-tertiary px-2 py-2 text-io-content-primary md:flex-row md:rounded-full',
     className,
   )}
 >
