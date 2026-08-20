@@ -7,7 +7,6 @@ import type { DefinitionSummary } from './definition';
 const definition: DefinitionSummary = {
   name: 'system-nexus-signal-with-start',
   title: 'Signal With Start through the system Nexus endpoint',
-  ticket: 'DT-4385',
   path: 'utilities/demo/scenarios/system-nexus-signal-with-start/definition.ts',
   stages: ['server', 'worker', 'ui', 'scenarios'],
   examples: ['signal-handlers'],
@@ -71,7 +70,6 @@ describe('demo list', () => {
     await run('list');
 
     expect(output.join('\n')).toContain('system-nexus-signal-with-start');
-    expect(output.join('\n')).toContain('(DT-4385)');
     expect(output.join('\n')).toContain(
       'stages: server, worker, ui, scenarios',
     );

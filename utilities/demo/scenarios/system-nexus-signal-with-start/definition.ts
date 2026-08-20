@@ -4,7 +4,6 @@ import { defineScenario } from '../../definition';
 export const definition = defineScenario({
   name: 'system-nexus-signal-with-start',
   title: 'Signal With Start through the system Nexus endpoint',
-  ticket: 'DT-4385',
   feature: 'src/lib/system-nexus-endpoints/signal-with-start-workflow',
   summary:
     'A workflow calls SignalWithStartWorkflowExecution on the __temporal_system Nexus endpoint. Both of the resulting events carry a binary/protobuf workflowservice message. Without this branch the UI shows the raw Nexus transport; with it the UI decodes the payload and shows the operation, its target, and the link back to the caller. The operation\'s target is the "signal-handlers" catalog example, so the workflow it starts and signals is one the catalog already runs.',
@@ -29,7 +28,6 @@ export const definition = defineScenario({
     signalInput: 'delivered by the system Nexus operation',
     memo: {
       demo: 'system-nexus-signal-with-start',
-      ticket: 'DT-4385',
     },
   } satisfies Options,
   preview: {

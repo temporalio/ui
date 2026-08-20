@@ -45,7 +45,6 @@ export const renderMarkdown = (input: SummaryInput): string => {
   lines.push(`# ${definition.title}`);
   lines.push('');
 
-  if (definition.ticket) lines.push(`**Ticket:** ${definition.ticket}  `);
   if (definition.feature) lines.push(`**Feature:** ${definition.feature}  `);
   lines.push(`**Definition:** \`${input.definitionPath}\``);
   lines.push('');
@@ -130,7 +129,6 @@ export const printSummary = (
   const heading = (text: string) => write(`\n${chalk.bold.cyan(text)}`);
 
   write(`\n${chalk.bold.green('▸')} ${chalk.bold(definition.title)}`);
-  if (definition.ticket) write(chalk.dim(`  ${definition.ticket}`));
 
   heading('What this run did');
   for (const stage of stages) {

@@ -51,7 +51,7 @@ const formatDefinitions = (definitions: readonly DefinitionSummary[]) => {
 
   return definitions
     .flatMap((definition) => [
-      `  ${definition.name}${definition.ticket ? `  (${definition.ticket})` : ''}`,
+      `  ${definition.name}`,
       `    ${definition.title}`,
       `    stages: ${definition.stages.join(', ') || 'none'}`,
       ...(definition.examples.length

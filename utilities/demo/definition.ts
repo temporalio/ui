@@ -71,7 +71,6 @@ const uiSchema = z
 export const definitionSchema = z.object({
   name: z.string(),
   title: z.string(),
-  ticket: z.string().optional(),
   feature: z.string().optional(),
   summary: z.string().optional(),
   server: serverSchema,
@@ -166,7 +165,6 @@ export const loadDefinition = async (name: string, cwd = process.cwd()) => {
 export type DefinitionSummary = {
   name: string;
   title: string;
-  ticket?: string;
   path: string;
   stages: string[];
   examples: string[];
@@ -197,7 +195,6 @@ export const listDefinitions = async (
         name: data.name,
         title: data.title,
         ownScenario: hasOwnScenario(data.name, cwd),
-        ticket: data.ticket,
         path,
         stages: [
           ...(data.server.enabled ? ['server'] : []),

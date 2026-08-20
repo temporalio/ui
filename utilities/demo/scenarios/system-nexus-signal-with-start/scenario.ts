@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { Client, Connection } from '@temporalio/client';
+import protoPkg from '@temporalio/proto';
 import {
   DefaultLogger,
   NativeConnection,
@@ -39,6 +40,73 @@ const optionsSchema = z.strictObject({
   /** Defaults to the caller's workflow id. */
   identity: z.string().optional(),
 });
+
+/** What the UI renders from the decoded request, and the target needs to run. */
+const REQUIRED_FIELDS = [
+  'workflowId',
+  'workflowType',
+  'taskQueue',
+  'signalName',
+  'identity',
+] as const;
+
+/**
+ * Fields this caller deliberately leaves unset. The server records the request
+ * as the caller sent it today, so any of these appearing means the server
+ * started populating it, which changes what the UI shows.
+ */
+const UNSET_FIELDS = ['namespace', 'requestId', 'control', 'links'] as const;
+
+/**
+ * The demo exists to prove the UI has real data to render, so it checks the
+ * recorded request rather than trusting that what was sent is what was stored.
+ * This is the guard against the operation's shape drifting underneath us.
+ */
+const checkRecordedShape = async (
+  client: Client,
+  callerWorkflowId: string,
+): Promise<string[]> => {
+  const history = await client.workflow
+    .getHandle(callerWorkflowId)
+    .fetchHistory();
+
+  const scheduled = history.events?.find(
+    (event) => event.nexusOperationScheduledEventAttributes,
+  );
+  const input = scheduled?.nexusOperationScheduledEventAttributes?.input;
+
+  if (!input?.data) {
+    throw new Error(
+      'The caller recorded no NexusOperationScheduled input, so there is nothing for the UI to decode.',
+    );
+  }
+
+  const request =
+    protoPkg.temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest.decode(
+      input.data,
+    ).toJSON() as Record<string, unknown>;
+
+  const missing = REQUIRED_FIELDS.filter((field) => !request[field]);
+
+  if (missing.length) {
+    throw new Error(
+      [
+        `The recorded request no longer carries: ${missing.join(', ')}.`,
+        'The UI renders signalName, identity, and control from this request, and',
+        'the target needs the rest. Either the caller stopped sending them, or the',
+        'server changed what it records. Update this scenario to match.',
+      ].join('\n'),
+    );
+  }
+
+  const appeared = UNSET_FIELDS.filter((field) => request[field]);
+
+  return appeared.length
+    ? [
+        `The server now populates ${appeared.join(', ')} on the request, which this caller does not send. The UI may show more than these review steps describe.`,
+      ]
+    : [];
+};
 
 const run = async (
   { address, namespace, log }: ScenarioContext,
@@ -103,6 +171,8 @@ const run = async (
     `The operation returned started=${result.started} for run ${result.runId}`,
   );
 
+  const shapeNotes = await checkRecordedShape(client, caller.workflowId);
+
   return {
     workflows: [
       {
@@ -128,6 +198,7 @@ const run = async (
         ? 'The operation started a new target workflow (started=true).'
         : 'The target already existed, so the operation only signaled it (started=false).',
       `The target runs the "${target.id}" catalog example on the catalog worker, so nothing here is demo-only code.`,
+      ...shapeNotes,
     ],
     shutdown: async () => {
       await connection.close();
