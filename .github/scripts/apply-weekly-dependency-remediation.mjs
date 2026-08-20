@@ -861,10 +861,12 @@ export async function runCli(args = process.argv.slice(2)) {
     lockfile: lockfileText,
     goMod: goModText,
   });
+  const applied = options.apply && plan.actions.length > 0;
   const report = {
     ...plan,
     manifestPath: path.resolve(options.packageJson),
-    applied: options.apply && plan.actions.length > 0,
+    applied,
+    ...(applied ? { resolver: 'deterministic-planner' } : {}),
   };
 
   if (options.apply && plan.actions.length > 0) {
