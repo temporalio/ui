@@ -55,7 +55,9 @@
 </script>
 
 {#snippet template(args: MenuArgs, context: StoryContext<MenuArgs>)}
-  <div class="flex items-center justify-center">
+  <div
+    class="flex items-center justify-center border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+  >
     <MenuContainer>
       <MenuButton hasIndicator variant={args.variant} controls={context.id}>
         {#snippet leading()}
