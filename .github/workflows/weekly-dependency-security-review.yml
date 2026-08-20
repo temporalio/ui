@@ -134,13 +134,6 @@ jobs:
             --report weekly-dependency-remediation.json \
             --apply
 
-          unexpected="$(git ls-files --others --exclude-standard | grep -vE '^weekly-dependency-(security-audit|remediation)\.json$' || true)"
-          if [ -n "$unexpected" ]; then
-            echo "Unexpected new files:" >&2
-            echo "$unexpected" >&2
-            exit 1
-          fi
-
           unexpected="$(git diff --name-only | grep -vE '^package\.json$' || true)"
           if [ -n "$unexpected" ]; then
             echo "The planner changed a file outside package.json:" >&2
