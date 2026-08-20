@@ -159,7 +159,7 @@
             {@render linkDisplay(linkView)}
             {#if targetTypeLabel}
               <p
-                class="text-xs text-secondary/80"
+                class="text-xs text-io-content-secondary opacity-80"
                 data-testid="link-target-type"
               >
                 {targetTypeLabel}

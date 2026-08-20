@@ -208,8 +208,8 @@
     {...$constraints.name}
   />
   <div class="flex flex-col gap-0">
-    <p class="text-base text-primary">{translate('nexus.target')}</p>
-    <p class="text-xs text-secondary">
+    <p class="text-base text-io-content-primary">{translate('nexus.target')}</p>
+    <p class="text-xs text-io-content-secondary">
       {translate('nexus.target-description')}
     </p>
   </div>
@@ -242,8 +242,10 @@
   />
   <IsOssGuard {isCloud}>
     <div class="flex flex-col gap-0">
-      <p class="text-base text-primary">{translate('nexus.access-policy')}</p>
-      <p class="text-xs text-secondary">
+      <p class="text-base text-io-content-primary">
+        {translate('nexus.access-policy')}
+      </p>
+      <p class="text-xs text-io-content-secondary">
         {translate('nexus.allowed-caller-namespaces-description')}
       </p>
     </div>
@@ -272,7 +274,7 @@
       {translate('nexus.description-label')}
     </p>
     <MarkdownEditor bind:content={$form.descriptionString} />
-    <p class="text-xs text-secondary">
+    <p class="text-xs text-io-content-secondary">
       {translate('nexus.description-hint')}
     </p>
   </div>
