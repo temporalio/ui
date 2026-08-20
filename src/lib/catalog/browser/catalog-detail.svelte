@@ -49,7 +49,7 @@
     if (state === 'loading') {
       return {
         Icon: IconSpinner,
-        iconClass: 'animate-spin text-secondary',
+        iconClass: 'animate-spin text-io-content-secondary',
         iconLabel: `${iconSubject} is checking`,
         label,
         tooltip:
@@ -87,7 +87,7 @@
 
     return {
       Icon: IconQuestionCircle,
-      iconClass: 'text-secondary',
+      iconClass: 'text-io-content-secondary',
       iconLabel: `${iconSubject} status is unknown`,
       label,
       tooltip:
@@ -521,7 +521,7 @@
   >
     <div class="min-w-0 space-y-6">
       <section
-        class="surface-primary min-w-0 space-y-4 rounded-sm border border-subtle p-4"
+        class="min-w-0 space-y-4 rounded-sm border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
         aria-label="Configuration"
       >
         <h2 class="text-lg">Configuration</h2>
@@ -553,7 +553,7 @@
           aria-label="Start options"
           hidden={!configureOpen}
         >
-          <div class="rounded-sm border border-subtle p-3">
+          <div class="rounded-sm border border-io-border-primary p-3">
             <PayloadInput
               id="catalog-start-options"
               bind:input={startOptionsEditor}
@@ -563,10 +563,12 @@
           </div>
 
           {#if sharedStartOptionsDeclared}
-            <div class="space-y-2 rounded-sm border border-subtle p-3">
+            <div
+              class="space-y-2 rounded-sm border border-io-border-primary p-3"
+            >
               <div>
                 <h3 class="text-sm font-medium">Custom Search Attributes</h3>
-                <p class="text-xs text-secondary">
+                <p class="text-xs text-io-content-secondary">
                   Indexed fields used in a List Filter to filter a list of
                   Workflow Executions.
                 </p>
@@ -578,14 +580,16 @@
               />
             </div>
 
-            <div class="space-y-2 rounded-sm border border-subtle p-3">
+            <div
+              class="space-y-2 rounded-sm border border-io-border-primary p-3"
+            >
               <div>
                 <Label
                   for="catalog-start-delay"
                   label="Workflow Start Delay"
                   class="text-sm"
                 />
-                <p class="text-xs text-secondary">
+                <p class="text-xs text-io-content-secondary">
                   Time to wait before dispatching the first workflow task.
                 </p>
               </div>
@@ -602,10 +606,12 @@
               />
             </div>
 
-            <div class="space-y-2 rounded-sm border border-subtle p-3">
+            <div
+              class="space-y-2 rounded-sm border border-io-border-primary p-3"
+            >
               <div>
                 <h3 class="text-sm font-medium">User Metadata</h3>
-                <p class="text-xs text-secondary">
+                <p class="text-xs text-io-content-secondary">
                   Add context to the Workflow Execution to help identify and
                   understand its operations. Markdown supported.
                 </p>
@@ -625,7 +631,7 @@
         {/if}
 
         <div
-          class="surface-primary sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-subtle py-3"
+          class="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-io-border-primary bg-io-surface-primary py-3 text-io-content-primary"
         >
           <Button
             size="sm"
@@ -670,10 +676,12 @@
                     ? host.evidenceLink(session.outcome)
                     : undefined}
                 <TableRow>
-                  <td class="truncate py-2 font-mono text-xs text-secondary">
+                  <td
+                    class="truncate py-2 font-mono text-xs text-io-content-secondary"
+                  >
                     {session.reference.attempt.executionId}
                   </td>
-                  <td class="text-xs text-secondary">
+                  <td class="text-xs text-io-content-secondary">
                     {relativeSessionTime(session.createdAt)}
                   </td>
                   <td>
@@ -694,7 +702,9 @@
                         >{sessionStateLabels[session.state]}</Badge
                       >
                       {#if explanation}
-                        <p class="mt-1 text-xs text-secondary">{explanation}</p>
+                        <p class="mt-1 text-xs text-io-content-secondary">
+                          {explanation}
+                        </p>
                       {/if}
                     {/if}
                   </td>
@@ -742,7 +752,10 @@
               {/each}
             {:else}
               <TableRow>
-                <td colspan="4" class="py-6 text-center text-sm text-secondary">
+                <td
+                  colspan="4"
+                  class="py-6 text-center text-sm text-io-content-secondary"
+                >
                   Runs appear here until you refresh the page.
                 </td>
               </TableRow>
@@ -754,7 +767,7 @@
 
     <aside class="space-y-4" aria-label="Execution details">
       <section
-        class="surface-primary space-y-4 rounded-sm border border-subtle p-4"
+        class="space-y-4 rounded-sm border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
         aria-label="Execution details"
       >
         <h2 class="text-base">Execution details</h2>
@@ -765,17 +778,17 @@
             {/each}
           </ul>
         {/if}
-        <dl class="divide-y divide-subtle text-sm">
+        <dl class="divide-y divide-io-border-primary text-sm">
           <div class="py-2 first:pt-0">
-            <dt class="body-small text-secondary">Type</dt>
+            <dt class="body-small text-io-content-secondary">Type</dt>
             <dd class="mt-0.5">{executionKindLabel}</dd>
           </div>
           <div class="py-2 first:pt-0">
-            <dt class="body-small text-secondary">Namespace</dt>
+            <dt class="body-small text-io-content-secondary">Namespace</dt>
             <dd class="mt-0.5">{descriptor.execution.namespace}</dd>
           </div>
           <div class="py-2 last:pb-0">
-            <dt class="body-small text-secondary">Target</dt>
+            <dt class="body-small text-io-content-secondary">Target</dt>
             <dd class="mt-0.5 break-all font-mono text-xs">
               {descriptor.execution.targetId}
             </dd>
@@ -783,7 +796,7 @@
         </dl>
       </section>
       <section
-        class="surface-primary space-y-3 rounded-sm border border-subtle p-4"
+        class="space-y-3 rounded-sm border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
         aria-label="Readiness"
       >
         <div class="flex items-center justify-between gap-2">
@@ -798,7 +811,9 @@
         </div>
         <span class="sr-only" aria-live="polite">{readinessAnnouncement}</span>
         <div class="space-y-2">
-          <div class="surface-subtle rounded-sm p-2">
+          <div
+            class="rounded-sm bg-io-surface-secondary p-2 text-io-content-primary"
+          >
             <div class="flex items-center gap-2 text-sm">
               <Tooltip text={workerPresentation.tooltip} bottom>
                 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -815,7 +830,7 @@
               <span>{workerPresentation.label}</span>
             </div>
             {#if !readinessLoading && workerReadinessState === 'unavailable'}
-              <p class="mt-2 text-xs text-secondary">
+              <p class="mt-2 text-xs text-io-content-secondary">
                 Start a catalog worker, then run the example:
               </p>
               <Copyable
@@ -836,7 +851,9 @@
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               })}
-              <div class="surface-subtle rounded-sm p-2">
+              <div
+                class="rounded-sm bg-io-surface-secondary p-2 text-io-content-primary"
+              >
                 <div class="flex items-center gap-2 text-sm">
                   <Tooltip text={presentation.tooltip} bottom>
                     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -851,7 +868,7 @@
                   <span>{presentation.label}</span>
                 </div>
                 {#if check.kind === 'nexus-endpoint' && check.state === 'unavailable'}
-                  <p class="mt-2 text-xs text-secondary">
+                  <p class="mt-2 text-xs text-io-content-secondary">
                     Create the declared endpoint, then run the example again:
                   </p>
                   <Copyable
@@ -875,7 +892,7 @@
       </section>
       {#if descriptor.setupMarkdown}
         <section
-          class="surface-primary rounded-sm border border-subtle p-4"
+          class="rounded-sm border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
           aria-label="Setup"
         >
           <h2 class="text-base">Setup</h2>
@@ -888,11 +905,11 @@
         </section>
       {/if}
       <section
-        class="surface-primary rounded-sm border border-subtle p-4"
+        class="rounded-sm border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
         aria-label="What to verify"
       >
         <h2 class="text-base">What to verify</h2>
-        <p class="mt-2 text-sm text-secondary">
+        <p class="mt-2 text-sm text-io-content-secondary">
           {descriptor.expectedEvidence.length
             ? descriptor.expectedEvidence.join(' · ')
             : 'Nothing to verify was specified.'}
