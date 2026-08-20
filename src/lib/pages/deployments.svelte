@@ -27,7 +27,7 @@
 
   let {
     canCreateServerlessDeployment = true,
-    showConnectionStatus = false,
+    showConnectionStatus = true,
   }: Props = $props();
 
   let error = $state('');

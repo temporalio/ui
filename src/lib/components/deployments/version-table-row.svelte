@@ -58,7 +58,7 @@
     namespace,
     deploymentName,
     conflictToken,
-    showConnectionStatus = false,
+    showConnectionStatus = true,
     onChange,
     onValidationComplete,
   }: Props = $props();
