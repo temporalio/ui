@@ -52,14 +52,14 @@
           {translate('standalone-activities.empty-state-title')}
         {/if}
       </h2>
-      <p class="text-secondary">
+      <p class="text-io-content-secondary">
         {#if $activityError}
           {$activityError}
         {:else}
           {translate('standalone-activities.empty-state-description')}
         {/if}
       </p>
-      <NoQueryResults class="m-auto mt-8 text-subtle" />
+      <NoQueryResults class="m-auto mt-8 text-io-content-tertiary" />
     </div>
   </div>
 {:else}
@@ -68,7 +68,7 @@
     aria-live="polite"
   >
     <div
-      class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
+      class="flex w-auto min-w-[280px] flex-col gap-4 bg-io-surface-primary p-8 text-io-content-primary xl:min-w-[520px] xl:flex-1"
     >
       {#if $activityError}
         <h2>

@@ -165,7 +165,8 @@
             {/if}
             <p>
               Payload downloads require a codec server with a <span
-                class="rounded-sm bg-code-block px-1 font-mono">/download</span
+                class="rounded-sm bg-io-surface-code-block px-1 font-mono"
+                >/download</span
               >
               endpoint. <Link
                 href="https://docs.temporal.io/codec-server"

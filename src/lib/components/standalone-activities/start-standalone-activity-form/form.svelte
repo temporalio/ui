@@ -385,7 +385,7 @@
         <h5>
           {translate('standalone-activities.form-search-attributes-heading')}
         </h5>
-        <p class="text-secondary">
+        <p class="text-io-content-secondary">
           {translate(
             'standalone-activities.form-search-attributes-description',
           )}
@@ -403,7 +403,7 @@
     >
       <div class="space-y-2">
         <h5>{translate('standalone-activities.form-user-metadata-heading')}</h5>
-        <p class="text-secondary">
+        <p class="text-io-content-secondary">
           {translate('standalone-activities.form-user-metadata-description')}
         </p>
       </div>

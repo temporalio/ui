@@ -58,7 +58,7 @@
         <!-- TODO: Add count when there is a WorkersCount API available -->
         <CountRefreshButton count={0} {refresh} />
       </div>
-      <p class="mt-2 text-xs text-secondary">
+      <p class="mt-2 text-xs text-io-content-secondary">
         {refreshTimeFormatted}
       </p>
     </div>

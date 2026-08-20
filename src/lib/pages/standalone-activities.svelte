@@ -198,7 +198,7 @@
             <Translate key="standalone-activities.recent-activities" />
           {/if}
         </h1>
-        <p class="mt-3 text-xs text-secondary">
+        <p class="mt-3 text-xs text-io-content-secondary">
           {refreshTimeFormatted}
         </p>
       </div>

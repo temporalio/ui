@@ -126,7 +126,7 @@
       <!-- Title and Description -->
       <div>
         <h2 class="text-base font-medium">{translate('codec-server.title')}</h2>
-        <p class="text-sm text-secondary">
+        <p class="text-sm text-io-content-secondary">
           {translate('codec-server.description')}
         </p>
       </div>
@@ -138,7 +138,7 @@
 
       <!-- Endpoint Input -->
       <div class="space-y-2">
-        <p class="text-sm text-secondary">
+        <p class="text-sm text-io-content-secondary">
           {translate('codec-server.endpoint-description-prefix')}
           <Link
             href="https://docs.temporal.io/dataconversion#codec-server"
@@ -183,7 +183,7 @@
       <!-- Custom Message and Link Section -->
       {#if showCustomSection}
         <div class="space-y-4">
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('codec-server.custom-section-description')}
           </p>
           <div class="space-y-4">
@@ -212,7 +212,7 @@
                 hintText={$errors.customLink?.[0]}
                 disabled={$submitting}
               />
-              <p class="text-sm text-secondary">
+              <p class="text-sm text-io-content-secondary">
                 {translate('codec-server.custom-link-description')}
               </p>
             </div>

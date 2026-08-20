@@ -455,7 +455,7 @@
             />
           {/each}
 
-          <hr class="border-subtle" />
+          <hr class="border-io-border-primary" />
 
           {#each [...linkList]
             .filter((item) => !item.hidden)
