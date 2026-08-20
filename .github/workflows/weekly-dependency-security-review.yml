@@ -27,8 +27,6 @@ on:
         default: main
         type: string
     secrets:
-      ANTHROPIC_API_KEY:
-        required: false
       SLACK_BOT_TOKEN:
         required: false
       TEMPORAL_CICD_APP_ID:
@@ -124,83 +122,37 @@ jobs:
           --go-mod server/go.mod
           --report weekly-dependency-remediation.json
 
-      - id: audited-base
-        name: Record the audited source revision
+      - id: manifest
+        name: Apply the authorized manifest remediation
         if: inputs.mode == 'apply'
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          if [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo 'ANTHROPIC_API_KEY is required in apply mode.' >&2
-            exit 1
-          fi
-          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "audit_sha256=$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
-          echo "remediation_sha256=$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          node .github/scripts/apply-weekly-dependency-remediation.mjs \
+            --audit weekly-dependency-security-audit.json \
+            --package-json package.json \
+            --lockfile pnpm-lock.yaml \
+            --go-mod server/go.mod \
+            --report weekly-dependency-remediation.json \
+            --apply
 
-      - name: Ask Claude to author the manifest remediation
-        if: inputs.mode == 'apply'
-        uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b # v1.0.183
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ github.token }}
-          show_full_output: false
-          display_report: false
-          prompt: |
-            You are preparing the smallest safe dependency-security remediation for this repository.
-
-            Read `weekly-dependency-security-audit.json`,
-            `weekly-dependency-remediation.json`, and the existing `package.json`.
-            Apply exactly the actions already authorized in
-            `weekly-dependency-remediation.json`. Do not address alerts classified as
-            manual or unsupported, and do not perform unrelated upgrades, configuration,
-            script, or formatting changes. If the plan has no actions, leave package.json
-            byte-for-byte unchanged.
-
-            You may edit only the existing `package.json`. Do not create files, edit the
-            lockfile, run commands, use the network, commit, push, comment, or open a pull
-            request. The trusted workflow will regenerate the lockfile, test the candidate,
-            attest it, and publish it through a separate credentialed job.
-          claude_args: |
-            --allowedTools "Read,Edit"
-            --disallowedTools "Bash,Write,WebFetch,WebSearch"
-            --max-turns 10
-
-      - id: claude-candidate
-        name: Reject out-of-scope Claude changes and record resolver evidence
-        if: inputs.mode == 'apply'
-        env:
-          AUDITED_BASE_SHA: ${{ steps.audited-base.outputs.sha }}
-          AUDIT_SHA256: ${{ steps.audited-base.outputs.audit_sha256 }}
-          REMEDIATION_SHA256: ${{ steps.audited-base.outputs.remediation_sha256 }}
-        run: |
-          test "$(git rev-parse HEAD)" = "$AUDITED_BASE_SHA"
-          git diff --cached --quiet
-
-          test -f weekly-dependency-security-audit.json
-          test -f weekly-dependency-remediation.json
-          test "$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)" = "$AUDIT_SHA256"
-          test "$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)" = "$REMEDIATION_SHA256"
-
-          unexpected_untracked="$(git ls-files --others --exclude-standard | grep -vE '^weekly-dependency-(security-audit|remediation)\.json$' || true)"
-          if [ -n "$unexpected_untracked" ]; then
-            echo "Claude created unexpected files:" >&2
-            echo "$unexpected_untracked" >&2
+          unexpected="$(git ls-files --others --exclude-standard | grep -vE '^weekly-dependency-(security-audit|remediation)\.json$' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "Unexpected new files:" >&2
+            echo "$unexpected" >&2
             exit 1
           fi
 
           unexpected="$(git diff --name-only | grep -vE '^package\.json$' || true)"
           if [ -n "$unexpected" ]; then
-            echo "Claude changed files outside package.json:" >&2
+            echo "The planner changed a file outside package.json:" >&2
             echo "$unexpected" >&2
             exit 1
           fi
-          git show "${AUDITED_BASE_SHA}:package.json" > "$RUNNER_TEMP/weekly-dependency-base-package.json"
-          node .github/scripts/validate-claude-dependency-remediation.mjs \
-            --base "$RUNNER_TEMP/weekly-dependency-base-package.json" \
-            --candidate package.json \
-            --report weekly-dependency-remediation.json \
-            --github-output "$GITHUB_OUTPUT"
+
+          if git diff --quiet -- package.json; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
 
       - id: go-candidate
         name: Apply the authorized Go module remediation
@@ -221,7 +173,7 @@ jobs:
           echo 'changed=true' >> "$GITHUB_OUTPUT"
 
       - name: Resolve the lockfile without lifecycle scripts
-        if: inputs.mode == 'apply' && steps.claude-candidate.outputs.changed == 'true'
+        if: inputs.mode == 'apply' && steps.manifest.outputs.changed == 'true'
         run: pnpm install --lockfile-only --ignore-scripts
         env:
           HUSKY: '0'
@@ -443,7 +395,7 @@ jobs:
             '.verification.verified == true
              and (.actions | type == "array" and length > 0)
              and ((.actions | map(select(.type != "go-module")) | length) == 0
-                  or (.applied == true and .resolver == "claude-code"))' \
+                  or (.applied == true and .resolver == "deterministic-planner"))' \
             candidate/weekly-dependency-remediation.json \
             > /dev/null
           jq empty candidate/package.json

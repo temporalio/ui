@@ -23,8 +23,6 @@ on:
       - .github/scripts/weekly-dependency-security-audit.test.mjs
       - .github/scripts/apply-weekly-dependency-remediation.mjs
       - .github/scripts/apply-weekly-dependency-remediation.test.mjs
-      - .github/scripts/validate-claude-dependency-remediation.mjs
-      - .github/scripts/validate-claude-dependency-remediation.test.mjs
       - .github/scripts/verify-weekly-dependency-remediation.mjs
       - .github/scripts/verify-weekly-dependency-remediation.test.mjs
       - .github/scripts/weekly-dependency-security-digest.mjs
@@ -52,8 +50,6 @@ jobs:
       notify: false
       publish: false
       source_ref: ${{ github.sha }}
-    secrets:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
   dependency-security:
     if: >-
