@@ -167,11 +167,11 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full border border-solid border-io-border-primary bg-io-surface-information;
+    @apply h-4 w-8 appearance-none rounded-full border border-solid border-io-border-primary bg-io-interactive-primary;
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply h-4 w-8 rounded-full border border-solid border-io-border-primary bg-io-surface-information shadow-none;
+    @apply h-4 w-8 rounded-full border border-solid border-io-border-primary bg-io-interactive-primary shadow-none;
   }
 
   input[type='range']:focus {
