@@ -9,7 +9,19 @@ export const definition = defineScenario({
     'A workflow calls SignalWithStartWorkflowExecution on the __temporal_system Nexus endpoint. Both of the resulting events carry a binary/protobuf workflowservice message. Without this branch the UI shows the raw Nexus transport; with it the UI decodes the payload and shows the operation, its target, and the link back to the caller. The operation\'s target is the "signal-handlers" catalog example, so the workflow it starts and signals is one the catalog already runs.',
   server: {
     source: 'auto',
-    requires: { serverCommit: '01aa279c462fd9e7efc8e0ba6bbc4554b51557dd' },
+    requires: {
+      // The commit that adds the operation, and the release line that carries
+      // it. The floor is stated because a fetched checkout has no history to
+      // derive it from.
+      serverCommit: '01aa279c462fd9e7efc8e0ba6bbc4554b51557dd',
+      minServerVersion: '1.32.0',
+      // A verified pair, and it has to stay a pair. The workspace puts both
+      // repositories in one dependency graph, they are not released in step,
+      // and go.temporal.io/api changes under both: these two agree on v1.63.0,
+      // while the current mains disagree and do not compile. Move both together.
+      serverRef: 'a31f476255b2c7c00176f683cdce84710daaba44',
+      cliRef: '590d3a7ac8cff31673bca69e969427a34f321f7b',
+    },
     dynamicConfig: {
       'history.enableChasm': true,
       'history.enableSignalWithStartFromWorkflow': true,

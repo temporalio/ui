@@ -155,32 +155,43 @@ one. Nothing is built, so it is much faster.
 `temporalio/temporal` checkout into the CLI's dev server through a Go workspace
 held in `.feature-demo/`.
 
-Where those checkouts live belongs to your machine, not to a definition, so a
-definition does not name them. Set them once:
-
-```bash
-cp .env.feature-demo.local.example .env.feature-demo.local
-# then edit the two paths
-```
+The two checkouts are fetched, not configured. A blobless shallow fetch of one
+commit costs about a second, so the build uses `temporalio/temporal` and
+`temporalio/cli` at the refs a definition names, both `main` by default:
 
 ```
-TEMPORAL_SERVER_REPO=/path/to/temporalio/temporal
-TEMPORAL_CLI_REPO=/path/to/temporalio/cli
+· Fetching Temporal CLI at main
+· Fetching Temporal server at main
 ```
 
-Real environment variables win over that file, which is gitignored. The paths
-are read only when a build is actually needed, so a demo whose feature is in a
-release never asks for them, and a definition that does need one fails with the
-two variables to set. **Neither repository is modified**: no `replace`
-directive is added and no `go.work` file is written inside either tree. Whatever
-each repo has checked out is what gets compiled, and the resolved commits are
-recorded in the summary.
+They land in `.feature-demo/checkouts/`, which means the demo needs no
+configuration, it does not compile whatever you happen to have open, and it
+cannot pick up a `replace` directive from your own tree.
 
-This is what replaces `make start` in the server repo. It buys three things
-`make start` cannot give you: the dynamic config arrives as command-line flags
-instead of an edit to `config/dynamicconfig/development-sql.yaml`, the `default`
-namespace and the search attributes are registered for you, and the run is
-reproducible from the JSON file alone.
+**The two refs are a pair, and they have to move together.** The workspace puts
+both modules in one dependency graph, so Go resolves `go.temporal.io/api` to the
+highest requirement across the two, and both trees then have to compile against
+that one version. The repositories are not released in step, so an arbitrary pair
+fails, including the current `main` of each: today the CLI wants v1.63.4 and the
+server wants v1.63.5, and each removes something the other uses. The pair this
+scenario names agrees on v1.63.0.
+
+To move them, find a CLI commit and a server commit that name the same
+`go.temporal.io/api`, and change both refs at once. The build reports the pair it
+used when it fails.
+
+`requires.serverCommit` is a floor, not a build target. It gives the release line
+the feature needs, and the fetched server is checked to contain it:
+
+```
+.../checkouts/temporal_server_repo-main is at a31f4762, which does not contain
+01aa279c4. That commit adds the feature this scenario shows.
+```
+
+To build your own working tree instead, which is what developing the feature
+wants, point `TEMPORAL_SERVER_REPO` or `TEMPORAL_CLI_REPO` at it. An explicit
+path wins over a fetch, and only then are uncommitted changes part of the build
+cache key.
 
 ## `worker`
 

@@ -122,15 +122,24 @@ export const planServerStrategy = (
   const short = requirement.serverCommit.slice(0, 9);
 
   if (!commit?.knownLocally) {
+    // A stated floor needs no git history, so it is preferred over a build.
+    if (requirement.minServerVersion) {
+      reasons.push(
+        `Commit ${short} adds the feature, and the definition states that Server ${requirement.minServerVersion} or later has it.`,
+      );
+
+      return {
+        minServerVersion: requirement.minServerVersion,
+        mustBuildLocally: false,
+        reasons,
+      };
+    }
+
     reasons.push(
-      `Commit ${short} could not be resolved in a server checkout, so its release line is unknown. Configure TEMPORAL_SERVER_REPO, fetch the commit, or set minServerVersion.`,
+      `Commit ${short} could not be resolved in a server checkout and the definition states no minServerVersion, so its release line is unknown.`,
     );
 
-    return {
-      minServerVersion: requirement.minServerVersion,
-      mustBuildLocally: true,
-      reasons,
-    };
+    return { mustBuildLocally: true, reasons };
   }
 
   if (!commit.onMain) {

@@ -32,6 +32,14 @@ const serverSchema = z
     requires: z
       .object({
         serverCommit: z.string().optional(),
+        /**
+         * Refs to build the dev server from. Both default to main, because the
+         * two repositories share one dependency graph in the workspace and a
+         * pair from different times does not compile. serverCommit is a floor,
+         * not a build target: the fetched server is checked to contain it.
+         */
+        serverRef: z.string().default('main'),
+        cliRef: z.string().default('main'),
         minServerVersion: z.string().optional(),
       })
       .prefault({}),

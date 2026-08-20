@@ -156,86 +156,195 @@ const downloadCli = async (version: string, log: Logger): Promise<string> => {
  * Where the Temporal checkouts live on this machine. A definition may name them,
  * but normally the environment does, so a definition stays portable.
  */
-const repoPath = (
-  fromDefinition: string | undefined,
-  variable: string,
-  label: string,
-): string => {
-  const configured = fromDefinition ?? process.env[variable];
+const CHECKOUT_DIR = join(WORK_DIR, 'checkouts');
 
-  if (!configured) {
+const REPOS = {
+  server: {
+    url: 'https://github.com/temporalio/temporal.git',
+    label: 'Temporal server',
+    variable: 'TEMPORAL_SERVER_REPO',
+  },
+  cli: {
+    url: 'https://github.com/temporalio/cli.git',
+    label: 'Temporal CLI',
+    variable: 'TEMPORAL_CLI_REPO',
+  },
+} as const;
+
+type RepoSource = {
+  path: string;
+  ref: string;
+  sha: string;
+  /** A checkout this tool owns is clean, so its commit identifies it fully. */
+  key: string;
+  provenance: string;
+};
+
+/**
+ * Fetches one commit rather than cloning a repository. GitHub serves a blobless
+ * shallow fetch of any reachable commit, so this costs seconds instead of the
+ * whole history, and the checkout belongs to this tool rather than to whatever a
+ * person happens to have open.
+ */
+const ensureCheckout = async (
+  repo: (typeof REPOS)[keyof typeof REPOS],
+  ref: string,
+  log: Logger,
+): Promise<RepoSource> => {
+  const path = join(CHECKOUT_DIR, `${repo.variable.toLowerCase()}-${ref}`);
+  const head = async () =>
+    (await $`git -C ${path} rev-parse HEAD`.quiet().nothrow()).stdout.trim();
+
+  const pinned = /^[0-9a-f]{7,40}$/.test(ref);
+  const current = existsSync(join(path, '.git')) ? await head() : '';
+
+  // A pinned commit cannot move, so an existing checkout of it is reusable. A
+  // branch can move, so it is fetched again.
+  if (!current || !pinned) {
+    log(`Fetching ${repo.label} at ${ref}`);
+
+    await mkdir(path, { recursive: true });
+    await $`git -C ${path} init -q`.quiet().nothrow();
+    await $`git -C ${path} remote add origin ${repo.url}`.quiet().nothrow();
+
+    const fetched =
+      await $`git -C ${path} fetch --depth 1 --filter=blob:none origin ${ref}`
+        .quiet()
+        .nothrow();
+
+    if (fetched.exitCode !== 0) {
+      throw new Error(
+        [
+          `Could not fetch ${ref} from ${repo.url}.`,
+          `Set ${repo.variable} to a local checkout instead, or check the ref.`,
+          fetched.stderr.trim(),
+        ].join('\n'),
+      );
+    }
+
+    await $`git -C ${path} checkout -q --force FETCH_HEAD`.quiet().nothrow();
+  }
+
+  const sha = await head();
+
+  return {
+    path,
+    ref,
+    sha,
+    key: sha,
+    provenance: `${repo.label}: ${repo.url} @ ${ref} (${sha.slice(0, 9)}), fetched into ${path}`,
+  };
+};
+
+/** A checkout somebody is working in, which may carry uncommitted changes. */
+const useLocalRepo = async (
+  repo: (typeof REPOS)[keyof typeof REPOS],
+  path: string,
+): Promise<RepoSource> => {
+  const expanded = expandPath(path);
+
+  if (!existsSync(join(expanded, 'go.mod'))) {
+    throw new Error(`${expanded} is not a Go module checkout.`);
+  }
+
+  const described = await gitDescribe(expanded);
+  const uncommitted = described.changedGoFiles
+    ? `, ${described.changedGoFiles} uncommitted Go file(s)`
+    : '';
+
+  return {
+    path: expanded,
+    ref: described.ref,
+    sha: described.sha,
+    key: `${described.sha}-${described.fingerprint}`,
+    provenance: `${repo.label}: ${expanded} @ ${described.ref} (${described.sha}${uncommitted})`,
+  };
+};
+
+/**
+ * A pinned checkout by default, so the demo needs no configuration and does not
+ * compile whatever a person has open. An explicit path wins, because somebody
+ * developing the feature wants their own working tree.
+ */
+const resolveRepo = async (
+  repo: (typeof REPOS)[keyof typeof REPOS],
+  fromDefinition: string | undefined,
+  ref: string | undefined,
+  log: Logger,
+): Promise<RepoSource> => {
+  const local = fromDefinition ?? process.env[repo.variable];
+
+  if (local) return useLocalRepo(repo, local);
+
+  if (!ref) {
     throw new Error(
       [
-        `This definition needs a local build of the Temporal server, but no ${label} checkout is configured.`,
-        `Set ${variable}, or put it in .env.feature-demo.local, which is gitignored:`,
-        '',
-        '  TEMPORAL_SERVER_REPO=/path/to/temporalio/temporal',
-        '  TEMPORAL_CLI_REPO=/path/to/temporalio/cli',
+        `A build of the ${repo.label} needs a ref to fetch, and this definition gives none.`,
+        repo.variable === 'TEMPORAL_SERVER_REPO'
+          ? 'Set requires.serverCommit in the definition, or point TEMPORAL_SERVER_REPO at a checkout.'
+          : `Set requires.cliRef in the definition, or point ${repo.variable} at a checkout.`,
       ].join('\n'),
     );
   }
 
-  return expandPath(configured);
+  return ensureCheckout(repo, ref, log);
 };
 
 const buildWorkspaceCli = async (
   server: ServerDefinition,
   log: Logger,
 ): Promise<{ binary: string; provenance: string[] }> => {
-  const cliRepo = repoPath(server.cliRepo, 'TEMPORAL_CLI_REPO', 'Temporal CLI');
-  const serverRepo = repoPath(
-    server.serverRepo,
-    'TEMPORAL_SERVER_REPO',
-    'Temporal server',
-  );
+  const [cli, temporal] = await Promise.all([
+    resolveRepo(REPOS.cli, server.cliRepo, server.requires.cliRef, log),
+    resolveRepo(
+      REPOS.server,
+      server.serverRepo,
+      server.serverRef ?? server.requires.serverRef,
+      log,
+    ),
+  ]);
 
-  for (const repo of [cliRepo, serverRepo]) {
-    if (!existsSync(join(repo, 'go.mod'))) {
-      throw new Error(`${repo} is not a Go module checkout.`);
+  const required = server.requires.serverCommit;
+
+  const shallow =
+    (
+      await $`git -C ${temporal.path} rev-parse --is-shallow-repository`
+        .quiet()
+        .nothrow()
+    ).stdout.trim() === 'true';
+
+  // A fetched checkout has one commit, so ancestry cannot be computed from it.
+  // The version floor covers that case, checked against the built binary.
+  if (required && !shallow) {
+    const contains =
+      await $`git -C ${temporal.path} merge-base --is-ancestor ${required} HEAD`
+        .quiet()
+        .nothrow();
+
+    if (contains.exitCode !== 0) {
+      throw new Error(
+        [
+          `${temporal.path} is at ${temporal.sha.slice(0, 9)}, which does not contain ${required.slice(0, 9)}.`,
+          'That commit adds the feature this scenario shows. Fetch a ref that has it,',
+          'or set requires.serverRef to one.',
+        ].join('\n'),
+      );
     }
   }
 
-  const cli = await gitDescribe(cliRepo);
-  const local = await gitDescribe(serverRepo);
-
-  if (
-    server.serverRef &&
-    server.serverRef !== local.ref &&
-    server.serverRef !== local.sha
-  ) {
-    throw new Error(
-      [
-        `This definition needs ${serverRepo} on "${server.serverRef}", but it is on "${local.ref}" (${local.sha}).`,
-        `Check it out first:  git -C ${serverRepo} checkout ${server.serverRef}`,
-      ].join('\n'),
-    );
-  }
-
-  const binary = join(
-    BIN_DIR,
-    `temporal-workspace-${cli.sha}-${local.sha}-${cli.fingerprint}-${local.fingerprint}`,
-  );
+  const binary = join(BIN_DIR, `temporal-workspace-${cli.key}-${temporal.key}`);
   const goWork = join(WORK_DIR, 'go.work');
 
   await mkdir(BIN_DIR, { recursive: true });
   await writeFile(
     goWork,
-    `go 1.26.4
-
-use (
-	${cliRepo}
-	${serverRepo}
-)
-`,
+    `go 1.26.4\n\nuse (\n\t${cli.path}\n\t${temporal.path}\n)\n`,
   );
 
-  const uncommitted = (count: number) =>
-    count ? `, ${count} uncommitted Go file(s)` : '';
-
   const provenance = [
-    `CLI repo: ${cliRepo} @ ${cli.ref} (${cli.sha}${uncommitted(cli.changedGoFiles)})`,
-    `Server repo: ${serverRepo} @ ${local.ref} (${local.sha}${uncommitted(local.changedGoFiles)})`,
-    `Go workspace: ${goWork} (neither repo modified)`,
+    cli.provenance,
+    temporal.provenance,
+    `Go workspace: ${goWork} (neither checkout modified)`,
   ];
 
   if (existsSync(binary)) {
@@ -243,17 +352,29 @@ use (
     return { binary, provenance };
   }
 
-  log('Building the CLI against the local server. This takes a few minutes.');
+  log('Building the CLI against that server. This takes a few minutes.');
 
   const build = $({
-    cwd: cliRepo,
+    cwd: cli.path,
     env: { ...process.env, GOWORK: goWork },
   })`go build -o ${binary} ./cmd/temporal`;
 
-  const { exitCode, stderr } = await build.nothrow();
+  const { exitCode, stderr, stdout } = await build.nothrow();
 
   if (exitCode !== 0) {
-    throw new Error(`The workspace build failed:\n${stderr}`);
+    // go reports compile errors on stdout as often as stderr.
+    throw new Error(
+      [
+        'The workspace build failed.',
+        'These two checkouts share one dependency graph, so they have to be a',
+        'compatible pair. Move requires.serverRef and requires.cliRef together.',
+        `${cli.provenance}`,
+        `${temporal.provenance}`,
+        '',
+        [stderr, stdout].filter(Boolean).join('\n').trim() ||
+          'The build produced no output.',
+      ].join('\n'),
+    );
   }
 
   return { binary, provenance };
