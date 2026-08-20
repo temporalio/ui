@@ -36,6 +36,8 @@ const optionsSchema = z.strictObject({
     .default('a signal delivered by the system Nexus endpoint'),
   workflowInput: z.array(z.unknown()).optional(),
   memo: z.record(z.string(), z.unknown()).default({}),
+  /** Defaults to the caller's workflow id. */
+  identity: z.string().optional(),
 });
 
 const run = async (

@@ -1,5 +1,5 @@
 import protoPkg from '@temporalio/proto';
-import { createNexusServiceClient } from '@temporalio/workflow';
+import { createNexusServiceClient, workflowInfo } from '@temporalio/workflow';
 import * as nexus from 'nexus-rpc';
 
 const { temporal } = protoPkg;
@@ -30,6 +30,8 @@ export type CallerInput = {
   signalInput: unknown;
   workflowInput: unknown[];
   memo: Record<string, unknown>;
+  /** Defaults to this workflow's id. The UI shows it on the initiated event. */
+  identity?: string;
 };
 
 /**
@@ -70,6 +72,10 @@ export async function SystemNexusSignalWithStartCaller(
       workflowType: { name: input.targetWorkflowType },
       taskQueue: { name: input.targetTaskQueue },
       signalName: input.signalName,
+      // Nothing populates this for us: the server records the request as the
+      // caller sent it, and no SDK sets identity on this path yet. The UI shows
+      // it when present, so the caller names itself.
+      identity: input.identity ?? workflowInfo().workflowId,
       signalInput: { payloads: [jsonPayload(input.signalInput)] },
       input: { payloads: input.workflowInput.map(jsonPayload) },
       ...(Object.keys(input.memo).length

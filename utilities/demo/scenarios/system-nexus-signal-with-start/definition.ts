@@ -35,7 +35,7 @@ export const definition = defineScenario({
   preview: {
     notes: [
       'Open the caller workflow\'s History tab. The two Nexus rows must read "Signal With Start Workflow Execution Initiated" and "\u2026 Delivered", not "Nexus Operation Scheduled" and "Nexus Operation Completed".',
-      "Expand the Initiated row. It must show the target workflow ID, the signal name, and the caller's identity, and it must not show the endpoint, service, operation, or requestId transport fields.",
+      "Expand the Initiated row. It must show the target workflow ID, the signal name, and the caller's identity, and it must not show the endpoint, service, operation, or requestId transport fields. The server records the request as the caller sent it, so identity appears because the caller sets it; a 'control' row appears only for a caller that sets that field.",
       'Follow the target execution link from the Initiated row. It must land on the target workflow.',
       "Open the target workflow's History tab. Its Workflow Execution Signaled row must carry a link back to the caller.",
       "Switch the caller's history to Compact. The collapsed group row must read the operation label, not the raw Nexus event name.",
