@@ -135,10 +135,8 @@ jobs:
       TEMPORAL_CICD_APP_ID: ${{ secrets.TEMPORAL_CICD_APP_ID }}
       TEMPORAL_CICD_PRIVATE_KEY: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
 
-  # Waits for the dependency reply so the thread always reads in the same order.
-  # The dependency module is the critical path already, so this costs seconds.
   vln-review:
-    needs: [resolve-inputs, start-thread, dependency-security]
+    needs: [resolve-inputs, start-thread]
     if: always() && needs.resolve-inputs.result == 'success'
     uses: ./.github/workflows/weekly-vln-review.yml
     with:
@@ -150,7 +148,7 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
   external-contributor-review:
-    needs: [resolve-inputs, start-thread, dependency-security]
+    needs: [resolve-inputs, start-thread]
     if: always() && needs.resolve-inputs.result == 'success'
     uses: ./.github/workflows/weekly-external-contributor-review.yml
     with:
