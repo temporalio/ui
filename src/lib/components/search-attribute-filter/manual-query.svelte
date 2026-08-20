@@ -7,6 +7,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconSearch } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import type { SearchAttributes } from '$lib/types/workflows';
@@ -77,7 +78,7 @@
       label={translate('workflows.search-placeholder')}
       labelHidden
       placeholder={translate('workflows.search-placeholder')}
-      icon="search"
+      Icon={IconSearch}
       class="grow  [&_*]:border-0"
       inputContainerClass="!border-r border-io-border-primary bg-io-surface-information text-io-content-primary"
       clearable

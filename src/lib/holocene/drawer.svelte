@@ -7,6 +7,7 @@
 
   import { clickoutside } from '$lib/holocene/outside-click';
   import { portal } from '$lib/holocene/portal/portal-action';
+  import { IconClose } from '$lib/io/icon';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
@@ -78,7 +79,7 @@
           data-testid="drawer-close-button"
           label={closeButtonLabel}
           class="text-io-content-primary"
-          icon="close"
+          Icon={IconClose}
           aria-expanded={open}
           aria-controls="navigation-drawer"
           onclick={onClick}

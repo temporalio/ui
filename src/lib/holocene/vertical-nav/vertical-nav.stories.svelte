@@ -2,6 +2,19 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
+  import {
+    IconBuildings,
+    IconChevronRight,
+    IconDownload,
+    IconExternalLink,
+    IconInfo,
+    IconLink,
+    IconLock,
+    IconSearch,
+    IconTag,
+    IconTerminal,
+  } from '$lib/io/icon';
+
   import VerticalNavItem from './vertical-nav-item.svelte';
   import VerticalNav from './vertical-nav.svelte';
 
@@ -25,34 +38,34 @@
         id="overview"
         href="#overview"
         label="Overview"
-        leadingIcon="office-buildings"
+        LeadingIcon={IconBuildings}
       />
       <VerticalNavItem
         id="security"
         href="#security"
         label="Security"
-        leadingIcon="lock"
+        LeadingIcon={IconLock}
         description="Manage deletion protection"
       />
       <VerticalNavItem
         id="tags"
         href="#tags"
         label="Tags"
-        leadingIcon="tag"
+        LeadingIcon={IconTag}
         description="Namespace metadata"
       />
       <VerticalNavItem
         id="connectivity"
         href="#connectivity"
         label="Connectivity"
-        leadingIcon="link"
+        LeadingIcon={IconLink}
         description="Private link configuration"
       />
       <VerticalNavItem
         id="search-attributes"
         href="#search-attributes"
         label="Search Attributes"
-        leadingIcon="search"
+        LeadingIcon={IconSearch}
         description="Custom search fields"
       />
     </VerticalNav>
@@ -70,20 +83,20 @@
         id="overview"
         href="#overview"
         label="Overview"
-        leadingIcon="office-buildings"
+        LeadingIcon={IconBuildings}
       />
       <VerticalNavItem
         id="security"
         href="#security"
         label="Security"
-        leadingIcon="lock"
+        LeadingIcon={IconLock}
         description="Manage deletion protection"
       />
       <VerticalNavItem
         id="tags"
         href="#tags"
         label="Tags (Coming Soon)"
-        leadingIcon="tag"
+        LeadingIcon={IconTag}
         description="Namespace metadata"
         disabled={true}
       />
@@ -91,7 +104,7 @@
         id="connectivity"
         href="#connectivity"
         label="Connectivity (Coming Soon)"
-        leadingIcon="link"
+        LeadingIcon={IconLink}
         description="Private link configuration"
         disabled={true}
       />
@@ -106,14 +119,14 @@
         id="overview"
         href="#overview"
         label="Overview"
-        leadingIcon="office-buildings"
+        LeadingIcon={IconBuildings}
         onclick={() => (activeItemId = 'overview')}
       />
       <VerticalNavItem
         id="security"
         href="#security"
         label="Security"
-        leadingIcon="lock"
+        LeadingIcon={IconLock}
         description="Manage deletion protection"
         onclick={() => (activeItemId = 'security')}
       />
@@ -121,7 +134,7 @@
         id="tags"
         href="#tags"
         label="Tags"
-        leadingIcon="tag"
+        LeadingIcon={IconTag}
         description="Namespace metadata"
         onclick={() => (activeItemId = 'tags')}
       />
@@ -129,7 +142,7 @@
         id="connectivity"
         href="#connectivity"
         label="Connectivity"
-        leadingIcon="link"
+        LeadingIcon={IconLink}
         description="Private link configuration"
         onclick={() => (activeItemId = 'connectivity')}
       />
@@ -137,7 +150,7 @@
         id="search-attributes"
         href="#search-attributes"
         label="Search Attributes"
-        leadingIcon="search"
+        LeadingIcon={IconSearch}
         description="Custom search fields"
         onclick={() => (activeItemId = 'search-attributes')}
       />
@@ -145,7 +158,7 @@
         id="codec-server"
         href="#codec-server"
         label="Codec Server"
-        leadingIcon="terminal"
+        LeadingIcon={IconTerminal}
         description="Data encryption settings"
         onclick={() => (activeItemId = 'codec-server')}
       />
@@ -153,7 +166,7 @@
         id="export"
         href="#export"
         label="Export"
-        leadingIcon="download"
+        LeadingIcon={IconDownload}
         description="Data export configuration"
         onclick={() => (activeItemId = 'export')}
       />
@@ -171,23 +184,23 @@
         id="overview"
         href="#overview"
         label="Overview"
-        leadingIcon="office-buildings"
-        trailingIcon="chevron-right"
+        LeadingIcon={IconBuildings}
+        TrailingIcon={IconChevronRight}
       />
       <VerticalNavItem
         id="security"
         href="#security"
         label="Security"
-        leadingIcon="lock"
-        trailingIcon="external-link"
+        LeadingIcon={IconLock}
+        TrailingIcon={IconExternalLink}
         description="Opens in new tab"
       />
       <VerticalNavItem
         id="tags"
         href="#tags"
         label="Tags"
-        leadingIcon="tag"
-        trailingIcon="info"
+        LeadingIcon={IconTag}
+        TrailingIcon={IconInfo}
         description="Learn more about tags"
       />
     </VerticalNav>
@@ -203,7 +216,7 @@
           id="overview"
           href="#overview"
           label="Overview"
-          leadingIcon="office-buildings"
+          LeadingIcon={IconBuildings}
           onclick={(e) => {
             e.preventDefault();
             activeItemId = 'overview';
@@ -213,7 +226,7 @@
           id="security"
           href="#security"
           label="Security"
-          leadingIcon="lock"
+          LeadingIcon={IconLock}
           description="Manage deletion protection"
           onclick={(e) => {
             e.preventDefault();
@@ -224,7 +237,7 @@
           id="tags"
           href="#tags"
           label="Tags"
-          leadingIcon="tag"
+          LeadingIcon={IconTag}
           description="Namespace metadata"
           onclick={(e) => {
             e.preventDefault();
@@ -235,7 +248,7 @@
           id="connectivity"
           href="#connectivity"
           label="Connectivity"
-          leadingIcon="link"
+          LeadingIcon={IconLink}
           description="Private link configuration"
           onclick={(e) => {
             e.preventDefault();
@@ -246,7 +259,7 @@
           id="search-attributes"
           href="#search-attributes"
           label="Search Attributes"
-          leadingIcon="search"
+          LeadingIcon={IconSearch}
           description="Custom search fields"
           onclick={(e) => {
             e.preventDefault();

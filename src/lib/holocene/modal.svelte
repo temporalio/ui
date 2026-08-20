@@ -5,6 +5,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
+  import { IconClose } from '$lib/io/icon';
 
   import IconButton from './icon-button.svelte';
 
@@ -115,7 +116,7 @@
   {#if !loading}
     <IconButton
       label={cancelText}
-      icon="close"
+      Icon={IconClose}
       class="float-right m-4"
       onclick={closeModal}
     />

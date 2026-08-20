@@ -5,6 +5,11 @@
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconTranscoderError,
+    IconTranscoderOff,
+    IconTranscoderOn,
+  } from '$lib/io/icon';
   import { dataEncoder } from '$lib/stores/data-encoder';
 
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
@@ -29,16 +34,16 @@
     return base;
   });
 
-  const icon = $derived.by(() => {
+  const Icon = $derived.by(() => {
     if ($dataEncoder?.endpoint) {
       if ($dataEncoder.hasError) {
-        return 'transcoder-error';
+        return IconTranscoderError;
       }
 
-      return 'transcoder-on';
+      return IconTranscoderOn;
     }
 
-    return 'transcoder-off';
+    return IconTranscoderOff;
   });
 
   const onCodecServerClick = () => {
@@ -70,7 +75,7 @@
       label={translate('data-encoder.codec-server')}
       data-testid={testId}
       class="border border-transparent pl-4"
-      {icon}
+      {Icon}
     />
     {@render children?.()}
   </div>

@@ -13,8 +13,8 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
   import type { Failure } from '$lib/types';
   import {
     formatAttemptsLeft,
@@ -64,7 +64,7 @@
   >
   <DetailListValue>
     <Badge type={badgeType} class="flex items-center gap-2">
-      <Icon name="retry" class={failed ? 'text-io-content-danger' : ''} />
+      <IconRetry class={failed ? 'text-io-content-danger' : ''} />
       <span>{attempt} of {formatMaximumAttempts(maximumAttempts)}</span>
     </Badge>
 

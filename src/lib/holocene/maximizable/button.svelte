@@ -1,8 +1,8 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconArrowExpand, IconArrowMinimize } from '$lib/io/icon';
 
   interface Props {
     maximized: boolean;
@@ -18,7 +18,7 @@
   const maximizeText = translate('common.maximize');
 
   const iconTitle = $derived(maximized ? minimizeText : maximizeText);
-  const svgName = $derived(maximized ? 'minimize' : 'expand');
+  const Glyph = $derived(maximized ? IconArrowMinimize : IconArrowExpand);
 </script>
 
 <button
@@ -28,5 +28,5 @@
   )}
   {onclick}
 >
-  <Icon title={iconTitle} name={svgName} />
+  <Glyph title={iconTitle} />
 </button>

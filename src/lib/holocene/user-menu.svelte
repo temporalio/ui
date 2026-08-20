@@ -7,10 +7,10 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
+  import { IconAstronaut, IconLogout } from '$lib/io/icon';
   import { authUser } from '$lib/stores/auth-user';
   import ziggy from '$lib/vendor/ziggy-full-face.png';
 
-  import Icon from './icon/icon.svelte';
   import MenuDivider from './menu/menu-divider.svelte';
 
   interface Props {
@@ -63,13 +63,13 @@
     {#if $authUser.accessToken}
       <MenuItem hoverable={false}>
         <div class="flex items-center justify-start gap-4">
-          <Icon name="astronaut" />
+          <IconAstronaut />
           <p>{$authUser?.email}</p>
         </div>
       </MenuItem>
       <MenuItem onclick={logout}>
         <div class="flex items-center justify-start gap-4">
-          <Icon name="logout" />
+          <IconLogout />
           {translate('common.log-out')}
         </div>
       </MenuItem>

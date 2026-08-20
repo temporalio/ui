@@ -4,7 +4,7 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { IconCheckmark, IconHyphen } from '$lib/io/icon';
 
   import Label from './label.svelte';
 
@@ -78,12 +78,8 @@
     onChange?.({ checked: isChecked, value });
   };
 
-  const checkIconName = $derived(
-    indeterminate
-      ? ('hyphen' as const)
-      : displayChecked
-        ? ('checkmark' as const)
-        : null,
+  const CheckIcon = $derived(
+    indeterminate ? IconHyphen : displayChecked ? IconCheckmark : null,
   );
 
   const errorId = $derived(`${id}-error`);
@@ -184,12 +180,8 @@
           'border-io-border-danger peer-checked:border-io-border-danger peer-indeterminate:border-io-border-danger peer-focus-visible:ring-2 peer-focus-visible:ring-io-border-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-io-background-primary',
       )}
     >
-      {#if checkIconName}
-        <Icon
-          class="absolute left-0 top-0 h-4 w-4"
-          name={checkIconName}
-          strokeWidth={3}
-        />
+      {#if CheckIcon}
+        <CheckIcon class="absolute left-0 top-0 h-4 w-4" />
       {/if}
     </span>
 

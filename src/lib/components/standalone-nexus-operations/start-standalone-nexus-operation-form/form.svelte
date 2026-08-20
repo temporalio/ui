@@ -17,6 +17,7 @@
   import Link from '$lib/holocene/link.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClose, IconRetry } from '$lib/io/icon';
   import {
     encodings,
     type PayloadInputEncoding,
@@ -367,7 +368,7 @@
                 class="ml-2.5"
                 variant="secondary"
                 onclick={generateRandomId}
-                leadingIcon="retry"
+                LeadingIcon={IconRetry}
                 >{translate(
                   'standalone-nexus-operations.form-random-uuid',
                 )}</Button
@@ -588,7 +589,7 @@
             <Button
               type="button"
               variant="ghost"
-              leadingIcon="close"
+              LeadingIcon={IconClose}
               onclick={() => removeNexusHeader(index)}
             />
           </div>

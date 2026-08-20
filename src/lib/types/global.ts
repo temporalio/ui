@@ -1,4 +1,4 @@
-import type { IconName } from '$lib/holocene/icon';
+import type { IconComponent } from '$lib/io/icon';
 
 export type NamespaceListItem = {
   namespace: string;
@@ -149,8 +149,9 @@ export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
 export type NavLinkItem = {
   href: string;
-  icon: IconName;
+  Icon: IconComponent;
   label: string;
+  testId?: string;
   tooltip?: string;
   external?: boolean;
   enabled?: boolean;

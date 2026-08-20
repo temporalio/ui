@@ -4,9 +4,11 @@
   import type { ComponentProps } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
 
   import { shouldNotBeTransparent } from './test-utilities';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Button',
@@ -36,18 +38,20 @@
         name: 'Count',
         control: { type: 'number', min: 0, max: 99, step: 1 },
       },
-      leadingIcon: {
+      LeadingIcon: {
         name: 'Leading Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
         table: {
           category: 'Icon',
         },
       },
-      trailingIcon: {
+      TrailingIcon: {
         name: 'Trailing Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
         table: {
           category: 'Icon',
         },
@@ -136,11 +140,15 @@
 
 <Story name="With Count" args={{ count: 5 }} {template} />
 
-<Story name="With Leading Icon" args={{ leadingIcon: 'workflow' }} {template} />
+<Story
+  name="With Leading Icon"
+  args={{ LeadingIcon: ioIcons.IconTemporalWorkflow }}
+  {template}
+/>
 
 <Story
   name="With Trailing Icon"
-  args={{ trailingIcon: 'workflow' }}
+  args={{ TrailingIcon: ioIcons.IconTemporalWorkflow }}
   {template}
 />
 
@@ -150,7 +158,7 @@
   {#snippet template(args)}
     <Button
       {...args}
-      leadingIcon="temporal-logo"
+      LeadingIcon={ioIcons.IconTemporal}
       {loading}
       onclick={() => {
         loading = true;
@@ -168,7 +176,7 @@
   {#snippet template(args)}
     <Button
       {...args}
-      trailingIcon="temporal-logo"
+      TrailingIcon={ioIcons.IconTemporal}
       {loading}
       onclick={() => {
         loading = true;
@@ -184,8 +192,8 @@
   {#snippet template(args)}
     <Button
       {...args}
-      trailingIcon="temporal-logo"
-      leadingIcon="temporal-logo"
+      TrailingIcon={ioIcons.IconTemporal}
+      LeadingIcon={ioIcons.IconTemporal}
       {loading}
       onclick={() => {
         loading = true;

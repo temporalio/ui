@@ -2,9 +2,9 @@
   import Timestamp from '$lib/components/timestamp.svelte';
   import AccordionGroup from '$lib/holocene/accordion/accordion-group.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconWarning } from '$lib/io/icon';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
   import type {
     WorkflowTaskFailedEvent,
@@ -35,11 +35,13 @@
   let timeoutType = $derived(
     isTimedOutTaskEvent(error) && error.attributes?.timeoutType,
   );
+
+  const CategoryGlyph = $derived(CategoryIcon[error.category].Icon);
 </script>
 
 {#if cause && cause !== 'ResetWorkflow'}
   <Alert
-    icon="warning"
+    Icon={IconWarning}
     intent="warning"
     title={translate(`typed-errors.${cause}.title`)}
   >
@@ -63,10 +65,7 @@
       >
         <div class="flex items-center gap-2">
           {error.id}
-          <Icon
-            name={CategoryIcon[error.category].name}
-            title={CategoryIcon[error.category].title}
-          />
+          <CategoryGlyph title={CategoryIcon[error.category].title} />
           <span class="font-semibold text-io-content-danger"
             >{spaceBetweenCapitalLetters(error?.name)}</span
           >

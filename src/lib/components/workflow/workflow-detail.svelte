@@ -1,10 +1,9 @@
 <script lang="ts">
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { type IconComponent } from '$lib/io/icon';
 
   type Props = {
     title?: string;
@@ -12,7 +11,7 @@
     copyable?: boolean;
     href?: string | null;
     textSize?: string;
-    icon?: IconName | undefined;
+    Icon?: IconComponent | undefined;
     tooltip?: string;
   };
 
@@ -22,7 +21,7 @@
     copyable = false,
     href = null,
     textSize = 'md',
-    icon = undefined,
+    Icon,
     tooltip = '',
   }: Props = $props();
 </script>
@@ -36,8 +35,8 @@
       visible
       container-class="gap-1 w-full"
     >
-      {#if icon}
-        <Icon name={icon} />
+      {#if Icon}
+        <Icon />
       {/if}
       {#if title}
         {title}
@@ -58,8 +57,8 @@
       {/if}
     </Copyable>
   {:else}
-    {#if icon}
-      <Icon name={icon} />
+    {#if Icon}
+      <Icon />
     {/if}
     {#if title}
       {title}

@@ -8,6 +8,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconSearch } from '$lib/io/icon';
   import NexusEmptyState from '$lib/pages/nexus-empty-state.svelte';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -63,7 +64,7 @@
     <Input
       id="endpoint-search"
       bind:value={search}
-      icon="search"
+      Icon={IconSearch}
       label={searchPlaceholder}
       labelHidden
       autoFocus

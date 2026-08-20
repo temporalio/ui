@@ -4,10 +4,9 @@
   import { cva } from 'class-variance-authority';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock, IconExclamationOctagon, IconSpinner } from '$lib/io/icon';
   import { getStatusLabel, type Status } from '$lib/utilities/get-status-label';
 
   import HeartBeat from './heart-beat-indicator.svelte';
@@ -103,7 +102,7 @@
       )}
     >
       {#if loading}
-        <Spinner class="h-4 w-4 animate-spin" />
+        <IconSpinner class="animate-spin" />
       {:else if count !== undefined && count >= 0}
         {count.toLocaleString()}
       {/if}
@@ -124,7 +123,7 @@
           big && 'h-8 px-2',
         )}
       >
-        <Icon name="clock" class={merge(!big && 'px-0.5')} />
+        <IconClock class={merge(!big && 'px-0.5')} />
       </span>
     {/if}
     {#if taskFailure}
@@ -137,7 +136,7 @@
           big && 'h-8 px-2',
         )}
       >
-        <Icon name="exclamation-octagon" class={merge(!big && 'px-0.5')} />
+        <IconExclamationOctagon class={merge(!big && 'px-0.5')} />
       </span>
     {/if}
 

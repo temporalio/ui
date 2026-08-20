@@ -5,11 +5,13 @@
   import type { ComponentProps } from 'svelte';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
 
   import Button from '../button.svelte';
 
   import AsyncTest from './async-test.svelte';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   type ComboboxArgs = Omit<
     Partial<ComponentProps<typeof Combobox>>,
@@ -38,7 +40,7 @@
       valid: true,
       error: '',
       hintText: '',
-      leadingIcon: 'search',
+      LeadingIcon: ioIcons.IconSearch,
       labelHidden: false,
     },
     argTypes: {
@@ -54,10 +56,11 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       minSize: { name: 'Minimum Size', control: 'number' },
       maxSize: { name: 'Maximum Size', control: 'number' },
-      leadingIcon: {
-        name: 'Icon',
+      LeadingIcon: {
+        name: 'Leading Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
       },
       noResultsText: { name: 'No Results Text', control: 'text' },
       optionValueKey: { control: 'text', table: { disable: true } },
@@ -321,7 +324,7 @@
           id={context.id}
           data-testid={context.id}
           onchange={logAction('change')}
-          leadingIcon="search"
+          LeadingIcon={ioIcons.IconSearch}
           options={[
             'English',
             'English (UK)',
@@ -341,7 +344,7 @@
               onclick={() => {}}
               variant="ghost"
               size="xs"
-              leadingIcon="close"
+              LeadingIcon={ioIcons.IconClose}
               aria-label="clear"
             />
           {/snippet}

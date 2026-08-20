@@ -2,14 +2,13 @@
   import type { Snippet } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import { type IconComponent } from '$lib/io/icon';
 
   interface Props {
     label: string;
     menuLabel: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     id: string;
     disabled?: boolean;
     position?: 'left' | 'right';
@@ -24,7 +23,7 @@
   let {
     label,
     menuLabel,
-    icon,
+    Icon,
     id,
     disabled = false,
     position = 'left',
@@ -49,8 +48,8 @@
       data-track-text={label}
       {onclick}
     >
-      {#if icon}
-        <Icon name={icon} />
+      {#if Icon}
+        <Icon />
       {/if}
       {label}
     </Button>

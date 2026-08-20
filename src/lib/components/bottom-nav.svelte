@@ -8,9 +8,13 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconClose,
+    IconExternalLink,
+    IconNamespaceSwitcher,
+  } from '$lib/io/icon';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
@@ -188,7 +192,7 @@
       onclick={onLinksClick}
     >
       {#if viewLinks}
-        <Icon name="close" height={32} width={32} />
+        <IconClose height={32} width={32} />
       {:else}
         <Logo height={32} width={32} />
       {/if}
@@ -207,7 +211,7 @@
         <Button
           variant="ghost"
           data-testid="namespace-switcher"
-          leadingIcon="namespace-switcher"
+          LeadingIcon={IconNamespaceSwitcher}
           size="xs"
           class="grow text-io-content-white"
           onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
@@ -218,8 +222,9 @@
           size="xs"
           href={routeForNamespace({ namespace })}
           disabled={!namespaceExists}
-          ><Icon class="text-io-content-white" name="external-link" /></Button
         >
+          <IconExternalLink class="text-io-content-white" />
+        </Button>
       </div>
     {/if}
   {/if}
@@ -231,7 +236,7 @@
     onclick={onSettingsClick}
   >
     {#if viewSettings}
-      <Icon name="close" height={32} width={32} />
+      <IconClose height={32} width={32} />
     {:else}
       <div
         class="flex aspect-square w-[32px] min-w-[32px] items-center justify-center"

@@ -1,18 +1,14 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  import type { IconName } from '$lib/holocene/icon';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-
-  import Icon from '../icon/icon.svelte';
+  import type { IconComponent } from '$lib/io/icon';
 
   interface Props {
     onClick?: () => void;
     label: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     tooltip?: string;
-    animate?: boolean;
-    active?: boolean;
     disabled?: boolean;
     class?: string;
     'data-testid'?: string;
@@ -21,10 +17,8 @@
   let {
     onClick = () => {},
     label,
-    icon,
+    Icon,
     tooltip = label,
-    animate = false,
-    active = false,
     disabled = false,
     class: className = '',
     'data-testid': testId,
@@ -59,9 +53,9 @@
       className,
     )}
   >
-    {#if icon}
+    {#if Icon}
       <div class="flex h-6 w-6 items-center">
-        <Icon name={icon} {animate} {active} />
+        <Icon />
       </div>
     {/if}
     <div class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100">

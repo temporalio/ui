@@ -4,6 +4,7 @@
   import Drawer from '$lib/holocene/drawer.svelte';
   import Shortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconKeyboard } from '$lib/io/icon';
 
   type Props = {
     open?: boolean;
@@ -18,7 +19,7 @@
   <Button
     size="sm"
     variant="secondary"
-    leadingIcon="keyboard"
+    LeadingIcon={IconKeyboard}
     onclick={onOpen}
   />
 </div>

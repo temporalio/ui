@@ -6,9 +6,9 @@
   import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRelationship } from '$lib/io/icon';
   import {
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
@@ -114,7 +114,7 @@
                 : translate('workflows.show-children')}
               topLeft
             >
-              <Icon name="relationship" class="scale-80" />
+              <IconRelationship />
             </Tooltip>
           </Button>
         {/if}

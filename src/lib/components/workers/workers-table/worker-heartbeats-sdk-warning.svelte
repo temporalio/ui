@@ -1,8 +1,8 @@
 <script lang="ts">
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconHeartbeat } from '$lib/io/icon';
   import { sdkInfo } from '$lib/stores/events';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
@@ -51,7 +51,7 @@
   aria-live="polite"
 >
   <span class="flex h-20 w-20 items-center justify-center rounded-full">
-    <Icon name="heartbeat" class="block h-full w-full text-blue-200" />
+    <IconHeartbeat class="block h-full w-full text-blue-200" />
   </span>
   <div class="text-center">
     <h5>{translate('workers.no-worker-heartbeats')}</h5>

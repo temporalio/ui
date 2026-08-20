@@ -1,8 +1,8 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconUpload } from '$lib/io/icon';
   import { toaster } from '$lib/stores/toaster';
 
   type Props = {
@@ -42,6 +42,6 @@
     className,
   )}
 >
-  <Icon name="upload" />
+  <IconUpload />
 </label>
 <input {id} class="hidden" type="file" {accept} onchange={onFileSelect} />

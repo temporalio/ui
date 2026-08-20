@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry, IconTemporalPersistence } from '$lib/io/icon';
   import {
     isExternallyStoredRawPayload,
     isParsedPayload,
@@ -39,7 +39,7 @@
         results[0].decodedValue.externalPayloads?.[0].sizeBytes ?? 0,
       )}
       <div class="flex flex-row items-center gap-2">
-        <Icon name="storage" />
+        <IconTemporalPersistence />
         {@render codeBlock(`${size} payload stored externally`)}
       </div>
     {:else if isParsedPayload(results[0]?.decodedValue)}
@@ -60,7 +60,7 @@
     )}
     <IconButton
       class="h-8 w-8"
-      icon="retry"
+      Icon={IconRetry}
       onclick={retry}
       label={translate('common.retry')}
     />

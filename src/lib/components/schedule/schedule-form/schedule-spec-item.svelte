@@ -6,6 +6,7 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTrash } from '$lib/io/icon';
 
   import { type FormScheduleSchema } from '../schema/form';
   import { getFormSpecInitialData } from '../utilities/get-form-spec-initial-data';
@@ -107,7 +108,7 @@
         <IconButton
           variant="ghost"
           size="sm"
-          icon="trash"
+          Icon={IconTrash}
           label={translate('common.delete')}
           class="mr-4 mt-[1.625rem] h-10"
           onclick={onRemove}
@@ -146,7 +147,7 @@
       <IconButton
         variant="ghost"
         size="sm"
-        icon="trash"
+        Icon={IconTrash}
         label={translate('common.delete')}
         onclick={(e) => {
           e.stopPropagation();

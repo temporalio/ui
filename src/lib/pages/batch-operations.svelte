@@ -3,6 +3,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconInfo } from '$lib/io/icon';
   import { listBatchOperations } from '$lib/services/batch-service';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 
@@ -19,7 +20,7 @@
 {:then { operations }}
   {#if $inProgressBatchOperation}
     <Alert
-      icon="info"
+      Icon={IconInfo}
       intent="info"
       title={translate('batch.max-concurrent-alert-title')}
     >

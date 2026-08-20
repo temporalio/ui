@@ -1,4 +1,5 @@
 <script lang="ts" module>
+  import { IconClose } from '$lib/io/icon';
   import { persistStore } from '$lib/stores/persist-store';
 
   export const dismissedWorkflowCommonErrors = persistStore<boolean>(
@@ -44,7 +45,7 @@
           aria-label={translate('workflows.dismiss-common-errors')}
           class="h-8 w-8 shrink-0 p-0"
           disableTracking={true}
-          leadingIcon="close"
+          LeadingIcon={IconClose}
           size="xs"
           variant="ghost"
           onclick={dismissCommonErrors}

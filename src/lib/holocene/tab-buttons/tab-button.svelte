@@ -9,14 +9,13 @@
 
   import { page } from '$app/state';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { type IconComponent } from '$lib/io/icon';
   import { getAppContext } from '$lib/utilities/get-context';
 
   import Tooltip from '../tooltip.svelte';
 
   type BaseProps = {
-    icon?: IconName;
+    Icon?: IconComponent;
     group?: boolean;
     active?: boolean;
     disabled?: boolean;
@@ -43,7 +42,7 @@
 
   let {
     class: className = '',
-    icon,
+    Icon,
     group = getAppContext('group'),
     href = '',
     base,
@@ -76,9 +75,9 @@
   {...rest}
 >
   <Tooltip hide={!tooltip} text={tooltip} top>
-    {#if icon}
+    {#if Icon}
       <div class="flex items-center gap-2">
-        <Icon name={icon} />
+        <Icon />
         {#if children}
           <span class="hidden md:block">{@render children()}</span>
         {/if}

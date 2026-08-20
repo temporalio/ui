@@ -1,10 +1,10 @@
 <script lang="ts">
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronRight } from '$lib/io/icon';
   import {
     deleteWorkerDeploymentVersion,
     removeRampingDeploymentVersion,
@@ -344,8 +344,7 @@
           onclick={() => (expanded = !expanded)}
           class="shrink-0"
         >
-          <Icon
-            name="chevron-right"
+          <IconChevronRight
             class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
           />
         </button>

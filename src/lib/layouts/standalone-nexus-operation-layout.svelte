@@ -10,6 +10,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { nexusOperationsSearchParams } from '$lib/stores/nexus-operations';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
@@ -89,7 +90,7 @@
     <Link
       href={nexusOperationsHref}
       data-testid="back-to-nexus-operations"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {translate('standalone-nexus-operations.back-to-nexus-operations')}
     </Link>

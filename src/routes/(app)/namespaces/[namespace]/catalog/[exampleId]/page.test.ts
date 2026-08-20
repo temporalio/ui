@@ -13,7 +13,7 @@ describe('/namespaces/[namespace]/catalog/[exampleId]', () => {
 
     expect(source).toContain("import Badge from '$lib/holocene/badge.svelte'");
     expect(source).toContain("import Link from '$lib/holocene/link.svelte'");
-    expect(source).toContain('leadingIcon="chevron-left"');
+    expect(source).toContain('LeadingIcon={IconChevronLeft}');
     expect(source).toContain('routeForCatalog({ namespace })');
     expect(source).toContain('resolveCatalogForNamespace(namespace)');
     expect(source).toContain('{descriptor.title}');

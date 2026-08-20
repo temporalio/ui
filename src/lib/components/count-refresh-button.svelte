@@ -6,6 +6,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
 
   interface Props {
     count: number;
@@ -21,7 +22,7 @@
 <Button
   size="xs"
   variant="ghost"
-  leadingIcon="retry"
+  LeadingIcon={IconRetry}
   onclick={() => {
     $refresh = Date.now();
     onRefresh?.();

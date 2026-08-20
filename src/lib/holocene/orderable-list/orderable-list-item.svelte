@@ -1,4 +1,11 @@
 <script lang="ts">
+  import {
+    IconAdd,
+    IconChevronDown,
+    IconChevronUp,
+    IconHyphen,
+  } from '$lib/io/icon';
+
   import IconButton from '../icon-button.svelte';
 
   type ExtendedDragEvent = DragEvent & {
@@ -103,14 +110,14 @@
       <div class="flex items-center">
         <IconButton
           disabled={index === 0}
-          icon="chevron-up"
+          Icon={IconChevronUp}
           data-testid="orderable-list-item-{label}-move-up-button"
           label={moveUpButtonLabel}
           onclick={() => onMoveItem?.({ from: index, to: index - 1 })}
         />
         <IconButton
           disabled={index === totalItems - 1}
-          icon="chevron-down"
+          Icon={IconChevronDown}
           data-testid="orderable-list-item-{label}-move-down-button"
           label={moveDownButtonLabel}
           onclick={() => onMoveItem?.({ from: index, to: index + 1 })}
@@ -122,14 +129,14 @@
   {#if !readonly}
     {#if isStatic}
       <IconButton
-        icon="add"
+        Icon={IconAdd}
         data-testid="orderable-list-item-{label}-add-button"
         label={addButtonLabel}
         onclick={() => onAddItem?.()}
       />
     {:else}
       <IconButton
-        icon="hyphen"
+        Icon={IconHyphen}
         data-testid="orderable-list-item-{label}-remove-button"
         label={removeButtonLabel}
         onclick={() => onRemoveItem?.()}

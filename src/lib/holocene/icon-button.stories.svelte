@@ -4,21 +4,23 @@
   import type { ComponentProps } from 'svelte';
 
   import IconButton from '$lib/holocene/icon-button.svelte';
+  import * as ioIcons from '$lib/io/icon';
 
-  import { iconNames } from './icon';
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Icon Button (Deprecated)',
     component: IconButton,
     args: {
-      icon: 'close',
+      Icon: ioIcons.IconClose,
       label: 'Click Me',
     },
     argTypes: {
       label: { control: 'text' },
-      icon: {
+      Icon: {
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
       },
     },
     render: template,

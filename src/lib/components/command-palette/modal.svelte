@@ -6,6 +6,7 @@
 
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClose } from '$lib/io/icon';
 
   interface Props extends HTMLAttributes<HTMLDialogElement> {
     content: Snippet;
@@ -76,7 +77,7 @@
   {#if !loading}
     <IconButton
       label={cancelText}
-      icon="close"
+      Icon={IconClose}
       class="float-right m-4"
       onclick={closeModal}
     />
