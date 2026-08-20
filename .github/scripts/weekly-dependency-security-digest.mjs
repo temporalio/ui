@@ -194,11 +194,19 @@ const unresolvedItems = ({ audit, remediation }) => {
           : Array.isArray(item.alertIds) && item.alertIds.length > 0
             ? item.alertIds.map((id) => `#${id}`).join(', ')
             : null;
+        // The name is escaped first, then wrapped. Backticks keep a scoped
+        // package name from rendering as a Slack mention, and the escape still
+        // stops the name itself from carrying formatting.
+        const code = name
+          ? `\`${escapeSlackMrkdwn(truncateText(String(name)))}\``
+          : null;
         const label = item.number
-          ? `${alertReference} ${name ?? 'alert'}`
-          : (name ?? alertReference ?? 'unidentified alert');
-        const reason = item.reason ? ` — ${item.reason}` : '';
-        return `• ${escapeSlackMrkdwn(truncateText(label))}${escapeSlackMrkdwn(truncateText(reason))}`;
+          ? `${alertReference} ${code ?? 'alert'}`
+          : (code ?? alertReference ?? 'unidentified alert');
+        const reason = item.reason
+          ? ` — ${escapeSlackMrkdwn(truncateText(item.reason))}`
+          : '';
+        return `• ${label}${reason}`;
       }),
       omittedCount: Math.max(unresolved.length - DEFAULT_UNRESOLVED_LIMIT, 0),
     };
@@ -354,6 +362,78 @@ const contextBlock = (mrkdwn) => ({
   elements: [{ type: 'mrkdwn', text: mrkdwn }],
 });
 
+const SEVERITY_ORDER = ['critical', 'high', 'medium', 'low'];
+const SEVERITY_MARK = {
+  critical: ':red_circle:',
+  high: ':red_circle:',
+  medium: ':large_orange_circle:',
+  low: ':large_yellow_circle:',
+};
+
+/** Alert number to its advisory page and severity, taken from the audit. */
+const alertIndex = (audit) => {
+  const index = new Map();
+  for (const alert of audit?.dependabot?.alerts ?? []) {
+    if (!Number.isInteger(alert.number)) continue;
+    index.set(alert.number, {
+      url:
+        alert.url ??
+        (audit.repository
+          ? `https://github.com/${audit.repository}/security/dependabot/${alert.number}`
+          : null),
+      severity: String(alert.severity ?? 'unknown').toLowerCase(),
+    });
+  }
+  return index;
+};
+
+/** Each alert number linked to its advisory page when the audit knows it. */
+const alertLinks = (alertIds, index) =>
+  (alertIds ?? [])
+    .map((id) => {
+      const url = index.get(id)?.url;
+      return url ? slackLink(url, String(id)) : String(id);
+    })
+    .join(', ');
+
+/** The worst severity across a set of alerts, with a count and a colour. */
+const severityBadge = (alertIds, index) => {
+  const severities = (alertIds ?? [])
+    .map((id) => index.get(id)?.severity)
+    .filter((value) => SEVERITY_ORDER.includes(value));
+  if (severities.length === 0) return null;
+  const worst = SEVERITY_ORDER.find((value) => severities.includes(value));
+  const count = severities.filter((value) => value === worst).length;
+  return `${SEVERITY_MARK[worst]} *${count} ${worst.toUpperCase()}*`;
+};
+
+/**
+ * The headline a reader sees first. A published change leads with READY and the
+ * number of alerts it closes. Anything else falls back to the plain line.
+ */
+const remediationHeadline = ({ audit, remediation, publishStatus }) => {
+  const line = remediationLine({ audit, remediation, publishStatus });
+  const result = remediation ?? audit.remediationResult;
+  const url = result?.pullRequestUrl;
+  if (publishStatus !== 'success' || !result?.applied || !url) return line;
+
+  const number = /\/pull\/(\d+)/.exec(url)?.[1];
+  if (!number) return line;
+  const closed = new Set(
+    (result.actions ?? []).flatMap((action) => action.alertIds ?? []),
+  ).size;
+  const alertText =
+    closed > 0 ? ` closes ${closed} alert${closed === 1 ? '' : 's'}` : '';
+  return `:white_check_mark: *READY*  ${slackLink(url, `#${number}`)}${alertText}`;
+};
+
+const fieldsBlock = (pairs) => ({
+  type: 'section',
+  fields: pairs
+    .flatMap(([label, value]) => [`*${label}*`, value])
+    .map((text) => ({ type: 'mrkdwn', text: truncateText(text, 2_000) })),
+});
+
 /** One line per authorized action, naming the range and the resolved version. */
 const changeLines = (result) => {
   const actions = Array.isArray(result?.actions) ? result.actions : [];
@@ -405,18 +485,59 @@ export const buildDependencySecurityReply = ({
   const result = remediation ?? audit.remediationResult;
   const blocks = [headerBlock('Dependency security')];
   blocks.push(
-    ...sectionBlocks(remediationLine({ audit, remediation, publishStatus })),
+    ...sectionBlocks(
+      remediationHeadline({ audit, remediation, publishStatus }),
+    ),
   );
 
-  const changes = changeLines(result);
-  if (changes.length > 0) blocks.push(...sectionBlocks(changes.join('\n')));
+  // One field grid per authorized action: what changed, what it resolves to,
+  // and every alert it closes, each linked to its advisory page.
+  const alerts = alertIndex(audit);
+  const actions = Array.isArray(result?.actions) ? result.actions : [];
+  const resolvedAfter = new Map();
+  for (const alert of result?.verification?.alerts ?? []) {
+    if (alert.packageName && alert.resolvedVersions?.length) {
+      resolvedAfter.set(alert.packageName, alert.resolvedVersions.join(', '));
+    }
+  }
+  for (const action of actions.slice(0, 3)) {
+    const range =
+      action.from && action.to
+        ? `\`${action.from}\` → \`${action.to}\``
+        : String(action.to ?? '');
+    const pairs = [
+      [
+        'Change',
+        `\`${escapeSlackMrkdwn(String(action.packageName))}\` ${range}`,
+      ],
+    ];
+    const after = resolvedAfter.get(action.packageName);
+    if (after) pairs.push(['Resolves to', `${after}, verified after install`]);
+    const links = alertLinks(action.alertIds, alerts);
+    if (links) pairs.push(['Alerts', links]);
+    blocks.push(fieldsBlock(pairs));
+  }
+  if (actions.length > 3) {
+    blocks.push(...sectionBlocks(`• …and ${actions.length - 3} more changes`));
+  }
+  if (actions.length === 0) {
+    const changes = changeLines(result);
+    if (changes.length > 0) blocks.push(...sectionBlocks(changes.join('\n')));
+  }
 
   const unresolved = unresolvedItems({ audit, remediation });
   if (unresolved.lines.length > 0) {
     blocks.push(dividerBlock());
-    blocks.push(
-      ...sectionBlocks(['*Needs a decision*', ...unresolved.lines].join('\n')),
-    );
+    const unresolvedAlertIds = (result?.classifications ?? [])
+      .filter((item) =>
+        ['manual', 'unsupported', 'alreadySafe'].includes(item.status),
+      )
+      .flatMap((item) => item.alertIds ?? []);
+    const badge = severityBadge(unresolvedAlertIds, alerts);
+    const heading = badge
+      ? `${badge}  *Needs a decision*`
+      : '*Needs a decision*';
+    blocks.push(...sectionBlocks([heading, ...unresolved.lines].join('\n')));
     if (unresolved.omittedCount > 0) {
       blocks.push(...sectionBlocks(omittedLine(unresolved.omittedCount, null)));
     }
@@ -467,15 +588,36 @@ export const buildExternalContributorReply = ({
   threadTs = null,
 }) => {
   const external = audit.externalContributors ?? {};
+  const groupHeading = (mark, label, pullRequests, totalCount) =>
+    `${mark} *${totalCount ?? pullRequests.length} ${label}*`;
   const sections = [
     [
-      '*Ready for review*',
+      groupHeading(
+        ':large_green_circle:',
+        'READY FOR REVIEW',
+        external.reviewReady ?? [],
+        external.reviewReadyCount,
+      ),
       external.reviewReady ?? [],
       external.reviewReadyCount,
     ],
-    ['*Needs triage*', external.triage ?? [], external.triageCount],
     [
-      '*Waiting on author*',
+      groupHeading(
+        ':large_orange_circle:',
+        'NEED TRIAGE',
+        external.triage ?? [],
+        external.triageCount,
+      ),
+      external.triage ?? [],
+      external.triageCount,
+    ],
+    [
+      groupHeading(
+        ':large_yellow_circle:',
+        'WAITING ON AUTHOR',
+        external.authorFollowup ?? [],
+        external.authorFollowupCount,
+      ),
       external.authorFollowup ?? [],
       external.authorFollowupCount,
     ],

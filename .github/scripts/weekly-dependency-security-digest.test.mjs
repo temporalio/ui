@@ -180,9 +180,9 @@ test('builds external contributor replies by action bucket with stale count', ()
     threadTs: '172345.000001',
   });
   assert.equal(reply.channel, 'C123');
-  assert.match(reply.text, /Ready for review/);
+  assert.match(reply.text, /READY FOR REVIEW/);
   assert.match(reply.text, /#14: Community fix/);
-  assert.match(reply.text, /Waiting on author/);
+  assert.match(reply.text, /WAITING ON AUTHOR/);
   assert.match(reply.text, /2 external PRs have not been updated in 14\+ days/);
 });
 
@@ -602,5 +602,177 @@ test('folds the omitted count into the group it belongs to', () => {
     (block) => block.type === 'section' && /more/.test(block.text.text),
   );
   assert.equal(withCount.length, 1);
-  assert.match(withCount[0].text.text, /Needs triage/);
+  assert.match(withCount[0].text.text, /NEED TRIAGE/);
+});
+
+const auditWithAlerts = {
+  repository: 'temporalio/ui',
+  run: { url: RUN },
+  dependabot: {
+    openAlertCount: 5,
+    alerts: [
+      {
+        number: 338,
+        severity: 'medium',
+        url: 'https://github.com/temporalio/ui/security/dependabot/338',
+        package: 'protobufjs',
+      },
+      {
+        number: 300,
+        severity: 'high',
+        url: 'https://github.com/temporalio/ui/security/dependabot/300',
+        package: 'protobufjs',
+      },
+      {
+        number: 299,
+        severity: 'medium',
+        url: 'https://github.com/temporalio/ui/security/dependabot/299',
+        package: 'protobufjs',
+      },
+      {
+        number: 295,
+        severity: 'high',
+        url: 'https://github.com/temporalio/ui/security/dependabot/295',
+        package: '@grpc/grpc-js',
+      },
+      {
+        number: 294,
+        severity: 'high',
+        url: 'https://github.com/temporalio/ui/security/dependabot/294',
+        package: '@grpc/grpc-js',
+      },
+    ],
+  },
+  remediation: null,
+  vln: { pending: [], needsTriage: [] },
+  externalContributors: {
+    reviewReady: [],
+    triage: [],
+    authorFollowup: [],
+    staleCount: 0,
+  },
+};
+
+const richRemediation = {
+  summary: { actions: 1, manual: 1, unsupported: 0, alreadySafe: 0 },
+  applied: true,
+  resolver: 'deterministic-planner',
+  pullRequestUrl: 'https://github.com/temporalio/ui/pull/3846',
+  actions: [
+    {
+      packageName: 'protobufjs',
+      alertIds: [338, 300, 299],
+      type: 'pnpm-override',
+      from: '^7.5.5',
+      to: '^7.6.5',
+    },
+  ],
+  classifications: [
+    {
+      packageName: '@grpc/grpc-js',
+      alertIds: [295, 294],
+      status: 'manual',
+      reason: 'no existing pnpm override',
+      resolvedVersions: ['1.14.3'],
+    },
+  ],
+  verification: {
+    verified: true,
+    alerts: [
+      { alertId: 338, packageName: 'protobufjs', resolvedVersions: ['7.6.5'] },
+    ],
+  },
+};
+
+const richReply = () =>
+  buildDependencySecurityReply({
+    audit: auditWithAlerts,
+    remediation: richRemediation,
+    publishStatus: 'success',
+    runUrl: RUN,
+  });
+
+test('links every alert number to its GitHub security page', () => {
+  const rendered = JSON.stringify(richReply().blocks);
+  for (const number of [338, 300, 299]) {
+    assert.ok(
+      rendered.includes(`security/dependabot/${number}|${number}`),
+      `alert ${number} is not linked to its advisory page`,
+    );
+  }
+});
+
+test('lays the change out as section fields', () => {
+  const withFields = richReply().blocks.filter((block) =>
+    Array.isArray(block.fields),
+  );
+  assert.equal(withFields.length, 1);
+  const fields = withFields[0].fields;
+  assert.ok(fields.length % 2 === 0);
+  assert.ok(fields.length <= 10);
+  const labels = fields
+    .filter((_, index) => index % 2 === 0)
+    .map((f) => f.text);
+  assert.deepEqual(labels, ['*Change*', '*Resolves to*', '*Alerts*']);
+  for (const field of fields) {
+    assert.equal(field.type, 'mrkdwn');
+    assert.ok(field.text.length <= 2_000);
+  }
+});
+
+test('leads a group with its highest severity and a count', () => {
+  const rendered = JSON.stringify(richReply().blocks);
+  assert.match(rendered, /2 HIGH/);
+  assert.match(rendered, /READY/);
+});
+
+test('renders a scoped package name as code, never as a mention', () => {
+  const reply = buildDependencySecurityReply({
+    audit: auditWithAlerts,
+    remediation: {
+      summary: { actions: 0, manual: 1, unsupported: 0, alreadySafe: 0 },
+      applied: false,
+      actions: [],
+      classifications: [
+        {
+          packageName: '@grpc/grpc-js',
+          alertIds: [295, 294],
+          status: 'manual',
+          reason: 'no existing pnpm override',
+        },
+      ],
+    },
+  });
+  const rendered = reply.blocks
+    .filter((block) => block.type === 'section')
+    .map((block) => block.text.text)
+    .join('\n');
+
+  assert.ok(rendered.includes('`@grpc/grpc-js`'));
+  // A zero-width space before the backtick would stop Slack rendering code.
+  assert.doesNotMatch(rendered, /\u200B`@grpc/);
+});
+
+test('still escapes formatting inside a package name', () => {
+  const reply = buildDependencySecurityReply({
+    audit: auditWithAlerts,
+    remediation: {
+      summary: { actions: 0, manual: 1, unsupported: 0, alreadySafe: 0 },
+      applied: false,
+      actions: [],
+      classifications: [
+        {
+          packageName: 'evil`*name*`',
+          alertIds: [295],
+          status: 'manual',
+          reason: 'check *this*',
+        },
+      ],
+    },
+  });
+  const rendered = reply.blocks
+    .filter((block) => block.type === 'section')
+    .map((block) => block.text.text)
+    .join('\n');
+  assert.match(rendered, /\u200B\*/);
 });
