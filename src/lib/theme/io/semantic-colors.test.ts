@@ -89,6 +89,7 @@ describe('semantic color opacity', () => {
     const compositingColors = [
       ...Object.values(semanticColors.border),
       ...Object.values(semanticColors.actions),
+      ...Object.values(semanticColors.overlay),
     ];
 
     for (const color of compositingColors) {

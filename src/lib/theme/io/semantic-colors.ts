@@ -84,6 +84,10 @@ type ActionColors = Readonly<{
   'brand-hover': SemanticColor;
 }>;
 
+type OverlayColors = Readonly<{
+  backdrop: SemanticColor;
+}>;
+
 type SemanticColors = Readonly<{
   background: BackgroundColors;
   content: ContentColors;
@@ -91,6 +95,7 @@ type SemanticColors = Readonly<{
   border: BorderColors;
   interactive: InteractiveColors;
   actions: ActionColors;
+  overlay: OverlayColors;
 }>;
 
 const backgroundPrimary: OpaqueSemanticColor = {
@@ -364,6 +369,12 @@ export const semanticColors: SemanticColors = {
     'brand-hover': {
       light: colorAlphaScales.indigo[30],
       dark: colorAlphaScales.indigo[30],
+    },
+  },
+  overlay: {
+    backdrop: {
+      light: colorAlphaScales.slate[20],
+      dark: colorAlphaScales.slate[20],
     },
   },
 };

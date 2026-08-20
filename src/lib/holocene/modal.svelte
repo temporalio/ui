@@ -172,15 +172,11 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto border border-secondary p-0 text-primary shadow-xl md:h-max;
+    @apply z-50 w-full max-w-lg overflow-y-auto border border-io-border-tertiary bg-io-background-primary p-0 text-io-content-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-black/50 transition-opacity duration-200;
-
-    :global([data-theme='dark']) & {
-      background-color: rgb(var(--color-surface-background) / 50%);
-    }
+    @apply cursor-pointer bg-io-overlay-backdrop backdrop-blur-[8px] transition-opacity duration-200;
   }
 
   .body.hightlightNav::backdrop {
@@ -192,7 +188,7 @@
   }
 
   .title {
-    @apply surface-primary px-8 pb-0 pt-8 text-2xl;
+    @apply bg-io-background-primary px-8 pb-0 pt-8 text-2xl text-io-content-primary;
   }
 
   .content {

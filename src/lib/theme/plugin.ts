@@ -40,6 +40,7 @@ const resolveSemanticColors = (mode: keyof SemanticColor) => ({
   ...resolveColorGroup('border', semanticColors.border, mode),
   ...resolveColorGroup('interactive', semanticColors.interactive, mode),
   ...resolveColorGroup('actions', semanticColors.actions, mode),
+  ...resolveColorGroup('overlay', semanticColors.overlay, mode),
 });
 
 const ioColors = {
@@ -54,6 +55,7 @@ const ioColors = {
   border: referenceColorGroup('border', semanticColors.border),
   interactive: referenceColorGroup('interactive', semanticColors.interactive),
   actions: referenceColorGroup('actions', semanticColors.actions),
+  overlay: referenceColorGroup('overlay', semanticColors.overlay),
 };
 
 const ioLight = resolveSemanticColors('light');
