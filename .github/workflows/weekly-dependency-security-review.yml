@@ -470,7 +470,22 @@ jobs:
             git push --force-with-lease origin "HEAD:refs/heads/${BRANCH}"
           fi
 
-          body="This draft is maintained by the weekly dependency-security review.\n\nClaude authored the package.json remediation from read-only Dependabot evidence. The trusted workflow regenerated pnpm-lock.yaml, rejected changes outside those two files, and passed the candidate through the full validation and hash-attestation boundary before this separate publishing job received write credentials. The workflow does not dismiss Dependabot alerts; merging this PR is the resolution path.\n\nWorkflow evidence: ${RUN_URL}"
+          body="$(cat <<EOF
+          The weekly dependency-security review maintains this draft.
+
+          A deterministic planner read the Dependabot evidence and wrote the dependency
+          change. No model authored any part of it. The trusted workflow then rebuilt
+          the lockfile, refused every change outside the approved dependency files,
+          proved that each remediated alert no longer matches its advisory range, and
+          attested the file hashes. This separate publishing job received the write
+          credential only after those checks passed.
+
+          The workflow does not dismiss a Dependabot alert. Merging this pull request
+          is the way an alert resolves.
+
+          Workflow evidence: ${RUN_URL}
+          EOF
+          )"
           pr_url="$(gh pr list --repo "$REPOSITORY" --head "$BRANCH" --base main --state open --json url --jq '.[0].url')"
           if [ -n "$pr_url" ]; then
             gh pr edit "$pr_url" --repo "$REPOSITORY" --title 'fix: weekly Dependabot security remediation' --body "$body"
