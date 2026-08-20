@@ -9,6 +9,7 @@
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
+  import PendingActivityState from '$lib/components/standalone-activities/pending-activity-state.svelte';
   import WorkflowCallback from '$lib/components/workflow/workflow-callback.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
@@ -22,7 +23,6 @@
   } from '$lib/utilities/format-event-attributes';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
-  import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
@@ -103,13 +103,11 @@
               <DetailListLabel
                 >{translate('standalone-activities.run-state')}</DetailListLabel
               >
-              <DetailListTextValue
-                text={fromScreamingEnum(
-                  $activityExecution.info.runState ??
-                    'PENDING_ACTIVITY_STATE_UNSPECIFIED',
-                  '',
-                )}
-              />
+              <DetailListValue>
+                <PendingActivityState
+                  state={$activityExecution.info.runState}
+                />
+              </DetailListValue>
               {@render activityExecutionAttemptsBadge(
                 $activityExecution.info.attempt ?? 0,
                 $activityExecution.info.retryPolicy?.maximumAttempts ?? null,
