@@ -321,7 +321,7 @@
             </svg>
           {/if}
           <span
-            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-current"
+            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-io-surface-primary px-1.5 text-current"
           >
             {#if pendingActivity}
               {translate('workflows.attempt')}

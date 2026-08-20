@@ -62,7 +62,7 @@
 
 {#snippet marker(centerX: number, centerY: number)}
   <div
-    class="absolute bg-primary"
+    class="absolute bg-io-surface-primary"
     style:left="{centerX - HIT_HALF_WIDTH}px"
     style:top="{centerY - RADIUS}px"
     style:width="{HIT_WIDTH}px"
@@ -75,7 +75,11 @@
     style:width="{iconSize}px"
     style:height="{iconSize}px"
   >
-    <IconCollapse class="text-secondary" width={iconSize} height={iconSize} />
+    <IconCollapse
+      class="text-io-content-secondary"
+      width={iconSize}
+      height={iconSize}
+    />
   </div>
 {/snippet}
 
@@ -124,7 +128,7 @@
     {@render marker(labelX, ROW_HEIGHT)}
     {@render marker(labelX, timelineHeight)}
     <div
-      class="pointer-events-none absolute origin-left rotate-45 whitespace-nowrap text-[10px] leading-none text-secondary"
+      class="pointer-events-none absolute origin-left rotate-45 whitespace-nowrap text-[10px] leading-none text-io-content-secondary"
       style:left="{labelX}px"
       style:top="{labelY}px"
     >
