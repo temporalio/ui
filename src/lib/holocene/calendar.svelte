@@ -79,16 +79,16 @@
   }
 
   .selected {
-    @apply bg-interactive text-off-white;
+    @apply bg-io-interactive-primary text-io-content-white;
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-interactive/50 text-primary;
+    @apply cursor-not-allowed bg-interactive/50 text-io-content-primary;
   }
 
   .highlight {
     &:not(.disabled) {
-      @apply hover:scale-125 hover:cursor-pointer hover:bg-interactive-hover hover:text-off-white;
+      @apply hover:scale-125 hover:cursor-pointer hover:bg-io-interactive-primary-hover hover:text-io-content-white;
 
       transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
     }

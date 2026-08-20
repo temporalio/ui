@@ -91,15 +91,15 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex items-center justify-center rounded-t border border-b-0 border-subtle/0 px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
+    @apply flex items-center justify-center rounded-t border border-b-0 border-transparent px-4 py-2 text-sm leading-4 text-io-content-primary focus-visible:outline-none;
 
     &:not(.disabled) {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-2 focus-visible:ring-primary/70;
+      @apply hover:bg-io-actions-hover-overlay focus-visible:bg-io-actions-hover-overlay focus-visible:ring-2 focus-visible:ring-io-interactive-primary;
     }
   }
 
   .toggle-button.active {
-    @apply surface-primary border-subtle/100;
+    @apply border-io-border-brand bg-io-background-primary text-io-content-brand;
   }
 
   .toggle-button.disabled {

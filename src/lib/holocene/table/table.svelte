@@ -53,10 +53,10 @@
 
 <style lang="postcss">
   .holocene-table {
-    @apply surface-primary table-auto;
+    @apply table-auto bg-io-background-primary text-io-content-primary;
 
     &.bordered {
-      @apply border border-subtle;
+      @apply border border-io-border-primary;
     }
 
     &.layout-auto {
@@ -88,13 +88,13 @@
     }
 
     :global(tr > th) {
-      @apply h-9 border-b border-subtle px-2 text-left text-sm font-medium;
+      @apply h-9 border-b border-io-border-primary px-2 text-left text-sm font-medium;
     }
   }
 
   :where(.holocene-table-body) {
     :global(tr) {
-      @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-b border-io-border-primary last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
     :global(tr.expanded) {
@@ -110,11 +110,11 @@
     }
 
     :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
+      @apply hover:text-io-content-brand hover:underline hover:decoration-io-content-brand;
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-8 border-b border-io-border-primary last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
   }
 </style>

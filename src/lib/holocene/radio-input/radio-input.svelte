@@ -40,7 +40,7 @@
       <input
         bind:group={$group}
         type="radio"
-        class="surface-primary"
+        class="bg-io-interactive-secondary"
         aria-describedby={description ? `${id}-description` : null}
         data-track-name="radio-input"
         data-track-intent="select"
@@ -65,36 +65,41 @@
 
 <style lang="postcss">
   .description {
-    @apply ml-7 text-sm font-normal text-primary;
+    @apply ml-7 text-sm font-normal text-io-content-primary;
   }
 
   input[type='radio'] {
-    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-secondary outline-none;
+    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-io-border-tertiary outline-none;
 
     &:checked {
-      @apply bg-interactive;
+      @apply border-io-interactive-primary bg-io-interactive-primary;
     }
 
     &:enabled {
-      &:focus-visible,
-      &:hover {
-        @apply bg-interactive-active ring-2 ring-primary/70;
+      &:focus-visible {
+        @apply ring-2 ring-io-interactive-primary ring-offset-2 ring-offset-io-background-primary;
+      }
 
-        &:checked {
-          &:not(:active) {
-            @apply shadow-none;
-          }
-        }
+      &:hover:not(:checked) {
+        @apply border-io-border-brand bg-io-actions-hover-overlay;
+      }
 
-        &:not(:active) {
-          @apply border-inverse;
-        }
+      &:active:not(:checked) {
+        @apply bg-io-actions-press-overlay;
+      }
+
+      &:checked:hover:not(:active) {
+        @apply border-io-interactive-primary-hover bg-io-interactive-primary-hover shadow-none;
+      }
+
+      &:checked:active {
+        @apply border-io-interactive-primary-press bg-io-interactive-primary-press;
       }
     }
 
     &:checked,
     &:active {
-      @apply shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
+      @apply shadow-[inset_0_0_0_1px] shadow-io-content-inverse-primary;
     }
 
     &:disabled {

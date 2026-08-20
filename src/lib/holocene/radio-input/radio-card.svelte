@@ -52,7 +52,7 @@
   <div
     class={merge(
       'flex items-start gap-3 border p-4',
-      'border-subtle',
+      'border-io-border-primary',
       labelContainerClass,
       disabled && 'opacity-50',
     )}
@@ -67,7 +67,7 @@
       <input
         bind:group={$group}
         type="radio"
-        class="radio-card-input surface-primary mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border border-secondary"
+        class="radio-card-input mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border border-io-border-tertiary bg-io-interactive-secondary"
         {name}
         {value}
         {id}
@@ -79,7 +79,7 @@
           {@render labelBadge?.()}
         </div>
         {#if description}
-          <p class="text-sm text-secondary">{description}</p>
+          <p class="text-sm text-io-content-secondary">{description}</p>
         {/if}
       </div>
     </label>
@@ -91,7 +91,9 @@
   </div>
 
   {#if selected && children}
-    <div class="surface-background border border-t-0 border-subtle p-5">
+    <div
+      class="border border-t-0 border-io-border-primary bg-io-background-primary p-5 text-io-content-primary"
+    >
       {@render children()}
     </div>
   {/if}
@@ -102,17 +104,28 @@
     @apply box-border cursor-pointer outline-none;
 
     &:checked {
-      @apply bg-interactive shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
+      @apply border-io-interactive-primary bg-io-interactive-primary shadow-[inset_0_0_0_1px] shadow-io-content-inverse-primary;
     }
 
     &:enabled {
-      &:focus-visible,
-      &:hover {
-        @apply bg-interactive-active ring-2 ring-primary/70;
+      &:focus-visible {
+        @apply ring-2 ring-io-interactive-primary ring-offset-2 ring-offset-io-background-primary;
+      }
 
-        &:not(:active) {
-          @apply border-inverse;
-        }
+      &:hover:not(:checked) {
+        @apply border-io-border-brand bg-io-actions-hover-overlay;
+      }
+
+      &:active:not(:checked) {
+        @apply bg-io-actions-press-overlay;
+      }
+
+      &:checked:hover {
+        @apply border-io-interactive-primary-hover bg-io-interactive-primary-hover;
+      }
+
+      &:checked:active {
+        @apply border-io-interactive-primary-press bg-io-interactive-primary-press;
       }
     }
 
