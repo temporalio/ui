@@ -43,6 +43,6 @@
   });
 </script>
 
-<div class={twMerge('border border-subtle p-8', className)}>
+<div class={twMerge('border border-io-border-primary p-8', className)}>
   <p class={twJoin('font-mono text-xs', isEmpty && 'italic')}>{preview}.</p>
 </div>

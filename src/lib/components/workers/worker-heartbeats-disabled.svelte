@@ -26,7 +26,7 @@
       <h5>
         {translate('workers.worker-heartbeats-disabled')}
       </h5>
-      <p class="text-secondary">
+      <p class="text-io-content-secondary">
         {translate('workers.worker-heartbeats-enablement')}
       </p>
     </div>

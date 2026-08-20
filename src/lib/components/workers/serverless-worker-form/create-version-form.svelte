@@ -95,7 +95,7 @@
       <h3 class="text-base font-medium">
         {translate('workers.configuration-section')}
       </h3>
-      <p class="mb-4 text-sm text-secondary">
+      <p class="mb-4 text-sm text-io-content-secondary">
         {translate('workers.version-configuration-description')}
       </p>
       <Input
@@ -115,7 +115,7 @@
       <h3 class="text-base font-medium">
         {translate('workers.compute-section')}
       </h3>
-      <p class="mb-4 text-sm text-secondary">
+      <p class="mb-4 text-sm text-io-content-secondary">
         {translate('workers.compute-description')}
       </p>
       <ComputeProviderPicker

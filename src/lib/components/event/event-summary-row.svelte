@@ -416,10 +416,10 @@
 
 <style lang="postcss">
   tr[data-testid='event-summary-row'].active {
-    @apply surface-table-related-hover;
+    @apply bg-io-interactive-secondary-hover text-io-content-primary;
   }
 
   tr[data-testid='event-summary-row'].active:hover {
-    @apply surface-table-header;
+    @apply bg-io-surface-table-header;
   }
 </style>

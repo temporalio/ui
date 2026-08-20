@@ -13,7 +13,7 @@
   size="sm"
   leadingIcon="feedback"
   variant="ghost"
-  class="text-brand shadow-md"
+  class="text-io-content-brand shadow-md"
   {href}
   target="_blank"
   data-testid="give-feedback"

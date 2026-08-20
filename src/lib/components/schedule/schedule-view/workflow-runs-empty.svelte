@@ -38,7 +38,7 @@
       leadingIcon="play"
       onclick={openTriggerConfirmationModal}
       variant="ghost"
-      class="border border-subtle"
+      class="border border-io-border-primary"
     >
       {translate('schedules.trigger-now')}
     </Button>
@@ -47,7 +47,7 @@
       leadingIcon="retry"
       onclick={openBackfillConfirmationModal}
       variant="ghost"
-      class="border border-subtle"
+      class="border border-io-border-primary"
     >
       {translate('schedules.backfill-schedule')}
     </Button>

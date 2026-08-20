@@ -58,7 +58,7 @@
     {#if currentSdk}
       {@const { href, sdk, version } = currentSdk}
       {#if !minimumVersionRequired(version, $sdkInfo.version)}
-        <p class="flex flex-row gap-1 text-secondary">
+        <p class="flex flex-row gap-1 text-io-content-secondary">
           {translate('workers.worker-heartbeats-sdk-link-preface')}
           <Link newTab {href}>
             <SdkLogo {sdk} {version} hideDocsLink />
@@ -67,7 +67,7 @@
         </p>
       {/if}
     {:else}
-      <p class="text-secondary">
+      <p class="text-io-content-secondary">
         {translate('workers.worker-heartbeats-sdk-list-preface')}
       </p>
       <div

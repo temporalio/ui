@@ -27,7 +27,7 @@
 
 {#snippet pill()}
   <div
-    class="inline-flex min-w-24 items-center justify-center gap-2 border border-subtle px-1"
+    class="inline-flex min-w-24 items-center justify-center gap-2 border border-io-border-primary px-1"
   >
     {#if config}
       <Icon name={config.icon} />

@@ -36,7 +36,7 @@
   {#snippet titleSnippet()}
     <h3>
       {translate('deployments.validate-connection-for')}
-      <span class="font-mono text-secondary">{buildId}</span>
+      <span class="font-mono text-io-content-secondary">{buildId}</span>
     </h3>
   {/snippet}
   {#snippet footer()}
@@ -54,9 +54,11 @@
       {#if loading}
         <div class="flex items-center gap-2">
           <div
-            class="h-5 w-5 shrink-0 animate-pulse rounded-full bg-subtle"
+            class="h-5 w-5 shrink-0 animate-pulse rounded-full bg-io-surface-tertiary"
           ></div>
-          <div class="h-5 w-40 animate-pulse rounded bg-subtle"></div>
+          <div
+            class="h-5 w-40 animate-pulse rounded bg-io-surface-tertiary"
+          ></div>
         </div>
       {:else if result}
         <div class="flex items-start gap-2">
@@ -77,7 +79,7 @@
                 : translate('deployments.validate-connection-invalid')}
             </p>
             {#if result.message}
-              <p class="text-xs text-secondary">{result.message}</p>
+              <p class="text-xs text-io-content-secondary">{result.message}</p>
             {/if}
           </div>
         </div>

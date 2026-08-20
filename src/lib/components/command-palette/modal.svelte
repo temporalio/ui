@@ -95,7 +95,7 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full overflow-y-auto rounded-sm border border-secondary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
+    @apply z-50 w-full overflow-y-auto rounded-sm border border-io-border-secondary bg-io-surface-primary p-0 text-io-content-primary shadow-xl md:h-max lg:max-w-4xl;
   }
 
   .body::backdrop {
@@ -107,7 +107,7 @@
   }
 
   .title {
-    @apply surface-primary px-8 pb-0 pt-8 text-2xl;
+    @apply bg-io-surface-primary px-8 pb-0 pt-8 text-2xl text-io-content-primary;
   }
 
   .content {

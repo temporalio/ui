@@ -46,11 +46,11 @@
 
 <div class="w-full">
   <button
-    class="relative flex w-full select-none border-subtle {isActive &&
-      'surface-interactive'} {isCurrent &&
+    class="relative flex w-full select-none border-io-border-primary {isActive &&
+      'bg-io-interactive-primary text-io-content-white hover:bg-io-interactive-primary-hover focus-visible:bg-io-interactive-primary-hover active:bg-io-interactive-primary-press'} {isCurrent &&
       !isActive &&
-      'surface-subtle'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
-      'hover:surface-interactive-secondary'}"
+      'bg-io-surface-tertiary text-io-content-primary'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
+      'hover:bg-io-actions-hover-overlay'}"
     class:border-l={!isRootWorkflow && !isActive}
     onclick={(e) => {
       e.stopPropagation();
@@ -59,7 +59,7 @@
   >
     {#if !isRootWorkflow && !isActive}
       <div
-        class="absolute left-0 top-[25%] h-[1px] w-3 bg-subtle lg:top-[50%] lg:w-6"
+        class="absolute left-0 top-[25%] h-[1px] w-3 bg-io-border-primary lg:top-[50%] lg:w-6"
       ></div>
     {/if}
     <div class="flex w-full items-center gap-3 pr-2 text-sm">

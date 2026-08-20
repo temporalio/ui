@@ -139,12 +139,12 @@
   }
 </script>
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-io-border-primary" />
 
 <h2 class="text-base font-medium">
   {translate('workers.resource-section')}
 </h2>
-<p class="mb-4 text-sm text-secondary">
+<p class="mb-4 text-sm text-io-content-secondary">
   {translate('workers.resource-section-description')}
 </p>
 
@@ -223,12 +223,12 @@
   </div>
 {/if}
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-io-border-primary" />
 
 <h2 class="text-base font-medium">
   {translate('workers.access-section')}
 </h2>
-<p class="mb-4 text-sm text-secondary">
+<p class="mb-4 text-sm text-io-content-secondary">
   {translate('workers.access-section-description')}
 </p>
 
@@ -261,7 +261,9 @@
       bind:open={showRoleHelp}
       class="[&_h3]:text-sm"
     >
-      <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+      <div
+        class="-mt-8 flex flex-col gap-3 border-t border-io-border-primary pt-3"
+      >
         <ToggleButtons>
           <ToggleButton
             active={activeRoleHelpTab === 'cloudformation'}
@@ -277,7 +279,7 @@
           </ToggleButton>
         </ToggleButtons>
         {#if activeRoleHelpTab === 'cloudformation'}
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('workers.launch-stack-description')}
           </p>
           <div class="flex flex-wrap items-center gap-4">
@@ -295,7 +297,7 @@
             </Button>
           </div>
         {:else}
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('workers.terraform-description-before')}<Link
               href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/aws/lambda"
               newTab>{translate('workers.terraform-iam-module-link')}</Link
@@ -334,8 +336,10 @@
         bind:open={showCloudRunHelp}
         class="[&_h3]:text-sm"
       >
-        <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
-          <p class="text-sm text-secondary">
+        <div
+          class="-mt-8 flex flex-col gap-3 border-t border-io-border-primary pt-3"
+        >
+          <p class="text-sm text-io-content-secondary">
             {translate('workers.cloud-run-terraform-description-before')}<Link
               href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
               newTab
@@ -356,7 +360,7 @@
             copyIconTitle={translate('workers.copy-snippet')}
             copySuccessIconTitle={translate('workers.copied')}
           />
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('workers.cloud-run-invoker-handoff')}
           </p>
         </div>
@@ -365,14 +369,14 @@
   </div>
 {/if}
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-io-border-primary" />
 
 <div class="flex flex-wrap items-center justify-between gap-4">
   <div>
     <h2 class="text-base font-medium">
       {translate('workers.scaling-lifecycle-section')}
     </h2>
-    <p class="text-sm text-secondary">
+    <p class="text-sm text-io-content-secondary">
       {translate('workers.scaling-lifecycle-description')}
     </p>
   </div>

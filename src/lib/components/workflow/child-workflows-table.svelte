@@ -79,7 +79,7 @@
           <td class="max-lg:hidden">
             {child.type}
           </td>
-          <td class="hover:text-blue-700 hover:underline">
+          <td class="hover:text-io-content-brand hover:underline">
             <Link
               href={routeForWorkflow({
                 namespace: child.namespace,
@@ -90,7 +90,7 @@
               {child.workflowId}
             </Link>
           </td>
-          <td class="hover:text-blue-700 hover:underline">
+          <td class="hover:text-io-content-brand hover:underline">
             <Link
               href={routeForWorkflow({
                 namespace: child.namespace,

@@ -116,8 +116,13 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton size="xs" controls={controlsId} hasIndicator class="bg-secondary">
-    {attribute} =<span class="pl-1 text-brand"
+  <MenuButton
+    size="xs"
+    controls={controlsId}
+    hasIndicator
+    class="bg-io-surface-secondary"
+  >
+    {attribute} =<span class="pl-1 text-io-content-brand"
       >{filters.map((f) => f.value).join(', ')}</span
     >
   </MenuButton>

@@ -30,7 +30,7 @@
       <th scope="col">{translate('workflows.parent-run-id')}</th>
     </TableHeaderRow>
   {/snippet}
-  <TableRow class="hover:text-blue-700 hover:underline">
+  <TableRow class="hover:text-io-content-brand hover:underline">
     <td>
       <Link
         href={routeForWorkflow({

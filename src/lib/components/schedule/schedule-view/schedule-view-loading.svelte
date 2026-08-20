@@ -36,7 +36,7 @@
   </div>
 
   <dl class="flex flex-col gap-2">
-    <dt class="text-sm font-medium text-secondary">
+    <dt class="text-sm font-medium text-io-content-secondary">
       {translate('workflows.total-workflows')}
     </dt>
     <dd class="flex flex-wrap items-center gap-2">

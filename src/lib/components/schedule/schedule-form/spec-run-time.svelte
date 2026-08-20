@@ -55,7 +55,7 @@
   <legend class="contents font-medium"
     >{translate('schedules.run-time-heading')}</legend
   >
-  <p class="text-sm text-secondary">
+  <p class="text-sm text-io-content-secondary">
     {translate('schedules.run-time-description', {
       timezoneName: $form.timezoneName ?? 'UTC',
     })}
@@ -99,7 +99,7 @@
   </div>
   <div class="flex gap-2 text-xs">
     <Icon name="clock" class="inline-block" />
-    <p class="text-secondary">
+    <p class="text-io-content-secondary">
       {translate('schedules.run-time-based-on-timezone', {
         timezoneName: $form.timezoneName,
       })}

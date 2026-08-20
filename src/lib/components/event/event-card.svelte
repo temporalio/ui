@@ -80,7 +80,7 @@
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class="flex flex-1 cursor-default flex-col gap-2 border-b border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
 >
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center gap-2 text-base">
@@ -129,7 +129,7 @@
 
 {#snippet eventLink(view: EventLinkDisplay)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-io-content-secondary">
       {view.label}
     </p>
     <Copyable
@@ -181,7 +181,7 @@
 
 {#snippet eventSummary(value: RawPayload)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">Summary</p>
+    <p class="min-w-56 text-sm text-io-content-secondary">Summary</p>
     <PayloadSummary
       class="whitespace-pre-line"
       {value}
@@ -194,7 +194,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
-    <p class="mb-1 min-w-56 text-sm text-secondary/80">
+    <p class="mb-1 min-w-56 text-sm text-io-content-secondary">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -227,7 +227,7 @@
   </div>
   {#if stackTrace}
     <div>
-      <p class="mb-1 min-w-56 text-sm text-secondary/80">
+      <p class="mb-1 min-w-56 text-sm text-io-content-secondary">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock
@@ -245,7 +245,7 @@
 
 {#snippet link(key: string, value: string | number)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-io-content-secondary">
       {format(key)}
     </p>
     <Copyable
@@ -265,7 +265,7 @@
 
 {#snippet details(key: string, value: string | number)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-io-content-secondary">
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">

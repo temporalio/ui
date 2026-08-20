@@ -17,7 +17,7 @@
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class="flex flex-1 cursor-default flex-col gap-2 border-b border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
 >
   <div class="flex-1">
     <div class="flex flex-wrap items-center space-x-3">
@@ -96,7 +96,7 @@
       {/if}
       {#if operation.blockedReason}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="text-sm text-io-content-secondary">
             {translate('nexus.blocked-reason')}
           </p>
           <CodeBlock
@@ -110,7 +110,7 @@
       {/if}
       {#if Object.keys(operation.cancellationInfo ?? {}).length > 0}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="text-sm text-io-content-secondary">
             {translate('nexus.cancellation-info')}
           </p>
           <CodeBlock
@@ -128,7 +128,7 @@
 
 {#snippet nextRetry(timeDifference: string)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-io-content-secondary">
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
@@ -140,7 +140,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-io-content-secondary">
       {label}
     </p>
     <p class="w-full whitespace-pre-line">
@@ -167,7 +167,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if operation.lastAttemptFailure}
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm text-io-content-secondary">
           {translate('workflows.last-failure')}
         </p>
         <CodeBlock
@@ -183,7 +183,7 @@
     </div>
     <div class="flex flex-1 flex-col">
       {#if operation.lastAttemptFailure?.stackTrace}
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm text-io-content-secondary">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock

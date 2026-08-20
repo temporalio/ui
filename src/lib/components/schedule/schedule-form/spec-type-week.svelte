@@ -103,7 +103,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <p class="text-sm text-secondary">
+  <p class="text-sm text-io-content-secondary">
     {translate('schedules.recurring-days-description')}
   </p>
 

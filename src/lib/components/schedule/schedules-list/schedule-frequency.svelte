@@ -27,7 +27,7 @@
       {/each}
     </ul>
   </div>
-  <p class="text-secondary">
+  <p class="text-io-content-secondary">
     {translate('common.timezone', { timezone: timezoneName })}
   </p>
 </div>

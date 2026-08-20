@@ -126,7 +126,7 @@
           <h3 class="text-2xl font-medium">
             {translate('schedules.overlap-policy')}
           </h3>
-          <p class="mt-1 text-secondary">
+          <p class="mt-1 text-io-content-secondary">
             {translate('schedules.overlap-policy-description')}
           </p>
         </hgroup>
@@ -156,7 +156,7 @@
           <h3 class="text-2xl font-medium">
             {translate('schedules.on-start-behavior')}
           </h3>
-          <p class="mt-1 text-secondary">
+          <p class="mt-1 text-io-content-secondary">
             {translate('schedules.on-start-behavior-description')}
           </p>
         </hgroup>
@@ -181,7 +181,7 @@
           <h3 class="text-2xl font-medium">
             {translate('schedules.pause-on-failure')}
           </h3>
-          <p class="mt-1 text-secondary">
+          <p class="mt-1 text-io-content-secondary">
             {translate('schedules.pause-on-failure-description')}
           </p>
         </hgroup>
@@ -206,7 +206,7 @@
           <h3 class="text-2xl font-medium">
             {translate('schedules.catchup-window-policy')}
           </h3>
-          <p class="mt-1 text-secondary">
+          <p class="mt-1 text-io-content-secondary">
             {translate('schedules.catchup-window-policy-description')}
           </p>
         </hgroup>
@@ -250,7 +250,7 @@
 
     <hgroup>
       <h3 class="text-2xl font-medium">{translate('schedules.timeouts')}</h3>
-      <p class="mt-1 text-secondary">
+      <p class="mt-1 text-io-content-secondary">
         {translate('schedules.timeouts-description')}
       </p>
     </hgroup>
