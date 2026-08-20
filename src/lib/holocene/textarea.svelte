@@ -118,7 +118,7 @@
 
 <style lang="postcss">
   .error {
-    @apply border-io-border-danger focus-within:border-io-border-danger;
+    @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger;
   }
 
   .error-msg {

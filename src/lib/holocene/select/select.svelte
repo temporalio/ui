@@ -136,7 +136,7 @@
         class={merge(
           'w-full border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary focus-visible:border-io-border-tertiary focus-visible:bg-io-interactive-secondary focus-visible:ring-io-interactive-primary enabled:hover:bg-io-actions-hover-overlay disabled:opacity-[0.32] data-[active=true]:bg-io-actions-press-overlay',
           !valid &&
-            'border-io-border-danger focus-visible:border-io-border-danger',
+            'border-io-border-danger focus-visible:border-io-border-danger focus-visible:ring-io-border-danger',
           menuButtonClass,
         )}
         hasIndicator={!disabled}

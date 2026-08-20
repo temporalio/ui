@@ -70,12 +70,16 @@
 </script>
 
 {#snippet template(args: ComboboxArgs, context: StoryContext<ComboboxArgs>)}
-  <Combobox
-    {...args as unknown as ComponentProps<typeof Combobox>}
-    id={context.id}
-    data-testid={context.id}
-    onchange={logAction('change')}
-  />
+  <div
+    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+  >
+    <Combobox
+      {...args as unknown as ComponentProps<typeof Combobox>}
+      id={context.id}
+      data-testid={context.id}
+      onchange={logAction('change')}
+    />
+  </div>
 {/snippet}
 
 <Story
@@ -237,7 +241,11 @@
   }}
 >
   {#snippet template(_args, context)}
-    <AsyncTest id={context.id}></AsyncTest>
+    <div
+      class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+    >
+      <AsyncTest id={context.id}></AsyncTest>
+    </div>
   {/snippet}
 </Story>
 
@@ -304,37 +312,41 @@
   }}
 >
   {#snippet template(args, context)}
-    <div class="w-64">
-      <Combobox
-        {...args as unknown as ComponentProps<typeof Combobox>}
-        id={context.id}
-        data-testid={context.id}
-        onchange={logAction('change')}
-        leadingIcon="search"
-        options={[
-          'English',
-          'English (UK)',
-          'German',
-          'French',
-          'Japanese',
-          'Spanish',
-          'Portuguese',
-          'Mandarin',
-          'Hindi',
-          'Russian',
-          'Italian',
-        ]}
-      >
-        {#snippet action()}
-          <Button
-            onclick={() => {}}
-            variant="ghost"
-            size="xs"
-            leadingIcon="close"
-            aria-label="clear"
-          />
-        {/snippet}
-      </Combobox>
+    <div
+      class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+    >
+      <div class="w-64">
+        <Combobox
+          {...args as unknown as ComponentProps<typeof Combobox>}
+          id={context.id}
+          data-testid={context.id}
+          onchange={logAction('change')}
+          leadingIcon="search"
+          options={[
+            'English',
+            'English (UK)',
+            'German',
+            'French',
+            'Japanese',
+            'Spanish',
+            'Portuguese',
+            'Mandarin',
+            'Hindi',
+            'Russian',
+            'Italian',
+          ]}
+        >
+          {#snippet action()}
+            <Button
+              onclick={() => {}}
+              variant="ghost"
+              size="xs"
+              leadingIcon="close"
+              aria-label="clear"
+            />
+          {/snippet}
+        </Combobox>
+      </div>
     </div>
   {/snippet}
 </Story>

@@ -198,7 +198,8 @@
         'focus-within:border-io-border-secondary hover:border-io-border-brand',
       disabled &&
         'cursor-not-allowed border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
-      error && 'border-io-border-danger focus-within:border-io-border-danger',
+      error &&
+        'border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger',
       inputClass,
     )}
   >

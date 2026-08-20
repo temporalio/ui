@@ -119,7 +119,7 @@
         'relative box-border inline-flex h-10 w-full items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary',
         !isDisabled &&
           !showError &&
-          'focus-within:border-io-border-secondary hover:border-io-border-brand',
+          'focus-within:border-io-border-secondary hover:border-io-border-brand focus-within:hover:border-io-border-secondary',
         isDisabled &&
           'border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
         inputContainerClass,
@@ -240,7 +240,7 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-io-border-danger focus-within:border-io-border-danger;
+      @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger;
     }
   }
 
