@@ -24,8 +24,10 @@
       'transition-colors',
       'transition-shadow',
       'focus-visible:outline-none',
-      'focus-visible:border-inverse',
       'focus-visible:ring-2',
+      'focus-visible:ring-io-interactive-primary',
+      'focus-visible:ring-offset-2',
+      'focus-visible:ring-offset-io-background-primary',
       'whitespace-nowrap',
       'no-underline',
       'active:scale-[0.98]',
@@ -35,15 +37,15 @@
       variants: {
         variant: {
           primary:
-            'surface-interactive border-transparent text-white focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:bg-subtle data-[active=true]:text-primary',
+            'border-transparent bg-io-interactive-primary text-io-content-white hover:bg-io-interactive-primary-hover active:bg-io-interactive-primary-press focus-visible:bg-io-interactive-primary-hover data-[active=true]:bg-io-interactive-secondary-press data-[active=true]:text-io-content-primary',
           secondary:
-            'surface-primary border-subtle focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary data-[active=true]:bg-subtle',
+            'border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary hover:bg-io-actions-hover-overlay active:bg-io-actions-press-overlay focus-visible:bg-io-interactive-secondary data-[active=true]:bg-io-actions-press-overlay',
           destructive:
-            'surface-interactive-danger border-transparent focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:surface-interactive-danger',
+            'border-transparent bg-io-interactive-danger text-io-content-white hover:bg-io-interactive-danger-hover active:bg-io-interactive-danger-press focus-visible:bg-io-interactive-danger data-[active=true]:bg-io-interactive-danger-press',
           ghost:
-            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:bg-subtle',
+            'border-transparent bg-transparent text-io-content-secondary hover:bg-io-actions-hover-overlay active:bg-io-actions-press-overlay focus-visible:bg-io-interactive-secondary data-[active=true]:bg-io-actions-press-overlay data-[active=true]:text-io-content-primary',
           'table-header':
-            'bg-transparent border-transparent focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary focus-visible:border-transparent',
+            'border-transparent bg-transparent text-io-content-primary focus-visible:border-transparent',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -196,7 +198,7 @@
     {/if}
     {#if count > 0}
       <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
+        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px] bg-io-interactive-secondary text-io-content-primary"
         type="count">{count}</Badge
       >
     {/if}
@@ -232,7 +234,7 @@
     {/if}
     {#if count > 0}
       <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
+        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px] bg-io-interactive-secondary text-io-content-primary"
         type="count">{count}</Badge
       >
     {/if}

@@ -192,7 +192,7 @@
   {/if}
   <div
     class={twMerge(
-      'flex h-10 items-center border border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary focus-within:ring-2 focus-within:ring-io-interactive-primary',
+      'flex h-10 items-center border border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
       !disabled &&
         !error &&
         'focus-within:border-io-border-secondary hover:border-io-border-brand',

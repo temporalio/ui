@@ -66,7 +66,7 @@
   <div class="flex items-center">
     <div
       class={merge(
-        'relative box-border flex h-10 min-w-16 items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary',
+        'relative box-border flex h-10 min-w-16 items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
         !disabled &&
           valid &&
           'focus-within:border-io-border-secondary hover:border-io-border-brand',

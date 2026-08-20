@@ -84,7 +84,11 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Button>)}
-  <Button {...args} onclick={action('click')}>Click Me</Button>
+  <div
+    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+  >
+    <Button {...args} onclick={action('click')}>Click Me</Button>
+  </div>
 {/snippet}
 
 <Story name="Primary" args={{}} {template} />

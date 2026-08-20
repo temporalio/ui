@@ -11,7 +11,7 @@
     success: 'bg-io-surface-status-green text-io-content-success',
     danger: 'bg-io-surface-status-red text-io-content-danger',
     count:
-      'h-6 w-6 min-w-max rounded-full bg-io-surface-status-blue text-io-content-information',
+      'h-6 w-6 min-w-max rounded-full border border-io-border-tertiary bg-io-surface-status-neutral text-io-content-primary',
     subtle:
       'bg-io-surface-tertiary text-io-content-secondary font-normal select-all',
     ghost:

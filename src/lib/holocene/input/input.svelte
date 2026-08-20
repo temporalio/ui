@@ -116,7 +116,7 @@
     <div
       class={merge(
         'input-container',
-        'relative box-border inline-flex h-10 w-full items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary',
+        'relative box-border inline-flex h-10 w-full items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
         !isDisabled &&
           !showError &&
           'focus-within:border-io-border-secondary hover:border-io-border-brand focus-within:hover:border-io-border-secondary',

@@ -61,7 +61,7 @@
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full border border-io-border-tertiary focus-within:ring-2 focus-within:ring-io-interactive-primary',
+      'relative box-border inline-flex w-full border border-io-border-tertiary focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
       !disabled &&
         isValid &&
         'focus-within:border-io-border-secondary hover:border-io-border-brand',
