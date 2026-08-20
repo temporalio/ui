@@ -8,6 +8,7 @@
   import Link from '$lib/holocene/link.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { groupEvents } from '$lib/models/event-groups';
   import { routeForArchivalWorkflows } from '$lib/utilities/route-for';
 
@@ -28,7 +29,7 @@
     <Link
       href={workflowsHref}
       data-testid="back-to-archival-workflows"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {translate('workflows.back-to-archived-workflows')}
     </Link>

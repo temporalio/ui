@@ -3,6 +3,7 @@
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import { isActivityDelayed } from '$lib/utilities/delayed-activities';
@@ -117,7 +118,7 @@
         >
         <DetailListLinkValue
           copyable
-          iconName="filter"
+          Icon={IconFilter}
           text={activityType ?? ''}
           href={activityTypeFilterLink}
         />
@@ -127,7 +128,7 @@
       >
       <DetailListLinkValue
         copyable
-        iconName="filter"
+        Icon={IconFilter}
         text={activityExecutionInfo.taskQueue ?? ''}
         href={taskQueueFilterLink}
       />

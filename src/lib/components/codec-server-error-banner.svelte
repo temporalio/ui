@@ -2,6 +2,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTranscoderError } from '$lib/io/icon';
   import { dataEncoder } from '$lib/stores/data-encoder';
 
   const message = $derived(
@@ -15,7 +16,7 @@
 </script>
 
 {#if $dataEncoder.hasError}
-  <Alert intent="error" icon="transcoder-error">
+  <Alert intent="error" Icon={IconTranscoderError}>
     <div class="flex items-center gap-2">
       <p>{message}</p>
       <Link href={linkUrl} newTab>{linkUrl}</Link>

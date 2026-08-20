@@ -1,8 +1,8 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCheckCircleSolid, IconWarning } from '$lib/io/icon';
 
   interface Props {
     buildId: string;
@@ -23,6 +23,8 @@
   }: Props = $props();
 
   const isValid = $derived(!result?.message);
+
+  const Glyph = $derived(isValid ? IconCheckCircleSolid : IconWarning);
 </script>
 
 <Modal
@@ -60,8 +62,7 @@
         </div>
       {:else if result}
         <div class="flex items-start gap-2">
-          <Icon
-            name={isValid ? 'circle-check-filled' : 'warning'}
+          <Glyph
             class="mt-0.5 h-4 w-4 shrink-0 {isValid
               ? 'text-success'
               : 'text-danger'}"

@@ -3,9 +3,9 @@
 
   import { base } from '$app/paths';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconArrowsLeftRightToLine } from '$lib/io/icon';
 
   interface Props {
     version: string;
@@ -52,7 +52,7 @@
     class="mx-2 flex items-center justify-center opacity-0 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:p-2"
     onclick={ontoggle}
   >
-    <Icon name="collapse" />
+    <IconArrowsLeftRightToLine />
   </button>
 </div>
 <div role="list">

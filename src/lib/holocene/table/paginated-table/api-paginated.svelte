@@ -16,6 +16,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
+  import { IconArrowLeft, IconArrowRight } from '$lib/io/icon';
   import {
     createPaginationStore,
     type PaginationStore,
@@ -275,7 +276,7 @@
         label={previousButtonLabel}
         disabled={!$store.hasPrevious}
         onclick={handlePreviousPage}
-        icon="arrow-left"
+        Icon={IconArrowLeft}
       />
       <div class="flex gap-1">
         <p>
@@ -291,7 +292,7 @@
         label={nextButtonLabel}
         disabled={!$store.hasNext || $store.updating}
         onclick={fetchIndexData}
-        icon="arrow-right"
+        Icon={IconArrowRight}
       />
     </nav>
   {/snippet}

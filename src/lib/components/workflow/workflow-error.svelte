@@ -3,6 +3,7 @@
 
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import type { NetworkError } from '$lib/types/global';
   import { routeForWorkflows } from '$lib/utilities/route-for';
@@ -29,7 +30,7 @@
         namespace,
       })}?${$workflowsSearchParams}`}
       data-testid="back-to-workflows"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {translate('workflows.back-to-workflows')}
     </Link>

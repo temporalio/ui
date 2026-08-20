@@ -2,6 +2,7 @@
   import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import type { NexusOperationExecutionInfo } from '$lib/types/nexus-operation-execution';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
@@ -101,7 +102,7 @@
       >
       <DetailListLinkValue
         copyable
-        iconName="filter"
+        Icon={IconFilter}
         text={nexusOperationInfo.endpoint ?? ''}
         href={endpointFilterLink}
       />

@@ -6,6 +6,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconLightningBolt } from '$lib/io/icon';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
 
   type Props = ComponentProps<typeof Button> & {
@@ -45,7 +46,7 @@
     size="xs"
     variant="ghost"
     class="start-button"
-    leadingIcon="lightning-bolt"
+    LeadingIcon={IconLightningBolt}
     aria-label={translate('workflows.start-workflow-like-this-one')}
     onclick={() => goto(href)}
     {...rest}

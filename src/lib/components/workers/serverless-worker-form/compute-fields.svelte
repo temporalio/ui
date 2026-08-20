@@ -8,6 +8,12 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconChevronDown,
+    IconChevronUp,
+    IconExternalLinkOptical,
+    IconInfo,
+  } from '$lib/io/icon';
 
   import {
     hasCloudRunImpersonatorPlaceholder,
@@ -166,7 +172,7 @@
       type="button"
       href="https://console.aws.amazon.com/lambda"
       target="_blank"
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLinkOptical}
     >
       {translate('workers.open-lambda-console')}
     </Button>
@@ -215,7 +221,7 @@
         type="button"
         href="https://console.cloud.google.com/run/worker-pools"
         target="_blank"
-        trailingIcon="external-link"
+        TrailingIcon={IconExternalLinkOptical}
       >
         {translate('workers.open-cloud-run-console')}
       </Button>
@@ -256,7 +262,7 @@
       required
     />
     <Accordion
-      icon="info"
+      Icon={IconInfo}
       title={translate('workers.no-role-prompt')}
       bind:open={showRoleHelp}
       class="[&_h3]:text-sm"
@@ -286,7 +292,7 @@
               size="sm"
               href={launchStackHref}
               target="_blank"
-              trailingIcon="external-link"
+              TrailingIcon={IconExternalLinkOptical}
             >
               {translate('workers.launch-stack')}
             </Button>
@@ -329,7 +335,7 @@
     />
     {#if provider === 'cloud-run'}
       <Accordion
-        icon="info"
+        Icon={IconInfo}
         title={translate('workers.cloud-run-setup-prompt')}
         bind:open={showCloudRunHelp}
         class="[&_h3]:text-sm"
@@ -380,7 +386,7 @@
     variant="secondary"
     size="sm"
     type="button"
-    trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
+    TrailingIcon={showScaling ? IconChevronUp : IconChevronDown}
     onclick={() => (showScaling = !showScaling)}
   >
     {showScaling

@@ -5,8 +5,8 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
@@ -155,7 +155,7 @@
 
 {#snippet attempts()}
   <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
-    <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
+    <IconRetry class="mr-1 {failed && 'font-bold text-red-400'}" />
     {operation.attempt ?? 0}
   </Badge>
 {/snippet}

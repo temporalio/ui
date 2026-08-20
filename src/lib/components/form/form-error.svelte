@@ -1,8 +1,8 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
 
   interface Props {
     class?: string;
@@ -51,7 +51,7 @@
               onclick={handleRetry}
               disabled={isRetrying}
             >
-              <Icon name="retry" />
+              <IconRetry />
               {isRetrying
                 ? translate('common.retrying')
                 : translate('common.try-again')}

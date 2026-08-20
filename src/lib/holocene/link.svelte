@@ -6,9 +6,7 @@
 
   import { goto } from '$app/navigation';
 
-  import type { IconName } from '$lib/holocene/icon';
-
-  import Icon from './icon/icon.svelte';
+  import type { IconComponent } from '$lib/io/icon';
 
   interface Props extends Omit<HTMLAnchorAttributes, 'class' | 'onclick'> {
     href: string;
@@ -16,10 +14,8 @@
     interactive?: boolean;
     newTab?: boolean;
     class?: string;
-    /** @deprecated Use `leadingIcon` */
-    icon?: IconName;
-    leadingIcon?: IconName;
-    trailingIcon?: IconName;
+    LeadingIcon?: IconComponent;
+    TrailingIcon?: IconComponent;
     text?: string;
     light?: boolean;
     gotoParams?: Parameters<typeof goto>[1];
@@ -34,9 +30,8 @@
     active = false,
     interactive = false,
     newTab = false,
-    icon,
-    leadingIcon,
-    trailingIcon,
+    LeadingIcon,
+    TrailingIcon,
     text = '',
     light = false,
     gotoParams = {},
@@ -45,8 +40,7 @@
     ...rest
   }: Props = $props();
 
-  const effectiveLeading = $derived(leadingIcon ?? icon);
-  const hasIcon = $derived(!!(effectiveLeading || trailingIcon));
+  const hasIcon = $derived(!!(LeadingIcon || TrailingIcon));
 
   const onLinkClick = (e: MouseEvent) => {
     if (e.button === 1 || newTab || e.metaKey || e.ctrlKey || e.shiftKey)
@@ -78,10 +72,15 @@
   {...rest}
   onclick={handleClick}
 >
-  {#if effectiveLeading}
-    <Icon class="mt-0.5" name={effectiveLeading} />
-  {/if}{#if text}{text}{/if}{@render children?.()}{#if trailingIcon}
-    <Icon class="mt-0.5" name={trailingIcon} />
+  {#if LeadingIcon}
+    <LeadingIcon class="mt-0.5" />
+  {/if}
+  {#if text}
+    {text}
+  {/if}
+  {@render children?.()}
+  {#if TrailingIcon}
+    <TrailingIcon class="mt-0.5" />
   {/if}
 </a>
 

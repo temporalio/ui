@@ -5,8 +5,11 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import {
+    IconChevronDown,
+    IconChevronUp,
+    type IconComponent,
+  } from '$lib/io/icon';
 
   interface Props extends Omit<
     HTMLAttributes<HTMLDivElement>,
@@ -15,7 +18,7 @@
     title: string;
     id?: string;
     subtitle?: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     open?: boolean;
     expandable?: boolean;
     error?: string;
@@ -33,7 +36,7 @@
     title,
     id = generatedId,
     subtitle = '',
-    icon,
+    Icon,
     open = $bindable(false),
     expandable = true,
     error = '',
@@ -49,6 +52,8 @@
     open = !open;
     onToggle?.();
   };
+
+  const Glyph = $derived(open ? IconChevronUp : IconChevronDown);
 </script>
 
 {#if expandable}
@@ -72,14 +77,14 @@
         <div class="flex w-full flex-row items-center justify-between gap-2">
           <div class="flex w-full items-center gap-2">
             <h3 class="flex shrink-0 items-center gap-2">
-              {#if icon}<Icon name={icon} />{/if}
+              {#if Icon}<Icon />{/if}
               {title}
             </h3>
             <div class="text-secondary max-sm:hidden">
               {@render summary?.()}
             </div>
           </div>
-          <Icon class="shrink-0" name={open ? 'chevron-up' : 'chevron-down'} />
+          <Glyph class="shrink-0" />
         </div>
         <div class="text-secondary sm:hidden">
           {@render summary?.()}
@@ -115,7 +120,7 @@
       <div class="flex w-full flex-row items-center justify-between gap-2">
         <div class="flex w-full items-center gap-2">
           <h3 class="flex shrink-0 items-center gap-2">
-            {#if icon}<Icon name={icon} />{/if}
+            {#if Icon}<Icon />{/if}
             {title}
           </h3>
           <div class="text-secondary max-sm:hidden">

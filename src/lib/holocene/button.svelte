@@ -7,7 +7,7 @@
   import { cva, type VariantProps } from 'class-variance-authority';
   import type { Snippet } from 'svelte';
 
-  import type { IconName } from '$lib/holocene/icon';
+  import type { IconComponent } from '$lib/io/icon';
 
   const buttonStyles = cva(
     [
@@ -67,8 +67,8 @@
     disabled?: boolean;
     loading?: boolean;
     active?: boolean;
-    leadingIcon?: IconName;
-    trailingIcon?: IconName;
+    LeadingIcon?: IconComponent;
+    TrailingIcon?: IconComponent;
     count?: number;
     id?: string;
     disableTracking?: boolean;
@@ -100,7 +100,7 @@
   import { goto } from '$app/navigation';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { IconSpinner } from '$lib/io/icon';
 
   let {
     variant = 'primary',
@@ -108,8 +108,8 @@
     disabled = false,
     loading = false,
     active = false,
-    leadingIcon,
-    trailingIcon,
+    LeadingIcon,
+    TrailingIcon,
     count = 0,
     id,
     href,
@@ -180,18 +180,21 @@
     onclick={handleLinkClick}
     onkeydown={handleKeydown}
   >
-    {#if leadingIcon || (loading && !trailingIcon)}
+    {#if LeadingIcon || (loading && !TrailingIcon)}
+      {@const LeadingGlyph = loading ? IconSpinner : LeadingIcon!}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon!} />
+        <LeadingGlyph />
       </span>
     {/if}
     {@render children?.()}
-    {#if trailingIcon}
+    {#if TrailingIcon}
+      {@const TrailingGlyph =
+        loading && !LeadingIcon ? IconSpinner : TrailingIcon}
       <span
-        class:animate-spin={loading && !leadingIcon}
-        class:invisible={loading && leadingIcon}
+        class:animate-spin={loading && !LeadingIcon}
+        class:invisible={loading && LeadingIcon}
       >
-        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
+        <TrailingGlyph />
       </span>
     {/if}
     {#if count > 0}
@@ -215,19 +218,22 @@
     onclick={handleClick}
     onkeydown={handleKeydown}
   >
-    {#if leadingIcon || (loading && !trailingIcon)}
+    {#if LeadingIcon || (loading && !TrailingIcon)}
+      {@const LeadingGlyph = loading ? IconSpinner : LeadingIcon!}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon!} />
+        <LeadingGlyph />
       </span>
     {/if}
     {@render children?.()}
 
-    {#if trailingIcon}
+    {#if TrailingIcon}
+      {@const TrailingGlyph =
+        loading && !LeadingIcon ? IconSpinner : TrailingIcon}
       <span
-        class:animate-spin={loading && !leadingIcon}
-        class:invisible={loading && leadingIcon}
+        class:animate-spin={loading && !LeadingIcon}
+        class:invisible={loading && LeadingIcon}
       >
-        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
+        <TrailingGlyph />
       </span>
     {/if}
     {#if count > 0}

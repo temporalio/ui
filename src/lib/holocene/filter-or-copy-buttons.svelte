@@ -1,7 +1,7 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { IconCheckmark, IconCopy, IconFilter } from '$lib/io/icon';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   type Props = {
@@ -31,6 +31,8 @@
   }: Props = $props();
 
   const { copy, copied } = copyToClipboard();
+
+  const Glyph = $derived($copied ? IconCheckmark : IconCopy);
 </script>
 
 {#if show}
@@ -46,7 +48,7 @@
         class:filtered
       >
         {#key filtered}
-          <Icon title={filterIconTitle} name="filter" class="m-0.5" />
+          <IconFilter title={filterIconTitle} class="m-0.5" />
         {/key}
       </button>
     {/if}
@@ -59,9 +61,8 @@
           copy(e, content);
         }}
       >
-        <Icon
+        <Glyph
           title={$copied ? copySuccessIconTitle : copyIconTitle}
-          name={$copied ? 'checkmark' : 'copy'}
           class="m-0.5"
         />
       </button>

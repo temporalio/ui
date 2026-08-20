@@ -32,10 +32,9 @@
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import { type IconComponent, IconLock, IconSpinner } from '$lib/io/icon';
 
   type T = $$Generic;
 
@@ -48,7 +47,7 @@
     placeholder?: string;
     disabled?: boolean;
     loading?: boolean;
-    leadingIcon?: IconName;
+    LeadingIcon?: IconComponent;
     onChange?: (value: T) => void;
     'data-testid'?: string;
     menuButtonClass?: ClassNameValue;
@@ -69,7 +68,7 @@
     placeholder = '',
     disabled = false,
     loading = false,
-    leadingIcon = undefined,
+    LeadingIcon,
     onChange = () => {},
     menuButtonClass = undefined,
     menuClass = undefined,
@@ -146,8 +145,8 @@
         aria-describedby={showError ? errorId : undefined}
       >
         {#snippet leading()}
-          {#if leadingIcon}
-            <Icon name={leadingIcon} />
+          {#if LeadingIcon}
+            <LeadingIcon />
           {:else if leadingProp}
             {@render leadingProp()}
           {/if}
@@ -164,9 +163,9 @@
         />
         {#snippet trailing()}
           {#if disabled}
-            <Icon name="lock" />
+            <IconLock />
           {:else if loading}
-            <Icon name="spinner" class="animate-spin" />
+            <IconSpinner class="animate-spin" />
           {/if}
         {/snippet}
       </MenuButton>

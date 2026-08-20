@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { IconClose, IconWarning } from '$lib/io/icon';
 
   interface Props {
     intent?: 'warning' | 'default';
@@ -32,7 +32,7 @@
 
 <span class={merge('chip', intent)}>
   {#if intent === 'warning'}
-    <Icon name="warning" class="shrink-0" />
+    <IconWarning class="shrink-0" />
   {/if}
   {#if button}
     <button
@@ -58,7 +58,7 @@
     data-track-text={removeButtonLabel}
     onclick={handleRemove}
   >
-    <Icon name="close" />
+    <IconClose />
   </button>
 </span>
 

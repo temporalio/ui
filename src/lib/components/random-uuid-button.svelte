@@ -3,6 +3,7 @@
     type ButtonWithoutHrefProps,
   } from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
 
   type Props = ButtonWithoutHrefProps & {
     value: string;
@@ -17,6 +18,11 @@
   };
 </script>
 
-<Button variant="secondary" leadingIcon="retry" onclick={generate} {...rest}>
+<Button
+  variant="secondary"
+  LeadingIcon={IconRetry}
+  onclick={generate}
+  {...rest}
+>
   {translate('common.random-uuid')}
 </Button>

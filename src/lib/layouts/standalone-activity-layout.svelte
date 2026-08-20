@@ -11,6 +11,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { getActivityPollers } from '$lib/services/pollers-service';
   import { activitiesSearchParams } from '$lib/stores/activities';
   import { pathMatches } from '$lib/utilities/path-matches';
@@ -102,7 +103,7 @@
       <Link
         href={activitiesHref}
         data-testid="back-to-activities"
-        icon="chevron-left"
+        LeadingIcon={IconChevronLeft}
       >
         {translate('standalone-activities.back-to-activities')}
       </Link>
