@@ -105,7 +105,7 @@
           id="{id}-range"
           name="range"
           type="range"
-          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-io-border-primary"
+          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-io-border-tertiary"
           bind:value
           {min}
           {max}
