@@ -51,3 +51,7 @@ go.work.sum
 /.workflow-catalog.lock.recovery
 /.workflow-catalog.journal.json
 /.workflow-catalog.transaction-*/
+
+# Feature demo runner output and machine-local paths (scripts/feature-demo.ts)
+/.feature-demo/
+/.env.feature-demo.local
