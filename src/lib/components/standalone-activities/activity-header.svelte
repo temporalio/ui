@@ -48,9 +48,9 @@
   );
 </script>
 
-<div class="space-y-2">
+<div class="flex flex-col gap-4">
   <div
-    class="flex items-center justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
+    class="flex items-start justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
   >
     <div class="flex items-center gap-4">
       <ActivityExecutionStatus
@@ -58,21 +58,19 @@
         delayed={isActivityDelayed(activityExecutionInfo)}
         big
       />
-      <div class="text-2xl font-medium">
-        <h1
-          data-testid="activity-id-heading"
-          class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
-        >
-          <Copyable
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={activityExecutionInfo.activityId ?? ''}
-            clickAllToCopy
-            container-class="w-full"
-            class="overflow-hidden text-ellipsis text-left"
-          />
-        </h1>
-      </div>
+      <h1
+        data-testid="activity-id-heading"
+        class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+      >
+        <Copyable
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          content={activityExecutionInfo.activityId ?? ''}
+          clickAllToCopy
+          container-class="w-full"
+          class="overflow-hidden text-ellipsis text-left"
+        />
+      </h1>
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>

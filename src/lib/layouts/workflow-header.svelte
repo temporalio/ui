@@ -138,7 +138,7 @@
   </div>
 </div>
 <header class="flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
+  <div class="flex flex-col items-start justify-between gap-4 xl:flex-row">
     <div
       class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
     >
