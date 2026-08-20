@@ -27,8 +27,7 @@ on:
       - .github/scripts/verify-weekly-dependency-remediation.test.mjs
       - .github/scripts/weekly-dependency-security-digest.mjs
       - .github/scripts/weekly-dependency-security-digest.test.mjs
-      - package.json
-      - pnpm-lock.yaml
+      - .github/scripts/slack-utils.mjs
 
 permissions:
   contents: read
