@@ -108,8 +108,12 @@ const remediationLine = ({ audit, remediation, publishStatus }) => {
         : null;
 
   if (result?.applied && publishedPullRequest) {
-    const label = publishedPullRequest.number
-      ? `#${publishedPullRequest.number}: ${publishedPullRequest.title}`
+    const numberFromUrl = /\/pull\/(\d+)/.exec(publishedPullRequest.url ?? '');
+    const number = publishedPullRequest.number ?? numberFromUrl?.[1] ?? null;
+    const label = number
+      ? publishedPullRequest.title
+        ? `#${number}: ${publishedPullRequest.title}`
+        : `#${number}`
       : 'view draft remediation PR';
     return `Draft remediation PR: ${slackLink(publishedPullRequest.url, label)}${remediationActionText(result, true)}`;
   }
@@ -200,6 +204,34 @@ const dependencySecurityText = ({
   return lines.join('\n');
 };
 
+const vlnBlocks = ({ audit, vlnLimit, runUrl }) => {
+  const pending = audit.vln?.pending ?? [];
+  const needsTriage = audit.vln?.needsTriage ?? [];
+  const blocks = [headerBlock('VLN review')];
+
+  const group = (heading, pullRequests) => {
+    const visible = pullRequests.slice(0, vlnLimit);
+    if (visible.length === 0) return;
+    blocks.push(
+      ...sectionBlocks(
+        [`*${heading}*`, ...visible.map(renderPullRequest)].join('\n'),
+      ),
+    );
+    const omitted = pullRequests.length - visible.length;
+    if (omitted > 0) blocks.push(...sectionBlocks(omittedLine(omitted, null)));
+  };
+
+  group('Pending VLN PRs', pending);
+  if (pending.length > 0 && needsTriage.length > 0) blocks.push(dividerBlock());
+  group('Needs triage', needsTriage);
+
+  if (pending.length === 0 && needsTriage.length === 0) {
+    blocks.push(...sectionBlocks('No pending VLN pull request.'));
+  }
+  if (runUrl) blocks.push(contextBlock(slackLink(runUrl, 'workflow run')));
+  return blocks;
+};
+
 const vlnReviewText = ({ audit, vlnLimit, runUrl }) => {
   const vlns = audit.vln?.pending ?? [];
   const needsTriage = audit.vln?.needsTriage ?? [];
@@ -228,14 +260,107 @@ const vlnReviewText = ({ audit, vlnLimit, runUrl }) => {
   return lines.join('\n');
 };
 
-const asThreadReply = ({ channel = null, threadTs = null, text }) => ({
+const countOf = (value) => (Number.isInteger(value) ? value : 0);
+
+const unresolvedCount = (result) => {
+  if (Array.isArray(result?.unresolved)) return result.unresolved.length;
+  if (Array.isArray(result?.classifications)) {
+    return result.classifications.filter((item) =>
+      ['manual', 'unsupported', 'alreadySafe'].includes(item.status),
+    ).length;
+  }
+  return 0;
+};
+
+/** A person must act on the dependency module for one of these reasons. */
+export const dependencyNeedsAction = ({
+  audit,
+  remediation = null,
+  publishStatus = 'skipped',
+}) => {
+  if (publishStatus === 'failure') return true;
+  const result = remediation ?? audit.remediationResult;
+  const summary = result?.summary ?? {};
+  if (countOf(summary.actions) > 0) return true;
+  if (countOf(summary.manual) > 0) return true;
+  if (countOf(summary.unsupported) > 0) return true;
+  if (countOf(summary.alreadySafe) > 0) return true;
+  if (Array.isArray(result?.actions) && result.actions.length > 0) return true;
+  if (unresolvedCount(result) > 0) return true;
+  if (result?.pullRequest || result?.pullRequestUrl) return true;
+  if (audit.remediation) return true;
+  return countOf(audit.dependabot?.openAlertCount) > 0;
+};
+
+/** A person must act on the VLN module when a pull request waits. */
+export const vlnNeedsAction = ({ audit }) =>
+  (audit.vln?.pending ?? []).length > 0 ||
+  (audit.vln?.needsTriage ?? []).length > 0;
+
+/**
+ * A person must act on the external module when a pull request waits. A stale
+ * count alone is context, not work, so it does not make the module actionable.
+ */
+export const externalNeedsAction = ({ audit }) => {
+  const external = audit.externalContributors ?? {};
+  return (
+    (external.reviewReady ?? []).length > 0 ||
+    (external.triage ?? []).length > 0 ||
+    (external.authorFollowup ?? []).length > 0
+  );
+};
+
+const headerBlock = (text) => ({
+  type: 'header',
+  text: { type: 'plain_text', text: truncateText(text, 150) },
+});
+
+const sectionBlocks = (mrkdwn) =>
+  splitSlackSectionText(mrkdwn).map((text) => ({
+    type: 'section',
+    text: { type: 'mrkdwn', text },
+  }));
+
+const dividerBlock = () => ({ type: 'divider' });
+
+const contextBlock = (mrkdwn) => ({
+  type: 'context',
+  elements: [{ type: 'mrkdwn', text: mrkdwn }],
+});
+
+/** One line per authorized action, naming the range and the resolved version. */
+const changeLines = (result) => {
+  const actions = Array.isArray(result?.actions) ? result.actions : [];
+  const resolved = new Map();
+  for (const alert of result?.verification?.alerts ?? []) {
+    if (alert.packageName && alert.resolvedVersions?.length) {
+      resolved.set(alert.packageName, alert.resolvedVersions.join(', '));
+    }
+  }
+  return actions.map((action) => {
+    const range =
+      action.from && action.to ? ` \`${action.from}\` → \`${action.to}\`` : '';
+    const after = resolved.get(action.packageName);
+    const resolvedText = after ? `, resolves to ${after}` : '';
+    const alertIds = action.alertIds ?? [];
+    const alerts =
+      alertIds.length > 0 ? ` · alerts ${alertIds.join(', ')}` : '';
+    return `• \`${escapeSlackMrkdwn(String(action.packageName))}\`${range}${resolvedText}${alerts}`;
+  });
+};
+
+const asThreadReply = ({
+  channel = null,
+  threadTs = null,
+  text,
+  actionable = true,
+  blocks = null,
+}) => ({
   channel,
   thread_ts: threadTs,
   text,
-  blocks: splitSlackSectionText(text).map((sectionText) => ({
-    type: 'section',
-    text: { type: 'mrkdwn', text: sectionText },
-  })),
+  actionable,
+  blocks: blocks ?? sectionBlocks(text),
 });
 
 /**
@@ -251,9 +376,38 @@ export const buildDependencySecurityReply = ({
   threadTs = null,
 }) => {
   validatePublishStatus(publishStatus);
+  const result = remediation ?? audit.remediationResult;
+  const blocks = [headerBlock('Dependency security')];
+  blocks.push(
+    ...sectionBlocks(remediationLine({ audit, remediation, publishStatus })),
+  );
+
+  const changes = changeLines(result);
+  if (changes.length > 0) blocks.push(...sectionBlocks(changes.join('\n')));
+
+  const unresolved = unresolvedItems({ audit, remediation });
+  if (unresolved.lines.length > 0) {
+    blocks.push(dividerBlock());
+    blocks.push(
+      ...sectionBlocks(['*Needs a decision*', ...unresolved.lines].join('\n')),
+    );
+    if (unresolved.omittedCount > 0) {
+      blocks.push(...sectionBlocks(omittedLine(unresolved.omittedCount, null)));
+    }
+  }
+  if (runUrl) {
+    blocks.push(
+      contextBlock(
+        `${slackLink(runUrl, 'workflow run')} · the planner authored this change`,
+      ),
+    );
+  }
+
   return asThreadReply({
     channel,
     threadTs,
+    actionable: dependencyNeedsAction({ audit, remediation, publishStatus }),
+    blocks,
     text: dependencySecurityText({
       audit,
       remediation,
@@ -274,6 +428,8 @@ export const buildVlnReviewReply = ({
   asThreadReply({
     channel,
     threadTs,
+    actionable: vlnNeedsAction({ audit }),
+    blocks: vlnBlocks({ audit, vlnLimit, runUrl }),
     text: vlnReviewText({ audit, vlnLimit, runUrl }),
   });
 
@@ -318,7 +474,45 @@ export const buildExternalContributorReply = ({
     );
   }
   if (runUrl) lines.push('', `Run: ${slackLink(runUrl, 'view workflow run')}`);
-  return asThreadReply({ channel, threadTs, text: lines.join('\n') });
+  const blocks = [headerBlock('External contributor PRs')];
+  let firstGroup = true;
+  for (const [heading, pullRequests, totalCount] of sections) {
+    if (pullRequests.length === 0) continue;
+    if (!firstGroup) blocks.push(dividerBlock());
+    firstGroup = false;
+    blocks.push(
+      ...sectionBlocks(
+        [heading, ...pullRequests.map(renderPullRequest)].join('\n'),
+      ),
+    );
+    const omitted = Math.max(
+      (totalCount ?? pullRequests.length) - pullRequests.length,
+      0,
+    );
+    if (omitted > 0) blocks.push(...sectionBlocks(omittedLine(omitted, null)));
+  }
+  if (firstGroup) {
+    blocks.push(...sectionBlocks('No eligible external contributor PR.'));
+  }
+
+  const contextParts = [];
+  if (runUrl) contextParts.push(slackLink(runUrl, 'workflow run'));
+  if (external.staleCount > 0) {
+    contextParts.push(
+      `${external.staleCount} PR${external.staleCount === 1 ? '' : 's'} idle for 14+ days`,
+    );
+  }
+  if (contextParts.length > 0) {
+    blocks.push(contextBlock(contextParts.join(' · ')));
+  }
+
+  return asThreadReply({
+    channel,
+    threadTs,
+    actionable: externalNeedsAction({ audit }),
+    blocks,
+    text: lines.join('\n'),
+  });
 };
 
 // Kept as a small compatibility wrapper for callers that only need a single
@@ -401,9 +595,11 @@ export const runDigestCli = async ({
           : (() => {
               throw new Error(`Unsupported --module value: ${module}`);
             })();
-  await writeFile(output, `${JSON.stringify(payload, null, 2)}\n`);
+  const { actionable, ...slackPayload } = payload;
+  await writeFile(output, `${JSON.stringify(slackPayload, null, 2)}\n`);
   await writeGithubOutput('digest-file', output);
   await writeGithubOutput('slack-text', payload.text);
+  await writeGithubOutput('actionable', String(actionable));
   console.log(JSON.stringify(payload));
   return payload;
 };

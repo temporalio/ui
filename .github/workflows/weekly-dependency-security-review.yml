@@ -571,6 +571,8 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Post dependency-security digest
+        # An unset value means the digest did not run, which is itself worth posting.
+        if: steps.payload.outputs.actionable != 'false'
         uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
         with:
           method: chat.postMessage

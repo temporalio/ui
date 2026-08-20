@@ -152,13 +152,18 @@ jobs:
         vln-review,
         external-contributor-review,
       ]
+    # Reports a module that did not succeed. A run where every module succeeded
+    # says nothing here, because each reply already carries its own outcome.
     if: >-
       always() &&
       needs.resolve-inputs.outputs.notify == 'true' &&
-      needs.start-thread.outputs.thread_ts != ''
+      needs.start-thread.outputs.thread_ts != '' &&
+      (needs.dependency-security.result != 'success' ||
+       needs.vln-review.result != 'success' ||
+       needs.external-contributor-review.result != 'success')
     runs-on: ubuntu-latest
     steps:
-      - name: Post module status
+      - name: Report the modules that did not succeed
         uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
         with:
           method: chat.postMessage
@@ -167,4 +172,4 @@ jobs:
           payload: |
             channel: "${{ needs.start-thread.outputs.slack_channel }}"
             thread_ts: "${{ needs.start-thread.outputs.thread_ts }}"
-            text: "Weekly review finished. Dependency security: ${{ needs.dependency-security.result }}. VLN review: ${{ needs.vln-review.result }}. External contributors: ${{ needs.external-contributor-review.result }}."
+            text: ":warning: A module did not succeed. Dependency security: ${{ needs.dependency-security.result }}. VLN review: ${{ needs.vln-review.result }}. External contributors: ${{ needs.external-contributor-review.result }}. ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
