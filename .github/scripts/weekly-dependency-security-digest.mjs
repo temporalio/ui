@@ -75,21 +75,8 @@ export const splitSlackSectionText = (
   return chunks;
 };
 
-const statusText = (pullRequest) => {
-  const parts = [];
-  if (pullRequest.draft) parts.push('draft');
-  if (pullRequest.review?.status && pullRequest.review.status !== 'pending') {
-    parts.push(pullRequest.review.status.replaceAll('_', ' '));
-  }
-  if (pullRequest.merge && pullRequest.merge !== 'mergeable') {
-    parts.push(pullRequest.merge);
-  }
-  if (pullRequest.checks?.status && pullRequest.checks.status !== 'passing') {
-    parts.push(`checks ${pullRequest.checks.status}`);
-  }
-  return parts.length > 0 ? ` — ${parts.join(', ')}` : '';
-};
-
+// The group badge already names the state of every item it holds, so a list
+// item carries no status. Repeating it made Slack collapse the whole group.
 const renderPullRequest = (pullRequest) =>
   `• ${slackLink(
     pullRequest.url,
@@ -97,7 +84,7 @@ const renderPullRequest = (pullRequest) =>
       `#${pullRequest.number}: ${pullRequest.title}`,
       LIST_TITLE_LIMIT,
     ),
-  )}${statusText(pullRequest)}`;
+  )}`;
 
 const remediationActionCount = (result) =>
   result?.summary?.actions ?? result?.actions?.length ?? null;
@@ -363,12 +350,10 @@ const contextBlock = (mrkdwn) => ({
 });
 
 const SEVERITY_ORDER = ['critical', 'high', 'medium', 'low'];
-const SEVERITY_MARK = {
-  critical: ':red_circle:',
-  high: ':red_circle:',
-  medium: ':large_orange_circle:',
-  low: ':large_yellow_circle:',
-};
+
+// Slack holds no badge primitive. A code span is the closest: the client draws
+// it as a small bordered chip, the same shape it gives a version or a package.
+const badge = (label) => `\`${label}\``;
 
 /** Alert number to its advisory page and severity, taken from the audit. */
 const alertIndex = (audit) => {
@@ -404,7 +389,7 @@ const severityBadge = (alertIds, index) => {
   if (severities.length === 0) return null;
   const worst = SEVERITY_ORDER.find((value) => severities.includes(value));
   const count = severities.filter((value) => value === worst).length;
-  return `${SEVERITY_MARK[worst]} *${count} ${worst.toUpperCase()}*`;
+  return badge(`${count} ${worst.toUpperCase()}`);
 };
 
 /**
@@ -424,7 +409,7 @@ const remediationHeadline = ({ audit, remediation, publishStatus }) => {
   ).size;
   const alertText =
     closed > 0 ? ` closes ${closed} alert${closed === 1 ? '' : 's'}` : '';
-  return `:white_check_mark: *READY*  ${slackLink(url, `#${number}`)}${alertText}`;
+  return `${badge('READY')}  *${slackLink(url, `#${number}`)}*${alertText}`;
 };
 
 const fieldsBlock = (pairs) => ({
@@ -588,12 +573,11 @@ export const buildExternalContributorReply = ({
   threadTs = null,
 }) => {
   const external = audit.externalContributors ?? {};
-  const groupHeading = (mark, label, pullRequests, totalCount) =>
-    `${mark} *${totalCount ?? pullRequests.length} ${label}*`;
+  const groupHeading = (label, pullRequests, totalCount) =>
+    badge(`${totalCount ?? pullRequests.length} ${label}`);
   const sections = [
     [
       groupHeading(
-        ':large_green_circle:',
         'READY FOR REVIEW',
         external.reviewReady ?? [],
         external.reviewReadyCount,
@@ -602,18 +586,12 @@ export const buildExternalContributorReply = ({
       external.reviewReadyCount,
     ],
     [
-      groupHeading(
-        ':large_orange_circle:',
-        'NEED TRIAGE',
-        external.triage ?? [],
-        external.triageCount,
-      ),
+      groupHeading('NEED TRIAGE', external.triage ?? [], external.triageCount),
       external.triage ?? [],
       external.triageCount,
     ],
     [
       groupHeading(
-        ':large_yellow_circle:',
         'WAITING ON AUTHOR',
         external.authorFollowup ?? [],
         external.authorFollowupCount,

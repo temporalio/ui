@@ -570,16 +570,26 @@ test('keeps every list section short enough for Slack to render inline', () => {
     runUrl: RUN,
   });
 
-  // Slack hides the URL of a link, so measure what a reader sees.
+  // Slack hides the URL of a link, so measure what a reader sees. Slack
+  // collapses a whole message behind a Show more control, not one block, so
+  // the budget applies to the message. A reply of roughly 814 characters
+  // collapsed in run 32382088464.
   const visible = (text) => text.replaceAll(/<[^|>]+\|([^>]*)>/g, '$1');
-
-  for (const block of reply.blocks) {
-    if (block.type !== 'section') continue;
-    const shown = visible(block.text.text);
-    assert.ok(shown.length <= 600, `section shows ${shown.length} characters`);
-    for (const line of shown.split('\n')) {
-      assert.ok(line.length <= 120, `line shows ${line.length} characters`);
+  const shownText = (block) => {
+    if (block.type === 'divider') return '';
+    if (block.type === 'context') {
+      return block.elements.map((element) => visible(element.text)).join(' ');
     }
+    if (Array.isArray(block.fields)) {
+      return block.fields.map((field) => visible(field.text)).join(' ');
+    }
+    return visible(block.text.text);
+  };
+
+  const shown = reply.blocks.map(shownText).join('\n');
+  assert.ok(shown.length <= 600, `the reply shows ${shown.length} characters`);
+  for (const line of shown.split('\n')) {
+    assert.ok(line.length <= 120, `a line shows ${line.length} characters`);
   }
 });
 
