@@ -112,8 +112,48 @@ event group to `resolveSystemNexusEvent`.
 
 ## How to see the display on your computer
 
-The Temporal server must support the operation. Read the `local-temporal` skill
-for the procedure to run a local server build.
+Do this command:
 
-You must also enable `history.enableChasm` and
-`history.enableSignalWithStartFromWorkflow` in the dynamic configuration.
+```bash
+pnpm demo start system-nexus-signal-with-start
+```
+
+The command starts the server, starts the UI, makes the two events, and shows
+the links to the workflows. `pnpm demo stop` stops it again. Read
+`demos/README.md` for the command list and the definition format.
+
+The definition does these necessary things for you:
+
+- It finds the commit that added the operation, then selects a server. If a CLI
+  release has the commit, it uses that release. If no release has it, the command
+  compiles your `temporalio/temporal` checkout into the dev server of the CLI.
+- It enables `history.enableChasm` and
+  `history.enableSignalWithStartFromWorkflow` in the dynamic configuration.
+- It starts the catalog worker against that server.
+- It sends the operation to the `__temporal_system` endpoint.
+
+The target of the operation is the `signal-handlers` catalog example. The catalog
+worker runs it. Thus the workflow that the operation starts and signals is a
+workflow that the catalog has. Read the `catalog` skill.
+
+**The demo is of the Nexus operation, not the `signalWithStart` function of the
+client.** The function of the client goes to the frontend RPC. It makes no caller
+workflow and no Nexus events.
+
+**The Go SDK cannot send this operation from a workflow.** It refuses the
+reserved `__temporal_` prefix. This is the reason that
+`TestBothWorkflowsVisibleAfterSWSFromWorkflow` in the server repository is a
+skipped test.
+
+**The TypeScript SDK can send it.** The demo scenario uses an ordinary caller
+workflow with `createNexusServiceClient` and the `__temporal_system` endpoint.
+
+The payloads are `binary/protobuf` workflowservice messages, and the SDK has no
+encoder for them yet. Therefore the scenario supplies one in
+`payload-converter.ts` and it runs the caller on a worker of its own, thus the
+Catalog worker gets no change. The converter is temporary: it goes away when the
+SDK gets the operation. The Python SDK has it as
+`workflow.signal_with_start_workflow(...)` on a branch. Read
+`utilities/demo/README.md` for the details of the converter.
+
+To use a server that is not the default, read the `local-temporal` skill.
