@@ -116,7 +116,12 @@
     <div
       class={merge(
         'input-container',
-        'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        'relative box-border inline-flex h-10 w-full items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary',
+        !isDisabled &&
+          !showError &&
+          'focus-within:border-io-border-secondary hover:border-io-border-brand',
+        isDisabled &&
+          'border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
         inputContainerClass,
       )}
       class:disabled={isDisabled}
@@ -235,28 +240,20 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-io-border-danger focus-within:ring-io-border-danger;
-
-      > .input {
-        @apply caret-io-content-danger;
-      }
-    }
-
-    &.disabled {
-      @apply opacity-50;
+      @apply border-io-border-danger focus-within:border-io-border-danger;
     }
   }
 
   .input {
-    @apply m-2 h-full w-full bg-transparent focus:text-brand focus:outline-none;
+    @apply m-2 h-full w-full bg-transparent text-io-content-primary placeholder:text-io-content-tertiary focus:outline-none disabled:text-io-content-tertiary;
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
+    @apply block h-full w-fit border-r border-io-border-primary px-4 py-2 text-io-content-secondary;
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
+    @apply block h-full w-fit border-l border-io-border-primary bg-io-surface-tertiary px-4 py-2;
   }
 
   .noBorder {
@@ -268,7 +265,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-io-border-primary;
   }
 
   .disabled-icon-container {
@@ -280,11 +277,11 @@
   }
 
   .hint-text {
-    @apply text-xs text-primary;
+    @apply text-xs text-io-content-primary;
 
     &.error,
     &.invalid {
-      @apply text-danger;
+      @apply text-io-content-danger;
     }
   }
 

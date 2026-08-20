@@ -33,7 +33,7 @@
     'grow',
     'cursor-pointer',
     'gap-2',
-    'text-primary',
+    'text-io-content-primary',
     'text-sm',
     'font-medium',
     'focus:outline-none',

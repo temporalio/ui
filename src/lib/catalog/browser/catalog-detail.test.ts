@@ -233,7 +233,7 @@ describe('CatalogDetail', () => {
       }),
     ).toEqual({
       icon: 'circle-check',
-      iconClass: 'text-success',
+      iconClass: 'text-io-content-success',
       iconLabel: 'Worker readiness is ready',
       label: 'Handler worker is polling',
       tooltip: 'A Worker is polling.',
@@ -313,7 +313,7 @@ describe('CatalogDetail', () => {
       }),
     ).toEqual({
       icon: 'warning',
-      iconClass: 'text-warning',
+      iconClass: 'text-io-content-warning',
       iconLabel: 'Worker readiness is unavailable',
       label: 'Handler worker is polling',
       tooltip:

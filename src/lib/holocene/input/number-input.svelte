@@ -65,8 +65,14 @@
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center">
     <div
-      class="surface-primary relative box-border flex h-10 min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
-      class:opacity-50={disabled}
+      class={merge(
+        'relative box-border flex h-10 min-w-16 items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary',
+        !disabled &&
+          valid &&
+          'focus-within:border-io-border-secondary hover:border-io-border-brand',
+        disabled &&
+          'border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
+      )}
       class:search
       class:invalid={!valid}
     >
@@ -76,7 +82,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-primary focus:text-brand focus:outline-none"
+        class="m-2 block w-full bg-transparent text-center text-io-content-primary placeholder:text-io-content-tertiary focus:outline-none disabled:text-io-content-tertiary"
         type="number"
         {max}
         {min}
@@ -98,9 +104,12 @@
     </div>
     {#if units}
       <div
-        class="flex h-10 items-center border-y border-r border-subtle bg-subtle px-2"
+        class={merge(
+          'flex h-10 items-center border-y border-r border-io-border-tertiary bg-io-surface-tertiary px-2 text-io-content-primary',
+          disabled && 'border-io-border-secondary text-io-content-tertiary',
+        )}
       >
-        <p class="text-sm font-normal text-primary">{units}</p>
+        <p class="text-sm font-normal">{units}</p>
       </div>
     {/if}
   </div>
@@ -128,6 +137,6 @@
   }
 
   .invalid {
-    @apply border-io-border-danger focus-within:ring-io-border-danger;
+    @apply border-io-border-danger focus-within:border-io-border-danger;
   }
 </style>

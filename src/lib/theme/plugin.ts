@@ -38,6 +38,8 @@ const resolveSemanticColors = (mode: keyof SemanticColor) => ({
   ...resolveColorGroup('surface', surfaceColors, mode),
   ...resolveColorGroup('surface-status', surfaceStatusColors, mode),
   ...resolveColorGroup('border', semanticColors.border, mode),
+  ...resolveColorGroup('interactive', semanticColors.interactive, mode),
+  ...resolveColorGroup('actions', semanticColors.actions, mode),
 });
 
 const ioColors = {
@@ -50,6 +52,8 @@ const ioColors = {
     status: referenceColorGroup('surface-status', surfaceStatusColors),
   },
   border: referenceColorGroup('border', semanticColors.border),
+  interactive: referenceColorGroup('interactive', semanticColors.interactive),
+  actions: referenceColorGroup('actions', semanticColors.actions),
 };
 
 const ioLight = resolveSemanticColors('light');

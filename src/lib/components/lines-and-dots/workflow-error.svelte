@@ -73,7 +73,7 @@
         </div>
         <Timestamp dateTime={error?.eventTime} />
       </div>
-      <div class="flex flex-col gap-2 bg-io-background-primary p-4">
+      <div class="flex flex-col gap-2 bg-io-surface-primary p-4">
         {#if timeoutType}
           <p>
             <span class="mr-2 text-io-content-secondary">Timeout Type</span>

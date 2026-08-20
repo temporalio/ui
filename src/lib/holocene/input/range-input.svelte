@@ -143,7 +143,7 @@
   }
 
   .numeric-input {
-    @apply h-10 w-10 border border-io-border-primary bg-io-surface-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-io-border-information;
+    @apply h-10 w-10 border border-io-border-primary bg-io-surface-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary;
 
     appearance: textfield;
   }
@@ -159,7 +159,7 @@
   }
 
   .numeric-input:focus {
-    @apply outline ring-2 ring-io-border-information;
+    @apply outline ring-2 ring-io-interactive-primary;
   }
 
   .floating-value {
@@ -179,10 +179,10 @@
   }
 
   input[type='range']:focus::-webkit-slider-thumb {
-    @apply border border-io-border-primary ring-2 ring-io-border-information;
+    @apply border border-io-border-primary ring-2 ring-io-interactive-primary;
   }
 
   input[type='range']:focus::-moz-range-thumb {
-    @apply border border-io-border-primary ring-2 ring-io-border-information;
+    @apply border border-io-border-primary ring-2 ring-io-interactive-primary;
   }
 </style>

@@ -60,11 +60,31 @@ type BorderColors = Readonly<{
   error: SemanticColor;
 }>;
 
+type InteractiveColors = Readonly<{
+  primary: SemanticColor;
+  'primary-hover': SemanticColor;
+  'primary-press': SemanticColor;
+  secondary: SemanticColor;
+  'secondary-hover': SemanticColor;
+  'secondary-press': SemanticColor;
+  danger: SemanticColor;
+  'danger-hover': SemanticColor;
+  'danger-press': SemanticColor;
+}>;
+
+type ActionColors = Readonly<{
+  'hover-overlay': SemanticColor;
+  'press-overlay': SemanticColor;
+  'brand-hover': SemanticColor;
+}>;
+
 type SemanticColors = Readonly<{
   background: BackgroundColors;
   content: ContentColors;
   surface: SurfaceColors;
   border: BorderColors;
+  interactive: InteractiveColors;
+  actions: ActionColors;
 }>;
 
 export const semanticColors: SemanticColors = {
@@ -228,6 +248,58 @@ export const semanticColors: SemanticColors = {
     error: {
       light: colorAlphaScales.persimmon[60],
       dark: colorAlphaScales.persimmon[60],
+    },
+  },
+  interactive: {
+    primary: {
+      light: colorScales.indigo[9],
+      dark: colorScales.indigo[10],
+    },
+    'primary-hover': {
+      light: colorScales.indigo[10],
+      dark: colorScales.indigo[9],
+    },
+    'primary-press': {
+      light: colorScales.indigo[11],
+      dark: colorAlphaScales.slate[40],
+    },
+    secondary: {
+      light: colorScales.slate[1],
+      dark: colorScales.slate[12],
+    },
+    'secondary-hover': {
+      light: colorAlphaScales.indigo[10],
+      dark: colorAlphaScales.indigo[5],
+    },
+    'secondary-press': {
+      light: colorAlphaScales.indigo[15],
+      dark: colorAlphaScales.indigo[20],
+    },
+    danger: {
+      light: colorScales.red[9],
+      dark: colorScales.red[11],
+    },
+    'danger-hover': {
+      light: colorScales.red[10],
+      dark: colorScales.red[10],
+    },
+    'danger-press': {
+      light: colorScales.red[11],
+      dark: colorScales.red[9],
+    },
+  },
+  actions: {
+    'hover-overlay': {
+      light: colorAlphaScales.neutral[10],
+      dark: `color-mix(in srgb, ${colorScales.neutral[4]} 15%, transparent)`,
+    },
+    'press-overlay': {
+      light: colorAlphaScales.neutral[15],
+      dark: `color-mix(in srgb, ${colorScales.neutral[4]} 20%, transparent)`,
+    },
+    'brand-hover': {
+      light: colorAlphaScales.indigo[30],
+      dark: colorAlphaScales.indigo[30],
     },
   },
 };

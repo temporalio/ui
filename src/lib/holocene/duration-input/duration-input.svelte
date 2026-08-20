@@ -186,21 +186,25 @@
     {@render afterLabel?.()}
   </div>
   {#if hintTextAbove}
-    <p class="text-xs text-secondary">
+    <p class="text-xs text-io-content-secondary">
       {hintTextAbove}
     </p>
   {/if}
   <div
     class={twMerge(
-      'surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50',
+      'flex h-10 items-center border border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary focus-within:ring-2 focus-within:ring-io-interactive-primary',
+      !disabled &&
+        !error &&
+        'focus-within:border-io-border-secondary hover:border-io-border-brand',
+      disabled &&
+        'cursor-not-allowed border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
+      error && 'border-io-border-danger focus-within:border-io-border-danger',
       inputClass,
-      error && 'border-io-border-danger focus-within:ring-io-border-danger',
-      disabled && 'cursor-not-allowed opacity-50',
     )}
   >
     <input
       {id}
-      class="flex h-full grow border-r border-subtle bg-transparent p-2 focus-visible:outline-none disabled:cursor-not-allowed"
+      class="flex h-full grow border-r border-io-border-primary bg-transparent p-2 text-io-content-primary placeholder:text-io-content-tertiary focus-visible:outline-none disabled:cursor-not-allowed disabled:text-io-content-tertiary"
       type="number"
       {disabled}
       bind:value={rawValue}
@@ -209,7 +213,10 @@
     />
     <select
       id="{id}-unit-select"
-      class="surface-secondary h-full pl-2 focus-visible:outline-none disabled:cursor-not-allowed"
+      class={twMerge(
+        'h-full bg-io-surface-secondary pl-2 text-io-content-primary focus-visible:outline-none disabled:cursor-not-allowed',
+        disabled && 'bg-io-surface-tertiary text-io-content-tertiary',
+      )}
       {disabled}
       bind:value={unit}
       onchange={handleUnitChange}
@@ -222,7 +229,7 @@
   {#if hintText}
     <p
       class={twMerge(
-        'text-xs text-secondary',
+        'text-xs text-io-content-secondary',
         error && 'text-io-content-danger',
       )}
     >

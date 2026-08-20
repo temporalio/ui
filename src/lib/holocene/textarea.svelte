@@ -61,16 +61,20 @@
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full border border-io-border-primary focus-within:border-io-border-information focus-within:ring-2 focus-within:ring-io-border-information',
+      'relative box-border inline-flex w-full border border-io-border-tertiary focus-within:ring-2 focus-within:ring-io-interactive-primary',
+      !disabled &&
+        isValid &&
+        'focus-within:border-io-border-secondary hover:border-io-border-brand',
+      disabled && 'border-io-border-secondary',
       !isValid && 'error',
-      !disabled && 'hover:border-io-border-information',
     )}
   >
     <textarea
       bind:value
       class={merge(
-        'min-h-fit w-full bg-io-background-primary px-3 py-2 text-sm text-io-content-primary focus-visible:outline-none',
-        disabled && 'cursor-not-allowed opacity-50',
+        'min-h-fit w-full bg-io-interactive-secondary px-3 py-2 text-sm text-io-content-primary placeholder:text-io-content-tertiary focus-visible:outline-none',
+        disabled &&
+          'cursor-not-allowed bg-io-surface-tertiary text-io-content-tertiary',
       )}
       {id}
       {disabled}
@@ -114,7 +118,7 @@
 
 <style lang="postcss">
   .error {
-    @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-2 focus-within:ring-io-border-danger;
+    @apply border-io-border-danger focus-within:border-io-border-danger;
   }
 
   .error-msg {
