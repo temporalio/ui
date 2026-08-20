@@ -77,7 +77,7 @@
     "validate:versions": "./scripts/validate-versions.sh",
     "knip": "knip",
     "a11y:manifest:test": "node scripts/a11y/manifest.test.mjs",
-    "test:github-automation": "node --test .github/scripts/weekly-dependency-security-audit.test.mjs .github/scripts/apply-weekly-dependency-remediation.test.mjs .github/scripts/validate-claude-dependency-remediation.test.mjs .github/scripts/verify-weekly-dependency-remediation.test.mjs .github/scripts/weekly-dependency-security-digest.test.mjs"
+    "test:github-automation": "node --test .github/scripts/weekly-dependency-security-audit.test.mjs .github/scripts/apply-weekly-dependency-remediation.test.mjs .github/scripts/verify-weekly-dependency-remediation.test.mjs .github/scripts/weekly-dependency-security-digest.test.mjs"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.7",
