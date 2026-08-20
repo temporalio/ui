@@ -18,7 +18,9 @@
 </script>
 
 <PageTitle title="Sign In" url={page.url.href} />
-<header class="flex h-16 w-full items-center justify-between bg-primary px-10">
+<header
+  class="flex h-16 w-full items-center justify-between bg-io-surface-primary px-10"
+>
   <img src={Logo} alt="" class="max-h-10" />
   <FeedbackButton />
 </header>

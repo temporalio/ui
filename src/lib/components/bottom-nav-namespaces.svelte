@@ -57,7 +57,7 @@
 
 <style lang="postcss">
   .namespace {
-    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:bg-io-interactive-secondary hover:text-io-content-primary focus-visible:border-inverse focus-visible:bg-io-interactive-secondary focus-visible:text-io-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary;
+    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:bg-io-interactive-secondary hover:text-io-content-primary focus-visible:border-io-slate-1 focus-visible:bg-io-interactive-secondary focus-visible:text-io-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary;
 
     &.selected {
       @apply text-io-content-brand;

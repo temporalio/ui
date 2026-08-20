@@ -145,8 +145,8 @@
       'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden',
       'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-io-interactive-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-io-interactive-primary',
       isCloud
-        ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-io-content-white focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
-        : 'surface-black',
+        ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-io-content-white focus-visible:[&_[role=button]]:ring-io-green-7 focus-visible:[&_a]:ring-io-green-7'
+        : 'navigation-inverse bg-io-neutral-12 text-io-content-white',
     )}
     data-nav="open"
     in:slide={{ duration: 200, delay: 0 }}
@@ -174,8 +174,8 @@
     'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 px-4 py-2 transition-colors md:hidden',
     'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-io-interactive-primary focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-io-interactive-primary',
     isCloud
-      ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-io-content-white focus-visible:[&_a]:ring-success focus-visible:[&_button]:ring-success'
-      : 'surface-black border-t border-io-border-primary',
+      ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-io-content-white focus-visible:[&_a]:ring-io-green-7 focus-visible:[&_button]:ring-io-green-7'
+      : 'navigation-inverse border-t border-io-border-primary bg-io-neutral-12 text-io-content-white',
     className,
   )}
   data-testid="top-nav"
@@ -257,7 +257,7 @@
 
 <style lang="postcss">
   .namespace-wrapper {
-    @apply surface-black flex h-10 w-full grow flex-row items-center border border-io-border-primary px-0.5 text-sm focus-within:border-io-border-brand focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary;
+    @apply flex h-10 w-full grow flex-row items-center border border-io-border-primary bg-io-neutral-12 px-0.5 text-sm text-io-content-white focus-within:border-io-border-brand focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary;
   }
 
   .nav-button {
