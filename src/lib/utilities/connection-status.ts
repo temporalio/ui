@@ -2,6 +2,7 @@ import { translate } from '$lib/i18n/translate';
 import type { ComputeStatus } from '$lib/types/deployments';
 import type { ValidTime } from '$lib/utilities/format-time';
 import { isTimestamp, timestampToDate } from '$lib/utilities/format-time';
+import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
 export type ConnectionState = 'pending' | 'connected' | 'failed';
 
@@ -61,4 +62,28 @@ export const connectionTooltip = (computeStatus?: ComputeStatus): string => {
   if (state === 'connected') return checked;
   const errorMessage = computeStatus?.providerValidation?.errorMessage ?? '';
   return (errorMessage ? `${errorMessage}. ` : '') + checked;
+};
+
+export type ValidationOutcome =
+  | { state: 'valid' }
+  | { state: 'invalid'; message: string }
+  | { state: 'indeterminate'; message?: string };
+
+/**
+ * The backend reports a completed check that found a problem as InvalidArgument,
+ * which is a verdict. Every other failure, such as a gateway timeout or a lost
+ * connection, means the check did not finish, so the connection state stays
+ * unknown.
+ */
+export const resolveValidationOutcome = (
+  error: Pick<APIErrorResponse, 'status' | 'body'>,
+): ValidationOutcome => {
+  const message = error?.body?.message || undefined;
+  if (error?.status === 400) {
+    return {
+      state: 'invalid',
+      message: message ?? translate('deployments.validate-connection-error'),
+    };
+  }
+  return { state: 'indeterminate', message };
 };

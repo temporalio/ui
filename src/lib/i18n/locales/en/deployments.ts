@@ -117,6 +117,9 @@ export const Strings = {
   'validate-connection-error': 'Failed to validate connection',
   'validate-connection-valid': 'Connection is valid',
   'validate-connection-invalid': 'Connection is invalid',
+  'validate-connection-incomplete': 'Could not complete the check',
+  'validate-connection-incomplete-description':
+    'The connection status is unknown. The check can still complete in the background. Retry, or refresh to see the current status.',
   'validate-connection-no-task-queue':
     "This Worker Deployment Version's Task Queue is not registered. The serverless function may be failing after invocation. Check the function for configuration or runtime errors, then re-run it from your cloud provider's console. Alternatively, create a new Version to retry.",
   'validate-connection-no-task-queue-pending':
