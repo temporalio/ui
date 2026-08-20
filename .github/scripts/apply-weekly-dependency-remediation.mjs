@@ -435,8 +435,36 @@ function highestPatchedVersion(alerts) {
   );
 }
 
+/** The resolved versions that an alert of this group still covers. */
+function vulnerableResolvedVersions(alerts, resolvedVersions) {
+  return (resolvedVersions ?? []).filter((version) =>
+    alerts.some((item) => isVersionVulnerable(version, item.vulnerableRange)),
+  );
+}
+
 function classifyPackage(alerts, packageJson, resolvedVersions) {
   const result = classifyPackageStatus(alerts, packageJson, resolvedVersions);
+  const stillVulnerable = vulnerableResolvedVersions(alerts, resolvedVersions);
+
+  // The manifest satisfies the advisory and the planner therefore has no work
+  // to do, but the lockfile still holds a version the advisory covers. The
+  // floor does not take effect, so a person must find out why. Without this a
+  // run reports success, creates no pull request, and leaves the alert open,
+  // because the verification step only reads an alert that an action names.
+  if (
+    result.status === 'safe' &&
+    !result.action &&
+    stillVulnerable.length > 0
+  ) {
+    return classification({
+      packageName: alerts[0]?.packageName,
+      alertIds: alerts.map((alert) => alert.id),
+      status: 'manual',
+      reason: `${result.reason} The lockfile still resolves ${stillVulnerable.join(', ')}, so that floor does not take effect.`,
+      resolvedVersions,
+    });
+  }
+
   if (!resolvedVersions?.length || result.resolvedVersions) return result;
   return { ...result, resolvedVersions };
 }
@@ -477,8 +505,9 @@ function classifyPackageStatus(alerts, packageJson, resolvedVersions) {
     });
   }
 
-  const vulnerableResolved = (resolvedVersions ?? []).filter((version) =>
-    alerts.some((item) => isVersionVulnerable(version, item.vulnerableRange)),
+  const vulnerableResolved = vulnerableResolvedVersions(
+    alerts,
+    resolvedVersions,
   );
   if (resolvedVersions?.length && vulnerableResolved.length === 0) {
     return classification({
