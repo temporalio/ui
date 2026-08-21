@@ -38,13 +38,16 @@ cors:
     - "http://localhost:8080"
     {{- end }}
 tls:
-  caFile: {{ env "TEMPORAL_TLS_CA" | default "" }}
-  certFile: {{ env "TEMPORAL_TLS_CERT" | default "" }}
-  keyFile: {{ env "TEMPORAL_TLS_KEY" | default "" }}
-  caData: {{ env "TEMPORAL_TLS_CA_DATA" | default "" }}
-  certData: {{ env "TEMPORAL_TLS_CERT_DATA" | default "" }}
-  keyData: {{ env "TEMPORAL_TLS_KEY_DATA" | default "" }}
-  enableHostVerification: {{ env "TEMPORAL_TLS_ENABLE_HOST_VERIFICATION" | default "false" }}
+  # The standard envconfig names shared by the temporal CLI and SDKs are resolved first.
+  # TEMPORAL_TLS_CA/CERT/KEY (and their _DATA variants) and TEMPORAL_TLS_ENABLE_HOST_VERIFICATION
+  # are ui-server-specific names kept as a fallback for backwards compatibility.
+  caFile: {{ env "TEMPORAL_TLS_SERVER_CA_CERT_PATH" | default (env "TEMPORAL_TLS_CA") }}
+  certFile: {{ env "TEMPORAL_TLS_CLIENT_CERT_PATH" | default (env "TEMPORAL_TLS_CERT") }}
+  keyFile: {{ env "TEMPORAL_TLS_CLIENT_KEY_PATH" | default (env "TEMPORAL_TLS_KEY") }}
+  caData: {{ env "TEMPORAL_TLS_SERVER_CA_CERT_DATA" | default (env "TEMPORAL_TLS_CA_DATA") }}
+  certData: {{ env "TEMPORAL_TLS_CLIENT_CERT_DATA" | default (env "TEMPORAL_TLS_CERT_DATA") }}
+  keyData: {{ env "TEMPORAL_TLS_CLIENT_KEY_DATA" | default (env "TEMPORAL_TLS_KEY_DATA") }}
+  enableHostVerification: {{ if env "TEMPORAL_TLS_DISABLE_HOST_VERIFICATION" }}{{ eq (env "TEMPORAL_TLS_DISABLE_HOST_VERIFICATION") "false" }}{{ else if env "TEMPORAL_TLS_ENABLE_HOST_VERIFICATION" }}{{ env "TEMPORAL_TLS_ENABLE_HOST_VERIFICATION" }}{{ else }}false{{ end }}
   serverName: {{ env "TEMPORAL_TLS_SERVER_NAME" | default "" }}
 uiServerTLS:
   certFile: {{ env "TEMPORAL_UI_SERVER_TLS_CERT" | default "" }}
