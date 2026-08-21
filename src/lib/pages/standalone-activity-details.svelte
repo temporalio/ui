@@ -41,6 +41,18 @@
       ($activityExecution?.info?.attempt ?? 0) > 1,
   );
 
+  const hasLastHeartbeatTime = $derived(
+    !!$activityExecution?.info?.lastHeartbeatTime,
+  );
+
+  const hasHeartbeatTimeout = $derived(
+    !!$activityExecution?.info?.heartbeatTimeout,
+  );
+
+  const heartbeatRowCount = $derived(
+    (hasLastHeartbeatTime ? 1 : 0) + (hasHeartbeatTimeout ? 1 : 0),
+  );
+
   const hasCodeBlocks = $derived(
     !!(
       $activityExecution?.info?.lastFailure ||
@@ -195,31 +207,35 @@
             {/if}
           </DetailList>
         </div>
-        {#if !isClosed}
+        {#if heartbeatRowCount > 0}
           <div class="space-y-2">
             <h5>
               {translate('standalone-activities.health')}
             </h5>
             <DetailList
-              rowCount={2}
+              rowCount={heartbeatRowCount}
               aria-label={translate('standalone-activities.health')}
             >
-              <DetailListLabel
-                >{translate(
-                  'standalone-activities.last-heartbeat',
-                )}</DetailListLabel
-              >
-              <DetailListTimestampValue
-                timestamp={$activityExecution.info.lastHeartbeatTime}
-              />
-              <DetailListLabel
-                >{translate(
-                  'standalone-activities.heartbeat-timeout',
-                )}</DetailListLabel
-              >
-              <DetailListTextValue
-                text={fromSeconds($activityExecution.info.heartbeatTimeout)}
-              />
+              {#if hasLastHeartbeatTime}
+                <DetailListLabel
+                  >{translate(
+                    'standalone-activities.last-heartbeat',
+                  )}</DetailListLabel
+                >
+                <DetailListTimestampValue
+                  timestamp={$activityExecution.info.lastHeartbeatTime}
+                />
+              {/if}
+              {#if hasHeartbeatTimeout}
+                <DetailListLabel
+                  >{translate(
+                    'standalone-activities.heartbeat-timeout',
+                  )}</DetailListLabel
+                >
+                <DetailListTextValue
+                  text={fromSeconds($activityExecution.info.heartbeatTimeout)}
+                />
+              {/if}
             </DetailList>
           </div>
         {/if}
