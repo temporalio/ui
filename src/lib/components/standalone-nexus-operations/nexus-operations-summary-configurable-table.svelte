@@ -2,10 +2,10 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalSettings } from '$lib/io/icon';
   import { fetchPaginatedNexusOperations } from '$lib/services/standalone-nexus-operations';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import {
@@ -87,7 +87,7 @@
           size="xs"
           variant="ghost"
         >
-          <Icon name="settings" />
+          <IconTemporalSettings />
         </Button>
       </Tooltip>
     {/snippet}

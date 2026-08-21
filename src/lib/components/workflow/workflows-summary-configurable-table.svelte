@@ -9,10 +9,14 @@
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconTable,
+    IconTableDense,
+    IconTemporalSettings,
+  } from '$lib/io/icon';
   import {
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
@@ -280,7 +284,7 @@
           data-testid="table-density-button"
           size="xs"
           variant="ghost"
-          leadingIcon={dense ? 'table-dense' : 'table-comfy'}
+          LeadingIcon={dense ? IconTableDense : IconTable}
           aria-label={dense
             ? translate('common.dense')
             : translate('common.comfortable')}
@@ -300,7 +304,7 @@
           variant="ghost"
           aria-label={translate('common.configure-columns')}
         >
-          <Icon name="settings" />
+          <IconTemporalSettings />
         </Button>
       </Tooltip>
     {/snippet}

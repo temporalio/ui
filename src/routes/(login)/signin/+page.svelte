@@ -8,6 +8,7 @@
   import FeedbackButton from '$lib/components/feedback-button.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import { IconLock } from '$lib/io/icon';
   import { routeForAuthentication } from '$lib/utilities/route-for';
   import Logo from '$lib/vendor/logo.svg';
 
@@ -29,7 +30,7 @@
   <div class="flex items-center justify-center">
     <Button
       data-testid="login-button"
-      leadingIcon="lock"
+      LeadingIcon={IconLock}
       onclick={() => {
         if (BROWSER) {
           window.location.assign(

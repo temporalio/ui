@@ -4,6 +4,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconUpload } from '$lib/io/icon';
   import { groupEvents } from '$lib/models/event-groups';
   import { toEventHistory } from '$lib/models/event-history';
   import { importEventGroups, importEvents } from '$lib/stores/import-events';
@@ -73,7 +74,7 @@
     accept=".json"
     onchange={onFileSelect}
   />
-  <Button leadingIcon="file-upload" onclick={onConfirm} disabled={!fileLoaded}
+  <Button LeadingIcon={IconUpload} onclick={onConfirm} disabled={!fileLoaded}
     >{translate('common.import')}</Button
   >
 </div>

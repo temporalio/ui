@@ -7,12 +7,12 @@
   import Button, {
     type ButtonWithoutHrefProps,
   } from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     MENU_CONTEXT,
     type MenuContext,
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
+  import { IconChevronDown } from '$lib/io/icon';
 
   export interface Props extends Omit<ButtonWithoutHrefProps, 'onclick'> {
     controls: string;
@@ -112,8 +112,7 @@
   {/if}
   {#if hasIndicator}
     <div class="flex">
-      <Icon
-        name="chevron-down"
+      <IconChevronDown
         class={merge('transition-transform', $open && 'rotate-180')}
       />
     </div>

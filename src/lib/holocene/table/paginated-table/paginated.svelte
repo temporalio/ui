@@ -7,6 +7,7 @@
   import Button from '$lib/holocene/button.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
+  import { IconArrowLeft, IconArrowRight } from '$lib/io/icon';
   import {
     currentPageKey,
     defaultItemsPerPage,
@@ -170,14 +171,14 @@
       <IconButton
         label={previousPageButtonLabel}
         disabled={!$store.hasPrevious}
-        icon="arrow-left"
+        Icon={IconArrowLeft}
         onclick={() => handlePageChange($store.currentPage - 1)}
       />
       <IconButton
         label={nextPageButtonLabel}
         disabled={!$store.hasNext}
         onclick={() => handlePageChange($store.currentPage + 1)}
-        icon="arrow-right"
+        Icon={IconArrowRight}
       />
     </nav>
   {/snippet}

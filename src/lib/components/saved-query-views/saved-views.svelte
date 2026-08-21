@@ -9,10 +9,18 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { setPaginatedTableMaxHeight } from '$lib/holocene/table/paginated-table/context';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconArrowsLeftRightToLine,
+    IconBookmark,
+    IconCheckmark,
+    type IconComponent,
+    IconCopy,
+    IconExclamationOctagon,
+    IconHappyLappy,
+  } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
@@ -76,7 +84,7 @@
     id: 'unsaved',
     name: 'New View',
     query,
-    icon: 'bookmark',
+    Icon: IconBookmark,
     badge: 'Unsaved',
     type: 'system',
     active: true,
@@ -295,7 +303,7 @@
           }}>Edit</Button
         >
         <Button
-          leadingIcon={$copied ? 'checkmark' : 'copy'}
+          LeadingIcon={$copied ? IconCheckmark : IconCopy}
           aria-label="Share"
           size="xs"
           variant="ghost"
@@ -376,7 +384,8 @@
       disabled={view.disabled}
       size="xs"
     >
-      <Icon name={view.icon || 'bookmark'} class="h-4 w-4 flex-shrink-0" />
+      {@const Glyph = view.Icon || IconBookmark}
+      <Glyph class="h-4 w-4 flex-shrink-0" />
       {#if showLabel}
         <span class="truncate font-normal">{view.name}</span>
       {/if}
@@ -390,7 +399,7 @@
         {@render queryBadge({
           className: `font-mono ${view.count > 0 ? 'bg-red-50 dark:bg-red-900 text-red-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-600 text-blue-900 dark:text-white'}`,
           content: view.count,
-          icon: view.count > 0 ? 'exclamation-octagon' : 'happy-lappy',
+          Icon: view.count > 0 ? IconExclamationOctagon : IconHappyLappy,
           iconClass:
             view.count > 0
               ? 'bg-red-200 dark:bg-red-700 text-red-900 dark:text-white'
@@ -405,24 +414,24 @@
   className,
   content,
   iconClass,
-  icon,
+  Icon,
 }: {
   className?: ClassNameValue;
   content: string | number;
   iconClass?: ClassNameValue;
-  icon?: IconName;
+  Icon?: IconComponent;
 })}
   <span
     class={merge(
       'surface-subtle flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium',
-      icon && 'gap-1.5 p-0.5 pl-2',
+      Icon && 'gap-1.5 p-0.5 pl-2',
       className,
     )}
   >
     <span class="max-w-16 truncate">{content}</span>
-    {#if icon}
+    {#if Icon}
       <span class={merge('rounded-full p-0.5', iconClass)}>
-        <Icon name={icon} class="p-0.5" />
+        <Icon class="p-0.5" />
       </span>
     {/if}
   </span>

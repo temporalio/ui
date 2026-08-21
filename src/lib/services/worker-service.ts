@@ -47,6 +47,28 @@ export const fetchPaginatedWorkers = async (
   };
 };
 
+export const fetchWorkerCount = async (
+  { namespace, query }: ListWorkersRequest,
+  request = fetch,
+): Promise<{ count: number | undefined }> => {
+  try {
+    const route = routeForApi('workers.count', {
+      namespace: namespace ?? '',
+    });
+    const result = await requestFromAPI<{ count: string }>(route, {
+      params: query ? { query } : {},
+      handleError: () => {},
+      request,
+    });
+    if (result?.count === undefined) return { count: undefined };
+
+    const count = parseInt(result.count);
+    return { count: Number.isNaN(count) ? undefined : count };
+  } catch {
+    return { count: undefined };
+  }
+};
+
 export async function describeWorker(
   parameters: DescribeWorkerRequest,
   request = fetch,

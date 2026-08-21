@@ -8,6 +8,7 @@
   import Error from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { describeWorker } from '$lib/services/worker-service';
   import type { WorkerInfo } from '$lib/types';
   import type { NetworkError } from '$lib/types/global';
@@ -47,7 +48,7 @@
   <Link
     href={routeForWorkers({ namespace })}
     data-testid="back-to-workers"
-    icon="chevron-left"
+    LeadingIcon={IconChevronLeft}
   >
     {translate('workers.back-to-workers')}
   </Link>

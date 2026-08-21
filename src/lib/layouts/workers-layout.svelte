@@ -5,11 +5,18 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { refresh } from '$lib/stores/workers';
+  import { createCountPoller } from '$lib/runes/count-poller.svelte';
+  import { fetchWorkerCount } from '$lib/services/worker-service';
+  import {
+    refresh,
+    workerCount,
+    workerCountEnabled,
+  } from '$lib/stores/workers';
   import {
     routeForWorkerDeployments,
     routeForWorkers,
@@ -38,25 +45,52 @@
     deploymentsHrefProp ?? routeForWorkerDeployments({ namespace }),
   );
 
-  let refreshTime = $state(new Date());
+  const query = $derived(page.url.searchParams.get('query') ?? '');
+  const workerHeartbeatsEnabled = $derived(
+    !!page.data?.namespace?.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
+  const countEnabled = $derived(workerHeartbeatsEnabled && $workerCountEnabled);
+
+  let countLoaded = $state(false);
+
+  const countPoller = createCountPoller({
+    getStore: () => workerCount,
+    fetch: ({ signal }) =>
+      countEnabled
+        ? fetchWorkerCount({ namespace, query }, (input, init) =>
+            fetch(input, { ...init, signal }),
+          )
+        : Promise.resolve({ count: undefined }),
+    transform: (response) => response.count ?? $workerCount.count,
+    disabled: () => !countEnabled,
+    watch() {
+      void namespace;
+      void query;
+      void countEnabled;
+      void $refresh;
+    },
+    onReset: () => {
+      countLoaded = false;
+      workerCount.update((s) => ({ ...s, count: 0 }));
+    },
+    onInitialFetch: (_count, response) => {
+      countLoaded = response.count !== undefined;
+    },
+  });
+
+  const refreshTime = $derived(new Date(countPoller.refreshTime));
 
   const refreshTimeFormatted = $derived($timestamp(refreshTime));
-
-  $effect(() => {
-    void $refresh;
-    refreshTime = new Date();
-  });
 </script>
 
 <header class="flex flex-col gap-2">
-  <div class="flex min-h-10 flex-wrap items-center justify-between gap-2">
+  <div class="flex min-h-10 flex-wrap items-start justify-between gap-2">
     <div>
       <div class="flex items-start gap-2">
         <h1 class="leading-7" data-cy="workers-title">
           {translate('workers.workers')}
         </h1>
-        <!-- TODO: Add count when there is a WorkersCount API available -->
-        <CountRefreshButton count={0} {refresh} />
+        <CountRefreshButton count={$workerCount.newCount} {refresh} />
       </div>
       <p class="mt-2 text-xs text-secondary">
         {refreshTimeFormatted}
@@ -73,7 +107,13 @@
         id="workers-tab"
         href={workersHref}
         active={page.url.pathname.endsWith('/workers')}
-      ></Tab>
+      >
+        {#if countEnabled && countLoaded}
+          <Badge type="primary" class="px-2 py-0">
+            {$workerCount.count}
+          </Badge>
+        {/if}
+      </Tab>
       <Tab
         label={translate('deployments.deployments')}
         id="deployments-tab"

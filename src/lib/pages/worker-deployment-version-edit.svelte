@@ -8,6 +8,7 @@
   import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import {
     buildGcpCloudRunComputeConfig,
     buildLambdaComputeConfig,
@@ -60,7 +61,7 @@
   {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
   {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
   <div class="flex max-w-[45rem] flex-col gap-4">
-    <Link href={backHref} icon="chevron-left">
+    <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {translate('workers.back-to-deployment', { deployment })}
     </Link>
     <h1 class="text-2xl font-semibold">

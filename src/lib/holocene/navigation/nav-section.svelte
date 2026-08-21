@@ -16,7 +16,8 @@
   <NavigationItem
     link={item.href}
     label={item.label}
-    icon={item.icon}
+    Icon={item.Icon}
+    data-testid={item.testId}
     tooltip={item.tooltip || item.label}
     external={item.external}
     animate={item.animate}

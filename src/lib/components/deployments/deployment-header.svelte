@@ -6,6 +6,7 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import {
     routeForWorkerDeployments,
     routeForWorkerDeploymentVersionCreate,
@@ -48,7 +49,10 @@
 
 <header class="flex flex-col gap-4">
   <div class="flex items-center gap-2 text-sm">
-    <Link href={routeForWorkerDeployments({ namespace })} icon="chevron-left">
+    <Link
+      href={routeForWorkerDeployments({ namespace })}
+      LeadingIcon={IconChevronLeft}
+    >
       {translate('deployments.back-to-deployments')}
     </Link>
     {#if showInstancesLink}

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconMoon, IconSun, IconSystemWindow } from '$lib/io/icon';
   import { useDarkModePreference } from '$lib/utilities/dark-mode';
   import {
     type DarkModePreference,
@@ -29,7 +29,7 @@
     active={$useDarkModePreference === 'system'}
     size="xs"
   >
-    <Icon name="system-window" />
+    <IconSystemWindow />
   </ToggleButton>
   <ToggleButton
     aria-label={translate('common.day')}
@@ -38,7 +38,7 @@
     active={$useDarkModePreference === false}
     size="xs"
   >
-    <Icon name="sun" />
+    <IconSun />
   </ToggleButton>
   <ToggleButton
     aria-label={translate('common.night')}
@@ -47,6 +47,6 @@
     active={$useDarkModePreference === true}
     size="xs"
   >
-    <Icon name="moon" />
+    <IconMoon />
   </ToggleButton>
 </ToggleButtons>

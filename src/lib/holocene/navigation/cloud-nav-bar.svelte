@@ -4,9 +4,9 @@
 
   import { base } from '$app/paths';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconArrowLeft, IconArrowsLeftRightToLine } from '$lib/io/icon';
 
   interface Props {
     version: string;
@@ -45,9 +45,8 @@
     {#if subtitle}
       {#if subtitleHref}
         <a href={subtitleHref} class="contents">
-          <Icon
-            label="Project Namespaces"
-            name="arrow-left"
+          <IconArrowLeft
+            title="Project Namespaces"
             class="m-1.5 text-indigo-100 group-data-[nav=closed]:hidden"
           />
           <h2
@@ -76,7 +75,7 @@
     class="mx-[8px] justify-self-end transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
     onclick={ontoggle}
   >
-    <Icon name="collapse" class="text-indigo-100" />
+    <IconArrowsLeftRightToLine class="text-indigo-100" />
   </button>
 </div>
 <div role="list">

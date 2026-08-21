@@ -1,12 +1,17 @@
 <script lang="ts">
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+  import {
+    IconExternalLink,
+    IconPlaySolid,
+    IconSearch,
+    IconTemporalSettings,
+  } from '$lib/io/icon';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { changePendingRunCount } from './catalog-list-state';
@@ -140,7 +145,7 @@
         aria-label={evidence.label}
         class="inline-flex items-center !no-underline"
       >
-        <Icon name="external-link" class="h-3.5 w-3.5" />
+        <IconExternalLink class="h-3.5 w-3.5" />
       </Link>
     {/if}
   </span>
@@ -172,7 +177,7 @@
     <Input
       id="catalog-search"
       bind:value={query}
-      icon="search"
+      Icon={IconSearch}
       label="Search examples"
       labelHidden
       type="search"
@@ -266,7 +271,7 @@
                 <Button
                   href={exampleHref(descriptor.id)}
                   aria-label="Configure"
-                  leadingIcon="settings"
+                  LeadingIcon={IconTemporalSettings}
                   size="xs"
                   variant="secondary"
                 >
@@ -275,7 +280,7 @@
                 <div class="relative">
                   <Button
                     size="xs"
-                    leadingIcon="play"
+                    LeadingIcon={IconPlaySolid}
                     aria-label={pending
                       ? `Start (${pending} pending)`
                       : 'Start'}

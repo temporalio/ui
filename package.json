@@ -77,7 +77,7 @@
     "validate:versions": "./scripts/validate-versions.sh",
     "knip": "knip",
     "a11y:manifest:test": "node scripts/a11y/manifest.test.mjs",
-    "test:github-automation": "node --test .github/scripts/weekly-dependency-security-audit.test.mjs .github/scripts/apply-weekly-dependency-remediation.test.mjs .github/scripts/validate-claude-dependency-remediation.test.mjs .github/scripts/verify-weekly-dependency-remediation.test.mjs .github/scripts/weekly-dependency-security-digest.test.mjs"
+    "test:github-automation": "node --test .github/scripts/weekly-dependency-security-audit.test.mjs .github/scripts/apply-weekly-dependency-remediation.test.mjs .github/scripts/verify-weekly-dependency-remediation.test.mjs .github/scripts/weekly-dependency-security-digest.test.mjs"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.7",
@@ -118,7 +118,7 @@
     "micromark-extension-gfm-table": "^2.1.0",
     "remark-stringify": "^10.0.3",
     "sveltekit-superforms": "2.30.2",
-    "tailwind-merge": "^1.14.0",
+    "tailwind-merge": "^2.6.1",
     "unist-util-remove": "^4.0.0",
     "url-pattern": "^1.0.3",
     "zod": "^4.1.12"
@@ -201,7 +201,7 @@
     "stylelint": "^17.0.0",
     "stylelint-config-recommended": "^18.0.0",
     "stylelint-config-standard": "^40.0.0",
-    "svelte": "5.55.7",
+    "svelte": "5.56.3",
     "svelte-check": "^4.1.5",
     "svelte-preprocess": "^6.0.3",
     "tailwindcss": "^3.4.1",
@@ -279,6 +279,10 @@
   "packageManager": "pnpm@10.10.0",
   "exports": {
     "./_": "Wildcard entries below are replaced with explicit paths by scripts/generate-exports.mjs during prepack",
+    "./io/icon": {
+      "types": "./dist/io/icon/index.d.ts",
+      "import": "./dist/io/icon/index.js"
+    },
     "./*.svelte": {
       "types": "./dist/*.svelte.d.ts",
       "svelte": "./dist/*.svelte"

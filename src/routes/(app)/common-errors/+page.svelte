@@ -9,6 +9,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
+  import { IconExclamationCircle, IconInfo, IconWarning } from '$lib/io/icon';
   import type { CommonErrorSeverity } from '$lib/types/common-errors';
 
   type FilterOption = CommonErrorSeverity | 'all';
@@ -41,21 +42,21 @@
     >
     <TabButton
       active={activeFilter === 'error'}
-      icon="error"
+      Icon={IconExclamationCircle}
       onclick={() => {
         activeFilter = 'error';
       }}>Errors ({errorCount})</TabButton
     >
     <TabButton
       active={activeFilter === 'warning'}
-      icon="warning"
+      Icon={IconWarning}
       onclick={() => {
         activeFilter = 'warning';
       }}>Warnings ({warningCount})</TabButton
     >
     <TabButton
       active={activeFilter === 'info'}
-      icon="info"
+      Icon={IconInfo}
       onclick={() => {
         activeFilter = 'info';
       }}>Info ({infoCount})</TabButton

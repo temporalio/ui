@@ -1445,7 +1445,7 @@ registry.registerExample({
           'src/lib/holocene/button.svelte',
           'src/lib/holocene/card.svelte',
           'src/lib/holocene/copyable',
-          'src/lib/holocene/icon',
+          'src/lib/io/icon',
           'src/lib/holocene/icon-button.svelte',
           'src/lib/holocene/input/input.svelte',
           'src/lib/holocene/label.svelte',
@@ -1664,11 +1664,13 @@ registry.registerExample({
           "import { resolveCatalogRouting } from '@temporalio/ui/catalog/browser/routing';",
           "import CatalogDetail from '@temporalio/ui/catalog/browser/catalog-detail.svelte';",
           "import CatalogList from '@temporalio/ui/catalog/browser/catalog-list.svelte';",
+          "import { IconAdd } from '@temporalio/ui/io/icon';",
           "const [target] = resolveCatalogRouting([{ targetId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
           'document.body.dataset.catalogSize = String(catalog.length);',
           'document.body.dataset.catalogDetail = typeof CatalogDetail;',
           'document.body.dataset.catalogList = typeof CatalogList;',
           'document.body.dataset.catalogNamespace = target.namespace;',
+          'document.body.dataset.iconAdd = typeof IconAdd;',
         ].join('\n'),
       );
 

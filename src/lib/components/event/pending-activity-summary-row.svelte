@@ -6,9 +6,9 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconPause, IconRetry } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { PendingActivity } from '$lib/types/events';
@@ -59,6 +59,8 @@
     expanded = !expanded;
     onRowClick();
   };
+
+  const Glyph = $derived(CategoryIcon['activity'].Icon);
 </script>
 
 <tr
@@ -100,8 +102,7 @@
   </td>
   <td class="">
     <p class={eventTypeStyle({ category: 'activity' })}>
-      <Icon
-        name={CategoryIcon['activity'].name}
+      <Glyph
         title={CategoryIcon['activity'].title}
         class="mr-1 inline animate-pulse"
       />
@@ -118,13 +119,13 @@
             ? 'danger'
             : 'default'}
       >
-        <Icon
+        {@const Glyph = event.paused ? IconPause : IconRetry}
+        <Glyph
           class={merge(
             'mr-1 inline',
             (event.attempt ?? 0) > 1 && 'font-bold text-red-400',
             event.paused && 'font-bold text-yellow-700',
           )}
-          name={event.paused ? 'pause' : 'retry'}
         />
         {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}

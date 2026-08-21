@@ -40,7 +40,7 @@ const report = ({ actions, classifications = [] }) => ({
   actions,
   classifications,
   applied: true,
-  resolver: 'claude-code',
+  resolver: 'deterministic-planner',
 });
 
 test('confirms a remediated alert when every resolved copy escapes its range', () => {

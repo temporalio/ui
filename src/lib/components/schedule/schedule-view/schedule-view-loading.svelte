@@ -2,6 +2,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { routeForSchedules } from '$lib/utilities/route-for';
 
   interface Props {
@@ -13,7 +14,7 @@
 </script>
 
 <header class="mb-2 flex flex-col gap-4">
-  <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+  <Link href={routeForSchedules({ namespace })} LeadingIcon={IconChevronLeft}>
     {translate('schedules.back-to-schedules')}
   </Link>
   <div class="flex items-start justify-between">

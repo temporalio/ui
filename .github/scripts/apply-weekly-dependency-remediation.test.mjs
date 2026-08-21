@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -956,4 +956,129 @@ test('refuses an override whose lower bound carries a prerelease', () => {
   assert.equal(plan.actions.length, 0);
   assert.equal(plan.classifications[0].status, 'manual');
   assert.match(plan.classifications[0].reason, /prerelease/);
+});
+
+test('records the deterministic planner as the resolver when it applies a plan', async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'weekly-resolver-'));
+  const auditPath = path.join(directory, 'audit.json');
+  const packageJsonPath = path.join(directory, 'package.json');
+  const reportPath = path.join(directory, 'remediation.json');
+
+  await writeFile(
+    auditPath,
+    JSON.stringify([alert({ name: 'lodash', patched: '4.17.21' })]),
+  );
+  await writeFile(
+    packageJsonPath,
+    JSON.stringify(manifest({ dependencies: { lodash: '^4.17.20' } })),
+  );
+
+  const { report } = await runCli([
+    '--audit',
+    auditPath,
+    '--package-json',
+    packageJsonPath,
+    '--report',
+    reportPath,
+    '--apply',
+  ]);
+
+  assert.equal(report.applied, true);
+  assert.equal(report.resolver, 'deterministic-planner');
+
+  const written = JSON.parse(await readFile(reportPath, 'utf8'));
+  assert.equal(written.resolver, 'deterministic-planner');
+  const applied = JSON.parse(await readFile(packageJsonPath, 'utf8'));
+  assert.equal(applied.dependencies.lodash, '^4.17.21');
+});
+
+test('names no resolver when a plan holds no action', async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'weekly-resolver-none-'));
+  const auditPath = path.join(directory, 'audit.json');
+  const packageJsonPath = path.join(directory, 'package.json');
+
+  await writeFile(auditPath, JSON.stringify([]));
+  await writeFile(packageJsonPath, JSON.stringify(manifest()));
+
+  const { report } = await runCli([
+    '--audit',
+    auditPath,
+    '--package-json',
+    packageJsonPath,
+    '--report',
+    path.join(directory, 'remediation.json'),
+    '--apply',
+  ]);
+
+  assert.equal(report.applied, false);
+  assert.equal(report.resolver, undefined);
+});
+
+const vulnerableLockfile = (entry) => `lockfileVersion: '9.0'
+
+packages:
+
+  ${entry}:
+    resolution: {integrity: sha512-aaa}
+`;
+
+test('refuses an override whose floor meets the patch while the lockfile stays vulnerable', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 61,
+        name: 'cookie',
+        patched: '0.7.0',
+        vulnerable: '< 0.7.0',
+        manifestPath: 'pnpm-lock.yaml',
+      }),
+    ],
+    packageJson: manifest({ overrides: { cookie: '>=0.7.0' } }),
+    lockfile: vulnerableLockfile('cookie@0.6.0'),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.deepEqual(plan.classifications[0].resolvedVersions, ['0.6.0']);
+  assert.match(plan.classifications[0].reason, /0\.6\.0/);
+  assert.match(plan.classifications[0].reason, /does not take effect/);
+});
+
+test('refuses a direct dependency whose floor meets the patch while the lockfile stays vulnerable', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 62,
+        name: 'axios',
+        patched: '1.7.0',
+        vulnerable: '< 1.7.0',
+        manifestPath: 'package.json',
+      }),
+    ],
+    packageJson: manifest({ dependencies: { axios: '^1.8.0' } }),
+    lockfile: vulnerableLockfile('axios@1.6.0'),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'manual');
+  assert.match(plan.classifications[0].reason, /1\.6\.0/);
+});
+
+test('still reports an already patched tree as already safe', () => {
+  const plan = planRemediation({
+    audit: [
+      alert({
+        number: 63,
+        name: 'cookie',
+        patched: '0.7.0',
+        vulnerable: '< 0.7.0',
+        manifestPath: 'pnpm-lock.yaml',
+      }),
+    ],
+    packageJson: manifest({ overrides: { cookie: '>=0.7.0' } }),
+    lockfile: vulnerableLockfile('cookie@0.7.0'),
+  });
+
+  assert.equal(plan.actions.length, 0);
+  assert.equal(plan.classifications[0].status, 'alreadySafe');
 });

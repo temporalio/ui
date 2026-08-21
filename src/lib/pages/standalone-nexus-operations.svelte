@@ -78,33 +78,35 @@
 </script>
 
 <header class="flex flex-col gap-2">
-  <div class="flex flex-col justify-between gap-2 md:flex-row">
+  <div class="flex flex-col items-start justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
-        <h1 class="flex items-center gap-2 leading-7">
-          {#if $supportsAdvancedVisibility}
-            <span data-testid="nexus-operation-count"
-              >{$nexusOperationCount.count.toLocaleString()}</span
-            >
-            <Translate
-              key="standalone-nexus-operations.nexus-operations-plural"
-              count={$nexusOperationCount.count}
-            />
-          {:else}
-            <Translate
-              key="standalone-nexus-operations.recent-nexus-operations"
-            />
-          {/if}
-        </h1>
-        <p class="mt-3 text-xs text-secondary">
+        <div class="flex flex-row flex-wrap items-start gap-2">
+          <h1 class="flex items-center gap-2 leading-7">
+            {#if $supportsAdvancedVisibility}
+              <span data-testid="nexus-operation-count"
+                >{$nexusOperationCount.count.toLocaleString()}</span
+              >
+              <Translate
+                key="standalone-nexus-operations.nexus-operations-plural"
+                count={$nexusOperationCount.count}
+              />
+            {:else}
+              <Translate
+                key="standalone-nexus-operations.recent-nexus-operations"
+              />
+            {/if}
+          </h1>
+          <CountRefreshButton
+            count={$nexusOperationCount.newCount}
+            refresh={nexusOperationRefresh}
+          />
+        </div>
+        <p class="mt-2 text-xs text-secondary">
           {refreshTimeFormatted}
         </p>
       </div>
       {@render releaseStageBadge?.()}
-      <CountRefreshButton
-        count={$nexusOperationCount.newCount}
-        refresh={nexusOperationRefresh}
-      />
       <StatusCounts
         bind:refreshTime
         countStore={nexusOperationCount}

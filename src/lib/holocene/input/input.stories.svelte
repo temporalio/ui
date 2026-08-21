@@ -3,11 +3,13 @@
   import { expect, fn, userEvent, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
 
   import Button from '../button.svelte';
 
   import Input from './input.svelte';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Input',
@@ -50,7 +52,12 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       clearable: { name: 'Clearable', control: 'boolean' },
       copyable: { name: 'Copyable', control: 'boolean' },
-      icon: { name: 'Icon', control: 'select', options: iconNames },
+      Icon: {
+        name: 'Icon',
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
       spellcheck: { name: 'Spell Check', control: 'boolean' },
       maxLength: { name: 'Max Length', control: 'number' },
       hideCount: { name: 'Hide Count', control: 'boolean' },
@@ -91,7 +98,7 @@
 
 <Story name="Invalid" args={{ valid: false }} />
 
-<Story name="With Icon" args={{ icon: 'search' }} />
+<Story name="With Icon" args={{ Icon: ioIcons.IconSearch }} />
 
 <Story name="With Suffix" args={{ suffix: 'suffix' }} />
 
