@@ -45,12 +45,20 @@
     !!$activityExecution?.info?.lastHeartbeatTime,
   );
 
-  const hasHeartbeatTimeout = $derived(
-    !!$activityExecution?.info?.heartbeatTimeout,
+  const hasTotalHeartbeatCount = $derived(
+    $activityExecution?.info?.totalHeartbeatCount != undefined,
   );
 
+  const heartbeatTimeout = $derived(
+    $activityExecution?.info?.heartbeatTimeout ?? '',
+  );
+
+  const hasHeartbeatTimeout = $derived(!!heartbeatTimeout);
+
   const heartbeatRowCount = $derived(
-    (hasLastHeartbeatTime ? 1 : 0) + (hasHeartbeatTimeout ? 1 : 0),
+    (hasLastHeartbeatTime ? 1 : 0) +
+      (hasTotalHeartbeatCount ? 1 : 0) +
+      (hasHeartbeatTimeout ? 1 : 0),
   );
 
   const hasCodeBlocks = $derived(
@@ -233,7 +241,17 @@
                   )}</DetailListLabel
                 >
                 <DetailListTextValue
-                  text={fromSeconds($activityExecution.info.heartbeatTimeout)}
+                  text={fromSeconds(heartbeatTimeout) || heartbeatTimeout}
+                />
+              {/if}
+              {#if hasTotalHeartbeatCount}
+                <DetailListLabel
+                  >{translate(
+                    'standalone-activities.total-heartbeats',
+                  )}</DetailListLabel
+                >
+                <DetailListTextValue
+                  text={$activityExecution.info.totalHeartbeatCount ?? ''}
                 />
               {/if}
             </DetailList>

@@ -63,6 +63,7 @@ export interface ActivityExecutionInfo extends Omit<
   | 'heartbeatTimeout'
   | 'executionDuration'
   | 'stateTransitionCount'
+  | 'totalHeartbeatCount'
   | 'currentRetryInterval'
   | 'executionTime'
   | 'startDelay'
@@ -75,6 +76,7 @@ export interface ActivityExecutionInfo extends Omit<
   heartbeatTimeout: string;
   executionDuration?: string;
   stateTransitionCount: string;
+  totalHeartbeatCount?: string;
   currentRetryInterval: string;
   searchAttributes: WorkflowSearchAttributes;
   sdkName?: string;
