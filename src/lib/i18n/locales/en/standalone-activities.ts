@@ -109,6 +109,7 @@ export const Strings = {
   'execution-time': 'Execution Time',
   'execution-duration': 'Execution Duration',
   'last-heartbeat': 'Last Heartbeat',
+  'total-heartbeats': 'Total Heartbeats',
   'heartbeat-timeout': 'Heartbeat Timeout',
   'current-retry-interval': 'Current Retry Interval',
   'last-attempt-complete-time': 'Last Attempted Complete Time',

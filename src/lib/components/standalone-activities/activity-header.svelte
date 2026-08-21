@@ -40,6 +40,10 @@
       `ActivityType="${activityType}"`,
     ),
   );
+  const billableActions = $derived(
+    (activityExecutionInfo.attempt ?? 0) +
+      Number(activityExecutionInfo.totalHeartbeatCount ?? 0),
+  );
   const taskQueueFilterLink = $derived(
     routeForStandaloneActivitiesWithQuery(
       { namespace },
@@ -138,7 +142,7 @@
         <DetailListLabel
           >{translate('workflows.billable-actions')}</DetailListLabel
         >
-        <DetailListTextValue text={String(activityExecutionInfo.attempt)} />
+        <DetailListTextValue text={String(billableActions)} />
       {:else}
         <DetailListLabel
           >{translate('workflows.state-transitions')}</DetailListLabel
