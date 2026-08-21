@@ -1,6 +1,6 @@
-import { type ColorAlpha, colorAlphaScales } from './color-alpha-scales';
+import { colorAlphaScales } from './color-alpha-scales';
 import { colorScales } from './color-scales';
-import { compositeColor } from './composite-color';
+import type { HexColor } from './types';
 
 export type SemanticColor = Readonly<{
   light: string;
@@ -102,35 +102,19 @@ type SemanticColors = Readonly<{
   overlay: OverlayColors;
 }>;
 
-const backgroundPrimary: OpaqueSemanticColor = {
-  light: colorScales.slate[1],
-  dark: colorScales.slate[12],
-};
-
 const surfacePrimary: OpaqueSemanticColor = {
-  light: compositeColor(colorScales.slate[9], 5, backgroundPrimary.light),
-  dark: compositeColor(colorScales.slate[9], 5, backgroundPrimary.dark),
+  light: '#f8f8f8',
+  dark: '#121212',
 };
 
-const compositeSemanticColor = (
-  light: HexColor,
-  dark: HexColor,
-  alpha: ColorAlpha,
-  background: OpaqueSemanticColor,
-): OpaqueSemanticColor => ({
-  light: compositeColor(light, alpha, background.light),
-  dark: compositeColor(dark, alpha, background.dark),
-});
+const backgroundPrimary = surfacePrimary;
 
 const interactivePrimary: OpaqueSemanticColor = {
   light: colorScales.indigo[9],
   dark: colorScales.indigo[10],
 };
 
-const interactiveSecondary: OpaqueSemanticColor = {
-  light: colorScales.slate[1],
-  dark: colorScales.slate[12],
-};
+const interactiveSecondary = surfacePrimary;
 
 export const semanticColors: SemanticColors = {
   background: {
@@ -200,18 +184,14 @@ export const semanticColors: SemanticColors = {
   },
   surface: {
     primary: surfacePrimary,
-    secondary: compositeSemanticColor(
-      colorScales.slate[9],
-      colorScales.slate[9],
-      10,
-      surfacePrimary,
-    ),
-    tertiary: compositeSemanticColor(
-      colorScales.slate[9],
-      colorScales.slate[9],
-      15,
-      surfacePrimary,
-    ),
+    secondary: {
+      light: colorScales.slate[2],
+      dark: colorScales.neutral[11],
+    },
+    tertiary: {
+      light: colorScales.slate[3],
+      dark: colorScales.neutral[10],
+    },
     'table-header': {
       light: colorScales.slate[3],
       dark: colorScales.neutral[9],
@@ -220,79 +200,55 @@ export const semanticColors: SemanticColors = {
       light: colorScales.slate[2],
       dark: colorScales.neutral[10],
     },
-    brand: compositeSemanticColor(
-      colorScales.indigo[9],
-      colorScales.indigo[9],
-      20,
-      surfacePrimary,
-    ),
-    information: compositeSemanticColor(
-      colorScales.blue[9],
-      colorScales.blue[9],
-      20,
-      surfacePrimary,
-    ),
-    success: compositeSemanticColor(
-      colorScales.green[9],
-      colorScales.green[9],
-      20,
-      surfacePrimary,
-    ),
-    warning: compositeSemanticColor(
-      colorScales.amber[9],
-      colorScales.amber[9],
-      20,
-      surfacePrimary,
-    ),
-    danger: compositeSemanticColor(
-      colorScales.red[9],
-      colorScales.red[9],
-      20,
-      surfacePrimary,
-    ),
-    error: compositeSemanticColor(
-      colorScales.persimmon[9],
-      colorScales.persimmon[9],
-      20,
-      surfacePrimary,
-    ),
+    brand: {
+      light: colorScales.indigo[3],
+      dark: colorScales.indigo[12],
+    },
+    information: {
+      light: colorScales.blue[3],
+      dark: colorScales.blue[12],
+    },
+    success: {
+      light: colorScales.green[3],
+      dark: colorScales.green[12],
+    },
+    warning: {
+      light: colorScales.amber[3],
+      dark: colorScales.amber[12],
+    },
+    danger: {
+      light: colorScales.red[3],
+      dark: colorScales.red[12],
+    },
+    error: {
+      light: colorScales.persimmon[3],
+      dark: colorScales.persimmon[12],
+    },
     status: {
-      blue: compositeSemanticColor(
-        colorScales.blue[9],
-        colorScales.blue[9],
-        15,
-        surfacePrimary,
-      ),
-      green: compositeSemanticColor(
-        colorScales.green[9],
-        colorScales.green[9],
-        15,
-        surfacePrimary,
-      ),
-      red: compositeSemanticColor(
-        colorScales.red[9],
-        colorScales.red[9],
-        15,
-        surfacePrimary,
-      ),
-      persimmon: compositeSemanticColor(
-        colorScales.persimmon[9],
-        colorScales.persimmon[9],
-        15,
-        surfacePrimary,
-      ),
-      amber: compositeSemanticColor(
-        colorScales.amber[9],
-        colorScales.amber[9],
-        15,
-        surfacePrimary,
-      ),
-      neutral: compositeSemanticColor(
-        colorScales.neutral[9],
-        colorScales.neutral[4],
-        15,
-        surfacePrimary,
-      ),
+      blue: {
+        light: colorScales.blue[3],
+        dark: colorScales.blue[12],
+      },
+      green: {
+        light: colorScales.green[3],
+        dark: colorScales.green[12],
+      },
+      red: {
+        light: colorScales.red[3],
+        dark: colorScales.red[12],
+      },
+      persimmon: {
+        light: colorScales.persimmon[3],
+        dark: colorScales.persimmon[12],
+      },
+      amber: {
+        light: colorScales.amber[3],
+        dark: colorScales.amber[12],
+      },
+      neutral: {
+        light: colorScales.slate[3],
+        dark: colorScales.neutral[9],
+      },
     },
   },
   border: {
@@ -341,28 +297,16 @@ export const semanticColors: SemanticColors = {
     },
     'primary-press': {
       light: colorScales.indigo[11],
-      dark: compositeColor(colorScales.slate[9], 40, interactivePrimary.dark),
+      dark: '#4d61ab',
     },
     secondary: interactiveSecondary,
     'secondary-hover': {
-      light: compositeColor(
-        colorScales.indigo[9],
-        10,
-        interactiveSecondary.light,
-      ),
-      dark: compositeColor(colorScales.indigo[9], 5, interactiveSecondary.dark),
+      light: '#e5e9f5',
+      dark: '#14161c',
     },
     'secondary-press': {
-      light: compositeColor(
-        colorScales.indigo[9],
-        15,
-        interactiveSecondary.light,
-      ),
-      dark: compositeColor(
-        colorScales.indigo[9],
-        20,
-        interactiveSecondary.dark,
-      ),
+      light: '#dce2f4',
+      dark: '#1b223b',
     },
     danger: {
       light: colorScales.red[9],
@@ -387,8 +331,8 @@ export const semanticColors: SemanticColors = {
       dark: `color-mix(in srgb, ${colorScales.neutral[4]} 20%, transparent)`,
     },
     'brand-hover': {
-      light: colorAlphaScales.indigo[30],
-      dark: colorAlphaScales.indigo[30],
+      light: colorAlphaScales.indigo[10],
+      dark: colorAlphaScales.indigo[5],
     },
   },
   overlay: {

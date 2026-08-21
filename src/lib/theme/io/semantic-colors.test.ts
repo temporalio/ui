@@ -2,26 +2,27 @@ import { describe, expect, it } from 'vitest';
 
 import { colorAlphaScales } from './color-alpha-scales';
 import { colorScales } from './color-scales';
-import { compositeColor } from './composite-color';
 import { semanticColors } from './semantic-colors';
 
 const OPAQUE_HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
-describe('color compositing', () => {
-  it('precomposites a foreground color over an opaque background', () => {
-    expect(compositeColor('#000000', 50, '#ffffff')).toBe('#808080');
-  });
-});
-
-describe('precomposited semantic colors', () => {
-  it('matches representative final Figma colors', () => {
+describe('semantic surface colors', () => {
+  it('matches representative Figma colors', () => {
     expect(semanticColors.surface.primary).toEqual({
-      light: '#f4f4f3',
-      dark: '#22211f',
+      light: '#f8f8f8',
+      dark: '#121212',
+    });
+    expect(semanticColors.surface.secondary).toEqual({
+      light: colorScales.slate[2],
+      dark: colorScales.neutral[11],
+    });
+    expect(semanticColors.surface.tertiary).toEqual({
+      light: colorScales.slate[3],
+      dark: colorScales.neutral[10],
     });
     expect(semanticColors.surface.status.blue).toEqual({
-      light: '#cfe5f5',
-      dark: '#1d3241',
+      light: colorScales.blue[3],
+      dark: colorScales.blue[12],
     });
     expect(semanticColors.surface['table-header']).toEqual({
       light: colorScales.slate[3],
@@ -60,16 +61,16 @@ describe('interactive semantic colors', () => {
         dark: '#4d61ab',
       },
       secondary: {
-        light: colorScales.slate[1],
-        dark: colorScales.slate[12],
+        light: '#f8f8f8',
+        dark: '#121212',
       },
       'secondary-hover': {
-        light: '#e8ecf7',
-        dark: '#202125',
+        light: '#e5e9f5',
+        dark: '#14161c',
       },
       'secondary-press': {
-        light: '#dfe4f6',
-        dark: '#242b42',
+        light: '#dce2f4',
+        dark: '#1b223b',
       },
       danger: {
         light: colorScales.red[9],
@@ -102,7 +103,7 @@ describe('semantic color opacity', () => {
     }
   });
 
-  it('preserves translucency for compositing tokens', () => {
+  it('preserves translucency for borders and overlays', () => {
     const compositingColors = [
       ...Object.values(semanticColors.border),
       ...Object.values(semanticColors.actions),
@@ -128,8 +129,8 @@ describe('action semantic colors', () => {
         dark: `color-mix(in srgb, ${colorScales.neutral[4]} 20%, transparent)`,
       },
       'brand-hover': {
-        light: colorAlphaScales.indigo[30],
-        dark: colorAlphaScales.indigo[30],
+        light: colorAlphaScales.indigo[10],
+        dark: colorAlphaScales.indigo[5],
       },
     });
   });

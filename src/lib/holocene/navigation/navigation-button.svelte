@@ -48,7 +48,7 @@
     data-track-intent="action"
     data-track-text={label}
     class={merge(
-      'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-black hover:bg-opacity-25 group-[.navigation-inverse]:hover:bg-white group-[.navigation-inverse]:hover:bg-opacity-25',
+      'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-io-alpha-neutral-30 group-[.navigation-inverse]:hover:bg-io-neutral-6',
       disabled && 'pointer-events-none cursor-not-allowed opacity-50',
       className,
     )}

@@ -427,7 +427,7 @@
             'https://support.temporal.io'}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center hover:text-white"
+          class="flex items-center hover:text-io-content-white"
           aria-label="Support"
         >
           <IconSupport />

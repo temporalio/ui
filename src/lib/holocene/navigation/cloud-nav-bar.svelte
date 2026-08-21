@@ -35,7 +35,7 @@
   <div
     class="flex flex-row items-center justify-start group-data-[nav=closed]:hidden"
   >
-    <a href={base || '/'} class="text-inherit flex items-center">
+    <a href={base || '/'} class="flex items-center text-inherit">
       <Logo
         height={24}
         width={24}

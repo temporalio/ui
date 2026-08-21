@@ -22,7 +22,7 @@
 </script>
 
 <div class={twMerge('flex flex-col items-center gap-4', className)}>
-  <IconHeartbeat width={80} height={80} class="text-blue-400" />
+  <IconHeartbeat width={80} height={80} class="text-io-blue-8" />
   {#if title}
     <p class="text-center text-base font-medium">{title}</p>
   {/if}

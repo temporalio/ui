@@ -55,9 +55,9 @@
       data-track-text={label}
       class={merge(
         'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm',
-        'hover:bg-black hover:bg-opacity-25 group-[.navigation-inverse]:hover:bg-white group-[.navigation-inverse]:hover:bg-opacity-25',
+        'hover:bg-io-alpha-neutral-30 group-[.navigation-inverse]:hover:bg-io-neutral-6',
         active &&
-          'bg-black bg-opacity-25 group-[.navigation-inverse]:bg-white group-[.navigation-inverse]:bg-opacity-25',
+          'bg-io-alpha-neutral-30 group-[.navigation-inverse]:bg-io-neutral-6',
         disabled && 'pointer-events-none cursor-not-allowed opacity-50',
       )}
       class:text-io-content-tertiary={disabled}

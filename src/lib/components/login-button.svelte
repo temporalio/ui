@@ -17,6 +17,6 @@
   }
 
   .login-button:hover {
-    @apply rounded-md bg-purple-100 text-io-content-primary;
+    @apply rounded-md bg-io-slate-blue-3 text-io-content-primary;
   }
 </style>
