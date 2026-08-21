@@ -48,15 +48,19 @@
   args: ComponentProps<typeof Textarea>,
   context: StoryContext<ComponentProps<typeof Textarea>>,
 )}
-  <Textarea
-    {...args}
-    oninput={action('input')}
-    onblur={action('blue')}
-    onchange={action('change')}
-    onfocus={action('focus')}
-    onkeydown={action('keydown')}
-    id={context.id}
-  />
+  <div
+    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+  >
+    <Textarea
+      {...args}
+      oninput={action('input')}
+      onblur={action('blue')}
+      onchange={action('change')}
+      onfocus={action('focus')}
+      onkeydown={action('keydown')}
+      id={context.id}
+    />
+  </div>
 {/snippet}
 
 <Story

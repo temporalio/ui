@@ -30,10 +30,10 @@
   <h1>
     {translate('standalone-nexus-operations.start-standalone-nexus-operation')}
   </h1>
-  <p class="text-secondary">
+  <p class="text-io-content-secondary">
     {translate('standalone-nexus-operations.form-page-description')}
   </p>
-  <p class="text-sm text-secondary">
+  <p class="text-sm text-io-content-secondary">
     {translate('standalone-nexus-operations.form-page-allowlist-note', {
       namespace,
     })}

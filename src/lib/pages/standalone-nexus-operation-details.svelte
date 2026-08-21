@@ -88,7 +88,7 @@
     <h5>{translate('standalone-nexus-operations.operation-event-history')}</h5>
 
     <div class="space-y-4">
-      <h5 class="text-secondary">
+      <h5 class="text-io-content-secondary">
         {translate('standalone-nexus-operations.run-details-section')}
       </h5>
       <DetailList
@@ -151,11 +151,11 @@
     </div>
 
     <div class="space-y-4">
-      <h5 class="text-secondary">
+      <h5 class="text-io-content-secondary">
         {translate('standalone-nexus-operations.operation-details-section')}
       </h5>
       {#if handlerLink?.href}
-        <p class="text-sm text-secondary">
+        <p class="text-sm text-io-content-secondary">
           {translate('standalone-nexus-operations.handler-namespace-note')}
         </p>
       {/if}
@@ -259,7 +259,7 @@
 
       {#if hasNexusHeader}
         <div class="space-y-2">
-          <p class="font-medium text-secondary">
+          <p class="font-medium text-io-content-secondary">
             {translate('standalone-nexus-operations.nexus-header')}
           </p>
           <CodeBlock content={JSON.stringify(info.nexusHeader, null, 2)} />
@@ -268,7 +268,7 @@
     </div>
 
     <div class="space-y-4">
-      <h5 class="text-secondary">
+      <h5 class="text-io-content-secondary">
         {translate('standalone-nexus-operations.timeout-configuration')}
       </h5>
       <DetailList
@@ -301,7 +301,7 @@
 
     {#if (info.attempt ?? 0) > 1}
       <div class="space-y-4">
-        <h5 class="text-secondary">
+        <h5 class="text-io-content-secondary">
           {translate('standalone-nexus-operations.attempt-section')}
         </h5>
         <DetailList
@@ -334,7 +334,7 @@
         </DetailList>
         {#if hasLastAttemptFailure}
           <div class="space-y-2">
-            <p class="font-medium text-secondary">
+            <p class="font-medium text-io-content-secondary">
               {translate('standalone-nexus-operations.last-attempt-failure')}
             </p>
             <CodeBlock
@@ -347,7 +347,7 @@
 
     {#if info.cancellationInfo}
       <div class="space-y-4">
-        <h5 class="text-secondary">
+        <h5 class="text-io-content-secondary">
           {translate('standalone-nexus-operations.cancellation-info')}
         </h5>
         <DetailList
@@ -396,7 +396,7 @@
         </DetailList>
         {#if info.cancellationInfo.lastAttemptFailure}
           <div class="space-y-2">
-            <p class="font-medium text-secondary">
+            <p class="font-medium text-io-content-secondary">
               {translate('standalone-nexus-operations.last-attempt-failure')}
             </p>
             <CodeBlock

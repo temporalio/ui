@@ -35,7 +35,7 @@
   }
 
   body {
-    @apply body-normal surface-background relative overscroll-none;
+    @apply body-normal relative overscroll-none bg-io-background-primary text-io-content-primary;
   }
 
   body[data-theme='light'] {

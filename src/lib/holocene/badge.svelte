@@ -4,15 +4,23 @@
   export type BadgeType = VariantProps<typeof types>['type'];
 
   const type = {
-    primary: 'bg-blue-300',
-    secondary: 'bg-purple-200 dark:bg-purple-800 dark:text-white',
-    default: 'bg-slate-100',
-    warning: 'bg-yellow-200',
-    success: 'bg-green-200',
-    danger: 'bg-red-200',
-    count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
-    subtle: 'surface-subtle dark:text-white font-normal select-all',
-    ghost: 'surface-primary text-primary border border-subtle',
+    primary:
+      'border border-io-border-information bg-io-surface-information text-io-content-information',
+    secondary: 'bg-io-alpha-purple-30 text-io-content-primary',
+    default:
+      'border border-io-border-secondary bg-io-surface-primary text-io-content-secondary',
+    warning:
+      'border border-io-border-warning bg-io-surface-warning text-io-content-warning',
+    success:
+      'border border-io-border-success bg-io-surface-success text-io-content-success',
+    danger:
+      'border border-io-border-danger bg-io-surface-danger text-io-content-danger',
+    count:
+      'h-6 w-6 min-w-max rounded-full border border-io-border-information bg-io-surface-information text-io-content-information',
+    subtle:
+      'bg-io-surface-tertiary text-io-content-secondary font-normal select-all',
+    ghost:
+      'bg-io-surface-primary text-io-content-primary border border-io-border-tertiary',
   };
 
   const types = cva(
@@ -29,7 +37,6 @@
       'font-medium',
       'leading-[1.5]',
       'transition-colors',
-      'text-black',
     ],
     {
       variants: {

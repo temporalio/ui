@@ -1,8 +1,55 @@
 import plugin from 'tailwindcss/plugin';
 
-import { colors } from './colors';
-import { css } from './utilities';
-import { dark, light } from './variables';
+import { colorAlphaScales } from './io/color-alpha-scales';
+import { colorScales } from './io/color-scales';
+import { type SemanticColor, semanticColors } from './io/semantic-colors';
+
+type SemanticColorGroup = Readonly<Record<string, SemanticColor>>;
+
+const referenceColorGroup = (group: string, colors: SemanticColorGroup) =>
+  Object.fromEntries(
+    Object.keys(colors).map((name) => [
+      name,
+      `var(--color-io-${group}-${name})`,
+    ]),
+  );
+
+const resolveColorGroup = (
+  group: string,
+  colors: SemanticColorGroup,
+  mode: keyof SemanticColor,
+) =>
+  Object.fromEntries(
+    Object.entries(colors).map(([name, color]) => [
+      `--color-io-${group}-${name}`,
+      color[mode],
+    ]),
+  );
+
+const resolveSemanticColors = (mode: keyof SemanticColor) => ({
+  ...resolveColorGroup('background', semanticColors.background, mode),
+  ...resolveColorGroup('content', semanticColors.content, mode),
+  ...resolveColorGroup('surface', semanticColors.surface, mode),
+  ...resolveColorGroup('border', semanticColors.border, mode),
+  ...resolveColorGroup('interactive', semanticColors.interactive, mode),
+  ...resolveColorGroup('actions', semanticColors.actions, mode),
+  ...resolveColorGroup('overlay', semanticColors.overlay, mode),
+});
+
+const ioColors = {
+  ...colorScales,
+  alpha: colorAlphaScales,
+  background: referenceColorGroup('background', semanticColors.background),
+  content: referenceColorGroup('content', semanticColors.content),
+  surface: referenceColorGroup('surface', semanticColors.surface),
+  border: referenceColorGroup('border', semanticColors.border),
+  interactive: referenceColorGroup('interactive', semanticColors.interactive),
+  actions: referenceColorGroup('actions', semanticColors.actions),
+  overlay: referenceColorGroup('overlay', semanticColors.overlay),
+};
+
+const ioLight = resolveSemanticColors('light');
+const ioDark = resolveSemanticColors('dark');
 
 const textStyles = plugin(({ addBase, theme }) => {
   addBase({
@@ -55,194 +102,20 @@ const textStyles = plugin(({ addBase, theme }) => {
 });
 
 const temporal = plugin(
-  ({ addComponents, addBase }) => {
+  ({ addBase }) => {
     addBase({
-      ':root': light,
-      '[data-theme="dark"]': dark,
-    });
-
-    addComponents({
-      '.surface-background': {
-        backgroundColor: css('--color-surface-background'),
-        color: css('--color-text-primary'),
-      },
-      '.surface-primary': {
-        backgroundColor: css('--color-surface-primary'),
-        color: css('--color-text-primary'),
-      },
-      '.surface-secondary': {
-        backgroundColor: css('--color-surface-secondary'),
-        color: css('--color-text-primary'),
-      },
-      '.surface-interactive': {
-        backgroundColor: css('--color-interactive-surface'),
-        color: css('--color-text-white'),
-        '&:focus-visible': {
-          backgroundColor: css('--color-interactive-hover'),
-        },
-        '&:hover': {
-          backgroundColor: css('--color-interactive-hover'),
-        },
-        '&:active': {
-          backgroundColor: css('--color-interactive-active'),
-        },
-      },
-      '.surface-interactive-secondary': {
-        backgroundColor: css('--color-interactive-secondary-surface'),
-        color: css('--color-text-primary'),
-        '&:focus-visible': {
-          backgroundColor: css('--color-interactive-secondary-hover'),
-        },
-        '&:hover': {
-          backgroundColor: css('--color-interactive-secondary-hover'),
-        },
-        '&:active': {
-          backgroundColor: css('--color-interactive-secondary-active'),
-        },
-      },
-      '.surface-interactive-danger': {
-        backgroundColor: css('--color-interactive-danger-surface'),
-        color: css('--color-text-black'),
-        '&:focus-visible': {
-          backgroundColor: css('--color-interactive-danger-hover'),
-        },
-        '&:hover': {
-          backgroundColor: css('--color-interactive-danger-hover'),
-        },
-        '&:active': {
-          backgroundColor: css('--color-interactive-danger-active'),
-        },
-      },
-      '.surface-interactive-ghost': {
-        backgroundColor: css('--color-surface-primary'),
-        color: css('--color-text-primary'),
-        '&:focus-visible': {
-          backgroundColor: css('--color-interactive-ghost-hover'),
-        },
-        '&:hover': {
-          backgroundColor: css('--color-interactive-ghost-hover'),
-        },
-        '&:active': {
-          backgroundColor: css('--color-interactive-ghost-active'),
-        },
-      },
-      '.surface-information': {
-        backgroundColor: css('--color-surface-information'),
-        color: css('--color-text-primary'),
-      },
-      '.surface-inverse': {
-        backgroundColor: css('--color-surface-inverse'),
-        color: css('--color-text-inverse'),
-      },
-      '.surface-subtle': {
-        backgroundColor: css('--color-surface-subtle'),
-        color: css('--color-text-primary'),
-      },
-      '.surface-table': {
-        backgroundColor: css('--color-surface-table'),
-        color: css('--color-text-inverse'),
-      },
-      '.surface-table-header': {
-        backgroundColor: css('--color-surface-table-header'),
-        color: css('--color-text-primary'),
-      },
-      '.surface-warning': {
-        backgroundColor: css('--color-surface-subtle'),
-        color: css('--color-text-black'),
-      },
-      '.surface-danger': {
-        backgroundColor: css('--color-surface-danger'),
-        color: css('--color-text-primary'),
-      },
-      '.surface-table-related-hover': {
-        backgroundColor: css('--color-surface-table-related-hover'),
-        color: css('--color-text-primary'),
-      },
-      '.surface-black': {
-        backgroundColor: css('--color-surface-black'),
-        color: css('--color-text-white'),
-      },
+      ':root': ioLight,
+      '[data-theme="dark"]': ioDark,
     });
   },
   {
     theme: {
       colors: {
-        ...colors,
-        brand: css('--color-surface-brand'),
+        inherit: 'inherit',
+        current: 'currentColor',
+        transparent: 'transparent',
+        io: ioColors,
       },
-      backgroundColor: ({ theme }) => ({
-        ...theme('colors'),
-
-        primary: css('--color-surface-primary'),
-        secondary: css('--color-surface-secondary'),
-        inverse: css('--color-surface-inverse'),
-        subtle: css('--color-surface-subtle'),
-
-        interactive: css('--color-interactive-surface'),
-        'interactive-hover': css('--color-interactive-hover'),
-        'interactive-active': css('--color-interactive-active'),
-        'interactive-error': css('--color-interactive-danger-surface'),
-
-        'interactive-secondary-hover': css(
-          '--color-interactive-secondary-hover',
-        ),
-        'interactive-secondary-active': css(
-          '--color-interactive-secondary-active',
-        ),
-        'interactive-table-hover': css('--color-interactive-table-hover'),
-
-        information: css('--color-surface-information'),
-        success: css('--color-surface-success'),
-        warning: css('--color-surface-warning'),
-        danger: css('--color-surface-danger'),
-        'code-block': css('--color-surface-code-block'),
-
-        DEFAULT: css('--color-surface-primary'),
-      }),
-      borderColor: ({ theme }) => ({
-        ...theme('colors'),
-        primary: css('--color-border-primary'),
-        secondary: css('--color-border-secondary'),
-        subtle: css('--color-border-subtle'),
-        interactive: css('--color-interactive-surface'),
-        'interactive-hover': css('--color-interactive-hover'),
-        inverse: css('--color-border-inverse'),
-        table: css('--color-border-table'),
-        'table-related-hover': css('--color-surface-table-related-hover'),
-        information: css('--color-border-information'),
-        success: css('--color-border-success'),
-        warning: css('--color-border-warning'),
-        danger: css('--color-border-danger'),
-
-        DEFAULT: css('--color-border-primary'),
-      }),
-      ringColor: ({ theme }) => ({
-        ...theme('colors'),
-        primary: css('--color-border-focus-info'),
-        danger: css('--color-border-focus-danger'),
-        success: css('--color-surface-success-loud'),
-        brand: css('--color-surface-brand'),
-      }),
-      textColor: ({ theme }) => ({
-        ...theme('colors'),
-        primary: css('--color-text-primary'),
-        secondary: css('--color-text-secondary'),
-        subtle: css('--color-text-subtle'),
-        inverse: css('--color-text-inverse'),
-        brand: css('--color-text-brand'),
-
-        danger: css('--color-text-danger'),
-        information: css('--color-text-information'),
-        success: css('--color-text-success'),
-        warning: css('--color-text-warning'),
-
-        DEFAULT: css('--color-text-primary'),
-      }),
-      caretColor: ({ theme }) => ({
-        ...theme('colors'),
-
-        danger: css('--color-text-danger'),
-      }),
       extend: {
         transitionProperty: {
           width: 'width',
@@ -256,4 +129,4 @@ const temporal = plugin(
 );
 
 export default temporal;
-export { colors, textStyles };
+export { textStyles };

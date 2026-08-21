@@ -49,7 +49,7 @@
         {descriptor.source.label}
       </Badge>
     </div>
-    <p class="mt-1 max-w-3xl text-sm text-secondary">
+    <p class="mt-1 max-w-3xl text-sm text-io-content-secondary">
       {descriptor.description}
     </p>
   </header>
@@ -67,10 +67,13 @@
     aria-labelledby="catalog-example-not-found"
   >
     <h1 id="catalog-example-not-found">Catalog example not found</h1>
-    <p class="text-secondary">
+    <p class="text-io-content-secondary">
       No catalog example matches <code>{exampleId}</code>.
     </p>
-    <a class="text-primary underline" href={routeForCatalog({ namespace })}>
+    <a
+      class="text-io-content-primary underline"
+      href={routeForCatalog({ namespace })}
+    >
       Back to catalog
     </a>
   </section>

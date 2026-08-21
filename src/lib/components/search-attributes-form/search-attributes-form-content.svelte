@@ -178,7 +178,7 @@
         {#if description}
           {@render description()}
         {:else}
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('search-attributes.description')}
             <Link href="https://docs.temporal.io/search-attribute" newTab
               >{translate('search-attributes.docs-link')}</Link

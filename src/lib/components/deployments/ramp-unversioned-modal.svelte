@@ -59,7 +59,7 @@
         units="%"
       />
       {#if error}
-        <p class="text-sm text-danger">{error}</p>
+        <p class="text-sm text-io-content-danger">{error}</p>
       {/if}
     </div>
   {/snippet}

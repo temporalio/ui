@@ -148,7 +148,7 @@
             {/if}
           </div>
         {:else}
-          <span class="text-secondary"
+          <span class="text-io-content-secondary"
             >{translate('deployments.unversioned')}</span
           >
         {/if}
@@ -157,7 +157,7 @@
       <td class="py-1 text-left">
         {#if isSameAsCurrent}
           <span
-            class="inline-flex items-center border border-subtle px-2 py-0.5 text-secondary"
+            class="inline-flex items-center border border-io-border-primary px-2 py-0.5 text-io-content-secondary"
           >
             {translate('deployments.same-as-current')}
           </span>
@@ -182,7 +182,7 @@
             {/if}
           </div>
         {:else}
-          <span class="text-secondary">—</span>
+          <span class="text-io-content-secondary">—</span>
         {/if}
       </td>
     {:else if label === 'Created At'}

@@ -40,7 +40,7 @@
     text={tooltip}
     right
     class="block"
-    tooltipClass="rounded-none text-white ml-4 group-data-[nav=open]:hidden"
+    tooltipClass="rounded-none text-io-content-white ml-4 group-data-[nav=open]:hidden"
   >
     <a
       href={link}
@@ -55,12 +55,12 @@
       data-track-text={label}
       class={merge(
         'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm',
-        'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+        'hover:bg-io-alpha-neutral-30 group-[.navigation-inverse]:hover:bg-io-neutral-6',
         active &&
-          'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
+          'bg-io-alpha-neutral-30 group-[.navigation-inverse]:bg-io-neutral-6',
         disabled && 'pointer-events-none cursor-not-allowed opacity-50',
       )}
-      class:text-disabled={disabled}
+      class:text-io-content-tertiary={disabled}
     >
       {#if Icon}
         <div class="flex h-6 w-6 items-center" class:animate-pulse={animate}>

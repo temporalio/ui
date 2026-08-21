@@ -33,11 +33,11 @@
   }: Props = $props();
 
   const variants: Readonly<Record<ToastVariant, string>> = {
-    primary: 'bg-slate-800 text-white',
-    success: 'bg-success',
-    error: 'bg-danger',
-    info: 'bg-information',
-    warning: 'bg-warning',
+    primary: 'bg-io-indigo-8 text-io-content-white',
+    success: 'bg-io-surface-success text-io-content-primary',
+    error: 'bg-io-surface-danger text-io-content-primary',
+    info: 'bg-io-surface-information text-io-content-primary',
+    warning: 'bg-io-surface-warning text-io-content-primary',
   };
 
   const variantIcon: Readonly<Record<ToastVariant, IconComponent | null>> = {
@@ -76,7 +76,7 @@
     size="sm"
     LeadingIcon={IconClose}
     aria-label={dismissLabel}
-    class="text-inherit h-6 w-6 shrink-0 p-0"
+    class="h-6 w-6 shrink-0 p-0 text-inherit"
     disableTracking
     onclick={handleDismiss}
   />

@@ -31,7 +31,12 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Link>)}
-  <div class={twMerge(args.light && 'bg-space-black')}>
+  <div
+    class={twMerge(
+      'p-4',
+      args.light ? 'bg-io-neutral-12' : 'bg-io-surface-primary',
+    )}
+  >
     <Link {...args}>This is a link.</Link>
   </div>
 {/snippet}

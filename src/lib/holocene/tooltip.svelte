@@ -190,7 +190,7 @@
           id={tooltipId}
           role="tooltip"
           class={merge(
-            'inline-block rounded-md bg-slate-800 px-2 py-2 text-xs text-slate-50',
+            'inline-block rounded-md bg-io-neutral-7 px-2 py-2 text-xs text-io-content-white',
             tooltipClass,
           )}
           onmouseenter={handleHoverEnter}
@@ -224,7 +224,7 @@
       >
         <div
           class={merge(
-            'inline-block rounded-md bg-slate-800 px-2 py-2 text-slate-50',
+            'inline-block rounded-md bg-io-neutral-7 px-2 py-2 text-io-content-white',
             tooltipClass,
           )}
         >

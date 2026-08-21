@@ -33,7 +33,7 @@
     'grow',
     'cursor-pointer',
     'gap-2',
-    'text-primary',
+    'text-io-content-primary',
     'text-sm',
     'font-medium',
     'focus:outline-none',
@@ -52,7 +52,8 @@
   {#if required}
     <span
       aria-hidden="true"
-      class="-ml-1 translate-y-0.5 font-mono leading-none text-danger">*</span
+      class="-ml-1 translate-y-0.5 font-mono leading-none text-io-content-danger"
+      >*</span
     >
   {/if}
 </label>

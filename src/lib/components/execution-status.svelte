@@ -39,30 +39,30 @@
 
   const workflowStatus = cva(
     [
-      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap text-black gap-0.5 font-medium',
+      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap gap-0.5 font-medium',
     ],
     {
       variants: {
         status: {
-          Running: 'bg-blue-300',
-          TimedOut: 'bg-orange-200',
-          Completed: 'bg-green-200',
-          Failed: 'bg-red-200',
-          ContinuedAsNew: 'bg-purple-200',
-          Canceled: 'bg-slate-100',
-          Terminated: 'bg-yellow-200',
-          Paused: 'bg-yellow-200',
-          Unspecified: 'bg-slate-100',
-          Scheduled: 'bg-blue-300',
-          Started: 'bg-blue-300',
-          Open: 'bg-green-200',
-          New: 'bg-blue-300',
-          Initiated: 'bg-blue-300',
-          Fired: 'bg-pink-200',
-          CancelRequested: 'bg-yellow-200',
-          Signaled: 'bg-pink-200',
-          Pending: 'bg-purple-200',
-          Retrying: 'bg-red-200',
+          Running: 'bg-io-surface-information text-io-content-information',
+          TimedOut: 'bg-io-surface-error text-io-content-error',
+          Completed: 'bg-io-surface-success text-io-content-success',
+          Failed: 'bg-io-surface-danger text-io-content-danger',
+          ContinuedAsNew: 'bg-io-alpha-purple-30 text-io-content-primary',
+          Canceled: 'bg-io-surface-primary text-io-content-secondary',
+          Terminated: 'bg-io-surface-warning text-io-content-warning',
+          Paused: 'bg-io-surface-warning text-io-content-warning',
+          Unspecified: 'bg-io-surface-primary text-io-content-secondary',
+          Scheduled: 'bg-io-surface-information text-io-content-information',
+          Started: 'bg-io-surface-information text-io-content-information',
+          Open: 'bg-io-surface-success text-io-content-success',
+          New: 'bg-io-surface-information text-io-content-information',
+          Initiated: 'bg-io-surface-information text-io-content-information',
+          Fired: 'bg-io-alpha-pink-30 text-io-content-primary',
+          CancelRequested: 'bg-io-surface-warning text-io-content-warning',
+          Signaled: 'bg-io-alpha-pink-30 text-io-content-primary',
+          Pending: 'bg-io-alpha-purple-30 text-io-content-primary',
+          Retrying: 'bg-io-surface-danger text-io-content-danger',
         },
       },
     },
@@ -130,7 +130,7 @@
       <span
         class={merge(
           workflowStatus(),
-          'bg-red-200 text-red-900 dark:bg-red-700 dark:text-white',
+          'bg-io-surface-danger text-io-content-danger',
           'rounded-l-none',
           newCount && 'rounded-r-none',
           big && 'h-8 px-2',
@@ -143,7 +143,7 @@
     {#if newCount}
       <span
         class={merge(
-          'font-base surface-primary rounded-r-sm px-1 py-0.5',
+          'font-base rounded-r-sm bg-io-surface-primary px-1 py-0.5 text-io-content-primary',
           big && 'px-2',
         )}
         in:fade

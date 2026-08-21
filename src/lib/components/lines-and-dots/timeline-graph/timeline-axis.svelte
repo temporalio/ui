@@ -108,7 +108,7 @@
        of dash segments (huge GPU textures → jank); a gradient fill exceeds
        WebKit's backing-store height and vanishes in Safari. A solid fill is
        cheap and renders at any height in both. */
-    background: rgb(var(--color-text-primary));
+    background: var(--color-io-content-primary);
   }
 
   .tick-label {

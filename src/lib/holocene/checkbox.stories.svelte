@@ -36,12 +36,16 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Checkbox>)}
-  <Checkbox
-    {...args}
-    onChange={action('change')}
-    onclick={action('click')}
-    onkeypress={action('keypress')}
-  />
+  <div
+    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+  >
+    <Checkbox
+      {...args}
+      onChange={action('change')}
+      onclick={action('click')}
+      onkeypress={action('keypress')}
+    />
+  </div>
 {/snippet}
 
 <Story name="Default" />

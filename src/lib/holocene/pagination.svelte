@@ -309,12 +309,12 @@
   .arrow-left {
     border-width: 6px 12px 6px 0;
 
-    @apply border-b-transparent border-l-transparent border-r-primary border-t-transparent;
+    @apply border-b-transparent border-l-transparent border-r-io-content-primary border-t-transparent;
   }
 
   .arrow-right {
     border-width: 6px 0 6px 12px;
 
-    @apply border-b-transparent border-l-primary border-r-transparent border-t-transparent;
+    @apply border-b-transparent border-l-io-content-primary border-r-transparent border-t-transparent;
   }
 </style>

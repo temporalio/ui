@@ -48,7 +48,10 @@
   const tabs: View[] = ['recent', 'upcoming'];
 </script>
 
-<Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
+<Panel
+  class="flex w-full flex-col gap-4 border-io-border-primary p-6"
+  as="section"
+>
   <header class="mb-1 flex items-center justify-between">
     <h2 class="text-2xl font-medium">{translate('schedules.workflow-runs')}</h2>
     <Link

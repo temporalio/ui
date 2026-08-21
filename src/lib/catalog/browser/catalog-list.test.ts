@@ -127,7 +127,9 @@ describe('CatalogList', () => {
     expect(body).toContain('>Start<');
     expect(body).toContain('Configure');
     expect(body).toContain('sticky right-0');
-    expect(body).toContain('w-36 !text-right sm:w-60');
+    expect(body).toMatch(
+      /<th[^>]*class="(?=[^"]*w-36)(?=[^"]*!text-right)(?=[^"]*sm:w-60)[^"]*"/,
+    );
     expect(body).toContain('hidden sm:inline');
   });
 
@@ -293,7 +295,7 @@ describe('CatalogList', () => {
     );
 
     expect(source).toContain(
-      'class="flex w-full flex-wrap items-center gap-2 border border-subtle bg-primary p-1.5"',
+      'class="flex w-full flex-wrap items-center gap-2 border border-io-border-primary bg-io-surface-primary p-1.5"',
     );
     expect(source).toMatch(/<Input[\s\S]*id="catalog-search"[\s\S]*noBorder/);
   });
@@ -306,7 +308,7 @@ describe('CatalogList', () => {
 
     expect(source).toContain("import Link from '$lib/holocene/link.svelte';");
     expect(source).toContain(
-      '<Link\n                class="table-link block break-words text-sm font-medium text-primary"\n                href={exampleHref(descriptor.id)}',
+      '<Link\n                class="table-link block break-words text-sm font-medium text-io-content-primary"\n                href={exampleHref(descriptor.id)}',
     );
   });
 
@@ -344,7 +346,7 @@ describe('CatalogList', () => {
     );
 
     expect(source).toMatch(
-      /class="[^"]*catalog-table-region[^"]*"[\s\S]*class="[^"]*catalog-actions-cell[^"]*surface-primary[^"]*sticky[^"]*right-0[^"]*"[\s\S]*:global\(\.holocene-table-body tr:nth-of-type\(odd\) > \.catalog-actions-cell\) \{\s*@apply surface-background;\s*\}[\s\S]*:global\(\.holocene-table-body tr:hover > \.catalog-actions-cell\) \{\s*@apply bg-interactive-table-hover bg-fixed;\s*\}/,
+      /class="[^"]*catalog-table-region[^"]*"[\s\S]*class="(?=[^"]*catalog-actions-cell)(?=[^"]*sticky)(?=[^"]*right-0)(?=[^"]*bg-io-surface-primary)(?=[^"]*text-io-content-primary)[^"]*"[\s\S]*:global\(\.holocene-table-body tr:nth-of-type\(odd\) > \.catalog-actions-cell\) \{\s*@apply bg-io-background-primary text-io-content-primary;\s*\}[\s\S]*:global\(\.holocene-table-body tr:hover > \.catalog-actions-cell\) \{\s*@apply bg-io-interactive-secondary-hover bg-fixed;\s*\}/,
     );
   });
 });

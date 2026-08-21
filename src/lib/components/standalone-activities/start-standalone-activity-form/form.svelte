@@ -312,7 +312,7 @@
   <Card
     class={twMerge(
       'space-y-4',
-      $errors.startToCloseTimeout ? 'border-danger' : '',
+      $errors.startToCloseTimeout ? 'border-io-border-danger' : '',
     )}
   >
     <h5>{translate('standalone-activities.form-options-heading')}</h5>
@@ -359,7 +359,7 @@
     />
 
     {#if $errors.startToCloseTimeout}
-      <p class="text-xs text-danger">
+      <p class="text-xs text-io-content-danger">
         {$errors.startToCloseTimeout}
       </p>
     {/if}
@@ -385,7 +385,7 @@
         <h5>
           {translate('standalone-activities.form-search-attributes-heading')}
         </h5>
-        <p class="text-secondary">
+        <p class="text-io-content-secondary">
           {translate(
             'standalone-activities.form-search-attributes-description',
           )}
@@ -403,7 +403,7 @@
     >
       <div class="space-y-2">
         <h5>{translate('standalone-activities.form-user-metadata-heading')}</h5>
-        <p class="text-secondary">
+        <p class="text-io-content-secondary">
           {translate('standalone-activities.form-user-metadata-description')}
         </p>
       </div>

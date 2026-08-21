@@ -303,36 +303,36 @@
 </script>
 
 {#snippet keyboardShortcuts()}
-  <div class="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
+  <div class="flex gap-4 text-xs text-io-content-secondary">
     <span class="flex items-center gap-1.5">
       {#if ActiveComponent}
         <kbd
-          class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+          class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
           >←</kbd
         >
       {/if}
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
         >↑</kbd
       ><kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
         >↓</kbd
       >
-      <span class="text-slate-400">navigate</span>
+      <span class="text-io-content-tertiary">navigate</span>
     </span>
     <span class="flex items-center gap-1.5">
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
         >⏎</kbd
       >
-      <span class="text-slate-400">select</span>
+      <span class="text-io-content-tertiary">select</span>
     </span>
     <span class="flex items-center gap-1.5">
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
         >Esc</kbd
       >
-      <span class="text-slate-400">close</span>
+      <span class="text-io-content-tertiary">close</span>
     </span>
   </div>
 {/snippet}
@@ -341,7 +341,7 @@
   {#each filteredCommands as command, index (command.id)}
     <button
       type="button"
-      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-slate-50 hover:shadow-sm dark:hover:bg-slate-800"
+      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-io-actions-hover-overlay hover:shadow-sm"
       class:selected={index === selectedIndex}
       onclick={() => handleCommandClick(command)}
       onmouseenter={() => (selectedIndex = index)}
@@ -351,16 +351,16 @@
       <div class="flex items-center gap-4">
         {#if command.Icon}
           {@const CommandIcon = command.Icon}
-          <div class="h-6 w-6 flex-shrink-0 text-secondary">
+          <div class="h-6 w-6 flex-shrink-0 text-io-content-secondary">
             <CommandIcon />
           </div>
         {/if}
         <div class="flex flex-col gap-1">
-          <div class="text-lg font-semibold text-secondary">
+          <div class="text-lg font-semibold text-io-content-secondary">
             {command.title}
           </div>
           {#if command.subtitle}
-            <div class="text-sm text-secondary">
+            <div class="text-sm text-io-content-secondary">
               {command.subtitle}
             </div>
           {/if}
@@ -368,7 +368,7 @@
       </div>
       {#if command.category}
         <div
-          class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+          class="rounded-full bg-io-surface-tertiary px-3 py-1.5 text-xs font-medium text-io-content-secondary"
         >
           {command.category}
         </div>
@@ -376,11 +376,11 @@
     </button>
   {:else}
     <div
-      class="flex min-h-96 flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400"
+      class="flex min-h-96 flex-col items-center justify-center py-12 text-io-content-secondary"
     >
       <IconSearch />
-      <h3 class="mt-2 text-secondary">No commands found</h3>
-      <p class="mt-2 text-secondary">Try a different search term</p>
+      <h3 class="mt-2 text-io-content-secondary">No commands found</h3>
+      <p class="mt-2 text-io-content-secondary">Try a different search term</p>
     </div>
   {/each}
 {/snippet}
@@ -396,13 +396,13 @@
   {#snippet content()}
     <div class="flex h-full flex-1 flex-col">
       <div
-        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
+        class="sticky top-0 z-20 border-b border-io-border-primary bg-io-surface-primary pb-4 pt-2"
       >
         <div class="flex items-center justify-between px-6 py-3">
           <div
-            class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
+            class="flex items-center gap-3 text-lg font-semibold text-io-content-primary"
           >
-            <div class="h-5 w-5 text-indigo-600 dark:text-indigo-400">
+            <div class="h-5 w-5 text-io-content-brand">
               <IconSearch />
             </div>
             Command Palette
@@ -412,7 +412,7 @@
             <button
               type="button"
               onclick={close}
-              class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              class="flex h-8 w-8 items-center justify-center rounded-full text-io-content-tertiary transition-colors hover:bg-io-actions-hover-overlay hover:text-io-content-secondary"
               aria-label="Close"
             >
               <IconClose class="h-4 w-4" />
@@ -449,11 +449,12 @@
 
 <style lang="postcss">
   .selected {
-    @apply border-indigo-200 bg-indigo-50 shadow-sm;
+    @apply border-io-border-brand bg-io-surface-brand shadow-sm;
   }
 
   :global(.body::backdrop) {
-    background: rgb(15 23 42 / 75%);
+    @apply bg-io-overlay-backdrop;
+
     backdrop-filter: blur(4px);
     opacity: 0;
     transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);

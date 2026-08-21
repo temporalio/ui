@@ -1,6 +1,7 @@
 <script lang="ts">
   import { eventCategoryColor } from '$lib/components/event/event-styles';
   import {
+    dotColors,
     getCategoryStrokeColor,
     getStatusStrokeColor,
   } from '$lib/components/lines-and-dots/colors';
@@ -30,7 +31,7 @@
     { status: 'Completed' },
     {
       status: 'Completed with retries',
-      style: `background: linear-gradient(255deg, ${getStatusStrokeColor('Completed')} 0%, #F55 100%)`,
+      style: `background: linear-gradient(255deg, ${getStatusStrokeColor('Completed')} 0%, ${dotColors('Failed').fill} 100%)`,
     },
     { status: 'Failed' },
     { status: 'Fired' },
@@ -109,7 +110,7 @@
 <Tooltip
   bottomLeft
   width={380}
-  tooltipClass="!surface-primary border border-subtle"
+  tooltipClass="border border-io-border-primary !bg-io-surface-primary !text-io-content-primary"
   usePortal
 >
   {#snippet content()}
@@ -133,5 +134,5 @@
       </dl>
     </div>
   {/snippet}
-  <IconInfo class="text-secondary" />
+  <IconInfo class="text-io-content-secondary" />
 </Tooltip>

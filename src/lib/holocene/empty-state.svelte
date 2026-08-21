@@ -25,7 +25,7 @@
 </script>
 
 <div
-  class="my-12 flex w-full flex-col items-center justify-start gap-2 text-primary {className}"
+  class="my-12 flex w-full flex-col items-center justify-start gap-2 text-io-content-primary {className}"
   data-testid={testId}
 >
   <span class="flex h-16 w-16 items-center justify-center rounded-full">
@@ -36,7 +36,9 @@
     <p class="text-center">{content}</p>
   {/if}
   {#if error}
-    <p class="border border-danger bg-danger p-5 text-center">
+    <p
+      class="border border-io-border-danger bg-io-surface-danger p-5 text-center"
+    >
       {error}
     </p>
   {/if}

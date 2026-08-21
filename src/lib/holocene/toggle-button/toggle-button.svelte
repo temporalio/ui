@@ -55,7 +55,7 @@
     'aria-pressed': pressed ? 'true' : 'false',
     href: href ? href + page.url.search : undefined,
     class: merge(
-      pressed && 'bg-interactive-secondary-active',
+      pressed && 'bg-io-actions-press-overlay',
       group && '[&:not(:last-child)]:border-r-0',
       className,
     ),

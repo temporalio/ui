@@ -113,7 +113,7 @@
       <h2 class="mb-1 text-base font-medium">
         {translate('workers.configuration-section')}
       </h2>
-      <p class="mb-4 text-sm text-secondary">
+      <p class="mb-4 text-sm text-io-content-secondary">
         {translate('workers.deployment-configuration-description')}
       </p>
       <div class="flex flex-col gap-4">
@@ -144,7 +144,7 @@
       <h2 class="mb-1 text-base font-medium">
         {translate('workers.compute-provider')}
       </h2>
-      <p class="mb-4 text-sm text-secondary">
+      <p class="mb-4 text-sm text-io-content-secondary">
         {translate('workers.compute-description')}
       </p>
       <ComputeProviderPicker

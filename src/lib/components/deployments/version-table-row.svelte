@@ -371,7 +371,7 @@
       {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
         <ConnectionBadge computeStatus={version.computeStatus} />
       {:else}
-        <span class="text-secondary">—</span>
+        <span class="text-io-content-secondary">—</span>
       {/if}
     </td>
   {/if}
@@ -398,7 +398,9 @@
 </tr>
 
 {#if expanded}
-  <tr class="surface-primary border-y border-subtle">
+  <tr
+    class="border-y border-io-border-primary bg-io-surface-primary text-io-content-primary"
+  >
     <td colspan={showConnectionStatus ? 6 : 5} class="!p-1">
       <VersionRowDetails
         {namespace}
@@ -484,7 +486,7 @@
         {translate('deployments.unset-current-description')}
       </p>
       {#if unsetCurrentError}
-        <p class="text-sm text-danger">{unsetCurrentError}</p>
+        <p class="text-sm text-io-content-danger">{unsetCurrentError}</p>
       {/if}
     </div>
   {/snippet}

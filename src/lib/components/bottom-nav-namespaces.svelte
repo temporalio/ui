@@ -32,14 +32,14 @@
       labelHidden
       autoFocus
       placeholder="Search"
-      class="sticky top-0 w-full bg-primary p-2"
+      class="sticky top-0 w-full bg-io-surface-primary p-2"
       bind:value={search}
     />
     <ul class="flex w-full flex-col gap-4 overflow-auto p-4 pt-2">
       {#each namespaces as { namespace, onClick } (namespace)}
         <li>
           <button
-            class="namespace"
+            class="namespace dark:focus-visible:border-io-border-brand"
             class:selected={namespace === $lastUsedNamespace}
             onclick={(e) => {
               e.preventDefault();
@@ -57,10 +57,10 @@
 
 <style lang="postcss">
   .namespace {
-    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:bg-io-interactive-secondary hover:text-io-content-primary focus-visible:border-io-slate-1 focus-visible:bg-io-interactive-secondary focus-visible:text-io-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary;
 
     &.selected {
-      @apply text-brand;
+      @apply text-io-content-brand;
     }
   }
 </style>

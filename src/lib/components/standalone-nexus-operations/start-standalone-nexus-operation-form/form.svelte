@@ -349,7 +349,7 @@
             )}
             for="operationId"
           />
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('standalone-nexus-operations.form-operation-id-body')}
           </p>
           <Input
@@ -406,7 +406,7 @@
             for="endpoint"
             required
           />
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('standalone-nexus-operations.form-endpoint-body')}
           </p>
           <Input
@@ -426,7 +426,7 @@
             for="service"
             required
           />
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('standalone-nexus-operations.form-service-body')}
           </p>
           <Input
@@ -448,7 +448,7 @@
             for="operation"
             required
           />
-          <p class="text-sm text-secondary">
+          <p class="text-sm text-io-content-secondary">
             {translate('standalone-nexus-operations.form-operation-name-body')}
           </p>
           <Input
@@ -488,7 +488,7 @@
             )}
           </Button>
         </div>
-        <p class="text-sm text-secondary">
+        <p class="text-sm text-io-content-secondary">
           {translate(
             'standalone-nexus-operations.form-operation-policies-description',
           )}
@@ -504,7 +504,9 @@
         </p>
         <dl class="flex flex-col gap-2 text-sm">
           <div class="flex items-center gap-6">
-            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+            <dt
+              class="w-[260px] shrink-0 font-medium text-io-content-secondary"
+            >
               {translate(
                 'standalone-nexus-operations.form-closed-operation-id-reuse-label',
               )}
@@ -521,7 +523,9 @@
             </dd>
           </div>
           <div class="flex items-center gap-6">
-            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+            <dt
+              class="w-[260px] shrink-0 font-medium text-io-content-secondary"
+            >
               {translate(
                 'standalone-nexus-operations.form-running-operation-id-conflict-label',
               )}
@@ -538,7 +542,9 @@
             </dd>
           </div>
           <div class="flex items-center gap-6">
-            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+            <dt
+              class="w-[260px] shrink-0 font-medium text-io-content-secondary"
+            >
               {translate(
                 'standalone-nexus-operations.form-timeouts-summary-label',
               )}
@@ -609,7 +615,7 @@
               'standalone-nexus-operations.form-search-attributes-heading',
             )}
           </h5>
-          <p class="text-secondary">
+          <p class="text-io-content-secondary">
             {translate(
               'standalone-nexus-operations.form-search-attributes-description',
             )}
@@ -631,7 +637,7 @@
               'standalone-nexus-operations.form-user-metadata-heading',
             )}
           </h5>
-          <p class="text-secondary">
+          <p class="text-io-content-secondary">
             {translate(
               'standalone-nexus-operations.form-user-metadata-description',
             )}
@@ -665,7 +671,7 @@
       </h5>
       <dl class="space-y-3 text-sm">
         <div class="flex justify-between gap-4">
-          <dt class="text-secondary">
+          <dt class="text-io-content-secondary">
             {translate(
               'standalone-nexus-operations.operation-summary-start-date',
             )}
@@ -673,7 +679,7 @@
           <dd>{startDate}</dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-secondary">
+          <dt class="text-io-content-secondary">
             {translate(
               'standalone-nexus-operations.operation-summary-target-endpoint',
             )}
@@ -681,7 +687,7 @@
           <dd class="text-right">{$form.endpoint || '—'}</dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-secondary">
+          <dt class="text-io-content-secondary">
             {translate(
               'standalone-nexus-operations.operation-summary-service-name',
             )}
@@ -689,7 +695,7 @@
           <dd class="text-right">{$form.service || '—'}</dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-secondary">
+          <dt class="text-io-content-secondary">
             {translate(
               'standalone-nexus-operations.operation-summary-operation-name',
             )}

@@ -158,14 +158,15 @@
               {/snippet}
             </CodeBlock>
             {#if downloadError}
-              <div class="flex items-start gap-2 text-danger">
+              <div class="flex items-start gap-2 text-io-content-danger">
                 <IconExclamationOctagon width={16} height={16} />
                 <p class="leading-4">{downloadError}</p>
               </div>
             {/if}
             <p>
               Payload downloads require a codec server with a <span
-                class="rounded-sm bg-code-block px-1 font-mono">/download</span
+                class="rounded-sm bg-io-surface-code-block px-1 font-mono"
+                >/download</span
               >
               endpoint. <Link
                 href="https://docs.temporal.io/codec-server"
@@ -219,7 +220,7 @@
           />
         {/snippet}
       </CodeBlock>
-      <div class="flex items-start gap-2 text-danger">
+      <div class="flex items-start gap-2 text-io-content-danger">
         <IconExclamationOctagon width={16} height={16} />
         <p class="leading-4">
           {#if isNetworkError(error)}

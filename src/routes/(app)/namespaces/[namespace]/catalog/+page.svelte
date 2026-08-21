@@ -28,7 +28,7 @@
 
 <header class="mb-4">
   <h1>Catalog</h1>
-  <p class="mt-1 text-sm text-secondary">
+  <p class="mt-1 text-sm text-io-content-secondary">
     Browse and run catalog examples for local development.
   </p>
 </header>

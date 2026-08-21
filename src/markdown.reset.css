@@ -102,10 +102,10 @@ blockquote {
   padding-top: 0;
   padding-bottom: 0;
   padding-left: 0.5rem;
-  border-left: 4px solid;
-  border-left-color: #92a4c3;
-  background: #e8efff;
-  color: #121416;
+  border-left: 4px solid var(--color-io-border-brand);
+  background: var(--color-io-surface-code-block);
+  color: var(--color-io-content-code-block);
+
   p {
     font-size: 1.25rem;
     line-height: 1.75rem;
@@ -113,132 +113,44 @@ blockquote {
 }
 
 code {
-  font-family: monospace;
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
-  background: #e8efff;
-  color: #121416;
-}
-body[data-theme='light-background'] code {
+  background: var(--color-io-surface-code-block);
+  color: var(--color-io-content-code-block);
   font-family: monospace;
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  background: #e8efff;
-  color: #121416;
-}
-pre code {
-  padding: 0;
-  background: none;
-  color: inherit;
-}
-body[data-theme='dark-background'] code {
-  font-family: monospace;
-  border-radius: 0.25rem;
-  background: #292d3e;
-  color: #f8fafc;
-}
-body[data-theme='light-primary'] code {
-  font-family: monospace;
-  border-radius: 0.25rem;
-  background: #e8efff;
-  color: #121416;
-}
-body[data-theme='dark-primary'] code {
-  font-family: monospace;
-  border-radius: 0.25rem;
-  background: #292d3e;
-  color: #f8fafc;
-}
-
-body[data-theme='light-background'] pre {
-  font-family: monospace;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  border-color: #aebed9;
-  background: #e8efff;
-  color: #141414;
-}
-body[data-theme='dark-background'] pre {
-  font-family: monospace;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  border-color: #1e293b;
-  background: #292d3e;
-  color: #f8fafc;
-}
-
-body[data-theme='light-primary'] pre {
-  font-family: monospace;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  background: #e8efff;
-  color: #121416;
-}
-body[data-theme='dark-primary'] pre {
-  font-family: monospace;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  background: #292d3e;
-  color: #f8fafc;
 }
 
 pre {
-  font-family: monospace;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  background: #e8efff;
-  color: #121416;
   overflow-x: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--color-io-border-secondary);
+  border-radius: 0.25rem;
+  background: var(--color-io-surface-code-block);
+  color: var(--color-io-content-code-block);
+  font-family: monospace;
   white-space: pre;
+
   code {
     padding: 0;
+    background: none;
+    color: inherit;
   }
 }
 
-body[data-theme='light'] {
-  background-color: #fff;
-  color: #121416;
-  a {
-    color: #444ce7;
-  }
-}
-
-body[data-theme='dark'] {
-  background-color: #141414;
-  color: #f8fafc;
-  a {
-    color: #8098f9;
-  }
-}
-
-body[data-theme='light-background'] {
-  background-color: #f8fafc;
-  color: #121416;
-  a {
-    color: #444ce7;
-  }
-}
-
-body[data-theme='dark-background'] {
-  background-color: #141414;
-  color: #f8fafc;
-  a {
-    color: #8098f9;
-  }
-}
-
-body[data-theme='light-primary'] {
-  background-color: #fff;
-  color: #121416;
-  a {
-    color: #444ce7;
-  }
-}
-
+body[data-theme='light'],
+body[data-theme='dark'],
+body[data-theme='light-primary'],
 body[data-theme='dark-primary'] {
-  background-color: #000;
-  color: #f8fafc;
-  a {
-    color: #8098f9;
-  }
+  background-color: var(--color-io-surface-primary);
+  color: var(--color-io-content-primary);
+}
+
+body[data-theme='light-background'],
+body[data-theme='dark-background'] {
+  background-color: var(--color-io-background-primary);
+  color: var(--color-io-content-primary);
+}
+
+body[data-theme] a {
+  color: var(--color-io-content-brand);
 }

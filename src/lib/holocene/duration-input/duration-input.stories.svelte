@@ -29,11 +29,15 @@
 </script>
 
 {#snippet template(args: Args)}
-  <DurationInput
-    {...args}
-    bind:value={args.value}
-    hintText="Value: {args.value}"
-  />
+  <div
+    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+  >
+    <DurationInput
+      {...args}
+      bind:value={args.value}
+      hintText="Value: {args.value}"
+    />
+  </div>
 {/snippet}
 
 <Story name="With default units" />

@@ -202,26 +202,30 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer border border-transparent text-sm focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply cursor-pointer border border-transparent text-sm text-io-content-primary focus-visible:border-io-interactive-primary focus-visible:bg-io-interactive-primary focus-visible:text-io-content-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary active:bg-io-interactive-primary-press active:text-io-content-white;
 
     &.active {
-      @apply bg-interactive-secondary-hover;
+      @apply bg-io-interactive-primary text-io-content-white;
     }
 
     &.hoverable {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;
-    }
-
-    &.selected {
-      @apply bg-brand/10 text-brand;
+      @apply hover:bg-io-interactive-primary hover:text-io-content-white;
     }
 
     &.destructive {
-      @apply text-danger;
+      @apply text-io-content-danger focus-visible:border-io-interactive-danger focus-visible:bg-io-interactive-danger focus-visible:text-io-content-white focus-visible:ring-io-interactive-danger active:bg-io-interactive-danger-press active:text-io-content-white;
+
+      &.active {
+        @apply bg-io-interactive-danger text-io-content-white;
+      }
+
+      &.hoverable {
+        @apply hover:bg-io-interactive-danger-hover hover:text-io-content-white;
+      }
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed opacity-50;
+      @apply pointer-events-none cursor-not-allowed text-io-content-tertiary opacity-50;
     }
   }
 
@@ -234,6 +238,12 @@
   }
 
   .menu-item-description {
-    @apply mr-6 text-xs font-normal text-secondary;
+    @apply mr-6 text-xs font-normal text-io-content-secondary;
+  }
+
+  .menu-item.active .menu-item-description,
+  .menu-item.hoverable:hover .menu-item-description,
+  .menu-item:focus-visible .menu-item-description {
+    @apply text-io-content-white;
   }
 </style>

@@ -48,7 +48,7 @@
   {#if allSelected}
     <p class="mb-2">{allSelectedText}</p>
     <div
-      class="surface-subtle mb-2 overflow-scroll whitespace-nowrap border border-subtle p-2"
+      class="mb-2 overflow-scroll whitespace-nowrap border border-io-border-primary bg-io-surface-tertiary p-2 text-io-content-primary"
     >
       <code data-testid={queryTestId}>
         {query}

@@ -59,7 +59,10 @@
 {#if expandable}
   <div
     data-track-container={title}
-    class={merge('surface-primary w-full border border-subtle', className)}
+    class={merge(
+      'w-full border border-io-border-tertiary bg-io-background-primary text-io-content-primary',
+      className,
+    )}
     {...rest}
   >
     <div class="flex w-full flex-row items-center">
@@ -67,7 +70,7 @@
         id="{id}-trigger"
         aria-expanded={open}
         aria-controls="{id}-content"
-        class="flex grow flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+        class="flex grow flex-col p-4 focus-visible:bg-io-alpha-slate-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary"
         type="button"
         data-track-name="accordion"
         data-track-intent="toggle"
@@ -80,20 +83,20 @@
               {#if Icon}<Icon />{/if}
               {title}
             </h3>
-            <div class="text-secondary max-sm:hidden">
+            <div class="text-io-content-secondary max-sm:hidden">
               {@render summary?.()}
             </div>
           </div>
           <Glyph class="shrink-0" />
         </div>
-        <div class="text-secondary sm:hidden">
+        <div class="text-io-content-secondary sm:hidden">
           {@render summary?.()}
         </div>
         <p class="flex items-center">
           {#if error}
             <Badge class="mr-2" type="danger">{error}</Badge>
           {/if}
-          <span class="text-secondary">{subtitle}</span>
+          <span class="text-io-content-secondary">{subtitle}</span>
         </p>
       </button>
       <div class="flex shrink-0 flex-row items-center gap-2 pr-2">
@@ -112,7 +115,7 @@
   </div>
 {:else}
   <div
-    class="surface-primary w-full border border-subtle p-4"
+    class="w-full border border-io-border-tertiary bg-io-background-primary p-4 text-io-content-primary"
     data-track-container={title}
     {...rest}
   >
@@ -123,7 +126,7 @@
             {#if Icon}<Icon />{/if}
             {title}
           </h3>
-          <div class="text-secondary max-sm:hidden">
+          <div class="text-io-content-secondary max-sm:hidden">
             {@render summary?.()}
           </div>
         </div>
@@ -131,14 +134,14 @@
           {@render action?.()}
         </div>
       </div>
-      <div class="text-secondary sm:hidden">
+      <div class="text-io-content-secondary sm:hidden">
         {@render summary?.()}
       </div>
       <p class="flex items-center">
         {#if error}
           <Badge class="mr-2" type="danger">{error}</Badge>
         {/if}
-        <span class="text-secondary">{subtitle}</span>
+        <span class="text-io-content-secondary">{subtitle}</span>
       </p>
     </div>
 

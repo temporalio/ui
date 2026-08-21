@@ -114,9 +114,11 @@
     {#snippet leading()}
       <div
         class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
-        class:bg-interactive={filterActive}
+        class:bg-io-interactive-primary={filterActive}
       >
-        <IconFilter class={filterActive ? 'pt-0.5 text-white' : undefined} />
+        <IconFilter
+          class={filterActive ? 'pt-0.5 text-io-content-white' : undefined}
+        />
       </div>
     {/snippet}
     <span class="hidden text-sm md:block">{translate('common.filter')}</span>

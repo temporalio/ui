@@ -39,14 +39,14 @@
 
 <Story name="Contact Sheet">
   {#snippet template()}
-    <div class="text-primary">
+    <div class="text-io-content-primary">
       <p class="mb-4 text-sm opacity-60">{glyphs.length} icons</p>
       <ul
         class="grid list-none grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-2 p-0"
       >
         {#each glyphs as [name, Glyph] (name)}
           <li
-            class="surface-primary flex flex-col items-center gap-2 rounded-lg border border-subtle p-3 text-center"
+            class="flex flex-col items-center gap-2 rounded-lg border border-io-border-primary bg-io-surface-primary p-3 text-center text-io-content-primary"
           >
             <span class="text-2xl"><Glyph /></span>
             <code class="break-all text-[0.625rem] leading-tight opacity-70">
@@ -61,7 +61,7 @@
 
 <Story name="Optical Adjustments">
   {#snippet template()}
-    <div class="text-primary">
+    <div class="text-io-content-primary">
       <p class="mb-4 max-w-prose text-sm opacity-60">
         Some Io glyphs fill their viewBox where the icons they replaced were
         inset, so they read larger at the same box size. An optical variant
@@ -72,7 +72,7 @@
       <ul class="flex list-none flex-col gap-3 p-0">
         {#each optical as { name, baseName, Glyph, Base } (name)}
           <li
-            class="surface-primary flex flex-col gap-3 rounded-lg border border-subtle p-4"
+            class="flex flex-col gap-3 rounded-lg border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
           >
             <code class="text-xs opacity-70">{baseName}</code>
             <div class="flex flex-wrap items-end gap-6">
@@ -81,7 +81,9 @@
                   {#each [{ label: 'base', Component: Base }, { label: 'optical', Component: Glyph }] as variant (variant.label)}
                     {@const Rendered = variant.Component}
                     <div class="flex flex-col items-center gap-1">
-                      <span class="outline-danger outline-dotted outline-1">
+                      <span
+                        class="outline-dotted outline-1 outline-io-border-danger"
+                      >
                         <Rendered width={size} height={size} />
                       </span>
                       <span class="text-[0.625rem] opacity-60">
@@ -97,7 +99,7 @@
               {#each [{ label: baseName, Component: Base }, { label: name, Component: Glyph }] as variant (variant.label)}
                 {@const Rendered = variant.Component}
                 <span
-                  class="surface-primary inline-flex items-center gap-2 rounded border border-subtle px-4 py-2"
+                  class="inline-flex items-center gap-2 rounded border border-io-border-primary bg-io-surface-primary px-4 py-2 text-io-content-primary"
                 >
                   In a button
                   <Rendered />

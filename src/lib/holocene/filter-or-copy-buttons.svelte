@@ -76,10 +76,10 @@
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full p-0.5 text-primary hover:surface-inverse;
+    @apply relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full bg-io-surface-primary p-0.5 text-io-content-primary hover:bg-io-actions-hover-overlay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary active:bg-io-actions-press-overlay;
   }
 
   .filtered {
-    @apply surface-inverse;
+    @apply bg-io-interactive-primary text-io-content-white hover:bg-io-interactive-primary-hover active:bg-io-interactive-primary-press;
   }
 </style>

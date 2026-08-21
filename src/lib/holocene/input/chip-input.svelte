@@ -117,8 +117,12 @@
   <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
   <div
     class={merge(
-      'surface-primary flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-2 focus-within:ring-primary/70',
-      disabled && 'cursor-not-allowed opacity-65',
+      'flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-io-border-tertiary bg-io-interactive-secondary p-2 text-sm text-io-content-primary focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
+      !disabled &&
+        !invalid &&
+        'focus-within:border-io-border-secondary hover:border-io-border-brand',
+      disabled &&
+        'cursor-not-allowed border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
       invalid && 'invalid',
     )}
   >
@@ -173,7 +177,7 @@
     {#if maxLength && !disabled}
       <span class="count">
         <span
-          class="text-information"
+          class="text-io-content-information"
           class:warn={maxLength - chips.length <= 5}
           class:error={maxLength === chips?.length}
         >
@@ -202,15 +206,15 @@
 
 <style lang="postcss">
   .invalid {
-    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
+    @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger;
   }
 
   input {
-    @apply surface-primary inline-block grow focus:outline-none;
+    @apply inline-block grow bg-transparent text-io-content-primary placeholder:text-io-content-tertiary focus:outline-none disabled:text-io-content-tertiary;
   }
 
   .error-msg {
-    @apply break-words text-sm text-danger;
+    @apply break-words text-sm text-io-content-danger;
   }
 
   .error-msg.min-width {
@@ -218,14 +222,14 @@
   }
 
   .count {
-    @apply invisible text-right text-sm font-medium text-primary group-focus-within:visible;
+    @apply invisible text-right text-sm font-medium text-io-content-primary group-focus-within:visible;
   }
 
   .count > .warn {
-    @apply text-warning;
+    @apply text-io-content-warning;
   }
 
   .count > .error {
-    @apply text-danger;
+    @apply text-io-content-danger;
   }
 </style>

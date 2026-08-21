@@ -51,14 +51,14 @@
   aria-live="polite"
 >
   <span class="flex h-20 w-20 items-center justify-center rounded-full">
-    <IconHeartbeat class="block h-full w-full text-blue-200" />
+    <IconHeartbeat class="block h-full w-full text-io-indigo-6" />
   </span>
   <div class="text-center">
     <h5>{translate('workers.no-worker-heartbeats')}</h5>
     {#if currentSdk}
       {@const { href, sdk, version } = currentSdk}
       {#if !minimumVersionRequired(version, $sdkInfo.version)}
-        <p class="flex flex-row gap-1 text-secondary">
+        <p class="flex flex-row gap-1 text-io-content-secondary">
           {translate('workers.worker-heartbeats-sdk-link-preface')}
           <Link newTab {href}>
             <SdkLogo {sdk} {version} hideDocsLink />
@@ -67,7 +67,7 @@
         </p>
       {/if}
     {:else}
-      <p class="text-secondary">
+      <p class="text-io-content-secondary">
         {translate('workers.worker-heartbeats-sdk-list-preface')}
       </p>
       <div

@@ -83,7 +83,7 @@
 >
   <div bind:this={contentEl} class="flex flex-col">
     <div
-      class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
+      class="relative flex h-full items-center justify-between bg-io-surface-secondary text-sm"
     >
       <div class="flex h-full items-center gap-4 px-2">
         {#if status}
@@ -103,12 +103,14 @@
         >
       </div>
     </div>
-    <div class="surface-primary">
+    <div class="bg-io-surface-primary text-io-content-primary">
       <EventDetailsFull {group} event={group.initialEvent} lazy={true} />
     </div>
     {#if childWorkflowStartedEvent}
-      <div class="surface-primary p-4">
-        <div class="font-medium leading-4 text-secondary">Child Workflow</div>
+      <div class="bg-io-surface-primary p-4 text-io-content-primary">
+        <div class="font-medium leading-4 text-io-content-secondary">
+          Child Workflow
+        </div>
         {#key group.eventList.length}
           {#if childWorkflowStartedEvent.attributes.workflowExecution?.workflowId}
             <GraphWidget
@@ -118,7 +120,7 @@
               runId={childWorkflowStartedEvent.attributes.workflowExecution
                 .runId ?? undefined}
               viewportHeight={320}
-              class="surface-primary overflow-x-hidden border-t border-subtle"
+              class="overflow-x-hidden border-t border-io-border-primary bg-io-surface-primary text-io-content-primary"
             />
           {/if}
         {/key}

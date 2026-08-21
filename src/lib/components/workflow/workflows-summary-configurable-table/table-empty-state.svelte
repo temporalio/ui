@@ -51,7 +51,7 @@
             : translate('workflows.workflow-query-empty-state-title')}
         {/if}
       </h2>
-      <p class="text-secondary">
+      <p class="text-io-content-secondary">
         {#if $workflowError}
           {$workflowError}
         {:else}
@@ -63,9 +63,9 @@
         {/if}
       </p>
       {#if hasTaskFailuresQuery}
-        <NoWorkflowTaskFailures class="m-auto mt-8 text-subtle" />
+        <NoWorkflowTaskFailures class="m-auto mt-8 text-io-content-tertiary" />
       {:else}
-        <NoQueryResults class="m-auto mt-8 text-subtle" />
+        <NoQueryResults class="m-auto mt-8 text-io-content-tertiary" />
       {/if}
     </div>
   </div>
@@ -75,7 +75,7 @@
     aria-live="polite"
   >
     <div
-      class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
+      class="flex w-auto min-w-[280px] flex-col gap-4 bg-io-surface-primary p-8 text-io-content-primary xl:min-w-[520px] xl:flex-1"
     >
       <h2>
         {translate('workflows.workflow-empty-state-title')}
@@ -111,10 +111,10 @@
       {/if}
     </div>
     <div class="flex h-full flex-col">
-      <div class="bg-off-white dark:bg-[#0f1725]">
+      <div class="bg-io-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-io-indigo-8"></div>
     </div>
   </div>
 {/if}

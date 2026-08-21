@@ -157,13 +157,13 @@
           />
         </div>
         {#if invalidEndTime}
-          <span class="text-xs text-danger" role="alert">
+          <span class="text-xs text-io-content-danger" role="alert">
             {translate('schedules.backfill-end-before-start')}
           </span>
         {/if}
         <div class="flex w-full flex-row items-center gap-2">
           <IconClock />
-          <span class="text-xs font-normal text-slate-500"
+          <span class="text-xs font-normal text-io-content-secondary"
             >{translate('common.based-on-time-preface')}
             {timezone === 'UTC'
               ? translate('common.universal-standard-time')
@@ -172,7 +172,11 @@
         </div>
       </div>
 
-      <hr tabindex="-1" aria-hidden="true" class="my-4 w-full border-subtle" />
+      <hr
+        tabindex="-1"
+        aria-hidden="true"
+        class="my-4 w-full border-io-border-primary"
+      />
 
       <RadioGroup name="overlap-policy" group={selectedOverlapPolicy}>
         {#each Object.entries(overlapPolicyContent) as [value, content] (value)}

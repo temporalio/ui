@@ -67,7 +67,7 @@
   <ul class={twMerge('flex flex-col gap-2', className)}>
     {#each runs as run, i (run.runId || i)}
       <li
-        class="grid grid-cols-[max-content_1fr] gap-x-2 gap-y-1 border-b border-subtle py-2 sm:grid-cols-[minmax(max-content,7rem)_1fr_max-content]"
+        class="grid grid-cols-[max-content_1fr] gap-x-2 gap-y-1 border-b border-io-border-primary py-2 sm:grid-cols-[minmax(max-content,7rem)_1fr_max-content]"
       >
         <div class="col-start-1 row-start-1 flex items-center">
           <WorkflowStatus status={run.status} />

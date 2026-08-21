@@ -8,7 +8,9 @@
 </script>
 
 <Glyph
-  class={includesTaskQueueType ? 'text-blue-700' : 'text-primary'}
+  class={includesTaskQueueType
+    ? 'text-io-content-success'
+    : 'text-io-content-primary'}
   title={includesTaskQueueType
     ? translate('common.yes')
     : translate('common.no')}

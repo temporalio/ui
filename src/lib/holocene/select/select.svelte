@@ -132,7 +132,12 @@
     <Label {label} hidden={labelHidden} for={id} {required} />
     {#key $labelCtx}
       <MenuButton
-        class={merge('w-full', !valid && 'border-danger', menuButtonClass)}
+        class={merge(
+          'w-full border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary focus-visible:border-io-border-tertiary focus-visible:bg-io-interactive-secondary focus-visible:ring-io-interactive-primary enabled:hover:bg-io-actions-hover-overlay disabled:opacity-[0.32] data-[active=true]:bg-io-actions-press-overlay',
+          !valid &&
+            'border-io-border-danger focus-visible:border-io-border-danger focus-visible:ring-io-border-danger',
+          menuButtonClass,
+        )}
         hasIndicator={!disabled}
         disabled={disabled || loading}
         controls="{id}-select"
@@ -156,6 +161,11 @@
           value={!value && placeholder !== '' ? placeholder : $labelCtx}
           tabindex="-1"
           disabled
+          class={merge(
+            !value && placeholder !== ''
+              ? 'text-io-content-secondary'
+              : 'text-io-content-primary',
+          )}
           class:disabled
           {required}
           aria-required={required}
@@ -177,7 +187,7 @@
     </Menu>
   {/if}
 
-  <span id={errorId} role="alert" class="text-xs text-danger">
+  <span id={errorId} role="alert" class="text-xs text-io-content-danger">
     {#if showError}{error}{/if}
   </span>
 </MenuContainer>

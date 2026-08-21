@@ -43,21 +43,21 @@
             {endpoint.spec.name}
           </Link>
         {:else}
-          <span class="text-secondary">—</span>
+          <span class="text-io-content-secondary">—</span>
         {/if}
       </td>
       <td>
         {#if endpoint.lastModifiedTime}
           <Timestamp dateTime={endpoint.lastModifiedTime} relative />
         {:else}
-          <span class="text-secondary">—</span>
+          <span class="text-io-content-secondary">—</span>
         {/if}
       </td>
       <td>
         {#if endpoint.createdTime}
           <Timestamp dateTime={endpoint.createdTime} relative={false} />
         {:else}
-          <span class="text-secondary">—</span>
+          <span class="text-io-content-secondary">—</span>
         {/if}
       </td>
     </TableRow>

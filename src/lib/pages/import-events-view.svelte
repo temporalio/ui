@@ -28,7 +28,10 @@
     class="flex items-end justify-end gap-4"
     aria-label={translate('events.event-history-view')}
   >
-    <div id="event-view-toggle" class="surface-primary flex gap-4">
+    <div
+      id="event-view-toggle"
+      class="flex gap-4 bg-io-surface-primary text-io-content-primary"
+    >
       <ToggleButtons>
         <ToggleButton
           LeadingIcon={IconFeed}

@@ -35,7 +35,7 @@
 {#if errors.length > 0 && !commonErrorsDismissed}
   <section
     aria-labelledby="workflow-common-errors-title"
-    class="max-w-screen-lg border border-subtle bg-primary p-3 xl:w-2/3"
+    class="max-w-screen-lg border border-io-border-primary bg-io-surface-primary p-3 xl:w-2/3"
     data-testid="workflow-common-errors"
   >
     <div class="mb-3 flex items-center justify-between gap-2">

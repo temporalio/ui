@@ -46,14 +46,14 @@
         traffic will be routed to this Worker Deployment Version.
       </p>
       {#if currentBuildId}
-        <div class="border border-subtle">
+        <div class="border border-io-border-primary">
           <div class="flex items-center justify-between px-4 py-3 text-sm">
-            <span class="text-secondary"
+            <span class="text-io-content-secondary"
               >{translate('deployments.build-id')}</span
             >
             <span class="flex items-center gap-2 font-mono font-medium">
-              <span class="text-secondary">{currentBuildId}</span>
-              <IconArrowRight class="h-3.5 w-3.5 text-secondary" />
+              <span class="text-io-content-secondary">{currentBuildId}</span>
+              <IconArrowRight class="h-3.5 w-3.5 text-io-content-secondary" />
               <span>{buildId}</span>
             </span>
           </div>

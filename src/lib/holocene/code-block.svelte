@@ -292,7 +292,7 @@
   <button
     class={twMerge(
       'h-full border-b-2 border-transparent py-2',
-      title === activeTab ? 'border-brand' : '',
+      title === activeTab ? 'border-io-border-brand' : '',
     )}
     onclick={() => (activeTab = title)}
   >
@@ -301,11 +301,14 @@
 {/snippet}
 
 <div
-  class={twMerge('min-w-[80px] grow', hasHeader && ['border border-subtle'])}
+  class={twMerge(
+    'min-w-[80px] grow',
+    hasHeader && ['border border-io-border-primary'],
+  )}
 >
   {#if tabs && tabs.length > 0}
     <div
-      class="flex flex-row items-center justify-between border-b border-subtle bg-code-block px-3"
+      class="flex flex-row items-center justify-between border-b border-io-border-primary bg-io-surface-code-block px-3 text-io-content-secondary"
     >
       <div class="flex flex-row items-center gap-4">
         {#each tabs as title (title)}
@@ -318,7 +321,7 @@
           <CopyButton
             {copyIconTitle}
             {copySuccessIconTitle}
-            class="m-0 rounded-full text-secondary"
+            class="m-0 rounded-full text-io-content-secondary"
             onclick={handleCopy}
             copied={!!$copied}
           />
@@ -333,7 +336,7 @@
       identical, minimising ResizeObserver churn when the real editor swaps in.
     -->
     <pre
-      class="overflow-auto border border-subtle bg-code-block p-2 text-primary"
+      class="overflow-auto border border-io-border-primary bg-io-surface-code-block p-2 text-io-content-code-block"
       style:font-family="Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace"
       style:font-size="0.875em"
       style:max-height={maxHeight ? `${maxHeight}px` : undefined}
@@ -358,7 +361,7 @@
           <CopyButton
             {copyIconTitle}
             {copySuccessIconTitle}
-            class="m-0 rounded-full text-secondary"
+            class="m-0 rounded-full text-io-content-secondary"
             onclick={handleCopy}
             copied={$copied}
           />

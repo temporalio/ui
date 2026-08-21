@@ -16,7 +16,7 @@
   >
     <span class="flex h-20 w-20 items-center justify-center rounded-full">
       <IconHeartbeat
-        class="block h-full w-full text-blue-200"
+        class="block h-full w-full text-io-indigo-6"
         height={20}
         width={20}
       />
@@ -25,7 +25,7 @@
       <h5>
         {translate('workers.worker-heartbeats-disabled')}
       </h5>
-      <p class="text-secondary">
+      <p class="text-io-content-secondary">
         {translate('workers.worker-heartbeats-enablement')}
       </p>
     </div>

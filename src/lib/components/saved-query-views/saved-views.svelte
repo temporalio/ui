@@ -217,7 +217,7 @@
 <div class="flex overflow-auto">
   <div
     class={merge(
-      'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
+      'relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-io-border-primary bg-io-surface-primary text-io-content-primary shadow-sm transition-all duration-300 ease-in-out',
       $savedQueryNavOpen
         ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
         : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
@@ -225,7 +225,7 @@
     style="will-change: width"
   >
     <div
-      class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
+      class="flex items-center justify-center gap-2 border-b border-io-border-primary px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
     >
       <div
         class={merge(
@@ -243,7 +243,7 @@
         {/if}
         <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
         <button
-          class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
+          class="hidden rounded-sm p-0.5 hover:bg-io-actions-hover-overlay lg:inline-flex"
           aria-label={$savedQueryNavOpen
             ? 'Collapse saved views'
             : 'Expand saved views'}
@@ -280,7 +280,7 @@
         </p>
       {/if}
 
-      <div class="border-t border-subtle"></div>
+      <div class="border-t border-io-border-primary"></div>
 
       {#if unsavedQuery}
         {@render queryButton(unsaveView)}
@@ -307,7 +307,7 @@
       {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
         <p
           class={merge(
-            ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
+            'pl-1 text-center text-io-content-secondary lg:pl-4 lg:text-left',
             !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
           )}
         >
@@ -367,7 +367,7 @@
         onclick={() => setActiveQueryView(view)}
         class={merge(
           'flex w-full justify-start',
-          (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
+          (view.count ?? 0) > 0 && 'text-io-content-error',
         )}
         active={view.active}
         disabled={view.disabled}
@@ -394,13 +394,13 @@
           {/if}
           {#if view.count != undefined}
             {@render queryBadge({
-              className: `font-mono ${view.count > 0 ? 'bg-red-50 dark:bg-red-900 text-red-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-600 text-blue-900 dark:text-white'}`,
+              className: `font-mono ${view.count > 0 ? 'bg-io-surface-error text-io-content-error' : 'bg-io-surface-primary text-io-content-secondary'}`,
               content: view.count,
               Icon: view.count > 0 ? IconExclamationOctagon : IconHappyLappy,
               iconClass:
                 view.count > 0
-                  ? 'bg-red-200 dark:bg-red-700 text-red-900 dark:text-white'
-                  : 'surface-subtle',
+                  ? 'bg-io-overlay-error text-io-content-error'
+                  : 'bg-io-overlay-tertiary text-io-content-secondary',
             })}
           {/if}
         {/if}
@@ -504,7 +504,7 @@
 })}
   <span
     class={merge(
-      'surface-subtle right-2 top-2 hidden items-center rounded-full px-2 py-1 text-xs font-medium lg:static lg:ml-auto lg:flex',
+      'right-2 top-2 hidden items-center rounded-full bg-io-surface-tertiary px-2 py-1 text-xs font-medium text-io-content-secondary lg:static lg:ml-auto lg:flex',
       Icon && 'gap-1.5 p-0.5 pl-2',
       className,
     )}

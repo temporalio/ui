@@ -145,32 +145,39 @@
           'flex-none',
           'cursor-pointer',
           'border',
-          'bg-primary',
-          'text-inverse',
+          'border-io-border-tertiary',
+          'bg-io-interactive-secondary',
+          'text-io-content-inverse-primary',
           'bg-clip-padding',
-          'peer-indeterminate:bg-interactive',
-          'peer-indeterminate:border-interactive',
-          'peer-checked:bg-interactive',
-          'peer-checked:border-interactive',
+          'peer-indeterminate:border-io-interactive-primary',
+          'peer-indeterminate:bg-io-interactive-primary',
+          'peer-checked:border-io-interactive-primary',
+          'peer-checked:bg-io-interactive-primary',
         ],
-        !disabled && [
-          'group-hover:border-inverse',
-          'peer-focus-visible:border-inverse',
-          'group-hover:peer-checked:border-inverse',
-          'group-hover:peer-indeterminate:border-inverse',
-          'group-hover:bg-interactive-active',
-          'peer-focus-visible:bg-interactive-active',
-          'group-hover:peer-checked:bg-interactive-active',
-          'group-hover:peer-indeterminate:bg-interactive-active',
-          'group-hover:ring-2',
-          'group-hover:ring-primary/70',
-          'peer-focus-visible:ring-2',
-          'peer-focus-visible:ring-primary/70',
-          'peer-focus-visible:ring-offset-2',
-          'peer-focus-visible:ring-offset-[var(--color-surface-primary)]',
-        ],
+        !disabled &&
+          valid && [
+            'peer-focus-visible:ring-2',
+            'peer-focus-visible:ring-io-interactive-primary',
+            'peer-focus-visible:ring-offset-2',
+            'peer-focus-visible:ring-offset-io-background-primary',
+          ],
+        !disabled &&
+          valid && [
+            'group-hover:border-io-border-brand',
+            'group-hover:bg-io-actions-hover-overlay',
+            'group-active:bg-io-actions-press-overlay',
+            'group-hover:peer-checked:border-io-interactive-primary-hover',
+            'group-hover:peer-checked:bg-io-interactive-primary-hover',
+            'group-active:peer-checked:border-io-interactive-primary-press',
+            'group-active:peer-checked:bg-io-interactive-primary-press',
+            'group-hover:peer-indeterminate:border-io-interactive-primary-hover',
+            'group-hover:peer-indeterminate:bg-io-interactive-primary-hover',
+            'group-active:peer-indeterminate:border-io-interactive-primary-press',
+            'group-active:peer-indeterminate:bg-io-interactive-primary-press',
+          ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
-        valid ? 'border-secondary' : 'border-danger peer-checked:border-danger',
+        !valid &&
+          'border-io-border-danger peer-checked:border-io-border-danger peer-indeterminate:border-io-border-danger peer-focus-visible:ring-2 peer-focus-visible:ring-io-border-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-io-background-primary',
       )}
     >
       {#if CheckIcon}
@@ -186,12 +193,14 @@
           {label}
         </span>
         {#if description}
-          <p class="text-xs font-normal text-secondary">{description}</p>
+          <p class="text-xs font-normal text-io-content-secondary">
+            {description}
+          </p>
         {/if}
       </div>
     {/if}
   </Label>
-  <span id={errorId} role="alert" class="text-xs text-danger">
+  <span id={errorId} role="alert" class="text-xs text-io-content-danger">
     {#if showError}{error}{/if}
   </span>
 </div>
