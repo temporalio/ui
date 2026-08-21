@@ -14,7 +14,11 @@
   let { namespace }: Props = $props();
 </script>
 
-<h1>{translate('batch.list-page-title')}</h1>
+<header>
+  <h1 class="leading-7">
+    {translate('batch.list-page-title')}
+  </h1>
+</header>
 {#await listBatchOperations(namespace)}
   <Loading />
 {:then { operations }}

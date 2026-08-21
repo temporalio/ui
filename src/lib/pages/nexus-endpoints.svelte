@@ -54,12 +54,14 @@
     {/snippet}
   </NexusEmptyState>
 {:else}
-  <div class="mb-8 flex items-center justify-between">
-    <h1 data-testid="namespace-selector-title">
-      {translate('nexus.endpoints')}
-    </h1>
-    {@render actions?.()}
-  </div>
+  <header>
+    <div class="flex flex-col items-start justify-between gap-2 md:flex-row">
+      <h1 data-testid="namespace-selector-title" class="leading-7">
+        {translate('nexus.endpoints')}
+      </h1>
+      {@render actions?.()}
+    </div>
+  </header>
   <div class="flex flex-col gap-4">
     <Input
       id="endpoint-search"
