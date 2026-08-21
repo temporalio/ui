@@ -8,6 +8,7 @@ export const activityCount = writable({
   count: 0,
   newCount: 0,
 });
+export const activityWorkerCount = writable<number | undefined>(undefined);
 
 export const activityError = writable('');
 export const activitiesQuery = writable<string>('');

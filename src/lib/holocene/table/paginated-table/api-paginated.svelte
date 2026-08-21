@@ -38,7 +38,7 @@
     onShiftUp?: KeyboardHandler;
     onShiftDown?: KeyboardHandler;
     onSpace?: KeyboardHandler;
-    total?: string | number;
+    total?: number;
     pageSizeSelectLabel: string;
     emptyStateTitle?: string;
     emptyStateMessage?: string;
@@ -67,7 +67,7 @@
     onShiftUp,
     onShiftDown,
     onSpace,
-    total = '',
+    total,
     pageSizeSelectLabel,
     emptyStateTitle = '',
     emptyStateMessage = '',

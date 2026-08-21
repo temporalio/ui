@@ -64,7 +64,7 @@
 
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
 
-  const { workflow } = $derived($workflowRun);
+  const { workflow, workerCount } = $derived($workflowRun);
   const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
   const workerDeployment = $derived(
     workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
@@ -111,6 +111,7 @@
   );
   const linkCount = $derived(outboundLinks + inboundLinks);
   const sharedFilterParams = $derived(getSharedFilterParams(page.url));
+  const taskQueue = $derived(workflow?.taskQueue ?? '');
 </script>
 
 <div class="flex items-center justify-between">
@@ -138,7 +139,7 @@
   </div>
 </div>
 <header class="flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
+  <div class="flex flex-col items-start justify-between gap-4 xl:flex-row">
     <div
       class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
     >
@@ -266,7 +267,7 @@
   {/if}
   <NoWorkersPollingAlert
     {namespace}
-    taskQueue={workflow?.taskQueue ?? ''}
+    {taskQueue}
     {runningWithNoWorkers}
     deployment={workerDeployment}
   />
@@ -341,7 +342,11 @@
           routeForWorkflowWorkers(routeParameters),
         )}
       >
-        <!-- TODO: Add Badge with workers count when there is a WorkersCount API available -->
+        {#if workerCount !== undefined}
+          <Badge type="primary" class="px-2 py-0">
+            {workerCount}
+          </Badge>
+        {/if}
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}

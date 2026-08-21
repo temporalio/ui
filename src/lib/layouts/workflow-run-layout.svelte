@@ -25,6 +25,7 @@
   import { runLivePoll } from '$lib/services/live-poll';
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
+  import { fetchWorkerCount } from '$lib/services/worker-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
@@ -33,6 +34,7 @@
     pauseLiveUpdates,
     timelineEvents,
   } from '$lib/stores/events';
+  import { workerCountEnabled } from '$lib/stores/workers';
   import {
     initialWorkflowRun,
     refresh,
@@ -57,6 +59,12 @@
   let workflowId = $derived(page.params.workflow);
   let runId = $derived(page.params.run);
   let showJson = $derived(page.url.searchParams.has('json'));
+  let workerHeartbeatsEnabled = $derived(
+    !!page.data?.namespace?.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
+  let workerCountEnabledForNamespace = $derived(
+    workerHeartbeatsEnabled && $workerCountEnabled,
+  );
   let fullJson = $derived({
     ...$workflowRun,
     eventHistory: eventBuffer.events,
@@ -189,6 +197,20 @@
     $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
     workflowRunController = new AbortController();
+
+    const onWorkersRoute = page.url.pathname.endsWith('/workers');
+
+    if (workerCountEnabledForNamespace && taskQueue && !onWorkersRoute) {
+      const countController = workflowRunController;
+      fetchWorkerCount(
+        { namespace: ns, query: `TaskQueue="${taskQueue}"` },
+        (input, init) =>
+          fetch(input, { ...init, signal: countController.signal }),
+      ).then(({ count }) => {
+        if (!countController.signal.aborted && count !== undefined)
+          $workflowRun.workerCount = count;
+      });
+    }
 
     if (workflow.isRunning && workers?.pollers?.length) {
       getWorkflowMetadata(

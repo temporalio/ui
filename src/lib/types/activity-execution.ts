@@ -11,6 +11,9 @@ import type { WorkflowSearchAttributes } from './workflows';
 export type ActivityExecutionStatus =
   keyof typeof import('@temporalio/proto').temporal.api.enums.v1.ActivityExecutionStatus;
 
+export type PendingActivityState =
+  keyof typeof import('@temporalio/proto').temporal.api.enums.v1.PendingActivityState;
+
 export type ActivityIdReusePolicy =
   keyof typeof import('@temporalio/proto').temporal.api.enums.v1.ActivityIdReusePolicy;
 
@@ -63,18 +66,20 @@ export interface ActivityExecutionInfo extends Omit<
   | 'heartbeatTimeout'
   | 'executionDuration'
   | 'stateTransitionCount'
+  | 'totalHeartbeatCount'
   | 'currentRetryInterval'
   | 'executionTime'
   | 'startDelay'
 > {
   status: ActivityExecutionStatus;
-  runState?: string; // only for running activities
+  runState?: PendingActivityState;
   scheduleToCloseTimeout: string;
   scheduleToStartTimeout: string;
   startToCloseTimeout: string;
   heartbeatTimeout: string;
   executionDuration?: string;
   stateTransitionCount: string;
+  totalHeartbeatCount?: string;
   currentRetryInterval: string;
   searchAttributes: WorkflowSearchAttributes;
   sdkName?: string;

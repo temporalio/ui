@@ -36,5 +36,5 @@
   data-track-text={copyIconTitle}
   {...rest}
 >
-  <Glyph title={copied ? copySuccessIconTitle : copyIconTitle} />
+  <Glyph class="size-4" title={copied ? copySuccessIconTitle : copyIconTitle} />
 </button>
