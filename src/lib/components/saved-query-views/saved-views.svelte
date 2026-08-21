@@ -394,13 +394,13 @@
           {/if}
           {#if view.count != undefined}
             {@render queryBadge({
-              className: `font-mono ${view.count > 0 ? 'bg-io-surface-status-persimmon text-io-content-error' : 'bg-io-surface-status-neutral text-io-content-primary'}`,
+              className: `font-mono ${view.count > 0 ? 'bg-io-surface-error text-io-content-error' : 'bg-io-surface-primary text-io-content-secondary'}`,
               content: view.count,
               Icon: view.count > 0 ? IconExclamationOctagon : IconHappyLappy,
               iconClass:
                 view.count > 0
-                  ? 'bg-io-surface-error text-io-content-error'
-                  : 'bg-io-surface-tertiary text-io-content-primary',
+                  ? 'bg-io-overlay-error text-io-content-error'
+                  : 'bg-io-overlay-tertiary text-io-content-secondary',
             })}
           {/if}
         {/if}

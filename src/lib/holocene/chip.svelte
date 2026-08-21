@@ -64,7 +64,7 @@
 
 <style lang="postcss">
   .chip {
-    @apply flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm border border-io-border-tertiary bg-io-surface-status-neutral p-1 pl-2 text-sm leading-[1.5] text-io-content-primary;
+    @apply flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm border border-io-border-secondary bg-io-surface-primary p-1 pl-2 text-sm leading-[1.5] text-io-content-secondary;
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;
@@ -72,6 +72,6 @@
   }
 
   .warning {
-    @apply border-io-border-warning bg-io-surface-status-amber text-io-content-warning;
+    @apply border-io-border-warning bg-io-surface-warning text-io-content-warning;
   }
 </style>

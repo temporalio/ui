@@ -9,19 +9,19 @@ const OPAQUE_HEX_COLOR = /^#[0-9a-f]{6}$/i;
 describe('semantic surface colors', () => {
   it('matches representative Figma colors', () => {
     expect(semanticColors.surface.primary).toEqual({
-      light: '#f8f8f8',
-      dark: '#121212',
+      light: colorScales.slate[1],
+      dark: colorScales.neutral[11],
     });
     expect(semanticColors.surface.secondary).toEqual({
       light: colorScales.slate[2],
-      dark: colorScales.neutral[11],
+      dark: colorScales.neutral[10],
     });
     expect(semanticColors.surface.tertiary).toEqual({
       light: colorScales.slate[3],
-      dark: colorScales.neutral[10],
+      dark: colorScales.neutral[9],
     });
-    expect(semanticColors.surface.status.blue).toEqual({
-      light: colorScales.blue[3],
+    expect(semanticColors.surface.information).toEqual({
+      light: colorScales.blue[4],
       dark: colorScales.blue[12],
     });
     expect(semanticColors.surface['table-header']).toEqual({
@@ -29,8 +29,8 @@ describe('semantic surface colors', () => {
       dark: colorScales.neutral[9],
     });
     expect(semanticColors.surface['code-block']).toEqual({
-      light: colorScales.slate[2],
-      dark: colorScales.neutral[10],
+      light: colorScales.indigo[5],
+      dark: colorScales.indigo[12],
     });
     expect(semanticColors.content['code-block']).toEqual({
       light: colorScales.slate[12],
@@ -90,10 +90,8 @@ describe('interactive semantic colors', () => {
 
 describe('semantic color opacity', () => {
   it('uses opaque values for replacement fills', () => {
-    const { status, ...surfaceColors } = semanticColors.surface;
     const replacementFills = [
-      ...Object.values(surfaceColors),
-      ...Object.values(status),
+      ...Object.values(semanticColors.surface),
       ...Object.values(semanticColors.interactive),
     ];
 
@@ -103,17 +101,28 @@ describe('semantic color opacity', () => {
     }
   });
 
-  it('preserves translucency for borders and overlays', () => {
-    const compositingColors = [
-      ...Object.values(semanticColors.border),
-      ...Object.values(semanticColors.actions),
-      ...Object.values(semanticColors.overlay),
-    ];
-
-    for (const color of compositingColors) {
+  it('preserves translucency for alpha overlays', () => {
+    for (const color of Object.values(semanticColors.overlay)) {
       expect(color.light).toContain('color-mix');
       expect(color.dark).toContain('color-mix');
     }
+  });
+});
+
+describe('Figma alpha overlay colors', () => {
+  it('uses the theme-specific overlay strengths', () => {
+    expect(semanticColors.overlay.primary).toEqual({
+      light: colorAlphaScales.neutral[10],
+      dark: colorAlphaScales.slate[20],
+    });
+    expect(semanticColors.overlay.tertiary).toEqual({
+      light: colorAlphaScales.neutral[30],
+      dark: colorAlphaScales.slate[30],
+    });
+    expect(semanticColors.overlay.warning).toEqual({
+      light: colorAlphaScales.amber[20],
+      dark: colorAlphaScales.amber[15],
+    });
   });
 });
 

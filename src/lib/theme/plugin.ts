@@ -6,9 +6,6 @@ import { type SemanticColor, semanticColors } from './io/semantic-colors';
 
 type SemanticColorGroup = Readonly<Record<string, SemanticColor>>;
 
-const { status: surfaceStatusColors, ...surfaceColors } =
-  semanticColors.surface;
-
 const referenceColorGroup = (group: string, colors: SemanticColorGroup) =>
   Object.fromEntries(
     Object.keys(colors).map((name) => [
@@ -32,8 +29,7 @@ const resolveColorGroup = (
 const resolveSemanticColors = (mode: keyof SemanticColor) => ({
   ...resolveColorGroup('background', semanticColors.background, mode),
   ...resolveColorGroup('content', semanticColors.content, mode),
-  ...resolveColorGroup('surface', surfaceColors, mode),
-  ...resolveColorGroup('surface-status', surfaceStatusColors, mode),
+  ...resolveColorGroup('surface', semanticColors.surface, mode),
   ...resolveColorGroup('border', semanticColors.border, mode),
   ...resolveColorGroup('interactive', semanticColors.interactive, mode),
   ...resolveColorGroup('actions', semanticColors.actions, mode),
@@ -45,10 +41,7 @@ const ioColors = {
   alpha: colorAlphaScales,
   background: referenceColorGroup('background', semanticColors.background),
   content: referenceColorGroup('content', semanticColors.content),
-  surface: {
-    ...referenceColorGroup('surface', surfaceColors),
-    status: referenceColorGroup('surface-status', surfaceStatusColors),
-  },
+  surface: referenceColorGroup('surface', semanticColors.surface),
   border: referenceColorGroup('border', semanticColors.border),
   interactive: referenceColorGroup('interactive', semanticColors.interactive),
   actions: referenceColorGroup('actions', semanticColors.actions),

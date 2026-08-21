@@ -34,15 +34,6 @@ type ContentColors = Readonly<{
   white: SemanticColor;
 }>;
 
-type SurfaceStatusColors = Readonly<{
-  blue: SemanticColor;
-  green: SemanticColor;
-  red: SemanticColor;
-  persimmon: SemanticColor;
-  amber: SemanticColor;
-  neutral: SemanticColor;
-}>;
-
 type SurfaceColors = Readonly<{
   primary: SemanticColor;
   secondary: SemanticColor;
@@ -55,7 +46,6 @@ type SurfaceColors = Readonly<{
   warning: SemanticColor;
   danger: SemanticColor;
   error: SemanticColor;
-  status: SurfaceStatusColors;
 }>;
 
 type BorderColors = Readonly<{
@@ -89,6 +79,14 @@ type ActionColors = Readonly<{
 }>;
 
 type OverlayColors = Readonly<{
+  primary: SemanticColor;
+  secondary: SemanticColor;
+  tertiary: SemanticColor;
+  information: SemanticColor;
+  success: SemanticColor;
+  warning: SemanticColor;
+  danger: SemanticColor;
+  error: SemanticColor;
   backdrop: SemanticColor;
 }>;
 
@@ -102,19 +100,22 @@ type SemanticColors = Readonly<{
   overlay: OverlayColors;
 }>;
 
-const surfacePrimary: OpaqueSemanticColor = {
+const backgroundPrimary: OpaqueSemanticColor = {
   light: '#f8f8f8',
   dark: '#121212',
 };
 
-const backgroundPrimary = surfacePrimary;
+const surfacePrimary: OpaqueSemanticColor = {
+  light: colorScales.slate[1],
+  dark: colorScales.neutral[11],
+};
 
 const interactivePrimary: OpaqueSemanticColor = {
   light: colorScales.indigo[9],
   dark: colorScales.indigo[10],
 };
 
-const interactiveSecondary = surfacePrimary;
+const interactiveSecondary = backgroundPrimary;
 
 export const semanticColors: SemanticColors = {
   background: {
@@ -186,107 +187,81 @@ export const semanticColors: SemanticColors = {
     primary: surfacePrimary,
     secondary: {
       light: colorScales.slate[2],
-      dark: colorScales.neutral[11],
+      dark: colorScales.neutral[10],
     },
     tertiary: {
       light: colorScales.slate[3],
-      dark: colorScales.neutral[10],
+      dark: colorScales.neutral[9],
     },
     'table-header': {
       light: colorScales.slate[3],
       dark: colorScales.neutral[9],
     },
     'code-block': {
-      light: colorScales.slate[2],
-      dark: colorScales.neutral[10],
+      light: colorScales.indigo[5],
+      dark: colorScales.indigo[12],
     },
     brand: {
-      light: colorScales.indigo[3],
+      light: colorScales.indigo[5],
       dark: colorScales.indigo[12],
     },
     information: {
-      light: colorScales.blue[3],
+      light: colorScales.blue[4],
       dark: colorScales.blue[12],
     },
     success: {
-      light: colorScales.green[3],
+      light: colorScales.green[4],
       dark: colorScales.green[12],
     },
     warning: {
-      light: colorScales.amber[3],
+      light: colorScales.amber[2],
       dark: colorScales.amber[12],
     },
     danger: {
-      light: colorScales.red[3],
+      light: colorScales.red[4],
       dark: colorScales.red[12],
     },
     error: {
-      light: colorScales.persimmon[3],
+      light: colorScales.persimmon[4],
       dark: colorScales.persimmon[12],
-    },
-    status: {
-      blue: {
-        light: colorScales.blue[3],
-        dark: colorScales.blue[12],
-      },
-      green: {
-        light: colorScales.green[3],
-        dark: colorScales.green[12],
-      },
-      red: {
-        light: colorScales.red[3],
-        dark: colorScales.red[12],
-      },
-      persimmon: {
-        light: colorScales.persimmon[3],
-        dark: colorScales.persimmon[12],
-      },
-      amber: {
-        light: colorScales.amber[3],
-        dark: colorScales.amber[12],
-      },
-      neutral: {
-        light: colorScales.slate[3],
-        dark: colorScales.neutral[9],
-      },
     },
   },
   border: {
     primary: {
       light: colorAlphaScales.slate[20],
-      dark: colorAlphaScales.slate[20],
+      dark: colorAlphaScales.slate[30],
     },
     secondary: {
       light: colorAlphaScales.slate[40],
-      dark: colorAlphaScales.slate[40],
+      dark: colorAlphaScales.slate[50],
     },
     tertiary: {
       light: colorAlphaScales.slate[60],
-      dark: colorAlphaScales.slate[60],
+      dark: colorAlphaScales.slate[70],
     },
     brand: {
-      light: colorAlphaScales.indigo[60],
-      dark: colorAlphaScales.indigo[60],
+      light: colorScales.indigo[9],
+      dark: colorAlphaScales.indigo[70],
     },
     information: {
       light: colorAlphaScales.blue[60],
-      dark: colorAlphaScales.blue[60],
+      dark: colorAlphaScales.blue[70],
     },
     success: {
       light: colorAlphaScales.green[60],
-      dark: colorAlphaScales.green[60],
+      dark: colorAlphaScales.green[70],
     },
     warning: {
       light: colorAlphaScales.amber[60],
-      dark: colorAlphaScales.amber[60],
+      dark: colorAlphaScales.amber[70],
     },
     danger: {
       light: colorAlphaScales.red[60],
-      dark: colorAlphaScales.red[60],
+      dark: colorAlphaScales.red[70],
     },
     error: {
-      light: colorAlphaScales.persimmon[60],
-      dark: colorAlphaScales.persimmon[60],
+      light: colorAlphaScales.persimmon[50],
+      dark: colorAlphaScales.persimmon[70],
     },
   },
   interactive: {
@@ -336,6 +311,38 @@ export const semanticColors: SemanticColors = {
     },
   },
   overlay: {
+    primary: {
+      light: colorAlphaScales.neutral[10],
+      dark: colorAlphaScales.slate[20],
+    },
+    secondary: {
+      light: colorAlphaScales.neutral[15],
+      dark: colorAlphaScales.slate[30],
+    },
+    tertiary: {
+      light: colorAlphaScales.neutral[30],
+      dark: colorAlphaScales.slate[30],
+    },
+    information: {
+      light: colorAlphaScales.blue[20],
+      dark: colorAlphaScales.blue[20],
+    },
+    success: {
+      light: colorAlphaScales.green[20],
+      dark: colorAlphaScales.green[20],
+    },
+    warning: {
+      light: colorAlphaScales.amber[20],
+      dark: colorAlphaScales.amber[15],
+    },
+    danger: {
+      light: colorAlphaScales.red[20],
+      dark: colorAlphaScales.red[20],
+    },
+    error: {
+      light: colorAlphaScales.persimmon[20],
+      dark: colorAlphaScales.persimmon[20],
+    },
     backdrop: {
       light: colorAlphaScales.slate[20],
       dark: colorAlphaScales.slate[20],

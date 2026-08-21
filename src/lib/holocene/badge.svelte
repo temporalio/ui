@@ -5,18 +5,18 @@
 
   const type = {
     primary:
-      'border border-io-border-information bg-io-surface-status-blue text-io-content-information',
+      'border border-io-border-information bg-io-surface-information text-io-content-information',
     secondary: 'bg-io-alpha-purple-30 text-io-content-primary',
     default:
-      'border border-io-border-tertiary bg-io-surface-status-neutral text-io-content-primary',
+      'border border-io-border-secondary bg-io-surface-primary text-io-content-secondary',
     warning:
-      'border border-io-border-warning bg-io-surface-status-amber text-io-content-warning',
+      'border border-io-border-warning bg-io-surface-warning text-io-content-warning',
     success:
-      'border border-io-border-success bg-io-surface-status-green text-io-content-success',
+      'border border-io-border-success bg-io-surface-success text-io-content-success',
     danger:
-      'border border-io-border-danger bg-io-surface-status-red text-io-content-danger',
+      'border border-io-border-danger bg-io-surface-danger text-io-content-danger',
     count:
-      'h-6 w-6 min-w-max rounded-full border border-io-border-information bg-io-surface-status-blue text-io-content-information',
+      'h-6 w-6 min-w-max rounded-full border border-io-border-information bg-io-surface-information text-io-content-information',
     subtle:
       'bg-io-surface-tertiary text-io-content-secondary font-normal select-all',
     ghost:
