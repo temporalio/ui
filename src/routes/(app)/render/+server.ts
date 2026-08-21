@@ -6,6 +6,7 @@ import { toHtml } from 'hast-util-to-html';
 import { h } from 'hastscript';
 import { toHast } from 'mdast-util-to-hast';
 
+import { semanticColors } from '$lib/theme/io/semantic-colors';
 import { process } from '$lib/utilities/render-markdown';
 
 type RenderOptions = {
@@ -14,6 +15,32 @@ type RenderOptions = {
   theme?: string;
   overrideTheme?: string;
 };
+
+type ThemeMode = 'light' | 'dark';
+
+const markdownColorVariables = (mode: ThemeMode) => ({
+  '--color-io-background-primary': semanticColors.background.primary[mode],
+  '--color-io-content-brand': semanticColors.content.brand[mode],
+  '--color-io-content-code-block': semanticColors.content['code-block'][mode],
+  '--color-io-content-primary': semanticColors.content.primary[mode],
+  '--color-io-border-brand': semanticColors.border.brand[mode],
+  '--color-io-border-secondary': semanticColors.border.secondary[mode],
+  '--color-io-surface-code-block': semanticColors.surface['code-block'][mode],
+  '--color-io-surface-primary': semanticColors.surface.primary[mode],
+});
+
+const markdownColorRule = (selector: string, mode: ThemeMode): string => {
+  const declarations = Object.entries(markdownColorVariables(mode))
+    .map(([name, value]) => `${name}: ${value};`)
+    .join('\n');
+
+  return `${selector} {\n${declarations}\n}`;
+};
+
+const markdownThemeCss = [
+  markdownColorRule(':root', 'light'),
+  markdownColorRule("body[data-theme^='dark']", 'dark'),
+].join('\n');
 
 /**
  * Generate a random nonce.
@@ -46,7 +73,7 @@ const createPage = (
   { nonce, theme, overrideTheme }: RenderOptions,
 ) => {
   const cssPath = path.resolve('src/markdown.reset.css');
-  const css = fs.readFileSync(cssPath, 'utf8');
+  const css = `${markdownThemeCss}\n${fs.readFileSync(cssPath, 'utf8')}`;
   return toHtml(
     h('html', [
       h('head', [

@@ -1,6 +1,10 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
+  import {
+    dotColors,
+    getStatusStrokeColor,
+  } from '$lib/components/lines-and-dots/colors';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import {
     type LazyGroup,
@@ -66,6 +70,8 @@
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
+  const completedColor = getStatusStrokeColor('Completed');
+  const failedColor = dotColors('Failed').fill;
 
   let canvasWidth = $state(0);
 
@@ -495,6 +501,8 @@
         style:height="{svgHeight}px"
         style:--dot="{dotSize}px"
         style:--dot-r="{dotRadius}px"
+        style:--completed-color={completedColor}
+        style:--failed-color={failedColor}
       >
         <TimelineIconDefs />
 
@@ -620,7 +628,11 @@
   }
 
   .canvas :global(.tl-line--gradient) {
-    background-image: linear-gradient(255deg, #1ff1a5 0%, #f55 100%);
+    background-image: linear-gradient(
+      255deg,
+      var(--completed-color) 0%,
+      var(--failed-color) 100%
+    );
   }
 
   .canvas :global(.tl-line--dashed) {

@@ -118,7 +118,7 @@
       <div class="bg-io-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-io-indigo-8"></div>
     </div>
   </div>
 {/if}

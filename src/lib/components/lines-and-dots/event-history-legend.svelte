@@ -1,6 +1,7 @@
 <script lang="ts">
   import { eventCategoryColor } from '$lib/components/event/event-styles';
   import {
+    dotColors,
     getCategoryStrokeColor,
     getStatusStrokeColor,
   } from '$lib/components/lines-and-dots/colors';
@@ -30,7 +31,7 @@
     { status: 'Completed' },
     {
       status: 'Completed with retries',
-      style: `background: linear-gradient(255deg, ${getStatusStrokeColor('Completed')} 0%, #F55 100%)`,
+      style: `background: linear-gradient(255deg, ${getStatusStrokeColor('Completed')} 0%, ${dotColors('Failed').fill} 100%)`,
     },
     { status: 'Failed' },
     { status: 'Fired' },
