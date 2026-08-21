@@ -8,6 +8,7 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalNexus } from '$lib/io/icon';
   import type { CallbackState } from '$lib/types';
   import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
@@ -72,7 +73,7 @@
   {/if}
 {/snippet}
 
-<Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>
+<Alert Icon={IconTemporalNexus} intent={failed ? 'error' : 'info'} {title}>
   <div class="flex flex-col gap-2 pt-2">
     {#each linkViews as view (view.key)}
       {@render callbackLink(view)}

@@ -3,6 +3,7 @@
 
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import { IconArrowDown, IconArrowUp } from '$lib/io/icon';
   import { buildGroupIndex, groupEvents } from '$lib/models/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { fetchAllEvents } from '$lib/services/events-service';
@@ -117,7 +118,7 @@
   <Button
     variant="secondary"
     size="xs"
-    leadingIcon="arrow-up"
+    LeadingIcon={IconArrowUp}
     onclick={loadPrevious}
     disabled={ids[0] === '1' || loading}
     data-testid="load-previous">Show Previous 10</Button
@@ -139,7 +140,7 @@
   <Button
     variant="secondary"
     size="xs"
-    leadingIcon="arrow-down"
+    LeadingIcon={IconArrowDown}
     onclick={loadNext}
     disabled={ids[ids.length - 1] === lastEventId || loading}
     data-testid="load-next">Show Next 10</Button

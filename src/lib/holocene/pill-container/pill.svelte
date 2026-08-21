@@ -8,8 +8,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { type IconComponent, IconSpinner } from '$lib/io/icon';
 
   import { PILLS, type PillsContext } from './pill-container.svelte';
 
@@ -18,7 +17,7 @@
     disabled?: boolean;
     loading?: boolean;
     active?: boolean;
-    icon?: IconName;
+    Icon?: IconComponent;
     count?: number;
     class?: string;
     children?: Snippet;
@@ -30,7 +29,7 @@
     disabled = false,
     loading = false,
     active = undefined,
-    icon = undefined,
+    Icon,
     count = undefined,
     class: className = '',
     children,
@@ -53,6 +52,8 @@
     selectPill(id);
     onclick?.(e);
   };
+
+  const Glyph = $derived(loading ? IconSpinner : Icon);
 </script>
 
 <button
@@ -69,9 +70,9 @@
   )}
   {disabled}
 >
-  {#if icon}
+  {#if Icon}
     <span class:animate-spin={loading}>
-      <Icon name={loading ? 'spinner' : icon} />
+      <Glyph />
     </span>
   {/if}
   {@render children?.()}

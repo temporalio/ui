@@ -5,12 +5,12 @@
   import Card from '$lib/holocene/card.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock, IconInfo } from '$lib/io/icon';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { ianaTimezoneComboboxOptions } from '$lib/utilities/timezone';
 
@@ -109,7 +109,7 @@
             width={250}
             text={translate('schedules.start-date-tooltip')}
           >
-            <Icon name="square-info" class="h-3 w-3" />
+            <IconInfo class="h-3 w-3" />
           </Tooltip>
         {/snippet}
       </DatePicker>
@@ -192,7 +192,7 @@
         optionLabelKey="label"
         noResultsText={translate('common.no-results')}
         placeholder={translate('schedules.timezone-placeholder')}
-        leadingIcon="clock"
+        LeadingIcon={IconClock}
         required
       />
 
@@ -217,7 +217,7 @@
             width={250}
             text={translate('schedules.jitter-tooltip')}
           >
-            <Icon name="square-info" class="h-3 w-3" />
+            <IconInfo class="h-3 w-3" />
           </Tooltip>
         {/snippet}
       </Input>

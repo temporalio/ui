@@ -1,7 +1,8 @@
 <script lang="ts">
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
+  import ExecutionStatus from '$lib/components/execution-status.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import type { NexusOperationExecutionInfo } from '$lib/types/nexus-operation-execution';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
@@ -35,12 +36,13 @@
   );
 </script>
 
-<div class="space-y-2">
-  <div class="flex items-center gap-4 max-xl:w-full max-xl:flex-wrap">
-    <WorkflowStatus
-      status={toNexusOperationStatus(nexusOperationInfo.status)}
-    />
-    <div class="text-2xl font-medium">
+<div class="flex flex-col gap-4">
+  <div class="flex items-start gap-4 max-xl:w-full max-xl:flex-wrap">
+    <div class="flex items-center gap-4">
+      <ExecutionStatus
+        status={toNexusOperationStatus(nexusOperationInfo.status)}
+        big
+      />
       <h1
         data-testid="nexus-operation-id-heading"
         class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
@@ -101,7 +103,7 @@
       >
       <DetailListLinkValue
         copyable
-        iconName="filter"
+        Icon={IconFilter}
         text={nexusOperationInfo.endpoint ?? ''}
         href={endpointFilterLink}
       />

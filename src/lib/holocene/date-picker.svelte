@@ -3,6 +3,11 @@
 
   import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconCalendarPlus,
+    IconChevronLeft,
+    IconChevronRight,
+  } from '$lib/io/icon';
   import { getMonthName } from '$lib/utilities/calendar';
   import {
     DATE_PICKER_INPUT_FORMAT,
@@ -11,7 +16,6 @@
   } from '$lib/utilities/date-picker-input';
 
   import Calender from './calendar.svelte';
-  import Icon from './icon/icon.svelte';
   import Input from './input/input.svelte';
 
   interface Props {
@@ -108,7 +112,7 @@
     {label}
     {afterLabel}
     {labelHidden}
-    icon="calendar-plus"
+    Icon={IconCalendarPlus}
     type="text"
     onfocus={onFocus}
     onblur={onBlur}
@@ -134,7 +138,7 @@
         <div class="flex items-center justify-center">
           <button type="button" onclick={prev} title={previousMonth}>
             <span class="sr-only">{previousMonth}</span>
-            <Icon name="chevron-left" /></button
+            <IconChevronLeft /></button
           >
         </div>
         <div class="flex items-center justify-center">
@@ -145,7 +149,7 @@
           <span class="sr-only">Next Month</span>
           <button type="button" onclick={next} title={nextMonth}>
             <span class="sr-only">{nextMonth}</span>
-            <Icon name="chevron-right" />
+            <IconChevronRight />
           </button>
         </div>
       </div>

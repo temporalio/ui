@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { IconAws, type IconComponent, IconGcp } from '$lib/io/icon';
   import type { ComputeStatus } from '$lib/types/deployments';
   import {
     connectionStateColor,
@@ -9,9 +9,9 @@
     deriveConnectionStatus,
   } from '$lib/utilities/connection-status';
 
-  const CONFIG: Record<string, { icon: 'aws' | 'gcp'; label: string }> = {
-    'aws-lambda': { icon: 'aws', label: 'Lambda' },
-    'gcp-cloud-run': { icon: 'gcp', label: 'Cloud Run' },
+  const CONFIG: Record<string, { Icon: IconComponent; label: string }> = {
+    'aws-lambda': { Icon: IconAws, label: 'Lambda' },
+    'gcp-cloud-run': { Icon: IconGcp, label: 'Cloud Run' },
   };
 
   let {
@@ -30,7 +30,8 @@
     class="inline-flex min-w-24 items-center justify-center gap-2 border border-subtle px-1"
   >
     {#if config}
-      <Icon name={config.icon} />
+      {@const ProviderIcon = config.Icon}
+      <ProviderIcon />
       <p>{config.label}</p>
     {/if}
     {#if state}

@@ -11,8 +11,8 @@
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
@@ -248,7 +248,7 @@
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
     <Badge type={failed ? 'danger' : 'default'}>
-      <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
+      <IconRetry class="mr-1 {failed && 'font-bold text-red-400'}" />
       {activity.attempt ?? 0} of {formatMaximumAttempts(
         activity.maximumAttempts ?? null,
       )}

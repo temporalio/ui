@@ -3,12 +3,11 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import { type IconComponent } from '$lib/io/icon';
 
   interface Props extends Omit<HTMLInputAttributes, 'value' | 'class'> {
-    icon?: IconName;
+    Icon?: IconComponent;
     id: string;
     value: number;
     label: string;
@@ -29,7 +28,7 @@
   }
 
   let {
-    icon,
+    Icon,
     id,
     value = $bindable(),
     label,
@@ -70,9 +69,9 @@
       class:search
       class:invalid={!valid}
     >
-      {#if icon}
+      {#if Icon}
         <span class="icon-container">
-          <Icon name={icon} />
+          <Icon />
         </span>
       {/if}
       <input

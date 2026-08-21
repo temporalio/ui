@@ -18,12 +18,19 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconChevronLeft,
+    IconExternalLinkOptical,
+    IconFilter,
+    IconMicrochip,
+    IconSpinner,
+    IconTemporalServer,
+  } from '$lib/io/icon';
   import type {
     WorkerInfo,
     WorkerPollerInfo,
@@ -97,7 +104,7 @@
 <div class="flex items-center gap-2">
   {@render breadcrumb()}
   {#if heartbeat?.workerInstanceKey}
-    <Icon name="chevron-left" />
+    <IconChevronLeft />
     {heartbeat.workerInstanceKey}
   {/if}
 </div>
@@ -156,7 +163,7 @@
             namespace,
             query: `TaskQueue="${heartbeat.taskQueue}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
       <DetailListLabel>{translate('workers.sdk')}</DetailListLabel>
@@ -191,7 +198,7 @@
             namespace,
             query: `DeploymentName="${heartbeat.deploymentVersion.deploymentName}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
     </DetailListColumn>
@@ -207,7 +214,7 @@
             namespace,
             query: `HostName="${hostName}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
       {@const processId = heartbeat?.hostInfo?.processId}
@@ -239,7 +246,7 @@
     </ToggleButtons>
     {#if refreshing}
       <p class="flex items-center gap-1">
-        <Icon name="spinner" class="animate-spin text-indigo-600" />
+        <IconSpinner class="animate-spin text-indigo-600" />
         {translate('workers.pulling-latest-snapshot')}
       </p>
     {:else}
@@ -309,8 +316,8 @@
               {:else}
                 {slots?.currentUsedSlots ?? 0}
               {/if}
-            </span>{#if slots?.currentAvailableSlots}
-              /{slots.currentAvailableSlots - (slots?.currentUsedSlots ?? 0)}
+            </span>{#if slots?.currentAvailableSlots && slots.currentAvailableSlots >= 0}
+              /{slots.currentAvailableSlots + (slots?.currentUsedSlots ?? 0)}
             {/if}
           </p>
           {#if slots?.slotSupplierKind}
@@ -380,7 +387,7 @@
           {translate('workers.zero-slots-configured')}
         </p>
         <Link
-          trailingIcon="external-link"
+          TrailingIcon={IconExternalLinkOptical}
           href="https://docs.temporal.io/develop/worker-performance#custom-slot-implementation"
           newTab
         >
@@ -418,7 +425,7 @@
   <Alert intent="warning" title={translate('workers.go-dependency-warning')}>
     <p class="mb-1">{translate('workers.go-dependency-warning-description')}</p>
     <Link
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLinkOptical}
       href="https://docs.temporal.io/cloud/worker-health#enable-host-resource-reporting"
       newTab
     >
@@ -435,7 +442,7 @@
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
         <span id="cpu-label" class="flex items-center gap-1 font-semibold">
-          <Icon name="microchip" class="h-3 w-3 text-secondary" />
+          <IconMicrochip class="h-3 w-3 text-secondary" />
           {translate('workers.cpu-usage')}
         </span>
         <span>{cpuUsage.toFixed(0)}%</span>
@@ -445,7 +452,7 @@
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
         <span id="memory-label" class="flex items-center gap-1 font-semibold">
-          <Icon name="server" class="h-3 w-3 text-secondary" />
+          <IconTemporalServer class="h-3 w-3 text-secondary" />
           {translate('workers.memory-usage')}
         </span>
         <span>{memUsage.toFixed(0)}%</span>
@@ -488,7 +495,7 @@
       </div>
     </dl>
     <Link
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLinkOptical}
       href="https://docs.temporal.io/develop/worker-performance#workflow-cache-tuning"
       newTab
       class="mt-4"

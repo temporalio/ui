@@ -5,6 +5,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import { getIdentity } from '$lib/utilities/core-context';
   import { routeForCatalog } from '$lib/utilities/route-for';
@@ -39,7 +40,7 @@
   <PageTitle title={`${descriptor.title} | Catalog`} />
 
   <header class="mb-6">
-    <Link href={routeForCatalog({ namespace })} leadingIcon="chevron-left">
+    <Link href={routeForCatalog({ namespace })} LeadingIcon={IconChevronLeft}>
       Back to catalog
     </Link>
     <div class="mt-3 flex flex-wrap items-center gap-2">

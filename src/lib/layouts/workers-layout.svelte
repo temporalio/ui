@@ -84,7 +84,7 @@
 </script>
 
 <header class="flex flex-col gap-2">
-  <div class="flex min-h-10 flex-wrap items-center justify-between gap-2">
+  <div class="flex min-h-10 flex-wrap items-start justify-between gap-2">
     <div>
       <div class="flex items-start gap-2">
         <h1 class="leading-7" data-cy="workers-title">

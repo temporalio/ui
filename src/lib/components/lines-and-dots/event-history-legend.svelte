@@ -5,9 +5,9 @@
     getStatusStrokeColor,
   } from '$lib/components/lines-and-dots/colors';
   import { CategoryIcon } from '$lib/components/lines-and-dots/constants';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconInfo } from '$lib/io/icon';
   import type {
     EventClassification,
     EventTypeCategory,
@@ -95,13 +95,13 @@
 {/snippet}
 
 {#snippet eventCategoryKey(category: EventTypeCategory)}
-  {@const { name, title } = CategoryIcon[category]}
+  {@const { Icon, title } = CategoryIcon[category]}
   <dd
     class="mt-1 flex items-center gap-2 {eventCategoryColor({
       category,
     })}"
   >
-    <Icon {name} class="h-3.5 w-3.5 shrink-0" />
+    <Icon class="h-3.5 w-3.5 shrink-0" />
     {title}
   </dd>
 {/snippet}
@@ -133,5 +133,5 @@
       </dl>
     </div>
   {/snippet}
-  <Icon name="info" class="text-secondary" />
+  <IconInfo class="text-secondary" />
 </Tooltip>

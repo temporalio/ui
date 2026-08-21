@@ -3,7 +3,6 @@
 
   import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     Menu,
     MenuButton,
@@ -12,6 +11,7 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import { IconFilter } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
@@ -94,7 +94,7 @@
   >
     {translate('common.status')}
     {#snippet trailing()}
-      <Icon name="filter" />
+      <IconFilter />
     {/snippet}
   </MenuButton>
   <Menu keepOpen id="execution-status-filter">

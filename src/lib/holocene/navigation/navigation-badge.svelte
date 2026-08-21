@@ -2,12 +2,10 @@
   import type { Snippet } from 'svelte';
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
-
-  import type { IconName } from '../icon';
-  import Icon from '../icon/icon.svelte';
+  import type { IconComponent } from '$lib/io/icon';
 
   interface Props {
-    icon: IconName;
+    Icon: IconComponent;
     link: string;
     tooltip?: string;
     external?: boolean;
@@ -17,7 +15,7 @@
   }
 
   let {
-    icon,
+    Icon,
     link,
     tooltip = '',
     external = false,
@@ -46,8 +44,8 @@
       <div
         class="flex h-6 w-6 items-center whitespace-nowrap group-data-[nav=open]:hidden group-data-[nav=closed]:justify-center"
       >
-        {#if icon}
-          <Icon name={icon} />
+        {#if Icon}
+          <Icon />
         {/if}
       </div>
       <div

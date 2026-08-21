@@ -5,6 +5,7 @@
     type MultiSelectOptions,
   } from '$lib/holocene/select/multi-select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import {
     allEventTypeOptions,
     compactEventTypeOptions,
@@ -64,5 +65,5 @@
   clearAllLabel={translate('common.clear-all-capitalized')}
   onChange={onOptionClick}
   variant="table-header"
-  icon="filter"
+  Icon={IconFilter}
 />

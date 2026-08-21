@@ -67,8 +67,10 @@
     >
       <svg
         class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
-        viewBox="0 0 24 24"><use href="#ti-workflow" /></svg
+        viewBox="0 0 16 16"
       >
+        <use href="#ti-workflow" />
+      </svg>
     </div>
   {/each}
 </div>

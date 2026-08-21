@@ -4,11 +4,10 @@
   import { type Snippet, untrack } from 'svelte';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconAws, type IconComponent, IconGcp } from '$lib/io/icon';
   import { hasCapability } from '$lib/utilities/has-capability.svelte';
 
   import {
@@ -27,9 +26,9 @@
 
   const configuredProviders = untrack(() => providers);
 
-  const providerIcon: Record<ComputeProviderValue, IconName> = {
-    lambda: 'aws',
-    'cloud-run': 'gcp',
+  const providerIcon: Record<ComputeProviderValue, IconComponent> = {
+    lambda: IconAws,
+    'cloud-run': IconGcp,
   };
 
   const providerLabel = (value: ComputeProviderValue): string => {
@@ -119,10 +118,11 @@
         </span>
       {/snippet}
       {#snippet icon()}
+        {@const ProviderIcon = providerIcon[option.value]}
         <div
           class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded-none border border-subtle"
         >
-          <Icon name={providerIcon[option.value]} width={32} height={32} />
+          <ProviderIcon width={32} height={32} />
         </div>
       {/snippet}
     </RadioCard>

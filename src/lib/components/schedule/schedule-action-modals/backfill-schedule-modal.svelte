@@ -5,12 +5,12 @@
   import { utcToZonedTime } from 'date-fns-tz';
 
   import DatePicker from '$lib/holocene/date-picker.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock } from '$lib/io/icon';
   import {
     actionPending,
     clearConfirmationModalActionTimeout,
@@ -162,7 +162,7 @@
           </span>
         {/if}
         <div class="flex w-full flex-row items-center gap-2">
-          <Icon name="clock" aria-hidden="true" />
+          <IconClock />
           <span class="text-xs font-normal text-slate-500"
             >{translate('common.based-on-time-preface')}
             {timezone === 'UTC'

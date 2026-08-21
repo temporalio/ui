@@ -3,6 +3,8 @@
 
   import { page } from '$app/state';
 
+  import ActivityDetailsLoading from '$lib/components/standalone-activities/activity-details-loading.svelte';
+  import ActivityHeaderLoading from '$lib/components/standalone-activities/activity-header-loading.svelte';
   import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -12,6 +14,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { getActivityPollers } from '$lib/services/pollers-service';
   import { fetchWorkerCount } from '$lib/services/worker-service';
   import {
@@ -42,6 +45,7 @@
   let { children, namespace, activityId, runId }: Props = $props();
 
   let error = $state<Error | undefined>();
+  let loading = $state(true);
 
   const activityPollerAbortController = new AbortController();
   const poller = $derived(
@@ -52,9 +56,11 @@
       activityPollerAbortController,
       (execution) => {
         $activityExecution = execution;
+        loading = false;
       },
       (e) => {
         error = e;
+        loading = false;
       },
     ),
   );
@@ -132,59 +138,63 @@
   });
 </script>
 
-{#if $activityExecution}
-  <div class="flex flex-col gap-4">
-    <div class="flex items-center gap-2">
-      <Link
-        href={activitiesHref}
-        data-testid="back-to-activities"
-        icon="chevron-left"
-      >
-        {translate('standalone-activities.back-to-activities')}
-      </Link>
-    </div>
+<div class="flex flex-col gap-4">
+  <div class="flex items-center gap-2">
+    <Link
+      href={activitiesHref}
+      data-testid="back-to-activities"
+      LeadingIcon={IconChevronLeft}
+    >
+      {translate('standalone-activities.back-to-activities')}
+    </Link>
+  </div>
+
+  {#if $activityExecution}
     <ActivityExecutionHeader
       {namespace}
       {poller}
       activityExecutionInfo={$activityExecution.info}
     />
+  {:else if loading}
+    <ActivityHeaderLoading />
+  {/if}
 
-    <Tabs>
-      <TabList label={translate('standalone-activities.layout-tabs-label')}>
-        <Tab
-          label={translate('standalone-activities.layout-details-tab')}
-          id="activity-execution-details-tab"
-          href={detailsRoute}
-          active={pathMatches(page.url.pathname, detailsRoute)}
-        />
-        <Tab
-          label={translate('standalone-activities.layout-workers-tab')}
-          id="activity-execution-workers-tab"
-          href={workersRoute}
-          active={pathMatches(page.url.pathname, workersRoute)}
-        >
-          {#if $activityWorkerCount !== undefined}
-            <Badge type="primary" class="px-2 py-0">
-              {$activityWorkerCount}
-            </Badge>
-          {/if}
-        </Tab>
-        <Tab
-          label={translate(
-            'standalone-activities.layout-search-attributes-tab',
-          )}
-          id="activity-execution-search-attributes-tab"
-          href={searchAttributesRoute}
-          active={pathMatches(page.url.pathname, searchAttributesRoute)}
-        />
-        <Tab
-          label={translate('standalone-activities.layout-user-metadata-tab')}
-          id="activity-execution-metadata-tab"
-          href={metadataRoute}
-          active={pathMatches(page.url.pathname, metadataRoute)}
-        />
-      </TabList>
-    </Tabs>
+  <Tabs>
+    <TabList label={translate('standalone-activities.layout-tabs-label')}>
+      <Tab
+        label={translate('standalone-activities.layout-details-tab')}
+        id="activity-execution-details-tab"
+        href={detailsRoute}
+        active={pathMatches(page.url.pathname, detailsRoute)}
+      />
+      <Tab
+        label={translate('standalone-activities.layout-workers-tab')}
+        id="activity-execution-workers-tab"
+        href={workersRoute}
+        active={pathMatches(page.url.pathname, workersRoute)}
+      >
+        {#if $activityWorkerCount !== undefined}
+          <Badge type="primary" class="px-2 py-0">
+            {$activityWorkerCount}
+          </Badge>
+        {/if}
+      </Tab>
+      <Tab
+        label={translate('standalone-activities.layout-search-attributes-tab')}
+        id="activity-execution-search-attributes-tab"
+        href={searchAttributesRoute}
+        active={pathMatches(page.url.pathname, searchAttributesRoute)}
+      />
+      <Tab
+        label={translate('standalone-activities.layout-user-metadata-tab')}
+        id="activity-execution-metadata-tab"
+        href={metadataRoute}
+        active={pathMatches(page.url.pathname, metadataRoute)}
+      />
+    </TabList>
+  </Tabs>
+
+  {#if $activityExecution}
     {#if getPollersRequest}
       {#await getPollersRequest then response}
         <NoWorkersPollingAlert
@@ -197,7 +207,9 @@
       {/await}
     {/if}
     {@render children()}
-  </div>
-{:else if error}
-  <ErrorComponent {error} />
-{/if}
+  {:else if loading}
+    <ActivityDetailsLoading />
+  {:else if error}
+    <ErrorComponent {error} />
+  {/if}
+</div>

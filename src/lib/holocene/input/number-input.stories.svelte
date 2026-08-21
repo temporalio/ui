@@ -2,8 +2,10 @@
   import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
-  import { iconNames } from '$lib/holocene/icon';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
+  import * as ioIcons from '$lib/io/icon';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Number Input',
@@ -30,7 +32,12 @@
       disabled: { name: 'Disabled', control: 'boolean' },
       required: { name: 'Required', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
-      icon: { name: 'Icon', control: 'select', options: iconNames },
+      Icon: {
+        name: 'Icon',
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
       max: { name: 'Minimum Value', control: { type: 'number', min: 0 } },
       min: { name: 'Maximum Value', control: { type: 'number', min: 0 } },
       search: { name: 'Search', control: 'boolean' },
@@ -60,6 +67,9 @@
 
 <Story name="With Units" args={{ units: 'days' }} />
 
-<Story name="With Icon" args={{ icon: 'calendar' }} />
+<Story name="With Icon" args={{ Icon: ioIcons.IconCalendar }} />
 
-<Story name="With Icon and Units" args={{ icon: 'calendar', units: 'weeks' }} />
+<Story
+  name="With Icon and Units"
+  args={{ Icon: ioIcons.IconCalendar, units: 'weeks' }}
+/>

@@ -2,6 +2,7 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
+  import { IconFeedback } from '$lib/io/icon';
 
   const href = $derived(
     page.data?.settings?.feedbackURL ||
@@ -11,7 +12,7 @@
 
 <Button
   size="sm"
-  leadingIcon="feedback"
+  LeadingIcon={IconFeedback}
   variant="ghost"
   class="text-brand shadow-md"
   {href}

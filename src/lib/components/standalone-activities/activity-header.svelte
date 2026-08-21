@@ -3,6 +3,7 @@
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import { isActivityDelayed } from '$lib/utilities/delayed-activities';
@@ -39,6 +40,10 @@
       `ActivityType="${activityType}"`,
     ),
   );
+  const billableActions = $derived(
+    (activityExecutionInfo.attempt ?? 0) +
+      Number(activityExecutionInfo.totalHeartbeatCount ?? 0),
+  );
   const taskQueueFilterLink = $derived(
     routeForStandaloneActivitiesWithQuery(
       { namespace },
@@ -47,9 +52,9 @@
   );
 </script>
 
-<div class="space-y-2">
+<div class="flex flex-col gap-4">
   <div
-    class="flex items-center justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
+    class="flex items-start justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
   >
     <div class="flex items-center gap-4">
       <ActivityExecutionStatus
@@ -57,21 +62,19 @@
         delayed={isActivityDelayed(activityExecutionInfo)}
         big
       />
-      <div class="text-2xl font-medium">
-        <h1
-          data-testid="activity-id-heading"
-          class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
-        >
-          <Copyable
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={activityExecutionInfo.activityId ?? ''}
-            clickAllToCopy
-            container-class="w-full"
-            class="overflow-hidden text-ellipsis text-left"
-          />
-        </h1>
-      </div>
+      <h1
+        data-testid="activity-id-heading"
+        class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+      >
+        <Copyable
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          content={activityExecutionInfo.activityId ?? ''}
+          clickAllToCopy
+          container-class="w-full"
+          class="overflow-hidden text-ellipsis text-left"
+        />
+      </h1>
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
@@ -117,7 +120,7 @@
         >
         <DetailListLinkValue
           copyable
-          iconName="filter"
+          Icon={IconFilter}
           text={activityType ?? ''}
           href={activityTypeFilterLink}
         />
@@ -127,7 +130,7 @@
       >
       <DetailListLinkValue
         copyable
-        iconName="filter"
+        Icon={IconFilter}
         text={activityExecutionInfo.taskQueue ?? ''}
         href={taskQueueFilterLink}
       />
@@ -137,7 +140,7 @@
         <DetailListLabel
           >{translate('workflows.billable-actions')}</DetailListLabel
         >
-        <DetailListTextValue text={String(activityExecutionInfo.attempt)} />
+        <DetailListTextValue text={String(billableActions)} />
       {:else}
         <DetailListLabel
           >{translate('workflows.state-transitions')}</DetailListLabel
