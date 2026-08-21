@@ -49,6 +49,36 @@ const deployment = {
   },
 } satisfies DescribeWorkerDeploymentResponse;
 
+const pendingDeployment = {
+  conflictToken: 'token',
+  workerDeploymentInfo: {
+    name: 'deployment',
+    createTime: '',
+    routingConfig: {
+      currentDeploymentVersion: {
+        deploymentName: 'deployment',
+        buildId: 'build-id',
+      },
+    },
+    lastModifierIdentity: 'test',
+    versionSummaries: [
+      {
+        version: 'deployment.build-id',
+        createTime: '',
+        deploymentVersion: {
+          deploymentName: 'deployment',
+          buildId: 'build-id',
+        },
+        status: 'WORKER_DEPLOYMENT_VERSION_STATUS_CURRENT',
+        computeConfig: {
+          scalingGroups: { default: { providerType: 'aws-lambda' } },
+        },
+        computeStatus: { providerValidation: {} },
+      },
+    ],
+  },
+} satisfies DescribeWorkerDeploymentResponse;
+
 const selfHostedDeployment = {
   conflictToken: 'token',
   workerDeploymentInfo: {
@@ -149,20 +179,19 @@ describe('deployment connection status visibility', () => {
 
   afterAll(closeDeploymentClientTestRunner);
 
-  test('hides the connection header and cell by default', async () => {
+  test('renders the connection header and cell by default', async () => {
     const target = await client.renderDeployment({
       fetchDeployment: deployment,
       fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
-      showConnectionStatus: false,
     });
 
     expect(target.querySelector('th:nth-child(4)')?.textContent).toBe(
-      'Deployed At',
+      'Connection',
     );
-    expect(target.textContent).not.toContain('Connected');
+    expect(target.textContent).toContain('Connected');
     const details = client.expandDetails(target);
     expect(details).not.toBeNull();
-    expect(details?.getAttribute('colspan')).toBe('5');
+    expect(details?.getAttribute('colspan')).toBe('6');
   });
 
   test('renders the matching connection header and cell when enabled', async () => {
@@ -179,6 +208,35 @@ describe('deployment connection status visibility', () => {
     const details = client.expandDetails(target);
     expect(details).not.toBeNull();
     expect(details?.getAttribute('colspan')).toBe('6');
+  });
+
+  test('hides the connection header and cell when the consumer opts out', async () => {
+    const target = await client.renderDeployment({
+      fetchDeployment: deployment,
+      fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
+      showConnectionStatus: false,
+    });
+
+    expect(target.querySelector('th:nth-child(4)')?.textContent).toBe(
+      'Deployed At',
+    );
+    expect(target.textContent).not.toContain('Connected');
+    const details = client.expandDetails(target);
+    expect(details).not.toBeNull();
+    expect(details?.getAttribute('colspan')).toBe('5');
+  });
+
+  test('shows the pending connection state for a version with no completed check', async () => {
+    const target = await client.renderDeployment({
+      fetchDeployment: pendingDeployment,
+      fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
+    });
+
+    expect(target.querySelector('th:nth-child(4)')?.textContent).toBe(
+      'Connection',
+    );
+    expect(target.textContent).toContain('Pending');
+    expect(target.textContent).not.toContain('Connected');
   });
 
   test('shows compute-only deployment and version actions for deployments with compute config', async () => {

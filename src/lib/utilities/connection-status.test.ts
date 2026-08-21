@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   deriveConnectionStatus,
   formatConnectionCheckTime,
+  resolveValidationOutcome,
 } from './connection-status';
 
 describe('deriveConnectionStatus', () => {
@@ -91,5 +92,54 @@ describe('formatConnectionCheckTime', () => {
     expect(formatConnectionCheckTime(new Date('invalid'))).toBe(
       'less than an hour ago',
     );
+  });
+});
+
+describe('resolveValidationOutcome', () => {
+  const body = (message?: string) =>
+    ({ code: 3, message, details: [] }) as never;
+
+  it('treats an InvalidArgument as a verdict and keeps the server message', () => {
+    expect(
+      resolveValidationOutcome({ status: 400, body: body('Role not assumed') }),
+    ).toEqual({ state: 'invalid', message: 'Role not assumed' });
+  });
+
+  it('falls back to generic copy for an InvalidArgument with no message', () => {
+    expect(resolveValidationOutcome({ status: 400, body: body() })).toEqual({
+      state: 'invalid',
+      message: 'Failed to validate connection',
+    });
+  });
+
+  it('does not call a gateway timeout invalid', () => {
+    expect(
+      resolveValidationOutcome({ status: 504, body: body('Gateway Timeout') }),
+    ).toEqual({ state: 'indeterminate', message: 'Gateway Timeout' });
+  });
+
+  it.each([500, 502, 503, 504])(
+    'reports %i as indeterminate rather than invalid',
+    (status) => {
+      expect(resolveValidationOutcome({ status, body: body() }).state).toBe(
+        'indeterminate',
+      );
+    },
+  );
+
+  it.each([401, 403, 404, 429])(
+    'reports %i as indeterminate because it is not a connection verdict',
+    (status) => {
+      expect(resolveValidationOutcome({ status, body: body() }).state).toBe(
+        'indeterminate',
+      );
+    },
+  );
+
+  it('drops an empty message rather than showing a blank line', () => {
+    expect(resolveValidationOutcome({ status: 504, body: body('') })).toEqual({
+      state: 'indeterminate',
+      message: undefined,
+    });
   });
 });
