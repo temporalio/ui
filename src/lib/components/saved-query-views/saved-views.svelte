@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Readable, Writable } from 'svelte/store';
-  import { slide } from 'svelte/transition';
 
   import { onMount, type Snippet } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
@@ -9,11 +8,8 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import { setPaginatedTableMaxHeight } from '$lib/holocene/table/paginated-table/context';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { translate } from '$lib/i18n/translate';
   import {
-    IconArrowsLeftRightToLine,
     IconBookmark,
     IconCheckmark,
     type IconComponent,
@@ -33,6 +29,7 @@
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
+  import CustomViewsMenu from './custom-views-menu.svelte';
   import ViewModal from './view-modal.svelte';
 
   interface Props {
@@ -82,7 +79,7 @@
   );
   const unsaveView: SavedQuery = $derived({
     id: 'unsaved',
-    name: 'New View',
+    name: 'Unsaved view',
     query,
     Icon: IconBookmark,
     badge: 'Unsaved',
@@ -92,6 +89,11 @@
   const unsavedQuery = $derived(query && activeQueryView?.id === 'unsaved');
   const activeUserView = $derived(
     activeQueryView?.type === 'user' ? activeQueryView : undefined,
+  );
+  const activeUserViewDirty = $derived(
+    Boolean(activeUserView) &&
+      Boolean(query) &&
+      activeUserView?.query !== query,
   );
 
   onMount(() => {
@@ -216,12 +218,12 @@
 
 <div class="flex flex-col">
   <div
-    class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border border-b-0 border-subtle p-1.5"
+    class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border border-b-0 border-subtle p-1.5 lg:flex-nowrap"
     role="group"
     aria-label="Saved Views"
     data-testid="saved-views-bar"
   >
-    <div class="flex flex-wrap items-center gap-1">
+    <div class="flex shrink-0 flex-wrap items-center gap-1 lg:flex-nowrap">
       {#each systemViews as view (view.id)}
         {@render queryButton(
           {
@@ -235,105 +237,76 @@
 
     <div class="hidden h-6 shrink-0 border-l border-subtle lg:block"></div>
 
-    <div class="flex flex-wrap items-center gap-1">
-      <p
-        class="flex items-center gap-1.5 whitespace-nowrap pl-1 text-xs font-medium lg:text-sm"
-      >
-        {translate('common.custom-views')}
-        {@render queryBadge({
-          className: 'font-mono',
-          content: `${namespaceSavedQueries.length}/${maxQueries}`,
-        })}
-      </p>
+    <div class="flex min-w-0 grow flex-wrap items-center gap-1 lg:flex-nowrap">
+      <CustomViewsMenu
+        {id}
+        views={namespaceSavedQueries}
+        activeView={activeQueryView}
+        draftView={unsavedQuery ? unsaveView : undefined}
+        dirty={activeUserViewDirty}
+        {maxQueries}
+        onSelect={setActiveQueryView}
+      />
 
-      {#if unsavedQuery}
-        {@render queryButton(unsaveView, true)}
-      {/if}
-
-      {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
-        {@render queryButton(
-          {
-            ...savedQuery,
-            active: savedQuery.id === activeQueryView?.id,
-            badge:
-              savedQuery.id === activeQueryView?.id &&
-              savedQuery.query !== query
-                ? 'Unsaved'
-                : undefined,
-          },
-          true,
-        )}
-      {/each}
-
-      {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
-        <p class="whitespace-nowrap px-1 text-secondary">No Views</p>
-      {/if}
-    </div>
-
-    {#if activeUserView}
-      <div
-        class="ml-auto flex items-center gap-1"
-        transition:slide={{ axis: 'x' }}
-      >
-        {#if activeUserView.query !== query}
+      {#if activeUserView}
+        <div class="flex shrink-0 items-center gap-1">
+          {#if activeUserViewDirty}
+            <Button
+              size="xs"
+              variant="primary"
+              data-testid="save-view-button"
+              data-track-name="save-view-button"
+              data-track-intent="action"
+              data-track-text="save"
+              onclick={() => {
+                onSaveView({
+                  ...activeUserView,
+                  query,
+                });
+              }}>Save</Button
+            >
+          {/if}
           <Button
             size="xs"
-            variant="primary"
-            data-testid="save-view-button"
-            data-track-name="save-view-button"
+            variant="secondary"
+            data-testid="edit-view-button"
+            data-track-name="edit-view-button"
             data-track-intent="action"
-            data-track-text="save"
+            data-track-text="edit"
             onclick={() => {
-              onSaveView({
-                ...activeUserView,
-                query,
-              });
-            }}>Save</Button
+              editViewModalOpen = true;
+            }}>Edit</Button
           >
-        {/if}
-        <Button
-          size="xs"
-          variant="secondary"
-          data-testid="edit-view-button"
-          data-track-name="edit-view-button"
-          data-track-intent="action"
-          data-track-text="edit"
-          onclick={() => {
-            editViewModalOpen = true;
-          }}>Edit</Button
-        >
-        <Button
-          LeadingIcon={$copied ? IconCheckmark : IconCopy}
-          aria-label="Share"
-          size="xs"
-          variant="ghost"
-          class="opacity-80"
-          data-testid="share-view-button"
-          data-track-name="share-view-button"
-          data-track-intent="action"
-          data-track-text="share"
-          onclick={handleCopy}>Share</Button
-        >
-      </div>
-    {:else if unsavedQuery}
-      <div
-        class="ml-auto flex items-center gap-1"
-        transition:slide={{ axis: 'x' }}
-      >
-        <Button
-          size="xs"
-          variant="secondary"
-          disabled={maxViewsReached}
-          data-testid="create-view-button"
-          data-track-name="create-view-button"
-          data-track-intent="action"
-          data-track-text="create"
-          onclick={() => {
-            saveViewModalOpen = true;
-          }}>Save as New</Button
-        >
-      </div>
-    {/if}
+          <Button
+            LeadingIcon={$copied ? IconCheckmark : IconCopy}
+            aria-label="Share"
+            size="xs"
+            variant="ghost"
+            class="opacity-80"
+            data-testid="share-view-button"
+            data-track-name="share-view-button"
+            data-track-intent="action"
+            data-track-text="share"
+            onclick={handleCopy}>Share</Button
+          >
+        </div>
+      {:else if unsavedQuery}
+        <div class="flex shrink-0 items-center gap-1">
+          <Button
+            size="xs"
+            variant="secondary"
+            disabled={maxViewsReached}
+            data-testid="create-view-button"
+            data-track-name="create-view-button"
+            data-track-intent="action"
+            data-track-text="create"
+            onclick={() => {
+              saveViewModalOpen = true;
+            }}>Save as New</Button
+          >
+        </div>
+      {/if}
+    </div>
   </div>
 
   {@render children()}

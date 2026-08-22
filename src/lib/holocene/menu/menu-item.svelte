@@ -183,7 +183,7 @@
     {...rest as HTMLLiAttributes}
   >
     {@render leading?.()}
-    <div class="grow">
+    <div class="min-w-0 grow">
       <div class:centered class="menu-item-wrapper">
         {@render children?.()}
         {#if selected}
