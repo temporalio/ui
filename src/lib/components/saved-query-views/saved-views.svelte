@@ -10,14 +10,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    IconBookmark,
-    IconCheckmark,
-    type IconComponent,
-    IconCopy,
-    IconExclamationOctagon,
-    IconHappyLappy,
-  } from '$lib/io/icon';
+  import { IconBookmark, IconCheckmark, IconCopy } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
@@ -373,11 +366,6 @@
         {@render queryBadge({
           className: `font-mono ${view.count > 0 ? 'bg-red-50 dark:bg-red-900 text-red-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-600 text-blue-900 dark:text-white'}`,
           content: view.count,
-          Icon: view.count > 0 ? IconExclamationOctagon : IconHappyLappy,
-          iconClass:
-            view.count > 0
-              ? 'bg-red-200 dark:bg-red-700 text-red-900 dark:text-white'
-              : 'surface-subtle',
         })}
       {/if}
     </Button>
@@ -387,26 +375,16 @@
 {#snippet queryBadge({
   className,
   content,
-  iconClass,
-  Icon,
 }: {
   className?: ClassNameValue;
   content: string | number;
-  iconClass?: ClassNameValue;
-  Icon?: IconComponent;
 })}
   <span
     class={merge(
       'surface-subtle flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium',
-      Icon && 'gap-1.5 p-0.5 pl-2',
       className,
     )}
   >
     <span class="max-w-16 truncate">{content}</span>
-    {#if Icon}
-      <span class={merge('rounded-full p-0.5', iconClass)}>
-        <Icon class="p-0.5" />
-      </span>
-    {/if}
   </span>
 {/snippet}
