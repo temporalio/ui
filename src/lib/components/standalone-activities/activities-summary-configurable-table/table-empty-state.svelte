@@ -114,7 +114,7 @@
         {/each}
       {/if}
     </div>
-    <div class="flex h-full flex-col max-xl:hidden">
+    <div class="flex flex-col max-xl:hidden">
       <div class="bg-off-white dark:bg-[#0f1725]">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
