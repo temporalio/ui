@@ -38,6 +38,7 @@ export const Strings = {
   between: 'Between',
   'in-last': 'In Last',
   'starts-with': 'Starts with',
+  contains: 'Contains',
   equals: 'Equals',
   'greater-than': 'Greater Than',
   'greater-than-or-equal-to': 'Greater than or equal to',
