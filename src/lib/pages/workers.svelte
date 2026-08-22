@@ -37,32 +37,32 @@
 </script>
 
 {#if workerHeartbeatsEnabled}
-  <FilterBar
-    filters={workerFilters}
-    options={$workerSearchAttributeOptions}
-    searchAttributes={$workerSearchAttributes}
-    id="worker"
-    statusAttribute="WorkerStatus"
-    includeNullConditions={false}
-  />
-
-  <SavedQueryViews
-    filters={workerFilters}
-    savedQueries={savedWorkerQueries}
-    systemViews={systemWorkerViews}
-    defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
-    searchAttributes={workerSearchAttributes}
-    id="worker"
-  >
-    {#key [namespace, query, $refresh]}
-      <WorkersTable
-        {namespace}
-        onFetch={() => fetchPaginatedWorkers({ namespace, query })}
-        total={$workerCount.count}
-        filterable
-      />
-    {/key}
-  </SavedQueryViews>
+  <div>
+    <FilterBar
+      filters={workerFilters}
+      options={$workerSearchAttributeOptions}
+      searchAttributes={$workerSearchAttributes}
+      id="worker"
+      statusAttribute="WorkerStatus"
+      includeNullConditions={false}
+    />
+    <SavedQueryViews
+      filters={workerFilters}
+      savedQueries={savedWorkerQueries}
+      systemViews={systemWorkerViews}
+      defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
+      searchAttributes={workerSearchAttributes}
+      id="worker"
+    />
+  </div>
+  {#key [namespace, query, $refresh]}
+    <WorkersTable
+      {namespace}
+      onFetch={() => fetchPaginatedWorkers({ namespace, query })}
+      total={$workerCount.count}
+      filterable
+    />
+  {/key}
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}

@@ -266,20 +266,21 @@
   </div>
 </header>
 
-<FilterBar />
-<SavedQueryViews
-  filters={workflowFilters}
-  savedQueries={savedWorkflowQueries}
-  {systemViews}
-  defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
-  {searchAttributes}
-  id="workflow"
->
-  <WorkflowsSummaryConfigurableTable
-    onClickConfigure={openCustomizationDrawer}
-    {cloud}
+<div>
+  <FilterBar />
+  <SavedQueryViews
+    filters={workflowFilters}
+    savedQueries={savedWorkflowQueries}
+    {systemViews}
+    defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
+    {searchAttributes}
+    id="workflow"
   />
-</SavedQueryViews>
+</div>
+<WorkflowsSummaryConfigurableTable
+  onClickConfigure={openCustomizationDrawer}
+  {cloud}
+/>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

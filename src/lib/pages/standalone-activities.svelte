@@ -227,19 +227,20 @@
   </div>
 </header>
 
-<FilterBar />
-<SavedQueryViews
-  filters={activityFilters}
-  savedQueries={savedActivityQueries}
-  systemViews={systemActivityViews}
-  defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
-  searchAttributes={activityExecutionSearchAttributes}
-  id="activity"
->
-  <ActivitiesSummaryConfigurableTable
-    onClickConfigure={openCustomizationDrawer}
+<div>
+  <FilterBar />
+  <SavedQueryViews
+    filters={activityFilters}
+    savedQueries={savedActivityQueries}
+    systemViews={systemActivityViews}
+    defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
+    searchAttributes={activityExecutionSearchAttributes}
+    id="activity"
   />
-</SavedQueryViews>
+</div>
+<ActivitiesSummaryConfigurableTable
+  onClickConfigure={openCustomizationDrawer}
+/>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

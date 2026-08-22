@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Readable, Writable } from 'svelte/store';
 
-  import { onMount, type Snippet } from 'svelte';
+  import { onMount } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import { goto } from '$app/navigation';
@@ -34,7 +34,6 @@
     maxQueries?: number;
     searchAttributes: Readable<SearchAttributes>;
     id: string;
-    children: Snippet;
   }
 
   let {
@@ -45,7 +44,6 @@
     maxQueries = MAX_SAVED_QUERIES,
     searchAttributes,
     id,
-    children,
   }: Props = $props();
 
   let activeQueryView: SavedQuery | undefined = $state();
@@ -210,100 +208,96 @@
   };
 </script>
 
-<div class="flex flex-col">
-  <div
-    class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border border-b-0 border-subtle p-1.5 lg:flex-nowrap"
-    role="group"
-    aria-label={translate('common.saved-views')}
-    data-testid="saved-views-bar"
-  >
-    <div class="flex shrink-0 flex-wrap items-center gap-1 lg:flex-nowrap">
-      {#each systemViews as view (view.id)}
-        {@render queryButton(
-          {
-            ...view,
-            active: query === view.query,
-          },
-          false,
-        )}
-      {/each}
-    </div>
-
-    <div class="hidden h-6 shrink-0 border-l border-subtle lg:block"></div>
-
-    <div class="flex min-w-0 grow flex-wrap items-center gap-1 lg:flex-nowrap">
-      <CustomViewsMenu
-        {id}
-        views={namespaceSavedQueries}
-        activeView={activeQueryView}
-        draftView={unsavedQuery ? unsavedView : undefined}
-        dirty={activeUserViewDirty}
-        {maxQueries}
-        onSelect={setActiveQueryView}
-      />
-
-      {#if activeUserView}
-        <div class="flex shrink-0 items-center gap-1">
-          {#if activeUserViewDirty}
-            <Button
-              size="xs"
-              variant="primary"
-              data-testid="save-view-button"
-              data-track-name="save-view-button"
-              data-track-intent="action"
-              data-track-text="save"
-              onclick={() => {
-                onSaveView({
-                  ...activeUserView,
-                  query,
-                });
-              }}>{translate('common.save')}</Button
-            >
-          {/if}
-          <Button
-            size="xs"
-            variant="secondary"
-            data-testid="edit-view-button"
-            data-track-name="edit-view-button"
-            data-track-intent="action"
-            data-track-text="edit"
-            onclick={() => {
-              editViewModalOpen = true;
-            }}>{translate('common.edit')}</Button
-          >
-          <Button
-            LeadingIcon={$copied ? IconCheckmark : IconCopy}
-            aria-label={translate('common.share')}
-            size="xs"
-            variant="ghost"
-            class="opacity-80"
-            data-testid="share-view-button"
-            data-track-name="share-view-button"
-            data-track-intent="action"
-            data-track-text="share"
-            onclick={handleCopy}>{translate('common.share')}</Button
-          >
-        </div>
-      {:else if unsavedQuery}
-        <div class="flex shrink-0 items-center gap-1">
-          <Button
-            size="xs"
-            variant="secondary"
-            disabled={maxViewsReached}
-            data-testid="create-view-button"
-            data-track-name="create-view-button"
-            data-track-intent="action"
-            data-track-text="create"
-            onclick={() => {
-              saveViewModalOpen = true;
-            }}>{translate('common.save-as-new')}</Button
-          >
-        </div>
-      {/if}
-    </div>
+<div
+  class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-b border-subtle p-1.5 lg:flex-nowrap"
+  role="group"
+  aria-label={translate('common.saved-views')}
+  data-testid="saved-views-bar"
+>
+  <div class="flex shrink-0 flex-wrap items-center gap-1 lg:flex-nowrap">
+    {#each systemViews as view (view.id)}
+      {@render queryButton(
+        {
+          ...view,
+          active: query === view.query,
+        },
+        false,
+      )}
+    {/each}
   </div>
 
-  {@render children()}
+  <div class="hidden h-6 shrink-0 border-l border-subtle lg:block"></div>
+
+  <div class="flex min-w-0 grow flex-wrap items-center gap-1 lg:flex-nowrap">
+    <CustomViewsMenu
+      {id}
+      views={namespaceSavedQueries}
+      activeView={activeQueryView}
+      draftView={unsavedQuery ? unsavedView : undefined}
+      dirty={activeUserViewDirty}
+      {maxQueries}
+      onSelect={setActiveQueryView}
+    />
+
+    {#if activeUserView}
+      <div class="flex shrink-0 items-center gap-1">
+        {#if activeUserViewDirty}
+          <Button
+            size="xs"
+            variant="primary"
+            data-testid="save-view-button"
+            data-track-name="save-view-button"
+            data-track-intent="action"
+            data-track-text="save"
+            onclick={() => {
+              onSaveView({
+                ...activeUserView,
+                query,
+              });
+            }}>{translate('common.save')}</Button
+          >
+        {/if}
+        <Button
+          size="xs"
+          variant="secondary"
+          data-testid="edit-view-button"
+          data-track-name="edit-view-button"
+          data-track-intent="action"
+          data-track-text="edit"
+          onclick={() => {
+            editViewModalOpen = true;
+          }}>{translate('common.edit')}</Button
+        >
+        <Button
+          LeadingIcon={$copied ? IconCheckmark : IconCopy}
+          aria-label={translate('common.share')}
+          size="xs"
+          variant="ghost"
+          class="opacity-80"
+          data-testid="share-view-button"
+          data-track-name="share-view-button"
+          data-track-intent="action"
+          data-track-text="share"
+          onclick={handleCopy}>{translate('common.share')}</Button
+        >
+      </div>
+    {:else if unsavedQuery}
+      <div class="flex shrink-0 items-center gap-1">
+        <Button
+          size="xs"
+          variant="secondary"
+          disabled={maxViewsReached}
+          data-testid="create-view-button"
+          data-track-name="create-view-button"
+          data-track-intent="action"
+          data-track-text="create"
+          onclick={() => {
+            saveViewModalOpen = true;
+          }}>{translate('common.save-as-new')}</Button
+        >
+      </div>
+    {/if}
+  </div>
 </div>
 <ViewModal
   id="{id}-save-view-modal"

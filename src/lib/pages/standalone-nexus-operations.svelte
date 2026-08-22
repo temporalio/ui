@@ -125,19 +125,20 @@
   </div>
 </header>
 
-<FilterBar />
-<SavedQueryViews
-  filters={nexusOperationFilters}
-  savedQueries={savedNexusQueries}
-  systemViews={systemNexusViews}
-  defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
-  searchAttributes={nexusOperationSearchAttributes}
-  id="nexus"
->
-  <NexusOperationsSummaryConfigurableTable
-    onClickConfigure={openCustomizationDrawer}
+<div>
+  <FilterBar />
+  <SavedQueryViews
+    filters={nexusOperationFilters}
+    savedQueries={savedNexusQueries}
+    systemViews={systemNexusViews}
+    defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
+    searchAttributes={nexusOperationSearchAttributes}
+    id="nexus"
   />
-</SavedQueryViews>
+</div>
+<NexusOperationsSummaryConfigurableTable
+  onClickConfigure={openCustomizationDrawer}
+/>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

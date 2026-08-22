@@ -139,93 +139,94 @@
   </div>
 </header>
 
-<FilterBar
-  filters={scheduleFilters}
-  options={$scheduleSearchAttributeOptions}
-  searchAttributes={$scheduleSearchAttributes}
-  id="schedules"
-/>
-<SavedQueryViews
-  filters={scheduleFilters}
-  savedQueries={savedScheduleQueries}
-  systemViews={systemScheduleViews}
-  defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
-  searchAttributes={scheduleSearchAttributes}
-  id="schedule"
->
-  {#key [namespace, query, $schedulesRefresh]}
-    <PaginatedTable
-      {onFetch}
-      {onError}
-      total={$schedulesCount.count}
-      aria-label={translate('common.schedules')}
-      pageSizeSelectLabel={translate('common.per-page')}
-      nextButtonLabel={translate('common.next')}
-      previousButtonLabel={translate('common.previous')}
-      emptyStateMessage={translate('schedules.empty-state-title')}
-      errorMessage={translate('schedules.error-message-fetching')}
-    >
-      {#snippet caption()}
-        <caption class="sr-only">{translate('common.schedules')}</caption>
-      {/snippet}
-      {#snippet headers()}
-        <tr class="text-left">
-          {#each columns as { label }, i (`${label}:${i}`)}
-            <th>{label}</th>
-          {/each}
-        </tr>
-      {/snippet}
-      {#snippet rows({ visibleItems })}
-        {#each visibleItems as schedule}
-          <SchedulesTableRow {schedule} {columns} />
+<div>
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
+  />
+  <SavedQueryViews
+    filters={scheduleFilters}
+    savedQueries={savedScheduleQueries}
+    systemViews={systemScheduleViews}
+    defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+    searchAttributes={scheduleSearchAttributes}
+    id="schedule"
+  />
+</div>
+{#key [namespace, query, $schedulesRefresh]}
+  <PaginatedTable
+    {onFetch}
+    {onError}
+    total={$schedulesCount.count}
+    aria-label={translate('common.schedules')}
+    pageSizeSelectLabel={translate('common.per-page')}
+    nextButtonLabel={translate('common.next')}
+    previousButtonLabel={translate('common.previous')}
+    emptyStateMessage={translate('schedules.empty-state-title')}
+    errorMessage={translate('schedules.error-message-fetching')}
+  >
+    {#snippet caption()}
+      <caption class="sr-only">{translate('common.schedules')}</caption>
+    {/snippet}
+    {#snippet headers()}
+      <tr class="text-left">
+        {#each columns as { label }, i (`${label}:${i}`)}
+          <th>{label}</th>
         {/each}
-      {/snippet}
+      </tr>
+    {/snippet}
+    {#snippet rows({ visibleItems })}
+      {#each visibleItems as schedule}
+        <SchedulesTableRow {schedule} {columns} />
+      {/each}
+    {/snippet}
 
-      {#snippet empty()}
-        <div class="flex h-full flex-col items-center justify-center">
-          {#if error}
-            <EmptyState title={translate('schedules.empty-state-title')}>
-              <Alert intent="warning" Icon={IconWarning} class="mx-12">
-                {error}
-              </Alert>
-            </EmptyState>
-          {:else if query}
-            <EmptyState
-              title={translate('schedules.empty-state-title')}
-              content={translate('schedules.empty-state-description')}
-            />
-          {:else}
-            <EmptyState title={translate('schedules.empty-state-title')}>
-              <p>
-                {translate('schedules.getting-started-docs-link-preface')}
-                <Link newTab href="https://docs.temporal.io/workflows/#schedule"
-                  >{translate('schedules.getting-started-docs-link')}</Link
-                >
-                {translate('schedules.getting-started-cli-link-preface')}
-                <Link newTab href="https://docs.temporal.io/cli/schedule"
-                  >Temporal CLI</Link
-                >.
-              </p>
-            </EmptyState>
-          {/if}
-        </div>
-      {/snippet}
-      {#snippet actionsEndAdditional()}
-        <Tooltip text={translate('common.configure-columns')} top>
-          <Button
-            onclick={openCustomizationDrawer}
-            data-testid="workflows-summary-table-configuration-button"
-            size="xs"
-            variant="ghost"
-            aria-label={translate('common.configure-columns')}
-          >
-            <IconTemporalSettings />
-          </Button>
-        </Tooltip>
-      {/snippet}
-    </PaginatedTable>
-  {/key}
-</SavedQueryViews>
+    {#snippet empty()}
+      <div class="flex h-full flex-col items-center justify-center">
+        {#if error}
+          <EmptyState title={translate('schedules.empty-state-title')}>
+            <Alert intent="warning" Icon={IconWarning} class="mx-12">
+              {error}
+            </Alert>
+          </EmptyState>
+        {:else if query}
+          <EmptyState
+            title={translate('schedules.empty-state-title')}
+            content={translate('schedules.empty-state-description')}
+          />
+        {:else}
+          <EmptyState title={translate('schedules.empty-state-title')}>
+            <p>
+              {translate('schedules.getting-started-docs-link-preface')}
+              <Link newTab href="https://docs.temporal.io/workflows/#schedule"
+                >{translate('schedules.getting-started-docs-link')}</Link
+              >
+              {translate('schedules.getting-started-cli-link-preface')}
+              <Link newTab href="https://docs.temporal.io/cli/schedule"
+                >Temporal CLI</Link
+              >.
+            </p>
+          </EmptyState>
+        {/if}
+      </div>
+    {/snippet}
+    {#snippet actionsEndAdditional()}
+      <Tooltip text={translate('common.configure-columns')} top>
+        <Button
+          onclick={openCustomizationDrawer}
+          data-testid="workflows-summary-table-configuration-button"
+          size="xs"
+          variant="ghost"
+          aria-label={translate('common.configure-columns')}
+        >
+          <IconTemporalSettings />
+        </Button>
+      </Tooltip>
+    {/snippet}
+  </PaginatedTable>
+{/key}
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}
