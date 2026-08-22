@@ -9,6 +9,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
     IconBookmark,
     IconCheckmark,
@@ -77,12 +78,12 @@
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
   );
-  const unsaveView: SavedQuery = $derived({
+  const unsavedView: SavedQuery = $derived({
     id: 'unsaved',
-    name: 'Unsaved view',
+    name: translate('common.unsaved-view'),
     query,
     Icon: IconBookmark,
-    badge: 'Unsaved',
+    badge: translate('common.unsaved'),
     type: 'system',
     active: true,
   });
@@ -120,7 +121,7 @@
     } else if (systemQueryView) {
       activeQueryView = systemQueryView;
     } else if (query) {
-      activeQueryView = unsaveView;
+      activeQueryView = unsavedView;
     }
   });
 
@@ -142,7 +143,7 @@
         } else if (systemQueryView) {
           activeQueryView = systemQueryView;
         } else {
-          activeQueryView = unsaveView;
+          activeQueryView = unsavedView;
         }
       }
     }
@@ -220,7 +221,7 @@
   <div
     class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border border-b-0 border-subtle p-1.5 lg:flex-nowrap"
     role="group"
-    aria-label="Saved Views"
+    aria-label={translate('common.saved-views')}
     data-testid="saved-views-bar"
   >
     <div class="flex shrink-0 flex-wrap items-center gap-1 lg:flex-nowrap">
@@ -242,7 +243,7 @@
         {id}
         views={namespaceSavedQueries}
         activeView={activeQueryView}
-        draftView={unsavedQuery ? unsaveView : undefined}
+        draftView={unsavedQuery ? unsavedView : undefined}
         dirty={activeUserViewDirty}
         {maxQueries}
         onSelect={setActiveQueryView}
@@ -263,7 +264,7 @@
                   ...activeUserView,
                   query,
                 });
-              }}>Save</Button
+              }}>{translate('common.save')}</Button
             >
           {/if}
           <Button
@@ -275,11 +276,11 @@
             data-track-text="edit"
             onclick={() => {
               editViewModalOpen = true;
-            }}>Edit</Button
+            }}>{translate('common.edit')}</Button
           >
           <Button
             LeadingIcon={$copied ? IconCheckmark : IconCopy}
-            aria-label="Share"
+            aria-label={translate('common.share')}
             size="xs"
             variant="ghost"
             class="opacity-80"
@@ -287,7 +288,7 @@
             data-track-name="share-view-button"
             data-track-intent="action"
             data-track-text="share"
-            onclick={handleCopy}>Share</Button
+            onclick={handleCopy}>{translate('common.share')}</Button
           >
         </div>
       {:else if unsavedQuery}
@@ -302,7 +303,7 @@
             data-track-text="create"
             onclick={() => {
               saveViewModalOpen = true;
-            }}>Save as New</Button
+            }}>{translate('common.save-as-new')}</Button
           >
         </div>
       {/if}

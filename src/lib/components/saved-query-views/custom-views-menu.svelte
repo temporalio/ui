@@ -57,7 +57,7 @@
   const noneSelected = $derived(!activeUserView && !draftActive);
   const label = $derived(
     draftActive
-      ? 'Unsaved view'
+      ? (draftView?.name ?? '')
       : (activeUserView?.name ?? translate('common.custom-views')),
   );
   const unsaved = $derived(draftActive || (Boolean(activeUserView) && dirty));
@@ -121,7 +121,7 @@
       <span
         class="surface-subtle ml-1.5 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium italic"
       >
-        Unsaved
+        {translate('common.unsaved')}
       </span>
     {/if}
   </MenuButton>
@@ -139,7 +139,7 @@
         noBorder
         bind:value={search}
         Icon={IconSearch}
-        placeholder="Search views"
+        placeholder={translate('common.search-views')}
         class="w-full"
         onkeydown={handleSearchKeydown}
       />
@@ -152,7 +152,7 @@
         hoverable={false}
         data-testid="draft-view-item"
       >
-        <span class="italic">Unsaved view</span>
+        <span class="italic">{draftView.name}</span>
       </MenuItem>
       <MenuDivider />
     {/if}
@@ -170,7 +170,7 @@
     {:else}
       <MenuItem disabled class="whitespace-nowrap">
         {views.length === 0
-          ? 'No saved views yet'
+          ? translate('common.no-saved-views')
           : translate('common.no-results')}
       </MenuItem>
     {/each}
@@ -178,7 +178,10 @@
     <MenuDivider />
 
     <li role="presentation" class="px-3 py-2 text-xs text-secondary">
-      {views.length} of {maxQueries} views used
+      {translate('common.views-used', {
+        used: views.length,
+        total: maxQueries,
+      })}
     </li>
   </Menu>
 </MenuContainer>

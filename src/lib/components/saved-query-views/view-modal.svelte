@@ -86,15 +86,15 @@
   const nameValid = $derived(validStartEnd && !collidesWithOther);
 
   const nameError = $derived(() => {
-    if (!trimmedName) return 'Name is required';
+    if (!trimmedName) return translate('common.view-name-required');
     if (!allowedChars.test(trimmedName))
-      return 'Use only letters, numbers, spaces, hyphens (-), underscores (_), and periods (.)';
+      return translate('common.view-name-invalid-characters');
     if (
       startsWithInvalid.test(trimmedName) ||
       endsWithInvalid.test(trimmedName)
     )
-      return 'Name cannot start or end with hyphens (-) or periods (.)';
-    if (collidesWithOther) return 'Name must be unique';
+      return translate('common.view-name-invalid-start-end');
+    if (collidesWithOther) return translate('common.view-name-not-unique');
     return '';
   });
 
@@ -167,13 +167,17 @@
   onConfirmModal={onConfirm}
 >
   {#snippet titleSnippet()}
-    <h3>{view ? 'Edit View' : 'Save as New View'}</h3>
+    <h3>
+      {view
+        ? translate('common.edit-view')
+        : translate('common.save-as-new-view')}
+    </h3>
   {/snippet}
   {#snippet content()}
     <div class="flex h-full flex-1 flex-col gap-1">
       <Input
         id="view-name"
-        label="Name"
+        label={translate('common.name')}
         required
         maxLength={255}
         bind:value={name}
@@ -181,7 +185,7 @@
         valid={!touched || nameValid}
         hintText={touched && !nameValid ? nameError() : ''}
         error={touched && !nameValid}
-        placeholder="Name of view"
+        placeholder={translate('common.view-name-placeholder')}
         class="w-full"
         data-testid={`${id}-input`}
       />
@@ -193,7 +197,9 @@
             data-testid="create-as-new-button"
             onclick={onCreateAsNew}
             size="sm"
-            >{name === view.name ? 'Create Copy' : 'Create New'}</Button
+            >{name === view.name
+              ? translate('common.create-copy')
+              : translate('common.create-new')}</Button
           >
         </div>
       {/if}
@@ -207,7 +213,8 @@
         : ''}"
       onclick={onDelete}
     >
-      <IconTrash /> Delete this Saved View
+      <IconTrash />
+      {translate('common.delete-saved-view')}
     </Button>
   {/snippet}
 </Modal>
