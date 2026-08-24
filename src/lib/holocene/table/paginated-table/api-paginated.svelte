@@ -7,10 +7,12 @@
 
 <script lang="ts" generics="T">
   import type { HTMLAttributes } from 'svelte/elements';
+  import { writable } from 'svelte/store';
 
   import { debounce } from 'es-toolkit';
   import type { Snippet } from 'svelte';
-  import { onMount } from 'svelte';
+  import { getContext, onMount } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Alert from '$lib/holocene/alert.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -25,6 +27,11 @@
   import { isError } from '$lib/utilities/is';
 
   import PaginatedTable from './index.svelte';
+  import {
+    TABLE_MAXIMIZABLE_CONTEXT,
+    type TableMaximizableContext,
+  } from './maximizable-view.svelte';
+  import MaximizeToggle from './maximize-toggle.svelte';
 
   type KeyboardHandler = ((event: KeyboardEvent) => void) | undefined;
 
@@ -224,6 +231,12 @@
   const adjustedTotal = $derived(
     !$store.hasNext && $store.indexEnd !== total ? $store.indexEnd : total,
   );
+
+  const maximizableContext = getContext<TableMaximizableContext | undefined>(
+    TABLE_MAXIMIZABLE_CONTEXT,
+  );
+  const maximizable = Boolean(maximizableContext);
+  const maximized = maximizableContext?.maximized ?? writable(false);
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -249,7 +262,8 @@
   loading={$store.loading}
   updating={$store.updating}
   visibleItems={$store.visibleItems}
-  {maxHeight}
+  maxHeight={maximizable && $maximized ? '100%' : maxHeight}
+  class={merge(maximizable && $maximized && 'border-x-0 border-b-0')}
   {id}
   {caption}
   {headers}
@@ -272,6 +286,9 @@
         visibleItems: $store.visibleItems,
         page: $store.index + 1,
       })}
+      {#if maximizable}
+        <MaximizeToggle {maximized} />
+      {/if}
       <IconButton
         label={previousButtonLabel}
         disabled={!$store.hasPrevious}
