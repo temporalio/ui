@@ -39,6 +39,7 @@
     maxReplicas?: number;
     initialReplicas?: number;
     utilizationTarget?: number;
+    scaleDownStabilizationMs?: number;
     scaleUpCooloffMs?: number;
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
@@ -59,6 +60,7 @@
       maxReplicas?: string[];
       initialReplicas?: string[];
       utilizationTarget?: string[];
+      scaleDownStabilizationMs?: string[];
       scaleUpCooloffMs?: string[];
       scaleUpBacklogThreshold?: string[];
       maxWorkerLifetimeMs?: string[];
@@ -80,6 +82,7 @@
     maxReplicas = $bindable(30),
     initialReplicas = $bindable(0),
     utilizationTarget = $bindable(0.8),
+    scaleDownStabilizationMs = $bindable(90_000),
     scaleUpCooloffMs = $bindable(),
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
@@ -527,6 +530,25 @@
       hintText={errors.utilizationTarget?.[0] ||
         translate('workers.utilization-target-hint')}
       error={!!errors.utilizationTarget?.[0]}
+      required
+    />
+    <Input
+      value={String(scaleDownStabilizationMs)}
+      onchange={(e) => {
+        scaleDownStabilizationMs = Number(
+          (e.target as HTMLInputElement).value,
+        );
+      }}
+      id="scaleDownStabilizationMs"
+      name="scaleDownStabilizationMs"
+      type="number"
+      min={0}
+      max={2_147_483_647}
+      step={1}
+      label={translate('workers.scale-down-stabilization-ms-label')}
+      hintText={errors.scaleDownStabilizationMs?.[0] ||
+        translate('workers.scale-down-stabilization-ms-hint')}
+      error={!!errors.scaleDownStabilizationMs?.[0]}
       required
     />
   </div>

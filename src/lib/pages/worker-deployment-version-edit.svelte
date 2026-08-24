@@ -90,6 +90,7 @@
         maxReplicas: scalerDetails.maxReplicas,
         initialReplicas: scalerDetails.initialReplicas,
         utilizationTarget: scalerDetails.utilizationTarget,
+        scaleDownStabilizationMs: scalerDetails.scaleDownStabilizationMs,
       }}
       cancelHref={backHref}
       onSubmit={async (data) => {
@@ -106,6 +107,7 @@
                   maxReplicas: data.maxReplicas,
                   initialReplicas: data.initialReplicas,
                   utilizationTarget: data.utilizationTarget,
+                  scaleDownStabilizationMs: data.scaleDownStabilizationMs,
                 },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {

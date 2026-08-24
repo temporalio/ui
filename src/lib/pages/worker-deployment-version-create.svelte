@@ -118,6 +118,7 @@
                   maxReplicas: data.maxReplicas,
                   initialReplicas: data.initialReplicas,
                   utilizationTarget: data.utilizationTarget,
+                  scaleDownStabilizationMs: data.scaleDownStabilizationMs,
                 },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {

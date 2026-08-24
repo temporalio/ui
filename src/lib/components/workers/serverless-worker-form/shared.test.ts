@@ -98,6 +98,7 @@ describe('Cloud Run replica validation', () => {
     expect(result.maxReplicas).toBe(30);
     expect(result.initialReplicas).toBe(0);
     expect(result.utilizationTarget).toBe(0.8);
+    expect(result.scaleDownStabilizationMs).toBe(90_000);
   });
 
   it.each([
@@ -117,6 +118,11 @@ describe('Cloud Run replica validation', () => {
     ],
     ['zero utilization', { utilizationTarget: 0 }],
     ['utilization above one', { utilizationTarget: 1.01 }],
+    ['negative stabilization window', { scaleDownStabilizationMs: -1 }],
+    [
+      'sub-millisecond stabilization window',
+      { scaleDownStabilizationMs: 0.5 },
+    ],
   ])('rejects %s', (_name, replicas) => {
     expect(
       editVersionSchema.safeParse({ ...baseCloudRunData, ...replicas }).success,
@@ -135,7 +141,17 @@ describe('Cloud Run replica validation', () => {
       maxReplicas: 30,
       initialReplicas: 0,
       utilizationTarget: 0.8,
+      scaleDownStabilizationMs: 90_000,
     });
+  });
+
+  it('accepts a zero stabilization window', () => {
+    const result = editVersionSchema.parse({
+      ...baseCloudRunData,
+      scaleDownStabilizationMs: 0,
+    });
+
+    expect(result.scaleDownStabilizationMs).toBe(0);
   });
 });
 

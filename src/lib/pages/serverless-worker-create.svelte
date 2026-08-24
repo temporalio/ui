@@ -102,6 +102,7 @@
           maxReplicas: data.maxReplicas,
           initialReplicas: data.initialReplicas,
           utilizationTarget: data.utilizationTarget,
+          scaleDownStabilizationMs: data.scaleDownStabilizationMs,
         },
       );
     } else {

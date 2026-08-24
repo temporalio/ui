@@ -186,6 +186,9 @@ export const Strings = {
   'utilization-target-label': 'Utilization Target',
   'utilization-target-hint':
     'Target average worker utilization across the fleet, from greater than 0 to 1.',
+  'scale-down-stabilization-ms-label': 'Scale-down Stabilization (ms)',
+  'scale-down-stabilization-ms-hint':
+    'Wait this many ms after demand ends before scaling down. 0 = no wait. Default: 90000.',
   'compute-provider': 'Compute Provider',
   'compute-provider-description':
     'Select how your worker activities will be executed.',

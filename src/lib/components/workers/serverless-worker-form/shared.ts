@@ -20,6 +20,7 @@ const providerFields = {
   maxReplicas: z.number().int().min(1).max(2_147_483_647).default(30),
   initialReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
   utilizationTarget: z.number().gt(0).max(1).default(0.8),
+  scaleDownStabilizationMs: z.number().int().min(0).default(90_000),
 };
 
 const validateProviderFields = (

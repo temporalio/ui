@@ -465,6 +465,7 @@ export const buildGcpCloudRunComputeConfig = (
     maxReplicas?: number;
     initialReplicas?: number;
     utilizationTarget?: number;
+    scaleDownStabilizationMs?: number;
   } = {},
 ): ComputeConfig => {
   const providerPayload: Record<string, string> = {
@@ -480,6 +481,7 @@ export const buildGcpCloudRunComputeConfig = (
     max_count: scalingOptions.maxReplicas ?? 30,
     initial_count: scalingOptions.initialReplicas ?? 0,
     utilization_target: scalingOptions.utilizationTarget ?? 0.8,
+    no_sync_quiet_ms: scalingOptions.scaleDownStabilizationMs ?? 90_000,
   };
 
   return {
@@ -562,6 +564,7 @@ export const decodeScalerDetails = (
   maxReplicas?: number;
   initialReplicas?: number;
   utilizationTarget?: number;
+  scaleDownStabilizationMs?: number;
 } => {
   const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
   if (!scalingGroup?.scaler?.details?.data) return {};
@@ -584,6 +587,8 @@ export const decodeScalerDetails = (
       result.initialReplicas = raw['initial_count'];
     if (raw['utilization_target'] !== undefined)
       result.utilizationTarget = raw['utilization_target'];
+    if (raw['no_sync_quiet_ms'] !== undefined)
+      result.scaleDownStabilizationMs = raw['no_sync_quiet_ms'];
     return result;
   } catch {
     return {};
