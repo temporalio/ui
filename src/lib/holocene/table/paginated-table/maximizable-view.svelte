@@ -12,6 +12,7 @@
   import { writable } from 'svelte/store';
 
   import { setContext, type Snippet } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   interface Props {
     children: Snippet;
@@ -36,9 +37,9 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <div
-  class={$maximized
-    ? 'surface-primary fixed inset-0 z-40 flex flex-col'
-    : 'contents'}
+  class={merge(
+    $maximized && 'surface-primary fixed inset-0 z-40 flex flex-col',
+  )}
 >
   {@render children()}
 </div>

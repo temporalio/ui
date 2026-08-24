@@ -14,6 +14,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings, IconWarning } from '$lib/io/icon';
@@ -139,7 +140,7 @@
   </div>
 </header>
 
-<div>
+<MaximizableTableView>
   <SavedQueryViews
     filters={scheduleFilters}
     savedQueries={savedScheduleQueries}
@@ -226,7 +227,7 @@
       {/snippet}
     </PaginatedTable>
   {/key}
-</div>
+</MaximizableTableView>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}
