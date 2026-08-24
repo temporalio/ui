@@ -133,7 +133,7 @@
     {#key $labelCtx}
       <MenuButton
         class={merge(
-          'w-full border-tertiary bg-interactive-secondary text-primary focus-visible:border-tertiary focus-visible:bg-interactive-secondary focus-visible:ring-interactive-primary enabled:hover:bg-action-hover-overlay disabled:opacity-[0.32] data-[active=true]:bg-action-press-overlay',
+          'w-full border-secondary bg-interactive-secondary text-primary focus-visible:border-secondary focus-visible:bg-interactive-secondary focus-visible:ring-interactive-primary enabled:hover:border-tertiary enabled:hover:bg-action-hover-overlay disabled:bg-surface-primary disabled:opacity-disabled',
           !valid &&
             'border-danger focus-visible:border-danger focus-visible:ring-danger',
           menuButtonClass,
@@ -180,7 +180,12 @@
     {/key}
   </div>
   {#if children}
-    <Menu role="listbox" id="{id}-select" class={menuClass} {position}>
+    <Menu
+      role="listbox"
+      id="{id}-select"
+      class={merge('bg-surface-primary', menuClass)}
+      {position}
+    >
       {@render children()}
     </Menu>
   {/if}

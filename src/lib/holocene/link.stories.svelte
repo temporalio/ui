@@ -15,6 +15,7 @@
     args: {
       href: 'https://temporal.io',
       active: false,
+      disabled: false,
       newTab: false,
       light: false,
     },
@@ -43,5 +44,7 @@
 <Story name="With Icon" args={{ LeadingIcon: ioIcons.IconClose }} />
 
 <Story name="Active" args={{ active: true }} />
+
+<Story name="Disabled" args={{ disabled: true }} />
 
 <Story name="Light" args={{ light: true }} />

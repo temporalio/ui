@@ -58,7 +58,7 @@
     class={merge(
       'not-sr-only flex h-5 w-9 items-center rounded-xl border border-tertiary bg-interactive-secondary p-px text-primary peer-checked:justify-end peer-checked:border-interactive-primary peer-checked:bg-interactive-primary peer-checked:text-white',
       !disabled &&
-        'group-hover:border-brand group-hover:bg-action-hover-overlay group-active:bg-action-press-overlay group-hover:peer-checked:border-interactive-primary-hover group-hover:peer-checked:bg-interactive-primary-hover group-active:peer-checked:border-interactive-primary-press group-active:peer-checked:bg-interactive-primary-press peer-focus-visible:ring-2 peer-focus-visible:ring-interactive-primary',
+        'group-hover:border-brand group-hover:bg-action-brand-hover group-active:bg-action-brand-press group-hover:peer-checked:border-interactive-primary-hover group-hover:peer-checked:bg-interactive-primary-hover group-active:peer-checked:border-interactive-primary-press group-active:peer-checked:bg-interactive-primary-press peer-focus-visible:ring-2 peer-focus-visible:ring-interactive-primary',
     )}
   >
     <span class="h-4 w-4 rounded-[50%] bg-current"></span>

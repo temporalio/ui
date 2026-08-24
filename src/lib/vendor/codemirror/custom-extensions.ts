@@ -33,8 +33,8 @@ export type EditorLanguage =
 
 const baseTheme = {
   '&': {
-    color: 'var(--color-content-code-block)',
-    backgroundColor: 'var(--color-surface-code-block)',
+    color: 'var(--color-content-primary)',
+    backgroundColor: 'var(--color-surface-secondary)',
     height: '100%',
   },
   '.cm-scroller': {
@@ -44,7 +44,7 @@ const baseTheme = {
     overflow: 'auto',
   },
   '.cm-content': {
-    caretColor: 'var(--color-content-code-block)',
+    caretColor: 'var(--color-content-primary)',
     fontSize: '0.875em',
   },
   '.cm-editor&.cm-focused': {
@@ -94,8 +94,8 @@ export const getEditorThemeWithLineNumbers = (
       },
       '.cm-gutters': {
         ...baseTheme['.cm-gutters'],
-        color: 'var(--color-content-code-block)',
-        borderRight: '1px solid var(--color-border-secondary)',
+        color: 'var(--color-content-primary)',
+        borderRight: '1px solid var(--color-border-primary)',
       },
       '.cm-gutter .cm-gutterElement': {
         padding: '0 0.5rem',
@@ -131,17 +131,17 @@ export const highlightStyles = HighlightStyle.define(
   [
     {
       tag: tags.punctuation,
-      color: 'var(--color-content-code-block)',
+      color: 'var(--color-content-primary)',
     },
-    { tag: tags.string, color: 'var(--color-content-code-block)' },
+    { tag: tags.string, color: 'var(--color-content-primary)' },
     { tag: tags.propertyName, color: 'var(--color-content-brand)' },
-    { tag: tags.bool, color: 'var(--color-content-code-block)' },
-    { tag: tags.number, color: 'var(--color-content-code-block)' },
-    { tag: tags.operator, color: 'var(--color-content-code-block-accent)' },
+    { tag: tags.bool, color: 'var(--color-content-primary)' },
+    { tag: tags.number, color: 'var(--color-content-primary)' },
+    { tag: tags.operator, color: 'var(--color-content-brand)' },
     { tag: tags.comment, color: 'var(--color-content-tertiary)' },
     {
       tag: tags.variableName,
-      color: 'var(--color-content-code-block-accent)',
+      color: 'var(--color-content-brand)',
     },
   ],
   { themeType: 'light' },

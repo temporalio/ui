@@ -23,7 +23,7 @@
       variant: {
         name: 'Variant',
         control: 'select',
-        options: ['primary', 'secondary', 'destructive', 'ghost'],
+        options: ['primary', 'secondary', 'tertiary', 'destructive', 'ghost'],
       },
       size: {
         name: 'Size',
@@ -119,6 +119,8 @@
   play={shouldNotBeTransparent((canvas) => canvas.getByRole('button'))}
   {template}
 />
+
+<Story name="Tertiary" args={{ variant: 'tertiary' }} {template} />
 
 <Story name="Destructive" args={{ variant: 'destructive' }} {template} />
 

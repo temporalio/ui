@@ -20,12 +20,14 @@ type ContentColors = Readonly<{
   primary: SemanticColor;
   secondary: SemanticColor;
   tertiary: SemanticColor;
-  'code-block': SemanticColor;
-  'code-block-accent': SemanticColor;
   brand: SemanticColor;
   information: SemanticColor;
   success: SemanticColor;
   warning: SemanticColor;
+  'static-text-info': SemanticColor;
+  'static-text-success': SemanticColor;
+  'static-text-warning': SemanticColor;
+  'static-text-danger': SemanticColor;
   danger: SemanticColor;
   error: SemanticColor;
   'inverse-secondary': SemanticColor;
@@ -38,8 +40,7 @@ type SurfaceColors = Readonly<{
   primary: SemanticColor;
   secondary: SemanticColor;
   tertiary: SemanticColor;
-  'table-header': SemanticColor;
-  'code-block': SemanticColor;
+  'static-neutral': SemanticColor;
   brand: SemanticColor;
   information: SemanticColor;
   success: SemanticColor;
@@ -76,6 +77,7 @@ type ActionColors = Readonly<{
   'hover-overlay': SemanticColor;
   'press-overlay': SemanticColor;
   'brand-hover': SemanticColor;
+  'brand-press': SemanticColor;
 }>;
 
 type OverlayColors = Readonly<{
@@ -112,10 +114,20 @@ const surfacePrimary: OpaqueSemanticColor = {
 
 const interactivePrimary: OpaqueSemanticColor = {
   light: colorScales.indigo[9],
-  dark: colorScales.indigo[10],
+  dark: colorScales.indigo[11],
 };
 
 const interactiveSecondary = backgroundPrimary;
+
+const fixedBlack: OpaqueSemanticColor = {
+  light: '#000000',
+  dark: '#000000',
+};
+
+const fixedWhite: OpaqueSemanticColor = {
+  light: '#ffffff',
+  dark: '#ffffff',
+};
 
 export const semanticColors: SemanticColors = {
   background: {
@@ -134,14 +146,6 @@ export const semanticColors: SemanticColors = {
       light: colorScales.slate[8],
       dark: colorScales.neutral[4],
     },
-    'code-block': {
-      light: colorScales.slate[12],
-      dark: colorScales.slate[1],
-    },
-    'code-block-accent': {
-      light: colorScales['dark-magenta'][9],
-      dark: colorScales['dark-magenta'][8],
-    },
     brand: {
       light: colorScales.indigo[9],
       dark: colorScales.indigo[8],
@@ -158,13 +162,29 @@ export const semanticColors: SemanticColors = {
       light: colorScales.amber[12],
       dark: colorScales.amber[7],
     },
+    'static-text-info': {
+      light: colorScales.blue[11],
+      dark: colorScales.blue[9],
+    },
+    'static-text-success': {
+      light: colorScales.green[11],
+      dark: colorScales.green[9],
+    },
+    'static-text-warning': {
+      light: colorScales.amber[11],
+      dark: colorScales.amber[9],
+    },
+    'static-text-danger': {
+      light: colorScales.red[11],
+      dark: colorScales.red[9],
+    },
     danger: {
       light: colorScales.red[12],
       dark: colorScales.red[7],
     },
     error: {
       light: colorScales.persimmon[12],
-      dark: colorScales.persimmon[7],
+      dark: colorScales.persimmon[8],
     },
     'inverse-secondary': {
       light: colorScales.slate[6],
@@ -174,14 +194,8 @@ export const semanticColors: SemanticColors = {
       light: colorScales.slate[1],
       dark: colorScales.slate[12],
     },
-    black: {
-      light: '#000000',
-      dark: '#000000',
-    },
-    white: {
-      light: '#ffffff',
-      dark: '#ffffff',
-    },
+    black: fixedBlack,
+    white: fixedWhite,
   },
   surface: {
     primary: surfacePrimary,
@@ -193,13 +207,9 @@ export const semanticColors: SemanticColors = {
       light: colorScales.slate[3],
       dark: colorScales.neutral[9],
     },
-    'table-header': {
-      light: colorScales.slate[3],
-      dark: colorScales.neutral[9],
-    },
-    'code-block': {
-      light: colorScales.indigo[5],
-      dark: colorScales.indigo[12],
+    'static-neutral': {
+      light: colorScales.neutral[7],
+      dark: colorScales.neutral[7],
     },
     brand: {
       light: colorScales.indigo[5],
@@ -268,11 +278,11 @@ export const semanticColors: SemanticColors = {
     primary: interactivePrimary,
     'primary-hover': {
       light: colorScales.indigo[10],
-      dark: colorScales.indigo[9],
+      dark: colorScales.indigo[10],
     },
     'primary-press': {
       light: colorScales.indigo[11],
-      dark: '#4d61ab',
+      dark: colorScales.indigo[9],
     },
     secondary: interactiveSecondary,
     'secondary-hover': {
@@ -299,15 +309,19 @@ export const semanticColors: SemanticColors = {
   actions: {
     'hover-overlay': {
       light: colorAlphaScales.neutral[10],
-      dark: `color-mix(in srgb, ${colorScales.neutral[4]} 15%, transparent)`,
+      dark: colorAlphaScales.slate[15],
     },
     'press-overlay': {
       light: colorAlphaScales.neutral[15],
-      dark: `color-mix(in srgb, ${colorScales.neutral[4]} 20%, transparent)`,
+      dark: colorAlphaScales.slate[20],
     },
     'brand-hover': {
       light: colorAlphaScales.indigo[10],
       dark: colorAlphaScales.indigo[5],
+    },
+    'brand-press': {
+      light: colorAlphaScales.indigo[15],
+      dark: colorAlphaScales.indigo[20],
     },
   },
   overlay: {

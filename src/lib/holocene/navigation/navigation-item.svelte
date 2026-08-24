@@ -54,11 +54,10 @@
       data-track-intent="navigate"
       data-track-text={label}
       class={merge(
-        'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm',
-        'hover:bg-alpha-neutral-30 group-[.navigation-inverse]:hover:bg-neutral-6',
+        'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm text-secondary hover:bg-surface-primary hover:text-primary group-[.navigation-cloud]:text-white group-[.navigation-cloud]:hover:bg-action-hover-overlay group-[.navigation-cloud]:hover:text-white',
         active &&
-          'bg-alpha-neutral-30 group-[.navigation-inverse]:bg-neutral-6',
-        disabled && 'pointer-events-none cursor-not-allowed opacity-50',
+          'bg-action-brand-hover text-brand hover:bg-action-brand-press hover:text-brand group-[.navigation-cloud]:bg-action-hover-overlay group-[.navigation-cloud]:text-white group-[.navigation-cloud]:hover:bg-action-press-overlay group-[.navigation-cloud]:hover:text-white',
+        disabled && 'pointer-events-none cursor-not-allowed opacity-disabled',
       )}
       class:text-tertiary={disabled}
     >

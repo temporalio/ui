@@ -165,7 +165,7 @@
             {/if}
             <p>
               Payload downloads require a codec server with a <span
-                class="rounded-sm bg-surface-code-block px-1 font-mono"
+                class="rounded-sm bg-surface-brand px-1 font-mono"
                 >/download</span
               >
               endpoint. <Link

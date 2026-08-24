@@ -367,7 +367,7 @@
         onclick={() => setActiveQueryView(view)}
         class={merge(
           'flex w-full justify-start',
-          (view.count ?? 0) > 0 && 'text-error',
+          (view.count ?? 0) > 0 && 'text-static-text-danger',
         )}
         active={view.active}
         disabled={view.disabled}

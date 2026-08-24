@@ -52,7 +52,8 @@
   {#if required}
     <span
       aria-hidden="true"
-      class="-ml-1 translate-y-0.5 font-mono leading-none text-danger">*</span
+      class="-ml-1 translate-y-0.5 font-mono leading-none text-static-text-danger"
+      >*</span
     >
   {/if}
 </label>

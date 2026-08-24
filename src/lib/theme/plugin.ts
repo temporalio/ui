@@ -5,6 +5,7 @@ import {
   darkSemanticColorVariables,
   lightSemanticColorVariables,
 } from './color-api';
+import { semanticOpacity } from './io/semantic-opacity';
 
 const textStyles = plugin(({ addBase, theme }) => {
   addBase({
@@ -70,6 +71,7 @@ const temporal = plugin(
     theme: {
       ...colorTheme,
       extend: {
+        opacity: semanticOpacity,
         transitionProperty: {
           width: 'width',
           height: 'height',

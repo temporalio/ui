@@ -226,7 +226,7 @@
           <th scope="col" class="hidden w-36 sm:table-cell">Latest run</th>
           <th
             scope="col"
-            class="sticky right-0 z-20 w-36 bg-surface-table-header !text-right text-primary sm:w-60"
+            class="sticky right-0 z-20 w-36 bg-surface-tertiary !text-right text-primary sm:w-60"
             >Actions</th
           >
         </TableHeaderRow>

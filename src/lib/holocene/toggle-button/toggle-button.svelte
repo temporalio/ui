@@ -55,7 +55,8 @@
     'aria-pressed': pressed ? 'true' : 'false',
     href: href ? href + page.url.search : undefined,
     class: merge(
-      pressed && 'bg-action-press-overlay',
+      pressed &&
+        'border-transparent bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press focus-visible:bg-interactive-primary-hover',
       group && '[&:not(:last-child)]:border-r-0',
       className,
     ),

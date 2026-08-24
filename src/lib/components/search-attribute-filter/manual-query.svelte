@@ -65,10 +65,10 @@
   }
 </script>
 
-<div class="w-full border border-t-0 border-primary" in:fade>
+<div class="w-full" in:fade>
   <form
     onsubmit={handleSearch}
-    class="flex gap-0"
+    class="flex gap-0 border border-t-0 border-primary"
     transition:slide
     role="search"
   >
@@ -79,8 +79,8 @@
       labelHidden
       placeholder={translate('workflows.search-placeholder')}
       Icon={IconSearch}
-      class="grow  [&_*]:border-0"
-      inputContainerClass="!border-r border-primary bg-surface-information text-primary"
+      class="grow"
+      inputContainerClass="border-0 bg-background-primary text-primary focus-within:ring-inset focus-within:ring-offset-0"
       clearable
       copyButtonLabel={translate('common.copy-icon-title')}
       clearButtonLabel={translate('common.clear-input-button-label')}
@@ -95,6 +95,7 @@
       data-testid="{id}-manual-search-button"
       variant="ghost"
       type="submit"
+      class="rounded-none border-0 border-l border-l-primary focus-visible:ring-inset focus-visible:ring-offset-0 active:scale-100"
     >
       {translate('common.search')}
     </Button>

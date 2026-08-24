@@ -57,17 +57,17 @@
       const selectedToggle = await canvas.findByTestId(
         `toggle-button-${get(selected)}`,
       );
-      expect(selectedToggle).toHaveClass('bg-action-press-overlay');
+      expect(selectedToggle).toHaveClass('bg-interactive-primary');
     });
     await step('Validate that the other toggles are not active', async () => {
-      expect(second).not.toHaveClass('bg-action-press-overlay');
-      expect(third).not.toHaveClass('bg-action-press-overlay');
-      expect(fourth).not.toHaveClass('bg-action-press-overlay');
+      expect(second).not.toHaveClass('bg-interactive-primary');
+      expect(third).not.toHaveClass('bg-interactive-primary');
+      expect(fourth).not.toHaveClass('bg-interactive-primary');
     });
     await step('Click the second toggle', async () => {
       await userEvent.click(second);
-      expect(first).not.toHaveClass('bg-action-press-overlay');
-      expect(second).toHaveClass('bg-action-press-overlay');
+      expect(first).not.toHaveClass('bg-interactive-primary');
+      expect(second).toHaveClass('bg-interactive-primary');
     });
   }}
   {template}

@@ -57,7 +57,7 @@
       id="{id}-trigger"
       aria-expanded={open}
       aria-controls="{id}-content"
-      class="grow cursor-pointer hover:bg-alpha-indigo-5 focus-visible:outline-interactive-primary"
+      class="grow cursor-pointer hover:bg-action-brand-hover focus-visible:bg-surface-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary"
       type="button"
       onclick={toggleAccordion}
     >

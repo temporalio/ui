@@ -20,6 +20,7 @@
       placeholder: 'Placeholder...',
       labelHidden: false,
       disabled: false,
+      readonly: false,
       clearable: false,
       copyable: false,
       required: false,
@@ -40,6 +41,7 @@
       required: { name: 'Required', control: 'boolean' },
       error: { name: 'Error', control: 'boolean' },
       disabled: { name: 'Disabled', control: 'boolean' },
+      readonly: { name: 'Read Only', control: 'boolean' },
       valid: { name: 'Valid', control: 'boolean' },
       autocomplete: {
         name: 'Autocomplete',
@@ -93,6 +95,8 @@
 <Story name="Empty" />
 
 <Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Read Only" args={{ readonly: true, value: 'Read-only value' }} />
 
 <Story name="Required" args={{ required: true }} />
 

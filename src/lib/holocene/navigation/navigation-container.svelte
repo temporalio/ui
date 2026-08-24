@@ -38,7 +38,7 @@
     'group grid min-h-full grid-cols-[2rem] grid-rows-[fit-content(1.5rem)] gap-2 border-r border-primary px-2 py-4 transition-width data-[nav=closed]:w-[calc(3rem_+_1px)] data-[nav=open]:w-[16rem] data-[nav=open]:grid-cols-[100%] motion-reduce:transition-none',
     'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-interactive-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary',
     isCloud
-      ? 'bg-gradient-to-b from-indigo-9 to-indigo-12 text-white focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-green-7 focus-visible:[&_a]:ring-green-7'
+      ? 'navigation-cloud bg-gradient-to-b from-indigo-9 to-indigo-12 text-white focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-green-7 focus-visible:[&_a]:ring-green-7'
       : 'navigation-inverse bg-neutral-12 text-white',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}

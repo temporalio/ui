@@ -14,7 +14,7 @@
 
 <div
   class={twMerge(
-    'bg-surface-secondary text-primary',
+    'bg-surface-primary text-primary',
     'border',
     'border-primary',
     'p-4',

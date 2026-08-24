@@ -7,12 +7,12 @@
     primary:
       'border border-information bg-surface-information text-information',
     secondary: 'bg-alpha-purple-30 text-primary',
-    default: 'border border-secondary bg-surface-primary text-secondary',
+    default: 'border border-tertiary bg-surface-tertiary text-secondary',
     warning: 'border border-warning bg-surface-warning text-warning',
     success: 'border border-success bg-surface-success text-success',
     danger: 'border border-danger bg-surface-danger text-danger',
     count:
-      'h-6 w-6 min-w-max rounded-full border border-information bg-surface-information text-information',
+      'h-6 w-6 min-w-max rounded-full border border-secondary bg-surface-tertiary text-primary',
     subtle: 'bg-surface-tertiary text-secondary font-normal select-all',
     ghost: 'bg-surface-primary text-primary border border-tertiary',
   };

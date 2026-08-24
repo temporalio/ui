@@ -65,14 +65,16 @@
 
 <style lang="postcss">
   .description {
-    @apply ml-7 text-sm font-normal text-primary;
+    @apply ml-7 text-sm font-normal text-secondary;
   }
 
   input[type='radio'] {
-    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-tertiary outline-none;
+    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-secondary bg-interactive-secondary outline-none;
 
     &:checked {
-      @apply border-interactive-primary bg-interactive-primary;
+      @apply bg-interactive-primary;
+
+      box-shadow: inset 0 0 0 2px var(--color-interactive-secondary);
     }
 
     &:enabled {
@@ -80,26 +82,15 @@
         @apply ring-2 ring-interactive-primary ring-offset-2 ring-offset-background-primary;
       }
 
-      &:hover:not(:checked) {
-        @apply border-brand bg-action-hover-overlay;
+      &:hover:not(:checked),
+      &:focus-visible:not(:checked) {
+        @apply border-tertiary;
       }
 
-      &:active:not(:checked) {
-        @apply bg-action-press-overlay;
+      &:checked:hover,
+      &:checked:focus-visible {
+        @apply border-brand;
       }
-
-      &:checked:hover:not(:active) {
-        @apply border-interactive-primary-hover bg-interactive-primary-hover shadow-none;
-      }
-
-      &:checked:active {
-        @apply border-interactive-primary-press bg-interactive-primary-press;
-      }
-    }
-
-    &:checked,
-    &:active {
-      @apply shadow-[inset_0_0_0_1px] shadow-content-inverse-primary;
     }
 
     &:disabled {

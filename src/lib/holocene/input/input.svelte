@@ -58,6 +58,7 @@
     name = id,
     copyable = false,
     disabled = false,
+    readonly = false,
     clearable = false,
     autocomplete = 'off',
     valid = true,
@@ -121,10 +122,15 @@
     <div
       class={merge(
         'input-container',
-        'relative box-border inline-flex h-10 w-full items-center border border-tertiary bg-interactive-secondary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        'relative box-border inline-flex h-10 w-full items-center border border-primary bg-interactive-secondary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
         !isDisabled &&
+          !readonly &&
           !showError &&
           'focus-within:border-secondary hover:border-brand focus-within:hover:border-secondary',
+        value && !isDisabled && !showError && 'border-secondary',
+        readonly &&
+          !isDisabled &&
+          'border-primary bg-surface-primary hover:border-primary',
         isDisabled && 'border-secondary bg-surface-tertiary text-tertiary',
         inputContainerClass,
       )}
@@ -152,6 +158,7 @@
         {name}
         {spellcheck}
         {required}
+        {readonly}
         aria-invalid={showError ? 'true' : undefined}
         aria-describedby={hintText ? (showError ? errorId : hintId) : undefined}
         {autocomplete}
@@ -244,7 +251,9 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-danger focus-within:border-danger focus-within:ring-danger;
+      @apply border-danger focus-within:border-danger;
+
+      box-shadow: inset 0 0 0 1px var(--color-border-primary);
     }
   }
 
@@ -281,7 +290,7 @@
   }
 
   .hint-text {
-    @apply text-xs text-primary;
+    @apply text-xs text-tertiary;
 
     &.error,
     &.invalid {

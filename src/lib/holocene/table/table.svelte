@@ -53,7 +53,7 @@
 
 <style lang="postcss">
   .holocene-table {
-    @apply table-auto bg-background-primary text-primary;
+    @apply table-auto text-primary;
 
     &.bordered {
       @apply border border-primary;
@@ -84,7 +84,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply bg-surface-table-header text-primary;
+      @apply bg-surface-tertiary text-primary;
     }
 
     :global(tr > th) {
@@ -94,15 +94,11 @@
 
   :where(.holocene-table-body) {
     :global(tr) {
-      @apply border-b border-primary last-of-type:border-0 hover:bg-interactive-secondary-hover hover:bg-fixed;
+      @apply border-b border-primary last-of-type:border-0 hover:bg-action-hover-overlay hover:bg-fixed;
     }
 
     :global(tr.expanded) {
       @apply w-full hover:bg-surface-primary;
-    }
-
-    :global(tr:nth-of-type(odd)) {
-      @apply bg-background-primary text-primary;
     }
 
     :global(tr > td) {
@@ -114,7 +110,7 @@
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-primary last-of-type:border-0 hover:bg-interactive-secondary-hover hover:bg-fixed;
+      @apply h-8 border-b border-primary last-of-type:border-0 hover:bg-action-hover-overlay hover:bg-fixed;
     }
   }
 </style>

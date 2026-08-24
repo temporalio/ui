@@ -30,7 +30,7 @@
   };
 </script>
 
-<span class={merge('chip', intent)}>
+<span class={merge('chip', intent)} class:disabled>
   {#if intent === 'warning'}
     <IconWarning class="shrink-0" />
   {/if}
@@ -40,6 +40,7 @@
       data-track-name="chip"
       data-track-intent="action"
       data-track-text="*textContent*"
+      {disabled}
       {onclick}
     >
       {@render children?.()}
@@ -56,6 +57,7 @@
     data-track-name="chip"
     data-track-intent="remove"
     data-track-text={removeButtonLabel}
+    {disabled}
     onclick={handleRemove}
   >
     <IconClose />
@@ -64,7 +66,25 @@
 
 <style lang="postcss">
   .chip {
-    @apply flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm border border-secondary bg-surface-primary p-1 pl-2 text-sm leading-[1.5] text-secondary;
+    @apply flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm border border-secondary bg-surface-primary p-1 pl-2 text-sm leading-[1.5] text-secondary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary;
+
+    &:not(.disabled):hover {
+      background-image: linear-gradient(
+        var(--color-actions-hover-overlay),
+        var(--color-actions-hover-overlay)
+      );
+    }
+
+    &:not(.disabled):active {
+      background-image: linear-gradient(
+        var(--color-actions-press-overlay),
+        var(--color-actions-press-overlay)
+      );
+    }
+
+    &.disabled {
+      @apply pointer-events-none cursor-not-allowed opacity-disabled;
+    }
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;

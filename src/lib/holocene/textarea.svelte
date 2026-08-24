@@ -26,6 +26,7 @@
 
   let {
     disabled = false,
+    readonly = false,
     error = '',
     isValid = true,
     placeholder = '',
@@ -57,14 +58,17 @@
 <div class={merge('group flex flex-col gap-1', className)}>
   <Label {required} hidden={labelHidden} {label} for={id} />
   {#if description}
-    <p class="-mt-1 text-sm">{description}</p>
+    <p class="-mt-1 text-sm text-secondary">{description}</p>
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full border border-tertiary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      'relative box-border inline-flex w-full border border-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
       !disabled &&
+        !readonly &&
         isValid &&
         'focus-within:border-secondary hover:border-brand',
+      value && !disabled && isValid && 'border-secondary',
+      readonly && !disabled && 'border-primary hover:border-primary',
       disabled && 'border-secondary',
       !isValid && 'error',
     )}
@@ -73,10 +77,12 @@
       bind:value
       class={merge(
         'min-h-fit w-full bg-interactive-secondary px-3 py-2 text-sm text-primary placeholder:text-tertiary focus-visible:outline-none',
+        readonly && !disabled && 'bg-surface-primary',
         disabled && 'cursor-not-allowed bg-surface-tertiary text-tertiary',
       )}
       {id}
       {disabled}
+      {readonly}
       {placeholder}
       {rows}
       {spellcheck}
@@ -117,7 +123,9 @@
 
 <style lang="postcss">
   .error {
-    @apply border-danger focus-within:border-danger focus-within:ring-danger;
+    @apply border-danger focus-within:border-danger;
+
+    box-shadow: inset 0 0 0 1px var(--color-border-primary);
   }
 
   .error-msg {

@@ -136,6 +136,7 @@
 
     <span
       class={merge(
+        'checkbox-control',
         [
           'relative',
           'box-content',
@@ -144,10 +145,10 @@
           'w-4',
           'flex-none',
           'cursor-pointer',
-          'border',
-          'border-tertiary',
+          'border-2',
+          'border-secondary',
           'bg-interactive-secondary',
-          'text-inverse-primary',
+          'text-white',
           'bg-clip-padding',
           'peer-indeterminate:border-interactive-primary',
           'peer-indeterminate:bg-interactive-primary',
@@ -163,17 +164,10 @@
           ],
         !disabled &&
           valid && [
-            'group-hover:border-brand',
-            'group-hover:bg-action-hover-overlay',
-            'group-active:bg-action-press-overlay',
-            'group-hover:peer-checked:border-interactive-primary-hover',
-            'group-hover:peer-checked:bg-interactive-primary-hover',
-            'group-active:peer-checked:border-interactive-primary-press',
-            'group-active:peer-checked:bg-interactive-primary-press',
-            'group-hover:peer-indeterminate:border-interactive-primary-hover',
-            'group-hover:peer-indeterminate:bg-interactive-primary-hover',
-            'group-active:peer-indeterminate:border-interactive-primary-press',
-            'group-active:peer-indeterminate:bg-interactive-primary-press',
+            'group-hover:border-tertiary',
+            'peer-focus-visible:border-tertiary',
+            'group-hover:peer-checked:border-primary',
+            'group-hover:peer-indeterminate:border-primary',
           ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
         !valid &&
@@ -193,7 +187,7 @@
           {label}
         </span>
         {#if description}
-          <p class="text-xs font-normal text-secondary">
+          <p class="text-sm font-normal text-secondary">
             {description}
           </p>
         {/if}
@@ -204,3 +198,10 @@
     {#if showError}{error}{/if}
   </span>
 </div>
+
+<style lang="postcss">
+  .peer:checked:focus-visible + .checkbox-control,
+  .peer:indeterminate:focus-visible + .checkbox-control {
+    @apply border-primary;
+  }
+</style>

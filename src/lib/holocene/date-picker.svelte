@@ -130,7 +130,7 @@
     <!-- keep focus on the input while interacting with the calendar so blur
     validation doesn't fire (and shift layout) mid-click -->
     <div
-      class="absolute z-30 inline-block rounded border border-primary bg-background-primary text-primary shadow"
+      class="absolute z-30 inline-block rounded border border-primary bg-surface-secondary text-primary shadow"
       onmousedown={(e) => e.preventDefault()}
       role="presentation"
     >

@@ -27,7 +27,7 @@
         {translate('schedules.cron-view-example-description')}
       </p>
       <pre
-        class="w-full overflow-auto bg-surface-code-block p-4 text-xs text-code-block">{translate(
+        class="w-full overflow-auto bg-surface-brand p-4 text-xs text-primary">{translate(
           'schedules.cron-format-diagram',
         )}</pre>
     </div>

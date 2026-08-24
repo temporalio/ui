@@ -20,6 +20,7 @@
       search: false,
       labelHidden: false,
       disabled: false,
+      readonly: false,
       required: false,
       hintText: '',
     },
@@ -30,6 +31,7 @@
       units: { name: 'Units', control: 'text' },
       hintText: { name: 'Hint Text', control: 'text' },
       disabled: { name: 'Disabled', control: 'boolean' },
+      readonly: { name: 'Read Only', control: 'boolean' },
       required: { name: 'Required', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       Icon: {
@@ -58,6 +60,8 @@
 <Story name="Default" />
 
 <Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Read Only" args={{ readonly: true, value: 42 }} />
 
 <Story name="Required" args={{ required: true }} />
 

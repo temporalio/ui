@@ -36,7 +36,7 @@
 
 <div class="container">
   <div class="row">
-    {#each weekDays as day}
+    {#each weekDays as day (day.label)}
       <p class="cell">{day.label.slice(0, 2)}</p>
     {/each}
   </div>
@@ -46,6 +46,7 @@
       {#if value}
         <button
           type="button"
+          disabled={!allowed}
           onclick={allowed && value ? () => onChange(value) : () => {}}
           class="cell"
           class:highlight={allowed && value}
@@ -75,7 +76,7 @@
   }
 
   .cell {
-    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-xl p-2 text-sm;
+    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-xl p-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary;
   }
 
   .selected {
@@ -83,14 +84,18 @@
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-surface-tertiary text-tertiary;
+    @apply cursor-not-allowed opacity-disabled;
   }
 
-  .highlight {
-    &:not(.disabled) {
-      @apply hover:scale-125 hover:cursor-pointer hover:bg-interactive-primary-hover hover:text-white;
+  .highlight:not(.disabled) {
+    @apply cursor-pointer;
+  }
 
-      transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-    }
+  .highlight:not(.disabled, .selected) {
+    @apply hover:bg-action-hover-overlay focus-visible:bg-background-primary;
+  }
+
+  .highlight.selected:not(.disabled) {
+    @apply hover:bg-interactive-primary-hover hover:text-white focus-visible:bg-interactive-primary;
   }
 </style>

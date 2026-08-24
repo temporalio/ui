@@ -26,6 +26,7 @@
     centered?: boolean;
     class?: ClassNameValue;
     hoverable?: boolean;
+    interaction?: 'menu' | 'select';
     onclick?: () => void;
     children?: Snippet;
     leading?: Snippet;
@@ -56,6 +57,7 @@
     description = undefined,
     centered = false,
     hoverable = true,
+    interaction = 'menu',
     newTab = false,
     onclick,
     children,
@@ -142,6 +144,7 @@
     class:active
     class:disabled
     class:hoverable
+    class:select={interaction === 'select'}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -172,6 +175,7 @@
     class:selected
     class:hoverable
     class:active
+    class:select={interaction === 'select'}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -202,14 +206,22 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer border border-transparent text-sm text-primary focus-visible:border-interactive-primary focus-visible:bg-interactive-primary focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-interactive-primary-press active:text-white;
+    @apply cursor-pointer border border-transparent text-sm text-primary focus-visible:border-interactive-primary focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-action-brand-press;
 
     &.active {
       @apply bg-interactive-primary text-white;
     }
 
     &.hoverable {
-      @apply hover:bg-interactive-primary hover:text-white;
+      @apply hover:bg-action-brand-hover hover:text-primary;
+    }
+
+    &.select {
+      @apply focus-visible:bg-interactive-primary-hover focus-visible:text-white active:bg-interactive-primary-press active:text-white;
+
+      &.hoverable {
+        @apply hover:bg-interactive-primary-hover hover:text-white;
+      }
     }
 
     &.destructive {
@@ -242,8 +254,11 @@
   }
 
   .menu-item.active .menu-item-description,
-  .menu-item.hoverable:hover .menu-item-description,
-  .menu-item:focus-visible .menu-item-description {
+  .menu-item.select.hoverable:hover .menu-item-description,
+  .menu-item.select:focus-visible .menu-item-description,
+  .menu-item.select:active .menu-item-description,
+  .menu-item.destructive.hoverable:hover .menu-item-description,
+  .menu-item.destructive:focus-visible .menu-item-description {
     @apply text-white;
   }
 </style>

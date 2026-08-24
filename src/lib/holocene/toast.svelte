@@ -33,7 +33,7 @@
   }: Props = $props();
 
   const variants: Readonly<Record<ToastVariant, string>> = {
-    primary: 'bg-indigo-8 text-white',
+    primary: 'bg-surface-brand text-primary',
     success: 'bg-surface-success text-primary',
     error: 'bg-surface-danger text-primary',
     info: 'bg-surface-information text-primary',
@@ -60,7 +60,7 @@
 <div
   {id}
   class={merge(
-    'flex grow-0 items-center justify-between gap-4 rounded-md px-3 py-2.5 shadow',
+    'flex grow-0 items-center justify-between gap-4 rounded-md border border-primary px-3 py-2.5 shadow',
     variants[variant],
   )}
   transition:fly={{ x: 250 }}

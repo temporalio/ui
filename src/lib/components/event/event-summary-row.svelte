@@ -426,6 +426,6 @@
   }
 
   tr[data-testid='event-summary-row'].active:hover {
-    @apply bg-surface-table-header;
+    @apply bg-surface-tertiary;
   }
 </style>

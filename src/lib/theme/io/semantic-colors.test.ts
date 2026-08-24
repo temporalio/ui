@@ -24,24 +24,38 @@ describe('semantic surface colors', () => {
       light: colorScales.blue[4],
       dark: colorScales.blue[12],
     });
-    expect(semanticColors.surface['table-header']).toEqual({
-      light: colorScales.slate[3],
-      dark: colorScales.neutral[9],
-    });
-    expect(semanticColors.surface['code-block']).toEqual({
-      light: colorScales.indigo[5],
-      dark: colorScales.indigo[12],
-    });
-    expect(semanticColors.content['code-block']).toEqual({
-      light: colorScales.slate[12],
-      dark: colorScales.slate[1],
-    });
-    expect(semanticColors.content['code-block-accent']).toEqual({
-      light: colorScales['dark-magenta'][9],
-      dark: colorScales['dark-magenta'][8],
-    });
 
-    expect(semanticColors.interactive['primary-press'].dark).toBe('#4d61ab');
+    expect(semanticColors.content.error).toEqual({
+      light: colorScales.persimmon[12],
+      dark: colorScales.persimmon[8],
+    });
+    expect({
+      'text-info': semanticColors.content['static-text-info'],
+      'text-success': semanticColors.content['static-text-success'],
+      'text-warning': semanticColors.content['static-text-warning'],
+      'text-danger': semanticColors.content['static-text-danger'],
+    }).toEqual({
+      'text-info': {
+        light: colorScales.blue[11],
+        dark: colorScales.blue[9],
+      },
+      'text-success': {
+        light: colorScales.green[11],
+        dark: colorScales.green[9],
+      },
+      'text-warning': {
+        light: colorScales.amber[11],
+        dark: colorScales.amber[9],
+      },
+      'text-danger': {
+        light: colorScales.red[11],
+        dark: colorScales.red[9],
+      },
+    });
+    expect(semanticColors.surface['static-neutral']).toEqual({
+      light: colorScales.neutral[7],
+      dark: colorScales.neutral[7],
+    });
   });
 });
 
@@ -50,15 +64,15 @@ describe('interactive semantic colors', () => {
     expect(semanticColors.interactive).toEqual({
       primary: {
         light: colorScales.indigo[9],
-        dark: colorScales.indigo[10],
+        dark: colorScales.indigo[11],
       },
       'primary-hover': {
         light: colorScales.indigo[10],
-        dark: colorScales.indigo[9],
+        dark: colorScales.indigo[10],
       },
       'primary-press': {
         light: colorScales.indigo[11],
-        dark: '#4d61ab',
+        dark: colorScales.indigo[9],
       },
       secondary: {
         light: '#f8f8f8',
@@ -131,15 +145,19 @@ describe('action semantic colors', () => {
     expect(semanticColors.actions).toEqual({
       'hover-overlay': {
         light: colorAlphaScales.neutral[10],
-        dark: `color-mix(in srgb, ${colorScales.neutral[4]} 15%, transparent)`,
+        dark: colorAlphaScales.slate[15],
       },
       'press-overlay': {
         light: colorAlphaScales.neutral[15],
-        dark: `color-mix(in srgb, ${colorScales.neutral[4]} 20%, transparent)`,
+        dark: colorAlphaScales.slate[20],
       },
       'brand-hover': {
         light: colorAlphaScales.indigo[10],
         dark: colorAlphaScales.indigo[5],
+      },
+      'brand-press': {
+        light: colorAlphaScales.indigo[15],
+        dark: colorAlphaScales.indigo[20],
       },
     });
   });

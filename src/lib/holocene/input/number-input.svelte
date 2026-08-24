@@ -37,6 +37,7 @@
     placeholder = '',
     name,
     disabled = false,
+    readonly = false,
     required = false,
     invalid = false,
     hintText = '',
@@ -65,10 +66,14 @@
   <div class="flex items-center">
     <div
       class={merge(
-        'relative box-border flex h-10 min-w-16 items-center border border-tertiary bg-interactive-secondary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        'relative box-border flex h-10 min-w-16 items-center border border-primary bg-interactive-secondary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
         !disabled &&
+          !readonly &&
           valid &&
           'focus-within:border-secondary hover:border-brand',
+        readonly &&
+          !disabled &&
+          'border-primary bg-surface-primary hover:border-primary',
         disabled && 'border-secondary bg-surface-tertiary text-tertiary',
       )}
       class:search
@@ -85,6 +90,7 @@
         {max}
         {min}
         {disabled}
+        {readonly}
         data-lpignore="true"
         data-1p-ignore="true"
         {placeholder}
@@ -103,7 +109,7 @@
     {#if units}
       <div
         class={merge(
-          'flex h-10 items-center border-y border-r border-tertiary bg-surface-tertiary px-2 text-primary',
+          'flex h-10 items-center border-y border-r border-primary bg-surface-tertiary px-2 text-primary',
           disabled && 'border-secondary text-tertiary',
         )}
       >
@@ -135,6 +141,8 @@
   }
 
   .invalid {
-    @apply border-danger focus-within:border-danger focus-within:ring-danger;
+    @apply border-danger focus-within:border-danger;
+
+    box-shadow: inset 0 0 0 1px var(--color-border-primary);
   }
 </style>

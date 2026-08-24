@@ -56,10 +56,10 @@
   type={href ? undefined : 'button'}
   role="tab"
   class={merge(
-    'mb-[-1px] flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 border-transparent text-sm font-medium leading-8 outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary',
+    'mb-[-1px] flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 border-transparent text-sm font-medium leading-8 text-secondary outline-none focus-visible:bg-interactive-secondary focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary',
     className,
-    isActive && 'border-brand text-brand',
-    disabled && 'cursor-not-allowed opacity-50',
+    isActive && 'border-brand text-primary focus-visible:text-brand',
+    disabled && 'cursor-not-allowed opacity-disabled',
     !disabled && 'hover:text-brand',
   )}
   aria-selected={isActive}

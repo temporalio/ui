@@ -20,6 +20,15 @@ const expectClass = (css: string, className: string): void => {
   expect(css).toContain(`.${className.replaceAll(':', '\\:')}`);
 };
 
+describe('semantic opacity API', () => {
+  it('compiles the disabled opacity token', async () => {
+    const css = await compileClasses(['opacity-disabled']);
+
+    expectClass(css, 'opacity-disabled');
+    expect(css).toContain('opacity: 0.32');
+  });
+});
+
 describe('property-aware color API', () => {
   it('compiles the contracted colors for every color property', async () => {
     const classes = [
@@ -32,6 +41,7 @@ describe('property-aware color API', () => {
       'bg-action-hover-overlay',
       'bg-overlay-primary',
       'bg-content-primary',
+      'bg-surface-static-neutral',
       'bg-border-primary',
       'bg-white',
       'bg-black',
@@ -71,6 +81,10 @@ describe('property-aware color API', () => {
       'stroke-none',
       'text-primary',
       'text-brand',
+      'text-static-text-info',
+      'text-static-text-success',
+      'text-static-text-warning',
+      'text-static-text-danger',
       'text-white',
       'text-indigo-6',
       'text-alpha-red-30',
@@ -89,6 +103,13 @@ describe('property-aware color API', () => {
       'background-color: var(--color-actions-hover-overlay)',
     );
     expect(css).toContain('color: var(--color-content-primary)');
+    expect(css).toContain('color: var(--color-content-static-text-info)');
+    expect(css).toContain('color: var(--color-content-static-text-success)');
+    expect(css).toContain('color: var(--color-content-static-text-warning)');
+    expect(css).toContain('color: var(--color-content-static-text-danger)');
+    expect(css).toContain(
+      'background-color: var(--color-surface-static-neutral)',
+    );
     expect(css).toContain('border-color: var(--color-border-primary)');
     expect(css).toContain(
       'color: rgb(193 208 255 / var(--tw-text-opacity, 1))',

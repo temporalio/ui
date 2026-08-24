@@ -2,7 +2,7 @@
   import { cva } from 'class-variance-authority';
 
   const sharedMenuStyles = [
-    'bg-interactive-secondary',
+    'bg-surface-secondary',
     'min-w-fit',
     'list-none',
     'overflow-auto',
