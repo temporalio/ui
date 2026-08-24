@@ -86,18 +86,18 @@
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 text-io-content-primary underline underline-offset-2 hover:text-io-content-brand focus-visible:text-io-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary;
+    @apply max-w-fit cursor-pointer items-center gap-2 text-primary underline underline-offset-2 hover:text-brand focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary;
 
     &.active {
-      @apply text-io-content-brand;
+      @apply text-brand;
     }
 
     &.interactive {
-      @apply text-io-content-white hover:text-io-content-brand focus-visible:text-io-content-white;
+      @apply text-white hover:text-brand focus-visible:text-white;
     }
 
     &.light {
-      @apply text-io-content-white hover:text-io-content-brand;
+      @apply text-white hover:text-brand;
     }
   }
 

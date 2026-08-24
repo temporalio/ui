@@ -145,39 +145,39 @@
           'flex-none',
           'cursor-pointer',
           'border',
-          'border-io-border-tertiary',
-          'bg-io-interactive-secondary',
-          'text-io-content-inverse-primary',
+          'border-tertiary',
+          'bg-interactive-secondary',
+          'text-inverse-primary',
           'bg-clip-padding',
-          'peer-indeterminate:border-io-interactive-primary',
-          'peer-indeterminate:bg-io-interactive-primary',
-          'peer-checked:border-io-interactive-primary',
-          'peer-checked:bg-io-interactive-primary',
+          'peer-indeterminate:border-interactive-primary',
+          'peer-indeterminate:bg-interactive-primary',
+          'peer-checked:border-interactive-primary',
+          'peer-checked:bg-interactive-primary',
         ],
         !disabled &&
           valid && [
             'peer-focus-visible:ring-2',
-            'peer-focus-visible:ring-io-interactive-primary',
+            'peer-focus-visible:ring-interactive-primary',
             'peer-focus-visible:ring-offset-2',
-            'peer-focus-visible:ring-offset-io-background-primary',
+            'peer-focus-visible:ring-offset-background-primary',
           ],
         !disabled &&
           valid && [
-            'group-hover:border-io-border-brand',
-            'group-hover:bg-io-actions-hover-overlay',
-            'group-active:bg-io-actions-press-overlay',
-            'group-hover:peer-checked:border-io-interactive-primary-hover',
-            'group-hover:peer-checked:bg-io-interactive-primary-hover',
-            'group-active:peer-checked:border-io-interactive-primary-press',
-            'group-active:peer-checked:bg-io-interactive-primary-press',
-            'group-hover:peer-indeterminate:border-io-interactive-primary-hover',
-            'group-hover:peer-indeterminate:bg-io-interactive-primary-hover',
-            'group-active:peer-indeterminate:border-io-interactive-primary-press',
-            'group-active:peer-indeterminate:bg-io-interactive-primary-press',
+            'group-hover:border-brand',
+            'group-hover:bg-action-hover-overlay',
+            'group-active:bg-action-press-overlay',
+            'group-hover:peer-checked:border-interactive-primary-hover',
+            'group-hover:peer-checked:bg-interactive-primary-hover',
+            'group-active:peer-checked:border-interactive-primary-press',
+            'group-active:peer-checked:bg-interactive-primary-press',
+            'group-hover:peer-indeterminate:border-interactive-primary-hover',
+            'group-hover:peer-indeterminate:bg-interactive-primary-hover',
+            'group-active:peer-indeterminate:border-interactive-primary-press',
+            'group-active:peer-indeterminate:bg-interactive-primary-press',
           ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
         !valid &&
-          'border-io-border-danger peer-checked:border-io-border-danger peer-indeterminate:border-io-border-danger peer-focus-visible:ring-2 peer-focus-visible:ring-io-border-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-io-background-primary',
+          'border-danger peer-checked:border-danger peer-indeterminate:border-danger peer-focus-visible:ring-2 peer-focus-visible:ring-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background-primary',
       )}
     >
       {#if CheckIcon}
@@ -193,14 +193,14 @@
           {label}
         </span>
         {#if description}
-          <p class="text-xs font-normal text-io-content-secondary">
+          <p class="text-xs font-normal text-secondary">
             {description}
           </p>
         {/if}
       </div>
     {/if}
   </Label>
-  <span id={errorId} role="alert" class="text-xs text-io-content-danger">
+  <span id={errorId} role="alert" class="text-xs text-danger">
     {#if showError}{error}{/if}
   </span>
 </div>

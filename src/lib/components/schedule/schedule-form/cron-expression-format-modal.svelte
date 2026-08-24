@@ -23,11 +23,11 @@
   {/snippet}
   {#snippet content()}
     <div class="flex flex-col gap-2">
-      <p class="text-io-content-secondary">
+      <p class="text-secondary">
         {translate('schedules.cron-view-example-description')}
       </p>
       <pre
-        class="w-full overflow-auto bg-io-surface-code-block p-4 text-xs text-io-content-code-block">{translate(
+        class="w-full overflow-auto bg-surface-code-block p-4 text-xs text-code-block">{translate(
           'schedules.cron-format-diagram',
         )}</pre>
     </div>

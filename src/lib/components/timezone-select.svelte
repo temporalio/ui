@@ -129,7 +129,7 @@
 
 <MenuContainer
   {open}
-  class="text-sm text-io-content-primary max-md:w-full max-md:justify-items-end"
+  class="text-sm text-primary max-md:w-full max-md:justify-items-end"
 >
   <MenuButton
     label={translate('common.timezone', { timezone })}
@@ -230,7 +230,7 @@
       <div class="mx-4 mb-4 mt-3">
         <Timestamp
           as="p"
-          class="text-xs text-io-content-secondary"
+          class="text-xs text-secondary"
           dateTime={currentDate}
         />
       </div>

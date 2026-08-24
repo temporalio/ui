@@ -110,7 +110,7 @@
 <Tooltip
   bottomLeft
   width={380}
-  tooltipClass="border border-io-border-primary !bg-io-surface-primary !text-io-content-primary"
+  tooltipClass="border border-primary !bg-surface-primary !text-primary"
   usePortal
 >
   {#snippet content()}
@@ -134,5 +134,5 @@
       </dl>
     </div>
   {/snippet}
-  <IconInfo class="text-io-content-secondary" />
+  <IconInfo class="text-secondary" />
 </Tooltip>

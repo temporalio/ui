@@ -68,7 +68,7 @@
     <div class="flex max-h-[65vh] min-h-0 flex-col gap-5 overflow-y-auto pr-2">
       {#if $newsFeed.error}
         <div
-          class="flex items-start gap-2 border border-io-border-warning bg-io-surface-warning p-3 text-sm text-io-content-primary"
+          class="flex items-start gap-2 border border-warning bg-surface-warning p-3 text-sm text-primary"
           role="alert"
         >
           <IconWarning class="mt-0.5" />
@@ -77,14 +77,14 @@
       {/if}
 
       {#if $newsFeed.isLoading && !$newsFeed.items.length}
-        <div class="flex items-center gap-2 text-sm text-io-content-tertiary">
+        <div class="flex items-center gap-2 text-sm text-tertiary">
           <IconSpinner class="animate-spin" />
           {translate('common.news-feed-loading')}
         </div>
       {:else if $newsFeed.items.length}
         {#each $newsFeed.items as item (item.id)}
           <article
-            class="min-h-fit border-b border-io-border-primary py-2 last:border-b-0"
+            class="min-h-fit border-b border-primary py-2 last:border-b-0"
           >
             <h4>{item.title}</h4>
             <Markdown
@@ -98,7 +98,7 @@
           </article>
         {/each}
       {:else}
-        <p class="text-sm text-io-content-tertiary">
+        <p class="text-sm text-tertiary">
           {translate('common.news-feed-empty')}
         </p>
       {/if}
@@ -119,7 +119,7 @@
         >
           {translate('common.refresh')}
         </Button>
-        <span class="text-io-content-tertiary">{lastFetchedLabel}</span>
+        <span class="text-tertiary">{lastFetchedLabel}</span>
       </div>
 
       <Checkbox

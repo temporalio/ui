@@ -39,7 +39,7 @@
 <Story name="All Scenarios" asChild>
   <div class="flex flex-col items-start gap-4 p-4">
     <div class="flex flex-col items-start gap-2">
-      <p class="text-sm text-io-content-secondary">
+      <p class="text-sm text-secondary">
         Current Version cell (pill + connection)
       </p>
       <ComputeBadge type="aws-lambda" computeStatus={connected} />
@@ -50,14 +50,12 @@
       <ComputeBadge type="gcp-cloud-run" computeStatus={pending} />
     </div>
     <div class="flex flex-col items-start gap-2">
-      <p class="text-sm text-io-content-secondary">
-        Compute only (no connection)
-      </p>
+      <p class="text-sm text-secondary">Compute only (no connection)</p>
       <ComputeBadge type="aws-lambda" />
       <ComputeBadge type="gcp-cloud-run" />
     </div>
     <div class="flex flex-col items-start gap-2">
-      <p class="text-sm text-io-content-secondary">
+      <p class="text-sm text-secondary">
         Connection column (details, word only)
       </p>
       <ConnectionBadge computeStatus={connected} />

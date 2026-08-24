@@ -147,7 +147,7 @@
 
 <style lang="postcss">
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between border-b border-io-border-primary p-2 text-sm font-medium last-of-type:border-b-0;
+    @apply flex select-none list-none flex-row items-center justify-between border-b border-primary p-2 text-sm font-medium last-of-type:border-b-0;
   }
 
   .orderable-item[draggable='true'] {
@@ -155,10 +155,10 @@
   }
 
   .orderable-item.readonly {
-    @apply bg-io-surface-secondary text-io-content-primary;
+    @apply bg-surface-secondary text-primary;
   }
 
   :global(.orderable-item.dragging-over:not(.locked)) {
-    @apply bg-io-surface-brand;
+    @apply bg-surface-brand;
   }
 </style>

@@ -29,9 +29,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Chip>)}
-  <div
-    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
-  >
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
     <Chip {...args} onremove={action('remove')} onclick={action('click')}>
       ross.edfort@temporal.io
     </Chip>

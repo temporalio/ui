@@ -120,9 +120,9 @@
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="bg-io-surface-secondary"
+    class="bg-surface-secondary"
   >
-    {attribute} =<span class="pl-1 text-io-content-brand"
+    {attribute} =<span class="pl-1 text-brand"
       >{filters.map((f) => f.value).join(', ')}</span
     >
   </MenuButton>

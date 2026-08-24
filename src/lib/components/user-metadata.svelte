@@ -12,12 +12,10 @@
 
 <div
   data-testid="user-metadata"
-  class="flex h-full flex-1 flex-col bg-io-background-primary"
+  class="flex h-full flex-1 flex-col bg-background-primary"
 >
   <div>
-    <div
-      class="w-full bg-io-surface-information px-6 py-2 text-io-content-primary"
-    >
+    <div class="w-full bg-surface-information px-6 py-2 text-primary">
       <h3 data-testid="user-metadata-summary-heading">
         {translate('workflows.summary')}
       </h3>
@@ -29,7 +27,7 @@
         content={summary}
       />
     {:else}
-      <div class="py-6 pl-6 text-io-content-tertiary">
+      <div class="py-6 pl-6 text-tertiary">
         <p class="text-sm italic">
           {translate('workflows.no-summary-available')}
         </p>
@@ -37,9 +35,7 @@
     {/if}
   </div>
   <div>
-    <div
-      class="w-full bg-io-surface-information px-6 py-2 text-io-content-primary"
-    >
+    <div class="w-full bg-surface-information px-6 py-2 text-primary">
       <h3 data-testid="user-metadata-summary-heading">
         {translate('workflows.details')}
       </h3>
@@ -51,7 +47,7 @@
         content={details}
       />
     {:else}
-      <div class="py-6 pl-6 text-io-content-tertiary">
+      <div class="py-6 pl-6 text-tertiary">
         <p class="text-sm italic">
           {translate('workflows.no-details-available')}
         </p>

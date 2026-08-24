@@ -75,7 +75,7 @@ export function expandDetails(target: HTMLElement) {
   expand?.click();
   flushSync();
   return target.querySelector<HTMLTableCellElement>(
-    'tr.bg-io-surface-primary > td[colspan]',
+    'tr.bg-surface-primary > td[colspan]',
   );
 }
 

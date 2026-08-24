@@ -13,10 +13,10 @@
 
 <style lang="postcss">
   .login-button {
-    @apply flex items-center justify-center px-4 py-2 text-sm text-io-content-white;
+    @apply flex items-center justify-center px-4 py-2 text-sm text-white;
   }
 
   .login-button:hover {
-    @apply rounded-md bg-io-slate-blue-3 text-io-content-primary;
+    @apply rounded-md bg-slate-blue-3 text-primary;
   }
 </style>

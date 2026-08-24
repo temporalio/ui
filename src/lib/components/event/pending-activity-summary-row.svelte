@@ -123,8 +123,8 @@
         <Glyph
           class={merge(
             'mr-1 inline',
-            (event.attempt ?? 0) > 1 && 'font-bold text-io-content-danger',
-            event.paused && 'font-bold text-io-content-warning',
+            (event.attempt ?? 0) > 1 && 'font-bold text-danger',
+            event.paused && 'font-bold text-warning',
           )}
         />
         {translate('workflows.attempt')}

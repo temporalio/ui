@@ -120,7 +120,7 @@
       {#snippet icon()}
         {@const ProviderIcon = providerIcon[option.value]}
         <div
-          class="flex h-11 w-11 items-center justify-center rounded-none border border-io-border-primary bg-io-surface-primary"
+          class="flex h-11 w-11 items-center justify-center rounded-none border border-primary bg-surface-primary"
         >
           <ProviderIcon width={32} height={32} />
         </div>

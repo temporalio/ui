@@ -40,7 +40,7 @@
       <input
         bind:group={$group}
         type="radio"
-        class="bg-io-interactive-secondary"
+        class="bg-interactive-secondary"
         aria-describedby={description ? `${id}-description` : null}
         data-track-name="radio-input"
         data-track-intent="select"
@@ -65,41 +65,41 @@
 
 <style lang="postcss">
   .description {
-    @apply ml-7 text-sm font-normal text-io-content-primary;
+    @apply ml-7 text-sm font-normal text-primary;
   }
 
   input[type='radio'] {
-    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-io-border-tertiary outline-none;
+    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-tertiary outline-none;
 
     &:checked {
-      @apply border-io-interactive-primary bg-io-interactive-primary;
+      @apply border-interactive-primary bg-interactive-primary;
     }
 
     &:enabled {
       &:focus-visible {
-        @apply ring-2 ring-io-interactive-primary ring-offset-2 ring-offset-io-background-primary;
+        @apply ring-2 ring-interactive-primary ring-offset-2 ring-offset-background-primary;
       }
 
       &:hover:not(:checked) {
-        @apply border-io-border-brand bg-io-actions-hover-overlay;
+        @apply border-brand bg-action-hover-overlay;
       }
 
       &:active:not(:checked) {
-        @apply bg-io-actions-press-overlay;
+        @apply bg-action-press-overlay;
       }
 
       &:checked:hover:not(:active) {
-        @apply border-io-interactive-primary-hover bg-io-interactive-primary-hover shadow-none;
+        @apply border-interactive-primary-hover bg-interactive-primary-hover shadow-none;
       }
 
       &:checked:active {
-        @apply border-io-interactive-primary-press bg-io-interactive-primary-press;
+        @apply border-interactive-primary-press bg-interactive-primary-press;
       }
     }
 
     &:checked,
     &:active {
-      @apply shadow-[inset_0_0_0_1px] shadow-io-content-inverse-primary;
+      @apply shadow-[inset_0_0_0_1px] shadow-content-inverse-primary;
     }
 
     &:disabled {

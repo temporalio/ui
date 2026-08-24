@@ -23,7 +23,7 @@
 <Accordion title={translate('schedules.advanced-settings')} open>
   <dl class="grid grid-cols-2 gap-4 text-sm">
     <div>
-      <dt class="text-io-content-secondary">
+      <dt class="text-secondary">
         {translate('common.start-date')}
       </dt>
       <dd>
@@ -34,14 +34,14 @@
     </div>
 
     <div>
-      <dt class="text-io-content-secondary">{translate('common.end-date')}</dt>
+      <dt class="text-secondary">{translate('common.end-date')}</dt>
       <dd>
         {spec?.endTime ? $timestamp(spec.endTime) : translate('common.never')}
       </dd>
     </div>
 
     <div>
-      <dt class="text-io-content-secondary">
+      <dt class="text-secondary">
         {translate('common.timezone-label')}
       </dt>
       <dd>
@@ -50,7 +50,7 @@
     </div>
 
     <div>
-      <dt class="text-io-content-secondary">{translate('schedules.jitter')}</dt>
+      <dt class="text-secondary">{translate('schedules.jitter')}</dt>
       <dd>
         {spec?.jitter && spec.jitter !== '0s'
           ? String(spec.jitter)
@@ -59,7 +59,7 @@
     </div>
 
     <div>
-      <dt class="text-io-content-secondary">
+      <dt class="text-secondary">
         {translate('schedules.overlap-policy')}
       </dt>
       <dd>
@@ -71,7 +71,7 @@
     </div>
 
     <div>
-      <dt class="text-io-content-secondary">
+      <dt class="text-secondary">
         {translate('schedules.catchup-window-policy')}
       </dt>
       <dd>
@@ -82,7 +82,7 @@
     </div>
 
     <div>
-      <dt class="text-io-content-secondary">
+      <dt class="text-secondary">
         {translate('schedules.pause-on-failure')}
       </dt>
       <dd>
@@ -93,7 +93,7 @@
     </div>
 
     <div>
-      <dt class="text-io-content-secondary">
+      <dt class="text-secondary">
         {translate('schedules.exclusion-calendar')}
       </dt>
       <dd>
@@ -113,7 +113,7 @@
 
     {#if state?.limitedActions}
       <div>
-        <dt class="text-io-content-secondary">
+        <dt class="text-secondary">
           {translate('schedules.remaining-actions')}
         </dt>
         <dd>
@@ -124,7 +124,7 @@
 
     {#if policies?.keepOriginalWorkflowId != null}
       <div>
-        <dt class="text-io-content-secondary">
+        <dt class="text-secondary">
           {translate('schedules.keep-original-workflow-id')}
         </dt>
         <dd>
@@ -136,7 +136,7 @@
     {/if}
 
     <div class="col-span-full">
-      <dt class="text-io-content-secondary">
+      <dt class="text-secondary">
         {translate('common.notes')}
       </dt>
       <dd>

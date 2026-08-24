@@ -143,10 +143,10 @@
   <div
     class={merge(
       'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden',
-      'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-io-interactive-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-io-interactive-primary',
+      'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-interactive-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary',
       isCloud
-        ? 'bg-gradient-to-b from-io-indigo-9 to-io-indigo-12 text-io-content-white focus-visible:[&_[role=button]]:ring-io-green-7 focus-visible:[&_a]:ring-io-green-7'
-        : 'navigation-inverse bg-io-neutral-12 text-io-content-white',
+        ? 'bg-gradient-to-b from-indigo-9 to-indigo-12 text-white focus-visible:[&_[role=button]]:ring-green-7 focus-visible:[&_a]:ring-green-7'
+        : 'navigation-inverse bg-neutral-12 text-white',
     )}
     data-nav="open"
     in:slide={{ duration: 200, delay: 0 }}
@@ -172,10 +172,10 @@
 <nav
   class={merge(
     'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 px-4 py-2 transition-colors md:hidden',
-    'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-io-interactive-primary focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-io-interactive-primary',
+    'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-interactive-primary',
     isCloud
-      ? 'bg-gradient-to-b from-io-indigo-9 to-io-slate-blue-11 text-io-content-white focus-visible:[&_a]:ring-io-green-7 focus-visible:[&_button]:ring-io-green-7'
-      : 'navigation-inverse border-t border-io-border-primary bg-io-neutral-12 text-io-content-white',
+      ? 'bg-gradient-to-b from-indigo-9 to-slate-blue-11 text-white focus-visible:[&_a]:ring-green-7 focus-visible:[&_button]:ring-green-7'
+      : 'navigation-inverse border-t border-primary bg-neutral-12 text-white',
     className,
   )}
   data-testid="top-nav"
@@ -206,24 +206,24 @@
       })}
     {:else}
       <div
-        class="namespace-wrapper dark:focus-within:bg-io-surface-primary dark:focus-within:text-io-content-primary"
+        class="namespace-wrapper dark:focus-within:bg-surface-primary dark:focus-within:text-primary"
       >
         <Button
           variant="ghost"
           data-testid="namespace-switcher"
           LeadingIcon={IconNamespaceSwitcher}
           size="xs"
-          class="grow text-io-content-white"
+          class="grow text-white"
           onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
         >
-        <div class="ml-1 h-full w-1 border-l border-io-border-primary"></div>
+        <div class="ml-1 h-full w-1 border-l border-primary"></div>
         <Button
           variant="ghost"
           size="xs"
           href={routeForNamespace({ namespace })}
           disabled={!namespaceExists}
         >
-          <IconExternalLink class="text-io-content-white" />
+          <IconExternalLink class="text-white" />
         </Button>
       </div>
     {/if}
@@ -257,7 +257,7 @@
 
 <style lang="postcss">
   .namespace-wrapper {
-    @apply flex h-10 w-full grow flex-row items-center border border-io-border-primary bg-io-neutral-12 px-0.5 text-sm text-io-content-white focus-within:border-io-border-brand focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary;
+    @apply flex h-10 w-full grow flex-row items-center border border-primary bg-neutral-12 px-0.5 text-sm text-white focus-within:border-brand focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary;
   }
 
   .nav-button {

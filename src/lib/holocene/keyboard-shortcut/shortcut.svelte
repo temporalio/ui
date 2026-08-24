@@ -39,6 +39,6 @@
 
 <style lang="postcss">
   .shortcut {
-    @apply inline-flex w-auto min-w-[32px] items-center justify-center border border-io-border-tertiary bg-io-surface-tertiary px-1 py-1.5 text-xs font-semibold text-io-content-primary;
+    @apply inline-flex w-auto min-w-[32px] items-center justify-center border border-tertiary bg-surface-tertiary px-1 py-1.5 text-xs font-semibold text-primary;
   }
 </style>

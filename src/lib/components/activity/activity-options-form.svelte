@@ -199,7 +199,7 @@
           for="maximum-attempts"
           label={translate('activities.retry-max-attempts')}
         />
-        <p class="mb-1 text-xs text-io-content-secondary">
+        <p class="mb-1 text-xs text-secondary">
           {translate('activities.retry-max-attempts-description')}
         </p>
         <NumberInput
@@ -218,7 +218,7 @@
           for="retry-backoff-coefficient"
           label={translate('activities.retry-backoff-coefficient')}
         />
-        <p class="mb-1 text-xs text-io-content-secondary">
+        <p class="mb-1 text-xs text-secondary">
           {translate('activities.retry-backoff-coefficient-description')}
         </p>
         <NumberInput

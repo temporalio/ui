@@ -84,12 +84,12 @@
   >
   <DetailListValue>
     <Badge type={badgeType} class="flex items-center gap-2">
-      <IconRetry class={failed ? 'text-io-content-danger' : ''} />
+      <IconRetry class={failed ? 'text-danger' : ''} />
       <span>{attempt} of {formatMaximumAttempts(maximumAttempts)}</span>
     </Badge>
 
     {#if maximumAttempts && !isClosed}
-      <p class="ml-1 text-io-content-secondary">
+      <p class="ml-1 text-secondary">
         {formatAttemptsLeft(maximumAttempts, attempt)} remaining
       </p>
     {/if}
@@ -408,7 +408,7 @@
         <div class="space-y-2">
           {#if $activityExecution.info.lastFailure}
             <div class="space-y-2">
-              <p class="font-medium text-io-content-secondary">
+              <p class="font-medium text-secondary">
                 {translate('standalone-activities.last-failure')}
               </p>
               <PayloadCodeBlock
@@ -419,7 +419,7 @@
           {/if}
           {#if $activityExecution.info.retryPolicy}
             <div class="space-y-2">
-              <p class="font-medium text-io-content-secondary">
+              <p class="font-medium text-secondary">
                 {translate('standalone-activities.retry-policy')}
               </p>
               <CodeBlock
@@ -434,7 +434,7 @@
           {/if}
           {#if $activityExecution.info.heartbeatDetails}
             <div class="space-y-2">
-              <p class="font-medium text-io-content-secondary">
+              <p class="font-medium text-secondary">
                 {translate('standalone-activities.heartbeat-details')}
               </p>
               <PayloadCodeBlock
@@ -445,7 +445,7 @@
           {/if}
           {#if $activityExecution.info.header?.fields}
             <div class="space-y-2">
-              <p class="font-medium text-io-content-secondary">
+              <p class="font-medium text-secondary">
                 {translate('standalone-activities.header')}
               </p>
               <PayloadCodeBlock

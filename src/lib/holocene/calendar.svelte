@@ -79,16 +79,16 @@
   }
 
   .selected {
-    @apply bg-io-interactive-primary text-io-content-white;
+    @apply bg-interactive-primary text-white;
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-io-surface-tertiary text-io-content-tertiary;
+    @apply cursor-not-allowed bg-surface-tertiary text-tertiary;
   }
 
   .highlight {
     &:not(.disabled) {
-      @apply hover:scale-125 hover:cursor-pointer hover:bg-io-interactive-primary-hover hover:text-io-content-white;
+      @apply hover:scale-125 hover:cursor-pointer hover:bg-interactive-primary-hover hover:text-white;
 
       transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
     }

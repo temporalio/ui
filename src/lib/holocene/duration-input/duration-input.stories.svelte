@@ -29,9 +29,7 @@
 </script>
 
 {#snippet template(args: Args)}
-  <div
-    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
-  >
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
     <DurationInput
       {...args}
       bind:value={args.value}

@@ -69,7 +69,7 @@
               'standalone-nexus-operations.form-id-reuse-policy-heading',
             )}
           </h2>
-          <p class="mt-1 text-sm text-io-content-secondary">
+          <p class="mt-1 text-sm text-secondary">
             {translate(
               'standalone-nexus-operations.form-id-reuse-policy-description',
             )}
@@ -116,7 +116,7 @@
               'standalone-nexus-operations.form-id-conflict-policy-heading',
             )}
           </h2>
-          <p class="mt-1 text-sm text-io-content-secondary">
+          <p class="mt-1 text-sm text-secondary">
             {translate(
               'standalone-nexus-operations.form-id-conflict-policy-description',
             )}
@@ -151,7 +151,7 @@
           <h2 class="text-base font-semibold">
             {translate('standalone-nexus-operations.form-timeouts-heading')}
           </h2>
-          <p class="mt-1 text-sm text-io-content-secondary">
+          <p class="mt-1 text-sm text-secondary">
             {translate('standalone-nexus-operations.form-timeouts-description')}
           </p>
         </div>
@@ -164,7 +164,7 @@
               )}
               bind:value={scheduleToCloseTimeout}
             />
-            <p class="mt-1 text-xs text-io-content-secondary">
+            <p class="mt-1 text-xs text-secondary">
               {translate(
                 'standalone-nexus-operations.form-schedule-to-close-timeout-hint',
               )}
@@ -178,7 +178,7 @@
               )}
               bind:value={scheduleToStartTimeout}
             />
-            <p class="mt-1 text-xs text-io-content-secondary">
+            <p class="mt-1 text-xs text-secondary">
               {translate(
                 'standalone-nexus-operations.form-schedule-to-start-timeout-hint',
               )}
@@ -192,7 +192,7 @@
               )}
               bind:value={startToCloseTimeout}
             />
-            <p class="mt-1 text-xs text-io-content-secondary">
+            <p class="mt-1 text-xs text-secondary">
               {translate(
                 'standalone-nexus-operations.form-start-to-close-timeout-hint',
               )}

@@ -27,7 +27,7 @@
   <Link
     {href}
     class="flex w-fit flex-row items-center gap-1 truncate rounded-sm {isBadge &&
-      'bg-io-surface-tertiary'}"
+      'bg-surface-tertiary'}"
   >
     <span class="truncate">
       {text}

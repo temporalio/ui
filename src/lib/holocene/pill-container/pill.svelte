@@ -63,10 +63,10 @@
     handleClick(e);
   }}
   class={merge(
-    'flex items-center justify-center gap-2 rounded-full bg-transparent px-3 py-1 text-sm text-io-content-primary hover:bg-io-actions-hover-overlay active:bg-io-actions-press-overlay',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary',
+    'flex items-center justify-center gap-2 rounded-full bg-transparent px-3 py-1 text-sm text-primary hover:bg-action-hover-overlay active:bg-action-press-overlay',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary',
     isActive &&
-      'bg-io-interactive-primary text-io-content-white hover:bg-io-interactive-primary-hover active:bg-io-interactive-primary-press',
+      'bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press',
     className,
   )}
   {disabled}

@@ -41,10 +41,10 @@
         <button
           type="button"
           {...getAttributes({
-            class: `cursor-pointer rounded-md border px-3 py-1.5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary ${
+            class: `cursor-pointer rounded-md border px-3 py-1.5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary ${
               isSelected
-                ? 'border-io-interactive-primary bg-io-interactive-primary text-io-content-white'
-                : 'border-io-border-tertiary bg-io-surface-primary text-io-content-primary hover:bg-io-actions-hover-overlay'
+                ? 'border-interactive-primary bg-interactive-primary text-white'
+                : 'border-tertiary bg-surface-primary text-primary hover:bg-action-hover-overlay'
             }`,
           })}
         >
@@ -57,7 +57,7 @@
         <div
           {...getAttributes({
             class:
-              'mt-4 rounded-md border border-io-border-tertiary p-4 text-sm text-io-content-primary',
+              'mt-4 rounded-md border border-tertiary p-4 text-sm text-primary',
           })}
         >
           {tab} content

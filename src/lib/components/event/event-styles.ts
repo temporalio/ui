@@ -1,16 +1,16 @@
 import { cva } from 'class-variance-authority';
 
 const categoryColorVariants = {
-  workflow: 'text-io-blue-11 dark:text-io-blue-8',
-  activity: 'text-io-slate-blue-9 dark:text-io-purple-9',
-  'child-workflow': 'text-io-peacock-blue-9',
-  timer: 'text-io-amber-11 dark:text-io-amber-10',
-  signal: 'text-io-pink-9 dark:text-io-pink-8',
-  update: 'text-io-indigo-9 dark:text-io-blue-8',
-  other: 'text-io-neutral-5 dark:text-io-neutral-2',
-  nexus: 'text-io-indigo-9 dark:text-io-indigo-8',
-  'local-activity': 'text-io-neutral-5 dark:text-io-neutral-2',
-  default: 'text-io-slate-blue-9 dark:text-io-purple-9',
+  workflow: 'text-blue-11 dark:text-blue-8',
+  activity: 'text-slate-blue-9 dark:text-purple-9',
+  'child-workflow': 'text-peacock-blue-9',
+  timer: 'text-amber-11 dark:text-amber-10',
+  signal: 'text-pink-9 dark:text-pink-8',
+  update: 'text-indigo-9 dark:text-blue-8',
+  other: 'text-neutral-5 dark:text-neutral-2',
+  nexus: 'text-indigo-9 dark:text-indigo-8',
+  'local-activity': 'text-neutral-5 dark:text-neutral-2',
+  default: 'text-slate-blue-9 dark:text-purple-9',
 };
 
 export const eventCategoryColor = cva('', {

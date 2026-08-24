@@ -65,7 +65,7 @@
   }
 </script>
 
-<div class="w-full border border-t-0 border-io-border-primary" in:fade>
+<div class="w-full border border-t-0 border-primary" in:fade>
   <form
     onsubmit={handleSearch}
     class="flex gap-0"
@@ -80,7 +80,7 @@
       placeholder={translate('workflows.search-placeholder')}
       Icon={IconSearch}
       class="grow  [&_*]:border-0"
-      inputContainerClass="!border-r border-io-border-primary bg-io-surface-information text-io-content-primary"
+      inputContainerClass="!border-r border-primary bg-surface-information text-primary"
       clearable
       copyButtonLabel={translate('common.copy-icon-title')}
       clearButtonLabel={translate('common.clear-input-button-label')}

@@ -117,12 +117,12 @@
   <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
   <div
     class={merge(
-      'flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-io-border-tertiary bg-io-interactive-secondary p-2 text-sm text-io-content-primary focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
+      'flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-tertiary bg-interactive-secondary p-2 text-sm text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
       !disabled &&
         !invalid &&
-        'focus-within:border-io-border-secondary hover:border-io-border-brand',
+        'focus-within:border-secondary hover:border-brand',
       disabled &&
-        'cursor-not-allowed border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
+        'cursor-not-allowed border-secondary bg-surface-tertiary text-tertiary',
       invalid && 'invalid',
     )}
   >
@@ -177,7 +177,7 @@
     {#if maxLength && !disabled}
       <span class="count">
         <span
-          class="text-io-content-information"
+          class="text-information"
           class:warn={maxLength - chips.length <= 5}
           class:error={maxLength === chips?.length}
         >
@@ -206,15 +206,15 @@
 
 <style lang="postcss">
   .invalid {
-    @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger;
+    @apply border-danger focus-within:border-danger focus-within:ring-danger;
   }
 
   input {
-    @apply inline-block grow bg-transparent text-io-content-primary placeholder:text-io-content-tertiary focus:outline-none disabled:text-io-content-tertiary;
+    @apply inline-block grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 
   .error-msg {
-    @apply break-words text-sm text-io-content-danger;
+    @apply break-words text-sm text-danger;
   }
 
   .error-msg.min-width {
@@ -222,14 +222,14 @@
   }
 
   .count {
-    @apply invisible text-right text-sm font-medium text-io-content-primary group-focus-within:visible;
+    @apply invisible text-right text-sm font-medium text-primary group-focus-within:visible;
   }
 
   .count > .warn {
-    @apply text-io-content-warning;
+    @apply text-warning;
   }
 
   .count > .error {
-    @apply text-io-content-danger;
+    @apply text-danger;
   }
 </style>

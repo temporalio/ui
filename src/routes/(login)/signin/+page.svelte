@@ -19,7 +19,7 @@
 
 <PageTitle title="Sign In" url={page.url.href} />
 <header
-  class="flex h-16 w-full items-center justify-between bg-io-surface-primary px-10"
+  class="flex h-16 w-full items-center justify-between bg-surface-primary px-10"
 >
   <img src={Logo} alt="" class="max-h-10" />
   <FeedbackButton />
@@ -49,9 +49,7 @@
 
   {#if error}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
-      <p
-        class="border border-io-border-error bg-io-surface-error p-5 text-center"
-      >
+      <p class="border border-error bg-surface-error p-5 text-center">
         {error}
       </p>
     </div>

@@ -3,7 +3,7 @@
 
   const comboboxStyles = cva(
     [
-      'bg-io-interactive-secondary',
+      'bg-interactive-secondary',
       'flex',
       'max-h-28',
       'min-h-10',
@@ -13,18 +13,18 @@
       'overflow-auto',
       'border',
       'text-sm',
-      'text-io-content-primary',
+      'text-primary',
       'focus-within:outline-none',
       'focus-within:ring-2',
-      'focus-within:ring-io-interactive-primary',
+      'focus-within:ring-interactive-primary',
     ],
     {
       variants: {
         variant: {
           default:
-            'border-io-border-tertiary hover:border-io-border-brand focus-within:border-io-border-secondary',
+            'border-tertiary hover:border-brand focus-within:border-secondary',
           ghost:
-            'border-transparent bg-transparent hover:bg-io-actions-hover-overlay focus-within:border-transparent focus-within:bg-transparent focus-within:ring-transparent',
+            'border-transparent bg-transparent hover:bg-action-hover-overlay focus-within:border-transparent focus-within:bg-transparent focus-within:ring-transparent',
         },
       },
       defaultVariants: {
@@ -515,13 +515,11 @@
         comboboxStyles({ variant }),
         !valid &&
           variant === 'default' &&
-          'border border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger hover:border-io-border-danger',
+          'border border-danger focus-within:border-danger focus-within:ring-danger hover:border-danger',
         disabled &&
           variant === 'default' &&
-          'border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary hover:border-io-border-secondary',
-        disabled &&
-          variant === 'ghost' &&
-          'text-io-content-tertiary hover:bg-transparent',
+          'border-secondary bg-surface-tertiary text-tertiary hover:border-secondary',
+        disabled && variant === 'ghost' && 'text-tertiary hover:bg-transparent',
         className,
       )}
     >
@@ -591,9 +589,7 @@
         />
       </div>
       {#if action}
-        <div
-          class="ml-1 flex h-full items-start border-l border-io-border-primary p-0.5"
-        >
+        <div class="ml-1 flex h-full items-start border-l border-primary p-0.5">
           {#if actionTooltip}
             <Tooltip text={actionTooltip} right>
               {@render action()}
@@ -604,7 +600,7 @@
         </div>
       {:else if href}
         <div
-          class="ml-1 flex h-full items-center border-l border-io-border-primary p-0.5"
+          class="ml-1 flex h-full items-center border-l border-primary p-0.5"
         >
           {#if actionTooltip}
             <Tooltip
@@ -635,7 +631,7 @@
       {#if showChevron}
         <button
           type="button"
-          class="flex h-full items-center rounded pr-2 hover:bg-io-actions-hover-overlay focus:outline-none"
+          class="flex h-full items-center rounded pr-2 hover:bg-action-hover-overlay focus:outline-none"
           onclick={handleChevronClick}
           aria-label={$open ? 'Close options' : 'Open options'}
           tabindex="-1"
@@ -727,10 +723,10 @@
 
 <style lang="postcss">
   .hint-text {
-    @apply text-xs text-io-content-primary;
+    @apply text-xs text-primary;
 
     &.error {
-      @apply text-io-content-danger;
+      @apply text-danger;
     }
   }
 
@@ -739,6 +735,6 @@
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-io-content-primary placeholder:text-io-content-tertiary focus:outline-none disabled:text-io-content-tertiary;
+    @apply flex grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 </style>

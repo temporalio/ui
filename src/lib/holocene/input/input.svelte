@@ -121,12 +121,11 @@
     <div
       class={merge(
         'input-container',
-        'relative box-border inline-flex h-10 w-full items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
+        'relative box-border inline-flex h-10 w-full items-center border border-tertiary bg-interactive-secondary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
         !isDisabled &&
           !showError &&
-          'focus-within:border-io-border-secondary hover:border-io-border-brand focus-within:hover:border-io-border-secondary',
-        isDisabled &&
-          'border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
+          'focus-within:border-secondary hover:border-brand focus-within:hover:border-secondary',
+        isDisabled && 'border-secondary bg-surface-tertiary text-tertiary',
         inputContainerClass,
       )}
       class:disabled={isDisabled}
@@ -228,9 +227,9 @@
       >
         <span
           class={merge(
-            maxLength - value?.length > 5 && 'text-io-content-success',
-            maxLength - value?.length <= 5 && 'text-io-content-warning',
-            maxLength === value?.length && 'text-io-content-danger',
+            maxLength - value?.length > 5 && 'text-success',
+            maxLength - value?.length <= 5 && 'text-warning',
+            maxLength === value?.length && 'text-danger',
           )}
         >
           {value?.length ?? 0}
@@ -245,20 +244,20 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger;
+      @apply border-danger focus-within:border-danger focus-within:ring-danger;
     }
   }
 
   .input {
-    @apply m-2 h-full w-full bg-transparent text-io-content-primary placeholder:text-io-content-tertiary focus:outline-none disabled:text-io-content-tertiary;
+    @apply m-2 h-full w-full bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-io-border-primary px-4 py-2 text-io-content-secondary;
+    @apply block h-full w-fit border-r border-primary px-4 py-2 text-secondary;
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-io-border-primary bg-io-surface-tertiary px-4 py-2;
+    @apply block h-full w-fit border-l border-primary bg-surface-tertiary px-4 py-2;
   }
 
   .noBorder {
@@ -270,7 +269,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-io-border-primary;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-primary;
   }
 
   .disabled-icon-container {
@@ -282,11 +281,11 @@
   }
 
   .hint-text {
-    @apply text-xs text-io-content-primary;
+    @apply text-xs text-primary;
 
     &.error,
     &.invalid {
-      @apply text-io-content-danger;
+      @apply text-danger;
     }
   }
 

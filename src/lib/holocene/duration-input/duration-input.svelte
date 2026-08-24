@@ -186,26 +186,24 @@
     {@render afterLabel?.()}
   </div>
   {#if hintTextAbove}
-    <p class="text-xs text-io-content-secondary">
+    <p class="text-xs text-secondary">
       {hintTextAbove}
     </p>
   {/if}
   <div
     class={twMerge(
-      'flex h-10 items-center border border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
-      !disabled &&
-        !error &&
-        'focus-within:border-io-border-secondary hover:border-io-border-brand',
+      'flex h-10 items-center border border-tertiary bg-interactive-secondary text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      !disabled && !error && 'focus-within:border-secondary hover:border-brand',
       disabled &&
-        'cursor-not-allowed border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
+        'cursor-not-allowed border-secondary bg-surface-tertiary text-tertiary',
       error &&
-        'border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger',
+        'border-danger focus-within:border-danger focus-within:ring-danger',
       inputClass,
     )}
   >
     <input
       {id}
-      class="flex h-full grow border-r border-io-border-primary bg-transparent p-2 text-io-content-primary placeholder:text-io-content-tertiary focus-visible:outline-none disabled:cursor-not-allowed disabled:text-io-content-tertiary"
+      class="flex h-full grow border-r border-primary bg-transparent p-2 text-primary placeholder:text-tertiary focus-visible:outline-none disabled:cursor-not-allowed disabled:text-tertiary"
       type="number"
       {disabled}
       bind:value={rawValue}
@@ -215,8 +213,8 @@
     <select
       id="{id}-unit-select"
       class={twMerge(
-        'h-full bg-io-surface-secondary pl-2 text-io-content-primary focus-visible:outline-none disabled:cursor-not-allowed',
-        disabled && 'bg-io-surface-tertiary text-io-content-tertiary',
+        'h-full bg-surface-secondary pl-2 text-primary focus-visible:outline-none disabled:cursor-not-allowed',
+        disabled && 'bg-surface-tertiary text-tertiary',
       )}
       {disabled}
       bind:value={unit}
@@ -228,12 +226,7 @@
     </select>
   </div>
   {#if hintText}
-    <p
-      class={twMerge(
-        'text-xs text-io-content-secondary',
-        error && 'text-io-content-danger',
-      )}
-    >
+    <p class={twMerge('text-xs text-secondary', error && 'text-danger')}>
       {hintText}
     </p>
   {/if}

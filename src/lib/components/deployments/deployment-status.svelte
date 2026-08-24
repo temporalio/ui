@@ -40,18 +40,18 @@
 
   const deploymentStatus = cva(
     [
-      'flex items-center justify-center gap-1 px-1 min-w-24 transition-colors border border-io-border-primary',
+      'flex items-center justify-center gap-1 px-1 min-w-24 transition-colors border border-primary',
     ],
     {
       variants: {
         status: {
-          Latest: 'text-io-content-secondary',
-          Ramping: 'text-io-content-brand',
-          Current: 'text-io-content-information',
-          Draining: 'text-io-content-warning',
-          Drained: 'text-io-content-secondary',
-          Inactive: 'text-io-content-secondary',
-          Created: 'text-io-content-secondary',
+          Latest: 'text-secondary',
+          Ramping: 'text-brand',
+          Current: 'text-information',
+          Draining: 'text-warning',
+          Drained: 'text-secondary',
+          Inactive: 'text-secondary',
+          Created: 'text-secondary',
         },
       },
     },

@@ -30,7 +30,7 @@
   >
     <div
       id="event-view-toggle"
-      class="flex gap-4 bg-io-surface-primary text-io-content-primary"
+      class="flex gap-4 bg-surface-primary text-primary"
     >
       <ToggleButtons>
         <ToggleButton

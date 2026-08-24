@@ -32,10 +32,7 @@
 
 {#snippet template(args: ComponentProps<typeof Link>)}
   <div
-    class={twMerge(
-      'p-4',
-      args.light ? 'bg-io-neutral-12' : 'bg-io-surface-primary',
-    )}
+    class={twMerge('p-4', args.light ? 'bg-neutral-12' : 'bg-surface-primary')}
   >
     <Link {...args}>This is a link.</Link>
   </div>

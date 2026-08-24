@@ -15,7 +15,7 @@
   } = $props();
 </script>
 
-<tr class="bg-io-surface-primary">
+<tr class="bg-surface-primary">
   <td colspan={$isCloud ? 5 : 4}>
     {#if loading}
       <Loading />

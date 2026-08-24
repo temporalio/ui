@@ -8,18 +8,12 @@
 
 <div class="mt-2 transition-all hover:cursor-pointer">
   <button class="flex items-center" onclick={() => (conditional = '=')}>
-    <div
-      class="ml-4 mr-2 p-1 text-io-content-primary"
-      class:active={conditional === '='}
-    >
+    <div class="ml-4 mr-2 p-1 text-primary" class:active={conditional === '='}>
       Is
     </div>
   </button>
   <button class="flex items-center" onclick={() => (conditional = '!=')}>
-    <div
-      class="ml-4 mr-2 p-1 text-io-content-primary"
-      class:active={conditional === '!='}
-    >
+    <div class="ml-4 mr-2 p-1 text-primary" class:active={conditional === '!='}>
       Is Not
     </div>
   </button>
@@ -27,6 +21,6 @@
 
 <style lang="postcss">
   .active {
-    @apply bg-io-interactive-primary text-io-content-white;
+    @apply bg-interactive-primary text-white;
   }
 </style>

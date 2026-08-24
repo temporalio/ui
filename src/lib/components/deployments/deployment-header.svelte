@@ -56,7 +56,7 @@
       {translate('deployments.back-to-deployments')}
     </Link>
     {#if showInstancesLink}
-      <span class="text-io-content-secondary">|</span>
+      <span class="text-secondary">|</span>
       <Link href={instancesHref}>
         {translate('deployments.go-to-instances')}
       </Link>

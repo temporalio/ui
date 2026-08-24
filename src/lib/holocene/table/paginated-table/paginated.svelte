@@ -148,13 +148,13 @@
     <div class="hidden items-center gap-2 md:flex">
       {#each $store.pageShortcuts as pageShortcut}
         {#if isNaN(pageShortcut)}
-          <span class="text-io-content-primary">...</span>
+          <span class="text-primary">...</span>
         {:else}
           <Button
             variant="ghost"
             size="sm"
             class={pageShortcut === $store.currentPage
-              ? 'bg-io-actions-press-overlay'
+              ? 'bg-action-press-overlay'
               : ''}
             aria-label={pageButtonLabel(pageShortcut)}
             onclick={() => handlePageChange(pageShortcut)}

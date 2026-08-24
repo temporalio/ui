@@ -58,9 +58,9 @@
   };
 </script>
 
-<div class="flex flex-col bg-io-surface-primary">
+<div class="flex flex-col bg-surface-primary">
   <div
-    class="relative z-10 w-full overflow-hidden border-b border-io-border-primary bg-io-surface-primary lg:sticky lg:top-[var(--top-nav-height)]"
+    class="relative z-10 w-full overflow-hidden border-b border-primary bg-surface-primary lg:sticky lg:top-[var(--top-nav-height)]"
   >
     <ZoomSvg
       initialZoom={2}
@@ -96,7 +96,7 @@
     </ZoomSvg>
   </div>
   <div
-    class="flex h-auto w-full flex-col overflow-auto bg-io-surface-secondary text-base text-io-content-primary"
+    class="flex h-auto w-full flex-col overflow-auto bg-surface-secondary text-base text-primary"
   >
     <WorkflowFamilyNodeDescription
       {root}

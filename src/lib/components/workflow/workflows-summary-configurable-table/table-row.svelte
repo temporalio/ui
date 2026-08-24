@@ -128,6 +128,6 @@
 
 <style lang="postcss">
   .child {
-    @apply bg-io-surface-secondary;
+    @apply bg-surface-secondary;
   }
 </style>

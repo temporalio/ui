@@ -48,7 +48,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 <div class="flex gap-4 max-sm:flex-col">
-  <div class="flex w-full gap-4 bg-io-surface-tertiary">
+  <div class="flex w-full gap-4 bg-surface-tertiary">
     <RangeInput
       label={translate('common.event')}
       labelHidden
@@ -68,8 +68,8 @@
       >
         <span
           class="arrow arrow-left border-b-transparent border-t-transparent"
-          class:border-r-io-content-primary={index !== 1}
-          class:border-r-io-content-tertiary={index === 1}
+          class:border-r-content-primary={index !== 1}
+          class:border-r-content-tertiary={index === 1}
         ></span>
       </button>
       <button
@@ -82,8 +82,8 @@
       >
         <span
           class="arrow arrow-right border-b-transparent border-t-transparent"
-          class:border-l-io-content-tertiary={index === events.length}
-          class:border-l-io-content-primary={index !== events.length}
+          class:border-l-content-tertiary={index === events.length}
+          class:border-l-content-primary={index !== events.length}
         ></span>
       </button>
     </div>
@@ -119,7 +119,7 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-io-content-tertiary;
+    @apply cursor-not-allowed text-tertiary;
   }
 
   .arrow {

@@ -88,23 +88,23 @@
 
 <style lang="postcss">
   .alert {
-    @apply items-start gap-2 break-words border p-5 text-sm text-io-content-primary;
+    @apply items-start gap-2 break-words border p-5 text-sm text-primary;
   }
 
   .alert.success {
-    @apply border-io-border-success bg-io-surface-success;
+    @apply border-success bg-surface-success;
   }
 
   .alert.info {
-    @apply border-io-border-information bg-io-surface-information;
+    @apply border-information bg-surface-information;
   }
 
   .alert.error {
-    @apply border-io-border-danger bg-io-surface-danger;
+    @apply border-danger bg-surface-danger;
   }
 
   .alert.warning {
-    @apply border-io-border-warning bg-io-surface-warning;
+    @apply border-warning bg-surface-warning;
   }
 
   .content :global(> *) {

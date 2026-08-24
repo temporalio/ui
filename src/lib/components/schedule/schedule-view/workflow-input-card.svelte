@@ -12,10 +12,7 @@
   let { input, scheduleId }: Props = $props();
 </script>
 
-<Panel
-  class="flex w-full flex-col gap-4 border-io-border-primary p-6"
-  as="section"
->
+<Panel class="flex w-full flex-col gap-4 border-primary p-6" as="section">
   <InputAndResultsPayload
     title={translate('schedules.workflow-input')}
     content={input}

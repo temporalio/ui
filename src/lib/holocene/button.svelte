@@ -25,9 +25,9 @@
       'transition-shadow',
       'focus-visible:outline-none',
       'focus-visible:ring-2',
-      'focus-visible:ring-io-interactive-primary',
+      'focus-visible:ring-interactive-primary',
       'focus-visible:ring-offset-2',
-      'focus-visible:ring-offset-io-background-primary',
+      'focus-visible:ring-offset-background-primary',
       'whitespace-nowrap',
       'no-underline',
       'active:scale-[0.98]',
@@ -37,15 +37,15 @@
       variants: {
         variant: {
           primary:
-            'border-transparent bg-io-interactive-primary text-io-content-white hover:bg-io-interactive-primary-hover active:bg-io-interactive-primary-press focus-visible:bg-io-interactive-primary-hover data-[active=true]:bg-io-interactive-secondary-press data-[active=true]:text-io-content-primary',
+            'border-transparent bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press focus-visible:bg-interactive-primary-hover data-[active=true]:bg-interactive-secondary-press data-[active=true]:text-primary',
           secondary:
-            'border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary hover:bg-io-actions-hover-overlay active:bg-io-actions-press-overlay focus-visible:bg-io-interactive-secondary data-[active=true]:bg-io-actions-press-overlay',
+            'border-tertiary bg-interactive-secondary text-primary hover:bg-action-hover-overlay active:bg-action-press-overlay focus-visible:bg-interactive-secondary data-[active=true]:bg-action-press-overlay',
           destructive:
-            'border-transparent bg-io-interactive-danger text-io-content-white hover:bg-io-interactive-danger-hover active:bg-io-interactive-danger-press focus-visible:bg-io-interactive-danger data-[active=true]:bg-io-interactive-danger-press',
+            'border-transparent bg-interactive-danger text-white hover:bg-interactive-danger-hover active:bg-interactive-danger-press focus-visible:bg-interactive-danger data-[active=true]:bg-interactive-danger-press',
           ghost:
-            'border-transparent bg-transparent text-io-content-secondary hover:bg-io-actions-hover-overlay active:bg-io-actions-press-overlay focus-visible:bg-io-interactive-secondary data-[active=true]:bg-io-actions-press-overlay data-[active=true]:text-io-content-primary',
+            'border-transparent bg-transparent text-secondary hover:bg-action-hover-overlay active:bg-action-press-overlay focus-visible:bg-interactive-secondary data-[active=true]:bg-action-press-overlay data-[active=true]:text-primary',
           'table-header':
-            'border-transparent bg-transparent text-io-content-primary focus-visible:border-transparent',
+            'border-transparent bg-transparent text-primary focus-visible:border-transparent',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',

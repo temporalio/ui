@@ -56,9 +56,9 @@
   />
   <span
     class={merge(
-      'not-sr-only flex h-5 w-9 items-center rounded-xl border border-io-border-tertiary bg-io-interactive-secondary p-px text-io-content-primary peer-checked:justify-end peer-checked:border-io-interactive-primary peer-checked:bg-io-interactive-primary peer-checked:text-io-content-white',
+      'not-sr-only flex h-5 w-9 items-center rounded-xl border border-tertiary bg-interactive-secondary p-px text-primary peer-checked:justify-end peer-checked:border-interactive-primary peer-checked:bg-interactive-primary peer-checked:text-white',
       !disabled &&
-        'group-hover:border-io-border-brand group-hover:bg-io-actions-hover-overlay group-active:bg-io-actions-press-overlay group-hover:peer-checked:border-io-interactive-primary-hover group-hover:peer-checked:bg-io-interactive-primary-hover group-active:peer-checked:border-io-interactive-primary-press group-active:peer-checked:bg-io-interactive-primary-press peer-focus-visible:ring-2 peer-focus-visible:ring-io-interactive-primary',
+        'group-hover:border-brand group-hover:bg-action-hover-overlay group-active:bg-action-press-overlay group-hover:peer-checked:border-interactive-primary-hover group-hover:peer-checked:bg-interactive-primary-hover group-active:peer-checked:border-interactive-primary-press group-active:peer-checked:bg-interactive-primary-press peer-focus-visible:ring-2 peer-focus-visible:ring-interactive-primary',
     )}
   >
     <span class="h-4 w-4 rounded-[50%] bg-current"></span>

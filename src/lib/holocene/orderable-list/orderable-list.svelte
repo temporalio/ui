@@ -30,6 +30,6 @@
   }
 
   .orderable-list {
-    @apply border border-io-border-primary bg-io-background-primary text-io-content-primary;
+    @apply border border-primary bg-background-primary text-primary;
   }
 </style>

@@ -202,30 +202,30 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer border border-transparent text-sm text-io-content-primary focus-visible:border-io-interactive-primary focus-visible:bg-io-interactive-primary focus-visible:text-io-content-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary active:bg-io-interactive-primary-press active:text-io-content-white;
+    @apply cursor-pointer border border-transparent text-sm text-primary focus-visible:border-interactive-primary focus-visible:bg-interactive-primary focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-interactive-primary-press active:text-white;
 
     &.active {
-      @apply bg-io-interactive-primary text-io-content-white;
+      @apply bg-interactive-primary text-white;
     }
 
     &.hoverable {
-      @apply hover:bg-io-interactive-primary hover:text-io-content-white;
+      @apply hover:bg-interactive-primary hover:text-white;
     }
 
     &.destructive {
-      @apply text-io-content-danger focus-visible:border-io-interactive-danger focus-visible:bg-io-interactive-danger focus-visible:text-io-content-white focus-visible:ring-io-interactive-danger active:bg-io-interactive-danger-press active:text-io-content-white;
+      @apply text-danger focus-visible:border-interactive-danger focus-visible:bg-interactive-danger focus-visible:text-white focus-visible:ring-interactive-danger active:bg-interactive-danger-press active:text-white;
 
       &.active {
-        @apply bg-io-interactive-danger text-io-content-white;
+        @apply bg-interactive-danger text-white;
       }
 
       &.hoverable {
-        @apply hover:bg-io-interactive-danger-hover hover:text-io-content-white;
+        @apply hover:bg-interactive-danger-hover hover:text-white;
       }
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed text-io-content-tertiary opacity-50;
+      @apply pointer-events-none cursor-not-allowed text-tertiary opacity-50;
     }
   }
 
@@ -238,12 +238,12 @@
   }
 
   .menu-item-description {
-    @apply mr-6 text-xs font-normal text-io-content-secondary;
+    @apply mr-6 text-xs font-normal text-secondary;
   }
 
   .menu-item.active .menu-item-description,
   .menu-item.hoverable:hover .menu-item-description,
   .menu-item:focus-visible .menu-item-description {
-    @apply text-io-content-white;
+    @apply text-white;
   }
 </style>

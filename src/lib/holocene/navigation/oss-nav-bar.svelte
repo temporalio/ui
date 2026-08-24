@@ -49,7 +49,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-2 flex items-center justify-center opacity-0 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:p-2"
+    class="mx-2 flex items-center justify-center opacity-0 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:p-2"
     onclick={ontoggle}
   >
     <IconArrowsLeftRightToLine />
@@ -65,7 +65,7 @@
     {@render bottom()}
   {/if}
   <div
-    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-io-content-inverse-secondary"
+    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-inverse-secondary"
   >
     <span class="sr-only">{translate('common.version')}</span>
     {version}

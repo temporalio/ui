@@ -24,18 +24,12 @@
   };
 
   const stateColors: Record<PendingActivityState, string> = {
-    PENDING_ACTIVITY_STATE_UNSPECIFIED:
-      'bg-io-surface-primary text-io-content-secondary',
-    PENDING_ACTIVITY_STATE_SCHEDULED:
-      'bg-io-surface-information text-io-content-information',
-    PENDING_ACTIVITY_STATE_STARTED:
-      'bg-io-surface-information text-io-content-information',
-    PENDING_ACTIVITY_STATE_CANCEL_REQUESTED:
-      'bg-io-surface-warning text-io-content-warning',
-    PENDING_ACTIVITY_STATE_PAUSED:
-      'bg-io-surface-warning text-io-content-warning',
-    PENDING_ACTIVITY_STATE_PAUSE_REQUESTED:
-      'bg-io-surface-warning text-io-content-warning',
+    PENDING_ACTIVITY_STATE_UNSPECIFIED: 'bg-surface-primary text-secondary',
+    PENDING_ACTIVITY_STATE_SCHEDULED: 'bg-surface-information text-information',
+    PENDING_ACTIVITY_STATE_STARTED: 'bg-surface-information text-information',
+    PENDING_ACTIVITY_STATE_CANCEL_REQUESTED: 'bg-surface-warning text-warning',
+    PENDING_ACTIVITY_STATE_PAUSED: 'bg-surface-warning text-warning',
+    PENDING_ACTIVITY_STATE_PAUSE_REQUESTED: 'bg-surface-warning text-warning',
   };
 
   let { runState, class: className, ...rest }: Props = $props();

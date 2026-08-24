@@ -53,10 +53,10 @@
 
 <style lang="postcss">
   .holocene-table {
-    @apply table-auto bg-io-background-primary text-io-content-primary;
+    @apply table-auto bg-background-primary text-primary;
 
     &.bordered {
-      @apply border border-io-border-primary;
+      @apply border border-primary;
     }
 
     &.layout-auto {
@@ -84,25 +84,25 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply bg-io-surface-table-header text-io-content-primary;
+      @apply bg-surface-table-header text-primary;
     }
 
     :global(tr > th) {
-      @apply h-9 border-b border-io-border-primary px-2 text-left text-sm font-medium;
+      @apply h-9 border-b border-primary px-2 text-left text-sm font-medium;
     }
   }
 
   :where(.holocene-table-body) {
     :global(tr) {
-      @apply border-b border-io-border-primary last-of-type:border-0 hover:bg-io-interactive-secondary-hover hover:bg-fixed;
+      @apply border-b border-primary last-of-type:border-0 hover:bg-interactive-secondary-hover hover:bg-fixed;
     }
 
     :global(tr.expanded) {
-      @apply w-full hover:bg-io-surface-primary;
+      @apply w-full hover:bg-surface-primary;
     }
 
     :global(tr:nth-of-type(odd)) {
-      @apply bg-io-background-primary text-io-content-primary;
+      @apply bg-background-primary text-primary;
     }
 
     :global(tr > td) {
@@ -110,11 +110,11 @@
     }
 
     :global(tr > td > .table-link) {
-      @apply hover:text-io-content-brand hover:underline hover:decoration-io-content-brand;
+      @apply hover:text-brand hover:underline hover:decoration-brand;
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-io-border-primary last-of-type:border-0 hover:bg-io-interactive-secondary-hover hover:bg-fixed;
+      @apply h-8 border-b border-primary last-of-type:border-0 hover:bg-interactive-secondary-hover hover:bg-fixed;
     }
   }
 </style>

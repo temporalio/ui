@@ -22,7 +22,7 @@
 <div
   {id}
   class:hidden={!active}
-  class:text-io-content-primary={active}
+  class:text-primary={active}
   aria-labelledby={tabId}
   tabindex="0"
   role="tabpanel"

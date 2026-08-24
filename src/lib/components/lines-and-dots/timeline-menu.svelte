@@ -2,13 +2,13 @@
   import { cva } from 'class-variance-authority';
 
   const sharedMenuStyles = [
-    'bg-io-surface-primary',
+    'bg-surface-primary',
     'min-w-fit',
     'list-none',
     'overflow-auto',
     'border',
-    'border-io-border-primary',
-    'text-io-content-primary',
+    'border-primary',
+    'text-primary',
     'shadow',
     'w-full',
   ];

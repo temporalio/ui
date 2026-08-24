@@ -5,16 +5,16 @@
   const groupHover = cva(['h-full w-full border-2'], {
     variants: {
       category: {
-        workflow: 'border-io-blue-11 bg-io-indigo-11/80',
-        activity: 'border-io-slate-blue-10 bg-io-slate-blue-10/80',
-        'child-workflow': 'border-io-peacock-blue-9 bg-io-peacock-blue-9/80',
-        timer: 'border-io-amber-11 bg-io-amber-11/80',
-        signal: 'border-io-pink-10 bg-io-dark-magenta-9/80',
-        update: 'border-io-blue-11 bg-io-indigo-11/80',
-        other: 'border-io-neutral-5 bg-io-indigo-12/80',
-        nexus: 'border-io-indigo-10 bg-io-slate-blue-11/80',
-        'local-activity': 'border-io-neutral-5 bg-io-indigo-12/80',
-        default: 'border-io-slate-blue-10 bg-io-slate-blue-11/80',
+        workflow: 'border-blue-11 bg-indigo-11/80',
+        activity: 'border-slate-blue-10 bg-slate-blue-10/80',
+        'child-workflow': 'border-peacock-blue-9 bg-peacock-blue-9/80',
+        timer: 'border-amber-11 bg-amber-11/80',
+        signal: 'border-pink-10 bg-dark-magenta-9/80',
+        update: 'border-blue-11 bg-indigo-11/80',
+        other: 'border-neutral-5 bg-indigo-12/80',
+        nexus: 'border-indigo-10 bg-slate-blue-11/80',
+        'local-activity': 'border-neutral-5 bg-indigo-12/80',
+        default: 'border-slate-blue-10 bg-slate-blue-11/80',
       },
     },
   });
@@ -231,7 +231,7 @@
   >
     {#if icon}
       <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-io-content-black"
+        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
         viewBox="0 0 16 16"
       >
         <use href="#ti-{icon}" />
@@ -321,7 +321,7 @@
             </svg>
           {/if}
           <span
-            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-io-surface-primary px-1.5 text-current"
+            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-surface-primary px-1.5 text-current"
           >
             {#if pendingActivity}
               {translate('workflows.attempt')}

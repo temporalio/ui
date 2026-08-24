@@ -108,8 +108,7 @@
         {#if event.attempt}
           <Badge class="mx-1" type={event.attempt > 1 ? 'danger' : 'default'}>
             <IconRetry
-              class="mr-1 inline {event.attempt > 1 &&
-                'font-bold text-io-content-danger'}"
+              class="mr-1 inline {event.attempt > 1 && 'font-bold text-danger'}"
             />
             {translate('workflows.attempt')}
             {event.attempt}

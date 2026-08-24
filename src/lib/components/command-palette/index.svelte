@@ -303,36 +303,36 @@
 </script>
 
 {#snippet keyboardShortcuts()}
-  <div class="flex gap-4 text-xs text-io-content-secondary">
+  <div class="flex gap-4 text-xs text-secondary">
     <span class="flex items-center gap-1.5">
       {#if ActiveComponent}
         <kbd
-          class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
+          class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
           >←</kbd
         >
       {/if}
       <kbd
-        class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
+        class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
         >↑</kbd
       ><kbd
-        class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
+        class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
         >↓</kbd
       >
-      <span class="text-io-content-tertiary">navigate</span>
+      <span class="text-tertiary">navigate</span>
     </span>
     <span class="flex items-center gap-1.5">
       <kbd
-        class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
+        class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
         >⏎</kbd
       >
-      <span class="text-io-content-tertiary">select</span>
+      <span class="text-tertiary">select</span>
     </span>
     <span class="flex items-center gap-1.5">
       <kbd
-        class="rounded border border-io-border-tertiary bg-io-surface-tertiary px-2 py-1 font-mono text-xs text-io-content-primary"
+        class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
         >Esc</kbd
       >
-      <span class="text-io-content-tertiary">close</span>
+      <span class="text-tertiary">close</span>
     </span>
   </div>
 {/snippet}
@@ -341,7 +341,7 @@
   {#each filteredCommands as command, index (command.id)}
     <button
       type="button"
-      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-io-actions-hover-overlay hover:shadow-sm"
+      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-action-hover-overlay hover:shadow-sm"
       class:selected={index === selectedIndex}
       onclick={() => handleCommandClick(command)}
       onmouseenter={() => (selectedIndex = index)}
@@ -351,16 +351,16 @@
       <div class="flex items-center gap-4">
         {#if command.Icon}
           {@const CommandIcon = command.Icon}
-          <div class="h-6 w-6 flex-shrink-0 text-io-content-secondary">
+          <div class="h-6 w-6 flex-shrink-0 text-secondary">
             <CommandIcon />
           </div>
         {/if}
         <div class="flex flex-col gap-1">
-          <div class="text-lg font-semibold text-io-content-secondary">
+          <div class="text-lg font-semibold text-secondary">
             {command.title}
           </div>
           {#if command.subtitle}
-            <div class="text-sm text-io-content-secondary">
+            <div class="text-sm text-secondary">
               {command.subtitle}
             </div>
           {/if}
@@ -368,7 +368,7 @@
       </div>
       {#if command.category}
         <div
-          class="rounded-full bg-io-surface-tertiary px-3 py-1.5 text-xs font-medium text-io-content-secondary"
+          class="rounded-full bg-surface-tertiary px-3 py-1.5 text-xs font-medium text-secondary"
         >
           {command.category}
         </div>
@@ -376,11 +376,11 @@
     </button>
   {:else}
     <div
-      class="flex min-h-96 flex-col items-center justify-center py-12 text-io-content-secondary"
+      class="flex min-h-96 flex-col items-center justify-center py-12 text-secondary"
     >
       <IconSearch />
-      <h3 class="mt-2 text-io-content-secondary">No commands found</h3>
-      <p class="mt-2 text-io-content-secondary">Try a different search term</p>
+      <h3 class="mt-2 text-secondary">No commands found</h3>
+      <p class="mt-2 text-secondary">Try a different search term</p>
     </div>
   {/each}
 {/snippet}
@@ -396,13 +396,13 @@
   {#snippet content()}
     <div class="flex h-full flex-1 flex-col">
       <div
-        class="sticky top-0 z-20 border-b border-io-border-primary bg-io-surface-primary pb-4 pt-2"
+        class="sticky top-0 z-20 border-b border-primary bg-surface-primary pb-4 pt-2"
       >
         <div class="flex items-center justify-between px-6 py-3">
           <div
-            class="flex items-center gap-3 text-lg font-semibold text-io-content-primary"
+            class="flex items-center gap-3 text-lg font-semibold text-primary"
           >
-            <div class="h-5 w-5 text-io-content-brand">
+            <div class="h-5 w-5 text-brand">
               <IconSearch />
             </div>
             Command Palette
@@ -412,7 +412,7 @@
             <button
               type="button"
               onclick={close}
-              class="flex h-8 w-8 items-center justify-center rounded-full text-io-content-tertiary transition-colors hover:bg-io-actions-hover-overlay hover:text-io-content-secondary"
+              class="flex h-8 w-8 items-center justify-center rounded-full text-tertiary transition-colors hover:bg-action-hover-overlay hover:text-secondary"
               aria-label="Close"
             >
               <IconClose class="h-4 w-4" />
@@ -449,11 +449,11 @@
 
 <style lang="postcss">
   .selected {
-    @apply border-io-border-brand bg-io-surface-brand shadow-sm;
+    @apply border-brand bg-surface-brand shadow-sm;
   }
 
   :global(.body::backdrop) {
-    @apply bg-io-overlay-backdrop;
+    @apply bg-overlay-backdrop;
 
     backdrop-filter: blur(4px);
     opacity: 0;

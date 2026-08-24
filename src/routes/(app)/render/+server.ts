@@ -19,14 +19,14 @@ type RenderOptions = {
 type ThemeMode = 'light' | 'dark';
 
 const markdownColorVariables = (mode: ThemeMode) => ({
-  '--color-io-background-primary': semanticColors.background.primary[mode],
-  '--color-io-content-brand': semanticColors.content.brand[mode],
-  '--color-io-content-code-block': semanticColors.content['code-block'][mode],
-  '--color-io-content-primary': semanticColors.content.primary[mode],
-  '--color-io-border-brand': semanticColors.border.brand[mode],
-  '--color-io-border-secondary': semanticColors.border.secondary[mode],
-  '--color-io-surface-code-block': semanticColors.surface['code-block'][mode],
-  '--color-io-surface-primary': semanticColors.surface.primary[mode],
+  '--color-background-primary': semanticColors.background.primary[mode],
+  '--color-content-brand': semanticColors.content.brand[mode],
+  '--color-content-code-block': semanticColors.content['code-block'][mode],
+  '--color-content-primary': semanticColors.content.primary[mode],
+  '--color-border-brand': semanticColors.border.brand[mode],
+  '--color-border-secondary': semanticColors.border.secondary[mode],
+  '--color-surface-code-block': semanticColors.surface['code-block'][mode],
+  '--color-surface-primary': semanticColors.surface.primary[mode],
 });
 
 const markdownColorRule = (selector: string, mode: ThemeMode): string => {

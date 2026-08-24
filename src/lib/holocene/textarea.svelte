@@ -38,7 +38,7 @@
     required = false,
     description = '',
     maxLength = 0,
-    class: className = 'text-io-content-primary',
+    class: className = 'text-primary',
     onkeydown,
     errorSnippet,
     ...rest
@@ -61,20 +61,19 @@
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full border border-io-border-tertiary focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
+      'relative box-border inline-flex w-full border border-tertiary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
       !disabled &&
         isValid &&
-        'focus-within:border-io-border-secondary hover:border-io-border-brand',
-      disabled && 'border-io-border-secondary',
+        'focus-within:border-secondary hover:border-brand',
+      disabled && 'border-secondary',
       !isValid && 'error',
     )}
   >
     <textarea
       bind:value
       class={merge(
-        'min-h-fit w-full bg-io-interactive-secondary px-3 py-2 text-sm text-io-content-primary placeholder:text-io-content-tertiary focus-visible:outline-none',
-        disabled &&
-          'cursor-not-allowed bg-io-surface-tertiary text-io-content-tertiary',
+        'min-h-fit w-full bg-interactive-secondary px-3 py-2 text-sm text-primary placeholder:text-tertiary focus-visible:outline-none',
+        disabled && 'cursor-not-allowed bg-surface-tertiary text-tertiary',
       )}
       {id}
       {disabled}
@@ -107,7 +106,7 @@
     {#if maxLength && !disabled}
       <span class="count">
         <span
-          class="text-io-content-information"
+          class="text-information"
           class:warn={maxLength - value?.length <= 5}
           class:error={maxLength === value?.length}>{value?.length ?? 0}</span
         >&nbsp;/&nbsp;{maxLength}
@@ -118,11 +117,11 @@
 
 <style lang="postcss">
   .error {
-    @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger;
+    @apply border-danger focus-within:border-danger focus-within:ring-danger;
   }
 
   .error-msg {
-    @apply min-h-[1.25rem] break-words border-io-border-danger text-xs text-io-content-danger;
+    @apply min-h-[1.25rem] break-words border-danger text-xs text-danger;
   }
 
   .error-msg.min-width {
@@ -130,14 +129,14 @@
   }
 
   .count {
-    @apply invisible text-right text-xs text-io-content-primary group-focus-within:visible;
+    @apply invisible text-right text-xs text-primary group-focus-within:visible;
   }
 
   .count > .warn {
-    @apply text-io-content-warning;
+    @apply text-warning;
   }
 
   .count > .error {
-    @apply text-io-content-danger;
+    @apply text-danger;
   }
 </style>

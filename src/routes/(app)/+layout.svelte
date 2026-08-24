@@ -427,7 +427,7 @@
             'https://support.temporal.io'}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center hover:text-io-content-white"
+          class="flex items-center hover:text-white"
           aria-label="Support"
         >
           <IconSupport />
@@ -455,7 +455,7 @@
             />
           {/each}
 
-          <hr class="border-io-border-primary" />
+          <hr class="border-primary" />
 
           {#each [...linkList]
             .filter((item) => !item.hidden)

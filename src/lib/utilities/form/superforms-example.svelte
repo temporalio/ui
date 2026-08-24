@@ -215,11 +215,10 @@
           name="description"
           id="description"
           rows="4"
-          class="w-full rounded-md border border-io-border-primary bg-io-background-primary px-3 py-2 text-io-content-primary focus:outline-none focus:ring-2 focus:ring-io-interactive-primary focus:ring-offset-2 focus:ring-offset-io-background-primary"
+          class="w-full rounded-md border border-primary bg-background-primary px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-interactive-primary focus:ring-offset-2 focus:ring-offset-background-primary"
         ></textarea>
         {#if $loadingErrors.description}
-          <span class="text-sm text-io-content-error"
-            >{$loadingErrors.description[0]}</span
+          <span class="text-sm text-error">{$loadingErrors.description[0]}</span
           >
         {/if}
       </div>
@@ -230,7 +229,7 @@
 
       {#if $loadingMessage}
         <div
-          class="rounded border border-io-border-success bg-io-surface-success p-3 text-io-content-success"
+          class="rounded border border-success bg-surface-success p-3 text-success"
         >
           {$loadingMessage}
         </div>
@@ -265,7 +264,7 @@
 
       {#if $passwordAllErrors.length > 0}
         <div
-          class="rounded border border-io-border-error bg-io-surface-error p-3 text-io-content-error"
+          class="rounded border border-error bg-surface-error p-3 text-error"
         >
           <p class="font-medium">Please fix the following errors:</p>
           <ul class="mt-2 list-inside list-disc">

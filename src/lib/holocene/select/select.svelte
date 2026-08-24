@@ -133,9 +133,9 @@
     {#key $labelCtx}
       <MenuButton
         class={merge(
-          'w-full border-io-border-tertiary bg-io-interactive-secondary text-io-content-primary focus-visible:border-io-border-tertiary focus-visible:bg-io-interactive-secondary focus-visible:ring-io-interactive-primary enabled:hover:bg-io-actions-hover-overlay disabled:opacity-[0.32] data-[active=true]:bg-io-actions-press-overlay',
+          'w-full border-tertiary bg-interactive-secondary text-primary focus-visible:border-tertiary focus-visible:bg-interactive-secondary focus-visible:ring-interactive-primary enabled:hover:bg-action-hover-overlay disabled:opacity-[0.32] data-[active=true]:bg-action-press-overlay',
           !valid &&
-            'border-io-border-danger focus-visible:border-io-border-danger focus-visible:ring-io-border-danger',
+            'border-danger focus-visible:border-danger focus-visible:ring-danger',
           menuButtonClass,
         )}
         hasIndicator={!disabled}
@@ -162,9 +162,7 @@
           tabindex="-1"
           disabled
           class={merge(
-            !value && placeholder !== ''
-              ? 'text-io-content-secondary'
-              : 'text-io-content-primary',
+            !value && placeholder !== '' ? 'text-secondary' : 'text-primary',
           )}
           class:disabled
           {required}
@@ -187,7 +185,7 @@
     </Menu>
   {/if}
 
-  <span id={errorId} role="alert" class="text-xs text-io-content-danger">
+  <span id={errorId} role="alert" class="text-xs text-danger">
     {#if showError}{error}{/if}
   </span>
 </MenuContainer>

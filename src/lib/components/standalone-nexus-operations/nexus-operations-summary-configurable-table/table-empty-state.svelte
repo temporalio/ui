@@ -50,14 +50,14 @@
           {translate('standalone-nexus-operations.empty-state-title')}
         {/if}
       </h2>
-      <p class="text-io-content-secondary">
+      <p class="text-secondary">
         {#if $nexusOperationError}
           {$nexusOperationError}
         {:else}
           {translate('standalone-nexus-operations.empty-state-description')}
         {/if}
       </p>
-      <NoQueryResults class="m-auto mt-8 text-io-content-tertiary" />
+      <NoQueryResults class="m-auto mt-8 text-tertiary" />
     </div>
   </div>
 {:else}
@@ -66,7 +66,7 @@
     aria-live="polite"
   >
     <div
-      class="flex w-auto min-w-[280px] flex-col gap-6 bg-io-surface-primary p-8 text-io-content-primary xl:min-w-[520px] xl:flex-1"
+      class="flex w-auto min-w-[280px] flex-col gap-6 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
     >
       <h2>
         {translate('standalone-nexus-operations.empty-state-no-data-title')}
@@ -129,10 +129,10 @@
       {/if}
     </div>
     <div class="flex h-full flex-col">
-      <div class="bg-io-surface-primary">
+      <div class="bg-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-io-indigo-8"></div>
+      <div class="flex-1 bg-indigo-8"></div>
     </div>
   </div>
 {/if}

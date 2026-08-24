@@ -33,11 +33,11 @@
   }: Props = $props();
 
   const variants: Readonly<Record<ToastVariant, string>> = {
-    primary: 'bg-io-indigo-8 text-io-content-white',
-    success: 'bg-io-surface-success text-io-content-primary',
-    error: 'bg-io-surface-danger text-io-content-primary',
-    info: 'bg-io-surface-information text-io-content-primary',
-    warning: 'bg-io-surface-warning text-io-content-primary',
+    primary: 'bg-indigo-8 text-white',
+    success: 'bg-surface-success text-primary',
+    error: 'bg-surface-danger text-primary',
+    info: 'bg-surface-information text-primary',
+    warning: 'bg-surface-warning text-primary',
   };
 
   const variantIcon: Readonly<Record<ToastVariant, IconComponent | null>> = {

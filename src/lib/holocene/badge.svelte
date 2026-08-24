@@ -5,22 +5,16 @@
 
   const type = {
     primary:
-      'border border-io-border-information bg-io-surface-information text-io-content-information',
-    secondary: 'bg-io-alpha-purple-30 text-io-content-primary',
-    default:
-      'border border-io-border-secondary bg-io-surface-primary text-io-content-secondary',
-    warning:
-      'border border-io-border-warning bg-io-surface-warning text-io-content-warning',
-    success:
-      'border border-io-border-success bg-io-surface-success text-io-content-success',
-    danger:
-      'border border-io-border-danger bg-io-surface-danger text-io-content-danger',
+      'border border-information bg-surface-information text-information',
+    secondary: 'bg-alpha-purple-30 text-primary',
+    default: 'border border-secondary bg-surface-primary text-secondary',
+    warning: 'border border-warning bg-surface-warning text-warning',
+    success: 'border border-success bg-surface-success text-success',
+    danger: 'border border-danger bg-surface-danger text-danger',
     count:
-      'h-6 w-6 min-w-max rounded-full border border-io-border-information bg-io-surface-information text-io-content-information',
-    subtle:
-      'bg-io-surface-tertiary text-io-content-secondary font-normal select-all',
-    ghost:
-      'bg-io-surface-primary text-io-content-primary border border-io-border-tertiary',
+      'h-6 w-6 min-w-max rounded-full border border-information bg-surface-information text-information',
+    subtle: 'bg-surface-tertiary text-secondary font-normal select-all',
+    ghost: 'bg-surface-primary text-primary border border-tertiary',
   };
 
   const types = cva(

@@ -387,7 +387,7 @@
 
 {#if showJson}
   <div
-    class="relative h-auto whitespace-break-spaces break-words bg-io-surface-primary p-4"
+    class="relative h-auto whitespace-break-spaces break-words bg-surface-primary p-4"
   >
     <CopyButton
       copyIconTitle={translate('common.copy-icon-title')}

@@ -195,7 +195,7 @@
 </div>
 <div class="relative">
   <div
-    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-io-border-primary bg-io-background-primary text-io-content-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-primary bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="items-bottom flex gap-4 pt-2">
       <h2>
@@ -249,8 +249,8 @@
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-io-content-tertiary'
-              : 'bg-io-content-success'}"
+              ? 'bg-content-tertiary'
+              : 'bg-content-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -269,7 +269,7 @@
   </div>
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}
-      <div class="border-t border-io-border-primary px-4">
+      <div class="border-t border-primary px-4">
         <WorkflowHistoryJson events={filteredEvents} />
       </div>
     {:else}

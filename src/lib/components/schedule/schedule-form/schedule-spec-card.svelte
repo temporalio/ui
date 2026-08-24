@@ -94,7 +94,7 @@
 <Card class="w-full">
   <h2 class="text-2xl font-medium">{translate('schedules.schedule-spec')}</h2>
   <div class="mt-4 flex flex-col gap-4">
-    <p class="text-sm text-io-content-secondary">
+    <p class="text-sm text-secondary">
       {translate('schedules.spec-description')}
       <Link href="https://docs.temporal.io/schedule#spec" newTab>
         {translate('schedules.spec-learn-more')}

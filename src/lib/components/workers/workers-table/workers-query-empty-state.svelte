@@ -11,9 +11,9 @@
     <h2>
       {translate('workers.empty-state-title')}
     </h2>
-    <p class="text-io-content-secondary">
+    <p class="text-secondary">
       {translate('workers.worker-query-empty-state-description')}
     </p>
   </div>
-  <NoQueryResults class="m-auto mt-8 text-io-content-tertiary" />
+  <NoQueryResults class="m-auto mt-8 text-tertiary" />
 </div>

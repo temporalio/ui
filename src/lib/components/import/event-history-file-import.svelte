@@ -69,7 +69,7 @@
   />
   <input
     id="import-event-history-file-upload"
-    class="import-input block border border-io-border-primary p-2"
+    class="import-input block border border-primary p-2"
     type="file"
     accept=".json"
     onchange={onFileSelect}

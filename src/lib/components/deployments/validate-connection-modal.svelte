@@ -38,7 +38,7 @@
   {#snippet titleSnippet()}
     <h3>
       {translate('deployments.validate-connection-for')}
-      <span class="font-mono text-io-content-secondary">{buildId}</span>
+      <span class="font-mono text-secondary">{buildId}</span>
     </h3>
   {/snippet}
   {#snippet footer()}
@@ -56,31 +56,29 @@
       {#if loading}
         <div class="flex items-center gap-2">
           <div
-            class="h-5 w-5 shrink-0 animate-pulse rounded-full bg-io-surface-tertiary"
+            class="h-5 w-5 shrink-0 animate-pulse rounded-full bg-surface-tertiary"
           ></div>
-          <div
-            class="h-5 w-40 animate-pulse rounded bg-io-surface-tertiary"
-          ></div>
+          <div class="h-5 w-40 animate-pulse rounded bg-surface-tertiary"></div>
         </div>
       {:else if result}
         <div class="flex items-start gap-2">
           <Glyph
             class="mt-0.5 h-4 w-4 shrink-0 {isValid
-              ? 'text-io-content-success'
-              : 'text-io-content-danger'}"
+              ? 'text-success'
+              : 'text-danger'}"
           />
           <div class="flex flex-col gap-1">
             <p
               class="text-sm font-medium {isValid
-                ? 'text-io-content-success'
-                : 'text-io-content-danger'}"
+                ? 'text-success'
+                : 'text-danger'}"
             >
               {isValid
                 ? translate('deployments.validate-connection-valid')
                 : translate('deployments.validate-connection-invalid')}
             </p>
             {#if result.message}
-              <p class="text-xs text-io-content-secondary">{result.message}</p>
+              <p class="text-xs text-secondary">{result.message}</p>
             {/if}
           </div>
         </div>

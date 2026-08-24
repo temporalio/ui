@@ -25,9 +25,9 @@
     {
       variants: {
         status: {
-          Unspecified: 'bg-io-surface-primary text-io-content-secondary',
-          Running: 'bg-io-surface-information text-io-content-information',
-          ShuttingDown: 'bg-io-surface-warning text-io-content-warning',
+          Unspecified: 'bg-surface-primary text-secondary',
+          Running: 'bg-surface-information text-information',
+          ShuttingDown: 'bg-surface-warning text-warning',
         },
       },
     },

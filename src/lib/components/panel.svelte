@@ -20,9 +20,9 @@
 <svelte:element
   this={as}
   class={twMerge(
-    'border border-io-border-primary bg-io-surface-primary p-8 text-io-content-primary',
+    'border border-primary bg-surface-primary p-8 text-primary',
     className,
-    error && 'border-io-border-danger bg-io-surface-danger',
+    error && 'border-danger bg-surface-danger',
   )}
 >
   {@render children?.()}

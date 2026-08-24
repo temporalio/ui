@@ -59,7 +59,7 @@
     {id}
     data-theme={dark ? 'dark' : undefined}
     class={merge(
-      'fixed z-[55] h-auto overflow-y-auto border-io-border-tertiary bg-io-background-primary text-io-content-primary',
+      'fixed z-[55] h-auto overflow-y-auto border-tertiary bg-background-primary text-primary',
       position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
       position === 'right' &&
         'right-0 top-0 h-full w-screen border-l sm:max-w-fit',
@@ -78,7 +78,7 @@
         <IconButton
           data-testid="drawer-close-button"
           label={closeButtonLabel}
-          class="text-io-content-primary"
+          class="text-primary"
           Icon={IconClose}
           aria-expanded={open}
           aria-controls="navigation-drawer"

@@ -12,7 +12,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Card>)}
-  <div class="bg-io-surface-primary p-4 text-io-content-primary">
+  <div class="bg-surface-primary p-4 text-primary">
     <Card {...args}>
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate

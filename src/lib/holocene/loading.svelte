@@ -65,11 +65,11 @@
       /* Drop Shadow  */
       --ellipse-shadow: color-mix(
         in srgb,
-        var(--color-io-content-primary) 15%,
+        var(--color-content-primary) 15%,
         transparent
       );
       --ellipse-drop-shadow: drop-shadow(0 4px 12px var(--ellipse-shadow));
-      --stroke-color: var(--color-io-content-primary);
+      --stroke-color: var(--color-content-primary);
     }
 
     /* Default states - no animation */

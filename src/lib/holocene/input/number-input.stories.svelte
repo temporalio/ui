@@ -50,9 +50,7 @@
   args: ComponentProps<typeof NumberInput>,
   context: StoryContext<ComponentProps<typeof NumberInput>>,
 )}
-  <div
-    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
-  >
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
     <NumberInput {...args} id={context.id} />
   </div>
 {/snippet}

@@ -47,11 +47,11 @@
         <a href={subtitleHref} class="contents">
           <IconArrowLeft
             title="Project Namespaces"
-            class="m-1.5 text-io-indigo-4 group-data-[nav=closed]:hidden"
+            class="m-1.5 text-indigo-4 group-data-[nav=closed]:hidden"
           />
           <h2
             class={merge(
-              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-io-indigo-4 underline group-data-[nav=open]:block',
+              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-indigo-4 underline group-data-[nav=open]:block',
               subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
             )}
           >
@@ -61,7 +61,7 @@
       {:else}
         <h2
           class={merge(
-            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-io-indigo-4 group-data-[nav=open]:block',
+            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-indigo-4 group-data-[nav=open]:block',
             subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
           )}
         >
@@ -72,10 +72,10 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[8px] justify-self-end transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-green-7"
+    class="mx-[8px] justify-self-end transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-7"
     onclick={ontoggle}
   >
-    <IconArrowsLeftRightToLine class="text-io-indigo-4" />
+    <IconArrowsLeftRightToLine class="text-indigo-4" />
   </button>
 </div>
 <div role="list">
@@ -88,7 +88,7 @@
     {@render bottom()}
   {/if}
   <div
-    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-io-content-inverse-secondary"
+    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-inverse-secondary"
   >
     <span class="sr-only">{translate('common.version')}</span>
     {version}

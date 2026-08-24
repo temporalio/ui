@@ -85,7 +85,7 @@
   <div id="modal-content-{id}" class="content">
     {@render content?.()}
     <p
-      class="mt-2 text-sm font-normal text-io-content-danger"
+      class="mt-2 text-sm font-normal text-danger"
       class:hidden={!error}
       role="alert"
     >
@@ -96,7 +96,7 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50 w-full overflow-y-auto rounded-sm border border-io-border-secondary bg-io-surface-primary p-0 text-io-content-primary shadow-xl md:h-max lg:max-w-4xl;
+    @apply z-50 w-full overflow-y-auto rounded-sm border border-secondary bg-surface-primary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
   }
 
   .body::backdrop {
@@ -108,7 +108,7 @@
   }
 
   .title {
-    @apply bg-io-surface-primary px-8 pb-0 pt-8 text-2xl text-io-content-primary;
+    @apply bg-surface-primary px-8 pb-0 pt-8 text-2xl text-primary;
   }
 
   .content {

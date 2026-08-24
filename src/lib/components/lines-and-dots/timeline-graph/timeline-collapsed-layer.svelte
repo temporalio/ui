@@ -62,7 +62,7 @@
 
 {#snippet marker(centerX: number, centerY: number)}
   <div
-    class="absolute bg-io-surface-primary"
+    class="absolute bg-surface-primary"
     style:left="{centerX - HIT_HALF_WIDTH}px"
     style:top="{centerY - RADIUS}px"
     style:width="{HIT_WIDTH}px"
@@ -75,11 +75,7 @@
     style:width="{iconSize}px"
     style:height="{iconSize}px"
   >
-    <IconCollapse
-      class="text-io-content-secondary"
-      width={iconSize}
-      height={iconSize}
-    />
+    <IconCollapse class="text-secondary" width={iconSize} height={iconSize} />
   </div>
 {/snippet}
 
@@ -128,7 +124,7 @@
     {@render marker(labelX, ROW_HEIGHT)}
     {@render marker(labelX, timelineHeight)}
     <div
-      class="pointer-events-none absolute origin-left rotate-45 whitespace-nowrap text-[10px] leading-none text-io-content-secondary"
+      class="pointer-events-none absolute origin-left rotate-45 whitespace-nowrap text-[10px] leading-none text-secondary"
       style:left="{labelX}px"
       style:top="{labelY}px"
     >
@@ -153,6 +149,6 @@
 
 <style lang="postcss">
   .zigzag-path {
-    stroke: var(--color-io-content-secondary);
+    stroke: var(--color-content-secondary);
   }
 </style>

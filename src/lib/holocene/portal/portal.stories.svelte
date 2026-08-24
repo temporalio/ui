@@ -66,7 +66,7 @@
 
     <Portal {...rest} anchor="portal-button" open={args.open}>
       <div
-        class="border border-io-border-tertiary bg-io-surface-primary p-4"
+        class="border border-tertiary bg-surface-primary p-4"
         style="max-width: 200px;"
       >
         <p class="text-sm">Portal content goes here.</p>
@@ -97,9 +97,7 @@
         flipOnCollision={args.flipOnCollision}
         offset={args.offset}
       >
-        <div
-          class="border border-io-border-tertiary bg-io-surface-primary p-4 shadow-lg"
-        >
+        <div class="border border-tertiary bg-surface-primary p-4 shadow-lg">
           <p class="text-xs">Positioned top but flipOnCollision is enabled.</p>
         </div>
       </Portal>
@@ -127,9 +125,7 @@
         flipOnCollision={args.flipOnCollision}
         offset={args.offset}
       >
-        <div
-          class="border border-io-border-tertiary bg-io-surface-primary p-4 shadow-lg"
-        >
+        <div class="border border-tertiary bg-surface-primary p-4 shadow-lg">
           <p class="text-xs">
             Positioned bottom but flipOnCollision is enabled.
           </p>
@@ -159,9 +155,7 @@
         flipOnCollision={args.flipOnCollision}
         offset={args.offset}
       >
-        <div
-          class="border border-io-border-tertiary bg-io-surface-primary p-4 shadow-lg"
-        >
+        <div class="border border-tertiary bg-surface-primary p-4 shadow-lg">
           <p class="text-xs">Positioned left but flipOnCollision is enabled.</p>
         </div>
       </Portal>
@@ -189,9 +183,7 @@
         flipOnCollision={args.flipOnCollision}
         offset={args.offset}
       >
-        <div
-          class="border border-io-border-tertiary bg-io-surface-primary p-4 shadow-lg"
-        >
+        <div class="border border-tertiary bg-surface-primary p-4 shadow-lg">
           <p class="text-xs">
             Positioned right but flipOnCollision is enabled.
           </p>
@@ -205,10 +197,10 @@
   {#snippet template(args)}
     <div
       id="combined-container"
-      class="h-96 w-1/2 overflow-auto rounded border border-io-border-tertiary bg-io-surface-secondary p-4"
+      class="h-96 w-1/2 overflow-auto rounded border border-tertiary bg-surface-secondary p-4"
     >
       <div class="h-[800px] w-[1200px]">
-        <p class="mb-2 text-xs text-io-content-secondary">
+        <p class="mb-2 text-xs text-secondary">
           Scroll in any direction. The portal will hide when out of view and
           flip when near edges.
         </p>
@@ -226,7 +218,7 @@
             offset={args.offset}
           >
             <div
-              class="max-w-60 border border-io-border-tertiary bg-io-surface-primary p-4 shadow-lg"
+              class="max-w-60 border border-tertiary bg-surface-primary p-4 shadow-lg"
             >
               <p class="text-sm">
                 ✅ Custom scroll container<br />

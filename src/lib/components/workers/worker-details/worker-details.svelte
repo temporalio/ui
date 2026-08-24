@@ -236,8 +236,8 @@
       >
         <span
           class="h-1.5 w-1.5 rounded-full {autoRefresh
-            ? 'bg-io-green-9'
-            : 'bg-io-surface-tertiary'}"
+            ? 'bg-green-9'
+            : 'bg-surface-tertiary'}"
         ></span>
         {autoRefresh
           ? translate('workers.auto-refresh-on')
@@ -246,7 +246,7 @@
     </ToggleButtons>
     {#if refreshing}
       <p class="flex items-center gap-1">
-        <IconSpinner class="animate-spin text-io-content-brand" />
+        <IconSpinner class="animate-spin text-brand" />
         {translate('workers.pulling-latest-snapshot')}
       </p>
     {:else}
@@ -285,7 +285,7 @@
     <aside class="flex w-full flex-col gap-4 xl:max-w-sm">
       <Card>
         {@render hostUsage()}
-        <hr class="my-4 border-io-border-primary" />
+        <hr class="my-4 border-primary" />
         {@render workflowCache()}
       </Card>
       <!-- TODO: Add back task failure rate. -->
@@ -305,15 +305,12 @@
     <h5 class="mb-2">{title}</h5>
     <dl class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:grid-rows-1">
       <div>
-        <dt
-          id="slots-{title}"
-          class="mb-1 h-6 text-sm text-io-content-secondary"
-        >
+        <dt id="slots-{title}" class="mb-1 h-6 text-sm text-secondary">
           {translate('workers.slots-used')}
         </dt>
         <dd>
-          <p class="truncate font-mono text-lg text-io-content-secondary">
-            <span class="text-2xl font-semibold text-io-content-brand">
+          <p class="truncate font-mono text-lg text-secondary">
+            <span class="text-2xl font-semibold text-brand">
               {#if noSlotsConfigured}
                 -
               {:else}
@@ -343,12 +340,10 @@
         </dd>
       </div>
       <div>
-        <dt
-          class="mb-1 flex h-6 items-center text-sm text-io-content-secondary"
-        >
+        <dt class="mb-1 flex h-6 items-center text-sm text-secondary">
           {translate('workers.tasks-processed')}
         </dt>
-        <dd class="font-mono text-2xl font-semibold text-io-content-brand">
+        <dd class="font-mono text-2xl font-semibold text-brand">
           {slots?.totalProcessedTasks !== undefined
             ? (slots.totalProcessedTasks ?? 0).toLocaleString()
             : '-'}
@@ -358,11 +353,11 @@
       {#if poller}
         {@const hasCurrentPollers = poller.currentPollers !== undefined}
         <div>
-          <dt class="mb-1 h-6 text-sm text-io-content-secondary">
+          <dt class="mb-1 h-6 text-sm text-secondary">
             {translate('workers.poller-count')}
           </dt>
           <dd>
-            <p class="font-mono text-2xl font-semibold text-io-content-brand">
+            <p class="font-mono text-2xl font-semibold text-brand">
               {hasCurrentPollers ? (poller.currentPollers ?? 0) : '-'}
             </p>
             <Tooltip
@@ -388,7 +383,7 @@
     </dl>
     {#if !slots?.currentUsedSlots && !slots?.currentAvailableSlots}
       <div class="flex items-end gap-1 text-sm">
-        <p class="text-io-content-secondary">
+        <p class="text-secondary">
           {translate('workers.zero-slots-configured')}
         </p>
         <Link
@@ -400,7 +395,7 @@
         </Link>
       </div>
     {:else if poller?.lastSuccessfulPollTime}
-      <p class="text-sm text-io-content-secondary">
+      <p class="text-sm text-secondary">
         {translate('workers.last-polled')}
         <Timestamp dateTime={poller.lastSuccessfulPollTime} as="span" />
       </p>
@@ -415,10 +410,10 @@
     aria-valuenow={value}
     aria-valuemin={0}
     aria-valuemax={maxValue}
-    class="relative h-2 w-full overflow-hidden rounded bg-io-surface-information"
+    class="relative h-2 w-full overflow-hidden rounded bg-surface-information"
   >
     <div
-      class="absolute left-0 h-full bg-io-indigo-9"
+      class="absolute left-0 h-full bg-indigo-9"
       style="width:{maxValue > 0
         ? Math.min((value / maxValue) * 100, 100)
         : 0}%;"
@@ -447,7 +442,7 @@
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
         <span id="cpu-label" class="flex items-center gap-1 font-semibold">
-          <IconMicrochip class="h-3 w-3 text-io-content-secondary" />
+          <IconMicrochip class="h-3 w-3 text-secondary" />
           {translate('workers.cpu-usage')}
         </span>
         <span>{cpuUsage.toFixed(0)}%</span>
@@ -457,7 +452,7 @@
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
         <span id="memory-label" class="flex items-center gap-1 font-semibold">
-          <IconTemporalServer class="h-3 w-3 text-io-content-secondary" />
+          <IconTemporalServer class="h-3 w-3 text-secondary" />
           {translate('workers.memory-usage')}
         </span>
         <span>{memUsage.toFixed(0)}%</span>
@@ -477,24 +472,24 @@
     </h6>
     <dl class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
       <div>
-        <dt class="text-sm text-io-content-secondary">
+        <dt class="text-sm text-secondary">
           {translate('workers.cache-size')}
         </dt>
-        <dd class="font-mono text-2xl font-semibold text-io-content-brand">
+        <dd class="font-mono text-2xl font-semibold text-brand">
           {currentStickyCacheSize.toLocaleString()}
         </dd>
-        <dd class="text-xs text-io-content-secondary">
+        <dd class="text-xs text-secondary">
           {translate('workers.cache-size-description')}
         </dd>
       </div>
       <div>
-        <dt class="text-sm font-medium text-io-content-secondary">
+        <dt class="text-sm font-medium text-secondary">
           {translate('workers.cache-hits')}
         </dt>
-        <dd class="font-mono text-2xl font-semibold text-io-content-brand">
+        <dd class="font-mono text-2xl font-semibold text-brand">
           {cacheHitRate}%
         </dd>
-        <dd class="text-xs text-io-content-secondary">
+        <dd class="text-xs text-secondary">
           {translate('workers.cache-hits-description', { hits: cacheHitRate })}
         </dd>
       </div>
@@ -516,10 +511,10 @@
       {translate('workers.diagnostics')}
     </h5>
     <dl>
-      <dt class="text-sm text-io-content-secondary">
+      <dt class="text-sm text-secondary">
         {translate('workers.task-failure-rate')}
       </dt>
-      <dd class="font-mono text-2xl text-io-content-brand">
+      <dd class="font-mono text-2xl text-brand">
         {taskFailureRate}%
       </dd>
     </dl>

@@ -22,7 +22,7 @@
 </script>
 
 <div class={twMerge('flex flex-col items-center gap-4', className)}>
-  <IconHeartbeat width={80} height={80} class="text-io-blue-8" />
+  <IconHeartbeat width={80} height={80} class="text-blue-8" />
   {#if title}
     <p class="text-center text-base font-medium">{title}</p>
   {/if}
@@ -38,7 +38,7 @@
       LeadingIcon={IconPlaySolid}
       onclick={openTriggerConfirmationModal}
       variant="ghost"
-      class="border border-io-border-primary"
+      class="border border-primary"
     >
       {translate('schedules.trigger-now')}
     </Button>
@@ -47,7 +47,7 @@
       LeadingIcon={IconRetry}
       onclick={openBackfillConfirmationModal}
       variant="ghost"
-      class="border border-io-border-primary"
+      class="border border-primary"
     >
       {translate('schedules.backfill-schedule')}
     </Button>

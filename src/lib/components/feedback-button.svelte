@@ -14,7 +14,7 @@
   size="sm"
   LeadingIcon={IconFeedback}
   variant="ghost"
-  class="text-io-content-brand shadow-md"
+  class="text-brand shadow-md"
   {href}
   target="_blank"
   data-testid="give-feedback"

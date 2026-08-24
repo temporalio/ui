@@ -89,7 +89,7 @@
   />
   <button
     type="button"
-    class="mr-auto underline hover:text-io-content-brand"
+    class="mr-auto underline hover:text-brand"
     onclick={() => (isCronExpressionFormatModalOpen = true)}
   >
     {translate('schedules.cron-formatting-help')}

@@ -67,13 +67,13 @@
   <h2 class="text-lg font-semibold">{translate('schedules.summary-title')}</h2>
   <dl class="mt-4 flex flex-col gap-3">
     <div>
-      <dt class="text-xs text-io-content-secondary">
+      <dt class="text-xs text-secondary">
         {translate('schedules.name-input-label')}
       </dt>
       <dd class="text-sm">{$form.name || '--'}</dd>
     </div>
     <div>
-      <dt class="text-xs text-io-content-secondary">
+      <dt class="text-xs text-secondary">
         {translate('schedules.summary-start-date-label')}
       </dt>
       <dd class="text-sm">
@@ -81,25 +81,25 @@
       </dd>
     </div>
     <div>
-      <dt class="text-xs text-io-content-secondary">
+      <dt class="text-xs text-secondary">
         {translate('schedules.summary-end-label')}
       </dt>
       <dd class="text-sm">{endDisplay}</dd>
     </div>
     <div>
-      <dt class="text-xs text-io-content-secondary">
+      <dt class="text-xs text-secondary">
         {translate('schedules.summary-workflow-type-label')}
       </dt>
       <dd class="text-sm">{$form.workflowType || '--'}</dd>
     </div>
     <div>
-      <dt class="text-xs text-io-content-secondary">
+      <dt class="text-xs text-secondary">
         {translate('common.task-queue')}
       </dt>
       <dd class="text-sm">{$form.taskQueue || '--'}</dd>
     </div>
     <div>
-      <dt class="text-xs text-io-content-secondary">
+      <dt class="text-xs text-secondary">
         {translate('common.description')}
       </dt>
       <dd class="flex flex-col text-sm">

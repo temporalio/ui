@@ -68,7 +68,7 @@
     {translate('schedules.policies-heading')}
   </h2>
   <div class="mt-4 flex flex-col gap-4">
-    <p class="text-sm text-io-content-secondary">
+    <p class="text-sm text-secondary">
       {translate('schedules.policies-description')}
       <Link href="https://docs.temporal.io/schedule#policies" newTab>
         {translate('schedules.policies-learn-more')}
@@ -79,7 +79,7 @@
       class="flex flex-col gap-y-4 lg:grid lg:grid-cols-[max-content,1fr] lg:grid-rows-none lg:gap-x-6 lg:gap-y-2"
     >
       <div class="lg:contents">
-        <dt class="text-xs text-io-content-secondary lg:text-sm">
+        <dt class="text-xs text-secondary lg:text-sm">
           {translate('schedules.overlap-policy')}
         </dt>
         <dd>
@@ -88,14 +88,14 @@
       </div>
 
       <div class="lg:contents">
-        <dt class="text-xs text-io-content-secondary lg:text-sm">
+        <dt class="text-xs text-secondary lg:text-sm">
           {translate('schedules.on-start-behavior')}
         </dt>
         <dd>{onStartBehavior}</dd>
       </div>
 
       <div class="lg:contents">
-        <dt class="text-xs text-io-content-secondary lg:text-sm">
+        <dt class="text-xs text-secondary lg:text-sm">
           {translate('schedules.catchup-window-policy')}
         </dt>
         <dd>
@@ -106,7 +106,7 @@
       </div>
 
       <div class="lg:contents">
-        <dt class="text-xs text-io-content-secondary lg:text-sm">
+        <dt class="text-xs text-secondary lg:text-sm">
           {translate('schedules.pause-on-failure-question')}
         </dt>
         <dd>
@@ -117,7 +117,7 @@
       </div>
 
       <div class="lg:contents">
-        <dt class="text-xs text-io-content-secondary lg:text-sm">
+        <dt class="text-xs text-secondary lg:text-sm">
           {translate('schedules.timeouts')}
         </dt>
         <dd>{timeoutsSummary}</dd>

@@ -37,7 +37,7 @@
 {:else}
   <ul class={twMerge('flex flex-col gap-2', className)}>
     {#each sortedUpcomingRuns as run, i (i)}
-      <li class="gap-y-1 border-b border-io-border-primary py-2 font-mono">
+      <li class="gap-y-1 border-b border-primary py-2 font-mono">
         {$timestamp(run)}
       </li>
     {/each}

@@ -23,10 +23,7 @@
   const specs = $derived(getFormSpecFromSpec(schedule?.schedule?.spec));
 </script>
 
-<Panel
-  class="flex w-full flex-col gap-4 border-io-border-primary p-6"
-  as="section"
->
+<Panel class="flex w-full flex-col gap-4 border-primary p-6" as="section">
   <header class="mb-1 flex items-center justify-between">
     <h2 class="text-2xl font-medium">
       {translate('schedules.schedule-specs')}
@@ -45,7 +42,7 @@
     </Button>
   </header>
 
-  <p class="text-xs text-io-content-secondary">
+  <p class="text-xs text-secondary">
     {translate('schedules.schedule-specs-description')}
   </p>
 

@@ -133,7 +133,7 @@
         class="w-full min-w-[300px]"
       />
     </MenuItem>
-    <hr class="border-io-border-primary" />
+    <hr class="border-primary" />
 
     {#each filteredOptions as { value, label, type } (value)}
       <MenuItem
@@ -146,7 +146,7 @@
       >
         <div>
           <p class="leading-3">{label}</p>
-          <small class="text-io-content-secondary">{type}</small>
+          <small class="text-secondary">{type}</small>
         </div>
       </MenuItem>
     {:else}

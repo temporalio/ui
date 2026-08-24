@@ -132,23 +132,23 @@
   const workflowStatus = cva(['stroke-2'], {
     variants: {
       status: {
-        Running: 'fill-io-blue-7 stroke-io-zaffre-8',
-        TimedOut: 'fill-io-persimmon-6 stroke-io-amber-8',
-        Completed: 'fill-io-green-5 stroke-io-green-8',
-        Failed: 'fill-io-persimmon-6 stroke-io-red-9',
-        ContinuedAsNew: 'fill-io-slate-blue-4 stroke-io-slate-blue-8',
-        Canceled: 'fill-io-zaffre-4 stroke-io-zaffre-7',
-        Terminated: 'fill-io-amber-5 stroke-io-amber-10',
-        Paused: 'fill-io-amber-5 stroke-io-amber-10',
-        Unspecified: 'fill-io-zaffre-4 stroke-io-zaffre-7',
-        Scheduled: 'fill-io-blue-7 stroke-io-zaffre-8',
-        Started: 'fill-io-blue-7 stroke-io-zaffre-8',
-        Open: 'fill-io-green-5 stroke-io-green-8',
-        New: 'fill-io-blue-7 stroke-io-zaffre-8',
-        Initiated: 'fill-io-blue-7 stroke-io-zaffre-8',
-        Fired: 'fill-io-purple-5 stroke-io-pink-8',
-        CancelRequested: 'fill-io-amber-5 stroke-io-amber-10',
-        Signaled: 'fill-io-purple-5 stroke-io-pink-8',
+        Running: 'fill-blue-7 stroke-zaffre-8',
+        TimedOut: 'fill-persimmon-6 stroke-amber-8',
+        Completed: 'fill-green-5 stroke-green-8',
+        Failed: 'fill-persimmon-6 stroke-red-9',
+        ContinuedAsNew: 'fill-slate-blue-4 stroke-slate-blue-8',
+        Canceled: 'fill-zaffre-4 stroke-zaffre-7',
+        Terminated: 'fill-amber-5 stroke-amber-10',
+        Paused: 'fill-amber-5 stroke-amber-10',
+        Unspecified: 'fill-zaffre-4 stroke-zaffre-7',
+        Scheduled: 'fill-blue-7 stroke-zaffre-8',
+        Started: 'fill-blue-7 stroke-zaffre-8',
+        Open: 'fill-green-5 stroke-green-8',
+        New: 'fill-blue-7 stroke-zaffre-8',
+        Initiated: 'fill-blue-7 stroke-zaffre-8',
+        Fired: 'fill-purple-5 stroke-pink-8',
+        CancelRequested: 'fill-amber-5 stroke-amber-10',
+        Signaled: 'fill-purple-5 stroke-pink-8',
       },
     },
   });
@@ -161,8 +161,8 @@
     x2={getPosition(root?.children.length - 1).childX}
     y2={getPosition(0).childY - 1.5 * radius}
     class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-      ? 'stroke-io-indigo-10'
-      : 'stroke-io-zaffre-4 dark:stroke-io-indigo-12'}"
+      ? 'stroke-indigo-10'
+      : 'stroke-zaffre-4 dark:stroke-indigo-12'}"
   />
 {/if}
 {#each root?.children as child, index}
@@ -188,8 +188,8 @@
     x2={childX}
     y2={childY}
     class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-      ? 'stroke-io-indigo-10'
-      : 'stroke-io-zaffre-4 dark:stroke-io-indigo-12'}"
+      ? 'stroke-indigo-10'
+      : 'stroke-zaffre-4 dark:stroke-indigo-12'}"
   />
   <g
     role="button"
@@ -209,8 +209,8 @@
         x2={childX}
         y2={childY + 2.5 * radius}
         class="stroke-2 duration-300 ease-in-out {isActive(child)
-          ? 'stroke-io-indigo-10'
-          : 'stroke-io-zaffre-4 dark:stroke-io-indigo-12'}"
+          ? 'stroke-indigo-10'
+          : 'stroke-zaffre-4 dark:stroke-indigo-12'}"
       />
     {/if}
     {#if isActive(child)}
@@ -218,7 +218,7 @@
         cx={childX}
         cy={childY}
         r={radius}
-        class="fill-io-indigo-10"
+        class="fill-indigo-10"
         fill-opacity=".95"
       />
     {/if}
@@ -227,7 +227,7 @@
         cx={childX}
         cy={childY}
         r={radius}
-        class="fill-io-indigo-6"
+        class="fill-indigo-6"
         fill-opacity=".75"
       />
     {/if}
@@ -270,10 +270,10 @@
       y1={y}
       x2={x - 4 * radius}
       y2={y}
-      class="stroke-io-slate-blue-3 stroke-2 duration-300 ease-in-out dark:stroke-io-neutral-9"
+      class="stroke-slate-blue-3 stroke-2 duration-300 ease-in-out dark:stroke-neutral-9"
     />
     <rect
-      class="fill-io-content-white stroke-io-slate-blue-3 dark:fill-io-neutral-12 dark:stroke-io-neutral-9"
+      class="fill-white stroke-slate-blue-3 dark:fill-neutral-12 dark:stroke-neutral-9"
       x={x - 3 * radius - radius / 2}
       y={y - radius / 4}
       cx={radius / 2}
@@ -282,7 +282,7 @@
       height={radius / 2}
     />
     <rect
-      class="fill-io-content-white stroke-io-slate-blue-3 dark:fill-io-neutral-12 dark:stroke-io-neutral-9"
+      class="fill-white stroke-slate-blue-3 dark:fill-neutral-12 dark:stroke-neutral-9"
       x={x - 1.5 * radius - radius / 2}
       y={y - radius / 4}
       cx={radius / 2}
@@ -295,10 +295,10 @@
       y1={y}
       x2={x + 4 * radius}
       y2={y}
-      class="stroke-io-slate-blue-3 stroke-2 duration-300 ease-in-out dark:stroke-io-neutral-9"
+      class="stroke-slate-blue-3 stroke-2 duration-300 ease-in-out dark:stroke-neutral-9"
     />
     <rect
-      class="fill-io-content-white stroke-io-slate-blue-3 dark:fill-io-neutral-12 dark:stroke-io-neutral-9"
+      class="fill-white stroke-slate-blue-3 dark:fill-neutral-12 dark:stroke-neutral-9"
       x={x + 1.5 * radius}
       y={y - radius / 4}
       cx={radius / 2}
@@ -307,7 +307,7 @@
       height={radius / 2}
     />
     <rect
-      class="fill-io-content-white stroke-io-slate-blue-3 dark:fill-io-neutral-12 dark:stroke-io-neutral-9"
+      class="fill-white stroke-slate-blue-3 dark:fill-neutral-12 dark:stroke-neutral-9"
       x={x + 3 * radius}
       y={y - radius / 4}
       cx={radius / 2}
@@ -337,7 +337,7 @@
         x2={x}
         y2={y - 2.5 * radius}
         stroke-dasharray="3 2"
-        class="stroke-io-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-io-indigo-12"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <line
         x1={x - 5 * radius}
@@ -345,7 +345,7 @@
         x2={x}
         y2={y - 2.5 * radius}
         stroke-dasharray="3 2"
-        class="stroke-io-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-io-indigo-12"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <IconTemporalSchedules x={x - 9.25 * radius} y={y - 4.15 * radius} />
       <text
@@ -372,7 +372,7 @@
         y1={y}
         x2={x + 4 * radius}
         y2={y}
-        class="stroke-io-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-io-indigo-12"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <text
         x={x + 4.25 * radius}
@@ -398,7 +398,7 @@
         y1={y}
         x2={x - 4 * radius}
         y2={y}
-        class="stroke-io-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-io-indigo-12"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <text
         x={x - 4.25 * radius}
@@ -427,7 +427,7 @@
         x2={radius}
         y2={y}
         stroke-dasharray="3 2"
-        class="stroke-io-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-io-indigo-12"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <text
         x={radius}
@@ -454,8 +454,8 @@
         x2={x}
         y2={y + 2.5 * radius}
         class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-          ? 'stroke-io-indigo-10'
-          : 'stroke-io-zaffre-4 dark:stroke-io-indigo-12'}"
+          ? 'stroke-indigo-10'
+          : 'stroke-zaffre-4 dark:stroke-indigo-12'}"
       />
     {/if}
     {#if isCurrent(root)}
@@ -463,7 +463,7 @@
         cx={x}
         cy={y}
         r={radius}
-        class="fill-io-indigo-6"
+        class="fill-indigo-6"
         fill-opacity=".75"
       />
     {/if}
@@ -472,7 +472,7 @@
         cx={x}
         cy={y}
         r={radius}
-        class="fill-io-indigo-10"
+        class="fill-indigo-10"
         fill-opacity=".95"
       />
     {/if}

@@ -120,11 +120,11 @@
 
 <div class="flex flex-col gap-4">
   <fieldset class="flex flex-col gap-2">
-    <legend class="contents text-sm text-io-content-secondary">
+    <legend class="contents text-sm text-secondary">
       {translate('schedules.recurring-dates-description')}
     </legend>
     <div
-      class="grid max-w-[27rem] grid-cols-5 gap-3 border border-io-border-primary p-3 sm:grid-cols-7"
+      class="grid max-w-[27rem] grid-cols-5 gap-3 border border-primary p-3 sm:grid-cols-7"
     >
       {#each DAYS_OF_MONTH as day (day)}
         {@const isSelected = isDaySelected(day)}

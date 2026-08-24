@@ -148,7 +148,7 @@
   </DetailList>
 
   <dl class="-mt-2 flex flex-col gap-1">
-    <dt class="text-io-content-secondary">
+    <dt class="text-secondary">
       {translate('schedules.total-workflows-all-time')}
     </dt>
     <dd class="flex flex-wrap items-center gap-2">

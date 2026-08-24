@@ -44,25 +44,25 @@
     {
       variants: {
         status: {
-          Running: 'bg-io-surface-information text-io-content-information',
-          TimedOut: 'bg-io-surface-error text-io-content-error',
-          Completed: 'bg-io-surface-success text-io-content-success',
-          Failed: 'bg-io-surface-danger text-io-content-danger',
-          ContinuedAsNew: 'bg-io-alpha-purple-30 text-io-content-primary',
-          Canceled: 'bg-io-surface-primary text-io-content-secondary',
-          Terminated: 'bg-io-surface-warning text-io-content-warning',
-          Paused: 'bg-io-surface-warning text-io-content-warning',
-          Unspecified: 'bg-io-surface-primary text-io-content-secondary',
-          Scheduled: 'bg-io-surface-information text-io-content-information',
-          Started: 'bg-io-surface-information text-io-content-information',
-          Open: 'bg-io-surface-success text-io-content-success',
-          New: 'bg-io-surface-information text-io-content-information',
-          Initiated: 'bg-io-surface-information text-io-content-information',
-          Fired: 'bg-io-alpha-pink-30 text-io-content-primary',
-          CancelRequested: 'bg-io-surface-warning text-io-content-warning',
-          Signaled: 'bg-io-alpha-pink-30 text-io-content-primary',
-          Pending: 'bg-io-alpha-purple-30 text-io-content-primary',
-          Retrying: 'bg-io-surface-danger text-io-content-danger',
+          Running: 'bg-surface-information text-information',
+          TimedOut: 'bg-surface-error text-error',
+          Completed: 'bg-surface-success text-success',
+          Failed: 'bg-surface-danger text-danger',
+          ContinuedAsNew: 'bg-alpha-purple-30 text-primary',
+          Canceled: 'bg-surface-primary text-secondary',
+          Terminated: 'bg-surface-warning text-warning',
+          Paused: 'bg-surface-warning text-warning',
+          Unspecified: 'bg-surface-primary text-secondary',
+          Scheduled: 'bg-surface-information text-information',
+          Started: 'bg-surface-information text-information',
+          Open: 'bg-surface-success text-success',
+          New: 'bg-surface-information text-information',
+          Initiated: 'bg-surface-information text-information',
+          Fired: 'bg-alpha-pink-30 text-primary',
+          CancelRequested: 'bg-surface-warning text-warning',
+          Signaled: 'bg-alpha-pink-30 text-primary',
+          Pending: 'bg-alpha-purple-30 text-primary',
+          Retrying: 'bg-surface-danger text-danger',
         },
       },
     },
@@ -130,7 +130,7 @@
       <span
         class={merge(
           workflowStatus(),
-          'bg-io-surface-danger text-io-content-danger',
+          'bg-surface-danger text-danger',
           'rounded-l-none',
           newCount && 'rounded-r-none',
           big && 'h-8 px-2',
@@ -143,7 +143,7 @@
     {#if newCount}
       <span
         class={merge(
-          'font-base rounded-r-sm bg-io-surface-primary px-1 py-0.5 text-io-content-primary',
+          'font-base rounded-r-sm bg-surface-primary px-1 py-0.5 text-primary',
           big && 'px-2',
         )}
         in:fade

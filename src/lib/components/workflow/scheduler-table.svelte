@@ -24,7 +24,7 @@
       <th scope="col">{translate('schedules.schedule')}</th>
     </TableHeaderRow>
   {/snippet}
-  <TableRow class="hover:text-io-content-brand hover:underline">
+  <TableRow class="hover:text-brand hover:underline">
     <td>
       <Link
         href={routeForSchedule({

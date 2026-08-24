@@ -134,7 +134,7 @@
     <div id="modal-content-{id}" class="content">
       {@render content?.()}
       <p
-        class="mt-2 text-sm font-normal text-io-content-danger"
+        class="mt-2 text-sm font-normal text-danger"
         class:hidden={!error}
         role="alert"
       >
@@ -173,11 +173,11 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50 w-full max-w-lg overflow-y-auto border border-io-border-tertiary bg-io-background-primary p-0 text-io-content-primary shadow-xl md:h-max;
+    @apply z-50 w-full max-w-lg overflow-y-auto border border-tertiary bg-background-primary p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-io-overlay-backdrop backdrop-blur-[8px] transition-opacity duration-200;
+    @apply cursor-pointer bg-overlay-backdrop backdrop-blur-[8px] transition-opacity duration-200;
   }
 
   .body.hightlightNav::backdrop {
@@ -189,7 +189,7 @@
   }
 
   .title {
-    @apply bg-io-background-primary px-8 pb-0 pt-8 text-2xl text-io-content-primary;
+    @apply bg-background-primary px-8 pb-0 pt-8 text-2xl text-primary;
   }
 
   .content {

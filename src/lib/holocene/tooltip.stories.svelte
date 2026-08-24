@@ -153,7 +153,7 @@
 
 <Story name="Portal (avoids overflow clipping)" asChild>
   <div
-    class="overflow-hidden rounded border border-io-border-tertiary bg-io-surface-primary p-4"
+    class="overflow-hidden rounded border border-tertiary bg-surface-primary p-4"
   >
     <Tooltip top usePortal text="This renders outside the overflow container">
       <Button>Hover me (portal)</Button>

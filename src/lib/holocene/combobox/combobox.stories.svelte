@@ -73,9 +73,7 @@
 </script>
 
 {#snippet template(args: ComboboxArgs, context: StoryContext<ComboboxArgs>)}
-  <div
-    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
-  >
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
     <Combobox
       {...args as unknown as ComponentProps<typeof Combobox>}
       id={context.id}
@@ -244,9 +242,7 @@
   }}
 >
   {#snippet template(_args, context)}
-    <div
-      class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
-    >
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
       <AsyncTest id={context.id}></AsyncTest>
     </div>
   {/snippet}
@@ -315,9 +311,7 @@
   }}
 >
   {#snippet template(args, context)}
-    <div
-      class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
-    >
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
       <div class="w-64">
         <Combobox
           {...args as unknown as ComponentProps<typeof Combobox>}

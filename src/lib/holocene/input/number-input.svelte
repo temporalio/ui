@@ -65,12 +65,11 @@
   <div class="flex items-center">
     <div
       class={merge(
-        'relative box-border flex h-10 min-w-16 items-center border border-io-border-tertiary bg-io-interactive-secondary text-sm text-io-content-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary',
+        'relative box-border flex h-10 min-w-16 items-center border border-tertiary bg-interactive-secondary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
         !disabled &&
           valid &&
-          'focus-within:border-io-border-secondary hover:border-io-border-brand',
-        disabled &&
-          'border-io-border-secondary bg-io-surface-tertiary text-io-content-tertiary',
+          'focus-within:border-secondary hover:border-brand',
+        disabled && 'border-secondary bg-surface-tertiary text-tertiary',
       )}
       class:search
       class:invalid={!valid}
@@ -81,7 +80,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-io-content-primary placeholder:text-io-content-tertiary focus:outline-none disabled:text-io-content-tertiary"
+        class="m-2 block w-full bg-transparent text-center text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary"
         type="number"
         {max}
         {min}
@@ -104,8 +103,8 @@
     {#if units}
       <div
         class={merge(
-          'flex h-10 items-center border-y border-r border-io-border-tertiary bg-io-surface-tertiary px-2 text-io-content-primary',
-          disabled && 'border-io-border-secondary text-io-content-tertiary',
+          'flex h-10 items-center border-y border-r border-tertiary bg-surface-tertiary px-2 text-primary',
+          disabled && 'border-secondary text-tertiary',
         )}
       >
         <p class="text-sm font-normal">{units}</p>
@@ -116,7 +115,7 @@
 <span
   id={errorId}
   role="alert"
-  class="text-xs text-io-content-danger"
+  class="text-xs text-danger"
   class:mt-1={!valid && !!hintText}
 >
   {#if !valid && hintText}{hintText}{/if}
@@ -136,6 +135,6 @@
   }
 
   .invalid {
-    @apply border-io-border-danger focus-within:border-io-border-danger focus-within:ring-io-border-danger;
+    @apply border-danger focus-within:border-danger focus-within:ring-danger;
   }
 </style>

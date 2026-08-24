@@ -60,7 +60,7 @@
   <div
     data-track-container={title}
     class={merge(
-      'w-full border border-io-border-tertiary bg-io-background-primary text-io-content-primary',
+      'w-full border border-tertiary bg-background-primary text-primary',
       className,
     )}
     {...rest}
@@ -70,7 +70,7 @@
         id="{id}-trigger"
         aria-expanded={open}
         aria-controls="{id}-content"
-        class="flex grow flex-col p-4 focus-visible:bg-io-alpha-slate-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary"
+        class="flex grow flex-col p-4 focus-visible:bg-alpha-slate-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary"
         type="button"
         data-track-name="accordion"
         data-track-intent="toggle"
@@ -83,20 +83,20 @@
               {#if Icon}<Icon />{/if}
               {title}
             </h3>
-            <div class="text-io-content-secondary max-sm:hidden">
+            <div class="text-secondary max-sm:hidden">
               {@render summary?.()}
             </div>
           </div>
           <Glyph class="shrink-0" />
         </div>
-        <div class="text-io-content-secondary sm:hidden">
+        <div class="text-secondary sm:hidden">
           {@render summary?.()}
         </div>
         <p class="flex items-center">
           {#if error}
             <Badge class="mr-2" type="danger">{error}</Badge>
           {/if}
-          <span class="text-io-content-secondary">{subtitle}</span>
+          <span class="text-secondary">{subtitle}</span>
         </p>
       </button>
       <div class="flex shrink-0 flex-row items-center gap-2 pr-2">
@@ -115,7 +115,7 @@
   </div>
 {:else}
   <div
-    class="w-full border border-io-border-tertiary bg-io-background-primary p-4 text-io-content-primary"
+    class="w-full border border-tertiary bg-background-primary p-4 text-primary"
     data-track-container={title}
     {...rest}
   >
@@ -126,7 +126,7 @@
             {#if Icon}<Icon />{/if}
             {title}
           </h3>
-          <div class="text-io-content-secondary max-sm:hidden">
+          <div class="text-secondary max-sm:hidden">
             {@render summary?.()}
           </div>
         </div>
@@ -134,14 +134,14 @@
           {@render action?.()}
         </div>
       </div>
-      <div class="text-io-content-secondary sm:hidden">
+      <div class="text-secondary sm:hidden">
         {@render summary?.()}
       </div>
       <p class="flex items-center">
         {#if error}
           <Badge class="mr-2" type="danger">{error}</Badge>
         {/if}
-        <span class="text-io-content-secondary">{subtitle}</span>
+        <span class="text-secondary">{subtitle}</span>
       </p>
     </div>
 

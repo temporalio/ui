@@ -21,16 +21,12 @@
 
 {#await fetchPromise}
   <div
-    class="flex flex-col gap-2 bg-io-surface-secondary py-3 pl-6 text-xs text-io-content-primary"
+    class="flex flex-col gap-2 bg-surface-secondary py-3 pl-6 text-xs text-primary"
   >
     {#each [1, 2, 3] as _ (_)}
       <div class="flex items-center gap-2">
-        <div
-          class="h-3 w-20 animate-pulse rounded bg-io-surface-tertiary"
-        ></div>
-        <div
-          class="h-3 w-64 animate-pulse rounded bg-io-surface-tertiary"
-        ></div>
+        <div class="h-3 w-20 animate-pulse rounded bg-surface-tertiary"></div>
+        <div class="h-3 w-64 animate-pulse rounded bg-surface-tertiary"></div>
       </div>
     {/each}
   </div>
@@ -42,12 +38,12 @@
   {/if}
 {:catch err}
   <div class="flex items-center gap-2 py-2 text-xs">
-    <span class="text-io-content-danger"
+    <span class="text-danger"
       >{err?.message ?? translate('deployments.version-load-error')}</span
     >
     <button
       type="button"
-      class="text-io-content-primary underline"
+      class="text-primary underline"
       onclick={() => {
         retryCount++;
       }}>{translate('common.retry')}</button

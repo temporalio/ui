@@ -6,7 +6,7 @@
 
 <div
   class={merge(
-    'background-animate w-full rounded-full bg-gradient-to-r from-io-surface-primary via-io-surface-secondary to-io-surface-tertiary',
+    'background-animate w-full rounded-full bg-gradient-to-r from-surface-primary via-surface-secondary to-surface-tertiary',
     className,
   )}
 ></div>

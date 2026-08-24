@@ -85,9 +85,7 @@
   args: ComponentProps<typeof Input>,
   context: StoryContext<ComponentProps<typeof Input>>,
 )}
-  <div
-    class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
-  >
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
     <Input {...args} id={context.id} data-testid={context.id} />
   </div>
 {/snippet}
@@ -153,9 +151,7 @@
 
 <Story name="With Buttons">
   {#snippet template(args, context)}
-    <div
-      class="border border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
-    >
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
       <Input {...args} id={context.id} data-testid={context.id}>
         {#snippet beforeInput()}
           <Button type="button">Before</Button>

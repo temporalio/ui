@@ -42,7 +42,7 @@
         class:hidden={!showProfilePic}
       />
       <div
-        class="aspect-square h-full w-[24px] bg-io-blue-5 p-0.5 text-io-content-primary dark:bg-io-blue-12"
+        class="aspect-square h-full w-[24px] bg-blue-5 p-0.5 text-primary dark:bg-blue-12"
         class:hidden={showProfilePic}
       >
         {#if $authUser?.name}
@@ -85,7 +85,7 @@
     <MenuDivider />
     <MenuItem
       hoverable={false}
-      class="text-io-content-tertiary"
+      class="text-tertiary"
       newTab
       href="https://t.mp/slack"
     >
@@ -93,7 +93,7 @@
     </MenuItem>
     <MenuItem
       hoverable={false}
-      class="text-io-content-tertiary"
+      class="text-tertiary"
       newTab
       href="https://community.temporal.io/"
     >
@@ -101,7 +101,7 @@
     </MenuItem>
     <MenuItem
       hoverable={false}
-      class="text-io-content-tertiary"
+      class="text-tertiary"
       newTab
       href="https://temporal.io/change-log"
     >

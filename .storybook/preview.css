@@ -1,7 +1,7 @@
 body.sb-show-main,
 #storybook-root {
-  background-color: var(--color-io-background-primary);
-  color: var(--color-io-content-primary);
+  background-color: var(--color-background-primary);
+  color: var(--color-content-primary);
 }
 
 #storybook-root {

@@ -11,6 +11,6 @@
 
 {#if show}
   <span
-    class="absolute right-1 top-1 h-2 w-2 animate-pulse rounded-full bg-io-green-9"
+    class="absolute right-1 top-1 h-2 w-2 animate-pulse rounded-full bg-green-9"
   ></span>
 {/if}

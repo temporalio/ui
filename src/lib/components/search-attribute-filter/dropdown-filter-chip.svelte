@@ -350,10 +350,10 @@
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="bg-io-surface-secondary"
+    class="bg-surface-secondary"
   >
     {getDisplayKeyWithConditional(localFilter)}<span
-      class="max-w-[160px] truncate pl-1 text-io-content-brand lg:max-w-full"
+      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
       >{getDisplayValue(localFilter)}</span
     >
   </MenuButton>
@@ -478,7 +478,7 @@
               </div>
             {/if}
             <p
-              class="flex items-center justify-end gap-1 text-sm text-io-content-secondary"
+              class="flex items-center justify-end gap-1 text-sm text-secondary"
             >
               <IconClock />
               {translate('common.based-on-time-preface')}

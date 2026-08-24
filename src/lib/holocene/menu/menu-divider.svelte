@@ -1,1 +1,1 @@
-<hr tabindex="-1" aria-hidden="true" class="w-full border-io-border-primary" />
+<hr tabindex="-1" aria-hidden="true" class="w-full border-primary" />

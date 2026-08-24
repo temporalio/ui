@@ -57,7 +57,7 @@
       id="{id}-trigger"
       aria-expanded={open}
       aria-controls="{id}-content"
-      class="grow cursor-pointer hover:bg-io-alpha-indigo-5 focus-visible:outline-io-interactive-primary"
+      class="grow cursor-pointer hover:bg-alpha-indigo-5 focus-visible:outline-interactive-primary"
       type="button"
       onclick={toggleAccordion}
     >
@@ -74,7 +74,7 @@
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
-    class="block w-full bg-io-background-primary p-2"
+    class="block w-full bg-background-primary p-2"
     class:hidden={!open}
   >
     {@render children?.(open)}

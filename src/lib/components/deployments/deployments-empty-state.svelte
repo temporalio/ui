@@ -22,12 +22,12 @@
 </script>
 
 <div class="flex flex-col items-center gap-4 py-16">
-  <IconTemporalWorker class="h-20 w-20 text-io-indigo-6" />
+  <IconTemporalWorker class="h-20 w-20 text-indigo-6" />
   <div class="flex flex-col items-center gap-2">
     <p class="text-base font-medium">
       {translate('deployments.empty-state-title')}
     </p>
-    <p class="max-w-[500px] text-center text-sm text-io-content-secondary">
+    <p class="max-w-[500px] text-center text-sm text-secondary">
       {translate('deployments.empty-state-description')}
     </p>
   </div>

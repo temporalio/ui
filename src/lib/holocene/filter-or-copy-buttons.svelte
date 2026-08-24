@@ -76,10 +76,10 @@
   }
 
   .copy-or-filter-button {
-    @apply relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full bg-io-surface-primary p-0.5 text-io-content-primary hover:bg-io-actions-hover-overlay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-io-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-io-background-primary active:bg-io-actions-press-overlay;
+    @apply relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full bg-surface-primary p-0.5 text-primary hover:bg-action-hover-overlay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-action-press-overlay;
   }
 
   .filtered {
-    @apply bg-io-interactive-primary text-io-content-white hover:bg-io-interactive-primary-hover active:bg-io-interactive-primary-press;
+    @apply bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press;
   }
 </style>

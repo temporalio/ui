@@ -26,7 +26,7 @@
     </h2>
     <TabList
       label={translate('schedules.add-schedule-attr')}
-      class="flex flex-wrap gap-4 text-io-content-secondary"
+      class="flex flex-wrap gap-4 text-secondary"
     >
       <Tab
         label={translate('schedules.schedule')}

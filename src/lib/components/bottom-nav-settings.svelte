@@ -68,7 +68,7 @@
       <p>{translate('common.theme')}</p>
       <DarkModeMenu />
     </div>
-    <hr class="border-io-border-primary" />
+    <hr class="border-primary" />
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}

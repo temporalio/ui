@@ -105,7 +105,7 @@
           id="{id}-range"
           name="range"
           type="range"
-          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-io-border-tertiary"
+          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-tertiary"
           bind:value
           {min}
           {max}
@@ -139,11 +139,11 @@
 
 <style lang="postcss">
   .range-input-container {
-    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap text-io-content-primary;
+    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap text-primary;
   }
 
   .numeric-input {
-    @apply h-10 w-10 border border-io-border-primary bg-io-surface-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-io-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-io-background-primary;
+    @apply h-10 w-10 border border-primary bg-surface-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary;
 
     appearance: textfield;
   }
@@ -155,7 +155,7 @@
   }
 
   .numeric-input.invalid {
-    @apply border-io-border-danger bg-io-surface-danger text-io-content-danger ring-io-border-danger;
+    @apply border-danger bg-surface-danger text-danger ring-danger;
   }
 
   .numeric-input:focus {
@@ -167,11 +167,11 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full border border-solid border-io-border-primary bg-io-interactive-primary;
+    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-interactive-primary;
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply h-4 w-8 rounded-full border border-solid border-io-border-primary bg-io-interactive-primary shadow-none;
+    @apply h-4 w-8 rounded-full border border-solid border-primary bg-interactive-primary shadow-none;
   }
 
   input[type='range']:focus {
@@ -179,10 +179,10 @@
   }
 
   input[type='range']:focus::-webkit-slider-thumb {
-    @apply border border-io-border-primary ring-2 ring-io-interactive-primary ring-offset-2 ring-offset-io-background-primary;
+    @apply border border-primary ring-2 ring-interactive-primary ring-offset-2 ring-offset-background-primary;
   }
 
   input[type='range']:focus::-moz-range-thumb {
-    @apply border border-io-border-primary ring-2 ring-io-interactive-primary ring-offset-2 ring-offset-io-background-primary;
+    @apply border border-primary ring-2 ring-interactive-primary ring-offset-2 ring-offset-background-primary;
   }
 </style>

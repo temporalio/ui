@@ -130,13 +130,13 @@
   {@const rawValue = getRawValue(spec)}
   <div
     bind:this={containerEl}
-    class="relative flex min-h-16 w-full justify-between gap-4 border border-io-border-primary bg-io-background-primary px-4 py-3 text-left text-io-content-primary transition-colors"
+    class="relative flex min-h-16 w-full justify-between gap-4 border border-primary bg-background-primary px-4 py-3 text-left text-primary transition-colors"
   >
     <div
       class="grid w-full grid-cols-1 items-center gap-2 text-sm md:grid-cols-[minmax(8rem,max-content)_4fr_minmax(max-content,1fr)] md:gap-4"
     >
       <span class="font-semibold">{typeLabel}</span>
-      <span class="flex-1 flex-wrap text-xs text-io-content-secondary">
+      <span class="flex-1 flex-wrap text-xs text-secondary">
         {getScheduleSpecSummary(spec)}.
       </span>
       {#if rawValue}

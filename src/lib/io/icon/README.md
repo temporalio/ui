@@ -10,7 +10,7 @@ Each icon is its own component. There is no code generation — adding one is a 
 </script>
 
 <IconAdd />
-<IconAdd class="size-5 text-io-content-secondary" />
+<IconAdd class="size-5 text-secondary" />
 <IconAdd title="Add workflow" />
 ```
 

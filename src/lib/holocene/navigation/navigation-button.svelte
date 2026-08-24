@@ -36,7 +36,7 @@
   text={tooltip}
   right
   class="block"
-  tooltipClass="rounded-none text-io-content-white ml-4 group-data-[nav=open]:hidden"
+  tooltipClass="rounded-none text-white ml-4 group-data-[nav=open]:hidden"
 >
   <div
     role="button"
@@ -48,7 +48,7 @@
     data-track-intent="action"
     data-track-text={label}
     class={merge(
-      'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-io-alpha-neutral-30 group-[.navigation-inverse]:hover:bg-io-neutral-6',
+      'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-alpha-neutral-30 group-[.navigation-inverse]:hover:bg-neutral-6',
       disabled && 'pointer-events-none cursor-not-allowed opacity-50',
       className,
     )}

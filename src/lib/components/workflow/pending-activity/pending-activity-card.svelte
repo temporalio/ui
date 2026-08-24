@@ -47,7 +47,7 @@
 </script>
 
 <div
-  class="flex flex-1 cursor-default flex-col gap-2 border-b border-io-border-primary bg-io-surface-primary p-4 text-io-content-primary"
+  class="flex flex-1 cursor-default flex-col gap-2 border-b border-primary bg-surface-primary p-4 text-primary"
 >
   <div class="flex flex-1 flex-wrap justify-between gap-2">
     <div class="flex flex-wrap items-center space-x-3">
@@ -155,7 +155,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-io-content-secondary">
+    <p class="min-w-56 text-sm text-secondary">
       {label}
     </p>
     <p class="w-full whitespace-pre-line">
@@ -170,7 +170,7 @@
 
 {#snippet heartbeat()}
   <div>
-    <p class="text-sm text-io-content-secondary">
+    <p class="text-sm text-secondary">
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
@@ -189,7 +189,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if activity.lastFailure}
-        <p class="text-sm text-io-content-secondary">
+        <p class="text-sm text-secondary">
           {translate('workflows.last-failure')}
         </p>
         {#key activity.attempt}
@@ -203,7 +203,7 @@
     </div>
     {#if activity.lastFailure?.stackTrace}
       <div>
-        <p class="text-sm text-io-content-secondary">
+        <p class="text-sm text-secondary">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock
@@ -235,7 +235,7 @@
 
 {#snippet nextRetry(timeDifference: string)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-io-content-secondary">
+    <p class="min-w-56 text-sm text-secondary">
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
@@ -248,13 +248,13 @@
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
     <Badge type={failed ? 'danger' : 'default'}>
-      <IconRetry class="mr-1 {failed && 'font-bold text-io-content-danger'}" />
+      <IconRetry class="mr-1 {failed && 'font-bold text-danger'}" />
       {activity.attempt ?? 0} of {formatMaximumAttempts(
         activity.maximumAttempts ?? null,
       )}
     </Badge>
     {#if activity.maximumAttempts}
-      <p class="ml-1 text-sm text-io-content-secondary">
+      <p class="ml-1 text-sm text-secondary">
         {formatAttemptsLeft(activity.maximumAttempts, activity.attempt ?? 0)} remaining
       </p>
     {/if}

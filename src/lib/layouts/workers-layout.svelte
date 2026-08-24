@@ -92,7 +92,7 @@
         </h1>
         <CountRefreshButton count={$workerCount.newCount} {refresh} />
       </div>
-      <p class="mt-2 text-xs text-io-content-secondary">
+      <p class="mt-2 text-xs text-secondary">
         {refreshTimeFormatted}
       </p>
     </div>

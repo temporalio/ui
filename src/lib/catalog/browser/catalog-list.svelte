@@ -159,16 +159,12 @@
   {#if latest?.state === 'execution-terminal'}
     {@const status = terminalStatusPresentation(latest.terminalStatus!)}
     {@render runBadge(status.type, status.label, evidence)}
-    <span class="text-io-content-secondary"
-      >{relativeRunTime(latest.createdAt)}</span
-    >
+    <span class="text-secondary">{relativeRunTime(latest.createdAt)}</span>
   {:else if latest}
     {@render runBadge('subtle', sessionStateLabels[latest.state], evidence)}
-    <span class="text-io-content-secondary"
-      >{relativeRunTime(latest.createdAt)}</span
-    >
+    <span class="text-secondary">{relativeRunTime(latest.createdAt)}</span>
   {:else}
-    <span class="text-io-content-secondary">Not run</span>
+    <span class="text-secondary">Not run</span>
   {/if}
 {/snippet}
 
@@ -176,7 +172,7 @@
   <div
     role="search"
     aria-label="Filter example catalog"
-    class="flex w-full flex-wrap items-center gap-2 border border-io-border-primary bg-io-surface-primary p-1.5"
+    class="flex w-full flex-wrap items-center gap-2 border border-primary bg-surface-primary p-1.5"
   >
     <Input
       id="catalog-search"
@@ -214,7 +210,7 @@
   </div>
 
   {#if runError}
-    <p class="text-sm text-io-content-danger" role="alert">{runError}</p>
+    <p class="text-sm text-danger" role="alert">{runError}</p>
   {/if}
 
   <div class="catalog-table-region w-full overflow-x-auto">
@@ -230,7 +226,7 @@
           <th scope="col" class="hidden w-36 sm:table-cell">Latest run</th>
           <th
             scope="col"
-            class="sticky right-0 z-20 w-36 bg-io-surface-table-header !text-right text-io-content-primary sm:w-60"
+            class="sticky right-0 z-20 w-36 bg-surface-table-header !text-right text-primary sm:w-60"
             >Actions</th
           >
         </TableHeaderRow>
@@ -242,14 +238,12 @@
           <TableRow>
             <td class="min-w-0 py-2">
               <Link
-                class="table-link block break-words text-sm font-medium text-io-content-primary"
+                class="table-link block break-words text-sm font-medium text-primary"
                 href={exampleHref(descriptor.id)}
               >
                 {descriptor.title}
               </Link>
-              <p
-                class="hidden truncate text-xs text-io-content-secondary sm:block"
-              >
+              <p class="hidden truncate text-xs text-secondary sm:block">
                 {descriptor.description}
               </p>
               <div
@@ -271,7 +265,7 @@
               </div>
             </td>
             <td
-              class="catalog-actions-cell sticky right-0 z-[5] bg-io-surface-primary text-io-content-primary"
+              class="catalog-actions-cell sticky right-0 z-[5] bg-surface-primary text-primary"
             >
               <div class="flex items-center justify-end gap-1 sm:gap-2">
                 <Button
@@ -294,7 +288,7 @@
                   >
                   {#if pending}
                     <span
-                      class="pointer-events-none absolute -right-1 -top-1 min-w-4 rounded-full border border-io-border-primary bg-io-surface-primary px-1 text-center text-[10px] leading-4 text-io-content-primary"
+                      class="pointer-events-none absolute -right-1 -top-1 min-w-4 rounded-full border border-primary bg-surface-primary px-1 text-center text-[10px] leading-4 text-primary"
                       aria-hidden="true">{pending}</span
                     >
                   {/if}
@@ -305,10 +299,7 @@
         {/each}
       {:else}
         <TableRow>
-          <td
-            colspan="5"
-            class="py-6 text-center text-sm text-io-content-secondary"
-          >
+          <td colspan="5" class="py-6 text-center text-sm text-secondary">
             No examples match the current filters.
           </td>
         </TableRow>
@@ -320,11 +311,11 @@
 <style lang="postcss">
   .catalog-table-region {
     :global(.holocene-table-body tr:nth-of-type(odd) > .catalog-actions-cell) {
-      @apply bg-io-background-primary text-io-content-primary;
+      @apply bg-background-primary text-primary;
     }
 
     :global(.holocene-table-body tr:hover > .catalog-actions-cell) {
-      @apply bg-io-interactive-secondary-hover bg-fixed;
+      @apply bg-interactive-secondary-hover bg-fixed;
     }
   }
 </style>
