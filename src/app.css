@@ -9,6 +9,7 @@
 @layer base {
   :root {
     --top-nav-height: 3rem;
+    --layout-pt: 0px;
     --banner-height: 0px;
     --bottom-nav-height: 4rem;
     --scroll-inset-top: 0px;
