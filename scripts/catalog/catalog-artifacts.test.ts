@@ -24,6 +24,7 @@ import {
   verifyCatalogProjectBoundaries,
 } from './catalog-artifacts';
 import { catalogWorkerEntry, runCatalogWorkerDevelopment } from './catalog-cli';
+import { createInRepoTemporaryDirectory } from './test-temp-root';
 import { catalogRegistrationSource as localRegistrationFallback } from '../../src/lib/catalog/worker/local-registration-fallback';
 import { createCatalogRegistry } from '../../src/lib/catalog/worker/registry';
 import { requireCatalogRoutingFromEnvironment } from '../../src/lib/catalog/worker/routing-config';
@@ -35,7 +36,7 @@ const packageConsumerTest =
   process.env.CATALOG_PACKAGE_TEST === '1' ? it : it.skip;
 
 const createTemporaryDirectory = async () => {
-  const directory = await mkdtemp(join(process.cwd(), '.catalog-test-'));
+  const directory = await createInRepoTemporaryDirectory('catalog-test-');
   temporaryDirectories.push(directory);
   return directory;
 };
