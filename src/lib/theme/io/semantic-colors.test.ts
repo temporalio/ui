@@ -126,12 +126,16 @@ describe('semantic color opacity', () => {
 describe('Figma alpha overlay colors', () => {
   it('uses the theme-specific overlay strengths', () => {
     expect(semanticColors.overlay.primary).toEqual({
+      light: colorAlphaScales.neutral[5],
+      dark: colorAlphaScales.slate[5],
+    });
+    expect(semanticColors.overlay.secondary).toEqual({
       light: colorAlphaScales.neutral[10],
-      dark: colorAlphaScales.slate[20],
+      dark: colorAlphaScales.slate[10],
     });
     expect(semanticColors.overlay.tertiary).toEqual({
-      light: colorAlphaScales.neutral[30],
-      dark: colorAlphaScales.slate[30],
+      light: colorAlphaScales.neutral[15],
+      dark: colorAlphaScales.slate[15],
     });
     expect(semanticColors.overlay.warning).toEqual({
       light: colorAlphaScales.amber[20],

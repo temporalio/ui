@@ -106,7 +106,7 @@
     }
 
     :global(tr:nth-of-type(even)) {
-      @apply bg-surface-secondary;
+      @apply bg-overlay-primary;
     }
 
     :global(tr > td) {

@@ -311,11 +311,19 @@
 <style lang="postcss">
   .catalog-table-region {
     :global(.holocene-table-body tr:nth-of-type(even) > .catalog-actions-cell) {
-      @apply bg-surface-secondary text-primary;
+      @apply text-primary;
+
+      background-color: var(--color-surface-primary);
+      background-image: linear-gradient(
+        var(--color-overlay-primary),
+        var(--color-overlay-primary)
+      );
     }
 
     :global(.holocene-table-body tr:hover > .catalog-actions-cell) {
       @apply bg-interactive-secondary-hover bg-fixed;
+
+      background-image: none;
     }
   }
 </style>

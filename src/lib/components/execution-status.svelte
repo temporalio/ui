@@ -99,7 +99,7 @@
         workflowStatus({
           status,
         }),
-        (newCount || delayed || taskFailure) && 'rounded-r-none',
+        (newCount || delayed || taskFailure) && 'rounded-r-none border-r-0',
         big && 'h-8 px-4',
       )}
     >
@@ -120,8 +120,8 @@
           workflowStatus({
             status: 'Paused',
           }),
-          'rounded-l-none',
-          (newCount || taskFailure) && 'rounded-r-none',
+          'rounded-l-none border-l-0',
+          (newCount || taskFailure) && 'rounded-r-none border-r-0',
           big && 'h-8 px-2',
         )}
       >
@@ -133,8 +133,8 @@
         class={merge(
           workflowStatus(),
           'border-danger bg-surface-danger text-danger',
-          'rounded-l-none',
-          newCount && 'rounded-r-none',
+          'rounded-l-none border-l-0',
+          newCount && 'rounded-r-none border-r-0',
           big && 'h-8 px-2',
         )}
       >
@@ -145,8 +145,8 @@
     {#if newCount}
       <span
         class={merge(
-          'font-base rounded-r-sm bg-surface-primary px-1 py-0.5 text-primary',
-          big && 'px-2',
+          'font-base h-5 rounded-r-sm border border-l-0 border-tertiary bg-surface-primary px-1 py-0.5 text-primary',
+          big && 'h-8 px-2',
         )}
         in:fade
       >

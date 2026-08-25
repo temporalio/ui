@@ -69,6 +69,7 @@
       placeholder={translate('workflows.search-placeholder')}
       Icon={IconSearch}
       class="grow lg:w-3/4 [&_*]:border-r-0"
+      inputContainerClass="bg-surface-primary"
       clearable
       clearButtonLabel={translate('common.clear-input-button-label')}
       onClear={handleClearInput}

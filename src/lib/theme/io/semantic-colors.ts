@@ -326,16 +326,16 @@ export const semanticColors: SemanticColors = {
   },
   overlay: {
     primary: {
-      light: colorAlphaScales.neutral[10],
-      dark: colorAlphaScales.slate[20],
+      light: colorAlphaScales.neutral[5],
+      dark: colorAlphaScales.slate[5],
     },
     secondary: {
-      light: colorAlphaScales.neutral[15],
-      dark: colorAlphaScales.slate[30],
+      light: colorAlphaScales.neutral[10],
+      dark: colorAlphaScales.slate[10],
     },
     tertiary: {
-      light: colorAlphaScales.neutral[30],
-      dark: colorAlphaScales.slate[30],
+      light: colorAlphaScales.neutral[15],
+      dark: colorAlphaScales.slate[15],
     },
     information: {
       light: colorAlphaScales.blue[20],
