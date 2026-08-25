@@ -36,7 +36,9 @@ export default defineConfig({
       'e2e',
       'tests',
       '.svelte-kit',
+      '.catalog-tmp/**',
     ],
+    globalSetup: ['./vitest-global-setup.ts'],
     environment: 'jsdom',
     setupFiles: ['./vitest-setup.ts', 'vitest-localstorage-mock'],
     deps: {
