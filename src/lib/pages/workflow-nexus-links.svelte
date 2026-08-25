@@ -9,7 +9,7 @@
   import { groupEvents } from '$lib/models/event-groups';
   import {
     getInboundLinkForEvent,
-    getInboundNexusLinkEvents,
+    getVisibleInboundNexusLinkEvents,
   } from '$lib/runes/inbound-nexus-links.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -43,9 +43,10 @@
         !group.eventList.some((event) => isSystemNexusScheduledEvent(event)),
     ),
   );
-  const inboundLinkEvents = $derived(
-    getInboundNexusLinkEvents($fullEventHistory),
+  const inboundLinks = getVisibleInboundNexusLinkEvents(
+    () => $fullEventHistory,
   );
+  const inboundLinkEvents = $derived(inboundLinks.events);
 </script>
 
 {#snippet linkDisplay(view: EventLinkDisplay)}

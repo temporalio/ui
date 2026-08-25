@@ -49,7 +49,7 @@ export const definition = defineScenario({
       'Follow the target execution link from the Initiated row. It must land on the target workflow.',
       "Open the target workflow's History tab. Its Workflow Execution Signaled row must carry a link back to the caller.",
       "Switch the caller's history to Compact. The collapsed group row must read the operation label, not the raw Nexus event name.",
-      'Open the Timeline tab on the caller. The operation must use the Nexus colour and icon.',
+      'Open the Timeline tab on the caller. The operation must use the signal icon and, on hover, the signal colour. A completed group draws its static line in the Completed green whatever its category, so the category only shows through on hover.',
       'Open the catalog page for signal-handlers. It must show a worker polling its task queue, which is the same worker that ran the target.',
     ],
   },
