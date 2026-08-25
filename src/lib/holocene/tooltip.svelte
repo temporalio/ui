@@ -125,7 +125,7 @@
     }
   }
 
-  function isKeyboardFocus(target: EventTarget | null) {
+  function isFocusVisible(target: EventTarget | null) {
     if (!(target instanceof Element)) return true;
 
     try {
@@ -136,7 +136,7 @@
   }
 
   function handleFocusIn(event: FocusEvent) {
-    if (!isKeyboardFocus(event.target)) return;
+    if (!isFocusVisible(event.target)) return;
 
     isFocused = true;
   }
