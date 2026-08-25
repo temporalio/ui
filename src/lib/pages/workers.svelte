@@ -38,14 +38,6 @@
 
 {#if workerHeartbeatsEnabled}
   <div>
-    <FilterBar
-      filters={workerFilters}
-      options={$workerSearchAttributeOptions}
-      searchAttributes={$workerSearchAttributes}
-      id="worker"
-      statusAttribute="WorkerStatus"
-      includeNullConditions={false}
-    />
     <SavedQueryViews
       filters={workerFilters}
       savedQueries={savedWorkerQueries}
@@ -53,6 +45,14 @@
       defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
       searchAttributes={workerSearchAttributes}
       id="worker"
+    />
+    <FilterBar
+      filters={workerFilters}
+      options={$workerSearchAttributeOptions}
+      searchAttributes={$workerSearchAttributes}
+      id="worker"
+      statusAttribute="WorkerStatus"
+      includeNullConditions={false}
     />
   </div>
   {#key [namespace, query, $refresh]}

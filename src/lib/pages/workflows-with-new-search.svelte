@@ -267,7 +267,6 @@
 </header>
 
 <div>
-  <FilterBar />
   <SavedQueryViews
     filters={workflowFilters}
     savedQueries={savedWorkflowQueries}
@@ -276,6 +275,7 @@
     {searchAttributes}
     id="workflow"
   />
+  <FilterBar />
 </div>
 <WorkflowsSummaryConfigurableTable
   onClickConfigure={openCustomizationDrawer}

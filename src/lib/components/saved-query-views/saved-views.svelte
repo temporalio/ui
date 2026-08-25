@@ -209,7 +209,7 @@
 </script>
 
 <div
-  class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-b border-subtle p-1.5 lg:flex-nowrap"
+  class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-t border-subtle p-1.5 lg:flex-nowrap"
   role="group"
   aria-label={translate('common.saved-views')}
   data-testid="saved-views-bar"

@@ -228,7 +228,6 @@
 </header>
 
 <div>
-  <FilterBar />
   <SavedQueryViews
     filters={activityFilters}
     savedQueries={savedActivityQueries}
@@ -237,6 +236,7 @@
     searchAttributes={activityExecutionSearchAttributes}
     id="activity"
   />
+  <FilterBar />
 </div>
 <ActivitiesSummaryConfigurableTable
   onClickConfigure={openCustomizationDrawer}

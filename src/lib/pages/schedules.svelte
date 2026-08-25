@@ -140,12 +140,6 @@
 </header>
 
 <div>
-  <FilterBar
-    filters={scheduleFilters}
-    options={$scheduleSearchAttributeOptions}
-    searchAttributes={$scheduleSearchAttributes}
-    id="schedules"
-  />
   <SavedQueryViews
     filters={scheduleFilters}
     savedQueries={savedScheduleQueries}
@@ -153,6 +147,12 @@
     defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
     searchAttributes={scheduleSearchAttributes}
     id="schedule"
+  />
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
   />
 </div>
 {#key [namespace, query, $schedulesRefresh]}
