@@ -120,6 +120,14 @@ export const resolveSystemNexusEvent = (
   };
 };
 
+/**
+ * True when the event schedules an operation on the system endpoint. Only the
+ * scheduled event carries the endpoint, so it is the anchor for deciding
+ * whether the other events of an operation belong to the system endpoint.
+ */
+export const isSystemNexusScheduledEvent = (event: WorkflowEvent): boolean =>
+  isNexusOperationScheduledEvent(event) && isSystemEndpoint(event);
+
 /** The group label for a system Nexus operation, or null to use the default. */
 export const systemNexusGroupLabel = (event: WorkflowEvent): string | null =>
   operationForScheduled(event)?.label ?? null;

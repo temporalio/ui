@@ -7,7 +7,11 @@ import { describe, expect, it } from 'vitest';
 
 import type { WorkflowEvent } from '$lib/types/events';
 
-import { resolveSystemNexusEvent, schemaForMessageType } from './index';
+import {
+  isSystemNexusScheduledEvent,
+  resolveSystemNexusEvent,
+  schemaForMessageType,
+} from './index';
 import { escapeQueryValue } from './shared';
 
 const toBinaryPayload = (
@@ -376,5 +380,29 @@ describe('endpoint trust', () => {
     );
 
     expect(display).toBeNull();
+  });
+});
+
+describe('isSystemNexusScheduledEvent', () => {
+  it('accepts a scheduled event on the system endpoint', () => {
+    expect(
+      isSystemNexusScheduledEvent(scheduledEvent({ workflowId: 'target' })),
+    ).toBe(true);
+  });
+
+  it('refuses a scheduled event on a user endpoint', () => {
+    expect(
+      isSystemNexusScheduledEvent(
+        scheduledEvent({ workflowId: 'target' }, 'my-endpoint'),
+      ),
+    ).toBe(false);
+  });
+
+  it('refuses a terminal event, which carries no endpoint', () => {
+    expect(
+      isSystemNexusScheduledEvent(
+        completedEvent({ runId: 'target-run-id', started: true }),
+      ),
+    ).toBe(false);
   });
 });
