@@ -30,6 +30,15 @@
     'transcoder-error': IconTranscoderError,
   };
 
+  const intentIconClass: Readonly<Record<Intent, string>> = {
+    warning: 'text-warning',
+    error: 'text-danger',
+    success: 'text-success',
+    info: 'text-information',
+    nexus: '',
+    'transcoder-error': '',
+  };
+
   interface Props extends HTMLAttributes<HTMLDivElement> {
     intent: Intent;
     title?: string;
@@ -73,7 +82,7 @@
   {role}
   {...rest}
 >
-  <Icon class="mt-0.5 shrink-0" />
+  <Icon class={merge('mt-0.5 shrink-0', intentIconClass[intent])} />
   <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}

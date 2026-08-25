@@ -346,7 +346,7 @@ describe('CatalogList', () => {
     );
 
     expect(source).toMatch(
-      /class="[^"]*catalog-table-region[^"]*"[\s\S]*class="(?=[^"]*catalog-actions-cell)(?=[^"]*sticky)(?=[^"]*right-0)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*"[\s\S]*:global\(\.holocene-table-body tr:nth-of-type\(odd\) > \.catalog-actions-cell\) \{\s*@apply bg-background-primary text-primary;\s*\}[\s\S]*:global\(\.holocene-table-body tr:hover > \.catalog-actions-cell\) \{\s*@apply bg-interactive-secondary-hover bg-fixed;\s*\}/,
+      /class="[^"]*catalog-table-region[^"]*"[\s\S]*class="(?=[^"]*catalog-actions-cell)(?=[^"]*sticky)(?=[^"]*right-0)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*"[\s\S]*:global\(\.holocene-table-body tr:nth-of-type\(even\) > \.catalog-actions-cell\) \{\s*@apply bg-surface-secondary text-primary;\s*\}[\s\S]*:global\(\.holocene-table-body tr:hover > \.catalog-actions-cell\) \{\s*@apply bg-interactive-secondary-hover bg-fixed;\s*\}/,
     );
   });
 });

@@ -57,7 +57,7 @@
 
 <style lang="postcss">
   .holocene-table {
-    @apply table-auto text-primary;
+    @apply table-auto bg-surface-primary text-primary;
 
     &.bordered {
       @apply border border-primary;
@@ -103,6 +103,10 @@
 
     :global(tr.expanded) {
       @apply w-full hover:bg-surface-primary;
+    }
+
+    :global(tr:nth-of-type(even)) {
+      @apply bg-surface-secondary;
     }
 
     :global(tr > td) {

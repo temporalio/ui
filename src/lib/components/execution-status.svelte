@@ -39,30 +39,32 @@
 
   const workflowStatus = cva(
     [
-      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap gap-0.5 font-medium',
+      'flex h-5 items-center gap-0.5 whitespace-nowrap rounded-sm border border-transparent px-1 py-0.5 font-medium',
     ],
     {
       variants: {
         status: {
-          Running: 'bg-surface-information text-information',
-          TimedOut: 'bg-surface-error text-error',
-          Completed: 'bg-surface-success text-success',
-          Failed: 'bg-surface-danger text-danger',
-          ContinuedAsNew: 'bg-alpha-purple-30 text-primary',
-          Canceled: 'bg-surface-primary text-secondary',
-          Terminated: 'bg-surface-warning text-warning',
-          Paused: 'bg-surface-warning text-warning',
-          Unspecified: 'bg-surface-primary text-secondary',
-          Scheduled: 'bg-surface-information text-information',
-          Started: 'bg-surface-information text-information',
-          Open: 'bg-surface-success text-success',
-          New: 'bg-surface-information text-information',
-          Initiated: 'bg-surface-information text-information',
+          Running: 'border-information bg-surface-information text-information',
+          TimedOut: 'border-error bg-surface-error text-error',
+          Completed: 'border-success bg-surface-success text-success',
+          Failed: 'border-danger bg-surface-danger text-danger',
+          ContinuedAsNew: 'border-success bg-surface-success text-success',
+          Canceled: 'border-tertiary bg-surface-tertiary text-secondary',
+          Terminated: 'border-warning bg-surface-warning text-warning',
+          Paused: 'border-information bg-surface-information text-information',
+          Unspecified: 'border-tertiary bg-surface-primary text-secondary',
+          Scheduled:
+            'border-information bg-surface-information text-information',
+          Started: 'border-information bg-surface-information text-information',
+          Open: 'border-success bg-surface-success text-success',
+          New: 'border-information bg-surface-information text-information',
+          Initiated:
+            'border-information bg-surface-information text-information',
           Fired: 'bg-alpha-pink-30 text-primary',
-          CancelRequested: 'bg-surface-warning text-warning',
+          CancelRequested: 'border-warning bg-surface-warning text-warning',
           Signaled: 'bg-alpha-pink-30 text-primary',
           Pending: 'bg-alpha-purple-30 text-primary',
-          Retrying: 'bg-surface-danger text-danger',
+          Retrying: 'border-danger bg-surface-danger text-danger',
         },
       },
     },
@@ -130,7 +132,7 @@
       <span
         class={merge(
           workflowStatus(),
-          'bg-surface-danger text-danger',
+          'border-danger bg-surface-danger text-danger',
           'rounded-l-none',
           newCount && 'rounded-r-none',
           big && 'h-8 px-2',

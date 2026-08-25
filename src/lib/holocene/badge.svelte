@@ -12,7 +12,7 @@
     success: 'border border-success bg-surface-success text-success',
     danger: 'border border-danger bg-surface-danger text-danger',
     count:
-      'h-6 w-6 min-w-max rounded-full border border-secondary bg-surface-tertiary text-primary',
+      'gap-1 rounded-full border border-secondary bg-surface-tertiary px-1 py-0 font-mono text-xs font-normal leading-4 text-primary',
     subtle: 'bg-surface-tertiary text-secondary font-normal select-all',
     ghost: 'bg-surface-primary text-primary border border-tertiary',
   };

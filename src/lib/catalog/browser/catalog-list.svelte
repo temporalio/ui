@@ -310,8 +310,8 @@
 
 <style lang="postcss">
   .catalog-table-region {
-    :global(.holocene-table-body tr:nth-of-type(odd) > .catalog-actions-cell) {
-      @apply bg-background-primary text-primary;
+    :global(.holocene-table-body tr:nth-of-type(even) > .catalog-actions-cell) {
+      @apply bg-surface-secondary text-primary;
     }
 
     :global(.holocene-table-body tr:hover > .catalog-actions-cell) {
