@@ -54,15 +54,15 @@
       statusAttribute="WorkerStatus"
       includeNullConditions={false}
     />
+    {#key [namespace, query, $refresh]}
+      <WorkersTable
+        {namespace}
+        onFetch={() => fetchPaginatedWorkers({ namespace, query })}
+        total={$workerCount.count}
+        filterable
+      />
+    {/key}
   </div>
-  {#key [namespace, query, $refresh]}
-    <WorkersTable
-      {namespace}
-      onFetch={() => fetchPaginatedWorkers({ namespace, query })}
-      total={$workerCount.count}
-      filterable
-    />
-  {/key}
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}

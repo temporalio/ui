@@ -276,11 +276,11 @@
     id="workflow"
   />
   <FilterBar />
+  <WorkflowsSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
+    {cloud}
+  />
 </div>
-<WorkflowsSummaryConfigurableTable
-  onClickConfigure={openCustomizationDrawer}
-  {cloud}
-/>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

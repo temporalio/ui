@@ -237,10 +237,10 @@
     id="activity"
   />
   <FilterBar />
+  <ActivitiesSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
+  />
 </div>
-<ActivitiesSummaryConfigurableTable
-  onClickConfigure={openCustomizationDrawer}
-/>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

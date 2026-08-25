@@ -135,10 +135,10 @@
     id="nexus"
   />
   <FilterBar />
+  <NexusOperationsSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
+  />
 </div>
-<NexusOperationsSummaryConfigurableTable
-  onClickConfigure={openCustomizationDrawer}
-/>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}
