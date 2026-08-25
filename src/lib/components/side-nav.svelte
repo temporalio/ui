@@ -23,9 +23,7 @@
   {#each sections as section, i (i)}
     <NavSection navItems={section} />
     {#if isNotLastItem(section, i)}
-      <hr
-        class="border-alpha-neutral-30 group-[.navigation-inverse]:border-neutral-12 group-data-[nav=closed]:hidden"
-      />
+      <hr class="border-primary group-data-[nav=closed]:hidden" />
     {/if}
   {/each}
 </Navigation>

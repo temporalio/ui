@@ -39,7 +39,7 @@
       href={link}
       {rel}
       {target}
-      class="relative flex cursor-pointer items-center border border-alpha-slate-20 bg-alpha-slate-10 text-white hover:bg-white hover:text-black group-data-[nav=closed]:p-1 group-data-[nav=open]:px-2.5 group-data-[nav=open]:py-2"
+      class="relative flex cursor-pointer items-center border border-primary bg-overlay-primary text-primary hover:bg-action-hover-overlay group-data-[nav=closed]:p-1 group-data-[nav=open]:px-2.5 group-data-[nav=open]:py-2"
     >
       <div
         class="flex h-6 w-6 items-center whitespace-nowrap group-data-[nav=open]:hidden group-data-[nav=closed]:justify-center"

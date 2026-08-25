@@ -54,15 +54,18 @@
       data-track-intent="navigate"
       data-track-text={label}
       class={merge(
-        'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm text-secondary hover:bg-surface-primary hover:text-primary group-[.navigation-cloud]:text-white group-[.navigation-cloud]:hover:bg-action-hover-overlay group-[.navigation-cloud]:hover:text-white',
+        'flex items-center gap-3 whitespace-nowrap rounded p-2 text-xs font-medium text-secondary hover:bg-surface-primary hover:text-primary',
         active &&
-          'bg-action-brand-hover text-brand hover:bg-action-brand-press hover:text-brand group-[.navigation-cloud]:bg-action-hover-overlay group-[.navigation-cloud]:text-white group-[.navigation-cloud]:hover:bg-action-press-overlay group-[.navigation-cloud]:hover:text-white',
+          'bg-action-brand-hover text-brand hover:bg-action-brand-press hover:text-brand',
         disabled && 'pointer-events-none cursor-not-allowed opacity-disabled',
       )}
       class:text-tertiary={disabled}
     >
       {#if Icon}
-        <div class="flex h-6 w-6 items-center" class:animate-pulse={animate}>
+        <div
+          class="flex size-4 shrink-0 items-center"
+          class:animate-pulse={animate}
+        >
           <Icon />
         </div>
       {/if}

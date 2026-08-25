@@ -179,7 +179,7 @@ describe('action semantic colors', () => {
       },
       'brand-hover': {
         light: colorAlphaScales.indigo[10],
-        dark: colorAlphaScales.indigo[5],
+        dark: colorAlphaScales.indigo[10],
       },
       'brand-press': {
         light: colorAlphaScales.indigo[15],

@@ -48,13 +48,13 @@
     data-track-intent="action"
     data-track-text={label}
     class={merge(
-      'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm text-secondary hover:bg-surface-primary hover:text-primary group-[.navigation-cloud]:text-white group-[.navigation-cloud]:hover:bg-action-hover-overlay group-[.navigation-cloud]:hover:text-white',
+      'relative flex items-center gap-3 whitespace-nowrap rounded p-2 text-xs font-medium text-secondary hover:bg-surface-primary hover:text-primary',
       disabled && 'pointer-events-none cursor-not-allowed opacity-disabled',
       className,
     )}
   >
     {#if Icon}
-      <div class="flex h-6 w-6 items-center">
+      <div class="flex size-4 shrink-0 items-center">
         <Icon />
       </div>
     {/if}
