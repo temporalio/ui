@@ -41,6 +41,7 @@ describe('property-aware color API', () => {
       'bg-action-hover-overlay',
       'bg-overlay-primary',
       'bg-content-primary',
+      'bg-content-static-text-success',
       'bg-surface-static-neutral',
       'bg-border-primary',
       'bg-white',
@@ -101,6 +102,9 @@ describe('property-aware color API', () => {
     expect(css).toContain('background-color: var(--color-background-primary)');
     expect(css).toContain(
       'background-color: var(--color-actions-hover-overlay)',
+    );
+    expect(css).toContain(
+      'background-color: var(--color-content-static-text-success)',
     );
     expect(css).toContain('color: var(--color-content-primary)');
     expect(css).toContain('color: var(--color-content-static-text-info)');
