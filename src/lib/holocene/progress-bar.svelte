@@ -1,7 +1,27 @@
+<script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
+  interface Props {
+    subtle?: boolean;
+    class?: string;
+  }
+
+  let { subtle = false, class: className = '' }: Props = $props();
+</script>
+
 <div
-  class="absolute left-0 right-0 z-[5] h-1.5 overflow-hidden rounded-full bg-surface-tertiary"
+  class={merge(
+    'absolute left-0 right-0 z-[5] overflow-hidden',
+    subtle ? 'h-0.5 bg-transparent' : 'h-1.5 rounded-full bg-surface-tertiary',
+    className,
+  )}
 >
-  <span class="block h-full w-2/5 rounded-full bg-content-brand"></span>
+  <span
+    class={merge(
+      'block h-full w-2/5 bg-content-brand',
+      !subtle && 'rounded-full',
+    )}
+  ></span>
 </div>
 
 <style>

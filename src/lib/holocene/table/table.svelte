@@ -43,7 +43,11 @@
   <thead class="holocene-table-header">
     {@render headers?.()}
     {#if updating}
-      <ProgressBar />
+      <tr aria-hidden="true" class="!h-0 bg-transparent">
+        <th colspan="1000" class="relative !h-0 !border-0 !p-0">
+          <ProgressBar subtle class="bottom-0" />
+        </th>
+      </tr>
     {/if}
   </thead>
   <tbody class="holocene-table-body">
