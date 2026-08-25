@@ -29,8 +29,7 @@ export const Strings = {
   'view-name-invalid-start-end':
     'Name cannot start or end with hyphens (-) or periods (.)',
   'view-name-not-unique': 'Name must be unique',
-  'duplicate-view': 'Duplicate View',
-  'create-new': 'Create New',
+  duplicate: 'Duplicate',
   'delete-view': 'Delete View',
   'start-time': 'Start Time',
   'end-time': 'End Time',

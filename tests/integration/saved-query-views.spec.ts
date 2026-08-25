@@ -163,8 +163,7 @@ test.describe('Saved Query Views', () => {
       .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await expectSelectedView(page, 'Original view');
-    await page.getByTestId('edit-view-button').click();
-    await page.getByTestId('create-as-new-button').click();
+    await page.getByTestId('duplicate-view-button').click();
 
     await expectSelectedView(page, 'Original view-copy');
     await expect
@@ -173,7 +172,7 @@ test.describe('Saved Query Views', () => {
 
     await selectCustomView(page, 'original-view-copy');
     await page.getByTestId('edit-view-button').click();
-    await page.getByRole('button', { name: 'Delete this Saved View' }).click();
+    await page.getByRole('button', { name: 'Delete View' }).click();
 
     await expect(page.getByTestId('original-view-copy')).toHaveCount(0);
     await expect.poll(() => getQueryParam(page.url())).toBe('');

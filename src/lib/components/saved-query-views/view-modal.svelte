@@ -124,32 +124,6 @@
     }
   };
 
-  const onCreateAsNew = (event: Event) => {
-    event.preventDefault();
-
-    if (!nameValid || !onCreateView) return;
-
-    const base = trimmedName;
-    const currentNameTrimmed = view?.name?.trim() ?? '';
-
-    let candidate = base === currentNameTrimmed ? `${base}-copy` : base;
-    let i = 2;
-    const exists = (n: string) =>
-      existing.some((q) => q.name.toLowerCase() === n.toLowerCase());
-    while (exists(candidate)) {
-      candidate = `${base}-copy-${i++}`;
-    }
-
-    const updatedView: SavedQuery = {
-      id: Date.now().toString(),
-      name: candidate,
-      query,
-      type: 'user',
-    };
-    onCreateView(updatedView);
-    hideModal();
-  };
-
   const onDelete = () => {
     if (view) onDeleteView?.(view);
     hideModal();
@@ -188,20 +162,6 @@
         class="w-full"
         data-testid={`${id}-input`}
       />
-      {#if view}
-        <div class="flex items-center justify-start gap-2">
-          <Button
-            variant="secondary"
-            disabled={!nameValid || maxViewsReached}
-            data-testid="create-as-new-button"
-            onclick={onCreateAsNew}
-            class="mt-1"
-            >{name === view.name
-              ? translate('common.duplicate-view')
-              : translate('common.create-new')}</Button
-          >
-        </div>
-      {/if}
     </div>
   {/snippet}
   {#snippet footer()}

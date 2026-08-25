@@ -192,6 +192,29 @@
     activeQueryView = view;
   };
 
+  const onDuplicateView = () => {
+    if (!activeUserView) return;
+
+    const base = activeUserView.name.trim();
+    const exists = (n: string) =>
+      namespaceSavedQueries.some(
+        (q) => q.type === 'user' && q.name.toLowerCase() === n.toLowerCase(),
+      );
+
+    let candidate = `${base}-copy`;
+    let i = 2;
+    while (exists(candidate)) {
+      candidate = `${base}-copy-${i++}`;
+    }
+
+    onCreateView({
+      id: Date.now().toString(),
+      name: candidate,
+      query,
+      type: 'user',
+    });
+  };
+
   const onDeleteView = (view: SavedQuery) => {
     $savedQueries[namespace] = $savedQueries[namespace].filter(
       (q) => q?.id !== view.id,
@@ -267,6 +290,16 @@
           onclick={() => {
             editViewModalOpen = true;
           }}>{translate('common.edit')}</Button
+        >
+        <Button
+          size="xs"
+          variant="secondary"
+          disabled={maxViewsReached}
+          data-testid="duplicate-view-button"
+          data-track-name="duplicate-view-button"
+          data-track-intent="action"
+          data-track-text="duplicate"
+          onclick={onDuplicateView}>{translate('common.duplicate')}</Button
         >
         <Button
           LeadingIcon={$copied ? IconCheckmark : IconCopy}
