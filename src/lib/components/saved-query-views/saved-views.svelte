@@ -237,15 +237,12 @@
   aria-label={translate('common.saved-views')}
   data-testid="saved-views-bar"
 >
-  <div class="flex shrink-0 flex-wrap items-center gap-1 lg:flex-nowrap">
+  <div class="flex max-w-full shrink-0 flex-wrap items-center gap-1">
     {#each systemViews as view (view.id)}
-      {@render queryButton(
-        {
-          ...view,
-          active: query === view.query,
-        },
-        false,
-      )}
+      {@render queryButton({
+        ...view,
+        active: query === view.query,
+      })}
     {/each}
   </div>
 
@@ -353,12 +350,11 @@
   {maxQueries}
 />
 
-{#snippet queryButton(view: SavedQuery, showLabel: boolean)}
+{#snippet queryButton(view: SavedQuery)}
   <Tooltip
     text={view.count != undefined ? `${view.name} • ${view.count}` : view.name}
     bottom
     usePortal
-    hide={showLabel && view.count == undefined}
     tooltipClass="max-w-[280px]"
   >
     <Button
@@ -383,9 +379,9 @@
     >
       {@const Glyph = view.Icon || IconBookmark}
       <Glyph class="h-4 w-4 flex-shrink-0" />
-      {#if showLabel}
-        <span class="truncate font-normal">{view.name}</span>
-      {/if}
+      <span class="hidden truncate font-normal xl:inline-block"
+        >{view.name}</span
+      >
       {#if view.badge}
         {@render queryBadge({
           className: 'italic',
