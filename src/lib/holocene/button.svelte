@@ -41,11 +41,11 @@
           secondary:
             'border-brand bg-surface-primary text-brand hover:bg-action-brand-hover active:bg-action-brand-press focus-visible:bg-surface-primary data-[active=true]:border-transparent data-[active=true]:bg-interactive-primary data-[active=true]:text-white data-[active=true]:hover:bg-interactive-primary-hover data-[active=true]:active:bg-interactive-primary-press data-[active=true]:focus-visible:bg-interactive-primary-hover',
           tertiary:
-            'border-tertiary bg-transparent text-primary hover:bg-action-hover-overlay active:bg-action-press-overlay focus-visible:bg-surface-primary data-[active=true]:border-transparent data-[active=true]:bg-interactive-primary data-[active=true]:text-white data-[active=true]:hover:bg-interactive-primary-hover data-[active=true]:active:bg-interactive-primary-press data-[active=true]:focus-visible:bg-interactive-primary-hover',
+            'border-tertiary bg-transparent text-primary hover:bg-action-hover-overlay active:bg-action-press-overlay focus-visible:bg-surface-primary data-[active=true]:border-transparent data-[active=true]:bg-interactive-primary data-[active=true]:text-white data-[active=true]:hover:bg-interactive-primary-hover data-[active=true]:active:bg-interactive-tertiary-press data-[active=true]:focus-visible:bg-interactive-primary-hover',
           destructive:
             'border-transparent bg-interactive-danger text-white hover:bg-interactive-danger-hover active:bg-interactive-danger-press focus-visible:bg-interactive-danger',
           ghost:
-            'border-transparent bg-transparent text-secondary hover:bg-action-hover-overlay active:bg-action-press-overlay focus-visible:bg-surface-primary data-[active=true]:bg-interactive-primary data-[active=true]:text-white data-[active=true]:hover:bg-interactive-primary-hover data-[active=true]:active:bg-interactive-primary-press data-[active=true]:focus-visible:bg-interactive-primary-hover',
+            'border-transparent bg-transparent text-secondary hover:bg-action-hover-overlay active:bg-action-press-overlay focus-visible:bg-surface-primary data-[active=true]:bg-interactive-tertiary-press data-[active=true]:hover:bg-interactive-tertiary-hover data-[active=true]:active:bg-interactive-tertiary-press data-[active=true]:focus-visible:bg-interactive-tertiary-hover',
           'table-header':
             'border-transparent bg-transparent text-primary focus-visible:border-transparent',
         },

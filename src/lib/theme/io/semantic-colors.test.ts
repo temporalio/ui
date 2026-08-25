@@ -79,12 +79,20 @@ describe('interactive semantic colors', () => {
         dark: '#121212',
       },
       'secondary-hover': {
-        light: '#e5e9f5',
-        dark: '#14161c',
+        light: colorAlphaScales.indigo[10],
+        dark: colorAlphaScales.indigo[10],
       },
       'secondary-press': {
-        light: '#dce2f4',
-        dark: '#1b223b',
+        light: colorAlphaScales.indigo[15],
+        dark: colorAlphaScales.indigo[20],
+      },
+      'tertiary-press': {
+        light: colorAlphaScales.neutral[10],
+        dark: colorAlphaScales.slate[20],
+      },
+      'tertiary-hover': {
+        light: colorAlphaScales.neutral[5],
+        dark: colorAlphaScales.slate[10],
       },
       danger: {
         light: colorScales.red[9],
@@ -106,7 +114,13 @@ describe('semantic color opacity', () => {
   it('uses opaque values for replacement fills', () => {
     const replacementFills = [
       ...Object.values(semanticColors.surface),
-      ...Object.values(semanticColors.interactive),
+      semanticColors.interactive.primary,
+      semanticColors.interactive['primary-hover'],
+      semanticColors.interactive['primary-press'],
+      semanticColors.interactive.secondary,
+      semanticColors.interactive.danger,
+      semanticColors.interactive['danger-hover'],
+      semanticColors.interactive['danger-press'],
     ];
 
     for (const color of replacementFills) {
@@ -115,8 +129,16 @@ describe('semantic color opacity', () => {
     }
   });
 
-  it('preserves translucency for alpha overlays', () => {
-    for (const color of Object.values(semanticColors.overlay)) {
+  it('preserves translucency for alpha interactions and overlays', () => {
+    const alphaColors = [
+      semanticColors.interactive['secondary-hover'],
+      semanticColors.interactive['secondary-press'],
+      semanticColors.interactive['tertiary-hover'],
+      semanticColors.interactive['tertiary-press'],
+      ...Object.values(semanticColors.overlay),
+    ];
+
+    for (const color of alphaColors) {
       expect(color.light).toContain('color-mix');
       expect(color.dark).toContain('color-mix');
     }

@@ -68,6 +68,8 @@ type InteractiveColors = Readonly<{
   secondary: SemanticColor;
   'secondary-hover': SemanticColor;
   'secondary-press': SemanticColor;
+  'tertiary-press': SemanticColor;
+  'tertiary-hover': SemanticColor;
   danger: SemanticColor;
   'danger-hover': SemanticColor;
   'danger-press': SemanticColor;
@@ -286,12 +288,20 @@ export const semanticColors: SemanticColors = {
     },
     secondary: interactiveSecondary,
     'secondary-hover': {
-      light: '#e5e9f5',
-      dark: '#14161c',
+      light: colorAlphaScales.indigo[10],
+      dark: colorAlphaScales.indigo[10],
     },
     'secondary-press': {
-      light: '#dce2f4',
-      dark: '#1b223b',
+      light: colorAlphaScales.indigo[15],
+      dark: colorAlphaScales.indigo[20],
+    },
+    'tertiary-press': {
+      light: colorAlphaScales.neutral[10],
+      dark: colorAlphaScales.slate[20],
+    },
+    'tertiary-hover': {
+      light: colorAlphaScales.neutral[5],
+      dark: colorAlphaScales.slate[10],
     },
     danger: {
       light: colorScales.red[9],
