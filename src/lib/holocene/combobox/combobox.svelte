@@ -274,6 +274,10 @@
     return Array.isArray(value);
   };
 
+  const selectedCountLabel = $derived(
+    isArrayValue(value) ? numberOfItemsSelectedLabel(value.length) : '',
+  );
+
   const addCustomValue = () => {
     if (!trimmedFilterValue) return;
     if (isArrayValue(value) && value.includes(trimmedFilterValue)) return;
@@ -541,8 +545,8 @@
             {#if value.length > chipLimit}
               <p>+{value.slice(chipLimit).length}</p>
             {/if}
-          {:else}
-            <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
+          {:else if selectedCountLabel}
+            <Badge>{selectedCountLabel}</Badge>
           {/if}
         {/if}
         <input
