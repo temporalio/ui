@@ -132,6 +132,51 @@ test('shows the persisted connection status and refreshes it after validation', 
   await expect(page.getByText('Failed', { exact: true })).toBeVisible();
 });
 
+test('does not call a gateway timeout an invalid connection', async ({
+  page,
+}) => {
+  let validationRequests = 0;
+
+  await Promise.all([
+    mockClusterApi(page),
+    mockNamespaceApi(page),
+    mockNamespacesApi(page),
+    mockSearchAttributesApi(page),
+    mockSettingsApi(page),
+    mockSystemInfoApi(page, {
+      capabilities: { serverScaledDeployments: true },
+    }),
+  ]);
+  await page.route(DEPLOYMENT_API, (route) =>
+    route.fulfill({ json: deploymentResponse('pending') }),
+  );
+  await page.route(VALIDATE_API, (route) => {
+    validationRequests += 1;
+    return route.fulfill({
+      status: 504,
+      json: { message: 'upstream request timeout' },
+    });
+  });
+
+  await page.goto(deploymentUrl);
+  await page.getByRole('button', { name: 'Actions', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Validate Connection' }).click();
+
+  const modal = page.locator('#validate-connection-modal-build-1');
+  await expect(modal).toBeVisible();
+  await expect.poll(() => validationRequests).toBe(1);
+
+  await expect(modal.getByText('Could not complete the check')).toBeVisible();
+  await expect(modal.getByText('Connection is invalid')).toHaveCount(0);
+  await expect(modal.getByText('Connection is valid')).toHaveCount(0);
+  await expect(
+    modal.getByText('The connection status is unknown.', { exact: false }),
+  ).toBeVisible();
+
+  // The badge keeps the status the server last reported.
+  await expect(page.getByText('Pending', { exact: true })).toBeVisible();
+});
+
 test('leaves the connection cell empty for a version with no compute config', async ({
   page,
 }) => {
