@@ -10,7 +10,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconBookmark, IconCheckmark, IconCopy } from '$lib/io/icon';
+  import { IconBookmark, IconCheckmark, IconLink } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
@@ -282,7 +282,7 @@
         {/if}
         <Button
           size="xs"
-          variant="secondary"
+          variant="ghost"
           data-testid="edit-view-button"
           data-track-name="edit-view-button"
           data-track-intent="action"
@@ -293,7 +293,7 @@
         >
         <Button
           size="xs"
-          variant="secondary"
+          variant="ghost"
           disabled={maxViewsReached}
           data-testid="duplicate-view-button"
           data-track-name="duplicate-view-button"
@@ -302,7 +302,7 @@
           onclick={onDuplicateView}>{translate('common.duplicate')}</Button
         >
         <Button
-          LeadingIcon={$copied ? IconCheckmark : IconCopy}
+          LeadingIcon={$copied ? IconCheckmark : IconLink}
           aria-label={translate('common.share')}
           size="xs"
           variant="ghost"
@@ -321,7 +321,7 @@
       <div class="flex shrink-0 items-center gap-1">
         <Button
           size="xs"
-          variant="secondary"
+          variant="ghost"
           disabled={maxViewsReached}
           data-testid="create-view-button"
           data-track-name="create-view-button"
