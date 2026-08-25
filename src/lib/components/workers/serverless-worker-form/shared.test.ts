@@ -5,7 +5,35 @@ import {
   editVersionSchema,
   getInitialComputeProvider,
   interpolateTerraformTemplate,
+  msToScaleDownStabilization,
+  scaleDownStabilizationToMs,
 } from './shared';
+
+describe('scale-down stabilization conversion', () => {
+  it.each([
+    ['0s', 0],
+    ['0.1s', 100],
+    ['90s', 90_000],
+    ['300s', 300_000],
+  ])('converts %s to %i ms', (duration, ms) => {
+    expect(scaleDownStabilizationToMs(duration)).toBe(ms);
+  });
+
+  it.each([
+    [0, '0s'],
+    [100, '0.1s'],
+    [90_000, '90s'],
+    [300_000, '300s'],
+  ])('converts %i ms back to %s', (ms, duration) => {
+    expect(msToScaleDownStabilization(ms)).toBe(duration);
+  });
+
+  it('round-trips the value the CLI defaults to', () => {
+    expect(scaleDownStabilizationToMs(msToScaleDownStabilization(90_000))).toBe(
+      90_000,
+    );
+  });
+});
 
 describe('getInitialComputeProvider', () => {
   it('defaults to Lambda when provider configuration is omitted', () => {
@@ -98,7 +126,7 @@ describe('Cloud Run replica validation', () => {
     expect(result.maxReplicas).toBe(30);
     expect(result.initialReplicas).toBe(0);
     expect(result.utilizationTarget).toBe(0.8);
-    expect(result.scaleDownStabilizationMs).toBe(90_000);
+    expect(result.scaleDownStabilization).toBe('90s');
   });
 
   it.each([
@@ -118,11 +146,12 @@ describe('Cloud Run replica validation', () => {
     ],
     ['zero utilization', { utilizationTarget: 0 }],
     ['utilization above one', { utilizationTarget: 1.01 }],
-    ['negative stabilization window', { scaleDownStabilizationMs: -1 }],
+    ['negative stabilization window', { scaleDownStabilization: '-1s' }],
     [
       'sub-millisecond stabilization window',
-      { scaleDownStabilizationMs: 0.5 },
+      { scaleDownStabilization: '0.0005s' },
     ],
+    ['unitless stabilization window', { scaleDownStabilization: '90' }],
   ])('rejects %s', (_name, replicas) => {
     expect(
       editVersionSchema.safeParse({ ...baseCloudRunData, ...replicas }).success,
@@ -141,17 +170,26 @@ describe('Cloud Run replica validation', () => {
       maxReplicas: 30,
       initialReplicas: 0,
       utilizationTarget: 0.8,
-      scaleDownStabilizationMs: 90_000,
+      scaleDownStabilization: '90s',
     });
   });
 
   it('accepts a zero stabilization window', () => {
     const result = editVersionSchema.parse({
       ...baseCloudRunData,
-      scaleDownStabilizationMs: 0,
+      scaleDownStabilization: '0s',
     });
 
-    expect(result.scaleDownStabilizationMs).toBe(0);
+    expect(result.scaleDownStabilization).toBe('0s');
+  });
+
+  it('accepts a whole-millisecond stabilization window', () => {
+    const result = editVersionSchema.parse({
+      ...baseCloudRunData,
+      scaleDownStabilization: '0.1s',
+    });
+
+    expect(result.scaleDownStabilization).toBe('0.1s');
   });
 });
 

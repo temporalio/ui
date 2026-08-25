@@ -4,6 +4,10 @@
   import DeleteWorkerModal from '$lib/components/workers/delete-worker-modal.svelte';
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
   import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
+  import {
+    msToScaleDownStabilization,
+    scaleDownStabilizationToMs,
+  } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -90,7 +94,12 @@
         maxReplicas: scalerDetails.maxReplicas,
         initialReplicas: scalerDetails.initialReplicas,
         utilizationTarget: scalerDetails.utilizationTarget,
-        scaleDownStabilizationMs: scalerDetails.scaleDownStabilizationMs,
+        scaleDownStabilization:
+          scalerDetails.scaleDownStabilizationMs === undefined
+            ? undefined
+            : msToScaleDownStabilization(
+                scalerDetails.scaleDownStabilizationMs,
+              ),
       }}
       cancelHref={backHref}
       onSubmit={async (data) => {
@@ -107,7 +116,9 @@
                   maxReplicas: data.maxReplicas,
                   initialReplicas: data.initialReplicas,
                   utilizationTarget: data.utilizationTarget,
-                  scaleDownStabilizationMs: data.scaleDownStabilizationMs,
+                  scaleDownStabilizationMs: scaleDownStabilizationToMs(
+                    data.scaleDownStabilization,
+                  ),
                 },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {

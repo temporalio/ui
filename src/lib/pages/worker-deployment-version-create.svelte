@@ -1,6 +1,7 @@
 <script lang="ts">
   import CreateVersionForm from '$lib/components/workers/serverless-worker-form/create-version-form.svelte';
   import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
+  import { scaleDownStabilizationToMs } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -118,7 +119,9 @@
                   maxReplicas: data.maxReplicas,
                   initialReplicas: data.initialReplicas,
                   utilizationTarget: data.utilizationTarget,
-                  scaleDownStabilizationMs: data.scaleDownStabilizationMs,
+                  scaleDownStabilizationMs: scaleDownStabilizationToMs(
+                    data.scaleDownStabilization,
+                  ),
                 },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {

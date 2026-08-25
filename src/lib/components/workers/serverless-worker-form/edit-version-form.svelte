@@ -10,6 +10,7 @@
 
   import {
     type ComputeProviderOption,
+    defaultScaleDownStabilization,
     type EditVersionFormData,
     editVersionSchema,
     getInitialComputeProvider,
@@ -32,7 +33,7 @@
       maxReplicas?: number;
       initialReplicas?: number;
       utilizationTarget?: number;
-      scaleDownStabilizationMs?: number;
+      scaleDownStabilization?: string;
       scaleUpCooloffMs?: number;
       scaleUpBacklogThreshold?: number;
       maxWorkerLifetimeMs?: number;
@@ -77,8 +78,8 @@
       maxReplicas: initialData.maxReplicas ?? 30,
       initialReplicas: initialData.initialReplicas ?? 0,
       utilizationTarget: initialData.utilizationTarget ?? 0.8,
-      scaleDownStabilizationMs:
-        initialData.scaleDownStabilizationMs ?? 90_000,
+      scaleDownStabilization:
+        initialData.scaleDownStabilization ?? defaultScaleDownStabilization,
       scaleUpCooloffMs: initialData.scaleUpCooloffMs,
       scaleUpBacklogThreshold: initialData.scaleUpBacklogThreshold,
       maxWorkerLifetimeMs: initialData.maxWorkerLifetimeMs,
@@ -131,7 +132,7 @@
         bind:maxReplicas={$form.maxReplicas}
         bind:initialReplicas={$form.initialReplicas}
         bind:utilizationTarget={$form.utilizationTarget}
-        bind:scaleDownStabilizationMs={$form.scaleDownStabilizationMs}
+        bind:scaleDownStabilization={$form.scaleDownStabilization}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
