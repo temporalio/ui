@@ -23,7 +23,7 @@
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import CustomViewsMenu from './custom-views-menu.svelte';
+  import SavedViewsMenu from './saved-views-menu.svelte';
   import ViewModal from './view-modal.svelte';
 
   interface Props {
@@ -229,7 +229,7 @@
   <div class="hidden h-6 shrink-0 border-l border-subtle lg:block"></div>
 
   <div class="flex min-w-0 grow flex-wrap items-center gap-1 lg:flex-nowrap">
-    <CustomViewsMenu
+    <SavedViewsMenu
       {id}
       views={namespaceSavedQueries}
       activeView={activeQueryView}
@@ -278,7 +278,10 @@
           data-track-name="share-view-button"
           data-track-intent="action"
           data-track-text="share"
-          onclick={handleCopy}>{translate('common.share')}</Button
+          onclick={handleCopy}
+          >{$copied
+            ? translate('common.copied')
+            : translate('common.share')}</Button
         >
       </div>
     {:else if unsavedQuery}

@@ -10,10 +10,10 @@ const getQueryParam = (url: string) =>
   new URL(url, 'http://localhost').searchParams.get('query') || '';
 
 const openCustomViews = (page: Page) =>
-  page.getByTestId('custom-views-button').click();
+  page.getByTestId('saved-views-button').click();
 
 const expectSelectedView = (page: Page, name: string) =>
-  expect(page.getByTestId('custom-views-button')).toContainText(name);
+  expect(page.getByTestId('saved-views-button')).toContainText(name);
 
 const selectCustomView = async (page: Page, testId: string) => {
   await openCustomViews(page);
@@ -114,7 +114,7 @@ test.describe('Saved Query Views', () => {
 
     await selectCustomView(page, 'my-view-2');
     await page.getByTestId('edit-view-button').click();
-    await page.getByRole('button', { name: 'Delete this Saved View' }).click();
+    await page.getByRole('button', { name: 'Delete View' }).click();
 
     await expect(page.getByTestId('my-view-2')).toHaveCount(0);
     await expect.poll(() => getQueryParam(page.url())).toBe('');

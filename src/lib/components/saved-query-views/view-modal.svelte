@@ -7,7 +7,6 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconTrash } from '$lib/io/icon';
   import {
     MAX_SAVED_QUERIES,
     type SavedQuery,
@@ -174,7 +173,7 @@
     </h3>
   {/snippet}
   {#snippet content()}
-    <div class="flex h-full flex-1 flex-col gap-1">
+    <div class="flex h-full flex-1 gap-1">
       <Input
         id="view-name"
         label={translate('common.name')}
@@ -196,9 +195,9 @@
             disabled={!nameValid || maxViewsReached}
             data-testid="create-as-new-button"
             onclick={onCreateAsNew}
-            size="sm"
+            class="mt-1"
             >{name === view.name
-              ? translate('common.create-copy')
+              ? translate('common.duplicate-view')
               : translate('common.create-new')}</Button
           >
         </div>
@@ -207,14 +206,11 @@
   {/snippet}
   {#snippet footer()}
     <Button
-      variant="ghost"
-      class="flex items-center gap-1 text-sm underline {!onDeleteView
-        ? 'invisible'
-        : ''}"
+      variant="destructive"
+      class={!onDeleteView ? 'invisible' : ''}
       onclick={onDelete}
     >
-      <IconTrash />
-      {translate('common.delete-saved-view')}
+      {translate('common.delete-view')}
     </Button>
   {/snippet}
 </Modal>

@@ -35,8 +35,8 @@
     onSelect,
   }: Props = $props();
 
-  const menuId = $derived(`${id}-custom-views-menu`);
-  const searchId = $derived(`${id}-custom-views-search`);
+  const menuId = $derived(`${id}-saved-views-menu`);
+  const searchId = $derived(`${id}-saved-views-search`);
 
   const open = writable(false);
   let search = $state('');
@@ -58,7 +58,7 @@
   const label = $derived(
     draftActive
       ? (draftView?.name ?? '')
-      : (activeUserView?.name ?? translate('common.custom-views')),
+      : (activeUserView?.name ?? translate('common.saved-views')),
   );
   const unsaved = $derived(draftActive || (Boolean(activeUserView) && dirty));
 
@@ -90,14 +90,14 @@
 
 <MenuContainer {open} class="min-w-0">
   <MenuButton
-    id="{id}-custom-views-button"
+    id="{id}-saved-views-button"
     controls={menuId}
     variant="secondary"
     size="xs"
     hasIndicator
     title={label}
     class={merge('max-w-full', unsaved && 'border-dashed')}
-    data-testid="custom-views-button"
+    data-testid="saved-views-button"
     onclick={(isOpen) => {
       if (isOpen) focusSearch();
     }}
@@ -107,7 +107,10 @@
       <Glyph class={merge('size-4 shrink-0', draftActive && 'opacity-60')} />
     {/snippet}
     <span
-      class={merge('min-w-0 truncate font-normal', draftActive && 'italic')}
+      class={merge(
+        'min-w-0 truncate font-normal',
+        draftActive && 'pr-0.5 italic',
+      )}
     >
       {label}
     </span>
