@@ -2,6 +2,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { routeForSchedules } from '$lib/utilities/route-for';
 
   interface Props {
@@ -15,7 +16,7 @@
 
 <header class="mb-8">
   <div class="relative flex flex-col gap-1">
-    <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+    <Link href={routeForSchedules({ namespace })} LeadingIcon={IconChevronLeft}>
       {translate('schedules.back-to-schedules')}
     </Link>
     <h1 class="mt-8 select-all" data-testid="schedule-name">

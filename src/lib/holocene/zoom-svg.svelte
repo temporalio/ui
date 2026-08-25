@@ -1,6 +1,16 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import {
+    IconAdd,
+    IconChevronDown,
+    IconChevronLeft,
+    IconChevronRight,
+    IconChevronUp,
+    IconHyphen,
+    IconTarget,
+  } from '$lib/io/icon';
+
   import Button from './button.svelte';
   import Tooltip from './tooltip.svelte';
 
@@ -190,7 +200,7 @@
         <Button
           variant="secondary"
           size="sm"
-          leadingIcon="chevron-up"
+          LeadingIcon={IconChevronUp}
           aria-label="Pan up"
           onclick={() => panBy(0, -PAN_STEP_RATIO)}
         />
@@ -199,7 +209,7 @@
         <Button
           variant="secondary"
           size="sm"
-          leadingIcon="chevron-down"
+          LeadingIcon={IconChevronDown}
           aria-label="Pan down"
           onclick={() => panBy(0, PAN_STEP_RATIO)}
         />
@@ -208,7 +218,7 @@
         <Button
           variant="secondary"
           size="sm"
-          leadingIcon="chevron-left"
+          LeadingIcon={IconChevronLeft}
           aria-label="Pan left"
           onclick={() => panBy(-PAN_STEP_RATIO, 0)}
         />
@@ -217,7 +227,7 @@
         <Button
           variant="secondary"
           size="sm"
-          leadingIcon="chevron-right"
+          LeadingIcon={IconChevronRight}
           aria-label="Pan right"
           onclick={() => panBy(PAN_STEP_RATIO, 0)}
         />
@@ -228,7 +238,7 @@
         <Button
           variant="secondary"
           size="sm"
-          leadingIcon="add"
+          LeadingIcon={IconAdd}
           aria-label="Zoom in"
           disabled={zoomLevel - ZOOM_STEP < maxZoomIn}
           onclick={() => zoomBy(-ZOOM_STEP)}
@@ -238,7 +248,7 @@
         <Button
           variant="secondary"
           size="sm"
-          leadingIcon="hyphen"
+          LeadingIcon={IconHyphen}
           aria-label="Zoom out"
           disabled={zoomLevel + ZOOM_STEP > maxZoomOut}
           onclick={() => zoomBy(ZOOM_STEP)}
@@ -250,7 +260,7 @@
         class="cursor-pointer"
         variant="secondary"
         size="sm"
-        leadingIcon="target"
+        LeadingIcon={IconTarget}
         aria-label="Center"
         onclick={() => {
           onCenter();

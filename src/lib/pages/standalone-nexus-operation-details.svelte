@@ -10,6 +10,7 @@
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import {
     eventLinkTargetTypeLabel,
     toEventLinkView,
@@ -179,7 +180,7 @@
         {#if endpointFilterLink}
           <DetailListLinkValue
             copyable
-            iconName="filter"
+            Icon={IconFilter}
             text={info.endpoint ?? ''}
             href={endpointFilterLink}
           />
@@ -194,7 +195,7 @@
         {#if serviceFilterLink}
           <DetailListLinkValue
             copyable
-            iconName="filter"
+            Icon={IconFilter}
             text={info.service ?? ''}
             href={serviceFilterLink}
           />
@@ -209,7 +210,7 @@
         {#if operationFilterLink}
           <DetailListLinkValue
             copyable
-            iconName="filter"
+            Icon={IconFilter}
             text={info.operation ?? ''}
             href={operationFilterLink}
           />

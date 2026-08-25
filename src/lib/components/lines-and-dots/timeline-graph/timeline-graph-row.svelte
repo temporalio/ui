@@ -238,8 +238,10 @@
     {#if icon}
       <svg
         class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
-        viewBox="0 0 24 24"><use href="#ti-{icon}" /></svg
+        viewBox="0 0 16 16"
       >
+        <use href="#ti-{icon}" />
+      </svg>
     {/if}
   </div>
 {/snippet}
@@ -320,7 +322,7 @@
           style:top="{spanCy}px"
         >
           {#if iconName}
-            <svg class="h-[14px] w-[14px] text-current" viewBox="0 0 24 24">
+            <svg class="h-[14px] w-[14px] text-current" viewBox="0 0 16 16">
               <use href="#ti-{iconName}" />
             </svg>
           {/if}

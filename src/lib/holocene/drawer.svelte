@@ -6,6 +6,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import { clickoutside } from '$lib/holocene/outside-click';
+  import { IconClose } from '$lib/io/icon';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
@@ -108,7 +109,7 @@
             dark ? 'text-white' : 'text-primary',
             'hover:text-primary',
           )}
-          icon="close"
+          Icon={IconClose}
           aria-expanded={open}
           aria-controls="navigation-drawer"
           onclick={onClick}

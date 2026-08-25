@@ -3,8 +3,9 @@
   import type { ComponentProps } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
-  import type { IconName } from './icon';
-  import { iconNames } from './icon';
+  import * as ioIcons from '$lib/io/icon';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   import Link from './link.svelte';
 
@@ -13,14 +14,17 @@
     component: Link,
     args: {
       href: 'https://temporal.io',
-      icon: undefined as IconName | undefined,
       active: false,
       newTab: false,
       light: false,
     },
     argTypes: {
       href: { control: 'text' },
-      icon: { control: 'select', options: iconNames },
+      LeadingIcon: {
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
     },
     render: template,
   });
@@ -34,7 +38,7 @@
 
 <Story name="Default" />
 
-<Story name="With Icon" args={{ icon: 'close' }} />
+<Story name="With Icon" args={{ LeadingIcon: ioIcons.IconClose }} />
 
 <Story name="Active" args={{ active: true }} />
 

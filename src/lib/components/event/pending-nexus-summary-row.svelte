@@ -4,9 +4,9 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { PendingNexusOperation } from '$lib/types/events';
@@ -56,6 +56,8 @@
     expanded = !expanded;
     onRowClick();
   };
+
+  const Glyph = $derived(CategoryIcon['nexus'].Icon);
 </script>
 
 <tr
@@ -97,8 +99,7 @@
     <div class="flex">
       <div class="flex w-full items-center gap-2">
         <p class={eventTypeStyle({ category: 'nexus' })}>
-          <Icon
-            name={CategoryIcon['nexus'].name}
+          <Glyph
             title={CategoryIcon['nexus'].title}
             class="mr-1 inline animate-pulse"
           />
@@ -106,10 +107,9 @@
         </p>
         {#if event.attempt}
           <Badge class="mx-1" type={event.attempt > 1 ? 'danger' : 'default'}>
-            <Icon
+            <IconRetry
               class="mr-1 inline {event.attempt > 1 &&
                 'font-bold text-red-400'}"
-              name="retry"
             />
             {translate('workflows.attempt')}
             {event.attempt}

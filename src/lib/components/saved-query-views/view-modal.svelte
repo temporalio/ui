@@ -4,10 +4,10 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTrash } from '$lib/io/icon';
   import {
     MAX_SAVED_QUERIES,
     type SavedQuery,
@@ -207,7 +207,7 @@
         : ''}"
       onclick={onDelete}
     >
-      <Icon name="trash" /> Delete this Saved View
+      <IconTrash /> Delete this Saved View
     </Button>
   {/snippet}
 </Modal>

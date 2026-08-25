@@ -2,8 +2,8 @@
   import { twMerge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconHeartbeat, IconPlaySolid, IconRetry } from '$lib/io/icon';
   interface Props {
     class?: string;
     title?: string;
@@ -22,7 +22,7 @@
 </script>
 
 <div class={twMerge('flex flex-col items-center gap-4', className)}>
-  <Icon name="heartbeat" width={80} height={80} class="text-blue-400" />
+  <IconHeartbeat width={80} height={80} class="text-blue-400" />
   {#if title}
     <p class="text-center text-base font-medium">{title}</p>
   {/if}
@@ -35,7 +35,7 @@
   <div class="flex flex-col items-center gap-4 sm:flex-row">
     <Button
       size="sm"
-      leadingIcon="play"
+      LeadingIcon={IconPlaySolid}
       onclick={openTriggerConfirmationModal}
       variant="ghost"
       class="border border-subtle"
@@ -44,7 +44,7 @@
     </Button>
     <Button
       size="sm"
-      leadingIcon="retry"
+      LeadingIcon={IconRetry}
       onclick={openBackfillConfirmationModal}
       variant="ghost"
       class="border border-subtle"

@@ -3,14 +3,13 @@
 
   import { page } from '$app/state';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { type IconComponent } from '$lib/io/icon';
 
   interface Props {
     link: string;
     label: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     tooltip?: string;
     external?: boolean;
     animate?: boolean;
@@ -22,7 +21,7 @@
   let {
     link,
     label,
-    icon,
+    Icon,
     tooltip = label,
     external = false,
     animate = false,
@@ -36,7 +35,7 @@
   const active = $derived(isActive && isActive(page.url.href));
 </script>
 
-<div role="listitem" data-testid={testId || `${icon}-button`} class="relative">
+<div role="listitem" data-testid={testId} class="relative">
   <Tooltip
     text={tooltip}
     right
@@ -63,9 +62,9 @@
       )}
       class:text-disabled={disabled}
     >
-      {#if icon}
-        <div class="flex h-6 w-6 items-center">
-          <Icon name={icon} {animate} />
+      {#if Icon}
+        <div class="flex h-6 w-6 items-center" class:animate-pulse={animate}>
+          <Icon />
         </div>
       {/if}
       <div

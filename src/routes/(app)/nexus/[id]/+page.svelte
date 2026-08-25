@@ -10,6 +10,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import NexusEndpoint from '$lib/pages/nexus-endpoint.svelte';
   import {
     routeForNexus,
@@ -27,7 +28,7 @@
 />
 {#if endpoint}
   <div class="flex flex-col gap-4">
-    <Link href={routeForNexus()} icon="chevron-left">
+    <Link href={routeForNexus()} LeadingIcon={IconChevronLeft}>
       {translate('nexus.back-to-endpoints')}
     </Link>
     <NexusEndpoint {endpoint}>

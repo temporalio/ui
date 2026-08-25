@@ -3,7 +3,7 @@
   import { action } from 'storybook/actions';
   import type { ComponentProps } from 'svelte';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { IconTemporal } from '$lib/io/icon';
 
   import { shouldNotBeTransparent } from '../test-utilities';
 
@@ -59,7 +59,7 @@
     <MenuContainer>
       <MenuButton hasIndicator variant={args.variant} controls={context.id}>
         {#snippet leading()}
-          <Icon name="temporal-logo" />
+          <IconTemporal />
         {/snippet}
         Menu
       </MenuButton>

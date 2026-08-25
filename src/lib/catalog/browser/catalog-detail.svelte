@@ -1,6 +1,4 @@
 <script module lang="ts">
-  import type { IconName } from '$lib/holocene/icon';
-
   import type { ReadinessCheck as HostReadinessCheck } from './workbench-host';
 
   export type WorkerReadinessDisplayState =
@@ -25,7 +23,7 @@
     currentDescriptor === requestDescriptor && currentEpoch === requestEpoch;
 
   type ReadinessPresentation = {
-    icon: IconName;
+    Icon: IconComponent;
     iconClass: string;
     iconLabel: string;
     label: string;
@@ -50,7 +48,7 @@
 
     if (state === 'loading') {
       return {
-        icon: 'spinner',
+        Icon: IconSpinner,
         iconClass: 'animate-spin text-secondary',
         iconLabel: `${iconSubject} is checking`,
         label,
@@ -63,7 +61,7 @@
 
     if (state === 'ready') {
       return {
-        icon: 'circle-check',
+        Icon: IconCheckCircle,
         iconClass: 'text-success',
         iconLabel: `${iconSubject} is ready`,
         label,
@@ -76,7 +74,7 @@
 
     if (state === 'unavailable') {
       return {
-        icon: 'warning',
+        Icon: IconWarning,
         iconClass: 'text-warning',
         iconLabel: `${iconSubject} is unavailable`,
         label,
@@ -88,7 +86,7 @@
     }
 
     return {
-      icon: 'circle-question',
+      Icon: IconQuestionCircle,
       iconClass: 'text-secondary',
       iconLabel: `${iconSubject} status is unknown`,
       label,
@@ -122,7 +120,6 @@
     DEFAULT_UNITS,
     SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
@@ -131,6 +128,17 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import {
+    IconCheckCircle,
+    IconChevronDown,
+    IconChevronUp,
+    IconClose,
+    type IconComponent,
+    IconPlaySolid,
+    IconQuestionCircle,
+    IconSpinner,
+    IconWarning,
+  } from '$lib/io/icon';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
@@ -620,13 +628,13 @@
           <Button
             size="sm"
             variant="ghost"
-            trailingIcon={configureOpen ? 'chevron-up' : 'chevron-down'}
+            TrailingIcon={configureOpen ? IconChevronUp : IconChevronDown}
             aria-expanded={configureOpen}
             onclick={() => (configureOpen = !configureOpen)}
             >Start options</Button
           >
           <Button
-            leadingIcon="play"
+            LeadingIcon={IconPlaySolid}
             disabled={running || inputMalformed}
             onclick={run}
           >
@@ -703,7 +711,7 @@
                           size="xs"
                           variant="ghost"
                           class="h-7 px-1.5"
-                          leadingIcon="play"
+                          LeadingIcon={IconPlaySolid}
                           aria-label="Resume checking"
                           onclick={() => sessionStore.resume(session.id)}
                         />
@@ -713,7 +721,7 @@
                           size="xs"
                           variant="ghost"
                           class="h-7 px-1.5"
-                          leadingIcon="close"
+                          LeadingIcon={IconClose}
                           aria-label="Stop checking"
                           onclick={() => sessionStore.stop(session.id)}
                         />
@@ -797,10 +805,8 @@
                   tabindex="0"
                   aria-label={workerPresentation.iconLabel}
                 >
-                  <Icon
-                    name={workerPresentation.icon}
+                  <workerPresentation.Icon
                     class={workerPresentation.iconClass}
-                    aria-hidden="true"
                   />
                 </span>
               </Tooltip>
@@ -837,11 +843,7 @@
                       tabindex="0"
                       aria-label={presentation.iconLabel}
                     >
-                      <Icon
-                        name={presentation.icon}
-                        class={presentation.iconClass}
-                        aria-hidden="true"
-                      />
+                      <presentation.Icon class={presentation.iconClass} />
                     </span>
                   </Tooltip>
                   <span>{presentation.label}</span>

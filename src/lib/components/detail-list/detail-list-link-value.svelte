@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { type IconComponent } from '$lib/io/icon';
 
   import DetailListValue from './detail-list-value.svelte';
 
@@ -11,7 +10,7 @@
     text: string;
     href: string;
     isBadge?: boolean;
-    iconName?: IconName | undefined;
+    Icon?: IconComponent | undefined;
   }
 
   let {
@@ -20,7 +19,7 @@
     copyableText = text,
     href,
     isBadge = false,
-    iconName = undefined,
+    Icon,
   }: Props = $props();
 </script>
 
@@ -34,8 +33,8 @@
       {text}
     </span>
 
-    {#if iconName}
-      <Icon name={iconName} class="shrink-0" />
+    {#if Icon}
+      <Icon class="shrink-0" />
     {/if}
   </Link>
 </DetailListValue>

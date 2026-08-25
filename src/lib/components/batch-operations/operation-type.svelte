@@ -1,7 +1,7 @@
 <script lang="ts">
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalActivity, IconTemporalWorkflow } from '$lib/io/icon';
   import {
     type BatchOperationActionType,
     BatchOperationExecutionType,
@@ -51,6 +51,12 @@
       Delete: 'danger',
       Unspecified: 'default',
     };
+
+  const Glyph = $derived(
+    executionType === BatchOperationExecutionType.Activity
+      ? IconTemporalActivity
+      : IconTemporalWorkflow,
+  );
 </script>
 
 <span class="flex items-center gap-2">
@@ -60,11 +66,7 @@
     </Badge>
     {#if executionType}
       <span class="flex items-center gap-1">
-        <Icon
-          name={executionType === BatchOperationExecutionType.Activity
-            ? 'activity'
-            : 'workflow'}
-        />
+        <Glyph />
         {executionType === BatchOperationExecutionType.Activity
           ? translate('common.activities-plural', { count: 2 })
           : translate('common.workflows-plural', { count: 2 })}

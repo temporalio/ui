@@ -5,9 +5,9 @@
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { workflowRun } from '$lib/stores/workflow-run';
 
@@ -79,7 +79,7 @@
             disabled={loading}
             aria-label={translate('common.refresh')}
           >
-            <Icon name="retry" />
+            <IconRetry />
           </Button>
         </div>
         {#if lastFetched}

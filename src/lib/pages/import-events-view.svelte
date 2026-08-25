@@ -5,6 +5,7 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCode, IconCompact, IconFeed } from '$lib/io/icon';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';
 
@@ -30,17 +31,17 @@
     <div id="event-view-toggle" class="surface-primary flex gap-4">
       <ToggleButtons>
         <ToggleButton
-          leadingIcon="feed"
+          LeadingIcon={IconFeed}
           href={routeForEventHistoryImport($lastUsedNamespace, 'feed')}
           >{translate('workflows.history')}</ToggleButton
         >
         <ToggleButton
-          leadingIcon="compact"
+          LeadingIcon={IconCompact}
           href={routeForEventHistoryImport($lastUsedNamespace, 'compact')}
           >{translate('workflows.compact')}</ToggleButton
         >
         <ToggleButton
-          leadingIcon="json"
+          LeadingIcon={IconCode}
           href={routeForEventHistoryImport($lastUsedNamespace, 'json')}
           >{translate('workflows.json')}</ToggleButton
         >

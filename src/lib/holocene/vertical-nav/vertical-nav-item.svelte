@@ -4,8 +4,7 @@
   import { getContext, onDestroy, onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon';
+  import type { IconComponent } from '$lib/io/icon';
 
   import { VERTICAL_NAV, type VerticalNavContext } from './vertical-nav.svelte';
 
@@ -13,8 +12,8 @@
     label: string;
     id: string;
     href: string;
-    leadingIcon?: IconName;
-    trailingIcon?: IconName;
+    LeadingIcon?: IconComponent;
+    TrailingIcon?: IconComponent;
     description?: string;
     active?: boolean;
     disabled?: boolean;
@@ -26,8 +25,8 @@
     label,
     id,
     href,
-    leadingIcon = undefined,
-    trailingIcon = undefined,
+    LeadingIcon,
+    TrailingIcon,
     description = undefined,
     active = undefined,
     disabled = false,
@@ -93,8 +92,8 @@
     onmouseleave={handleMouseLeave}
     {...restProps}
   >
-    {#if leadingIcon}
-      <Icon name={leadingIcon} class="size-4 flex-shrink-0" />
+    {#if LeadingIcon}
+      <LeadingIcon class="size-4 flex-shrink-0" />
     {/if}
 
     <div class="flex flex-1 flex-col">
@@ -104,8 +103,8 @@
       {/if}
     </div>
 
-    {#if trailingIcon}
-      <Icon name={trailingIcon} class="size-4 flex-shrink-0" />
+    {#if TrailingIcon}
+      <TrailingIcon class="size-4 flex-shrink-0" />
     {/if}
   </a>
 </li>

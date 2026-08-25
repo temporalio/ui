@@ -13,11 +13,16 @@
 
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconDownload,
+    IconExclamationOctagon,
+    IconExternalLink,
+    IconRetry,
+  } from '$lib/io/icon';
   import { downloadExternalPayloadWithCodec } from '$lib/services/data-encoder';
   import type { Payload, Payloads } from '$lib/types';
   import {
@@ -141,7 +146,7 @@
                   <Button
                     size="sm"
                     variant="ghost"
-                    leadingIcon="download"
+                    LeadingIcon={IconDownload}
                     disabled={!getCodecEndpoint(page.data.settings)}
                     loading={downloadLoading}
                     onclick={() =>
@@ -154,7 +159,7 @@
             </CodeBlock>
             {#if downloadError}
               <div class="flex items-start gap-2 text-danger">
-                <Icon width={16} height={16} name="exclamation-octagon" />
+                <IconExclamationOctagon width={16} height={16} />
                 <p class="leading-4">{downloadError}</p>
               </div>
             {/if}
@@ -167,7 +172,7 @@
                 newTab
                 >How to set up a codec server
               </Link>
-              <Icon class="inline" name="external-link" />
+              <IconExternalLink class="inline" />
             </p>
           {:else if isParsedPayload(result.decodedValue)}
             <CodeBlock
@@ -208,14 +213,14 @@
       >
         {#snippet headerActions()}
           <IconButton
-            icon="retry"
+            Icon={IconRetry}
             onclick={retry}
             label={translate('common.retry')}
           />
         {/snippet}
       </CodeBlock>
       <div class="flex items-start gap-2 text-danger">
-        <Icon width={16} height={16} name="exclamation-octagon" />
+        <IconExclamationOctagon width={16} height={16} />
         <p class="leading-4">
           {#if isNetworkError(error)}
             {error.message} - {error.statusText}

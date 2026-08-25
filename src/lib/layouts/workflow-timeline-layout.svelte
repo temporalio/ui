@@ -19,6 +19,12 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconArrowAscending,
+    IconArrowDescending,
+    IconCollapse,
+    IconDownload,
+  } from '$lib/io/icon';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
@@ -156,13 +162,13 @@
     <div class="flex items-center gap-2">
       <ToggleButtons>
         <ToggleButton
-          leadingIcon={reverseSort ? 'descending' : 'ascending'}
+          LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="zoom-in"
           onclick={onSort}
           size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
         >
         <ToggleButton
-          leadingIcon="timeline-collapse"
+          LeadingIcon={IconCollapse}
           data-testid="toggle-idle-time"
           loading={!historyCtx.fetchComplete}
           disabled={!historyCtx.fetchComplete ||
@@ -193,7 +199,7 @@
         </ToggleButton>
         <ToggleButton
           data-testid="download"
-          leadingIcon="download"
+          LeadingIcon={IconDownload}
           size="sm"
           onclick={() => (showDownloadPrompt = true)}
         >

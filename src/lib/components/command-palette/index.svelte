@@ -4,9 +4,22 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import {
+    IconAdd,
+    IconArchive,
+    IconClose,
+    type IconComponent,
+    IconImport,
+    IconMerge,
+    IconPlaySolid,
+    IconSearch,
+    IconTemporalBatch,
+    IconTemporalNamespaces,
+    IconTemporalNexus,
+    IconTemporalSchedules,
+    IconTemporalWorkflow,
+  } from '$lib/io/icon';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
@@ -36,7 +49,7 @@
     id: string;
     title: string;
     subtitle?: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     action: () => void;
     category?: string;
   }
@@ -51,7 +64,7 @@
         id: 'start-workflow',
         title: 'Start Workflow',
         subtitle: 'Create a new workflow execution',
-        icon: 'play',
+        Icon: IconPlaySolid,
         category: 'Navigation',
         action: () => {
           goto(routeForWorkflowStart({ namespace }));
@@ -62,7 +75,7 @@
         id: 'create-schedule',
         title: 'Create Schedule',
         subtitle: 'Create a new workflow schedule',
-        icon: 'add',
+        Icon: IconAdd,
         category: 'Navigation',
         action: () => {
           goto(routeForScheduleCreate({ namespace }));
@@ -73,7 +86,7 @@
         id: 'workflows',
         title: 'View Workflows',
         subtitle: `Navigate to workflows in ${namespace}`,
-        icon: 'workflow',
+        Icon: IconTemporalWorkflow,
         category: 'Navigation',
         action: () => {
           goto(routeForWorkflows({ namespace }));
@@ -84,7 +97,7 @@
         id: 'schedules',
         title: 'View Schedules',
         subtitle: `Navigate to schedules in ${namespace}`,
-        icon: 'schedules',
+        Icon: IconTemporalSchedules,
         category: 'Navigation',
         action: () => {
           goto(routeForSchedules({ namespace }));
@@ -95,7 +108,7 @@
         id: 'batch-operations',
         title: 'View Batch Operations',
         subtitle: `Navigate to batch operations in ${namespace}`,
-        icon: 'batch-operation',
+        Icon: IconTemporalBatch,
         category: 'Navigation',
         action: () => {
           goto(routeForBatchOperations({ namespace }));
@@ -106,7 +119,7 @@
         id: 'namespaces',
         title: 'View Namespaces',
         subtitle: 'Navigate to namespace overview',
-        icon: 'namespace',
+        Icon: IconTemporalNamespaces,
         category: 'Navigation',
         action: () => {
           goto(routeForNamespaces());
@@ -117,7 +130,7 @@
         id: 'worker-deployments',
         title: 'View Worker Deployments',
         subtitle: `Navigate to worker deployments in ${namespace}`,
-        icon: 'merge',
+        Icon: IconMerge,
         category: 'Navigation',
         action: () => {
           goto(routeForWorkerDeployments({ namespace }));
@@ -128,7 +141,7 @@
         id: 'nexus',
         title: 'View Nexus',
         subtitle: 'Navigate to Nexus endpoints',
-        icon: 'nexus',
+        Icon: IconTemporalNexus,
         category: 'Navigation',
         action: () => {
           goto(routeForNexus());
@@ -139,7 +152,7 @@
         id: 'archival',
         title: 'View Archive',
         subtitle: `Navigate to archived workflows in ${namespace}`,
-        icon: 'archives',
+        Icon: IconArchive,
         category: 'Navigation',
         action: () => {
           goto(routeForArchivalWorkflows({ namespace }));
@@ -150,7 +163,7 @@
         id: 'import',
         title: 'Import Events',
         subtitle: 'Import workflow event history',
-        icon: 'import',
+        Icon: IconImport,
         category: 'Actions',
         action: () => {
           goto(routeForEventHistoryImport());
@@ -336,9 +349,10 @@
       aria-selected={index === selectedIndex}
     >
       <div class="flex items-center gap-4">
-        {#if command.icon}
+        {#if command.Icon}
+          {@const CommandIcon = command.Icon}
           <div class="h-6 w-6 flex-shrink-0 text-secondary">
-            <Icon name={command.icon} />
+            <CommandIcon />
           </div>
         {/if}
         <div class="flex flex-col gap-1">
@@ -364,7 +378,7 @@
     <div
       class="flex min-h-96 flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400"
     >
-      <Icon name="search" />
+      <IconSearch />
       <h3 class="mt-2 text-secondary">No commands found</h3>
       <p class="mt-2 text-secondary">Try a different search term</p>
     </div>
@@ -389,7 +403,7 @@
             class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
           >
             <div class="h-5 w-5 text-indigo-600 dark:text-indigo-400">
-              <Icon name="search" />
+              <IconSearch />
             </div>
             Command Palette
           </div>
@@ -401,7 +415,7 @@
               class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
               aria-label="Close"
             >
-              <Icon name="close" class="h-4 w-4" />
+              <IconClose class="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -411,7 +425,7 @@
               id="action-search"
               bind:value={searchQuery}
               placeholder="Search for commands..."
-              icon="search"
+              Icon={IconSearch}
               labelHidden
               label="Search commands"
               autocomplete="off"
