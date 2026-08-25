@@ -125,7 +125,19 @@
     }
   }
 
-  function handleFocusIn() {
+  function isFocusVisible(target: EventTarget | null) {
+    if (!(target instanceof Element)) return true;
+
+    try {
+      return target.matches(':focus-visible');
+    } catch {
+      return true;
+    }
+  }
+
+  function handleFocusIn(event: FocusEvent) {
+    if (!isFocusVisible(event.target)) return;
+
     isFocused = true;
   }
 

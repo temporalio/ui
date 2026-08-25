@@ -205,6 +205,34 @@
 />
 
 <Story
+  name="Multiselect Without Count Label"
+  args={{
+    options: ['English', 'German', 'French'],
+    multiselect: true,
+    displayChips: false,
+    value: ['English'],
+    numberOfItemsSelectedLabel: () => '',
+  }}
+  play={async ({ canvasElement }) => {
+    expect(canvasElement.querySelectorAll('.rounded-sm.p-1')).toHaveLength(0);
+  }}
+/>
+
+<Story
+  name="Multiselect With Count Label"
+  args={{
+    options: ['English', 'German', 'French'],
+    multiselect: true,
+    displayChips: false,
+    value: ['English'],
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByText('1 option selected')).toBeInTheDocument();
+  }}
+/>
+
+<Story
   name="Async Select"
   play={async ({ canvasElement, id, step }) => {
     const canvas = within(canvasElement);

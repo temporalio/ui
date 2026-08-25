@@ -10,32 +10,37 @@
     {
       sdk: 'Go',
       version: '1.41.0',
-      href: 'https://github.com/temporalio/sdk-go/releases/tag/v1.41.0',
+      href: 'https://github.com/temporalio/sdk-go/releases',
     },
     {
       sdk: 'Python',
       version: '1.20.0',
-      href: 'https://github.com/temporalio/sdk-python/releases/tag/1.20.0',
+      href: 'https://github.com/temporalio/sdk-python/releases',
     },
     {
       sdk: 'TypeScript',
       version: '1.14.0',
-      href: 'https://github.com/temporalio/sdk-typescript/releases/tag/v1.14.0',
+      href: 'https://github.com/temporalio/sdk-typescript/releases',
     },
     {
       sdk: '.NET',
       version: '1.10.0',
-      href: 'https://github.com/temporalio/sdk-dotnet/releases/tag/1.10.0',
+      href: 'https://github.com/temporalio/sdk-dotnet/releases',
     },
     {
       sdk: 'Ruby',
       version: '1.1.0',
-      href: 'https://github.com/temporalio/sdk-ruby/releases/tag/v1.1.0',
+      href: 'https://github.com/temporalio/sdk-ruby/releases',
     },
     {
       sdk: 'Java',
       version: '1.35.0',
-      href: 'https://github.com/temporalio/sdk-java/releases/tag/v1.35.0',
+      href: 'https://github.com/temporalio/sdk-java/releases',
+    },
+    {
+      sdk: 'Rust',
+      version: '0.70.0',
+      href: 'https://github.com/temporalio/sdk-rust/releases',
     },
   ];
   const currentSdk = $derived(
