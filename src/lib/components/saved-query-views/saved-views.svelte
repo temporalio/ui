@@ -394,12 +394,12 @@
           {/if}
           {#if view.count != undefined}
             {@render queryBadge({
-              className: `font-mono ${view.count > 0 ? 'bg-surface-error text-error' : 'bg-surface-primary text-secondary'}`,
+              className: `font-mono ${view.count > 0 ? 'bg-surface-danger text-danger' : 'bg-surface-primary text-secondary'}`,
               content: view.count,
               Icon: view.count > 0 ? IconExclamationOctagon : IconHappyLappy,
               iconClass:
                 view.count > 0
-                  ? 'bg-overlay-error text-error'
+                  ? 'bg-overlay-danger text-danger'
                   : 'bg-overlay-tertiary text-secondary',
             })}
           {/if}

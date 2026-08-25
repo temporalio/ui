@@ -10,9 +10,9 @@
     xmlns="http://www.w3.org/2000/svg"
     x="0px"
     y="0px"
-    width="30px"
+    width="20px"
     height="18px"
-    viewBox="0 0 150 73"
+    viewBox="0 0 100 73"
     xml:space="preserve"
     aria-hidden="true"
     focusable="false"
@@ -31,7 +31,7 @@
 
 <style lang="postcss">
   .heart-beat {
-    @apply relative flex w-5 items-center justify-center text-center;
+    @apply relative flex w-5 shrink-0 items-center justify-center overflow-hidden text-center;
   }
 
   .heart-rate-line {
