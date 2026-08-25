@@ -78,10 +78,13 @@
       <MenuItem disabled>Anonymous Tardigrade</MenuItem>
       <MenuDivider />
     {/if}
-    <MenuItem hoverable={false}>
+    <li
+      role="none"
+      class="m-1 flex items-center justify-between gap-2 border border-transparent px-3 py-2 text-sm text-primary"
+    >
       {translate('common.theme')}
       <DarkModeMenu />
-    </MenuItem>
+    </li>
     <MenuDivider />
     <MenuItem
       hoverable={false}
