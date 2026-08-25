@@ -29,9 +29,11 @@
 </script>
 
 <div
-  class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
+  class="grid grid-cols-[minmax(0,1fr)_auto] grid-rows-[2rem_2rem] items-center gap-y-2 pb-4 group-data-[nav=closed]:grid-cols-1"
 >
-  <div class="flex w-fit items-center gap-1 text-nowrap">
+  <div
+    class="flex w-fit items-center gap-1 text-nowrap group-data-[nav=closed]:justify-self-center"
+  >
     <a href={base || '/'} class="flex items-center">
       <Logo height={24} width={24} class="m-1" />
     </a>
@@ -49,7 +51,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-2 flex items-center justify-center opacity-0 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:p-2"
+    class="mx-2 flex items-center justify-center justify-self-end opacity-0 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:justify-self-center group-data-[nav=closed]:p-2"
     onclick={ontoggle}
   >
     <IconArrowsLeftRightToLine />
