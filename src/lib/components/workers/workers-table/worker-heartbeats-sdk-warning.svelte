@@ -37,6 +37,11 @@
       version: '1.35.0',
       href: 'https://github.com/temporalio/sdk-java/releases',
     },
+    {
+      sdk: 'Rust',
+      version: '0.70.0',
+      href: 'https://github.com/temporalio/sdk-rust/releases',
+    },
   ];
   const currentSdk = $derived(
     supportedVersions.find(
