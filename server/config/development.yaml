@@ -68,7 +68,7 @@ codec:
 forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
   - X-Forwarded-For
 customUi:
-  enabled: {{ env "TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED" | default "false" }}
+  enabled: {{ if or (eq (env "TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED") "true") (eq (env "TEMPORAL_UI_EXTENSION_AUTH_EXAMPLE_ENABLED") "true") }}true{{ else }}false{{ end }}
   iframeExtensions:
     - id: local-extension-example
       title: Local extension example
@@ -79,4 +79,17 @@ customUi:
         defaultHeight: 112
         minHeight: 72
         maxHeight: 200
+      permissions: []
+    # Loads the runnable example from examples/custom-ui-extension-with-auth,
+    # which signs in against the sample OIDC server with the device flow. It is
+    # also unprivileged: loopback HTTP extensions never receive permissions.
+    - id: local-extension-auth-example
+      title: Local extension auth example
+      slot: app.top-nav.sub-nav
+      src: http://127.0.0.1:8091/
+      allowedOrigin: http://127.0.0.1:8091
+      sizing:
+        defaultHeight: 120
+        minHeight: 72
+        maxHeight: 240
       permissions: []

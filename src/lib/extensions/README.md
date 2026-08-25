@@ -102,6 +102,35 @@ example to a dedicated HTTPS origin, add the deployed Temporal UI origin to the
 extension's host allowlist and `frame-ancestors` policy, then use the privileged
 configuration below.
 
+## Run the authentication example
+
+`examples/custom-ui-extension-with-auth` shows how an extension establishes its
+own end-user session. Because Temporal UI shares no tokens or cookies with an
+extension, the example authenticates against the repository's sample OIDC server
+itself, using the device authorization grant. That grant is what makes sign-in
+possible from an opaque sandbox: there is no storage for a PKCE verifier and no
+way to complete a redirect or a popup.
+
+```sh
+# Terminal 1: sample identity provider (http://localhost:8889)
+pnpm oidc-server
+```
+
+```sh
+# Terminal 2: extension origin (http://127.0.0.1:8091)
+pnpm dev:extension-auth-example
+```
+
+```sh
+# Terminal 3: UI Server and Temporal UI against local Temporal
+pnpm dev:ui:extension-auth-example
+```
+
+Tokens stay on the extension's own backend, which acts as a confidential OIDC
+client. The iframe receives only a user code during sign-in and an opaque
+session handle afterwards. See that example's README for the production
+adaptation and for the demo-only shortcuts it takes.
+
 For a disposable mount-only check without running the example server,
 `https://example.com/` can be configured as an unprivileged iframe. It does not
 implement the Temporal extension protocol, so it cannot prove handshake,

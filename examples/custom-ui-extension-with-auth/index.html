@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!--
+      These values are part of the extension's trust configuration. In a real
+      deployment, set temporal-ui-origin to the exact origin that embeds this
+      page and keep the ID in sync with the Temporal UI server configuration.
+    -->
+    <meta name="temporal-ui-origin" content="http://localhost:3000" />
+    <meta name="temporal-extension-id" content="local-extension-auth-example" />
+
+    <title>Temporal UI extension with authentication</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="extension" aria-labelledby="extension-title">
+      <section class="summary">
+        <div class="identity">
+          <span class="logo" aria-hidden="true">T</span>
+          <div>
+            <h1 id="extension-title">Extension sign-in</h1>
+            <p>
+              This extension holds its own session, separate from Temporal UI.
+            </p>
+          </div>
+        </div>
+
+        <dl class="readouts" aria-label="Extension state">
+          <div>
+            <dt>Host</dt>
+            <dd id="connection-status" class="status" data-state="waiting">
+              Waiting for Temporal UI
+            </dd>
+          </div>
+          <div>
+            <dt>Signed in as</dt>
+            <dd id="account-value">Not signed in</dd>
+          </div>
+          <div>
+            <dt>Access token</dt>
+            <dd id="token-value">None</dd>
+          </div>
+        </dl>
+
+        <div class="actions" aria-label="Extension actions">
+          <button id="sign-in-button" type="button" disabled>Sign in</button>
+          <button id="sign-out-button" type="button" hidden>Sign out</button>
+        </div>
+      </section>
+
+      <section id="device-panel" class="device-panel" hidden>
+        <div>
+          <h2>Finish signing in</h2>
+          <p>
+            Open the verification URL in a new browser tab and enter this code.
+          </p>
+          <p class="hint">
+            The sandboxed iframe cannot open the identity provider itself, so
+            the device flow hands the step to a normal browser tab.
+          </p>
+        </div>
+        <div class="device-details">
+          <div>
+            <span class="device-label">Code</span>
+            <output id="user-code" class="user-code">--------</output>
+          </div>
+          <div>
+            <span class="device-label">Verification URL</span>
+            <output id="verification-uri" class="verification-uri">—</output>
+          </div>
+          <p id="device-status" class="device-status">Waiting for approval…</p>
+        </div>
+      </section>
+
+      <p id="action-status" class="action-status" aria-live="polite"></p>
+    </main>
+
+    <noscript
+      >This example requires JavaScript to use the extension protocol.</noscript
+    >
+    <script defer src="/extension.js"></script>
+  </body>
+</html>

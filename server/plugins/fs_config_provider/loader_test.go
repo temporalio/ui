@@ -57,15 +57,17 @@ func TestLoaderSuite(t *testing.T) {
 
 func TestDevelopmentExtensionExampleIsOptIn(t *testing.T) {
 	t.Setenv("TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED", "")
+	t.Setenv("TEMPORAL_UI_EXTENSION_AUTH_EXAMPLE_ENABLED", "")
 
 	cfg, err := LoadConfig("../../config", "development")
 	require.NoError(t, err)
 	require.False(t, cfg.CustomUI.Enabled)
-	require.Len(t, cfg.CustomUI.IframeExtensions, 1)
+	require.Len(t, cfg.CustomUI.IframeExtensions, 2)
 }
 
 func TestDevelopmentExtensionExampleCanBeEnabled(t *testing.T) {
 	t.Setenv("TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED", "true")
+	t.Setenv("TEMPORAL_UI_EXTENSION_AUTH_EXAMPLE_ENABLED", "")
 
 	cfg, err := LoadConfig("../../config", "development")
 	require.NoError(t, err)
@@ -73,6 +75,21 @@ func TestDevelopmentExtensionExampleCanBeEnabled(t *testing.T) {
 	require.Equal(t, "local-extension-example", cfg.CustomUI.IframeExtensions[0].ID)
 	require.Equal(t, "http://127.0.0.1:8090", cfg.CustomUI.IframeExtensions[0].AllowedOrigin)
 	require.Empty(t, cfg.CustomUI.IframeExtensions[0].Permissions)
+}
+
+func TestDevelopmentExtensionAuthExampleCanBeEnabled(t *testing.T) {
+	t.Setenv("TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED", "")
+	t.Setenv("TEMPORAL_UI_EXTENSION_AUTH_EXAMPLE_ENABLED", "true")
+
+	cfg, err := LoadConfig("../../config", "development")
+	require.NoError(t, err)
+	require.True(t, cfg.CustomUI.Enabled)
+	require.Equal(t, "local-extension-auth-example", cfg.CustomUI.IframeExtensions[1].ID)
+	require.Equal(t, "http://127.0.0.1:8091", cfg.CustomUI.IframeExtensions[1].AllowedOrigin)
+	// Loopback HTTP extensions are never privileged, so the auth example
+	// establishes its own session instead of receiving host context.
+	require.Empty(t, cfg.CustomUI.IframeExtensions[1].Permissions)
+	require.False(t, cfg.CustomUI.IframeExtensions[1].Sandbox.AllowSameOrigin)
 }
 
 func (s *LoaderSuite) SetupTest() {
