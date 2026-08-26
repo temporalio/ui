@@ -346,9 +346,17 @@
 {/snippet}
 
 <MenuContainer {open}>
-  <MenuButton size="xs" controls={controlsId} hasIndicator class="bg-secondary">
-    {getDisplayKeyWithConditional(localFilter)}<span
-      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
+  <MenuButton
+    size="xs"
+    controls={controlsId}
+    hasIndicator
+    class="min-w-0 max-w-full bg-secondary"
+    title="{getDisplayKeyWithConditional(localFilter)} {getDisplayValue(
+      localFilter,
+    )}"
+  >
+    <span class="truncate">{getDisplayKeyWithConditional(localFilter)}</span
+    ><span class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
       >{getDisplayValue(localFilter)}</span
     >
   </MenuButton>

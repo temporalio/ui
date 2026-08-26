@@ -139,20 +139,21 @@
   </div>
 </header>
 
-<FilterBar
-  filters={scheduleFilters}
-  options={$scheduleSearchAttributeOptions}
-  searchAttributes={$scheduleSearchAttributes}
-  id="schedules"
-/>
-<SavedQueryViews
-  filters={scheduleFilters}
-  savedQueries={savedScheduleQueries}
-  systemViews={systemScheduleViews}
-  defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
-  searchAttributes={scheduleSearchAttributes}
-  id="schedule"
->
+<div>
+  <SavedQueryViews
+    filters={scheduleFilters}
+    savedQueries={savedScheduleQueries}
+    systemViews={systemScheduleViews}
+    defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+    searchAttributes={scheduleSearchAttributes}
+    id="schedule"
+  />
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
+  />
   {#key [namespace, query, $schedulesRefresh]}
     <PaginatedTable
       {onFetch}
@@ -225,7 +226,7 @@
       {/snippet}
     </PaginatedTable>
   {/key}
-</SavedQueryViews>
+</div>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

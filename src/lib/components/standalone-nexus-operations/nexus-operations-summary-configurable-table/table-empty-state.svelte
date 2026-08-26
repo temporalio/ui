@@ -128,7 +128,7 @@
         </div>
       {/if}
     </div>
-    <div class="flex h-full flex-col">
+    <div class="flex flex-col">
       <div class="bg-off-white dark:bg-[#0f1725]">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>

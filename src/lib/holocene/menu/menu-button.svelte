@@ -106,7 +106,7 @@
 >
   {@render leading?.()}
   {#if children}
-    <div class="flex grow items-center">
+    <div class="flex min-w-0 grow items-center">
       {@render children()}
     </div>
   {/if}

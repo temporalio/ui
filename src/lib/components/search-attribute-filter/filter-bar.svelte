@@ -53,7 +53,7 @@
 
 <div>
   <div
-    class="flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
+    class="flex w-full flex-wrap items-center justify-between gap-2 border border-b-0 border-subtle bg-primary p-1.5"
   >
     <Filter
       {filters}
