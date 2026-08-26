@@ -15,37 +15,20 @@ const referenceColorGroup = (group: string, colors: SemanticColorGroup) =>
     Object.keys(colors).map((name) => [name, `var(--color-${group}-${name})`]),
   );
 
-const resolveColorGroup = (
-  group: string,
-  colors: SemanticColorGroup,
-  mode: keyof SemanticColor,
-) =>
+const resolveSemanticColors = (mode: keyof SemanticColor) =>
   Object.fromEntries(
-    Object.entries(colors).map(([name, color]) => [
-      `--color-${group}-${name}`,
-      color[mode],
-    ]),
+    Object.entries(semanticColors).flatMap(([group, colors]) =>
+      Object.entries(colors).map(([name, color]) => [
+        `--color-${group}-${name}`,
+        color[mode],
+      ]),
+    ),
   );
-
-const resolveSemanticColors = (mode: keyof SemanticColor) => ({
-  ...resolveColorGroup('background', semanticColors.background, mode),
-  ...resolveColorGroup('content', semanticColors.content, mode),
-  ...resolveColorGroup('surface', semanticColors.surface, mode),
-  ...resolveColorGroup('border', semanticColors.border, mode),
-  ...resolveColorGroup('interactive', semanticColors.interactive, mode),
-  ...resolveColorGroup('actions', semanticColors.actions, mode),
-  ...resolveColorGroup('overlay', semanticColors.overlay, mode),
-});
 
 const keywordColors = {
   inherit: 'inherit',
   current: 'currentColor',
   transparent: 'transparent',
-};
-
-const primitiveColors = {
-  ...colorScales,
-  alpha: colorAlphaScales,
 };
 
 const contentColorReferences = referenceColorGroup(
@@ -62,8 +45,13 @@ const fixedColors = {
   white: fixedWhite,
 };
 const paintColors = {
-  ...primitiveColors,
+  ...colorScales,
+  alpha: colorAlphaScales,
   ...fixedColors,
+};
+const basePaintColors = {
+  ...keywordColors,
+  ...paintColors,
 };
 
 const semanticColorReferences = {
@@ -76,9 +64,11 @@ const semanticColorReferences = {
   overlay: referenceColorGroup('overlay', semanticColors.overlay),
 };
 
-const borderColors = semanticColorReferences.border;
-const interactiveColors = semanticColorReferences.interactive;
-const backgroundColors = semanticColorReferences.background;
+const {
+  background: backgroundColors,
+  border: borderColors,
+  interactive: interactiveColors,
+} = semanticColorReferences;
 
 export const fixedColorNames = Object.keys(fixedColors);
 
@@ -91,13 +81,11 @@ export const semanticColorVariableNames = Object.keys(
 export const colorTheme = {
   colors: keywordColors,
   accentColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     auto: 'auto',
   },
   backgroundColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     background: backgroundColors,
     surface: semanticColorReferences.surface,
     interactive: interactiveColors,
@@ -107,75 +95,62 @@ export const colorTheme = {
     border: borderColors,
   },
   borderColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...borderColors,
     interactive: interactiveColors,
     content: contentColors,
   },
   boxShadowColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     content: contentColors,
   },
   caretColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...contentColors,
   },
   divideColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...borderColors,
   },
   fill: {
-    ...keywordColors,
+    ...basePaintColors,
     none: 'none',
-    ...paintColors,
     ...contentColors,
   },
   gradientColorStops: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...semanticColorReferences,
   },
   outlineColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...borderColors,
     interactive: interactiveColors,
   },
   placeholderColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...contentColors,
   },
   ringColor: {
     DEFAULT: interactiveColors.primary,
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...borderColors,
     interactive: interactiveColors,
   },
   ringOffsetColor: {
     DEFAULT: backgroundColors.primary,
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     background: backgroundColors,
   },
   stroke: {
-    ...keywordColors,
+    ...basePaintColors,
     none: 'none',
-    ...paintColors,
   },
   textColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...contentColors,
   },
   textDecorationColor: {
-    ...keywordColors,
-    ...paintColors,
+    ...basePaintColors,
     ...contentColors,
   },
 } satisfies Readonly<Record<string, ColorThemeValue>>;

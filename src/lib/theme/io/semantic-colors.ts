@@ -1,137 +1,43 @@
 import { colorAlphaScales } from './color-alpha-scales';
 import { colorScales } from './color-scales';
-import type { HexColor } from './types';
 
 export type SemanticColor = Readonly<{
   light: string;
   dark: string;
 }>;
 
-type OpaqueSemanticColor = Readonly<{
-  light: HexColor;
-  dark: HexColor;
-}>;
+type SemanticColorMap = Readonly<
+  Record<string, Readonly<Record<string, SemanticColor>>>
+>;
 
-type BackgroundColors = Readonly<{
-  primary: SemanticColor;
-}>;
-
-type ContentColors = Readonly<{
-  primary: SemanticColor;
-  secondary: SemanticColor;
-  tertiary: SemanticColor;
-  brand: SemanticColor;
-  information: SemanticColor;
-  success: SemanticColor;
-  warning: SemanticColor;
-  'static-text-info': SemanticColor;
-  'static-text-success': SemanticColor;
-  'static-text-warning': SemanticColor;
-  'static-text-danger': SemanticColor;
-  danger: SemanticColor;
-  error: SemanticColor;
-  'inverse-secondary': SemanticColor;
-  'inverse-primary': SemanticColor;
-  black: SemanticColor;
-  white: SemanticColor;
-}>;
-
-type SurfaceColors = Readonly<{
-  primary: SemanticColor;
-  secondary: SemanticColor;
-  tertiary: SemanticColor;
-  'static-neutral': SemanticColor;
-  brand: SemanticColor;
-  information: SemanticColor;
-  success: SemanticColor;
-  warning: SemanticColor;
-  danger: SemanticColor;
-  error: SemanticColor;
-}>;
-
-type BorderColors = Readonly<{
-  primary: SemanticColor;
-  secondary: SemanticColor;
-  tertiary: SemanticColor;
-  brand: SemanticColor;
-  information: SemanticColor;
-  success: SemanticColor;
-  warning: SemanticColor;
-  danger: SemanticColor;
-  error: SemanticColor;
-}>;
-
-type InteractiveColors = Readonly<{
-  primary: SemanticColor;
-  'primary-hover': SemanticColor;
-  'primary-press': SemanticColor;
-  secondary: SemanticColor;
-  'secondary-hover': SemanticColor;
-  'secondary-press': SemanticColor;
-  'tertiary-press': SemanticColor;
-  'tertiary-hover': SemanticColor;
-  danger: SemanticColor;
-  'danger-hover': SemanticColor;
-  'danger-press': SemanticColor;
-}>;
-
-type ActionColors = Readonly<{
-  'hover-overlay': SemanticColor;
-  'press-overlay': SemanticColor;
-  'brand-hover': SemanticColor;
-  'brand-press': SemanticColor;
-}>;
-
-type OverlayColors = Readonly<{
-  primary: SemanticColor;
-  secondary: SemanticColor;
-  tertiary: SemanticColor;
-  information: SemanticColor;
-  success: SemanticColor;
-  warning: SemanticColor;
-  danger: SemanticColor;
-  error: SemanticColor;
-  backdrop: SemanticColor;
-}>;
-
-type SemanticColors = Readonly<{
-  background: BackgroundColors;
-  content: ContentColors;
-  surface: SurfaceColors;
-  border: BorderColors;
-  interactive: InteractiveColors;
-  actions: ActionColors;
-  overlay: OverlayColors;
-}>;
-
-const backgroundPrimary: OpaqueSemanticColor = {
+const backgroundPrimary = {
   light: '#f8f8f8',
-  dark: '#121212',
-};
+  dark: colorScales.neutral[12],
+} satisfies SemanticColor;
 
-const surfacePrimary: OpaqueSemanticColor = {
+const surfacePrimary = {
   light: colorScales.slate[1],
   dark: colorScales.neutral[11],
-};
+} satisfies SemanticColor;
 
-const interactivePrimary: OpaqueSemanticColor = {
+const interactivePrimary = {
   light: colorScales.indigo[9],
   dark: colorScales.indigo[11],
-};
+} satisfies SemanticColor;
 
-const interactiveSecondary = backgroundPrimary;
+const interactiveSecondary = surfacePrimary;
 
-const fixedBlack: OpaqueSemanticColor = {
+const fixedBlack = {
   light: '#000000',
   dark: '#000000',
-};
+} satisfies SemanticColor;
 
-const fixedWhite: OpaqueSemanticColor = {
+const fixedWhite = {
   light: '#ffffff',
   dark: '#ffffff',
-};
+} satisfies SemanticColor;
 
-export const semanticColors: SemanticColors = {
+export const semanticColors = {
   background: {
     primary: backgroundPrimary,
   },
@@ -372,4 +278,4 @@ export const semanticColors: SemanticColors = {
       dark: colorAlphaScales.slate[20],
     },
   },
-};
+} satisfies SemanticColorMap;
