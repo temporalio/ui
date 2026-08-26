@@ -11,6 +11,7 @@
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchNexusOperationCountByStatus } from '$lib/services/nexus-operation-counts';
@@ -125,7 +126,7 @@
   </div>
 </header>
 
-<div>
+<MaximizableTableView>
   <SavedQueryViews
     filters={nexusOperationFilters}
     savedQueries={savedNexusQueries}
@@ -138,11 +139,7 @@
   <NexusOperationsSummaryConfigurableTable
     onClickConfigure={openCustomizationDrawer}
   />
-</div>
-<ConfigurableTableHeadersDrawer
-  {availableColumns}
-  bind:open={customizationDrawerOpen}
-  table={TABLE_TYPE.NEXUS_OPERATIONS}
-  type={translate('common.columns')}
-  title={translate('standalone-nexus-operations.nexus-operations-table')}
+</MaximizableTableView>
+type={translate('common.columns')}
+title={translate('standalone-nexus-operations.nexus-operations-table')}
 />

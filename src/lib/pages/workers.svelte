@@ -7,6 +7,7 @@
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
   import {
@@ -37,7 +38,7 @@
 </script>
 
 {#if workerHeartbeatsEnabled}
-  <div>
+  <MaximizableTableView>
     <SavedQueryViews
       filters={workerFilters}
       savedQueries={savedWorkerQueries}
@@ -62,7 +63,7 @@
         filterable
       />
     {/key}
-  </div>
+  </MaximizableTableView>
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}
