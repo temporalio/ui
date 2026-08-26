@@ -15,11 +15,17 @@
 
   type ComboboxArgs = Omit<
     Partial<ComponentProps<typeof Combobox>>,
-    'options' | 'value' | 'optionLabelKey' | 'optionValueKey' | 'multiselect'
+    | 'options'
+    | 'value'
+    | 'optionLabelKey'
+    | 'optionValueKey'
+    | 'optionDescriptionKey'
+    | 'multiselect'
   > & {
     options?: readonly (string | Record<string, unknown>)[];
     optionLabelKey?: string;
     optionValueKey?: string;
+    optionDescriptionKey?: string;
     multiselect?: boolean;
     allowCustomValue?: boolean;
     showChevron?: boolean;
@@ -65,6 +71,7 @@
       noResultsText: { name: 'No Results Text', control: 'text' },
       optionValueKey: { control: 'text', table: { disable: true } },
       optionLabelKey: { control: 'text', table: { disable: true } },
+      optionDescriptionKey: { control: 'text', table: { disable: true } },
 
       options: { table: { disable: true } },
     },
@@ -154,6 +161,60 @@
     const menu = await canvas.findByRole('listbox');
 
     expect(menu).toBeInTheDocument();
+  }}
+/>
+
+<Story
+  name="Custom Options With Descriptions"
+  args={{
+    label: 'Select a Namespace',
+    options: [
+      {
+        label: 'billing-prod',
+        value: 'billing-prod',
+        description: 'Invoicing and payment workflows',
+      },
+      {
+        label: 'billing-staging',
+        value: 'billing-staging',
+        description: 'Pre-release verification',
+      },
+      {
+        label: 'search-prod',
+        value: 'search-prod',
+        description: 'Indexing pipeline',
+      },
+      { label: 'internal-tools', value: 'internal-tools' },
+    ],
+    optionLabelKey: 'label',
+    optionValueKey: 'value',
+    optionDescriptionKey: 'description',
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    await userEvent.type(combobox, 'billing');
+
+    const menu = await canvas.findByRole('listbox');
+    expect(menu).toBeInTheDocument();
+
+    // Descriptions render as a secondary line beneath the label.
+    expect(
+      canvas.getByText('Invoicing and payment workflows'),
+    ).toBeInTheDocument();
+
+    // An option without a description still renders, with no secondary line.
+    await userEvent.clear(combobox);
+    await userEvent.type(combobox, 'internal');
+    expect(canvas.getByText('internal-tools')).toBeInTheDocument();
+
+    // Filtering matches the label only — never the description.
+    await userEvent.clear(combobox);
+    await userEvent.type(combobox, 'Indexing');
+    await waitFor(() => {
+      expect(canvas.getByText('No Results')).toBeInTheDocument();
+    });
   }}
 />
 
