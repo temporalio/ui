@@ -140,6 +140,10 @@
     onClickConfigure={openCustomizationDrawer}
   />
 </MaximizableTableView>
-type={translate('common.columns')}
-title={translate('standalone-nexus-operations.nexus-operations-table')}
+<ConfigurableTableHeadersDrawer
+  {availableColumns}
+  bind:open={customizationDrawerOpen}
+  table={TABLE_TYPE.NEXUS_OPERATIONS}
+  type={translate('common.columns')}
+  title={translate('standalone-nexus-operations.nexus-operations-table')}
 />
