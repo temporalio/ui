@@ -327,7 +327,7 @@
 
 {#snippet conditionalButtons(options: { value: string; label: string }[])}
   <ToggleButtons>
-    {#each options as option}
+    {#each options as option (option.value)}
       <ToggleButton
         variant="secondary"
         active={localFilter.conditional === option.value}
@@ -350,10 +350,13 @@
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="bg-surface-secondary"
+    class="min-w-0 max-w-full bg-surface-secondary"
+    title="{getDisplayKeyWithConditional(localFilter)} {getDisplayValue(
+      localFilter,
+    )}"
   >
-    {getDisplayKeyWithConditional(localFilter)}<span
-      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
+    <span class="truncate">{getDisplayKeyWithConditional(localFilter)}</span
+    ><span class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
       >{getDisplayValue(localFilter)}</span
     >
   </MenuButton>

@@ -59,6 +59,8 @@
     `dropdown-filter-chip-${attribute.toLowerCase()}`,
   );
 
+  const statusValues = $derived(filters.map((f) => f.value).join(', '));
+
   function handleStatusSelect(status: string | null) {
     if (localFilters.find((f) => f.value === status)) {
       localFilters = localFilters.filter((f) => f.value !== status);
@@ -120,10 +122,12 @@
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="bg-surface-secondary"
+    class="min-w-0 max-w-full bg-surface-secondary"
+    title="{attribute} = {statusValues}"
   >
-    {attribute} =<span class="pl-1 text-brand"
-      >{filters.map((f) => f.value).join(', ')}</span
+    <span class="truncate">{attribute} =</span><span
+      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
+      >{statusValues}</span
     >
   </MenuButton>
 

@@ -128,11 +128,11 @@
         </div>
       {/if}
     </div>
-    <div class="flex h-full flex-col">
+    <div class="flex flex-col">
       <div class="bg-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-indigo-8"></div>
+      <div class="flex-1 bg-[#818cf8]"></div>
     </div>
   </div>
 {/if}

@@ -78,8 +78,7 @@
   <Card
     class={merge(
       'flex flex-col gap-4',
-      allowedCallerNamespaces &&
-        'h-auto xl:max-h-[var(--panel-h)] xl:w-1/2 xl:overflow-auto',
+      allowedCallerNamespaces && 'h-auto xl:w-1/2',
     )}
   >
     <h5>{translate('common.description')}</h5>

@@ -37,23 +37,23 @@
 </script>
 
 {#if workerHeartbeatsEnabled}
-  <FilterBar
-    filters={workerFilters}
-    options={$workerSearchAttributeOptions}
-    searchAttributes={$workerSearchAttributes}
-    id="worker"
-    statusAttribute="WorkerStatus"
-    includeNullConditions={false}
-  />
-
-  <SavedQueryViews
-    filters={workerFilters}
-    savedQueries={savedWorkerQueries}
-    systemViews={systemWorkerViews}
-    defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
-    searchAttributes={workerSearchAttributes}
-    id="worker"
-  >
+  <div>
+    <SavedQueryViews
+      filters={workerFilters}
+      savedQueries={savedWorkerQueries}
+      systemViews={systemWorkerViews}
+      defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
+      searchAttributes={workerSearchAttributes}
+      id="worker"
+    />
+    <FilterBar
+      filters={workerFilters}
+      options={$workerSearchAttributeOptions}
+      searchAttributes={$workerSearchAttributes}
+      id="worker"
+      statusAttribute="WorkerStatus"
+      includeNullConditions={false}
+    />
     {#key [namespace, query, $refresh]}
       <WorkersTable
         {namespace}
@@ -62,7 +62,7 @@
         filterable
       />
     {/key}
-  </SavedQueryViews>
+  </div>
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}
