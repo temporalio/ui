@@ -1,18 +1,19 @@
 import { execFile } from 'node:child_process';
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { createInRepoTemporaryDirectory } from './test-temp-root';
 import { createUiCatalogAuthoring } from './ui-authoring';
 
 const temporaryDirectories: string[] = [];
 const execFileAsync = promisify(execFile);
 
 const createIsolatedCatalogRoot = async () => {
-  const rootDirectory = await mkdtemp(
-    join(process.cwd(), '.catalog-ui-authoring-'),
+  const rootDirectory = await createInRepoTemporaryDirectory(
+    'catalog-ui-authoring-',
   );
   temporaryDirectories.push(rootDirectory);
   await Promise.all([
@@ -25,8 +26,8 @@ const createIsolatedCatalogRoot = async () => {
 };
 
 const createIsolatedCatalogCliRoot = async () => {
-  const rootDirectory = await mkdtemp(
-    join(process.cwd(), '.catalog-ui-authoring-cli-'),
+  const rootDirectory = await createInRepoTemporaryDirectory(
+    'catalog-ui-authoring-cli-',
   );
   temporaryDirectories.push(rootDirectory);
   await Promise.all([
