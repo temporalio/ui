@@ -331,21 +331,21 @@
           style:left="{textPosition[0] - spanLeft}px"
           style:top="{spanCy}px"
         >
-          {#if iconName}
-            <svg class="h-[14px] w-[14px] text-current" viewBox="0 0 16 16">
-              <use href="#ti-{iconName}" />
-            </svg>
-          {/if}
           <span
             class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-current"
           >
+            {#if iconName}
+              <svg class="h-[14px] w-[20px] text-current" viewBox="0 0 16 16">
+                <use href="#ti-{iconName}" />
+              </svg>
+            {/if}
             {#if pendingActivity}
               {translate('workflows.attempt')}
               {pendingActivity.attempt} / {pendingActivity.maximumAttempts ||
                 '∞'}
               •&nbsp;{@render summary(decodedValue)}
             {:else if retried}
-              {retryAttempt} • {@render summary(decodedValue)}
+              {retryAttempt} •&nbsp; {@render summary(decodedValue)}
             {:else if decodedLocalActivity}
               {decodedLocalActivity.value}
             {:else}
