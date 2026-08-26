@@ -22,6 +22,7 @@
 
 <script lang="ts">
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
+  import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
@@ -187,6 +188,21 @@
   const spanCy = HALO; // button-local vertical center
 </script>
 
+{#snippet summary(value: string)}
+  {#if group?.userMetadata?.summary}
+    <Preview
+      content={value}
+      fill={false}
+      inline
+      minHeight={0}
+      overrideTheme="primary"
+      title={translate('workflows.summary')}
+    />
+  {:else}
+    {value}
+  {/if}
+{/snippet}
+
 <!-- lines/dots are inline snippets, not child components — plain divs, no
      per-element instances. -->
 {#snippet connector(
@@ -327,13 +343,13 @@
               {translate('workflows.attempt')}
               {pendingActivity.attempt} / {pendingActivity.maximumAttempts ||
                 '∞'}
-              •&nbsp;{decodedValue}
+              •&nbsp;{@render summary(decodedValue)}
             {:else if retried}
-              {retryAttempt} • {decodedValue}
+              {retryAttempt} • {@render summary(decodedValue)}
             {:else if decodedLocalActivity}
               {decodedLocalActivity.value}
             {:else}
-              {decodedValue}
+              {@render summary(decodedValue)}
             {/if}
           </span>
         </div>

@@ -18,8 +18,10 @@
       | undefined;
     fill?: boolean;
     frameId?: string;
+    inline?: boolean;
     minHeight?: number;
     previewTheme?: 'dark' | 'light';
+    title?: string;
   }
 
   let {
@@ -28,8 +30,10 @@
     fill = true,
     overrideTheme = '',
     frameId = '',
+    inline = false,
     minHeight = 100,
     previewTheme,
+    title = 'output',
   }: Props = $props();
 
   let iframe: HTMLIFrameElement | null = $state(null);
@@ -56,10 +60,28 @@
     return Math.ceil(Math.max(contentHeight, minHeight));
   };
 
+  const getRenderedWidth = (iframeDocument: Document) => {
+    const { body } = iframeDocument;
+    const main = iframeDocument.querySelector('main');
+    const contentWidth = main
+      ? Math.max(main.scrollWidth, main.getBoundingClientRect().width)
+      : Math.max(body.scrollWidth, body.getBoundingClientRect().width);
+
+    return Math.ceil(contentWidth);
+  };
+
   const resizeIframe = () => {
     if (!iframe) return;
     const iframeDocument = iframe.contentDocument;
     if (!iframeDocument) return;
+
+    if (inline) {
+      iframe.width = '0';
+      iframe.style.width = '0px';
+      const width = getRenderedWidth(iframeDocument);
+      iframe.width = `${width}`;
+      iframe.style.width = `${width}px`;
+    }
 
     iframe.height = '0';
     iframe.style.height = '0px';
@@ -70,7 +92,7 @@
   };
 
   $effect(() => {
-    if (!iframe || typeof ResizeObserver === 'undefined') return;
+    if (!iframe || inline || typeof ResizeObserver === 'undefined') return;
 
     const resizeObserver = new ResizeObserver(([entry]) => {
       const width = Math.round(entry.contentRect.width);
@@ -105,18 +127,23 @@
   );
   const previewPath = $derived(
     resolve(
-      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}`,
+      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&inline=${inline}`,
       {},
     ),
   );
 </script>
 
-<section class={twMerge(fill ? 'h-full w-full' : 'w-full', className)}>
+<section
+  class={twMerge(
+    inline ? 'inline-flex max-w-full' : fill ? 'h-full w-full' : 'w-full',
+    className,
+  )}
+>
   <iframe
     bind:this={iframe}
     onload={resizeIframe}
-    title="output"
-    class="block w-full"
+    {title}
+    class={inline ? 'block border-0 align-middle' : 'block w-full border-0'}
     src={previewPath}
     id={frameId}
   ></iframe>
