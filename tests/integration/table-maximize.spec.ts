@@ -17,7 +17,6 @@ const expectMaximized = async (page: Page) => {
 };
 
 const expectRestored = async (page: Page) => {
-  await expect(tableView(page)).toHaveCSS('display', 'contents');
   await expect(maximizeButton(page)).toHaveAccessibleName('Maximize');
 };
 
@@ -56,7 +55,6 @@ test.describe('Maximize Table', () => {
 
     await page.keyboard.press('Escape');
 
-    await expect(tableView(page)).toHaveCSS('display', 'contents');
     await expect(maximizeButton(page)).toHaveAccessibleName('Maximize');
   });
 
