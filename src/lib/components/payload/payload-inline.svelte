@@ -24,7 +24,7 @@
 
 {#snippet codeBlock(value: string)}
   <div
-    class="overflow-hidden border border-primary bg-surface-brand px-1 py-0.5 font-mono text-xs text-primary {className}"
+    class="overflow-hidden border border-primary bg-overlay-primary px-1 py-0.5 font-mono text-xs text-primary {className}"
   >
     <code>
       <pre class="truncate">{value.slice(0, truncateAt)}</pre>
