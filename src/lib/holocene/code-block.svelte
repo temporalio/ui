@@ -305,7 +305,7 @@
 >
   {#if tabs && tabs.length > 0}
     <div
-      class="flex flex-row items-center justify-between border-b border-secondary bg-surface-secondary px-3 text-secondary"
+      class="flex flex-row items-center justify-between border-b border-secondary bg-overlay-primary px-3 text-secondary"
     >
       <div class="flex flex-row items-center gap-4">
         {#each tabs as title (title)}
@@ -333,7 +333,7 @@
       identical, minimising ResizeObserver churn when the real editor swaps in.
     -->
     <pre
-      class="overflow-auto border border-secondary bg-surface-secondary p-2 text-primary"
+      class="overflow-auto border border-secondary bg-overlay-primary p-2 text-primary"
       style:font-family="Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace"
       style:font-size="0.875em"
       style:max-height={maxHeight ? `${maxHeight}px` : undefined}
