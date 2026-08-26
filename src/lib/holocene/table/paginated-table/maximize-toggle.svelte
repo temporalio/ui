@@ -26,5 +26,8 @@
     variant="ghost"
     aria-label={label}
     LeadingIcon={Glyph}
+    data-track-name="maximize-table-control"
+    data-track-intent="action"
+    data-track-text={label}
   />
 </Tooltip>

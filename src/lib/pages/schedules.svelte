@@ -216,10 +216,13 @@
         <Tooltip text={translate('common.configure-columns')} top>
           <Button
             onclick={openCustomizationDrawer}
-            data-testid="workflows-summary-table-configuration-button"
+            data-testid="schedules-summary-table-configuration-button"
             size="xs"
             variant="ghost"
             aria-label={translate('common.configure-columns')}
+            data-track-name="configure-columns-table-control"
+            data-track-intent="action"
+            data-track-text={translate('common.configure-columns')}
           >
             <IconTemporalSettings />
           </Button>
