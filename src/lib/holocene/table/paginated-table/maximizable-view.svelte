@@ -34,7 +34,7 @@
   };
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydowncapture={handleKeydown} />
 
 <div
   class={merge(
