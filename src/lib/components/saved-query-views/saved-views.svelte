@@ -355,7 +355,7 @@
     text={view.count != undefined ? `${view.name} • ${view.count}` : view.name}
     bottom
     usePortal
-    tooltipClass="max-w-[280px]"
+    tooltipClass="max-w-[280px] xl:hidden"
   >
     <Button
       variant="ghost"
