@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
   import { resolve } from '$app/paths';
@@ -38,6 +39,7 @@
 
   let iframe: HTMLIFrameElement | null = $state(null);
   let iframeWidth = 0;
+  let loading = $state(true);
 
   const parsePixels = (value: string | undefined) => {
     const parsed = Number.parseFloat(value ?? '0');
@@ -91,6 +93,16 @@
     iframe.style.height = `${height + 2}px`;
   };
 
+  const handleLoad = async () => {
+    if (inline) {
+      loading = false;
+      // Flush the removal of the zero-size loading styles before measuring.
+      await tick();
+    }
+
+    resizeIframe();
+  };
+
   $effect(() => {
     if (!iframe || inline || typeof ResizeObserver === 'undefined') return;
 
@@ -131,6 +143,10 @@
       {},
     ),
   );
+
+  $effect.pre(() => {
+    if (inline && previewPath) loading = true;
+  });
 </script>
 
 <section
@@ -141,9 +157,12 @@
 >
   <iframe
     bind:this={iframe}
-    onload={resizeIframe}
+    onload={handleLoad}
     {title}
-    class={inline ? 'block border-0 align-middle' : 'block w-full border-0'}
+    class={twMerge(
+      inline ? 'block border-0 align-middle' : 'block w-full border-0',
+      inline && loading && 'invisible !h-0 !w-0',
+    )}
     src={previewPath}
     id={frameId}
   ></iframe>
