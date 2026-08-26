@@ -12,7 +12,10 @@
   let { pendingTask = undefined }: Props = $props();
 </script>
 
-<Accordion title={translate('workflows.pending-workflow-task')}>
+<Accordion
+  title={translate('workflows.pending-workflow-task')}
+  class="border-tertiary bg-background-primary"
+>
   {#if pendingTask}
     <div class="flex flex-col gap-2">
       <p class="flex items-center gap-4">

@@ -20,11 +20,7 @@
   const notes = $derived(schedule?.schedule?.state?.notes);
 </script>
 
-<Accordion
-  title={translate('schedules.advanced-settings')}
-  class="border-primary bg-surface-primary"
-  open
->
+<Accordion title={translate('schedules.advanced-settings')} open>
   <dl class="grid grid-cols-2 gap-4 text-sm">
     <div>
       <dt class="text-secondary">

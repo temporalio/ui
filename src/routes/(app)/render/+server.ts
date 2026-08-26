@@ -24,8 +24,8 @@ const markdownColorVariables = (mode: ThemeMode) => ({
   '--color-content-primary': semanticColors.content.primary[mode],
   '--color-border-brand': semanticColors.border.brand[mode],
   '--color-border-secondary': semanticColors.border.secondary[mode],
-  '--color-surface-brand': semanticColors.surface.brand[mode],
   '--color-surface-primary': semanticColors.surface.primary[mode],
+  '--color-surface-secondary': semanticColors.surface.secondary[mode],
 });
 
 const markdownColorRule = (selector: string, mode: ThemeMode): string => {

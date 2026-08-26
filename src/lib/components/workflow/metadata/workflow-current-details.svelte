@@ -97,7 +97,7 @@
   {#key currentDetails}
     <Markdown
       frameId="user-metadata-current-details"
-      overrideTheme="primary"
+      overrideTheme="background"
       content={currentDetails}
     />
   {/key}

@@ -23,7 +23,7 @@
     {#if summary}
       <Markdown
         frameId="user-metadata-summary"
-        overrideTheme="primary"
+        overrideTheme="background"
         content={summary}
       />
     {:else}
@@ -43,7 +43,7 @@
     {#if details}
       <Markdown
         frameId="user-metadata-details"
-        overrideTheme="primary"
+        overrideTheme="background"
         content={details}
       />
     {:else}

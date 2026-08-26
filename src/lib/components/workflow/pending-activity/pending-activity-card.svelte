@@ -224,6 +224,7 @@
     title={activity.lastFailure?.stackTrace
       ? translate('workflows.last-failure-with-stack-trace')
       : translate('workflows.last-failure')}
+    class="border-tertiary bg-background-primary"
   >
     {#snippet children(open)}
       {#if open}

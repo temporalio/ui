@@ -28,7 +28,6 @@
     'events.custom-search',
   )} ${pluralize(translate('events.attribute'), searchAttributeCount)}`}
   expandable={searchAttributeCount > 0}
-  class="border-primary bg-surface-primary"
 >
   {#if searchAttributeCount}
     <ul class="w-full">

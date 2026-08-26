@@ -265,7 +265,7 @@
       Icon={IconInfo}
       title={translate('workers.no-role-prompt')}
       bind:open={showRoleHelp}
-      class="[&_h3]:text-sm"
+      class="border-tertiary bg-background-primary [&_h3]:text-sm"
     >
       <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
         <ToggleButtons>
@@ -338,7 +338,7 @@
         Icon={IconInfo}
         title={translate('workers.cloud-run-setup-prompt')}
         bind:open={showCloudRunHelp}
-        class="[&_h3]:text-sm"
+        class="border-tertiary bg-background-primary [&_h3]:text-sm"
       >
         <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
           <p class="text-sm text-secondary">
