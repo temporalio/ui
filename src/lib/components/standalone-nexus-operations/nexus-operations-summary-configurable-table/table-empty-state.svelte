@@ -132,7 +132,7 @@
       <div class="bg-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-[#8da4ef]"></div>
     </div>
   </div>
 {/if}

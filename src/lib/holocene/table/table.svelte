@@ -88,7 +88,7 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply bg-surface-tertiary text-primary;
+      @apply bg-surface-secondary text-primary;
     }
 
     :global(tr > th) {
