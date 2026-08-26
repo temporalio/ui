@@ -98,7 +98,7 @@
       </TableCellWithFilterOrCopyButtons>
     {:else if label === translate('schedules.recent-runs')}
       <td class="cell truncate">
-        {#each sortRecentActions(schedule?.info?.recentActions ?? []) as run (run?.actualTime)}
+        {#each sortRecentActions(schedule?.info?.recentActions ?? []) as run (run)}
           {@const startWorkflowResult = run?.startWorkflowResult}
           <p>
             {#if startWorkflowResult && startWorkflowResult.workflowId && startWorkflowResult.runId}
