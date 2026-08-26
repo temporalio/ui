@@ -92,7 +92,7 @@
   <MenuButton
     id="{id}-saved-views-button"
     controls={menuId}
-    variant="secondary"
+    variant="tertiary"
     size="xs"
     hasIndicator
     title={label}

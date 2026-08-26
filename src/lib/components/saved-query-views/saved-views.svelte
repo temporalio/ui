@@ -369,7 +369,7 @@
       data-track-intent="action"
       data-track-text={view.name}
       onclick={() => setActiveQueryView(view)}
-      class={merge('max-w-[240px]', (view.count ?? 0) > 0 && 'text-danger')}
+      class="max-w-[240px]"
       active={view.active}
       disabled={view.disabled}
       size="xs"
