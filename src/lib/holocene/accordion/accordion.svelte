@@ -102,9 +102,11 @@
           <span class="text-secondary">{subtitle}</span>
         </p>
       </button>
-      <div class="flex shrink-0 flex-row items-center gap-2 pr-2">
-        {@render action?.()}
-      </div>
+      {#if action}
+        <div class="flex shrink-0 flex-row items-center gap-2 pr-2">
+          {@render action()}
+        </div>
+      {/if}
     </div>
 
     <div
@@ -118,7 +120,10 @@
   </div>
 {:else}
   <div
-    class="w-full border border-tertiary bg-background-primary p-4 text-primary"
+    class={merge(
+      'w-full border border-tertiary bg-background-primary p-4 text-primary',
+      className,
+    )}
     data-track-container={title}
     {...rest}
   >
