@@ -34,7 +34,7 @@ export type EditorLanguage =
 const baseTheme = {
   '&': {
     color: 'var(--color-content-primary)',
-    backgroundColor: 'var(--color-surface-secondary)',
+    backgroundColor: 'var(--color-overlay-primary)',
     height: '100%',
   },
   '.cm-scroller': {
