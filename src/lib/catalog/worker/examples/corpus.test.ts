@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { sharedWorkflowCorpusInventory } from './inventory.js';
 import { priorityFairnessWorkflow } from './priority-fairness/workflow.js';
+import { logStep } from './sequential-markdown-activities/activities.js';
+import { recordActivityWithoutSummary } from './sequential-no-summary-activities/activities.js';
+import { recordActivity } from './sequential-plain-text-activities/activities.js';
 import { greet } from './shared-activities.js';
 import validateJsonSchema from '../../browser/schema-validator.js';
 import { createCatalogRegistry, generateCatalog } from '../registry.js';
@@ -45,6 +48,49 @@ const proofExampleIds = [
   'priority-fairness',
   'standalone-activity',
   'nexus-greeting',
+  'sequential-markdown-activities',
+  'sequential-no-summary-activities',
+  'sequential-plain-text-activities',
+] as const;
+
+const activitySummaryExamples = [
+  {
+    id: 'sequential-markdown-activities',
+    title: 'Sequential activities with Markdown summaries',
+    workflowType: 'sequentialMarkdownActivities',
+    activityName: 'logStep',
+    activity: logStep,
+    capabilityTags: ['activities', 'sequencing', 'retries'],
+    expectedEvidence: [
+      'Two thousand non-overlapping activity executions in deterministic order.',
+      'Logging step 10 fails three attempts and succeeds on attempt four.',
+      'Each activity summary displays a Logging System link.',
+    ],
+  },
+  {
+    id: 'sequential-no-summary-activities',
+    title: 'Sequential activities without summaries',
+    workflowType: 'sequentialNoSummaryActivities',
+    activityName: 'recordActivityWithoutSummary',
+    activity: recordActivityWithoutSummary,
+    capabilityTags: ['activities', 'sequencing'],
+    expectedEvidence: [
+      'Two thousand non-overlapping activity executions in deterministic order.',
+      'Activity timeline entries do not display summaries.',
+    ],
+  },
+  {
+    id: 'sequential-plain-text-activities',
+    title: 'Sequential plain text activities',
+    workflowType: 'sequentialPlainTextActivities',
+    activityName: 'recordActivity',
+    activity: recordActivity,
+    capabilityTags: ['activities', 'sequencing'],
+    expectedEvidence: [
+      'Two thousand non-overlapping activity executions in deterministic order.',
+      'Activity summaries range from Activity 1 through Activity 2000.',
+    ],
+  },
 ] as const;
 
 describe('shared workflow corpus', () => {
@@ -115,12 +161,63 @@ describe('shared workflow corpus', () => {
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
         'nexusGreeting',
+        ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
     );
     for (const example of registry.examples) {
       if (example.execution.kind !== 'workflow' || !target) continue;
       expect(target.workflowExports[example.execution.workflowType]).toBe(
         example.execution.workflow,
+      );
+    }
+  });
+
+  it('registers the sequential activity summary variants with their activity bindings', async () => {
+    const registry = createCatalogRegistry();
+
+    catalogRegistrationSource.register(registry);
+    const generated = generateCatalog(registry);
+    const binding = generated.workerBindings[0];
+
+    for (const expected of activitySummaryExamples) {
+      const descriptor = generated.browserDescriptors.find(
+        ({ id }) => id === expected.id,
+      );
+      const registration = registry.examples.find(
+        ({ id }) => id === expected.id,
+      );
+
+      expect(descriptor).toMatchObject({
+        id: expected.id,
+        title: expected.title,
+        capabilityTags: expected.capabilityTags,
+        expectedEvidence: expected.expectedEvidence,
+        input: {
+          defaultValue: [],
+          schema: { type: 'array', items: false, maxItems: 0 },
+        },
+        startOptions: { defaultValue: {} },
+        execution: {
+          kind: 'workflow',
+          workflowType: expected.workflowType,
+        },
+      });
+      await expect(
+        validateJsonSchema(descriptor!.input.schema, []),
+      ).resolves.toBe(true);
+      await expect(
+        validateJsonSchema(descriptor!.input.schema, ['unexpected']),
+      ).resolves.toBe(false);
+      expect(registration?.execution.kind).toBe('workflow');
+      if (registration?.execution.kind !== 'workflow') continue;
+      expect(Object.keys(registration.execution.activities)).toEqual([
+        expected.activityName,
+      ]);
+      expect(registration.execution.activities[expected.activityName]).toBe(
+        expected.activity,
+      );
+      expect(binding?.activities[expected.activityName]).toBe(
+        expected.activity,
       );
     }
   });
@@ -476,6 +573,15 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/parallel-activities/workflow.ts',
         'src/lib/catalog/worker/examples/sequential-activities/example.ts',
         'src/lib/catalog/worker/examples/sequential-activities/workflow.ts',
+        'src/lib/catalog/worker/examples/sequential-markdown-activities/activities.ts',
+        'src/lib/catalog/worker/examples/sequential-markdown-activities/example.ts',
+        'src/lib/catalog/worker/examples/sequential-markdown-activities/workflow.ts',
+        'src/lib/catalog/worker/examples/sequential-no-summary-activities/activities.ts',
+        'src/lib/catalog/worker/examples/sequential-no-summary-activities/example.ts',
+        'src/lib/catalog/worker/examples/sequential-no-summary-activities/workflow.ts',
+        'src/lib/catalog/worker/examples/sequential-plain-text-activities/activities.ts',
+        'src/lib/catalog/worker/examples/sequential-plain-text-activities/example.ts',
+        'src/lib/catalog/worker/examples/sequential-plain-text-activities/workflow.ts',
         'src/lib/catalog/worker/examples/long-activity/example.ts',
         'src/lib/catalog/worker/examples/long-activity/workflow.ts',
         'src/lib/catalog/worker/examples/long-activity/activity.ts',
