@@ -23,7 +23,7 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
-  import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
+  import { getVisibleInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
@@ -106,9 +106,10 @@
   const outboundLinks = $derived(
     getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
   );
-  const inboundLinks = $derived(
-    getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
+  const visibleInboundLinks = getVisibleInboundNexusLinkEvents(
+    () => $fullEventHistory,
   );
+  const inboundLinks = $derived(visibleInboundLinks.events?.length || 0);
   const linkCount = $derived(outboundLinks + inboundLinks);
   const sharedFilterParams = $derived(getSharedFilterParams(page.url));
   const taskQueue = $derived(workflow?.taskQueue ?? '');

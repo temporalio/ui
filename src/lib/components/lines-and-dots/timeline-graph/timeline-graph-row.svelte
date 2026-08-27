@@ -25,6 +25,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
+  import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import {
     decodeLocalActivity,
     getLocalActivityMarkerEvent,
@@ -150,9 +151,14 @@
   );
   const retried = $derived(retryAttempt > 1);
 
+  const effectiveCategory = $derived(
+    resolveSystemNexusEvent(group.initialEvent)?.timelineCategory ??
+      group.category,
+  );
+
   const lineColor = $derived(
     strokeColor({
-      category: group.category,
+      category: effectiveCategory,
       classification: group.lastEvent.classification,
     }),
   );
@@ -167,7 +173,7 @@
         ? (pendingActivity.attempt ?? 0) > 1
           ? 'retry'
           : 'pending'
-        : group.category,
+        : effectiveCategory,
       classification: group.lastEvent.classification,
     }),
   );
@@ -253,7 +259,7 @@
     onclick={onClick}
   >
     <div
-      class="highlight {groupHover({ category: group.category })}"
+      class="highlight {groupHover({ category: effectiveCategory })}"
       style:border-radius="{highlightRadius}px"
     ></div>
     {#each points as pointX, index (index)}
@@ -288,7 +294,7 @@
           ? 'pause'
           : decodedLocalActivity
             ? CategoryIcon['local-activity'].name
-            : CategoryIcon[group.category].name,
+            : CategoryIcon[effectiveCategory].name,
       )}
     {/each}
     <!-- Inside the button so hovering/clicking the label hits the same target;
