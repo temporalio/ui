@@ -6,7 +6,11 @@
 
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconArrowLeft, IconArrowsLeftRightToLine } from '$lib/io/icon';
+  import {
+    IconArrowLeft,
+    IconArrowsLeftRightToLine,
+    IconCollapse,
+  } from '$lib/io/icon';
 
   interface Props {
     version: string;
@@ -35,23 +39,24 @@
   <div
     class="flex flex-row items-center justify-start group-data-[nav=closed]:hidden"
   >
-    <a href={base || '/'} class="flex items-center text-inherit">
-      <Logo
-        height={24}
-        width={24}
-        class={merge(subtitle !== 'Cloud' && 'hidden')}
-      />
-    </a>
+    {#if subtitle === 'Cloud'}
+      <a href={base || '/'} class="flex items-center text-inherit">
+        <Logo height={24} width={24} />
+      </a>
+    {/if}
     {#if subtitle}
       {#if subtitleHref}
-        <a href={subtitleHref} class="contents">
+        <a
+          href={subtitleHref}
+          class="inline-flex items-center rounded hover:bg-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+        >
           <IconArrowLeft
             title="Project Namespaces"
-            class="m-1.5 text-secondary group-data-[nav=closed]:hidden"
+            class="m-1.5 text-primary group-data-[nav=closed]:hidden"
           />
           <h2
             class={merge(
-              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-secondary underline hover:text-primary group-data-[nav=open]:block',
+              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-primary underline hover:text-primary group-data-[nav=open]:block',
               subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
             )}
           >
@@ -72,10 +77,14 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[8px] justify-self-end text-secondary transition-[opacity,transform] hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+    class="mx-[8px] flex size-6 items-center justify-center justify-self-end rounded text-secondary transition-[opacity,transform] hover:bg-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
     onclick={ontoggle}
   >
-    <IconArrowsLeftRightToLine />
+    {#if navOpen}
+      <IconCollapse />
+    {:else}
+      <IconArrowsLeftRightToLine />
+    {/if}
   </button>
 </div>
 <div role="list">

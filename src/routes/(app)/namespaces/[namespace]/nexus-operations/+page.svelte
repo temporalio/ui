@@ -24,7 +24,7 @@
 
 <StandaloneNexusOperations>
   {#snippet releaseStageBadge()}
-    <Badge type="secondary">Pre-release</Badge>
+    <Badge type="accent">Pre-release</Badge>
   {/snippet}
   {#snippet headerActions()}
     {#if !startDisabled}

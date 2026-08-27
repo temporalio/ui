@@ -98,7 +98,7 @@
       'bg-surface-accent',
       'text-accent',
     );
-    await expect(preReleaseBadge).not.toHaveClass(
+    await expect(preReleaseBadge).toHaveClass(
       'border-accent',
       'bg-surface-accent',
       'text-accent',
