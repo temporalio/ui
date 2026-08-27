@@ -7,6 +7,7 @@
     primary:
       'border border-information bg-surface-information text-information',
     secondary: 'bg-alpha-purple-30 text-primary',
+    accent: 'border border-accent bg-surface-accent text-accent',
     default: 'border border-tertiary bg-surface-tertiary text-secondary',
     warning: 'border border-warning bg-surface-warning text-warning',
     success: 'border border-success bg-surface-success text-success',

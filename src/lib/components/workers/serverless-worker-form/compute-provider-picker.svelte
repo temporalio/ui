@@ -51,6 +51,14 @@
 
   const badgeClass = 'px-1.5 py-0 text-xs font-normal leading-5';
 
+  const releaseStageBadgeType = (
+    option: ComputeProviderOption,
+  ): 'accent' | 'secondary' =>
+    (option.releaseStage ?? defaultReleaseStage[option.value]) ===
+    'public-preview'
+      ? 'accent'
+      : 'secondary';
+
   const releaseStageLabel = (option: ComputeProviderOption): string => {
     switch (option.releaseStage ?? defaultReleaseStage[option.value]) {
       case 'public-preview':
@@ -111,7 +119,7 @@
               {option.disabledReason}
             </Badge>
           {:else if releaseStageLabel(option)}
-            <Badge type="secondary" class={badgeClass}>
+            <Badge type={releaseStageBadgeType(option)} class={badgeClass}>
               {releaseStageLabel(option)}
             </Badge>
           {/if}

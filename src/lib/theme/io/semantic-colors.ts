@@ -94,6 +94,10 @@ export const semanticColors = {
       light: colorScales.persimmon[12],
       dark: colorScales.persimmon[8],
     },
+    accent: {
+      light: colorScales.purple[12],
+      dark: colorScales.purple[8],
+    },
     'inverse-secondary': {
       light: colorScales.slate[6],
       dark: colorScales.slate[6],
@@ -143,6 +147,10 @@ export const semanticColors = {
       light: colorScales.persimmon[4],
       dark: colorScales.persimmon[12],
     },
+    accent: {
+      light: colorScales.purple[5],
+      dark: colorScales.purple[12],
+    },
   },
   border: {
     primary: {
@@ -180,6 +188,10 @@ export const semanticColors = {
     error: {
       light: colorAlphaScales.persimmon[50],
       dark: colorAlphaScales.persimmon[70],
+    },
+    accent: {
+      light: colorAlphaScales.purple[80],
+      dark: colorAlphaScales.purple[80],
     },
   },
   interactive: {
@@ -272,6 +284,10 @@ export const semanticColors = {
     error: {
       light: colorAlphaScales.persimmon[20],
       dark: colorAlphaScales.persimmon[20],
+    },
+    accent: {
+      light: colorAlphaScales.purple[20],
+      dark: colorAlphaScales.purple[20],
     },
     backdrop: {
       light: colorAlphaScales.slate[20],

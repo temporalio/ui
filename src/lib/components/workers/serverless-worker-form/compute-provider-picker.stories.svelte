@@ -90,8 +90,19 @@
   asChild
   play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText('Public Preview')).toBeInTheDocument();
-    await expect(canvas.getByText('Pre-release')).toBeInTheDocument();
+    const publicPreviewBadge = canvas.getByText('Public Preview');
+    const preReleaseBadge = canvas.getByText('Pre-release');
+
+    await expect(publicPreviewBadge).toHaveClass(
+      'border-accent',
+      'bg-surface-accent',
+      'text-accent',
+    );
+    await expect(preReleaseBadge).not.toHaveClass(
+      'border-accent',
+      'bg-surface-accent',
+      'text-accent',
+    );
   }}
 >
   <div class="max-w-[45rem] p-4">
