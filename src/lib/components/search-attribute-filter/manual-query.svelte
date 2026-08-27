@@ -80,7 +80,7 @@
       placeholder={translate('workflows.search-placeholder')}
       Icon={IconSearch}
       class="grow  [&_*]:border-0"
-      inputContainerClass="!border-r border-primary bg-surface-primary text-primary focus-within:z-20"
+      inputContainerClass="!border-r border-primary bg-surface-primary text-primary hover:border-primary focus-within:z-20 focus-within:ring-inset focus-within:ring-offset-0"
       clearable
       copyButtonLabel={translate('common.copy-icon-title')}
       clearButtonLabel={translate('common.clear-input-button-label')}
