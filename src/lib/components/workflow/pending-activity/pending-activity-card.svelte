@@ -9,7 +9,7 @@
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import Badge, { type BadgeSize } from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconRetry } from '$lib/io/icon';
@@ -28,7 +28,12 @@
   let {
     activity,
     totalPending,
-  }: { activity: PendingActivity; totalPending?: number } = $props();
+    size,
+  }: {
+    activity: PendingActivity;
+    totalPending?: number;
+    size?: BadgeSize;
+  } = $props();
   const failed = $derived(
     (activity.attempt ?? 0) > 1 && !!activity.lastFailure,
   );
@@ -248,7 +253,7 @@
 
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
-    <Badge type={failed ? 'danger' : 'default'}>
+    <Badge type={failed ? 'danger' : 'default'} {size}>
       <IconRetry class="mr-1 {failed && 'font-bold text-danger'}" />
       {activity.attempt ?? 0} of {formatMaximumAttempts(
         activity.maximumAttempts ?? null,

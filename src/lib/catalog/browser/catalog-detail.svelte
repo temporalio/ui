@@ -681,18 +681,14 @@
                       {@const status = terminalStatusPresentation(
                         session.terminalStatus!,
                       )}
-                      <Badge
-                        type={status.type}
-                        class="px-1.5 py-0 text-xs leading-5"
-                        >{status.label}</Badge
-                      >
+                      <Badge type={status.type} size="sm">{status.label}</Badge>
                     {:else}
                       {@const explanation =
                         launchOutcomeExplanation(session.outcome) ??
                         session.error}
-                      <Badge type="subtle" class="px-1.5 py-0 text-xs leading-5"
-                        >{sessionStateLabels[session.state]}</Badge
-                      >
+                      <Badge type="subtle" size="sm">
+                        {sessionStateLabels[session.state]}
+                      </Badge>
                       {#if explanation}
                         <p class="mt-1 text-xs text-secondary">
                           {explanation}

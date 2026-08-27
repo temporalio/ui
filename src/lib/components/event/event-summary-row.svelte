@@ -165,6 +165,7 @@
       event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt,
   );
 
+  const badgeSize = $derived(compact ? 'sm' : 'md');
   const showSecondaryAttribute = $derived(
     compact &&
       secondaryAttribute?.key &&
@@ -326,6 +327,7 @@
     <div class="flex items-center gap-2">
       {#if pendingAttempt}
         <Badge
+          size={badgeSize}
           class="mr-1"
           type={isPausedPendingActivity
             ? 'warning'
@@ -359,17 +361,24 @@
         </Badge>
       {/if}
       {#if !primaryLocalAttribute && primaryAttribute?.key}
-        <EventDetailsRow {...primaryAttribute} {attributes} />
+        <EventDetailsRow {...primaryAttribute} {attributes} size={badgeSize} />
       {/if}
       {#if primaryLocalAttribute && primaryLocalAttribute.key}
-        <EventDetailsRow {...primaryLocalAttribute} {attributes} />
+        <EventDetailsRow
+          {...primaryLocalAttribute}
+          {attributes}
+          size={badgeSize}
+        />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
         <div
           class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
           <p class="whitespace-nowrap text-right text-xs">Summary</p>
-          <PayloadSummary value={currentEvent.userMetadata.summary} />
+          <PayloadSummary
+            value={currentEvent.userMetadata.summary}
+            size={badgeSize}
+          />
         </div>
       {/if}
       {#if currentEvent?.links?.length}
@@ -384,10 +393,15 @@
           key="attempt"
           value={nonPendingActivityAttempt.toString()}
           {attributes}
+          size={badgeSize}
         />
       {/if}
       {#if showSecondaryAttribute}
-        <EventDetailsRow {...secondaryAttribute} {attributes} />
+        <EventDetailsRow
+          {...secondaryAttribute}
+          {attributes}
+          size={badgeSize}
+        />
       {/if}
     </div>
   </td>
@@ -399,7 +413,11 @@
             text={translate('workflows.estimated-billable-actions')}
             topRight
           >
-            <Badge type="subtle" class="text-bold shrink-0 gap-1 px-1.5">
+            <Badge
+              type="subtle"
+              size={badgeSize}
+              class="text-bold shrink-0 gap-1"
+            >
               {event.billableActions}
             </Badge>
           </Tooltip>
@@ -415,7 +433,7 @@
     data-testid="event-summary-row-expanded"
   >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
-      <EventDetailsFull {group} event={currentEvent} />
+      <EventDetailsFull {group} event={currentEvent} size={badgeSize} />
     </td>
   </tr>
 {/if}

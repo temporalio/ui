@@ -2,6 +2,7 @@
   import { cva, type VariantProps } from 'class-variance-authority';
 
   export type BadgeType = VariantProps<typeof types>['type'];
+  export type BadgeSize = VariantProps<typeof types>['size'];
 
   const type = {
     primary:
@@ -36,9 +37,14 @@
     {
       variants: {
         type,
+        size: {
+          sm: 'px-1.5 py-0 text-xs leading-5',
+          md: '',
+        },
       },
       defaultVariants: {
         type: 'default',
+        size: 'md',
       },
     },
   );
@@ -52,13 +58,27 @@
 
   interface Props {
     type?: BadgeType | null | false;
+    size?: BadgeSize;
     class?: string;
     children?: Snippet;
   }
 
-  let { type = 'default', class: className = '', children }: Props = $props();
+  let {
+    type = 'default',
+    size = 'md',
+    class: className = '',
+    children,
+  }: Props = $props();
 </script>
 
-<div class={merge(types({ type: type || 'default' }), className)}>
+<div
+  class={merge(
+    types({
+      type: type || 'default',
+      size: type === 'count' ? 'md' : size,
+    }),
+    className,
+  )}
+>
   {@render children?.()}
 </div>

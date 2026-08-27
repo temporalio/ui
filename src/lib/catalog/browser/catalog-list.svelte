@@ -126,7 +126,7 @@
 {#snippet sourceBadge(descriptor: BrowserCatalogDescriptor)}
   <Badge
     type={descriptor.source.id === 'local' ? 'warning' : 'subtle'}
-    class="px-1 py-0.5 text-xs leading-none"
+    size="sm"
   >
     {descriptor.source.label}
   </Badge>
@@ -138,7 +138,7 @@
   evidence: EvidenceLink | undefined,
 )}
   <span class="inline-flex items-center gap-1">
-    <Badge {type} class="px-1 py-0.5 text-xs leading-none">{label}</Badge>
+    <Badge {type} size="sm">{label}</Badge>
     {#if evidence}
       <Link
         href={evidence.href}

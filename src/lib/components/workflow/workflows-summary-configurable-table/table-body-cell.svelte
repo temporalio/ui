@@ -253,7 +253,7 @@
           options={{ format: truncate ? 'short' : 'long' }}
         />
       {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
-        <Badge>{content}</Badge>
+        <Badge size={truncate ? 'sm' : 'md'}>{content}</Badge>
       {:else}
         <Tooltip
           usePortal

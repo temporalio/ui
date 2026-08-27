@@ -102,7 +102,7 @@
         <td>{translate('namespaces.global')}</td>
         <td>
           <Badge
-            class="px-1 py-0"
+            size="sm"
             type={badgeTypeForBoolean(namespace?.isGlobalNamespace, false)}
           >
             {namespace?.isGlobalNamespace
@@ -123,7 +123,7 @@
         <td>{translate('namespaces.history-archival')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
+            size="sm"
             type={badgeTypeForArchivalState(
               namespace?.config?.historyArchivalState,
             )}
@@ -136,7 +136,7 @@
         <td>{translate('namespaces.visibility-archival')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
+            size="sm"
             type={badgeTypeForArchivalState(
               namespace?.config?.visibilityArchivalState,
             )}
@@ -201,7 +201,7 @@
         <td>{translate('namespaces.client-actions')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
+            size="sm"
             type={badgeTypeForBoolean($settings.disableWriteActions)}
             >{badgeTextForBoolean($settings.disableWriteActions)}</Badge
           ></td
@@ -211,7 +211,7 @@
         <td>{translate('workflows.terminate-modal-title')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
+            size="sm"
             type={badgeTypeForBoolean($settings.workflowTerminateDisabled)}
             >{badgeTextForBoolean($settings.workflowTerminateDisabled)}</Badge
           ></td
@@ -221,7 +221,7 @@
         <td>{translate('workflows.cancel-modal-title')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
+            size="sm"
             type={badgeTypeForBoolean($settings.workflowCancelDisabled)}
             >{badgeTextForBoolean($settings.workflowCancelDisabled)}</Badge
           ></td
@@ -231,7 +231,7 @@
         <td>{translate('namespaces.signal-workflow')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
+            size="sm"
             type={badgeTypeForBoolean($settings.workflowSignalDisabled)}
             >{badgeTextForBoolean($settings.workflowSignalDisabled)}</Badge
           ></td
@@ -241,7 +241,7 @@
         <td>{translate('workflows.reset-modal-title')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
+            size="sm"
             type={badgeTypeForBoolean($settings.workflowResetDisabled)}
             >{badgeTextForBoolean($settings.workflowResetDisabled)}</Badge
           ></td
@@ -252,7 +252,7 @@
           <td>{translate('workflows.pause-workflow')}</td>
           <td
             ><Badge
-              class="px-1 py-0"
+              size="sm"
               type={badgeTypeForBoolean($settings.workflowPauseDisabled)}
               >{badgeTextForBoolean($settings.workflowPauseDisabled)}</Badge
             ></td

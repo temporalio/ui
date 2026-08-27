@@ -644,7 +644,7 @@ describe('CatalogDetail', () => {
       'utf8',
     );
 
-    expect(source).toContain('class="px-1.5 py-0 text-xs leading-5"');
+    expect(source).toContain('size="sm"');
     expect(source).toContain('class="h-7 px-1.5"');
     expect(source).toContain(
       'class="truncate py-2 font-mono text-xs text-secondary"',

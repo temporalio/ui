@@ -49,7 +49,7 @@
   {#each operations as { state, jobId, operationType, startTime, closeTime }, i (`${jobId}:${i}`)}
     <TableRow>
       <td>
-        <Badge class="h-5" type={jobStateToBadgeType[state]}>
+        <Badge size="sm" type={jobStateToBadgeType[state]}>
           {state}
         </Badge>
       </td>
@@ -58,7 +58,7 @@
         ></td
       >
       <td>
-        <OperationType {operationType} />
+        <OperationType {operationType} size="sm" />
       </td>
       <Timestamp as="td" class="max-sm:hidden" dateTime={startTime} />
       <Timestamp as="td" class="max-sm:hidden" dateTime={closeTime} />

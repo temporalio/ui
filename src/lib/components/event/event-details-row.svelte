@@ -2,7 +2,7 @@
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import PayloadInline from '$lib/components/payload/payload-inline.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import Badge, { type BadgeSize } from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isRawPayload, isRawPayloads } from '$lib/utilities/decode-payload';
@@ -21,6 +21,7 @@
     value: SummaryAttribute['value'] | number | boolean | null;
     attributes: CombinedAttributes;
     showKey?: boolean;
+    size?: BadgeSize;
     class?: ClassNameValue;
   }
 
@@ -29,6 +30,7 @@
     value,
     attributes,
     showKey = true,
+    size,
     class: className = '',
   }: Props = $props();
 
@@ -65,7 +67,7 @@
         />
       </Copyable>
     {:else}
-      <Badge type="subtle" class="block select-none truncate">
+      <Badge type="subtle" {size} class="block select-none truncate">
         {formatSummaryAttributeDisplayValue(value)}
       </Badge>
     {/if}

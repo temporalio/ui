@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type Snippet, untrack } from 'svelte';
 
-  import Badge from '$lib/holocene/badge.svelte';
+  import Badge, { type BadgeSize } from '$lib/holocene/badge.svelte';
   import type { Payload } from '$lib/types';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -11,6 +11,7 @@
     fallback?: string;
     prefix?: string;
     maxSummaryLength?: number;
+    size?: BadgeSize;
     class?: string;
     children?: Snippet<[decodedValue: string]>;
   }
@@ -20,6 +21,7 @@
     fallback = '',
     prefix = '',
     maxSummaryLength = 120,
+    size,
     class: className = '',
     children,
   }: Props = $props();
@@ -68,5 +70,5 @@
 {:else if className}
   <span class={className}>{decodedValue || fallback}</span>
 {:else}
-  <Badge type="secondary">{decodedValue || fallback}</Badge>
+  <Badge type="secondary" {size}>{decodedValue || fallback}</Badge>
 {/if}

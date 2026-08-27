@@ -1,5 +1,8 @@
 <script lang="ts">
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
+  import Badge, {
+    type BadgeSize,
+    type BadgeType,
+  } from '$lib/holocene/badge.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalActivity, IconTemporalWorkflow } from '$lib/io/icon';
   import {
@@ -11,9 +14,10 @@
 
   interface Props {
     operationType?: BatchOperationType;
+    size?: BadgeSize;
   }
 
-  let { operationType }: Props = $props();
+  let { operationType, size }: Props = $props();
 
   // The API returns the raw screaming enum (e.g.
   // BATCH_OPERATION_TYPE_CANCEL_ACTIVITY) we want to derive
@@ -61,7 +65,7 @@
 
 <span class="flex items-center gap-2">
   {#if operationType}
-    <Badge class="h-5" type={operationTypeToBadgeType[action]}>
+    <Badge {size} type={operationTypeToBadgeType[action]}>
       {action}
     </Badge>
     {#if executionType}
