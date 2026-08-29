@@ -383,14 +383,14 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex h-dvh w-screen flex-row">
+<div class="flex h-[calc(100dvh-var(--layout-pt))] w-screen flex-row">
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
     position={toaster.position}
   />
-  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
+  <div class="sticky top-0 z-30 hidden h-full w-auto md:block">
     <SideNavigation sections={[linkList, linkListForSecondGroup]} {isCloud}>
       {#snippet bottom()}
         {#if !isCloud}
@@ -436,7 +436,7 @@
       <UserMenu {logout} />
     </TopNavigation>
     {#snippet main()}
-      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+      <div class="flex h-full w-full flex-col gap-4 p-4 md:p-8">
         <ErrorBoundary>
           {@render children()}
         </ErrorBoundary>
