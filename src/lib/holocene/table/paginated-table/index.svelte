@@ -44,7 +44,9 @@
     ...rest
   }: Props = $props();
 
-  const scrollsInTable = $derived(verticalScroll === 'table');
+  const scrollsInTable = $derived(
+    verticalScroll === 'table' || (maxHeight !== '' && maxHeight !== 'none'),
+  );
 
   let tableContainer = $state<HTMLDivElement>();
   let footerHeight = $state(0);
