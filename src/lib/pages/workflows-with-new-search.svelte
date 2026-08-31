@@ -39,6 +39,7 @@
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchWorkflowTaskFailures } from '$lib/services/workflow-counts';
@@ -266,20 +267,21 @@
   </div>
 </header>
 
-<FilterBar />
-<SavedQueryViews
-  filters={workflowFilters}
-  savedQueries={savedWorkflowQueries}
-  {systemViews}
-  defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
-  {searchAttributes}
-  id="workflow"
->
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={workflowFilters}
+    savedQueries={savedWorkflowQueries}
+    {systemViews}
+    defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
+    {searchAttributes}
+    id="workflow"
+  />
+  <FilterBar />
   <WorkflowsSummaryConfigurableTable
     onClickConfigure={openCustomizationDrawer}
     {cloud}
   />
-</SavedQueryViews>
+</MaximizableTableView>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

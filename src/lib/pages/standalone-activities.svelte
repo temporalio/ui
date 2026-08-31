@@ -43,6 +43,7 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchActivityCountByStatus } from '$lib/services/activity-counts';
@@ -227,19 +228,20 @@
   </div>
 </header>
 
-<FilterBar />
-<SavedQueryViews
-  filters={activityFilters}
-  savedQueries={savedActivityQueries}
-  systemViews={systemActivityViews}
-  defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
-  searchAttributes={activityExecutionSearchAttributes}
-  id="activity"
->
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={activityFilters}
+    savedQueries={savedActivityQueries}
+    systemViews={systemActivityViews}
+    defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
+    searchAttributes={activityExecutionSearchAttributes}
+    id="activity"
+  />
+  <FilterBar />
   <ActivitiesSummaryConfigurableTable
     onClickConfigure={openCustomizationDrawer}
   />
-</SavedQueryViews>
+</MaximizableTableView>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

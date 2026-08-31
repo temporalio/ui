@@ -1,3 +1,4 @@
+import { systemNexusGroupLabel } from '$lib/system-nexus-endpoints';
 import type { CommonHistoryEvent } from '$lib/types/events';
 import { formatDurationAbbreviated } from '$lib/utilities/format-time';
 import { getSummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
@@ -62,12 +63,12 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isNexusOperationScheduledEvent(event)) {
-    return [
-      event.nexusOperationScheduledEventAttributes?.service,
-      event.nexusOperationScheduledEventAttributes?.operation,
-    ]
+    const attrs = event.nexusOperationScheduledEventAttributes;
+    const fallback = [attrs?.service, attrs?.operation]
       .filter(Boolean)
       .join('.');
+
+    return systemNexusGroupLabel(event) ?? fallback;
   }
 
   return '';
@@ -112,7 +113,7 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
     isNexusOperationScheduledEvent(event) ||
     isNexusOperationStartedEvent(event)
   ) {
-    return 'Nexus Operation';
+    return systemNexusGroupLabel(event) ?? 'Nexus Operation';
   }
 
   return '';

@@ -7,6 +7,7 @@
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
   import {
@@ -37,23 +38,23 @@
 </script>
 
 {#if workerHeartbeatsEnabled}
-  <FilterBar
-    filters={workerFilters}
-    options={$workerSearchAttributeOptions}
-    searchAttributes={$workerSearchAttributes}
-    id="worker"
-    statusAttribute="WorkerStatus"
-    includeNullConditions={false}
-  />
-
-  <SavedQueryViews
-    filters={workerFilters}
-    savedQueries={savedWorkerQueries}
-    systemViews={systemWorkerViews}
-    defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
-    searchAttributes={workerSearchAttributes}
-    id="worker"
-  >
+  <MaximizableTableView>
+    <SavedQueryViews
+      filters={workerFilters}
+      savedQueries={savedWorkerQueries}
+      systemViews={systemWorkerViews}
+      defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
+      searchAttributes={workerSearchAttributes}
+      id="worker"
+    />
+    <FilterBar
+      filters={workerFilters}
+      options={$workerSearchAttributeOptions}
+      searchAttributes={$workerSearchAttributes}
+      id="worker"
+      statusAttribute="WorkerStatus"
+      includeNullConditions={false}
+    />
     {#key [namespace, query, $refresh]}
       <WorkersTable
         {namespace}
@@ -62,7 +63,7 @@
         filterable
       />
     {/key}
-  </SavedQueryViews>
+  </MaximizableTableView>
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}

@@ -27,7 +27,6 @@ export const Strings = {
   'no-activities-description-part-3':
     'Get started with a job today and graduate to a Workflow when you need multi-step orchestration, human-in-the-loop, signals, updates, or timers.',
   'get-started-title': 'Get started with your preferred SDK’s code samples',
-  'custom-views': 'Custom Views',
   'recent-activities': 'Recent Standalone Activities',
   'activity-id': 'Activity ID',
   'run-id': 'Run ID',
