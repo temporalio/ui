@@ -68,7 +68,7 @@
 
 <div
   class={merge(
-    'surface-primary flex min-h-[154px] grow flex-col overflow-auto border border-subtle',
+    'surface-primary flex grow flex-col overflow-auto border border-subtle',
     className,
   )}
   id="{rest['id']}-container"
