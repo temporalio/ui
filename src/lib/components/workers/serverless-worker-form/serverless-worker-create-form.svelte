@@ -13,6 +13,7 @@
     type ComputeProviderOption,
     type CreateDeploymentFormData,
     createDeploymentSchema,
+    defaultScaleDownStabilization,
     getInitialComputeProvider,
   } from './shared';
 
@@ -70,6 +71,7 @@
       maxReplicas: 30,
       initialReplicas: 0,
       utilizationTarget: 0.8,
+      scaleDownStabilization: defaultScaleDownStabilization,
       scaleUpCooloffMs: undefined as number | undefined,
       scaleUpBacklogThreshold: undefined as number | undefined,
       maxWorkerLifetimeMs: undefined as number | undefined,
@@ -165,6 +167,7 @@
         bind:maxReplicas={$form.maxReplicas}
         bind:initialReplicas={$form.initialReplicas}
         bind:utilizationTarget={$form.utilizationTarget}
+        bind:scaleDownStabilization={$form.scaleDownStabilization}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}

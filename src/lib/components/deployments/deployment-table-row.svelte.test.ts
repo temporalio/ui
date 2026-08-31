@@ -15,6 +15,7 @@ import type { ComputeStatus } from '$lib/types/deployments';
 import {
   closeDeploymentClientTestRunner,
   getDeploymentClientTestRunner,
+  VITE_SERVER_BOOT_TIMEOUT_MS,
 } from './deployment-client-test-runner';
 
 const computeStatuses: Record<string, ComputeStatus> = {
@@ -35,7 +36,7 @@ describe('deployment list connection status visibility', () => {
 
   beforeAll(async () => {
     client = await getDeploymentClientTestRunner();
-  });
+  }, VITE_SERVER_BOOT_TIMEOUT_MS);
 
   beforeEach(() => {
     vi.stubGlobal(
