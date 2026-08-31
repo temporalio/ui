@@ -12,6 +12,7 @@ import {
 import {
   closeDeploymentClientTestRunner,
   getDeploymentClientTestRunner,
+  VITE_SERVER_BOOT_TIMEOUT_MS,
 } from '$lib/components/deployments/deployment-client-test-runner';
 import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
 
@@ -101,7 +102,7 @@ describe('deployment connection status visibility', () => {
 
   beforeAll(async () => {
     client = await getDeploymentClientTestRunner();
-  });
+  }, VITE_SERVER_BOOT_TIMEOUT_MS);
 
   beforeEach(() => {
     vi.stubGlobal(
