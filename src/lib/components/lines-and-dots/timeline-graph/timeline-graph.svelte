@@ -26,6 +26,7 @@
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
+  import { EVENT_GROUP_COLOR } from '../colors';
   import EndTimeInterval from '../end-time-interval.svelte';
   import {
     EVENT_GROUP_LINE_HEIGHT,
@@ -717,7 +718,7 @@
         {#if selectedEventGroupBounds?.outlineHeight}
           <div
             data-testid="event-group-row-backdrop"
-            class="pointer-events-none absolute box-content rounded-b-lg border-x-2 border-b-2 border-brand bg-brand/10"
+            class="pointer-events-none absolute box-content rounded-b-lg border-x-2 border-b-2 border-brand bg-brand/20"
             style:left="{GUTTER - 8}px"
             style:top="{selectedEventGroupBounds.outlineTop}px"
             style:width="{canvasWidth - GUTTER * 2 + 16}px"
@@ -758,7 +759,10 @@
         {#if selectedEventGroup && selectedEventGroupBounds}
           <div
             data-testid="selected-event-group-header"
-            class="absolute z-10 box-content flex min-w-0 items-center justify-between border-x-2 border-t border-brand bg-slate-50 text-sm dark:bg-slate-800"
+            class={twMerge(
+              'absolute z-10 box-content flex min-w-0 items-center justify-between border-x-2 border-t border-brand bg-slate-50 text-sm dark:bg-slate-800',
+              selectedEventGroup.isPending && 'border-t-transparent',
+            )}
             style:left="{GUTTER - 8}px"
             style:top="{selectedEventGroupBounds.headerTop}px"
             style:width="{canvasWidth - GUTTER * 2 + 16}px"
@@ -799,6 +803,15 @@
                 <IconClose />
               </Button>
             </div>
+            {#if selectedEventGroup.isPending}
+              <div
+                aria-hidden="true"
+                class="tl-line tl-line--animate tl-line--dashed tl-line--square pointer-events-none absolute -inset-x-0.5 z-20"
+                style:top="-{EVENT_GROUP_LINE_HEIGHT}px"
+                style:height="{EVENT_GROUP_LINE_HEIGHT}px"
+                style:--tl-line-color={EVENT_GROUP_COLOR}
+              ></div>
+            {/if}
           </div>
         {/if}
 

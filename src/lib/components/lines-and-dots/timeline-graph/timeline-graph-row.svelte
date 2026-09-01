@@ -154,7 +154,7 @@
       positioningPoints,
       ROW_HEIGHT / 2,
       timelineWidth,
-      group.isPending,
+      group.isPending && !isEventMarkerGroup,
     );
     return { points, textAnchor, textPosition };
   };
@@ -219,13 +219,17 @@
   // Highlight corner radius, concentric with the dots' rounded corners.
   const highlightRadius = RADIUS * 0.8;
   const spanLeft = $derived(points[0] - HALO);
+  const eventMarkerRangeEnd = $derived(
+    group.isPending ? canvasWidth - GUTTER : getEventMarkerRangeEnd(points),
+  );
   const spanWidth = $derived(
-    (group.isPending && canvasWidth - points[0] - HALO) ||
-      (isEventMarkerGroup
-        ? getEventMarkerRangeEnd(points) - points[0] + HALO * 2
+    isEventMarkerGroup
+      ? eventMarkerRangeEnd - points[0] + HALO * 2
+      : group.isPending
+        ? canvasWidth - points[0] - HALO
         : points.length >= 2
           ? points[points.length - 1] - points[0] + RADIUS * 3
-          : RADIUS * 3),
+          : RADIUS * 3,
   );
   const spanCy = HALO; // button-local vertical center
 </script>
@@ -307,8 +311,16 @@
     ></div>
     {#if isEventMarkerGroup}
       {@const rangeStartX = points[0] - spanLeft}
-      {@const rangeEndX = getEventMarkerRangeEnd(points) - spanLeft}
-      {@render connector(rangeStartX, rangeEndX, lineColor, { thin: true })}
+      {@const rangeEndX = eventMarkerRangeEnd - spanLeft}
+      {#if group.isPending}
+        {@render connector(rangeStartX, rangeEndX, lineColor, {
+          animate: true,
+          dashed: true,
+          thin: true,
+        })}
+      {:else}
+        {@render connector(rangeStartX, rangeEndX, lineColor, { thin: true })}
+      {/if}
       <div
         class="absolute"
         style:left="{rangeStartX - EVENT_GROUP_CAP_WIDTH / 2}px"
@@ -317,14 +329,16 @@
         style:height="{EVENT_GROUP_CAP_HEIGHT}px"
         style:background-color={lineColor}
       ></div>
-      <div
-        class="absolute"
-        style:left="{rangeEndX - EVENT_GROUP_CAP_WIDTH / 2}px"
-        style:top="{spanCy - EVENT_GROUP_CAP_HEIGHT / 2}px"
-        style:width="{EVENT_GROUP_CAP_WIDTH}px"
-        style:height="{EVENT_GROUP_CAP_HEIGHT}px"
-        style:background-color={lineColor}
-      ></div>
+      {#if !group.isPending}
+        <div
+          class="absolute"
+          style:left="{rangeEndX - EVENT_GROUP_CAP_WIDTH / 2}px"
+          style:top="{spanCy - EVENT_GROUP_CAP_HEIGHT / 2}px"
+          style:width="{EVENT_GROUP_CAP_WIDTH}px"
+          style:height="{EVENT_GROUP_CAP_HEIGHT}px"
+          style:background-color={lineColor}
+        ></div>
+      {/if}
     {:else}
       {#each points as pointX, index (index)}
         {@const localX = pointX - spanLeft}

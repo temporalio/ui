@@ -199,6 +199,28 @@ describe('createTimelineEventMarkerGroups', () => {
     expect(groups[1].lifecycleGroups).toHaveLength(1);
   });
 
+  it('is pending when any attributed lifecycle group is pending', () => {
+    const first = createEvent('1', [{ label: { id: 'checkout' } }]);
+    const second = createEvent('2', [{ label: { id: 'checkout' } }]);
+    const completedGroup = createLifecycleGroup('1', [first]);
+    const pendingGroup = createLifecycleGroup('2', [second]);
+    pendingGroup.isPending = true;
+
+    const [group] = createTimelineEventMarkerGroups(
+      [
+        createAttribution(
+          { label: { id: 'checkout' } },
+          [first, second],
+          ['1', '2'],
+        ),
+      ],
+      [completedGroup, pendingGroup],
+      presentationsByMarkerKey,
+    );
+
+    expect(group.isPending).toBe(true);
+  });
+
   it('uses a label payload found on any occurrence of a marker', () => {
     const first = createEvent('1', [{ label: { id: 'checkout' } }]);
     const label = {

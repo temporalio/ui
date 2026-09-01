@@ -1,15 +1,10 @@
 <script lang="ts">
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getEventMarkerPresentation } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import type { EventGroupMarker } from '$lib/types/events';
-  import {
-    TRUNCATE_LENGTH,
-    truncateValue,
-  } from '$lib/utilities/truncate-value';
 
   let { markers }: { markers: EventGroupMarker[] } = $props();
 
@@ -34,19 +29,14 @@
           fallback={presentation.displayName}
         >
           {#snippet children(decodedValue)}
-            <Tooltip
-              usePortal
-              text={decodedValue}
-              hide={decodedValue.length <= TRUNCATE_LENGTH}
-              top
-              class="max-w-full"
+            <Badge
+              class="w-full min-w-0 max-w-fit gap-1 border border-brand bg-brand px-1.5 py-0.5 text-left text-xs text-white shadow-sm"
             >
-              <Badge
-                class="max-w-full gap-1 border border-brand bg-brand px-1.5 py-0.5 text-xs text-white shadow-sm"
+              <span
+                class="overflow-wrap-anywhere w-full min-w-0 whitespace-normal text-wrap"
+                >{decodedValue}</span
               >
-                <span>{truncateValue(decodedValue)}</span>
-              </Badge>
-            </Tooltip>
+            </Badge>
           {/snippet}
         </PayloadSummary>
       {/each}

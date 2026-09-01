@@ -158,7 +158,7 @@ const toTimelineEventMarkerGroup = (
     category: 'other',
     eventTime: lastEvent.eventTime,
     attributes: lastEvent.attributes,
-    isPending: false,
+    isPending: lifecycleGroups.some((group) => group.isPending),
     isFailureOrTimedOut: lifecycleGroups.some(
       (group) => group.isFailureOrTimedOut,
     ),
