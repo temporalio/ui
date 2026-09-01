@@ -3,6 +3,9 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
+  import DurationInput, {
+    getFirstWholeNumberUnit,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -22,7 +25,11 @@
   import { GCP_REGIONS } from './gcp-regions';
   import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
   import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
-  import { interpolateTerraformTemplate } from './shared';
+  import {
+    defaultScaleDownStabilization,
+    interpolateTerraformTemplate,
+    scaleDownStabilizationUnits,
+  } from './shared';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
 
   interface Props {
@@ -39,6 +46,7 @@
     maxReplicas?: number;
     initialReplicas?: number;
     utilizationTarget?: number;
+    scaleDownStabilization?: string;
     scaleUpCooloffMs?: number;
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
@@ -59,6 +67,7 @@
       maxReplicas?: string[];
       initialReplicas?: string[];
       utilizationTarget?: string[];
+      scaleDownStabilization?: string[];
       scaleUpCooloffMs?: string[];
       scaleUpBacklogThreshold?: string[];
       maxWorkerLifetimeMs?: string[];
@@ -80,6 +89,7 @@
     maxReplicas = $bindable(30),
     initialReplicas = $bindable(0),
     utilizationTarget = $bindable(0.8),
+    scaleDownStabilization = $bindable(defaultScaleDownStabilization),
     scaleUpCooloffMs = $bindable(),
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
@@ -527,6 +537,24 @@
       hintText={errors.utilizationTarget?.[0] ||
         translate('workers.utilization-target-hint')}
       error={!!errors.utilizationTarget?.[0]}
+      required
+    />
+    <DurationInput
+      bind:value={scaleDownStabilization}
+      id="scaleDownStabilization"
+      name="scaleDownStabilization"
+      inputmode="numeric"
+      min={0}
+      units={scaleDownStabilizationUnits}
+      initialUnit={getFirstWholeNumberUnit(
+        scaleDownStabilization,
+        scaleDownStabilizationUnits,
+        'second(s)',
+      )}
+      label={translate('workers.scale-down-stabilization-label')}
+      hintText={errors.scaleDownStabilization?.[0] ||
+        translate('workers.scale-down-stabilization-hint')}
+      error={!!errors.scaleDownStabilization?.[0]}
       required
     />
   </div>

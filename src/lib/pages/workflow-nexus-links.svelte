@@ -9,10 +9,11 @@
   import { groupEvents } from '$lib/models/event-groups';
   import {
     getInboundLinkForEvent,
-    getInboundNexusLinkEvents,
+    getVisibleInboundNexusLinkEvents,
   } from '$lib/runes/inbound-nexus-links.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { isSystemNexusScheduledEvent } from '$lib/system-nexus-endpoints';
   import {
     type EventLinkDisplay,
     eventLinkTargetTypeLabel,
@@ -35,11 +36,17 @@
     ),
   );
   const nexusGroups = $derived(
-    groups.filter((group) => group.category === 'nexus' && group.links?.length),
+    groups.filter(
+      (group) =>
+        group.category === 'nexus' &&
+        group.links?.length &&
+        !group.eventList.some((event) => isSystemNexusScheduledEvent(event)),
+    ),
   );
-  const inboundLinkEvents = $derived(
-    getInboundNexusLinkEvents($fullEventHistory),
+  const inboundLinks = getVisibleInboundNexusLinkEvents(
+    () => $fullEventHistory,
   );
+  const inboundLinkEvents = $derived(inboundLinks.events);
 </script>
 
 {#snippet linkDisplay(view: EventLinkDisplay)}

@@ -4,6 +4,7 @@
     ComputeProviderOption,
     CreateDeploymentFormData,
   } from '$lib/components/workers/serverless-worker-form/shared';
+  import { scaleDownStabilizationToMs } from '$lib/components/workers/serverless-worker-form/shared';
   import { translate } from '$lib/i18n/translate';
   import {
     buildGcpCloudRunComputeConfig,
@@ -102,6 +103,9 @@
           maxReplicas: data.maxReplicas,
           initialReplicas: data.initialReplicas,
           utilizationTarget: data.utilizationTarget,
+          scaleDownStabilizationMs: scaleDownStabilizationToMs(
+            data.scaleDownStabilization,
+          ),
         },
       );
     } else {

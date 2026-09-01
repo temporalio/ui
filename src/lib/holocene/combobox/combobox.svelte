@@ -135,12 +135,18 @@
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
+    optionDescriptionKey?: never;
   }
 
   interface CustomOptionProps {
     options: T[];
     optionValueKey: keyof T;
     optionLabelKey?: keyof T;
+    /**
+     * Optional key whose value renders as a secondary line beneath each
+     * option's label. Filtering still matches on the label only.
+     */
+    optionDescriptionKey?: keyof T;
   }
 
   type Props =
@@ -166,6 +172,7 @@
     showChevron = false,
     optionValueKey = undefined,
     optionLabelKey = optionValueKey,
+    optionDescriptionKey = undefined,
     minSize = 0,
     maxSize = 120,
     hintText = '',
@@ -330,6 +337,18 @@
     }
 
     return '';
+  }
+
+  function getOptionDescription(option: string | T): string | undefined {
+    if (optionDescriptionKey == null) return undefined;
+    if (option === null) return undefined;
+    if (isStringOption(option)) return undefined;
+    if (!isObjectOption(option)) return undefined;
+    if (!(optionDescriptionKey in option)) return undefined;
+
+    const description = option[optionDescriptionKey];
+
+    return description == null ? undefined : String(description);
   }
 
   function getSelectedOption(options: (string | T)[]) {
@@ -707,6 +726,7 @@
         onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}
+        description={getOptionDescription(option)}
         class={optionClass}
       />
     {:else}
