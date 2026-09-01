@@ -289,7 +289,7 @@
 
 <style lang="postcss">
   .caret {
-    @apply inline-flex items-center justify-center;
+    @apply inline-flex items-center justify-center rounded;
 
     width: 24px;
     height: 24px;

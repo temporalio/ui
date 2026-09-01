@@ -12,6 +12,7 @@
   const buttonStyles = cva(
     [
       'relative',
+      'rounded',
       'flex',
       'w-fit',
       'items-center',

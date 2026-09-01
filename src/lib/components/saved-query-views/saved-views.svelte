@@ -232,7 +232,7 @@
 </script>
 
 <div
-  class="flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-t border-primary bg-surface-primary p-1.5 text-primary lg:flex-nowrap"
+  class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-surface-primary p-1.5 text-primary lg:flex-nowrap"
   role="group"
   aria-label={translate('common.saved-views')}
   data-testid="saved-views-bar"

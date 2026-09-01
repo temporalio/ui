@@ -6,6 +6,7 @@
     'min-w-fit',
     'list-none',
     'overflow-auto',
+    'rounded',
     'border',
     'border-primary',
     'text-primary',

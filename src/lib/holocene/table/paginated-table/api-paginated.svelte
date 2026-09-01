@@ -263,7 +263,7 @@
   updating={$store.updating}
   visibleItems={$store.visibleItems}
   maxHeight={maximizable && $maximized ? '100%' : maxHeight}
-  class={merge(maximizable && $maximized && 'border-x-0 border-b-0')}
+  class={merge(maximizable && 'rounded-none border-0 border-t')}
   {id}
   {caption}
   {headers}

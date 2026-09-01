@@ -90,7 +90,7 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex items-center justify-center rounded-t border border-b-0 border-transparent px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
+    @apply flex items-center justify-center rounded-t-md border border-b-0 border-transparent px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
 
     &:not(.disabled) {
       @apply hover:bg-interactive-tertiary-hover focus-visible:bg-interactive-tertiary-hover focus-visible:ring-2 focus-visible:ring-interactive-primary;

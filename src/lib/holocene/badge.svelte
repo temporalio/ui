@@ -27,7 +27,7 @@
       'items-center',
       'justify-center',
       'text-nowrap',
-      'rounded-sm',
+      'rounded-full',
       'p-1',
       'text-sm',
       'font-medium',

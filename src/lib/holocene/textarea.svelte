@@ -62,7 +62,7 @@
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full border border-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      'relative box-border inline-flex w-full rounded border border-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
       !disabled &&
         !readonly &&
         isValid &&
@@ -76,7 +76,7 @@
     <textarea
       bind:value
       class={merge(
-        'min-h-fit w-full bg-interactive-secondary px-3 py-2 text-sm text-primary placeholder:text-tertiary focus-visible:outline-none',
+        'min-h-fit w-full rounded bg-interactive-secondary px-3 py-2 text-sm text-primary placeholder:text-tertiary focus-visible:outline-none',
         readonly && !disabled && 'bg-surface-primary',
         disabled && 'cursor-not-allowed bg-surface-tertiary text-tertiary',
       )}

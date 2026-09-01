@@ -65,7 +65,7 @@
   }
 </script>
 
-<div class="w-full border border-b-0 border-primary" in:fade>
+<div class="w-full border-t border-primary" in:fade>
   <form
     onsubmit={handleSearch}
     class="flex gap-0"

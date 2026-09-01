@@ -96,7 +96,7 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50 w-full overflow-y-auto rounded-sm border border-secondary bg-surface-primary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
+    @apply z-50 w-full overflow-y-auto rounded-lg border border-secondary bg-surface-primary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
   }
 
   .body::backdrop {

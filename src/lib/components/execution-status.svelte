@@ -39,7 +39,7 @@
 
   const workflowStatus = cva(
     [
-      'flex h-5 items-center gap-0.5 whitespace-nowrap rounded-sm border border-transparent px-1 py-0.5 font-medium',
+      'flex h-5 items-center gap-0.5 whitespace-nowrap rounded-full border border-transparent px-1 py-0.5 font-medium',
     ],
     {
       variants: {

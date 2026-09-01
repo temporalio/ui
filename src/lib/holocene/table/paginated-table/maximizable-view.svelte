@@ -38,8 +38,9 @@
 
 <div
   class={merge(
-    $maximized &&
-      'fixed inset-0 z-40 flex flex-col bg-surface-primary text-primary',
+    $maximized
+      ? 'fixed inset-0 z-40 flex flex-col bg-surface-primary text-primary'
+      : 'overflow-hidden rounded-lg border border-primary',
   )}
   data-testid="maximizable-table-view"
 >

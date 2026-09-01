@@ -60,7 +60,7 @@
 <div
   {id}
   class={merge(
-    'flex grow-0 items-center justify-between gap-4 rounded-md border border-primary px-3 py-2.5 shadow',
+    'flex grow-0 items-center justify-between gap-4 rounded-lg border border-primary px-3 py-2.5 shadow',
     variants[variant],
   )}
   transition:fly={{ x: 250 }}

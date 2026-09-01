@@ -301,7 +301,10 @@
 {/snippet}
 
 <div
-  class={twMerge('min-w-[80px] grow', hasHeader && ['border border-secondary'])}
+  class={twMerge(
+    'min-w-[80px] grow rounded',
+    hasHeader && 'overflow-hidden border border-secondary',
+  )}
 >
   {#if tabs && tabs.length > 0}
     <div
@@ -333,7 +336,7 @@
       identical, minimising ResizeObserver churn when the real editor swaps in.
     -->
     <pre
-      class="overflow-auto border border-secondary bg-surface-overlay-primary p-2 text-primary"
+      class="overflow-auto rounded border border-secondary bg-surface-overlay-primary p-2 text-primary"
       style:font-family="Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace"
       style:font-size="0.875em"
       style:max-height={maxHeight ? `${maxHeight}px` : undefined}

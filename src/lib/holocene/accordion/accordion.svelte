@@ -62,7 +62,7 @@
   <div
     data-track-container={title}
     class={merge(
-      'w-full border border-primary bg-surface-primary text-primary',
+      'w-full rounded border border-primary bg-surface-primary text-primary',
       className,
     )}
     {...rest}
@@ -121,7 +121,7 @@
 {:else}
   <div
     class={merge(
-      'w-full border border-primary bg-surface-primary p-4 text-primary',
+      'w-full rounded border border-primary bg-surface-primary p-4 text-primary',
       className,
     )}
     data-track-container={title}

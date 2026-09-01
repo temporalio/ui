@@ -66,7 +66,7 @@
 
 <style lang="postcss">
   .chip {
-    @apply flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm border border-secondary bg-surface-primary p-1 pl-2 text-sm leading-[1.5] text-secondary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary;
+    @apply flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded border border-secondary bg-surface-primary p-1 pl-2 text-sm leading-[1.5] text-secondary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary;
 
     &:not(.disabled):hover {
       background-image: linear-gradient(

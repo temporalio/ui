@@ -17,6 +17,7 @@
     'bg-surface-primary text-primary',
     'border',
     'border-primary',
+    'rounded-lg',
     'p-4',
     className,
   )}

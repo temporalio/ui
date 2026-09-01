@@ -139,6 +139,7 @@
         'checkbox-control',
         [
           'relative',
+          'rounded-sm',
           'box-content',
           'flex',
           'h-4',

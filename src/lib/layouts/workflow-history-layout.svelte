@@ -195,7 +195,7 @@
 </div>
 <div class="relative">
   <div
-    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-primary bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="items-bottom flex gap-4 pt-2">
       <h2>

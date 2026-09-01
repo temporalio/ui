@@ -63,6 +63,7 @@ const headerStyles = (header: boolean): Record<string, string> =>
     : {
         borderWidth: '1px',
         borderColor: 'var(--color-border-secondary)',
+        borderRadius: '0.25rem',
       };
 
 export const getEditorTheme = (isDark: boolean, header: boolean) =>

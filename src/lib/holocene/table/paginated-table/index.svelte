@@ -60,7 +60,7 @@
 
 <div
   class={merge(
-    'min-h-[154px] grow overflow-auto border border-primary bg-background-primary text-primary',
+    'min-h-[154px] grow overflow-auto rounded-lg border border-primary bg-background-primary text-primary',
     className,
   )}
   id="{rest['id']}-container"

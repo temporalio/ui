@@ -12,14 +12,14 @@
 <div
   class={merge(
     'absolute left-0 right-0 z-[5] overflow-hidden',
-    subtle ? 'h-0.5 bg-transparent' : 'h-1.5 rounded-full bg-surface-tertiary',
+    subtle ? 'h-0.5 bg-transparent' : 'h-1.5 rounded-lg bg-surface-tertiary',
     className,
   )}
 >
   <span
     class={merge(
       'block h-full w-2/5 bg-content-brand',
-      !subtle && 'rounded-full',
+      !subtle && 'rounded-lg',
     )}
   ></span>
 </div>

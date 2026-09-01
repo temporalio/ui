@@ -14,7 +14,7 @@
   }
 
   const THEME_BUTTON_CLASS =
-    'h-[34px] w-[34px] p-2 first:rounded-l-sm last:rounded-r-sm [&:not(:last-child)]:border-r';
+    'h-[34px] w-[34px] p-2 [&:not(:last-child)]:border-r';
   const SELECTED_THEME_BUTTON_CLASS =
     'border-tertiary bg-interactive-tertiary-press text-primary hover:bg-interactive-tertiary-press active:bg-interactive-tertiary-press focus-visible:bg-interactive-tertiary-press';
 

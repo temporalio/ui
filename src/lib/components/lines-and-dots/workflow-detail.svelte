@@ -71,7 +71,7 @@
       {#if badge}
         <Badge
           type={badge}
-          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
+          class="w-fit select-all gap-1 truncate px-1 font-mono leading-4"
         >
           {#if Icon}
             <Icon class="shrink-0" />

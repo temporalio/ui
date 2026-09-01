@@ -57,7 +57,7 @@
     class: merge(
       pressed &&
         'border-transparent bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press focus-visible:bg-interactive-primary-hover',
-      group && '[&:not(:last-child)]:border-r-0',
+      group && 'rounded-none [&:not(:last-child)]:border-r-0',
       className,
     ),
   } as ButtonProps);
