@@ -88,8 +88,8 @@ export const darkTheme = {
       workflow: {
         workflow: colorScales.zaffre[9],
         activity: colorScales['dark-magenta'][9],
-        signal: colorScales.pink[9],
-        timer: colorScales.persimmon[9],
+        signal: colorScales.persimmon[9],
+        timer: colorScales.pink[9],
         nexus: colorScales['peacock-blue'][9],
         query: colorScales['slate-blue'][9],
         capacity: colorScales.olive[9],
