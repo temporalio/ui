@@ -131,6 +131,47 @@ describe('output equivalence with groupEvents', () => {
     expect(getEventMarkerGroupArray()[0].lifecycleGroups[0].eventCount).toBe(2);
   });
 
+  it('reuses marker groups whose lifecycle groups did not change', () => {
+    const [checkoutScheduled, checkoutStarted] = makeActivityGroup(1);
+    checkoutScheduled.eventGroupMarkers = [{ label: { id: 'checkout' } }];
+    const [paymentScheduled] = makeActivityGroup(4);
+    paymentScheduled.eventGroupMarkers = [{ label: { id: 'payment' } }];
+
+    ingestHistoryEvent(checkoutScheduled);
+    ingestHistoryEvent(paymentScheduled);
+    const initial = new Map(
+      getEventMarkerGroupArray().map((group) => [group.markerKey, group]),
+    );
+
+    ingestHistoryEvent(checkoutStarted);
+    const updated = new Map(
+      getEventMarkerGroupArray().map((group) => [group.markerKey, group]),
+    );
+
+    expect(updated.get('label:checkout')).not.toBe(
+      initial.get('label:checkout'),
+    );
+    expect(updated.get('label:payment')).toBe(initial.get('label:payment'));
+  });
+
+  it('rebuilds a marker group when its pending metadata changes', () => {
+    const scheduled = makeActivityScheduled(1, 'MyActivity');
+    scheduled.eventGroupMarkers = [{ label: { id: 'checkout' } }];
+    ingestHistoryEvent(scheduled);
+    const [initial] = getEventMarkerGroupArray();
+
+    setPendingMetadata(
+      [
+        { activityId: '1', state: 'Started', activityType: 'MyActivity' },
+      ] as Parameters<typeof setPendingMetadata>[0],
+      [],
+    );
+
+    const [updated] = getEventMarkerGroupArray();
+    expect(updated).not.toBe(initial);
+    expect(updated.isPending).toBe(true);
+  });
+
   it('attributes a marker whose lifecycle head has not loaded yet', () => {
     const [, started] = makeActivityGroup(1);
     started.eventGroupMarkers = [{ label: { id: 'checkout' } }];

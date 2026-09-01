@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SvelteMap } from 'svelte/reactivity';
   import { writable } from 'svelte/store';
 
   import { goto } from '$app/navigation';
@@ -16,6 +17,7 @@
   import type { TimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
   import { clearActiveGroups } from '$lib/stores/active-events';
   import { eventGroupFilter } from '$lib/stores/filters';
+  import type { Payload } from '$lib/types';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
 
@@ -23,7 +25,8 @@
 
   const open = writable(false);
   let search = $state('');
-  let decodedLabels = $state.raw(new Map<string, string>());
+  const decodedLabels = new SvelteMap<string, string>();
+  const decodedPayloads = new SvelteMap<string, Payload>();
 
   const labelFor = (group: TimelineEventMarkerGroup): string =>
     decodedLabels.get(group.markerKey) ?? group.displayName;
@@ -38,32 +41,36 @@
 
   $effect(() => {
     if (!$open) return;
-    const currentGroups = groups;
-    let cancelled = false;
+    const groupsToDecode = groups.flatMap((group) => {
+      const payload = group.eventGroupMarker.label?.label;
+      if (!payload || decodedPayloads.get(group.markerKey) === payload) {
+        return [];
+      }
+      decodedPayloads.set(group.markerKey, payload);
+      return [{ group, payload }];
+    });
+    if (!groupsToDecode.length) return;
 
     Promise.all(
-      currentGroups.map(async (group) => {
-        const payload = group.eventGroupMarker.label?.label;
-        if (!payload) return [group.markerKey, group.displayName] as const;
+      groupsToDecode.map(async ({ group, payload }) => {
         try {
           const decoded = await decodePayloadAndParseDataToJSON(payload);
-          return [
-            group.markerKey,
-            typeof decoded === 'string' && decoded
-              ? decoded
-              : group.displayName,
-          ] as const;
+          return {
+            key: group.markerKey,
+            label: typeof decoded === 'string' && decoded ? decoded : undefined,
+            payload,
+          };
         } catch {
-          return [group.markerKey, group.displayName] as const;
+          return { key: group.markerKey, label: undefined, payload };
         }
       }),
-    ).then((labels) => {
-      if (!cancelled) decodedLabels = new Map(labels);
+    ).then((results) => {
+      for (const { key, label, payload } of results) {
+        if (decodedPayloads.get(key) !== payload) continue;
+        if (label) decodedLabels.set(key, label);
+        else decodedLabels.delete(key);
+      }
     });
-
-    return () => {
-      cancelled = true;
-    };
   });
 
   const setSelection = (next: string[]) => {
@@ -89,7 +96,7 @@
   <MenuButton
     controls="event-group-filter-menu"
     count={$eventGroupFilter.length}
-    disabled={!groups.length}
+    disabled={!groups.length && !$eventGroupFilter.length}
     hasIndicator
     size="sm"
     class="border-l-0"

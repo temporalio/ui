@@ -216,6 +216,11 @@ let cachedLazyGroupsNoWFTRevision = -1;
 let cachedWftFailed: WorkflowEvent | undefined;
 let cachedWftFailedRevision = -1;
 let cachedEventMarkerGroups: TimelineEventMarkerGroup[] | null = null;
+const cachedEventMarkerGroupsByKey = new Map<
+  string,
+  TimelineEventMarkerGroup
+>();
+const dirtyEventMarkerKeys = new Set<string>();
 
 const eventGroupMarkerPresentationLabels = new Map<string, string>();
 const eventGroupMarkerPresentations = new Map<
@@ -224,9 +229,20 @@ const eventGroupMarkerPresentations = new Map<
 >();
 const eventMarkerAttributions = new Map<string, EventMarkerAttribution>();
 const eventGroupMarkerKeysByLifecycleGroupId = new Map<string, Set<string>>();
-const markerReferencedLifecycleGroupIds = new Set<string>();
 
 const changeListeners = new Set<ChangeListener>();
+
+function invalidateEventMarkerKey(key: string): void {
+  dirtyEventMarkerKeys.add(key);
+  cachedEventMarkerGroups = null;
+}
+
+function invalidateEventMarkersForLifecycleGroup(groupId: string): void {
+  const markerKeys = eventGroupMarkerKeysByLifecycleGroupId.get(groupId);
+  if (!markerKeys) return;
+  for (const markerKey of markerKeys) dirtyEventMarkerKeys.add(markerKey);
+  cachedEventMarkerGroups = null;
+}
 
 // Pending metadata from the workflow run, held so a head event arriving later
 // can pick its own up. Records currently carrying some are tracked so a walk is
@@ -379,7 +395,7 @@ function indexEventGroupMarkerPresentationLabel(event: WorkflowEvent): void {
   eventGroupMarkerPresentationLabels.set(markerKey, presentationLabel);
   const marker = eventMarkerAttributions.get(markerKey)?.eventGroupMarker;
   if (marker && refreshEventGroupMarkerPresentation(markerKey, marker)) {
-    cachedEventMarkerGroups = null;
+    invalidateEventMarkerKey(markerKey);
   }
 }
 
@@ -413,7 +429,6 @@ function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
 }
 
 function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
-  let changed = false;
   for (const marker of event.eventGroupMarkers ?? []) {
     const key = getEventGroupMarkerKey(marker);
     if (!key) continue;
@@ -424,21 +439,20 @@ function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
       eventGroupMarkerKeysByLifecycleGroupId.set(groupId, groupMarkerKeys);
     }
     groupMarkerKeys.add(key);
-    markerReferencedLifecycleGroupIds.add(groupId);
 
     let attribution = eventMarkerAttributions.get(key);
     if (!attribution) {
       attribution = { key, eventGroupMarker: marker, eventsById: new Map() };
       eventMarkerAttributions.set(key, attribution);
       refreshEventGroupMarkerPresentation(key, marker);
-      changed = true;
+      invalidateEventMarkerKey(key);
     } else if (
       marker.label?.label &&
       !attribution.eventGroupMarker.label?.label
     ) {
       attribution.eventGroupMarker = marker;
       refreshEventGroupMarkerPresentation(key, marker);
-      changed = true;
+      invalidateEventMarkerKey(key);
     }
 
     if (!attribution.eventsById.has(event.id)) {
@@ -446,10 +460,9 @@ function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
         event,
         lifecycleGroupId: groupId,
       });
-      changed = true;
+      invalidateEventMarkerKey(key);
     }
   }
-  if (changed) cachedEventMarkerGroups = null;
 }
 
 export function getEventMarkerPresentation(
@@ -581,7 +594,8 @@ export function reset(historyLength: number): void {
   eventGroupMarkerPresentations.clear();
   eventMarkerAttributions.clear();
   eventGroupMarkerKeysByLifecycleGroupId.clear();
-  markerReferencedLifecycleGroupIds.clear();
+  cachedEventMarkerGroupsByKey.clear();
+  dirtyEventMarkerKeys.clear();
 
   revision++;
   cachedGroups = null;
@@ -625,9 +639,7 @@ export function ingestHistoryEvent(raw: HistoryEvent): boolean {
   const groupId = String(headSlot + 1);
   recordFor(headSlot).addMember(slot, event);
   attributeEventMarkers(event, groupId);
-  if (markerReferencedLifecycleGroupIds.has(groupId)) {
-    cachedEventMarkerGroups = null;
-  }
+  invalidateEventMarkersForLifecycleGroup(groupId);
   revision++;
 
   notifyChanged();
@@ -663,9 +675,7 @@ export function setPendingMetadata(
     if (applyPendingMetadataTo(record)) {
       revision++;
       changed = true;
-      if (markerReferencedLifecycleGroupIds.has(record.id)) {
-        cachedEventMarkerGroups = null;
-      }
+      invalidateEventMarkersForLifecycleGroup(record.id);
     }
   }
 
@@ -777,26 +787,39 @@ export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
 export function getEventMarkerGroupArray(): TimelineEventMarkerGroup[] {
   if (cachedEventMarkerGroups) return cachedEventMarkerGroups;
 
-  const referencedGroupIds = new Set<string>();
-  for (const attribution of eventMarkerAttributions.values()) {
+  for (const markerKey of dirtyEventMarkerKeys) {
+    const attribution = eventMarkerAttributions.get(markerKey);
+    if (!attribution) {
+      cachedEventMarkerGroupsByKey.delete(markerKey);
+      continue;
+    }
+
+    const referencedGroupIds = new Set<string>();
     for (const entry of attribution.eventsById.values()) {
       referencedGroupIds.add(entry.lifecycleGroupId);
     }
-  }
 
-  const lifecycleGroups: EventGroup[] = [];
-  for (const groupId of referencedGroupIds) {
-    const headSlot = Number(groupId) - 1;
-    const recordIndex = headGroup[headSlot];
-    if (!recordIndex) continue;
-    const group = materializeEventGroup(records[recordIndex - 1]);
-    if (group) lifecycleGroups.push(group);
-  }
+    const lifecycleGroups: EventGroup[] = [];
+    for (const groupId of referencedGroupIds) {
+      const headSlot = Number(groupId) - 1;
+      const recordIndex = headGroup[headSlot];
+      if (!recordIndex) continue;
+      const group = materializeEventGroup(records[recordIndex - 1]);
+      if (group) lifecycleGroups.push(group);
+    }
 
-  cachedEventMarkerGroups = createTimelineEventMarkerGroups(
-    eventMarkerAttributions.values(),
-    lifecycleGroups,
-    eventGroupMarkerPresentations,
+    const [group] = createTimelineEventMarkerGroups(
+      [attribution],
+      lifecycleGroups,
+      eventGroupMarkerPresentations,
+    );
+    if (group) cachedEventMarkerGroupsByKey.set(markerKey, group);
+    else cachedEventMarkerGroupsByKey.delete(markerKey);
+  }
+  dirtyEventMarkerKeys.clear();
+
+  cachedEventMarkerGroups = [...cachedEventMarkerGroupsByKey.values()].toSorted(
+    (a, b) => Number(a.initialEvent.id) - Number(b.initialEvent.id),
   );
   return cachedEventMarkerGroups;
 }
