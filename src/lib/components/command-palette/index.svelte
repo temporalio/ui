@@ -341,7 +341,7 @@
   {#each filteredCommands as command, index (command.id)}
     <button
       type="button"
-      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-action-hover-overlay hover:shadow-sm"
+      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-interactive-tertiary-hover hover:shadow-sm"
       class:selected={index === selectedIndex}
       onclick={() => handleCommandClick(command)}
       onmouseenter={() => (selectedIndex = index)}
@@ -412,7 +412,7 @@
             <button
               type="button"
               onclick={close}
-              class="flex h-8 w-8 items-center justify-center rounded-full text-tertiary transition-colors hover:bg-action-hover-overlay hover:text-secondary"
+              class="flex h-8 w-8 items-center justify-center rounded-full text-tertiary transition-colors hover:bg-interactive-tertiary-hover hover:text-secondary"
               aria-label="Close"
             >
               <IconClose class="h-4 w-4" />
@@ -453,7 +453,7 @@
   }
 
   :global(.body::backdrop) {
-    @apply bg-overlay-backdrop;
+    @apply bg-surface-overlay-neutral;
 
     backdrop-filter: blur(4px);
     opacity: 0;

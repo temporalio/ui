@@ -315,8 +315,8 @@
 
       background-color: var(--color-surface-primary);
       background-image: linear-gradient(
-        var(--color-overlay-primary),
-        var(--color-overlay-primary)
+        var(--color-surface-overlay-primary),
+        var(--color-surface-overlay-primary)
       );
     }
 

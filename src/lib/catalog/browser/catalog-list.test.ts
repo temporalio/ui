@@ -352,7 +352,7 @@ describe('CatalogList', () => {
       ':global(.holocene-table-body tr:nth-of-type(even) > .catalog-actions-cell)',
     );
     expect(source).toContain('background-color: var(--color-surface-primary);');
-    expect(source).toContain('var(--color-overlay-primary)');
+    expect(source).toContain('var(--color-surface-overlay-primary)');
     expect(source).toContain(
       ':global(.holocene-table-body tr:hover > .catalog-actions-cell)',
     );

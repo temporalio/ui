@@ -7,6 +7,6 @@
 <span class="relative inline-flex">
   <IconMegaphone {...props} />
   <span
-    class="absolute -right-0.5 -top-0.5 size-2 animate-pulse rounded-full bg-content-static-text-success"
+    class="absolute -right-0.5 -top-0.5 size-2 animate-pulse rounded-full bg-content-static-success"
   ></span>
 </span>

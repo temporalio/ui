@@ -177,7 +177,7 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-overlay-backdrop backdrop-blur-[8px] transition-opacity duration-200;
+    @apply cursor-pointer bg-surface-overlay-neutral backdrop-blur-[8px] transition-opacity duration-200;
   }
 
   .body.hightlightNav::backdrop {

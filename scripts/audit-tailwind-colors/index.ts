@@ -8,7 +8,7 @@ import {
   type ColorThemeValue,
   fixedColorNames,
   semanticColorVariableNames,
-} from '../../src/lib/theme/color-api';
+} from '../../src/lib/theme/tailwind-colors';
 import { getProjectRoot } from '../get-project-root';
 
 type ViolationKind =
@@ -74,6 +74,32 @@ const TAILWIND_DEFAULT_SHADES = new Set([
   '800',
   '900',
   '950',
+]);
+
+const RETIRED_SEMANTIC_COLORS = new Set([
+  'action-hover-overlay',
+  'action-press-overlay',
+  'action-brand-hover',
+  'action-brand-press',
+  'actions-hover-overlay',
+  'actions-press-overlay',
+  'actions-brand-hover',
+  'actions-brand-press',
+  'overlay-primary',
+  'overlay-secondary',
+  'overlay-tertiary',
+  'overlay-information',
+  'overlay-success',
+  'overlay-warning',
+  'overlay-danger',
+  'overlay-error',
+  'overlay-accent',
+  'overlay-backdrop',
+  'static-text-info',
+  'static-text-success',
+  'static-text-warning',
+  'static-text-danger',
+  'surface-static-neutral',
 ]);
 
 const LEGACY_SEMANTIC_COLORS: Readonly<Record<string, ReadonlySet<string>>> = {
@@ -229,6 +255,7 @@ const isInvalidTailwindColor = (utility: string, color: string): boolean => {
   const allowedColors = propertyColorNames[normalizedUtility];
 
   if (color.startsWith('io-')) return true;
+  if (RETIRED_SEMANTIC_COLORS.has(color)) return true;
   if (NON_COLOR_UTILITY_VALUES[normalizedUtility]?.has(color)) return false;
   if (allowedColors?.has(color)) return false;
   if (duplicateContentFixedColorNames.has(color)) return true;
@@ -310,6 +337,7 @@ const findViolations = async (
       '**/dist/**',
       '**/node_modules/**',
       '**/scripts/audit-tailwind-colors/**',
+      '**/theme/io/themes/**',
       '**/storybook-static/**',
       'server/**',
       '**/utilities/oidc-server/**',

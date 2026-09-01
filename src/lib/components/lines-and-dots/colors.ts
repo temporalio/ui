@@ -1,4 +1,4 @@
-import { colorScales } from '$lib/theme/io/color-scales';
+import { colorScales } from '$lib/theme/io/themes';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
 

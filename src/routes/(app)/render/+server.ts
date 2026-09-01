@@ -6,7 +6,11 @@ import { toHtml } from 'hast-util-to-html';
 import { h } from 'hastscript';
 import { toHast } from 'mdast-util-to-hast';
 
-import { semanticColors } from '$lib/theme/io/semantic-colors';
+import {
+  type IoTheme,
+  ioThemeToCssVariables,
+  themes,
+} from '$lib/theme/io/themes';
 import { process } from '$lib/utilities/render-markdown';
 
 type RenderOptions = {
@@ -16,20 +20,27 @@ type RenderOptions = {
   overrideTheme?: string;
 };
 
-type ThemeMode = 'light' | 'dark';
+const { dark: darkTheme, light: lightTheme } = themes;
 
-const markdownColorVariables = (mode: ThemeMode) => ({
-  '--color-background-primary': semanticColors.background.primary[mode],
-  '--color-content-brand': semanticColors.content.brand[mode],
-  '--color-content-primary': semanticColors.content.primary[mode],
-  '--color-border-brand': semanticColors.border.brand[mode],
-  '--color-border-secondary': semanticColors.border.secondary[mode],
-  '--color-surface-primary': semanticColors.surface.primary[mode],
-  '--color-surface-secondary': semanticColors.surface.secondary[mode],
-});
+const markdownColorVariableNames = new Set([
+  '--color-background-primary',
+  '--color-content-brand',
+  '--color-content-primary',
+  '--color-border-brand',
+  '--color-border-secondary',
+  '--color-surface-primary',
+  '--color-surface-secondary',
+]);
 
-const markdownColorRule = (selector: string, mode: ThemeMode): string => {
-  const declarations = Object.entries(markdownColorVariables(mode))
+const markdownColorVariables = (theme: IoTheme) =>
+  Object.fromEntries(
+    Object.entries(ioThemeToCssVariables(theme)).filter(([name]) =>
+      markdownColorVariableNames.has(name),
+    ),
+  );
+
+const markdownColorRule = (selector: string, theme: IoTheme): string => {
+  const declarations = Object.entries(markdownColorVariables(theme))
     .map(([name, value]) => `${name}: ${value};`)
     .join('\n');
 
@@ -37,8 +48,8 @@ const markdownColorRule = (selector: string, mode: ThemeMode): string => {
 };
 
 const markdownThemeCss = [
-  markdownColorRule(':root', 'light'),
-  markdownColorRule("body[data-theme^='dark']", 'dark'),
+  markdownColorRule(':root', lightTheme),
+  markdownColorRule("body[data-theme^='dark']", darkTheme),
 ].join('\n');
 
 /**

@@ -13,6 +13,32 @@ type AuditResult = {
 
 const temporaryDirectories: string[] = [];
 
+const retiredTailwindClasses = [
+  'bg-action-hover-overlay',
+  'bg-action-press-overlay',
+  'bg-action-brand-hover',
+  'bg-action-brand-press',
+  'via-actions-hover-overlay',
+  'via-actions-press-overlay',
+  'via-actions-brand-hover',
+  'via-actions-brand-press',
+  'bg-overlay-primary',
+  'bg-overlay-secondary',
+  'bg-overlay-tertiary',
+  'bg-overlay-information',
+  'bg-overlay-success',
+  'bg-overlay-warning',
+  'bg-overlay-danger',
+  'bg-overlay-error',
+  'bg-overlay-accent',
+  'bg-overlay-backdrop',
+  'text-static-text-info',
+  'text-static-text-success',
+  'text-static-text-warning',
+  'text-static-text-danger',
+  'bg-surface-static-neutral',
+];
+
 const createAuditTarget = async (source: string): Promise<string> => {
   const directory = await mkdtemp(join(tmpdir(), 'tailwind-color-audit-'));
   temporaryDirectories.push(directory);
@@ -47,8 +73,8 @@ afterEach(async () => {
 describe('Tailwind color audit CLI', () => {
   it('accepts the property-aware API, generated variables, and arbitrary colors', async () => {
     const directory = await createAuditTarget(`
-      <div class="accent-auto bg-background-primary bg-surface-primary bg-surface-accent bg-interactive-primary bg-action-hover-overlay bg-overlay-primary bg-overlay-accent bg-content-primary bg-content-accent bg-border-primary bg-border-accent bg-white bg-black bg-indigo-9 bg-alpha-red-30 border-primary border-accent border-interactive-primary border-content-primary divide-primary ring-danger ring-accent ring-interactive-primary ring-offset-background-primary outline-danger outline-accent outline-interactive-primary caret-primary caret-accent fill-primary fill-accent fill-indigo-9 fill-none stroke-indigo-9 stroke-none from-surface-primary from-surface-accent via-actions-hover-overlay via-overlay-accent to-content-accent decoration-primary decoration-accent shadow-content-inverse-primary shadow-content-accent placeholder-tertiary placeholder-accent text-primary text-brand text-accent text-white bg-inherit text-current border-transparent bg-[#123456] outline-none shadow-none bg-none border-none decoration-auto decoration-from-font text-sm border-2 ring-2 ring-offset-2 stroke-2 text-indigo-6 text-alpha-red-30 border-slate-1 border-alpha-neutral-30 ring-green-7 ring-alpha-indigo-30 divide-purple-5 outline-alpha-blue-30 caret-red-9 placeholder-alpha-slate-20 decoration-indigo-6 shadow-alpha-neutral-30 ring-offset-slate-1 accent-alpha-green-30 border-white ring-black">
-        <span style="color: var(--color-content-primary); background: var(--color-actions-hover-overlay)">Valid</span>
+      <div class="accent-auto bg-background-primary bg-background-secondary bg-surface-primary bg-surface-neutral bg-surface-accent bg-interactive-primary bg-interactive-tertiary-hover bg-surface-overlay-primary bg-surface-overlay-accent bg-action-info bg-content-primary bg-content-accent bg-border-primary bg-border-accent bg-white bg-black bg-indigo-9 bg-alpha-red-30 border-primary border-accent border-action-danger border-interactive-primary border-content-primary divide-primary ring-danger ring-accent ring-interactive-primary ring-offset-background-primary outline-danger outline-accent outline-interactive-primary caret-primary caret-accent fill-primary fill-accent fill-action-workflow-signal fill-indigo-9 fill-none stroke-action-workflow-timer stroke-indigo-9 stroke-none from-surface-primary from-surface-accent via-interactive-tertiary-hover via-surface-overlay-accent to-action-workflow-workflow to-content-accent decoration-primary decoration-accent shadow-content-inverse-primary shadow-content-accent placeholder-tertiary placeholder-accent text-primary text-brand text-accent text-static-success text-action-workflow-activity text-white bg-inherit text-current border-transparent bg-[#123456] outline-none shadow-none bg-none border-none decoration-auto decoration-from-font text-sm border-2 ring-2 ring-offset-2 stroke-2 text-indigo-6 text-alpha-red-30 border-slate-1 border-alpha-neutral-30 ring-green-7 ring-alpha-indigo-30 divide-purple-5 outline-alpha-blue-30 caret-red-9 placeholder-alpha-slate-20 decoration-indigo-6 shadow-alpha-neutral-30 ring-offset-slate-1 accent-alpha-green-30 border-white ring-black">
+        <span style="color: var(--color-content-primary); background: var(--color-interactive-tertiary-hover)">Valid</span>
       </div>
     `);
 
@@ -61,8 +87,8 @@ describe('Tailwind color audit CLI', () => {
 
   it('rejects io colors and variables, Tailwind defaults, legacy aliases, and property-invalid colors', async () => {
     const directory = await createAuditTarget(`
-      <div class="bg-io-surface-primary text-io-content-primary border-io-border-primary divide-io-border-primary ring-io-interactive-primary ring-offset-io-background-primary outline-io-border-danger caret-io-content-danger fill-io-content-primary stroke-io-indigo-9 from-io-surface-primary decoration-io-content-primary shadow-io-content-primary accent-io-content-primary placeholder-io-content-primary bg-gray-100 text-red-500 stroke-white bg-primary surface-primary text-surface-primary border-surface-primary divide-interactive-primary ring-surface-primary ring-offset-primary outline-content-primary caret-border-danger fill-surface-primary stroke-primary from-primary decoration-border-primary shadow-primary accent-primary placeholder-surface-primary bg-content-white border-content-black from-content-white shadow-content-black text-content-white">
-        <span style="color: var(--color-io-content-primary); background: var(--color-text-primary)">Invalid</span>
+      <div class="bg-io-surface-primary text-io-content-primary border-io-border-primary divide-io-border-primary ring-io-interactive-primary ring-offset-io-background-primary outline-io-border-danger caret-io-content-danger fill-io-content-primary stroke-io-indigo-9 from-io-surface-primary decoration-io-content-primary shadow-io-content-primary accent-io-content-primary placeholder-io-content-primary bg-gray-100 text-red-500 stroke-white bg-primary ${retiredTailwindClasses.join(' ')} surface-primary text-surface-primary border-surface-primary divide-interactive-primary ring-surface-primary ring-offset-primary outline-content-primary caret-border-danger fill-surface-primary stroke-primary from-primary decoration-border-primary shadow-primary accent-primary placeholder-surface-primary bg-content-white border-content-black from-content-white shadow-content-black text-content-white">
+        <span style="color: var(--color-io-content-primary); border-color: var(--color-text-primary); background: var(--color-actions-hover-overlay)">Invalid</span>
       </div>
     `);
 
@@ -78,6 +104,12 @@ describe('Tailwind color audit CLI', () => {
       '[legacy-tailwind-color] text-surface-primary',
     );
     expect(result.stderr).toContain('[legacy-tailwind-color] bg-primary');
+    for (const className of retiredTailwindClasses) {
+      expect(result.stderr).toContain(`[legacy-tailwind-color] ${className}`);
+    }
+    expect(result.stderr).toContain(
+      '[legacy-css-variable] --color-actions-hover-overlay',
+    );
     expect(result.stderr).toContain(
       '[legacy-tailwind-color] outline-content-primary',
     );

@@ -24,7 +24,7 @@
           default:
             'border-tertiary hover:border-brand focus-within:border-secondary',
           ghost:
-            'border-transparent bg-transparent hover:bg-action-hover-overlay focus-within:border-transparent focus-within:bg-transparent focus-within:ring-transparent',
+            'border-transparent bg-transparent hover:bg-interactive-tertiary-hover focus-within:border-transparent focus-within:bg-transparent focus-within:ring-transparent',
         },
       },
       defaultVariants: {
@@ -654,7 +654,7 @@
       {#if showChevron}
         <button
           type="button"
-          class="flex h-full items-center rounded pr-2 hover:bg-action-hover-overlay focus:outline-none"
+          class="flex h-full items-center rounded pr-2 hover:bg-interactive-tertiary-hover focus:outline-none"
           onclick={handleChevronClick}
           aria-label={$open ? 'Close options' : 'Open options'}
           tabindex="-1"

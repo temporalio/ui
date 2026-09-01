@@ -113,11 +113,11 @@
       }
 
       &:hover:not(:checked) {
-        @apply border-brand bg-action-hover-overlay;
+        @apply border-brand bg-interactive-tertiary-hover;
       }
 
       &:active:not(:checked) {
-        @apply bg-action-press-overlay;
+        @apply bg-interactive-tertiary-press;
       }
 
       &:checked:hover {

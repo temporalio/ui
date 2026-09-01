@@ -1,6 +1,27 @@
-export type ColorScaleStep = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+function withAlpha(color: string, alpha: number): string {
+  if (alpha === 100) {
+    return color;
+  }
 
-type ColorScale = Record<ColorScaleStep, `#${string}`>;
+  return `color-mix(in srgb, ${color} ${alpha}%, transparent)`;
+}
+
+function getAlphaScaleFor(color: `#${string}`) {
+  return {
+    5: withAlpha(color, 5),
+    10: withAlpha(color, 10),
+    15: withAlpha(color, 15),
+    20: withAlpha(color, 20),
+    30: withAlpha(color, 30),
+    40: withAlpha(color, 40),
+    50: withAlpha(color, 50),
+    60: withAlpha(color, 60),
+    70: withAlpha(color, 70),
+    80: withAlpha(color, 80),
+    90: withAlpha(color, 90),
+    100: withAlpha(color, 100),
+  };
+}
 
 export const colorScales = {
   indigo: {
@@ -227,6 +248,23 @@ export const colorScales = {
     11: '#191919',
     12: '#111111',
   },
-} satisfies Record<string, ColorScale>;
+} as const;
 
-export type ColorScaleName = keyof typeof colorScales;
+export const colorAlphaScales = {
+  amber: getAlphaScaleFor(colorScales.amber[9]),
+  blue: getAlphaScaleFor(colorScales.blue[9]),
+  'dark-magenta': getAlphaScaleFor(colorScales['dark-magenta'][9]),
+  green: getAlphaScaleFor(colorScales.green[9]),
+  indigo: getAlphaScaleFor(colorScales.indigo[9]),
+  neutral: getAlphaScaleFor(colorScales.neutral[9]),
+  olive: getAlphaScaleFor(colorScales.olive[9]),
+  'peacock-blue': getAlphaScaleFor(colorScales['peacock-blue'][9]),
+  persimmon: getAlphaScaleFor(colorScales.persimmon[9]),
+  pink: getAlphaScaleFor(colorScales.pink[9]),
+  purple: getAlphaScaleFor(colorScales.purple[9]),
+  red: getAlphaScaleFor(colorScales.red[9]),
+  slate: getAlphaScaleFor(colorScales.slate[9]),
+  'slate-blue': getAlphaScaleFor(colorScales['slate-blue'][9]),
+  tangerine: getAlphaScaleFor(colorScales.tangerine[9]),
+  zaffre: getAlphaScaleFor(colorScales.zaffre[9]),
+};

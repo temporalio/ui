@@ -23,7 +23,7 @@
 <button
   type="button"
   class={merge(
-    'm-1 border border-transparent bg-transparent p-1 text-primary hover:bg-action-hover-overlay focus-visible:bg-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-action-press-overlay',
+    'm-1 border border-transparent bg-transparent p-1 text-primary hover:bg-interactive-tertiary-hover focus-visible:bg-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press',
     className,
   )}
   {onclick}

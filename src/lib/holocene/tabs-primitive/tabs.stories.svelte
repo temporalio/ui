@@ -44,7 +44,7 @@
             class: `cursor-pointer rounded-md border px-3 py-1.5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary ${
               isSelected
                 ? 'border-interactive-primary bg-interactive-primary text-white'
-                : 'border-tertiary bg-surface-primary text-primary hover:bg-action-hover-overlay'
+                : 'border-tertiary bg-surface-primary text-primary hover:bg-interactive-tertiary-hover'
             }`,
           })}
         >

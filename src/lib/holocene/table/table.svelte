@@ -98,7 +98,7 @@
 
   :where(.holocene-table-body) {
     :global(tr) {
-      @apply border-b border-primary last-of-type:border-0 hover:bg-action-hover-overlay hover:bg-fixed;
+      @apply border-b border-primary last-of-type:border-0 hover:bg-interactive-tertiary-hover hover:bg-fixed;
     }
 
     :global(tr.expanded) {
@@ -106,7 +106,7 @@
     }
 
     :global(tr:nth-of-type(even)) {
-      @apply bg-overlay-primary;
+      @apply bg-surface-overlay-primary;
     }
 
     :global(tr > td) {
@@ -118,7 +118,7 @@
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-primary last-of-type:border-0 hover:bg-action-hover-overlay hover:bg-fixed;
+      @apply h-8 border-b border-primary last-of-type:border-0 hover:bg-interactive-tertiary-hover hover:bg-fixed;
     }
   }
 </style>

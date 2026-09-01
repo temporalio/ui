@@ -50,7 +50,7 @@
       'bg-interactive-primary text-white hover:bg-interactive-primary-hover focus-visible:bg-interactive-primary-hover active:bg-interactive-primary-press'} {isCurrent &&
       !isActive &&
       'bg-surface-tertiary text-primary'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
-      'hover:bg-action-hover-overlay'}"
+      'hover:bg-interactive-tertiary-hover'}"
     class:border-l={!isRootWorkflow && !isActive}
     onclick={(e) => {
       e.stopPropagation();

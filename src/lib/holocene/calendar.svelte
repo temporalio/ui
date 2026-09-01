@@ -92,7 +92,7 @@
   }
 
   .highlight:not(.disabled, .selected) {
-    @apply hover:bg-action-hover-overlay focus-visible:bg-background-primary;
+    @apply hover:bg-interactive-tertiary-hover focus-visible:bg-background-primary;
   }
 
   .highlight.selected:not(.disabled) {

@@ -70,15 +70,15 @@
 
     &:not(.disabled):hover {
       background-image: linear-gradient(
-        var(--color-actions-hover-overlay),
-        var(--color-actions-hover-overlay)
+        var(--color-interactive-tertiary-hover),
+        var(--color-interactive-tertiary-hover)
       );
     }
 
     &:not(.disabled):active {
       background-image: linear-gradient(
-        var(--color-actions-press-overlay),
-        var(--color-actions-press-overlay)
+        var(--color-interactive-tertiary-press),
+        var(--color-interactive-tertiary-press)
       );
     }
 

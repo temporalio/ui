@@ -51,7 +51,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-2 flex items-center justify-center justify-self-end rounded text-primary opacity-0 transition-opacity hover:bg-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:justify-self-center group-data-[nav=closed]:p-2"
+    class="mx-2 flex items-center justify-center justify-self-end rounded text-primary opacity-0 transition-opacity hover:bg-surface-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:justify-self-center group-data-[nav=closed]:p-2"
     onclick={ontoggle}
   >
     {#if navOpen}

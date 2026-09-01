@@ -56,7 +56,7 @@
           height="101"
           viewBox="0 0 346 101"
           fill="none"
-          class="mr-auto max-w-full border border-secondary bg-overlay-primary p-2 text-primary"
+          class="mr-auto max-w-full border border-secondary bg-surface-overlay-primary p-2 text-primary"
         >
           <line x1="20.5" y1="44" x2="20.5" y2="60" stroke="currentcolor" />
           <line x1="108.5" y1="44" x2="108.5" y2="60" stroke="currentcolor" />
@@ -178,7 +178,7 @@
           height="117"
           viewBox="0 0 346 117"
           fill="none"
-          class="mr-auto max-w-full border border-secondary bg-overlay-primary p-2 text-primary"
+          class="mr-auto max-w-full border border-secondary bg-surface-overlay-primary p-2 text-primary"
         >
           <line x1="20.5" y1="44" x2="20.5" y2="60" stroke="currentcolor" />
           <line x1="108.5" y1="44" x2="108.5" y2="60" stroke="currentcolor" />
@@ -305,7 +305,7 @@
           height="117"
           viewBox="0 0 382 117"
           fill="none"
-          class="mr-auto max-w-full border border-secondary bg-overlay-primary p-2 text-primary"
+          class="mr-auto max-w-full border border-secondary bg-surface-overlay-primary p-2 text-primary"
         >
           <line x1="20.5" y1="44" x2="20.5" y2="60" stroke="currentcolor" />
           <line x1="100.5" y1="44" x2="100.5" y2="60" stroke="currentcolor" />

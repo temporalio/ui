@@ -206,14 +206,14 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer border border-transparent text-sm text-primary focus-visible:border-interactive-primary focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-action-brand-press;
+    @apply cursor-pointer border border-transparent text-sm text-primary focus-visible:border-interactive-primary focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-interactive-secondary-press;
 
     &.active {
       @apply bg-interactive-primary text-white;
     }
 
     &.hoverable {
-      @apply hover:bg-action-brand-hover hover:text-primary;
+      @apply hover:bg-interactive-secondary-hover hover:text-primary;
     }
 
     &.select {

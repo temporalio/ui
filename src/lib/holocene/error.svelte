@@ -32,7 +32,7 @@
 >
   <h1 class="text-[12rem] font-semibold">{status}</h1>
   <p class="-mt-6 mb-5 text-lg">Uh oh. There's an error.</p>
-  <p class="my-4 w-auto text-2xl font-extrabold text-static-text-danger">
+  <p class="my-4 w-auto text-2xl font-extrabold text-static-danger">
     {message}
   </p>
 

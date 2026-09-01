@@ -1,11 +1,7 @@
 import plugin from 'tailwindcss/plugin';
 
-import {
-  colorTheme,
-  darkSemanticColorVariables,
-  lightSemanticColorVariables,
-} from './color-api';
-import { semanticOpacity } from './io/semantic-opacity';
+import { themesBaseStyles } from './io/themes';
+import { colorTheme, opacityTheme } from './tailwind-colors';
 
 const textStyles = plugin(({ addBase, theme }) => {
   addBase({
@@ -59,10 +55,7 @@ const textStyles = plugin(({ addBase, theme }) => {
 
 const temporal = plugin(
   ({ addBase }) => {
-    addBase({
-      ':root': lightSemanticColorVariables,
-      '[data-theme="dark"]': darkSemanticColorVariables,
-    });
+    addBase(themesBaseStyles);
   },
   {
     future: {
@@ -71,7 +64,7 @@ const temporal = plugin(
     theme: {
       ...colorTheme,
       extend: {
-        opacity: semanticOpacity,
+        opacity: opacityTheme,
         transitionProperty: {
           width: 'width',
           height: 'height',

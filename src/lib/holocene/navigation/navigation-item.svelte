@@ -54,9 +54,9 @@
       data-track-intent="navigate"
       data-track-text={label}
       class={merge(
-        'mb-2 flex items-center whitespace-nowrap rounded px-2 py-1 text-sm font-medium text-secondary hover:bg-overlay-primary hover:text-primary',
+        'mb-2 flex items-center whitespace-nowrap rounded px-2 py-1 text-sm font-medium text-secondary hover:bg-surface-overlay-primary hover:text-primary',
         active &&
-          'bg-action-brand-hover text-brand hover:bg-action-brand-press hover:text-brand',
+          'bg-interactive-secondary-hover text-brand hover:bg-interactive-secondary-press hover:text-brand',
         disabled && 'pointer-events-none cursor-not-allowed opacity-disabled',
       )}
       class:text-tertiary={disabled}
