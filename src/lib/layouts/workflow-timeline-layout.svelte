@@ -4,6 +4,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter.svelte';
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
@@ -27,6 +28,7 @@
   } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isTimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
+  import { lazyGroupMatchesEventGroupFilter } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives, setActiveGroup } from '$lib/stores/active-events';
   import {
@@ -35,7 +37,7 @@
     eventGroupsEnabled,
   } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
-  import { eventTypeFilter } from '$lib/stores/filters';
+  import { eventGroupFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
     WorkflowTaskFailedEvent,
@@ -56,6 +58,7 @@
   $effect(() => {
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventGroupFilter = urlParams.eventGroups;
   });
 
   const onAutoRefreshToggle = () => {
@@ -73,14 +76,28 @@
   const hasMarkerGroups = $derived(eventBuffer.hasEventMarkerGroups);
   let selectedMarkerKey = $state<string>();
 
+  const selectedMarkerKeys = $derived(new Set($eventGroupFilter));
+
   const filteredBufferLazyGroups = $derived.by(() => {
     const active = $eventTypeFilter;
-    return bufferLazyGroups.filter((group) => active.includes(group.category));
+    return bufferLazyGroups.filter(
+      (group) =>
+        active.includes(group.category) &&
+        lazyGroupMatchesEventGroupFilter(group, selectedMarkerKeys),
+    );
   });
+
+  const filteredMarkerGroups = $derived(
+    selectedMarkerKeys.size
+      ? markerGroups.filter((group) => selectedMarkerKeys.has(group.markerKey))
+      : markerGroups,
+  );
 
   const selectedMarkerGroup = $derived(
     selectedMarkerKey
-      ? markerGroups.find((group) => group.markerKey === selectedMarkerKey)
+      ? filteredMarkerGroups.find(
+          (group) => group.markerKey === selectedMarkerKey,
+        )
       : undefined,
   );
 
@@ -103,7 +120,7 @@
     }
 
     const outerGroups = getTimelineGroups(
-      markerGroups,
+      filteredMarkerGroups,
       reverseSort,
       historyCtx.fetchComplete,
       historyCtx.descMinId,
@@ -132,7 +149,9 @@
 
   // Expanding an Event Group changes the rendered rows, but the scale keeps
   // using the outer rows so selecting a group never reprojects the x-axis.
-  const timelineGroups = $derived($eventGroupsEnabled ? markerGroups : groups);
+  const timelineGroups = $derived(
+    $eventGroupsEnabled ? filteredMarkerGroups : groups,
+  );
 
   const workflowTaskFailedError = $derived.by(() => {
     if (!historyCtx.fetchComplete) return undefined;
@@ -192,7 +211,9 @@
   $effect(() => {
     if (
       selectedMarkerKey &&
-      !markerGroups.some((group) => group.markerKey === selectedMarkerKey)
+      !filteredMarkerGroups.some(
+        (group) => group.markerKey === selectedMarkerKey,
+      )
     ) {
       selectedMarkerKey = undefined;
       clearActives();
@@ -279,6 +300,7 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
+        <EventGroupFilter groups={markerGroups} />
         <ToggleButton
           data-testid="event-groups"
           disabled={!hasMarkerGroups}
