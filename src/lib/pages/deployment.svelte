@@ -167,7 +167,6 @@
       previousPageButtonLabel={translate('common.previous-page')}
       pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
       items={info.versionSummaries ?? []}
-      maxHeight="fit-content"
     >
       {#snippet caption()}
         <caption class="sr-only">
