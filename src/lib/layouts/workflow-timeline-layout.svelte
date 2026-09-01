@@ -27,7 +27,11 @@
   } from '$lib/io/icon';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
-  import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
+  import {
+    collapseIdleTime,
+    eventFilterSort,
+    eventGroupsEnabled,
+  } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -63,20 +67,29 @@
   const reverseSort = $derived($eventFilterSort === 'descending');
 
   const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
+  const markerGroups = $derived(eventBuffer.eventMarkerGroups);
+  const hasMarkerGroups = $derived(eventBuffer.hasEventMarkerGroups);
 
   const filteredBufferLazyGroups = $derived.by(() => {
     const active = $eventTypeFilter;
     return bufferLazyGroups.filter((g) => active.includes(g.category));
   });
 
-  const lazyGroups = $derived(
+  const groups = $derived(
     getTimelineGroups(
-      filteredBufferLazyGroups,
+      $eventGroupsEnabled ? markerGroups : filteredBufferLazyGroups,
       reverseSort,
       historyCtx.fetchComplete,
       historyCtx.descMinId,
     ),
   );
+
+  $effect(() => {
+    if (historyCtx.fetchComplete && !hasMarkerGroups && $eventGroupsEnabled) {
+      clearActives();
+      $eventGroupsEnabled = false;
+    }
+  });
 
   const workflowTaskFailedError = $derived.by(() => {
     if (!historyCtx.fetchComplete) return undefined;
@@ -101,14 +114,19 @@
     updateEventFilterParams(page.url, { sort: newSort }, goto);
   };
 
+  const onEventGroupsToggle = () => {
+    clearActives();
+    $eventGroupsEnabled = !$eventGroupsEnabled;
+  };
+
   // The timeline renders in normal page flow: the page (#content-wrapper)
   // scrolls it and the controls bar sticks to the top-nav. TimelineGraph
   // virtualizes internally via IntersectionObserver, so there's no bounded
   // scroll container, no scroll-offset bridge, and no height plumbing here.
   const estimatedTotalGroups = $derived.by(() => {
-    if (historyCtx.fetchComplete) return lazyGroups.length;
+    if (historyCtx.fetchComplete) return groups.length;
     const totalEvents = historyCtx.totalExpectedEvents ?? 0;
-    return Math.max(lazyGroups.length, Math.ceil(totalEvents * 0.5));
+    return Math.max(groups.length, Math.ceil(totalEvents * 0.5));
   });
 
   onMount(() => {
@@ -151,9 +169,9 @@
   this block). The controls bar sticks below the top-nav while the page scrolls
   the timeline past it; the timeline virtualizes itself via IntersectionObserver.
 -->
-<div>
+<div class="relative isolate z-0">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[60] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="flex items-center gap-2">
       <h2>{translate('workflows.timeline-tab')}</h2>
@@ -182,9 +200,19 @@
         </ToggleButton>
         <EventTypeFilter compact={false} />
         <ToggleButton
+          data-testid="event-groups"
+          disabled={!hasMarkerGroups}
+          onclick={onEventGroupsToggle}
+          size="sm"
+          class="border-l-0"
+        >
+          {$eventGroupsEnabled
+            ? translate('workflows.hide-event-groups')
+            : translate('workflows.show-event-groups')}
+        </ToggleButton>
+        <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
-          class="border-l-0"
           size="sm"
           onclick={onAutoRefreshToggle}
         >
@@ -217,7 +245,7 @@
   {#if workflow}
     <TimelineGraph
       {workflow}
-      {lazyGroups}
+      {groups}
       {reverseSort}
       loading={!historyCtx.fetchComplete}
       totalExpectedEvents={estimatedTotalGroups}

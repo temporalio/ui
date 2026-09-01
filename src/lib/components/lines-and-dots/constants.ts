@@ -23,6 +23,8 @@ export type TimelineIconName =
   | 'retention'
   | 'feather'
   | 'relationship'
+  | 'compact'
+  | 'pencil'
   | 'update'
   | 'terminal'
   | 'nexus';

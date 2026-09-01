@@ -358,6 +358,11 @@ export const Strings = {
   'scheduled-by': 'Scheduled By',
   'auto-refresh-on': 'Auto Refresh On',
   'auto-refresh-off': 'Auto Refresh Off',
+  'show-event-groups': 'Show Event Groups',
+  'hide-event-groups': 'Hide Event Groups',
+  'event-groups': 'Event Groups',
+  'event-group-event-count_one': '{{count, number}} event',
+  'event-group-event-count_other': '{{count, number}} events',
   minimized: 'Minimized',
   expanded: 'Expanded',
   'timeline-minimized':

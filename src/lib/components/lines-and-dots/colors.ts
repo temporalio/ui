@@ -3,6 +3,8 @@ import type { WorkflowStatus } from '$lib/types/workflows';
 
 const DEFAULT_STROKE_COLOR = 'currentColor';
 
+export const EVENT_GROUP_COLOR = 'rgb(var(--color-surface-brand))';
+
 const STATUS_STROKE_COLORS: Record<
   NonNullable<WorkflowStatus> | EventClassification | 'Delayed',
   string
@@ -32,7 +34,12 @@ export const getStatusStrokeColor = (
 ): string => (status && STATUS_STROKE_COLORS[status]) ?? DEFAULT_STROKE_COLOR;
 
 const CATEGORY_STROKE_COLORS: Record<
-  EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
+  | EventTypeCategory
+  | 'pending'
+  | 'retry'
+  | 'marker'
+  | 'command'
+  | 'event-group',
   string
 > = {
   timer: '#fbbf24',
@@ -41,6 +48,7 @@ const CATEGORY_STROKE_COLORS: Record<
   workflow: '#ebebeb',
   marker: '#ebebeb',
   command: '#ebebeb',
+  'event-group': EVENT_GROUP_COLOR,
   'child-workflow': '#0899B2',
   update: '#FF9B70',
   pending: '#a78bfa',
@@ -51,7 +59,13 @@ const CATEGORY_STROKE_COLORS: Record<
 };
 
 export const getCategoryStrokeColor = (
-  category: EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
+  category:
+    | EventTypeCategory
+    | 'pending'
+    | 'retry'
+    | 'marker'
+    | 'command'
+    | 'event-group',
 ): string => CATEGORY_STROKE_COLORS[category] ?? DEFAULT_STROKE_COLOR;
 
 export type DotColors = { readonly fill: string; readonly stroke: string };
@@ -99,7 +113,7 @@ export function strokeColor({
   delayed = false,
 }: {
   status?: WorkflowStatus | 'none';
-  category?: EventTypeCategory | 'pending' | 'retry';
+  category?: EventTypeCategory | 'pending' | 'retry' | 'event-group';
   classification?: EventClassification;
   delayed?: boolean;
 }): string {

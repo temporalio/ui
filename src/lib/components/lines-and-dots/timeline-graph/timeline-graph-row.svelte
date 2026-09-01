@@ -14,6 +14,7 @@
         other: 'border-slate-700 bg-slate-800/80',
         nexus: 'border-indigo-700 bg-indigo-800/80',
         'local-activity': 'border-slate-700 bg-slate-800/80',
+        'event-group': 'border-brand bg-brand/20',
         default: 'border-purple-700 bg-purple-900/80',
       },
     },
@@ -24,6 +25,7 @@
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { isTimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import {
@@ -41,7 +43,12 @@
   import { dotBox, lineBox } from './primitives';
   import { type DotColors, dotColors, strokeColor } from '../colors';
   import { CategoryIcon, type TimelineIconName } from '../constants';
-  import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
+  import {
+    EVENT_GROUP_LINE_HEIGHT,
+    GUTTER,
+    RADIUS,
+    ROW_HEIGHT,
+  } from './constants';
   import { timelineTextPosition } from './timeline-positioning';
 
   type Props = {
@@ -63,7 +70,16 @@
   }: Props = $props();
 
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
+  const isEventMarkerGroup = $derived(isTimelineEventMarkerGroup(group));
   const pendingActivity = $derived(group?.pendingActivity);
+  const EVENT_GROUP_CAP_HEIGHT = 14;
+  const EVENT_GROUP_CAP_WIDTH = 2;
+
+  const getEventMarkerRangeEnd = (eventPoints: number[]): number =>
+    Math.max(
+      eventPoints[eventPoints.length - 1] ?? eventPoints[0],
+      eventPoints[0] + RADIUS * 2,
+    );
 
   // Reactive (not untrack) so a re-pointed pooled row relabels for its new group.
   const accessibleName = $derived(
@@ -115,14 +131,25 @@
     // Loop to `count` (not events.map) to depend on eventCount without allocating.
     const points: number[] = [];
     const pointCount = Math.min(count, events.length);
-    for (let idx = 0; idx < pointCount; idx++) {
-      points.push(Math.round(project(events[idx].eventTime)));
+    if (isEventMarkerGroup && pointCount > 0) {
+      points.push(Math.round(project(events[0].eventTime)));
+      if (pointCount > 1) {
+        points.push(Math.round(project(events[pointCount - 1].eventTime)));
+      }
+    } else {
+      for (let idx = 0; idx < pointCount; idx++) {
+        points.push(Math.round(project(events[idx].eventTime)));
+      }
     }
     if (pauseTime) {
       points.push(Math.round(project(pauseTime)));
     }
+    const positioningPoints =
+      isEventMarkerGroup && points.length
+        ? [points[0], getEventMarkerRangeEnd(points)]
+        : points;
     const { textAnchor, textPosition } = timelineTextPosition(
-      points,
+      positioningPoints,
       ROW_HEIGHT / 2,
       timelineWidth,
       group.isPending,
@@ -135,7 +162,7 @@
   );
 
   const onClick = () => {
-    if (readOnly) return;
+    if (readOnly || isEventMarkerGroup) return;
     setActiveGroup(group);
   };
 
@@ -157,10 +184,12 @@
   );
 
   const lineColor = $derived(
-    strokeColor({
-      category: effectiveCategory,
-      classification: group.lastEvent.classification,
-    }),
+    isEventMarkerGroup
+      ? strokeColor({ category: 'event-group' })
+      : strokeColor({
+          category: effectiveCategory,
+          classification: group.lastEvent.classification,
+        }),
   );
   const showRetryGradient = $derived(
     retried && group.lastEvent.classification === 'Completed',
@@ -186,9 +215,11 @@
   const spanLeft = $derived(points[0] - HALO);
   const spanWidth = $derived(
     (group.isPending && canvasWidth - points[0] - HALO) ||
-      (points.length >= 2
-        ? points[points.length - 1] - points[0] + RADIUS * 3
-        : RADIUS * 3),
+      (isEventMarkerGroup
+        ? getEventMarkerRangeEnd(points) - points[0] + HALO * 2
+        : points.length >= 2
+          ? points[points.length - 1] - points[0] + RADIUS * 3
+          : RADIUS * 3),
   );
   const spanCy = HALO; // button-local vertical center
 </script>
@@ -204,18 +235,21 @@
     animate?: boolean;
     gradient?: boolean;
     dim?: number;
+    thin?: boolean;
   },
 )}
   {@const bounds = lineBox([leftX, spanCy], [rightX, spanCy])}
+  {@const lineHeight = opts.thin ? EVENT_GROUP_LINE_HEIGHT : bounds.height}
   <div
     class="tl-line absolute"
     class:tl-line--gradient={opts.gradient}
     class:tl-line--dashed={opts.dashed}
     class:tl-line--animate={opts.animate}
+    class:tl-line--square={opts.thin}
     style:left="{bounds.left}px"
-    style:top="{bounds.top}px"
+    style:top="{bounds.top + (bounds.height - lineHeight) / 2}px"
     style:width="{bounds.width}px"
-    style:height="{bounds.height}px"
+    style:height="{lineHeight}px"
     style:--tl-line-color={color}
     style:opacity={opts.dim || null}
   ></div>
@@ -259,49 +293,74 @@
     onclick={onClick}
   >
     <div
-      class="highlight {groupHover({ category: effectiveCategory })}"
+      class="highlight {groupHover({
+        category: isEventMarkerGroup ? 'event-group' : effectiveCategory,
+      })}"
       style:border-radius="{highlightRadius}px"
     ></div>
-    {#each points as pointX, index (index)}
-      {@const localX = pointX - spanLeft}
-      {@const nextPoint = points[index + 1]}
-      {#if nextPoint}
-        {@render connector(localX, nextPoint - spanLeft, lineColor, {
-          gradient: showRetryGradient,
-          dim: scheduling && index === 0 ? 0.35 : undefined,
-        })}
-      {/if}
-      {#if !nextPoint && group.isPending && !pauseTime}
-        {@render connector(
-          localX,
-          canvasWidth - GUTTER - spanLeft,
-          pendingLineColor,
-          {
-            dashed: true,
-            animate: true,
-          },
-        )}
+    {#if isEventMarkerGroup}
+      {@const rangeStartX = points[0] - spanLeft}
+      {@const rangeEndX = getEventMarkerRangeEnd(points) - spanLeft}
+      {@render connector(rangeStartX, rangeEndX, lineColor, { thin: true })}
+      <div
+        class="absolute"
+        style:left="{rangeStartX - EVENT_GROUP_CAP_WIDTH / 2}px"
+        style:top="{spanCy - EVENT_GROUP_CAP_HEIGHT / 2}px"
+        style:width="{EVENT_GROUP_CAP_WIDTH}px"
+        style:height="{EVENT_GROUP_CAP_HEIGHT}px"
+        style:background-color={lineColor}
+      ></div>
+      <div
+        class="absolute"
+        style:left="{rangeEndX - EVENT_GROUP_CAP_WIDTH / 2}px"
+        style:top="{spanCy - EVENT_GROUP_CAP_HEIGHT / 2}px"
+        style:width="{EVENT_GROUP_CAP_WIDTH}px"
+        style:height="{EVENT_GROUP_CAP_HEIGHT}px"
+        style:background-color={lineColor}
+      ></div>
+    {:else}
+      {#each points as pointX, index (index)}
+        {@const localX = pointX - spanLeft}
+        {@const nextPoint = points[index + 1]}
+        {#if nextPoint}
+          {@render connector(localX, nextPoint - spanLeft, lineColor, {
+            gradient: showRetryGradient,
+            dim: scheduling && index === 0 ? 0.35 : undefined,
+          })}
+        {/if}
+        {#if !nextPoint && group.isPending && !pauseTime}
+          {@render connector(
+            localX,
+            canvasWidth - GUTTER - spanLeft,
+            pendingLineColor,
+            {
+              dashed: true,
+              animate: true,
+            },
+          )}
+          {@render dot(
+            localX,
+            dotColors(group.lastEvent.classification),
+            'retry',
+          )}
+        {/if}
         {@render dot(
           localX,
-          dotColors(group.lastEvent.classification),
-          'retry',
+          dotColors(group.eventList[index]?.classification),
+          pauseTime && index !== 0
+            ? 'pause'
+            : decodedLocalActivity
+              ? CategoryIcon['local-activity'].name
+              : CategoryIcon[effectiveCategory].name,
         )}
-      {/if}
-      {@render dot(
-        localX,
-        dotColors(group.eventList[index]?.classification),
-        pauseTime && index !== 0
-          ? 'pause'
-          : decodedLocalActivity
-            ? CategoryIcon['local-activity'].name
-            : CategoryIcon[effectiveCategory].name,
-      )}
-    {/each}
+      {/each}
+    {/if}
     <!-- Inside the button so hovering/clicking the label hits the same target;
          positioned button-local (offset by spanLeft), may overflow the box. -->
     <PayloadSummary
       value={group?.userMetadata?.summary}
-      prefix={isActivityTaskScheduledEvent(group.initialEvent)
+      prefix={!isEventMarkerGroup &&
+      isActivityTaskScheduledEvent(group.initialEvent)
         ? group?.displayName
         : ''}
       fallback={decodedLocalActivity
@@ -340,6 +399,13 @@
               {decodedLocalActivity.value}
             {:else}
               {decodedValue}
+              {#if isEventMarkerGroup}
+                <span class="ml-1 text-secondary">
+                  {translate('workflows.event-group-event-count', {
+                    count: eventCount,
+                  })}
+                </span>
+              {/if}
             {/if}
           </span>
         </div>
