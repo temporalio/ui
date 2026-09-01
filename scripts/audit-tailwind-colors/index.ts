@@ -235,6 +235,16 @@ const propertyColorNames = Object.fromEntries(
 const allApiColorNames = new Set(
   Object.values(propertyColorNames).flatMap((names) => [...names]),
 );
+const parsedColorNamePrefixes = new Set(
+  [
+    ...allApiColorNames,
+    ...RETIRED_SEMANTIC_COLORS,
+    ...LEGACY_NAMED_COLORS,
+    ...TAILWIND_DEFAULT_PALETTES,
+    ...Object.values(LEGACY_SEMANTIC_COLORS).flatMap((names) => [...names]),
+    'io',
+  ].map((name) => name.split('-')[0] || name),
+);
 const duplicateContentFixedColorNames = new Set(
   fixedColorNames.map((name) => `content-${name}`),
 );
@@ -250,6 +260,9 @@ const isTailwindDefaultPaletteColor = (color: string): boolean =>
     return TAILWIND_DEFAULT_SHADES.has(color.slice(palette.length + 1));
   });
 
+const isParsedColorName = (color: string): boolean =>
+  parsedColorNamePrefixes.has(color.split('-')[0] || color);
+
 const isInvalidTailwindColor = (utility: string, color: string): boolean => {
   const normalizedUtility = normalizeUtility(utility);
   const allowedColors = propertyColorNames[normalizedUtility];
@@ -262,7 +275,8 @@ const isInvalidTailwindColor = (utility: string, color: string): boolean => {
   if (allApiColorNames.has(color)) return true;
   if (LEGACY_NAMED_COLORS.has(color)) return true;
   if (isTailwindDefaultPaletteColor(color)) return true;
-  return LEGACY_SEMANTIC_COLORS[normalizedUtility]?.has(color) || false;
+  if (LEGACY_SEMANTIC_COLORS[normalizedUtility]?.has(color)) return true;
+  return true;
 };
 
 const toViolation = (
@@ -306,7 +320,7 @@ const findLineViolations = (
   for (const match of line.matchAll(TAILWIND_COLOR_PATTERN)) {
     const utility = match[1] || '';
     const color = match[2] || '';
-    if (isInvalidTailwindColor(utility, color)) {
+    if (isParsedColorName(color) && isInvalidTailwindColor(utility, color)) {
       violations.push(
         toViolation(
           projectRoot,

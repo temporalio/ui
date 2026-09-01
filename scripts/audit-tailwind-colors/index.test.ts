@@ -73,7 +73,7 @@ afterEach(async () => {
 describe('Tailwind color audit CLI', () => {
   it('accepts the property-aware API, generated variables, and arbitrary colors', async () => {
     const directory = await createAuditTarget(`
-      <div class="accent-auto bg-background-primary bg-background-secondary bg-surface-primary bg-surface-neutral bg-surface-accent bg-interactive-primary bg-interactive-tertiary-hover bg-surface-overlay-primary bg-surface-overlay-accent bg-action-info bg-content-primary bg-content-accent bg-border-primary bg-border-accent bg-white bg-black bg-indigo-9 bg-alpha-red-30 border-primary border-accent border-action-danger border-interactive-primary border-content-primary divide-primary ring-danger ring-accent ring-interactive-primary ring-offset-background-primary outline-danger outline-accent outline-interactive-primary caret-primary caret-accent fill-primary fill-accent fill-action-workflow-signal fill-indigo-9 fill-none stroke-action-workflow-timer stroke-indigo-9 stroke-none from-surface-primary from-surface-accent via-interactive-tertiary-hover via-surface-overlay-accent to-action-workflow-workflow to-content-accent decoration-primary decoration-accent shadow-content-inverse-primary shadow-content-accent placeholder-tertiary placeholder-accent text-primary text-brand text-accent text-static-success text-action-workflow-activity text-white bg-inherit text-current border-transparent bg-[#123456] outline-none shadow-none bg-none border-none decoration-auto decoration-from-font text-sm border-2 ring-2 ring-offset-2 stroke-2 text-indigo-6 text-alpha-red-30 border-slate-1 border-alpha-neutral-30 ring-green-7 ring-alpha-indigo-30 divide-purple-5 outline-alpha-blue-30 caret-red-9 placeholder-alpha-slate-20 decoration-indigo-6 shadow-alpha-neutral-30 ring-offset-slate-1 accent-alpha-green-30 border-white ring-black">
+      <div class="accent-auto bg-background-primary bg-surface-primary bg-surface-neutral bg-surface-accent bg-interactive-primary bg-interactive-tertiary-hover bg-surface-overlay-primary bg-surface-overlay-accent bg-action-info bg-content-primary bg-content-accent bg-border-primary bg-border-accent bg-white bg-black bg-indigo-9 bg-alpha-red-30 border-primary border-accent border-action-danger border-interactive-primary border-content-primary divide-primary ring-danger ring-accent ring-interactive-primary ring-offset-background-primary outline-danger outline-accent outline-interactive-primary caret-primary caret-accent fill-primary fill-accent fill-action-workflow-signal fill-indigo-9 fill-none stroke-action-workflow-timer stroke-indigo-9 stroke-none from-surface-primary from-surface-accent via-interactive-tertiary-hover via-surface-overlay-accent to-action-workflow-workflow to-content-accent decoration-primary decoration-accent shadow-content-inverse-primary shadow-content-accent placeholder-tertiary placeholder-accent text-primary text-brand text-accent text-static-success text-action-workflow-activity text-white bg-inherit text-current border-transparent bg-[#123456] outline-none shadow-none bg-none border-none decoration-auto decoration-from-font text-sm border-2 ring-2 ring-offset-2 stroke-2 text-indigo-6 text-alpha-red-30 border-slate-1 border-alpha-neutral-30 ring-green-7 ring-alpha-indigo-30 divide-purple-5 outline-alpha-blue-30 caret-red-9 placeholder-alpha-slate-20 decoration-indigo-6 shadow-alpha-neutral-30 ring-offset-slate-1 accent-alpha-green-30 border-white ring-black">
         <span style="color: var(--color-content-primary); background: var(--color-interactive-tertiary-hover)">Valid</span>
       </div>
     `);
@@ -83,6 +83,25 @@ describe('Tailwind color audit CLI', () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain('No color API violations found');
     expect(result.stderr).toBe('');
+  });
+
+  it('rejects parsed unknown colors while accepting registered colors', async () => {
+    const directory = await createAuditTarget(`
+      <div class="bg-surface-garbage bg-content-static-text-success bg-background-secondary">Colors</div>
+    `);
+
+    const result = await runAudit(directory);
+
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain(
+      '[legacy-tailwind-color] bg-surface-garbage',
+    );
+    expect(result.stderr).toContain(
+      '[legacy-tailwind-color] bg-content-static-text-success',
+    );
+    expect(result.stderr).toContain(
+      '[legacy-tailwind-color] bg-background-secondary',
+    );
   });
 
   it('rejects io colors and variables, Tailwind defaults, legacy aliases, and property-invalid colors', async () => {

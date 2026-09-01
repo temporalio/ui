@@ -210,7 +210,7 @@
     style:transform={activeBackgroundStyles.transform}
     style:height={activeBackgroundStyles.height}
     style:opacity={activeBackgroundStyles.opacity}
-    class={`pointer-events-none absolute left-0 w-full bg-interactive-tertiary-press transition-all hover:bg-interactive-tertiary-hover ${ACTIVE_TRANSITION_DURATION} ease-out`}
+    class={`pointer-events-none absolute left-0 w-full bg-interactive-tertiary-press transition-all ${ACTIVE_TRANSITION_DURATION} ease-out`}
     aria-hidden="true"
   ></div>
 
