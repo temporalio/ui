@@ -9,9 +9,13 @@ export { default as IconArrowDescending } from './icons/arrow-descending.svelte'
 export { default as IconArrowDown } from './icons/arrow-down.svelte';
 export { default as IconArrowExpand } from './icons/arrow-expand.svelte';
 export { default as IconArrowLeft } from './icons/arrow-left.svelte';
+export { default as IconArrowLeftToLine } from './icons/arrow-left-to-line.svelte';
 export { default as IconArrowMinimize } from './icons/arrow-minimize.svelte';
 export { default as IconArrowRight } from './icons/arrow-right.svelte';
 export { default as IconArrowRightArrowLeft } from './icons/arrow-right-arrow-left.svelte';
+export { default as IconArrowRightToLine } from './icons/arrow-right-to-line.svelte';
+export { default as IconArrowSquareCaretLeft } from './icons/arrow-square-caret-left.svelte';
+export { default as IconArrowSquareCaretRight } from './icons/arrow-square-caret-right.svelte';
 export { default as IconArrowTrendingDown } from './icons/arrow-trending-down.svelte';
 export { default as IconArrowTrendingUp } from './icons/arrow-trending-up.svelte';
 export { default as IconArrowUp } from './icons/arrow-up.svelte';

@@ -5,7 +5,10 @@
 
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconArrowsLeftRightToLine, IconCollapse } from '$lib/io/icon';
+  import {
+    IconArrowSquareCaretLeft,
+    IconArrowSquareCaretRight,
+  } from '$lib/io/icon';
 
   interface Props {
     version: string;
@@ -55,9 +58,9 @@
     onclick={ontoggle}
   >
     {#if navOpen}
-      <IconCollapse />
+      <IconArrowSquareCaretLeft />
     {:else}
-      <IconArrowsLeftRightToLine />
+      <IconArrowSquareCaretRight />
     {/if}
   </button>
 </div>

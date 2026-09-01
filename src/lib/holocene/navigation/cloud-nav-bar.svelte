@@ -8,8 +8,8 @@
   import { translate } from '$lib/i18n/translate';
   import {
     IconArrowLeft,
-    IconArrowsLeftRightToLine,
-    IconCollapse,
+    IconArrowSquareCaretLeft,
+    IconArrowSquareCaretRight,
   } from '$lib/io/icon';
 
   interface Props {
@@ -81,9 +81,9 @@
     onclick={ontoggle}
   >
     {#if navOpen}
-      <IconCollapse />
+      <IconArrowSquareCaretLeft />
     {:else}
-      <IconArrowsLeftRightToLine />
+      <IconArrowSquareCaretRight />
     {/if}
   </button>
 </div>
