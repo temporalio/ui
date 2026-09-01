@@ -1,7 +1,11 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { IconClock, IconClose } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
     isTimelineEventMarkerGroup,
@@ -18,11 +22,17 @@
   import { eventStatusFilter } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
   import EndTimeInterval from '../end-time-interval.svelte';
-  import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
+  import {
+    EVENT_GROUP_LINE_HEIGHT,
+    GUTTER,
+    RADIUS,
+    ROW_HEIGHT,
+  } from './constants';
   import {
     getDescStart,
     getPendingBlockY,
@@ -55,7 +65,12 @@
 
   interface Props {
     workflow: WorkflowExecution;
+    // Filtering, sorting and segment layout need no EventGroup, so only the
+    // pooled rows below materialize one.
     groups: TimelineGroup[];
+    timelineGroups?: TimelineGroup[];
+    selectedEventGroup?: TimelineEventMarkerGroup;
+    onCloseEventGroup?: () => void;
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
@@ -63,12 +78,18 @@
     totalExpectedEvents?: number;
     descMinId?: number;
     panelHeight?: number;
+    embeddedSelection?: boolean;
+    selectedGroup?: EventGroup;
+    onSelectGroup?: (group: EventGroup) => void;
     onTimelineInit?: (timeline: Timeline) => void;
   }
 
   let {
     workflow,
     groups,
+    timelineGroups,
+    selectedEventGroup,
+    onCloseEventGroup,
     readOnly = false,
     error = false,
     reverseSort = false,
@@ -76,10 +97,16 @@
     totalExpectedEvents = 0,
     descMinId = 0,
     panelHeight = $bindable(0),
+    embeddedSelection = false,
+    selectedGroup = $bindable<EventGroup | undefined>(undefined),
+    onSelectGroup,
     onTimelineInit,
   }: Props = $props();
 
   const DOT_STROKE = 2; // dot border
+  const EVENT_GROUP_HEADER_HEIGHT = 32;
+  const EVENT_GROUP_HEADER_SPACING = 16;
+  const EVENT_GROUP_FOOTER_SPACING = 16;
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
@@ -121,7 +148,7 @@
   const timeline = new Timeline({
     getFullEventHistory: () => $fullEventHistory,
     getWorkflow: () => workflow,
-    getLazyGroups: () => groups,
+    getLazyGroups: () => timelineGroups ?? groups,
     getCurrentTimeMs: () => nowMs,
     getLoading: () => loading,
     getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
@@ -286,15 +313,32 @@
     new Map(filteredGroups.map((g, i) => [g.id, i])),
   );
 
+  const selectedEventGroupRowIds = $derived(
+    selectedEventGroup
+      ? new Set([
+          selectedEventGroup.id,
+          ...selectedEventGroup.lifecycleGroups.map((group) => group.id),
+        ])
+      : undefined,
+  );
+
   // Active group's index in filteredGroups (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
+  const activeGroupId = $derived(
+    embeddedSelection ? selectedGroup?.id : $activeGroups[0],
+  );
+
   const activeIdx = $derived(
-    $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
+    activeGroupId ? (groupIndexMap.get(activeGroupId) ?? -1) : -1,
   );
 
   $effect(() => {
-    if ($activeGroups.length === 0) panelHeight = 0;
+    if (!activeGroupId) panelHeight = 0;
   });
+
+  const selectEmbeddedGroup = (group: EventGroup) => {
+    selectedGroup = selectedGroup?.id === group.id ? undefined : group;
+  };
 
   // Open detail panel pushes rows below the active one down by panelHeight.
   // reverseSort flips "below" to i < activeIdx.
@@ -315,7 +359,14 @@
   // Widen the mount window by the panel's row span: shiftFor moves rows down but
   // getWindowBounds maps on the unshifted y, so without this they'd leave a blank.
   const windowOverscan = $derived(
-    OVERSCAN + Math.ceil(panelHeight / ROW_HEIGHT),
+    OVERSCAN +
+      Math.ceil(
+        (panelHeight + (selectedEventGroup ? EVENT_GROUP_HEADER_SPACING : 0)) /
+          ROW_HEIGHT,
+      ) +
+      Math.ceil(
+        (selectedEventGroup ? EVENT_GROUP_FOOTER_SPACING : 0) / ROW_HEIGHT,
+      ),
   );
 
   // Full drawn height (rows + axis + detail panel). The container is this tall and
@@ -324,7 +375,11 @@
     Math.max(
       ROW_HEIGHT * (filteredGroups.length + pendingGroupCount + 2),
       120,
-    ) + panelHeight,
+    ) +
+      panelHeight +
+      (selectedEventGroup
+        ? EVENT_GROUP_HEADER_SPACING + EVENT_GROUP_FOOTER_SPACING
+        : 0),
   );
   const AXIS_LABEL_ZONE = 150;
   const svgHeight = $derived(timelineHeight + AXIS_LABEL_ZONE);
@@ -488,6 +543,98 @@
         }),
   );
 
+  const selectedEventGroupLayout = $derived.by(() => {
+    if (!selectedEventGroup || !selectedEventGroupRowIds) return undefined;
+
+    const headerIndex = groupIndexMap.get(selectedEventGroup.id) ?? -1;
+    if (headerIndex < 0) return undefined;
+
+    let bottomIndex = -1;
+    let top = Number.POSITIVE_INFINITY;
+    let bottom = Number.NEGATIVE_INFINITY;
+
+    for (let index = 0; index < filteredGroups.length; index++) {
+      if (!selectedEventGroupRowIds.has(filteredGroups[index].id)) continue;
+
+      if (
+        bottomIndex === -1 ||
+        (reverseSort ? index < bottomIndex : index > bottomIndex)
+      ) {
+        bottomIndex = index;
+      }
+
+      const belowHeader = reverseSort
+        ? index < headerIndex
+        : index > headerIndex;
+      const centerY =
+        getY(index) +
+        shiftFor(index) +
+        (belowHeader ? EVENT_GROUP_HEADER_SPACING : 0);
+      top = Math.min(top, centerY - ROW_HEIGHT / 2);
+      bottom = Math.max(bottom, centerY + ROW_HEIGHT / 2 + 4);
+    }
+
+    if (bottomIndex === -1) return undefined;
+
+    if (
+      panelHeight > 0 &&
+      activeIdx >= 0 &&
+      selectedEventGroupRowIds.has(filteredGroups[activeIdx]?.id)
+    ) {
+      const activeBelowHeader = reverseSort
+        ? activeIdx < headerIndex
+        : activeIdx > headerIndex;
+      bottom = Math.max(
+        bottom,
+        getY(activeIdx) +
+          (activeBelowHeader ? EVENT_GROUP_HEADER_SPACING : 0) +
+          1.33 * RADIUS +
+          panelHeight +
+          4,
+      );
+    }
+
+    return {
+      headerIndex,
+      bottomIndex,
+      bounds: {
+        headerTop: top,
+        outlineTop: top + EVENT_GROUP_HEADER_HEIGHT,
+        outlineHeight: Math.max(0, bottom - top - EVENT_GROUP_HEADER_HEIGHT),
+      },
+    };
+  });
+
+  function eventGroupHeaderShiftFor(i: number): number {
+    const headerIndex = selectedEventGroupLayout?.headerIndex ?? -1;
+    if (headerIndex < 0) return 0;
+    const belowHeader = reverseSort ? i < headerIndex : i > headerIndex;
+    return belowHeader ? EVENT_GROUP_HEADER_SPACING : 0;
+  }
+
+  function eventGroupFooterShiftFor(i: number): number {
+    const bottomIndex = selectedEventGroupLayout?.bottomIndex ?? -1;
+    if (bottomIndex < 0) return 0;
+    const belowGroup = reverseSort ? i < bottomIndex : i > bottomIndex;
+    return belowGroup ? EVENT_GROUP_FOOTER_SPACING : 0;
+  }
+
+  function rowShiftFor(i: number): number {
+    return (
+      shiftFor(i) + eventGroupHeaderShiftFor(i) + eventGroupFooterShiftFor(i)
+    );
+  }
+
+  const selectedEventGroupBounds = $derived(selectedEventGroupLayout?.bounds);
+
+  const selectedEventGroupDuration = $derived(
+    formatEventGroupDuration({
+      group: selectedEventGroup,
+      endTime: workflow.endTime ?? nowMs,
+      includeMilliseconds: true,
+    }),
+  );
+
   // Border rails span the full timeline height so they meet the bottom axis.
   const lineTop = 0;
   const lineBottom = $derived(timelineHeight);
@@ -506,7 +653,7 @@
     {#snippet children({ endTime })}
       <div
         class="pointer-events-none sticky top-[120px]"
-        class:invisible={!!$activeGroups.length}
+        class:invisible={activeIdx >= 0}
       >
         <div class="flex w-full justify-between text-xs">
           <p class="w-60 -translate-x-24 rotate-90">
@@ -567,6 +714,17 @@
           </div>
         {/if}
 
+        {#if selectedEventGroupBounds?.outlineHeight}
+          <div
+            data-testid="event-group-row-backdrop"
+            class="pointer-events-none absolute box-content rounded-b-lg border-x-2 border-b-2 border-brand bg-brand/10"
+            style:left="{GUTTER - 8}px"
+            style:top="{selectedEventGroupBounds.outlineTop}px"
+            style:width="{canvasWidth - GUTTER * 2 + 16}px"
+            style:height="{selectedEventGroupBounds.outlineHeight}px"
+          ></div>
+        {/if}
+
         <!-- Keyed by slot index so Svelte reuses the <li>s in place; the <li>
            persists when its slot is null, only the inner row toggles.
            pointer-events-none so clicks fall through to the collapse toggles;
@@ -579,21 +737,70 @@
               style:height="{ROW_HEIGHT}px"
               style:contain="layout"
               style:transform={slot
-                ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + shiftFor(slot.index)}px)`
+                ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + rowShiftFor(slot.index)}px)`
                 : undefined}
             >
-              {#if slot}
+              {#if slot && slot.group.id !== selectedEventGroup?.id}
                 <TimelineGraphRow
                   group={toEventGroup(slot.group)}
                   eventCount={eventCount(slot.group)}
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
+                  onSelect={onSelectGroup ??
+                    (embeddedSelection ? selectEmbeddedGroup : undefined)}
                 />
               {/if}
             </li>
           {/each}
         </ul>
+
+        {#if selectedEventGroup && selectedEventGroupBounds}
+          <div
+            data-testid="selected-event-group-header"
+            class="absolute z-10 box-content flex min-w-0 items-center justify-between border-x-2 border-t border-brand bg-slate-50 text-sm dark:bg-slate-800"
+            style:left="{GUTTER - 8}px"
+            style:top="{selectedEventGroupBounds.headerTop}px"
+            style:width="{canvasWidth - GUTTER * 2 + 16}px"
+            style:height="{EVENT_GROUP_HEADER_HEIGHT}px"
+            style:border-top-width="{EVENT_GROUP_LINE_HEIGHT}px"
+          >
+            <div class="flex h-full min-w-0 flex-1 items-center gap-4 px-2">
+              <PayloadSummary
+                value={selectedEventGroup.userMetadata?.summary}
+                fallback={selectedEventGroup.displayName}
+              >
+                {#snippet children(decodedValue)}
+                  <span class="min-w-0 truncate" title={decodedValue}
+                    >{decodedValue}</span
+                  >
+                {/snippet}
+              </PayloadSummary>
+              <span class="shrink-0">
+                {translate('workflows.event-group-event-count', {
+                  count: selectedEventGroup.eventList.length,
+                })}
+              </span>
+              {#if selectedEventGroupDuration}
+                <span class="flex shrink-0 items-center gap-1">
+                  <IconClock />
+                  {selectedEventGroupDuration}
+                </span>
+              {/if}
+            </div>
+            <div class="flex shrink-0 items-center gap-4">
+              <Button
+                data-testid="close-event-group"
+                variant="ghost"
+                size="xs"
+                onclick={onCloseEventGroup}
+              >
+                {translate('common.close')}
+                <IconClose />
+              </Button>
+            </div>
+          </div>
+        {/if}
 
         {#if loading && pendingGroupCount > 0}
           {@const rectY = getPendingBlockY({
@@ -615,16 +822,26 @@
         {#if !readOnly && activeIdx >= 0}
           {@const activeGroup = filteredGroups[activeIdx]}
           {#if activeGroup}
-            {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
-            <GroupDetailsRow
-              y={panelY}
-              group={toEventGroup(activeGroup)}
-              {canvasWidth}
-              endTime={workflow?.endTime ? endTime : nowMs}
-              onHeight={(height) => {
-                panelHeight = height;
-              }}
-            />
+            {@const panelY =
+              getY(activeIdx) +
+              eventGroupHeaderShiftFor(activeIdx) +
+              1.33 * RADIUS}
+            {#if !isEventMarkerGroup(activeGroup)}
+              <GroupDetailsRow
+                y={panelY}
+                group={toEventGroup(activeGroup)}
+                {canvasWidth}
+                endTime={workflow?.endTime ? endTime : nowMs}
+                onClose={embeddedSelection
+                  ? () => {
+                      selectedGroup = undefined;
+                    }
+                  : undefined}
+                onHeight={(height) => {
+                  panelHeight = height;
+                }}
+              />
+            {/if}
           {/if}
         {/if}
       </div>

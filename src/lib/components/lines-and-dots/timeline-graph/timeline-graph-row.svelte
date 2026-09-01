@@ -56,6 +56,7 @@
     canvasWidth: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
+    onSelect?: (group: EventGroup) => void;
     // Reactive event count so the row recomputes on streamed appends (eventList
     // is mutated in place) and on pooled re-point.
     eventCount?: number;
@@ -66,6 +67,7 @@
     canvasWidth,
     project,
     readOnly = false,
+    onSelect,
     eventCount = 0,
   }: Props = $props();
 
@@ -162,8 +164,12 @@
   );
 
   const onClick = () => {
-    if (readOnly || isEventMarkerGroup) return;
-    setActiveGroup(group);
+    if (readOnly) return;
+    if (onSelect) {
+      onSelect(group);
+    } else {
+      setActiveGroup(group);
+    }
   };
 
   // Only activity groups carry an ActivityTaskStarted event; guard so other
@@ -282,6 +288,7 @@
 
 <div class="absolute inset-0">
   <button
+    id={isEventMarkerGroup ? group.id : undefined}
     type="button"
     class="event"
     aria-label={accessibleName}

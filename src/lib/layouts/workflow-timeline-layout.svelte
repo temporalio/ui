@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, onMount } from 'svelte';
+  import { getContext, onMount, tick } from 'svelte';
 
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
@@ -25,8 +25,10 @@
     IconCollapse,
     IconDownload,
   } from '$lib/io/icon';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { isTimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
-  import { clearActives } from '$lib/stores/active-events';
+  import { clearActives, setActiveGroup } from '$lib/stores/active-events';
   import {
     collapseIdleTime,
     eventFilterSort,
@@ -69,27 +71,68 @@
   const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
   const markerGroups = $derived(eventBuffer.eventMarkerGroups);
   const hasMarkerGroups = $derived(eventBuffer.hasEventMarkerGroups);
+  let selectedMarkerKey = $state<string>();
 
   const filteredBufferLazyGroups = $derived.by(() => {
     const active = $eventTypeFilter;
-    return bufferLazyGroups.filter((g) => active.includes(g.category));
+    return bufferLazyGroups.filter((group) => active.includes(group.category));
   });
 
-  const groups = $derived(
-    getTimelineGroups(
-      $eventGroupsEnabled ? markerGroups : filteredBufferLazyGroups,
-      reverseSort,
-      historyCtx.fetchComplete,
-      historyCtx.descMinId,
-    ),
+  const selectedMarkerGroup = $derived(
+    selectedMarkerKey
+      ? markerGroups.find((group) => group.markerKey === selectedMarkerKey)
+      : undefined,
   );
 
   $effect(() => {
     if (historyCtx.fetchComplete && !hasMarkerGroups && $eventGroupsEnabled) {
       clearActives();
+      selectedMarkerKey = undefined;
       $eventGroupsEnabled = false;
     }
   });
+
+  const groups = $derived.by(() => {
+    if (!$eventGroupsEnabled) {
+      return getTimelineGroups(
+        filteredBufferLazyGroups,
+        reverseSort,
+        historyCtx.fetchComplete,
+        historyCtx.descMinId,
+      );
+    }
+
+    const outerGroups = getTimelineGroups(
+      markerGroups,
+      reverseSort,
+      historyCtx.fetchComplete,
+      historyCtx.descMinId,
+    );
+    if (!selectedMarkerGroup) return outerGroups;
+
+    const lifecycleGroups = getTimelineGroups(
+      selectedMarkerGroup.lifecycleGroups.filter((lifecycleGroup) =>
+        $eventTypeFilter.includes(lifecycleGroup.category),
+      ),
+      reverseSort,
+      true,
+      0,
+    );
+
+    return outerGroups.flatMap((group) => {
+      if (group.id !== selectedMarkerGroup.id) return group;
+
+      // Keep the selected marker row as a header slot and place it at the
+      // visual top of its lifecycle rows for either sort direction.
+      return reverseSort
+        ? [...lifecycleGroups, group]
+        : [group, ...lifecycleGroups];
+    });
+  });
+
+  // Expanding an Event Group changes the rendered rows, but the scale keeps
+  // using the outer rows so selecting a group never reprojects the x-axis.
+  const timelineGroups = $derived($eventGroupsEnabled ? markerGroups : groups);
 
   const workflowTaskFailedError = $derived.by(() => {
     if (!historyCtx.fetchComplete) return undefined;
@@ -116,8 +159,45 @@
 
   const onEventGroupsToggle = () => {
     clearActives();
-    $eventGroupsEnabled = !$eventGroupsEnabled;
+    selectedMarkerKey = undefined;
+    const enabled = !$eventGroupsEnabled;
+    $eventGroupsEnabled = enabled;
   };
+
+  const onTimelineGroupSelect = async (group: EventGroup) => {
+    if (isTimelineEventMarkerGroup(group)) {
+      clearActives();
+      selectedMarkerKey =
+        selectedMarkerKey === group.markerKey ? undefined : group.markerKey;
+      await tick();
+      document
+        .querySelector<HTMLButtonElement>('[data-testid="close-event-group"]')
+        ?.focus();
+      return;
+    }
+    setActiveGroup(group);
+  };
+
+  const closeSelectedEventGroup = async () => {
+    const groupId = selectedMarkerGroup?.id;
+    clearActives();
+    selectedMarkerKey = undefined;
+    await tick();
+
+    if (groupId) {
+      document.getElementById(groupId)?.focus();
+    }
+  };
+
+  $effect(() => {
+    if (
+      selectedMarkerKey &&
+      !markerGroups.some((group) => group.markerKey === selectedMarkerKey)
+    ) {
+      selectedMarkerKey = undefined;
+      clearActives();
+    }
+  });
 
   // The timeline renders in normal page flow: the page (#content-wrapper)
   // scrolls it and the controls bar sticks to the top-nav. TimelineGraph
@@ -202,8 +282,8 @@
         <ToggleButton
           data-testid="event-groups"
           disabled={!hasMarkerGroups}
-          onclick={onEventGroupsToggle}
           size="sm"
+          onclick={onEventGroupsToggle}
           class="border-l-0"
         >
           {$eventGroupsEnabled
@@ -246,11 +326,15 @@
     <TimelineGraph
       {workflow}
       {groups}
+      {timelineGroups}
+      selectedEventGroup={selectedMarkerGroup}
+      onCloseEventGroup={closeSelectedEventGroup}
       {reverseSort}
       loading={!historyCtx.fetchComplete}
       totalExpectedEvents={estimatedTotalGroups}
       descMinId={historyCtx.descMinId}
       error={Boolean(workflowTaskFailedError)}
+      onSelectGroup={onTimelineGroupSelect}
       onTimelineInit={handleTimelineInit}
     />
   {/if}

@@ -21,6 +21,7 @@
     endTime?: string | Date | number;
     x?: number;
     y: number;
+    onClose?: () => void;
     // Reports panel height so timeline-graph can shift the rows below it.
     onHeight?: (h: number) => void;
   };
@@ -31,6 +32,7 @@
     endTime = Date.now(),
     x = 0,
     y,
+    onClose,
     onHeight,
   }: Props = $props();
 
@@ -73,6 +75,14 @@
     }
     return group?.finalClassification || group?.classification;
   });
+
+  const close = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      setActiveGroup(group);
+    }
+  };
 </script>
 
 <div
@@ -98,7 +108,7 @@
         {/if}
       </div>
       <div class="flex items-center gap-4">
-        <Button variant="ghost" size="xs" onclick={() => setActiveGroup(group)}
+        <Button variant="ghost" size="xs" onclick={close}
           >{translate('common.close')} <IconClose /></Button
         >
       </div>
