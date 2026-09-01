@@ -46,6 +46,12 @@ importers:
 
   .:
     dependencies:
+      '@buf/temporalio_api.bufbuild_es':
+        specifier: 2.12.0-20260602195324-874c8d65f615.1
+        version: 2.12.0-20260602195324-874c8d65f615.1(@bufbuild/protobuf@2.14.0)
+      '@bufbuild/protobuf':
+        specifier: ^2.12.0
+        version: 2.14.0
       '@codemirror/autocomplete':
         specifier: ^6.18.7
         version: 6.20.3
@@ -173,12 +179,6 @@ importers:
       '@babel/core':
         specifier: ^7.20.12
         version: 7.29.7
-      '@buf/temporalio_api.bufbuild_es':
-        specifier: 2.12.0-20260602195324-874c8d65f615.1
-        version: 2.12.0-20260602195324-874c8d65f615.1(@bufbuild/protobuf@2.14.0)
-      '@bufbuild/protobuf':
-        specifier: ^2.12.0
-        version: 2.14.0
       '@chromatic-com/storybook':
         specifier: ^5.2.1
         version: 5.2.1(storybook@10.5.5(@types/react@19.2.7)(prettier@3.8.1)(react@18.3.1))
