@@ -5,11 +5,11 @@ import type { WorkflowStatus } from '$lib/types/workflows';
 const DEFAULT_STROKE_COLOR = 'currentColor';
 
 const WORKFLOW_ACTION_COLOR_VARIABLES = {
-  workflow: 'var(--color-actions-workflow-workflow)',
-  activity: 'var(--color-actions-workflow-activity)',
-  signal: 'var(--color-actions-workflow-signal)',
-  timer: 'var(--color-actions-workflow-timer)',
-  nexus: 'var(--color-actions-workflow-nexus)',
+  workflow: 'var(--color-action-workflow-workflow)',
+  activity: 'var(--color-action-workflow-activity)',
+  signal: 'var(--color-action-workflow-signal)',
+  timer: 'var(--color-action-workflow-timer)',
+  nexus: 'var(--color-action-workflow-nexus)',
 };
 
 export const WORKFLOW_ACTION_HOVER_CLASSES = {

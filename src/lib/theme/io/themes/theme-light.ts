@@ -80,7 +80,7 @@ export const lightTheme = {
       'danger-hover': colorScales.red[10],
       'danger-press': colorScales.red[11],
     },
-    actions: {
+    action: {
       info: colorScales.blue[10],
       success: colorScales.green[10],
       warning: colorScales.tangerine[10],

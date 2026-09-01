@@ -77,7 +77,7 @@ export type IoTheme = {
       'danger-hover': string;
       'danger-press': string;
     };
-    actions: {
+    action: {
       info: string;
       success: string;
       warning: string;

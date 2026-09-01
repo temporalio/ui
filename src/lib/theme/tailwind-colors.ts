@@ -17,7 +17,7 @@ const defaultTheme = themes[defaultThemeName];
 const colorReferences = toCssVariableReferences(defaultTheme.color, 'color');
 
 const {
-  actions: actionColors,
+  action: actionColors,
   background: backgroundColors,
   border: borderColors,
   content: { black: fixedBlack, white: fixedWhite, ...contentColors },

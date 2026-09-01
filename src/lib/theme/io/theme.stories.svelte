@@ -50,7 +50,7 @@
     'surface',
     'border',
     'interactive',
-    'actions',
+    'action',
   ];
 
   const getTailwindClass = (group: string, name: string): string => {
@@ -59,7 +59,7 @@
     if (group === 'surface') return ['bg', 'surface', name].join('-');
     if (group === 'border') return ['border', name].join('-');
     if (group === 'interactive') return ['bg', 'interactive', name].join('-');
-    if (group === 'actions') return ['text', 'action', name].join('-');
+    if (group === 'action') return ['text', 'action', name].join('-');
 
     return ['opacity', name].join('-');
   };
@@ -100,7 +100,7 @@
 
   const getWorkflowActionTokens = (theme: IoTheme): ThemeToken[] =>
     Object.entries(
-      toCssVariables(theme.color.actions.workflow, 'color-actions-workflow'),
+      toCssVariables(theme.color.action.workflow, 'color-action-workflow'),
     ).map(([cssVariable, value]) => {
       const name = cssVariable.split('-').at(-1) || cssVariable;
 
