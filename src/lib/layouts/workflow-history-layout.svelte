@@ -233,6 +233,7 @@
             data-testid="zoom-in"
             onclick={onSort}
             size="sm"
+            variant="tertiary"
           >
             {reverseSort
               ? translate('common.descending')
@@ -245,12 +246,13 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
+          variant="tertiary"
           onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
               ? 'bg-content-tertiary'
-              : 'bg-content-success'}"
+              : 'bg-content-static-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -260,6 +262,7 @@
           data-testid="download"
           LeadingIcon={IconDownload}
           size="sm"
+          variant="tertiary"
           onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}

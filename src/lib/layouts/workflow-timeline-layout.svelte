@@ -165,8 +165,11 @@
           LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="zoom-in"
           onclick={onSort}
-          size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+          size="sm"
+          variant="tertiary"
         >
+          {reverseSort ? 'Descending' : 'Ascending'}
+        </ToggleButton>
         <ToggleButton
           LeadingIcon={IconCollapse}
           data-testid="toggle-idle-time"
@@ -175,6 +178,7 @@
             !timeline?.hasCollapsibleSegments}
           onclick={onToggleIdleTime}
           size="sm"
+          variant="tertiary"
         >
           {timeline?.allCollapsibleSegmentsCollapsed
             ? translate('workflows.show-idle-time')
@@ -186,12 +190,13 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
+          variant="tertiary"
           onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
               ? 'bg-content-tertiary'
-              : 'bg-content-success'}"
+              : 'bg-content-static-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -201,6 +206,7 @@
           data-testid="download"
           LeadingIcon={IconDownload}
           size="sm"
+          variant="tertiary"
           onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}
