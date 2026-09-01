@@ -1,19 +1,15 @@
 <script module lang="ts">
   import { cva } from 'class-variance-authority';
 
+  import { WORKFLOW_ACTION_HOVER_CLASSES } from '../colors';
+
   // Module scope so the variant config is built once, not per mounted row.
   const groupHover = cva(['h-full w-full border-2'], {
     variants: {
       category: {
-        workflow: 'border-blue-11 bg-indigo-11/80',
-        activity: 'border-slate-blue-10 bg-slate-blue-10/80',
-        'child-workflow': 'border-peacock-blue-9 bg-peacock-blue-9/80',
-        timer: 'border-amber-11 bg-amber-11/80',
-        signal: 'border-pink-10 bg-dark-magenta-9/80',
+        ...WORKFLOW_ACTION_HOVER_CLASSES,
         update: 'border-blue-11 bg-indigo-11/80',
         other: 'border-neutral-5 bg-indigo-12/80',
-        nexus: 'border-indigo-10 bg-slate-blue-11/80',
-        'local-activity': 'border-neutral-5 bg-indigo-12/80',
         default: 'border-slate-blue-10 bg-slate-blue-11/80',
       },
     },

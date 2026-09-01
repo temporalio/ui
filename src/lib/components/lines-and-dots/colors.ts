@@ -4,6 +4,26 @@ import type { WorkflowStatus } from '$lib/types/workflows';
 
 const DEFAULT_STROKE_COLOR = 'currentColor';
 
+const WORKFLOW_ACTION_COLOR_VARIABLES = {
+  workflow: 'var(--color-actions-workflow-workflow)',
+  activity: 'var(--color-actions-workflow-activity)',
+  signal: 'var(--color-actions-workflow-signal)',
+  timer: 'var(--color-actions-workflow-timer)',
+  nexus: 'var(--color-actions-workflow-nexus)',
+};
+
+export const WORKFLOW_ACTION_HOVER_CLASSES = {
+  workflow: 'border-action-workflow-workflow bg-action-workflow-workflow/80',
+  activity: 'border-action-workflow-activity bg-action-workflow-activity/80',
+  'child-workflow':
+    'border-action-workflow-workflow bg-action-workflow-workflow/80',
+  timer: 'border-action-workflow-timer bg-action-workflow-timer/80',
+  signal: 'border-action-workflow-signal bg-action-workflow-signal/80',
+  nexus: 'border-action-workflow-nexus bg-action-workflow-nexus/80',
+  'local-activity':
+    'border-action-workflow-activity bg-action-workflow-activity/80',
+};
+
 const STATUS_STROKE_COLORS: Record<
   NonNullable<WorkflowStatus> | EventClassification | 'Delayed',
   string
@@ -36,18 +56,18 @@ const CATEGORY_STROKE_COLORS: Record<
   EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
   string
 > = {
-  timer: colorScales.amber[9],
-  signal: colorScales.pink[9],
-  activity: colorScales['slate-blue'][8],
-  workflow: colorScales.neutral[1],
+  timer: WORKFLOW_ACTION_COLOR_VARIABLES.timer,
+  signal: WORKFLOW_ACTION_COLOR_VARIABLES.signal,
+  activity: WORKFLOW_ACTION_COLOR_VARIABLES.activity,
+  workflow: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
   marker: colorScales.neutral[1],
   command: colorScales.neutral[1],
-  'child-workflow': colorScales['peacock-blue'][9],
+  'child-workflow': WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
   update: colorScales.persimmon[8],
   pending: colorScales['slate-blue'][8],
   retry: colorScales.persimmon[8],
-  'local-activity': DEFAULT_STROKE_COLOR,
-  nexus: DEFAULT_STROKE_COLOR,
+  'local-activity': WORKFLOW_ACTION_COLOR_VARIABLES.activity,
+  nexus: WORKFLOW_ACTION_COLOR_VARIABLES.nexus,
   other: DEFAULT_STROKE_COLOR,
 };
 
@@ -101,10 +121,16 @@ const CLASSIFICATION_DOT_COLORS: Record<string, DotColors> = {
 const CATEGORY_DOT_COLORS: Record<string, DotColors> = {
   marker: { fill: colorScales.neutral[1], stroke: DEFAULT_DOT_STROKE },
   command: { fill: colorScales.neutral[1], stroke: DEFAULT_DOT_STROKE },
-  timer: { fill: colorScales.amber[9], stroke: DEFAULT_DOT_STROKE },
-  signal: { fill: colorScales.pink[9], stroke: DEFAULT_DOT_STROKE },
+  timer: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.timer,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  signal: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.signal,
+    stroke: DEFAULT_DOT_STROKE,
+  },
   activity: {
-    fill: colorScales['slate-blue'][8],
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.activity,
     stroke: DEFAULT_DOT_STROKE,
   },
   pending: {
@@ -112,11 +138,22 @@ const CATEGORY_DOT_COLORS: Record<string, DotColors> = {
     stroke: colorScales['slate-blue'][8],
   },
   'child-workflow': {
-    fill: colorScales.green[6],
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
     stroke: DEFAULT_DOT_STROKE,
   },
   update: { fill: colorScales.blue[9], stroke: DEFAULT_DOT_STROKE },
-  workflow: { fill: colorScales.green[10], stroke: DEFAULT_DOT_STROKE },
+  workflow: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  'local-activity': {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.activity,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  nexus: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.nexus,
+    stroke: DEFAULT_DOT_STROKE,
+  },
 };
 
 export function dotColors(
