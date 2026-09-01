@@ -18,6 +18,7 @@ export type HistoryEvent = Replace<
     eventId: string;
     links?: EventLink[];
     principal?: Principal;
+    eventGroupMarkers?: EventGroupMarker[];
   }
 >;
 
@@ -35,6 +36,22 @@ export type Payload = {
   metadata?: { [k: string]: string };
   data?: string;
 };
+
+type ApiEventGroupMarker = NonNullable<
+  NonNullable<import('$lib/types').HistoryEvent['eventGroupMarkers']>[number]
+>;
+
+type ApiInboundEventMarker = NonNullable<ApiEventGroupMarker['inboundEvent']>;
+
+export type EventGroupMarker = Replace<
+  ApiEventGroupMarker,
+  {
+    inboundEvent?: Replace<
+      ApiInboundEventMarker,
+      { inboundEventId?: string | null }
+    > | null;
+  }
+>;
 
 export type PauseInfo = {
   manual: {
@@ -114,7 +131,8 @@ export type CommonEventKey =
   | 'workerMayIgnore'
   | 'name'
   | 'links'
-  | 'principal';
+  | 'principal'
+  | 'eventGroupMarkers';
 
 export type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 

@@ -9,8 +9,17 @@ import {
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
 import { toEvent } from '$lib/models/event-history';
+import {
+  createTimelineEventMarkerGroups,
+  type EventGroupMarkerPresentation,
+  type EventMarkerAttribution,
+  getEventGroupMarkerKey,
+  getEventGroupMarkerPresentation,
+  type TimelineEventMarkerGroup,
+} from '$lib/models/event-marker-groups';
 import type {
   CommonHistoryEvent,
+  EventGroupMarker,
   HistoryEvent,
   PendingActivity,
   PendingNexusOperation,
@@ -206,6 +215,16 @@ let cachedLazyGroupsNoWFT: LazyGroup[] | null = null;
 let cachedLazyGroupsNoWFTRevision = -1;
 let cachedWftFailed: WorkflowEvent | undefined;
 let cachedWftFailedRevision = -1;
+let cachedEventMarkerGroups: TimelineEventMarkerGroup[] | null = null;
+
+const eventGroupMarkerPresentationLabels = new Map<string, string>();
+const eventGroupMarkerPresentations = new Map<
+  string,
+  EventGroupMarkerPresentation
+>();
+const eventMarkerAttributions = new Map<string, EventMarkerAttribution>();
+const eventGroupMarkerKeysByLifecycleGroupId = new Map<string, Set<string>>();
+const markerReferencedLifecycleGroupIds = new Set<string>();
 
 const changeListeners = new Set<ChangeListener>();
 
@@ -275,11 +294,190 @@ function shouldNotAddBillableAction(event: WorkflowEvent): boolean {
   return Number(event.id) < Number(failedEvent.eventId);
 }
 
+function formatEventGroupMarkerPresentationLabel(
+  name: string,
+  id: string,
+): string {
+  return `${name} (${id})`;
+}
+
+function indexEventGroupMarkerPresentationLabel(event: WorkflowEvent): void {
+  let markerKey: string | undefined;
+  let presentationLabel: string | undefined;
+
+  if (event.eventType === 'WorkflowExecutionStarted') {
+    markerKey = `event:${event.id}`;
+    presentationLabel = formatEventGroupMarkerPresentationLabel(
+      event.eventType,
+      event.id,
+    );
+  } else if (event.eventType === 'WorkflowExecutionSignaled') {
+    const signalName = (event.attributes as { signalName?: unknown })
+      .signalName;
+    markerKey = `event:${event.id}`;
+    presentationLabel = formatEventGroupMarkerPresentationLabel(
+      typeof signalName === 'string' && signalName
+        ? signalName
+        : event.eventType,
+      event.id,
+    );
+  } else if (event.eventType === 'WorkflowExecutionUpdateAdmitted') {
+    const request = (
+      event.attributes as {
+        request?: {
+          meta?: { updateId?: unknown };
+          input?: { name?: unknown };
+        };
+      }
+    ).request;
+    const updateId = request?.meta?.updateId;
+    if (typeof updateId !== 'string' || !updateId) return;
+    const updateName = request?.input?.name;
+    markerKey = `update:${updateId}`;
+    presentationLabel = formatEventGroupMarkerPresentationLabel(
+      typeof updateName === 'string' && updateName
+        ? updateName
+        : event.eventType,
+      updateId,
+    );
+  } else if (event.eventType === 'WorkflowExecutionUpdateAccepted') {
+    const attributes = event.attributes as {
+      acceptedRequest?: {
+        meta?: { updateId?: unknown };
+        input?: { name?: unknown };
+      };
+      protocolInstanceId?: unknown;
+    };
+    const request = attributes.acceptedRequest;
+    const updateId =
+      typeof request?.meta?.updateId === 'string'
+        ? request.meta.updateId
+        : typeof attributes.protocolInstanceId === 'string'
+          ? attributes.protocolInstanceId
+          : undefined;
+    if (!updateId) return;
+    markerKey = `update:${updateId}`;
+    const updateName = request?.input?.name;
+    if (
+      !(typeof updateName === 'string' && updateName) &&
+      eventGroupMarkerPresentationLabels.has(markerKey)
+    ) {
+      return;
+    }
+    presentationLabel = formatEventGroupMarkerPresentationLabel(
+      typeof updateName === 'string' && updateName
+        ? updateName
+        : event.eventType,
+      updateId,
+    );
+  }
+
+  if (!markerKey || !presentationLabel) return;
+  if (eventGroupMarkerPresentationLabels.get(markerKey) === presentationLabel) {
+    return;
+  }
+  eventGroupMarkerPresentationLabels.set(markerKey, presentationLabel);
+  const marker = eventMarkerAttributions.get(markerKey)?.eventGroupMarker;
+  if (marker && refreshEventGroupMarkerPresentation(markerKey, marker)) {
+    cachedEventMarkerGroups = null;
+  }
+}
+
+function refreshEventGroupMarkerPresentation(
+  key: string,
+  marker: EventGroupMarker,
+): boolean {
+  const presentation = getEventGroupMarkerPresentation(
+    marker,
+    eventGroupMarkerPresentationLabels,
+  );
+  if (!presentation) return false;
+  const previous = eventGroupMarkerPresentations.get(key);
+  if (
+    previous?.displayName === presentation.displayName &&
+    previous.label === presentation.label
+  ) {
+    return false;
+  }
+  eventGroupMarkerPresentations.set(key, presentation);
+  return true;
+}
+
 function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
-  return toEvent(raw, {
+  const event = toEvent(raw, {
     shouldNotAddBillableAction,
     processedWorkflowTaskIds,
   });
+  indexEventGroupMarkerPresentationLabel(event);
+  return event;
+}
+
+function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
+  let changed = false;
+  for (const marker of event.eventGroupMarkers ?? []) {
+    const key = getEventGroupMarkerKey(marker);
+    if (!key) continue;
+
+    let groupMarkerKeys = eventGroupMarkerKeysByLifecycleGroupId.get(groupId);
+    if (!groupMarkerKeys) {
+      groupMarkerKeys = new Set();
+      eventGroupMarkerKeysByLifecycleGroupId.set(groupId, groupMarkerKeys);
+    }
+    groupMarkerKeys.add(key);
+    markerReferencedLifecycleGroupIds.add(groupId);
+
+    let attribution = eventMarkerAttributions.get(key);
+    if (!attribution) {
+      attribution = { key, eventGroupMarker: marker, eventsById: new Map() };
+      eventMarkerAttributions.set(key, attribution);
+      refreshEventGroupMarkerPresentation(key, marker);
+      changed = true;
+    } else if (
+      marker.label?.label &&
+      !attribution.eventGroupMarker.label?.label
+    ) {
+      attribution.eventGroupMarker = marker;
+      refreshEventGroupMarkerPresentation(key, marker);
+      changed = true;
+    }
+
+    if (!attribution.eventsById.has(event.id)) {
+      attribution.eventsById.set(event.id, {
+        event,
+        lifecycleGroupId: groupId,
+      });
+      changed = true;
+    }
+  }
+  if (changed) cachedEventMarkerGroups = null;
+}
+
+export function getEventMarkerPresentation(
+  marker: EventGroupMarker,
+): EventGroupMarkerPresentation | undefined {
+  const key = getEventGroupMarkerKey(marker);
+  if (!key) return;
+  const existing = eventGroupMarkerPresentations.get(key);
+  if (existing) return existing;
+  refreshEventGroupMarkerPresentation(key, marker);
+  return eventGroupMarkerPresentations.get(key);
+}
+
+export function hasEventMarkerGroups(): boolean {
+  return eventMarkerAttributions.size > 0;
+}
+
+export function lazyGroupMatchesEventGroupFilter(
+  group: LazyGroup,
+  markerKeys: ReadonlySet<string>,
+): boolean {
+  if (!markerKeys.size) return true;
+  const groupMarkerKeys = eventGroupMarkerKeysByLifecycleGroupId.get(group.id);
+  if (!groupMarkerKeys) return false;
+  for (const key of markerKeys) {
+    if (groupMarkerKeys.has(key)) return true;
+  }
+  return false;
 }
 
 function recordFor(headSlot: number): GroupRecord {
@@ -379,6 +577,11 @@ export function reset(historyLength: number): void {
 
   failedEvent = null;
   processedWorkflowTaskIds.clear();
+  eventGroupMarkerPresentationLabels.clear();
+  eventGroupMarkerPresentations.clear();
+  eventMarkerAttributions.clear();
+  eventGroupMarkerKeysByLifecycleGroupId.clear();
+  markerReferencedLifecycleGroupIds.clear();
 
   revision++;
   cachedGroups = null;
@@ -386,6 +589,7 @@ export function reset(historyLength: number): void {
   cachedEvents = null;
   cachedLazyGroups = null;
   cachedLazyGroupsNoWFT = null;
+  cachedEventMarkerGroups = null;
 
   notifyChanged(true);
 }
@@ -418,7 +622,12 @@ export function ingestHistoryEvent(raw: HistoryEvent): boolean {
   const headSlot = parsedHeadSlot >= 0 ? parsedHeadSlot : slot;
   grow(headSlot);
 
+  const groupId = String(headSlot + 1);
   recordFor(headSlot).addMember(slot, event);
+  attributeEventMarkers(event, groupId);
+  if (markerReferencedLifecycleGroupIds.has(groupId)) {
+    cachedEventMarkerGroups = null;
+  }
   revision++;
 
   notifyChanged();
@@ -454,6 +663,9 @@ export function setPendingMetadata(
     if (applyPendingMetadataTo(record)) {
       revision++;
       changed = true;
+      if (markerReferencedLifecycleGroupIds.has(record.id)) {
+        cachedEventMarkerGroups = null;
+      }
     }
   }
 
@@ -556,6 +768,37 @@ export function getGroupArray(opts?: GroupArrayOptions): EventGroup[] {
     cachedGroupsRevision = revision;
   }
   return result;
+}
+
+/**
+ * Event Group rows derived from marker attribution. Only lifecycle groups
+ * referenced by a marker are materialized; the normal timeline remains lazy.
+ */
+export function getEventMarkerGroupArray(): TimelineEventMarkerGroup[] {
+  if (cachedEventMarkerGroups) return cachedEventMarkerGroups;
+
+  const referencedGroupIds = new Set<string>();
+  for (const attribution of eventMarkerAttributions.values()) {
+    for (const entry of attribution.eventsById.values()) {
+      referencedGroupIds.add(entry.lifecycleGroupId);
+    }
+  }
+
+  const lifecycleGroups: EventGroup[] = [];
+  for (const groupId of referencedGroupIds) {
+    const headSlot = Number(groupId) - 1;
+    const recordIndex = headGroup[headSlot];
+    if (!recordIndex) continue;
+    const group = materializeEventGroup(records[recordIndex - 1]);
+    if (group) lifecycleGroups.push(group);
+  }
+
+  cachedEventMarkerGroups = createTimelineEventMarkerGroups(
+    eventMarkerAttributions.values(),
+    lifecycleGroups,
+    eventGroupMarkerPresentations,
+  );
+  return cachedEventMarkerGroups;
 }
 
 /** Flat WorkflowEvent[] in ascending event-id order. */

@@ -13,9 +13,12 @@ vi.mock('$lib/models/event-history', async (importOriginal) => {
 
 import {
   getEventArray,
+  getEventMarkerGroupArray,
+  getEventMarkerPresentation,
   getGroupArray,
   getLazyGroups,
   getWorkflowTaskFailedEvent,
+  hasEventMarkerGroups,
   ingestHistoryEvent,
   isWorkflowTaskGroup,
   type LazyGroup,
@@ -45,6 +48,7 @@ import {
   makeWorkflowTaskGroup,
   makeWorkflowTaskScheduled,
   makeWorkflowTaskStarted,
+  makeWorkflowUpdateAccepted,
   makeWorkflowUpdateGroup,
 } from './test-helpers/synthetic-events';
 
@@ -97,6 +101,84 @@ describe('output equivalence with groupEvents', () => {
     const actual = getGroupArray();
     const wftGroups = actual.filter(isWorkflowTaskGroup);
     expect(wftGroups.length).toBeGreaterThan(0);
+  });
+
+  it('builds marker groups without materializing unrelated lifecycle groups', () => {
+    const marked = makeActivityGroup(1);
+    for (const event of marked) {
+      event.eventGroupMarkers = [{ label: { id: 'checkout' } }];
+    }
+    loadAll(marked);
+
+    const markerGroups = getEventMarkerGroupArray();
+    expect(markerGroups[0].markerKey).toBe('label:checkout');
+    expect(markerGroups[0].eventCount).toBe(marked.length);
+    expect(markerGroups[0].lifecycleGroups[0].id).toBe('1');
+
+    loadAll(makeActivityGroup(4));
+    expect(getEventMarkerGroupArray()).toBe(markerGroups);
+  });
+
+  it('rebuilds a marker group when its lifecycle group changes', () => {
+    const [scheduled, started] = makeActivityGroup(1);
+    scheduled.eventGroupMarkers = [{ label: { id: 'checkout' } }];
+    ingestHistoryEvent(scheduled);
+    const initial = getEventMarkerGroupArray();
+
+    ingestHistoryEvent(started);
+
+    expect(getEventMarkerGroupArray()).not.toBe(initial);
+    expect(getEventMarkerGroupArray()[0].lifecycleGroups[0].eventCount).toBe(2);
+  });
+
+  it('attributes a marker whose lifecycle head has not loaded yet', () => {
+    const [, started] = makeActivityGroup(1);
+    started.eventGroupMarkers = [{ label: { id: 'checkout' } }];
+
+    ingestHistoryEvent(started);
+
+    expect(hasEventMarkerGroups()).toBe(true);
+    expect(getEventMarkerGroupArray()[0].eventList[0].id).toBe('2');
+  });
+
+  it('uses signal and update names as inbound marker labels', () => {
+    const signal = {
+      eventId: '1',
+      eventTime: '2024-01-01T00:00:00.000000000Z',
+      eventType: 'WorkflowExecutionSignaled',
+      workflowExecutionSignaledEventAttributes: {
+        signalName: 'paymentReceived',
+      },
+      eventGroupMarkers: [{ inboundEvent: { inboundEventId: '1' } }],
+    } as unknown as HistoryEvent;
+    const update = {
+      ...makeWorkflowUpdateAccepted(2),
+      workflowExecutionUpdateAcceptedEventAttributes: {
+        protocolInstanceId: 'update-2',
+        acceptedRequest: {
+          meta: { updateId: 'update-2' },
+          input: { name: 'changeSeat' },
+        },
+        acceptedRequestSequencingEventId: '1',
+      },
+      eventGroupMarkers: [{ inboundUpdate: { inboundUpdateId: 'update-2' } }],
+    } as unknown as HistoryEvent;
+
+    ingestHistoryEvent(signal);
+    ingestHistoryEvent(update);
+
+    const labels = new Map(
+      getEventMarkerGroupArray().map((group) => [
+        group.markerKey,
+        group.displayName,
+      ]),
+    );
+    expect(labels.get('event:1')).toBe('paymentReceived (1)');
+    expect(labels.get('update:update-2')).toBe('changeSeat (update-2)');
+    expect(
+      getEventMarkerPresentation({ inboundEvent: { inboundEventId: '1' } })
+        ?.displayName,
+    ).toBe('paymentReceived (1)');
   });
 });
 

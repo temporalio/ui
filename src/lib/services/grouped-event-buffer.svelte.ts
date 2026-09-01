@@ -5,9 +5,11 @@ import type { WorkflowEvent } from '$lib/types/events';
 
 import {
   getEventArray,
+  getEventMarkerGroupArray,
   getGroupArray,
   getLazyGroups,
   getWorkflowTaskFailedEvent,
+  hasEventMarkerGroups,
   type LazyGroup,
   onChange,
 } from './grouped-event-buffer';
@@ -79,6 +81,16 @@ class EventBufferView {
   readonly events: WorkflowEvent[] = $derived.by(() => {
     void this._version;
     return getEventArray();
+  });
+
+  readonly eventMarkerGroups = $derived.by(() => {
+    void this._version;
+    return getEventMarkerGroupArray();
+  });
+
+  readonly hasEventMarkerGroups = $derived.by(() => {
+    void this._version;
+    return hasEventMarkerGroups();
   });
 
   /** The active WorkflowTaskFailed/TimedOut event, if the run has one. */
