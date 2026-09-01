@@ -38,7 +38,7 @@
 <label
   for={id}
   class={twMerge(
-    'relative flex h-10 w-fit cursor-pointer items-center justify-center border border-tertiary bg-interactive-secondary px-4 py-2 text-base text-primary hover:bg-interactive-tertiary-hover focus-visible:bg-interactive-secondary focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press',
+    'relative flex h-10 w-fit cursor-pointer items-center justify-center rounded border border-tertiary bg-interactive-secondary px-4 py-2 text-base text-primary hover:bg-interactive-tertiary-hover focus-visible:bg-interactive-secondary focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press',
     className,
   )}
 >

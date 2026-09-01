@@ -31,7 +31,7 @@
 
 <table
   class={merge(
-    'holocene-table relative w-full border-collapse overflow-hidden rounded-lg',
+    'holocene-table relative w-full border-separate border-spacing-0 overflow-hidden rounded-lg',
     fixed ? 'layout-fixed' : 'layout-auto',
     className,
   )}
@@ -85,14 +85,14 @@
   }
 
   .holocene-table-header {
-    @apply sticky top-0 z-10 border-b border-primary;
+    @apply sticky top-0 z-10;
 
     :global(tr) {
       @apply bg-surface-secondary text-primary;
     }
 
     :global(tr > th) {
-      @apply h-9 px-2 text-left text-sm font-medium;
+      @apply h-9 border-b border-primary px-2 text-left text-sm font-medium;
     }
   }
 
