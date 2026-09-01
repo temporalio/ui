@@ -84,7 +84,7 @@ const createAttribution = (
 });
 
 const presentationLabelsByMarkerKey = new Map([
-  ['event:1', 'WorkflowExecutionStarted (1)'],
+  ['event:1', 'WorkflowExecutionStarted'],
   ['update:update-1', 'Start the update (update-1)'],
 ]);
 
@@ -146,7 +146,7 @@ describe('createTimelineEventMarkerGroups', () => {
       ),
     ).toMatchObject({
       key: 'event:1',
-      displayName: 'WorkflowExecutionStarted (1)',
+      displayName: 'WorkflowExecutionStarted',
     });
     expect(
       getEventGroupMarkerPresentation(

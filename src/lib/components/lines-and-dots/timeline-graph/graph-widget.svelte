@@ -15,33 +15,26 @@
   };
 
   interface Props {
-    namespace?: string;
+    namespace: string;
     workflowId?: string | null;
     runId?: string | null;
     eventCount?: number;
     viewportHeight?: number;
-    snapshot?: TimelineSnapshot;
-    readOnly?: boolean;
     onLoad?: () => void;
     class?: string;
   }
 
   let {
-    namespace = '',
+    namespace,
     workflowId,
     runId = '',
     eventCount = 0,
     viewportHeight = 360,
-    snapshot,
-    readOnly = true,
     onLoad = () => {},
     class: className = '',
   }: Props = $props();
 
-  let fetchedSnapshot = $state<TimelineSnapshot>();
-  let selectedGroup = $state<EventGroups[number]>();
-
-  const resolvedSnapshot = $derived(snapshot ?? fetchedSnapshot);
+  let snapshot = $state<TimelineSnapshot>();
 
   const getWorkflowAndEventHistory = async () => {
     if (!namespace || !workflowId || !runId) return;
@@ -65,44 +58,30 @@
 
   $effect(() => {
     void fetchKey;
-    if (snapshot) return;
     let cancelled = false;
     untrack(() => getWorkflowAndEventHistory()).then((next) => {
       if (cancelled) return;
-      fetchedSnapshot = next;
+      snapshot = next;
       onLoad();
     });
     return () => {
       cancelled = true;
     };
   });
-
-  $effect(() => {
-    if (
-      selectedGroup &&
-      !resolvedSnapshot?.groups.some((group) => group.id === selectedGroup?.id)
-    ) {
-      selectedGroup = undefined;
-    }
-  });
 </script>
 
-{#if resolvedSnapshot}
+{#if snapshot}
   <!-- Bounded scroll box for the child-workflow mini-timeline; the graph
        virtualizes against this scroll parent (our TimelineGraph takes no
        viewportHeight prop). -->
   <div
     class="cursor-pointer overflow-auto {className}"
-    style:max-height={selectedGroup && !readOnly
-      ? 'none'
-      : `${viewportHeight}px`}
+    style:max-height="{viewportHeight}px"
   >
     <TimelineGraph
-      workflow={resolvedSnapshot.workflow}
-      groups={resolvedSnapshot.groups}
-      {readOnly}
-      embeddedSelection={!readOnly}
-      bind:selectedGroup
+      workflow={snapshot.workflow}
+      groups={snapshot.groups}
+      readOnly
     />
   </div>
 {/if}

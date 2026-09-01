@@ -221,6 +221,31 @@ describe('output equivalence with groupEvents', () => {
         ?.displayName,
     ).toBe('paymentReceived (1)');
   });
+
+  it('uses event types without IDs when inbound markers have no name', () => {
+    const workflowStarted = makeWorkflowStarted(1);
+    workflowStarted.eventGroupMarkers = [
+      { inboundEvent: { inboundEventId: '1' } },
+    ];
+    const updateAccepted = makeWorkflowUpdateAccepted(2);
+    updateAccepted.eventGroupMarkers = [
+      { inboundUpdate: { inboundUpdateId: 'update-2' } },
+    ];
+
+    ingestHistoryEvent(workflowStarted);
+    ingestHistoryEvent(updateAccepted);
+
+    const labels = new Map(
+      getEventMarkerGroupArray().map((group) => [
+        group.markerKey,
+        group.displayName,
+      ]),
+    );
+    expect(labels.get('event:1')).toBe('WorkflowExecutionStarted');
+    expect(labels.get('update:update-2')).toBe(
+      'WorkflowExecutionUpdateAccepted',
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------

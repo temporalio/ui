@@ -79,8 +79,6 @@
     totalExpectedEvents?: number;
     descMinId?: number;
     panelHeight?: number;
-    embeddedSelection?: boolean;
-    selectedGroup?: EventGroup;
     onSelectGroup?: (group: EventGroup) => void;
     onTimelineInit?: (timeline: Timeline) => void;
   }
@@ -98,8 +96,6 @@
     totalExpectedEvents = 0,
     descMinId = 0,
     panelHeight = $bindable(0),
-    embeddedSelection = false,
-    selectedGroup = $bindable<EventGroup | undefined>(undefined),
     onSelectGroup,
     onTimelineInit,
   }: Props = $props();
@@ -325,9 +321,7 @@
 
   // Active group's index in filteredGroups (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
-  const activeGroupId = $derived(
-    embeddedSelection ? selectedGroup?.id : $activeGroups[0],
-  );
+  const activeGroupId = $derived($activeGroups[0]);
 
   const activeIdx = $derived(
     activeGroupId ? (groupIndexMap.get(activeGroupId) ?? -1) : -1,
@@ -336,10 +330,6 @@
   $effect(() => {
     if (!activeGroupId) panelHeight = 0;
   });
-
-  const selectEmbeddedGroup = (group: EventGroup) => {
-    selectedGroup = selectedGroup?.id === group.id ? undefined : group;
-  };
 
   // Open detail panel pushes rows below the active one down by panelHeight.
   // reverseSort flips "below" to i < activeIdx.
@@ -748,8 +738,7 @@
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
-                  onSelect={onSelectGroup ??
-                    (embeddedSelection ? selectEmbeddedGroup : undefined)}
+                  onSelect={onSelectGroup}
                 />
               {/if}
             </li>
@@ -845,11 +834,6 @@
                 group={toEventGroup(activeGroup)}
                 {canvasWidth}
                 endTime={workflow?.endTime ? endTime : nowMs}
-                onClose={embeddedSelection
-                  ? () => {
-                      selectedGroup = undefined;
-                    }
-                  : undefined}
                 onHeight={(height) => {
                   panelHeight = height;
                 }}

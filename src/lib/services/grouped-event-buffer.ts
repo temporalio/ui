@@ -310,11 +310,14 @@ function shouldNotAddBillableAction(event: WorkflowEvent): boolean {
   return Number(event.id) < Number(failedEvent.eventId);
 }
 
-function formatEventGroupMarkerPresentationLabel(
-  name: string,
+function getInboundMarkerPresentationLabel(
+  specificName: unknown,
+  fallbackEventType: string,
   id: string,
 ): string {
-  return `${name} (${id})`;
+  return typeof specificName === 'string' && specificName
+    ? `${specificName} (${id})`
+    : fallbackEventType;
 }
 
 function indexEventGroupMarkerPresentationLabel(event: WorkflowEvent): void {
@@ -323,7 +326,8 @@ function indexEventGroupMarkerPresentationLabel(event: WorkflowEvent): void {
 
   if (event.eventType === 'WorkflowExecutionStarted') {
     markerKey = `event:${event.id}`;
-    presentationLabel = formatEventGroupMarkerPresentationLabel(
+    presentationLabel = getInboundMarkerPresentationLabel(
+      undefined,
       event.eventType,
       event.id,
     );
@@ -331,10 +335,9 @@ function indexEventGroupMarkerPresentationLabel(event: WorkflowEvent): void {
     const signalName = (event.attributes as { signalName?: unknown })
       .signalName;
     markerKey = `event:${event.id}`;
-    presentationLabel = formatEventGroupMarkerPresentationLabel(
-      typeof signalName === 'string' && signalName
-        ? signalName
-        : event.eventType,
+    presentationLabel = getInboundMarkerPresentationLabel(
+      signalName,
+      event.eventType,
       event.id,
     );
   } else if (event.eventType === 'WorkflowExecutionUpdateAdmitted') {
@@ -350,10 +353,9 @@ function indexEventGroupMarkerPresentationLabel(event: WorkflowEvent): void {
     if (typeof updateId !== 'string' || !updateId) return;
     const updateName = request?.input?.name;
     markerKey = `update:${updateId}`;
-    presentationLabel = formatEventGroupMarkerPresentationLabel(
-      typeof updateName === 'string' && updateName
-        ? updateName
-        : event.eventType,
+    presentationLabel = getInboundMarkerPresentationLabel(
+      updateName,
+      event.eventType,
       updateId,
     );
   } else if (event.eventType === 'WorkflowExecutionUpdateAccepted') {
@@ -380,10 +382,9 @@ function indexEventGroupMarkerPresentationLabel(event: WorkflowEvent): void {
     ) {
       return;
     }
-    presentationLabel = formatEventGroupMarkerPresentationLabel(
-      typeof updateName === 'string' && updateName
-        ? updateName
-        : event.eventType,
+    presentationLabel = getInboundMarkerPresentationLabel(
+      updateName,
+      event.eventType,
       updateId,
     );
   }
