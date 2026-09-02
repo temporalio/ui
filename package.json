@@ -289,6 +289,26 @@
       "types": "./dist/io/badge/index.d.ts",
       "import": "./dist/io/badge/index.js"
     },
+    "./io/badge-count": {
+      "types": "./dist/io/badge-count/index.d.ts",
+      "import": "./dist/io/badge-count/index.js"
+    },
+    "./io/badge-status": {
+      "types": "./dist/io/badge-status/index.d.ts",
+      "import": "./dist/io/badge-status/index.js"
+    },
+    "./io/chip": {
+      "types": "./dist/io/chip/index.d.ts",
+      "import": "./dist/io/chip/index.js"
+    },
+    "./io/chip-status": {
+      "types": "./dist/io/chip-status/index.d.ts",
+      "import": "./dist/io/chip-status/index.js"
+    },
+    "./io/tag": {
+      "types": "./dist/io/tag/index.d.ts",
+      "import": "./dist/io/tag/index.js"
+    },
     "./*.svelte": {
       "types": "./dist/*.svelte.d.ts",
       "svelte": "./dist/*.svelte"

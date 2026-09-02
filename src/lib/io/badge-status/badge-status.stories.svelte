@@ -8,11 +8,10 @@
     IconHeartbeat,
   } from '$lib/io/icon';
 
-  import type { StatusBadgeStatus } from './types';
+  import type { BadgeStatusValue } from './badge-status.svelte';
+  import BadgeStatus from './badge-status.svelte';
 
-  import StatusBadge from './status-badge.svelte';
-
-  const statuses: StatusBadgeStatus[] = [
+  const statuses: BadgeStatusValue[] = [
     'Running',
     'Paused',
     'Completed',
@@ -24,8 +23,8 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'Io/Badge/Status Badge',
-    component: StatusBadge,
+    title: 'Io/Badge Status',
+    component: BadgeStatus,
     args: {
       status: 'Running',
     },
@@ -42,9 +41,9 @@
   });
 </script>
 
-{#snippet template(args: ComponentProps<typeof StatusBadge>)}
-  <div class="bg-background-primary p-6 text-primary">
-    <StatusBadge {...args} />
+{#snippet template(args: ComponentProps<typeof BadgeStatus>)}
+  <div class="border border-primary bg-surface-primary p-6 text-primary">
+    <BadgeStatus {...args} />
   </div>
 {/snippet}
 
@@ -65,11 +64,13 @@
 
 <Story name="Statuses">
   {#snippet template()}
-    <div class="flex flex-wrap items-center gap-4 bg-background-primary p-6">
+    <div
+      class="flex flex-wrap items-center gap-4 border border-primary bg-surface-primary p-6"
+    >
       {#each statuses as status (status)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{status}</span>
-          <StatusBadge {status} />
+          <BadgeStatus {status} />
         </div>
       {/each}
     </div>

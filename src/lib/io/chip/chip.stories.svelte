@@ -2,35 +2,33 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
-  import {
-    IconAwsColor,
-    IconExclamationOctagon,
-    IconHeartbeat,
-  } from '$lib/io/icon';
+  import { IconClose, IconRegions } from '$lib/io/icon';
 
-  import type { BadgeColorScheme } from './badge.svelte';
-  import Badge from './badge.svelte';
+  import type { ChipColorScheme } from './chip.svelte';
+  import Chip from './chip.svelte';
 
-  const colorSchemes: BadgeColorScheme[] = [
+  const colorSchemes: ChipColorScheme[] = [
     'neutral',
     'info',
     'success',
     'warning',
     'danger',
     'error',
-    'accent',
   ];
 
   const { Story } = defineMeta({
-    title: 'Io/Badge',
-    component: Badge,
+    title: 'Io/Chip',
+    component: Chip,
     args: {
-      text: 'badge',
+      text: 'chip',
       colorScheme: 'neutral',
+      extension: { text: 'ext' },
+      disabled: false,
     },
     argTypes: {
       text: { control: 'text' },
       colorScheme: { control: 'select', options: colorSchemes },
+      disabled: { control: 'boolean' },
       Icon: { control: false },
       extension: { control: 'object' },
       class: { table: { disable: true } },
@@ -42,27 +40,13 @@
   });
 </script>
 
-{#snippet template(args: ComponentProps<typeof Badge>)}
+{#snippet template(args: ComponentProps<typeof Chip>)}
   <div class="border border-primary bg-surface-primary p-6 text-primary">
-    <Badge {...args} />
+    <Chip {...args} />
   </div>
 {/snippet}
 
 <Story name="Playground" />
-
-<Story name="With icon" args={{ Icon: IconHeartbeat }} />
-
-<Story
-  name="With extension"
-  args={{
-    Icon: IconHeartbeat,
-    extension: {
-      text: '987',
-      LeadIcon: IconAwsColor,
-      TrailIcon: IconExclamationOctagon,
-    },
-  }}
-/>
 
 <Story name="Color schemes">
   {#snippet template()}
@@ -72,10 +56,11 @@
       {#each colorSchemes as colorScheme (colorScheme)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{colorScheme}</span>
-          <Badge
+          <Chip
             {colorScheme}
-            text="badge"
-            extension={{ text: '987', TrailIcon: IconExclamationOctagon }}
+            text="chip"
+            Icon={IconRegions}
+            extension={{ text: 'ext', Icon: IconClose }}
           />
         </div>
       {/each}

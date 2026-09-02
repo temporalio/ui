@@ -2,11 +2,10 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
-  import type { TagBadgeVariant } from './types';
+  import type { TagColorScheme } from './tag.svelte';
+  import Tag from './tag.svelte';
 
-  import TagBadge from './tag-badge.svelte';
-
-  const variants: TagBadgeVariant[] = [
+  const colorSchemes: TagColorScheme[] = [
     'neutral',
     'info',
     'success',
@@ -16,15 +15,15 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'Io/Badge/Tag Badge',
-    component: TagBadge,
+    title: 'Io/Tag',
+    component: Tag,
     args: {
       text: 'tag',
-      variant: 'neutral',
+      colorScheme: 'neutral',
     },
     argTypes: {
       text: { control: 'text' },
-      variant: { control: 'select', options: variants },
+      colorScheme: { control: 'select', options: colorSchemes },
       Icon: { control: false },
       extension: { control: 'object' },
       class: { table: { disable: true } },
@@ -36,9 +35,9 @@
   });
 </script>
 
-{#snippet template(args: ComponentProps<typeof TagBadge>)}
-  <div class="bg-background-primary p-6 text-primary">
-    <TagBadge {...args} />
+{#snippet template(args: ComponentProps<typeof Tag>)}
+  <div class="border border-primary bg-surface-primary p-6 text-primary">
+    <Tag {...args} />
   </div>
 {/snippet}
 
@@ -51,13 +50,15 @@
   args={{ Icon: null, extension: { text: 'extension', Icon: null } }}
 />
 
-<Story name="Variants">
+<Story name="Color schemes">
   {#snippet template()}
-    <div class="flex flex-wrap items-center gap-4 bg-background-primary p-6">
-      {#each variants as variant (variant)}
+    <div
+      class="flex flex-wrap items-center gap-4 border border-primary bg-surface-primary p-6"
+    >
+      {#each colorSchemes as colorScheme (colorScheme)}
         <div class="flex flex-col items-start gap-2">
-          <span class="text-xs text-secondary">{variant}</span>
-          <TagBadge {variant} text="tag" extension={{ text: 'extension' }} />
+          <span class="text-xs text-secondary">{colorScheme}</span>
+          <Tag {colorScheme} text="tag" extension={{ text: 'extension' }} />
         </div>
       {/each}
     </div>
