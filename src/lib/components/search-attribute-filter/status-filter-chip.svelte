@@ -125,7 +125,7 @@
     class="min-w-0 max-w-full bg-surface-secondary"
     title="{attribute} = {statusValues}"
   >
-    <span class="truncate">{attribute} =</span><span
+    <span class="truncate text-primary">{attribute} =</span><span
       class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
       >{statusValues}</span
     >

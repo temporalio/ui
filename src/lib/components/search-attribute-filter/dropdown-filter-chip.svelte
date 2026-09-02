@@ -355,7 +355,8 @@
       localFilter,
     )}"
   >
-    <span class="truncate">{getDisplayKeyWithConditional(localFilter)}</span
+    <span class="truncate text-primary"
+      >{getDisplayKeyWithConditional(localFilter)}</span
     ><span class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
       >{getDisplayValue(localFilter)}</span
     >
