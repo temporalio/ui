@@ -285,6 +285,10 @@
       "types": "./dist/io/icon/index.d.ts",
       "import": "./dist/io/icon/index.js"
     },
+    "./io/badge": {
+      "types": "./dist/io/badge/index.d.ts",
+      "import": "./dist/io/badge/index.js"
+    },
     "./*.svelte": {
       "types": "./dist/*.svelte.d.ts",
       "svelte": "./dist/*.svelte"
