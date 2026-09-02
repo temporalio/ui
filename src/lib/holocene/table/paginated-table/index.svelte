@@ -14,6 +14,7 @@
     maxHeight?: string;
     fixed?: boolean;
     class?: ClassNameValue;
+    tableClass?: string;
     caption?: Snippet;
     headers?: Snippet<[{ visibleItems: Item[] }]>;
     children?: Snippet;
@@ -31,6 +32,7 @@
     maxHeight = '',
     fixed = false,
     class: className = '',
+    tableClass = '',
     caption,
     headers,
     children,
@@ -81,6 +83,7 @@
   {:else}
     <Table
       bordered={false}
+      class={tableClass}
       {updating}
       {fixed}
       {caption}

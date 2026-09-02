@@ -264,6 +264,7 @@
   visibleItems={$store.visibleItems}
   maxHeight={maximizable && $maximized ? '100%' : maxHeight}
   class={merge(maximizable && 'rounded-none border-0 border-t')}
+  tableClass={maximizable ? 'rounded-none' : ''}
   {id}
   {caption}
   {headers}
