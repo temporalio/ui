@@ -363,6 +363,13 @@ export const Strings = {
   'event-groups': 'Event Groups',
   'event-group-event-count_one': '{{count, number}} event',
   'event-group-event-count_other': '{{count, number}} events',
+  'event-group-failed-count': '{{count, number}} Failed',
+  'event-group-timed-out-count': '{{count, number}} Timed Out',
+  'event-group-retry-count_one': '{{count, number}} Retry',
+  'event-group-retry-count_other': '{{count, number}} Retries',
+  'event-group-canceled-count': '{{count, number}} Canceled',
+  'event-group-terminated-count': '{{count, number}} Terminated',
+  'event-group-paused-count': '{{count, number}} Paused',
   minimized: 'Minimized',
   expanded: 'Expanded',
   'timeline-minimized':

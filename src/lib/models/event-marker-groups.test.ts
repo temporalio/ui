@@ -12,6 +12,7 @@ import {
   eventMatchesEventGroupFilter,
   getEventGroupMarkerKey,
   getEventGroupMarkerPresentation,
+  getEventMarkerGroupStatusSummary,
   lifecycleGroupMatchesEventGroupFilter,
 } from './event-marker-groups';
 
@@ -35,6 +36,7 @@ const createEvent = (
 const createLifecycleGroup = (
   id: string,
   eventList: WorkflowEvent[],
+  overrides: Partial<EventGroup> = {},
 ): EventGroup =>
   ({
     id,
@@ -60,6 +62,7 @@ const createLifecycleGroup = (
     links: [],
     billableActions: 0,
     eventCount: eventList.length,
+    ...overrides,
   }) as EventGroup;
 
 const createAttribution = (
@@ -219,6 +222,64 @@ describe('createTimelineEventMarkerGroups', () => {
     );
 
     expect(group.isPending).toBe(true);
+  });
+
+  it('summarizes exceptional lifecycle group states', () => {
+    const failed = createEvent('1');
+    failed.classification = 'Failed';
+    const retryStarted = createEvent('2');
+    Object.assign(retryStarted, {
+      eventType: 'ActivityTaskStarted',
+      name: 'ActivityTaskStarted',
+      classification: 'Started',
+      activityTaskStartedEventAttributes: { attempt: 3 },
+      attributes: { attempt: 3 },
+    });
+    const timedOut = createEvent('6');
+    timedOut.classification = 'TimedOut';
+    const canceled = createEvent('3');
+    const terminated = createEvent('4');
+    const paused = createEvent('5');
+
+    expect(
+      getEventMarkerGroupStatusSummary([
+        createLifecycleGroup('1', [failed]),
+        createLifecycleGroup('2', [retryStarted, timedOut]),
+        createLifecycleGroup('3', [canceled], { isCanceled: true }),
+        createLifecycleGroup('4', [terminated], { isTerminated: true }),
+        createLifecycleGroup('5', [paused], {
+          isPending: true,
+          pendingActivity: { paused: true } as never,
+        }),
+      ]),
+    ).toEqual({
+      failed: 1,
+      timedOut: 1,
+      retries: 2,
+      canceled: 1,
+      terminated: 1,
+      paused: 1,
+    });
+  });
+
+  it('reuses a lifecycle group status summary until its identity changes', () => {
+    const event = createEvent('1');
+    let classificationReads = 0;
+    Object.defineProperty(event, 'classification', {
+      get: () => {
+        classificationReads++;
+        return 'Failed';
+      },
+    });
+    const lifecycleGroup = createLifecycleGroup('1', [event]);
+
+    getEventMarkerGroupStatusSummary([lifecycleGroup]);
+    const readsAfterFirstSummary = classificationReads;
+    getEventMarkerGroupStatusSummary([lifecycleGroup]);
+    expect(classificationReads).toBe(readsAfterFirstSummary);
+
+    getEventMarkerGroupStatusSummary([{ ...lifecycleGroup }]);
+    expect(classificationReads).toBeGreaterThan(readsAfterFirstSummary);
   });
 
   it('uses a label payload found on any occurrence of a marker', () => {

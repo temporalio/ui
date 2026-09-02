@@ -4,13 +4,32 @@ import type {
 } from '$lib/models/event-groups/event-groups';
 import type { Payload } from '$lib/types';
 import type { EventGroupMarker, WorkflowEvent } from '$lib/types/events';
+import { isActivityTaskStartedEvent } from '$lib/utilities/is-event-type';
 
 export interface TimelineEventMarkerGroup extends EventGroup {
   eventMarker: true;
   markerKey: string;
   eventGroupMarker: EventGroupMarker;
   lifecycleGroups: EventGroups;
+  statusSummary: EventMarkerGroupStatusSummary;
 }
+
+export type EventMarkerGroupStatusSummary = {
+  failed: number;
+  timedOut: number;
+  retries: number;
+  canceled: number;
+  terminated: number;
+  paused: number;
+};
+
+// Materialized lifecycle groups keep their identity until their contents change.
+// Weak keys let overlapping marker groups share the event scan without retaining
+// obsolete lifecycle groups after the event buffer rematerializes them.
+const lifecycleGroupStatusSummaryCache = new WeakMap<
+  EventGroup,
+  EventMarkerGroupStatusSummary
+>();
 
 type MarkerIdentity = EventGroupMarkerPresentation & {
   eventGroupMarker: EventGroupMarker;
@@ -125,6 +144,75 @@ const toStandaloneLifecycleGroup = (event: WorkflowEvent): EventGroup => ({
   eventCount: 1,
 });
 
+const attemptNumber = (value: unknown): number => {
+  const attempt = Number(value);
+  return Number.isFinite(attempt) && attempt > 0 ? attempt : 0;
+};
+
+const getLifecycleGroupStatusSummary = (
+  group: EventGroup,
+): EventMarkerGroupStatusSummary => {
+  const cached = lifecycleGroupStatusSummaryCache.get(group);
+  if (cached) return cached;
+
+  const summary: EventMarkerGroupStatusSummary = {
+    failed: 0,
+    timedOut: 0,
+    retries: 0,
+    canceled: 0,
+    terminated: 0,
+    paused: 0,
+  };
+
+  let highestAttempt = Math.max(
+    attemptNumber(group.pendingActivity?.attempt),
+    attemptNumber(group.pendingNexusOperation?.attempt),
+  );
+  for (const event of group.eventList) {
+    const classification = event.classification;
+    summary.failed ||= Number(classification === 'Failed');
+    summary.timedOut ||= Number(classification === 'TimedOut');
+    if (isActivityTaskStartedEvent(event)) {
+      highestAttempt = Math.max(
+        highestAttempt,
+        attemptNumber(event.attributes.attempt),
+      );
+    }
+  }
+  summary.canceled = Number(group.isCanceled);
+  summary.terminated = Number(group.isTerminated);
+  summary.paused = Number(Boolean(group.pendingActivity?.paused));
+  summary.retries = Math.max(0, highestAttempt - 1);
+
+  lifecycleGroupStatusSummaryCache.set(group, summary);
+  return summary;
+};
+
+export const getEventMarkerGroupStatusSummary = (
+  lifecycleGroups: EventGroups,
+): EventMarkerGroupStatusSummary => {
+  const summary: EventMarkerGroupStatusSummary = {
+    failed: 0,
+    timedOut: 0,
+    retries: 0,
+    canceled: 0,
+    terminated: 0,
+    paused: 0,
+  };
+
+  for (const group of lifecycleGroups) {
+    const groupSummary = getLifecycleGroupStatusSummary(group);
+    summary.failed += groupSummary.failed;
+    summary.timedOut += groupSummary.timedOut;
+    summary.retries += groupSummary.retries;
+    summary.canceled += groupSummary.canceled;
+    summary.terminated += groupSummary.terminated;
+    summary.paused += groupSummary.paused;
+  }
+
+  return summary;
+};
+
 const toTimelineEventMarkerGroup = (
   marker: MarkerAccumulator,
 ): TimelineEventMarkerGroup | undefined => {
@@ -145,6 +233,7 @@ const toTimelineEventMarkerGroup = (
     markerKey: marker.key,
     eventGroupMarker: marker.eventGroupMarker,
     lifecycleGroups,
+    statusSummary: getEventMarkerGroupStatusSummary(lifecycleGroups),
     id: `event-marker:${marker.key}`,
     name: marker.displayName,
     label: marker.displayName,

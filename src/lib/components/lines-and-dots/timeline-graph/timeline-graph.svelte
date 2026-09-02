@@ -3,7 +3,9 @@
 
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import type { I18nKey } from '$lib/i18n';
   import { translate } from '$lib/i18n/translate';
   import { IconClock, IconClose } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
@@ -26,14 +28,8 @@
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
-  import { EVENT_GROUP_COLOR } from '../colors';
   import EndTimeInterval from '../end-time-interval.svelte';
-  import {
-    EVENT_GROUP_LINE_HEIGHT,
-    GUTTER,
-    RADIUS,
-    ROW_HEIGHT,
-  } from './constants';
+  import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
   import {
     getDescStart,
     getPendingBlockY,
@@ -101,14 +97,17 @@
   }: Props = $props();
 
   const DOT_STROKE = 2; // dot border
-  const EVENT_GROUP_HEADER_HEIGHT = 32;
+  const EVENT_GROUP_HEADER_MIN_HEIGHT = 32;
   const EVENT_GROUP_HEADER_SPACING = 16;
   const EVENT_GROUP_FOOTER_SPACING = 16;
+  const EVENT_GROUP_ROW_OVERFLOW = Math.max(0, (RADIUS * 3 - ROW_HEIGHT) / 2);
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
 
   let canvasWidth = $state(0);
+  let eventGroupHeaderEl = $state<HTMLDivElement | null>(null);
+  let eventGroupHeaderHeight = $state(EVENT_GROUP_HEADER_MIN_HEIGHT);
 
   // Width via ResizeObserver, not bind:clientWidth: the latter reads clientWidth
   // in every reactive flush, forcing a full sync layout of the tall canvas.
@@ -136,6 +135,22 @@
       observer.disconnect();
       cancelAnimationFrame(rafId);
     };
+  });
+
+  $effect(() => {
+    if (!selectedEventGroup || !eventGroupHeaderEl) {
+      eventGroupHeaderHeight = EVENT_GROUP_HEADER_MIN_HEIGHT;
+      return;
+    }
+
+    const observer = new ResizeObserver(([entry]) => {
+      eventGroupHeaderHeight = Math.max(
+        EVENT_GROUP_HEADER_MIN_HEIGHT,
+        Math.ceil(entry.contentRect.height),
+      );
+    });
+    observer.observe(eventGroupHeaderEl);
+    return () => observer.disconnect();
   });
 
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
@@ -347,14 +362,19 @@
     getTotalForY(filteredGroups.length, pendingGroupCount, descStart),
   );
 
+  const eventGroupExpansionHeight = $derived(
+    selectedEventGroup
+      ? EVENT_GROUP_ROW_OVERFLOW +
+          eventGroupHeaderHeight +
+          EVENT_GROUP_HEADER_SPACING
+      : 0,
+  );
+
   // Widen the mount window by the panel's row span: shiftFor moves rows down but
   // getWindowBounds maps on the unshifted y, so without this they'd leave a blank.
   const windowOverscan = $derived(
     OVERSCAN +
-      Math.ceil(
-        (panelHeight + (selectedEventGroup ? EVENT_GROUP_HEADER_SPACING : 0)) /
-          ROW_HEIGHT,
-      ) +
+      Math.ceil((panelHeight + eventGroupExpansionHeight) / ROW_HEIGHT) +
       Math.ceil(
         (selectedEventGroup ? EVENT_GROUP_FOOTER_SPACING : 0) / ROW_HEIGHT,
       ),
@@ -369,7 +389,7 @@
     ) +
       panelHeight +
       (selectedEventGroup
-        ? EVENT_GROUP_HEADER_SPACING + EVENT_GROUP_FOOTER_SPACING
+        ? eventGroupExpansionHeight + EVENT_GROUP_FOOTER_SPACING
         : 0),
   );
   const AXIS_LABEL_ZONE = 150;
@@ -540,17 +560,24 @@
     const headerIndex = groupIndexMap.get(selectedEventGroup.id) ?? -1;
     if (headerIndex < 0) return undefined;
 
-    let bottomIndex = -1;
-    let top = Number.POSITIVE_INFINITY;
-    let bottom = Number.NEGATIVE_INFINITY;
+    const headerTop =
+      getY(headerIndex) +
+      shiftFor(headerIndex) +
+      ROW_HEIGHT / 2 +
+      EVENT_GROUP_ROW_OVERFLOW;
+    let bottomIndex = headerIndex;
+    let bottom = headerTop + eventGroupHeaderHeight;
 
     for (let index = 0; index < filteredGroups.length; index++) {
-      if (!selectedEventGroupRowIds.has(filteredGroups[index].id)) continue;
-
+      const groupId = filteredGroups[index].id;
       if (
-        bottomIndex === -1 ||
-        (reverseSort ? index < bottomIndex : index > bottomIndex)
+        groupId === selectedEventGroup.id ||
+        !selectedEventGroupRowIds.has(groupId)
       ) {
+        continue;
+      }
+
+      if (reverseSort ? index < bottomIndex : index > bottomIndex) {
         bottomIndex = index;
       }
 
@@ -560,12 +587,9 @@
       const centerY =
         getY(index) +
         shiftFor(index) +
-        (belowHeader ? EVENT_GROUP_HEADER_SPACING : 0);
-      top = Math.min(top, centerY - ROW_HEIGHT / 2);
+        (belowHeader ? eventGroupExpansionHeight : 0);
       bottom = Math.max(bottom, centerY + ROW_HEIGHT / 2 + 4);
     }
-
-    if (bottomIndex === -1) return undefined;
 
     if (
       panelHeight > 0 &&
@@ -578,7 +602,7 @@
       bottom = Math.max(
         bottom,
         getY(activeIdx) +
-          (activeBelowHeader ? EVENT_GROUP_HEADER_SPACING : 0) +
+          (activeBelowHeader ? eventGroupExpansionHeight : 0) +
           1.33 * RADIUS +
           panelHeight +
           4,
@@ -589,9 +613,9 @@
       headerIndex,
       bottomIndex,
       bounds: {
-        headerTop: top,
-        outlineTop: top + EVENT_GROUP_HEADER_HEIGHT,
-        outlineHeight: Math.max(0, bottom - top - EVENT_GROUP_HEADER_HEIGHT),
+        headerTop,
+        outlineTop: headerTop + eventGroupHeaderHeight,
+        outlineHeight: Math.max(0, bottom - headerTop - eventGroupHeaderHeight),
       },
     };
   });
@@ -600,7 +624,7 @@
     const headerIndex = selectedEventGroupLayout?.headerIndex ?? -1;
     if (headerIndex < 0) return 0;
     const belowHeader = reverseSort ? i < headerIndex : i > headerIndex;
-    return belowHeader ? EVENT_GROUP_HEADER_SPACING : 0;
+    return belowHeader ? eventGroupExpansionHeight : 0;
   }
 
   function eventGroupFooterShiftFor(i: number): number {
@@ -621,10 +645,74 @@
   const selectedEventGroupDuration = $derived(
     formatEventGroupDuration({
       group: selectedEventGroup,
-      endTime: workflow.endTime ?? nowMs,
+      endTime: workflow.endTime || nowMs,
       includeMilliseconds: true,
     }),
   );
+
+  type EventGroupStatusBadge = {
+    key: string;
+    label: string;
+    type: BadgeType;
+  };
+
+  const selectedEventGroupStatusBadges = $derived.by(() => {
+    const summary = selectedEventGroup?.statusSummary;
+    if (!summary) return [];
+
+    const badges: EventGroupStatusBadge[] = [];
+    const addBadge = (
+      key: string,
+      labelKey: I18nKey,
+      count: number,
+      type: BadgeType,
+    ): void => {
+      if (!count) return;
+      badges.push({
+        key,
+        label: translate(labelKey, { count }),
+        type,
+      });
+    };
+
+    addBadge(
+      'canceled',
+      'workflows.event-group-canceled-count',
+      summary.canceled,
+      'subtle',
+    );
+    addBadge(
+      'failed',
+      'workflows.event-group-failed-count',
+      summary.failed,
+      'danger',
+    );
+    addBadge(
+      'paused',
+      'workflows.event-group-paused-count',
+      summary.paused,
+      'warning',
+    );
+    addBadge(
+      'retry',
+      'workflows.event-group-retry-count',
+      summary.retries,
+      'warning',
+    );
+    addBadge(
+      'terminated',
+      'workflows.event-group-terminated-count',
+      summary.terminated,
+      'danger',
+    );
+    addBadge(
+      'timed-out',
+      'workflows.event-group-timed-out-count',
+      summary.timedOut,
+      'warning',
+    );
+    return badges;
+  });
 
   // Border rails span the full timeline height so they meet the bottom axis.
   const lineTop = 0;
@@ -708,7 +796,7 @@
         {#if selectedEventGroupBounds?.outlineHeight}
           <div
             data-testid="event-group-row-backdrop"
-            class="pointer-events-none absolute box-content rounded-b-lg border-x-2 border-b-2 border-brand bg-brand/20"
+            class="pointer-events-none absolute rounded-b-lg border-x-2 border-b-2 border-brand bg-brand/15"
             style:left="{GUTTER - 8}px"
             style:top="{selectedEventGroupBounds.outlineTop}px"
             style:width="{canvasWidth - GUTTER * 2 + 16}px"
@@ -731,7 +819,7 @@
                 ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + rowShiftFor(slot.index)}px)`
                 : undefined}
             >
-              {#if slot && slot.group.id !== selectedEventGroup?.id}
+              {#if slot}
                 <TimelineGraphRow
                   group={toEventGroup(slot.group)}
                   eventCount={eventCount(slot.group)}
@@ -748,38 +836,47 @@
         {#if selectedEventGroup && selectedEventGroupBounds}
           <div
             data-testid="selected-event-group-header"
-            class={twMerge(
-              'absolute z-10 box-content flex min-w-0 items-center justify-between border-x-2 border-t border-brand bg-slate-50 text-sm dark:bg-slate-800',
-              selectedEventGroup.isPending && 'border-t-transparent',
-            )}
+            bind:this={eventGroupHeaderEl}
+            class="absolute z-10 box-content flex min-w-0 items-start justify-between bg-slate-50 text-sm dark:bg-slate-800"
             style:left="{GUTTER - 8}px"
             style:top="{selectedEventGroupBounds.headerTop}px"
             style:width="{canvasWidth - GUTTER * 2 + 16}px"
-            style:height="{EVENT_GROUP_HEADER_HEIGHT}px"
-            style:border-top-width="{EVENT_GROUP_LINE_HEIGHT}px"
+            style:min-height="{EVENT_GROUP_HEADER_MIN_HEIGHT}px"
           >
-            <div class="flex h-full min-w-0 flex-1 items-center gap-4 px-2">
+            <div
+              class="flex min-h-8 min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1 px-2 py-1"
+            >
               <PayloadSummary
                 value={selectedEventGroup.userMetadata?.summary}
                 fallback={selectedEventGroup.displayName}
               >
                 {#snippet children(decodedValue)}
-                  <span class="min-w-0 truncate" title={decodedValue}
+                  <span class="min-w-0 max-w-full whitespace-normal break-words"
                     >{decodedValue}</span
                   >
                 {/snippet}
               </PayloadSummary>
-              <span class="shrink-0">
-                {translate('workflows.event-group-event-count', {
-                  count: selectedEventGroup.eventList.length,
-                })}
-              </span>
               {#if selectedEventGroupDuration}
                 <span class="flex shrink-0 items-center gap-1">
                   <IconClock />
                   {selectedEventGroupDuration}
                 </span>
               {/if}
+              {#if selectedEventGroupStatusBadges.length}
+                {#each selectedEventGroupStatusBadges as badge (badge.key)}
+                  <Badge
+                    type={badge.type}
+                    class="shrink-0 px-1.5 py-0.5 text-xs"
+                  >
+                    {badge.label}
+                  </Badge>
+                {/each}
+              {/if}
+              <span class="shrink-0">
+                {translate('workflows.event-group-event-count', {
+                  count: selectedEventGroup.eventList.length,
+                })}
+              </span>
             </div>
             <div class="flex shrink-0 items-center gap-4">
               <Button
@@ -792,15 +889,6 @@
                 <IconClose />
               </Button>
             </div>
-            {#if selectedEventGroup.isPending}
-              <div
-                aria-hidden="true"
-                class="tl-line tl-line--animate tl-line--dashed tl-line--square pointer-events-none absolute -inset-x-0.5 z-20"
-                style:top="-{EVENT_GROUP_LINE_HEIGHT}px"
-                style:height="{EVENT_GROUP_LINE_HEIGHT}px"
-                style:--tl-line-color={EVENT_GROUP_COLOR}
-              ></div>
-            {/if}
           </div>
         {/if}
 
