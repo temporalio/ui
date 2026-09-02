@@ -114,7 +114,7 @@
   >
     Add Filter
   </MenuButton>
-  <Menu id="{id}-search-attribute-menu">
+  <Menu id="{id}-search-attribute-menu" usePortal>
     <MenuItem
       class="p-0"
       hoverable={false}
