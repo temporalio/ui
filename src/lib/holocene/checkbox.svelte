@@ -105,7 +105,7 @@
         'items-center',
         'gap-3',
         'text-sm',
-        'leading-[18px]',
+        'leading-5',
         'min-h-6',
         'min-w-6',
         'group',
@@ -140,17 +140,16 @@
         [
           'relative',
           'rounded-sm',
-          'box-content',
+          'box-border',
           'flex',
-          'h-4',
-          'w-4',
+          'h-5',
+          'w-5',
           'flex-none',
           'cursor-pointer',
-          'border-2',
+          'border',
           'border-secondary',
-          'bg-interactive-secondary',
-          'text-white',
-          'bg-clip-padding',
+          'bg-background-primary',
+          'text-inverse-primary',
           'peer-indeterminate:border-interactive-primary',
           'peer-indeterminate:bg-interactive-primary',
           'peer-checked:border-interactive-primary',
@@ -162,21 +161,22 @@
             'peer-focus-visible:ring-interactive-primary',
             'peer-focus-visible:ring-offset-2',
             'peer-focus-visible:ring-offset-background-primary',
+            'peer-focus-visible:shadow-sm',
           ],
         !disabled &&
           valid && [
             'group-hover:border-tertiary',
             'peer-focus-visible:border-tertiary',
-            'group-hover:peer-checked:border-primary',
-            'group-hover:peer-indeterminate:border-primary',
+            'group-hover:peer-checked:border-interactive-primary',
+            'group-hover:peer-indeterminate:border-interactive-primary',
           ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
         !valid &&
-          'border-danger peer-checked:border-danger peer-indeterminate:border-danger peer-focus-visible:ring-2 peer-focus-visible:ring-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background-primary',
+          'border-danger peer-checked:border-danger peer-indeterminate:border-danger peer-focus-visible:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background-primary',
       )}
     >
       {#if CheckIcon}
-        <CheckIcon class="absolute left-0 top-0 h-4 w-4" />
+        <CheckIcon class="absolute inset-0 m-auto h-4 w-4" />
       {/if}
     </span>
 
@@ -184,8 +184,14 @@
       {@render flex()}
     {:else}
       <div>
-        <span class="label" class:sr-only={labelHidden}>
+        <span class:sr-only={labelHidden}>
           {label}
+          {#if required}
+            <span
+              aria-hidden="true"
+              class="ml-1 font-mono leading-none text-static-danger">*</span
+            >
+          {/if}
         </span>
         {#if description}
           <p class="text-sm font-normal text-secondary">
@@ -201,8 +207,9 @@
 </div>
 
 <style lang="postcss">
-  .peer:checked:focus-visible + .checkbox-control,
-  .peer:indeterminate:focus-visible + .checkbox-control {
-    @apply border-primary;
+  .peer:not([aria-invalid='true']):checked:focus-visible + .checkbox-control,
+  .peer:not([aria-invalid='true']):indeterminate:focus-visible
+    + .checkbox-control {
+    @apply border-interactive-primary;
   }
 </style>

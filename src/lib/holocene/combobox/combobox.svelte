@@ -23,7 +23,7 @@
       variants: {
         variant: {
           default:
-            'border-tertiary hover:border-brand focus-within:border-secondary',
+            'border-primary hover:border-brand focus-within:border-secondary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
           ghost:
             'border-transparent bg-transparent hover:bg-interactive-tertiary-hover focus-within:border-transparent focus-within:bg-transparent focus-within:ring-transparent',
         },
@@ -537,6 +537,7 @@
     <div
       class={merge(
         comboboxStyles({ variant }),
+        value.length > 0 && variant === 'default' && 'border-secondary',
         !valid &&
           variant === 'default' &&
           'border border-danger focus-within:border-danger focus-within:ring-danger hover:border-danger',

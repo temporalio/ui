@@ -67,12 +67,17 @@
     )}
     {...rest}
   >
-    <div class="flex w-full flex-row items-center">
+    <div class="flex w-full flex-row items-center rounded-[inherit]">
       <button
         id="{id}-trigger"
         aria-expanded={open}
         aria-controls="{id}-content"
-        class="flex grow flex-col p-4 hover:bg-interactive-secondary-hover focus-visible:bg-surface-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary disabled:cursor-not-allowed disabled:opacity-disabled disabled:hover:bg-transparent"
+        class={merge(
+          'flex grow flex-col rounded-tl-[inherit] p-4 hover:bg-interactive-secondary-hover focus-visible:bg-surface-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary disabled:cursor-not-allowed disabled:opacity-disabled disabled:hover:bg-transparent',
+          !action && 'rounded-tr-[inherit]',
+          !open && 'rounded-bl-[inherit]',
+          !open && !action && 'rounded-br-[inherit]',
+        )}
         type="button"
         {disabled}
         data-track-name="accordion"

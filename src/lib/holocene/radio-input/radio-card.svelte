@@ -6,6 +6,7 @@
 
   import type { RadioGroupContext } from './types';
 
+  import RadioControl from './radio-control.svelte';
   import { RADIO_GROUP_CONTEXT } from './radio-group.svelte';
 
   interface Props {
@@ -64,10 +65,9 @@
       )}
       for={id}
     >
-      <input
-        bind:group={$group}
-        type="radio"
-        class="radio-card-input mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border border-tertiary bg-interactive-secondary"
+      <RadioControl
+        {group}
+        class="mt-0.5 shrink-0"
         {name}
         {value}
         {id}
@@ -98,39 +98,3 @@
     </div>
   {/if}
 </div>
-
-<style lang="postcss">
-  .radio-card-input {
-    @apply box-border cursor-pointer outline-none;
-
-    &:checked {
-      @apply border-interactive-primary bg-interactive-primary shadow-[inset_0_0_0_1px] shadow-content-inverse-primary;
-    }
-
-    &:enabled {
-      &:focus-visible {
-        @apply ring-2 ring-interactive-primary ring-offset-2 ring-offset-background-primary;
-      }
-
-      &:hover:not(:checked) {
-        @apply border-brand bg-interactive-tertiary-hover;
-      }
-
-      &:active:not(:checked) {
-        @apply bg-interactive-tertiary-press;
-      }
-
-      &:checked:hover {
-        @apply border-interactive-primary-hover bg-interactive-primary-hover;
-      }
-
-      &:checked:active {
-        @apply border-interactive-primary-press bg-interactive-primary-press;
-      }
-    }
-
-    &:disabled {
-      @apply cursor-not-allowed opacity-50;
-    }
-  }
-</style>
