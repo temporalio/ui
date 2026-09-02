@@ -252,8 +252,6 @@
     &.error,
     &.invalid {
       @apply border-danger focus-within:border-danger;
-
-      box-shadow: inset 0 0 0 1px var(--color-border-primary);
     }
   }
 
@@ -262,11 +260,11 @@
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-primary px-4 py-2 text-secondary;
+    @apply block h-full w-fit rounded-l-[inherit] border-r border-primary px-4 py-2 text-secondary;
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-primary bg-surface-tertiary px-4 py-2;
+    @apply block h-full w-fit rounded-r-[inherit] border-l border-primary bg-surface-tertiary px-4 py-2;
   }
 
   .noBorder {

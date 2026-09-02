@@ -192,7 +192,7 @@
   {/if}
   <div
     class={twMerge(
-      'flex h-10 items-center rounded-sm border border-tertiary bg-interactive-secondary text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      'flex h-10 items-center rounded border border-tertiary bg-interactive-secondary text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
       !disabled && !error && 'focus-within:border-secondary hover:border-brand',
       disabled &&
         'cursor-not-allowed border-secondary bg-surface-tertiary text-tertiary',
@@ -213,7 +213,7 @@
     <select
       id="{id}-unit-select"
       class={twMerge(
-        'h-full bg-surface-secondary pl-2 text-primary focus-visible:outline-none disabled:cursor-not-allowed',
+        'h-full rounded-r-[inherit] bg-surface-secondary pl-2 text-primary focus-visible:outline-none disabled:cursor-not-allowed',
         disabled && 'bg-surface-tertiary text-tertiary',
       )}
       {disabled}

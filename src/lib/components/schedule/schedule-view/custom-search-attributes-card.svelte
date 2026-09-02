@@ -23,6 +23,7 @@
 </script>
 
 <Accordion
+  class="rounded-lg"
   title={translate('events.custom-search-attributes')}
   subtitle={`${searchAttributeCount} ${translate(
     'events.custom-search',

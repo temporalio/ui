@@ -27,8 +27,7 @@
         {translate('schedules.cron-view-example-description')}
       </p>
       <pre
-        class="w-full overflow-auto border border-secondary bg-surface-overlay-primary p-2 text-primary"
-        style:font-family="Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace"
+        class="w-full overflow-auto rounded-sm border border-secondary bg-surface-overlay-primary p-2 font-mono text-primary"
         style:font-size="0.875em">{translate(
           'schedules.cron-format-diagram',
         )}</pre>

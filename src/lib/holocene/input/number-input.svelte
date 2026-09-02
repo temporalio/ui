@@ -67,6 +67,7 @@
     <div
       class={merge(
         'relative box-border flex h-10 min-w-16 items-center rounded border border-primary bg-interactive-secondary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        units && 'rounded-r-none',
         !disabled &&
           !readonly &&
           valid &&
@@ -85,7 +86,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary"
+        class="focus:ring-none m-2 block w-full bg-transparent text-center text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary"
         type="number"
         {max}
         {min}
@@ -109,7 +110,7 @@
     {#if units}
       <div
         class={merge(
-          'flex h-10 items-center border-y border-r border-primary bg-surface-tertiary px-2 text-primary',
+          'flex h-10 items-center rounded-r border-y border-r border-primary bg-surface-tertiary px-2 text-primary',
           disabled && 'border-secondary text-tertiary',
         )}
       >
