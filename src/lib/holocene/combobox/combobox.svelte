@@ -3,7 +3,7 @@
 
   const comboboxStyles = cva(
     [
-      'bg-interactive-secondary',
+      'bg-background-primary',
       'flex',
       'max-h-28',
       'min-h-10',

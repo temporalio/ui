@@ -117,7 +117,7 @@
   <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
   <div
     class={merge(
-      'flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-tertiary bg-interactive-secondary p-2 text-sm text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      'flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-tertiary bg-background-primary p-2 text-sm text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
       !disabled &&
         !invalid &&
         'focus-within:border-secondary hover:border-brand',

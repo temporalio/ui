@@ -66,7 +66,7 @@
   <div class="flex items-center">
     <div
       class={merge(
-        'relative box-border flex h-10 min-w-16 items-center rounded border border-primary bg-interactive-secondary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        'relative box-border flex h-10 min-w-16 items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
         units && 'rounded-r-none',
         !disabled &&
           !readonly &&

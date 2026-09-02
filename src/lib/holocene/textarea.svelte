@@ -76,7 +76,7 @@
     <textarea
       bind:value
       class={merge(
-        'min-h-fit w-full rounded bg-interactive-secondary px-3 py-2 text-sm text-primary placeholder:text-tertiary focus-visible:outline-none',
+        'min-h-fit w-full rounded bg-background-primary px-3 py-2 text-sm text-primary placeholder:text-tertiary focus-visible:outline-none',
         readonly && !disabled && 'bg-surface-primary',
         disabled && 'cursor-not-allowed bg-surface-tertiary text-tertiary',
       )}

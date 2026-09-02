@@ -192,7 +192,7 @@
   {/if}
   <div
     class={twMerge(
-      'flex h-10 items-center rounded border border-tertiary bg-interactive-secondary text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      'flex h-10 items-center rounded border border-tertiary bg-background-primary text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
       !disabled && !error && 'focus-within:border-secondary hover:border-brand',
       disabled &&
         'cursor-not-allowed border-secondary bg-surface-tertiary text-tertiary',

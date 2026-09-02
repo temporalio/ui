@@ -133,7 +133,7 @@
     {#key $labelCtx}
       <MenuButton
         class={merge(
-          'w-full border-secondary bg-interactive-secondary text-primary focus-visible:border-secondary focus-visible:bg-interactive-secondary focus-visible:ring-interactive-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-primary disabled:opacity-disabled',
+          'w-full border-secondary bg-background-primary text-primary focus-visible:border-secondary focus-visible:bg-background-primary focus-visible:ring-interactive-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-tertiary disabled:opacity-disabled',
           !valid &&
             'border-danger focus-visible:border-danger focus-visible:ring-danger',
           menuButtonClass,
