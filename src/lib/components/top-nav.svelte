@@ -29,7 +29,7 @@
       'flex-row',
       'items-center justify-end',
       'border-b border-primary',
-      'px-8 py-1',
+      'h-[var(--top-nav-height)] px-8',
       className,
     )}
     data-testid="top-nav"

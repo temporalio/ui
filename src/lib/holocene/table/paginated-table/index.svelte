@@ -13,6 +13,7 @@
     updating?: boolean;
     maxHeight?: string;
     fixed?: boolean;
+    verticalScroll?: 'responsive' | 'table';
     class?: ClassNameValue;
     tableClass?: string;
     caption?: Snippet;
@@ -31,6 +32,7 @@
     updating = false,
     maxHeight = '',
     fixed = false,
+    verticalScroll = 'responsive',
     class: className = '',
     tableClass = '',
     caption,
@@ -44,15 +46,21 @@
     ...rest
   }: Props = $props();
 
+  const scrollsInTable = $derived(
+    verticalScroll === 'table' || (maxHeight !== '' && maxHeight !== 'none'),
+  );
+
   let tableContainer = $state<HTMLDivElement>();
   let footerHeight = $state(0);
 
-  const tableOffset = $derived(
-    tableContainer?.offsetTop ? tableContainer.offsetTop + 32 : 0,
-  );
-
   export function scrollToTop() {
-    tableContainer?.scrollTo({ top: 0, behavior: 'instant' });
+    if (!tableContainer) return;
+
+    if (tableContainer.scrollHeight > tableContainer.clientHeight) {
+      tableContainer.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+      tableContainer.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
   }
 </script>
 
@@ -62,17 +70,15 @@
 
 <div
   class={merge(
-    'min-h-[154px] grow overflow-auto rounded-lg border border-primary bg-background-primary text-primary',
+    'flex grow flex-col overflow-auto rounded-lg border border-primary bg-background-primary text-primary',
     className,
   )}
   id="{rest['id']}-container"
   bind:this={tableContainer}
-  style="max-height: {maxHeight ||
-    `calc(100vh - var(--layout-pt) - ${tableOffset}px)`};
-  scroll-padding-top: var(--table-header-h, 2.25rem);
-  scroll-padding-bottom: {footerHeight}px;
-
-  --table-header-h: 2.25rem;"
+  style:max-height={maxHeight || null}
+  style:scroll-padding-top="var(--table-header-h, 2.25rem)"
+  style:scroll-padding-bottom="{footerHeight}px"
+  style:--table-header-h="2.25rem"
 >
   {#if loading}
     {#if loadingContent}
@@ -82,8 +88,8 @@
     {/if}
   {:else}
     <Table
+      class={merge('shrink-0', tableClass)}
       bordered={false}
-      class={tableClass}
       {updating}
       {fixed}
       {caption}
@@ -94,7 +100,10 @@
     </Table>
     {#if visibleItems.length}
       <div
-        class="sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-primary bg-surface-primary px-4 py-2 text-primary"
+        class={merge(
+          'sticky left-0 flex w-full shrink-0 flex-wrap items-center justify-between gap-2 border-t border-primary bg-surface-primary px-4 py-2 text-primary',
+          scrollsInTable ? 'bottom-0 mt-auto' : 'md:bottom-0 md:mt-auto',
+        )}
         bind:clientHeight={footerHeight}
       >
         {@render actionsStart?.()}
@@ -102,7 +111,7 @@
         {@render actionsEnd?.()}
       </div>
     {:else}
-      <div style="height: calc(100% - var(--table-header-h));">
+      <div class="sticky left-0 flex w-full grow flex-col justify-center">
         {@render empty?.()}
       </div>
     {/if}

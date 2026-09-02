@@ -138,7 +138,7 @@
   });
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex min-h-0 grow flex-col gap-4">
   <div class="flex items-center gap-2">
     <Link
       href={activitiesHref}

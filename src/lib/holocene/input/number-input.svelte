@@ -86,7 +86,7 @@
         </span>
       {/if}
       <input
-        class="focus:ring-none m-2 block w-full bg-transparent text-center text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary"
+        class="m-2 block w-full bg-transparent text-center text-primary placeholder:text-tertiary focus:outline-none focus:ring-0 disabled:text-tertiary"
         type="number"
         {max}
         {min}
