@@ -17,6 +17,7 @@
       'focus-within:outline-none',
       'focus-within:ring-2',
       'focus-within:ring-interactive-primary',
+      'rounded',
     ],
     {
       variants: {
