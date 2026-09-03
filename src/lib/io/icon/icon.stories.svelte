@@ -4,7 +4,7 @@
   import IconSvgWrapper from './icon-svg-wrapper.svelte';
 
   const { Story } = defineMeta({
-    title: 'Io/Icon',
+    title: 'IO/Design System/Icon',
     component: IconSvgWrapper,
     argTypes: {
       title: { name: 'Accessible label', control: 'text' },

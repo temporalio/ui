@@ -3,7 +3,7 @@
   import type { ComponentProps } from 'svelte';
 
   import {
-    IconAwsColor,
+    IconClock,
     IconExclamationOctagon,
     IconHeartbeat,
   } from '$lib/io/icon';
@@ -23,15 +23,16 @@
   ];
 
   const { Story } = defineMeta({
-    title: 'Io/Badge Status',
+    title: 'IO/Design System/Badge Status',
     component: BadgeStatus,
     args: {
       status: 'Running',
     },
     argTypes: {
       status: { control: 'select', options: statuses },
+      text: { control: 'text' },
       TrailIcon: { control: false },
-      extension: { control: 'object' },
+      extensions: { control: 'object' },
       class: { table: { disable: true } },
     },
     parameters: {
@@ -52,13 +53,20 @@
 <Story name="With trail icon" args={{ TrailIcon: IconHeartbeat }} />
 
 <Story
-  name="With extension"
+  name="With extensions"
   args={{
-    extension: {
-      text: '123,987',
-      LeadIcon: IconAwsColor,
-      TrailIcon: IconExclamationOctagon,
-    },
+    extensions: [
+      {
+        text: 'delayed',
+        colorScheme: 'info',
+        TrailIcon: IconClock,
+      },
+      {
+        text: 'task failure',
+        colorScheme: 'danger',
+        TrailIcon: IconExclamationOctagon,
+      },
+    ],
   }}
 />
 

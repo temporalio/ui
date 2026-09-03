@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import type { IconComponent } from '$lib/io/icon';
+  import type { ConditionalValue } from '$lib/io/types';
 
   export type ChipColorScheme =
     | 'neutral'
@@ -11,7 +12,7 @@
 
   export type ChipExtension = {
     text: string;
-    Icon?: IconComponent | null;
+    Icon?: ConditionalValue<IconComponent>;
   };
 
   const sharedClasses =
@@ -61,8 +62,8 @@
   > {
     text: string;
     colorScheme?: ChipColorScheme;
-    Icon?: IconComponent | null;
-    extension?: ChipExtension;
+    Icon?: ConditionalValue<IconComponent>;
+    extension?: ConditionalValue<ChipExtension>;
     class?: string;
     type?: HTMLButtonAttributes['type'];
   }

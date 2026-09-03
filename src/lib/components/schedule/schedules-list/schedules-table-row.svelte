@@ -2,13 +2,14 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeStatus } from '$lib/io/badge-status';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
   import {
     routeForSchedule,
     routeForWorkflow,
@@ -28,6 +29,7 @@
 
   let { schedule, columns }: Props = $props();
 
+  const status = $derived(schedule?.info?.paused ? 'Paused' : 'Running');
   const spec = $derived(schedule?.info?.spec);
   const searchAttributes = $derived(schedule?.searchAttributes ?? {});
   const decodedAttributes = $derived(
@@ -58,8 +60,10 @@
   {#each columns as { label } (label)}
     {#if label === translate('common.status')}
       <td class="cell">
-        <WorkflowStatus
-          status={schedule?.info?.paused ? 'Paused' : 'Running'}
+        <BadgeStatus
+          {status}
+          text={getWorkflowStatusLabel(status)}
+          data-testid="execution-status"
         />
       </td>
     {:else if label === translate('schedules.id')}

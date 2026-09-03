@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import type { IconComponent } from '$lib/io/icon';
+  import type { ConditionalValue } from '$lib/io/types';
 
   export type TagColorScheme =
     | 'neutral'
@@ -11,7 +12,7 @@
 
   export type TagExtension = {
     text: string;
-    Icon?: IconComponent | null;
+    Icon?: ConditionalValue<IconComponent>;
   };
 
   const sharedClasses =
@@ -42,8 +43,8 @@
   > {
     text: string;
     colorScheme?: TagColorScheme;
-    Icon?: IconComponent | null;
-    extension?: TagExtension;
+    Icon?: ConditionalValue<IconComponent>;
+    extension?: ConditionalValue<TagExtension>;
     class?: string;
   }
 
@@ -57,7 +58,11 @@
   }: Props = $props();
 
   const ExtensionIcon = $derived(
-    extension?.Icon === undefined ? IconTag : extension.Icon,
+    extension
+      ? extension.Icon === undefined
+        ? IconTag
+        : extension.Icon
+      : null,
   );
 </script>
 

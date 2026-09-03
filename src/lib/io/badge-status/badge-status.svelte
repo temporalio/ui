@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import type { IconComponent } from '$lib/io/icon';
+  import type { ConditionalValue } from '$lib/io/types';
 
   export type BadgeStatusValue =
     | 'Running'
@@ -11,13 +12,7 @@
     | 'Terminated'
     | 'Canceled';
 
-  export type BadgeStatusExtension = {
-    text?: string;
-    LeadIcon?: IconComponent;
-    TrailIcon?: IconComponent;
-  };
-
-  type BadgeStatusColorScheme =
+  export type BadgeStatusColorScheme =
     | 'neutral'
     | 'info'
     | 'success'
@@ -25,10 +20,24 @@
     | 'danger'
     | 'error';
 
+  export type BadgeStatusExtension = {
+    text?: string;
+    colorScheme?: BadgeStatusColorScheme;
+    LeadIcon?: ConditionalValue<IconComponent>;
+    TrailIcon?: ConditionalValue<IconComponent>;
+  };
+
+  export type BadgeStatusExtensions = ConditionalValue<BadgeStatusExtension>[];
+
+  const isBadgeStatusExtension = (
+    extension: ConditionalValue<BadgeStatusExtension>,
+  ): extension is BadgeStatusExtension =>
+    extension !== false && extension !== null && extension !== undefined;
+
   const sharedClasses =
-    'inline-flex whitespace-nowrap divide-x divide-inherit rounded-full border font-mono text-xs font-medium leading-none uppercase tracking-wide';
+    'inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono text-xs font-medium leading-none uppercase tracking-wide';
   const segmentClasses =
-    'inline-flex flex-nowrap items-center justify-center gap-1 px-1 py-0.5';
+    'inline-flex flex-nowrap items-center justify-center gap-1 border px-1 py-0.5';
 
   const colorSchemeClasses: Record<BadgeStatusColorScheme, string> = {
     neutral: 'border-tertiary bg-surface-tertiary text-secondary',
@@ -64,38 +73,48 @@
     'children' | 'class'
   > {
     status: BadgeStatusValue;
-    TrailIcon?: IconComponent | null;
-    extension?: BadgeStatusExtension;
+    text?: string;
+    TrailIcon?: ConditionalValue<IconComponent>;
+    extensions?: ConditionalValue<BadgeStatusExtensions>;
     class?: string;
   }
 
   let {
     status,
+    text,
     TrailIcon,
-    extension,
+    extensions,
     class: className,
     ...rest
   }: Props = $props();
 
   const configuration = $derived(statusConfiguration[status]);
+  const visibleExtensions = $derived(
+    extensions ? extensions.filter(isBadgeStatusExtension) : [],
+  );
 </script>
 
-<span
-  class={twMerge(
-    sharedClasses,
-    colorSchemeClasses[configuration.colorScheme],
-    className,
-  )}
-  {...rest}
->
-  <span class={segmentClasses}>
-    <span>{configuration.text}</span>
+<span class={twMerge(sharedClasses, className)} {...rest}>
+  <span
+    class={twMerge(
+      segmentClasses,
+      colorSchemeClasses[configuration.colorScheme],
+      visibleExtensions.length ? 'rounded-l-full border-r-0' : 'rounded-full',
+    )}
+  >
+    <span>{text ?? configuration.text}</span>
     {#if TrailIcon}
       <TrailIcon width="1em" height="1em" />
     {/if}
   </span>
-  {#if extension}
-    <span class={segmentClasses}>
+  {#each visibleExtensions as extension, index (index)}
+    <span
+      class={twMerge(
+        segmentClasses,
+        colorSchemeClasses[extension.colorScheme ?? configuration.colorScheme],
+        index < visibleExtensions.length - 1 ? 'border-r-0' : 'rounded-r-full',
+      )}
+    >
       {#if extension.LeadIcon}
         <extension.LeadIcon width="1em" height="1em" />
       {/if}
@@ -106,5 +125,5 @@
         <extension.TrailIcon width="1em" height="1em" />
       {/if}
     </span>
-  {/if}
+  {/each}
 </span>

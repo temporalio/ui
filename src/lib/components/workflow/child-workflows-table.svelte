@@ -1,12 +1,13 @@
 <script lang="ts">
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { WorkflowExecution } from '$lib/types/workflows';
+  import type { EventClassification } from '$lib/types/events';
+  import type { WorkflowExecution, WorkflowStatus } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
@@ -17,6 +18,22 @@
   }
 
   let { children = [], pendingChildren = [], namespace }: Props = $props();
+
+  const toChildWorkflowStatus = (
+    status: EventClassification,
+  ): WorkflowStatus => {
+    switch (status) {
+      case 'Running':
+      case 'Completed':
+      case 'Failed':
+      case 'Canceled':
+      case 'TimedOut':
+      case 'Terminated':
+        return status;
+      default:
+        return null;
+    }
+  };
 
   const formattedPending = $derived(
     pendingChildren.map((c) => {
@@ -36,7 +53,7 @@
         runId: c.attributes.workflowExecution?.runId ?? '',
         workflowId: c.attributes.workflowExecution?.workflowId ?? '',
         type: c.attributes.workflowType,
-        status: c.classification,
+        status: toChildWorkflowStatus(c.classification),
         namespace: c.attributes?.namespace || namespace,
       };
     }),
@@ -74,7 +91,7 @@
       {#each visibleItems as child}
         <TableRow>
           <td class="max-md:hidden">
-            <WorkflowStatus status={child.status} />
+            <WorkflowStatusBadge status={child.status} />
           </td>
           <td class="max-lg:hidden">
             {child.type}

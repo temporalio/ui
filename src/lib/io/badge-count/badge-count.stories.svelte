@@ -5,7 +5,7 @@
   import BadgeCount from './badge-count.svelte';
 
   const { Story } = defineMeta({
-    title: 'Io/Badge Count',
+    title: 'IO/Design System/Badge Count',
     component: BadgeCount,
     args: {
       value: '12',

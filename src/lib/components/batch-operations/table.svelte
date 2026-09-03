@@ -1,13 +1,13 @@
 <script lang="ts">
   import OperationType from '$lib/components/batch-operations/operation-type.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
   import type {
     BatchOperationInfo,
     BatchOperationState,
@@ -21,11 +21,11 @@
 
   let { namespace, operations }: Props = $props();
 
-  const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
+  const jobStateToColorScheme: Record<BatchOperationState, BadgeColorScheme> = {
     Completed: 'success',
-    Running: 'primary',
+    Running: 'info',
     Failed: 'danger',
-    Unspecified: undefined,
+    Unspecified: 'neutral',
   };
 </script>
 
@@ -49,16 +49,14 @@
   {#each operations as { state, jobId, operationType, startTime, closeTime }, i (`${jobId}:${i}`)}
     <TableRow>
       <td>
-        <Badge size="sm" type={jobStateToBadgeType[state]}>
-          {state}
-        </Badge>
+        <Badge text={state} colorScheme={jobStateToColorScheme[state]} />
       </td>
       <td
         ><Link href={routeForBatchOperation({ namespace, jobId })}>{jobId}</Link
         ></td
       >
       <td>
-        <OperationType {operationType} size="sm" />
+        <OperationType {operationType} />
       </td>
       <Timestamp as="td" class="max-sm:hidden" dateTime={startTime} />
       <Timestamp as="td" class="max-sm:hidden" dateTime={closeTime} />

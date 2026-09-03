@@ -1,9 +1,6 @@
 <script lang="ts">
-  import Badge, {
-    type BadgeSize,
-    type BadgeType,
-  } from '$lib/holocene/badge.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
   import { IconTemporalActivity, IconTemporalWorkflow } from '$lib/io/icon';
   import {
     type BatchOperationActionType,
@@ -14,10 +11,9 @@
 
   interface Props {
     operationType?: BatchOperationType;
-    size?: BadgeSize;
   }
 
-  let { operationType, size }: Props = $props();
+  let { operationType }: Props = $props();
 
   // The API returns the raw screaming enum (e.g.
   // BATCH_OPERATION_TYPE_CANCEL_ACTIVITY) we want to derive
@@ -46,15 +42,17 @@
     ),
   );
 
-  const operationTypeToBadgeType: Record<BatchOperationActionType, BadgeType> =
-    {
-      Terminate: 'warning',
-      Cancel: 'default',
-      Reset: 'primary',
-      Signal: 'secondary',
-      Delete: 'danger',
-      Unspecified: 'default',
-    };
+  const operationTypeToColorScheme: Record<
+    BatchOperationActionType,
+    BadgeColorScheme
+  > = {
+    Terminate: 'warning',
+    Cancel: 'neutral',
+    Reset: 'info',
+    Signal: 'accent',
+    Delete: 'danger',
+    Unspecified: 'neutral',
+  };
 
   const Glyph = $derived(
     executionType === BatchOperationExecutionType.Activity
@@ -65,9 +63,7 @@
 
 <span class="flex items-center gap-2">
   {#if operationType}
-    <Badge {size} type={operationTypeToBadgeType[action]}>
-      {action}
-    </Badge>
+    <Badge text={action} colorScheme={operationTypeToColorScheme[action]} />
     {#if executionType}
       <span class="flex items-center gap-1">
         <Glyph />

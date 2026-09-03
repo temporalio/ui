@@ -4,7 +4,7 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Badge from '$lib/holocene/badge.svelte';
+  import { Badge } from '$lib/io/badge';
   import {
     IconChevronDown,
     IconChevronUp,
@@ -102,7 +102,7 @@
         </div>
         <p class="flex items-center">
           {#if error}
-            <Badge class="mr-2" type="danger">{error}</Badge>
+            <Badge class="mr-2" colorScheme="danger" text={error} />
           {/if}
           <span class="text-secondary">{subtitle}</span>
         </p>
@@ -152,7 +152,7 @@
       </div>
       <p class="flex items-center">
         {#if error}
-          <Badge class="mr-2" type="danger">{error}</Badge>
+          <Badge class="mr-2" colorScheme="danger" text={error} />
         {/if}
         <span class="text-secondary">{subtitle}</span>
       </p>

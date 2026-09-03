@@ -5,11 +5,11 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { fetchWorkerCount } from '$lib/services/worker-service';
   import {
@@ -109,9 +109,7 @@
         active={page.url.pathname.endsWith('/workers')}
       >
         {#if countEnabled && countLoaded}
-          <Badge type="primary" class="px-2 py-0">
-            {$workerCount.count}
-          </Badge>
+          <Badge text={String($workerCount.count)} colorScheme="info" />
         {/if}
       </Tab>
       <Tab

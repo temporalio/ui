@@ -3,11 +3,12 @@
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import LegacyBadge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import { IconCanceled, IconRetry } from '$lib/io/icon';
   import { workflowRun } from '$lib/stores/workflow-run';
   import {
@@ -43,13 +44,15 @@
     >
       {#snippet summary()}
         <div class="flex items-center gap-2">
-          <Badge type="count">{pendingActivities.length}</Badge>
+          <LegacyBadge type="count">{pendingActivities.length}</LegacyBadge>
           {#if canceled}
             <Tooltip
               bottom
               text={translate('workflows.pending-activities-canceled')}
             >
-              <Badge type="warning" class="py-0"><IconCanceled /></Badge>
+              <LegacyBadge type="warning" class="py-0"
+                ><IconCanceled /></LegacyBadge
+              >
             </Tooltip>
           {/if}
         </div>
@@ -68,9 +71,10 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.activity-type')}
                     </h4>
-                    <Badge type={failed ? 'danger' : undefined}>
-                      {pendingActivity.activityType}
-                    </Badge>
+                    <Badge
+                      colorScheme={failed ? 'danger' : 'neutral'}
+                      text={pendingActivity.activityType ?? ''}
+                    />
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
@@ -82,23 +86,24 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempt')}
                     </h4>
-                    <Badge type={failed ? 'danger' : undefined}>
+                    <LegacyBadge type={failed ? 'danger' : undefined}>
                       {#if failed}
                         <IconRetry />
                       {/if}
                       {pendingActivity.attempt}
-                    </Badge>
+                    </LegacyBadge>
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempts-left')}
                     </h4>
-                    <Badge type={failed ? 'danger' : undefined}>
-                      {formatAttemptsLeft(
+                    <Badge
+                      colorScheme={failed ? 'danger' : 'neutral'}
+                      text={`${formatAttemptsLeft(
                         pendingActivity.maximumAttempts ?? null,
                         pendingActivity.attempt ?? 0,
-                      )}
-                    </Badge>
+                      )}`}
+                    />
                   </div>
                   {#if failed && pendingActivity.scheduledTime}
                     {@const timeDifference = toTimeDifference({
@@ -110,9 +115,7 @@
                         <h4 class="pending-activity-detail-header">
                           {translate('workflows.next-retry')}
                         </h4>
-                        <Badge type={failed ? 'danger' : undefined}>
-                          {timeDifference}
-                        </Badge>
+                        <Badge colorScheme="danger" text={timeDifference} />
                       </div>
                     {/if}
                   {/if}

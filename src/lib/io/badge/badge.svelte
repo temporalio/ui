@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import type { IconComponent } from '$lib/io/icon';
+  import type { ConditionalValue } from '$lib/io/types';
 
   export type BadgeColorScheme =
     | 'neutral'
@@ -12,8 +13,8 @@
 
   export type BadgeExtension = {
     text?: string;
-    LeadIcon?: IconComponent;
-    TrailIcon?: IconComponent;
+    LeadIcon?: ConditionalValue<IconComponent>;
+    TrailIcon?: ConditionalValue<IconComponent>;
   };
 
   const sharedClasses =
@@ -43,8 +44,8 @@
   > {
     text: string;
     colorScheme?: BadgeColorScheme;
-    Icon?: IconComponent | null;
-    extension?: BadgeExtension;
+    Icon?: ConditionalValue<IconComponent>;
+    extension?: ConditionalValue<BadgeExtension>;
     class?: string;
   }
 
