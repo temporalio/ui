@@ -3,10 +3,10 @@
 
   import { type Snippet, untrack } from 'svelte';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import { IconAws, type IconComponent, IconGcp } from '$lib/io/icon';
   import { hasCapability } from '$lib/utilities/has-capability.svelte';
 
@@ -48,8 +48,6 @@
         return translate('workers.provider-cloud-run-description');
     }
   };
-
-  const badgeClass = 'px-1.5 py-0 text-xs font-normal leading-5';
 
   const releaseStageLabel = (option: ComputeProviderOption): string => {
     switch (option.releaseStage ?? defaultReleaseStage[option.value]) {
@@ -107,13 +105,9 @@
       {#snippet labelBadge()}
         <span>
           {#if option.disabled && option.disabledReason}
-            <Badge type="secondary" class={badgeClass}>
-              {option.disabledReason}
-            </Badge>
+            <Badge text={option.disabledReason} />
           {:else if releaseStageLabel(option)}
-            <Badge type="accent" class={badgeClass}>
-              {releaseStageLabel(option)}
-            </Badge>
+            <Badge text={releaseStageLabel(option)} colorScheme="accent" />
           {/if}
         </span>
       {/snippet}

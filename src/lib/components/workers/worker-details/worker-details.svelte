@@ -15,7 +15,6 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -31,6 +30,7 @@
     IconSpinner,
     IconTemporalServer,
   } from '$lib/io/icon';
+  import { Tag } from '$lib/io/tag';
   import type {
     WorkerInfo,
     WorkerPollerInfo,
@@ -329,12 +329,11 @@
               hide={!tooltipText || noSlotsConfigured}
               width={200}
             >
-              <Badge
-                type="ghost"
-                class={merge('mt-1 text-xs', noSlotsConfigured && 'invisible')}
-              >
-                {slots.slotSupplierKind}
-              </Badge>
+              <Tag
+                text={slots.slotSupplierKind}
+                Icon={null}
+                class={merge('mt-1', noSlotsConfigured && 'invisible')}
+              />
             </Tooltip>
           {/if}
         </dd>
@@ -368,14 +367,13 @@
               hide={!hasCurrentPollers}
               width={200}
             >
-              <Badge
-                type="ghost"
-                class={merge('mt-1 text-xs', !hasCurrentPollers && 'invisible')}
-              >
-                {poller.isAutoscaling
+              <Tag
+                text={poller.isAutoscaling
                   ? translate('workers.autoscaling')
                   : translate('workers.simple-maximum')}
-              </Badge>
+                Icon={null}
+                class={merge('mt-1', !hasCurrentPollers && 'invisible')}
+              />
             </Tooltip>
           </dd>
         </div>
