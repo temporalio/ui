@@ -1,5 +1,4 @@
-import { Client, Connection, type ScheduleSpec } from '@temporalio/client';
-import type { Duration } from '@temporalio/common';
+import { Client, Connection } from '@temporalio/client';
 
 import {
   catalogScheduleMemoKey,
@@ -11,23 +10,8 @@ import type {
   CatalogSchedulePlanResult,
   ExistingCatalogSchedule,
 } from './plan.js';
-import type { BrowserScheduleSpec } from '../../../browser/types.js';
 import { parseCatalogConnectionConfig } from '../../connection-config.js';
-
-export const toScheduleSpec = ({
-  cronExpressions,
-  intervals,
-}: BrowserScheduleSpec): ScheduleSpec => ({
-  ...(cronExpressions ? { cronExpressions: [...cronExpressions] } : {}),
-  ...(intervals
-    ? {
-        intervals: intervals.map(({ every, offset }) => ({
-          every: every as Duration,
-          ...(offset === undefined ? {} : { offset: offset as Duration }),
-        })),
-      }
-    : {}),
-});
+import { toScheduleSpec } from '../../schedule-spec.js';
 
 const describeError = (error: unknown) =>
   error instanceof Error ? error.message : String(error);

@@ -69,8 +69,12 @@ const bootstrap = async ({
 } = {}) => {
   const events: CatalogScheduleBootstrapEvent[] = [];
 
+  const workerBindings = bindings(examples);
+
   await bootstrapCatalogScheduleSync({
-    bindings: bindings(examples),
+    bindings: workerBindings,
+    registeredTargetIds: workerBindings.map(({ target }) => target.id),
+    runningTargetIds: workerBindings.map(({ target }) => target.id),
     describeManager: async () => ({ exists, paused }),
     createManager,
     updateManagerArgs,
@@ -200,5 +204,86 @@ describe('bootstrapCatalogScheduleSync and a paused manager', () => {
     expect(updateManagerArgs).toHaveBeenCalledTimes(1);
     expect(triggerManager).toHaveBeenCalledTimes(1);
     expect(events.map(({ state }) => state)).toEqual(['updated', 'triggered']);
+  });
+});
+
+describe('bootstrapCatalogScheduleSync and an incomplete binding set', () => {
+  const operations = {
+    describeManager: async () => ({ exists: false, paused: false }),
+    createManager: async () => undefined,
+    updateManagerArgs: async () => undefined,
+    triggerManager: async () => undefined,
+    onEvent: () => undefined,
+  };
+
+  it('refuses to reconcile when a registered target is missing', async () => {
+    const present = bindings(syncExamples());
+
+    await expect(
+      bootstrapCatalogScheduleSync({
+        ...operations,
+        bindings: present,
+        // The registry knows about a second target this call did not receive.
+        registeredTargetIds: ['shared-workflows', 'local-examples'],
+        runningTargetIds: ['shared-workflows'],
+      }),
+    ).rejects.toThrow(/local-examples is also registered/);
+  });
+
+  it('names the partial set in the message so the caller can see what it sent', async () => {
+    await expect(
+      bootstrapCatalogScheduleSync({
+        ...operations,
+        bindings: [],
+        registeredTargetIds: ['shared-workflows'],
+        runningTargetIds: [],
+      }),
+    ).rejects.toThrow(/given no targets/);
+  });
+
+  it('reconciles when every registered target is present', async () => {
+    const createManager = vi.fn(async () => undefined);
+    const present = bindings(syncExamples());
+
+    await bootstrapCatalogScheduleSync({
+      ...operations,
+      createManager,
+      bindings: present,
+      registeredTargetIds: ['shared-workflows'],
+      runningTargetIds: ['shared-workflows'],
+    });
+
+    expect(createManager).toHaveBeenCalledOnce();
+  });
+});
+
+describe('bootstrapCatalogScheduleSync and a narrowed run', () => {
+  it('skips when no worker in this process polls the manager target', async () => {
+    const events: CatalogScheduleBootstrapEvent[] = [];
+    const createManager = vi.fn(async () => undefined);
+    const triggerManager = vi.fn(async () => undefined);
+    const present = bindings(syncExamples());
+
+    await bootstrapCatalogScheduleSync({
+      bindings: present,
+      registeredTargetIds: ['shared-workflows'],
+      // CATALOG_TARGET_ID narrowed this process to a target that is not the
+      // manager's, so a triggered sync would sit as backlog nothing polls.
+      runningTargetIds: ['local-examples'],
+      describeManager: async () => ({ exists: false, paused: false }),
+      createManager,
+      updateManagerArgs: async () => undefined,
+      triggerManager,
+      onEvent: (event) => events.push(event),
+    });
+
+    expect(createManager).not.toHaveBeenCalled();
+    expect(triggerManager).not.toHaveBeenCalled();
+    expect(events).toEqual([
+      expect.objectContaining({
+        state: 'skipped',
+        reason: expect.stringContaining('shared-workflows'),
+      }),
+    ]);
   });
 });

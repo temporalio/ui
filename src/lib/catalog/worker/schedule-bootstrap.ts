@@ -19,15 +19,46 @@ export type CatalogScheduleBootstrapEvent = {
   error?: unknown;
 };
 
+/**
+ * Refuses a binding set that does not cover every registered target.
+ *
+ * The desired list is built from the bindings handed in, and the reconciler
+ * deletes every catalog-owned schedule that is not on it. So a partial set does
+ * not reconcile a subset — it deletes the schedules the missing targets
+ * declare. `registeredTargetIds` comes from the registry rather than from
+ * `bindings`, which is what makes this check able to see the difference.
+ */
+const assertEveryTargetPresent = (
+  bindings: readonly CatalogWorkerBinding[],
+  registeredTargetIds: readonly string[],
+) => {
+  const present = new Set(bindings.map(({ target }) => target.id));
+  const missing = registeredTargetIds.filter((id) => !present.has(id));
+
+  if (missing.length === 0) return;
+
+  throw new Error(
+    `The schedule manager was given ${present.size === 0 ? 'no targets' : [...present].join(', ')} but ${missing.join(', ')} is also registered. ` +
+      'Reconciling from a partial set would delete the schedules the missing targets declare, so it needs every registered target.',
+  );
+};
+
 export const bootstrapCatalogScheduleSync = async ({
   bindings,
+  registeredTargetIds,
+  runningTargetIds,
   describeManager,
   createManager,
   updateManagerArgs,
   triggerManager,
   onEvent,
 }: {
+  /** Every registered target, not the subset this process will poll. */
   bindings: readonly CatalogWorkerBinding[];
+  /** Target ids the registry knows about, used to prove `bindings` is complete. */
+  registeredTargetIds: readonly string[];
+  /** Targets this process will actually poll, which may be narrower. */
+  runningTargetIds: readonly string[];
   describeManager: (
     entry: CatalogDesiredSchedule,
   ) => Promise<{ exists: boolean; paused: boolean }>;
@@ -36,6 +67,8 @@ export const bootstrapCatalogScheduleSync = async ({
   triggerManager: (entry: CatalogDesiredSchedule) => Promise<void>;
   onEvent: (event: CatalogScheduleBootstrapEvent) => void;
 }): Promise<void> => {
+  assertEveryTargetPresent(bindings, registeredTargetIds);
+
   const declared = declaredSchedules(bindings);
   const manager = bindings
     .flatMap(({ target, examples }) =>
@@ -48,6 +81,15 @@ export const bootstrapCatalogScheduleSync = async ({
       state: 'skipped',
       scheduleId: catalogScheduleSyncScheduleId,
       reason: `The "${catalogScheduleSyncExampleId}" example is not registered as a workflow on any target`,
+    });
+    return;
+  }
+
+  if (!runningTargetIds.includes(manager.target.id)) {
+    onEvent({
+      state: 'skipped',
+      scheduleId: catalogScheduleSyncScheduleId,
+      reason: `No worker in this process polls the "${manager.target.id}" target, so a triggered sync would wait for one`,
     });
     return;
   }

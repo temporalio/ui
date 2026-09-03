@@ -100,6 +100,12 @@ When it is on, the worker creates its own `ui-catalog-schedule-sync` schedule, p
 
 Ownership comes from a memo. The manager stamps `uiCatalog` on every schedule it creates and only ever updates or deletes a schedule carrying that memo. An owned schedule that no example declares any more is deleted. A schedule id that already exists without the memo is reported as blocked and is never touched.
 
+### Reconciliation is always whole-catalog
+
+The desired list is built from every registered target, and the reconciler deletes any catalog-owned schedule that is not on it. A partial list therefore does not reconcile a subset — it deletes what the missing targets declare. The bootstrap refuses a binding set that does not cover every registered target rather than acting on one.
+
+`CATALOG_TARGET_ID` narrows which workers this process runs; it never narrows the desired list. If it excludes the target the `schedule-sync` example is registered on, the bootstrap reports that it skipped, because a triggered sync would wait for a worker this process is not starting.
+
 ### Stopping a schedule without a deploy
 
 Pause it in the UI. The manager treats a running state that disagrees with the declaration as a decision somebody made, reports the schedule as held, and writes nothing to it — not the spec, not the action, not the state. Resume it and the next sync reconciles it normally.

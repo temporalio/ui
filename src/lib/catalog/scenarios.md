@@ -140,6 +140,16 @@ The worker creates its own hourly `ui-catalog-schedule-sync` schedule, triggers 
 
 Run it in a namespace that no other schedule manager owns. A reconciler that deletes every schedule it does not know about will remove the catalog's schedules on its next pass.
 
+### One target only, with schedules enabled
+
+```bash
+CATALOG_TARGET_ID=shared-workflows CATALOG_SCHEDULES=enabled pnpm catalog worker
+```
+
+The worker polls one target, but reconciliation still runs against every registered target's declarations. Narrowing to a target that does not register `schedule-sync` reports a skip instead of triggering a sync nothing would pick up.
+
+**Unverified.** Covered by unit tests on the bootstrap; not exercised against a live server.
+
 ### A schedule paused by hand
 
 Pause a catalog-owned schedule in the UI. The next sync reports it as held and writes nothing to it; the example page shows a Held badge naming what happened. Resume it and the following sync reconciles it again, rewriting any edits made while it was held.
