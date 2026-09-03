@@ -9,6 +9,8 @@ export const Strings = {
   apply: 'Apply',
   remove: 'Remove',
   query: 'Query',
+  'view-raw-query': 'View raw query',
+  'hide-raw-query': 'Hide raw query',
   ago: 'ago',
   'all-time': 'All Time',
   time: 'Time',
