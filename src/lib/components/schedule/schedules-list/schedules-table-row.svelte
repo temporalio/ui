@@ -3,13 +3,12 @@
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { BadgeStatus } from '$lib/io/badge-status';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
   import {
     routeForSchedule,
     routeForWorkflow,
@@ -60,11 +59,7 @@
   {#each columns as { label } (label)}
     {#if label === translate('common.status')}
       <td class="cell">
-        <BadgeStatus
-          {status}
-          text={getWorkflowStatusLabel(status)}
-          data-testid="execution-status"
-        />
+        <WorkflowStatusBadge {status} />
       </td>
     {:else if label === translate('schedules.id')}
       <td class="cell whitespace-pre-line break-words">

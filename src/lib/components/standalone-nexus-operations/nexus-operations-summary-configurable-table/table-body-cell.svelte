@@ -2,13 +2,12 @@
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
-  import { BadgeStatus } from '$lib/io/badge-status';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
+
+  import NexusOperationStatusBadge from '../../nexus-operation-status-badge.svelte';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
@@ -102,12 +101,7 @@
     data-testid="nexus-operations-summary-table-body-cell"
   >
     {#if label === 'Status'}
-      {@const status = toNexusOperationStatus(operation.status)}
-      <BadgeStatus
-        {status}
-        text={getWorkflowStatusLabel(status)}
-        data-testid="execution-status"
-      />
+      <NexusOperationStatusBadge status={operation.status} />
     {:else if label === 'Schedule Time'}
       <Timestamp dateTime={operation.scheduleTime} />
     {:else if label === 'Close Time'}

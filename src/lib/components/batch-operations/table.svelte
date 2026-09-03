@@ -1,4 +1,5 @@
 <script lang="ts">
+  import BatchOperationStatusBadge from '$lib/components/batch-operations/batch-operation-status-badge.svelte';
   import OperationType from '$lib/components/batch-operations/operation-type.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -7,11 +8,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
-  import type {
-    BatchOperationInfo,
-    BatchOperationState,
-  } from '$lib/types/batch';
+  import type { BatchOperationInfo } from '$lib/types/batch';
   import { routeForBatchOperation } from '$lib/utilities/route-for';
 
   interface Props {
@@ -20,13 +17,6 @@
   }
 
   let { namespace, operations }: Props = $props();
-
-  const jobStateToColorScheme: Record<BatchOperationState, BadgeColorScheme> = {
-    Completed: 'success',
-    Running: 'info',
-    Failed: 'danger',
-    Unspecified: 'neutral',
-  };
 </script>
 
 <Table>
@@ -49,7 +39,7 @@
   {#each operations as { state, jobId, operationType, startTime, closeTime }, i (`${jobId}:${i}`)}
     <TableRow>
       <td>
-        <Badge text={state} colorScheme={jobStateToColorScheme[state]} />
+        <BatchOperationStatusBadge {state} />
       </td>
       <td
         ><Link href={routeForBatchOperation({ namespace, jobId })}>{jobId}</Link
