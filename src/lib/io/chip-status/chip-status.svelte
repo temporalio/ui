@@ -93,9 +93,6 @@
   }: Props = $props();
 
   const configuration = $derived(statusConfiguration[status]);
-  const label = $derived(
-    count === undefined ? configuration.text : `${count} ${configuration.text}`,
-  );
 </script>
 
 <button
@@ -107,7 +104,15 @@
   )}
   {...rest}
 >
-  <span class="{segmentClasses} py-0.5 font-medium">{label}</span>
+  <span class="{segmentClasses} py-0.5 font-medium">
+    {#if typeof count === 'number'}
+      {count.toLocaleString()} {configuration.text}
+    {:else if count != null}
+      {count} {configuration.text}
+    {:else}
+      {configuration.text}
+    {/if}
+  </span>
   {#if extension !== undefined}
     <span
       class={twMerge(
@@ -116,7 +121,11 @@
         'font-normal',
       )}
     >
-      {extension}
+      {#if typeof extension === 'number'}
+        {extension.toLocaleString(undefined, { signDisplay: 'always' })}
+      {:else}
+        {extension}
+      {/if}
     </span>
   {/if}
 </button>

@@ -151,10 +151,8 @@
       {#if status}
         <ChipStatus
           {status}
-          count={count.toLocaleString()}
-          extension={newCountDiff
-            ? newCountDiff.toLocaleString(undefined, { signDisplay: 'always' })
-            : undefined}
+          {count}
+          extension={newCountDiff || undefined}
           onclick={() => onStatusClick(status)}
           data-testid={`${testId}-${status}`}
         />

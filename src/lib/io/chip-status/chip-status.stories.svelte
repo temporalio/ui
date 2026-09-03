@@ -21,14 +21,14 @@
     component: ChipStatus,
     args: {
       status: 'Running',
-      count: '14',
-      extension: '+2',
+      count: 14,
+      extension: 2,
       disabled: false,
     },
     argTypes: {
       status: { control: 'select', options: statuses },
-      count: { control: 'text' },
-      extension: { control: 'text' },
+      count: { control: 'number' },
+      extension: { control: 'number' },
       disabled: { control: 'boolean' },
       class: { table: { disable: true } },
     },
@@ -55,7 +55,7 @@
       {#each statuses as status (status)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{status}</span>
-          <ChipStatus {status} count="14" extension="+2" />
+          <ChipStatus {status} count={14} extension={2} />
         </div>
       {/each}
     </div>
