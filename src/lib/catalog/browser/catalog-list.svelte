@@ -1,11 +1,12 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+  import { Badge } from '$lib/io/badge';
+  import { BadgeStatus, type BadgeStatusValue } from '$lib/io/badge-status';
   import {
     IconExternalLink,
     IconPlaySolid,
@@ -27,9 +28,6 @@
   import type { EvidenceLink, WorkbenchHost } from './workbench-host';
 
   type SourceFilter = 'all' | string;
-  type RunBadgeType =
-    | ReturnType<typeof terminalStatusPresentation>['type']
-    | 'subtle';
 
   interface Props {
     descriptors: readonly BrowserCatalogDescriptor[];
@@ -125,20 +123,22 @@
 
 {#snippet sourceBadge(descriptor: BrowserCatalogDescriptor)}
   <Badge
-    type={descriptor.source.id === 'local' ? 'warning' : 'subtle'}
-    size="sm"
-  >
-    {descriptor.source.label}
-  </Badge>
+    text={descriptor.source.label}
+    colorScheme={descriptor.source.id === 'local' ? 'warning' : 'neutral'}
+  />
 {/snippet}
 
 {#snippet runBadge(
-  type: RunBadgeType,
   label: string,
   evidence: EvidenceLink | undefined,
+  status: BadgeStatusValue | undefined,
 )}
   <span class="inline-flex items-center gap-1">
-    <Badge {type} size="sm">{label}</Badge>
+    {#if status}
+      <BadgeStatus {status} text={label} />
+    {:else}
+      <Badge text={label} />
+    {/if}
     {#if evidence}
       <Link
         href={evidence.href}
@@ -158,10 +158,10 @@
       : undefined}
   {#if latest?.state === 'execution-terminal'}
     {@const status = terminalStatusPresentation(latest.terminalStatus!)}
-    {@render runBadge(status.type, status.label, evidence)}
+    {@render runBadge(status.label, evidence, status.status)}
     <span class="text-secondary">{relativeRunTime(latest.createdAt)}</span>
   {:else if latest}
-    {@render runBadge('subtle', sessionStateLabels[latest.state], evidence)}
+    {@render runBadge(sessionStateLabels[latest.state], evidence, undefined)}
     <span class="text-secondary">{relativeRunTime(latest.createdAt)}</span>
   {:else}
     <span class="text-secondary">Not run</span>

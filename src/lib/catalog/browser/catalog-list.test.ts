@@ -120,7 +120,7 @@ describe('CatalogList', () => {
     expect(body).toContain('Order lifecycle');
     expect(body).toContain('Start and inspect an order workflow.');
     expect(body).toMatch(
-      /class="[^"]*px-1\.5[^"]*py-0[^"]*text-xs[^"]*leading-5[^"]*"[^>]*><!---->OSS/,
+      /class="[^"]*border-tertiary[^"]*bg-surface-tertiary[^"]*text-secondary[^"]*"[\s\S]*?<span>OSS<\/span>/,
     );
     expect(body).toContain('catalog-tasks');
     expect(body).toContain('Not run');
@@ -224,7 +224,7 @@ describe('CatalogList', () => {
 
     expect(body).toContain('Completed');
     expect(body).toMatch(
-      /class="[^"]*px-1\.5[^"]*py-0[^"]*text-xs[^"]*leading-5[^"]*"[^>]*><!---->Completed/,
+      /class="[^"]*border-success[^"]*bg-surface-success[^"]*text-success[^"]*"[\s\S]*?Completed/,
     );
     expect(body).toMatch(/1m ago|just now/);
   });

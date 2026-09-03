@@ -112,7 +112,6 @@
 <script lang="ts">
   import PayloadInput from '$lib/components/payload-input.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import DurationInput, {
@@ -128,6 +127,8 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { Badge } from '$lib/io/badge';
+  import { BadgeStatus } from '$lib/io/badge-status';
   import {
     IconCheckCircle,
     IconChevronDown,
@@ -139,6 +140,7 @@
     IconSpinner,
     IconWarning,
   } from '$lib/io/icon';
+  import { Tag } from '$lib/io/tag';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
@@ -681,14 +683,12 @@
                       {@const status = terminalStatusPresentation(
                         session.terminalStatus!,
                       )}
-                      <Badge type={status.type} size="sm">{status.label}</Badge>
+                      <BadgeStatus status={status.status} text={status.label} />
                     {:else}
                       {@const explanation =
                         launchOutcomeExplanation(session.outcome) ??
                         session.error}
-                      <Badge type="subtle" size="sm">
-                        {sessionStateLabels[session.state]}
-                      </Badge>
+                      <Badge text={sessionStateLabels[session.state]} />
                       {#if explanation}
                         <p class="mt-1 text-xs text-secondary">
                           {explanation}
@@ -759,7 +759,7 @@
         {#if capabilityTags.length}
           <ul class="flex flex-wrap gap-2" aria-label="Capabilities">
             {#each capabilityTags as capability (capability)}
-              <li><Badge type="ghost">{capability}</Badge></li>
+              <li><Tag text={capability} Icon={null} /></li>
             {/each}
           </ul>
         {/if}
