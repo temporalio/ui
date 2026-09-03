@@ -126,9 +126,8 @@
     title="{attribute} = {statusValues}"
   >
     <div class="min-w-0 text-left">
-      <span class="break-words">{attribute} =</span><span
-        class="break-all pl-1 text-brand">{statusValues}</span
-      >
+      <span class="break-words">{attribute} =</span>
+      <span class="break-all text-brand">{statusValues}</span>
     </div>
   </MenuButton>
 

@@ -358,9 +358,8 @@
     <div class="min-w-0 text-left">
       <span class="break-words"
         >{getDisplayKeyWithConditional(localFilter)}</span
-      ><span class="break-all pl-1 text-brand"
-        >{getDisplayValue(localFilter)}</span
       >
+      <span class="break-all text-brand">{getDisplayValue(localFilter)}</span>
     </div>
   </MenuButton>
 
