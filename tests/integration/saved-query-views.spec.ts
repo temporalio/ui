@@ -376,6 +376,45 @@ test.describe('Saved Query Views', () => {
     );
   });
 
+  test('System saved queries keep unsaved filter edits made on a saved view', async ({
+    page,
+  }) => {
+    const savedQuery = '`WorkflowId`="user-view-1"';
+    const edited = `${savedQuery} AND \`TaskQueue\`="queue-z"`;
+
+    await page.goto(
+      `/namespaces/default/workflows?query=${encodeURIComponent(savedQuery)}&savedQuery=My+View`,
+    );
+    await expectSelectedView(page, 'My View');
+
+    await page.locator('#workflow-search-attribute-filter-button').click();
+    await page.locator('#workflow-filter-search').fill('TaskQueue');
+    await page.getByRole('menuitem', { name: 'TaskQueue Keyword' }).click();
+    await page
+      .getByTestId('dropdown-filter-chip-TaskQueue-1-text')
+      .fill('queue-z');
+    await page.getByRole('button', { name: 'Apply' }).click();
+
+    await expect.poll(() => getQueryParam(page.url())).toBe(edited);
+    await expect(page.getByTestId('save-view-button')).toBeVisible();
+
+    await page.getByTestId('running').click();
+    await expect
+      .poll(() => getQueryParam(page.url()))
+      .toBe(`${edited} AND \`ExecutionStatus\`="Running"`);
+    await expectSelectedView(page, 'My View');
+
+    await page.getByTestId('child-workflows').click();
+    await expect
+      .poll(() => getQueryParam(page.url()))
+      .toBe(`${edited} AND \`ParentWorkflowId\` is null`);
+
+    await page.getByTestId('child-workflows').click();
+    await expect.poll(() => getQueryParam(page.url())).toBe(edited);
+    await expect(page.getByTestId('save-view-button')).toBeVisible();
+    await expectSelectedView(page, 'My View');
+  });
+
   test('All Workflows clears the active user saved view', async ({ page }) => {
     await page.locator('#workflow-search-attribute-filter-button').click();
     await page.locator('#workflow-filter-search').fill('WorkflowId');

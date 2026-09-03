@@ -181,11 +181,7 @@
       narrowsActiveView(view) && isSystemViewActive(view);
     const addsToActiveView =
       narrowsActiveView(view) && onCustomView && !removesActiveView;
-    const baseQuery = activeUserView
-      ? systemViewBaseQuery
-      : addedSystemView
-        ? addedSystemViewBase
-        : query;
+    const baseQuery = addedSystemView ? addedSystemViewBase : query;
     const nextQuery = removesActiveView
       ? addedSystemView === view.id
         ? addedSystemViewBase
