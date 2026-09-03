@@ -12,14 +12,7 @@
     },
     argTypes: {
       value: { control: 'text' },
-      total: {
-        control: 'text',
-        if: { arg: 'variant', eq: 'total' },
-      },
-      variant: {
-        control: 'select',
-        options: ['single', 'happy', 'error', 'total'],
-      },
+      total: { control: 'text' },
       class: { table: { disable: true } },
     },
     parameters: {
@@ -37,26 +30,18 @@
 
 <Story name="Playground" />
 
-<Story name="Variants">
+<Story name="Examples">
   {#snippet template()}
     <div
       class="flex flex-wrap items-end gap-6 border border-primary bg-surface-primary p-6"
     >
       <div class="flex flex-col items-start gap-2">
         <span class="text-xs text-secondary">Single</span>
-        <BadgeCount value={12} variant="single" />
-      </div>
-      <div class="flex flex-col items-start gap-2">
-        <span class="text-xs text-secondary">Happy</span>
         <BadgeCount value={12} />
       </div>
       <div class="flex flex-col items-start gap-2">
-        <span class="text-xs text-secondary">Error</span>
-        <BadgeCount value={20} variant="error" />
-      </div>
-      <div class="flex flex-col items-start gap-2">
         <span class="text-xs text-secondary">Total</span>
-        <BadgeCount value={12} total={20} variant="total" />
+        <BadgeCount value={12} total={20} />
       </div>
     </div>
   {/snippet}

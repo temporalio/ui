@@ -116,12 +116,7 @@
       {label}
     </span>
     {#if noneSelected}
-      <BadgeCount
-        variant="total"
-        value={views.length}
-        total={maxQueries}
-        class="ml-1.5"
-      />
+      <BadgeCount value={views.length} total={maxQueries} class="ml-1.5" />
     {:else if unsaved && !draftActive}
       <span
         class="ml-1.5 shrink-0 rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium italic text-secondary"

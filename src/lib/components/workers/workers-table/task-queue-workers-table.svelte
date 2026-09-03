@@ -77,7 +77,7 @@
           ?.length ?? 0}
       <h2 class="flex items-center gap-2" data-testid="workers">
         {translate('workers.workers')}
-        <BadgeCount variant="single" value={pollerCount} />
+        <BadgeCount value={pollerCount} />
       </h2>
     {:else}
       <Alert
@@ -116,7 +116,7 @@
         {@const pollerCount =
           getWorkflowPollersWithVersions(searchAttributes, workers)?.pollers
             ?.length ?? 0}
-        <BadgeCount variant="single" value={pollerCount} />
+        <BadgeCount value={pollerCount} />
       {/await}
     </ToggleButton>
   </ToggleButtons>

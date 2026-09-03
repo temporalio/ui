@@ -78,6 +78,6 @@
   {/if}
   {@render children?.()}
   {#if count != null}
-    <BadgeCount variant="single" value={count} />
+    <BadgeCount value={count} />
   {/if}
 </button>

@@ -32,10 +32,7 @@
       <h1>
         {translate('batch.describe-page-title')}
       </h1>
-      <BatchOperationStatusBadge
-        state={operation.state}
-        class="h-8 px-4 text-lg"
-      />
+      <BatchOperationStatusBadge state={operation.state} />
     </div>
     <Copyable
       content={operation.jobId}

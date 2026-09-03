@@ -94,10 +94,7 @@
   <Card class="flex flex-col gap-4">
     <div class="flex items-center gap-2">
       <h5>{translate('nexus.allowed-caller-namespaces')}</h5>
-      <BadgeCount
-        variant="single"
-        value={allowedCallerNamespaces?.length ?? 0}
-      />
+      <BadgeCount value={allowedCallerNamespaces?.length ?? 0} />
     </div>
     <div class="flex flex-wrap items-center gap-4">
       <PaginatedTable

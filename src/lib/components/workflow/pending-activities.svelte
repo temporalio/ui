@@ -45,7 +45,7 @@
     >
       {#snippet summary()}
         <div class="flex items-center gap-2">
-          <BadgeCount variant="single" value={pendingActivities.length} />
+          <BadgeCount value={pendingActivities.length} />
           {#if canceled}
             <Tooltip
               bottom

@@ -303,7 +303,7 @@
           }),
         )}
       >
-        <BadgeCount variant="single" value={workflow?.historyEvents ?? 0} />
+        <BadgeCount value={workflow?.historyEvents ?? 0} />
       </Tab>
       <Tab
         label={translate('workflows.relationships')}
@@ -314,10 +314,7 @@
           routeForRelationships(routeParameters),
         )}
       >
-        <BadgeCount
-          variant="single"
-          value={workflowRelationships.relationshipCount}
-        />
+        <BadgeCount value={workflowRelationships.relationshipCount} />
       </Tab>
       {#if linkCount > 0}
         <Tab
@@ -329,7 +326,7 @@
             routeForNexusLinks(routeParameters),
           )}
         >
-          <BadgeCount variant="single" value={linkCount} />
+          <BadgeCount value={linkCount} />
         </Tab>
       {/if}
       <Tab
@@ -342,7 +339,7 @@
         )}
       >
         {#if workerCount !== undefined}
-          <BadgeCount variant="single" value={workerCount} />
+          <BadgeCount value={workerCount} />
         {/if}
       </Tab>
       <Tab
@@ -361,10 +358,7 @@
             text={String(workflow?.pendingActivities?.length ?? 0)}
           />
         {:else}
-          <BadgeCount
-            variant="single"
-            value={workflow?.pendingActivities?.length ?? 0}
-          />
+          <BadgeCount value={workflow?.pendingActivities?.length ?? 0} />
         {/if}
       </Tab>
       <Tab
