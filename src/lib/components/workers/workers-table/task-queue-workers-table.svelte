@@ -1,12 +1,12 @@
 <script lang="ts">
   import PollersTable from '$lib/components/workers/pollers-table/pollers-table.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -77,7 +77,7 @@
           ?.length ?? 0}
       <h2 class="flex items-center gap-2" data-testid="workers">
         {translate('workers.workers')}
-        <Badge type="count">{pollerCount}</Badge>
+        <BadgeCount variant="single" value={pollerCount} />
       </h2>
     {:else}
       <Alert
@@ -116,9 +116,7 @@
         {@const pollerCount =
           getWorkflowPollersWithVersions(searchAttributes, workers)?.pollers
             ?.length ?? 0}
-        <Badge type="count">
-          {pollerCount}
-        </Badge>
+        <BadgeCount variant="single" value={pollerCount} />
       {/await}
     </ToggleButton>
   </ToggleButtons>

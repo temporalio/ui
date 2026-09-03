@@ -2,7 +2,6 @@
   import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import Button, {
     type ButtonWithoutHrefProps,
@@ -12,6 +11,7 @@
     type MenuContext,
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { IconChevronDown } from '$lib/io/icon';
 
   export interface Props extends Omit<ButtonWithoutHrefProps, 'onclick'> {
@@ -118,9 +118,10 @@
   {/if}
   {@render trailing?.()}
   {#if count > 0}
-    <Badge
-      class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-      type="count">{count}</Badge
-    >
+    <BadgeCount
+      class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+      variant="single"
+      value={count}
+    />
   {/if}
 </Button>

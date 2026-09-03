@@ -55,6 +55,7 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import {
     IconAdd,
     IconChevronDown,
@@ -63,7 +64,6 @@
     IconSpinner,
   } from '$lib/io/icon';
 
-  import Badge from '../badge.svelte';
   import Button from '../button.svelte';
   import Chip from '../chip.svelte';
   import MenuDivider from '../menu/menu-divider.svelte';
@@ -571,7 +571,7 @@
               <p>+{value.slice(chipLimit).length}</p>
             {/if}
           {:else if selectedCountLabel}
-            <Badge>{selectedCountLabel}</Badge>
+            <Badge text={selectedCountLabel} />
           {/if}
         {/if}
         <input

@@ -9,6 +9,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { IconCanceled, IconRetry } from '$lib/io/icon';
   import { workflowRun } from '$lib/stores/workflow-run';
   import {
@@ -44,7 +45,7 @@
     >
       {#snippet summary()}
         <div class="flex items-center gap-2">
-          <LegacyBadge type="count">{pendingActivities.length}</LegacyBadge>
+          <BadgeCount variant="single" value={pendingActivities.length} />
           {#if canceled}
             <Tooltip
               bottom

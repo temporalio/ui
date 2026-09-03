@@ -7,7 +7,7 @@
   import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Badge from '$lib/holocene/badge.svelte';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { type IconComponent, IconSpinner } from '$lib/io/icon';
 
   import { PILLS, type PillsContext } from './pill-container.svelte';
@@ -78,6 +78,6 @@
   {/if}
   {@render children?.()}
   {#if count != null}
-    <Badge type="count">{count}</Badge>
+    <BadgeCount variant="single" value={count} />
   {/if}
 </button>

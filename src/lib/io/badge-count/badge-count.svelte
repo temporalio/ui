@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  export type BadgeCountVariant = 'happy' | 'error' | 'total';
+  export type BadgeCountVariant = 'single' | 'happy' | 'error' | 'total';
 
   const sharedClasses =
     '[text-box:trim-both_cap_alphabetic] [&_span]:[text-box:inherit] inline-flex whitespace-nowrap rounded-full border font-mono text-xs font-medium leading-none uppercase';
@@ -7,6 +7,7 @@
     'inline-flex flex-nowrap items-center justify-center gap-1 px-1 py-0.5';
 
   const variantClasses: Record<BadgeCountVariant, string> = {
+    single: 'border-secondary bg-surface-tertiary text-primary',
     happy: 'border-secondary bg-surface-tertiary text-primary',
     error: 'border-danger bg-surface-danger text-danger',
     total: 'border-secondary bg-surface-tertiary text-primary',
@@ -29,6 +30,10 @@
   };
 
   type Props =
+    | (SharedProps & {
+        variant: 'single';
+        total?: never;
+      })
     | (SharedProps & {
         variant?: 'happy';
         total?: never;

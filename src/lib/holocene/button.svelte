@@ -104,7 +104,7 @@
 
   import { goto } from '$app/navigation';
 
-  import Badge from '$lib/holocene/badge.svelte';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { IconSpinner } from '$lib/io/icon';
 
   let {
@@ -203,10 +203,11 @@
       </span>
     {/if}
     {#if count > 0}
-      <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-        type="count">{count}</Badge
-      >
+      <BadgeCount
+        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        variant="single"
+        value={count}
+      />
     {/if}
   </a>
 {:else}
@@ -242,10 +243,11 @@
       </span>
     {/if}
     {#if count > 0}
-      <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-        type="count">{count}</Badge
-      >
+      <BadgeCount
+        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        variant="single"
+        value={count}
+      />
     {/if}
   </button>
 {/if}

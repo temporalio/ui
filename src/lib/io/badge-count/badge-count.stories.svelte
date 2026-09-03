@@ -18,7 +18,7 @@
       },
       variant: {
         control: 'select',
-        options: ['happy', 'error', 'total'],
+        options: ['single', 'happy', 'error', 'total'],
       },
       class: { table: { disable: true } },
     },
@@ -42,6 +42,10 @@
     <div
       class="flex flex-wrap items-end gap-6 border border-primary bg-surface-primary p-6"
     >
+      <div class="flex flex-col items-start gap-2">
+        <span class="text-xs text-secondary">Single</span>
+        <BadgeCount value={12} variant="single" />
+      </div>
       <div class="flex flex-col items-start gap-2">
         <span class="text-xs text-secondary">Happy</span>
         <BadgeCount value={12} />
