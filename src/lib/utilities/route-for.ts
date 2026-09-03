@@ -111,6 +111,14 @@ export const routeForCatalog = ({
   });
 };
 
+export const routeForAgents = ({
+  namespace,
+}: NamespaceParameter): ResolvedPathname => {
+  return withPrefix('/namespaces/[namespace]/agents', {
+    namespace,
+  });
+};
+
 export const routeForCatalogExample = ({
   namespace,
   exampleId,

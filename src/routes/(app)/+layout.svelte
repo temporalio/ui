@@ -23,6 +23,7 @@
     IconBook,
     IconFeedback,
     IconImport,
+    IconRobot,
     IconSupport,
     IconTemporalActivity,
     IconTemporalBatch,
@@ -44,6 +45,7 @@
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
   import {
+    routeForAgents,
     routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForCatalog,
@@ -112,6 +114,7 @@
   const getRoutes = (namespace: string) => {
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
+      agentsRoute: routeForAgents({ namespace }),
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
       standaloneNexusOperationsRoute: routeForStandaloneNexusOperations({
         namespace,
@@ -131,6 +134,7 @@
   const getNavPrimaryLinks = (
     {
       workflowsRoute,
+      agentsRoute,
       standaloneActivitiesRoute,
       standaloneNexusOperationsRoute,
       schedulesRoute,
@@ -142,6 +146,7 @@
       nexusRoute,
     }: {
       workflowsRoute: string;
+      agentsRoute: string;
       standaloneActivitiesRoute: string;
       standaloneNexusOperationsRoute: string;
       schedulesRoute: string;
@@ -164,6 +169,7 @@
         isActive: (path) =>
           path.includes(namespacesRoute) &&
           !path.includes(workflowsRoute) &&
+          !path.includes(agentsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
           !path.includes(workersRoute) &&
@@ -178,6 +184,13 @@
         testId: 'workflow-button',
         label: translate('common.workflows'),
         isActive: (path) => path.includes(workflowsRoute),
+      },
+      {
+        href: agentsRoute,
+        Icon: IconRobot,
+        testId: 'agents-button',
+        label: translate('common.agents'),
+        isActive: (path) => path.includes(agentsRoute),
       },
       {
         href: standaloneActivitiesRoute,
@@ -242,6 +255,7 @@
       historyImportRoute,
     }: {
       workflowsRoute: string;
+      agentsRoute: string;
       standaloneActivitiesRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
@@ -287,6 +301,7 @@
   );
   let {
     workflowsRoute,
+    agentsRoute,
     schedulesRoute,
     batchOperationsRoute,
     workersRoute,
@@ -299,6 +314,7 @@
   let showNamespacePicker = $derived(
     [
       workflowsRoute,
+      agentsRoute,
       schedulesRoute,
       workersRoute,
       workerDeploymentsRoute,
@@ -312,6 +328,10 @@
 
   function getCurrentHref(namespace: string) {
     const namespacePages = [
+      {
+        subPath: 'agents',
+        fullRoute: routeForAgents({ namespace }),
+      },
       {
         subPath: 'schedules',
         fullRoute: routeForSchedules({ namespace }),
