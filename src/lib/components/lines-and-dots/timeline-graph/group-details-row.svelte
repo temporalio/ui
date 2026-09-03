@@ -4,7 +4,9 @@
   import { page } from '$app/stores';
 
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
+  import EventStatusBadge, {
+    type EventStatus,
+  } from '$lib/components/event/event-status-badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconClock, IconClose } from '$lib/io/icon';
@@ -62,16 +64,14 @@
     formatEventGroupDuration({ group, endTime, includeMilliseconds: true }),
   );
 
-  const status = $derived.by(() => {
-    const pending = group?.pendingActivity;
+  const status = $derived.by<EventStatus>(() => {
+    const pending = group.pendingActivity;
     if (pending) {
-      if (pending.paused) return translate('workflows.paused');
-      if ((pending.attempt ?? 0) > 1) {
-        return translate('events.event-classification.retrying');
-      }
-      return translate('events.event-classification.pending');
+      if (pending.paused) return 'Paused';
+      if ((pending.attempt ?? 0) > 1) return 'Retrying';
+      return 'Pending';
     }
-    return group?.finalClassification || group?.classification;
+    return group.finalClassification || group.classification;
   });
 </script>
 
@@ -86,9 +86,7 @@
       class="relative flex h-full items-center justify-between bg-surface-secondary text-sm"
     >
       <div class="flex h-full items-center gap-4 px-2">
-        {#if status}
-          <WorkflowStatus {status} />
-        {/if}
+        <EventStatusBadge {status} />
         {title}
         {#if duration}
           <div class="flex items-center gap-1">

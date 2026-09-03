@@ -7,7 +7,7 @@
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
 
   import FilterableTableCell from './filterable-table-cell.svelte';

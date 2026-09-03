@@ -1,11 +1,12 @@
 <script lang="ts">
-  import ExecutionStatus from '$lib/components/execution-status.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeStatus } from '$lib/io/badge-status';
   import { IconFilter } from '$lib/io/icon';
   import type { NexusOperationExecutionInfo } from '$lib/types/nexus-operation-execution';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
   import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneNexusOperationPoller } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
 
@@ -28,6 +29,8 @@
 
   let { nexusOperationInfo, namespace, poller }: Props = $props();
 
+  const status = $derived(toNexusOperationStatus(nexusOperationInfo.status));
+  const statusText = $derived(getWorkflowStatusLabel(status));
   const endpointFilterLink = $derived(
     routeForStandaloneNexusOperationsWithQuery(
       { namespace },
@@ -39,10 +42,7 @@
 <div class="flex flex-col gap-4">
   <div class="flex items-start gap-4 max-xl:w-full max-xl:flex-wrap">
     <div class="flex items-center gap-4">
-      <ExecutionStatus
-        status={toNexusOperationStatus(nexusOperationInfo.status)}
-        big
-      />
+      <BadgeStatus {status} text={statusText} data-testid="execution-status" />
       <h1
         data-testid="nexus-operation-id-heading"
         class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"

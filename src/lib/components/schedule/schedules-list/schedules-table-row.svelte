@@ -9,7 +9,7 @@
   import { BadgeStatus } from '$lib/io/badge-status';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
   import {
     routeForSchedule,
     routeForWorkflow,

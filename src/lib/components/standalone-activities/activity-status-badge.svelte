@@ -7,7 +7,7 @@
   } from '$lib/io/badge-status';
   import { IconClock } from '$lib/io/icon';
   import type { ActivityStatus } from '$lib/utilities/get-activity-status-and-count';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
 
   interface Props {
     status: ActivityStatus;
@@ -23,16 +23,8 @@
       TrailIcon: IconClock,
     },
   ]);
-  const accessibleLabel = $derived(delayed ? `${text}, ${delayedText}` : text);
 </script>
 
 <Tooltip topLeft text={delayedText} hide={!delayed}>
-  <BadgeStatus
-    {status}
-    {text}
-    {extensions}
-    role="img"
-    aria-label={accessibleLabel}
-    data-testid="execution-status"
-  />
+  <BadgeStatus {status} {text} {extensions} data-testid="execution-status" />
 </Tooltip>

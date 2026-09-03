@@ -8,7 +8,7 @@
   } from '$lib/io/badge-status';
   import { IconClock, IconExclamationOctagon } from '$lib/io/icon';
   import type { WorkflowStatus } from '$lib/types/workflows';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
 
   interface Props {
     status: WorkflowStatus;
@@ -35,25 +35,12 @@
     ...(taskFailure ? [taskFailureText] : []),
   ]);
   const tooltipText = $derived(modifierLabels.join(', '));
-  const accessibleLabel = $derived([text, ...modifierLabels].join(', '));
 </script>
 
 <Tooltip topLeft text={tooltipText} hide={!modifierLabels.length}>
   {#if status}
-    <BadgeStatus
-      {status}
-      {text}
-      {extensions}
-      role="img"
-      aria-label={accessibleLabel}
-      data-testid="execution-status"
-    />
+    <BadgeStatus {status} {text} {extensions} data-testid="execution-status" />
   {:else}
-    <Badge
-      {text}
-      role="img"
-      aria-label={accessibleLabel}
-      data-testid="execution-status"
-    />
+    <Badge {text} data-testid="execution-status" />
   {/if}
 </Tooltip>

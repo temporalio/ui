@@ -5,7 +5,7 @@
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
+  import EventStatusBadge from '$lib/components/event/event-status-badge.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
@@ -56,7 +56,7 @@
 >
   <div class="flex flex-1 flex-wrap justify-between gap-2">
     <div class="flex flex-wrap items-center space-x-3">
-      <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
+      <EventStatusBadge status={activity.paused ? 'Paused' : activity.state} />
       <h4>{activity.activityType}</h4>
     </div>
     {#if showActivityCommands}

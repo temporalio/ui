@@ -27,8 +27,8 @@
     getLocalActivityMarkerEvent,
   } from '$lib/utilities/decode-local-activity';
   import type { ValidTime } from '$lib/utilities/format-time';
+  import { getEventClassificationLabel } from '$lib/utilities/get-event-classification-label';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
-  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
