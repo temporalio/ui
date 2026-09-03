@@ -32,6 +32,7 @@
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { getSharedFilterParams } from '$lib/utilities/event-filter-params';
+  import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
@@ -64,11 +65,9 @@
 
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
 
-  const { workflow, workerCount } = $derived($workflowRun);
+  const { workflow, workers, workerCount } = $derived($workflowRun);
   const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
-  const workerDeployment = $derived(
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
-  );
+  const workerDeployment = $derived(getWorkerDeploymentName(workers, workflow));
   const routeParameters = $derived({
     namespace,
     workflow: workflowId,
