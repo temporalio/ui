@@ -37,6 +37,21 @@ const nexusDescriptor: BrowserCatalogDescriptor = {
   },
 };
 
+const scheduledDescriptor: BrowserCatalogDescriptor = {
+  ...workflowDescriptor,
+  id: 'hourly-order',
+  execution: {
+    ...workflowDescriptor.execution,
+    kind: 'workflow',
+    workflowType: 'orderWorkflow',
+    schedule: {
+      id: 'ui-catalog-hello-hourly',
+      spec: { cronExpressions: ['0 * * * *'] },
+      paused: true,
+    },
+  },
+};
+
 const activityDescriptor: BrowserCatalogDescriptor = {
   ...workflowDescriptor,
   id: 'priority-activity',
@@ -69,6 +84,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -115,6 +131,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -144,6 +161,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -171,6 +189,7 @@ describe('OSS WorkbenchHost', () => {
       launch: vi.fn().mockResolvedValue({ status: 'accepted', runId: 'run-1' }),
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -189,6 +208,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -214,6 +234,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -239,6 +260,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -264,6 +286,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -294,6 +317,7 @@ describe('OSS WorkbenchHost', () => {
       launch: vi.fn().mockResolvedValue({ status: 'accepted' }),
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -319,6 +343,7 @@ describe('OSS WorkbenchHost', () => {
       launch: vi.fn().mockResolvedValue({ status: 'accepted', runId: 42 }),
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -338,6 +363,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -358,6 +384,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -380,6 +407,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -402,6 +430,7 @@ describe('OSS WorkbenchHost', () => {
       launch,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -427,6 +456,7 @@ describe('OSS WorkbenchHost', () => {
       }),
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -451,6 +481,7 @@ describe('OSS WorkbenchHost', () => {
       }),
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref,
     });
     const outcome = await host.start(command);
@@ -471,6 +502,7 @@ describe('OSS WorkbenchHost', () => {
       launch: vi.fn(),
       checkWorker,
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -499,6 +531,7 @@ describe('OSS WorkbenchHost', () => {
       launch: vi.fn(),
       checkWorker: vi.fn().mockResolvedValue(true),
       checkNexusEndpoint,
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 
@@ -522,6 +555,79 @@ describe('OSS WorkbenchHost', () => {
     );
   });
 
+  it('reports a declared schedule as an advisory check after the Nexus checks', async () => {
+    const checkSchedule = vi.fn().mockResolvedValue(true);
+    const host = assembleWorkbenchHost({
+      descriptors: [scheduledDescriptor],
+      launch: vi.fn(),
+      checkWorker: vi.fn().mockResolvedValue(true),
+      checkNexusEndpoint: vi.fn(),
+      checkSchedule,
+      createEvidenceHref: vi.fn(),
+    });
+
+    await expect(host.checkReadiness('hourly-order')).resolves.toEqual([
+      {
+        kind: 'worker',
+        required: false,
+        state: 'ready',
+        taskQueueType: 1,
+      },
+      {
+        kind: 'schedule',
+        required: false,
+        state: 'ready',
+        scheduleId: 'ui-catalog-hello-hourly',
+        paused: true,
+      },
+    ]);
+    expect(checkSchedule).toHaveBeenCalledWith(
+      { namespace: 'catalog-demo', scheduleId: 'ui-catalog-hello-hourly' },
+      undefined,
+    );
+  });
+
+  it('leaves a schedule check indeterminate when the lookup throws', async () => {
+    const host = assembleWorkbenchHost({
+      descriptors: [scheduledDescriptor],
+      launch: vi.fn(),
+      checkWorker: vi.fn().mockResolvedValue(true),
+      checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn().mockRejectedValue(new Error('unreachable')),
+      createEvidenceHref: vi.fn(),
+    });
+
+    await expect(host.checkReadiness('hourly-order')).resolves.toContainEqual({
+      kind: 'schedule',
+      required: false,
+      state: 'indeterminate',
+      scheduleId: 'ui-catalog-hello-hourly',
+      paused: true,
+    });
+  });
+
+  it('omits the schedule check when no schedule is declared', async () => {
+    const checkSchedule = vi.fn();
+    const host = assembleWorkbenchHost({
+      descriptors: [workflowDescriptor],
+      launch: vi.fn(),
+      checkWorker: vi.fn().mockResolvedValue(true),
+      checkNexusEndpoint: vi.fn(),
+      checkSchedule,
+      createEvidenceHref: vi.fn(),
+    });
+
+    await expect(host.checkReadiness('order-lifecycle')).resolves.toEqual([
+      {
+        kind: 'worker',
+        required: false,
+        state: 'ready',
+        taskQueueType: 1,
+      },
+    ]);
+    expect(checkSchedule).not.toHaveBeenCalled();
+  });
+
   it('performs one observation request with the accepted reference and signal', async () => {
     const observe = vi.fn().mockResolvedValue({
       state: 'running',
@@ -534,6 +640,7 @@ describe('OSS WorkbenchHost', () => {
       observe,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
     const controller = new AbortController();
@@ -573,6 +680,7 @@ describe('OSS WorkbenchHost', () => {
       observe,
       checkWorker: vi.fn(),
       checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi.fn(),
       createEvidenceHref: vi.fn(),
     });
 

@@ -30,6 +30,43 @@
     tooltip: string;
   };
 
+  type ReadinessCopy = {
+    label: string;
+    subject: string;
+    loading: string;
+    ready: string;
+    unavailable: (taskQueue: string) => string;
+    unknown: string;
+  };
+
+  const readinessCopy: Record<HostReadinessCheck['kind'], ReadinessCopy> = {
+    worker: {
+      label: 'Handler worker is polling',
+      subject: 'Worker readiness',
+      loading: 'Checking for workers…',
+      ready: 'A Worker is polling.',
+      unavailable: (taskQueue) =>
+        `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm catalog worker" to start one.`,
+      unknown: 'Worker status couldn’t be checked.',
+    },
+    'nexus-endpoint': {
+      label: 'Endpoint matches the declared target and policy',
+      subject: 'Nexus endpoint readiness',
+      loading: 'Checking Nexus endpoint readiness…',
+      ready: 'Nexus endpoint is ready.',
+      unavailable: () => 'Nexus endpoint is unavailable.',
+      unknown: 'Nexus endpoint status couldn’t be checked.',
+    },
+    schedule: {
+      label: 'Declared schedule exists',
+      subject: 'Schedule readiness',
+      loading: 'Checking schedule readiness…',
+      ready: 'The declared schedule exists.',
+      unavailable: () => 'The declared schedule is missing.',
+      unknown: 'Schedule status couldn’t be checked.',
+    },
+  };
+
   export const readinessPresentation = ({
     kind,
     state,
@@ -39,23 +76,16 @@
     state: WorkerReadinessDisplayState | 'loading';
     taskQueue: string;
   }): ReadinessPresentation => {
-    const label =
-      kind === 'worker'
-        ? 'Handler worker is polling'
-        : 'Endpoint matches the declared target and policy';
-    const iconSubject =
-      kind === 'worker' ? 'Worker readiness' : 'Nexus endpoint readiness';
+    const copy = readinessCopy[kind];
+    const { label, subject } = copy;
 
     if (state === 'loading') {
       return {
         Icon: IconSpinner,
         iconClass: 'animate-spin text-secondary',
-        iconLabel: `${iconSubject} is checking`,
+        iconLabel: `${subject} is checking`,
         label,
-        tooltip:
-          kind === 'worker'
-            ? 'Checking for workers…'
-            : 'Checking Nexus endpoint readiness…',
+        tooltip: copy.loading,
       };
     }
 
@@ -63,12 +93,9 @@
       return {
         Icon: IconCheckCircle,
         iconClass: 'text-success',
-        iconLabel: `${iconSubject} is ready`,
+        iconLabel: `${subject} is ready`,
         label,
-        tooltip:
-          kind === 'worker'
-            ? 'A Worker is polling.'
-            : 'Nexus endpoint is ready.',
+        tooltip: copy.ready,
       };
     }
 
@@ -76,25 +103,31 @@
       return {
         Icon: IconWarning,
         iconClass: 'text-warning',
-        iconLabel: `${iconSubject} is unavailable`,
+        iconLabel: `${subject} is unavailable`,
         label,
-        tooltip:
-          kind === 'worker'
-            ? `This run will wait for a Worker to poll the ${taskQueue} Task Queue. Run "pnpm catalog worker" to start one.`
-            : 'Nexus endpoint is unavailable.',
+        tooltip: copy.unavailable(taskQueue),
       };
     }
 
     return {
       Icon: IconQuestionCircle,
       iconClass: 'text-secondary',
-      iconLabel: `${iconSubject} status is unknown`,
+      iconLabel: `${subject} status is unknown`,
       label,
-      tooltip:
-        kind === 'worker'
-          ? 'Worker status couldn’t be checked.'
-          : 'Nexus endpoint status couldn’t be checked.',
+      tooltip: copy.unknown,
     };
+  };
+
+  export const scheduleSpecSummary = (spec: BrowserScheduleSpec): string => {
+    if (spec.cronExpressions?.length) return spec.cronExpressions.join(', ');
+
+    if (spec.intervals?.length) {
+      return spec.intervals
+        .map((interval) => `every ${interval.every}`)
+        .join(', ');
+    }
+
+    return '';
   };
 
   export const nexusEndpointCreateCommand = ({
@@ -122,6 +155,7 @@
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -141,6 +175,7 @@
   } from '$lib/io/icon';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { routeForSchedule } from '$lib/utilities/route-for';
 
   import { launchOutcomeExplanation } from './launch-outcome-presentation';
   import { createReadinessLoader } from './readiness-loader';
@@ -152,7 +187,11 @@
   } from './session-store';
   import { declaredExecutionId, startFromEditors } from './start-example';
   import { catalogSharedStartOptionNames } from './start-options';
-  import type { BrowserCatalogDescriptor, JsonValue } from './types';
+  import type {
+    BrowserCatalogDescriptor,
+    BrowserScheduleSpec,
+    JsonValue,
+  } from './types';
   import type { ReadinessCheck, WorkbenchHost } from './workbench-host';
 
   type FixedExecutionField = {
@@ -313,6 +352,11 @@
   );
   let prerequisiteReadiness = $derived(
     readiness.filter((check) => check.kind !== 'worker'),
+  );
+  let declaredScheduleSpec = $derived(
+    descriptor.execution.kind === 'workflow' && descriptor.execution.schedule
+      ? scheduleSpecSummary(descriptor.execution.schedule.spec)
+      : '',
   );
   let readinessAnnouncement = $derived(
     [
@@ -847,7 +891,45 @@
                     </span>
                   </Tooltip>
                   <span>{presentation.label}</span>
+                  {#if check.kind === 'schedule'}
+                    {#if declaredScheduleSpec}
+                      <span class="font-mono text-xs text-secondary"
+                        >{declaredScheduleSpec}</span
+                      >
+                    {/if}
+                    {#if check.paused}
+                      <Badge type="subtle" class="px-1 py-0 text-xs leading-4"
+                        >Paused</Badge
+                      >
+                    {/if}
+                  {/if}
                 </div>
+                {#if check.kind === 'schedule' && check.state === 'unavailable'}
+                  <p class="mt-2 text-xs text-secondary">
+                    Enable the schedule manager, then restart the worker:
+                  </p>
+                  <Copyable
+                    visible
+                    clickAllToCopy
+                    content="CATALOG_SCHEDULES=enabled"
+                    copyIconTitle="Copy the schedule manager setting"
+                    copySuccessIconTitle="Copied the schedule manager setting"
+                    container-class="mt-1"
+                    class="font-mono text-xs"
+                  />
+                  <p class="mt-1 text-xs text-secondary">
+                    Add it to .env.catalog.local, then run pnpm catalog worker.
+                  </p>
+                {/if}
+                {#if check.kind === 'schedule' && check.state === 'ready'}
+                  <Link
+                    class="mt-2 inline-block text-xs"
+                    href={routeForSchedule({
+                      namespace: descriptor.execution.namespace,
+                      scheduleId: check.scheduleId,
+                    })}>Open schedule</Link
+                  >
+                {/if}
                 {#if check.kind === 'nexus-endpoint' && check.state === 'unavailable'}
                   <p class="mt-2 text-xs text-secondary">
                     Create the declared endpoint, then run the example again:

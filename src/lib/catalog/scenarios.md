@@ -121,6 +121,27 @@ Without provisioning authority, the worker prints the `temporal operator nexus e
 
 **Verified** for the UI state and copy. The credentialed worker path is unverified.
 
+## Schedules
+
+### Schedule manager disabled
+
+The committed default. `CATALOG_SCHEDULES` is unset, so the worker prints one line naming the setting and creates no schedule. Any value other than `enabled` or `disabled` fails startup with a message naming the variable.
+
+**Verified** against a local server: the disabled line and banner appear, no schedule is created, and an invalid value fails before any target starts.
+
+### Schedule manager enabled
+
+```bash
+# .env.catalog.local
+CATALOG_SCHEDULES=enabled
+```
+
+The worker creates its own hourly `ui-catalog-schedule-sync` schedule, triggers it once, and the reconciliation workflow creates, updates, or deletes the schedules the examples declare. Only schedules carrying the `uiCatalog` memo are updated or deleted; a foreign id is reported as blocked.
+
+Run it in a namespace that no other schedule manager owns. A reconciler that deletes every schedule it does not know about will remove the catalog's schedules on its next pass.
+
+**Verified** against a local server in a dedicated namespace. Cold start created the manager and the `hello` schedule with the ownership memo; a restart updated the manager's arguments and triggered a sync. A hand-deleted declared schedule was recreated. A hand-edited cron on an owned schedule was rewritten back. A memo-marked schedule for a removed example was deleted. A schedule without the memo was left alone, and one squatting on a declared id was reported as blocked and left untouched. The example page's schedule readiness check was covered by client tests only.
+
 ## Environment interference
 
 ### A second Temporal server on the same port

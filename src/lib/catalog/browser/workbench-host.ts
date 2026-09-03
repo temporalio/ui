@@ -100,7 +100,18 @@ export type NexusEndpointReadinessCheck = {
   endpoint: string;
 };
 
-export type ReadinessCheck = NexusEndpointReadinessCheck | WorkerReadinessCheck;
+export type ScheduleReadinessCheck = {
+  kind: 'schedule';
+  required: false;
+  state: ReadinessState;
+  scheduleId: string;
+  paused: boolean;
+};
+
+export type ReadinessCheck =
+  | NexusEndpointReadinessCheck
+  | ScheduleReadinessCheck
+  | WorkerReadinessCheck;
 
 export type EvidenceLink = {
   href: string;

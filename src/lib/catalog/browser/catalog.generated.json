@@ -1,5 +1,5 @@
 {
-  "sourceHash": "d7f2464b31a33221a79aee1b28edb90c8bf32a6aaf8d0bd990a1cf6a95c984ee",
+  "sourceHash": "4782f0f1f2739f078ce1da9817f4115367bd74d187d77421106d728e3949135b",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -211,7 +211,13 @@
         "targetId": "shared-workflows",
         "namespace": "default",
         "taskQueue": "ui-catalog",
-        "workflowType": "hello"
+        "workflowType": "hello",
+        "schedule": {
+          "id": "ui-catalog-hello-hourly",
+          "spec": { "cronExpressions": ["0 * * * *"] },
+          "paused": false,
+          "note": "Declared by the hello catalog example"
+        }
       },
       "source": { "id": "oss", "label": "OSS" }
     },
@@ -490,6 +496,52 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "priorityFairnessWorkflow"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "schedule-sync",
+      "title": "Schedule sync",
+      "description": "Reconciles the schedules declared by catalog examples against the server.",
+      "capabilityTags": ["schedules", "activities", "terminal-outcome"],
+      "expectedEvidence": [
+        "A completed workflow whose result lists the created, updated, and deleted schedule ids."
+      ],
+      "input": {
+        "defaultValue": [[]],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Declared schedules",
+              "type": "array",
+              "items": { "type": "object" }
+            }
+          ],
+          "items": false,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "setupMarkdown": "The schedule manager is disabled by default, so no catalog example creates a schedule until you turn it on.\n\nSet `CATALOG_SCHEDULES=enabled` in `.env.catalog.local` and restart the worker. The worker then creates its own hourly `ui-catalog-schedule-sync` schedule and triggers it once.\n\nThe manager only writes schedules it owns. Ownership comes from the `uiCatalog` memo it stamps on every schedule it creates. A schedule id that already exists without that memo is reported as blocked and is never updated or deleted.",
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "catalogScheduleSync"
       },
       "source": { "id": "oss", "label": "OSS" }
     },

@@ -246,6 +246,13 @@
               <p class="hidden truncate text-xs text-secondary sm:block">
                 {descriptor.description}
               </p>
+              {#if descriptor.execution.kind === 'workflow' && descriptor.execution.schedule}
+                <Badge
+                  type="subtle"
+                  class="mt-1 inline-block px-1 py-0.5 text-xs leading-none"
+                  >Scheduled</Badge
+                >
+              {/if}
               <div
                 class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:hidden"
               >

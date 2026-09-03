@@ -32,10 +32,24 @@ export type BrowserExecutionTarget = {
   taskQueue: string;
 };
 
+export type BrowserScheduleSpec = {
+  cronExpressions?: string[];
+  intervals?: { every: string; offset?: string }[];
+};
+
+export type BrowserScheduleDeclaration = {
+  id: string;
+  spec: BrowserScheduleSpec;
+  input?: JsonValue[];
+  paused: boolean;
+  note?: string;
+};
+
 export type BrowserWorkflowExecution = BrowserExecutionTarget & {
   kind: 'workflow';
   workflowType: string;
   nexusEndpoints?: string[];
+  schedule?: BrowserScheduleDeclaration;
 };
 
 export type BrowserStandaloneActivityExecution = BrowserExecutionTarget & {

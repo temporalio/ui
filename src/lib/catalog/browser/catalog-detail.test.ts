@@ -44,7 +44,7 @@ let isCurrentCatalogDetailRequest: (request: {
   requestEpoch: number;
 }) => boolean;
 let readinessPresentation: (config: {
-  kind: 'nexus-endpoint' | 'worker';
+  kind: 'nexus-endpoint' | 'schedule' | 'worker';
   state:
     | 'error'
     | 'indeterminate'
@@ -65,6 +65,10 @@ let nexusEndpointCreateCommand: (config: {
   endpoint: string;
   namespace: string;
   taskQueue: string;
+}) => string;
+let scheduleSpecSummary: (spec: {
+  cronExpressions?: string[];
+  intervals?: { every: string; offset?: string }[];
 }) => string;
 
 beforeAll(async () => {
@@ -109,6 +113,7 @@ beforeAll(async () => {
         isCurrentCatalogDetailRequest: module.isCurrentCatalogDetailRequest,
         nexusEndpointCreateCommand: module.nexusEndpointCreateCommand,
         readinessPresentation: module.readinessPresentation,
+        scheduleSpecSummary: module.scheduleSpecSummary,
         renderComponent: (await server.ssrLoadModule('svelte/server')).render,
       };
     },
@@ -120,6 +125,7 @@ beforeAll(async () => {
     nexusEndpointCreateCommand,
     renderComponent,
     readinessPresentation,
+    scheduleSpecSummary,
   } = lifecycle.value);
 }, catalogHarnessSetupTimeoutMs);
 
@@ -393,6 +399,81 @@ describe('CatalogDetail', () => {
         ...expected,
       });
     }
+  });
+
+  it('uses the same static-label presentation for schedule readiness rows', () => {
+    for (const [state, expected] of [
+      [
+        'loading',
+        {
+          iconLabel: 'Schedule readiness is checking',
+          tooltip: 'Checking schedule readiness…',
+        },
+      ],
+      [
+        'ready',
+        {
+          Icon: iconNamed(IconCheckCircle),
+          iconLabel: 'Schedule readiness is ready',
+          tooltip: 'The declared schedule exists.',
+        },
+      ],
+      [
+        'unavailable',
+        {
+          Icon: iconNamed(IconWarning),
+          iconLabel: 'Schedule readiness is unavailable',
+          tooltip: 'The declared schedule is missing.',
+        },
+      ],
+      [
+        'indeterminate',
+        {
+          Icon: iconNamed(IconQuestionCircle),
+          iconLabel: 'Schedule readiness status is unknown',
+          tooltip: 'Schedule status couldn’t be checked.',
+        },
+      ],
+    ] as const) {
+      expect(
+        readinessPresentation({
+          kind: 'schedule',
+          state,
+          taskQueue: 'catalog-tasks',
+        }),
+      ).toMatchObject({
+        label: 'Declared schedule exists',
+        ...expected,
+      });
+    }
+  });
+
+  it('summarizes a declared schedule spec compactly', () => {
+    expect(
+      scheduleSpecSummary({ cronExpressions: ['0 * * * *', '@daily'] }),
+    ).toBe('0 * * * *, @daily');
+    expect(scheduleSpecSummary({ intervals: [{ every: '1h' }] })).toBe(
+      'every 1h',
+    );
+    expect(scheduleSpecSummary({})).toBe('');
+  });
+
+  it('hands off the schedule manager setting when the declared schedule is missing', () => {
+    const source = readFileSync(
+      resolve('src/lib/catalog/browser/catalog-detail.svelte'),
+      'utf8',
+    );
+
+    expect(source).toContain(
+      "check.kind === 'schedule' && check.state === 'unavailable'",
+    );
+    expect(source).toContain('content="CATALOG_SCHEDULES=enabled"');
+    expect(source).toContain('Enable the schedule manager');
+    expect(source).toContain(
+      'Add it to .env.catalog.local, then run pnpm catalog worker.',
+    );
+    expect(source).toContain('href={routeForSchedule({');
+    expect(source).toContain('>Open schedule</Link');
   });
 
   it('hands off the exact endpoint create command when the Nexus endpoint is unavailable', () => {

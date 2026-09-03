@@ -31,6 +31,7 @@ Copy the example file to `.env.catalog.local` and uncomment what you need. Only 
 | `TEMPORAL_ADDRESS`           | Server address. Defaults to `127.0.0.1:7233`.                       |
 | `TEMPORAL_NAMESPACE`         | Namespace the worker registers and polls in. Defaults to `default`. |
 | `CATALOG_TARGET_ID` | Optional. Run one target instead of all of them.                    |
+| `CATALOG_SCHEDULES` | Optional. `enabled` or `disabled`. Defaults to `disabled`.          |
 
 Prefer `127.0.0.1` over `localhost`. On some machines `localhost` resolves to IPv6 and reaches a different Temporal server than the UI is reading — for example a container publishing the same port — which appears as a healthy worker the catalog cannot see.
 
@@ -71,6 +72,33 @@ A target is a worker specification: a namespace, a task queue, a workflow bundle
 The worker waits for the server rather than exiting if it starts first, printing progress while it retries. Non-connection failures, such as an invalid API key, still fail immediately.
 
 On a plaintext local connection, the worker creates any Nexus endpoints its examples declare. When it lacks the authority to do so — any credentialed connection, including Temporal Cloud — it prints the exact `temporal operator nexus endpoint create` command instead, and the catalog page shows the same command as copyable text.
+
+## Schedules
+
+An example may declare one schedule beside its execution:
+
+```ts
+execution: {
+  kind: 'workflow',
+  workflowType: 'hello',
+  workflow: hello,
+  activities: { greet },
+  schedule: {
+    id: 'ui-catalog-hello-hourly',
+    spec: { cronExpressions: ['0 * * * *'] },
+    paused: false,
+    note: 'Declared by the hello catalog example',
+  },
+}
+```
+
+The spec accepts `cronExpressions`, `intervals`, or both, and needs at least one entry. `input` is optional: without it the schedule starts the workflow with the same input the Run button uses. Schedule ids must be unique across every registered example.
+
+The schedule manager is **disabled by default**. Set `CATALOG_SCHEDULES=enabled` in `.env.catalog.local` to turn it on. When it is off, the worker prints one line saying so and creates nothing.
+
+When it is on, the worker creates its own `ui-catalog-schedule-sync` schedule, points it at the `schedule-sync` example, and triggers it once. That workflow reconciles every declared schedule on an hourly cadence.
+
+Ownership comes from a memo. The manager stamps `uiCatalog` on every schedule it creates and only ever updates or deletes a schedule carrying that memo. An owned schedule that no example declares any more is deleted. A schedule id that already exists without the memo is reported as blocked and is never touched.
 
 ## Generated artifacts
 

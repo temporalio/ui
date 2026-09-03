@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 
-import { Connection } from '@temporalio/client';
+import { Client, Connection, ScheduleNotFoundError } from '@temporalio/client';
 import {
   DefaultLogger,
   NativeConnection,
@@ -17,9 +17,17 @@ import {
   declaredNexusEndpoints,
   ensureDeclaredNexusEndpoints,
 } from '../../src/lib/catalog/worker/endpoint-provisioning';
+import { toScheduleSpec } from '../../src/lib/catalog/worker/examples/schedule-sync/activities';
+import {
+  catalogScheduleMemoKey,
+  catalogScheduleOwnership,
+} from '../../src/lib/catalog/worker/examples/schedule-sync/ownership';
 import type { CatalogTarget } from '../../src/lib/catalog/worker/registry';
 import { requireCatalogRoutingFromEnvironment } from '../../src/lib/catalog/worker/routing-config';
 import type { CatalogRunnerEvent } from '../../src/lib/catalog/worker/runner';
+import { bootstrapCatalogScheduleSync } from '../../src/lib/catalog/worker/schedule-bootstrap';
+import { parseCatalogScheduleConfig } from '../../src/lib/catalog/worker/schedule-config';
+import type { CatalogDesiredSchedule } from '../../src/lib/catalog/worker/schedule-declarations';
 import {
   formatCatalogBanner,
   supportsAnsiColor,
@@ -41,6 +49,7 @@ const loadEnvironment = (
 ).loadEnvFile;
 const runningTargetIds = new Set<string>();
 let announcedTargets: readonly { target: CatalogTarget }[] = [];
+let schedulesEnabled = false;
 
 const emitCatalogEvent = ({ type, ...details }: CatalogRunnerEvent) => {
   console.info(
@@ -60,6 +69,7 @@ const emitCatalogEvent = ({ type, ...details }: CatalogRunnerEvent) => {
         isTTY: Boolean(process.stdout.isTTY),
         environment: process.env,
       }),
+      schedulesEnabled,
     }),
   );
 };
@@ -83,6 +93,8 @@ try {
     : workerBindings;
   announcedTargets = selectedBindings;
   const connectionConfig = parseCatalogConnectionConfig(process.env);
+  const scheduleConfig = parseCatalogScheduleConfig(process.env);
+  schedulesEnabled = scheduleConfig.enabled;
 
   if (
     declaredNexusEndpoints(selectedBindings).length > 0 &&
@@ -132,6 +144,96 @@ try {
       });
     } finally {
       await client.close();
+    }
+  }
+
+  if (!scheduleConfig.enabled) {
+    console.info(
+      'Schedule manager disabled; set CATALOG_SCHEDULES=enabled in .env.catalog.local to create declared schedules.',
+    );
+  } else {
+    const connection = await connectWithRetry({
+      connect: () =>
+        Connection.connect({
+          address: connectionConfig.address,
+          ...(connectionConfig.apiKey
+            ? { apiKey: connectionConfig.apiKey }
+            : {}),
+          ...(connectionConfig.tls ? { tls: connectionConfig.tls } : {}),
+        }),
+      onWaiting: ({ attempt }) =>
+        console.info(
+          `Waiting for the Temporal server at ${connectionConfig.address}… (attempt ${attempt})`,
+        ),
+    });
+    const managerHandle = ({ id, namespace }: CatalogDesiredSchedule) =>
+      new Client({ connection, namespace }).schedule.getHandle(id);
+
+    try {
+      await bootstrapCatalogScheduleSync({
+        bindings: selectedBindings,
+        describeManager: async (entry) => {
+          try {
+            await managerHandle(entry).describe();
+            return { exists: true };
+          } catch (error) {
+            if (error instanceof ScheduleNotFoundError)
+              return { exists: false };
+            throw error;
+          }
+        },
+        createManager: async (entry) => {
+          await new Client({
+            connection,
+            namespace: entry.namespace,
+          }).schedule.create({
+            scheduleId: entry.id,
+            spec: toScheduleSpec(entry.spec),
+            action: {
+              type: 'startWorkflow',
+              workflowType: entry.workflowType,
+              taskQueue: entry.taskQueue,
+              args: entry.args,
+            },
+            state: { paused: entry.paused, note: entry.note },
+            memo: {
+              [catalogScheduleMemoKey]: catalogScheduleOwnership(
+                entry.exampleId,
+              ),
+            },
+          });
+        },
+        updateManagerArgs: async (entry) => {
+          await managerHandle(entry).update((previous) => ({
+            ...previous,
+            action: {
+              ...previous.action,
+              type: 'startWorkflow',
+              workflowType: entry.workflowType,
+              taskQueue: entry.taskQueue,
+              args: entry.args,
+            },
+          }));
+        },
+        triggerManager: async (entry) => {
+          await managerHandle(entry).trigger();
+        },
+        onEvent: (event) => {
+          if (event.state === 'skipped') {
+            console.info(`Schedule manager skipped: ${event.reason}`);
+          } else if (event.state === 'blocked') {
+            console.info(
+              `Cannot reconcile schedule "${event.scheduleId}": ${event.error instanceof Error ? event.error.message : String(event.error)}`,
+            );
+          } else {
+            console.info(
+              `Schedule "${event.scheduleId}" ${event.state} in ${event.namespace}/${event.taskQueue} with ${event.declaredCount} declared schedules.`,
+            );
+          }
+        },
+      });
+    } finally {
+      await connection.close();
     }
   }
 

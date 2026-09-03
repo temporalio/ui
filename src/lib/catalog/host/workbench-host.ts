@@ -69,6 +69,10 @@ export type WorkbenchHostDependencies = {
     request: { namespace: string; endpoint: string },
     signal?: AbortSignal,
   ) => Promise<boolean>;
+  checkSchedule: (
+    request: { namespace: string; scheduleId: string },
+    signal?: AbortSignal,
+  ) => Promise<boolean>;
   createEvidenceHref: (
     reference: LaunchReference & { runId: string },
   ) => string;
@@ -131,6 +135,7 @@ export const assembleWorkbenchHost = ({
   observe,
   checkWorker,
   checkNexusEndpoint,
+  checkSchedule,
   createEvidenceHref,
 }: WorkbenchHostDependencies): WorkbenchHost => {
   const descriptorsById = new Map(
@@ -281,6 +286,37 @@ export const assembleWorkbenchHost = ({
           required: true,
           state: endpointState,
           endpoint,
+        });
+      }
+
+      const declaredSchedule =
+        descriptor.execution.kind === 'workflow'
+          ? descriptor.execution.schedule
+          : undefined;
+
+      if (declaredSchedule) {
+        let scheduleState: ReadinessCheck['state'];
+
+        try {
+          scheduleState = (await checkSchedule(
+            {
+              namespace: descriptor.execution.namespace,
+              scheduleId: declaredSchedule.id,
+            },
+            signal,
+          ))
+            ? 'ready'
+            : 'unavailable';
+        } catch {
+          scheduleState = 'indeterminate';
+        }
+
+        checks.push({
+          kind: 'schedule',
+          required: false,
+          state: scheduleState,
+          scheduleId: declaredSchedule.id,
+          paused: declaredSchedule.paused,
         });
       }
 
