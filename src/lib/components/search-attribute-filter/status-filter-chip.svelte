@@ -1,8 +1,8 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -14,10 +14,10 @@
   } from '$lib/models/worker-status';
   import { workerStatusFilters } from '$lib/models/worker-status';
   import {
+    isWorkflowStatusType,
     type WorkflowFilters,
     workflowStatusFilters,
   } from '$lib/models/workflow-status';
-  import type { WorkflowStatus as WorkflowStatusType } from '$lib/types/workflows';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters.js';
 
   import type { StatusAttribute } from './types.ts';
@@ -51,6 +51,13 @@
       filters: workerStatusFilters,
     },
   };
+
+  const isWorkerStatusType = (
+    status: string | null,
+  ): status is WorkerStatusType =>
+    status === 'Unspecified' ||
+    status === 'Running' ||
+    status === 'ShuttingDown';
 
   const open = writable(false);
   let localFilters = $state([...filters]);
@@ -159,10 +166,10 @@
           {/snippet}
           {#if status === 'All'}
             <Translate key="workflows.all-statuses" />
-          {:else if attribute === 'ExecutionStatus'}
-            <WorkflowStatus status={status as WorkflowStatusType} />
-          {:else if attribute === 'WorkerStatus'}
-            <WorkerStatus status={status as WorkerStatusType} />
+          {:else if attribute === 'ExecutionStatus' && status && isWorkflowStatusType(status)}
+            <WorkflowStatusBadge {status} />
+          {:else if attribute === 'WorkerStatus' && isWorkerStatusType(status)}
+            <WorkerStatus {status} />
           {/if}
         </MenuItem>
       {/each}
