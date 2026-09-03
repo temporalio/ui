@@ -345,20 +345,23 @@
   </ToggleButtons>
 {/snippet}
 
-<MenuContainer {open}>
+<MenuContainer {open} class="min-w-0 max-w-full">
   <MenuButton
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="min-w-0 max-w-full bg-secondary"
+    class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-secondary"
     title="{getDisplayKeyWithConditional(localFilter)} {getDisplayValue(
       localFilter,
     )}"
   >
-    <span class="truncate">{getDisplayKeyWithConditional(localFilter)}</span
-    ><span class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
-      >{getDisplayValue(localFilter)}</span
-    >
+    <div class="min-w-0 text-left">
+      <span class="break-words"
+        >{getDisplayKeyWithConditional(localFilter)}</span
+      ><span class="break-all pl-1 text-brand"
+        >{getDisplayValue(localFilter)}</span
+      >
+    </div>
   </MenuButton>
 
   <Menu id={controlsId} class="max-h-fit w-64 p-4 lg:max-w-fit">
