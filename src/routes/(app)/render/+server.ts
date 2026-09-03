@@ -9,6 +9,7 @@ import { toHast } from 'mdast-util-to-hast';
 import { process } from '$lib/utilities/render-markdown';
 
 type RenderOptions = {
+  compact?: boolean;
   host: string;
   nonce: string;
   theme?: string;
@@ -43,7 +44,7 @@ const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
  */
 const createPage = (
   ast: ReturnType<typeof toHast>,
-  { nonce, theme, overrideTheme }: RenderOptions,
+  { compact, nonce, theme, overrideTheme }: RenderOptions,
 ) => {
   const cssPath = path.resolve('src/markdown.reset.css');
   const css = fs.readFileSync(cssPath, 'utf8');
@@ -62,7 +63,7 @@ const createPage = (
       h(
         'body',
         {
-          class: 'prose',
+          class: compact ? 'prose compact' : 'prose',
           'data-theme': overrideTheme ? `${theme}-${overrideTheme}` : theme,
         },
         h('main', ast),
@@ -78,12 +79,14 @@ export const GET = async (req: Request) => {
   const content = url.searchParams.get('content') || '';
   const theme = url.searchParams.get('theme') || '';
   const overrideTheme = url.searchParams.get('overrideTheme') || '';
+  const compact = url.searchParams.get('compact') === 'true';
 
   if (host === null) return new Response('Not found', { status: 404 });
   if (content === null) return new Response('Not found', { status: 404 });
 
   const nonce = generateNonce();
   const html = createPage(await process(content), {
+    compact,
     nonce,
     host,
     theme,

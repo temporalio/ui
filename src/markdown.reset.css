@@ -18,6 +18,19 @@ body {
   font-family: sans-serif;
 }
 
+/* No page padding and flowing wrappers, so a short string renders as a line
+   of text rather than a padded box. Wrapping stays on. */
+body.compact {
+  padding: 0;
+  white-space: normal;
+}
+
+body.compact main,
+body.compact p {
+  display: inline;
+  margin: 0;
+}
+
 h1 {
   font-size: 2em;
 }
