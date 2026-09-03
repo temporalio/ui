@@ -74,6 +74,7 @@
   > {
     status: BadgeStatusValue;
     text?: string;
+    count?: string | number;
     TrailIcon?: ConditionalValue<IconComponent>;
     extensions?: ConditionalValue<BadgeStatusExtensions>;
     class?: string;
@@ -82,6 +83,7 @@
   let {
     status,
     text,
+    count,
     TrailIcon,
     extensions,
     class: className,
@@ -102,7 +104,15 @@
       visibleExtensions.length ? 'rounded-l-full border-r-0' : 'rounded-full',
     )}
   >
-    <span>{text ?? configuration.text}</span>
+    <span>
+      {#if typeof count === 'number'}
+        {count.toLocaleString()} {text ?? configuration.text}
+      {:else if count != null}
+        {count} {text ?? configuration.text}
+      {:else}
+        {text ?? configuration.text}
+      {/if}
+    </span>
     {#if TrailIcon}
       <TrailIcon width="1em" height="1em" />
     {/if}

@@ -27,10 +27,12 @@
     component: BadgeStatus,
     args: {
       status: 'Running',
+      count: 14,
     },
     argTypes: {
       status: { control: 'select', options: statuses },
       text: { control: 'text' },
+      count: { control: 'number' },
       TrailIcon: { control: false },
       extensions: { control: 'object' },
       class: { table: { disable: true } },
@@ -78,7 +80,7 @@
       {#each statuses as status (status)}
         <div class="flex flex-col items-start gap-2">
           <span class="text-xs text-secondary">{status}</span>
-          <BadgeStatus {status} />
+          <BadgeStatus {status} count={14} />
         </div>
       {/each}
     </div>
