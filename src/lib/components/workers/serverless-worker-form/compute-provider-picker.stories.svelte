@@ -121,3 +121,47 @@
     />
   </div>
 </Story>
+
+<Story
+  name="AWS namespace (Lambda and AgentCore)"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('AWS Lambda')).toBeInTheDocument();
+    await expect(
+      canvas.getByText('Amazon Bedrock AgentCore'),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText('Public Preview')).toBeInTheDocument();
+    await expect(canvas.getByText('Pre-release')).toBeInTheDocument();
+  }}
+>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker
+      provider="agentcore"
+      providers={[{ value: 'lambda' }, { value: 'agentcore' }]}
+    />
+  </div>
+</Story>
+
+<Story
+  name="AgentCore awaiting server support"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Coming Soon')).toBeInTheDocument();
+  }}
+>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker
+      provider="lambda"
+      providers={[
+        { value: 'lambda' },
+        {
+          value: 'agentcore',
+          disabled: true,
+          disabledReason: 'Coming Soon',
+        },
+      ]}
+    />
+  </div>
+</Story>

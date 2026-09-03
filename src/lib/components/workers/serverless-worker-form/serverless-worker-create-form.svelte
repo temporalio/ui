@@ -22,6 +22,7 @@
 
   interface SubmitFieldErrors {
     lambdaArn?: string[];
+    agentCoreEndpointArn?: string[];
     iamRoleArn?: string[];
   }
 
@@ -61,6 +62,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: '',
+      agentCoreEndpointArn: '',
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject: '',
@@ -90,6 +92,9 @@
           if (fieldErrors) {
             if (fieldErrors.lambdaArn)
               form.errors.lambdaArn = fieldErrors.lambdaArn;
+            if (fieldErrors.agentCoreEndpointArn)
+              form.errors.agentCoreEndpointArn =
+                fieldErrors.agentCoreEndpointArn;
             if (fieldErrors.iamRoleArn)
               form.errors.iamRoleArn = fieldErrors.iamRoleArn;
             return;
@@ -156,6 +161,7 @@
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
+        bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
         bind:iamRoleArn={$form.iamRoleArn}
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}

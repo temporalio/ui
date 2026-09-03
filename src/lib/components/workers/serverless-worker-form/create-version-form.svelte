@@ -54,6 +54,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: '',
+      agentCoreEndpointArn: '',
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject: '',
@@ -127,6 +128,7 @@
         <ComputeFields
           provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}
+          bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
           bind:iamRoleArn={$form.iamRoleArn}
           bind:roleExternalId={$form.roleExternalId}
           bind:gcpProject={$form.gcpProject}

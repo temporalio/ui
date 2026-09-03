@@ -34,7 +34,22 @@ describe('lockComputeProvider', () => {
   it('locks all alternatives to the provider used by existing versions', () => {
     expect(lockComputeProvider(deployment(['aws-lambda']))).toEqual({
       provider: 'lambda',
-      providers: [{ value: 'lambda' }, { value: 'cloud-run', hidden: true }],
+      providers: [
+        { value: 'lambda' },
+        { value: 'agentcore', hidden: true },
+        { value: 'cloud-run', hidden: true },
+      ],
+    });
+  });
+
+  it('locks all alternatives to AgentCore when versions use it', () => {
+    expect(lockComputeProvider(deployment(['aws-agentcore']))).toEqual({
+      provider: 'agentcore',
+      providers: [
+        { value: 'lambda', hidden: true },
+        { value: 'agentcore' },
+        { value: 'cloud-run', hidden: true },
+      ],
     });
   });
 

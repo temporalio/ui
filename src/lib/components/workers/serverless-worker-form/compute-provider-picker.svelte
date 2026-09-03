@@ -28,6 +28,7 @@
 
   const providerIcon: Record<ComputeProviderValue, IconComponent> = {
     lambda: IconAws,
+    agentcore: IconAws,
     'cloud-run': IconGcp,
   };
 
@@ -35,6 +36,8 @@
     switch (value) {
       case 'lambda':
         return translate('workers.provider-lambda');
+      case 'agentcore':
+        return translate('workers.provider-agentcore');
       case 'cloud-run':
         return translate('workers.provider-cloud-run');
     }
@@ -44,6 +47,8 @@
     switch (value) {
       case 'lambda':
         return translate('workers.provider-lambda-description');
+      case 'agentcore':
+        return translate('workers.provider-agentcore-description');
       case 'cloud-run':
         return translate('workers.provider-cloud-run-description');
     }
@@ -65,9 +70,19 @@
   const cloudRunCapable = $derived(
     hasCapability('serverScaledProviderCloudRun'),
   );
+  const agentCoreCapable = $derived(
+    hasCapability('serverScaledProviderAgentCore'),
+  );
 
   const defaultProviders = $derived<ComputeProviderOption[]>([
     { value: 'lambda' },
+    {
+      value: 'agentcore',
+      disabled: !agentCoreCapable,
+      disabledReason: agentCoreCapable
+        ? undefined
+        : translate('workers.coming-soon'),
+    },
     {
       value: 'cloud-run',
       disabled: !cloudRunCapable,
