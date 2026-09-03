@@ -15,13 +15,14 @@
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
   import { getVisibleInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
@@ -302,9 +303,7 @@
           }),
         )}
       >
-        <Badge type="primary" class="px-2 py-0">
-          {workflow?.historyEvents}
-        </Badge>
+        <BadgeCount variant="single" value={workflow?.historyEvents ?? 0} />
       </Tab>
       <Tab
         label={translate('workflows.relationships')}
@@ -315,10 +314,11 @@
           routeForRelationships(routeParameters),
         )}
       >
-        <Badge type="primary" class="px-2 py-0">
-          {workflowRelationships.relationshipCount}
-        </Badge></Tab
-      >
+        <BadgeCount
+          variant="single"
+          value={workflowRelationships.relationshipCount}
+        />
+      </Tab>
       {#if linkCount > 0}
         <Tab
           label={translate('workflows.nexus-links-tab')}
@@ -329,9 +329,7 @@
             routeForNexusLinks(routeParameters),
           )}
         >
-          <Badge type="primary" class="px-2 py-0">
-            {linkCount}
-          </Badge>
+          <BadgeCount variant="single" value={linkCount} />
         </Tab>
       {/if}
       <Tab
@@ -344,9 +342,7 @@
         )}
       >
         {#if workerCount !== undefined}
-          <Badge type="primary" class="px-2 py-0">
-            {workerCount}
-          </Badge>
+          <BadgeCount variant="single" value={workerCount} />
         {/if}
       </Tab>
       <Tab
@@ -358,17 +354,18 @@
           routeForPendingActivities(routeParameters),
         )}
       >
-        <Badge
-          type={activitiesCanceled ? 'warning' : 'primary'}
-          class="px-2 py-0"
-        >
-          <div class="flex items-center gap-1">
-            {#if activitiesCanceled}
-              <IconCanceled />
-            {/if}
-            {workflow?.pendingActivities?.length}
-          </div>
-        </Badge>
+        {#if activitiesCanceled}
+          <Badge
+            colorScheme="warning"
+            Icon={IconCanceled}
+            text={String(workflow?.pendingActivities?.length ?? 0)}
+          />
+        {:else}
+          <BadgeCount
+            variant="single"
+            value={workflow?.pendingActivities?.length ?? 0}
+          />
+        {/if}
       </Tab>
       <Tab
         label={translate('workflows.call-stack-tab')}
