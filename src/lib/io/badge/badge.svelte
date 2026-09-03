@@ -18,7 +18,7 @@
   };
 
   const sharedClasses =
-    'inline-flex whitespace-nowrap divide-x divide-inherit rounded-full border font-mono text-xs font-medium leading-none uppercase';
+    '[text-box:trim-both_cap_alphabetic] [&_span]:[text-box:inherit] inline-flex whitespace-nowrap divide-x divide-inherit rounded-full border font-mono text-xs font-medium leading-none uppercase';
   const segmentClasses =
     'inline-flex flex-nowrap items-center justify-center gap-1 px-1 py-0.5';
 

@@ -2,6 +2,8 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
+  import { IconTag } from '$lib/io/icon';
+
   import type { TagColorScheme } from './tag.svelte';
   import Tag from './tag.svelte';
 
@@ -46,8 +48,13 @@
 <Story name="With extension" args={{ extension: { text: 'extension' } }} />
 
 <Story
+  name="With extension icon"
+  args={{ extension: { text: 'extension', Icon: IconTag } }}
+/>
+
+<Story
   name="Without icons"
-  args={{ Icon: null, extension: { text: 'extension', Icon: null } }}
+  args={{ Icon: null, extension: { text: 'extension' } }}
 />
 
 <Story name="Color schemes">

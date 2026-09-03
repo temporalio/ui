@@ -35,7 +35,7 @@
     extension !== false && extension !== null && extension !== undefined;
 
   const sharedClasses =
-    'inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono text-xs font-medium leading-none uppercase tracking-wide';
+    '[text-box:trim-both_cap_alphabetic] [&_span]:[text-box:inherit] inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono text-xs font-medium leading-none uppercase tracking-wide';
   const segmentClasses =
     'inline-flex flex-nowrap items-center justify-center gap-1 border px-1 py-0.5';
 
