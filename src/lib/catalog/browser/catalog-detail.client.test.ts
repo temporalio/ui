@@ -105,6 +105,7 @@ describe('CatalogDetail client interactions', () => {
             state: 'unavailable',
             scheduleId: 'ui-catalog-hello-hourly',
             paused: true,
+            held: false,
           },
         ],
       ],
@@ -141,6 +142,7 @@ describe('CatalogDetail client interactions', () => {
             state: 'ready',
             scheduleId: 'ui-catalog-hello-hourly',
             paused: false,
+            held: false,
           },
         ],
       ],
@@ -154,6 +156,34 @@ describe('CatalogDetail client interactions', () => {
     expect(scheduleLink?.getAttribute('href')).toContain(
       'ui-catalog-hello-hourly',
     );
+  });
+
+  it('explains a held schedule and still links to it', async () => {
+    const target = await client.renderDetail({
+      withSchedule: true,
+      readinessResponses: [
+        [
+          { kind: 'worker', required: false, state: 'ready', taskQueueType: 1 },
+          {
+            kind: 'schedule',
+            required: false,
+            state: 'ready',
+            scheduleId: 'ui-catalog-hello-hourly',
+            paused: false,
+            held: true,
+          },
+        ],
+      ],
+    });
+    await client.flush();
+    const readinessPanel = target.querySelector('[aria-label="Readiness"]');
+
+    expect(readinessPanel?.textContent).toContain('Held');
+    expect(readinessPanel?.textContent).toContain('paused by hand');
+    expect(readinessPanel?.textContent).toContain('Resume');
+    expect(
+      readinessPanel?.querySelector('a[href*="/schedules/"]'),
+    ).not.toBeNull();
   });
 
   it('runs the execution id it shows and then shows the next one', async () => {

@@ -105,7 +105,13 @@ export type ScheduleReadinessCheck = {
   required: false;
   state: ReadinessState;
   scheduleId: string;
+  /** What the example declares. */
   paused: boolean;
+  /**
+   * The schedule's running state on the server diverges from the declaration,
+   * so the manager is leaving it alone until the two agree again.
+   */
+  held: boolean;
 };
 
 export type ReadinessCheck =

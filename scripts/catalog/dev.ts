@@ -174,11 +174,11 @@ try {
         bindings: selectedBindings,
         describeManager: async (entry) => {
           try {
-            await managerHandle(entry).describe();
-            return { exists: true };
+            const { state } = await managerHandle(entry).describe();
+            return { exists: true, paused: state.paused };
           } catch (error) {
             if (error instanceof ScheduleNotFoundError)
-              return { exists: false };
+              return { exists: false, paused: false };
             throw error;
           }
         },
@@ -221,6 +221,10 @@ try {
         onEvent: (event) => {
           if (event.state === 'skipped') {
             console.info(`Schedule manager skipped: ${event.reason}`);
+          } else if (event.state === 'held') {
+            console.info(
+              `Schedule "${event.scheduleId}" is held: ${event.reason}. No schedule was created, updated, or deleted.`,
+            );
           } else if (event.state === 'blocked') {
             console.info(
               `Cannot reconcile schedule "${event.scheduleId}": ${event.error instanceof Error ? event.error.message : String(event.error)}`,

@@ -72,7 +72,7 @@ export type WorkbenchHostDependencies = {
   checkSchedule: (
     request: { namespace: string; scheduleId: string },
     signal?: AbortSignal,
-  ) => Promise<boolean>;
+  ) => Promise<{ exists: boolean; paused: boolean }>;
   createEvidenceHref: (
     reference: LaunchReference & { runId: string },
   ) => string;
@@ -296,17 +296,19 @@ export const assembleWorkbenchHost = ({
 
       if (declaredSchedule) {
         let scheduleState: ReadinessCheck['state'];
+        let held = false;
 
         try {
-          scheduleState = (await checkSchedule(
+          const { exists, paused } = await checkSchedule(
             {
               namespace: descriptor.execution.namespace,
               scheduleId: declaredSchedule.id,
             },
             signal,
-          ))
-            ? 'ready'
-            : 'unavailable';
+          );
+
+          scheduleState = exists ? 'ready' : 'unavailable';
+          held = exists && paused !== declaredSchedule.paused;
         } catch {
           scheduleState = 'indeterminate';
         }
@@ -317,6 +319,7 @@ export const assembleWorkbenchHost = ({
           state: scheduleState,
           scheduleId: declaredSchedule.id,
           paused: declaredSchedule.paused,
+          held,
         });
       }
 

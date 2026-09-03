@@ -443,15 +443,20 @@ export const createApiWorkbenchHost = ({
       const route = routeForApi('schedule', { namespace, scheduleId });
 
       try {
-        const response = await requestFromAPI<{ schedule?: unknown }>(route, {
+        const response = await requestFromAPI<{
+          schedule?: { state?: { paused?: boolean } };
+        }>(route, {
           request,
           notifyOnError: false,
           options: { signal },
         });
 
-        return Boolean(response?.schedule);
+        return {
+          exists: Boolean(response?.schedule),
+          paused: Boolean(response?.schedule?.state?.paused),
+        };
       } catch {
-        return false;
+        return { exists: false, paused: false };
       }
     },
     createEvidenceHref: evidenceHref,

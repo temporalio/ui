@@ -365,7 +365,7 @@ describe('createApiWorkbenchHost', () => {
       if (url.includes('/task-queues/')) {
         return jsonResponse({ pollers: [{ identity: 'worker' }] });
       }
-      return jsonResponse({ schedule: { spec: {} } });
+      return jsonResponse({ schedule: { spec: {}, state: { paused: true } } });
     });
     const host = createApiWorkbenchHost({
       descriptors: [scheduledDescriptor],
@@ -378,10 +378,34 @@ describe('createApiWorkbenchHost', () => {
       state: 'ready',
       scheduleId: 'ui-catalog-hello-hourly',
       paused: true,
+      held: false,
     });
     expect(request.mock.calls.at(-1)?.[0]).toMatch(
       /\/api\/v1\/namespaces\/catalog-demo\/schedules\/ui-catalog-hello-hourly\?$/,
     );
+  });
+
+  it('holds the schedule when the server disagrees with the declaration', async () => {
+    const request = vi.fn().mockImplementation(async (url: string) => {
+      if (url.includes('/task-queues/')) {
+        return jsonResponse({ pollers: [{ identity: 'worker' }] });
+      }
+      // Declared paused: true, running on the server.
+      return jsonResponse({ schedule: { spec: {}, state: { paused: false } } });
+    });
+    const host = createApiWorkbenchHost({
+      descriptors: [scheduledDescriptor],
+      request,
+    });
+
+    await expect(host.checkReadiness('hourly-order')).resolves.toContainEqual({
+      kind: 'schedule',
+      required: false,
+      state: 'ready',
+      scheduleId: 'ui-catalog-hello-hourly',
+      paused: true,
+      held: true,
+    });
   });
 
   it('reports a missing schedule as unavailable without failing readiness', async () => {
@@ -402,6 +426,7 @@ describe('createApiWorkbenchHost', () => {
       state: 'unavailable',
       scheduleId: 'ui-catalog-hello-hourly',
       paused: true,
+      held: false,
     });
   });
 

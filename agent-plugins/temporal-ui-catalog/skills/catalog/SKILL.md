@@ -116,6 +116,8 @@ When it is on, the worker creates its own hourly `ui-catalog-schedule-sync` sche
 
 The manager stamps a `uiCatalog` memo on each schedule it creates and only writes schedules carrying that memo. An owned schedule that no example declares any more is deleted. An existing id without the memo is reported as blocked and is never updated or deleted.
 
+To stop a declared schedule without editing code, pause it. A running state that disagrees with the declaration is reported as held, and the manager writes nothing to that schedule — spec, action, and state are all left alone — until it is resumed. Pausing `ui-catalog-schedule-sync` stops reconciliation entirely, including at worker startup, so it works as a kill switch that survives restarts.
+
 ## Promote a local example into the shared catalog
 
 Promotion is deliberate and never automatic:

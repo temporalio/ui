@@ -65,6 +65,7 @@ export const listCatalogSchedules = async ({
       existing.push({
         id: summary.scheduleId,
         owned,
+        paused: summary.state.paused,
         ...(owned ? { exampleId: memo[catalogScheduleMemoKey].exampleId } : {}),
       });
     }
@@ -85,6 +86,7 @@ export const applyCatalogSchedulePlan = async ({
       updated: [],
       deleted: [],
       blocked: plan.blocked.map(({ id }) => id),
+      held: plan.held.map(({ id }) => id),
       errors: [],
     };
 

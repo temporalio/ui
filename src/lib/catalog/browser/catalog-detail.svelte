@@ -902,6 +902,11 @@
                         >Paused</Badge
                       >
                     {/if}
+                    {#if check.held}
+                      <Badge type="warning" class="px-1 py-0 text-xs leading-4"
+                        >Held</Badge
+                      >
+                    {/if}
                   {/if}
                 </div>
                 {#if check.kind === 'schedule' && check.state === 'unavailable'}
@@ -919,6 +924,14 @@
                   />
                   <p class="mt-1 text-xs text-secondary">
                     Add it to .env.catalog.local, then run pnpm catalog worker.
+                  </p>
+                {/if}
+                {#if check.kind === 'schedule' && check.held}
+                  <p class="mt-2 text-xs text-secondary">
+                    This schedule was {check.paused ? 'resumed' : 'paused'} by hand,
+                    so the manager is leaving it alone. {check.paused
+                      ? 'Pause'
+                      : 'Resume'} it to hand it back.
                   </p>
                 {/if}
                 {#if check.kind === 'schedule' && check.state === 'ready'}

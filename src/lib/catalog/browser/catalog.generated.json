@@ -1,5 +1,5 @@
 {
-  "sourceHash": "4782f0f1f2739f078ce1da9817f4115367bd74d187d77421106d728e3949135b",
+  "sourceHash": "d3d3b81019103ad0310ce49f73087cc9448814d7cbee87ed863341dc0da05a90",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -535,7 +535,7 @@
           }
         }
       },
-      "setupMarkdown": "The schedule manager is disabled by default, so no catalog example creates a schedule until you turn it on.\n\nSet `CATALOG_SCHEDULES=enabled` in `.env.catalog.local` and restart the worker. The worker then creates its own hourly `ui-catalog-schedule-sync` schedule and triggers it once.\n\nThe manager only writes schedules it owns. Ownership comes from the `uiCatalog` memo it stamps on every schedule it creates. A schedule id that already exists without that memo is reported as blocked and is never updated or deleted.",
+      "setupMarkdown": "The schedule manager is disabled by default, so no catalog example creates a schedule until you turn it on.\n\nSet `CATALOG_SCHEDULES=enabled` in `.env.catalog.local` and restart the worker. The worker then creates its own hourly `ui-catalog-schedule-sync` schedule and triggers it once.\n\nThe manager only writes schedules it owns. Ownership comes from the `uiCatalog` memo it stamps on every schedule it creates. A schedule id that already exists without that memo is reported as blocked and is never updated or deleted.\n\nTo stop a declared schedule without changing code, pause it. A running state that disagrees with the declaration is reported as held, and the manager writes nothing to that schedule until you resume it. Pausing this schedule stops reconciliation altogether, including at worker startup.",
       "execution": {
         "kind": "workflow",
         "targetId": "shared-workflows",

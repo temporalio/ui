@@ -100,6 +100,14 @@ When it is on, the worker creates its own `ui-catalog-schedule-sync` schedule, p
 
 Ownership comes from a memo. The manager stamps `uiCatalog` on every schedule it creates and only ever updates or deletes a schedule carrying that memo. An owned schedule that no example declares any more is deleted. A schedule id that already exists without the memo is reported as blocked and is never touched.
 
+### Stopping a schedule without a deploy
+
+Pause it in the UI. The manager treats a running state that disagrees with the declaration as a decision somebody made, reports the schedule as held, and writes nothing to it — not the spec, not the action, not the state. Resume it and the next sync reconciles it normally.
+
+Pausing `ui-catalog-schedule-sync` itself stops all reconciliation, including at worker startup: the bootstrap sees the pause and skips both the argument rewrite and the trigger.
+
+A held schedule can drift arbitrarily far from its declaration while it is held, because nothing is rewriting it. Resuming it hands it back to the reconciler, which rewrites all of that on the next pass. A hold is a pause button, not a place to keep hand edits.
+
 ## Generated artifacts
 
 The browser reads generated artifacts rather than importing worker code. `catalog.generated.json`, `catalog.generated.ts`, and the local assemblies under `catalog.local/` are all generated: never edit them by hand.

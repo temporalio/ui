@@ -27,6 +27,7 @@ export async function catalogScheduleSync(
     updated: [],
     deleted: [],
     blocked: [],
+    held: [],
     errors: [],
   };
 
@@ -42,6 +43,7 @@ export async function catalogScheduleSync(
     merged.updated.push(...result.updated);
     merged.deleted.push(...result.deleted);
     merged.blocked.push(...result.blocked);
+    merged.held.push(...result.held);
     merged.errors.push(...result.errors);
   }
 

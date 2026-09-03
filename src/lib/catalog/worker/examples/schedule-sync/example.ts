@@ -46,6 +46,8 @@ export const catalogExample: CatalogExampleDefinition = {
     'Set `CATALOG_SCHEDULES=enabled` in `.env.catalog.local` and restart the worker. The worker then creates its own hourly `ui-catalog-schedule-sync` schedule and triggers it once.',
     '',
     'The manager only writes schedules it owns. Ownership comes from the `uiCatalog` memo it stamps on every schedule it creates. A schedule id that already exists without that memo is reported as blocked and is never updated or deleted.',
+    '',
+    'To stop a declared schedule without changing code, pause it. A running state that disagrees with the declaration is reported as held, and the manager writes nothing to that schedule until you resume it. Pausing this schedule stops reconciliation altogether, including at worker startup.',
   ].join('\n'),
   execution: {
     kind: 'workflow',

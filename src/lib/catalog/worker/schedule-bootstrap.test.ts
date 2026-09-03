@@ -55,12 +55,14 @@ const syncExamples = () => [
 const bootstrap = async ({
   examples = syncExamples(),
   exists = false,
+  paused = false,
   triggerManager = vi.fn(async () => undefined),
   createManager = vi.fn(async () => undefined),
   updateManagerArgs = vi.fn(async () => undefined),
 }: {
   examples?: CatalogWorkerBinding['examples'];
   exists?: boolean;
+  paused?: boolean;
   triggerManager?: (entry: CatalogDesiredSchedule) => Promise<void>;
   createManager?: (entry: CatalogDesiredSchedule) => Promise<void>;
   updateManagerArgs?: (entry: CatalogDesiredSchedule) => Promise<void>;
@@ -69,7 +71,7 @@ const bootstrap = async ({
 
   await bootstrapCatalogScheduleSync({
     bindings: bindings(examples),
-    describeManager: async () => ({ exists }),
+    describeManager: async () => ({ exists, paused }),
     createManager,
     updateManagerArgs,
     triggerManager,
@@ -169,5 +171,34 @@ describe('bootstrapCatalogScheduleSync', () => {
       },
     ]);
     expect(triggerManager).not.toHaveBeenCalled();
+  });
+});
+
+describe('bootstrapCatalogScheduleSync and a paused manager', () => {
+  it('writes nothing and triggers nothing when the manager is paused by hand', async () => {
+    const { events, createManager, updateManagerArgs, triggerManager } =
+      await bootstrap({ exists: true, paused: true });
+
+    expect(createManager).not.toHaveBeenCalled();
+    expect(updateManagerArgs).not.toHaveBeenCalled();
+    expect(triggerManager).not.toHaveBeenCalled();
+    expect(events).toEqual([
+      expect.objectContaining({
+        state: 'held',
+        scheduleId: 'ui-catalog-schedule-sync',
+        reason: 'paused by hand; resume it to reconcile again',
+      }),
+    ]);
+  });
+
+  it('reconciles again once the manager is resumed', async () => {
+    const { events, updateManagerArgs, triggerManager } = await bootstrap({
+      exists: true,
+      paused: false,
+    });
+
+    expect(updateManagerArgs).toHaveBeenCalledTimes(1);
+    expect(triggerManager).toHaveBeenCalledTimes(1);
+    expect(events.map(({ state }) => state)).toEqual(['updated', 'triggered']);
   });
 });

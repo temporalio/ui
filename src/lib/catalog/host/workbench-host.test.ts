@@ -556,7 +556,9 @@ describe('OSS WorkbenchHost', () => {
   });
 
   it('reports a declared schedule as an advisory check after the Nexus checks', async () => {
-    const checkSchedule = vi.fn().mockResolvedValue(true);
+    const checkSchedule = vi
+      .fn()
+      .mockResolvedValue({ exists: true, paused: true });
     const host = assembleWorkbenchHost({
       descriptors: [scheduledDescriptor],
       launch: vi.fn(),
@@ -579,12 +581,56 @@ describe('OSS WorkbenchHost', () => {
         state: 'ready',
         scheduleId: 'ui-catalog-hello-hourly',
         paused: true,
+        held: false,
       },
     ]);
     expect(checkSchedule).toHaveBeenCalledWith(
       { namespace: 'catalog-demo', scheduleId: 'ui-catalog-hello-hourly' },
       undefined,
     );
+  });
+
+  it('reports a schedule held when its running state diverges from the declaration', async () => {
+    const host = assembleWorkbenchHost({
+      descriptors: [scheduledDescriptor],
+      launch: vi.fn(),
+      checkWorker: vi.fn().mockResolvedValue(true),
+      checkNexusEndpoint: vi.fn(),
+      // The example declares paused: true; somebody resumed it.
+      checkSchedule: vi.fn().mockResolvedValue({ exists: true, paused: false }),
+      createEvidenceHref: vi.fn(),
+    });
+
+    await expect(host.checkReadiness('hourly-order')).resolves.toContainEqual({
+      kind: 'schedule',
+      required: false,
+      state: 'ready',
+      scheduleId: 'ui-catalog-hello-hourly',
+      paused: true,
+      held: true,
+    });
+  });
+
+  it('does not hold a schedule that is missing from the server', async () => {
+    const host = assembleWorkbenchHost({
+      descriptors: [scheduledDescriptor],
+      launch: vi.fn(),
+      checkWorker: vi.fn().mockResolvedValue(true),
+      checkNexusEndpoint: vi.fn(),
+      checkSchedule: vi
+        .fn()
+        .mockResolvedValue({ exists: false, paused: false }),
+      createEvidenceHref: vi.fn(),
+    });
+
+    await expect(host.checkReadiness('hourly-order')).resolves.toContainEqual({
+      kind: 'schedule',
+      required: false,
+      state: 'unavailable',
+      scheduleId: 'ui-catalog-hello-hourly',
+      paused: true,
+      held: false,
+    });
   });
 
   it('leaves a schedule check indeterminate when the lookup throws', async () => {
@@ -603,6 +649,7 @@ describe('OSS WorkbenchHost', () => {
       state: 'indeterminate',
       scheduleId: 'ui-catalog-hello-hourly',
       paused: true,
+      held: false,
     });
   });
 

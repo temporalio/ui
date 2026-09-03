@@ -10,7 +10,7 @@ import {
 } from './schedule-declarations.js';
 
 export type CatalogScheduleBootstrapEvent = {
-  state: 'blocked' | 'created' | 'skipped' | 'triggered' | 'updated';
+  state: 'blocked' | 'created' | 'held' | 'skipped' | 'triggered' | 'updated';
   scheduleId: string;
   namespace?: string;
   taskQueue?: string;
@@ -30,7 +30,7 @@ export const bootstrapCatalogScheduleSync = async ({
   bindings: readonly CatalogWorkerBinding[];
   describeManager: (
     entry: CatalogDesiredSchedule,
-  ) => Promise<{ exists: boolean }>;
+  ) => Promise<{ exists: boolean; paused: boolean }>;
   createManager: (entry: CatalogDesiredSchedule) => Promise<void>;
   updateManagerArgs: (entry: CatalogDesiredSchedule) => Promise<void>;
   triggerManager: (entry: CatalogDesiredSchedule) => Promise<void>;
@@ -65,7 +65,19 @@ export const bootstrapCatalogScheduleSync = async ({
   };
 
   try {
-    const { exists } = await describeManager(entry);
+    const { exists, paused } = await describeManager(entry);
+
+    // A paused manager is the kill switch. Rewriting its args or triggering it
+    // would restart the reconciliation the pause was meant to stop, and every
+    // worker restart would do it again. Resume it to hand control back.
+    if (exists && paused) {
+      onEvent({
+        state: 'held',
+        ...details,
+        reason: 'paused by hand; resume it to reconcile again',
+      });
+      return;
+    }
 
     if (exists) {
       await updateManagerArgs(entry);

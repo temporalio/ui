@@ -184,6 +184,7 @@ describe('catalog example start', () => {
           state: 'unavailable',
           scheduleId: 'ui-catalog-hello-hourly',
           paused: true,
+          held: false,
         },
       ],
     });

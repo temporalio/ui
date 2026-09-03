@@ -140,6 +140,16 @@ The worker creates its own hourly `ui-catalog-schedule-sync` schedule, triggers 
 
 Run it in a namespace that no other schedule manager owns. A reconciler that deletes every schedule it does not know about will remove the catalog's schedules on its next pass.
 
+### A schedule paused by hand
+
+Pause a catalog-owned schedule in the UI. The next sync reports it as held and writes nothing to it; the example page shows a Held badge naming what happened. Resume it and the following sync reconciles it again, rewriting any edits made while it was held.
+
+Pausing `ui-catalog-schedule-sync` stops reconciliation entirely. Worker startup then prints the held line instead of rewriting the manager's arguments and triggering it, so the pause survives restarts.
+
+**Unverified.** Covered by unit tests across the plan, the bootstrap, and the readiness check, but not yet exercised against a live server.
+
+### Schedule manager enabled (continued)
+
 **Verified** against a local server in a dedicated namespace. Cold start created the manager and the `hello` schedule with the ownership memo; a restart updated the manager's arguments and triggered a sync. A hand-deleted declared schedule was recreated. A hand-edited cron on an owned schedule was rewritten back. A memo-marked schedule for a removed example was deleted. A schedule without the memo was left alone, and one squatting on a declared id was reported as blocked and left untouched. The example page's schedule readiness check was covered by client tests only.
 
 ## Environment interference
