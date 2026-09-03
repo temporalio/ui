@@ -5,8 +5,8 @@
 
   import { page } from '$app/state';
 
-  import WorkflowCountStatus from '$lib/components/execution-status.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import { ChipStatus } from '$lib/io/chip-status';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
@@ -147,14 +147,18 @@
   {#each allStatusGroups as { count, status } (status)}
     {#if !countPoller.loading}
       {@const group = newStatusGroups.find((g) => g.status === status)}
-      <button onclick={() => onStatusClick(status)}>
-        <WorkflowCountStatus
+      {@const newCountDiff = group ? group.count - count : 0}
+      {#if status}
+        <ChipStatus
           {status}
-          {count}
-          newCount={group ? group.count - count : 0}
-          test-id="{testId}-{status}"
+          count={count.toLocaleString()}
+          extension={newCountDiff
+            ? newCountDiff.toLocaleString(undefined, { signDisplay: 'always' })
+            : undefined}
+          onclick={() => onStatusClick(status)}
+          data-testid={`${testId}-${status}`}
         />
-      </button>
+      {/if}
     {:else}
       <Skeleton class="h-6 w-24 rounded-sm" />
     {/if}

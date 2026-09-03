@@ -77,6 +77,7 @@
     'children' | 'class' | 'type'
   > {
     status: ChipStatusValue;
+    count?: string | number;
     extension?: string | number;
     class?: string;
     type?: HTMLButtonAttributes['type'];
@@ -84,6 +85,7 @@
 
   let {
     status,
+    count,
     extension,
     class: className,
     type = 'button',
@@ -91,6 +93,9 @@
   }: Props = $props();
 
   const configuration = $derived(statusConfiguration[status]);
+  const label = $derived(
+    count === undefined ? configuration.text : `${count} ${configuration.text}`,
+  );
 </script>
 
 <button
@@ -102,9 +107,7 @@
   )}
   {...rest}
 >
-  <span class="{segmentClasses} py-0.5 font-medium">
-    {configuration.text}
-  </span>
+  <span class="{segmentClasses} py-0.5 font-medium">{label}</span>
   {#if extension !== undefined}
     <span
       class={twMerge(
