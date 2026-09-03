@@ -114,19 +114,10 @@
       ? addedSystemView === view.id ||
         query === combineQueries(systemViewBaseQuery, view.query)
       : query === view.query;
-  const appliedSystemView = $derived.by(() => {
-    if (!activeUserView) return undefined;
-    return systemViews.find(
-      (system) =>
-        system.query &&
-        query === combineQueries(systemViewBaseQuery, system.query),
-    );
-  });
   const activeUserViewDirty = $derived(
     Boolean(activeUserView) &&
       Boolean(query) &&
-      activeUserView?.query !== query &&
-      !appliedSystemView,
+      activeUserView?.query !== query,
   );
 
   onMount(() => {
@@ -186,16 +177,29 @@
   });
 
   const setActiveQueryView = (view: SavedQuery) => {
-    const addsToActiveView = narrowsActiveView(view) && onCustomView;
+    const removesActiveView =
+      narrowsActiveView(view) && isSystemViewActive(view);
+    const addsToActiveView =
+      narrowsActiveView(view) && onCustomView && !removesActiveView;
     const baseQuery = activeUserView
       ? systemViewBaseQuery
       : addedSystemView
         ? addedSystemViewBase
         : query;
-    const nextView = addsToActiveView ? activeQueryView : view;
-    const nextQuery = addsToActiveView
-      ? combineQueries(baseQuery, view.query)
-      : view.query;
+    const nextQuery = removesActiveView
+      ? addedSystemView === view.id
+        ? addedSystemViewBase
+        : systemViewBaseQuery
+      : addsToActiveView
+        ? combineQueries(baseQuery, view.query)
+        : view.query;
+    const nextView = removesActiveView
+      ? nextQuery
+        ? activeQueryView
+        : defaultView
+      : addsToActiveView
+        ? activeQueryView
+        : view;
 
     if (nextView?.id === activeQueryView?.id && nextQuery === query) return;
 
