@@ -6,6 +6,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { IconCode } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
@@ -53,7 +54,7 @@
 
 <div>
   <div
-    class="flex w-full flex-wrap items-center justify-between gap-2 border border-b-0 border-subtle bg-primary p-1.5"
+    class="flex w-full flex-wrap items-end justify-between gap-2 border border-b-0 border-subtle bg-primary p-1.5"
   >
     <Filter
       {filters}
@@ -62,9 +63,11 @@
       {statusAttribute}
       {includeNullConditions}
     />
-    <div class="flex items-center gap-1">
+    <div class="flex shrink-0 items-center gap-1">
       <Tooltip
-        text={viewManualQuery ? 'Hide raw query' : 'View raw query'}
+        text={viewManualQuery
+          ? translate('common.hide-raw-query')
+          : translate('common.view-raw-query')}
         left
       >
         <Button

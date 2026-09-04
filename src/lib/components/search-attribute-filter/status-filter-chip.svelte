@@ -117,18 +117,18 @@
   });
 </script>
 
-<MenuContainer {open}>
+<MenuContainer {open} class="min-w-0 max-w-full">
   <MenuButton
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="min-w-0 max-w-full bg-secondary"
+    class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-secondary"
     title="{attribute} = {statusValues}"
   >
-    <span class="truncate">{attribute} =</span><span
-      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
-      >{statusValues}</span
-    >
+    <div class="min-w-0 text-left">
+      <span class="break-words">{attribute} =</span>
+      <span class="break-all text-brand">{statusValues}</span>
+    </div>
   </MenuButton>
 
   <Menu id={controlsId} class="max-h-fit w-80 max-w-fit p-4" keepOpen>

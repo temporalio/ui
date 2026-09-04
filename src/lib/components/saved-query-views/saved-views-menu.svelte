@@ -22,7 +22,8 @@
     draftView?: SavedQuery;
     dirty?: boolean;
     maxQueries: number;
-    onSelect: (view: SavedQuery) => void;
+    onSelect: (view: SavedQuery, event?: MouseEvent) => void;
+    viewHref: (view: SavedQuery) => string;
   }
 
   let {
@@ -33,6 +34,7 @@
     dirty = false,
     maxQueries,
     onSelect,
+    viewHref,
   }: Props = $props();
 
   const menuId = $derived(`${id}-saved-views-menu`);
@@ -164,7 +166,8 @@
       <MenuItem
         data-view-item
         selected={view.id === activeView?.id}
-        onclick={() => onSelect(view)}
+        href={viewHref(view)}
+        onclick={(event) => onSelect(view, event)}
         data-testid={view.name.toLowerCase().replace(/\s+/g, '-')}
         data-track-name="user-query-menu-item"
       >

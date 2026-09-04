@@ -19,6 +19,7 @@
   } from '$lib/stores/saved-queries';
   import type { SearchAttributes } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { isModifiedClick } from '$lib/utilities/is-modified-click';
   import { combineQueries } from '$lib/utilities/query/combine-queries';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
@@ -176,7 +177,21 @@
     }
   });
 
-  const setActiveQueryView = (view: SavedQuery) => {
+  const viewHref = (view: SavedQuery) => {
+    const url = new URL(page.url);
+    if (view.query) {
+      url.searchParams.set('query', view.query);
+    } else {
+      url.searchParams.delete('query');
+    }
+    url.searchParams.delete(currentPageKey);
+    return `${url.pathname}${url.search}`;
+  };
+
+  const setActiveQueryView = (view: SavedQuery, event?: MouseEvent) => {
+    if (isModifiedClick(event)) return;
+    event?.preventDefault();
+
     const removesActiveView =
       narrowsActiveView(view) && isSystemViewActive(view);
     const addsToActiveView =
@@ -317,6 +332,7 @@
       draftView={unsavedQuery ? unsavedView : undefined}
       dirty={activeUserViewDirty}
       {maxQueries}
+      {viewHref}
       onSelect={setActiveQueryView}
     />
 
@@ -420,7 +436,6 @@
   >
     <Button
       variant="ghost"
-      aria-label={view.name}
       data-testid={view.type === 'system'
         ? view.id
         : view.name.toLowerCase().replace(/\s+/g, '-')}
@@ -429,7 +444,8 @@
         : 'user-query-button'}
       data-track-intent="action"
       data-track-text={view.name}
-      onclick={() => setActiveQueryView(view)}
+      href={viewHref(view)}
+      onclick={(event) => setActiveQueryView(view, event)}
       class={merge(
         'max-w-[240px]',
         (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
@@ -440,7 +456,7 @@
     >
       {@const Glyph = view.Icon || IconBookmark}
       <Glyph class="h-4 w-4 flex-shrink-0" />
-      <span class="hidden truncate font-normal xl:inline-block"
+      <span class="truncate font-normal max-xl:sr-only xl:inline-block"
         >{view.name}</span
       >
       {#if view.badge}
