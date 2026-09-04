@@ -131,7 +131,11 @@
     {/if}
   </MenuButton>
 
-  <Menu id={menuId} class="w-max min-w-full max-w-[32rem]">
+  <Menu
+    id={menuId}
+    usePortal
+    class="w-max min-w-full max-w-[min(100dvw-1rem,32rem)]"
+  >
     <MenuItem
       class="p-0"
       hoverable={false}
