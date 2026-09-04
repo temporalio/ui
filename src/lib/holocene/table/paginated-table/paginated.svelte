@@ -11,9 +11,11 @@
   import {
     currentPageKey,
     defaultItemsPerPage,
+    getStartingIndexForPage,
     MAX_PAGE_SIZE,
     options,
     pagination,
+    perPageFromSearchParameter,
     perPageKey,
   } from '$lib/stores/pagination';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -71,7 +73,18 @@
   const currentPageParam = $derived(
     url.searchParams.get(currentPageKey) || '1',
   );
-  const store = $derived(pagination(items, perPageParam, currentPageParam));
+  // pagination() takes a starting index, not a page number, so convert before
+  // constructing it. Passing the page straight through made every rebuild start
+  // at index 0, flashing page 1 and destroying expanded rows before the $effect
+  // below could jump back.
+  const startingIndex = $derived(
+    getStartingIndexForPage(
+      parseInt(currentPageParam, 10),
+      perPageFromSearchParameter(perPageParam),
+      items,
+    ),
+  );
+  const store = $derived(pagination(items, perPageParam, startingIndex));
 
   // keep the 'page-size' url search param within the supported options
   $effect(() => {
