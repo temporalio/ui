@@ -75,7 +75,6 @@
     "demo": "esno utilities/demo/demo-cli.ts",
     "run-workflows": "esno scripts/run-workflows.ts",
     "run-workflows:long-running": "esno scripts/start-long-running.ts",
-    "audit:tailwind": "esno scripts/audit-tailwind-colors",
     "validate:versions": "./scripts/validate-versions.sh",
     "knip": "knip",
     "a11y:manifest:test": "node scripts/a11y/manifest.test.mjs",
