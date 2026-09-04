@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { BadgeSize } from '$lib/holocene/badge.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import type { WorkflowEvent } from '$lib/types/events';
@@ -13,13 +12,11 @@
     group = undefined,
     event = undefined,
     lazy = false,
-    size,
     groupRow = false,
   }: {
     group?: EventGroup;
     event?: WorkflowEvent;
     lazy?: boolean;
-    size?: BadgeSize;
     /** The row that opened this represents the whole group, not one event. */
     groupRow?: boolean;
   } = $props();
@@ -49,12 +46,9 @@
 {#if showEventGroup}
   <div class="flex flex-col overflow-hidden">
     {#if group?.pendingActivity}
-      <PendingActivityCard activity={group.pendingActivity} {size} />
+      <PendingActivityCard activity={group.pendingActivity} />
     {:else if group?.pendingNexusOperation}
-      <PendingNexusOperationCard
-        operation={group.pendingNexusOperation}
-        {size}
-      />
+      <PendingNexusOperationCard operation={group.pendingNexusOperation} />
     {/if}
     {#each group?.eventList ?? [] as groupEvent (groupEvent.id)}
       <EventCard

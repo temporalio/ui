@@ -9,10 +9,9 @@
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Badge, { type BadgeSize } from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconRetry } from '$lib/io/icon';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { coreUserStore } from '$lib/stores/core-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
@@ -28,11 +27,9 @@
   let {
     activity,
     totalPending,
-    size,
   }: {
     activity: PendingActivity;
     totalPending?: number;
-    size?: BadgeSize;
   } = $props();
   const failed = $derived(
     (activity.attempt ?? 0) > 1 && !!activity.lastFailure,
@@ -253,12 +250,10 @@
 
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
-    <Badge type={failed ? 'danger' : 'default'} {size}>
-      <IconRetry class="mr-1 {failed && 'font-bold text-danger'}" />
-      {activity.attempt ?? 0} of {formatMaximumAttempts(
-        activity.maximumAttempts ?? null,
-      )}
-    </Badge>
+    <BadgeCount
+      value={activity.attempt ?? 0}
+      total={formatMaximumAttempts(activity.maximumAttempts ?? null)}
+    />
     {#if activity.maximumAttempts}
       <p class="ml-1 text-sm text-secondary">
         {formatAttemptsLeft(activity.maximumAttempts, activity.attempt ?? 0)} remaining

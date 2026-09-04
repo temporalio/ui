@@ -3,18 +3,15 @@
   import type { Snippet } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge, { type BadgeSize } from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import { IconRetry } from '$lib/io/icon';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  let {
-    operation,
-    size,
-  }: { operation: PendingNexusOperation; size?: BadgeSize } = $props();
+  let { operation }: { operation: PendingNexusOperation } = $props();
 
   const failed = $derived((operation.attempt ?? 0) > 1);
 </script>
@@ -24,7 +21,7 @@
 >
   <div class="flex-1">
     <div class="flex flex-wrap items-center space-x-3">
-      <Badge {size}>{operation.state}</Badge>
+      <Badge text={String(operation.state ?? '')} />
       <h4>{translate('workflows.pending-nexus-operation')}</h4>
     </div>
   </div>
@@ -157,10 +154,12 @@
 {/snippet}
 
 {#snippet attempts()}
-  <Badge {size} class="mr-1" type={failed ? 'danger' : 'default'}>
-    <IconRetry class="mr-1 {failed && 'font-bold text-danger'}" />
-    {operation.attempt ?? 0}
-  </Badge>
+  <Badge
+    text={String(operation.attempt ?? 0)}
+    colorScheme={failed ? 'danger' : 'neutral'}
+    Icon={IconRetry}
+    class="mr-1"
+  />
 {/snippet}
 
 {#snippet failures()}

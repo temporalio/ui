@@ -2,16 +2,14 @@
   import { page } from '$app/stores';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import PendingAttemptBadge from '$lib/components/workflow/pending-attempt-badge/pending-attempt-badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconRetry } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
-  import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { eventTypeStyle } from './event-styles';
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -106,23 +104,11 @@
           {translate('workflows.pending-nexus-operation')}
         </p>
         {#if event.attempt}
-          <Badge class="mx-1" type={event.attempt > 1 ? 'danger' : 'default'}>
-            <IconRetry
-              class="mr-1 inline {event.attempt > 1 && 'font-bold text-danger'}"
-            />
-            {translate('workflows.attempt')}
-            {event.attempt}
-            {#if event.attempt > 1 && event.nextAttemptScheduleTime}
-              {@const timeDifference = toTimeDifference({
-                date: event.nextAttemptScheduleTime,
-                negativeDefault: '',
-              })}
-              {#if timeDifference}
-                • {translate('workflows.next-retry')}
-                {timeDifference}
-              {/if}
-            {/if}
-          </Badge>
+          <PendingAttemptBadge
+            attempt={event.attempt}
+            nextRetryTime={event.nextAttemptScheduleTime}
+            class="mx-1"
+          />
         {/if}
       </div>
     </div>

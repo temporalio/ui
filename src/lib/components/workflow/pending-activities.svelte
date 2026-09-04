@@ -3,7 +3,6 @@
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import LegacyBadge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -45,16 +44,19 @@
     >
       {#snippet summary()}
         <div class="flex items-center gap-2">
-          <BadgeCount value={pendingActivities.length} />
           {#if canceled}
             <Tooltip
               bottom
               text={translate('workflows.pending-activities-canceled')}
             >
-              <LegacyBadge type="warning" class="py-0"
-                ><IconCanceled /></LegacyBadge
-              >
+              <Badge
+                colorScheme="warning"
+                text={String(pendingActivities.length)}
+                Icon={IconCanceled}
+              />
             </Tooltip>
+          {:else}
+            <BadgeCount value={pendingActivities.length} />
           {/if}
         </div>
       {/snippet}
@@ -87,12 +89,11 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempt')}
                     </h4>
-                    <LegacyBadge type={failed ? 'danger' : undefined}>
-                      {#if failed}
-                        <IconRetry />
-                      {/if}
-                      {pendingActivity.attempt}
-                    </LegacyBadge>
+                    <Badge
+                      colorScheme={failed ? 'danger' : 'neutral'}
+                      text={String(pendingActivity.attempt ?? 0)}
+                      Icon={failed ? IconRetry : undefined}
+                    />
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
