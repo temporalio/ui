@@ -14,6 +14,7 @@ export type LockedComputeProvider = {
 
 const providerValue = (type?: string): ComputeProviderValue | undefined => {
   if (type === 'aws-lambda' || type === 'lambda') return 'lambda';
+  if (type === 'aws-agentcore' || type === 'agentcore') return 'agentcore';
   if (type === 'gcp-cloud-run' || type === 'cloud-run') return 'cloud-run';
 };
 
@@ -62,6 +63,7 @@ export const lockComputeProvider = (
   const provider = providers[0];
   const source = configuredProviders ?? [
     { value: 'lambda' as const },
+    { value: 'agentcore' as const },
     { value: 'cloud-run' as const },
   ];
   const configuredProvider = source.find(({ value }) => value === provider);

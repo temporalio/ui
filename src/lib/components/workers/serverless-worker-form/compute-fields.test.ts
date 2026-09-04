@@ -82,6 +82,7 @@ const cloudRunModuleUrl =
 
 interface ComputeFieldsOptions {
   provider: string;
+  agentCoreEndpointArn?: string;
   gcpProject?: string;
   gcpServiceAccount?: string;
   cloudRunTerraformTemplate?: string;
@@ -90,6 +91,7 @@ interface ComputeFieldsOptions {
 
 const renderComputeFields = ({
   provider,
+  agentCoreEndpointArn = '',
   gcpProject = '',
   gcpServiceAccount = '',
   cloudRunTerraformTemplate,
@@ -99,6 +101,7 @@ const renderComputeFields = ({
     props: {
       provider,
       lambdaArn: '',
+      agentCoreEndpointArn,
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject,
@@ -268,5 +271,40 @@ describe('ComputeFields server-rendered setup guidance', () => {
     expect(body).not.toContain(impersonatorWarning);
     expect(body).not.toContain(impersonatorPlaceholder);
     expect(getTerraformSnippet(body)).toBeUndefined();
+  });
+});
+
+describe('AgentCore compute fields', () => {
+  it('asks for the Runtime Endpoint ARN, not a Lambda function ARN', () => {
+    const body = renderComputeFields({ provider: 'agentcore' });
+
+    expect(body).toContain('Agent Runtime Endpoint ARN');
+    expect(body).toContain('name="agentCoreEndpointArn"');
+    expect(body).not.toContain('name="lambdaArn"');
+  });
+
+  it('reuses the Lambda Access fields, since both assume an IAM role', () => {
+    const body = renderComputeFields({ provider: 'agentcore' });
+
+    expect(body).toContain('name="iamRoleArn"');
+    expect(body).toContain('name="roleExternalId"');
+  });
+
+  // The CloudFormation and Terraform helpers grant lambda:InvokeFunction, so
+  // they would hand out a role that cannot invoke an AgentCore runtime.
+  it('hides the Lambda IAM setup helper', () => {
+    const lambda = renderComputeFields({ provider: 'lambda' });
+    const agentCore = renderComputeFields({ provider: 'agentcore' });
+
+    expect(lambda).toContain("Don't have a role yet? Create one");
+    expect(agentCore).not.toContain("Don't have a role yet? Create one");
+  });
+
+  it('offers the invoke-based scaling fields rather than replica controls', () => {
+    const body = renderComputeFields({ provider: 'agentcore' });
+
+    expect(body).toContain('Scaling and Lifecycle');
+    expect(body).not.toContain('name="minReplicas"');
+    expect(body).not.toContain('name="utilizationTarget"');
   });
 });

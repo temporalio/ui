@@ -141,6 +141,13 @@ export const Strings = {
     'arn:aws:lambda:us-west-2:123456789012:function:orders-worker',
   'lambda-arn-help':
     'The Amazon Resource Name of your Lambda function. Use an unqualified ARN (no version/alias suffix).',
+  'agentcore-endpoint-arn-label': 'Agent Runtime Endpoint ARN',
+  'agentcore-endpoint-arn-hint':
+    'The ARN of the Bedrock AgentCore Runtime endpoint to invoke.',
+  'agentcore-endpoint-arn-placeholder':
+    'arn:aws:bedrock-agentcore:us-west-2:123456789012:runtime/orders-worker-abc123/runtime-endpoint/DEFAULT',
+  'agentcore-endpoint-arn-help':
+    'The Runtime endpoint ARN, not the Runtime ARN. Temporal reads the runtime id and endpoint name out of it, so it must end in /runtime-endpoint/<name>.',
   'iam-role-label': 'IAM Role ARN',
   'iam-role-hint': 'The ARN of the IAM role for Temporal to assume.',
   'iam-role-placeholder':
@@ -195,6 +202,9 @@ export const Strings = {
   'provider-lambda': 'AWS Lambda',
   'provider-lambda-description':
     'Run workers as Lambda functions in your AWS account.',
+  'provider-agentcore': 'Amazon Bedrock AgentCore',
+  'provider-agentcore-description':
+    'Run Workers as Bedrock AgentCore Runtime sessions in your AWS account.',
   'provider-cloud-run': 'Google Cloud Run',
   'provider-cloud-run-description':
     'Run workers as Cloud Run services in your GCP project.',
@@ -239,6 +249,7 @@ export const Strings = {
   'open-iam-console': 'Open IAM Console',
   'open-aws-lambda': 'Open AWS Lambda',
   'open-aws-iam': 'Open AWS IAM Console',
+  'open-agentcore-console': 'Open AgentCore Console',
   'open-cloud-run-console': 'Open Cloud Run Console',
   'serverless-docs-link': 'Learn more about serverless workers',
   'copy-arn': 'Copy ARN',

@@ -11,6 +11,7 @@
 
   const CONFIG: Record<string, { Icon: IconComponent; label: string }> = {
     'aws-lambda': { Icon: IconAws, label: 'Lambda' },
+    'aws-agentcore': { Icon: IconAws, label: 'AgentCore' },
     'gcp-cloud-run': { Icon: IconGcp, label: 'Cloud Run' },
   };
 

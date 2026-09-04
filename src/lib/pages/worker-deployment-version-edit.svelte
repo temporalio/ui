@@ -5,8 +5,8 @@
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
   import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
   import {
+    buildComputeConfigFromForm,
     msToScaleDownStabilization,
-    scaleDownStabilizationToMs,
   } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -14,8 +14,7 @@
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft } from '$lib/io/icon';
   import {
-    buildGcpCloudRunComputeConfig,
-    buildLambdaComputeConfig,
+    decodeAgentCoreProviderDetails,
     decodeGcpCloudRunProviderDetails,
     decodeLambdaProviderDetails,
     decodeScalerDetails,
@@ -62,6 +61,7 @@
 {:then versionResponse}
   {@const info = versionResponse.workerDeploymentVersionInfo}
   {@const providerDetails = decodeLambdaProviderDetails(info.computeConfig)}
+  {@const agentCoreDetails = decodeAgentCoreProviderDetails(info.computeConfig)}
   {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
   {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
   <div class="flex max-w-[45rem] flex-col gap-4">
@@ -78,10 +78,19 @@
       {terraformTemplate}
       {cloudRunTerraformTemplate}
       initialData={{
-        provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
+        provider: agentCoreDetails.agentCoreEndpointArn
+          ? 'agentcore'
+          : gcpDetails.gcpWorkerPool
+            ? 'cloud-run'
+            : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',
-        iamRoleArn: providerDetails.iamRoleArn ?? '',
-        roleExternalId: providerDetails.roleExternalId ?? '',
+        agentCoreEndpointArn: agentCoreDetails.agentCoreEndpointArn ?? '',
+        iamRoleArn:
+          providerDetails.iamRoleArn ?? agentCoreDetails.iamRoleArn ?? '',
+        roleExternalId:
+          providerDetails.roleExternalId ??
+          agentCoreDetails.roleExternalId ??
+          '',
         gcpProject: gcpDetails.gcpProject,
         gcpRegion: gcpDetails.gcpRegion,
         gcpWorkerPool: gcpDetails.gcpWorkerPool,
@@ -104,30 +113,7 @@
       cancelHref={backHref}
       onSubmit={async (data) => {
         error = undefined;
-        const computeConfig =
-          data.provider === 'cloud-run'
-            ? buildGcpCloudRunComputeConfig(
-                data.gcpProject,
-                data.gcpRegion,
-                data.gcpWorkerPool,
-                data.gcpServiceAccount,
-                {
-                  minReplicas: data.minReplicas,
-                  maxReplicas: data.maxReplicas,
-                  initialReplicas: data.initialReplicas,
-                  utilizationTarget: data.utilizationTarget,
-                  scaleDownStabilizationMs: scaleDownStabilizationToMs(
-                    data.scaleDownStabilization,
-                  ),
-                },
-              )
-            : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {
-                roleExternalId: data.roleExternalId,
-                scaleUpCooloffMs: data.scaleUpCooloffMs,
-                scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-                maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-                metricsPollIntervalMs: data.metricsPollIntervalMs,
-              });
+        const computeConfig = buildComputeConfigFromForm(data);
         await updateWorkerDeploymentVersionComputeConfig(
           { namespace, deploymentName: deployment, buildId, computeConfig },
           (err) => {

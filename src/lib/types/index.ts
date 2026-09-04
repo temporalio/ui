@@ -16,8 +16,16 @@ export type GetClusterInfoResponse =
   temporal.api.workflowservice.v1.IGetClusterInfoResponse;
 export type GetSystemInfoResponse =
   temporal.api.workflowservice.v1.IGetSystemInfoResponse;
+// `serverScaledProviderAgentCore` is not in the api protos yet, so it is
+// declared here to gate the AgentCore compute provider ahead of the server
+// advertising it. OSS shows Coming Soon until then; cloud-ui enables it by
+// mapping a feature flag into its synthesized systemInfo capabilities, the
+// same way Cloud Run was handled before temporalio/api#799 landed. Drop this
+// intersection on the api bump that adds server_scaled_provider_agent_core.
 export type Capabilities =
-  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities;
+  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
+    serverScaledProviderAgentCore?: boolean | null;
+  };
 
 export type NamespaceCapabilities =
   NonNullable<temporal.api.namespace.v1.NamespaceInfo.ICapabilities>;

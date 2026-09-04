@@ -7,6 +7,12 @@ import {
   parseDuration,
   SECONDS,
 } from '$lib/holocene/duration-input/duration-input.svelte';
+import {
+  buildAgentCoreComputeConfig,
+  buildGcpCloudRunComputeConfig,
+  buildLambdaComputeConfig,
+} from '$lib/services/deployments-service';
+import type { ComputeConfig } from '$lib/types/deployments';
 
 const scalingFields = {
   scaleUpCooloffMs: z.number().int().min(0).optional(),
@@ -50,9 +56,16 @@ const scaleDownStabilizationField = z
   })
   .default(defaultScaleDownStabilization);
 
+// AgentCore takes the Runtime *Endpoint* ARN, not the Runtime ARN: the
+// provider parses the runtime id and endpoint name out of it and rejects
+// anything else. See parseAgentCoreEndpointARN in temporal-auto-scaled-workers.
+const AGENT_CORE_ENDPOINT_ARN =
+  /^arn:aws:bedrock-agentcore:[a-z0-9-]+:\d{12}:runtime\/[^/]+\/runtime-endpoint\/[^/]+$/;
+
 const providerFields = {
-  provider: z.enum(['lambda', 'cloud-run']).default('lambda'),
+  provider: z.enum(['lambda', 'agentcore', 'cloud-run']).default('lambda'),
   lambdaArn: z.string().default(''),
+  agentCoreEndpointArn: z.string().default(''),
   iamRoleArn: z.string().default(''),
   roleExternalId: z.string().default(''),
   gcpProject: z.string().default(''),
@@ -66,11 +79,54 @@ const providerFields = {
   scaleDownStabilization: scaleDownStabilizationField,
 };
 
+// Lambda and AgentCore are both invoked through an assumed IAM role, so they
+// take the same Access fields and validate them identically.
+const validateAwsAccessFields = (
+  data: z.infer<z.ZodObject<typeof providerFields>>,
+  ctx: z.RefinementCtx,
+) => {
+  if (!data.iamRoleArn) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['iamRoleArn'],
+      message: 'IAM Role ARN is required',
+    });
+  } else if (!/^arn:aws:iam::\d{12}:role\/.+$/.test(data.iamRoleArn)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['iamRoleArn'],
+      message: 'Invalid IAM Role ARN format',
+    });
+  }
+  if (!data.roleExternalId) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['roleExternalId'],
+      message: 'External ID is required',
+    });
+  }
+};
+
 const validateProviderFields = (
   data: z.infer<z.ZodObject<typeof providerFields>>,
   ctx: z.RefinementCtx,
 ) => {
-  if (data.provider === 'lambda') {
+  if (data.provider === 'agentcore') {
+    if (!data.agentCoreEndpointArn) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['agentCoreEndpointArn'],
+        message: 'Agent Runtime Endpoint ARN is required',
+      });
+    } else if (!AGENT_CORE_ENDPOINT_ARN.test(data.agentCoreEndpointArn)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['agentCoreEndpointArn'],
+        message: 'Invalid Agent Runtime Endpoint ARN format',
+      });
+    }
+    validateAwsAccessFields(data, ctx);
+  } else if (data.provider === 'lambda') {
     if (!data.lambdaArn) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -86,26 +142,7 @@ const validateProviderFields = (
         message: 'Invalid Lambda ARN format',
       });
     }
-    if (!data.iamRoleArn) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['iamRoleArn'],
-        message: 'IAM Role ARN is required',
-      });
-    } else if (!/^arn:aws:iam::\d{12}:role\/.+$/.test(data.iamRoleArn)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['iamRoleArn'],
-        message: 'Invalid IAM Role ARN format',
-      });
-    }
-    if (!data.roleExternalId) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['roleExternalId'],
-        message: 'External ID is required',
-      });
-    }
+    validateAwsAccessFields(data, ctx);
   } else if (data.provider === 'cloud-run') {
     if (!data.gcpProject)
       ctx.addIssue({
@@ -184,7 +221,57 @@ export type CreateDeploymentFormData = z.infer<typeof createDeploymentSchema>;
 export type CreateVersionFormData = z.infer<typeof createVersionSchema>;
 export type EditVersionFormData = z.infer<typeof editVersionSchema>;
 
-export type ComputeProviderValue = 'lambda' | 'cloud-run';
+type ComputeFormValues = z.infer<z.ZodObject<typeof providerFields>> &
+  Partial<z.infer<z.ZodObject<typeof scalingFields>>>;
+
+// The single place that maps a provider choice onto a ComputeConfig. Every
+// create/edit page routes through here so a new provider is one branch, not a
+// ternary in each page.
+export const buildComputeConfigFromForm = (
+  data: ComputeFormValues,
+): ComputeConfig => {
+  if (data.provider === 'cloud-run') {
+    return buildGcpCloudRunComputeConfig(
+      data.gcpProject,
+      data.gcpRegion,
+      data.gcpWorkerPool,
+      data.gcpServiceAccount,
+      {
+        minReplicas: data.minReplicas,
+        maxReplicas: data.maxReplicas,
+        initialReplicas: data.initialReplicas,
+        utilizationTarget: data.utilizationTarget,
+        scaleDownStabilizationMs: scaleDownStabilizationToMs(
+          data.scaleDownStabilization,
+        ),
+      },
+    );
+  }
+
+  const invokeScaling = {
+    roleExternalId: data.roleExternalId,
+    scaleUpCooloffMs: data.scaleUpCooloffMs,
+    scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+    maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+    metricsPollIntervalMs: data.metricsPollIntervalMs,
+  };
+
+  if (data.provider === 'agentcore') {
+    return buildAgentCoreComputeConfig(
+      data.agentCoreEndpointArn,
+      data.iamRoleArn,
+      invokeScaling,
+    );
+  }
+
+  return buildLambdaComputeConfig(
+    data.lambdaArn,
+    data.iamRoleArn,
+    invokeScaling,
+  );
+};
+
+export type ComputeProviderValue = 'lambda' | 'agentcore' | 'cloud-run';
 
 export type ComputeProviderReleaseStage =
   | 'public-preview'
@@ -204,6 +291,7 @@ export const defaultReleaseStage: Record<
   ComputeProviderReleaseStage
 > = {
   lambda: 'public-preview',
+  agentcore: 'pre-release',
   'cloud-run': 'pre-release',
 };
 

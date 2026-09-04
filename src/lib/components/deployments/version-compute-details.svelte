@@ -2,6 +2,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    decodeAgentCoreProviderDetails,
     decodeGcpCloudRunProviderDetails,
     decodeLambdaProviderDetails,
     decodeScalerDetails,
@@ -12,10 +13,22 @@
     $props();
 
   const lambdaDetails = $derived(decodeLambdaProviderDetails(computeConfig));
+  const agentCoreDetails = $derived(
+    decodeAgentCoreProviderDetails(computeConfig),
+  );
   const gcpDetails = $derived(decodeGcpCloudRunProviderDetails(computeConfig));
   const scalerParams = $derived(decodeScalerDetails(computeConfig));
+  // Lambda and AgentCore share the assumed-role fields; only one decodes.
+  const iamRoleArn = $derived(
+    lambdaDetails.iamRoleArn ?? agentCoreDetails.iamRoleArn,
+  );
+  const roleExternalId = $derived(
+    lambdaDetails.roleExternalId ?? agentCoreDetails.roleExternalId,
+  );
   const isCompute = $derived(
-    !!lambdaDetails.lambdaArn || !!gcpDetails.gcpWorkerPool,
+    !!lambdaDetails.lambdaArn ||
+      !!agentCoreDetails.agentCoreEndpointArn ||
+      !!gcpDetails.gcpWorkerPool,
   );
   const hasScalerParams = $derived(
     scalerParams.scaleUpCooloffMs !== undefined ||
@@ -41,26 +54,42 @@
         </Copyable>
       </div>
     {/if}
-    {#if lambdaDetails.iamRoleArn}
+    {#if agentCoreDetails.agentCoreEndpointArn}
+      <div class="flex items-center gap-1">
+        <span class="font-medium text-secondary"
+          >{translate('workers.agentcore-endpoint-arn-label')}</span
+        >
+        <Copyable
+          content={agentCoreDetails.agentCoreEndpointArn}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        >
+          <code class="text-primary"
+            >{agentCoreDetails.agentCoreEndpointArn}</code
+          >
+        </Copyable>
+      </div>
+    {/if}
+    {#if iamRoleArn}
       <div class="flex items-center gap-1">
         <span class="font-medium text-secondary"
           >{translate('workers.iam-role-label')}</span
         >
         <Copyable
-          content={lambdaDetails.iamRoleArn}
+          content={iamRoleArn}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
         >
-          <code class="text-primary">{lambdaDetails.iamRoleArn}</code>
+          <code class="text-primary">{iamRoleArn}</code>
         </Copyable>
       </div>
     {/if}
-    {#if lambdaDetails.roleExternalId}
+    {#if roleExternalId}
       <div class="flex gap-1">
         <span class="font-medium text-secondary"
           >{translate('deployments.role-external-id')}</span
         >
-        <code class="text-primary">{lambdaDetails.roleExternalId}</code>
+        <code class="text-primary">{roleExternalId}</code>
       </div>
     {/if}
     {#if gcpDetails.gcpWorkerPool}
