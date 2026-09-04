@@ -20,6 +20,7 @@
   import type { SearchAttributes } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { isModifiedClick } from '$lib/utilities/is-modified-click';
+  import { combineQueries } from '$lib/utilities/query/combine-queries';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -48,6 +49,9 @@
   }: Props = $props();
 
   let activeQueryView: SavedQuery | undefined = $state();
+  let addedSystemViewId: string | undefined = $state();
+  let addedSystemViewBase = $state('');
+  let addedSystemViewQuery = $state('');
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
   let pendingQueryTarget: string | undefined = $state();
@@ -70,6 +74,18 @@
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
   );
+  const savedQueryViewWithSystemView = $derived(
+    query &&
+      namespaceSavedQueries.find(
+        (saved) =>
+          saved.query &&
+          systemViews.some(
+            (system) =>
+              system.query &&
+              query === combineQueries(saved.query, system.query),
+          ),
+      ),
+  );
   const unsavedView: SavedQuery = $derived({
     id: 'unsaved',
     name: translate('common.unsaved-view'),
@@ -83,6 +99,22 @@
   const activeUserView = $derived(
     activeQueryView?.type === 'user' ? activeQueryView : undefined,
   );
+  const systemViewBaseQuery = $derived(activeUserView?.query ?? '');
+  const onCustomView = $derived(
+    Boolean(activeUserView) || Boolean(unsavedQuery),
+  );
+  const addedSystemView = $derived(
+    addedSystemViewId && addedSystemViewQuery === query
+      ? addedSystemViewId
+      : undefined,
+  );
+  const narrowsActiveView = (view: SavedQuery) =>
+    view.type === 'system' && view.id !== defaultView.id;
+  const isSystemViewActive = (view: SavedQuery) =>
+    narrowsActiveView(view)
+      ? addedSystemView === view.id ||
+        query === combineQueries(systemViewBaseQuery, view.query)
+      : query === view.query;
   const activeUserViewDirty = $derived(
     Boolean(activeUserView) &&
       Boolean(query) &&
@@ -110,6 +142,8 @@
       goto(url);
     } else if (savedQueryView) {
       activeQueryView = savedQueryView;
+    } else if (savedQueryViewWithSystemView) {
+      activeQueryView = savedQueryViewWithSystemView;
     } else if (systemQueryView) {
       activeQueryView = systemQueryView;
     } else if (query) {
@@ -132,6 +166,8 @@
       if (query && activeQueryView.query !== query) {
         if (savedQueryView) {
           activeQueryView = savedQueryView;
+        } else if (savedQueryViewWithSystemView) {
+          activeQueryView = savedQueryViewWithSystemView;
         } else if (systemQueryView) {
           activeQueryView = systemQueryView;
         } else {
@@ -155,18 +191,44 @@
   const setActiveQueryView = (view: SavedQuery, event?: MouseEvent) => {
     if (isModifiedClick(event)) return;
     event?.preventDefault();
-    if (view.id === activeQueryView?.id) return;
-    activeQueryView = view;
-    pendingQueryTarget = view.query || '';
 
-    if (view.query) {
-      $filters = toListWorkflowFilters(view.query, $searchAttributes);
-    }
+    const removesActiveView =
+      narrowsActiveView(view) && isSystemViewActive(view);
+    const addsToActiveView =
+      narrowsActiveView(view) && onCustomView && !removesActiveView;
+    const baseQuery = addedSystemView ? addedSystemViewBase : query;
+    const nextQuery = removesActiveView
+      ? addedSystemView === view.id
+        ? addedSystemViewBase
+        : systemViewBaseQuery
+      : addsToActiveView
+        ? combineQueries(baseQuery, view.query)
+        : view.query;
+    const nextView = removesActiveView
+      ? nextQuery
+        ? activeQueryView
+        : defaultView
+      : addsToActiveView
+        ? activeQueryView
+        : view;
+
+    if (nextView?.id === activeQueryView?.id && nextQuery === query) return;
+
+    addedSystemViewId = addsToActiveView ? view.id : undefined;
+    addedSystemViewBase = addsToActiveView ? baseQuery : '';
+    addedSystemViewQuery = addsToActiveView ? nextQuery : '';
+
+    activeQueryView = nextView;
+    pendingQueryTarget = nextQuery || '';
+
+    $filters = nextQuery
+      ? toListWorkflowFilters(nextQuery, $searchAttributes)
+      : [];
 
     updateQueryParameters({
       url: page.url,
       parameter: 'query',
-      value: view.query,
+      value: nextQuery,
       allowEmpty: true,
       clearParameters: [currentPageKey],
     });
@@ -255,7 +317,7 @@
     {#each systemViews as view (view.id)}
       {@render queryButton({
         ...view,
-        active: query === view.query,
+        active: isSystemViewActive(view),
       })}
     {/each}
   </div>
