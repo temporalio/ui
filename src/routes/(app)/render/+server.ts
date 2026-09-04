@@ -10,6 +10,7 @@ import { process } from '$lib/utilities/render-markdown';
 
 type RenderOptions = {
   host: string;
+  inline?: boolean;
   nonce: string;
   theme?: string;
   overrideTheme?: string;
@@ -43,7 +44,7 @@ const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
  */
 const createPage = (
   ast: ReturnType<typeof toHast>,
-  { nonce, theme, overrideTheme }: RenderOptions,
+  { inline, nonce, theme, overrideTheme }: RenderOptions,
 ) => {
   const cssPath = path.resolve('src/markdown.reset.css');
   const css = fs.readFileSync(cssPath, 'utf8');
@@ -62,7 +63,7 @@ const createPage = (
       h(
         'body',
         {
-          class: 'prose',
+          class: inline ? 'prose inline-mode' : 'prose',
           'data-theme': overrideTheme ? `${theme}-${overrideTheme}` : theme,
         },
         h('main', ast),
@@ -78,6 +79,7 @@ export const GET = async (req: Request) => {
   const content = url.searchParams.get('content') || '';
   const theme = url.searchParams.get('theme') || '';
   const overrideTheme = url.searchParams.get('overrideTheme') || '';
+  const inline = url.searchParams.get('inline') === 'true';
 
   if (host === null) return new Response('Not found', { status: 404 });
   if (content === null) return new Response('Not found', { status: 404 });
@@ -86,6 +88,7 @@ export const GET = async (req: Request) => {
   const html = createPage(await process(content), {
     nonce,
     host,
+    inline,
     theme,
     overrideTheme,
   });

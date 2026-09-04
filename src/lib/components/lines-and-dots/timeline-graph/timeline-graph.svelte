@@ -22,7 +22,12 @@
     getPendingBlockY,
     getRowY,
     getTotalForY,
+    removePanelGapFromBand,
   } from './timeline-positioning';
+  import {
+    assignTimelineRowPool,
+    type TimelineRowSlot,
+  } from './timeline-row-pool';
 
   import GroupDetailsRow from './group-details-row.svelte';
   import TimelineAxis from './timeline-axis.svelte';
@@ -285,10 +290,16 @@
     getTotalForY(filteredLazyGroups.length, pendingGroupCount, descStart),
   );
 
-  // Widen the mount window by the panel's row span: shiftFor moves rows down but
-  // getWindowBounds maps on the unshifted y, so without this they'd leave a blank.
-  const windowOverscan = $derived(
-    OVERSCAN + Math.ceil(panelHeight / ROW_HEIGHT),
+  const activePanelY = $derived(
+    activeIdx >= 0
+      ? getRowY(activeIdx, {
+          descStart,
+          pendingGroupCount,
+          totalForY,
+          reverseSort,
+        }) +
+          1.33 * RADIUS
+      : null,
   );
 
   // Full drawn height (rows + axis + detail panel). The container is this tall and
@@ -315,6 +326,16 @@
   const layerBandHeight = $derived(
     visibleBand ? visibleBand[1] - visibleBand[0] : timelineHeight,
   );
+
+  const rowWindowBand = $derived.by(() => {
+    const band = visibleBand;
+    return removePanelGapFromBand({
+      bandTop: band ? band[0] : 0,
+      bandHeight: band ? band[1] - band[0] : Math.min(svgHeight, 1000),
+      panelHeight,
+      panelTop: activePanelY,
+    });
+  });
 
   let scroller: HTMLElement | null = null;
   let bandRafId: ReturnType<typeof requestAnimationFrame> | undefined;
@@ -389,14 +410,11 @@
   });
 
   const [windowStart, windowEnd] = $derived.by(() => {
-    const band = visibleBand;
-    const bandTop = band ? band[0] : 0;
-    const bandHeight = band ? band[1] - band[0] : Math.min(svgHeight, 1000);
     return getWindowBounds({
-      bandTop,
-      bandHeight,
+      bandTop: rowWindowBand.bandTop,
+      bandHeight: rowWindowBand.bandHeight,
       total: filteredLazyGroups.length,
-      overscan: windowOverscan,
+      overscan: OVERSCAN,
       reverseSort,
       descStart,
       pendingCount: pendingGroupCount,
@@ -410,39 +428,25 @@
   // re-point to a new group — avoids the mount churn that caused major-GC pauses.
   const POOL_SLACK = 4;
   const poolSize = $derived.by(() => {
-    const band = visibleBand;
-    const bandHeight = band ? band[1] - band[0] : Math.min(svgHeight, 1000);
-    return Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
+    return (
+      Math.ceil(rowWindowBand.bandHeight / ROW_HEIGHT) +
+      2 * OVERSCAN +
+      POOL_SLACK
+    );
   });
 
   // Reuse the prior slot object when nothing changed, or every row re-renders.
   // Version counts as changed: a lazy group's identity is stable for the whole
   // run, so identity alone would miss a group that gained an event.
-  type Slot = {
-    index: number;
-    lazy: LazyGroup;
-    version: number | undefined;
-  };
-  let prevSlots: (Slot | null)[] = [];
+  let prevSlots: (TimelineRowSlot<LazyGroup> | null)[] = [];
   const pool = $derived.by(() => {
-    const total = filteredLazyGroups.length;
-    const slots: (Slot | null)[] = new Array(poolSize).fill(null);
-    const end = Math.min(windowEnd, total, windowStart + poolSize);
-    for (let index = windowStart; index < end; index++) {
-      const slotIndex = index % poolSize;
-      const lazy = filteredLazyGroups[index];
-      const prev = prevSlots[slotIndex];
-      if (
-        prev &&
-        prev.index === index &&
-        prev.lazy === lazy &&
-        prev.version === lazy.version
-      ) {
-        slots[slotIndex] = prev;
-      } else {
-        slots[slotIndex] = { index, lazy, version: lazy.version };
-      }
-    }
+    const slots = assignTimelineRowPool({
+      groups: filteredLazyGroups,
+      poolSize,
+      previousSlots: prevSlots,
+      windowEnd,
+      windowStart,
+    });
     prevSlots = slots;
     return slots;
   });

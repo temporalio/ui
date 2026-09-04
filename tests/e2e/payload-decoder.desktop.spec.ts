@@ -189,13 +189,13 @@ test.describe('Payload Decoder', () => {
       await workflowDetail.openHistory();
 
       await expect(
-        eventHistory.eventRow('Workflow Execution Started'),
+        eventHistory.eventSummary('Workflow Execution Started'),
       ).toContainText('this is the summary');
-      await expect(eventHistory.eventRow('Timer Started')).toContainText(
+      await expect(eventHistory.eventSummary('Timer Started')).toContainText(
         'Sleeping for 10 minutes',
       );
       await eventHistory.expandEvent('Timer Started');
-      await expect(eventHistory.expandedRow('first')).toContainText(
+      await expect(eventHistory.expandedSummary('first')).toContainText(
         'Sleeping for 10 minutes',
       );
 

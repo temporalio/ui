@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
   import { resolve } from '$app/paths';
@@ -18,8 +19,10 @@
       | undefined;
     fill?: boolean;
     frameId?: string;
+    inline?: boolean;
     minHeight?: number;
     previewTheme?: 'dark' | 'light';
+    title?: string;
   }
 
   let {
@@ -28,12 +31,15 @@
     fill = true,
     overrideTheme = '',
     frameId = '',
+    inline = false,
     minHeight = 100,
     previewTheme,
+    title = 'output',
   }: Props = $props();
 
   let iframe: HTMLIFrameElement | null = $state(null);
   let iframeWidth = 0;
+  let loading = $state(true);
 
   const parsePixels = (value: string | undefined) => {
     const parsed = Number.parseFloat(value ?? '0');
@@ -56,10 +62,28 @@
     return Math.ceil(Math.max(contentHeight, minHeight));
   };
 
+  const getRenderedWidth = (iframeDocument: Document) => {
+    const { body } = iframeDocument;
+    const main = iframeDocument.querySelector('main');
+    const contentWidth = main
+      ? Math.max(main.scrollWidth, main.getBoundingClientRect().width)
+      : Math.max(body.scrollWidth, body.getBoundingClientRect().width);
+
+    return Math.ceil(contentWidth);
+  };
+
   const resizeIframe = () => {
     if (!iframe) return;
     const iframeDocument = iframe.contentDocument;
     if (!iframeDocument) return;
+
+    if (inline) {
+      iframe.width = '0';
+      iframe.style.width = '0px';
+      const width = getRenderedWidth(iframeDocument);
+      iframe.width = `${width}`;
+      iframe.style.width = `${width}px`;
+    }
 
     iframe.height = '0';
     iframe.style.height = '0px';
@@ -69,8 +93,18 @@
     iframe.style.height = `${height + 2}px`;
   };
 
+  const handleLoad = async () => {
+    if (inline) {
+      loading = false;
+      // Flush the removal of the zero-size loading styles before measuring.
+      await tick();
+    }
+
+    resizeIframe();
+  };
+
   $effect(() => {
-    if (!iframe || typeof ResizeObserver === 'undefined') return;
+    if (!iframe || inline || typeof ResizeObserver === 'undefined') return;
 
     const resizeObserver = new ResizeObserver(([entry]) => {
       const width = Math.round(entry.contentRect.width);
@@ -105,18 +139,30 @@
   );
   const previewPath = $derived(
     resolve(
-      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}`,
+      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&inline=${inline}`,
       {},
     ),
   );
+
+  $effect.pre(() => {
+    if (inline && previewPath) loading = true;
+  });
 </script>
 
-<section class={twMerge(fill ? 'h-full w-full' : 'w-full', className)}>
+<section
+  class={twMerge(
+    inline ? 'inline-flex max-w-full' : fill ? 'h-full w-full' : 'w-full',
+    className,
+  )}
+>
   <iframe
     bind:this={iframe}
-    onload={resizeIframe}
-    title="output"
-    class="block w-full"
+    onload={handleLoad}
+    {title}
+    class={twMerge(
+      inline ? 'block border-0 align-middle' : 'block w-full border-0',
+      inline && loading && 'invisible !h-0 !w-0',
+    )}
     src={previewPath}
     id={frameId}
   ></iframe>

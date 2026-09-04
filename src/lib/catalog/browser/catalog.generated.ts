@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'd7f2464b31a33221a79aee1b28edb90c8bf32a6aaf8d0bd990a1cf6a95c984ee',
+    'c720bff85e43428d513a282dfaad5da638a2846c14b798a84d0d578f91caeceb',
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -529,6 +529,114 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-markdown-activities',
+      title: 'Sequential activities with Markdown summaries',
+      description:
+        'Runs 2,000 activities sequentially with Markdown summaries and retries one step three times.',
+      capabilityTags: ['activities', 'sequencing', 'retries'],
+      expectedEvidence: [
+        'Two thousand non-overlapping activity executions in deterministic order.',
+        'Logging step 10 fails three attempts and succeeds on attempt four.',
+        'Each activity summary displays a Logging System link.',
+      ],
+      input: {
+        defaultValue: [],
+        schema: { type: 'array', items: false, maxItems: 0 },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialMarkdownActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-no-summary-activities',
+      title: 'Sequential activities without summaries',
+      description: 'Runs 2,000 activities sequentially without summaries.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'Two thousand non-overlapping activity executions in deterministic order.',
+        'Activity timeline entries do not display summaries.',
+      ],
+      input: {
+        defaultValue: [],
+        schema: { type: 'array', items: false, maxItems: 0 },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialNoSummaryActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-plain-text-activities',
+      title: 'Sequential plain text activities',
+      description:
+        'Runs 2,000 activities sequentially with an indexed plain-text summary.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'Two thousand non-overlapping activity executions in deterministic order.',
+        'Activity summaries range from Activity 1 through Activity 2000.',
+      ],
+      input: {
+        defaultValue: [],
+        schema: { type: 'array', items: false, maxItems: 0 },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialPlainTextActivities',
       },
       source: { id: 'oss', label: 'OSS' },
     },

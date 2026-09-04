@@ -10,6 +10,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -388,7 +389,18 @@
           class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
           <p class="whitespace-nowrap text-right text-xs">Summary</p>
-          <PayloadSummary value={currentEvent.userMetadata.summary} />
+          <PayloadSummary value={currentEvent.userMetadata.summary}>
+            {#snippet children(decodedValue)}
+              <Preview
+                content={decodedValue}
+                fill={false}
+                inline
+                minHeight={0}
+                overrideTheme="primary"
+                title={translate('workflows.summary')}
+              />
+            {/snippet}
+          </PayloadSummary>
         </div>
       {/if}
       {#if systemNexus?.summaryAttribute}

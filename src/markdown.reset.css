@@ -18,6 +18,22 @@ body {
   font-family: sans-serif;
 }
 
+body.inline-mode {
+  display: inline-block;
+  width: max-content;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: 1;
+}
+
+body.inline-mode main,
+body.inline-mode p {
+  display: inline;
+  margin: 0;
+}
+
 h1 {
   font-size: 2em;
 }
