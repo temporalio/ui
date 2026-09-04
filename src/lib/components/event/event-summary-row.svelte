@@ -178,7 +178,6 @@
       event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt,
   );
 
-  const badgeSize = $derived(compact ? 'sm' : 'md');
   const showSecondaryAttribute = $derived(
     compact &&
       !systemNexus &&
@@ -353,24 +352,17 @@
         />
       {/if}
       {#if !primaryLocalAttribute && primaryAttribute?.key}
-        <EventDetailsRow {...primaryAttribute} {attributes} size={badgeSize} />
+        <EventDetailsRow {...primaryAttribute} {attributes} />
       {/if}
       {#if primaryLocalAttribute && primaryLocalAttribute.key}
-        <EventDetailsRow
-          {...primaryLocalAttribute}
-          {attributes}
-          size={badgeSize}
-        />
+        <EventDetailsRow {...primaryLocalAttribute} {attributes} />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
         <div
           class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
           <p class="whitespace-nowrap text-right text-xs">Summary</p>
-          <PayloadSummary
-            value={currentEvent.userMetadata.summary}
-            size={badgeSize}
-          />
+          <PayloadSummary value={currentEvent.userMetadata.summary} />
         </div>
       {/if}
       {#if systemNexus?.summaryAttribute}
@@ -407,15 +399,10 @@
           key="attempt"
           value={nonPendingActivityAttempt.toString()}
           {attributes}
-          size={badgeSize}
         />
       {/if}
       {#if showSecondaryAttribute}
-        <EventDetailsRow
-          {...secondaryAttribute}
-          {attributes}
-          size={badgeSize}
-        />
+        <EventDetailsRow {...secondaryAttribute} {attributes} />
       {/if}
     </div>
   </td>

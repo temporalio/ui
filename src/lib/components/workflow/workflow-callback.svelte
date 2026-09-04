@@ -5,11 +5,11 @@
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { IconTemporalNexus } from '$lib/io/icon';
-  import type { CallbackState } from '$lib/types';
   import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
   import {
@@ -45,11 +45,18 @@
     Succeeded: translate('nexus.callback.succeeded'),
   };
 
-  const failedState = 'Failed' as unknown as CallbackState;
-  const failed = $derived(callback.state === failedState);
-  const title = $derived(
-    titles[callback.state ?? ''] || translate('nexus.nexus-callback'),
+  const state = $derived(String(callback.state ?? ''));
+  const failed = $derived(state === 'Failed');
+  const stateColorScheme = $derived(
+    state === 'Succeeded'
+      ? 'success'
+      : state === 'Failed'
+        ? 'danger'
+        : state === 'Backing Off'
+          ? 'warning'
+          : 'neutral',
   );
+  const title = $derived(titles[state] || translate('nexus.nexus-callback'));
   const links = $derived(callback?.callback?.links || []);
   const showCallbackUrl = $derived(!links.length && !link && callbackUrl);
   const namespace = $derived(page.params.namespace);
@@ -80,37 +87,51 @@
     {/each}
     <div class="flex flex-col items-start gap-2 md:flex-row md:items-center">
       <p class="flex items-center gap-2">
-        {translate('common.state')}<Badge type="subtle">{callback.state}</Badge>
+        {translate('common.state')}
+        <Badge text={state} colorScheme={stateColorScheme} />
       </p>
       {#if callback.attempt}
         <p class="flex items-center gap-2">
           {translate('common.attempt')}
-          <Badge type="subtle">{callback.attempt}</Badge>
+          <BadgeCount value={callback.attempt} />
         </p>
       {/if}
       {#if callback.lastAttemptCompleteTime}
         <p class="flex items-center gap-2">
           {translate('nexus.last-attempt-completed-time')}
-          <Badge type="subtle">{completedTime}</Badge>
+          <span
+            class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs text-secondary"
+            >{completedTime}</span
+          >
         </p>
       {/if}
       {#if callback.nextAttemptScheduleTime}
         <p class="flex items-center gap-2">
           {translate('nexus.next-attempt-scheduled-time')}
-          <Badge type="subtle">{nextTime}</Badge>
+          <span
+            class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs text-secondary"
+            >{nextTime}</span
+          >
         </p>
       {/if}
     </div>
     {#if showCallbackUrl}
       <p class="flex items-center gap-2">
         {translate('nexus.callback-url')}
-        <Badge type="subtle">{callbackUrl}</Badge>
+        <span
+          class="break-all rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 font-mono text-xs text-secondary"
+        >
+          {callbackUrl}
+        </span>
       </p>
     {/if}
     {#if blockedReason}
       <p class="flex items-center gap-2">
         {translate('nexus.blocked-reason')}
-        <Badge type="subtle">{blockedReason}</Badge>
+        <span
+          class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+          >{blockedReason}</span
+        >
       </p>
     {/if}
     {#if failure}

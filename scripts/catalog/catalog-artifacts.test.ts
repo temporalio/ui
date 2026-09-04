@@ -1442,7 +1442,6 @@ registry.registerExample({
           'svelte.config.js',
           'tsconfig.json',
           'scripts/generate-exports.mjs',
-          'src/lib/holocene/badge.svelte',
           'src/lib/holocene/button.svelte',
           'src/lib/holocene/card.svelte',
           'src/lib/holocene/copyable',
