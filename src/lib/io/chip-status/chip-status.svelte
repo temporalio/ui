@@ -77,6 +77,7 @@
     'children' | 'class' | 'type'
   > {
     status: ChipStatusValue;
+    text?: string;
     count?: string | number;
     extension?: string | number;
     class?: string;
@@ -85,6 +86,7 @@
 
   let {
     status,
+    text,
     count,
     extension,
     class: className,
@@ -93,6 +95,16 @@
   }: Props = $props();
 
   const configuration = $derived(statusConfiguration[status]);
+  const label = $derived.by(() => {
+    const statusText = text ?? configuration.text;
+
+    if (typeof count === 'number') {
+      return `${count.toLocaleString()} ${statusText}`;
+    }
+    if (count != null) return `${count} ${statusText}`;
+
+    return statusText;
+  });
 </script>
 
 <button
@@ -104,15 +116,7 @@
   )}
   {...rest}
 >
-  <span class="{segmentClasses} font-medium">
-    {#if typeof count === 'number'}
-      {count.toLocaleString()} {configuration.text}
-    {:else if count != null}
-      {count} {configuration.text}
-    {:else}
-      {configuration.text}
-    {/if}
-  </span>
+  <span class="{segmentClasses} font-medium">{label}</span>
   {#if extension !== undefined}
     <span
       class={twMerge(

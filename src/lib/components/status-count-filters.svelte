@@ -18,6 +18,7 @@
   } from '$lib/stores/workflows';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     combineFilters,
@@ -107,6 +108,7 @@
       {#if status}
         <ChipStatus
           {status}
+          text={getWorkflowStatusLabel(status)}
           {count}
           extension={difference || undefined}
           onclick={() => onStatusClick(status)}
