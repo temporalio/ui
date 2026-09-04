@@ -18,6 +18,43 @@ body {
   font-family: sans-serif;
 }
 
+/* No page padding, so a short string renders as a line of text rather than a
+   padded box. Wrapping stays on. */
+body.compact {
+  padding: 0;
+  overflow: hidden;
+  white-space: normal;
+}
+
+/* The reset above sizes every element with a star selector, which beats
+   inheritance, so compact restates the metrics or the text renders at
+   12.25px beside 14px text outside the frame. */
+body.compact,
+body.compact main,
+body.compact p,
+body.compact strong,
+body.compact em,
+body.compact a {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Blocks with the margins zeroed, not display: inline. The frame's height is
+   measured from main, and an inline box reports the text box rather than the
+   line box, which clips descenders. */
+body.compact main,
+body.compact p {
+  display: block;
+  margin: 0;
+}
+
+/* Vertical padding on an inline code span grows the line box. */
+body.compact code {
+  padding: 0 0.375rem;
+  font-size: 13px;
+  line-height: 20px;
+}
+
 h1 {
   font-size: 2em;
 }
