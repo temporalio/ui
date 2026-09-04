@@ -38,7 +38,10 @@
   const keepOpen = writable(false);
   const menuElement: Writable<HTMLUListElement | null> = writable(null);
 
-  const closeMenu = () => {
+  const closeMenu = (event?: MouseEvent) => {
+    if (event?.target instanceof Node && $menuElement?.contains(event.target))
+      return;
+
     if ($open) {
       onclose?.();
       $open = false;

@@ -131,7 +131,7 @@
     </div>
   </MenuButton>
 
-  <Menu id={controlsId} class="max-h-fit w-80 max-w-fit p-4" keepOpen>
+  <Menu id={controlsId} usePortal class="max-h-fit w-80 max-w-fit p-4" keepOpen>
     <div class="space-y-2">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-medium">

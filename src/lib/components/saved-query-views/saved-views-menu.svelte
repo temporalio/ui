@@ -131,7 +131,11 @@
     {/if}
   </MenuButton>
 
-  <Menu id={menuId} class="w-max min-w-full max-w-[32rem]">
+  <Menu
+    id={menuId}
+    usePortal
+    class="w-max min-w-full max-w-[min(100dvw-1rem,32rem)]"
+  >
     <MenuItem
       class="p-0"
       hoverable={false}
@@ -181,9 +185,10 @@
       </MenuItem>
     {/each}
 
-    <MenuDivider />
-
-    <li role="presentation" class="px-3 py-2 text-xs text-secondary">
+    <li
+      role="presentation"
+      class="surface-primary sticky bottom-0 z-10 border-t border-subtle px-3 py-2 text-xs text-secondary"
+    >
       {translate('common.views-used', {
         used: views.length,
         total: maxQueries,
