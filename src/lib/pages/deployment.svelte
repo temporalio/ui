@@ -27,7 +27,7 @@
     showConnectionStatus?: boolean;
   }
 
-  let { showInstancesLink = true, showConnectionStatus = false }: Props =
+  let { showInstancesLink = true, showConnectionStatus = true }: Props =
     $props();
 
   const { namespace } = $derived(page.params);

@@ -78,24 +78,24 @@ describe('deployment list connection status visibility', () => {
 
   afterAll(closeDeploymentClientTestRunner);
 
-  test('keeps providers visible while hiding statuses by default and restores statuses when enabled', async () => {
-    const hidden = client.renderRows({ computeStatuses });
-
-    expect(hidden.textContent?.match(/Lambda/g)).toHaveLength(3);
-    for (const status of Object.keys(computeStatuses)) {
-      expect(hidden.textContent).not.toContain(status);
-    }
-
-    await client.cleanup();
-
-    const visible = client.renderRows({
-      computeStatuses,
-      showConnectionStatus: true,
-    });
+  test('shows every connection status alongside the provider by default', async () => {
+    const visible = client.renderRows({ computeStatuses });
 
     expect(visible.textContent?.match(/Lambda/g)).toHaveLength(3);
     for (const status of Object.keys(computeStatuses)) {
       expect(visible.textContent).toContain(status);
+    }
+  });
+
+  test('keeps providers visible while hiding statuses when the consumer opts out', async () => {
+    const hidden = client.renderRows({
+      computeStatuses,
+      showConnectionStatus: false,
+    });
+
+    expect(hidden.textContent?.match(/Lambda/g)).toHaveLength(3);
+    for (const status of Object.keys(computeStatuses)) {
+      expect(hidden.textContent).not.toContain(status);
     }
   });
 });
