@@ -100,7 +100,24 @@ export type NexusEndpointReadinessCheck = {
   endpoint: string;
 };
 
-export type ReadinessCheck = NexusEndpointReadinessCheck | WorkerReadinessCheck;
+export type ScheduleReadinessCheck = {
+  kind: 'schedule';
+  required: false;
+  state: ReadinessState;
+  scheduleId: string;
+  /** What the example declares. */
+  paused: boolean;
+  /**
+   * The schedule's running state on the server diverges from the declaration,
+   * so the manager is leaving it alone until the two agree again.
+   */
+  held: boolean;
+};
+
+export type ReadinessCheck =
+  | NexusEndpointReadinessCheck
+  | ScheduleReadinessCheck
+  | WorkerReadinessCheck;
 
 export type EvidenceLink = {
   href: string;
