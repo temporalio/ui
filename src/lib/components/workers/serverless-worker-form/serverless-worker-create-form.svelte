@@ -17,6 +17,7 @@
     getInitialComputeProvider,
   } from './shared';
 
+  import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
@@ -153,6 +154,7 @@
         bind:provider={$form.provider}
         providers={computeProviders}
       />
+      <CloudRunLatencyNotice provider={$form.provider} class="mt-4" />
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
