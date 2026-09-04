@@ -77,7 +77,7 @@
   };
 
   const focusFirstMenuItem = () => {
-    const focusable: (HTMLInputElement | HTMLLIElement)[] = Array.from(
+    const focusable: HTMLElement[] = Array.from(
       $menuElement?.querySelectorAll(MENU_ITEM_SELECTORS) ?? [],
     );
 

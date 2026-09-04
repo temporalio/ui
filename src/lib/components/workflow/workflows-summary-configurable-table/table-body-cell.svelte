@@ -184,15 +184,9 @@
         taskFailure={isWorkflowTaskFailure(workflow)}
       />
     {:else if label === 'End'}
-      <Timestamp
-        dateTime={workflow.endTime}
-        options={{ format: truncate ? 'short' : 'long' }}
-      />
+      <Timestamp dateTime={workflow.endTime} />
     {:else if label === 'Start'}
-      <Timestamp
-        dateTime={workflow.startTime}
-        options={{ format: truncate ? 'short' : 'long' }}
-      />
+      <Timestamp dateTime={workflow.startTime} />
     {:else if label === 'Task Queue'}
       <Tooltip
         usePortal
@@ -222,10 +216,7 @@
         ? workflow.stateTransitionCount
         : ''}
     {:else if label === 'Execution Time'}
-      <Timestamp
-        dateTime={workflow.executionTime}
-        options={{ format: truncate ? 'short' : 'long' }}
-      />
+      <Timestamp dateTime={workflow.executionTime} />
     {:else if label === 'Execution Duration'}
       {formatDistanceAbbreviated({
         start: workflow?.startTime,
@@ -238,20 +229,14 @@
       {@const content =
         workflow.searchAttributes?.indexedFields?.TemporalScheduledStartTime}
       {#if content && typeof content === 'string'}
-        <Timestamp
-          dateTime={content}
-          options={{ format: truncate ? 'short' : 'long' }}
-        />
+        <Timestamp dateTime={content} />
       {/if}
     {:else if label === 'Change Version'}
       {workflow.searchAttributes?.indexedFields?.TemporalChangeVersion}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
       {@const content = workflow.searchAttributes?.indexedFields?.[label]}
       {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
-        <Timestamp
-          dateTime={content}
-          options={{ format: truncate ? 'short' : 'long' }}
-        />
+        <Timestamp dateTime={content} />
       {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
         <Badge text={content ?? ''} />
       {:else}

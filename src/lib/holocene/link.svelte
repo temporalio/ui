@@ -7,6 +7,7 @@
   import { goto } from '$app/navigation';
 
   import type { IconComponent } from '$lib/io/icon';
+  import { isModifiedClick } from '$lib/utilities/is-modified-click';
 
   interface Props extends Omit<HTMLAnchorAttributes, 'class' | 'onclick'> {
     href: string;
@@ -45,8 +46,7 @@
   const hasIcon = $derived(!!(LeadingIcon || TrailingIcon));
 
   const onLinkClick = (e: MouseEvent) => {
-    if (e.button === 1 || newTab || e.metaKey || e.ctrlKey || e.shiftKey)
-      return;
+    if (isModifiedClick(e) || newTab) return;
 
     e.preventDefault();
     goto(href, gotoParams);
