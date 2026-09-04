@@ -299,8 +299,9 @@
   slots: WorkerSlotsInfo | null | undefined,
   poller: WorkerPollerInfo | null | undefined,
 )}
-  {@const noSlotsConfigured =
-    !slots?.currentUsedSlots && !slots?.currentAvailableSlots}
+  {@const usedSlots = slots?.currentUsedSlots ?? 0}
+  {@const availableSlots = slots?.currentAvailableSlots ?? 0}
+  {@const noSlotsConfigured = !usedSlots && !availableSlots}
   <Card class="flex flex-col gap-2">
     <h5 class="mb-2">{title}</h5>
     <dl class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:grid-rows-1">
@@ -314,10 +315,10 @@
               {#if noSlotsConfigured}
                 -
               {:else}
-                {slots?.currentUsedSlots ?? 0}
+                {usedSlots}
               {/if}
-            </span>{#if slots?.currentAvailableSlots && slots.currentAvailableSlots >= 0}
-              /{slots.currentAvailableSlots + (slots?.currentUsedSlots ?? 0)}
+            </span>{#if !noSlotsConfigured && availableSlots >= 0}
+              /{availableSlots + usedSlots}
             {/if}
           </p>
           {#if slots?.slotSupplierKind}
