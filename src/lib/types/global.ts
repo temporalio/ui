@@ -100,6 +100,7 @@ export type Settings = {
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
   activityCommandsDisabled: boolean;
+  workflowSortingEnabled: boolean;
   showTemporalSystemNamespace: boolean;
   navCollapsedByDefault: boolean;
   feedbackURL: string;
