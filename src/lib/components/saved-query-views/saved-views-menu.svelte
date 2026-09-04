@@ -185,9 +185,10 @@
       </MenuItem>
     {/each}
 
-    <MenuDivider />
-
-    <li role="presentation" class="px-3 py-2 text-xs text-secondary">
+    <li
+      role="presentation"
+      class="surface-primary sticky bottom-0 z-10 border-t border-subtle px-3 py-2 text-xs text-secondary"
+    >
       {translate('common.views-used', {
         used: views.length,
         total: maxQueries,
