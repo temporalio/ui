@@ -22,6 +22,7 @@
     activityWorkerCount,
   } from '$lib/stores/activities';
   import { workerCountEnabled } from '$lib/stores/workers';
+  import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForStandaloneActivities,
@@ -200,9 +201,10 @@
         <NoWorkersPollingAlert
           {namespace}
           taskQueue={$activityExecution.info.taskQueue ?? ''}
-          runningWithNoWorkers={!response.pollers &&
+          runningWithNoWorkers={!response.pollers?.length &&
             $activityExecution.info.status ===
               'ACTIVITY_EXECUTION_STATUS_RUNNING'}
+          deployment={getWorkerDeploymentName(response, null)}
         />
       {/await}
     {/if}
