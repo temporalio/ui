@@ -36,7 +36,7 @@
     <p class="text-center">{content}</p>
   {/if}
   {#if error}
-    <p class="border border-danger bg-surface-danger p-5 text-center">
+    <p class="rounded border border-danger bg-surface-danger p-5 text-center">
       {error}
     </p>
   {/if}

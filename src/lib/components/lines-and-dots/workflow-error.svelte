@@ -58,7 +58,7 @@
       </p>
     {/if}
     <div
-      class="mt-2 flex w-full flex-col gap-0 overflow-hidden border border-danger"
+      class="mt-2 flex w-full flex-col gap-0 overflow-hidden rounded border border-danger"
     >
       <div
         class="flex items-center justify-between gap-2 bg-surface-danger px-2 py-2"

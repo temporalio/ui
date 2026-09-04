@@ -88,7 +88,7 @@
     {/if}
   {:else}
     <Table
-      class={merge('shrink-0', tableClass)}
+      class={merge('shrink-0 rounded-b-none', tableClass)}
       bordered={false}
       {updating}
       {fixed}

@@ -2,7 +2,6 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Badge } from '$lib/io/badge';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
 
   interface Props {
@@ -12,6 +11,16 @@
   let { pendingTask = undefined }: Props = $props();
 </script>
 
+{#snippet metadata(value: string)}
+  {#if value}
+    <span
+      class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+    >
+      {value}
+    </span>
+  {/if}
+{/snippet}
+
 <Accordion
   title={translate('workflows.pending-workflow-task')}
   class="border-tertiary bg-background-primary"
@@ -20,23 +29,23 @@
     <div class="flex flex-col gap-2">
       <p class="flex items-center gap-4">
         {translate('common.state')}
-        <Badge text={String(pendingTask.state)} />
+        {@render metadata(String(pendingTask.state))}
       </p>
       <p class="flex items-center gap-4">
         {translate('common.attempt')}
-        <Badge text={String(pendingTask.attempt)} />
+        {@render metadata(String(pendingTask.attempt))}
       </p>
       <p class="flex items-center gap-4">
         {translate('workflows.original-scheduled-time')}
-        <Badge text={$timestamp(pendingTask.originalScheduledTime)} />
+        {@render metadata($timestamp(pendingTask.originalScheduledTime))}
       </p>
       <p class="flex items-center gap-4">
         {translate('workflows.scheduled-time')}
-        <Badge text={$timestamp(pendingTask.scheduledTime)} />
+        {@render metadata($timestamp(pendingTask.scheduledTime))}
       </p>
       <p class="flex items-center gap-4">
         {translate('workflows.started-time')}
-        <Badge text={$timestamp(pendingTask.startedTime)} />
+        {@render metadata($timestamp(pendingTask.startedTime))}
       </p>
     </div>
   {/if}
