@@ -12,6 +12,7 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { IconBookmark, IconSearch } from '$lib/io/icon';
   import type { SavedQuery } from '$lib/stores/saved-queries';
 
@@ -94,7 +95,7 @@
   <MenuButton
     id="{id}-saved-views-button"
     controls={menuId}
-    variant="secondary"
+    variant="tertiary"
     size="xs"
     hasIndicator
     title={label}
@@ -117,14 +118,10 @@
       {label}
     </span>
     {#if noneSelected}
-      <span
-        class="surface-subtle ml-1.5 shrink-0 rounded-full px-2 py-0.5 font-mono text-xs font-medium"
-      >
-        {views.length}/{maxQueries}
-      </span>
+      <BadgeCount value={views.length} total={maxQueries} class="ml-1.5" />
     {:else if unsaved && !draftActive}
       <span
-        class="surface-subtle ml-1.5 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium italic"
+        class="ml-1.5 shrink-0 rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium italic text-secondary"
       >
         {translate('common.unsaved')}
       </span>

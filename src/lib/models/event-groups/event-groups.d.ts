@@ -1,5 +1,6 @@
 import type { EventLink, Payload } from '$lib/types';
 import type {
+  EventClassification,
   PendingActivity,
   PendingNexusOperation,
   WorkflowEvent,

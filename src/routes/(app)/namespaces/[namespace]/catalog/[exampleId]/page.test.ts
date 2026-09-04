@@ -11,7 +11,7 @@ describe('/namespaces/[namespace]/catalog/[exampleId]', () => {
   it('presents the selected example scoped to the route namespace', () => {
     const source = readFileSync(pagePath, 'utf8');
 
-    expect(source).toContain("import Badge from '$lib/holocene/badge.svelte'");
+    expect(source).toContain("import { Badge } from '$lib/io/badge'");
     expect(source).toContain("import Link from '$lib/holocene/link.svelte'");
     expect(source).toContain('LeadingIcon={IconChevronLeft}');
     expect(source).toContain('routeForCatalog({ namespace })');
@@ -19,7 +19,7 @@ describe('/namespaces/[namespace]/catalog/[exampleId]', () => {
     expect(source).toContain('{descriptor.title}');
     expect(source).toContain('{descriptor.description}');
     expect(source).toContain("descriptor.source.id === 'local'");
-    expect(source).toContain('{descriptor.source.label}');
+    expect(source).toContain('text={descriptor.source.label}');
     expect(source).not.toContain('Permalink');
     expect(source).not.toContain('routeForCatalogExample(');
     expect(source).not.toContain('getCatalogContext');

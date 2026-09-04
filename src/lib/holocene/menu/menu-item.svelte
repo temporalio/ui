@@ -29,6 +29,7 @@
     centered?: boolean;
     class?: ClassNameValue;
     hoverable?: boolean;
+    interaction?: 'menu' | 'select';
     onclick?: (event?: MouseEvent) => void;
     children?: Snippet;
     leading?: Snippet;
@@ -59,6 +60,7 @@
     description = undefined,
     centered = false,
     hoverable = true,
+    interaction = 'menu',
     newTab = false,
     onclick,
     children,
@@ -177,6 +179,7 @@
     class:hoverable
     class:destructive
     class:selected
+    class:select={interaction === 'select'}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -220,6 +223,7 @@
     class:selected
     class:hoverable
     class:active
+    class:select={interaction === 'select'}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -250,26 +254,38 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer border border-transparent text-sm focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply cursor-pointer rounded border border-transparent text-sm text-primary focus-visible:border-interactive-primary focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-interactive-secondary-press;
 
     &.active {
-      @apply bg-interactive-secondary-hover;
+      @apply bg-interactive-primary text-white;
     }
 
     &.hoverable {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;
+      @apply hover:bg-interactive-secondary-hover hover:text-primary;
     }
 
-    &.selected {
-      @apply bg-brand/10 text-brand;
+    &.select {
+      @apply focus-visible:bg-interactive-primary-hover focus-visible:text-white active:bg-interactive-primary-press active:text-white;
+
+      &.hoverable {
+        @apply hover:bg-interactive-primary-hover hover:text-white;
+      }
     }
 
     &.destructive {
-      @apply text-danger;
+      @apply text-danger focus-visible:border-interactive-danger focus-visible:bg-interactive-danger focus-visible:text-white focus-visible:ring-interactive-danger active:bg-interactive-danger-press active:text-white;
+
+      &.active {
+        @apply bg-interactive-danger text-white;
+      }
+
+      &.hoverable {
+        @apply hover:bg-interactive-danger-hover hover:text-white;
+      }
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed opacity-50;
+      @apply pointer-events-none cursor-not-allowed text-tertiary opacity-50;
     }
   }
 
@@ -283,5 +299,14 @@
 
   .menu-item-description {
     @apply mr-6 text-xs font-normal text-secondary;
+  }
+
+  .menu-item.active .menu-item-description,
+  .menu-item.select.hoverable:hover .menu-item-description,
+  .menu-item.select:focus-visible .menu-item-description,
+  .menu-item.select:active .menu-item-description,
+  .menu-item.destructive.hoverable:hover .menu-item-description,
+  .menu-item.destructive:focus-visible .menu-item-description {
+    @apply text-white;
   }
 </style>

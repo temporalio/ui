@@ -1,11 +1,12 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+  import { Badge } from '$lib/io/badge';
+  import { BadgeStatus, type BadgeStatusValue } from '$lib/io/badge-status';
   import {
     IconExternalLink,
     IconPlaySolid,
@@ -27,9 +28,6 @@
   import type { EvidenceLink, WorkbenchHost } from './workbench-host';
 
   type SourceFilter = 'all' | string;
-  type RunBadgeType =
-    | ReturnType<typeof terminalStatusPresentation>['type']
-    | 'subtle';
 
   interface Props {
     descriptors: readonly BrowserCatalogDescriptor[];
@@ -125,20 +123,22 @@
 
 {#snippet sourceBadge(descriptor: BrowserCatalogDescriptor)}
   <Badge
-    type={descriptor.source.id === 'local' ? 'warning' : 'subtle'}
-    class="px-1 py-0.5 text-xs leading-none"
-  >
-    {descriptor.source.label}
-  </Badge>
+    text={descriptor.source.label}
+    colorScheme={descriptor.source.id === 'local' ? 'warning' : 'neutral'}
+  />
 {/snippet}
 
 {#snippet runBadge(
-  type: RunBadgeType,
   label: string,
   evidence: EvidenceLink | undefined,
+  status: BadgeStatusValue | undefined,
 )}
   <span class="inline-flex items-center gap-1">
-    <Badge {type} class="px-1 py-0.5 text-xs leading-none">{label}</Badge>
+    {#if status}
+      <BadgeStatus {status} text={label} />
+    {:else}
+      <Badge text={label} />
+    {/if}
     {#if evidence}
       <Link
         href={evidence.href}
@@ -158,10 +158,10 @@
       : undefined}
   {#if latest?.state === 'execution-terminal'}
     {@const status = terminalStatusPresentation(latest.terminalStatus!)}
-    {@render runBadge(status.type, status.label, evidence)}
+    {@render runBadge(status.label, evidence, status.status)}
     <span class="text-secondary">{relativeRunTime(latest.createdAt)}</span>
   {:else if latest}
-    {@render runBadge('subtle', sessionStateLabels[latest.state], evidence)}
+    {@render runBadge(sessionStateLabels[latest.state], evidence, undefined)}
     <span class="text-secondary">{relativeRunTime(latest.createdAt)}</span>
   {:else}
     <span class="text-secondary">Not run</span>
@@ -172,7 +172,7 @@
   <div
     role="search"
     aria-label="Filter example catalog"
-    class="flex w-full flex-wrap items-center gap-2 border border-subtle bg-primary p-1.5"
+    class="flex w-full flex-wrap items-center gap-2 border border-primary bg-surface-primary p-1.5"
   >
     <Input
       id="catalog-search"
@@ -226,7 +226,7 @@
           <th scope="col" class="hidden w-36 sm:table-cell">Latest run</th>
           <th
             scope="col"
-            class="surface-table-header sticky right-0 z-20 w-36 !text-right sm:w-60"
+            class="sticky right-0 z-20 w-36 bg-surface-tertiary !text-right text-primary sm:w-60"
             >Actions</th
           >
         </TableHeaderRow>
@@ -265,7 +265,7 @@
               </div>
             </td>
             <td
-              class="catalog-actions-cell surface-primary sticky right-0 z-[5]"
+              class="catalog-actions-cell sticky right-0 z-[5] bg-surface-primary text-primary"
             >
               <div class="flex items-center justify-end gap-1 sm:gap-2">
                 <Button
@@ -288,7 +288,7 @@
                   >
                   {#if pending}
                     <span
-                      class="surface-primary pointer-events-none absolute -right-1 -top-1 min-w-4 rounded-full border border-subtle px-1 text-center text-[10px] leading-4 text-primary"
+                      class="pointer-events-none absolute -right-1 -top-1 min-w-4 rounded-full border border-primary bg-surface-primary px-1 text-center text-[10px] leading-4 text-primary"
                       aria-hidden="true">{pending}</span
                     >
                   {/if}
@@ -310,12 +310,20 @@
 
 <style lang="postcss">
   .catalog-table-region {
-    :global(.holocene-table-body tr:nth-of-type(odd) > .catalog-actions-cell) {
-      @apply surface-background;
+    :global(.holocene-table-body tr:nth-of-type(even) > .catalog-actions-cell) {
+      @apply text-primary;
+
+      background-color: var(--color-surface-primary);
+      background-image: linear-gradient(
+        var(--color-surface-overlay-primary),
+        var(--color-surface-overlay-primary)
+      );
     }
 
     :global(.holocene-table-body tr:hover > .catalog-actions-cell) {
-      @apply bg-interactive-table-hover bg-fixed;
+      @apply bg-interactive-secondary-hover bg-fixed;
+
+      background-image: none;
     }
   }
 </style>

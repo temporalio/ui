@@ -65,7 +65,7 @@
   }
 </script>
 
-<div class="w-full border border-b-0 border-subtle" in:fade>
+<div class="w-full border-t border-primary" in:fade>
   <form
     onsubmit={handleSearch}
     class="flex gap-0"
@@ -80,7 +80,7 @@
       placeholder={translate('workflows.search-placeholder')}
       Icon={IconSearch}
       class="grow  [&_*]:border-0"
-      inputContainerClass="surface-information !border-r border-subtle focus-within:z-20"
+      inputContainerClass="rounded-none !border-r border-primary bg-surface-primary text-primary hover:border-primary focus-within:z-20 focus-within:ring-inset focus-within:ring-offset-0"
       clearable
       copyButtonLabel={translate('common.copy-icon-title')}
       clearButtonLabel={translate('common.clear-input-button-label')}
@@ -95,7 +95,7 @@
       data-testid="{id}-manual-search-button"
       variant="ghost"
       type="submit"
-      class="focus-visible:z-20"
+      class="rounded-none focus-visible:z-20"
     >
       {translate('common.search')}
     </Button>

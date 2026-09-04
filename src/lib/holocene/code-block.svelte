@@ -301,11 +301,14 @@
 {/snippet}
 
 <div
-  class={twMerge('min-w-[80px] grow', hasHeader && ['border border-subtle'])}
+  class={twMerge(
+    'min-w-[80px] grow rounded',
+    hasHeader && 'overflow-hidden border border-secondary',
+  )}
 >
   {#if tabs && tabs.length > 0}
     <div
-      class="flex flex-row items-center justify-between border-b border-subtle bg-code-block px-3"
+      class="flex flex-row items-center justify-between border-b border-secondary bg-surface-overlay-primary px-3 text-secondary"
     >
       <div class="flex flex-row items-center gap-4">
         {#each tabs as title (title)}
@@ -333,7 +336,7 @@
       identical, minimising ResizeObserver churn when the real editor swaps in.
     -->
     <pre
-      class="overflow-auto border border-subtle bg-code-block p-2 text-primary"
+      class="overflow-auto rounded border border-secondary bg-surface-overlay-primary p-2 text-primary"
       style:font-family="Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace"
       style:font-size="0.875em"
       style:max-height={maxHeight ? `${maxHeight}px` : undefined}

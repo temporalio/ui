@@ -80,12 +80,14 @@
 </script>
 
 {#snippet template(args: ComboboxArgs, context: StoryContext<ComboboxArgs>)}
-  <Combobox
-    {...args as unknown as ComponentProps<typeof Combobox>}
-    id={context.id}
-    data-testid={context.id}
-    onchange={logAction('change')}
-  />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Combobox
+      {...args as unknown as ComponentProps<typeof Combobox>}
+      id={context.id}
+      data-testid={context.id}
+      onchange={logAction('change')}
+    />
+  </div>
 {/snippet}
 
 <Story
@@ -329,7 +331,9 @@
   }}
 >
   {#snippet template(_args, context)}
-    <AsyncTest id={context.id}></AsyncTest>
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
+      <AsyncTest id={context.id}></AsyncTest>
+    </div>
   {/snippet}
 </Story>
 
@@ -396,37 +400,39 @@
   }}
 >
   {#snippet template(args, context)}
-    <div class="w-64">
-      <Combobox
-        {...args as unknown as ComponentProps<typeof Combobox>}
-        id={context.id}
-        data-testid={context.id}
-        onchange={logAction('change')}
-        LeadingIcon={ioIcons.IconSearch}
-        options={[
-          'English',
-          'English (UK)',
-          'German',
-          'French',
-          'Japanese',
-          'Spanish',
-          'Portuguese',
-          'Mandarin',
-          'Hindi',
-          'Russian',
-          'Italian',
-        ]}
-      >
-        {#snippet action()}
-          <Button
-            onclick={() => {}}
-            variant="ghost"
-            size="xs"
-            LeadingIcon={ioIcons.IconClose}
-            aria-label="clear"
-          />
-        {/snippet}
-      </Combobox>
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
+      <div class="w-64">
+        <Combobox
+          {...args as unknown as ComponentProps<typeof Combobox>}
+          id={context.id}
+          data-testid={context.id}
+          onchange={logAction('change')}
+          LeadingIcon={ioIcons.IconSearch}
+          options={[
+            'English',
+            'English (UK)',
+            'German',
+            'French',
+            'Japanese',
+            'Spanish',
+            'Portuguese',
+            'Mandarin',
+            'Hindi',
+            'Russian',
+            'Italian',
+          ]}
+        >
+          {#snippet action()}
+            <Button
+              onclick={() => {}}
+              variant="ghost"
+              size="xs"
+              LeadingIcon={ioIcons.IconClose}
+              aria-label="clear"
+            />
+          {/snippet}
+        </Combobox>
+      </div>
     </div>
   {/snippet}
 </Story>

@@ -31,7 +31,7 @@
 
 <table
   class={merge(
-    'holocene-table relative w-full border-separate border-spacing-0',
+    'holocene-table relative w-full border-separate border-spacing-0 overflow-hidden rounded-lg',
     fixed ? 'layout-fixed' : 'layout-auto',
     className,
   )}
@@ -43,7 +43,11 @@
   <thead class="holocene-table-header">
     {@render headers?.()}
     {#if updating}
-      <ProgressBar />
+      <tr aria-hidden="true" class="!h-0 bg-transparent">
+        <th colspan="1000" class="relative !h-0 !border-0 !p-0">
+          <ProgressBar subtle class="bottom-0" />
+        </th>
+      </tr>
     {/if}
   </thead>
   <tbody class="holocene-table-body">
@@ -53,10 +57,10 @@
 
 <style lang="postcss">
   .holocene-table {
-    @apply surface-primary table-auto;
+    @apply table-auto bg-surface-primary text-primary;
 
     &.bordered {
-      @apply border border-subtle;
+      @apply border border-primary;
     }
 
     &.layout-auto {
@@ -84,25 +88,25 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-table-header;
+      @apply bg-surface-secondary text-primary;
     }
 
     :global(tr > th) {
-      @apply h-9 border-b border-subtle px-2 text-left text-sm font-medium;
+      @apply h-9 border-b border-primary px-2 text-left text-sm font-medium;
     }
   }
 
   :where(.holocene-table-body) {
     :global(tr) {
-      @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-b border-primary last-of-type:border-0 hover:bg-interactive-tertiary-hover hover:bg-fixed;
     }
 
     :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
+      @apply w-full hover:bg-surface-primary;
     }
 
-    :global(tr:nth-of-type(odd)) {
-      @apply surface-background;
+    :global(tr:nth-of-type(even)) {
+      @apply bg-surface-overlay-primary;
     }
 
     :global(tr > td) {
@@ -110,11 +114,11 @@
     }
 
     :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
+      @apply hover:text-brand hover:underline hover:decoration-brand;
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-8 border-b border-primary last-of-type:border-0 hover:bg-interactive-tertiary-hover hover:bg-fixed;
     }
   }
 </style>

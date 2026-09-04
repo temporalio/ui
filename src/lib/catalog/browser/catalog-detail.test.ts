@@ -223,7 +223,7 @@ describe('CatalogDetail', () => {
       /class="[^"]*flex-wrap[^"]*justify-between[^"]*"[\s\S]*>Start options<[\s\S]*>Start</,
     );
     expect(source).toMatch(
-      /aria-label="Start options"[\s\S]*hidden={!configureOpen}[\s\S]*class="surface-primary sticky bottom-0 flex flex-wrap items-center justify-between/,
+      /aria-label="Start options"[\s\S]*hidden={!configureOpen}[\s\S]*class="(?=[^"]*sticky)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*"/,
     );
   });
 
@@ -510,10 +510,10 @@ describe('CatalogDetail', () => {
     expect(body).toContain('aria-label="Execution details"');
     expect(body).toContain('aria-label="What to verify"');
     expect(body).toMatch(
-      /<section class="[^"]*surface-primary[^"]*border border-subtle[^"]*" aria-label="Execution details"/,
+      /<section class="(?=[^"]*border-primary)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*" aria-label="Execution details"/,
     );
     expect(body).toMatch(
-      /<section class="[^"]*surface-primary[^"]*border border-subtle[^"]*" aria-label="What to verify"/,
+      /<section class="(?=[^"]*border-primary)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*" aria-label="What to verify"/,
     );
     expect(body).toMatch(
       /aria-label="Execution details"[\s\S]*Workflow[\s\S]*catalog/,
@@ -644,7 +644,7 @@ describe('CatalogDetail', () => {
       'utf8',
     );
 
-    expect(source).toContain('class="px-1.5 py-0 text-xs leading-5"');
+    expect(source).toContain('size="sm"');
     expect(source).toContain('class="h-7 px-1.5"');
     expect(source).toContain(
       'class="truncate py-2 font-mono text-xs text-secondary"',

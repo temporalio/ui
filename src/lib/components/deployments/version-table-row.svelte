@@ -398,7 +398,7 @@
 </tr>
 
 {#if expanded}
-  <tr class="surface-primary border-y border-subtle">
+  <tr class="border-y border-primary bg-surface-primary text-primary">
     <td colspan={showConnectionStatus ? 6 : 5} class="!p-1">
       <VersionRowDetails
         {namespace}

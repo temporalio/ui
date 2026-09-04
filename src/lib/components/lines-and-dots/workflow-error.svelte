@@ -58,9 +58,11 @@
       </p>
     {/if}
     <div
-      class="mt-2 flex w-full flex-col gap-0 overflow-hidden border border-danger"
+      class="mt-2 flex w-full flex-col gap-0 overflow-hidden rounded border border-danger"
     >
-      <div class="flex items-center justify-between gap-2 bg-danger px-2 py-2">
+      <div
+        class="flex items-center justify-between gap-2 bg-surface-danger px-2 py-2"
+      >
         <div class="flex items-center gap-2">
           {error.id}
           <CategoryGlyph title={CategoryIcon[error.category].title} />
@@ -70,7 +72,7 @@
         </div>
         <Timestamp dateTime={error?.eventTime} />
       </div>
-      <div class="flex flex-col gap-2 bg-primary p-4">
+      <div class="flex flex-col gap-2 bg-surface-primary p-4">
         {#if timeoutType}
           <p>
             <span class="mr-2 text-secondary">Timeout Type</span>

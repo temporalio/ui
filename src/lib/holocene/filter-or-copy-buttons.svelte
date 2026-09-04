@@ -76,10 +76,10 @@
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full p-0.5 text-primary hover:surface-inverse;
+    @apply relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full bg-surface-primary p-0.5 text-primary hover:bg-interactive-tertiary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press;
   }
 
   .filtered {
-    @apply surface-inverse;
+    @apply bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press;
   }
 </style>

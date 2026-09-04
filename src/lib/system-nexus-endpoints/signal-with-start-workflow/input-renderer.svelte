@@ -28,12 +28,12 @@
   {#if signalInput || workflowInput}
     {#if signalInput}
       {#if workflowInput}
-        <p class="text-xs text-secondary/70">Signal Input</p>
+        <p class="text-secondary/70 text-xs">Signal Input</p>
       {/if}
       <PayloadCodeBlock value={signalInput} {maxHeight} />
     {/if}
     {#if workflowInput}
-      <p class="text-xs text-secondary/70">Workflow Input</p>
+      <p class="text-secondary/70 text-xs">Workflow Input</p>
       <PayloadCodeBlock value={workflowInput} {maxHeight} />
     {/if}
   {:else}

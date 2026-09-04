@@ -37,6 +37,7 @@
     placeholder = '',
     name,
     disabled = false,
+    readonly = false,
     required = false,
     invalid = false,
     hintText = '',
@@ -64,8 +65,18 @@
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center">
     <div
-      class="surface-primary relative box-border flex h-10 min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
-      class:opacity-50={disabled}
+      class={merge(
+        'relative box-border flex h-10 min-w-16 items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        units && 'rounded-r-none',
+        !disabled &&
+          !readonly &&
+          valid &&
+          'focus-within:border-secondary hover:border-brand',
+        readonly &&
+          !disabled &&
+          'border-primary bg-surface-primary hover:border-primary',
+        disabled && 'border-secondary bg-surface-tertiary text-tertiary',
+      )}
       class:search
       class:invalid={!valid}
     >
@@ -75,11 +86,12 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-primary focus:text-brand focus:outline-none"
+        class="m-2 block w-full bg-transparent text-center text-primary placeholder:text-tertiary focus:outline-none focus:ring-0 disabled:text-tertiary"
         type="number"
         {max}
         {min}
         {disabled}
+        {readonly}
         data-lpignore="true"
         data-1p-ignore="true"
         {placeholder}
@@ -97,9 +109,12 @@
     </div>
     {#if units}
       <div
-        class="flex h-10 items-center border-y border-r border-subtle bg-subtle px-2"
+        class={merge(
+          'flex h-10 items-center rounded-r border-y border-r border-primary bg-surface-tertiary px-2 text-primary',
+          disabled && 'border-secondary text-tertiary',
+        )}
       >
-        <p class="text-sm font-normal text-primary">{units}</p>
+        <p class="text-sm font-normal">{units}</p>
       </div>
     {/if}
   </div>
@@ -127,6 +142,8 @@
   }
 
   .invalid {
-    @apply border-danger focus-within:ring-danger/70;
+    @apply border-danger focus-within:border-danger;
+
+    box-shadow: inset 0 0 0 1px var(--color-border-primary);
   }
 </style>

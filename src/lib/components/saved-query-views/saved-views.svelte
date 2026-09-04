@@ -246,7 +246,7 @@
 </script>
 
 <div
-  class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-t border-subtle p-1.5 lg:flex-nowrap"
+  class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-surface-primary p-1.5 text-primary lg:flex-nowrap"
   role="group"
   aria-label={translate('common.saved-views')}
   data-testid="saved-views-bar"
@@ -260,7 +260,7 @@
     {/each}
   </div>
 
-  <div class="hidden h-6 shrink-0 border-l border-subtle lg:block"></div>
+  <div class="hidden h-6 shrink-0 border-l border-primary lg:block"></div>
 
   <div class="flex min-w-0 grow flex-wrap items-center gap-1 lg:flex-nowrap">
     <SavedViewsMenu
@@ -384,10 +384,7 @@
       data-track-text={view.name}
       href={viewHref(view)}
       onclick={(event) => setActiveQueryView(view, event)}
-      class={merge(
-        'max-w-[240px]',
-        (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
-      )}
+      class="max-w-[240px]"
       active={view.active}
       disabled={view.disabled}
       size="xs"
@@ -405,7 +402,7 @@
       {/if}
       {#if view.count != undefined}
         {@render queryBadge({
-          className: `font-mono ${view.count > 0 ? 'bg-red-50 dark:bg-red-900 text-red-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-600 text-blue-900 dark:text-white'}`,
+          className: `font-mono ${view.count > 0 ? 'bg-surface-danger text-danger' : 'bg-surface-information text-information'}`,
           content: view.count,
         })}
       {/if}
@@ -422,7 +419,7 @@
 })}
   <span
     class={merge(
-      'surface-subtle flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium',
+      'flex shrink-0 items-center rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium text-primary',
       className,
     )}
   >

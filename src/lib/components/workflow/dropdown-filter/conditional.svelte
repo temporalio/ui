@@ -21,6 +21,6 @@
 
 <style lang="postcss">
   .active {
-    @apply bg-black text-white;
+    @apply bg-interactive-primary text-white;
   }
 </style>

@@ -1,21 +1,42 @@
+import { colorScales } from '$lib/theme/io/themes';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
 
 const DEFAULT_STROKE_COLOR = 'currentColor';
 
+const WORKFLOW_ACTION_COLOR_VARIABLES = {
+  workflow: 'var(--color-action-workflow-workflow)',
+  activity: 'var(--color-action-workflow-activity)',
+  signal: 'var(--color-action-workflow-signal)',
+  timer: 'var(--color-action-workflow-timer)',
+  nexus: 'var(--color-action-workflow-nexus)',
+};
+
+export const WORKFLOW_ACTION_HOVER_CLASSES = {
+  workflow: 'border-action-workflow-workflow bg-action-workflow-workflow/80',
+  activity: 'border-action-workflow-activity bg-action-workflow-activity/80',
+  'child-workflow':
+    'border-action-workflow-workflow bg-action-workflow-workflow/80',
+  timer: 'border-action-workflow-timer bg-action-workflow-timer/80',
+  signal: 'border-action-workflow-signal bg-action-workflow-signal/80',
+  nexus: 'border-action-workflow-nexus bg-action-workflow-nexus/80',
+  'local-activity':
+    'border-action-workflow-activity bg-action-workflow-activity/80',
+};
+
 const STATUS_STROKE_COLORS: Record<
   NonNullable<WorkflowStatus> | EventClassification | 'Delayed',
   string
 > = {
-  Completed: '#1ff1a5',
-  Failed: '#c71607',
-  Terminated: '#c71607',
-  Signaled: '#d300d8',
-  Fired: '#f8a208',
-  TimedOut: '#f97316',
-  Canceled: '#fed64b',
-  Running: '#3b82f6',
-  Delayed: '#fbbf24',
+  Completed: colorScales.green[9],
+  Failed: colorScales.red[11],
+  Terminated: colorScales.red[11],
+  Signaled: colorScales.pink[9],
+  Fired: colorScales.tangerine[9],
+  TimedOut: colorScales.persimmon[9],
+  Canceled: colorScales.amber[9],
+  Running: colorScales.blue[9],
+  Delayed: colorScales.amber[9],
   ContinuedAsNew: DEFAULT_STROKE_COLOR,
   Paused: DEFAULT_STROKE_COLOR,
   Unspecified: DEFAULT_STROKE_COLOR,
@@ -35,18 +56,18 @@ const CATEGORY_STROKE_COLORS: Record<
   EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
   string
 > = {
-  timer: '#fbbf24',
-  signal: '#d300d8',
-  activity: '#a78bfa',
-  workflow: '#ebebeb',
-  marker: '#ebebeb',
-  command: '#ebebeb',
-  'child-workflow': '#0899B2',
-  update: '#FF9B70',
-  pending: '#a78bfa',
-  retry: '#FF9B70',
-  'local-activity': DEFAULT_STROKE_COLOR,
-  nexus: DEFAULT_STROKE_COLOR,
+  timer: WORKFLOW_ACTION_COLOR_VARIABLES.timer,
+  signal: WORKFLOW_ACTION_COLOR_VARIABLES.signal,
+  activity: WORKFLOW_ACTION_COLOR_VARIABLES.activity,
+  workflow: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
+  marker: colorScales.neutral[1],
+  command: colorScales.neutral[1],
+  'child-workflow': WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
+  update: colorScales.persimmon[8],
+  pending: colorScales['slate-blue'][8],
+  retry: colorScales.persimmon[8],
+  'local-activity': WORKFLOW_ACTION_COLOR_VARIABLES.activity,
+  nexus: WORKFLOW_ACTION_COLOR_VARIABLES.nexus,
   other: DEFAULT_STROKE_COLOR,
 };
 
@@ -56,29 +77,83 @@ export const getCategoryStrokeColor = (
 
 export type DotColors = { readonly fill: string; readonly stroke: string };
 
-const DOT_DEFAULT: DotColors = { fill: '#e8efff', stroke: '#141414' };
+const DEFAULT_DOT_STROKE = colorScales.neutral[11];
+const DOT_DEFAULT: DotColors = {
+  fill: colorScales.indigo[3],
+  stroke: DEFAULT_DOT_STROKE,
+};
 
 const CLASSIFICATION_DOT_COLORS: Record<string, DotColors> = {
-  Started: { fill: '#92a4c3', stroke: '#141414' },
-  Completed: { fill: '#1ff1a5', stroke: '#00964e' },
-  Fired: { fill: '#f8a208', stroke: '#fed64b' },
-  Signaled: { fill: '#d300d8', stroke: '#ff26ff' },
-  Failed: { fill: '#f55', stroke: '#c71607' },
-  Terminated: { fill: '#f55', stroke: '#c71607' },
-  TimedOut: { fill: '#c2570c', stroke: '#f97316' },
-  Canceled: { fill: '#fed64b', stroke: '#fff4c6' },
+  Started: {
+    fill: colorScales.zaffre[7],
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  Completed: {
+    fill: colorScales.green[9],
+    stroke: colorScales.green[11],
+  },
+  Fired: {
+    fill: colorScales.tangerine[9],
+    stroke: colorScales.amber[9],
+  },
+  Signaled: {
+    fill: colorScales.pink[9],
+    stroke: colorScales.pink[8],
+  },
+  Failed: {
+    fill: colorScales.red[9],
+    stroke: colorScales.red[11],
+  },
+  Terminated: {
+    fill: colorScales.red[9],
+    stroke: colorScales.red[11],
+  },
+  TimedOut: {
+    fill: colorScales.persimmon[11],
+    stroke: colorScales.persimmon[9],
+  },
+  Canceled: {
+    fill: colorScales.amber[9],
+    stroke: colorScales.amber[3],
+  },
 };
 
 const CATEGORY_DOT_COLORS: Record<string, DotColors> = {
-  marker: { fill: '#ebebeb', stroke: '#141414' },
-  command: { fill: '#ebebeb', stroke: '#141414' },
-  timer: { fill: '#fbbf24', stroke: '#141414' },
-  signal: { fill: '#d300d8', stroke: '#141414' },
-  activity: { fill: '#a78bfa', stroke: '#141414' },
-  pending: { fill: '#141414', stroke: '#a78bfa' },
-  'child-workflow': { fill: '#b2f8d9', stroke: '#141414' },
-  update: { fill: '#06b6d4', stroke: '#141414' },
-  workflow: { fill: '#059669', stroke: '#141414' },
+  marker: { fill: colorScales.neutral[1], stroke: DEFAULT_DOT_STROKE },
+  command: { fill: colorScales.neutral[1], stroke: DEFAULT_DOT_STROKE },
+  timer: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.timer,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  signal: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.signal,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  activity: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.activity,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  pending: {
+    fill: DEFAULT_DOT_STROKE,
+    stroke: colorScales['slate-blue'][8],
+  },
+  'child-workflow': {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  update: { fill: colorScales.blue[9], stroke: DEFAULT_DOT_STROKE },
+  workflow: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  'local-activity': {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.activity,
+    stroke: DEFAULT_DOT_STROKE,
+  },
+  nexus: {
+    fill: WORKFLOW_ACTION_COLOR_VARIABLES.nexus,
+    stroke: DEFAULT_DOT_STROKE,
+  },
 };
 
 export function dotColors(
@@ -105,7 +180,8 @@ export function strokeColor({
 }): string {
   let color = DEFAULT_STROKE_COLOR;
   if (status) {
-    color = status === 'none' ? '#141414' : getStatusStrokeColor(status);
+    color =
+      status === 'none' ? DEFAULT_DOT_STROKE : getStatusStrokeColor(status);
   }
   if (category) {
     const categoryColor = getCategoryStrokeColor(category);

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { type Snippet, untrack } from 'svelte';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import type { Payload } from '$lib/types';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -68,5 +67,9 @@
 {:else if className}
   <span class={className}>{decodedValue || fallback}</span>
 {:else}
-  <Badge type="secondary">{decodedValue || fallback}</Badge>
+  <span
+    class="inline-block max-w-full truncate rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+  >
+    {decodedValue || fallback}
+  </span>
 {/if}

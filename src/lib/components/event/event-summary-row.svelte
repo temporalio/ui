@@ -6,18 +6,14 @@
 
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import PendingAttemptBadge from '$lib/components/workflow/pending-attempt-badge/pending-attempt-badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    IconChevronDown,
-    IconChevronUp,
-    IconPause,
-    IconRetry,
-  } from '$lib/io/icon';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { IconChevronDown, IconChevronUp } from '$lib/io/icon';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -45,7 +41,6 @@
     isWorkflowExecutionSignaledEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
-  import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { eventTypeStyle } from './event-styles';
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -252,9 +247,9 @@
 <tr
   class={merge(
     'hover:cursor-pointer',
-    failure && '!bg-red-400/40 hover:!bg-red-400/60',
-    canceled && '!bg-yellow-400/30 hover:!bg-yellow-400/50',
-    terminated && '!bg-pink-700/30 hover:!bg-pink-700/50',
+    failure && '!bg-alpha-red-40 hover:!bg-alpha-red-60',
+    canceled && '!bg-alpha-amber-30 hover:!bg-alpha-amber-50',
+    terminated && '!bg-alpha-red-30 hover:!bg-alpha-red-50',
     hasRelatedActivities(group, hoveredEventId) && 'active',
   )}
   id={`${event.id}-${index}`}
@@ -344,38 +339,17 @@
   >
     <div class="flex items-center gap-2">
       {#if pendingAttempt}
-        <Badge
+        <PendingAttemptBadge
+          attempt={pendingAttempt}
+          maximumAttempts={isPendingActivity
+            ? (isPendingActivity.maximumAttempts ?? null)
+            : undefined}
+          paused={Boolean(isPausedPendingActivity)}
+          nextRetryTime={isPendingActivity
+            ? isPendingActivity.scheduledTime
+            : undefined}
           class="mr-1"
-          type={isPausedPendingActivity
-            ? 'warning'
-            : pendingAttempt > 1
-              ? 'danger'
-              : 'default'}
-        >
-          {@const Glyph = isPausedPendingActivity ? IconPause : IconRetry}
-          <Glyph
-            class={merge(
-              'mr-1 inline',
-              pendingAttempt > 1 && 'font-bold text-red-400',
-              isPausedPendingActivity && 'font-bold text-yellow-700',
-            )}
-          />
-          {translate('workflows.attempt')}
-          {pendingAttempt}
-          {#if isPendingActivity}
-            / {isPendingActivity?.maximumAttempts || '∞'}
-            {#if pendingAttempt > 1 && isPendingActivity?.scheduledTime}
-              {@const timeDifference = toTimeDifference({
-                date: isPendingActivity.scheduledTime,
-                negativeDefault: '',
-              })}
-              {#if timeDifference}
-                • {translate('workflows.next-retry')}
-                {timeDifference}
-              {/if}
-            {/if}
-          {/if}
-        </Badge>
+        />
       {/if}
       {#if !primaryLocalAttribute && primaryAttribute?.key}
         <EventDetailsRow {...primaryAttribute} {attributes} />
@@ -440,9 +414,7 @@
             text={translate('workflows.estimated-billable-actions')}
             topRight
           >
-            <Badge type="subtle" class="text-bold shrink-0 gap-1 px-1.5">
-              {event.billableActions}
-            </Badge>
+            <BadgeCount value={event.billableActions} class="shrink-0" />
           </Tooltip>
         {/if}
       </div>
@@ -467,10 +439,10 @@
 
 <style lang="postcss">
   tr[data-testid='event-summary-row'].active {
-    @apply surface-table-related-hover;
+    @apply bg-interactive-secondary-hover text-primary;
   }
 
   tr[data-testid='event-summary-row'].active:hover {
-    @apply surface-table-header;
+    @apply bg-surface-tertiary;
   }
 </style>

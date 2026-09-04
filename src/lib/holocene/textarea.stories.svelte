@@ -19,6 +19,7 @@
       error: '',
       required: false,
       disabled: false,
+      readonly: false,
       isValid: true,
       rows: 5,
       spellcheck: false,
@@ -33,6 +34,7 @@
       error: { name: 'Error', control: 'text' },
       required: { name: 'Required', control: 'boolean' },
       disabled: { name: 'Disabled', control: 'boolean' },
+      readonly: { name: 'Read Only', control: 'boolean' },
       isValid: { name: 'Valid?', control: 'boolean' },
       rows: { name: 'Rows', control: 'range', min: 1, max: 10, step: 1 },
       spellcheck: { name: 'Spellcheck', control: 'boolean' },
@@ -48,15 +50,17 @@
   args: ComponentProps<typeof Textarea>,
   context: StoryContext<ComponentProps<typeof Textarea>>,
 )}
-  <Textarea
-    {...args}
-    oninput={action('input')}
-    onblur={action('blue')}
-    onchange={action('change')}
-    onfocus={action('focus')}
-    onkeydown={action('keydown')}
-    id={context.id}
-  />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Textarea
+      {...args}
+      oninput={action('input')}
+      onblur={action('blue')}
+      onchange={action('change')}
+      onfocus={action('focus')}
+      onkeydown={action('keydown')}
+      id={context.id}
+    />
+  </div>
 {/snippet}
 
 <Story
@@ -65,6 +69,8 @@
 />
 
 <Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Read Only" args={{ readonly: true, value: 'Read-only value' }} />
 
 <Story name="Error" args={{ error: 'An error message.', isValid: false }} />
 

@@ -23,7 +23,7 @@
       variant: {
         name: 'Variant',
         control: 'select',
-        options: ['primary', 'secondary', 'destructive', 'ghost'],
+        options: ['primary', 'secondary', 'tertiary', 'destructive', 'ghost'],
       },
       size: {
         name: 'Size',
@@ -88,7 +88,9 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Button>)}
-  <Button {...args} onclick={action('click')}>Click Me</Button>
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Button {...args} onclick={action('click')}>Click Me</Button>
+  </div>
 {/snippet}
 
 <Story name="Primary" args={{}} {template} />
@@ -117,6 +119,8 @@
   play={shouldNotBeTransparent((canvas) => canvas.getByRole('button'))}
   {template}
 />
+
+<Story name="Tertiary" args={{ variant: 'tertiary' }} {template} />
 
 <Story name="Destructive" args={{ variant: 'destructive' }} {template} />
 

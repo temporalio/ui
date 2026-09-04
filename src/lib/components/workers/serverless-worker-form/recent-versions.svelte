@@ -53,7 +53,7 @@
       {#each visibleVersions as version, index (index)}
         {@const { status, label } = getStatus(version)}
         <li
-          class="flex w-full items-start justify-between gap-2 border-b border-subtle py-2 last-of-type:border-b-0"
+          class="flex w-full items-start justify-between gap-2 border-b border-primary py-2 last-of-type:border-b-0"
         >
           <div class="flex flex-wrap items-center gap-2 truncate">
             <span class="select-all truncate font-mono text-sm"

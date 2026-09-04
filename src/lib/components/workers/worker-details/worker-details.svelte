@@ -15,7 +15,6 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -31,6 +30,7 @@
     IconSpinner,
     IconTemporalServer,
   } from '$lib/io/icon';
+  import { Tag } from '$lib/io/tag';
   import type {
     WorkerInfo,
     WorkerPollerInfo,
@@ -236,8 +236,8 @@
       >
         <span
           class="h-1.5 w-1.5 rounded-full {autoRefresh
-            ? 'bg-green-600'
-            : 'bg-slate-300'}"
+            ? 'bg-green-9'
+            : 'bg-surface-tertiary'}"
         ></span>
         {autoRefresh
           ? translate('workers.auto-refresh-on')
@@ -246,7 +246,7 @@
     </ToggleButtons>
     {#if refreshing}
       <p class="flex items-center gap-1">
-        <IconSpinner class="animate-spin text-indigo-600" />
+        <IconSpinner class="animate-spin text-brand" />
         {translate('workers.pulling-latest-snapshot')}
       </p>
     {:else}
@@ -285,7 +285,7 @@
     <aside class="flex w-full flex-col gap-4 xl:max-w-sm">
       <Card>
         {@render hostUsage()}
-        <hr class="my-4 border-subtle" />
+        <hr class="my-4 border-primary" />
         {@render workflowCache()}
       </Card>
       <!-- TODO: Add back task failure rate. -->
@@ -329,12 +329,11 @@
               hide={!tooltipText || noSlotsConfigured}
               width={200}
             >
-              <Badge
-                type="ghost"
-                class={merge('mt-1 text-xs', noSlotsConfigured && 'invisible')}
-              >
-                {slots.slotSupplierKind}
-              </Badge>
+              <Tag
+                text={slots.slotSupplierKind}
+                Icon={null}
+                class={merge('mt-1', noSlotsConfigured && 'invisible')}
+              />
             </Tooltip>
           {/if}
         </dd>
@@ -368,14 +367,13 @@
               hide={!hasCurrentPollers}
               width={200}
             >
-              <Badge
-                type="ghost"
-                class={merge('mt-1 text-xs', !hasCurrentPollers && 'invisible')}
-              >
-                {poller.isAutoscaling
+              <Tag
+                text={poller.isAutoscaling
                   ? translate('workers.autoscaling')
                   : translate('workers.simple-maximum')}
-              </Badge>
+                Icon={null}
+                class={merge('mt-1', !hasCurrentPollers && 'invisible')}
+              />
             </Tooltip>
           </dd>
         </div>
@@ -410,10 +408,10 @@
     aria-valuenow={value}
     aria-valuemin={0}
     aria-valuemax={maxValue}
-    class="relative h-2 w-full overflow-hidden rounded bg-indigo-100"
+    class="relative h-2 w-full overflow-hidden rounded bg-surface-information"
   >
     <div
-      class="absolute left-0 h-full bg-indigo-600"
+      class="absolute left-0 h-full bg-indigo-9"
       style="width:{maxValue > 0
         ? Math.min((value / maxValue) * 100, 100)
         : 0}%;"
@@ -483,7 +481,7 @@
         </dd>
       </div>
       <div>
-        <dt class="font-mediumtext-sm text-secondary">
+        <dt class="text-sm font-medium text-secondary">
           {translate('workers.cache-hits')}
         </dt>
         <dd class="font-mono text-2xl font-semibold text-brand">
@@ -514,7 +512,9 @@
       <dt class="text-sm text-secondary">
         {translate('workers.task-failure-rate')}
       </dt>
-      <dd class="font-mono text-2xl text-brand">{taskFailureRate}%</dd>
+      <dd class="font-mono text-2xl text-brand">
+        {taskFailureRate}%
+      </dd>
     </dl>
   </Card>
 {/snippet}

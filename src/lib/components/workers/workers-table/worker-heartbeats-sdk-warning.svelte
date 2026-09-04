@@ -56,7 +56,7 @@
   aria-live="polite"
 >
   <span class="flex h-20 w-20 items-center justify-center rounded-full">
-    <IconHeartbeat class="block h-full w-full text-blue-200" />
+    <IconHeartbeat class="block h-full w-full text-indigo-6" />
   </span>
   <div class="text-center">
     <h5>{translate('workers.no-worker-heartbeats')}</h5>

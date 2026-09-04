@@ -11,7 +11,7 @@
     EventTypeCategory,
     WorkflowEventWithPending,
   } from '$lib/types/events';
-  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
+  import { getEventClassificationLabel } from '$lib/utilities/get-event-classification-label';
   import {
     isPendingActivity,
     isPendingNexusOperation,

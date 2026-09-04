@@ -105,7 +105,7 @@
     id="{id}-search-attribute-filter-button"
     controls="{id}-search-attribute-menu"
     LeadingIcon={IconFilter}
-    variant="secondary"
+    variant="tertiary"
     data-testid="add-filter-button"
     disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
     onclick={() => (searchAttributeValue = '')}
@@ -133,7 +133,7 @@
         class="w-full min-w-[300px]"
       />
     </MenuItem>
-    <hr class="border-subtle" />
+    <hr class="border-primary" />
 
     {#each filteredOptions as { value, label, type } (value)}
       <MenuItem

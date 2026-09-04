@@ -57,7 +57,7 @@
           {translate('standalone-nexus-operations.empty-state-description')}
         {/if}
       </p>
-      <NoQueryResults class="m-auto mt-8 text-subtle" />
+      <NoQueryResults class="m-auto mt-8 text-tertiary" />
     </div>
   </div>
 {:else}
@@ -66,7 +66,7 @@
     aria-live="polite"
   >
     <div
-      class="surface-primary flex w-auto min-w-[280px] flex-col gap-6 p-8 xl:min-w-[520px] xl:flex-1"
+      class="flex w-auto min-w-[280px] flex-col gap-6 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
     >
       <h2>
         {translate('standalone-nexus-operations.empty-state-no-data-title')}
@@ -129,10 +129,10 @@
       {/if}
     </div>
     <div class="flex flex-col">
-      <div class="bg-off-white dark:bg-[#0f1725]">
+      <div class="bg-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-[#8da4ef]"></div>
     </div>
   </div>
 {/if}

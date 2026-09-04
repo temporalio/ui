@@ -15,6 +15,7 @@
     fixed?: boolean;
     verticalScroll?: 'responsive' | 'table';
     class?: ClassNameValue;
+    tableClass?: string;
     caption?: Snippet;
     headers?: Snippet<[{ visibleItems: Item[] }]>;
     children?: Snippet;
@@ -33,6 +34,7 @@
     fixed = false,
     verticalScroll = 'responsive',
     class: className = '',
+    tableClass = '',
     caption,
     headers,
     children,
@@ -68,7 +70,7 @@
 
 <div
   class={merge(
-    'surface-primary flex grow flex-col overflow-auto border border-subtle',
+    'flex grow flex-col overflow-auto rounded-lg border border-primary bg-background-primary text-primary',
     className,
   )}
   id="{rest['id']}-container"
@@ -86,7 +88,7 @@
     {/if}
   {:else}
     <Table
-      class="shrink-0"
+      class={merge('shrink-0 rounded-b-none', tableClass)}
       bordered={false}
       {updating}
       {fixed}
@@ -99,7 +101,7 @@
     {#if visibleItems.length}
       <div
         class={merge(
-          'surface-primary sticky left-0 flex w-full shrink-0 flex-wrap items-center justify-between gap-2 border-t border-subtle px-4 py-2',
+          'sticky left-0 flex w-full shrink-0 flex-wrap items-center justify-between gap-2 border-t border-primary bg-surface-primary px-4 py-2 text-primary',
           scrollsInTable ? 'bottom-0 mt-auto' : 'md:bottom-0 md:mt-auto',
         )}
         bind:clientHeight={footerHeight}

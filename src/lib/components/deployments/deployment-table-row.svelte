@@ -157,7 +157,7 @@
       <td class="py-1 text-left">
         {#if isSameAsCurrent}
           <span
-            class="inline-flex items-center border border-subtle px-2 py-0.5 text-secondary"
+            class="inline-flex items-center border border-primary px-2 py-0.5 text-secondary"
           >
             {translate('deployments.same-as-current')}
           </span>

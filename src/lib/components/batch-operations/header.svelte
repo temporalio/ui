@@ -1,11 +1,12 @@
 <script lang="ts">
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { autoRefresh } from '$lib/stores/batch-operations';
-  import type { BatchOperation, BatchOperationState } from '$lib/types/batch';
+  import type { BatchOperation } from '$lib/types/batch';
+
+  import BatchOperationStatusBadge from './batch-operation-status-badge.svelte';
 
   interface Props {
     operation: BatchOperation;
@@ -23,13 +24,6 @@
     $autoRefresh = checked;
     onToggleAutoRefresh?.(checked);
   };
-
-  const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
-    Completed: 'success',
-    Running: 'primary',
-    Failed: 'danger',
-    Unspecified: undefined,
-  };
 </script>
 
 <div class="flex items-center justify-between">
@@ -38,12 +32,7 @@
       <h1>
         {translate('batch.describe-page-title')}
       </h1>
-      <Badge
-        type={jobStateToBadgeType[operation.state]}
-        class="h-8 px-4 text-lg"
-      >
-        {operation.state}
-      </Badge>
+      <BatchOperationStatusBadge state={operation.state} />
     </div>
     <Copyable
       content={operation.jobId}

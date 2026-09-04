@@ -20,6 +20,7 @@
       search: false,
       labelHidden: false,
       disabled: false,
+      readonly: false,
       required: false,
       hintText: '',
     },
@@ -30,6 +31,7 @@
       units: { name: 'Units', control: 'text' },
       hintText: { name: 'Hint Text', control: 'text' },
       disabled: { name: 'Disabled', control: 'boolean' },
+      readonly: { name: 'Read Only', control: 'boolean' },
       required: { name: 'Required', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       Icon: {
@@ -50,12 +52,16 @@
   args: ComponentProps<typeof NumberInput>,
   context: StoryContext<ComponentProps<typeof NumberInput>>,
 )}
-  <NumberInput {...args} id={context.id} />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <NumberInput {...args} id={context.id} />
+  </div>
 {/snippet}
 
 <Story name="Default" />
 
 <Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Read Only" args={{ readonly: true, value: 42 }} />
 
 <Story name="Required" args={{ required: true }} />
 

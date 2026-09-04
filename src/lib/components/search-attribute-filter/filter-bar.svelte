@@ -54,7 +54,7 @@
 
 <div>
   <div
-    class="flex w-full flex-wrap items-end justify-between gap-2 border border-b-0 border-subtle bg-primary p-1.5"
+    class="flex w-full flex-wrap items-end justify-between gap-2 border-t border-primary bg-surface-primary p-1.5"
   >
     <Filter
       {filters}

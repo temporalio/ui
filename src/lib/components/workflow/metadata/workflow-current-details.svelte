@@ -60,14 +60,16 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="flex flex-1 flex-col border-l border-subtle">
-  <div class="surface-information w-full px-6 py-2">
+<div
+  class="flex flex-1 flex-col border-l border-primary bg-background-primary text-primary"
+>
+  <div class="w-full bg-surface-information px-6 py-2 text-primary">
     <div class="flex items-center justify-between">
       <h3>{translate('workflows.current-details')}</h3>
       <div class="flex flex-row items-center gap-2 lg:flex-col xl:flex-row">
         <p class="hidden sm:block">
           Press the <span
-            class="mx-1 rounded bg-subtle px-1 text-sm font-medium leading-4"
+            class="mx-1 rounded bg-surface-tertiary px-1 text-sm font-medium leading-4"
             >R</span
           > for freshness
         </p>
@@ -95,8 +97,7 @@
   {#key currentDetails}
     <Markdown
       frameId="user-metadata-current-details"
-      class="p-3"
-      overrideTheme="primary"
+      overrideTheme="background"
       content={currentDetails}
     />
   {/key}

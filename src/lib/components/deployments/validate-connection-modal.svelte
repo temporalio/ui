@@ -56,9 +56,9 @@
       {#if loading}
         <div class="flex items-center gap-2">
           <div
-            class="h-5 w-5 shrink-0 animate-pulse rounded-full bg-subtle"
+            class="h-5 w-5 shrink-0 animate-pulse rounded-full bg-surface-tertiary"
           ></div>
-          <div class="h-5 w-40 animate-pulse rounded bg-subtle"></div>
+          <div class="h-5 w-40 animate-pulse rounded bg-surface-tertiary"></div>
         </div>
       {:else if result}
         <div class="flex items-start gap-2">

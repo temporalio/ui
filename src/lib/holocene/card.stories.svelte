@@ -12,14 +12,16 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Card>)}
-  <Card {...args}>
-    <p>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
-      exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
-      sed rerum necessitatibus minima nobis, ullam minus inventore voluptates
-      itaque?
-    </p>
-  </Card>
+  <div class="bg-surface-primary p-4 text-primary">
+    <Card {...args}>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
+        exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
+        sed rerum necessitatibus minima nobis, ullam minus inventore voluptates
+        itaque?
+      </p>
+    </Card>
+  </div>
 {/snippet}
 
 <Story name="Default" />

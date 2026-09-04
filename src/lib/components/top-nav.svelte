@@ -22,13 +22,13 @@
 {#if md.current}
   <nav
     class={merge(
-      'surface-primary',
+      'bg-surface-primary text-primary',
       'sticky top-0 z-40',
       'flex',
       'w-full',
       'flex-row',
       'items-center justify-end',
-      'border-b border-subtle',
+      'border-b border-primary',
       'h-[var(--top-nav-height)] px-8',
       className,
     )}

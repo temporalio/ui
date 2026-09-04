@@ -20,6 +20,7 @@
       placeholder: 'Placeholder...',
       labelHidden: false,
       disabled: false,
+      readonly: false,
       clearable: false,
       copyable: false,
       required: false,
@@ -40,6 +41,7 @@
       required: { name: 'Required', control: 'boolean' },
       error: { name: 'Error', control: 'boolean' },
       disabled: { name: 'Disabled', control: 'boolean' },
+      readonly: { name: 'Read Only', control: 'boolean' },
       valid: { name: 'Valid', control: 'boolean' },
       autocomplete: {
         name: 'Autocomplete',
@@ -85,12 +87,16 @@
   args: ComponentProps<typeof Input>,
   context: StoryContext<ComponentProps<typeof Input>>,
 )}
-  <Input {...args} id={context.id} data-testid={context.id} />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Input {...args} id={context.id} data-testid={context.id} />
+  </div>
 {/snippet}
 
 <Story name="Empty" />
 
 <Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Read Only" args={{ readonly: true, value: 'Read-only value' }} />
 
 <Story name="Required" args={{ required: true }} />
 
@@ -149,13 +155,15 @@
 
 <Story name="With Buttons">
   {#snippet template(args, context)}
-    <Input {...args} id={context.id} data-testid={context.id}>
-      {#snippet beforeInput()}
-        <Button type="button">Before</Button>
-      {/snippet}
-      {#snippet afterInput()}
-        <Button type="button">After</Button>
-      {/snippet}
-    </Input>
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
+      <Input {...args} id={context.id} data-testid={context.id}>
+        {#snippet beforeInput()}
+          <Button type="button">Before</Button>
+        {/snippet}
+        {#snippet afterInput()}
+          <Button type="button">After</Button>
+        {/snippet}
+      </Input>
+    </div>
   {/snippet}
 </Story>

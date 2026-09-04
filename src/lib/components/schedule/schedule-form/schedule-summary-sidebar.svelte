@@ -93,7 +93,9 @@
       <dd class="text-sm">{$form.workflowType || '--'}</dd>
     </div>
     <div>
-      <dt class="text-xs text-secondary">{translate('common.task-queue')}</dt>
+      <dt class="text-xs text-secondary">
+        {translate('common.task-queue')}
+      </dt>
       <dd class="text-sm">{$form.taskQueue || '--'}</dd>
     </div>
     <div>

@@ -93,7 +93,7 @@
             <Skeleton class="h-2 w-full" />
           </div>
         </div>
-        <hr class="border-subtle" />
+        <hr class="border-primary" />
         <div>
           <Skeleton class="mb-4 h-5 w-28" />
           <div class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">

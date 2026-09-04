@@ -327,7 +327,7 @@
 
 {#snippet conditionalButtons(options: { value: string; label: string }[])}
   <ToggleButtons>
-    {#each options as option}
+    {#each options as option (option.value)}
       <ToggleButton
         variant="secondary"
         active={localFilter.conditional === option.value}
@@ -350,13 +350,13 @@
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-secondary"
+    class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-surface-secondary"
     title="{getDisplayKeyWithConditional(localFilter)} {getDisplayValue(
       localFilter,
     )}"
   >
     <div class="min-w-0 text-left">
-      <span class="break-words"
+      <span class="break-words text-primary"
         >{getDisplayKeyWithConditional(localFilter)}</span
       >
       <span class="break-all text-brand">{getDisplayValue(localFilter)}</span>

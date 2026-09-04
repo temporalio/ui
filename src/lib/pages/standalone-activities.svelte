@@ -39,7 +39,7 @@
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
   import BatchCancelConfirmationModal from '$lib/components/standalone-activities/batch-cancel-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/standalone-activities/batch-terminate-confirmation-modal.svelte';
-  import StatusCounts from '$lib/components/status-counts.svelte';
+  import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -210,7 +210,7 @@
         </p>
       </div>
       {@render releaseStageBadge?.()}
-      <StatusCounts
+      <StatusCountFilters
         bind:refreshTime
         countStore={activityCount}
         refresh={activityRefresh}

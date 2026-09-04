@@ -1,19 +1,15 @@
 <script lang="ts">
-  import { twMerge as merge } from 'tailwind-merge';
-
   import { page } from '$app/stores';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import PendingAttemptBadge from '$lib/components/workflow/pending-attempt-badge/pending-attempt-badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconPause, IconRetry } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { PendingActivity } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
-  import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { eventTypeStyle } from './event-styles';
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -111,35 +107,13 @@
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex items-center gap-1">
-      <Badge
+      <PendingAttemptBadge
+        attempt={event.attempt ?? 0}
+        maximumAttempts={event.maximumAttempts ?? null}
+        paused={Boolean(event.paused)}
+        nextRetryTime={event.scheduledTime}
         class="mr-1"
-        type={event.paused
-          ? 'warning'
-          : (event.attempt ?? 0) > 1
-            ? 'danger'
-            : 'default'}
-      >
-        {@const Glyph = event.paused ? IconPause : IconRetry}
-        <Glyph
-          class={merge(
-            'mr-1 inline',
-            (event.attempt ?? 0) > 1 && 'font-bold text-red-400',
-            event.paused && 'font-bold text-yellow-700',
-          )}
-        />
-        {translate('workflows.attempt')}
-        {event.attempt} / {event.maximumAttempts || '∞'}
-        {#if (event.attempt ?? 0) > 1 && event.scheduledTime}
-          {@const timeDifference = toTimeDifference({
-            date: event.scheduledTime,
-            negativeDefault: '',
-          })}
-          {#if timeDifference}
-            • {translate('workflows.next-retry')}
-            {timeDifference}
-          {/if}
-        {/if}
-      </Badge>
+      />
       <EventDetailsRow
         key="activityType"
         value={event.activityType ?? null}

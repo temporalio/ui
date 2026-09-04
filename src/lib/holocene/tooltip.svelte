@@ -202,7 +202,7 @@
           id={tooltipId}
           role="tooltip"
           class={merge(
-            'inline-block rounded-md bg-slate-800 px-2 py-2 text-xs text-slate-50',
+            'inline-block rounded bg-neutral-7 px-2 py-2 text-xs text-white',
             tooltipClass,
           )}
           onmouseenter={handleHoverEnter}
@@ -220,7 +220,7 @@
         role="tooltip"
         class={merge(
           'tooltip absolute left-0 top-0 z-50 translate-x-12 whitespace-nowrap text-xs transition-all',
-          isOpen ? 'inline-block opacity-95' : 'hidden opacity-0',
+          isOpen ? 'inline-block opacity-100' : 'hidden opacity-0',
         )}
         onmouseenter={handleHoverEnter}
         onmouseleave={handleHoverLeave}
@@ -236,7 +236,7 @@
       >
         <div
           class={merge(
-            'inline-block rounded-md bg-slate-800 px-2 py-2 text-slate-50',
+            'inline-block rounded bg-neutral-7 px-2 py-2 text-white',
             tooltipClass,
           )}
         >
