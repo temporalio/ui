@@ -53,7 +53,7 @@
 
 <div
   class={twMerge(
-    'flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5',
+    'flex min-h-[24px] flex-wrap items-center gap-2 pt-1',
     className,
   )}
   aria-busy={statusCounts.loading}
