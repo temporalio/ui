@@ -35,9 +35,9 @@
     extension !== false && extension !== null && extension !== undefined;
 
   const sharedClasses =
-    '[text-box:trim-both_cap_alphabetic] [&_span]:[text-box:inherit] inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono text-xs font-medium leading-none uppercase tracking-wide';
+    'inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono text-xs font-medium leading-none uppercase tracking-wide';
   const segmentClasses =
-    'inline-flex flex-nowrap items-center justify-center gap-1 border px-1 py-0.5';
+    'inline-flex flex-nowrap items-center justify-center gap-1 border py-1 px-1.5';
 
   const colorSchemeClasses: Record<BadgeStatusColorScheme, string> = {
     neutral: 'border-tertiary bg-surface-tertiary text-secondary',

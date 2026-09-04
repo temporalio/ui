@@ -1,8 +1,8 @@
 <script lang="ts" module>
   const sharedClasses =
-    '[text-box:trim-both_cap_alphabetic] [&_span]:[text-box:inherit] inline-flex whitespace-nowrap rounded-full border border-secondary bg-surface-tertiary font-mono text-xs font-medium leading-none text-primary uppercase';
+    'inline-flex whitespace-nowrap rounded-full border border-secondary bg-surface-tertiary font-mono text-xs font-medium leading-none text-primary uppercase';
   const segmentClasses =
-    'inline-flex flex-nowrap items-center justify-center gap-1 px-1 py-0.5';
+    'inline-flex flex-nowrap items-center justify-center gap-1 py-1 px-1.5';
 </script>
 
 <script lang="ts">
