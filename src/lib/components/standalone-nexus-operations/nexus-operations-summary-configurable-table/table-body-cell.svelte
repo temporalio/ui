@@ -7,7 +7,7 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
 
-  import NexusOperationStatusBadge from '../../nexus-operation-status-badge.svelte';
+  import NexusOperationStatusBadge from '../nexus-operation-status-badge.svelte';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
