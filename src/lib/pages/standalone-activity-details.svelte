@@ -16,7 +16,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconRetry } from '$lib/io/icon';
-  import type { Failure } from '$lib/types';
+  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -61,6 +61,11 @@
       (hasHeartbeatTimeout ? 1 : 0),
   );
 
+  const nextRetryDelay = $derived(
+    $activityExecution?.info?.lastFailure?.applicationFailureInfo
+      ?.nextRetryDelay,
+  );
+
   const hasCodeBlocks = $derived(
     !!(
       $activityExecution?.info?.lastFailure ||
@@ -74,7 +79,7 @@
 {#snippet activityExecutionAttemptsBadge(
   attempt: number,
   maximumAttempts: number | null,
-  lastFailure: Failure | null,
+  lastFailure: ActivityExecutionInfo['lastFailure'],
 )}
   {@const failed = attempt > 1 && !!lastFailure}
   {@const badgeType = failed ? 'danger' : 'default'}
@@ -261,7 +266,7 @@
               {translate('standalone-activities.retry-state')}
             </h5>
             <DetailList
-              rowCount={3}
+              rowCount={3 + (nextRetryDelay ? 1 : 0)}
               aria-label={translate('standalone-activities.retry-state')}
             >
               <DetailListLabel
@@ -272,6 +277,15 @@
               <DetailListTextValue
                 text={fromSeconds($activityExecution.info.currentRetryInterval)}
               />
+
+              {#if nextRetryDelay}
+                <DetailListLabel
+                  >{translate(
+                    'standalone-activities.next-retry-delay',
+                  )}</DetailListLabel
+                >
+                <DetailListTextValue text={fromSeconds(nextRetryDelay)} />
+              {/if}
 
               <DetailListLabel
                 >{translate(
