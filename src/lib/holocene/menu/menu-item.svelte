@@ -264,6 +264,10 @@
       @apply hover:bg-interactive-secondary-hover hover:text-primary;
     }
 
+    &.selected {
+      @apply bg-interactive-secondary-press text-primary;
+    }
+
     &.select {
       @apply focus-visible:bg-interactive-primary-hover focus-visible:text-white active:bg-interactive-primary-press active:text-white;
 
