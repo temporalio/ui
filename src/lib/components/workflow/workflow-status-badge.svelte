@@ -23,6 +23,7 @@
   const taskFailureText = $derived(translate('workflows.task-failure'));
   const extensions = $derived<BadgeStatusExtensions>([
     delayed && {
+      colorScheme: 'warning',
       TrailIcon: IconClock,
     },
     taskFailure && {

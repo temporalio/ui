@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { defaultThemeName, themes, toCssVariables } from './index';
+import {
+  colorAlphaScales,
+  defaultThemeName,
+  themes,
+  toCssVariables,
+} from './index';
 
 const registeredThemes = Object.entries(themes);
 const colorContract = Object.keys(
@@ -16,9 +21,26 @@ describe('registered IO themes', () => {
     expect(variableNames).toEqual(colorContract);
   });
 
-  it.each(registeredThemes)('%s has 75 color variables', (_, theme) => {
+  it.each(registeredThemes)('%s has 80 color variables', (_, theme) => {
     const variables = toCssVariables(theme.color, 'color');
 
-    expect(Object.keys(variables)).toHaveLength(75);
+    expect(Object.keys(variables)).toHaveLength(80);
   });
+
+  it.each(registeredThemes)(
+    '%s defines workflow action hover colors at 80 percent opacity',
+    (_, theme) => {
+      const variables = toCssVariables(theme.color, 'color');
+
+      expect(variables).toMatchObject({
+        '--color-action-workflow-workflow-hover': colorAlphaScales.zaffre[80],
+        '--color-action-workflow-activity-hover':
+          colorAlphaScales['dark-magenta'][80],
+        '--color-action-workflow-signal-hover': colorAlphaScales.persimmon[80],
+        '--color-action-workflow-timer-hover': colorAlphaScales.pink[80],
+        '--color-action-workflow-nexus-hover':
+          colorAlphaScales['peacock-blue'][80],
+      });
+    },
+  );
 });

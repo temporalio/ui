@@ -13,6 +13,8 @@
   fill="none"
   class="text-tertiary {className}"
   xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  focusable="false"
 >
   <path d="M245.5 101.5H235.5V111.5H245.5V101.5Z" fill="currentColor" />
   <path

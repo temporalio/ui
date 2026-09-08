@@ -318,7 +318,7 @@
 
 {#snippet systemNexusLink(nexusLink: SystemNexusLink)}
   <div class="flex items-start gap-4">
-    <p class="text-secondary/80 min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-secondary">
       {nexusLink.label}
     </p>
     <Copyable

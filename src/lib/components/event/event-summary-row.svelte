@@ -249,7 +249,7 @@
     'hover:cursor-pointer',
     failure && '!bg-alpha-red-40 hover:!bg-alpha-red-60',
     canceled && '!bg-alpha-amber-30 hover:!bg-alpha-amber-50',
-    terminated && '!bg-alpha-red-30 hover:!bg-alpha-red-50',
+    terminated && '!bg-alpha-pink-30 hover:!bg-alpha-pink-50',
     hasRelatedActivities(group, hoveredEventId) && 'active',
   )}
   id={`${event.id}-${index}`}

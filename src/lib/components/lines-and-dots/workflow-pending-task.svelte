@@ -11,7 +11,7 @@
   let { pendingTask = undefined }: Props = $props();
 </script>
 
-{#snippet metadata(value: string)}
+{#snippet metadata(value: string | undefined)}
   {#if value}
     <span
       class="rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
@@ -29,11 +29,11 @@
     <div class="flex flex-col gap-2">
       <p class="flex items-center gap-4">
         {translate('common.state')}
-        {@render metadata(String(pendingTask.state))}
+        {@render metadata(pendingTask.state?.toString())}
       </p>
       <p class="flex items-center gap-4">
         {translate('common.attempt')}
-        {@render metadata(String(pendingTask.attempt))}
+        {@render metadata(pendingTask.attempt?.toString())}
       </p>
       <p class="flex items-center gap-4">
         {translate('workflows.original-scheduled-time')}

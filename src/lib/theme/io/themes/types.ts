@@ -84,10 +84,15 @@ export type IoTheme = {
       danger: string;
       workflow: {
         workflow: string;
+        'workflow-hover': string;
         activity: string;
+        'activity-hover': string;
         signal: string;
+        'signal-hover': string;
         timer: string;
+        'timer-hover': string;
         nexus: string;
+        'nexus-hover': string;
         query: string;
         capacity: string;
         fairness: string;

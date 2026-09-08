@@ -4,7 +4,6 @@ import {
   defaultThemeName,
   themes,
   toCssVariableReferences,
-  toCssVariables,
 } from './io/themes';
 
 export interface ColorThemeGroup {
@@ -28,9 +27,6 @@ const {
 export const opacityTheme = toCssVariableReferences(
   defaultTheme.opacity,
   'opacity',
-);
-export const semanticColorVariableNames = Object.keys(
-  toCssVariables(defaultTheme.color, 'color'),
 );
 
 const keywordColors = {
@@ -60,8 +56,6 @@ const semanticColors = {
   action: actionColors,
 };
 
-export const fixedColorNames = Object.keys(fixedColors);
-
 export const colorTheme = {
   colors: keywordColors,
   accentColor: {
@@ -74,6 +68,7 @@ export const colorTheme = {
     ...semanticColors,
   },
   borderColor: {
+    DEFAULT: borderColors.primary,
     ...basePaintColors,
     ...borderColors,
     interactive: interactiveColors,

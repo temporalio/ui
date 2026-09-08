@@ -20,6 +20,7 @@
   const delayedText = $derived(translate('workflows.delayed'));
   const extensions = $derived<BadgeStatusExtensions>([
     delayed && {
+      colorScheme: 'warning',
       TrailIcon: IconClock,
     },
   ]);

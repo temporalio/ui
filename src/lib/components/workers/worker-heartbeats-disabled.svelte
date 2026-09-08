@@ -16,7 +16,7 @@
   >
     <span class="flex h-20 w-20 items-center justify-center rounded-full">
       <IconHeartbeat
-        class="block h-full w-full text-indigo-6"
+        class="block h-full w-full text-information"
         height={20}
         width={20}
       />

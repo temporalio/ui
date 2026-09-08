@@ -13,15 +13,15 @@ const WORKFLOW_ACTION_COLOR_VARIABLES = {
 };
 
 export const WORKFLOW_ACTION_HOVER_CLASSES = {
-  workflow: 'border-action-workflow-workflow bg-action-workflow-workflow/80',
-  activity: 'border-action-workflow-activity bg-action-workflow-activity/80',
+  workflow: 'border-action-workflow-workflow bg-action-workflow-workflow-hover',
+  activity: 'border-action-workflow-activity bg-action-workflow-activity-hover',
   'child-workflow':
-    'border-action-workflow-workflow bg-action-workflow-workflow/80',
-  timer: 'border-action-workflow-timer bg-action-workflow-timer/80',
-  signal: 'border-action-workflow-signal bg-action-workflow-signal/80',
-  nexus: 'border-action-workflow-nexus bg-action-workflow-nexus/80',
+    'border-action-workflow-workflow bg-action-workflow-workflow-hover',
+  timer: 'border-action-workflow-timer bg-action-workflow-timer-hover',
+  signal: 'border-action-workflow-signal bg-action-workflow-signal-hover',
+  nexus: 'border-action-workflow-nexus bg-action-workflow-nexus-hover',
   'local-activity':
-    'border-action-workflow-activity bg-action-workflow-activity/80',
+    'border-action-workflow-activity bg-action-workflow-activity-hover',
 };
 
 const STATUS_STROKE_COLORS: Record<
