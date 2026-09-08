@@ -193,7 +193,8 @@
     },
   ];
 
-  const onboardingPrompt = 'Onboard with your coding agent';
+  const onboardingPrompt =
+    'Fetch and follow the instructions at https://github.com/temporal-community/temporal-agent-harness/blob/main/README.md and get the monty example agent running';
   const { copy, copied } = copyToClipboard();
 
   const copyOnboardingPrompt = (event: MouseEvent) => {
@@ -251,7 +252,7 @@
           </div>
 
           <div class="grid items-start gap-8 lg:grid-cols-2 lg:justify-between">
-            <div class="max-w-[25rem] px-4">
+            <div class="max-w-[25rem]">
               <Badge
                 type="warning"
                 class="mb-2 bg-[#FF996C]/90 text-xs text-white dark:bg-[#FF996C]/20 dark:text-[#FF996C]"
@@ -326,28 +327,29 @@
               with, and point it at the knowledgebase for answers grounded in
               Temporal docs.
             </p>
-            <div
-              class="relative flex max-w-fit items-center overflow-hidden rounded-sm border border-secondary bg-secondary font-mono text-xs leading-4 text-primary md:h-6"
+            <button
+              class="group relative flex max-w-fit items-center overflow-hidden rounded-sm border border-secondary bg-secondary/50 font-mono text-xs leading-4 text-primary hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:h-6"
+              type="button"
+              aria-label={$copied
+                ? 'Onboarding prompt copied'
+                : 'Copy onboarding prompt'}
+              title={$copied
+                ? 'Onboarding prompt copied'
+                : 'Copy onboarding prompt'}
+              onclick={copyOnboardingPrompt}
             >
-              <span class="min-w-fit px-3">{onboardingPrompt}</span>
-              <button
-                class="grid size-11 shrink-0 place-items-center bg-secondary hover:bg-interactive-secondary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:size-6"
-                type="button"
-                aria-label={$copied
-                  ? 'Onboarding prompt copied'
-                  : 'Copy onboarding prompt'}
-                title={$copied
-                  ? 'Onboarding prompt copied'
-                  : 'Copy onboarding prompt'}
-                onclick={copyOnboardingPrompt}
+              <span class="min-w-fit px-3">Onboard with your coding agent</span>
+              <span
+                class="grid size-11 shrink-0 place-items-center bg-secondary group-hover:bg-interactive-secondary-hover md:size-6"
+                aria-hidden="true"
               >
                 {#if $copied}
                   <IconCheckmark class="size-3" />
                 {:else}
                   <IconCopy class="size-3" />
                 {/if}
-              </button>
-            </div>
+              </span>
+            </button>
           </section>
 
           <section
