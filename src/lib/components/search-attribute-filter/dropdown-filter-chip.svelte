@@ -3,7 +3,7 @@
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
-  import { getContext, untrack } from 'svelte';
+  import { untrack } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -52,11 +52,6 @@
   import { getTimezone, TIME_UNIT_OPTIONS } from '$lib/utilities/timezone';
   import { toDate } from '$lib/utilities/to-duration';
 
-  import {
-    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
-    type SearchAttributeFilterContext,
-  } from './filter.svelte';
-
   type Props = {
     filter: SearchAttributeFilter;
     onUpdate: (updatedFilter: SearchAttributeFilter) => void;
@@ -73,10 +68,6 @@
     openIndex = null,
   }: Props = $props();
 
-  const { includeNullConditions = true } =
-    getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT) ??
-    {};
-
   const open = writable(false);
   let localFilter = $state({ ...filter });
 
@@ -92,14 +83,10 @@
   const isTimeRange = $derived(localFilter.conditional === 'BETWEEN');
   const selectedTime = $derived(getSelectedTimezone($timeFormat));
 
-  const defaultConditionOptions = $derived(
-    includeNullConditions
-      ? [
-          { value: 'is', label: translate('common.is-null') },
-          { value: 'is not', label: translate('common.is-not-null') },
-        ]
-      : [],
-  );
+  const defaultConditionOptions = [
+    { value: 'is', label: translate('common.is-null') },
+    { value: 'is not', label: translate('common.is-not-null') },
+  ];
 
   const conditionalOptions = $derived([
     { value: '=', label: translate('common.equal-to'), id: 'equal-to' },
