@@ -21,10 +21,11 @@ describe('registered IO themes', () => {
     expect(variableNames).toEqual(colorContract);
   });
 
-  it.each(registeredThemes)('%s has 80 color variables', (_, theme) => {
+  it.each(registeredThemes)('%s has 81 color variables', (_, theme) => {
     const variables = toCssVariables(theme.color, 'color');
 
-    expect(Object.keys(variables)).toHaveLength(80);
+    expect(Object.keys(variables)).toHaveLength(81);
+    expect(variables['--color-interactive-tertiary']).toBe('transparent');
   });
 
   it.each(registeredThemes)(

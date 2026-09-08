@@ -74,6 +74,7 @@ export const darkTheme = {
       secondary: colorScales.neutral[11],
       'secondary-hover': colorAlphaScales.indigo[10],
       'secondary-press': colorAlphaScales.indigo[20],
+      tertiary: 'transparent',
       'tertiary-hover': colorAlphaScales.slate[15],
       'tertiary-press': colorAlphaScales.slate[10],
       danger: colorScales.red[11],

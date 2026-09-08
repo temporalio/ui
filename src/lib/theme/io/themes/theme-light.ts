@@ -74,6 +74,7 @@ export const lightTheme = {
       secondary: colorScales.slate[1],
       'secondary-hover': colorAlphaScales.indigo[10],
       'secondary-press': colorAlphaScales.indigo[15],
+      tertiary: 'transparent',
       'tertiary-hover': colorAlphaScales.neutral[10],
       'tertiary-press': colorAlphaScales.neutral[5],
       danger: colorScales.red[9],

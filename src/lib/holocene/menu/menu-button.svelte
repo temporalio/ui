@@ -100,6 +100,7 @@
   {variant}
   class={className}
   {size}
+  active={$open}
   disableTracking={true}
   {...rest}
 >

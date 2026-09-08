@@ -71,6 +71,7 @@ export type IoTheme = {
       secondary: string;
       'secondary-hover': string;
       'secondary-press': string;
+      tertiary: string;
       'tertiary-hover': string;
       'tertiary-press': string;
       danger: string;
