@@ -112,7 +112,6 @@ export const Strings = {
   attempt: 'Attempt',
   'schedule-time': 'Schedule Time',
   'execution-time': 'Execution Time',
-  'execution-duration': 'Execution Duration',
   'last-heartbeat': 'Last Heartbeat',
   'total-heartbeats': 'Total Heartbeats',
   'heartbeat-timeout': 'Heartbeat Timeout',
