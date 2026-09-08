@@ -180,23 +180,26 @@
       {#if buildId}
         <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
         <span class="max-w-72">
-          <!-- TODO: Make filterable link for Build ID with DT-3745 -->
-          <DetailListTextValue
-            copyable={!!buildId}
-            copyableText={buildId}
+          <DetailListLinkValue
+            copyable
             text={buildId}
-            tooltipText={buildId}
+            href={routeForWorkersWithQuery({
+              namespace,
+              query: `BuildId="${buildId}"`,
+            }) ?? ''}
+            Icon={IconFilter}
           />
         </span>
       {/if}
-      {#if heartbeat?.deploymentVersion?.deploymentName}
+      {@const deploymentName = heartbeat?.deploymentVersion?.deploymentName}
+      {#if deploymentName}
         <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
         <DetailListLinkValue
           copyable
-          text={heartbeat.deploymentVersion.deploymentName}
+          text={deploymentName}
           href={routeForWorkersWithQuery({
             namespace,
-            query: `DeploymentName="${heartbeat.deploymentVersion.deploymentName}"`,
+            query: `DeploymentName="${deploymentName}"`,
           }) ?? ''}
           Icon={IconFilter}
         />
