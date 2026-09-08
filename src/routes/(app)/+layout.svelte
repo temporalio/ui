@@ -186,13 +186,6 @@
         isActive: (path) => path.includes(workflowsRoute),
       },
       {
-        href: agentsRoute,
-        Icon: IconRobot,
-        testId: 'agents-button',
-        label: translate('common.agents'),
-        isActive: (path) => path.includes(agentsRoute),
-      },
-      {
         href: standaloneActivitiesRoute,
         Icon: IconTemporalActivity,
         testId: 'activity-button',
@@ -245,6 +238,13 @@
           const match = path.split('/').find((segment) => segment === 'nexus');
           return !!match;
         },
+      },
+      {
+        href: agentsRoute,
+        Icon: IconRobot,
+        testId: 'agents-button',
+        label: translate('common.agents'),
+        isActive: (path) => path.includes(agentsRoute),
       },
     ];
   };
