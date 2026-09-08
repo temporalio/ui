@@ -268,7 +268,7 @@
             >
             <DetailListTextValue
               text={fromSeconds($activityExecution.info.heartbeatTimeout) ||
-                $activityExecution.info.heartbeatTimeout}
+                '-'}
             />
             <DetailListLabel
               >{translate(
@@ -299,7 +299,7 @@
             <DetailListTextValue
               text={fromSeconds(
                 $activityExecution.info.scheduleToStartTimeout,
-              ) || $activityExecution.info.scheduleToStartTimeout}
+              ) || '-'}
             />
             <DetailListLabel
               >{translate(
@@ -309,7 +309,7 @@
             <DetailListTextValue
               text={fromSeconds(
                 $activityExecution.info.scheduleToCloseTimeout,
-              ) || $activityExecution.info.scheduleToCloseTimeout}
+              ) || '-'}
             />
             <DetailListLabel
               >{translate(
@@ -318,7 +318,7 @@
             >
             <DetailListTextValue
               text={fromSeconds($activityExecution.info.startToCloseTimeout) ||
-                $activityExecution.info.startToCloseTimeout}
+                '-'}
             />
           </DetailList>
         </div>
