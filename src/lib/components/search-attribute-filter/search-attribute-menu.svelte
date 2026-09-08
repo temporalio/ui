@@ -114,7 +114,7 @@
   >
     Add Filter
   </MenuButton>
-  <Menu id="{id}-search-attribute-menu">
+  <Menu id="{id}-search-attribute-menu" usePortal>
     <MenuItem
       class="p-0"
       hoverable={false}
@@ -130,7 +130,7 @@
         bind:value={searchAttributeValue}
         Icon={IconSearch}
         placeholder={translate('common.search')}
-        class="w-full min-w-[300px]"
+        class="w-full"
       />
     </MenuItem>
     <hr class="border-subtle" />
@@ -145,7 +145,7 @@
           !!$filters.find((f) => f.attribute === statusAttribute)}
       >
         <div>
-          <p class="leading-3">{label}</p>
+          <p class="break-all leading-3">{label}</p>
           <small class="text-secondary">{type}</small>
         </div>
       </MenuItem>

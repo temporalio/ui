@@ -82,7 +82,7 @@
 </script>
 
 {#key [namespace, $refresh]}
-  <div class="flex flex-col gap-4">
+  <div class="flex min-h-0 grow flex-col gap-4">
     <PaginatedTable
       {onFetch}
       {onError}

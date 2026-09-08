@@ -1,6 +1,6 @@
 <script lang="ts" module>
   export const MENU_ITEM_SELECTORS =
-    'input, li[role="option"]:not([aria-disabled="true"]), li[role="menuitem"]:not([aria-disabled="true"])';
+    'input, li[role="option"]:not([aria-disabled="true"]), li[role="menuitem"]:not([aria-disabled="true"]), a[role="menuitem"]:not([aria-disabled="true"])';
 </script>
 
 <script lang="ts">
@@ -13,7 +13,10 @@
   import { getContext, type Snippet } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
+  import { goto } from '$app/navigation';
+
   import { IconCheckmark, IconExternalLinkOptical } from '$lib/io/icon';
+  import { isModifiedClick } from '$lib/utilities/is-modified-click';
 
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
@@ -26,7 +29,7 @@
     centered?: boolean;
     class?: ClassNameValue;
     hoverable?: boolean;
-    onclick?: () => void;
+    onclick?: (event?: MouseEvent) => void;
     children?: Snippet;
     leading?: Snippet;
     trailing?: Snippet;
@@ -66,6 +69,14 @@
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
+  const isSameOrigin = (url: string) => {
+    try {
+      return new URL(url, location.href).origin === location.origin;
+    } catch {
+      return false;
+    }
+  };
+
   const handleKeydown: KeyboardEventHandler<
     HTMLLIElement | HTMLAnchorElement
   > = (event) => {
@@ -84,8 +95,17 @@
         break;
       case ' ':
       case 'Enter':
-        onclick?.();
-        if (!$keepOpen) $open = false;
+        // Links already activate on Enter, and leaving that to the browser
+        // keeps modifier+Enter opening a new tab, so only Space is synthesized
+        if (href) {
+          if (event.key === ' ') {
+            event.preventDefault();
+            (event.currentTarget as HTMLAnchorElement).click();
+          }
+        } else {
+          onclick?.();
+          if (!$keepOpen) $open = false;
+        }
         break;
       default:
         break;
@@ -100,7 +120,7 @@
       nextElement = nextElement.nextElementSibling;
     }
 
-    if (nextElement && nextElement instanceof HTMLLIElement) {
+    if (nextElement instanceof HTMLElement) {
       nextElement.focus();
     }
   };
@@ -115,7 +135,7 @@
       previousElement = previousElement.previousElementSibling;
     }
 
-    if (previousElement && previousElement instanceof HTMLLIElement) {
+    if (previousElement instanceof HTMLElement) {
       previousElement.focus();
     }
   };
@@ -123,6 +143,19 @@
   const handleClick = () => {
     if (!$keepOpen) $open = false;
     onclick?.();
+  };
+
+  const handleLinkClick = (event: MouseEvent) => {
+    const modified = isModifiedClick(event);
+    if (!$keepOpen && !modified) $open = false;
+    onclick?.(event);
+
+    const anchor = event.currentTarget as HTMLAnchorElement;
+    if (modified || anchor.target || event.defaultPrevented) return;
+    if (!href || !isSameOrigin(href)) return;
+
+    event.preventDefault();
+    goto(href);
   };
 </script>
 
@@ -142,6 +175,8 @@
     class:active
     class:disabled
     class:hoverable
+    class:destructive
+    class:selected
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -149,11 +184,24 @@
     data-track-intent="navigate"
     data-track-text="*textContent*"
     onkeydown={handleKeydown}
+    onclick={handleLinkClick}
     {...rest as HTMLAnchorAttributes}
   >
-    <div>
-      {@render children?.()}
+    {@render leading?.()}
+    <div class="min-w-0 grow">
+      <div class:centered class="menu-item-wrapper">
+        {@render children?.()}
+        {#if selected}
+          <IconCheckmark class="shrink-0" />
+        {/if}
+      </div>
+      {#if description}
+        <div class="menu-item-description" class:text-center={centered}>
+          {description}
+        </div>
+      {/if}
     </div>
+    {@render trailing?.()}
     {#if newTab}
       <IconExternalLinkOptical height={20} width={20} />
     {/if}

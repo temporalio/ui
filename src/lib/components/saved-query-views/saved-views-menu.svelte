@@ -22,7 +22,8 @@
     draftView?: SavedQuery;
     dirty?: boolean;
     maxQueries: number;
-    onSelect: (view: SavedQuery) => void;
+    onSelect: (view: SavedQuery, event?: MouseEvent) => void;
+    viewHref: (view: SavedQuery) => string;
   }
 
   let {
@@ -33,6 +34,7 @@
     dirty = false,
     maxQueries,
     onSelect,
+    viewHref,
   }: Props = $props();
 
   const menuId = $derived(`${id}-saved-views-menu`);
@@ -129,7 +131,11 @@
     {/if}
   </MenuButton>
 
-  <Menu id={menuId} class="w-max min-w-full max-w-[32rem]">
+  <Menu
+    id={menuId}
+    usePortal
+    class="w-max min-w-full max-w-[min(100dvw-1rem,32rem)]"
+  >
     <MenuItem
       class="p-0"
       hoverable={false}
@@ -164,7 +170,8 @@
       <MenuItem
         data-view-item
         selected={view.id === activeView?.id}
-        onclick={() => onSelect(view)}
+        href={viewHref(view)}
+        onclick={(event) => onSelect(view, event)}
         data-testid={view.name.toLowerCase().replace(/\s+/g, '-')}
         data-track-name="user-query-menu-item"
       >
@@ -178,9 +185,10 @@
       </MenuItem>
     {/each}
 
-    <MenuDivider />
-
-    <li role="presentation" class="px-3 py-2 text-xs text-secondary">
+    <li
+      role="presentation"
+      class="surface-primary sticky bottom-0 z-10 border-t border-subtle px-3 py-2 text-xs text-secondary"
+    >
       {translate('common.views-used', {
         used: views.length,
         total: maxQueries,

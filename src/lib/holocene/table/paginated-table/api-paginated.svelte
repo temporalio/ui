@@ -262,7 +262,8 @@
   loading={$store.loading}
   updating={$store.updating}
   visibleItems={$store.visibleItems}
-  maxHeight={maximizable && $maximized ? '100%' : maxHeight}
+  {maxHeight}
+  verticalScroll={maximizable && $maximized ? 'table' : 'responsive'}
   class={merge(maximizable && $maximized && 'border-x-0 border-b-0')}
   {id}
   {caption}
@@ -281,7 +282,7 @@
   {/snippet}
 
   {#snippet actionsEnd()}
-    <nav class="flex shrink-0 items-center gap-2" aria-label={ariaLabel}>
+    <div class="ml-auto flex shrink-0 items-center gap-2">
       {@render actionsEndAdditional?.({
         visibleItems: $store.visibleItems,
         page: $store.index + 1,
@@ -289,6 +290,11 @@
       {#if maximizable}
         <MaximizeToggle {maximized} />
       {/if}
+    </div>
+    <nav
+      class="flex shrink-0 items-center gap-2 max-md:w-full max-md:justify-between"
+      aria-label={ariaLabel}
+    >
       <IconButton
         label={previousButtonLabel}
         disabled={!$store.hasPrevious}

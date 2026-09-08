@@ -2,7 +2,6 @@ import type { Payload } from '$lib/types';
 import type { CommonHistoryEvent, WorkflowEvent } from '$lib/types/events';
 import {
   isActivityTaskScheduledEvent,
-  isLocalActivityMarkerEvent,
   isMarkerRecordedEvent,
   isNexusOperationScheduledEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
@@ -27,14 +26,12 @@ import {
 } from './get-group-name';
 
 /**
- * A group's category, which is its head event's except for local-activity
- * markers. Shared with the buffer's LazyGroup so both derive it identically —
- * views filter on one and render the other.
+ * A group's category, which is its head event's — including the local-activity
+ * split, which toEvent already applied. Shared with the buffer's LazyGroup so
+ * both derive it identically — views filter on one and render the other.
  */
-export const groupCategory = (
-  head: WorkflowEvent,
-): WorkflowEvent['category'] =>
-  isLocalActivityMarkerEvent(head) ? 'local-activity' : head.category;
+export const groupCategory = (head: WorkflowEvent): WorkflowEvent['category'] =>
+  head.category;
 
 /**
  * Whether a group is still open. Depends only on its head event, how many of

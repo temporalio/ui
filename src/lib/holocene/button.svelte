@@ -101,6 +101,7 @@
 
   import Badge from '$lib/holocene/badge.svelte';
   import { IconSpinner } from '$lib/io/icon';
+  import { isModifiedClick } from '$lib/utilities/is-modified-click';
 
   let {
     variant = 'primary',
@@ -129,8 +130,8 @@
   }
 
   const onLinkClick = (event: MouseEvent) => {
-    // Skip if middle mouse click or new tab
-    if (event.button === 1 || target || event.metaKey) return;
+    // Skip if new tab/window click or navigation was already handled
+    if (isModifiedClick(event) || target || event.defaultPrevented) return;
     if (!href) return;
     event.preventDefault();
     goto(href);
@@ -138,8 +139,8 @@
 
   const handleLinkClick = (event: MouseEvent) => {
     event.stopPropagation();
-    onLinkClick(event);
     onclick?.(event);
+    onLinkClick(event);
   };
 
   const handleClick = (event: MouseEvent) => {
@@ -168,7 +169,6 @@
     bind:this={element}
     {href}
     {id}
-    role="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
     data-variant={variant}
