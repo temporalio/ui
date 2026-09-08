@@ -184,7 +184,7 @@
 
     <li
       role="presentation"
-      class="surface-primary border-subtle sticky bottom-0 z-10 border-t px-3 py-2 text-xs text-secondary"
+      class="surface-primary sticky bottom-0 z-10 border-t border-secondary px-3 py-2 text-xs text-secondary"
     >
       {translate('common.views-used', {
         used: views.length,

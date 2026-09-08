@@ -150,6 +150,8 @@
       >
         {#if workflow}
           <WorkflowStatusBadge
+            role="status"
+            aria-atomic="true"
             status={workflow.status}
             delayed={isWorkflowDelayed(workflow)}
             taskFailure={isWorkflowTaskFailure(workflow)}

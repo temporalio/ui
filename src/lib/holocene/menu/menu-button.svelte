@@ -98,7 +98,7 @@
   aria-expanded={$open}
   aria-label={label}
   {variant}
-  class={merge(className)}
+  class={className}
   {size}
   disableTracking={true}
   {...rest}

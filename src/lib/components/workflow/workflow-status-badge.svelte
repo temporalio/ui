@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
@@ -10,13 +12,21 @@
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
 
-  interface Props {
+  interface Props extends Omit<
+    HTMLAttributes<HTMLSpanElement>,
+    'children' | 'class'
+  > {
     status: WorkflowStatus;
     delayed?: boolean;
     taskFailure?: boolean;
   }
 
-  let { status, delayed = false, taskFailure = false }: Props = $props();
+  let {
+    status,
+    delayed = false,
+    taskFailure = false,
+    ...rest
+  }: Props = $props();
 
   const text = $derived(getWorkflowStatusLabel(status));
   const delayedText = $derived(translate('workflows.delayed'));
@@ -40,8 +50,14 @@
 
 <Tooltip topLeft text={tooltipText} hide={!modifierLabels.length}>
   {#if status}
-    <BadgeStatus {status} {text} {extensions} data-testid="execution-status" />
+    <BadgeStatus
+      {status}
+      {text}
+      {extensions}
+      {...rest}
+      data-testid="execution-status"
+    />
   {:else}
-    <Badge {text} data-testid="execution-status" />
+    <Badge {text} {...rest} data-testid="execution-status" />
   {/if}
 </Tooltip>
