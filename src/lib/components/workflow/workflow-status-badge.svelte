@@ -9,6 +9,7 @@
     type BadgeStatusExtensions,
   } from '$lib/io/badge-status';
   import { IconClock, IconExclamationOctagon } from '$lib/io/icon';
+  import { isWorkflowStatusType } from '$lib/models/workflow-status';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
 
@@ -49,7 +50,7 @@
 </script>
 
 <Tooltip topLeft text={tooltipText} hide={!modifierLabels.length}>
-  {#if status}
+  {#if status && isWorkflowStatusType(status)}
     <BadgeStatus
       {status}
       {text}
