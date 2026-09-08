@@ -363,7 +363,11 @@
     </div>
   </MenuButton>
 
-  <Menu id={controlsId} class="max-h-fit w-64 p-4 lg:max-w-fit">
+  <Menu
+    id={controlsId}
+    usePortal
+    class="max-h-fit w-min min-w-0 max-w-[calc(100dvw-1rem)] p-4"
+  >
     <form onsubmit={applyChanges}>
       <div class="space-y-4">
         <div class="flex items-center justify-between">
@@ -394,6 +398,7 @@
                   clearLabel={translate('common.clear-input-button-label')}
                 />
                 <TimePicker
+                  class="flex-col sm:flex-row"
                   bind:hour={start.hour}
                   bind:minute={start.minute}
                   bind:second={start.second}
@@ -410,6 +415,7 @@
                   clearLabel={translate('common.clear-input-button-label')}
                 />
                 <TimePicker
+                  class="flex-col sm:flex-row"
                   bind:hour={end.hour}
                   bind:minute={end.minute}
                   bind:second={end.second}
@@ -473,6 +479,7 @@
                     disabled={$timeFormatType !== 'absolute' || isNullFilter}
                   />
                   <TimePicker
+                    class="flex-col sm:flex-row"
                     bind:hour={start.hour}
                     bind:minute={start.minute}
                     bind:second={start.second}

@@ -117,6 +117,7 @@ export const Strings = {
   'total-heartbeats': 'Total Heartbeats',
   'heartbeat-timeout': 'Heartbeat Timeout',
   'current-retry-interval': 'Current Retry Interval',
+  'next-retry-delay': 'Next Retry Delay',
   'last-attempt-complete-time': 'Last Attempted Complete Time',
   'next-attempt-schedule-time': 'Next Attempt Scheduled Time',
   'schedule-to-start-timeout': 'Schedule to Start Timeout',
