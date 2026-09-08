@@ -3,6 +3,8 @@ export const Namespace = 'workers' as const;
 export const Strings = {
   worker: 'Worker',
   workers: 'Workers',
+  workers_one: 'Worker',
+  workers_other: 'Workers',
   pollers: 'Pollers',
   'worker-details': 'Worker Details',
   'worker-views': 'Worker Views',

@@ -5,9 +5,10 @@
 
   interface Props {
     status?: WorkerStatus;
+    count?: number;
   }
 
-  let { status = 'Running' }: Props = $props();
+  let { status = 'Running', count }: Props = $props();
 
   const colorSchemeByWorkerStatus: Record<WorkerStatus, BadgeColorScheme> = {
     Running: 'info',
@@ -22,4 +23,9 @@
   };
 </script>
 
-<Badge text={label[status]} colorScheme={colorSchemeByWorkerStatus[status]} />
+<Badge
+  text={count !== undefined && count >= 0
+    ? `${count.toLocaleString()} ${label[status]}`
+    : label[status]}
+  colorScheme={colorSchemeByWorkerStatus[status]}
+/>

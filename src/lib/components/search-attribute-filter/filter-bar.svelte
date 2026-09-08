@@ -25,7 +25,6 @@
     id: string;
     statusAttribute?: StatusAttribute;
     onManualSearch?: (query: string) => void;
-    includeNullConditions?: boolean;
   }
 
   let {
@@ -35,7 +34,6 @@
     id,
     statusAttribute = 'ExecutionStatus',
     onManualSearch,
-    includeNullConditions,
   }: Props = $props();
 
   let viewManualQuery = $state(false);
@@ -56,13 +54,7 @@
   <div
     class="flex w-full flex-wrap items-end justify-between gap-2 border-t border-primary bg-surface-primary p-1.5"
   >
-    <Filter
-      {filters}
-      {options}
-      {id}
-      {statusAttribute}
-      {includeNullConditions}
-    />
+    <Filter {filters} {options} {id} {statusAttribute} />
     <div class="flex shrink-0 items-center gap-1">
       <Tooltip
         text={viewManualQuery
