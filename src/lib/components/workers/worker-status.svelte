@@ -8,9 +8,10 @@
   interface Props {
     delay?: number;
     status?: WorkerStatus;
+    count?: number;
   }
 
-  let { delay = 0, status = 'Running' }: Props = $props();
+  let { delay = 0, status = 'Running', count }: Props = $props();
 
   const label: Record<WorkerStatus, string> = {
     Running: translate('workflows.running'),
@@ -38,6 +39,9 @@
 
 <div class="relative flex items-center gap-0 text-center text-xs leading-4">
   <span class={workerStatus({ status })}>
+    {#if count !== undefined && count >= 0}
+      {count.toLocaleString()}
+    {/if}
     {label[status]}
     {#if isRunning}
       <HeartBeat {delay} />
