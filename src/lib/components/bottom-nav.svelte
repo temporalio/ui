@@ -144,7 +144,6 @@
     class={merge(
       'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto border-b border-primary bg-surface-primary text-primary md:hidden',
       'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-interactive-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary',
-      isCloud ? 'navigation-cloud' : 'navigation-inverse',
     )}
     data-nav="open"
     in:slide={{ duration: 200, delay: 0 }}
@@ -171,7 +170,6 @@
   class={merge(
     'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 border-t border-primary bg-surface-primary px-4 py-2 text-primary transition-colors md:hidden',
     'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-interactive-primary',
-    isCloud ? 'navigation-cloud' : 'navigation-inverse',
     className,
   )}
   data-testid="top-nav"
