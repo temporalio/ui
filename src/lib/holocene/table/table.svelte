@@ -31,7 +31,7 @@
 
 <table
   class={merge(
-    'holocene-table relative w-full border-separate border-spacing-0 overflow-clip rounded-lg',
+    'holocene-table relative w-full border-separate border-spacing-0 overflow-hidden rounded-lg',
     fixed ? 'layout-fixed' : 'layout-auto',
     className,
   )}
