@@ -19,43 +19,46 @@
   let { namespace, operations }: Props = $props();
 </script>
 
-<Table>
-  {#snippet caption()}
-    <caption class="sr-only">{translate('batch.list-page-title')}</caption>
-  {/snippet}
-  {#snippet headers()}
-    <TableHeaderRow>
-      <th scope="col" class="w-28">{translate('common.status')}</th>
-      <th scope="col" class="w-auto">{translate('common.job-id')}</th>
-      <th scope="col" class="w-40">{translate('batch.operation-type')}</th>
-      <th scope="col" class="max-sm:hidden lg:w-56"
-        >{translate('common.start-time')}</th
-      >
-      <th scope="col" class="max-sm:hidden lg:w-56"
-        >{translate('common.close-time')}</th
-      >
-    </TableHeaderRow>
-  {/snippet}
-  {#each operations as { state, jobId, operationType, startTime, closeTime }, i (`${jobId}:${i}`)}
-    <TableRow>
-      <td>
-        <BatchOperationStatusBadge {state} />
-      </td>
-      <td
-        ><Link href={routeForBatchOperation({ namespace, jobId })}>{jobId}</Link
-        ></td
-      >
-      <td>
-        <OperationType {operationType} />
-      </td>
-      <Timestamp as="td" class="max-sm:hidden" dateTime={startTime} />
-      <Timestamp as="td" class="max-sm:hidden" dateTime={closeTime} />
-    </TableRow>
-  {:else}
-    <TableRow>
-      <td class="max-sm:hidden" colspan="5">
-        <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
-      </td>
-    </TableRow>
-  {/each}
-</Table>
+<div class="w-full min-w-0 overflow-x-auto rounded-lg">
+  <Table>
+    {#snippet caption()}
+      <caption class="sr-only">{translate('batch.list-page-title')}</caption>
+    {/snippet}
+    {#snippet headers()}
+      <TableHeaderRow>
+        <th scope="col" class="w-28">{translate('common.status')}</th>
+        <th scope="col" class="w-auto">{translate('common.job-id')}</th>
+        <th scope="col" class="w-40">{translate('batch.operation-type')}</th>
+        <th scope="col" class="max-sm:hidden lg:w-56"
+          >{translate('common.start-time')}</th
+        >
+        <th scope="col" class="max-sm:hidden lg:w-56"
+          >{translate('common.close-time')}</th
+        >
+      </TableHeaderRow>
+    {/snippet}
+    {#each operations as { state, jobId, operationType, startTime, closeTime }, i (`${jobId}:${i}`)}
+      <TableRow>
+        <td>
+          <BatchOperationStatusBadge {state} />
+        </td>
+        <td
+          ><Link href={routeForBatchOperation({ namespace, jobId })}
+            >{jobId}</Link
+          ></td
+        >
+        <td>
+          <OperationType {operationType} />
+        </td>
+        <Timestamp as="td" class="max-sm:hidden" dateTime={startTime} />
+        <Timestamp as="td" class="max-sm:hidden" dateTime={closeTime} />
+      </TableRow>
+    {:else}
+      <TableRow>
+        <td class="max-sm:hidden" colspan="5">
+          <EmptyState title={translate('batch.empty-state-title')}></EmptyState>
+        </td>
+      </TableRow>
+    {/each}
+  </Table>
+</div>
