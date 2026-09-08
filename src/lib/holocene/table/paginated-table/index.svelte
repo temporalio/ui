@@ -51,6 +51,7 @@
   );
 
   let tableContainer = $state<HTMLDivElement>();
+  let table = $state<Table>();
   let footerHeight = $state(0);
 
   export function scrollToTop() {
@@ -70,7 +71,7 @@
 
 <div
   class={merge(
-    'flex grow flex-col overflow-auto rounded-lg border border-primary bg-background-primary text-primary',
+    'flex min-h-0 grow flex-col rounded-lg border border-primary bg-background-primary text-primary',
     className,
   )}
   id="{rest['id']}-container"
@@ -88,7 +89,8 @@
     {/if}
   {:else}
     <Table
-      class={merge('shrink-0 rounded-b-none', tableClass)}
+      bind:this={table}
+      containerClass={merge('min-h-0 grow rounded-b-none', tableClass)}
       bordered={false}
       {updating}
       {fixed}

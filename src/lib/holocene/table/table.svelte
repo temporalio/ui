@@ -9,9 +9,11 @@
   interface Props extends HTMLTableAttributes {
     updating?: boolean;
     class?: string;
+    containerClass?: string;
     'data-testid'?: string;
     fixed?: boolean;
     bordered?: boolean;
+    rounded?: boolean;
     caption?: Snippet;
     headers?: Snippet;
     children?: Snippet;
@@ -19,49 +21,68 @@
 
   let {
     class: className = '',
+    containerClass = '',
     updating = false,
     fixed = false,
     bordered = true,
+    rounded = true,
     caption,
     headers,
     children,
     ...rest
   }: Props = $props();
+
+  let scrollContainer = $state<HTMLDivElement>();
+
+  export function scrollToTop() {
+    if (!scrollContainer) return false;
+    if (scrollContainer.scrollHeight <= scrollContainer.clientHeight) {
+      return false;
+    }
+
+    scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    return true;
+  }
 </script>
 
-<table
+<div
+  bind:this={scrollContainer}
   class={merge(
-    'holocene-table relative w-full border-separate border-spacing-0 overflow-hidden rounded-lg',
-    fixed ? 'layout-fixed' : 'layout-auto',
-    className,
+    'relative max-h-full w-full overflow-auto',
+    rounded && 'rounded-lg',
+    bordered && 'border border-primary',
+    containerClass,
   )}
-  class:bordered
-  aria-busy={updating ? 'true' : undefined}
-  {...rest}
 >
-  {@render caption?.()}
-  <thead class="holocene-table-header">
-    {@render headers?.()}
-    {#if updating}
-      <tr aria-hidden="true" class="!h-0 bg-transparent">
-        <th colspan="1000" class="relative !h-0 !border-0 !p-0">
-          <ProgressBar subtle class="bottom-0" />
-        </th>
-      </tr>
-    {/if}
-  </thead>
-  <tbody class="holocene-table-body">
-    {@render children?.()}
-  </tbody>
-</table>
+  <table
+    class={merge(
+      'holocene-table min-w-full border-separate border-spacing-0',
+      fixed ? 'layout-fixed' : 'layout-auto',
+      className,
+    )}
+    aria-busy={updating ? 'true' : undefined}
+    {...rest}
+  >
+    {@render caption?.()}
+    <thead class="holocene-table-header">
+      {@render headers?.()}
+      {#if updating}
+        <tr aria-hidden="true" class="!h-0 bg-transparent">
+          <th colspan="1000" class="relative !h-0 !border-0 !p-0">
+            <ProgressBar subtle class="bottom-0" />
+          </th>
+        </tr>
+      {/if}
+    </thead>
+    <tbody class="holocene-table-body">
+      {@render children?.()}
+    </tbody>
+  </table>
+</div>
 
 <style lang="postcss">
   .holocene-table {
     @apply table-auto bg-surface-primary text-primary;
-
-    &.bordered {
-      @apply border border-primary;
-    }
 
     &.layout-auto {
       @apply table-auto;
