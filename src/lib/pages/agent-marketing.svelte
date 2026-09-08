@@ -15,6 +15,7 @@
   import integrationTuningEngines from '$lib/assets/agents/integration-tuning-engines.svg';
   import integrationVercel from '$lib/assets/agents/integration-vercel.svg';
   import PageTitle from '$lib/components/page-title.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { IconCheckmark, IconCopy, IconPlaySolid } from '$lib/io/icon';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
@@ -249,13 +250,12 @@
             </p>
           </div>
 
-          <div
-            class="grid items-start gap-8 lg:grid-cols-[minmax(0,23.875rem)_minmax(0,29.5625rem)] lg:justify-between"
-          >
-            <div class="max-w-[23.875rem]">
-              <span
-                class="inline-flex rounded-sm bg-warning/10 px-2 py-1 text-[0.625rem] leading-4 tracking-[0.08em] text-warning"
-                >EXPERIMENTAL</span
+          <div class="grid items-start gap-8 lg:grid-cols-2 lg:justify-between">
+            <div class="max-w-[25rem] px-4">
+              <Badge
+                type="warning"
+                class="mb-2 bg-[#FF996C]/90 text-xs text-white dark:bg-[#FF996C]/20 dark:text-[#FF996C]"
+                >EXPERIMENTAL</Badge
               >
               <div class="mt-2 space-y-4">
                 <div class="space-y-1">
