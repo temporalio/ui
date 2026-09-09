@@ -38,6 +38,7 @@
     component: Combobox,
     args: {
       label: 'Select a Language',
+      value: '',
       placeholder: 'Start Typing...',
       noResultsText: 'No Results',
       readonly: false,
