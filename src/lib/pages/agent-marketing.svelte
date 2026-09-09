@@ -15,8 +15,8 @@
   import integrationTuningEngines from '$lib/assets/agents/integration-tuning-engines.svg';
   import integrationVercel from '$lib/assets/agents/integration-vercel.svg';
   import PageTitle from '$lib/components/page-title.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import { Badge } from '$lib/io/badge';
   import { IconCheckmark, IconCopy, IconPlaySolid } from '$lib/io/icon';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
@@ -236,7 +236,7 @@
     >
       <div class="min-w-0 space-y-5">
         <section
-          class="overflow-hidden rounded-lg border border-subtle bg-primary p-6 md:p-8"
+          class="border-subtle bg-primary overflow-hidden rounded-lg border p-6 md:p-8"
           aria-labelledby="agents-heading"
         >
           <div class="mb-8 space-y-1 md:mb-12">
@@ -253,11 +253,7 @@
 
           <div class="grid items-start gap-8 lg:grid-cols-2 lg:justify-between">
             <div class="max-w-[25rem]">
-              <Badge
-                type="warning"
-                class="mb-2 bg-[#FF996C]/90 text-xs text-white dark:bg-[#FF996C]/20 dark:text-[#FF996C]"
-                >EXPERIMENTAL</Badge
-              >
+              <Badge colorScheme="warning" text="EXPERIMENTAL"></Badge>
               <div class="mt-2 space-y-4">
                 <div class="space-y-1">
                   <h2>
@@ -286,7 +282,7 @@
             </div>
 
             <figure
-              class="relative aspect-[473/300] min-w-0 overflow-hidden rounded-lg border border-subtle bg-code-block"
+              class="border-subtle bg-code-block relative aspect-[473/300] min-w-0 overflow-hidden rounded-lg border"
             >
               <img
                 class="absolute left-[-0.63%] top-[-16%] h-[162.33%] w-[136.36%] max-w-none opacity-60"
@@ -298,7 +294,7 @@
                 aria-hidden="true"
               ></div>
               <Button
-                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-secondary/80"
+                class="bg-secondary/80 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 href="https://github.com/temporal-community/temporal-agent-harness"
                 target="_blank"
                 variant="secondary"
@@ -314,7 +310,7 @@
 
         <div class="grid gap-5 md:grid-cols-[1.049fr_1fr]">
           <section
-            class="flex flex-col gap-4 rounded-lg border border-subtle bg-primary p-6 md:p-8"
+            class="border-subtle bg-primary flex flex-col gap-4 rounded-lg border p-6 md:p-8"
             aria-labelledby="skills-heading"
           >
             <h2 id="skills-heading">
@@ -328,7 +324,7 @@
               Temporal docs.
             </p>
             <button
-              class="group relative flex max-w-fit items-center overflow-hidden rounded-sm border border-secondary bg-secondary/50 font-mono text-xs leading-4 text-primary hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:h-6"
+              class="bg-secondary/50 hover:bg-secondary group relative flex max-w-fit items-center overflow-hidden rounded-sm border border-secondary font-mono text-xs leading-4 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:h-6"
               type="button"
               aria-label={$copied
                 ? 'Onboarding prompt copied'
@@ -340,7 +336,7 @@
             >
               <span class="min-w-fit px-3">Onboard with your coding agent</span>
               <span
-                class="grid size-11 shrink-0 place-items-center bg-secondary group-hover:bg-interactive-secondary-hover md:size-6"
+                class="bg-secondary grid size-11 shrink-0 place-items-center group-hover:bg-interactive-secondary-hover md:size-6"
                 aria-hidden="true"
               >
                 {#if $copied}
@@ -353,7 +349,7 @@
           </section>
 
           <section
-            class="min-h-[20.75rem] rounded-lg border border-subtle bg-primary p-6 md:p-8"
+            class="border-subtle bg-primary min-h-[20.75rem] rounded-lg border p-6 md:p-8"
             aria-labelledby="cookbooks-heading"
           >
             <h2 id="cookbooks-heading">
@@ -385,7 +381,7 @@
 
       <aside
         id="integrations"
-        class="self-start rounded-lg border border-subtle bg-primary p-6 md:p-8 min-[1400px]:sticky"
+        class="border-subtle bg-primary self-start rounded-lg border p-6 md:p-8 min-[1400px]:sticky"
         aria-labelledby="integrations-heading"
       >
         <h2 id="integrations-heading">
