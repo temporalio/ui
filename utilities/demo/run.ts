@@ -11,9 +11,11 @@ import {
 } from './definition';
 import { startCatalogExamples } from './examples';
 import { WORK_DIR } from './paths';
+import { runPreflight } from './preflight';
 import { listenersOn, stopPid, type Supervised } from './process';
 import type { Scenario, StartedWorkflow } from './scenario';
 import { startServer } from './stages/server';
+import { startTunnel } from './stages/tunnel';
 import { startUi } from './stages/ui';
 import { startCatalogWorker } from './stages/worker';
 import { clearState, isRunning, readState, writeState } from './state';
@@ -110,6 +112,7 @@ export const startFeatureDemo = async (
   let address = `127.0.0.1:${definition.server.port}`;
   let bundledUiUrl: string | undefined;
   let webUrl: string | undefined;
+  let publicAddress: string | undefined;
 
   // A worker with a long activity in flight can take minutes to drain, so a
   // scenario gets a moment and then the run continues regardless.
@@ -186,6 +189,15 @@ export const startFeatureDemo = async (
   }
 
   async function runStages() {
+    await runPreflight(definition, log);
+
+    // A scenario's own prerequisites, while failing is still cheap.
+    if (hasOwnScenario(definition.name)) {
+      const own = await loadOwnScenario(definition.name);
+
+      if (own.preflight) await own.preflight(definition.scenario);
+    }
+
     const server = stageState('server', definition.server.enabled, options);
 
     if (server.run) {
@@ -264,6 +276,38 @@ export const startFeatureDemo = async (
       });
     }
 
+    const tunnel = stageState('tunnel', definition.tunnel.enabled, options);
+
+    if (tunnel.run) {
+      const running = await startTunnel(
+        definition.tunnel,
+        definition.server.port,
+        log,
+        definition.name,
+      );
+
+      publicAddress = running.publicAddress;
+
+      if (running.process) processes.push(running.process);
+
+      outcomes.push({
+        stage: 'tunnel',
+        ran: true,
+        details: [
+          `Frontend reachable from outside this machine at ${running.publicAddress}`,
+          'A server-scaled Worker dials the frontend back, which localhost cannot offer.',
+          'The hostname changes per run, so anything holding it must be updated each time.',
+        ],
+      });
+    } else {
+      outcomes.push({
+        stage: 'tunnel',
+        ran: false,
+        reason: tunnel.reason,
+        details: [],
+      });
+    }
+
     const ui = stageState('ui', definition.ui.enabled, options);
 
     if (ui.run) {
@@ -327,6 +371,7 @@ export const startFeatureDemo = async (
 
     const context = {
       address,
+      publicAddress,
       namespace: definition.server.namespace,
       log,
     };

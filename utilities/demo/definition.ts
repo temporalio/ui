@@ -9,7 +9,13 @@ import { z } from 'zod';
 import { requireWorkflowExample } from './catalog';
 import { exampleEntrySchema } from './examples';
 
-export const STAGES = ['server', 'worker', 'ui', 'scenarios'] as const;
+export const STAGES = [
+  'server',
+  'worker',
+  'tunnel',
+  'ui',
+  'scenarios',
+] as const;
 
 export type Stage = (typeof STAGES)[number];
 
@@ -41,6 +47,22 @@ const serverSchema = z
         serverRef: z.string().default('main'),
         cliRef: z.string().default('main'),
         minServerVersion: z.string().optional(),
+        /**
+         * Go modules the built server must carry, as module path to minimum
+         * version. Some features arrive in the server through a dependency
+         * bump rather than a server commit, and serverCommit cannot express
+         * that: the commit lives in another repository. A pseudo-version is
+         * ordered by its embedded timestamp, so
+         * `v0.0.0-20260824233950-312f95fb8b99` is satisfied by anything from
+         * that moment on.
+         */
+        serverModules: z.record(z.string(), z.string()).default({}),
+        /**
+         * Executables the run needs on PATH. Checked before any stage starts,
+         * so a missing `docker` or `ngrok` fails immediately with a name
+         * rather than midway through a build.
+         */
+        commands: z.array(z.string()).default([]),
       })
       .prefault({}),
     port: z.number().int().default(7233),
@@ -65,6 +87,22 @@ const workerSchema = z
   })
   .prefault({});
 
+/**
+ * Publishes the frontend on a public address. A Worker that Temporal launches
+ * in a cloud provider has to dial the frontend back, and a dev server on
+ * localhost is not reachable from there, so a scenario covering server-scaled
+ * Workers needs an inbound path that outlives its own process.
+ */
+const tunnelSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    provider: z.enum(['ngrok']).default('ngrok'),
+    /** Defaults to the frontend port the server stage provisioned. */
+    targetPort: z.number().int().optional(),
+    readyTimeoutMs: z.number().int().default(60_000),
+  })
+  .prefault({});
+
 const uiSchema = z
   .object({
     enabled: z.boolean().default(true),
@@ -83,6 +121,7 @@ export const definitionSchema = z.object({
   summary: z.string().optional(),
   server: serverSchema,
   worker: workerSchema,
+  tunnel: tunnelSchema,
   ui: uiSchema,
   /** Catalog examples this demo starts. */
   examples: z.array(exampleEntrySchema).default([]),
@@ -114,6 +153,7 @@ export const defineScenario = (input: DefinitionInput): Definition => {
 };
 export type ServerDefinition = Definition['server'];
 export type WorkerDefinition = Definition['worker'];
+export type TunnelDefinition = Definition['tunnel'];
 export type UiDefinition = Definition['ui'];
 export type ExampleDefinition = Definition['examples'][number];
 
@@ -207,6 +247,7 @@ export const listDefinitions = async (
         stages: [
           ...(data.server.enabled ? ['server'] : []),
           ...(data.worker.enabled ? ['worker'] : []),
+          ...(data.tunnel.enabled ? ['tunnel'] : []),
           ...(data.ui.enabled ? ['ui'] : []),
           ...(hasWork(data, cwd) ? ['scenarios'] : []),
         ],
