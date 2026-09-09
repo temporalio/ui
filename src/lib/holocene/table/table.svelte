@@ -17,6 +17,7 @@
     caption?: Snippet;
     headers?: Snippet;
     children?: Snippet;
+    emptyState?: Snippet;
   }
 
   let {
@@ -29,6 +30,7 @@
     caption,
     headers,
     children,
+    emptyState,
     ...rest
   }: Props = $props();
 
@@ -48,7 +50,7 @@
 <div
   bind:this={scrollContainer}
   class={merge(
-    'relative max-h-full w-full overflow-auto',
+    'relative flex max-h-full w-full flex-col overflow-auto',
     rounded && 'rounded-lg',
     bordered && 'border border-primary',
     containerClass,
@@ -56,7 +58,7 @@
 >
   <table
     class={merge(
-      'holocene-table min-w-full border-separate border-spacing-0',
+      'holocene-table min-w-full shrink-0 border-separate border-spacing-0',
       fixed ? 'layout-fixed' : 'layout-auto',
       className,
     )}
@@ -78,6 +80,7 @@
       {@render children?.()}
     </tbody>
   </table>
+  {@render emptyState?.()}
 </div>
 
 <style lang="postcss">

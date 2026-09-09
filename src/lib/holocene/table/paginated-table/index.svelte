@@ -69,6 +69,14 @@
   {@render headers?.({ visibleItems })}
 {/snippet}
 
+{#snippet emptyState()}
+  <div
+    class="sticky left-0 flex w-full grow flex-col justify-center bg-surface-primary"
+  >
+    {@render empty?.()}
+  </div>
+{/snippet}
+
 <div
   class={merge(
     'flex min-h-0 grow flex-col rounded-lg border border-primary bg-background-primary text-primary',
@@ -96,6 +104,7 @@
       {fixed}
       {caption}
       headers={tableHeaders}
+      emptyState={visibleItems.length ? undefined : emptyState}
       {...rest}
     >
       {@render children?.()}
@@ -111,10 +120,6 @@
         {@render actionsStart?.()}
         {@render actionsCenter?.()}
         {@render actionsEnd?.()}
-      </div>
-    {:else}
-      <div class="sticky left-0 flex w-full grow flex-col justify-center">
-        {@render empty?.()}
       </div>
     {/if}
   {/if}
