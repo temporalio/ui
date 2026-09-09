@@ -21,6 +21,7 @@ batchActionsDisabled: false
 startWorkflowDisabled: false
 hideWorkflowQueryErrors: false
 refreshWorkflowCountsDisabled: false
+workflowSortingEnabled: false
 # =============================================================================
 # Auth Testing Configuration
 # =============================================================================

@@ -292,6 +292,9 @@ export const Strings = {
   'workflow-task-failures-query-empty-state-description':
     'None of your Workflows currently match your task failure criteria',
   'workflow-query-error-state': 'Error Filtering Workflows',
+  'sort-by-column': 'Sort by {{column}}',
+  'sorting-not-supported':
+    'Sorting is not supported by this Namespace’s Visibility store.',
   'workflow-empty-state-title': 'No Workflows running in this Namespace',
   'workflow-empty-state-description':
     'You can populate the Web UI with sample Workflows. You can find a complete list of executable code samples at',
