@@ -13,6 +13,7 @@ vi.mock('$lib/models/event-history', async (importOriginal) => {
 
 import {
   getEventArray,
+  getEventMarkerDescriptorArray,
   getEventMarkerGroupArray,
   getEventMarkerPresentation,
   getGroupArray,
@@ -111,12 +112,20 @@ describe('output equivalence with groupEvents', () => {
     loadAll(marked);
 
     const markerGroups = getEventMarkerGroupArray();
+    const markerDescriptors = getEventMarkerDescriptorArray();
     expect(markerGroups[0].markerKey).toBe('label:checkout');
     expect(markerGroups[0].eventCount).toBe(marked.length);
     expect(markerGroups[0].lifecycleGroups[0].id).toBe('1');
+    expect(markerDescriptors[0]).toMatchObject({
+      markerKey: 'label:checkout',
+      displayName: 'checkout',
+      eventCount: marked.length,
+      firstEventId: '1',
+    });
 
     loadAll(makeActivityGroup(4));
     expect(getEventMarkerGroupArray()).toBe(markerGroups);
+    expect(getEventMarkerDescriptorArray()).toBe(markerDescriptors);
   });
 
   it('rebuilds a marker group when its lifecycle group changes', () => {
@@ -124,11 +133,13 @@ describe('output equivalence with groupEvents', () => {
     scheduled.eventGroupMarkers = [{ label: { id: 'checkout' } }];
     ingestHistoryEvent(scheduled);
     const initial = getEventMarkerGroupArray();
+    const initialDescriptors = getEventMarkerDescriptorArray();
 
     ingestHistoryEvent(started);
 
     expect(getEventMarkerGroupArray()).not.toBe(initial);
     expect(getEventMarkerGroupArray()[0].lifecycleGroups[0].eventCount).toBe(2);
+    expect(getEventMarkerDescriptorArray()).toBe(initialDescriptors);
   });
 
   it('reuses marker groups whose lifecycle groups did not change', () => {

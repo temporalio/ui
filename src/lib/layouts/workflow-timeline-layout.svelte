@@ -73,6 +73,7 @@
 
   const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
   const markerGroups = $derived(eventBuffer.eventMarkerGroups);
+  const markerDescriptors = $derived(eventBuffer.eventMarkerDescriptors);
   const hasMarkerGroups = $derived(eventBuffer.hasEventMarkerGroups);
   let selectedMarkerKey = $state<string>();
 
@@ -300,7 +301,7 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
-        <EventGroupFilter groups={markerGroups} />
+        <EventGroupFilter markers={markerDescriptors} />
         <ToggleButton
           data-testid="event-groups"
           disabled={!hasMarkerGroups}

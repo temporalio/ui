@@ -72,6 +72,10 @@ const createAttribution = (
 ): EventMarkerAttribution => ({
   key: getEventGroupMarkerKey(marker)!,
   eventGroupMarker: marker,
+  firstEventId: events.reduce(
+    (first, event) => (Number(event.id) < Number(first) ? event.id : first),
+    events[0].id,
+  ),
   eventsById: new Map(
     events.map((event, index) => [
       event.id,
@@ -222,6 +226,31 @@ describe('createTimelineEventMarkerGroups', () => {
     );
 
     expect(group.isPending).toBe(true);
+  });
+
+  it('ends at the last event in an attributed lifecycle group', () => {
+    const timerStarted = createEvent('1', [{ label: { id: 'traveler-care' } }]);
+    const timerFired = createEvent('9');
+    const timerLifecycle = createLifecycleGroup('1', [
+      timerStarted,
+      timerFired,
+    ]);
+
+    const [group] = createTimelineEventMarkerGroups(
+      [
+        createAttribution(
+          { label: { id: 'traveler-care' } },
+          [timerStarted],
+          ['1'],
+        ),
+      ],
+      [timerLifecycle],
+      presentationsByMarkerKey,
+    );
+
+    expect(group.eventList).toEqual([timerStarted]);
+    expect(group.lastEvent).toBe(timerFired);
+    expect(group.eventTime).toBe(timerFired.eventTime);
   });
 
   it('summarizes exceptional lifecycle group states', () => {

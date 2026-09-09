@@ -5,6 +5,7 @@ import type { WorkflowEvent } from '$lib/types/events';
 
 import {
   getEventArray,
+  getEventMarkerDescriptorArray,
   getEventMarkerGroupArray,
   getGroupArray,
   getLazyGroups,
@@ -86,6 +87,11 @@ class EventBufferView {
   readonly eventMarkerGroups = $derived.by(() => {
     void this._version;
     return getEventMarkerGroupArray();
+  });
+
+  readonly eventMarkerDescriptors = $derived.by(() => {
+    void this._version;
+    return getEventMarkerDescriptorArray();
   });
 
   readonly hasEventMarkerGroups = $derived.by(() => {

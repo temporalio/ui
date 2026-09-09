@@ -49,12 +49,21 @@ export type EventMarkerAttribution = {
   key: string;
   eventGroupMarker: EventGroupMarker;
   eventsById: Map<string, EventMarkerAttributionEntry>;
+  firstEventId: string;
 };
 
 export type EventGroupMarkerPresentation = {
   key: string;
   displayName: string;
   label?: Payload;
+};
+
+export type EventGroupMarkerDescriptor = {
+  markerKey: string;
+  eventGroupMarker: EventGroupMarker;
+  displayName: string;
+  eventCount: number;
+  firstEventId: string;
 };
 
 export const getEventGroupMarkerKey = (
@@ -116,6 +125,25 @@ const getMarkerIdentity = (
     getEventGroupMarkerPresentation(marker);
   if (!presentation) return;
   return { ...presentation, eventGroupMarker: marker };
+};
+
+export const createEventGroupMarkerDescriptor = (
+  attribution: EventMarkerAttribution,
+  presentationsByMarkerKey: ReadonlyMap<string, EventGroupMarkerPresentation>,
+): EventGroupMarkerDescriptor | undefined => {
+  const identity = getMarkerIdentity(
+    attribution.eventGroupMarker,
+    presentationsByMarkerKey,
+  );
+  if (!identity) return;
+
+  return {
+    markerKey: identity.key,
+    eventGroupMarker: identity.eventGroupMarker,
+    displayName: identity.displayName,
+    eventCount: attribution.eventsById.size,
+    firstEventId: attribution.firstEventId,
+  };
 };
 
 const toStandaloneLifecycleGroup = (event: WorkflowEvent): EventGroup => ({
@@ -188,10 +216,13 @@ const getLifecycleGroupStatusSummary = (
   return summary;
 };
 
-export const getEventMarkerGroupStatusSummary = (
+const summarizeEventMarkerLifecycleGroups = (
   lifecycleGroups: EventGroups,
-): EventMarkerGroupStatusSummary => {
-  const summary: EventMarkerGroupStatusSummary = {
+): {
+  statusSummary: EventMarkerGroupStatusSummary;
+  lastEvent?: WorkflowEvent;
+} => {
+  const statusSummary: EventMarkerGroupStatusSummary = {
     failed: 0,
     timedOut: 0,
     retries: 0,
@@ -199,19 +230,29 @@ export const getEventMarkerGroupStatusSummary = (
     terminated: 0,
     paused: 0,
   };
+  let lastEvent: WorkflowEvent | undefined;
 
   for (const group of lifecycleGroups) {
     const groupSummary = getLifecycleGroupStatusSummary(group);
-    summary.failed += groupSummary.failed;
-    summary.timedOut += groupSummary.timedOut;
-    summary.retries += groupSummary.retries;
-    summary.canceled += groupSummary.canceled;
-    summary.terminated += groupSummary.terminated;
-    summary.paused += groupSummary.paused;
+    statusSummary.failed += groupSummary.failed;
+    statusSummary.timedOut += groupSummary.timedOut;
+    statusSummary.retries += groupSummary.retries;
+    statusSummary.canceled += groupSummary.canceled;
+    statusSummary.terminated += groupSummary.terminated;
+    statusSummary.paused += groupSummary.paused;
+
+    if (!lastEvent || Number(group.lastEvent.id) > Number(lastEvent.id)) {
+      lastEvent = group.lastEvent;
+    }
   }
 
-  return summary;
+  return { statusSummary, lastEvent };
 };
+
+export const getEventMarkerGroupStatusSummary = (
+  lifecycleGroups: EventGroups,
+): EventMarkerGroupStatusSummary =>
+  summarizeEventMarkerLifecycleGroups(lifecycleGroups).statusSummary;
 
 const toTimelineEventMarkerGroup = (
   marker: MarkerAccumulator,
@@ -226,14 +267,21 @@ const toTimelineEventMarkerGroup = (
 
   const eventList = attributedEvents;
   const initialEvent = eventList[0];
-  const lastEvent = eventList[eventList.length - 1];
+  const lastAttributedEvent = eventList[eventList.length - 1];
+  const { statusSummary, lastEvent: lastLifecycleEvent } =
+    summarizeEventMarkerLifecycleGroups(lifecycleGroups);
+  const lastEvent =
+    lastLifecycleEvent &&
+    Number(lastLifecycleEvent.id) > Number(lastAttributedEvent.id)
+      ? lastLifecycleEvent
+      : lastAttributedEvent;
 
   return {
     eventMarker: true,
     markerKey: marker.key,
     eventGroupMarker: marker.eventGroupMarker,
     lifecycleGroups,
-    statusSummary: getEventMarkerGroupStatusSummary(lifecycleGroups),
+    statusSummary,
     id: `event-marker:${marker.key}`,
     name: marker.displayName,
     label: marker.displayName,

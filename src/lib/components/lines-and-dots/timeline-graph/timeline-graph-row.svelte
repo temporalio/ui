@@ -128,6 +128,7 @@
   const getDistancePointsAndPositions = (
     timelineWidth: number,
     events: EventGroup['eventList'],
+    lastEvent: EventGroup['lastEvent'],
     count: number,
   ) => {
     // Loop to `count` (not events.map) to depend on eventCount without allocating.
@@ -135,9 +136,7 @@
     const pointCount = Math.min(count, events.length);
     if (isEventMarkerGroup && pointCount > 0) {
       points.push(Math.round(project(events[0].eventTime)));
-      if (pointCount > 1) {
-        points.push(Math.round(project(events[pointCount - 1].eventTime)));
-      }
+      points.push(Math.round(project(lastEvent.eventTime)));
     } else {
       for (let idx = 0; idx < pointCount; idx++) {
         points.push(Math.round(project(events[idx].eventTime)));
@@ -160,7 +159,12 @@
   };
 
   const { points, textAnchor, textPosition } = $derived(
-    getDistancePointsAndPositions(timelineWidth, group.eventList, eventCount),
+    getDistancePointsAndPositions(
+      timelineWidth,
+      group.eventList,
+      group.lastEvent,
+      eventCount,
+    ),
   );
 
   const onClick = () => {

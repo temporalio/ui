@@ -10,7 +10,9 @@ import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
 import { toEvent } from '$lib/models/event-history';
 import {
+  createEventGroupMarkerDescriptor,
   createTimelineEventMarkerGroups,
+  type EventGroupMarkerDescriptor,
   type EventGroupMarkerPresentation,
   type EventMarkerAttribution,
   getEventGroupMarkerKey,
@@ -216,6 +218,7 @@ let cachedLazyGroupsNoWFTRevision = -1;
 let cachedWftFailed: WorkflowEvent | undefined;
 let cachedWftFailedRevision = -1;
 let cachedEventMarkerGroups: TimelineEventMarkerGroup[] | null = null;
+let cachedEventMarkerDescriptors: EventGroupMarkerDescriptor[] | null = null;
 const cachedEventMarkerGroupsByKey = new Map<
   string,
   TimelineEventMarkerGroup
@@ -235,6 +238,7 @@ const changeListeners = new Set<ChangeListener>();
 function invalidateEventMarkerKey(key: string): void {
   dirtyEventMarkerKeys.add(key);
   cachedEventMarkerGroups = null;
+  cachedEventMarkerDescriptors = null;
 }
 
 function invalidateEventMarkersForLifecycleGroup(groupId: string): void {
@@ -443,7 +447,12 @@ function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
 
     let attribution = eventMarkerAttributions.get(key);
     if (!attribution) {
-      attribution = { key, eventGroupMarker: marker, eventsById: new Map() };
+      attribution = {
+        key,
+        eventGroupMarker: marker,
+        eventsById: new Map(),
+        firstEventId: event.id,
+      };
       eventMarkerAttributions.set(key, attribution);
       refreshEventGroupMarkerPresentation(key, marker);
       invalidateEventMarkerKey(key);
@@ -461,6 +470,9 @@ function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
         event,
         lifecycleGroupId: groupId,
       });
+      if (Number(event.id) < Number(attribution.firstEventId)) {
+        attribution.firstEventId = event.id;
+      }
       invalidateEventMarkerKey(key);
     }
   }
@@ -605,6 +617,7 @@ export function reset(historyLength: number): void {
   cachedLazyGroups = null;
   cachedLazyGroupsNoWFT = null;
   cachedEventMarkerGroups = null;
+  cachedEventMarkerDescriptors = null;
 
   notifyChanged(true);
 }
@@ -823,6 +836,25 @@ export function getEventMarkerGroupArray(): TimelineEventMarkerGroup[] {
     (a, b) => Number(a.initialEvent.id) - Number(b.initialEvent.id),
   );
   return cachedEventMarkerGroups;
+}
+
+/** Lightweight filter options that never materialize lifecycle groups. */
+export function getEventMarkerDescriptorArray(): EventGroupMarkerDescriptor[] {
+  if (cachedEventMarkerDescriptors) return cachedEventMarkerDescriptors;
+
+  const descriptors: EventGroupMarkerDescriptor[] = [];
+  for (const attribution of eventMarkerAttributions.values()) {
+    const descriptor = createEventGroupMarkerDescriptor(
+      attribution,
+      eventGroupMarkerPresentations,
+    );
+    if (descriptor) descriptors.push(descriptor);
+  }
+
+  cachedEventMarkerDescriptors = descriptors.toSorted(
+    (a, b) => Number(a.firstEventId) - Number(b.firstEventId),
+  );
+  return cachedEventMarkerDescriptors;
 }
 
 /** Flat WorkflowEvent[] in ascending event-id order. */

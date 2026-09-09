@@ -86,7 +86,7 @@
   // The feed view needs full groups, read lazily in tableProps below.
   const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
   const bufferEvents = $derived(eventBuffer.events);
-  const markerGroups = $derived(eventBuffer.eventMarkerGroups);
+  const markerDescriptors = $derived(eventBuffer.eventMarkerDescriptors);
   let updating = $derived(!historyCtx.fetchComplete);
 
   const selectedMarkerKeys = $derived(new Set($eventGroupFilter));
@@ -266,7 +266,7 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
-        <EventGroupFilter groups={markerGroups} />
+        <EventGroupFilter markers={markerDescriptors} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"

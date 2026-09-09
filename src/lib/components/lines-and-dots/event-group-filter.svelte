@@ -14,54 +14,54 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconSearch } from '$lib/io/icon';
-  import type { TimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
+  import type { EventGroupMarkerDescriptor } from '$lib/models/event-marker-groups';
   import { clearActiveGroups } from '$lib/stores/active-events';
   import { eventGroupFilter } from '$lib/stores/filters';
   import type { Payload } from '$lib/types';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
 
-  let { groups }: { groups: TimelineEventMarkerGroup[] } = $props();
+  let { markers }: { markers: EventGroupMarkerDescriptor[] } = $props();
 
   const open = writable(false);
   let search = $state('');
   const decodedLabels = new SvelteMap<string, string>();
   const decodedPayloads = new SvelteMap<string, Payload>();
 
-  const labelFor = (group: TimelineEventMarkerGroup): string =>
-    decodedLabels.get(group.markerKey) ?? group.displayName;
+  const labelFor = (marker: EventGroupMarkerDescriptor): string =>
+    decodedLabels.get(marker.markerKey) ?? marker.displayName;
 
   const options = $derived.by(() => {
     const query = search.trim().toLocaleLowerCase();
-    if (!query) return groups;
-    return groups.filter((group) =>
-      labelFor(group).toLocaleLowerCase().includes(query),
+    if (!query) return markers;
+    return markers.filter((marker) =>
+      labelFor(marker).toLocaleLowerCase().includes(query),
     );
   });
 
   $effect(() => {
     if (!$open) return;
-    const groupsToDecode = groups.flatMap((group) => {
-      const payload = group.eventGroupMarker.label?.label;
-      if (!payload || decodedPayloads.get(group.markerKey) === payload) {
+    const markersToDecode = markers.flatMap((marker) => {
+      const payload = marker.eventGroupMarker.label?.label;
+      if (!payload || decodedPayloads.get(marker.markerKey) === payload) {
         return [];
       }
-      decodedPayloads.set(group.markerKey, payload);
-      return [{ group, payload }];
+      decodedPayloads.set(marker.markerKey, payload);
+      return [{ marker, payload }];
     });
-    if (!groupsToDecode.length) return;
+    if (!markersToDecode.length) return;
 
     Promise.all(
-      groupsToDecode.map(async ({ group, payload }) => {
+      markersToDecode.map(async ({ marker, payload }) => {
         try {
           const decoded = await decodePayloadAndParseDataToJSON(payload);
           return {
-            key: group.markerKey,
+            key: marker.markerKey,
             label: typeof decoded === 'string' && decoded ? decoded : undefined,
             payload,
           };
         } catch {
-          return { key: group.markerKey, label: undefined, payload };
+          return { key: marker.markerKey, label: undefined, payload };
         }
       }),
     ).then((results) => {
@@ -96,7 +96,7 @@
   <MenuButton
     controls="event-group-filter-menu"
     count={$eventGroupFilter.length}
-    disabled={!groups.length && !$eventGroupFilter.length}
+    disabled={!markers.length && !$eventGroupFilter.length}
     hasIndicator
     size="sm"
     class="border-l-0"
@@ -131,13 +131,13 @@
       <MenuDivider />
     {/if}
     {#if options.length}
-      {#each options as group (group.markerKey)}
-        {@const label = labelFor(group)}
-        <MenuItem onclick={() => toggle(group.markerKey)} class="min-w-0">
+      {#each options as marker (marker.markerKey)}
+        {@const label = labelFor(marker)}
+        <MenuItem onclick={() => toggle(marker.markerKey)} class="min-w-0">
           {#snippet leading()}
             <Checkbox
-              onclick={() => toggle(group.markerKey)}
-              checked={$eventGroupFilter.includes(group.markerKey)}
+              onclick={() => toggle(marker.markerKey)}
+              checked={$eventGroupFilter.includes(marker.markerKey)}
               {label}
               labelHidden
             />
@@ -145,7 +145,7 @@
           <div class="flex min-w-0 flex-1 items-center gap-2">
             <span class="min-w-0 flex-1 truncate" title={label}>{label}</span>
             <span class="shrink-0 text-xs text-secondary">
-              {group.eventList.length}
+              {marker.eventCount}
             </span>
           </div>
         </MenuItem>
