@@ -99,17 +99,20 @@ export type EventTypeCategory =
 export type EventClassification =
   import('$lib/models/event-history/get-event-classification').EventClassification;
 
-export interface WorkflowEvent extends HistoryEvent {
-  id: string;
-  attributes: EventAttribute;
-  timestamp: string;
-  classification: EventClassification;
-  category: EventTypeCategory;
-  name: EventType;
-  links?: EventLink[];
-  billableActions?: number;
-  principal?: Principal;
-}
+export type WorkflowEvent = Replace<
+  HistoryEvent,
+  {
+    id: string;
+    attributes: EventAttribute;
+    timestamp: string;
+    classification: EventClassification;
+    category: EventTypeCategory;
+    name: EventType;
+    links?: EventLink[];
+    billableActions?: number;
+    principal?: Principal;
+  }
+>;
 
 export type WorkflowEvents = WorkflowEvent[];
 
