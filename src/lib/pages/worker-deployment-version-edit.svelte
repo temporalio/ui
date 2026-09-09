@@ -23,7 +23,7 @@
     updateWorkerDeploymentVersionComputeConfig,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
-  import { lockProvidersTo } from '$lib/utilities/lock-compute-provider';
+  import { allowProviderInUse } from '$lib/utilities/lock-compute-provider';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
   interface Props {
@@ -65,9 +65,9 @@
   {@const agentCoreDetails = decodeAgentCoreProviderDetails(info.computeConfig)}
   {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
   {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
-  <!-- The Version already uses a provider, so the picker is locked to it.
-       Without the lock the capability-gated default list wins and the provider
-       in use renders selected, disabled, and badged "Coming Soon". -->
+  <!-- The provider in use is ungated so it does not render selected, disabled,
+       and badged "Coming Soon" at once. The alternatives keep their gating:
+       provider.type is an accepted update path, so switching is a real choice. -->
   {@const configuredProvider = agentCoreDetails.agentCoreEndpointArn
     ? 'agentcore'
     : gcpDetails.gcpWorkerPool
@@ -82,7 +82,10 @@
     </h1>
     <EditVersionForm
       {error}
-      computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
+      computeProviders={allowProviderInUse(
+        configuredProvider,
+        computeProviders,
+      )}
       {gcpRegions}
       {terraformTemplate}
       {cloudRunTerraformTemplate}

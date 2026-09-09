@@ -41,7 +41,7 @@ const DEFAULT_PROVIDERS: readonly ComputeProviderOption[] = [
 ];
 
 /**
- * The provider options to show for a Version that already uses one.
+ * Ungates the provider a Version already uses, leaving the alternatives alone.
  *
  * The provider in use is a fact, not an offer, so it is always visible and
  * always selectable. Capability gating exists to stop somebody choosing a
@@ -49,9 +49,12 @@ const DEFAULT_PROVIDERS: readonly ComputeProviderOption[] = [
  * running as unavailable, which is what a selected card badged "Coming Soon"
  * says. The release stage is kept, because that stays true.
  *
- * Every other provider is hidden: a Version's provider cannot be changed.
+ * The other providers keep their gating, because switching a Version to one of
+ * them is a real choice: `provider.type` is an accepted update path on
+ * UpdateWorkerDeploymentVersionComputeConfig, so an alternative the Service can
+ * run should stay offered, and one it cannot should stay refused.
  */
-export const lockProvidersTo = (
+export const allowProviderInUse = (
   provider: ComputeProviderValue,
   configuredProviders?: readonly ComputeProviderOption[],
 ): readonly ComputeProviderOption[] => {
@@ -60,13 +63,32 @@ export const lockProvidersTo = (
   const options = known ? source : [...source, { value: provider }];
 
   return options.map((option) => {
-    if (option.value !== provider) return { ...option, hidden: true };
+    if (option.value !== provider) return option;
 
-    const { disabled, disabledReason, hidden, ...usable } = option;
+    const {
+      disabled: _disabled,
+      disabledReason: _disabledReason,
+      hidden: _hidden,
+      ...usable
+    } = option;
 
     return usable;
   });
 };
+
+/**
+ * As above, but hides the alternatives.
+ *
+ * Used when creating a new Version in an existing Deployment, where the
+ * provider is inherited rather than chosen.
+ */
+export const lockProvidersTo = (
+  provider: ComputeProviderValue,
+  configuredProviders?: readonly ComputeProviderOption[],
+): readonly ComputeProviderOption[] =>
+  allowProviderInUse(provider, configuredProviders).map((option) =>
+    option.value === provider ? option : { ...option, hidden: true },
+  );
 
 export const lockComputeProvider = (
   deployment: DescribeWorkerDeployment,

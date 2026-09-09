@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import type { DescribeWorkerDeployment } from '$lib/types/deployments';
 
-import { lockComputeProvider, lockProvidersTo } from './lock-compute-provider';
+import {
+  allowProviderInUse,
+  lockComputeProvider,
+  lockProvidersTo,
+} from './lock-compute-provider';
 
 const deployment = (types: (string | undefined)[]): DescribeWorkerDeployment =>
   ({
@@ -183,6 +187,45 @@ describe('lockProvidersTo', () => {
   it('adds a provider the configuration omits, rather than showing nothing', () => {
     expect(lockProvidersTo('agentcore', [{ value: 'lambda' }])).toEqual([
       { value: 'lambda', hidden: true },
+      { value: 'agentcore' },
+    ]);
+  });
+});
+
+describe('allowProviderInUse', () => {
+  const gated = [
+    { value: 'lambda' as const },
+    {
+      value: 'agentcore' as const,
+      releaseStage: 'pre-release' as const,
+      disabled: true,
+      disabledReason: 'Coming Soon',
+    },
+    {
+      value: 'cloud-run' as const,
+      disabled: true,
+      disabledReason: 'Coming Soon',
+    },
+  ];
+
+  // provider.type is an accepted update path on
+  // UpdateWorkerDeploymentVersionComputeConfig, so switching a Version to
+  // another provider is a real choice and the alternatives must stay visible.
+  it('ungates the provider in use and leaves the alternatives alone', () => {
+    expect(allowProviderInUse('agentcore', gated)).toEqual([
+      { value: 'lambda' },
+      { value: 'agentcore', releaseStage: 'pre-release' },
+      { value: 'cloud-run', disabled: true, disabledReason: 'Coming Soon' },
+    ]);
+  });
+
+  it('leaves an already usable provider untouched', () => {
+    expect(allowProviderInUse('lambda', gated)).toEqual(gated);
+  });
+
+  it('adds a provider the configuration omits, rather than showing nothing', () => {
+    expect(allowProviderInUse('agentcore', [{ value: 'lambda' }])).toEqual([
+      { value: 'lambda' },
       { value: 'agentcore' },
     ]);
   });
