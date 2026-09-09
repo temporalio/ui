@@ -106,9 +106,15 @@
 <Story name="Button Group">
   {#snippet template(args)}
     <div class="button-group flex">
-      <Button {...args} onclick={action('click')}>First</Button>
-      <Button {...args} onclick={action('click')}>Middle</Button>
-      <Button {...args} onclick={action('click')}>Last</Button>
+      <Button {...args} class="rounded-r-none" onclick={action('click')}
+        >First</Button
+      >
+      <Button {...args} class="rounded-none" onclick={action('click')}
+        >Middle</Button
+      >
+      <Button {...args} class="rounded-l-none" onclick={action('click')}
+        >Last</Button
+      >
     </div>
   {/snippet}
 </Story>
