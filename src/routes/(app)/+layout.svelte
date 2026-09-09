@@ -19,11 +19,11 @@
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    IconAgent,
     IconArchive,
     IconBook,
     IconFeedback,
     IconImport,
-    IconRobot,
     IconSupport,
     IconTemporalActivity,
     IconTemporalBatch,
@@ -211,6 +211,13 @@
         isActive: (path) => path.includes(schedulesRoute),
       },
       {
+        href: agentsRoute,
+        Icon: IconAgent,
+        testId: 'agents-button',
+        label: translate('common.agents'),
+        isActive: (path) => path.includes(agentsRoute),
+      },
+      {
         href: batchOperationsRoute,
         Icon: IconTemporalBatch,
         testId: 'batch-operation-button',
@@ -238,13 +245,6 @@
           const match = path.split('/').find((segment) => segment === 'nexus');
           return !!match;
         },
-      },
-      {
-        href: agentsRoute,
-        Icon: IconRobot,
-        testId: 'agents-button',
-        label: translate('common.agents'),
-        isActive: (path) => path.includes(agentsRoute),
       },
     ];
   };
