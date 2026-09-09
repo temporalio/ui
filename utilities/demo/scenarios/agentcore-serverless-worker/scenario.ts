@@ -3,7 +3,11 @@ import { z } from 'zod';
 import { $ } from 'zx';
 
 import { resolveCli } from './cli';
-import { checkProvisioningAccess, provisionAgentCore } from './provision';
+import {
+  checkProvisioningAccess,
+  provisionAgentCore,
+  runtimeExists,
+} from './provision';
 import { failure } from '../../remedy';
 import type { Scenario, ScenarioContext, ScenarioResult } from '../../scenario';
 
@@ -103,6 +107,18 @@ const resolveSource = (raw: Record<string, unknown>) => {
   };
 };
 
+const malformedEndpoint = (endpointArn: string, region: string) =>
+  failure({
+    attempting: `"${endpointArn}" is not a Runtime Endpoint ARN, so the provider cannot resolve a runtime from it.`,
+    fixes: [
+      'Use the four-part form: arn:aws:bedrock-agentcore:<region>:<account>:runtime/<id>/runtime-endpoint/<name>.',
+      'A bare Runtime ARN is the usual mistake. The provider parses the runtime id and endpoint name out of this value, so it needs the endpoint suffix.',
+    ],
+    seeAlso: [
+      `aws bedrock-agentcore-control list-agent-runtime-endpoints --region ${region} --agent-runtime-id <runtime-id>`,
+    ],
+  });
+
 const missingEndpoint = () =>
   failure({
     attempting:
@@ -130,6 +146,34 @@ export const scenario: Scenario = {
     // after one.
     if (!endpointArn && provision) {
       await checkProvisioningAccess(options.region);
+
+      return;
+    }
+
+    const parsed = ENDPOINT_ARN.exec(endpointArn);
+
+    if (!parsed) throw malformedEndpoint(endpointArn, options.region);
+
+    // An ARN is a string, so having one proves nothing about whether it
+    // resolves. Checking here rather than in run means a stale one costs
+    // seconds instead of a server build and a tunnel.
+    const [, runtimeId] = parsed;
+    const { exists, reported } = await runtimeExists(options.region, runtimeId);
+
+    if (!exists) {
+      throw failure({
+        attempting: `The AgentCore runtime "${runtimeId}" named by the endpoint ARN does not exist in ${options.region}, so there is nothing for the Worker Controller to invoke.`,
+        reported,
+        fixes: [
+          'If this came from a previous run, the runtime has since been deleted. Unset AGENTCORE_ENDPOINT_ARN, and this scenario will provision a fresh one when AGENTCORE_PROVISION=1 or provision: true.',
+          'An explicit endpoint ARN takes precedence over provisioning, so a stale one in the environment quietly shadows it.',
+          `If the runtime is real, check the region: it must match the one inside the ARN, which reads ${options.region}.`,
+        ],
+        seeAlso: [
+          `aws bedrock-agentcore-control list-agent-runtimes --region ${options.region}`,
+          'echo $AGENTCORE_ENDPOINT_ARN',
+        ],
+      });
     }
   },
 
@@ -137,11 +181,29 @@ export const scenario: Scenario = {
     const { options, endpointArn: given, provision } = resolveSource(raw);
     const { log, namespace } = context;
 
+    // Before anything is created. Provisioning bills, and a run without the
+    // tunnel cannot finish, so failing here costs nothing while failing after
+    // provisioning leaves resources behind for a run that never had a chance.
+    if (!context.publicAddress) {
+      throw failure({
+        attempting: 'This scenario needs the tunnel stage, and it did not run.',
+        fixes: [
+          'Set tunnel.enabled in the definition.',
+          'If you passed --skip tunnel or --only, include the tunnel stage.',
+        ],
+        seeAlso: [
+          'The Worker runs inside AgentCore in AWS and dials the frontend back to poll. That inbound leg is the one thing a dev server on localhost cannot offer; the outbound leg to AWS is never the problem.',
+        ],
+      });
+    }
+
     const teardown: string[] = [];
     let endpointArn = given;
 
     if (!endpointArn && provision) {
-      log('No endpoint ARN given and provision is on, so creating one');
+      log(
+        'No endpoint ARN given, so provisioning one. An AgentCore runtime bills while it exists; the summary lists what was created and how to remove it.',
+      );
 
       const provisioned = await provisionAgentCore(options.region, log);
 
@@ -157,33 +219,9 @@ export const scenario: Scenario = {
 
     const parsed = ENDPOINT_ARN.exec(endpointArn);
 
-    if (!parsed) {
-      throw failure({
-        attempting: `"${endpointArn}" is not a Runtime Endpoint ARN, so the provider cannot resolve a runtime from it.`,
-        fixes: [
-          'Use the four-part form: arn:aws:bedrock-agentcore:<region>:<account>:runtime/<id>/runtime-endpoint/<name>.',
-          'A bare Runtime ARN is the usual mistake. The provider parses the runtime id and endpoint name out of this value, so it needs the endpoint suffix.',
-        ],
-        seeAlso: [
-          `aws bedrock-agentcore-control list-agent-runtime-endpoints --region ${options.region} --agent-runtime-id <runtime-id>`,
-        ],
-      });
-    }
+    if (!parsed) throw malformedEndpoint(endpointArn, options.region);
 
     const [, runtimeId, endpointName] = parsed;
-
-    if (!context.publicAddress) {
-      throw failure({
-        attempting: 'This scenario needs the tunnel stage, and it did not run.',
-        fixes: [
-          'Set tunnel.enabled in the definition.',
-          'If you passed --skip tunnel or --only, include the tunnel stage.',
-        ],
-        seeAlso: [
-          'The Worker runs inside AgentCore in AWS and dials the frontend back to poll. That inbound leg is the one thing a dev server on localhost cannot offer; the outbound leg to AWS is never the problem.',
-        ],
-      });
-    }
 
     const observations: string[] = [];
     const buildId = options.buildId || `run-${Date.now()}`;

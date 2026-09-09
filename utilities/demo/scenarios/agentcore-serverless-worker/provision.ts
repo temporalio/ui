@@ -129,6 +129,33 @@ export const checkProvisioningAccess = async (region: string) => {
   return { account };
 };
 
+/**
+ * Whether the runtime a given endpoint ARN names still exists.
+ *
+ * An ARN is a string, so having one says nothing about whether it resolves. A
+ * runtime that was deleted, or that lives in another account or region, leaves
+ * an ARN behind that looks entirely valid.
+ */
+export const runtimeExists = async (
+  region: string,
+  runtimeId: string,
+): Promise<{ exists: boolean; reported?: string }> => {
+  const got = await probe('aws', [
+    'bedrock-agentcore-control',
+    'get-agent-runtime',
+    '--region',
+    region,
+    '--agent-runtime-id',
+    runtimeId,
+    '--output',
+    'json',
+  ]);
+
+  if (got.exitCode === 0) return { exists: true };
+
+  return { exists: false, reported: got.stderr || got.stdout };
+};
+
 const runtimeEndpointArn = (
   region: string,
   account: string,

@@ -269,10 +269,23 @@ There are two ways to get one.
 
 ### Let the scenario create it
 
-`AGENTCORE_PROVISION=1` for a single run, or `provision: true` in the
-definition for a permanent choice. The environment variable exists so a
-reviewer can opt in without editing a tracked file and remembering to revert
-it. It creates the ECR repository, builds
+**This is the default for `agentcore-serverless-worker`**, because the scenario
+cannot run without a runtime and a demo whose first run fails is not a demo.
+`pnpm demo start agentcore-serverless-worker` therefore creates one.
+
+It **does bill while it exists.** The run says so when it starts provisioning,
+and the summary lists what was created with the commands to remove it.
+Provisioning is idempotent by name, so running the scenario repeatedly reuses
+one runtime rather than adding another.
+
+To point at your own instead, set `AGENTCORE_ENDPOINT_ARN` or `endpointArn`. To
+refuse outright, set `provision: false`; `AGENTCORE_PROVISION=1` turns it back
+on for a single run without editing a tracked file.
+
+Note that an explicit endpoint ARN **takes precedence over provisioning**, so a
+stale one left in your environment shadows it. Preflight checks that the
+runtime an ARN names actually exists and says so if it does not, because an ARN
+is a string and having one proves nothing about whether it resolves. It creates the ECR repository, builds
 and pushes the Worker image from `scenarios/agentcore-serverless-worker/worker`,
 creates the execution role, and creates the runtime and its endpoint.
 
