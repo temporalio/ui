@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { $ } from 'zx';
 
 import { resolveCli } from './cli';
-import { provisionAgentCore } from './provision';
+import { checkProvisioningAccess, provisionAgentCore } from './provision';
 import { failure } from '../../remedy';
 import type { Scenario, ScenarioContext, ScenarioResult } from '../../scenario';
 
@@ -88,19 +88,59 @@ const waitForEndpoint = async (
   );
 };
 
+/**
+ * Where the endpoint ARN comes from, and whether provisioning may create one.
+ * Shared by preflight and run so they cannot disagree about what this needs.
+ */
+const resolveSource = (raw: Record<string, unknown>) => {
+  const options = optionsSchema.parse(raw);
+
+  return {
+    options,
+    endpointArn:
+      options.endpointArn || process.env.AGENTCORE_ENDPOINT_ARN || '',
+    provision: options.provision || process.env.AGENTCORE_PROVISION === '1',
+  };
+};
+
+const missingEndpoint = () =>
+  failure({
+    attempting:
+      'This scenario needs a Bedrock AgentCore Runtime endpoint to invoke, and none was given.',
+    fixes: [
+      'Set AGENTCORE_ENDPOINT_ARN to a Runtime Endpoint ARN, or endpointArn in the definition.',
+      'Or let this scenario create one: AGENTCORE_PROVISION=1 for a single run, or provision: true in the definition. It needs AWS credentials that can use bedrock-agentcore, ECR, and IAM, and will name the exact policies if any are missing.',
+    ],
+    seeAlso: [
+      'Provision is off by default because an AgentCore runtime bills while it exists, and a demo should not create billable cloud resources by surprise.',
+      '"Provisioning the AgentCore runtime" in utilities/demo/README.md',
+    ],
+  });
+
 export const scenario: Scenario = {
   describe:
     'Creates a Worker Deployment Version whose compute provider is Bedrock AgentCore, lets the Worker Controller invoke it, and runs a workflow on the Worker that starts inside the AgentCore session.',
 
+  async preflight(raw) {
+    const { options, endpointArn, provision } = resolveSource(raw);
+
+    if (!endpointArn && !provision) throw missingEndpoint();
+
+    // Prove the AWS access provisioning needs before a server build, not
+    // after one.
+    if (!endpointArn && provision) {
+      await checkProvisioningAccess(options.region);
+    }
+  },
+
   async run(context: ScenarioContext, raw): Promise<ScenarioResult> {
-    const options = optionsSchema.parse(raw);
+    const { options, endpointArn: given, provision } = resolveSource(raw);
     const { log, namespace } = context;
 
     const teardown: string[] = [];
-    let endpointArn =
-      options.endpointArn || process.env.AGENTCORE_ENDPOINT_ARN || '';
+    let endpointArn = given;
 
-    if (!endpointArn && options.provision) {
+    if (!endpointArn && provision) {
       log('No endpoint ARN given and provision is on, so creating one');
 
       const provisioned = await provisionAgentCore(options.region, log);
@@ -113,20 +153,7 @@ export const scenario: Scenario = {
       }
     }
 
-    if (!endpointArn) {
-      throw failure({
-        attempting:
-          'This scenario needs a Bedrock AgentCore Runtime endpoint to invoke, and none was given.',
-        fixes: [
-          'Set AGENTCORE_ENDPOINT_ARN to a Runtime Endpoint ARN, or endpointArn in the definition.',
-          'Or set provision: true in the definition to have this scenario create one. It needs AWS credentials that can use bedrock-agentcore, ECR, and IAM; the failure will say exactly which policies if they are missing.',
-        ],
-        seeAlso: [
-          'Provision is off by default because an AgentCore runtime bills while it exists, and a demo should not create billable cloud resources by surprise.',
-          '"Provisioning the AgentCore runtime" in utilities/demo/README.md',
-        ],
-      });
-    }
+    if (!endpointArn) throw missingEndpoint();
 
     const parsed = ENDPOINT_ARN.exec(endpointArn);
 

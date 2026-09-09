@@ -269,7 +269,10 @@ There are two ways to get one.
 
 ### Let the scenario create it
 
-Set `provision: true` in the definition. It creates the ECR repository, builds
+`AGENTCORE_PROVISION=1` for a single run, or `provision: true` in the
+definition for a permanent choice. The environment variable exists so a
+reviewer can opt in without editing a tracked file and remembering to revert
+it. It creates the ECR repository, builds
 and pushes the Worker image from `scenarios/agentcore-serverless-worker/worker`,
 creates the execution role, and creates the runtime and its endpoint.
 
@@ -284,7 +287,9 @@ The summary therefore lists exactly what was created and the commands to
 remove it.
 
 Before creating anything it checks that the calling identity can actually do
-every part, so a missing permission does not leave a half-provisioned account.
+every part, and it does so in the scenario's `preflight`, which runs before any
+stage. A missing permission therefore costs seconds rather than surfacing after
+a server build, and cannot leave a half-provisioned account.
 If something is missing it names the policies to attach, including the one
 that wastes people's time: **the ECR managed policies are named
 `AmazonEC2ContainerRegistry*`, so searching the IAM console for "ecr" finds

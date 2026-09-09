@@ -191,6 +191,13 @@ export const startFeatureDemo = async (
   async function runStages() {
     await runPreflight(definition, log);
 
+    // A scenario's own prerequisites, while failing is still cheap.
+    if (hasOwnScenario(definition.name)) {
+      const own = await loadOwnScenario(definition.name);
+
+      if (own.preflight) await own.preflight(definition.scenario);
+    }
+
     const server = stageState('server', definition.server.enabled, options);
 
     if (server.run) {

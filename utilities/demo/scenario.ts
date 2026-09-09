@@ -34,6 +34,15 @@ export type ScenarioResult = {
  */
 export type Scenario = {
   describe: string;
+  /**
+   * Checked before any stage starts, so a scenario can refuse for its own
+   * reasons while refusing is still cheap. Without this a missing input
+   * surfaces in the scenarios stage, which is after a server build, and a
+   * person waits minutes to be told something a string comparison knew.
+   *
+   * It gets the options and no context: nothing is running yet.
+   */
+  preflight?: (options: Record<string, unknown>) => Promise<void>;
   run: (
     context: ScenarioContext,
     options: Record<string, unknown>,
