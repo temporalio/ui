@@ -36,6 +36,8 @@ export const definition = defineScenario({
   // The Worker is the one AgentCore starts. A catalog worker here would poll
   // the same queue and quietly make the demo prove nothing.
   worker: { enabled: false },
+  // Load-bearing: the Version is created by driving this UI, so --skip ui
+  // leaves the scenario with nothing to drive.
   tunnel: { enabled: true },
   scenario: {
     // Empty reads AGENTCORE_ENDPOINT_ARN. See "Provisioning the AgentCore
@@ -57,11 +59,13 @@ export const definition = defineScenario({
   } satisfies Options,
   preview: {
     notes: [
+      'The Version is created by driving the real create-version form with Playwright, not by the CLI. That is the point: the CLI could already do this, so a CLI run proves nothing about the change under review. Set createVersion: "cli" to fall back, and headed: true to watch the browser do it.',
       'The summary must report the workflow completed, and its result must name the AgentCore host. Nothing polled from this machine, so only a Worker AWS started could have run it.',
       'Open the Worker Deployment Version in the UI. Its compute provider must read AgentCore, with scaler "no-sync", and its task queues must list the queue the workflow ran on. That registration came from the Worker inside AgentCore polling with versioning.',
       'The Resource field on the version must be the Runtime *Endpoint* ARN, ending in /runtime-endpoint/<name>. A bare Runtime ARN is rejected: the provider parses the runtime id and endpoint name out of it.',
       'Check the runtime log group. It must show one INVOKED line carrying {"deploymentName","buildId"} — the payload the Worker Controller sends — followed by the Worker reporting that it is polling.',
       'Run it twice. The second run gets a fresh tunnel hostname and a fresh build id, and must still work: the scenario repoints the runtime each time rather than trusting a stored address.',
+      "The form makes IAM Role ARN and External ID required, and this server discards both because it runs with require_role_and_external_id false. The run types placeholders to get past them. The UI has no equivalent of the CLI's --aws-agentcore-skip-role-and-external-id, which is the gap FE-675 tracks.",
     ],
   },
 });

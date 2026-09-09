@@ -1,3 +1,4 @@
+import { chromium } from '@playwright/test';
 import { Client, Connection } from '@temporalio/client';
 import { z } from 'zod';
 import { $ } from 'zx';
@@ -8,6 +9,8 @@ import {
   provisionAgentCore,
   runtimeExists,
 } from './provision';
+import { createVersionInUi } from './ui-create-version';
+import { runDirFor } from '../../paths';
 import { failure } from '../../remedy';
 import type { Scenario, ScenarioContext, ScenarioResult } from '../../scenario';
 
@@ -45,6 +48,26 @@ const optionsSchema = z.strictObject({
    * once goes stale; turn this off only when something else keeps it current.
    */
   updateRuntimeAddress: z.boolean().default(true),
+  /**
+   * How the Worker Deployment Version gets created.
+   *
+   * "ui" drives the real create-version form with Playwright, because the UI
+   * is what this scenario exists to demonstrate: the CLI path proves only
+   * that the server accepts an aws-agentcore config, which was never in
+   * question. "cli" is the headless fallback for a machine with no browser.
+   */
+  createVersion: z.enum(['ui', 'cli']).default('ui'),
+  /** Show the browser while the form is driven, rather than running headless. */
+  headed: z.boolean().default(false),
+  /**
+   * The Access fields the form requires. This server runs with
+   * require_role_and_external_id false and discards both, so these are
+   * placeholders that go no further than the form. Cloud requires real ones.
+   */
+  iamRoleArn: z
+    .string()
+    .default('arn:aws:iam::000000000000:role/temporal-agentcore-demo'),
+  roleExternalId: z.string().default('agentcore-demo-external-id'),
   runtimeReadyTimeoutMs: z.number().int().default(300_000),
   workflowTimeoutMs: z.number().int().default(120_000),
 });
@@ -133,6 +156,33 @@ const missingEndpoint = () =>
     ],
   });
 
+/** Playwright ships the driver in the package and the browsers out of band. */
+const checkBrowserInstalled = async () => {
+  const probe = await $`npx playwright install --dry-run chromium`
+    .quiet()
+    .nothrow();
+
+  // --dry-run prints where it would install and exits 0 whether or not the
+  // browser is there, so the launch is what actually settles it.
+  const launched = await chromium
+    .launch({ headless: true })
+    .then((browser) => browser.close().then(() => true))
+    .catch(() => false);
+
+  if (launched) return;
+
+  throw failure({
+    attempting:
+      'This scenario creates the Version by driving the UI, and no Playwright browser could be launched.',
+    reported: probe.stdout || probe.stderr,
+    fixes: [
+      'Install the browser: npx playwright install chromium.',
+      'Or set createVersion: "cli" to create the Version with the CLI instead. That runs anywhere, but it gives up the thing this scenario demonstrates.',
+    ],
+    seeAlso: ['npx playwright install --dry-run chromium'],
+  });
+};
+
 export const scenario: Scenario = {
   describe:
     'Creates a Worker Deployment Version whose compute provider is Bedrock AgentCore, lets the Worker Controller invoke it, and runs a workflow on the Worker that starts inside the AgentCore session.',
@@ -141,6 +191,11 @@ export const scenario: Scenario = {
     const { options, endpointArn, provision } = resolveSource(raw);
 
     if (!endpointArn && !provision) throw missingEndpoint();
+
+    // The Version is created by driving a browser, and Playwright downloads
+    // its browsers separately from the package. Finding that out here costs
+    // seconds; finding it out in run costs a server build and a tunnel first.
+    if (options.createVersion === 'ui') await checkBrowserInstalled();
 
     // Prove the AWS access provisioning needs before a server build, not
     // after one.
@@ -362,26 +417,58 @@ export const scenario: Scenario = {
     // task queue association: the Worker polls with versioning, and matching
     // learns the queue from that registration. Nothing else can teach it,
     // because create-version takes no task queue.
-    const created =
-      await $`${cli} worker deployment create-version --address ${context.address} --namespace ${namespace} --deployment-name ${options.deploymentName} --build-id ${buildId} --aws-agentcore-endpoint-arn ${endpointArn} --aws-agentcore-skip-role-and-external-id`
-        .quiet()
-        .nothrow();
+    if (options.createVersion === 'ui') {
+      if (!context.uiUrl) {
+        throw failure({
+          attempting:
+            'This scenario creates the Version through the UI, and no UI is running.',
+          reported: 'The run context carries no uiUrl.',
+          fixes: [
+            'The ui stage was skipped. Drop --skip ui, or set createVersion: "cli" to use the CLI instead and give up what this scenario is demonstrating.',
+          ],
+        });
+      }
 
-    if (created.exitCode !== 0) {
-      throw failure({
-        attempting: `The server rejected Version ${buildId} with the aws-agentcore compute provider.`,
-        reported: created.stderr || created.stdout,
-        fixes: [
-          '"unknown compute provider" or "Could not instantiate compute provider" means the server does not have the provider registered: its auto-scaled-workers dependency predates it. requires.serverModules is what asserts that, so check the server stage actually built from a checkout carrying the bump.',
-          '"workercontroller" errors mean the feature gate is off: set workercontroller.enabled in dynamicConfig.',
-          'An AWS error here comes from ValidateConfig calling GetAgentRuntimeEndpoint, so it means the credentials the server runs with cannot reach the endpoint. The server needs AWS_REGION and working credentials in its own environment, not just yours.',
-          'A validation error naming the ARN means it is not a Runtime Endpoint ARN; it must end in /runtime-endpoint/<name>.',
-        ],
-        seeAlso: [
-          `aws bedrock-agentcore-control get-agent-runtime-endpoint --region ${options.region} --agent-runtime-id ${runtimeId} --endpoint-name ${endpointName}`,
-          'The server log in the run directory records what the Worker Controller activity returned.',
-        ],
-      });
+      observations.push(
+        ...(await createVersionInUi({
+          uiUrl: context.uiUrl,
+          namespace,
+          deploymentName: options.deploymentName,
+          buildId,
+          endpointArn,
+          iamRoleArn: options.iamRoleArn,
+          externalId: options.roleExternalId,
+          screenshotDir: runDirFor('agentcore-serverless-worker'),
+          headed: options.headed,
+          log,
+        })),
+      );
+
+      observations.push(
+        "The form required an IAM Role ARN and an External ID, which this server discards because it runs with require_role_and_external_id false. The UI cannot express the CLI's --aws-agentcore-skip-role-and-external-id, so a self-hosted operator who set that has to type values that go nowhere.",
+      );
+    } else {
+      const created =
+        await $`${cli} worker deployment create-version --address ${context.address} --namespace ${namespace} --deployment-name ${options.deploymentName} --build-id ${buildId} --aws-agentcore-endpoint-arn ${endpointArn} --aws-agentcore-skip-role-and-external-id`
+          .quiet()
+          .nothrow();
+
+      if (created.exitCode !== 0) {
+        throw failure({
+          attempting: `The server rejected Version ${buildId} with the aws-agentcore compute provider.`,
+          reported: created.stderr || created.stdout,
+          fixes: [
+            '"unknown compute provider" or "Could not instantiate compute provider" means the server does not have the provider registered: its auto-scaled-workers dependency predates it. requires.serverModules is what asserts that, so check the server stage actually built from a checkout carrying the bump.',
+            '"workercontroller" errors mean the feature gate is off: set workercontroller.enabled in dynamicConfig.',
+            'An AWS error here comes from ValidateConfig calling GetAgentRuntimeEndpoint, so it means the credentials the server runs with cannot reach the endpoint. The server needs AWS_REGION and working credentials in its own environment, not just yours.',
+            'A validation error naming the ARN means it is not a Runtime Endpoint ARN; it must end in /runtime-endpoint/<name>.',
+          ],
+          seeAlso: [
+            `aws bedrock-agentcore-control get-agent-runtime-endpoint --region ${options.region} --agent-runtime-id ${runtimeId} --endpoint-name ${endpointName}`,
+            'The server log in the run directory records what the Worker Controller activity returned.',
+          ],
+        });
+      }
     }
 
     observations.push(

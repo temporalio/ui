@@ -262,6 +262,45 @@ once.
 The stage implies `ngrok` on PATH, so a definition does not restate it, and
 preflight fails with that name before any stage starts.
 
+## Creating the Version through the UI
+
+`agentcore-serverless-worker` creates its Worker Deployment Version by driving
+the real create-version form with Playwright, not by calling the CLI.
+
+That is deliberate. The CLI could already create an AgentCore Version before
+any of this existed, so a run that shells out to `temporal worker deployment
+create-version` proves the server works and says nothing about the UI. What is
+under review is whether the form offers the provider, whether its one distinct
+field validates, and whether the config the form builds is one the server
+accepts. Only driving the form answers that.
+
+The run opens the form, selects **Amazon Bedrock AgentCore**, fills the Agent
+Runtime Endpoint ARN and the Access fields, submits, and reports what it saw.
+Screenshots land in the run directory, one per step, so a failure leaves a
+picture of where it stopped.
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `createVersion` | `ui` | `cli` falls back to the CLI, for a machine with no browser |
+| `headed` | `false` | `true` shows the browser doing it |
+
+The `ui` stage is load-bearing here: `--skip ui` leaves the scenario with
+nothing to drive, and it says so rather than falling back silently. Playwright
+downloads its browsers separately from the package, so preflight launches one
+before any stage starts rather than after a server build.
+
+### The Access fields go nowhere
+
+The form makes **IAM Role ARN** and **External ID** required. This server runs
+with `workercontroller.compute_providers.aws.require_role_and_external_id` set
+to false and discards both, so the run types placeholders purely to get past
+the validation.
+
+That gap is real, not an artifact of the demo: the UI has no equivalent of the
+CLI's `--aws-agentcore-skip-role-and-external-id`, so a self-hosted operator
+who turned the requirement off can create a Version by CLI but not by form.
+FE-675 tracks it.
+
 ## Provisioning the AgentCore runtime
 
 `agentcore-serverless-worker` needs a Bedrock AgentCore Runtime to invoke.

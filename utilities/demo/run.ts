@@ -372,6 +372,10 @@ export const startFeatureDemo = async (
     const context = {
       address,
       publicAddress,
+      // The UI the ui stage started when it ran, which is the one built from
+      // this checkout. The server's bundled UI is the fallback, and is
+      // whatever the server binary shipped with.
+      uiUrl: webUrl ?? bundledUiUrl,
       namespace: definition.server.namespace,
       log,
     };

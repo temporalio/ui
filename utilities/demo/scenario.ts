@@ -17,6 +17,12 @@ export type ScenarioContext = {
    * rather than `address`, because the provider cannot dial localhost.
    */
   publicAddress?: string;
+  /**
+   * Where a person can open this run in a browser. Set to the UI the ui stage
+   * started when it ran, and the server's bundled UI otherwise. A scenario
+   * that hands a step to the reviewer needs this to say where to go.
+   */
+  uiUrl?: string;
   namespace: string;
   log: Logger;
 };
