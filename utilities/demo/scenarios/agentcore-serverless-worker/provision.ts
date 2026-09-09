@@ -22,6 +22,12 @@ export type ProvisionResult = {
   /** Resources this run created, as teardown commands. Empty when all reused. */
   created: string[];
   reused: boolean;
+  /**
+   * True when the runtime was created with this run's environment already set,
+   * so the caller has nothing to update. A reused runtime carries whatever a
+   * previous run left on it and does need updating.
+   */
+  environmentApplied: boolean;
 };
 
 /**
@@ -156,6 +162,69 @@ export const runtimeExists = async (
   return { exists: false, reported: got.stderr || got.stdout };
 };
 
+/**
+ * Waits for a runtime to leave CREATING.
+ *
+ * create-agent-runtime returns as soon as the request is accepted, and the
+ * service rejects both updates and invokes until the runtime is ready. Without
+ * this the next call fails with a ConflictException, and whether it does is a
+ * matter of how fast the rest of the run is.
+ */
+const waitForRuntime = async (
+  region: string,
+  runtimeId: string,
+  log: Logger,
+  timeoutMs = 300_000,
+) => {
+  const deadline = Date.now() + timeoutMs;
+  let announced = false;
+
+  while (Date.now() < deadline) {
+    const got = await probe('aws', [
+      'bedrock-agentcore-control',
+      'get-agent-runtime',
+      '--region',
+      region,
+      '--agent-runtime-id',
+      runtimeId,
+      '--output',
+      'json',
+    ]);
+
+    if (got.exitCode === 0) {
+      const status = (JSON.parse(got.stdout) as { status?: string }).status;
+
+      if (status === 'READY') return;
+
+      if (status && /FAILED|DELET/.test(status)) {
+        throw failure({
+          attempting: `AgentCore runtime ${runtimeId} reached ${status}, so no Worker can start from it.`,
+          fixes: [
+            'A CREATE_FAILED runtime usually cannot pull its image; check the execution role can read the ECR repository.',
+          ],
+          seeAlso: [
+            `aws bedrock-agentcore-control get-agent-runtime --region ${region} --agent-runtime-id ${runtimeId}`,
+          ],
+        });
+      }
+
+      if (!announced) {
+        log(`Waiting for runtime ${runtimeId} to become ready`);
+        announced = true;
+      }
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 10_000));
+  }
+
+  throw failure({
+    attempting: `AgentCore runtime ${runtimeId} did not become ready within ${timeoutMs}ms.`,
+    seeAlso: [
+      `aws bedrock-agentcore-control get-agent-runtime --region ${region} --agent-runtime-id ${runtimeId}`,
+    ],
+  });
+};
+
 const runtimeEndpointArn = (
   region: string,
   account: string,
@@ -200,6 +269,7 @@ const existingRuntimeId = async (
  */
 export const provisionAgentCore = async (
   region: string,
+  environment: Record<string, string>,
   log: Logger,
 ): Promise<ProvisionResult> => {
   const { account } = await checkProvisioningAccess(region);
@@ -210,10 +280,14 @@ export const provisionAgentCore = async (
   if (alreadyThere) {
     log(`Reusing AgentCore runtime ${alreadyThere} from a previous provision`);
 
+    await waitForRuntime(region, alreadyThere, log);
+
     return {
       endpointArn: runtimeEndpointArn(region, account, alreadyThere),
       created: [],
       reused: true,
+      // Whatever a previous run set is on it, so the caller must update it.
+      environmentApplied: false,
     };
   }
 
@@ -439,9 +513,12 @@ export const provisionAgentCore = async (
     `aws bedrock-agentcore-control delete-agent-runtime --region ${region} --agent-runtime-id ${runtimeId}`,
   );
 
+  await waitForRuntime(region, runtimeId, log);
+
   return {
     endpointArn: runtimeEndpointArn(region, account, runtimeId),
     created,
     reused: false,
+    environmentApplied: true,
   };
 };

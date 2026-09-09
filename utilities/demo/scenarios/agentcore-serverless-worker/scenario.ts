@@ -199,16 +199,30 @@ export const scenario: Scenario = {
 
     const teardown: string[] = [];
     let endpointArn = given;
+    // What the Worker inside AgentCore needs in order to reach this run.
+    const workerEnvironment = {
+      TEMPORAL_ADDRESS: context.publicAddress,
+      TEMPORAL_NAMESPACE: namespace,
+      TEMPORAL_TASK_QUEUE: options.taskQueue,
+    };
+    // A runtime created just now already carries the environment above, so
+    // there is nothing to point at anything.
+    let environmentApplied = false;
 
     if (!endpointArn && provision) {
       log(
         'No endpoint ARN given, so provisioning one. An AgentCore runtime bills while it exists; the summary lists what was created and how to remove it.',
       );
 
-      const provisioned = await provisionAgentCore(options.region, log);
+      const provisioned = await provisionAgentCore(
+        options.region,
+        workerEnvironment,
+        log,
+      );
 
       endpointArn = provisioned.endpointArn;
       teardown.push(...provisioned.created);
+      environmentApplied = provisioned.environmentApplied;
 
       if (provisioned.reused) {
         log('Reused an AgentCore runtime a previous run provisioned');
@@ -231,7 +245,7 @@ export const scenario: Scenario = {
 
     log(`Using Temporal CLI at ${cli}`);
 
-    if (options.updateRuntimeAddress) {
+    if (options.updateRuntimeAddress && !environmentApplied) {
       log(
         `Pointing AgentCore runtime ${runtimeId} at ${context.publicAddress}`,
       );
@@ -281,13 +295,24 @@ export const scenario: Scenario = {
           runtime.agentRuntimeArtifact,
         )} --network-configuration ${JSON.stringify(
           runtime.networkConfiguration ?? { networkMode: 'PUBLIC' },
-        )} --environment-variables ${JSON.stringify({
-          TEMPORAL_ADDRESS: context.publicAddress,
-          TEMPORAL_NAMESPACE: namespace,
-          TEMPORAL_TASK_QUEUE: options.taskQueue,
-        })} --output json`
+        )} --environment-variables ${JSON.stringify(
+          workerEnvironment,
+        )} --output json`
           .quiet()
           .nothrow();
+
+      if (updated.exitCode !== 0 && /ConflictException/.test(updated.stderr)) {
+        throw failure({
+          attempting: `AgentCore runtime ${runtimeId} was busy and would not accept the tunnel address.`,
+          reported: updated.stderr,
+          fixes: [
+            'The runtime is mid-create or mid-update. It settles in a minute or two; run the scenario again.',
+          ],
+          seeAlso: [
+            `aws bedrock-agentcore-control get-agent-runtime --region ${options.region} --agent-runtime-id ${runtimeId} --query status`,
+          ],
+        });
+      }
 
       if (updated.exitCode !== 0) {
         throw failure({
@@ -314,6 +339,10 @@ export const scenario: Scenario = {
 
       observations.push(
         `AgentCore runtime ${runtimeId} points at ${context.publicAddress}, this run's tunnel.`,
+      );
+    } else if (environmentApplied) {
+      observations.push(
+        `AgentCore runtime ${runtimeId} was created pointing at ${context.publicAddress}, this run's tunnel.`,
       );
     }
 
