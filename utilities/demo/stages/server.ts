@@ -21,6 +21,7 @@ import {
   planServerStrategy,
   satisfies,
   unmetModuleRequirements,
+  workspaceGoVersion,
 } from '../requirements';
 
 export type ProvisionedServer = {
@@ -336,8 +337,13 @@ const buildWorkspaceCli = async (
   // Some features reach the server through a dependency bump rather than a
   // server commit, so the go.mod of the checkout being built is the thing to
   // check. serverCommit cannot express it: the commit lives in another repo.
+  const [serverGoMod, cliGoMod] = await Promise.all([
+    readFile(join(temporal.path, 'go.mod'), 'utf8'),
+    readFile(join(cli.path, 'go.mod'), 'utf8'),
+  ]);
+
   const unmet = unmetModuleRequirements(
-    await readFile(join(temporal.path, 'go.mod'), 'utf8'),
+    serverGoMod,
     server.requires.serverModules,
   );
 
@@ -358,9 +364,14 @@ const buildWorkspaceCli = async (
   const goWork = join(WORK_DIR, 'go.work');
 
   await mkdir(BIN_DIR, { recursive: true });
+  // Go refuses a workspace whose directive is below a member module's, and
+  // both repositories bump theirs on their own schedule, so this follows the
+  // checkouts rather than being pinned here.
+  const goVersion = workspaceGoVersion([serverGoMod, cliGoMod]);
+
   await writeFile(
     goWork,
-    `go 1.26.4\n\nuse (\n\t${cli.path}\n\t${temporal.path}\n)\n`,
+    `go ${goVersion}\n\nuse (\n\t${cli.path}\n\t${temporal.path}\n)\n`,
   );
 
   const provenance = [

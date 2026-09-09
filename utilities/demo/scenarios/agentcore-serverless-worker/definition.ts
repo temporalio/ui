@@ -18,6 +18,12 @@ export const definition = defineScenario({
       },
       commands: ['aws', 'temporal'],
     },
+    // Distinct ports on purpose. The server stage stands down when something
+    // already listens, which for this scenario would silently reuse a server
+    // that has no aws-agentcore provider and make the run prove nothing.
+    port: 7533,
+    uiPort: 8533,
+    httpPort: 7543,
     dynamicConfig: {
       // Without this the server rejects any compute config outright.
       'workercontroller.enabled': true,

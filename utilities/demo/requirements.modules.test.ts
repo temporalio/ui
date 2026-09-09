@@ -4,6 +4,7 @@ import {
   moduleSatisfies,
   readModuleVersions,
   unmetModuleRequirements,
+  workspaceGoVersion,
 } from './requirements';
 
 // Shaped like temporalio/temporal's go.mod, with the auto-scaled-workers line
@@ -85,5 +86,31 @@ describe('unmetModuleRequirements', () => {
 
   it('is a no-op with no requirements', () => {
     expect(unmetModuleRequirements(GO_MOD)).toEqual([]);
+  });
+});
+
+describe('workspaceGoVersion', () => {
+  const mod = (version: string) => `module x\n\ngo ${version}\n`;
+
+  it('takes the highest directive among the modules', () => {
+    // The real failure: the CLI moved to 1.26.5 while the server was on 1.26.4,
+    // and a workspace pinned to the lower one will not build.
+    expect(workspaceGoVersion([mod('1.26.4'), mod('1.26.5')])).toBe('1.26.5');
+    expect(workspaceGoVersion([mod('1.26.5'), mod('1.26.4')])).toBe('1.26.5');
+  });
+
+  it('handles a two-part directive', () => {
+    expect(workspaceGoVersion([mod('1.27')])).toBe('1.27');
+  });
+
+  it('falls back when no module declares one', () => {
+    expect(workspaceGoVersion(['module x\n'], '1.24')).toBe('1.24');
+  });
+
+  it('ignores a go directive inside a require line', () => {
+    const tricky =
+      'module x\n\ngo 1.26.4\n\nrequire (\n\tgo.temporal.io/api v1.63.5\n)\n';
+
+    expect(workspaceGoVersion([tricky])).toBe('1.26.4');
   });
 });

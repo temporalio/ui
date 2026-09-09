@@ -272,3 +272,26 @@ export const unmetModuleRequirements = (
       version ? !moduleSatisfies(version, minimum) : true,
     );
 };
+
+/** The `go` directive a go.mod declares, if any. */
+export const goDirective = (goMod: string): string | undefined =>
+  /^go\s+(\d+\.\d+(?:\.\d+)?)\s*$/m.exec(goMod)?.[1];
+
+/**
+ * The `go` directive a workspace must declare to hold these modules: the
+ * highest any of them asks for. Go refuses to build a workspace whose
+ * directive is below a member module's, and both repositories bump theirs on
+ * their own schedule, so this cannot be a constant.
+ */
+export const workspaceGoVersion = (
+  goMods: readonly string[],
+  fallback = '1.24',
+): string =>
+  goMods
+    .map((mod) => goDirective(mod))
+    .filter((version): version is string => Boolean(version))
+    .reduce(
+      (highest, version) =>
+        compareVersions(version, highest) > 0 ? version : highest,
+      fallback,
+    );

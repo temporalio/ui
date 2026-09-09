@@ -9,7 +9,13 @@ import { z } from 'zod';
 import { requireWorkflowExample } from './catalog';
 import { exampleEntrySchema } from './examples';
 
-export const STAGES = ['server', 'worker', 'ui', 'scenarios'] as const;
+export const STAGES = [
+  'server',
+  'worker',
+  'tunnel',
+  'ui',
+  'scenarios',
+] as const;
 
 export type Stage = (typeof STAGES)[number];
 

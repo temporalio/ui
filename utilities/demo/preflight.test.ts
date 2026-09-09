@@ -7,8 +7,11 @@ import {
   requiredCommands,
 } from './preflight';
 
-const scenario = (input: Parameters<typeof defineScenario>[0]) =>
-  defineScenario({ name: 'x', title: 'x', ...input });
+type Input = Parameters<typeof defineScenario>[0];
+
+// name and title are the only required fields, and no case here varies them.
+const scenario = (input: Omit<Input, 'name' | 'title'>) =>
+  defineScenario({ ...input, name: 'x', title: 'x' });
 
 describe('impliedCommands', () => {
   it('needs ngrok when the tunnel stage is on', () => {

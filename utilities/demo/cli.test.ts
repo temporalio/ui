@@ -176,7 +176,9 @@ describe('demo start', () => {
     ).rejects.toThrow('--skip needs one of these stages');
 
     expect(commands.start).not.toHaveBeenCalled();
-    expect(errors.join('\n')).toContain('server, worker, ui, scenarios');
+    expect(errors.join('\n')).toContain(
+      'server, worker, tunnel, ui, scenarios',
+    );
   });
 
   it('refuses a flag it does not have', async () => {

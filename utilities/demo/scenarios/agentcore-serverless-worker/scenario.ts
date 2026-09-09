@@ -147,26 +147,72 @@ export const scenario: Scenario = {
         `Pointing AgentCore runtime ${runtimeId} at ${context.publicAddress}`,
       );
 
+      // update-agent-runtime replaces the runtime rather than patching it, so
+      // the role, artifact, and network configuration have to be sent back
+      // unchanged alongside the new environment. Reading them first keeps the
+      // scenario from having to know how the runtime was built.
+      const current =
+        await $`aws bedrock-agentcore-control get-agent-runtime --region ${options.region} --agent-runtime-id ${runtimeId} --output json`
+          .quiet()
+          .nothrow();
+
+      if (current.exitCode !== 0) {
+        throw failure({
+          attempting: `Could not read AgentCore runtime ${runtimeId}, so its role and artifact could not be carried into the update.`,
+          reported: current.stderr || current.stdout,
+          fixes: [
+            'AccessDenied means the caller lacks bedrock-agentcore:GetAgentRuntime.',
+            `ResourceNotFound means no runtime with that id exists in ${options.region}; the region must match the one in the endpoint ARN.`,
+          ],
+          seeAlso: [
+            `aws bedrock-agentcore-control list-agent-runtimes --region ${options.region}`,
+            'aws sts get-caller-identity',
+          ],
+        });
+      }
+
+      const runtime = JSON.parse(current.stdout) as {
+        roleArn?: string;
+        agentRuntimeArtifact?: unknown;
+        networkConfiguration?: unknown;
+      };
+
+      if (!runtime.roleArn || !runtime.agentRuntimeArtifact) {
+        throw failure({
+          attempting: `AgentCore runtime ${runtimeId} did not report the role and artifact needed to update it.`,
+          reported: current.stdout,
+          fixes: [
+            'Update it by hand with --role-arn and --agent-runtime-artifact, then set updateRuntimeAddress: false.',
+          ],
+        });
+      }
+
       const updated =
-        await $`aws bedrock-agentcore-control update-agent-runtime --region ${options.region} --agent-runtime-id ${runtimeId} --environment-variables ${JSON.stringify(
-          {
-            TEMPORAL_ADDRESS: context.publicAddress,
-            TEMPORAL_NAMESPACE: namespace,
-            TEMPORAL_TASK_QUEUE: options.taskQueue,
-          },
-        )} --output json`
+        await $`aws bedrock-agentcore-control update-agent-runtime --region ${options.region} --agent-runtime-id ${runtimeId} --role-arn ${runtime.roleArn} --agent-runtime-artifact ${JSON.stringify(
+          runtime.agentRuntimeArtifact,
+        )} --network-configuration ${JSON.stringify(
+          runtime.networkConfiguration ?? { networkMode: 'PUBLIC' },
+        )} --environment-variables ${JSON.stringify({
+          TEMPORAL_ADDRESS: context.publicAddress,
+          TEMPORAL_NAMESPACE: namespace,
+          TEMPORAL_TASK_QUEUE: options.taskQueue,
+        })} --output json`
           .quiet()
           .nothrow();
 
       if (updated.exitCode !== 0) {
-        throw new Error(
-          [
-            `Could not update AgentCore runtime ${runtimeId}.`,
-            'update-agent-runtime requires the current role and artifact too;',
-            'see the README for the full command.',
-            updated.stderr.trim(),
-          ].join('\n'),
-        );
+        throw failure({
+          attempting: `Could not point AgentCore runtime ${runtimeId} at this run's tunnel, so the Worker it starts would dial a stale address.`,
+          reported: updated.stderr || updated.stdout,
+          fixes: [
+            'AccessDenied means the caller lacks bedrock-agentcore:UpdateAgentRuntime, or iam:PassRole on the execution role.',
+            'ValidationException naming the container URI means the execution role cannot pull the image from ECR.',
+            'Or set updateRuntimeAddress: false and keep TEMPORAL_ADDRESS current yourself.',
+          ],
+          seeAlso: [
+            `aws bedrock-agentcore-control get-agent-runtime --region ${options.region} --agent-runtime-id ${runtimeId}`,
+          ],
+        });
       }
 
       await waitForEndpoint(
