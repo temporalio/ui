@@ -11,12 +11,10 @@
   import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
   import PendingActivityState from '$lib/components/standalone-activities/pending-activity-state.svelte';
   import WorkflowCallback from '$lib/components/workflow/workflow-callback.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconRetry } from '$lib/io/icon';
-  import type { Failure } from '$lib/types';
+  import { BadgeCount } from '$lib/io/badge-count';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -41,24 +39,9 @@
       ($activityExecution?.info?.attempt ?? 0) > 1,
   );
 
-  const hasLastHeartbeatTime = $derived(
-    !!$activityExecution?.info?.lastHeartbeatTime,
-  );
-
-  const hasTotalHeartbeatCount = $derived(
-    $activityExecution?.info?.totalHeartbeatCount != undefined,
-  );
-
-  const heartbeatTimeout = $derived(
-    $activityExecution?.info?.heartbeatTimeout ?? '',
-  );
-
-  const hasHeartbeatTimeout = $derived(!!heartbeatTimeout);
-
-  const heartbeatRowCount = $derived(
-    (hasLastHeartbeatTime ? 1 : 0) +
-      (hasTotalHeartbeatCount ? 1 : 0) +
-      (hasHeartbeatTimeout ? 1 : 0),
+  const nextRetryDelay = $derived(
+    $activityExecution?.info?.lastFailure?.applicationFailureInfo
+      ?.nextRetryDelay,
   );
 
   const hasCodeBlocks = $derived(
@@ -71,22 +54,18 @@
   );
 </script>
 
-{#snippet activityExecutionAttemptsBadge(
+{#snippet activityExecutionAttempts(
   attempt: number,
   maximumAttempts: number | null,
-  lastFailure: Failure | null,
 )}
-  {@const failed = attempt > 1 && !!lastFailure}
-  {@const badgeType = failed ? 'danger' : 'default'}
-
   <DetailListLabel class="flex items-center"
     >{translate('standalone-activities.attempt')}</DetailListLabel
   >
   <DetailListValue>
-    <Badge type={badgeType} class="flex items-center gap-2">
-      <IconRetry class={failed ? 'text-red-400' : ''} />
-      <span>{attempt} of {formatMaximumAttempts(maximumAttempts)}</span>
-    </Badge>
+    <BadgeCount
+      value={attempt}
+      total={formatMaximumAttempts(maximumAttempts)}
+    />
 
     {#if maximumAttempts && !isClosed}
       <p class="ml-1 text-secondary">
@@ -128,14 +107,66 @@
                   runState={$activityExecution.info.runState}
                 />
               </DetailListValue>
-              {@render activityExecutionAttemptsBadge(
+              {@render activityExecutionAttempts(
                 $activityExecution.info.attempt ?? 0,
                 $activityExecution.info.retryPolicy?.maximumAttempts ?? null,
-                $activityExecution.info.lastFailure ?? null,
               )}
             </DetailList>
           </div>
         {/if}
+
+        {#if isRetrying}
+          <div class="space-y-2">
+            <h5>
+              {translate('standalone-activities.retry-state')}
+            </h5>
+            <DetailList
+              rowCount={3 + (nextRetryDelay ? 1 : 0)}
+              aria-label={translate('standalone-activities.retry-state')}
+            >
+              <DetailListLabel
+                >{translate(
+                  'standalone-activities.current-retry-interval',
+                )}</DetailListLabel
+              >
+              <DetailListTextValue
+                text={fromSeconds(
+                  $activityExecution.info.currentRetryInterval,
+                ) || '-'}
+              />
+
+              {#if nextRetryDelay}
+                <DetailListLabel
+                  >{translate(
+                    'standalone-activities.next-retry-delay',
+                  )}</DetailListLabel
+                >
+                <DetailListTextValue text={fromSeconds(nextRetryDelay)} />
+              {/if}
+
+              <DetailListLabel
+                >{translate(
+                  'standalone-activities.last-attempt-complete-time',
+                )}</DetailListLabel
+              >
+              <DetailListTimestampValue
+                timestamp={$activityExecution.info.lastAttemptCompleteTime}
+                fallback="-"
+              />
+
+              <DetailListLabel
+                >{translate(
+                  'standalone-activities.next-attempt-schedule-time',
+                )}</DetailListLabel
+              >
+              <DetailListTimestampValue
+                timestamp={$activityExecution.info.nextAttemptScheduleTime}
+                fallback="-"
+              />
+            </DetailList>
+          </div>
+        {/if}
+
         <div class="space-y-2">
           <h5>
             {translate('standalone-activities.timing-and-progress')}
@@ -149,23 +180,12 @@
             aria-label={translate('standalone-activities.timing-and-progress')}
           >
             {#if isClosed}
-              <DetailListLabel
-                >{translate(
-                  'standalone-activities.execution-duration',
-                )}</DetailListLabel
-              >
-              <DetailListTextValue
-                text={formatDurationAbbreviated(
-                  $activityExecution.info.executionDuration ?? '',
-                )}
-              />
               {#if $activityExecution.info.attempt != undefined}
                 {#if $activityExecution.info.attempt > 1}
-                  {@render activityExecutionAttemptsBadge(
+                  {@render activityExecutionAttempts(
                     $activityExecution.info.attempt,
                     $activityExecution.info.retryPolicy?.maximumAttempts ??
                       null,
-                    $activityExecution.info.lastFailure ?? null,
                   )}
                 {:else}
                   <DetailListLabel
@@ -187,16 +207,23 @@
             <DetailListTimestampValue
               timestamp={$activityExecution.info.scheduleTime}
             />
-            {#if $activityExecution.info.startDelay}
-              <DetailListLabel
-                >{translate(
-                  'standalone-activities.start-delay',
-                )}</DetailListLabel
-              >
-              <DetailListTextValue
-                text={fromSeconds($activityExecution.info.startDelay)}
-              />
-            {/if}
+            <DetailListLabel
+              >{translate('standalone-activities.start-delay')}</DetailListLabel
+            >
+            <DetailListTextValue
+              text={fromSeconds($activityExecution.info.startDelay ?? '') ||
+                '-'}
+            />
+            <DetailListLabel
+              >{translate(
+                'standalone-activities.execution-time',
+              )}</DetailListLabel
+            >
+            <DetailListTextValue
+              text={formatDurationAbbreviated(
+                $activityExecution.info.executionTime ?? '',
+              ) || '-'}
+            />
             <DetailListLabel
               >{translate(
                 'standalone-activities.last-started-time',
@@ -204,95 +231,47 @@
             >
             <DetailListTimestampValue
               timestamp={$activityExecution.info.lastStartedTime}
+              fallback="-"
             />
-            {#if isClosed}
-              <DetailListLabel>{translate('common.end')}</DetailListLabel>
-              <DetailListTimestampValue
-                timestamp={$activityExecution.info.lastStartedTime}
-              />
-            {/if}
           </DetailList>
         </div>
-        {#if heartbeatRowCount > 0}
-          <div class="space-y-2">
-            <h5>
-              {translate('standalone-activities.health')}
-            </h5>
-            <DetailList
-              rowCount={heartbeatRowCount}
-              aria-label={translate('standalone-activities.health')}
-            >
-              {#if hasLastHeartbeatTime}
-                <DetailListLabel
-                  >{translate(
-                    'standalone-activities.last-heartbeat',
-                  )}</DetailListLabel
-                >
-                <DetailListTimestampValue
-                  timestamp={$activityExecution.info.lastHeartbeatTime}
-                />
-              {/if}
-              {#if hasHeartbeatTimeout}
-                <DetailListLabel
-                  >{translate(
-                    'standalone-activities.heartbeat-timeout',
-                  )}</DetailListLabel
-                >
-                <DetailListTextValue
-                  text={fromSeconds(heartbeatTimeout) || heartbeatTimeout}
-                />
-              {/if}
-              {#if hasTotalHeartbeatCount}
-                <DetailListLabel
-                  >{translate(
-                    'standalone-activities.total-heartbeats',
-                  )}</DetailListLabel
-                >
-                <DetailListTextValue
-                  text={$activityExecution.info.totalHeartbeatCount ?? ''}
-                />
-              {/if}
-            </DetailList>
-          </div>
-        {/if}
-        {#if isRetrying}
-          <div class="space-y-2">
-            <h5>
-              {translate('standalone-activities.retry-state')}
-            </h5>
-            <DetailList
-              rowCount={3}
-              aria-label={translate('standalone-activities.retry-state')}
-            >
-              <DetailListLabel
-                >{translate(
-                  'standalone-activities.current-retry-interval',
-                )}</DetailListLabel
-              >
-              <DetailListTextValue
-                text={fromSeconds($activityExecution.info.currentRetryInterval)}
-              />
 
-              <DetailListLabel
-                >{translate(
-                  'standalone-activities.last-attempt-complete-time',
-                )}</DetailListLabel
-              >
-              <DetailListTimestampValue
-                timestamp={$activityExecution.info.lastAttemptCompleteTime}
-              />
-
-              <DetailListLabel
-                >{translate(
-                  'standalone-activities.next-attempt-schedule-time',
-                )}</DetailListLabel
-              >
-              <DetailListTimestampValue
-                timestamp={$activityExecution.info.nextAttemptScheduleTime}
-              />
-            </DetailList>
-          </div>
-        {/if}
+        <div class="space-y-2">
+          <h5>
+            {translate('standalone-activities.health')}
+          </h5>
+          <DetailList
+            rowCount={3}
+            aria-label={translate('standalone-activities.health')}
+          >
+            <DetailListLabel
+              >{translate(
+                'standalone-activities.last-heartbeat',
+              )}</DetailListLabel
+            >
+            <DetailListTimestampValue
+              timestamp={$activityExecution.info.lastHeartbeatTime}
+              fallback="-"
+            />
+            <DetailListLabel
+              >{translate(
+                'standalone-activities.heartbeat-timeout',
+              )}</DetailListLabel
+            >
+            <DetailListTextValue
+              text={fromSeconds($activityExecution.info.heartbeatTimeout) ||
+                '-'}
+            />
+            <DetailListLabel
+              >{translate(
+                'standalone-activities.total-heartbeats',
+              )}</DetailListLabel
+            >
+            <DetailListTextValue
+              text={$activityExecution.info.totalHeartbeatCount ?? '-'}
+            />
+          </DetailList>
+        </div>
 
         <div class="space-y-2">
           <h5>
@@ -310,7 +289,9 @@
               )}</DetailListLabel
             >
             <DetailListTextValue
-              text={fromSeconds($activityExecution.info.scheduleToStartTimeout)}
+              text={fromSeconds(
+                $activityExecution.info.scheduleToStartTimeout,
+              ) || '-'}
             />
             <DetailListLabel
               >{translate(
@@ -318,7 +299,9 @@
               )}</DetailListLabel
             >
             <DetailListTextValue
-              text={fromSeconds($activityExecution.info.scheduleToCloseTimeout)}
+              text={fromSeconds(
+                $activityExecution.info.scheduleToCloseTimeout,
+              ) || '-'}
             />
             <DetailListLabel
               >{translate(
@@ -326,7 +309,8 @@
               )}</DetailListLabel
             >
             <DetailListTextValue
-              text={fromSeconds($activityExecution.info.startToCloseTimeout)}
+              text={fromSeconds($activityExecution.info.startToCloseTimeout) ||
+                '-'}
             />
           </DetailList>
         </div>
@@ -355,10 +339,11 @@
               )}</DetailListLabel
             >
             <DetailListTextValue
-              text={$activityExecution.info.lastWorkerIdentity ?? ''}
+              text={$activityExecution.info.lastWorkerIdentity ?? '-'}
             />
           </DetailList>
         </div>
+
         {#if $activityExecution.info.priority}
           {@const { priorityKey, fairnessKey, fairnessWeight } =
             $activityExecution.info.priority}
@@ -391,7 +376,7 @@
                   >
                   <DetailListTextValue text={fairnessKey} />
                 {/if}
-                {#if fairnessWeight}
+                {#if fairnessWeight != null}
                   <DetailListLabel
                     >{translate(
                       'standalone-activities.fairness-weight',

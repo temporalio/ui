@@ -154,7 +154,7 @@
             variant="ghost"
             size="sm"
             class={pageShortcut === $store.currentPage
-              ? 'bg-interactive-secondary-active'
+              ? 'bg-interactive-tertiary-press'
               : ''}
             aria-label={pageButtonLabel(pageShortcut)}
             onclick={() => handlePageChange(pageShortcut)}

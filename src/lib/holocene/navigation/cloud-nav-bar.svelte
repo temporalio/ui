@@ -6,7 +6,11 @@
 
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconArrowLeft, IconArrowsLeftRightToLine } from '$lib/io/icon';
+  import {
+    IconArrowLeft,
+    IconArrowSquareCaretLeft,
+    IconArrowSquareCaretRight,
+  } from '$lib/io/icon';
 
   interface Props {
     version: string;
@@ -35,23 +39,24 @@
   <div
     class="flex flex-row items-center justify-start group-data-[nav=closed]:hidden"
   >
-    <a href={base || '/'} class="text-inherit flex items-center">
-      <Logo
-        height={24}
-        width={24}
-        class={merge(subtitle !== 'Cloud' && 'hidden')}
-      />
-    </a>
+    {#if subtitle === 'Cloud'}
+      <a href={base || '/'} class="flex items-center text-inherit">
+        <Logo height={24} width={24} />
+      </a>
+    {/if}
     {#if subtitle}
       {#if subtitleHref}
-        <a href={subtitleHref} class="contents">
+        <a
+          href={subtitleHref}
+          class="inline-flex items-center rounded hover:bg-surface-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+        >
           <IconArrowLeft
             title="Project Namespaces"
-            class="m-1.5 text-indigo-100 group-data-[nav=closed]:hidden"
+            class="m-1.5 text-primary group-data-[nav=closed]:hidden"
           />
           <h2
             class={merge(
-              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-indigo-100 underline group-data-[nav=open]:block',
+              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-primary underline hover:text-primary group-data-[nav=open]:block',
               subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
             )}
           >
@@ -61,7 +66,7 @@
       {:else}
         <h2
           class={merge(
-            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-indigo-100 group-data-[nav=open]:block',
+            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-primary group-data-[nav=open]:block',
             subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
           )}
         >
@@ -72,10 +77,14 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[8px] justify-self-end transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
+    class="mx-[8px] flex size-6 items-center justify-center justify-self-end rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
     onclick={ontoggle}
   >
-    <IconArrowsLeftRightToLine class="text-indigo-100" />
+    {#if navOpen}
+      <IconArrowSquareCaretLeft />
+    {:else}
+      <IconArrowSquareCaretRight />
+    {/if}
   </button>
 </div>
 <div role="list">
@@ -88,7 +97,7 @@
     {@render bottom()}
   {/if}
   <div
-    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-300"
+    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-inverse-secondary"
   >
     <span class="sr-only">{translate('common.version')}</span>
     {version}

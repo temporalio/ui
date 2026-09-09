@@ -29,7 +29,7 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof VerticalNav>)}
-  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
+  <div class="min-h-[400px] w-64 border-r border-primary p-4">
     <VerticalNav
       aria-label="Settings navigation"
       activeItemId={args.activeItemId}
@@ -77,7 +77,7 @@
 <Story name="With Active Item" args={{ activeItemId: 'security' }} {template} />
 
 <Story name="With Disabled Items" asChild>
-  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
+  <div class="min-h-[400px] w-64 border-r border-primary p-4">
     <VerticalNav aria-label="Settings navigation" activeItemId="overview">
       <VerticalNavItem
         id="overview"
@@ -113,7 +113,7 @@
 </Story>
 
 <Story name="Interactive" asChild>
-  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
+  <div class="min-h-[400px] w-64 border-r border-primary p-4">
     <VerticalNav aria-label="Settings navigation" {activeItemId}>
       <VerticalNavItem
         id="overview"
@@ -178,7 +178,7 @@
 </Story>
 
 <Story name="With Trailing Icons" asChild>
-  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
+  <div class="min-h-[400px] w-64 border-r border-primary p-4">
     <VerticalNav aria-label="Settings navigation" activeItemId="overview">
       <VerticalNavItem
         id="overview"
@@ -210,7 +210,7 @@
 <Story name="With Content Panels" asChild>
   <div class="flex min-h-[500px]">
     <!-- Navigation -->
-    <div class="w-64 border-r border-subtle p-4">
+    <div class="w-64 border-r border-primary p-4">
       <VerticalNav aria-label="Settings navigation" {activeItemId}>
         <VerticalNavItem
           id="overview"
@@ -278,11 +278,11 @@
             Get a high-level view of your namespace configuration and usage.
           </p>
           <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-lg border border-subtle p-4">
+            <div class="rounded-lg border border-primary p-4">
               <h3 class="mb-2 font-medium">Region</h3>
               <p class="text-sm text-secondary">us-west-2</p>
             </div>
-            <div class="rounded-lg border border-subtle p-4">
+            <div class="rounded-lg border border-primary p-4">
               <h3 class="mb-2 font-medium">Created</h3>
               <p class="text-sm text-secondary">2 months ago</p>
             </div>
@@ -294,7 +294,7 @@
           <p class="text-secondary">
             Configure deletion protection and other security features.
           </p>
-          <div class="rounded-lg border border-subtle p-4">
+          <div class="rounded-lg border border-primary p-4">
             <label class="flex items-center gap-3">
               <input type="checkbox" class="rounded" checked />
               <div>
@@ -314,10 +314,10 @@
           </p>
           <div class="space-y-2">
             <div class="flex items-center gap-2">
-              <span class="bg-interactive-secondary rounded px-2 py-1 text-sm">
+              <span class="rounded bg-surface-secondary px-2 py-1 text-sm">
                 environment: production
               </span>
-              <span class="bg-interactive-secondary rounded px-2 py-1 text-sm">
+              <span class="rounded bg-surface-secondary px-2 py-1 text-sm">
                 team: platform
               </span>
             </div>
@@ -332,7 +332,7 @@
           <p class="text-secondary">
             Configure private links and network connectivity options.
           </p>
-          <div class="rounded-lg border border-subtle p-4">
+          <div class="rounded-lg border border-primary p-4">
             <h3 class="mb-2 font-medium">Private Links</h3>
             <p class="text-sm text-secondary">No private links configured</p>
             <button class="mt-2 text-sm text-primary hover:underline">
@@ -347,13 +347,13 @@
             Define custom search attributes for advanced workflow filtering.
           </p>
           <div class="space-y-2">
-            <div class="rounded-lg border border-subtle p-3">
+            <div class="rounded-lg border border-primary p-3">
               <div class="flex items-center justify-between">
                 <span class="font-mono text-sm">CustomerId</span>
                 <span class="text-sm text-secondary">Keyword</span>
               </div>
             </div>
-            <div class="rounded-lg border border-subtle p-3">
+            <div class="rounded-lg border border-primary p-3">
               <div class="flex items-center justify-between">
                 <span class="font-mono text-sm">OrderAmount</span>
                 <span class="text-sm text-secondary">Double</span>

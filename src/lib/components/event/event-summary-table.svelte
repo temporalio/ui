@@ -145,7 +145,6 @@
     {updating}
     items={filteredItems}
     maxHeight="none"
-    class="border-t-0"
   >
     {#snippet headers()}
       <TableHeaderRow class="!h-8">

@@ -90,15 +90,15 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex items-center justify-center rounded-t border border-b-0 border-subtle/0 px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
+    @apply flex items-center justify-center rounded-t-md border border-b-0 border-transparent px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
 
     &:not(.disabled) {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-2 focus-visible:ring-primary/70;
+      @apply hover:bg-interactive-tertiary-hover focus-visible:bg-interactive-tertiary-hover focus-visible:ring-2 focus-visible:ring-interactive-primary;
     }
   }
 
   .toggle-button.active {
-    @apply surface-primary border-subtle/100;
+    @apply border-brand bg-background-primary text-brand;
   }
 
   .toggle-button.disabled {

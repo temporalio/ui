@@ -192,15 +192,18 @@
   {/if}
   <div
     class={twMerge(
-      'surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50',
+      'flex h-10 items-center rounded border border-tertiary bg-background-primary text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      !disabled && !error && 'focus-within:border-secondary hover:border-brand',
+      disabled &&
+        'cursor-not-allowed border-secondary bg-surface-tertiary text-tertiary',
+      error &&
+        'border-danger focus-within:border-danger focus-within:ring-danger',
       inputClass,
-      error && 'border-danger focus-within:ring-danger/50',
-      disabled && 'cursor-not-allowed opacity-50',
     )}
   >
     <input
       {id}
-      class="flex h-full grow border-r border-subtle bg-transparent p-2 focus-visible:outline-none disabled:cursor-not-allowed"
+      class="flex h-full grow border-r border-primary bg-transparent p-2 text-primary placeholder:text-tertiary focus-visible:outline-none disabled:cursor-not-allowed disabled:text-tertiary"
       type="number"
       {disabled}
       bind:value={rawValue}
@@ -209,7 +212,10 @@
     />
     <select
       id="{id}-unit-select"
-      class="surface-secondary h-full pl-2 focus-visible:outline-none disabled:cursor-not-allowed"
+      class={twMerge(
+        'h-full rounded-r-[inherit] bg-surface-secondary pl-2 text-primary focus-visible:outline-none disabled:cursor-not-allowed',
+        disabled && 'bg-surface-tertiary text-tertiary',
+      )}
       {disabled}
       bind:value={unit}
       onchange={handleUnitChange}

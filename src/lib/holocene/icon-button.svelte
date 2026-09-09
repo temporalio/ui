@@ -13,7 +13,7 @@
     Icon: IconComponent;
     'data-testid'?: string;
     label: string;
-    variant?: 'primary' | 'secondary' | 'ghost';
+    variant?: 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'ghost';
     class?: string;
     size?: ComponentProps<typeof Button>['size'];
     onclick?: (event: MouseEvent) => void;

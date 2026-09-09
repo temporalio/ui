@@ -1,8 +1,8 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -14,10 +14,10 @@
   } from '$lib/models/worker-status';
   import { workerStatusFilters } from '$lib/models/worker-status';
   import {
+    isWorkflowStatusType,
     type WorkflowFilters,
     workflowStatusFilters,
   } from '$lib/models/workflow-status';
-  import type { WorkflowStatus as WorkflowStatusType } from '$lib/types/workflows';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters.js';
 
   import type { StatusAttribute } from './types.ts';
@@ -51,6 +51,13 @@
       filters: workerStatusFilters,
     },
   };
+
+  const isWorkerStatusType = (
+    status: string | null,
+  ): status is WorkerStatusType =>
+    status === 'Unspecified' ||
+    status === 'Running' ||
+    status === 'ShuttingDown';
 
   const open = writable(false);
   let localFilters = $state([...filters]);
@@ -117,21 +124,21 @@
   });
 </script>
 
-<MenuContainer {open}>
+<MenuContainer {open} class="min-w-0 max-w-full">
   <MenuButton
     size="xs"
     controls={controlsId}
     hasIndicator
-    class="min-w-0 max-w-full bg-secondary"
+    class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-surface-secondary"
     title="{attribute} = {statusValues}"
   >
-    <span class="truncate">{attribute} =</span><span
-      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
-      >{statusValues}</span
-    >
+    <div class="min-w-0 text-left">
+      <span class="break-words text-primary">{attribute} =</span>
+      <span class="break-all text-brand">{statusValues}</span>
+    </div>
   </MenuButton>
 
-  <Menu id={controlsId} class="max-h-fit w-80 max-w-fit p-4" keepOpen>
+  <Menu id={controlsId} usePortal class="max-h-fit w-80 max-w-fit p-4" keepOpen>
     <div class="space-y-2">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-medium">
@@ -159,10 +166,10 @@
           {/snippet}
           {#if status === 'All'}
             <Translate key="workflows.all-statuses" />
-          {:else if attribute === 'ExecutionStatus'}
-            <WorkflowStatus status={status as WorkflowStatusType} />
-          {:else if attribute === 'WorkerStatus'}
-            <WorkerStatus status={status as WorkerStatusType} />
+          {:else if attribute === 'ExecutionStatus' && status && isWorkflowStatusType(status)}
+            <WorkflowStatusBadge {status} />
+          {:else if attribute === 'WorkerStatus' && isWorkerStatusType(status)}
+            <WorkerStatus {status} />
           {/if}
         </MenuItem>
       {/each}

@@ -242,7 +242,9 @@
   />
   <IsOssGuard {isCloud}>
     <div class="flex flex-col gap-0">
-      <p class="text-base text-primary">{translate('nexus.access-policy')}</p>
+      <p class="text-base text-primary">
+        {translate('nexus.access-policy')}
+      </p>
       <p class="text-xs text-secondary">
         {translate('nexus.allowed-caller-namespaces-description')}
       </p>
