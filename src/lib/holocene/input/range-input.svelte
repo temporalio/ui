@@ -105,7 +105,7 @@
           id="{id}-range"
           name="range"
           type="range"
-          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-primary"
+          class="h-0 w-full cursor-pointer appearance-none rounded border-y border-tertiary"
           bind:value
           {min}
           {max}
@@ -143,7 +143,7 @@
   }
 
   .numeric-input {
-    @apply h-10 w-10 border border-subtle bg-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply h-10 w-10 border border-primary bg-surface-information text-center text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary;
 
     appearance: textfield;
   }
@@ -155,11 +155,11 @@
   }
 
   .numeric-input.invalid {
-    @apply border-danger bg-red-100 text-danger;
+    @apply border-danger bg-surface-danger text-danger ring-danger;
   }
 
   .numeric-input:focus {
-    @apply outline ring-2 ring-primary/70;
+    @apply outline ring-2;
   }
 
   .floating-value {
@@ -167,11 +167,11 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-information;
+    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-interactive-primary;
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply h-4 w-8 rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
+    @apply h-4 w-8 rounded-full border border-solid border-primary bg-interactive-primary shadow-none;
   }
 
   input[type='range']:focus {
@@ -179,10 +179,10 @@
   }
 
   input[type='range']:focus::-webkit-slider-thumb {
-    @apply border border-primary ring-2 ring-primary/70;
+    @apply border border-primary ring-2 ring-interactive-primary ring-offset-2 ring-offset-background-primary;
   }
 
   input[type='range']:focus::-moz-range-thumb {
-    @apply border border-primary ring-2 ring-primary/70;
+    @apply border border-primary ring-2 ring-interactive-primary ring-offset-2 ring-offset-background-primary;
   }
 </style>

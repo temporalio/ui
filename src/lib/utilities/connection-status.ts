@@ -16,7 +16,7 @@ export const deriveConnectionStatus = (
 export const connectionStateColor: Record<ConnectionState, string> = {
   connected: 'text-success',
   failed: 'text-danger',
-  pending: 'text-subtle',
+  pending: 'text-tertiary',
 };
 
 export const connectionStateLabel = (state: ConnectionState): string => {

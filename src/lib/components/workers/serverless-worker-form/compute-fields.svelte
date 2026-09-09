@@ -158,7 +158,7 @@
   }
 </script>
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <h2 class="text-base font-medium">
   {translate('workers.resource-section')}
@@ -266,7 +266,7 @@
   </div>
 {/if}
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <h2 class="text-base font-medium">
   {translate('workers.access-section')}
@@ -303,9 +303,9 @@
         Icon={IconInfo}
         title={translate('workers.no-role-prompt')}
         bind:open={showRoleHelp}
-        class="[&_h3]:text-sm"
+        class="border-tertiary bg-background-primary [&_h3]:text-sm"
       >
-        <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+        <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
           <ToggleButtons>
             <ToggleButton
               active={activeRoleHelpTab === 'cloudformation'}
@@ -381,9 +381,9 @@
         Icon={IconInfo}
         title={translate('workers.cloud-run-setup-prompt')}
         bind:open={showCloudRunHelp}
-        class="[&_h3]:text-sm"
+        class="border-tertiary bg-background-primary [&_h3]:text-sm"
       >
-        <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+        <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
           <p class="text-sm text-secondary">
             {translate('workers.cloud-run-terraform-description-before')}<Link
               href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
@@ -414,7 +414,7 @@
   </div>
 {/if}
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <div class="flex flex-wrap items-center justify-between gap-4">
   <div>

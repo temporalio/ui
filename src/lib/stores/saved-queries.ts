@@ -3,7 +3,6 @@ import {
   IconCheckCircle,
   IconClock,
   type IconComponent,
-  IconExclamationCircle,
   IconExclamationOctagon,
   IconHappyLappy,
   IconHeartbeat,
@@ -152,7 +151,7 @@ export const systemActivityViews: SavedQuery[] = [
     id: 'failed',
     name: 'Failed',
     query: '`ExecutionStatus`="Failed"',
-    Icon: IconExclamationCircle,
+    Icon: IconExclamationOctagon,
     type: 'system',
   },
 ];
@@ -183,7 +182,7 @@ export const systemNexusViews: SavedQuery[] = [
   },
   {
     id: 'last-hour',
-    name: 'Last Hour',
+    name: 'Last 1h',
     query: `StartTime >= "${getLastHour()}"`,
     Icon: IconClock,
     type: 'system',

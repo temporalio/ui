@@ -29,7 +29,10 @@
   const { selectValue, handleChange, options } =
     getContext<SelectContext<T>>(SELECT_CONTEXT);
 
-  interface Props extends Omit<MenuItemWithoutHrefProps, 'value' | 'onclick'> {
+  interface Props extends Omit<
+    MenuItemWithoutHrefProps,
+    'value' | 'onclick' | 'interaction'
+  > {
     value: T;
     children: Snippet;
     onclick?: (value: T) => void;
@@ -76,7 +79,13 @@
   };
 </script>
 
-<MenuItem onclick={handleOptionClick} role="option" {selected} {...rest}>
+<MenuItem
+  onclick={handleOptionClick}
+  role="option"
+  interaction="select"
+  {selected}
+  {...rest}
+>
   <span bind:this={slotWrapper}>
     {@render children()}
   </span>

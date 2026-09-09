@@ -23,7 +23,7 @@
       variant: {
         name: 'Variant',
         control: 'select',
-        options: ['primary', 'secondary', 'destructive', 'ghost'],
+        options: ['primary', 'secondary', 'tertiary', 'destructive', 'ghost'],
       },
       size: {
         name: 'Size',
@@ -88,7 +88,9 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Button>)}
-  <Button {...args} onclick={action('click')}>Click Me</Button>
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Button {...args} onclick={action('click')}>Click Me</Button>
+  </div>
 {/snippet}
 
 <Story name="Primary" args={{}} {template} />
@@ -104,9 +106,15 @@
 <Story name="Button Group">
   {#snippet template(args)}
     <div class="button-group flex">
-      <Button {...args} onclick={action('click')}>First</Button>
-      <Button {...args} onclick={action('click')}>Middle</Button>
-      <Button {...args} onclick={action('click')}>Last</Button>
+      <Button {...args} class="rounded-r-none" onclick={action('click')}
+        >First</Button
+      >
+      <Button {...args} class="rounded-none" onclick={action('click')}
+        >Middle</Button
+      >
+      <Button {...args} class="rounded-l-none" onclick={action('click')}
+        >Last</Button
+      >
     </div>
   {/snippet}
 </Story>
@@ -117,6 +125,8 @@
   play={shouldNotBeTransparent((canvas) => canvas.getByRole('button'))}
   {template}
 />
+
+<Story name="Tertiary" args={{ variant: 'tertiary' }} {template} />
 
 <Story name="Destructive" args={{ variant: 'destructive' }} {template} />
 

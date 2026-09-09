@@ -101,7 +101,7 @@
   </div>
 </div>
 {#if $eventViewType === 'json'}
-  <div class="border-t border-subtle px-4">
+  <div class="border-t border-primary px-4">
     <WorkflowHistoryJson />
   </div>
 {:else}

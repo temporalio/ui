@@ -132,7 +132,12 @@
     <Label {label} hidden={labelHidden} for={id} {required} />
     {#key $labelCtx}
       <MenuButton
-        class={merge('w-full', !valid && 'border-danger', menuButtonClass)}
+        class={merge(
+          'w-full border-secondary bg-background-primary text-primary focus-visible:border-secondary focus-visible:bg-background-primary focus-visible:ring-interactive-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-tertiary disabled:opacity-disabled',
+          !valid &&
+            'border-danger focus-visible:border-danger focus-visible:ring-danger',
+          menuButtonClass,
+        )}
         hasIndicator={!disabled}
         disabled={disabled || loading}
         controls="{id}-select"
@@ -156,6 +161,9 @@
           value={!value && placeholder !== '' ? placeholder : $labelCtx}
           tabindex="-1"
           disabled
+          class={merge(
+            !value && placeholder !== '' ? 'text-secondary' : 'text-primary',
+          )}
           class:disabled
           {required}
           aria-required={required}
@@ -172,7 +180,12 @@
     {/key}
   </div>
   {#if children}
-    <Menu role="listbox" id="{id}-select" class={menuClass} {position}>
+    <Menu
+      role="listbox"
+      id="{id}-select"
+      class={merge('bg-surface-primary', menuClass)}
+      {position}
+    >
       {@render children()}
     </Menu>
   {/if}

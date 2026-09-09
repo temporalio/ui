@@ -15,6 +15,7 @@
     fixed?: boolean;
     verticalScroll?: 'responsive' | 'table';
     class?: ClassNameValue;
+    tableClass?: string;
     caption?: Snippet;
     headers?: Snippet<[{ visibleItems: Item[] }]>;
     children?: Snippet;
@@ -33,6 +34,7 @@
     fixed = false,
     verticalScroll = 'responsive',
     class: className = '',
+    tableClass = '',
     caption,
     headers,
     children,
@@ -49,6 +51,7 @@
   );
 
   let tableContainer = $state<HTMLDivElement>();
+  let table = $state<Table>();
   let footerHeight = $state(0);
 
   export function scrollToTop() {
@@ -66,9 +69,17 @@
   {@render headers?.({ visibleItems })}
 {/snippet}
 
+{#snippet emptyState()}
+  <div
+    class="sticky left-0 flex w-full grow flex-col justify-center bg-surface-primary"
+  >
+    {@render empty?.()}
+  </div>
+{/snippet}
+
 <div
   class={merge(
-    'surface-primary flex grow flex-col overflow-auto border border-subtle',
+    'flex min-h-0 grow flex-col rounded-lg border border-primary bg-background-primary text-primary',
     className,
   )}
   id="{rest['id']}-container"
@@ -86,12 +97,14 @@
     {/if}
   {:else}
     <Table
-      class="shrink-0"
+      bind:this={table}
+      containerClass={merge('min-h-0 grow rounded-b-none', tableClass)}
       bordered={false}
       {updating}
       {fixed}
       {caption}
       headers={tableHeaders}
+      emptyState={visibleItems.length ? undefined : emptyState}
       {...rest}
     >
       {@render children?.()}
@@ -99,7 +112,7 @@
     {#if visibleItems.length}
       <div
         class={merge(
-          'surface-primary sticky left-0 flex w-full shrink-0 flex-wrap items-center justify-between gap-2 border-t border-subtle px-4 py-2',
+          'sticky left-0 flex w-full shrink-0 flex-wrap items-center justify-between gap-2 border-t border-primary bg-surface-primary px-4 py-2 text-primary',
           scrollsInTable ? 'bottom-0 mt-auto' : 'md:bottom-0 md:mt-auto',
         )}
         bind:clientHeight={footerHeight}
@@ -107,10 +120,6 @@
         {@render actionsStart?.()}
         {@render actionsCenter?.()}
         {@render actionsEnd?.()}
-      </div>
-    {:else}
-      <div class="sticky left-0 flex w-full grow flex-col justify-center">
-        {@render empty?.()}
       </div>
     {/if}
   {/if}

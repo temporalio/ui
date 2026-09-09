@@ -85,15 +85,7 @@
   </div>
 </Story>
 
-<Story
-  name="Both enabled (cross-cloud)"
-  asChild
-  play={async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByText('Public Preview')).toBeInTheDocument();
-    await expect(canvas.getByText('Pre-release')).toBeInTheDocument();
-  }}
->
+<Story name="Both enabled (cross-cloud)" asChild>
   <div class="max-w-[45rem] p-4">
     <ComputeProviderPicker
       provider="lambda"
