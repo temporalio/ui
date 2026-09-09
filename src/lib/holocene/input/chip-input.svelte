@@ -117,8 +117,12 @@
   <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
   <div
     class={merge(
-      'surface-primary flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-2 focus-within:ring-primary/70',
-      disabled && 'cursor-not-allowed opacity-65',
+      'flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-tertiary bg-background-primary p-2 text-sm text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      !disabled &&
+        !invalid &&
+        'focus-within:border-secondary hover:border-brand',
+      disabled &&
+        'cursor-not-allowed border-secondary bg-surface-tertiary text-tertiary',
       invalid && 'invalid',
     )}
   >
@@ -202,11 +206,11 @@
 
 <style lang="postcss">
   .invalid {
-    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
+    @apply border-danger focus-within:border-danger focus-within:ring-danger;
   }
 
   input {
-    @apply surface-primary inline-block grow focus:outline-none;
+    @apply inline-block grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 
   .error-msg {

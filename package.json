@@ -75,7 +75,6 @@
     "demo": "esno utilities/demo/demo-cli.ts",
     "run-workflows": "esno scripts/run-workflows.ts",
     "run-workflows:long-running": "esno scripts/start-long-running.ts",
-    "audit:tailwind": "esno scripts/audit-tailwind-colors",
     "validate:versions": "./scripts/validate-versions.sh",
     "knip": "knip",
     "a11y:manifest:test": "node scripts/a11y/manifest.test.mjs",
@@ -94,8 +93,6 @@
     "@codemirror/legacy-modes": "^6.5.1",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.2",
-    "@fontsource-variable/inter": "^5.0.8",
-    "@fontsource/noto-sans-mono": "^5.0.9",
     "@hyperjump/json-schema": "^1.17.8",
     "@lezer/highlight": "^1.1.3",
     "@sveltejs/package": "^2.3.10",
@@ -286,6 +283,30 @@
     "./io/icon": {
       "types": "./dist/io/icon/index.d.ts",
       "import": "./dist/io/icon/index.js"
+    },
+    "./io/badge": {
+      "types": "./dist/io/badge/index.d.ts",
+      "import": "./dist/io/badge/index.js"
+    },
+    "./io/badge-count": {
+      "types": "./dist/io/badge-count/index.d.ts",
+      "import": "./dist/io/badge-count/index.js"
+    },
+    "./io/badge-status": {
+      "types": "./dist/io/badge-status/index.d.ts",
+      "import": "./dist/io/badge-status/index.js"
+    },
+    "./io/chip": {
+      "types": "./dist/io/chip/index.d.ts",
+      "import": "./dist/io/chip/index.js"
+    },
+    "./io/chip-status": {
+      "types": "./dist/io/chip-status/index.d.ts",
+      "import": "./dist/io/chip-status/index.js"
+    },
+    "./io/tag": {
+      "types": "./dist/io/tag/index.d.ts",
+      "import": "./dist/io/tag/index.js"
     },
     "./*.svelte": {
       "types": "./dist/*.svelte.d.ts",

@@ -78,6 +78,14 @@ test('it should update the datetime filter based on the selected timezone', asyn
   expect(getDatetime(query)).toMatch(validDatetime);
 });
 
+test('it should focus the search input when opening the filter menu', async ({
+  page,
+}) => {
+  await page.getByTestId('add-filter-button').click();
+
+  await expect(page.locator('#workflow-filter-search')).toBeFocused();
+});
+
 test('it should filter by ExecutionStatus', async ({ page }) => {
   await page.getByTestId('add-filter-button').click();
   await page.getByText('ExecutionStatus').click();

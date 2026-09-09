@@ -153,7 +153,7 @@
 -->
 <div>
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary pb-2 text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="flex items-center gap-2">
       <h2>{translate('workflows.timeline-tab')}</h2>
@@ -165,8 +165,11 @@
           LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="zoom-in"
           onclick={onSort}
-          size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+          size="sm"
+          variant="tertiary"
         >
+          {reverseSort ? 'Descending' : 'Ascending'}
+        </ToggleButton>
         <ToggleButton
           LeadingIcon={IconCollapse}
           data-testid="toggle-idle-time"
@@ -175,6 +178,7 @@
             !timeline?.hasCollapsibleSegments}
           onclick={onToggleIdleTime}
           size="sm"
+          variant="tertiary"
         >
           {timeline?.allCollapsibleSegmentsCollapsed
             ? translate('workflows.show-idle-time')
@@ -186,12 +190,13 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
+          variant="tertiary"
           onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
+              ? 'bg-content-tertiary'
+              : 'bg-content-static-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -201,6 +206,7 @@
           data-testid="download"
           LeadingIcon={IconDownload}
           size="sm"
+          variant="tertiary"
           onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}

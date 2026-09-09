@@ -150,7 +150,7 @@
 <style lang="postcss">
   tbody {
     :global(tr:nth-of-type(odd)) {
-      @apply surface-primary;
+      @apply bg-surface-primary text-primary;
     }
 
     :global(tr > td) {

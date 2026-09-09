@@ -66,7 +66,7 @@
 
     <Portal {...rest} anchor="portal-button" open={args.open}>
       <div
-        class="border border-subtle bg-primary p-4"
+        class="border border-tertiary bg-surface-primary p-4"
         style="max-width: 200px;"
       >
         <p class="text-sm">Portal content goes here.</p>
@@ -97,7 +97,7 @@
         flipOnCollision={args.flipOnCollision}
         offset={args.offset}
       >
-        <div class="border border-subtle bg-primary p-4 shadow-lg">
+        <div class="border border-tertiary bg-surface-primary p-4 shadow-lg">
           <p class="text-xs">Positioned top but flipOnCollision is enabled.</p>
         </div>
       </Portal>
@@ -125,7 +125,7 @@
         flipOnCollision={args.flipOnCollision}
         offset={args.offset}
       >
-        <div class="border border-subtle bg-primary p-4 shadow-lg">
+        <div class="border border-tertiary bg-surface-primary p-4 shadow-lg">
           <p class="text-xs">
             Positioned bottom but flipOnCollision is enabled.
           </p>
@@ -155,7 +155,7 @@
         flipOnCollision={args.flipOnCollision}
         offset={args.offset}
       >
-        <div class="border border-subtle bg-primary p-4 shadow-lg">
+        <div class="border border-tertiary bg-surface-primary p-4 shadow-lg">
           <p class="text-xs">Positioned left but flipOnCollision is enabled.</p>
         </div>
       </Portal>
@@ -183,7 +183,7 @@
         flipOnCollision={args.flipOnCollision}
         offset={args.offset}
       >
-        <div class="border border-subtle bg-primary p-4 shadow-lg">
+        <div class="border border-tertiary bg-surface-primary p-4 shadow-lg">
           <p class="text-xs">
             Positioned right but flipOnCollision is enabled.
           </p>
@@ -197,7 +197,7 @@
   {#snippet template(args)}
     <div
       id="combined-container"
-      class="h-96 w-1/2 overflow-auto rounded border border-subtle bg-secondary p-4"
+      class="h-96 w-1/2 overflow-auto rounded border border-tertiary bg-surface-secondary p-4"
     >
       <div class="h-[800px] w-[1200px]">
         <p class="mb-2 text-xs text-secondary">
@@ -217,7 +217,9 @@
             flipOnCollision={args.flipOnCollision}
             offset={args.offset}
           >
-            <div class="max-w-60 border border-subtle bg-primary p-4 shadow-lg">
+            <div
+              class="max-w-60 border border-tertiary bg-surface-primary p-4 shadow-lg"
+            >
               <p class="text-sm">
                 ✅ Custom scroll container<br />
                 ✅ Hide when invisible<br />
