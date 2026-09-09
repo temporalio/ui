@@ -23,6 +23,7 @@
     updateWorkerDeploymentVersionComputeConfig,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
+  import { lockProvidersTo } from '$lib/utilities/lock-compute-provider';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
   interface Props {
@@ -64,6 +65,14 @@
   {@const agentCoreDetails = decodeAgentCoreProviderDetails(info.computeConfig)}
   {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
   {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
+  <!-- The Version already uses a provider, so the picker is locked to it.
+       Without the lock the capability-gated default list wins and the provider
+       in use renders selected, disabled, and badged "Coming Soon". -->
+  {@const configuredProvider = agentCoreDetails.agentCoreEndpointArn
+    ? 'agentcore'
+    : gcpDetails.gcpWorkerPool
+      ? 'cloud-run'
+      : 'lambda'}
   <div class="flex max-w-[45rem] flex-col gap-4">
     <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {translate('workers.back-to-deployment', { deployment })}
@@ -73,16 +82,12 @@
     </h1>
     <EditVersionForm
       {error}
-      {computeProviders}
+      computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
       {gcpRegions}
       {terraformTemplate}
       {cloudRunTerraformTemplate}
       initialData={{
-        provider: agentCoreDetails.agentCoreEndpointArn
-          ? 'agentcore'
-          : gcpDetails.gcpWorkerPool
-            ? 'cloud-run'
-            : 'lambda',
+        provider: configuredProvider,
         lambdaArn: providerDetails.lambdaArn ?? '',
         agentCoreEndpointArn: agentCoreDetails.agentCoreEndpointArn ?? '',
         iamRoleArn:

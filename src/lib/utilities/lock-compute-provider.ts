@@ -34,6 +34,40 @@ const providersInConfig = (
   return providers as ComputeProviderValue[];
 };
 
+const DEFAULT_PROVIDERS: readonly ComputeProviderOption[] = [
+  { value: 'lambda' },
+  { value: 'agentcore' },
+  { value: 'cloud-run' },
+];
+
+/**
+ * The provider options to show for a Version that already uses one.
+ *
+ * The provider in use is a fact, not an offer, so it is always visible and
+ * always selectable. Capability gating exists to stop somebody choosing a
+ * provider the Service cannot run; it must never describe one that is already
+ * running as unavailable, which is what a selected card badged "Coming Soon"
+ * says. The release stage is kept, because that stays true.
+ *
+ * Every other provider is hidden: a Version's provider cannot be changed.
+ */
+export const lockProvidersTo = (
+  provider: ComputeProviderValue,
+  configuredProviders?: readonly ComputeProviderOption[],
+): readonly ComputeProviderOption[] => {
+  const source = configuredProviders ?? DEFAULT_PROVIDERS;
+  const known = source.some(({ value }) => value === provider);
+  const options = known ? source : [...source, { value: provider }];
+
+  return options.map((option) => {
+    if (option.value !== provider) return { ...option, hidden: true };
+
+    const { disabled, disabledReason, hidden, ...usable } = option;
+
+    return usable;
+  });
+};
+
 export const lockComputeProvider = (
   deployment: DescribeWorkerDeployment,
   configuredProviders?: readonly ComputeProviderOption[],
@@ -61,24 +95,8 @@ export const lockComputeProvider = (
   }
 
   const provider = providers[0];
-  const source = configuredProviders ?? [
-    { value: 'lambda' as const },
-    { value: 'agentcore' as const },
-    { value: 'cloud-run' as const },
-  ];
-  const configuredProvider = source.find(({ value }) => value === provider);
-  if (
-    !configuredProvider ||
-    configuredProvider.hidden ||
-    configuredProvider.disabled
-  ) {
-    return;
-  }
+  const source = configuredProviders ?? DEFAULT_PROVIDERS;
+  if (!source.some(({ value }) => value === provider)) return;
 
-  return {
-    provider,
-    providers: source.map((option) =>
-      option.value === provider ? option : { ...option, hidden: true },
-    ),
-  };
+  return { provider, providers: lockProvidersTo(provider, source) };
 };

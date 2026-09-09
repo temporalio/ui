@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { DescribeWorkerDeployment } from '$lib/types/deployments';
 
-import { lockComputeProvider } from './lock-compute-provider';
+import { lockComputeProvider, lockProvidersTo } from './lock-compute-provider';
 
 const deployment = (types: (string | undefined)[]): DescribeWorkerDeployment =>
   ({
@@ -53,13 +53,16 @@ describe('lockComputeProvider', () => {
     });
   });
 
-  it('preserves metadata on the matching configured provider', () => {
+  // Metadata that stays true is kept; the gating fields are dropped, because
+  // the provider is in use and so cannot be unavailable.
+  it('keeps release stage on the matching provider and drops its gating', () => {
     const providers = [
       { value: 'lambda' as const },
       {
         value: 'cloud-run' as const,
-        disabled: false,
-        disabledReason: 'Available',
+        releaseStage: 'pre-release' as const,
+        disabled: true,
+        disabledReason: 'Coming Soon',
       },
     ];
 
@@ -67,28 +70,45 @@ describe('lockComputeProvider', () => {
       lockComputeProvider(deployment(['gcp-cloud-run']), providers),
     ).toEqual({
       provider: 'cloud-run',
-      providers: [{ value: 'lambda', hidden: true }, providers[1]],
+      providers: [
+        { value: 'lambda', hidden: true },
+        { value: 'cloud-run', releaseStage: 'pre-release' },
+      ],
     });
   });
 
-  it('fails closed when the existing provider is excluded by configuration', () => {
+  it('fails closed when configuration does not know the existing provider', () => {
     expect(
       lockComputeProvider(deployment(['gcp-cloud-run']), [{ value: 'lambda' }]),
     ).toBeUndefined();
+  });
 
+  // A Version already running on a provider is proof the provider works, so
+  // gating must not describe it as unavailable. Previously this fell back to
+  // the gated list and rendered the provider in use selected, disabled, and
+  // badged "Coming Soon".
+  it('offers a configured provider that gating would otherwise disable', () => {
+    expect(
+      lockComputeProvider(deployment(['gcp-cloud-run']), [
+        { value: 'lambda' },
+        { value: 'cloud-run', disabled: true, disabledReason: 'Coming Soon' },
+      ]),
+    ).toEqual({
+      provider: 'cloud-run',
+      providers: [{ value: 'lambda', hidden: true }, { value: 'cloud-run' }],
+    });
+  });
+
+  it('offers a configured provider that gating would otherwise hide', () => {
     expect(
       lockComputeProvider(deployment(['gcp-cloud-run']), [
         { value: 'lambda' },
         { value: 'cloud-run', hidden: true },
       ]),
-    ).toBeUndefined();
-
-    expect(
-      lockComputeProvider(deployment(['gcp-cloud-run']), [
-        { value: 'lambda' },
-        { value: 'cloud-run', disabled: true },
-      ]),
-    ).toBeUndefined();
+    ).toEqual({
+      provider: 'cloud-run',
+      providers: [{ value: 'lambda', hidden: true }, { value: 'cloud-run' }],
+    });
   });
 
   it.each([[['aws-lambda', 'gcp-cloud-run']], [['unknown']], [[undefined]]])(
@@ -120,5 +140,50 @@ describe('lockComputeProvider', () => {
     ['gcp-cloud-run', 'cloud-run'],
   ] as const)('maps the %s provider type to %s', (type, provider) => {
     expect(lockComputeProvider(deployment([type]))?.provider).toBe(provider);
+  });
+});
+
+describe('lockProvidersTo', () => {
+  it('shows only the provider in use, and shows it as usable', () => {
+    expect(
+      lockProvidersTo('agentcore', [
+        { value: 'lambda' },
+        { value: 'agentcore', disabled: true, disabledReason: 'Coming Soon' },
+        { value: 'cloud-run', disabled: true, disabledReason: 'Coming Soon' },
+      ]),
+    ).toEqual([
+      { value: 'lambda', hidden: true },
+      { value: 'agentcore' },
+      {
+        value: 'cloud-run',
+        hidden: true,
+        disabled: true,
+        disabledReason: 'Coming Soon',
+      },
+    ]);
+  });
+
+  // The stage stays true whether or not the Service advertises the provider.
+  it('keeps the release stage', () => {
+    expect(
+      lockProvidersTo('agentcore', [
+        { value: 'agentcore', releaseStage: 'pre-release', disabled: true },
+      ]),
+    ).toEqual([{ value: 'agentcore', releaseStage: 'pre-release' }]);
+  });
+
+  it('falls back to the known providers when none are configured', () => {
+    expect(lockProvidersTo('lambda')).toEqual([
+      { value: 'lambda' },
+      { value: 'agentcore', hidden: true },
+      { value: 'cloud-run', hidden: true },
+    ]);
+  });
+
+  it('adds a provider the configuration omits, rather than showing nothing', () => {
+    expect(lockProvidersTo('agentcore', [{ value: 'lambda' }])).toEqual([
+      { value: 'lambda', hidden: true },
+      { value: 'agentcore' },
+    ]);
   });
 });
