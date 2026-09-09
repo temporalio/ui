@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { $ } from 'zx';
 
 import { resolveCli } from './cli';
+import { provisionAgentCore } from './provision';
 import { failure } from '../../remedy';
 import type { Scenario, ScenarioContext, ScenarioResult } from '../../scenario';
 
@@ -19,6 +20,14 @@ const optionsSchema = z.strictObject({
    * means read AGENTCORE_ENDPOINT_ARN from the environment.
    */
   endpointArn: z.string().default(''),
+  /**
+   * Create the AgentCore runtime when no endpoint ARN is given, rather than
+   * refusing. Off by default because an AgentCore runtime bills while it
+   * exists, and starting a demo should not create billable cloud resources by
+   * surprise. Provisioning is idempotent by name, so turning this on for
+   * repeated runs reuses one runtime rather than adding another.
+   */
+  provision: z.boolean().default(false),
   region: z.string().default('us-west-2'),
   deploymentName: z.string().default('agentcore-demo'),
   buildId: z.string().default(''),
@@ -87,8 +96,22 @@ export const scenario: Scenario = {
     const options = optionsSchema.parse(raw);
     const { log, namespace } = context;
 
-    const endpointArn =
+    const teardown: string[] = [];
+    let endpointArn =
       options.endpointArn || process.env.AGENTCORE_ENDPOINT_ARN || '';
+
+    if (!endpointArn && options.provision) {
+      log('No endpoint ARN given and provision is on, so creating one');
+
+      const provisioned = await provisionAgentCore(options.region, log);
+
+      endpointArn = provisioned.endpointArn;
+      teardown.push(...provisioned.created);
+
+      if (provisioned.reused) {
+        log('Reused an AgentCore runtime a previous run provisioned');
+      }
+    }
 
     if (!endpointArn) {
       throw failure({
@@ -96,10 +119,11 @@ export const scenario: Scenario = {
           'This scenario needs a Bedrock AgentCore Runtime endpoint to invoke, and none was given.',
         fixes: [
           'Set AGENTCORE_ENDPOINT_ARN to a Runtime Endpoint ARN, or endpointArn in the definition.',
-          'To create one, follow "Provisioning the AgentCore runtime" in utilities/demo/README.md.',
+          'Or set provision: true in the definition to have this scenario create one. It needs AWS credentials that can use bedrock-agentcore, ECR, and IAM; the failure will say exactly which policies if they are missing.',
         ],
         seeAlso: [
-          'It is deliberately not provisioned here: an AgentCore runtime bills while it exists, and a demo should not create billable cloud resources as a side effect of starting.',
+          'Provision is off by default because an AgentCore runtime bills while it exists, and a demo should not create billable cloud resources by surprise.',
+          '"Provisioning the AgentCore runtime" in utilities/demo/README.md',
         ],
       });
     }
@@ -341,6 +365,17 @@ export const scenario: Scenario = {
     observations.push(
       `${options.workflowType} completed on the AgentCore Worker and returned: ${JSON.stringify(result)}`,
     );
+
+    if (teardown.length) {
+      observations.push(
+        [
+          'This run provisioned AWS resources, and an AgentCore runtime bills while it exists.',
+          'They are left in place so the demo can be inspected, and reused by later runs.',
+          'Remove them with:',
+          ...teardown.map((command) => `  ${command}`),
+        ].join('\n'),
+      );
+    }
 
     return {
       workflows: [

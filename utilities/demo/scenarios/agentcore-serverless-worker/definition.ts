@@ -41,6 +41,10 @@ export const definition = defineScenario({
     // Empty reads AGENTCORE_ENDPOINT_ARN. See "Provisioning the AgentCore
     // runtime" in utilities/demo/README.md.
     endpointArn: '',
+    // Off by default: an AgentCore runtime bills while it exists. Turn it on
+    // and the scenario creates one, reusing it on later runs. See
+    // "Provisioning the AgentCore runtime" in utilities/demo/README.md.
+    provision: false,
     region: 'us-west-2',
     deploymentName: 'agentcore-demo',
     taskQueue: 'agentcore-tq',

@@ -244,10 +244,46 @@ preflight fails with that name before any stage starts.
 
 ## Provisioning the AgentCore runtime
 
-`agentcore-serverless-worker` needs a Bedrock AgentCore Runtime to invoke, and
-does **not** create one: a runtime bills while it exists, and starting a demo
-should not create billable cloud resources as a side effect. Provision once,
-then set `AGENTCORE_ENDPOINT_ARN`.
+`agentcore-serverless-worker` needs a Bedrock AgentCore Runtime to invoke.
+There are two ways to get one.
+
+### Let the scenario create it
+
+Set `provision: true` in the definition. It creates the ECR repository, builds
+and pushes the Worker image from `scenarios/agentcore-serverless-worker/worker`,
+creates the execution role, and creates the runtime and its endpoint.
+
+It is **off by default**, because an AgentCore runtime bills while it exists
+and starting a demo should not create billable cloud resources by surprise.
+
+Provisioning is idempotent by name, so turning it on for repeated runs reuses
+one runtime rather than adding another. Nothing is torn down at the end: a
+scenario's shutdown gets a three second grace, which is not enough to delete a
+runtime, and a reviewer wants the demo to still exist when the run finishes.
+The summary therefore lists exactly what was created and the commands to
+remove it.
+
+Before creating anything it checks that the calling identity can actually do
+every part, so a missing permission does not leave a half-provisioned account.
+If something is missing it names the policies to attach, including the one
+that wastes people's time: **the ECR managed policies are named
+`AmazonEC2ContainerRegistry*`, so searching the IAM console for "ecr" finds
+nothing.** Search `ContainerRegistry`.
+
+What the calling identity needs:
+
+- `BedrockAgentCoreFullAccess` — search "AgentCore" in the policy list
+- `AmazonEC2ContainerRegistryFullAccess` — search "ContainerRegistry"
+- `iam:CreateRole`, `iam:PutRolePolicy`, `iam:GetRole`, `iam:PassRole`, to
+  create the execution role and hand it to AgentCore
+
+If you would rather not grant those, ask someone for a Runtime Endpoint ARN
+and use the other way.
+
+### Or bring your own
+
+Provision once by hand, then set `AGENTCORE_ENDPOINT_ARN` and leave
+`provision` off.
 
 The container has to answer `/ping` and `/invocations` on port 8080, be built
 for `linux/arm64`, and start a Temporal worker using the `deploymentName` and
