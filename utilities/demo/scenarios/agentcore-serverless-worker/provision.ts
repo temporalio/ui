@@ -23,9 +23,10 @@ export type ProvisionResult = {
   created: string[];
   reused: boolean;
   /**
-   * True when the runtime was created with this run's environment already set,
-   * so the caller has nothing to update. A reused runtime carries whatever a
-   * previous run left on it and does need updating.
+   * Whether the runtime already carries this run's environment. Always false
+   * today: AgentCore only applies an environment through update, so the caller
+   * sets it either way. Kept so a future create that honours the environment
+   * can skip the update.
    */
   environmentApplied: boolean;
 };
@@ -269,7 +270,6 @@ const existingRuntimeId = async (
  */
 export const provisionAgentCore = async (
   region: string,
-  environment: Record<string, string>,
   log: Logger,
 ): Promise<ProvisionResult> => {
   const { account } = await checkProvisioningAccess(region);
@@ -519,6 +519,12 @@ export const provisionAgentCore = async (
     endpointArn: runtimeEndpointArn(region, account, runtimeId),
     created,
     reused: false,
-    environmentApplied: true,
+    // create-agent-runtime accepts --environment-variables and then ignores
+    // it: the runtime comes back with environmentVariables null and the Worker
+    // starts with an empty TEMPORAL_ADDRESS. Only update applies an
+    // environment, so the caller always has to set it. Waiting for READY above
+    // is what stops that update racing the runtime's CREATING state, which is
+    // the real fix for the ConflictException.
+    environmentApplied: false,
   };
 };

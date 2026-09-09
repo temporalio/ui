@@ -214,11 +214,7 @@ export const scenario: Scenario = {
         'No endpoint ARN given, so provisioning one. An AgentCore runtime bills while it exists; the summary lists what was created and how to remove it.',
       );
 
-      const provisioned = await provisionAgentCore(
-        options.region,
-        workerEnvironment,
-        log,
-      );
+      const provisioned = await provisionAgentCore(options.region, log);
 
       endpointArn = provisioned.endpointArn;
       teardown.push(...provisioned.created);
