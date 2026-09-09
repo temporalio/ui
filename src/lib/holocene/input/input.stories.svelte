@@ -156,12 +156,17 @@
 <Story name="With Buttons">
   {#snippet template(args, context)}
     <div class="border border-primary bg-surface-primary p-4 text-primary">
-      <Input {...args} id={context.id} data-testid={context.id}>
+      <Input
+        {...args}
+        inputContainerClass="rounded-none"
+        id={context.id}
+        data-testid={context.id}
+      >
         {#snippet beforeInput()}
-          <Button type="button">Before</Button>
+          <Button class="rounded-r-none" type="button">Before</Button>
         {/snippet}
         {#snippet afterInput()}
-          <Button type="button">After</Button>
+          <Button class="rounded-l-none" type="button">After</Button>
         {/snippet}
       </Input>
     </div>
