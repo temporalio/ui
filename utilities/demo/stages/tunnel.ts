@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
-import { mkdir } from 'fs/promises';
+import { mkdir, rm } from 'fs/promises';
+import { createConnection } from 'net';
 import { join } from 'path';
 
 import { chalk } from 'zx';
@@ -58,6 +59,31 @@ const tunnelError = (logFile: string): TunnelFailure | undefined => {
   return { code, reported: messages.at(-1) };
 };
 
+/** Whether something accepts a TCP connection at host:port. */
+export const canConnect = (
+  address: string,
+  timeoutMs = 10_000,
+): Promise<boolean> => {
+  const separator = address.lastIndexOf(':');
+  const host = address.slice(0, separator);
+  const port = Number.parseInt(address.slice(separator + 1), 10);
+
+  if (!host || !Number.isInteger(port)) return Promise.resolve(false);
+
+  return new Promise((resolve) => {
+    const socket = createConnection({ host, port });
+    const finish = (result: boolean) => {
+      socket.destroy();
+      resolve(result);
+    };
+
+    socket.setTimeout(timeoutMs);
+    socket.once('connect', () => finish(true));
+    socket.once('error', () => finish(false));
+    socket.once('timeout', () => finish(false));
+  });
+};
+
 const waitForAddress = async (logFile: string, timeoutMs: number) => {
   const deadline = Date.now() + timeoutMs;
 
@@ -100,6 +126,12 @@ export const startTunnel = async (
 
   const logFile = join(directory, 'tunnel.log');
 
+  // Children append to their log, and the address is read back out of it, so a
+  // previous run's url would satisfy the wait before this ngrok has written
+  // anything. That reads as success and hands out a dead address, which then
+  // fails far away from here as a connection refused inside the provider.
+  await rm(logFile, { force: true });
+
   log(`Opening an ngrok TCP tunnel to 127.0.0.1:${port}`);
 
   const child = startDetached(
@@ -127,6 +159,24 @@ export const startTunnel = async (
         ...(problem?.code ? [NGROK_DOC(problem.code)] : []),
         'Run the tunnel by hand to see it fail live: ngrok tcp ' + String(port),
       ],
+    });
+  }
+
+  // Prove the address before handing it to anything. A tunnel that reports a
+  // url and does not carry traffic is indistinguishable from a working one
+  // until something remote fails to dial it.
+  const reachable = await canConnect(publicAddress);
+
+  if (!reachable) {
+    await child.stop();
+
+    throw failure({
+      attempting: `The ngrok tunnel reported ${publicAddress}, but nothing accepted a connection there, so a Worker in a cloud provider could not reach the frontend either.`,
+      fixes: [
+        `Confirm the frontend is listening: nc -z 127.0.0.1 ${port}`,
+        'Check for another ngrok agent holding the account session: pkill ngrok, then retry.',
+      ],
+      seeAlso: [`Tunnel log: ${logFile}`],
     });
   }
 
