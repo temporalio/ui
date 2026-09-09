@@ -36,7 +36,7 @@ jobs:
           path: ._reusable
 
       - name: Find Pending Reviews and Send Reminders
-        uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71 # v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_USER_MAP: ${{ secrets.SLACK_USER_MAP }}
