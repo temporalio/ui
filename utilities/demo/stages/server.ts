@@ -179,6 +179,11 @@ type RepoSource = {
   sha: string;
   /** A checkout this tool owns is clean, so its commit identifies it fully. */
   key: string;
+  /**
+   * True when this tool fetched the checkout, so it may be modified. A path
+   * someone pointed at is their working tree and is left alone.
+   */
+  owned: boolean;
   provenance: string;
 };
 
@@ -234,6 +239,7 @@ const ensureCheckout = async (
     ref,
     sha,
     key: sha,
+    owned: true,
     provenance: `${repo.label}: ${repo.url} @ ${ref} (${sha.slice(0, 9)}), fetched into ${path}`,
   };
 };
@@ -259,6 +265,7 @@ const useLocalRepo = async (
     ref: described.ref,
     sha: described.sha,
     key: `${described.sha}-${described.fingerprint}`,
+    owned: false,
     provenance: `${repo.label}: ${expanded} @ ${described.ref} (${described.sha}${uncommitted})`,
   };
 };
@@ -290,6 +297,89 @@ const resolveRepo = async (
   }
 
   return ensureCheckout(repo, ref, log);
+};
+
+/**
+ * Brings a tool-owned checkout up to the module versions a scenario needs.
+ *
+ * A feature can arrive in the server through a dependency bump, and there may
+ * be no server ref that carries it: the bump is a one-line change nobody has
+ * pushed. Declaring the requirement and then telling a person to go and edit a
+ * checkout this tool fetched into its own cache is busywork, so it is applied
+ * here. A checkout somebody pointed at is their working tree and is never
+ * touched.
+ */
+const applyModuleRequirements = async (
+  repo: RepoSource,
+  required: Record<string, string>,
+  unmet: readonly { module: string; required: string; found?: string }[],
+  log: Logger,
+): Promise<string> => {
+  log(
+    `Bumping ${unmet.length} module requirement(s) in the fetched server checkout`,
+  );
+
+  for (const { module } of unmet) {
+    const version = required[module];
+
+    log(chalk.dim(`  go get ${module}@${version}`));
+
+    const got = await $`go -C ${repo.path} get ${`${module}@${version}`}`
+      .quiet()
+      .nothrow();
+
+    if (got.exitCode !== 0) {
+      throw new Error(
+        [
+          `Could not bump ${module} to ${version} in ${repo.path}.`,
+          'A private module needs git credentials that reach it; go get reports what it could not resolve.',
+          got.stderr.trim(),
+        ].join('\n'),
+      );
+    }
+  }
+
+  const tidied = await $`go -C ${repo.path} mod tidy`.quiet().nothrow();
+
+  if (tidied.exitCode !== 0) {
+    throw new Error(
+      [
+        `Bumped the modules in ${repo.path}, but "go mod tidy" then failed, so the checkout will not build.`,
+        'The requested version may be incompatible with this server ref. Move requires.serverRef to one that suits it.',
+        tidied.stderr.trim(),
+      ].join('\n'),
+    );
+  }
+
+  const stillUnmet = unmetModuleRequirements(
+    await readFile(join(repo.path, 'go.mod'), 'utf8'),
+    required,
+  );
+
+  if (stillUnmet.length) {
+    throw new Error(
+      [
+        `Bumped the modules in ${repo.path}, but the go.mod still does not satisfy:`,
+        ...stillUnmet.map(
+          ({ module, required: floor, found }) =>
+            `  ${module} needs ${floor}, found ${found ?? 'no requirement at all'}`,
+        ),
+        '"go mod tidy" can lower a requirement another module constrains. Move requires.serverRef to a ref that suits it.',
+      ].join('\n'),
+    );
+  }
+
+  // The build cache is keyed by checkout content, and this changed it, so the
+  // key has to move too or a pre-bump binary would be reused.
+  return createHash('sha256')
+    .update(
+      Object.entries(required)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([module, version]) => `${module}@${version}`)
+        .join(','),
+    )
+    .digest('hex')
+    .slice(0, 12);
 };
 
 const buildWorkspaceCli = async (
@@ -347,7 +437,16 @@ const buildWorkspaceCli = async (
     server.requires.serverModules,
   );
 
-  if (unmet.length) {
+  let moduleKey = '';
+
+  if (unmet.length && temporal.owned) {
+    moduleKey = await applyModuleRequirements(
+      temporal,
+      server.requires.serverModules,
+      unmet,
+      log,
+    );
+  } else if (unmet.length) {
     throw new Error(
       [
         `${temporal.path} does not carry the Go module version(s) this scenario needs:`,
@@ -355,12 +454,16 @@ const buildWorkspaceCli = async (
           ({ module, required: floor, found }) =>
             `  ${module} needs ${floor}, found ${found ?? 'no requirement at all'}`,
         ),
-        'Bump it in that checkout, or point TEMPORAL_SERVER_REPO at one that has it.',
+        'That is your working tree, so this tool will not modify it. Bump it there,',
+        'or unset TEMPORAL_SERVER_REPO to let the tool fetch and bump its own checkout.',
       ].join('\n'),
     );
   }
 
-  const binary = join(BIN_DIR, `temporal-workspace-${cli.key}-${temporal.key}`);
+  const binary = join(
+    BIN_DIR,
+    `temporal-workspace-${cli.key}-${temporal.key}${moduleKey ? `-${moduleKey}` : ''}`,
+  );
   const goWork = join(WORK_DIR, 'go.work');
 
   await mkdir(BIN_DIR, { recursive: true });

@@ -212,8 +212,28 @@ requires: {
 
 A pseudo-version is ordered by its embedded commit timestamp, so that value is
 satisfied by anything from that moment on, and a tagged release satisfies it
-outright. A checkout that falls short fails before the build, naming the
-module, the floor, and what it found.
+outright.
+
+**A requirement that is not met is applied, not reported.** A feature can
+arrive in the server through a dependency bump with no server ref carrying it,
+because the bump is a one-line change nobody has pushed. So a checkout this
+tool fetched gets `go get` and `go mod tidy` run on it:
+
+```
+· Bumping 1 module requirement(s) in the fetched server checkout
+·   go get go.temporal.io/auto-scaled-workers@v0.0.0-20260824233950-312f95fb8b99
+```
+
+Two consequences worth knowing. The bump changes the checkout, so the build
+cache key includes the module requirements; otherwise a pre-bump binary would
+be reused against a bumped go.mod. And `go mod tidy` can lower a requirement
+another module constrains, so it is re-verified afterwards rather than assumed
+— if the pair is genuinely incompatible the failure says to move
+`requires.serverRef`.
+
+A checkout **you** pointed `TEMPORAL_SERVER_REPO` at is your working tree and
+is never modified. That case still fails, and says to bump it yourself or to
+unset the variable and let the tool use its own checkout.
 
 ## `tunnel`
 
