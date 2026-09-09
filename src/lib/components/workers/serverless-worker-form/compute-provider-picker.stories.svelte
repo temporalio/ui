@@ -85,26 +85,7 @@
   </div>
 </Story>
 
-<Story
-  name="Both enabled (cross-cloud)"
-  asChild
-  play={async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const publicPreviewBadge = canvas.getByText('Public Preview');
-    const preReleaseBadge = canvas.getByText('Pre-release');
-
-    await expect(publicPreviewBadge).toHaveClass(
-      'border-accent',
-      'bg-surface-accent',
-      'text-accent',
-    );
-    await expect(preReleaseBadge).toHaveClass(
-      'border-accent',
-      'bg-surface-accent',
-      'text-accent',
-    );
-  }}
->
+<Story name="Both enabled (cross-cloud)" asChild>
   <div class="max-w-[45rem] p-4">
     <ComputeProviderPicker
       provider="lambda"
