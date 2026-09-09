@@ -42,17 +42,8 @@ const DEFAULT_PROVIDERS: readonly ComputeProviderOption[] = [
 
 /**
  * Ungates the provider a Version already uses, leaving the alternatives alone.
- *
- * The provider in use is a fact, not an offer, so it is always visible and
- * always selectable. Capability gating exists to stop somebody choosing a
- * provider the Service cannot run; it must never describe one that is already
- * running as unavailable, which is what a selected card badged "Coming Soon"
- * says. The release stage is kept, because that stays true.
- *
- * The other providers keep their gating, because switching a Version to one of
- * them is a real choice: `provider.type` is an accepted update path on
- * UpdateWorkerDeploymentVersionComputeConfig, so an alternative the Service can
- * run should stay offered, and one it cannot should stay refused.
+ * Exported for tests and for callers that want the ungating without the
+ * hiding; `lockProvidersTo` is what the Version forms use.
  */
 export const allowProviderInUse = (
   provider: ComputeProviderValue,
@@ -77,10 +68,14 @@ export const allowProviderInUse = (
 };
 
 /**
- * As above, but hides the alternatives.
+ * The provider options to show for a Version that already has one.
  *
- * Used when creating a new Version in an existing Deployment, where the
- * provider is inherited rather than chosen.
+ * A Version's provider cannot be changed, so only the provider in use is
+ * shown: offering alternatives that cannot be applied is a worse lie than the
+ * one this replaces. It is also always selectable and keeps its release stage,
+ * because a Version already running on a provider is proof the provider works,
+ * and a card that is selected, disabled, and badged "Coming Soon" at once says
+ * otherwise.
  */
 export const lockProvidersTo = (
   provider: ComputeProviderValue,

@@ -144,23 +144,41 @@
 </Story>
 
 <Story
-  name="AgentCore awaiting server support"
+  name="Self-hosted (every provider selectable)"
   asChild
   play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText('Coming Soon')).toBeInTheDocument();
+    await expect(canvas.getByText('AWS Lambda')).toBeInTheDocument();
+    await expect(
+      canvas.getByText('Amazon Bedrock AgentCore'),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText('Google Cloud Run')).toBeInTheDocument();
+    await expect(canvas.queryByText('Coming Soon')).not.toBeInTheDocument();
+  }}
+>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker provider="agentcore" />
+  </div>
+</Story>
+
+<Story
+  name="Locked to the provider a Version uses"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByText('Amazon Bedrock AgentCore'),
+    ).toBeInTheDocument();
+    await expect(canvas.queryByText('AWS Lambda')).not.toBeInTheDocument();
   }}
 >
   <div class="max-w-[45rem] p-4">
     <ComputeProviderPicker
-      provider="lambda"
+      provider="agentcore"
       providers={[
-        { value: 'lambda' },
-        {
-          value: 'agentcore',
-          disabled: true,
-          disabledReason: 'Coming Soon',
-        },
+        { value: 'lambda', hidden: true },
+        { value: 'agentcore' },
+        { value: 'cloud-run', hidden: true },
       ]}
     />
   </div>

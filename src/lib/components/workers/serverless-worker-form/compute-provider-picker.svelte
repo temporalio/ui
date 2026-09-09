@@ -8,7 +8,6 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconAws, type IconComponent, IconGcp } from '$lib/io/icon';
-  import { hasCapability } from '$lib/utilities/has-capability.svelte';
 
   import {
     type ComputeProviderOption,
@@ -67,29 +66,20 @@
     }
   };
 
-  const cloudRunCapable = $derived(
-    hasCapability('serverScaledProviderCloudRun'),
-  );
-  const agentCoreCapable = $derived(
-    hasCapability('serverScaledProviderAgentCore'),
-  );
-
+  /**
+   * Every provider, selectable. Self-hosted has no per-account entitlement to
+   * express, and a Service that cannot run a provider rejects the Version with
+   * a reason, so gating the picker only hides the choice behind a badge that
+   * cannot be acted on.
+   *
+   * A caller that does need to restrict the list passes `providers`, which is
+   * how Temporal Cloud offers only the providers matching the Namespace's own
+   * cloud.
+   */
   const defaultProviders = $derived<ComputeProviderOption[]>([
     { value: 'lambda' },
-    {
-      value: 'agentcore',
-      disabled: !agentCoreCapable,
-      disabledReason: agentCoreCapable
-        ? undefined
-        : translate('workers.coming-soon'),
-    },
-    {
-      value: 'cloud-run',
-      disabled: !cloudRunCapable,
-      disabledReason: cloudRunCapable
-        ? undefined
-        : translate('workers.coming-soon'),
-    },
+    { value: 'agentcore' },
+    { value: 'cloud-run' },
   ]);
 
   const resolvedProviders = $derived(configuredProviders ?? defaultProviders);
