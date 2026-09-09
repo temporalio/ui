@@ -20,6 +20,7 @@ import {
   pickCli,
   planServerStrategy,
   satisfies,
+  unmetModuleRequirements,
 } from '../requirements';
 
 export type ProvisionedServer = {
@@ -330,6 +331,27 @@ const buildWorkspaceCli = async (
         ].join('\n'),
       );
     }
+  }
+
+  // Some features reach the server through a dependency bump rather than a
+  // server commit, so the go.mod of the checkout being built is the thing to
+  // check. serverCommit cannot express it: the commit lives in another repo.
+  const unmet = unmetModuleRequirements(
+    await readFile(join(temporal.path, 'go.mod'), 'utf8'),
+    server.requires.serverModules,
+  );
+
+  if (unmet.length) {
+    throw new Error(
+      [
+        `${temporal.path} does not carry the Go module version(s) this scenario needs:`,
+        ...unmet.map(
+          ({ module, required: floor, found }) =>
+            `  ${module} needs ${floor}, found ${found ?? 'no requirement at all'}`,
+        ),
+        'Bump it in that checkout, or point TEMPORAL_SERVER_REPO at one that has it.',
+      ].join('\n'),
+    );
   }
 
   const binary = join(BIN_DIR, `temporal-workspace-${cli.key}-${temporal.key}`);

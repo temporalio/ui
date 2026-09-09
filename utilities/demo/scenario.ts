@@ -11,6 +11,12 @@ export type StartedWorkflow = {
 
 export type ScenarioContext = {
   address: string;
+  /**
+   * Set when the tunnel stage ran: an address reachable from outside this
+   * machine. A scenario whose Workers run in a cloud provider needs this
+   * rather than `address`, because the provider cannot dial localhost.
+   */
+  publicAddress?: string;
   namespace: string;
   log: Logger;
 };

@@ -119,7 +119,7 @@ fails before anything starts, naming the problem.
 
 ## Stages
 
-Four stages run in order. Each one is optional: turn it off with `"enabled":
+Five stages run in order. Each one is optional: turn it off with `"enabled":
 false` in the definition, or with `--skip <stage>` / `--only <stage>`. A stage
 also stands down on its own when something is already listening on its port, so
 a server or UI you started yourself is reused rather than fought over.
@@ -128,6 +128,7 @@ a server or UI you started yourself is reused rather than fought over.
 | ----------- | --------------------------------------------------------------- |
 | `server`    | Provisions a Temporal dev server and applies the dynamic config |
 | `worker`    | Starts the catalog worker against that server                   |
+| `tunnel`    | Publishes the frontend on a public address                       |
 | `ui`        | Starts the ui-server API and the UI dev server                  |
 | `scenarios` | Runs the workflows that exercise the feature                    |
 
@@ -142,6 +143,8 @@ a server or UI you started yourself is reused rather than fought over.
 | `serverRepo`       | Overrides `TEMPORAL_SERVER_REPO` for this definition, rarely wanted     |
 | `serverRef`        | Fails the run unless the server checkout is on this branch or commit    |
 | `minServerVersion` | Fails the run early if the resolved server is older than this           |
+| `requires.serverModules` | Go modules the built server must carry, as module path to minimum version |
+| `requires.commands`      | Executables the run needs on PATH                                 |
 | `dynamicConfig`    | `--dynamic-config-value` pairs, as JSON values                          |
 | `searchAttributes` | `--search-attribute` pairs, name to type                                |
 | `port`, `uiPort`, `httpPort`, `logLevel`, `dbFilename`, `namespace` | Dev server settings |
@@ -192,6 +195,83 @@ To build your own working tree instead, which is what developing the feature
 wants, point `TEMPORAL_SERVER_REPO` or `TEMPORAL_CLI_REPO` at it. An explicit
 path wins over a fetch, and only then are uncommitted changes part of the build
 cache key.
+
+### When the feature arrives through a dependency
+
+`requires.serverCommit` cannot express a feature that reaches the server
+through a dependency bump, because the commit lives in another repository.
+`requires.serverModules` checks the go.mod of the checkout being built:
+
+```ts
+requires: {
+  serverModules: {
+    'go.temporal.io/auto-scaled-workers': 'v0.0.0-20260824233950-312f95fb8b99',
+  },
+}
+```
+
+A pseudo-version is ordered by its embedded commit timestamp, so that value is
+satisfied by anything from that moment on, and a tagged release satisfies it
+outright. A checkout that falls short fails before the build, naming the
+module, the floor, and what it found.
+
+## `tunnel`
+
+| Field            | Meaning                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `provider`       | `ngrok`                                                   |
+| `targetPort`     | Defaults to the frontend port the server stage provisioned |
+| `readyTimeoutMs` | How long to wait for a public address                      |
+
+Publishes the frontend on a public address, and exposes it to a scenario as
+`context.publicAddress`.
+
+A server-scaled Worker runs wherever Temporal launched it — a Lambda, a Cloud
+Run pool, a Bedrock AgentCore session — and dials the frontend back to poll.
+That inbound leg is the only thing a dev server on localhost cannot offer; the
+outbound leg to the provider is never the problem. A scenario covering
+server-scaled Workers needs this stage, and one that does not should leave it
+off.
+
+**The address is not stable across runs.** A fresh tunnel means a fresh
+hostname, so anything holding it — a provider's environment, say — has to be
+updated per run rather than configured once. A scenario that repoints its
+provider each run works twice in a row; one that trusts a stored address works
+once.
+
+The stage implies `ngrok` on PATH, so a definition does not restate it, and
+preflight fails with that name before any stage starts.
+
+## Provisioning the AgentCore runtime
+
+`agentcore-serverless-worker` needs a Bedrock AgentCore Runtime to invoke, and
+does **not** create one: a runtime bills while it exists, and starting a demo
+should not create billable cloud resources as a side effect. Provision once,
+then set `AGENTCORE_ENDPOINT_ARN`.
+
+The container has to answer `/ping` and `/invocations` on port 8080, be built
+for `linux/arm64`, and start a Temporal worker using the `deploymentName` and
+`buildId` from the invoke payload. Two things catch people out:
+
+- A worker built with `UseVersioning` must register every workflow through
+  `RegisterWorkflowWithOptions` with a `VersioningBehavior`. Plain
+  `RegisterWorkflow` panics with `workflow type does not have a versioning
+  behavior` before it ever polls.
+- Pass the **Runtime Endpoint** ARN, ending in `/runtime-endpoint/<name>`. The
+  provider parses the runtime id and endpoint name out of it, so a bare Runtime
+  ARN is rejected.
+
+```bash
+# The four-part endpoint ARN, which is what the scenario wants:
+aws bedrock-agentcore-control list-agent-runtime-endpoints \
+  --region us-west-2 --agent-runtime-id <runtime-id> \
+  --query 'runtimeEndpoints[].agentRuntimeEndpointArn' --output text
+```
+
+Creating the version is what invokes the runtime, and that first invoke is also
+what associates the task queue: the worker polls with versioning and matching
+learns the queue from that registration. `create-version` takes no task queue,
+so nothing else can teach it.
 
 ## `worker`
 
