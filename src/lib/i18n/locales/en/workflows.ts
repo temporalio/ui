@@ -370,6 +370,8 @@ export const Strings = {
   'event-group-canceled-count': '{{count, number}} Canceled',
   'event-group-terminated-count': '{{count, number}} Terminated',
   'event-group-paused-count': '{{count, number}} Paused',
+  'event-group-filter-more-results':
+    'Refine your search to see more Event Groups.',
   minimized: 'Minimized',
   expanded: 'Expanded',
   'timeline-minimized':

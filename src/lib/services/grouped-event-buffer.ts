@@ -11,10 +11,11 @@ import { getGroupId } from '$lib/models/event-groups/get-group-id';
 import { toEvent } from '$lib/models/event-history';
 import {
   createEventGroupMarkerDescriptor,
-  createTimelineEventMarkerGroups,
+  createTimelineEventMarkerGroup,
   type EventGroupMarkerDescriptor,
   type EventGroupMarkerPresentation,
   type EventMarkerAttribution,
+  getCachedOrderedLifecycleGroupIds,
   getEventGroupMarkerKey,
   getEventGroupMarkerPresentation,
   type TimelineEventMarkerGroup,
@@ -451,6 +452,8 @@ function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
         key,
         eventGroupMarker: marker,
         eventsById: new Map(),
+        lifecycleGroupIds: new Set(),
+        firstEventByLifecycleGroupId: new Map(),
         firstEventId: event.id,
       };
       eventMarkerAttributions.set(key, attribution);
@@ -470,6 +473,39 @@ function attributeEventMarkers(event: WorkflowEvent, groupId: string): void {
         event,
         lifecycleGroupId: groupId,
       });
+      const isNewLifecycleGroup = !attribution.lifecycleGroupIds.has(groupId);
+      attribution.lifecycleGroupIds.add(groupId);
+      const firstLifecycleEvent =
+        attribution.firstEventByLifecycleGroupId.get(groupId);
+      if (
+        !firstLifecycleEvent ||
+        Number(event.id) < Number(firstLifecycleEvent.id)
+      ) {
+        attribution.firstEventByLifecycleGroupId.set(groupId, event);
+      }
+      if (isNewLifecycleGroup) {
+        const orderedLifecycleGroupIds = attribution.orderedLifecycleGroupIds;
+        if (
+          orderedLifecycleGroupIds?.length &&
+          Number(groupId) >
+            Number(
+              orderedLifecycleGroupIds[orderedLifecycleGroupIds.length - 1],
+            )
+        ) {
+          orderedLifecycleGroupIds.push(groupId);
+        } else {
+          attribution.orderedLifecycleGroupIds = undefined;
+        }
+      }
+      const orderedEvents = attribution.orderedEvents;
+      if (
+        orderedEvents?.length &&
+        Number(event.id) > Number(orderedEvents[orderedEvents.length - 1].id)
+      ) {
+        orderedEvents.push(event);
+      } else {
+        attribution.orderedEvents = undefined;
+      }
       if (Number(event.id) < Number(attribution.firstEventId)) {
         attribution.firstEventId = event.id;
       }
@@ -808,13 +844,8 @@ export function getEventMarkerGroupArray(): TimelineEventMarkerGroup[] {
       continue;
     }
 
-    const referencedGroupIds = new Set<string>();
-    for (const entry of attribution.eventsById.values()) {
-      referencedGroupIds.add(entry.lifecycleGroupId);
-    }
-
     const lifecycleGroups: EventGroup[] = [];
-    for (const groupId of referencedGroupIds) {
+    for (const groupId of getCachedOrderedLifecycleGroupIds(attribution)) {
       const headSlot = Number(groupId) - 1;
       const recordIndex = headGroup[headSlot];
       if (!recordIndex) continue;
@@ -822,8 +853,8 @@ export function getEventMarkerGroupArray(): TimelineEventMarkerGroup[] {
       if (group) lifecycleGroups.push(group);
     }
 
-    const [group] = createTimelineEventMarkerGroups(
-      [attribution],
+    const group = createTimelineEventMarkerGroup(
+      attribution,
       lifecycleGroups,
       eventGroupMarkerPresentations,
     );

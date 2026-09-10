@@ -35,11 +35,6 @@ type MarkerIdentity = EventGroupMarkerPresentation & {
   eventGroupMarker: EventGroupMarker;
 };
 
-type MarkerAccumulator = MarkerIdentity & {
-  events: WorkflowEvent[];
-  lifecycleGroups: Map<string, EventGroup>;
-};
-
 type EventMarkerAttributionEntry = {
   event: WorkflowEvent;
   lifecycleGroupId: string;
@@ -49,7 +44,11 @@ export type EventMarkerAttribution = {
   key: string;
   eventGroupMarker: EventGroupMarker;
   eventsById: Map<string, EventMarkerAttributionEntry>;
+  lifecycleGroupIds: Set<string>;
+  firstEventByLifecycleGroupId: Map<string, WorkflowEvent>;
   firstEventId: string;
+  orderedEvents?: WorkflowEvent[];
+  orderedLifecycleGroupIds?: string[];
 };
 
 export type EventGroupMarkerPresentation = {
@@ -221,6 +220,10 @@ const summarizeEventMarkerLifecycleGroups = (
 ): {
   statusSummary: EventMarkerGroupStatusSummary;
   lastEvent?: WorkflowEvent;
+  isPending: boolean;
+  isFailureOrTimedOut: boolean;
+  isCanceled: boolean;
+  isTerminated: boolean;
 } => {
   const statusSummary: EventMarkerGroupStatusSummary = {
     failed: 0,
@@ -231,6 +234,10 @@ const summarizeEventMarkerLifecycleGroups = (
     paused: 0,
   };
   let lastEvent: WorkflowEvent | undefined;
+  let isPending = false;
+  let isFailureOrTimedOut = false;
+  let isCanceled = false;
+  let isTerminated = false;
 
   for (const group of lifecycleGroups) {
     const groupSummary = getLifecycleGroupStatusSummary(group);
@@ -240,36 +247,69 @@ const summarizeEventMarkerLifecycleGroups = (
     statusSummary.canceled += groupSummary.canceled;
     statusSummary.terminated += groupSummary.terminated;
     statusSummary.paused += groupSummary.paused;
+    isPending ||= group.isPending;
+    isFailureOrTimedOut ||= group.isFailureOrTimedOut;
+    isCanceled ||= group.isCanceled;
+    isTerminated ||= group.isTerminated;
 
     if (!lastEvent || Number(group.lastEvent.id) > Number(lastEvent.id)) {
       lastEvent = group.lastEvent;
     }
   }
 
-  return { statusSummary, lastEvent };
+  return {
+    statusSummary,
+    lastEvent,
+    isPending,
+    isFailureOrTimedOut,
+    isCanceled,
+    isTerminated,
+  };
 };
 
-export const getEventMarkerGroupStatusSummary = (
-  lifecycleGroups: EventGroups,
-): EventMarkerGroupStatusSummary =>
-  summarizeEventMarkerLifecycleGroups(lifecycleGroups).statusSummary;
+const getCachedOrderedAttributedEvents = (
+  attribution: EventMarkerAttribution,
+): WorkflowEvent[] => {
+  if (!attribution.orderedEvents) {
+    attribution.orderedEvents = [...attribution.eventsById.values()]
+      .map(({ event }) => event)
+      .toSorted((a, b) => Number(a.id) - Number(b.id));
+  }
+  return attribution.orderedEvents;
+};
+
+export const getCachedOrderedLifecycleGroupIds = (
+  attribution: EventMarkerAttribution,
+): string[] => {
+  if (!attribution.orderedLifecycleGroupIds) {
+    attribution.orderedLifecycleGroupIds = [
+      ...attribution.lifecycleGroupIds,
+    ].toSorted((a, b) => Number(a) - Number(b));
+  }
+  return attribution.orderedLifecycleGroupIds;
+};
 
 const toTimelineEventMarkerGroup = (
-  marker: MarkerAccumulator,
+  marker: MarkerIdentity & {
+    attribution: EventMarkerAttribution;
+    lifecycleGroups: EventGroups;
+  },
 ): TimelineEventMarkerGroup | undefined => {
-  const attributedEvents = marker.events.toSorted(
-    (a, b) => Number(a.id) - Number(b.id),
-  );
-  const lifecycleGroups = [...marker.lifecycleGroups.values()].toSorted(
-    (a, b) => Number(a.initialEvent.id) - Number(b.initialEvent.id),
-  );
+  const attributedEvents = getCachedOrderedAttributedEvents(marker.attribution);
+  const lifecycleGroups = marker.lifecycleGroups;
   if (!attributedEvents.length) return;
 
   const eventList = attributedEvents;
   const initialEvent = eventList[0];
   const lastAttributedEvent = eventList[eventList.length - 1];
-  const { statusSummary, lastEvent: lastLifecycleEvent } =
-    summarizeEventMarkerLifecycleGroups(lifecycleGroups);
+  const {
+    statusSummary,
+    lastEvent: lastLifecycleEvent,
+    isPending,
+    isFailureOrTimedOut,
+    isCanceled,
+    isTerminated,
+  } = summarizeEventMarkerLifecycleGroups(lifecycleGroups);
   const lastEvent =
     lastLifecycleEvent &&
     Number(lastLifecycleEvent.id) > Number(lastAttributedEvent.id)
@@ -290,28 +330,43 @@ const toTimelineEventMarkerGroup = (
     initialEvent,
     lastEvent,
     timestamp: initialEvent.timestamp,
-    classification: 'Open',
-    finalClassification: 'Open',
+    classification: isPending ? 'Running' : 'Completed',
+    finalClassification: isPending ? 'Running' : 'Completed',
     category: 'other',
     eventTime: lastEvent.eventTime,
     attributes: lastEvent.attributes,
-    isPending: lifecycleGroups.some((group) => group.isPending),
-    isFailureOrTimedOut: lifecycleGroups.some(
-      (group) => group.isFailureOrTimedOut,
-    ),
-    isCanceled: lifecycleGroups.some((group) => group.isCanceled),
-    isTerminated: lifecycleGroups.some((group) => group.isTerminated),
+    isPending,
+    isFailureOrTimedOut,
+    isCanceled,
+    isTerminated,
     level: undefined,
     pendingActivity: undefined,
     pendingNexusOperation: undefined,
     userMetadata: marker.label ? { summary: marker.label } : undefined,
-    links: attributedEvents.flatMap((event) => event.links ?? []),
-    billableActions: attributedEvents.reduce(
-      (total, event) => total + (event.billableActions ?? 0),
-      0,
-    ),
+    // Marker groups are presentation-only containers. Their child lifecycle
+    // groups retain links and billable-action information.
+    links: [],
+    billableActions: 0,
     eventCount: attributedEvents.length,
   };
+};
+
+export const createTimelineEventMarkerGroup = (
+  attribution: EventMarkerAttribution,
+  lifecycleGroups: EventGroups,
+  presentationsByMarkerKey: ReadonlyMap<string, EventGroupMarkerPresentation>,
+): TimelineEventMarkerGroup | undefined => {
+  const identity = getMarkerIdentity(
+    attribution.eventGroupMarker,
+    presentationsByMarkerKey,
+  );
+  if (!identity) return;
+
+  return toTimelineEventMarkerGroup({
+    ...identity,
+    attribution,
+    lifecycleGroups,
+  });
 };
 
 export const createTimelineEventMarkerGroups = (
@@ -325,33 +380,27 @@ export const createTimelineEventMarkerGroups = (
 
   return [...attributions]
     .map((attribution) => {
-      const identity = getMarkerIdentity(
-        attribution.eventGroupMarker,
-        presentationsByMarkerKey,
-      );
-      if (!identity) return;
-
-      const attributedEvents: WorkflowEvent[] = [];
-      const attributedLifecycleGroups = new Map<string, EventGroup>();
-      for (const {
-        event,
-        lifecycleGroupId,
-      } of attribution.eventsById.values()) {
-        attributedEvents.push(event);
+      const attributedLifecycleGroups: EventGroup[] = [];
+      for (const lifecycleGroupId of getCachedOrderedLifecycleGroupIds(
+        attribution,
+      )) {
         const group = lifecycleGroupsById.get(lifecycleGroupId);
         if (group) {
-          attributedLifecycleGroups.set(lifecycleGroupId, group);
+          attributedLifecycleGroups.push(group);
         } else {
-          const standalone = toStandaloneLifecycleGroup(event);
-          attributedLifecycleGroups.set(standalone.id, standalone);
+          const event =
+            attribution.firstEventByLifecycleGroupId.get(lifecycleGroupId);
+          if (event) {
+            attributedLifecycleGroups.push(toStandaloneLifecycleGroup(event));
+          }
         }
       }
 
-      return toTimelineEventMarkerGroup({
-        ...identity,
-        events: attributedEvents,
-        lifecycleGroups: attributedLifecycleGroups,
-      });
+      return createTimelineEventMarkerGroup(
+        attribution,
+        attributedLifecycleGroups,
+        presentationsByMarkerKey,
+      );
     })
     .filter((group): group is TimelineEventMarkerGroup => Boolean(group))
     .toSorted((a, b) => Number(a.initialEvent.id) - Number(b.initialEvent.id));
@@ -372,15 +421,5 @@ export const eventMatchesEventGroupFilter = (
       const key = getEventGroupMarkerKey(marker);
       return key ? markerKeys.has(key) : false;
     }),
-  );
-};
-
-export const lifecycleGroupMatchesEventGroupFilter = (
-  group: EventGroup,
-  markerKeys: ReadonlySet<string>,
-): boolean => {
-  if (!markerKeys.size) return true;
-  return group.eventList.some((event) =>
-    eventMatchesEventGroupFilter(event, markerKeys),
   );
 };

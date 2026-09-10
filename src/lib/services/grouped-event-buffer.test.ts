@@ -193,6 +193,35 @@ describe('output equivalence with groupEvents', () => {
     expect(getEventMarkerGroupArray()[0].eventList[0].id).toBe('2');
   });
 
+  it('keeps marker events and lifecycle groups ordered across cursor arrival order', () => {
+    const first = makeActivityScheduled(1, 'First');
+    const second = makeActivityScheduled(4, 'Second');
+    const third = makeActivityScheduled(7, 'Third');
+    for (const event of [first, second, third]) {
+      event.eventGroupMarkers = [{ label: { id: 'ordered' } }];
+    }
+
+    ingestHistoryEvent(second);
+    getEventMarkerGroupArray(); // Prime the ordered attribution caches.
+    ingestHistoryEvent(first);
+
+    let [group] = getEventMarkerGroupArray();
+    expect(group.eventList.map((event) => event.id)).toEqual(['1', '4']);
+    expect(group.lifecycleGroups.map((lifecycle) => lifecycle.id)).toEqual([
+      '1',
+      '4',
+    ]);
+
+    ingestHistoryEvent(third);
+    [group] = getEventMarkerGroupArray();
+    expect(group.eventList.map((event) => event.id)).toEqual(['1', '4', '7']);
+    expect(group.lifecycleGroups.map((lifecycle) => lifecycle.id)).toEqual([
+      '1',
+      '4',
+      '7',
+    ]);
+  });
+
   it('uses signal and update names as inbound marker labels', () => {
     const signal = {
       eventId: '1',

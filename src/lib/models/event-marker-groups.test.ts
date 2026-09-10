@@ -12,8 +12,6 @@ import {
   eventMatchesEventGroupFilter,
   getEventGroupMarkerKey,
   getEventGroupMarkerPresentation,
-  getEventMarkerGroupStatusSummary,
-  lifecycleGroupMatchesEventGroupFilter,
 } from './event-marker-groups';
 
 const createEvent = (
@@ -76,6 +74,13 @@ const createAttribution = (
     (first, event) => (Number(event.id) < Number(first) ? event.id : first),
     events[0].id,
   ),
+  lifecycleGroupIds: new Set(lifecycleGroupIds),
+  firstEventByLifecycleGroupId: new Map(
+    lifecycleGroupIds.map((lifecycleGroupId, index) => [
+      lifecycleGroupId,
+      events[lifecycleGroupIds.length === 1 ? 0 : index],
+    ]),
+  ),
   eventsById: new Map(
     events.map((event, index) => [
       event.id,
@@ -111,11 +116,8 @@ const presentationsByMarkerKey = new Map(
 );
 
 describe('createTimelineEventMarkerGroups', () => {
-  it('matches events and lifecycle groups against any selected marker', () => {
+  it('matches events against any selected marker', () => {
     const checkout = createEvent('1', [{ label: { id: 'checkout' } }]);
-    const payment = createEvent('2', [{ label: { id: 'payment' } }]);
-    const lifecycleGroup = createLifecycleGroup('1', [checkout, payment]);
-
     expect(
       eventMatchesEventGroupFilter(
         checkout,
@@ -125,15 +127,6 @@ describe('createTimelineEventMarkerGroups', () => {
     expect(
       eventMatchesEventGroupFilter(checkout, new Set(['label:other'])),
     ).toBe(false);
-    expect(
-      lifecycleGroupMatchesEventGroupFilter(
-        lifecycleGroup,
-        new Set(['label:payment']),
-      ),
-    ).toBe(true);
-    expect(
-      lifecycleGroupMatchesEventGroupFilter(lifecycleGroup, new Set()),
-    ).toBe(true);
   });
 
   it('uses consistent fallback labels for marker kinds', () => {
@@ -226,6 +219,21 @@ describe('createTimelineEventMarkerGroups', () => {
     );
 
     expect(group.isPending).toBe(true);
+    expect(group.classification).toBe('Running');
+    expect(group.finalClassification).toBe('Running');
+  });
+
+  it('is completed when none of its lifecycle groups are pending', () => {
+    const event = createEvent('1', [{ label: { id: 'checkout' } }]);
+
+    const [group] = createTimelineEventMarkerGroups(
+      [createAttribution({ label: { id: 'checkout' } }, [event], ['1'])],
+      [createLifecycleGroup('1', [event])],
+      presentationsByMarkerKey,
+    );
+
+    expect(group.classification).toBe('Completed');
+    expect(group.finalClassification).toBe('Completed');
   });
 
   it('ends at the last event in an attributed lifecycle group', () => {
@@ -270,18 +278,29 @@ describe('createTimelineEventMarkerGroups', () => {
     const terminated = createEvent('4');
     const paused = createEvent('5');
 
-    expect(
-      getEventMarkerGroupStatusSummary([
-        createLifecycleGroup('1', [failed]),
-        createLifecycleGroup('2', [retryStarted, timedOut]),
-        createLifecycleGroup('3', [canceled], { isCanceled: true }),
-        createLifecycleGroup('4', [terminated], { isTerminated: true }),
-        createLifecycleGroup('5', [paused], {
-          isPending: true,
-          pendingActivity: { paused: true } as never,
-        }),
-      ]),
-    ).toEqual({
+    const lifecycleGroups = [
+      createLifecycleGroup('1', [failed]),
+      createLifecycleGroup('2', [retryStarted, timedOut]),
+      createLifecycleGroup('3', [canceled], { isCanceled: true }),
+      createLifecycleGroup('4', [terminated], { isTerminated: true }),
+      createLifecycleGroup('5', [paused], {
+        isPending: true,
+        pendingActivity: { paused: true } as never,
+      }),
+    ];
+    const [group] = createTimelineEventMarkerGroups(
+      [
+        createAttribution(
+          { label: { id: 'recovery' } },
+          [failed, retryStarted, canceled, terminated, paused],
+          ['1', '2', '3', '4', '5'],
+        ),
+      ],
+      lifecycleGroups,
+      presentationsByMarkerKey,
+    );
+
+    expect(group.statusSummary).toEqual({
       failed: 1,
       timedOut: 1,
       retries: 2,
@@ -302,12 +321,24 @@ describe('createTimelineEventMarkerGroups', () => {
     });
     const lifecycleGroup = createLifecycleGroup('1', [event]);
 
-    getEventMarkerGroupStatusSummary([lifecycleGroup]);
+    createTimelineEventMarkerGroups(
+      [createAttribution({ label: { id: 'cached-summary' } }, [event], ['1'])],
+      [lifecycleGroup],
+      presentationsByMarkerKey,
+    );
     const readsAfterFirstSummary = classificationReads;
-    getEventMarkerGroupStatusSummary([lifecycleGroup]);
+    createTimelineEventMarkerGroups(
+      [createAttribution({ label: { id: 'cached-summary' } }, [event], ['1'])],
+      [lifecycleGroup],
+      presentationsByMarkerKey,
+    );
     expect(classificationReads).toBe(readsAfterFirstSummary);
 
-    getEventMarkerGroupStatusSummary([{ ...lifecycleGroup }]);
+    createTimelineEventMarkerGroups(
+      [createAttribution({ label: { id: 'cached-summary' } }, [event], ['1'])],
+      [{ ...lifecycleGroup }],
+      presentationsByMarkerKey,
+    );
     expect(classificationReads).toBeGreaterThan(readsAfterFirstSummary);
   });
 

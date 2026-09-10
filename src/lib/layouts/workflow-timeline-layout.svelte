@@ -52,6 +52,9 @@
   const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
 
   const namespace = $derived(page.params.namespace);
+  const workflowExecutionKey = $derived(
+    `${page.params.namespace}:${page.params.workflow}:${page.params.run}`,
+  );
   const workflow = $derived($workflowRun.workflow);
 
   const urlParams = $derived(parseEventFilterParams(page.url));
@@ -301,7 +304,9 @@
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
         <EventTypeFilter compact={false} />
-        <EventGroupFilter markers={markerDescriptors} />
+        {#key workflowExecutionKey}
+          <EventGroupFilter markers={markerDescriptors} />
+        {/key}
         <ToggleButton
           data-testid="event-groups"
           disabled={!hasMarkerGroups}

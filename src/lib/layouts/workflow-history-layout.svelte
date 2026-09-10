@@ -59,6 +59,9 @@
   const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
 
   const { namespace } = $derived(page.params);
+  const workflowExecutionKey = $derived(
+    `${page.params.namespace}:${page.params.workflow}:${page.params.run}`,
+  );
   const { workflow } = $derived($workflowRun);
   const pendingActivities = $derived(workflow?.pendingActivities ?? []);
   const pendingNexusOperations = $derived(
@@ -266,7 +269,9 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
-        <EventGroupFilter markers={markerDescriptors} />
+        {#key workflowExecutionKey}
+          <EventGroupFilter markers={markerDescriptors} />
+        {/key}
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"

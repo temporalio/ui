@@ -568,14 +568,9 @@
     let bottomIndex = headerIndex;
     let bottom = headerTop + eventGroupHeaderHeight;
 
-    for (let index = 0; index < filteredGroups.length; index++) {
-      const groupId = filteredGroups[index].id;
-      if (
-        groupId === selectedEventGroup.id ||
-        !selectedEventGroupRowIds.has(groupId)
-      ) {
-        continue;
-      }
+    for (const lifecycleGroup of selectedEventGroup.lifecycleGroups) {
+      const index = groupIndexMap.get(lifecycleGroup.id);
+      if (index === undefined) continue;
 
       if (reverseSort ? index < bottomIndex : index > bottomIndex) {
         bottomIndex = index;
@@ -676,21 +671,15 @@
     };
 
     addBadge(
-      'canceled',
-      'workflows.event-group-canceled-count',
-      summary.canceled,
-      'subtle',
-    );
-    addBadge(
       'failed',
       'workflows.event-group-failed-count',
       summary.failed,
       'danger',
     );
     addBadge(
-      'paused',
-      'workflows.event-group-paused-count',
-      summary.paused,
+      'timed-out',
+      'workflows.event-group-timed-out-count',
+      summary.timedOut,
       'warning',
     );
     addBadge(
@@ -706,9 +695,15 @@
       'danger',
     );
     addBadge(
-      'timed-out',
-      'workflows.event-group-timed-out-count',
-      summary.timedOut,
+      'canceled',
+      'workflows.event-group-canceled-count',
+      summary.canceled,
+      'subtle',
+    );
+    addBadge(
+      'paused',
+      'workflows.event-group-paused-count',
+      summary.paused,
       'warning',
     );
     return badges;

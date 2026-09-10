@@ -2,6 +2,8 @@
   import { SvelteMap } from 'svelte/reactivity';
   import { writable } from 'svelte/store';
 
+  import { untrack } from 'svelte';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -21,7 +23,11 @@
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
 
+  import { limitEventGroupFilterOptions } from './event-group-filter';
+
   let { markers }: { markers: EventGroupMarkerDescriptor[] } = $props();
+
+  const DECODE_CONCURRENCY = 4;
 
   const open = writable(false);
   let search = $state('');
@@ -31,7 +37,7 @@
   const labelFor = (marker: EventGroupMarkerDescriptor): string =>
     decodedLabels.get(marker.markerKey) ?? marker.displayName;
 
-  const options = $derived.by(() => {
+  const matchingOptions = $derived.by(() => {
     const query = search.trim().toLocaleLowerCase();
     if (!query) return markers;
     return markers.filter((marker) =>
@@ -39,38 +45,71 @@
     );
   });
 
-  $effect(() => {
-    if (!$open) return;
-    const markersToDecode = markers.flatMap((marker) => {
-      const payload = marker.eventGroupMarker.label?.label;
-      if (!payload || decodedPayloads.get(marker.markerKey) === payload) {
-        return [];
-      }
-      decodedPayloads.set(marker.markerKey, payload);
-      return [{ marker, payload }];
-    });
-    if (!markersToDecode.length) return;
+  const visibleOptions = $derived(
+    limitEventGroupFilterOptions(matchingOptions, new Set($eventGroupFilter)),
+  );
 
-    Promise.all(
-      markersToDecode.map(async ({ marker, payload }) => {
+  const hasMoreOptions = $derived(
+    matchingOptions.length > visibleOptions.length,
+  );
+
+  type MarkerToDecode = {
+    marker: EventGroupMarkerDescriptor;
+    payload: Payload;
+  };
+
+  const decodeMarkers = async (
+    markersToDecode: MarkerToDecode[],
+    isActive: () => boolean,
+  ) => {
+    let nextIndex = 0;
+
+    const worker = async () => {
+      while (isActive() && nextIndex < markersToDecode.length) {
+        const index = nextIndex++;
+        const { marker, payload } = markersToDecode[index];
+        decodedPayloads.set(marker.markerKey, payload);
+        let label: string | undefined;
         try {
           const decoded = await decodePayloadAndParseDataToJSON(payload);
-          return {
-            key: marker.markerKey,
-            label: typeof decoded === 'string' && decoded ? decoded : undefined,
-            payload,
-          };
+          label = typeof decoded === 'string' && decoded ? decoded : undefined;
         } catch {
-          return { key: marker.markerKey, label: undefined, payload };
+          label = undefined;
         }
-      }),
-    ).then((results) => {
-      for (const { key, label, payload } of results) {
-        if (decodedPayloads.get(key) !== payload) continue;
-        if (label) decodedLabels.set(key, label);
-        else decodedLabels.delete(key);
+
+        if (decodedPayloads.get(marker.markerKey) !== payload) continue;
+        if (label) decodedLabels.set(marker.markerKey, label);
+        else decodedLabels.delete(marker.markerKey);
       }
-    });
+    };
+
+    await Promise.all(
+      Array.from(
+        { length: Math.min(DECODE_CONCURRENCY, markersToDecode.length) },
+        worker,
+      ),
+    );
+  };
+
+  $effect(() => {
+    if (!$open) return;
+    const currentMarkers = markers;
+    const markersToDecode = untrack(() =>
+      currentMarkers.flatMap((marker) => {
+        const payload = marker.eventGroupMarker.label?.label;
+        if (!payload || decodedPayloads.get(marker.markerKey) === payload) {
+          return [];
+        }
+        return [{ marker, payload }];
+      }),
+    );
+    if (!markersToDecode.length) return;
+
+    let active = true;
+    void decodeMarkers(markersToDecode, () => active);
+    return () => {
+      active = false;
+    };
   });
 
   const setSelection = (next: string[]) => {
@@ -109,7 +148,7 @@
     id="event-group-filter-menu"
     keepOpen
     position="right"
-    class="w-[280px] md:w-[380px]"
+    class="w-[280px] min-w-0 max-w-[calc(100dvw-1rem)] md:w-[380px]"
   >
     <li role="none" class="p-2">
       <Input
@@ -130,8 +169,8 @@
       </MenuItem>
       <MenuDivider />
     {/if}
-    {#if options.length}
-      {#each options as marker (marker.markerKey)}
+    {#if matchingOptions.length}
+      {#each visibleOptions as marker (marker.markerKey)}
         {@const label = labelFor(marker)}
         <MenuItem onclick={() => toggle(marker.markerKey)} class="min-w-0">
           {#snippet leading()}
@@ -143,13 +182,23 @@
             />
           {/snippet}
           <div class="flex min-w-0 flex-1 items-center gap-2">
-            <span class="min-w-0 flex-1 truncate" title={label}>{label}</span>
+            <span class="min-w-0 flex-1 whitespace-normal break-words"
+              >{label}</span
+            >
             <span class="shrink-0 text-xs text-secondary">
               {marker.eventCount}
             </span>
           </div>
         </MenuItem>
       {/each}
+      {#if hasMoreOptions}
+        <li
+          role="none"
+          class="surface-primary sticky bottom-0 px-3 py-2 text-center text-xs text-secondary"
+        >
+          {translate('workflows.event-group-filter-more-results')}
+        </li>
+      {/if}
     {:else}
       <li role="none" class="px-3 py-4 text-center text-sm text-secondary">
         {translate('common.no-results')}
