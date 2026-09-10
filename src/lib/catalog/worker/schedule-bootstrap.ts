@@ -1,0 +1,142 @@
+import {
+  catalogScheduleSyncExampleId,
+  catalogScheduleSyncScheduleId,
+  managerScheduleEntry,
+} from './examples/schedule-sync/ownership.js';
+import type { CatalogWorkerBinding } from './registry.js';
+import {
+  type CatalogDesiredSchedule,
+  declaredSchedules,
+} from './schedule-declarations.js';
+
+export type CatalogScheduleBootstrapEvent = {
+  state: 'blocked' | 'created' | 'held' | 'skipped' | 'triggered' | 'updated';
+  scheduleId: string;
+  namespace?: string;
+  taskQueue?: string;
+  declaredCount?: number;
+  reason?: string;
+  error?: unknown;
+};
+
+/**
+ * Refuses a binding set that does not cover every registered target.
+ *
+ * The desired list is built from the bindings handed in, and the reconciler
+ * deletes every catalog-owned schedule that is not on it. So a partial set does
+ * not reconcile a subset — it deletes the schedules the missing targets
+ * declare. `registeredTargetIds` comes from the registry rather than from
+ * `bindings`, which is what makes this check able to see the difference.
+ */
+const assertEveryTargetPresent = (
+  bindings: readonly CatalogWorkerBinding[],
+  registeredTargetIds: readonly string[],
+) => {
+  const present = new Set(bindings.map(({ target }) => target.id));
+  const missing = registeredTargetIds.filter((id) => !present.has(id));
+
+  if (missing.length === 0) return;
+
+  throw new Error(
+    `The schedule manager was given ${present.size === 0 ? 'no targets' : [...present].join(', ')} but ${missing.join(', ')} is also registered. ` +
+      'Reconciling from a partial set would delete the schedules the missing targets declare, so it needs every registered target.',
+  );
+};
+
+export const bootstrapCatalogScheduleSync = async ({
+  bindings,
+  registeredTargetIds,
+  runningTargetIds,
+  describeManager,
+  createManager,
+  updateManagerArgs,
+  triggerManager,
+  onEvent,
+}: {
+  /** Every registered target, not the subset this process will poll. */
+  bindings: readonly CatalogWorkerBinding[];
+  /** Target ids the registry knows about, used to prove `bindings` is complete. */
+  registeredTargetIds: readonly string[];
+  /** Targets this process will actually poll, which may be narrower. */
+  runningTargetIds: readonly string[];
+  describeManager: (
+    entry: CatalogDesiredSchedule,
+  ) => Promise<{ exists: boolean; paused: boolean }>;
+  createManager: (entry: CatalogDesiredSchedule) => Promise<void>;
+  updateManagerArgs: (entry: CatalogDesiredSchedule) => Promise<void>;
+  triggerManager: (entry: CatalogDesiredSchedule) => Promise<void>;
+  onEvent: (event: CatalogScheduleBootstrapEvent) => void;
+}): Promise<void> => {
+  assertEveryTargetPresent(bindings, registeredTargetIds);
+
+  const declared = declaredSchedules(bindings);
+  const manager = bindings
+    .flatMap(({ target, examples }) =>
+      examples.map((example) => ({ target, example })),
+    )
+    .find(({ example }) => example.id === catalogScheduleSyncExampleId);
+
+  if (!manager || manager.example.execution.kind !== 'workflow') {
+    onEvent({
+      state: 'skipped',
+      scheduleId: catalogScheduleSyncScheduleId,
+      reason: `The "${catalogScheduleSyncExampleId}" example is not registered as a workflow on any target`,
+    });
+    return;
+  }
+
+  if (!runningTargetIds.includes(manager.target.id)) {
+    onEvent({
+      state: 'skipped',
+      scheduleId: catalogScheduleSyncScheduleId,
+      reason: `No worker in this process polls the "${manager.target.id}" target, so a triggered sync would wait for one`,
+    });
+    return;
+  }
+
+  const entry = managerScheduleEntry(declared, {
+    namespace: manager.target.namespace,
+    taskQueue: manager.target.taskQueue,
+    workflowType: manager.example.execution.workflowType,
+  });
+  const details = {
+    scheduleId: entry.id,
+    namespace: entry.namespace,
+    taskQueue: entry.taskQueue,
+    declaredCount: declared.length,
+  };
+
+  try {
+    const { exists, paused } = await describeManager(entry);
+
+    // A paused manager is the kill switch. Rewriting its args or triggering it
+    // would restart the reconciliation the pause was meant to stop, and every
+    // worker restart would do it again. Resume it to hand control back.
+    if (exists && paused) {
+      onEvent({
+        state: 'held',
+        ...details,
+        reason: 'paused by hand; resume it to reconcile again',
+      });
+      return;
+    }
+
+    if (exists) {
+      await updateManagerArgs(entry);
+      onEvent({ state: 'updated', ...details });
+    } else {
+      await createManager(entry);
+      onEvent({ state: 'created', ...details });
+    }
+  } catch (error) {
+    onEvent({ state: 'blocked', ...details, error });
+    return;
+  }
+
+  try {
+    await triggerManager(entry);
+    onEvent({ state: 'triggered', ...details });
+  } catch (error) {
+    onEvent({ state: 'blocked', ...details, error });
+  }
+};

@@ -6,8 +6,10 @@ import { withSharedCatalogStartOptions } from '../browser/start-options.js';
 import type {
   BrowserCatalogDescriptor,
   BrowserCatalogMetadata,
+  BrowserScheduleDeclaration,
   JsonObject,
   JsonSchema,
+  JsonValue,
   RuntimeJsonDocument,
 } from '../browser/types';
 
@@ -31,6 +33,8 @@ type ExampleMetadata = BrowserCatalogMetadata & {
   targetId: string;
 };
 
+export type CatalogScheduleDeclaration = BrowserScheduleDeclaration;
+
 type WorkflowExecution = {
   kind: 'workflow';
   workflowType: string;
@@ -38,6 +42,7 @@ type WorkflowExecution = {
   activities: Readonly<Record<string, ActivityImplementation>>;
   nexusEndpoints?: readonly string[];
   nexusServices?: readonly ServiceHandler[];
+  schedule?: CatalogScheduleDeclaration;
 };
 
 type StandaloneActivityExecution = {
@@ -93,6 +98,7 @@ export type CatalogWorkerBinding = {
   examples: {
     id: string;
     execution: CatalogExampleRegistration['execution'];
+    inputDefault: JsonValue;
   }[];
   activities: Record<string, ActivityImplementation>;
   nexusServices: ServiceHandler[];
@@ -252,6 +258,71 @@ const isNexusHandler = (value: unknown): value is ServiceHandler =>
   typeof value.definition.operations === 'object' &&
   value.definition.operations !== null;
 
+const scheduleFields = new Set(['id', 'spec', 'input', 'paused', 'note']);
+
+const scheduleSpecFields = new Set(['cronExpressions', 'intervals']);
+
+const scheduleIntervalFields = new Set(['every', 'offset']);
+
+const isPlainRecord = (
+  value: unknown,
+  knownFields: ReadonlySet<string>,
+): value is Record<string, unknown> =>
+  typeof value === 'object' &&
+  value !== null &&
+  !Array.isArray(value) &&
+  hasOnlyEnumerableDataProperties(value) &&
+  hasOnlyKnownFields(value, knownFields);
+
+const isScheduleInterval = (value: unknown): boolean => {
+  if (!isPlainRecord(value, scheduleIntervalFields)) return false;
+
+  return (
+    isNonEmptyString(value.every) &&
+    (value.offset === undefined || isNonEmptyString(value.offset))
+  );
+};
+
+const isCatalogScheduleDeclaration = (
+  value: unknown,
+): value is CatalogScheduleDeclaration => {
+  if (!isPlainRecord(value, scheduleFields)) return false;
+
+  if (
+    !isNonEmptyString(value.id) ||
+    typeof value.paused !== 'boolean' ||
+    (value.note !== undefined && !isNonEmptyString(value.note)) ||
+    (value.input !== undefined &&
+      (!Array.isArray(value.input) || !isJsonSerializable(value.input)))
+  ) {
+    return false;
+  }
+
+  if (!isPlainRecord(value.spec, scheduleSpecFields)) return false;
+
+  const { cronExpressions, intervals } = value.spec;
+
+  if (
+    cronExpressions !== undefined &&
+    (!Array.isArray(cronExpressions) ||
+      !cronExpressions.every(isNonEmptyString))
+  ) {
+    return false;
+  }
+
+  if (
+    intervals !== undefined &&
+    (!Array.isArray(intervals) || !intervals.every(isScheduleInterval))
+  ) {
+    return false;
+  }
+
+  const cronCount = Array.isArray(cronExpressions) ? cronExpressions.length : 0;
+  const intervalCount = Array.isArray(intervals) ? intervals.length : 0;
+
+  return cronCount + intervalCount > 0;
+};
+
 const exampleFields = new Set([
   'id',
   'title',
@@ -280,6 +351,7 @@ const workflowExecutionFields = new Set([
   'activities',
   'nexusEndpoints',
   'nexusServices',
+  'schedule',
 ]);
 
 const standaloneActivityExecutionFields = new Set([
@@ -513,6 +585,16 @@ export const generateCatalog = (registry: CatalogRegistry) => {
 
     if (
       example.execution.kind === 'workflow' &&
+      example.execution.schedule !== undefined &&
+      !isCatalogScheduleDeclaration(example.execution.schedule)
+    ) {
+      throw new Error(
+        `Catalog workflow execution for example "${example.id}" declares an invalid schedule`,
+      );
+    }
+
+    if (
+      example.execution.kind === 'workflow' &&
       !hasOnlyEnumerableDataProperties(example.execution.activities)
     ) {
       throw new Error(
@@ -532,6 +614,7 @@ export const generateCatalog = (registry: CatalogRegistry) => {
   }
 
   const exampleIds = new Set<string>();
+  const scheduleIds = new Set<string>();
 
   for (const { execution, id, targetId } of registry.examples) {
     if (exampleIds.has(id)) {
@@ -539,6 +622,16 @@ export const generateCatalog = (registry: CatalogRegistry) => {
     }
 
     exampleIds.add(id);
+
+    if (execution.kind === 'workflow' && execution.schedule) {
+      if (scheduleIds.has(execution.schedule.id)) {
+        throw new Error(
+          `Duplicate catalog schedule id "${execution.schedule.id}" declared by example "${id}"`,
+        );
+      }
+
+      scheduleIds.add(execution.schedule.id);
+    }
 
     const target = registry.targets.find((target) => target.id === targetId);
 
@@ -629,7 +722,11 @@ export const generateCatalog = (registry: CatalogRegistry) => {
 
       return {
         target,
-        examples: examples.map(({ id, execution }) => ({ id, execution })),
+        examples: examples.map(({ id, execution, input }) => ({
+          id,
+          execution,
+          inputDefault: input.defaultValue,
+        })),
         activities,
         nexusServices,
       };
@@ -685,6 +782,7 @@ export const generateCatalog = (registry: CatalogRegistry) => {
           ...(execution.nexusEndpoints?.length
             ? { nexusEndpoints: [...execution.nexusEndpoints] }
             : {}),
+          ...(execution.schedule ? { schedule: execution.schedule } : {}),
         },
       };
     });

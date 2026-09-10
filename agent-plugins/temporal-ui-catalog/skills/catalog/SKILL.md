@@ -89,6 +89,35 @@ Each declared endpoint becomes a required readiness check. On a plaintext local 
 
 For manual steps no check can verify, add `setupMarkdown` to the example. It renders as a Setup card on the example page and travels in the generated artifact, so agents read the same guidance a person sees.
 
+## Schedules
+
+An example may declare one schedule beside its execution:
+
+```ts
+execution: {
+  kind: 'workflow',
+  workflowType: 'hello',
+  workflow: hello,
+  activities: { greet },
+  schedule: {
+    id: 'ui-catalog-hello-hourly',
+    spec: { cronExpressions: ['0 * * * *'] },
+    paused: false,
+    note: 'Declared by the hello catalog example',
+  },
+}
+```
+
+The spec takes `cronExpressions`, `intervals`, or both, and needs at least one entry. Add `input` to run the schedule with different arguments; without it the schedule uses the same input the Run button uses. Schedule ids must be unique across every registered example.
+
+Nothing is created until you turn the manager on. It is **disabled by default**; set `CATALOG_SCHEDULES=enabled` in `.env.catalog.local` and restart the worker. When it is off, the worker prints one line saying so.
+
+When it is on, the worker creates its own hourly `ui-catalog-schedule-sync` schedule and triggers it once. That schedule runs the `schedule-sync` example, which reconciles every declared schedule.
+
+The manager stamps a `uiCatalog` memo on each schedule it creates and only writes schedules carrying that memo. An owned schedule that no example declares any more is deleted. An existing id without the memo is reported as blocked and is never updated or deleted.
+
+To stop a declared schedule without editing code, pause it. A running state that disagrees with the declaration is reported as held, and the manager writes nothing to that schedule — spec, action, and state are all left alone — until it is resumed. Pausing `ui-catalog-schedule-sync` stops reconciliation entirely, including at worker startup, so it works as a kill switch that survives restarts.
+
 ## Promote a local example into the shared catalog
 
 Promotion is deliberate and never automatic:

@@ -15,12 +15,13 @@ import { catalogExample as example7 } from './long-activity/example.js';
 import { catalogExample as example8 } from './nexus-greeting/example.js';
 import { catalogExample as example9 } from './parallel-activities/example.js';
 import { catalogExample as example10 } from './priority-fairness/example.js';
-import { catalogExample as example11 } from './sequential-activities/example.js';
-import { catalogExample as example12 } from './signal-collector/example.js';
-import { catalogExample as example13 } from './signal-handlers/example.js';
-import { catalogExample as example14 } from './standalone-activity/example.js';
-import { catalogExample as example15 } from './timer-driven-repetition/example.js';
-import { catalogExample as example16 } from './workflow-patching/example.js';
+import { catalogExample as example11 } from './schedule-sync/example.js';
+import { catalogExample as example12 } from './sequential-activities/example.js';
+import { catalogExample as example13 } from './signal-collector/example.js';
+import { catalogExample as example14 } from './signal-handlers/example.js';
+import { catalogExample as example15 } from './standalone-activity/example.js';
+import { catalogExample as example16 } from './timer-driven-repetition/example.js';
+import { catalogExample as example17 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -40,6 +41,7 @@ const sharedWorkflowDefinitions = [
   example14,
   example15,
   example16,
+  example17,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -109,6 +111,11 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/parallel-activities/workflow.ts',
   'src/lib/catalog/worker/examples/priority-fairness/example.ts',
   'src/lib/catalog/worker/examples/priority-fairness/workflow.ts',
+  'src/lib/catalog/worker/examples/schedule-sync/activities.ts',
+  'src/lib/catalog/worker/examples/schedule-sync/example.ts',
+  'src/lib/catalog/worker/examples/schedule-sync/ownership.ts',
+  'src/lib/catalog/worker/examples/schedule-sync/plan.ts',
+  'src/lib/catalog/worker/examples/schedule-sync/workflow.ts',
   'src/lib/catalog/worker/examples/sequential-activities/example.ts',
   'src/lib/catalog/worker/examples/sequential-activities/workflow.ts',
   'src/lib/catalog/worker/examples/signal-collector/activity.ts',

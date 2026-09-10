@@ -10,6 +10,7 @@ export { longActivity } from './examples/long-activity/workflow.js';
 export { nexusGreeting } from './examples/nexus-greeting/workflow.js';
 export { parallelActivities } from './examples/parallel-activities/workflow.js';
 export { priorityFairnessWorkflow } from './examples/priority-fairness/workflow.js';
+export { catalogScheduleSync } from './examples/schedule-sync/workflow.js';
 export { sequentialActivities } from './examples/sequential-activities/workflow.js';
 export { signalCollector } from './examples/signal-collector/workflow.js';
 export { signalWorkflow } from './examples/signal-handlers/workflow.js';

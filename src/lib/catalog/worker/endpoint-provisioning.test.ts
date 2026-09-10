@@ -19,6 +19,7 @@ const binding = (
   examples: executions.map((execution, index) => ({
     id: `${targetId}-example-${index}`,
     execution,
+    inputDefault: [],
   })),
   activities: {},
   nexusServices: [],
