@@ -15,7 +15,11 @@ import {
   hasCloudRunImpersonatorPlaceholder,
   interpolateCloudRunTerraformTemplate,
 } from './cloud-run-terraform';
+import defaultAgentCoreTerraformTemplate from './serverless-worker-agentcore.tf?raw';
 import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
+import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
+import { interpolateTerraformTemplate } from './shared';
+import agentCoreCfnTemplate from './temporal-agentcore-role.yaml?raw';
 
 let computeFields: Component<Record<string, unknown>>;
 let renderComponent: typeof render;
@@ -87,7 +91,11 @@ interface ComputeFieldsOptions {
   gcpServiceAccount?: string;
   cloudRunTerraformTemplate?: string;
   terraformTemplate?: string;
+  roleExternalId?: string;
 }
+
+const AGENT_CORE_ENDPOINT_ARN =
+  'arn:aws:bedrock-agentcore:us-west-2:123456789012:runtime/orders-worker-abc123/runtime-endpoint/DEFAULT';
 
 const renderComputeFields = ({
   provider,
@@ -96,6 +104,7 @@ const renderComputeFields = ({
   gcpServiceAccount = '',
   cloudRunTerraformTemplate,
   terraformTemplate,
+  roleExternalId = '',
 }: ComputeFieldsOptions): string => {
   const { body } = renderComponent(computeFields, {
     props: {
@@ -103,7 +112,7 @@ const renderComputeFields = ({
       lambdaArn: '',
       agentCoreEndpointArn,
       iamRoleArn: '',
-      roleExternalId: '',
+      roleExternalId,
       gcpProject,
       gcpServiceAccount,
       cloudRunTerraformTemplate,
@@ -290,14 +299,65 @@ describe('AgentCore compute fields', () => {
     expect(body).toContain('name="roleExternalId"');
   });
 
-  // The CloudFormation and Terraform helpers grant lambda:InvokeFunction, so
-  // they would hand out a role that cannot invoke an AgentCore runtime.
-  it('hides the Lambda IAM setup helper', () => {
+  it('offers the IAM setup helper, as Lambda does', () => {
     const lambda = renderComputeFields({ provider: 'lambda' });
     const agentCore = renderComputeFields({ provider: 'agentcore' });
 
     expect(lambda).toContain("Don't have a role yet? Create one");
-    expect(agentCore).not.toContain("Don't have a role yet? Create one");
+    expect(agentCore).toContain("Don't have a role yet? Create one");
+  });
+
+  // Sharing Lambda's material would hand out a role granting
+  // lambda:InvokeFunction, which cannot invoke a runtime. The helper has to
+  // follow the provider, not merely appear for it.
+  it('ships Terraform that points at the AgentCore module', () => {
+    expect(defaultAgentCoreTerraformTemplate).toContain(
+      'serverless-workers/aws/agentcore',
+    );
+    expect(defaultAgentCoreTerraformTemplate).not.toContain(
+      'serverless-workers/aws/lambda',
+    );
+  });
+
+  it('ships CloudFormation granting InvokeAgentRuntime, not InvokeFunction', () => {
+    expect(agentCoreCfnTemplate).toContain(
+      'bedrock-agentcore:InvokeAgentRuntime',
+    );
+    expect(agentCoreCfnTemplate).toContain(
+      'bedrock-agentcore:GetAgentRuntimeEndpoint',
+    );
+    expect(agentCoreCfnTemplate).not.toContain('lambda:InvokeFunction');
+  });
+
+  // Cloud assumes the role as a service principal; a self-hosted server
+  // assumes it as its own IAM identity, which is a different trust policy key.
+  it('lets the CloudFormation trust policy name a self-hosted principal', () => {
+    expect(agentCoreCfnTemplate).toContain('TemporalPrincipal');
+    expect(agentCoreCfnTemplate).toContain('sts:ExternalId');
+    expect(agentCoreCfnTemplate).toContain('Service: temporal.io');
+  });
+
+  it('fills the AgentCore Terraform snippet with the endpoint ARN and external id', () => {
+    const filled = interpolateTerraformTemplate(
+      defaultAgentCoreTerraformTemplate,
+      {
+        externalId: 'tmprl-external-id',
+        agentCoreEndpointArn: AGENT_CORE_ENDPOINT_ARN,
+      },
+    );
+
+    expect(filled).toContain('external_id = "tmprl-external-id"');
+    expect(filled).toContain(AGENT_CORE_ENDPOINT_ARN);
+    expect(filled).not.toContain('<external-id>');
+  });
+
+  it('leaves the Lambda snippet alone when given AgentCore values', () => {
+    const filled = interpolateTerraformTemplate(defaultTerraformTemplate, {
+      agentCoreEndpointArn: AGENT_CORE_ENDPOINT_ARN,
+    });
+
+    expect(filled).not.toContain(AGENT_CORE_ENDPOINT_ARN);
+    expect(filled).toBe(defaultTerraformTemplate);
   });
 
   it('offers the invoke-based scaling fields rather than replica controls', () => {

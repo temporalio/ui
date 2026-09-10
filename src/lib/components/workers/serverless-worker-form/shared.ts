@@ -324,11 +324,30 @@ export const getInitialComputeProvider = ({
 interface TerraformTemplateValues {
   externalId?: string;
   lambdaArn?: string;
+  /** The Runtime Endpoint ARN, for the AgentCore module's list. */
+  agentCoreEndpointArn?: string;
 }
+
+/** Rewrites a `key = [...]` list in an HCL snippet with the ARNs given. */
+const replaceArnList = (template: string, key: string, value?: string) => {
+  const arns = (value ?? '')
+    .split(',')
+    .map((arn) => arn.trim())
+    .filter(Boolean);
+
+  if (!arns.length) return template;
+
+  const entries = arns.map((arn) => `    "${arn}",`).join('\n');
+
+  return template.replace(
+    new RegExp(`(${key}\\s*=\\s*\\[)[^\\]]*(\\])`),
+    (_, open: string, close: string) => `${open}\n${entries}\n  ${close}`,
+  );
+};
 
 export const interpolateTerraformTemplate = (
   template: string,
-  { externalId, lambdaArn }: TerraformTemplateValues,
+  { externalId, lambdaArn, agentCoreEndpointArn }: TerraformTemplateValues,
 ): string => {
   let result = template;
 
@@ -339,18 +358,11 @@ export const interpolateTerraformTemplate = (
     );
   }
 
-  const arns = (lambdaArn ?? '')
-    .split(',')
-    .map((arn) => arn.trim())
-    .filter(Boolean);
-
-  if (arns.length) {
-    const entries = arns.map((arn) => `    "${arn}",`).join('\n');
-    result = result.replace(
-      /(lambda_function_arns\s*=\s*\[)[^\]]*(\])/,
-      (_, open: string, close: string) => `${open}\n${entries}\n  ${close}`,
-    );
-  }
+  // Only one of these keys exists in a given snippet, so both run and the
+  // absent one is a no-op rather than the caller having to say which provider
+  // this template belongs to.
+  result = replaceArnList(result, 'lambda_function_arns', lambdaArn);
+  result = replaceArnList(result, 'agent_runtime_arns', agentCoreEndpointArn);
 
   return result;
 };
