@@ -289,17 +289,32 @@ nothing to drive, and it says so rather than falling back silently. Playwright
 downloads its browsers separately from the package, so preflight launches one
 before any stage starts rather than after a server build.
 
-### The Access fields go nowhere
+### The Access fields need a real role
 
-The form makes **IAM Role ARN** and **External ID** required. This server runs
-with `workercontroller.compute_providers.aws.require_role_and_external_id` set
-to false and discards both, so the run types placeholders purely to get past
-the validation.
+The form makes **IAM Role ARN** and **External ID** required, and always sends
+them. Setting
+`workercontroller.compute_providers.aws.require_role_and_external_id` to false
+makes the role *optional*, not ignored: a compute config that carries a role is
+one the server will assume. A placeholder therefore does not get discarded, it
+fails at `sts:AssumeRole` after the form has already done its job.
 
-That gap is real, not an artifact of the demo: the UI has no equivalent of the
-CLI's `--aws-agentcore-skip-role-and-external-id`, so a self-hosted operator
-who turned the requirement off can create a Version by CLI but not by form.
-FE-675 tracks it.
+So the scenario provisions a real one, `TemporalDemoAgentCoreInvoke`, trusting
+this account with an `sts:ExternalId` condition and granting
+`bedrock-agentcore:InvokeAgentRuntime` and `GetAgentRuntimeEndpoint`. It is
+listed in the teardown commands with everything else. Set `iamRoleArn` to use a
+role you already have instead.
+
+This is a different role from `TemporalDemoAgentCoreExecution`. That one is
+handed to AgentCore so it can pull the image; this one is assumed by whatever
+runs the Worker Controller so it can invoke the runtime.
+
+Cloud differs in the trust policy only: there Temporal assumes the customer's
+role, so it names `temporal.io` rather than the caller's own account.
+
+The gap this leaves is real. The CLI can create a Version with no role at all
+via `--aws-agentcore-skip-role-and-external-id`; the form has no equivalent, so
+a self-hosted operator who turned the requirement off still has to supply a
+role that assumes. FE-675 tracks it.
 
 ## Provisioning the AgentCore runtime
 

@@ -65,7 +65,7 @@ export const definition = defineScenario({
       'The Resource field on the version must be the Runtime *Endpoint* ARN, ending in /runtime-endpoint/<name>. A bare Runtime ARN is rejected: the provider parses the runtime id and endpoint name out of it.',
       'Check the runtime log group. It must show one INVOKED line carrying {"deploymentName","buildId"} — the payload the Worker Controller sends — followed by the Worker reporting that it is polling.',
       'Run it twice. The second run gets a fresh tunnel hostname and a fresh build id, and must still work: the scenario repoints the runtime each time rather than trusting a stored address.',
-      "The form makes IAM Role ARN and External ID required, and this server discards both because it runs with require_role_and_external_id false. The run types placeholders to get past them. The UI has no equivalent of the CLI's --aws-agentcore-skip-role-and-external-id, which is the gap FE-675 tracks.",
+      "The form makes IAM Role ARN and External ID required and always sends them, and require_role_and_external_id false makes the role optional rather than ignored: the server assumes what it is sent. The run provisions a real invoke role, and the Version works only because that role assumes. The UI has no equivalent of the CLI's --aws-agentcore-skip-role-and-external-id, which is the gap FE-675 tracks.",
     ],
   },
 });

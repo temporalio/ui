@@ -6,6 +6,7 @@ import { $ } from 'zx';
 import { resolveCli } from './cli';
 import {
   checkProvisioningAccess,
+  ensureInvokeRole,
   provisionAgentCore,
   runtimeExists,
 } from './provision';
@@ -37,6 +38,13 @@ const optionsSchema = z.strictObject({
   provision: z.boolean().default(false),
   region: z.string().default('us-west-2'),
   deploymentName: z.string().default('agentcore-demo'),
+  /**
+   * Give each run its own deployment, suffixed with the run's timestamp.
+   * Reusing one deployment does not work: its earlier Versions go INACTIVE,
+   * the server stops reporting their ComputeConfig, and the create-version
+   * page then refuses to render the form at all.
+   */
+  uniqueDeployment: z.boolean().default(true),
   buildId: z.string().default(''),
   taskQueue: z.string().default('agentcore-tq'),
   /** Registered by the Worker the AgentCore session starts. */
@@ -60,14 +68,15 @@ const optionsSchema = z.strictObject({
   /** Show the browser while the form is driven, rather than running headless. */
   headed: z.boolean().default(false),
   /**
-   * The Access fields the form requires. This server runs with
-   * require_role_and_external_id false and discards both, so these are
-   * placeholders that go no further than the form. Cloud requires real ones.
+   * The Access fields the form requires and always sends.
+   *
+   * require_role_and_external_id false makes the role optional, not ignored:
+   * the server assumes whatever role the config carries. The CLI can omit it
+   * with --aws-agentcore-skip-role-and-external-id and the form cannot, so
+   * this has to be a role that really assumes. Empty means provision one.
    */
-  iamRoleArn: z
-    .string()
-    .default('arn:aws:iam::000000000000:role/temporal-agentcore-demo'),
-  roleExternalId: z.string().default('agentcore-demo-external-id'),
+  iamRoleArn: z.string().default(''),
+  roleExternalId: z.string().default('temporal-agentcore-demo'),
   runtimeReadyTimeoutMs: z.number().int().default(300_000),
   workflowTimeoutMs: z.number().int().default(120_000),
 });
@@ -290,6 +299,21 @@ export const scenario: Scenario = {
 
     const observations: string[] = [];
     const buildId = options.buildId || `run-${Date.now()}`;
+
+    // Versions from earlier runs stay INACTIVE, and the server drops
+    // ComputeConfig from inactive Version summaries (FE-672). The
+    // create-version page cannot read a provider it cannot see, so it reports
+    // the deployment as unreadable and renders an error where the form should
+    // be: a second run against the same deployment finds no form to drive.
+    //
+    // Deleting those Versions is not available either. AgentCore sessions
+    // from earlier runs keep polling, and the server refuses to delete a
+    // Version with active pollers, which in turn blocks deleting the
+    // deployment. A per-run deployment is what keeps every run starting from
+    // a form that works.
+    const deploymentName = options.uniqueDeployment
+      ? `${options.deploymentName}-${buildId.replace(/^run-/, '')}`
+      : options.deploymentName;
     // PATH may hold a CLI older than the agentcore flags, so this is resolved
     // rather than assumed.
     const cli = await resolveCli();
@@ -400,11 +424,11 @@ export const scenario: Scenario = {
     const connection = await Connection.connect({ address: context.address });
     const client = new Client({ connection, namespace });
 
-    log(`Creating Worker Deployment "${options.deploymentName}"`);
+    log(`Creating Worker Deployment "${deploymentName}"`);
 
     // Lazily created deployments do not exist until a Worker polls, and a
     // serverless Version has no Worker yet, so it is created up front.
-    await $`${cli} worker deployment create --address ${context.address} --namespace ${namespace} --name ${options.deploymentName}`
+    await $`${cli} worker deployment create --address ${context.address} --namespace ${namespace} --name ${deploymentName}`
       .quiet()
       .nothrow();
 
@@ -429,15 +453,28 @@ export const scenario: Scenario = {
         });
       }
 
+      // The form requires the Access fields and always sends them, and the
+      // server assumes what it is sent, so this has to be a role that really
+      // assumes. A placeholder here fails at AssumeRole, not at the form.
+      const invoke = options.iamRoleArn
+        ? {
+            roleArn: options.iamRoleArn,
+            externalId: options.roleExternalId,
+            created: [] as string[],
+          }
+        : await ensureInvokeRole(options.region, options.roleExternalId, log);
+
+      teardown.push(...invoke.created);
+
       observations.push(
         ...(await createVersionInUi({
           uiUrl: context.uiUrl,
           namespace,
-          deploymentName: options.deploymentName,
+          deploymentName,
           buildId,
           endpointArn,
-          iamRoleArn: options.iamRoleArn,
-          externalId: options.roleExternalId,
+          iamRoleArn: invoke.roleArn,
+          externalId: invoke.externalId,
           screenshotDir: runDirFor('agentcore-serverless-worker'),
           headed: options.headed,
           log,
@@ -445,11 +482,11 @@ export const scenario: Scenario = {
       );
 
       observations.push(
-        "The form required an IAM Role ARN and an External ID, which this server discards because it runs with require_role_and_external_id false. The UI cannot express the CLI's --aws-agentcore-skip-role-and-external-id, so a self-hosted operator who set that has to type values that go nowhere.",
+        `The form required an IAM Role ARN and an External ID, and the server assumed ${invoke.roleArn} to reach the runtime. require_role_and_external_id false makes the role optional, not ignored, and the UI has no equivalent of the CLI's --aws-agentcore-skip-role-and-external-id: a self-hosted operator who turned the requirement off still has to supply a role that assumes. FE-675 tracks that.`,
       );
     } else {
       const created =
-        await $`${cli} worker deployment create-version --address ${context.address} --namespace ${namespace} --deployment-name ${options.deploymentName} --build-id ${buildId} --aws-agentcore-endpoint-arn ${endpointArn} --aws-agentcore-skip-role-and-external-id`
+        await $`${cli} worker deployment create-version --address ${context.address} --namespace ${namespace} --deployment-name ${deploymentName} --build-id ${buildId} --aws-agentcore-endpoint-arn ${endpointArn} --aws-agentcore-skip-role-and-external-id`
           .quiet()
           .nothrow();
 
@@ -472,7 +509,7 @@ export const scenario: Scenario = {
     }
 
     observations.push(
-      `Version ${options.deploymentName}.${buildId} was accepted with provider "aws-agentcore" and scaler "no-sync".`,
+      `Version ${deploymentName}.${buildId} was accepted with provider "aws-agentcore" and scaler "no-sync".`,
     );
 
     log('Waiting for the AgentCore Worker to register its task queue');
@@ -482,7 +519,7 @@ export const scenario: Scenario = {
 
     while (Date.now() < deadline && !registered) {
       const described =
-        await $`${cli} worker deployment describe-version --address ${context.address} --namespace ${namespace} --deployment-name ${options.deploymentName} --build-id ${buildId} -o json`
+        await $`${cli} worker deployment describe-version --address ${context.address} --namespace ${namespace} --deployment-name ${deploymentName} --build-id ${buildId} -o json`
           .quiet()
           .nothrow();
 
@@ -511,7 +548,7 @@ export const scenario: Scenario = {
         ],
         seeAlso: [
           `aws logs tail /aws/bedrock-agentcore/runtimes/${runtimeId}-${endpointName} --region ${options.region} --since 10m`,
-          `temporal worker deployment describe-version --address ${context.address} --namespace ${namespace} --deployment-name ${options.deploymentName} --build-id ${buildId} -o json`,
+          `temporal worker deployment describe-version --address ${context.address} --namespace ${namespace} --deployment-name ${deploymentName} --build-id ${buildId} -o json`,
         ],
       });
     }
@@ -522,7 +559,7 @@ export const scenario: Scenario = {
 
     log(`Setting ${buildId} current so tasks route to it`);
 
-    await $`${cli} worker deployment set-current-version --address ${context.address} --namespace ${namespace} --deployment-name ${options.deploymentName} --build-id ${buildId} --yes`
+    await $`${cli} worker deployment set-current-version --address ${context.address} --namespace ${namespace} --deployment-name ${deploymentName} --build-id ${buildId} --yes`
       .quiet()
       .nothrow();
 

@@ -12,6 +12,12 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 export const NAMES = {
   repository: 'temporal-demo-agentcore',
   role: 'TemporalDemoAgentCoreExecution',
+  /**
+   * Distinct from `role`. That one is handed to AgentCore so it can pull the
+   * image; this one is assumed by whatever runs the Worker Controller so it
+   * can invoke the runtime. Different trust, different permissions.
+   */
+  invokeRole: 'TemporalDemoAgentCoreInvoke',
   runtime: 'temporal_demo_agentcore',
   endpoint: 'DEFAULT',
   tag: 'demo',
@@ -44,8 +50,9 @@ const SETUP_GUIDANCE = [
   '  - BedrockAgentCoreFullAccess (search "AgentCore" in the IAM policy list)',
   '  - AmazonEC2ContainerRegistryFullAccess — search "ContainerRegistry", NOT "ecr":',
   '    the ECR managed policies do not contain the string "ecr" in their names.',
-  '  - IAM permissions to create the execution role and pass it to AgentCore:',
-  '    iam:CreateRole, iam:PutRolePolicy, iam:GetRole, iam:PassRole.',
+  '  - IAM permissions to create the execution and invoke roles, and to pass',
+  '    the execution role to AgentCore: iam:CreateRole, iam:PutRolePolicy,',
+  '    iam:GetRole, iam:PassRole, iam:UpdateAssumeRolePolicy.',
   'Or, if you would rather not grant these, ask someone for a Runtime Endpoint',
   'ARN and set AGENTCORE_ENDPOINT_ARN instead of turning provision on.',
 ];
@@ -257,6 +264,193 @@ const existingRuntimeId = async (
   return runtimes?.find(
     ({ agentRuntimeName }) => agentRuntimeName === NAMES.runtime,
   )?.agentRuntimeId;
+};
+
+export type InvokeRole = {
+  roleArn: string;
+  externalId: string;
+  /** Teardown commands for what this call created. Empty when it all existed. */
+  created: string[];
+};
+
+/**
+ * The role Temporal assumes to invoke the runtime.
+ *
+ * `require_role_and_external_id: false` makes the role optional, not ignored:
+ * a compute config that carries one is a config the server will assume. The
+ * CLI can leave it out with --aws-agentcore-skip-role-and-external-id, but the
+ * form requires both fields and always sends them, so driving the UI needs a
+ * role that genuinely assumes rather than a placeholder.
+ *
+ * Self-hosted differs from Cloud here. Cloud assumes the customer's role, so
+ * the trust policy names temporal.io. Here the caller is whoever runs the
+ * server, so the trust policy names this account and leans on the external ID
+ * to stop a bare account principal from being an open door.
+ */
+export const ensureInvokeRole = async (
+  region: string,
+  externalId: string,
+  log: Logger,
+): Promise<InvokeRole> => {
+  const { account } = await checkProvisioningAccess(region);
+  const created: string[] = [];
+  const roleArn = `arn:aws:iam::${account}:role/${NAMES.invokeRole}`;
+
+  const trust = JSON.stringify({
+    Version: '2012-10-17',
+    Statement: [
+      {
+        Effect: 'Allow',
+        Principal: { AWS: `arn:aws:iam::${account}:root` },
+        Action: 'sts:AssumeRole',
+        Condition: { StringEquals: { 'sts:ExternalId': externalId } },
+      },
+    ],
+  });
+
+  const permissions = JSON.stringify({
+    Version: '2012-10-17',
+    Statement: [
+      {
+        Sid: 'InvokeAgentCoreRuntime',
+        Effect: 'Allow',
+        Action: [
+          'bedrock-agentcore:InvokeAgentRuntime',
+          'bedrock-agentcore:GetAgentRuntimeEndpoint',
+          'bedrock-agentcore:GetAgentRuntime',
+        ],
+        Resource: [
+          `arn:aws:bedrock-agentcore:${region}:${account}:runtime/*`,
+          `arn:aws:bedrock-agentcore:${region}:${account}:runtime/*/runtime-endpoint/*`,
+        ],
+      },
+    ],
+  });
+
+  log(`Ensuring invoke role ${NAMES.invokeRole}`);
+
+  const role = await probe('aws', [
+    'iam',
+    'create-role',
+    '--role-name',
+    NAMES.invokeRole,
+    '--assume-role-policy-document',
+    trust,
+    '--output',
+    'json',
+  ]);
+
+  if (role.exitCode === 0) {
+    created.push(
+      `aws iam delete-role-policy --role-name ${NAMES.invokeRole} --policy-name invoke-agentcore`,
+    );
+    created.push(`aws iam delete-role --role-name ${NAMES.invokeRole}`);
+  } else {
+    // Already there from an earlier run. The external ID is what the trust
+    // policy turns on, so it is rewritten rather than assumed to still match.
+    const updated = await probe('aws', [
+      'iam',
+      'update-assume-role-policy',
+      '--role-name',
+      NAMES.invokeRole,
+      '--policy-document',
+      trust,
+    ]);
+
+    if (updated.exitCode !== 0) {
+      throw failure({
+        attempting: `Could not reuse the invoke role ${NAMES.invokeRole}.`,
+        reported: updated.stderr || updated.stdout || role.stderr,
+        fixes: [
+          'The role exists but its trust policy could not be rewritten, so the external ID this run uses may not be the one it trusts.',
+          'iam:UpdateAssumeRolePolicy is what this needs, on top of the permissions provisioning already asks for.',
+          `Deleting it lets the next run recreate it: aws iam delete-role-policy --role-name ${NAMES.invokeRole} --policy-name invoke-agentcore && aws iam delete-role --role-name ${NAMES.invokeRole}`,
+        ],
+        seeAlso: [`aws iam get-role --role-name ${NAMES.invokeRole}`],
+      });
+    }
+  }
+
+  const policy = await probe('aws', [
+    'iam',
+    'put-role-policy',
+    '--role-name',
+    NAMES.invokeRole,
+    '--policy-name',
+    'invoke-agentcore',
+    '--policy-document',
+    permissions,
+  ]);
+
+  if (policy.exitCode !== 0) {
+    throw failure({
+      attempting: `Could not attach invoke permissions to ${NAMES.invokeRole}.`,
+      reported: policy.stderr || policy.stdout,
+      fixes: [
+        'iam:PutRolePolicy is what this needs.',
+        'Without it the role exists but cannot invoke the runtime, and the Version fails later with an AccessDenied that names bedrock-agentcore rather than IAM.',
+      ],
+      seeAlso: [
+        `aws iam get-role-policy --role-name ${NAMES.invokeRole} --policy-name invoke-agentcore`,
+      ],
+    });
+  }
+
+  // A role is not assumable the instant it is created, and the server tries
+  // seconds later when the form is submitted. Waiting here turns what would
+  // surface as an AccessDenied on the Version into a wait nobody notices.
+  // Proving it with the real call, external ID and all, is also what catches a
+  // trust policy that does not say what this run needs.
+  await waitUntilAssumable(roleArn, externalId, log);
+
+  return { roleArn, externalId, created };
+};
+
+/** Polls sts:AssumeRole until the role answers to it, or gives up saying so. */
+const waitUntilAssumable = async (
+  roleArn: string,
+  externalId: string,
+  log: Logger,
+  timeoutMs = 120_000,
+) => {
+  const deadline = Date.now() + timeoutMs;
+  let reported = '';
+
+  while (Date.now() < deadline) {
+    const attempt = await probe('aws', [
+      'sts',
+      'assume-role',
+      '--role-arn',
+      roleArn,
+      '--role-session-name',
+      'temporal-demo-preflight',
+      '--external-id',
+      externalId,
+      '--output',
+      'json',
+    ]);
+
+    if (attempt.exitCode === 0) return;
+
+    reported = attempt.stderr || attempt.stdout;
+
+    log('Waiting for the invoke role to become assumable');
+    await new Promise((resolve) => setTimeout(resolve, 5_000));
+  }
+
+  throw failure({
+    attempting: `The invoke role ${roleArn} never became assumable.`,
+    reported,
+    fixes: [
+      'IAM is eventually consistent, so a role created moments ago is briefly not assumable. This waited two minutes, which is longer than that normally takes.',
+      'An AccessDenied that persists is usually the caller lacking sts:AssumeRole on this role, or a service control policy denying it.',
+      `The trust policy has to enforce the external ID this run uses: ${externalId}.`,
+    ],
+    seeAlso: [
+      `aws iam get-role --role-name ${NAMES.invokeRole} --query Role.AssumeRolePolicyDocument`,
+      `aws sts assume-role --role-arn ${roleArn} --role-session-name probe --external-id ${externalId}`,
+    ],
+  });
 };
 
 /**
