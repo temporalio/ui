@@ -112,7 +112,7 @@
     {#if visibleItems.length}
       <div
         class={merge(
-          'sticky left-0 flex w-full shrink-0 flex-wrap items-center justify-between gap-2 border-t border-primary bg-surface-primary px-4 py-2 text-primary',
+          'sticky left-0 flex w-full shrink-0 flex-wrap items-center justify-between gap-2 rounded rounded-t-none border-t border-primary bg-surface-primary px-4 py-2 text-primary',
           scrollsInTable ? 'bottom-0 mt-auto' : 'md:bottom-0 md:mt-auto',
         )}
         bind:clientHeight={footerHeight}

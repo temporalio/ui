@@ -308,6 +308,11 @@
       "types": "./dist/io/tag/index.d.ts",
       "import": "./dist/io/tag/index.js"
     },
+    "./theme/preset": {
+      "types": "./dist/theme/preset.d.ts",
+      "import": "./dist/theme/preset.js",
+      "default": "./dist/theme/preset.js"
+    },
     "./*.svelte": {
       "types": "./dist/*.svelte.d.ts",
       "svelte": "./dist/*.svelte"
