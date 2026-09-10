@@ -301,7 +301,7 @@ export const scenario: Scenario = {
     const buildId = options.buildId || `run-${Date.now()}`;
 
     // Versions from earlier runs stay INACTIVE, and the server drops
-    // ComputeConfig from inactive Version summaries (FE-672). The
+    // ComputeConfig from inactive Version summaries. The
     // create-version page cannot read a provider it cannot see, so it reports
     // the deployment as unreadable and renders an error where the form should
     // be: a second run against the same deployment finds no form to drive.
@@ -482,7 +482,7 @@ export const scenario: Scenario = {
       );
 
       observations.push(
-        `The form required an IAM Role ARN and an External ID, and the server assumed ${invoke.roleArn} to reach the runtime. require_role_and_external_id false makes the role optional, not ignored, and the UI has no equivalent of the CLI's --aws-agentcore-skip-role-and-external-id: a self-hosted operator who turned the requirement off still has to supply a role that assumes. FE-675 tracks that.`,
+        `The form required an IAM Role ARN and an External ID, and the server assumed ${invoke.roleArn} to reach the runtime. require_role_and_external_id false makes the role optional, not ignored, and the UI has no equivalent of the CLI's --aws-agentcore-skip-role-and-external-id: a self-hosted operator who turned the requirement off still has to supply a role that assumes.`,
       );
     } else {
       const created =

@@ -314,7 +314,7 @@ role, so it names `temporal.io` rather than the caller's own account.
 The gap this leaves is real. The CLI can create a Version with no role at all
 via `--aws-agentcore-skip-role-and-external-id`; the form has no equivalent, so
 a self-hosted operator who turned the requirement off still has to supply a
-role that assumes. FE-675 tracks it.
+role that assumes.
 
 ## Provisioning the AgentCore runtime
 

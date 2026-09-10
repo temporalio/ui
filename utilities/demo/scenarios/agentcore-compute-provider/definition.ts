@@ -19,13 +19,13 @@ export const definition = defineScenario({
   preview: {
     notes: [
       'Storybook covers the enabled form with no server: run `pnpm storybook` and open Workers/Compute Provider Picker. "AWS namespace (Lambda and AgentCore)" must show both AWS cards, Lambda badged Public Preview and AgentCore badged Pre-release.',
-      'In the running UI, open a namespace and start a serverless Worker deployment. The Compute Provider list must show Amazon Bedrock AgentCore, disabled, badged Coming Soon, because this server does not advertise serverScaledProviderAgentCore.',
+      'In the running UI, open a namespace and start a serverless Worker deployment. The Compute Provider list must show Amazon Bedrock AgentCore as selectable, badged Pre-release. Self-hosted offers every provider: there is no per-account entitlement to express, and a Service that cannot run one rejects the Version with a reason.',
       'Lambda must be unchanged: selectable, with its Function ARN field, IAM Role ARN, External ID, and the CloudFormation/Terraform role helper.',
       'Select AgentCore in Storybook\'s "AWS namespace (Lambda and AgentCore)" story. The Resource field must read "Agent Runtime Endpoint ARN" — not "Agent Runtime ARN" — because the provider parses the runtime id and endpoint name out of it and rejects a bare Runtime ARN.',
       'AgentCore must reuse the Lambda Access fields (IAM Role ARN, External ID) and must NOT offer the CloudFormation/Terraform helper, which grants lambda:InvokeFunction and would hand out a role that cannot invoke a runtime.',
       'Open Scaling and Lifecycle under AgentCore. It must show the invoke-based fields (scale-up cooloff, backlog threshold, max worker lifetime, metrics poll interval) and no replica or utilization controls, because AgentCore pairs with the no-sync scaler like Lambda.',
       'Saving an AgentCore version end to end additionally needs a server whose auto-scaled-workers dependency contains 312f95fb8b99a2fecdcbe3d1763c2c655e921f4a (2026-08-24), which registers the aws-agentcore provider. temporalio/temporal main still pins v0.0.0-20260811170210, so a stock server rejects the provider type. Build one with TEMPORAL_SERVER_REPO pointed at a checkout carrying the bump.',
-      'Enabling the option rather than gating it needs server_scaled_provider_agent_core in temporalio/api plus the server advertising it in GetSystemInfo. Neither exists yet; cloud-ui can enable it sooner by mapping an account feature flag into its synthesized capabilities, as it does for Cloud Run.',
+      'Hosted Temporal decides provider visibility for itself and passes the list in, so nothing here changes what it offers. Whether a provider is advertised per Namespace is a separate proposal and not a dependency of this scenario.',
     ],
   },
 });
