@@ -194,6 +194,29 @@
     },
   ];
 
+  const cookbooks: ResourceLink[] = [
+    {
+      name: 'AI Cookbooks',
+      href: 'https://docs.temporal.io/ai/cookbook',
+    },
+    {
+      name: 'OpenAI Agent Demo',
+      href: 'https://github.com/temporal-community/openai-agents-demos',
+    },
+    {
+      name: 'Durable React Agent',
+      href: 'https://github.com/temporal-community/durable-react-agent-gemini',
+    },
+    {
+      name: 'Durable Async MCP',
+      href: 'https://github.com/temporal-community/durable-async-mcp',
+    },
+    {
+      name: 'Durable Agents Workshop',
+      href: 'https://github.com/temporal-community/ai-agents-workshop-python',
+    },
+  ];
+
   const { copy: copyHarness, copied: copiedHarness } = copyToClipboard();
   const { copy: copySkill, copied: copiedSkill } = copyToClipboard();
 
@@ -220,29 +243,6 @@
     const prompt = 'Install and run the Agent Harness via PyPi package at ....';
     copySkill(event, prompt);
   };
-
-  const cookbooks: ResourceLink[] = [
-    {
-      name: 'AI Cookbooks',
-      href: 'https://docs.temporal.io/ai/cookbook',
-    },
-    {
-      name: 'OpenAI Agent Demo',
-      href: 'https://github.com/temporal-community/openai-agents-demos',
-    },
-    {
-      name: 'Durable React Agent',
-      href: 'https://github.com/temporal-community/durable-react-agent-gemini',
-    },
-    {
-      name: 'Durable Async MCP',
-      href: 'https://github.com/temporal-community/durable-async-mcp',
-    },
-    {
-      name: 'Durable Agents Workshop',
-      href: 'https://github.com/temporal-community/ai-agents-workshop-python',
-    },
-  ];
 </script>
 
 <div
@@ -401,8 +401,8 @@
             <div class="mt-4 flex flex-col items-start gap-4">
               {#each cookbooks as cookbook (cookbook.href)}
                 <Link
-                  class="inline-flex min-h-11 text-sm leading-5 min-[1400px]:min-h-5"
                   href={cookbook.href}
+                  aria-label={'Open ' + cookbook.name + ' cookbook'}
                   newTab
                 >
                   {cookbook.name}
@@ -423,8 +423,8 @@
           <div class="mt-4 space-y-4">
             {#each integrations as integration (integration.name)}
               <Link
-                class="flex min-h-11 gap-4 text-secondary no-underline hover:text-primary min-[1400px]:min-h-5"
                 href={integration.links[0].href}
+                class="flex gap-4"
                 newTab
                 aria-label={'Open ' + integration.name + ' integration'}
               >
@@ -457,7 +457,6 @@
               with durable execution.
             </p>
             <Link
-              class="mt-4 inline-flex min-h-11 text-sm leading-5 min-[1400px]:min-h-5"
               href="https://temporal.io/blog?query=agent"
               newTab
               aria-label="Browse Temporal blog posts about AI agents"
