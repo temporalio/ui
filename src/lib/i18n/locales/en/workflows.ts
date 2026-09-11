@@ -169,9 +169,6 @@ export const Strings = {
   'workflow-error-no-workers-serverless-description':
     'The {{taskQueue}} task queue is served by the serverless worker deployment {{deployment}}, which scales down to zero when idle. Workers will start automatically when there are tasks to process.',
   'view-worker-deployment': 'View Worker Deployment',
-  'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
-  'workflow-error-no-compatible-workers-description':
-    'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
   'dismiss-common-errors': 'Dismiss Common Errors',
   'state-transitions': 'State Transitions',
   relationships: 'Relationships',
