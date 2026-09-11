@@ -2,6 +2,7 @@ export type { IconComponent, IconProps } from './types';
 
 export { default as IconAdd } from './icons/add.svelte';
 export { default as IconAddSquare } from './icons/add-square.svelte';
+export { default as IconAgent } from './icons/agent.svelte';
 export { default as IconApple } from './icons/apple.svelte';
 export { default as IconArchive } from './icons/archive.svelte';
 export { default as IconArrowAscending } from './icons/arrow-ascending.svelte';

@@ -150,6 +150,7 @@ export const Strings = {
   close: 'Close',
   deprecated: 'Deprecated',
   namespaces: 'Namespaces',
+  agents: 'Agents',
   cluster: 'Cluster',
   'codec-server': 'Codec Server',
   workflows: 'Workflows',
