@@ -11,6 +11,8 @@
     | 'error'
     | 'accent';
 
+  export type BadgeSize = 'sm' | 'md';
+
   export type BadgeExtension = {
     text?: string;
     LeadIcon?: ConditionalValue<IconComponent>;
@@ -18,9 +20,14 @@
   };
 
   const sharedClasses =
-    'inline-flex whitespace-nowrap divide-x divide-inherit rounded-full border font-mono text-xs font-medium leading-none uppercase';
+    'inline-flex whitespace-nowrap divide-x divide-inherit rounded-full border font-mono font-medium leading-none uppercase';
   const segmentClasses =
-    'inline-flex flex-nowrap items-center justify-center gap-1 py-1 px-1.5';
+    'inline-flex flex-nowrap items-center justify-center gap-1';
+
+  const sizeClasses: Record<BadgeSize, { badge: string; segment: string }> = {
+    sm: { badge: 'text-2xs', segment: 'py-0.5 px-1' },
+    md: { badge: 'text-xs', segment: 'py-1 px-1.5' },
+  };
 
   const colorSchemeClasses: Record<BadgeColorScheme, string> = {
     neutral: 'border-tertiary bg-surface-tertiary text-secondary',
@@ -44,6 +51,7 @@
   > {
     text: string;
     colorScheme?: BadgeColorScheme;
+    size?: BadgeSize;
     Icon?: ConditionalValue<IconComponent>;
     extension?: ConditionalValue<BadgeExtension>;
     class?: string;
@@ -52,6 +60,7 @@
   let {
     text,
     colorScheme = 'neutral',
+    size = 'md',
     Icon,
     extension,
     class: className,
@@ -60,17 +69,22 @@
 </script>
 
 <span
-  class={twMerge(sharedClasses, colorSchemeClasses[colorScheme], className)}
+  class={twMerge(
+    sharedClasses,
+    sizeClasses[size].badge,
+    colorSchemeClasses[colorScheme],
+    className,
+  )}
   {...rest}
 >
-  <span class={segmentClasses}>
+  <span class={twMerge(segmentClasses, sizeClasses[size].segment)}>
     <span>{text}</span>
     {#if Icon}
       <Icon width="1em" height="1em" />
     {/if}
   </span>
   {#if extension}
-    <span class={segmentClasses}>
+    <span class={twMerge(segmentClasses, sizeClasses[size].segment)}>
       {#if extension.LeadIcon}
         <extension.LeadIcon width="1em" height="1em" />
       {/if}

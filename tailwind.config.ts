@@ -39,6 +39,9 @@ const config = {
       animation: {
         'spin-slow': 'spin 3s linear infinite',
       },
+      fontSize: {
+        '2xs': '0.625rem',
+      },
       zIndex: {
         100: '100',
       },

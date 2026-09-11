@@ -8,8 +8,13 @@
     IconHeartbeat,
   } from '$lib/io/icon';
 
-  import type { BadgeStatusValue } from './badge-status.svelte';
+  import type {
+    BadgeStatusSize,
+    BadgeStatusValue,
+  } from './badge-status.svelte';
   import BadgeStatus from './badge-status.svelte';
+
+  const sizes: BadgeStatusSize[] = ['sm', 'md'];
 
   const statuses: BadgeStatusValue[] = [
     'Running',
@@ -28,11 +33,13 @@
     args: {
       status: 'Running',
       count: 14,
+      size: 'md',
     },
     argTypes: {
       status: { control: 'select', options: statuses },
       text: { control: 'text' },
       count: { control: 'number' },
+      size: { control: 'select', options: sizes },
       TrailIcon: { control: false },
       extensions: { control: 'object' },
       class: { table: { disable: true } },
@@ -71,6 +78,21 @@
     ],
   }}
 />
+
+<Story name="Sizes">
+  {#snippet template()}
+    <div
+      class="flex flex-wrap items-end gap-4 border border-primary bg-surface-primary p-6"
+    >
+      {#each sizes as size (size)}
+        <div class="flex flex-col items-start gap-2">
+          <span class="text-xs text-secondary">{size}</span>
+          <BadgeStatus {size} status="Running" count={14} />
+        </div>
+      {/each}
+    </div>
+  {/snippet}
+</Story>
 
 <Story name="Statuses">
   {#snippet template()}
