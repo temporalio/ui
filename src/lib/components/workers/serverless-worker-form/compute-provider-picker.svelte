@@ -7,7 +7,7 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
-  import { IconAws, type IconComponent, IconGcp } from '$lib/io/icon';
+  import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
 
   import {
     type ComputeProviderOption,
@@ -25,10 +25,12 @@
 
   const configuredProviders = untrack(() => providers);
 
+  // The brand marks, not the monochrome glyphs. These are vendor logos rather
+  // than UI icons, so they keep their own colour on either theme.
   const providerIcon: Record<ComputeProviderValue, IconComponent> = {
-    lambda: IconAws,
-    agentcore: IconAws,
-    'cloud-run': IconGcp,
+    lambda: IconAwsColor,
+    agentcore: IconAwsColor,
+    'cloud-run': IconGcpColor,
   };
 
   const providerLabel = (value: ComputeProviderValue): string => {
@@ -119,7 +121,7 @@
       {#snippet icon()}
         {@const ProviderIcon = providerIcon[option.value]}
         <div
-          class="flex h-11 w-11 items-center justify-center rounded-none border border-primary bg-surface-primary"
+          class="flex h-11 w-11 items-center justify-center rounded border border-primary bg-surface-primary"
         >
           <ProviderIcon width={32} height={32} />
         </div>
