@@ -240,7 +240,8 @@
   };
 
   const copySkillPrompt = (event: MouseEvent) => {
-    const prompt = 'Install and run the Agent Harness via PyPi package at ....';
+    const prompt =
+      'Follow the instructions at https://docs.temporal.io/with-ai.md to install skills with your current agent.';
     copySkill(event, prompt);
   };
 </script>
@@ -362,9 +363,9 @@
           >
             <h5 id="skills-heading">Temporal Skills</h5>
             <p class="my-4 text-base leading-6 text-secondary">
-              Install the developer skill in the assistant you already code
-              with, and point it at the knowledgebase for answers grounded in
-              Temporal docs.
+              Install the Developer, Ops, Serverless, Cloud and Cloud Setup
+              skills in the assistant you already code with, and point it at the
+              knowledgebase for answers grounded in Temporal docs.
             </p>
             <Button
               class="font-mono text-primary"
