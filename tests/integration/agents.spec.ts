@@ -11,8 +11,8 @@ test.beforeEach(async ({ page }) => {
 test('shows the agents resource hub', async ({ page }) => {
   await expect(
     page.getByRole('heading', {
-      name: 'Build durable AI agents on Temporal',
-      level: 1,
+      name: 'Build Durable AI Agents on Temporal',
+      level: 2,
     }),
   ).toBeVisible();
 
