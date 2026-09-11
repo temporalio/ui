@@ -194,9 +194,9 @@
     },
   ];
 
-  const onboardingPrompt =
-    'Follow the instructions at https://docs.temporal.io/with-ai.md to install skills with your current agent.';
-  const { copy, copied } = copyToClipboard();
+  const { copy: copyHarness, copied: copiedHarness } = copyToClipboard();
+  const { copy: copySkill, copied: copiedSkill } = copyToClipboard();
+
   let agentHarnessVideo: HTMLVideoElement;
   let agentHarnessDemoStarted = $state(false);
 
@@ -211,18 +211,20 @@
     agentHarnessVideo.load();
   };
 
-  const copyOnboardingPrompt = (event: MouseEvent) => {
-    copy(event, onboardingPrompt);
+  const copyHarnessPrompt = (event: MouseEvent) => {
+    const prompt = 'Install and run the Agent Harness via PyPi package at ....';
+    copyHarness(event, prompt);
+  };
+
+  const copySkillPrompt = (event: MouseEvent) => {
+    const prompt = 'Install and run the Agent Harness via PyPi package at ....';
+    copySkill(event, prompt);
   };
 
   const cookbooks: ResourceLink[] = [
     {
       name: 'AI Cookbooks',
       href: 'https://docs.temporal.io/ai/cookbook',
-    },
-    {
-      name: 'Temporal AI Agent Demo',
-      href: 'https://github.com/temporal-community/temporal-ai-agent',
     },
     {
       name: 'OpenAI Agent Demo',
@@ -233,8 +235,12 @@
       href: 'https://github.com/temporal-community/durable-react-agent-gemini',
     },
     {
-      name: 'Durable MCP',
-      href: 'https://github.com/temporal-community/durable-mcp',
+      name: 'Durable Async MCP',
+      href: 'https://github.com/temporal-community/durable-async-mcp',
+    },
+    {
+      name: 'Durable Agents Workshop',
+      href: 'https://github.com/temporal-community/ai-agents-workshop-python',
     },
   ];
 </script>
@@ -283,14 +289,35 @@
                     state.
                   </p>
                 </div>
-                <Button
-                  href="https://github.com/temporal-community/temporal-agent-harness"
-                  target="_blank"
-                  size="xs"
-                  aria-label="Open Agent Harness"
-                >
-                  Go to Github
-                </Button>
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                  <Button
+                    href="https://github.com/temporal-community/temporal-agent-harness"
+                    target="_blank"
+                    size="xs"
+                    aria-label="Open Agent Harness"
+                  >
+                    Go to Github
+                  </Button>
+                  <Button
+                    class="font-mono text-primary"
+                    variant="secondary"
+                    size="xs"
+                    aria-label={$copiedHarness
+                      ? 'Harness prompt copied'
+                      : 'Copy harness prompt'}
+                    title={$copiedHarness
+                      ? 'Harness prompt copied'
+                      : 'Copy harness prompt'}
+                    onclick={copyHarnessPrompt}
+                  >
+                    Install harness with your coding agent
+                    {#if $copiedHarness}
+                      <IconCheckmark class="size-3" />
+                    {:else}
+                      <IconCopy class="size-3" />
+                    {/if}
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -343,16 +370,16 @@
               class="font-mono text-primary"
               variant="secondary"
               size="xs"
-              aria-label={$copied
-                ? 'Onboarding prompt copied'
-                : 'Copy onboarding prompt'}
-              title={$copied
-                ? 'Onboarding prompt copied'
-                : 'Copy onboarding prompt'}
-              onclick={copyOnboardingPrompt}
+              aria-label={$copiedSkill
+                ? 'Install skill prompt copied'
+                : 'Copy install skill prompt'}
+              title={$copiedSkill
+                ? 'Install skill prompt copied'
+                : 'Copy install skill prompt'}
+              onclick={copySkillPrompt}
             >
-              Install with your coding agent
-              {#if $copied}
+              Install skills with your coding agent
+              {#if $copiedSkill}
                 <IconCheckmark class="size-3" />
               {:else}
                 <IconCopy class="size-3" />
