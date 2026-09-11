@@ -235,7 +235,8 @@
   };
 
   const copyHarnessPrompt = (event: MouseEvent) => {
-    const prompt = 'Install and run the Agent Harness via PyPi package at ....';
+    const prompt =
+      'Follow the installation instructions at https://github.com/temporal-community/temporal-agent-harness to clone the project on the latest stable release and start running examples with your current agent.';
     copyHarness(event, prompt);
   };
 
