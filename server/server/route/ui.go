@@ -164,7 +164,7 @@ const pageTemplate = `
 			{{.CSS}}
 	</style>
 </head>
-<body class="prose" {{if .Theme}}data-theme="{{.Theme}}"{{end}}>
+<body class="{{.BodyClass}}" {{if .Theme}}data-theme="{{.Theme}}"{{end}}>
 	<main>
 			{{.Content}}
 	</main>
@@ -188,20 +188,28 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			finalTheme = fmt.Sprintf("%s-%s", theme, overrideTheme)
 		}
 
+		// Matches the SvelteKit route's parsing: only the exact string opts in.
+		bodyClass := "prose"
+		if c.QueryParam("compact") == "true" {
+			bodyClass = "prose compact"
+		}
+
 		// Process markdown to HTML
 		renderedHTML := processMarkdown(content)
 
 		nonce := generateNonce()
 
 		data := struct {
-			Content template.HTML
-			Nonce   string
-			Theme   string
-			CSS     template.CSS
+			Content   template.HTML
+			Nonce     string
+			Theme     string
+			BodyClass string
+			CSS       template.CSS
 		}{
-			Content: template.HTML(renderedHTML),
-			Nonce:   nonce,
-			Theme:   finalTheme,
+			Content:   template.HTML(renderedHTML),
+			Nonce:     nonce,
+			Theme:     finalTheme,
+			BodyClass: bodyClass,
 			CSS: template.CSS(`*,
 		body {
 			margin: 0;
@@ -214,9 +222,47 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 		body {
 			overscroll-behavior: none;
 			position: relative;
+			overflow-wrap: break-word;
 			padding: 1rem;
 			white-space: pre-line;
 			font-family: sans-serif;
+		}
+
+		/* No page padding, so a short string renders as a line of text rather than
+		   a padded box. Wrapping stays on. */
+		body.compact {
+			padding: 0;
+			overflow: hidden;
+			white-space: normal;
+		}
+
+		/* The reset above sizes every element with a star selector, which beats
+		   inheritance, so compact restates the metrics or the frame renders at
+		   16px beside the 14px text around it. */
+		body.compact,
+		body.compact main,
+		body.compact p,
+		body.compact strong,
+		body.compact em,
+		body.compact a {
+			font-size: 14px;
+			line-height: 20px;
+		}
+
+		/* Blocks with the margins zeroed, not display: inline. The embedder
+		   measures the frame from main, and an inline box reports the text box
+		   rather than the line box, which clips descenders. */
+		body.compact main,
+		body.compact p {
+			display: block;
+			margin: 0;
+		}
+
+		/* Vertical padding on an inline code span grows the line box. */
+		body.compact code {
+			padding: 0 0.375rem;
+			font-size: 13px;
+			line-height: 20px;
 		}
 
 		h1 {
@@ -241,6 +287,13 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 
 		h6 {
 			font-size: 0.67em;
+		}
+
+		/* Pinned rather than left to the UA default, so bold matches the 600 the
+		   SvelteKit stylesheet renders at instead of the UA's 700. */
+		strong,
+		b {
+			font-weight: 600;
 		}
 
 		blockquote,
@@ -373,6 +426,29 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 
 		body[data-theme='dark-primary'] a {
 			color: #8098f9;
+		}
+
+		/* A compact frame paints no background of its own. An iframe's canvas is
+		   transparent when the embedded document is, so the frame takes whatever
+		   surface the page put it on, in either colour scheme, without the page
+		   having to name that surface.
+
+		   Last in the file on purpose: the theme rules above set background-color
+		   at the same specificity, so order decides. */
+		body.compact {
+			background-color: transparent;
+		}
+
+		/* The transparency only holds if this document's colour scheme matches
+		   the one the page gave the iframe element. When they differ the browser
+		   paints an opaque canvas instead, so a dark page shows a white box. The
+		   theme is an attribute on body, so the root reads it from there. */
+		html {
+			color-scheme: light;
+		}
+
+		html:has(body[data-theme^='dark']) {
+			color-scheme: dark;
 		}
 	`),
 		}
