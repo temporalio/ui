@@ -43,6 +43,7 @@ const operators = [
   '(',
   ')',
   'starts_with',
+  'like',
 ] as const;
 
 const conditionals = [
@@ -57,6 +58,7 @@ const conditionals = [
   '<',
   '!',
   'starts_with',
+  'like',
   'is',
   'is not',
   'in',
@@ -185,6 +187,11 @@ export const isError = (e: unknown): e is Error => {
 export const isStartsWith = (x: unknown) => {
   if (!isString(x)) return false;
   return x.toLocaleLowerCase() === 'starts_with';
+};
+
+export const isContains = (x: unknown) => {
+  if (!isString(x)) return false;
+  return x.toLocaleLowerCase() === 'like';
 };
 
 export const isInConditional = (x: unknown) => {

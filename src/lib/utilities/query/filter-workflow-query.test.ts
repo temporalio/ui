@@ -49,6 +49,21 @@ describe('toListWorkflowQueryFromFilters', () => {
     expect(query).toBe('`ExecutionStatus`="Running"');
   });
 
+  it('should convert a contains (LIKE) filter and wrap the value in wildcards', () => {
+    const filters = [
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: 'LIKE',
+        operator: '',
+        parenthesis: '',
+        value: 'e2d4257b',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`WorkflowId` LIKE "%e2d4257b%"');
+  });
+
   it('should convert multiple ExecutionStatus filters', () => {
     const filters = [
       {

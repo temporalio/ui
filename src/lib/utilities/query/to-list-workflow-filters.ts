@@ -14,6 +14,7 @@ import { isValidDate } from '../format-date';
 import {
   isBetween,
   isConditional,
+  isContains,
   isJoin,
   isNullConditional,
   isParenthesis,
@@ -138,6 +139,10 @@ export const toListWorkflowFilters = (
         } else if (isBoolStatement(filter.type)) {
           filter.value = tokenTwoAhead;
           filter.conditional = '=';
+        } else if (isContains(nextToken)) {
+          // Strip the '%' wildcards that toFilterQueryStatement wraps around
+          // a Contains value so the chip shows the raw user-typed text.
+          filter.value = tokenTwoAhead?.replace(/^%/, '').replace(/%$/, '');
         } else {
           filter.value = tokenTwoAhead;
         }
