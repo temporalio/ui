@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -49,12 +49,12 @@
       {#each visibleItems as child}
         <TableRow>
           <td class="max-md:hidden">
-            <WorkflowStatus status={child.status} />
+            <WorkflowStatusBadge status={child.status} />
           </td>
           <td class="max-lg:hidden">
             {child.name}
           </td>
-          <td class="hover:text-blue-700 hover:underline">
+          <td class="hover:text-brand hover:underline">
             <Link
               href={routeForWorkflow({
                 namespace,
@@ -65,7 +65,7 @@
               {child.id}
             </Link>
           </td>
-          <td class="hover:text-blue-700 hover:underline">
+          <td class="hover:text-brand hover:underline">
             <Link
               href={routeForWorkflow({
                 namespace,

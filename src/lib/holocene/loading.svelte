@@ -63,9 +63,13 @@
       --horizontal-offset-shape2: -575;
 
       /* Drop Shadow  */
-      --ellipse-shadow: rgb(var(--color-text-primary) / 15%);
+      --ellipse-shadow: color-mix(
+        in srgb,
+        var(--color-content-primary) 15%,
+        transparent
+      );
       --ellipse-drop-shadow: drop-shadow(0 4px 12px var(--ellipse-shadow));
-      --stroke-color: rgb(var(--color-text-primary));
+      --stroke-color: var(--color-content-primary);
     }
 
     /* Default states - no animation */

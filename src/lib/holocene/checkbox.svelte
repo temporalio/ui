@@ -105,7 +105,7 @@
         'items-center',
         'gap-3',
         'text-sm',
-        'leading-[18px]',
+        'leading-5',
         'min-h-6',
         'min-w-6',
         'group',
@@ -136,45 +136,47 @@
 
     <span
       class={merge(
+        'checkbox-control',
         [
           'relative',
-          'box-content',
+          'rounded-sm',
+          'box-border',
           'flex',
-          'h-4',
-          'w-4',
+          'h-5',
+          'w-5',
           'flex-none',
           'cursor-pointer',
           'border',
-          'bg-primary',
-          'text-inverse',
-          'bg-clip-padding',
-          'peer-indeterminate:bg-interactive',
-          'peer-indeterminate:border-interactive',
-          'peer-checked:bg-interactive',
-          'peer-checked:border-interactive',
+          'border-secondary',
+          'bg-background-primary',
+          'text-inverse-primary',
+          'peer-indeterminate:border-interactive-primary',
+          'peer-indeterminate:bg-interactive-primary',
+          'peer-checked:border-interactive-primary',
+          'peer-checked:bg-interactive-primary',
         ],
-        !disabled && [
-          'group-hover:border-inverse',
-          'peer-focus-visible:border-inverse',
-          'group-hover:peer-checked:border-inverse',
-          'group-hover:peer-indeterminate:border-inverse',
-          'group-hover:bg-interactive-active',
-          'peer-focus-visible:bg-interactive-active',
-          'group-hover:peer-checked:bg-interactive-active',
-          'group-hover:peer-indeterminate:bg-interactive-active',
-          'group-hover:ring-2',
-          'group-hover:ring-primary/70',
-          'peer-focus-visible:ring-2',
-          'peer-focus-visible:ring-primary/70',
-          'peer-focus-visible:ring-offset-2',
-          'peer-focus-visible:ring-offset-[var(--color-surface-primary)]',
-        ],
+        !disabled &&
+          valid && [
+            'peer-focus-visible:ring-2',
+            'peer-focus-visible:ring-interactive-primary',
+            'peer-focus-visible:ring-offset-2',
+            'peer-focus-visible:ring-offset-background-primary',
+            'peer-focus-visible:shadow-sm',
+          ],
+        !disabled &&
+          valid && [
+            'group-hover:border-tertiary',
+            'peer-focus-visible:border-tertiary',
+            'group-hover:peer-checked:border-interactive-primary',
+            'group-hover:peer-indeterminate:border-interactive-primary',
+          ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
-        valid ? 'border-secondary' : 'border-danger peer-checked:border-danger',
+        !valid &&
+          'border-danger peer-checked:border-danger peer-indeterminate:border-danger peer-focus-visible:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-danger peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background-primary',
       )}
     >
       {#if CheckIcon}
-        <CheckIcon class="absolute left-0 top-0 h-4 w-4" />
+        <CheckIcon class="absolute inset-0 m-auto h-4 w-4" />
       {/if}
     </span>
 
@@ -182,11 +184,19 @@
       {@render flex()}
     {:else}
       <div>
-        <span class="label" class:sr-only={labelHidden}>
+        <span class:sr-only={labelHidden}>
           {label}
+          {#if required}
+            <span
+              aria-hidden="true"
+              class="ml-1 font-mono leading-none text-static-danger">*</span
+            >
+          {/if}
         </span>
         {#if description}
-          <p class="text-xs font-normal text-secondary">{description}</p>
+          <p class="text-sm font-normal text-secondary">
+            {description}
+          </p>
         {/if}
       </div>
     {/if}
@@ -195,3 +205,11 @@
     {#if showError}{error}{/if}
   </span>
 </div>
+
+<style lang="postcss">
+  .peer:not([aria-invalid='true']):checked:focus-visible + .checkbox-control,
+  .peer:not([aria-invalid='true']):indeterminate:focus-visible
+    + .checkbox-control {
+    @apply border-interactive-primary;
+  }
+</style>

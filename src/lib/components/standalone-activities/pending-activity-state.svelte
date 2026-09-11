@@ -24,12 +24,12 @@
   };
 
   const stateColors: Record<PendingActivityState, string> = {
-    PENDING_ACTIVITY_STATE_UNSPECIFIED: 'bg-slate-100',
-    PENDING_ACTIVITY_STATE_SCHEDULED: 'bg-blue-300',
-    PENDING_ACTIVITY_STATE_STARTED: 'bg-blue-300',
-    PENDING_ACTIVITY_STATE_CANCEL_REQUESTED: 'bg-yellow-200',
-    PENDING_ACTIVITY_STATE_PAUSED: 'bg-yellow-200',
-    PENDING_ACTIVITY_STATE_PAUSE_REQUESTED: 'bg-yellow-200',
+    PENDING_ACTIVITY_STATE_UNSPECIFIED: 'bg-surface-primary text-secondary',
+    PENDING_ACTIVITY_STATE_SCHEDULED: 'bg-surface-information text-information',
+    PENDING_ACTIVITY_STATE_STARTED: 'bg-surface-information text-information',
+    PENDING_ACTIVITY_STATE_CANCEL_REQUESTED: 'bg-surface-warning text-warning',
+    PENDING_ACTIVITY_STATE_PAUSED: 'bg-surface-warning text-warning',
+    PENDING_ACTIVITY_STATE_PAUSE_REQUESTED: 'bg-surface-warning text-warning',
   };
 
   let { runState, class: className, ...rest }: Props = $props();
@@ -43,7 +43,7 @@
 
 <span
   class={merge(
-    'flex h-5 w-fit items-center whitespace-nowrap rounded-sm px-1 py-0.5 text-xs font-medium leading-4 text-black',
+    'flex h-5 w-fit items-center whitespace-nowrap rounded-sm px-1 py-0.5 text-xs font-medium leading-4',
     stateColors[state],
     className,
   )}

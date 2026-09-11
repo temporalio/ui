@@ -2,12 +2,13 @@
   import { cva } from 'class-variance-authority';
 
   const sharedMenuStyles = [
-    'surface-primary',
+    'bg-surface-secondary',
     'min-w-fit',
     'list-none',
     'overflow-auto',
+    'rounded',
     'border',
-    'border-subtle',
+    'border-primary',
     'text-primary',
     'shadow',
     'w-full',
@@ -152,6 +153,7 @@
     anchor={anchorElement}
     open={$open}
     position={portalPosition}
+    offset={{ y: 4 }}
     {scrollContainer}
   >
     {@render menu({ _class: merge(sharedMenuStyles, maxHeight, className) })}
