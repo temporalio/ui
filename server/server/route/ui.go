@@ -427,6 +427,29 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 		body[data-theme='dark-primary'] a {
 			color: #8098f9;
 		}
+
+		/* A compact frame paints no background of its own. An iframe's canvas is
+		   transparent when the embedded document is, so the frame takes whatever
+		   surface the page put it on, in either colour scheme, without the page
+		   having to name that surface.
+
+		   Last in the file on purpose: the theme rules above set background-color
+		   at the same specificity, so order decides. */
+		body.compact {
+			background-color: transparent;
+		}
+
+		/* The transparency only holds if this document's colour scheme matches
+		   the one the page gave the iframe element. When they differ the browser
+		   paints an opaque canvas instead, so a dark page shows a white box. The
+		   theme is an attribute on body, so the root reads it from there. */
+		html {
+			color-scheme: light;
+		}
+
+		html:has(body[data-theme^='dark']) {
+			color-scheme: dark;
+		}
 	`),
 		}
 

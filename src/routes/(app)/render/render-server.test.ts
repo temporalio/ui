@@ -49,6 +49,17 @@ describe('/render', () => {
     expect(html).toContain('body.compact');
   });
 
+  // A compact frame that paints its own canvas shows as a white box on a dark
+  // page. Transparency needs both halves: the background, and a color-scheme on
+  // the root matching what the embedder gave the iframe element.
+  it('takes the surface it is placed on in compact mode', async () => {
+    const { html } = await render({ content: 'hello', compact: 'true' });
+
+    expect(html).toContain('background-color: transparent');
+    expect(html).toContain('color-scheme: light');
+    expect(html).toContain("html:has(body[data-theme^='dark'])");
+  });
+
   it('leaves compact mode opt-in', async () => {
     const { html } = await render({ content: 'hello', compact: 'false' });
 

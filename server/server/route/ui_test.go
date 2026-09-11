@@ -359,3 +359,14 @@ func TestSetRenderRoute_CompactRulesMatchCanonicalStylesheet(t *testing.T) {
 			"src/markdown.reset.css has %q; this route's copy does not", selector)
 	}
 }
+
+// Regression: a compact frame that paints its own canvas shows as a white box
+// on a dark page. Transparency needs both halves — the background and a
+// color-scheme on the root that matches what the embedder gave the iframe.
+func TestSetRenderRoute_CompactFrameIsTransparent(t *testing.T) {
+	body := renderRequest(t, "content=hello&compact=true")
+
+	assert.Contains(t, body, "background-color: transparent;")
+	assert.Contains(t, body, "color-scheme: light;")
+	assert.Contains(t, body, "html:has(body[data-theme^='dark'])")
+}
