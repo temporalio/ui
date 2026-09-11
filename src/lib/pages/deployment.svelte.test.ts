@@ -226,6 +226,19 @@ describe('deployment connection status visibility', () => {
     expect(details?.getAttribute('colspan')).toBe('5');
   });
 
+  test('hides the connection column for a self-hosted deployment', async () => {
+    const target = await client.renderDeployment({
+      fetchDeployment: selfHostedDeployment,
+      fetchDeploymentVersion: { workerDeploymentVersionInfo: {} },
+    });
+
+    expect(
+      Array.from(target.querySelectorAll('th')).map((th) => th.textContent),
+    ).toEqual(['Build ID', 'Lifecycle', 'Compute', 'Deployed At', 'Actions']);
+    const details = client.expandDetails(target);
+    expect(details).toBeNull();
+  });
+
   test('shows the pending connection state for a version with no completed check', async () => {
     const target = await client.renderDeployment({
       fetchDeployment: pendingDeployment,

@@ -1,8 +1,56 @@
 import { translate } from '$lib/i18n/translate';
-import type { ComputeStatus } from '$lib/types/deployments';
+import type {
+  ComputeStatus,
+  DescribeWorkerDeployment,
+  RoutingConfig,
+  VersionSummary,
+} from '$lib/types/deployments';
+import { isVersionSummaryNew } from '$lib/types/deployments';
+import { matchesVersion } from '$lib/utilities/deployment-has-compute-config';
+import { parseVersionStatus } from '$lib/utilities/deployments';
 import type { ValidTime } from '$lib/utilities/format-time';
 import { isTimestamp, timestampToDate } from '$lib/utilities/format-time';
 import type { APIErrorResponse } from '$lib/utilities/request-from-api';
+
+export const versionComputeProviderType = (
+  summary: VersionSummary,
+): string | undefined => {
+  if (!isVersionSummaryNew(summary)) return undefined;
+  const scalingGroup = Object.values(
+    summary.computeConfig?.scalingGroups ?? {},
+  )[0];
+  return scalingGroup?.providerType ?? scalingGroup?.provider?.type;
+};
+
+/**
+ * A connection status only exists for a version the provider currently backs,
+ * so only a current, ramping, or draining version with a compute provider has
+ * one to report.
+ */
+export const versionShowsConnectionStatus = (
+  summary: VersionSummary,
+  routingConfig: RoutingConfig = {},
+): boolean => {
+  if (!versionComputeProviderType(summary)) return false;
+  return (
+    matchesVersion(summary, routingConfig.currentDeploymentVersion) ||
+    matchesVersion(summary, routingConfig.rampingDeploymentVersion) ||
+    (isVersionSummaryNew(summary) &&
+      parseVersionStatus(summary.status).status === 'Draining')
+  );
+};
+
+/**
+ * The Connection column is only worth a column when at least one version can
+ * fill it. A self-hosted deployment has no provider to report on, so the column
+ * would hold nothing but placeholders.
+ */
+export const deploymentShowsConnectionStatus = (
+  deployment?: DescribeWorkerDeployment,
+): boolean =>
+  (deployment?.versionSummaries ?? []).some((summary) =>
+    versionShowsConnectionStatus(summary, deployment?.routingConfig ?? {}),
+  );
 
 export type ConnectionState = 'pending' | 'connected' | 'failed';
 

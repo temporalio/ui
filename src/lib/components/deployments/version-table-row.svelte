@@ -23,6 +23,8 @@
   import {
     resolveValidationOutcome,
     type ValidationOutcome,
+    versionComputeProviderType,
+    versionShowsConnectionStatus,
   } from '$lib/utilities/connection-status';
   import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
@@ -133,19 +135,10 @@
   }
   const statusLabel = $derived(resolveVersionStatusLabel());
 
-  const computeScalingGroup = $derived(
-    isVersionSummaryNew(version) && version.computeConfig
-      ? Object.values(version.computeConfig.scalingGroups ?? {})[0]
-      : undefined,
-  );
-  const computeProviderType = $derived(
-    computeScalingGroup?.providerType ?? computeScalingGroup?.provider?.type,
-  );
+  const computeProviderType = $derived(versionComputeProviderType(version));
 
   const connectionVisible = $derived(
-    isCurrent ||
-      isRamping ||
-      parseVersionStatus(drainageStatus).status === 'Draining',
+    versionShowsConnectionStatus(version, routingConfig),
   );
 
   const workflowHref = $derived(
@@ -369,7 +362,7 @@
   </td>
   {#if showConnectionStatus}
     <td class="text-left">
-      {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
+      {#if connectionVisible && isVersionSummaryNew(version)}
         <ConnectionBadge computeStatus={version.computeStatus} />
       {:else}
         <span class="text-secondary">—</span>

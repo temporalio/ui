@@ -177,7 +177,7 @@ test('does not call a gateway timeout an invalid connection', async ({
   await expect(page.getByText('Pending', { exact: true })).toBeVisible();
 });
 
-test('leaves the connection cell empty for a version with no compute config', async ({
+test('hides the connection column for a deployment with no compute config', async ({
   page,
 }) => {
   await Promise.all([
@@ -200,7 +200,47 @@ test('leaves the connection cell empty for a version with no compute config', as
 
   await page.goto(deploymentUrl);
   await expect(
+    page.getByRole('columnheader', { name: 'Build ID' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('columnheader', { name: 'Connection', exact: true }),
+  ).toHaveCount(0);
+  await expect(page.getByText('Connected', { exact: true })).toHaveCount(0);
+});
+
+test('keeps the connection column and empties the cell for a version with no compute config', async ({
+  page,
+}) => {
+  await Promise.all([
+    mockClusterApi(page),
+    mockNamespaceApi(page),
+    mockNamespacesApi(page),
+    mockSearchAttributesApi(page),
+    mockSettingsApi(page),
+    mockSystemInfoApi(page, {
+      capabilities: { serverScaledDeployments: true },
+    }),
+  ]);
+  await page.route(DEPLOYMENT_API, (route) => {
+    const response = deploymentResponse('connected');
+    response.workerDeploymentInfo.versionSummaries.push({
+      version: 'my-deployment.build-2',
+      deploymentVersion: {
+        deploymentName: 'my-deployment',
+        buildId: 'build-2',
+      },
+      createTime: { seconds: 0, nanos: 0 },
+      status: 'WORKER_DEPLOYMENT_VERSION_STATUS_INACTIVE',
+    } as (typeof response.workerDeploymentInfo.versionSummaries)[number]);
+    return route.fulfill({ json: response });
+  });
+
+  await page.goto(deploymentUrl);
+  await expect(
     page.getByRole('columnheader', { name: 'Connection', exact: true }),
   ).toHaveCount(1);
-  await expect(page.getByText('Connected', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Connected', { exact: true })).toBeVisible();
+
+  const inactiveRow = page.getByRole('row', { name: /build-2/ });
+  await expect(inactiveRow.getByRole('cell').nth(3)).toHaveText('—');
 });
