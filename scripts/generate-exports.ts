@@ -2,13 +2,19 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { publicSubpaths } from './public-exports.mjs';
+import { z } from 'zod';
+
+import { publicSubpaths } from './public-exports.js';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const libRoot = join(repoRoot, 'src/lib');
 const packagePath = join(repoRoot, 'package.json');
 
-const resolveEntry = (source) => {
+type ExportConditions = Record<string, string>;
+type PackageExport = string | ExportConditions;
+type PackageExports = Record<string, PackageExport>;
+
+const resolveEntry = (source: string): ExportConditions | null => {
   if (source.endsWith('.svelte')) {
     if (!existsSync(join(libRoot, source))) return null;
 
@@ -65,10 +71,10 @@ const resolveEntry = (source) => {
   return null;
 };
 
-const createPackageExports = () => {
-  const packageExports = {};
-  const duplicateSubpaths = [];
-  const unresolvedSubpaths = [];
+const createPackageExports = (): PackageExports => {
+  const packageExports: PackageExports = {};
+  const duplicateSubpaths: string[] = [];
+  const unresolvedSubpaths: string[] = [];
 
   for (const source of [...publicSubpaths].sort()) {
     const subpath = `./${source}`;
@@ -105,7 +111,9 @@ const createPackageExports = () => {
   return packageExports;
 };
 
-const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+const packageJson = z
+  .record(z.string(), z.json())
+  .parse(JSON.parse(readFileSync(packagePath, 'utf8')));
 const packageExports = createPackageExports();
 const serializedExports = JSON.stringify(packageExports);
 const exportsAreCurrent =
@@ -117,7 +125,7 @@ if (
   ![undefined, '--check', '--validate-dist'].includes(mode)
 ) {
   console.error(
-    'Usage: node scripts/generate-exports.mjs [--check|--validate-dist]',
+    'Usage: esno scripts/generate-exports.ts [--check|--validate-dist]',
   );
   process.exit(1);
 }
@@ -137,7 +145,7 @@ if (mode === '--validate-dist') {
     process.exit(1);
   }
 
-  const missingTargets = new Set();
+  const missingTargets = new Set<string>();
   for (const entry of Object.values(packageExports)) {
     const targets = typeof entry === 'string' ? [entry] : Object.values(entry);
     for (const target of targets) {

@@ -1441,7 +1441,7 @@ registry.registerExample({
           'package.json',
           'svelte.config.js',
           'tsconfig.json',
-          'scripts/generate-exports.mjs',
+          'scripts/generate-exports.ts',
           'src/lib/holocene/button.svelte',
           'src/lib/holocene/card.svelte',
           'src/lib/holocene/copyable',
@@ -1560,7 +1560,7 @@ registry.registerExample({
         `${JSON.stringify(packageJson, null, 2)}\n`,
       );
       await writeFile(
-        join(packageDirectory, 'scripts/public-exports.mjs'),
+        join(packageDirectory, 'scripts/public-exports.ts'),
         [
           'export const publicSubpaths = [',
           "  'catalog/authoring',",
