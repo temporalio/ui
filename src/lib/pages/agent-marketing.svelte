@@ -273,7 +273,7 @@
               <Badge colorScheme="warning" text="EXPERIMENTAL"></Badge>
               <div class="mt-2 space-y-4">
                 <div class="space-y-1">
-                  <h4>Temporal Agent Harness</h4>
+                  <h3>Temporal Agent Harness</h3>
                   <p class="text-base leading-6 text-secondary">
                     A durable agent harness and a matching session UI in one
                     repo. The harness adds durable turns, tool-approval
