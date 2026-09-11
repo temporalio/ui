@@ -9,6 +9,7 @@
   import {
     calculatePosition,
     getElementRect,
+    getLayoutRect,
     hasMoved,
   } from './position-calculator';
   import type { PortalProps } from './types';
@@ -88,7 +89,7 @@
   function updatePosition() {
     if (!portalElement || !anchorElement) return;
 
-    const anchorRect = getElementRect(anchorElement);
+    const anchorRect = getLayoutRect(anchorElement);
     const portalRect = getElementRect(portalElement);
 
     const containerRect =

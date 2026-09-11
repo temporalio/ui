@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   applyOffset,
@@ -8,6 +8,7 @@ import {
   detectCollision,
   getFlippedOffset,
   getFlippedPosition,
+  getLayoutRect,
   hasMoved,
 } from './position-calculator';
 import type { PortalPosition, Rect } from './types';
@@ -298,6 +299,115 @@ describe('position-calculator', () => {
 
     it('should detect a height change', () => {
       expect(hasMoved(anchorRect, createRect(100, 100, 50, 60))).toBe(true);
+    });
+  });
+
+  describe('getLayoutRect', () => {
+    beforeEach(() => {
+      vi.stubGlobal(
+        'DOMMatrixReadOnly',
+        class {
+          a: number;
+          b: number;
+          c: number;
+          d: number;
+
+          constructor(value: string) {
+            if (!value.startsWith('matrix(')) {
+              throw new SyntaxError(`Failed to parse '${value}'`);
+            }
+
+            const [a, b, c, d] = value
+              .replace(/^matrix\(|\)$/g, '')
+              .split(',')
+              .map(Number);
+            this.a = a;
+            this.b = b;
+            this.c = c;
+            this.d = d;
+          }
+        },
+      );
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    const stubElement = (
+      rect: Rect,
+      transform: string,
+      transformOrigin = '25px 15px',
+    ): HTMLElement => {
+      const element = document.createElement('button');
+      element.getBoundingClientRect = () => rect as DOMRect;
+      vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+        transform,
+        transformOrigin,
+      } as CSSStyleDeclaration);
+
+      return element;
+    };
+
+    const expectRect = (actual: Rect, expected: Rect) => {
+      expect(actual.left).toBeCloseTo(expected.left);
+      expect(actual.top).toBeCloseTo(expected.top);
+      expect(actual.width).toBeCloseTo(expected.width);
+      expect(actual.height).toBeCloseTo(expected.height);
+      expect(actual.right).toBeCloseTo(expected.right);
+      expect(actual.bottom).toBeCloseTo(expected.bottom);
+    };
+
+    it('should return the measured rect when the element is untransformed', () => {
+      expect(getLayoutRect(stubElement(anchorRect, 'none'))).toEqual(
+        anchorRect,
+      );
+    });
+
+    it('should undo a press scale applied about the center', () => {
+      const pressed = createRect(100.5, 100.3, 49, 29.4);
+      const element = stubElement(pressed, 'matrix(0.98, 0, 0, 0.98, 0, 0)');
+
+      expectRect(getLayoutRect(element), anchorRect);
+    });
+
+    it('should respect a non-center transform origin', () => {
+      const pressed = createRect(100, 100, 49, 29.4);
+      const element = stubElement(
+        pressed,
+        'matrix(0.98, 0, 0, 0.98, 0, 0)',
+        '0px 0px',
+      );
+
+      expectRect(getLayoutRect(element), anchorRect);
+    });
+
+    it('should return the measured rect for a rotation', () => {
+      const rotated = createRect(95, 95, 60, 40);
+      const element = stubElement(rotated, 'matrix(0.7, 0.7, -0.7, 0.7, 0, 0)');
+
+      expect(getLayoutRect(element)).toEqual(rotated);
+    });
+
+    it('should return the measured rect for a mirrored element', () => {
+      const mirrored = createRect(100, 100, 50, 30);
+      const element = stubElement(mirrored, 'matrix(-1, 0, 0, 1, 0, 0)');
+
+      expect(getLayoutRect(element)).toEqual(mirrored);
+    });
+
+    it('should return the measured rect for a half turn', () => {
+      const turned = createRect(100, 100, 50, 30);
+      const element = stubElement(turned, 'matrix(-1, 0, 0, -1, 0, 0)');
+
+      expect(getLayoutRect(element)).toEqual(turned);
+    });
+
+    it('should return the measured rect when the transform cannot be parsed', () => {
+      const element = stubElement(anchorRect, 'translateX(-50%) scale(0.98)');
+
+      expect(getLayoutRect(element)).toEqual(anchorRect);
     });
   });
 

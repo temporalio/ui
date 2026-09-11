@@ -28,6 +28,46 @@ export function getElementRect(element: HTMLElement): Rect {
   };
 }
 
+export function getLayoutRect(element: HTMLElement): Rect {
+  const rect = getElementRect(element);
+
+  if (typeof DOMMatrixReadOnly === 'undefined') return rect;
+
+  const { transform, transformOrigin } = window.getComputedStyle(element);
+  if (!transform || transform === 'none') return rect;
+
+  let matrix: DOMMatrixReadOnly;
+  try {
+    matrix = new DOMMatrixReadOnly(transform);
+  } catch {
+    return rect;
+  }
+
+  const { a: scaleX, b, c, d: scaleY } = matrix;
+
+  if (b !== 0 || c !== 0) return rect;
+  if (!(scaleX > 0) || !(scaleY > 0)) return rect;
+  if (scaleX === 1 && scaleY === 1) return rect;
+
+  const [originX = 0, originY = 0] = transformOrigin
+    .split(' ')
+    .map((value) => parseFloat(value) || 0);
+
+  const width = rect.width / scaleX;
+  const height = rect.height / scaleY;
+  const left = rect.left - originX * (1 - scaleX);
+  const top = rect.top - originY * (1 - scaleY);
+
+  return {
+    top,
+    left,
+    width,
+    height,
+    bottom: top + height,
+    right: left + width,
+  };
+}
+
 export function hasMoved(a: Rect, b: Rect): boolean {
   return (
     a.top !== b.top ||
