@@ -13,6 +13,7 @@ body {
 body {
   overscroll-behavior: none;
   position: relative;
+  overflow-wrap: break-word;
   padding: 1rem;
   white-space: pre-line;
   font-family: sans-serif;

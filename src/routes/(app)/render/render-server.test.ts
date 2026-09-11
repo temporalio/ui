@@ -10,6 +10,15 @@ const render = async (params: Record<string, string>) => {
 };
 
 describe('/render', () => {
+  it('breaks a long unbroken token instead of overflowing', async () => {
+    const { html } = await render({
+      content: 'See https://example.com/' + 'x'.repeat(180),
+      compact: 'true',
+    });
+
+    expect(html).toMatch(/body \{[^}]*overflow-wrap: break-word/);
+  });
+
   it('renders bold at bold weight', async () => {
     const { html } = await render({ content: '**loud**', compact: 'true' });
 
