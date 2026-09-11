@@ -10,6 +10,13 @@ const render = async (params: Record<string, string>) => {
 };
 
 describe('/render', () => {
+  it('renders bold at bold weight', async () => {
+    const { html } = await render({ content: '**loud**', compact: 'true' });
+
+    expect(html).toContain('<strong>loud</strong>');
+    expect(html).toMatch(/strong,\s*\nb \{\s*font-weight: 600/);
+  });
+
   it('serves markdown under a locked-down policy', async () => {
     const { response } = await render({ content: 'hello' });
     const policy = response.headers.get('Content-Security-Policy') ?? '';

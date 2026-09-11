@@ -103,6 +103,13 @@ td {
   border-color: color-mix(in srgb, currentColor 20%, transparent);
 }
 
+/* The star selector at the top sets font-weight on every element, beating the
+   UA default for strong. Without this, bold renders at normal weight. */
+strong,
+b {
+  font-weight: 600;
+}
+
 th {
   font-weight: 600;
 }
