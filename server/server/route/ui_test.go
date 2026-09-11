@@ -334,11 +334,10 @@ func TestSetRenderRoute_BreaksLongWords(t *testing.T) {
 	assert.Contains(t, renderRequest(t, "content=hello"), "overflow-wrap: break-word;")
 }
 
-// This route's stylesheet is a hand-maintained copy of src/markdown.reset.css,
-// and the two have drifted before. A full comparison is not possible — the
-// SvelteKit copy resolves colors through Io theme variables this server cannot
-// read, so it hardcodes hex instead. The compact block carries no colors, so
-// that much can be held to parity here.
+// markdown.gen.css is generated from src/markdown.reset.css, so this is a
+// tripwire for a stale generated file that runs without needing node. The
+// authoritative check is scripts/generate-markdown-css.test.ts, which compares
+// the whole file against freshly generated content.
 func TestSetRenderRoute_CompactRulesMatchCanonicalStylesheet(t *testing.T) {
 	canonical, err := os.ReadFile(filepath.Join("..", "..", "..", "src", "markdown.reset.css"))
 	if err != nil {
@@ -369,4 +368,17 @@ func TestSetRenderRoute_CompactFrameIsTransparent(t *testing.T) {
 	assert.Contains(t, body, "background-color: transparent;")
 	assert.Contains(t, body, "color-scheme: light;")
 	assert.Contains(t, body, "html:has(body[data-theme^='dark'])")
+}
+
+// The stylesheet here used to be a copy that predated the Io design system, so
+// a packaged server rendered markdown in the old Holocene palette no matter
+// what theme the page was in. The colours now come from the same Io themes the
+// app uses, through the generator.
+func TestSetRenderRoute_ServesIoThemeColors(t *testing.T) {
+	body := renderRequest(t, "content=hello")
+
+	assert.Contains(t, body, "--color-surface-primary:")
+	assert.Contains(t, body, "--color-content-primary:")
+	assert.Contains(t, body, "body[data-theme^='dark']")
+	assert.NotContains(t, body, "#e8efff", "pre-Io Holocene blue is back")
 }
