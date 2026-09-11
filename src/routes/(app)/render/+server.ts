@@ -6,11 +6,7 @@ import { toHtml } from 'hast-util-to-html';
 import { h } from 'hastscript';
 import { toHast } from 'mdast-util-to-hast';
 
-import {
-  type IoTheme,
-  ioThemeToCssVariables,
-  themes,
-} from '$lib/theme/io/themes';
+import { composeMarkdownStylesheet } from '$lib/utilities/markdown-stylesheet';
 import { process } from '$lib/utilities/render-markdown';
 
 type RenderOptions = {
@@ -20,38 +16,6 @@ type RenderOptions = {
   theme?: string;
   overrideTheme?: string;
 };
-
-const { dark: darkTheme, light: lightTheme } = themes;
-
-const markdownColorVariableNames = new Set([
-  '--color-background-primary',
-  '--color-content-brand',
-  '--color-content-primary',
-  '--color-border-brand',
-  '--color-border-secondary',
-  '--color-surface-primary',
-  '--color-surface-secondary',
-]);
-
-const markdownColorVariables = (theme: IoTheme) =>
-  Object.fromEntries(
-    Object.entries(ioThemeToCssVariables(theme)).filter(([name]) =>
-      markdownColorVariableNames.has(name),
-    ),
-  );
-
-const markdownColorRule = (selector: string, theme: IoTheme): string => {
-  const declarations = Object.entries(markdownColorVariables(theme))
-    .map(([name, value]) => `${name}: ${value};`)
-    .join('\n');
-
-  return `${selector} {\n${declarations}\n}`;
-};
-
-const markdownThemeCss = [
-  markdownColorRule(':root', lightTheme),
-  markdownColorRule("body[data-theme^='dark']", darkTheme),
-].join('\n');
 
 /**
  * Generate a random nonce.
@@ -84,7 +48,7 @@ const createPage = (
   { compact, nonce, theme, overrideTheme }: RenderOptions,
 ) => {
   const cssPath = path.resolve('src/markdown.reset.css');
-  const css = `${markdownThemeCss}\n${fs.readFileSync(cssPath, 'utf8')}`;
+  const css = composeMarkdownStylesheet(fs.readFileSync(cssPath, 'utf8'));
   return toHtml(
     h('html', [
       h('head', [
