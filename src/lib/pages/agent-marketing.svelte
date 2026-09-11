@@ -250,8 +250,8 @@
 <div
   class="agents-page surface-background min-h-full flex-none overflow-x-hidden"
 >
-  <header class="pb-4 text-base"><h5>Agents</h5></header>
-  <main class="w-full">
+  <header class="pb-4 text-base"><p>Agents</p></header>
+  <div class="w-full">
     <div
       class="grid w-full items-start gap-5 min-[1400px]:grid-cols-[minmax(0,1fr)_18.4375rem]"
     >
@@ -362,7 +362,7 @@
             class="border-subtle bg-primary flex min-h-[20.75rem] flex-col rounded-lg border p-6 md:p-8"
             aria-labelledby="skills-heading"
           >
-            <h5 id="skills-heading">Temporal Skills</h5>
+            <h2 id="skills-heading">Temporal Skills</h2>
             <p class="my-4 text-base leading-6 text-secondary">
               Install the Developer, Ops, Serverless, Cloud and Cloud Setup
               skills in the assistant you already code with, and point it at the
@@ -393,7 +393,7 @@
             class="border-subtle bg-primary min-h-[20.75rem] rounded-lg border p-6 md:p-8"
             aria-labelledby="cookbooks-heading"
           >
-            <h5 id="cookbooks-heading">Cookbooks and Demos</h5>
+            <h2 id="cookbooks-heading">Cookbooks and Demos</h2>
             <p
               class="mt-4 max-w-[25.125rem] text-base leading-6 text-secondary"
             >
@@ -421,7 +421,7 @@
           class="border-subtle bg-primary rounded-lg border p-6 md:p-8"
           aria-labelledby="integrations-heading"
         >
-          <h3 id="integrations-heading">Integrations</h3>
+          <h2 id="integrations-heading">Integrations</h2>
           <div class="mt-4 space-y-4">
             {#each integrations as integration (integration.name)}
               <Link
@@ -452,7 +452,7 @@
           class="border-subtle bg-primary rounded-lg border p-6 md:p-8"
           aria-labelledby="blog-heading"
         >
-          <h5 id="blog-heading">Blog</h5>
+          <h2 id="blog-heading">Blog</h2>
           <article>
             <p class="mt-4 text-base leading-6 text-secondary">
               Read practical guidance and ideas for building reliable agents
@@ -469,5 +469,5 @@
         </section>
       </div>
     </div>
-  </main>
+  </div>
 </div>

@@ -23,9 +23,11 @@ test('shows the agents resource hub', async ({ page }) => {
     'https://github.com/temporal-community/temporal-agent-harness',
   );
 
-  await expect(page.getByRole('heading', { name: 'Google ADK' })).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'Cookbooks and demos' }),
+    page.getByRole('link', { name: 'Open Google ADK integration' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Cookbooks and Demos' }),
   ).toBeVisible();
 });
 
