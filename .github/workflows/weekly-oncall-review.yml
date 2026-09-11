@@ -1,0 +1,191 @@
+name: Weekly On-Call Review
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Whether dependency remediations may update the draft PR'
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - apply
+      notify:
+        description: 'Post the weekly review thread to Slack'
+        required: true
+        default: true
+        type: boolean
+      slack_channel:
+        description: 'Slack channel ID for this manual run'
+        required: true
+        default: C0BPXR260DA
+        type: string
+      source_ref:
+        description: 'Revision the modules check out. Leave empty to use the revision this run was dispatched from.'
+        required: false
+        default: ''
+        type: string
+
+# The GitHub App token is scoped to the publishing job in the called workflow.
+# The workflow GITHUB_TOKEN never needs write access.
+permissions:
+  contents: read
+  pull-requests: read
+  vulnerability-alerts: read
+
+concurrency:
+  group: weekly-oncall-review
+  cancel-in-progress: false
+
+jobs:
+  resolve-inputs:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.inputs.outputs.mode }}
+      notify: ${{ steps.inputs.outputs.notify }}
+      slack_channel: ${{ steps.inputs.outputs.slack_channel }}
+      source_ref: ${{ steps.inputs.outputs.source_ref }}
+    steps:
+      - id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REQUESTED_MODE: ${{ inputs.mode }}
+          REQUESTED_NOTIFY: ${{ inputs.notify }}
+          REQUESTED_SLACK_CHANNEL: ${{ inputs.slack_channel }}
+          REQUESTED_SOURCE_REF: ${{ inputs.source_ref }}
+          DISPATCH_REF: ${{ github.ref_name }}
+          SCHEDULED_SLACK_CHANNEL: ${{ vars.ONCALL_FRONTEND_SLACK_CHANNEL }}
+        run: |
+          mode="$REQUESTED_MODE"
+          notify="$REQUESTED_NOTIFY"
+          slack_channel="$REQUESTED_SLACK_CHANNEL"
+
+          if [ "$EVENT_NAME" = 'schedule' ]; then
+            mode='dry-run'
+            notify='true'
+            slack_channel="$SCHEDULED_SLACK_CHANNEL"
+          fi
+
+          case "$mode" in
+            dry-run|apply) ;;
+            *) echo "Invalid mode: $mode" >&2; exit 1 ;;
+          esac
+          case "$notify" in
+            true|false) ;;
+            *) echo "Invalid notify value: $notify" >&2; exit 1 ;;
+          esac
+          if [ "$notify" = 'true' ] && ! [[ "$slack_channel" =~ ^[CGD][A-Z0-9]{8,}$ ]]; then
+            echo 'Slack channel must be a channel ID, not a channel name.' >&2
+            exit 1
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "notify=$notify" >> "$GITHUB_OUTPUT"
+          echo "slack_channel=$slack_channel" >> "$GITHUB_OUTPUT"
+
+          # A run tests the revision it was dispatched from unless told otherwise.
+          source_ref="${REQUESTED_SOURCE_REF:-$DISPATCH_REF}"
+          if [ "$EVENT_NAME" = 'schedule' ]; then source_ref='main'; fi
+          echo "source_ref=$source_ref" >> "$GITHUB_OUTPUT"
+
+  start-thread:
+    needs: resolve-inputs
+    if: needs.resolve-inputs.outputs.notify == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      slack_channel: ${{ fromJSON(steps.post.outputs.response).channel }}
+      thread_ts: ${{ fromJSON(steps.post.outputs.response).ts }}
+    steps:
+      - id: post
+        name: Start the weekly on-call review thread
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        with:
+          method: chat.postMessage
+          errors: true
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: "${{ needs.resolve-inputs.outputs.slack_channel }}"
+            text: "Weekly frontend on-call review has started."
+            blocks:
+              - type: header
+                text:
+                  type: plain_text
+                  text: "Weekly frontend on-call review"
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "Dependency security and pending VLN PRs are being reviewed in this thread."
+              - type: context
+                elements:
+                  - type: mrkdwn
+                    text: "Mode: `${{ needs.resolve-inputs.outputs.mode }}` • <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Workflow run>"
+
+  dependency-security:
+    needs: [resolve-inputs, start-thread]
+    if: always() && needs.resolve-inputs.result == 'success'
+    uses: ./.github/workflows/weekly-dependency-security-review.yml
+    with:
+      source_ref: ${{ needs.resolve-inputs.outputs.source_ref }}
+      mode: ${{ needs.resolve-inputs.outputs.mode }}
+      notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
+      slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
+      thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      TEMPORAL_CICD_APP_ID: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+      TEMPORAL_CICD_PRIVATE_KEY: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+
+  vln-review:
+    needs: [resolve-inputs, start-thread]
+    if: always() && needs.resolve-inputs.result == 'success'
+    uses: ./.github/workflows/weekly-vln-review.yml
+    with:
+      source_ref: ${{ needs.resolve-inputs.outputs.source_ref }}
+      notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
+      slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
+      thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  external-contributor-review:
+    needs: [resolve-inputs, start-thread]
+    if: always() && needs.resolve-inputs.result == 'success'
+    uses: ./.github/workflows/weekly-external-contributor-review.yml
+    with:
+      source_ref: ${{ needs.resolve-inputs.outputs.source_ref }}
+      notify: ${{ needs.resolve-inputs.outputs.notify == 'true' }}
+      slack_channel: ${{ needs.start-thread.outputs.slack_channel }}
+      thread_ts: ${{ needs.start-thread.outputs.thread_ts }}
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  finish-thread:
+    needs:
+      [
+        resolve-inputs,
+        start-thread,
+        dependency-security,
+        vln-review,
+        external-contributor-review,
+      ]
+    # Reports a module that did not succeed. A run where every module succeeded
+    # says nothing here, because each reply already carries its own outcome.
+    if: >-
+      always() &&
+      needs.resolve-inputs.outputs.notify == 'true' &&
+      needs.start-thread.outputs.thread_ts != '' &&
+      (needs.dependency-security.result != 'success' ||
+       needs.vln-review.result != 'success' ||
+       needs.external-contributor-review.result != 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report the modules that did not succeed
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        with:
+          method: chat.postMessage
+          errors: true
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: "${{ needs.start-thread.outputs.slack_channel }}"
+            thread_ts: "${{ needs.start-thread.outputs.thread_ts }}"
+            text: ":warning: A module did not succeed. Dependency security: ${{ needs.dependency-security.result }}. VLN review: ${{ needs.vln-review.result }}. External contributors: ${{ needs.external-contributor-review.result }}. ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

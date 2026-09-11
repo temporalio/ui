@@ -1,20 +1,16 @@
 <script module lang="ts">
   import { cva } from 'class-variance-authority';
 
+  import { WORKFLOW_ACTION_HOVER_CLASSES } from '../colors';
+
   // Module scope so the variant config is built once, not per mounted row.
   const groupHover = cva(['h-full w-full border-2'], {
     variants: {
       category: {
-        workflow: 'border-blue-700 bg-blue-800/80 ',
-        activity: 'border-purple-700 bg-purple-800/80 ',
-        'child-workflow': 'border-cyan-600  bg-cyan-600/80 ',
-        timer: 'border-yellow-700 bg-yellow-800/80',
-        signal: 'border-pink-700 bg-pink-800/80',
-        update: 'border-blue-700 bg-blue-800/80',
-        other: 'border-slate-700 bg-slate-800/80',
-        nexus: 'border-indigo-700 bg-indigo-800/80',
-        'local-activity': 'border-slate-700 bg-slate-800/80',
-        default: 'border-purple-700 bg-purple-900/80',
+        ...WORKFLOW_ACTION_HOVER_CLASSES,
+        update: 'border-blue-11 bg-indigo-11/80',
+        other: 'border-neutral-5 bg-indigo-12/80',
+        default: 'border-slate-blue-10 bg-slate-blue-11/80',
       },
     },
   });
@@ -25,13 +21,14 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
+  import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import {
     decodeLocalActivity,
     getLocalActivityMarkerEvent,
   } from '$lib/utilities/decode-local-activity';
   import type { ValidTime } from '$lib/utilities/format-time';
+  import { getEventClassificationLabel } from '$lib/utilities/get-event-classification-label';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
-  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
@@ -150,9 +147,14 @@
   );
   const retried = $derived(retryAttempt > 1);
 
+  const effectiveCategory = $derived(
+    resolveSystemNexusEvent(group.initialEvent)?.timelineCategory ??
+      group.category,
+  );
+
   const lineColor = $derived(
     strokeColor({
-      category: group.category,
+      category: effectiveCategory,
       classification: group.lastEvent.classification,
     }),
   );
@@ -167,7 +169,7 @@
         ? (pendingActivity.attempt ?? 0) > 1
           ? 'retry'
           : 'pending'
-        : group.category,
+        : effectiveCategory,
       classification: group.lastEvent.classification,
     }),
   );
@@ -232,8 +234,10 @@
     {#if icon}
       <svg
         class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
-        viewBox="0 0 24 24"><use href="#ti-{icon}" /></svg
+        viewBox="0 0 16 16"
       >
+        <use href="#ti-{icon}" />
+      </svg>
     {/if}
   </div>
 {/snippet}
@@ -251,7 +255,7 @@
     onclick={onClick}
   >
     <div
-      class="highlight {groupHover({ category: group.category })}"
+      class="highlight {groupHover({ category: effectiveCategory })}"
       style:border-radius="{highlightRadius}px"
     ></div>
     {#each points as pointX, index (index)}
@@ -286,7 +290,7 @@
           ? 'pause'
           : decodedLocalActivity
             ? CategoryIcon['local-activity'].name
-            : CategoryIcon[group.category].name,
+            : CategoryIcon[effectiveCategory].name,
       )}
     {/each}
     <!-- Inside the button so hovering/clicking the label hits the same target;
@@ -314,12 +318,12 @@
           style:top="{spanCy}px"
         >
           {#if iconName}
-            <svg class="h-[14px] w-[14px] text-current" viewBox="0 0 24 24">
+            <svg class="h-[14px] w-[14px] text-current" viewBox="0 0 16 16">
               <use href="#ti-{iconName}" />
             </svg>
           {/if}
           <span
-            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-current"
+            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-surface-primary px-1.5 text-current"
           >
             {#if pendingActivity}
               {translate('workflows.attempt')}

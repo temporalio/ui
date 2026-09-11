@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
@@ -37,7 +36,7 @@
     base,
     active = false,
     variant = 'secondary',
-    leadingIcon,
+    LeadingIcon,
     onclick,
     children,
     ...rest
@@ -50,21 +49,22 @@
   const buttonProps = $derived({
     ...rest,
     variant,
-    leadingIcon,
+    LeadingIcon,
     onclick,
     'data-track-name': 'toggle-button',
     'aria-pressed': pressed ? 'true' : 'false',
     href: href ? href + page.url.search : undefined,
     class: merge(
-      pressed && 'bg-interactive-secondary-active',
-      group && '[&:not(:last-child)]:border-r-0',
+      pressed &&
+        'border-transparent bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press focus-visible:bg-interactive-primary-hover',
+      group && 'rounded-none [&:not(:last-child)]:border-r-0',
       className,
     ),
   } as ButtonProps);
 </script>
 
 <Button {...buttonProps}>
-  {#if leadingIcon}
+  {#if LeadingIcon}
     <span class="hidden md:block">{@render children?.()}</span>
   {:else}
     {@render children?.()}

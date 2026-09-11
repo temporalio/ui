@@ -1,0 +1,130 @@
+name: Weekly VLN Review Module
+
+on:
+  workflow_call:
+    inputs:
+      notify:
+        required: true
+        type: boolean
+      slack_channel:
+        required: false
+        type: string
+      thread_ts:
+        required: false
+        type: string
+      source_ref:
+        description: 'Revision that contains the audit and digest source'
+        required: false
+        default: main
+        type: string
+    secrets:
+      SLACK_BOT_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      artifact_name: ${{ steps.artifact.outputs.name }}
+    # This job reads GitHub metadata only: no package installation, Slack, or
+    # GitHub App credential is available here.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout trusted audit source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_ref }}
+          persist-credentials: false
+
+      - id: artifact
+        name: Name the audit artifact
+        run: echo "name=weekly-vln-audit-${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_OUTPUT"
+
+      - name: Audit open VLN pull requests
+        run: >-
+          node .github/scripts/weekly-dependency-security-audit.mjs
+          --scope vln-review
+          --output weekly-vln-audit.json
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+
+      - name: Upload VLN audit evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.artifact.outputs.name }}
+          if-no-files-found: warn
+          retention-days: 14
+          path: weekly-vln-audit.json
+
+  notify:
+    needs: audit
+    if: always() && inputs.notify && inputs.thread_ts != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout trusted digest source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_ref }}
+          persist-credentials: false
+
+      - name: Download VLN audit evidence when available
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ needs.audit.outputs.artifact_name }}
+          path: evidence
+
+      - id: payload
+        name: Build the threaded VLN reply
+        env:
+          AUDIT_RESULT: ${{ needs.audit.result }}
+          CHANNEL: ${{ inputs.slack_channel }}
+          THREAD_TS: ${{ inputs.thread_ts }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -f evidence/weekly-vln-audit.json ]; then
+            node .github/scripts/weekly-dependency-security-digest.mjs \
+              --module vln-review \
+              --channel "$CHANNEL" \
+              --thread-ts "$THREAD_TS" \
+              --input evidence/weekly-vln-audit.json \
+              --output weekly-vln-review-reply.json \
+              --run-url "$RUN_URL"
+          else
+            jq -n \
+              --arg channel "$CHANNEL" \
+              --arg thread_ts "$THREAD_TS" \
+              --arg audit_result "$AUDIT_RESULT" \
+              --arg run_url "$RUN_URL" \
+              '{channel: $channel, thread_ts: $thread_ts, text: ("VLN review did not produce evidence. Audit: " + $audit_result + ". " + $run_url)}' \
+              > weekly-vln-review-reply.json
+          fi
+          {
+            echo 'payload<<EOF'
+            cat weekly-vln-review-reply.json
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post VLN digest
+        # An unset value means the digest did not run, which is itself worth posting.
+        if: steps.payload.outputs.actionable != 'false'
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        with:
+          method: chat.postMessage
+          errors: true
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: ${{ steps.payload.outputs.payload }}

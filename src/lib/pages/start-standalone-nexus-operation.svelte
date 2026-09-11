@@ -2,6 +2,7 @@
   import StartNexusOperationForm from '$lib/components/standalone-nexus-operations/start-standalone-nexus-operation-form/form.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { nexusOperationsSearchParams } from '$lib/stores/nexus-operations';
   import { routeForStandaloneNexusOperations } from '$lib/utilities/route-for';
 
@@ -21,7 +22,7 @@
     <Link
       href={nexusOperationsHref}
       data-testid="back-to-nexus-operations"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {translate('standalone-nexus-operations.back-to-nexus-operations')}
     </Link>

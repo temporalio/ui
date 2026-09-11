@@ -14,9 +14,11 @@
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
-<h1 data-testid="namespace-selector-title" class="mb-8">
-  {translate('common.namespaces')}
-</h1>
+<header>
+  <h1 data-testid="namespace-selector-title" class="leading-7">
+    {translate('common.namespaces')}
+  </h1>
+</header>
 {#if $namespaces?.length > 0}
   <Pagination
     items={$namespaces}

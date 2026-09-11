@@ -8,9 +8,13 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconClose,
+    IconExternalLink,
+    IconNamespaceSwitcher,
+  } from '$lib/io/icon';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
@@ -138,11 +142,8 @@
 {#if menuIsOpen}
   <div
     class={merge(
-      'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden',
-      'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary/70 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70',
-      isCloud
-        ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
-        : 'surface-black',
+      'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto border-b border-primary bg-surface-primary text-primary md:hidden',
+      'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-interactive-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary',
     )}
     data-nav="open"
     in:slide={{ duration: 200, delay: 0 }}
@@ -167,11 +168,8 @@
 {/if}
 <nav
   class={merge(
-    'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 px-4 py-2 transition-colors md:hidden',
-    'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70 focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-primary/70',
-    isCloud
-      ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-off-white focus-visible:[&_a]:ring-success focus-visible:[&_button]:ring-success'
-      : 'surface-black border-t border-subtle',
+    'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 border-t border-primary bg-surface-primary px-4 py-2 text-primary transition-colors md:hidden',
+    'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-interactive-primary',
     className,
   )}
   data-testid="top-nav"
@@ -188,7 +186,7 @@
       onclick={onLinksClick}
     >
       {#if viewLinks}
-        <Icon name="close" height={32} width={32} />
+        <IconClose height={32} width={32} />
       {:else}
         <Logo height={32} width={32} />
       {/if}
@@ -201,23 +199,26 @@
         onClick: onNamespaceClick,
       })}
     {:else}
-      <div class="namespace-wrapper">
+      <div
+        class="namespace-wrapper dark:focus-within:bg-surface-primary dark:focus-within:text-primary"
+      >
         <Button
           variant="ghost"
           data-testid="namespace-switcher"
-          leadingIcon="namespace-switcher"
+          LeadingIcon={IconNamespaceSwitcher}
           size="xs"
-          class="grow text-white"
+          class="grow"
           onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
         >
-        <div class="ml-1 h-full w-1 border-l border-subtle"></div>
+        <div class="ml-1 h-full w-1 border-l border-primary"></div>
         <Button
           variant="ghost"
           size="xs"
           href={routeForNamespace({ namespace })}
           disabled={!namespaceExists}
-          ><Icon class="text-white" name="external-link" /></Button
         >
+          <IconExternalLink />
+        </Button>
       </div>
     {/if}
   {/if}
@@ -229,7 +230,7 @@
     onclick={onSettingsClick}
   >
     {#if viewSettings}
-      <Icon name="close" height={32} width={32} />
+      <IconClose height={32} width={32} />
     {:else}
       <div
         class="flex aspect-square w-[32px] min-w-[32px] items-center justify-center"
@@ -250,7 +251,7 @@
 
 <style lang="postcss">
   .namespace-wrapper {
-    @apply surface-black flex h-10 w-full grow flex-row items-center border border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply flex h-10 w-full grow flex-row items-center border border-primary bg-surface-primary px-0.5 text-sm text-primary focus-within:border-brand focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary;
   }
 
   .nav-button {

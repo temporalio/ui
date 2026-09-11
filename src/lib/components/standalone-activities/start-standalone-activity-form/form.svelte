@@ -25,6 +25,7 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronDown, IconChevronUp } from '$lib/io/icon';
   import {
     encodings,
     type PayloadInputEncoding,
@@ -472,7 +473,7 @@
     <Button
       type="button"
       variant="ghost"
-      trailingIcon={advancedOptionsVisible ? 'chevron-up' : 'chevron-down'}
+      TrailingIcon={advancedOptionsVisible ? IconChevronUp : IconChevronDown}
       data-testid="start-standalone-activity-more-options"
       onclick={() => (advancedOptionsVisible = !advancedOptionsVisible)}
     >

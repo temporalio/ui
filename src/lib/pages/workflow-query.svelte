@@ -13,6 +13,7 @@
   import Select from '$lib/holocene/select/select.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
   import {
     getQuery,
     getWorkflowMetadata,
@@ -162,7 +163,7 @@
             onclick={() => query(queryType)}
             {loading}
             variant={edited ? 'primary' : 'secondary'}
-            leadingIcon={edited ? undefined : 'retry'}
+            LeadingIcon={edited ? undefined : IconRetry}
             disabled={loading}
           >
             {edited

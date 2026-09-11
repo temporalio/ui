@@ -19,6 +19,12 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconArrowAscending,
+    IconArrowDescending,
+    IconCollapse,
+    IconDownload,
+  } from '$lib/io/icon';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
@@ -147,7 +153,7 @@
 -->
 <div>
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary pb-2 text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="flex items-center gap-2">
       <h2>{translate('workflows.timeline-tab')}</h2>
@@ -156,19 +162,23 @@
     <div class="flex items-center gap-2">
       <ToggleButtons>
         <ToggleButton
-          leadingIcon={reverseSort ? 'descending' : 'ascending'}
+          LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="zoom-in"
           onclick={onSort}
-          size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+          size="sm"
+          variant="tertiary"
         >
+          {reverseSort ? 'Descending' : 'Ascending'}
+        </ToggleButton>
         <ToggleButton
-          leadingIcon="timeline-collapse"
+          LeadingIcon={IconCollapse}
           data-testid="toggle-idle-time"
           loading={!historyCtx.fetchComplete}
           disabled={!historyCtx.fetchComplete ||
             !timeline?.hasCollapsibleSegments}
           onclick={onToggleIdleTime}
           size="sm"
+          variant="tertiary"
         >
           {timeline?.allCollapsibleSegmentsCollapsed
             ? translate('workflows.show-idle-time')
@@ -180,12 +190,13 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
+          variant="tertiary"
           onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
+              ? 'bg-content-tertiary'
+              : 'bg-content-static-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -193,8 +204,9 @@
         </ToggleButton>
         <ToggleButton
           data-testid="download"
-          leadingIcon="download"
+          LeadingIcon={IconDownload}
           size="sm"
+          variant="tertiary"
           onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}

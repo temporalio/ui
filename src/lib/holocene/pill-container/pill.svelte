@@ -7,9 +7,8 @@
   import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { type IconComponent, IconSpinner } from '$lib/io/icon';
 
   import { PILLS, type PillsContext } from './pill-container.svelte';
 
@@ -18,7 +17,7 @@
     disabled?: boolean;
     loading?: boolean;
     active?: boolean;
-    icon?: IconName;
+    Icon?: IconComponent;
     count?: number;
     class?: string;
     children?: Snippet;
@@ -30,7 +29,7 @@
     disabled = false,
     loading = false,
     active = undefined,
-    icon = undefined,
+    Icon,
     count = undefined,
     class: className = '',
     children,
@@ -53,6 +52,8 @@
     selectPill(id);
     onclick?.(e);
   };
+
+  const Glyph = $derived(loading ? IconSpinner : Icon);
 </script>
 
 <button
@@ -62,20 +63,21 @@
     handleClick(e);
   }}
   class={merge(
-    'flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
-    isActive && 'bg-interactive text-white',
+    'flex items-center justify-center gap-2 rounded-full bg-transparent px-3 py-1 text-sm text-primary hover:bg-interactive-tertiary-hover active:bg-interactive-tertiary-press',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary',
+    isActive &&
+      'bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press',
     className,
   )}
   {disabled}
 >
-  {#if icon}
+  {#if Icon}
     <span class:animate-spin={loading}>
-      <Icon name={loading ? 'spinner' : icon} />
+      <Glyph />
     </span>
   {/if}
   {@render children?.()}
   {#if count != null}
-    <Badge type="count">{count}</Badge>
+    <BadgeCount value={count} />
   {/if}
 </button>

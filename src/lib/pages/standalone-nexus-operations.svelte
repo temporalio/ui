@@ -8,9 +8,10 @@
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import NexusOperationsSummaryConfigurableTable from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-nexus-operations/nexus-operations-summary-filter-bar/filter-bar.svelte';
-  import StatusCounts from '$lib/components/status-counts.svelte';
+  import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchNexusOperationCountByStatus } from '$lib/services/nexus-operation-counts';
@@ -78,34 +79,36 @@
 </script>
 
 <header class="flex flex-col gap-2">
-  <div class="flex flex-col justify-between gap-2 md:flex-row">
+  <div class="flex flex-col items-start justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
-        <h1 class="flex items-center gap-2 leading-7">
-          {#if $supportsAdvancedVisibility}
-            <span data-testid="nexus-operation-count"
-              >{$nexusOperationCount.count.toLocaleString()}</span
-            >
-            <Translate
-              key="standalone-nexus-operations.nexus-operations-plural"
-              count={$nexusOperationCount.count}
-            />
-          {:else}
-            <Translate
-              key="standalone-nexus-operations.recent-nexus-operations"
-            />
-          {/if}
-        </h1>
-        <p class="mt-3 text-xs text-secondary">
+        <div class="flex flex-row flex-wrap items-start gap-2">
+          <h1 class="flex items-center gap-2 leading-7">
+            {#if $supportsAdvancedVisibility}
+              <span data-testid="nexus-operation-count"
+                >{$nexusOperationCount.count.toLocaleString()}</span
+              >
+              <Translate
+                key="standalone-nexus-operations.nexus-operations-plural"
+                count={$nexusOperationCount.count}
+              />
+            {:else}
+              <Translate
+                key="standalone-nexus-operations.recent-nexus-operations"
+              />
+            {/if}
+          </h1>
+          <CountRefreshButton
+            count={$nexusOperationCount.newCount}
+            refresh={nexusOperationRefresh}
+          />
+        </div>
+        <p class="mt-2 text-xs text-secondary">
           {refreshTimeFormatted}
         </p>
       </div>
       {@render releaseStageBadge?.()}
-      <CountRefreshButton
-        count={$nexusOperationCount.newCount}
-        refresh={nexusOperationRefresh}
-      />
-      <StatusCounts
+      <StatusCountFilters
         bind:refreshTime
         countStore={nexusOperationCount}
         refresh={nexusOperationRefresh}
@@ -123,19 +126,20 @@
   </div>
 </header>
 
-<FilterBar />
-<SavedQueryViews
-  filters={nexusOperationFilters}
-  savedQueries={savedNexusQueries}
-  systemViews={systemNexusViews}
-  defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
-  searchAttributes={nexusOperationSearchAttributes}
-  id="nexus"
->
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={nexusOperationFilters}
+    savedQueries={savedNexusQueries}
+    systemViews={systemNexusViews}
+    defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
+    searchAttributes={nexusOperationSearchAttributes}
+    id="nexus"
+  />
+  <FilterBar />
   <NexusOperationsSummaryConfigurableTable
     onClickConfigure={openCustomizationDrawer}
   />
-</SavedQueryViews>
+</MaximizableTableView>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

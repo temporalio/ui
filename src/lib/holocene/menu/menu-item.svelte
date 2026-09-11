@@ -1,6 +1,6 @@
 <script lang="ts" module>
   export const MENU_ITEM_SELECTORS =
-    'input, li[role="option"]:not([aria-disabled="true"]), li[role="menuitem"]:not([aria-disabled="true"])';
+    'input, li[role="option"]:not([aria-disabled="true"]), li[role="menuitem"]:not([aria-disabled="true"]), a[role="menuitem"]:not([aria-disabled="true"])';
 </script>
 
 <script lang="ts">
@@ -13,7 +13,10 @@
   import { getContext, type Snippet } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { goto } from '$app/navigation';
+
+  import { IconCheckmark, IconExternalLinkOptical } from '$lib/io/icon';
+  import { isModifiedClick } from '$lib/utilities/is-modified-click';
 
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
@@ -26,7 +29,8 @@
     centered?: boolean;
     class?: ClassNameValue;
     hoverable?: boolean;
-    onclick?: () => void;
+    interaction?: 'menu' | 'select';
+    onclick?: (event?: MouseEvent) => void;
     children?: Snippet;
     leading?: Snippet;
     trailing?: Snippet;
@@ -56,6 +60,7 @@
     description = undefined,
     centered = false,
     hoverable = true,
+    interaction = 'menu',
     newTab = false,
     onclick,
     children,
@@ -65,6 +70,14 @@
   }: Props = $props();
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
+
+  const isSameOrigin = (url: string) => {
+    try {
+      return new URL(url, location.href).origin === location.origin;
+    } catch {
+      return false;
+    }
+  };
 
   const handleKeydown: KeyboardEventHandler<
     HTMLLIElement | HTMLAnchorElement
@@ -84,8 +97,17 @@
         break;
       case ' ':
       case 'Enter':
-        onclick?.();
-        if (!$keepOpen) $open = false;
+        // Links already activate on Enter, and leaving that to the browser
+        // keeps modifier+Enter opening a new tab, so only Space is synthesized
+        if (href) {
+          if (event.key === ' ') {
+            event.preventDefault();
+            (event.currentTarget as HTMLAnchorElement).click();
+          }
+        } else {
+          onclick?.();
+          if (!$keepOpen) $open = false;
+        }
         break;
       default:
         break;
@@ -100,7 +122,7 @@
       nextElement = nextElement.nextElementSibling;
     }
 
-    if (nextElement && nextElement instanceof HTMLLIElement) {
+    if (nextElement instanceof HTMLElement) {
       nextElement.focus();
     }
   };
@@ -115,7 +137,7 @@
       previousElement = previousElement.previousElementSibling;
     }
 
-    if (previousElement && previousElement instanceof HTMLLIElement) {
+    if (previousElement instanceof HTMLElement) {
       previousElement.focus();
     }
   };
@@ -123,6 +145,19 @@
   const handleClick = () => {
     if (!$keepOpen) $open = false;
     onclick?.();
+  };
+
+  const handleLinkClick = (event: MouseEvent) => {
+    const modified = isModifiedClick(event);
+    if (!$keepOpen && !modified) $open = false;
+    onclick?.(event);
+
+    const anchor = event.currentTarget as HTMLAnchorElement;
+    if (modified || anchor.target || event.defaultPrevented) return;
+    if (!href || !isSameOrigin(href)) return;
+
+    event.preventDefault();
+    goto(href);
   };
 </script>
 
@@ -142,6 +177,9 @@
     class:active
     class:disabled
     class:hoverable
+    class:destructive
+    class:selected
+    class:select={interaction === 'select'}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -149,13 +187,26 @@
     data-track-intent="navigate"
     data-track-text="*textContent*"
     onkeydown={handleKeydown}
+    onclick={handleLinkClick}
     {...rest as HTMLAnchorAttributes}
   >
-    <div>
-      {@render children?.()}
+    {@render leading?.()}
+    <div class="min-w-0 grow">
+      <div class:centered class="menu-item-wrapper">
+        {@render children?.()}
+        {#if selected}
+          <IconCheckmark class="shrink-0" />
+        {/if}
+      </div>
+      {#if description}
+        <div class="menu-item-description" class:text-center={centered}>
+          {description}
+        </div>
+      {/if}
     </div>
+    {@render trailing?.()}
     {#if newTab}
-      <Icon height={20} width={20} name="external-link" />
+      <IconExternalLinkOptical height={20} width={20} />
     {/if}
   </a>
 {:else}
@@ -172,6 +223,7 @@
     class:selected
     class:hoverable
     class:active
+    class:select={interaction === 'select'}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -183,11 +235,11 @@
     {...rest as HTMLLiAttributes}
   >
     {@render leading?.()}
-    <div class="grow">
+    <div class="min-w-0 grow">
       <div class:centered class="menu-item-wrapper">
         {@render children?.()}
         {#if selected}
-          <Icon name="checkmark" class="shrink-0" />
+          <IconCheckmark class="shrink-0" />
         {/if}
       </div>
       {#if description}
@@ -202,26 +254,42 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer border border-transparent text-sm focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply cursor-pointer rounded border border-transparent text-sm text-primary focus-visible:border-interactive-primary focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary active:bg-interactive-secondary-press;
 
     &.active {
-      @apply bg-interactive-secondary-hover;
+      @apply bg-interactive-primary text-white;
     }
 
     &.hoverable {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;
+      @apply hover:bg-interactive-secondary-hover hover:text-primary;
     }
 
     &.selected {
-      @apply bg-brand/10 text-brand;
+      @apply bg-interactive-secondary-press text-primary;
+    }
+
+    &.select {
+      @apply focus-visible:bg-interactive-primary-hover focus-visible:text-white active:bg-interactive-primary-press active:text-white;
+
+      &.hoverable {
+        @apply hover:bg-interactive-primary-hover hover:text-white;
+      }
     }
 
     &.destructive {
-      @apply text-danger;
+      @apply text-danger focus-visible:border-interactive-danger focus-visible:bg-interactive-danger focus-visible:text-white focus-visible:ring-interactive-danger active:bg-interactive-danger-press active:text-white;
+
+      &.active {
+        @apply bg-interactive-danger text-white;
+      }
+
+      &.hoverable {
+        @apply hover:bg-interactive-danger-hover hover:text-white;
+      }
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed opacity-50;
+      @apply pointer-events-none cursor-not-allowed text-tertiary opacity-50;
     }
   }
 
@@ -235,5 +303,14 @@
 
   .menu-item-description {
     @apply mr-6 text-xs font-normal text-secondary;
+  }
+
+  .menu-item.active .menu-item-description,
+  .menu-item.select.hoverable:hover .menu-item-description,
+  .menu-item.select:focus-visible .menu-item-description,
+  .menu-item.select:active .menu-item-description,
+  .menu-item.destructive.hoverable:hover .menu-item-description,
+  .menu-item.destructive:focus-visible .menu-item-description {
+    @apply text-white;
   }
 </style>

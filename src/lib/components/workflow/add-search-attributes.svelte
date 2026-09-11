@@ -4,6 +4,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconAdd } from '$lib/io/icon';
   import {
     customSearchAttributes,
     type SearchAttributesSchema,
@@ -52,7 +53,7 @@
   {/each}
   <Button
     {variant}
-    leadingIcon="add"
+    LeadingIcon={IconAdd}
     class="max-sm:w-full"
     data-testid="add-search-attribute-button"
     onclick={addSearchAttribute}

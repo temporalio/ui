@@ -1,4 +1,19 @@
-import type { IconName } from '$lib/holocene/icon';
+import {
+  IconCalendar,
+  IconCheckCircle,
+  IconClock,
+  type IconComponent,
+  IconExclamationOctagon,
+  IconHappyLappy,
+  IconHeartbeat,
+  IconPause,
+  IconRelationship,
+  IconTemporalActivity,
+  IconTemporalNexus,
+  IconTemporalSchedules,
+  IconTemporalWorker,
+  IconTemporalWorkflow,
+} from '$lib/io/icon';
 import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
 
 import { persistStore } from './persist-store';
@@ -7,7 +22,7 @@ export type SavedQuery = {
   id: string;
   name: string;
   query: string;
-  icon?: IconName;
+  Icon?: IconComponent;
   count?: number;
   badge?: string;
   disabled?: boolean;
@@ -30,17 +45,17 @@ const getLastHour = () => {
 
 export const DEFAULT_WORKFLOW_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
-  name: 'All Workflows',
+  name: 'All',
   query: '',
-  icon: 'workflow',
+  Icon: IconTemporalWorkflow,
   type: 'system',
 };
 
 const TASK_FAILURES_VIEW: SavedQuery = {
   id: 'task-failures',
-  name: 'Task Failures',
+  name: 'Failures',
   query: TASK_FAILURES_QUERY,
-  icon: 'happy-lappy',
+  Icon: IconHappyLappy,
   type: 'system',
 };
 
@@ -50,28 +65,28 @@ const systemWorkflowViews: SavedQuery[] = [
     id: 'running',
     name: 'Running',
     query: '`ExecutionStatus`="Running"',
-    icon: 'heartbeat',
+    Icon: IconHeartbeat,
     type: 'system',
   },
   {
     id: 'child-workflows',
-    name: 'Parent Workflows',
+    name: 'Parent',
     query: '`ParentWorkflowId` is null',
-    icon: 'relationship',
+    Icon: IconRelationship,
     type: 'system',
   },
   {
     id: 'today',
     name: 'Today',
     query: `StartTime >= "${getToday()}"`,
-    icon: 'calendar',
+    Icon: IconCalendar,
     type: 'system',
   },
   {
     id: 'last-hour',
-    name: 'Last Hour',
+    name: 'Last 1h',
     query: `StartTime >= "${getLastHour()}"`,
-    icon: 'clock',
+    Icon: IconClock,
     type: 'system',
   },
 ];
@@ -88,10 +103,10 @@ export const getSystemWorkflowViews = (
           {
             ...TASK_FAILURES_VIEW,
             count: taskFailuresCount,
-            icon:
+            Icon:
               taskFailuresCount > 0
-                ? 'exclamation-octagon'
-                : TASK_FAILURES_VIEW.icon,
+                ? IconExclamationOctagon
+                : TASK_FAILURES_VIEW.Icon,
           },
         ]
       : []),
@@ -112,7 +127,7 @@ export const DEFAULT_ACTIVITY_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
   name: 'All',
   query: '',
-  icon: 'activity',
+  Icon: IconTemporalActivity,
   type: 'system',
 };
 
@@ -122,21 +137,21 @@ export const systemActivityViews: SavedQuery[] = [
     id: 'running',
     name: 'Running',
     query: '`ExecutionStatus`="Running"',
-    icon: 'heartbeat',
+    Icon: IconHeartbeat,
     type: 'system',
   },
   {
     id: 'completed',
     name: 'Completed',
     query: '`ExecutionStatus`="Completed"',
-    icon: 'circle-check',
+    Icon: IconCheckCircle,
     type: 'system',
   },
   {
     id: 'failed',
     name: 'Failed',
     query: '`ExecutionStatus`="Failed"',
-    icon: 'error',
+    Icon: IconExclamationOctagon,
     type: 'system',
   },
 ];
@@ -152,7 +167,7 @@ export const DEFAULT_NEXUS_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
   name: 'All',
   query: '',
-  icon: 'nexus',
+  Icon: IconTemporalNexus,
   type: 'system',
 };
 
@@ -162,14 +177,14 @@ export const systemNexusViews: SavedQuery[] = [
     id: 'today',
     name: 'Today',
     query: `StartTime >= "${getToday()}"`,
-    icon: 'calendar',
+    Icon: IconCalendar,
     type: 'system',
   },
   {
     id: 'last-hour',
-    name: 'Last Hour',
+    name: 'Last 1h',
     query: `StartTime >= "${getLastHour()}"`,
-    icon: 'clock',
+    Icon: IconClock,
     type: 'system',
   },
 ];
@@ -185,7 +200,7 @@ export const DEFAULT_WORKER_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
   name: 'All',
   query: '',
-  icon: 'workers',
+  Icon: IconTemporalWorker,
   type: 'system',
 };
 
@@ -195,7 +210,7 @@ export const systemWorkerViews: SavedQuery[] = [
     id: 'running',
     name: 'Running',
     query: '`WorkerStatus`="Running"',
-    icon: 'heartbeat',
+    Icon: IconHeartbeat,
     type: 'system',
   },
 ];
@@ -211,7 +226,7 @@ export const DEFAULT_SCHEDULE_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
   name: 'All',
   query: '',
-  icon: 'schedules',
+  Icon: IconTemporalSchedules,
   type: 'system',
 };
 
@@ -221,7 +236,7 @@ export const systemScheduleViews: SavedQuery[] = [
     id: 'paused',
     name: 'Paused',
     query: '`TemporalSchedulePaused`=true',
-    icon: 'pause',
+    Icon: IconPause,
     type: 'system',
   },
 ];

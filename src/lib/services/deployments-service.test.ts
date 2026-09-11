@@ -490,6 +490,7 @@ describe('deployments service', () => {
         max_count: 30,
         initial_count: 0,
         utilization_target: 0.8,
+        no_sync_quiet_ms: 90_000,
       });
     });
 
@@ -504,6 +505,7 @@ describe('deployments service', () => {
           maxReplicas: 12,
           initialReplicas: 6,
           utilizationTarget: 0.65,
+          scaleDownStabilizationMs: 300_000,
         },
       );
 
@@ -518,12 +520,36 @@ describe('deployments service', () => {
         maxReplicas: 12,
         initialReplicas: 6,
         utilizationTarget: 0.65,
+        scaleDownStabilizationMs: 300_000,
       });
       expect(
         JSON.parse(
           atob(config.scalingGroups?.['default']?.scaler?.details?.data ?? ''),
         ),
-      ).toMatchObject({ initial_count: 6, utilization_target: 0.65 });
+      ).toMatchObject({
+        initial_count: 6,
+        utilization_target: 0.65,
+        no_sync_quiet_ms: 300_000,
+      });
+    });
+
+    test('sends a zero stabilization window rather than the default', () => {
+      const config = buildGcpCloudRunComputeConfig(
+        'test-project',
+        'us-east1',
+        'worker-pool',
+        'worker@example.com',
+        { scaleDownStabilizationMs: 0 },
+      );
+
+      expect(
+        JSON.parse(
+          atob(config.scalingGroups?.['default']?.scaler?.details?.data ?? ''),
+        ),
+      ).toMatchObject({ no_sync_quiet_ms: 0 });
+      expect(decodeScalerDetails(config)).toMatchObject({
+        scaleDownStabilizationMs: 0,
+      });
     });
   });
 

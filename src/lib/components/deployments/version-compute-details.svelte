@@ -26,7 +26,9 @@
 </script>
 
 {#if isCompute}
-  <div class="surface-secondary flex flex-col gap-2 py-3 pl-6 text-xs">
+  <div
+    class="flex flex-col gap-2 bg-surface-secondary py-3 pl-6 text-xs text-primary"
+  >
     {#if lambdaDetails.lambdaArn}
       <div class="flex items-center gap-1">
         <span class="font-medium text-secondary"

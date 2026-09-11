@@ -17,13 +17,19 @@
     DEFAULT_UNITS,
     SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconChevronDown,
+    IconChevronLeft,
+    IconChevronUp,
+    IconExternalLink,
+    IconInfo,
+  } from '$lib/io/icon';
   import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
   import { getPollers } from '$lib/services/pollers-service';
   import {
@@ -253,7 +259,7 @@
       namespace,
     })}?${$workflowsSearchParams}`}
     data-testid="back-to-workflows"
-    icon="chevron-left"
+    LeadingIcon={IconChevronLeft}
   >
     {translate('workflows.back-to-workflows')}
   </Link>
@@ -369,7 +375,7 @@
               width={200}
               text={translate('workflows.markdown-description')}
             >
-              <Icon name="info" /></Tooltip
+              <IconInfo /></Tooltip
             >
           </p>
         </div>
@@ -385,7 +391,7 @@
       <Button
         variant="ghost"
         class="max-sm:w-full"
-        trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
+        TrailingIcon={viewAdvancedOptions ? IconChevronUp : IconChevronDown}
         onclick={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
       >
@@ -408,7 +414,7 @@
               })}
               class="inline-flex items-center gap-1"
             >
-              <Icon name="external-link" class="h-4 w-4" />
+              <IconExternalLink />
               {translate('workflows.view-running-workflow')}
             </Link>
           </div>

@@ -1,10 +1,15 @@
 import { decodePayloadsWithCodec as callCodecEndpoint } from '$lib/services/data-encoder';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
+import { schemaForMessageType } from '$lib/system-nexus-endpoints';
 import type { Memo, Payload, Payloads } from '$lib/types';
 import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
 import type { Optional, Replace } from '$lib/types/global';
 
 import { atob } from './atob';
+import {
+  binaryProtobufMessageType,
+  decodeBinaryProtobuf,
+} from './decode-binary-protobuf';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -108,6 +113,24 @@ export function parseRawPayloadToJSON(
 ): unknown | Payload | null {
   if (payload === null) {
     return payload;
+  }
+
+  const messageType = binaryProtobufMessageType(payload);
+  const schema = messageType ? schemaForMessageType(messageType) : null;
+  const decoded = schema
+    ? decodeBinaryProtobuf(payload, schema, (p) =>
+        parseRawPayloadToJSON(p, true),
+      )
+    : null;
+  if (decoded) {
+    if (returnDataOnly) return decoded.data;
+    return {
+      metadata: {
+        ...parseBase64ObjectValues(payload?.metadata ?? {}),
+        encoding: 'json/plain',
+      },
+      data: decoded.data,
+    };
   }
 
   try {

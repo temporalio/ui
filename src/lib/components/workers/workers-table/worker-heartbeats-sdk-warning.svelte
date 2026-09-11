@@ -1,8 +1,8 @@
 <script lang="ts">
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconHeartbeat } from '$lib/io/icon';
   import { sdkInfo } from '$lib/stores/events';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
@@ -10,32 +10,37 @@
     {
       sdk: 'Go',
       version: '1.41.0',
-      href: 'https://github.com/temporalio/sdk-go/releases/tag/v1.41.0',
+      href: 'https://github.com/temporalio/sdk-go/releases',
     },
     {
       sdk: 'Python',
       version: '1.20.0',
-      href: 'https://github.com/temporalio/sdk-python/releases/tag/1.20.0',
+      href: 'https://github.com/temporalio/sdk-python/releases',
     },
     {
       sdk: 'TypeScript',
       version: '1.14.0',
-      href: 'https://github.com/temporalio/sdk-typescript/releases/tag/v1.14.0',
+      href: 'https://github.com/temporalio/sdk-typescript/releases',
     },
     {
       sdk: '.NET',
       version: '1.10.0',
-      href: 'https://github.com/temporalio/sdk-dotnet/releases/tag/1.10.0',
+      href: 'https://github.com/temporalio/sdk-dotnet/releases',
     },
     {
       sdk: 'Ruby',
       version: '1.1.0',
-      href: 'https://github.com/temporalio/sdk-ruby/releases/tag/v1.1.0',
+      href: 'https://github.com/temporalio/sdk-ruby/releases',
     },
     {
       sdk: 'Java',
       version: '1.35.0',
-      href: 'https://github.com/temporalio/sdk-java/releases/tag/v1.35.0',
+      href: 'https://github.com/temporalio/sdk-java/releases',
+    },
+    {
+      sdk: 'Rust',
+      version: '0.70.0',
+      href: 'https://github.com/temporalio/sdk-rust/releases',
     },
   ];
   const currentSdk = $derived(
@@ -51,7 +56,7 @@
   aria-live="polite"
 >
   <span class="flex h-20 w-20 items-center justify-center rounded-full">
-    <Icon name="heartbeat" class="block h-full w-full text-blue-200" />
+    <IconHeartbeat class="block h-full w-full text-information" />
   </span>
   <div class="text-center">
     <h5>{translate('workers.no-worker-heartbeats')}</h5>

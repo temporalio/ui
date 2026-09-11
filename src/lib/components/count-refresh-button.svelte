@@ -6,6 +6,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
 
   interface Props {
     count: number;
@@ -21,7 +22,7 @@
 <Button
   size="xs"
   variant="ghost"
-  leadingIcon="retry"
+  LeadingIcon={IconRetry}
   onclick={() => {
     $refresh = Date.now();
     onRefresh?.();
@@ -30,7 +31,7 @@
   {translate('common.refresh')}
   <span
     class={merge(
-      'inline-grid overflow-hidden rounded-sm bg-slate-50 px-1 py-0.5 dark:bg-slate-600',
+      'inline-grid overflow-hidden rounded-sm bg-surface-tertiary px-1 py-0.5',
       !count && 'bg-transparent p-0',
     )}
   >

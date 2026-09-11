@@ -3,11 +3,20 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
+  import DurationInput, {
+    getFirstWholeNumberUnit,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconChevronDown,
+    IconChevronUp,
+    IconExternalLinkOptical,
+    IconInfo,
+  } from '$lib/io/icon';
 
   import {
     hasCloudRunImpersonatorPlaceholder,
@@ -16,7 +25,11 @@
   import { GCP_REGIONS } from './gcp-regions';
   import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
   import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
-  import { interpolateTerraformTemplate } from './shared';
+  import {
+    defaultScaleDownStabilization,
+    interpolateTerraformTemplate,
+    scaleDownStabilizationUnits,
+  } from './shared';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
 
   interface Props {
@@ -33,6 +46,7 @@
     maxReplicas?: number;
     initialReplicas?: number;
     utilizationTarget?: number;
+    scaleDownStabilization?: string;
     scaleUpCooloffMs?: number;
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
@@ -53,6 +67,7 @@
       maxReplicas?: string[];
       initialReplicas?: string[];
       utilizationTarget?: string[];
+      scaleDownStabilization?: string[];
       scaleUpCooloffMs?: string[];
       scaleUpBacklogThreshold?: string[];
       maxWorkerLifetimeMs?: string[];
@@ -74,6 +89,7 @@
     maxReplicas = $bindable(30),
     initialReplicas = $bindable(0),
     utilizationTarget = $bindable(0.8),
+    scaleDownStabilization = $bindable(defaultScaleDownStabilization),
     scaleUpCooloffMs = $bindable(),
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
@@ -139,7 +155,7 @@
   }
 </script>
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <h2 class="text-base font-medium">
   {translate('workers.resource-section')}
@@ -166,7 +182,7 @@
       type="button"
       href="https://console.aws.amazon.com/lambda"
       target="_blank"
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLinkOptical}
     >
       {translate('workers.open-lambda-console')}
     </Button>
@@ -215,7 +231,7 @@
         type="button"
         href="https://console.cloud.google.com/run/worker-pools"
         target="_blank"
-        trailingIcon="external-link"
+        TrailingIcon={IconExternalLinkOptical}
       >
         {translate('workers.open-cloud-run-console')}
       </Button>
@@ -223,7 +239,7 @@
   </div>
 {/if}
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <h2 class="text-base font-medium">
   {translate('workers.access-section')}
@@ -256,12 +272,12 @@
       required
     />
     <Accordion
-      icon="info"
+      Icon={IconInfo}
       title={translate('workers.no-role-prompt')}
       bind:open={showRoleHelp}
-      class="[&_h3]:text-sm"
+      class="border-tertiary bg-background-primary [&_h3]:text-sm"
     >
-      <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+      <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
         <ToggleButtons>
           <ToggleButton
             active={activeRoleHelpTab === 'cloudformation'}
@@ -286,7 +302,7 @@
               size="sm"
               href={launchStackHref}
               target="_blank"
-              trailingIcon="external-link"
+              TrailingIcon={IconExternalLinkOptical}
             >
               {translate('workers.launch-stack')}
             </Button>
@@ -329,12 +345,12 @@
     />
     {#if provider === 'cloud-run'}
       <Accordion
-        icon="info"
+        Icon={IconInfo}
         title={translate('workers.cloud-run-setup-prompt')}
         bind:open={showCloudRunHelp}
-        class="[&_h3]:text-sm"
+        class="border-tertiary bg-background-primary [&_h3]:text-sm"
       >
-        <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+        <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
           <p class="text-sm text-secondary">
             {translate('workers.cloud-run-terraform-description-before')}<Link
               href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
@@ -365,7 +381,7 @@
   </div>
 {/if}
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <div class="flex flex-wrap items-center justify-between gap-4">
   <div>
@@ -380,7 +396,7 @@
     variant="secondary"
     size="sm"
     type="button"
-    trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
+    TrailingIcon={showScaling ? IconChevronUp : IconChevronDown}
     onclick={() => (showScaling = !showScaling)}
   >
     {showScaling
@@ -521,6 +537,24 @@
       hintText={errors.utilizationTarget?.[0] ||
         translate('workers.utilization-target-hint')}
       error={!!errors.utilizationTarget?.[0]}
+      required
+    />
+    <DurationInput
+      bind:value={scaleDownStabilization}
+      id="scaleDownStabilization"
+      name="scaleDownStabilization"
+      inputmode="numeric"
+      min={0}
+      units={scaleDownStabilizationUnits}
+      initialUnit={getFirstWholeNumberUnit(
+        scaleDownStabilization,
+        scaleDownStabilizationUnits,
+        'second(s)',
+      )}
+      label={translate('workers.scale-down-stabilization-label')}
+      hintText={errors.scaleDownStabilization?.[0] ||
+        translate('workers.scale-down-stabilization-hint')}
+      error={!!errors.scaleDownStabilization?.[0]}
       required
     />
   </div>

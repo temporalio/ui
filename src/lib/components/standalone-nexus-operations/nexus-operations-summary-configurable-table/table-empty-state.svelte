@@ -3,9 +3,9 @@
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconGithub, IconWarning } from '$lib/io/icon';
   import { nexusOperationError } from '$lib/stores/nexus-operations';
   import noResultsImages from '$lib/vendor/empty-state.svg';
 
@@ -57,7 +57,7 @@
           {translate('standalone-nexus-operations.empty-state-description')}
         {/if}
       </p>
-      <NoQueryResults class="m-auto mt-8 text-subtle" />
+      <NoQueryResults class="m-auto mt-8 text-tertiary" />
     </div>
   </div>
 {:else}
@@ -66,7 +66,7 @@
     aria-live="polite"
   >
     <div
-      class="surface-primary flex w-auto min-w-[280px] flex-col gap-6 p-8 xl:min-w-[520px] xl:flex-1"
+      class="flex w-auto min-w-[280px] flex-col gap-6 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
     >
       <h2>
         {translate('standalone-nexus-operations.empty-state-no-data-title')}
@@ -74,7 +74,7 @@
       {#if $nexusOperationError}
         <Alert
           intent="warning"
-          icon="warning"
+          Icon={IconWarning}
           title={translate('common.error-occurred')}
           style="overflow-wrap: anywhere"
         >
@@ -118,7 +118,7 @@
           <ul class="flex flex-col gap-2">
             {#each codeSamples as sample (sample.label)}
               <li class="flex items-center gap-2">
-                <Icon name="github" class="h-5 w-5 shrink-0" />
+                <IconGithub class="h-5 w-5 shrink-0" />
                 <Link href={sample.href} newTab>
                   {sample.label}
                 </Link>
@@ -128,11 +128,11 @@
         </div>
       {/if}
     </div>
-    <div class="flex h-full flex-col">
-      <div class="bg-off-white dark:bg-[#0f1725]">
+    <div class="flex flex-col">
+      <div class="bg-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-[#8da4ef]"></div>
     </div>
   </div>
 {/if}

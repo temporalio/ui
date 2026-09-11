@@ -9,6 +9,8 @@ import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-serve
 
 type ClientRunner = typeof import('./deployment-client-test-runner-entry');
 
+export const VITE_SERVER_BOOT_TIMEOUT_MS = 60_000;
+
 let closeViteServer: (() => Promise<void>) | undefined;
 let runner: ClientRunner | undefined;
 let textEncoder: PropertyDescriptor | undefined;

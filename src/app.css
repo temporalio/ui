@@ -1,7 +1,3 @@
-@import '@fontsource-variable/inter';
-
-@import '@fontsource/noto-sans-mono';
-
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -9,15 +5,13 @@
 @layer base {
   :root {
     --top-nav-height: 3rem;
+    --layout-pt: 0px;
     --banner-height: 0px;
     --bottom-nav-height: 4rem;
     --scroll-inset-top: 0px;
     --scroll-inset-bottom: calc(
       var(--bottom-nav-height) + var(--banner-height)
     );
-    --panel-collapsed-w: 60px;
-    --panel-expanded-w: 240px;
-    --panel-h: 73dvh;
   }
 
   @media (min-width: 768px) {
@@ -35,7 +29,7 @@
   }
 
   body {
-    @apply body-normal surface-background relative overscroll-none;
+    @apply body-normal relative overscroll-none bg-background-primary text-primary;
   }
 
   body[data-theme='light'] {

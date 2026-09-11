@@ -5,7 +5,6 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     Menu,
     MenuButton,
@@ -14,6 +13,7 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock } from '$lib/io/icon';
   import type {
     EventSortOrder,
     EventSortOrderOptions,
@@ -67,7 +67,7 @@
     controls="event-date-filter-menu"
     data-testid="event-date-filter-button"
   >
-    <Icon class="md:hidden" name="clock" />
+    <IconClock class="md:hidden" />
     <span class="max-md:hidden">{translate('common.date-and-time')}</span>
   </MenuButton>
   <Menu class="w-80" id="event-date-filter-menu" position="right">

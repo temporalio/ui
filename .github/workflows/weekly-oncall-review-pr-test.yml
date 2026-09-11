@@ -1,0 +1,82 @@
+name: Weekly On-Call Review PR Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Rehearse the dependency-security module. apply exercises the full remediation path without publishing.'
+        required: true
+        default: apply
+        type: choice
+        options:
+          - dry-run
+          - apply
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - .github/workflows/weekly-oncall-review.yml
+      - .github/workflows/weekly-oncall-review-pr-test.yml
+      - .github/workflows/weekly-dependency-security-review.yml
+      - .github/workflows/weekly-vln-review.yml
+      - .github/workflows/weekly-external-contributor-review.yml
+      - .github/scripts/weekly-dependency-security-audit.mjs
+      - .github/scripts/weekly-dependency-security-audit.test.mjs
+      - .github/scripts/apply-weekly-dependency-remediation.mjs
+      - .github/scripts/apply-weekly-dependency-remediation.test.mjs
+      - .github/scripts/verify-weekly-dependency-remediation.mjs
+      - .github/scripts/verify-weekly-dependency-remediation.test.mjs
+      - .github/scripts/weekly-dependency-security-digest.mjs
+      - .github/scripts/weekly-dependency-security-digest.test.mjs
+      - .github/scripts/slack-utils.mjs
+
+permissions:
+  contents: read
+  pull-requests: read
+  vulnerability-alerts: read
+
+concurrency:
+  group: weekly-oncall-review-pr-test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Rehearses the full remediation path on any ref. publish is false, so the
+  # credentialed job never runs and no pull request is touched.
+  dependency-security-rehearsal:
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/weekly-dependency-security-review.yml
+    with:
+      mode: ${{ inputs.mode }}
+      notify: false
+      publish: false
+      source_ref: ${{ github.sha }}
+
+  dependency-security:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/weekly-dependency-security-review.yml
+    with:
+      mode: dry-run
+      notify: false
+      source_ref: ${{ github.event.pull_request.head.sha }}
+
+  vln-review:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/weekly-vln-review.yml
+    with:
+      notify: false
+      source_ref: ${{ github.event.pull_request.head.sha }}
+
+  external-contributor-review:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/weekly-external-contributor-review.yml
+    with:
+      notify: false
+      source_ref: ${{ github.event.pull_request.head.sha }}

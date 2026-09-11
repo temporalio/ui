@@ -2,6 +2,7 @@
   import StandaloneActivityForm from '$lib/components/standalone-activities/start-standalone-activity-form/form.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { activitiesSearchParams } from '$lib/stores/activities';
   import { routeForStandaloneActivities } from '$lib/utilities/route-for';
 
@@ -21,7 +22,7 @@
     <Link
       href={activitiesHref}
       data-testid="back-to-activities"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {translate('standalone-activities.back-to-activities')}
     </Link>

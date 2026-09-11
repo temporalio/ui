@@ -4,9 +4,22 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import {
+    IconAdd,
+    IconArchive,
+    IconClose,
+    type IconComponent,
+    IconImport,
+    IconMerge,
+    IconPlaySolid,
+    IconSearch,
+    IconTemporalBatch,
+    IconTemporalNamespaces,
+    IconTemporalNexus,
+    IconTemporalSchedules,
+    IconTemporalWorkflow,
+  } from '$lib/io/icon';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
@@ -36,7 +49,7 @@
     id: string;
     title: string;
     subtitle?: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     action: () => void;
     category?: string;
   }
@@ -51,7 +64,7 @@
         id: 'start-workflow',
         title: 'Start Workflow',
         subtitle: 'Create a new workflow execution',
-        icon: 'play',
+        Icon: IconPlaySolid,
         category: 'Navigation',
         action: () => {
           goto(routeForWorkflowStart({ namespace }));
@@ -62,7 +75,7 @@
         id: 'create-schedule',
         title: 'Create Schedule',
         subtitle: 'Create a new workflow schedule',
-        icon: 'add',
+        Icon: IconAdd,
         category: 'Navigation',
         action: () => {
           goto(routeForScheduleCreate({ namespace }));
@@ -73,7 +86,7 @@
         id: 'workflows',
         title: 'View Workflows',
         subtitle: `Navigate to workflows in ${namespace}`,
-        icon: 'workflow',
+        Icon: IconTemporalWorkflow,
         category: 'Navigation',
         action: () => {
           goto(routeForWorkflows({ namespace }));
@@ -84,7 +97,7 @@
         id: 'schedules',
         title: 'View Schedules',
         subtitle: `Navigate to schedules in ${namespace}`,
-        icon: 'schedules',
+        Icon: IconTemporalSchedules,
         category: 'Navigation',
         action: () => {
           goto(routeForSchedules({ namespace }));
@@ -95,7 +108,7 @@
         id: 'batch-operations',
         title: 'View Batch Operations',
         subtitle: `Navigate to batch operations in ${namespace}`,
-        icon: 'batch-operation',
+        Icon: IconTemporalBatch,
         category: 'Navigation',
         action: () => {
           goto(routeForBatchOperations({ namespace }));
@@ -106,7 +119,7 @@
         id: 'namespaces',
         title: 'View Namespaces',
         subtitle: 'Navigate to namespace overview',
-        icon: 'namespace',
+        Icon: IconTemporalNamespaces,
         category: 'Navigation',
         action: () => {
           goto(routeForNamespaces());
@@ -117,7 +130,7 @@
         id: 'worker-deployments',
         title: 'View Worker Deployments',
         subtitle: `Navigate to worker deployments in ${namespace}`,
-        icon: 'merge',
+        Icon: IconMerge,
         category: 'Navigation',
         action: () => {
           goto(routeForWorkerDeployments({ namespace }));
@@ -128,7 +141,7 @@
         id: 'nexus',
         title: 'View Nexus',
         subtitle: 'Navigate to Nexus endpoints',
-        icon: 'nexus',
+        Icon: IconTemporalNexus,
         category: 'Navigation',
         action: () => {
           goto(routeForNexus());
@@ -139,7 +152,7 @@
         id: 'archival',
         title: 'View Archive',
         subtitle: `Navigate to archived workflows in ${namespace}`,
-        icon: 'archives',
+        Icon: IconArchive,
         category: 'Navigation',
         action: () => {
           goto(routeForArchivalWorkflows({ namespace }));
@@ -150,7 +163,7 @@
         id: 'import',
         title: 'Import Events',
         subtitle: 'Import workflow event history',
-        icon: 'import',
+        Icon: IconImport,
         category: 'Actions',
         action: () => {
           goto(routeForEventHistoryImport());
@@ -290,36 +303,36 @@
 </script>
 
 {#snippet keyboardShortcuts()}
-  <div class="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
+  <div class="flex gap-4 text-xs text-secondary">
     <span class="flex items-center gap-1.5">
       {#if ActiveComponent}
         <kbd
-          class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+          class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
           >←</kbd
         >
       {/if}
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
         >↑</kbd
       ><kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
         >↓</kbd
       >
-      <span class="text-slate-400">navigate</span>
+      <span class="text-tertiary">navigate</span>
     </span>
     <span class="flex items-center gap-1.5">
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
         >⏎</kbd
       >
-      <span class="text-slate-400">select</span>
+      <span class="text-tertiary">select</span>
     </span>
     <span class="flex items-center gap-1.5">
       <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        class="rounded border border-tertiary bg-surface-tertiary px-2 py-1 font-mono text-xs text-primary"
         >Esc</kbd
       >
-      <span class="text-slate-400">close</span>
+      <span class="text-tertiary">close</span>
     </span>
   </div>
 {/snippet}
@@ -328,7 +341,7 @@
   {#each filteredCommands as command, index (command.id)}
     <button
       type="button"
-      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-slate-50 hover:shadow-sm dark:hover:bg-slate-800"
+      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-interactive-tertiary-hover hover:shadow-sm"
       class:selected={index === selectedIndex}
       onclick={() => handleCommandClick(command)}
       onmouseenter={() => (selectedIndex = index)}
@@ -336,9 +349,10 @@
       aria-selected={index === selectedIndex}
     >
       <div class="flex items-center gap-4">
-        {#if command.icon}
+        {#if command.Icon}
+          {@const CommandIcon = command.Icon}
           <div class="h-6 w-6 flex-shrink-0 text-secondary">
-            <Icon name={command.icon} />
+            <CommandIcon />
           </div>
         {/if}
         <div class="flex flex-col gap-1">
@@ -354,7 +368,7 @@
       </div>
       {#if command.category}
         <div
-          class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+          class="rounded-full bg-surface-tertiary px-3 py-1.5 text-xs font-medium text-secondary"
         >
           {command.category}
         </div>
@@ -362,9 +376,9 @@
     </button>
   {:else}
     <div
-      class="flex min-h-96 flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400"
+      class="flex min-h-96 flex-col items-center justify-center py-12 text-secondary"
     >
-      <Icon name="search" />
+      <IconSearch />
       <h3 class="mt-2 text-secondary">No commands found</h3>
       <p class="mt-2 text-secondary">Try a different search term</p>
     </div>
@@ -382,14 +396,14 @@
   {#snippet content()}
     <div class="flex h-full flex-1 flex-col">
       <div
-        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
+        class="sticky top-0 z-20 border-b border-primary bg-surface-primary pb-4 pt-2"
       >
         <div class="flex items-center justify-between px-6 py-3">
           <div
-            class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
+            class="flex items-center gap-3 text-lg font-semibold text-primary"
           >
-            <div class="h-5 w-5 text-indigo-600 dark:text-indigo-400">
-              <Icon name="search" />
+            <div class="h-5 w-5 text-brand">
+              <IconSearch />
             </div>
             Command Palette
           </div>
@@ -398,10 +412,10 @@
             <button
               type="button"
               onclick={close}
-              class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              class="flex h-8 w-8 items-center justify-center rounded-full text-tertiary transition-colors hover:bg-interactive-tertiary-hover hover:text-secondary"
               aria-label="Close"
             >
-              <Icon name="close" class="h-4 w-4" />
+              <IconClose class="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -411,7 +425,7 @@
               id="action-search"
               bind:value={searchQuery}
               placeholder="Search for commands..."
-              icon="search"
+              Icon={IconSearch}
               labelHidden
               label="Search commands"
               autocomplete="off"
@@ -435,11 +449,12 @@
 
 <style lang="postcss">
   .selected {
-    @apply border-indigo-200 bg-indigo-50 shadow-sm;
+    @apply border-brand bg-surface-brand shadow-sm;
   }
 
   :global(.body::backdrop) {
-    background: rgb(15 23 42 / 75%);
+    @apply bg-surface-overlay-neutral;
+
     backdrop-filter: blur(4px);
     opacity: 0;
     transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);

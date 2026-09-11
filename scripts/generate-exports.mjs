@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { publicExportTargets } from './public-exports.mjs';
+import { publicSubpaths } from './public-exports.mjs';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const libRoot = join(repoRoot, 'src/lib');
@@ -67,24 +67,39 @@ const resolveEntry = (source) => {
 
 const createPackageExports = () => {
   const packageExports = {};
-  const unresolved = [];
+  const duplicateSubpaths = [];
+  const unresolvedSubpaths = [];
 
-  for (const [subpath, source] of Object.entries(publicExportTargets).sort()) {
+  for (const source of [...publicSubpaths].sort()) {
+    const subpath = `./${source}`;
+    if (subpath in packageExports) {
+      duplicateSubpaths.push(subpath);
+      continue;
+    }
+
     const entry = resolveEntry(source);
     if (!entry) {
-      unresolved.push(`${subpath} -> ${source}`);
+      unresolvedSubpaths.push(subpath);
       continue;
     }
     packageExports[subpath] = entry;
   }
 
-  if (unresolved.length) {
+  if (duplicateSubpaths.length) {
     console.error(
-      `Could not resolve ${unresolved.length} public export(s) in src/lib:`,
+      `Found ${duplicateSubpaths.length} duplicate public export(s):`,
     );
-    for (const entry of unresolved) console.error(`  - ${entry}`);
-    process.exit(1);
+    for (const subpath of duplicateSubpaths) console.error(`  - ${subpath}`);
   }
+
+  if (unresolvedSubpaths.length) {
+    console.error(
+      `Could not resolve ${unresolvedSubpaths.length} public export(s) in src/lib:`,
+    );
+    for (const subpath of unresolvedSubpaths) console.error(`  - ${subpath}`);
+  }
+
+  if (duplicateSubpaths.length || unresolvedSubpaths.length) process.exit(1);
 
   packageExports['./package.json'] = './package.json';
   return packageExports;

@@ -10,18 +10,17 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <nav
+  <header
     id="event-history"
-    class="block items-center justify-between gap-4 pb-4 lg:flex"
-    aria-label={translate('events.import-event-history')}
+    class="flex flex-col items-start justify-between gap-2 md:flex-row"
   >
-    <h1 data-testid="import-event-history">
+    <h1 data-testid="import-event-history" class="leading-7">
       {translate('events.import-event-history')}
     </h1>
     <div class="flex gap-4">
       <HistoryImport />
     </div>
-  </nav>
+  </header>
   <div class="w-full md:w-1/2">
     <code class="md:text-md font-mono text-sm leading-8"
       >type HistoryEvent = temporal.api.history.v1.IHistoryEvent</code

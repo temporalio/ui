@@ -8,6 +8,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconGithub, IconWarning } from '$lib/io/icon';
   import { workflowError } from '$lib/stores/workflows';
   import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
   import noResultsImages from '$lib/vendor/empty-state.svg';
@@ -62,9 +63,9 @@
         {/if}
       </p>
       {#if hasTaskFailuresQuery}
-        <NoWorkflowTaskFailures class="m-auto mt-8 text-subtle" />
+        <NoWorkflowTaskFailures class="m-auto mt-8 text-tertiary" />
       {:else}
-        <NoQueryResults class="m-auto mt-8 text-subtle" />
+        <NoQueryResults class="m-auto mt-8 text-tertiary" />
       {/if}
     </div>
   </div>
@@ -74,7 +75,7 @@
     aria-live="polite"
   >
     <div
-      class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
+      class="flex w-auto min-w-[280px] flex-col gap-4 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
     >
       <h2>
         {translate('workflows.workflow-empty-state-title')}
@@ -82,7 +83,7 @@
       {#if $workflowError}
         <Alert
           intent="warning"
-          icon="warning"
+          Icon={IconWarning}
           title={translate('common.error-occurred')}
           style="overflow-wrap: anywhere"
         >
@@ -97,10 +98,10 @@
           >.
         </p>
         <ul class="flex flex-col gap-2">
-          {#each samples as sample}
+          {#each samples as sample (sample)}
             <li>
               <Link
-                icon="github"
+                LeadingIcon={IconGithub}
                 newTab
                 href="https://github.com/temporalio/{sample}">{sample}</Link
               >
@@ -109,11 +110,11 @@
         </ul>
       {/if}
     </div>
-    <div class="flex h-full flex-col">
-      <div class="bg-off-white dark:bg-[#0f1725]">
+    <div class="flex flex-col">
+      <div class="bg-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-[#8da4ef]"></div>
     </div>
   </div>
 {/if}

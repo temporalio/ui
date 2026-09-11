@@ -3,6 +3,7 @@
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconNamespaceSwitcher } from '$lib/io/icon';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
@@ -49,7 +50,7 @@
   labelHidden
   {value}
   id="namespace-switcher"
-  leadingIcon="namespace-switcher"
+  LeadingIcon={IconNamespaceSwitcher}
   options={sortedNamespaceList}
   optionValueKey="namespace"
   onchange={handleNamespaceSelect}

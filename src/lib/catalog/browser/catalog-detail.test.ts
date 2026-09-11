@@ -11,12 +11,28 @@ import type { Component } from 'svelte';
 import { createServer } from 'vite';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import {
+  IconCheckCircle,
+  type IconComponent,
+  IconQuestionCircle,
+  IconWarning,
+} from '$lib/io/icon';
 import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
 
 import { catalogHarnessSetupTimeoutMs } from './catalog-harness-timeout';
 import { createCatalogSessionStore } from './session-store';
 import type { BrowserCatalogDescriptor } from './types';
 import type { WorkbenchHost } from './workbench-host';
+
+// The component is loaded through an isolated Vite server, so the icon
+// components it returns are different objects than the ones imported here.
+// Compare by compiled component name rather than by reference.
+const iconNamed = (icon: { name: string }) => ({
+  asymmetricMatch: (actual: unknown) =>
+    typeof actual === 'function' &&
+    (actual as { name: string }).name === icon.name,
+  toString: () => `iconNamed(${icon.name})`,
+});
 
 let catalogDetail: Component<Record<string, unknown>>;
 let renderComponent: typeof render;
@@ -39,7 +55,7 @@ let readinessPresentation: (config: {
     | 'unavailable';
   taskQueue: string;
 }) => {
-  icon: string;
+  Icon: IconComponent;
   iconClass: string;
   iconLabel: string;
   label: string;
@@ -207,7 +223,7 @@ describe('CatalogDetail', () => {
       /class="[^"]*flex-wrap[^"]*justify-between[^"]*"[\s\S]*>Start options<[\s\S]*>Start</,
     );
     expect(source).toMatch(
-      /aria-label="Start options"[\s\S]*hidden={!configureOpen}[\s\S]*class="surface-primary sticky bottom-0 flex flex-wrap items-center justify-between/,
+      /aria-label="Start options"[\s\S]*hidden={!configureOpen}[\s\S]*class="(?=[^"]*sticky)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*"/,
     );
   });
 
@@ -232,7 +248,7 @@ describe('CatalogDetail', () => {
         taskQueue: 'catalog-tasks',
       }),
     ).toEqual({
-      icon: 'circle-check',
+      Icon: iconNamed(IconCheckCircle),
       iconClass: 'text-success',
       iconLabel: 'Worker readiness is ready',
       label: 'Handler worker is polling',
@@ -312,7 +328,7 @@ describe('CatalogDetail', () => {
         taskQueue: 'catalog-tasks',
       }),
     ).toEqual({
-      icon: 'warning',
+      Icon: iconNamed(IconWarning),
       iconClass: 'text-warning',
       iconLabel: 'Worker readiness is unavailable',
       label: 'Handler worker is polling',
@@ -338,7 +354,7 @@ describe('CatalogDetail', () => {
           taskQueue: 'catalog-tasks',
         }),
       ).toMatchObject({
-        icon: 'circle-question',
+        Icon: iconNamed(IconQuestionCircle),
         iconClass: 'text-secondary',
         iconLabel: 'Worker readiness status is unknown',
         label: 'Handler worker is polling',
@@ -352,7 +368,7 @@ describe('CatalogDetail', () => {
       [
         'ready',
         {
-          icon: 'circle-check',
+          Icon: iconNamed(IconCheckCircle),
           iconLabel: 'Nexus endpoint readiness is ready',
           tooltip: 'Nexus endpoint is ready.',
         },
@@ -360,7 +376,7 @@ describe('CatalogDetail', () => {
       [
         'unavailable',
         {
-          icon: 'warning',
+          Icon: iconNamed(IconWarning),
           iconLabel: 'Nexus endpoint readiness is unavailable',
           tooltip: 'Nexus endpoint is unavailable.',
         },
@@ -494,10 +510,10 @@ describe('CatalogDetail', () => {
     expect(body).toContain('aria-label="Execution details"');
     expect(body).toContain('aria-label="What to verify"');
     expect(body).toMatch(
-      /<section class="[^"]*surface-primary[^"]*border border-subtle[^"]*" aria-label="Execution details"/,
+      /<section class="(?=[^"]*border-primary)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*" aria-label="Execution details"/,
     );
     expect(body).toMatch(
-      /<section class="[^"]*surface-primary[^"]*border border-subtle[^"]*" aria-label="What to verify"/,
+      /<section class="(?=[^"]*border-primary)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*" aria-label="What to verify"/,
     );
     expect(body).toMatch(
       /aria-label="Execution details"[\s\S]*Workflow[\s\S]*catalog/,
@@ -628,7 +644,7 @@ describe('CatalogDetail', () => {
       'utf8',
     );
 
-    expect(source).toContain('class="px-1.5 py-0 text-xs leading-5"');
+    expect(source).toContain('size="sm"');
     expect(source).toContain('class="h-7 px-1.5"');
     expect(source).toContain(
       'class="truncate py-2 font-mono text-xs text-secondary"',

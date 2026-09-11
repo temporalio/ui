@@ -6,14 +6,52 @@ import { toHtml } from 'hast-util-to-html';
 import { h } from 'hastscript';
 import { toHast } from 'mdast-util-to-hast';
 
+import {
+  type IoTheme,
+  ioThemeToCssVariables,
+  themes,
+} from '$lib/theme/io/themes';
 import { process } from '$lib/utilities/render-markdown';
 
 type RenderOptions = {
+  compact?: boolean;
   host: string;
   nonce: string;
   theme?: string;
   overrideTheme?: string;
 };
+
+const { dark: darkTheme, light: lightTheme } = themes;
+
+const markdownColorVariableNames = new Set([
+  '--color-background-primary',
+  '--color-content-brand',
+  '--color-content-primary',
+  '--color-border-brand',
+  '--color-border-secondary',
+  '--color-surface-primary',
+  '--color-surface-secondary',
+]);
+
+const markdownColorVariables = (theme: IoTheme) =>
+  Object.fromEntries(
+    Object.entries(ioThemeToCssVariables(theme)).filter(([name]) =>
+      markdownColorVariableNames.has(name),
+    ),
+  );
+
+const markdownColorRule = (selector: string, theme: IoTheme): string => {
+  const declarations = Object.entries(markdownColorVariables(theme))
+    .map(([name, value]) => `${name}: ${value};`)
+    .join('\n');
+
+  return `${selector} {\n${declarations}\n}`;
+};
+
+const markdownThemeCss = [
+  markdownColorRule(':root', lightTheme),
+  markdownColorRule("body[data-theme^='dark']", darkTheme),
+].join('\n');
 
 /**
  * Generate a random nonce.
@@ -43,10 +81,10 @@ const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
  */
 const createPage = (
   ast: ReturnType<typeof toHast>,
-  { nonce, theme, overrideTheme }: RenderOptions,
+  { compact, nonce, theme, overrideTheme }: RenderOptions,
 ) => {
   const cssPath = path.resolve('src/markdown.reset.css');
-  const css = fs.readFileSync(cssPath, 'utf8');
+  const css = `${markdownThemeCss}\n${fs.readFileSync(cssPath, 'utf8')}`;
   return toHtml(
     h('html', [
       h('head', [
@@ -62,7 +100,7 @@ const createPage = (
       h(
         'body',
         {
-          class: 'prose',
+          class: compact ? 'prose compact' : 'prose',
           'data-theme': overrideTheme ? `${theme}-${overrideTheme}` : theme,
         },
         h('main', ast),
@@ -78,12 +116,14 @@ export const GET = async (req: Request) => {
   const content = url.searchParams.get('content') || '';
   const theme = url.searchParams.get('theme') || '';
   const overrideTheme = url.searchParams.get('overrideTheme') || '';
+  const compact = url.searchParams.get('compact') === 'true';
 
   if (host === null) return new Response('Not found', { status: 404 });
   if (content === null) return new Response('Not found', { status: 404 });
 
   const nonce = generateNonce();
   const html = createPage(await process(content), {
+    compact,
     nonce,
     host,
     theme,

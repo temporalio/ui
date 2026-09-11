@@ -1,11 +1,54 @@
 import { z } from 'zod/v3';
 
+import {
+  HOURS,
+  MILLISECONDS,
+  MINUTES,
+  parseDuration,
+  SECONDS,
+} from '$lib/holocene/duration-input/duration-input.svelte';
+
 const scalingFields = {
   scaleUpCooloffMs: z.number().int().min(0).optional(),
   scaleUpBacklogThreshold: z.number().int().min(0).optional(),
   maxWorkerLifetimeMs: z.number().int().min(0).optional(),
   metricsPollIntervalMs: z.number().int().min(10000).optional(),
 };
+
+export const scaleDownStabilizationUnits = [
+  HOURS,
+  MINUTES,
+  SECONDS,
+  MILLISECONDS,
+];
+
+export const defaultScaleDownStabilization = '90s';
+
+const durationPattern = /^\d+(\.\d+)?s$/;
+
+// `0.1 * 1000` is `100.00000000000001` in binary floating point; round to
+// nanosecond precision to strip that noise before testing for whole
+// milliseconds, matching what the duration input does when it displays a value.
+const stripFloatNoise = (n: number): number => Math.round(n * 1e9) / 1e9;
+
+const durationToMs = (duration: string): number =>
+  stripFloatNoise(Number(parseDuration(duration)) * 1000);
+
+export const scaleDownStabilizationToMs = (duration: string): number =>
+  Math.round(durationToMs(duration));
+
+export const msToScaleDownStabilization = (ms: number): string =>
+  `${ms / 1000}s`;
+
+const scaleDownStabilizationField = z
+  .string()
+  .refine((val) => durationPattern.test(val), {
+    message: 'Enter a duration in seconds, such as 90s',
+  })
+  .refine((val) => Number.isInteger(durationToMs(val)), {
+    message: 'Duration must be a whole number of milliseconds',
+  })
+  .default(defaultScaleDownStabilization);
 
 const providerFields = {
   provider: z.enum(['lambda', 'cloud-run']).default('lambda'),
@@ -20,6 +63,7 @@ const providerFields = {
   maxReplicas: z.number().int().min(1).max(2_147_483_647).default(30),
   initialReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
   utilizationTarget: z.number().gt(0).max(1).default(0.8),
+  scaleDownStabilization: scaleDownStabilizationField,
 };
 
 const validateProviderFields = (

@@ -1,0 +1,599 @@
+name: Weekly Dependency Security Review Module
+
+on:
+  workflow_call:
+    inputs:
+      mode:
+        description: 'dry-run reports findings; apply may update the draft remediation PR'
+        required: true
+        type: string
+      notify:
+        required: true
+        type: boolean
+      publish:
+        description: 'Allow the credentialed job to update the draft PR. Set false to rehearse.'
+        required: false
+        default: true
+        type: boolean
+      slack_channel:
+        required: false
+        type: string
+      thread_ts:
+        required: false
+        type: string
+      source_ref:
+        description: 'Revision that contains the audited automation source'
+        required: false
+        default: main
+        type: string
+    secrets:
+      SLACK_BOT_TOKEN:
+        required: false
+      TEMPORAL_CICD_APP_ID:
+        required: false
+      TEMPORAL_CICD_PRIVATE_KEY:
+        required: false
+
+# This module is deliberately callable only. The coordinator owns scheduling,
+# the root Slack message, and later additive on-call modules.
+permissions:
+  contents: read
+  pull-requests: read
+  vulnerability-alerts: read
+
+concurrency:
+  group: weekly-dependency-security-review-${{ inputs.source_ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit-and-remediate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      artifact_name: ${{ steps.artifact.outputs.name }}
+      base_sha: ${{ steps.verified.outputs.base_sha }}
+      changed: ${{ steps.changes.outputs.changed }}
+      audit_sha256: ${{ steps.verified.outputs.audit_sha256 }}
+      package_json_sha256: ${{ steps.verified.outputs.package_json_sha256 }}
+      pnpm_lock_sha256: ${{ steps.verified.outputs.pnpm_lock_sha256 }}
+      go_mod_sha256: ${{ steps.verified.outputs.go_mod_sha256 }}
+      go_sum_sha256: ${{ steps.verified.outputs.go_sum_sha256 }}
+      remediation_report_sha256: ${{ steps.verified.outputs.remediation_report_sha256 }}
+    # This is the only job that installs or executes package code. It has a
+    # read-only GITHUB_TOKEN and receives neither App nor Slack credentials.
+    permissions:
+      contents: read
+      pull-requests: read
+      vulnerability-alerts: read
+    steps:
+      - name: Checkout trusted workflow source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_ref }}
+          persist-credentials: false
+
+      - name: Validate remediation mode
+        env:
+          MODE: ${{ inputs.mode }}
+        run: |
+          case "$MODE" in
+            dry-run|apply) ;;
+            *) echo "Invalid remediation mode: $MODE" >&2; exit 1 ;;
+          esac
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '^22.23.1'
+          cache: pnpm
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+
+      - id: artifact
+        name: Name the candidate artifact
+        run: echo "name=weekly-dependency-security-candidate-${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_OUTPUT"
+
+      - name: Audit open Dependabot alerts and VLN pull requests
+        run: >-
+          node .github/scripts/weekly-dependency-security-audit.mjs
+          --scope dependency-security
+          --output weekly-dependency-security-audit.json
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+
+      - name: Plan manifest-only remediation evidence
+        run: >-
+          node .github/scripts/apply-weekly-dependency-remediation.mjs
+          --audit weekly-dependency-security-audit.json
+          --package-json package.json
+          --lockfile pnpm-lock.yaml
+          --go-mod server/go.mod
+          --report weekly-dependency-remediation.json
+
+      - id: manifest
+        name: Apply the authorized manifest remediation
+        if: inputs.mode == 'apply'
+        run: |
+          node .github/scripts/apply-weekly-dependency-remediation.mjs \
+            --audit weekly-dependency-security-audit.json \
+            --package-json package.json \
+            --lockfile pnpm-lock.yaml \
+            --go-mod server/go.mod \
+            --report weekly-dependency-remediation.json \
+            --apply
+
+          unexpected="$(git diff --name-only | grep -vE '^package\.json$' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "The planner changed a file outside package.json:" >&2
+            echo "$unexpected" >&2
+            exit 1
+          fi
+
+          if git diff --quiet -- package.json; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: go-candidate
+        name: Apply the authorized Go module remediation
+        if: inputs.mode == 'apply'
+        run: |
+          go_modules="$(jq -r '[.actions[] | select(.type == "go-module")][] | "\(.packageName)@\(.to)"' weekly-dependency-remediation.json)"
+          if [ -z "$go_modules" ]; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          cd server
+          while IFS= read -r module; do
+            [ -n "$module" ] || continue
+            echo "Updating $module"
+            go get "$module"
+          done <<< "$go_modules"
+          go mod tidy
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+
+      - name: Resolve the lockfile without lifecycle scripts
+        if: inputs.mode == 'apply' && steps.manifest.outputs.changed == 'true'
+        run: pnpm install --lockfile-only --ignore-scripts
+        env:
+          HUSKY: '0'
+
+      - name: Install the candidate dependency graph from its lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
+        env:
+          HUSKY: '0'
+
+      - name: Verify that the candidate resolves every remediated alert
+        if: inputs.mode == 'apply'
+        run: >-
+          node .github/scripts/verify-weekly-dependency-remediation.mjs
+          --audit weekly-dependency-security-audit.json
+          --report weekly-dependency-remediation.json
+          --lockfile pnpm-lock.yaml
+          --go-mod server/go.mod
+
+      - id: attest
+        name: Attest the audited base and candidate dependency files
+        run: |
+          base_sha="$(git rev-parse HEAD)"
+          audit_hash="$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
+          package_hash="$(sha256sum package.json | cut -d ' ' -f 1)"
+          lockfile_hash="$(sha256sum pnpm-lock.yaml | cut -d ' ' -f 1)"
+          go_mod_hash="$(sha256sum server/go.mod | cut -d ' ' -f 1)"
+          go_sum_hash="$(sha256sum server/go.sum | cut -d ' ' -f 1)"
+
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          echo "audit_sha256=$audit_hash" >> "$GITHUB_OUTPUT"
+          echo "package_json_sha256=$package_hash" >> "$GITHUB_OUTPUT"
+          echo "pnpm_lock_sha256=$lockfile_hash" >> "$GITHUB_OUTPUT"
+          echo "go_mod_sha256=$go_mod_hash" >> "$GITHUB_OUTPUT"
+          echo "go_sum_sha256=$go_sum_hash" >> "$GITHUB_OUTPUT"
+
+          jq -n \
+            --arg baseSha "$base_sha" \
+            --arg auditSha256 "$audit_hash" \
+            --arg packageJsonSha256 "$package_hash" \
+            --arg pnpmLockSha256 "$lockfile_hash" \
+            --arg goModSha256 "$go_mod_hash" \
+            --arg goSumSha256 "$go_sum_hash" \
+            '{schemaVersion: 1, baseSha: $baseSha, auditSha256: $auditSha256, packageJsonSha256: $packageJsonSha256, pnpmLockSha256: $pnpmLockSha256, goModSha256: $goModSha256, goSumSha256: $goSumSha256}' \
+            > weekly-dependency-candidate-attestation.json
+
+          jq \
+            --slurpfile candidate weekly-dependency-candidate-attestation.json \
+            '. + {candidate: $candidate[0]}' \
+            weekly-dependency-remediation.json \
+            > weekly-dependency-remediation.with-candidate.json
+          mv weekly-dependency-remediation.with-candidate.json weekly-dependency-remediation.json
+          report_hash="$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)"
+          echo "remediation_report_sha256=$report_hash" >> "$GITHUB_OUTPUT"
+
+      - name: Generate SvelteKit build metadata
+        run: pnpm exec svelte-kit sync
+        env:
+          HUSKY: '0'
+
+      - name: Test GitHub automation scripts
+        run: pnpm test:github-automation
+
+      - name: Reject changes outside the approved dependency files
+        if: inputs.mode == 'apply'
+        run: |
+          unexpected="$(git diff --name-only | grep -vE '^(package\.json|pnpm-lock\.yaml|server/go\.mod|server/go\.sum)$' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "Unexpected file changes:" >&2
+            echo "$unexpected" >&2
+            exit 1
+          fi
+
+      - id: changes
+        name: Record whether an approved candidate exists
+        run: |
+          if git diff --quiet -- package.json pnpm-lock.yaml server/go.mod server/go.sum; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run unit tests as the pull request checks run them
+        run: pnpm test -- --run
+
+      - name: Run type checks
+        run: pnpm run check
+
+      - name: Lint the candidate
+        run: pnpm run --if-present lint:ci
+
+      - name: Build the server bundle
+        run: pnpm build:server
+
+      - id: verified
+        name: Verify package execution did not change the candidate
+        env:
+          EXPECTED_BASE_SHA: ${{ steps.attest.outputs.base_sha }}
+          EXPECTED_AUDIT_HASH: ${{ steps.attest.outputs.audit_sha256 }}
+          EXPECTED_PACKAGE_HASH: ${{ steps.attest.outputs.package_json_sha256 }}
+          EXPECTED_LOCKFILE_HASH: ${{ steps.attest.outputs.pnpm_lock_sha256 }}
+          EXPECTED_GO_MOD_HASH: ${{ steps.attest.outputs.go_mod_sha256 }}
+          EXPECTED_GO_SUM_HASH: ${{ steps.attest.outputs.go_sum_sha256 }}
+          EXPECTED_REPORT_HASH: ${{ steps.attest.outputs.remediation_report_sha256 }}
+        run: |
+          actual_audit_hash="$(sha256sum weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
+          actual_package_hash="$(sha256sum package.json | cut -d ' ' -f 1)"
+          actual_lockfile_hash="$(sha256sum pnpm-lock.yaml | cut -d ' ' -f 1)"
+          actual_go_mod_hash="$(sha256sum server/go.mod | cut -d ' ' -f 1)"
+          actual_go_sum_hash="$(sha256sum server/go.sum | cut -d ' ' -f 1)"
+          actual_report_hash="$(sha256sum weekly-dependency-remediation.json | cut -d ' ' -f 1)"
+
+          test "$actual_audit_hash" = "$EXPECTED_AUDIT_HASH"
+          test "$actual_package_hash" = "$EXPECTED_PACKAGE_HASH"
+          test "$actual_lockfile_hash" = "$EXPECTED_LOCKFILE_HASH"
+          test "$actual_go_mod_hash" = "$EXPECTED_GO_MOD_HASH"
+          test "$actual_go_sum_hash" = "$EXPECTED_GO_SUM_HASH"
+          test "$actual_report_hash" = "$EXPECTED_REPORT_HASH"
+          jq --exit-status \
+            --arg baseSha "$EXPECTED_BASE_SHA" \
+            --arg auditSha256 "$EXPECTED_AUDIT_HASH" \
+            --arg packageJsonSha256 "$EXPECTED_PACKAGE_HASH" \
+            --arg pnpmLockSha256 "$EXPECTED_LOCKFILE_HASH" \
+            --arg goModSha256 "$EXPECTED_GO_MOD_HASH" \
+            --arg goSumSha256 "$EXPECTED_GO_SUM_HASH" \
+            '.baseSha == $baseSha and .auditSha256 == $auditSha256 and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256 and .goModSha256 == $goModSha256 and .goSumSha256 == $goSumSha256' \
+            weekly-dependency-candidate-attestation.json \
+            > /dev/null
+          jq --exit-status \
+            --slurpfile candidateAttestation weekly-dependency-candidate-attestation.json \
+            '.candidate == $candidateAttestation[0]' \
+            weekly-dependency-remediation.json \
+            > /dev/null
+
+          echo "base_sha=$EXPECTED_BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "audit_sha256=$EXPECTED_AUDIT_HASH" >> "$GITHUB_OUTPUT"
+          echo "package_json_sha256=$EXPECTED_PACKAGE_HASH" >> "$GITHUB_OUTPUT"
+          echo "pnpm_lock_sha256=$EXPECTED_LOCKFILE_HASH" >> "$GITHUB_OUTPUT"
+          echo "go_mod_sha256=$EXPECTED_GO_MOD_HASH" >> "$GITHUB_OUTPUT"
+          echo "go_sum_sha256=$EXPECTED_GO_SUM_HASH" >> "$GITHUB_OUTPUT"
+          echo "remediation_report_sha256=$EXPECTED_REPORT_HASH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload reports and approved candidate
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.artifact.outputs.name }}
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            weekly-dependency-security-audit.json
+            weekly-dependency-remediation.json
+            weekly-dependency-candidate-attestation.json
+            package.json
+            pnpm-lock.yaml
+            server/go.mod
+            server/go.sum
+
+  publish:
+    needs: audit-and-remediate
+    if: >-
+      github.event_name != 'pull_request' &&
+      inputs.publish &&
+      inputs.mode == 'apply' &&
+      needs.audit-and-remediate.outputs.changed == 'true' &&
+      needs.audit-and-remediate.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      pr_url: ${{ steps.pull-request.outputs.pr_url }}
+    # No package manager or repository package code runs in this job.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout source revision without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download the approved candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ needs.audit-and-remediate.outputs.artifact_name }}
+          path: candidate
+
+      - name: Verify and stage only the approved candidate files
+        env:
+          TRUSTED_BASE_SHA: ${{ needs.audit-and-remediate.outputs.base_sha }}
+          TRUSTED_AUDIT_HASH: ${{ needs.audit-and-remediate.outputs.audit_sha256 }}
+          TRUSTED_PACKAGE_HASH: ${{ needs.audit-and-remediate.outputs.package_json_sha256 }}
+          TRUSTED_LOCKFILE_HASH: ${{ needs.audit-and-remediate.outputs.pnpm_lock_sha256 }}
+          TRUSTED_GO_MOD_HASH: ${{ needs.audit-and-remediate.outputs.go_mod_sha256 }}
+          TRUSTED_GO_SUM_HASH: ${{ needs.audit-and-remediate.outputs.go_sum_sha256 }}
+          TRUSTED_REPORT_HASH: ${{ needs.audit-and-remediate.outputs.remediation_report_sha256 }}
+        run: |
+          test -f candidate/weekly-dependency-security-audit.json
+          test -f candidate/package.json
+          test -f candidate/pnpm-lock.yaml
+          test -f candidate/server/go.mod
+          test -f candidate/server/go.sum
+          test -f candidate/weekly-dependency-remediation.json
+          test -f candidate/weekly-dependency-candidate-attestation.json
+          actual_audit_hash="$(sha256sum candidate/weekly-dependency-security-audit.json | cut -d ' ' -f 1)"
+          actual_package_hash="$(sha256sum candidate/package.json | cut -d ' ' -f 1)"
+          actual_lockfile_hash="$(sha256sum candidate/pnpm-lock.yaml | cut -d ' ' -f 1)"
+          actual_go_mod_hash="$(sha256sum candidate/server/go.mod | cut -d ' ' -f 1)"
+          actual_go_sum_hash="$(sha256sum candidate/server/go.sum | cut -d ' ' -f 1)"
+          actual_report_hash="$(sha256sum candidate/weekly-dependency-remediation.json | cut -d ' ' -f 1)"
+
+          test "$actual_audit_hash" = "$TRUSTED_AUDIT_HASH"
+          test "$actual_package_hash" = "$TRUSTED_PACKAGE_HASH"
+          test "$actual_lockfile_hash" = "$TRUSTED_LOCKFILE_HASH"
+          test "$actual_go_mod_hash" = "$TRUSTED_GO_MOD_HASH"
+          test "$actual_go_sum_hash" = "$TRUSTED_GO_SUM_HASH"
+          test "$actual_report_hash" = "$TRUSTED_REPORT_HASH"
+          jq --exit-status \
+            '.verification.verified == true
+             and (.actions | type == "array" and length > 0)
+             and ((.actions | map(select(.type != "go-module")) | length) == 0
+                  or (.applied == true and .resolver == "deterministic-planner"))' \
+            candidate/weekly-dependency-remediation.json \
+            > /dev/null
+          jq empty candidate/package.json
+          jq --exit-status \
+            --arg baseSha "$TRUSTED_BASE_SHA" \
+            --arg auditSha256 "$TRUSTED_AUDIT_HASH" \
+            --arg packageJsonSha256 "$TRUSTED_PACKAGE_HASH" \
+            --arg pnpmLockSha256 "$TRUSTED_LOCKFILE_HASH" \
+            --arg goModSha256 "$TRUSTED_GO_MOD_HASH" \
+            --arg goSumSha256 "$TRUSTED_GO_SUM_HASH" \
+            '.baseSha == $baseSha and .auditSha256 == $auditSha256 and .packageJsonSha256 == $packageJsonSha256 and .pnpmLockSha256 == $pnpmLockSha256 and .goModSha256 == $goModSha256 and .goSumSha256 == $goSumSha256' \
+            candidate/weekly-dependency-candidate-attestation.json \
+            > /dev/null
+          jq --exit-status \
+            --slurpfile candidateAttestation candidate/weekly-dependency-candidate-attestation.json \
+            '.candidate == $candidateAttestation[0]' \
+            candidate/weekly-dependency-remediation.json \
+            > /dev/null
+
+          git fetch origin '+refs/heads/main:refs/remotes/origin/main'
+          current_main="$(git rev-parse origin/main)"
+          checked_out_base="$(git rev-parse HEAD)"
+          test "$checked_out_base" = "$TRUSTED_BASE_SHA"
+          test "$current_main" = "$TRUSTED_BASE_SHA"
+
+          cp candidate/package.json package.json
+          cp candidate/pnpm-lock.yaml pnpm-lock.yaml
+          cp candidate/server/go.mod server/go.mod
+          cp candidate/server/go.sum server/go.sum
+
+          unexpected="$(git diff --name-only | grep -vE '^(package\.json|pnpm-lock\.yaml|server/go\.mod|server/go\.sum)$' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "Refusing to publish unexpected changes:" >&2
+            echo "$unexpected" >&2
+            exit 1
+          fi
+
+          git add -- package.json pnpm-lock.yaml server/go.mod server/go.sum
+          if git diff --cached --quiet; then
+            echo 'Candidate artifact did not contain a dependency change.' >&2
+            exit 1
+          fi
+
+      - name: Create a short-lived Temporal CI/CD App token
+        id: app-token
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        with:
+          client-id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private-key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+          owner: temporalio
+          repositories: ui
+          permission-contents: write
+          permission-pull-requests: write
+
+      - id: pull-request
+        name: Update the single draft remediation pull request
+        env:
+          BRANCH: automation/weekly-dependency-security
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          HUSKY: '0'
+          REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TRUSTED_BASE_SHA: ${{ needs.audit-and-remediate.outputs.base_sha }}
+        run: |
+          git config user.name 'temporal-cicd[bot]'
+          git config user.email 'temporal-cicd[bot]@users.noreply.github.com'
+          git remote set-url origin "https://x-access-token:${GITHUB_APP_TOKEN}@github.com/${REPOSITORY}.git"
+          git fetch origin '+refs/heads/main:refs/remotes/origin/main'
+          test "$(git rev-parse HEAD)" = "$TRUSTED_BASE_SHA"
+          test "$(git rev-parse origin/main)" = "$TRUSTED_BASE_SHA"
+
+          git commit -m 'fix: weekly Dependabot security remediation'
+          git fetch origin "+refs/heads/${BRANCH}:refs/remotes/origin/${BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
+            expected="$(git rev-parse "refs/remotes/origin/${BRANCH}")"
+            git push "--force-with-lease=refs/heads/${BRANCH}:${expected}" origin "HEAD:refs/heads/${BRANCH}"
+          else
+            git push --force-with-lease origin "HEAD:refs/heads/${BRANCH}"
+          fi
+
+          body="$(cat <<EOF
+          The weekly dependency-security review maintains this draft.
+
+          A deterministic planner read the Dependabot evidence and wrote the dependency
+          change. No model authored any part of it. The trusted workflow then rebuilt
+          the lockfile, refused every change outside the approved dependency files,
+          proved that each remediated alert no longer matches its advisory range, and
+          attested the file hashes. This separate publishing job received the write
+          credential only after those checks passed.
+
+          The workflow does not dismiss a Dependabot alert. Merging this pull request
+          is the way an alert resolves.
+
+          Workflow evidence: ${RUN_URL}
+          EOF
+          )"
+          pr_url="$(gh pr list --repo "$REPOSITORY" --head "$BRANCH" --base main --state open --json url --jq '.[0].url')"
+          if [ -n "$pr_url" ]; then
+            gh pr edit "$pr_url" --repo "$REPOSITORY" --title 'fix: weekly Dependabot security remediation' --body "$body"
+          else
+            pr_url="$(gh pr create --repo "$REPOSITORY" --base main --head "$BRANCH" --draft --title 'fix: weekly Dependabot security remediation' --body "$body")"
+          fi
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+
+  notify:
+    needs: [audit-and-remediate, publish]
+    if: always() && inputs.notify && inputs.thread_ts != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      status: ${{ steps.status.outputs.status }}
+    # This job gets the Slack token only. It does not install dependencies or
+    # receive the GitHub App token.
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout trusted digest source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_ref }}
+          persist-credentials: false
+
+      - name: Download audit evidence when available
+        id: evidence
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ needs.audit-and-remediate.outputs.artifact_name }}
+          path: evidence
+
+      - id: payload
+        name: Build the threaded Slack reply
+        env:
+          AUDIT_RESULT: ${{ needs.audit-and-remediate.result }}
+          PUBLISH_RESULT: ${{ needs.publish.result }}
+          CHANNEL: ${{ inputs.slack_channel }}
+          REMEDIATION_PR_URL: ${{ needs.publish.outputs.pr_url }}
+          TRUSTED_AUDIT_HASH: ${{ needs.audit-and-remediate.outputs.audit_sha256 }}
+          TRUSTED_REPORT_HASH: ${{ needs.audit-and-remediate.outputs.remediation_report_sha256 }}
+          THREAD_TS: ${{ inputs.thread_ts }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          evidence_valid=false
+          if [ -n "$TRUSTED_AUDIT_HASH" ] && \
+             [ -n "$TRUSTED_REPORT_HASH" ] && \
+             [ -f evidence/weekly-dependency-security-audit.json ] && \
+             [ -f evidence/weekly-dependency-remediation.json ] && \
+             [ "$(sha256sum evidence/weekly-dependency-security-audit.json | cut -d ' ' -f 1)" = "$TRUSTED_AUDIT_HASH" ] && \
+             [ "$(sha256sum evidence/weekly-dependency-remediation.json | cut -d ' ' -f 1)" = "$TRUSTED_REPORT_HASH" ]; then
+            evidence_valid=true
+          fi
+
+          if [ "$evidence_valid" = true ]; then
+            case "$PUBLISH_RESULT" in
+              success)
+                if [ -n "$REMEDIATION_PR_URL" ]; then
+                  publish_status='success'
+                else
+                  publish_status='failure'
+                fi
+                ;;
+              failure|cancelled) publish_status='failure' ;;
+              *) publish_status='skipped' ;;
+            esac
+
+            args=(
+              --module dependency-security
+              --channel "$CHANNEL"
+              --thread-ts "$THREAD_TS"
+              --input evidence/weekly-dependency-security-audit.json
+              --output weekly-dependency-security-reply.json
+              --publish-status "$publish_status"
+              --run-url "$RUN_URL"
+            )
+            args+=(--remediation evidence/weekly-dependency-remediation.json)
+            if [ -n "$REMEDIATION_PR_URL" ]; then
+              args+=(--remediation-pr-url "$REMEDIATION_PR_URL")
+            fi
+            node .github/scripts/weekly-dependency-security-digest.mjs "${args[@]}"
+          else
+            jq -n \
+              --arg channel "$CHANNEL" \
+              --arg thread_ts "$THREAD_TS" \
+              --arg audit_result "$AUDIT_RESULT" \
+              --arg publish_result "$PUBLISH_RESULT" \
+              --arg run_url "$RUN_URL" \
+              '{channel: $channel, thread_ts: $thread_ts, text: ("Dependency security review did not produce evidence. Audit: " + $audit_result + "; publish: " + $publish_result + ". " + $run_url)}' \
+              > weekly-dependency-security-reply.json
+          fi
+          {
+            echo 'payload<<EOF'
+            cat weekly-dependency-security-reply.json
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post dependency-security digest
+        # An unset value means the digest did not run, which is itself worth posting.
+        if: steps.payload.outputs.actionable != 'false'
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        with:
+          method: chat.postMessage
+          errors: true
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: ${{ steps.payload.outputs.payload }}
+
+      - id: status
+        run: echo 'status=success' >> "$GITHUB_OUTPUT"

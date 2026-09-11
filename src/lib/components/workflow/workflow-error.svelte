@@ -3,6 +3,7 @@
 
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import type { NetworkError } from '$lib/types/global';
   import { routeForWorkflows } from '$lib/utilities/route-for';
@@ -29,7 +30,7 @@
         namespace,
       })}?${$workflowsSearchParams}`}
       data-testid="back-to-workflows"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {translate('workflows.back-to-workflows')}
     </Link>
@@ -40,7 +41,7 @@
     {error?.statusCode ?? '500'}
   </h1>
   <p class="-mt-12 text-lg">{title}</p>
-  <p class="text-2xl font-bold text-red-700">
+  <p class="text-2xl font-bold text-danger">
     {error?.statusText ?? ''}
   </p>
 </div>

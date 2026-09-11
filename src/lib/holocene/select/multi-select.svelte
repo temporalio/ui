@@ -1,5 +1,7 @@
 <script module lang="ts">
-  type Option = { label: string; value: string; icon?: IconName };
+  import type { IconComponent } from '$lib/io/icon';
+
+  type Option = { label: string; value: string; Icon?: IconComponent };
   export type MultiSelectOptions = Option[];
 </script>
 
@@ -16,8 +18,6 @@
   } from '$lib/holocene/menu';
 
   import type { ButtonStyles } from '../button.svelte';
-  import type { IconName } from '../icon';
-  import Icon from '../icon/icon.svelte';
 
   interface Props {
     options?: MultiSelectOptions;
@@ -26,7 +26,7 @@
     label: string;
     id: string;
     variant?: ButtonStyles['variant'];
-    icon?: IconName | undefined;
+    Icon?: IconComponent;
     selectAllLabel: string;
     clearAllLabel: string;
     active?: boolean;
@@ -42,7 +42,7 @@
     label,
     id,
     variant = 'secondary',
-    icon = undefined,
+    Icon,
     selectAllLabel,
     clearAllLabel,
     active = false,
@@ -94,7 +94,7 @@
     data-track-intent="select"
     data-track-text={label}
   >
-    {#if icon}<Icon class="md:hidden" name={icon} />{/if}
+    {#if Icon}<Icon class="md:hidden" />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>
   <Menu {id} keepOpen {position}>
@@ -117,8 +117,9 @@
           />
         {/snippet}
         <div class="flex items-center gap-2">
-          {#if option.icon}
-            <Icon name={option.icon} />
+          {#if option.Icon}
+            {@const OptionIcon = option.Icon}
+            <OptionIcon />
           {/if}
           {option.label}
         </div>

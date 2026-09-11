@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import { toWorkflowExecution } from '$lib/models/workflow-execution';
+import type { EventLink } from '$lib/types';
+import type { WorkflowEvent, WorkflowEvents } from '$lib/types/events';
 
 import { parseRawPayloadToJSON } from './decode-payload';
-import { getWorkflowRelationships } from './get-workflow-relationships';
+import {
+  getWorkflowNexusLinksFromHistory,
+  getWorkflowRelationships,
+} from './get-workflow-relationships';
 
 import childEvents from '$fixtures/events.children.json';
 import completedEvents from '$fixtures/events.completed.json';
@@ -240,5 +245,71 @@ describe('getWorkflowRelationships', () => {
         namespaces.namespaces[0],
       ).scheduleId,
     ).toBe('');
+  });
+});
+
+describe('getWorkflowNexusLinksFromHistory', () => {
+  const link = (workflowId: string): EventLink =>
+    ({
+      workflowEvent: {
+        namespace: 'default',
+        workflowId,
+        runId: 'run-id',
+        eventRef: { eventId: '1' },
+      },
+    }) as unknown as EventLink;
+
+  const scheduled = (id: string, endpoint: string): WorkflowEvent =>
+    ({
+      id,
+      category: 'nexus',
+      name: 'NexusOperationScheduled',
+      nexusOperationScheduledEventAttributes: {
+        endpoint,
+        service: 'temporal.api.workflowservice.v1.WorkflowService',
+        operation: 'SignalWithStartWorkflowExecution',
+      },
+      links: [link(`scheduled-${id}`)],
+    }) as unknown as WorkflowEvent;
+
+  const completed = (id: string, scheduledEventId: string): WorkflowEvent =>
+    ({
+      id,
+      category: 'nexus',
+      name: 'NexusOperationCompleted',
+      nexusOperationCompletedEventAttributes: { scheduledEventId },
+      links: [link(`completed-${id}`)],
+    }) as unknown as WorkflowEvent;
+
+  it('should return the links of an operation on a user endpoint', () => {
+    const history = [
+      scheduled('5', 'my-endpoint'),
+      completed('6', '5'),
+    ] as WorkflowEvents;
+
+    expect(getWorkflowNexusLinksFromHistory(history)).toHaveLength(2);
+  });
+
+  it('should drop the links of an operation on the system endpoint', () => {
+    const history = [
+      scheduled('5', '__temporal_system'),
+      completed('6', '5'),
+    ] as WorkflowEvents;
+
+    expect(getWorkflowNexusLinksFromHistory(history)).toHaveLength(0);
+  });
+
+  it('should keep user endpoint links when a system operation is present', () => {
+    const history = [
+      scheduled('5', '__temporal_system'),
+      completed('6', '5'),
+      scheduled('7', 'my-endpoint'),
+      completed('8', '7'),
+    ] as WorkflowEvents;
+
+    expect(getWorkflowNexusLinksFromHistory(history)).toEqual([
+      link('scheduled-7'),
+      link('completed-8'),
+    ]);
   });
 });

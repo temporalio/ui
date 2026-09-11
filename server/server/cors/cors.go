@@ -61,20 +61,22 @@ func CORSMiddleware(config CORSConfig) echo.MiddlewareFunc {
 	}
 }
 
+// IsOriginAllowed reports whether origin appears in the configured allow list.
+func IsOriginAllowed(origin string, allowOrigins []string) bool {
+	for _, allowedOrigin := range allowOrigins {
+		if allowedOrigin == origin || allowedOrigin == "*" {
+			return true
+		}
+	}
+
+	return false
+}
+
 // handleStaticCORS handles standard CORS with predefined allowed origins
 func handleStaticCORS(c echo.Context, next echo.HandlerFunc, allowOrigins []string, config CORSConfig) error {
 	origin := c.Request().Header.Get("Origin")
 
-	// Check if origin is in allowed list
-	allowed := false
-	for _, allowedOrigin := range allowOrigins {
-		if allowedOrigin == origin || allowedOrigin == "*" {
-			allowed = true
-			break
-		}
-	}
-
-	if allowed {
+	if IsOriginAllowed(origin, allowOrigins) {
 		setCORSHeaders(c, origin, config)
 	}
 

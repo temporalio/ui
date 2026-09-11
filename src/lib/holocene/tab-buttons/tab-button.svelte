@@ -9,14 +9,13 @@
 
   import { page } from '$app/state';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { type IconComponent } from '$lib/io/icon';
   import { getAppContext } from '$lib/utilities/get-context';
 
   import Tooltip from '../tooltip.svelte';
 
   type BaseProps = {
-    icon?: IconName;
+    Icon?: IconComponent;
     group?: boolean;
     active?: boolean;
     disabled?: boolean;
@@ -43,7 +42,7 @@
 
   let {
     class: className = '',
-    icon,
+    Icon,
     group = getAppContext('group'),
     href = '',
     base,
@@ -76,9 +75,9 @@
   {...rest}
 >
   <Tooltip hide={!tooltip} text={tooltip} top>
-    {#if icon}
+    {#if Icon}
       <div class="flex items-center gap-2">
-        <Icon name={icon} />
+        <Icon />
         {#if children}
           <span class="hidden md:block">{@render children()}</span>
         {/if}
@@ -91,15 +90,15 @@
 
 <style lang="postcss">
   .toggle-button {
-    @apply flex items-center justify-center rounded-t border border-b-0 border-subtle/0 px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
+    @apply flex items-center justify-center rounded-t-md border border-b-0 border-transparent px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
 
     &:not(.disabled) {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-2 focus-visible:ring-primary/70;
+      @apply hover:bg-interactive-tertiary-hover focus-visible:bg-interactive-tertiary-hover focus-visible:ring-2 focus-visible:ring-interactive-primary;
     }
   }
 
   .toggle-button.active {
-    @apply surface-primary border-subtle/100;
+    @apply border-brand bg-background-primary text-brand;
   }
 
   .toggle-button.disabled {

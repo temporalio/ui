@@ -8,9 +8,15 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    resolveSystemNexusEvent,
+    systemNexusInputRenderer,
+    type SystemNexusLink,
+  } from '$lib/system-nexus-endpoints';
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
+  import { isRawPayload } from '$lib/utilities/decode-payload';
   import {
     type EventLinkDisplay,
     eventLinkTargetTypeLabel,
@@ -27,26 +33,53 @@
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import {
+    isLocalActivityMarkerEvent,
+    isWorkflowExecutionSignaledEvent,
+  } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
 
-  let { event, lazy = false }: { event: WorkflowEvent; lazy?: boolean } =
-    $props();
+  let {
+    event,
+    lazy = false,
+    initiatingEvent = undefined,
+  }: {
+    event: WorkflowEvent;
+    lazy?: boolean;
+    /** The operation's NexusOperationScheduled event, when this is part of a group. */
+    initiatingEvent?: WorkflowEvent;
+  } = $props();
   const { namespace, workflow, run } = $derived(page.params);
 
-  const displayName = $derived(
-    isLocalActivityMarkerEvent(event)
-      ? translate('events.category.local-activity')
-      : spaceBetweenCapitalLetters(event.name),
+  const systemNexus = $derived(
+    resolveSystemNexusEvent(event, {
+      namespace,
+      workflow,
+      run,
+      initiatingEvent,
+    }),
   );
+
   const attributes = $derived.by(() => {
     const attrs = formatAttributes(event);
     if (event?.principal?.name) attrs.principalName = event.principal.name;
     if (event?.principal?.type) attrs.principalType = event.principal.type;
+    if (systemNexus?.attributes) {
+      const extra = attrs as Record<string, unknown>;
+      Object.assign(extra, systemNexus.attributes);
+    }
     return attrs;
   });
+
+  const displayName = $derived(
+    systemNexus?.displayName ??
+      (isLocalActivityMarkerEvent(event)
+        ? translate('events.category.local-activity')
+        : spaceBetweenCapitalLetters(event.name)),
+  );
+
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
     fields.filter(
@@ -61,11 +94,22 @@
   );
 
   const hiddenDetailFields = $derived.by(() => {
+    const systemNexusFields = systemNexus?.hiddenFields ?? [];
     if (event.category === 'activity')
-      return ['scheduledEventId', 'startedEventId', 'namespaceId'];
+      return [
+        ...systemNexusFields,
+        'scheduledEventId',
+        'startedEventId',
+        'namespaceId',
+      ];
     if (event.category === 'child-workflow')
-      return ['initiatedEventId', 'startedEventId', 'namespaceId'];
-    return ['namespaceId'];
+      return [
+        ...systemNexusFields,
+        'initiatedEventId',
+        'startedEventId',
+        'namespaceId',
+      ];
+    return [...systemNexusFields, 'namespaceId'];
   });
   const detailFields = $derived(
     fields.filter(
@@ -80,7 +124,7 @@
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class="flex flex-1 cursor-default flex-col gap-2 border-b border-primary bg-surface-primary p-4 text-primary"
 >
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center gap-2 text-base">
@@ -100,9 +144,11 @@
   </div>
   <div class="flex flex-col gap-1 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
-      {#if event?.links?.length}
+      {#if event?.links?.length && !systemNexus}
         {#if event.category === 'nexus'}
           {@render nexusHandlerLinks(event.links)}
+        {:else if isWorkflowExecutionSignaledEvent(event)}
+          {@render callerLinks(event.links)}
         {:else}
           {@render eventLinks(event.links)}
         {/if}
@@ -110,6 +156,9 @@
       {#if event?.userMetadata?.summary}
         {@render eventSummary(event.userMetadata.summary)}
       {/if}
+      {#each systemNexus?.links ?? [] as extraLink (extraLink.label)}
+        {@render systemNexusLink(extraLink)}
+      {/each}
       {#each detailFields as [key, value] (key)}
         {@render details(key, value)}
       {/each}
@@ -129,7 +178,7 @@
 
 {#snippet eventLink(view: EventLinkDisplay)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-secondary">
       {view.label}
     </p>
     <Copyable
@@ -149,6 +198,22 @@
 {#snippet eventLinks(links: ELink[])}
   {#each toEventLinkViews(links, { namespace }) as view (view.key)}
     {@render eventLink(view)}
+    {#if view.namespace}
+      {@render eventLink(view.namespace)}
+    {/if}
+  {/each}
+{/snippet}
+
+{#snippet callerLinks(links: ELink[])}
+  {#each toEventLinkViews( links, { namespace, perspective: 'caller' }, ) as view (view.key)}
+    {@render eventLink({
+      label: translate('nexus.caller-execution'),
+      value: view.value,
+      href: view.href,
+    })}
+    {#if view.event}
+      {@render eventLink(view.event)}
+    {/if}
     {#if view.namespace}
       {@render eventLink(view.namespace)}
     {/if}
@@ -181,7 +246,7 @@
 
 {#snippet eventSummary(value: RawPayload)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">Summary</p>
+    <p class="min-w-56 text-sm text-secondary">Summary</p>
     <PayloadSummary
       class="whitespace-pre-line"
       {value}
@@ -193,11 +258,19 @@
 {#snippet payloads(key: string, value: Record<string, unknown>)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
+  {@const NexusInputRenderer = isRawPayload(codeBlockValue)
+    ? systemNexusInputRenderer(codeBlockValue as RawPayload)
+    : null}
   <div>
-    <p class="mb-1 min-w-56 text-sm text-secondary/80">
+    <p class="mb-1 min-w-56 text-sm text-secondary">
       {format(key)}
     </p>
-    {#if value?.payloads}
+    {#if NexusInputRenderer}
+      <NexusInputRenderer
+        payload={codeBlockValue as RawPayload}
+        maxHeight={384}
+      />
+    {:else if value?.payloads}
       <PayloadCodeBlock
         filenameData={{
           workflowId: workflow,
@@ -227,7 +300,7 @@
   </div>
   {#if stackTrace}
     <div>
-      <p class="mb-1 min-w-56 text-sm text-secondary/80">
+      <p class="mb-1 min-w-56 text-sm text-secondary">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock
@@ -243,9 +316,30 @@
   {/if}
 {/snippet}
 
+{#snippet systemNexusLink(nexusLink: SystemNexusLink)}
+  <div class="flex items-start gap-4">
+    <p class="min-w-56 text-sm text-secondary">
+      {nexusLink.label}
+    </p>
+    <Copyable
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      content={nexusLink.value}
+    >
+      {#if nexusLink.href}
+        <Link href={nexusLink.href} class="whitespace-pre-line"
+          >{nexusLink.value}</Link
+        >
+      {:else}
+        <p class="whitespace-pre-line text-sm">{nexusLink.value}</p>
+      {/if}
+    </Copyable>
+  </div>
+{/snippet}
+
 {#snippet link(key: string, value: string | number)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-secondary">
       {format(key)}
     </p>
     <Copyable
@@ -265,7 +359,7 @@
 
 {#snippet details(key: string, value: string | number)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-secondary">
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">

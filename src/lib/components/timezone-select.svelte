@@ -6,7 +6,6 @@
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -19,6 +18,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock, IconSearch } from '$lib/io/icon';
   import {
     hourFormat,
     relativeTime,
@@ -140,7 +140,7 @@
     data-testid="timezones-menu-button"
   >
     {#snippet leading()}
-      <Icon name="clock" />
+      <IconClock />
     {/snippet}
     {timezone}
   </MenuButton>
@@ -155,7 +155,7 @@
       id="timezone-search"
       noBorder
       bind:value={search}
-      icon="search"
+      Icon={IconSearch}
       placeholder={translate('common.search')}
     />
 

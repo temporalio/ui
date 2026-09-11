@@ -2,7 +2,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
 
   import { GUTTER, ROW_HEIGHT } from './constants';
   import { dotBox, lineBox } from './primitives';
@@ -67,8 +67,10 @@
     >
       <svg
         class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
-        viewBox="0 0 24 24"><use href="#ti-workflow" /></svg
+        viewBox="0 0 16 16"
       >
+        <use href="#ti-workflow" />
+      </svg>
     </div>
   {/each}
 </div>

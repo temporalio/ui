@@ -3,15 +3,18 @@
 
   import type { Snippet } from 'svelte';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import {
+    IconArrowDown,
+    IconArrowRight,
+    type IconComponent,
+  } from '$lib/io/icon';
 
   interface Props extends Omit<
     HTMLAttributes<HTMLDivElement>,
     'title' | 'children'
   > {
     id?: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     open?: boolean;
     expandable?: boolean;
     error?: string;
@@ -28,7 +31,7 @@
     id = crypto.randomUUID(),
     open = $bindable(false),
     onToggle,
-    icon,
+    Icon,
     class: className,
     title,
     description,
@@ -44,6 +47,8 @@
       open = !open;
     }
   };
+
+  const Glyph = $derived(Icon ? Icon : open ? IconArrowDown : IconArrowRight);
 </script>
 
 <div class="w-full {className}">
@@ -52,14 +57,14 @@
       id="{id}-trigger"
       aria-expanded={open}
       aria-controls="{id}-content"
-      class="focus-visible:outline-interactive grow cursor-pointer hover:bg-interactive-secondary-hover"
+      class="grow cursor-pointer hover:bg-interactive-secondary-hover focus-visible:bg-surface-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary"
       type="button"
       onclick={toggleAccordion}
     >
       <div class="flex w-full flex-row items-center justify-between gap-2 pr-4">
         {@render title?.()}
         {@render description?.()}
-        <Icon name={icon ? icon : open ? 'arrow-down' : 'arrow-right'} />
+        <Glyph />
       </div>
     </button>
     <div class="flex shrink-0 items-center gap-4 pr-4">
@@ -69,7 +74,7 @@
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
-    class="block w-full bg-primary p-2"
+    class="block w-full bg-background-primary p-2"
     class:hidden={!open}
   >
     {@render children?.(open)}

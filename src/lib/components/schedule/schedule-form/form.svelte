@@ -11,6 +11,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { formatList } from '$lib/i18n/format-list';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft, IconTrash } from '$lib/io/icon';
   import {
     loading,
     openConfirmationModal,
@@ -124,7 +125,7 @@
   {#if $loading}
     <Loading />
   {:else}
-    <Link href={backHref} icon="chevron-left">
+    <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {backTitle}
     </Link>
     <h1>{title}</h1>
@@ -189,7 +190,7 @@
               variant="destructive"
               type="button"
               data-testid="delete-schedule-button"
-              leadingIcon="trash"
+              LeadingIcon={IconTrash}
               class="ml-auto hidden sm:inline-flex"
               onclick={() => openConfirmationModal('delete')}
             >

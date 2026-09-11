@@ -1,6 +1,4 @@
 <script module lang="ts">
-  import type { IconName } from '$lib/holocene/icon';
-
   import type { ReadinessCheck as HostReadinessCheck } from './workbench-host';
 
   export type WorkerReadinessDisplayState =
@@ -25,7 +23,7 @@
     currentDescriptor === requestDescriptor && currentEpoch === requestEpoch;
 
   type ReadinessPresentation = {
-    icon: IconName;
+    Icon: IconComponent;
     iconClass: string;
     iconLabel: string;
     label: string;
@@ -50,7 +48,7 @@
 
     if (state === 'loading') {
       return {
-        icon: 'spinner',
+        Icon: IconSpinner,
         iconClass: 'animate-spin text-secondary',
         iconLabel: `${iconSubject} is checking`,
         label,
@@ -63,7 +61,7 @@
 
     if (state === 'ready') {
       return {
-        icon: 'circle-check',
+        Icon: IconCheckCircle,
         iconClass: 'text-success',
         iconLabel: `${iconSubject} is ready`,
         label,
@@ -76,7 +74,7 @@
 
     if (state === 'unavailable') {
       return {
-        icon: 'warning',
+        Icon: IconWarning,
         iconClass: 'text-warning',
         iconLabel: `${iconSubject} is unavailable`,
         label,
@@ -88,7 +86,7 @@
     }
 
     return {
-      icon: 'circle-question',
+      Icon: IconQuestionCircle,
       iconClass: 'text-secondary',
       iconLabel: `${iconSubject} status is unknown`,
       label,
@@ -114,7 +112,6 @@
 <script lang="ts">
   import PayloadInput from '$lib/components/payload-input.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import DurationInput, {
@@ -122,7 +119,6 @@
     DEFAULT_UNITS,
     SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
@@ -131,6 +127,20 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { Badge } from '$lib/io/badge';
+  import { BadgeStatus } from '$lib/io/badge-status';
+  import {
+    IconCheckCircle,
+    IconChevronDown,
+    IconChevronUp,
+    IconClose,
+    type IconComponent,
+    IconPlaySolid,
+    IconQuestionCircle,
+    IconSpinner,
+    IconWarning,
+  } from '$lib/io/icon';
+  import { Tag } from '$lib/io/tag';
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
@@ -513,7 +523,7 @@
   >
     <div class="min-w-0 space-y-6">
       <section
-        class="surface-primary min-w-0 space-y-4 rounded-sm border border-subtle p-4"
+        class="min-w-0 space-y-4 rounded-sm border border-primary bg-surface-primary p-4 text-primary"
         aria-label="Configuration"
       >
         <h2 class="text-lg">Configuration</h2>
@@ -545,7 +555,7 @@
           aria-label="Start options"
           hidden={!configureOpen}
         >
-          <div class="rounded-sm border border-subtle p-3">
+          <div class="rounded-sm border border-primary p-3">
             <PayloadInput
               id="catalog-start-options"
               bind:input={startOptionsEditor}
@@ -555,7 +565,7 @@
           </div>
 
           {#if sharedStartOptionsDeclared}
-            <div class="space-y-2 rounded-sm border border-subtle p-3">
+            <div class="space-y-2 rounded-sm border border-primary p-3">
               <div>
                 <h3 class="text-sm font-medium">Custom Search Attributes</h3>
                 <p class="text-xs text-secondary">
@@ -570,7 +580,7 @@
               />
             </div>
 
-            <div class="space-y-2 rounded-sm border border-subtle p-3">
+            <div class="space-y-2 rounded-sm border border-primary p-3">
               <div>
                 <Label
                   for="catalog-start-delay"
@@ -594,7 +604,7 @@
               />
             </div>
 
-            <div class="space-y-2 rounded-sm border border-subtle p-3">
+            <div class="space-y-2 rounded-sm border border-primary p-3">
               <div>
                 <h3 class="text-sm font-medium">User Metadata</h3>
                 <p class="text-xs text-secondary">
@@ -611,22 +621,24 @@
         </section>
 
         {#if editorError}
-          <p class="text-sm text-danger" role="alert">{editorError}</p>
+          <p class="text-sm text-danger" role="alert">
+            {editorError}
+          </p>
         {/if}
 
         <div
-          class="surface-primary sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-subtle py-3"
+          class="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-primary bg-surface-primary py-3 text-primary"
         >
           <Button
             size="sm"
             variant="ghost"
-            trailingIcon={configureOpen ? 'chevron-up' : 'chevron-down'}
+            TrailingIcon={configureOpen ? IconChevronUp : IconChevronDown}
             aria-expanded={configureOpen}
             onclick={() => (configureOpen = !configureOpen)}
             >Start options</Button
           >
           <Button
-            leadingIcon="play"
+            LeadingIcon={IconPlaySolid}
             disabled={running || inputMalformed}
             onclick={run}
           >
@@ -671,20 +683,16 @@
                       {@const status = terminalStatusPresentation(
                         session.terminalStatus!,
                       )}
-                      <Badge
-                        type={status.type}
-                        class="px-1.5 py-0 text-xs leading-5"
-                        >{status.label}</Badge
-                      >
+                      <BadgeStatus status={status.status} text={status.label} />
                     {:else}
                       {@const explanation =
                         launchOutcomeExplanation(session.outcome) ??
                         session.error}
-                      <Badge type="subtle" class="px-1.5 py-0 text-xs leading-5"
-                        >{sessionStateLabels[session.state]}</Badge
-                      >
+                      <Badge text={sessionStateLabels[session.state]} />
                       {#if explanation}
-                        <p class="mt-1 text-xs text-secondary">{explanation}</p>
+                        <p class="mt-1 text-xs text-secondary">
+                          {explanation}
+                        </p>
                       {/if}
                     {/if}
                   </td>
@@ -703,7 +711,7 @@
                           size="xs"
                           variant="ghost"
                           class="h-7 px-1.5"
-                          leadingIcon="play"
+                          LeadingIcon={IconPlaySolid}
                           aria-label="Resume checking"
                           onclick={() => sessionStore.resume(session.id)}
                         />
@@ -713,7 +721,7 @@
                           size="xs"
                           variant="ghost"
                           class="h-7 px-1.5"
-                          leadingIcon="close"
+                          LeadingIcon={IconClose}
                           aria-label="Stop checking"
                           onclick={() => sessionStore.stop(session.id)}
                         />
@@ -744,18 +752,18 @@
 
     <aside class="space-y-4" aria-label="Execution details">
       <section
-        class="surface-primary space-y-4 rounded-sm border border-subtle p-4"
+        class="space-y-4 rounded-sm border border-primary bg-surface-primary p-4 text-primary"
         aria-label="Execution details"
       >
         <h2 class="text-base">Execution details</h2>
         {#if capabilityTags.length}
           <ul class="flex flex-wrap gap-2" aria-label="Capabilities">
             {#each capabilityTags as capability (capability)}
-              <li><Badge type="ghost">{capability}</Badge></li>
+              <li><Tag text={capability} Icon={null} /></li>
             {/each}
           </ul>
         {/if}
-        <dl class="divide-y divide-subtle text-sm">
+        <dl class="divide-y divide-primary text-sm">
           <div class="py-2 first:pt-0">
             <dt class="body-small text-secondary">Type</dt>
             <dd class="mt-0.5">{executionKindLabel}</dd>
@@ -773,7 +781,7 @@
         </dl>
       </section>
       <section
-        class="surface-primary space-y-3 rounded-sm border border-subtle p-4"
+        class="space-y-3 rounded-sm border border-primary bg-surface-primary p-4 text-primary"
         aria-label="Readiness"
       >
         <div class="flex items-center justify-between gap-2">
@@ -788,7 +796,7 @@
         </div>
         <span class="sr-only" aria-live="polite">{readinessAnnouncement}</span>
         <div class="space-y-2">
-          <div class="surface-subtle rounded-sm p-2">
+          <div class="rounded-sm bg-surface-secondary p-2 text-primary">
             <div class="flex items-center gap-2 text-sm">
               <Tooltip text={workerPresentation.tooltip} bottom>
                 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -797,10 +805,8 @@
                   tabindex="0"
                   aria-label={workerPresentation.iconLabel}
                 >
-                  <Icon
-                    name={workerPresentation.icon}
+                  <workerPresentation.Icon
                     class={workerPresentation.iconClass}
-                    aria-hidden="true"
                   />
                 </span>
               </Tooltip>
@@ -828,7 +834,7 @@
                 state: check.state,
                 taskQueue: descriptor.execution.taskQueue,
               })}
-              <div class="surface-subtle rounded-sm p-2">
+              <div class="rounded-sm bg-surface-secondary p-2 text-primary">
                 <div class="flex items-center gap-2 text-sm">
                   <Tooltip text={presentation.tooltip} bottom>
                     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -837,11 +843,7 @@
                       tabindex="0"
                       aria-label={presentation.iconLabel}
                     >
-                      <Icon
-                        name={presentation.icon}
-                        class={presentation.iconClass}
-                        aria-hidden="true"
-                      />
+                      <presentation.Icon class={presentation.iconClass} />
                     </span>
                   </Tooltip>
                   <span>{presentation.label}</span>
@@ -871,7 +873,7 @@
       </section>
       {#if descriptor.setupMarkdown}
         <section
-          class="surface-primary rounded-sm border border-subtle p-4"
+          class="rounded-sm border border-primary bg-surface-primary p-4 text-primary"
           aria-label="Setup"
         >
           <h2 class="text-base">Setup</h2>
@@ -884,7 +886,7 @@
         </section>
       {/if}
       <section
-        class="surface-primary rounded-sm border border-subtle p-4"
+        class="rounded-sm border border-primary bg-surface-primary p-4 text-primary"
         aria-label="What to verify"
       >
         <h2 class="text-base">What to verify</h2>

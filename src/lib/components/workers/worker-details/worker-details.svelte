@@ -15,15 +15,22 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconChevronLeft,
+    IconExternalLinkOptical,
+    IconFilter,
+    IconMicrochip,
+    IconSpinner,
+    IconTemporalServer,
+  } from '$lib/io/icon';
+  import { Tag } from '$lib/io/tag';
   import type {
     WorkerInfo,
     WorkerPollerInfo,
@@ -97,7 +104,7 @@
 <div class="flex items-center gap-2">
   {@render breadcrumb()}
   {#if heartbeat?.workerInstanceKey}
-    <Icon name="chevron-left" />
+    <IconChevronLeft />
     {heartbeat.workerInstanceKey}
   {/if}
 </div>
@@ -156,7 +163,7 @@
             namespace,
             query: `TaskQueue="${heartbeat.taskQueue}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
       <DetailListLabel>{translate('workers.sdk')}</DetailListLabel>
@@ -173,25 +180,28 @@
       {#if buildId}
         <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
         <span class="max-w-72">
-          <!-- TODO: Make filterable link for Build ID with DT-3745 -->
-          <DetailListTextValue
-            copyable={!!buildId}
-            copyableText={buildId}
+          <DetailListLinkValue
+            copyable
             text={buildId}
-            tooltipText={buildId}
+            href={routeForWorkersWithQuery({
+              namespace,
+              query: `BuildId="${buildId}"`,
+            }) ?? ''}
+            Icon={IconFilter}
           />
         </span>
       {/if}
-      {#if heartbeat?.deploymentVersion?.deploymentName}
+      {@const deploymentName = heartbeat?.deploymentVersion?.deploymentName}
+      {#if deploymentName}
         <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
         <DetailListLinkValue
           copyable
-          text={heartbeat.deploymentVersion.deploymentName}
+          text={deploymentName}
           href={routeForWorkersWithQuery({
             namespace,
-            query: `DeploymentName="${heartbeat.deploymentVersion.deploymentName}"`,
+            query: `DeploymentName="${deploymentName}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
     </DetailListColumn>
@@ -207,7 +217,7 @@
             namespace,
             query: `HostName="${hostName}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
       {@const processId = heartbeat?.hostInfo?.processId}
@@ -229,8 +239,8 @@
       >
         <span
           class="h-1.5 w-1.5 rounded-full {autoRefresh
-            ? 'bg-green-600'
-            : 'bg-slate-300'}"
+            ? 'bg-green-9'
+            : 'bg-surface-tertiary'}"
         ></span>
         {autoRefresh
           ? translate('workers.auto-refresh-on')
@@ -239,7 +249,7 @@
     </ToggleButtons>
     {#if refreshing}
       <p class="flex items-center gap-1">
-        <Icon name="spinner" class="animate-spin text-indigo-600" />
+        <IconSpinner class="animate-spin text-brand" />
         {translate('workers.pulling-latest-snapshot')}
       </p>
     {:else}
@@ -278,7 +288,7 @@
     <aside class="flex w-full flex-col gap-4 xl:max-w-sm">
       <Card>
         {@render hostUsage()}
-        <hr class="my-4 border-subtle" />
+        <hr class="my-4 border-primary" />
         {@render workflowCache()}
       </Card>
       <!-- TODO: Add back task failure rate. -->
@@ -322,12 +332,11 @@
               hide={!tooltipText || noSlotsConfigured}
               width={200}
             >
-              <Badge
-                type="ghost"
-                class={merge('mt-1 text-xs', noSlotsConfigured && 'invisible')}
-              >
-                {slots.slotSupplierKind}
-              </Badge>
+              <Tag
+                text={slots.slotSupplierKind}
+                Icon={null}
+                class={merge('mt-1', noSlotsConfigured && 'invisible')}
+              />
             </Tooltip>
           {/if}
         </dd>
@@ -361,14 +370,13 @@
               hide={!hasCurrentPollers}
               width={200}
             >
-              <Badge
-                type="ghost"
-                class={merge('mt-1 text-xs', !hasCurrentPollers && 'invisible')}
-              >
-                {poller.isAutoscaling
+              <Tag
+                text={poller.isAutoscaling
                   ? translate('workers.autoscaling')
                   : translate('workers.simple-maximum')}
-              </Badge>
+                Icon={null}
+                class={merge('mt-1', !hasCurrentPollers && 'invisible')}
+              />
             </Tooltip>
           </dd>
         </div>
@@ -380,7 +388,7 @@
           {translate('workers.zero-slots-configured')}
         </p>
         <Link
-          trailingIcon="external-link"
+          TrailingIcon={IconExternalLinkOptical}
           href="https://docs.temporal.io/develop/worker-performance#custom-slot-implementation"
           newTab
         >
@@ -403,10 +411,10 @@
     aria-valuenow={value}
     aria-valuemin={0}
     aria-valuemax={maxValue}
-    class="relative h-2 w-full overflow-hidden rounded bg-indigo-100"
+    class="relative h-2 w-full overflow-hidden rounded bg-surface-information"
   >
     <div
-      class="absolute left-0 h-full bg-indigo-600"
+      class="absolute left-0 h-full bg-indigo-9"
       style="width:{maxValue > 0
         ? Math.min((value / maxValue) * 100, 100)
         : 0}%;"
@@ -418,7 +426,7 @@
   <Alert intent="warning" title={translate('workers.go-dependency-warning')}>
     <p class="mb-1">{translate('workers.go-dependency-warning-description')}</p>
     <Link
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLinkOptical}
       href="https://docs.temporal.io/cloud/worker-health#enable-host-resource-reporting"
       newTab
     >
@@ -435,7 +443,7 @@
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
         <span id="cpu-label" class="flex items-center gap-1 font-semibold">
-          <Icon name="microchip" class="h-3 w-3 text-secondary" />
+          <IconMicrochip class="h-3 w-3 text-secondary" />
           {translate('workers.cpu-usage')}
         </span>
         <span>{cpuUsage.toFixed(0)}%</span>
@@ -445,7 +453,7 @@
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
         <span id="memory-label" class="flex items-center gap-1 font-semibold">
-          <Icon name="server" class="h-3 w-3 text-secondary" />
+          <IconTemporalServer class="h-3 w-3 text-secondary" />
           {translate('workers.memory-usage')}
         </span>
         <span>{memUsage.toFixed(0)}%</span>
@@ -476,7 +484,7 @@
         </dd>
       </div>
       <div>
-        <dt class="font-mediumtext-sm text-secondary">
+        <dt class="text-sm font-medium text-secondary">
           {translate('workers.cache-hits')}
         </dt>
         <dd class="font-mono text-2xl font-semibold text-brand">
@@ -488,7 +496,7 @@
       </div>
     </dl>
     <Link
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLinkOptical}
       href="https://docs.temporal.io/develop/worker-performance#workflow-cache-tuning"
       newTab
       class="mt-4"
@@ -507,7 +515,9 @@
       <dt class="text-sm text-secondary">
         {translate('workers.task-failure-rate')}
       </dt>
-      <dd class="font-mono text-2xl text-brand">{taskFailureRate}%</dd>
+      <dd class="font-mono text-2xl text-brand">
+        {taskFailureRate}%
+      </dd>
     </dl>
   </Card>
 {/snippet}

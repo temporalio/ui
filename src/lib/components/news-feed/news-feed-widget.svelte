@@ -2,9 +2,11 @@
   import Button from '$lib/holocene/button.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconMegaphone } from '$lib/io/icon';
   import { createNewsFeedStore } from '$lib/stores/news-feed';
   import type { NewsFeedSource } from '$lib/types/news-feed';
 
+  import MegaphoneUnread from './megaphone-unread.svelte';
   import NewsFeedModal from './news-feed-modal.svelte';
 
   interface Props {
@@ -42,13 +44,13 @@
     onClick={openNewsFeed}
     tooltip={label}
     label={translate('common.news')}
-    icon={unread ? 'megaphone-unread' : 'megaphone'}
+    Icon={unread ? MegaphoneUnread : IconMegaphone}
     data-testid="news-feed-trigger"
   />
 {:else}
   <Button
     variant="ghost"
-    leadingIcon={unread ? 'megaphone-unread' : 'megaphone'}
+    LeadingIcon={unread ? MegaphoneUnread : IconMegaphone}
     aria-label={label}
     class="h-9 w-9 shrink-0 p-0"
     data-testid="news-feed-trigger"

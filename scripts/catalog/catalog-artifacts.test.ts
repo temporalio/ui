@@ -24,6 +24,7 @@ import {
   verifyCatalogProjectBoundaries,
 } from './catalog-artifacts';
 import { catalogWorkerEntry, runCatalogWorkerDevelopment } from './catalog-cli';
+import { createInRepoTemporaryDirectory } from './test-temp-root';
 import { catalogRegistrationSource as localRegistrationFallback } from '../../src/lib/catalog/worker/local-registration-fallback';
 import { createCatalogRegistry } from '../../src/lib/catalog/worker/registry';
 import { requireCatalogRoutingFromEnvironment } from '../../src/lib/catalog/worker/routing-config';
@@ -35,7 +36,7 @@ const packageConsumerTest =
   process.env.CATALOG_PACKAGE_TEST === '1' ? it : it.skip;
 
 const createTemporaryDirectory = async () => {
-  const directory = await mkdtemp(join(process.cwd(), '.catalog-test-'));
+  const directory = await createInRepoTemporaryDirectory('catalog-test-');
   temporaryDirectories.push(directory);
   return directory;
 };
@@ -1441,11 +1442,15 @@ registry.registerExample({
           'svelte.config.js',
           'tsconfig.json',
           'scripts/generate-exports.mjs',
-          'src/lib/holocene/badge.svelte',
           'src/lib/holocene/button.svelte',
           'src/lib/holocene/card.svelte',
           'src/lib/holocene/copyable',
-          'src/lib/holocene/icon',
+          'src/lib/io/badge',
+          'src/lib/io/badge-count',
+          'src/lib/io/badge-status',
+          'src/lib/io/icon',
+          'src/lib/io/tag',
+          'src/lib/io/types.ts',
           'src/lib/holocene/icon-button.svelte',
           'src/lib/holocene/input/input.svelte',
           'src/lib/holocene/label.svelte',
@@ -1474,6 +1479,7 @@ registry.registerExample({
           'src/lib/utilities/format-time.ts',
           'src/lib/utilities/has.ts',
           'src/lib/utilities/is-function.ts',
+          'src/lib/utilities/is-modified-click.ts',
           'src/lib/utilities/is.ts',
           'src/lib/utilities/parse-with-big-int.ts',
           'src/lib/utilities/pluralize.ts',
@@ -1548,9 +1554,37 @@ registry.registerExample({
         await readFile(join(packageDirectory, 'package.json'), 'utf8'),
       );
       packageJson.scripts.prepare = 'svelte-kit sync';
+      packageJson.scripts.prepack = 'pnpm generate:exports && pnpm package';
       await writeFile(
         join(packageDirectory, 'package.json'),
         `${JSON.stringify(packageJson, null, 2)}\n`,
+      );
+      await writeFile(
+        join(packageDirectory, 'scripts/public-exports.mjs'),
+        [
+          'export const publicSubpaths = [',
+          "  'catalog/authoring',",
+          "  'catalog/browser/catalog',",
+          "  'catalog/browser/catalog-detail.svelte',",
+          "  'catalog/browser/catalog-list.svelte',",
+          "  'catalog/browser/routing',",
+          "  'catalog/worker/connection-config',",
+          "  'catalog/worker/development',",
+          "  'catalog/worker/registry',",
+          "  'catalog/worker/routing-config',",
+          "  'catalog/worker/runner',",
+          "  'catalog/worker/shared-registrations',",
+          "  'catalog/worker/workflow-execution-logger',",
+          "  'catalog/worker/workflows',",
+          "  'io/icon',",
+          "  'svelte-mocks/app/environment',",
+          "  'svelte-mocks/app/navigation',",
+          "  'svelte-mocks/app/paths',",
+          "  'svelte-mocks/app/state',",
+          "  'svelte-mocks/app/stores',",
+          '];',
+          '',
+        ].join('\n'),
       );
       await symlink(
         join(rootDirectory, 'node_modules'),
@@ -1664,11 +1698,13 @@ registry.registerExample({
           "import { resolveCatalogRouting } from '@temporalio/ui/catalog/browser/routing';",
           "import CatalogDetail from '@temporalio/ui/catalog/browser/catalog-detail.svelte';",
           "import CatalogList from '@temporalio/ui/catalog/browser/catalog-list.svelte';",
+          "import { IconAdd } from '@temporalio/ui/io/icon';",
           "const [target] = resolveCatalogRouting([{ targetId: 'shared-workflows', namespace: 'default', taskQueue: 'default' }], { 'shared-workflows': { namespace: 'runtime', taskQueue: 'runtime' } });",
           'document.body.dataset.catalogSize = String(catalog.length);',
           'document.body.dataset.catalogDetail = typeof CatalogDetail;',
           'document.body.dataset.catalogList = typeof CatalogList;',
           'document.body.dataset.catalogNamespace = target.namespace;',
+          'document.body.dataset.iconAdd = typeof IconAdd;',
         ].join('\n'),
       );
 

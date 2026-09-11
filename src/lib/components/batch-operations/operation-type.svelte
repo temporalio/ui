@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
+  import { IconTemporalActivity, IconTemporalWorkflow } from '$lib/io/icon';
   import {
     type BatchOperationActionType,
     BatchOperationExecutionType,
@@ -42,29 +42,31 @@
     ),
   );
 
-  const operationTypeToBadgeType: Record<BatchOperationActionType, BadgeType> =
-    {
-      Terminate: 'warning',
-      Cancel: 'default',
-      Reset: 'primary',
-      Signal: 'secondary',
-      Delete: 'danger',
-      Unspecified: 'default',
-    };
+  const operationTypeToColorScheme: Record<
+    BatchOperationActionType,
+    BadgeColorScheme
+  > = {
+    Terminate: 'warning',
+    Cancel: 'neutral',
+    Reset: 'info',
+    Signal: 'accent',
+    Delete: 'danger',
+    Unspecified: 'neutral',
+  };
+
+  const Glyph = $derived(
+    executionType === BatchOperationExecutionType.Activity
+      ? IconTemporalActivity
+      : IconTemporalWorkflow,
+  );
 </script>
 
 <span class="flex items-center gap-2">
   {#if operationType}
-    <Badge class="h-5" type={operationTypeToBadgeType[action]}>
-      {action}
-    </Badge>
+    <Badge text={action} colorScheme={operationTypeToColorScheme[action]} />
     {#if executionType}
       <span class="flex items-center gap-1">
-        <Icon
-          name={executionType === BatchOperationExecutionType.Activity
-            ? 'activity'
-            : 'workflow'}
-        />
+        <Glyph />
         {executionType === BatchOperationExecutionType.Activity
           ? translate('common.activities-plural', { count: 2 })
           : translate('common.workflows-plural', { count: 2 })}

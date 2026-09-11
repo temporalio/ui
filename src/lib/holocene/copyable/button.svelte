@@ -3,8 +3,8 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCheckmark, IconCopy } from '$lib/io/icon';
 
   interface Props extends HTMLButtonAttributes {
     copyIconTitle?: string;
@@ -22,11 +22,13 @@
     class: className = '',
     ...rest
   }: Props = $props();
+
+  const Glyph = $derived(copied ? IconCheckmark : IconCopy);
 </script>
 
 <button
   class={merge(
-    'surface-interactive-secondary h-6 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    'h-6 border border-transparent bg-transparent p-1 text-primary hover:bg-interactive-tertiary-hover focus-visible:bg-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press',
     className,
   )}
   data-track-name="copyable-button"
@@ -34,8 +36,5 @@
   data-track-text={copyIconTitle}
   {...rest}
 >
-  <Icon
-    title={copied ? copySuccessIconTitle : copyIconTitle}
-    name={copied ? 'checkmark' : 'copy'}
-  />
+  <Glyph class="size-4" title={copied ? copySuccessIconTitle : copyIconTitle} />
 </button>

@@ -1177,6 +1177,15 @@ export const createCatalogAuthoring = (adapter: CatalogAuthoringAdapter) => {
       withLock(() =>
         withJournaledFiles(adapter.generatedPaths, generateUnlocked),
       ),
+    /**
+     * The examples the catalog knows about, tracked and local alike. This is the
+     * catalog's own answer to "what can I run", so callers never read the
+     * generated artifacts to find out.
+     */
+    list: async (): Promise<readonly CatalogComposedExample[]> =>
+      [...(await adapter.loadExamples())].sort((left, right) =>
+        left.id.localeCompare(right.id),
+      ),
     verify: () => withLock(verifyUnlocked),
     planDemote,
     planPromote,
@@ -1195,6 +1204,7 @@ export const catalogHelp = `Usage: catalog <command>
 
 Commands:
   catalog help                   Show this help text.
+  catalog list [--json]          List the catalog examples.
   catalog scaffold <example-id>  Create a local catalog example.
   catalog generate               Generate catalog artifacts.
   catalog verify                 Verify catalog artifacts and boundaries.
@@ -1204,6 +1214,23 @@ Commands:
                                            Move or preview a tracked example into the local, Git-ignored catalog.
   catalog dev                    Start the catalog UI and worker.
   catalog worker                 Start the catalog worker.`;
+
+const formatCatalogList = (examples: readonly CatalogComposedExample[]) => {
+  if (!examples.length) {
+    return 'No catalog examples. Run "catalog scaffold <example-id>" to make one.';
+  }
+
+  return examples
+    .map((example) =>
+      [
+        example.id,
+        example.sourceId,
+        example.targetId,
+        example.workflowType ?? '-',
+      ].join('\t'),
+    )
+    .join('\n');
+};
 
 const formatCatalogMoveSuccess = ({
   exampleId,
@@ -1257,6 +1284,21 @@ export const runCatalogCli = async ({
     io.writeOutput(catalogHelp);
     return;
   }
+  if (command === 'list' && (argv.length === 1 || argv.length === 2)) {
+    if (argv.length === 2 && argv[1] !== '--json') {
+      fail('Usage: catalog list [--json]');
+    }
+
+    const examples = await authoring.list();
+
+    io.writeOutput(
+      argv[1] === '--json'
+        ? JSON.stringify(examples, null, 2)
+        : formatCatalogList(examples),
+    );
+    return;
+  }
+
   if (command === 'scaffold' && argv.length === 2) {
     await authoring.scaffold(argv[1]);
     io.writeOutput(
@@ -1334,6 +1376,7 @@ export const runCatalogCli = async ({
       'dev',
       'generate',
       'help',
+      'list',
       'scaffold',
       'verify',
       'worker',

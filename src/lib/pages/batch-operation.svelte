@@ -6,6 +6,7 @@
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { describeBatchOperation } from '$lib/services/batch-service';
   import { autoRefresh } from '$lib/stores/batch-operations';
   import { routeForBatchOperations } from '$lib/utilities/route-for';
@@ -42,7 +43,10 @@
 
 <div class="flex flex-col gap-4">
   <div class="flex flex-row">
-    <Link href={routeForBatchOperations({ namespace })} icon="chevron-left">
+    <Link
+      href={routeForBatchOperations({ namespace })}
+      LeadingIcon={IconChevronLeft}
+    >
       {translate('batch.back-link')}
     </Link>
   </div>

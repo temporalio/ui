@@ -1,9 +1,11 @@
 <script lang="ts">
   import CreateVersionForm from '$lib/components/workers/serverless-worker-form/create-version-form.svelte';
   import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
+  import { scaleDownStabilizationToMs } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import {
     buildGcpCloudRunComputeConfig,
     buildLambdaComputeConfig,
@@ -83,7 +85,7 @@
 </script>
 
 <div class="flex max-w-[45rem] flex-col gap-4">
-  <Link href={backHref} icon="chevron-left">
+  <Link href={backHref} LeadingIcon={IconChevronLeft}>
     {translate('workers.back-to-deployment', { deployment })}
   </Link>
   <h1>
@@ -117,6 +119,9 @@
                   maxReplicas: data.maxReplicas,
                   initialReplicas: data.initialReplicas,
                   utilizationTarget: data.utilizationTarget,
+                  scaleDownStabilizationMs: scaleDownStabilizationToMs(
+                    data.scaleDownStabilization,
+                  ),
                 },
               )
             : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {

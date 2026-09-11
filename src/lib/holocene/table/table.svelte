@@ -9,55 +9,83 @@
   interface Props extends HTMLTableAttributes {
     updating?: boolean;
     class?: string;
+    containerClass?: string;
     'data-testid'?: string;
     fixed?: boolean;
     bordered?: boolean;
+    rounded?: boolean;
     caption?: Snippet;
     headers?: Snippet;
     children?: Snippet;
+    emptyState?: Snippet;
   }
 
   let {
     class: className = '',
+    containerClass = '',
     updating = false,
     fixed = false,
     bordered = true,
+    rounded = true,
     caption,
     headers,
     children,
+    emptyState,
     ...rest
   }: Props = $props();
+
+  let scrollContainer = $state<HTMLDivElement>();
+
+  export function scrollToTop() {
+    if (!scrollContainer) return false;
+    if (scrollContainer.scrollHeight <= scrollContainer.clientHeight) {
+      return false;
+    }
+
+    scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    return true;
+  }
 </script>
 
-<table
+<div
+  bind:this={scrollContainer}
   class={merge(
-    'holocene-table relative w-full border-separate border-spacing-0',
-    fixed ? 'layout-fixed' : 'layout-auto',
-    className,
+    'relative flex max-h-full w-full flex-col overflow-auto',
+    rounded && 'rounded-lg',
+    bordered && 'border border-primary',
+    containerClass,
   )}
-  class:bordered
-  aria-busy={updating ? 'true' : undefined}
-  {...rest}
 >
-  {@render caption?.()}
-  <thead class="holocene-table-header">
-    {@render headers?.()}
-    {#if updating}
-      <ProgressBar />
-    {/if}
-  </thead>
-  <tbody class="holocene-table-body">
-    {@render children?.()}
-  </tbody>
-</table>
+  <table
+    class={merge(
+      'holocene-table min-w-full shrink-0 border-separate border-spacing-0',
+      fixed ? 'layout-fixed' : 'layout-auto',
+      className,
+    )}
+    aria-busy={updating ? 'true' : undefined}
+    {...rest}
+  >
+    {@render caption?.()}
+    <thead class="holocene-table-header">
+      {@render headers?.()}
+      {#if updating}
+        <tr aria-hidden="true" class="!h-0 bg-transparent">
+          <th colspan="1000" class="relative !h-0 !border-0 !p-0">
+            <ProgressBar subtle class="bottom-0" />
+          </th>
+        </tr>
+      {/if}
+    </thead>
+    <tbody class="holocene-table-body">
+      {@render children?.()}
+    </tbody>
+  </table>
+  {@render emptyState?.()}
+</div>
 
 <style lang="postcss">
   .holocene-table {
-    @apply surface-primary table-auto;
-
-    &.bordered {
-      @apply border border-subtle;
-    }
+    @apply table-auto bg-surface-primary text-primary;
 
     &.layout-auto {
       @apply table-auto;
@@ -84,25 +112,25 @@
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-table-header;
+      @apply bg-surface-secondary text-primary;
     }
 
     :global(tr > th) {
-      @apply h-9 border-b border-subtle px-2 text-left text-sm font-medium;
+      @apply h-9 border-b border-primary px-2 text-left text-sm font-medium;
     }
   }
 
   :where(.holocene-table-body) {
     :global(tr) {
-      @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-b border-primary last-of-type:border-0 hover:bg-interactive-tertiary-hover hover:bg-fixed;
     }
 
     :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
+      @apply w-full hover:bg-surface-primary;
     }
 
-    :global(tr:nth-of-type(odd)) {
-      @apply surface-background;
+    :global(tr:nth-of-type(even)) {
+      @apply bg-surface-overlay-primary;
     }
 
     :global(tr > td) {
@@ -110,11 +138,11 @@
     }
 
     :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
+      @apply hover:text-brand hover:underline hover:decoration-brand;
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-8 border-b border-primary last-of-type:border-0 hover:bg-interactive-tertiary-hover hover:bg-fixed;
     }
   }
 </style>

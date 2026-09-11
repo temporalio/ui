@@ -10,20 +10,21 @@
   import DetailListLabel from '$lib/components/detail-list/detail-list-label.svelte';
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import DetailList from '$lib/components/detail-list/detail-list.svelte';
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
+  import { Badge } from '$lib/io/badge';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { IconCanceled, IconChevronLeft, IconInfo } from '$lib/io/icon';
+  import { getVisibleInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
@@ -64,7 +65,7 @@
 
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
 
-  const { workflow } = $derived($workflowRun);
+  const { workflow, workerCount } = $derived($workflowRun);
   const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
   const workerDeployment = $derived(
     workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
@@ -106,11 +107,13 @@
   const outboundLinks = $derived(
     getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
   );
-  const inboundLinks = $derived(
-    getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
+  const visibleInboundLinks = getVisibleInboundNexusLinkEvents(
+    () => $fullEventHistory,
   );
+  const inboundLinks = $derived(visibleInboundLinks.events?.length || 0);
   const linkCount = $derived(outboundLinks + inboundLinks);
   const sharedFilterParams = $derived(getSharedFilterParams(page.url));
+  const taskQueue = $derived(workflow?.taskQueue ?? '');
 </script>
 
 <div class="flex items-center justify-between">
@@ -118,7 +121,7 @@
     <Link
       href={workflowsHref}
       data-testid="back-to-workflows"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {eventId
         ? translate('common.workflows')
@@ -130,7 +133,7 @@
           ...routeParameters,
         })}
         data-testid="back-to-workflow-execution"
-        icon="chevron-left"
+        LeadingIcon={IconChevronLeft}
       >
         {runId}
       </Link>
@@ -138,20 +141,22 @@
   </div>
 </div>
 <header class="flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
+  <div class="flex flex-col items-start justify-between gap-4 xl:flex-row">
     <div
       class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
     >
       <div
         class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
       >
-        <WorkflowStatus
-          status={workflow?.status}
-          big
-          announce
-          delayed={workflow ? isWorkflowDelayed(workflow) : false}
-          taskFailure={workflow ? isWorkflowTaskFailure(workflow) : false}
-        />
+        {#if workflow}
+          <WorkflowStatusBadge
+            role="status"
+            aria-atomic="true"
+            status={workflow.status}
+            delayed={isWorkflowDelayed(workflow)}
+            taskFailure={isWorkflowTaskFailure(workflow)}
+          />
+        {/if}
         <div class="xl:hidden">
           <WorkflowActions
             {cancelInProgress}
@@ -193,7 +198,7 @@
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
-        icon="info"
+        Icon={IconInfo}
         intent="info"
         title={translate('workflows.cancel-request-sent')}
         class="max-w-screen-lg xl:w-2/3"
@@ -206,7 +211,7 @@
     {@const pauseInfo = workflow?.workflowExtendedInfo.pauseInfo}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
-        icon="info"
+        Icon={IconInfo}
         intent="info"
         title={translate('workflows.workflow-paused')}
         class="max-w-screen-lg xl:w-2/3"
@@ -245,7 +250,7 @@
   {#if workflowHasBeenReset}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
-        icon="info"
+        Icon={IconInfo}
         intent="info"
         data-testid="workflow-reset-alert"
         title={translate('workflows.reset-success-alert-title')}
@@ -266,7 +271,7 @@
   {/if}
   <NoWorkersPollingAlert
     {namespace}
-    taskQueue={workflow?.taskQueue ?? ''}
+    {taskQueue}
     {runningWithNoWorkers}
     deployment={workerDeployment}
   />
@@ -300,9 +305,7 @@
           }),
         )}
       >
-        <Badge type="primary" class="px-2 py-0">
-          {workflow?.historyEvents}
-        </Badge>
+        <BadgeCount value={workflow?.historyEvents ?? 0} />
       </Tab>
       <Tab
         label={translate('workflows.relationships')}
@@ -313,10 +316,8 @@
           routeForRelationships(routeParameters),
         )}
       >
-        <Badge type="primary" class="px-2 py-0">
-          {workflowRelationships.relationshipCount}
-        </Badge></Tab
-      >
+        <BadgeCount value={workflowRelationships.relationshipCount} />
+      </Tab>
       {#if linkCount > 0}
         <Tab
           label={translate('workflows.nexus-links-tab')}
@@ -327,9 +328,7 @@
             routeForNexusLinks(routeParameters),
           )}
         >
-          <Badge type="primary" class="px-2 py-0">
-            {linkCount}
-          </Badge>
+          <BadgeCount value={linkCount} />
         </Tab>
       {/if}
       <Tab
@@ -341,7 +340,9 @@
           routeForWorkflowWorkers(routeParameters),
         )}
       >
-        <!-- TODO: Add Badge with workers count when there is a WorkersCount API available -->
+        {#if workerCount !== undefined}
+          <BadgeCount value={workerCount} />
+        {/if}
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}
@@ -352,17 +353,15 @@
           routeForPendingActivities(routeParameters),
         )}
       >
-        <Badge
-          type={activitiesCanceled ? 'warning' : 'primary'}
-          class="px-2 py-0"
-        >
-          <div class="flex items-center gap-1">
-            {#if activitiesCanceled}
-              <Icon name="canceled" />
-            {/if}
-            {workflow?.pendingActivities?.length}
-          </div>
-        </Badge>
+        {#if activitiesCanceled}
+          <Badge
+            colorScheme="warning"
+            Icon={IconCanceled}
+            text={String(workflow?.pendingActivities?.length ?? 0)}
+          />
+        {:else}
+          <BadgeCount value={workflow?.pendingActivities?.length ?? 0} />
+        {/if}
       </Tab>
       <Tab
         label={translate('workflows.call-stack-tab')}

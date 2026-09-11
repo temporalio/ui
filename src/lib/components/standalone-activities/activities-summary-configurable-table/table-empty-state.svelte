@@ -6,6 +6,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconWarning } from '$lib/io/icon';
   import { activityError } from '$lib/stores/activities';
   import noResultsImages from '$lib/vendor/empty-state.svg';
 
@@ -58,7 +59,7 @@
           {translate('standalone-activities.empty-state-description')}
         {/if}
       </p>
-      <NoQueryResults class="m-auto mt-8 text-subtle" />
+      <NoQueryResults class="m-auto mt-8 text-tertiary" />
     </div>
   </div>
 {:else}
@@ -67,7 +68,7 @@
     aria-live="polite"
   >
     <div
-      class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
+      class="flex w-auto min-w-[280px] flex-col gap-4 bg-surface-primary p-8 text-primary xl:min-w-[520px] xl:flex-1"
     >
       {#if $activityError}
         <h2>
@@ -75,7 +76,7 @@
         </h2>
         <Alert
           intent="warning"
-          icon="warning"
+          Icon={IconWarning}
           title={translate('common.error-occurred')}
           style="overflow-wrap: anywhere"
         >
@@ -113,11 +114,11 @@
         {/each}
       {/if}
     </div>
-    <div class="flex h-full flex-col max-xl:hidden">
-      <div class="bg-off-white dark:bg-[#0f1725]">
+    <div class="flex flex-col max-xl:hidden">
+      <div class="bg-surface-primary">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
-      <div class="flex-1 bg-[#818cf8]"></div>
+      <div class="flex-1 bg-[#8da4ef]"></div>
     </div>
   </div>
 {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import { getContext } from 'svelte';
+  import { getContext, tick } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -14,6 +14,7 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter, IconSearch } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import {
@@ -46,6 +47,12 @@
     getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT);
 
   const open = writable(false);
+  const searchId = `${id}-filter-search`;
+
+  const focusSearch = async () => {
+    await tick();
+    document.getElementById(searchId)?.focus();
+  };
 
   const getDefaultConditional = (type: SearchAttributeType) => {
     switch (type) {
@@ -103,36 +110,33 @@
   <MenuButton
     id="{id}-search-attribute-filter-button"
     controls="{id}-search-attribute-menu"
-    leadingIcon="filter"
-    variant="secondary"
+    LeadingIcon={IconFilter}
+    variant="tertiary"
     data-testid="add-filter-button"
     disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
-    onclick={() => (searchAttributeValue = '')}
+    onclick={(isOpen) => {
+      searchAttributeValue = '';
+      if (isOpen) focusSearch();
+    }}
     class="text-nowrap"
     size="xs"
   >
     Add Filter
   </MenuButton>
-  <Menu id="{id}-search-attribute-menu">
-    <MenuItem
-      class="p-0"
-      hoverable={false}
-      onclick={() => {
-        document.getElementById(`${id}-filter-search`)?.focus();
-      }}
-    >
+  <Menu id="{id}-search-attribute-menu" usePortal>
+    <MenuItem class="p-0" hoverable={false} onclick={focusSearch}>
       <Input
         label={translate('common.search')}
         labelHidden
-        id="{id}-filter-search"
+        id={searchId}
         noBorder
         bind:value={searchAttributeValue}
-        icon="search"
+        Icon={IconSearch}
         placeholder={translate('common.search')}
-        class="w-full min-w-[300px]"
+        class="w-full"
       />
     </MenuItem>
-    <hr class="border-subtle" />
+    <hr class="border-primary" />
 
     {#each filteredOptions as { value, label, type } (value)}
       <MenuItem
@@ -144,7 +148,7 @@
           !!$filters.find((f) => f.attribute === statusAttribute)}
       >
         <div>
-          <p class="leading-3">{label}</p>
+          <p class="break-all leading-3">{label}</p>
           <small class="text-secondary">{type}</small>
         </div>
       </MenuItem>

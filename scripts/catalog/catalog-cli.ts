@@ -15,6 +15,7 @@ const isReportedCatalogCliError = (error: unknown) => {
     'Unknown catalog command',
     'Invalid arguments for catalog command',
     'Usage: catalog demote',
+    'Usage: catalog list',
     'Usage: catalog promote',
   ].some((prefix) => error.message.startsWith(prefix));
 };

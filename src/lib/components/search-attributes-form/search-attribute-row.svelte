@@ -7,6 +7,7 @@
   import Select from '$lib/holocene/select/select.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClose, IconTrash } from '$lib/io/icon';
 
   import type { SearchAttributeTypeOption } from './types';
 
@@ -92,7 +93,7 @@
       size="xs"
       onclick={onRemove}
       disabled={submitting}
-      leadingIcon="close"
+      LeadingIcon={IconClose}
       class="rounded-full"
     />
   {:else if isDeletable}
@@ -106,7 +107,7 @@
         size="xs"
         onclick={onRemove}
         disabled={submitting || isCloud}
-        leadingIcon="trash"
+        LeadingIcon={IconTrash}
       />
     </Tooltip>
   {/if}
