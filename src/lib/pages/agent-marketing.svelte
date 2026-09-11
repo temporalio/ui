@@ -1,5 +1,6 @@
 <script lang="ts">
-  import agentHarnessPreview from '$lib/assets/agents/agent-harness-preview.svg';
+  import agentHarnessDemo from '$lib/assets/agents/agent-harness-demo.mp4';
+  import agentHarnessPreview from '$lib/assets/agents/agent-harness-preview.jpg';
   import integrationBraintrust from '$lib/assets/agents/integration-braintrust.svg';
   import integrationDeepAgents from '$lib/assets/agents/integration-deep-agents.svg';
   import integrationGoogleAdk from '$lib/assets/agents/integration-google-adk.svg';
@@ -196,6 +197,19 @@
   const onboardingPrompt =
     'Fetch and follow the instructions at https://github.com/temporal-community/temporal-agent-harness/blob/main/README.md and get the monty example agent running';
   const { copy, copied } = copyToClipboard();
+  let agentHarnessVideo: HTMLVideoElement;
+  let agentHarnessDemoStarted = $state(false);
+
+  const playAgentHarnessDemo = () => {
+    void agentHarnessVideo
+      .play()
+      .catch(() => (agentHarnessDemoStarted = false));
+  };
+
+  const resetAgentHarnessDemo = () => {
+    agentHarnessDemoStarted = false;
+    agentHarnessVideo.load();
+  };
 
   const copyOnboardingPrompt = (event: MouseEvent) => {
     copy(event, onboardingPrompt);
@@ -282,28 +296,40 @@
             </div>
 
             <figure
-              class="border-subtle bg-code-block relative aspect-[473/300] min-w-0 overflow-hidden rounded-lg border"
+              class="border-subtle bg-code-block relative aspect-[812/480] min-w-0 overflow-hidden rounded-lg border"
             >
-              <img
-                class="absolute left-[-0.63%] top-[-16%] h-[162.33%] w-[136.36%] max-w-none opacity-60"
-                src={agentHarnessPreview}
-                alt="Temporal Agent Harness session UI showing agent events and execution state"
-              />
-              <div
-                class="from-code-block/90 to-code-block/20 pointer-events-none absolute inset-0 bg-gradient-to-b"
-                aria-hidden="true"
-              ></div>
-              <Button
-                class="bg-secondary/80 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                href="https://github.com/temporal-community/temporal-agent-harness"
-                target="_blank"
-                variant="secondary"
-                size="md"
-                aria-label="Open the Temporal Agent Harness demo"
+              <video
+                id="agent-harness-demo"
+                bind:this={agentHarnessVideo}
+                class="absolute inset-0 size-full object-cover"
+                class:opacity-60={!agentHarnessDemoStarted}
+                poster={agentHarnessPreview}
+                preload="metadata"
+                playsinline
+                controls={agentHarnessDemoStarted}
+                aria-label="Temporal Agent Harness session UI demo showing agent events and execution state"
+                onplay={() => (agentHarnessDemoStarted = true)}
+                onended={resetAgentHarnessDemo}
               >
-                <IconPlaySolid class="size-5" />
-                Watch Demo
-              </Button>
+                <source src={agentHarnessDemo} type="video/mp4" />
+              </video>
+              {#if !agentHarnessDemoStarted}
+                <div
+                  class="from-code-block/90 to-code-block/20 pointer-events-none absolute inset-0 bg-gradient-to-b"
+                  aria-hidden="true"
+                ></div>
+                <Button
+                  class="bg-secondary/80 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                  onclick={playAgentHarnessDemo}
+                  variant="secondary"
+                  size="md"
+                  aria-controls="agent-harness-demo"
+                  aria-label="Play the Temporal Agent Harness demo"
+                >
+                  <IconPlaySolid class="size-5" />
+                  Watch Demo
+                </Button>
+              {/if}
             </figure>
           </div>
         </section>
