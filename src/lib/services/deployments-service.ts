@@ -399,40 +399,49 @@ export const removeRampingUnversionedWorkers = async (
   });
 };
 
-export const buildLambdaComputeConfig = (
-  lambdaArn: string,
+type InvokeScalingOptions = {
+  scaleUpCooloffMs?: number;
+  scaleUpBacklogThreshold?: number;
+  maxWorkerLifetimeMs?: number;
+  scaleUpDispatchRateEpsilon?: number;
+  metricsPollIntervalMs?: number;
+  roleExternalId?: string;
+};
+
+// Lambda and AgentCore are both invoke-based providers in
+// temporal-auto-scaled-workers, so they pair with the `no-sync` scaler and take
+// the same role/external-id details. They differ only in the provider type and
+// the key naming the resource to invoke: `arn` for Lambda, `endpoint_arn` for
+// AgentCore.
+const buildInvokeComputeConfig = (
+  providerType: 'aws-lambda' | 'aws-agentcore',
+  resourceKey: 'arn' | 'endpoint_arn',
+  resourceArn: string,
   iamRoleArn: string,
-  scalingOptions?: {
-    scaleUpCooloffMs?: number;
-    scaleUpBacklogThreshold?: number;
-    maxWorkerLifetimeMs?: number;
-    scaleUpDispatchRateEpsilon?: number;
-    metricsPollIntervalMs?: number;
-    roleExternalId?: string;
-  },
+  scalingOptions: InvokeScalingOptions = {},
 ): ComputeConfig => {
   const providerPayload: Record<string, string> = {
-    arn: lambdaArn,
+    [resourceKey]: resourceArn,
     role: iamRoleArn,
   };
-  if (scalingOptions?.roleExternalId)
+  if (scalingOptions.roleExternalId)
     providerPayload['role_external_id'] = scalingOptions.roleExternalId;
   const providerJson = JSON.stringify(providerPayload);
   const providerData = btoa(providerJson);
   const encoding = btoa('json/plain');
 
   const scalerConfig: Record<string, number> = {};
-  if (scalingOptions?.scaleUpCooloffMs !== undefined)
+  if (scalingOptions.scaleUpCooloffMs !== undefined)
     scalerConfig['scale_up_cooloff_ms'] = scalingOptions.scaleUpCooloffMs;
-  if (scalingOptions?.scaleUpBacklogThreshold !== undefined)
+  if (scalingOptions.scaleUpBacklogThreshold !== undefined)
     scalerConfig['scale_up_backlog_threshold'] =
       scalingOptions.scaleUpBacklogThreshold;
-  if (scalingOptions?.maxWorkerLifetimeMs !== undefined)
+  if (scalingOptions.maxWorkerLifetimeMs !== undefined)
     scalerConfig['max_worker_lifetime_ms'] = scalingOptions.maxWorkerLifetimeMs;
-  if (scalingOptions?.scaleUpDispatchRateEpsilon !== undefined)
+  if (scalingOptions.scaleUpDispatchRateEpsilon !== undefined)
     scalerConfig['scale_up_dispatch_rate_epsilon'] =
       scalingOptions.scaleUpDispatchRateEpsilon;
-  if (scalingOptions?.metricsPollIntervalMs !== undefined)
+  if (scalingOptions.metricsPollIntervalMs !== undefined)
     scalerConfig['metrics_poll_interval_ms'] =
       scalingOptions.metricsPollIntervalMs;
 
@@ -440,7 +449,7 @@ export const buildLambdaComputeConfig = (
     scalingGroups: {
       default: {
         provider: {
-          type: 'aws-lambda',
+          type: providerType,
           details: { metadata: { encoding }, data: providerData },
         },
         scaler: {
@@ -454,6 +463,32 @@ export const buildLambdaComputeConfig = (
     },
   };
 };
+
+export const buildLambdaComputeConfig = (
+  lambdaArn: string,
+  iamRoleArn: string,
+  scalingOptions?: InvokeScalingOptions,
+): ComputeConfig =>
+  buildInvokeComputeConfig(
+    'aws-lambda',
+    'arn',
+    lambdaArn,
+    iamRoleArn,
+    scalingOptions,
+  );
+
+export const buildAgentCoreComputeConfig = (
+  agentCoreEndpointArn: string,
+  iamRoleArn: string,
+  scalingOptions?: InvokeScalingOptions,
+): ComputeConfig =>
+  buildInvokeComputeConfig(
+    'aws-agentcore',
+    'endpoint_arn',
+    agentCoreEndpointArn,
+    iamRoleArn,
+    scalingOptions,
+  );
 
 export const buildGcpCloudRunComputeConfig = (
   project: string,
@@ -520,6 +555,28 @@ export const decodeLambdaProviderDetails = (
       roleExternalId?: string;
     } = {};
     if (raw.arn) result.lambdaArn = raw.arn;
+    if (raw.role) result.iamRoleArn = raw.role;
+    if (raw.role_external_id) result.roleExternalId = raw.role_external_id;
+    return result;
+  } catch {
+    return {};
+  }
+};
+
+export const decodeAgentCoreProviderDetails = (
+  computeConfig?: ComputeConfig,
+): {
+  agentCoreEndpointArn?: string;
+  iamRoleArn?: string;
+  roleExternalId?: string;
+} => {
+  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'aws-agentcore') return {};
+  if (!scalingGroup?.provider?.details?.data) return {};
+  try {
+    const raw = JSON.parse(atob(scalingGroup.provider.details.data));
+    const result: ReturnType<typeof decodeAgentCoreProviderDetails> = {};
+    if (raw.endpoint_arn) result.agentCoreEndpointArn = raw.endpoint_arn;
     if (raw.role) result.iamRoleArn = raw.role;
     if (raw.role_external_id) result.roleExternalId = raw.role_external_id;
     return result;

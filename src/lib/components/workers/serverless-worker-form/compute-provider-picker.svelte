@@ -7,8 +7,7 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
-  import { IconAws, type IconComponent, IconGcp } from '$lib/io/icon';
-  import { hasCapability } from '$lib/utilities/has-capability.svelte';
+  import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
 
   import {
     type ComputeProviderOption,
@@ -26,15 +25,20 @@
 
   const configuredProviders = untrack(() => providers);
 
+  // The brand marks, not the monochrome glyphs. These are vendor logos rather
+  // than UI icons, so they keep their own colour on either theme.
   const providerIcon: Record<ComputeProviderValue, IconComponent> = {
-    lambda: IconAws,
-    'cloud-run': IconGcp,
+    lambda: IconAwsColor,
+    agentcore: IconAwsColor,
+    'cloud-run': IconGcpColor,
   };
 
   const providerLabel = (value: ComputeProviderValue): string => {
     switch (value) {
       case 'lambda':
         return translate('workers.provider-lambda');
+      case 'agentcore':
+        return translate('workers.provider-agentcore');
       case 'cloud-run':
         return translate('workers.provider-cloud-run');
     }
@@ -44,6 +48,8 @@
     switch (value) {
       case 'lambda':
         return translate('workers.provider-lambda-description');
+      case 'agentcore':
+        return translate('workers.provider-agentcore-description');
       case 'cloud-run':
         return translate('workers.provider-cloud-run-description');
     }
@@ -60,19 +66,20 @@
     }
   };
 
-  const cloudRunCapable = $derived(
-    hasCapability('serverScaledProviderCloudRun'),
-  );
-
+  /**
+   * Every provider, selectable. Self-hosted has no per-account entitlement to
+   * express, and a Service that cannot run a provider rejects the Version with
+   * a reason, so gating the picker only hides the choice behind a badge that
+   * cannot be acted on.
+   *
+   * A caller that does need to restrict the list passes `providers`, which is
+   * how Temporal Cloud offers only the providers matching the Namespace's own
+   * cloud.
+   */
   const defaultProviders = $derived<ComputeProviderOption[]>([
     { value: 'lambda' },
-    {
-      value: 'cloud-run',
-      disabled: !cloudRunCapable,
-      disabledReason: cloudRunCapable
-        ? undefined
-        : translate('workers.coming-soon'),
-    },
+    { value: 'agentcore' },
+    { value: 'cloud-run' },
   ]);
 
   const resolvedProviders = $derived(configuredProviders ?? defaultProviders);
@@ -114,7 +121,7 @@
       {#snippet icon()}
         {@const ProviderIcon = providerIcon[option.value]}
         <div
-          class="flex h-11 w-11 items-center justify-center rounded-none border border-primary bg-surface-primary"
+          class="flex h-11 w-11 items-center justify-center rounded border border-primary bg-surface-primary"
         >
           <ProviderIcon width={32} height={32} />
         </div>
