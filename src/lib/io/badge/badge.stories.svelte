@@ -8,8 +8,10 @@
     IconHeartbeat,
   } from '$lib/io/icon';
 
-  import type { BadgeColorScheme } from './badge.svelte';
+  import type { BadgeColorScheme, BadgeSize } from './badge.svelte';
   import Badge from './badge.svelte';
+
+  const sizes: BadgeSize[] = ['sm', 'md'];
 
   const colorSchemes: BadgeColorScheme[] = [
     'neutral',
@@ -27,10 +29,12 @@
     args: {
       text: 'badge',
       colorScheme: 'neutral',
+      size: 'md',
     },
     argTypes: {
       text: { control: 'text' },
       colorScheme: { control: 'select', options: colorSchemes },
+      size: { control: 'select', options: sizes },
       Icon: { control: false },
       extension: { control: 'object' },
       class: { table: { disable: true } },
@@ -63,6 +67,25 @@
     },
   }}
 />
+
+<Story name="Sizes">
+  {#snippet template()}
+    <div
+      class="flex flex-wrap items-end gap-4 border border-primary bg-surface-primary p-6"
+    >
+      {#each sizes as size (size)}
+        <div class="flex flex-col items-start gap-2">
+          <span class="text-xs text-secondary">{size}</span>
+          <Badge
+            {size}
+            text="badge"
+            extension={{ text: '987', TrailIcon: IconExclamationOctagon }}
+          />
+        </div>
+      {/each}
+    </div>
+  {/snippet}
+</Story>
 
 <Story name="Color schemes">
   {#snippet template()}

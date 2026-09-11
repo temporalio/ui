@@ -20,6 +20,8 @@
     | 'danger'
     | 'error';
 
+  export type BadgeStatusSize = 'sm' | 'md';
+
   export type BadgeStatusExtension = {
     text?: string;
     colorScheme?: BadgeStatusColorScheme;
@@ -35,9 +37,17 @@
     extension !== false && extension !== null && extension !== undefined;
 
   const sharedClasses =
-    'inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono text-xs font-medium leading-none uppercase tracking-wide';
+    'inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono font-medium leading-none uppercase tracking-wide';
   const segmentClasses =
-    'inline-flex flex-nowrap items-center justify-center gap-1 border py-1 px-1.5';
+    'inline-flex flex-nowrap items-center justify-center gap-1 border';
+
+  const sizeClasses: Record<
+    BadgeStatusSize,
+    { badge: string; segment: string }
+  > = {
+    sm: { badge: 'text-2xs', segment: 'py-0.5 px-1' },
+    md: { badge: 'text-xs', segment: 'py-1 px-1.5' },
+  };
 
   const colorSchemeClasses: Record<BadgeStatusColorScheme, string> = {
     neutral: 'border-tertiary bg-surface-tertiary text-secondary',
@@ -73,6 +83,7 @@
     'children' | 'class'
   > {
     status: BadgeStatusValue;
+    size?: BadgeStatusSize;
     text?: string;
     count?: string | number;
     TrailIcon?: ConditionalValue<IconComponent>;
@@ -82,6 +93,7 @@
 
   let {
     status,
+    size = 'md',
     text,
     count,
     TrailIcon,
@@ -96,10 +108,14 @@
   );
 </script>
 
-<span class={twMerge(sharedClasses, className)} {...rest}>
+<span
+  class={twMerge(sharedClasses, sizeClasses[size].badge, className)}
+  {...rest}
+>
   <span
     class={twMerge(
       segmentClasses,
+      sizeClasses[size].segment,
       colorSchemeClasses[configuration.colorScheme],
       visibleExtensions.length ? 'rounded-l-full border-r-0' : 'rounded-full',
     )}
@@ -121,6 +137,7 @@
     <span
       class={twMerge(
         segmentClasses,
+        sizeClasses[size].segment,
         colorSchemeClasses[extension.colorScheme ?? configuration.colorScheme],
         index < visibleExtensions.length - 1 ? 'border-r-0' : 'rounded-r-full',
       )}
