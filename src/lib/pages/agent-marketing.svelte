@@ -15,7 +15,6 @@
   import integrationTenuo from '$lib/assets/agents/integration-tenuo.svg';
   import integrationTuningEngines from '$lib/assets/agents/integration-tuning-engines.svg';
   import integrationVercel from '$lib/assets/agents/integration-vercel.svg';
-  import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { Badge } from '$lib/io/badge';
@@ -240,11 +239,10 @@
   ];
 </script>
 
-<PageTitle title="Agents | Temporal" />
 <div
   class="agents-page surface-background min-h-full flex-none overflow-x-hidden"
 >
-  <header class="pb-4 text-base"><p>Agents</p></header>
+  <header class="pb-4 text-base"><h5>Agents</h5></header>
   <main class="w-full">
     <div
       class="grid w-full items-start gap-5 min-[1400px]:grid-cols-[minmax(0,1fr)_18.4375rem]"
