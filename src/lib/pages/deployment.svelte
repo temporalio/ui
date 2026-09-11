@@ -18,6 +18,7 @@
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
+  import { deploymentShowsConnectionStatus } from '$lib/utilities/connection-status';
   import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
@@ -27,7 +28,7 @@
     showConnectionStatus?: boolean;
   }
 
-  let { showInstancesLink = true, showConnectionStatus = false }: Props =
+  let { showInstancesLink = true, showConnectionStatus = true }: Props =
     $props();
 
   const { namespace } = $derived(page.params);
@@ -131,6 +132,8 @@
   {/if}
   {@const info = deployment.workerDeploymentInfo}
   {@const hasComputeConfig = deploymentHasComputeConfig(info)}
+  {@const connectionColumnVisible =
+    showConnectionStatus && deploymentShowsConnectionStatus(info)}
   {@const unversionedRampingPercentage =
     !info.routingConfig?.rampingDeploymentVersion &&
     info.routingConfig?.rampingVersionPercentage != null
@@ -178,7 +181,7 @@
           <th>{translate('deployments.build-id')}</th>
           <th>{translate('deployments.lifecycle')}</th>
           <th>{translate('deployments.compute')}</th>
-          {#if showConnectionStatus}
+          {#if connectionColumnVisible}
             <th>{translate('deployments.connection')}</th>
           {/if}
           <th>{translate('deployments.deployed')}</th>
@@ -193,7 +196,7 @@
             {namespace}
             {deploymentName}
             conflictToken={deployment.conflictToken}
-            {showConnectionStatus}
+            showConnectionStatus={connectionColumnVisible}
             onChange={reload}
             onValidationComplete={reload}
           />
