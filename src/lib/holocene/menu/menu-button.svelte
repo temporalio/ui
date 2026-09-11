@@ -87,41 +87,54 @@
   };
 </script>
 
-<Button
-  {id}
-  {disabled}
-  type="button"
-  onclick={handleClick}
-  onkeydown={handleKeyDown}
-  aria-haspopup={!disabled}
-  aria-controls={controls}
-  aria-expanded={$open}
-  aria-label={label}
-  {variant}
-  class={className}
-  {size}
-  active={$open}
-  disableTracking={true}
-  {...rest}
->
-  {@render leading?.()}
-  {#if children}
-    <div class="flex min-w-0 grow items-center">
-      {@render children()}
-    </div>
-  {/if}
-  {#if hasIndicator}
-    <div class="flex">
-      <IconChevronDown
-        class={merge('transition-transform', $open && 'rotate-180')}
+<span class="menu-button-anchor" data-menu-anchor={controls}>
+  <Button
+    {id}
+    {disabled}
+    type="button"
+    onclick={handleClick}
+    onkeydown={handleKeyDown}
+    aria-haspopup={!disabled}
+    aria-controls={controls}
+    aria-expanded={$open}
+    aria-label={label}
+    {variant}
+    class={className}
+    {size}
+    active={$open}
+    disableTracking={true}
+    {...rest}
+  >
+    {@render leading?.()}
+    {#if children}
+      <div class="flex min-w-0 grow items-center">
+        {@render children()}
+      </div>
+    {/if}
+    {#if hasIndicator}
+      <div class="flex">
+        <IconChevronDown
+          class={merge('transition-transform', $open && 'rotate-180')}
+        />
+      </div>
+    {/if}
+    {@render trailing?.()}
+    {#if count > 0}
+      <BadgeCount
+        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        value={count}
       />
-    </div>
-  {/if}
-  {@render trailing?.()}
-  {#if count > 0}
-    <BadgeCount
-      class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
-      value={count}
-    />
-  {/if}
-</Button>
+    {/if}
+  </Button>
+</span>
+
+<style>
+  .menu-button-anchor {
+    display: inline-flex;
+    max-width: 100%;
+  }
+
+  .menu-button-anchor:has(> :global(button.w-full)) {
+    width: 100%;
+  }
+</style>
