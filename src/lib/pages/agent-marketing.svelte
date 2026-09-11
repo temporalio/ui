@@ -261,11 +261,7 @@
           aria-labelledby="agents-heading"
         >
           <div class="mb-8 space-y-1 md:mb-12">
-            <h1 id="agents-heading">
-              <span class="block text-xl font-normal leading-7"
-                >Build Durable AI Agents on Temporal</span
-              >
-            </h1>
+            <h2 id="agents-heading">Build Durable AI Agents on Temporal</h2>
             <p class="text-sm leading-5 text-secondary">
               Orchestrate your workflows, AI apps, and agents across any models,
               tools, systems, and length of time.
@@ -277,11 +273,7 @@
               <Badge colorScheme="warning" text="EXPERIMENTAL"></Badge>
               <div class="mt-2 space-y-4">
                 <div class="space-y-1">
-                  <h2>
-                    <span class="block text-base font-normal leading-6"
-                      >Temporal Agent Harness</span
-                    >
-                  </h2>
+                  <h4>Temporal Agent Harness</h4>
                   <p class="text-base leading-6 text-secondary">
                     A durable agent harness and a matching session UI in one
                     repo. The harness adds durable turns, tool-approval
