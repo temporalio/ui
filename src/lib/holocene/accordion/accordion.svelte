@@ -4,7 +4,7 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Badge from '$lib/holocene/badge.svelte';
+  import { Badge } from '$lib/io/badge';
   import {
     IconChevronDown,
     IconChevronUp,
@@ -21,6 +21,7 @@
     Icon?: IconComponent;
     open?: boolean;
     expandable?: boolean;
+    disabled?: boolean;
     error?: string;
     onToggle?: () => void;
     'data-testid'?: string;
@@ -39,6 +40,7 @@
     Icon,
     open = $bindable(false),
     expandable = true,
+    disabled = false,
     error = '',
     onToggle,
     class: className = '',
@@ -59,16 +61,25 @@
 {#if expandable}
   <div
     data-track-container={title}
-    class={merge('surface-primary w-full border border-subtle', className)}
+    class={merge(
+      'w-full rounded border border-primary bg-surface-primary text-primary',
+      className,
+    )}
     {...rest}
   >
-    <div class="flex w-full flex-row items-center">
+    <div class="flex w-full flex-row items-center rounded-[inherit]">
       <button
         id="{id}-trigger"
         aria-expanded={open}
         aria-controls="{id}-content"
-        class="flex grow flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
+        class={merge(
+          'flex grow flex-col rounded-tl-[inherit] p-4 hover:bg-interactive-secondary-hover focus-visible:bg-surface-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary disabled:cursor-not-allowed disabled:opacity-disabled disabled:hover:bg-transparent',
+          !action && 'rounded-tr-[inherit]',
+          !open && 'rounded-bl-[inherit]',
+          !open && !action && 'rounded-br-[inherit]',
+        )}
         type="button"
+        {disabled}
         data-track-name="accordion"
         data-track-intent="toggle"
         data-track-text={title}
@@ -91,14 +102,16 @@
         </div>
         <p class="flex items-center">
           {#if error}
-            <Badge class="mr-2" type="danger">{error}</Badge>
+            <Badge class="mr-2" colorScheme="danger" text={error} />
           {/if}
           <span class="text-secondary">{subtitle}</span>
         </p>
       </button>
-      <div class="flex shrink-0 flex-row items-center gap-2 pr-2">
-        {@render action?.()}
-      </div>
+      {#if action}
+        <div class="flex shrink-0 flex-row items-center gap-2 pr-2">
+          {@render action()}
+        </div>
+      {/if}
     </div>
 
     <div
@@ -112,7 +125,10 @@
   </div>
 {:else}
   <div
-    class="surface-primary w-full border border-subtle p-4"
+    class={merge(
+      'w-full rounded border border-primary bg-surface-primary p-4 text-primary',
+      className,
+    )}
     data-track-container={title}
     {...rest}
   >
@@ -136,7 +152,7 @@
       </div>
       <p class="flex items-center">
         {#if error}
-          <Badge class="mr-2" type="danger">{error}</Badge>
+          <Badge class="mr-2" colorScheme="danger" text={error} />
         {/if}
         <span class="text-secondary">{subtitle}</span>
       </p>

@@ -138,6 +138,7 @@
     disabled={!markers.length && !$eventGroupFilter.length}
     hasIndicator
     size="sm"
+    variant="tertiary"
     class="border-l-0"
   >
     <span class="hidden text-sm md:block">

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import { getContext } from 'svelte';
+  import { getContext, tick } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -47,6 +47,12 @@
     getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT);
 
   const open = writable(false);
+  const searchId = `${id}-filter-search`;
+
+  const focusSearch = async () => {
+    await tick();
+    document.getElementById(searchId)?.focus();
+  };
 
   const getDefaultConditional = (type: SearchAttributeType) => {
     switch (type) {
@@ -105,27 +111,24 @@
     id="{id}-search-attribute-filter-button"
     controls="{id}-search-attribute-menu"
     LeadingIcon={IconFilter}
-    variant="secondary"
+    variant="tertiary"
     data-testid="add-filter-button"
     disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
-    onclick={() => (searchAttributeValue = '')}
+    onclick={(isOpen) => {
+      searchAttributeValue = '';
+      if (isOpen) focusSearch();
+    }}
     class="text-nowrap"
     size="xs"
   >
     Add Filter
   </MenuButton>
   <Menu id="{id}-search-attribute-menu" usePortal>
-    <MenuItem
-      class="p-0"
-      hoverable={false}
-      onclick={() => {
-        document.getElementById(`${id}-filter-search`)?.focus();
-      }}
-    >
+    <MenuItem class="p-0" hoverable={false} onclick={focusSearch}>
       <Input
         label={translate('common.search')}
         labelHidden
-        id="{id}-filter-search"
+        id={searchId}
         noBorder
         bind:value={searchAttributeValue}
         Icon={IconSearch}
@@ -133,7 +136,7 @@
         class="w-full"
       />
     </MenuItem>
-    <hr class="border-subtle" />
+    <hr class="border-primary" />
 
     {#each filteredOptions as { value, label, type } (value)}
       <MenuItem

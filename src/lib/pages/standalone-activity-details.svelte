@@ -11,12 +11,10 @@
   import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
   import PendingActivityState from '$lib/components/standalone-activities/pending-activity-state.svelte';
   import WorkflowCallback from '$lib/components/workflow/workflow-callback.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconRetry } from '$lib/io/icon';
-  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { BadgeCount } from '$lib/io/badge-count';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -56,22 +54,18 @@
   );
 </script>
 
-{#snippet activityExecutionAttemptsBadge(
+{#snippet activityExecutionAttempts(
   attempt: number,
   maximumAttempts: number | null,
-  lastFailure: ActivityExecutionInfo['lastFailure'],
 )}
-  {@const failed = attempt > 1 && !!lastFailure}
-  {@const badgeType = failed ? 'danger' : 'default'}
-
   <DetailListLabel class="flex items-center"
     >{translate('standalone-activities.attempt')}</DetailListLabel
   >
   <DetailListValue>
-    <Badge type={badgeType} class="flex items-center gap-2 text-xs">
-      <IconRetry class={failed ? 'text-red-400' : ''} />
-      <span>{attempt} of {formatMaximumAttempts(maximumAttempts)}</span>
-    </Badge>
+    <BadgeCount
+      value={attempt}
+      total={formatMaximumAttempts(maximumAttempts)}
+    />
 
     {#if maximumAttempts && !isClosed}
       <p class="ml-1 text-secondary">
@@ -113,10 +107,9 @@
                   runState={$activityExecution.info.runState}
                 />
               </DetailListValue>
-              {@render activityExecutionAttemptsBadge(
+              {@render activityExecutionAttempts(
                 $activityExecution.info.attempt ?? 0,
                 $activityExecution.info.retryPolicy?.maximumAttempts ?? null,
-                $activityExecution.info.lastFailure ?? null,
               )}
             </DetailList>
           </div>
@@ -189,11 +182,10 @@
             {#if isClosed}
               {#if $activityExecution.info.attempt != undefined}
                 {#if $activityExecution.info.attempt > 1}
-                  {@render activityExecutionAttemptsBadge(
+                  {@render activityExecutionAttempts(
                     $activityExecution.info.attempt,
                     $activityExecution.info.retryPolicy?.maximumAttempts ??
                       null,
-                    $activityExecution.info.lastFailure ?? null,
                   )}
                 {:else}
                   <DetailListLabel

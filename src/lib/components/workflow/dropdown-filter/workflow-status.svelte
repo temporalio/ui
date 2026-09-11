@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import {
     Menu,
@@ -113,7 +113,7 @@
         {#if status === 'All'}
           <Translate key="workflows.all-statuses" />
         {:else}
-          <WorkflowStatus {status} />
+          <WorkflowStatusBadge {status} />
         {/if}
       </MenuItem>
     {/each}

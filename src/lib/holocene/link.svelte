@@ -12,6 +12,7 @@
   interface Props extends Omit<HTMLAnchorAttributes, 'class' | 'onclick'> {
     href: string;
     active?: boolean;
+    disabled?: boolean;
     interactive?: boolean;
     newTab?: boolean;
     class?: string;
@@ -29,6 +30,7 @@
     class: className = '',
     href,
     active = false,
+    disabled = false,
     interactive = false,
     newTab = false,
     LeadingIcon,
@@ -52,23 +54,31 @@
 
   const handleClick = (event: MouseEvent) => {
     event.stopPropagation();
+
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+
     onLinkClick(event);
     onclick?.(event);
   };
 </script>
 
 <a
-  {href}
+  href={disabled ? undefined : href}
   target={newTab ? '_blank' : null}
   rel={newTab ? 'noreferrer noopener' : null}
   class={merge('link', hasIcon ? 'inline-flex' : 'inline', className)}
   class:active
+  class:disabled
   class:interactive
   class:light
   data-track-name="link"
   data-track-intent="navigate"
   data-track-text={text || '*textContent*'}
-  tabindex={href ? null : 0}
+  aria-disabled={disabled || undefined}
+  tabindex={disabled ? -1 : href ? null : 0}
   {...rest}
   onclick={handleClick}
 >
@@ -86,18 +96,22 @@
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 text-primary underline underline-offset-2 hover:text-brand focus-visible:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded-sm text-primary underline underline-offset-2 hover:text-brand focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary;
 
     &.active {
       @apply text-brand;
     }
 
+    &.disabled {
+      @apply pointer-events-none cursor-not-allowed opacity-disabled;
+    }
+
     &.interactive {
-      @apply text-white hover:text-indigo-200 focus-visible:text-indigo-200;
+      @apply text-white hover:text-brand focus-visible:text-white;
     }
 
     &.light {
-      @apply text-off-white hover:text-indigo-400;
+      @apply text-white hover:text-brand;
     }
   }
 
