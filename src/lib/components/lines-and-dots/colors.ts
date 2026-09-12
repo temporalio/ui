@@ -4,6 +4,8 @@ import type { WorkflowStatus } from '$lib/types/workflows';
 
 const DEFAULT_STROKE_COLOR = 'currentColor';
 
+export const EVENT_GROUP_COLOR = 'var(--color-content-brand)';
+
 const WORKFLOW_ACTION_COLOR_VARIABLES = {
   workflow: 'var(--color-action-workflow-workflow)',
   activity: 'var(--color-action-workflow-activity)',
@@ -53,7 +55,12 @@ export const getStatusStrokeColor = (
 ): string => (status && STATUS_STROKE_COLORS[status]) ?? DEFAULT_STROKE_COLOR;
 
 const CATEGORY_STROKE_COLORS: Record<
-  EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
+  | EventTypeCategory
+  | 'pending'
+  | 'retry'
+  | 'marker'
+  | 'command'
+  | 'event-group',
   string
 > = {
   timer: WORKFLOW_ACTION_COLOR_VARIABLES.timer,
@@ -62,6 +69,7 @@ const CATEGORY_STROKE_COLORS: Record<
   workflow: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
   marker: colorScales.neutral[1],
   command: colorScales.neutral[1],
+  'event-group': EVENT_GROUP_COLOR,
   'child-workflow': WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
   update: colorScales.persimmon[8],
   pending: colorScales['slate-blue'][8],
@@ -72,7 +80,13 @@ const CATEGORY_STROKE_COLORS: Record<
 };
 
 export const getCategoryStrokeColor = (
-  category: EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
+  category:
+    | EventTypeCategory
+    | 'pending'
+    | 'retry'
+    | 'marker'
+    | 'command'
+    | 'event-group',
 ): string => CATEGORY_STROKE_COLORS[category] ?? DEFAULT_STROKE_COLOR;
 
 export type DotColors = { readonly fill: string; readonly stroke: string };
@@ -174,7 +188,7 @@ export function strokeColor({
   delayed = false,
 }: {
   status?: WorkflowStatus | 'none';
-  category?: EventTypeCategory | 'pending' | 'retry';
+  category?: EventTypeCategory | 'pending' | 'retry' | 'event-group';
   classification?: EventClassification;
   delayed?: boolean;
 }): string {

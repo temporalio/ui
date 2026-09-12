@@ -5,8 +5,20 @@
     dotColors,
     getStatusStrokeColor,
   } from '$lib/components/lines-and-dots/colors';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import type { I18nKey } from '$lib/i18n';
+  import { translate } from '$lib/i18n/translate';
+  import Badge, { type BadgeColorScheme } from '$lib/io/badge/badge.svelte';
+  import { IconClock, IconClose } from '$lib/io/icon';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
+    isTimelineEventMarkerGroup,
+    type TimelineEventMarkerGroup,
+  } from '$lib/models/event-marker-groups';
+  import {
+    isLazyGroup,
     type LazyGroup,
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
@@ -16,6 +28,7 @@
   import { eventStatusFilter } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
@@ -38,11 +51,27 @@
   import { Viewport } from './viewport.svelte';
   import WorkflowRow from './workflow-row.svelte';
 
+  type TimelineGroup = LazyGroup | EventGroup;
+
+  const isEventMarkerGroup = (
+    group: TimelineGroup,
+  ): group is TimelineEventMarkerGroup =>
+    !isLazyGroup(group) && isTimelineEventMarkerGroup(group);
+
+  const toEventGroup = (group: TimelineGroup): EventGroup =>
+    isLazyGroup(group) ? materializeGroup(group) : group;
+
+  const eventCount = (group: TimelineGroup): number =>
+    isLazyGroup(group) ? group.eventCount : group.eventList.length;
+
   interface Props {
     workflow: WorkflowExecution;
     // Filtering, sorting and segment layout need no EventGroup, so only the
     // pooled rows below materialize one.
-    lazyGroups: LazyGroup[];
+    groups: TimelineGroup[];
+    timelineGroups?: TimelineGroup[];
+    selectedEventGroup?: TimelineEventMarkerGroup;
+    onCloseEventGroup?: () => void;
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
@@ -50,12 +79,16 @@
     totalExpectedEvents?: number;
     descMinId?: number;
     panelHeight?: number;
+    onSelectGroup?: (group: EventGroup) => void;
     onTimelineInit?: (timeline: Timeline) => void;
   }
 
   let {
     workflow,
-    lazyGroups,
+    groups,
+    timelineGroups,
+    selectedEventGroup,
+    onCloseEventGroup,
     readOnly = false,
     error = false,
     reverseSort = false,
@@ -63,10 +96,15 @@
     totalExpectedEvents = 0,
     descMinId = 0,
     panelHeight = $bindable(0),
+    onSelectGroup,
     onTimelineInit,
   }: Props = $props();
 
   const DOT_STROKE = 2; // dot border
+  const EVENT_GROUP_HEADER_MIN_HEIGHT = 32;
+  const EVENT_GROUP_HEADER_SPACING = 16;
+  const EVENT_GROUP_FOOTER_SPACING = 16;
+  const EVENT_GROUP_ROW_OVERFLOW = Math.max(0, (RADIUS * 3 - ROW_HEIGHT) / 2);
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
@@ -74,6 +112,8 @@
   const failedColor = dotColors('Failed').fill;
 
   let canvasWidth = $state(0);
+  let eventGroupHeaderEl = $state<HTMLDivElement | null>(null);
+  let eventGroupHeaderHeight = $state(EVENT_GROUP_HEADER_MIN_HEIGHT);
 
   // Width via ResizeObserver, not bind:clientWidth: the latter reads clientWidth
   // in every reactive flush, forcing a full sync layout of the tall canvas.
@@ -103,6 +143,22 @@
     };
   });
 
+  $effect(() => {
+    if (!selectedEventGroup || !eventGroupHeaderEl) {
+      eventGroupHeaderHeight = EVENT_GROUP_HEADER_MIN_HEIGHT;
+      return;
+    }
+
+    const observer = new ResizeObserver(([entry]) => {
+      eventGroupHeaderHeight = Math.max(
+        EVENT_GROUP_HEADER_MIN_HEIGHT,
+        Math.ceil(entry.contentRect.height),
+      );
+    });
+    observer.observe(eventGroupHeaderEl);
+    return () => observer.disconnect();
+  });
+
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
 
   let nowMs = $state(Date.now());
@@ -110,7 +166,7 @@
   const timeline = new Timeline({
     getFullEventHistory: () => $fullEventHistory,
     getWorkflow: () => workflow,
-    getLazyGroups: () => lazyGroups,
+    getLazyGroups: () => timelineGroups ?? groups,
     getCurrentTimeMs: () => nowMs,
     getLoading: () => loading,
     getShouldCollapseByDefault: () => $collapseIdleTime === 'on',
@@ -141,18 +197,28 @@
     }
   };
 
-  const filteredLazyGroups = $derived(
-    getFailedOrPendingGroups(lazyGroups, $eventStatusFilter),
-  );
+  const filteredGroups = $derived.by(() => {
+    if (!$eventStatusFilter) return groups;
+    if (groups.every(isEventMarkerGroup)) return groups;
+
+    const statusFilteredIds = new Set(
+      getFailedOrPendingGroups(groups, $eventStatusFilter).map(
+        (group) => group.id,
+      ),
+    );
+    return groups.filter(
+      (group) => isEventMarkerGroup(group) || statusFilteredIds.has(group.id),
+    );
+  });
 
   // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
   // group count, so subtracting the loaded count is correct.
   const pendingGroupCount = $derived.by(() => {
     if (!loading) return 0;
     if (!totalExpectedEvents) {
-      return filteredLazyGroups.length === 0 ? 50 : 0;
+      return filteredGroups.length === 0 ? 50 : 0;
     }
-    return Math.max(0, totalExpectedEvents - filteredLazyGroups.length);
+    return Math.max(0, totalExpectedEvents - filteredGroups.length);
   });
 
   // Rows mounted beyond the viewport, so edge rows survive small scrolls and
@@ -262,17 +328,28 @@
   );
 
   const groupIndexMap = $derived(
-    new Map(filteredLazyGroups.map((g, i) => [g.id, i])),
+    new Map(filteredGroups.map((g, i) => [g.id, i])),
   );
 
-  // Active group's index in filteredLazyGroups (-1 = none). Derived here so the row
+  const selectedEventGroupRowIds = $derived(
+    selectedEventGroup
+      ? new Set([
+          selectedEventGroup.id,
+          ...selectedEventGroup.lifecycleGroups.map((group) => group.id),
+        ])
+      : undefined,
+  );
+
+  // Active group's index in filteredGroups (-1 = none). Derived here so the row
   // pool doesn't subscribe to $activeGroups directly.
+  const activeGroupId = $derived($activeGroups[0]);
+
   const activeIdx = $derived(
-    $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
+    activeGroupId ? (groupIndexMap.get(activeGroupId) ?? -1) : -1,
   );
 
   $effect(() => {
-    if ($activeGroups.length === 0) panelHeight = 0;
+    if (!activeGroupId) panelHeight = 0;
   });
 
   // Open detail panel pushes rows below the active one down by panelHeight.
@@ -284,26 +361,42 @@
   }
 
   const descStart = $derived(
-    getDescStart(filteredLazyGroups, descMinId, loading, pendingGroupCount),
+    getDescStart(filteredGroups, descMinId, loading, pendingGroupCount),
   );
 
   const totalForY = $derived(
-    getTotalForY(filteredLazyGroups.length, pendingGroupCount, descStart),
+    getTotalForY(filteredGroups.length, pendingGroupCount, descStart),
+  );
+
+  const eventGroupExpansionHeight = $derived(
+    selectedEventGroup
+      ? EVENT_GROUP_ROW_OVERFLOW +
+          eventGroupHeaderHeight +
+          EVENT_GROUP_HEADER_SPACING
+      : 0,
   );
 
   // Widen the mount window by the panel's row span: shiftFor moves rows down but
   // getWindowBounds maps on the unshifted y, so without this they'd leave a blank.
   const windowOverscan = $derived(
-    OVERSCAN + Math.ceil(panelHeight / ROW_HEIGHT),
+    OVERSCAN +
+      Math.ceil((panelHeight + eventGroupExpansionHeight) / ROW_HEIGHT) +
+      Math.ceil(
+        (selectedEventGroup ? EVENT_GROUP_FOOTER_SPACING : 0) / ROW_HEIGHT,
+      ),
   );
 
   // Full drawn height (rows + axis + detail panel). The container is this tall and
   // scrolls with the page.
   const timelineHeight = $derived(
     Math.max(
-      ROW_HEIGHT * (filteredLazyGroups.length + pendingGroupCount + 2),
+      ROW_HEIGHT * (filteredGroups.length + pendingGroupCount + 2),
       120,
-    ) + panelHeight,
+    ) +
+      panelHeight +
+      (selectedEventGroup
+        ? eventGroupExpansionHeight + EVENT_GROUP_FOOTER_SPACING
+        : 0),
   );
   const AXIS_LABEL_ZONE = 150;
   const svgHeight = $derived(timelineHeight + AXIS_LABEL_ZONE);
@@ -401,7 +494,7 @@
     return getWindowBounds({
       bandTop,
       bandHeight,
-      total: filteredLazyGroups.length,
+      total: filteredGroups.length,
       overscan: windowOverscan,
       reverseSort,
       descStart,
@@ -418,7 +511,9 @@
   const poolSize = $derived.by(() => {
     const band = visibleBand;
     const bandHeight = band ? band[1] - band[0] : Math.min(svgHeight, 1000);
-    return Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
+    const desired =
+      Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
+    return Math.max(1, Math.min(filteredGroups.length, desired));
   });
 
   // Reuse the prior slot object when nothing changed, or every row re-renders.
@@ -426,27 +521,28 @@
   // run, so identity alone would miss a group that gained an event.
   type Slot = {
     index: number;
-    lazy: LazyGroup;
+    group: TimelineGroup;
     version: number | undefined;
   };
   let prevSlots: (Slot | null)[] = [];
   const pool = $derived.by(() => {
-    const total = filteredLazyGroups.length;
+    const total = filteredGroups.length;
     const slots: (Slot | null)[] = new Array(poolSize).fill(null);
     const end = Math.min(windowEnd, total, windowStart + poolSize);
     for (let index = windowStart; index < end; index++) {
       const slotIndex = index % poolSize;
-      const lazy = filteredLazyGroups[index];
+      const group = filteredGroups[index];
+      const version = isLazyGroup(group) ? group.version : undefined;
       const prev = prevSlots[slotIndex];
       if (
         prev &&
         prev.index === index &&
-        prev.lazy === lazy &&
-        prev.version === lazy.version
+        prev.group === group &&
+        prev.version === version
       ) {
         slots[slotIndex] = prev;
       } else {
-        slots[slotIndex] = { index, lazy, version: lazy.version };
+        slots[slotIndex] = { index, group, version };
       }
     }
     prevSlots = slots;
@@ -463,6 +559,161 @@
           reverseSort,
         }),
   );
+
+  const selectedEventGroupLayout = $derived.by(() => {
+    if (!selectedEventGroup || !selectedEventGroupRowIds) return undefined;
+
+    const headerIndex = groupIndexMap.get(selectedEventGroup.id) ?? -1;
+    if (headerIndex < 0) return undefined;
+
+    const headerTop =
+      getY(headerIndex) +
+      shiftFor(headerIndex) +
+      ROW_HEIGHT / 2 +
+      EVENT_GROUP_ROW_OVERFLOW;
+    let bottomIndex = headerIndex;
+    let bottom = headerTop + eventGroupHeaderHeight;
+
+    for (const lifecycleGroup of selectedEventGroup.lifecycleGroups) {
+      const index = groupIndexMap.get(lifecycleGroup.id);
+      if (index === undefined) continue;
+
+      if (reverseSort ? index < bottomIndex : index > bottomIndex) {
+        bottomIndex = index;
+      }
+
+      const belowHeader = reverseSort
+        ? index < headerIndex
+        : index > headerIndex;
+      const centerY =
+        getY(index) +
+        shiftFor(index) +
+        (belowHeader ? eventGroupExpansionHeight : 0);
+      bottom = Math.max(bottom, centerY + ROW_HEIGHT / 2 + 4);
+    }
+
+    if (
+      panelHeight > 0 &&
+      activeIdx >= 0 &&
+      selectedEventGroupRowIds.has(filteredGroups[activeIdx]?.id)
+    ) {
+      const activeBelowHeader = reverseSort
+        ? activeIdx < headerIndex
+        : activeIdx > headerIndex;
+      bottom = Math.max(
+        bottom,
+        getY(activeIdx) +
+          (activeBelowHeader ? eventGroupExpansionHeight : 0) +
+          1.33 * RADIUS +
+          panelHeight +
+          4,
+      );
+    }
+
+    return {
+      headerIndex,
+      bottomIndex,
+      bounds: {
+        headerTop,
+        outlineTop: headerTop + eventGroupHeaderHeight,
+        outlineHeight: Math.max(0, bottom - headerTop - eventGroupHeaderHeight),
+      },
+    };
+  });
+
+  function eventGroupHeaderShiftFor(i: number): number {
+    const headerIndex = selectedEventGroupLayout?.headerIndex ?? -1;
+    if (headerIndex < 0) return 0;
+    const belowHeader = reverseSort ? i < headerIndex : i > headerIndex;
+    return belowHeader ? eventGroupExpansionHeight : 0;
+  }
+
+  function eventGroupFooterShiftFor(i: number): number {
+    const bottomIndex = selectedEventGroupLayout?.bottomIndex ?? -1;
+    if (bottomIndex < 0) return 0;
+    const belowGroup = reverseSort ? i < bottomIndex : i > bottomIndex;
+    return belowGroup ? EVENT_GROUP_FOOTER_SPACING : 0;
+  }
+
+  function rowShiftFor(i: number): number {
+    return (
+      shiftFor(i) + eventGroupHeaderShiftFor(i) + eventGroupFooterShiftFor(i)
+    );
+  }
+
+  const selectedEventGroupBounds = $derived(selectedEventGroupLayout?.bounds);
+
+  const selectedEventGroupDuration = $derived(
+    formatEventGroupDuration({
+      group: selectedEventGroup,
+      endTime: workflow.endTime || nowMs,
+      includeMilliseconds: true,
+    }),
+  );
+
+  type EventGroupStatusBadge = {
+    key: string;
+    label: string;
+    colorScheme: BadgeColorScheme;
+  };
+
+  const selectedEventGroupStatusBadges = $derived.by(() => {
+    const summary = selectedEventGroup?.statusSummary;
+    if (!summary) return [];
+
+    const badges: EventGroupStatusBadge[] = [];
+    const addBadge = (
+      key: string,
+      labelKey: I18nKey,
+      count: number,
+      colorScheme: BadgeColorScheme,
+    ): void => {
+      if (!count) return;
+      badges.push({
+        key,
+        label: translate(labelKey, { count }),
+        colorScheme,
+      });
+    };
+
+    addBadge(
+      'failed',
+      'workflows.event-group-failed-count',
+      summary.failed,
+      'danger',
+    );
+    addBadge(
+      'timed-out',
+      'workflows.event-group-timed-out-count',
+      summary.timedOut,
+      'warning',
+    );
+    addBadge(
+      'retry',
+      'workflows.event-group-retry-count',
+      summary.retries,
+      'warning',
+    );
+    addBadge(
+      'terminated',
+      'workflows.event-group-terminated-count',
+      summary.terminated,
+      'danger',
+    );
+    addBadge(
+      'canceled',
+      'workflows.event-group-canceled-count',
+      summary.canceled,
+      'neutral',
+    );
+    addBadge(
+      'paused',
+      'workflows.event-group-paused-count',
+      summary.paused,
+      'warning',
+    );
+    return badges;
+  });
 
   // Border rails span the full timeline height so they meet the bottom axis.
   const lineTop = 0;
@@ -482,7 +733,7 @@
     {#snippet children({ endTime })}
       <div
         class="pointer-events-none sticky top-[120px]"
-        class:invisible={!!$activeGroups.length}
+        class:invisible={activeIdx >= 0}
       >
         <div class="flex w-full justify-between text-xs">
           <p class="w-60 -translate-x-24 rotate-90">
@@ -545,6 +796,17 @@
           </div>
         {/if}
 
+        {#if selectedEventGroupBounds?.outlineHeight}
+          <div
+            data-testid="event-group-row-backdrop"
+            class="pointer-events-none absolute rounded-b-lg border-x-2 border-b-2 border-brand bg-alpha-indigo-15"
+            style:left="{GUTTER - 8}px"
+            style:top="{selectedEventGroupBounds.outlineTop}px"
+            style:width="{canvasWidth - GUTTER * 2 + 16}px"
+            style:height="{selectedEventGroupBounds.outlineHeight}px"
+          ></div>
+        {/if}
+
         <!-- Keyed by slot index so Svelte reuses the <li>s in place; the <li>
            persists when its slot is null, only the inner row toggles.
            pointer-events-none so clicks fall through to the collapse toggles;
@@ -557,26 +819,85 @@
               style:height="{ROW_HEIGHT}px"
               style:contain="layout"
               style:transform={slot
-                ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + shiftFor(slot.index)}px)`
+                ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + rowShiftFor(slot.index)}px)`
                 : undefined}
             >
               {#if slot}
                 <TimelineGraphRow
-                  group={materializeGroup(slot.lazy)}
-                  eventCount={slot.lazy.eventCount}
+                  group={toEventGroup(slot.group)}
+                  eventCount={eventCount(slot.group)}
                   {canvasWidth}
                   project={projectX}
                   {readOnly}
+                  onSelect={onSelectGroup}
                 />
               {/if}
             </li>
           {/each}
         </ul>
 
+        {#if selectedEventGroup && selectedEventGroupBounds}
+          <div
+            data-testid="selected-event-group-header"
+            bind:this={eventGroupHeaderEl}
+            class="absolute z-10 box-content flex min-w-0 items-start justify-between bg-surface-secondary text-sm"
+            style:left="{GUTTER - 8}px"
+            style:top="{selectedEventGroupBounds.headerTop}px"
+            style:width="{canvasWidth - GUTTER * 2 + 16}px"
+            style:min-height="{EVENT_GROUP_HEADER_MIN_HEIGHT}px"
+          >
+            <div
+              class="flex min-h-8 min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1 px-2 py-1"
+            >
+              <PayloadSummary
+                value={selectedEventGroup.userMetadata?.summary}
+                fallback={selectedEventGroup.displayName}
+              >
+                {#snippet children(decodedValue)}
+                  <span class="min-w-0 max-w-full whitespace-normal break-words"
+                    >{decodedValue}</span
+                  >
+                {/snippet}
+              </PayloadSummary>
+              {#if selectedEventGroupDuration}
+                <span class="flex shrink-0 items-center gap-1">
+                  <IconClock />
+                  {selectedEventGroupDuration}
+                </span>
+              {/if}
+              {#if selectedEventGroupStatusBadges.length}
+                {#each selectedEventGroupStatusBadges as badge (badge.key)}
+                  <Badge
+                    text={badge.label}
+                    colorScheme={badge.colorScheme}
+                    class="shrink-0"
+                  />
+                {/each}
+              {/if}
+              <span class="shrink-0">
+                {translate('workflows.event-group-event-count', {
+                  count: selectedEventGroup.eventList.length,
+                })}
+              </span>
+            </div>
+            <div class="flex shrink-0 items-center gap-4">
+              <Button
+                data-testid="close-event-group"
+                variant="ghost"
+                size="xs"
+                onclick={onCloseEventGroup}
+              >
+                {translate('common.close')}
+                <IconClose />
+              </Button>
+            </div>
+          </div>
+        {/if}
+
         {#if loading && pendingGroupCount > 0}
           {@const rectY = getPendingBlockY({
             descStart,
-            filteredGroupsLength: filteredLazyGroups.length,
+            filteredGroupsLength: filteredGroups.length,
             reverseSort,
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
@@ -591,18 +912,23 @@
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
         {#if !readOnly && activeIdx >= 0}
-          {@const activeLazyGroup = filteredLazyGroups[activeIdx]}
-          {#if activeLazyGroup}
-            {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
-            <GroupDetailsRow
-              y={panelY}
-              group={materializeGroup(activeLazyGroup)}
-              {canvasWidth}
-              endTime={workflow?.endTime ? endTime : nowMs}
-              onHeight={(height) => {
-                panelHeight = height;
-              }}
-            />
+          {@const activeGroup = filteredGroups[activeIdx]}
+          {#if activeGroup}
+            {@const panelY =
+              getY(activeIdx) +
+              eventGroupHeaderShiftFor(activeIdx) +
+              1.33 * RADIUS}
+            {#if !isEventMarkerGroup(activeGroup)}
+              <GroupDetailsRow
+                y={panelY}
+                group={toEventGroup(activeGroup)}
+                {canvasWidth}
+                endTime={workflow?.endTime ? endTime : nowMs}
+                onHeight={(height) => {
+                  panelHeight = height;
+                }}
+              />
+            {/if}
           {/if}
         {/if}
       </div>
@@ -625,6 +951,10 @@
   .canvas :global(.tl-line) {
     border-radius: 9999px;
     background-color: var(--tl-line-color);
+  }
+
+  .canvas :global(.tl-line--square) {
+    border-radius: 0;
   }
 
   .canvas :global(.tl-line--gradient) {

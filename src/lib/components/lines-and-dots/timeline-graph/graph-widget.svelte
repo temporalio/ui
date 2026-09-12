@@ -9,6 +9,11 @@
 
   import TimelineGraph from './timeline-graph.svelte';
 
+  type TimelineSnapshot = {
+    workflow: WorkflowExecution;
+    groups: EventGroups;
+  };
+
   interface Props {
     namespace: string;
     workflowId?: string | null;
@@ -29,10 +34,10 @@
     class: className = '',
   }: Props = $props();
 
-  let snapshot = $state<{ workflow: WorkflowExecution; groups: EventGroups }>();
+  let snapshot = $state<TimelineSnapshot>();
 
   const getWorkflowAndEventHistory = async () => {
-    if (!workflowId || !runId) return;
+    if (!namespace || !workflowId || !runId) return;
 
     const [{ workflow }, history] = await Promise.all([
       fetchWorkflow({ namespace, workflowId, runId }),
@@ -75,7 +80,7 @@
   >
     <TimelineGraph
       workflow={snapshot.workflow}
-      lazyGroups={snapshot.groups}
+      groups={snapshot.groups}
       readOnly
     />
   </div>

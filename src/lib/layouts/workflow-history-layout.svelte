@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -28,12 +29,21 @@
     IconFeed,
   } from '$lib/io/icon';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
+  import { eventMatchesEventGroupFilter } from '$lib/models/event-marker-groups';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import {
+    lazyGroupMatchesEventGroupFilter,
+    materializeGroup,
+  } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
-  import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
+  import {
+    eventCategoryFilter,
+    eventGroupFilter,
+    eventTypeFilter,
+  } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
     WorkflowEvent,
@@ -49,6 +59,9 @@
   const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
 
   const { namespace } = $derived(page.params);
+  const workflowExecutionKey = $derived(
+    `${page.params.namespace}:${page.params.workflow}:${page.params.run}`,
+  );
   const { workflow } = $derived($workflowRun);
   const pendingActivities = $derived(workflow?.pendingActivities ?? []);
   const pendingNexusOperations = $derived(
@@ -59,6 +72,7 @@
     const urlParams = parseEventFilterParams(page.url);
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
+    $eventGroupFilter = urlParams.eventGroups;
   });
 
   $effect(() => {
@@ -75,7 +89,10 @@
   // The feed view needs full groups, read lazily in tableProps below.
   const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
   const bufferEvents = $derived(eventBuffer.events);
+  const markerDescriptors = $derived(eventBuffer.eventMarkerDescriptors);
   let updating = $derived(!historyCtx.fetchComplete);
+
+  const selectedMarkerKeys = $derived(new Set($eventGroupFilter));
 
   onMount(() => {
     historyCtx.resume();
@@ -87,6 +104,9 @@
     return bufferLazyGroups.filter((g) => {
       if (!active.includes(g.category)) return false;
       if (cats && cats.length && !cats.includes(g.category)) return false;
+      if (!lazyGroupMatchesEventGroupFilter(g, selectedMarkerKeys)) {
+        return false;
+      }
       return true;
     });
   });
@@ -98,6 +118,7 @@
       const cat = (ev as WorkflowEvent).category;
       if (!active.includes(cat)) return false;
       if (cats && cats.length && !cats.includes(cat)) return false;
+      if (!eventMatchesEventGroupFilter(ev, selectedMarkerKeys)) return false;
       return true;
     });
   });
@@ -132,9 +153,17 @@
       : {
           compact: false as const,
           items: reverseSort
-            ? [...pendingNexusOperations, ...pendingActivities, ...history]
-            : [...history, ...pendingActivities, ...pendingNexusOperations],
-          groups: eventBuffer.groupsWithoutWorkflowTasks,
+            ? [
+                ...(selectedMarkerKeys.size ? [] : pendingNexusOperations),
+                ...(selectedMarkerKeys.size ? [] : pendingActivities),
+                ...history,
+              ]
+            : [
+                ...history,
+                ...(selectedMarkerKeys.size ? [] : pendingActivities),
+                ...(selectedMarkerKeys.size ? [] : pendingNexusOperations),
+              ],
+          groups: filteredLazyGroups.map(materializeGroup),
         },
   );
 
@@ -241,6 +270,9 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
+        {#key workflowExecutionKey}
+          <EventGroupFilter markers={markerDescriptors} />
+        {/key}
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"

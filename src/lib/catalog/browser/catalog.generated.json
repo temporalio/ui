@@ -1,5 +1,5 @@
 {
-  "sourceHash": "d7f2464b31a33221a79aee1b28edb90c8bf32a6aaf8d0bd990a1cf6a95c984ee",
+  "sourceHash": "4dbc6793d9d29d96db813f060a6cfa5198c672c4459f910c8eba14937449a6bc",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -351,6 +351,68 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "longActivity"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "mars-rover-dust-storm-recovery",
+      "title": "Event Groups example",
+      "description": "Mars rover dust-storm recovery with explicit, signal, and update Event Group Markers.",
+      "capabilityTags": [
+        "event-groups",
+        "activities",
+        "child-workflows",
+        "signals",
+        "updates",
+        "retries",
+        "cancellations"
+      ],
+      "expectedEvidence": [
+        "Three labeled Event Groups separate concurrent communications, science-payload, and surface-mission recovery paths.",
+        "Relay-link acquisition fails twice because of dust interference before succeeding on its third attempt.",
+        "A running sample-spectrometer activity is canceled to conserve power during the storm.",
+        "The dedicated orbiter-relay child workflow is terminated after direct contact is restored.",
+        "The ground-contact signal groups contact recording, telemetry validation, and downlink resumption inside the broader communications group.",
+        "The traverse-route update groups hazard assessment, route application, and waypoint upload inside the broader mission-planning group.",
+        "The surface-mission Event Group remains pending for at least two minutes, showing the running-state treatment in the timeline."
+      ],
+      "input": {
+        "defaultValue": [120],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Observation window in seconds",
+              "description": "The mission remains open for at least two minutes so its pending Event Group is easy to inspect.",
+              "type": "integer",
+              "minimum": 120,
+              "maximum": 900
+            }
+          ],
+          "items": false,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "setupMarkdown": "Event Groups require a Temporal Server version that supports Event Group Markers. The example automatically sends its Mission Control signal and update and terminates its relay-reservation child workflow by connecting back to the same namespace with the Catalog connection environment.",
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "marsRoverDustStormRecovery"
       },
       "source": { "id": "oss", "label": "OSS" }
     },
