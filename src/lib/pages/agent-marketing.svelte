@@ -250,14 +250,14 @@
 <div
   class="agents-page surface-background min-h-full flex-none overflow-x-hidden"
 >
-  <header class="pb-4 text-base"><p>Agents</p></header>
+  <header class="pb-4 text-base font-medium"><p>Agents</p></header>
   <div class="w-full">
     <div
       class="grid w-full items-start gap-5 min-[1400px]:grid-cols-[minmax(0,1fr)_18.4375rem]"
     >
       <div class="min-w-0 space-y-5">
         <section
-          class="border-subtle bg-primary overflow-hidden rounded-lg border p-6 md:p-8"
+          class="border-subtle overflow-hidden rounded-lg border bg-surface-primary p-6 md:p-8"
           aria-labelledby="agents-heading"
         >
           <div class="mb-8 space-y-1 md:mb-12">
@@ -351,7 +351,7 @@
 
         <div class="grid gap-5 md:grid-cols-[1.049fr_1fr]">
           <section
-            class="border-subtle bg-primary flex min-h-[20.75rem] flex-col rounded-lg border p-6 md:p-8"
+            class="border-subtle flex min-h-[20.75rem] flex-col rounded-lg border bg-surface-primary p-6 md:p-8"
             aria-labelledby="skills-heading"
           >
             <h2 id="skills-heading">Temporal Skills</h2>
@@ -382,7 +382,7 @@
           </section>
 
           <section
-            class="border-subtle bg-primary min-h-[20.75rem] rounded-lg border p-6 md:p-8"
+            class="border-subtle min-h-[20.75rem] rounded-lg border bg-surface-primary p-6 md:p-8"
             aria-labelledby="cookbooks-heading"
           >
             <h2 id="cookbooks-heading">Cookbooks and Demos</h2>
@@ -410,7 +410,7 @@
       <div class="space-y-5 self-start min-[1400px]:sticky">
         <aside
           id="integrations"
-          class="border-subtle bg-primary rounded-lg border p-6 md:p-8"
+          class="border-subtle rounded-lg border bg-surface-primary p-6 md:p-8"
           aria-labelledby="integrations-heading"
         >
           <h2 id="integrations-heading">Integrations</h2>
@@ -432,7 +432,7 @@
                     alt=""
                   />
                 </span>
-                <span class="min-w-0 truncate text-xs leading-4"
+                <span class="min-w-0 truncate text-sm leading-5"
                   >{integration.name}</span
                 >
               </Link>
@@ -441,12 +441,12 @@
         </aside>
 
         <section
-          class="border-subtle bg-primary rounded-lg border p-6 md:p-8"
+          class="border-subtle rounded-lg border bg-surface-primary p-6 md:p-8"
           aria-labelledby="blog-heading"
         >
           <h2 id="blog-heading">Blog</h2>
-          <article>
-            <p class="mt-4 text-base leading-6 text-secondary">
+          <article class="mt-4 flex flex-col items-start gap-4">
+            <p class="text-base leading-6 text-secondary">
               Read practical guidance and ideas for building reliable agents
               with durable execution.
             </p>
