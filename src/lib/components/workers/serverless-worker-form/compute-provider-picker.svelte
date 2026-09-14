@@ -112,9 +112,13 @@
       {#snippet labelBadge()}
         <span>
           {#if option.disabled && option.disabledReason}
-            <Badge text={option.disabledReason} />
+            <Badge size="sm" text={option.disabledReason} />
           {:else if releaseStageLabel(option)}
-            <Badge text={releaseStageLabel(option)} colorScheme="accent" />
+            <Badge
+              size="sm"
+              text={releaseStageLabel(option)}
+              colorScheme="accent"
+            />
           {/if}
         </span>
       {/snippet}
