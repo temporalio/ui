@@ -27,6 +27,12 @@ export const definition = defineScenario({
     dynamicConfig: {
       // Without this the server rejects any compute config outright.
       'workercontroller.enabled': true,
+      // The provider allowlist. It used to mean "restrict to these" and an
+      // unset value allowed everything; it now means "only these", and an
+      // unset value enables nothing at all. Leaving it out makes the server
+      // report that it could not instantiate the provider, which reads like
+      // the provider is missing rather than switched off.
+      'workercontroller.compute_providers.enabled': ['aws-agentcore'],
       // Use the ambient AWS credentials rather than assuming a role, so a
       // local run needs no IAM role, trust policy, or external ID. Cloud
       // always requires them; this is a local-only shortcut.

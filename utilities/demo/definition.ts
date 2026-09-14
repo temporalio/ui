@@ -19,7 +19,14 @@ export const STAGES = [
 
 export type Stage = (typeof STAGES)[number];
 
-const dynamicConfigValue = z.union([z.boolean(), z.number(), z.string()]);
+// Arrays included: some settings are lists, and the server takes them as JSON
+// on the same flag, so they need no special handling beyond being allowed here.
+const dynamicConfigValue = z.union([
+  z.boolean(),
+  z.number(),
+  z.string(),
+  z.array(z.string()),
+]);
 
 const serverSchema = z
   .object({
