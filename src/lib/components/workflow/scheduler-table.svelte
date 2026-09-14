@@ -7,18 +7,24 @@
   import { translate } from '$lib/i18n/translate';
   import { routeForSchedule } from '$lib/utilities/route-for';
 
-  export let scheduleId: string;
-  export let namespace: string;
+  interface Props {
+    scheduleId: string;
+    namespace: string;
+  }
+
+  let { scheduleId, namespace }: Props = $props();
 </script>
 
 <Table class="w-full">
-  <caption class="sr-only" slot="caption"
-    >{translate('schedules.schedule')}</caption
-  >
-  <TableHeaderRow slot="headers">
-    <th>{translate('schedules.schedule')}</th>
-  </TableHeaderRow>
-  <TableRow class="hover:text-blue-700 hover:underline">
+  {#snippet caption()}
+    <caption class="sr-only">{translate('schedules.schedule')}</caption>
+  {/snippet}
+  {#snippet headers()}
+    <TableHeaderRow>
+      <th scope="col">{translate('schedules.schedule')}</th>
+    </TableHeaderRow>
+  {/snippet}
+  <TableRow class="hover:text-brand hover:underline">
     <td>
       <Link
         href={routeForSchedule({

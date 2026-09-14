@@ -60,7 +60,13 @@ try {
       if (data.type === 'ERROR') {
         const error: StrictError = {
           filename: data.filename,
-          start: data.start,
+          // svelte-check's machine-verbose output uses 0-indexed LSP
+          // positions; convert to 1-indexed to match editors and GitHub
+          // inline-comment line numbers (Danger's `fail(msg, file, line)`).
+          start: {
+            line: data.start.line + 1,
+            character: data.start.character + 1,
+          },
           message: data.message.split('\n')[0], // Only first line
         };
 

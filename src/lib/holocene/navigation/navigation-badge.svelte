@@ -1,42 +1,58 @@
 <script lang="ts">
-  import type { IconName } from '../icon';
-  import Icon from '../icon/icon.svelte';
+  import type { Snippet } from 'svelte';
 
-  export let icon: IconName;
-  export let link: string;
-  export let tooltip: string = '';
-  export let external = false;
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import type { IconComponent } from '$lib/io/icon';
 
-  let className: string = '';
-  export { className as class };
+  interface Props {
+    Icon: IconComponent;
+    link: string;
+    tooltip?: string;
+    external?: boolean;
+    class?: string;
+    'data-testid'?: string;
+    children?: Snippet;
+  }
 
-  $: rel = external ? 'noopener noreferrer' : '';
-  $: target = external ? '_blank' : '';
+  let {
+    Icon,
+    link,
+    tooltip = '',
+    external = false,
+    class: className = '',
+    'data-testid': testId,
+    children,
+  }: Props = $props();
+
+  const rel = $derived(external ? 'noopener noreferrer' : '');
+  const target = $derived(external ? '_blank' : '');
 </script>
 
-<div
-  class="relative {className}"
-  role="listitem"
-  data-testid={$$props['data-testid']}
->
-  <a
-    href={link}
-    {rel}
-    {target}
-    class="relative flex cursor-pointer items-center border border-white/10 bg-white/5 text-white hover:bg-white hover:text-black group-data-[nav=closed]:p-1 group-data-[nav=open]:px-2.5 group-data-[nav=open]:py-2"
+<div class="relative {className}" role="listitem" data-testid={testId}>
+  <Tooltip
+    text={tooltip}
+    right
+    class="block"
+    tooltipClass="text-white ml-4 group-data-[nav=open]:hidden"
   >
-    <div
-      class="flex h-6 w-6 items-center whitespace-nowrap after:absolute after:left-[calc(100%_+_1.5rem)] after:top-0 after:hidden after:h-8 after:items-center after:rounded-md after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=open]:hidden group-data-[nav=open]:justify-start group-data-[nav=closed]:justify-center group-data-[nav=closed]:hover:after:flex"
-      data-tooltip={tooltip}
+    <a
+      href={link}
+      {rel}
+      {target}
+      class="relative flex cursor-pointer items-center border border-primary bg-surface-overlay-primary text-primary hover:bg-interactive-tertiary-hover group-data-[nav=closed]:p-1 group-data-[nav=open]:px-2.5 group-data-[nav=open]:py-2"
     >
-      {#if icon}
-        <Icon name={icon} />
-      {/if}
-    </div>
-    <div
-      class="text-center group-data-[nav=open]:visible group-data-[nav=closed]:hidden"
-    >
-      <slot />
-    </div>
-  </a>
+      <div
+        class="flex h-6 w-6 items-center whitespace-nowrap group-data-[nav=open]:hidden group-data-[nav=closed]:justify-center"
+      >
+        {#if Icon}
+          <Icon />
+        {/if}
+      </div>
+      <div
+        class="text-center group-data-[nav=open]:visible group-data-[nav=closed]:hidden"
+      >
+        {@render children?.()}
+      </div>
+    </a>
+  </Tooltip>
 </div>

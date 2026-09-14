@@ -4,18 +4,23 @@
   import Drawer from '$lib/holocene/drawer.svelte';
   import Shortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconKeyboard } from '$lib/io/icon';
 
-  export let open = false;
-  export let onOpen: () => void;
-  export let onClose: () => void;
+  type Props = {
+    open?: boolean;
+    onOpen: () => void;
+    onClose: () => void;
+  };
+
+  let { open = false, onOpen, onClose }: Props = $props();
 </script>
 
 <div class="shortcut-key-button">
   <Button
     size="sm"
     variant="secondary"
-    leadingIcon="keyboard"
-    on:click={onOpen}
+    LeadingIcon={IconKeyboard}
+    onclick={onOpen}
   />
 </div>
 <Drawer
@@ -26,7 +31,7 @@
 >
   <DrawerContent title={translate('common.keyboard-shortcuts')}>
     <div
-      class="grid grid-cols-1 gap-8 text-slate-500 md:grid-cols-2 xl:grid-cols-4 dark:text-slate-400"
+      class="grid grid-cols-1 gap-8 text-tertiary md:grid-cols-2 xl:grid-cols-4"
     >
       <div class="cell">
         {translate('common.next-page')}

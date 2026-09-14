@@ -4,7 +4,7 @@ import type {
   DescribeNamespaceResponse,
   ListNamespacesResponse,
 } from '$lib/types';
-import type { Settings } from '$lib/types/global';
+import type { NextPageToken, Replace, Settings } from '$lib/types/global';
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -13,7 +13,12 @@ import {
   toNamespaceStateReadable,
 } from '$lib/utilities/screaming-enums';
 
-const emptyNamespace = {
+type PaginatedNamespacesResponse = Replace<
+  ListNamespacesResponse,
+  { nextPageToken?: NextPageToken; namespaces?: DescribeNamespaceResponse[] }
+>;
+
+const emptyNamespace: { namespaces: DescribeNamespaceResponse[] } = {
   namespaces: [],
 };
 
@@ -21,17 +26,22 @@ const toNamespaceDetails = (
   namespace: DescribeNamespaceResponse,
 ): DescribeNamespaceResponse => {
   if (namespace.config) {
-    namespace.config.historyArchivalState = toNamespaceArchivalStateReadable(
-      namespace.config.historyArchivalState,
-    );
-    namespace.config.visibilityArchivalState = toNamespaceArchivalStateReadable(
-      namespace.config.visibilityArchivalState,
-    );
+    if (namespace.config.historyArchivalState != null) {
+      namespace.config.historyArchivalState = toNamespaceArchivalStateReadable(
+        namespace.config.historyArchivalState,
+      );
+    }
+    if (namespace.config.visibilityArchivalState != null) {
+      namespace.config.visibilityArchivalState =
+        toNamespaceArchivalStateReadable(
+          namespace.config.visibilityArchivalState,
+        );
+    }
   }
 
-  if (namespace.namespaceInfo) {
+  if (namespace.namespaceInfo && namespace.namespaceInfo.state != null) {
     namespace.namespaceInfo.state = toNamespaceStateReadable(
-      namespace.namespaceInfo?.state,
+      namespace.namespaceInfo.state,
     );
   }
   return namespace;
@@ -50,23 +60,24 @@ export async function fetchNamespaces(
 
   try {
     const route = routeForApi('namespaces');
-    const results = await paginated(async (token: string) =>
-      requestFromAPI<ListNamespacesResponse>(route, {
-        request,
-        token,
-        onError: () =>
-          toaster.push({
-            variant: 'error',
-            message: 'Unable to fetch namespaces',
-          }),
-      }),
+    const results = await paginated(
+      async (token?: NextPageToken) =>
+        (await requestFromAPI<PaginatedNamespacesResponse>(route, {
+          request,
+          token: token as string,
+          onError: () =>
+            toaster.push({
+              variant: 'error',
+              message: 'Unable to fetch namespaces',
+            }),
+        })) ?? {},
     );
 
     const _namespaces: DescribeNamespaceResponse[] = (results?.namespaces ?? [])
       .filter(
         (namespace: DescribeNamespaceResponse) =>
           showTemporalSystemNamespace ||
-          namespace.namespaceInfo.name !== 'temporal-system',
+          namespace.namespaceInfo?.name !== 'temporal-system',
       )
       .map(toNamespaceDetails);
 

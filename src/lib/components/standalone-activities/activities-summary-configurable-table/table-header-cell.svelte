@@ -10,6 +10,6 @@
   const label = $derived(column.label);
 </script>
 
-<th data-testid="activities-summary-table-header-cell-{label}">
+<th scope="col" data-testid="activities-summary-table-header-cell-{label}">
   {label}
 </th>

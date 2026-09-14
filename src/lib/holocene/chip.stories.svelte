@@ -1,20 +1,23 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
   import type { ComponentProps } from 'svelte';
 
   import Chip from '$lib/holocene/chip.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Chip',
     component: Chip,
     args: {
       intent: 'default',
       button: false,
+      disabled: false,
       removeButtonLabel: 'Remove',
     },
     argTypes: {
       intent: { control: 'select', options: ['warning', 'default'] },
       button: { control: 'boolean' },
+      disabled: { control: 'boolean' },
       removeButtonLabel: {
         name: 'Aria label for remove button',
         control: 'text',
@@ -23,23 +26,25 @@
         },
       },
     },
-  } satisfies Meta<ComponentProps<typeof Chip>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
-  <Chip {...args} onremove={action('remove')} onclick={action('click')}>
-    ross.edfort@temporal.io
-  </Chip>
-</Template>
+{#snippet template(args: ComponentProps<typeof Chip>)}
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Chip {...args} onremove={action('remove')} onclick={action('click')}>
+      ross.edfort@temporal.io
+    </Chip>
+  </div>
+{/snippet}
 
 <Story name="Default" />
 
 <Story name="Warning" args={{ intent: 'warning' }} />
+
+<Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Warning Disabled" args={{ intent: 'warning', disabled: true }} />
 
 <Story name="Default (as Button)" args={{ button: true }} />
 

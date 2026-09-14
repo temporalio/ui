@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     Menu,
     MenuButton,
@@ -12,6 +11,7 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import { IconFilter } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
@@ -21,8 +21,8 @@
     updateQueryParamsFromFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
 
-  $: statusFilters = $workflowFilters.filter(
-    (f) => f.attribute === 'ExecutionStatus',
+  const statusFilters = $derived(
+    $workflowFilters.filter((f) => f.attribute === 'ExecutionStatus'),
   );
 
   function mapStatusToFilter(value: string): SearchAttributeFilter {
@@ -82,7 +82,7 @@
       }
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, true);
+    updateQueryParamsFromFilter(page.url, $workflowFilters, true);
   };
 </script>
 
@@ -94,18 +94,18 @@
   >
     {translate('common.status')}
     {#snippet trailing()}
-      <Icon name="filter" />
+      <IconFilter />
     {/snippet}
   </MenuButton>
   <Menu keepOpen id="execution-status-filter">
     {#each workflowStatusFilters as status (status)}
-      <MenuItem onclick={() => onStatusClick(status)}>
+      <MenuItem onclick={() => onStatusClick(status ?? '')}>
         {#snippet leading()}
           <Checkbox
-            label={status}
+            label={status ?? ''}
             labelHidden
             tabindex={-1}
-            on:click={() => onStatusClick(status)}
+            onclick={() => onStatusClick(status ?? '')}
             checked={statusFilters.some((filter) => filter.value === status) ||
               (!statusFilters.length && status === 'All')}
           />
@@ -113,7 +113,7 @@
         {#if status === 'All'}
           <Translate key="workflows.all-statuses" />
         {:else}
-          <WorkflowStatus {status} />
+          <WorkflowStatusBadge {status} />
         {/if}
       </MenuItem>
     {/each}

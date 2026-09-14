@@ -1,3 +1,4 @@
+import type { Payloads } from '$lib/types';
 import type {
   WorkflowEvent,
   WorkflowExecutionCanceledEvent,
@@ -13,11 +14,10 @@ import {
   isWorkflowExecutionCompletedEvent,
   isWorkflowExecutionContinuedAsNewEvent,
 } from './is-event-type';
-import { stringifyWithBigInt } from './parse-with-big-int';
 
 export type WorkflowInputAndResults = {
-  input: string;
-  results: string;
+  input: Payloads | null | undefined;
+  results: Payloads | CompletionEventAttributes | null | undefined;
   contAsNew: boolean;
 };
 
@@ -28,6 +28,8 @@ type CompletionEvent =
   | WorkflowExecutionTimedOutEvent
   | WorkflowExecutionCanceledEvent
   | WorkflowExecutionTerminatedEvent;
+
+export type CompletionEventAttributes = CompletionEvent['attributes'];
 
 const completedEventTypes = [
   'WorkflowExecutionFailed',
@@ -67,12 +69,12 @@ const getEventResult = (event: CompletionEvent) => {
 export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   eventHistory: WorkflowEvent[],
 ): WorkflowInputAndResults => {
-  let input: string;
-  let results: string;
+  let input: Payloads | null | undefined;
+  let results: Payloads | CompletionEventAttributes | null | undefined;
   let contAsNew = false;
 
-  let workflowStartedEvent: WorkflowExecutionStartedEvent;
-  let workflowCompletedEvent: CompletionEvent;
+  let workflowStartedEvent: WorkflowExecutionStartedEvent | undefined;
+  let workflowCompletedEvent: CompletionEvent | undefined;
 
   for (const event of eventHistory) {
     if (isStartedEvent(event)) {
@@ -85,15 +87,14 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   }
 
   if (workflowStartedEvent) {
-    input = stringifyWithBigInt(
+    input =
       workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input ??
-        null,
-    );
+      null;
   }
 
   if (workflowCompletedEvent) {
     contAsNew = isWorkflowExecutionContinuedAsNewEvent(workflowCompletedEvent);
-    results = stringifyWithBigInt(getEventResult(workflowCompletedEvent));
+    results = getEventResult(workflowCompletedEvent);
   }
 
   return {

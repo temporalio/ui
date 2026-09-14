@@ -1,64 +1,41 @@
-import { get } from 'svelte/store';
-
-import { page } from '$app/stores';
-
 import { fetchRawEvents } from '$lib/services/events-service';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import type { HistoryEvent } from '$lib/types/events';
-import type { Settings } from '$lib/types/global';
 
 import {
-  cloneAllPotentialPayloadsWithCodec,
-  decodePayloadAttributes,
+  decodeEventAttributesForExport,
+  parsePayloadAttributes,
+  type PotentiallyDecodable,
 } from './decode-payload';
-import {
-  getCodecEndpoint,
-  getCodecIncludeCredentials,
-  getCodecPassAccessToken,
-} from './get-codec';
 import { stringifyWithBigInt } from './parse-with-big-int';
 
 const decodePayloads = async (
   event: HistoryEvent,
-  settings: Settings,
   decodeSetting: DownloadEventHistorySetting,
 ) => {
-  const endpoint = getCodecEndpoint(settings);
-  const passAccessToken = getCodecPassAccessToken(settings);
-  const includeCredentials = getCodecIncludeCredentials(settings);
-  const settingsWithLocalConfig = {
-    ...settings,
-    codec: {
-      ...settings?.codec,
-      endpoint,
-      passAccessToken,
-      includeCredentials,
-    },
-  };
-
-  // Keep download in payload structure
-  const returnDataOnly = false;
   try {
-    const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
+    const convertedAttributes = await decodeEventAttributesForExport(
       event,
-      get(page).params.namespace,
-      settingsWithLocalConfig,
       decodeSetting,
-      returnDataOnly,
     );
 
-    return decodePayloadAttributes(convertedAttributes, returnDataOnly);
+    return parsePayloadAttributes(
+      convertedAttributes as PotentiallyDecodable,
+      false,
+    );
   } catch {
     return event;
   }
 };
 
+type DecodedHistoryEvent = Awaited<ReturnType<typeof decodePayloads>>;
+
 function download(
-  events: HistoryEvent[],
+  events: DecodedHistoryEvent[],
   fileName: string,
   contentType: string,
 ) {
-  const content = stringifyWithBigInt({ events }, null, 2);
+  const content = stringifyWithBigInt({ events }, undefined, 2);
   const a = document.createElement('a');
   const file = new Blob([content], { type: contentType });
   a.href = URL.createObjectURL(file);
@@ -70,13 +47,11 @@ export const exportHistory = async ({
   namespace,
   workflowId,
   runId,
-  settings,
   decodeSetting,
 }: {
   namespace: string;
   workflowId: string;
   runId: string;
-  settings: Settings;
   decodeSetting: DownloadEventHistorySetting;
 }) => {
   try {
@@ -90,13 +65,9 @@ export const exportHistory = async ({
     if (decodeSetting === 'encoded') {
       download(rawEvents, `${runId}/events.json`, 'text/plain');
     } else {
-      const decodedEvents = [];
+      const decodedEvents: DecodedHistoryEvent[] = [];
       for (const event of rawEvents) {
-        const decodedEvent = await decodePayloads(
-          event,
-          settings,
-          decodeSetting,
-        );
+        const decodedEvent = await decodePayloads(event, decodeSetting);
         decodedEvents.push(decodedEvent);
       }
       download(decodedEvents, `${runId}/events.json`, 'text/plain');

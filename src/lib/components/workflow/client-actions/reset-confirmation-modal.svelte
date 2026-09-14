@@ -19,17 +19,21 @@
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+  }
 
-  let error = '';
-  let loading = false;
+  let { open = $bindable(), workflow, namespace }: Props = $props();
+
+  let error = $state('');
+  let loading = $state(false);
   let eventId: Writable<string> = writable('');
-  let reason: string;
-  let includeSignals = true;
-  let excludeSignals = false;
-  let excludeUpdates = false;
+  let reason = $state('');
+  let includeSignals = $state(true);
+  let excludeSignals = $state(false);
+  let excludeUpdates = $state(false);
 
   const identity = getIdentity();
 
@@ -67,7 +71,7 @@
       hideResetModal();
     } catch (err) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;
@@ -83,12 +87,14 @@
   bind:error
   bind:open
   {loading}
-  on:confirmModal={reset}
-  on:cancelModal={hideResetModal}
+  onConfirmModal={reset}
+  onCancelModal={hideResetModal}
   confirmDisabled={!$eventId}
 >
-  <h3 slot="title">{translate('workflows.reset-modal-title')}</h3>
-  <svelte:fragment slot="content">
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.reset-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
     <div class="flex w-full flex-col gap-4">
       <Select
         data-testid="workflow-reset-event-id-select"
@@ -127,10 +133,9 @@
       <Input
         id="reset-reason"
         bind:value={reason}
-        label={translate('common.reason')}
-        labelHidden
+        label={translate('common.reason-optional')}
         placeholder={translate('common.reason-placeholder')}
       />
     </div>
-  </svelte:fragment>
+  {/snippet}
 </Modal>

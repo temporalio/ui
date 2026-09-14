@@ -1,4 +1,4 @@
-import type { IconName } from '$lib/holocene/icon';
+import type { IconComponent } from '$lib/io/icon';
 
 export type NamespaceListItem = {
   namespace: string;
@@ -74,7 +74,8 @@ export interface NetworkError {
 export type Settings = {
   auth: {
     enabled: boolean;
-    options: string[];
+    options: string[] | null;
+    redirectToProvider: boolean;
   };
   baseUrl: string;
   codec: {
@@ -100,7 +101,9 @@ export type Settings = {
   batchActionsDisabled: boolean;
   activityCommandsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
+  navCollapsedByDefault: boolean;
   feedbackURL: string;
+  disableNewsFetch: boolean;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;
@@ -146,8 +149,9 @@ export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
 export type NavLinkItem = {
   href: string;
-  icon: IconName;
+  Icon: IconComponent;
   label: string;
+  testId?: string;
   tooltip?: string;
   external?: boolean;
   enabled?: boolean;

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -8,8 +9,6 @@
   import { decodeEventHistory } from '$lib/stores/events';
   import type { WorkflowEvents } from '$lib/types/events';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-
-  import PayloadDecoder from '../event/payload-decoder.svelte';
 
   interface Props {
     events?: WorkflowEvents;
@@ -19,7 +18,9 @@
   let { events = [], decode }: Props = $props();
 
   let index = $state(1);
-  let rawEvent = $derived(fromEventToRawEvent(events[index - 1]));
+  let rawEvent = $derived(
+    events[index - 1] ? fromEventToRawEvent(events[index - 1]) : {},
+  );
 
   function handleKeydown(event: KeyboardEvent) {
     switch (event.code) {
@@ -45,9 +46,9 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 <div class="flex gap-4 max-sm:flex-col">
-  <div class="bg-gray-100 flex w-full gap-4">
+  <div class="flex w-full gap-4 bg-surface-tertiary">
     <RangeInput
       label={translate('common.event')}
       labelHidden
@@ -66,10 +67,9 @@
         aria-label={translate('common.previous')}
       >
         <span
-          class="arrow arrow-left border-b-transparent border-t-transparent dark:border-r-white"
-          class:border-r-slate-900={index !== 1}
-          class:border-r-slate-100={index === 1}
-          class:dark:border-r-slate-800={index === 1}
+          class="arrow arrow-left border-b-transparent border-t-transparent"
+          class:border-r-content-primary={index !== 1}
+          class:border-r-content-tertiary={index === 1}
         ></span>
       </button>
       <button
@@ -81,10 +81,9 @@
         aria-label={translate('common.next')}
       >
         <span
-          class="arrow arrow-right border-b-transparent border-t-transparent dark:border-l-white"
-          class:border-l-slate-100={index === events.length}
-          class:border-l-slate-900={index !== events.length}
-          class:dark:border-l-slate-800={index === events.length}
+          class="arrow arrow-right border-b-transparent border-t-transparent"
+          class:border-l-content-tertiary={index === events.length}
+          class:border-l-content-primary={index !== events.length}
         ></span>
       </button>
     </div>
@@ -93,22 +92,16 @@
 </div>
 <div class="min-h-screen py-4">
   {#if $decodeEventHistory && events.length > 0}
-    {#key [index, $decodeEventHistory]}
-      <PayloadDecoder value={rawEvent}>
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            testId="event-history-json"
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
-    {/key}
+    <PayloadCodeBlock
+      value={rawEvent}
+      label={translate('common.json')}
+      testId="event-history-json"
+    />
   {:else}
     {#key index}
       <CodeBlock
         content={stringifyWithBigInt(rawEvent, undefined, 2)}
+        label={translate('common.json')}
         testId="event-history-json"
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -126,7 +119,7 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-slate-400;
+    @apply cursor-not-allowed text-tertiary;
   }
 
   .arrow {

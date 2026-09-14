@@ -5,15 +5,18 @@
   import { importEvents } from '$lib/stores/import-events';
   import type { WorkflowEvent } from '$lib/types/events';
 
-  $: sortedEvents =
+  const sortedEvents = $derived(
     $eventFilterSort === 'descending'
       ? [...$importEvents].reverse()
-      : $importEvents;
-  $: filteredEvents = sortedEvents.filter((event: WorkflowEvent) => {
-    if ($eventCategoryFilter)
-      return $eventCategoryFilter.includes(event.category);
-    return event;
-  });
+      : $importEvents,
+  );
+  const filteredEvents = $derived(
+    sortedEvents.filter((event: WorkflowEvent) => {
+      if ($eventCategoryFilter)
+        return $eventCategoryFilter.includes(event.category);
+      return event;
+    }),
+  );
 </script>
 
 <EventSummaryTable items={filteredEvents} />

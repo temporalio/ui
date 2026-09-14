@@ -38,6 +38,7 @@ auth:
 | Field                | Type     | Description                                                                                                                    |
 | -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `enabled`            | boolean  | Enable or disable authentication                                                                                               |
+| `redirectToProvider` | boolean  | Skip the Temporal UI login page and redirect unauthenticated users directly to the configured OIDC provider                    |
 | `maxSessionDuration` | duration | Maximum session duration before forced re-login (e.g., `8h`, `24h`, `168h`). Set to `0` or omit for unlimited session duration |
 | `providers`          | array    | List of auth providers (currently only the first is used)                                                                      |
 

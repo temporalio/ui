@@ -1,16 +1,26 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import type { ComponentProps } from 'svelte';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { IconTemporal } from '$lib/io/icon';
 
-  import MenuButton, {
-    type Props as MenuButtonProps,
-  } from './menu-button.svelte';
+  import { shouldNotBeTransparent } from '../test-utilities';
+
+  import MenuButton from './menu-button.svelte';
   import MenuContainer from './menu-container.svelte';
   import MenuItem from './menu-item.svelte';
-  import Menu, { type Props as MenuProps } from './menu.svelte';
+  import Menu from './menu.svelte';
 
-  export const meta = {
+  type MenuArgs = {
+    variant?: ComponentProps<typeof MenuButton>['variant'];
+    keepOpen?: ComponentProps<typeof Menu>['keepOpen'];
+    position?: ComponentProps<typeof Menu>['position'];
+    usePortal?: ComponentProps<typeof Menu>['usePortal'];
+    menuElement?: ComponentProps<typeof Menu>['menuElement'];
+  };
+
+  const { Story } = defineMeta({
     title: 'Menu',
     component: MenuButton,
     subcomponents: { MenuButton, MenuContainer, MenuItem },
@@ -18,6 +28,7 @@
       variant: 'primary',
       keepOpen: false,
       position: 'left',
+      usePortal: false,
     },
     argTypes: {
       variant: {
@@ -34,6 +45,10 @@
         control: 'inline-radio',
         options: ['left', 'right', 'top-left', 'top-right'],
       },
+      usePortal: {
+        name: 'Use Portal',
+        control: 'boolean',
+      },
       menuElement: {
         name: 'Menu Element',
         table: {
@@ -41,26 +56,28 @@
         },
       },
     },
-  } satisfies Meta<Pick<MenuButtonProps, 'variant'> | MenuProps>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import { shouldNotBeTransparent } from '../test-utilities';
-</script>
-
-<Template let:args let:context>
-  <div class="flex items-center justify-center">
+{#snippet template(args: MenuArgs, context: StoryContext<MenuArgs>)}
+  <div
+    class="flex items-center justify-center border border-primary bg-surface-primary p-4 text-primary"
+  >
     <MenuContainer>
       <MenuButton hasIndicator variant={args.variant} controls={context.id}>
         {#snippet leading()}
-          <Icon name="temporal-logo" />
+          <IconTemporal />
         {/snippet}
         Menu
       </MenuButton>
-      <Menu id={context.id} class="w-64" {...args}>
+      <Menu
+        id={context.id}
+        class="w-64"
+        keepOpen={args.keepOpen}
+        position={args.position}
+        usePortal={args.usePortal}
+      >
         <MenuItem href="https://temporal.io" newTab onclick={action('click')}>
           Link
         </MenuItem>
@@ -79,7 +96,7 @@
       </Menu>
     </MenuContainer>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Primary" args={{ variant: 'primary' }} />
 

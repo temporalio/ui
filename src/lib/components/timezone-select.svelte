@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { type Unsubscriber, writable } from 'svelte/store';
+  import { SvelteDate } from 'svelte/reactivity';
+  import { writable } from 'svelte/store';
 
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -18,6 +18,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock, IconSearch } from '$lib/io/icon';
   import {
     hourFormat,
     relativeTime,
@@ -37,8 +38,12 @@
     Timezones,
   } from '$lib/utilities/timezone';
 
-  export let position: 'left' | 'right' = 'right';
-  export let size: ButtonStyles['size'] = 'md';
+  interface Props {
+    position?: 'left' | 'right';
+    size?: ButtonStyles['size'];
+  }
+
+  let { position = 'right', size = 'md' }: Props = $props();
 
   const open = writable(false);
   const localTime = getLocalTime();
@@ -50,21 +55,22 @@
     { label: translate('common.local'), value: BASE_TIME_FORMAT_OPTIONS.LOCAL },
   ];
 
-  let search = '';
-  let intervalId: number | undefined = undefined;
-  let currentDate = new Date().setMilliseconds(0);
-  let openUnsubscriber: Unsubscriber | undefined;
+  let search = $state('');
+  let currentDate = new SvelteDate();
+  currentDate.setMilliseconds(0);
 
-  $: filteredOptions = !search
-    ? TimezoneOptions
-    : TimezoneOptions.filter(({ abbr, value, zones }) => {
-        const searchValue = search.trim().toLowerCase();
-        return (
-          value.toLowerCase().includes(searchValue) ||
-          abbr?.toLowerCase().includes(searchValue) ||
-          zones?.some((zone) => zone.toLowerCase().includes(searchValue))
-        );
-      });
+  const filteredOptions = $derived(
+    !search
+      ? TimezoneOptions
+      : TimezoneOptions.filter(({ abbr, value, zones }) => {
+          const searchValue = search.trim().toLowerCase();
+          return (
+            value.toLowerCase().includes(searchValue) ||
+            abbr?.toLowerCase().includes(searchValue) ||
+            zones?.some((zone) => zone.toLowerCase().includes(searchValue))
+          );
+        }),
+  );
 
   const selectTimezone = (value: string) => {
     if ($relativeTime && value !== BASE_TIME_FORMAT_OPTIONS.LOCAL)
@@ -88,17 +94,29 @@
     $hourFormat = format;
   };
 
-  $: timezone = Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat;
+  const timezone = $derived(Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat);
 
-  openUnsubscriber = open.subscribe((isOpen) => {
-    if (isOpen) {
-      currentDate = new Date().setMilliseconds(0);
+  $effect(() => {
+    let intervalId: number;
+    const clearInterval = () => {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
+    };
+
+    const updateCurrentDate = () => {
+      currentDate.setTime(Date.now());
+      currentDate.setMilliseconds(0);
+    };
+
+    if ($open) {
+      updateCurrentDate();
       intervalId = window.setInterval(() => {
-        currentDate = new Date().setMilliseconds(0);
+        updateCurrentDate();
       }, 1000);
-    } else {
-      window.clearInterval(intervalId);
     }
+
+    return clearInterval;
   });
 
   onMount(() => {
@@ -107,15 +125,11 @@
       $relativeTime = true;
     }
   });
-
-  onDestroy(() => {
-    openUnsubscriber?.();
-  });
 </script>
 
 <MenuContainer
   {open}
-  class="text-sm font-medium text-primary max-md:w-full max-md:justify-items-end"
+  class="text-sm text-primary max-md:w-full max-md:justify-items-end"
 >
   <MenuButton
     label={translate('common.timezone', { timezone })}
@@ -126,7 +140,7 @@
     data-testid="timezones-menu-button"
   >
     {#snippet leading()}
-      <Icon name="clock" />
+      <IconClock />
     {/snippet}
     {timezone}
   </MenuButton>
@@ -141,7 +155,7 @@
       id="timezone-search"
       noBorder
       bind:value={search}
-      icon="search"
+      Icon={IconSearch}
       placeholder={translate('common.search')}
     />
 
@@ -153,7 +167,7 @@
         id="relative-toggle"
         bind:checked={$relativeTime}
         labelPosition="left"
-        on:change={handleRelativeToggle}
+        onchange={handleRelativeToggle}
         data-testid="timezones-relative-toggle"
       />
     </div>
@@ -167,22 +181,22 @@
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'short'}
-            on:click={() => setTimestampFormat('short')}>Short</ToggleButton
+            onclick={() => setTimestampFormat('short')}>Short</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'medium'}
-            on:click={() => setTimestampFormat('medium')}>Default</ToggleButton
+            onclick={() => setTimestampFormat('medium')}>Default</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'long'}
-            on:click={() => setTimestampFormat('long')}>Long</ToggleButton
+            onclick={() => setTimestampFormat('long')}>Long</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'iso'}
-            on:click={() => setTimestampFormat('iso')}>ISO</ToggleButton
+            onclick={() => setTimestampFormat('iso')}>ISO</ToggleButton
           >
         </ToggleButtons>
       </div>
@@ -196,19 +210,19 @@
             size="xs"
             active={$hourFormat === 'system'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('system')}>System</ToggleButton
+            onclick={() => setHourFormat('system')}>System</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '12'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('12')}>12-hour</ToggleButton
+            onclick={() => setHourFormat('12')}>12-hour</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '24'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('24')}>24-hour</ToggleButton
+            onclick={() => setHourFormat('24')}>24-hour</ToggleButton
           >
         </ToggleButtons>
       </div>

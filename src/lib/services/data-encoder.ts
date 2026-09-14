@@ -1,13 +1,12 @@
-import { get } from 'svelte/store';
-
-import { page } from '$app/stores';
+import { page } from '$app/state';
 
 import { translate } from '$lib/i18n/translate';
 import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
-import type { NetworkError, Settings } from '$lib/types/global';
+import type { Payload, Payloads } from '$lib/types';
+import type { NetworkError } from '$lib/types/global';
 import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 import {
   getCodecEndpoint,
@@ -19,22 +18,48 @@ import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 export type PotentialPayloads = { payloads: unknown[] };
 
+export const NO_CODEC_SERVER_CONFIGURED_ERROR = new Error(
+  'No codec server configured',
+);
+
+const delay = (ms: number, signal?: AbortSignal): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(signal.reason);
+      return;
+    }
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(signal.reason);
+    });
+  });
+};
+
 export async function codeServerRequest({
   type,
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
+  signal,
 }: {
-  type: 'decode' | 'encode';
+  type: 'decode' | 'encode' | 'download';
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
-}): Promise<PotentialPayloads> {
+  signal?: AbortSignal;
+}): Promise<Payloads> {
+  const settings = page.data.settings;
+  const namespace = page.params.namespace;
   const endpoint = getCodecEndpoint(settings);
+
+  if (!endpoint) {
+    // Codec payloads are opaque JSON (unknown[]) crossing the REST boundary;
+    // downstream consumers treat them as proto Payloads.
+    if (type === 'decode') return payloads as unknown as Payloads;
+    throw NO_CODEC_SERVER_CONFIGURED_ERROR;
+  }
+
   const passAccessToken = getCodecPassAccessToken(settings);
   const includeCredentials = getCodecIncludeCredentials(settings);
 
-  const headers = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'X-Namespace': namespace,
   };
@@ -51,7 +76,7 @@ export async function codeServerRequest({
       }
     } else {
       setLastDataEncoderFailure();
-      return payloads;
+      return payloads as unknown as Payloads;
     }
   }
 
@@ -61,66 +86,97 @@ export async function codeServerRequest({
         credentials: 'include' as RequestCredentials,
         method: 'POST',
         body: stringifyWithBigInt(payloads),
+        signal,
       }
     : {
         headers,
         method: 'POST',
         body: stringifyWithBigInt(payloads),
+        signal,
       };
 
-  const decoderResponse: Promise<PotentialPayloads> = fetch(
-    endpoint + `/${type}`,
-    requestOptions,
-  )
-    .then((response) => {
+  // explicitly not constructing a new URL here because it
+  // drops any route prefix the user has configured, eg localhost:8080/codec-server
+  const url = `${endpoint}/${type}?preserveStorageRefs=true`;
+
+  const delays = [0, 500, 1000];
+  let lastErr: unknown;
+
+  for (let attempt = 0; attempt < delays.length; attempt++) {
+    if (attempt > 0) {
+      try {
+        await delay(delays[attempt], signal);
+      } catch {
+        break;
+      }
+    }
+    if (signal?.aborted) break;
+
+    try {
+      const response = await fetch(url, requestOptions);
+
       if (response.ok === false) {
-        throw {
+        const err = {
           statusCode: response.status,
           statusText: response.statusText,
           response,
           message: translate(`common.${type}-failed`),
         } as NetworkError;
-      } else {
-        return response.json();
-      }
-    })
-    .then((response) => {
-      setLastDataEncoderSuccess();
 
-      return response;
-    })
-    .catch((err: unknown) => {
-      setLastDataEncoderFailure(err);
-      if (type === 'decode') {
-        return payloads;
-      } else {
+        if (response.status >= 400 && response.status < 500) {
+          setLastDataEncoderFailure(err);
+          if (type === 'decode') return payloads as unknown as Payloads;
+          throw err;
+        }
+
+        lastErr = err;
+        continue;
+      }
+
+      const data = await response.json();
+      setLastDataEncoderSuccess();
+      return data;
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'statusCode' in err &&
+        (err as { statusCode: number }).statusCode >= 400 &&
+        (err as { statusCode: number }).statusCode < 500
+      ) {
         throw err;
       }
-    });
+      if (signal?.aborted) break;
+      lastErr = err;
+    }
+  }
 
-  return decoderResponse;
+  setLastDataEncoderFailure(lastErr);
+  if (type === 'decode') return payloads as unknown as Payloads;
+  throw lastErr;
 }
 
 export async function decodePayloadsWithCodec({
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
 }: {
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
-}): Promise<PotentialPayloads> {
-  return codeServerRequest({ type: 'decode', payloads, namespace, settings });
+}): Promise<Payloads> {
+  return codeServerRequest({ type: 'decode', payloads });
 }
 
 export async function encodePayloadsWithCodec({
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
 }: {
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
-}): Promise<PotentialPayloads> {
-  return codeServerRequest({ type: 'encode', payloads, namespace, settings });
+}): Promise<Payloads> {
+  return codeServerRequest({ type: 'encode', payloads });
+}
+
+export async function downloadExternalPayloadWithCodec(
+  payload: Payload,
+): Promise<Payloads> {
+  return codeServerRequest({
+    type: 'download',
+    payloads: { payloads: [payload] },
+  });
 }

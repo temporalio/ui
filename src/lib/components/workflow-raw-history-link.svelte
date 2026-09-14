@@ -1,25 +1,28 @@
 <script lang="ts">
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconExternalLinkOptical } from '$lib/io/icon';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { parameters } from '$lib/stores/events';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
   const { namespace, workflowId, runId } = $parameters;
 
-  $: href = routeForEventHistory({
-    namespace,
-    workflow: workflowId,
-    run: runId,
-  });
+  const href = $derived(
+    routeForEventHistory({
+      namespace,
+      workflow: workflowId,
+      run: runId,
+    }),
+  );
 
-  $: jsonHref = href + '.json';
+  const jsonHref = $derived(href + '.json');
 </script>
 
 {#if !$isCloud}
   <div class="flex items-center space-x-4">
     <Link
-      icon="external-link"
+      LeadingIcon={IconExternalLinkOptical}
       class="whitespace-nowrap"
       href={jsonHref}
       newTab={true}

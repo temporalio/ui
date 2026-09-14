@@ -1,11 +1,10 @@
-<script context="module">
+<script module>
   export const dateParameter = 'time-format';
 </script>
 
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     Menu,
     MenuButton,
@@ -14,6 +13,7 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock } from '$lib/io/icon';
   import type {
     EventSortOrder,
     EventSortOrderOptions,
@@ -22,9 +22,9 @@
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  export let compact: boolean;
+  let { compact }: { compact: boolean } = $props();
 
-  let sortOptions: EventSortOrderOptions = [
+  const sortOptions: EventSortOrderOptions = [
     { label: translate('events.sort-ascending'), option: 'ascending' },
     { label: translate('events.sort-descending'), option: 'descending' },
   ];
@@ -34,7 +34,7 @@
     updateQueryParameters({
       parameter: 'sort',
       value: option,
-      url: $page.url,
+      url: page.url,
     });
   };
 
@@ -46,11 +46,13 @@
     }
   };
 
-  $: value = getDateFilterValue({
-    compact,
-    sortOrder: $eventFilterSort,
-    showElapsed: $eventShowElapsed,
-  });
+  const value = $derived(
+    getDateFilterValue({
+      compact,
+      sortOrder: $eventFilterSort,
+      showElapsed: $eventShowElapsed,
+    }),
+  );
 </script>
 
 <MenuContainer>
@@ -61,7 +63,7 @@
     controls="event-date-filter-menu"
     data-testid="event-date-filter-button"
   >
-    <Icon class="md:hidden" name="clock" />
+    <IconClock class="md:hidden" />
     <span class="max-md:hidden">{translate('common.date-and-time')}</span>
   </MenuButton>
   <Menu class="w-80" id="event-date-filter-menu">

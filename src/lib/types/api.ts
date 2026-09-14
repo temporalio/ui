@@ -43,7 +43,11 @@ export type ParameterlessAPIRoutePath =
   | 'user'
   | 'nexus-endpoints'
   | 'namespaces';
-export type WorkerAPIRoutePath = 'worker-task-reachability';
+export type WorkerAPIRoutePath =
+  | 'worker-task-reachability'
+  | 'workers'
+  | 'workers.count'
+  | 'worker';
 export type SchedulesAPIRoutePath = 'schedules' | 'schedules.count';
 export type ScheduleAPIRoutePath =
   | 'schedule'
@@ -52,15 +56,35 @@ export type ScheduleAPIRoutePath =
 export type SearchAttributesRoutePath = 'search-attributes';
 export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
-export type WorkerDeploymentAPIRoutePath = 'worker-deployment';
-export type WorkerDeploymentVersionAPIRoutePath = 'worker-deployment-version';
+export type WorkerDeploymentAPIRoutePath =
+  | 'worker-deployment'
+  | 'worker-deployment-set-current-version'
+  | 'worker-deployment-set-ramping-version';
+export type WorkerDeploymentVersionAPIRoutePath =
+  | 'worker-deployment-version'
+  | 'worker-deployment-version-compute-config'
+  | 'worker-deployment-version-validate-compute-config';
+export type WorkerDeploymentVersionsAPIRoutePath = 'worker-deployment-versions';
 export type StandaloneActivitiesAPIRoutePath =
   | 'standalone-activities'
   | 'standalone-activities.count';
 export type StandaloneActivityAPIRoutePath =
   | 'standalone-activity'
   | 'standalone-activity.cancel'
-  | 'standalone-activity.terminate';
+  | 'standalone-activity.terminate'
+  | 'standalone-activity.pause'
+  | 'standalone-activity.unpause'
+  | 'standalone-activity.reset'
+  | 'standalone-activity.update-options';
+
+export type StandaloneNexusOperationsAPIRoutePath =
+  | 'standalone-nexus-operations'
+  | 'standalone-nexus-operations.count';
+export type StandaloneNexusOperationAPIRoutePath =
+  | 'standalone-nexus-operation'
+  | 'standalone-nexus-operation.poll'
+  | 'standalone-nexus-operation.cancel'
+  | 'standalone-nexus-operation.terminate';
 
 export type APIRoutePath =
   | ParameterlessAPIRoutePath
@@ -81,10 +105,13 @@ export type APIRoutePath =
   | WorkerDeploymentsAPIRoutePath
   | WorkerDeploymentAPIRoutePath
   | WorkerDeploymentVersionAPIRoutePath
+  | WorkerDeploymentVersionsAPIRoutePath
   | StandaloneActivityAPIRoutePath
-  | StandaloneActivitiesAPIRoutePath;
+  | StandaloneActivitiesAPIRoutePath
+  | StandaloneNexusOperationAPIRoutePath
+  | StandaloneNexusOperationsAPIRoutePath;
 
-export type APIRouteParameters = {
+export interface APIRouteParameters {
   namespace: string;
   workflowId: string;
   scheduleId: string;
@@ -96,10 +123,13 @@ export type APIRouteParameters = {
   signalName: string;
   updateName: string;
   activityId: string;
+  operationId: string;
   endpointId: string;
   deploymentName: string;
+  buildId: string;
   version: string;
-};
+  workerInstanceKey: string;
+}
 
 export type StandaloneActivitiesParameters = Pick<
   APIRouteParameters,
@@ -181,5 +211,14 @@ export type WorkerDeploymentRouteParameters = Pick<
 
 export type WorkerDeploymentVersionRouteParameters = Pick<
   APIRouteParameters,
-  'namespace' | 'version'
+  'namespace' | 'deploymentName' | 'buildId'
+>;
+
+export type StandaloneNexusOperationsParameters = Pick<
+  APIRouteParameters,
+  'namespace'
+>;
+export type StandaloneNexusOperationParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'operationId'
 >;

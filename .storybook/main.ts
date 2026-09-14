@@ -4,18 +4,11 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(ts|svelte)'],
   addons: [
     '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
-    {
-      name: '@storybook/addon-svelte-csf',
-      options: {
-        // REMOVE WHEN STORIES ARE UPGRADED TO NEW CSF SYNTAX
-        legacyTemplate: true,
-      },
-    },
+    '@storybook/addon-svelte-csf',
     '@storybook/addon-a11y',
     '@storybook/addon-themes',
     '@chromatic-com/storybook',
+    '@storybook/addon-docs',
   ],
   framework: '@storybook/sveltekit',
 };

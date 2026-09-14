@@ -14,8 +14,15 @@ const mockTaskQueues = {
   taskQueueStatus: null,
 };
 
-export const mockTaskQueuesApi = (page: Page) => {
+const mockEmptyTaskQueues = {
+  pollers: [],
+  taskQueueStatus: null,
+};
+
+export const mockTaskQueuesApi = (page: Page, empty = false) => {
   return page.route(TASK_QUEUES_API, (route) => {
-    return route.fulfill({ json: mockTaskQueues });
+    return route.fulfill({
+      json: empty ? mockEmptyTaskQueues : mockTaskQueues,
+    });
   });
 };

@@ -1,16 +1,12 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import type { IterableEvent, Payload, WorkflowEvent } from '$lib/types/events';
-import type { Settings } from '$lib/types/global';
+import type { Payload } from '$lib/types';
+import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
 
 import {
-  cloneAllPotentialPayloadsWithCodec,
-  decodePayloadAttributes,
+  decodeEventAttributes,
+  parsePayloadAttributes,
+  type PotentiallyDecodable,
 } from './decode-payload';
-import {
-  getCodecEndpoint,
-  getCodecIncludeCredentials,
-  getCodecPassAccessToken,
-} from './get-codec';
 import {
   formatSummaryValue,
   getActivityType,
@@ -31,49 +27,32 @@ export type DecodedLocalActivity = {
 
 export type LocalActivityDecodeOptions = {
   namespace: string;
-  settings: Settings;
 };
 
 export const decodeLocalActivity = async (
   event: IterableEvent,
-  options: LocalActivityDecodeOptions,
 ): Promise<SummaryAttribute | undefined> => {
   if (!('eventType' in event) || !isLocalActivityMarkerEvent(event)) {
     return undefined;
   }
 
-  const { namespace, settings } = options;
-
-  const codecSettings = {
-    ...settings,
-    codec: {
-      ...settings?.codec,
-      endpoint: getCodecEndpoint(settings),
-      passAccessToken: getCodecPassAccessToken(settings),
-      includeCredentials: getCodecIncludeCredentials(settings),
-    },
-  };
-
   try {
-    const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
-      event.attributes,
-      namespace,
-      codecSettings,
-    );
+    const convertedAttributes = await decodeEventAttributes(event.attributes);
 
-    const payloads = (event.markerRecordedEventAttributes?.details?.data
-      ?.payloads ||
+    const payloads =
+      event.markerRecordedEventAttributes?.details?.data?.payloads ||
       event.markerRecordedEventAttributes?.details?.type?.payloads ||
-      []) as unknown as Payload[];
+      [];
 
     if (!payloads?.length) return undefined;
 
-    const decodedAttributes = decodePayloadAttributes(
-      convertedAttributes,
+    const decodedAttributes = parsePayloadAttributes(
+      convertedAttributes as PotentiallyDecodable,
     ) as DecodedLocalActivity;
 
     const payload = (decodedAttributes?.details?.data?.payloads ||
       decodedAttributes?.details?.type?.payloads)?.[0];
+    if (!payload) return undefined;
     const activityType = getActivityType(payload);
 
     if (activityType) {

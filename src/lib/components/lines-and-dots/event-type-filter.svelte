@@ -2,16 +2,16 @@
   import { writable } from 'svelte/store';
 
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import {
     allEventTypeOptions,
     compactEventTypeOptions,
@@ -26,43 +26,46 @@
 
   import { CategoryIcon } from './constants';
 
-  export let compact = false;
+  interface Props {
+    compact?: boolean;
+  }
 
-  let open = writable(false);
+  let { compact = false }: Props = $props();
 
-  $: defaultOptions = compact
-    ? compactEventTypeOptions.map((o) => o.value)
-    : allEventTypeOptions.map((o) => o.value);
+  const open = writable(false);
 
-  $: options = [
-    ...(compact ? compactEventTypeOptions : allEventTypeOptions).map((o) => ({
-      ...o,
-      label: translate(o.label),
-      icon: CategoryIcon[o.value],
-      description: translate(o.description),
-    })),
-  ];
+  const defaultOptions = $derived(
+    compact
+      ? compactEventTypeOptions.map((o) => o.value)
+      : allEventTypeOptions.map((o) => o.value),
+  );
 
-  $: {
+  const options = $derived.by(() => {
+    let list = (compact ? compactEventTypeOptions : allEventTypeOptions).map(
+      (o) => ({
+        ...o,
+        label: translate(o.label),
+        icon: CategoryIcon[o.value],
+        description: o.description ? translate(o.description) : '',
+      }),
+    );
     if (isVersionNewer('1.21.0', $temporalVersion)) {
-      options = options.filter(({ value }) => value !== 'update');
+      list = list.filter(({ value }) => value !== 'update');
     }
-  }
-
-  $: {
-    if (!nexusEnabled($page.data.systemInfo?.capabilities)) {
-      options = options.filter(({ value }) => value !== 'nexus');
+    if (!nexusEnabled(page.data.systemInfo?.capabilities)) {
+      list = list.filter(({ value }) => value !== 'nexus');
     }
-  }
+    return list;
+  });
 
-  const onOptionClick = ({ value }) => {
+  const onOptionClick = ({ value }: (typeof options)[number]) => {
     clearActiveGroups();
     const newCategories = $eventTypeFilter.some((type) => type === value)
       ? $eventTypeFilter.filter((type) => type !== value)
       : [...$eventTypeFilter, value];
     $eventTypeFilter = newCategories;
     updateEventFilterParams(
-      $page.url,
+      page.url,
       {
         categories:
           newCategories.length === defaultOptions.length ? null : newCategories,
@@ -75,7 +78,7 @@
     $eventTypeFilter = defaultOptions;
     $eventStatusFilter = false;
     updateEventFilterParams(
-      $page.url,
+      page.url,
       { categories: null, statusFilter: false },
       goto,
     );
@@ -85,7 +88,7 @@
     $eventTypeFilter = defaultOptions;
     $eventStatusFilter = !$eventStatusFilter;
     updateEventFilterParams(
-      $page.url,
+      page.url,
       { categories: null, statusFilter: !$eventStatusFilter },
       goto,
     );
@@ -95,23 +98,25 @@
     $eventTypeFilter = [];
     $eventStatusFilter = false;
     updateEventFilterParams(
-      $page.url,
+      page.url,
       { categories: [], statusFilter: false },
       goto,
     );
   };
 
-  $: filterActive = $eventTypeFilter.length < defaultOptions.length;
+  const filterActive = $derived(
+    $eventTypeFilter.length < defaultOptions.length,
+  );
 </script>
 
 <MenuContainer {open}>
-  <MenuButton controls="status-menu" size="sm">
+  <MenuButton controls="status-menu" size="sm" variant="tertiary">
     {#snippet leading()}
       <div
         class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
-        class:bg-interactive={filterActive}
+        class:bg-interactive-primary={filterActive}
       >
-        <Icon name="filter" class={filterActive && 'pt-0.5 text-white'} />
+        <IconFilter class={filterActive ? 'pt-0.5 text-white' : undefined} />
       </div>
     {/snippet}
     <span class="hidden text-sm md:block">{translate('common.filter')}</span>
@@ -125,7 +130,7 @@
     <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>
       {#snippet leading()}
         <Checkbox
-          on:change={onAllClick}
+          onChange={onAllClick}
           checked={!$eventStatusFilter &&
             $eventTypeFilter.length === defaultOptions.length}
           label={translate('common.all')}
@@ -144,7 +149,7 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:change={onPendingClick}
+            onChange={onPendingClick}
             checked={$eventStatusFilter}
             label={translate('common.all')}
             labelHidden
@@ -157,7 +162,7 @@
     <MenuItem data-testid={translate('common.none')} onclick={onNoneClick}>
       {#snippet leading()}
         <Checkbox
-          on:change={onNoneClick}
+          onChange={onNoneClick}
           checked={!$eventStatusFilter && !$eventTypeFilter.length}
           label={translate('common.none')}
           labelHidden
@@ -167,7 +172,7 @@
       {translate('common.none')}
     </MenuItem>
     <MenuDivider />
-    {#each options as option}
+    {#each options as option (option.value)}
       <MenuItem
         data-testid={option.label}
         description={option.description}
@@ -178,7 +183,7 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:click={() => onOptionClick(option)}
+            onclick={() => onOptionClick(option)}
             checked={$eventTypeFilter.some((type) => type === option.value)}
             label={option.label}
             labelHidden

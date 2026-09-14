@@ -1,10 +1,9 @@
-<script lang="ts" context="module">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
   import Label from '$lib/holocene/label.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Label',
     component: Label,
     args: {
@@ -23,11 +22,7 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta<Label>;
+  });
 </script>
-
-<Template let:args>
-  <Label {...args} />
-</Template>
 
 <Story name="Default" />

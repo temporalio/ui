@@ -2,6 +2,7 @@ import { BROWSER } from 'esm-env';
 
 export function getApiOrigin(isBrowser = BROWSER): string | null {
   const endpoint = import.meta.env.VITE_API;
+  if (endpoint === undefined) return null;
   const isRelative = !endpoint.startsWith('http');
 
   let origin = '';

@@ -16,7 +16,7 @@
           namespace: targetNamespace,
           queue: targetTaskQueue,
         });
-        pollerCount = pollers.length;
+        pollerCount = pollers?.length ?? 0;
       } catch {
         pollerCount = undefined;
       }

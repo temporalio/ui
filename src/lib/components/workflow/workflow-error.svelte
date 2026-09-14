@@ -1,20 +1,26 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import type { NetworkError } from '$lib/types/global';
   import { routeForWorkflows } from '$lib/utilities/route-for';
 
-  export let error: NetworkError;
+  interface Props {
+    error: NetworkError;
+  }
 
-  $: ({ namespace } = $page.params);
+  let { error }: Props = $props();
 
-  $: title =
+  const namespace = $derived(page.params.namespace);
+
+  const title = $derived(
     error.statusCode === 404
       ? translate('workflows.workflow-404-title')
-      : translate('workflows.workflow-error-title');
+      : translate('workflows.workflow-error-title'),
+  );
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
@@ -24,7 +30,7 @@
         namespace,
       })}?${$workflowsSearchParams}`}
       data-testid="back-to-workflows"
-      icon="chevron-left"
+      LeadingIcon={IconChevronLeft}
     >
       {translate('workflows.back-to-workflows')}
     </Link>
@@ -35,7 +41,7 @@
     {error?.statusCode ?? '500'}
   </h1>
   <p class="-mt-12 text-lg">{title}</p>
-  <p class="text-2xl font-bold text-red-700">
+  <p class="text-2xl font-bold text-danger">
     {error?.statusText ?? ''}
   </p>
 </div>

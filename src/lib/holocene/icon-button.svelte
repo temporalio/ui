@@ -1,35 +1,45 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
+  import type { ComponentProps } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
-  import type { IconName } from '$lib/holocene/icon';
+  import Button, {
+    type ButtonWithoutHrefProps,
+  } from '$lib/holocene/button.svelte';
+  import type { IconComponent } from '$lib/io/icon';
 
-  interface $$Props extends HTMLButtonAttributes {
-    icon: IconName;
+  interface Props extends Omit<HTMLButtonAttributes, 'onclick'> {
+    Icon: IconComponent;
     'data-testid'?: string;
     label: string;
-    variant?: 'primary' | 'secondary' | 'ghost';
+    variant?: 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'ghost';
     class?: string;
+    size?: ComponentProps<typeof Button>['size'];
+    onclick?: (event: MouseEvent) => void;
   }
 
-  let className = '';
-  export { className as class };
-  export let icon: IconName;
-  export let label: string;
-  export let variant: 'primary' | 'secondary' | 'ghost' = 'ghost';
+  let {
+    class: className = '',
+    Icon,
+    label,
+    variant = 'ghost',
+    size = 'sm',
+    onclick,
+    ...rest
+  }: Props = $props();
 </script>
 
 <Button
   {variant}
-  leadingIcon={icon}
-  class={merge('h-9 w-9 shrink-0 p-0', className)}
+  {size}
+  LeadingIcon={Icon}
+  class={merge('aspect-square w-auto shrink-0 p-0', className)}
   aria-label={label}
   disableTracking={true}
   data-track-name="icon-button"
-  data-track-intent="{variant}-{icon}"
+  data-track-intent="{variant}-{label}"
   data-track-text={label}
-  on:click
-  {...$$restProps}
+  {onclick}
+  {...rest as ButtonWithoutHrefProps}
 />

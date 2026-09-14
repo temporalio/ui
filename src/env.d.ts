@@ -11,3 +11,9 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
   readonly vitest: Vitest;
 }
+
+declare module 'virtual:catalog-local' {
+  import type { BrowserCatalogDescriptor } from '$lib/catalog/browser/types';
+
+  export const localCatalog: BrowserCatalogDescriptor[];
+}

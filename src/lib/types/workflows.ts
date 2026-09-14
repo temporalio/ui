@@ -1,8 +1,9 @@
 import type {
   Memo,
-  Payloads,
+  Payload,
   PendingWorkflowTaskInfo,
   Priority,
+  WorkflowTaskFailedCause as ScreamingWorkflowTaskFailedCause,
   WorkflowExecutionStatus,
   WorkflowExtendedInfo,
   WorkflowVersionTimpstamp,
@@ -11,13 +12,31 @@ import type { Callback } from '$lib/types/nexus';
 
 import type { VersioningInfo } from './deployments';
 import type {
-  Payload,
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,
   PendingNexusOperation,
 } from './events';
 import type { Optional, Replace } from './global';
+
+/**
+ * Type-level equivalent of `fromScreamingEnum`: converts a SCREAMING_SNAKE_CASE
+ * enum key to PascalCase and strips the given prefix.
+ */
+type ScreamingToPascalCase<S extends string> =
+  S extends `${infer Head}_${infer Tail}`
+    ? `${Capitalize<Lowercase<Head>>}${ScreamingToPascalCase<Tail>}`
+    : Capitalize<Lowercase<S>>;
+
+type StripPrefix<
+  S extends string,
+  Prefix extends string,
+> = S extends `${Prefix}${infer Rest}` ? Rest : S;
+
+export type FromScreamingEnum<
+  S extends string,
+  Prefix extends string,
+> = StripPrefix<ScreamingToPascalCase<S>, Prefix>;
 
 /**
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
@@ -38,6 +57,8 @@ export type WorkflowExecutionInfo = Replace<
     closeTime: string;
     executionTime: string;
     historySizeBytes: string;
+    externalPayloadCount?: string;
+    externalPayloadSizeBytes?: string;
     historyLength: string;
     searchAttributes?: WorkflowSearchAttributes;
     memo?: Memo;
@@ -51,12 +72,12 @@ export type ListWorkflowExecutionsResponse = Replace<
 
 export type CountWorkflowExecutionsResponse = {
   count?: string;
-  groups?: { count: string; groupValues: Payloads }[];
+  groups?: { count: string; groupValues: Payload[] }[];
 };
 
 export type CountSchedulesResponse = {
   count?: string;
-  groups?: { count: string; groupValues: Payloads }[];
+  groups?: { count: string; groupValues: Payload[] }[];
 };
 
 export type WorkflowExecutionConfig = Replace<
@@ -159,7 +180,7 @@ export type DecodedWorkflowSearchAttributes = {
   indexedFields?: Record<string, string>;
 };
 
-export interface MostRecentWOrkflowVersionStamp extends WorkflowVersionTimpstamp {
+export interface MostRecentWorkflowVersionStamp extends WorkflowVersionTimpstamp {
   useVersioning?: boolean;
 }
 
@@ -174,7 +195,9 @@ export type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
-  mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
+  externalPayloadCount: string | undefined;
+  externalPayloadSizeBytes: string | undefined;
+  mostRecentWorkerVersionStamp?: MostRecentWorkflowVersionStamp;
   assignedBuildId?: string;
   searchAttributes?: DecodedWorkflowSearchAttributes;
   memo: Memo;
@@ -182,14 +205,14 @@ export type WorkflowExecution = {
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
   pendingActivities: PendingActivity[];
-  pendingWorkflowTask: PendingWorkflowTaskInfo;
+  pendingWorkflowTask?: PendingWorkflowTaskInfo;
   stateTransitionCount: string;
   parentNamespaceId?: string;
   parent?: WorkflowIdentifier;
   url: string;
   isRunning: boolean;
   isPaused: boolean;
-  defaultWorkflowTaskTimeout: Duration;
+  defaultWorkflowTaskTimeout?: Duration;
   workflowExecutionTimeout?: Duration;
   canBeTerminated: boolean;
   callbacks: Callback[];
@@ -202,37 +225,9 @@ export type WorkflowExecution = {
 };
 
 export type WorkflowTaskFailedCause =
-  | 'Unspecified'
-  | 'UnhandledCommand'
-  | 'BadScheduleActivityAttributes'
-  | 'BadRequestCancelActivityAttributes'
-  | 'BadStartTimerAttributes'
-  | 'BadCancelTimerAttributes'
-  | 'BadRecordMarkerAttributes'
-  | 'BadCompleteWorkflowExecutionAttributes'
-  | 'BadFailWorkflowExecutionAttributes'
-  | 'BadCancelWorkflowExecutionAttributes' // correct ?
-  | 'BadRequestCancelExternalAttributes'
-  | 'BadContinueAsNewAttributes'
-  | 'StartTimerDuplicateId'
-  | 'ResetStickyTaskQueue'
-  | 'WorkflowWorkerUnhandledFailure'
-  | 'WorkflowTaskHeartbeatError'
-  | 'BadSignalWorkflowExecutionAttributes'
-  | 'BadStartChildExecutionAttributes'
-  | 'ForceCloseCommand'
-  | 'FailoverCloseCommand'
-  | 'BadSignalInputSize'
-  | 'ResetWorkflow'
-  | 'BadBinary'
-  | 'ScheduleActivityDuplicateId'
-  | 'BadSearchAttributes'
-  | 'NonDeterministicError'
-  | 'BadModifyWorkflowPropertiesAttributes'
-  | 'PendingChildWorkflowsLimitExceeded'
-  | 'PendingActivitiesLimitExceeded'
-  | 'PendingSignalsLimitExceeded'
-  | 'PendingRequestCancelLimitExceeded'
-  | 'BadUpdateWorkflowExecutionMessage'
-  | 'UnhandledUpdate'
-  | 'WorkflowTaskTimedOut';
+  | FromScreamingEnum<
+      ScreamingWorkflowTaskFailedCause,
+      'WorkflowTaskFailedCause'
+    >
+  | 'WorkflowTaskTimedOut'
+  | 'WorkflowTaskHeartbeatError';

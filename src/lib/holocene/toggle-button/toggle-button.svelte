@@ -1,59 +1,72 @@
 <script lang="ts">
-  import type { ComponentProps } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import { getAppContext } from '$lib/utilities/get-context';
 
   import type {
+    ButtonProps,
     ButtonWithHrefProps,
     ButtonWithoutHrefProps,
   } from '../button.svelte';
   import Button from '../button.svelte';
 
-  type BaseProps = {
+  type ToggleBaseProps = {
     group?: boolean;
     active?: boolean;
   };
 
-  type AnchorProps = BaseProps &
+  type AnchorProps = ToggleBaseProps &
     ButtonWithHrefProps & {
       base?: string;
     };
 
-  type ButtonProps = BaseProps &
+  type ButtonToggleProps = ToggleBaseProps &
     ButtonWithoutHrefProps & {
       base?: never;
     };
 
-  type $$Props = AnchorProps | ButtonProps;
+  type Props = AnchorProps | ButtonToggleProps;
 
-  let className = '';
-  export { className as class };
-  export let group = getAppContext('group');
-  export let href = null;
-  export let base = href;
-  export let active = false;
-  export let variant: ComponentProps<Button>['variant'] = 'secondary';
+  let {
+    class: className = '',
+    group = getAppContext('group'),
+    href,
+    base,
+    active = false,
+    variant = 'secondary',
+    LeadingIcon,
+    onclick,
+    children,
+    ...rest
+  }: Props = $props();
+
+  const pressed = $derived(
+    href ? page.url.pathname.includes(base ?? href) : active,
+  );
+
+  const buttonProps = $derived({
+    ...rest,
+    variant,
+    LeadingIcon,
+    onclick,
+    'data-track-name': 'toggle-button',
+    'aria-pressed': pressed ? 'true' : 'false',
+    href: href ? href + page.url.search : undefined,
+    class: merge(
+      pressed &&
+        'border-transparent bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press focus-visible:bg-interactive-primary-hover',
+      group && 'rounded-none [&:not(:last-child)]:border-r-0',
+      className,
+    ),
+  } as ButtonProps);
 </script>
 
-<Button
-  on:click
-  class={merge(
-    (href ? $page.url.pathname.includes(base) : active) &&
-      'bg-interactive-secondary-active',
-    group && '[&:not(:last-child)]:border-r-0',
-    className,
-  )}
-  data-track-name="toggle-button"
-  {variant}
-  href={href ? href + $page.url.search : null}
-  {...$$restProps}
->
-  {#if $$restProps.leadingIcon}
-    <span class="hidden md:block"><slot /></span>
+<Button {...buttonProps}>
+  {#if LeadingIcon}
+    <span class="hidden md:block">{@render children?.()}</span>
   {:else}
-    <slot />
+    {@render children?.()}
   {/if}
 </Button>

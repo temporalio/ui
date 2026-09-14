@@ -1,9 +1,12 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import { fn } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Checkbox',
     component: Checkbox,
     args: {
@@ -15,6 +18,7 @@
       required: false,
       error: '',
       valid: true,
+      onChange: fn(),
     },
     argTypes: {
       label: { control: 'text' },
@@ -27,22 +31,20 @@
       group: { control: 'object', table: { disable: true } },
       valid: { control: 'boolean' },
     },
-  } satisfies Meta<Checkbox<string>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
-  <Checkbox
-    {...args}
-    on:change={action('change')}
-    on:click={action('click')}
-    on:keypress={action('keypress')}
-  />
-</Template>
+{#snippet template(args: ComponentProps<typeof Checkbox>)}
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Checkbox
+      {...args}
+      onChange={action('change')}
+      onclick={action('click')}
+      onkeypress={action('keypress')}
+    />
+  </div>
+{/snippet}
 
 <Story name="Default" />
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import debounce from 'just-debounce';
+  import { debounce } from 'es-toolkit';
   import type { Snippet } from 'svelte';
 
   import { page } from '$app/state';
@@ -8,6 +8,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconSearch } from '$lib/io/icon';
   import NexusEmptyState from '$lib/pages/nexus-empty-state.svelte';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -25,7 +26,7 @@
   let {
     endpoints = [],
     searchPlaceholder = translate('common.search'),
-    headers,
+    headers: headersSnippet,
     columns,
     actions,
   }: Props = $props();
@@ -53,32 +54,37 @@
     {/snippet}
   </NexusEmptyState>
 {:else}
-  <div class="mb-8 flex items-center justify-between">
-    <h1 data-testid="namespace-selector-title">
-      {translate('nexus.endpoints')}
-    </h1>
-    {@render actions?.()}
-  </div>
+  <header>
+    <div class="flex flex-col items-start justify-between gap-2 md:flex-row">
+      <h1 data-testid="namespace-selector-title" class="leading-7">
+        {translate('nexus.endpoints')}
+      </h1>
+      {@render actions?.()}
+    </div>
+  </header>
   <div class="flex flex-col gap-4">
     <Input
       id="endpoint-search"
       bind:value={search}
-      icon="search"
+      Icon={IconSearch}
       label={searchPlaceholder}
       labelHidden
       autoFocus
       type="search"
       placeholder={searchPlaceholder}
       class="w-full"
+      inputContainerClass="bg-surface-primary"
     />
     {#if endpoints.length}
       <Table class="w-full" bordered>
-        <caption class="sr-only" slot="caption">
-          {translate('nexus.endpoints')}
-        </caption>
-        <svelte:fragment slot="headers">
-          {@render headers?.()}
-        </svelte:fragment>
+        {#snippet caption()}
+          <caption class="sr-only">
+            {translate('nexus.endpoints')}
+          </caption>
+        {/snippet}
+        {#snippet headers()}
+          {@render headersSnippet?.()}
+        {/snippet}
         {#each endpoints as endpoint (endpoint.id)}
           {@render columns?.(endpoint)}
         {/each}

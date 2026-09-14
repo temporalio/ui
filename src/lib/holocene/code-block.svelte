@@ -2,7 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
-  import { historyKeymap, standardKeymap } from '@codemirror/commands';
+  import { history, historyKeymap, standardKeymap } from '@codemirror/commands';
   import {
     bracketMatching,
     ensureSyntaxTree,
@@ -11,9 +11,18 @@
     indentUnit,
     syntaxHighlighting,
   } from '@codemirror/language';
-  import { Compartment, EditorState, type Extension } from '@codemirror/state';
-  import { EditorView, keymap } from '@codemirror/view';
-  import { onMount, type Snippet } from 'svelte';
+  import {
+    Compartment,
+    EditorState,
+    type Extension,
+    Transaction,
+  } from '@codemirror/state';
+  import {
+    EditorView,
+    keymap,
+    placeholder as placeholderExtension,
+  } from '@codemirror/view';
+  import { onMount, type Snippet, tick } from 'svelte';
   import { twMerge as merge, twMerge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
@@ -52,6 +61,8 @@
     tabs?: string[];
     activeTab?: string;
     headerActions?: Snippet<[]>;
+    lazy?: boolean;
+    placeholder?: string;
   }
 
   interface PropsWithCopyable extends Override<
@@ -67,8 +78,8 @@
     class: className = undefined,
     editable = false,
     copyable = true,
-    copyIconTitle = '',
-    copySuccessIconTitle = '',
+    copyIconTitle = undefined,
+    copySuccessIconTitle = undefined,
     inline = false,
     testId = undefined,
     minHeight = undefined,
@@ -78,6 +89,8 @@
     tabs,
     activeTab = $bindable(),
     headerActions,
+    lazy = false,
+    placeholder,
     ...editorProps
   }: Props = $props();
 
@@ -85,6 +98,12 @@
 
   let editorElement = $state<HTMLElement | undefined>();
   let editorView = $state<EditorView | undefined>();
+
+  // PERF: When lazy=true we render a <pre> placeholder on the first frame so
+  // the panel is interactive immediately. CodeMirror is scheduled via
+  // setTimeout(0), which allows the browser to paint the <pre> before the
+  // heavier editor init runs. lazyReady flips true once the editor is mounted.
+  let lazyReady = $state(!lazy);
 
   // content
 
@@ -116,6 +135,7 @@
           to: doc.length,
           insert: newContent,
         },
+        annotations: Transaction.addToHistory.of(false),
       });
     }
   };
@@ -138,7 +158,7 @@
   let maximized = $state(false);
 
   const maximizable = $derived(
-    (maxHeight && !hasHeader && editorView?.contentHeight > maxHeight) ?? false,
+    !!maxHeight && !hasHeader && (editorView?.contentHeight ?? 0) > maxHeight,
   );
 
   // a compartment allows us to update extensions like the theme
@@ -156,16 +176,26 @@
 
   let dynamicExtensions: Extension[] = $derived(
     [
+      ...(editable ? [history()] : []),
       getEditorTheme($useDarkMode, hasHeader),
       getActionsTheme({ hasActions: copyable || maximizable }),
       EditorState.readOnly.of(!editable),
       EditorView.editable.of(editable),
-      EditorView.contentAttributes.of({ 'aria-label': label }),
+      EditorView.contentAttributes.of(
+        editable
+          ? { 'aria-label': label }
+          : { 'aria-label': label, 'aria-readonly': 'true', tabindex: '0' },
+      ),
       getLineBreakExtension(editable),
       getLanguageExtension(language),
       !inline ? EditorView.lineWrapping : undefined,
       !inline && !editable ? foldGutter() : undefined,
-      getHeightTheme({ maxHeight, minHeight, maximized }),
+      getHeightTheme({
+        maxHeight: maxHeight ?? 0,
+        minHeight: minHeight ?? 0,
+        maximized,
+      }),
+      placeholder ? placeholderExtension(placeholder) : undefined,
     ].filter((ext) => ext != null),
   );
 
@@ -177,7 +207,7 @@
         extensions: [staticExtensions, compartment.of(dynamicExtensions)],
       }),
       dispatch(transaction) {
-        editorView.update([transaction]);
+        editorView?.update([transaction]);
         if (transaction.docChanged) {
           onchange?.(getFormattedDoc());
         }
@@ -229,10 +259,30 @@
   };
 
   onMount(() => {
-    editorView = createEditorView();
-    editorView.contentDOM.onblur = handleEditorBlur;
-    ensureFullParse();
+    if (!lazy) {
+      editorView = createEditorView();
+      editorView.contentDOM.onblur = handleEditorBlur;
+      ensureFullParse();
+      return () => editorView?.destroy();
+    }
+
+    // PERF: Defer CodeMirror initialization until after the <pre> placeholder
+    // has painted. setTimeout(0) yields back to the browser so it can commit
+    // the current frame before we do any heavy editor work.
+    let destroyed = false;
+    const timer = setTimeout(async () => {
+      if (destroyed) return;
+      lazyReady = true;
+      await tick();
+      if (destroyed) return;
+      editorView = createEditorView();
+      editorView.contentDOM.onblur = handleEditorBlur;
+      ensureFullParse();
+    }, 0);
+
     return () => {
+      destroyed = true;
+      clearTimeout(timer);
       editorView?.destroy();
     };
   });
@@ -251,11 +301,14 @@
 {/snippet}
 
 <div
-  class={twMerge('min-w-[80px] grow', hasHeader && ['border border-subtle'])}
+  class={twMerge(
+    'min-w-[80px] grow rounded',
+    hasHeader && 'overflow-hidden border border-secondary',
+  )}
 >
   {#if tabs && tabs.length > 0}
     <div
-      class="flex flex-row items-center justify-between border-b border-subtle bg-code-block px-3"
+      class="flex flex-row items-center justify-between border-b border-secondary bg-surface-overlay-primary px-3 text-secondary"
     >
       <div class="flex flex-row items-center gap-4">
         {#each tabs as title (title)}
@@ -269,35 +322,51 @@
             {copyIconTitle}
             {copySuccessIconTitle}
             class="m-0 rounded-full text-secondary"
-            on:click={handleCopy}
-            copied={$copied}
+            onclick={handleCopy}
+            copied={!!$copied}
           />
         {/if}
       </div>
     </div>
   {/if}
-  <Maximizable bind:maximized enabled={maximizable}>
-    <div
-      bind:this={editorElement}
-      class:inline
-      class:editable
-      class:readOnly={!editable}
-      class={merge('h-full', className)}
-      data-testid={testId}
-      {...editorProps}
-      onblur={handleEditorBlur}
-    ></div>
+  {#if lazy && !lazyReady}
+    <!--
+      PERF: Placeholder shown on the first frame while CodeMirror initializes
+      async. Font/padding match the CM editor so the measured height is nearly
+      identical, minimising ResizeObserver churn when the real editor swaps in.
+    -->
+    <pre
+      class="overflow-auto rounded border border-secondary bg-surface-overlay-primary p-2 text-primary"
+      style:font-family="Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace"
+      style:font-size="0.875em"
+      style:max-height={maxHeight ? `${maxHeight}px` : undefined}
+      style:white-space="pre-wrap"
+      style:word-break="break-all">{format(content, language, inline)}</pre>
+  {:else}
+    <Maximizable bind:maximized enabled={maximizable}>
+      <div
+        bind:this={editorElement}
+        class:inline
+        class:editable
+        class:readOnly={!editable}
+        class={merge('h-full', className)}
+        data-testid={testId}
+        {...editorProps}
+      ></div>
 
-    {#snippet actions()}
-      {#if copyable && !hasHeader}
-        <CopyButton
-          {copyIconTitle}
-          {copySuccessIconTitle}
-          class="m-0 rounded-full text-secondary"
-          on:click={handleCopy}
-          copied={$copied}
-        />
-      {/if}
-    {/snippet}
-  </Maximizable>
+      {#snippet actions()}
+        {#if headerActions}
+          {@render headerActions()}
+        {:else if copyable && !hasHeader}
+          <CopyButton
+            {copyIconTitle}
+            {copySuccessIconTitle}
+            class="m-0 rounded-full text-secondary"
+            onclick={handleCopy}
+            copied={$copied}
+          />
+        {/if}
+      {/snippet}
+    </Maximizable>
+  {/if}
 </div>

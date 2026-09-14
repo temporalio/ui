@@ -1,23 +1,24 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { page } from '$app/state';
-
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { groupEvents } from '$lib/models/event-groups';
+  import { IconArrowDown, IconArrowUp } from '$lib/io/icon';
+  import { buildGroupIndex, groupEvents } from '$lib/models/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  const {
-    id: eventId,
-    namespace,
-    workflow: workflowId,
-    run: runId,
-  } = $derived(page.params);
+  interface Props {
+    eventId: string;
+    namespace: string;
+    workflowId: string;
+    runId: string;
+  }
+
+  const { eventId, namespace, workflowId, runId }: Props = $props();
 
   let ids = $derived([eventId]);
 
@@ -61,6 +62,7 @@
       ? ascendingGroups
       : [...ascendingGroups].reverse(),
   );
+  const groupIndex = $derived(buildGroupIndex(groups));
 
   const initialEvent = $derived(
     $fullEventHistory.find(
@@ -68,7 +70,7 @@
         e.id === eventId ||
         e.id ===
           String(
-            workflow.workflowExtendedInfo?.requestIdInfos?.[eventId]?.eventId,
+            workflow?.workflowExtendedInfo?.requestIdInfos?.[eventId]?.eventId,
           ),
     ),
   );
@@ -116,8 +118,8 @@
   <Button
     variant="secondary"
     size="xs"
-    leadingIcon="arrow-up"
-    on:click={loadPrevious}
+    LeadingIcon={IconArrowUp}
+    onclick={loadPrevious}
     disabled={ids[0] === '1' || loading}
     data-testid="load-previous">Show Previous 10</Button
   >
@@ -129,7 +131,7 @@
           {event}
           {index}
           expanded={event.id === initialEvent?.id}
-          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
+          group={isEvent(event) ? groupIndex.get(event.id) : undefined}
           initialItem={$fullEventHistory[0]}
         />
       {/each}
@@ -138,8 +140,8 @@
   <Button
     variant="secondary"
     size="xs"
-    leadingIcon="arrow-down"
-    on:click={loadNext}
+    LeadingIcon={IconArrowDown}
+    onclick={loadNext}
     disabled={ids[ids.length - 1] === lastEventId || loading}
     data-testid="load-next">Show Next 10</Button
   >
@@ -148,7 +150,7 @@
 <style lang="postcss">
   tbody {
     :global(tr:nth-of-type(odd)) {
-      @apply surface-primary;
+      @apply bg-surface-primary text-primary;
     }
 
     :global(tr > td) {

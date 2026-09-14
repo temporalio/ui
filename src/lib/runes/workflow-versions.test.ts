@@ -82,7 +82,7 @@ describe('getWorkflowPollersWithVersions', () => {
       });
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 
@@ -112,7 +112,7 @@ describe('getWorkflowPollersWithVersions', () => {
       });
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 
@@ -141,7 +141,7 @@ describe('getWorkflowPollersWithVersions', () => {
       );
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 
@@ -168,7 +168,7 @@ describe('getWorkflowPollersWithVersions', () => {
       const workers = createMockWorkers([poller1, poller2]);
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 
@@ -201,7 +201,7 @@ describe('getWorkflowPollersWithVersions', () => {
       const workers = createMockWorkers([]);
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 
@@ -217,7 +217,7 @@ describe('getWorkflowPollersWithVersions', () => {
       const workers = undefined as unknown as TaskQueueResponse;
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 
@@ -236,7 +236,7 @@ describe('getWorkflowPollersWithVersions', () => {
       const workers = createMockWorkers([]);
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 
@@ -258,7 +258,7 @@ describe('getWorkflowPollersWithVersions', () => {
 
       expect(() => {
         const result = getWorkflowPollersWithVersions(
-          workflow.searchAttributes.indexedFields,
+          workflow.searchAttributes?.indexedFields,
           workers,
         );
         expect(result.pollers).toBeDefined();
@@ -278,7 +278,7 @@ describe('getWorkflowPollersWithVersions', () => {
       const workers = createMockWorkers([incompletePoller]);
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 
@@ -301,7 +301,7 @@ describe('getWorkflowPollersWithVersions', () => {
       );
 
       const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
+        workflow.searchAttributes?.indexedFields,
         workers,
       );
 

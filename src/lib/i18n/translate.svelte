@@ -1,22 +1,28 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { I18nKey, I18nReplace } from '.';
   import { translate } from './translate';
 
-  interface $$Props {
+  interface Props {
     key: I18nKey;
     count?: number;
     replace?: I18nReplace;
+    children?: Snippet;
   }
 
-  export let key: I18nKey;
-  export let count: number = undefined;
-  export let replace: I18nReplace = undefined;
+  let {
+    key,
+    count = undefined,
+    replace = undefined,
+    children,
+  }: Props = $props();
 
-  $: translated = translate(key, { ...replace, count });
+  let translated = $derived(translate(key, { ...replace, count }));
 </script>
 
 {#if translated !== key}
   {translated}
 {:else}
-  <slot />
+  {@render children?.()}
 {/if}

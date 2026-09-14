@@ -1,17 +1,20 @@
-<script lang="ts" context="module">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import Search from './search.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Search',
     component: Search,
-  } satisfies Meta<Search>;
+    render: template,
+  });
 </script>
 
-<Template let:args>
-  <Search {...args} />
-</Template>
+{#snippet template(args: ComponentProps<typeof Search>)}
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Search {...args} />
+  </div>
+{/snippet}
 
 <Story name="Default" />

@@ -1,46 +1,36 @@
 <script lang="ts">
-  import type { WorkflowExecution } from '@temporalio/client';
-
-  import Checkbox from '$lib/holocene/checkbox.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Action } from '$lib/models/activity-actions';
-  import { unpauseActivity } from '$lib/services/workflow-activities-service';
-  import { triggerRefresh } from '$lib/stores/workflow-run';
-  import type { PendingActivity } from '$lib/types/events';
-  import { getIdentity } from '$lib/utilities/core-context';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
 
   type Props = {
     open: boolean;
-    namespace: string;
-    execution: WorkflowExecution;
-    activity: PendingActivity;
+    activityId: string;
+    onConfirm: () => Promise<void>;
   };
 
-  let { open = $bindable(), namespace, execution, activity }: Props = $props();
-  let { activityId: id, activityType: type } = $derived(activity);
+  let { open = $bindable(), activityId, onConfirm }: Props = $props();
 
   let error = $state('');
   let loading = $state(false);
-  let includeType = $state(false);
-
-  const identity = getIdentity();
 
   const hideModal = () => {
     open = false;
-    includeType = false;
   };
 
   const onActivityUnpause = async () => {
-    await unpauseActivity({
-      namespace,
-      execution,
-      id: includeType ? undefined : id,
-      type: includeType ? type : undefined,
-      identity,
-    });
-    triggerRefresh(Action.Unpause);
-    hideModal();
+    error = '';
+    loading = true;
+    try {
+      await onConfirm();
+      hideModal();
+    } catch (err: unknown) {
+      error = isNetworkError(err)
+        ? (err.message ?? translate('common.unknown-error'))
+        : translate('common.unknown-error');
+    } finally {
+      loading = false;
+    }
   };
 </script>
 
@@ -53,21 +43,19 @@
   confirmText={translate('workflows.unpause')}
   cancelText={translate('common.cancel')}
   confirmType="destructive"
-  on:cancelModal={hideModal}
-  on:confirmModal={onActivityUnpause}
+  onCancelModal={hideModal}
+  onConfirmModal={onActivityUnpause}
 >
-  <h3 slot="title">
-    {translate('activities.unpause-modal-confirmation', {
-      activityId: activity.id,
-    })}
-  </h3>
-  <div slot="content" class="flex flex-col gap-4">
-    <p>{translate('activities.unpause-modal-description')}</p>
-    <Checkbox
-      bind:checked={includeType}
-      label={translate('activities.unpause-all-activity-types', {
-        type,
+  {#snippet titleSnippet()}
+    <h3>
+      {translate('activities.unpause-modal-confirmation', {
+        activityId,
       })}
-    />
-  </div>
+    </h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>{translate('activities.unpause-modal-description')}</p>
+    </div>
+  {/snippet}
 </Modal>

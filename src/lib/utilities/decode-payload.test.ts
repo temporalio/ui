@@ -4,10 +4,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
 
 import {
-  convertPayloadToJsonWithCodec,
-  decodeAllPotentialPayloadsWithCodec,
-  decodePayload,
-  decodePayloadAttributes,
+  decodeEventAttributes,
+  parsePayloadAttributes,
+  parseRawPayloadToJSON,
 } from './decode-payload';
 import {
   dataConvertedWorkflowStartedEvent,
@@ -22,7 +21,9 @@ import { getEventAttributes } from '../../lib/models/event-history';
 import { resetLastDataConverterSuccess } from '../stores/data-converter-config';
 import {
   codecEndpoint,
+  includeCredentials,
   lastDataEncoderStatus,
+  overrideRemoteCodecConfiguration,
   resetLastDataEncoderSuccess,
 } from '../stores/data-encoder-config';
 
@@ -95,35 +96,68 @@ const JsonObjectEncodedWithConstructor = {
 const JsonObjectDecoded = { Transformer: 'OptimusPrime' };
 const JsonObjectDecodedWithConstructor = { ConstructorOutput: 'OptimusPrime' };
 
-describe('decodePayload with default returnDataOnly', () => {
+describe('parseRawPayloadToJSON with default returnDataOnly', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
-    expect(decodePayload(WebDecodePayload)).toEqual(WebDecodePayload);
+    expect(parseRawPayloadToJSON(WebDecodePayload)).toEqual(WebDecodePayload);
   });
   it('Should not decode a payload with encoding binary/null', () => {
-    expect(decodePayload(BinaryNullEncodedNoData)).toEqual(null);
+    expect(parseRawPayloadToJSON(BinaryNullEncodedNoData)).toEqual(null);
   });
   it('Should decode a payload with encoding json/plain', () => {
-    expect(decodePayload(JsonPlainEncoded)).toEqual(Base64Decoded);
+    expect(parseRawPayloadToJSON(JsonPlainEncoded)).toEqual(Base64Decoded);
   });
   it('Should decode a payload with encoding json/foo', () => {
-    expect(decodePayload(JsonFooEncoded)).toEqual(Base64Decoded);
+    expect(parseRawPayloadToJSON(JsonFooEncoded)).toEqual(Base64Decoded);
   });
   it('Should decode a payload with encoding json/protobuf', () => {
-    expect(decodePayload(ProtobufEncoded)).toEqual(Base64Decoded);
+    expect(parseRawPayloadToJSON(ProtobufEncoded)).toEqual(Base64Decoded);
+  });
+  it('Should decode a binary/protobuf SignalWithStartWorkflowExecutionRequest into typed JSON', () => {
+    const SignalWithStartBinaryProtobuf = {
+      metadata: {
+        encoding: 'YmluYXJ5L3Byb3RvYnVm',
+        messageType:
+          'dGVtcG9yYWwuYXBpLndvcmtmbG93c2VydmljZS52MS5TaWduYWxXaXRoU3RhcnRXb3JrZmxvd0V4ZWN1dGlvblJlcXVlc3Q=',
+      },
+      data: 'CgdkZWZhdWx0EhhzeXN0ZW0tbmV4dXMtd29ya2Zsb3ctaWQaDgoMRWNob1dvcmtmbG93IiYKJGZiZjdhNWQyLWY3ZWQtNGMyYi04MmI2LWZjZmVlNWQyZDJhNlgBYgt0ZXN0LXNpZ25hbA==',
+    };
+    const decoded = parseRawPayloadToJSON(
+      SignalWithStartBinaryProtobuf,
+    ) as Record<string, unknown> | null;
+    expect(decoded).not.toBeNull();
+    expect(decoded?.namespace).toBe('default');
+    expect(decoded?.workflowId).toBe('system-nexus-workflow-id');
+    expect(decoded?.signalName).toBe('test-signal');
+    expect(decoded?.workflowType).toEqual({ name: 'EchoWorkflow' });
+    expect(decoded?.taskQueue).toEqual({
+      name: 'fbf7a5d2-f7ed-4c2b-82b6-fcfee5d2d2a6',
+    });
+  });
+  it('Should leave a binary/protobuf payload untouched when messageType is unknown', () => {
+    const UnknownProtobuf = {
+      metadata: {
+        encoding: 'YmluYXJ5L3Byb3RvYnVm',
+        messageType: btoa('not.a.real.MessageType'),
+      },
+      data: 'CgVoZWxsbw==',
+    };
+    expect(parseRawPayloadToJSON(UnknownProtobuf)).toEqual(UnknownProtobuf);
   });
   it('Should decode a json payload with encoding json/plain', () => {
-    expect(decodePayload(JsonObjectEncoded)).toEqual(JsonObjectDecoded);
+    expect(parseRawPayloadToJSON(JsonObjectEncoded)).toEqual(JsonObjectDecoded);
   });
   it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
-    expect(decodePayload(JsonObjectEncodedWithConstructor)).toEqual(
+    expect(parseRawPayloadToJSON(JsonObjectEncodedWithConstructor)).toEqual(
       JsonObjectDecodedWithConstructor,
     );
   });
 });
 
-describe('decodePayload with returnDataOnly = false', () => {
+describe('parseRawPayloadToJSON with returnDataOnly = false', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
-    expect(decodePayload(WebDecodePayload, false)).toEqual(WebDecodePayload);
+    expect(parseRawPayloadToJSON(WebDecodePayload, false)).toEqual(
+      WebDecodePayload,
+    );
   });
   it('Should not decode a payload with encoding binary/null', () => {
     const fullDecodedPayload = {
@@ -132,7 +166,7 @@ describe('decodePayload with returnDataOnly = false', () => {
       },
       data: null,
     };
-    expect(decodePayload(BinaryNullEncodedNoData, false)).toEqual(
+    expect(parseRawPayloadToJSON(BinaryNullEncodedNoData, false)).toEqual(
       fullDecodedPayload,
     );
   });
@@ -144,7 +178,9 @@ describe('decodePayload with returnDataOnly = false', () => {
       },
       data: Base64Decoded,
     };
-    expect(decodePayload(JsonPlainEncoded, false)).toEqual(fullDecodedPayload);
+    expect(parseRawPayloadToJSON(JsonPlainEncoded, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a payload with encoding json/foo', () => {
     const fullDecodedPayload = {
@@ -154,7 +190,9 @@ describe('decodePayload with returnDataOnly = false', () => {
       },
       data: Base64Decoded,
     };
-    expect(decodePayload(JsonFooEncoded, false)).toEqual(fullDecodedPayload);
+    expect(parseRawPayloadToJSON(JsonFooEncoded, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a payload with encoding json/protobuf', () => {
     const fullDecodedPayload = {
@@ -164,7 +202,9 @@ describe('decodePayload with returnDataOnly = false', () => {
       },
       data: Base64Decoded,
     };
-    expect(decodePayload(ProtobufEncoded, false)).toEqual(fullDecodedPayload);
+    expect(parseRawPayloadToJSON(ProtobufEncoded, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a payload with encoding json/protobuf with messageType', () => {
     const fullDecodedPayload = {
@@ -175,9 +215,9 @@ describe('decodePayload with returnDataOnly = false', () => {
       },
       data: Base64Decoded,
     };
-    expect(decodePayload(ProtobufEncodedWithMessageType, false)).toEqual(
-      fullDecodedPayload,
-    );
+    expect(
+      parseRawPayloadToJSON(ProtobufEncodedWithMessageType, false),
+    ).toEqual(fullDecodedPayload);
   });
   it('Should decode a json payload with encoding json/plain', () => {
     const fullDecodedPayload = {
@@ -187,7 +227,9 @@ describe('decodePayload with returnDataOnly = false', () => {
       },
       data: JsonObjectDecoded,
     };
-    expect(decodePayload(JsonObjectEncoded, false)).toEqual(fullDecodedPayload);
+    expect(parseRawPayloadToJSON(JsonObjectEncoded, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
     const fullDecodedPayload = {
@@ -197,14 +239,14 @@ describe('decodePayload with returnDataOnly = false', () => {
       },
       data: JsonObjectDecodedWithConstructor,
     };
-    expect(decodePayload(JsonObjectEncodedWithConstructor, false)).toEqual(
-      fullDecodedPayload,
-    );
+    expect(
+      parseRawPayloadToJSON(JsonObjectEncodedWithConstructor, false),
+    ).toEqual(fullDecodedPayload);
   });
 });
 
-describe('decodePayloadAttributes', () => {
-  it('Should decodePayloadAttributes searchAttributes with indexedFields', () => {
+describe('parsePayloadAttributes', () => {
+  it('Should parsePayloadAttributes searchAttributes with indexedFields', () => {
     const payload = {
       searchAttributes: {
         indexedFields: {
@@ -224,11 +266,11 @@ describe('decodePayloadAttributes', () => {
       },
     };
 
-    const decodedPayload = decodePayloadAttributes(payload);
+    const decodedPayload = parsePayloadAttributes(payload);
     expect(decodedPayload).toEqual(result);
   });
 
-  it('Should decodePayloadAttributes searchAttributes without indexedFields', () => {
+  it('Should parsePayloadAttributes searchAttributes without indexedFields', () => {
     const payload = {
       searchAttributes: {
         CustomKeywordField: {
@@ -244,41 +286,39 @@ describe('decodePayloadAttributes', () => {
       searchAttributes: { CustomKeywordField: 'test@test.com' },
     };
 
-    const decodedPayload = decodePayloadAttributes(payload);
+    const decodedPayload = parsePayloadAttributes(payload);
     expect(decodedPayload).toEqual(result);
   });
 });
 
-describe('decode all potential payloads', () => {
+describe('decodeEventAttributes', () => {
+  beforeEach(() => {
+    overrideRemoteCodecConfiguration.set(true);
+  });
+
+  afterEach(() => {
+    resetLastDataEncoderSuccess();
+    codecEndpoint.set(null);
+    includeCredentials.set(false);
+    overrideRemoteCodecConfiguration.set(false);
+    vi.clearAllMocks();
+  });
+
   it('Should decode a payload with codec endpoint with encoding json/plain`', async () => {
-    const event = await decodeAllPotentialPayloadsWithCodec(
-      getTestPayloadEvent(),
-      'default',
-      {},
-      '',
-    );
+    const event = await decodeEventAttributes(getTestPayloadEvent());
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual('a test attribute');
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
   });
   it('Should not decode a null payload with codec endpoint with encoding json/plain`', async () => {
-    const event = await decodeAllPotentialPayloadsWithCodec(
+    const event = await decodeEventAttributes(
       getTestPayloadEventWithNullEncodedAttributes(),
-      'default',
-      {},
-      '',
     );
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual(null);
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
   });
-});
 
-describe('convertPayloadToJsonWithCodec', () => {
-  afterEach(() => {
-    resetLastDataEncoderSuccess();
-    vi.clearAllMocks();
-  });
   it('Should convert a payload through data-converter and set the success status when the endpoint is set and the endpoint connects', async () => {
     vi.stubGlobal('fetch', async () => {
       return {
@@ -286,57 +326,40 @@ describe('convertPayloadToJsonWithCodec', () => {
       };
     });
 
-    const endpoint = 'http://localhost:1337';
-    const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
+    codecEndpoint.set('http://localhost:1337');
+    const convertedPayload = await decodeEventAttributes(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+    );
 
-    const decodedPayload = decodePayloadAttributes(convertedPayload);
+    const decodedPayload = parsePayloadAttributes(convertedPayload);
     expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('success');
   });
   it('Should fail converting a payload through data-converter and set the error status when the endpoint is set and the endpoint fails', async () => {
-    // tslint:disable-next-line
     vi.stubGlobal('fetch', async () => {
       return {
         json: () => Promise.reject(),
       };
     });
 
-    const endpoint = 'http://localhost:1337';
-    const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
+    codecEndpoint.set('http://localhost:1337');
+    try {
+      await decodeEventAttributes(
+        parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      );
+    } catch {
+      // expected to throw on codec failure
+    }
 
-    const decodedPayload = decodePayloadAttributes(convertedPayload);
-    expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('error');
   });
   it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
-    const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint: '',
-        },
-      },
-    });
-    const decodedPayload = decodePayloadAttributes(convertedPayload);
+    const convertedPayload = await decodeEventAttributes(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+    );
+    const decodedPayload = parsePayloadAttributes(convertedPayload);
     expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
 
     const dataConverterStatus = get(lastDataEncoderStatus);
@@ -351,16 +374,10 @@ describe('convertPayloadToJsonWithCodec', () => {
 
     vi.stubGlobal('fetch', mockFetch);
 
-    const endpoint = 'http://localhost:1337';
-    await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
+    codecEndpoint.set('http://localhost:1337');
+    await decodeEventAttributes(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+    );
 
     expect(mockFetch).toBeCalledWith(
       expect.any(String),
@@ -376,17 +393,11 @@ describe('convertPayloadToJsonWithCodec', () => {
 
     vi.stubGlobal('fetch', mockFetch);
 
-    const endpoint = 'http://localhost:1337';
-    await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-          includeCredentials: true,
-        },
-      },
-    });
+    codecEndpoint.set('http://localhost:1337');
+    includeCredentials.set(true);
+    await decodeEventAttributes(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+    );
 
     expect(mockFetch).toBeCalledWith(
       expect.any(String),
@@ -400,6 +411,8 @@ describe('getEventAttributes', () => {
   afterEach(() => {
     resetLastDataEncoderSuccess();
     resetLastDataConverterSuccess();
+    codecEndpoint.set(null);
+    overrideRemoteCodecConfiguration.set(false);
   });
   it('Should convert a payload through data-converter and set the success status when the endpoint is set locally and the endpoint connects', async () => {
     vi.stubGlobal('fetch', async () => {
@@ -408,20 +421,12 @@ describe('getEventAttributes', () => {
       };
     });
 
-    const endpoint = 'http://localhost:1337';
-    codecEndpoint.set(endpoint);
+    codecEndpoint.set('http://localhost:1337');
+    overrideRemoteCodecConfiguration.set(true);
 
-    const decodedPayload = await getEventAttributes({
-      historyEvent: parseWithBigInt(
-        stringifyWithBigInt(workflowStartedHistoryEvent),
-      ),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint: '',
-        },
-      },
-    });
+    const decodedPayload = await getEventAttributes(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedHistoryEvent)),
+    );
 
     expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
     const dataConverterStatus = get(lastDataEncoderStatus);

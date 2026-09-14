@@ -402,6 +402,141 @@ pnpm validate:versions
 - [Peter Evans Actions](https://github.com/peter-evans)
 - [Release Drafter Configuration](https://github.com/release-drafter/release-drafter)
 
+## Weekly Frontend On-Call Review
+
+`weekly-oncall-review.yml` creates one Slack thread in `#oncall-frontend` and
+fans out to small, independently callable review modules. Scheduling is
+intentionally disabled pending enablement; start it from **Actions → Weekly
+On-Call Review** when needed. Manual runs default to `dry-run`; choose `apply`
+only when the generated dependency remediation draft PR may be updated. Manual
+notifications default to `C0BPXR260DA`
+(`#other-ross-tests-stuff`) so test runs do not post to the on-call channel.
+The `slack_channel` input accepts another Slack channel ID when needed.
+If scheduling is reintroduced, the dormant schedule fallback remains
+fail-safe: it uses `dry-run` mode and `ONCALL_FRONTEND_SLACK_CHANNEL`.
+`notify: false` runs the audits without posting to Slack.
+
+A separate `weekly-oncall-review-pr-test.yml` workflow validates internal pull
+requests that change the on-call workflows or the scripts and tests they use. It
+does not run for a change to `package.json` or `pnpm-lock.yaml`, because
+`lint-and-test.yml` and `playwright.yml` already validate a dependency change on
+every pull request. It checks out the PR head SHA and runs the dependency module
+in `dry-run` mode plus the VLN and external-review audits. Fork and Dependabot
+pull requests are skipped. The PR workflow passes no stored repository secrets
+and disables every notification path, so it validates the audit and remediation
+logic without posting to Slack or publishing changes.
+
+The same workflow also holds a manual rehearsal. A `workflow_dispatch` run
+starts the dependency module in the mode you choose, including `apply`, and sets
+the `publish` input to false. The job that holds the GitHub App token therefore
+does not run, and no pull request is touched. The publish job also refuses a
+`pull_request` event, so the rehearsal has two independent guards.
+
+After merging, use a manual `dry-run` dispatch to the default test channel
+`C0BPXR260DA` when Slack delivery itself needs validation.
+
+The coordinator owns the root Slack post and a final status reply. Modules add
+their own replies in the same thread:
+
+- `weekly-dependency-security-review.yml` audits Dependabot alerts, applies a
+  minimal dependency remediation in `apply` mode, and reports its evidence.
+- `weekly-vln-review.yml` reports open VLN remediation PRs.
+- `weekly-external-contributor-review.yml` reports active, non-bot PRs from
+  external forks. It groups the top five review-ready, triage, and
+  author-follow-up candidates and includes a stale-count summary.
+
+The module boundary is intentional: a future on-call concern can be added as a
+new `workflow_call` workflow and one more coordinator job without modifying the
+existing reviewers.
+
+### Dependency-security safety model
+
+The dependency module is a two-stage workflow. Its audit/remediation job has a
+read-only `GITHUB_TOKEN`; it has no Slack token and no Temporal CI/CD App
+credential. That job is the only one that runs `pnpm` or project code. It:
+
+1. tests the automation scripts;
+2. reads Dependabot alerts using the narrow `vulnerability-alerts: read`
+   permission and writes JSON evidence;
+3. in `apply` mode, writes the authorized actions of the deterministic plan to
+   `package.json`, and records `deterministic-planner` as the resolver. No model
+   reads or writes any file. Manual and ambiguous findings stay reported rather
+   than changed;
+4. proves that the planner created no unexpected file and changed nothing except
+   the existing `package.json`;
+5. applies any authorized Go module action with `go get` and `go mod tidy`, so
+   the Go toolchain owns that change;
+6. resolves `pnpm-lock.yaml` in the trusted workflow and performs a fresh frozen
+   install, with lifecycle scripts and Husky disabled;
+7. permits only `package.json` and `pnpm-lock.yaml` changes;
+8. records the audited source revision SHA and SHA-256 hashes for both
+   candidate files in the remediation report and a separate attestation before
+   package executables run;
+9. runs `svelte-kit sync` explicitly to generate the ignored `.svelte-kit`
+   metadata normally produced by the disabled lifecycle hook, then runs the unit
+   tests, `pnpm run check`, `lint:ci`, and `pnpm build:server` the way the pull
+   request checks run them;
+10. verifies that none of that package execution changed either candidate file
+    or the audit and final remediation evidence, and only then exports all four
+    trusted hashes as verified job outputs.
+
+The VLN and external-contributor modules pass narrower audit scopes. They do
+not request vulnerability-alert permissions and do not query Dependabot.
+
+Only a successful `apply` candidate is passed as an artifact to the publishing
+job. That job does **not** run a package manager or repository package code. It
+validates the candidate artifact and its hashes against the audit job's
+out-of-band verified outputs, and requires both its checkout and the current
+remote `main` to exactly match the audited base SHA. The artifact cannot vouch
+for its own integrity. The publisher verifies the audit and final remediation
+report hashes before trusting report fields, and the notifier likewise refuses
+to digest evidence that does not match those verified outputs. A newer `main`
+aborts the publish step so the next run
+can regenerate and retest the candidate. The publisher then uses the existing
+`TEMPORAL_CICD_APP_ID` and
+`TEMPORAL_CICD_PRIVATE_KEY` GitHub App credentials with only contents and pull
+request write permissions, and creates or force-with-lease updates the single
+draft branch `automation/weekly-dependency-security`.
+
+Premerge PR runs cannot reach the publishing path: they call the dependency
+module with `mode: dry-run`, and its publishing job is additionally blocked
+for every `pull_request` event. Dry runs require no Slack or GitHub App
+secret.
+
+The draft PR is therefore idempotent: one open PR accumulates the current
+week's minimal safe fixes. The workflow never dismisses Dependabot alerts;
+alerts resolve when a reviewed PR reaches `main`. If an alert needs a major
+upgrade, an unsupported manifest/ecosystem, or another manual decision, the
+Slack report calls it out instead of changing dependencies.
+
+Artifacts contain the audit, remediation plan, and any approved candidate for
+14 days. A Slack reply is still posted when the audit fails or no PR is needed,
+so on-call has a durable run link and failure signal. The dependency reply also
+receives the publish job's explicit `success`, `failure`, or `skipped` outcome;
+it only reports a published remediation when a successful job returned a PR
+URL.
+
+### Required configuration
+
+Repository secrets:
+
+- `SLACK_BOT_TOKEN` — used only by the root and module notification jobs.
+- `TEMPORAL_CICD_APP_ID` and `TEMPORAL_CICD_PRIVATE_KEY` — used only by the
+  dependency publishing job to update the draft PR.
+
+Repository variables:
+
+- `ONCALL_FRONTEND_SLACK_CHANNEL` — Slack channel ID for `#oncall-frontend`.
+
+The automation reports are covered by:
+
+```bash
+pnpm test:github-automation
+```
+
+This runs the shared audit, remediation planner, and digest tests without
+installing or executing the application dependency graph.
+
 ## 🔄 File Locations
 
 ### Workflows

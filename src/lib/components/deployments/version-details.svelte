@@ -5,7 +5,7 @@
 
   import WorkflowDetail from '../lines-and-dots/workflow-detail.svelte';
 
-  export let version: WorkerDeploymentVersionInfo;
+  let { version }: { version: WorkerDeploymentVersionInfo } = $props();
 </script>
 
 <div class="flex w-full flex-col gap-2 lg:flex-row lg:gap-8 xl:gap-16">

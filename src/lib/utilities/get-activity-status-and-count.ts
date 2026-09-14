@@ -1,8 +1,10 @@
 import type { ActivityExecutionStatus } from '$lib/types/activity-execution';
-import { decodePayload } from '$lib/utilities/decode-payload';
+import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
+import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
 
 export type ActivityStatus =
   | 'Running'
+  | 'Paused'
   | 'Completed'
   | 'Failed'
   | 'Canceled'
@@ -23,6 +25,7 @@ const executionStatusToActivityStatus: Record<
   ActivityStatus
 > = {
   ACTIVITY_EXECUTION_STATUS_UNSPECIFIED: 'Running',
+  ACTIVITY_EXECUTION_STATUS_PAUSED: 'Paused',
   ACTIVITY_EXECUTION_STATUS_RUNNING: 'Running',
   ACTIVITY_EXECUTION_STATUS_COMPLETED: 'Completed',
   ACTIVITY_EXECUTION_STATUS_FAILED: 'Failed',
@@ -37,10 +40,12 @@ export const toActivityStatus = (
   return executionStatusToActivityStatus[status] || 'Running';
 };
 
-export const getActivityStatusAndCountOfGroup = (groups = []) => {
+export const getActivityStatusAndCountOfGroup = (
+  groups: CountWorkflowExecutionsResponse['groups'] = [],
+): { status: ActivityStatus; count: number }[] => {
   return groups
     .map((group) => {
-      const rawStatus = decodePayload(
+      const rawStatus = parseRawPayloadToJSON(
         group?.groupValues[0],
       ) as unknown as ActivityStatus;
       const count = parseInt(group.count);

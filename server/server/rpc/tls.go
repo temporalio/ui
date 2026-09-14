@@ -61,17 +61,17 @@ type certLoader struct {
 }
 
 func (l *certLoader) GetClientCertificate(_ *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-	stat, err := os.Stat(l.KeyFile)
+	stat, err := os.Stat(l.CertFile)
 	if err != nil {
 		l.lock.RLock()
 		existingCert := l.cachedCert
 		l.lock.RUnlock()
 
 		if existingCert == nil {
-			return nil, fmt.Errorf("statting tls key file: %w", err)
+			return nil, fmt.Errorf("statting tls cert file: %w", err)
 		}
 
-		log.Printf("unable to stat tls key file, returning cached cert which may expire: %s", err)
+		log.Printf("unable to stat tls cert file, returning cached cert which may expire: %s", err)
 		return existingCert, nil
 	}
 

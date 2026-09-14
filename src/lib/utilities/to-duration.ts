@@ -158,15 +158,3 @@ export const fromSeconds = (
 
   return `${durationString}`;
 };
-
-export const isValidDurationQuery = (value: string): boolean => {
-  const isValidNumber = !isNaN(Number(value));
-  const isValidGolangDuration =
-    /^-?\d+\S*$/.test(value) &&
-    ['ns', 'us', 'µs', 'ms', 's', 'm', 'h'].some((char) =>
-      value.endsWith(char),
-    );
-  const isValidTime = /^\d+:[0-5][0-9]:[0-5][0-9]$/.test(value);
-
-  return isValidNumber || isValidGolangDuration || isValidTime;
-};

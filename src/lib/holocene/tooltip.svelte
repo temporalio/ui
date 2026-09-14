@@ -1,18 +1,31 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Portal from '$lib/holocene/portal/portal.svelte';
+  import type {
+    PortalOffset,
+    PortalPosition,
+  } from '$lib/holocene/portal/types';
+  import { type IconComponent } from '$lib/io/icon';
   import type { Only } from '$lib/types/global';
+
+  const HOVER_HIDE_DELAY_MS = 120;
 
   type BaseProps = {
     text?: string;
-    icon?: IconName;
-    hide?: boolean;
-    width?: number;
+    Icon?: IconComponent;
+    hide?: boolean | null;
+    width?: number | null;
     class?: string;
     tooltipClass?: string;
     show?: boolean;
+    usePortal?: boolean;
+    portalOffset?: PortalOffset;
+    scrollContainer?: string;
+    children?: Snippet;
+    content?: Snippet;
   };
 
   type BasePositionProps = {
@@ -45,68 +58,194 @@
     | OnlyLeft
     | OnlyTopLeft;
 
-  type $$Props = BaseProps & AllUniquePositionProps;
+  type Props = BaseProps & AllUniquePositionProps;
 
-  let className = '';
-  export { className as class };
-  export let text = '';
-  export let icon: IconName = null;
-  /** bottom center of the tooltip aligned to the top center of the wrapper */
-  export let top = false;
-  /** bottom right of the tooltip aligned to the top right of the wrapper */
-  export let topRight = false;
-  /** left center of the tooltip aligned to the right center of the wrapper */
-  export let right = false;
-  /** top center of the tooltip aligned to the bottom center of the wrapper */
-  export let bottom = false;
-  /** top left of the tooltip aligned to the bottom left of the wrapper */
-  export let bottomLeft = false;
-  /** top right of the tooltip aligned to the bottom right of the wrapper */
-  export let bottomRight = false;
-  /** right center of the tooltip aligned to the left center of the wrapper */
-  export let left = false;
-  /** bottom left of the tooltip aligned to the top left of the wrapper   */
-  export let topLeft = false;
-  export let hide: boolean | null = false;
-  export let width: number | null = null;
-  export let tooltipClass = '';
-  export let show = false;
+  let {
+    class: className = '',
+    text = '',
+    Icon,
+    top,
+    topRight,
+    right,
+    bottom,
+    bottomLeft,
+    bottomRight,
+    left,
+    topLeft,
+    hide = false,
+    width = null,
+    tooltipClass = '',
+    show = false,
+    usePortal = false,
+    portalOffset,
+    scrollContainer,
+    children,
+    content,
+  }: Props = $props();
+
+  let wrapperElement = $state<HTMLElement | null>(null);
+  let isHovered = $state(false);
+  let isFocused = $state(false);
+  let dismissed = $state(false);
+  let hoverHideTimer: ReturnType<typeof setTimeout> | null = null;
+  const uid = $props.id();
+  const tooltipId = `tooltip-${uid}`;
+
+  const isOpen = $derived((show || isHovered || isFocused) && !dismissed);
+
+  $effect(() => {
+    if (!isHovered && !isFocused && dismissed) {
+      dismissed = false;
+    }
+  });
+
+  function cancelHide() {
+    if (hoverHideTimer) {
+      clearTimeout(hoverHideTimer);
+      hoverHideTimer = null;
+    }
+  }
+
+  function handleHoverEnter() {
+    cancelHide();
+    isHovered = true;
+  }
+
+  function handleHoverLeave() {
+    cancelHide();
+    hoverHideTimer = setTimeout(() => {
+      isHovered = false;
+      hoverHideTimer = null;
+    }, HOVER_HIDE_DELAY_MS);
+  }
+
+  function handleWindowKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape' && isOpen) {
+      dismissed = true;
+    }
+  }
+
+  function isFocusVisible(target: EventTarget | null) {
+    if (!(target instanceof Element)) return true;
+
+    try {
+      return target.matches(':focus-visible');
+    } catch {
+      return true;
+    }
+  }
+
+  function handleFocusIn(event: FocusEvent) {
+    if (!isFocusVisible(event.target)) return;
+
+    isFocused = true;
+  }
+
+  function handleFocusOut(event: FocusEvent) {
+    const next = event.relatedTarget as HTMLElement | null;
+    if (next && wrapperElement?.contains(next)) return;
+    isFocused = false;
+  }
+
+  onDestroy(() => {
+    cancelHide();
+  });
+
+  const portalPosition = $derived.by((): PortalPosition => {
+    if (top) return 'top';
+    if (topRight) return 'top-right';
+    if (right) return 'right';
+    if (bottomRight) return 'bottom-right';
+    if (bottom) return 'bottom';
+    if (bottomLeft) return 'bottom-left';
+    if (left) return 'left';
+    if (topLeft) return 'top-left';
+    return 'top';
+  });
 </script>
 
+<svelte:window onkeydowncapture={handleWindowKeydown} />
+
+{#snippet tooltipContent()}
+  {#if content}
+    {@render content()}
+  {:else}
+    {#if Icon}<Icon class="inline h-4" />{/if}
+    <span>{text}</span>
+  {/if}
+{/snippet}
+
 {#if hide}
-  <slot />
+  {@render children?.()}
 {:else}
-  <div class={merge('wrapper group relative inline-block', className)}>
-    <slot />
-    <div
-      class={merge(
-        'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-95',
-        show && 'inline-block opacity-95',
-      )}
-      class:left
-      class:right
-      class:bottom
-      class:bottomLeft
-      class:bottomRight
-      class:top
-      class:topRight
-      class:topLeft
-      style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
-    >
-      <div
-        class={merge(
-          'inline-block rounded-md bg-slate-800 px-2 py-2 text-slate-50',
-          tooltipClass,
-        )}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    bind:this={wrapperElement}
+    class={merge('wrapper relative inline-block', className)}
+    aria-describedby={isOpen ? tooltipId : undefined}
+    onmouseenter={handleHoverEnter}
+    onmouseleave={handleHoverLeave}
+    onfocusin={handleFocusIn}
+    onfocusout={handleFocusOut}
+  >
+    {@render children?.()}
+
+    {#if usePortal && wrapperElement}
+      <Portal
+        offset={portalOffset}
+        anchor={wrapperElement}
+        open={isOpen}
+        position={portalPosition}
+        {scrollContainer}
       >
-        <div class="flex gap-2">
-          <slot name="content">
-            {#if icon}<Icon name={icon} class="inline h-4" />{/if}
-            <span>{text}</span>
-          </slot>
+        <div
+          id={tooltipId}
+          role="tooltip"
+          class={merge(
+            'inline-block rounded bg-neutral-7 px-2 py-2 text-xs text-white',
+            tooltipClass,
+          )}
+          onmouseenter={handleHoverEnter}
+          onmouseleave={handleHoverLeave}
+          style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
+        >
+          <div class="flex gap-2">
+            {@render tooltipContent()}
+          </div>
+        </div>
+      </Portal>
+    {:else}
+      <div
+        id={tooltipId}
+        role="tooltip"
+        class={merge(
+          'tooltip absolute left-0 top-0 z-50 translate-x-12 whitespace-nowrap text-xs transition-all',
+          isOpen ? 'inline-block opacity-100' : 'hidden opacity-0',
+        )}
+        onmouseenter={handleHoverEnter}
+        onmouseleave={handleHoverLeave}
+        class:left
+        class:right
+        class:bottom
+        class:bottomLeft
+        class:bottomRight
+        class:top
+        class:topRight
+        class:topLeft
+        style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
+      >
+        <div
+          class={merge(
+            'inline-block rounded bg-neutral-7 px-2 py-2 text-white',
+            tooltipClass,
+          )}
+        >
+          <div class="flex gap-2">
+            {@render tooltipContent()}
+          </div>
         </div>
       </div>
-    </div>
+    {/if}
   </div>
 {/if}
 

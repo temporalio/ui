@@ -1,29 +1,35 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
+<script lang="ts" module>
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { fn } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
 
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   import Option from './option.svelte';
   import Select from './select.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Select',
     component: Select,
+    render: template,
     args: {
       id: 'select',
       label: 'Select',
       placeholder: 'Select an option',
-      leadingIcon: undefined,
       labelHidden: false,
       disabled: false,
+      onChange: fn(),
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
       placeholder: { name: 'Placeholder', control: 'text' },
-      leadingIcon: {
-        name: 'Icon',
+      LeadingIcon: {
+        name: 'Leading Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
       },
       disabled: { name: 'Disabled', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
@@ -35,24 +41,23 @@
         options: ['left', 'right'],
       },
     },
-  } satisfies Meta<Select<string>>;
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: ComponentProps<typeof Select>,
+  context: StoryContext<ComponentProps<typeof Select>>,
+)}
   <Select {...args} id={context.id}>
     <Option value="pizza">Pizza</Option>
     <Option value="hamburgers">Hamburgers</Option>
     <Option value="hot_dogs">Hot Dogs</Option>
   </Select>
-</Template>
+{/snippet}
 
 <Story name="Unselected" />
 
-<Story name="With Icon" args={{ leadingIcon: 'regions' }} />
+<Story name="With Icon" args={{ LeadingIcon: ioIcons.IconRegions }} />
 
 <Story name="Selected" args={{ value: 'pizza' }} />
 
@@ -62,7 +67,7 @@
 
 <Story
   name="Disabled with Icon"
-  args={{ disabled: true, leadingIcon: 'regions' }}
+  args={{ disabled: true, LeadingIcon: ioIcons.IconRegions }}
 />
 
 <Story name="Disabled and Selected" args={{ disabled: true, value: 'pizza' }} />

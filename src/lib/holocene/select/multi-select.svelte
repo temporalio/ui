@@ -1,3 +1,10 @@
+<script module lang="ts">
+  import type { IconComponent } from '$lib/io/icon';
+
+  type Option = { label: string; value: string; Icon?: IconComponent };
+  export type MultiSelectOptions = Option[];
+</script>
+
 <script lang="ts">
   import { writable } from 'svelte/store';
 
@@ -11,31 +18,47 @@
   } from '$lib/holocene/menu';
 
   import type { ButtonStyles } from '../button.svelte';
-  import type { IconName } from '../icon';
-  import Icon from '../icon/icon.svelte';
 
-  type Option = { label: string; value: string; icon?: IconName };
-  type MultiSelectOptions = Option[];
+  interface Props {
+    options?: MultiSelectOptions;
+    initialSelected?: MultiSelectOptions;
+    onChange: (options: MultiSelectOptions) => void;
+    label: string;
+    id: string;
+    variant?: ButtonStyles['variant'];
+    Icon?: IconComponent;
+    selectAllLabel: string;
+    clearAllLabel: string;
+    active?: boolean;
+    disabled?: boolean;
+    position?: 'left' | 'right';
+    initialSelectedAll?: boolean;
+  }
 
-  export let options: MultiSelectOptions = [];
-  export let initialSelected: MultiSelectOptions = [];
-  export let onChange: (options: MultiSelectOptions) => void;
-  export let label: string;
-  export let id: string;
-  export let variant: ButtonStyles['variant'] = 'secondary';
-  export let icon: IconName | undefined = undefined;
-  export let selectAllLabel: string;
-  export let clearAllLabel: string;
-  export let active = false;
-  export let disabled = false;
-  export let position: 'left' | 'right' = 'left';
-  export let initialSelectedAll = true;
+  let {
+    options = [],
+    initialSelected = [],
+    onChange,
+    label,
+    id,
+    variant = 'secondary',
+    Icon,
+    selectAllLabel,
+    clearAllLabel,
+    active = false,
+    disabled = false,
+    position = 'left',
+    initialSelectedAll = true,
+  }: Props = $props();
 
-  let selectedOptions = initialSelected.length
-    ? initialSelected
-    : initialSelectedAll
-      ? options
-      : [];
+  // svelte-ignore state_referenced_locally
+  let selectedOptions = $state(
+    initialSelected.length
+      ? initialSelected
+      : initialSelectedAll
+        ? options
+        : [],
+  );
 
   const open = writable(false);
 
@@ -71,7 +94,7 @@
     data-track-intent="select"
     data-track-text={label}
   >
-    {#if icon}<Icon class="md:hidden" name={icon} />{/if}
+    {#if Icon}<Icon class="md:hidden" />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>
   <Menu {id} keepOpen {position}>
@@ -87,15 +110,16 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:click={() => onOptionClick(option)}
+            onclick={() => onOptionClick(option)}
             {checked}
             label={option.label}
             labelHidden
           />
         {/snippet}
         <div class="flex items-center gap-2">
-          {#if option.icon}
-            <Icon name={option.icon} />
+          {#if option.Icon}
+            {@const OptionIcon = option.Icon}
+            <OptionIcon />
           {/if}
           {option.label}
         </div>

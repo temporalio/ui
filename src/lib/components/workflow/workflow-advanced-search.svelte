@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-  import { fly } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconSearch } from '$lib/io/icon';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -15,17 +15,8 @@
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  let manualSearchString = '';
-
-  $: query = $page.url.searchParams.get('query');
-
-  function setManualString(query: string) {
-    manualSearchString = query;
-  }
-
-  $: {
-    setManualString(query);
-  }
+  const query = $derived(page.url.searchParams.get('query'));
+  let manualSearchString = $derived(query ?? '');
 
   const onSearch = () => {
     if (!manualSearchString) {
@@ -46,7 +37,7 @@
       $refresh = Date.now();
     } else {
       updateQueryParameters({
-        url: $page.url,
+        url: page.url,
         parameter: 'query',
         value: manualSearchString,
         allowEmpty: true,
@@ -62,7 +53,10 @@
 
 <div class="w-full" in:fade>
   <form
-    on:submit|preventDefault={onSearch}
+    onsubmit={(e) => {
+      e.preventDefault();
+      onSearch();
+    }}
     class="flex gap-0"
     in:fly={{ x: -100, duration: 150 }}
     role="search"
@@ -73,11 +67,12 @@
       label={translate('workflows.search-placeholder')}
       labelHidden
       placeholder={translate('workflows.search-placeholder')}
-      icon="search"
+      Icon={IconSearch}
       class="grow lg:w-3/4 [&_*]:border-r-0"
+      inputContainerClass="bg-surface-primary"
       clearable
       clearButtonLabel={translate('common.clear-input-button-label')}
-      on:clear={handleClearInput}
+      onClear={handleClearInput}
       bind:value={manualSearchString}
       maxLength={MAX_QUERY_LENGTH}
       hideCount={!manualSearchString ||

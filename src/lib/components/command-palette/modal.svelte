@@ -6,7 +6,7 @@
 
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { focusTrap } from '$lib/utilities/focus-trap';
+  import { IconClose } from '$lib/io/icon';
 
   interface Props extends HTMLAttributes<HTMLDialogElement> {
     content: Snippet;
@@ -62,7 +62,7 @@
   });
 </script>
 
-<svelte:window on:click={handleClick} />
+<svelte:window onclick={handleClick} />
 
 <dialog
   {id}
@@ -73,14 +73,13 @@
   aria-modal="true"
   aria-labelledby="modal-title-{id}"
   data-testid={dataTestId}
-  use:focusTrap={true}
 >
   {#if !loading}
     <IconButton
       label={cancelText}
-      icon="close"
+      Icon={IconClose}
       class="float-right m-4"
-      on:click={closeModal}
+      onclick={closeModal}
     />
   {/if}
   <div id="modal-content-{id}" class="content">
@@ -97,7 +96,7 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full overflow-y-auto rounded-sm border border-secondary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
+    @apply z-50 w-full overflow-y-auto rounded-lg border border-secondary bg-surface-primary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
   }
 
   .body::backdrop {
@@ -109,7 +108,7 @@
   }
 
   .title {
-    @apply surface-primary px-8 pb-0 pt-8 text-2xl;
+    @apply bg-surface-primary px-8 pb-0 pt-8 text-2xl text-primary;
   }
 
   .content {

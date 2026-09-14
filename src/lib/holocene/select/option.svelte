@@ -29,7 +29,10 @@
   const { selectValue, handleChange, options } =
     getContext<SelectContext<T>>(SELECT_CONTEXT);
 
-  interface Props extends Omit<MenuItemWithoutHrefProps, 'value' | 'onclick'> {
+  interface Props extends Omit<
+    MenuItemWithoutHrefProps,
+    'value' | 'onclick' | 'interaction'
+  > {
     value: T;
     children: Snippet;
     onclick?: (value: T) => void;
@@ -38,9 +41,9 @@
   let { value, children, onclick, ...rest }: Props = $props();
 
   let selected = $state(false);
-  let _value: T | string = $state();
+  let _value: T | string | undefined = $state();
   let slotWrapper: HTMLSpanElement;
-  let optionElement: HTMLLIElement;
+  let optionElement: HTMLLIElement | undefined = undefined;
   let label: string;
 
   $effect(() => {
@@ -54,7 +57,11 @@
   onMount(() => {
     if (slotWrapper) {
       label = slotWrapper.textContent;
-      $options.push({ value, label, nativeElement: optionElement });
+      $options.push({
+        value,
+        label,
+        nativeElement: optionElement!,
+      });
     }
   });
 
@@ -72,7 +79,13 @@
   };
 </script>
 
-<MenuItem onclick={handleOptionClick} role="option" {selected} {...rest}>
+<MenuItem
+  onclick={handleOptionClick}
+  role="option"
+  interaction="select"
+  {selected}
+  {...rest}
+>
   <span bind:this={slotWrapper}>
     {@render children()}
   </span>

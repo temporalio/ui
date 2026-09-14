@@ -4,13 +4,16 @@
 
   import { page } from '$app/state';
 
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import PendingAttemptBadge from '$lib/components/workflow/pending-attempt-badge/pending-attempt-badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { IconChevronDown, IconChevronUp } from '$lib/io/icon';
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
@@ -19,8 +22,11 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
+  import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
+  import { toEventLinkView } from '$lib/utilities/event-link';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -32,9 +38,9 @@
   import {
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
+    isWorkflowExecutionSignaledEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
-  import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import { eventTypeStyle } from './event-styles';
   import { CategoryIcon } from '../lines-and-dots/constants';
@@ -42,7 +48,6 @@
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
-  import MetadataDecoder from './metadata-decoder.svelte';
 
   interface Props {
     event: IterableEvent;
@@ -70,7 +75,7 @@
   let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
 
   const selectedId = $derived(
-    isEventGroup(event) ? Array.from(event.events.keys()).shift() : event.id,
+    isEventGroup(event) ? event.eventList[0]?.id : event.id,
   );
 
   const { workflow, run, namespace } = $derived(page.params);
@@ -82,7 +87,9 @@
   const attributes = $derived(formatAttributes(event));
 
   const currentEvent = $derived(
-    isEventGroup(event) ? event.events.get(selectedId) : event,
+    isEventGroup(event)
+      ? event.eventList.find((e) => e.id === selectedId)
+      : event,
   );
 
   const elapsedTime = $derived(
@@ -97,9 +104,8 @@
 
   const duration = $derived(
     isEventGroup(event)
-      ? formatDistanceAbbreviated({
-          start: event.initialEvent?.eventTime,
-          end: event.lastEvent?.eventTime,
+      ? formatEventGroupDuration({
+          group: event,
           includeMillisecondsForUnderSecond: true,
         })
       : '',
@@ -109,26 +115,46 @@
   const canceled = $derived(eventOrGroupIsCanceled(event));
   const terminated = $derived(eventOrGroupIsTerminated(event));
 
-  const displayName = $derived(
-    isEventGroup(event)
-      ? event.label
-      : isLocalActivityMarkerEvent(event)
-        ? translate('events.category.local-activity')
-        : spaceBetweenCapitalLetters(event.name),
+  const systemNexus = $derived(
+    resolveSystemNexusEvent(
+      isEventGroup(event) ? event.initialEvent : (event as WorkflowEvent),
+      { namespace, workflow, run, initiatingEvent: group?.initialEvent },
+    ),
   );
 
+  const systemNexusSummaryLink = $derived(
+    systemNexus?.links?.find((link) => link.kind === 'target-execution'),
+  );
+
+  const displayName = $derived.by(() => {
+    if (isEventGroup(event)) {
+      if (event.pendingActivity) return translate('workflows.pending-activity');
+      if (event.pendingNexusOperation)
+        return translate('workflows.pending-nexus-operation');
+      return event.label;
+    }
+    if (isLocalActivityMarkerEvent(event))
+      return translate('events.category.local-activity');
+    if (systemNexus?.displayName) return systemNexus.displayName;
+    return spaceBetweenCapitalLetters(event.name);
+  });
+
   const primaryAttribute = $derived(
-    !isLocalActivityMarkerEvent(event)
+    !isLocalActivityMarkerEvent(event) && !systemNexus
       ? getPrimaryAttributeForEvent(
           isEventGroup(event) ? event.initialEvent : event,
         )
       : undefined,
   );
 
+  const effectiveCategory = $derived(
+    systemNexus?.timelineCategory ?? event.category,
+  );
+
   const secondaryAttribute = $derived(
     getSecondaryAttributeForEvent(
       isEventGroup(event) ? event.lastEvent : event,
-      primaryAttribute?.key,
+      primaryAttribute?.key ?? '',
     ),
   );
 
@@ -154,6 +180,7 @@
 
   const showSecondaryAttribute = $derived(
     compact &&
+      !systemNexus &&
       secondaryAttribute?.key &&
       secondaryAttribute?.key !== primaryAttribute?.key &&
       !currentEvent?.userMetadata?.summary,
@@ -165,11 +192,14 @@
     $timestamp(currentEvent?.eventTime, { format: 'short' }),
   );
 
-  const onLinkClick = (event) => {
+  const onLinkClick = (event?: MouseEvent) => {
     expanded = !expanded;
-    event.stopPropagation();
+    event?.stopPropagation?.();
     onRowClick();
   };
+
+  const detailsId = $derived(`event-details-${event.id}-${index}`);
+
   const handleMouseEnter = () => {
     hoveredEventId = event.id;
   };
@@ -177,34 +207,49 @@
     hoveredEventId = undefined;
   };
 
-  let hasRelatedActivities = (group, hoveredEventId) => {
-    return group?.eventIds?.has(hoveredEventId);
+  const hasRelatedActivities = (
+    group: EventGroup | undefined,
+    hoveredEventId: string | undefined,
+  ) => {
+    return group?.eventList?.some((e) => e.id === hoveredEventId);
   };
 
   onMount(async () => {
     if (isLocalActivityMarkerEvent(event)) {
-      primaryLocalAttribute = await decodeLocalActivity(event, {
-        namespace: page.params.namespace,
-        settings: page.data.settings,
-      });
+      primaryLocalAttribute = await decodeLocalActivity(event);
     } else if (
       isEventGroup(event) &&
       isLocalActivityMarkerEvent(event.initialEvent)
     ) {
-      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent, {
-        namespace: page.params.namespace,
-        settings: page.data.settings,
-      });
+      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent);
     }
   });
+
+  const CategoryGlyph = $derived(CategoryIcon[effectiveCategory].Icon);
 </script>
+
+{#snippet expandButton()}
+  <IconButton
+    Icon={expanded ? IconChevronUp : IconChevronDown}
+    label={expanded
+      ? translate('events.collapse-details')
+      : translate('events.expand-details')}
+    aria-expanded={expanded}
+    aria-controls={expanded ? detailsId : undefined}
+    class="h-6 w-6"
+    onclick={(e) => {
+      e.stopPropagation();
+      onLinkClick(e);
+    }}
+  />
+{/snippet}
 
 <tr
   class={merge(
     'hover:cursor-pointer',
-    failure && '!bg-red-400/40 hover:!bg-red-400/60',
-    canceled && '!bg-yellow-400/30 hover:!bg-yellow-400/50',
-    terminated && '!bg-pink-700/30 hover:!bg-pink-700/50',
+    failure && '!bg-alpha-red-40 hover:!bg-alpha-red-60',
+    canceled && '!bg-alpha-amber-30 hover:!bg-alpha-amber-50',
+    terminated && '!bg-alpha-pink-30 hover:!bg-alpha-pink-50',
     hasRelatedActivities(group, hoveredEventId) && 'active',
   )}
   id={`${event.id}-${index}`}
@@ -216,27 +261,33 @@
 >
   {#if isEventGroup(event)}
     <td class="font-mono">
-      <div class="flex items-center gap-0.5">
-        {#each event.eventList as groupEvent}
-          <Link
-            data-testid="link"
-            href={routeForEventHistoryEvent({
-              eventId: groupEvent.id,
-              namespace,
-              workflow,
-              run,
-            })}
-          >
-            {groupEvent.id}
-          </Link>
-        {/each}
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <div class="flex items-center gap-0.5">
+          {#each event.eventList as groupEvent (groupEvent.id)}
+            <Link
+              data-testid="link"
+              href={routeForEventHistoryEvent({
+                eventId: groupEvent.id,
+                namespace,
+                workflow,
+                run,
+              })}
+            >
+              {groupEvent.id}
+            </Link>
+          {/each}
+        </div>
       </div>
     </td>
   {:else}
     <td class="font-mono">
-      <Link data-testid="link" {href}>
-        {event.id}
-      </Link>
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <Link data-testid="link" {href}>
+          {event.id}
+        </Link>
+      </div>
     </td>
   {/if}
   <td class="text-right md:hidden">
@@ -272,11 +323,13 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p class={eventTypeStyle({ category: event.category })}>
-      <Icon
-        name={CategoryIcon[event.category].name}
-        title={CategoryIcon[event.category].title}
-        class="mr-1 inline"
+    <p class={eventTypeStyle({ category: effectiveCategory })}>
+      <CategoryGlyph
+        title={CategoryIcon[effectiveCategory].title}
+        class={merge(
+          'mr-1 inline',
+          isEventGroup(event) && event.isPending && 'animate-pulse',
+        )}
       />
       {displayName}
     </p>
@@ -286,38 +339,17 @@
   >
     <div class="flex items-center gap-2">
       {#if pendingAttempt}
-        <Badge
+        <PendingAttemptBadge
+          attempt={pendingAttempt}
+          maximumAttempts={isPendingActivity
+            ? (isPendingActivity.maximumAttempts ?? null)
+            : undefined}
+          paused={Boolean(isPausedPendingActivity)}
+          nextRetryTime={isPendingActivity
+            ? isPendingActivity.scheduledTime
+            : undefined}
           class="mr-1"
-          type={isPausedPendingActivity
-            ? 'warning'
-            : pendingAttempt > 1
-              ? 'danger'
-              : 'default'}
-        >
-          <Icon
-            class={merge(
-              'mr-1 inline',
-              pendingAttempt > 1 && 'font-bold text-red-400',
-              isPausedPendingActivity && 'font-bold text-yellow-700',
-            )}
-            name={isPausedPendingActivity ? 'pause' : 'retry'}
-          />
-          {translate('workflows.attempt')}
-          {pendingAttempt}
-          {#if isPendingActivity}
-            / {isPendingActivity?.maximumAttempts || '∞'}
-            {#if pendingAttempt > 1}
-              {@const timeDifference = toTimeDifference({
-                date: isPendingActivity?.scheduledTime,
-                negativeDefault: '',
-              })}
-              {#if timeDifference}
-                • {translate('workflows.next-retry')}
-                {timeDifference}
-              {/if}
-            {/if}
-          {/if}
-        </Badge>
+        />
       {/if}
       {#if !primaryLocalAttribute && primaryAttribute?.key}
         <EventDetailsRow {...primaryAttribute} {attributes} />
@@ -326,27 +358,40 @@
         <EventDetailsRow {...primaryLocalAttribute} {attributes} />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
-        <MetadataDecoder
-          value={currentEvent.userMetadata.summary}
-          let:decodedValue
+        <div
+          class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
-          {#if decodedValue}
-            <div
-              class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
-            >
-              <p class="whitespace-nowrap text-right text-xs">Summary</p>
-              <Badge type="secondary" class="block select-none truncate">
-                {decodedValue}
-              </Badge>
-            </div>
-          {/if}
-        </MetadataDecoder>
+          <p class="whitespace-nowrap text-right text-xs">Summary</p>
+          <PayloadSummary value={currentEvent.userMetadata.summary} />
+        </div>
       {/if}
-      {#if currentEvent?.links?.length}
+      {#if systemNexus?.summaryAttribute}
+        <EventDetailsRow
+          key={systemNexus.summaryAttribute.key}
+          value={systemNexus.summaryAttribute.value}
+          {attributes}
+        />
+      {:else if systemNexusSummaryLink}
         <EventLink
-          link={currentEvent.links[0]}
+          view={systemNexusSummaryLink}
           class="max-w-xl"
           linkClass="truncate"
+          labelClass="text-xs"
+        />
+      {:else if currentEvent?.links?.length && !systemNexus}
+        {@const callerPerspective =
+          isWorkflowExecutionSignaledEvent(currentEvent)}
+        {@const linkView = toEventLinkView(currentEvent.links[0], {
+          namespace,
+          ...(callerPerspective && { perspective: 'caller' as const }),
+        })}
+        <EventLink
+          view={callerPerspective
+            ? { ...linkView, label: translate('nexus.caller-execution') }
+            : linkView}
+          class="max-w-xl"
+          linkClass="truncate"
+          labelClass="text-xs"
         />
       {/if}
       {#if nonPendingActivityAttempt}
@@ -369,9 +414,7 @@
             text={translate('workflows.estimated-billable-actions')}
             topRight
           >
-            <Badge type="subtle" class="text-bold shrink-0 gap-1 px-1.5">
-              {event.billableActions}
-            </Badge>
+            <BadgeCount value={event.billableActions} class="shrink-0" />
           </Tooltip>
         {/if}
       </div>
@@ -380,21 +423,26 @@
 </tr>
 {#if expanded}
   <tr
+    id={detailsId}
     class="w-full text-sm no-underline"
     data-testid="event-summary-row-expanded"
   >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
-      <EventDetailsFull {group} event={currentEvent} />
+      <EventDetailsFull
+        {group}
+        event={currentEvent}
+        groupRow={isEventGroup(event)}
+      />
     </td>
   </tr>
 {/if}
 
 <style lang="postcss">
   tr[data-testid='event-summary-row'].active {
-    @apply surface-table-related-hover;
+    @apply bg-interactive-secondary-hover text-primary;
   }
 
   tr[data-testid='event-summary-row'].active:hover {
-    @apply surface-table-header;
+    @apply bg-surface-tertiary;
   }
 </style>

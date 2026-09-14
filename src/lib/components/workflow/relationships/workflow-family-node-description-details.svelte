@@ -1,29 +1,44 @@
 <script lang="ts">
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconAdd, IconHyphen } from '$lib/io/icon';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import { showFullTree } from '../workflow-relationships.svelte';
 
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let isRootWorkflow = false;
-  export let isActive = false;
-  export let children = 0;
-  export let expanded = false;
+  type Props = {
+    workflow: WorkflowExecution;
+    namespace: string;
+    isRootWorkflow?: boolean;
+    isActive?: boolean;
+    childrenCount?: number;
+    expanded?: boolean;
+  };
 
-  $: elapsedTime = formatDistanceAbbreviated({
-    start: workflow?.startTime,
-    end: workflow?.endTime || Date.now(),
-    includeMilliseconds: true,
-  });
+  let {
+    workflow,
+    namespace,
+    isRootWorkflow = false,
+    isActive = false,
+    childrenCount = 0,
+    expanded = false,
+  }: Props = $props();
 
-  $: showExpandIcon = !isRootWorkflow && $showFullTree && children;
+  const elapsedTime = $derived(
+    formatDistanceAbbreviated({
+      start: workflow?.startTime,
+      end: workflow?.endTime || Date.now(),
+      includeMilliseconds: true,
+    }),
+  );
+
+  const showExpandIcon = $derived(
+    !isRootWorkflow && $showFullTree && childrenCount,
+  );
 </script>
 
 <div
@@ -32,7 +47,7 @@
   <div class="flex w-full flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
     <div class="flex items-center gap-2 lg:basis-96">
       <div class="w-32 leading-4">
-        <WorkflowStatus status={workflow.status} />
+        <WorkflowStatusBadge status={workflow.status} />
       </div>
       <div class="w-full leading-4">
         {#if isRootWorkflow}
@@ -62,7 +77,7 @@
           <p class="text-xs">{translate('common.child-count')}</p>
         {/if}
         <div class="flex basis-16 items-center gap-1 leading-4 lg:justify-end">
-          <span class="font-mono">{children}</span>
+          <span class="font-mono">{childrenCount}</span>
         </div>
       </div>
     {/if}
@@ -88,6 +103,7 @@
     </div>
   </div>
   {#if showExpandIcon}
-    <Icon class="shrink-0" name={expanded ? 'hyphen' : 'add'} />
+    {@const Glyph = expanded ? IconHyphen : IconAdd}
+    <Glyph class="shrink-0" />
   {/if}
 </div>

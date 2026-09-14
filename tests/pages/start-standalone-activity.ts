@@ -7,6 +7,7 @@ export class StartStandaloneActivityPage {
   readonly taskQueueInput: Locator;
   readonly startToCloseTimeoutInput: Locator;
   readonly scheduleToCloseTimeoutInput: Locator;
+  readonly startDelayInput: Locator;
   readonly submitButton: Locator;
   readonly activityIdInputError: Locator;
   readonly activityTypeInputError: Locator;
@@ -23,6 +24,7 @@ export class StartStandaloneActivityPage {
     this.taskQueueInput = page.locator('#taskQueue');
     this.startToCloseTimeoutInput = page.locator('#startToCloseTimeout');
     this.scheduleToCloseTimeoutInput = page.locator('#scheduleToCloseTimeout');
+    this.startDelayInput = page.locator('#startDelay');
     this.submitButton = page.getByTestId(
       'start-standalone-activity-submit-button',
     );

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { ClassNameValue } from 'tailwind-merge';
+
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { type IconComponent } from '$lib/io/icon';
 
   import DetailListValue from './detail-list-value.svelte';
 
@@ -11,9 +11,11 @@
     copyableText?: string;
     text: string;
     tooltipText?: string;
-    isBadge?: boolean;
-    badgeType?: BadgeType;
-    iconName?: IconName | undefined;
+    tooltipWidth?: number;
+    Icon?: IconComponent | undefined;
+    iconPosition?: 'leading' | 'trailing';
+    hasNumber?: boolean;
+    class?: ClassNameValue;
   }
 
   let {
@@ -21,30 +23,34 @@
     text,
     copyableText = text,
     tooltipText,
-    iconName,
-    isBadge = false,
-    badgeType = 'default',
+    tooltipWidth = 256,
+    Icon,
+    iconPosition = 'leading',
+    hasNumber = /\d/.test(text ?? ''),
+    class: className = '',
   }: Props = $props();
 </script>
 
 {#snippet content()}
-  {#if isBadge}
-    <Badge type={badgeType}>
-      {text}
-    </Badge>
-  {:else}
-    <div class="flex select-all items-center gap-1 truncate rounded-sm">
-      {#if iconName}
-        <Icon name={iconName} class="shrink-0" />
-      {/if}
-      <span class="truncate">{text}</span>
-    </div>
-  {/if}
+  <div class="flex select-all items-center gap-1 truncate rounded-sm">
+    {#if Icon && iconPosition === 'leading'}
+      <Icon class="shrink-0" />
+    {/if}
+    <span class="truncate {hasNumber ? 'font-mono' : ''}">{text}</span>
+    {#if Icon && iconPosition === 'trailing'}
+      <Icon class="shrink-0" />
+    {/if}
+  </div>
 {/snippet}
 
-<DetailListValue {copyable} {copyableText}>
+<DetailListValue class={className} {copyable} {copyableText}>
   {#if tooltipText}
-    <Tooltip text={tooltipText} top class="min-w-0">
+    <Tooltip
+      text={tooltipText}
+      top
+      width={tooltipWidth}
+      class="min-w-0 font-sans"
+    >
       {@render content()}
     </Tooltip>
   {:else}

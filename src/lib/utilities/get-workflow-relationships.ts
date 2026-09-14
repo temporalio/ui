@@ -1,3 +1,5 @@
+import { getGroupId } from '$lib/models/event-groups/get-group-id';
+import { isSystemNexusScheduledEvent } from '$lib/system-nexus-endpoints';
 import type { DescribeNamespaceResponse, EventLink } from '$lib/types';
 import type {
   ChildWorkflowExecutionCanceledEvent,
@@ -75,7 +77,7 @@ export const getWorkflowRelationships = (
   ) as ChildWorkflowClosedEvent[];
   const hasChildren = !!workflow?.pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
-  const parentNamespaceName = namespace.namespaceInfo?.name;
+  const parentNamespaceName = namespace.namespaceInfo?.name ?? undefined;
 
   const workflowExecutionStartedEvent = fullEventHistory.find(
     isWorkflowExecutionStartedEvent,
@@ -87,10 +89,13 @@ export const getWorkflowRelationships = (
     workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;
 
   const first =
-    firstExecutionRunId === workflow?.runId ? undefined : firstExecutionRunId;
+    firstExecutionRunId === workflow?.runId
+      ? undefined
+      : (firstExecutionRunId ?? undefined);
 
   const previous =
-    workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;
+    workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId ??
+    undefined;
 
   let scheduleId = '';
   const temporalScheduledById =
@@ -111,7 +116,7 @@ export const getWorkflowRelationships = (
 
   const relationshipCount =
     (parent ? 1 : 0) +
-    workflow?.pendingChildren.length +
+    (workflow?.pendingChildren?.length ?? 0) +
     children.length +
     (first ? 1 : 0) +
     (previous ? 1 : 0) +
@@ -136,12 +141,21 @@ export const getWorkflowNexusLinksFromHistory = (
   history: WorkflowEvents,
 ): EventLink[] => {
   try {
+    // Operations on the system endpoint are an internal transport, not a Nexus
+    // operation the user started. Their links do not belong in the list.
+    const systemOperationIds = new Set(
+      history
+        .filter((event) => isSystemNexusScheduledEvent(event))
+        .map((event) => event.id),
+    );
     const links = new Set<EventLink>();
     for (const event of history) {
-      if (event.category === 'nexus' && event.links && event.links.length > 0) {
-        for (const link of event.links) {
-          links.add(link);
-        }
+      if (event.category !== 'nexus') continue;
+      if (!event.links?.length) continue;
+      if (systemOperationIds.has(getGroupId(event))) continue;
+
+      for (const link of event.links) {
+        links.add(link);
       }
     }
 

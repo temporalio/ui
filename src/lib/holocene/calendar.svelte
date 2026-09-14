@@ -1,35 +1,42 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import { getDateRows, weekDays } from '$lib/utilities/calendar';
 
-  const dispatch = createEventDispatcher();
-
-  export let date: Date | undefined;
-  export let month: number | undefined;
-  export let year: number | undefined;
-  export let isAllowed = (_date: Date) => true;
-
-  let cells = [];
-
-  const onChange = (date: number) => {
-    dispatch('datechange', new Date(year, month, date));
+  type Props = {
+    date: Date;
+    month: number;
+    year: number;
+    isAllowed?: (date: Date) => boolean;
+    onDateChange?: (date: Date) => void;
   };
 
-  const allow = (year: number, month: number, date: number) => {
-    if (!date) return true;
-    return isAllowed(new Date(year, month, date));
+  let {
+    date,
+    month,
+    year,
+    isAllowed = (_date: Date) => true,
+    onDateChange,
+  }: Props = $props();
+
+  const onChange = (selectedDay: number) => {
+    onDateChange?.(new Date(year, month, selectedDay));
   };
 
-  $: cells = getDateRows(month, year).map((c) => ({
-    value: c,
-    allowed: allow(year, month, c),
-  }));
+  const allow = (year: number, month: number, day: number | undefined) => {
+    if (!day) return true;
+    return isAllowed(new Date(year, month, day));
+  };
+
+  const cells = $derived(
+    getDateRows(month, year).map((c) => ({
+      value: c,
+      allowed: allow(year, month, c),
+    })),
+  );
 </script>
 
 <div class="container">
   <div class="row">
-    {#each weekDays as day}
+    {#each weekDays as day (day.label)}
       <p class="cell">{day.label.slice(0, 2)}</p>
     {/each}
   </div>
@@ -39,7 +46,8 @@
       {#if value}
         <button
           type="button"
-          on:click={allowed && value ? () => onChange(value) : () => {}}
+          disabled={!allowed}
+          onclick={allowed && value ? () => onChange(value) : () => {}}
           class="cell"
           class:highlight={allowed && value}
           class:disabled={!allowed}
@@ -68,22 +76,26 @@
   }
 
   .cell {
-    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-xl p-2 text-sm;
+    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded-xl p-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary;
   }
 
   .selected {
-    @apply bg-interactive text-off-white;
+    @apply bg-interactive-primary text-white;
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-interactive/50 text-primary;
+    @apply cursor-not-allowed opacity-disabled;
   }
 
-  .highlight {
-    &:not(.disabled) {
-      @apply hover:scale-125 hover:cursor-pointer hover:bg-interactive-hover hover:text-off-white;
+  .highlight:not(.disabled) {
+    @apply cursor-pointer;
+  }
 
-      transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-    }
+  .highlight:not(.disabled, .selected) {
+    @apply hover:bg-interactive-tertiary-hover focus-visible:bg-background-primary;
+  }
+
+  .highlight.selected:not(.disabled) {
+    @apply hover:bg-interactive-primary-hover hover:text-white focus-visible:bg-interactive-primary;
   }
 </style>

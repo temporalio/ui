@@ -11,6 +11,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconNamespaceSwitcher, IconSearch } from '$lib/io/icon';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
   type Props = {
@@ -25,6 +26,7 @@
     endpoint?: NexusEndpoint;
     nameDisabled?: boolean;
     footer?: Snippet<[{ submitting: boolean }]>;
+    validateNamespacesExist?: ValidateNamespacesExist;
   };
 
   let {
@@ -39,6 +41,7 @@
     endpoint = undefined,
     nameDisabled = false,
     footer,
+    validateNamespacesExist,
   }: Props = $props();
 
   export type NexusFormData = {
@@ -49,7 +52,14 @@
     allowedCallerNamespaces: string[];
   };
 
-  const createNexusSchema = (pattern: RegExp) =>
+  export type ValidateNamespacesExist = (args: {
+    namespaceIds: string[];
+  }) => Promise<{ existingNamespaceIds: string[] }>;
+
+  const createNexusSchema = (
+    pattern: RegExp,
+    requireCallerNamespaces: boolean,
+  ) =>
     z.object({
       name: z
         .string()
@@ -58,12 +68,20 @@
         .refine((val) => pattern.test(val), {
           message: translate('nexus.endpoint-name-hint'),
         }),
-      descriptionString: z.string().optional().default(''),
+      descriptionString: z
+        .string()
+        .optional()
+        .default('')
+        .transform((val) => val.trim()),
       targetNamespace: z
         .string()
         .min(1, translate('nexus.target-namespace-required')),
       taskQueue: z.string().min(1, translate('nexus.task-queue-required')),
-      allowedCallerNamespaces: z.array(z.string()).default([]),
+      allowedCallerNamespaces: requireCallerNamespaces
+        ? z
+            .array(z.string())
+            .min(1, translate('nexus.caller-namespace-required'))
+        : z.array(z.string()).default([]),
     });
 
   const initialData: NexusFormData = {
@@ -76,11 +94,47 @@
 
   const superform = superForm(initialData, {
     SPA: true,
-    validators: zodClient(createNexusSchema(nameRegexPattern)),
+    validators: zodClient(createNexusSchema(nameRegexPattern, isCloud)),
     resetForm: false,
     dataType: 'json',
-    onUpdate: async ({ form }) => {
+    onUpdate: async ({ form, cancel }) => {
       if (!form.valid) return;
+
+      if (
+        isCloud &&
+        validateNamespacesExist &&
+        form.data.allowedCallerNamespaces.length > 0
+      ) {
+        try {
+          const { existingNamespaceIds } = await validateNamespacesExist({
+            namespaceIds: form.data.allowedCallerNamespaces,
+          });
+          const missing = form.data.allowedCallerNamespaces.filter(
+            (id) => !existingNamespaceIds.includes(id),
+          );
+          if (missing.length > 0) {
+            message.set({
+              intent: 'error',
+              title: translate('common.error-occurred'),
+              text: translate('nexus.caller-namespaces-do-not-exist', {
+                count: missing.length,
+                namespaces: missing.join(', '),
+              }),
+            });
+            cancel();
+            return;
+          }
+        } catch (err) {
+          message.set({
+            intent: 'error',
+            title: translate('nexus.caller-namespace-validation-failed'),
+            text: err instanceof Error ? err.message : '',
+          });
+          cancel();
+          return;
+        }
+      }
+
       await onSubmit?.(form.data);
     },
     onError: ({ result }) => {
@@ -108,11 +162,15 @@
           message ||
           errorProp ||
           statusText ||
-          (body && JSON.stringify(body)) ||
+          (body ? JSON.stringify(body) : '') ||
           JSON.stringify(error);
       }
 
-      message.set({ type: 'error', text: errorMessage });
+      message.set({
+        intent: 'error',
+        title: translate('common.error-occurred'),
+        text: errorMessage,
+      });
     },
   });
 
@@ -166,7 +224,7 @@
     id="target-namespace"
     name="targetNamespace"
     placeholder={translate('nexus.select-namespace')}
-    leadingIcon="namespace-switcher"
+    LeadingIcon={IconNamespaceSwitcher}
     options={targetNamespaceList}
     optionValueKey="namespace"
     minSize={32}
@@ -184,7 +242,9 @@
   />
   <IsOssGuard {isCloud}>
     <div class="flex flex-col gap-0">
-      <p class="text-base text-primary">{translate('nexus.access-policy')}</p>
+      <p class="text-base text-primary">
+        {translate('nexus.access-policy')}
+      </p>
       <p class="text-xs text-secondary">
         {translate('nexus.allowed-caller-namespaces-description')}
       </p>
@@ -194,15 +254,16 @@
       name="allowedCallerNamespaces"
       multiselect
       displayChips={false}
+      allowCustomValue
+      required
       bind:value={$form.allowedCallerNamespaces}
       options={callerNamespaces}
       label={translate('nexus.allowed-caller-namespaces')}
-      leadingIcon="search"
+      LeadingIcon={IconSearch}
       noResultsText={translate('common.no-results')}
       valid={!$errors.allowedCallerNamespaces}
-      error={typeof $errors.allowedCallerNamespaces?.[0] === 'string'
-        ? $errors.allowedCallerNamespaces[0]
-        : translate('nexus.caller-namespace-required')}
+      error={$errors.allowedCallerNamespaces?._errors?.[0] ||
+        translate('nexus.caller-namespace-required')}
       placeholder={translate('nexus.select-namespaces')}
       optionValueKey="value"
       optionLabelKey="label"

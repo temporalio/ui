@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Readable } from 'svelte/store';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
@@ -14,33 +14,39 @@
     type ConfigurableTableType,
     moveColumn,
     removeColumn,
+    TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
 
-  export let table: ConfigurableTableType;
-  export let availableColumns: Readable<ConfigurableTableHeader[]>;
-  export let type: string;
+  interface Props {
+    table: ConfigurableTableType;
+    availableColumns: Readable<ConfigurableTableHeader[]>;
+    type: string;
+  }
 
-  $: namespace = $page.params.namespace;
-  $: columnsInUse = $configurableTableColumns?.[namespace]?.[table] ?? [];
-  $: availableCustomColumns = availableCustomSearchAttributeColumns(
-    namespace,
-    table,
+  let { table, availableColumns, type }: Props = $props();
+
+  const namespace = $derived(page.params.namespace);
+  const columnsInUse = $derived(
+    $configurableTableColumns?.[namespace]?.[table] ?? [],
+  );
+
+  const availableCustomColumns = $derived(
+    availableCustomSearchAttributeColumns(namespace, table),
   );
 </script>
 
 <div class="flex flex-col gap-4">
   <OrderableList>
-    <svelte:fragment slot="heading">
+    {#snippet heading()}
       {type} <span class="font-normal">(in view)</span>
-    </svelte:fragment>
+    {/snippet}
     {#each columnsInUse as { label }, index (`${label}:${index}`)}
       <OrderableListItem
         {index}
         {label}
         totalItems={columnsInUse.length}
-        on:moveItem={(event) =>
-          moveColumn(event.detail.from, event.detail.to, namespace, table)}
-        on:removeItem={() => removeColumn(label, namespace, table)}
+        onMoveItem={({ from, to }) => moveColumn(from, to, namespace, table)}
+        onRemoveItem={() => removeColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
@@ -62,13 +68,13 @@
     {/each}
   </OrderableList>
   <OrderableList>
-    <svelte:fragment slot="heading">
+    {#snippet heading()}
       Available Columns <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
-    {#each $availableColumns as { label }}
+    {/snippet}
+    {#each $availableColumns as { label } (label)}
       <OrderableListItem
         static
-        on:addItem={() => addColumn(label, namespace, table)}
+        onAddItem={() => addColumn(label, namespace, table)}
         addButtonLabel={translate('workflows.add-column-label', {
           column: label,
         })}
@@ -81,22 +87,24 @@
       />
     {/each}
   </OrderableList>
-  <OrderableList>
-    <svelte:fragment slot="heading">
-      {translate('events.custom-search-attributes')}
-      <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
-    {#each $availableCustomColumns as { label }}
-      <OrderableListItem
-        static
-        on:addItem={() => addColumn(label, namespace, table)}
-        addButtonLabel={translate('workflows.add-column-label', {
-          column: label,
-        })}
-        {label}
-      />
-    {:else}
-      <OrderableListItem readonly label="No Custom Search Attributes" />
-    {/each}
-  </OrderableList>
+  {#if table !== TABLE_TYPE.DEPLOYMENTS}
+    <OrderableList>
+      {#snippet heading()}
+        {translate('events.custom-search-attributes')}
+        <span class="font-normal">(not in view)</span>
+      {/snippet}
+      {#each $availableCustomColumns as { label } (label)}
+        <OrderableListItem
+          static
+          onAddItem={() => addColumn(label, namespace, table)}
+          addButtonLabel={translate('workflows.add-column-label', {
+            column: label,
+          })}
+          {label}
+        />
+      {:else}
+        <OrderableListItem readonly label="No Custom Search Attributes" />
+      {/each}
+    </OrderableList>
+  {/if}
 </div>

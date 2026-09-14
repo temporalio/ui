@@ -1,0 +1,54 @@
+<script lang="ts">
+  import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import {
+    IconExternalLinkOptical,
+    IconTemporalWorker,
+    IconWarning,
+  } from '$lib/io/icon';
+
+  interface Props {
+    createHref: string;
+    error?: string;
+    canCreateServerlessDeployment?: boolean;
+  }
+
+  let {
+    createHref,
+    error = '',
+    canCreateServerlessDeployment = true,
+  }: Props = $props();
+</script>
+
+<div class="flex flex-col items-center gap-4 py-16">
+  <IconTemporalWorker class="h-20 w-20 text-indigo-6" />
+  <div class="flex flex-col items-center gap-2">
+    <p class="text-base font-medium">
+      {translate('deployments.empty-state-title')}
+    </p>
+    <p class="max-w-[500px] text-center text-sm text-secondary">
+      {translate('deployments.empty-state-description')}
+    </p>
+  </div>
+  <div class="flex flex-wrap items-center justify-center gap-4">
+    {#if canCreateServerlessDeployment}
+      <Button variant="secondary" href={createHref}>
+        {translate('deployments.create-serverless-deployment')}
+      </Button>
+    {/if}
+    <Button
+      variant="ghost"
+      href="https://docs.temporal.io/worker-deployments"
+      target="_blank"
+      TrailingIcon={IconExternalLinkOptical}
+    >
+      {translate('deployments.self-managed-deployment')}
+    </Button>
+  </div>
+  {#if error}
+    <Alert intent="warning" Icon={IconWarning} class="max-w-lg">
+      {error}
+    </Alert>
+  {/if}
+</div>

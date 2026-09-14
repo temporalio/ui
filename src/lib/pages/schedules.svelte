@@ -1,23 +1,26 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
-  import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
+  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
+  import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
+  import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalSettings, IconWarning } from '$lib/io/icon';
+  import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
-  import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fetchScheduleCount } from '$lib/services/workflow-counts';
   import {
     availableScheduleColumns,
     configurableTableColumns,
@@ -25,22 +28,39 @@
   } from '$lib/stores/configurable-table-columns';
   import { coreUserStore } from '$lib/stores/core-user';
   import { scheduleFilters } from '$lib/stores/filters';
-  import { schedulesCount } from '$lib/stores/schedules';
   import {
-    customSearchAttributes,
+    DEFAULT_SCHEDULE_SYSTEM_VIEW,
+    savedScheduleQueries,
+    systemScheduleViews,
+  } from '$lib/stores/saved-queries';
+  import { schedulesCount, schedulesRefresh } from '$lib/stores/schedules';
+  import {
+    scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
-    type SearchAttributeOption,
   } from '$lib/stores/search-attributes';
-  import { temporalVersion } from '$lib/stores/versions';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
-  import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  const { namespace } = $derived(page.params);
+  const query = $derived(page.url.searchParams.get('query') ?? '');
+
+  const countPoller = createCountPoller({
+    getStore: () => schedulesCount,
+    fetch: () => fetchScheduleCount({ namespace, query }),
+    transform: (countStr) => parseInt(countStr ?? '0', 10),
+    watch: () => {
+      void namespace;
+      void query;
+      void $schedulesRefresh;
+    },
+  });
+
+  const refreshTime = $derived(new Date(countPoller.refreshTime));
+  const refreshTimeFormatted = $derived($timestamp(refreshTime));
+
   const coreUser = coreUserStore();
-  let refresh = $state(Date.now());
   let customizationDrawerOpen = $state(false);
   let error = $state('');
 
@@ -48,26 +68,10 @@
     customizationDrawerOpen = true;
   };
 
-  const { namespace } = $derived(page.params);
   const columns = $derived(
     $configurableTableColumns?.[namespace]?.schedules ?? [],
   );
   const createDisabled = $derived($coreUser.namespaceWriteDisabled(namespace));
-  const searchAttributeOptions = $derived(
-    Object.entries({
-      ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
-        ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      }),
-      ...$customSearchAttributes,
-    }).map(([key, value]) => {
-      return {
-        label: key,
-        value: key,
-        type: value,
-      } as SearchAttributeOption;
-    }),
-  );
-  const query = $derived(page.url.searchParams.get('query'));
   const onFetch = $derived(() => {
     error = '';
     return fetchPaginatedSchedules(namespace, query, onError);
@@ -76,7 +80,6 @@
 
   onMount(() => {
     if (query) {
-      // Set filters from inital page load query if it exists
       $scheduleFilters = toListWorkflowFilters(
         query,
         $scheduleSearchAttributes,
@@ -84,118 +87,150 @@
     }
   });
 
-  const onError = (err: APIErrorResponse) => {
-    error = err?.body?.message || translate('schedules.error-message-fetching');
+  const onError = (err: unknown) => {
+    error =
+      (err as APIErrorResponse)?.body?.message ||
+      translate('schedules.error-message-fetching');
   };
-
-  const showFilters = $derived(Number($schedulesCount) > 0 || query);
 </script>
 
-<div class="flex flex-col gap-4">
-  <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-    <SchedulesCount />
-  </h1>
-  <div
-    class="flex flex-col gap-2 md:flex-row {showFilters
-      ? 'justify-between'
-      : 'justify-end'}"
-  >
-    {#if showFilters}
-      <SearchAttributeFilter
-        bind:filters={$scheduleFilters}
-        {searchAttributeOptions}
-        refresh={() => {
-          refresh = Date.now();
-        }}
-      />
-    {/if}
+<header class="flex flex-col gap-2">
+  <div class="flex flex-col items-start justify-between gap-2 md:flex-row">
+    <div class="flex flex-row flex-wrap items-start gap-2">
+      <div>
+        <div class="flex flex-row flex-wrap items-start gap-2">
+          <h1
+            class="flex items-center gap-2 leading-7"
+            data-cy="schedules-title"
+          >
+            <span
+              role="status"
+              aria-atomic="true"
+              class="flex items-center gap-2"
+            >
+              <span data-testid="schedule-count"
+                >{$schedulesCount.count.toLocaleString()}</span
+              >
+              {translate('common.schedules-plural', {
+                count: $schedulesCount.count,
+              })}
+            </span>
+          </h1>
+          <CountRefreshButton
+            count={$schedulesCount.newCount}
+            refresh={schedulesRefresh}
+          />
+        </div>
+        <p class="mt-2 text-xs text-secondary">
+          {refreshTimeFormatted}
+        </p>
+      </div>
+    </div>
     {#if !createDisabled}
-      <Button
-        data-testid="create-schedule"
-        href={routeForScheduleCreate({ namespace })}
-        disabled={!writeActionsAreAllowed()}
-      >
-        {translate('schedules.create')}
-      </Button>
+      <div class="flex items-center gap-4">
+        <Button
+          data-testid="create-schedule"
+          href={routeForScheduleCreate({ namespace })}
+          disabled={!writeActionsAreAllowed()}
+        >
+          {translate('schedules.create')}
+        </Button>
+      </div>
     {/if}
   </div>
-</div>
+</header>
 
-{#key [namespace, query, refresh]}
-  <PaginatedTable
-    let:visibleItems
-    {onFetch}
-    {onError}
-    total={$schedulesCount}
-    aria-label={translate('common.schedules')}
-    pageSizeSelectLabel={translate('common.per-page')}
-    nextButtonLabel={translate('common.next')}
-    previousButtonLabel={translate('common.previous')}
-    emptyStateMessage={translate('schedules.empty-state-title')}
-    errorMessage={translate('schedules.error-message-fetching')}
-  >
-    <caption class="sr-only" slot="caption"
-      >{translate('common.schedules')}</caption
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={scheduleFilters}
+    savedQueries={savedScheduleQueries}
+    systemViews={systemScheduleViews}
+    defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+    searchAttributes={scheduleSearchAttributes}
+    id="schedule"
+  />
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
+  />
+  {#key [namespace, query, $schedulesRefresh]}
+    <PaginatedTable
+      {onFetch}
+      {onError}
+      total={$schedulesCount.count}
+      aria-label={translate('common.schedules')}
+      pageSizeSelectLabel={translate('common.per-page')}
+      nextButtonLabel={translate('common.next')}
+      previousButtonLabel={translate('common.previous')}
+      emptyStateMessage={translate('schedules.empty-state-title')}
+      errorMessage={translate('schedules.error-message-fetching')}
     >
-    <tr slot="headers" class="text-left">
-      {#each columns as { label }}
-        <th>{label}</th>
-      {/each}
-    </tr>
-    {#each visibleItems as schedule}
-      <SchedulesTableRow {schedule} {columns} />
-    {/each}
+      {#snippet caption()}
+        <caption class="sr-only">{translate('common.schedules')}</caption>
+      {/snippet}
+      {#snippet headers()}
+        <tr class="text-left">
+          {#each columns as { label }, i (`${label}:${i}`)}
+            <th>{label}</th>
+          {/each}
+        </tr>
+      {/snippet}
+      {#snippet rows({ visibleItems })}
+        {#each visibleItems as schedule}
+          <SchedulesTableRow {schedule} {columns} />
+        {/each}
+      {/snippet}
 
-    <svelte:fragment slot="empty">
-      {#if error}
-        <EmptyState title={translate('schedules.empty-state-title')}>
-          <Alert intent="warning" icon="warning" class="mx-12">
-            {error}
-          </Alert>
-        </EmptyState>
-      {:else if query}
-        <EmptyState
-          title={translate('schedules.empty-state-title')}
-          content={translate('schedules.empty-state-description')}
-        />
-      {:else}
-        <EmptyState title={translate('schedules.empty-state-title')}>
-          <p>
-            {translate('schedules.getting-started-docs-link-preface')}
-            <Link newTab href="https://docs.temporal.io/workflows/#schedule"
-              >{translate('schedules.getting-started-docs-link')}</Link
-            >
-            {translate('schedules.getting-started-cli-link-preface')}
-            <Link newTab href="https://docs.temporal.io/cli/schedule"
-              >Temporal CLI</Link
-            >.
-          </p>
-          {#if !createDisabled}
-            <Button
-              data-testid="create-schedule"
-              on:click={() => goto(routeForScheduleCreate({ namespace }))}
-              disabled={!writeActionsAreAllowed()}
-            >
-              {translate('schedules.create')}
-            </Button>
+      {#snippet empty()}
+        <div class="flex h-full flex-col items-center justify-center">
+          {#if error}
+            <EmptyState title={translate('schedules.empty-state-title')}>
+              <Alert intent="warning" Icon={IconWarning} class="mx-12">
+                {error}
+              </Alert>
+            </EmptyState>
+          {:else if query}
+            <EmptyState
+              title={translate('schedules.empty-state-title')}
+              content={translate('schedules.empty-state-description')}
+            />
+          {:else}
+            <EmptyState title={translate('schedules.empty-state-title')}>
+              <p>
+                {translate('schedules.getting-started-docs-link-preface')}
+                <Link newTab href="https://docs.temporal.io/workflows/#schedule"
+                  >{translate('schedules.getting-started-docs-link')}</Link
+                >
+                {translate('schedules.getting-started-cli-link-preface')}
+                <Link newTab href="https://docs.temporal.io/cli/schedule"
+                  >Temporal CLI</Link
+                >.
+              </p>
+            </EmptyState>
           {/if}
-        </EmptyState>
-      {/if}
-    </svelte:fragment>
-    <svelte:fragment slot="actions-end-additional">
-      <Tooltip text="Configure Columns" top>
-        <Button
-          on:click={openCustomizationDrawer}
-          data-testid="workflows-summary-table-configuration-button"
-          size="xs"
-          variant="ghost"
-        >
-          <Icon name="settings" />
-        </Button>
-      </Tooltip>
-    </svelte:fragment>
-  </PaginatedTable>
-{/key}
+        </div>
+      {/snippet}
+      {#snippet actionsEndAdditional()}
+        <Tooltip text={translate('common.configure-columns')} top>
+          <Button
+            onclick={openCustomizationDrawer}
+            data-testid="schedules-summary-table-configuration-button"
+            size="xs"
+            variant="ghost"
+            aria-label={translate('common.configure-columns')}
+            data-track-name="configure-columns-table-control"
+            data-track-intent="action"
+            data-track-text={translate('common.configure-columns')}
+          >
+            <IconTemporalSettings />
+          </Button>
+        </Tooltip>
+      {/snippet}
+    </PaginatedTable>
+  {/key}
+</MaximizableTableView>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

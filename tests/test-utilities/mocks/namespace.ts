@@ -45,6 +45,10 @@ const MOCK_DEFAULT_NAMESPACE = {
     supportsSchedules: true,
     capabilities: {
       standaloneActivities: true,
+      workerHeartbeats: true,
+      standaloneActivityStartDelay: true,
+      standaloneActivityBatchOperations: true,
+      standaloneActivityOperatorCommands: true,
     },
   },
   config: {
@@ -73,41 +77,14 @@ const MOCK_DEFAULT_NAMESPACE = {
 };
 
 const MOCK_NAMESPACE_WITH_PAUSE_CAPABILITY = {
+  ...MOCK_DEFAULT_NAMESPACE,
   namespaceInfo: {
-    name: 'default',
-    state: 'Registered',
-    description: '',
-    ownerEmail: '',
-    data: {},
-    id: 'bbe0d4ea-c682-4c5a-bc4b-fadb8e8c8bfe',
-    supportsSchedules: true,
+    ...MOCK_DEFAULT_NAMESPACE.namespaceInfo,
     capabilities: {
+      ...MOCK_DEFAULT_NAMESPACE.namespaceInfo.capabilities,
       workflowPause: true,
     },
   },
-  config: {
-    workflowExecutionRetentionTtl: '86400s',
-    badBinaries: {
-      binaries: {},
-    },
-    historyArchivalState: 'Disabled',
-    historyArchivalUri: '',
-    visibilityArchivalState: 'Disabled',
-    visibilityArchivalUri: '',
-    customSearchAttributeAliases: {},
-  },
-  replicationConfig: {
-    activeClusterName: 'active',
-    clusters: [
-      {
-        clusterName: 'active',
-      },
-    ],
-    state: 'Unspecified',
-  },
-  failoverVersion: '0',
-  isGlobalNamespace: false,
-  failoverHistory: [],
 };
 
 export const mockNamespaceApi = (page: Page, archived = false) => {
@@ -122,6 +99,65 @@ export const mockNamespaceWithPauseCapability = (page: Page) => {
   return page.route(NAMESPACE_API, (route) => {
     route.fulfill({
       json: MOCK_NAMESPACE_WITH_PAUSE_CAPABILITY,
+    });
+  });
+};
+
+const MOCK_NAMESPACE_WITH_NEXUS_OPERATIONS = {
+  ...MOCK_DEFAULT_NAMESPACE,
+  namespaceInfo: {
+    ...MOCK_DEFAULT_NAMESPACE.namespaceInfo,
+    capabilities: {
+      ...MOCK_DEFAULT_NAMESPACE.namespaceInfo.capabilities,
+      standaloneNexusOperation: true,
+    },
+  },
+};
+
+export const mockNamespaceWithNexusOperations = (page: Page) => {
+  return page.route(NAMESPACE_API, (route) => {
+    route.fulfill({
+      json: MOCK_NAMESPACE_WITH_NEXUS_OPERATIONS,
+    });
+  });
+};
+
+const MOCK_NAMESPACE_WITH_NO_WORKER_HEARTBEATS = {
+  ...MOCK_DEFAULT_NAMESPACE,
+  namespaceInfo: {
+    ...MOCK_DEFAULT_NAMESPACE.namespaceInfo,
+    capabilities: {
+      ...MOCK_DEFAULT_NAMESPACE.namespaceInfo.capabilities,
+      workerHeartbeats: false,
+    },
+  },
+};
+
+export const mockNamespaceWithNoWorkerHeartbeats = (page: Page) => {
+  return page.route(NAMESPACE_API, (route) => {
+    route.fulfill({
+      json: MOCK_NAMESPACE_WITH_NO_WORKER_HEARTBEATS,
+    });
+  });
+};
+
+const MOCK_NAMESPACE_WITHOUT_STANDALONE_ACTIVITY_START_DELAY = {
+  ...MOCK_DEFAULT_NAMESPACE,
+  namespaceInfo: {
+    ...MOCK_DEFAULT_NAMESPACE.namespaceInfo,
+    capabilities: {
+      ...MOCK_DEFAULT_NAMESPACE.namespaceInfo.capabilities,
+      standaloneActivityStartDelay: false,
+    },
+  },
+};
+
+export const mockNamespaceWithoutStandaloneActivityStartDelay = (
+  page: Page,
+) => {
+  return page.route(NAMESPACE_API, (route) => {
+    route.fulfill({
+      json: MOCK_NAMESPACE_WITHOUT_STANDALONE_ACTIVITY_START_DELAY,
     });
   });
 };

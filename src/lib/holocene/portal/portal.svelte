@@ -6,7 +6,11 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import { portal } from './portal-action';
-  import { calculatePosition, getElementRect } from './position-calculator';
+  import {
+    calculatePosition,
+    getElementRect,
+    hasMoved,
+  } from './position-calculator';
   import type { PortalProps } from './types';
 
   let {
@@ -28,7 +32,8 @@
   let positionY = $state(0);
   let anchorElement = $state<HTMLElement | null>(null);
   let scrollContainerElement = $state<HTMLElement | Window>(window);
-  let rafId = $state<number | null>(null);
+  let rafId: number | null = null;
+  let needsUpdate = false;
 
   const shouldShowPortal = $derived(
     open && anchorElement && (!hideWhenAnchorHidden || isVisible),
@@ -108,13 +113,7 @@
   }
 
   function scheduleUpdate() {
-    if (rafId !== null) {
-      cancelAnimationFrame(rafId);
-    }
-    rafId = requestAnimationFrame(() => {
-      updatePosition();
-      rafId = null;
-    });
+    needsUpdate = true;
   }
 
   function getScrollableAncestors(element: HTMLElement): Set<EventTarget> {
@@ -138,16 +137,36 @@
   function setupPositioning(element: HTMLElement) {
     if (!anchorElement) return;
 
+    const anchorEl = anchorElement;
+
     untrack(() => updatePosition());
+
+    let lastAnchorRect = getElementRect(anchorEl);
+
+    const tick = () => {
+      rafId = requestAnimationFrame(tick);
+
+      if (!anchorEl.isConnected) return;
+
+      const anchorRect = getElementRect(anchorEl);
+
+      if (needsUpdate || hasMoved(anchorRect, lastAnchorRect)) {
+        needsUpdate = false;
+        lastAnchorRect = anchorRect;
+        updatePosition();
+      }
+    };
+
+    rafId = requestAnimationFrame(tick);
 
     const resizeObserver = new ResizeObserver(() => {
       scheduleUpdate();
     });
 
     resizeObserver.observe(element);
-    resizeObserver.observe(anchorElement);
+    resizeObserver.observe(anchorEl);
 
-    const scrollableAncestors = getScrollableAncestors(anchorElement);
+    const scrollableAncestors = getScrollableAncestors(anchorEl);
 
     const scrollCleanup = on(
       document,
@@ -169,6 +188,7 @@
         cancelAnimationFrame(rafId);
         rafId = null;
       }
+      needsUpdate = false;
       resizeObserver.disconnect();
       scrollCleanup();
       resizeCleanup();

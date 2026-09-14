@@ -1,0 +1,99 @@
+import { get } from 'svelte/store';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { createAnnouncer } from './announcer';
+
+describe('createAnnouncer', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('starts with no messages', () => {
+    const announcer = createAnnouncer();
+    expect(get(announcer.messages)).toEqual([]);
+  });
+
+  it('appends a polite message by default', () => {
+    const announcer = createAnnouncer();
+    announcer.announce('Saved');
+    const messages = get(announcer.messages);
+    expect(messages).toHaveLength(1);
+    expect(messages[0].message).toBe('Saved');
+    expect(messages[0].politeness).toBe('polite');
+    expect(messages[0].id).toBeTruthy();
+  });
+
+  it('appends an assertive message when requested', () => {
+    const announcer = createAnnouncer();
+    announcer.announce('Boom', 'assertive');
+    expect(get(announcer.messages)[0].politeness).toBe('assertive');
+  });
+
+  it('gives identical consecutive messages distinct ids', () => {
+    const announcer = createAnnouncer();
+    announcer.announce('Same');
+    announcer.announce('Same');
+    const messages = get(announcer.messages);
+    expect(messages).toHaveLength(2);
+    expect(messages[0].id).not.toBe(messages[1].id);
+  });
+
+  it('removes a message after the timeout', () => {
+    const announcer = createAnnouncer({ timeout: 1000 });
+    announcer.announce('Temporary');
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(1000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
+
+  it('clear() empties the buffer', () => {
+    const announcer = createAnnouncer();
+    announcer.announce('a');
+    announcer.announce('b');
+    announcer.clear();
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
+
+  it('respects duration when duration exceeds timeout', () => {
+    const announcer = createAnnouncer({ timeout: 1000 });
+    announcer.announce('Long', 'polite', 5000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(1000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(4000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
+
+  it('uses timeout when timeout exceeds duration', () => {
+    const announcer = createAnnouncer({ timeout: 5000 });
+    announcer.announce('Short', 'polite', 1000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(1000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(4000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
+
+  it('clear() cancels pending timers so messages do not reappear', () => {
+    const announcer = createAnnouncer({ timeout: 2000 });
+    announcer.announce('Will be cleared');
+    announcer.clear();
+    expect(get(announcer.messages)).toHaveLength(0);
+    vi.advanceTimersByTime(2000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
+
+  it('keeps a longer-duration message until its duration on a default announcer', () => {
+    const announcer = createAnnouncer();
+    announcer.announce('Long', 'polite', 10000);
+    vi.advanceTimersByTime(7000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(3000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
+});

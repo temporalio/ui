@@ -1,11 +1,12 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
-  import { userEvent, within } from '@storybook/test';
+<script lang="ts" module>
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { userEvent, within } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Chip Input',
     component: ChipInput,
     args: {
@@ -18,7 +19,7 @@
       removeChipButtonLabel: 'Remove',
       labelHidden: false,
       validator: isEmail,
-      maxLength: undefined,
+      maxLength: undefined as number | undefined,
       chips: ['tobias@temporal.io'],
       scrollTo: false,
     },
@@ -40,16 +41,18 @@
       },
       scrollTo: { name: 'Scroll To', control: 'boolean' },
     },
-  } satisfies Meta<ChipInput>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
-  <ChipInput {...args} id={context.id} />
-</Template>
+{#snippet template(
+  args: ComponentProps<typeof ChipInput>,
+  context: StoryContext<ComponentProps<typeof ChipInput>>,
+)}
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <ChipInput {...args} id={context.id} />
+  </div>
+{/snippet}
 
 <Story name="Default" />
 

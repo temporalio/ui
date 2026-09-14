@@ -8,13 +8,16 @@
   }
 
   let { navItems }: Props = $props();
+
+  const visibleNavItems = $derived(navItems.filter((item) => !item.hidden));
 </script>
 
-{#each navItems as item (item.label)}
+{#each visibleNavItems as item (item.label)}
   <NavigationItem
     link={item.href}
     label={item.label}
-    icon={item.icon}
+    Icon={item.Icon}
+    data-testid={item.testId}
     tooltip={item.tooltip || item.label}
     external={item.external}
     animate={item.animate}

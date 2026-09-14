@@ -1,23 +1,35 @@
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
+
+  import {
+    IconBuildings,
+    IconChevronRight,
+    IconDownload,
+    IconExternalLink,
+    IconInfo,
+    IconLink,
+    IconLock,
+    IconSearch,
+    IconTag,
+    IconTerminal,
+  } from '$lib/io/icon';
 
   import VerticalNavItem from './vertical-nav-item.svelte';
   import VerticalNav from './vertical-nav.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Vertical Nav',
     component: VerticalNav,
-  } satisfies Meta<VerticalNav>;
+  });
 </script>
 
 <script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
   let activeItemId = $state('overview');
 </script>
 
-<Template let:args>
-  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
+{#snippet template(args: ComponentProps<typeof VerticalNav>)}
+  <div class="min-h-[400px] w-64 border-r border-primary p-4">
     <VerticalNav
       aria-label="Settings navigation"
       activeItemId={args.activeItemId}
@@ -26,65 +38,65 @@
         id="overview"
         href="#overview"
         label="Overview"
-        leadingIcon="office-buildings"
+        LeadingIcon={IconBuildings}
       />
       <VerticalNavItem
         id="security"
         href="#security"
         label="Security"
-        leadingIcon="lock"
+        LeadingIcon={IconLock}
         description="Manage deletion protection"
       />
       <VerticalNavItem
         id="tags"
         href="#tags"
         label="Tags"
-        leadingIcon="tag"
+        LeadingIcon={IconTag}
         description="Namespace metadata"
       />
       <VerticalNavItem
         id="connectivity"
         href="#connectivity"
         label="Connectivity"
-        leadingIcon="link"
+        LeadingIcon={IconLink}
         description="Private link configuration"
       />
       <VerticalNavItem
         id="search-attributes"
         href="#search-attributes"
         label="Search Attributes"
-        leadingIcon="search"
+        LeadingIcon={IconSearch}
         description="Custom search fields"
       />
     </VerticalNav>
   </div>
-</Template>
+{/snippet}
 
-<Story name="Default" args={{ activeItemId: 'overview' }} />
+<Story name="Default" args={{ activeItemId: 'overview' }} {template} />
 
-<Story name="With Active Item" args={{ activeItemId: 'security' }} />
+<Story name="With Active Item" args={{ activeItemId: 'security' }} {template} />
 
-<Story name="With Disabled Items">
-  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
+<Story name="With Disabled Items" asChild>
+  <div class="min-h-[400px] w-64 border-r border-primary p-4">
     <VerticalNav aria-label="Settings navigation" activeItemId="overview">
       <VerticalNavItem
         id="overview"
         href="#overview"
         label="Overview"
-        leadingIcon="office-buildings"
+        LeadingIcon={IconBuildings}
       />
       <VerticalNavItem
         id="security"
         href="#security"
         label="Security"
-        leadingIcon="lock"
+        LeadingIcon={IconLock}
         description="Manage deletion protection"
       />
       <VerticalNavItem
         id="tags"
         href="#tags"
         label="Tags (Coming Soon)"
-        leadingIcon="tag"
+        LeadingIcon={IconTag}
         description="Namespace metadata"
         disabled={true}
       />
@@ -92,7 +104,7 @@
         id="connectivity"
         href="#connectivity"
         label="Connectivity (Coming Soon)"
-        leadingIcon="link"
+        LeadingIcon={IconLink}
         description="Private link configuration"
         disabled={true}
       />
@@ -100,21 +112,21 @@
   </div>
 </Story>
 
-<Story name="Interactive">
-  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
+<Story name="Interactive" asChild>
+  <div class="min-h-[400px] w-64 border-r border-primary p-4">
     <VerticalNav aria-label="Settings navigation" {activeItemId}>
       <VerticalNavItem
         id="overview"
         href="#overview"
         label="Overview"
-        leadingIcon="office-buildings"
+        LeadingIcon={IconBuildings}
         onclick={() => (activeItemId = 'overview')}
       />
       <VerticalNavItem
         id="security"
         href="#security"
         label="Security"
-        leadingIcon="lock"
+        LeadingIcon={IconLock}
         description="Manage deletion protection"
         onclick={() => (activeItemId = 'security')}
       />
@@ -122,7 +134,7 @@
         id="tags"
         href="#tags"
         label="Tags"
-        leadingIcon="tag"
+        LeadingIcon={IconTag}
         description="Namespace metadata"
         onclick={() => (activeItemId = 'tags')}
       />
@@ -130,7 +142,7 @@
         id="connectivity"
         href="#connectivity"
         label="Connectivity"
-        leadingIcon="link"
+        LeadingIcon={IconLink}
         description="Private link configuration"
         onclick={() => (activeItemId = 'connectivity')}
       />
@@ -138,7 +150,7 @@
         id="search-attributes"
         href="#search-attributes"
         label="Search Attributes"
-        leadingIcon="search"
+        LeadingIcon={IconSearch}
         description="Custom search fields"
         onclick={() => (activeItemId = 'search-attributes')}
       />
@@ -146,7 +158,7 @@
         id="codec-server"
         href="#codec-server"
         label="Codec Server"
-        leadingIcon="terminal"
+        LeadingIcon={IconTerminal}
         description="Data encryption settings"
         onclick={() => (activeItemId = 'codec-server')}
       />
@@ -154,7 +166,7 @@
         id="export"
         href="#export"
         label="Export"
-        leadingIcon="download"
+        LeadingIcon={IconDownload}
         description="Data export configuration"
         onclick={() => (activeItemId = 'export')}
       />
@@ -165,46 +177,46 @@
   </div>
 </Story>
 
-<Story name="With Trailing Icons">
-  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
+<Story name="With Trailing Icons" asChild>
+  <div class="min-h-[400px] w-64 border-r border-primary p-4">
     <VerticalNav aria-label="Settings navigation" activeItemId="overview">
       <VerticalNavItem
         id="overview"
         href="#overview"
         label="Overview"
-        leadingIcon="office-buildings"
-        trailingIcon="chevron-right"
+        LeadingIcon={IconBuildings}
+        TrailingIcon={IconChevronRight}
       />
       <VerticalNavItem
         id="security"
         href="#security"
         label="Security"
-        leadingIcon="lock"
-        trailingIcon="external-link"
+        LeadingIcon={IconLock}
+        TrailingIcon={IconExternalLink}
         description="Opens in new tab"
       />
       <VerticalNavItem
         id="tags"
         href="#tags"
         label="Tags"
-        leadingIcon="tag"
-        trailingIcon="info"
+        LeadingIcon={IconTag}
+        TrailingIcon={IconInfo}
         description="Learn more about tags"
       />
     </VerticalNav>
   </div>
 </Story>
 
-<Story name="With Content Panels">
+<Story name="With Content Panels" asChild>
   <div class="flex min-h-[500px]">
     <!-- Navigation -->
-    <div class="w-64 border-r border-subtle p-4">
+    <div class="w-64 border-r border-primary p-4">
       <VerticalNav aria-label="Settings navigation" {activeItemId}>
         <VerticalNavItem
           id="overview"
           href="#overview"
           label="Overview"
-          leadingIcon="office-buildings"
+          LeadingIcon={IconBuildings}
           onclick={(e) => {
             e.preventDefault();
             activeItemId = 'overview';
@@ -214,7 +226,7 @@
           id="security"
           href="#security"
           label="Security"
-          leadingIcon="lock"
+          LeadingIcon={IconLock}
           description="Manage deletion protection"
           onclick={(e) => {
             e.preventDefault();
@@ -225,7 +237,7 @@
           id="tags"
           href="#tags"
           label="Tags"
-          leadingIcon="tag"
+          LeadingIcon={IconTag}
           description="Namespace metadata"
           onclick={(e) => {
             e.preventDefault();
@@ -236,7 +248,7 @@
           id="connectivity"
           href="#connectivity"
           label="Connectivity"
-          leadingIcon="link"
+          LeadingIcon={IconLink}
           description="Private link configuration"
           onclick={(e) => {
             e.preventDefault();
@@ -247,7 +259,7 @@
           id="search-attributes"
           href="#search-attributes"
           label="Search Attributes"
-          leadingIcon="search"
+          LeadingIcon={IconSearch}
           description="Custom search fields"
           onclick={(e) => {
             e.preventDefault();
@@ -266,11 +278,11 @@
             Get a high-level view of your namespace configuration and usage.
           </p>
           <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-lg border border-subtle p-4">
+            <div class="rounded-lg border border-primary p-4">
               <h3 class="mb-2 font-medium">Region</h3>
               <p class="text-sm text-secondary">us-west-2</p>
             </div>
-            <div class="rounded-lg border border-subtle p-4">
+            <div class="rounded-lg border border-primary p-4">
               <h3 class="mb-2 font-medium">Created</h3>
               <p class="text-sm text-secondary">2 months ago</p>
             </div>
@@ -282,7 +294,7 @@
           <p class="text-secondary">
             Configure deletion protection and other security features.
           </p>
-          <div class="rounded-lg border border-subtle p-4">
+          <div class="rounded-lg border border-primary p-4">
             <label class="flex items-center gap-3">
               <input type="checkbox" class="rounded" checked />
               <div>
@@ -302,10 +314,10 @@
           </p>
           <div class="space-y-2">
             <div class="flex items-center gap-2">
-              <span class="bg-interactive-secondary rounded px-2 py-1 text-sm">
+              <span class="rounded bg-surface-secondary px-2 py-1 text-sm">
                 environment: production
               </span>
-              <span class="bg-interactive-secondary rounded px-2 py-1 text-sm">
+              <span class="rounded bg-surface-secondary px-2 py-1 text-sm">
                 team: platform
               </span>
             </div>
@@ -320,7 +332,7 @@
           <p class="text-secondary">
             Configure private links and network connectivity options.
           </p>
-          <div class="rounded-lg border border-subtle p-4">
+          <div class="rounded-lg border border-primary p-4">
             <h3 class="mb-2 font-medium">Private Links</h3>
             <p class="text-sm text-secondary">No private links configured</p>
             <button class="mt-2 text-sm text-primary hover:underline">
@@ -335,13 +347,13 @@
             Define custom search attributes for advanced workflow filtering.
           </p>
           <div class="space-y-2">
-            <div class="rounded-lg border border-subtle p-3">
+            <div class="rounded-lg border border-primary p-3">
               <div class="flex items-center justify-between">
                 <span class="font-mono text-sm">CustomerId</span>
                 <span class="text-sm text-secondary">Keyword</span>
               </div>
             </div>
-            <div class="rounded-lg border border-subtle p-3">
+            <div class="rounded-lg border border-primary p-3">
               <div class="flex items-center justify-between">
                 <span class="font-mono text-sm">OrderAmount</span>
                 <span class="text-sm text-secondary">Double</span>

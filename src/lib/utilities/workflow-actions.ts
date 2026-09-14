@@ -9,7 +9,7 @@ export const getPlaceholder = (
   action: Action,
   identity: string | undefined,
 ): string => {
-  let translatedAction: string;
+  let translatedAction = '';
   switch (action) {
     case Action.Cancel:
       translatedAction = translate('workflows.canceled');
@@ -35,19 +35,6 @@ export const getPlaceholder = (
 
   return translate('workflows.workflow-action-reason-placeholder', {
     action: translatedAction,
-    identity: identity || translate('common.unknown'),
+    identity: identity || 'webui',
   });
-};
-
-export const formatReason = ({
-  action,
-  reason,
-  identity,
-}: {
-  action: Action;
-  reason: string;
-  identity: string | undefined;
-}) => {
-  const placeholder = getPlaceholder(action, identity);
-  return reason ? [reason.trim(), placeholder].join(' ') : placeholder;
 };

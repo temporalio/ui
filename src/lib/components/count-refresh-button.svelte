@@ -1,0 +1,52 @@
+<script lang="ts">
+  import type { Writable } from 'svelte/store';
+  import { fly } from 'svelte/transition';
+
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import Button from '$lib/holocene/button.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
+
+  interface Props {
+    count: number;
+    refresh: Writable<number>;
+    onRefresh?: () => void;
+  }
+
+  let { count, refresh, onRefresh }: Props = $props();
+
+  const duration = 300;
+</script>
+
+<Button
+  size="xs"
+  variant="ghost"
+  LeadingIcon={IconRetry}
+  onclick={() => {
+    $refresh = Date.now();
+    onRefresh?.();
+  }}
+>
+  {translate('common.refresh')}
+  <span
+    class={merge(
+      'inline-grid overflow-hidden rounded-sm bg-surface-tertiary px-1 py-0.5',
+      !count && 'bg-transparent p-0',
+    )}
+  >
+    {#key count}
+      <span
+        class="col-start-1 row-start-1"
+        in:fly={{ y: 8, duration }}
+        out:fly={{ y: -8, duration }}
+      >
+        {#if count > 0}
+          +{count.toLocaleString()}
+        {:else if count < 0}
+          {count.toLocaleString()}
+        {/if}
+      </span>
+    {/key}
+  </span>
+</Button>

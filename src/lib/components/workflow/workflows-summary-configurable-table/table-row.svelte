@@ -1,44 +1,67 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRelationship } from '$lib/io/icon';
   import {
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { tableDensity } from '$lib/stores/table-density';
+  import { supportsWorkflowBulkActions } from '$lib/stores/workflow-bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   import StartWorkflowButton from '../start-workflow-button.svelte';
 
-  export let workflow: WorkflowExecution | undefined = undefined;
-  export let empty = false;
-  export let viewChildren: (workflow?: WorkflowExecution) => void = () => {};
-  export let childCount: number | undefined = undefined;
-  export let child = false;
+  type Props = {
+    workflow: WorkflowExecution;
+    empty?: boolean;
+    toggleChildrenVisibility?: (
+      workflow: WorkflowExecution,
+    ) => void | Promise<void>;
+    childCount?: number | undefined;
+    child?: boolean;
+    onClickBatchSelect?: (e: MouseEvent) => void;
+    children?: Snippet;
+  };
+
+  let {
+    workflow,
+    empty = false,
+    toggleChildrenVisibility = () => {},
+    childCount = undefined,
+    child = false,
+    onClickBatchSelect = () => {},
+    children,
+  }: Props = $props();
 
   const { allSelected, selectedWorkflows } = getContext<BatchOperationContext>(
     BATCH_OPERATION_CONTEXT,
   );
 
-  $: ({ namespace } = $page.params);
+  const namespace = $derived(page.params.namespace);
 
-  $: parentWorkflows =
-    $page.url.searchParams.get('query') === '`ParentWorkflowId` is null';
+  const parentWorkflows = $derived(
+    page.url.searchParams.get('query') === '`ParentWorkflowId` is null',
+  );
 
-  $: label = translate('workflows.select-workflow', {
-    workflow: workflow?.id,
-  });
+  const label = $derived(
+    translate('workflows.select-workflow', { workflow: workflow?.id }),
+  );
 
-  $: childrenShown = childCount !== undefined;
+  const childrenShown = $derived(childCount !== undefined);
+
+  const checked = $derived(
+    ($allSelected && !child) ||
+      $selectedWorkflows.some((selected) => selected.runId === workflow.runId),
+  );
 </script>
 
 <tr
@@ -47,12 +70,14 @@
   class:child
   class="dense"
 >
-  {#if !empty && $supportsBulkActions}
+  {#if !empty && $supportsWorkflowBulkActions}
     <td class="relative">
       <Checkbox
+        data-testid="batch-checkbox"
         {label}
         labelHidden
-        bind:group={$selectedWorkflows}
+        onclick={onClickBatchSelect}
+        {checked}
         value={workflow}
         disabled={$allSelected}
         aria-label={label}
@@ -64,13 +89,14 @@
         ? 'w-auto'
         : 'w-6'}"
     >
-      {#if !workflowCreateDisabled($page)}
+      {#if !workflowCreateDisabled(page)}
         <StartWorkflowButton
           {namespace}
           runId={workflow.runId}
           workflowId={workflow.id}
           taskQueue={workflow.taskQueue}
           workflowType={workflow.name}
+          class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
         />
       {/if}
       <IsTemporalServerVersionGuard minimumVersion="1.23.0">
@@ -78,15 +104,17 @@
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
-            on:click={() => viewChildren(workflow)}
+            onclick={() => toggleChildrenVisibility(workflow)}
+            class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
+              usePortal
               text={childrenShown
-                ? translate('workflows.children', { count: childCount })
+                ? translate('workflows.children', { count: childCount ?? 0 })
                 : translate('workflows.show-children')}
               topLeft
             >
-              <Icon name="relationship" class="scale-80" />
+              <IconRelationship />
             </Tooltip>
           </Button>
         {/if}
@@ -95,11 +123,11 @@
   {:else}
     <td></td>
   {/if}
-  <slot />
+  {@render children?.()}
 </tr>
 
 <style lang="postcss">
   .child {
-    @apply bg-slate-100/50 dark:bg-slate-100/5;
+    @apply bg-surface-secondary;
   }
 </style>

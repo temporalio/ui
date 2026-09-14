@@ -3,21 +3,27 @@
 
   import { cva } from 'class-variance-authority';
 
+  import { portal } from '$lib/holocene/portal/portal-action';
+  import {
+    type Toaster as Toast,
+    toaster as toasterStore,
+  } from '$lib/stores/toaster';
   import type { ToastPosition } from '$lib/types/holocene';
 
-  import type { Toaster as Toast } from '../stores/toaster';
-
   import Link from './link.svelte';
+  import LiveRegion from './live-region.svelte';
   import ToastComponent from './toast.svelte';
 
-  export let pop: Toast['pop'];
-  export let toasts: Toast['toasts'];
-  export let closeButtonLabel: string;
-  export let position: Writable<ToastPosition>;
+  interface Props {
+    pop: Toast['pop'];
+    toasts: Toast['toasts'];
+    closeButtonLabel: string;
+    position: Writable<ToastPosition>;
+  }
 
-  const dismissToast = (event: CustomEvent<{ id: string }>) => {
-    pop(event.detail.id);
-  };
+  let { pop, toasts, closeButtonLabel, position }: Props = $props();
+
+  const announcements = toasterStore.announcements;
 
   const toast = cva(['fixed z-[99999] flex flex-col items-end gap-2'], {
     variants: {
@@ -36,9 +42,21 @@
   });
 </script>
 
-<div class={toast({ position: $position })} role="log">
+<!-- Hoisted to <body> so it stays outside any focus-trap's inerted subtree
+(drawer/maximizable inert everything else); data-inert-skip keeps the trap's
+inertBackground walk from re-inerting it as a body-level sibling. -->
+<div class="sr-only" data-inert-skip use:portal>
+  <LiveRegion messages={$announcements} data-testid="toast-live-region" />
+</div>
+
+<div class={toast({ position: $position })}>
   {#each $toasts as { message, variant, id, link } (id)}
-    <ToastComponent {closeButtonLabel} {variant} {id} on:dismiss={dismissToast}>
+    <ToastComponent
+      {closeButtonLabel}
+      variant={variant ?? 'primary'}
+      id={id ?? ''}
+      onDismiss={pop}
+    >
       {#if link}
         <Link href={link}>
           {message}

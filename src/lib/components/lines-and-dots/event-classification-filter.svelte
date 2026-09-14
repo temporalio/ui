@@ -1,34 +1,39 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import MultiSelect from '$lib/holocene/select/multi-select.svelte';
+  import MultiSelect, {
+    type MultiSelectOptions,
+  } from '$lib/holocene/select/multi-select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import { eventClassifications } from '$lib/models/event-history/get-event-classification';
   import { eventClassificationFilter } from '$lib/stores/filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  $: label = translate('events.event-classification-label');
+  const label = translate('events.event-classification-label');
 
-  let parameter = 'classification';
-  let options = eventClassifications.map((o) => ({
+  const parameter = 'classification';
+  const options = eventClassifications.map((o) => ({
     value: o,
     label: o,
   }));
 
-  $: initialSelected = $eventClassificationFilter
-    ? options.filter((o) => $eventClassificationFilter.includes(o.value))
-    : [];
+  const initialSelected = $derived(
+    $eventClassificationFilter
+      ? options.filter((o) => $eventClassificationFilter.includes(o.value))
+      : [],
+  );
 
-  const onOptionClick = (_options) => {
+  const onOptionClick = (_options: MultiSelectOptions) => {
     if (_options.length === options.length) {
       _options = [];
     }
 
-    const value = _options.map((o) => o.value).join(',');
+    const value = _options.map((option) => option.value).join(',');
     updateQueryParameters({
       parameter: parameter,
       value,
-      url: $page.url,
+      url: page.url,
     });
   };
 </script>
@@ -43,5 +48,5 @@
   clearAllLabel={translate('common.clear-all-capitalized')}
   onChange={onOptionClick}
   variant="primary"
-  icon="filter"
+  Icon={IconFilter}
 />

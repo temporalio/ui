@@ -12,15 +12,25 @@
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let refresh: Writable<number> | undefined = undefined;
-  export let first: string | undefined = undefined;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+    refresh?: Writable<number>;
+    first?: string;
+  }
 
-  let reason: string = '';
-  let error: string = '';
-  let loading = false;
+  let {
+    open = $bindable(),
+    workflow,
+    namespace,
+    refresh = undefined,
+    first = undefined,
+  }: Props = $props();
+
+  let reason = $state('');
+  let error = $state('');
+  let loading = $state(false);
 
   const identity = getIdentity();
 
@@ -56,9 +66,10 @@
         message: translate('workflows.terminate-success'),
       });
     } catch (err: unknown) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     } finally {
       loading = false;
     }
@@ -74,21 +85,24 @@
   confirmText={translate('workflows.terminate')}
   cancelText={translate('common.cancel')}
   confirmType="destructive"
-  on:cancelModal={hideModal}
-  on:confirmModal={terminate}
+  onCancelModal={hideModal}
+  onConfirmModal={terminate}
 >
-  <h3 slot="title">{translate('workflows.terminate-modal-title')}</h3>
-  <div slot="content">
-    <p>
-      {translate('workflows.terminate-modal-confirmation')}
-    </p>
-    <Input
-      id="workflow-termination-reason"
-      class="mt-4"
-      placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason-placeholder')}
-      labelHidden
-      bind:value={reason}
-    />
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.terminate-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>
+        {translate('workflows.terminate-modal-confirmation')}
+      </p>
+      <Input
+        id="workflow-termination-reason"
+        class="mt-4"
+        placeholder={translate('common.reason-placeholder')}
+        label={translate('common.reason-optional')}
+        bind:value={reason}
+      />
+    </div>
+  {/snippet}
 </Modal>

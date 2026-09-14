@@ -5,7 +5,7 @@ import { isFromTypeScriptSDK } from './is-from-typescript-sdk';
 
 export const getFilePathsFromStackTrace = (
   stackTraceText: string,
-): { filePath: string; codeLine: number; character: number }[] => {
+): { filePath: string; codeLine: number; character: number }[] | undefined => {
   if (isFromTypeScriptSDK(stackTraceText)) {
     return getFilePathsFromTypeScriptStackTrace(stackTraceText);
   } else if (isFromGoSDK(stackTraceText)) {

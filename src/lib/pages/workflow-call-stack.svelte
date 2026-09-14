@@ -1,46 +1,54 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/state';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
 
   let { workflow, workers } = $derived($workflowRun);
   const namespace = $derived(page.params.namespace);
   let stackTrace: Eventual<ParsedQuery> = $state();
 
-  let refreshDate = $derived(
-    $timestamp($refresh.timestamp ? new Date($refresh.timestamp) : new Date(), {
+  let refreshDate = $state<string>();
+
+  const getStackTrace = () => {
+    if (!workflow) {
+      return undefined;
+    }
+    return getWorkflowStackTrace({
+      workflow,
+      namespace,
+    });
+  };
+
+  const setStackTrace = () => {
+    stackTrace = getStackTrace();
+    refreshDate = $timestamp(new Date(), {
       format: 'short',
-    }),
-  );
+    });
+  };
 
-  const getStackTrace = () =>
-    getWorkflowStackTrace(
-      {
-        workflow,
-        namespace,
-      },
-      page.data?.settings,
-    );
-
-  $effect(() => {
+  onMount(() => {
     if (workflow?.isRunning) {
-      stackTrace = getStackTrace();
+      setStackTrace();
     }
   });
 </script>
 
 <section>
-  {#if workflow?.isRunning && workers?.pollers?.length > 0}
+  {#if workflow?.isRunning && (workers?.pollers?.length ?? 0) > 0}
     {#await stackTrace}
       <div class="flex flex-col gap-2">
         <Skeleton class="h-16 w-1/3 rounded-sm" />
@@ -54,14 +62,24 @@
           title={translate('workflows.call-stack-alert')}
           class="mb-4 w-fit"
         />
-        <p>
-          {translate('workflows.call-stack-at')}
-          {refreshDate}
-        </p>
+        <div class="flex items-center gap-2">
+          <Button
+            variant="primary"
+            LeadingIcon={IconRetry}
+            onclick={setStackTrace}
+          >
+            {translate('workflows.refresh-call-stack')}
+          </Button>
+          <p>
+            {translate('workflows.call-stack-at')}
+            {refreshDate}
+          </p>
+        </div>
         <div class="my-2 flex h-full items-start">
           <CodeBlock
             content={result}
             language="text"
+            label={translate('workflows.call-stack-tab')}
             testId="query-call-stack"
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -94,7 +112,7 @@
           >
             {translate('workflows.call-stack-link')}</Link
           >{translate('workflows.call-stack-link-postface', {
-            taskQueue: workflow?.taskQueue,
+            taskQueue: workflow?.taskQueue ?? '',
           })}
         </p>
       {/if}

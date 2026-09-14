@@ -1,10 +1,11 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadInput from '$lib/components/payload-input.svelte';
+  import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -13,37 +14,50 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClose } from '$lib/io/icon';
   import { type PayloadInputEncoding } from '$lib/models/payload-encoding';
   import { updateWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { UpdateWorkflowResponse } from '$lib/types';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  $: ({ run: runId } = $page.params);
-  $: ({ metadata } = $workflowRun);
-  $: updateDefinitions = metadata?.definition?.updateDefinitions;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+  }
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
+  let { open = $bindable(), workflow, namespace }: Props = $props();
+
+  const runId = $derived(page.params.run);
+  const metadata = $derived($workflowRun.metadata);
+  const updateDefinitions = $derived(metadata?.definition?.updateDefinitions);
 
   const defaultEncoding: PayloadInputEncoding = 'json/plain';
 
-  let error = '';
-  let loading = false;
-  let failure;
-  let success;
+  let error = $state('');
+  let loading = $state(false);
+  let failure = $state<
+    NonNullable<UpdateWorkflowResponse['outcome']>['failure'] | undefined
+  >(undefined);
+  let success = $state<
+    | NonNullable<UpdateWorkflowResponse['outcome']>['success']
+    | boolean
+    | undefined
+  >(undefined);
 
-  let name = '';
-  let updateId = crypto.randomUUID();
-  let input = '';
-  let customUpdate = false;
+  let name = $state('');
+  let updateId = $state('');
+  let input = $state('');
+  let customUpdate = $state(false);
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
 
   const hideModal = () => {
     open = false;
     name = '';
+    updateId = '';
     input = '';
     customUpdate = false;
     $encoding = defaultEncoding;
@@ -69,7 +83,7 @@
 
       failure = result?.outcome?.failure;
       success = result?.outcome?.success || !failure;
-      updateId = crypto.randomUUID();
+      updateId = '';
 
       if (success) {
         toaster.push({
@@ -80,7 +94,7 @@
       }
     } catch (err) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;
@@ -103,80 +117,95 @@
   confirmText={translate('common.submit')}
   cancelText={translate('common.cancel')}
   confirmDisabled={!name || !encoding}
-  on:cancelModal={hideModal}
-  on:confirmModal={update}
+  onCancelModal={hideModal}
+  onConfirmModal={update}
 >
-  <h3 slot="title">{translate('workflows.update-modal-title')}</h3>
-  <div class="flex flex-col gap-4" slot="content">
-    {#if updateDefinitions?.length > 0 && !customUpdate}
-      <Select
-        id="update-select"
-        label={translate('common.name')}
-        class="min-w-fit"
-        bind:value={name}
-        data-testid="update-select"
-        placeholder="Select an Update"
-        required
-      >
-        {#each updateDefinitions as { name: value, description = '' }}
-          <Option {value} {description}>{value}</Option>
-        {/each}
-        <Option onclick={handleCustom} value="custom">Custom</Option>
-      </Select>
-    {:else}
-      <div class="flex w-full items-end justify-between gap-2">
-        <Input
-          id="update-name"
-          class="w-full"
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.update-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      {#if (updateDefinitions?.length ?? 0) > 0 && !customUpdate}
+        <Select
+          id="update-select"
           label={translate('common.name')}
-          required
+          class="min-w-fit"
           bind:value={name}
-        />
-        {#if customUpdate}
-          <Button
-            on:click={() => {
-              customUpdate = false;
-              name = '';
-            }}
-            variant="secondary"
-            leadingIcon="close"
+          data-testid="update-select"
+          placeholder="Select an Update"
+          required
+          disabled={loading}
+        >
+          {#each updateDefinitions as { name: value, description = '' } (value)}
+            <Option {value} {description}>{value}</Option>
+          {/each}
+          <Option onclick={handleCustom} value="custom">Custom</Option>
+        </Select>
+      {:else}
+        <div class="flex w-full items-end justify-between gap-2">
+          <Input
+            id="update-name"
+            class="w-full"
+            label={translate('common.name')}
+            required
+            bind:value={name}
+            disabled={loading}
           />
-        {/if}
-      </div>
-    {/if}
-    <Input
-      id="update-id"
-      label={translate('workflows.update-id')}
-      required
-      bind:value={updateId}
-    />
-    <PayloadInput bind:input />
-    {#if loading}
-      <Alert intent="info" title="In Progress"
-        >{translate('workflows.update-in-progress')}</Alert
+          {#if customUpdate}
+            <Button
+              onclick={() => {
+                customUpdate = false;
+                name = '';
+              }}
+              variant="secondary"
+              LeadingIcon={IconClose}
+              disabled={loading}
+            />
+          {/if}
+        </div>
+      {/if}
+      <Input
+        id="update-id"
+        label={translate('workflows.update-id')}
+        bind:value={updateId}
+        disabled={loading}
       >
-    {/if}
-    {#if failure}
-      <Alert intent="error" title={failure?.message || 'Failure'}>
-        {#if failure?.stackTrace}
-          <CodeBlock
-            class="mt-4"
-            content={failure.stackTrace}
-            language="text"
+        {#snippet afterInput()}
+          <RandomUuidButton
+            class="ml-2.5"
+            bind:value={updateId}
+            disabled={loading}
           />
-        {/if}
-      </Alert>
-    {/if}
-    {#if success}
-      <Alert intent="success" title="Success">
-        {#if success?.payloads?.[0] && success.payloads[0].data}
-          <PayloadDecoder value={success.payloads[0]}>
-            {#snippet children(decodedValue)}
-              <CodeBlock class="mt-4" content={decodedValue} language="text" />
-            {/snippet}
-          </PayloadDecoder>
-        {/if}
-      </Alert>
-    {/if}
-  </div>
+        {/snippet}
+      </Input>
+      <PayloadInput bind:input />
+      {#if loading}
+        <Alert intent="info" title="In Progress"
+          >{translate('workflows.update-in-progress')}</Alert
+        >
+      {/if}
+      {#if failure}
+        <Alert intent="error" title={failure?.message || 'Failure'}>
+          {#if failure?.stackTrace}
+            <CodeBlock
+              class="mt-4"
+              content={failure.stackTrace}
+              label={translate('common.stack-trace')}
+              language="text"
+            />
+          {/if}
+        </Alert>
+      {/if}
+      {#if success && typeof success === 'object'}
+        <Alert intent="success" title="Success">
+          {#if success?.payloads?.[0] && success.payloads[0].data}
+            <PayloadCodeBlock
+              value={success}
+              label={translate('workflows.update-result')}
+            />
+          {/if}
+        </Alert>
+      {/if}
+    </div>
+  {/snippet}
 </Modal>

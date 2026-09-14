@@ -8,6 +8,7 @@ import { typescript } from '@codemirror/legacy-modes/mode/javascript';
 import { python } from '@codemirror/legacy-modes/mode/python';
 import { ruby } from '@codemirror/legacy-modes/mode/ruby';
 import { shell } from '@codemirror/legacy-modes/mode/shell';
+import type { Extension } from '@codemirror/state';
 import type { DecorationSet, ViewUpdate } from '@codemirror/view';
 import {
   Decoration,
@@ -17,9 +18,6 @@ import {
   WidgetType,
 } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
-import colors from 'tailwindcss/colors';
-
-import { css } from '$lib/theme/utilities';
 
 export type EditorLanguage =
   | 'json'
@@ -35,8 +33,8 @@ export type EditorLanguage =
 
 const baseTheme = {
   '&': {
-    color: css('--color-text-primary'),
-    backgroundColor: css('--color-surface-code-block'),
+    color: 'var(--color-content-primary)',
+    backgroundColor: 'var(--color-surface-overlay-primary)',
     height: '100%',
   },
   '.cm-scroller': {
@@ -46,11 +44,12 @@ const baseTheme = {
     overflow: 'auto',
   },
   '.cm-content': {
-    caretColor: css('--color-text-primary'),
+    caretColor: 'var(--color-content-primary)',
     fontSize: '0.875em',
   },
   '.cm-editor&.cm-focused': {
-    outline: `2px solid ${colors.indigo['600']}`,
+    outline: '2px solid var(--color-interactive-primary)',
+    outlineOffset: '2px',
   },
   '.cm-gutters': {
     backgroundColor: 'transparent',
@@ -58,15 +57,16 @@ const baseTheme = {
   },
 };
 
-const headerStyles = (header: boolean) =>
+const headerStyles = (header: boolean): Record<string, string> =>
   header
     ? {}
     : {
         borderWidth: '1px',
-        borderColor: css('--color-border-subtle'),
+        borderColor: 'var(--color-border-secondary)',
+        borderRadius: '0.25rem',
       };
 
-export const getEditorTheme = (isDark: boolean, header) =>
+export const getEditorTheme = (isDark: boolean, header: boolean) =>
   EditorView.theme(
     {
       ...baseTheme,
@@ -95,8 +95,8 @@ export const getEditorThemeWithLineNumbers = (
       },
       '.cm-gutters': {
         ...baseTheme['.cm-gutters'],
-        color: css('--color-text-information'),
-        borderRight: `1px solid ${css('--color-border-subtle')}`,
+        color: 'var(--color-content-primary)',
+        borderRight: '1px solid var(--color-border-primary)',
       },
       '.cm-gutter .cm-gutterElement': {
         padding: '0 0.5rem',
@@ -130,14 +130,20 @@ export const getHeightTheme = ({
 
 export const highlightStyles = HighlightStyle.define(
   [
-    { tag: tags.punctuation, color: css('--color-text-primary') },
-    { tag: tags.string, color: css('--color-text-primary') },
-    { tag: tags.propertyName, color: css('--color-text-brand') },
-    { tag: tags.bool, color: css('--color-text-primary') },
-    { tag: tags.number, color: css('--color-text-primary') },
-    { tag: tags.operator, color: css('--color-text-pink') },
-    { tag: tags.comment, color: css('--color-text-subtle') },
-    { tag: tags.variableName, color: css('--color-text-pink') },
+    {
+      tag: tags.punctuation,
+      color: 'var(--color-content-primary)',
+    },
+    { tag: tags.string, color: 'var(--color-content-primary)' },
+    { tag: tags.propertyName, color: 'var(--color-content-brand)' },
+    { tag: tags.bool, color: 'var(--color-content-primary)' },
+    { tag: tags.number, color: 'var(--color-content-primary)' },
+    { tag: tags.operator, color: 'var(--color-content-brand)' },
+    { tag: tags.comment, color: 'var(--color-content-tertiary)' },
+    {
+      tag: tags.variableName,
+      color: 'var(--color-content-brand)',
+    },
   ],
   { themeType: 'light' },
 );
@@ -153,7 +159,7 @@ const lineBreakDecorator = new MatchDecorator({
   decoration: Decoration.replace({ widget: new LineBreakWidget() }),
 });
 
-export const getLineBreakExtension = (editable: boolean) => {
+export const getLineBreakExtension = (editable: boolean): Extension => {
   if (editable) return [];
 
   return ViewPlugin.fromClass(
@@ -174,14 +180,16 @@ export const getLineBreakExtension = (editable: boolean) => {
 };
 
 export const getLanguageExtension = (language: EditorLanguage) =>
-  ({
-    json: json(),
-    java: java(),
-    go: go(),
-    php: php(),
-    python: StreamLanguage.define(python),
-    shell: StreamLanguage.define(shell),
-    dotnet: StreamLanguage.define(csharp),
-    ruby: StreamLanguage.define(ruby),
-    typescript: StreamLanguage.define(typescript),
-  })[language] ?? undefined;
+  (
+    ({
+      json: json(),
+      java: java(),
+      go: go(),
+      php: php(),
+      python: StreamLanguage.define(python),
+      shell: StreamLanguage.define(shell),
+      dotnet: StreamLanguage.define(csharp),
+      ruby: StreamLanguage.define(ruby),
+      typescript: StreamLanguage.define(typescript),
+    }) as Partial<Record<EditorLanguage, Extension>>
+  )[language] ?? undefined;

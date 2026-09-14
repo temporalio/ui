@@ -4,16 +4,22 @@
   import type { NamespaceListItem } from '$lib/types/global';
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
 
-  export let open = false;
-  export let namespaceList: NamespaceListItem[] = [];
+  interface Props {
+    open?: boolean;
+    namespaceList?: NamespaceListItem[];
+  }
 
-  let search = '';
+  let { open = false, namespaceList = [] }: Props = $props();
 
-  $: namespaces = sortAlphabetically(
-    search
-      ? namespaceList.filter(({ namespace }) => namespace.includes(search))
-      : namespaceList,
-    (ns) => ns.namespace,
+  let search = $state('');
+
+  const namespaces = $derived(
+    sortAlphabetically(
+      search
+        ? namespaceList.filter(({ namespace }) => namespace.includes(search))
+        : namespaceList,
+      (ns) => ns.namespace,
+    ),
   );
 </script>
 
@@ -26,16 +32,20 @@
       labelHidden
       autoFocus
       placeholder="Search"
-      class="sticky top-0 w-full bg-primary p-2"
+      class="sticky top-0 w-full bg-surface-primary p-2"
       bind:value={search}
     />
     <ul class="flex w-full flex-col gap-4 overflow-auto p-4 pt-2">
       {#each namespaces as { namespace, onClick } (namespace)}
         <li>
           <button
-            class="namespace"
+            class="namespace dark:focus-visible:border-brand"
             class:selected={namespace === $lastUsedNamespace}
-            on:click|preventDefault|stopPropagation={() => onClick(namespace)}
+            onclick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClick(namespace);
+            }}
           >
             {namespace}
           </button>
@@ -47,7 +57,7 @@
 
 <style lang="postcss">
   .namespace {
-    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply w-full cursor-pointer border border-transparent text-left text-sm font-medium hover:bg-interactive-secondary hover:text-primary focus-visible:border-slate-1 focus-visible:bg-interactive-secondary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary;
 
     &.selected {
       @apply text-brand;

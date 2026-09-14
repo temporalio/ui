@@ -116,6 +116,50 @@ export const mockSchedule = {
   conflictToken: 'AAAAAAAAAAE=',
 };
 
+export const mockWeeklyCalendarSchedule = {
+  ...mockSchedule,
+  schedule: {
+    ...mockSchedule.schedule,
+    spec: {
+      structuredCalendar: [
+        {
+          dayOfWeek: [{ start: 1, end: 5, step: 1 }],
+          hour: [{ start: 9, end: 9 }],
+          minute: [{ start: 30, end: 30 }],
+        },
+      ],
+      calendar: [],
+      cronString: [],
+      interval: [],
+      timezoneName: 'UTC',
+    },
+  },
+};
+
+export const mockMonthlyCalendarSchedule = {
+  ...mockSchedule,
+  schedule: {
+    ...mockSchedule.schedule,
+    spec: {
+      structuredCalendar: [
+        {
+          dayOfMonth: [
+            { start: 1, end: 1 },
+            { start: 15, end: 15 },
+          ],
+          month: [{ start: 6, end: 6 }],
+          hour: [{ start: 0, end: 0 }],
+          minute: [{ start: 0, end: 0 }],
+        },
+      ],
+      calendar: [],
+      cronString: [],
+      interval: [],
+      timezoneName: 'UTC',
+    },
+  },
+};
+
 export const mockSchedulesApi = (page: Page, empty = false) => {
   return page.route(SCHEDULES_API, (route) => {
     const json = {
@@ -133,10 +177,13 @@ export const mockSchedulesApi = (page: Page, empty = false) => {
   });
 };
 
-export const mockScheduleApi = (page: Page) => {
+export const mockScheduleApi = (
+  page: Page,
+  scheduleResponse = mockSchedule,
+) => {
   return page.route(SCHEDULE_API, (route) => {
     return route.fulfill({
-      json: mockSchedule,
+      json: scheduleResponse,
     });
   });
 };

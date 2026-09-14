@@ -24,6 +24,7 @@ consumeAuthCookies();
 initCoreProvider({
   getAccessToken: async () => getAuthUser().accessToken ?? '',
   getIdToken: async () => getAuthUser().idToken,
+  getRoutePrefix: () => '',
   api: {
     preRequest: ossPreRequest,
     postResponse: ossPostResponse,

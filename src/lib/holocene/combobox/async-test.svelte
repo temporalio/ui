@@ -3,16 +3,20 @@
 
   import Combobox from './combobox.svelte';
 
-  let syncOptions = ['one', 'two', 'three'];
-  let asyncOptions = ['asyncone', 'asynctwo', 'asyncthree'];
-  let value = '';
-  let options = syncOptions;
-  let loading = false;
+  const syncOptions = ['one', 'two', 'three'];
+  const asyncOptions = ['asyncone', 'asynctwo', 'asyncthree'];
+  let value = $state('');
+  let options = $state<string[]>(syncOptions);
+  let loading = $state(false);
   let abortController: AbortController | null = null;
 
-  $: i = 0;
+  let i = $state(0);
 
-  export let id = '';
+  interface Props {
+    id?: string;
+  }
+
+  let { id = '' }: Props = $props();
 
   function input(v: string) {
     loading = true;

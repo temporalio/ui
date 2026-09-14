@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  formatSummaryAttributeDisplayValue,
   getCodeBlockValue,
   getPrimaryAttributeForEvent,
   getSummaryAttribute,
@@ -249,6 +250,26 @@ describe('getCodeBlockValue', () => {
   });
 });
 
+describe('formatSummaryAttributeDisplayValue', () => {
+  it('should return strings unchanged', () => {
+    expect(formatSummaryAttributeDisplayValue('completed')).toBe('completed');
+  });
+
+  it('should stringify decoded object values', () => {
+    expect(
+      formatSummaryAttributeDisplayValue({ status: 'completed', count: 1 }),
+    ).toBe('{"status":"completed","count":1}');
+  });
+
+  it('should render payload wrapper values as the first payload', () => {
+    expect(
+      formatSummaryAttributeDisplayValue({
+        payloads: [{ status: 'completed' }],
+      }),
+    ).toBe('{"status":"completed"}');
+  });
+});
+
 describe('getSummaryEvent', () => {
   it('should return expected payload for Go', async () => {
     const localActivity = await toEvent(goLocalActivity);
@@ -286,7 +307,7 @@ describe('getSummaryEvent', () => {
     });
   });
 
-  it('should return expected payload for a Nexus single payload', async () => {
+  it('should return the operation for a NexusOperationScheduled event', async () => {
     const nexusEvent = {
       eventId: '5',
       eventTime: '2024-07-11T17:42:53.326959Z',
@@ -310,13 +331,8 @@ describe('getSummaryEvent', () => {
     };
     const event = await toEvent(nexusEvent);
     expect(getSummaryAttribute(event)).toStrictEqual({
-      key: 'input',
-      value: {
-        metadata: {
-          encoding: 'anNvbi9wbGFpbg==',
-        },
-        data: 'InN0YXJ0LWFzeW5jIg==',
-      },
+      key: 'operation',
+      value: 'custom-op',
     });
   });
 });

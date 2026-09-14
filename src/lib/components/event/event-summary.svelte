@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
+  import { IconCode, IconCompact, IconFeed } from '$lib/io/icon';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
@@ -14,30 +15,50 @@
     EventTypeCategory,
     IterableEventWithPending,
   } from '$lib/types/events';
+  import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
-  export let history: IterableEventWithPending[];
-  export let groups: EventGroups;
-  export let minimized = true;
+  let {
+    history,
+    groups,
+    minimized = true,
+  }: {
+    history: IterableEventWithPending[];
+    groups: EventGroups;
+    minimized?: boolean;
+  } = $props();
 
-  $: ({ workflow } = $workflowRun);
-  $: reverseSort = $eventFilterSort === 'descending';
-  $: updating = !$fullEventHistory.length;
-  $: compact = $eventViewType === 'compact';
+  const workflow = $derived($workflowRun.workflow);
+  const reverseSort = $derived($eventFilterSort === 'descending');
+  const updating = $derived(!$fullEventHistory.length);
+  const compact = $derived($eventViewType === 'compact');
 
-  $: $eventCategoryFilter = $page.url?.searchParams?.get('category')
-    ? ($page.url?.searchParams
-        ?.get('category')
-        .split(',') as EventTypeCategory[])
-    : undefined;
+  $effect(() => {
+    const category = page.url?.searchParams?.get('category');
+    $eventCategoryFilter = category
+      ? (category.split(',') as EventTypeCategory[])
+      : undefined;
+  });
 
-  $: pendingActivities = workflow.pendingActivities;
-  $: pendingNexusOperations = workflow.pendingNexusOperations;
+  const pendingActivities = $derived(workflow?.pendingActivities ?? []);
+  const pendingNexusOperations = $derived(
+    workflow?.pendingNexusOperations ?? [],
+  );
 
-  $: items = compact
-    ? groups
-    : reverseSort
-      ? [...pendingNexusOperations, ...pendingActivities, ...history]
-      : [...history, ...pendingActivities, ...pendingNexusOperations];
+  // Union on `compact` — the pair travels as one object.
+  const tableProps = $derived(
+    compact
+      ? {
+          compact: true as const,
+          items: orderGroupsByPending(groups, reverseSort),
+        }
+      : {
+          compact: false as const,
+          items: reverseSort
+            ? [...pendingNexusOperations, ...pendingActivities, ...history]
+            : [...history, ...pendingActivities, ...pendingNexusOperations],
+          groups,
+        },
+  );
 
   const onAllClick = () => {
     $eventViewType = 'feed';
@@ -58,33 +79,33 @@
       <TabButton
         active={$eventViewType === 'feed'}
         data-testid="feed"
-        icon="feed"
+        Icon={IconFeed}
         class="h-10"
-        on:click={onAllClick}>All</TabButton
+        onclick={onAllClick}>All</TabButton
       >
       <TabButton
         active={$eventViewType === 'compact'}
         data-testid="compact"
-        icon="compact"
+        Icon={IconCompact}
         class="h-10"
-        on:click={onCompactClick}>Compact</TabButton
+        onclick={onCompactClick}>Compact</TabButton
       >
       <TabButton
         active={$eventViewType === 'json'}
         data-testid="json"
-        icon="json"
+        Icon={IconCode}
         class="h-10"
-        on:click={onJSONClick}>JSON</TabButton
+        onclick={onJSONClick}>JSON</TabButton
       >
     </TabButtons>
   </div>
 </div>
 {#if $eventViewType === 'json'}
-  <div class="border-t border-subtle px-4">
+  <div class="border-t border-primary px-4">
     <WorkflowHistoryJson />
   </div>
 {:else}
   <div data-testid="event-summary-table">
-    <EventSummaryTable {updating} {items} {groups} {compact} {minimized} />
+    <EventSummaryTable {updating} {minimized} {...tableProps} />
   </div>
 {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -7,54 +7,60 @@
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { supportsWorkflowBulkActions } from '$lib/stores/workflow-bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import BatchActions from './batch-actions.svelte';
 
-  export let workflows: WorkflowExecution[];
-  export let empty: boolean;
-  export let columnsCount: number;
-
-  const {
-    handleSelectPage,
-    selectedWorkflows,
-    pageSelected,
-    batchActionsVisible,
-  } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
-
-  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
-    const { checked } = event.detail;
-    handleSelectPage(checked, workflows);
+  type Props = {
+    workflows: WorkflowExecution[];
+    empty: boolean;
+    columnsCount: number;
+    pageSelectionStatus?: 'checked' | 'unchecked' | 'partial';
+    onSelectPage: (selected: boolean, workflows: WorkflowExecution[]) => void;
+    children?: Snippet;
   };
 
-  $: indeterminate =
-    $selectedWorkflows.length > 0 &&
-    $selectedWorkflows.length < workflows.length;
-  $: label = translate('workflows.select-all-workflows');
+  let {
+    workflows,
+    empty,
+    columnsCount,
+    pageSelectionStatus = 'unchecked',
+    onSelectPage,
+    children,
+  }: Props = $props();
+
+  const { batchActionsVisible } = getContext<BatchOperationContext>(
+    BATCH_OPERATION_CONTEXT,
+  );
+
+  const handleCheckboxChange = ({ checked }: { checked: boolean }) => {
+    onSelectPage(checked, workflows);
+  };
+  const label = translate('workflows.select-all-workflows');
 </script>
 
 <tr>
-  {#if !empty && $supportsBulkActions}
-    <th class="batch-actions-checkbox-table-cell">
+  {#if !empty && $supportsWorkflowBulkActions}
+    <th scope="col" class="batch-actions-checkbox-table-cell">
       <Checkbox
         {label}
         labelHidden
         id="select-visible-workflows"
         data-testid="batch-actions-checkbox"
-        bind:checked={$pageSelected}
-        {indeterminate}
-        on:change={handleCheckboxChange}
+        checked={pageSelectionStatus === 'checked'}
+        indeterminate={pageSelectionStatus === 'partial'}
+        onChange={handleCheckboxChange}
       />
     </th>
   {/if}
-  <th class="w-6"></th>
-  {#if $supportsBulkActions && $batchActionsVisible}
-    <th class="batch-actions-table-cell" colspan={columnsCount}>
+  <th scope="col" class="w-6"></th>
+  {#if $supportsWorkflowBulkActions && $batchActionsVisible}
+    <th scope="col" class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
     </th>
   {:else}
-    <slot />
+    {@render children?.()}
   {/if}
 </tr>
 

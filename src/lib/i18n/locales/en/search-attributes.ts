@@ -3,13 +3,17 @@ export const Namespace = 'search-attributes' as const;
 export const Strings = {
   // Component headers and labels
   title: 'Search Attributes',
-  description: 'Define custom search attributes for workflow queries.',
+  description:
+    'Define custom search attributes for workflow queries. For more information on search attribute types, read the',
+  'docs-link': 'Search Attribute docs',
   'column-attribute': 'Attribute',
   'column-type': 'Type',
   'attribute-label': 'Attribute {{index}}',
   'type-label': 'Type for Attribute {{index}}',
   'select-type-placeholder': 'Select type',
   'custom-search-attributes': 'Custom Search Attributes',
+  'cloud-delete-tooltip':
+    'To delete a search attribute, open a Support Ticket.',
 
   // Buttons
   'add-attribute-button': 'Add New Custom Search Attribute',
@@ -39,8 +43,8 @@ export const Strings = {
   'type-int': 'Int',
   'type-double': 'Double',
   'type-bool': 'Bool',
-  'type-datetime': 'DateTime',
-  'type-keywordlist': 'KeywordList',
+  'type-datetime': 'Datetime',
+  'type-keywordlist': 'Keyword List',
 
   // Story titles
   'story-title': 'Custom Search Attributes for {{namespace}}',

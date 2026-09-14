@@ -13,6 +13,11 @@ export const autoRefreshWorkflow = persistStore<'on' | 'off'>(
   'off',
 );
 
+export const collapseIdleTime = persistStore<'on' | 'off'>(
+  'collapseIdleTime',
+  'on',
+);
+
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
 
 export const eventFilterSort = persistStore<EventSortOrder>(

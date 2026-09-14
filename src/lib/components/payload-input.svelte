@@ -3,19 +3,32 @@
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import FileInput from '$lib/holocene/file-input.svelte';
-  import Label from '$lib/holocene/label.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let id: string = crypto.randomUUID();
-  export let error = false;
-  export let input: string;
-  export let label = translate('workflows.signal-payload-input-label');
-  export let loading = false;
-  export let hintText = translate('workflows.signal-payload-input-label-hint');
-  export let editing = true;
+  interface Props {
+    id?: string;
+    error?: boolean;
+    input: string;
+    label?: string;
+    loading?: boolean;
+    hintText?: string;
+    editing?: boolean;
+    placeholder?: string;
+    copyable?: boolean;
+  }
 
-  $: error = !isValidInput(input);
+  let {
+    id = crypto.randomUUID(),
+    error = $bindable(false),
+    input = $bindable(),
+    label = translate('workflows.signal-payload-input-label'),
+    loading = $bindable(false),
+    hintText = translate('workflows.signal-payload-input-label-hint'),
+    editing = true,
+    placeholder,
+    copyable = false,
+  }: Props = $props();
 
   const isValidInput = (value: string) => {
     if (!input) return true;
@@ -26,6 +39,12 @@
       return false;
     }
   };
+
+  const computedError = $derived(!isValidInput(input));
+
+  $effect(() => {
+    error = computedError;
+  });
 
   const handleInputChange = (text: string): void => {
     if (text !== input) {
@@ -46,21 +65,23 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <Label for={id} {label} />
+  <span class="text-sm font-medium">{label}</span>
   <div class="flex gap-2">
-    {#key [loading, editing]}
+    {#key `${loading}-${editing}`}
       <CodeBlock
         {id}
         maxHeight={320}
         content={input}
+        {label}
         onchange={handleInputChange}
         editable={editing}
-        copyable={false}
+        {copyable}
+        {placeholder}
       />
     {/key}
     {#if editing}
       <Tooltip text={translate('common.upload-json')} topRight>
-        <FileInput id="{id}-input-file-upload" {onUpload} />
+        <FileInput class="h-full" id="{id}-input-file-upload" {onUpload} />
       </Tooltip>
     {/if}
   </div>

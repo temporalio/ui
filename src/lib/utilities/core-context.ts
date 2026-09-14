@@ -14,11 +14,6 @@ export function getCoreContext() {
   return getContext(CORE_CONTEXT_KEY) as CoreContext;
 }
 
-export function formatIdentity(identity?: string) {
-  return identity ? `${identity} - webui` : 'webui';
-}
-
-export function getIdentity() {
-  const identity = getCoreContext().getUserIdentifier();
-  return formatIdentity(identity);
+export function getIdentity(): string | undefined {
+  return getCoreContext().getUserIdentifier();
 }

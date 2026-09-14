@@ -1,18 +1,29 @@
 <script lang="ts">
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { type IconComponent } from '$lib/io/icon';
 
-  export let title = '';
-  export let content: string;
-  export let copyable = false;
-  export let href: string = null;
-  export let textSize = 'md';
-  export let icon: IconName | undefined = undefined;
-  export let tooltip: string = '';
+  type Props = {
+    title?: string;
+    content: string;
+    copyable?: boolean;
+    href?: string | null;
+    textSize?: string;
+    Icon?: IconComponent | undefined;
+    tooltip?: string;
+  };
+
+  let {
+    title = '',
+    content,
+    copyable = false,
+    href = null,
+    textSize = 'md',
+    Icon,
+    tooltip = '',
+  }: Props = $props();
 </script>
 
 <p class="flex items-center gap-2 text-{textSize} whitespace-nowrap pt-2">
@@ -24,8 +35,8 @@
       visible
       container-class="gap-1 w-full"
     >
-      {#if icon}
-        <Icon name={icon} />
+      {#if Icon}
+        <Icon />
       {/if}
       {#if title}
         {title}
@@ -33,21 +44,21 @@
       {#if href}
         <Link
           {href}
-          class="surface-subtle w-fit truncate rounded-sm p-1 leading-4"
+          class="w-fit truncate rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
           >{content}</Link
         >
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
           <span
-            class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
+            class="w-fit select-all truncate rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
             >{content}</span
           >
         </Tooltip>
       {/if}
     </Copyable>
   {:else}
-    {#if icon}
-      <Icon name={icon} />
+    {#if Icon}
+      <Icon />
     {/if}
     {#if title}
       {title}
@@ -55,13 +66,13 @@
     {#if href}
       <Link
         {href}
-        class="surface-subtle w-fit truncate rounded-sm p-1 leading-4"
+        class="w-fit truncate rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
         >{content}</Link
       >
     {:else}
       <Tooltip text={tooltip} hide={!tooltip} top>
         <span
-          class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
+          class="w-fit select-all truncate rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
           >{content}</span
         >
       </Tooltip>

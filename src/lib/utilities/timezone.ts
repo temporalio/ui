@@ -84,6 +84,41 @@ export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
     return 0;
   });
 
+const offsetToMinutes = (offset: string): number => {
+  const match = offset.match(/UTC([+-])(\d{2}):(\d{2})/);
+  if (!match) return 0;
+  const [, sign, hours, minutes] = match;
+  return (sign === '-' ? -1 : 1) * (Number(hours) * 60 + Number(minutes));
+};
+
+export function getTimezoneOffsetRange(timeZone: string): string {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    timeZoneName: 'longOffset',
+  });
+  const year = new Date().getUTCFullYear();
+  const offsets = new Set<string>();
+  for (let month = 0; month < 12; month++) {
+    const parts = formatter.formatToParts(new Date(Date.UTC(year, month, 1)));
+    const value =
+      parts.find((part) => part.type === 'timeZoneName')?.value ?? '';
+    const normalized =
+      value === 'GMT' ? 'UTC+00:00' : value.replace('GMT', 'UTC');
+    offsets.add(normalized);
+  }
+  return [...offsets]
+    .sort((a, b) => offsetToMinutes(a) - offsetToMinutes(b))
+    .join('/');
+}
+
+export const ianaTimezoneComboboxOptions: { label: string; value: string }[] = [
+  { label: 'UTC', value: 'UTC' },
+  ...Intl.supportedValuesOf('timeZone').map((zone) => ({
+    label: `${zone} (${getTimezoneOffsetRange(zone)})`,
+    value: zone,
+  })),
+];
+
 export function getLocalTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }

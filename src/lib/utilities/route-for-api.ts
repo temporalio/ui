@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 
-import { resolve } from '$app/paths';
+import { base as appBase } from '$app/paths';
 import { page } from '$app/stores';
 
 import type {
@@ -23,6 +23,10 @@ import type {
   StandaloneActivitiesParameters,
   StandaloneActivityAPIRoutePath,
   StandaloneActivityParameters,
+  StandaloneNexusOperationAPIRoutePath,
+  StandaloneNexusOperationParameters,
+  StandaloneNexusOperationsAPIRoutePath,
+  StandaloneNexusOperationsParameters,
   TaskQueueAPIRoutePath,
   TaskQueueRouteParameters,
   WorkerAPIRoutePath,
@@ -32,6 +36,7 @@ import type {
   WorkerDeploymentsAPIRoutePath,
   WorkerDeploymentVersionAPIRoutePath,
   WorkerDeploymentVersionRouteParameters,
+  WorkerDeploymentVersionsAPIRoutePath,
   WorkflowActivitiesAPIRoutePath,
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
@@ -64,19 +69,23 @@ export const base = (namespace?: string): string => {
   let baseUrl = '';
   const webUrl: string | undefined = get(page).data?.webUrl;
 
+  const globalThisRecord = globalThis as Record<string, unknown>;
+  const appConfig = globalThisRecord.AppConfig as
+    | Record<string, string>
+    | undefined;
   const webUrlExistsWithNamespace = webUrl && namespace;
-  const apiUrlExistsWithNamespace = globalThis?.AppConfig?.apiUrl && namespace;
+  const apiUrlExistsWithNamespace = appConfig?.apiUrl && namespace;
 
   if (webUrlExistsWithNamespace) {
     baseUrl = webUrl;
   } else if (apiUrlExistsWithNamespace) {
     console.warn('Using fallback api url, web url not found');
-    baseUrl = replaceNamespaceInApiUrl(globalThis.AppConfig.apiUrl, namespace);
+    baseUrl = replaceNamespaceInApiUrl(appConfig.apiUrl, namespace);
   } else {
-    baseUrl = getApiOrigin();
+    baseUrl = getApiOrigin() ?? '';
   }
 
-  baseUrl = `${baseUrl}${resolve('', {})}`; // Append base path
+  baseUrl = `${baseUrl}${appBase}`;
 
   if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
 
@@ -84,8 +93,8 @@ export const base = (namespace?: string): string => {
 };
 
 const getPath = (endpoint: string): string => {
-  if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `/api/v1/${endpoint}`;
+  const path = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+  return `/api/v1/${path}`;
 };
 
 const withBase = (path: string, namespace?: string): string => {
@@ -99,10 +108,12 @@ const encode = (
   const version = get(page)?.data?.settings?.version;
   return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
+      const k = key as keyof typeof acc;
+      const v = (parameters as Record<string, string>)[key];
       if (version && minimumVersionRequired('2.23.0', version)) {
-        acc[key] = encodeURIComponent(parameters[key]);
+        acc[k] = encodeURIComponent(v);
       } else {
-        acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
+        acc[k] = encodeURIComponent(encodeURIComponent(v));
       }
       return acc;
     },
@@ -117,9 +128,12 @@ const encode = (
       batchJobId: '',
       runId: '',
       activityId: '',
+      operationId: '',
       endpointId: '',
       deploymentName: '',
+      buildId: '',
       version: '',
+      workerInstanceKey: '',
     },
   );
 };
@@ -151,6 +165,9 @@ export function pathForApi(
     'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-build-id-compatibility`,
     'task-queue.rules': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-versioning-rules`,
     user: '/me',
+    workers: `/namespaces/${parameters?.namespace}/workers`,
+    'workers.count': `/namespaces/${parameters?.namespace}/worker-count`,
+    worker: `/namespaces/${parameters?.namespace}/workers/describe/${parameters?.workerInstanceKey}`,
     'worker-task-reachability': `/namespaces/${parameters?.namespace}/worker-task-reachability`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/terminate`,
     'workflow.cancel': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/cancel`,
@@ -174,12 +191,27 @@ export function pathForApi(
     'nexus-endpoint.update': `/nexus/endpoints/${parameters?.endpointId}/update`,
     'worker-deployments': `/namespaces/${parameters?.namespace}/worker-deployments`,
     'worker-deployment': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}`,
-    'worker-deployment-version': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.version}`,
+    'worker-deployment-version': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}`,
+    'worker-deployment-versions': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}`,
+    'worker-deployment-version-compute-config': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}/update-compute-config`,
+    'worker-deployment-version-validate-compute-config': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}/validate-compute-config`,
+    'worker-deployment-set-current-version': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}/set-current-version`,
+    'worker-deployment-set-ramping-version': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}/set-ramping-version`,
     'standalone-activity': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}`,
     'standalone-activities': `/namespaces/${parameters?.namespace}/activities`,
     'standalone-activities.count': `/namespaces/${parameters?.namespace}/activity-count`,
     'standalone-activity.cancel': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/cancel`,
     'standalone-activity.terminate': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/terminate`,
+    'standalone-nexus-operations': `/namespaces/${parameters?.namespace}/nexus-operations`,
+    'standalone-nexus-operation': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}`,
+    'standalone-nexus-operation.poll': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}/poll`,
+    'standalone-nexus-operation.cancel': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}/cancel`,
+    'standalone-nexus-operation.terminate': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}/terminate`,
+    'standalone-nexus-operations.count': `/namespaces/${parameters?.namespace}/nexus-operation-count`,
+    'standalone-activity.pause': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/pause`,
+    'standalone-activity.unpause': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/unpause`,
+    'standalone-activity.reset': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/reset`,
+    'standalone-activity.update-options': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/update-options`,
   };
 
   return getPath(routes[route]);
@@ -211,7 +243,7 @@ export function routeForApi(
 ): string;
 export function routeForApi(
   route: WorkerAPIRoutePath,
-  parameters: NamespaceRouteParameters,
+  parameters: Partial<APIRouteParameters>,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
@@ -283,10 +315,25 @@ export function routeForApi(
   parameters: WorkerDeploymentVersionRouteParameters,
   shouldEncode?: boolean,
 ): string;
+export function routeForApi(
+  route: WorkerDeploymentVersionsAPIRoutePath,
+  parameters: WorkerDeploymentRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: StandaloneNexusOperationsAPIRoutePath,
+  parameters: StandaloneNexusOperationsParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: StandaloneNexusOperationAPIRoutePath,
+  parameters: StandaloneNexusOperationParameters,
+  shouldEncode?: boolean,
+): string;
 export function routeForApi(route: ParameterlessAPIRoutePath): string;
 export function routeForApi(
   route: APIRoutePath,
-  parameters?: APIRouteParameters,
+  parameters?: Partial<APIRouteParameters>,
   shouldEncode = true,
 ): string {
   const path = pathForApi(route, parameters, shouldEncode);

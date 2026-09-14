@@ -23,8 +23,8 @@ test.describe('Schedules Page', () => {
     await scheduleButton.click();
     await expect(page).toHaveURL(/schedules/);
     const createScheduleButton = page.getByTestId('create-schedule');
-    await expect(createScheduleButton.first()).toBeVisible();
-    await createScheduleButton.first().click();
+    await expect(createScheduleButton).toBeVisible();
+    await createScheduleButton.click();
     await expect(page).toHaveURL(/create/);
 
     await page.getByTestId('schedule-name-input').fill('e2e-schedule-1');
@@ -34,11 +34,32 @@ test.describe('Schedules Page', () => {
     await page
       .locator('#schedule-payload-input')
       .getByRole('textbox')
-      .fill('abc');
-    await page.getByRole('textbox', { name: 'hrs' }).fill('1');
+      .fill('"abc"');
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
+    await page.getByLabel('Time Interval').fill('90');
     const createSchedule = page.getByRole('button', {
       name: 'Create Schedule',
     });
     await expect(createSchedule).toBeEnabled();
+    await createSchedule.click();
+
+    await expect(page).toHaveURL(/schedules$/);
+    const scheduleLink = page.getByRole('link', { name: /e2e-schedule-1/ });
+    await expect(scheduleLink).toBeVisible();
+    await scheduleLink.click();
+
+    await expect(page.getByTestId('schedule-name')).toContainText(
+      'e2e-schedule-1',
+    );
+    await expect(page.getByText('Every 90 minute(s)').first()).toBeVisible();
+
+    await page.getByLabel('Schedule Actions').click();
+    await page.getByTestId('delete-schedule').click();
+    await page
+      .locator('#delete-schedule-modal')
+      .getByTestId('confirm-modal-button')
+      .click();
+    await expect(page).toHaveURL(/schedules$/);
   });
 });
