@@ -12,6 +12,7 @@
     currentPageKey,
     defaultItemsPerPage,
     getStartingIndexForPage,
+    getValidPage,
     MAX_PAGE_SIZE,
     options,
     pagination,
@@ -73,14 +74,17 @@
   const currentPageParam = $derived(
     url.searchParams.get(currentPageKey) || '1',
   );
+  const itemsPerPage = $derived(perPageFromSearchParameter(perPageParam));
   // pagination() takes a starting index, not a page number, so convert before
   // constructing it. Passing the page straight through made every rebuild start
   // at index 0, flashing page 1 and destroying expanded rows before the $effect
-  // below could jump back.
+  // below could jump back. getValidPage keeps an out-of-range page on a page
+  // boundary, which items.length - itemsPerPage does not when the count is not
+  // a multiple of the page size.
   const startingIndex = $derived(
     getStartingIndexForPage(
-      parseInt(currentPageParam, 10),
-      perPageFromSearchParameter(perPageParam),
+      getValidPage(parseInt(currentPageParam, 10), itemsPerPage, items),
+      itemsPerPage,
       items,
     ),
   );

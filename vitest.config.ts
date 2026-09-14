@@ -1,3 +1,4 @@
+import { createRequire } from 'module';
 import path from 'path';
 
 import { svelte } from '@sveltejs/vite-plugin-svelte';
@@ -6,23 +7,33 @@ import { configDefaults } from 'vitest/config';
 
 import { catalogLocalPlugin } from './plugins/vite-plugin-catalog-local';
 
+const requireFromConfig = createRequire(import.meta.url);
+const sveltePackagePath = requireFromConfig.resolve('svelte/package.json');
+const svelteBrowserEntry =
+  requireFromConfig(sveltePackagePath).exports['.']?.browser;
+
+if (typeof svelteBrowserEntry !== 'string') {
+  throw new Error(
+    "svelte's package exports no longer expose a string browser entry for '.'",
+  );
+}
+
+const svelteClientEntry = path.resolve(
+  path.dirname(sveltePackagePath),
+  svelteBrowserEntry,
+);
+
 export default defineConfig({
   plugins: [catalogLocalPlugin(), svelte({ hot: false })],
   resolve: {
     alias: [
       // Component tests mount Svelte client-side. Left alone, the bare `svelte`
-      // specifier resolves to index-server.js and mount() throws
+      // specifier resolves to its server build and mount() throws
       // lifecycle_function_unavailable. Scoped to an exact match so that
       // `svelte/store` and friends still resolve normally, and so Node-side
       // dependencies (prettier in scripts/catalog) keep their server builds —
       // a global resolve.conditions: ['browser'] breaks those.
-      {
-        find: /^svelte$/,
-        replacement: path.resolve(
-          __dirname,
-          './node_modules/svelte/src/index-client.js',
-        ),
-      },
+      { find: /^svelte$/, replacement: svelteClientEntry },
       { find: '$lib', replacement: path.resolve(__dirname, './src/lib') },
       { find: '$types', replacement: path.resolve(__dirname, './src/types') },
       {

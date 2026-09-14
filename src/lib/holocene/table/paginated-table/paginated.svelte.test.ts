@@ -1,8 +1,9 @@
-import { mount, unmount } from 'svelte';
+import { flushSync, mount, unmount } from 'svelte';
 import { describe, expect, it } from 'vitest';
 
 import { page } from '$app/state';
 
+import PaginatedRebuildHarness from './paginated-rebuild-harness.svelte';
 import Paginated from './paginated.svelte';
 
 // jsdom has no ResizeObserver; index.svelte binds element size.
@@ -14,7 +15,7 @@ class ResizeObserverStub {
 globalThis.ResizeObserver ??=
   ResizeObserverStub as unknown as typeof ResizeObserver;
 
-const makeItems = () => Array.from({ length: 500 }, (_, i) => i);
+const makeItems = (count = 500) => Array.from({ length: count }, (_, i) => i);
 
 const mountPaginated = (search: string, items = makeItems()) => {
   page.url = new URL(`http://localhost:3000/history${search}`);
@@ -67,10 +68,42 @@ describe('Paginated', () => {
     expect(renderedPageFor('?page=99&per-page=100')).toBe('5');
   });
 
-  it('keeps the page when items are rebuilt with a new identity', () => {
+  it('clamps to the last page when the count is not a page-size multiple', () => {
+    // 450 items is four full pages plus a partial fifth. Clamping on
+    // items.length - itemsPerPage lands at index 350, mid-page, and renders 4.
+    expect(renderedPageFor('?page=99&per-page=100', makeItems(450))).toBe('5');
+  });
+
+  it('keeps rendered rows mounted when items are rebuilt with a new identity', () => {
     // A data refresh replaces `items` with a fresh array, reconstructing the
-    // pagination store. That reconstruction must not move the user to page 1.
-    expect(renderedPageFor('?page=4&per-page=100', makeItems())).toBe('4');
-    expect(renderedPageFor('?page=4&per-page=100', makeItems())).toBe('4');
+    // $derived pagination store. Asserting on the settled page would pass even
+    // unfixed, because the corrective $effect runs in the same flush. What the
+    // user actually loses is row state, so assert on row node identity: a flash
+    // to page 1 and back destroys and recreates every keyed row.
+    page.url = new URL('http://localhost:3000/history?page=4&per-page=100');
+    const target = document.createElement('div');
+    document.body.appendChild(target);
+    const component = mount(PaginatedRebuildHarness, {
+      target,
+      props: { initialItems: makeItems() },
+    });
+
+    const rowsBefore = Array.from(
+      target.querySelectorAll('[data-testid="row"]'),
+    );
+    expect(rowsBefore).toHaveLength(100);
+    expect(rowsBefore[0].getAttribute('data-item')).toBe('300');
+
+    component.swapItems(makeItems());
+    flushSync();
+
+    const rowsAfter = Array.from(
+      target.querySelectorAll('[data-testid="row"]'),
+    );
+    expect(rowsAfter[0].getAttribute('data-item')).toBe('300');
+    expect(rowsAfter[0]).toBe(rowsBefore[0]);
+
+    unmount(component);
+    target.remove();
   });
 });
