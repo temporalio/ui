@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.54.0",
+  "version": "2.54.1",
   "engines": {
     "pnpm": ">=10.10.0",
     "node": ">=22.14.0"
@@ -307,6 +307,11 @@
     "./io/tag": {
       "types": "./dist/io/tag/index.d.ts",
       "import": "./dist/io/tag/index.js"
+    },
+    "./theme/preset": {
+      "types": "./dist/theme/preset.d.ts",
+      "import": "./dist/theme/preset.js",
+      "default": "./dist/theme/preset.js"
     },
     "./*.svelte": {
       "types": "./dist/*.svelte.d.ts",

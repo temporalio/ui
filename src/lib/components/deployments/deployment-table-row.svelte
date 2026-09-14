@@ -35,7 +35,7 @@
   let {
     deployment,
     columns,
-    showConnectionStatus = false,
+    showConnectionStatus = true,
     onChange,
   }: Props = $props();
 
