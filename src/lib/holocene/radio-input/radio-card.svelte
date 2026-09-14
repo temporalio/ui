@@ -47,13 +47,17 @@
   const { name, group } = ctx;
 
   const selected = $derived($group === value);
+  // The panel sits directly beneath the card with a shared edge, so the card
+  // gives up its bottom corners rather than rounding into it.
+  const hasPanel = $derived(selected && !!children);
 </script>
 
 <div class={merge('flex flex-col', className)}>
   <div
     class={merge(
-      'flex items-start gap-3 border p-4',
+      'flex items-start gap-3 rounded border p-4',
       'border-primary',
+      hasPanel && 'rounded-b-none',
       labelContainerClass,
       disabled && 'opacity-50',
     )}
@@ -92,7 +96,7 @@
 
   {#if selected && children}
     <div
-      class="border border-t-0 border-primary bg-background-primary p-5 text-primary"
+      class="rounded-b border border-t-0 border-primary bg-background-primary p-5 text-primary"
     >
       {@render children()}
     </div>
