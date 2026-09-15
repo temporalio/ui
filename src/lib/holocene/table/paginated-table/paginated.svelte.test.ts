@@ -34,9 +34,18 @@ const mountPaginated = (search: string, items = makeItems()) => {
   return { target, component };
 };
 
+// Mirrors the class paginated.svelte puts on the current page's button. It is a
+// styling detail that moves with the design system — it was renamed from
+// bg-interactive-secondary-active when Button's variants were reworked. Keep it
+// in sync with the Button `class` in paginated.svelte's actionsCenter.
+const ACTIVE_PAGE_CLASS = 'bg-interactive-tertiary-press';
+
+// classList.contains, not className.includes: the ghost variant carries this
+// same name inside modifiers (active:…, data-[active=true]:…), so a substring
+// test matches every button and always reports page 1.
 const activePage = (target: HTMLElement): string | undefined =>
   Array.from(target.querySelectorAll('button[aria-label^="Page "]'))
-    .find((b) => b.className.includes('bg-interactive-secondary-active'))
+    .find((b) => b.classList.contains(ACTIVE_PAGE_CLASS))
     ?.textContent?.trim();
 
 const renderedPageFor = (search: string, items = makeItems()) => {
