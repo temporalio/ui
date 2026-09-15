@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
 
@@ -8,9 +9,8 @@ import { configDefaults } from 'vitest/config';
 import { catalogLocalPlugin } from './plugins/vite-plugin-catalog-local';
 
 const requireFromConfig = createRequire(import.meta.url);
-const sveltePackagePath = requireFromConfig.resolve('svelte/package.json');
-const svelteBrowserEntry =
-  requireFromConfig(sveltePackagePath).exports['.']?.browser;
+const svelteBrowserEntry = requireFromConfig('svelte/package.json').exports['.']
+  ?.browser;
 
 if (typeof svelteBrowserEntry !== 'string') {
   throw new Error(
@@ -18,10 +18,24 @@ if (typeof svelteBrowserEntry !== 'string') {
   );
 }
 
+// Resolve against node_modules/svelte, NOT require.resolve's realpath. Under
+// pnpm that realpath lives in .pnpm/, a different path string from the one
+// `svelte/internal/client` resolves to — and compiled components import the
+// runtime from there, not from the bare `svelte` specifier this alias rewrites.
+// Two path strings for the same file means two runtime instances with separate
+// effect schedulers, so mount()/flushSync() drive a different scheduler than the
+// components use and part of the tree never finishes rendering.
 const svelteClientEntry = path.resolve(
-  path.dirname(sveltePackagePath),
+  __dirname,
+  'node_modules/svelte',
   svelteBrowserEntry,
 );
+
+if (!existsSync(svelteClientEntry)) {
+  throw new Error(
+    `Expected svelte's client entry at ${svelteClientEntry} but it does not exist`,
+  );
+}
 
 export default defineConfig({
   plugins: [catalogLocalPlugin(), svelte({ hot: false })],
