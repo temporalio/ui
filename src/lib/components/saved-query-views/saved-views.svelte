@@ -377,6 +377,17 @@
   <div class="hidden h-6 shrink-0 border-l border-primary lg:block"></div>
 
   <div class="flex min-w-0 grow flex-wrap items-center gap-1 lg:flex-nowrap">
+    <SavedViewsMenu
+      {id}
+      views={namespaceSavedQueries}
+      activeView={activeQueryView}
+      draftView={unsavedQuery ? unsavedView : undefined}
+      dirty={activeUserViewDirty}
+      {maxQueries}
+      {viewHref}
+      onSelect={setActiveQueryView}
+    />
+
     {#if lastViewedSavedQuery}
       <Button
         variant="ghost"
@@ -401,17 +412,6 @@
         >
       </Button>
     {/if}
-
-    <SavedViewsMenu
-      {id}
-      views={namespaceSavedQueries}
-      activeView={activeQueryView}
-      draftView={unsavedQuery ? unsavedView : undefined}
-      dirty={activeUserViewDirty}
-      {maxQueries}
-      {viewHref}
-      onSelect={setActiveQueryView}
-    />
 
     {#if activeUserView}
       <div class="flex shrink-0 items-center gap-1">

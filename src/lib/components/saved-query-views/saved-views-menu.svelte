@@ -109,7 +109,12 @@
     >
       {label}
     </span>
-    <BadgeCount value={views.length} total={maxQueries} class="ml-1.5" />
+    <BadgeCount
+      value={views.length}
+      total={maxQueries}
+      size="sm"
+      class="ml-1.5"
+    />
     {#if unsaved && !draftActive}
       <span
         class="ml-1.5 shrink-0 rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium italic text-secondary"
