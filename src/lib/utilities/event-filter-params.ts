@@ -9,6 +9,7 @@ export const SHARED_FILTER_PARAMS = [
   'sort',
   'category',
   'status',
+  'event_group',
   'refresh_off',
 ] as const;
 
@@ -27,14 +28,26 @@ export function sharedFilterParamsToString(
   return new URLSearchParams(params).toString();
 }
 
+const decodeEventGroupKey = (key: string): string => {
+  try {
+    return decodeURIComponent(key);
+  } catch {
+    return key;
+  }
+};
+
 export function parseEventFilterParams(url: URL) {
   const categoryParam = url.searchParams.get('category');
+  const eventGroupParam = url.searchParams.get('event_group');
   return {
     sort: (url.searchParams.get('sort') as EventSortOrder) || 'descending',
     categories: categoryParam
       ? (categoryParam.split(',') as EventTypeCategory[])
       : null,
     statusFilter: url.searchParams.get('status') === 'pending',
+    eventGroups: eventGroupParam
+      ? eventGroupParam.split(',').map(decodeEventGroupKey)
+      : [],
     refresh_off: url.searchParams.get('refresh_off') === 'true',
   };
 }
@@ -43,6 +56,7 @@ type FilterUpdate = {
   sort?: EventSortOrder;
   categories?: EventTypeCategory[] | null;
   statusFilter?: boolean;
+  eventGroups?: string[] | null;
   refresh_off?: boolean;
 };
 
@@ -74,6 +88,15 @@ export function updateEventFilterParams(
     parameters.push({
       parameter: 'status',
       value: filters.statusFilter ? 'pending' : undefined,
+    });
+  }
+
+  if (filters.eventGroups !== undefined) {
+    parameters.push({
+      parameter: 'event_group',
+      value: filters.eventGroups?.length
+        ? filters.eventGroups.map(encodeURIComponent).join(',')
+        : undefined,
     });
   }
 

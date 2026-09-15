@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { TimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
 
 import {
   eventGroupUsesCurrentDuration,
@@ -25,6 +26,14 @@ const group = ({
     pendingNexusOperation,
   }) as EventGroup;
 
+const eventMarkerGroup = (
+  overrides: Partial<EventGroup> = {},
+): TimelineEventMarkerGroup =>
+  ({
+    ...group(overrides),
+    eventMarker: true,
+  }) as TimelineEventMarkerGroup;
+
 describe('eventGroupUsesCurrentDuration', () => {
   it('uses the current time for pending activity groups', () => {
     const pendingActivityGroup = group({
@@ -48,6 +57,12 @@ describe('eventGroupUsesCurrentDuration', () => {
     expect(eventGroupUsesCurrentDuration(pendingNexusGroup)).toBe(true);
   });
 
+  it('uses the current time for pending Event Marker Groups', () => {
+    expect(
+      eventGroupUsesCurrentDuration(eventMarkerGroup({ isPending: true })),
+    ).toBe(true);
+  });
+
   it('does not use the current time for closed groups', () => {
     expect(eventGroupUsesCurrentDuration(group())).toBe(false);
   });
@@ -68,7 +83,7 @@ describe('getEventGroupDurationEnd', () => {
     );
   });
 
-  it('returns the current time for pending activity and Nexus groups', () => {
+  it('returns the current time for groups with an active pending duration', () => {
     const endTime = '2026-04-28T10:20:00Z';
 
     expect(
@@ -94,6 +109,10 @@ describe('getEventGroupDurationEnd', () => {
         endTime,
       ),
     ).toBe(endTime);
+
+    expect(
+      getEventGroupDurationEnd(eventMarkerGroup({ isPending: true }), endTime),
+    ).toBe(endTime);
   });
 });
 
@@ -111,6 +130,15 @@ describe('formatEventGroupDuration', () => {
             activityId: 'activity-id',
           } as EventGroup['pendingActivity'],
         }),
+        endTime: '2026-04-28T10:20:00Z',
+      }),
+    ).toBe('20m');
+  });
+
+  it('formats pending Event Marker Groups through the current time', () => {
+    expect(
+      formatEventGroupDuration({
+        group: eventMarkerGroup({ isPending: true }),
         endTime: '2026-04-28T10:20:00Z',
       }),
     ).toBe('20m');

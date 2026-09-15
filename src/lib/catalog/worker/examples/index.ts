@@ -12,15 +12,16 @@ import { catalogExample as example4 } from './hello/example.js';
 import { catalogExample as example5 } from './high-event-count/example.js';
 import { catalogExample as example6 } from './local-activity/example.js';
 import { catalogExample as example7 } from './long-activity/example.js';
-import { catalogExample as example8 } from './nexus-greeting/example.js';
-import { catalogExample as example9 } from './parallel-activities/example.js';
-import { catalogExample as example10 } from './priority-fairness/example.js';
-import { catalogExample as example11 } from './sequential-activities/example.js';
-import { catalogExample as example12 } from './signal-collector/example.js';
-import { catalogExample as example13 } from './signal-handlers/example.js';
-import { catalogExample as example14 } from './standalone-activity/example.js';
-import { catalogExample as example15 } from './timer-driven-repetition/example.js';
-import { catalogExample as example16 } from './workflow-patching/example.js';
+import { catalogExample as example8 } from './mars-rover-dust-storm-recovery/example.js';
+import { catalogExample as example9 } from './nexus-greeting/example.js';
+import { catalogExample as example10 } from './parallel-activities/example.js';
+import { catalogExample as example11 } from './priority-fairness/example.js';
+import { catalogExample as example12 } from './sequential-activities/example.js';
+import { catalogExample as example13 } from './signal-collector/example.js';
+import { catalogExample as example14 } from './signal-handlers/example.js';
+import { catalogExample as example15 } from './standalone-activity/example.js';
+import { catalogExample as example16 } from './timer-driven-repetition/example.js';
+import { catalogExample as example17 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -40,6 +41,7 @@ const sharedWorkflowDefinitions = [
   example14,
   example15,
   example16,
+  example17,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -101,6 +103,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/long-activity/activity.ts',
   'src/lib/catalog/worker/examples/long-activity/example.ts',
   'src/lib/catalog/worker/examples/long-activity/workflow.ts',
+  'src/lib/catalog/worker/examples/mars-rover-dust-storm-recovery/activity.ts',
+  'src/lib/catalog/worker/examples/mars-rover-dust-storm-recovery/example.ts',
+  'src/lib/catalog/worker/examples/mars-rover-dust-storm-recovery/workflow.ts',
   'src/lib/catalog/worker/examples/nexus-greeting/example.ts',
   'src/lib/catalog/worker/examples/nexus-greeting/handler.ts',
   'src/lib/catalog/worker/examples/nexus-greeting/service.ts',

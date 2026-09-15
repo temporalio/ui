@@ -42,6 +42,7 @@ const migratedWorkflowTypes = [
 ] as const;
 
 const proofExampleIds = [
+  'mars-rover-dust-storm-recovery',
   'priority-fairness',
   'standalone-activity',
   'nexus-greeting',
@@ -113,6 +114,7 @@ describe('shared workflow corpus', () => {
     expect(Object.keys(target?.workflowExports ?? {}).sort()).toEqual(
       [
         ...migratedWorkflowTypes,
+        'marsRoverDustStormRecovery',
         'priorityFairnessWorkflow',
         'nexusGreeting',
       ].sort(),
@@ -123,6 +125,51 @@ describe('shared workflow corpus', () => {
         example.execution.workflow,
       );
     }
+  });
+
+  it('registers the Mars rover Event Groups demonstration', () => {
+    const registry = createCatalogRegistry();
+
+    catalogRegistrationSource.register(registry);
+    const generated = generateCatalog(registry);
+    const example = generated.browserDescriptors.find(
+      ({ id }) => id === 'mars-rover-dust-storm-recovery',
+    );
+    const binding = generated.workerBindings[0];
+
+    expect(example).toMatchObject({
+      title: 'Event Groups example',
+      capabilityTags: [
+        'event-groups',
+        'activities',
+        'child-workflows',
+        'signals',
+        'updates',
+        'retries',
+        'cancellations',
+      ],
+      input: {
+        defaultValue: [120],
+        schema: {
+          prefixItems: [{ minimum: 120 }],
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        workflowType: 'marsRoverDustStormRecovery',
+      },
+    });
+    expect(binding?.activities).toEqual(
+      expect.objectContaining({
+        analyzeSampleCanister: expect.any(Function),
+        assessTraverseRoute: expect.any(Function),
+        directMissionControlDemo: expect.any(Function),
+        establishRelayLink: expect.any(Function),
+        resumeMissionTelemetry: expect.any(Function),
+        uploadTraverseWaypoints: expect.any(Function),
+        validateTelemetryStream: expect.any(Function),
+      }),
+    );
   });
 
   it('exposes priority and fairness settings that the greeting activity inherits', async () => {
@@ -470,6 +517,9 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/inventory.ts',
         'src/lib/catalog/worker/examples/index.ts',
         'src/lib/catalog/worker/examples/shared-activities.ts',
+        'src/lib/catalog/worker/examples/mars-rover-dust-storm-recovery/activity.ts',
+        'src/lib/catalog/worker/examples/mars-rover-dust-storm-recovery/example.ts',
+        'src/lib/catalog/worker/examples/mars-rover-dust-storm-recovery/workflow.ts',
         'src/lib/catalog/worker/examples/hello/example.ts',
         'src/lib/catalog/worker/examples/hello/workflow.ts',
         'src/lib/catalog/worker/examples/parallel-activities/example.ts',

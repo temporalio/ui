@@ -1,4 +1,5 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import { isTimelineEventMarkerGroup } from '$lib/models/event-marker-groups';
 
 import { formatDistanceAbbreviated, type ValidTime } from './format-time';
 
@@ -6,7 +7,10 @@ export const eventGroupUsesCurrentDuration = (
   group: EventGroup | undefined,
 ): boolean => {
   return Boolean(
-    group?.isPending && (group.pendingActivity || group.pendingNexusOperation),
+    group?.isPending &&
+    (isTimelineEventMarkerGroup(group) ||
+      group.pendingActivity ||
+      group.pendingNexusOperation),
   );
 };
 

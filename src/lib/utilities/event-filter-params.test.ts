@@ -29,6 +29,19 @@ describe('parseEventFilterParams', () => {
     const params = parseEventFilterParams(url);
     expect(params.sort).toBe('descending');
   });
+
+  it('round-trips opaque event group marker keys', async () => {
+    const url = new URL('http://localhost/');
+    const mockGoto = vi.fn((_href: string) => Promise.resolve());
+    const eventGroups = ['label:checkout,row-1', 'update:update/1'];
+
+    await updateEventFilterParams(url, { eventGroups }, mockGoto as never);
+
+    const calledUrl = mockGoto.mock.calls[0][0];
+    expect(parseEventFilterParams(new URL(calledUrl, url)).eventGroups).toEqual(
+      eventGroups,
+    );
+  });
 });
 
 describe('updateEventFilterParams', () => {

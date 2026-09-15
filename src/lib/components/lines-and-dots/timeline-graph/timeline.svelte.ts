@@ -16,12 +16,17 @@ const DEFAULT_DURATION_THRESHOLD_RATIO = 0.1;
 interface TimelineInit {
   getFullEventHistory: () => WorkflowEvents;
   getWorkflow: () => WorkflowExecution;
-  getLazyGroups: () => LazyGroup[];
+  getLazyGroups: () => TimelineGroup[];
   getCurrentTimeMs: () => number;
   getDurationThresholdRatio?: () => number;
   getLoading?: () => boolean;
   getShouldCollapseByDefault?: () => boolean;
 }
+
+type TimelineGroup = Pick<
+  LazyGroup,
+  'initialEvent' | 'lastEvent' | 'isPending'
+>;
 
 export class Timeline {
   private _collapsedSegmentKeys = new SvelteSet<TimeSegmentKey>();
@@ -29,7 +34,7 @@ export class Timeline {
 
   private _getFullEventHistory: () => WorkflowEvents;
   private _getWorkflow: () => WorkflowExecution;
-  private _getLazyGroups: () => LazyGroup[];
+  private _getLazyGroups: () => TimelineGroup[];
   private _getCurrentTimeMs: () => number;
   private _getDurationThresholdRatio: () => number;
   private _getLoading: () => boolean;

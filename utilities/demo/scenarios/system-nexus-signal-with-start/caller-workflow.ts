@@ -1,15 +1,11 @@
-import protoPkg from '@temporalio/proto';
+import { temporal } from '@temporalio/proto';
 import { createNexusServiceClient, workflowInfo } from '@temporalio/workflow';
 import * as nexus from 'nexus-rpc';
 
-const { temporal } = protoPkg;
-
-type Request = InstanceType<
-  typeof temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest
->;
-type Response = InstanceType<
-  typeof temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse
->;
+type Request =
+  temporal.api.workflowservice.v1.ISignalWithStartWorkflowExecutionRequest;
+type Response =
+  temporal.api.workflowservice.v1.ISignalWithStartWorkflowExecutionResponse;
 
 /**
  * The system endpoint serves the workflowservice contract, so the operation is
@@ -93,5 +89,5 @@ export async function SystemNexusSignalWithStartCaller(
     }),
   );
 
-  return { started: response.started, runId: response.runId };
+  return { started: response.started ?? false, runId: response.runId ?? '' };
 }
