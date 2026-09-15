@@ -20,6 +20,11 @@ const selectCustomView = async (page: Page, testId: string) => {
   await page.getByTestId(testId).click();
 };
 
+const getLastViewedSavedQueryIds = (page: Page) =>
+  page.evaluate(() =>
+    JSON.parse(localStorage.getItem('last-viewed-saved-query-ids') ?? '{}'),
+  );
+
 test.describe('Saved Query Views', () => {
   test.beforeEach(async ({ page }) => {
     await mockWorkflowsApis(page);
@@ -200,6 +205,106 @@ test.describe('Saved Query Views', () => {
 
     await expect(page.getByTestId('original-view-copy')).toHaveCount(0);
     await expect.poll(() => getQueryParam(page.url())).toBe('');
+  });
+
+  test('Last viewed saved query persists, updates, changes, and clears', async ({
+    page,
+  }) => {
+    const firstQuery = '`WorkflowId`="first-view"';
+    const secondQuery = '`WorkflowId`="second-view"';
+
+    await page.evaluate(
+      ({ firstQuery, secondQuery }) => {
+        localStorage.setItem(
+          'saved-workflow-queries',
+          JSON.stringify({
+            default: [
+              {
+                id: 'first-view-id',
+                name: 'First View',
+                query: firstQuery,
+                type: 'user',
+              },
+              {
+                id: 'second-view-id',
+                name: 'Second View',
+                query: secondQuery,
+                type: 'user',
+              },
+            ],
+          }),
+        );
+      },
+      { firstQuery, secondQuery },
+    );
+    await page.reload();
+    await waitForWorkflowsApis(page);
+
+    const lastViewedView = page.getByTestId('last-viewed-saved-view');
+    await expect(lastViewedView).toHaveCount(0);
+
+    await selectCustomView(page, 'first-view');
+    await expect(lastViewedView).toContainText('First View');
+    await expect(lastViewedView.getByText('First View')).toBeVisible();
+    const savedViewControls = page
+      .getByTestId('saved-views-bar')
+      .locator(
+        '[data-testid="last-viewed-saved-view"], [data-testid="saved-views-button"]',
+      );
+    await expect(savedViewControls.nth(0)).toHaveAttribute(
+      'data-testid',
+      'last-viewed-saved-view',
+    );
+    await expect(savedViewControls.nth(1)).toHaveAttribute(
+      'data-testid',
+      'saved-views-button',
+    );
+    await expect
+      .poll(() => getLastViewedSavedQueryIds(page))
+      .toEqual({
+        workflow: { default: 'first-view-id' },
+      });
+
+    await page.getByTestId('all').click();
+    await page.reload();
+    await waitForWorkflowsApis(page);
+    await expect(lastViewedView).toContainText('First View');
+
+    await lastViewedView.click();
+    await expect.poll(() => getQueryParam(page.url())).toBe(firstQuery);
+
+    await page.getByTestId('running').click();
+    const updatedFirstQuery = `${firstQuery} AND \`ExecutionStatus\`="Running"`;
+    await expect.poll(() => getQueryParam(page.url())).toBe(updatedFirstQuery);
+    await page.getByTestId('save-view-button').click();
+
+    await page.getByTestId('edit-view-button').click();
+    await page
+      .getByTestId('workflow-edit-view-modal-input')
+      .fill('Updated First View');
+    await page
+      .getByLabel('Edit View')
+      .getByTestId('confirm-modal-button')
+      .click();
+    await expect(lastViewedView).toContainText('Updated First View');
+
+    await page.getByTestId('all').click();
+    await lastViewedView.click();
+    await expect.poll(() => getQueryParam(page.url())).toBe(updatedFirstQuery);
+
+    await selectCustomView(page, 'second-view');
+    await expect(lastViewedView).toContainText('Second View');
+    await expect
+      .poll(() => getLastViewedSavedQueryIds(page))
+      .toEqual({
+        workflow: { default: 'second-view-id' },
+      });
+
+    await page.getByTestId('edit-view-button').click();
+    await page.getByRole('button', { name: 'Delete View' }).click();
+
+    await expect(lastViewedView).toHaveCount(0);
+    await expect.poll(() => getLastViewedSavedQueryIds(page)).toEqual({});
   });
 
   test('System saved queries narrow the active user saved view', async ({
