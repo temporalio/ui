@@ -31,6 +31,7 @@ const customAttributesWithSpacesQuery =
 const workflowQueryWithSpaces =
   '`WorkflowId`="One and Two" AND `Custom Keyword Field`="Hello = world"';
 const prefixQuery = '`WorkflowType` STARTS_WITH "hello"';
+const containsQuery = '`WorkflowId` LIKE "%hello%"';
 const isEmptyQuery = '`WorkflowType` is null';
 const isNotEmptyQuery = '`StartTime` IS NOT NULL';
 const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
@@ -85,6 +86,21 @@ describe('toListWorkflowFilters', () => {
         attribute: 'WorkflowType',
         type: 'Keyword',
         conditional: 'STARTS_WITH',
+        operator: '',
+        parenthesis: '',
+        value: 'hello',
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should parse a query with contains (LIKE) search and strip the wildcards', () => {
+    const result = toListWorkflowFilters(containsQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: 'LIKE',
         operator: '',
         parenthesis: '',
         value: 'hello',
