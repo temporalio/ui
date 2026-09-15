@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twMerge } from 'tailwind-merge';
+
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
@@ -16,6 +18,10 @@
   } from '$lib/services/deployments-service';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { ListWorkerDeployment } from '$lib/types/deployments';
+  import {
+    COLUMN_WIDTH_CLAMP_CLASSES,
+    columnWidthStyle,
+  } from '$lib/utilities/column-width';
   import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
     routeForWorkerDeployment,
@@ -110,9 +116,11 @@
 </script>
 
 <tr>
-  {#each columns as { label } (label)}
+  {#each columns as { label, width } (label)}
+    {@const widthStyle = columnWidthStyle(width)}
+    {@const clampToWidth = width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES}
     {#if label === 'Deployment'}
-      <td class="py-1 text-left">
+      <td class={twMerge('py-1 text-left', clampToWidth)} style={widthStyle}>
         <Copyable
           content={deployment.name}
           copyIconTitle={translate('common.copy-icon-title')}
@@ -127,7 +135,7 @@
         </Copyable>
       </td>
     {:else if label === 'Current Version'}
-      <td class="py-1 text-left">
+      <td class={twMerge('py-1 text-left', clampToWidth)} style={widthStyle}>
         {#if currentBuildId}
           <div class="flex items-center gap-2">
             <Link
@@ -154,7 +162,7 @@
         {/if}
       </td>
     {:else if label === 'Latest Version'}
-      <td class="py-1 text-left">
+      <td class={twMerge('py-1 text-left', clampToWidth)} style={widthStyle}>
         {#if isSameAsCurrent}
           <span
             class="inline-flex items-center border border-primary px-2 py-0.5 text-secondary"
@@ -186,7 +194,10 @@
         {/if}
       </td>
     {:else if label === 'Created At'}
-      <td class="truncate py-1 text-left">
+      <td
+        class={twMerge('truncate py-1 text-left', clampToWidth)}
+        style={widthStyle}
+      >
         <Timestamp as="p" dateTime={deployment.createTime} />
       </td>
     {/if}

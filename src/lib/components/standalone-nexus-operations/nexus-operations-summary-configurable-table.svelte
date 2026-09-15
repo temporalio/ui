@@ -1,13 +1,18 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import Button from '$lib/holocene/button.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings } from '$lib/io/icon';
   import { fetchPaginatedNexusOperations } from '$lib/services/standalone-nexus-operations';
-  import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import {
+    configurableTableColumns,
+    resizeColumn,
+    TABLE_TYPE,
+  } from '$lib/stores/configurable-table-columns';
   import {
     nexusOperationCount,
     nexusOperationLoading,
@@ -63,7 +68,16 @@
       <TableHeaderRow>
         <th></th>
         {#each columns as column (column.label)}
-          <TableHeaderCell {column} />
+          <TableHeaderCell
+            {column}
+            onResize={(width) =>
+              resizeColumn(
+                column.label,
+                width,
+                namespace,
+                TABLE_TYPE.NEXUS_OPERATIONS,
+              )}
+          />
         {/each}
       </TableHeaderRow>
     {/snippet}
@@ -80,6 +94,11 @@
       <TableEmptyState />
     {/snippet}
     {#snippet actionsEndAdditional()}
+      <ResetColumnWidthsButton
+        {columns}
+        {namespace}
+        table={TABLE_TYPE.NEXUS_OPERATIONS}
+      />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button
           onclick={onClickConfigure}

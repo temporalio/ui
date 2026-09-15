@@ -3,8 +3,10 @@
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
+  import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -14,9 +16,12 @@
     availableDeploymentColumns,
     configurableTableColumns,
     DEFAULT_DEPLOYMENTS_COLUMNS,
+    MIN_COLUMN_WIDTH,
+    resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
   import { refresh } from '$lib/stores/workers';
+  import { columnWidthStyle } from '$lib/utilities/column-width';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
@@ -99,8 +104,22 @@
       {/snippet}
       {#snippet headers()}
         <tr class="text-left">
-          {#each columns as { label } (label)}
-            <th>{columnLabel(label)}</th>
+          {#each columns as { label, width } (label)}
+            <th class="relative" style={columnWidthStyle(width)}>
+              <span class="block truncate">{columnLabel(label)}</span>
+              <ColumnResizeHandle
+                label={columnLabel(label)}
+                {width}
+                min={MIN_COLUMN_WIDTH}
+                onResize={(newWidth) =>
+                  resizeColumn(
+                    label,
+                    newWidth,
+                    namespace,
+                    TABLE_TYPE.DEPLOYMENTS,
+                  )}
+              />
+            </th>
           {/each}
           <th>{translate('deployments.actions')}</th>
         </tr>
@@ -124,6 +143,11 @@
         />
       {/snippet}
       {#snippet actionsEndAdditional()}
+        <ResetColumnWidthsButton
+          {columns}
+          {namespace}
+          table={TABLE_TYPE.DEPLOYMENTS}
+        />
         <Tooltip text={translate('common.configure-columns')} top>
           <Button
             onclick={openCustomizationDrawer}

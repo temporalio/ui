@@ -281,4 +281,6 @@ export const Strings = {
   'configure-columns': 'Configure Columns',
   'random-uuid': 'Random UUID',
   json: 'JSON',
+  'resize-column': 'Resize {{column}} column',
+  'reset-column-widths': 'Reset column widths',
 } as const;
