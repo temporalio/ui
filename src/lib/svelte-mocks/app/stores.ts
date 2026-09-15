@@ -36,6 +36,7 @@ const settings: Settings = {
   workflowTerminateDisabled: false,
   hideWorkflowQueryErrors: false,
   activityCommandsDisabled: false,
+  workflowSortingEnabled: false,
   feedbackURL: '',
   disableNewsFetch: false,
   runtimeEnvironment: {

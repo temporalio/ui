@@ -43,6 +43,7 @@ const settingsResponse = (
   HideWorkflowQueryErrors: false,
   RefreshWorkflowCountsDisabled: false,
   ActivityCommandsDisabled: false,
+  WorkflowSortingEnabled: false,
   ShowTemporalSystemNamespace: false,
   NavCollapsedByDefault: false,
   FeedbackURL: '',
@@ -125,6 +126,26 @@ describe('fetchSettings', () => {
     const settings = await fetchSettings();
 
     expect(settings.navCollapsedByDefault).toBe(false);
+  });
+
+  it('maps workflowSortingEnabled from settings response', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({ WorkflowSortingEnabled: true }),
+    );
+
+    const settings = await fetchSettings();
+
+    expect(settings.workflowSortingEnabled).toBe(true);
+  });
+
+  it('defaults workflowSortingEnabled to false when omitted', async () => {
+    const response = settingsResponse();
+    delete (response as Partial<SettingsResponse>).WorkflowSortingEnabled;
+    vi.mocked(requestFromAPI).mockResolvedValue(response);
+
+    const settings = await fetchSettings();
+
+    expect(settings.workflowSortingEnabled).toBe(false);
   });
 
   it('maps disableNewsFetch from settings response', async () => {

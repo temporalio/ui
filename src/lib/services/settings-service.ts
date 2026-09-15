@@ -41,6 +41,7 @@ const emptySettingsResponse: SettingsResponse = {
   HideWorkflowQueryErrors: false,
   RefreshWorkflowCountsDisabled: false,
   ActivityCommandsDisabled: false,
+  WorkflowSortingEnabled: false,
   ShowTemporalSystemNamespace: false,
   NavCollapsedByDefault: false,
   FeedbackURL: '',
@@ -89,6 +90,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     refreshWorkflowCountsDisabled:
       !!settingsResponse?.RefreshWorkflowCountsDisabled,
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
+    workflowSortingEnabled: !!settingsResponse?.WorkflowSortingEnabled,
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
     navCollapsedByDefault: !!settingsResponse?.NavCollapsedByDefault,
