@@ -296,11 +296,11 @@ test.describe('Saved Query Views', () => {
       );
     await expect(savedViewControls.nth(0)).toHaveAttribute(
       'data-testid',
-      'last-viewed-saved-view',
+      'saved-views-button',
     );
     await expect(savedViewControls.nth(1)).toHaveAttribute(
       'data-testid',
-      'saved-views-button',
+      'last-viewed-saved-view',
     );
     await expect
       .poll(() => getLastViewedSavedQueryIds(page))
