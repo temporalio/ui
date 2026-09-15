@@ -173,6 +173,7 @@
 
       if (!maxViewsReached) {
         $savedQueries[namespace] = [...$savedQueries[namespace], queryToSave];
+        rememberLastViewedSavedQuery(queryToSave);
       }
 
       activeQueryView = queryToSave;
@@ -297,6 +298,7 @@
     }
 
     $savedQueries[namespace] = [...$savedQueries[namespace], view];
+    rememberLastViewedSavedQuery(view);
     activeQueryView = view;
   };
 

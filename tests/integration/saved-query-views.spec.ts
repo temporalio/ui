@@ -12,8 +12,21 @@ const getQueryParam = (url: string) =>
 const openCustomViews = (page: Page) =>
   page.getByTestId('saved-views-button').click();
 
-const expectSelectedView = (page: Page, name: string) =>
-  expect(page.getByTestId('saved-views-button')).toContainText(name);
+const expectSelectedView = async (page: Page, name: string) => {
+  if (name === 'Saved Views') {
+    await expect(page.getByTestId('saved-views-button')).toContainText(name);
+    return;
+  }
+
+  if (name === 'Unsaved view') {
+    await expect(page.getByTestId('create-view-button')).toBeVisible();
+    return;
+  }
+
+  const lastViewedView = page.getByTestId('last-viewed-saved-view');
+  await expect(lastViewedView).toContainText(name);
+  await expect(lastViewedView).toHaveAttribute('data-active', 'true');
+};
 
 const selectCustomView = async (page: Page, testId: string) => {
   await openCustomViews(page);
