@@ -8,6 +8,7 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { sdkInfo } from '$lib/stores/events';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import {
@@ -15,6 +16,7 @@
     formatDuration,
   } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
+  import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
   import {
     routeForSchedule,
     routeForTaskQueue,
@@ -57,7 +59,7 @@
     }),
   );
   const deployment = $derived(
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
+    getWorkerDeploymentName($workflowRun?.workers, workflow),
   );
   const deploymentVersion = $derived(
     workflow?.searchAttributes?.indexedFields?.[
