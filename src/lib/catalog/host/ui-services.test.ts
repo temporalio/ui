@@ -58,6 +58,21 @@ const nexusDescriptor: BrowserCatalogDescriptor = {
   },
 };
 
+const scheduledDescriptor: BrowserCatalogDescriptor = {
+  ...descriptor,
+  id: 'hourly-order',
+  execution: {
+    ...descriptor.execution,
+    kind: 'workflow',
+    workflowType: 'orderWorkflow',
+    schedule: {
+      id: 'ui-catalog-hello-hourly',
+      spec: { cronExpressions: ['0 * * * *'] },
+      paused: true,
+    },
+  },
+};
+
 const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -343,6 +358,76 @@ describe('createApiWorkbenchHost', () => {
         /\/api\/v1\/nexus\/endpoints\?name=greeting-endpoint$/,
       ),
     ]);
+  });
+
+  it('describes the declared schedule and reports it as ready', async () => {
+    const request = vi.fn().mockImplementation(async (url: string) => {
+      if (url.includes('/task-queues/')) {
+        return jsonResponse({ pollers: [{ identity: 'worker' }] });
+      }
+      return jsonResponse({ schedule: { spec: {}, state: { paused: true } } });
+    });
+    const host = createApiWorkbenchHost({
+      descriptors: [scheduledDescriptor],
+      request,
+    });
+
+    await expect(host.checkReadiness('hourly-order')).resolves.toContainEqual({
+      kind: 'schedule',
+      required: false,
+      state: 'ready',
+      scheduleId: 'ui-catalog-hello-hourly',
+      paused: true,
+      held: false,
+    });
+    expect(request.mock.calls.at(-1)?.[0]).toMatch(
+      /\/api\/v1\/namespaces\/catalog-demo\/schedules\/ui-catalog-hello-hourly\?$/,
+    );
+  });
+
+  it('holds the schedule when the server disagrees with the declaration', async () => {
+    const request = vi.fn().mockImplementation(async (url: string) => {
+      if (url.includes('/task-queues/')) {
+        return jsonResponse({ pollers: [{ identity: 'worker' }] });
+      }
+      // Declared paused: true, running on the server.
+      return jsonResponse({ schedule: { spec: {}, state: { paused: false } } });
+    });
+    const host = createApiWorkbenchHost({
+      descriptors: [scheduledDescriptor],
+      request,
+    });
+
+    await expect(host.checkReadiness('hourly-order')).resolves.toContainEqual({
+      kind: 'schedule',
+      required: false,
+      state: 'ready',
+      scheduleId: 'ui-catalog-hello-hourly',
+      paused: true,
+      held: true,
+    });
+  });
+
+  it('reports a missing schedule as unavailable without failing readiness', async () => {
+    const request = vi.fn().mockImplementation(async (url: string) => {
+      if (url.includes('/task-queues/')) {
+        return jsonResponse({ pollers: [{ identity: 'worker' }] });
+      }
+      return jsonResponse({ message: 'schedule not found' }, 404);
+    });
+    const host = createApiWorkbenchHost({
+      descriptors: [scheduledDescriptor],
+      request,
+    });
+
+    await expect(host.checkReadiness('hourly-order')).resolves.toContainEqual({
+      kind: 'schedule',
+      required: false,
+      state: 'unavailable',
+      scheduleId: 'ui-catalog-hello-hourly',
+      paused: true,
+      held: false,
+    });
   });
 
   it('classifies a known HTTP conflict as rejected', async () => {

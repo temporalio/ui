@@ -33,5 +33,11 @@ export const catalogExample: CatalogExampleDefinition = {
     workflowType: 'hello',
     workflow: hello,
     activities: { greet },
+    schedule: {
+      id: 'ui-catalog-hello-hourly',
+      spec: { cronExpressions: ['0 * * * *'] },
+      paused: false,
+      note: 'Declared by the hello catalog example',
+    },
   },
 };

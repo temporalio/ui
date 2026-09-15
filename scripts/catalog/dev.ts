@@ -20,6 +20,9 @@ import {
 import type { CatalogTarget } from '../../src/lib/catalog/worker/registry';
 import { requireCatalogRoutingFromEnvironment } from '../../src/lib/catalog/worker/routing-config';
 import type { CatalogRunnerEvent } from '../../src/lib/catalog/worker/runner';
+import { bootstrapCatalogScheduleSync } from '../../src/lib/catalog/worker/schedule-bootstrap';
+import { parseCatalogScheduleConfig } from '../../src/lib/catalog/worker/schedule-config';
+import { catalogScheduleManagerOperations } from '../../src/lib/catalog/worker/schedule-manager-client';
 import {
   formatCatalogBanner,
   supportsAnsiColor,
@@ -41,6 +44,7 @@ const loadEnvironment = (
 ).loadEnvFile;
 const runningTargetIds = new Set<string>();
 let announcedTargets: readonly { target: CatalogTarget }[] = [];
+let schedulesEnabled = false;
 
 const emitCatalogEvent = ({ type, ...details }: CatalogRunnerEvent) => {
   console.info(
@@ -60,6 +64,7 @@ const emitCatalogEvent = ({ type, ...details }: CatalogRunnerEvent) => {
         isTTY: Boolean(process.stdout.isTTY),
         environment: process.env,
       }),
+      schedulesEnabled,
     }),
   );
 };
@@ -83,6 +88,8 @@ try {
     : workerBindings;
   announcedTargets = selectedBindings;
   const connectionConfig = parseCatalogConnectionConfig(process.env);
+  const scheduleConfig = parseCatalogScheduleConfig(process.env);
+  schedulesEnabled = scheduleConfig.enabled;
 
   if (
     declaredNexusEndpoints(selectedBindings).length > 0 &&
@@ -132,6 +139,57 @@ try {
       });
     } finally {
       await client.close();
+    }
+  }
+
+  if (!scheduleConfig.enabled) {
+    console.info(
+      'Schedule manager disabled; set CATALOG_SCHEDULES=enabled in .env.catalog.local to create declared schedules.',
+    );
+  } else {
+    const connection = await connectWithRetry({
+      connect: () =>
+        Connection.connect({
+          address: connectionConfig.address,
+          ...(connectionConfig.apiKey
+            ? { apiKey: connectionConfig.apiKey }
+            : {}),
+          ...(connectionConfig.tls ? { tls: connectionConfig.tls } : {}),
+        }),
+      onWaiting: ({ attempt }) =>
+        console.info(
+          `Waiting for the Temporal server at ${connectionConfig.address}… (attempt ${attempt})`,
+        ),
+    });
+    try {
+      await bootstrapCatalogScheduleSync({
+        // Every registered target, never the CATALOG_TARGET_ID subset: the
+        // reconciler deletes owned schedules that are not in the desired list,
+        // so a narrowed set would delete the other targets' schedules.
+        bindings: workerBindings,
+        registeredTargetIds: workerBindings.map(({ target }) => target.id),
+        runningTargetIds: selectedBindings.map(({ target }) => target.id),
+        ...catalogScheduleManagerOperations(connection),
+        onEvent: (event) => {
+          if (event.state === 'skipped') {
+            console.info(`Schedule manager skipped: ${event.reason}`);
+          } else if (event.state === 'held') {
+            console.info(
+              `Schedule "${event.scheduleId}" is held: ${event.reason}. No schedule was created, updated, or deleted.`,
+            );
+          } else if (event.state === 'blocked') {
+            console.info(
+              `Cannot reconcile schedule "${event.scheduleId}": ${event.error instanceof Error ? event.error.message : String(event.error)}`,
+            );
+          } else {
+            console.info(
+              `Schedule "${event.scheduleId}" ${event.state} in ${event.namespace}/${event.taskQueue} with ${event.declaredCount} declared schedules.`,
+            );
+          }
+        },
+      });
+    } finally {
+      await connection.close();
     }
   }
 

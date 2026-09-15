@@ -93,6 +93,99 @@ describe('CatalogDetail client interactions', () => {
     );
   });
 
+  it('shows the declared schedule check and how to enable the schedule manager', async () => {
+    const target = await client.renderDetail({
+      withSchedule: true,
+      readinessResponses: [
+        [
+          { kind: 'worker', required: false, state: 'ready', taskQueueType: 1 },
+          {
+            kind: 'schedule',
+            required: false,
+            state: 'unavailable',
+            scheduleId: 'ui-catalog-hello-hourly',
+            paused: true,
+            held: false,
+          },
+        ],
+      ],
+    });
+    await client.flush();
+    const readinessPanel = target.querySelector('[aria-label="Readiness"]');
+
+    expect(readinessPanel?.textContent).toContain('Declared schedule exists');
+    expect(readinessPanel?.textContent).toContain('0 * * * *');
+    expect(readinessPanel?.textContent).toContain('Paused');
+    expect(readinessPanel?.textContent).toContain(
+      'Enable the schedule manager, then restart the worker:',
+    );
+    expect(readinessPanel?.textContent).toContain('CATALOG_SCHEDULES=enabled');
+    expect(readinessPanel?.textContent).toContain(
+      'Add it to .env.catalog.local, then run pnpm catalog worker.',
+    );
+    expect(readinessPanel?.querySelector('a[href*="/schedules/"]')).toBeNull();
+    expect(
+      target.querySelector<HTMLButtonElement>('button[data-variant="primary"]')
+        ?.disabled,
+    ).toBe(false);
+  });
+
+  it('links to the schedule page once the declared schedule exists', async () => {
+    const target = await client.renderDetail({
+      withSchedule: true,
+      readinessResponses: [
+        [
+          { kind: 'worker', required: false, state: 'ready', taskQueueType: 1 },
+          {
+            kind: 'schedule',
+            required: false,
+            state: 'ready',
+            scheduleId: 'ui-catalog-hello-hourly',
+            paused: false,
+            held: false,
+          },
+        ],
+      ],
+    });
+    await client.flush();
+    const scheduleLink = target
+      .querySelector('[aria-label="Readiness"]')
+      ?.querySelector('a[href*="/schedules/"]');
+
+    expect(scheduleLink?.textContent?.trim()).toBe('Open schedule');
+    expect(scheduleLink?.getAttribute('href')).toContain(
+      'ui-catalog-hello-hourly',
+    );
+  });
+
+  it('explains a held schedule and still links to it', async () => {
+    const target = await client.renderDetail({
+      withSchedule: true,
+      readinessResponses: [
+        [
+          { kind: 'worker', required: false, state: 'ready', taskQueueType: 1 },
+          {
+            kind: 'schedule',
+            required: false,
+            state: 'ready',
+            scheduleId: 'ui-catalog-hello-hourly',
+            paused: false,
+            held: true,
+          },
+        ],
+      ],
+    });
+    await client.flush();
+    const readinessPanel = target.querySelector('[aria-label="Readiness"]');
+
+    expect(readinessPanel?.textContent).toContain('Held');
+    expect(readinessPanel?.textContent).toContain('paused by hand');
+    expect(readinessPanel?.textContent).toContain('Resume');
+    expect(
+      readinessPanel?.querySelector('a[href*="/schedules/"]'),
+    ).not.toBeNull();
+  });
+
   it('runs the execution id it shows and then shows the next one', async () => {
     const target = await client.renderDetail({ pinExecutionId: false });
     await client.flush();

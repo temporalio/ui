@@ -34,10 +34,12 @@ export const formatCatalogBanner = ({
   targets,
   origin = 'http://localhost:3000',
   color = false,
+  schedulesEnabled = false,
 }: {
   targets: readonly CatalogBannerTarget[];
   origin?: string;
   color?: boolean;
+  schedulesEnabled?: boolean;
 }): string => {
   const namespaces = [...new Set(targets.map(({ namespace }) => namespace))];
   const lines: BannerLine[] = [
@@ -52,6 +54,11 @@ export const formatCatalogBanner = ({
       text: `${id} → ${namespace} / ${taskQueue}`,
       style: '',
     })),
+    { text: '', style: '' },
+    {
+      text: `Schedule manager: ${schedulesEnabled ? 'enabled' : 'disabled'}`,
+      style: GRAY,
+    },
   ];
   const contentWidth = Math.max(...lines.map(({ text }) => width(text)));
   const paint = (value: string, style: string) =>

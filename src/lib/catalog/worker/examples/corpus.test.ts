@@ -45,6 +45,7 @@ const proofExampleIds = [
   'priority-fairness',
   'standalone-activity',
   'nexus-greeting',
+  'schedule-sync',
 ] as const;
 
 describe('shared workflow corpus', () => {
@@ -115,6 +116,7 @@ describe('shared workflow corpus', () => {
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
         'nexusGreeting',
+        'catalogScheduleSync',
       ].sort(),
     );
     for (const example of registry.examples) {
@@ -512,6 +514,11 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/nexus-greeting/workflow.ts',
         'src/lib/catalog/worker/examples/nexus-greeting/service.ts',
         'src/lib/catalog/worker/examples/nexus-greeting/handler.ts',
+        'src/lib/catalog/worker/examples/schedule-sync/example.ts',
+        'src/lib/catalog/worker/examples/schedule-sync/workflow.ts',
+        'src/lib/catalog/worker/examples/schedule-sync/activities.ts',
+        'src/lib/catalog/worker/examples/schedule-sync/ownership.ts',
+        'src/lib/catalog/worker/examples/schedule-sync/plan.ts',
       ].sort(),
     );
   });

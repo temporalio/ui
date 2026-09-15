@@ -80,6 +80,22 @@ const descriptor: BrowserCatalogDescriptor = {
   },
 };
 
+const scheduledDescriptor: BrowserCatalogDescriptor = {
+  ...descriptor,
+  id: 'hourly-order',
+  title: 'Hourly order',
+  execution: {
+    ...descriptor.execution,
+    kind: 'workflow',
+    workflowType: 'OrderLifecycle',
+    schedule: {
+      id: 'ui-catalog-hello-hourly',
+      spec: { cronExpressions: ['0 * * * *'] },
+      paused: true,
+    },
+  },
+};
+
 const host: WorkbenchHost = {
   start: vi.fn(),
   checkReadiness: vi.fn(async () => []),
@@ -100,6 +116,21 @@ describe('CatalogList', () => {
     expect(body).toContain('aria-label="Workflow examples"');
     expect(body).toContain('colspan="5"');
     expect(body).toContain('No examples match the current filters.');
+  });
+
+  it('marks rows whose workflow declares a schedule', () => {
+    const sessionStore = createCatalogSessionStore(host);
+    const { body } = renderComponent(catalogList, {
+      props: {
+        descriptors: [descriptor, scheduledDescriptor],
+        host,
+        sessionStore,
+        exampleHref,
+      },
+    });
+
+    expect(body).toContain('Scheduled');
+    expect(body.match(/>Scheduled</g)).toHaveLength(1);
   });
 
   it('renders catalog examples in a compact native table with fixed actions', () => {

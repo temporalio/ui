@@ -38,6 +38,22 @@ const descriptor: BrowserCatalogDescriptor = {
   },
 };
 
+const scheduledDescriptor: BrowserCatalogDescriptor = {
+  ...descriptor,
+  id: 'hourly-order',
+  title: 'Hourly order',
+  execution: {
+    ...descriptor.execution,
+    kind: 'workflow',
+    workflowType: 'OrderLifecycle',
+    schedule: {
+      id: 'ui-catalog-hello-hourly',
+      spec: { cronExpressions: ['0 * * * *'] },
+      paused: true,
+    },
+  },
+};
+
 const localDescriptor: BrowserCatalogDescriptor = {
   ...descriptor,
   id: 'payment-reminder',
@@ -113,6 +129,7 @@ export async function cleanup() {
 export async function renderDetail({
   deferReadiness = false,
   pinExecutionId = true,
+  withSchedule = false,
   readinessResponses = [
     [
       {
@@ -126,6 +143,7 @@ export async function renderDetail({
 }: {
   deferReadiness?: boolean;
   pinExecutionId?: boolean;
+  withSchedule?: boolean;
   readinessResponses?: ReadinessCheck[][];
 } = {}) {
   readinessCallCount = 0;
@@ -144,15 +162,16 @@ export async function renderDetail({
         );
   });
   const target = document.body.appendChild(document.createElement('div'));
+  const rendered = withSchedule ? scheduledDescriptor : descriptor;
   mounted.push(
     mount(CatalogDetail, {
       target,
       props: {
         descriptor: pinExecutionId
-          ? descriptor
+          ? rendered
           : {
-              ...descriptor,
-              startOptions: { ...descriptor.startOptions, defaultValue: {} },
+              ...rendered,
+              startOptions: { ...rendered.startOptions, defaultValue: {} },
             },
         host,
         sessionStore: createCatalogSessionStore(host),

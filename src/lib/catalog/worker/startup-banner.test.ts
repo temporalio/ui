@@ -36,6 +36,15 @@ describe('formatCatalogBanner', () => {
     expect(banner).toContain('local-workflows → default / ui-catalog-local');
   });
 
+  it('states whether the schedule manager is enabled', () => {
+    expect(formatCatalogBanner({ targets })).toContain(
+      'Schedule manager: disabled',
+    );
+    expect(formatCatalogBanner({ targets, schedulesEnabled: true })).toContain(
+      'Schedule manager: enabled',
+    );
+  });
+
   it('keeps every framed line the same width', () => {
     const widths = new Set(
       formatCatalogBanner({ targets })

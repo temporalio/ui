@@ -439,6 +439,26 @@ export const createApiWorkbenchHost = ({
         response?.endpoints?.some((item) => item.spec?.name === endpoint),
       );
     },
+    checkSchedule: async ({ namespace, scheduleId }, signal) => {
+      const route = routeForApi('schedule', { namespace, scheduleId });
+
+      try {
+        const response = await requestFromAPI<{
+          schedule?: { state?: { paused?: boolean } };
+        }>(route, {
+          request,
+          notifyOnError: false,
+          options: { signal },
+        });
+
+        return {
+          exists: Boolean(response?.schedule),
+          paused: Boolean(response?.schedule?.state?.paused),
+        };
+      } catch {
+        return { exists: false, paused: false };
+      }
+    },
     createEvidenceHref: evidenceHref,
   });
 };

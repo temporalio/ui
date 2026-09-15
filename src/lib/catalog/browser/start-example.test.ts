@@ -174,6 +174,25 @@ describe('catalog example start', () => {
     expect(catalogHost.start).not.toHaveBeenCalled();
   });
 
+  it('runs despite an unavailable advisory schedule check', async () => {
+    const catalogHost = host({
+      readiness: [
+        { kind: 'worker', required: false, state: 'ready', taskQueueType: 1 },
+        {
+          kind: 'schedule',
+          required: false,
+          state: 'unavailable',
+          scheduleId: 'ui-catalog-hello-hourly',
+          paused: true,
+          held: false,
+        },
+      ],
+    });
+
+    await expect(run(catalogHost)).resolves.toEqual({ started: true });
+    expect(catalogHost.start).toHaveBeenCalledOnce();
+  });
+
   it('reports readiness failures without dispatch', async () => {
     const catalogHost = host();
     catalogHost.checkReadiness = vi.fn(async () => {

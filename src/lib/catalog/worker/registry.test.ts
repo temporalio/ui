@@ -195,6 +195,7 @@ describe('generateCatalog', () => {
               workflow,
               activities: { greetingActivity: activity },
             },
+            inputDefault: ['Temporal'],
           },
         ],
         activities: { greetingActivity: activity },
@@ -268,6 +269,7 @@ describe('generateCatalog', () => {
           timeouts: { scheduleToClose: '1 minute' },
           policies: { retry: { maximumAttempts: 3 } },
         },
+        inputDefault: { name: 'Temporal' },
       },
     ]);
     expect(generated.workerBindings[0]?.activities).toEqual({
@@ -343,6 +345,7 @@ describe('generateCatalog', () => {
           handler,
           policies: { scheduleToClose: '1 minute' },
         },
+        inputDefault: { name: 'Temporal' },
       },
     ]);
     expect(generated.workerBindings[0]?.activities).toEqual({});
@@ -1527,6 +1530,231 @@ describe('generateCatalog', () => {
     ).not.toHaveProperty('setupMarkdown');
     expect(() => generateCatalog(registerSetupExample(''))).toThrow(
       'invalid metadata fields',
+    );
+  });
+});
+
+describe('generateCatalog schedule declarations', () => {
+  const registerScheduledExample = (
+    schedule: unknown,
+    id = 'scheduled-example',
+  ) => {
+    const workflow = () => undefined;
+    const registry = createCatalogRegistry();
+
+    registry.registerTarget({
+      id: 'catalog',
+      namespace: 'default',
+      taskQueue: 'catalog',
+      workflowsPath: './workflows',
+      workflowExports: { scheduledWorkflow: workflow },
+    });
+    registry.registerExample({
+      id,
+      title: 'Scheduled example',
+      description: 'Declares a schedule.',
+      targetId: 'catalog',
+      capabilityTags: [],
+      expectedEvidence: [],
+      input: { defaultValue: ['Temporal'], schema: {} },
+      startOptions: { defaultValue: {}, schema: {} },
+      execution: {
+        kind: 'workflow',
+        workflowType: 'scheduledWorkflow',
+        workflow,
+        activities: {},
+        schedule: schedule as never,
+      },
+    });
+
+    return registry;
+  };
+  const validSchedule = {
+    id: 'scheduled-hourly',
+    spec: { cronExpressions: ['0 * * * *'] },
+    paused: false,
+  };
+
+  it('emits a declared schedule into the browser descriptor', () => {
+    const generated = generateCatalog(
+      registerScheduledExample({
+        ...validSchedule,
+        input: ['Scheduled'],
+        note: 'Hourly',
+        spec: {
+          cronExpressions: ['0 * * * *'],
+          intervals: [{ every: '1h', offset: '5m' }],
+        },
+      }),
+    );
+
+    expect(generated.browserDescriptors[0]?.execution).toMatchObject({
+      schedule: {
+        id: 'scheduled-hourly',
+        spec: {
+          cronExpressions: ['0 * * * *'],
+          intervals: [{ every: '1h', offset: '5m' }],
+        },
+        input: ['Scheduled'],
+        paused: false,
+        note: 'Hourly',
+      },
+    });
+  });
+
+  it('omits the schedule from the descriptor when no example declares one', () => {
+    const generated = generateCatalog(registerScheduledExample(undefined));
+
+    expect(generated.browserDescriptors[0]?.execution).not.toHaveProperty(
+      'schedule',
+    );
+  });
+
+  it('carries the example input default onto the worker binding', () => {
+    const generated = generateCatalog(registerScheduledExample(validSchedule));
+
+    expect(generated.workerBindings[0]?.examples[0]?.inputDefault).toEqual([
+      'Temporal',
+    ]);
+  });
+
+  it('rejects an unknown field on the schedule', () => {
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({ ...validSchedule, cron: '0 * * * *' }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects an unknown field on the schedule spec', () => {
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({
+          ...validSchedule,
+          spec: { cronExpressions: ['0 * * * *'], calendars: [] },
+        }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects an unknown field on a schedule interval', () => {
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({
+          ...validSchedule,
+          spec: { intervals: [{ every: '1h', jitter: '1m' }] },
+        }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects an empty schedule id', () => {
+    expect(() =>
+      generateCatalog(registerScheduledExample({ ...validSchedule, id: '' })),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects a spec with neither a cron expression nor an interval', () => {
+    expect(() =>
+      generateCatalog(registerScheduledExample({ ...validSchedule, spec: {} })),
+    ).toThrow('declares an invalid schedule');
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({
+          ...validSchedule,
+          spec: { cronExpressions: [], intervals: [] },
+        }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects an empty cron expression', () => {
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({
+          ...validSchedule,
+          spec: { cronExpressions: [''] },
+        }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects an interval without a duration', () => {
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({
+          ...validSchedule,
+          spec: { intervals: [{ every: '' }] },
+        }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects an interval with an empty offset', () => {
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({
+          ...validSchedule,
+          spec: { intervals: [{ every: '1h', offset: '' }] },
+        }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects a non-boolean paused flag', () => {
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({ ...validSchedule, paused: 'false' }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects input that is not a JSON-serializable array', () => {
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({ ...validSchedule, input: 'Temporal' }),
+      ),
+    ).toThrow('declares an invalid schedule');
+    expect(() =>
+      generateCatalog(
+        registerScheduledExample({
+          ...validSchedule,
+          input: [() => undefined],
+        }),
+      ),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects an empty note', () => {
+    expect(() =>
+      generateCatalog(registerScheduledExample({ ...validSchedule, note: '' })),
+    ).toThrow('declares an invalid schedule');
+  });
+
+  it('rejects two examples declaring the same schedule id', () => {
+    const registry = registerScheduledExample(validSchedule);
+    const workflow = registry.targets[0].workflowExports.scheduledWorkflow;
+
+    registry.registerExample({
+      id: 'second-scheduled-example',
+      title: 'Second scheduled example',
+      description: 'Declares the same schedule id.',
+      targetId: 'catalog',
+      capabilityTags: [],
+      expectedEvidence: [],
+      input: { defaultValue: [], schema: {} },
+      startOptions: { defaultValue: {}, schema: {} },
+      execution: {
+        kind: 'workflow',
+        workflowType: 'scheduledWorkflow',
+        workflow,
+        activities: {},
+        schedule: validSchedule,
+      },
+    });
+
+    expect(() => generateCatalog(registry)).toThrow(
+      'Duplicate catalog schedule id "scheduled-hourly" declared by example "second-scheduled-example"',
     );
   });
 });
