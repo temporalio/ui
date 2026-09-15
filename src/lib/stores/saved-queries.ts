@@ -76,6 +76,14 @@ const systemWorkflowViews: SavedQuery[] = [
     type: 'system',
   },
   {
+    id: 'scheduled-workflows',
+    name: 'Scheduled',
+    query: '`TemporalScheduledById` is not null',
+    Icon: IconTemporalSchedules,
+    type: 'system',
+  },
+
+  {
     id: 'today',
     name: 'Today',
     query: `StartTime >= "${getToday()}"`,

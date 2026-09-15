@@ -12,6 +12,7 @@
   import { translate } from '$lib/i18n/translate';
   import { IconBookmark, IconCheckmark, IconLink } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { lastViewedSavedQueryIds } from '$lib/stores/last-viewed-saved-query';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     MAX_SAVED_QUERIES,
@@ -67,6 +68,12 @@
   const namespaceSavedQueries = $derived(
     sortAlphabetically($savedQueries?.[namespace] || [], (q) => q.name),
   );
+  const lastViewedSavedQueryId = $derived(
+    $lastViewedSavedQueryIds[id]?.[namespace],
+  );
+  const lastViewedSavedQuery = $derived(
+    namespaceSavedQueries.find((view) => view.id === lastViewedSavedQueryId),
+  );
   const systemQueryView = $derived(
     (query && systemViews.find((q) => q.query === query)) ||
       (!query && defaultView),
@@ -121,6 +128,38 @@
       activeUserView?.query !== query,
   );
 
+  const rememberLastViewedSavedQuery = (view: SavedQuery) => {
+    if (view.type !== 'user') return;
+
+    const savedQueryIds = $lastViewedSavedQueryIds[id] ?? {};
+    if (savedQueryIds[namespace] === view.id) return;
+
+    $lastViewedSavedQueryIds = {
+      ...$lastViewedSavedQueryIds,
+      [id]: {
+        ...savedQueryIds,
+        [namespace]: view.id,
+      },
+    };
+  };
+
+  const forgetLastViewedSavedQuery = () => {
+    const savedQueryIds = $lastViewedSavedQueryIds[id];
+    if (!savedQueryIds?.[namespace]) return;
+
+    const remainingSavedQueryIds = { ...savedQueryIds };
+    delete remainingSavedQueryIds[namespace];
+
+    const nextLastViewedSavedQueryIds = { ...$lastViewedSavedQueryIds };
+    if (Object.keys(remainingSavedQueryIds).length) {
+      nextLastViewedSavedQueryIds[id] = remainingSavedQueryIds;
+    } else {
+      delete nextLastViewedSavedQueryIds[id];
+    }
+
+    $lastViewedSavedQueryIds = nextLastViewedSavedQueryIds;
+  };
+
   onMount(() => {
     if (savedQueryParam) {
       const queryToSave = {
@@ -134,6 +173,7 @@
 
       if (!maxViewsReached) {
         $savedQueries[namespace] = [...$savedQueries[namespace], queryToSave];
+        rememberLastViewedSavedQuery(queryToSave);
       }
 
       activeQueryView = queryToSave;
@@ -177,6 +217,12 @@
     }
   });
 
+  $effect(() => {
+    if (lastViewedSavedQueryId && !lastViewedSavedQuery) {
+      forgetLastViewedSavedQuery();
+    }
+  });
+
   const viewHref = (view: SavedQuery) => {
     const url = new URL(page.url);
     if (view.query) {
@@ -191,6 +237,8 @@
   const setActiveQueryView = (view: SavedQuery, event?: MouseEvent) => {
     if (isModifiedClick(event)) return;
     event?.preventDefault();
+
+    rememberLastViewedSavedQuery(view);
 
     const removesActiveView =
       narrowsActiveView(view) && isSystemViewActive(view);
@@ -250,6 +298,7 @@
     }
 
     $savedQueries[namespace] = [...$savedQueries[namespace], view];
+    rememberLastViewedSavedQuery(view);
     activeQueryView = view;
   };
 
@@ -292,6 +341,9 @@
   };
 
   const onDeleteView = (view: SavedQuery) => {
+    if (lastViewedSavedQueryId === view.id) {
+      forgetLastViewedSavedQuery();
+    }
     $savedQueries[namespace] = $savedQueries[namespace].filter(
       (q) => q?.id !== view.id,
     );
@@ -335,6 +387,31 @@
       {viewHref}
       onSelect={setActiveQueryView}
     />
+
+    {#if lastViewedSavedQuery}
+      <Button
+        variant="ghost"
+        aria-label={translate('common.last-viewed-saved-view', {
+          name: lastViewedSavedQuery.name,
+        })}
+        title={lastViewedSavedQuery.name}
+        data-testid="last-viewed-saved-view"
+        data-track-name="last-viewed-saved-view"
+        data-track-intent="action"
+        data-track-text={lastViewedSavedQuery.name}
+        href={viewHref(lastViewedSavedQuery)}
+        onclick={(event) => setActiveQueryView(lastViewedSavedQuery, event)}
+        class="max-w-[240px]"
+        active={activeUserView?.id === lastViewedSavedQuery.id}
+        size="xs"
+      >
+        {@const Glyph = lastViewedSavedQuery.Icon || IconBookmark}
+        <Glyph class="h-4 w-4 flex-shrink-0" />
+        <span class="min-w-0 truncate font-normal"
+          >{lastViewedSavedQuery.name}</span
+        >
+      </Button>
+    {/if}
 
     {#if activeUserView}
       <div class="flex shrink-0 items-center gap-1">
@@ -430,7 +507,7 @@
 {#snippet queryButton(view: SavedQuery)}
   <Tooltip
     text={view.count != undefined ? `${view.name} • ${view.count}` : view.name}
-    bottom
+    top
     usePortal
     tooltipClass="max-w-[280px] xl:hidden"
   >
