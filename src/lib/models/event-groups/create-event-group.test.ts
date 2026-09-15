@@ -193,21 +193,17 @@ describe('groupIsPending', () => {
 });
 
 describe('groupCategory', () => {
-  it('reports local-activity for a local-activity marker', () => {
-    const marker = {
-      eventType: 'MarkerRecorded',
-      category: 'marker',
-      markerRecordedEventAttributes: { markerName: 'LocalActivity' },
-    } as unknown as WorkflowEvent;
-    expect(groupCategory(marker)).toBe('local-activity');
-  });
-
-  it('reports the head event category otherwise', () => {
-    const marker = {
-      eventType: 'MarkerRecorded',
-      category: 'marker',
-      markerRecordedEventAttributes: { markerName: 'Version' },
-    } as unknown as WorkflowEvent;
-    expect(groupCategory(marker)).toBe('marker');
-  });
+  // The local-activity split lives in toEvent, so a group just mirrors its head
+  // event — that is what keeps GroupRecord and EventGroup in agreement.
+  it.each(['local-activity', 'other', 'activity'])(
+    'mirrors a head event category of %s',
+    (category) => {
+      const head = {
+        eventType: 'MarkerRecorded',
+        category,
+        markerRecordedEventAttributes: { markerName: 'LocalActivity' },
+      } as unknown as WorkflowEvent;
+      expect(groupCategory(head)).toBe(category);
+    },
+  );
 });

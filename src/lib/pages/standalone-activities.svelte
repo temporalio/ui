@@ -39,10 +39,11 @@
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
   import BatchCancelConfirmationModal from '$lib/components/standalone-activities/batch-cancel-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/standalone-activities/batch-terminate-confirmation-modal.svelte';
-  import StatusCounts from '$lib/components/status-counts.svelte';
+  import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchActivityCountByStatus } from '$lib/services/activity-counts';
@@ -209,7 +210,7 @@
         </p>
       </div>
       {@render releaseStageBadge?.()}
-      <StatusCounts
+      <StatusCountFilters
         bind:refreshTime
         countStore={activityCount}
         refresh={activityRefresh}
@@ -227,19 +228,20 @@
   </div>
 </header>
 
-<FilterBar />
-<SavedQueryViews
-  filters={activityFilters}
-  savedQueries={savedActivityQueries}
-  systemViews={systemActivityViews}
-  defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
-  searchAttributes={activityExecutionSearchAttributes}
-  id="activity"
->
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={activityFilters}
+    savedQueries={savedActivityQueries}
+    systemViews={systemActivityViews}
+    defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
+    searchAttributes={activityExecutionSearchAttributes}
+    id="activity"
+  />
+  <FilterBar />
   <ActivitiesSummaryConfigurableTable
     onClickConfigure={openCustomizationDrawer}
   />
-</SavedQueryViews>
+</MaximizableTableView>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

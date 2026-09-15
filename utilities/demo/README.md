@@ -1,0 +1,510 @@
+# Feature demos
+
+One JSON file describes everything a reviewer needs to see a feature work:
+which Temporal server to run, which dynamic config to enable on it, which
+catalog examples to run against it, and what to look at afterwards.
+
+The workflows a demo runs are catalog examples, and the worker that runs them is
+the catalog worker. A demo names an example by id and takes its workflow type,
+task queue, and input schema from the catalog, so a demo cannot drift from the
+code the catalog page runs.
+
+```bash
+pnpm demo list                                     # the definitions
+pnpm demo scenarios                                # the scenarios a definition can name
+pnpm demo show system-nexus-signal-with-start      # the definition with its defaults applied
+pnpm demo start system-nexus-signal-with-start     # run every stage
+pnpm demo start system-nexus-signal-with-start --skip ui
+pnpm demo start system-nexus-signal-with-start --only scenarios --once
+pnpm demo stop                                     # stop what an earlier start left running
+pnpm demo new my-feature                           # a definition to edit
+```
+
+| Command                  | What it does                                                     |
+| ------------------------ | ---------------------------------------------------------------- |
+| `list`                   | Every scenario, with its stages and the examples it names         |
+| `scenarios`              | The scenario registry, with what each one does                     |
+| `show <definition>`      | The definition after defaults are applied, which runs nothing      |
+| `start <definition>`     | Runs the stages, prints the reviewer summary, and exits            |
+| `stop [<definition>]`    | Stops the processes a `start` recorded, all runs or one            |
+| `new <name> [example-id...]` | Writes a definition naming those catalog examples            |
+| `help`                   | The command list                                                   |
+
+`start` runs the stages, prints the reviewer summary, and exits. The processes it
+started are detached, so they keep running: `stop` is how they end. `--once`
+tears them down again before returning, which is what a one-shot check wants.
+
+Starting a scenario that is already recorded as running stops that run first, so
+a stale stack cannot be reused by accident. Anything unrecorded on a port belongs
+to somebody else and is reused as before.
+
+The summary lands in `.feature-demo/<name>/summary.md`, the process ids and the
+ports the run owns in `.feature-demo/<name>/run.json`, and each stage writes its
+own log beside them, so a stage that fails to come up says where to look. `stop`
+kills the recorded pids and then sweeps those ports, so a child that outlives its
+record still goes. A child that holds no port, such as the catalog worker, is
+reachable only through its recorded pid, because a sweep by process name would
+also catch a worker you started yourself.
+
+Repeat `--skip` or `--only` to name more than one stage.
+
+## Layout
+
+A scenario is a directory, the way a catalog example is. Its definition and its
+own behaviour live together, and both are TypeScript:
+
+```
+utilities/demo/
+  demo-cli.ts        the entry point
+  cli.ts run.ts      the dispatcher and the stage runner
+  stages/            one file per stage: server, worker, ui
+  examples.ts        starts the catalog examples a demo names
+  scenarios/
+    system-nexus-signal-with-start/
+      definition.ts      what to run and what to check
+      scenario.ts        behaviour naming examples cannot express
+    catalog-signals-and-timers/
+      definition.ts      names catalog examples only, so it ships no behaviour
+```
+
+A definition is a module, not JSON, because the shape only matters at runtime
+and TypeScript checks it for free. `defineScenario` applies the defaults, and a
+definition that passes an option its scenario does not have fails to compile:
+
+```
+error TS2561: Object literal may only specify known properties, but
+'signalNaem' does not exist in type '{ ... signalName?: string ... }'.
+Did you mean to write 'signalName'?
+```
+
+A scenario declares what to run in one of two ways, and may use both:
+
+- `examples` names catalog examples to start. The workflow type, the task queue,
+  and the input schema come from the catalog.
+- `scenario.ts` beside the `definition.ts` is for behaviour that naming examples
+  cannot express. It exports `scenario`, and the definition gives it options
+  under `scenario`, checked by the compiler.
+
+## Adding a demo
+
+1. **Pick the catalog examples.** The catalog owns this, so ask the catalog:
+
+   ```bash
+   pnpm catalog list            # id, source, target, workflow type
+   pnpm catalog list --json     # the same, for scripting
+   ```
+
+   If the feature needs a workflow the catalog does not have, add it there first
+   with `pnpm catalog scaffold <id>`, then `pnpm catalog generate`. Promote it
+   with `pnpm catalog promote <id>` when the demo should work from a clean clone.
+
+2. **Scaffold the definition with those ids:**
+
+   ```bash
+   pnpm demo new order-timeout signal-handlers long-activity
+   ```
+
+   Each example arrives with its `role` and `note` filled in from the catalog's
+   own title and description. A mistyped id fails before any file is written.
+3. **Say what the server needs.** Leave `source` as `auto`. Add
+   `requires.serverCommit` when the feature depends on an unreleased server change,
+   and put whatever dynamic config it needs in `dynamicConfig`. See
+   [Which source to use](#which-source-to-use).
+4. **Write the review steps.** `preview.notes` is the checklist the reviewer
+   follows, so write each one as something that must be true.
+5. **Run it.** `pnpm demo start order-timeout`, then `pnpm demo stop`.
+
+A bad example id or an input that does not match the example's declared schema
+fails before anything starts, naming the problem.
+
+## Stages
+
+Five stages run in order. Each one is optional: turn it off with `"enabled":
+false` in the definition, or with `--skip <stage>` / `--only <stage>`. A stage
+also stands down on its own when something is already listening on its port, so
+a server or UI you started yourself is reused rather than fought over.
+
+| Stage       | What it does                                                    |
+| ----------- | --------------------------------------------------------------- |
+| `server`    | Provisions a Temporal dev server and applies the dynamic config |
+| `worker`    | Starts the catalog worker against that server                   |
+| `tunnel`    | Publishes the frontend on a public address                       |
+| `ui`        | Starts the ui-server API and the UI dev server                  |
+| `scenarios` | Runs the workflows that exercise the feature                    |
+
+## `server`
+
+| Field              | Meaning                                                                 |
+| ------------------ | ----------------------------------------------------------------------- |
+| `source`           | `cli`, `workspace`, or `binary`                                         |
+| `version`          | `cli` source only: a `temporal.download` release, or `latest`            |
+| `path`             | `binary` source only: a CLI binary already on disk                      |
+| `cliRepo`          | Overrides `TEMPORAL_CLI_REPO` for this definition, rarely wanted        |
+| `serverRepo`       | Overrides `TEMPORAL_SERVER_REPO` for this definition, rarely wanted     |
+| `serverRef`        | Fails the run unless the server checkout is on this branch or commit    |
+| `minServerVersion` | Fails the run early if the resolved server is older than this           |
+| `requires.serverModules` | Go modules the built server must carry, as module path to minimum version |
+| `requires.commands`      | Executables the run needs on PATH                                 |
+| `dynamicConfig`    | `--dynamic-config-value` pairs, as JSON values                          |
+| `searchAttributes` | `--search-attribute` pairs, name to type                                |
+| `port`, `uiPort`, `httpPort`, `logLevel`, `dbFilename`, `namespace` | Dev server settings |
+
+### Which source to use
+
+`cli` downloads a published release, which is right whenever the feature is in
+one. Nothing is built, so it is much faster.
+
+`workspace` is for a feature no release carries yet. It compiles your own
+`temporalio/temporal` checkout into the CLI's dev server through a Go workspace
+held in `.feature-demo/`.
+
+The two checkouts are fetched, not configured. A blobless shallow fetch of one
+commit costs about a second, so the build uses `temporalio/temporal` and
+`temporalio/cli` at the refs a definition names, both `main` by default:
+
+```
+· Fetching Temporal CLI at main
+· Fetching Temporal server at main
+```
+
+They land in `.feature-demo/checkouts/`, which means the demo needs no
+configuration, it does not compile whatever you happen to have open, and it
+cannot pick up a `replace` directive from your own tree.
+
+**The two refs are a pair, and they have to move together.** The workspace puts
+both modules in one dependency graph, so Go resolves `go.temporal.io/api` to the
+highest requirement across the two, and both trees then have to compile against
+that one version. The repositories are not released in step, so an arbitrary pair
+fails, including the current `main` of each: today the CLI wants v1.63.4 and the
+server wants v1.63.5, and each removes something the other uses. The pair this
+scenario names agrees on v1.63.0.
+
+To move them, find a CLI commit and a server commit that name the same
+`go.temporal.io/api`, and change both refs at once. The build reports the pair it
+used when it fails.
+
+`requires.serverCommit` is a floor, not a build target. It gives the release line
+the feature needs, and the fetched server is checked to contain it:
+
+```
+.../checkouts/temporal_server_repo-main is at a31f4762, which does not contain
+01aa279c4. That commit adds the feature this scenario shows.
+```
+
+To build your own working tree instead, which is what developing the feature
+wants, point `TEMPORAL_SERVER_REPO` or `TEMPORAL_CLI_REPO` at it. An explicit
+path wins over a fetch, and only then are uncommitted changes part of the build
+cache key.
+
+### When the feature arrives through a dependency
+
+`requires.serverCommit` cannot express a feature that reaches the server
+through a dependency bump, because the commit lives in another repository.
+`requires.serverModules` checks the go.mod of the checkout being built:
+
+```ts
+requires: {
+  serverModules: {
+    'go.temporal.io/auto-scaled-workers': 'v0.0.0-20260824233950-312f95fb8b99',
+  },
+}
+```
+
+A pseudo-version is ordered by its embedded commit timestamp, so that value is
+satisfied by anything from that moment on, and a tagged release satisfies it
+outright.
+
+**A requirement that is not met is applied, not reported.** A feature can
+arrive in the server through a dependency bump with no server ref carrying it,
+because the bump is a one-line change nobody has pushed. So a checkout this
+tool fetched gets `go get` and `go mod tidy` run on it:
+
+```
+· Bumping 1 module requirement(s) in the fetched server checkout
+·   go get go.temporal.io/auto-scaled-workers@v0.0.0-20260824233950-312f95fb8b99
+```
+
+Two consequences worth knowing. The bump changes the checkout, so the build
+cache key includes the module requirements; otherwise a pre-bump binary would
+be reused against a bumped go.mod. And `go mod tidy` can lower a requirement
+another module constrains, so it is re-verified afterwards rather than assumed
+— if the pair is genuinely incompatible the failure says to move
+`requires.serverRef`.
+
+A checkout **you** pointed `TEMPORAL_SERVER_REPO` at is your working tree and
+is never modified. That case still fails, and says to bump it yourself or to
+unset the variable and let the tool use its own checkout.
+
+## `tunnel`
+
+| Field            | Meaning                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `provider`       | `ngrok`                                                   |
+| `targetPort`     | Defaults to the frontend port the server stage provisioned |
+| `readyTimeoutMs` | How long to wait for a public address                      |
+
+Publishes the frontend on a public address, and exposes it to a scenario as
+`context.publicAddress`.
+
+A server-scaled Worker runs wherever Temporal launched it — a Lambda, a Cloud
+Run pool, a Bedrock AgentCore session — and dials the frontend back to poll.
+That inbound leg is the only thing a dev server on localhost cannot offer; the
+outbound leg to the provider is never the problem. A scenario covering
+server-scaled Workers needs this stage, and one that does not should leave it
+off.
+
+**The address is not stable across runs.** A fresh tunnel means a fresh
+hostname, so anything holding it — a provider's environment, say — has to be
+updated per run rather than configured once. A scenario that repoints its
+provider each run works twice in a row; one that trusts a stored address works
+once.
+
+The stage implies `ngrok` on PATH, so a definition does not restate it, and
+preflight fails with that name before any stage starts.
+
+## Creating the Version through the UI
+
+`agentcore-serverless-worker` creates its Worker Deployment Version by driving
+the real create-version form with Playwright, not by calling the CLI.
+
+That is deliberate. The CLI could already create an AgentCore Version before
+any of this existed, so a run that shells out to `temporal worker deployment
+create-version` proves the server works and says nothing about the UI. What is
+under review is whether the form offers the provider, whether its one distinct
+field validates, and whether the config the form builds is one the server
+accepts. Only driving the form answers that.
+
+The run opens the form, selects **Amazon Bedrock AgentCore**, fills the Agent
+Runtime Endpoint ARN and the Access fields, submits, and reports what it saw.
+Screenshots land in the run directory, one per step, so a failure leaves a
+picture of where it stopped.
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `createVersion` | `ui` | `cli` falls back to the CLI, for a machine with no browser |
+| `headed` | `false` | `true` shows the browser doing it |
+
+The `ui` stage is load-bearing here: `--skip ui` leaves the scenario with
+nothing to drive, and it says so rather than falling back silently. Playwright
+downloads its browsers separately from the package, so preflight launches one
+before any stage starts rather than after a server build.
+
+### The Access fields need a real role
+
+The form makes **IAM Role ARN** and **External ID** required, and always sends
+them. Setting
+`workercontroller.compute_providers.aws.require_role_and_external_id` to false
+makes the role *optional*, not ignored: a compute config that carries a role is
+one the server will assume. A placeholder therefore does not get discarded, it
+fails at `sts:AssumeRole` after the form has already done its job.
+
+So the scenario provisions a real one, `TemporalDemoAgentCoreInvoke`, trusting
+this account with an `sts:ExternalId` condition and granting
+`bedrock-agentcore:InvokeAgentRuntime` and `GetAgentRuntimeEndpoint`. It is
+listed in the teardown commands with everything else. Set `iamRoleArn` to use a
+role you already have instead.
+
+This is a different role from `TemporalDemoAgentCoreExecution`. That one is
+handed to AgentCore so it can pull the image; this one is assumed by whatever
+runs the Worker Controller so it can invoke the runtime.
+
+Cloud differs in the trust policy only: there Temporal assumes the customer's
+role, so it names `temporal.io` rather than the caller's own account.
+
+The gap this leaves is real. The CLI can create a Version with no role at all
+via `--aws-agentcore-skip-role-and-external-id`; the form has no equivalent, so
+a self-hosted operator who turned the requirement off still has to supply a
+role that assumes.
+
+## Provisioning the AgentCore runtime
+
+`agentcore-serverless-worker` needs a Bedrock AgentCore Runtime to invoke.
+There are two ways to get one.
+
+### Let the scenario create it
+
+**This is the default for `agentcore-serverless-worker`**, because the scenario
+cannot run without a runtime and a demo whose first run fails is not a demo.
+`pnpm demo start agentcore-serverless-worker` therefore creates one.
+
+It **does bill while it exists.** The run says so when it starts provisioning,
+and the summary lists what was created with the commands to remove it.
+Provisioning is idempotent by name, so running the scenario repeatedly reuses
+one runtime rather than adding another.
+
+To point at your own instead, set `AGENTCORE_ENDPOINT_ARN` or `endpointArn`. To
+refuse outright, set `provision: false`; `AGENTCORE_PROVISION=1` turns it back
+on for a single run without editing a tracked file.
+
+Note that an explicit endpoint ARN **takes precedence over provisioning**, so a
+stale one left in your environment shadows it. Preflight checks that the
+runtime an ARN names actually exists and says so if it does not, because an ARN
+is a string and having one proves nothing about whether it resolves. It creates the ECR repository, builds
+and pushes the Worker image from `scenarios/agentcore-serverless-worker/worker`,
+creates the execution role, and creates the runtime and its endpoint.
+
+It is **off by default**, because an AgentCore runtime bills while it exists
+and starting a demo should not create billable cloud resources by surprise.
+
+Provisioning is idempotent by name, so turning it on for repeated runs reuses
+one runtime rather than adding another. Nothing is torn down at the end: a
+scenario's shutdown gets a three second grace, which is not enough to delete a
+runtime, and a reviewer wants the demo to still exist when the run finishes.
+The summary therefore lists exactly what was created and the commands to
+remove it.
+
+Before creating anything it checks that the calling identity can actually do
+every part, and it does so in the scenario's `preflight`, which runs before any
+stage. A missing permission therefore costs seconds rather than surfacing after
+a server build, and cannot leave a half-provisioned account.
+If something is missing it names the policies to attach, including the one
+that wastes people's time: **the ECR managed policies are named
+`AmazonEC2ContainerRegistry*`, so searching the IAM console for "ecr" finds
+nothing.** Search `ContainerRegistry`.
+
+What the calling identity needs:
+
+- `BedrockAgentCoreFullAccess` — search "AgentCore" in the policy list
+- `AmazonEC2ContainerRegistryFullAccess` — search "ContainerRegistry"
+- `iam:CreateRole`, `iam:PutRolePolicy`, `iam:GetRole`, `iam:PassRole`, to
+  create the execution role and hand it to AgentCore
+
+If you would rather not grant those, ask someone for a Runtime Endpoint ARN
+and use the other way.
+
+### Or bring your own
+
+Provision once by hand, then set `AGENTCORE_ENDPOINT_ARN` and leave
+`provision` off.
+
+The container has to answer `/ping` and `/invocations` on port 8080, be built
+for `linux/arm64`, and start a Temporal worker using the `deploymentName` and
+`buildId` from the invoke payload. Two things catch people out:
+
+- A worker built with `UseVersioning` must register every workflow through
+  `RegisterWorkflowWithOptions` with a `VersioningBehavior`. Plain
+  `RegisterWorkflow` panics with `workflow type does not have a versioning
+  behavior` before it ever polls.
+- Pass the **Runtime Endpoint** ARN, ending in `/runtime-endpoint/<name>`. The
+  provider parses the runtime id and endpoint name out of it, so a bare Runtime
+  ARN is rejected.
+
+```bash
+# The four-part endpoint ARN, which is what the scenario wants:
+aws bedrock-agentcore-control list-agent-runtime-endpoints \
+  --region us-west-2 --agent-runtime-id <runtime-id> \
+  --query 'runtimeEndpoints[].agentRuntimeEndpointArn' --output text
+```
+
+Creating the version is what invokes the runtime, and that first invoke is also
+what associates the task queue: the worker polls with versioning and matching
+learns the queue from that registration. `create-version` takes no task queue,
+so nothing else can teach it.
+
+## `worker`
+
+| Field            | Meaning                                                     |
+| ---------------- | ----------------------------------------------------------- |
+| `targetId`       | Limit the worker to one registered catalog target           |
+| `readyTimeoutMs` | How long to wait for the worker to report a running target  |
+
+The stage runs `pnpm catalog worker` with `TEMPORAL_ADDRESS` and
+`TEMPORAL_NAMESPACE` set to whatever the server stage provisioned. Real
+environment variables win over `.env.catalog`, so the worker follows the demo's
+server without any file being edited. The stage waits for the worker's own
+`target-running` event before the scenarios start, so nothing races.
+
+Task queues always come from a catalog target's registration and are never set
+here. See the `catalog` skill.
+
+## `ui`
+
+| Field             | Meaning                                              |
+| ----------------- | ---------------------------------------------------- |
+| `uiServer`        | Start the Go ui-server that serves the HTTP API      |
+| `web`             | Start the Vite dev server that serves the UI         |
+| `apiPort`         | ui-server port, default `8081`                       |
+| `webPort`         | UI port, default `3000`                              |
+| `rebuildUiServer` | Run `make build` in `server/` even if a binary exists |
+
+The ui-server reads `temporalGrpcAddress` from YAML with no environment
+override, so the runner generates its own config directory under
+`.feature-demo/` pointed at whichever port the server stage used.
+`server/config` is left alone.
+
+If the server checkout uses a newer `go.temporal.io/api` than `server/go.mod`,
+the ui-server rejects new HTTP fields before they reach the server. See the
+`local-temporal` skill for how to bring the two into line.
+
+## `examples` and `scenario`
+
+`examples` is a list of catalog examples to start:
+
+```json
+"examples": [
+  { "id": "signal-handlers", "input": [300], "role": "signal wait" }
+]
+```
+
+Each entry takes its workflow type, task queue, and default input from
+`catalog.generated.json`. An `input` override is checked against the schema the
+example declares, so a demo cannot pass something the catalog page would reject.
+Naming an example that does not exist fails with the list of ids that do, before
+anything starts.
+
+For behaviour that naming examples cannot express, a demo puts `scenario.ts`
+beside its `definition.ts`:
+
+```ts
+export const scenario: Scenario = {
+  describe: 'what it does',
+  run: async (context, options) => ({ workflows: [], observations: [] }),
+};
+```
+
+`definition.ts` passes it options under `scenario`, and the compiler checks them. A demo may have both: the
+examples start first, then the scenario runs.
+
+### Why `system-nexus-signal-with-start` ships a scenario
+
+The demo is of the Nexus **operation**, not the client's `signalWithStart`
+function. The plain client call reaches the frontend RPC directly and produces
+no caller workflow and no Nexus events, which is why the old
+`temporal/scripts/signal-with-start.ts` was deleted. What this renders is a
+workflow invoking `SignalWithStartWorkflowExecution` through the
+`__temporal_system` endpoint.
+
+The caller is an ordinary workflow. Only the **Go** SDK refuses the reserved
+`__temporal_` prefix, which is why the server's own
+`TestBothWorkflowsVisibleAfterSWSFromWorkflow` is skipped; TypeScript has no
+such check, so `createNexusServiceClient` reaches the endpoint directly.
+
+What TypeScript does not have yet is an encoder for the operation's payloads,
+which are `binary/protobuf` workflowservice messages. The SDK's own protobuf
+converters emit `json/protobuf` and want reflection metadata that
+`@temporalio/proto`'s generated classes do not carry. `payload-converter.ts`
+supplies one for the two messages, and the caller runs on a worker of its own
+so nothing is added to the shared catalog worker. That converter is scaffolding:
+it goes away when the SDK gains the operation. The Python SDK already has it as
+`workflow.signal_with_start_workflow(...)`, on a branch.
+
+Two things to know if that converter is ever revisited:
+
+- Those generated namespaces are not constructors, so `instanceof` cannot
+  identify a message. Match on `value.constructor.name`.
+- A response crosses into the workflow sandbox, so its buffer belongs to another
+  realm and protobufjs rejects it with "illegal buffer". Re-wrap it:
+  `decode(new Uint8Array(payload.data ?? []))`.
+- A payload codec must **not** encode the outer envelope. The Python SDK has a
+  regression test for exactly this. Nothing here uses a codec, so it is untested
+  in this repository.
+
+Only the caller needs any of this. The operation's target is a catalog example,
+run by the catalog worker, so the workflow that gets started and signalled is
+one the catalog already ships. Point `targetExample` at any catalog example that
+handles the signal name you set.
+
+## `preview`
+
+`preview.notes` is an ordered checklist for the reviewer. It goes to the console
+and into the summary file, so write it as the steps someone else follows.

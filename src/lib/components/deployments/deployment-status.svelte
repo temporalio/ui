@@ -40,15 +40,15 @@
 
   const deploymentStatus = cva(
     [
-      'flex items-center justify-center gap-1 px-1 min-w-24 transition-colors border border-subtle',
+      'flex items-center justify-center gap-1 px-1 min-w-24 transition-colors border border-primary',
     ],
     {
       variants: {
         status: {
           Latest: 'text-secondary',
-          Ramping: 'text-cyan-600 dark:text-cyan-400',
-          Current: 'text-blue-600 dark:text-blue-400',
-          Draining: 'text-yellow-600 dark:text-yellow-200',
+          Ramping: 'text-brand',
+          Current: 'text-information',
+          Draining: 'text-warning',
           Drained: 'text-secondary',
           Inactive: 'text-secondary',
           Created: 'text-secondary',

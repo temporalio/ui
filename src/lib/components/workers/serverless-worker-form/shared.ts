@@ -1,5 +1,19 @@
 import { z } from 'zod/v3';
 
+import {
+  HOURS,
+  MILLISECONDS,
+  MINUTES,
+  parseDuration,
+  SECONDS,
+} from '$lib/holocene/duration-input/duration-input.svelte';
+import {
+  buildAgentCoreComputeConfig,
+  buildGcpCloudRunComputeConfig,
+  buildLambdaComputeConfig,
+} from '$lib/services/deployments-service';
+import type { ComputeConfig } from '$lib/types/deployments';
+
 const scalingFields = {
   scaleUpCooloffMs: z.number().int().min(0).optional(),
   scaleUpBacklogThreshold: z.number().int().min(0).optional(),
@@ -7,9 +21,51 @@ const scalingFields = {
   metricsPollIntervalMs: z.number().int().min(10000).optional(),
 };
 
+export const scaleDownStabilizationUnits = [
+  HOURS,
+  MINUTES,
+  SECONDS,
+  MILLISECONDS,
+];
+
+export const defaultScaleDownStabilization = '90s';
+
+const durationPattern = /^\d+(\.\d+)?s$/;
+
+// `0.1 * 1000` is `100.00000000000001` in binary floating point; round to
+// nanosecond precision to strip that noise before testing for whole
+// milliseconds, matching what the duration input does when it displays a value.
+const stripFloatNoise = (n: number): number => Math.round(n * 1e9) / 1e9;
+
+const durationToMs = (duration: string): number =>
+  stripFloatNoise(Number(parseDuration(duration)) * 1000);
+
+export const scaleDownStabilizationToMs = (duration: string): number =>
+  Math.round(durationToMs(duration));
+
+export const msToScaleDownStabilization = (ms: number): string =>
+  `${ms / 1000}s`;
+
+const scaleDownStabilizationField = z
+  .string()
+  .refine((val) => durationPattern.test(val), {
+    message: 'Enter a duration in seconds, such as 90s',
+  })
+  .refine((val) => Number.isInteger(durationToMs(val)), {
+    message: 'Duration must be a whole number of milliseconds',
+  })
+  .default(defaultScaleDownStabilization);
+
+// AgentCore takes the Runtime *Endpoint* ARN, not the Runtime ARN: the
+// provider parses the runtime id and endpoint name out of it and rejects
+// anything else. See parseAgentCoreEndpointARN in temporal-auto-scaled-workers.
+const AGENT_CORE_ENDPOINT_ARN =
+  /^arn:aws:bedrock-agentcore:[a-z0-9-]+:\d{12}:runtime\/[^/]+\/runtime-endpoint\/[^/]+$/;
+
 const providerFields = {
-  provider: z.enum(['lambda', 'cloud-run']).default('lambda'),
+  provider: z.enum(['lambda', 'agentcore', 'cloud-run']).default('lambda'),
   lambdaArn: z.string().default(''),
+  agentCoreEndpointArn: z.string().default(''),
   iamRoleArn: z.string().default(''),
   roleExternalId: z.string().default(''),
   gcpProject: z.string().default(''),
@@ -20,13 +76,57 @@ const providerFields = {
   maxReplicas: z.number().int().min(1).max(2_147_483_647).default(30),
   initialReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
   utilizationTarget: z.number().gt(0).max(1).default(0.8),
+  scaleDownStabilization: scaleDownStabilizationField,
+};
+
+// Lambda and AgentCore are both invoked through an assumed IAM role, so they
+// take the same Access fields and validate them identically.
+const validateAwsAccessFields = (
+  data: z.infer<z.ZodObject<typeof providerFields>>,
+  ctx: z.RefinementCtx,
+) => {
+  if (!data.iamRoleArn) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['iamRoleArn'],
+      message: 'IAM Role ARN is required',
+    });
+  } else if (!/^arn:aws:iam::\d{12}:role\/.+$/.test(data.iamRoleArn)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['iamRoleArn'],
+      message: 'Invalid IAM Role ARN format',
+    });
+  }
+  if (!data.roleExternalId) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['roleExternalId'],
+      message: 'External ID is required',
+    });
+  }
 };
 
 const validateProviderFields = (
   data: z.infer<z.ZodObject<typeof providerFields>>,
   ctx: z.RefinementCtx,
 ) => {
-  if (data.provider === 'lambda') {
+  if (data.provider === 'agentcore') {
+    if (!data.agentCoreEndpointArn) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['agentCoreEndpointArn'],
+        message: 'Agent Runtime Endpoint ARN is required',
+      });
+    } else if (!AGENT_CORE_ENDPOINT_ARN.test(data.agentCoreEndpointArn)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['agentCoreEndpointArn'],
+        message: 'Invalid Agent Runtime Endpoint ARN format',
+      });
+    }
+    validateAwsAccessFields(data, ctx);
+  } else if (data.provider === 'lambda') {
     if (!data.lambdaArn) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -42,26 +142,7 @@ const validateProviderFields = (
         message: 'Invalid Lambda ARN format',
       });
     }
-    if (!data.iamRoleArn) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['iamRoleArn'],
-        message: 'IAM Role ARN is required',
-      });
-    } else if (!/^arn:aws:iam::\d{12}:role\/.+$/.test(data.iamRoleArn)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['iamRoleArn'],
-        message: 'Invalid IAM Role ARN format',
-      });
-    }
-    if (!data.roleExternalId) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['roleExternalId'],
-        message: 'External ID is required',
-      });
-    }
+    validateAwsAccessFields(data, ctx);
   } else if (data.provider === 'cloud-run') {
     if (!data.gcpProject)
       ctx.addIssue({
@@ -140,7 +221,57 @@ export type CreateDeploymentFormData = z.infer<typeof createDeploymentSchema>;
 export type CreateVersionFormData = z.infer<typeof createVersionSchema>;
 export type EditVersionFormData = z.infer<typeof editVersionSchema>;
 
-export type ComputeProviderValue = 'lambda' | 'cloud-run';
+type ComputeFormValues = z.infer<z.ZodObject<typeof providerFields>> &
+  Partial<z.infer<z.ZodObject<typeof scalingFields>>>;
+
+// The single place that maps a provider choice onto a ComputeConfig. Every
+// create/edit page routes through here so a new provider is one branch, not a
+// ternary in each page.
+export const buildComputeConfigFromForm = (
+  data: ComputeFormValues,
+): ComputeConfig => {
+  if (data.provider === 'cloud-run') {
+    return buildGcpCloudRunComputeConfig(
+      data.gcpProject,
+      data.gcpRegion,
+      data.gcpWorkerPool,
+      data.gcpServiceAccount,
+      {
+        minReplicas: data.minReplicas,
+        maxReplicas: data.maxReplicas,
+        initialReplicas: data.initialReplicas,
+        utilizationTarget: data.utilizationTarget,
+        scaleDownStabilizationMs: scaleDownStabilizationToMs(
+          data.scaleDownStabilization,
+        ),
+      },
+    );
+  }
+
+  const invokeScaling = {
+    roleExternalId: data.roleExternalId,
+    scaleUpCooloffMs: data.scaleUpCooloffMs,
+    scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+    maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+    metricsPollIntervalMs: data.metricsPollIntervalMs,
+  };
+
+  if (data.provider === 'agentcore') {
+    return buildAgentCoreComputeConfig(
+      data.agentCoreEndpointArn,
+      data.iamRoleArn,
+      invokeScaling,
+    );
+  }
+
+  return buildLambdaComputeConfig(
+    data.lambdaArn,
+    data.iamRoleArn,
+    invokeScaling,
+  );
+};
+
+export type ComputeProviderValue = 'lambda' | 'agentcore' | 'cloud-run';
 
 export type ComputeProviderReleaseStage =
   | 'public-preview'
@@ -160,6 +291,7 @@ export const defaultReleaseStage: Record<
   ComputeProviderReleaseStage
 > = {
   lambda: 'public-preview',
+  agentcore: 'pre-release',
   'cloud-run': 'pre-release',
 };
 
@@ -192,11 +324,30 @@ export const getInitialComputeProvider = ({
 interface TerraformTemplateValues {
   externalId?: string;
   lambdaArn?: string;
+  /** The Runtime Endpoint ARN, for the AgentCore module's list. */
+  agentCoreEndpointArn?: string;
 }
+
+/** Rewrites a `key = [...]` list in an HCL snippet with the ARNs given. */
+const replaceArnList = (template: string, key: string, value?: string) => {
+  const arns = (value ?? '')
+    .split(',')
+    .map((arn) => arn.trim())
+    .filter(Boolean);
+
+  if (!arns.length) return template;
+
+  const entries = arns.map((arn) => `    "${arn}",`).join('\n');
+
+  return template.replace(
+    new RegExp(`(${key}\\s*=\\s*\\[)[^\\]]*(\\])`),
+    (_, open: string, close: string) => `${open}\n${entries}\n  ${close}`,
+  );
+};
 
 export const interpolateTerraformTemplate = (
   template: string,
-  { externalId, lambdaArn }: TerraformTemplateValues,
+  { externalId, lambdaArn, agentCoreEndpointArn }: TerraformTemplateValues,
 ): string => {
   let result = template;
 
@@ -207,18 +358,11 @@ export const interpolateTerraformTemplate = (
     );
   }
 
-  const arns = (lambdaArn ?? '')
-    .split(',')
-    .map((arn) => arn.trim())
-    .filter(Boolean);
-
-  if (arns.length) {
-    const entries = arns.map((arn) => `    "${arn}",`).join('\n');
-    result = result.replace(
-      /(lambda_function_arns\s*=\s*\[)[^\]]*(\])/,
-      (_, open: string, close: string) => `${open}\n${entries}\n  ${close}`,
-    );
-  }
+  // Only one of these keys exists in a given snippet, so both run and the
+  // absent one is a no-op rather than the caller having to say which provider
+  // this template belongs to.
+  result = replaceArnList(result, 'lambda_function_arns', lambdaArn);
+  result = replaceArnList(result, 'agent_runtime_arns', agentCoreEndpointArn);
 
   return result;
 };

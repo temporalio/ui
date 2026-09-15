@@ -114,10 +114,10 @@
 
 <Story name="Right" args={{ position: 'right' }} {template} />
 
-<Story name="Bottom (Light)" args={{ dark: false }} {template} />
+<Story name="Bottom (Theme)" args={{ dark: false }} {template} />
 
 <Story
-  name="Right (Light)"
+  name="Right (Theme)"
   args={{ position: 'right', dark: false }}
   {template}
 />

@@ -15,11 +15,17 @@
 
   type ComboboxArgs = Omit<
     Partial<ComponentProps<typeof Combobox>>,
-    'options' | 'value' | 'optionLabelKey' | 'optionValueKey' | 'multiselect'
+    | 'options'
+    | 'value'
+    | 'optionLabelKey'
+    | 'optionValueKey'
+    | 'optionDescriptionKey'
+    | 'multiselect'
   > & {
     options?: readonly (string | Record<string, unknown>)[];
     optionLabelKey?: string;
     optionValueKey?: string;
+    optionDescriptionKey?: string;
     multiselect?: boolean;
     allowCustomValue?: boolean;
     showChevron?: boolean;
@@ -32,6 +38,7 @@
     component: Combobox,
     args: {
       label: 'Select a Language',
+      value: '',
       placeholder: 'Start Typing...',
       noResultsText: 'No Results',
       readonly: false,
@@ -65,6 +72,7 @@
       noResultsText: { name: 'No Results Text', control: 'text' },
       optionValueKey: { control: 'text', table: { disable: true } },
       optionLabelKey: { control: 'text', table: { disable: true } },
+      optionDescriptionKey: { control: 'text', table: { disable: true } },
 
       options: { table: { disable: true } },
     },
@@ -73,12 +81,14 @@
 </script>
 
 {#snippet template(args: ComboboxArgs, context: StoryContext<ComboboxArgs>)}
-  <Combobox
-    {...args as unknown as ComponentProps<typeof Combobox>}
-    id={context.id}
-    data-testid={context.id}
-    onchange={logAction('change')}
-  />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Combobox
+      {...args as unknown as ComponentProps<typeof Combobox>}
+      id={context.id}
+      data-testid={context.id}
+      onchange={logAction('change')}
+    />
+  </div>
 {/snippet}
 
 <Story
@@ -154,6 +164,60 @@
     const menu = await canvas.findByRole('listbox');
 
     expect(menu).toBeInTheDocument();
+  }}
+/>
+
+<Story
+  name="Custom Options With Descriptions"
+  args={{
+    label: 'Select a Namespace',
+    options: [
+      {
+        label: 'billing-prod',
+        value: 'billing-prod',
+        description: 'Invoicing and payment workflows',
+      },
+      {
+        label: 'billing-staging',
+        value: 'billing-staging',
+        description: 'Pre-release verification',
+      },
+      {
+        label: 'search-prod',
+        value: 'search-prod',
+        description: 'Indexing pipeline',
+      },
+      { label: 'internal-tools', value: 'internal-tools' },
+    ],
+    optionLabelKey: 'label',
+    optionValueKey: 'value',
+    optionDescriptionKey: 'description',
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    await userEvent.type(combobox, 'billing');
+
+    const menu = await canvas.findByRole('listbox');
+    expect(menu).toBeInTheDocument();
+
+    // Descriptions render as a secondary line beneath the label.
+    expect(
+      canvas.getByText('Invoicing and payment workflows'),
+    ).toBeInTheDocument();
+
+    // An option without a description still renders, with no secondary line.
+    await userEvent.clear(combobox);
+    await userEvent.type(combobox, 'internal');
+    expect(canvas.getByText('internal-tools')).toBeInTheDocument();
+
+    // Filtering matches the label only — never the description.
+    await userEvent.clear(combobox);
+    await userEvent.type(combobox, 'Indexing');
+    await waitFor(() => {
+      expect(canvas.getByText('No Results')).toBeInTheDocument();
+    });
   }}
 />
 
@@ -268,7 +332,9 @@
   }}
 >
   {#snippet template(_args, context)}
-    <AsyncTest id={context.id}></AsyncTest>
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
+      <AsyncTest id={context.id}></AsyncTest>
+    </div>
   {/snippet}
 </Story>
 
@@ -335,37 +401,39 @@
   }}
 >
   {#snippet template(args, context)}
-    <div class="w-64">
-      <Combobox
-        {...args as unknown as ComponentProps<typeof Combobox>}
-        id={context.id}
-        data-testid={context.id}
-        onchange={logAction('change')}
-        LeadingIcon={ioIcons.IconSearch}
-        options={[
-          'English',
-          'English (UK)',
-          'German',
-          'French',
-          'Japanese',
-          'Spanish',
-          'Portuguese',
-          'Mandarin',
-          'Hindi',
-          'Russian',
-          'Italian',
-        ]}
-      >
-        {#snippet action()}
-          <Button
-            onclick={() => {}}
-            variant="ghost"
-            size="xs"
-            LeadingIcon={ioIcons.IconClose}
-            aria-label="clear"
-          />
-        {/snippet}
-      </Combobox>
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
+      <div class="w-64">
+        <Combobox
+          {...args as unknown as ComponentProps<typeof Combobox>}
+          id={context.id}
+          data-testid={context.id}
+          onchange={logAction('change')}
+          LeadingIcon={ioIcons.IconSearch}
+          options={[
+            'English',
+            'English (UK)',
+            'German',
+            'French',
+            'Japanese',
+            'Spanish',
+            'Portuguese',
+            'Mandarin',
+            'Hindi',
+            'Russian',
+            'Italian',
+          ]}
+        >
+          {#snippet action()}
+            <Button
+              onclick={() => {}}
+              variant="ghost"
+              size="xs"
+              LeadingIcon={ioIcons.IconClose}
+              aria-label="clear"
+            />
+          {/snippet}
+        </Combobox>
+      </div>
     </div>
   {/snippet}
 </Story>

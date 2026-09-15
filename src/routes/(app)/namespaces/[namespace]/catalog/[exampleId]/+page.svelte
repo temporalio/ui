@@ -3,8 +3,8 @@
 
   import CatalogDetail from '$lib/catalog/browser/catalog-detail.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { Badge } from '$lib/io/badge';
   import { IconChevronLeft } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import { getIdentity } from '$lib/utilities/core-context';
@@ -45,9 +45,10 @@
     </Link>
     <div class="mt-3 flex flex-wrap items-center gap-2">
       <h1>{descriptor.title}</h1>
-      <Badge type={descriptor.source.id === 'local' ? 'warning' : 'subtle'}>
-        {descriptor.source.label}
-      </Badge>
+      <Badge
+        text={descriptor.source.label}
+        colorScheme={descriptor.source.id === 'local' ? 'warning' : 'neutral'}
+      />
     </div>
     <p class="mt-1 max-w-3xl text-sm text-secondary">
       {descriptor.description}

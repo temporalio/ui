@@ -3,7 +3,6 @@ import {
   IconCheckCircle,
   IconClock,
   type IconComponent,
-  IconExclamationCircle,
   IconExclamationOctagon,
   IconHappyLappy,
   IconHeartbeat,
@@ -46,7 +45,7 @@ const getLastHour = () => {
 
 export const DEFAULT_WORKFLOW_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
-  name: 'All Workflows',
+  name: 'All',
   query: '',
   Icon: IconTemporalWorkflow,
   type: 'system',
@@ -54,7 +53,7 @@ export const DEFAULT_WORKFLOW_SYSTEM_VIEW: SavedQuery = {
 
 const TASK_FAILURES_VIEW: SavedQuery = {
   id: 'task-failures',
-  name: 'Task Failures',
+  name: 'Failures',
   query: TASK_FAILURES_QUERY,
   Icon: IconHappyLappy,
   type: 'system',
@@ -71,7 +70,7 @@ const systemWorkflowViews: SavedQuery[] = [
   },
   {
     id: 'child-workflows',
-    name: 'Parent Workflows',
+    name: 'Parent',
     query: '`ParentWorkflowId` is null',
     Icon: IconRelationship,
     type: 'system',
@@ -85,7 +84,7 @@ const systemWorkflowViews: SavedQuery[] = [
   },
   {
     id: 'last-hour',
-    name: 'Last Hour',
+    name: 'Last 1h',
     query: `StartTime >= "${getLastHour()}"`,
     Icon: IconClock,
     type: 'system',
@@ -152,7 +151,7 @@ export const systemActivityViews: SavedQuery[] = [
     id: 'failed',
     name: 'Failed',
     query: '`ExecutionStatus`="Failed"',
-    Icon: IconExclamationCircle,
+    Icon: IconExclamationOctagon,
     type: 'system',
   },
 ];
@@ -183,7 +182,7 @@ export const systemNexusViews: SavedQuery[] = [
   },
   {
     id: 'last-hour',
-    name: 'Last Hour',
+    name: 'Last 1h',
     query: `StartTime >= "${getLastHour()}"`,
     Icon: IconClock,
     type: 'system',

@@ -27,7 +27,7 @@
 
   let {
     canCreateServerlessDeployment = true,
-    showConnectionStatus = false,
+    showConnectionStatus = true,
   }: Props = $props();
 
   let error = $state('');
@@ -82,7 +82,7 @@
 </script>
 
 {#key [namespace, $refresh]}
-  <div class="flex flex-col gap-4">
+  <div class="flex min-h-0 grow flex-col gap-4">
     <PaginatedTable
       {onFetch}
       {onError}
@@ -124,12 +124,16 @@
         />
       {/snippet}
       {#snippet actionsEndAdditional()}
-        <Tooltip text="Configure Columns" top>
+        <Tooltip text={translate('common.configure-columns')} top>
           <Button
             onclick={openCustomizationDrawer}
             data-testid="deployments-table-configuration-button"
             size="xs"
             variant="ghost"
+            aria-label={translate('common.configure-columns')}
+            data-track-name="configure-columns-table-control"
+            data-track-intent="action"
+            data-track-text={translate('common.configure-columns')}
           >
             <IconTemporalSettings />
           </Button>

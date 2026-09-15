@@ -80,12 +80,16 @@
       <TableEmptyState />
     {/snippet}
     {#snippet actionsEndAdditional()}
-      <Tooltip text="Configure Columns" top>
+      <Tooltip text={translate('common.configure-columns')} top>
         <Button
           onclick={onClickConfigure}
           data-testid="nexus-operations-summary-table-configuration-button"
           size="xs"
           variant="ghost"
+          aria-label={translate('common.configure-columns')}
+          data-track-name="configure-columns-table-control"
+          data-track-intent="action"
+          data-track-text={translate('common.configure-columns')}
         >
           <IconTemporalSettings />
         </Button>

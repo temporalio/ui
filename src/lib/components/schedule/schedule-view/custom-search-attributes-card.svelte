@@ -23,6 +23,7 @@
 </script>
 
 <Accordion
+  class="rounded-lg"
   title={translate('events.custom-search-attributes')}
   subtitle={`${searchAttributeCount} ${translate(
     'events.custom-search',
@@ -34,10 +35,11 @@
       {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue] (`${searchAttrName}-${searchAttrValue}`)}
         {@const value = payloadToString(searchAttrValue)}
         <li
-          class="flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0"
+          class="flex flex-wrap items-center gap-2 border-b border-primary py-2 last-of-type:border-b-0"
         >
           <span class="break-all">{searchAttrName}</span>
-          <span class="surface-subtle select-all rounded-sm p-1 leading-4"
+          <span
+            class="select-all rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
             >{value}</span
           >
         </li>

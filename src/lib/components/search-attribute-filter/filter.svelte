@@ -14,7 +14,6 @@
     resetFilter: () => void;
     chipOpenIndex: Writable<number | null>;
     id: string;
-    includeNullConditions: boolean;
   }
 </script>
 
@@ -38,16 +37,9 @@
     options: SearchAttributeOption[];
     id: string;
     statusAttribute?: StatusAttribute;
-    includeNullConditions?: boolean;
   }
 
-  let {
-    filters,
-    options,
-    id,
-    statusAttribute,
-    includeNullConditions = true,
-  }: Props = $props();
+  let { filters, options, id, statusAttribute }: Props = $props();
 
   const filter = writable<SearchAttributeFilter>(createFilter());
   const activeQueryIndex = writable<number | null>(null);
@@ -66,7 +58,6 @@
     resetFilter,
     chipOpenIndex,
     id,
-    includeNullConditions,
   });
 
   function handleSubmit() {
@@ -87,7 +78,7 @@
   }
 </script>
 
-<div class="flex shrink flex-wrap items-center justify-start gap-2">
+<div class="flex min-w-0 flex-1 flex-wrap items-center justify-start gap-2">
   <DropdownFilterList {filters} {statusAttribute} />
   <SearchAttributeMenu {options} {filters} {statusAttribute} />
 </div>

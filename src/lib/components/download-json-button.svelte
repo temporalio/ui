@@ -34,6 +34,9 @@
     size="xs"
     variant="ghost"
     aria-label={translate('common.download-json')}
+    data-track-name="export-table-control"
+    data-track-intent="action"
+    data-track-text={translate('common.download-json')}
   >
     <IconDownload />
   </Button>

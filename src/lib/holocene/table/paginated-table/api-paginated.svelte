@@ -7,10 +7,12 @@
 
 <script lang="ts" generics="T">
   import type { HTMLAttributes } from 'svelte/elements';
+  import { writable } from 'svelte/store';
 
   import { debounce } from 'es-toolkit';
   import type { Snippet } from 'svelte';
-  import { onMount } from 'svelte';
+  import { getContext, onMount } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import Alert from '$lib/holocene/alert.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -25,6 +27,11 @@
   import { isError } from '$lib/utilities/is';
 
   import PaginatedTable from './index.svelte';
+  import {
+    TABLE_MAXIMIZABLE_CONTEXT,
+    type TableMaximizableContext,
+  } from './maximizable-view.svelte';
+  import MaximizeToggle from './maximize-toggle.svelte';
 
   type KeyboardHandler = ((event: KeyboardEvent) => void) | undefined;
 
@@ -224,6 +231,12 @@
   const adjustedTotal = $derived(
     !$store.hasNext && $store.indexEnd !== total ? $store.indexEnd : total,
   );
+
+  const maximizableContext = getContext<TableMaximizableContext | undefined>(
+    TABLE_MAXIMIZABLE_CONTEXT,
+  );
+  const maximizable = Boolean(maximizableContext);
+  const maximized = maximizableContext?.maximized ?? writable(false);
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -250,6 +263,9 @@
   updating={$store.updating}
   visibleItems={$store.visibleItems}
   {maxHeight}
+  verticalScroll={maximizable && $maximized ? 'table' : 'responsive'}
+  class={merge(maximizable && 'rounded-none border-0 border-t')}
+  tableClass={maximizable ? 'rounded-none' : ''}
   {id}
   {caption}
   {headers}
@@ -267,11 +283,19 @@
   {/snippet}
 
   {#snippet actionsEnd()}
-    <nav class="flex shrink-0 items-center gap-2" aria-label={ariaLabel}>
+    <div class="ml-auto flex shrink-0 items-center gap-2">
       {@render actionsEndAdditional?.({
         visibleItems: $store.visibleItems,
         page: $store.index + 1,
       })}
+      {#if maximizable}
+        <MaximizeToggle {maximized} />
+      {/if}
+    </div>
+    <nav
+      class="flex shrink-0 items-center gap-2 max-md:w-full max-md:justify-between"
+      aria-label={ariaLabel}
+    >
       <IconButton
         label={previousButtonLabel}
         disabled={!$store.hasPrevious}

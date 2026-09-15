@@ -155,6 +155,9 @@
           size="xs"
           variant="ghost"
           aria-label={translate('common.configure-columns')}
+          data-track-name="configure-columns-table-control"
+          data-track-intent="action"
+          data-track-text={translate('common.configure-columns')}
         >
           <IconTemporalSettings />
         </Button>

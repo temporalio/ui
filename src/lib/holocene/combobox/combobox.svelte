@@ -3,7 +3,7 @@
 
   const comboboxStyles = cva(
     [
-      'surface-primary',
+      'bg-background-primary',
       'flex',
       'max-h-28',
       'min-h-10',
@@ -13,17 +13,19 @@
       'overflow-auto',
       'border',
       'text-sm',
-      'dark:focus-within:surface-primary',
+      'text-primary',
       'focus-within:outline-none',
       'focus-within:ring-2',
+      'focus-within:ring-interactive-primary',
+      'rounded',
     ],
     {
       variants: {
         variant: {
           default:
-            'border-subtle focus-within:border-interactive focus-within:ring-primary/70',
+            'border-primary hover:border-brand focus-within:border-secondary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
           ghost:
-            'bg-transparent border-transparent focus-within:border-transparent focus-within:ring-transparent focus-within:bg-transparent hover:surface-interactive-secondary',
+            'border-transparent bg-transparent hover:bg-interactive-tertiary-hover focus-within:border-transparent focus-within:bg-transparent focus-within:ring-transparent',
         },
       },
       defaultVariants: {
@@ -53,6 +55,7 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import {
     IconAdd,
     IconChevronDown,
@@ -61,7 +64,6 @@
     IconSpinner,
   } from '$lib/io/icon';
 
-  import Badge from '../badge.svelte';
   import Button from '../button.svelte';
   import Chip from '../chip.svelte';
   import MenuDivider from '../menu/menu-divider.svelte';
@@ -134,12 +136,18 @@
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
+    optionDescriptionKey?: never;
   }
 
   interface CustomOptionProps {
     options: T[];
     optionValueKey: keyof T;
     optionLabelKey?: keyof T;
+    /**
+     * Optional key whose value renders as a secondary line beneath each
+     * option's label. Filtering still matches on the label only.
+     */
+    optionDescriptionKey?: keyof T;
   }
 
   type Props =
@@ -165,6 +173,7 @@
     showChevron = false,
     optionValueKey = undefined,
     optionLabelKey = optionValueKey,
+    optionDescriptionKey = undefined,
     minSize = 0,
     maxSize = 120,
     hintText = '',
@@ -329,6 +338,18 @@
     }
 
     return '';
+  }
+
+  function getOptionDescription(option: string | T): string | undefined {
+    if (optionDescriptionKey == null) return undefined;
+    if (option === null) return undefined;
+    if (isStringOption(option)) return undefined;
+    if (!isObjectOption(option)) return undefined;
+    if (!(optionDescriptionKey in option)) return undefined;
+
+    const description = option[optionDescriptionKey];
+
+    return description == null ? undefined : String(description);
   }
 
   function getSelectedOption(options: (string | T)[]) {
@@ -516,10 +537,14 @@
     <div
       class={merge(
         comboboxStyles({ variant }),
+        value.length > 0 && variant === 'default' && 'border-secondary',
         !valid &&
           variant === 'default' &&
-          'border border-danger text-danger focus-within:ring-danger/70',
-        disabled && 'opacity-50',
+          'border border-danger focus-within:border-danger focus-within:ring-danger hover:border-danger',
+        disabled &&
+          variant === 'default' &&
+          'border-secondary bg-surface-tertiary text-tertiary hover:border-secondary',
+        disabled && variant === 'ghost' && 'text-tertiary hover:bg-transparent',
         className,
       )}
     >
@@ -546,7 +571,7 @@
               <p>+{value.slice(chipLimit).length}</p>
             {/if}
           {:else if selectedCountLabel}
-            <Badge>{selectedCountLabel}</Badge>
+            <Badge text={selectedCountLabel} />
           {/if}
         {/if}
         <input
@@ -589,7 +614,7 @@
         />
       </div>
       {#if action}
-        <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
+        <div class="ml-1 flex h-full items-start border-l border-primary p-0.5">
           {#if actionTooltip}
             <Tooltip text={actionTooltip} right>
               {@render action()}
@@ -599,7 +624,9 @@
           {/if}
         </div>
       {:else if href}
-        <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+        <div
+          class="ml-1 flex h-full items-center border-l border-primary p-0.5"
+        >
           {#if actionTooltip}
             <Tooltip
               text={actionTooltip}
@@ -629,7 +656,7 @@
       {#if showChevron}
         <button
           type="button"
-          class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
+          class="flex h-full items-center rounded pr-2 hover:bg-interactive-tertiary-hover focus:outline-none"
           onclick={handleChevronClick}
           aria-label={$open ? 'Close options' : 'Open options'}
           tabindex="-1"
@@ -701,6 +728,7 @@
         onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}
+        description={getOptionDescription(option)}
         class={optionClass}
       />
     {:else}
@@ -733,6 +761,6 @@
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary focus:outline-none;
+    @apply flex grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 </style>

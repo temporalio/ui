@@ -42,11 +42,11 @@
         class:hidden={!showProfilePic}
       />
       <div
-        class="aspect-square h-full w-[24px] bg-blue-200 p-0.5"
+        class="aspect-square h-full w-[24px] bg-blue-5 p-0.5 text-primary dark:bg-blue-12"
         class:hidden={showProfilePic}
       >
         {#if $authUser?.name}
-          <div class="text-center text-sm text-black">
+          <div class="text-center text-sm">
             {$authUser?.name.trim().charAt(0)}
           </div>
         {/if}
@@ -78,14 +78,17 @@
       <MenuItem disabled>Anonymous Tardigrade</MenuItem>
       <MenuDivider />
     {/if}
-    <MenuItem hoverable={false}>
+    <li
+      role="none"
+      class="m-1 flex items-center justify-between gap-2 border border-transparent px-3 py-2 text-sm text-primary"
+    >
       {translate('common.theme')}
       <DarkModeMenu />
-    </MenuItem>
+    </li>
     <MenuDivider />
     <MenuItem
       hoverable={false}
-      class="text-subtle"
+      class="text-tertiary"
       newTab
       href="https://t.mp/slack"
     >
@@ -93,7 +96,7 @@
     </MenuItem>
     <MenuItem
       hoverable={false}
-      class="text-subtle"
+      class="text-tertiary"
       newTab
       href="https://community.temporal.io/"
     >
@@ -101,7 +104,7 @@
     </MenuItem>
     <MenuItem
       hoverable={false}
-      class="text-subtle"
+      class="text-tertiary"
       newTab
       href="https://temporal.io/change-log"
     >

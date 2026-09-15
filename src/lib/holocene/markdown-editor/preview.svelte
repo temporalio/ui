@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { tick } from 'svelte';
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
   import { resolve } from '$app/paths';
@@ -22,6 +21,17 @@
     inline?: boolean;
     minHeight?: number;
     previewTheme?: 'dark' | 'light';
+    /**
+     * Render without the page padding, with the block wrappers flowing
+     * inline, so a short string hugs its own text instead of sitting in a
+     * padded box. The content still wraps, so it suits a label or a summary
+     * of a sentence or two rather than a document.
+     */
+    compact?: boolean;
+    /**
+     * Accessible name for the frame. Name what the content is, so a frame in
+     * a list of them is distinguishable.
+     */
     title?: string;
   }
 
@@ -34,6 +44,7 @@
     inline = false,
     minHeight = 100,
     previewTheme,
+    compact = false,
     title = 'output',
   }: Props = $props();
 
@@ -93,16 +104,6 @@
     iframe.style.height = `${height + 2}px`;
   };
 
-  const handleLoad = async () => {
-    if (inline) {
-      loading = false;
-      // Flush the removal of the zero-size loading styles before measuring.
-      await tick();
-    }
-
-    resizeIframe();
-  };
-
   $effect(() => {
     if (!iframe || inline || typeof ResizeObserver === 'undefined') return;
 
@@ -139,7 +140,7 @@
   );
   const previewPath = $derived(
     resolve(
-      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&inline=${inline}`,
+      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&compact=${compact}`,
       {},
     ),
   );
@@ -157,12 +158,9 @@
 >
   <iframe
     bind:this={iframe}
-    onload={handleLoad}
+    onload={resizeIframe}
     {title}
-    class={twMerge(
-      inline ? 'block border-0 align-middle' : 'block w-full border-0',
-      inline && loading && 'invisible !h-0 !w-0',
-    )}
+    class="block w-full border-0"
     src={previewPath}
     id={frameId}
   ></iframe>

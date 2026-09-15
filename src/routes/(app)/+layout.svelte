@@ -19,6 +19,7 @@
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    IconAgent,
     IconArchive,
     IconBook,
     IconFeedback,
@@ -44,6 +45,7 @@
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
   import {
+    routeForAgents,
     routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForCatalog,
@@ -112,6 +114,7 @@
   const getRoutes = (namespace: string) => {
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
+      agentsRoute: routeForAgents({ namespace }),
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
       standaloneNexusOperationsRoute: routeForStandaloneNexusOperations({
         namespace,
@@ -131,6 +134,7 @@
   const getNavPrimaryLinks = (
     {
       workflowsRoute,
+      agentsRoute,
       standaloneActivitiesRoute,
       standaloneNexusOperationsRoute,
       schedulesRoute,
@@ -142,6 +146,7 @@
       nexusRoute,
     }: {
       workflowsRoute: string;
+      agentsRoute: string;
       standaloneActivitiesRoute: string;
       standaloneNexusOperationsRoute: string;
       schedulesRoute: string;
@@ -164,6 +169,7 @@
         isActive: (path) =>
           path.includes(namespacesRoute) &&
           !path.includes(workflowsRoute) &&
+          !path.includes(agentsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
           !path.includes(workersRoute) &&
@@ -205,6 +211,13 @@
         isActive: (path) => path.includes(schedulesRoute),
       },
       {
+        href: agentsRoute,
+        Icon: IconAgent,
+        testId: 'agents-button',
+        label: translate('common.agents'),
+        isActive: (path) => path.includes(agentsRoute),
+      },
+      {
         href: batchOperationsRoute,
         Icon: IconTemporalBatch,
         testId: 'batch-operation-button',
@@ -242,6 +255,7 @@
       historyImportRoute,
     }: {
       workflowsRoute: string;
+      agentsRoute: string;
       standaloneActivitiesRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
@@ -287,6 +301,7 @@
   );
   let {
     workflowsRoute,
+    agentsRoute,
     schedulesRoute,
     batchOperationsRoute,
     workersRoute,
@@ -299,6 +314,7 @@
   let showNamespacePicker = $derived(
     [
       workflowsRoute,
+      agentsRoute,
       schedulesRoute,
       workersRoute,
       workerDeploymentsRoute,
@@ -312,6 +328,10 @@
 
   function getCurrentHref(namespace: string) {
     const namespacePages = [
+      {
+        subPath: 'agents',
+        fullRoute: routeForAgents({ namespace }),
+      },
       {
         subPath: 'schedules',
         fullRoute: routeForSchedules({ namespace }),
@@ -383,14 +403,14 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex h-dvh w-screen flex-row">
+<div class="flex h-[calc(100dvh-var(--layout-pt))] w-screen flex-row">
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
     position={toaster.position}
   />
-  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
+  <div class="sticky top-0 z-30 hidden h-full w-auto md:block">
     <SideNavigation sections={[linkList, linkListForSecondGroup]} {isCloud}>
       {#snippet bottom()}
         {#if !isCloud}
@@ -436,10 +456,18 @@
       <UserMenu {logout} />
     </TopNavigation>
     {#snippet main()}
-      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+      <div
+        class="flex h-full w-full flex-col gap-4 p-4 md:px-8 md:pb-0 md:pt-8"
+      >
         <ErrorBoundary>
           {@render children()}
         </ErrorBoundary>
+        <!--
+          md+ needs a definite height so tables can size against it, and an
+          overflowing box drops its padding-bottom from the scroll area. A
+          real box survives it: gap-4 (16px) + h-4 (16px) = pb-8's 32px.
+        -->
+        <div aria-hidden="true" class="hidden shrink-0 md:block md:h-4"></div>
       </div>
     {/snippet}
     {#snippet footer()}
@@ -455,7 +483,7 @@
             />
           {/each}
 
-          <hr class="border-subtle" />
+          <hr class="border-primary" />
 
           {#each [...linkList]
             .filter((item) => !item.hidden)

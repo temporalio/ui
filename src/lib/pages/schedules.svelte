@@ -14,6 +14,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconTemporalSettings, IconWarning } from '$lib/io/icon';
@@ -139,20 +140,21 @@
   </div>
 </header>
 
-<FilterBar
-  filters={scheduleFilters}
-  options={$scheduleSearchAttributeOptions}
-  searchAttributes={$scheduleSearchAttributes}
-  id="schedules"
-/>
-<SavedQueryViews
-  filters={scheduleFilters}
-  savedQueries={savedScheduleQueries}
-  systemViews={systemScheduleViews}
-  defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
-  searchAttributes={scheduleSearchAttributes}
-  id="schedule"
->
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={scheduleFilters}
+    savedQueries={savedScheduleQueries}
+    systemViews={systemScheduleViews}
+    defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+    searchAttributes={scheduleSearchAttributes}
+    id="schedule"
+  />
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
+  />
   {#key [namespace, query, $schedulesRefresh]}
     <PaginatedTable
       {onFetch}
@@ -214,10 +216,13 @@
         <Tooltip text={translate('common.configure-columns')} top>
           <Button
             onclick={openCustomizationDrawer}
-            data-testid="workflows-summary-table-configuration-button"
+            data-testid="schedules-summary-table-configuration-button"
             size="xs"
             variant="ghost"
             aria-label={translate('common.configure-columns')}
+            data-track-name="configure-columns-table-control"
+            data-track-intent="action"
+            data-track-text={translate('common.configure-columns')}
           >
             <IconTemporalSettings />
           </Button>
@@ -225,7 +230,7 @@
       {/snippet}
     </PaginatedTable>
   {/key}
-</SavedQueryViews>
+</MaximizableTableView>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

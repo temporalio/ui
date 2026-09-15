@@ -10,6 +10,8 @@
 
   import {
     type ComputeProviderOption,
+    type ComputeProviderValue,
+    defaultScaleDownStabilization,
     type EditVersionFormData,
     editVersionSchema,
     getInitialComputeProvider,
@@ -20,8 +22,9 @@
 
   interface Props {
     initialData: {
-      provider?: 'lambda' | 'cloud-run';
+      provider?: ComputeProviderValue;
       lambdaArn: string;
+      agentCoreEndpointArn?: string;
       iamRoleArn: string;
       roleExternalId: string;
       gcpProject?: string;
@@ -32,6 +35,7 @@
       maxReplicas?: number;
       initialReplicas?: number;
       utilizationTarget?: number;
+      scaleDownStabilization?: string;
       scaleUpCooloffMs?: number;
       scaleUpBacklogThreshold?: number;
       maxWorkerLifetimeMs?: number;
@@ -66,6 +70,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: initialData.lambdaArn,
+      agentCoreEndpointArn: initialData.agentCoreEndpointArn ?? '',
       iamRoleArn: initialData.iamRoleArn,
       roleExternalId: initialData.roleExternalId ?? '',
       gcpProject: initialData.gcpProject ?? '',
@@ -76,6 +81,8 @@
       maxReplicas: initialData.maxReplicas ?? 30,
       initialReplicas: initialData.initialReplicas ?? 0,
       utilizationTarget: initialData.utilizationTarget ?? 0.8,
+      scaleDownStabilization:
+        initialData.scaleDownStabilization ?? defaultScaleDownStabilization,
       scaleUpCooloffMs: initialData.scaleUpCooloffMs,
       scaleUpBacklogThreshold: initialData.scaleUpBacklogThreshold,
       maxWorkerLifetimeMs: initialData.maxWorkerLifetimeMs,
@@ -117,6 +124,7 @@
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
+        bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
         bind:iamRoleArn={$form.iamRoleArn}
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}
@@ -128,6 +136,7 @@
         bind:maxReplicas={$form.maxReplicas}
         bind:initialReplicas={$form.initialReplicas}
         bind:utilizationTarget={$form.utilizationTarget}
+        bind:scaleDownStabilization={$form.scaleDownStabilization}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}

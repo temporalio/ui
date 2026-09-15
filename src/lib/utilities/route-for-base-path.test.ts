@@ -5,6 +5,7 @@ import { base } from '$app/paths';
 import { initCoreProvider } from './core-provider';
 import * as routeForModule from './route-for';
 import {
+  routeForAgents,
   routeForArchivalEventHistory,
   routeForArchivalWorkflows,
   routeForAuthentication,
@@ -106,6 +107,7 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],
     ['routeForNamespace', () => routeForNamespace(namespaceParams)],
     ['routeForNamespaceSelector', () => routeForNamespaceSelector()],
+    ['routeForAgents', () => routeForAgents(namespaceParams)],
     ['routeForWorkflows', () => routeForWorkflows(namespaceParams)],
     [
       'routeForArchivalWorkflows',
@@ -360,6 +362,7 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],
     ['routeForNamespace', () => routeForNamespace(namespaceParams)],
     ['routeForNamespaceSelector', () => routeForNamespaceSelector()],
+    ['routeForAgents', () => routeForAgents(namespaceParams)],
     ['routeForWorkflows', () => routeForWorkflows(namespaceParams)],
     [
       'routeForArchivalWorkflows',
