@@ -57,7 +57,6 @@
   const draftActive = $derived(
     Boolean(draftView) && activeView?.id === draftView?.id,
   );
-  const noneSelected = $derived(!activeUserView && !draftActive);
   const label = translate('common.saved-views');
 
   const unsaved = $derived(draftActive || (Boolean(activeUserView) && dirty));
@@ -110,9 +109,8 @@
     >
       {label}
     </span>
-    {#if noneSelected}
-      <BadgeCount value={views.length} total={maxQueries} class="ml-1.5" />
-    {:else if unsaved && !draftActive}
+    <BadgeCount value={views.length} total={maxQueries} class="ml-1.5" />
+    {#if unsaved && !draftActive}
       <span
         class="ml-1.5 shrink-0 rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium italic text-secondary"
       >

@@ -100,6 +100,36 @@ test.describe('Saved Query Views', () => {
     );
   });
 
+  test('Saved views count stays visible in every selection state', async ({
+    page,
+  }) => {
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'saved-workflow-queries',
+        JSON.stringify({
+          default: Array.from({ length: 4 }, (_, index) => ({
+            id: `view-${index + 1}`,
+            name: `View ${index + 1}`,
+            query: `\`WorkflowId\`="view-${index + 1}"`,
+            type: 'user',
+          })),
+        }),
+      );
+    });
+    await page.reload();
+    await waitForWorkflowsApis(page);
+
+    const savedViewsButton = page.getByTestId('saved-views-button');
+    await expect(savedViewsButton).toContainText(/4\s*\/\s*50/);
+
+    await selectCustomView(page, 'view-1');
+    await expect(savedViewsButton).toContainText(/4\s*\/\s*50/);
+
+    await page.getByTestId('running').click();
+    await expect(savedViewsButton).toContainText(/4\s*\/\s*50/);
+    await expect(savedViewsButton).toContainText('Unsaved');
+  });
+
   test('User saved queries: create new, edit view, then delete', async ({
     page,
   }) => {
