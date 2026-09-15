@@ -4,7 +4,7 @@
   import type { Snippet } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
-  type ControlledAttribute = 'viewBox' | 'xmlns' | 'role' | 'aria-hidden';
+  type ControlledAttribute = 'xmlns' | 'role' | 'aria-hidden';
 
   interface Props extends Omit<
     SVGAttributes<SVGSVGElement>,
@@ -13,6 +13,7 @@
     children: Snippet;
     title?: string;
     class?: string;
+    viewBox?: string;
   }
 
   const {
@@ -20,6 +21,7 @@
     'aria-labelledby': ariaLabelledBy,
     'aria-label': ariaLabel,
     class: className,
+    viewBox = '0 0 16 16',
     children,
     ...rest
   }: Props = $props();
@@ -30,7 +32,7 @@
 <svg
   width="1.143em"
   height="1.143em"
-  viewBox="0 0 16 16"
+  {viewBox}
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
   role={labelled ? 'img' : undefined}

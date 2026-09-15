@@ -4,12 +4,15 @@ import { terminalStatusPresentation } from './session-presentation';
 
 describe('terminalStatusPresentation', () => {
   it.each([
-    ['completed', { label: 'Completed', type: 'success' }],
-    ['canceled', { label: 'Canceled', type: 'warning' }],
-    ['continued-as-new', { label: 'Continued as new', type: 'primary' }],
-    ['failed', { label: 'Failed', type: 'danger' }],
-    ['terminated', { label: 'Terminated', type: 'danger' }],
-    ['timed-out', { label: 'Timed out', type: 'danger' }],
+    ['completed', { label: 'Completed', status: 'Completed' }],
+    ['canceled', { label: 'Canceled', status: 'Canceled' }],
+    [
+      'continued-as-new',
+      { label: 'Continued as new', status: 'ContinuedAsNew' },
+    ],
+    ['failed', { label: 'Failed', status: 'Failed' }],
+    ['terminated', { label: 'Terminated', status: 'Terminated' }],
+    ['timed-out', { label: 'Timed out', status: 'TimedOut' }],
   ] as const)('presents %s sessions', (status, presentation) => {
     expect(terminalStatusPresentation(status)).toEqual(presentation);
   });

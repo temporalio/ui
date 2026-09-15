@@ -157,6 +157,34 @@ describe('toEventHistory', () => {
   }
 });
 
+describe('marker categorization', () => {
+  const markerEvent = (eventId: string, markerName: string) =>
+    ({
+      eventId,
+      eventTime: '2022-07-01T20:28:48.796369169Z',
+      eventType: 'MarkerRecorded',
+      version: '0',
+      taskId: '29887292',
+      markerRecordedEventAttributes: {
+        markerName,
+        workflowTaskCompletedEventId: '1',
+      },
+    }) as unknown as HistoryEvent;
+
+  it.each(['LocalActivity', 'core_local_activity'])(
+    'categorizes a %s marker as local-activity',
+    async (markerName) => {
+      const [event] = await toEventHistory([markerEvent('2', markerName)]);
+      expect(event.category).toBe('local-activity');
+    },
+  );
+
+  it('leaves a Version marker in other', async () => {
+    const [event] = await toEventHistory([markerEvent('2', 'Version')]);
+    expect(event.category).toBe('other');
+  });
+});
+
 describe('fromEventToRawEvent', () => {
   const additionalProperties = [
     'attributes',

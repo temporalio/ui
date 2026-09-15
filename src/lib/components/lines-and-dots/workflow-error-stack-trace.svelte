@@ -14,7 +14,10 @@
 </script>
 
 {#if failure}
-  <Accordion title={translate('common.failure')} class="text-sm">
+  <Accordion
+    title={translate('common.failure')}
+    class="border-tertiary bg-background-primary text-sm"
+  >
     {#snippet summary()}
       <div class="w-full text-right text-xs">
         {failure?.message}

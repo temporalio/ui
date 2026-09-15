@@ -70,6 +70,7 @@ export interface ActivityExecutionInfo extends Omit<
   | 'currentRetryInterval'
   | 'executionTime'
   | 'startDelay'
+  | 'lastFailure'
 > {
   status: ActivityExecutionStatus;
   runState?: PendingActivityState;
@@ -86,6 +87,16 @@ export interface ActivityExecutionInfo extends Omit<
   sdkVersion?: string;
   executionTime?: string;
   startDelay?: string;
+  lastFailure?:
+    | (Omit<Failure, 'applicationFailureInfo'> & {
+        applicationFailureInfo?:
+          | (Omit<
+              temporal.api.failure.v1.IApplicationFailureInfo,
+              'nextRetryDelay'
+            > & { nextRetryDelay?: string | null })
+          | null;
+      })
+    | null;
 }
 
 export interface ActivityExecution {

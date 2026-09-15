@@ -4,7 +4,7 @@
   import IconSvgWrapper from './icon-svg-wrapper.svelte';
 
   const { Story } = defineMeta({
-    title: 'Io/Icon',
+    title: 'IO/Design System/Icon',
     component: IconSvgWrapper,
     argTypes: {
       title: { name: 'Accessible label', control: 'text' },
@@ -46,7 +46,7 @@
       >
         {#each glyphs as [name, Glyph] (name)}
           <li
-            class="surface-primary flex flex-col items-center gap-2 rounded-lg border border-subtle p-3 text-center"
+            class="flex flex-col items-center gap-2 rounded-lg border border-primary bg-surface-primary p-3 text-center text-primary"
           >
             <span class="text-2xl"><Glyph /></span>
             <code class="break-all text-[0.625rem] leading-tight opacity-70">
@@ -72,7 +72,7 @@
       <ul class="flex list-none flex-col gap-3 p-0">
         {#each optical as { name, baseName, Glyph, Base } (name)}
           <li
-            class="surface-primary flex flex-col gap-3 rounded-lg border border-subtle p-4"
+            class="flex flex-col gap-3 rounded-lg border border-primary bg-surface-primary p-4 text-primary"
           >
             <code class="text-xs opacity-70">{baseName}</code>
             <div class="flex flex-wrap items-end gap-6">
@@ -81,7 +81,7 @@
                   {#each [{ label: 'base', Component: Base }, { label: 'optical', Component: Glyph }] as variant (variant.label)}
                     {@const Rendered = variant.Component}
                     <div class="flex flex-col items-center gap-1">
-                      <span class="outline-danger outline-dotted outline-1">
+                      <span class="outline-dotted outline-1 outline-danger">
                         <Rendered width={size} height={size} />
                       </span>
                       <span class="text-[0.625rem] opacity-60">
@@ -97,7 +97,7 @@
               {#each [{ label: baseName, Component: Base }, { label: name, Component: Glyph }] as variant (variant.label)}
                 {@const Rendered = variant.Component}
                 <span
-                  class="surface-primary inline-flex items-center gap-2 rounded border border-subtle px-4 py-2"
+                  class="inline-flex items-center gap-2 rounded border border-primary bg-surface-primary px-4 py-2 text-primary"
                 >
                   In a button
                   <Rendered />

@@ -12,6 +12,7 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeCount } from '$lib/io/badge-count';
   import { IconBookmark, IconSearch } from '$lib/io/icon';
   import type { SavedQuery } from '$lib/stores/saved-queries';
 
@@ -22,7 +23,8 @@
     draftView?: SavedQuery;
     dirty?: boolean;
     maxQueries: number;
-    onSelect: (view: SavedQuery) => void;
+    onSelect: (view: SavedQuery, event?: MouseEvent) => void;
+    viewHref: (view: SavedQuery) => string;
   }
 
   let {
@@ -33,6 +35,7 @@
     dirty = false,
     maxQueries,
     onSelect,
+    viewHref,
   }: Props = $props();
 
   const menuId = $derived(`${id}-saved-views-menu`);
@@ -92,7 +95,7 @@
   <MenuButton
     id="{id}-saved-views-button"
     controls={menuId}
-    variant="secondary"
+    variant="tertiary"
     size="xs"
     hasIndicator
     title={label}
@@ -115,21 +118,21 @@
       {label}
     </span>
     {#if noneSelected}
-      <span
-        class="surface-subtle ml-1.5 shrink-0 rounded-full px-2 py-0.5 font-mono text-xs font-medium"
-      >
-        {views.length}/{maxQueries}
-      </span>
+      <BadgeCount value={views.length} total={maxQueries} class="ml-1.5" />
     {:else if unsaved && !draftActive}
       <span
-        class="surface-subtle ml-1.5 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium italic"
+        class="ml-1.5 shrink-0 rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium italic text-secondary"
       >
         {translate('common.unsaved')}
       </span>
     {/if}
   </MenuButton>
 
-  <Menu id={menuId} class="w-max min-w-full max-w-[32rem]">
+  <Menu
+    id={menuId}
+    usePortal
+    class="w-max min-w-full max-w-[min(100dvw-1rem,32rem)]"
+  >
     <MenuItem
       class="p-0"
       hoverable={false}
@@ -164,7 +167,8 @@
       <MenuItem
         data-view-item
         selected={view.id === activeView?.id}
-        onclick={() => onSelect(view)}
+        href={viewHref(view)}
+        onclick={(event) => onSelect(view, event)}
         data-testid={view.name.toLowerCase().replace(/\s+/g, '-')}
         data-track-name="user-query-menu-item"
       >
@@ -178,9 +182,10 @@
       </MenuItem>
     {/each}
 
-    <MenuDivider />
-
-    <li role="presentation" class="px-3 py-2 text-xs text-secondary">
+    <li
+      role="presentation"
+      class="surface-primary sticky bottom-0 z-10 border-t border-secondary px-3 py-2 text-xs text-secondary"
+    >
       {translate('common.views-used', {
         used: views.length,
         total: maxQueries,

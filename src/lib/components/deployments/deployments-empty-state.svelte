@@ -22,7 +22,7 @@
 </script>
 
 <div class="flex flex-col items-center gap-4 py-16">
-  <IconTemporalWorker class="h-20 w-20 text-blue-200" />
+  <IconTemporalWorker class="h-20 w-20 text-indigo-6" />
   <div class="flex flex-col items-center gap-2">
     <p class="text-base font-medium">
       {translate('deployments.empty-state-title')}

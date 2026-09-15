@@ -20,10 +20,16 @@
   const notes = $derived(schedule?.schedule?.state?.notes);
 </script>
 
-<Accordion title={translate('schedules.advanced-settings')} open>
+<Accordion
+  class="rounded-lg"
+  title={translate('schedules.advanced-settings')}
+  open
+>
   <dl class="grid grid-cols-2 gap-4 text-sm">
     <div>
-      <dt class="text-secondary">{translate('common.start-date')}</dt>
+      <dt class="text-secondary">
+        {translate('common.start-date')}
+      </dt>
       <dd>
         {spec?.startTime
           ? $timestamp(spec.startTime)
@@ -39,7 +45,9 @@
     </div>
 
     <div>
-      <dt class="text-secondary">{translate('common.timezone-label')}</dt>
+      <dt class="text-secondary">
+        {translate('common.timezone-label')}
+      </dt>
       <dd>
         {spec?.timezoneName || 'UTC'}
       </dd>
@@ -55,7 +63,9 @@
     </div>
 
     <div>
-      <dt class="text-secondary">{translate('schedules.overlap-policy')}</dt>
+      <dt class="text-secondary">
+        {translate('schedules.overlap-policy')}
+      </dt>
       <dd>
         {String(
           fromScreamingEnum(policies?.overlapPolicy, 'ScheduleOverlapPolicy') ??

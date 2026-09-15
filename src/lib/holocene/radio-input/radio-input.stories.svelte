@@ -65,6 +65,10 @@
   args={{ value: 'unchecked', disabled: true }}
 />
 
+<Story name="Required" args={{ required: true }} />
+
+<Story name="Error" args={{ value: 'unchecked', 'aria-invalid': true }} />
+
 <Story name="Description" args={{ description: 'This is a description.' }} />
 
 <Story

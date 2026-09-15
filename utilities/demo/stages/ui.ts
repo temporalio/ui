@@ -8,6 +8,7 @@ import { $, chalk } from 'zx';
 import type { UiDefinition } from '../definition';
 import { type Logger, runDirFor, WORK_DIR } from '../paths';
 import { startDetached, type Supervised } from '../process';
+import { failure } from '../remedy';
 
 export type RunningUi = {
   apiUrl?: string;
@@ -69,12 +70,45 @@ const startUiServer = async (
   const configDir = await writeConfig(ui, address);
 
   if (ui.rebuildUiServer || !existsSync(binary)) {
+    // The ui-server embeds the built frontend with //go:embed all:assets, and
+    // a Go embed of a missing directory is a compile error rather than an
+    // empty filesystem. A fresh worktree has never built them, so the binary
+    // cannot be built until they exist.
+    const assets = join(serverDir, 'ui', 'assets');
+
+    if (!existsSync(assets)) {
+      log('Building the frontend assets the ui-server embeds');
+
+      const built = await $`pnpm build:server`.quiet().nothrow();
+
+      if (built.exitCode !== 0) {
+        throw failure({
+          attempting:
+            'Could not build the frontend assets that the ui-server embeds, so its binary cannot be built either.',
+          reported: built.stderr || built.stdout,
+          fixes: [
+            'Run "pnpm install" if this worktree has never installed its dependencies, then try again.',
+            'Run "pnpm build:server" by hand to see the full build output.',
+          ],
+          seeAlso: [`Expected output in ${assets}`],
+        });
+      }
+    }
+
     log('Building the ui-server binary (make build)');
 
     const build = await $({ cwd: serverDir })`make build`.quiet().nothrow();
 
     if (build.exitCode !== 0) {
-      throw new Error(`make build failed in server/:\n${build.stderr}`);
+      throw failure({
+        attempting: 'Could not build the ui-server binary.',
+        reported: build.stderr || build.stdout,
+        fixes: [
+          'A "pattern all:assets: no matching files found" error means the embedded frontend assets are missing. "pnpm build:server" writes them to server/ui/assets, and this stage runs it when the directory is absent — so seeing this means the build produced no output.',
+          'Otherwise a Go toolchain problem: "make build" in server/ shows it in full.',
+        ],
+        seeAlso: [join(serverDir, 'ui', 'assets')],
+      });
     }
   }
 

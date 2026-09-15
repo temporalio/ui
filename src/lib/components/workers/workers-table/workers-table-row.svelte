@@ -49,10 +49,10 @@
       : undefined}
     {filterable}
   />
-  <!-- TODO: Make Build ID filterable with DT-3745 -->
   <WorkersTableCell
     attribute="BuildId"
     value={worker?.deploymentVersion?.buildId}
+    {filterable}
   />
   <WorkersTableCell
     attribute="TaskQueue"

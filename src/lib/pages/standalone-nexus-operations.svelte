@@ -8,7 +8,7 @@
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import NexusOperationsSummaryConfigurableTable from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-nexus-operations/nexus-operations-summary-filter-bar/filter-bar.svelte';
-  import StatusCounts from '$lib/components/status-counts.svelte';
+  import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
@@ -108,7 +108,7 @@
         </p>
       </div>
       {@render releaseStageBadge?.()}
-      <StatusCounts
+      <StatusCountFilters
         bind:refreshTime
         countStore={nexusOperationCount}
         refresh={nexusOperationRefresh}

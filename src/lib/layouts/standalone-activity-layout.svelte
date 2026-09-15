@@ -7,13 +7,13 @@
   import ActivityHeaderLoading from '$lib/components/standalone-activities/activity-header-loading.svelte';
   import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import ErrorComponent from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import { IconChevronLeft } from '$lib/io/icon';
   import { getActivityPollers } from '$lib/services/pollers-service';
   import { fetchWorkerCount } from '$lib/services/worker-service';
@@ -174,9 +174,7 @@
         active={pathMatches(page.url.pathname, workersRoute)}
       >
         {#if $activityWorkerCount !== undefined}
-          <Badge type="primary" class="px-2 py-0">
-            {$activityWorkerCount}
-          </Badge>
+          <Badge text={String($activityWorkerCount)} colorScheme="info" />
         {/if}
       </Tab>
       <Tab

@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
+
   import Input from '$lib/holocene/input/input.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
 
   interface Props {
+    class?: ClassNameValue;
     hour?: string;
     minute?: string;
     second?: string;
@@ -17,6 +20,7 @@
   }
 
   let {
+    class: className = '',
     hour = $bindable(''),
     minute = $bindable(''),
     second = $bindable(''),
@@ -35,7 +39,7 @@
   };
 </script>
 
-<div class="flex gap-2">
+<div class={merge('flex gap-2', className)}>
   <Input
     id="{idPrefix}hour"
     label="hrs"

@@ -12,7 +12,6 @@ import type {
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
 import {
-  isLocalActivityMarkerEvent,
   isResetEvent,
   isWorkflowTaskCompletedEvent,
 } from '$lib/utilities/is-event-type';
@@ -82,12 +81,7 @@ export const sdkInfo = derived(bufferVersion, () =>
 export const filteredEventHistory = derived(
   [bufferVersion, eventTypeFilter],
   ([, $types]) =>
-    getEventArray().filter((event) => {
-      if (isLocalActivityMarkerEvent(event)) {
-        return $types.includes('local-activity');
-      }
-      return $types.includes(event.category);
-    }),
+    getEventArray().filter((event) => $types.includes(event.category)),
 );
 
 export const decodeEventHistory = persistStore<boolean>(
