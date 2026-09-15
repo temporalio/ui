@@ -13,7 +13,7 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import { BadgeCount } from '$lib/io/badge-count';
-  import { IconBookmark, IconSearch } from '$lib/io/icon';
+  import { IconSearch } from '$lib/io/icon';
   import type { SavedQuery } from '$lib/stores/saved-queries';
 
   interface Props {
@@ -58,11 +58,8 @@
     Boolean(draftView) && activeView?.id === draftView?.id,
   );
   const noneSelected = $derived(!activeUserView && !draftActive);
-  const label = $derived(
-    draftActive
-      ? (draftView?.name ?? '')
-      : (activeUserView?.name ?? translate('common.saved-views')),
-  );
+  const label = translate('common.saved-views');
+
   const unsaved = $derived(draftActive || (Boolean(activeUserView) && dirty));
 
   const focusSearch = () => {
@@ -105,10 +102,6 @@
       if (isOpen) focusSearch();
     }}
   >
-    {#snippet leading()}
-      {@const Glyph = activeUserView?.Icon ?? IconBookmark}
-      <Glyph class={merge('size-4 shrink-0', draftActive && 'opacity-60')} />
-    {/snippet}
     <span
       class={merge(
         'min-w-0 truncate font-normal',
