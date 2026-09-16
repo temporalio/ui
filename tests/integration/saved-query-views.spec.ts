@@ -12,13 +12,46 @@ const getQueryParam = (url: string) =>
 const openCustomViews = (page: Page) =>
   page.getByTestId('saved-views-button').click();
 
-const expectSelectedView = (page: Page, name: string) =>
-  expect(page.getByTestId('saved-views-button')).toContainText(name);
+const expectSelectedView = async (
+  page: Page,
+  name: string,
+  { dirty = false }: { dirty?: boolean } = {},
+) => {
+  if (name === 'Saved Views') {
+    await expect(page.getByTestId('saved-views-button')).toContainText(name);
+    return;
+  }
+
+  if (name === 'Unsaved view') {
+    await expect(page.getByTestId('saved-views-button')).toContainText(name);
+    await expect(page.getByTestId('saved-views-button')).toHaveClass(
+      /border-dashed/,
+    );
+    await expect(page.getByTestId('create-view-button')).toBeVisible();
+    return;
+  }
+
+  const lastViewedView = page.getByTestId('last-viewed-saved-view');
+  await expect(lastViewedView).toContainText(name);
+  await expect(lastViewedView).toHaveAttribute(
+    'data-active',
+    dirty ? 'false' : 'true',
+  );
+  if (dirty) {
+    await expect(lastViewedView).toContainText('Unsaved');
+    await expect(lastViewedView).toHaveClass(/border-dashed/);
+  }
+};
 
 const selectCustomView = async (page: Page, testId: string) => {
   await openCustomViews(page);
   await page.getByTestId(testId).click();
 };
+
+const getLastViewedSavedQueryIds = (page: Page) =>
+  page.evaluate(() =>
+    JSON.parse(localStorage.getItem('last-viewed-saved-query-ids') ?? '{}'),
+  );
 
 test.describe('Saved Query Views', () => {
   test.beforeEach(async ({ page }) => {
@@ -82,6 +115,69 @@ test.describe('Saved Query Views', () => {
     );
   });
 
+  test('Saved views count stays visible in every selection state', async ({
+    page,
+  }) => {
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'saved-workflow-queries',
+        JSON.stringify({
+          default: Array.from({ length: 4 }, (_, index) => ({
+            id: `view-${index + 1}`,
+            name: `View ${index + 1}`,
+            query: `\`WorkflowId\`="view-${index + 1}"`,
+            type: 'user',
+          })),
+        }),
+      );
+    });
+    await page.reload();
+    await waitForWorkflowsApis(page);
+
+    const savedViewsButton = page.getByTestId('saved-views-button');
+    await expect(savedViewsButton).toContainText(/4\s*\/\s*50/);
+
+    await selectCustomView(page, 'view-1');
+    await expect(savedViewsButton).toContainText(/4\s*\/\s*50/);
+
+    await page.getByTestId('running').click();
+    await expect(savedViewsButton).toContainText(/4\s*\/\s*50/);
+    await expect(savedViewsButton).not.toContainText('Unsaved');
+    await expect(savedViewsButton).not.toHaveClass(/border-dashed/);
+
+    const lastViewedView = page.getByTestId('last-viewed-saved-view');
+    await expect(lastViewedView).toContainText('View 1');
+    await expect(lastViewedView).toContainText('Unsaved');
+    await expect(lastViewedView).toHaveClass(/border-dashed/);
+    await expect(lastViewedView).toHaveAttribute('data-active', 'false');
+
+    const draftQuery = '`WorkflowId`="draft-view"';
+    await page.goto(
+      `/namespaces/default/workflows?query=${encodeURIComponent(draftQuery)}`,
+    );
+    await waitForWorkflowsApis(page);
+    await expectSelectedView(page, 'Unsaved view');
+    await expect(savedViewsButton).toContainText(/4\s*\/\s*50/);
+
+    const savedViewControls = page
+      .getByTestId('saved-views-bar')
+      .locator(
+        '[data-testid="saved-views-button"], [data-testid="create-view-button"], [data-testid="last-viewed-saved-view"]',
+      );
+    await expect(savedViewControls.nth(0)).toHaveAttribute(
+      'data-testid',
+      'saved-views-button',
+    );
+    await expect(savedViewControls.nth(1)).toHaveAttribute(
+      'data-testid',
+      'create-view-button',
+    );
+    await expect(savedViewControls.nth(2)).toHaveAttribute(
+      'data-testid',
+      'last-viewed-saved-view',
+    );
+  });
+
   test('User saved queries: create new, edit view, then delete', async ({
     page,
   }) => {
@@ -122,7 +218,7 @@ test.describe('Saved Query Views', () => {
       .poll(() => getQueryParam(page.url()))
       .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
-    await expectSelectedView(page, 'My View');
+    await expectSelectedView(page, 'My View', { dirty: true });
     await page.getByTestId('edit-view-button').click();
 
     await page.getByTestId('workflow-edit-view-modal-input').fill('My View 2');
@@ -186,7 +282,7 @@ test.describe('Saved Query Views', () => {
       .poll(() => getQueryParam(page.url()))
       .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
-    await expectSelectedView(page, 'Original view');
+    await expectSelectedView(page, 'Original view', { dirty: true });
     await page.getByTestId('duplicate-view-button').click();
 
     await expectSelectedView(page, 'Original view-copy');
@@ -200,6 +296,106 @@ test.describe('Saved Query Views', () => {
 
     await expect(page.getByTestId('original-view-copy')).toHaveCount(0);
     await expect.poll(() => getQueryParam(page.url())).toBe('');
+  });
+
+  test('Last viewed saved query persists, updates, changes, and clears', async ({
+    page,
+  }) => {
+    const firstQuery = '`WorkflowId`="first-view"';
+    const secondQuery = '`WorkflowId`="second-view"';
+
+    await page.evaluate(
+      ({ firstQuery, secondQuery }) => {
+        localStorage.setItem(
+          'saved-workflow-queries',
+          JSON.stringify({
+            default: [
+              {
+                id: 'first-view-id',
+                name: 'First View',
+                query: firstQuery,
+                type: 'user',
+              },
+              {
+                id: 'second-view-id',
+                name: 'Second View',
+                query: secondQuery,
+                type: 'user',
+              },
+            ],
+          }),
+        );
+      },
+      { firstQuery, secondQuery },
+    );
+    await page.reload();
+    await waitForWorkflowsApis(page);
+
+    const lastViewedView = page.getByTestId('last-viewed-saved-view');
+    await expect(lastViewedView).toHaveCount(0);
+
+    await selectCustomView(page, 'first-view');
+    await expect(lastViewedView).toContainText('First View');
+    await expect(lastViewedView.getByText('First View')).toBeVisible();
+    const savedViewControls = page
+      .getByTestId('saved-views-bar')
+      .locator(
+        '[data-testid="last-viewed-saved-view"], [data-testid="saved-views-button"]',
+      );
+    await expect(savedViewControls.nth(0)).toHaveAttribute(
+      'data-testid',
+      'saved-views-button',
+    );
+    await expect(savedViewControls.nth(1)).toHaveAttribute(
+      'data-testid',
+      'last-viewed-saved-view',
+    );
+    await expect
+      .poll(() => getLastViewedSavedQueryIds(page))
+      .toEqual({
+        workflow: { default: 'first-view-id' },
+      });
+
+    await page.getByTestId('all').click();
+    await page.reload();
+    await waitForWorkflowsApis(page);
+    await expect(lastViewedView).toContainText('First View');
+
+    await lastViewedView.click();
+    await expect.poll(() => getQueryParam(page.url())).toBe(firstQuery);
+
+    await page.getByTestId('running').click();
+    const updatedFirstQuery = `${firstQuery} AND \`ExecutionStatus\`="Running"`;
+    await expect.poll(() => getQueryParam(page.url())).toBe(updatedFirstQuery);
+    await page.getByTestId('save-view-button').click();
+
+    await page.getByTestId('edit-view-button').click();
+    await page
+      .getByTestId('workflow-edit-view-modal-input')
+      .fill('Updated First View');
+    await page
+      .getByLabel('Edit View')
+      .getByTestId('confirm-modal-button')
+      .click();
+    await expect(lastViewedView).toContainText('Updated First View');
+
+    await page.getByTestId('all').click();
+    await lastViewedView.click();
+    await expect.poll(() => getQueryParam(page.url())).toBe(updatedFirstQuery);
+
+    await selectCustomView(page, 'second-view');
+    await expect(lastViewedView).toContainText('Second View');
+    await expect
+      .poll(() => getLastViewedSavedQueryIds(page))
+      .toEqual({
+        workflow: { default: 'second-view-id' },
+      });
+
+    await page.getByTestId('edit-view-button').click();
+    await page.getByRole('button', { name: 'Delete View' }).click();
+
+    await expect(lastViewedView).toHaveCount(0);
+    await expect.poll(() => getLastViewedSavedQueryIds(page)).toEqual({});
   });
 
   test('System saved queries narrow the active user saved view', async ({
@@ -227,14 +423,14 @@ test.describe('Saved Query Views', () => {
     await expect
       .poll(() => getQueryParam(page.url()))
       .toBe('`WorkflowId`="user-view-1" AND `ExecutionStatus`="Running"');
-    await expectSelectedView(page, 'My View');
+    await expectSelectedView(page, 'My View', { dirty: true });
     await expect(page.getByTestId('save-view-button')).toBeVisible();
 
     await page.getByTestId('child-workflows').click();
     await expect
       .poll(() => getQueryParam(page.url()))
       .toBe('`WorkflowId`="user-view-1" AND `ParentWorkflowId` is null');
-    await expectSelectedView(page, 'My View');
+    await expectSelectedView(page, 'My View', { dirty: true });
     await expect(page.getByTestId('save-view-button')).toBeVisible();
 
     await page.getByTestId('child-workflows').click();
@@ -334,7 +530,7 @@ test.describe('Saved Query Views', () => {
 
     await page.reload();
     await waitForWorkflowsApis(page);
-    await expectSelectedView(page, 'My View');
+    await expectSelectedView(page, 'My View', { dirty: true });
     await expect(page.getByTestId('running')).toHaveAttribute(
       'data-active',
       'true',
@@ -402,7 +598,7 @@ test.describe('Saved Query Views', () => {
     await expect
       .poll(() => getQueryParam(page.url()))
       .toBe(`${edited} AND \`ExecutionStatus\`="Running"`);
-    await expectSelectedView(page, 'My View');
+    await expectSelectedView(page, 'My View', { dirty: true });
 
     await page.getByTestId('child-workflows').click();
     await expect
@@ -412,7 +608,7 @@ test.describe('Saved Query Views', () => {
     await page.getByTestId('child-workflows').click();
     await expect.poll(() => getQueryParam(page.url())).toBe(edited);
     await expect(page.getByTestId('save-view-button')).toBeVisible();
-    await expectSelectedView(page, 'My View');
+    await expectSelectedView(page, 'My View', { dirty: true });
   });
 
   test('All Workflows clears the active user saved view', async ({ page }) => {

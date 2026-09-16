@@ -16,6 +16,7 @@ export const Strings = {
   time: 'Time',
   custom: 'Custom',
   'saved-views': 'Saved Views',
+  'last-viewed-saved-view': 'Last viewed saved view: {{name}}',
   'search-views': 'Search views',
   'no-saved-views': 'No saved views yet',
   'views-used': '{{used}} of {{total}} views used',

@@ -13,7 +13,7 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import { BadgeCount } from '$lib/io/badge-count';
-  import { IconBookmark, IconSearch } from '$lib/io/icon';
+  import { IconSearch } from '$lib/io/icon';
   import type { SavedQuery } from '$lib/stores/saved-queries';
 
   interface Props {
@@ -21,7 +21,6 @@
     views: SavedQuery[];
     activeView?: SavedQuery;
     draftView?: SavedQuery;
-    dirty?: boolean;
     maxQueries: number;
     onSelect: (view: SavedQuery, event?: MouseEvent) => void;
     viewHref: (view: SavedQuery) => string;
@@ -32,7 +31,6 @@
     views,
     activeView,
     draftView,
-    dirty = false,
     maxQueries,
     onSelect,
     viewHref,
@@ -51,19 +49,12 @@
       : views;
   });
 
-  const activeUserView = $derived(
-    activeView?.type === 'user' ? activeView : undefined,
-  );
   const draftActive = $derived(
     Boolean(draftView) && activeView?.id === draftView?.id,
   );
-  const noneSelected = $derived(!activeUserView && !draftActive);
   const label = $derived(
-    draftActive
-      ? (draftView?.name ?? '')
-      : (activeUserView?.name ?? translate('common.saved-views')),
+    draftActive ? (draftView?.name ?? '') : translate('common.saved-views'),
   );
-  const unsaved = $derived(draftActive || (Boolean(activeUserView) && dirty));
 
   const focusSearch = () => {
     requestAnimationFrame(() => document.getElementById(searchId)?.focus());
@@ -99,16 +90,12 @@
     size="xs"
     hasIndicator
     title={label}
-    class={merge('max-w-full', unsaved && 'border-dashed')}
+    class={merge('max-w-full', draftActive && 'border-dashed')}
     data-testid="saved-views-button"
     onclick={(isOpen) => {
       if (isOpen) focusSearch();
     }}
   >
-    {#snippet leading()}
-      {@const Glyph = activeUserView?.Icon ?? IconBookmark}
-      <Glyph class={merge('size-4 shrink-0', draftActive && 'opacity-60')} />
-    {/snippet}
     <span
       class={merge(
         'min-w-0 truncate font-normal',
@@ -117,15 +104,12 @@
     >
       {label}
     </span>
-    {#if noneSelected}
-      <BadgeCount value={views.length} total={maxQueries} class="ml-1.5" />
-    {:else if unsaved && !draftActive}
-      <span
-        class="ml-1.5 shrink-0 rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium italic text-secondary"
-      >
-        {translate('common.unsaved')}
-      </span>
-    {/if}
+    <BadgeCount
+      value={views.length}
+      total={maxQueries}
+      size="sm"
+      class="ml-1.5"
+    />
   </MenuButton>
 
   <Menu
