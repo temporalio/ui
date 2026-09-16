@@ -247,7 +247,7 @@
 
 {#snippet eventSummary(value: RawPayload)}
   <div class="flex items-start gap-4">
-    <p class="text-secondary/80 min-w-56 text-sm">Summary</p>
+    <p class="min-w-56 text-sm text-secondary">Summary</p>
     <PayloadSummary
       class="whitespace-pre-line"
       {value}
