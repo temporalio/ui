@@ -4,11 +4,12 @@
   import { base } from '$app/paths';
 
   import Logo from '$lib/holocene/logo.svelte';
-  import { translate } from '$lib/i18n/translate';
   import {
     IconArrowSquareCaretLeft,
     IconArrowSquareCaretRight,
   } from '$lib/io/icon';
+
+  import NavVersion from './nav-version.svelte';
 
   interface Props {
     version: string;
@@ -73,10 +74,5 @@
   {#if bottom}
     {@render bottom()}
   {/if}
-  <div
-    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-inverse-secondary"
-  >
-    <span class="sr-only">{translate('common.version')}</span>
-    {version}
-  </div>
+  <NavVersion {version} />
 </div>
