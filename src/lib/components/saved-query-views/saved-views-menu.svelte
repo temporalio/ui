@@ -21,7 +21,6 @@
     views: SavedQuery[];
     activeView?: SavedQuery;
     draftView?: SavedQuery;
-    dirty?: boolean;
     maxQueries: number;
     onSelect: (view: SavedQuery, event?: MouseEvent) => void;
     viewHref: (view: SavedQuery) => string;
@@ -32,7 +31,6 @@
     views,
     activeView,
     draftView,
-    dirty = false,
     maxQueries,
     onSelect,
     viewHref,
@@ -51,15 +49,12 @@
       : views;
   });
 
-  const activeUserView = $derived(
-    activeView?.type === 'user' ? activeView : undefined,
-  );
   const draftActive = $derived(
     Boolean(draftView) && activeView?.id === draftView?.id,
   );
-  const label = translate('common.saved-views');
-
-  const unsaved = $derived(draftActive || (Boolean(activeUserView) && dirty));
+  const label = $derived(
+    draftActive ? (draftView?.name ?? '') : translate('common.saved-views'),
+  );
 
   const focusSearch = () => {
     requestAnimationFrame(() => document.getElementById(searchId)?.focus());
@@ -95,7 +90,7 @@
     size="xs"
     hasIndicator
     title={label}
-    class={merge('max-w-full', unsaved && 'border-dashed')}
+    class={merge('max-w-full', draftActive && 'border-dashed')}
     data-testid="saved-views-button"
     onclick={(isOpen) => {
       if (isOpen) focusSearch();
@@ -115,13 +110,6 @@
       size="sm"
       class="ml-1.5"
     />
-    {#if unsaved && !draftActive}
-      <span
-        class="ml-1.5 shrink-0 rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium italic text-secondary"
-      >
-        {translate('common.unsaved')}
-      </span>
-    {/if}
   </MenuButton>
 
   <Menu

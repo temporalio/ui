@@ -127,6 +127,9 @@
       Boolean(query) &&
       activeUserView?.query !== query,
   );
+  const lastViewedSavedQueryDirty = $derived(
+    activeUserViewDirty && activeUserView?.id === lastViewedSavedQuery?.id,
+  );
 
   const rememberLastViewedSavedQuery = (view: SavedQuery) => {
     if (view.type !== 'user') return;
@@ -382,11 +385,27 @@
       views={namespaceSavedQueries}
       activeView={activeQueryView}
       draftView={unsavedQuery ? unsavedView : undefined}
-      dirty={activeUserViewDirty}
       {maxQueries}
       {viewHref}
       onSelect={setActiveQueryView}
     />
+
+    {#if unsavedQuery}
+      <div class="flex shrink-0 items-center gap-1">
+        <Button
+          size="xs"
+          variant="ghost"
+          disabled={maxViewsReached}
+          data-testid="create-view-button"
+          data-track-name="create-view-button"
+          data-track-intent="action"
+          data-track-text="create"
+          onclick={() => {
+            saveViewModalOpen = true;
+          }}>{translate('common.save-as-new')}</Button
+        >
+      </div>
+    {/if}
 
     {#if lastViewedSavedQuery}
       <Button
@@ -401,8 +420,12 @@
         data-track-text={lastViewedSavedQuery.name}
         href={viewHref(lastViewedSavedQuery)}
         onclick={(event) => setActiveQueryView(lastViewedSavedQuery, event)}
-        class="max-w-[240px]"
-        active={activeUserView?.id === lastViewedSavedQuery.id}
+        class={merge(
+          'max-w-[240px]',
+          lastViewedSavedQueryDirty && 'border-dashed border-tertiary',
+        )}
+        active={activeUserView?.id === lastViewedSavedQuery.id &&
+          !lastViewedSavedQueryDirty}
         size="xs"
       >
         {@const Glyph = lastViewedSavedQuery.Icon || IconBookmark}
@@ -410,6 +433,12 @@
         <span class="min-w-0 truncate font-normal"
           >{lastViewedSavedQuery.name}</span
         >
+        {#if lastViewedSavedQueryDirty}
+          {@render queryBadge({
+            className: 'italic',
+            content: translate('common.unsaved'),
+          })}
+        {/if}
       </Button>
     {/if}
 
@@ -466,21 +495,6 @@
           >{$copied
             ? translate('common.copied')
             : translate('common.share')}</Button
-        >
-      </div>
-    {:else if unsavedQuery}
-      <div class="flex shrink-0 items-center gap-1">
-        <Button
-          size="xs"
-          variant="ghost"
-          disabled={maxViewsReached}
-          data-testid="create-view-button"
-          data-track-name="create-view-button"
-          data-track-intent="action"
-          data-track-text="create"
-          onclick={() => {
-            saveViewModalOpen = true;
-          }}>{translate('common.save-as-new')}</Button
         >
       </div>
     {/if}
