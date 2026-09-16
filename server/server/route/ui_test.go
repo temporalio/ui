@@ -334,12 +334,12 @@ func TestSetRenderRoute_BreaksLongWords(t *testing.T) {
 	assert.Contains(t, renderRequest(t, "content=hello"), "overflow-wrap: break-word;")
 }
 
-// markdown.gen.css is generated from src/markdown.reset.css, so this is a
+// markdown.gen.css is generated from src/lib/utilities/markdown-reset.ts, so this is a
 // tripwire for a stale generated file that runs without needing node. The
 // authoritative check is scripts/generate-markdown-css.test.ts, which compares
 // the whole file against freshly generated content.
 func TestSetRenderRoute_CompactRulesMatchCanonicalStylesheet(t *testing.T) {
-	canonical, err := os.ReadFile(filepath.Join("..", "..", "..", "src", "markdown.reset.css"))
+	canonical, err := os.ReadFile(filepath.Join("..", "..", "..", "src", "lib", "utilities", "markdown-reset.ts"))
 	if err != nil {
 		t.Skip("canonical stylesheet not present; server module built standalone")
 	}
@@ -355,7 +355,7 @@ func TestSetRenderRoute_CompactRulesMatchCanonicalStylesheet(t *testing.T) {
 	body := renderRequest(t, "content=hello&compact=true")
 	for _, selector := range want {
 		assert.Contains(t, body, selector,
-			"src/markdown.reset.css has %q; this route's copy does not", selector)
+			"src/lib/utilities/markdown-reset.ts has %q; this route's copy does not", selector)
 	}
 }
 
