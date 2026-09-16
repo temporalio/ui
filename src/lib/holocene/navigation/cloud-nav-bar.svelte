@@ -77,7 +77,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="flex size-6 shrink-0 items-center justify-center justify-self-end rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
+    class="flex size-6 shrink-0 items-center justify-center rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
     onclick={ontoggle}
   >
     {#if navOpen}
