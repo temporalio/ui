@@ -1,19 +1,15 @@
 <script lang="ts">
-  import type { ComponentProps } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { Badge } from '$lib/io/badge';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
-  import {
-    customSearchAttributes,
-    isCustomSearchAttribute,
-    workflowIncludesSearchAttribute,
-  } from '$lib/stores/search-attributes';
+  import { searchAttributes } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowExecution,
@@ -25,7 +21,7 @@
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
+  import { toQuickFilterValue } from '$lib/utilities/query/quick-filter';
   import {
     routeForWorkerDeployment,
     routeForWorkflow,
@@ -35,6 +31,12 @@
     truncateValue,
   } from '$lib/utilities/truncate-value';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
+
+  import {
+    ARCHIVAL_FILTERABLE_COLUMNS,
+    getWorkflowColumnAttribute,
+    getWorkflowColumnValue,
+  } from './column-search-attributes';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
@@ -53,23 +55,31 @@
 
   const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
-  const isCustomKeywordOrTextAttribute = $derived(
-    isCustomSearchAttribute(label) &&
-      ($customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.KEYWORD ||
-        $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.TEXT) &&
-      typeof workflow.searchAttributes?.indexedFields?.[label] === 'string',
+
+  const attribute = $derived(getWorkflowColumnAttribute(label));
+  const type = $derived($searchAttributes[attribute]);
+  const value = $derived(getWorkflowColumnValue(label, workflow));
+  const filterable = $derived(
+    (!archival || ARCHIVAL_FILTERABLE_COLUMNS.includes(label)) &&
+      toQuickFilterValue({ attribute, type, value }) !== null,
   );
 
-  const filterableLabels = [
-    'Type',
-    'Workflow ID',
-    'Run ID',
-    'Deployment',
-    'Versioning Behavior',
-    'Deployment Version',
-    'Build ID',
-    'Scheduled By ID',
-  ];
+  const href = $derived.by(() => {
+    if (['Type', 'Workflow ID', 'Run ID'].includes(label)) {
+      return routeForWorkflow({
+        namespace,
+        workflow: workflow.id,
+        run: workflow.runId,
+        archival,
+      });
+    }
+    if (label === 'Deployment' && value) {
+      return routeForWorkerDeployment({ namespace, deployment: String(value) });
+    }
+    return undefined;
+  });
+
+  const displayValue = $derived(value === undefined ? '' : String(value));
 
   const className = $derived(
     twMerge(
@@ -87,181 +97,67 @@
   };
 </script>
 
-{#snippet renderFilterableTableCell(
-  filterableCellProps: Pick<
-    ComponentProps<typeof FilterableTableCell>,
-    'attribute' | 'value' | 'href' | 'type'
-  >,
-)}
+{#snippet text(content: string)}
+  <Tooltip
+    usePortal
+    text={content}
+    top
+    class="min-w-0"
+    hide={hideTooltip(content)}
+  >
+    {#if href}
+      <Link {href}>{truncate ? truncateValue(content) : content}</Link>
+    {:else}
+      {truncate ? truncateValue(content) : content}
+    {/if}
+  </Tooltip>
+{/snippet}
+
+{#snippet cellContent()}
+  {#if label === 'Status'}
+    <WorkflowStatusBadge
+      status={workflow.status}
+      delayed={isWorkflowDelayed(workflow)}
+      taskFailure={isWorkflowTaskFailure(workflow)}
+    />
+  {:else if label === 'Start' || label === 'End' || label === 'Execution Time' || label === 'Scheduled Start Time'}
+    <Timestamp dateTime={displayValue} />
+  {:else if label === 'History Size'}
+    {formatBytes(parseInt(workflow.historySizeBytes, 10))}
+  {:else if label === 'State Transitions' || label === 'History Length'}
+    {displayValue}
+  {:else if label === 'Execution Duration'}
+    {formatDistanceAbbreviated({
+      start: workflow?.startTime,
+      end: workflow?.endTime,
+      includeMilliseconds: true,
+    })}
+  {:else if label === 'Parent Namespace'}
+    {@render text(workflow?.parentNamespaceId ?? '')}
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
+    <Timestamp dateTime={displayValue} />
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
+    <Badge text={displayValue} />
+  {:else}
+    {@render text(displayValue)}
+  {/if}
+{/snippet}
+
+{#if filterable}
   <FilterableTableCell
     class={className}
     style={widthStyle}
     data-testid={testId}
+    {attribute}
+    {type}
+    {value}
+    copyValue={displayValue}
     {truncate}
-    {...filterableCellProps}
-  />
-{/snippet}
-
-{#if filterableLabels.includes(label) || isCustomKeywordOrTextAttribute}
-  {#if label === 'Type'}
-    {@render renderFilterableTableCell({
-      attribute: 'WorkflowType',
-      value: workflow.name,
-      href: routeForWorkflow({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-        archival,
-      }),
-    })}
-  {:else if label === 'Workflow ID'}
-    {@render renderFilterableTableCell({
-      attribute: 'WorkflowId',
-      value: workflow.id,
-      href: routeForWorkflow({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-        archival,
-      }),
-    })}
-  {:else if label === 'Run ID'}
-    {@render renderFilterableTableCell({
-      attribute: 'RunId',
-      value: workflow.runId,
-      href: routeForWorkflow({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-        archival,
-      }),
-    })}
-  {:else if label === 'Deployment'}
-    {@const deployment =
-      workflow.searchAttributes?.indexedFields?.TemporalWorkerDeployment}
-    {@render renderFilterableTableCell({
-      attribute: 'TemporalWorkerDeployment',
-      value: deployment && typeof deployment === 'string' ? deployment : '',
-      href: deployment
-        ? routeForWorkerDeployment({ namespace, deployment })
-        : undefined,
-    })}
-  {:else if label === 'Deployment Version'}
-    {@const version =
-      workflow.searchAttributes?.indexedFields?.TemporalWorkerDeploymentVersion}
-    {@render renderFilterableTableCell({
-      attribute: 'TemporalWorkerDeploymentVersion',
-      value: version && typeof version === 'string' ? version : '',
-    })}
-  {:else if label === 'Build ID'}
-    {@const buildId =
-      workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ||
-      getBuildIdFromVersion(
-        workflow.searchAttributes?.indexedFields
-          ?.TemporalWorkerDeploymentVersion,
-      )}
-    {@render renderFilterableTableCell({
-      attribute: 'TemporalWorkerBuildId',
-      value: buildId && typeof buildId === 'string' ? buildId : '',
-    })}
-  {:else if label === 'Versioning Behavior'}
-    {@const behavior =
-      workflow.searchAttributes?.indexedFields
-        ?.TemporalWorkflowVersioningBehavior}
-    {@render renderFilterableTableCell({
-      attribute: 'TemporalWorkflowVersioningBehavior',
-      value: behavior && typeof behavior === 'string' ? behavior : '',
-    })}
-  {:else if isCustomKeywordOrTextAttribute}
-    {@const content = workflow.searchAttributes?.indexedFields?.[label]}
-    {@render renderFilterableTableCell({
-      attribute: label,
-      value: typeof content === 'string' ? content : '',
-      type: $customSearchAttributes[label],
-    })}
-  {:else if label === 'Scheduled By ID'}
-    {@const scheduleId =
-      workflow.searchAttributes?.indexedFields?.TemporalScheduledById}
-    {@render renderFilterableTableCell({
-      attribute: 'TemporalScheduledById',
-      value: scheduleId && typeof scheduleId === 'string' ? scheduleId : '',
-    })}
-  {/if}
+  >
+    {@render cellContent()}
+  </FilterableTableCell>
 {:else}
   <td class={className} style={widthStyle} data-testid={testId}>
-    {#if label === 'Status'}
-      <WorkflowStatusBadge
-        status={workflow.status}
-        delayed={isWorkflowDelayed(workflow)}
-        taskFailure={isWorkflowTaskFailure(workflow)}
-      />
-    {:else if label === 'End'}
-      <Timestamp dateTime={workflow.endTime} />
-    {:else if label === 'Start'}
-      <Timestamp dateTime={workflow.startTime} />
-    {:else if label === 'Task Queue'}
-      <Tooltip
-        usePortal
-        text={workflow.taskQueue}
-        top
-        class="min-w-0"
-        hide={hideTooltip(workflow.taskQueue)}
-      >
-        {truncate ? truncateValue(workflow.taskQueue) : workflow.taskQueue}
-      </Tooltip>
-    {:else if label === 'Parent Namespace'}
-      <Tooltip
-        usePortal
-        text={workflow?.parentNamespaceId ?? ''}
-        top
-        class="min-w-0"
-        hide={hideTooltip(workflow?.parentNamespaceId)}
-      >
-        {truncate
-          ? truncateValue(workflow?.parentNamespaceId ?? '')
-          : (workflow?.parentNamespaceId ?? '')}
-      </Tooltip>
-    {:else if label === 'History Size'}
-      {formatBytes(parseInt(workflow.historySizeBytes, 10))}
-    {:else if label === 'State Transitions'}
-      {parseInt(workflow.stateTransitionCount, 10) > 0
-        ? workflow.stateTransitionCount
-        : ''}
-    {:else if label === 'Execution Time'}
-      <Timestamp dateTime={workflow.executionTime} />
-    {:else if label === 'Execution Duration'}
-      {formatDistanceAbbreviated({
-        start: workflow?.startTime,
-        end: workflow?.endTime,
-        includeMilliseconds: true,
-      })}
-    {:else if label === 'History Length'}
-      {parseInt(workflow.historyEvents, 10) > 0 ? workflow.historyEvents : ''}
-    {:else if label === 'Scheduled Start Time'}
-      {@const content =
-        workflow.searchAttributes?.indexedFields?.TemporalScheduledStartTime}
-      {#if content && typeof content === 'string'}
-        <Timestamp dateTime={content} />
-      {/if}
-    {:else if label === 'Change Version'}
-      {workflow.searchAttributes?.indexedFields?.TemporalChangeVersion}
-    {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
-      {@const content = workflow.searchAttributes?.indexedFields?.[label]}
-      {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
-        <Timestamp dateTime={content} />
-      {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
-        <Badge text={content ?? ''} />
-      {:else}
-        <Tooltip
-          usePortal
-          text={content}
-          top
-          class="min-w-0"
-          hide={hideTooltip(content)}
-        >
-          {truncate ? truncateValue(content) : content}
-        </Tooltip>
-      {/if}
-    {/if}
+    {@render cellContent()}
   </td>
 {/if}

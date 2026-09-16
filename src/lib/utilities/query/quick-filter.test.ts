@@ -13,6 +13,7 @@ import {
   getDefaultConditional,
   isQuickFilterActive,
   toggleQuickFilter,
+  toQuickFilterValue,
 } from './quick-filter';
 import {
   createFilter,
@@ -350,5 +351,34 @@ describe('toggleQuickFilter', () => {
     });
 
     expect(toggleQuickFilter(statuses, completed)).toEqual([completed]);
+  });
+});
+
+describe('toQuickFilterValue', () => {
+  it('returns the value a quick filter would use without building a filter', () => {
+    expect(
+      toQuickFilterValue({
+        attribute: 'CustomKeywordListField',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+        value: ['a', 'b'],
+      }),
+    ).toBe('("a", "b")');
+  });
+
+  it('returns null when the column has no attribute or no type', () => {
+    expect(
+      toQuickFilterValue({
+        attribute: '',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        value: 'a',
+      }),
+    ).toBeNull();
+    expect(
+      toQuickFilterValue({
+        attribute: 'ParentNamespace',
+        type: undefined,
+        value: 'default',
+      }),
+    ).toBeNull();
   });
 });

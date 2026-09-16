@@ -103,27 +103,51 @@ export const formatQuickFilterValue = ({
   }
 };
 
+type QuickFilterInput = {
+  attribute: string;
+  type: SearchAttributeType | undefined;
+  value: QuickFilterValue;
+};
+
+// The formatted value a quick filter would use, or null when the value cannot
+// be filtered on. Building the filter itself is deferred until the click so
+// rendering a cell does not generate a filter id it will never use.
+export const toQuickFilterValue = ({
+  attribute,
+  type,
+  value,
+}: QuickFilterInput): string | null => {
+  if (!attribute || !type) return null;
+
+  return formatQuickFilterValue({
+    type,
+    value,
+    conditional: getDefaultConditional(type),
+  });
+};
+
 export const createQuickFilter = ({
   attribute,
   type,
   value,
-}: {
-  attribute: string;
-  type: SearchAttributeType | undefined;
-  value: QuickFilterValue;
-}): SearchAttributeFilter | null => {
-  if (!attribute || !type) return null;
+}: QuickFilterInput): SearchAttributeFilter | null => {
+  const formattedValue = toQuickFilterValue({ attribute, type, value });
+  if (formattedValue === null || !type) return null;
 
-  const conditional = getDefaultConditional(type);
-  const formattedValue = formatQuickFilterValue({ type, value, conditional });
-  if (formattedValue === null) return null;
-
-  return createFilter({ attribute, type, value: formattedValue, conditional });
+  return createFilter({
+    attribute,
+    type,
+    value: formattedValue,
+    conditional: getDefaultConditional(type),
+  });
 };
 
 export const isQuickFilterActive = (
   filters: SearchAttributeFilter[],
-  quickFilter: SearchAttributeFilter | null,
+  quickFilter: Pick<
+    SearchAttributeFilter,
+    'attribute' | 'value' | 'conditional'
+  > | null,
 ): boolean => {
   if (!quickFilter) return false;
 

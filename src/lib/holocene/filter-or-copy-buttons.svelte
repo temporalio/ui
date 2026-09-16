@@ -46,6 +46,7 @@
         }}
         class="copy-or-filter-button"
         class:filtered
+        data-testid="quick-filter-button"
       >
         {#key filtered}
           <IconFilter title={filterIconTitle} class="m-0.5" />
@@ -72,7 +73,7 @@
 
 <style lang="postcss">
   .copy-or-filter {
-    @apply absolute bottom-0 right-0 top-0 inline-flex gap-1 px-1;
+    @apply absolute bottom-0 right-0 top-0 inline-flex gap-1 bg-surface-primary px-1;
   }
 
   .copy-or-filter-button {
