@@ -195,7 +195,8 @@
     <Preview
       content={value}
       fill={false}
-      inline
+      fitContent
+      compact
       minHeight={0}
       overrideTheme="primary"
       title={translate('workflows.summary')}

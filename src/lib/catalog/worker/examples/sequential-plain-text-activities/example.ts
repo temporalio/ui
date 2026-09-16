@@ -2,8 +2,20 @@ import { recordActivity } from './activities.js';
 import { sequentialPlainTextActivities } from './workflow.js';
 
 const input = {
-  defaultValue: [],
-  schema: { type: 'array', items: false, maxItems: 0 },
+  defaultValue: [20],
+  schema: {
+    type: 'array',
+    prefixItems: [
+      {
+        title: 'Activity count',
+        type: 'integer',
+        minimum: 1,
+        maximum: 2_000,
+      },
+    ],
+    items: false,
+    maxItems: 1,
+  },
 };
 
 const startOptions = {
@@ -18,11 +30,11 @@ export const catalogExample = {
   id: 'sequential-plain-text-activities',
   title: 'Sequential plain text activities',
   description:
-    'Runs 2,000 activities sequentially with an indexed plain-text summary.',
+    'Runs 20 activities by default with an indexed plain-text summary.',
   capabilityTags: ['activities', 'sequencing'],
   expectedEvidence: [
-    'Two thousand non-overlapping activity executions in deterministic order.',
-    'Activity summaries range from Activity 1 through Activity 2000.',
+    'The configured number of non-overlapping activity executions in deterministic order.',
+    'Activity summaries range from Activity 1 through the configured count.',
   ],
   input,
   startOptions,

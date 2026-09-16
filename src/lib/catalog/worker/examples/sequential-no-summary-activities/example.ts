@@ -2,8 +2,20 @@ import { recordActivityWithoutSummary } from './activities.js';
 import { sequentialNoSummaryActivities } from './workflow.js';
 
 const input = {
-  defaultValue: [],
-  schema: { type: 'array', items: false, maxItems: 0 },
+  defaultValue: [20],
+  schema: {
+    type: 'array',
+    prefixItems: [
+      {
+        title: 'Activity count',
+        type: 'integer',
+        minimum: 1,
+        maximum: 2_000,
+      },
+    ],
+    items: false,
+    maxItems: 1,
+  },
 };
 
 const startOptions = {
@@ -17,10 +29,10 @@ const startOptions = {
 export const catalogExample = {
   id: 'sequential-no-summary-activities',
   title: 'Sequential activities without summaries',
-  description: 'Runs 2,000 activities sequentially without summaries.',
+  description: 'Runs 20 activities by default without summaries.',
   capabilityTags: ['activities', 'sequencing'],
   expectedEvidence: [
-    'Two thousand non-overlapping activity executions in deterministic order.',
+    'The configured number of non-overlapping activity executions in deterministic order.',
     'Activity timeline entries do not display summaries.',
   ],
   input,

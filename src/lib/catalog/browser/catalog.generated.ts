@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'c720bff85e43428d513a282dfaad5da638a2846c14b798a84d0d578f91caeceb',
+    '4be4b7bdce0105db55dcc4ce2e2bcce31edbf7016f0b2966893e91f0183c164d',
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -536,16 +536,28 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       id: 'sequential-markdown-activities',
       title: 'Sequential activities with Markdown summaries',
       description:
-        'Runs 2,000 activities sequentially with Markdown summaries and retries one step three times.',
+        'Runs 20 activities by default with Markdown summaries and retries one step three times.',
       capabilityTags: ['activities', 'sequencing', 'retries'],
       expectedEvidence: [
-        'Two thousand non-overlapping activity executions in deterministic order.',
-        'Logging step 10 fails three attempts and succeeds on attempt four.',
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'When included, logging step 10 fails three attempts and succeeds on attempt four.',
         'Each activity summary displays a Logging System link.',
       ],
       input: {
-        defaultValue: [],
-        schema: { type: 'array', items: false, maxItems: 0 },
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
       },
       startOptions: {
         defaultValue: {},
@@ -572,15 +584,27 @@ export const catalogArtifact: BrowserCatalogArtifact = {
     {
       id: 'sequential-no-summary-activities',
       title: 'Sequential activities without summaries',
-      description: 'Runs 2,000 activities sequentially without summaries.',
+      description: 'Runs 20 activities by default without summaries.',
       capabilityTags: ['activities', 'sequencing'],
       expectedEvidence: [
-        'Two thousand non-overlapping activity executions in deterministic order.',
+        'The configured number of non-overlapping activity executions in deterministic order.',
         'Activity timeline entries do not display summaries.',
       ],
       input: {
-        defaultValue: [],
-        schema: { type: 'array', items: false, maxItems: 0 },
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
       },
       startOptions: {
         defaultValue: {},
@@ -608,15 +632,27 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       id: 'sequential-plain-text-activities',
       title: 'Sequential plain text activities',
       description:
-        'Runs 2,000 activities sequentially with an indexed plain-text summary.',
+        'Runs 20 activities by default with an indexed plain-text summary.',
       capabilityTags: ['activities', 'sequencing'],
       expectedEvidence: [
-        'Two thousand non-overlapping activity executions in deterministic order.',
-        'Activity summaries range from Activity 1 through Activity 2000.',
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'Activity summaries range from Activity 1 through the configured count.',
       ],
       input: {
-        defaultValue: [],
-        schema: { type: 'array', items: false, maxItems: 0 },
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
       },
       startOptions: {
         defaultValue: {},

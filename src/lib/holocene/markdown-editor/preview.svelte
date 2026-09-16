@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
   import { resolve } from '$app/paths';
@@ -17,15 +18,16 @@
       | ''
       | undefined;
     fill?: boolean;
+    /** Size the host frame to its content without changing render styles. */
+    fitContent?: boolean;
     frameId?: string;
-    inline?: boolean;
     minHeight?: number;
     previewTheme?: 'dark' | 'light';
     /**
-     * Render without the page padding, with the block wrappers flowing
-     * inline, so a short string hugs its own text instead of sitting in a
-     * padded box. The content still wraps, so it suits a label or a summary
-     * of a sentence or two rather than a document.
+     * Render without the page padding or block margins, so a short string
+     * sits naturally beside surrounding text instead of in a padded box.
+     * The content still wraps, so it suits a label or a summary of a sentence
+     * or two rather than a document.
      */
     compact?: boolean;
     /**
@@ -39,9 +41,9 @@
     content,
     class: className = '',
     fill = true,
+    fitContent = false,
     overrideTheme = '',
     frameId = '',
-    inline = false,
     minHeight = 100,
     previewTheme,
     compact = false,
@@ -75,10 +77,25 @@
 
   const getRenderedWidth = (iframeDocument: Document) => {
     const { body } = iframeDocument;
-    const main = iframeDocument.querySelector('main');
-    const contentWidth = main
-      ? Math.max(main.scrollWidth, main.getBoundingClientRect().width)
-      : Math.max(body.scrollWidth, body.getBoundingClientRect().width);
+    const main = iframeDocument.querySelector<HTMLElement>('main');
+    const view = iframeDocument.defaultView;
+    const bodyStyles = view?.getComputedStyle(body);
+    const horizontalBodyPadding =
+      parsePixels(bodyStyles?.paddingLeft) +
+      parsePixels(bodyStyles?.paddingRight);
+
+    if (!main) {
+      return Math.ceil(
+        Math.max(body.scrollWidth, body.getBoundingClientRect().width),
+      );
+    }
+
+    const previousWidth = main.style.width;
+    main.style.width = 'max-content';
+    const contentWidth =
+      Math.max(main.scrollWidth, main.getBoundingClientRect().width) +
+      horizontalBodyPadding;
+    main.style.width = previousWidth;
 
     return Math.ceil(contentWidth);
   };
@@ -88,9 +105,7 @@
     const iframeDocument = iframe.contentDocument;
     if (!iframeDocument) return;
 
-    if (inline) {
-      iframe.width = '0';
-      iframe.style.width = '0px';
+    if (fitContent) {
       const width = getRenderedWidth(iframeDocument);
       iframe.width = `${width}`;
       iframe.style.width = `${width}px`;
@@ -104,8 +119,18 @@
     iframe.style.height = `${height + 2}px`;
   };
 
+  const handleLoad = async () => {
+    if (fitContent) {
+      loading = false;
+      // Flush the loading styles before measuring the rendered document.
+      await tick();
+    }
+
+    resizeIframe();
+  };
+
   $effect(() => {
-    if (!iframe || inline || typeof ResizeObserver === 'undefined') return;
+    if (!iframe || fitContent || typeof ResizeObserver === 'undefined') return;
 
     const resizeObserver = new ResizeObserver(([entry]) => {
       const width = Math.round(entry.contentRect.width);
@@ -146,21 +171,26 @@
   );
 
   $effect.pre(() => {
-    if (inline && previewPath) loading = true;
+    if (fitContent && previewPath) loading = true;
   });
 </script>
 
 <section
   class={twMerge(
-    inline ? 'inline-flex max-w-full' : fill ? 'h-full w-full' : 'w-full',
+    fitContent ? 'inline-flex shrink-0' : fill ? 'h-full w-full' : 'w-full',
     className,
   )}
 >
   <iframe
     bind:this={iframe}
-    onload={resizeIframe}
+    onload={handleLoad}
     {title}
-    class="block w-full border-0"
+    class={twMerge(
+      fitContent
+        ? 'block shrink-0 border-0 align-middle'
+        : 'block w-full border-0',
+      fitContent && loading && 'invisible !h-0 !w-0',
+    )}
     src={previewPath}
     id={frameId}
   ></iframe>

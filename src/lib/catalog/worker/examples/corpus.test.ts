@@ -62,8 +62,8 @@ const activitySummaryExamples = [
     activity: logStep,
     capabilityTags: ['activities', 'sequencing', 'retries'],
     expectedEvidence: [
-      'Two thousand non-overlapping activity executions in deterministic order.',
-      'Logging step 10 fails three attempts and succeeds on attempt four.',
+      'The configured number of non-overlapping activity executions in deterministic order.',
+      'When included, logging step 10 fails three attempts and succeeds on attempt four.',
       'Each activity summary displays a Logging System link.',
     ],
   },
@@ -75,7 +75,7 @@ const activitySummaryExamples = [
     activity: recordActivityWithoutSummary,
     capabilityTags: ['activities', 'sequencing'],
     expectedEvidence: [
-      'Two thousand non-overlapping activity executions in deterministic order.',
+      'The configured number of non-overlapping activity executions in deterministic order.',
       'Activity timeline entries do not display summaries.',
     ],
   },
@@ -87,8 +87,8 @@ const activitySummaryExamples = [
     activity: recordActivity,
     capabilityTags: ['activities', 'sequencing'],
     expectedEvidence: [
-      'Two thousand non-overlapping activity executions in deterministic order.',
-      'Activity summaries range from Activity 1 through Activity 2000.',
+      'The configured number of non-overlapping activity executions in deterministic order.',
+      'Activity summaries range from Activity 1 through the configured count.',
     ],
   },
 ] as const;
@@ -193,8 +193,20 @@ describe('shared workflow corpus', () => {
         capabilityTags: expected.capabilityTags,
         expectedEvidence: expected.expectedEvidence,
         input: {
-          defaultValue: [],
-          schema: { type: 'array', items: false, maxItems: 0 },
+          defaultValue: [20],
+          schema: {
+            type: 'array',
+            prefixItems: [
+              {
+                title: 'Activity count',
+                type: 'integer',
+                minimum: 1,
+                maximum: 2_000,
+              },
+            ],
+            items: false,
+            maxItems: 1,
+          },
         },
         startOptions: { defaultValue: {} },
         execution: {
@@ -203,7 +215,7 @@ describe('shared workflow corpus', () => {
         },
       });
       await expect(
-        validateJsonSchema(descriptor!.input.schema, []),
+        validateJsonSchema(descriptor!.input.schema, [20]),
       ).resolves.toBe(true);
       await expect(
         validateJsonSchema(descriptor!.input.schema, ['unexpected']),

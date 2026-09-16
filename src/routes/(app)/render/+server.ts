@@ -16,7 +16,6 @@ import { process } from '$lib/utilities/render-markdown';
 type RenderOptions = {
   compact?: boolean;
   host: string;
-  inline?: boolean;
   nonce: string;
   theme?: string;
   overrideTheme?: string;

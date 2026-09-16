@@ -2,8 +2,20 @@ import { logStep } from './activities.js';
 import { sequentialMarkdownActivities } from './workflow.js';
 
 const input = {
-  defaultValue: [],
-  schema: { type: 'array', items: false, maxItems: 0 },
+  defaultValue: [20],
+  schema: {
+    type: 'array',
+    prefixItems: [
+      {
+        title: 'Activity count',
+        type: 'integer',
+        minimum: 1,
+        maximum: 2_000,
+      },
+    ],
+    items: false,
+    maxItems: 1,
+  },
 };
 
 const startOptions = {
@@ -18,11 +30,11 @@ export const catalogExample = {
   id: 'sequential-markdown-activities',
   title: 'Sequential activities with Markdown summaries',
   description:
-    'Runs 2,000 activities sequentially with Markdown summaries and retries one step three times.',
+    'Runs 20 activities by default with Markdown summaries and retries one step three times.',
   capabilityTags: ['activities', 'sequencing', 'retries'],
   expectedEvidence: [
-    'Two thousand non-overlapping activity executions in deterministic order.',
-    'Logging step 10 fails three attempts and succeeds on attempt four.',
+    'The configured number of non-overlapping activity executions in deterministic order.',
+    'When included, logging step 10 fails three attempts and succeeds on attempt four.',
     'Each activity summary displays a Logging System link.',
   ],
   input,

@@ -62,13 +62,15 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
     await renderHeld;
     await route.fulfill({
       contentType: 'text/html',
-      body: '<html><body><main>Timeline summary</main></body></html>',
+      body: `<html><head><style>
+        * { margin: 0; padding: 0; font: 14px/20px sans-serif; }
+      </style></head><body><main>Timeline summary</main></body></html>`,
     });
   });
 
   await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
 
-  const iframe = page.locator('iframe[src*="inline=true"]').first();
+  const iframe = page.locator('iframe[src*="compact=true"]').first();
   await expect(iframe).toBeAttached();
   await expect(iframe).toHaveCSS('visibility', 'hidden');
   await expect
@@ -85,10 +87,12 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
   await expect(iframe).toBeVisible();
   await expect
     .poll(() =>
-      iframe.evaluate((element) => {
-        const rect = element.getBoundingClientRect();
-        return rect.height > 0 && rect.width > 0;
-      }),
+      iframe.evaluate((element) => element.getBoundingClientRect().width),
     )
-    .toBe(true);
+    .toBeGreaterThan(100);
+  await expect
+    .poll(() =>
+      iframe.evaluate((element) => element.getBoundingClientRect().height),
+    )
+    .toBeLessThanOrEqual(24);
 });

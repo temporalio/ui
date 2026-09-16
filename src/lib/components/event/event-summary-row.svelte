@@ -368,7 +368,8 @@
               <Preview
                 content={decodedValue}
                 fill={false}
-                inline
+                fitContent
+                compact
                 minHeight={0}
                 overrideTheme="primary"
                 title={translate('workflows.summary')}
