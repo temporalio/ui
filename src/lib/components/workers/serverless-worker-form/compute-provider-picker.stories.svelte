@@ -113,3 +113,65 @@
     />
   </div>
 </Story>
+
+<Story
+  name="AWS namespace (Lambda and AgentCore)"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('AWS Lambda')).toBeInTheDocument();
+    await expect(
+      canvas.getByText('Amazon Bedrock AgentCore'),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText('Public Preview')).toBeInTheDocument();
+    await expect(canvas.getByText('Pre-release')).toBeInTheDocument();
+  }}
+>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker
+      provider="agentcore"
+      providers={[{ value: 'lambda' }, { value: 'agentcore' }]}
+    />
+  </div>
+</Story>
+
+<Story
+  name="Self-hosted (every provider selectable)"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('AWS Lambda')).toBeInTheDocument();
+    await expect(
+      canvas.getByText('Amazon Bedrock AgentCore'),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText('Google Cloud Run')).toBeInTheDocument();
+    await expect(canvas.queryByText('Coming Soon')).not.toBeInTheDocument();
+  }}
+>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker provider="agentcore" />
+  </div>
+</Story>
+
+<Story
+  name="Locked to the provider a Version uses"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByText('Amazon Bedrock AgentCore'),
+    ).toBeInTheDocument();
+    await expect(canvas.queryByText('AWS Lambda')).not.toBeInTheDocument();
+  }}
+>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker
+      provider="agentcore"
+      providers={[
+        { value: 'lambda', hidden: true },
+        { value: 'agentcore' },
+        { value: 'cloud-run', hidden: true },
+      ]}
+    />
+  </div>
+</Story>

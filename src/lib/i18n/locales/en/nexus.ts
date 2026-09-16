@@ -97,4 +97,20 @@ export const Strings = {
   operation: 'Operation',
   'operation-token': 'Operation Token',
   'cancellation-info': 'Cancellation Info',
+  'registry-empty-state-title': 'Get Started',
+  'registry-empty-state-nexus-link': 'Temporal Nexus',
+  'registry-empty-state-nexus-description':
+    "allows you to reliably connect Temporal Applications. It promotes a more modular architecture for sharing a subset of your team's capabilities with well-defined microservice contracts for other teams to use. Nexus was designed with Durable Execution in mind and enables each team to have their own Namespace for improved modularity, security, debugging, and fault isolation.",
+  'registry-empty-state-services-link': 'Nexus Services',
+  'registry-empty-state-services-preface': 'are exposed from a',
+  'registry-empty-state-endpoint-link': 'Nexus Endpoint',
+  'registry-empty-state-services-midface': 'created in the',
+  'registry-empty-state-registry-link': 'Nexus Registry',
+  'registry-empty-state-services-postface':
+    '. Adding a Nexus Endpoint to the Nexus Registry deploys the Endpoint, so it is available at runtime to serve Nexus requests.',
+  'registry-empty-state-proxy-preface':
+    'A Nexus Endpoint is a reverse proxy that decouples the caller from the handler and routes requests to upstream targets. It currently supports routing to a single target Namespace and Task Queue. Nexus Services and',
+  'registry-empty-state-operations-link': 'Nexus Operations',
+  'registry-empty-state-proxy-postface':
+    'are often registered in the same Worker as the underlying Temporal primitives they abstract.',
 } as const;

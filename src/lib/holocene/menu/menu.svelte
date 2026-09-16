@@ -99,9 +99,9 @@
 
   $effect(function getAnchorElement() {
     if (usePortal && id) {
-      anchorElement = document.querySelector(
-        `[aria-controls="${id}"]`,
-      ) as HTMLElement | null;
+      anchorElement = document.querySelector<HTMLElement>(
+        `[data-menu-anchor="${id}"]`,
+      );
     }
   });
 

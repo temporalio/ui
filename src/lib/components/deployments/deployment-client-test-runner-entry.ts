@@ -50,7 +50,7 @@ export async function renderDeployment({
 }: {
   fetchDeployment: unknown;
   fetchDeploymentVersion: unknown;
-  showConnectionStatus: boolean;
+  showConnectionStatus?: boolean;
 }) {
   setPageState();
   resetDeploymentsServiceMock({ fetchDeployment, fetchDeploymentVersion });
@@ -59,7 +59,7 @@ export async function renderDeployment({
   mounted.push(
     mount(Deployment, {
       target,
-      props: { showConnectionStatus },
+      props: showConnectionStatus === undefined ? {} : { showConnectionStatus },
     }),
   );
   await Promise.resolve();
@@ -90,7 +90,7 @@ export function openMenu(controls: string) {
 
 export function renderRows({
   computeStatuses,
-  showConnectionStatus = false,
+  showConnectionStatus,
 }: {
   computeStatuses: Record<string, ComputeStatus>;
   showConnectionStatus?: boolean;
@@ -106,7 +106,9 @@ export function renderRows({
         props: {
           deployment: deployment(status.toLowerCase(), computeStatus),
           columns: [{ label: 'Current Version' }],
-          showConnectionStatus,
+          ...(showConnectionStatus === undefined
+            ? {}
+            : { showConnectionStatus }),
         },
       }),
     );

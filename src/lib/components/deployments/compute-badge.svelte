@@ -1,6 +1,6 @@
 <script lang="ts">
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { IconAws, type IconComponent, IconGcp } from '$lib/io/icon';
+  import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
   import type { ComputeStatus } from '$lib/types/deployments';
   import {
     connectionStateColor,
@@ -10,8 +10,11 @@
   } from '$lib/utilities/connection-status';
 
   const CONFIG: Record<string, { Icon: IconComponent; label: string }> = {
-    'aws-lambda': { Icon: IconAws, label: 'Lambda' },
-    'gcp-cloud-run': { Icon: IconGcp, label: 'Cloud Run' },
+    // Brand marks, not monochrome glyphs: these identify a vendor, so they
+    // keep their own colour on either theme.
+    'aws-lambda': { Icon: IconAwsColor, label: 'Lambda' },
+    'aws-agentcore': { Icon: IconAwsColor, label: 'AgentCore' },
+    'gcp-cloud-run': { Icon: IconGcpColor, label: 'Cloud Run' },
   };
 
   let {

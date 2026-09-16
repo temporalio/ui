@@ -2,13 +2,18 @@
   import Button from '$lib/holocene/button.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconCheckCircleSolid, IconWarning } from '$lib/io/icon';
+  import {
+    IconCheckCircleSolid,
+    IconQuestionCircle,
+    IconWarning,
+  } from '$lib/io/icon';
+  import type { ValidationOutcome } from '$lib/utilities/connection-status';
 
   interface Props {
     buildId: string;
     open: boolean;
     loading: boolean;
-    result: { message?: string } | null;
+    result: ValidationOutcome | null;
     onClose: () => void;
     onRetry: () => void;
   }
@@ -22,9 +27,27 @@
     onRetry,
   }: Props = $props();
 
-  const isValid = $derived(!result?.message);
+  const state = $derived(result?.state);
 
-  const Glyph = $derived(isValid ? IconCheckCircleSolid : IconWarning);
+  const Glyph = $derived.by(() => {
+    if (state === 'valid') return IconCheckCircleSolid;
+    if (state === 'invalid') return IconWarning;
+    return IconQuestionCircle;
+  });
+
+  const tone = $derived.by(() => {
+    if (state === 'valid') return 'text-success';
+    if (state === 'invalid') return 'text-danger';
+    return 'text-secondary';
+  });
+
+  const heading = $derived.by(() => {
+    if (state === 'valid')
+      return translate('deployments.validate-connection-valid');
+    if (state === 'invalid')
+      return translate('deployments.validate-connection-invalid');
+    return translate('deployments.validate-connection-incomplete');
+  });
 </script>
 
 <Modal
@@ -62,22 +85,19 @@
         </div>
       {:else if result}
         <div class="flex items-start gap-2">
-          <Glyph
-            class="mt-0.5 h-4 w-4 shrink-0 {isValid
-              ? 'text-success'
-              : 'text-danger'}"
-          />
+          <Glyph class="mt-0.5 h-4 w-4 shrink-0 {tone}" />
           <div class="flex flex-col gap-1">
-            <p
-              class="text-sm font-medium {isValid
-                ? 'text-success'
-                : 'text-danger'}"
-            >
-              {isValid
-                ? translate('deployments.validate-connection-valid')
-                : translate('deployments.validate-connection-invalid')}
+            <p class="text-sm font-medium {tone}">
+              {heading}
             </p>
-            {#if result.message}
+            {#if state === 'indeterminate'}
+              <p class="text-xs text-secondary">
+                {translate(
+                  'deployments.validate-connection-incomplete-description',
+                )}
+              </p>
+            {/if}
+            {#if result.state !== 'valid' && result.message}
               <p class="text-xs text-secondary">{result.message}</p>
             {/if}
           </div>

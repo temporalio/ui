@@ -16,6 +16,7 @@
     variant?: ComponentProps<typeof MenuButton>['variant'];
     keepOpen?: ComponentProps<typeof Menu>['keepOpen'];
     position?: ComponentProps<typeof Menu>['position'];
+    usePortal?: ComponentProps<typeof Menu>['usePortal'];
     menuElement?: ComponentProps<typeof Menu>['menuElement'];
   };
 
@@ -27,6 +28,7 @@
       variant: 'primary',
       keepOpen: false,
       position: 'left',
+      usePortal: false,
     },
     argTypes: {
       variant: {
@@ -42,6 +44,10 @@
         name: 'Position',
         control: 'inline-radio',
         options: ['left', 'right', 'top-left', 'top-right'],
+      },
+      usePortal: {
+        name: 'Use Portal',
+        control: 'boolean',
       },
       menuElement: {
         name: 'Menu Element',
@@ -70,6 +76,7 @@
         class="w-64"
         keepOpen={args.keepOpen}
         position={args.position}
+        usePortal={args.usePortal}
       >
         <MenuItem href="https://temporal.io" newTab onclick={action('click')}>
           Link
