@@ -75,6 +75,11 @@
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
+  // Icon size is a ratio of the dot's padding box (dotSize minus the border-2
+  // the rows hardcode), snapped to an even px.
+  const DOT_ICON_RATIO = 0.75;
+  const dotIconSize =
+    2 * Math.round(((dotSize - 2 * DOT_STROKE) * DOT_ICON_RATIO) / 2);
   const completedColor = getStatusStrokeColor('Completed');
   const failedColor = dotColors('Failed').fill;
 
@@ -505,6 +510,7 @@
         style:height="{svgHeight}px"
         style:--dot="{dotSize}px"
         style:--dot-r="{dotRadius}px"
+        style:--dot-icon="{dotIconSize}px"
         style:--completed-color={completedColor}
         style:--failed-color={failedColor}
       >

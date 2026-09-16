@@ -250,7 +250,7 @@
   >
     {#if icon}
       <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
+        class="absolute left-1/2 top-1/2 h-[var(--dot-icon)] w-[var(--dot-icon)] -translate-x-1/2 -translate-y-1/2 text-black"
         viewBox="0 0 16 16"
       >
         <use href="#ti-{icon}" />
