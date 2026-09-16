@@ -152,10 +152,10 @@ func processMarkdown(content string) string {
 	return string(markdown.Render(ast, renderer))
 }
 
-// The stylesheet is generated from src/markdown.reset.css and the Io theme
-// colours by scripts/generate-markdown-css.ts, so this route and the SvelteKit
-// one at src/routes/(app)/render serve identical CSS. Edit the reset, then run
-// `pnpm generate:markdown-css`.
+// The stylesheet is generated from src/lib/utilities/markdown-reset.ts and
+// the Io theme colours by scripts/generate-markdown-css.ts, so this route and
+// the SvelteKit one at src/routes/(app)/render serve identical CSS. Edit the
+// reset, then run `pnpm generate:markdown-css`.
 //
 //go:embed markdown.gen.css
 var markdownCSS string

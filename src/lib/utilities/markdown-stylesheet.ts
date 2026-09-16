@@ -1,5 +1,6 @@
 // Relative rather than $lib: scripts/generate-markdown-css.ts pulls this
 // module in through esno, which does not resolve SvelteKit aliases.
+import { markdownReset } from './markdown-reset';
 import {
   type IoTheme,
   ioThemeToCssVariables,
@@ -44,13 +45,12 @@ export const markdownThemeCss = [
 ].join('\n');
 
 /**
- * The complete stylesheet for a rendered markdown frame.
+ * The complete stylesheet for a rendered markdown frame: the Io colours the
+ * reset refers to, then the reset itself.
  *
- * Kept pure and given the reset as an argument so the two things that need
- * this stylesheet can both call it: the SvelteKit route, which imports the
- * reset at build time, and scripts/generate-markdown-css.ts, which reads it
- * from disk to produce the copy the Go render route embeds. Neither composes
- * the stylesheet itself, so the two cannot disagree.
+ * Everything that paints markdown in a frame imports this one constant — the
+ * SvelteKit route, scripts/generate-markdown-css.ts (which writes the copy the
+ * Go route embeds), and cloud-ui through the package — so none of them can
+ * carry a stale copy.
  */
-export const composeMarkdownStylesheet = (reset: string): string =>
-  `${markdownThemeCss}\n${reset}`;
+export const markdownStylesheet = `${markdownThemeCss}\n${markdownReset}`;
