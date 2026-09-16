@@ -1,3 +1,13 @@
+// The stylesheet for a rendered markdown frame, as a string so that it ships
+// in the package and every consumer imports the same text: the SvelteKit
+// render route, scripts/generate-markdown-css.ts for the Go route, and
+// cloud-ui. It lives here rather than as a .css file because svelte-package
+// only publishes what is under src/lib, and esno (which runs the generator)
+// cannot resolve a ?raw import.
+//
+// This file is one template literal. A backtick or ${ anywhere in the CSS,
+// comments included, ends the literal early and breaks the build.
+export const markdownReset = `
 *,
 body {
   margin: 0;
@@ -226,3 +236,4 @@ html {
 html:has(body[data-theme^='dark']) {
   color-scheme: dark;
 }
+`;
