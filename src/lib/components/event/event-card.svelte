@@ -7,6 +7,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     resolveSystemNexusEvent,
@@ -251,7 +252,18 @@
       class="whitespace-pre-line"
       {value}
       fallback={translate('events.decode-failed')}
-    />
+    >
+      {#snippet children(decodedValue)}
+        <Preview
+          content={decodedValue}
+          fill={false}
+          compact
+          minHeight={0}
+          overrideTheme="primary"
+          title={translate('workflows.summary')}
+        />
+      {/snippet}
+    </PayloadSummary>
   </div>
 {/snippet}
 
