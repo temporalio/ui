@@ -19,6 +19,11 @@ const expectSelectedView = async (
 ) => {
   if (name === 'Saved Views') {
     await expect(page.getByTestId('saved-views-button')).toContainText(name);
+    await expect(page.getByTestId('edit-view-button')).toHaveCount(0);
+    await expect(page.getByTestId('last-viewed-saved-view')).toHaveAttribute(
+      'data-active',
+      'false',
+    );
     return;
   }
 

@@ -163,6 +163,11 @@
     $lastViewedSavedQueryIds = nextLastViewedSavedQueryIds;
   };
 
+  const setSavedQueryView = (view: SavedQuery) => {
+    activeQueryView = view;
+    rememberLastViewedSavedQuery(view);
+  };
+
   onMount(() => {
     if (savedQueryParam) {
       const queryToSave = {
@@ -184,9 +189,9 @@
       url.searchParams.delete('savedQuery');
       goto(url);
     } else if (savedQueryView) {
-      activeQueryView = savedQueryView;
+      setSavedQueryView(savedQueryView);
     } else if (savedQueryViewWithSystemView) {
-      activeQueryView = savedQueryViewWithSystemView;
+      setSavedQueryView(savedQueryViewWithSystemView);
     } else if (systemQueryView) {
       activeQueryView = systemQueryView;
     } else if (query) {
@@ -208,9 +213,9 @@
     if (activeQueryView?.type === 'system') {
       if (query && activeQueryView.query !== query) {
         if (savedQueryView) {
-          activeQueryView = savedQueryView;
+          setSavedQueryView(savedQueryView);
         } else if (savedQueryViewWithSystemView) {
-          activeQueryView = savedQueryViewWithSystemView;
+          setSavedQueryView(savedQueryViewWithSystemView);
         } else if (systemQueryView) {
           activeQueryView = systemQueryView;
         } else {
@@ -221,7 +226,11 @@
   });
 
   $effect(() => {
-    if (lastViewedSavedQueryId && !lastViewedSavedQuery) {
+    if (
+      namespaceSavedQueries.length &&
+      lastViewedSavedQueryId &&
+      !lastViewedSavedQuery
+    ) {
       forgetLastViewedSavedQuery();
     }
   });
@@ -301,8 +310,7 @@
     }
 
     $savedQueries[namespace] = [...$savedQueries[namespace], view];
-    rememberLastViewedSavedQuery(view);
-    activeQueryView = view;
+    setSavedQueryView(view);
   };
 
   const onSaveView = (view: SavedQuery) => {
@@ -317,7 +325,7 @@
     } else {
       $savedQueries[namespace] = [...$savedQueries[namespace], view];
     }
-    activeQueryView = view;
+    setSavedQueryView(view);
   };
 
   const onDuplicateView = () => {
