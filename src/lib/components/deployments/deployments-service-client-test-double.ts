@@ -32,6 +32,10 @@ export function decodeLambdaProviderDetails() {
   return {};
 }
 
+export function decodeAgentCoreProviderDetails() {
+  return {};
+}
+
 export function decodeGcpCloudRunProviderDetails() {
   return {};
 }

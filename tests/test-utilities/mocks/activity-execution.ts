@@ -137,7 +137,7 @@ export const mockStandaloneActivityCountApi = (
         count: String(count),
         groups: [
           {
-            groupValues: [{ data: { data: btoa('"Running"') } }],
+            groupValues: [{ data: btoa('"Running"') }],
             count: String(count),
           },
         ],

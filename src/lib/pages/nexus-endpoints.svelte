@@ -73,6 +73,7 @@
       type="search"
       placeholder={searchPlaceholder}
       class="w-full"
+      inputContainerClass="bg-surface-primary"
     />
     {#if endpoints.length}
       <Table class="w-full" bordered>

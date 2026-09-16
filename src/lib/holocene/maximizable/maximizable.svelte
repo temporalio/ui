@@ -117,7 +117,7 @@
   class={merge(
     'relative',
     maximized &&
-      'fixed left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-white dark:bg-black',
+      'fixed left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-background-primary text-primary',
     className,
   )}
   tabindex="-1"

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -14,7 +13,6 @@
     href?: string;
     Icon?: IconComponent;
     tooltip?: string;
-    badge?: BadgeType;
     class?: string;
   }
 
@@ -26,7 +24,6 @@
     href,
     Icon,
     tooltip = '',
-    badge,
     class: className = '',
   }: Props = $props();
 </script>
@@ -68,26 +65,14 @@
     >
   {:else}
     <Tooltip text={tooltip} hide={!tooltip} top>
-      {#if badge}
-        <Badge
-          type={badge}
-          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
-        >
-          {#if Icon}
-            <Icon class="shrink-0" />
-          {/if}
-          {content}
-        </Badge>
-      {:else}
-        <span
-          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
-        >
-          {#if Icon}
-            <Icon class="shrink-0" />
-          {/if}
-          {content}</span
-        >
-      {/if}
+      <span
+        class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
+      >
+        {#if Icon}
+          <Icon class="shrink-0" />
+        {/if}
+        {content}</span
+      >
     </Tooltip>
   {/if}
 </p>

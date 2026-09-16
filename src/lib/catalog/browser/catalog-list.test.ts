@@ -120,14 +120,16 @@ describe('CatalogList', () => {
     expect(body).toContain('Order lifecycle');
     expect(body).toContain('Start and inspect an order workflow.');
     expect(body).toMatch(
-      /class="[^"]*px-1[^"]*py-0\.5[^"]*text-xs[^"]*leading-none[^"]*"[^>]*><!---->OSS/,
+      /class="[^"]*border-tertiary[^"]*bg-surface-tertiary[^"]*text-secondary[^"]*"[\s\S]*?<span>OSS<\/span>/,
     );
     expect(body).toContain('catalog-tasks');
     expect(body).toContain('Not run');
     expect(body).toContain('>Start<');
     expect(body).toContain('Configure');
     expect(body).toContain('sticky right-0');
-    expect(body).toContain('w-36 !text-right sm:w-60');
+    expect(body).toMatch(
+      /<th[^>]*class="(?=[^"]*w-36)(?=[^"]*!text-right)(?=[^"]*sm:w-60)[^"]*"/,
+    );
     expect(body).toContain('hidden sm:inline');
   });
 
@@ -222,7 +224,7 @@ describe('CatalogList', () => {
 
     expect(body).toContain('Completed');
     expect(body).toMatch(
-      /class="[^"]*px-1[^"]*py-0\.5[^"]*text-xs[^"]*leading-none[^"]*"[^>]*><!---->Completed/,
+      /class="[^"]*border-success[^"]*bg-surface-success[^"]*text-success[^"]*"[\s\S]*?Completed/,
     );
     expect(body).toMatch(/1m ago|just now/);
   });
@@ -293,7 +295,7 @@ describe('CatalogList', () => {
     );
 
     expect(source).toContain(
-      'class="flex w-full flex-wrap items-center gap-2 border border-subtle bg-primary p-1.5"',
+      'class="flex w-full flex-wrap items-center gap-2 border border-primary bg-surface-primary p-1.5"',
     );
     expect(source).toMatch(/<Input[\s\S]*id="catalog-search"[\s\S]*noBorder/);
   });
@@ -344,7 +346,16 @@ describe('CatalogList', () => {
     );
 
     expect(source).toMatch(
-      /class="[^"]*catalog-table-region[^"]*"[\s\S]*class="[^"]*catalog-actions-cell[^"]*surface-primary[^"]*sticky[^"]*right-0[^"]*"[\s\S]*:global\(\.holocene-table-body tr:nth-of-type\(odd\) > \.catalog-actions-cell\) \{\s*@apply surface-background;\s*\}[\s\S]*:global\(\.holocene-table-body tr:hover > \.catalog-actions-cell\) \{\s*@apply bg-interactive-table-hover bg-fixed;\s*\}/,
+      /class="[^"]*catalog-table-region[^"]*"[\s\S]*class="(?=[^"]*catalog-actions-cell)(?=[^"]*sticky)(?=[^"]*right-0)(?=[^"]*bg-surface-primary)(?=[^"]*text-primary)[^"]*"/,
     );
+    expect(source).toContain(
+      ':global(.holocene-table-body tr:nth-of-type(even) > .catalog-actions-cell)',
+    );
+    expect(source).toContain('background-color: var(--color-surface-primary);');
+    expect(source).toContain('var(--color-surface-overlay-primary)');
+    expect(source).toContain(
+      ':global(.holocene-table-body tr:hover > .catalog-actions-cell)',
+    );
+    expect(source).toContain('background-image: none;');
   });
 });

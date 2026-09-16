@@ -3,10 +3,10 @@
 
   import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { Badge } from '$lib/io/badge';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import {
     customSearchAttributes,
@@ -178,7 +178,7 @@
 {:else}
   <td class={className} data-testid={testId}>
     {#if label === 'Status'}
-      <WorkflowStatus
+      <WorkflowStatusBadge
         status={workflow.status}
         delayed={isWorkflowDelayed(workflow)}
         taskFailure={isWorkflowTaskFailure(workflow)}
@@ -238,7 +238,7 @@
       {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
         <Timestamp dateTime={content} />
       {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
-        <Badge>{content}</Badge>
+        <Badge text={content ?? ''} />
       {:else}
         <Tooltip
           usePortal

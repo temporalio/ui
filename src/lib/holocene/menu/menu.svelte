@@ -2,12 +2,13 @@
   import { cva } from 'class-variance-authority';
 
   const sharedMenuStyles = [
-    'surface-primary',
+    'bg-surface-secondary',
     'min-w-fit',
     'list-none',
     'overflow-auto',
+    'rounded',
     'border',
-    'border-subtle',
+    'border-primary',
     'text-primary',
     'shadow',
     'w-full',
@@ -98,9 +99,9 @@
 
   $effect(function getAnchorElement() {
     if (usePortal && id) {
-      anchorElement = document.querySelector(
-        `[aria-controls="${id}"]`,
-      ) as HTMLElement | null;
+      anchorElement = document.querySelector<HTMLElement>(
+        `[data-menu-anchor="${id}"]`,
+      );
     }
   });
 

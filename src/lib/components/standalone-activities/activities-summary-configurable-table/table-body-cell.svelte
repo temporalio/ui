@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import ActivityExecutionStatus from '$lib/components/execution-status.svelte';
+  import ActivityStatusBadge from '$lib/components/standalone-activities/activity-status-badge.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
@@ -77,7 +77,7 @@
 {:else}
   <td class={className} data-testid={testId}>
     {#if label === 'Status'}
-      <ActivityExecutionStatus
+      <ActivityStatusBadge
         status={toActivityStatus(activity.status)}
         delayed={isActivityDelayed(activity)}
       />

@@ -1,6 +1,10 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
+  import {
+    dotColors,
+    getStatusStrokeColor,
+  } from '$lib/components/lines-and-dots/colors';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import {
     type LazyGroup,
@@ -66,6 +70,8 @@
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
+  const completedColor = getStatusStrokeColor('Completed');
+  const failedColor = dotColors('Failed').fill;
 
   let canvasWidth = $state(0);
 
@@ -466,8 +472,8 @@
 <div
   id="event-history-timeline-graph"
   class={twMerge(
-    'relative overflow-hidden border border-t-0 border-subtle bg-primary',
-    error && 'bg-danger',
+    'relative overflow-hidden rounded-lg border border-primary bg-surface-primary',
+    error && 'bg-surface-danger',
   )}
   style:height="{svgHeight}px"
   bind:this={containerEl}
@@ -495,6 +501,8 @@
         style:height="{svgHeight}px"
         style:--dot="{dotSize}px"
         style:--dot-r="{dotRadius}px"
+        style:--completed-color={completedColor}
+        style:--failed-color={failedColor}
       >
         <TimelineIconDefs />
 
@@ -573,7 +581,7 @@
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
           <div
-            class="absolute animate-pulse rounded bg-slate-400/30"
+            class="absolute animate-pulse rounded bg-surface-tertiary"
             style:left="{GUTTER}px"
             style:top="{rectY}px"
             style:width="{canvasWidth - GUTTER * 2}px"
@@ -608,7 +616,7 @@
   .canvas {
     position: relative;
     margin-top: -1rem;
-    color: rgb(var(--color-text-primary));
+    color: var(--color-content-primary);
   }
 
   /* Connector-line styles for the row components' `.tl-line` divs; :global since
@@ -620,7 +628,11 @@
   }
 
   .canvas :global(.tl-line--gradient) {
-    background-image: linear-gradient(255deg, #1ff1a5 0%, #f55 100%);
+    background-image: linear-gradient(
+      255deg,
+      var(--completed-color) 0%,
+      var(--failed-color) 100%
+    );
   }
 
   .canvas :global(.tl-line--dashed) {

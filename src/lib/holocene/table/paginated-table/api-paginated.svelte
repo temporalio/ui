@@ -264,7 +264,8 @@
   visibleItems={$store.visibleItems}
   {maxHeight}
   verticalScroll={maximizable && $maximized ? 'table' : 'responsive'}
-  class={merge(maximizable && $maximized && 'border-x-0 border-b-0')}
+  class={merge(maximizable && 'rounded-none border-0 border-t')}
+  tableClass={maximizable ? 'rounded-none' : ''}
   {id}
   {caption}
   {headers}

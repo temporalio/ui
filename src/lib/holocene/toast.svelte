@@ -33,11 +33,11 @@
   }: Props = $props();
 
   const variants: Readonly<Record<ToastVariant, string>> = {
-    primary: 'bg-slate-800 text-white',
-    success: 'bg-success',
-    error: 'bg-danger',
-    info: 'bg-information',
-    warning: 'bg-warning',
+    primary: 'bg-surface-brand text-primary',
+    success: 'bg-surface-success text-primary',
+    error: 'bg-surface-danger text-primary',
+    info: 'bg-surface-information text-primary',
+    warning: 'bg-surface-warning text-primary',
   };
 
   const variantIcon: Readonly<Record<ToastVariant, IconComponent | null>> = {
@@ -60,7 +60,7 @@
 <div
   {id}
   class={merge(
-    'flex grow-0 items-center justify-between gap-4 rounded-md px-3 py-2.5 shadow',
+    'flex grow-0 items-center justify-between gap-4 rounded-lg border border-primary px-3 py-2.5 shadow',
     variants[variant],
   )}
   transition:fly={{ x: 250 }}
@@ -76,7 +76,7 @@
     size="sm"
     LeadingIcon={IconClose}
     aria-label={dismissLabel}
-    class="text-inherit h-6 w-6 shrink-0 p-0"
+    class="h-6 w-6 shrink-0 p-0 text-inherit"
     disableTracking
     onclick={handleDismiss}
   />

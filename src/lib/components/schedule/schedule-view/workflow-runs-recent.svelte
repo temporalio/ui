@@ -1,8 +1,8 @@
 <script lang="ts">
   import { twMerge } from 'tailwind-merge';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -67,10 +67,10 @@
   <ul class={twMerge('flex flex-col gap-2', className)}>
     {#each runs as run, i (run.runId || i)}
       <li
-        class="grid grid-cols-[max-content_1fr] gap-x-2 gap-y-1 border-b border-subtle py-2 sm:grid-cols-[minmax(max-content,7rem)_1fr_max-content]"
+        class="grid grid-cols-[max-content_1fr] gap-x-2 gap-y-1 border-b border-primary py-2 sm:grid-cols-[minmax(max-content,7rem)_1fr_max-content]"
       >
         <div class="col-start-1 row-start-1 flex items-center">
-          <WorkflowStatus status={run.status} />
+          <WorkflowStatusBadge status={run.status} />
         </div>
 
         <div

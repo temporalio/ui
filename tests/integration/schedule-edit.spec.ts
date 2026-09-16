@@ -205,6 +205,12 @@ test.describe('Schedules List with schedules', () => {
     await page.getByRole('button', { name: 'Edit', exact: true }).click();
 
     await expect(payloadInput).toContainText('"message"');
+
+    await payloadInput.focus();
+    await payloadInput.press('End');
+    await payloadInput.press('x');
+    await expect(payloadInput).toBeFocused();
+
     expect(pageErrors.map(({ message }) => message).join('\n')).not.toContain(
       'split is not a function',
     );

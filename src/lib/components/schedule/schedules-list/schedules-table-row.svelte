@@ -2,8 +2,8 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -28,6 +28,7 @@
 
   let { schedule, columns }: Props = $props();
 
+  const status = $derived(schedule?.info?.paused ? 'Paused' : 'Running');
   const spec = $derived(schedule?.info?.spec);
   const searchAttributes = $derived(schedule?.searchAttributes ?? {});
   const decodedAttributes = $derived(
@@ -58,9 +59,7 @@
   {#each columns as { label } (label)}
     {#if label === translate('common.status')}
       <td class="cell">
-        <WorkflowStatus
-          status={schedule?.info?.paused ? 'Paused' : 'Running'}
-        />
+        <WorkflowStatusBadge {status} />
       </td>
     {:else if label === translate('schedules.id')}
       <td class="cell whitespace-pre-line break-words">

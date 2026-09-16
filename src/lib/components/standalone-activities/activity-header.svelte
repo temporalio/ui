@@ -1,5 +1,4 @@
 <script lang="ts">
-  import ActivityExecutionStatus from '$lib/components/execution-status.svelte';
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -24,6 +23,7 @@
   } from '../detail-list';
 
   import ActivityExecutionActions from './activity-actions.svelte';
+  import ActivityStatusBadge from './activity-status-badge.svelte';
 
   interface Props {
     activityExecutionInfo: ActivityExecutionInfo;
@@ -57,10 +57,9 @@
     class="flex items-start justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
   >
     <div class="flex items-center gap-4">
-      <ActivityExecutionStatus
+      <ActivityStatusBadge
         status={toActivityStatus(activityExecutionInfo.status)}
         delayed={isActivityDelayed(activityExecutionInfo)}
-        big
       />
       <h1
         data-testid="activity-id-heading"

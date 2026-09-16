@@ -20,6 +20,18 @@
     frameId?: string;
     minHeight?: number;
     previewTheme?: 'dark' | 'light';
+    /**
+     * Render without the page padding, with the block wrappers flowing
+     * inline, so a short string hugs its own text instead of sitting in a
+     * padded box. The content still wraps, so it suits a label or a summary
+     * of a sentence or two rather than a document.
+     */
+    compact?: boolean;
+    /**
+     * Accessible name for the frame. Name what the content is, so a frame in
+     * a list of them is distinguishable.
+     */
+    title?: string;
   }
 
   let {
@@ -30,6 +42,8 @@
     frameId = '',
     minHeight = 100,
     previewTheme,
+    compact = false,
+    title = 'output',
   }: Props = $props();
 
   let iframe: HTMLIFrameElement | null = $state(null);
@@ -105,7 +119,7 @@
   );
   const previewPath = $derived(
     resolve(
-      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}`,
+      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&compact=${compact}`,
       {},
     ),
   );
@@ -115,8 +129,8 @@
   <iframe
     bind:this={iframe}
     onload={resizeIframe}
-    title="output"
-    class="block w-full"
+    {title}
+    class="block w-full border-0"
     src={previewPath}
     id={frameId}
   ></iframe>

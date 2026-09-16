@@ -62,10 +62,7 @@
       --horizontal-offset-start: -273;
       --horizontal-offset-shape2: -575;
 
-      /* Drop Shadow  */
-      --ellipse-shadow: rgb(var(--color-text-primary) / 15%);
-      --ellipse-drop-shadow: drop-shadow(0 4px 12px var(--ellipse-shadow));
-      --stroke-color: rgb(var(--color-text-primary));
+      --stroke-color: var(--color-content-primary);
     }
 
     /* Default states - no animation */
@@ -73,14 +70,12 @@
       stroke: var(--stroke-color);
       stroke-dasharray: 0 848;
       stroke-dashoffset: var(--vertical-offset-start);
-      filter: var(--ellipse-drop-shadow);
     }
 
     .horizontal-ellipse {
       stroke: var(--stroke-color);
       stroke-dasharray: 0 850;
       stroke-dashoffset: var(--horizontal-offset-start);
-      filter: var(--ellipse-drop-shadow);
     }
 
     /* Combined infinite loop animation */
