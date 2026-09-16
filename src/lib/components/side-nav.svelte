@@ -12,17 +12,13 @@
     bottom?: Snippet;
   }
 
-  let isNotLastItem = (section: NavLinkItem[], i: number): boolean => {
-    return i != section.length - 1;
-  };
-
   let { isCloud = false, sections, bottom }: Props = $props();
 </script>
 
 <Navigation {isCloud} {bottom} aria-label={translate('common.primary')}>
   {#each sections as section, i (i)}
     <NavSection navItems={section} />
-    {#if isNotLastItem(section, i)}
+    {#if i !== sections.length - 1}
       <hr class="my-2 border-primary group-data-[nav=closed]:hidden" />
     {/if}
   {/each}
