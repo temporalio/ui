@@ -34,7 +34,7 @@
 </script>
 
 <div
-  class="flex min-h-7 items-center justify-between pb-2 group-data-[nav=closed]:justify-center"
+  class="flex min-h-7 items-center justify-between gap-2 pb-2 group-data-[nav=closed]:justify-center"
 >
   <div
     class="flex flex-row items-center justify-start group-data-[nav=closed]:hidden"
@@ -77,7 +77,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-[8px] flex size-6 shrink-0 items-center justify-center justify-self-end rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-data-[nav=closed]:mx-0"
+    class="flex size-6 shrink-0 items-center justify-center justify-self-end rounded text-secondary transition-[opacity,transform] hover:bg-surface-overlay-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
     onclick={ontoggle}
   >
     {#if navOpen}
