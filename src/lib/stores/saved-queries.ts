@@ -82,7 +82,6 @@ const systemWorkflowViews: SavedQuery[] = [
     Icon: IconTemporalSchedules,
     type: 'system',
   },
-
   {
     id: 'today',
     name: 'Today',
