@@ -226,7 +226,11 @@
   });
 
   $effect(() => {
-    if (lastViewedSavedQueryId && !lastViewedSavedQuery) {
+    if (
+      namespaceSavedQueries.length &&
+      lastViewedSavedQueryId &&
+      !lastViewedSavedQuery
+    ) {
       forgetLastViewedSavedQuery();
     }
   });
