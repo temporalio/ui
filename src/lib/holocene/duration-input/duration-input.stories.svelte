@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
@@ -31,11 +29,13 @@
 </script>
 
 {#snippet template(args: Args)}
-  <DurationInput
-    {...args}
-    bind:value={args.value}
-    hintText="Value: {args.value}"
-  />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <DurationInput
+      {...args}
+      bind:value={args.value}
+      hintText="Value: {args.value}"
+    />
+  </div>
 {/snippet}
 
 <Story name="With default units" />

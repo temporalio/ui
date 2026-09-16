@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { FullAutoFill } from 'svelte/elements';
+
   import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
@@ -20,6 +22,7 @@
     maxLength?: number;
     class?: string;
     scrollTo?: boolean;
+    autocomplete?: FullAutoFill;
   };
 
   let {
@@ -38,11 +41,13 @@
     maxLength = 0,
     class: className = '',
     scrollTo = false,
+    autocomplete = 'off',
   }: Props = $props();
 
   let displayValue = $state('');
 
   const invalid = $derived(chips.some((chip) => !validator(chip)));
+  const errorId = $derived(`${id}-error`);
 
   const handleKeydown = (e: KeyboardEvent) => {
     e.stopPropagation();
@@ -67,7 +72,7 @@
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
     if (maxLength && chips.length >= maxLength) return;
-    const clipboardContents = e.clipboardData.getData('text/plain');
+    const clipboardContents = e.clipboardData?.getData('text/plain') ?? '';
     let newValues = clipboardContents
       .split(',')
       .map((content) => content.trim());
@@ -112,8 +117,12 @@
   <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
   <div
     class={merge(
-      'surface-primary flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-2 focus-within:ring-primary/70',
-      disabled && 'cursor-not-allowed opacity-65',
+      'flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-tertiary bg-background-primary p-2 text-sm text-primary focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+      !disabled &&
+        !invalid &&
+        'focus-within:border-secondary hover:border-brand',
+      disabled &&
+        'cursor-not-allowed border-secondary bg-surface-tertiary text-tertiary',
       invalid && 'invalid',
     )}
   >
@@ -133,13 +142,15 @@
     <input
       data-lpignore="true"
       data-1p-ignore="true"
-      autocomplete="off"
+      {autocomplete}
       class:cursor-not-allowed={disabled}
       {disabled}
       {placeholder}
       {id}
       {name}
       {required}
+      aria-invalid={invalid ? 'true' : undefined}
+      aria-describedby={invalid && hintText ? errorId : undefined}
       multiple
       data-testid={id}
       bind:value={displayValue}
@@ -152,30 +163,29 @@
     />
   </div>
 
-  {#if (invalid && hintText) || (maxLength && !disabled)}
-    <div class="flex justify-between gap-2">
-      <div
-        class="error-msg"
-        class:min-width={maxLength}
-        aria-live={invalid ? 'assertive' : 'off'}
-      >
-        {#if invalid && hintText}
-          <p>{hintText}</p>
-        {/if}
-      </div>
-      {#if maxLength && !disabled}
-        <span class="count">
-          <span
-            class="text-information"
-            class:warn={maxLength - chips.length <= 5}
-            class:error={maxLength === chips?.length}
-          >
-            {chips.length}
-          </span>&nbsp;/&nbsp;{maxLength}
-        </span>
+  <div class="flex justify-between gap-2">
+    <div
+      id={errorId}
+      class="error-msg"
+      class:min-width={maxLength}
+      role="alert"
+    >
+      {#if invalid && hintText}
+        <p>{hintText}</p>
       {/if}
     </div>
-  {/if}
+    {#if maxLength && !disabled}
+      <span class="count">
+        <span
+          class="text-information"
+          class:warn={maxLength - chips.length <= 5}
+          class:error={maxLength === chips?.length}
+        >
+          {chips.length}
+        </span>&nbsp;/&nbsp;{maxLength}
+      </span>
+    {/if}
+  </div>
 
   {#if chips.length > 0 && external}
     <div class="flex flex-row flex-wrap gap-1">
@@ -196,11 +206,11 @@
 
 <style lang="postcss">
   .invalid {
-    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
+    @apply border-danger focus-within:border-danger focus-within:ring-danger;
   }
 
   input {
-    @apply surface-primary inline-block grow focus:outline-none;
+    @apply inline-block grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 
   .error-msg {

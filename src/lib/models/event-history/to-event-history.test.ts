@@ -77,8 +77,6 @@ const historyEvent = {
   },
 } as unknown as HistoryEvent;
 
-const namespace = 'unit-tests';
-
 describe('getEventAttributes', () => {
   beforeEach(() => {
     vi.mock('$lib/utilities/decode-payload', () => {
@@ -154,9 +152,37 @@ describe('toEventHistory', () => {
 
       const [event] = events;
 
-      expect(event[property]).toBeDefined();
+      expect(event[property as keyof typeof event]).toBeDefined();
     });
   }
+});
+
+describe('marker categorization', () => {
+  const markerEvent = (eventId: string, markerName: string) =>
+    ({
+      eventId,
+      eventTime: '2022-07-01T20:28:48.796369169Z',
+      eventType: 'MarkerRecorded',
+      version: '0',
+      taskId: '29887292',
+      markerRecordedEventAttributes: {
+        markerName,
+        workflowTaskCompletedEventId: '1',
+      },
+    }) as unknown as HistoryEvent;
+
+  it.each(['LocalActivity', 'core_local_activity'])(
+    'categorizes a %s marker as local-activity',
+    async (markerName) => {
+      const [event] = await toEventHistory([markerEvent('2', markerName)]);
+      expect(event.category).toBe('local-activity');
+    },
+  );
+
+  it('leaves a Version marker in other', async () => {
+    const [event] = await toEventHistory([markerEvent('2', 'Version')]);
+    expect(event.category).toBe('other');
+  });
 });
 
 describe('fromEventToRawEvent', () => {
@@ -178,7 +204,7 @@ describe('fromEventToRawEvent', () => {
       const [event] = events;
       const rawEvent = fromEventToRawEvent(event);
 
-      expect(rawEvent[property]).toBeUndefined();
+      expect(rawEvent[property as keyof typeof rawEvent]).toBeUndefined();
     });
   }
 });

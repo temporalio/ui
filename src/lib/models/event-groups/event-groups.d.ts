@@ -1,5 +1,6 @@
 import type { EventLink, Payload } from '$lib/types';
 import type {
+  EventClassification,
   PendingActivity,
   PendingNexusOperation,
   WorkflowEvent,
@@ -17,11 +18,10 @@ interface EventGroup extends Pick<
   name: string;
   label: string;
   displayName: string;
-  events: Map<EventId, WorkflowEvent>;
-  eventIds: Set<EventId>;
+  eventList: WorkflowEvent[];
+  eventCount: number;
   initialEvent: WorkflowEvent;
   lastEvent: WorkflowEvent;
-  eventList: WorkflowEvent[];
   finalClassification: EventClassification;
   isPending: boolean;
   isFailureOrTimedOut: boolean;

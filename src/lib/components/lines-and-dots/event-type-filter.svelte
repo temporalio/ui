@@ -5,13 +5,13 @@
   import { page } from '$app/state';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
   import {
     allEventTypeOptions,
     compactEventTypeOptions,
@@ -110,16 +110,13 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton controls="status-menu" size="sm">
+  <MenuButton controls="status-menu" size="sm" variant="tertiary">
     {#snippet leading()}
       <div
         class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
-        class:bg-interactive={filterActive}
+        class:bg-interactive-primary={filterActive}
       >
-        <Icon
-          name="filter"
-          class={filterActive ? 'pt-0.5 text-white' : undefined}
-        />
+        <IconFilter class={filterActive ? 'pt-0.5 text-white' : undefined} />
       </div>
     {/snippet}
     <span class="hidden text-sm md:block">{translate('common.filter')}</span>
@@ -133,7 +130,7 @@
     <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>
       {#snippet leading()}
         <Checkbox
-          on:change={onAllClick}
+          onChange={onAllClick}
           checked={!$eventStatusFilter &&
             $eventTypeFilter.length === defaultOptions.length}
           label={translate('common.all')}
@@ -152,7 +149,7 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:change={onPendingClick}
+            onChange={onPendingClick}
             checked={$eventStatusFilter}
             label={translate('common.all')}
             labelHidden
@@ -165,7 +162,7 @@
     <MenuItem data-testid={translate('common.none')} onclick={onNoneClick}>
       {#snippet leading()}
         <Checkbox
-          on:change={onNoneClick}
+          onChange={onNoneClick}
           checked={!$eventStatusFilter && !$eventTypeFilter.length}
           label={translate('common.none')}
           labelHidden
@@ -186,7 +183,7 @@
       >
         {#snippet leading()}
           <Checkbox
-            on:click={() => onOptionClick(option)}
+            onclick={() => onOptionClick(option)}
             checked={$eventTypeFilter.some((type) => type === option.value)}
             label={option.label}
             labelHidden

@@ -3,7 +3,7 @@
 
   const comboboxStyles = cva(
     [
-      'surface-primary',
+      'bg-background-primary',
       'flex',
       'max-h-28',
       'min-h-10',
@@ -13,17 +13,19 @@
       'overflow-auto',
       'border',
       'text-sm',
-      'dark:focus-within:surface-primary',
+      'text-primary',
       'focus-within:outline-none',
       'focus-within:ring-2',
+      'focus-within:ring-interactive-primary',
+      'rounded',
     ],
     {
       variants: {
         variant: {
           default:
-            'border-subtle focus-within:border-interactive focus-within:ring-primary/70',
+            'border-primary hover:border-brand focus-within:border-secondary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
           ghost:
-            'bg-transparent border-transparent focus-within:border-transparent focus-within:ring-transparent focus-within:bg-transparent hover:surface-interactive-secondary',
+            'border-transparent bg-transparent hover:bg-interactive-tertiary-hover focus-within:border-transparent focus-within:bg-transparent focus-within:ring-transparent',
         },
       },
       defaultVariants: {
@@ -53,12 +55,17 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
+  import {
+    IconAdd,
+    IconChevronDown,
+    type IconComponent,
+    IconExternalLinkOptical,
+    IconSpinner,
+  } from '$lib/io/icon';
 
-  import Badge from '../badge.svelte';
   import Button from '../button.svelte';
   import Chip from '../chip.svelte';
-  import type { IconName } from '../icon';
-  import Icon from '../icon/icon.svelte';
   import MenuDivider from '../menu/menu-divider.svelte';
   import Tooltip from '../tooltip.svelte';
 
@@ -76,11 +83,12 @@
     placeholder?: string;
     readonly?: boolean;
     required?: boolean;
-    leadingIcon?: IconName;
+    LeadingIcon?: IconComponent;
     showChevron?: boolean;
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
+    hintText?: string;
     error?: string;
     valid?: boolean;
     actionTooltip?: string;
@@ -108,6 +116,7 @@
     removeChipLabel?: string;
     selectAllLabel?: string;
     deselectAllLabel?: string;
+    hideControls?: boolean;
     numberOfItemsSelectedLabel?: (count: number) => string;
   }
 
@@ -119,6 +128,7 @@
     removeChipLabel?: never;
     selectAllLabel?: never;
     deselectAllLabel?: never;
+    hideControls?: never;
     numberOfItemsSelectedLabel?: never;
   }
 
@@ -126,12 +136,18 @@
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
+    optionDescriptionKey?: never;
   }
 
   interface CustomOptionProps {
     options: T[];
     optionValueKey: keyof T;
     optionLabelKey?: keyof T;
+    /**
+     * Optional key whose value renders as a secondary line beneath each
+     * option's label. Filtering still matches on the label only.
+     */
+    optionDescriptionKey?: keyof T;
   }
 
   type Props =
@@ -150,15 +166,17 @@
     disabled = false,
     labelHidden = false,
     options,
-    placeholder = null,
+    placeholder = undefined,
     readonly = false,
     required = false,
-    leadingIcon = null,
+    LeadingIcon,
     showChevron = false,
-    optionValueKey = null,
+    optionValueKey = undefined,
     optionLabelKey = optionValueKey,
+    optionDescriptionKey = undefined,
     minSize = 0,
     maxSize = 120,
+    hintText = '',
     error = '',
     valid = true,
     open = writable(false),
@@ -168,6 +186,7 @@
     displayChips = true,
     selectAllLabel = 'Select All',
     deselectAllLabel = 'Deselect All',
+    hideControls = false,
     removeChipLabel = 'Remove Option',
     numberOfItemsSelectedLabel = (count: number) =>
       `${count} option${count > 1 ? 's' : ''} selected`,
@@ -239,19 +258,19 @@
     if ($open) return;
     $open = true;
     filterValue = '';
-    inputElement.focus();
-    inputElement.select();
+    inputElement?.focus();
+    inputElement?.select();
   };
 
   const closeList = () => {
     if (!$open) return;
     $open = false;
-    onclose?.(selectedOption);
+    onclose?.(selectedOption as string | T);
     resetValueAndOptions();
   };
 
   const handleMenuClose = () => {
-    onclose?.(selectedOption);
+    onclose?.(selectedOption as string | T);
     resetValueAndOptions();
   };
 
@@ -264,6 +283,10 @@
     return Array.isArray(value);
   };
 
+  const selectedCountLabel = $derived(
+    isArrayValue(value) ? numberOfItemsSelectedLabel(value.length) : '',
+  );
+
   const addCustomValue = () => {
     if (!trimmedFilterValue) return;
     if (isArrayValue(value) && value.includes(trimmedFilterValue)) return;
@@ -272,7 +295,9 @@
     }
     handleSelectOption(trimmedFilterValue);
     filterValue = '';
-    displayValue = '';
+    if (multiselect) {
+      displayValue = '';
+    }
   };
 
   const isStringOption = (option: string | T): option is string => {
@@ -288,8 +313,8 @@
     if (typeof option !== 'object') return false;
 
     return (
-      optionValueKey !== null &&
-      optionLabelKey !== null &&
+      optionValueKey != null &&
+      optionLabelKey != null &&
       optionValueKey in option &&
       optionLabelKey in option
     );
@@ -309,8 +334,22 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      return String(option[optionLabelKey]);
+      return String(option[optionLabelKey!]);
     }
+
+    return '';
+  }
+
+  function getOptionDescription(option: string | T): string | undefined {
+    if (optionDescriptionKey == null) return undefined;
+    if (option === null) return undefined;
+    if (isStringOption(option)) return undefined;
+    if (!isObjectOption(option)) return undefined;
+    if (!(optionDescriptionKey in option)) return undefined;
+
+    const description = option[optionDescriptionKey];
+
+    return description == null ? undefined : String(description);
   }
 
   function getSelectedOption(options: (string | T)[]) {
@@ -320,7 +359,7 @@
       }
 
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return option[optionValueKey] === value;
+        return option[optionValueKey!] === value;
       }
     });
   }
@@ -344,7 +383,7 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      const opt = String(option[optionValueKey]);
+      const opt = String(option[optionValueKey!]);
       if (isArrayValue(value)) {
         if (value.includes(opt)) {
           value = value.filter((o) => o !== opt);
@@ -376,7 +415,7 @@
 
     value = list.map((option) => {
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return String(option[optionValueKey]);
+        return String(option[optionValueKey!]);
       } else if (isStringOption(option)) {
         return option;
       }
@@ -388,7 +427,7 @@
   };
 
   const focusFirstOption = () => {
-    const listItemElement: HTMLLIElement = menuElement.querySelector(
+    const listItemElement = menuElement?.querySelector<HTMLLIElement>(
       'li[role="option"]:not([aria-disabled="true"])',
     );
 
@@ -452,12 +491,16 @@
       }
 
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return String(option[optionLabelKey])
+        return String(option[optionLabelKey!])
           .toLowerCase()
           .includes(value.toLowerCase());
       }
     });
   }
+
+  const errorId = $derived(`${id}-error`);
+  const hintId = $derived(`${id}-hint`);
+  const showError = $derived(!!error && !valid);
 
   const handleInputClick: MouseEventHandler<HTMLInputElement> = (event) => {
     event.stopPropagation();
@@ -477,7 +520,7 @@
     option: string | T,
     value: string | string[],
   ): boolean => {
-    if (isObjectOption(option)) {
+    if (isObjectOption(option) && optionValueKey != null) {
       const o = String(option[optionValueKey]);
       return isArrayValue(value) ? value.includes(o) : value === o;
     } else if (isStringOption(option)) {
@@ -489,27 +532,31 @@
 </script>
 
 <MenuContainer {open} onclose={handleMenuClose}>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1.5">
     <Label hidden={labelHidden} {required} {label} for={id} />
     <div
       class={merge(
         comboboxStyles({ variant }),
+        value.length > 0 && variant === 'default' && 'border-secondary',
         !valid &&
           variant === 'default' &&
-          'border border-danger text-danger focus-within:ring-danger/70',
-        disabled && 'opacity-50',
+          'border border-danger focus-within:border-danger focus-within:ring-danger hover:border-danger',
+        disabled &&
+          variant === 'default' &&
+          'border-secondary bg-surface-tertiary text-tertiary hover:border-secondary',
+        disabled && variant === 'ghost' && 'text-tertiary hover:bg-transparent',
         className,
       )}
     >
-      {#if leadingIcon}
-        <Icon class="ml-2 shrink-0" name={leadingIcon} />
+      {#if LeadingIcon}
+        <LeadingIcon class="ml-2 shrink-0" />
       {/if}
       <div
         class={merge(
           'input-wrapper',
           multiselect && 'gap-1',
           multiselect && 'm-1',
-          leadingIcon && multiselect && 'ml-2',
+          LeadingIcon && multiselect && 'ml-2',
         )}
       >
         {#if multiselect && isArrayValue(value) && value.length > 0}
@@ -523,8 +570,8 @@
             {#if value.length > chipLimit}
               <p>+{value.slice(chipLimit).length}</p>
             {/if}
-          {:else}
-            <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
+          {:else if selectedCountLabel}
+            <Badge text={selectedCountLabel} />
           {/if}
         {/if}
         <input
@@ -538,14 +585,14 @@
           class={merge(
             'combobox-input',
             multiselect
-              ? value.length > 0 || leadingIcon
+              ? value.length > 0 || LeadingIcon
                 ? 'indent-0'
                 : 'indent-1'
               : 'indent-2',
             className,
           )}
           role="combobox"
-          autocomplete="off"
+          autocomplete={rest.autocomplete ?? 'off'}
           autocapitalize="off"
           spellcheck="false"
           data-lpignore="true"
@@ -553,6 +600,8 @@
           aria-controls="{id}-listbox"
           aria-expanded={$open}
           aria-required={required}
+          aria-invalid={!valid ? 'true' : undefined}
+          aria-describedby={showError ? errorId : hintText ? hintId : undefined}
           aria-autocomplete="list"
           onfocus={handleFocus}
           onblur={handleBlur}
@@ -565,7 +614,7 @@
         />
       </div>
       {#if action}
-        <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
+        <div class="ml-1 flex h-full items-start border-l border-primary p-0.5">
           {#if actionTooltip}
             <Tooltip text={actionTooltip} right>
               {@render action()}
@@ -575,15 +624,22 @@
           {/if}
         </div>
       {:else if href}
-        <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+        <div
+          class="ml-1 flex h-full items-center border-l border-primary p-0.5"
+        >
           {#if actionTooltip}
-            <Tooltip text={actionTooltip} right>
+            <Tooltip
+              text={actionTooltip}
+              right
+              usePortal
+              portalOffset={{ x: 6 }}
+            >
               <Button
                 variant="ghost"
                 size="xs"
                 {href}
                 disabled={hrefDisabled}
-                leadingIcon="external-link"
+                LeadingIcon={IconExternalLinkOptical}
               />
             </Tooltip>
           {:else}
@@ -592,7 +648,7 @@
               size="xs"
               {href}
               disabled={hrefDisabled}
-              leadingIcon="external-link"
+              LeadingIcon={IconExternalLinkOptical}
             />
           {/if}
         </div>
@@ -600,13 +656,12 @@
       {#if showChevron}
         <button
           type="button"
-          class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
+          class="flex h-full items-center rounded pr-2 hover:bg-interactive-tertiary-hover focus:outline-none"
           onclick={handleChevronClick}
           aria-label={$open ? 'Close options' : 'Open options'}
           tabindex="-1"
         >
-          <Icon
-            name="chevron-down"
+          <IconChevronDown
             class={merge(
               'transition-transform duration-200',
               $open && 'rotate-180',
@@ -615,6 +670,19 @@
           />
         </button>
       {/if}
+    </div>
+    <div class="inline-flex" class:hidden={!hintText && !showError}>
+      <span
+        id={errorId}
+        role="alert"
+        class="hint-text error"
+        class:hidden={!showError}
+      >
+        {#if showError}{error}{/if}
+      </span>
+      <span id={hintId} class="hint-text" class:hidden={showError}>
+        {#if !showError}{hintText}{/if}
+      </span>
     </div>
   </div>
 
@@ -626,7 +694,7 @@
     class="w-full"
     maxHeight={maxMenuHeight}
   >
-    {#if multiselect && isArrayValue(value)}
+    {#if multiselect && isArrayValue(value) && !hideControls}
       <ComboboxOption
         disabled={value.length === allOptions.length}
         onclick={selectAll}
@@ -647,7 +715,7 @@
         label="{translate('common.add')} {trimmedFilterValue}"
       >
         {#snippet leading()}
-          <Icon name="add" />
+          <IconAdd />
         {/snippet}
       </ComboboxOption>
       {#if list.length > 0}
@@ -660,6 +728,7 @@
         onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}
+        description={getOptionDescription(option)}
         class={optionClass}
       />
     {:else}
@@ -671,27 +740,27 @@
     {#if loading}
       <ComboboxOption disabled label={loadingText}>
         {#snippet leading()}
-          <Icon name="spinner" class="animate-spin" />
+          <IconSpinner class="animate-spin" />
         {/snippet}
       </ComboboxOption>
     {/if}
   </Menu>
-
-  {#if error && !valid}
-    <span class="error">{error}</span>
-  {/if}
 </MenuContainer>
 
 <style lang="postcss">
-  .error {
-    @apply text-xs text-danger;
+  .hint-text {
+    @apply text-xs text-primary;
+
+    &.error {
+      @apply text-danger;
+    }
   }
 
   .input-wrapper {
-    @apply flex w-full flex-wrap items-center;
+    @apply flex grow flex-wrap items-center;
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary focus:outline-none;
+    @apply flex grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 </style>

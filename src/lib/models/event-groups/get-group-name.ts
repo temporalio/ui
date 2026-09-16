@@ -1,3 +1,4 @@
+import { systemNexusGroupLabel } from '$lib/system-nexus-endpoints';
 import type { CommonHistoryEvent } from '$lib/types/events';
 import { formatDurationAbbreviated } from '$lib/utilities/format-time';
 import { getSummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
@@ -18,7 +19,7 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return '';
 
   if (isActivityTaskScheduledEvent(event)) {
-    return event.activityTaskScheduledEventAttributes?.activityType?.name;
+    return event.activityTaskScheduledEventAttributes?.activityType?.name ?? '';
   }
 
   if (isTimerStartedEvent(event)) {
@@ -30,34 +31,47 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
-    return event.signalExternalWorkflowExecutionInitiatedEventAttributes
-      ?.signalName;
+    return (
+      event.signalExternalWorkflowExecutionInitiatedEventAttributes
+        ?.signalName ?? ''
+    );
   }
 
   if (isWorkflowExecutionSignaledEvent(event)) {
-    return event.workflowExecutionSignaledEventAttributes?.signalName;
+    return event.workflowExecutionSignaledEventAttributes?.signalName ?? '';
   }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
       return 'Local Activity';
     }
-    return event.markerRecordedEventAttributes?.markerName;
+    return event.markerRecordedEventAttributes?.markerName ?? '';
   }
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
-    return event.startChildWorkflowExecutionInitiatedEventAttributes
-      ?.workflowType?.name;
+    return (
+      event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType
+        ?.name ?? ''
+    );
   }
 
   if (isWorkflowExecutionUpdateAcceptedEvent(event)) {
-    return event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
-      ?.input?.name;
+    return (
+      event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
+        ?.input?.name ?? ''
+    );
   }
 
   if (isNexusOperationScheduledEvent(event)) {
-    return `${event.nexusOperationScheduledEventAttributes.service}.${event.nexusOperationScheduledEventAttributes.operation}`;
+    const attrs = event.nexusOperationScheduledEventAttributes;
+    const fallback = [attrs?.service, attrs?.operation]
+      .filter(Boolean)
+      .join('.');
+
+    return systemNexusGroupLabel(event) ?? fallback;
   }
+
+  return '';
 };
 
 export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
@@ -99,8 +113,10 @@ export const getEventGroupLabel = (event: CommonHistoryEvent): string => {
     isNexusOperationScheduledEvent(event) ||
     isNexusOperationStartedEvent(event)
   ) {
-    return 'Nexus Operation';
+    return systemNexusGroupLabel(event) ?? 'Nexus Operation';
   }
+
+  return '';
 };
 
 export const getEventGroupDisplayName = (event: CommonHistoryEvent): string => {

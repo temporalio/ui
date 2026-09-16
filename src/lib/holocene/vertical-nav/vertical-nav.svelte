@@ -36,13 +36,13 @@
 
   let {
     'aria-label': ariaLabel,
-    activeItemId = null,
+    activeItemId = undefined,
     class: className = '',
     children,
     ...restProps
   }: Props = $props();
 
-  const activeItem = writable<string>(activeItemId);
+  const activeItem = writable<string>(activeItemId ?? '');
   const hoveredItem = writable<string | null>(null);
   const itemElements = new Map<string, HTMLElement>();
 
@@ -54,7 +54,7 @@
 
   // Sync activeItemId prop to internal store
   $effect.pre(() => {
-    if (activeItemId !== null) {
+    if (activeItemId != null) {
       activeItem.set(activeItemId);
     }
   });
@@ -210,7 +210,7 @@
     style:transform={activeBackgroundStyles.transform}
     style:height={activeBackgroundStyles.height}
     style:opacity={activeBackgroundStyles.opacity}
-    class={`pointer-events-none absolute left-0 w-full bg-interactive-secondary-active transition-all ${ACTIVE_TRANSITION_DURATION} ease-out`}
+    class={`pointer-events-none absolute left-0 w-full rounded bg-interactive-tertiary-press transition-all ${ACTIVE_TRANSITION_DURATION} ease-out`}
     aria-hidden="true"
   ></div>
 
@@ -220,7 +220,7 @@
       style:transform={hoverBackgroundStyles.transform}
       style:height={hoverBackgroundStyles.height}
       style:opacity={showHoverOpacity ? '1' : '0'}
-      class={`pointer-events-none absolute left-0 w-full bg-interactive-secondary-hover ${
+      class={`pointer-events-none absolute left-0 w-full rounded bg-interactive-tertiary-hover ${
         enableTransitions
           ? `transition-all ${HOVER_TRANSITION_DURATION} ease-out`
           : `transition-opacity ${HOVER_TRANSITION_DURATION} ease-in`

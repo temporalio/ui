@@ -3,8 +3,12 @@
 
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconAdd,
+    IconChevronSelectorVertical,
+    IconHyphen,
+  } from '$lib/io/icon';
   import {
     type ConfigurableTableHeader,
     type ConfigurableTableType,
@@ -44,13 +48,11 @@
   class="w-[35vw] min-w-min max-w-fit"
 >
   <DrawerContent title={translate('workflows.configure-headers', { title })}>
-    <svelte:fragment slot="subtitle">
-      Add (<Icon class="inline" name="add" />), re-arrange (<Icon
+    {#snippet subtitle()}
+      Add (<IconAdd class="inline" />), re-arrange (<IconChevronSelectorVertical
         class="inline"
-        name="chevron-selector-vertical"
-      />), and remove (<Icon class="inline" name="hyphen" />), {type} to personalize
-      the {title}.
-    </svelte:fragment>
+      />), and remove (<IconHyphen class="inline" />), {type} to personalize the {title}.
+    {/snippet}
 
     <OrderableList {availableColumns} {table} {type} />
   </DrawerContent>

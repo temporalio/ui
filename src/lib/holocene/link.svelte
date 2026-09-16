@@ -1,83 +1,117 @@
 <script lang="ts">
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { goto } from '$app/navigation';
 
-  import type { IconName } from '$lib/holocene/icon';
+  import type { IconComponent } from '$lib/io/icon';
+  import { isModifiedClick } from '$lib/utilities/is-modified-click';
 
-  import Icon from './icon/icon.svelte';
-
-  type $$Props = HTMLAnchorAttributes & {
+  interface Props extends Omit<HTMLAnchorAttributes, 'class' | 'onclick'> {
     href: string;
     active?: boolean;
+    disabled?: boolean;
     interactive?: boolean;
     newTab?: boolean;
     class?: string;
-    icon?: IconName;
+    LeadingIcon?: IconComponent;
+    TrailingIcon?: IconComponent;
     text?: string;
     light?: boolean;
+    gotoParams?: Parameters<typeof goto>[1];
     'data-testid'?: string;
-  };
+    children?: Snippet;
+    onclick?: (event: MouseEvent) => void;
+  }
 
-  let className = '';
-  export { className as class };
-  export let href: string;
-  export let active = false;
-  export let interactive = false;
-  export let newTab = false;
-  export let icon: IconName = null;
-  export let text: string = '';
-  export let light = false;
+  let {
+    class: className = '',
+    href,
+    active = false,
+    disabled = false,
+    interactive = false,
+    newTab = false,
+    LeadingIcon,
+    TrailingIcon,
+    text = '',
+    light = false,
+    gotoParams = {},
+    children,
+    onclick,
+    ...rest
+  }: Props = $props();
+
+  const hasIcon = $derived(!!(LeadingIcon || TrailingIcon));
 
   const onLinkClick = (e: MouseEvent) => {
-    if (e.button === 1 || newTab || e.metaKey || e.ctrlKey || e.shiftKey)
-      return;
+    if (isModifiedClick(e) || newTab) return;
 
     e.preventDefault();
-    goto(href);
+    goto(href, gotoParams);
+  };
+
+  const handleClick = (event: MouseEvent) => {
+    event.stopPropagation();
+
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+
+    onLinkClick(event);
+    onclick?.(event);
   };
 </script>
 
 <a
-  {href}
+  href={disabled ? undefined : href}
   target={newTab ? '_blank' : null}
   rel={newTab ? 'noreferrer noopener' : null}
-  class={merge('link', icon ? 'inline-flex' : 'inline', className)}
+  class={merge('link', hasIcon ? 'inline-flex' : 'inline', className)}
   class:active
+  class:disabled
   class:interactive
   class:light
   data-track-name="link"
   data-track-intent="navigate"
   data-track-text={text || '*textContent*'}
-  on:click|stopPropagation={onLinkClick}
-  tabindex={href ? null : 0}
-  {...$$restProps}
+  aria-disabled={disabled || undefined}
+  tabindex={disabled ? -1 : href ? null : 0}
+  {...rest}
+  onclick={handleClick}
 >
-  {#if icon}
-    <Icon class="mt-0.5" name={icon} />
+  {#if LeadingIcon}
+    <LeadingIcon class="mt-0.5" />
   {/if}
   {#if text}
     {text}
   {/if}
-  <slot />
+  {@render children?.()}
+  {#if TrailingIcon}
+    <TrailingIcon class="mt-0.5" />
+  {/if}
 </a>
 
 <style lang="postcss">
   .link {
-    @apply max-w-fit cursor-pointer items-center gap-2 text-primary underline underline-offset-2 hover:text-brand focus-visible:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70;
+    @apply max-w-fit cursor-pointer items-center gap-2 rounded-sm text-primary underline underline-offset-2 hover:text-brand focus-visible:bg-surface-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary;
 
     &.active {
       @apply text-brand;
     }
 
+    &.disabled {
+      @apply pointer-events-none cursor-not-allowed opacity-disabled;
+    }
+
     &.interactive {
-      @apply text-white hover:text-indigo-200 focus-visible:text-indigo-200;
+      @apply text-white hover:text-brand focus-visible:text-white;
     }
 
     &.light {
-      @apply text-off-white hover:text-indigo-400;
+      @apply text-white hover:text-brand;
     }
   }
 

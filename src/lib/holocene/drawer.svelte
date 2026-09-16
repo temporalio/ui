@@ -1,104 +1,91 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { onDestroy, onMount, setContext } from 'svelte';
+  import type { Snippet } from 'svelte';
+  import { setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { clickoutside } from '$lib/holocene/outside-click';
+  import { portal } from '$lib/holocene/portal/portal-action';
+  import { IconClose } from '$lib/io/icon';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
-  export let open = false;
-  export let position: 'bottom' | 'right' = 'bottom';
-  export let dark = true;
-  export let onClick: (e: MouseEvent | CustomEvent) => void;
-  export let id = 'navigation-drawer';
-  export let closeButtonLabel: string;
-  export let closePadding: boolean = true;
+  interface Props {
+    open?: boolean;
+    position?: 'bottom' | 'right';
+    dark?: boolean;
+    onClick: (e: MouseEvent) => void;
+    id?: string;
+    closeButtonLabel: string;
+    closePadding?: boolean;
+    class?: string;
+    children?: Snippet;
+  }
 
-  let portalElement: HTMLElement | null = null;
+  let {
+    open = $bindable(false),
+    position = 'bottom',
+    dark = true,
+    onClick,
+    id = 'navigation-drawer',
+    closeButtonLabel,
+    closePadding = true,
+    class: className = '',
+    children,
+  }: Props = $props();
 
-  let className = '';
-  export { className as class };
-
-  $: flyParamsIn = {
+  const flyParamsIn = $derived({
     duration: 250,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
-  };
+  });
 
-  $: flyParamsOut = {
+  const flyParamsOut = $derived({
     duration: 150,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
-  };
-
-  $: {
-    setContext('drawer-pos', position);
-  }
-
-  onMount(() => {
-    portalElement = document.createElement('div');
-    portalElement.className = 'drawer-portal';
-    document.body.appendChild(portalElement);
   });
 
-  onDestroy(() => {
-    if (portalElement) {
-      document.body.removeChild(portalElement);
-    }
-  });
-
-  function portal(node: HTMLElement) {
-    if (portalElement) {
-      portalElement.appendChild(node);
-    }
-
-    return {
-      destroy() {
-        if (node.parentNode) {
-          node.parentNode.removeChild(node);
-        }
-      },
-    };
-  }
+  // svelte-ignore state_referenced_locally
+  setContext('drawer-pos', position);
 </script>
 
-{#if open && portalElement}
+{#if open}
+  <!-- Order matters: use:portal must run before use:focusTrap. Actions set up
+  top-to-bottom, and focusTrap inerts everything outside this node by walking up
+  to <body> — so the node must already be portaled into its final location, or
+  the wrong siblings get inerted. -->
   <aside
     {id}
+    data-theme={dark ? 'dark' : undefined}
     class={merge(
-      'surface-primary fixed z-[55] h-auto overflow-y-auto border-subtle text-primary',
+      'fixed z-[55] h-auto overflow-y-auto border-tertiary bg-background-primary text-primary',
       position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
       position === 'right' &&
         'right-0 top-0 h-full w-screen border-l sm:max-w-fit',
-      dark && 'bg-black text-off-white',
       className,
     )}
     in:fly={flyParamsIn}
     out:fly={flyParamsOut}
     role="region"
+    tabindex="-1"
     use:portal
     use:focusTrap={true}
     use:clickoutside={onClick}
   >
     <div class="relative h-full" class:pt-10={closePadding}>
       <div class="absolute right-2 top-2">
-        <slot name="close-button">
-          <IconButton
-            data-testid="drawer-close-button"
-            label={closeButtonLabel}
-            class={merge(
-              dark ? 'text-white' : 'text-primary',
-              'hover:text-primary',
-            )}
-            icon="close"
-            aria-expanded={open}
-            aria-controls="navigation-drawer"
-            on:click={onClick}
-          />
-        </slot>
+        <IconButton
+          data-testid="drawer-close-button"
+          label={closeButtonLabel}
+          class="text-primary"
+          Icon={IconClose}
+          aria-expanded={open}
+          aria-controls="navigation-drawer"
+          onclick={onClick}
+        />
       </div>
-      <slot />
+      {@render children?.()}
     </div>
   </aside>
 {/if}

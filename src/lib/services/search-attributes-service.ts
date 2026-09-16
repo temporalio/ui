@@ -14,8 +14,8 @@ export const fetchSearchAttributesForNamespace = async (
         request,
       });
 
-    const customAttributes = { ...searchAttributesResponse.customAttributes };
-    const systemAttributes = { ...searchAttributesResponse.systemAttributes };
+    const customAttributes = { ...searchAttributesResponse?.customAttributes };
+    const systemAttributes = { ...searchAttributesResponse?.systemAttributes };
     Object.entries(customAttributes).forEach(([key, value]) => {
       customAttributes[key] = toSearchAttributeTypeReadable(value);
     });

@@ -22,11 +22,11 @@
   const { copy, copied } = copyToClipboard();
 
   const handleCopy = (e: Event) => {
-    copy(e, copyableText);
+    copy(e, copyableText ?? '');
   };
 </script>
 
-<dt class={twMerge('col-[2] flex', className)}>
+<dd class={twMerge('col-[2] flex', className)}>
   {@render children()}
   {#if copyable}
     <!-- 
@@ -38,9 +38,9 @@
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         copied={$copied}
-        on:click={handleCopy}
+        onclick={handleCopy}
         class="absolute left-0"
       />
     </div>
   {/if}
-</dt>
+</dd>

@@ -1,12 +1,16 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import type { ComponentProps } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
 
-  export const meta = {
+  import { shouldNotBeTransparent } from './test-utilities';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
+
+  const { Story } = defineMeta({
     title: 'Button',
     component: Button,
     args: {
@@ -19,7 +23,7 @@
       variant: {
         name: 'Variant',
         control: 'select',
-        options: ['primary', 'secondary', 'destructive', 'ghost'],
+        options: ['primary', 'secondary', 'tertiary', 'destructive', 'ghost'],
       },
       size: {
         name: 'Size',
@@ -34,18 +38,20 @@
         name: 'Count',
         control: { type: 'number', min: 0, max: 99, step: 1 },
       },
-      leadingIcon: {
+      LeadingIcon: {
         name: 'Leading Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
         table: {
           category: 'Icon',
         },
       },
-      trailingIcon: {
+      TrailingIcon: {
         name: 'Trailing Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
         table: {
           category: 'Icon',
         },
@@ -74,109 +80,133 @@
         },
       },
     },
-  } satisfies Meta<Button>;
+  });
 </script>
 
 <script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import { shouldNotBeTransparent } from './test-utilities';
-
   let loading = $state(false);
 </script>
 
-<Template let:args>
-  <Button {...args} on:click={action('click')}>Click Me</Button>
-</Template>
-
-<Story name="Primary" args={{}} />
-
-<Story name="With Long Title" let:args>
-  <div class="max-w-16">
-    <Button {...args} on:click={action('click')}>Request Cancellation</Button>
+{#snippet template(args: ComponentProps<typeof Button>)}
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Button {...args} onclick={action('click')}>Click Me</Button>
   </div>
+{/snippet}
+
+<Story name="Primary" args={{}} {template} />
+
+<Story name="With Long Title">
+  {#snippet template(args)}
+    <div class="max-w-16">
+      <Button {...args} onclick={action('click')}>Request Cancellation</Button>
+    </div>
+  {/snippet}
 </Story>
 
-<Story name="Button Group" let:args>
-  <div class="button-group flex">
-    <Button {...args} on:click={action('click')}>First</Button>
-    <Button {...args} on:click={action('click')}>Middle</Button>
-    <Button {...args} on:click={action('click')}>Last</Button>
-  </div>
+<Story name="Button Group">
+  {#snippet template(args)}
+    <div class="button-group flex">
+      <Button {...args} class="rounded-r-none" onclick={action('click')}
+        >First</Button
+      >
+      <Button {...args} class="rounded-none" onclick={action('click')}
+        >Middle</Button
+      >
+      <Button {...args} class="rounded-l-none" onclick={action('click')}
+        >Last</Button
+      >
+    </div>
+  {/snippet}
 </Story>
 
 <Story
   name="Secondary"
   args={{ variant: 'secondary' }}
   play={shouldNotBeTransparent((canvas) => canvas.getByRole('button'))}
+  {template}
 />
 
-<Story name="Destructive" args={{ variant: 'destructive' }} />
+<Story name="Tertiary" args={{ variant: 'tertiary' }} {template} />
 
-<Story name="Ghost" args={{ variant: 'ghost' }} />
+<Story name="Destructive" args={{ variant: 'destructive' }} {template} />
 
-<Story name="Extra Small" args={{ size: 'xs' }} />
+<Story name="Ghost" args={{ variant: 'ghost' }} {template} />
 
-<Story name="Small" args={{ size: 'sm' }} />
+<Story name="Extra Small" args={{ size: 'xs' }} {template} />
 
-<Story name="Large" args={{ size: 'lg' }} />
+<Story name="Small" args={{ size: 'sm' }} {template} />
 
-<Story name="Loading" args={{ loading: true }} />
+<Story name="Large" args={{ size: 'lg' }} {template} />
 
-<Story name="Disabled" args={{ disabled: true }} />
+<Story name="Loading" args={{ loading: true }} {template} />
 
-<Story name="Active" args={{ active: true }} />
+<Story name="Disabled" args={{ disabled: true }} {template} />
 
-<Story name="With Count" args={{ count: 5 }} />
+<Story name="Active" args={{ active: true }} {template} />
 
-<Story name="With Leading Icon" args={{ leadingIcon: 'workflow' }} />
+<Story name="With Count" args={{ count: 5 }} {template} />
 
-<Story name="With Trailing Icon" args={{ trailingIcon: 'workflow' }} />
+<Story
+  name="With Leading Icon"
+  args={{ LeadingIcon: ioIcons.IconTemporalWorkflow }}
+  {template}
+/>
 
-<Story name="With Link" args={{ href: 'https://example.com' }} />
+<Story
+  name="With Trailing Icon"
+  args={{ TrailingIcon: ioIcons.IconTemporalWorkflow }}
+  {template}
+/>
 
-<Story name="With Leading Icon & Loading" let:args>
-  <Button
-    {...args}
-    leadingIcon="temporal-logo"
-    {loading}
-    on:click={() => {
-      loading = true;
-      setTimeout(() => {
-        loading = false;
-      }, 2000);
-    }}
-  >
-    Click me for Loading
-  </Button>
+<Story name="With Link" args={{ href: 'https://example.com' }} {template} />
+
+<Story name="With Leading Icon & Loading">
+  {#snippet template(args)}
+    <Button
+      {...args}
+      LeadingIcon={ioIcons.IconTemporal}
+      {loading}
+      onclick={() => {
+        loading = true;
+        setTimeout(() => {
+          loading = false;
+        }, 2000);
+      }}
+    >
+      Click me for Loading
+    </Button>
+  {/snippet}
 </Story>
 
-<Story name="With Trailing Icon & Loading" let:args>
-  <Button
-    {...args}
-    trailingIcon="temporal-logo"
-    {loading}
-    on:click={() => {
-      loading = true;
-      setTimeout(() => {
-        loading = false;
-      }, 2000);
-    }}>Click me for Loading</Button
-  >
+<Story name="With Trailing Icon & Loading">
+  {#snippet template(args)}
+    <Button
+      {...args}
+      TrailingIcon={ioIcons.IconTemporal}
+      {loading}
+      onclick={() => {
+        loading = true;
+        setTimeout(() => {
+          loading = false;
+        }, 2000);
+      }}>Click me for Loading</Button
+    >
+  {/snippet}
 </Story>
 
-<Story name="With Trailing and Leading Icon & Loading" let:args>
-  <Button
-    {...args}
-    trailingIcon="temporal-logo"
-    leadingIcon="temporal-logo"
-    {loading}
-    on:click={() => {
-      loading = true;
-      setTimeout(() => {
-        loading = false;
-      }, 2000);
-    }}>Click me for Loading</Button
-  >
+<Story name="With Trailing and Leading Icon & Loading">
+  {#snippet template(args)}
+    <Button
+      {...args}
+      TrailingIcon={ioIcons.IconTemporal}
+      LeadingIcon={ioIcons.IconTemporal}
+      {loading}
+      onclick={() => {
+        loading = true;
+        setTimeout(() => {
+          loading = false;
+        }, 2000);
+      }}>Click me for Loading</Button
+    >
+  {/snippet}
 </Story>

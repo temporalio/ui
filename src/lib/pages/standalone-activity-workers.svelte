@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { mapValues } from 'es-toolkit';
+
   import { page } from '$app/state';
 
   import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
+  import { activityWorkerCount } from '$lib/stores/activities';
   import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
   import { isEmptyObject } from '$lib/utilities/is';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
@@ -22,14 +25,10 @@
   const decodedSearchAttributes = $derived.by(() => {
     if (isEmptyObject(searchAttributes)) return {};
 
-    const decoded = Object.entries(
+    const decoded = mapValues(
       searchAttributes?.indexedFields ?? {},
-    ).reduce((searchAttributes, [searchAttributeName, payload]) => {
-      return {
-        ...searchAttributes,
-        [searchAttributeName]: parseRawPayloadToJSON(payload),
-      };
-    }, {});
+      (payload) => parseRawPayloadToJSON(payload),
+    ) as Record<string, string>;
     return decoded;
   });
 </script>
@@ -39,4 +38,5 @@
   {taskQueue}
   searchAttributes={decodedSearchAttributes}
   useFallback={!workerHeartbeatsEnabled || useFallback}
+  onCount={(count) => ($activityWorkerCount = count)}
 />

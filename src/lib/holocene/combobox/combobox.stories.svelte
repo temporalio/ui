@@ -1,17 +1,44 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
-  import { expect, userEvent, waitFor, within } from '@storybook/test';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { action as logAction } from 'storybook/actions';
+  import { expect, userEvent, waitFor, within } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
 
-  export const meta = {
+  import Button from '../button.svelte';
+
+  import AsyncTest from './async-test.svelte';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
+
+  type ComboboxArgs = Omit<
+    Partial<ComponentProps<typeof Combobox>>,
+    | 'options'
+    | 'value'
+    | 'optionLabelKey'
+    | 'optionValueKey'
+    | 'optionDescriptionKey'
+    | 'multiselect'
+  > & {
+    options?: readonly (string | Record<string, unknown>)[];
+    optionLabelKey?: string;
+    optionValueKey?: string;
+    optionDescriptionKey?: string;
+    multiselect?: boolean;
+    allowCustomValue?: boolean;
+    showChevron?: boolean;
+    variant?: string;
+    value?: unknown;
+  };
+
+  const { Story } = defineMeta({
     title: 'Combobox',
     component: Combobox,
     args: {
       label: 'Select a Language',
+      value: '',
       placeholder: 'Start Typing...',
       noResultsText: 'No Results',
       readonly: false,
@@ -19,7 +46,8 @@
       disabled: false,
       valid: true,
       error: '',
-      leadingIcon: 'search',
+      hintText: '',
+      LeadingIcon: ioIcons.IconSearch,
       labelHidden: false,
     },
     argTypes: {
@@ -30,41 +58,38 @@
       required: { name: 'Required', control: 'boolean' },
       disabled: { name: 'Disabled', control: 'boolean' },
       error: { name: 'Error', control: 'text' },
+      hintText: { name: 'Hint Text', control: 'text' },
       valid: { name: 'Valid', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       minSize: { name: 'Minimum Size', control: 'number' },
       maxSize: { name: 'Maximum Size', control: 'number' },
-      leadingIcon: {
-        name: 'Icon',
+      LeadingIcon: {
+        name: 'Leading Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
       },
       noResultsText: { name: 'No Results Text', control: 'text' },
       optionValueKey: { control: 'text', table: { disable: true } },
       optionLabelKey: { control: 'text', table: { disable: true } },
+      optionDescriptionKey: { control: 'text', table: { disable: true } },
 
       options: { table: { disable: true } },
     },
-  } satisfies Meta<Combobox<unknown>>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import Button from '../button.svelte';
-
-  import AsyncTest from './async-test.svelte';
-</script>
-
-<Template let:args let:context>
-  <Combobox
-    id={context.id}
-    data-testid={context.id}
-    onchange={action('change')}
-    {...args}
-  />
-</Template>
+{#snippet template(args: ComboboxArgs, context: StoryContext<ComboboxArgs>)}
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Combobox
+      {...args as unknown as ComponentProps<typeof Combobox>}
+      id={context.id}
+      data-testid={context.id}
+      onchange={logAction('change')}
+    />
+  </div>
+{/snippet}
 
 <Story
   name="String Options"
@@ -75,6 +100,44 @@
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
     await userEvent.type(combobox, 'English');
+  }}
+/>
+
+<Story
+  name="With Hint Text"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+    hintText: 'Choose the language used for this workflow.',
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    expect(combobox).toHaveAccessibleDescription(
+      'Choose the language used for this workflow.',
+    );
+  }}
+/>
+
+<Story
+  name="Error Overrides Hint Text"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+    hintText: 'Choose the language used for this workflow.',
+    error: 'Select a language.',
+    valid: false,
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    expect(combobox).toHaveAccessibleDescription('Select a language.');
+    expect(combobox).not.toHaveAccessibleDescription(
+      'Choose the language used for this workflow.',
+    );
+    expect(
+      canvas.queryByText('Choose the language used for this workflow.'),
+    ).not.toBeInTheDocument();
   }}
 />
 
@@ -101,6 +164,60 @@
     const menu = await canvas.findByRole('listbox');
 
     expect(menu).toBeInTheDocument();
+  }}
+/>
+
+<Story
+  name="Custom Options With Descriptions"
+  args={{
+    label: 'Select a Namespace',
+    options: [
+      {
+        label: 'billing-prod',
+        value: 'billing-prod',
+        description: 'Invoicing and payment workflows',
+      },
+      {
+        label: 'billing-staging',
+        value: 'billing-staging',
+        description: 'Pre-release verification',
+      },
+      {
+        label: 'search-prod',
+        value: 'search-prod',
+        description: 'Indexing pipeline',
+      },
+      { label: 'internal-tools', value: 'internal-tools' },
+    ],
+    optionLabelKey: 'label',
+    optionValueKey: 'value',
+    optionDescriptionKey: 'description',
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    await userEvent.type(combobox, 'billing');
+
+    const menu = await canvas.findByRole('listbox');
+    expect(menu).toBeInTheDocument();
+
+    // Descriptions render as a secondary line beneath the label.
+    expect(
+      canvas.getByText('Invoicing and payment workflows'),
+    ).toBeInTheDocument();
+
+    // An option without a description still renders, with no secondary line.
+    await userEvent.clear(combobox);
+    await userEvent.type(combobox, 'internal');
+    expect(canvas.getByText('internal-tools')).toBeInTheDocument();
+
+    // Filtering matches the label only — never the description.
+    await userEvent.clear(combobox);
+    await userEvent.type(combobox, 'Indexing');
+    await waitFor(() => {
+      expect(canvas.getByText('No Results')).toBeInTheDocument();
+    });
   }}
 />
 
@@ -150,6 +267,34 @@
 />
 
 <Story
+  name="Multiselect Without Count Label"
+  args={{
+    options: ['English', 'German', 'French'],
+    multiselect: true,
+    displayChips: false,
+    value: ['English'],
+    numberOfItemsSelectedLabel: () => '',
+  }}
+  play={async ({ canvasElement }) => {
+    expect(canvasElement.querySelectorAll('.rounded-sm.p-1')).toHaveLength(0);
+  }}
+/>
+
+<Story
+  name="Multiselect With Count Label"
+  args={{
+    options: ['English', 'German', 'French'],
+    multiselect: true,
+    displayChips: false,
+    value: ['English'],
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByText('1 option selected')).toBeInTheDocument();
+  }}
+/>
+
+<Story
   name="Async Select"
   play={async ({ canvasElement, id, step }) => {
     const canvas = within(canvasElement);
@@ -185,9 +330,12 @@
       );
     });
   }}
-  let:context
 >
-  <AsyncTest id={context.id}></AsyncTest>
+  {#snippet template(_args, context)}
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
+      <AsyncTest id={context.id}></AsyncTest>
+    </div>
+  {/snippet}
 </Story>
 
 <Story
@@ -246,43 +394,46 @@
 
 <Story
   name="With Action"
-  let:args
-  let:context
   play={async ({ canvasElement, id }) => {
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
     await userEvent.type(combobox, 'E');
   }}
 >
-  <div class="w-64">
-    <Combobox
-      id={context.id}
-      data-testid={context.id}
-      onchange={action('change')}
-      leadingIcon="search"
-      options={[
-        'English',
-        'English (UK)',
-        'German',
-        'French',
-        'Japanese',
-        'Spanish',
-        'Portuguese',
-        'Mandarin',
-        'Hindi',
-        'Russian',
-        'Italian',
-      ]}
-      {...args}
-    >
-      <Button
-        on:click={() => {}}
-        slot="action"
-        variant="ghost"
-        size="xs"
-        leadingIcon="close"
-        aria-label="clear"
-      />
-    </Combobox>
-  </div>
+  {#snippet template(args, context)}
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
+      <div class="w-64">
+        <Combobox
+          {...args as unknown as ComponentProps<typeof Combobox>}
+          id={context.id}
+          data-testid={context.id}
+          onchange={logAction('change')}
+          LeadingIcon={ioIcons.IconSearch}
+          options={[
+            'English',
+            'English (UK)',
+            'German',
+            'French',
+            'Japanese',
+            'Spanish',
+            'Portuguese',
+            'Mandarin',
+            'Hindi',
+            'Russian',
+            'Italian',
+          ]}
+        >
+          {#snippet action()}
+            <Button
+              onclick={() => {}}
+              variant="ghost"
+              size="xs"
+              LeadingIcon={ioIcons.IconClose}
+              aria-label="clear"
+            />
+          {/snippet}
+        </Combobox>
+      </div>
+    </div>
+  {/snippet}
 </Story>

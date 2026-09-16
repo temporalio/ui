@@ -13,7 +13,9 @@ export const workflowStatuses: readonly WorkflowStatus[] = [
   'Terminated',
 ] as const;
 
-export function isWorkflowStatusType(value: string): value is WorkflowStatus {
+export function isWorkflowStatusType(
+  value: string,
+): value is NonNullable<WorkflowStatus> {
   return workflowStatuses.includes(value as WorkflowStatus);
 }
 

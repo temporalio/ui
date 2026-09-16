@@ -1,38 +1,52 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
-  import { expect, userEvent, within } from '@storybook/test';
+  import { get, writable } from 'svelte/store';
+
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import { expect, userEvent, within } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import ToggleButton from './toggle-button.svelte';
   import ToggleButtons from './toggle-buttons.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Toggle Button',
     component: ToggleButton,
-    subcomponents: { ToggleButtons },
     argTypes: {
       group: { table: { disable: true } },
       base: { table: { disable: true } },
       href: { table: { disable: true } },
       active: { table: { disable: true } },
     },
-  } satisfies Meta<ToggleButton>;
+  });
 </script>
 
 <script lang="ts">
-  import { get, writable } from 'svelte/store';
-
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
   const selected = writable(0);
   const select = (index: number) => {
     selected.set(index);
     action('select')(index);
   };
+</script>
 
-  const play: Story['play'] = async ({ canvasElement, step }) => {
+{#snippet template(args: ComponentProps<typeof ToggleButton>)}
+  <ToggleButtons>
+    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index (name)}
+      <ToggleButton
+        {...args}
+        data-testid={`toggle-button-${index}`}
+        active={$selected === index}
+        onclick={() => select(index)}
+      >
+        {name}
+      </ToggleButton>
+    {/each}
+  </ToggleButtons>
+{/snippet}
+
+<Story
+  name="Default"
+  play={async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     selected.set(0);
     const first = await canvas.findByTestId('toggle-button-0');
@@ -43,34 +57,18 @@
       const selectedToggle = await canvas.findByTestId(
         `toggle-button-${get(selected)}`,
       );
-      expect(selectedToggle).toHaveClass('bg-interactive-secondary-active');
+      expect(selectedToggle).toHaveClass('bg-interactive-primary');
     });
     await step('Validate that the other toggles are not active', async () => {
-      expect(second).not.toHaveClass('bg-interactive-secondary-active');
-      expect(third).not.toHaveClass('bg-interactive-secondary-active');
-      expect(fourth).not.toHaveClass('bg-interactive-secondary-active');
+      expect(second).not.toHaveClass('bg-interactive-primary');
+      expect(third).not.toHaveClass('bg-interactive-primary');
+      expect(fourth).not.toHaveClass('bg-interactive-primary');
     });
     await step('Click the second toggle', async () => {
       await userEvent.click(second);
-      expect(first).not.toHaveClass('bg-interactive-secondary-active');
-      expect(second).toHaveClass('bg-interactive-secondary-active');
+      expect(first).not.toHaveClass('bg-interactive-primary');
+      expect(second).toHaveClass('bg-interactive-primary');
     });
-  };
-</script>
-
-<Template let:args>
-  <ToggleButtons>
-    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index (name)}
-      <ToggleButton
-        {...args}
-        data-testid={`toggle-button-${index}`}
-        active={$selected === index}
-        on:click={() => select(index)}
-      >
-        {name}
-      </ToggleButton>
-    {/each}
-  </ToggleButtons>
-</Template>
-
-<Story name="Default" {play} />
+  }}
+  {template}
+/>

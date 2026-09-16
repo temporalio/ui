@@ -6,15 +6,15 @@
   import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRelationship } from '$lib/io/icon';
   import {
     BATCH_OPERATION_CONTEXT,
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import { tableDensity } from '$lib/stores/table-density';
+  import { supportsWorkflowBulkActions } from '$lib/stores/workflow-bulk-actions';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
@@ -70,13 +70,13 @@
   class:child
   class="dense"
 >
-  {#if !empty && $supportsBulkActions}
+  {#if !empty && $supportsWorkflowBulkActions}
     <td class="relative">
       <Checkbox
         data-testid="batch-checkbox"
         {label}
         labelHidden
-        on:click={onClickBatchSelect}
+        onclick={onClickBatchSelect}
         {checked}
         value={workflow}
         disabled={$allSelected}
@@ -104,7 +104,7 @@
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
-            on:click={() => toggleChildrenVisibility(workflow)}
+            onclick={() => toggleChildrenVisibility(workflow)}
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
@@ -114,7 +114,7 @@
                 : translate('workflows.show-children')}
               topLeft
             >
-              <Icon name="relationship" class="scale-80" />
+              <IconRelationship />
             </Tooltip>
           </Button>
         {/if}
@@ -128,6 +128,6 @@
 
 <style lang="postcss">
   .child {
-    @apply bg-slate-100/50 dark:bg-slate-100/5;
+    @apply bg-surface-secondary;
   }
 </style>

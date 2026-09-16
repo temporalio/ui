@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  formatSummaryAttributeDisplayValue,
   getCodeBlockValue,
   getPrimaryAttributeForEvent,
   getSummaryAttribute,
@@ -246,6 +247,26 @@ describe('getCodeBlockValue', () => {
     expect(getCodeBlockValue(1)).toBe(1);
     expect(getCodeBlockValue(null)).toBe(null);
     expect(getCodeBlockValue([1, 2, 3])).toEqual([1, 2, 3]);
+  });
+});
+
+describe('formatSummaryAttributeDisplayValue', () => {
+  it('should return strings unchanged', () => {
+    expect(formatSummaryAttributeDisplayValue('completed')).toBe('completed');
+  });
+
+  it('should stringify decoded object values', () => {
+    expect(
+      formatSummaryAttributeDisplayValue({ status: 'completed', count: 1 }),
+    ).toBe('{"status":"completed","count":1}');
+  });
+
+  it('should render payload wrapper values as the first payload', () => {
+    expect(
+      formatSummaryAttributeDisplayValue({
+        payloads: [{ status: 'completed' }],
+      }),
+    ).toBe('{"status":"completed"}');
   });
 });
 

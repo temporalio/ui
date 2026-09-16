@@ -17,7 +17,7 @@
 
   const createEditorView = () => {
     return new EditorView({
-      parent: editorElement,
+      parent: editorElement ?? undefined,
       state: EditorState.create({
         doc: content,
         extensions: [
@@ -27,8 +27,8 @@
         ],
       }),
       dispatch(transaction) {
-        editorView.update([transaction]);
-        if (transaction.docChanged) {
+        editorView?.update([transaction]);
+        if (transaction.docChanged && editorView) {
           content = editorView.state.doc.toString();
         }
       },
@@ -39,7 +39,7 @@
     editorView = createEditorView();
 
     return () => {
-      editorView.destroy();
+      editorView?.destroy();
     };
   });
 </script>

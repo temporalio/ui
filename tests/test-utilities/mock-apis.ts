@@ -1,6 +1,11 @@
 import type { Page } from '@playwright/test';
 
 import {
+  mockStandaloneActivitiesListApi,
+  mockStandaloneActivityCountApi,
+  STANDALONE_ACTIVITIES_LIST_API,
+} from './mocks/activity-execution';
+import {
   mockCreateBatchOperationApi,
   mockDescribeBatchOperationApi,
 } from './mocks/batch-operations';
@@ -12,9 +17,14 @@ import {
 } from './mocks/event-history';
 import {
   mockNamespaceApi,
+  mockNamespaceWithNexusOperations,
   mockNamespaceWithNoWorkerHeartbeats,
 } from './mocks/namespace';
 import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
+import {
+  mockNexusOperationCountApi,
+  mockNexusOperationsApi,
+} from './mocks/nexus-operations';
 import { mockSchedulesApi } from './mocks/schedules';
 import { mockSchedulesCountApi } from './mocks/schedules-count';
 import { mockSearchAttributesApi } from './mocks/search-attributes';
@@ -39,6 +49,7 @@ export {
   mockNamespaceApi,
   mockNamespaceWithPauseCapability,
   mockNamespaceWithNoWorkerHeartbeats,
+  mockNamespaceWithoutStandaloneActivityStartDelay,
   NAMESPACE_API,
 } from './mocks/namespace';
 export { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
@@ -49,7 +60,13 @@ export {
   mockSearchAttributesApi,
   SEARCH_ATTRIBUTES_API,
 } from './mocks/search-attributes';
-export { mockSchedule, mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
+export {
+  mockMonthlyCalendarSchedule,
+  mockSchedule,
+  mockScheduleApi,
+  mockWeeklyCalendarSchedule,
+  SCHEDULE_API,
+} from './mocks/schedules';
 export {
   mockSchedulesCountApi,
   SCHEDULES_COUNT_API,
@@ -59,9 +76,19 @@ export {
   mockWorkflowApi,
   mockWorkflowPauseApi,
   mockWorkflowUnpauseApi,
+  mockWorkflowWithRunningActivity,
+  mockWorkflowWithPausedActivity,
+  mockActivityPauseApi,
+  mockActivityUnpauseApi,
+  mockActivityResetApi,
+  mockActivityUpdateOptionsApi,
   WORKFLOW_API,
   WORKFLOW_PAUSE_API,
   WORKFLOW_UNPAUSE_API,
+  ACTIVITY_PAUSE_API,
+  ACTIVITY_UNPAUSE_API,
+  ACTIVITY_RESET_API,
+  ACTIVITY_UPDATE_OPTIONS_API,
 } from './mocks/workflow';
 export {
   mockWorkflowsCountApi,
@@ -74,9 +101,39 @@ export {
   CREATE_BATCH_OPERATION_API,
   DESCRIBE_BATCH_OPERATION_API,
 } from './mocks/batch-operations';
+export {
+  mockRunningActivityExecution,
+  mockDelayedActivityExecution,
+  mockPausedActivityExecution,
+  mockRunningActivityExecutionInfos,
+  mockStandaloneActivityApi,
+  mockStandaloneActivitiesListApi,
+  mockStandaloneActivityCountApi,
+  mockStandaloneActivityPauseApi,
+  mockStandaloneActivityUnpauseApi,
+  mockStandaloneActivityResetApi,
+  mockStandaloneActivityUpdateOptionsApi,
+  STANDALONE_ACTIVITY_API,
+  STANDALONE_ACTIVITIES_LIST_API,
+  STANDALONE_ACTIVITY_COUNT_API,
+  STANDALONE_ACTIVITY_PAUSE_API,
+  STANDALONE_ACTIVITY_UNPAUSE_API,
+  STANDALONE_ACTIVITY_RESET_API,
+  STANDALONE_ACTIVITY_UPDATE_OPTIONS_API,
+} from './mocks/activity-execution';
 export { EVENT_HISTORY_API, mockEventHistoryApi } from './mocks/event-history';
 export { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
 export { mockWorkersApi, WORKERS_API } from './mocks/workers';
+export {
+  mockNexusOperationsApi,
+  mockNexusOperationApi,
+  mockNexusOperationCountApi,
+  NEXUS_OPERATIONS_API,
+  NEXUS_OPERATION_API,
+  NEXUS_OPERATION_COUNT_API,
+  MOCK_NEXUS_OPERATION,
+} from './mocks/nexus-operations';
+export { mockNamespaceWithNexusOperations } from './mocks/namespace';
 
 export const mockGlobalApis = (page: Page) => {
   return Promise.all([
@@ -134,11 +191,35 @@ export const mockWorkersPageApis = (
   ]);
 };
 
+export const mockNexusOperationsApis = (page: Page, { empty = false } = {}) => {
+  return Promise.all([
+    mockGlobalApis(page),
+    mockNamespaceWithNexusOperations(page),
+    mockNexusOperationsApi(page, empty),
+    mockNexusOperationCountApi(page, empty),
+    mockSearchAttributesApi(page),
+  ]);
+};
+
 export const mockBatchOperationApis = (page: Page) => {
   return Promise.all([
     mockCreateBatchOperationApi(page),
     mockDescribeBatchOperationApi(page),
   ]);
+};
+
+export const mockActivitiesApis = (page: Page) => {
+  return Promise.all([
+    mockGlobalApis(page),
+    mockNamespaceApi(page),
+    mockSearchAttributesApi(page),
+    mockStandaloneActivitiesListApi(page),
+    mockStandaloneActivityCountApi(page),
+  ]);
+};
+
+export const waitForActivitiesApis = (page: Page) => {
+  return Promise.all([page.waitForResponse(STANDALONE_ACTIVITIES_LIST_API)]);
 };
 
 export const mockWorkflowApis = (

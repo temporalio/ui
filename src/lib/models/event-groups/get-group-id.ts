@@ -33,146 +33,150 @@ import {
 
 export const getGroupId = (event: CommonHistoryEvent): string => {
   if (isActivityTaskStartedEvent(event))
-    return String(event.activityTaskStartedEventAttributes.scheduledEventId);
+    return String(event.activityTaskStartedEventAttributes?.scheduledEventId);
 
   if (isActivityTaskCanceledEvent(event)) {
-    return String(event.activityTaskCanceledEventAttributes.scheduledEventId);
+    return String(event.activityTaskCanceledEventAttributes?.scheduledEventId);
   }
 
   if (isActivityTaskCancelRequestedEvent(event)) {
     return String(
-      event.activityTaskCancelRequestedEventAttributes.scheduledEventId,
+      event.activityTaskCancelRequestedEventAttributes?.scheduledEventId,
     );
   }
 
   if (isActivityTaskFailedEvent(event)) {
-    return String(event.activityTaskFailedEventAttributes.scheduledEventId);
+    return String(event.activityTaskFailedEventAttributes?.scheduledEventId);
   }
 
   if (isActivityTaskTimedOutEvent(event)) {
-    return String(event.activityTaskTimedOutEventAttributes.scheduledEventId);
+    return String(event.activityTaskTimedOutEventAttributes?.scheduledEventId);
   }
 
   if (isActivityTaskCompletedEvent(event)) {
-    return String(event.activityTaskCompletedEventAttributes.scheduledEventId);
+    return String(event.activityTaskCompletedEventAttributes?.scheduledEventId);
   }
 
   if (isChildWorkflowExecutionStartedEvent(event)) {
     return String(
-      event.childWorkflowExecutionStartedEventAttributes.initiatedEventId,
+      event.childWorkflowExecutionStartedEventAttributes?.initiatedEventId,
     );
   }
 
   if (isChildWorkflowExecutionTerminatedEvent(event)) {
     return String(
-      event.childWorkflowExecutionTerminatedEventAttributes.initiatedEventId,
+      event.childWorkflowExecutionTerminatedEventAttributes?.initiatedEventId,
     );
   }
 
   if (isChildWorkflowExecutionCompletedEvent(event)) {
     return String(
-      event.childWorkflowExecutionCompletedEventAttributes.initiatedEventId,
+      event.childWorkflowExecutionCompletedEventAttributes?.initiatedEventId,
     );
   }
 
   if (isChildWorkflowExecutionCanceledEvent(event)) {
     return String(
-      event.childWorkflowExecutionCanceledEventAttributes.initiatedEventId,
+      event.childWorkflowExecutionCanceledEventAttributes?.initiatedEventId,
     );
   }
 
   if (isChildWorkflowExecutionFailedEvent(event)) {
     return String(
-      event.childWorkflowExecutionFailedEventAttributes.initiatedEventId,
+      event.childWorkflowExecutionFailedEventAttributes?.initiatedEventId,
     );
   }
 
   if (isChildWorkflowExecutionTimedOutEvent(event)) {
     return String(
-      event.childWorkflowExecutionTimedOutEventAttributes.initiatedEventId,
+      event.childWorkflowExecutionTimedOutEventAttributes?.initiatedEventId,
     );
   }
 
   if (isStartChildWorkflowExecutionFailedEvent(event)) {
     return String(
-      event.startChildWorkflowExecutionFailedEventAttributes.initiatedEventId,
+      event.startChildWorkflowExecutionFailedEventAttributes?.initiatedEventId,
     );
   }
 
   if (isTimerFiredEvent(event)) {
-    return String(event.timerFiredEventAttributes.startedEventId);
+    return String(event.timerFiredEventAttributes?.startedEventId);
   }
 
   if (isTimerCanceledEvent(event)) {
-    return String(event.timerCanceledEventAttributes.startedEventId);
+    return String(event.timerCanceledEventAttributes?.startedEventId);
   }
 
   if (isWorkflowExecutionUpdateCompletedEvent(event)) {
     return String(
-      event.workflowExecutionUpdateCompletedEventAttributes.acceptedEventId,
+      event.workflowExecutionUpdateCompletedEventAttributes?.acceptedEventId,
     );
   }
 
   if (isExternalWorkflowExecutionSignaledEvent(event)) {
     return String(
-      event.externalWorkflowExecutionSignaledEventAttributes.initiatedEventId,
+      event.externalWorkflowExecutionSignaledEventAttributes?.initiatedEventId,
     );
   }
 
   if (isWorkflowTaskStartedEvent(event)) {
-    return String(event.workflowTaskStartedEventAttributes.scheduledEventId);
+    return String(event.workflowTaskStartedEventAttributes?.scheduledEventId);
   }
 
   if (isWorkflowTaskCompletedEvent(event)) {
-    return String(event.workflowTaskCompletedEventAttributes.scheduledEventId);
+    return String(event.workflowTaskCompletedEventAttributes?.scheduledEventId);
   }
 
   if (isPureWorkflowTaskFailedEvent(event)) {
-    return String(event.workflowTaskFailedEventAttributes.scheduledEventId);
+    return String(event.workflowTaskFailedEventAttributes?.scheduledEventId);
   }
 
   if (isWorkflowTaskTimedOutEvent(event)) {
-    return String(event.workflowTaskTimedOutEventAttributes.scheduledEventId);
+    return String(event.workflowTaskTimedOutEventAttributes?.scheduledEventId);
   }
 
   if (isNexusOperationStartedEvent(event)) {
-    return String(event.nexusOperationStartedEventAttributes.scheduledEventId);
+    return String(event.nexusOperationStartedEventAttributes?.scheduledEventId);
   }
 
   if (isNexusOperationCompletedEvent(event)) {
     return String(
-      event.nexusOperationCompletedEventAttributes.scheduledEventId,
+      event.nexusOperationCompletedEventAttributes?.scheduledEventId,
     );
   }
 
   if (isNexusOperationFailedEvent(event)) {
-    return String(event.nexusOperationFailedEventAttributes.scheduledEventId);
+    return String(event.nexusOperationFailedEventAttributes?.scheduledEventId);
   }
 
   if (isNexusOperationCanceledEvent(event)) {
-    return String(event.nexusOperationCanceledEventAttributes.scheduledEventId);
+    return String(
+      event.nexusOperationCanceledEventAttributes?.scheduledEventId,
+    );
   }
 
   if (isNexusOperationTimedOutEvent(event)) {
-    return String(event.nexusOperationTimedOutEventAttributes.scheduledEventId);
+    return String(
+      event.nexusOperationTimedOutEventAttributes?.scheduledEventId,
+    );
   }
 
   if (isNexusOperationCancelRequestedEvent(event)) {
     return String(
-      event.nexusOperationCancelRequestedEventAttributes.scheduledEventId,
+      event.nexusOperationCancelRequestedEventAttributes?.scheduledEventId,
     );
   }
 
   if (isNexusOperationCancelRequestCompletedEvent(event)) {
     return String(
       event.nexusOperationCancelRequestCompletedEventAttributes
-        .scheduledEventId,
+        ?.scheduledEventId,
     );
   }
 
   if (isNexusOperationCancelRequestFailedEvent(event)) {
     return String(
-      event.nexusOperationCancelRequestFailedEventAttributes.scheduledEventId,
+      event.nexusOperationCancelRequestFailedEventAttributes?.scheduledEventId,
     );
   }
 

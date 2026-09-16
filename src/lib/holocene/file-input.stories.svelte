@@ -1,30 +1,22 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { fn } from 'storybook/test';
 
-  export const meta = {
+  import FileInput from './file-input.svelte';
+
+  const { Story } = defineMeta({
     title: 'File Input',
     component: FileInput,
     args: {
       id: 'file-input',
       accept: '.json',
+      onUpload: fn(),
     },
     argTypes: {
       id: { control: 'text' },
       accept: { control: 'text' },
     },
-  } satisfies Meta<typeof FileInput>;
+  });
 </script>
-
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import FileInput from './file-input.svelte';
-</script>
-
-<Template let:args>
-  <FileInput {...args} />
-</Template>
 
 <Story name="Default" />

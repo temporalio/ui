@@ -47,7 +47,7 @@
     const result = decodedPayloads.map((decodedPayload, idx) => {
       return {
         decodedValue: decodedPayload,
-        originalValue: value.payloads[idx],
+        originalValue: value.payloads![idx],
       };
     });
 
@@ -61,9 +61,9 @@
     value: T,
   ): Promise<DecodedPayloadResult> => {
     const decodedValue = await decodeEventAttributes(value);
-    const result = [
+    const result: DecodedPayloadResult = [
       {
-        decodedValue,
+        decodedValue: decodedValue ?? value,
         originalValue: value,
       },
     ];

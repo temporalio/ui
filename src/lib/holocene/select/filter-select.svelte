@@ -19,7 +19,7 @@
     label,
     value,
     options = [],
-    parameter = null,
+    parameter = undefined,
     position = undefined,
     children,
     ...rest
@@ -36,6 +36,7 @@
   let _value = $derived(parameterValue || (value && value.toString()));
 
   const onChange = () => {
+    if (!parameter) return;
     updateQueryParameters({
       parameter,
       value: _value,
@@ -48,7 +49,7 @@
   {#if children}
     {@render children()}
   {:else}
-    {#each options.map((o) => o.toString()) as option}
+    {#each options.map((option) => (option ?? '').toString()) as option}
       <Option value={option} />
     {/each}
   {/if}

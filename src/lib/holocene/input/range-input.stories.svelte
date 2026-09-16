@@ -1,11 +1,10 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import RangeInput from '$lib/holocene/input/range-input.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Range Input',
     component: RangeInput,
     args: {
@@ -42,16 +41,18 @@
       },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
     },
-  } satisfies Meta<RangeInput>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
-  <RangeInput {...args} id={context.id} />
-</Template>
+{#snippet template(
+  args: ComponentProps<typeof RangeInput>,
+  context: StoryContext<ComponentProps<typeof RangeInput>>,
+)}
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <RangeInput {...args} id={context.id} />
+  </div>
+{/snippet}
 
 <Story name="Default" />
 

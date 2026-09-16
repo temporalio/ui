@@ -1,8 +1,6 @@
 <script lang="ts" module>
   import type { Readable, Writable } from 'svelte/store';
 
-  import { twMerge as merge } from 'tailwind-merge';
-
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   export const BATCH_OPERATION_CONTEXT = 'BATCH_OPERATION_CONTEXT';
@@ -22,14 +20,15 @@
 </script>
 
 <script lang="ts">
-  import { derived as derivedStore, writable } from 'svelte/store';
+  import { derived as derivedStore } from 'svelte/store';
 
   import { onMount, setContext, type Snippet } from 'svelte';
 
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
-  import StatusCounts from '$lib/components/status-counts.svelte';
+  import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
+  import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
@@ -40,15 +39,20 @@
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
-  import SavedQueryViews from '$lib/pages/saved-query-views.svelte';
   import { fetchWorkflowTaskFailures } from '$lib/services/workflow-counts';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { createBatchSelection } from '$lib/stores/batch-selection';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
+  import {
+    DEFAULT_WORKFLOW_SYSTEM_VIEW,
+    getSystemWorkflowViews,
+    savedWorkflowQueries,
+  } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
     refresh,
@@ -86,6 +90,10 @@
     );
   });
 
+  const systemViews = $derived(
+    getSystemWorkflowViews(hasTaskFailureAttribute, $taskFailuresCount),
+  );
+
   const availableColumns = $derived(
     availableWorkflowSystemSearchAttributeColumns(
       namespace,
@@ -109,6 +117,15 @@
     $workflowsSearchParams = searchParams;
   });
 
+  const {
+    allSelected,
+    selectedItems: selectedWorkflows,
+    batchActionsVisible,
+    selectItems: selectWorkflows,
+    handleSelectAll,
+    reset: resetSelection,
+  } = createBatchSelection<WorkflowExecution>((workflow) => workflow.runId);
+
   $effect(() => {
     void namespace;
     void query;
@@ -116,11 +133,6 @@
     void $refresh;
     resetSelection();
   });
-
-  const resetSelection = () => {
-    $allSelected = false;
-    $selectedWorkflows = [];
-  };
 
   let customizationDrawerOpen = $state(false);
 
@@ -130,12 +142,6 @@
   let terminateConfirmationModalOpen = $state(false);
   let cancelConfirmationModalOpen = $state(false);
 
-  const allSelected = writable<boolean>(false);
-  const selectedWorkflows = writable<WorkflowExecution[]>([]);
-  const batchActionsVisible = derivedStore(
-    selectedWorkflows,
-    (workflows) => workflows.length > 0,
-  );
   const workflowStartEnabled = $derived(!workflowCreateDisabled(page));
 
   const terminableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
@@ -164,37 +170,6 @@
 
   const openBatchResetConfirmationModal = () => {
     batchResetConfirmationModalOpen = true;
-  };
-
-  const handleSelectAll = (workflows: WorkflowExecution[]) => {
-    allSelected.set(true);
-    selectedWorkflows.set([...workflows]);
-  };
-
-  /**
-   * Handle the selection or deselection of workflows.
-   * This modifies the existing selection. It does not replace it (i.e., if a workflow was already selected and it was not deselected by this call, it will remain selected).
-   * @param checked Whether to select or deselect workflows
-   * @param workflows Workflows to be selected or deselected
-   */
-  const selectWorkflows = (
-    checked: boolean,
-    workflows: WorkflowExecution[],
-  ): void => {
-    // Map is not being used reactively here.
-    // We could refactor the selected workflows store to use SvelteMap if we wanted to though.
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const selected = new Map($selectedWorkflows.map((w) => [w.runId, w]));
-
-    for (const workflow of workflows) {
-      if (checked) {
-        selected.set(workflow.runId, workflow);
-      } else {
-        selected.delete(workflow.runId);
-      }
-    }
-
-    selectedWorkflows.set(Array.from(selected.values()));
   };
 
   setContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT, {
@@ -245,7 +220,7 @@
 />
 
 <header class="flex flex-col gap-2">
-  <div class="flex flex-col justify-between gap-2 md:flex-row">
+  <div class="flex flex-col items-start justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
         <div class="flex flex-row flex-wrap items-start gap-2">
@@ -254,13 +229,19 @@
             data-cy="workflows-title"
           >
             {#if $supportsAdvancedVisibility}
-              <span data-testid="workflow-count"
-                >{$workflowCount.count.toLocaleString()}</span
+              <span
+                role="status"
+                aria-atomic="true"
+                class="flex items-center gap-2"
               >
-              <Translate
-                key="common.workflows-plural"
-                count={$workflowCount.count}
-              />
+                <span data-testid="workflow-count"
+                  >{$workflowCount.count.toLocaleString()}</span
+                >
+                <Translate
+                  key="common.workflows-plural"
+                  count={$workflowCount.count}
+                />
+              </span>
             {:else}
               <Translate key="workflows.recent-workflows" />
             {/if}
@@ -271,7 +252,7 @@
           {refreshTimeFormatted}
         </p>
       </div>
-      <StatusCounts bind:refreshTime />
+      <StatusCountFilters bind:refreshTime />
     </div>
     {#if headerActions || workflowStartEnabled}
       <div class="flex items-center gap-4">
@@ -286,21 +267,21 @@
   </div>
 </header>
 
-<FilterBar />
-<div class="flex overflow-auto">
-  <SavedQueryViews />
-  <div
-    class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-    )}
-  >
-    <WorkflowsSummaryConfigurableTable
-      onClickConfigure={openCustomizationDrawer}
-      {cloud}
-    />
-  </div>
-</div>
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={workflowFilters}
+    savedQueries={savedWorkflowQueries}
+    {systemViews}
+    defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
+    {searchAttributes}
+    id="workflow"
+  />
+  <FilterBar />
+  <WorkflowsSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
+    {cloud}
+  />
+</MaximizableTableView>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

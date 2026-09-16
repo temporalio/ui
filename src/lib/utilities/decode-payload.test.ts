@@ -23,6 +23,7 @@ import {
   codecEndpoint,
   includeCredentials,
   lastDataEncoderStatus,
+  overrideRemoteCodecConfiguration,
   resetLastDataEncoderSuccess,
 } from '../stores/data-encoder-config';
 
@@ -110,6 +111,37 @@ describe('parseRawPayloadToJSON with default returnDataOnly', () => {
   });
   it('Should decode a payload with encoding json/protobuf', () => {
     expect(parseRawPayloadToJSON(ProtobufEncoded)).toEqual(Base64Decoded);
+  });
+  it('Should decode a binary/protobuf SignalWithStartWorkflowExecutionRequest into typed JSON', () => {
+    const SignalWithStartBinaryProtobuf = {
+      metadata: {
+        encoding: 'YmluYXJ5L3Byb3RvYnVm',
+        messageType:
+          'dGVtcG9yYWwuYXBpLndvcmtmbG93c2VydmljZS52MS5TaWduYWxXaXRoU3RhcnRXb3JrZmxvd0V4ZWN1dGlvblJlcXVlc3Q=',
+      },
+      data: 'CgdkZWZhdWx0EhhzeXN0ZW0tbmV4dXMtd29ya2Zsb3ctaWQaDgoMRWNob1dvcmtmbG93IiYKJGZiZjdhNWQyLWY3ZWQtNGMyYi04MmI2LWZjZmVlNWQyZDJhNlgBYgt0ZXN0LXNpZ25hbA==',
+    };
+    const decoded = parseRawPayloadToJSON(
+      SignalWithStartBinaryProtobuf,
+    ) as Record<string, unknown> | null;
+    expect(decoded).not.toBeNull();
+    expect(decoded?.namespace).toBe('default');
+    expect(decoded?.workflowId).toBe('system-nexus-workflow-id');
+    expect(decoded?.signalName).toBe('test-signal');
+    expect(decoded?.workflowType).toEqual({ name: 'EchoWorkflow' });
+    expect(decoded?.taskQueue).toEqual({
+      name: 'fbf7a5d2-f7ed-4c2b-82b6-fcfee5d2d2a6',
+    });
+  });
+  it('Should leave a binary/protobuf payload untouched when messageType is unknown', () => {
+    const UnknownProtobuf = {
+      metadata: {
+        encoding: 'YmluYXJ5L3Byb3RvYnVm',
+        messageType: btoa('not.a.real.MessageType'),
+      },
+      data: 'CgVoZWxsbw==',
+    };
+    expect(parseRawPayloadToJSON(UnknownProtobuf)).toEqual(UnknownProtobuf);
   });
   it('Should decode a json payload with encoding json/plain', () => {
     expect(parseRawPayloadToJSON(JsonObjectEncoded)).toEqual(JsonObjectDecoded);
@@ -260,10 +292,15 @@ describe('parsePayloadAttributes', () => {
 });
 
 describe('decodeEventAttributes', () => {
+  beforeEach(() => {
+    overrideRemoteCodecConfiguration.set(true);
+  });
+
   afterEach(() => {
     resetLastDataEncoderSuccess();
     codecEndpoint.set(null);
     includeCredentials.set(false);
+    overrideRemoteCodecConfiguration.set(false);
     vi.clearAllMocks();
   });
 
@@ -375,6 +412,7 @@ describe('getEventAttributes', () => {
     resetLastDataEncoderSuccess();
     resetLastDataConverterSuccess();
     codecEndpoint.set(null);
+    overrideRemoteCodecConfiguration.set(false);
   });
   it('Should convert a payload through data-converter and set the success status when the endpoint is set locally and the endpoint connects', async () => {
     vi.stubGlobal('fetch', async () => {
@@ -384,6 +422,7 @@ describe('getEventAttributes', () => {
     });
 
     codecEndpoint.set('http://localhost:1337');
+    overrideRemoteCodecConfiguration.set(true);
 
     const decodedPayload = await getEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedHistoryEvent)),

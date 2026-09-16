@@ -24,7 +24,7 @@
   let { class: className = '', children }: Props = $props();
 
   const pills: { id: string; disabled: boolean }[] = [];
-  const activePill = writable<string>(null);
+  const activePill = writable<string>('');
 
   setContext<PillsContext>(PILLS, {
     registerPill: (pill: string, disabled = false) => {
@@ -40,7 +40,7 @@
 
         activePill.update((current) =>
           current === pill
-            ? (pills.find((p) => p.id !== pill && !p.disabled)?.id ?? null)
+            ? (pills.find((p) => p.id !== pill && !p.disabled)?.id ?? '')
             : current,
         );
       });
@@ -54,7 +54,7 @@
 
 <div
   class={merge(
-    'surface-subtle inline-flex flex-col items-center justify-start gap-2 rounded-md px-2 py-2 md:flex-row md:rounded-full',
+    'inline-flex flex-col items-center justify-start gap-2 rounded-md bg-surface-tertiary px-2 py-2 text-primary md:flex-row md:rounded-full',
     className,
   )}
 >

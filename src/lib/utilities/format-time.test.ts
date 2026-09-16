@@ -8,7 +8,10 @@ import {
   fromSecondsToDaysOrHours,
   fromSecondsToMinutesAndSeconds,
   getDuration,
+  getEpochMilliseconds,
   getTimestampDifference,
+  maxDate,
+  validTimeToDate,
 } from './format-time';
 
 describe('getDuration', () => {
@@ -318,6 +321,35 @@ describe('fromSecondsToDaysOrHours', () => {
   });
 });
 
+describe('getEpochMilliseconds', () => {
+  it('should return epoch milliseconds, not the sub-second component', () => {
+    expect(getEpochMilliseconds('2026-06-30T08:03:25.812286937Z')).toBe(
+      Date.parse('2026-06-30T08:03:25.812Z'),
+    );
+  });
+
+  it('should sort timestamps chronologically regardless of sub-second fraction', () => {
+    const times = [
+      '2026-06-30T11:05:30.793784947Z',
+      '2026-06-30T08:03:25.812286937Z',
+      '2026-06-30T13:01:01.591393007Z',
+    ];
+    const sorted = [...times].sort(
+      (a, b) => getEpochMilliseconds(a) - getEpochMilliseconds(b),
+    );
+    expect(sorted).toEqual([
+      '2026-06-30T08:03:25.812286937Z',
+      '2026-06-30T11:05:30.793784947Z',
+      '2026-06-30T13:01:01.591393007Z',
+    ]);
+  });
+
+  it('should return 0 for nullish input', () => {
+    expect(getEpochMilliseconds(undefined)).toBe(0);
+    expect(getEpochMilliseconds(null)).toBe(0);
+  });
+});
+
 describe('getTimestampDifference', () => {
   it('should return ms difference for two dates seconds apart', () => {
     const start = '2022-04-13T11:29:32.633009Z';
@@ -368,5 +400,114 @@ describe('formatSecondsAbbreviated', () => {
   it('should return "1ms" for 0.001 seconds', () => {
     expect(formatSecondsAbbreviated(0.001)).toBe('1ms');
     expect(formatSecondsAbbreviated('0.001')).toBe('1ms');
+  });
+});
+
+describe('maxDate', () => {
+  it('should return the latest date from a list of ISO strings', () => {
+    const result = maxDate(
+      '2022-04-13T16:29:35.630Z',
+      '2022-04-13T16:29:33.630Z',
+      '2022-04-13T16:29:41.630Z',
+    );
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:29:41.630Z');
+  });
+
+  it('should return the latest date from a list of Timestamp objects', () => {
+    const result = maxDate(
+      { seconds: '1649866175', nanos: 0 },
+      { seconds: '1649866170', nanos: 0 },
+      { seconds: '1649866180', nanos: 0 },
+    );
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:40.000Z');
+  });
+
+  it('should return the latest date when mixing Timestamps, strings, and Date instances', () => {
+    const result = maxDate(
+      '2022-04-13T16:29:35.630Z',
+      { seconds: '1649866175', nanos: 630000000 },
+      new Date('2022-04-13T16:29:41.000Z'),
+    );
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:29:41.000Z');
+  });
+
+  it('should return the only date when given a single argument', () => {
+    const result = maxDate('2022-04-13T16:29:35.630Z');
+    expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
+  });
+
+  it('should differentiate between Timestamps with different nanos in the same second', () => {
+    const result = maxDate(
+      { seconds: '1649866175', nanos: 500000000 },
+      { seconds: '1649866175', nanos: 100000000 },
+      { seconds: '1649866175', nanos: 900000000 },
+    );
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.900Z');
+  });
+
+  it('should throw RangeError when given no arguments', () => {
+    expect(() => maxDate()).toThrow(RangeError);
+  });
+});
+
+describe('validTimeToDate', () => {
+  it('should convert a Timestamp object with seconds and nanos to a Date', () => {
+    const timestamp = { seconds: '1649866175', nanos: 630571000 };
+    const result = validTimeToDate(timestamp);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.630Z');
+  });
+
+  it('should convert a Timestamp object with numeric seconds to a Date', () => {
+    const timestamp = { seconds: 1649866175, nanos: 630571000 };
+    const result = validTimeToDate(timestamp);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.630Z');
+  });
+
+  it('should convert a Timestamp object with zero nanos to a Date', () => {
+    const timestamp = { seconds: '1649866175', nanos: 0 };
+    const result = validTimeToDate(timestamp);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.000Z');
+  });
+
+  it('should convert a Timestamp object with null nanos to a Date', () => {
+    const timestamp = { seconds: '1649866175', nanos: null };
+    const result = validTimeToDate(timestamp);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.000Z');
+  });
+
+  it('should convert an ISO date string to a Date', () => {
+    const isoString = '2022-04-13T16:29:35.630Z';
+    const result = validTimeToDate(isoString);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
+  });
+
+  it('should convert an ISO date string with nanosecond precision to a Date', () => {
+    const isoString = '2022-04-13T16:29:35.630571Z';
+    const result = validTimeToDate(isoString);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
+  });
+
+  it('should return a Date when passed a Date instance', () => {
+    const date = new Date('2022-04-13T16:29:35.630Z');
+    const result = validTimeToDate(date);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
+  });
+
+  it('should throw a TypeError if given unparsable string', () => {
+    expect(() => validTimeToDate('not-a-date')).toThrow(TypeError);
+  });
+
+  it('should throw on an empty string', () => {
+    expect(() => validTimeToDate('')).toThrow(TypeError);
   });
 });

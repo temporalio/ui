@@ -100,7 +100,7 @@
 </script>
 
 {#if visibleFilters.length > 0}
-  <div class="flex flex-wrap items-center gap-2">
+  <div class="flex min-w-0 flex-wrap items-center gap-2">
     {#each visibleFilters as filterItem, i (filterItem.id)}
       {#if statusAttribute && isStatusFilter(filterItem) && i === firstExecutionStatusIndex}
         <StatusFilterChip
@@ -123,7 +123,7 @@
     {/each}
 
     {#if hasMoreFilters}
-      <Button variant="secondary" size="xs" on:click={viewMoreFilters}>
+      <Button variant="secondary" size="xs" onclick={viewMoreFilters}>
         {translate('common.view-more')}
       </Button>
     {/if}

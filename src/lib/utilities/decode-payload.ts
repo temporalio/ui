@@ -1,10 +1,15 @@
 import { decodePayloadsWithCodec as callCodecEndpoint } from '$lib/services/data-encoder';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
+import { schemaForMessageType } from '$lib/system-nexus-endpoints';
 import type { Memo, Payload, Payloads } from '$lib/types';
 import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
 import type { Optional, Replace } from '$lib/types/global';
 
 import { atob } from './atob';
+import {
+  binaryProtobufMessageType,
+  decodeBinaryProtobuf,
+} from './decode-binary-protobuf';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -83,11 +88,11 @@ export function base64ParsePayloadMetadata(
   payloadOrPayloads: Payload | Payloads,
 ): ParsedMetadata | ParsedMetadata[] {
   if (isRawPayload(payloadOrPayloads)) {
-    return parseBase64ObjectValues(payloadOrPayloads.metadata);
+    return parseBase64ObjectValues(payloadOrPayloads.metadata ?? {});
   }
 
-  return payloadOrPayloads.payloads.map((payload) =>
-    parseBase64ObjectValues(payload.metadata),
+  return (payloadOrPayloads.payloads ?? []).map((payload) =>
+    parseBase64ObjectValues(payload.metadata ?? {}),
   );
 }
 
@@ -110,10 +115,28 @@ export function parseRawPayloadToJSON(
     return payload;
   }
 
+  const messageType = binaryProtobufMessageType(payload);
+  const schema = messageType ? schemaForMessageType(messageType) : null;
+  const decoded = schema
+    ? decodeBinaryProtobuf(payload, schema, (p) =>
+        parseRawPayloadToJSON(p, true),
+      )
+    : null;
+  if (decoded) {
+    if (returnDataOnly) return decoded.data;
+    return {
+      metadata: {
+        ...parseBase64ObjectValues(payload?.metadata ?? {}),
+        encoding: 'json/plain',
+      },
+      data: decoded.data,
+    };
+  }
+
   try {
     const data = parseWithBigInt(atob(String(payload?.data ?? '')));
     if (returnDataOnly) return data;
-    const metadata = parseBase64ObjectValues(payload?.metadata);
+    const metadata = parseBase64ObjectValues(payload?.metadata ?? {});
     return {
       metadata,
       data,
@@ -129,7 +152,7 @@ export function parseRawPayloadToJSON(
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
   if (encoding === 'binary/null') {
     if (returnDataOnly) return null;
-    const metadata = parseBase64ObjectValues(payload?.metadata);
+    const metadata = parseBase64ObjectValues(payload?.metadata ?? {});
     return {
       metadata,
       data: null,
@@ -156,43 +179,62 @@ export const parsePayloadAttributes = <
   Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>
 > => {
   // Decode Search Attributes
-  if (has(eventAttribute, 'searchAttributes')) {
-    const searchAttributes = has(
+  if (
+    has<['searchAttributes'], Record<string, Payload>>(
+      eventAttribute,
+      'searchAttributes',
+    )
+  ) {
+    const searchAttributes = has<['indexedFields'], Record<string, Payload>>(
       eventAttribute.searchAttributes,
       'indexedFields',
     )
       ? eventAttribute.searchAttributes.indexedFields
       : eventAttribute.searchAttributes;
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = parseRawPayloadToJSON(value, returnDataOnly);
+      searchAttributes[key] = parseRawPayloadToJSON(
+        value,
+        returnDataOnly,
+      ) as Payload;
     });
   }
 
   // Decode Memo
-  if (has(eventAttribute, 'memo') && has(eventAttribute.memo, 'fields')) {
+  if (
+    has(eventAttribute, 'memo') &&
+    has<['fields'], Record<string, Payload>>(eventAttribute.memo, 'fields')
+  ) {
     const memo = eventAttribute.memo.fields;
 
     Object.entries(memo).forEach(([key, value]) => {
-      memo[key] = parseRawPayloadToJSON(value, returnDataOnly);
+      memo[key] = parseRawPayloadToJSON(value, returnDataOnly) as Payload;
     });
   }
 
   // Decode Header
-  if (has(eventAttribute, 'header') && has(eventAttribute.header, 'fields')) {
+  if (
+    has(eventAttribute, 'header') &&
+    has<['fields'], Record<string, Payload>>(eventAttribute.header, 'fields')
+  ) {
     const header = eventAttribute.header.fields;
 
     Object.entries(header).forEach(([key, value]) => {
-      header[key] = parseRawPayloadToJSON(value, returnDataOnly);
+      header[key] = parseRawPayloadToJSON(value, returnDataOnly) as Payload;
     });
   }
 
   // Decode Query Result
   // This one is a best guess from the previous codebase and needs verified
-  if (has(eventAttribute, 'queryResult')) {
+  if (
+    has<['queryResult'], Record<string, Payload>>(eventAttribute, 'queryResult')
+  ) {
     const queryResult = eventAttribute?.queryResult;
 
     Object.entries(queryResult).forEach(([key, value]) => {
-      queryResult[key] = parseRawPayloadToJSON(value, returnDataOnly);
+      queryResult[key] = parseRawPayloadToJSON(
+        value,
+        returnDataOnly,
+      ) as Payload;
     });
   }
 
@@ -309,7 +351,7 @@ export async function decodePayloadsAndParseDataToJSON(
   payloads: Payloads | null | undefined,
   returnDataOnly: boolean = true,
 ): Promise<unknown[]> {
-  const decoded = await decodePayloadsWithRemoteCodec(payloads?.payloads);
+  const decoded = await decodePayloadsWithRemoteCodec(payloads?.payloads ?? []);
 
   if (!decoded || !decoded[0]) {
     return [null];
@@ -356,20 +398,19 @@ const decodeEventAttributesInternal = async (
       return decoded?.[0] ?? clone;
     }
 
-    for (const key of Object.keys(clone)) {
-      if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
-        const data = toArray(clone[key]);
+    const record = clone as Record<string, unknown>;
+    for (const key of Object.keys(record)) {
+      const value = record[key];
+      if (keyIs(key, 'payloads', 'encodedAttributes') && value) {
+        const data = toArray(value as Payload | Payload[]);
         const decoded = await decode(data, returnDataOnly);
-        clone[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
-      } else {
-        const next = clone[key];
-        if (isObject(next)) {
-          clone[key] = await decodeEventAttributesInternal(
-            next,
-            decodeSetting,
-            returnDataOnly,
-          );
-        }
+        record[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
+      } else if (isObject(value)) {
+        record[key] = await decodeEventAttributesInternal(
+          value,
+          decodeSetting,
+          returnDataOnly,
+        );
       }
     }
   }

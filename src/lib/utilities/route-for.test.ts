@@ -17,9 +17,13 @@ import {
   isEventParameters,
   isNamespaceParameter,
   isWorkflowParameters,
+  routeForAgents,
   routeForArchivalWorkflows,
   routeForAuthentication,
+  routeForAuthenticationRedirect,
   routeForCallStack,
+  routeForCatalog,
+  routeForCatalogExample,
   routeForEventHistory,
   routeForEventHistoryImport,
   routeForLoginPage,
@@ -66,6 +70,27 @@ describe('routeFor', () => {
   it('should route to "workflows"', () => {
     const path = routeForWorkflows({ namespace: 'default' });
     expect(path).toBe(`${base}/namespaces/default/workflows`);
+  });
+
+  it('should route to the catalog within a namespace', () => {
+    expect(routeForCatalog({ namespace: 'default' })).toBe(
+      `${base}/namespaces/default/catalog`,
+    );
+  });
+
+  it('should route to agents within a namespace', () => {
+    expect(routeForAgents({ namespace: 'default' })).toBe(
+      `${base}/namespaces/default/agents`,
+    );
+  });
+
+  it('should encode a catalog example ID', () => {
+    expect(
+      routeForCatalogExample({
+        namespace: 'default',
+        exampleId: 'release/2026 #1',
+      }),
+    ).toBe(`${base}/namespaces/default/catalog/release%2F2026%20%231`);
   });
 
   it('should route to archival workflows', () => {
@@ -352,6 +377,43 @@ describe('routeFor SSO authentication ', () => {
 
     it('should return a URL with the correct returnUrl', () => {
       expect(routeForLoginPage('', false)).toBe(`${base}/login`);
+    });
+  });
+
+  describe('routeForAuthenticationRedirect', () => {
+    it('should return the login page when redirectToProvider is disabled', () => {
+      const settings = {
+        auth: {
+          redirectToProvider: false,
+        },
+        baseUrl: 'https://localhost',
+      };
+
+      expect(routeForAuthenticationRedirect(settings)).toBe(
+        routeForLoginPage(),
+      );
+    });
+
+    it('should return the SSO route with returnUrl when redirectToProvider is enabled', () => {
+      const settings = {
+        auth: {
+          options: ['one'],
+          redirectToProvider: true,
+        },
+        baseUrl: 'https://localhost',
+      };
+      const currentUrl = new URL(
+        'https://temporal.io/namespaces/default/workflows?one=1&two=2',
+      );
+
+      const redirectUrl = routeForAuthenticationRedirect(settings, currentUrl);
+      const parsedUrl = new URL(redirectUrl);
+
+      expect(parsedUrl.origin).toBe('https://localhost');
+      expect(parsedUrl.pathname).toBe(`${base}/auth/sso`);
+      expect(parsedUrl.searchParams.get('one')).toBe('1');
+      expect(parsedUrl.searchParams.get('two')).toBeNull();
+      expect(parsedUrl.searchParams.get('returnUrl')).toBe(currentUrl.href);
     });
   });
 

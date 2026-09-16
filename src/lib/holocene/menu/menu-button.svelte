@@ -2,17 +2,17 @@
   import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import Button, {
     type ButtonWithoutHrefProps,
   } from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     MENU_CONTEXT,
     type MenuContext,
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { IconChevronDown } from '$lib/io/icon';
 
   export interface Props extends Omit<ButtonWithoutHrefProps, 'onclick'> {
     controls: string;
@@ -77,7 +77,7 @@
   };
 
   const focusFirstMenuItem = () => {
-    const focusable: (HTMLInputElement | HTMLLIElement)[] = Array.from(
+    const focusable: HTMLElement[] = Array.from(
       $menuElement?.querySelectorAll(MENU_ITEM_SELECTORS) ?? [],
     );
 
@@ -87,42 +87,54 @@
   };
 </script>
 
-<Button
-  {id}
-  {disabled}
-  type="button"
-  on:click={handleClick}
-  on:keydown={handleKeyDown}
-  aria-haspopup={!disabled}
-  aria-controls={controls}
-  aria-expanded={$open}
-  aria-label={label}
-  {variant}
-  class={merge(className)}
-  {size}
-  active={$open}
-  disableTracking={true}
-  {...rest}
->
-  {@render leading?.()}
-  {#if children}
-    <div class="flex grow items-center">
-      {@render children()}
-    </div>
-  {/if}
-  {#if hasIndicator}
-    <div class="flex">
-      <Icon
-        name="chevron-down"
-        class={merge('transition-transform', $open && 'rotate-180')}
+<span class="menu-button-anchor" data-menu-anchor={controls}>
+  <Button
+    {id}
+    {disabled}
+    type="button"
+    onclick={handleClick}
+    onkeydown={handleKeyDown}
+    aria-haspopup={!disabled}
+    aria-controls={controls}
+    aria-expanded={$open}
+    aria-label={label}
+    {variant}
+    class={className}
+    {size}
+    active={$open}
+    disableTracking={true}
+    {...rest}
+  >
+    {@render leading?.()}
+    {#if children}
+      <div class="flex min-w-0 grow items-center">
+        {@render children()}
+      </div>
+    {/if}
+    {#if hasIndicator}
+      <div class="flex">
+        <IconChevronDown
+          class={merge('transition-transform', $open && 'rotate-180')}
+        />
+      </div>
+    {/if}
+    {@render trailing?.()}
+    {#if count > 0}
+      <BadgeCount
+        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        value={count}
       />
-    </div>
-  {/if}
-  {@render trailing?.()}
-  {#if count > 0}
-    <Badge
-      class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-      type="count">{count}</Badge
-    >
-  {/if}
-</Button>
+    {/if}
+  </Button>
+</span>
+
+<style>
+  .menu-button-anchor {
+    display: inline-flex;
+    max-width: 100%;
+  }
+
+  .menu-button-anchor:has(> :global(button.w-full)) {
+    width: 100%;
+  }
+</style>

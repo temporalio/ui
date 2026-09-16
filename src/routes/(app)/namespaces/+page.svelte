@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import { page } from '$app/stores';
 
@@ -16,37 +14,42 @@
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
-<h1 data-testid="namespace-selector-title" class="mb-8">
-  {translate('common.namespaces')}
-</h1>
+<header>
+  <h1 data-testid="namespace-selector-title" class="leading-7">
+    {translate('common.namespaces')}
+  </h1>
+</header>
 {#if $namespaces?.length > 0}
   <Pagination
     items={$namespaces}
-    let:visibleItems
     aria-label={translate('common.namespaces')}
     pageSizeSelectLabel={translate('common.per-page')}
     previousButtonLabel={translate('common.previous')}
     nextButtonLabel={translate('common.next')}
   >
-    <Table class="w-full">
-      <caption class="sr-only" slot="caption"
-        >{translate('common.namespaces')}</caption
-      >
-      <TableHeaderRow slot="headers">
-        <th>{translate('common.name')}</th>
-      </TableHeaderRow>
-      {#each visibleItems as namespace (namespace.namespaceInfo.name)}
-        <TableRow>
-          <td>
-            <Link
-              href={routeForNamespace({
-                namespace: namespace.namespaceInfo.name,
-              })}>{namespace.namespaceInfo.name}</Link
-            >
-          </td>
-        </TableRow>
-      {/each}
-    </Table>
+    {#snippet children({ visibleItems })}
+      <Table class="w-full">
+        {#snippet caption()}
+          <caption class="sr-only">{translate('common.namespaces')}</caption>
+        {/snippet}
+        {#snippet headers()}
+          <TableHeaderRow>
+            <th>{translate('common.name')}</th>
+          </TableHeaderRow>
+        {/snippet}
+        {#each visibleItems as namespace (namespace.namespaceInfo?.name)}
+          <TableRow>
+            <td>
+              <Link
+                href={routeForNamespace({
+                  namespace: namespace.namespaceInfo?.name ?? '',
+                })}>{namespace.namespaceInfo?.name}</Link
+              >
+            </td>
+          </TableRow>
+        {/each}
+      </Table>
+    {/snippet}
   </Pagination>
 {:else}
   <EmptyState

@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import { goto } from '$app/navigation';
 
@@ -19,6 +17,6 @@
   }
 
   .login-button:hover {
-    @apply rounded-md bg-purple-100 text-primary;
+    @apply rounded-md bg-slate-blue-3 text-primary;
   }
 </style>

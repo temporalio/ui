@@ -95,10 +95,10 @@
     <Button
       size="xs"
       variant="ghost"
-      class="focus-visible:border-table"
+      class="focus-visible:border-tertiary"
       data-testid="bulk-cancel-button"
       disabled={!$cancelableWorkflows.length}
-      on:click={openBatchCancelConfirmationModal}
+      onclick={openBatchCancelConfirmationModal}
       >{translate('workflows.request-cancellation')}</Button
     >
   {/if}
@@ -106,9 +106,9 @@
     <Button
       size="xs"
       variant="ghost"
-      class="focus-visible:border-table"
+      class="focus-visible:border-tertiary"
       data-testid="bulk-reset-button"
-      on:click={openBatchResetConfirmationModal}
+      onclick={openBatchResetConfirmationModal}
       >{translate('workflows.reset')}</Button
     >
   {/if}
@@ -116,9 +116,9 @@
     <Button
       size="xs"
       variant="destructive"
-      class="focus-visible:border-table"
+      class="focus-visible:border-tertiary"
       data-testid="bulk-terminate-button"
-      on:click={openBatchTerminateConfirmationModal}
+      onclick={openBatchTerminateConfirmationModal}
       >{translate('workflows.terminate')}</Button
     >
   {/if}

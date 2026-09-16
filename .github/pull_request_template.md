@@ -32,3 +32,13 @@ We work best with you when we have accepted the idea first before you code. -->
 ## Docs
 
 ### Any docs updates needed? <!--- Update README if applicable or point out where to update docs.temporal.io -->
+
+<!--
+A11y audit PRs: if this PR closes one or more accessibility audit fix docs,
+add an `A11y-Audit-Ref: <slug>` line per fix doc closed. Example:
+
+  A11y-Audit-Ref: 2.5.8-chip-remove-button
+
+The A11y PR Triage workflow uses these trailers to apply bucket labels.
+See CLAUDE.md ("Accessibility Audit Follow-up") for details.
+-->

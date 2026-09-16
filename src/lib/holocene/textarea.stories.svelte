@@ -1,11 +1,14 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { action } from 'storybook/actions';
+  import { userEvent, within } from 'storybook/test';
+  import type { ComponentProps } from 'svelte';
+
+  import { shouldNotBeTransparent } from './test-utilities';
 
   import Textarea from './textarea.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Textarea',
     component: Textarea,
     args: {
@@ -16,10 +19,11 @@
       error: '',
       required: false,
       disabled: false,
+      readonly: false,
       isValid: true,
       rows: 5,
       spellcheck: false,
-      maxLength: undefined,
+      maxLength: undefined as number | undefined,
       labelHidden: false,
     },
     argTypes: {
@@ -30,6 +34,7 @@
       error: { name: 'Error', control: 'text' },
       required: { name: 'Required', control: 'boolean' },
       disabled: { name: 'Disabled', control: 'boolean' },
+      readonly: { name: 'Read Only', control: 'boolean' },
       isValid: { name: 'Valid?', control: 'boolean' },
       rows: { name: 'Rows', control: 'range', min: 1, max: 10, step: 1 },
       spellcheck: { name: 'Spellcheck', control: 'boolean' },
@@ -37,28 +42,26 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       id: { name: 'Id', control: 'text', table: { disable: true } },
     },
-  } satisfies Meta<Textarea>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { action } from '@storybook/addon-actions';
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-  import { userEvent, within } from '@storybook/test';
-
-  import { shouldNotBeTransparent } from './test-utilities';
-</script>
-
-<Template let:args let:context>
-  <Textarea
-    on:input={action('input')}
-    on:blur={action('blue')}
-    on:change={action('change')}
-    on:focus={action('focus')}
-    on:keydown={action('keydown')}
-    id={context.id}
-    {...args}
-  />
-</Template>
+{#snippet template(
+  args: ComponentProps<typeof Textarea>,
+  context: StoryContext<ComponentProps<typeof Textarea>>,
+)}
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Textarea
+      {...args}
+      oninput={action('input')}
+      onblur={action('blue')}
+      onchange={action('change')}
+      onfocus={action('focus')}
+      onkeydown={action('keydown')}
+      id={context.id}
+    />
+  </div>
+{/snippet}
 
 <Story
   name="Default"
@@ -66,6 +69,8 @@
 />
 
 <Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Read Only" args={{ readonly: true, value: 'Read-only value' }} />
 
 <Story name="Error" args={{ error: 'An error message.', isValid: false }} />
 

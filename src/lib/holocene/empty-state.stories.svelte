@@ -1,43 +1,36 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
-  import { iconNames } from './icon';
+  import * as ioIcons from '$lib/io/icon';
 
   import EmptyState from './empty-state.svelte';
 
-  export const meta = {
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
+
+  const { Story } = defineMeta({
     title: 'Empty State',
     component: EmptyState,
     args: {
       title: 'No Resources Found',
       content: 'The resources you requested could not be found.',
       error: '',
-      icon: 'comet',
+      Icon: ioIcons.IconComet,
     },
     argTypes: {
       title: { control: 'text' },
       content: { control: 'text' },
       error: { control: 'text' },
-      icon: {
+      Icon: {
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
         table: {
           category: 'Icon',
         },
       },
     },
-  } satisfies Meta<EmptyState>;
+  });
 </script>
-
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
-  <EmptyState {...args} />
-</Template>
 
 <Story name="Default" />
 

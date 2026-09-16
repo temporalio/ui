@@ -1,10 +1,16 @@
 <script lang="ts">
+  import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter } from '$lib/io/icon';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { isActivityDelayed } from '$lib/utilities/delayed-activities';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
+  import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
+  import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { routeForStandaloneActivitiesWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
-  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
     DetailList,
@@ -13,10 +19,11 @@
     DetailListLinkValue,
     DetailListTextValue,
     DetailListTimestampValue,
+    DetailListValue,
   } from '../detail-list';
 
   import ActivityExecutionActions from './activity-actions.svelte';
-  import ActivityExecutionStatus from './activity-status.svelte';
+  import ActivityStatusBadge from './activity-status-badge.svelte';
 
   interface Props {
     activityExecutionInfo: ActivityExecutionInfo;
@@ -26,12 +33,16 @@
 
   let { activityExecutionInfo, namespace, poller }: Props = $props();
 
-  const activityType = $derived(activityExecutionInfo.activityType.name);
+  const activityType = $derived(activityExecutionInfo.activityType?.name);
   const activityTypeFilterLink = $derived(
     routeForStandaloneActivitiesWithQuery(
       { namespace },
       `ActivityType="${activityType}"`,
     ),
+  );
+  const billableActions = $derived(
+    (activityExecutionInfo.attempt ?? 0) +
+      Number(activityExecutionInfo.totalHeartbeatCount ?? 0),
   );
   const taskQueueFilterLink = $derived(
     routeForStandaloneActivitiesWithQuery(
@@ -41,40 +52,49 @@
   );
 </script>
 
-<div class="space-y-2">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      <ActivityExecutionStatus status={activityExecutionInfo.status} />
-      <div class="text-2xl font-medium">
+<div class="flex flex-col gap-4">
+  <div
+    class="flex items-start justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
+  >
+    <div class="flex items-center gap-4">
+      <ActivityStatusBadge
+        status={toActivityStatus(activityExecutionInfo.status)}
+        delayed={isActivityDelayed(activityExecutionInfo)}
+      />
+      <h1
+        data-testid="activity-id-heading"
+        class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+      >
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={activityExecutionInfo.activityId}
+          content={activityExecutionInfo.activityId ?? ''}
           clickAllToCopy
           container-class="w-full"
           class="overflow-hidden text-ellipsis text-left"
         />
-      </div>
+      </h1>
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
-  <DetailList aria-label="activity execution details" rowCount={4}>
+  <DetailList
+    aria-label="activity execution details"
+    rowCount={activityExecutionInfo.executionTime ? 4 : 3}
+  >
     <DetailListColumn>
-      <DetailListLabel
-        >{translate('standalone-activities.scheduled-time')}</DetailListLabel
-      >
+      <DetailListLabel>{translate('common.start')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.scheduleTime}
       />
-      <DetailListLabel
-        >{translate('standalone-activities.last-started-time')}</DetailListLabel
-      >
-      <DetailListTimestampValue
-        timestamp={activityExecutionInfo.lastStartedTime}
-      />
-      <DetailListLabel
-        >{translate('standalone-activities.close-time')}</DetailListLabel
-      >
+      {#if activityExecutionInfo.executionTime}
+        <DetailListLabel
+          >{translate('standalone-activities.execution-time')}</DetailListLabel
+        >
+        <DetailListTimestampValue
+          timestamp={activityExecutionInfo.executionTime}
+        />
+      {/if}
+      <DetailListLabel>{translate('common.end')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.closeTime}
         fallback="-"
@@ -84,7 +104,7 @@
       >
       <DetailListTextValue
         text={activityExecutionInfo.executionDuration
-          ? fromSeconds(activityExecutionInfo.executionDuration)
+          ? formatDurationAbbreviated(activityExecutionInfo.executionDuration)
           : '-'}
       />
     </DetailListColumn>
@@ -92,15 +112,15 @@
       <DetailListLabel
         >{translate('standalone-activities.run-id')}</DetailListLabel
       >
-      <DetailListTextValue copyable text={activityExecutionInfo.runId} />
+      <DetailListTextValue copyable text={activityExecutionInfo.runId ?? ''} />
       {#if activityType}
         <DetailListLabel
           >{translate('standalone-activities.activity-type')}</DetailListLabel
         >
         <DetailListLinkValue
           copyable
-          iconName="filter"
-          text={activityType}
+          Icon={IconFilter}
+          text={activityType ?? ''}
           href={activityTypeFilterLink}
         />
       {/if}
@@ -109,10 +129,34 @@
       >
       <DetailListLinkValue
         copyable
-        iconName="filter"
-        text={activityExecutionInfo.taskQueue}
+        Icon={IconFilter}
+        text={activityExecutionInfo.taskQueue ?? ''}
         href={taskQueueFilterLink}
       />
+    </DetailListColumn>
+    <DetailListColumn>
+      {#if $isCloud}
+        <DetailListLabel
+          >{translate('workflows.billable-actions')}</DetailListLabel
+        >
+        <DetailListTextValue text={String(billableActions)} />
+      {:else}
+        <DetailListLabel
+          >{translate('workflows.state-transitions')}</DetailListLabel
+        >
+        <DetailListTextValue
+          text={activityExecutionInfo.stateTransitionCount}
+        />
+      {/if}
+      {#if activityExecutionInfo.sdkName && activityExecutionInfo.sdkVersion}
+        <DetailListLabel>{translate('workflows.sdk')}</DetailListLabel>
+        <DetailListValue>
+          <SdkLogo
+            sdk={formatSDKName(activityExecutionInfo.sdkName)}
+            version={activityExecutionInfo.sdkVersion}
+          />
+        </DetailListValue>
+      {/if}
     </DetailListColumn>
   </DetailList>
 </div>

@@ -1,26 +1,43 @@
-<script lang="ts">
+<script lang="ts" generics="T">
   import { writable, type Writable } from 'svelte/store';
 
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { RadioGroupContext } from './types';
 
+  import RadioControl from './radio-control.svelte';
   import { RADIO_GROUP_CONTEXT } from './radio-group.svelte';
 
-  type T = $$Generic;
+  interface Props {
+    value: T;
+    id: string;
+    label: string;
+    labelContainerClass?: string;
+    description?: string;
+    disabled?: boolean;
+    class?: string;
+    labelBadge?: Snippet;
+    icon?: Snippet;
+    children?: Snippet;
+  }
 
-  export let value: T;
-  export let id: string;
-  export let label: string;
-  export let description: string = '';
-  export let disabled: boolean = false;
+  let {
+    value,
+    id,
+    label,
+    labelContainerClass = '',
+    description = '',
+    disabled = false,
+    class: className = '',
+    labelBadge,
+    icon,
+    children,
+  }: Props = $props();
 
-  let className: string = '';
-  export { className as class };
-
-  let internalGroup: Writable<T> = writable(value);
-  let internalName: string = '';
+  // svelte-ignore state_referenced_locally
+  const internalGroup: Writable<T> = writable(value);
+  const internalName = '';
 
   const ctx = getContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT) ?? {
     name: internalName,
@@ -29,14 +46,19 @@
 
   const { name, group } = ctx;
 
-  $: selected = $group === value;
+  const selected = $derived($group === value);
+  // The panel sits directly beneath the card with a shared edge, so the card
+  // gives up its bottom corners rather than rounding into it.
+  const hasPanel = $derived(selected && !!children);
 </script>
 
 <div class={merge('flex flex-col', className)}>
   <div
     class={merge(
-      'flex items-start gap-3 border p-4',
-      'border-subtle',
+      'flex items-start gap-3 rounded border p-4',
+      'border-primary',
+      hasPanel && 'rounded-b-none',
+      labelContainerClass,
       disabled && 'opacity-50',
     )}
   >
@@ -47,10 +69,9 @@
       )}
       for={id}
     >
-      <input
-        bind:group={$group}
-        type="radio"
-        class="radio-card-input surface-primary mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border border-secondary"
+      <RadioControl
+        {group}
+        class="mt-0.5 shrink-0"
         {name}
         {value}
         {id}
@@ -59,48 +80,25 @@
       <div class="flex-1">
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span class="text-sm font-medium">{label}</span>
-          <slot name="label-badge" />
+          {@render labelBadge?.()}
         </div>
         {#if description}
           <p class="text-sm text-secondary">{description}</p>
         {/if}
       </div>
     </label>
-    {#if $$slots.icon}
+    {#if icon}
       <div class="shrink-0">
-        <slot name="icon" />
+        {@render icon()}
       </div>
     {/if}
   </div>
 
-  {#if selected && $$slots.default}
-    <div class="surface-background border border-t-0 border-subtle p-5">
-      <slot />
+  {#if selected && children}
+    <div
+      class="rounded-b border border-t-0 border-primary bg-background-primary p-5 text-primary"
+    >
+      {@render children()}
     </div>
   {/if}
 </div>
-
-<style lang="postcss">
-  .radio-card-input {
-    @apply box-border cursor-pointer outline-none;
-
-    &:checked {
-      @apply bg-interactive shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
-    }
-
-    &:enabled {
-      &:focus-visible,
-      &:hover {
-        @apply bg-interactive-active ring-2 ring-primary/70;
-
-        &:not(:active) {
-          @apply border-inverse;
-        }
-      }
-    }
-
-    &:disabled {
-      @apply cursor-not-allowed opacity-50;
-    }
-  }
-</style>

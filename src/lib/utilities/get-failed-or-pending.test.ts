@@ -37,17 +37,17 @@ const failedLocalEvent = {
 };
 
 const completedEventGroup = {
-  events: [completedEvent],
+  eventList: [completedEvent],
   classification: 'Completed',
   isPending: false,
 };
 const failedEventGroup = {
-  events: [failedEvent],
+  eventList: [failedEvent],
   classification: 'Failed',
   isPending: false,
 };
 const pendingEventGroup = {
-  events: [failedEvent],
+  eventList: [failedEvent],
   classification: 'Failed',
   isPending: true,
 };

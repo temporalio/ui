@@ -6,9 +6,9 @@ import type {
   CreateWorkerDeploymentVersionRequest,
   DeploymentParameters,
   DeploymentVersionParameters,
+  DescribeWorkerDeploymentResponse,
+  ListWorkerDeployment,
   ListWorkerDeploymentsResponse,
-  WorkerDeploymentResponse,
-  WorkerDeploymentSummary,
   WorkerDeploymentVersionResponse,
 } from '$lib/types/deployments';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -19,7 +19,39 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 type PaginatedDeploymentsPromise = (
   pageSize: number,
   token: string,
-) => Promise<{ items: WorkerDeploymentSummary[]; nextPageToken: string }>;
+) => Promise<{ items: ListWorkerDeployment[]; nextPageToken: string }>;
+
+const emptyWorkerDeploymentResponse = {
+  conflictToken: '',
+  workerDeploymentInfo: {
+    name: '',
+    createTime: {},
+    routingConfig: {},
+    lastModifierIdentity: '',
+    versionSummaries: [],
+  },
+} satisfies DescribeWorkerDeploymentResponse;
+
+const emptyWorkerDeploymentVersionResponse: WorkerDeploymentVersionResponse = {
+  workerDeploymentVersionInfo: {
+    version: '',
+    deploymentName: '',
+    createTime: {},
+    routingChangedTime: {},
+    currentSinceTime: {},
+    rampingSinceTime: {},
+    rampPercentage: 0,
+    taskQueueInfos: [],
+    drainageInfo: {
+      status: '',
+      lastChangedTime: {},
+      lastCheckedTime: {},
+    },
+    metadata: {
+      entries: {},
+    },
+  },
+};
 
 export const fetchPaginatedDeployments = async (
   namespace: string,
@@ -31,15 +63,16 @@ export const fetchPaginatedDeployments = async (
     const route = routeForApi('worker-deployments', { namespace });
     return requestFromAPI<ListWorkerDeploymentsResponse>(route, {
       params: {
-        maximumPageSize: String(pageSize),
+        pageSize: String(pageSize),
         nextPageToken: token,
         ...(query ? { query } : {}),
       },
       request,
       onError,
-    }).then(({ workerDeployments, nextPageToken }) => {
+    }).then((response) => {
+      const { workerDeployments, nextPageToken } = response ?? {};
       return {
-        items: workerDeployments,
+        items: workerDeployments ?? [],
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });
@@ -63,15 +96,23 @@ export const createWorkerDeployment = async (
     },
     onError,
     notifyOnError: false,
-  });
+  }).then((response) => response ?? { conflictToken: '' });
 };
 
 export const fetchDeployment = async (
   parameters: DeploymentParameters,
   request = fetch,
-): Promise<WorkerDeploymentResponse> => {
+  onError?: ErrorCallback,
+  notifyOnError = true,
+  signal?: AbortSignal,
+): Promise<DescribeWorkerDeploymentResponse> => {
   const route = routeForApi('worker-deployment', parameters);
-  return requestFromAPI(route, { request });
+  return requestFromAPI<DescribeWorkerDeploymentResponse>(route, {
+    request,
+    onError,
+    notifyOnError,
+    options: { signal },
+  }).then((response) => response ?? emptyWorkerDeploymentResponse);
 };
 
 export const fetchDeploymentVersion = async (
@@ -79,7 +120,9 @@ export const fetchDeploymentVersion = async (
   request = fetch,
 ): Promise<WorkerDeploymentVersionResponse> => {
   const route = routeForApi('worker-deployment-version', parameters);
-  return requestFromAPI(route, { request });
+  return requestFromAPI<WorkerDeploymentVersionResponse>(route, {
+    request,
+  }).then((response) => response ?? emptyWorkerDeploymentVersionResponse);
 };
 
 export const deleteWorkerDeployment = async (
@@ -149,11 +192,14 @@ export const createWorkerDeploymentVersion = async (
 
 const toScalingGroupsPayload = (
   computeConfig: ComputeConfig,
-): Record<string, { scalingGroup: ComputeConfigScalingGroup }> =>
+): Record<
+  string,
+  { scalingGroup: ComputeConfigScalingGroup; updateMask: string }
+> =>
   Object.fromEntries(
     Object.entries(computeConfig.scalingGroups ?? {}).map(([name, group]) => [
       name,
-      { scalingGroup: group },
+      { scalingGroup: group, updateMask: 'provider,scaler' },
     ]),
   );
 
@@ -196,6 +242,29 @@ export const validateWorkerDeploymentVersionComputeConfig = async (
     },
     onError,
     notifyOnError: false,
+  }).then((response) => response ?? { valid: false });
+};
+
+/**
+ * The validation API has two modes: a submitted scaling-group change is a
+ * candidate-config dry run, while an empty body validates the persisted/current
+ * config and lets the backend persist its connection status asynchronously.
+ */
+export const validateCurrentWorkerDeploymentVersionComputeConfig = async (
+  parameters: DeploymentVersionParameters,
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-version-validate-compute-config',
+    parameters,
+  );
+  await requestFromAPI<void>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({}),
+    },
+    onError,
+    notifyOnError: false,
   });
 };
 
@@ -218,52 +287,169 @@ export const setCurrentDeploymentVersion = async (
   });
 };
 
-export const buildLambdaComputeConfig = (
-  lambdaArn: string,
-  iamRoleArn: string,
-  scalingOptions?: {
-    scaleUpCooloffMs?: number;
-    scaleUpBacklogThreshold?: number;
-    maxWorkerLifetimeMs?: number;
-    scaleUpDispatchRateEpsilon?: number;
-    metricsPollIntervalMs?: number;
-    roleExternalId?: string;
+export const unsetCurrentDeploymentVersion = async (
+  parameters: DeploymentParameters & { conflictToken?: string },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-current-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        buildId: '',
+        ...(parameters.conflictToken
+          ? { conflictToken: parameters.conflictToken }
+          : {}),
+      }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
+export const setRampingDeploymentVersion = async (
+  request: DeploymentVersionParameters & {
+    rampingVersionPercentage: number;
+    conflictToken?: string;
   },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi('worker-deployment-set-ramping-version', {
+    namespace: request.namespace,
+    deploymentName: request.deploymentName,
+  });
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        buildId: request.buildId,
+        percentage: request.rampingVersionPercentage,
+        ...(request.conflictToken
+          ? { conflictToken: request.conflictToken }
+          : {}),
+      }),
+    },
+    onError,
+  });
+};
+
+export const removeRampingDeploymentVersion = async (
+  request: DeploymentParameters & { conflictToken?: string },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi('worker-deployment-set-ramping-version', request);
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        buildId: '',
+        ...(request.conflictToken
+          ? { conflictToken: request.conflictToken }
+          : {}),
+      }),
+    },
+    onError,
+  });
+};
+
+export const setRampingUnversionedWorkers = async (
+  parameters: DeploymentParameters & { percentage: number },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-ramping-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        buildId: '',
+        percentage: parameters.percentage,
+      }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
+export const removeRampingUnversionedWorkers = async (
+  parameters: DeploymentParameters & { conflictToken?: string },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-ramping-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        buildId: '',
+        ...(parameters.conflictToken
+          ? { conflictToken: parameters.conflictToken }
+          : {}),
+      }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
+type InvokeScalingOptions = {
+  scaleUpCooloffMs?: number;
+  scaleUpBacklogThreshold?: number;
+  maxWorkerLifetimeMs?: number;
+  scaleUpDispatchRateEpsilon?: number;
+  metricsPollIntervalMs?: number;
+  roleExternalId?: string;
+};
+
+// Lambda and AgentCore are both invoke-based providers in
+// temporal-auto-scaled-workers, so they pair with the `no-sync` scaler and take
+// the same role/external-id details. They differ only in the provider type and
+// the key naming the resource to invoke: `arn` for Lambda, `endpoint_arn` for
+// AgentCore.
+const buildInvokeComputeConfig = (
+  providerType: 'aws-lambda' | 'aws-agentcore',
+  resourceKey: 'arn' | 'endpoint_arn',
+  resourceArn: string,
+  iamRoleArn: string,
+  scalingOptions: InvokeScalingOptions = {},
 ): ComputeConfig => {
   const providerPayload: Record<string, string> = {
-    arn: lambdaArn,
+    [resourceKey]: resourceArn,
     role: iamRoleArn,
   };
-  if (scalingOptions?.roleExternalId)
+  if (scalingOptions.roleExternalId)
     providerPayload['role_external_id'] = scalingOptions.roleExternalId;
   const providerJson = JSON.stringify(providerPayload);
   const providerData = btoa(providerJson);
   const encoding = btoa('json/plain');
 
   const scalerConfig: Record<string, number> = {};
-  if (scalingOptions?.scaleUpCooloffMs !== undefined)
+  if (scalingOptions.scaleUpCooloffMs !== undefined)
     scalerConfig['scale_up_cooloff_ms'] = scalingOptions.scaleUpCooloffMs;
-  if (scalingOptions?.scaleUpBacklogThreshold !== undefined)
+  if (scalingOptions.scaleUpBacklogThreshold !== undefined)
     scalerConfig['scale_up_backlog_threshold'] =
       scalingOptions.scaleUpBacklogThreshold;
-  if (scalingOptions?.maxWorkerLifetimeMs !== undefined)
+  if (scalingOptions.maxWorkerLifetimeMs !== undefined)
     scalerConfig['max_worker_lifetime_ms'] = scalingOptions.maxWorkerLifetimeMs;
-  if (scalingOptions?.scaleUpDispatchRateEpsilon !== undefined)
+  if (scalingOptions.scaleUpDispatchRateEpsilon !== undefined)
     scalerConfig['scale_up_dispatch_rate_epsilon'] =
       scalingOptions.scaleUpDispatchRateEpsilon;
-  if (scalingOptions?.metricsPollIntervalMs !== undefined)
+  if (scalingOptions.metricsPollIntervalMs !== undefined)
     scalerConfig['metrics_poll_interval_ms'] =
       scalingOptions.metricsPollIntervalMs;
 
   return {
     scalingGroups: {
       default: {
-        taskQueueTypes: [
-          'TASK_QUEUE_TYPE_WORKFLOW',
-          'TASK_QUEUE_TYPE_ACTIVITY',
-        ],
         provider: {
-          type: 'aws-lambda',
+          type: providerType,
           details: { metadata: { encoding }, data: providerData },
         },
         scaler: {
@@ -278,10 +464,88 @@ export const buildLambdaComputeConfig = (
   };
 };
 
+export const buildLambdaComputeConfig = (
+  lambdaArn: string,
+  iamRoleArn: string,
+  scalingOptions?: InvokeScalingOptions,
+): ComputeConfig =>
+  buildInvokeComputeConfig(
+    'aws-lambda',
+    'arn',
+    lambdaArn,
+    iamRoleArn,
+    scalingOptions,
+  );
+
+export const buildAgentCoreComputeConfig = (
+  agentCoreEndpointArn: string,
+  iamRoleArn: string,
+  scalingOptions?: InvokeScalingOptions,
+): ComputeConfig =>
+  buildInvokeComputeConfig(
+    'aws-agentcore',
+    'endpoint_arn',
+    agentCoreEndpointArn,
+    iamRoleArn,
+    scalingOptions,
+  );
+
+export const buildGcpCloudRunComputeConfig = (
+  project: string,
+  region: string,
+  workerPool: string,
+  serviceAccount: string,
+  scalingOptions: {
+    minReplicas?: number;
+    maxReplicas?: number;
+    initialReplicas?: number;
+    utilizationTarget?: number;
+    scaleDownStabilizationMs?: number;
+  } = {},
+): ComputeConfig => {
+  const providerPayload: Record<string, string> = {
+    project,
+    region,
+    worker_pool: workerPool,
+    service_account: serviceAccount,
+  };
+  const providerData = btoa(JSON.stringify(providerPayload));
+  const encoding = btoa('json/plain');
+  const scalerConfig = {
+    min_count: scalingOptions.minReplicas ?? 0,
+    max_count: scalingOptions.maxReplicas ?? 30,
+    initial_count: scalingOptions.initialReplicas ?? 0,
+    utilization_target: scalingOptions.utilizationTarget ?? 0.8,
+    no_sync_quiet_ms: scalingOptions.scaleDownStabilizationMs ?? 90_000,
+  };
+
+  return {
+    scalingGroups: {
+      default: {
+        provider: {
+          type: 'gcp-cloud-run',
+          details: { metadata: { encoding }, data: providerData },
+        },
+        scaler: {
+          type: 'rate-based',
+          details: {
+            metadata: { encoding },
+            data: btoa(JSON.stringify(scalerConfig)),
+          },
+        },
+      },
+    },
+  };
+};
+
+const providerTypeOf = (scalingGroup?: ComputeConfigScalingGroup) =>
+  scalingGroup?.providerType ?? scalingGroup?.provider?.type;
+
 export const decodeLambdaProviderDetails = (
   computeConfig?: ComputeConfig,
 ): { lambdaArn?: string; iamRoleArn?: string; roleExternalId?: string } => {
   const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'aws-lambda') return {};
   if (!scalingGroup?.provider?.details?.data) return {};
   try {
     const raw = JSON.parse(atob(scalingGroup.provider.details.data));
@@ -299,6 +563,52 @@ export const decodeLambdaProviderDetails = (
   }
 };
 
+export const decodeAgentCoreProviderDetails = (
+  computeConfig?: ComputeConfig,
+): {
+  agentCoreEndpointArn?: string;
+  iamRoleArn?: string;
+  roleExternalId?: string;
+} => {
+  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'aws-agentcore') return {};
+  if (!scalingGroup?.provider?.details?.data) return {};
+  try {
+    const raw = JSON.parse(atob(scalingGroup.provider.details.data));
+    const result: ReturnType<typeof decodeAgentCoreProviderDetails> = {};
+    if (raw.endpoint_arn) result.agentCoreEndpointArn = raw.endpoint_arn;
+    if (raw.role) result.iamRoleArn = raw.role;
+    if (raw.role_external_id) result.roleExternalId = raw.role_external_id;
+    return result;
+  } catch {
+    return {};
+  }
+};
+
+export const decodeGcpCloudRunProviderDetails = (
+  computeConfig?: ComputeConfig,
+): {
+  gcpProject?: string;
+  gcpRegion?: string;
+  gcpWorkerPool?: string;
+  gcpServiceAccount?: string;
+} => {
+  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'gcp-cloud-run') return {};
+  if (!scalingGroup?.provider?.details?.data) return {};
+  try {
+    const raw = JSON.parse(atob(scalingGroup.provider.details.data));
+    const result: ReturnType<typeof decodeGcpCloudRunProviderDetails> = {};
+    if (raw.project) result.gcpProject = raw.project;
+    if (raw.region) result.gcpRegion = raw.region;
+    if (raw.worker_pool) result.gcpWorkerPool = raw.worker_pool;
+    if (raw.service_account) result.gcpServiceAccount = raw.service_account;
+    return result;
+  } catch {
+    return {};
+  }
+};
+
 export const decodeScalerDetails = (
   computeConfig?: ComputeConfig,
 ): {
@@ -307,6 +617,11 @@ export const decodeScalerDetails = (
   maxWorkerLifetimeMs?: number;
   scaleUpDispatchRateEpsilon?: number;
   metricsPollIntervalMs?: number;
+  minReplicas?: number;
+  maxReplicas?: number;
+  initialReplicas?: number;
+  utilizationTarget?: number;
+  scaleDownStabilizationMs?: number;
 } => {
   const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
   if (!scalingGroup?.scaler?.details?.data) return {};
@@ -323,6 +638,14 @@ export const decodeScalerDetails = (
       result.scaleUpDispatchRateEpsilon = raw['scale_up_dispatch_rate_epsilon'];
     if (raw['metrics_poll_interval_ms'] !== undefined)
       result.metricsPollIntervalMs = raw['metrics_poll_interval_ms'];
+    if (raw['min_count'] !== undefined) result.minReplicas = raw['min_count'];
+    if (raw['max_count'] !== undefined) result.maxReplicas = raw['max_count'];
+    if (raw['initial_count'] !== undefined)
+      result.initialReplicas = raw['initial_count'];
+    if (raw['utilization_target'] !== undefined)
+      result.utilizationTarget = raw['utilization_target'];
+    if (raw['no_sync_quiet_ms'] !== undefined)
+      result.scaleDownStabilizationMs = raw['no_sync_quiet_ms'];
     return result;
   } catch {
     return {};

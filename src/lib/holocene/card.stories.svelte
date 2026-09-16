@@ -1,29 +1,27 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import Card from './card.svelte';
 
-  export const meta = {
+  const { Story } = defineMeta({
     title: 'Card',
     component: Card,
-  } satisfies Meta<Card>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
-  <Card {...args}>
-    <p>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
-      exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
-      sed rerum necessitatibus minima nobis, ullam minus inventore voluptates
-      itaque?
-    </p>
-  </Card>
-</Template>
+{#snippet template(args: ComponentProps<typeof Card>)}
+  <div class="bg-surface-primary p-4 text-primary">
+    <Card {...args}>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
+        exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
+        sed rerum necessitatibus minima nobis, ullam minus inventore voluptates
+        itaque?
+      </p>
+    </Card>
+  </div>
+{/snippet}
 
 <Story name="Default" />

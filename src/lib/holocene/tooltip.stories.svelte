@@ -1,13 +1,14 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
-  import { iconNames } from '$lib/holocene/icon';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import * as ioIcons from '$lib/io/icon';
 
-  export const meta = {
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
+
+  const { Story } = defineMeta({
     title: 'Tooltip',
     component: Tooltip,
     args: {
@@ -27,7 +28,12 @@
         control: 'boolean',
         if: { arg: 'hide', neq: true },
       },
-      icon: { name: 'Icon', control: 'select', options: iconNames },
+      Icon: {
+        name: 'Icon',
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
       width: { name: 'Width', control: { type: 'range', min: 0, max: 400 } },
       top: {
         name: 'Top',
@@ -70,72 +76,85 @@
         table: { category: 'Positioning' },
       },
     },
-  } satisfies Meta<Tooltip>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args let:context>
+{#snippet template(
+  args: ComponentProps<typeof Tooltip>,
+  context: StoryContext<ComponentProps<typeof Tooltip>>,
+)}
   <div class="flex h-screen w-full items-center justify-center">
     <Tooltip {...args}>
       <Button>{context.name} Tooltip</Button>
     </Tooltip>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Top" args={{ top: true }} />
 
-<Story name="Top with Icon" args={{ top: true, icon: 'trash' }} />
+<Story name="Top with Icon" args={{ top: true, Icon: ioIcons.IconTrash }} />
 
 <Story name="Top Right" args={{ topRight: true }} />
 
-<Story name="Top Right with Icon" args={{ topRight: true, icon: 'trash' }} />
+<Story
+  name="Top Right with Icon"
+  args={{ topRight: true, Icon: ioIcons.IconTrash }}
+/>
 
 <Story name="Top Left" args={{ topLeft: true }} />
 
-<Story name="Top Left with Icon" args={{ topLeft: true, icon: 'trash' }} />
+<Story
+  name="Top Left with Icon"
+  args={{ topLeft: true, Icon: ioIcons.IconTrash }}
+/>
 
 <Story name="Bottom" args={{ bottom: true }} />
 
-<Story name="Bottom with Icon" args={{ bottom: true, icon: 'trash' }} />
+<Story
+  name="Bottom with Icon"
+  args={{ bottom: true, Icon: ioIcons.IconTrash }}
+/>
 
 <Story name="Bottom Right" args={{ bottomRight: true }} />
 
 <Story
   name="Bottom Right with Icon"
-  args={{ bottomRight: true, icon: 'trash' }}
+  args={{ bottomRight: true, Icon: ioIcons.IconTrash }}
 />
 
 <Story name="Bottom Left" args={{ bottomLeft: true }} />
 
 <Story
   name="Bottom Left with Icon"
-  args={{ bottomLeft: true, icon: 'trash' }}
+  args={{ bottomLeft: true, Icon: ioIcons.IconTrash }}
 />
 
 <Story name="Left" args={{ left: true }} />
 
-<Story name="Left with Icon" args={{ left: true, icon: 'trash' }} />
+<Story name="Left with Icon" args={{ left: true, Icon: ioIcons.IconTrash }} />
 
 <Story name="Right" args={{ right: true }} />
 
-<Story name="Right with Icon" args={{ right: true, icon: 'trash' }} />
+<Story name="Right with Icon" args={{ right: true, Icon: ioIcons.IconTrash }} />
 
-<Story name="With Content instead of text">
+<Story name="With Content instead of text" asChild>
   <Tooltip bottomRight show>
-    <div slot="content">
-      <div>whadup</div>
-      <div>whadup</div>
-      <div>whadup</div>
-    </div>
+    {#snippet content()}
+      <div>
+        <div>whadup</div>
+        <div>whadup</div>
+        <div>whadup</div>
+      </div>
+    {/snippet}
     <Button>Tooltip</Button>
   </Tooltip>
 </Story>
 
-<Story name="Portal (avoids overflow clipping)">
-  <div class="overflow-hidden rounded border border-slate-600 p-4">
+<Story name="Portal (avoids overflow clipping)" asChild>
+  <div
+    class="overflow-hidden rounded border border-tertiary bg-surface-primary p-4"
+  >
     <Tooltip top usePortal text="This renders outside the overflow container">
       <Button>Hover me (portal)</Button>
     </Tooltip>

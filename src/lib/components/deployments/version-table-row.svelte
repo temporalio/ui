@@ -1,15 +1,17 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronRight } from '$lib/io/icon';
   import {
     deleteWorkerDeploymentVersion,
-    fetchDeploymentVersion,
+    removeRampingDeploymentVersion,
     setCurrentDeploymentVersion,
-    validateWorkerDeploymentVersionComputeConfig,
+    setRampingDeploymentVersion,
+    unsetCurrentDeploymentVersion,
+    validateCurrentWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { toaster } from '$lib/stores/toaster';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
@@ -18,6 +20,12 @@
     type RoutingConfig,
     type VersionSummary,
   } from '$lib/types/deployments';
+  import {
+    resolveValidationOutcome,
+    type ValidationOutcome,
+    versionComputeProviderType,
+    versionShowsConnectionStatus,
+  } from '$lib/utilities/connection-status';
   import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
     getBuildIdFromVersion,
@@ -31,9 +39,11 @@
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
   import ComputeBadge from './compute-badge.svelte';
+  import ConnectionBadge from './connection-badge.svelte';
   import DeleteVersionModal from './delete-version-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
   import SetCurrentVersionModal from './set-current-version-modal.svelte';
+  import SetRampingVersionModal from './set-ramping-version-modal.svelte';
   import ValidateConnectionModal from './validate-connection-modal.svelte';
   import VersionActionsMenu from './version-actions-menu.svelte';
   import VersionRowDetails from './version-row-details.svelte';
@@ -44,7 +54,9 @@
     namespace: string;
     deploymentName: string;
     conflictToken?: string;
+    showConnectionStatus?: boolean;
     onChange?: () => void;
+    onValidationComplete?: () => void;
   }
   let {
     routingConfig,
@@ -52,7 +64,9 @@
     namespace,
     deploymentName,
     conflictToken,
+    showConnectionStatus = true,
     onChange,
+    onValidationComplete,
   }: Props = $props();
 
   const currentDeploymentName = $derived(
@@ -121,13 +135,10 @@
   }
   const statusLabel = $derived(resolveVersionStatusLabel());
 
-  const computeScalingGroup = $derived(
-    isVersionSummaryNew(version) && version.computeConfig
-      ? Object.values(version.computeConfig.scalingGroups ?? {})[0]
-      : undefined,
-  );
-  const computeProviderType = $derived(
-    computeScalingGroup?.providerType ?? computeScalingGroup?.provider?.type,
+  const computeProviderType = $derived(versionComputeProviderType(version));
+
+  const connectionVisible = $derived(
+    versionShowsConnectionStatus(version, routingConfig),
   );
 
   const workflowHref = $derived(
@@ -145,41 +156,55 @@
     }),
   );
 
+  const canRampToVersion = $derived(
+    parseVersionStatus(drainageStatus).status !== 'Created',
+  );
+  const otherVersionRamping = $derived(
+    rampingBuildId && !isRamping
+      ? `${rampingDeploymentName}.${rampingBuildId}`
+      : undefined,
+  );
+
   let expanded = $state(false);
   let showSetCurrentModal = $state(false);
   let setCurrentError = $state('');
+  let showUnsetCurrentModal = $state(false);
+  let unsetCurrentError = $state('');
   let showDeleteVersionModal = $state(false);
   let deleteVersionError = $state('');
   let showValidateModal = $state(false);
   let validateLoading = $state(false);
-  let validateResult = $state<{ message?: string } | null>(null);
+  let validateResult = $state<ValidationOutcome | null>(null);
+  let showSetRampingModal = $state(false);
+  let setRampingError = $state('');
+  let setRampingLoading = $state(false);
+  let rampingPercentage = $state(0);
 
   async function handleValidateConnection() {
+    if (validateLoading) return;
+
     validateResult = null;
     validateLoading = true;
     showValidateModal = true;
-    const versionDetails = await fetchDeploymentVersion({
-      namespace,
-      deploymentName,
-      buildId: versionBuildId,
-    });
-    const computeConfig =
-      versionDetails.workerDeploymentVersionInfo.computeConfig;
-    if (!computeConfig) {
+    try {
+      let outcome: ValidationOutcome | undefined;
+      await validateCurrentWorkerDeploymentVersionComputeConfig(
+        { namespace, deploymentName, buildId: versionBuildId },
+        (error) => {
+          outcome = resolveValidationOutcome(error);
+        },
+      );
+      validateResult = outcome ?? { state: 'valid' };
+    } catch {
+      // A request that never returned tells us nothing about the connection.
+      validateResult = { state: 'indeterminate' };
+    } finally {
       validateLoading = false;
-      return;
     }
-    let errorMessage: string | undefined;
-    await validateWorkerDeploymentVersionComputeConfig(
-      { namespace, deploymentName, buildId: versionBuildId, computeConfig },
-      (error) => {
-        errorMessage =
-          (error.body as { message?: string })?.message ??
-          translate('deployments.validate-connection-error');
-      },
-    );
-    validateResult = { message: errorMessage };
-    validateLoading = false;
+
+    // A completed check persists the connection status, and a check that did
+    // not return to us can still finish, so refresh for every outcome.
+    onValidationComplete?.();
   }
 
   async function handleSetCurrentVersion() {
@@ -197,6 +222,88 @@
     toaster.push({
       variant: 'primary',
       message: translate('deployments.set-current-version-success', {
+        buildId: versionBuildId,
+      }),
+    });
+    onChange?.();
+  }
+
+  async function handleUnsetCurrentVersion() {
+    unsetCurrentError = '';
+    await unsetCurrentDeploymentVersion(
+      { namespace, deploymentName, conflictToken },
+      (err) => {
+        unsetCurrentError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.unset-current-error');
+      },
+    );
+    if (unsetCurrentError) return;
+    showUnsetCurrentModal = false;
+    onChange?.();
+  }
+
+  function openSetRamping() {
+    rampingPercentage = isRamping
+      ? (routingConfig.rampingVersionPercentage ?? 0)
+      : 0;
+    setRampingError = '';
+    showSetRampingModal = true;
+  }
+
+  async function handleSetRamping() {
+    setRampingError = '';
+    setRampingLoading = true;
+    try {
+      await setRampingDeploymentVersion(
+        {
+          namespace,
+          deploymentName,
+          buildId: versionBuildId,
+          rampingVersionPercentage: rampingPercentage,
+          conflictToken,
+        },
+        (err) => {
+          setRampingError =
+            (err as { body?: { message?: string } })?.body?.message ??
+            translate('deployments.set-ramping-error');
+        },
+      );
+    } finally {
+      setRampingLoading = false;
+    }
+    if (setRampingError) return;
+    showSetRampingModal = false;
+    toaster.push({
+      variant: 'primary',
+      message: translate('deployments.set-ramping-success', {
+        buildId: versionBuildId,
+        percentage: rampingPercentage,
+      }),
+    });
+    onChange?.();
+  }
+
+  async function handleRemoveRamping() {
+    setRampingError = '';
+    setRampingLoading = true;
+    try {
+      await removeRampingDeploymentVersion(
+        { namespace, deploymentName, conflictToken },
+        (err) => {
+          setRampingError =
+            (err as { body?: { message?: string } })?.body?.message ??
+            translate('deployments.remove-ramping-error');
+        },
+      );
+    } finally {
+      setRampingLoading = false;
+    }
+    if (setRampingError) return;
+    showSetRampingModal = false;
+    toaster.push({
+      variant: 'primary',
+      message: translate('deployments.remove-ramping-success', {
         buildId: versionBuildId,
       }),
     });
@@ -222,23 +329,20 @@
 <tr>
   <td class="text-left">
     <div class="flex items-center gap-1">
-      <CapabilityGuard capability="serverScaledDeployments">
-        {#if computeProviderType}
-          <button
-            type="button"
-            aria-label={expanded
-              ? translate('common.collapse')
-              : translate('common.expand')}
-            onclick={() => (expanded = !expanded)}
-            class="shrink-0"
-          >
-            <Icon
-              name="chevron-right"
-              class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
-            />
-          </button>
-        {/if}
-      </CapabilityGuard>
+      {#if computeProviderType}
+        <button
+          type="button"
+          aria-label={expanded
+            ? translate('common.collapse')
+            : translate('common.expand')}
+          onclick={() => (expanded = !expanded)}
+          class="shrink-0"
+        >
+          <IconChevronRight
+            class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
+          />
+        </button>
+      {/if}
       <Copyable
         content={versionBuildId}
         copyIconTitle={translate('common.copy-icon-title')}
@@ -253,11 +357,18 @@
   <td class="text-left">
     <DeploymentStatus {status} label={statusLabel} />
   </td>
-  <CapabilityGuard capability="serverScaledDeployments">
+  <td class="text-left">
+    <ComputeBadge type={computeProviderType} />
+  </td>
+  {#if showConnectionStatus}
     <td class="text-left">
-      <ComputeBadge type={computeProviderType} />
+      {#if connectionVisible && isVersionSummaryNew(version)}
+        <ConnectionBadge computeStatus={version.computeStatus} />
+      {:else}
+        <span class="text-secondary">—</span>
+      {/if}
     </td>
-  </CapabilityGuard>
+  {/if}
   <Timestamp
     as="td"
     class="whitespace-pre-line break-words text-left"
@@ -268,15 +379,21 @@
     {editHref}
     {workflowHref}
     {isCurrent}
+    hasComputeConfig={isVersionSummaryNew(version)
+      ? Object.keys(version.computeConfig?.scalingGroups ?? {}).length > 0
+      : false}
+    {isRamping}
     onSetCurrent={() => (showSetCurrentModal = true)}
+    onSetRamping={openSetRamping}
+    onUnsetCurrent={() => (showUnsetCurrentModal = true)}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}
   />
 </tr>
 
 {#if expanded}
-  <tr class="surface-primary border-y border-subtle">
-    <td colspan={5} class="!p-1">
+  <tr class="border-y border-primary bg-surface-primary text-primary">
+    <td colspan={showConnectionStatus ? 6 : 5} class="!p-1">
       <VersionRowDetails
         {namespace}
         {deploymentName}
@@ -299,9 +416,31 @@
   }}
 />
 
+<SetRampingVersionModal
+  buildId={versionBuildId}
+  {deploymentName}
+  open={showSetRampingModal}
+  error={setRampingError}
+  loading={setRampingLoading}
+  hasActivePollers={canRampToVersion}
+  {isRamping}
+  existingRampingVersion={otherVersionRamping}
+  existingRampingPercentage={routingConfig.rampingVersionPercentage}
+  currentPercentage={isRamping
+    ? (routingConfig.rampingVersionPercentage ?? undefined)
+    : undefined}
+  bind:percentage={rampingPercentage}
+  onConfirm={handleSetRamping}
+  onRemove={handleRemoveRamping}
+  onCancel={() => {
+    showSetRampingModal = false;
+    setRampingError = '';
+  }}
+/>
+
 <ValidateConnectionModal
   buildId={versionBuildId}
-  open={showValidateModal}
+  bind:open={showValidateModal}
   loading={validateLoading}
   result={validateResult}
   onClose={() => (showValidateModal = false)}
@@ -318,3 +457,29 @@
     deleteVersionError = '';
   }}
 />
+
+<Modal
+  id="unset-current-version-modal"
+  open={showUnsetCurrentModal}
+  confirmText={translate('common.confirm')}
+  cancelText={translate('common.cancel')}
+  onConfirmModal={handleUnsetCurrentVersion}
+  onCancelModal={() => {
+    showUnsetCurrentModal = false;
+    unsetCurrentError = '';
+  }}
+>
+  {#snippet titleSnippet()}
+    <h3>{translate('deployments.unset-current')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      <p class="text-sm">
+        {translate('deployments.unset-current-description')}
+      </p>
+      {#if unsetCurrentError}
+        <p class="text-sm text-danger">{unsetCurrentError}</p>
+      {/if}
+    </div>
+  {/snippet}
+</Modal>

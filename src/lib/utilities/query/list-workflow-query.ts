@@ -41,7 +41,7 @@ const filterKeys: readonly FilterKey[] = [
   'closeTime',
 ] as const;
 
-const isValid = (value: unknown): boolean => {
+const isValid = (value: unknown): value is FilterValue => {
   if (value === null) return false;
   if (value === undefined) return false;
   if (value === '') return false;
@@ -88,7 +88,7 @@ const toQueryStatements = (
       if (isFilterKey(key) && isValid(value))
         return toQueryStatement(key, value, archived);
     })
-    .filter(Boolean);
+    .filter((statement): statement is string => Boolean(statement));
 };
 
 export const toListWorkflowQuery = (

@@ -1,11 +1,14 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { resolve } from '$app/paths';
+  import { base } from '$app/paths';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconArrowSquareCaretLeft,
+    IconArrowSquareCaretRight,
+  } from '$lib/io/icon';
 
   interface Props {
     version: string;
@@ -29,10 +32,12 @@
 </script>
 
 <div
-  class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
+  class="grid grid-cols-[minmax(0,1fr)_auto] grid-rows-[2rem_2rem] items-center gap-y-2 pb-4 group-data-[nav=closed]:grid-cols-1"
 >
-  <div class="flex w-fit items-center gap-1 text-nowrap">
-    <a href={resolve('', {})} class="flex items-center">
+  <div
+    class="flex w-fit items-center gap-1 text-nowrap group-data-[nav=closed]:justify-self-center"
+  >
+    <a href={base || '/'} class="flex items-center">
       <Logo height={24} width={24} class="m-1" />
     </a>
     {#if subtitleHref}
@@ -49,10 +54,14 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-2 flex items-center justify-center opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 group-data-[nav=closed]:p-2"
+    class="mx-2 flex items-center justify-center justify-self-end rounded text-primary opacity-0 transition-opacity hover:bg-surface-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:justify-self-center group-data-[nav=closed]:p-2"
     onclick={ontoggle}
   >
-    <Icon name="chevron-right" />
+    {#if navOpen}
+      <IconArrowSquareCaretLeft />
+    {:else}
+      <IconArrowSquareCaretRight />
+    {/if}
   </button>
 </div>
 <div role="list">
@@ -65,7 +74,7 @@
     {@render bottom()}
   {/if}
   <div
-    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-300"
+    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-inverse-secondary"
   >
     <span class="sr-only">{translate('common.version')}</span>
     {version}

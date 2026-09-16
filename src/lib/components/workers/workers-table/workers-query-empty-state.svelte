@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -17,5 +15,5 @@
       {translate('workers.worker-query-empty-state-description')}
     </p>
   </div>
-  <NoQueryResults class="m-auto mt-8 text-subtle" />
+  <NoQueryResults class="m-auto mt-8 text-tertiary" />
 </div>

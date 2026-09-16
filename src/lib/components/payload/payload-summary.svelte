@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { type Snippet } from 'svelte';
+  import { type Snippet, untrack } from 'svelte';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import type { Payload } from '$lib/types';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {
     value: Payload | null | undefined;
@@ -25,25 +25,27 @@
 
   let decodedValue = $state(fallback);
 
-  const decodePromise = $derived(
-    (() => {
-      const _value = value;
-      const _fallback = fallback;
-      const _prefix = prefix;
-      const _max = maxSummaryLength;
+  const decodeValue = (_value: Payload | null | undefined): Promise<string> => {
+    if (!_value) return Promise.resolve(fallback);
 
-      if (!_value) return Promise.resolve(_fallback);
+    return decodePayloadAndParseDataToJSON(_value).then((result) => {
+      if (typeof result !== 'string' || !result) return fallback;
+      if (!prefix) return result;
+      const prefixed = `${prefix} • ${result}`;
+      return prefixed.length <= maxSummaryLength
+        ? prefixed
+        : prefixed.slice(0, maxSummaryLength) + '...';
+    });
+  };
 
-      return decodePayloadAndParseDataToJSON(_value).then((result) => {
-        if (typeof result !== 'string' || !result) return _fallback;
-        if (!_prefix) return result;
-        const prefixed = `${_prefix} • ${result}`;
-        return prefixed.length <= _max
-          ? prefixed
-          : prefixed.slice(0, _max) + '...';
-      });
-    })(),
-  );
+  const valueJson = $derived(stringifyWithBigInt(value));
+  const decodePromise = $derived.by(() => {
+    void valueJson;
+    void prefix;
+    void fallback;
+    void maxSummaryLength;
+    return decodeValue(untrack(() => value));
+  });
 
   $effect(() => {
     let cancelled = false;
@@ -65,5 +67,9 @@
 {:else if className}
   <span class={className}>{decodedValue || fallback}</span>
 {:else}
-  <Badge type="secondary">{decodedValue || fallback}</Badge>
+  <span
+    class="inline-block max-w-full truncate rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+  >
+    {decodedValue || fallback}
+  </span>
 {/if}

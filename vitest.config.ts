@@ -4,8 +4,10 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 
+import { catalogLocalPlugin } from './plugins/vite-plugin-catalog-local';
+
 export default defineConfig({
-  plugins: [svelte({ hot: false })],
+  plugins: [catalogLocalPlugin(), svelte({ hot: false })],
   resolve: {
     alias: {
       $lib: path.resolve(__dirname, './src/lib'),
@@ -34,7 +36,9 @@ export default defineConfig({
       'e2e',
       'tests',
       '.svelte-kit',
+      '.catalog-tmp/**',
     ],
+    globalSetup: ['./vitest-global-setup.ts'],
     environment: 'jsdom',
     setupFiles: ['./vitest-setup.ts', 'vitest-localstorage-mock'],
     deps: {

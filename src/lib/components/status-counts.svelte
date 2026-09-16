@@ -1,206 +1,85 @@
 <script lang="ts">
-  import { type Readable, type Writable } from 'svelte/store';
-
-  import { onDestroy } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
-  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { BadgeStatus } from '$lib/io/badge-status';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
-  import { workflowFilters } from '$lib/stores/filters';
-  import { currentPageKey } from '$lib/stores/pagination';
   import {
     disableWorkflowCountsRefresh,
     workflowCount,
     refresh as workflowRefresh,
   } from '$lib/stores/workflows';
-  import {
-    type CountWorkflowExecutionsResponse,
-    SEARCH_ATTRIBUTE_TYPE,
-    type WorkflowStatus,
-  } from '$lib/types/workflows';
-  import type { ActivityStatus } from '$lib/utilities/get-activity-status-and-count';
   import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
-  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
+
   import {
-    combineFilters,
-    createFilter,
-  } from '$lib/utilities/query/to-list-workflow-filters';
-  import { getExponentialBackoff } from '$lib/utilities/refresh-rate';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-
-  import WorkflowCountStatus from './workflow-status.svelte';
-
-  type Status = WorkflowStatus | ActivityStatus;
-  type StatusCount = { status: Status; count: number };
-
-  interface Props {
-    staticQuery?: string;
-    refreshTime?: Date;
-    countStore?: Writable<{ count: number; newCount: number }>;
-    refresh?: Writable<number>;
-    filters?: Writable<SearchAttributeFilter[]>;
-    fetchCounts?: (opts: {
-      namespace: string;
-      query: string;
-    }) => Promise<CountWorkflowExecutionsResponse>;
-    getStatusAndCount?: (
-      groups: CountWorkflowExecutionsResponse['groups'],
-    ) => StatusCount[];
-    'data-testid'?: string;
-    disableRefresh?: Readable<boolean>;
-  }
+    createStatusCountsState,
+    type StatusCountDataProps,
+  } from './status-counts-state.svelte';
 
   let {
     staticQuery = '',
     refreshTime = $bindable(),
     countStore = workflowCount,
     refresh = workflowRefresh,
-    filters = workflowFilters,
     fetchCounts = fetchWorkflowCountByExecutionStatus,
     getStatusAndCount = getStatusAndCountOfGroup,
     'data-testid': testId = 'workflow-status',
     disableRefresh = disableWorkflowCountsRefresh,
-  }: Props = $props();
+    class: className,
+  }: StatusCountDataProps = $props();
 
   const queryParam = $derived(page.url.searchParams.get('query'));
   const namespace = $derived(page.params.namespace ?? '');
   const query = $derived(staticQuery || queryParam || '');
   const perPage = $derived(page.url.searchParams.get('per-page'));
 
-  let statusGroups: StatusCount[] = $state([]);
-  let newStatusGroups: StatusCount[] = $state([]);
-  let refreshInterval: ReturnType<typeof setTimeout>;
-
-  const allStatusGroups = $derived(
-    newStatusGroups.length > statusGroups.length
-      ? [
-          ...statusGroups,
-          ...newStatusGroups
-            .filter((g) => !statusGroups.some((s) => s.status === g.status))
-            .map((g) => ({ status: g.status, count: 0 })),
-        ]
-      : statusGroups,
-  );
-
-  let attempt = $state(1);
-  let loading = $state(false);
-
-  const initialIntervalSeconds = 60;
-  const maxAttempts = 20;
-
-  const onStatusClick = (status: Status) => {
-    const statusExists = $filters.some(
-      (filter) =>
-        filter.attribute === 'ExecutionStatus' && filter.value === status,
-    );
-
-    if (!statusExists && status) {
-      const filter = createFilter({
-        attribute: 'ExecutionStatus',
-        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-        value: status,
-        conditional: '=',
-      });
-      $filters = [...$filters, filter];
-      const searchQuery = toListWorkflowQueryFromFilters(
-        combineFilters($filters),
-      );
-      updateQueryParameters({
-        url: page.url,
-        parameter: 'query',
-        value: searchQuery,
-        clearParameters: [currentPageKey],
-      });
-    }
-  };
-
-  const clearNewCounts = () => {
-    clearTimeout(refreshInterval);
-    newStatusGroups = [];
-    $countStore.newCount = 0;
-    attempt = 1;
-  };
-
-  const runFetch = () =>
-    fetchCounts({ namespace, query }).catch(() => ({
-      count: '0',
-      groups: [],
-    }));
-
-  const fetchInitialCounts = async () => {
-    loading = true;
-    try {
-      const { count, groups } = await runFetch();
-      $countStore.count = parseInt(count ?? '0');
-      statusGroups = getStatusAndCount(groups);
-    } finally {
-      refreshTime = new Date();
-      loading = false;
-    }
-  };
-
-  const fetchNewCounts = async () => {
-    try {
-      const { count, groups } = await runFetch();
-      $countStore.newCount = parseInt(count ?? '0') - $countStore.count;
-      newStatusGroups = getStatusAndCount(groups);
-    } finally {
-      refreshTime = new Date();
-      attempt += 1;
-    }
-  };
-
-  const scheduleNext = () => {
-    const intervalSeconds = getExponentialBackoff(
-      initialIntervalSeconds,
-      attempt,
-    );
-    refreshInterval = setTimeout(async () => {
-      await fetchNewCounts();
-      if (!$disableRefresh && attempt <= maxAttempts) {
-        scheduleNext();
-      }
-    }, intervalSeconds);
-  };
-
-  const scheduleFirst = async () => {
-    clearNewCounts();
-    await fetchInitialCounts();
-    if (!$disableRefresh) {
-      scheduleNext();
-    }
-  };
-
-  $effect(() => {
-    void namespace;
-    void query;
-    void perPage;
-    void $refresh;
-
-    scheduleFirst();
+  const statusCounts = createStatusCountsState({
+    getNamespace: () => namespace,
+    getQuery: () => query,
+    getPerPage: () => perPage,
+    getRefresh: () => $refresh,
+    getCountStore: () => countStore,
+    isRefreshDisabled: () => $disableRefresh,
+    getFetchCounts: () => fetchCounts,
+    getStatusAndCount: () => getStatusAndCount,
   });
 
-  onDestroy(() => {
-    clearNewCounts();
+  $effect(function propagateRefreshTimeChange() {
+    refreshTime = new Date(statusCounts.refreshTime);
   });
 </script>
 
-<div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
-  {#each allStatusGroups as { count, status } (status)}
-    {#if !loading}
-      {@const group = newStatusGroups.find((g) => g.status === status)}
-      <button onclick={() => onStatusClick(status)}>
-        <WorkflowCountStatus
+<div
+  class={twMerge(
+    'flex min-h-[24px] flex-wrap items-center gap-2 pt-1',
+    className,
+  )}
+  aria-busy={statusCounts.loading}
+>
+  {#each statusCounts.items as { count, difference, status } (status)}
+    {#if !statusCounts.loading}
+      {#if status}
+        <BadgeStatus
           {status}
+          text={getWorkflowStatusLabel(status)}
           {count}
-          newCount={group ? group.count - count : 0}
-          test-id="{testId}-{status}"
+          extensions={difference
+            ? [
+                {
+                  text: difference.toLocaleString(undefined, {
+                    signDisplay: 'always',
+                  }),
+                },
+              ]
+            : undefined}
+          data-testid={`${testId}-${status}`}
         />
-      </button>
+      {/if}
     {:else}
-      <Skeleton class="h-6 w-24 rounded-sm" />
+      <Skeleton class="h-6 w-24 rounded-full" />
     {/if}
   {/each}
 </div>

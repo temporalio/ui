@@ -9,12 +9,13 @@ import { clearAuthUser, getAuthUser } from '$lib/stores/auth-user';
 import type { GetClusterInfoResponse, GetSystemInfoResponse } from '$lib/types';
 import type { Settings } from '$lib/types/global';
 import { isAuthorized } from '$lib/utilities/is-authorized';
-import { routeForLoginPage } from '$lib/utilities/route-for';
+import { routeForAuthenticationRedirect } from '$lib/utilities/route-for';
 
 import '../../app.css';
 
 export const load: LayoutLoad = async function ({
   fetch,
+  url,
 }): Promise<LayoutData> {
   const settings: Settings = await fetchSettings(fetch);
 
@@ -25,7 +26,7 @@ export const load: LayoutLoad = async function ({
   const user = getAuthUser();
 
   if (!isAuthorized(settings, user)) {
-    redirect(302, routeForLoginPage());
+    redirect(302, routeForAuthenticationRedirect(settings, url));
   }
 
   fetchNamespaces(settings, fetch);

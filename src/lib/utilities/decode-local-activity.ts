@@ -5,6 +5,7 @@ import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
 import {
   decodeEventAttributes,
   parsePayloadAttributes,
+  type PotentiallyDecodable,
 } from './decode-payload';
 import {
   formatSummaryValue,
@@ -46,11 +47,12 @@ export const decodeLocalActivity = async (
     if (!payloads?.length) return undefined;
 
     const decodedAttributes = parsePayloadAttributes(
-      convertedAttributes,
+      convertedAttributes as PotentiallyDecodable,
     ) as DecodedLocalActivity;
 
     const payload = (decodedAttributes?.details?.data?.payloads ||
       decodedAttributes?.details?.type?.payloads)?.[0];
+    if (!payload) return undefined;
     const activityType = getActivityType(payload);
 
     if (activityType) {

@@ -8,25 +8,52 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconClose,
+    IconExternalLink,
+    IconNamespaceSwitcher,
+  } from '$lib/io/icon';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import type { NamespaceListItem, NavLinkItem } from '$lib/types/global';
+  import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
   import ziggy from '$lib/vendor/ziggy-full-face.png';
 
-  import BottomNavLinks from './bottom-nav-links.svelte';
   import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
   import BottomNavSettings from './bottom-nav-settings.svelte';
 
   interface Props {
     namespaceList?: NamespaceListItem[];
-    sections: NavLinkItem[][];
+    linksSnippet: Snippet;
     isCloud?: boolean;
     showNamespacePicker?: boolean;
     children?: Snippet;
     nsPicker?: Snippet<
+      [
+        {
+          open: boolean;
+          closeMenu: () => void;
+        },
+      ]
+    >;
+    centerButton?: Snippet<
+      [
+        {
+          open: boolean;
+          onClick: () => void;
+        },
+      ]
+    >;
+    menuButton?: Snippet<
+      [
+        {
+          open: boolean;
+          onClick: () => void;
+        },
+      ]
+    >;
+    linksContent?: Snippet<
       [
         {
           open: boolean;
@@ -40,11 +67,14 @@
 
   let {
     namespaceList = [],
-    sections,
+    linksSnippet,
     isCloud = false,
     showNamespacePicker = true,
     children,
     nsPicker,
+    centerButton,
+    menuButton,
+    linksContent,
     profilePicture,
     class: className = '',
   }: Props = $props();
@@ -107,22 +137,25 @@
   };
 </script>
 
-<svelte:window onkeypress={escapeHandler} />
+<svelte:window onkeydown={escapeHandler} />
 
 {#if menuIsOpen}
   <div
     class={merge(
-      'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto md:hidden',
-      'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary/70 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70',
-      isCloud
-        ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
-        : 'surface-black',
+      'group fixed top-0 z-50 h-[calc(100%-64px)] w-full overflow-auto border-b border-primary bg-surface-primary text-primary md:hidden',
+      'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-interactive-primary focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary',
     )}
     data-nav="open"
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
   >
-    <BottomNavLinks open={viewLinks} {sections} />
+    {#if linksContent}
+      {@render linksContent({ open: viewLinks, closeMenu })}
+    {:else if viewLinks}
+      <div class="flex flex-col gap-6 px-4 py-8">
+        {@render linksSnippet?.()}
+      </div>
+    {/if}
     {#if nsPicker}
       {@render nsPicker({ open: viewNamespaces, closeMenu })}
     {:else}
@@ -135,48 +168,59 @@
 {/if}
 <nav
   class={merge(
-    'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 px-4 py-2 transition-colors md:hidden',
-    'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70 focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-primary/70',
-    isCloud
-      ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-off-white focus-visible:[&_a]:ring-success focus-visible:[&_button]:ring-success'
-      : 'surface-black border-t border-subtle',
+    'fixed bottom-0 z-40 flex h-[64px] w-full flex-row items-center justify-between gap-5 border-t border-primary bg-surface-primary px-4 py-2 text-primary transition-colors md:hidden',
+    'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-interactive-primary focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-interactive-primary',
     className,
   )}
   data-testid="top-nav"
   aria-label={translate('common.main')}
 >
-  <button
-    class="nav-button relative"
-    data-testid="nav-menu-button"
-    class:active-shadow={viewLinks}
-    type="button"
-    onclick={onLinksClick}
-  >
-    {#if viewLinks}
-      <Icon name="close" height={32} width={32} />
-    {:else}
-      <Logo height={32} width={32} />
-    {/if}
-  </button>
+  {#if menuButton}
+    {@render menuButton({ open: viewLinks, onClick: onLinksClick })}
+  {:else}
+    <button
+      class="nav-button relative"
+      data-testid="nav-menu-button"
+      class:active-shadow={viewLinks}
+      type="button"
+      onclick={onLinksClick}
+    >
+      {#if viewLinks}
+        <IconClose height={32} width={32} />
+      {:else}
+        <Logo height={32} width={32} />
+      {/if}
+    </button>
+  {/if}
   {#if showNamespacePicker}
-    <div class="namespace-wrapper">
-      <Button
-        variant="ghost"
-        data-testid="namespace-switcher"
-        leadingIcon="namespace-switcher"
-        size="xs"
-        class="grow text-white"
-        on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+    {#if centerButton}
+      {@render centerButton({
+        open: viewNamespaces,
+        onClick: onNamespaceClick,
+      })}
+    {:else}
+      <div
+        class="namespace-wrapper dark:focus-within:bg-surface-primary dark:focus-within:text-primary"
       >
-      <div class="ml-1 h-full w-1 border-l border-subtle"></div>
-      <Button
-        variant="ghost"
-        size="xs"
-        href={routeForNamespace({ namespace })}
-        disabled={!namespaceExists}
-        ><Icon class="text-white" name="external-link" /></Button
-      >
-    </div>
+        <Button
+          variant="ghost"
+          data-testid="namespace-switcher"
+          LeadingIcon={IconNamespaceSwitcher}
+          size="xs"
+          class="grow"
+          onclick={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+        >
+        <div class="ml-1 h-full w-1 border-l border-primary"></div>
+        <Button
+          variant="ghost"
+          size="xs"
+          href={routeForNamespace({ namespace })}
+          disabled={!namespaceExists}
+        >
+          <IconExternalLink />
+        </Button>
+      </div>
+    {/if}
   {/if}
   <button
     class="nav-button"
@@ -186,7 +230,7 @@
     onclick={onSettingsClick}
   >
     {#if viewSettings}
-      <Icon name="close" height={32} width={32} />
+      <IconClose height={32} width={32} />
     {:else}
       <div
         class="flex aspect-square w-[32px] min-w-[32px] items-center justify-center"
@@ -207,7 +251,7 @@
 
 <style lang="postcss">
   .namespace-wrapper {
-    @apply surface-black flex h-10 w-full grow flex-row items-center border border-subtle px-0.5 text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply flex h-10 w-full grow flex-row items-center border border-primary bg-surface-primary px-0.5 text-sm text-primary focus-within:border-brand focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary;
   }
 
   .nav-button {

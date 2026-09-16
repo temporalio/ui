@@ -4,7 +4,10 @@ import { describe, expect, test } from 'vitest';
 
 import {
   addColumn,
+  DEFAULT_DEPLOYMENTS_COLUMNS,
+  migrateColumnLabels,
   moveColumn,
+  persistedDeploymentsTableColumns,
   persistedWorkflowTableColumns,
   removeColumn,
   TABLE_TYPE,
@@ -51,5 +54,109 @@ describe('Workflow Table Columns store', () => {
         default: [{ label: 'Start' }, { label: 'End' }],
       });
     });
+  });
+});
+
+describe('Deployment Table Columns store', () => {
+  test('Latest Version is hidden by default', () => {
+    expect(
+      DEFAULT_DEPLOYMENTS_COLUMNS.some(
+        ({ label }) => label === 'Latest Version',
+      ),
+    ).toBe(false);
+  });
+
+  describe('addColumn', () => {
+    test('adds the Latest Version column and persists it', () => {
+      persistedDeploymentsTableColumns.set({ default: [] });
+      addColumn('Latest Version', 'default', TABLE_TYPE.DEPLOYMENTS);
+      expect(get(persistedDeploymentsTableColumns)).toEqual({
+        default: [{ label: 'Latest Version' }],
+      });
+    });
+  });
+
+  describe('removeColumn', () => {
+    test('removes the Latest Version column', () => {
+      persistedDeploymentsTableColumns.set({
+        default: [{ label: 'Latest Version' }],
+      });
+      removeColumn('Latest Version', 'default', TABLE_TYPE.DEPLOYMENTS);
+      expect(get(persistedDeploymentsTableColumns)).toEqual({ default: [] });
+    });
+  });
+});
+
+describe('migrateColumnLabels', () => {
+  const migrate = migrateColumnLabels({
+    'Start Time': 'Start',
+    'Close Time': 'End',
+    'Activity Type': 'Type',
+  });
+
+  test('renames columns matching the provided label map', () => {
+    const state = {
+      default: [
+        { label: 'Status' },
+        { label: 'Activity Type' },
+        { label: 'Start Time' },
+        { label: 'Close Time' },
+      ],
+    };
+
+    expect(migrate(state)).toEqual({
+      default: [
+        { label: 'Status' },
+        { label: 'Type' },
+        { label: 'Start' },
+        { label: 'End' },
+      ],
+    });
+  });
+
+  test('preserves other column properties like pinned', () => {
+    const state = {
+      default: [{ label: 'Activity Type', pinned: true }],
+    };
+
+    expect(migrate(state)).toEqual({
+      default: [{ label: 'Type', pinned: true }],
+    });
+  });
+
+  test('migrates labels across multiple namespaces', () => {
+    const state = {
+      default: [{ label: 'Start Time' }],
+      other: [{ label: 'Close Time' }],
+    };
+
+    expect(migrate(state)).toEqual({
+      default: [{ label: 'Start' }],
+      other: [{ label: 'End' }],
+    });
+  });
+
+  test('dedupes when a renamed label collides with an existing one', () => {
+    const state = {
+      default: [{ label: 'Start' }, { label: 'Start Time' }],
+    };
+
+    expect(migrate(state)).toEqual({
+      default: [{ label: 'Start' }],
+    });
+  });
+
+  test('returns the same reference when nothing needs migrating', () => {
+    const state = {
+      default: [{ label: 'Status' }, { label: 'Type' }, { label: 'Start' }],
+    };
+
+    expect(migrate(state)).toBe(state);
+  });
+
+  test('handles undefined namespace columns', () => {
+    const state = { default: undefined };
+
+    expect(migrate(state)).toEqual({ default: undefined });
   });
 });

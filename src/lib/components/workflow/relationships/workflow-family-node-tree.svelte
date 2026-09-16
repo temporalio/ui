@@ -3,7 +3,8 @@
 
   import { page } from '$app/state';
 
-  import Icon from '$lib/holocene/icon';
+  import { translate } from '$lib/i18n/translate';
+  import { IconTemporalSchedules } from '$lib/io/icon';
   import type { RootNode } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -16,26 +17,50 @@
 
   import { showFullTree } from '../workflow-relationships.svelte';
 
-  export let root: RootNode;
-  export let width: number;
-  export let height: number;
-  export let zoomLevel: number;
-  export let rootX = 0;
-  export let rootY = 0;
-  export let generation = 1;
-  export let openRuns: Map<number, string>;
-  export let expandAll: boolean;
-  export let onNodeClick: (node: RootNode, generation: number) => void;
-  export let activeWorkflow: WorkflowExecution | undefined = undefined;
+  import WorkflowFamilyNodeTree from './workflow-family-node-tree.svelte';
 
-  $: ({ workflow, run, namespace } = page.params);
-  $: ({ workflow: fullWorkflow } = $workflowRun);
-  $: workflowRelationships = getWorkflowRelationships(
-    fullWorkflow,
-    $fullEventHistory,
-    page.data.namespace,
+  interface Props {
+    root: RootNode;
+    width: number;
+    height: number;
+    zoomLevel: number;
+    rootX?: number;
+    rootY?: number;
+    generation?: number;
+    openRuns: Map<number, string>;
+    expandAll: boolean;
+    onNodeClick: (node: RootNode, generation: number) => void;
+    activeWorkflow?: WorkflowExecution;
+  }
+
+  let {
+    root,
+    width,
+    height,
+    zoomLevel,
+    rootX = 0,
+    rootY = 0,
+    generation = 1,
+    openRuns,
+    expandAll,
+    onNodeClick,
+    activeWorkflow,
+  }: Props = $props();
+
+  const workflow = $derived(page.params.workflow);
+  const run = $derived(page.params.run);
+  const namespace = $derived(page.params.namespace);
+  const fullWorkflow = $derived($workflowRun.workflow);
+  const workflowRelationships = $derived(
+    getWorkflowRelationships(
+      fullWorkflow,
+      $fullEventHistory,
+      page.data.namespace,
+    ),
   );
-  $: ({ first, next, previous } = workflowRelationships);
+  const first = $derived(workflowRelationships.first);
+  const next = $derived(workflowRelationships.next);
+  const previous = $derived(workflowRelationships.previous);
 
   const getPositions = (
     width: number,
@@ -53,9 +78,12 @@
     };
   };
 
-  $: ({ x, y, radius } = getPositions(width, height, rootX, rootY));
+  const positions = $derived(getPositions(width, height, rootX, rootY));
+  const x = $derived(positions.x);
+  const y = $derived(positions.y);
+  const radius = $derived(positions.radius);
 
-  $: getPosition = (index: number) => {
+  const getPosition = (index: number) => {
     const childY = y + 4 * radius;
 
     const getX = () => {
@@ -76,44 +104,51 @@
     return { childX: getX(), childY };
   };
 
-  const nodeClick = (e, node: RootNode) => {
+  const nodeClick = (e: Event, node: RootNode) => {
     e.stopPropagation();
     onNodeClick(node, generation);
   };
 
-  $: isExpanded = (node: RootNode) => {
+  const handleNodeKeydown = (event: KeyboardEvent, target: RootNode) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      nodeClick(event, target);
+    }
+  };
+
+  const isExpanded = (node: RootNode) => {
     const opened = openRuns.get(generation) === node.workflow.runId;
     return expandAll || opened;
   };
 
-  $: isCurrent = (node: RootNode) => {
+  const isCurrent = (node: RootNode) => {
     return node.workflow.id === workflow && node.workflow.runId === run;
   };
 
-  $: isActive = (node: RootNode) => {
+  const isActive = (node: RootNode) => {
     return node.workflow.runId === activeWorkflow?.runId;
   };
 
   const workflowStatus = cva(['stroke-2'], {
     variants: {
       status: {
-        Running: 'fill-blue-300 stroke-blue-500',
-        TimedOut: 'fill-orange-200 stroke-orange-400',
-        Completed: 'fill-green-200 stroke-green-400',
-        Failed: 'fill-red-200 stroke-red-400',
-        ContinuedAsNew: 'fill-purple-200 stroke-purple-400',
-        Canceled: 'fill-slate-100 stroke-slate-300',
-        Terminated: 'fill-yellow-200 stroke-yellow-400',
-        Paused: 'fill-yellow-200 stroke-yellow-400',
-        Unspecified: 'fill-slate-100 stroke-slate-300',
-        Scheduled: 'fill-blue-300 stroke-blue-500',
-        Started: 'fill-blue-300 stroke-blue-500',
-        Open: 'fill-green-200 stroke-green-400',
-        New: 'fill-blue-300 stroke-blue-500',
-        Initiated: 'fill-blue-300 stroke-blue-500',
-        Fired: 'fill-pink-200 stroke-pink-400',
-        CancelRequested: 'fill-yellow-200 stroke-yellow-400',
-        Signaled: 'fill-pink-200 stroke-pink-400',
+        Running: 'fill-blue-7 stroke-zaffre-8',
+        TimedOut: 'fill-persimmon-6 stroke-amber-8',
+        Completed: 'fill-green-5 stroke-green-8',
+        Failed: 'fill-persimmon-6 stroke-red-9',
+        ContinuedAsNew: 'fill-slate-blue-4 stroke-slate-blue-8',
+        Canceled: 'fill-zaffre-4 stroke-zaffre-7',
+        Terminated: 'fill-amber-5 stroke-amber-10',
+        Paused: 'fill-amber-5 stroke-amber-10',
+        Unspecified: 'fill-zaffre-4 stroke-zaffre-7',
+        Scheduled: 'fill-blue-7 stroke-zaffre-8',
+        Started: 'fill-blue-7 stroke-zaffre-8',
+        Open: 'fill-green-5 stroke-green-8',
+        New: 'fill-blue-7 stroke-zaffre-8',
+        Initiated: 'fill-blue-7 stroke-zaffre-8',
+        Fired: 'fill-purple-5 stroke-pink-8',
+        CancelRequested: 'fill-amber-5 stroke-amber-10',
+        Signaled: 'fill-purple-5 stroke-pink-8',
       },
     },
   });
@@ -126,14 +161,14 @@
     x2={getPosition(root?.children.length - 1).childX}
     y2={getPosition(0).childY - 1.5 * radius}
     class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-      ? 'stroke-indigo-700'
-      : 'stroke-slate-100 dark:stroke-slate-800'}"
+      ? 'stroke-indigo-10'
+      : 'stroke-zaffre-4 dark:stroke-indigo-12'}"
   />
 {/if}
 {#each root?.children as child, index}
   {@const { childX, childY } = getPosition(index)}
   {#if child.children.length && isExpanded(child)}
-    <svelte:self
+    <WorkflowFamilyNodeTree
       root={child}
       {width}
       {height}
@@ -153,15 +188,19 @@
     x2={childX}
     y2={childY}
     class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-      ? 'stroke-indigo-700'
-      : 'stroke-slate-100 dark:stroke-slate-800'}"
+      ? 'stroke-indigo-10'
+      : 'stroke-zaffre-4 dark:stroke-indigo-12'}"
   />
   <g
     role="button"
     tabindex="0"
+    aria-label={translate('workflows.family-node-label', {
+      id: child.workflow.id,
+      status: child.workflow.status ?? '',
+    })}
     class="outline-none transition-all"
-    on:click={(e) => nodeClick(e, child)}
-    on:keypress={(e) => nodeClick(e, child)}
+    onclick={(e) => nodeClick(e, child)}
+    onkeydown={(e) => handleNodeKeydown(e, child)}
   >
     {#if child?.children?.length && isExpanded(child)}
       <line
@@ -170,8 +209,8 @@
         x2={childX}
         y2={childY + 2.5 * radius}
         class="stroke-2 duration-300 ease-in-out {isActive(child)
-          ? 'stroke-indigo-700'
-          : 'stroke-slate-100 dark:stroke-slate-800'}"
+          ? 'stroke-indigo-10'
+          : 'stroke-zaffre-4 dark:stroke-indigo-12'}"
       />
     {/if}
     {#if isActive(child)}
@@ -179,7 +218,7 @@
         cx={childX}
         cy={childY}
         r={radius}
-        class="fill-indigo-700"
+        class="fill-indigo-10"
         fill-opacity=".95"
       />
     {/if}
@@ -188,7 +227,7 @@
         cx={childX}
         cy={childY}
         r={radius}
-        class="fill-indigo-200"
+        class="fill-indigo-6"
         fill-opacity=".75"
       />
     {/if}
@@ -218,23 +257,23 @@
         y={!child?.children?.length
           ? childY + 1.15 * radius
           : childY - 1.15 * radius}
-        class={!child?.children?.length && '[writing-mode:vertical-lr]'}
+        class={!child?.children?.length ? '[writing-mode:vertical-lr]' : ''}
         fill="currentcolor"
         text-anchor={!child?.children?.length ? 'start' : 'start'}
         font-weight="500">{child.workflow.id}</text
       >
     {/if}
   </g>
-  {#if !$showFullTree && child.siblingCount > 0}
+  {#if !$showFullTree && (child.siblingCount ?? 0) > 0}
     <line
       x1={x}
       y1={y}
       x2={x - 4 * radius}
       y2={y}
-      class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
+      class="stroke-slate-blue-3 stroke-2 duration-300 ease-in-out dark:stroke-neutral-9"
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="fill-white stroke-slate-blue-3 dark:fill-neutral-12 dark:stroke-neutral-9"
       x={x - 3 * radius - radius / 2}
       y={y - radius / 4}
       cx={radius / 2}
@@ -243,7 +282,7 @@
       height={radius / 2}
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="fill-white stroke-slate-blue-3 dark:fill-neutral-12 dark:stroke-neutral-9"
       x={x - 1.5 * radius - radius / 2}
       y={y - radius / 4}
       cx={radius / 2}
@@ -256,10 +295,10 @@
       y1={y}
       x2={x + 4 * radius}
       y2={y}
-      class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
+      class="stroke-slate-blue-3 stroke-2 duration-300 ease-in-out dark:stroke-neutral-9"
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="fill-white stroke-slate-blue-3 dark:fill-neutral-12 dark:stroke-neutral-9"
       x={x + 1.5 * radius}
       y={y - radius / 4}
       cx={radius / 2}
@@ -268,7 +307,7 @@
       height={radius / 2}
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="fill-white stroke-slate-blue-3 dark:fill-neutral-12 dark:stroke-neutral-9"
       x={x + 3 * radius}
       y={y - radius / 4}
       cx={radius / 2}
@@ -284,8 +323,12 @@
     role="button"
     class="outline-none"
     tabindex="0"
-    on:click={(e) => nodeClick(e, root)}
-    on:keypress={(e) => nodeClick(e, root)}
+    aria-label={translate('workflows.family-node-label', {
+      id: root.workflow.id,
+      status: root.workflow.status ?? '',
+    })}
+    onclick={(e) => nodeClick(e, root)}
+    onkeydown={(e) => handleNodeKeydown(e, root)}
   >
     {#if root?.scheduleId}
       <line
@@ -294,7 +337,7 @@
         x2={x}
         y2={y - 2.5 * radius}
         stroke-dasharray="3 2"
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <line
         x1={x - 5 * radius}
@@ -302,9 +345,9 @@
         x2={x}
         y2={y - 2.5 * radius}
         stroke-dasharray="3 2"
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
-      <Icon x={x - 9.25 * radius} y={y - 4.15 * radius} name="schedules" />
+      <IconTemporalSchedules x={x - 9.25 * radius} y={y - 4.15 * radius} />
       <text
         x={x - 5.25 * radius}
         y={y - 3.5 * radius}
@@ -329,7 +372,7 @@
         y1={y}
         x2={x + 4 * radius}
         y2={y}
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <text
         x={x + 4.25 * radius}
@@ -355,7 +398,7 @@
         y1={y}
         x2={x - 4 * radius}
         y2={y}
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <text
         x={x - 4.25 * radius}
@@ -384,7 +427,7 @@
         x2={radius}
         y2={y}
         stroke-dasharray="3 2"
-        class="stroke-slate-100 stroke-2 transition-all duration-300 ease-in-out dark:stroke-slate-800"
+        class="stroke-zaffre-4 stroke-2 transition-all duration-300 ease-in-out dark:stroke-indigo-12"
       />
       <text
         x={radius}
@@ -411,8 +454,8 @@
         x2={x}
         y2={y + 2.5 * radius}
         class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
-          ? 'stroke-indigo-700'
-          : 'stroke-slate-100 dark:stroke-slate-800'}"
+          ? 'stroke-indigo-10'
+          : 'stroke-zaffre-4 dark:stroke-indigo-12'}"
       />
     {/if}
     {#if isCurrent(root)}
@@ -420,7 +463,7 @@
         cx={x}
         cy={y}
         r={radius}
-        class="fill-indigo-200"
+        class="fill-indigo-6"
         fill-opacity=".75"
       />
     {/if}
@@ -429,7 +472,7 @@
         cx={x}
         cy={y}
         r={radius}
-        class="fill-indigo-700"
+        class="fill-indigo-10"
         fill-opacity=".95"
       />
     {/if}

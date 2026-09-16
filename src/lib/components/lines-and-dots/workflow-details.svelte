@@ -3,9 +3,11 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter, IconInfo } from '$lib/io/icon';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { fullEventHistory, sdkInfo } from '$lib/stores/events';
+  import { sdkInfo } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import {
@@ -15,7 +17,6 @@
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForSchedule,
-    routeForTaskQueue,
     routeForWorkerDeployment,
     routeForWorkflow,
     routeForWorkflowsWithQuery,
@@ -80,8 +81,8 @@
       : '',
   );
   let totalActions = $derived(
-    $fullEventHistory
-      .reduce((acc, e) => (e?.billableActions ?? 0) + acc, 0)
+    eventBuffer.events
+      .reduce((acc, event) => (event?.billableActions ?? 0) + acc, 0)
       .toString(),
   );
 
@@ -117,12 +118,11 @@
   <DetailListLabel>
     {translate('common.duration')}
   </DetailListLabel>
-  <DetailListTextValue class="font-mono" text={elapsedTime} />
+  <DetailListTextValue text={elapsedTime} />
 
   {#if workflow?.workflowExecutionTimeout && workflow?.workflowExecutionTimeout.toString() !== '0s'}
     <DetailListLabel>{translate('workflows.workflow-timeout')}</DetailListLabel>
     <DetailListTextValue
-      class="font-mono"
       text={formatDuration(workflow.workflowExecutionTimeout)}
       tooltipText={formatDuration(workflow.workflowExecutionTimeout)}
     />
@@ -145,17 +145,20 @@
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
       }) ?? ''}
-      iconName="filter"
+      Icon={IconFilter}
     />
 
     {#if workflow?.taskQueue}
       <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
       <DetailListLinkValue
+        copyable
+        copyableText={workflow.taskQueue}
         text={workflow.taskQueue}
-        href={routeForTaskQueue({
+        href={routeForWorkflowsWithQuery({
           namespace,
-          queue: workflow.taskQueue,
-        })}
+          query: `TaskQueue="${workflow.taskQueue}"`,
+        }) ?? ''}
+        Icon={IconFilter}
       />
     {/if}
 
@@ -199,7 +202,7 @@
                 query: `TemporalWorkerDeploymentVersion="${deploymentVersion}"`,
               }) ?? '')
             : ''}
-          iconName={deploymentVersion ? 'filter' : undefined}
+          Icon={deploymentVersion ? IconFilter : undefined}
         />
       {/if}
 
@@ -215,7 +218,7 @@
             namespace,
             query: `TemporalWorkflowVersioningBehavior="${versioningBehavior}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
     </DetailListColumn>
@@ -262,11 +265,10 @@
   <DetailListColumn>
     <DetailListLabel>{translate('common.history-size')}</DetailListLabel>
     <DetailListTextValue
-      class="font-mono"
       tooltipText={workflow.externalPayloadCount
         ? translate('workflows.external-payload-tooltip')
         : ''}
-      iconName={workflow.externalPayloadCount ? 'square-info' : undefined}
+      Icon={workflow.externalPayloadCount ? IconInfo : undefined}
       iconPosition="trailing"
       text={historySizeFormatted}
     />
@@ -275,26 +277,21 @@
         >{translate('workflows.external-payload-size')}</DetailListLabel
       >
       <DetailListTextValue
-        class="font-mono"
-        text={formatBytes(parseInt(workflow.externalPayloadSizeBytes, 10))}
+        text={formatBytes(
+          parseInt(workflow.externalPayloadSizeBytes ?? '', 10),
+        )}
       />
       <DetailListLabel
         >{translate('workflows.external-payload-count')}</DetailListLabel
       >
-      <DetailListTextValue
-        class="font-mono"
-        text={workflow.externalPayloadCount}
-      />
+      <DetailListTextValue text={workflow.externalPayloadCount} />
     {/if}
 
     {#if !$isCloud}
       <DetailListLabel
         >{translate('workflows.state-transitions')}</DetailListLabel
       >
-      <DetailListTextValue
-        class="font-mono"
-        text={workflow?.stateTransitionCount}
-      />
+      <DetailListTextValue text={workflow?.stateTransitionCount} />
     {:else}
       <Tooltip
         bottomLeft

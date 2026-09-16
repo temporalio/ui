@@ -2,6 +2,11 @@
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconTranscoderError,
+    IconTranscoderOff,
+    IconTranscoderOn,
+  } from '$lib/io/icon';
   import { dataEncoder } from '$lib/stores/data-encoder';
 
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
@@ -30,8 +35,8 @@
           label={translate('data-encoder.codec-server-configured')}
           class="relative flex items-center"
           data-testid="data-encoder-status-configured"
-          icon="transcoder-on"
-          on:click={onIconClick}
+          Icon={IconTranscoderOn}
+          onclick={onIconClick}
         />
       </Tooltip>
     {:else if $dataEncoder.hasError}
@@ -41,8 +46,8 @@
           label={translate('data-encoder.codec-server-error')}
           class="relative flex items-center"
           data-testid="data-encoder-status-error"
-          icon="transcoder-error"
-          on:click={onIconClick}
+          Icon={IconTranscoderError}
+          onclick={onIconClick}
         />
       </Tooltip>
     {:else if $dataEncoder.hasSuccess}
@@ -55,8 +60,8 @@
           label={translate('data-encoder.codec-server-success')}
           class="relative flex items-center"
           data-testid="data-encoder-status-success"
-          icon="transcoder-on"
-          on:click={onIconClick}
+          Icon={IconTranscoderOn}
+          onclick={onIconClick}
         />
       </Tooltip>
     {/if}
@@ -70,8 +75,8 @@
         label={translate('data-encoder.configure-codec-server')}
         class="relative flex items-center"
         data-testid="data-encoder-status"
-        icon="transcoder-off"
-        on:click={onIconClick}
+        Icon={IconTranscoderOff}
+        onclick={onIconClick}
       />
     </Tooltip>
   {/if}

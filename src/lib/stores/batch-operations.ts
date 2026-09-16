@@ -3,10 +3,13 @@ import { writable } from 'svelte/store';
 import { pollBatchOperation } from '$lib/services/batch-service';
 import { persistStore } from '$lib/stores/persist-store';
 
-export const inProgressBatchOperation = writable<{
-  namespace: string;
-  jobId: string;
-}>();
+export const inProgressBatchOperation = writable<
+  | {
+      namespace: string;
+      jobId: string;
+    }
+  | undefined
+>();
 
 inProgressBatchOperation.subscribe(async (operation) => {
   if (operation) {

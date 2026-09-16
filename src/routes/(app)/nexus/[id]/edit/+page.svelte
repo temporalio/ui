@@ -5,6 +5,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import NexusEditEndpoint from '$lib/pages/nexus-edit-endpoint.svelte';
   import type { NexusFormData } from '$lib/pages/nexus-form.svelte';
   import {
@@ -79,7 +80,10 @@
 />
 {#if endpoint}
   <div class="flex flex-col gap-4">
-    <Link href={routeForNexusEndpoint(page.params.id)} icon="chevron-left">
+    <Link
+      href={routeForNexusEndpoint(page.params.id)}
+      LeadingIcon={IconChevronLeft}
+    >
       {translate('nexus.back-to-endpoint')}
     </Link>
     <NexusEditEndpoint

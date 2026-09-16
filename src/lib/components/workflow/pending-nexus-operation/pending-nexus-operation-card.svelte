@@ -1,27 +1,27 @@
 <script lang="ts">
+  import { omit } from 'es-toolkit';
   import type { Snippet } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
+  import { IconRetry } from '$lib/io/icon';
   import type { PendingNexusOperation } from '$lib/types/events';
-  import { omit } from '$lib/utilities/omit';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   let { operation }: { operation: PendingNexusOperation } = $props();
 
-  const failed = $derived(operation.attempt > 1);
+  const failed = $derived((operation.attempt ?? 0) > 1);
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class="flex flex-1 cursor-default flex-col gap-2 border-b border-primary bg-surface-primary p-4 text-primary"
 >
   <div class="flex-1">
     <div class="flex flex-wrap items-center space-x-3">
-      <Badge>{operation.state}</Badge>
+      <Badge text={String(operation.state ?? '')} />
       <h4>{translate('workflows.pending-nexus-operation')}</h4>
     </div>
   </div>
@@ -80,7 +80,7 @@
       {#if operation.scheduleToStartTimeout}
         {@render detail(
           translate('workflows.schedule-to-start-timeout'),
-          operation.scheduleToCloseTimeout as string,
+          operation.scheduleToStartTimeout as string,
         )}
       {/if}
       {#if operation.startToCloseTimeout}
@@ -96,12 +96,13 @@
       {/if}
       {#if operation.blockedReason}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="text-sm text-secondary">
             {translate('nexus.blocked-reason')}
           </p>
           <CodeBlock
             language="text"
             content={operation.blockedReason}
+            label={translate('nexus.blocked-reason')}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -109,12 +110,13 @@
       {/if}
       {#if Object.keys(operation.cancellationInfo ?? {}).length > 0}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="text-sm text-secondary">
             {translate('nexus.cancellation-info')}
           </p>
           <CodeBlock
             language="text"
             content={stringifyWithBigInt(operation.cancellationInfo)}
+            label={translate('nexus.cancellation-info')}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -124,9 +126,9 @@
   </div>
 </div>
 
-{#snippet nextRetry(timeDifference)}
+{#snippet nextRetry(timeDifference: string)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-secondary">
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
@@ -138,7 +140,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-secondary">
       {label}
     </p>
     <p class="w-full whitespace-pre-line">
@@ -152,23 +154,26 @@
 {/snippet}
 
 {#snippet attempts()}
-  <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
-    <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
-    {operation.attempt ?? 0}
-  </Badge>
+  <Badge
+    text={String(operation.attempt ?? 0)}
+    colorScheme={failed ? 'danger' : 'neutral'}
+    Icon={IconRetry}
+    class="mr-1"
+  />
 {/snippet}
 
 {#snippet failures()}
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if operation.lastAttemptFailure}
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm text-secondary">
           {translate('workflows.last-failure')}
         </p>
         <CodeBlock
           content={stringifyWithBigInt(
-            omit(operation.lastAttemptFailure, 'stackTrace'),
+            omit(operation.lastAttemptFailure, ['stackTrace']),
           )}
+          label={translate('workflows.last-failure')}
           maxHeight={384}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -177,13 +182,14 @@
     </div>
     <div class="flex flex-1 flex-col">
       {#if operation.lastAttemptFailure?.stackTrace}
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm text-secondary">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock
           language="text"
           maxHeight={384}
           content={operation.lastAttemptFailure.stackTrace}
+          label={translate('common.stack-trace')}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />

@@ -1,21 +1,42 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import type { Snippet } from 'svelte';
 
-  export let label: string;
-  export let menuLabel: string;
-  export let icon: IconName | undefined = undefined;
-  export let id: string;
-  export let disabled = false;
-  export let position: 'left' | 'right' = 'left';
-  export let primaryActionDisabled = false;
-  export let href: string | undefined = undefined;
-  export let menuClass: string | undefined = undefined;
+  import Button from '$lib/holocene/button.svelte';
+  import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import { type IconComponent } from '$lib/io/icon';
+
+  interface Props {
+    label: string;
+    menuLabel: string;
+    Icon?: IconComponent;
+    id: string;
+    disabled?: boolean;
+    position?: 'left' | 'right';
+    primaryActionDisabled?: boolean;
+    href?: string;
+    menuClass?: string;
+    class?: string;
+    onclick?: (event: MouseEvent) => void;
+    children?: Snippet;
+  }
+
+  let {
+    label,
+    menuLabel,
+    Icon,
+    id,
+    disabled = false,
+    position = 'left',
+    primaryActionDisabled = false,
+    href,
+    menuClass,
+    class: className,
+    onclick,
+    children,
+  }: Props = $props();
 </script>
 
-<MenuContainer class={$$props.class}>
+<MenuContainer class={className}>
   <div class="button-group flex h-10 cursor-pointer flex-row gap-[1px]">
     <Button
       disabled={disabled || primaryActionDisabled}
@@ -25,15 +46,16 @@
       data-track-name="split-button"
       data-track-intent="primary"
       data-track-text={label}
-      on:click
+      class="rounded-r-none"
+      {onclick}
     >
-      {#if icon}
-        <Icon name={icon} />
+      {#if Icon}
+        <Icon />
       {/if}
       {label}
     </Button>
     <MenuButton
-      class="max-w-fit grow-0 px-3"
+      class="max-w-fit grow-0 rounded-l-none px-3"
       id="{id}-menu-button"
       label={menuLabel}
       controls="{id}-menu"
@@ -44,6 +66,6 @@
   </div>
 
   <Menu id="{id}-menu" {position} class={menuClass}>
-    <slot />
+    {@render children?.()}
   </Menu>
 </MenuContainer>

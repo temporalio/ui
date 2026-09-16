@@ -4,6 +4,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconAdd } from '$lib/io/icon';
   import {
     customSearchAttributes,
     type SearchAttributesSchema,
@@ -16,7 +17,7 @@
     class?: ClassNameValue;
     attributesToAdd: SearchAttributesSchema;
     buttonCopy?: string;
-    variant?: ComponentProps<Button>['variant'];
+    variant?: ComponentProps<typeof Button>['variant'];
   }
 
   let {
@@ -29,7 +30,7 @@
   const addSearchAttribute = () => {
     attributesToAdd = [
       ...attributesToAdd,
-      { label: null, value: null, type: SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED },
+      { label: '', value: null, type: SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED },
     ];
   };
 
@@ -52,10 +53,10 @@
   {/each}
   <Button
     {variant}
-    leadingIcon="add"
+    LeadingIcon={IconAdd}
     class="max-sm:w-full"
     data-testid="add-search-attribute-button"
-    on:click={addSearchAttribute}
+    onclick={addSearchAttribute}
     disabled={!searchAttributes.length ||
       attributes.length === searchAttributes.length}>{buttonCopy}</Button
   >

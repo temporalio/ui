@@ -3,7 +3,7 @@
     workflowId?: string;
     runId?: string;
     scheduleId?: string;
-    type: 'input' | 'result' | undefined;
+    type: string | undefined;
     eventId?: string | undefined;
   };
 </script>
@@ -13,11 +13,16 @@
 
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconDownload,
+    IconExclamationOctagon,
+    IconExternalLink,
+    IconRetry,
+  } from '$lib/io/icon';
   import { downloadExternalPayloadWithCodec } from '$lib/services/data-encoder';
   import type { Payload, Payloads } from '$lib/types';
   import {
@@ -35,12 +40,21 @@
 
   interface Props {
     value: Payload | Payloads | PayloadContainingObject;
+    label?: string;
     maxHeight?: number;
     testId?: string;
     filenameData?: PayloadDownloadFilenameData;
+    lazy?: boolean;
   }
 
-  let { value, maxHeight, testId, filenameData = undefined }: Props = $props();
+  let {
+    value,
+    label = '',
+    maxHeight,
+    testId,
+    filenameData = undefined,
+    lazy = false,
+  }: Props = $props();
 
   let downloadError: string | undefined = $state(undefined);
   let downloadLoading: boolean = $state(false);
@@ -68,7 +82,7 @@
     let data: Payloads | undefined = undefined;
     try {
       data = await downloadExternalPayloadWithCodec(payload);
-      const parsed = parseRawPayloadToJSON(data.payloads[0]);
+      const parsed = parseRawPayloadToJSON(data.payloads![0]);
       const content = stringifyWithBigInt(parsed, undefined, 2);
       const a = document.createElement('a');
       const file = new Blob([content], { type: 'json/plain' });
@@ -88,115 +102,134 @@
   };
 </script>
 
-<PayloadDecoder {value}>
-  {#snippet loading()}
-    <CodeBlock
-      content={stringifyWithBigInt(value)}
-      {maxHeight}
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      {testId}
-      language="json"
-    />
-  {/snippet}
-  {#snippet children(results)}
-    <div class="space-y-2">
-      {#each results as result (result)}
-        {#if isExternallyStoredRawPayload(result?.decodedValue)}
-          {@const size = formatBytes(
-            result.decodedValue.externalPayloads?.[0].sizeBytes ?? 0,
-          )}
-          <CodeBlock
-            content={stringifyWithBigInt(result.decodedValue.data)}
-            {maxHeight}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            {testId}
-            language="json"
-          >
-            {#snippet headerActions()}
-              <Tooltip
-                width={192}
-                top
-                hide={!!getCodecEndpoint(page.data.settings)}
-                text="Add a codec server with a /download endpoint to download this payload."
-              >
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  leadingIcon="download"
-                  disabled={!getCodecEndpoint(page.data.settings)}
-                  loading={downloadLoading}
-                  on:click={() => downloadExternalPayload(result.originalValue)}
-                >
-                  {size}
-                </Button>
-              </Tooltip>
-            {/snippet}
-          </CodeBlock>
-          {#if downloadError}
-            <div class="flex items-start gap-2 text-danger">
-              <Icon width={16} height={16} name="exclamation-octagon" />
-              <p class="leading-4">{downloadError}</p>
-            </div>
-          {/if}
-          <p>
-            Payload downloads require a codec server with a <span
-              class="rounded-sm bg-code-block px-1 font-mono">/download</span
+<!-- w-0 + min-w-full clamps the codeblock to its container's resolved width so
+     a long unbroken payload (e.g. raw base64) wraps instead of expanding a
+     table-auto cell. Covers loading, decoded, and error states. -->
+<div class="w-0 min-w-full">
+  <PayloadDecoder {value}>
+    {#snippet loading()}
+      <CodeBlock
+        content={stringifyWithBigInt(value)}
+        {label}
+        {maxHeight}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        {testId}
+        language="json"
+        {lazy}
+      />
+    {/snippet}
+    {#snippet children(results)}
+      <div class="space-y-2">
+        {#each results as result (result)}
+          {#if isExternallyStoredRawPayload(result?.decodedValue)}
+            {@const size = formatBytes(
+              result.decodedValue.externalPayloads?.[0].sizeBytes ?? 0,
+            )}
+            <CodeBlock
+              content={stringifyWithBigInt(result.decodedValue.data)}
+              {label}
+              {maxHeight}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+              {testId}
+              language="json"
+              {lazy}
             >
-            endpoint. <Link href="https://docs.temporal.io/codec-server" newTab
-              >How to set up a codec server
-            </Link>
-            <Icon class="inline" name="external-link" />
-          </p>
-        {:else if isParsedPayload(result.decodedValue)}
-          <CodeBlock
-            content={stringifyWithBigInt(result.decodedValue.data)}
-            {maxHeight}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            {testId}
-            language="json"
+              {#snippet headerActions()}
+                <Tooltip
+                  width={192}
+                  top
+                  hide={!!getCodecEndpoint(page.data.settings)}
+                  text="Add a codec server with a /download endpoint to download this payload."
+                >
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    LeadingIcon={IconDownload}
+                    disabled={!getCodecEndpoint(page.data.settings)}
+                    loading={downloadLoading}
+                    onclick={() =>
+                      downloadExternalPayload(result.originalValue)}
+                  >
+                    {size}
+                  </Button>
+                </Tooltip>
+              {/snippet}
+            </CodeBlock>
+            {#if downloadError}
+              <div class="flex items-start gap-2 text-danger">
+                <IconExclamationOctagon width={16} height={16} />
+                <p class="leading-4">{downloadError}</p>
+              </div>
+            {/if}
+            <p>
+              Payload downloads require a codec server with a <span
+                class="rounded-sm bg-surface-overlay-primary px-1 font-mono"
+                >/download</span
+              >
+              endpoint. <Link
+                href="https://docs.temporal.io/codec-server"
+                newTab
+                >How to set up a codec server
+              </Link>
+              <IconExternalLink class="inline" />
+            </p>
+          {:else if isParsedPayload(result.decodedValue)}
+            <CodeBlock
+              content={stringifyWithBigInt(result.decodedValue.data)}
+              {label}
+              {maxHeight}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+              {testId}
+              language="json"
+              {lazy}
+            />
+          {:else}
+            <CodeBlock
+              content={stringifyWithBigInt(result.decodedValue)}
+              {label}
+              {maxHeight}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+              {testId}
+              language="json"
+              {lazy}
+            />
+          {/if}
+        {/each}
+      </div>
+    {/snippet}
+    {#snippet error({ error, retry })}
+      <CodeBlock
+        content={stringifyWithBigInt(value)}
+        {label}
+        {maxHeight}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        {testId}
+        language="json"
+        {lazy}
+      >
+        {#snippet headerActions()}
+          <IconButton
+            Icon={IconRetry}
+            onclick={retry}
+            label={translate('common.retry')}
           />
-        {:else}
-          <CodeBlock
-            content={stringifyWithBigInt(result.decodedValue)}
-            {maxHeight}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            {testId}
-            language="json"
-          />
-        {/if}
-      {/each}
-    </div>
-  {/snippet}
-  {#snippet error({ error, retry })}
-    <CodeBlock
-      content={stringifyWithBigInt(value)}
-      {maxHeight}
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      {testId}
-      language="json"
-    >
-      {#snippet headerActions()}
-        <IconButton
-          icon="retry"
-          on:click={retry}
-          label={translate('common.retry')}
-        />
-      {/snippet}
-    </CodeBlock>
-    <div class="flex items-start gap-2 text-danger">
-      <Icon width={16} height={16} name="exclamation-octagon" />
-      <p class="leading-4">
-        {#if isNetworkError(error)}
-          {error.message} - {error.statusText}
-        {:else}
-          {stringifyWithBigInt(error)}
-        {/if}
-      </p>
-    </div>
-  {/snippet}
-</PayloadDecoder>
+        {/snippet}
+      </CodeBlock>
+      <div class="flex items-start gap-2 text-danger">
+        <IconExclamationOctagon width={16} height={16} />
+        <p class="leading-4">
+          {#if isNetworkError(error)}
+            {error.message} - {error.statusText}
+          {:else}
+            {stringifyWithBigInt(error)}
+          {/if}
+        </p>
+      </div>
+    {/snippet}
+  </PayloadDecoder>
+</div>

@@ -7,9 +7,9 @@
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconSearch } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { searchAttributes as defaultSearchAttributes } from '$lib/stores/search-attributes';
   import type { SearchAttributes } from '$lib/types/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
@@ -17,17 +17,12 @@
 
   interface Props {
     filters: Writable<SearchAttributeFilter[]>;
-    searchAttributes?: SearchAttributes;
+    searchAttributes: SearchAttributes;
     id: string;
     onSearch?: (query: string) => void;
   }
 
-  let {
-    filters,
-    searchAttributes = $defaultSearchAttributes,
-    id,
-    onSearch,
-  }: Props = $props();
+  let { filters, searchAttributes, id, onSearch }: Props = $props();
 
   let manualSearchString = $state('');
 
@@ -70,7 +65,7 @@
   }
 </script>
 
-<div class="w-full border border-t-0 border-subtle" in:fade>
+<div class="w-full border-t border-primary" in:fade>
   <form
     onsubmit={handleSearch}
     class="flex gap-0"
@@ -83,13 +78,13 @@
       label={translate('workflows.search-placeholder')}
       labelHidden
       placeholder={translate('workflows.search-placeholder')}
-      icon="search"
+      Icon={IconSearch}
       class="grow  [&_*]:border-0"
-      inputContainerClass="surface-information !border-r border-subtle"
+      inputContainerClass="rounded-none !border-r border-primary bg-surface-primary text-primary hover:border-primary focus-within:z-20 focus-within:ring-inset focus-within:ring-offset-0"
       clearable
       copyButtonLabel={translate('common.copy-icon-title')}
       clearButtonLabel={translate('common.clear-input-button-label')}
-      on:clear={handleClearInput}
+      onClear={handleClearInput}
       bind:value={manualSearchString}
       maxLength={MAX_QUERY_LENGTH}
       hideCount={!manualSearchString ||
@@ -100,6 +95,7 @@
       data-testid="{id}-manual-search-button"
       variant="ghost"
       type="submit"
+      class="rounded-none focus-visible:z-20"
     >
       {translate('common.search')}
     </Button>

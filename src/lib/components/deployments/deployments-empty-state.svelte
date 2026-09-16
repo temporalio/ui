@@ -1,20 +1,28 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconExternalLinkOptical,
+    IconTemporalWorker,
+    IconWarning,
+  } from '$lib/io/icon';
 
   interface Props {
     createHref: string;
     error?: string;
+    canCreateServerlessDeployment?: boolean;
   }
 
-  let { createHref, error = '' }: Props = $props();
+  let {
+    createHref,
+    error = '',
+    canCreateServerlessDeployment = true,
+  }: Props = $props();
 </script>
 
 <div class="flex flex-col items-center gap-4 py-16">
-  <Icon name="workers" class="h-20 w-20 text-blue-200" />
+  <IconTemporalWorker class="h-20 w-20 text-indigo-6" />
   <div class="flex flex-col items-center gap-2">
     <p class="text-base font-medium">
       {translate('deployments.empty-state-title')}
@@ -24,22 +32,22 @@
     </p>
   </div>
   <div class="flex flex-wrap items-center justify-center gap-4">
-    <CapabilityGuard capability="serverScaledDeployments">
+    {#if canCreateServerlessDeployment}
       <Button variant="secondary" href={createHref}>
         {translate('deployments.create-serverless-deployment')}
       </Button>
-    </CapabilityGuard>
+    {/if}
     <Button
       variant="ghost"
       href="https://docs.temporal.io/worker-deployments"
       target="_blank"
-      trailingIcon="external-link"
+      TrailingIcon={IconExternalLinkOptical}
     >
       {translate('deployments.self-managed-deployment')}
     </Button>
   </div>
   {#if error}
-    <Alert intent="warning" icon="warning" class="max-w-lg">
+    <Alert intent="warning" Icon={IconWarning} class="max-w-lg">
       {error}
     </Alert>
   {/if}

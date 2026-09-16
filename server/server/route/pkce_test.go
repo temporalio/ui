@@ -69,7 +69,7 @@ func TestAuthenticate_AddsPKCEParamsToAuthURL(t *testing.T) {
 		Scopes:      []string{"openid", "profile"},
 	}
 
-	handler := authenticate(oauthCfg, nil, []string{}, true)
+	handler := authenticate(oauthCfg, nil, []string{}, false, true)
 	err := handler(c)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusFound, rec.Code)
@@ -103,7 +103,7 @@ func TestAuthenticate_SetsCodeVerifierCookie(t *testing.T) {
 		Scopes:      []string{"openid"},
 	}
 
-	handler := authenticate(oauthCfg, nil, []string{}, true)
+	handler := authenticate(oauthCfg, nil, []string{}, false, true)
 	err := handler(c)
 	require.NoError(t, err)
 
@@ -139,7 +139,7 @@ func TestAuthenticate_SetsCallbackCookieForPreV280(t *testing.T) {
 		Scopes:      []string{"openid"},
 	}
 
-	handler := authenticate(oauthCfg, nil, []string{}, true)
+	handler := authenticate(oauthCfg, nil, []string{}, false, true)
 	err := handler(c)
 	require.NoError(t, err)
 
@@ -162,7 +162,7 @@ func TestLogout_ClearsCodeVerifier(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	handler := logout()
+	handler := logout(false)
 	err := handler(c)
 	require.NoError(t, err)
 
@@ -192,7 +192,7 @@ func TestAuthenticate_PKCEDisabled_NoChallengeParams(t *testing.T) {
 		Scopes:      []string{"openid"},
 	}
 
-	handler := authenticate(oauthCfg, nil, []string{}, false)
+	handler := authenticate(oauthCfg, nil, []string{}, false, false)
 	err := handler(c)
 	require.NoError(t, err)
 
@@ -225,7 +225,7 @@ func TestAuthenticate_PKCEDisabled_NoVerifierCookie(t *testing.T) {
 		Scopes:      []string{"openid"},
 	}
 
-	handler := authenticate(oauthCfg, nil, []string{}, false)
+	handler := authenticate(oauthCfg, nil, []string{}, false, false)
 	err := handler(c)
 	require.NoError(t, err)
 
@@ -256,7 +256,7 @@ func TestAuthenticate_WithOptionsIncludesPKCE(t *testing.T) {
 		"audience": "test-audience",
 	}
 
-	handler := authenticate(oauthCfg, options, []string{}, true)
+	handler := authenticate(oauthCfg, options, []string{}, false, true)
 	err := handler(c)
 	require.NoError(t, err)
 

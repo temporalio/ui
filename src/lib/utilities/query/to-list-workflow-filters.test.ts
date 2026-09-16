@@ -45,6 +45,8 @@ const attributes = {
   'Custom Keyword Field': 'Keyword',
   'Custom Bool Field': 'Bool',
   CustomKeywordListField: 'KeywordList',
+  CustomIntField: 'Int',
+  CustomDoubleField: 'Double',
 };
 
 describe('toListWorkflowFilters', () => {
@@ -265,6 +267,39 @@ describe('toListWorkflowFilters', () => {
         operator: '',
         parenthesis: '',
         value: 'true',
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should parse a query with an unquoted Int value', () => {
+    const result = toListWorkflowFilters('`CustomIntField`=1', attributes);
+    const expectedFilters = [
+      {
+        attribute: 'CustomIntField',
+        type: 'Int',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: '1',
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should parse a query with an unquoted Double value and a comparison operator', () => {
+    const result = toListWorkflowFilters(
+      '`CustomDoubleField`>=1.5',
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'CustomDoubleField',
+        type: 'Double',
+        conditional: '>=',
+        operator: '',
+        parenthesis: '',
+        value: '1.5',
       },
     ];
     expect(result).toMatchObject(expectedFilters);

@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  The IAM role Temporal assumes to invoke your Bedrock AgentCore Runtimes.
+  This is not the AgentCore execution role, which AgentCore itself assumes to
+  pull your image; this one is assumed by Temporal to start a session.
+Parameters:
+  AssumeRoleExternalId:
+    Type: String
+    MinLength: 1
+    Description: >-
+      The External ID Temporal presents when assuming this role. It must match
+      the External ID on the Worker Deployment Version, or the assume fails.
+  TemporalPrincipal:
+    Type: String
+    Default: temporal.io
+    Description: >-
+      Temporal Cloud: leave this as temporal.io. Self-hosted: the ARN of the
+      IAM identity your Temporal service runs as, for example
+      arn:aws:iam::123456789012:role/temporal-server.
+  AgentRuntimeArns:
+    Type: CommaDelimitedList
+    Default: '*'
+    Description: >-
+      Runtime ARNs this role may invoke. Narrow this to your runtimes rather
+      than leaving it as *.
+Conditions:
+  # Temporal Cloud assumes the role as a service principal. A self-hosted
+  # server assumes it as whatever IAM identity it runs as, which is an AWS
+  # principal rather than a service, so the trust policy differs by key.
+  TemporalIsService: !Equals [!Ref TemporalPrincipal, 'temporal.io']
+Resources:
+  TemporalAgentCoreRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: !If
+              - TemporalIsService
+              - Service: temporal.io
+              - AWS: !Ref TemporalPrincipal
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref AssumeRoleExternalId
+      Policies:
+        - PolicyName: InvokeAgentCore
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # InvokeAgentRuntime starts the session. GetAgentRuntimeEndpoint
+              # is what validation calls first, so a role without it fails when
+              # the Version is created rather than when a Worker is needed.
+              - Effect: Allow
+                Action:
+                  - bedrock-agentcore:InvokeAgentRuntime
+                  - bedrock-agentcore:GetAgentRuntimeEndpoint
+                Resource: !Ref AgentRuntimeArns
+Outputs:
+  RoleArn:
+    Description: Put this in the IAM Role ARN field on the Worker Deployment Version.
+    Value: !GetAtt TemporalAgentCoreRole.Arn

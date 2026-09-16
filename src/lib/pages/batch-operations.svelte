@@ -3,6 +3,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconInfo } from '$lib/io/icon';
   import { listBatchOperations } from '$lib/services/batch-service';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 
@@ -13,13 +14,17 @@
   let { namespace }: Props = $props();
 </script>
 
-<h1>{translate('batch.list-page-title')}</h1>
+<header>
+  <h1 class="leading-7">
+    {translate('batch.list-page-title')}
+  </h1>
+</header>
 {#await listBatchOperations(namespace)}
   <Loading />
 {:then { operations }}
   {#if $inProgressBatchOperation}
     <Alert
-      icon="info"
+      Icon={IconInfo}
       intent="info"
       title={translate('batch.max-concurrent-alert-title')}
     >

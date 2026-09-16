@@ -50,52 +50,53 @@
       root = await fetchAllDirectWorkflows({
         namespace,
         workflow: node.workflow,
-        parentWorkflowId: node.workflow?.parent?.workflowId,
-        parentRunId: node.workflow?.parent?.runId,
+        parentWorkflowId: node.workflow?.parent?.workflowId ?? '',
+        parentRunId: node.workflow?.parent?.runId ?? undefined,
       });
     }
     activeWorkflow = node.workflow;
   };
 </script>
 
-<div class="flex flex-col bg-primary">
+<div class="flex flex-col bg-surface-primary">
   <div
-    class="relative z-10 w-full overflow-hidden border-b border-subtle bg-primary lg:sticky lg:top-[var(--top-nav-height)]"
+    class="relative z-10 w-full overflow-hidden border-b border-primary bg-surface-primary lg:sticky lg:top-[var(--top-nav-height)]"
   >
     <ZoomSvg
       initialZoom={2}
       maxZoomOut={8}
       maxZoomIn={0.25}
       containerHeight={280}
-      let:width
-      let:height
-      let:zoomLevel
     >
-      <div class="flex py-4" slot="controls">
-        {#if $showFullTree}
-          <ToggleSwitch
-            label={translate('common.expand-all')}
-            labelPosition="left"
-            id="autorefresh"
-            checked={expandAll}
-            on:change={onExpandAll}
-          />
-        {/if}
-      </div>
-      <WorkflowFamilyNodeTree
-        {root}
-        {width}
-        {height}
-        {zoomLevel}
-        {onNodeClick}
-        {expandAll}
-        {openRuns}
-        {activeWorkflow}
-      />
+      {#snippet controls()}
+        <div class="flex py-4">
+          {#if $showFullTree}
+            <ToggleSwitch
+              label={translate('common.expand-all')}
+              labelPosition="left"
+              id="autorefresh"
+              checked={expandAll}
+              onchange={onExpandAll}
+            />
+          {/if}
+        </div>
+      {/snippet}
+      {#snippet graph({ width, height, zoomLevel })}
+        <WorkflowFamilyNodeTree
+          {root}
+          {width}
+          {height}
+          {zoomLevel}
+          {onNodeClick}
+          {expandAll}
+          {openRuns}
+          {activeWorkflow}
+        />
+      {/snippet}
     </ZoomSvg>
   </div>
   <div
-    class="surface-secondary flex h-auto w-full flex-col overflow-auto text-base"
+    class="flex h-auto w-full flex-col overflow-auto bg-surface-secondary text-base text-primary"
   >
     <WorkflowFamilyNodeDescription
       {root}

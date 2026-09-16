@@ -5,12 +5,16 @@ import { base } from '$app/paths';
 import { initCoreProvider } from './core-provider';
 import * as routeForModule from './route-for';
 import {
+  routeForAgents,
   routeForArchivalEventHistory,
   routeForArchivalWorkflows,
   routeForAuthentication,
+  routeForAuthenticationRedirect,
   routeForBatchOperation,
   routeForBatchOperations,
   routeForCallStack,
+  routeForCatalog,
+  routeForCatalogExample,
   routeForCommonErrors,
   routeForEventHistory,
   routeForEventHistoryEvent,
@@ -36,7 +40,13 @@ import {
   routeForStandaloneActivityMetadata,
   routeForStandaloneActivitySearchAttributes,
   routeForStandaloneActivityWorkers,
+  routeForStandaloneNexusOperationDetails,
+  routeForStandaloneNexusOperationMetadata,
+  routeForStandaloneNexusOperations,
+  routeForStandaloneNexusOperationSearchAttributes,
+  routeForStandaloneNexusOperationsWithQuery,
   routeForStartStandaloneActivity,
+  routeForStartStandaloneNexusOperation,
   routeForTaskQueue,
   routeForTimeline,
   routeForUserMetadata,
@@ -75,14 +85,29 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     runId: 'run-1',
   };
 
+  const nexusOperationParams = {
+    namespace: 'default',
+    operationId: 'op-1',
+  };
+
   const cases: [string, () => string | undefined][] = [
     ['routeForNamespaces', () => routeForNamespaces()],
     ['routeForNexus', () => routeForNexus()],
+    [
+      'routeForCatalogExample',
+      () =>
+        routeForCatalogExample({
+          ...namespaceParams,
+          exampleId: 'example-id',
+        }),
+    ],
+    ['routeForCatalog', () => routeForCatalog(namespaceParams)],
     ['routeForNexusEndpoint', () => routeForNexusEndpoint('ep-1')],
     ['routeForNexusEndpointEdit', () => routeForNexusEndpointEdit('ep-1')],
     ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],
     ['routeForNamespace', () => routeForNamespace(namespaceParams)],
     ['routeForNamespaceSelector', () => routeForNamespaceSelector()],
+    ['routeForAgents', () => routeForAgents(namespaceParams)],
     ['routeForWorkflows', () => routeForWorkflows(namespaceParams)],
     [
       'routeForArchivalWorkflows',
@@ -180,6 +205,35 @@ describe('routeFor functions should resolve the base path exactly once', () => {
       () => routeForStandaloneActivityMetadata(activityParams),
     ],
     [
+      'routeForStandaloneNexusOperations',
+      () => routeForStandaloneNexusOperations(namespaceParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationsWithQuery',
+      () =>
+        routeForStandaloneNexusOperationsWithQuery(
+          namespaceParams,
+          'test-query',
+        ),
+    ],
+    [
+      'routeForStartStandaloneNexusOperation',
+      () => routeForStartStandaloneNexusOperation(namespaceParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationDetails',
+      () => routeForStandaloneNexusOperationDetails(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationSearchAttributes',
+      () =>
+        routeForStandaloneNexusOperationSearchAttributes(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationMetadata',
+      () => routeForStandaloneNexusOperationMetadata(nexusOperationParams),
+    ],
+    [
       'routeForWorkflowStart',
       () => routeForWorkflowStart({ namespace: 'default' }),
     ],
@@ -194,6 +248,17 @@ describe('routeFor functions should resolve the base path exactly once', () => {
           settings: { auth: {}, baseUrl: 'https://example.com' },
           searchParams: new URLSearchParams(),
         }),
+    ],
+    [
+      'routeForAuthenticationRedirect',
+      () =>
+        routeForAuthenticationRedirect(
+          {
+            auth: { redirectToProvider: true },
+            baseUrl: 'https://example.com',
+          },
+          new URL('https://example.com/namespaces/default/workflows'),
+        ),
     ],
     ['routeForLoginPage', () => routeForLoginPage('', false)],
     ['routeForCommonErrors', () => routeForCommonErrors()],
@@ -277,6 +342,11 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     runId: 'run-1',
   };
 
+  const nexusOperationParams = {
+    namespace: 'default',
+    operationId: 'op-1',
+  };
+
   afterEach(() => {
     initCoreProvider({
       getAccessToken: async () => '',
@@ -292,6 +362,7 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],
     ['routeForNamespace', () => routeForNamespace(namespaceParams)],
     ['routeForNamespaceSelector', () => routeForNamespaceSelector()],
+    ['routeForAgents', () => routeForAgents(namespaceParams)],
     ['routeForWorkflows', () => routeForWorkflows(namespaceParams)],
     [
       'routeForArchivalWorkflows',
@@ -389,6 +460,35 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
       () => routeForStandaloneActivityMetadata(activityParams),
     ],
     [
+      'routeForStandaloneNexusOperations',
+      () => routeForStandaloneNexusOperations(namespaceParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationsWithQuery',
+      () =>
+        routeForStandaloneNexusOperationsWithQuery(
+          namespaceParams,
+          'test-query',
+        ),
+    ],
+    [
+      'routeForStartStandaloneNexusOperation',
+      () => routeForStartStandaloneNexusOperation(namespaceParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationDetails',
+      () => routeForStandaloneNexusOperationDetails(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationSearchAttributes',
+      () =>
+        routeForStandaloneNexusOperationSearchAttributes(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationMetadata',
+      () => routeForStandaloneNexusOperationMetadata(nexusOperationParams),
+    ],
+    [
       'routeForWorkflowStart',
       () => routeForWorkflowStart({ namespace: 'default' }),
     ],
@@ -406,6 +506,17 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
           settings: { auth: {}, baseUrl: 'https://example.com' },
           searchParams: new URLSearchParams(),
         }),
+    ],
+    [
+      'routeForAuthenticationRedirect',
+      () =>
+        routeForAuthenticationRedirect(
+          {
+            auth: { redirectToProvider: true },
+            baseUrl: 'https://example.com',
+          },
+          new URL('https://example.com/namespaces/default/workflows'),
+        ),
     ],
     ['routeForLoginPage', () => routeForLoginPage('', false)],
   ];

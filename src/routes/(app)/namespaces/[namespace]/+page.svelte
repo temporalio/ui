@@ -6,12 +6,12 @@
   import type { PageData } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge, type BadgeColorScheme } from '$lib/io/badge';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { settings } from '$lib/stores/settings';
@@ -30,21 +30,23 @@
     ARCHIVAL_STATE_ENABLED = 2,
   }
 
-  const badgeTypeForArchivalState = (state: ArchivalState): BadgeType => {
+  const badgeColorSchemeForArchivalState = (
+    state: ArchivalState,
+  ): BadgeColorScheme => {
     return state === ArchivalState.ARCHIVAL_STATE_ENABLED
       ? 'success'
-      : undefined;
+      : 'neutral';
   };
 
-  const badgeTypeForBoolean = (
+  const badgeColorSchemeForBoolean = (
     bool: boolean,
     invertLogic = true,
-  ): BadgeType => {
+  ): BadgeColorScheme => {
     if (invertLogic) {
-      return bool ? undefined : 'success';
+      return bool ? 'neutral' : 'success';
     }
 
-    return bool ? 'success' : undefined;
+    return bool ? 'success' : 'neutral';
   };
 
   const badgeTextForBoolean = (bool: boolean) => {
@@ -77,16 +79,20 @@
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
     <Table>
-      <caption class="sr-only" slot="caption"
-        >{`${translate('namespaces.namespace')} ${translate(
-          'common.details',
-        )}`}</caption
-      >
-      <tr slot="headers">
-        <th colspan="2">
-          <h3>{translate('common.details')}</h3>
-        </th>
-      </tr>
+      {#snippet caption()}
+        <caption class="sr-only"
+          >{`${translate('namespaces.namespace')} ${translate(
+            'common.details',
+          )}`}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th colspan="2">
+            <h3>{translate('common.details')}</h3>
+          </th>
+        </tr>
+      {/snippet}
       <tr data-testid="namespace-owner">
         <td>{translate('namespaces.owner')}</td>
         <td
@@ -98,13 +104,14 @@
         <td>{translate('namespaces.global')}</td>
         <td>
           <Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean(namespace?.isGlobalNamespace, false)}
-          >
-            {namespace?.isGlobalNamespace
+            colorScheme={badgeColorSchemeForBoolean(
+              namespace?.isGlobalNamespace,
+              false,
+            )}
+            text={namespace?.isGlobalNamespace
               ? translate('common.yes')
               : translate('common.no')}
-          </Badge>
+          />
         </td>
       </tr>
       <tr data-testid="namespace-retention">
@@ -119,26 +126,22 @@
         <td>{translate('namespaces.history-archival')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForArchivalState(
+            colorScheme={badgeColorSchemeForArchivalState(
               namespace?.config?.historyArchivalState,
             )}
-          >
-            {namespace?.config?.historyArchivalState}
-          </Badge></td
+            text={`${namespace?.config?.historyArchivalState ?? ''}`}
+          /></td
         >
       </tr>
       <tr data-testid="namespace-visibility">
         <td>{translate('namespaces.visibility-archival')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForArchivalState(
+            colorScheme={badgeColorSchemeForArchivalState(
               namespace?.config?.visibilityArchivalState,
             )}
-          >
-            {namespace?.config?.visibilityArchivalState}
-          </Badge></td
+            text={`${namespace?.config?.visibilityArchivalState ?? ''}`}
+          /></td
         >
       </tr>
       <tr data-testid="namespace-failover">
@@ -154,14 +157,16 @@
 
   <article class="namespace-info flex w-full flex-col">
     <Table>
-      <caption class="sr-only" slot="caption"
-        >{translate('namespaces.versions')}</caption
-      >
-      <tr slot="headers">
-        <th colspan="2">
-          <h3>{translate('namespaces.versions')}</h3>
-        </th>
-      </tr>
+      {#snippet caption()}
+        <caption class="sr-only">{translate('namespaces.versions')}</caption>
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th colspan="2">
+            <h3>{translate('namespaces.versions')}</h3>
+          </th>
+        </tr>
+      {/snippet}
 
       <tr data-testid="server-version">
         <td>Temporal Server Version</td>
@@ -176,66 +181,74 @@
 
   <article class="namespace-info flex w-full flex-col">
     <Table>
-      <caption class="sr-only" slot="caption"
-        >{translate('namespaces.client-actions')}</caption
-      >
-
-      <tr slot="headers">
-        <th colspan="2">
-          <h3>
-            {translate('namespaces.client-actions')}
-          </h3>
-        </th>
-      </tr>
+      {#snippet caption()}
+        <caption class="sr-only"
+          >{translate('namespaces.client-actions')}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <tr>
+          <th colspan="2">
+            <h3>
+              {translate('namespaces.client-actions')}
+            </h3>
+          </th>
+        </tr>
+      {/snippet}
 
       <tr>
         <td>{translate('namespaces.client-actions')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.disableWriteActions)}
-            >{badgeTextForBoolean($settings.disableWriteActions)}</Badge
-          ></td
+            colorScheme={badgeColorSchemeForBoolean(
+              $settings.disableWriteActions,
+            )}
+            text={badgeTextForBoolean($settings.disableWriteActions)}
+          /></td
         >
       </tr>
       <tr>
         <td>{translate('workflows.terminate-modal-title')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.workflowTerminateDisabled)}
-            >{badgeTextForBoolean($settings.workflowTerminateDisabled)}</Badge
-          ></td
+            colorScheme={badgeColorSchemeForBoolean(
+              $settings.workflowTerminateDisabled,
+            )}
+            text={badgeTextForBoolean($settings.workflowTerminateDisabled)}
+          /></td
         >
       </tr>
       <tr>
         <td>{translate('workflows.cancel-modal-title')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.workflowCancelDisabled)}
-            >{badgeTextForBoolean($settings.workflowCancelDisabled)}</Badge
-          ></td
+            colorScheme={badgeColorSchemeForBoolean(
+              $settings.workflowCancelDisabled,
+            )}
+            text={badgeTextForBoolean($settings.workflowCancelDisabled)}
+          /></td
         >
       </tr>
       <tr>
         <td>{translate('namespaces.signal-workflow')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.workflowSignalDisabled)}
-            >{badgeTextForBoolean($settings.workflowSignalDisabled)}</Badge
-          ></td
+            colorScheme={badgeColorSchemeForBoolean(
+              $settings.workflowSignalDisabled,
+            )}
+            text={badgeTextForBoolean($settings.workflowSignalDisabled)}
+          /></td
         >
       </tr>
       <tr>
         <td>{translate('workflows.reset-modal-title')}</td>
         <td
           ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.workflowResetDisabled)}
-            >{badgeTextForBoolean($settings.workflowResetDisabled)}</Badge
-          ></td
+            colorScheme={badgeColorSchemeForBoolean(
+              $settings.workflowResetDisabled,
+            )}
+            text={badgeTextForBoolean($settings.workflowResetDisabled)}
+          /></td
         >
       </tr>
       {#if pauseEnabled}
@@ -243,10 +256,11 @@
           <td>{translate('workflows.pause-workflow')}</td>
           <td
             ><Badge
-              class="px-1 py-0"
-              type={badgeTypeForBoolean($settings.workflowPauseDisabled)}
-              >{badgeTextForBoolean($settings.workflowPauseDisabled)}</Badge
-            ></td
+              colorScheme={badgeColorSchemeForBoolean(
+                $settings.workflowPauseDisabled,
+              )}
+              text={badgeTextForBoolean($settings.workflowPauseDisabled)}
+            /></td
           >
         </tr>
       {/if}
@@ -260,13 +274,17 @@
       {translate('events.attribute-group.search-attributes')}
     </h3>
     <Table class="w-full">
-      <caption class="sr-only" slot="caption"
-        >{translate('events.attribute-group.search-attributes')}</caption
-      >
-      <TableHeaderRow slot="headers">
-        <th>{translate('common.key')}</th>
-        <th>{translate('common.type')}</th>
-      </TableHeaderRow>
+      {#snippet caption()}
+        <caption class="sr-only"
+          >{translate('events.attribute-group.search-attributes')}</caption
+        >
+      {/snippet}
+      {#snippet headers()}
+        <TableHeaderRow>
+          <th>{translate('common.key')}</th>
+          <th>{translate('common.type')}</th>
+        </TableHeaderRow>
+      {/snippet}
       {#each Object.entries($searchAttributes) as [key, type]}
         <TableRow>
           <td>{key}</td>

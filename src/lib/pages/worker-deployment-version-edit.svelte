@@ -3,12 +3,19 @@
 
   import DeleteWorkerModal from '$lib/components/workers/delete-worker-modal.svelte';
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
+  import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
+  import {
+    buildComputeConfigFromForm,
+    msToScaleDownStabilization,
+  } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import {
-    buildLambdaComputeConfig,
+    decodeAgentCoreProviderDetails,
+    decodeGcpCloudRunProviderDetails,
     decodeLambdaProviderDetails,
     decodeScalerDetails,
     deleteWorkerDeploymentVersion,
@@ -16,15 +23,28 @@
     updateWorkerDeploymentVersionComputeConfig,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
+  import { lockProvidersTo } from '$lib/utilities/lock-compute-provider';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
   interface Props {
     namespace: string;
     deployment: string;
     buildId: string;
+    computeProviders?: readonly ComputeProviderOption[];
+    gcpRegions?: string[];
+    terraformTemplate?: string;
+    cloudRunTerraformTemplate?: string;
   }
 
-  let { namespace, deployment, buildId }: Props = $props();
+  let {
+    namespace,
+    deployment,
+    buildId,
+    computeProviders,
+    gcpRegions,
+    terraformTemplate,
+    cloudRunTerraformTemplate,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -42,9 +62,18 @@
 {:then versionResponse}
   {@const info = versionResponse.workerDeploymentVersionInfo}
   {@const providerDetails = decodeLambdaProviderDetails(info.computeConfig)}
+  {@const agentCoreDetails = decodeAgentCoreProviderDetails(info.computeConfig)}
+  {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
   {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
+  <!-- A Version's provider cannot be changed, so the picker shows only the one
+       in use rather than offering alternatives that cannot be applied. -->
+  {@const configuredProvider = agentCoreDetails.agentCoreEndpointArn
+    ? 'agentcore'
+    : gcpDetails.gcpWorkerPool
+      ? 'cloud-run'
+      : 'lambda'}
   <div class="flex max-w-[45rem] flex-col gap-4">
-    <Link href={backHref} icon="chevron-left">
+    <Link href={backHref} LeadingIcon={IconChevronLeft}>
       {translate('workers.back-to-deployment', { deployment })}
     </Link>
     <h1 class="text-2xl font-semibold">
@@ -52,29 +81,43 @@
     </h1>
     <EditVersionForm
       {error}
+      computeProviders={lockProvidersTo(configuredProvider, computeProviders)}
+      {gcpRegions}
+      {terraformTemplate}
+      {cloudRunTerraformTemplate}
       initialData={{
+        provider: configuredProvider,
         lambdaArn: providerDetails.lambdaArn ?? '',
-        iamRoleArn: providerDetails.iamRoleArn ?? '',
-        roleExternalId: providerDetails.roleExternalId ?? '',
+        agentCoreEndpointArn: agentCoreDetails.agentCoreEndpointArn ?? '',
+        iamRoleArn:
+          providerDetails.iamRoleArn ?? agentCoreDetails.iamRoleArn ?? '',
+        roleExternalId:
+          providerDetails.roleExternalId ??
+          agentCoreDetails.roleExternalId ??
+          '',
+        gcpProject: gcpDetails.gcpProject,
+        gcpRegion: gcpDetails.gcpRegion,
+        gcpWorkerPool: gcpDetails.gcpWorkerPool,
+        gcpServiceAccount: gcpDetails.gcpServiceAccount,
         scaleUpCooloffMs: scalerDetails.scaleUpCooloffMs,
         scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
         maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
         metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
+        minReplicas: scalerDetails.minReplicas,
+        maxReplicas: scalerDetails.maxReplicas,
+        initialReplicas: scalerDetails.initialReplicas,
+        utilizationTarget: scalerDetails.utilizationTarget,
+        scaleDownStabilization:
+          scalerDetails.scaleDownStabilizationMs === undefined
+            ? undefined
+            : msToScaleDownStabilization(
+                scalerDetails.scaleDownStabilizationMs,
+              ),
       }}
       cancelHref={backHref}
       onSubmit={async (data) => {
         error = undefined;
-        const computeConfig = buildLambdaComputeConfig(
-          data.lambdaArn,
-          data.iamRoleArn,
-          {
-            roleExternalId: data.roleExternalId,
-            scaleUpCooloffMs: data.scaleUpCooloffMs,
-            scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-            maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-            metricsPollIntervalMs: data.metricsPollIntervalMs,
-          },
-        );
+        const computeConfig = buildComputeConfigFromForm(data);
         await updateWorkerDeploymentVersionComputeConfig(
           { namespace, deploymentName: deployment, buildId, computeConfig },
           (err) => {

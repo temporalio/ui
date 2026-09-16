@@ -1,5 +1,3 @@
-<svelte:options runes />
-
 <script lang="ts">
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import { activitiesQuery, activityRefresh } from '$lib/stores/activities';
@@ -17,6 +15,5 @@
   options={$activitySearchAttributeOptions}
   searchAttributes={$activitySearchAttributes}
   id="activity"
-  statusAttribute="ExecutionStatus"
   {onManualSearch}
 />

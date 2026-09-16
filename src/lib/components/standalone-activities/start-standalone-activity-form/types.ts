@@ -1,5 +1,5 @@
 import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
-import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
 export interface StandaloneActivityFormData {
   identity: string;
@@ -7,16 +7,18 @@ export interface StandaloneActivityFormData {
   activityId: string;
   taskQueue: string;
   activityType: string;
-  startToCloseTimeout: string;
-  scheduleToCloseTimeout: string;
-  scheduleToStartTimeout: string;
-  input: string;
+  startToCloseTimeout: string | undefined;
+  scheduleToCloseTimeout: string | undefined;
+  scheduleToStartTimeout: string | undefined;
+  startDelay: string | undefined;
+  input: string | undefined;
   encoding: PayloadInputEncoding;
-  messageType: string;
-  searchAttributes: SearchAttributeInput[];
-  summary: string;
-  details: string;
-  // retry policy
+  messageType: string | undefined;
+  searchAttributes: SearchAttributesSchema;
+  summary: string | undefined;
+  details: string | undefined;
+  // retry policy; numeric fields are held as strings (bound to number inputs)
+  // and coerced when the request is built.
   initialInterval: string;
   backoffCoefficient: string;
   maximumInterval: string;
@@ -31,6 +33,7 @@ export type StandaloneActivityFormDefaults = Pick<
   | 'activityId'
   | 'activityType'
   | 'taskQueue'
-  | 'startToCloseTimeout'
-  | 'scheduleToCloseTimeout'
->;
+> & {
+  startToCloseTimeout: string;
+  scheduleToCloseTimeout: string;
+};

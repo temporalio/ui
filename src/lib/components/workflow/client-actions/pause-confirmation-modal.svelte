@@ -4,7 +4,6 @@
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';
   import { pauseWorkflow } from '$lib/services/workflow-service';
-  import { pauseLiveUpdates } from '$lib/stores/events';
   import { toaster } from '$lib/stores/toaster';
   import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -49,7 +48,7 @@
       });
     } catch (err: unknown) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;
@@ -65,24 +64,27 @@
   {loading}
   confirmText={translate('workflows.pause-workflow')}
   cancelText={translate('common.cancel')}
-  on:cancelModal={hideModal}
-  on:confirmModal={pause}
+  onCancelModal={hideModal}
+  onConfirmModal={pause}
 >
-  <h3 slot="title">{translate('workflows.pause-workflow')}</h3>
-  <div slot="content">
-    <p>{translate('workflows.workflow-pause-description')}</p>
-    <ul class="mt-4 list-disc pl-6">
-      <li>{translate('workflows.workflow-pause-description-item-1')}</li>
-      <li>{translate('workflows.workflow-pause-description-item-2')}</li>
-      <li>{translate('workflows.workflow-pause-description-item-3')}</li>
-    </ul>
-    <Textarea
-      id="workflow-pause-details"
-      class="mt-4"
-      placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason')}
-      labelHidden
-      bind:value={reason}
-    />
-  </div>
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.pause-workflow')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div>
+      <p>{translate('workflows.workflow-pause-description')}</p>
+      <ul class="mt-4 list-disc pl-6">
+        <li>{translate('workflows.workflow-pause-description-item-1')}</li>
+        <li>{translate('workflows.workflow-pause-description-item-2')}</li>
+        <li>{translate('workflows.workflow-pause-description-item-3')}</li>
+      </ul>
+      <Textarea
+        id="workflow-pause-details"
+        class="mt-4"
+        placeholder={translate('common.reason-placeholder')}
+        label={translate('common.reason-optional')}
+        bind:value={reason}
+      />
+    </div>
+  {/snippet}
 </Modal>

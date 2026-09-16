@@ -1,20 +1,21 @@
-<svelte:options runes />
-
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
-  import { iconNames } from '$lib/holocene/icon';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
+  import * as ioIcons from '$lib/io/icon';
 
-  export const meta = {
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
+
+  const { Story } = defineMeta({
     title: 'Split Button',
     component: SplitButton,
     args: {
       label: 'Split Button',
       menuLabel: 'Actions',
       position: 'left',
-      icon: undefined,
+      Icon: undefined,
       disabled: false,
       primaryActionDisabled: false,
       href: 'https://caniuse.com',
@@ -34,31 +35,33 @@
         },
       },
 
-      icon: { name: 'Icon', control: 'select', options: iconNames },
+      Icon: {
+        name: 'Icon',
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
       disabled: { name: 'Disabled', control: 'boolean' },
       primaryActionDisabled: {
         name: 'Primary Action Disabled',
         control: 'boolean',
       },
     },
-  } satisfies Meta<SplitButton>;
+    render: template,
+  });
 </script>
 
-<script lang="ts">
-  import { Story, Template } from '@storybook/addon-svelte-csf';
-</script>
-
-<Template let:args>
+{#snippet template(args: ComponentProps<typeof SplitButton>)}
   <div class="flex">
     <SplitButton {...args}>
       <MenuItem>View</MenuItem>
       <MenuItem destructive>Delete</MenuItem>
     </SplitButton>
   </div>
-</Template>
+{/snippet}
 
 <Story name="Default" />
 
-<Story name="With Icon" args={{ icon: 'trash' }} />
+<Story name="With Icon" args={{ Icon: ioIcons.IconTrash }} />
 
 <Story name="Disabled" args={{ disabled: true }} />

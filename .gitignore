@@ -18,9 +18,14 @@ server/ui/assets
 /playwright-report/
 /playwright/.cache/
 /dist
+/storybook-static
 /audits
 go.work
 go.work.sum
+
+# Temporal proto generation — local-only output + cache (see scripts/generate-temporal-proto.ts)
+/.proto-cache/
+/vendor/temporalio-proto/
 
 # Claude Code local settings
 .serena
@@ -29,3 +34,29 @@ go.work.sum
 !.claude/skills/
 .sisyphus/*
 .omc
+
+/catalog.local/
+/.env.catalog.local
+/.catalog.lock
+/.catalog.lock.recovery
+/.catalog.journal.json
+/.catalog.transaction-*/
+
+# Isolated catalog fixtures. The tests copy the repo into these roots so the
+# copied CLI still resolves the root node_modules, so they cannot live in the
+# system temp directory.
+/.catalog-tmp/
+
+# Legacy Catalog state stays ignored so upgrades cannot expose credentials or
+# abandoned mutation state. The CLI migrates only local content and credentials;
+# old locks and journals are deliberately not resumed under canonical names.
+/workflow-catalog.local/
+/.env.workflow-catalog.local
+/.workflow-catalog.lock
+/.workflow-catalog.lock.recovery
+/.workflow-catalog.journal.json
+/.workflow-catalog.transaction-*/
+
+# Feature demo runner output and machine-local paths (scripts/feature-demo.ts)
+/.feature-demo/
+/.env.feature-demo.local

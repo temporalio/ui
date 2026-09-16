@@ -1,23 +1,42 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { getContext } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
-  export let title: string = '';
+  interface Props {
+    title?: string;
+    class?: string;
+    subtitle?: Snippet;
+    children?: Snippet;
+  }
 
-  let position: 'bottom' | 'right' = getContext('drawer-pos');
+  let {
+    title = '',
+    class: className = '',
+    subtitle,
+    children,
+  }: Props = $props();
+
+  const position: 'bottom' | 'right' = getContext('drawer-pos');
+
+  const hasHeader = $derived(Boolean(title) || Boolean(subtitle));
 </script>
 
-<div class="title-wrapper {position}">
-  <h2>{title}</h2>
-  {#if $$slots['subtitle']}
-    <p class="text-xs font-normal">
-      <slot name="subtitle" />
-    </p>
-  {/if}
-</div>
+{#if hasHeader}
+  <div class="title-wrapper {position}">
+    {#if title}
+      <h2>{title}</h2>
+    {/if}
+    {#if subtitle}
+      <p class="text-xs font-normal">
+        {@render subtitle()}
+      </p>
+    {/if}
+  </div>
+{/if}
 
-<div class={twMerge('content', position, $$props.class)}>
-  <slot />
+<div class={twMerge('content', position, !hasHeader && 'pt-6', className)}>
+  {@render children?.()}
 </div>
 
 <style lang="postcss">

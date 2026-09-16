@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import {
+    IconAdd,
+    IconChevronDown,
+    IconChevronUp,
+    IconHyphen,
+  } from '$lib/io/icon';
 
   import IconButton from '../icon-button.svelte';
-
-  const dispatch = createEventDispatcher<{
-    addItem: undefined;
-    moveItem: { from: number; to: number };
-    removeItem: undefined;
-  }>();
 
   type ExtendedDragEvent = DragEvent & {
     currentTarget: EventTarget & HTMLLIElement;
@@ -17,6 +16,9 @@
     label: string;
     index?: number;
     totalItems?: number;
+    onMoveItem?: (detail: { from: number; to: number }) => void;
+    onAddItem?: () => void;
+    onRemoveItem?: () => void;
   } & (
     | {
         readonly: true;
@@ -54,6 +56,9 @@
     moveDownButtonLabel = '',
     addButtonLabel = '',
     removeButtonLabel = '',
+    onMoveItem,
+    onAddItem,
+    onRemoveItem,
   }: Props = $props();
 
   const handleDragStart = (event: ExtendedDragEvent, index: number) => {
@@ -66,7 +71,7 @@
     if (!event.dataTransfer) return;
     event.currentTarget.classList.remove('dragging-over');
     const from = parseInt(event.dataTransfer.getData('text/plain'));
-    dispatch('moveItem', { from, to });
+    onMoveItem?.({ from, to });
   };
 
   const handleDragEnter = (event: ExtendedDragEvent) =>
@@ -105,17 +110,17 @@
       <div class="flex items-center">
         <IconButton
           disabled={index === 0}
-          icon="chevron-up"
+          Icon={IconChevronUp}
           data-testid="orderable-list-item-{label}-move-up-button"
           label={moveUpButtonLabel}
-          on:click={() => dispatch('moveItem', { from: index, to: index - 1 })}
+          onclick={() => onMoveItem?.({ from: index, to: index - 1 })}
         />
         <IconButton
           disabled={index === totalItems - 1}
-          icon="chevron-down"
+          Icon={IconChevronDown}
           data-testid="orderable-list-item-{label}-move-down-button"
           label={moveDownButtonLabel}
-          on:click={() => dispatch('moveItem', { from: index, to: index + 1 })}
+          onclick={() => onMoveItem?.({ from: index, to: index + 1 })}
         />
       </div>
     {/if}
@@ -124,17 +129,17 @@
   {#if !readonly}
     {#if isStatic}
       <IconButton
-        icon="add"
+        Icon={IconAdd}
         data-testid="orderable-list-item-{label}-add-button"
         label={addButtonLabel}
-        on:click={() => dispatch('addItem')}
+        onclick={() => onAddItem?.()}
       />
     {:else}
       <IconButton
-        icon="hyphen"
+        Icon={IconHyphen}
         data-testid="orderable-list-item-{label}-remove-button"
         label={removeButtonLabel}
-        on:click={() => dispatch('removeItem')}
+        onclick={() => onRemoveItem?.()}
       />
     {/if}
   {/if}
@@ -142,7 +147,7 @@
 
 <style lang="postcss">
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between border-b border-subtle p-2 text-sm font-medium last-of-type:border-b-0;
+    @apply flex select-none list-none flex-row items-center justify-between border-b border-primary p-2 text-sm font-medium last-of-type:border-b-0;
   }
 
   .orderable-item[draggable='true'] {
@@ -150,10 +155,10 @@
   }
 
   .orderable-item.readonly {
-    @apply surface-secondary;
+    @apply bg-surface-secondary text-primary;
   }
 
   :global(.orderable-item.dragging-over:not(.locked)) {
-    @apply bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply bg-surface-brand;
   }
 </style>

@@ -93,38 +93,42 @@
   confirmText={translate('common.submit')}
   cancelText={translate('common.cancel')}
   confirmDisabled={!name || !$encoding}
-  on:cancelModal={hideSignalModal}
-  on:confirmModal={signal}
+  onCancelModal={hideSignalModal}
+  onConfirmModal={signal}
 >
-  <h3 slot="title">{translate('workflows.signal-modal-title')}</h3>
-  <div slot="content" class="flex flex-col gap-4">
-    {#if signalDefinitions && signalDefinitions.length > 0 && !customSignal}
-      <Select
-        id="signal-select"
-        label={translate('workflows.signal-name-label')}
-        class="min-w-fit"
-        bind:value={name}
-        data-testid="signal-select"
-        placeholder="Select a signal"
-        required
-      >
-        <Option
-          onclick={handleCustom}
-          value="custom"
-          description="Input Signal name">{translate('common.custom')}</Option
+  {#snippet titleSnippet()}
+    <h3>{translate('workflows.signal-modal-title')}</h3>
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-4">
+      {#if signalDefinitions && signalDefinitions.length > 0 && !customSignal}
+        <Select
+          id="signal-select"
+          label={translate('workflows.signal-name-label')}
+          class="min-w-fit"
+          bind:value={name}
+          data-testid="signal-select"
+          placeholder="Select a signal"
+          required
         >
-        {#each signalDefinitions as { name: value, description = '' }}
-          <Option {value} {description}>{value}</Option>
-        {/each}
-      </Select>
-    {:else}
-      <Input
-        id="signal-name"
-        label={translate('workflows.signal-name-label')}
-        required
-        bind:value={name}
-      />
-    {/if}
-    <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
-  </div>
+          <Option
+            onclick={handleCustom}
+            value="custom"
+            description="Input Signal name">{translate('common.custom')}</Option
+          >
+          {#each signalDefinitions as { name: value, description = '' }}
+            <Option {value} {description}>{value}</Option>
+          {/each}
+        </Select>
+      {:else}
+        <Input
+          id="signal-name"
+          label={translate('workflows.signal-name-label')}
+          required
+          bind:value={name}
+        />
+      {/if}
+      <PayloadInputWithEncoding bind:input {encoding} bind:messageType />
+    </div>
+  {/snippet}
 </Modal>

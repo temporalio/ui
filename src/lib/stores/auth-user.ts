@@ -1,7 +1,10 @@
 import { get } from 'svelte/store';
 
+import { resolve } from '$app/paths';
+
 import { persistStore } from '$lib/stores/persist-store';
 import type { User } from '$lib/types/global';
+import { getApiOrigin } from '$lib/utilities/get-api-origin';
 
 export const authUser = persistStore<User>('AuthUser', {});
 
@@ -33,9 +36,15 @@ export const clearAuthUser = () => {
  */
 export async function logout(): Promise<void> {
   try {
-    await fetch('/auth/logout', {
+    const logoutUrl = new URL(
+      resolve('/auth/logout', {}),
+      getApiOrigin() ?? window.location.origin,
+    ).toString();
+
+    await fetch(logoutUrl, {
       method: 'GET',
       credentials: 'include',
+      redirect: 'manual',
     });
 
     console.info('[Auth] Logout successful, cookies cleared');
@@ -44,5 +53,5 @@ export async function logout(): Promise<void> {
   }
 
   clearAuthUser();
-  window.location.href = '/';
+  window.location.assign(resolve('/', {}));
 }

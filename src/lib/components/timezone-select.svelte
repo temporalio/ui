@@ -6,7 +6,6 @@
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -19,6 +18,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock, IconSearch } from '$lib/io/icon';
   import {
     hourFormat,
     relativeTime,
@@ -129,7 +129,7 @@
 
 <MenuContainer
   {open}
-  class="text-sm font-medium text-primary max-md:w-full max-md:justify-items-end"
+  class="text-sm text-primary max-md:w-full max-md:justify-items-end"
 >
   <MenuButton
     label={translate('common.timezone', { timezone })}
@@ -140,7 +140,7 @@
     data-testid="timezones-menu-button"
   >
     {#snippet leading()}
-      <Icon name="clock" />
+      <IconClock />
     {/snippet}
     {timezone}
   </MenuButton>
@@ -155,7 +155,7 @@
       id="timezone-search"
       noBorder
       bind:value={search}
-      icon="search"
+      Icon={IconSearch}
       placeholder={translate('common.search')}
     />
 
@@ -167,7 +167,7 @@
         id="relative-toggle"
         bind:checked={$relativeTime}
         labelPosition="left"
-        on:change={handleRelativeToggle}
+        onchange={handleRelativeToggle}
         data-testid="timezones-relative-toggle"
       />
     </div>
@@ -181,22 +181,22 @@
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'short'}
-            on:click={() => setTimestampFormat('short')}>Short</ToggleButton
+            onclick={() => setTimestampFormat('short')}>Short</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'medium'}
-            on:click={() => setTimestampFormat('medium')}>Default</ToggleButton
+            onclick={() => setTimestampFormat('medium')}>Default</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'long'}
-            on:click={() => setTimestampFormat('long')}>Long</ToggleButton
+            onclick={() => setTimestampFormat('long')}>Long</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$timestampFormat === 'iso'}
-            on:click={() => setTimestampFormat('iso')}>ISO</ToggleButton
+            onclick={() => setTimestampFormat('iso')}>ISO</ToggleButton
           >
         </ToggleButtons>
       </div>
@@ -210,19 +210,19 @@
             size="xs"
             active={$hourFormat === 'system'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('system')}>System</ToggleButton
+            onclick={() => setHourFormat('system')}>System</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '12'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('12')}>12-hour</ToggleButton
+            onclick={() => setHourFormat('12')}>12-hour</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '24'}
             disabled={$timestampFormat === 'iso'}
-            on:click={() => setHourFormat('24')}>24-hour</ToggleButton
+            onclick={() => setHourFormat('24')}>24-hour</ToggleButton
           >
         </ToggleButtons>
       </div>

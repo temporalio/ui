@@ -16,8 +16,8 @@ import {
 } from './is-event-type';
 
 export type WorkflowInputAndResults = {
-  input: Payloads;
-  results: Payloads | CompletionEventAttributes;
+  input: Payloads | null | undefined;
+  results: Payloads | CompletionEventAttributes | null | undefined;
   contAsNew: boolean;
 };
 
@@ -69,12 +69,12 @@ const getEventResult = (event: CompletionEvent) => {
 export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   eventHistory: WorkflowEvent[],
 ): WorkflowInputAndResults => {
-  let input: Payloads;
-  let results: Payloads | CompletionEventAttributes;
+  let input: Payloads | null | undefined;
+  let results: Payloads | CompletionEventAttributes | null | undefined;
   let contAsNew = false;
 
-  let workflowStartedEvent: WorkflowExecutionStartedEvent;
-  let workflowCompletedEvent: CompletionEvent;
+  let workflowStartedEvent: WorkflowExecutionStartedEvent | undefined;
+  let workflowCompletedEvent: CompletionEvent | undefined;
 
   for (const event of eventHistory) {
     if (isStartedEvent(event)) {

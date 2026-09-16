@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import FormError from '$lib/components/form/form-error.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -9,28 +11,28 @@
 
   interface Props {
     class?: string;
+    description?: Snippet;
     initialAttributesPromise: Promise<SearchAttributeDefinition[]>;
     onSave: (attributes: SearchAttributeDefinition[]) => Promise<void>;
     onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
     onCancel?: () => void;
     onRetry?: () => void;
-    getSupportedTypes: () => { label: string; value: string }[];
     hideTainted?: boolean;
-    hideCancelButton?: boolean;
     disableTypeForExisting?: boolean;
+    isCloud?: boolean;
   }
 
   let {
     class: className = '',
+    description,
     initialAttributesPromise,
     onSave,
     onSuccess,
     onCancel,
     onRetry,
-    getSupportedTypes,
     hideTainted = false,
-    hideCancelButton = false,
     disableTypeForExisting = false,
+    isCloud = false,
   }: Props = $props();
 </script>
 
@@ -39,14 +41,14 @@
 {:then initialAttributes}
   <SearchAttributesFormContent
     class={className}
+    {description}
     {initialAttributes}
     {onSave}
     {onSuccess}
     {onCancel}
-    {getSupportedTypes}
     {hideTainted}
-    {hideCancelButton}
     {disableTypeForExisting}
+    {isCloud}
   />
 {:catch error}
   <FormError

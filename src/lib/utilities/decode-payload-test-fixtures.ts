@@ -1,4 +1,6 @@
-export const workflowStartedEvent = {
+import type { PotentiallyDecodable } from './decode-payload';
+
+export const workflowStartedEvent: PotentiallyDecodable = {
   type: 'workflowExecutionStartedEventAttributes',
   workflowType: {
     name: 'BackgroundCheck',
@@ -55,7 +57,7 @@ export const workflowStartedEvent = {
   },
 };
 
-export const dataConvertedWorkflowStartedEvent = {
+export const dataConvertedWorkflowStartedEvent: PotentiallyDecodable = {
   type: 'workflowExecutionStartedEventAttributes',
   workflowType: { name: 'BackgroundCheck' },
   parentWorkflowNamespace: '',
@@ -88,7 +90,7 @@ export const dataConvertedWorkflowStartedEvent = {
   },
 };
 
-export const dataConvertedFailureWorkflowStartedEvent = {
+export const dataConvertedFailureWorkflowStartedEvent: PotentiallyDecodable = {
   type: 'workflowExecutionStartedEventAttributes',
   workflowType: { name: 'BackgroundCheck' },
   parentWorkflowNamespace: '',
@@ -130,7 +132,7 @@ export const dataConvertedFailureWorkflowStartedEvent = {
   },
 };
 
-export const noRemoteDataConverterWorkflowStartedEvent = {
+export const noRemoteDataConverterWorkflowStartedEvent: PotentiallyDecodable = {
   type: 'workflowExecutionStartedEventAttributes',
   workflowType: { name: 'BackgroundCheck' },
   parentWorkflowNamespace: '',
@@ -163,7 +165,7 @@ export const noRemoteDataConverterWorkflowStartedEvent = {
   },
 };
 
-export const workflowStartedHistoryEvent = {
+export const workflowStartedHistoryEvent: PotentiallyDecodable = {
   workflowExecutionStartedEventAttributes: {
     workflowType: {
       name: 'BackgroundCheck',
@@ -222,7 +224,7 @@ export const workflowStartedHistoryEvent = {
   },
 };
 
-export const getTestPayloadEvent = () => ({
+export const getTestPayloadEvent = (): PotentiallyDecodable => ({
   type: 'workflowExecutionStartedEventAttributes',
   workflowType: {
     name: 'BackgroundCheck',
@@ -281,56 +283,57 @@ export const getTestPayloadEvent = () => ({
   prevAutoResetPoints: null,
 });
 
-export const getTestPayloadEventWithNullEncodedAttributes = () => ({
-  type: 'workflowExecutionStartedEventAttributes',
-  workflowType: {
-    name: 'BackgroundCheck',
-  },
-  parentWorkflowNamespace: '',
-  parentWorkflowExecution: null,
-  parentInitiatedEventId: '0',
-  taskQueue: {
-    name: 'background-checks-main',
-    kind: 'Normal',
-  },
-  input: {
-    payloads: [
-      {
-        metadata: {
-          encoding: 'anNvbi9wbGFpbg==',
-        },
-        data: 'InRlc3RAdGVzdC5jb20i',
-      },
-    ],
-  },
-  details: {
-    detail1: {
+export const getTestPayloadEventWithNullEncodedAttributes =
+  (): PotentiallyDecodable => ({
+    type: 'workflowExecutionStartedEventAttributes',
+    workflowType: {
+      name: 'BackgroundCheck',
+    },
+    parentWorkflowNamespace: '',
+    parentWorkflowExecution: null,
+    parentInitiatedEventId: '0',
+    taskQueue: {
+      name: 'background-checks-main',
+      kind: 'Normal',
+    },
+    input: {
       payloads: [
         {
           metadata: {
             encoding: 'anNvbi9wbGFpbg==',
           },
-          data: 'eyAidGVzdCI6ICJkZXRhaWwiIH0=',
+          data: 'InRlc3RAdGVzdC5jb20i',
         },
       ],
     },
-  },
-  encodedAttributes: null,
-  workflowExecutionTimeout: '0s',
-  workflowRunTimeout: '0s',
-  workflowTaskTimeout: '10s',
-  continuedExecutionRunId: '',
-  initiator: 'Unspecified',
-  continuedFailure: null,
-  lastCompletionResult: null,
-  originalExecutionRunId: 'b4351cb3-f54f-4ed4-be5a-b13ef429b861',
-  identity: '1@ac0cd56257aa@',
-  firstExecutionRunId: 'b4351cb3-f54f-4ed4-be5a-b13ef429b861',
-  retryPolicy: null,
-  attempt: 1,
-  workflowExecutionExpirationTime: null,
-  cronSchedule: '',
-  firstWorkflowTaskBackoff: '0s',
-  memo: null,
-  prevAutoResetPoints: null,
-});
+    details: {
+      detail1: {
+        payloads: [
+          {
+            metadata: {
+              encoding: 'anNvbi9wbGFpbg==',
+            },
+            data: 'eyAidGVzdCI6ICJkZXRhaWwiIH0=',
+          },
+        ],
+      },
+    },
+    encodedAttributes: null,
+    workflowExecutionTimeout: '0s',
+    workflowRunTimeout: '0s',
+    workflowTaskTimeout: '10s',
+    continuedExecutionRunId: '',
+    initiator: 'Unspecified',
+    continuedFailure: null,
+    lastCompletionResult: null,
+    originalExecutionRunId: 'b4351cb3-f54f-4ed4-be5a-b13ef429b861',
+    identity: '1@ac0cd56257aa@',
+    firstExecutionRunId: 'b4351cb3-f54f-4ed4-be5a-b13ef429b861',
+    retryPolicy: null,
+    attempt: 1,
+    workflowExecutionExpirationTime: null,
+    cronSchedule: '',
+    firstWorkflowTaskBackoff: '0s',
+    memo: null,
+    prevAutoResetPoints: null,
+  });

@@ -20,6 +20,10 @@ export default {
       postcss: true,
     }),
   ],
+  compilerOptions: {
+    runes: ({ filename }) =>
+      filename.includes('node_modules') ? undefined : true,
+  },
   kit: {
     alias: {
       $lib: 'src/lib',

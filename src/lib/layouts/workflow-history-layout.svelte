@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getContext, onMount } from 'svelte';
+
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -8,32 +10,43 @@
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { groupEvents } from '$lib/models/event-groups';
-  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import {
+    IconArrowAscending,
+    IconArrowDescending,
+    IconCode,
+    IconCompact,
+    IconDownload,
+    IconFeed,
+  } from '$lib/io/icon';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
-  import {
-    currentEventHistory,
-    filteredEventHistory,
-    fullEventHistory,
-    pauseLiveUpdates,
-  } from '$lib/stores/events';
-  import { eventCategoryFilter } from '$lib/stores/filters';
+  import { pauseLiveUpdates } from '$lib/stores/events';
+  import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { IterableEventWithPending } from '$lib/types/events';
+  import type {
+    WorkflowEvent,
+    WorkflowTaskFailedEvent,
+    WorkflowTaskTimedOutEvent,
+  } from '$lib/types/events';
   import {
     parseEventFilterParams,
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
-  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
+
+  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
@@ -57,40 +70,72 @@
 
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
-  let updating = $derived(!$fullEventHistory.length);
 
-  let ascendingGroups = $derived(
-    groupEvents(
-      $filteredEventHistory,
-      'ascending',
-      pendingActivities,
-      pendingNexusOperations,
-    ),
-  );
+  // Enough to filter, sort and paginate; only the rendered page is materialized.
+  // The feed view needs full groups, read lazily in tableProps below.
+  const bufferLazyGroups = $derived(eventBuffer.lazyGroupsWithoutWorkflowTasks);
+  const bufferEvents = $derived(eventBuffer.events);
+  let updating = $derived(!historyCtx.fetchComplete);
 
-  const workflowTaskFailedError = $derived(
-    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
-  );
+  onMount(() => {
+    historyCtx.resume();
+  });
+
+  const filteredLazyGroups = $derived.by(() => {
+    const active = $eventTypeFilter;
+    const cats = $eventCategoryFilter;
+    return bufferLazyGroups.filter((g) => {
+      if (!active.includes(g.category)) return false;
+      if (cats && cats.length && !cats.includes(g.category)) return false;
+      return true;
+    });
+  });
+
+  const filteredEvents = $derived.by(() => {
+    const active = $eventTypeFilter;
+    const cats = $eventCategoryFilter;
+    return bufferEvents.filter((ev) => {
+      const cat = (ev as WorkflowEvent).category;
+      if (!active.includes(cat)) return false;
+      if (cats && cats.length && !cats.includes(cat)) return false;
+      return true;
+    });
+  });
+
+  const workflowTaskFailedError = $derived.by(() => {
+    if (!historyCtx.fetchComplete) return undefined;
+    return eventBuffer.workflowTaskFailedEvent as
+      | WorkflowTaskFailedEvent
+      | WorkflowTaskTimedOutEvent
+      | undefined;
+  });
 
   const isNotPending = $derived(
-    workflow && !workflow.isRunning && !workflow.isPaused,
+    !!workflow && !workflow.isRunning && !workflow.isPaused,
   );
 
-  let groups = $derived(
-    reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
+  let lazyGroups = $derived(
+    reverseSort ? filteredLazyGroups.toReversed() : filteredLazyGroups,
   );
   let history = $derived(
-    reverseSort ? [...$filteredEventHistory].reverse() : $filteredEventHistory,
+    reverseSort ? filteredEvents.toReversed() : filteredEvents,
   );
 
-  let items = $derived(
-    (compact
-      ? orderGroupsByPending(groups, reverseSort)
-      : reverseSort
-        ? [...pendingNexusOperations, ...pendingActivities, ...history]
-        : [...history, ...pendingActivities, ...pendingNexusOperations]) as
-      | EventGroups
-      | IterableEventWithPending[],
+  // EventSummaryTable's props are a union on `compact`, so the pair travels as
+  // one object. Keeps the materialized groups on the feed branch too.
+  const tableProps = $derived(
+    compact
+      ? {
+          compact: true as const,
+          items: orderGroupsByPending(lazyGroups, reverseSort),
+        }
+      : {
+          compact: false as const,
+          items: reverseSort
+            ? [...pendingNexusOperations, ...pendingActivities, ...history]
+            : [...history, ...pendingActivities, ...pendingNexusOperations],
+          groups: eventBuffer.groupsWithoutWorkflowTasks,
+        },
   );
 
   $effect(() => {
@@ -150,7 +195,7 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap-reverse items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="items-bottom flex gap-4 pt-2">
       <h2>
@@ -160,23 +205,23 @@
         <TabButton
           active={$eventViewType === 'feed'}
           data-testid="feed"
-          icon="feed"
+          Icon={IconFeed}
           class="h-10"
-          on:click={onAllClick}>All</TabButton
+          onclick={onAllClick}>All</TabButton
         >
         <TabButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
-          icon="compact"
+          Icon={IconCompact}
           class="h-10"
-          on:click={onCompactClick}>Compact</TabButton
+          onclick={onCompactClick}>Compact</TabButton
         >
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
-          icon="json"
+          Icon={IconCode}
           class="h-10"
-          on:click={onJSONClick}>JSON</TabButton
+          onclick={onJSONClick}>JSON</TabButton
         >
       </TabButtons>
     </div>
@@ -184,10 +229,11 @@
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
           <ToggleButton
-            leadingIcon={reverseSort ? 'descending' : 'ascending'}
+            LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
             data-testid="zoom-in"
-            on:click={onSort}
+            onclick={onSort}
             size="sm"
+            variant="tertiary"
           >
             {reverseSort
               ? translate('common.descending')
@@ -200,12 +246,13 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
-          on:click={onAutoRefreshToggle}
+          variant="tertiary"
+          onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
+              ? 'bg-content-tertiary'
+              : 'bg-content-static-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -213,9 +260,10 @@
         </ToggleButton>
         <ToggleButton
           data-testid="download"
-          leadingIcon="download"
+          LeadingIcon={IconDownload}
           size="sm"
-          on:click={() => (showDownloadPrompt = true)}
+          variant="tertiary"
+          onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}
         </ToggleButton>
@@ -224,12 +272,12 @@
   </div>
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}
-      <div class="border-t border-subtle px-4">
-        <WorkflowHistoryJson />
+      <div class="border-t border-primary px-4">
+        <WorkflowHistoryJson events={filteredEvents} />
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {items} {groups} {compact} />
+        <EventSummaryTable {updating} {...tableProps} />
       </div>
     {/if}
   </div>
@@ -237,6 +285,6 @@
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
   {namespace}
-  workflowId={workflow?.id}
-  runId={workflow?.runId}
+  workflowId={workflow?.id ?? ''}
+  runId={workflow?.runId ?? ''}
 />

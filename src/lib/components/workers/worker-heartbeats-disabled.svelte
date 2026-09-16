@@ -1,10 +1,8 @@
-<svelte:options runes />
-
 <script lang="ts">
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconHeartbeat } from '$lib/io/icon';
 
   const content = `frontend.workerHeartbeatsEnabled:
   - value: true`;
@@ -17,9 +15,8 @@
     aria-live="polite"
   >
     <span class="flex h-20 w-20 items-center justify-center rounded-full">
-      <Icon
-        name="heartbeat"
-        class="block h-full w-full text-blue-200"
+      <IconHeartbeat
+        class="block h-full w-full text-information"
         height={20}
         width={20}
       />
@@ -32,6 +29,10 @@
         {translate('workers.worker-heartbeats-enablement')}
       </p>
     </div>
-    <CodeBlock copyable {content} />
+    <CodeBlock
+      copyable
+      {content}
+      label={translate('workers.heartbeat-config')}
+    />
   </div>
 </Card>

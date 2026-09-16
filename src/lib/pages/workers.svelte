@@ -3,16 +3,23 @@
 
   import { page } from '$app/state';
 
+  import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
+  import {
+    DEFAULT_WORKER_SYSTEM_VIEW,
+    savedWorkerQueries,
+    systemWorkerViews,
+  } from '$lib/stores/saved-queries';
   import {
     workerSearchAttributeOptions,
     workerSearchAttributes,
   } from '$lib/stores/search-attributes';
-  import { refresh } from '$lib/stores/workers';
+  import { refresh, workerCount } from '$lib/stores/workers';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   const { namespace } = $derived(page.params);
@@ -31,22 +38,31 @@
 </script>
 
 {#if workerHeartbeatsEnabled}
-  <FilterBar
-    filters={workerFilters}
-    options={$workerSearchAttributeOptions}
-    searchAttributes={$workerSearchAttributes}
-    id="worker"
-    statusAttribute="WorkerStatus"
-    includeNullConditions={false}
-  />
-
-  {#key [namespace, query, $refresh]}
-    <WorkersTable
-      {namespace}
-      onFetch={() => fetchPaginatedWorkers({ namespace, query })}
-      filterable
+  <MaximizableTableView>
+    <SavedQueryViews
+      filters={workerFilters}
+      savedQueries={savedWorkerQueries}
+      systemViews={systemWorkerViews}
+      defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
+      searchAttributes={workerSearchAttributes}
+      id="worker"
     />
-  {/key}
+    <FilterBar
+      filters={workerFilters}
+      options={$workerSearchAttributeOptions}
+      searchAttributes={$workerSearchAttributes}
+      id="worker"
+      statusAttribute="WorkerStatus"
+    />
+    {#key [namespace, query, $refresh]}
+      <WorkersTable
+        {namespace}
+        onFetch={() => fetchPaginatedWorkers({ namespace, query })}
+        total={$workerCount.count}
+        filterable
+      />
+    {/key}
+  </MaximizableTableView>
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}

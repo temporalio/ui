@@ -1,21 +1,34 @@
-<script context="module" lang="ts">
+<script module lang="ts">
+  import type {
+    HTMLAnchorAttributes,
+    HTMLButtonAttributes,
+  } from 'svelte/elements';
+
+  import { cva, type VariantProps } from 'class-variance-authority';
+  import type { Snippet } from 'svelte';
+
+  import type { IconComponent } from '$lib/io/icon';
+
   const buttonStyles = cva(
     [
       'relative',
+      'rounded',
       'flex',
       'w-fit',
       'items-center',
       'justify-center',
       'border',
       'gap-2',
-      'disabled:opacity-50',
+      'disabled:opacity-disabled',
       'disabled:cursor-not-allowed',
       'border-box',
       'transition-colors',
       'transition-shadow',
       'focus-visible:outline-none',
-      'focus-visible:border-inverse',
       'focus-visible:ring-2',
+      'focus-visible:ring-interactive-primary',
+      'focus-visible:ring-offset-2',
+      'focus-visible:ring-offset-background-primary',
       'whitespace-nowrap',
       'no-underline',
       'active:scale-[0.98]',
@@ -25,15 +38,17 @@
       variants: {
         variant: {
           primary:
-            'surface-interactive border-transparent text-white focus-visible:ring-primary/70 data-[active=true]:bg-subtle data-[active=true]:text-primary',
+            'border-transparent bg-interactive-primary text-white hover:bg-interactive-primary-hover active:bg-interactive-primary-press focus-visible:bg-interactive-primary-hover data-[active=true]:bg-interactive-primary-press data-[active=true]:hover:bg-interactive-primary-press data-[active=true]:active:bg-interactive-primary-press data-[active=true]:focus-visible:bg-interactive-primary-press',
           secondary:
-            'surface-primary border-subtle focus-visible:ring-primary/70 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary data-[active=true]:bg-subtle',
+            'border-brand bg-surface-primary text-brand hover:bg-interactive-secondary-hover active:bg-interactive-secondary-press focus-visible:bg-surface-primary data-[active=true]:bg-interactive-secondary-press data-[active=true]:hover:bg-interactive-secondary-press data-[active=true]:active:bg-interactive-secondary-press data-[active=true]:focus-visible:bg-interactive-secondary-press',
+          tertiary:
+            'border-tertiary bg-interactive-tertiary text-primary hover:bg-interactive-tertiary-hover active:bg-interactive-tertiary-press focus-visible:bg-surface-primary data-[active=true]:bg-interactive-tertiary-press data-[active=true]:hover:bg-interactive-tertiary-press data-[active=true]:active:bg-interactive-tertiary-press data-[active=true]:focus-visible:bg-interactive-tertiary-press',
           destructive:
-            'surface-interactive-danger border-transparent focus-visible:ring-danger/70 data-[active=true]:surface-interactive-danger',
+            'border-transparent bg-interactive-danger text-white hover:bg-interactive-danger-hover active:bg-interactive-danger-press focus-visible:bg-interactive-danger data-[active=true]:bg-interactive-danger-press data-[active=true]:hover:bg-interactive-danger-press data-[active=true]:active:bg-interactive-danger-press data-[active=true]:focus-visible:bg-interactive-danger-press',
           ghost:
-            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary/70 data-[active=true]:bg-subtle',
+            'border-transparent bg-transparent text-secondary hover:bg-interactive-tertiary-hover active:bg-interactive-tertiary-press focus-visible:bg-surface-primary data-[active=true]:bg-interactive-tertiary-press data-[active=true]:hover:bg-interactive-tertiary-press data-[active=true]:active:bg-interactive-tertiary-press data-[active=true]:focus-visible:bg-interactive-tertiary-press',
           'table-header':
-            'bg-transparent border-transparent focus-visible:ring-primary/70 focus-visible:border-transparent',
+            'border-transparent bg-transparent text-primary focus-visible:border-transparent',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -49,174 +64,188 @@
     },
   );
 
-  type BaseProps = {
-    active?: boolean;
-    disabled?: boolean;
-    loading?: boolean;
-    leadingIcon?: IconName;
-    trailingIcon?: IconName;
-    count?: number;
-    id?: string;
-    'data-testid'?: string;
-    class?: string;
-    disableTracking?: boolean;
-  };
-
-  // Prevent Svelte 5 event handler props - use on:click instead
-  type ForbiddenEventProps = {
-    onclick?: never;
-    onkeydown?: never;
-  };
-
   export type ButtonStyles = VariantProps<typeof buttonStyles>;
 
+  interface BaseProps {
+    variant?: ButtonStyles['variant'];
+    size?: ButtonStyles['size'];
+    disabled?: boolean;
+    loading?: boolean;
+    active?: boolean;
+    LeadingIcon?: IconComponent;
+    TrailingIcon?: IconComponent;
+    count?: number;
+    id?: string;
+    disableTracking?: boolean;
+    class?: string;
+    'data-testid'?: string;
+    children?: Snippet;
+    onclick?: (event: MouseEvent) => void;
+    onkeydown?: (event: KeyboardEvent) => void;
+  }
+
   export type ButtonWithoutHrefProps = BaseProps &
-    ButtonStyles &
-    Omit<HTMLButtonAttributes, 'onclick' | 'onkeydown'> &
-    ForbiddenEventProps;
+    Omit<HTMLButtonAttributes, 'class' | 'onclick' | 'onkeydown'> & {
+      href?: never;
+      target?: never;
+    };
 
   export type ButtonWithHrefProps = BaseProps &
-    ButtonStyles &
-    Omit<HTMLAnchorAttributes, 'onclick'> &
-    ForbiddenEventProps & {
+    Omit<HTMLAnchorAttributes, 'class' | 'onclick' | 'onkeydown'> & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
-      disabled?: boolean;
     };
+
+  export type ButtonProps = ButtonWithoutHrefProps | ButtonWithHrefProps;
 </script>
 
 <script lang="ts">
-  import type {
-    HTMLAnchorAttributes,
-    HTMLButtonAttributes,
-  } from 'svelte/elements';
-
-  import { cva, type VariantProps } from 'class-variance-authority';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { goto } from '$app/navigation';
 
-  import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { IconSpinner } from '$lib/io/icon';
+  import { isModifiedClick } from '$lib/utilities/is-modified-click';
 
-  type $$Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
+  let {
+    variant = 'primary',
+    size = 'md',
+    disabled = false,
+    loading = false,
+    active = false,
+    LeadingIcon,
+    TrailingIcon,
+    count = 0,
+    id,
+    href,
+    target,
+    disableTracking = false,
+    class: className = '',
+    children,
+    onclick,
+    onkeydown,
+    ...rest
+  }: ButtonProps = $props();
 
-  export let variant: ButtonStyles['variant'] = 'primary';
-  export let size: ButtonStyles['size'] = 'md';
-  export let disabled = false;
-  export let loading = false;
-  export let active = false;
-  export let leadingIcon: IconName = null;
-  export let trailingIcon: IconName = null;
-  export let count = 0;
-  export let id: string = null;
-  export let href: string = null;
-  export let target: string = null;
-  export let disableTracking = false;
+  let element = $state<HTMLElement>();
 
-  let className = '';
-  export { className as class };
+  export function focus() {
+    element?.focus();
+  }
 
-  const onLinkClick = (e: MouseEvent) => {
-    // Skip if middle mouse click or new tab
-    if (e.button === 1 || target || e.metaKey) return;
-    e.preventDefault();
+  const onLinkClick = (event: MouseEvent) => {
+    // Skip if new tab/window click or navigation was already handled
+    if (isModifiedClick(event) || target || event.defaultPrevented) return;
+    if (!href) return;
+    event.preventDefault();
     goto(href);
   };
 
-  let dataTrackObj = {};
-  if (!disableTracking) {
-    dataTrackObj = {
-      'data-track-name': 'button',
-      'data-track-intent': variant,
-      'data-track-text': '*textContent*',
-    };
-  }
+  const handleLinkClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    onclick?.(event);
+    onLinkClick(event);
+  };
+
+  const handleClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    onclick?.(event);
+  };
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    event.stopPropagation();
+    onkeydown?.(event);
+  };
+
+  const dataTrackObj = $derived(
+    disableTracking
+      ? {}
+      : {
+          'data-track-name': 'button',
+          'data-track-intent': variant,
+          'data-track-text': '*textContent*',
+        },
+  );
 </script>
 
 {#if href && !disabled}
   <a
+    bind:this={element}
     {href}
     {id}
-    role="button"
-    type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
     data-variant={variant}
     data-active={active}
     {...dataTrackObj}
-    class={merge(
-      buttonStyles({
-        variant,
-        size,
-      }),
-      className,
-    )}
-    on:click|stopPropagation={onLinkClick}
+    class={merge(buttonStyles({ variant, size }), className)}
     tabindex={href ? null : 0}
-    {...$$restProps}
+    {...rest as HTMLAnchorAttributes}
+    onclick={handleLinkClick}
+    onkeydown={handleKeydown}
   >
-    {#if leadingIcon || (loading && !trailingIcon)}
+    {#if LeadingIcon || (loading && !TrailingIcon)}
+      {@const LeadingGlyph = loading ? IconSpinner : LeadingIcon!}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+        <LeadingGlyph />
       </span>
     {/if}
-    <slot />
-    {#if trailingIcon}
+    {@render children?.()}
+    {#if TrailingIcon}
+      {@const TrailingGlyph =
+        loading && !LeadingIcon ? IconSpinner : TrailingIcon}
       <span
-        class:animate-spin={loading && !leadingIcon}
-        class:invisible={loading && leadingIcon}
+        class:animate-spin={loading && !LeadingIcon}
+        class:invisible={loading && LeadingIcon}
       >
-        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
+        <TrailingGlyph />
       </span>
     {/if}
     {#if count > 0}
-      <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-        type="count">{count}</Badge
-      >
+      <BadgeCount
+        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        value={count}
+      />
     {/if}
   </a>
 {:else}
   <button
+    bind:this={element}
     {disabled}
     {id}
     type="button"
-    on:click|stopPropagation
-    on:keydown|stopPropagation
     data-variant={variant}
     data-active={active}
     {...dataTrackObj}
-    class={merge(
-      buttonStyles({
-        variant,
-        size,
-      }),
-      className,
-    )}
-    {...$$restProps}
+    class={merge(buttonStyles({ variant, size }), className)}
+    {...rest as HTMLButtonAttributes}
+    onclick={handleClick}
+    onkeydown={handleKeydown}
   >
-    {#if leadingIcon || (loading && !trailingIcon)}
+    {#if LeadingIcon || (loading && !TrailingIcon)}
+      {@const LeadingGlyph = loading ? IconSpinner : LeadingIcon!}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+        <LeadingGlyph />
       </span>
     {/if}
-    <slot />
+    {@render children?.()}
 
-    {#if trailingIcon}
+    {#if TrailingIcon}
+      {@const TrailingGlyph =
+        loading && !LeadingIcon ? IconSpinner : TrailingIcon}
       <span
-        class:animate-spin={loading && !leadingIcon}
-        class:invisible={loading && leadingIcon}
+        class:animate-spin={loading && !LeadingIcon}
+        class:invisible={loading && LeadingIcon}
       >
-        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
+        <TrailingGlyph />
       </span>
     {/if}
     {#if count > 0}
-      <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-        type="count">{count}</Badge
-      >
+      <BadgeCount
+        class="absolute right-0 top-0 translate-x-[10px] translate-y-[-10px]"
+        value={count}
+      />
     {/if}
   </button>
 {/if}

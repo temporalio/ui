@@ -1,29 +1,40 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { onMount, untrack } from 'svelte';
+  import { onMount, setContext, untrack } from 'svelte';
 
   import { page } from '$app/state';
 
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
+  import { throttleRefresh } from '$lib/services/events-service';
+  import type { PauseHandle } from '$lib/services/fetch-bidirectional';
+  import { fetchBidirectional } from '$lib/services/fetch-bidirectional';
   import {
-    fetchAllEvents,
-    throttleRefresh,
-  } from '$lib/services/events-service';
+    ingestHistoryEvent,
+    reset as resetBuffer,
+    setPendingMetadata,
+  } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
+  import { runLivePoll } from '$lib/services/live-poll';
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
+  import { fetchWorkerCount } from '$lib/services/worker-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import {
-    currentEventHistory,
     fullEventHistory,
     pauseLiveUpdates,
     timelineEvents,
   } from '$lib/stores/events';
+  import { workerCountEnabled } from '$lib/stores/workers';
   import {
     initialWorkflowRun,
     refresh,
@@ -35,6 +46,7 @@
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { routeForApi } from '$lib/utilities/route-for-api';
 
   interface Props {
     children: Snippet;
@@ -47,11 +59,58 @@
   let workflowId = $derived(page.params.workflow);
   let runId = $derived(page.params.run);
   let showJson = $derived(page.url.searchParams.has('json'));
-  let fullJson = $derived({ ...$workflowRun, eventHistory: $fullEventHistory });
+  let workerHeartbeatsEnabled = $derived(
+    !!page.data?.namespace?.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
+  let workerCountEnabledForNamespace = $derived(
+    workerHeartbeatsEnabled && $workerCountEnabled,
+  );
+  let fullJson = $derived({
+    ...$workflowRun,
+    eventHistory: eventBuffer.events,
+  });
 
   let workflowError: NetworkError | null = $state(null);
   let workflowRunController: AbortController;
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  let livePollingController: AbortController | null = null;
+
+  let fetchComplete = $state(false);
+  let latestEventId = $state(0);
+  let totalExpectedEvents = $state(0);
+  let descMinId = $state(0);
+
+  let _pauseHandle: PauseHandle | null = null;
+  let _resumeRequested = false;
+  let _lastPollToken = '';
+  let _pollPaused = false;
+
+  const ctx: HistoryContext = {
+    get fetchComplete() {
+      return fetchComplete;
+    },
+    get latestEventId() {
+      return latestEventId;
+    },
+    get totalExpectedEvents() {
+      return totalExpectedEvents;
+    },
+    get descMinId() {
+      return descMinId;
+    },
+    resume() {
+      if (_pauseHandle) {
+        const h = _pauseHandle;
+        _pauseHandle = null;
+        _resumeRequested = false;
+        h.resume();
+      } else {
+        _resumeRequested = true;
+      }
+    },
+  };
+
+  setContext(HISTORY_CTX, ctx);
 
   const { copy, copied } = copyToClipboard();
 
@@ -85,16 +144,42 @@
     }
   };
 
-  const getWorkflowAndEventHistory = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
+  const startLivePoll = (
+    ns: string,
+    wfId: string,
+    rId: string,
+    startToken: string,
   ) => {
-    const { settings } = page.data;
+    livePollingController?.abort();
+    livePollingController = new AbortController();
+    runLivePoll({
+      route: routeForApi('events.ascending', {
+        namespace: ns,
+        workflowId: wfId,
+      }),
+      runId: rId,
+      startToken,
+      signal: livePollingController.signal,
+      onEvent: (ev) => {
+        const isNew = ingestHistoryEvent(ev);
+        if (isNew)
+          latestEventId = Math.max(latestEventId, parseInt(ev.eventId));
+        return isNew;
+      },
+    }).then((lastToken) => {
+      _lastPollToken = lastToken;
+    });
+  };
+
+  const getWorkflowAndEventHistory = async (
+    ns: string,
+    wfId: string,
+    rId: string,
+  ) => {
     const { workflow, error } = await fetchWorkflow({
-      namespace,
-      workflowId,
-      runId,
+      namespace: ns,
+      workflowId: wfId,
+      runId: rId,
     });
 
     if (error) {
@@ -102,51 +187,100 @@
       return;
     }
 
-    if (!workflow) {
-      return;
-    }
+    if (!workflow) return;
 
     await decodeWorkflowUserMetadata(workflow);
 
     const { taskQueue } = workflow;
-    const workers = await getPollers({ queue: taskQueue!, namespace });
+    const workers = await getPollers({ queue: taskQueue!, namespace: ns });
 
     $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
     workflowRunController = new AbortController();
 
+    const onWorkersRoute = page.url.pathname.endsWith('/workers');
+
+    if (workerCountEnabledForNamespace && taskQueue && !onWorkersRoute) {
+      const countController = workflowRunController;
+      fetchWorkerCount(
+        { namespace: ns, query: `TaskQueue="${taskQueue}"` },
+        (input, init) =>
+          fetch(input, { ...init, signal: countController.signal }),
+      ).then(({ count }) => {
+        if (!countController.signal.aborted && count !== undefined)
+          $workflowRun.workerCount = count;
+      });
+    }
+
     if (workflow.isRunning && workers?.pollers?.length) {
       getWorkflowMetadata(
-        {
-          namespace,
-          workflow: {
-            id: workflowId,
-            runId,
-          },
-        },
+        { namespace: ns, workflow: { id: wfId, runId: rId } },
         workflowRunController.signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;
       });
     }
 
-    $fullEventHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      sort: 'ascending',
+    const historySize = parseInt(workflow.historyEvents ?? '0') || 0;
+    resetBuffer(historySize);
+    fetchComplete = false;
+    _pauseHandle = null;
+
+    // Start live poll immediately — concurrent with the bidirectional fetch.
+    // Any events that arrive while the fetch is in progress are captured right
+    // away rather than waiting for the full history to load first.
+    // ingestHistoryEvent deduplicates events the bidirectional fetch also
+    // delivers, so the two producers can write into the same store concurrently.
+    // Skip if the user has already paused auto-refresh — the pause $effect
+    // will restart from _lastPollToken when they unpause.
+    if (workflow.isRunning && !$pauseLiveUpdates) {
+      startLivePoll(ns, wfId, rId, '');
+    }
+
+    fetchBidirectional({
+      namespace: ns,
+      workflowId: wfId,
+      runId: rId,
       signal: workflowRunController.signal,
-      historySize: workflow.historyEvents,
-    });
+      maximumPageSize: 1000,
+      pauseAfterPages: 2,
+      onProgress: (p) => {
+        if (p.totalEstimated) totalExpectedEvents = p.totalEstimated;
+        if (p.descMinId) descMinId = p.descMinId;
+      },
+      onPause: (handle) => {
+        if (_resumeRequested) {
+          _resumeRequested = false;
+          handle.resume();
+        } else {
+          _pauseHandle = handle;
+        }
+      },
+      onRawPage: (events) => {
+        for (const event of events) {
+          ingestHistoryEvent(event);
+          const id = parseInt(event.eventId);
+          if (id > latestEventId) latestEventId = id;
+        }
+      },
+    })
+      .then(() => {
+        fetchComplete = true;
+      })
+      .catch((e: unknown) => {
+        if (e instanceof Error && e.name !== 'AbortError') {
+          workflowError = { message: e.message } as NetworkError;
+        }
+      });
   };
 
   const getOnlyWorkflowWithPendingActivities = async (
-    refresh: RefreshAction,
+    refreshAction: RefreshAction,
     pause: boolean,
   ) => {
     const shouldFetch =
-      refresh.timestamp &&
-      (refresh.action || (!pause && $workflowRun?.workflow?.isRunning));
+      refreshAction.timestamp &&
+      (refreshAction.action || (!pause && $workflowRun?.workflow?.isRunning));
 
     if (shouldFetch) {
       const { workflow, error } = await fetchWorkflow({
@@ -162,35 +296,53 @@
     }
   };
 
-  const abortPolling = () => {
-    $fullEventHistory = [];
-    if (workflowRunController) {
-      workflowRunController.abort();
-    }
+  const abortAll = () => {
+    if (workflowRunController) workflowRunController.abort();
+    livePollingController?.abort();
+    livePollingController = null;
   };
+
+  // Pending metadata comes from the workflow run, not the history. The buffer
+  // holds it and applies it as heads arrive, so this only pushes on a refresh.
+  $effect(() => {
+    setPendingMetadata(
+      $workflowRun.workflow?.pendingActivities ?? [],
+      $workflowRun.workflow?.pendingNexusOperations ?? [],
+    );
+  });
+
+  $effect(() => {
+    $fullEventHistory = eventBuffer.events;
+  });
 
   const clearWorkflowData = () => {
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
+    $fullEventHistory = [];
     workflowError = null;
-    abortPolling();
+    fetchComplete = false;
+    latestEventId = 0;
+    totalExpectedEvents = 0;
+    descMinId = 0;
+    _pauseHandle = null;
+    _resumeRequested = false;
+    _lastPollToken = '';
+    _pollPaused = false;
+    abortAll();
     resetLastDataEncoderSuccess();
     if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = null;
   };
 
-  $effect(() => {
-    runId;
-    untrack(() => {
-      clearWorkflowData();
-    });
-  });
-
+  // Clearing and refetching were separate effects on the same trigger, so
+  // clear-before-fetch held only because Svelte runs effects in creation order
+  // — reordering the declarations would have wiped each fetch.
   $effect(() => {
     const ns = namespace;
     const wfId = workflowId;
     const rId = runId;
     untrack(() => {
+      clearWorkflowData();
       getWorkflowAndEventHistory(ns, wfId, rId);
     });
   });
@@ -203,10 +355,21 @@
     });
   });
 
+  // Stop the live poll when the user pauses auto-refresh, and resume it from
+  // the last cursor when they unpause. This avoids holding an open server
+  // connection and accumulating events in liveGroups during a pause.
   $effect(() => {
-    if (!$pauseLiveUpdates) {
-      $currentEventHistory = $fullEventHistory;
-    }
+    const paused = $pauseLiveUpdates;
+    untrack(() => {
+      if (paused && livePollingController) {
+        _pollPaused = true;
+        livePollingController.abort();
+        livePollingController = null;
+      } else if (!paused && _pollPaused && $workflowRun.workflow?.isRunning) {
+        _pollPaused = false;
+        startLivePoll(namespace, workflowId, runId, _lastPollToken);
+      }
+    });
   });
 
   onMount(() => {
@@ -224,13 +387,13 @@
 
 {#if showJson}
   <div
-    class="relative h-auto whitespace-break-spaces break-words bg-primary p-4"
+    class="relative h-auto whitespace-break-spaces break-words bg-surface-primary p-4"
   >
     <CopyButton
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       class="absolute right-1 top-1"
-      on:click={handleCopy}
+      onclick={handleCopy}
       copied={$copied}
     />
     {stringifyWithBigInt(fullJson, undefined, 2)}
