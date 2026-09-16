@@ -97,7 +97,7 @@
     {@render bottom()}
   {/if}
   <div
-    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-inverse-secondary"
+    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-secondary"
   >
     <span class="sr-only">{translate('common.version')}</span>
     {version}
