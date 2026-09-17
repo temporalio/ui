@@ -113,21 +113,22 @@
     @apply absolute right-0 top-0 z-10 h-full w-2 translate-x-1/2 cursor-col-resize touch-none;
 
     &::after {
-      @apply absolute left-1/2 top-1/2 h-4 w-px -translate-x-1/2 -translate-y-1/2 bg-transparent transition-[height,width,background-color] duration-150 ease-out content-[''];
+      @apply absolute left-1/2 top-1/2 h-4 w-px -translate-x-1/2 -translate-y-1/2 bg-border-primary transition-[height,width,background-color] duration-150 ease-out content-[''];
     }
 
     &:focus-visible {
       @apply outline-none ring-2 ring-inset ring-primary;
     }
+
+    &:hover::after,
+    &:focus-visible::after,
+    &.resizing::after {
+      @apply h-6 w-0.5 bg-border-brand;
+    }
   }
 
-  :global(tr:hover) .resize-handle::after {
-    @apply bg-[rgb(var(--color-border-secondary))];
-  }
-
-  :global(tr:hover) .resize-handle:hover::after,
-  :global(tr) .resize-handle:focus-visible::after,
-  :global(tr) .resize-handle.resizing::after {
-    @apply h-6 w-0.5 bg-interactive-primary;
+  :global(th:last-child)
+    .resize-handle:not(:hover, :focus-visible, .resizing)::after {
+    @apply bg-transparent;
   }
 </style>
