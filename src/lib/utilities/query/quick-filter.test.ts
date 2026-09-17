@@ -92,6 +92,25 @@ describe('formatQuickFilterValue', () => {
     );
   });
 
+  it('normalizes a protobuf Timestamp, a Date and an epoch number to ISO', () => {
+    expect(
+      format(SEARCH_ATTRIBUTE_TYPE.DATETIME, {
+        seconds: 1704164645,
+        nanos: 0,
+      }),
+    ).toBe('2024-01-02T03:04:05.000Z');
+    expect(
+      format(SEARCH_ATTRIBUTE_TYPE.DATETIME, new Date('2024-01-02T03:04:05Z')),
+    ).toBe('2024-01-02T03:04:05.000Z');
+    expect(format(SEARCH_ATTRIBUTE_TYPE.DATETIME, 1704164645000)).toBe(
+      '2024-01-02T03:04:05.000Z',
+    );
+  });
+
+  it('rejects an unparseable Date', () => {
+    expect(format(SEARCH_ATTRIBUTE_TYPE.DATETIME, new Date('nope'))).toBeNull();
+  });
+
   it('rejects a Datetime that is not parseable, such as a formatted cell value', () => {
     expect(format(SEARCH_ATTRIBUTE_TYPE.DATETIME, 'not a date')).toBeNull();
     expect(format(SEARCH_ATTRIBUTE_TYPE.DATETIME, '')).toBeNull();

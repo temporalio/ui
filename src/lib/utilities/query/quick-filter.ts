@@ -5,18 +5,20 @@ import {
 } from '$lib/types/workflows';
 
 import { isValidDate } from '../format-date';
+import { isTimestamp, timestampToDate, type ValidTime } from '../format-time';
 import { isInConditional } from '../is';
 import { createFilter } from './to-list-workflow-filters';
 
 export type QuickFilterValue =
-  | string
-  | number
+  | ValidTime
   | boolean
   | string[]
   | null
   | undefined;
 
-export const getDefaultConditional = (type: SearchAttributeType) => {
+export const getDefaultConditional = (
+  type: SearchAttributeType | undefined,
+) => {
   switch (type) {
     case SEARCH_ATTRIBUTE_TYPE.BOOL:
       return '=';
@@ -55,8 +57,19 @@ const formatNumberValue = (value: QuickFilterValue): string | null => {
   return Number.isFinite(Number(value)) ? value.trim() : null;
 };
 
+// A time can reach a table cell as an ISO string, an epoch number, a Date or a
+// protobuf Timestamp, so normalize to the ISO string the query expects.
 const formatDatetimeValue = (value: QuickFilterValue): string | null => {
+  if (isTimestamp(value)) return timestampToDate(value).toISOString();
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? null : value.toISOString();
+  }
+  if (typeof value === 'number') {
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? null : date.toISOString();
+  }
   if (typeof value !== 'string' || !value) return null;
+
   return isValidDate(value) ? value : null;
 };
 
