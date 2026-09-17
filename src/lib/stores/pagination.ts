@@ -4,7 +4,7 @@ import { derived, get, writable } from 'svelte/store';
 import { has } from '$lib/utilities/has';
 
 export const defaultItemsPerPage = 100;
-export const options: string[] = ['100', '250', '500'];
+export const options: string[] = ['100', '250', '500', '1000'];
 export const perPageKey = 'per-page';
 export const currentPageKey = 'page';
 export const MAX_PAGE_SIZE = options[options.length - 1];
