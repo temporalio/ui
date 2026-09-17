@@ -33,6 +33,8 @@
     ) => Promise<SubmitFieldErrors | void>;
     onSuccess: () => void;
     cancelHref: string;
+    agentCoreCfnTemplateUrl?: string;
+    agentCoreCfnTemplate?: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
@@ -45,6 +47,8 @@
     onSubmit,
     onSuccess,
     cancelHref,
+    agentCoreCfnTemplateUrl,
+    agentCoreCfnTemplate,
     cfnTemplateUrl,
     cfnTemplate,
     terraformTemplate,
@@ -180,6 +184,8 @@
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+        {agentCoreCfnTemplateUrl}
+        {agentCoreCfnTemplate}
         {cfnTemplateUrl}
         {cfnTemplate}
         {terraformTemplate}
