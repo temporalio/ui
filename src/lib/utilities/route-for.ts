@@ -129,10 +129,6 @@ export const routeForCatalogExample = ({
   });
 };
 
-export const routeForCommonErrors = (): ResolvedPathname => {
-  return withPrefix('/common-errors', {});
-};
-
 export const routeForNexusEndpoint = (id: string): ResolvedPathname => {
   return withPrefix('/nexus/[id]', { id });
 };
