@@ -20,6 +20,8 @@
   interface Props {
     namespace: string;
     onSuccess: () => void;
+    agentCoreCfnTemplateUrl?: string;
+    agentCoreCfnTemplate?: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
@@ -36,6 +38,8 @@
   let {
     namespace,
     onSuccess,
+    agentCoreCfnTemplateUrl,
+    agentCoreCfnTemplate,
     cfnTemplateUrl,
     cfnTemplate,
     terraformTemplate,
@@ -190,6 +194,8 @@
   cancelHref={routeForWorkers({ namespace })}
   {onSuccess}
   onSubmit={handleCreate}
+  {agentCoreCfnTemplateUrl}
+  {agentCoreCfnTemplate}
   {cfnTemplateUrl}
   {cfnTemplate}
   {terraformTemplate}
