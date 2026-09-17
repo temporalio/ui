@@ -8,12 +8,15 @@ export type UIServer = {
   ready: () => ReturnType<typeof waitForPort>;
 };
 
-export type ValidEnv = 'development' | 'e2e' | 'with-auth';
+export type ValidEnv = 'development' | 'e2e' | 'e2e-auth' | 'with-auth';
 
-let uiServer: UIServer;
+// Keyed by env, because the E2E run needs two servers at once: the main one on
+// 8080 and an auth-enabled one on 8081. A single slot would leave whichever
+// started first without a handle to shut it down.
+const uiServers = new Map<ValidEnv, UIServer>();
 
-export const getUIServer = (): UIServer => {
-  return uiServer;
+export const getUIServer = (env: ValidEnv = 'e2e'): UIServer | undefined => {
+  return uiServers.get(env);
 };
 
 const portForEnv = (env: ValidEnv) => {
@@ -71,10 +74,12 @@ export const createUIServer = async (
     return waitForPort({ port: portForEnv(env), output: 'silent' });
   };
 
-  uiServer = {
+  const server: UIServer = {
     shutdown,
     ready,
   };
 
-  return uiServer;
+  uiServers.set(env, server);
+
+  return server;
 };
