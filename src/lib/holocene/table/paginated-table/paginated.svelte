@@ -81,12 +81,11 @@
   // below could jump back. getValidPage keeps an out-of-range page on a page
   // boundary, which items.length - itemsPerPage does not when the count is not
   // a multiple of the page size.
+  const validPage = $derived(
+    getValidPage(parseInt(currentPageParam, 10), itemsPerPage, items),
+  );
   const startingIndex = $derived(
-    getStartingIndexForPage(
-      getValidPage(parseInt(currentPageParam, 10), itemsPerPage, items),
-      itemsPerPage,
-      items,
-    ),
+    getStartingIndexForPage(validPage, itemsPerPage, items),
   );
   const store = $derived(pagination(items, perPageParam, startingIndex));
 
@@ -132,7 +131,7 @@
   };
 
   $effect(() => {
-    if (currentPageParam) store.jumpToPage(currentPageParam);
+    if (currentPageParam) store.jumpToPage(validPage);
     if (perPageParam) store.adjustPageSize(perPageParam);
   });
 </script>
