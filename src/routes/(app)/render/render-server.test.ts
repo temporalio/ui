@@ -19,6 +19,20 @@ describe('/render', () => {
     expect(html).toMatch(/body \{[^}]*overflow-wrap: break-word/);
   });
 
+  it('sets the page in the system font stack, not Helvetica', async () => {
+    const { html } = await render({ content: 'hello', compact: 'true' });
+
+    // The sandboxed frame cannot load the page's webfonts, so it uses the
+    // same system stacks the page falls back to. A bare sans-serif resolved
+    // to Helvetica on macOS and sat visibly apart from the page text.
+    expect(html).toMatch(
+      /body \{[^}]*font-family: var\(--markdown-font-sans\)/,
+    );
+    expect(html).toMatch(/--markdown-font-sans:[^;]*system-ui/);
+    expect(html).toMatch(/--markdown-font-mono:[^;]*ui-monospace/);
+    expect(html).not.toMatch(/font-family: sans-serif;/);
+  });
+
   it('renders bold at bold weight', async () => {
     const { html } = await render({ content: '**loud**', compact: 'true' });
 
