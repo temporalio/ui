@@ -26,7 +26,21 @@ body {
   overflow-wrap: break-word;
   padding: 1rem;
   white-space: pre-line;
-  font-family: sans-serif;
+  font-family: var(--markdown-font-sans);
+}
+
+/* The frame is sandboxed with default-src 'none', so it cannot load the
+   page's webfonts. Use the same system stacks Tailwind resolves to, so the
+   frame matches a page set in the system font (cloud-ui) and stays close to
+   one set in Inter. A bare sans-serif resolved to Helvetica on macOS, which
+   sat visibly apart from the page. */
+:root {
+  --markdown-font-sans:
+    ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --markdown-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
 }
 
 /* No page padding, so a short string renders as a line of text rather than a
@@ -172,7 +186,7 @@ code {
   border-radius: 0.25rem;
   background: var(--color-surface-secondary);
   color: var(--color-content-primary);
-  font-family: monospace;
+  font-family: var(--markdown-font-mono);
 }
 
 pre {
@@ -182,7 +196,7 @@ pre {
   border-radius: 0.25rem;
   background: var(--color-surface-secondary);
   color: var(--color-content-primary);
-  font-family: monospace;
+  font-family: var(--markdown-font-mono);
   white-space: pre;
 
   code {
