@@ -15,7 +15,7 @@ export type ValidEnv = 'development' | 'e2e' | 'e2e-auth' | 'with-auth';
 // started first without a handle to shut it down.
 const uiServers = new Map<ValidEnv, UIServer>();
 
-export const getUIServer = (env: ValidEnv = 'e2e'): UIServer => {
+export const getUIServer = (env: ValidEnv = 'e2e'): UIServer | undefined => {
   return uiServers.get(env);
 };
 
