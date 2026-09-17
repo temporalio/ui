@@ -41,7 +41,7 @@
   >
     {#if subtitle === 'Cloud'}
       <a href={base || '/'} class="flex items-center text-inherit">
-        <Logo height={24} width={24} />
+        <Logo height={24} width={24} class="m-1" />
       </a>
     {/if}
     {#if subtitle}
@@ -67,7 +67,7 @@
         <h2
           class={merge(
             'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-primary group-data-[nav=open]:block',
-            subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
+            subtitle === 'Cloud' ? 'pl-1 text-base' : 'text-xs',
           )}
         >
           {subtitle}
