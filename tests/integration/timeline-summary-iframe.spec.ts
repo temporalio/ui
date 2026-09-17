@@ -70,7 +70,7 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
 
   await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
 
-  const iframe = page.locator('iframe[src*="compact=true"]').first();
+  const iframe = page.locator('iframe[title="Summary"]').first();
   await expect(iframe).toBeAttached();
   await expect(iframe).toHaveCSS('visibility', 'hidden');
   await expect
@@ -95,4 +95,39 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
       iframe.evaluate((element) => element.getBoundingClientRect().height),
     )
     .toBeLessThanOrEqual(24);
+});
+
+test('does not add decoded timeline summaries to browser history', async ({
+  page,
+}) => {
+  await mockWorkflowApis(page, runningWorkflow);
+  await page.route(EVENT_HISTORY_API, (route) =>
+    route.fulfill({ json: historyPage(events) }),
+  );
+  await page.route(EVENT_HISTORY_API_REVERSE, (route) =>
+    route.fulfill({ json: historyPage([...events].reverse()) }),
+  );
+  await page.route('**/render?**', (route) => {
+    const content = new URL(route.request().url()).searchParams.get('content');
+    return route.fulfill({
+      contentType: 'text/html',
+      body: `<html><body><main>${content}</main></body></html>`,
+    });
+  });
+
+  await page.goto('/common-errors');
+  await page.goto(timelineUrl, { waitUntil: 'domcontentloaded' });
+
+  const iframe = page.locator('iframe[title="Summary"]').first();
+  await expect
+    .poll(() =>
+      iframe.evaluate(
+        (element: HTMLIFrameElement) =>
+          element.contentDocument?.querySelector('main')?.textContent,
+      ),
+    )
+    .toBe('SummarizedActivity • Timeline summary');
+
+  await page.evaluate(() => window.history.back());
+  await expect(page).toHaveURL(/\/common-errors$/);
 });

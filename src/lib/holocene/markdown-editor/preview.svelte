@@ -53,6 +53,7 @@
   let iframe: HTMLIFrameElement | null = $state(null);
   let iframeWidth = 0;
   let loading = $state(true);
+  let expectedPreviewUrl = '';
 
   const parsePixels = (value: string | undefined) => {
     const parsed = Number.parseFloat(value ?? '0');
@@ -120,6 +121,8 @@
   };
 
   const handleLoad = async () => {
+    if (iframe?.contentDocument?.URL !== expectedPreviewUrl) return;
+
     if (fitContent) {
       loading = false;
       // Flush the loading styles before measuring the rendered document.
@@ -170,8 +173,16 @@
     ),
   );
 
-  $effect.pre(() => {
-    if (fitContent && previewPath) loading = true;
+  $effect(() => {
+    const iframeWindow = iframe?.contentWindow;
+    if (!iframeWindow || !previewPath) return;
+
+    const nextPreviewUrl = new URL(previewPath, window.location.href).href;
+    if (nextPreviewUrl === expectedPreviewUrl) return;
+
+    expectedPreviewUrl = nextPreviewUrl;
+    if (fitContent) loading = true;
+    iframeWindow.location.replace(nextPreviewUrl);
   });
 </script>
 
@@ -191,7 +202,6 @@
         : 'block w-full border-0',
       fitContent && loading && 'invisible !h-0 !w-0',
     )}
-    src={previewPath}
     id={frameId}
   ></iframe>
 </section>
