@@ -3,12 +3,15 @@
 
   import { page } from '$app/state';
 
+  import QuickFilterTableCell from '$lib/components/search-attribute-filter/quick-filter-table-cell.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
+  import { workflowFilters } from '$lib/stores/filters';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
@@ -38,8 +41,6 @@
     getWorkflowColumnValue,
   } from './column-search-attributes';
 
-  import FilterableTableCell from './filterable-table-cell.svelte';
-
   type Props = {
     column: ConfigurableTableHeader;
     workflow: WorkflowExecution;
@@ -59,9 +60,10 @@
   const attribute = $derived(getWorkflowColumnAttribute(label));
   const type = $derived($searchAttributes[attribute]);
   const value = $derived(getWorkflowColumnValue(label, workflow));
+  const filterValue = $derived(toQuickFilterValue({ attribute, type, value }));
   const filterable = $derived(
     (!archival || ARCHIVAL_FILTERABLE_COLUMNS.includes(label)) &&
-      toQuickFilterValue({ attribute, type, value }) !== null,
+      filterValue !== null,
   );
 
   const href = $derived.by(() => {
@@ -79,7 +81,15 @@
     return undefined;
   });
 
-  const displayValue = $derived(value === undefined ? '' : String(value));
+  // Datetime cells display and copy the normalized ISO value, so the text in
+  // the cell and the value the filter uses never drift apart.
+  const displayValue = $derived(
+    type === SEARCH_ATTRIBUTE_TYPE.DATETIME
+      ? (filterValue ?? '')
+      : value === undefined
+        ? ''
+        : String(value),
+  );
 
   const className = $derived(
     twMerge(
@@ -144,18 +154,20 @@
 {/snippet}
 
 {#if filterable}
-  <FilterableTableCell
+  <QuickFilterTableCell
     class={className}
     style={widthStyle}
     data-testid={testId}
+    density={truncate ? 'dense' : 'comfortable'}
+    filterIconTitle={translate('common.filter-workflows')}
+    filters={workflowFilters}
     {attribute}
     {type}
     {value}
     copyValue={displayValue}
-    {truncate}
   >
     {@render cellContent()}
-  </FilterableTableCell>
+  </QuickFilterTableCell>
 {:else}
   <td class={className} style={widthStyle} data-testid={testId}>
     {@render cellContent()}
