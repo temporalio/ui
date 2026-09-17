@@ -3,6 +3,7 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconFilter, IconInfo } from '$lib/io/icon';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -16,7 +17,6 @@
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForSchedule,
-    routeForTaskQueue,
     routeForWorkerDeployment,
     routeForWorkflow,
     routeForWorkflowsWithQuery,
@@ -145,17 +145,20 @@
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
       }) ?? ''}
-      iconName="filter"
+      Icon={IconFilter}
     />
 
     {#if workflow?.taskQueue}
       <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
       <DetailListLinkValue
+        copyable
+        copyableText={workflow.taskQueue}
         text={workflow.taskQueue}
-        href={routeForTaskQueue({
+        href={routeForWorkflowsWithQuery({
           namespace,
-          queue: workflow.taskQueue,
-        })}
+          query: `TaskQueue="${workflow.taskQueue}"`,
+        }) ?? ''}
+        Icon={IconFilter}
       />
     {/if}
 
@@ -199,7 +202,7 @@
                 query: `TemporalWorkerDeploymentVersion="${deploymentVersion}"`,
               }) ?? '')
             : ''}
-          iconName={deploymentVersion ? 'filter' : undefined}
+          Icon={deploymentVersion ? IconFilter : undefined}
         />
       {/if}
 
@@ -215,7 +218,7 @@
             namespace,
             query: `TemporalWorkflowVersioningBehavior="${versioningBehavior}"`,
           }) ?? ''}
-          iconName="filter"
+          Icon={IconFilter}
         />
       {/if}
     </DetailListColumn>
@@ -265,7 +268,7 @@
       tooltipText={workflow.externalPayloadCount
         ? translate('workflows.external-payload-tooltip')
         : ''}
-      iconName={workflow.externalPayloadCount ? 'square-info' : undefined}
+      Icon={workflow.externalPayloadCount ? IconInfo : undefined}
       iconPosition="trailing"
       text={historySizeFormatted}
     />

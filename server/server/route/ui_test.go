@@ -3,6 +3,9 @@ package route
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"testing/fstest"
 
@@ -333,4 +336,129 @@ func TestBuildUIIndexHandler_FailsClosedForInvalidExtensionConfiguration(t *test
 	require.ErrorAs(t, err, &httpErr)
 	assert.Equal(t, http.StatusInternalServerError, httpErr.Code)
 	assert.Empty(t, rec.Header().Get("Content-Security-Policy"))
+}
+
+func renderRequest(t *testing.T, query string) string {
+	t.Helper()
+
+	e := echo.New()
+	SetRenderRoute(e, "/")
+
+	req := httptest.NewRequest(http.MethodGet, "/render?"+query, nil)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	return rec.Body.String()
+}
+
+// The SvelteKit route and this one are separate implementations of the same
+// page, so an embedder that asks for compact has to get it from both.
+func TestSetRenderRoute_CompactBodyClass(t *testing.T) {
+	tests := []struct {
+		name  string
+		query string
+		want  string
+	}{
+		{
+			name:  "compact opts in",
+			query: "content=hello&compact=true",
+			want:  `class="prose compact"`,
+		},
+		{
+			name:  "absent stays padded",
+			query: "content=hello",
+			want:  `class="prose"`,
+		},
+		{
+			name:  "false stays padded",
+			query: "content=hello&compact=false",
+			want:  `class="prose"`,
+		},
+		{
+			name:  "only the exact string opts in",
+			query: "content=hello&compact=TRUE",
+			want:  `class="prose"`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Contains(t, renderRequest(t, tt.query), tt.want)
+		})
+	}
+}
+
+func TestSetRenderRoute_StylesheetCarriesCompactRules(t *testing.T) {
+	body := renderRequest(t, "content=hello&compact=true")
+
+	// Without these the class on <body> selects nothing and the frame keeps
+	// the 1rem page padding it has in the standalone view.
+	assert.Contains(t, body, "body.compact {")
+	assert.Contains(t, body, "body.compact main,")
+	assert.Contains(t, body, "body.compact code {")
+}
+
+// Regression: a star selector reset with no strong rule renders bold at normal
+// weight. This route's reset does not set font-weight, so the pinned rule is
+// what keeps it at the same 600 the SvelteKit stylesheet uses.
+func TestSetRenderRoute_BoldIsPinned(t *testing.T) {
+	body := renderRequest(t, "content=**bold**")
+
+	assert.Contains(t, body, "<strong>bold</strong>")
+	assert.Contains(t, body, "font-weight: 600;")
+}
+
+// A 255-character description can hold an unbroken token longer than the frame.
+func TestSetRenderRoute_BreaksLongWords(t *testing.T) {
+	assert.Contains(t, renderRequest(t, "content=hello"), "overflow-wrap: break-word;")
+}
+
+// markdown.gen.css is generated from src/lib/utilities/markdown-reset.ts, so this is a
+// tripwire for a stale generated file that runs without needing node. The
+// authoritative check is scripts/generate-markdown-css.test.ts, which compares
+// the whole file against freshly generated content.
+func TestSetRenderRoute_CompactRulesMatchCanonicalStylesheet(t *testing.T) {
+	canonical, err := os.ReadFile(filepath.Join("..", "..", "..", "src", "lib", "utilities", "markdown-reset.ts"))
+	if err != nil {
+		t.Skip("canonical stylesheet not present; server module built standalone")
+	}
+
+	var want []string
+	for _, line := range strings.Split(string(canonical), "\n") {
+		if line = strings.TrimSpace(line); strings.HasPrefix(line, "body.compact") {
+			want = append(want, line)
+		}
+	}
+	assert.NotEmpty(t, want, "no compact selectors found in canonical stylesheet")
+
+	body := renderRequest(t, "content=hello&compact=true")
+	for _, selector := range want {
+		assert.Contains(t, body, selector,
+			"src/lib/utilities/markdown-reset.ts has %q; this route's copy does not", selector)
+	}
+}
+
+// Regression: a compact frame that paints its own canvas shows as a white box
+// on a dark page. Transparency needs both halves — the background and a
+// color-scheme on the root that matches what the embedder gave the iframe.
+func TestSetRenderRoute_CompactFrameIsTransparent(t *testing.T) {
+	body := renderRequest(t, "content=hello&compact=true")
+
+	assert.Contains(t, body, "background-color: transparent;")
+	assert.Contains(t, body, "color-scheme: light;")
+	assert.Contains(t, body, "html:has(body[data-theme^='dark'])")
+}
+
+// The stylesheet here used to be a copy that predated the Io design system, so
+// a packaged server rendered markdown in the old Holocene palette no matter
+// what theme the page was in. The colours now come from the same Io themes the
+// app uses, through the generator.
+func TestSetRenderRoute_ServesIoThemeColors(t *testing.T) {
+	body := renderRequest(t, "content=hello")
+
+	assert.Contains(t, body, "--color-surface-primary:")
+	assert.Contains(t, body, "--color-content-primary:")
+	assert.Contains(t, body, "body[data-theme^='dark']")
+	assert.NotContains(t, body, "#e8efff", "pre-Io Holocene blue is back")
 }

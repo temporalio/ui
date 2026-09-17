@@ -4,9 +4,15 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import type { IconName } from './icon';
+  import {
+    IconCheckmark,
+    type IconComponent,
+    IconExclamationCircle,
+    IconInfo,
+    IconNexus,
+    IconTranscoderError,
+    IconWarning,
+  } from '$lib/io/icon';
 
   type Intent =
     | 'warning'
@@ -15,12 +21,28 @@
     | 'info'
     | 'nexus'
     | 'transcoder-error';
-  type AlertIcon = Extract<IconName, Intent>;
+  const intentIcon: Readonly<Record<Intent, IconComponent>> = {
+    warning: IconWarning,
+    error: IconExclamationCircle,
+    success: IconCheckmark,
+    info: IconInfo,
+    nexus: IconNexus,
+    'transcoder-error': IconTranscoderError,
+  };
+
+  const intentIconClass: Readonly<Record<Intent, string>> = {
+    warning: 'text-warning',
+    error: 'text-danger',
+    success: 'text-success',
+    info: 'text-information',
+    nexus: '',
+    'transcoder-error': '',
+  };
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     intent: Intent;
     title?: string;
-    icon?: AlertIcon;
+    Icon?: IconComponent;
     'data-testid'?: string;
     hidden?: boolean;
     class?: string;
@@ -30,7 +52,7 @@
   let {
     intent,
     title = '',
-    icon = intent,
+    Icon = intentIcon[intent],
     hidden = false,
     class: className = '',
     children,
@@ -60,7 +82,7 @@
   {role}
   {...rest}
 >
-  <Icon name={icon} class="mt-0.5 shrink-0" />
+  <Icon class={merge('mt-0.5 shrink-0', intentIconClass[intent])} />
   <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}
@@ -75,23 +97,23 @@
 
 <style lang="postcss">
   .alert {
-    @apply items-start gap-2 break-words border p-5 text-sm text-primary;
+    @apply items-start gap-2 break-words rounded border p-5 text-sm text-primary;
   }
 
   .alert.success {
-    @apply border-success bg-success;
+    @apply border-success bg-surface-success;
   }
 
   .alert.info {
-    @apply border-information bg-information;
+    @apply border-information bg-surface-information;
   }
 
   .alert.error {
-    @apply border-danger bg-danger;
+    @apply border-danger bg-surface-danger;
   }
 
   .alert.warning {
-    @apply border-warning bg-warning;
+    @apply border-warning bg-surface-warning;
   }
 
   .content :global(> *) {

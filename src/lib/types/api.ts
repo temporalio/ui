@@ -47,6 +47,7 @@ export type ParameterlessAPIRoutePath =
 export type WorkerAPIRoutePath =
   | 'worker-task-reachability'
   | 'workers'
+  | 'workers.count'
   | 'worker';
 export type SchedulesAPIRoutePath = 'schedules' | 'schedules.count';
 export type ScheduleAPIRoutePath =

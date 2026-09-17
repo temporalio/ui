@@ -4,7 +4,7 @@
 
   import type { Props } from '$lib/holocene/code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { IconEyeHide, IconEyeShow } from '$lib/io/icon';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   const { Story } = defineMeta({
@@ -362,9 +362,9 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
     {#snippet headerActions()}
       <button onclick={() => (hidden = !hidden)}>
         {#if hidden}
-          <Icon name="eye-show" />
+          <IconEyeShow />
         {:else}
-          <Icon name="eye-hide" />
+          <IconEyeHide />
         {/if}
       </button>
     {/snippet}

@@ -25,6 +25,7 @@ package route
 import (
 	"bytes"
 	"crypto/rand"
+	_ "embed"
 	"encoding/hex"
 	"fmt"
 	"html/template"
@@ -178,6 +179,14 @@ func processMarkdown(content string) string {
 	return string(markdown.Render(ast, renderer))
 }
 
+// The stylesheet is generated from src/lib/utilities/markdown-reset.ts and
+// the Io theme colours by scripts/generate-markdown-css.ts, so this route and
+// the SvelteKit one at src/routes/(app)/render serve identical CSS. Edit the
+// reset, then run `pnpm generate:markdown-css`.
+//
+//go:embed markdown.gen.css
+var markdownCSS string
+
 // Template for the HTML page
 const pageTemplate = `
 <!DOCTYPE html>
@@ -191,7 +200,7 @@ const pageTemplate = `
 			{{.CSS}}
 	</style>
 </head>
-<body class="prose" {{if .Theme}}data-theme="{{.Theme}}"{{end}}>
+<body class="{{.BodyClass}}" {{if .Theme}}data-theme="{{.Theme}}"{{end}}>
 	<main>
 			{{.Content}}
 	</main>
@@ -215,193 +224,29 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			finalTheme = fmt.Sprintf("%s-%s", theme, overrideTheme)
 		}
 
+		// Matches the SvelteKit route's parsing: only the exact string opts in.
+		bodyClass := "prose"
+		if c.QueryParam("compact") == "true" {
+			bodyClass = "prose compact"
+		}
+
 		// Process markdown to HTML
 		renderedHTML := processMarkdown(content)
 
 		nonce := generateNonce()
 
 		data := struct {
-			Content template.HTML
-			Nonce   string
-			Theme   string
-			CSS     template.CSS
+			Content   template.HTML
+			Nonce     string
+			Theme     string
+			BodyClass string
+			CSS       template.CSS
 		}{
-			Content: template.HTML(renderedHTML),
-			Nonce:   nonce,
-			Theme:   finalTheme,
-			CSS: template.CSS(`*,
-		body {
-			margin: 0;
-			padding: 0;
-			border: 0;
-			font-size: 100%;
-			vertical-align: baseline;
-		}
-
-		body {
-			overscroll-behavior: none;
-			position: relative;
-			padding: 1rem;
-			white-space: pre-line;
-			font-family: sans-serif;
-		}
-
-		h1 {
-			font-size: 2em;
-		}
-
-		h2 {
-			font-size: 1.5em;
-		}
-
-		h3 {
-			font-size: 1.17em;
-		}
-
-		h4 {
-			font-size: 1em;
-		}
-
-		h5 {
-			font-size: 0.83em;
-		}
-
-		h6 {
-			font-size: 0.67em;
-		}
-
-		blockquote,
-		q {
-			quotes: none;
-		}
-		blockquote:before,
-		blockquote:after,
-		q:before,
-		q:after {
-			content: '';
-			content: none;
-		}
-
-		table {
-			border-collapse: collapse;
-			border-spacing: 0;
-		}
-
-		ul,
-		ol {
-			white-space: normal;
-		}
-
-		li {
-			list-style-position: inside;
-		}
-
-		li * {
-			display: inline;
-		}
-
-		a {
-			gap: 0.5rem;
-			align-items: center;
-			border-radius: 0.25rem;
-			max-width: fit-content;
-			text-decoration: underline;
-			text-underline-offset: 2px;
-			cursor: pointer;
-		}
-
-		blockquote {
-			padding-top: 0;
-			padding-bottom: 0;
-			padding-left: 0.5rem;
-			border-left: 4px solid;
-			border-left-color: #92a4c3;
-			background: #e8efff;
-			color: #121416;
-		}
-
-		blockquote p {
-			font-size: 1.25rem;
-			line-height: 1.75rem;
-		}
-
-		code {
-			font-family: monospace;
-			padding-top: 0.125rem;
-			padding-bottom: 0.125rem;
-			padding-left: 0.25rem;
-			padding-right: 0.25rem;
-			border-radius: 0.25rem;
-			background: #e8efff;
-			color: #121416;
-		}
-
-		pre {
-			font-family: monospace;
-			padding: 0.25rem;
-			border-radius: 0.25rem;
-			background: #e8efff;
-			color: #121416;
-		}
-
-		pre code {
-			padding: 0;
-		}
-
-		body[data-theme='light'] {
-			background-color: #fff;
-			color: #121416;
-		}
-
-		body[data-theme='light'] a {
-			color: #444ce7;
-		}
-
-		body[data-theme='dark'] {
-			background-color: #141414;
-			color: #f8fafc;
-		}
-
-		body[data-theme='dark'] a {
-			color: #8098f9;
-		}
-
-		body[data-theme='light-background'] {
-			background-color: #f8fafc;
-			color: #121416;
-		}
-
-		body[data-theme='light-background'] a {
-			color: #444ce7;
-		}
-
-		body[data-theme='dark-background'] {
-			background-color: #141414;
-			color: #f8fafc;
-		}
-
-		body[data-theme='dark-background'] a {
-			color: #8098f9;
-		}
-
-		body[data-theme='light-primary'] {
-			background-color: #fff;
-			color: #121416;
-		}
-
-		body[data-theme='light-primary'] a {
-			color: #444ce7;
-		}
-
-		body[data-theme='dark-primary'] {
-			background-color: #000;
-			color: #f8fafc;
-		}
-
-		body[data-theme='dark-primary'] a {
-			color: #8098f9;
-		}
-	`),
+			Content:   template.HTML(renderedHTML),
+			Nonce:     nonce,
+			Theme:     finalTheme,
+			BodyClass: bodyClass,
+			CSS:       template.CSS(markdownCSS),
 		}
 
 		// Set headers

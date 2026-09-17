@@ -4,9 +4,14 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import {
+    IconCheckmark,
+    IconClose,
+    type IconComponent,
+    IconCopy,
+    IconLock,
+  } from '$lib/io/icon';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
   import IconButton from '../icon-button.svelte';
@@ -17,7 +22,7 @@
     label: string;
     afterLabel?: Snippet;
     labelHidden?: boolean;
-    icon?: IconName;
+    Icon?: IconComponent;
     suffix?: string;
     prefix?: string;
     valid?: boolean;
@@ -46,13 +51,14 @@
     label,
     afterLabel,
     labelHidden = false,
-    icon = undefined,
+    Icon,
     placeholder = '',
     suffix = '',
     prefix = '',
     name = id,
     copyable = false,
     disabled = false,
+    readonly = false,
     clearable = false,
     autocomplete = 'off',
     valid = true,
@@ -116,7 +122,16 @@
     <div
       class={merge(
         'input-container',
-        'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        'relative box-border inline-flex h-10 w-full items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        !isDisabled &&
+          !readonly &&
+          !showError &&
+          'focus-within:border-secondary hover:border-brand focus-within:hover:border-secondary',
+        value && !isDisabled && !showError && 'border-secondary',
+        readonly &&
+          !isDisabled &&
+          'border-primary bg-surface-primary hover:border-primary',
+        isDisabled && 'border-secondary bg-surface-tertiary text-tertiary',
         inputContainerClass,
       )}
       class:disabled={isDisabled}
@@ -124,9 +139,9 @@
       class:noBorder
       class:invalid={!valid}
     >
-      {#if icon}
+      {#if Icon}
         <span class="icon-container">
-          <Icon name={icon} />
+          <Icon />
         </span>
       {:else if prefix}
         <p class="prefix">{prefix}</p>
@@ -143,6 +158,7 @@
         {name}
         {spellcheck}
         {required}
+        {readonly}
         aria-invalid={showError ? 'true' : undefined}
         aria-describedby={hintText ? (showError ? errorId : hintId) : undefined}
         {autocomplete}
@@ -169,22 +185,22 @@
             onclick={(e) => copy(e, value)}
           >
             {#if $copied}
-              <Icon name="checkmark" />
+              <IconCheckmark />
             {:else}
-              <Icon name="copy" />
+              <IconCopy />
             {/if}
           </button>
         </div>
       {:else if isDisabled}
         <div class="disabled-icon-container">
-          <Icon name="lock" />
+          <IconLock />
         </div>
       {:else if clearable && value}
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
             onclick={handleClear}
-            icon="close"
+            Icon={IconClose}
           />
         </div>
       {/if}
@@ -235,28 +251,20 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-danger focus-within:ring-danger/70;
-
-      > .input {
-        @apply caret-danger;
-      }
-    }
-
-    &.disabled {
-      @apply opacity-50;
+      @apply border-danger focus-within:border-danger;
     }
   }
 
   .input {
-    @apply m-2 h-full w-full bg-transparent focus:text-brand focus:outline-none;
+    @apply m-2 h-full w-full bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
+    @apply block h-full w-fit rounded-l-[inherit] border-r border-primary px-4 py-2 text-secondary;
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
+    @apply block h-full w-fit rounded-r-[inherit] border-l border-primary bg-surface-tertiary px-4 py-2;
   }
 
   .noBorder {
@@ -268,7 +276,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-primary;
   }
 
   .disabled-icon-container {
@@ -280,7 +288,7 @@
   }
 
   .hint-text {
-    @apply text-xs text-primary;
+    @apply text-xs text-tertiary;
 
     &.error,
     &.invalid {

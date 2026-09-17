@@ -1,13 +1,14 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCheckmark, IconClose } from '$lib/io/icon';
 
   let { includesTaskQueueType }: { includesTaskQueueType: boolean } = $props();
+
+  const Glyph = $derived(includesTaskQueueType ? IconCheckmark : IconClose);
 </script>
 
-<Icon
-  name={includesTaskQueueType ? 'checkmark' : 'close'}
-  class={includesTaskQueueType ? 'text-blue-700' : 'text-primary'}
+<Glyph
+  class={includesTaskQueueType ? 'text-success' : 'text-primary'}
   title={includesTaskQueueType
     ? translate('common.yes')
     : translate('common.no')}

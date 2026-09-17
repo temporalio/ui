@@ -3,6 +3,8 @@ export const Namespace = 'workers' as const;
 export const Strings = {
   worker: 'Worker',
   workers: 'Workers',
+  workers_one: 'Worker',
+  workers_other: 'Workers',
   pollers: 'Pollers',
   'worker-details': 'Worker Details',
   'worker-views': 'Worker Views',
@@ -141,6 +143,13 @@ export const Strings = {
     'arn:aws:lambda:us-west-2:123456789012:function:orders-worker',
   'lambda-arn-help':
     'The Amazon Resource Name of your Lambda function. Use an unqualified ARN (no version/alias suffix).',
+  'agentcore-endpoint-arn-label': 'Agent Runtime Endpoint ARN',
+  'agentcore-endpoint-arn-hint':
+    'The ARN of the Bedrock AgentCore Runtime endpoint to invoke.',
+  'agentcore-endpoint-arn-placeholder':
+    'arn:aws:bedrock-agentcore:us-west-2:123456789012:runtime/orders-worker-abc123/runtime-endpoint/DEFAULT',
+  'agentcore-endpoint-arn-help':
+    'The Runtime endpoint ARN, not the Runtime ARN. Temporal reads the runtime id and endpoint name out of it, so it must end in /runtime-endpoint/<name>.',
   'iam-role-label': 'IAM Role ARN',
   'iam-role-hint': 'The ARN of the IAM role for Temporal to assume.',
   'iam-role-placeholder':
@@ -186,12 +195,18 @@ export const Strings = {
   'utilization-target-label': 'Utilization Target',
   'utilization-target-hint':
     'Target average worker utilization across the fleet, from greater than 0 to 1.',
+  'scale-down-stabilization-label': 'Scale-down Stabilization',
+  'scale-down-stabilization-hint':
+    'Wait this long after demand ends before scaling down. 0 = no wait. Default: 90s.',
   'compute-provider': 'Compute Provider',
   'compute-provider-description':
     'Select how your worker activities will be executed.',
   'provider-lambda': 'AWS Lambda',
   'provider-lambda-description':
     'Run workers as Lambda functions in your AWS account.',
+  'provider-agentcore': 'Amazon Bedrock AgentCore',
+  'provider-agentcore-description':
+    'Run Workers as Bedrock AgentCore Runtime sessions in your AWS account.',
   'provider-cloud-run': 'Google Cloud Run',
   'provider-cloud-run-description':
     'Run workers as Cloud Run services in your GCP project.',
@@ -236,6 +251,7 @@ export const Strings = {
   'open-iam-console': 'Open IAM Console',
   'open-aws-lambda': 'Open AWS Lambda',
   'open-aws-iam': 'Open AWS IAM Console',
+  'open-agentcore-console': 'Open AgentCore Console',
   'open-cloud-run-console': 'Open Cloud Run Console',
   'serverless-docs-link': 'Learn more about serverless workers',
   'copy-arn': 'Copy ARN',
@@ -337,6 +353,12 @@ export const Strings = {
   'terraform-description-after':
     ' to create the IAM role Temporal Cloud assumes to invoke your Lambda functions.',
   'cloud-run-setup-prompt': "Don't have a service account yet? Create one",
+  'cloud-run-latency-notice-title':
+    'Open Google Cloud issue: high deployment latency in some regions',
+  'cloud-run-latency-notice-before':
+    'Google currently reports that creating or updating Cloud Run resources takes longer than expected in some regions, including us-central1. Google recommends deploying to another region while the issue is open. For the current status, see ',
+  'cloud-run-latency-notice-link': 'High deployment latency in some regions',
+  'cloud-run-latency-notice-after': ' in the Cloud Run known issues.',
   'cloud-run-terraform-description-before': 'Use our Terraform ',
   'cloud-run-terraform-module-link': 'Google Cloud Run Module',
   'cloud-run-terraform-description-after':

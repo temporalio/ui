@@ -1,6 +1,6 @@
 # Catalog configuration
 
-The catalog is a local-development page for browsing and running Temporal workflow examples. This document explains how it is configured. For the authoring workflow — adding, running, and promoting examples — install the `catalog` skill (`../../../agent-skills/skills/catalog/SKILL.md`) or read it directly.
+The catalog is a local-development page for browsing and running Temporal workflow examples. This document explains how it is configured. For the authoring workflow — adding, running, and promoting examples — install the `catalog` skill (`../../../agent-plugins/temporal-ui-catalog/skills/catalog/SKILL.md`) or read it directly.
 
 The catalog page is reachable only in local development. Every other environment returns 404.
 

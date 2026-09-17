@@ -2,7 +2,11 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
+  import * as ioIcons from '$lib/io/icon';
+
   import Alert from './alert.svelte';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Alert',
@@ -18,9 +22,10 @@
         control: 'select',
         options: ['info', 'success', 'warning', 'error'],
       },
-      icon: {
+      Icon: {
         control: 'select',
-        options: ['info', 'success', 'warning', 'error'],
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
       },
       hidden: { table: { disable: true } },
     },

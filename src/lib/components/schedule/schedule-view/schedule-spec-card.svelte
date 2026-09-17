@@ -3,6 +3,7 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCode } from '$lib/io/icon';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
 
   import { getFormSpecFromSpec } from '../utilities/get-form-spec';
@@ -22,7 +23,10 @@
   const specs = $derived(getFormSpecFromSpec(schedule?.schedule?.spec));
 </script>
 
-<Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
+<Panel
+  class="flex w-full flex-col gap-4 rounded-lg border-primary p-6"
+  as="section"
+>
   <header class="mb-1 flex items-center justify-between">
     <h2 class="text-2xl font-medium">
       {translate('schedules.schedule-specs')}
@@ -30,7 +34,7 @@
     <Button
       variant="secondary"
       size="sm"
-      trailingIcon="code"
+      TrailingIcon={IconCode}
       aria-expanded={isFullSpecVisible}
       aria-controls={scheduleFullSpecId}
       onclick={() => (isFullSpecVisible = !isFullSpecVisible)}

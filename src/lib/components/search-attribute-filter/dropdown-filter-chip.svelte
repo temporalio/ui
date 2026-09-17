@@ -3,12 +3,11 @@
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
-  import { getContext, untrack } from 'svelte';
+  import { untrack } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
@@ -19,6 +18,7 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock, IconTrash } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { prefixSearchEnabled } from '$lib/stores/capability-enablement';
   import {
@@ -52,11 +52,6 @@
   import { getTimezone, TIME_UNIT_OPTIONS } from '$lib/utilities/timezone';
   import { toDate } from '$lib/utilities/to-duration';
 
-  import {
-    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
-    type SearchAttributeFilterContext,
-  } from './filter.svelte';
-
   type Props = {
     filter: SearchAttributeFilter;
     onUpdate: (updatedFilter: SearchAttributeFilter) => void;
@@ -73,10 +68,6 @@
     openIndex = null,
   }: Props = $props();
 
-  const { includeNullConditions = true } =
-    getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT) ??
-    {};
-
   const open = writable(false);
   let localFilter = $state({ ...filter });
 
@@ -92,14 +83,10 @@
   const isTimeRange = $derived(localFilter.conditional === 'BETWEEN');
   const selectedTime = $derived(getSelectedTimezone($timeFormat));
 
-  const defaultConditionOptions = $derived(
-    includeNullConditions
-      ? [
-          { value: 'is', label: translate('common.is-null') },
-          { value: 'is not', label: translate('common.is-not-null') },
-        ]
-      : [],
-  );
+  const defaultConditionOptions = [
+    { value: 'is', label: translate('common.is-null') },
+    { value: 'is not', label: translate('common.is-not-null') },
+  ];
 
   const conditionalOptions = $derived([
     { value: '=', label: translate('common.equal-to'), id: 'equal-to' },
@@ -327,7 +314,7 @@
 
 {#snippet conditionalButtons(options: { value: string; label: string }[])}
   <ToggleButtons>
-    {#each options as option}
+    {#each options as option (option.value)}
       <ToggleButton
         variant="secondary"
         active={localFilter.conditional === option.value}
@@ -345,15 +332,29 @@
   </ToggleButtons>
 {/snippet}
 
-<MenuContainer {open}>
-  <MenuButton size="xs" controls={controlsId} hasIndicator class="bg-secondary">
-    {getDisplayKeyWithConditional(localFilter)}<span
-      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
-      >{getDisplayValue(localFilter)}</span
-    >
+<MenuContainer {open} class="min-w-0 max-w-full">
+  <MenuButton
+    size="xs"
+    controls={controlsId}
+    hasIndicator
+    class="h-auto min-h-8 min-w-0 max-w-full whitespace-normal bg-surface-secondary"
+    title="{getDisplayKeyWithConditional(localFilter)} {getDisplayValue(
+      localFilter,
+    )}"
+  >
+    <div class="min-w-0 text-left">
+      <span class="break-words text-primary"
+        >{getDisplayKeyWithConditional(localFilter)}</span
+      >
+      <span class="break-all text-brand">{getDisplayValue(localFilter)}</span>
+    </div>
   </MenuButton>
 
-  <Menu id={controlsId} class="max-h-fit w-64 p-4 lg:max-w-fit">
+  <Menu
+    id={controlsId}
+    usePortal
+    class="max-h-fit w-min min-w-0 max-w-[calc(100dvw-1rem)] p-4"
+  >
     <form onsubmit={applyChanges}>
       <div class="space-y-4">
         <div class="flex items-center justify-between">
@@ -384,6 +385,7 @@
                   clearLabel={translate('common.clear-input-button-label')}
                 />
                 <TimePicker
+                  class="flex-col sm:flex-row"
                   bind:hour={start.hour}
                   bind:minute={start.minute}
                   bind:second={start.second}
@@ -400,6 +402,7 @@
                   clearLabel={translate('common.clear-input-button-label')}
                 />
                 <TimePicker
+                  class="flex-col sm:flex-row"
                   bind:hour={end.hour}
                   bind:minute={end.minute}
                   bind:second={end.second}
@@ -463,6 +466,7 @@
                     disabled={$timeFormatType !== 'absolute' || isNullFilter}
                   />
                   <TimePicker
+                    class="flex-col sm:flex-row"
                     bind:hour={start.hour}
                     bind:minute={start.minute}
                     bind:second={start.second}
@@ -475,7 +479,7 @@
             <p
               class="flex items-center justify-end gap-1 text-sm text-secondary"
             >
-              <Icon name="clock" aria-hidden="true" />
+              <IconClock />
               {translate('common.based-on-time-preface')}
               {selectedTime}
             </p>
@@ -571,7 +575,7 @@
 
         <div class="flex justify-end gap-2">
           <Button
-            trailingIcon="trash"
+            TrailingIcon={IconTrash}
             variant="secondary"
             size="xs"
             data-testid="remove-filter-button"

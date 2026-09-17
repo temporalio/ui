@@ -2,8 +2,10 @@
   import { defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
   import type { ComponentProps } from 'svelte';
 
-  import { iconNames } from '$lib/holocene/icon';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
+  import * as ioIcons from '$lib/io/icon';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Number Input',
@@ -18,6 +20,7 @@
       search: false,
       labelHidden: false,
       disabled: false,
+      readonly: false,
       required: false,
       hintText: '',
     },
@@ -28,9 +31,15 @@
       units: { name: 'Units', control: 'text' },
       hintText: { name: 'Hint Text', control: 'text' },
       disabled: { name: 'Disabled', control: 'boolean' },
+      readonly: { name: 'Read Only', control: 'boolean' },
       required: { name: 'Required', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
-      icon: { name: 'Icon', control: 'select', options: iconNames },
+      Icon: {
+        name: 'Icon',
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
       max: { name: 'Minimum Value', control: { type: 'number', min: 0 } },
       min: { name: 'Maximum Value', control: { type: 'number', min: 0 } },
       search: { name: 'Search', control: 'boolean' },
@@ -43,12 +52,16 @@
   args: ComponentProps<typeof NumberInput>,
   context: StoryContext<ComponentProps<typeof NumberInput>>,
 )}
-  <NumberInput {...args} id={context.id} />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <NumberInput {...args} id={context.id} />
+  </div>
 {/snippet}
 
 <Story name="Default" />
 
 <Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Read Only" args={{ readonly: true, value: 42 }} />
 
 <Story name="Required" args={{ required: true }} />
 
@@ -60,6 +73,9 @@
 
 <Story name="With Units" args={{ units: 'days' }} />
 
-<Story name="With Icon" args={{ icon: 'calendar' }} />
+<Story name="With Icon" args={{ Icon: ioIcons.IconCalendar }} />
 
-<Story name="With Icon and Units" args={{ icon: 'calendar', units: 'weeks' }} />
+<Story
+  name="With Icon and Units"
+  args={{ Icon: ioIcons.IconCalendar, units: 'weeks' }}
+/>

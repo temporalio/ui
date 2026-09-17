@@ -3,7 +3,7 @@
 
   const comboboxStyles = cva(
     [
-      'surface-primary',
+      'bg-background-primary',
       'flex',
       'max-h-28',
       'min-h-10',
@@ -13,17 +13,19 @@
       'overflow-auto',
       'border',
       'text-sm',
-      'dark:focus-within:surface-primary',
+      'text-primary',
       'focus-within:outline-none',
       'focus-within:ring-2',
+      'focus-within:ring-interactive-primary',
+      'rounded',
     ],
     {
       variants: {
         variant: {
           default:
-            'border-subtle focus-within:border-interactive focus-within:ring-primary/70',
+            'border-primary hover:border-brand focus-within:border-secondary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
           ghost:
-            'bg-transparent border-transparent focus-within:border-transparent focus-within:ring-transparent focus-within:bg-transparent hover:surface-interactive-secondary',
+            'border-transparent bg-transparent hover:bg-interactive-tertiary-hover focus-within:border-transparent focus-within:bg-transparent focus-within:ring-transparent',
         },
       },
       defaultVariants: {
@@ -53,12 +55,17 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
+  import {
+    IconAdd,
+    IconChevronDown,
+    type IconComponent,
+    IconExternalLinkOptical,
+    IconSpinner,
+  } from '$lib/io/icon';
 
-  import Badge from '../badge.svelte';
   import Button from '../button.svelte';
   import Chip from '../chip.svelte';
-  import type { IconName } from '../icon';
-  import Icon from '../icon/icon.svelte';
   import MenuDivider from '../menu/menu-divider.svelte';
   import Tooltip from '../tooltip.svelte';
 
@@ -76,7 +83,7 @@
     placeholder?: string;
     readonly?: boolean;
     required?: boolean;
-    leadingIcon?: IconName;
+    LeadingIcon?: IconComponent;
     showChevron?: boolean;
     minSize?: number;
     maxSize?: number;
@@ -129,12 +136,18 @@
     options: string[];
     optionValueKey?: never;
     optionLabelKey?: never;
+    optionDescriptionKey?: never;
   }
 
   interface CustomOptionProps {
     options: T[];
     optionValueKey: keyof T;
     optionLabelKey?: keyof T;
+    /**
+     * Optional key whose value renders as a secondary line beneath each
+     * option's label. Filtering still matches on the label only.
+     */
+    optionDescriptionKey?: keyof T;
   }
 
   type Props =
@@ -156,10 +169,11 @@
     placeholder = undefined,
     readonly = false,
     required = false,
-    leadingIcon = undefined,
+    LeadingIcon,
     showChevron = false,
     optionValueKey = undefined,
     optionLabelKey = optionValueKey,
+    optionDescriptionKey = undefined,
     minSize = 0,
     maxSize = 120,
     hintText = '',
@@ -269,6 +283,10 @@
     return Array.isArray(value);
   };
 
+  const selectedCountLabel = $derived(
+    isArrayValue(value) ? numberOfItemsSelectedLabel(value.length) : '',
+  );
+
   const addCustomValue = () => {
     if (!trimmedFilterValue) return;
     if (isArrayValue(value) && value.includes(trimmedFilterValue)) return;
@@ -320,6 +338,18 @@
     }
 
     return '';
+  }
+
+  function getOptionDescription(option: string | T): string | undefined {
+    if (optionDescriptionKey == null) return undefined;
+    if (option === null) return undefined;
+    if (isStringOption(option)) return undefined;
+    if (!isObjectOption(option)) return undefined;
+    if (!(optionDescriptionKey in option)) return undefined;
+
+    const description = option[optionDescriptionKey];
+
+    return description == null ? undefined : String(description);
   }
 
   function getSelectedOption(options: (string | T)[]) {
@@ -507,22 +537,26 @@
     <div
       class={merge(
         comboboxStyles({ variant }),
+        value.length > 0 && variant === 'default' && 'border-secondary',
         !valid &&
           variant === 'default' &&
-          'border border-danger text-danger focus-within:ring-danger/70',
-        disabled && 'opacity-50',
+          'border border-danger focus-within:border-danger focus-within:ring-danger hover:border-danger',
+        disabled &&
+          variant === 'default' &&
+          'border-secondary bg-surface-tertiary text-tertiary hover:border-secondary',
+        disabled && variant === 'ghost' && 'text-tertiary hover:bg-transparent',
         className,
       )}
     >
-      {#if leadingIcon}
-        <Icon class="ml-2 shrink-0" name={leadingIcon} />
+      {#if LeadingIcon}
+        <LeadingIcon class="ml-2 shrink-0" />
       {/if}
       <div
         class={merge(
           'input-wrapper',
           multiselect && 'gap-1',
           multiselect && 'm-1',
-          leadingIcon && multiselect && 'ml-2',
+          LeadingIcon && multiselect && 'ml-2',
         )}
       >
         {#if multiselect && isArrayValue(value) && value.length > 0}
@@ -536,8 +570,8 @@
             {#if value.length > chipLimit}
               <p>+{value.slice(chipLimit).length}</p>
             {/if}
-          {:else}
-            <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
+          {:else if selectedCountLabel}
+            <Badge text={selectedCountLabel} />
           {/if}
         {/if}
         <input
@@ -551,7 +585,7 @@
           class={merge(
             'combobox-input',
             multiselect
-              ? value.length > 0 || leadingIcon
+              ? value.length > 0 || LeadingIcon
                 ? 'indent-0'
                 : 'indent-1'
               : 'indent-2',
@@ -580,7 +614,7 @@
         />
       </div>
       {#if action}
-        <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
+        <div class="ml-1 flex h-full items-start border-l border-primary p-0.5">
           {#if actionTooltip}
             <Tooltip text={actionTooltip} right>
               {@render action()}
@@ -590,7 +624,9 @@
           {/if}
         </div>
       {:else if href}
-        <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+        <div
+          class="ml-1 flex h-full items-center border-l border-primary p-0.5"
+        >
           {#if actionTooltip}
             <Tooltip
               text={actionTooltip}
@@ -603,7 +639,7 @@
                 size="xs"
                 {href}
                 disabled={hrefDisabled}
-                leadingIcon="external-link"
+                LeadingIcon={IconExternalLinkOptical}
               />
             </Tooltip>
           {:else}
@@ -612,7 +648,7 @@
               size="xs"
               {href}
               disabled={hrefDisabled}
-              leadingIcon="external-link"
+              LeadingIcon={IconExternalLinkOptical}
             />
           {/if}
         </div>
@@ -620,13 +656,12 @@
       {#if showChevron}
         <button
           type="button"
-          class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
+          class="flex h-full items-center rounded pr-2 hover:bg-interactive-tertiary-hover focus:outline-none"
           onclick={handleChevronClick}
           aria-label={$open ? 'Close options' : 'Open options'}
           tabindex="-1"
         >
-          <Icon
-            name="chevron-down"
+          <IconChevronDown
             class={merge(
               'transition-transform duration-200',
               $open && 'rotate-180',
@@ -680,7 +715,7 @@
         label="{translate('common.add')} {trimmedFilterValue}"
       >
         {#snippet leading()}
-          <Icon name="add" />
+          <IconAdd />
         {/snippet}
       </ComboboxOption>
       {#if list.length > 0}
@@ -693,6 +728,7 @@
         onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}
+        description={getOptionDescription(option)}
         class={optionClass}
       />
     {:else}
@@ -704,7 +740,7 @@
     {#if loading}
       <ComboboxOption disabled label={loadingText}>
         {#snippet leading()}
-          <Icon name="spinner" class="animate-spin" />
+          <IconSpinner class="animate-spin" />
         {/snippet}
       </ComboboxOption>
     {/if}
@@ -725,6 +761,6 @@
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary focus:outline-none;
+    @apply flex grow bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 </style>

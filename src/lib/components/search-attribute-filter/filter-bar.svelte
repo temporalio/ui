@@ -5,8 +5,9 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { IconCode } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import type { SearchAttributes } from '$lib/types/workflows';
@@ -24,7 +25,6 @@
     id: string;
     statusAttribute?: StatusAttribute;
     onManualSearch?: (query: string) => void;
-    includeNullConditions?: boolean;
   }
 
   let {
@@ -34,7 +34,6 @@
     id,
     statusAttribute = 'ExecutionStatus',
     onManualSearch,
-    includeNullConditions,
   }: Props = $props();
 
   let viewManualQuery = $state(false);
@@ -53,24 +52,20 @@
 
 <div>
   <div
-    class="flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
+    class="flex w-full flex-wrap items-end justify-between gap-2 border-t border-primary bg-surface-primary p-1.5"
   >
-    <Filter
-      {filters}
-      {options}
-      {id}
-      {statusAttribute}
-      {includeNullConditions}
-    />
-    <div class="flex items-center gap-1">
+    <Filter {filters} {options} {id} {statusAttribute} />
+    <div class="flex shrink-0 items-center gap-1">
       <Tooltip
-        text={viewManualQuery ? 'Hide raw query' : 'View raw query'}
+        text={viewManualQuery
+          ? translate('common.hide-raw-query')
+          : translate('common.view-raw-query')}
         left
       >
         <Button
           variant="ghost"
           size="xs"
-          leadingIcon="json"
+          LeadingIcon={IconCode}
           active={viewManualQuery}
           data-testid="toggle-manual-query"
           onclick={() => (viewManualQuery = !viewManualQuery)}

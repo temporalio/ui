@@ -4,6 +4,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconSearch } from '$lib/io/icon';
 
   interface Props {
     placeholder?: string;
@@ -46,7 +47,7 @@
     {label}
     {id}
     labelHidden
-    icon={icon ? 'search' : undefined}
+    Icon={icon ? IconSearch : undefined}
     type="search"
     {name}
     {value}

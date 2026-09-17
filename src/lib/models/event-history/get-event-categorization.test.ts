@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type {
+  CommonHistoryEvent,
   EventType,
   EventTypeCategory,
   WorkflowEvents,
@@ -10,6 +11,7 @@ import {
   allEventTypeOptions,
   compactEventTypeOptions,
   eventTypeCategorizations,
+  getCategoryForEvent,
   getEventCategory,
   getEventsInCategory,
   isCategoryType,
@@ -340,5 +342,48 @@ describe('isCategoryType', () => {
 
   it('should return false for "bogus"', () => {
     expect(isCategoryType('bogus')).toBe(false);
+  });
+});
+
+describe('getCategoryForEvent', () => {
+  const marker = (markerName: string) =>
+    ({
+      eventType: 'MarkerRecorded',
+      markerRecordedEventAttributes: { markerName },
+    }) as unknown as CommonHistoryEvent;
+
+  it('categorizes a LocalActivity marker as local-activity', () => {
+    expect(getCategoryForEvent(marker('LocalActivity'), 'MarkerRecorded')).toBe(
+      'local-activity',
+    );
+  });
+
+  it('categorizes a core_local_activity marker as local-activity', () => {
+    expect(
+      getCategoryForEvent(marker('core_local_activity'), 'MarkerRecorded'),
+    ).toBe('local-activity');
+  });
+
+  it.each(['Version', 'SideEffect'])(
+    'leaves a %s marker in other',
+    (markerName) => {
+      expect(getCategoryForEvent(marker(markerName), 'MarkerRecorded')).toBe(
+        'other',
+      );
+    },
+  );
+
+  it('falls back to the event type for non-marker events', () => {
+    const event = {
+      eventType: 'ActivityTaskScheduled',
+      activityTaskScheduledEventAttributes: {},
+    } as unknown as CommonHistoryEvent;
+    expect(getCategoryForEvent(event, 'ActivityTaskScheduled')).toBe(
+      'activity',
+    );
+  });
+
+  it('keeps getEventCategory a type-only lookup', () => {
+    expect(getEventCategory('MarkerRecorded')).toBe('other');
   });
 });

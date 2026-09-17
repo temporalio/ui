@@ -3,11 +3,13 @@
   import { expect, fn, userEvent, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
 
   import Button from '../button.svelte';
 
   import Input from './input.svelte';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Input',
@@ -18,6 +20,7 @@
       placeholder: 'Placeholder...',
       labelHidden: false,
       disabled: false,
+      readonly: false,
       clearable: false,
       copyable: false,
       required: false,
@@ -38,6 +41,7 @@
       required: { name: 'Required', control: 'boolean' },
       error: { name: 'Error', control: 'boolean' },
       disabled: { name: 'Disabled', control: 'boolean' },
+      readonly: { name: 'Read Only', control: 'boolean' },
       valid: { name: 'Valid', control: 'boolean' },
       autocomplete: {
         name: 'Autocomplete',
@@ -50,7 +54,12 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       clearable: { name: 'Clearable', control: 'boolean' },
       copyable: { name: 'Copyable', control: 'boolean' },
-      icon: { name: 'Icon', control: 'select', options: iconNames },
+      Icon: {
+        name: 'Icon',
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
       spellcheck: { name: 'Spell Check', control: 'boolean' },
       maxLength: { name: 'Max Length', control: 'number' },
       hideCount: { name: 'Hide Count', control: 'boolean' },
@@ -78,12 +87,16 @@
   args: ComponentProps<typeof Input>,
   context: StoryContext<ComponentProps<typeof Input>>,
 )}
-  <Input {...args} id={context.id} data-testid={context.id} />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Input {...args} id={context.id} data-testid={context.id} />
+  </div>
 {/snippet}
 
 <Story name="Empty" />
 
 <Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Read Only" args={{ readonly: true, value: 'Read-only value' }} />
 
 <Story name="Required" args={{ required: true }} />
 
@@ -91,7 +104,7 @@
 
 <Story name="Invalid" args={{ valid: false }} />
 
-<Story name="With Icon" args={{ icon: 'search' }} />
+<Story name="With Icon" args={{ Icon: ioIcons.IconSearch }} />
 
 <Story name="With Suffix" args={{ suffix: 'suffix' }} />
 
@@ -142,13 +155,20 @@
 
 <Story name="With Buttons">
   {#snippet template(args, context)}
-    <Input {...args} id={context.id} data-testid={context.id}>
-      {#snippet beforeInput()}
-        <Button type="button">Before</Button>
-      {/snippet}
-      {#snippet afterInput()}
-        <Button type="button">After</Button>
-      {/snippet}
-    </Input>
+    <div class="border border-primary bg-surface-primary p-4 text-primary">
+      <Input
+        {...args}
+        inputContainerClass="rounded-none"
+        id={context.id}
+        data-testid={context.id}
+      >
+        {#snippet beforeInput()}
+          <Button class="rounded-r-none" type="button">Before</Button>
+        {/snippet}
+        {#snippet afterInput()}
+          <Button class="rounded-l-none" type="button">After</Button>
+        {/snippet}
+      </Input>
+    </div>
   {/snippet}
 </Story>

@@ -13,13 +13,27 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconAgent,
+    IconArchive,
+    IconBook,
+    IconFeedback,
+    IconImport,
+    IconSupport,
+    IconTemporalActivity,
+    IconTemporalBatch,
+    IconTemporalNamespaces,
+    IconTemporalNexus,
+    IconTemporalSchedules,
+    IconTemporalWorker,
+    IconTemporalWorkflow,
+  } from '$lib/io/icon';
   import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
@@ -32,6 +46,7 @@
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
   import {
+    routeForAgents,
     routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForCatalog,
@@ -100,6 +115,7 @@
   const getRoutes = (namespace: string) => {
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
+      agentsRoute: routeForAgents({ namespace }),
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
       standaloneNexusOperationsRoute: routeForStandaloneNexusOperations({
         namespace,
@@ -119,6 +135,7 @@
   const getNavPrimaryLinks = (
     {
       workflowsRoute,
+      agentsRoute,
       standaloneActivitiesRoute,
       standaloneNexusOperationsRoute,
       schedulesRoute,
@@ -130,6 +147,7 @@
       nexusRoute,
     }: {
       workflowsRoute: string;
+      agentsRoute: string;
       standaloneActivitiesRoute: string;
       standaloneNexusOperationsRoute: string;
       schedulesRoute: string;
@@ -146,11 +164,13 @@
     return [
       {
         href: namespacesRoute,
-        icon: 'namespace',
+        Icon: IconTemporalNamespaces,
+        testId: 'namespace-button',
         label: translate('common.namespaces'),
         isActive: (path) =>
           path.includes(namespacesRoute) &&
           !path.includes(workflowsRoute) &&
+          !path.includes(agentsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
           !path.includes(workersRoute) &&
@@ -161,20 +181,23 @@
       },
       {
         href: workflowsRoute,
-        icon: 'workflow',
+        Icon: IconTemporalWorkflow,
+        testId: 'workflow-button',
         label: translate('common.workflows'),
         isActive: (path) => path.includes(workflowsRoute),
       },
       {
         href: standaloneActivitiesRoute,
-        icon: 'activity',
+        Icon: IconTemporalActivity,
+        testId: 'activity-button',
         label: translate('standalone-activities.standalone-activities'),
         isActive: (path) => path.includes(standaloneActivitiesRoute),
         hidden: !minimumVersionRequired('1.30.0', $temporalVersion),
       },
       {
         href: standaloneNexusOperationsRoute,
-        icon: 'nexus',
+        Icon: IconTemporalNexus,
+        testId: 'nexus-button',
         label: translate(
           'standalone-nexus-operations.standalone-nexus-operations',
         ),
@@ -183,13 +206,22 @@
       },
       {
         href: schedulesRoute,
-        icon: 'schedules',
+        Icon: IconTemporalSchedules,
+        testId: 'schedules-button',
         label: translate('common.schedules'),
         isActive: (path) => path.includes(schedulesRoute),
       },
       {
+        href: agentsRoute,
+        Icon: IconAgent,
+        testId: 'agents-button',
+        label: translate('common.agents'),
+        isActive: (path) => path.includes(agentsRoute),
+      },
+      {
         href: batchOperationsRoute,
-        icon: 'batch-operation',
+        Icon: IconTemporalBatch,
+        testId: 'batch-operation-button',
         label: translate('batch.nav-title'),
         tooltip: translate('batch.list-page-title'),
         animate: inProgressBatch,
@@ -197,7 +229,8 @@
       },
       {
         href: workersRoute,
-        icon: 'workers',
+        Icon: IconTemporalWorker,
+        testId: 'workers-button',
         label: translate('workers.workers'),
         tooltip: translate('workers.workers'),
         isActive: (path) =>
@@ -205,7 +238,8 @@
       },
       {
         href: nexusRoute,
-        icon: 'nexus',
+        Icon: IconTemporalNexus,
+        testId: 'nexus-button',
         label: translate('nexus.nexus'),
         hidden: !page.data?.systemInfo?.capabilities?.nexus,
         isActive: (path) => {
@@ -222,6 +256,7 @@
       historyImportRoute,
     }: {
       workflowsRoute: string;
+      agentsRoute: string;
       standaloneActivitiesRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
@@ -236,19 +271,22 @@
     return [
       {
         href: archivalRoute,
-        icon: 'archives',
+        Icon: IconArchive,
+        testId: 'archives-button',
         label: translate('common.archive'),
         isActive: (path) => path.includes(archivalRoute),
       },
       {
         href: historyImportRoute,
-        icon: 'import',
+        Icon: IconImport,
+        testId: 'import-button',
         label: translate('common.import'),
         isActive: (path) => path.includes(historyImportRoute),
       },
       {
         href: 'http://docs.temporal.io',
-        icon: 'book',
+        Icon: IconBook,
+        testId: 'book-button',
         label: translate('common.docs'),
         external: true,
       },
@@ -264,6 +302,7 @@
   );
   let {
     workflowsRoute,
+    agentsRoute,
     schedulesRoute,
     batchOperationsRoute,
     workersRoute,
@@ -276,6 +315,7 @@
   let showNamespacePicker = $derived(
     [
       workflowsRoute,
+      agentsRoute,
       schedulesRoute,
       workersRoute,
       workerDeploymentsRoute,
@@ -289,6 +329,10 @@
 
   function getCurrentHref(namespace: string) {
     const namespacePages = [
+      {
+        subPath: 'agents',
+        fullRoute: routeForAgents({ namespace }),
+      },
       {
         subPath: 'schedules',
         fullRoute: routeForSchedules({ namespace }),
@@ -360,14 +404,14 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex h-dvh w-screen flex-row">
+<div class="flex h-[calc(100dvh-var(--layout-pt))] w-screen flex-row">
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
     position={toaster.position}
   />
-  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
+  <div class="sticky top-0 z-30 hidden h-full w-auto md:block">
     <SideNavigation sections={[linkList, linkListForSecondGroup]} {isCloud}>
       {#snippet bottom()}
         {#if !isCloud}
@@ -375,7 +419,7 @@
             link={page.data?.settings?.feedbackURL ||
               'https://github.com/temporalio/ui/issues/new/choose'}
             label={translate('common.feedback')}
-            icon="feedback"
+            Icon={IconFeedback}
             tooltip={translate('common.feedback')}
             external
           />
@@ -407,17 +451,25 @@
           class="flex items-center hover:text-white"
           aria-label="Support"
         >
-          <Icon name="support" />
+          <IconSupport />
         </a>
       {/if}
       <UserMenu {logout} />
     </TopNavigation>
     <ExtensionSlot name="app.top-nav.sub-nav" />
     {#snippet main()}
-      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+      <div
+        class="flex h-full w-full flex-col gap-4 p-4 md:px-8 md:pb-0 md:pt-8"
+      >
         <ErrorBoundary>
           {@render children()}
         </ErrorBoundary>
+        <!--
+          md+ needs a definite height so tables can size against it, and an
+          overflowing box drops its padding-bottom from the scroll area. A
+          real box survives it: gap-4 (16px) + h-4 (16px) = pb-8's 32px.
+        -->
+        <div aria-hidden="true" class="hidden shrink-0 md:block md:h-4"></div>
       </div>
     {/snippet}
     {#snippet footer()}
@@ -426,15 +478,23 @@
           {#each [...linkListForSecondGroup]
             .filter((item) => !item.hidden)
             .reverse() as link, i (i)}
-            <NavigationItem {...link} link={link.href} />
+            <NavigationItem
+              {...link}
+              link={link.href}
+              data-testid={link.testId}
+            />
           {/each}
 
-          <hr class="border-subtle" />
+          <hr class="border-primary" />
 
           {#each [...linkList]
             .filter((item) => !item.hidden)
             .reverse() as link, i (i)}
-            <NavigationItem {...link} link={link.href} />
+            <NavigationItem
+              {...link}
+              link={link.href}
+              data-testid={link.testId}
+            />
           {/each}
         {/snippet}
         {#if showNewsFeed}

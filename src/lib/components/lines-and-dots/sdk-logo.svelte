@@ -1,24 +1,28 @@
 <script lang="ts">
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import dotNet from '$lib/vendor/sdk-logos/dotnet-colorblock.svg';
-  import go from '$lib/vendor/sdk-logos/go-colorblock.svg';
-  import java from '$lib/vendor/sdk-logos/java-colorblock.svg';
-  import php from '$lib/vendor/sdk-logos/php-colorblock.svg';
-  import python from '$lib/vendor/sdk-logos/python-colorblock.svg';
-  import ruby from '$lib/vendor/sdk-logos/ruby-colorblock.svg';
-  import rust from '$lib/vendor/sdk-logos/rust-colorblock.svg';
-  import typescript from '$lib/vendor/sdk-logos/typescript-colorblock.svg';
+  import {
+    IconBook,
+    type IconComponent,
+    IconDotnetColorblock,
+    IconGoColorblock,
+    IconJavaColorblock,
+    IconPhpColorblock,
+    IconPythonColorblock,
+    IconRubyColorblock,
+    IconRustColorblock,
+    IconTypescriptColorblock,
+  } from '$lib/io/icon';
 
-  const sdkLogos: Record<string, string> = {
-    go,
-    typescript,
-    java,
-    python,
-    '.net': dotNet,
-    ruby,
-    php,
-    rust,
+  const sdkLogos: Record<string, IconComponent> = {
+    go: IconGoColorblock,
+    typescript: IconTypescriptColorblock,
+    java: IconJavaColorblock,
+    python: IconPythonColorblock,
+    '.net': IconDotnetColorblock,
+    ruby: IconRubyColorblock,
+    php: IconPhpColorblock,
+    rust: IconRustColorblock,
   };
 
   const sdkToDocsSlug: Record<string, string> = {
@@ -38,7 +42,7 @@
   }
 
   let { sdk, version, hideDocsLink = false }: Props = $props();
-  const logo = $derived(sdkLogos[sdk.toLowerCase()]);
+  const Logo = $derived(sdkLogos[sdk.toLowerCase()]);
   const href = $derived(
     sdkToDocsSlug[sdk]
       ? `https://docs.temporal.io/develop/${sdkToDocsSlug[sdk]}`
@@ -47,9 +51,9 @@
 </script>
 
 <p class="flex w-full items-center gap-2">
-  {#if logo}
+  {#if Logo}
     <span class="relative flex w-6 shrink-0 items-center" aria-hidden="true">
-      <img src={logo} alt="" class="absolute h-6 w-6" />
+      <Logo class="absolute h-6 w-6" />
     </span>
   {/if}
   <Tooltip bottomRight text={`${sdk} ${version}`}>
@@ -59,6 +63,6 @@
     </span>
   </Tooltip>
   {#if href && !hideDocsLink}
-    <Link trailingIcon="book" {href} newTab>Docs</Link>
+    <Link TrailingIcon={IconBook} {href} newTab>Docs</Link>
   {/if}
 </p>

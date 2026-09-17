@@ -1196,6 +1196,7 @@ try {
         changedPaths: [],
         moved: { from: '', to: '' },
       }),
+      list: async () => [],
       scaffold: async () => undefined,
       generate: async () => [],
       verify: async () => undefined,
@@ -1219,6 +1220,133 @@ try {
     ).rejects.toThrow('Unknown catalog command "new"');
   });
 
+  it('lists the catalog examples the adapter knows about', async () => {
+    const output: string[] = [];
+    const authoring: ReturnType<typeof createCatalogAuthoring> = {
+      demote: async () => ({ changedPaths: [], moved: { from: '', to: '' } }),
+      list: async () => [
+        {
+          id: 'signal-handlers',
+          sourceFiles: [],
+          sourceId: 'oss',
+          targetId: 'shared-workflows',
+          workflowType: 'signalWorkflow',
+        },
+        {
+          id: 'standalone-activity',
+          sourceFiles: [],
+          sourceId: 'oss',
+          targetId: 'shared-workflows',
+        },
+      ],
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async () => ({ operations: [] }),
+      planPromote: async () => ({ operations: [] }),
+      promote: async () => ({ changedPaths: [], moved: { from: '', to: '' } }),
+    };
+
+    await runCatalogCli({
+      authoring,
+      argv: ['list'],
+      io: {
+        writeError: () => undefined,
+        writeOutput: (message) => output.push(message),
+      },
+    });
+
+    expect(output).toEqual([
+      [
+        'signal-handlers\toss\tshared-workflows\tsignalWorkflow',
+        'standalone-activity\toss\tshared-workflows\t-',
+      ].join('\n'),
+    ]);
+  });
+
+  it('lists the catalog examples as JSON on request', async () => {
+    const output: string[] = [];
+    const examples = [
+      {
+        id: 'hello',
+        sourceFiles: [],
+        sourceId: 'oss',
+        targetId: 'shared-workflows',
+        workflowType: 'hello',
+      },
+    ];
+    const authoring: ReturnType<typeof createCatalogAuthoring> = {
+      demote: async () => ({ changedPaths: [], moved: { from: '', to: '' } }),
+      list: async () => examples,
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async () => ({ operations: [] }),
+      planPromote: async () => ({ operations: [] }),
+      promote: async () => ({ changedPaths: [], moved: { from: '', to: '' } }),
+    };
+
+    await runCatalogCli({
+      authoring,
+      argv: ['list', '--json'],
+      io: {
+        writeError: () => undefined,
+        writeOutput: (message) => output.push(message),
+      },
+    });
+
+    expect(output).toEqual([JSON.stringify(examples, null, 2)]);
+  });
+
+  it('says how to make an example when the catalog has none', async () => {
+    const output: string[] = [];
+    const authoring: ReturnType<typeof createCatalogAuthoring> = {
+      demote: async () => ({ changedPaths: [], moved: { from: '', to: '' } }),
+      list: async () => [],
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async () => ({ operations: [] }),
+      planPromote: async () => ({ operations: [] }),
+      promote: async () => ({ changedPaths: [], moved: { from: '', to: '' } }),
+    };
+
+    await runCatalogCli({
+      authoring,
+      argv: ['list'],
+      io: {
+        writeError: () => undefined,
+        writeOutput: (message) => output.push(message),
+      },
+    });
+
+    expect(output.join('\n')).toContain('catalog scaffold <example-id>');
+  });
+
+  it('refuses an unknown flag on list', async () => {
+    const authoring: ReturnType<typeof createCatalogAuthoring> = {
+      demote: async () => ({ changedPaths: [], moved: { from: '', to: '' } }),
+      list: async () => [],
+      scaffold: async () => undefined,
+      generate: async () => [],
+      verify: async () => undefined,
+      planDemote: async () => ({ operations: [] }),
+      planPromote: async () => ({ operations: [] }),
+      promote: async () => ({ changedPaths: [], moved: { from: '', to: '' } }),
+    };
+
+    await expect(
+      runCatalogCli({
+        authoring,
+        argv: ['list', '--yaml'],
+        io: {
+          writeError: () => undefined,
+          writeOutput: () => undefined,
+        },
+      }),
+    ).rejects.toThrow('Usage: catalog list [--json]');
+  });
+
   it('dispatches demotion dry-run to the planner without mutating', async () => {
     const calls: string[] = [];
     const output: string[] = [];
@@ -1238,6 +1366,7 @@ try {
         calls.push('demote');
         return { changedPaths: [], moved: { from: '', to: '' } };
       },
+      list: async () => [],
       scaffold: async () => undefined,
       generate: async () => [],
       verify: async () => undefined,
@@ -1272,6 +1401,7 @@ try {
         changedPaths: [],
         moved: { from: '', to: '' },
       }),
+      list: async () => [],
       scaffold: async () => undefined,
       generate: async () => [],
       verify: async () => undefined,
@@ -1326,6 +1456,7 @@ try {
           },
         };
       },
+      list: async () => [],
       scaffold: async () => undefined,
       generate: async () => [],
       verify: async () => undefined,

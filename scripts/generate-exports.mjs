@@ -43,11 +43,18 @@ for (const rel of allFiles) {
     }
   } else if (rel.endsWith('.js') && !rel.includes('.svelte.')) {
     const base = rel.replace(/\.js$/, '');
-    exports[`./${base}`] = {
+    const entry = {
       types: `./dist/${base}.d.ts`,
       import: `./dist/${rel}`,
       default: `./dist/${rel}`,
     };
+    exports[`./${base}`] = entry;
+
+    // `exports` has no directory-index resolution, so alias each barrel's
+    // `/index` path to its directory
+    if (base.endsWith('/index')) {
+      exports[`./${base.slice(0, -'/index'.length)}`] = entry;
+    }
   }
 }
 

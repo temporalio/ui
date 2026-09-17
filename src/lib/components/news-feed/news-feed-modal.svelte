@@ -1,10 +1,15 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconRetry,
+    IconSpinner,
+    IconTemporal,
+    IconWarning,
+  } from '$lib/io/icon';
   import type { createNewsFeedStore } from '$lib/stores/news-feed';
   import {
     hourFormat,
@@ -56,30 +61,30 @@
 >
   {#snippet titleSnippet()}
     <h3 class="flex items-center gap-2">
-      <Icon name="temporal-logo" class="h-8 w-8" />{translate('common.news')}
+      <IconTemporal class="h-8 w-8" />{translate('common.news')}
     </h3>
   {/snippet}
   {#snippet content()}
     <div class="flex max-h-[65vh] min-h-0 flex-col gap-5 overflow-y-auto pr-2">
       {#if $newsFeed.error}
         <div
-          class="surface-warning flex items-start gap-2 border border-warning p-3 text-sm"
+          class="flex items-start gap-2 border border-warning bg-surface-warning p-3 text-sm text-primary"
           role="alert"
         >
-          <Icon name="warning" class="mt-0.5" />
+          <IconWarning class="mt-0.5" />
           <p>{$newsFeed.error}</p>
         </div>
       {/if}
 
       {#if $newsFeed.isLoading && !$newsFeed.items.length}
-        <div class="flex items-center gap-2 text-sm text-subtle">
-          <Icon name="spinner" class="animate-spin" />
+        <div class="flex items-center gap-2 text-sm text-tertiary">
+          <IconSpinner class="animate-spin" />
           {translate('common.news-feed-loading')}
         </div>
       {:else if $newsFeed.items.length}
         {#each $newsFeed.items as item (item.id)}
           <article
-            class="min-h-fit border-b border-subtle py-2 last:border-b-0"
+            class="min-h-fit border-b border-primary py-2 last:border-b-0"
           >
             <h4>{item.title}</h4>
             <Markdown
@@ -93,7 +98,9 @@
           </article>
         {/each}
       {:else}
-        <p class="text-sm text-subtle">{translate('common.news-feed-empty')}</p>
+        <p class="text-sm text-tertiary">
+          {translate('common.news-feed-empty')}
+        </p>
       {/if}
     </div>
   {/snippet}
@@ -106,13 +113,13 @@
         <Button
           variant="ghost"
           size="xs"
-          leadingIcon="retry"
+          LeadingIcon={IconRetry}
           loading={$newsFeed.isLoading}
           onclick={() => newsFeed.refresh({ cache: 'reload' })}
         >
           {translate('common.refresh')}
         </Button>
-        <span class="text-subtle">{lastFetchedLabel}</span>
+        <span class="text-tertiary">{lastFetchedLabel}</span>
       </div>
 
       <Checkbox

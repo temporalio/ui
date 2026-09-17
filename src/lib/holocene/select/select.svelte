@@ -32,10 +32,9 @@
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
+  import { type IconComponent, IconLock, IconSpinner } from '$lib/io/icon';
 
   type T = $$Generic;
 
@@ -48,7 +47,7 @@
     placeholder?: string;
     disabled?: boolean;
     loading?: boolean;
-    leadingIcon?: IconName;
+    LeadingIcon?: IconComponent;
     onChange?: (value: T) => void;
     'data-testid'?: string;
     menuButtonClass?: ClassNameValue;
@@ -69,7 +68,7 @@
     placeholder = '',
     disabled = false,
     loading = false,
-    leadingIcon = undefined,
+    LeadingIcon,
     onChange = () => {},
     menuButtonClass = undefined,
     menuClass = undefined,
@@ -133,7 +132,12 @@
     <Label {label} hidden={labelHidden} for={id} {required} />
     {#key $labelCtx}
       <MenuButton
-        class={merge('w-full', !valid && 'border-danger', menuButtonClass)}
+        class={merge(
+          'w-full border-secondary bg-background-primary text-primary focus-visible:border-secondary focus-visible:bg-background-primary focus-visible:ring-interactive-primary enabled:hover:border-tertiary enabled:hover:bg-interactive-tertiary-hover disabled:bg-surface-tertiary disabled:opacity-disabled',
+          !valid &&
+            'border-danger focus-visible:border-danger focus-visible:ring-danger',
+          menuButtonClass,
+        )}
         hasIndicator={!disabled}
         disabled={disabled || loading}
         controls="{id}-select"
@@ -146,8 +150,8 @@
         aria-describedby={showError ? errorId : undefined}
       >
         {#snippet leading()}
-          {#if leadingIcon}
-            <Icon name={leadingIcon} />
+          {#if LeadingIcon}
+            <LeadingIcon />
           {:else if leadingProp}
             {@render leadingProp()}
           {/if}
@@ -157,6 +161,9 @@
           value={!value && placeholder !== '' ? placeholder : $labelCtx}
           tabindex="-1"
           disabled
+          class={merge(
+            !value && placeholder !== '' ? 'text-secondary' : 'text-primary',
+          )}
           class:disabled
           {required}
           aria-required={required}
@@ -164,16 +171,21 @@
         />
         {#snippet trailing()}
           {#if disabled}
-            <Icon name="lock" />
+            <IconLock />
           {:else if loading}
-            <Icon name="spinner" class="animate-spin" />
+            <IconSpinner class="animate-spin" />
           {/if}
         {/snippet}
       </MenuButton>
     {/key}
   </div>
   {#if children}
-    <Menu role="listbox" id="{id}-select" class={menuClass} {position}>
+    <Menu
+      role="listbox"
+      id="{id}-select"
+      class={merge('bg-surface-primary', menuClass)}
+      {position}
+    >
       {@render children()}
     </Menu>
   {/if}

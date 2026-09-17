@@ -1,0 +1,49 @@
+<script lang="ts" module>
+  import type { Writable } from 'svelte/store';
+
+  export const TABLE_MAXIMIZABLE_CONTEXT = 'table-maximizable';
+
+  export type TableMaximizableContext = {
+    maximized: Writable<boolean>;
+  };
+</script>
+
+<script lang="ts">
+  import { writable } from 'svelte/store';
+
+  import { setContext, type Snippet } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
+
+  interface Props {
+    children: Snippet;
+  }
+
+  let { children }: Props = $props();
+
+  const maximized = writable(false);
+
+  setContext<TableMaximizableContext>(TABLE_MAXIMIZABLE_CONTEXT, { maximized });
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape' || !$maximized) return;
+
+    if (event.target instanceof Element && event.target.closest('dialog[open]'))
+      return;
+
+    $maximized = false;
+  };
+</script>
+
+<svelte:window onkeydowncapture={handleKeydown} />
+
+<div
+  class={merge(
+    'flex min-h-0 grow flex-col',
+    $maximized
+      ? 'fixed inset-0 z-40 bg-surface-primary pb-[var(--scroll-inset-bottom,0px)] text-primary'
+      : 'overflow-hidden rounded-lg border border-primary',
+  )}
+  data-testid="maximizable-table-view"
+>
+  {@render children()}
+</div>

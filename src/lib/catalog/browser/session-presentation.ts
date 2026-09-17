@@ -1,20 +1,27 @@
+import type { BadgeStatusValue } from '$lib/io/badge-status';
+
 import type { ExecutionTerminalStatus } from './workbench-host';
 
-export const terminalStatusPresentation = (status: ExecutionTerminalStatus) => {
-  if (status === 'completed') {
-    return { label: 'Completed', type: 'success' as const };
-  }
-  if (status === 'canceled') {
-    return { label: 'Canceled', type: 'warning' as const };
-  }
-  if (status === 'continued-as-new') {
-    return { label: 'Continued as new', type: 'primary' as const };
-  }
-
-  const label =
-    status === 'timed-out'
-      ? 'Timed out'
-      : `${status[0]?.toUpperCase()}${status.slice(1)}`;
-
-  return { label, type: 'danger' as const };
+type TerminalStatusPresentation = {
+  label: string;
+  status: BadgeStatusValue;
 };
+
+const terminalStatusPresentations: Record<
+  ExecutionTerminalStatus,
+  TerminalStatusPresentation
+> = {
+  canceled: { label: 'Canceled', status: 'Canceled' },
+  completed: { label: 'Completed', status: 'Completed' },
+  'continued-as-new': {
+    label: 'Continued as new',
+    status: 'ContinuedAsNew',
+  },
+  failed: { label: 'Failed', status: 'Failed' },
+  terminated: { label: 'Terminated', status: 'Terminated' },
+  'timed-out': { label: 'Timed out', status: 'TimedOut' },
+};
+
+export const terminalStatusPresentation = (
+  status: ExecutionTerminalStatus,
+): TerminalStatusPresentation => terminalStatusPresentations[status];

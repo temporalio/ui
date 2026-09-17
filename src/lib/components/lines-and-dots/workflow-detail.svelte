@@ -1,11 +1,9 @@
 <script lang="ts">
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { type IconComponent, IconFilter } from '$lib/io/icon';
 
   interface Props {
     title?: string;
@@ -13,9 +11,8 @@
     copyable?: boolean;
     filterable?: boolean;
     href?: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     tooltip?: string;
-    badge?: BadgeType;
     class?: string;
   }
 
@@ -25,9 +22,8 @@
     copyable = false,
     filterable = false,
     href,
-    icon,
+    Icon,
     tooltip = '',
-    badge,
     class: className = '',
   }: Props = $props();
 </script>
@@ -52,7 +48,7 @@
           class="flex w-fit flex-row items-center gap-1 truncate rounded-sm font-mono leading-4"
           ><span class="truncate">{content}</span>
           {#if filterable}
-            <Icon name="filter" class="shrink-0" />
+            <IconFilter class="shrink-0" />
           {/if}
         </Link>
       {:else}
@@ -69,26 +65,14 @@
     >
   {:else}
     <Tooltip text={tooltip} hide={!tooltip} top>
-      {#if badge}
-        <Badge
-          type={badge}
-          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
-        >
-          {#if icon}
-            <Icon name={icon} class="shrink-0" />
-          {/if}
-          {content}
-        </Badge>
-      {:else}
-        <span
-          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
-        >
-          {#if icon}
-            <Icon name={icon} class="shrink-0" />
-          {/if}
-          {content}</span
-        >
-      {/if}
+      <span
+        class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
+      >
+        {#if Icon}
+          <Icon class="shrink-0" />
+        {/if}
+        {content}</span
+      >
     </Tooltip>
   {/if}
 </p>

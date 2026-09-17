@@ -22,7 +22,7 @@ import {
 import { toEventNameReadable } from '$lib/utilities/screaming-enums';
 
 import { getEventBillableActions } from './get-event-billable-actions';
-import { getEventCategory } from './get-event-categorization';
+import { getCategoryForEvent } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
 
@@ -70,7 +70,7 @@ export const toEvent = (
   const eventType = toEventNameReadable(historyEvent.eventType);
   const timestamp = formatDate(String(historyEvent.eventTime));
   const classification = getEventClassification(eventType);
-  const category = getEventCategory(eventType);
+  const category = getCategoryForEvent(historyEvent, eventType);
 
   const { key, attributes } = findAttributesAndKey(historyEvent);
 

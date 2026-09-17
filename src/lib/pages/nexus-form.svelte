@@ -11,6 +11,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconNamespaceSwitcher, IconSearch } from '$lib/io/icon';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
   type Props = {
@@ -223,7 +224,7 @@
     id="target-namespace"
     name="targetNamespace"
     placeholder={translate('nexus.select-namespace')}
-    leadingIcon="namespace-switcher"
+    LeadingIcon={IconNamespaceSwitcher}
     options={targetNamespaceList}
     optionValueKey="namespace"
     minSize={32}
@@ -241,7 +242,9 @@
   />
   <IsOssGuard {isCloud}>
     <div class="flex flex-col gap-0">
-      <p class="text-base text-primary">{translate('nexus.access-policy')}</p>
+      <p class="text-base text-primary">
+        {translate('nexus.access-policy')}
+      </p>
       <p class="text-xs text-secondary">
         {translate('nexus.allowed-caller-namespaces-description')}
       </p>
@@ -256,7 +259,7 @@
       bind:value={$form.allowedCallerNamespaces}
       options={callerNamespaces}
       label={translate('nexus.allowed-caller-namespaces')}
-      leadingIcon="search"
+      LeadingIcon={IconSearch}
       noResultsText={translate('common.no-results')}
       valid={!$errors.allowedCallerNamespaces}
       error={$errors.allowedCallerNamespaces?._errors?.[0] ||

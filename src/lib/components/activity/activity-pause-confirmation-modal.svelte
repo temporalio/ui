@@ -3,6 +3,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconBook } from '$lib/io/icon';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
   type Props = {
@@ -62,7 +63,7 @@
       <p>{translate('activities.pause-modal-description')}</p>
       <Link
         newTab
-        trailingIcon="book"
+        TrailingIcon={IconBook}
         href="https://docs.temporal.io/activity-operations#important-considerations"
         class="mt-1"
       >

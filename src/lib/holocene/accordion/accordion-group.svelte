@@ -4,6 +4,8 @@
   let { children }: { children?: Snippet } = $props();
 </script>
 
-<div class="*:border-t-0 [&>*:first-child]:border-t">
+<div
+  class="*:rounded-none *:border-t-0 [&>*:first-child]:rounded-t [&>*:first-child]:border-t [&>*:last-child]:rounded-b"
+>
   {@render children?.()}
 </div>

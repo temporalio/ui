@@ -3,20 +3,19 @@
   import { onDestroy } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Portal from '$lib/holocene/portal/portal.svelte';
   import type {
     PortalOffset,
     PortalPosition,
   } from '$lib/holocene/portal/types';
+  import { type IconComponent } from '$lib/io/icon';
   import type { Only } from '$lib/types/global';
 
   const HOVER_HIDE_DELAY_MS = 120;
 
   type BaseProps = {
     text?: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     hide?: boolean | null;
     width?: number | null;
     class?: string;
@@ -64,7 +63,7 @@
   let {
     class: className = '',
     text = '',
-    icon,
+    Icon,
     top,
     topRight,
     right,
@@ -126,7 +125,19 @@
     }
   }
 
-  function handleFocusIn() {
+  function isFocusVisible(target: EventTarget | null) {
+    if (!(target instanceof Element)) return true;
+
+    try {
+      return target.matches(':focus-visible');
+    } catch {
+      return true;
+    }
+  }
+
+  function handleFocusIn(event: FocusEvent) {
+    if (!isFocusVisible(event.target)) return;
+
     isFocused = true;
   }
 
@@ -159,7 +170,7 @@
   {#if content}
     {@render content()}
   {:else}
-    {#if icon}<Icon name={icon} class="inline h-4" />{/if}
+    {#if Icon}<Icon class="inline h-4" />{/if}
     <span>{text}</span>
   {/if}
 {/snippet}
@@ -191,7 +202,7 @@
           id={tooltipId}
           role="tooltip"
           class={merge(
-            'inline-block rounded-md bg-slate-800 px-2 py-2 text-xs text-slate-50',
+            'inline-block rounded bg-neutral-7 px-2 py-2 text-xs text-white',
             tooltipClass,
           )}
           onmouseenter={handleHoverEnter}
@@ -209,7 +220,7 @@
         role="tooltip"
         class={merge(
           'tooltip absolute left-0 top-0 z-50 translate-x-12 whitespace-nowrap text-xs transition-all',
-          isOpen ? 'inline-block opacity-95' : 'hidden opacity-0',
+          isOpen ? 'inline-block opacity-100' : 'hidden opacity-0',
         )}
         onmouseenter={handleHoverEnter}
         onmouseleave={handleHoverLeave}
@@ -225,7 +236,7 @@
       >
         <div
           class={merge(
-            'inline-block rounded-md bg-slate-800 px-2 py-2 text-slate-50',
+            'inline-block rounded bg-neutral-7 px-2 py-2 text-white',
             tooltipClass,
           )}
         >

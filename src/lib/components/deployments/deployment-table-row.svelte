@@ -3,13 +3,13 @@
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconEllipsisVertical } from '$lib/io/icon';
   import {
     deleteWorkerDeployment,
     fetchDeployment,
@@ -35,7 +35,7 @@
   let {
     deployment,
     columns,
-    showConnectionStatus = false,
+    showConnectionStatus = true,
     onChange,
   }: Props = $props();
 
@@ -157,7 +157,7 @@
       <td class="py-1 text-left">
         {#if isSameAsCurrent}
           <span
-            class="inline-flex items-center border border-subtle px-2 py-0.5 text-secondary"
+            class="inline-flex items-center border border-primary px-2 py-0.5 text-secondary"
           >
             {translate('deployments.same-as-current')}
           </span>
@@ -200,7 +200,7 @@
         size="xs"
         class="flex h-8 w-8 items-center justify-center"
       >
-        <Icon name="vertical-ellipsis" class="h-4 w-4" />
+        <IconEllipsisVertical class="h-4 w-4" />
       </MenuButton>
       <Menu
         id="deployment-actions-{deployment.name}"

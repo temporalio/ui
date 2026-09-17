@@ -2,10 +2,39 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createDeploymentSchema,
+  createVersionSchema,
   editVersionSchema,
   getInitialComputeProvider,
   interpolateTerraformTemplate,
+  msToScaleDownStabilization,
+  scaleDownStabilizationToMs,
 } from './shared';
+
+describe('scale-down stabilization conversion', () => {
+  it.each([
+    ['0s', 0],
+    ['0.1s', 100],
+    ['90s', 90_000],
+    ['300s', 300_000],
+  ])('converts %s to %i ms', (duration, ms) => {
+    expect(scaleDownStabilizationToMs(duration)).toBe(ms);
+  });
+
+  it.each([
+    [0, '0s'],
+    [100, '0.1s'],
+    [90_000, '90s'],
+    [300_000, '300s'],
+  ])('converts %i ms back to %s', (ms, duration) => {
+    expect(msToScaleDownStabilization(ms)).toBe(duration);
+  });
+
+  it('round-trips the value the CLI defaults to', () => {
+    expect(scaleDownStabilizationToMs(msToScaleDownStabilization(90_000))).toBe(
+      90_000,
+    );
+  });
+});
 
 describe('getInitialComputeProvider', () => {
   it('defaults to Lambda when provider configuration is omitted', () => {
@@ -98,6 +127,7 @@ describe('Cloud Run replica validation', () => {
     expect(result.maxReplicas).toBe(30);
     expect(result.initialReplicas).toBe(0);
     expect(result.utilizationTarget).toBe(0.8);
+    expect(result.scaleDownStabilization).toBe('90s');
   });
 
   it.each([
@@ -117,6 +147,12 @@ describe('Cloud Run replica validation', () => {
     ],
     ['zero utilization', { utilizationTarget: 0 }],
     ['utilization above one', { utilizationTarget: 1.01 }],
+    ['negative stabilization window', { scaleDownStabilization: '-1s' }],
+    [
+      'sub-millisecond stabilization window',
+      { scaleDownStabilization: '0.0005s' },
+    ],
+    ['unitless stabilization window', { scaleDownStabilization: '90' }],
   ])('rejects %s', (_name, replicas) => {
     expect(
       editVersionSchema.safeParse({ ...baseCloudRunData, ...replicas }).success,
@@ -135,7 +171,26 @@ describe('Cloud Run replica validation', () => {
       maxReplicas: 30,
       initialReplicas: 0,
       utilizationTarget: 0.8,
+      scaleDownStabilization: '90s',
     });
+  });
+
+  it('accepts a zero stabilization window', () => {
+    const result = editVersionSchema.parse({
+      ...baseCloudRunData,
+      scaleDownStabilization: '0s',
+    });
+
+    expect(result.scaleDownStabilization).toBe('0s');
+  });
+
+  it('accepts a whole-millisecond stabilization window', () => {
+    const result = editVersionSchema.parse({
+      ...baseCloudRunData,
+      scaleDownStabilization: '0.1s',
+    });
+
+    expect(result.scaleDownStabilization).toBe('0.1s');
   });
 });
 
@@ -233,5 +288,55 @@ describe('interpolateTerraformTemplate', () => {
       'temporal_cloud_principals = [\n    "<principal-arn>",\n  ]',
     );
     expect(result).toContain('source = "terraform-modules/modules');
+  });
+});
+
+describe('AgentCore provider validation', () => {
+  const valid = {
+    buildId: '1.0.0',
+    provider: 'agentcore' as const,
+    agentCoreEndpointArn:
+      'arn:aws:bedrock-agentcore:us-west-2:123456789012:runtime/orders-abc123/runtime-endpoint/DEFAULT',
+    iamRoleArn:
+      'arn:aws:iam::123456789012:role/Temporal-Cloud-Serverless-Worker',
+    roleExternalId: 'tmprl-00000000-0000-0000-0000-000000000000',
+  };
+
+  const errorPaths = (data: Record<string, unknown>): string[] => {
+    const result = createVersionSchema.safeParse(data);
+    if (result.success) return [];
+    return result.error.issues.map((issue) => issue.path.join('.'));
+  };
+
+  it('accepts a Runtime Endpoint ARN with role and external id', () => {
+    expect(createVersionSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it('requires the endpoint ARN', () => {
+    expect(errorPaths({ ...valid, agentCoreEndpointArn: '' })).toContain(
+      'agentCoreEndpointArn',
+    );
+  });
+
+  // The provider parses the runtime id and endpoint name out of the ARN, so a
+  // bare Runtime ARN is rejected rather than silently failing at invoke time.
+  it('rejects a Runtime ARN that is not a Runtime Endpoint ARN', () => {
+    expect(
+      errorPaths({
+        ...valid,
+        agentCoreEndpointArn:
+          'arn:aws:bedrock-agentcore:us-west-2:123456789012:runtime/orders-abc123',
+      }),
+    ).toContain('agentCoreEndpointArn');
+  });
+
+  it('requires the IAM role and external id, as Lambda does', () => {
+    const paths = errorPaths({ ...valid, iamRoleArn: '', roleExternalId: '' });
+    expect(paths).toContain('iamRoleArn');
+    expect(paths).toContain('roleExternalId');
+  });
+
+  it('does not require Lambda or Cloud Run fields', () => {
+    expect(errorPaths(valid)).toEqual([]);
   });
 });

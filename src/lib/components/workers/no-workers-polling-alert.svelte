@@ -1,8 +1,8 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconArrowRight, IconInfo, IconWarning } from '$lib/io/icon';
   import { fetchDeployment } from '$lib/services/deployments-service';
   import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
@@ -56,7 +56,7 @@
 
 {#if serverlessDeployment && deployment}
   <Alert
-    icon="info"
+    Icon={IconInfo}
     intent="info"
     title={translate('workflows.workflow-error-no-workers-serverless-title')}
     class="max-w-screen-lg xl:w-2/3"
@@ -71,12 +71,12 @@
       class="mt-2 flex items-center gap-1"
     >
       {translate('workflows.view-worker-deployment')}
-      <Icon name="arrow-right" />
+      <IconArrowRight />
     </Link>
   </Alert>
 {:else}
   <Alert
-    icon="warning"
+    Icon={IconWarning}
     intent="warning"
     title={translate('workflows.workflow-error-no-workers-title')}
     class="max-w-screen-lg xl:w-2/3"
@@ -92,7 +92,7 @@
       class="mt-2 flex items-center gap-1"
     >
       {translate('workers.troubleshooting-workers-link')}
-      <Icon name="arrow-right" />
+      <IconArrowRight />
     </Link>
   </Alert>
 {/if}

@@ -28,6 +28,15 @@ export function getElementRect(element: HTMLElement): Rect {
   };
 }
 
+export function hasMoved(a: Rect, b: Rect): boolean {
+  return (
+    a.top !== b.top ||
+    a.left !== b.left ||
+    a.width !== b.width ||
+    a.height !== b.height
+  );
+}
+
 export function calculateBasePosition(
   anchorRect: Rect,
   portalRect: Rect,

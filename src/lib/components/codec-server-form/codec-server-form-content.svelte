@@ -8,12 +8,12 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Textarea from '$lib/holocene/textarea.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconAdd, IconTrash } from '$lib/io/icon';
 
   import type { CodecServerFormData } from './types';
 
@@ -228,7 +228,7 @@
                   $form.customLink = '';
                 }}
               >
-                <Icon name="trash" class="h-4 w-4" />
+                <IconTrash />
                 {translate('codec-server.remove-custom-button')}
               </Button>
             </div>
@@ -243,7 +243,7 @@
           size="sm"
           onclick={() => (showCustomSection = true)}
           disabled={$submitting}
-          leadingIcon="add"
+          LeadingIcon={IconAdd}
         >
           {translate('codec-server.add-custom-button')}
         </Button>

@@ -13,14 +13,17 @@
     type ComputeProviderOption,
     type CreateDeploymentFormData,
     createDeploymentSchema,
+    defaultScaleDownStabilization,
     getInitialComputeProvider,
   } from './shared';
 
+  import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
   interface SubmitFieldErrors {
     lambdaArn?: string[];
+    agentCoreEndpointArn?: string[];
     iamRoleArn?: string[];
   }
 
@@ -30,6 +33,8 @@
     ) => Promise<SubmitFieldErrors | void>;
     onSuccess: () => void;
     cancelHref: string;
+    agentCoreCfnTemplateUrl?: string;
+    agentCoreCfnTemplate?: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
@@ -42,6 +47,8 @@
     onSubmit,
     onSuccess,
     cancelHref,
+    agentCoreCfnTemplateUrl,
+    agentCoreCfnTemplate,
     cfnTemplateUrl,
     cfnTemplate,
     terraformTemplate,
@@ -60,6 +67,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: '',
+      agentCoreEndpointArn: '',
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject: '',
@@ -70,6 +78,7 @@
       maxReplicas: 30,
       initialReplicas: 0,
       utilizationTarget: 0.8,
+      scaleDownStabilization: defaultScaleDownStabilization,
       scaleUpCooloffMs: undefined as number | undefined,
       scaleUpBacklogThreshold: undefined as number | undefined,
       maxWorkerLifetimeMs: undefined as number | undefined,
@@ -88,6 +97,9 @@
           if (fieldErrors) {
             if (fieldErrors.lambdaArn)
               form.errors.lambdaArn = fieldErrors.lambdaArn;
+            if (fieldErrors.agentCoreEndpointArn)
+              form.errors.agentCoreEndpointArn =
+                fieldErrors.agentCoreEndpointArn;
             if (fieldErrors.iamRoleArn)
               form.errors.iamRoleArn = fieldErrors.iamRoleArn;
             return;
@@ -151,9 +163,11 @@
         bind:provider={$form.provider}
         providers={computeProviders}
       />
+      <CloudRunLatencyNotice provider={$form.provider} class="mt-4" />
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
+        bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
         bind:iamRoleArn={$form.iamRoleArn}
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}
@@ -165,10 +179,13 @@
         bind:maxReplicas={$form.maxReplicas}
         bind:initialReplicas={$form.initialReplicas}
         bind:utilizationTarget={$form.utilizationTarget}
+        bind:scaleDownStabilization={$form.scaleDownStabilization}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+        {agentCoreCfnTemplateUrl}
+        {agentCoreCfnTemplate}
         {cfnTemplateUrl}
         {cfnTemplate}
         {terraformTemplate}

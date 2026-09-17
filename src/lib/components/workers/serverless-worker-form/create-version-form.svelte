@@ -14,9 +14,11 @@
     type ComputeProviderOption,
     type CreateVersionFormData,
     createVersionSchema,
+    defaultScaleDownStabilization,
     getInitialComputeProvider,
   } from './shared';
 
+  import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
   import RecentVersions from './recent-versions.svelte';
@@ -53,6 +55,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: '',
+      agentCoreEndpointArn: '',
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject: '',
@@ -63,6 +66,7 @@
       maxReplicas: 30,
       initialReplicas: 0,
       utilizationTarget: 0.8,
+      scaleDownStabilization: defaultScaleDownStabilization,
       scaleUpCooloffMs: undefined as number | undefined,
       scaleUpBacklogThreshold: undefined as number | undefined,
       maxWorkerLifetimeMs: undefined as number | undefined,
@@ -122,9 +126,11 @@
         bind:provider={$form.provider}
         providers={computeProviders}
       >
+        <CloudRunLatencyNotice provider={$form.provider} />
         <ComputeFields
           provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}
+          bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
           bind:iamRoleArn={$form.iamRoleArn}
           bind:roleExternalId={$form.roleExternalId}
           bind:gcpProject={$form.gcpProject}
@@ -136,6 +142,7 @@
           bind:maxReplicas={$form.maxReplicas}
           bind:initialReplicas={$form.initialReplicas}
           bind:utilizationTarget={$form.utilizationTarget}
+          bind:scaleDownStabilization={$form.scaleDownStabilization}
           bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
           bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}

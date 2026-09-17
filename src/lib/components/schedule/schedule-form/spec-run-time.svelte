@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClock } from '$lib/io/icon';
 
   import type { FormScheduleSchema } from '../schema/form';
 
@@ -98,7 +98,7 @@
     />
   </div>
   <div class="flex gap-2 text-xs">
-    <Icon name="clock" class="inline-block" />
+    <IconClock class="inline-block" />
     <p class="text-secondary">
       {translate('schedules.run-time-based-on-timezone', {
         timezoneName: $form.timezoneName,

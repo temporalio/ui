@@ -6,6 +6,12 @@
 
   interface BaseProps {
     label: string;
+    /**
+     * Optional secondary line rendered beneath the label. Use it for context
+     * that helps disambiguate options — a description, an owner, a region.
+     * Filtering still matches on `label` only.
+     */
+    description?: string;
     class?: ClassNameValue;
     onclick?: () => void;
     leading?: Snippet;
@@ -31,6 +37,7 @@
     selected = false,
     disabled = false,
     label,
+    description = undefined,
     class: className = '',
     onclick,
     leading,
@@ -47,6 +54,7 @@
   {active}
   {selected}
   {disabled}
+  {description}
   {leading}
   {trailing}
 >

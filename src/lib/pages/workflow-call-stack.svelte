@@ -11,6 +11,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconRetry } from '$lib/io/icon';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -62,7 +63,11 @@
           class="mb-4 w-fit"
         />
         <div class="flex items-center gap-2">
-          <Button variant="primary" leadingIcon="retry" onclick={setStackTrace}>
+          <Button
+            variant="primary"
+            LeadingIcon={IconRetry}
+            onclick={setStackTrace}
+          >
             {translate('workflows.refresh-call-stack')}
           </Button>
           <p>

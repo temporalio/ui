@@ -4,10 +4,12 @@
   import { DetailList, DetailListColumn } from '../detail-list';
 </script>
 
-<div class="space-y-2">
-  <div class="flex items-center gap-4 max-xl:w-full max-xl:flex-wrap">
-    <Skeleton class="h-5 w-20 rounded-sm" />
-    <Skeleton class="h-8 w-72 rounded-sm" />
+<div class="flex flex-col gap-4">
+  <div class="flex items-start gap-4 max-xl:w-full max-xl:flex-wrap">
+    <div class="flex items-center gap-4">
+      <Skeleton class="h-8 w-24 rounded-sm" />
+      <Skeleton class="h-8 w-72 rounded-sm" />
+    </div>
     <div class="ml-auto flex items-center gap-2">
       <Skeleton class="h-7 w-36 rounded-sm" />
       <Skeleton class="h-7 w-28 rounded-sm" />

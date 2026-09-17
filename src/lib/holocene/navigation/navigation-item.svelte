@@ -3,14 +3,13 @@
 
   import { page } from '$app/state';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { type IconComponent } from '$lib/io/icon';
 
   interface Props {
     link: string;
     label: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     tooltip?: string;
     external?: boolean;
     animate?: boolean;
@@ -22,7 +21,7 @@
   let {
     link,
     label,
-    icon,
+    Icon,
     tooltip = label,
     external = false,
     animate = false,
@@ -36,7 +35,7 @@
   const active = $derived(isActive && isActive(page.url.href));
 </script>
 
-<div role="listitem" data-testid={testId || `${icon}-button`} class="relative">
+<div role="listitem" data-testid={testId} class="relative">
   <Tooltip
     text={tooltip}
     right
@@ -55,17 +54,16 @@
       data-track-intent="navigate"
       data-track-text={label}
       class={merge(
-        'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm',
-        'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+        'mb-2 flex items-center whitespace-nowrap rounded px-2 py-1 text-sm font-medium text-secondary hover:bg-surface-overlay-primary hover:text-primary',
         active &&
-          'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
-        disabled && 'pointer-events-none cursor-not-allowed opacity-50',
+          'bg-interactive-secondary-hover text-brand hover:bg-interactive-secondary-press hover:text-brand',
+        disabled && 'pointer-events-none cursor-not-allowed opacity-disabled',
       )}
-      class:text-disabled={disabled}
+      class:text-tertiary={disabled}
     >
-      {#if icon}
-        <div class="flex h-6 w-6 items-center">
-          <Icon name={icon} {animate} />
+      {#if Icon}
+        <div class="flex h-6 w-6 items-center" class:animate-pulse={animate}>
+          <Icon />
         </div>
       {/if}
       <div

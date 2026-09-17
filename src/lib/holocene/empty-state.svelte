@@ -1,14 +1,13 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { IconComet, type IconComponent } from '$lib/io/icon';
 
   interface Props {
     title: string;
     content?: string;
     error?: string;
-    icon?: IconName;
+    Icon?: IconComponent;
     class?: string;
     testId?: string;
     children?: Snippet;
@@ -18,7 +17,7 @@
     title,
     content = '',
     error = '',
-    icon = 'comet',
+    Icon = IconComet,
     class: className = '',
     testId,
     children,
@@ -30,14 +29,14 @@
   data-testid={testId}
 >
   <span class="flex h-16 w-16 items-center justify-center rounded-full">
-    <Icon name={icon} class="block h-full w-full" /></span
+    <Icon class="block h-full w-full" /></span
   >
   <p class="text-xl font-medium">{title}</p>
   {#if content}
     <p class="text-center">{content}</p>
   {/if}
   {#if error}
-    <p class="border border-danger bg-danger p-5 text-center">
+    <p class="rounded border border-danger bg-surface-danger p-5 text-center">
       {error}
     </p>
   {/if}

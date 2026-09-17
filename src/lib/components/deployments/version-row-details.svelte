@@ -20,11 +20,13 @@
 </script>
 
 {#await fetchPromise}
-  <div class="surface-secondary flex flex-col gap-2 py-3 pl-6 text-xs">
+  <div
+    class="flex flex-col gap-2 bg-surface-secondary py-3 pl-6 text-xs text-primary"
+  >
     {#each [1, 2, 3] as _ (_)}
       <div class="flex items-center gap-2">
-        <div class="h-3 w-20 animate-pulse rounded bg-subtle"></div>
-        <div class="h-3 w-64 animate-pulse rounded bg-subtle"></div>
+        <div class="h-3 w-20 animate-pulse rounded bg-surface-tertiary"></div>
+        <div class="h-3 w-64 animate-pulse rounded bg-surface-tertiary"></div>
       </div>
     {/each}
   </div>

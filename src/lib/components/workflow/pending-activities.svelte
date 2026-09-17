@@ -3,12 +3,13 @@
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { IconCanceled, IconRetry } from '$lib/io/icon';
   import { workflowRun } from '$lib/stores/workflow-run';
   import {
     formatAttemptsLeft,
@@ -43,15 +44,19 @@
     >
       {#snippet summary()}
         <div class="flex items-center gap-2">
-          <Badge type="count">{pendingActivities.length}</Badge>
           {#if canceled}
             <Tooltip
               bottom
               text={translate('workflows.pending-activities-canceled')}
             >
-              <Badge type="warning" class="py-0"><Icon name="canceled" /></Badge
-              >
+              <Badge
+                colorScheme="warning"
+                text={String(pendingActivities.length)}
+                Icon={IconCanceled}
+              />
             </Tooltip>
+          {:else}
+            <BadgeCount value={pendingActivities.length} />
           {/if}
         </div>
       {/snippet}
@@ -69,9 +74,10 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.activity-type')}
                     </h4>
-                    <Badge type={failed ? 'danger' : undefined}>
-                      {pendingActivity.activityType}
-                    </Badge>
+                    <Badge
+                      colorScheme={failed ? 'danger' : 'neutral'}
+                      text={pendingActivity.activityType ?? ''}
+                    />
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
@@ -83,23 +89,23 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempt')}
                     </h4>
-                    <Badge type={failed ? 'danger' : undefined}>
-                      {#if failed}
-                        <Icon name="retry" />
-                      {/if}
-                      {pendingActivity.attempt}
-                    </Badge>
+                    <Badge
+                      colorScheme={failed ? 'danger' : 'neutral'}
+                      text={String(pendingActivity.attempt ?? 0)}
+                      Icon={failed ? IconRetry : undefined}
+                    />
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.attempts-left')}
                     </h4>
-                    <Badge type={failed ? 'danger' : undefined}>
-                      {formatAttemptsLeft(
+                    <Badge
+                      colorScheme={failed ? 'danger' : 'neutral'}
+                      text={`${formatAttemptsLeft(
                         pendingActivity.maximumAttempts ?? null,
                         pendingActivity.attempt ?? 0,
-                      )}
-                    </Badge>
+                      )}`}
+                    />
                   </div>
                   {#if failed && pendingActivity.scheduledTime}
                     {@const timeDifference = toTimeDifference({
@@ -111,9 +117,7 @@
                         <h4 class="pending-activity-detail-header">
                           {translate('workflows.next-retry')}
                         </h4>
-                        <Badge type={failed ? 'danger' : undefined}>
-                          {timeDifference}
-                        </Badge>
+                        <Badge colorScheme="danger" text={timeDifference} />
                       </div>
                     {/if}
                   {/if}
@@ -192,7 +196,7 @@
   }
 
   .pending-activity-summary {
-    @apply w-full overflow-x-scroll border-b border-subtle py-1 text-sm;
+    @apply w-full overflow-x-scroll border-b border-primary py-1 text-sm;
   }
 
   .pending-activity-row:last-child .pending-activity-summary {

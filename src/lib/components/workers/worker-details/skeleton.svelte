@@ -2,9 +2,9 @@
   import type { Snippet } from 'svelte';
 
   import Card from '$lib/holocene/card.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
 
   interface Props {
     breadcrumb: Snippet;
@@ -15,7 +15,7 @@
 
 <div class="flex items-center gap-2">
   {@render breadcrumb()}
-  <Icon name="chevron-left" />
+  <IconChevronLeft />
   <Skeleton class="h-5 w-96 rounded-sm" />
 </div>
 
@@ -93,7 +93,7 @@
             <Skeleton class="h-2 w-full" />
           </div>
         </div>
-        <hr class="border-subtle" />
+        <hr class="border-primary" />
         <div>
           <Skeleton class="mb-4 h-5 w-28" />
           <div class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">

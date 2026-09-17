@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconCollapse } from '$lib/io/icon';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { RADIUS, ROW_HEIGHT } from './constants';
@@ -62,7 +62,7 @@
 
 {#snippet marker(centerX: number, centerY: number)}
   <div
-    class="absolute bg-primary"
+    class="absolute bg-surface-primary"
     style:left="{centerX - HIT_HALF_WIDTH}px"
     style:top="{centerY - RADIUS}px"
     style:width="{HIT_WIDTH}px"
@@ -75,12 +75,7 @@
     style:width="{iconSize}px"
     style:height="{iconSize}px"
   >
-    <Icon
-      class="text-secondary"
-      name="timeline-collapse"
-      width={iconSize}
-      height={iconSize}
-    />
+    <IconCollapse class="text-secondary" width={iconSize} height={iconSize} />
   </div>
 {/snippet}
 
@@ -154,6 +149,6 @@
 
 <style lang="postcss">
   .zigzag-path {
-    stroke: rgb(var(--color-text-secondary));
+    stroke: var(--color-content-secondary);
   }
 </style>

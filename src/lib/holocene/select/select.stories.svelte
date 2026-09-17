@@ -3,8 +3,9 @@
   import { fn } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   import Option from './option.svelte';
   import Select from './select.svelte';
@@ -17,7 +18,6 @@
       id: 'select',
       label: 'Select',
       placeholder: 'Select an option',
-      leadingIcon: undefined as IconName | undefined,
       labelHidden: false,
       disabled: false,
       onChange: fn(),
@@ -25,10 +25,11 @@
     argTypes: {
       label: { name: 'Label', control: 'text' },
       placeholder: { name: 'Placeholder', control: 'text' },
-      leadingIcon: {
-        name: 'Icon',
+      LeadingIcon: {
+        name: 'Leading Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
       },
       disabled: { name: 'Disabled', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
@@ -56,7 +57,7 @@
 
 <Story name="Unselected" />
 
-<Story name="With Icon" args={{ leadingIcon: 'regions' }} />
+<Story name="With Icon" args={{ LeadingIcon: ioIcons.IconRegions }} />
 
 <Story name="Selected" args={{ value: 'pizza' }} />
 
@@ -66,7 +67,7 @@
 
 <Story
   name="Disabled with Icon"
-  args={{ disabled: true, leadingIcon: 'regions' }}
+  args={{ disabled: true, LeadingIcon: ioIcons.IconRegions }}
 />
 
 <Story name="Disabled and Selected" args={{ disabled: true, value: 'pizza' }} />

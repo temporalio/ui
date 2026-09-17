@@ -39,10 +39,11 @@
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
   import BatchCancelConfirmationModal from '$lib/components/standalone-activities/batch-cancel-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/standalone-activities/batch-terminate-confirmation-modal.svelte';
-  import StatusCounts from '$lib/components/status-counts.svelte';
+  import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchActivityCountByStatus } from '$lib/services/activity-counts';
@@ -176,38 +177,40 @@
 />
 
 <header class="flex flex-col gap-2">
-  <div class="flex flex-col justify-between gap-2 md:flex-row">
+  <div class="flex flex-col items-start justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
-        <h1 class="flex items-center gap-2 leading-7">
-          {#if $supportsAdvancedVisibility}
-            <span
-              role="status"
-              aria-atomic="true"
-              class="flex items-center gap-2"
-            >
-              <span data-testid="activity-count"
-                >{$activityCount.count.toLocaleString()}</span
+        <div class="flex flex-row flex-wrap items-start gap-2">
+          <h1 class="flex items-center gap-2 leading-7">
+            {#if $supportsAdvancedVisibility}
+              <span
+                role="status"
+                aria-atomic="true"
+                class="flex items-center gap-2"
               >
-              <Translate
-                key="standalone-activities.activities-plural"
-                count={$activityCount.count}
-              />
-            </span>
-          {:else}
-            <Translate key="standalone-activities.recent-activities" />
-          {/if}
-        </h1>
-        <p class="mt-3 text-xs text-secondary">
+                <span data-testid="activity-count"
+                  >{$activityCount.count.toLocaleString()}</span
+                >
+                <Translate
+                  key="standalone-activities.activities-plural"
+                  count={$activityCount.count}
+                />
+              </span>
+            {:else}
+              <Translate key="standalone-activities.recent-activities" />
+            {/if}
+          </h1>
+          <CountRefreshButton
+            count={$activityCount.newCount}
+            refresh={activityRefresh}
+          />
+        </div>
+        <p class="mt-2 text-xs text-secondary">
           {refreshTimeFormatted}
         </p>
       </div>
       {@render releaseStageBadge?.()}
-      <CountRefreshButton
-        count={$activityCount.newCount}
-        refresh={activityRefresh}
-      />
-      <StatusCounts
+      <StatusCountFilters
         bind:refreshTime
         countStore={activityCount}
         refresh={activityRefresh}
@@ -225,19 +228,20 @@
   </div>
 </header>
 
-<FilterBar />
-<SavedQueryViews
-  filters={activityFilters}
-  savedQueries={savedActivityQueries}
-  systemViews={systemActivityViews}
-  defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
-  searchAttributes={activityExecutionSearchAttributes}
-  id="activity"
->
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={activityFilters}
+    savedQueries={savedActivityQueries}
+    systemViews={systemActivityViews}
+    defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
+    searchAttributes={activityExecutionSearchAttributes}
+    id="activity"
+  />
+  <FilterBar />
   <ActivitiesSummaryConfigurableTable
     onClickConfigure={openCustomizationDrawer}
   />
-</SavedQueryViews>
+</MaximizableTableView>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

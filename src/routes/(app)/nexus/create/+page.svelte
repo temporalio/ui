@@ -5,6 +5,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import NexusCreateEndpoint from '$lib/pages/nexus-create-endpoint.svelte';
   import type { NexusFormData } from '$lib/pages/nexus-form.svelte';
   import { createNexusEndpoint } from '$lib/services/nexus-service';
@@ -43,7 +44,7 @@
 
 <PageTitle title={translate('nexus.create-endpoint')} url={page.url.href} />
 <div class="flex flex-col gap-4">
-  <Link href={routeForNexus()} icon="chevron-left">
+  <Link href={routeForNexus()} LeadingIcon={IconChevronLeft}>
     {translate('nexus.back-to-endpoints')}
   </Link>
   <NexusCreateEndpoint {onCreate} {targetNamespaceList} />

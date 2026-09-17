@@ -5,6 +5,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft } from '$lib/io/icon';
   import ServerlessWorkerCreate from '$lib/pages/serverless-worker-create.svelte';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
@@ -17,7 +18,7 @@
   url={page.url.href}
 />
 <div class="flex flex-col gap-4">
-  <Link href={deploymentsHref} icon="chevron-left">
+  <Link href={deploymentsHref} LeadingIcon={IconChevronLeft}>
     {translate('workers.back-to-deployments')}
   </Link>
   <h1>

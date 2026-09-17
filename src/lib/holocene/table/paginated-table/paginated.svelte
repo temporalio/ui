@@ -7,12 +7,16 @@
   import Button from '$lib/holocene/button.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
+  import { IconArrowLeft, IconArrowRight } from '$lib/io/icon';
   import {
     currentPageKey,
     defaultItemsPerPage,
+    getStartingIndexForPage,
+    getValidPage,
     MAX_PAGE_SIZE,
     options,
     pagination,
+    perPageFromSearchParameter,
     perPageKey,
   } from '$lib/stores/pagination';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -70,7 +74,20 @@
   const currentPageParam = $derived(
     url.searchParams.get(currentPageKey) || '1',
   );
-  const store = $derived(pagination(items, perPageParam, currentPageParam));
+  const itemsPerPage = $derived(perPageFromSearchParameter(perPageParam));
+  // pagination() takes a starting index, not a page number, so convert before
+  // constructing it. Passing the page straight through made every rebuild start
+  // at index 0, flashing page 1 and destroying expanded rows before the $effect
+  // below could jump back. getValidPage keeps an out-of-range page on a page
+  // boundary, which items.length - itemsPerPage does not when the count is not
+  // a multiple of the page size.
+  const validPage = $derived(
+    getValidPage(parseInt(currentPageParam, 10), itemsPerPage, items),
+  );
+  const startingIndex = $derived(
+    getStartingIndexForPage(validPage, itemsPerPage, items),
+  );
+  const store = $derived(pagination(items, perPageParam, startingIndex));
 
   // keep the 'page-size' url search param within the supported options
   $effect(() => {
@@ -114,7 +131,7 @@
   };
 
   $effect(() => {
-    if (currentPageParam) store.jumpToPage(currentPageParam);
+    if (currentPageParam) store.jumpToPage(validPage);
     if (perPageParam) store.adjustPageSize(perPageParam);
   });
 </script>
@@ -153,7 +170,7 @@
             variant="ghost"
             size="sm"
             class={pageShortcut === $store.currentPage
-              ? 'bg-interactive-secondary-active'
+              ? 'bg-interactive-tertiary-press'
               : ''}
             aria-label={pageButtonLabel(pageShortcut)}
             onclick={() => handlePageChange(pageShortcut)}
@@ -170,14 +187,14 @@
       <IconButton
         label={previousPageButtonLabel}
         disabled={!$store.hasPrevious}
-        icon="arrow-left"
+        Icon={IconArrowLeft}
         onclick={() => handlePageChange($store.currentPage - 1)}
       />
       <IconButton
         label={nextPageButtonLabel}
         disabled={!$store.hasNext}
         onclick={() => handlePageChange($store.currentPage + 1)}
-        icon="arrow-right"
+        Icon={IconArrowRight}
       />
     </nav>
   {/snippet}

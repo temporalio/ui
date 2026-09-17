@@ -19,6 +19,14 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    IconArrowAscending,
+    IconArrowDescending,
+    IconCode,
+    IconCompact,
+    IconDownload,
+    IconFeed,
+  } from '$lib/io/icon';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
@@ -187,7 +195,7 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="items-bottom flex gap-4 pt-2">
       <h2>
@@ -197,21 +205,21 @@
         <TabButton
           active={$eventViewType === 'feed'}
           data-testid="feed"
-          icon="feed"
+          Icon={IconFeed}
           class="h-10"
           onclick={onAllClick}>All</TabButton
         >
         <TabButton
           active={$eventViewType === 'compact'}
           data-testid="compact"
-          icon="compact"
+          Icon={IconCompact}
           class="h-10"
           onclick={onCompactClick}>Compact</TabButton
         >
         <TabButton
           active={$eventViewType === 'json'}
           data-testid="json"
-          icon="json"
+          Icon={IconCode}
           class="h-10"
           onclick={onJSONClick}>JSON</TabButton
         >
@@ -221,10 +229,11 @@
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
           <ToggleButton
-            leadingIcon={reverseSort ? 'descending' : 'ascending'}
+            LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
             data-testid="zoom-in"
             onclick={onSort}
             size="sm"
+            variant="tertiary"
           >
             {reverseSort
               ? translate('common.descending')
@@ -237,12 +246,13 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
+          variant="tertiary"
           onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
+              ? 'bg-content-tertiary'
+              : 'bg-content-static-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -250,8 +260,9 @@
         </ToggleButton>
         <ToggleButton
           data-testid="download"
-          leadingIcon="download"
+          LeadingIcon={IconDownload}
           size="sm"
+          variant="tertiary"
           onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}
@@ -261,7 +272,7 @@
   </div>
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}
-      <div class="border-t border-subtle px-4">
+      <div class="border-t border-primary px-4">
         <WorkflowHistoryJson events={filteredEvents} />
       </div>
     {:else}

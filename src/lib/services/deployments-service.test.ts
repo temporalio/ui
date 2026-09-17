@@ -3,10 +3,12 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { base } from '$app/paths';
 
 import {
+  buildAgentCoreComputeConfig,
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
   createWorkerDeployment,
   createWorkerDeploymentVersion,
+  decodeAgentCoreProviderDetails,
   decodeGcpCloudRunProviderDetails,
   decodeLambdaProviderDetails,
   decodeScalerDetails,
@@ -471,6 +473,62 @@ describe('deployments service', () => {
     });
   });
 
+  describe('buildAgentCoreComputeConfig', () => {
+    const endpointArn =
+      'arn:aws:bedrock-agentcore:us-west-2:123456789012:runtime/orders-abc123/runtime-endpoint/DEFAULT';
+    const iamRoleArn = 'arn:aws:iam::123456789012:role/my-role';
+
+    test('writes the endpoint ARN under endpoint_arn, not arn', () => {
+      const result = buildAgentCoreComputeConfig(endpointArn, iamRoleArn);
+
+      const scalingGroup = result.scalingGroups?.['default'];
+      expect(scalingGroup?.provider?.type).toBe('aws-agentcore');
+
+      const decoded = JSON.parse(
+        atob(scalingGroup?.provider?.details?.data as string),
+      );
+      expect(decoded.endpoint_arn).toBe(endpointArn);
+      expect(decoded.arn).toBeUndefined();
+      expect(decoded.role).toBe(iamRoleArn);
+    });
+
+    test('pairs with the no-sync scaler, like Lambda', () => {
+      const result = buildAgentCoreComputeConfig(endpointArn, iamRoleArn, {
+        scaleUpCooloffMs: 1000,
+        maxWorkerLifetimeMs: 60000,
+      });
+
+      const scalingGroup = result.scalingGroups?.['default'];
+      expect(scalingGroup?.scaler?.type).toBe('no-sync');
+
+      const decoded = JSON.parse(
+        atob(scalingGroup?.scaler?.details?.data as string),
+      );
+      expect(decoded.scale_up_cooloff_ms).toBe(1000);
+      expect(decoded.max_worker_lifetime_ms).toBe(60000);
+    });
+
+    test('round-trips through decodeAgentCoreProviderDetails', () => {
+      const config = buildAgentCoreComputeConfig(endpointArn, iamRoleArn, {
+        roleExternalId: 'tmprl-ext-id',
+      });
+
+      expect(decodeAgentCoreProviderDetails(config)).toEqual({
+        agentCoreEndpointArn: endpointArn,
+        iamRoleArn,
+        roleExternalId: 'tmprl-ext-id',
+      });
+    });
+
+    test('decoders do not cross provider types', () => {
+      const agentCore = buildAgentCoreComputeConfig(endpointArn, iamRoleArn);
+      const lambda = buildLambdaComputeConfig('arn:lambda', iamRoleArn);
+
+      expect(decodeLambdaProviderDetails(agentCore)).toEqual({});
+      expect(decodeAgentCoreProviderDetails(lambda)).toEqual({});
+    });
+  });
+
   describe('buildGcpCloudRunComputeConfig', () => {
     test('builds rate-based scaler details with replica defaults', () => {
       const result = buildGcpCloudRunComputeConfig(
@@ -490,6 +548,7 @@ describe('deployments service', () => {
         max_count: 30,
         initial_count: 0,
         utilization_target: 0.8,
+        no_sync_quiet_ms: 90_000,
       });
     });
 
@@ -504,6 +563,7 @@ describe('deployments service', () => {
           maxReplicas: 12,
           initialReplicas: 6,
           utilizationTarget: 0.65,
+          scaleDownStabilizationMs: 300_000,
         },
       );
 
@@ -518,12 +578,36 @@ describe('deployments service', () => {
         maxReplicas: 12,
         initialReplicas: 6,
         utilizationTarget: 0.65,
+        scaleDownStabilizationMs: 300_000,
       });
       expect(
         JSON.parse(
           atob(config.scalingGroups?.['default']?.scaler?.details?.data ?? ''),
         ),
-      ).toMatchObject({ initial_count: 6, utilization_target: 0.65 });
+      ).toMatchObject({
+        initial_count: 6,
+        utilization_target: 0.65,
+        no_sync_quiet_ms: 300_000,
+      });
+    });
+
+    test('sends a zero stabilization window rather than the default', () => {
+      const config = buildGcpCloudRunComputeConfig(
+        'test-project',
+        'us-east1',
+        'worker-pool',
+        'worker@example.com',
+        { scaleDownStabilizationMs: 0 },
+      );
+
+      expect(
+        JSON.parse(
+          atob(config.scalingGroups?.['default']?.scaler?.details?.data ?? ''),
+        ),
+      ).toMatchObject({ no_sync_quiet_ms: 0 });
+      expect(decodeScalerDetails(config)).toMatchObject({
+        scaleDownStabilizationMs: 0,
+      });
     });
   });
 

@@ -12,11 +12,12 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
+  import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalSettings, IconWarning } from '$lib/io/icon';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { fetchScheduleCount } from '$lib/services/workflow-counts';
@@ -94,7 +95,7 @@
 </script>
 
 <header class="flex flex-col gap-2">
-  <div class="flex flex-col justify-between gap-2 md:flex-row">
+  <div class="flex flex-col items-start justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
         <div class="flex flex-row flex-wrap items-start gap-2">
@@ -139,20 +140,21 @@
   </div>
 </header>
 
-<FilterBar
-  filters={scheduleFilters}
-  options={$scheduleSearchAttributeOptions}
-  searchAttributes={$scheduleSearchAttributes}
-  id="schedules"
-/>
-<SavedQueryViews
-  filters={scheduleFilters}
-  savedQueries={savedScheduleQueries}
-  systemViews={systemScheduleViews}
-  defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
-  searchAttributes={scheduleSearchAttributes}
-  id="schedule"
->
+<MaximizableTableView>
+  <SavedQueryViews
+    filters={scheduleFilters}
+    savedQueries={savedScheduleQueries}
+    systemViews={systemScheduleViews}
+    defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+    searchAttributes={scheduleSearchAttributes}
+    id="schedule"
+  />
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
+  />
   {#key [namespace, query, $schedulesRefresh]}
     <PaginatedTable
       {onFetch}
@@ -185,7 +187,7 @@
         <div class="flex h-full flex-col items-center justify-center">
           {#if error}
             <EmptyState title={translate('schedules.empty-state-title')}>
-              <Alert intent="warning" icon="warning" class="mx-12">
+              <Alert intent="warning" Icon={IconWarning} class="mx-12">
                 {error}
               </Alert>
             </EmptyState>
@@ -214,18 +216,21 @@
         <Tooltip text={translate('common.configure-columns')} top>
           <Button
             onclick={openCustomizationDrawer}
-            data-testid="workflows-summary-table-configuration-button"
+            data-testid="schedules-summary-table-configuration-button"
             size="xs"
             variant="ghost"
             aria-label={translate('common.configure-columns')}
+            data-track-name="configure-columns-table-control"
+            data-track-intent="action"
+            data-track-text={translate('common.configure-columns')}
           >
-            <Icon name="settings" />
+            <IconTemporalSettings />
           </Button>
         </Tooltip>
       {/snippet}
     </PaginatedTable>
   {/key}
-</SavedQueryViews>
+</MaximizableTableView>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

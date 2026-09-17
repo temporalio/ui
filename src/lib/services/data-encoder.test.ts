@@ -70,7 +70,7 @@ describe('Codec Server Requests for Decode and Encode', () => {
     expect(response).toEqual(payloads);
   });
 
-  it('should throw an error for decode on failure', async () => {
+  it('should return original payloads for decode on server failure', async () => {
     global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: false,
@@ -80,9 +80,8 @@ describe('Codec Server Requests for Decode and Encode', () => {
     );
 
     codecEndpoint.set('http://localcodecserver.com');
-    await expect(
-      codeServerRequest({ type: 'decode', payloads }),
-    ).rejects.toThrow();
+    const result = await codeServerRequest({ type: 'decode', payloads });
+    expect(result).toEqual(payloads);
   });
 
   it('should send a request and return encoded payloads', async () => {

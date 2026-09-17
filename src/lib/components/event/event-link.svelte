@@ -17,6 +17,7 @@
     href?: string;
     class?: string;
     linkClass?: string;
+    labelClass?: string;
   }
 
   let {
@@ -28,6 +29,7 @@
     href,
     class: className = '',
     linkClass = '',
+    labelClass = 'text-sm',
   }: Props = $props();
 
   const linkView = $derived(
@@ -45,7 +47,7 @@
 <div
   class="flex flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {className}"
 >
-  <p class="max-w-fit whitespace-nowrap text-right text-sm">
+  <p class="max-w-fit whitespace-nowrap text-right {labelClass}">
     {resolvedLabel}
   </p>
   <div class="overflow-hidden {linkClass}">

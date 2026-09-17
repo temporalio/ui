@@ -4,7 +4,6 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -86,15 +85,15 @@
   const nameValid = $derived(validStartEnd && !collidesWithOther);
 
   const nameError = $derived(() => {
-    if (!trimmedName) return 'Name is required';
+    if (!trimmedName) return translate('common.view-name-required');
     if (!allowedChars.test(trimmedName))
-      return 'Use only letters, numbers, spaces, hyphens (-), underscores (_), and periods (.)';
+      return translate('common.view-name-invalid-characters');
     if (
       startsWithInvalid.test(trimmedName) ||
       endsWithInvalid.test(trimmedName)
     )
-      return 'Name cannot start or end with hyphens (-) or periods (.)';
-    if (collidesWithOther) return 'Name must be unique';
+      return translate('common.view-name-invalid-start-end');
+    if (collidesWithOther) return translate('common.view-name-not-unique');
     return '';
   });
 
@@ -125,32 +124,6 @@
     }
   };
 
-  const onCreateAsNew = (event: Event) => {
-    event.preventDefault();
-
-    if (!nameValid || !onCreateView) return;
-
-    const base = trimmedName;
-    const currentNameTrimmed = view?.name?.trim() ?? '';
-
-    let candidate = base === currentNameTrimmed ? `${base}-copy` : base;
-    let i = 2;
-    const exists = (n: string) =>
-      existing.some((q) => q.name.toLowerCase() === n.toLowerCase());
-    while (exists(candidate)) {
-      candidate = `${base}-copy-${i++}`;
-    }
-
-    const updatedView: SavedQuery = {
-      id: Date.now().toString(),
-      name: candidate,
-      query,
-      type: 'user',
-    };
-    onCreateView(updatedView);
-    hideModal();
-  };
-
   const onDelete = () => {
     if (view) onDeleteView?.(view);
     hideModal();
@@ -167,13 +140,17 @@
   onConfirmModal={onConfirm}
 >
   {#snippet titleSnippet()}
-    <h3>{view ? 'Edit View' : 'Save as New View'}</h3>
+    <h3>
+      {view
+        ? translate('common.edit-view')
+        : translate('common.save-as-new-view')}
+    </h3>
   {/snippet}
   {#snippet content()}
-    <div class="flex h-full flex-1 flex-col gap-1">
+    <div class="flex h-full flex-1 gap-1">
       <Input
         id="view-name"
-        label="Name"
+        label={translate('common.name')}
         required
         maxLength={255}
         bind:value={name}
@@ -181,33 +158,19 @@
         valid={!touched || nameValid}
         hintText={touched && !nameValid ? nameError() : ''}
         error={touched && !nameValid}
-        placeholder="Name of view"
+        placeholder={translate('common.view-name-placeholder')}
         class="w-full"
         data-testid={`${id}-input`}
       />
-      {#if view}
-        <div class="flex items-center justify-start gap-2">
-          <Button
-            variant="secondary"
-            disabled={!nameValid || maxViewsReached}
-            data-testid="create-as-new-button"
-            onclick={onCreateAsNew}
-            size="sm"
-            >{name === view.name ? 'Create Copy' : 'Create New'}</Button
-          >
-        </div>
-      {/if}
     </div>
   {/snippet}
   {#snippet footer()}
     <Button
-      variant="ghost"
-      class="flex items-center gap-1 text-sm underline {!onDeleteView
-        ? 'invisible'
-        : ''}"
+      variant="destructive"
+      class={!onDeleteView ? 'invisible' : ''}
       onclick={onDelete}
     >
-      <Icon name="trash" /> Delete this Saved View
+      {translate('common.delete-view')}
     </Button>
   {/snippet}
 </Modal>

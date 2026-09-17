@@ -8,6 +8,7 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconClose } from '$lib/io/icon';
   import {
     customSearchAttributeOptions,
     customSearchAttributes,
@@ -64,7 +65,7 @@
 </script>
 
 <div
-  class="flex flex-col gap-2 border-b border-subtle pb-4 sm:flex-row sm:gap-4"
+  class="flex flex-col gap-2 border-b border-primary pb-4 sm:flex-row sm:gap-4"
 >
   <div class="flex min-w-fit justify-between gap-2 sm:gap-4">
     <div class="grow [&_button]:w-full">
@@ -85,9 +86,10 @@
     </div>
     <Button
       variant="ghost"
-      leadingIcon="close"
+      size="sm"
+      LeadingIcon={IconClose}
       data-testid="search-attribute-close-button"
-      class="mt-6 w-10 rounded-full sm:hidden"
+      class="mt-6 h-10 w-10 rounded-full sm:hidden"
       onclick={() => onRemove(label)}
     />
   </div>
@@ -142,9 +144,10 @@
   {/if}
   <Button
     variant="ghost"
-    leadingIcon="close"
+    size="sm"
+    LeadingIcon={IconClose}
     data-testid="search-attribute-close-button"
-    class="mt-6 w-10 rounded-full max-sm:hidden"
+    class="mt-6 h-10 w-10 rounded-full max-sm:hidden"
     onclick={() => onRemove(label)}
   />
 </div>

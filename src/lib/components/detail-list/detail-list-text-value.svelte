@@ -1,10 +1,8 @@
 <script lang="ts">
   import type { ClassNameValue } from 'tailwind-merge';
 
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { type IconComponent } from '$lib/io/icon';
 
   import DetailListValue from './detail-list-value.svelte';
 
@@ -14,9 +12,7 @@
     text: string;
     tooltipText?: string;
     tooltipWidth?: number;
-    isBadge?: boolean;
-    badgeType?: BadgeType;
-    iconName?: IconName | undefined;
+    Icon?: IconComponent | undefined;
     iconPosition?: 'leading' | 'trailing';
     hasNumber?: boolean;
     class?: ClassNameValue;
@@ -28,31 +24,23 @@
     copyableText = text,
     tooltipText,
     tooltipWidth = 256,
-    iconName,
+    Icon,
     iconPosition = 'leading',
-    isBadge = false,
-    badgeType = 'default',
     hasNumber = /\d/.test(text ?? ''),
     class: className = '',
   }: Props = $props();
 </script>
 
 {#snippet content()}
-  {#if isBadge}
-    <Badge type={badgeType} class={hasNumber ? 'font-mono' : ''}>
-      {text}
-    </Badge>
-  {:else}
-    <div class="flex select-all items-center gap-1 truncate rounded-sm">
-      {#if iconName && iconPosition === 'leading'}
-        <Icon name={iconName} class="shrink-0" />
-      {/if}
-      <span class="truncate {hasNumber ? 'font-mono' : ''}">{text}</span>
-      {#if iconName && iconPosition === 'trailing'}
-        <Icon name={iconName} class="shrink-0" />
-      {/if}
-    </div>
-  {/if}
+  <div class="flex select-all items-center gap-1 truncate rounded-sm">
+    {#if Icon && iconPosition === 'leading'}
+      <Icon class="shrink-0" />
+    {/if}
+    <span class="truncate {hasNumber ? 'font-mono' : ''}">{text}</span>
+    {#if Icon && iconPosition === 'trailing'}
+      <Icon class="shrink-0" />
+    {/if}
+  </div>
 {/snippet}
 
 <DetailListValue class={className} {copyable} {copyableText}>

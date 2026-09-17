@@ -4,9 +4,11 @@
   import type { ComponentProps } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
 
   import { shouldNotBeTransparent } from './test-utilities';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Button',
@@ -21,7 +23,7 @@
       variant: {
         name: 'Variant',
         control: 'select',
-        options: ['primary', 'secondary', 'destructive', 'ghost'],
+        options: ['primary', 'secondary', 'tertiary', 'destructive', 'ghost'],
       },
       size: {
         name: 'Size',
@@ -36,18 +38,20 @@
         name: 'Count',
         control: { type: 'number', min: 0, max: 99, step: 1 },
       },
-      leadingIcon: {
+      LeadingIcon: {
         name: 'Leading Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
         table: {
           category: 'Icon',
         },
       },
-      trailingIcon: {
+      TrailingIcon: {
         name: 'Trailing Icon',
         control: 'select',
-        options: iconNames,
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
         table: {
           category: 'Icon',
         },
@@ -84,7 +88,9 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Button>)}
-  <Button {...args} onclick={action('click')}>Click Me</Button>
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Button {...args} onclick={action('click')}>Click Me</Button>
+  </div>
 {/snippet}
 
 <Story name="Primary" args={{}} {template} />
@@ -100,9 +106,15 @@
 <Story name="Button Group">
   {#snippet template(args)}
     <div class="button-group flex">
-      <Button {...args} onclick={action('click')}>First</Button>
-      <Button {...args} onclick={action('click')}>Middle</Button>
-      <Button {...args} onclick={action('click')}>Last</Button>
+      <Button {...args} class="rounded-r-none" onclick={action('click')}
+        >First</Button
+      >
+      <Button {...args} class="rounded-none" onclick={action('click')}
+        >Middle</Button
+      >
+      <Button {...args} class="rounded-l-none" onclick={action('click')}
+        >Last</Button
+      >
     </div>
   {/snippet}
 </Story>
@@ -113,6 +125,8 @@
   play={shouldNotBeTransparent((canvas) => canvas.getByRole('button'))}
   {template}
 />
+
+<Story name="Tertiary" args={{ variant: 'tertiary' }} {template} />
 
 <Story name="Destructive" args={{ variant: 'destructive' }} {template} />
 
@@ -132,11 +146,15 @@
 
 <Story name="With Count" args={{ count: 5 }} {template} />
 
-<Story name="With Leading Icon" args={{ leadingIcon: 'workflow' }} {template} />
+<Story
+  name="With Leading Icon"
+  args={{ LeadingIcon: ioIcons.IconTemporalWorkflow }}
+  {template}
+/>
 
 <Story
   name="With Trailing Icon"
-  args={{ trailingIcon: 'workflow' }}
+  args={{ TrailingIcon: ioIcons.IconTemporalWorkflow }}
   {template}
 />
 
@@ -146,7 +164,7 @@
   {#snippet template(args)}
     <Button
       {...args}
-      leadingIcon="temporal-logo"
+      LeadingIcon={ioIcons.IconTemporal}
       {loading}
       onclick={() => {
         loading = true;
@@ -164,7 +182,7 @@
   {#snippet template(args)}
     <Button
       {...args}
-      trailingIcon="temporal-logo"
+      TrailingIcon={ioIcons.IconTemporal}
       {loading}
       onclick={() => {
         loading = true;
@@ -180,8 +198,8 @@
   {#snippet template(args)}
     <Button
       {...args}
-      trailingIcon="temporal-logo"
-      leadingIcon="temporal-logo"
+      TrailingIcon={ioIcons.IconTemporal}
+      LeadingIcon={ioIcons.IconTemporal}
       {loading}
       onclick={() => {
         loading = true;

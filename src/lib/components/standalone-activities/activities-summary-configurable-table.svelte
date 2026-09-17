@@ -5,10 +5,10 @@
 
   import DownloadJsonButton from '$lib/components/download-json-button.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalSettings } from '$lib/io/icon';
   import {
     ACTIVITY_BATCH_OPERATION_CONTEXT,
     type ActivityBatchOperationContext,
@@ -155,8 +155,11 @@
           size="xs"
           variant="ghost"
           aria-label={translate('common.configure-columns')}
+          data-track-name="configure-columns-table-control"
+          data-track-intent="action"
+          data-track-text={translate('common.configure-columns')}
         >
-          <Icon name="settings" />
+          <IconTemporalSettings />
         </Button>
       </Tooltip>
     {/snippet}

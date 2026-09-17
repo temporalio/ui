@@ -1,9 +1,12 @@
 import type { I18nKey } from '$lib/i18n';
 import type {
+  CommonHistoryEvent,
   EventType,
+  HistoryEvent,
   IterableEvent,
   WorkflowEvents,
 } from '$lib/types/events';
+import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
 type Categories = typeof CATEGORIES;
 export type EventTypeCategory = Categories[keyof Categories];
@@ -159,6 +162,20 @@ export const compactEventTypeOptions: EventTypeOption[] =
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
   return eventTypeCategorizations?.[eventType] || CATEGORIES.OTHER;
 };
+
+/**
+ * An event's category. Local activities are `MarkerRecorded` events
+ * distinguished only by their marker name, so the type-only lookup above can
+ * never place them — without this they land in `other`, and the Local Activity
+ * filter matches nothing.
+ */
+export const getCategoryForEvent = (
+  event: CommonHistoryEvent | HistoryEvent,
+  eventType: EventType,
+): EventTypeCategory =>
+  isLocalActivityMarkerEvent(event)
+    ? CATEGORIES.LOCAL_ACTIVITY
+    : getEventCategory(eventType);
 
 export const isCategoryType = (value: string): value is EventTypeCategory => {
   for (const category in CATEGORIES) {

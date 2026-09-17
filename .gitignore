@@ -42,6 +42,11 @@ go.work.sum
 /.catalog.journal.json
 /.catalog.transaction-*/
 
+# Isolated catalog fixtures. The tests copy the repo into these roots so the
+# copied CLI still resolves the root node_modules, so they cannot live in the
+# system temp directory.
+/.catalog-tmp/
+
 # Legacy Catalog state stays ignored so upgrades cannot expose credentials or
 # abandoned mutation state. The CLI migrates only local content and credentials;
 # old locks and journals are deliberately not resumed under canonical names.
@@ -51,3 +56,7 @@ go.work.sum
 /.workflow-catalog.lock.recovery
 /.workflow-catalog.journal.json
 /.workflow-catalog.transaction-*/
+
+# Feature demo runner output and machine-local paths (scripts/feature-demo.ts)
+/.feature-demo/
+/.env.feature-demo.local

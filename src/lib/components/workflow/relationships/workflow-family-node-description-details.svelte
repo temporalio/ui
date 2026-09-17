@@ -1,9 +1,9 @@
 <script lang="ts">
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconAdd, IconHyphen } from '$lib/io/icon';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
@@ -47,7 +47,7 @@
   <div class="flex w-full flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
     <div class="flex items-center gap-2 lg:basis-96">
       <div class="w-32 leading-4">
-        <WorkflowStatus status={workflow.status} />
+        <WorkflowStatusBadge status={workflow.status} />
       </div>
       <div class="w-full leading-4">
         {#if isRootWorkflow}
@@ -103,6 +103,7 @@
     </div>
   </div>
   {#if showExpandIcon}
-    <Icon class="shrink-0" name={expanded ? 'hyphen' : 'add'} />
+    {@const Glyph = expanded ? IconHyphen : IconAdd}
+    <Glyph class="shrink-0" />
   {/if}
 </div>

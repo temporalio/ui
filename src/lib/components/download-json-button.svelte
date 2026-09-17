@@ -1,8 +1,8 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconDownload } from '$lib/io/icon';
   import { downloadJson } from '$lib/utilities/download-json';
 
   interface Props {
@@ -34,7 +34,10 @@
     size="xs"
     variant="ghost"
     aria-label={translate('common.download-json')}
+    data-track-name="export-table-control"
+    data-track-intent="action"
+    data-track-text={translate('common.download-json')}
   >
-    <Icon name="download" />
+    <IconDownload />
   </Button>
 </Tooltip>

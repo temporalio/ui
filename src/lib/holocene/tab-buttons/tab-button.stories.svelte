@@ -6,17 +6,24 @@
   import { expect, userEvent, within } from 'storybook/test';
   import type { ComponentProps } from 'svelte';
 
-  import { iconNames } from '$lib/holocene/icon';
+  import * as ioIcons from '$lib/io/icon';
 
   import TabButton from './tab-button.svelte';
   import TabButtons from './tab-buttons.svelte';
+
+  const iconOptions: Record<string, unknown> = { ...ioIcons };
 
   const { Story } = defineMeta({
     title: 'Tab Button',
     component: TabButton,
     subcomponents: { TabButtons },
     argTypes: {
-      icon: { name: 'Icon', control: 'select', options: iconNames },
+      Icon: {
+        name: 'Icon',
+        control: 'select',
+        options: Object.keys(iconOptions),
+        mapping: iconOptions,
+      },
       group: { table: { disable: true } },
       base: { table: { disable: true } },
       href: { table: { disable: true } },

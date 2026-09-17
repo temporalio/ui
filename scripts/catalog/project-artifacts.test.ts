@@ -1,16 +1,17 @@
-import { cp, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { verifyProjectCatalogBoundaries } from './project-artifacts';
+import { createInRepoTemporaryDirectory } from './test-temp-root';
 import type { CatalogRegistrationSource } from '../../src/lib/catalog/worker/registration-source';
 
 const temporaryDirectories: string[] = [];
 
 const createIsolatedCatalogRoot = async () => {
-  const rootDirectory = await mkdtemp(
-    join(process.cwd(), '.catalog-project-artifacts-'),
+  const rootDirectory = await createInRepoTemporaryDirectory(
+    'catalog-project-artifacts-',
   );
   temporaryDirectories.push(rootDirectory);
   await Promise.all([

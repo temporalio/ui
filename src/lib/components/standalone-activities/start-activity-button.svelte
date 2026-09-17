@@ -4,6 +4,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconLightningBolt } from '$lib/io/icon';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
 
   interface Props {
@@ -44,7 +45,7 @@
     size="xs"
     variant="ghost"
     class="start-button"
-    leadingIcon="lightning-bolt"
+    LeadingIcon={IconLightningBolt}
     aria-label={translate('standalone-activities.start-activity-like-this-one')}
     onclick={() => goto(href)}
   ></Button>

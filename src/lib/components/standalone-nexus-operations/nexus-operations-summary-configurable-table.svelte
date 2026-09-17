@@ -2,10 +2,10 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconTemporalSettings } from '$lib/io/icon';
   import { fetchPaginatedNexusOperations } from '$lib/services/standalone-nexus-operations';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import {
@@ -80,14 +80,18 @@
       <TableEmptyState />
     {/snippet}
     {#snippet actionsEndAdditional()}
-      <Tooltip text="Configure Columns" top>
+      <Tooltip text={translate('common.configure-columns')} top>
         <Button
           onclick={onClickConfigure}
           data-testid="nexus-operations-summary-table-configuration-button"
           size="xs"
           variant="ghost"
+          aria-label={translate('common.configure-columns')}
+          data-track-name="configure-columns-table-control"
+          data-track-intent="action"
+          data-track-text={translate('common.configure-columns')}
         >
-          <Icon name="settings" />
+          <IconTemporalSettings />
         </Button>
       </Tooltip>
     {/snippet}

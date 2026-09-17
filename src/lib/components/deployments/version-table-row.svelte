@@ -1,10 +1,10 @@
 <script lang="ts">
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronRight } from '$lib/io/icon';
   import {
     deleteWorkerDeploymentVersion,
     removeRampingDeploymentVersion,
@@ -20,6 +20,12 @@
     type RoutingConfig,
     type VersionSummary,
   } from '$lib/types/deployments';
+  import {
+    resolveValidationOutcome,
+    type ValidationOutcome,
+    versionComputeProviderType,
+    versionShowsConnectionStatus,
+  } from '$lib/utilities/connection-status';
   import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
     getBuildIdFromVersion,
@@ -58,7 +64,7 @@
     namespace,
     deploymentName,
     conflictToken,
-    showConnectionStatus = false,
+    showConnectionStatus = true,
     onChange,
     onValidationComplete,
   }: Props = $props();
@@ -129,19 +135,10 @@
   }
   const statusLabel = $derived(resolveVersionStatusLabel());
 
-  const computeScalingGroup = $derived(
-    isVersionSummaryNew(version) && version.computeConfig
-      ? Object.values(version.computeConfig.scalingGroups ?? {})[0]
-      : undefined,
-  );
-  const computeProviderType = $derived(
-    computeScalingGroup?.providerType ?? computeScalingGroup?.provider?.type,
-  );
+  const computeProviderType = $derived(versionComputeProviderType(version));
 
   const connectionVisible = $derived(
-    isCurrent ||
-      isRamping ||
-      parseVersionStatus(drainageStatus).status === 'Draining',
+    versionShowsConnectionStatus(version, routingConfig),
   );
 
   const workflowHref = $derived(
@@ -177,7 +174,7 @@
   let deleteVersionError = $state('');
   let showValidateModal = $state(false);
   let validateLoading = $state(false);
-  let validateResult = $state<{ message?: string } | null>(null);
+  let validateResult = $state<ValidationOutcome | null>(null);
   let showSetRampingModal = $state(false);
   let setRampingError = $state('');
   let setRampingLoading = $state(false);
@@ -190,27 +187,24 @@
     validateLoading = true;
     showValidateModal = true;
     try {
-      let errorMessage: string | undefined;
+      let outcome: ValidationOutcome | undefined;
       await validateCurrentWorkerDeploymentVersionComputeConfig(
         { namespace, deploymentName, buildId: versionBuildId },
         (error) => {
-          errorMessage =
-            (error.body as { message?: string })?.message ??
-            translate('deployments.validate-connection-error');
+          outcome = resolveValidationOutcome(error);
         },
       );
-      validateResult = { message: errorMessage };
-
-      // A handled provider error still completes validation and may update the
-      // persisted connection status, so refresh once for either resolved result.
-      onValidationComplete?.();
+      validateResult = outcome ?? { state: 'valid' };
     } catch {
-      validateResult = {
-        message: translate('deployments.validate-connection-error'),
-      };
+      // A request that never returned tells us nothing about the connection.
+      validateResult = { state: 'indeterminate' };
     } finally {
       validateLoading = false;
     }
+
+    // A completed check persists the connection status, and a check that did
+    // not return to us can still finish, so refresh for every outcome.
+    onValidationComplete?.();
   }
 
   async function handleSetCurrentVersion() {
@@ -344,8 +338,7 @@
           onclick={() => (expanded = !expanded)}
           class="shrink-0"
         >
-          <Icon
-            name="chevron-right"
+          <IconChevronRight
             class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
           />
         </button>
@@ -369,7 +362,7 @@
   </td>
   {#if showConnectionStatus}
     <td class="text-left">
-      {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
+      {#if connectionVisible && isVersionSummaryNew(version)}
         <ConnectionBadge computeStatus={version.computeStatus} />
       {:else}
         <span class="text-secondary">—</span>
@@ -399,7 +392,7 @@
 </tr>
 
 {#if expanded}
-  <tr class="surface-primary border-y border-subtle">
+  <tr class="border-y border-primary bg-surface-primary text-primary">
     <td colspan={showConnectionStatus ? 6 : 5} class="!p-1">
       <VersionRowDetails
         {namespace}

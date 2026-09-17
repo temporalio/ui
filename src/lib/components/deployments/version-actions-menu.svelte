@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconEllipsisVertical } from '$lib/io/icon';
 
   interface Props {
     buildId: string;
@@ -44,7 +44,7 @@
       size="xs"
       class="flex h-8 w-8 items-center justify-center"
     >
-      <Icon name="vertical-ellipsis" class="h-4 w-4" />
+      <IconEllipsisVertical class="h-4 w-4" />
     </MenuButton>
     <Menu id="version-actions-{buildId}" position="right" usePortal>
       {#if hasComputeConfig}

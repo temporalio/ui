@@ -7,13 +7,14 @@
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
   import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconChevronLeft, IconFilter } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import {
     openConfirmationModal,
@@ -56,7 +57,7 @@
 </script>
 
 <header class="mb-2 flex flex-col gap-4">
-  <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+  <Link href={routeForSchedules({ namespace })} LeadingIcon={IconChevronLeft}>
     {translate('schedules.back-to-schedules')}
   </Link>
   <div class="flex items-start justify-between gap-4">
@@ -64,7 +65,7 @@
       class="flex flex-wrap items-center gap-2 text-3xl"
       data-testid="schedule-name"
     >
-      <WorkflowStatus
+      <WorkflowStatusBadge
         status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
       />
       <span class="select-all">
@@ -125,7 +126,7 @@
         ].join(' AND '),
       }) ?? ''}
       text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name ?? ''}
-      iconName="filter"
+      Icon={IconFilter}
       copyable={Boolean(
         schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
       )}
