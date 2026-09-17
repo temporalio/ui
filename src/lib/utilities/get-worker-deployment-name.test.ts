@@ -42,7 +42,7 @@ describe('getWorkerDeploymentName', () => {
     expect(result).toBeUndefined();
   });
 
-  it('falls back to the search attribute when the queue has no current version', () => {
+  it('reads the search attribute when the queue has no current version', () => {
     const result = getWorkerDeploymentName(
       workers({ currentVersion: '__unversioned__' }),
       workflow('pinned-deployment'),
@@ -51,12 +51,23 @@ describe('getWorkerDeploymentName', () => {
     expect(result).toBe('pinned-deployment');
   });
 
-  it('prefers the task queue over the search attribute', () => {
+  it('keeps a pinned workflow on its own deployment when the queue is current elsewhere', () => {
     const result = getWorkerDeploymentName(
       workers({
         currentDeploymentVersion: { deploymentName: 'current', buildId: 'v2' },
       }),
-      workflow('stale-from-search-attribute'),
+      workflow('pinned-deployment'),
+    );
+
+    expect(result).toBe('pinned-deployment');
+  });
+
+  it('uses the task queue before the server writes the search attribute', () => {
+    const result = getWorkerDeploymentName(
+      workers({
+        currentDeploymentVersion: { deploymentName: 'current', buildId: 'v2' },
+      }),
+      workflow(),
     );
 
     expect(result).toBe('current');
