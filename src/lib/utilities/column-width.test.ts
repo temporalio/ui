@@ -1,10 +1,11 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import {
   clampColumnWidth,
   COLUMN_WIDTH_CLAMP_CLASSES,
   columnResizeActionForKey,
   columnWidthStyle,
+  handleColumnResizeKey,
   KEYBOARD_RESIZE_STEP,
 } from './column-width';
 
@@ -80,5 +81,53 @@ describe('COLUMN_WIDTH_CLAMP_CLASSES', () => {
     expect(COLUMN_WIDTH_CLAMP_CLASSES).toContain(
       '[&_.wrapper]:overflow-hidden',
     );
+  });
+});
+
+describe('handleColumnResizeKey', () => {
+  const resizeEvent = (key: string) => ({
+    key,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn(),
+  });
+
+  test('stops resize keys from reaching the pagination shortcuts', () => {
+    for (const key of ['ArrowLeft', 'ArrowRight', 'Enter', ' ']) {
+      const event = resizeEvent(key);
+
+      handleColumnResizeKey(event, 200, MIN, vi.fn());
+
+      expect(event.stopPropagation).toHaveBeenCalledOnce();
+      expect(event.preventDefault).toHaveBeenCalledOnce();
+    }
+  });
+
+  test('lets keys it does not handle through to other listeners', () => {
+    const event = resizeEvent('Tab');
+    const onResize = vi.fn();
+
+    handleColumnResizeKey(event, 200, MIN, onResize);
+
+    expect(event.stopPropagation).not.toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(onResize).not.toHaveBeenCalled();
+  });
+
+  test('resizes by one step in the direction of the arrow', () => {
+    const onResize = vi.fn();
+
+    handleColumnResizeKey(resizeEvent('ArrowRight'), 200, MIN, onResize);
+    expect(onResize).toHaveBeenLastCalledWith(200 + KEYBOARD_RESIZE_STEP);
+
+    handleColumnResizeKey(resizeEvent('ArrowLeft'), 200, MIN, onResize);
+    expect(onResize).toHaveBeenLastCalledWith(200 - KEYBOARD_RESIZE_STEP);
+  });
+
+  test('resets the column to autosize on Enter', () => {
+    const onResize = vi.fn();
+
+    handleColumnResizeKey(resizeEvent('Enter'), 200, MIN, onResize);
+
+    expect(onResize).toHaveBeenCalledWith(undefined);
   });
 });

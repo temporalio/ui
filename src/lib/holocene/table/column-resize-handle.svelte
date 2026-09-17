@@ -2,7 +2,7 @@
   import { translate } from '$lib/i18n/translate';
   import {
     clampColumnWidth,
-    columnResizeActionForKey,
+    handleColumnResizeKey,
   } from '$lib/utilities/column-width';
 
   interface Props {
@@ -81,11 +81,7 @@
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    const action = columnResizeActionForKey(event.key, currentWidth(), min);
-    if (action.type === 'ignore') return;
-
-    event.preventDefault();
-    onResize(action.type === 'reset' ? undefined : action.width);
+    handleColumnResizeKey(event, currentWidth(), min, onResize);
   };
 </script>
 
