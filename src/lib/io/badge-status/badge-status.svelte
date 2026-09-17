@@ -37,7 +37,7 @@
     extension !== false && extension !== null && extension !== undefined;
 
   const sharedClasses =
-    'inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono font-medium leading-none uppercase tracking-wide';
+    'inline-flex max-w-full items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono font-medium leading-none uppercase tracking-wide';
   const segmentClasses =
     'inline-flex flex-nowrap items-center justify-center gap-1 border';
 
@@ -117,10 +117,11 @@
       segmentClasses,
       sizeClasses[size].segment,
       colorSchemeClasses[configuration.colorScheme],
+      'min-w-0',
       visibleExtensions.length ? 'rounded-l-full border-r-0' : 'rounded-full',
     )}
   >
-    <span>
+    <span class="truncate">
       {#if typeof count === 'number'}
         {count.toLocaleString()} {text ?? configuration.text}
       {:else if count != null}
