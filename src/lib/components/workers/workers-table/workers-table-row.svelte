@@ -24,9 +24,9 @@
 </script>
 
 <tr>
-  <td>
+  <WorkersTableCell attribute="WorkerStatus" value={status} {filterable}>
     <WorkerStatus {status} />
-  </td>
+  </WorkersTableCell>
   <WorkersTableCell
     attribute="WorkerInstanceKey"
     value={worker?.workerInstanceKey}
@@ -76,6 +76,8 @@
   <WorkersTableCell
     attribute="StartTime"
     value={$timestamp(worker?.startTime)}
+    rawValue={worker?.startTime}
+    {filterable}
   />
   <WorkersTableCell
     {filterable}
