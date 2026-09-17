@@ -35,7 +35,13 @@ const settings: Settings = {
   workflowUpdateDisabled: false,
   workflowTerminateDisabled: false,
   hideWorkflowQueryErrors: false,
+  startWorkflowDisabled: false,
+  refreshWorkflowCountsDisabled: false,
   activityCommandsDisabled: false,
+  customUi: {
+    enabled: false,
+    iframeExtensions: [],
+  },
   feedbackURL: '',
   disableNewsFetch: false,
   runtimeEnvironment: {

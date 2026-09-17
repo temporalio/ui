@@ -6,6 +6,7 @@
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import NewsFeedWidget from '$lib/components/news-feed/news-feed-widget.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
@@ -455,6 +456,7 @@
       {/if}
       <UserMenu {logout} />
     </TopNavigation>
+    <ExtensionSlot name="app.top-nav.sub-nav" />
     {#snippet main()}
       <div
         class="flex h-full w-full flex-col gap-4 p-4 md:px-8 md:pb-0 md:pt-8"

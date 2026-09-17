@@ -1,7 +1,11 @@
 import { BROWSER } from 'esm-env';
 
-import type { SettingsResponse } from '$lib/types';
-import type { Settings } from '$lib/types/global';
+import {
+  isTemporalExtensionPermission,
+  isTemporalExtensionSlot,
+} from '$lib/extensions/iframe-extensions';
+import type { CustomUIResponse, SettingsResponse } from '$lib/types';
+import type { IframeExtension, Settings } from '$lib/types/global';
 import { getApiOrigin } from '$lib/utilities/get-api-origin';
 import { getEnvironment } from '$lib/utilities/get-environment';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -48,6 +52,76 @@ const emptySettingsResponse: SettingsResponse = {
   Version: '',
 };
 
+const positiveNumberOrUndefined = (value?: number): number | undefined => {
+  return typeof value === 'number' && value > 0 ? value : undefined;
+};
+
+const mapIframeExtensions = (
+  customUIResponse: CustomUIResponse | undefined,
+): IframeExtension[] => {
+  return (
+    customUIResponse?.IframeExtensions?.flatMap((extension) => {
+      if (!isTemporalExtensionSlot(extension.Slot)) return [];
+      const permissions = (extension.Permissions ?? []).filter(
+        isTemporalExtensionPermission,
+      );
+      if (permissions.length !== (extension.Permissions ?? []).length) {
+        return [];
+      }
+
+      return [
+        {
+          id: extension.ID,
+          title: extension.Title || extension.ID,
+          slot: extension.Slot,
+          src: extension.Src,
+          allowedOrigin: extension.AllowedOrigin,
+          routePatterns: extension.RoutePatterns ?? [],
+          sandbox: {
+            allowDownloads: !!extension.Sandbox?.AllowDownloads,
+            allowForms: !!extension.Sandbox?.AllowForms,
+            allowModals: !!extension.Sandbox?.AllowModals,
+            allowPopups: !!extension.Sandbox?.AllowPopups,
+            allowSameOrigin: !!extension.Sandbox?.AllowSameOrigin,
+          },
+          sizing: {
+            defaultHeight: positiveNumberOrUndefined(
+              extension.Sizing?.DefaultHeight,
+            ),
+            minHeight: positiveNumberOrUndefined(extension.Sizing?.MinHeight),
+            maxHeight: positiveNumberOrUndefined(extension.Sizing?.MaxHeight),
+            defaultWidth: positiveNumberOrUndefined(
+              extension.Sizing?.DefaultWidth,
+            ),
+            minWidth: positiveNumberOrUndefined(extension.Sizing?.MinWidth),
+            maxWidth: positiveNumberOrUndefined(extension.Sizing?.MaxWidth),
+          },
+          permissions,
+        },
+      ];
+    }) ?? []
+  );
+};
+
+export const fetchUiExtensions = async (
+  request = fetch,
+): Promise<IframeExtension[]> => {
+  try {
+    const route = routeForApi('ui-extensions');
+    const customUIResponse: CustomUIResponse | undefined = await requestFromAPI(
+      route,
+      {
+        request,
+        notifyOnError: false,
+      },
+    );
+    if (!customUIResponse?.Enabled) return [];
+    return mapIframeExtensions(customUIResponse);
+  } catch {
+    return [];
+  }
+};
+
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
   const route = routeForApi('settings');
   const settingsResponse: SettingsResponse =
@@ -89,11 +163,16 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     refreshWorkflowCountsDisabled:
       !!settingsResponse?.RefreshWorkflowCountsDisabled,
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
+    customUi: {
+      enabled: !!settingsResponse?.CustomUI?.Enabled,
+      iframeExtensions: [],
+    },
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
     navCollapsedByDefault: !!settingsResponse?.NavCollapsedByDefault,
     feedbackURL: settingsResponse?.FeedbackURL,
     disableNewsFetch: !!settingsResponse?.DisableNewsFetch,
+    supportURL: settingsResponse?.SupportURL,
     runtimeEnvironment: {
       get isCloud() {
         if (EnvironmentOverride) {
