@@ -32,7 +32,7 @@
 </script>
 
 <div
-  class="grid grid-cols-[minmax(0,1fr)_auto] grid-rows-[2rem_2rem] items-center gap-y-2 pb-4 group-data-[nav=closed]:grid-cols-1"
+  class="grid grid-cols-[minmax(0,1fr)_auto] grid-rows-[2rem_2rem] items-center gap-2 pb-4 group-data-[nav=closed]:grid-cols-1"
 >
   <div
     class="flex w-fit items-center gap-1 text-nowrap group-data-[nav=closed]:justify-self-center"
@@ -54,7 +54,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-2 flex items-center justify-center justify-self-end rounded text-primary opacity-0 transition-opacity hover:bg-surface-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:justify-self-center group-data-[nav=closed]:p-2"
+    class="flex size-6 shrink-0 items-center justify-center rounded text-primary opacity-0 transition-opacity hover:bg-surface-overlay-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:justify-self-center"
     onclick={ontoggle}
   >
     {#if navOpen}
@@ -74,7 +74,7 @@
     {@render bottom()}
   {/if}
   <div
-    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-inverse-secondary"
+    class="self-center justify-self-center py-3 text-center text-[0.6rem] text-secondary"
   >
     <span class="sr-only">{translate('common.version')}</span>
     {version}
