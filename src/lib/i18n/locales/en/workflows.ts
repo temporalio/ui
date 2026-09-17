@@ -172,7 +172,17 @@ export const Strings = {
   'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
   'workflow-error-no-compatible-workers-description':
     'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
-  'dismiss-common-errors': 'Dismiss Common Errors',
+  diagnostics: 'Diagnostics',
+  'show-diagnostics': 'Show Diagnostics',
+  'show-diagnostics-description':
+    'Show common error, warning and info. alerts if present in the Event History',
+  'dismiss-diagnostics': 'Dismiss Diagnostics',
+  'diagnostics-error_one': '{{count}} error',
+  'diagnostics-error_other': '{{count}} errors',
+  'diagnostics-warning_one': '{{count}} warning',
+  'diagnostics-warning_other': '{{count}} warnings',
+  'diagnostics-info_one': '{{count}} info',
+  'diagnostics-info_other': '{{count}} info',
   'state-transitions': 'State Transitions',
   relationships: 'Relationships',
   'family-node-label': 'Workflow {{id}}: {{status}}',
@@ -368,9 +378,6 @@ export const Strings = {
   'external-payload-tooltip':
     'History Size does not include externally stored payload size.',
   sdk: 'Workflow SDK',
-  'show-common-errors': 'Show Common Errors',
-  'show-common-errors-description':
-    'Show alerts for common errors if present in the Event History',
   'new-events-announcement_one': '{{count, number}} new event loaded',
   'new-events-announcement_other': '{{count, number}} new events loaded',
   'total-workflows': 'Total Workflows',

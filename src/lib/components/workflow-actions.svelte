@@ -245,14 +245,14 @@
   </MenuItem>
 {/snippet}
 
-{#snippet showWorkflowCommonErrors()}
+{#snippet showWorkflowDiagnostics()}
   {#if $dismissedWorkflowCommonErrors}
     <MenuItem
       onclick={() => ($dismissedWorkflowCommonErrors = false)}
-      data-testid="show-common-errors-button"
-      description={translate('workflows.show-common-errors-description')}
+      data-testid="show-diagnostics-button"
+      description={translate('workflows.show-diagnostics-description')}
     >
-      {translate('workflows.show-common-errors')}
+      {translate('workflows.show-diagnostics')}
     </MenuItem>
   {/if}
 {/snippet}
@@ -274,12 +274,12 @@
   {/each}
   <MenuDivider />
   {@render startWorkflow()}
-  {@render showWorkflowCommonErrors()}
+  {@render showWorkflowDiagnostics()}
 {/snippet}
 
-{#snippet worklfowActions()}
+{#snippet actions()}
   {@render startWorkflow()}
-  {@render showWorkflowCommonErrors()}
+  {@render showWorkflowDiagnostics()}
   {#if terminateEnabled && next}
     <MenuDivider />
     <MenuItem
@@ -316,7 +316,7 @@
       {#if isRunning || isPaused}
         {@render runningWorkflowActions()}
       {:else}
-        {@render worklfowActions()}
+        {@render actions()}
       {/if}
     </Menu>
   </MenuContainer>
