@@ -75,7 +75,7 @@
     <div
       class="flex items-center justify-between gap-2 border-b border-primary p-3"
     >
-      <h5 {id}>{translate('workflows.common-errors')}</h5>
+      <h5 {id}>{translate('workflows.diagnostics')}</h5>
       <div class="flex items-center gap-3">
         {#each counts as { severity, count } (severity)}
           {@const style = severityStyles[severity]}
@@ -83,7 +83,7 @@
             <span
               class="h-2 w-2 shrink-0 rounded-full border border-current {style.iconClass} {style.dotClass}"
             ></span>
-            {translate(`workflows.common-errors-${severity}`, { count })}
+            {translate(`workflows.diagnostics-${severity}`, { count })}
           </span>
         {/each}
         {#if onDismiss}

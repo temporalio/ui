@@ -32,9 +32,8 @@
 {#if !commonErrorsDismissed}
   <CommonErrorCard
     {errors}
-    class="max-w-screen-lg xl:w-2/3"
-    data-testid="workflow-common-errors"
-    dismissLabel={translate('workflows.dismiss-common-errors')}
+    data-testid="workflow-diagnostics"
+    dismissLabel={translate('workflows.dismiss-diagnostics')}
     onDismiss={dismissCommonErrors}
   />
 {/if}

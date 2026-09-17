@@ -7,7 +7,7 @@
   import CommonErrorCard from './common-error-card.svelte';
 
   const { Story } = defineMeta({
-    title: 'Common Error Card',
+    title: 'Diagnostics Card',
     component: CommonErrorCard,
     args: {
       errors: COMMON_ERRORS.slice(0, 4),
@@ -18,8 +18,8 @@
 
 <Story name="Default" />
 
-<Story name="Single Error" args={{ errors: COMMON_ERRORS.slice(1, 2) }} />
+<Story name="Single Alert" args={{ errors: COMMON_ERRORS.slice(1, 2) }} />
 
 <Story name="Not Dismissible" args={{ onDismiss: undefined }} />
 
-<Story name="All Errors" args={{ errors: COMMON_ERRORS }} />
+<Story name="All Alerts" args={{ errors: COMMON_ERRORS }} />
