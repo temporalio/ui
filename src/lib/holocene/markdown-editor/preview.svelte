@@ -7,6 +7,8 @@
 
   import { useDarkMode } from '$lib/utilities/dark-mode';
 
+  import { normalizePreviewContent } from './preview';
+
   interface Props {
     content: string;
     class?: ClassNameValue;
@@ -30,6 +32,8 @@
      * or two rather than a document.
      */
     compact?: boolean;
+    /** Normalize line breaks so Markdown renders on a single line. */
+    singleLine?: boolean;
     /**
      * Accessible name for the frame. Name what the content is, so a frame in
      * a list of them is distinguishable.
@@ -47,6 +51,7 @@
     minHeight = 100,
     previewTheme,
     compact = false,
+    singleLine = false,
     title = 'output',
   }: Props = $props();
 
@@ -162,7 +167,10 @@
     return content;
   };
 
-  const templatedContent = $derived(replaceTemplate(content));
+  const normalizedContent = $derived(
+    normalizePreviewContent(content, singleLine),
+  );
+  const templatedContent = $derived(replaceTemplate(normalizedContent));
   const resolvedPreviewTheme = $derived(
     previewTheme ?? ($useDarkMode ? 'dark' : 'light'),
   );

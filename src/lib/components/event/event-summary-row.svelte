@@ -370,6 +370,7 @@
                 fill={false}
                 fitContent
                 compact
+                singleLine
                 minHeight={0}
                 overrideTheme="primary"
                 title={translate('workflows.summary')}
