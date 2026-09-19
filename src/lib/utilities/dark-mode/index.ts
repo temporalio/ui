@@ -7,4 +7,4 @@ export {
   getNextDarkModePreference,
 } from './dark-mode';
 
-export type { DarkModePreference } from './dark-mode';
+export type { DarkModePreference, ThemeOverride } from './dark-mode';
