@@ -63,6 +63,23 @@ describe('/render', () => {
     expect(html).toContain('body.compact');
   });
 
+  it('holds the content to one line in inline mode', async () => {
+    const { html } = await render({
+      content: 'orders • shipped\n\nsecond paragraph',
+      inline: 'true',
+    });
+
+    expect(html).toContain('class="prose compact inline"');
+    expect(html).toContain('body.inline main {');
+    expect(html).toContain('body.inline br {');
+  });
+
+  it('only opts into inline on the exact string', async () => {
+    const { html } = await render({ content: 'hello', inline: 'TRUE' });
+
+    expect(html).toContain('class="prose"');
+  });
+
   // A compact frame that paints its own canvas shows as a white box on a dark
   // page. Transparency needs both halves: the background, and a color-scheme on
   // the root matching what the embedder gave the iframe element.

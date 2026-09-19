@@ -7,8 +7,6 @@
 
   import { useDarkMode } from '$lib/utilities/dark-mode';
 
-  import { normalizePreviewContent } from './preview';
-
   interface Props {
     content: string;
     class?: ClassNameValue;
@@ -32,8 +30,13 @@
      * or two rather than a document.
      */
     compact?: boolean;
-    /** Normalize line breaks so Markdown renders on a single line. */
-    singleLine?: boolean;
+    /**
+     * Compact, and held to one line: paragraphs and hard breaks run together
+     * as text rather than stacking. For a label in a row that has height for
+     * one line, where markdown written as several blocks would otherwise
+     * paint as several lines.
+     */
+    inline?: boolean;
     /**
      * Accessible name for the frame. Name what the content is, so a frame in
      * a list of them is distinguishable.
@@ -51,7 +54,7 @@
     minHeight = 100,
     previewTheme,
     compact = false,
-    singleLine = false,
+    inline = false,
     title = 'output',
   }: Props = $props();
 
@@ -167,18 +170,12 @@
     return content;
   };
 
-  const normalizedContent = $derived(
-    normalizePreviewContent(content, singleLine),
-  );
-  const templatedContent = $derived(replaceTemplate(normalizedContent));
+  const templatedContent = $derived(replaceTemplate(content));
   const resolvedPreviewTheme = $derived(
     previewTheme ?? ($useDarkMode ? 'dark' : 'light'),
   );
   const previewPath = $derived(
-    resolve(
-      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&compact=${compact}`,
-      {},
-    ),
+    `${resolve('/render', {})}?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&compact=${compact}&inline=${inline}`,
   );
 
   $effect(() => {
