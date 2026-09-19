@@ -22,17 +22,20 @@
     hasCloudRunImpersonatorPlaceholder,
     interpolateCloudRunTerraformTemplate,
   } from './cloud-run-terraform';
+  import {
+    COMPUTE_PROVIDERS,
+    computeProviderFromType,
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+    defaultComputeProviderTemplates,
+    TERRAFORM_MODULES,
+  } from './compute-providers';
   import { GCP_REGIONS } from './gcp-regions';
-  import defaultAgentCoreTerraformTemplate from './serverless-worker-agentcore.tf?raw';
-  import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
-  import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
   import {
     defaultScaleDownStabilization,
     interpolateTerraformTemplate,
     scaleDownStabilizationUnits,
   } from './shared';
-  import agentCoreCfnTemplate from './temporal-agentcore-role.yaml?raw';
-  import cfnTemplate from './temporal-worker-role.yaml?raw';
 
   interface Props {
     provider?: string;
@@ -54,13 +57,14 @@
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
     metricsPollIntervalMs?: number;
-    cfnTemplateUrl?: string;
-    cfnTemplate?: string;
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
-    agentCoreCfnTemplateUrl?: string;
-    agentCoreCfnTemplate?: string;
-    agentCoreTerraformTemplate?: string;
+    /**
+     * The templates offered per provider. Defaults to the ones bundled here,
+     * which is what a self-hosted deployment wants. A consumer overrides them
+     * by passing a full map: it is exhaustive over ComputeProviderValue, so
+     * adding a provider fails the consumer's type check until it supplies
+     * templates for it.
+     */
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     errors?: {
       lambdaArn?: string[];
       agentCoreEndpointArn?: string[];
@@ -102,45 +106,44 @@
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
     metricsPollIntervalMs = $bindable(),
-    cfnTemplateUrl,
-    cfnTemplate: cfnTemplateProp,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
-    agentCoreCfnTemplateUrl,
-    agentCoreCfnTemplate: agentCoreCfnTemplateProp,
-    agentCoreTerraformTemplate,
+    templates = defaultComputeProviderTemplates,
     errors = {},
   }: Props = $props();
 
   // Both AWS providers assume a role, and the role each needs is different:
   // one grants lambda:InvokeFunction, the other bedrock-agentcore:
   // InvokeAgentRuntime. Handing out the Lambda role for AgentCore would
-  // produce a role that cannot invoke a runtime, so the helper follows the
+  // produce a role that cannot invoke a runtime, so the templates follow the
   // selected provider rather than being shared.
   const isAgentCore = $derived(provider === 'agentcore');
-
-  const resolvedCfnTemplate = $derived(
-    isAgentCore
-      ? (agentCoreCfnTemplateProp ?? agentCoreCfnTemplate)
-      : (cfnTemplateProp ?? cfnTemplate),
+  // `provider` arrives as a form field, so it is a string until proven one of
+  // ours. Narrowing here rather than asserting keeps an unrecognised value from
+  // reading as a provider that happens to have no entry.
+  const providerValue = $derived(computeProviderFromType(provider));
+  const providerTemplates = $derived(
+    providerValue ? templates[providerValue] : undefined,
   );
+  const cloudFormation = $derived(providerTemplates?.cloudFormation);
+
+  const resolvedCfnTemplate = $derived(cloudFormation?.template ?? '');
+  // Only the key belonging to this provider's template is present, so both
+  // ARNs are passed and the absent one is a no-op.
   const resolvedTerraformTemplate = $derived(
-    isAgentCore
-      ? interpolateTerraformTemplate(
-          agentCoreTerraformTemplate ?? defaultAgentCoreTerraformTemplate,
-          { externalId: roleExternalId, agentCoreEndpointArn },
-        )
-      : interpolateTerraformTemplate(
-          terraformTemplate ?? defaultTerraformTemplate,
-          { externalId: roleExternalId, lambdaArn },
-        ),
+    interpolateTerraformTemplate(providerTemplates?.terraform ?? '', {
+      externalId: roleExternalId,
+      lambdaArn,
+      agentCoreEndpointArn,
+    }),
   );
   const terraformModuleHref = $derived(
-    `https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/aws/${isAgentCore ? 'agentcore' : 'lambda'}`,
+    (providerValue && COMPUTE_PROVIDERS[providerValue].terraformModuleHref) ||
+      TERRAFORM_MODULES,
   );
+  // Read from the map rather than the selected provider: the Cloud Run block
+  // renders inside its own branch, where `provider` is already 'cloud-run'.
   const resolvedCloudRunTerraformTemplate = $derived(
     interpolateCloudRunTerraformTemplate(
-      cloudRunTerraformTemplate ?? defaultCloudRunTerraformTemplate,
+      templates['cloud-run'].terraform,
       gcpProject,
     ),
   );
@@ -149,7 +152,7 @@
   );
 
   const launchStackHref = $derived.by(() => {
-    const templateUrl = isAgentCore ? agentCoreCfnTemplateUrl : cfnTemplateUrl;
+    const templateUrl = cloudFormation?.url;
 
     if (!templateUrl) {
       return 'https://console.aws.amazon.com/cloudformation/';
@@ -181,9 +184,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = isAgentCore
-      ? 'temporal-agentcore-role.yaml'
-      : 'temporal-worker-role.yaml';
+    a.download = cloudFormation?.fileName ?? 'temporal-worker-role.yaml';
     a.click();
     URL.revokeObjectURL(url);
   }
