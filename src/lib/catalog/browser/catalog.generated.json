@@ -1,5 +1,5 @@
 {
-  "sourceHash": "4be4b7bdce0105db55dcc4ce2e2bcce31edbf7016f0b2966893e91f0183c164d",
+  "sourceHash": "3b6baedfacc848f9baee952518fb3544ae9a8f9b0d5b25c85a99c03348d2d6fa",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -579,6 +579,53 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "sequentialMarkdownActivities"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "sequential-multiline-summary-activities",
+      "title": "Sequential activities with multi-line summaries",
+      "description": "Runs 20 activities by default with summaries that alternate between a paragraph break and a hard break.",
+      "capabilityTags": ["activities", "sequencing"],
+      "expectedEvidence": [
+        "The configured number of non-overlapping activity executions in deterministic order.",
+        "Each activity summary spans two Markdown blocks, and the timeline label stays on one line."
+      ],
+      "input": {
+        "defaultValue": [20],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Activity count",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000
+            }
+          ],
+          "items": false,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "sequentialMultilineSummaryActivities"
       },
       "source": { "id": "oss", "label": "OSS" }
     },

@@ -95,6 +95,39 @@ body.compact code {
   line-height: 20px;
 }
 
+/* A label on one line, whatever the markdown does. A summary written as two
+   paragraphs, or with a hard break, renders as separate blocks: the frame is
+   sized from that content, so the label paints as two stacked lines in a row
+   that has height for one. Inline runs the blocks together instead, and the
+   text is measured and painted as the single line the row expects. Inline is
+   always compact, so the metrics above still apply. */
+body.inline main {
+  white-space: nowrap;
+}
+
+/* main stays a block, so the height still comes from the line box rather than
+   the text box, which would clip descenders. The metrics are restated for the
+   same reason compact restates them: the star selector above beats
+   inheritance, so a heading or a list item would render at 12.25px on a line
+   of 14px text. */
+body.inline :is(p, h1, h2, h3, h4, h5, h6, ul, ol, li, blockquote, pre) {
+  display: inline;
+  margin: 0;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* The break between two blocks is the space between their words. A hard break
+   leaves the newline in the source beside it, which collapses to that space. */
+body.inline br {
+  display: none;
+}
+
+body.inline :is(p, li, blockquote, pre) + :is(p, li, blockquote, pre)::before {
+  content: ' ';
+}
+
 h1 {
   font-size: 2em;
 }

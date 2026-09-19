@@ -369,7 +369,7 @@
                 content={decodedValue}
                 fill={false}
                 fitContent
-                compact
+                inline
                 minHeight={0}
                 overrideTheme="primary"
                 title={translate('workflows.summary')}

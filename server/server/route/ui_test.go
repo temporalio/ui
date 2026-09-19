@@ -380,6 +380,16 @@ func TestSetRenderRoute_CompactBodyClass(t *testing.T) {
 			query: "content=hello&compact=TRUE",
 			want:  `class="prose"`,
 		},
+		{
+			name:  "inline opts into compact too",
+			query: "content=hello&inline=true",
+			want:  `class="prose compact inline"`,
+		},
+		{
+			name:  "only the exact string opts into inline",
+			query: "content=hello&inline=TRUE",
+			want:  `class="prose"`,
+		},
 	}
 
 	for _, tt := range tests {
@@ -397,6 +407,15 @@ func TestSetRenderRoute_StylesheetCarriesCompactRules(t *testing.T) {
 	assert.Contains(t, body, "body.compact {")
 	assert.Contains(t, body, "body.compact main,")
 	assert.Contains(t, body, "body.compact code {")
+}
+
+func TestSetRenderRoute_StylesheetCarriesInlineRules(t *testing.T) {
+	body := renderRequest(t, "content=hello&inline=true")
+
+	// Without these a summary written as two paragraphs, or with a hard
+	// break, paints as stacked lines in a row that has height for one.
+	assert.Contains(t, body, "body.inline main {")
+	assert.Contains(t, body, "body.inline br {")
 }
 
 // Regression: a star selector reset with no strong rule renders bold at normal
