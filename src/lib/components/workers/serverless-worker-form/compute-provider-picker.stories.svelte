@@ -85,6 +85,35 @@
   </div>
 </Story>
 
+<Story
+  name="GCP namespace (Cloud Run in public preview)"
+  asChild
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Google Cloud Run')).toBeInTheDocument();
+    // Asserted on the stage the badge carries rather than the words it renders,
+    // so rewording the label does not fail the test. No releaseStage is passed,
+    // so this reads the shared default rather than a caller override, in the
+    // shape Temporal Cloud renders for a GCP namespace with the AWS providers
+    // hidden.
+    const stage = canvasElement
+      .querySelector('[data-release-stage]')
+      ?.getAttribute('data-release-stage');
+    await expect(stage).toBe('public-preview');
+  }}
+>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker
+      provider="cloud-run"
+      providers={[
+        { value: 'lambda', hidden: true },
+        { value: 'agentcore', hidden: true },
+        { value: 'cloud-run' },
+      ]}
+    />
+  </div>
+</Story>
+
 <Story name="Both enabled (cross-cloud)" asChild>
   <div class="max-w-[45rem] p-4">
     <ComputeProviderPicker
@@ -98,9 +127,10 @@
   name="Release stage overridden by caller"
   asChild
   play={async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.queryByText('Public Preview')).not.toBeInTheDocument();
-    await expect(canvas.getByText('Pre-release')).toBeInTheDocument();
+    const stage = canvasElement
+      .querySelector('[data-release-stage]')
+      ?.getAttribute('data-release-stage');
+    await expect(stage).toBe('pre-release');
   }}
 >
   <div class="max-w-[45rem] p-4">
@@ -123,8 +153,10 @@
     await expect(
       canvas.getByText('Amazon Bedrock AgentCore'),
     ).toBeInTheDocument();
-    await expect(canvas.getByText('Public Preview')).toBeInTheDocument();
-    await expect(canvas.getByText('Pre-release')).toBeInTheDocument();
+    const stages = [
+      ...canvasElement.querySelectorAll('[data-release-stage]'),
+    ].map((badge) => badge.getAttribute('data-release-stage'));
+    await expect(stages).toEqual(['public-preview', 'pre-release']);
   }}
 >
   <div class="max-w-[45rem] p-4">

@@ -11,6 +11,7 @@
 
   import {
     type ComputeProviderOption,
+    type ComputeProviderReleaseStage,
     type ComputeProviderValue,
     defaultReleaseStage,
   } from './shared';
@@ -55,8 +56,13 @@
     }
   };
 
+  const releaseStageOf = (
+    option: ComputeProviderOption,
+  ): ComputeProviderReleaseStage =>
+    option.releaseStage ?? defaultReleaseStage[option.value];
+
   const releaseStageLabel = (option: ComputeProviderOption): string => {
-    switch (option.releaseStage ?? defaultReleaseStage[option.value]) {
+    switch (releaseStageOf(option)) {
       case 'public-preview':
         return translate('workers.public-preview');
       case 'pre-release':
@@ -118,6 +124,7 @@
               size="sm"
               text={releaseStageLabel(option)}
               colorScheme="accent"
+              data-release-stage={releaseStageOf(option)}
             />
           {/if}
         </span>
