@@ -1,6 +1,9 @@
 <script lang="ts">
+  import {
+    COMPUTE_PROVIDERS,
+    computeProviderFromType,
+  } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
   import type { ComputeStatus } from '$lib/types/deployments';
   import {
     connectionStateColor,
@@ -9,20 +12,13 @@
     deriveConnectionStatus,
   } from '$lib/utilities/connection-status';
 
-  const CONFIG: Record<string, { Icon: IconComponent; label: string }> = {
-    // Brand marks, not monochrome glyphs: these identify a vendor, so they
-    // keep their own colour on either theme.
-    'aws-lambda': { Icon: IconAwsColor, label: 'Lambda' },
-    'aws-agentcore': { Icon: IconAwsColor, label: 'AgentCore' },
-    'gcp-cloud-run': { Icon: IconGcpColor, label: 'Cloud Run' },
-  };
-
   let {
     type,
     computeStatus,
   }: { type: string | undefined; computeStatus?: ComputeStatus } = $props();
 
-  const config = $derived(type ? CONFIG[type] : undefined);
+  const provider = $derived(computeProviderFromType(type));
+  const config = $derived(provider ? COMPUTE_PROVIDERS[provider] : undefined);
   const state = $derived(
     computeStatus ? deriveConnectionStatus(computeStatus) : undefined,
   );
@@ -33,9 +29,9 @@
     class="inline-flex min-w-24 items-center justify-center gap-2 border border-primary px-1"
   >
     {#if config}
-      {@const ProviderIcon = config.Icon}
+      {@const ProviderIcon = config.icon}
       <ProviderIcon />
-      <p>{config.label}</p>
+      <p>{config.badgeLabel}</p>
     {/if}
     {#if state}
       <span

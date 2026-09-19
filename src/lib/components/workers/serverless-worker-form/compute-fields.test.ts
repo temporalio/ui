@@ -15,6 +15,7 @@ import {
   hasCloudRunImpersonatorPlaceholder,
   interpolateCloudRunTerraformTemplate,
 } from './cloud-run-terraform';
+import { defaultComputeProviderTemplates } from './compute-providers';
 import defaultAgentCoreTerraformTemplate from './serverless-worker-agentcore.tf?raw';
 import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
 import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
@@ -89,6 +90,7 @@ interface ComputeFieldsOptions {
   agentCoreEndpointArn?: string;
   gcpProject?: string;
   gcpServiceAccount?: string;
+  /** Overrides the Terraform template for the named provider only. */
   cloudRunTerraformTemplate?: string;
   terraformTemplate?: string;
   roleExternalId?: string;
@@ -106,6 +108,26 @@ const renderComputeFields = ({
   terraformTemplate,
   roleExternalId = '',
 }: ComputeFieldsOptions): string => {
+  // The component takes one exhaustive map now, so an override for a single
+  // provider is layered onto the defaults rather than passed as its own prop.
+  const templates = {
+    ...defaultComputeProviderTemplates,
+    ...(terraformTemplate !== undefined && {
+      [provider]: {
+        ...defaultComputeProviderTemplates[
+          provider as keyof typeof defaultComputeProviderTemplates
+        ],
+        terraform: terraformTemplate,
+      },
+    }),
+    ...(cloudRunTerraformTemplate !== undefined && {
+      'cloud-run': {
+        ...defaultComputeProviderTemplates['cloud-run'],
+        terraform: cloudRunTerraformTemplate,
+      },
+    }),
+  };
+
   const { body } = renderComponent(computeFields, {
     props: {
       provider,
@@ -115,8 +137,7 @@ const renderComputeFields = ({
       roleExternalId,
       gcpProject,
       gcpServiceAccount,
-      cloudRunTerraformTemplate,
-      terraformTemplate,
+      templates,
     },
   });
   return body;
