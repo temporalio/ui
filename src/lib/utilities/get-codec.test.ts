@@ -23,6 +23,8 @@ const defaultSettings = {
   showTemporalSystemNamespace: false,
   feedbackURL: '',
   disableNewsFetch: false,
+  nlSearchEnabled: false,
+  historyReviewEnabled: false,
   codec: {
     endpoint: '',
     passAccessToken: false,

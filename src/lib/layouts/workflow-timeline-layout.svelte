@@ -4,6 +4,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import HistoryReviewControls from '$lib/components/event/history-review-controls.svelte';
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
@@ -26,8 +27,13 @@
     IconDownload,
   } from '$lib/io/icon';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
+  import { historyReview } from '$lib/services/history-review-state.svelte';
   import { clearActives } from '$lib/stores/active-events';
-  import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
+  import {
+    collapseIdleTime,
+    eventFilterSort,
+    showAllReviewedEvents,
+  } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -45,6 +51,9 @@
 
   const namespace = $derived(page.params.namespace);
   const workflow = $derived($workflowRun.workflow);
+  const historyReviewEnabled = $derived(
+    !!page.data?.settings?.historyReviewEnabled,
+  );
 
   const urlParams = $derived(parseEventFilterParams(page.url));
   $effect(() => {
@@ -213,6 +222,12 @@
         </ToggleButton>
       </ToggleButtons>
     </div>
+    {#if historyReviewEnabled}
+      <HistoryReviewControls
+        fetchComplete={historyCtx.fetchComplete}
+        class="w-full"
+      />
+    {/if}
   </div>
 
   <!--
@@ -230,6 +245,8 @@
       descMinId={historyCtx.descMinId}
       error={Boolean(workflowTaskFailedError)}
       onTimelineInit={handleTimelineInit}
+      review={historyReviewEnabled ? historyReview : undefined}
+      showAllReviewed={$showAllReviewedEvents === 'on'}
     />
   {/if}
 </div>

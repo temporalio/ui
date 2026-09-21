@@ -49,6 +49,8 @@ const emptySettingsResponse: SettingsResponse = {
   NavCollapsedByDefault: false,
   FeedbackURL: '',
   DisableNewsFetch: false,
+  NLSearchEnabled: false,
+  HistoryReviewEnabled: false,
   Version: '',
 };
 
@@ -173,6 +175,8 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     feedbackURL: settingsResponse?.FeedbackURL,
     disableNewsFetch: !!settingsResponse?.DisableNewsFetch,
     supportURL: settingsResponse?.SupportURL,
+    nlSearchEnabled: !!settingsResponse?.NLSearchEnabled,
+    historyReviewEnabled: !!settingsResponse?.HistoryReviewEnabled,
     runtimeEnvironment: {
       get isCloud() {
         if (EnvironmentOverride) {

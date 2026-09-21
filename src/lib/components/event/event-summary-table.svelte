@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
@@ -15,6 +17,8 @@
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
+  import { HISTORY_REVIEW_COLLAPSE_THRESHOLD } from '$lib/services/history-review-service';
+  import type { HistoryReviewState } from '$lib/services/history-review-state.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
@@ -28,6 +32,11 @@
     getFailedOrPendingGroups,
   } from '$lib/utilities/get-failed-or-pending';
   import {
+    collapseRoutineRows,
+    type HiddenRunRow,
+    isHiddenRunRow,
+  } from '$lib/utilities/history-review-collapse';
+  import {
     isPendingActivity,
     isPendingNexusOperation,
   } from '$lib/utilities/is-pending-activity';
@@ -36,6 +45,7 @@
   import TableHeaderCell from '../workflow/workflows-summary-configurable-table/table-header-cell.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';
+  import EventHiddenRunRow from './event-hidden-run-row.svelte';
   import EventSummaryRow from './event-summary-row.svelte';
   import PendingActivitySummaryRow from './pending-activity-summary-row.svelte';
   import PendingNexusSummaryRow from './pending-nexus-summary-row.svelte';
@@ -45,6 +55,8 @@
     updating?: boolean;
     loading?: boolean;
     minimized?: boolean;
+    review?: HistoryReviewState;
+    showAllReviewed?: boolean;
   } & (
     | { compact: true; items: LazyGroup[]; groups?: never }
     | {
@@ -62,6 +74,8 @@
     updating = false,
     loading = false,
     minimized = true,
+    review = undefined,
+    showAllReviewed = false,
   }: Props = $props();
 
   // Set by a hovered row, read by its siblings to highlight related activities.
@@ -84,10 +98,60 @@
       : getFailedOrPendingEvents(items, $eventStatusFilter),
   );
 
+  type TableRow = IterableEventWithPending | LazyGroup;
+
+  const getRowId = (row: TableRow): string | undefined => {
+    if (isPendingActivity(row) || isPendingNexusOperation(row)) {
+      return undefined;
+    }
+    return String(row.id);
+  };
+
+  const getReviewScore = (row: TableRow) => {
+    const id = getRowId(row);
+    if (!review || id === undefined) return undefined;
+    const groupId = isLazyGroup(row) ? undefined : groupIndex.get(id)?.id;
+    return (
+      review.scores[id] ??
+      (groupId !== undefined ? review.scores[String(groupId)] : undefined)
+    );
+  };
+
+  const collapsed = $derived(
+    review?.hasReview
+      ? collapseRoutineRows<TableRow>({
+          rows: filteredItems,
+          getId: getRowId,
+          getScore: getReviewScore,
+          threshold: HISTORY_REVIEW_COLLAPSE_THRESHOLD,
+          openKeys: review.openKeys,
+          showAll: showAllReviewed,
+        })
+      : undefined,
+  );
+
+  const tableItems: (TableRow | HiddenRunRow<TableRow>)[] = $derived(
+    collapsed ? collapsed.rows : filteredItems,
+  );
+
+  const isRoutine = (row: TableRow) => {
+    const id = getRowId(row);
+    return !!collapsed && id !== undefined && collapsed.routineIds.has(id);
+  };
+
+  $effect(() => {
+    const summary = collapsed?.summary ?? null;
+    untrack(() => review?.setSummary(summary));
+  });
+
   // The gutter graph sits outside Paginated, so it re-derives the page.
   const graphHistory = $derived(
     showGraph
-      ? (filteredItems as WorkflowEventWithPending[]).slice(
+      ? (
+          tableItems.filter(
+            (item) => !isHiddenRunRow(item),
+          ) as WorkflowEventWithPending[]
+        ).slice(
           (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
           parseInt(currentPageParam) * parseInt(perPageParam),
         )
@@ -109,7 +173,13 @@
     return isLazyGroup(item) ? materializeGroup(item) : item;
   };
 
-  const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
+  const iterableKey = (
+    event: IterableEventWithPending | LazyGroup | HiddenRunRow<TableRow>,
+  ) => {
+    if (isHiddenRunRow(event)) {
+      return event.key;
+    }
+
     if (isPendingNexusOperation(event)) {
       return `pending-nexus-${event.scheduledEventId}`;
     }
@@ -143,7 +213,7 @@
     previousPageButtonLabel={translate('common.previous-page')}
     pageButtonLabel={(page) => translate('common.go-to-page', { page })}
     {updating}
-    items={filteredItems}
+    items={tableItems}
     maxHeight="none"
   >
     {#snippet headers()}
@@ -159,45 +229,13 @@
     {/snippet}
     {#snippet rows({ visibleItems })}
       {#each visibleItems as item, index (iterableKey(item))}
-        {@const row = materializeRowReactive(item)}
-        {#if isEventGroup(row)}
-          <EventSummaryRow
-            bind:hoveredEventId
-            event={row}
-            {index}
-            group={row}
-            {compact}
-            {initialItem}
-          />
-        {:else if isPendingActivity(row)}
-          <PendingActivitySummaryRow
-            event={row}
-            {index}
-            group={groups.find(
-              (g) =>
-                isPendingActivity(row) && g?.pendingActivity?.id === row.id,
-            )}
-          />
-        {:else if isPendingNexusOperation(row)}
-          <PendingNexusSummaryRow
-            event={row}
-            {index}
-            group={groups.find(
-              (g) =>
-                isPendingNexusOperation(row) &&
-                g?.pendingNexusOperation?.scheduledEventId ===
-                  row.scheduledEventId,
-            )}
+        {#if isHiddenRunRow(item)}
+          <EventHiddenRunRow
+            run={item}
+            onToggle={(key) => review?.toggleRun(key)}
           />
         {:else}
-          <EventSummaryRow
-            bind:hoveredEventId
-            event={row}
-            {index}
-            group={isEvent(row) ? groupIndex.get(row.id) : undefined}
-            {compact}
-            {initialItem}
-          />
+          {@render itemRow(item, index)}
         {/if}
       {:else}
         <EventEmptyRow loading={!$fullEventHistory.length || loading} />
@@ -205,3 +243,46 @@
     {/snippet}
   </Paginated>
 </div>
+
+{#snippet itemRow(item: TableRow, index: number)}
+  {@const row = materializeRowReactive(item)}
+  {#if isEventGroup(row)}
+    <EventSummaryRow
+      bind:hoveredEventId
+      event={row}
+      {index}
+      group={row}
+      {compact}
+      {initialItem}
+      routine={isRoutine(item)}
+    />
+  {:else if isPendingActivity(row)}
+    <PendingActivitySummaryRow
+      event={row}
+      {index}
+      group={groups.find(
+        (g) => isPendingActivity(row) && g?.pendingActivity?.id === row.id,
+      )}
+    />
+  {:else if isPendingNexusOperation(row)}
+    <PendingNexusSummaryRow
+      event={row}
+      {index}
+      group={groups.find(
+        (g) =>
+          isPendingNexusOperation(row) &&
+          g?.pendingNexusOperation?.scheduledEventId === row.scheduledEventId,
+      )}
+    />
+  {:else}
+    <EventSummaryRow
+      bind:hoveredEventId
+      event={row}
+      {index}
+      group={isEvent(row) ? groupIndex.get(row.id) : undefined}
+      {compact}
+      {initialItem}
+      routine={isRoutine(item)}
+    />
+  {/if}
+{/snippet}

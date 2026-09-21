@@ -274,6 +274,23 @@ export const Strings = {
   'close-search-input': 'Show Filters',
   'select-time': 'Select Time',
   'search-placeholder': 'Enter a query',
+  'nl-search-label': 'Describe the workflows you want to find',
+  'nl-search-placeholder':
+    'Describe workflows, for example "failed order workflows from yesterday"',
+  'nl-search-submit': 'Find',
+  'nl-search-loading': 'Interpreting your search',
+  'nl-search-applied': 'Filters applied.',
+  'nl-search-not-understood':
+    'Could not interpret this search. Try different words, or add filters manually.',
+  'nl-search-low-confidence':
+    'Filters applied with low confidence. Check the filters and adjust them if needed.',
+  'nl-search-error': 'Could not complete this search. Try again.',
+  'nl-search-rate-limited': 'Too many searches. Try again in a moment.',
+  'nl-search-rate-limited-retry_one':
+    'Too many searches. Try again in {{count}} second.',
+  'nl-search-rate-limited-retry_other':
+    'Too many searches. Try again in {{count}} seconds.',
+  'nl-search-forbidden': 'You do not have permission to search this namespace.',
   'child-workflows': 'Child Workflows',
   'retry-workflows': 'Retry Workflows',
   'workflow-name': 'Workflow Name',

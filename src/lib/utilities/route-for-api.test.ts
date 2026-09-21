@@ -48,6 +48,16 @@ describe('routeForApi', () => {
     expect(route).toBe(`${origin}${base}/api/v1/cluster-info`);
   });
 
+  it('should return a route for nl-search', () => {
+    const route = routeForApi('nl-search');
+    expect(route).toBe(`${origin}${base}/api/v1/nl-search`);
+  });
+
+  it('should return a route for history-review', () => {
+    const route = routeForApi('history-review');
+    expect(route).toBe(`${origin}${base}/api/v1/history-review`);
+  });
+
   it('should return a route for settings', () => {
     const route = routeForApi('settings');
     expect(route).toBe(`${origin}${base}/api/v1/settings`);
