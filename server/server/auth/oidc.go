@@ -26,12 +26,33 @@ package auth
 
 import (
 	"context"
+	"encoding/base64"
 	"net/http"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 )
+
+// PKCE verifier constraints per RFC 7636 §4.1: the verifier is 43-128
+// characters of unreserved base64url alphabet ([A-Z][a-z][0-9]-._~).
+const (
+	pkceVerifierMinLen = 43
+	pkceVerifierMaxLen = 128
+)
+
+// validatePKCEVerifier reports whether v satisfies RFC 7636 length and
+// alphabet constraints. The length check uses raw byte count, which equals
+// the character count for unreserved-base64url strings.
+func validatePKCEVerifier(v string) error {
+	if len(v) < pkceVerifierMinLen || len(v) > pkceVerifierMaxLen {
+		return echo.NewHTTPError(http.StatusBadRequest, "Code verifier length is outside the RFC 7636 range (43-128)")
+	}
+	if _, err := base64.RawURLEncoding.DecodeString(v); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Code verifier is not valid base64url")
+	}
+	return nil
+}
 
 type User struct {
 	OAuth2Token *oauth2.Token
@@ -58,7 +79,7 @@ type Claims struct {
 	Picture       string `json:"picture"`
 }
 
-func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, provider *oidc.Provider) (*User, error) {
+func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, provider *oidc.Provider, pkceEnabled bool) (*User, error) {
 	state, err := r.Cookie("state")
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie is not set in request")
@@ -67,9 +88,27 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie did not match")
 	}
 
-	oauth2Token, err := config.Exchange(ctx, r.URL.Query().Get("code"))
-	if err != nil {
-		return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
+	var oauth2Token *oauth2.Token
+	if pkceEnabled {
+		codeVerifier, err := r.Cookie("code_verifier")
+		if err != nil {
+			return nil, echo.NewHTTPError(http.StatusBadRequest, "Code verifier is not set in request")
+		}
+		// Reject malformed verifiers before contacting the IdP so that
+		// obvious tampering or cookie corruption fails fast with a clear
+		// 400 instead of bubbling up an opaque 500 from the token endpoint.
+		if verr := validatePKCEVerifier(codeVerifier.Value); verr != nil {
+			return nil, verr
+		}
+		oauth2Token, err = config.Exchange(ctx, r.URL.Query().Get("code"), oauth2.SetAuthURLParam("code_verifier", codeVerifier.Value))
+		if err != nil {
+			return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
+		}
+	} else {
+		oauth2Token, err = config.Exchange(ctx, r.URL.Query().Get("code"))
+		if err != nil {
+			return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
+		}
 	}
 
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
