@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -312,4 +313,88 @@ func TestExchangeCode_NonceMismatch(t *testing.T) {
 	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "Nonce did not match")
+}
+
+func TestExchangeCode_RejectsTooShortVerifier(t *testing.T) {
+	harness := newOIDCTestHarness(t)
+	defer harness.Close()
+
+	provider, err := harness.Provider(context.Background())
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
+	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
+	// 42 chars is below the RFC 7636 minimum of 43.
+	req.AddCookie(&http.Cookie{Name: "code_verifier", Value: strings.Repeat("a", 42)})
+	req.AddCookie(&http.Cookie{Name: "nonce", Value: "n"})
+
+	cfg := harness.OAuth2Config()
+	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "RFC 7636")
+}
+
+func TestExchangeCode_RejectsTooLongVerifier(t *testing.T) {
+	harness := newOIDCTestHarness(t)
+	defer harness.Close()
+
+	provider, err := harness.Provider(context.Background())
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
+	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
+	// 129 chars is above the RFC 7636 maximum of 128.
+	req.AddCookie(&http.Cookie{Name: "code_verifier", Value: strings.Repeat("a", 129)})
+	req.AddCookie(&http.Cookie{Name: "nonce", Value: "n"})
+
+	cfg := harness.OAuth2Config()
+	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "RFC 7636")
+}
+
+func TestExchangeCode_RejectsMalformedVerifier(t *testing.T) {
+	harness := newOIDCTestHarness(t)
+	defer harness.Close()
+
+	provider, err := harness.Provider(context.Background())
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
+	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
+	// 43 chars but contains '!' which is not in the unreserved set.
+	req.AddCookie(&http.Cookie{Name: "code_verifier", Value: "!" + strings.Repeat("a", 42)})
+	req.AddCookie(&http.Cookie{Name: "nonce", Value: "n"})
+
+	cfg := harness.OAuth2Config()
+	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "base64url")
+}
+
+func TestExchangeCode_AcceptsBoundaryLengthVerifiers(t *testing.T) {
+	// 43 and 128 char verifiers must be accepted (boundaries of RFC 7636).
+	// This avoids false rejections for valid edge cases.
+	cases := []int{43, 128}
+	for _, n := range cases {
+		t.Run("len", func(t *testing.T) {
+			harness := newOIDCTestHarness(t)
+			defer harness.Close()
+
+			tokenNonce := "n"
+			harness.nonce = tokenNonce
+
+			provider, err := harness.Provider(context.Background())
+			require.NoError(t, err)
+
+			req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
+			req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
+			req.AddCookie(&http.Cookie{Name: "code_verifier", Value: strings.Repeat("a", n)})
+			req.AddCookie(&http.Cookie{Name: "nonce", Value: tokenNonce})
+
+			cfg := harness.OAuth2Config()
+			_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
+			require.NoError(t, err, "len=%d must be accepted", n)
+		})
+	}
 }
