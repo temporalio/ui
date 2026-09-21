@@ -34,7 +34,9 @@ import (
 
 // CORSConfig holds the configuration for CORS middleware
 type CORSConfig struct {
-	AllowHeaders     []string
+	AllowHeaders []string
+	// ExposeHeaders lists the response headers that a cross-origin script can read
+	ExposeHeaders    []string
 	AllowCredentials bool
 	ConfigProvider   config.ConfigProvider
 }
@@ -115,6 +117,10 @@ func setCORSHeaders(c echo.Context, origin string, config CORSConfig) {
 
 	if len(config.AllowHeaders) > 0 {
 		c.Response().Header().Set("Access-Control-Allow-Headers", strings.Join(config.AllowHeaders, ", "))
+	}
+
+	if len(config.ExposeHeaders) > 0 {
+		c.Response().Header().Set("Access-Control-Expose-Headers", strings.Join(config.ExposeHeaders, ", "))
 	}
 
 	c.Response().Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")

@@ -81,6 +81,8 @@ type SettingsResponse struct {
 	HideWorkflowQueryErrors       bool
 	RefreshWorkflowCountsDisabled bool
 	ActivityCommandsDisabled      bool
+	NLSearchEnabled               bool
+	HistoryReviewEnabled          bool
 }
 
 type CustomUISettingsResponse struct {
@@ -310,6 +312,8 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			HideWorkflowQueryErrors:       cfg.HideWorkflowQueryErrors,
 			RefreshWorkflowCountsDisabled: cfg.RefreshWorkflowCountsDisabled,
 			ActivityCommandsDisabled:      cfg.ActivityCommandsDisabled,
+			NLSearchEnabled:               cfg.NLSearchEnabled(),
+			HistoryReviewEnabled:          cfg.HistoryReviewEnabled(),
 		}
 
 		return c.JSON(http.StatusOK, settings)

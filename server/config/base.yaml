@@ -1,2 +1,13 @@
 temporalGrpcAddress: 127.0.0.1:7233
 port: 8233
+typesafe:
+  rateLimit:
+    disabled: false
+    requestsPerMinute: 30
+    burst: 10
+    # for all callers together: it binds above about 10 active users (300 / 30)
+    deploymentRequestsPerMinute: 300
+nlSearch:
+  enabled: false
+historyReview:
+  enabled: false

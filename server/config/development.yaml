@@ -93,3 +93,26 @@ customUi:
         minHeight: 72
         maxHeight: 240
       permissions: []
+{{- $typesafeKey := env "TEMPORAL_TYPESAFE_API_KEY" | default (env "TEMPORAL_NL_SEARCH_API_KEY") }}
+typesafe: # the TypeSafe API, shared by nlSearch and historyReview: one deployment has one key
+  # The template escapes HTML and writes the value as YAML without quotes. A key that has
+  # one of & < > ' " + or ": " or " #" does not survive (standard base64 has +): put that key in a config file,
+  # as a quoted string, in place of the variable. The characters = / - _ . are safe.
+  # Set TEMPORAL_TYPESAFE_API_KEY to turn both features on. TEMPORAL_NL_SEARCH_API_KEY is the fallback.
+  apiKey: {{ $typesafeKey }} # secret, never sent to the browser
+  model: jev-latest
+  baseUrl: https://api.typesafe.ai
+  timeout: 5s
+  rateLimit: # protects the quota of the API key; an empty or zero value selects the default
+    disabled: false # the only way to turn the limit off
+    requestsPerMinute: 30 # for each caller (one Authorization header, or one IP)
+    burst: 10
+    # For all callers together. With the defaults, this limit is the one that binds when
+    # more than about 10 users are active at the same time (300 / 30). Keep it at or above
+    # requestsPerMinute, and below the quota of the API key. One history review costs
+    # one request for each 50 distinct rows.
+    deploymentRequestsPerMinute: 300
+nlSearch: # natural-language workflow search
+  enabled: {{ if $typesafeKey }}true{{ else }}false{{ end }}
+historyReview: # "Review with Jev" on the workflow event history
+  enabled: {{ if $typesafeKey }}true{{ else }}false{{ end }}

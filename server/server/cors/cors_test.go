@@ -160,3 +160,34 @@ func TestCORSMiddleware_PreflightRequest(t *testing.T) {
 	assert.Equal(t, http.StatusNoContent, rec.Code)
 	assert.Equal(t, "https://example.com", rec.Header().Get("Access-Control-Allow-Origin"))
 }
+
+func TestCORSMiddleware_ExposeHeaders(t *testing.T) {
+	cfg := &config.Config{CORS: config.CORS{AllowOrigins: []string{"https://example.com"}}}
+
+	tests := map[string]struct {
+		expose []string
+		want   string
+	}{
+		"exposed headers are listed":     {expose: []string{"Retry-After", "X-Other"}, want: "Retry-After, X-Other"},
+		"no header without a configured": {expose: nil, want: ""},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodPost, "/", nil)
+			req.Header.Set("Origin", "https://example.com")
+			rec := httptest.NewRecorder()
+
+			handler := CORSMiddleware(CORSConfig{
+				ExposeHeaders:  tt.expose,
+				ConfigProvider: &mockConfigProvider{cfg: cfg},
+			})(func(c echo.Context) error {
+				return c.NoContent(http.StatusTooManyRequests)
+			})
+
+			assert.NoError(t, handler(e.NewContext(req, rec)))
+			assert.Equal(t, tt.want, rec.Header().Get("Access-Control-Expose-Headers"))
+		})
+	}
+}
