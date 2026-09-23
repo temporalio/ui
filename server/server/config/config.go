@@ -45,6 +45,9 @@ type (
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
 		DisableNewsFetch    bool   `yaml:"disableNewsFetch"`
+		NotifyOnNewVersion  bool   `yaml:"notifyOnNewVersion"`
+		// How this server was installed: cli, docker, helm, or server
+		Distribution string `yaml:"distribution"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
 		// Collapse the left navigation and saved views navigation by default

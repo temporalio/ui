@@ -145,6 +145,8 @@ export type Settings = {
   navCollapsedByDefault: boolean;
   feedbackURL: string;
   disableNewsFetch: boolean;
+  notifyOnNewVersion: boolean;
+  distribution?: string;
   supportURL?: string;
   runtimeEnvironment: {
     isCloud: boolean;

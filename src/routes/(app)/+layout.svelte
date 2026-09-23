@@ -12,6 +12,7 @@
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
+  import UpgradeSticker from '$lib/components/upgrade-sticker.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
@@ -60,6 +61,7 @@
     routeForWorkers,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
+  import { getUpgradeNotice } from '$lib/utilities/upgrade-notice';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
@@ -76,6 +78,13 @@
   let newsFeedClusterId = $derived(page.data?.cluster?.clusterId ?? '');
   let showNewsFeed = $derived(
     !isCloud && !page.data?.settings?.disableNewsFetch && !!newsFeedClusterId,
+  );
+  let upgradeNotice = $derived(
+    getUpgradeNotice({
+      cluster: page.data?.cluster,
+      notifyOnNewVersion: !!page.data?.settings?.notifyOnNewVersion,
+      distribution: page.data?.settings?.distribution,
+    }),
   );
   let activeNamespaceName = $derived(
     page.params?.namespace ?? $lastUsedNamespace,
@@ -423,6 +432,9 @@
             tooltip={translate('common.feedback')}
             external
           />
+          {#if upgradeNotice}
+            <UpgradeSticker notice={upgradeNotice} />
+          {/if}
         {/if}
       {/snippet}
     </SideNavigation>

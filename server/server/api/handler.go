@@ -66,6 +66,8 @@ type SettingsResponse struct {
 	NavCollapsedByDefault         bool
 	FeedbackURL                   string
 	DisableNewsFetch              bool
+	NotifyOnNewVersion            bool
+	Distribution                  string
 	Codec                         *CodecResponse
 	CustomUI                      *CustomUISettingsResponse
 	Version                       string
@@ -287,6 +289,8 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			NavCollapsedByDefault:       cfg.NavCollapsedByDefault,
 			FeedbackURL:                 cfg.FeedbackURL,
 			DisableNewsFetch:            cfg.DisableNewsFetch,
+			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
+			Distribution:                cfg.Distribution,
 			Codec: &CodecResponse{
 				Endpoint:            cfg.Codec.Endpoint,
 				PassAccessToken:     cfg.Codec.PassAccessToken,
