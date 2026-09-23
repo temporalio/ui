@@ -14,34 +14,36 @@ export type ReleaseComponent = 'cli' | 'helm' | 'ui' | 'server';
 export type ComponentVersions = Partial<Record<ReleaseComponent, string>>;
 
 export type UpgradeNotice = {
-  component: ReleaseComponent;
+  distribution: UpgradeDistribution;
   current: string;
   latest: string;
   href: string;
 };
 
-const DISTRIBUTION_RELEASES: Record<UpgradeDistribution, ReleaseComponent[]> = {
-  cli: ['cli'],
-  docker: ['ui', 'server'],
-  helm: ['helm', 'ui', 'server'],
-  server: ['server'],
+const DISTRIBUTION_RELEASE: Record<UpgradeDistribution, ReleaseComponent> = {
+  cli: 'cli',
+  docker: 'ui',
+  helm: 'helm',
+  server: 'server',
 };
 
-const UPGRADE_LINKS: Record<ReleaseComponent, string> = {
+const UPGRADE_LINKS: Record<UpgradeDistribution, string> = {
   cli: 'https://docs.temporal.io/cli#install',
+  docker: 'https://hub.docker.com/r/temporalio/ui',
   helm: 'https://github.com/temporalio/helm-charts',
-  ui: 'https://hub.docker.com/r/temporalio/ui',
-  server: 'https://hub.docker.com/r/temporalio/server',
+  server: 'https://github.com/temporalio/temporal/releases',
 };
-
-const SERVER_RELEASES_LINK = 'https://github.com/temporalio/temporal/releases';
 
 export const toUpgradeDistribution = (value?: string): UpgradeDistribution =>
   UPGRADE_DISTRIBUTIONS.find((distribution) => distribution === value) ??
   'server';
 
-export const upgradeNoticeKey = ({ component, latest }: UpgradeNotice) =>
-  `${component}@${latest}`;
+export const releaseForDistribution = (
+  distribution: UpgradeDistribution,
+): ReleaseComponent => DISTRIBUTION_RELEASE[distribution];
+
+export const upgradeNoticeKey = ({ distribution, latest }: UpgradeNotice) =>
+  `${distribution}@${latest}`;
 
 export const getInstalledVersions = ({
   distribution,
@@ -60,14 +62,6 @@ export const getInstalledVersions = ({
   server: serverVersion,
 });
 
-const upgradeLink = (
-  component: ReleaseComponent,
-  distribution: UpgradeDistribution,
-) =>
-  component === 'server' && distribution === 'server'
-    ? SERVER_RELEASES_LINK
-    : UPGRADE_LINKS[component];
-
 export const getUpgradeNotice = ({
   distribution,
   installed,
@@ -77,17 +71,17 @@ export const getUpgradeNotice = ({
   installed: ComponentVersions;
   latest: ComponentVersions;
 }): UpgradeNotice | null => {
-  for (const component of DISTRIBUTION_RELEASES[distribution]) {
-    const current = installed[component];
-    const latestVersion = latest[component];
-    if (current && latestVersion && isVersionNewer(latestVersion, current)) {
-      return {
-        component,
-        current,
-        latest: latestVersion,
-        href: upgradeLink(component, distribution),
-      };
-    }
+  const component = releaseForDistribution(distribution);
+  const current = installed[component];
+  const latestVersion = latest[component];
+  if (!current || !latestVersion || !isVersionNewer(latestVersion, current)) {
+    return null;
   }
-  return null;
+
+  return {
+    distribution,
+    current,
+    latest: latestVersion,
+    href: UPGRADE_LINKS[distribution],
+  };
 };

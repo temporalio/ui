@@ -35,16 +35,16 @@ var releaseRepos = map[string]string{
 	ReleaseServer: "temporalio/temporal",
 }
 
-// Components to check for each distribution, in the order they are recommended.
-var distributionReleases = map[string][]string{
-	"cli":    {ReleaseCLI},
-	"docker": {ReleaseUI, ReleaseServer},
-	"helm":   {ReleaseHelm, ReleaseUI, ReleaseServer},
-	"server": {ReleaseServer},
+// The release that each distribution is upgraded to.
+var distributionReleases = map[string]string{
+	"cli":    ReleaseCLI,
+	"docker": ReleaseUI,
+	"helm":   ReleaseHelm,
+	"server": ReleaseServer,
 }
 
-// LatestReleasesResponse lists the latest published version of each
-// component that applies to this install's distribution.
+// LatestReleasesResponse lists the latest published version of the
+// release that this install's distribution is upgraded to.
 type LatestReleasesResponse struct {
 	Releases map[string]string
 }
@@ -80,11 +80,11 @@ func newReleaseChecker(baseURL string, client *http.Client, now func() time.Time
 	}
 }
 
-// ReleasesForDistribution returns the components checked for a distribution.
+// ReleaseForDistribution returns the release checked for a distribution.
 // Unknown distributions are treated as a server built from source.
-func ReleasesForDistribution(distribution string) []string {
-	if components, ok := distributionReleases[distribution]; ok {
-		return components
+func ReleaseForDistribution(distribution string) string {
+	if component, ok := distributionReleases[distribution]; ok {
+		return component
 	}
 	return distributionReleases["server"]
 }
@@ -154,8 +154,8 @@ func normalizeReleaseTag(tag string) string {
 	return strings.TrimPrefix(tag, "v")
 }
 
-// GetLatestReleases returns the latest release of each component that applies
-// to the configured distribution. Lookups that fail are left out.
+// GetLatestReleases returns the latest release of the configured
+// distribution. A failed lookup returns no releases.
 func GetLatestReleases(cfgProvider *config.ConfigProviderWithRefresh, checker *ReleaseChecker) func(echo.Context) error {
 	return func(c echo.Context) error {
 		cfg, err := cfgProvider.GetConfig()
@@ -168,11 +168,8 @@ func GetLatestReleases(cfgProvider *config.ConfigProviderWithRefresh, checker *R
 			return c.JSON(http.StatusOK, response)
 		}
 
-		for _, component := range ReleasesForDistribution(cfg.Distribution) {
-			version, err := checker.Latest(c.Request().Context(), component)
-			if err != nil {
-				continue
-			}
+		component := ReleaseForDistribution(cfg.Distribution)
+		if version, err := checker.Latest(c.Request().Context(), component); err == nil {
 			response.Releases[component] = version
 		}
 		return c.JSON(http.StatusOK, response)

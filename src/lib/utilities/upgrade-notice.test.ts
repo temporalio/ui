@@ -15,66 +15,53 @@ describe('getUpgradeNotice', () => {
         latest: { cli: '1.9.1' },
       }),
     ).toEqual({
-      component: 'cli',
+      distribution: 'cli',
       current: '1.4.1',
       latest: '1.9.1',
       href: 'https://docs.temporal.io/cli#install',
     });
   });
 
-  it('ignores a newer server release for the CLI', () => {
+  it('ignores releases of other components', () => {
     expect(
       getUpgradeNotice({
         distribution: 'cli',
-        installed: { cli: '1.9.1', server: '1.28.0' },
-        latest: { cli: '1.9.1', server: '1.32.0' },
+        installed: { cli: '1.9.1', ui: '2.39.0', server: '1.28.0' },
+        latest: { cli: '1.9.1', ui: '2.54.1', server: '1.32.0' },
       }),
     ).toBeNull();
   });
 
-  it('recommends the UI image before the server image for docker', () => {
+  it('checks the UI image for docker', () => {
     expect(
       getUpgradeNotice({
         distribution: 'docker',
         installed: { ui: '2.39.0', server: '1.28.0' },
-        latest: { ui: '2.54.1', server: '1.32.0' },
-      })?.component,
-    ).toBe('ui');
-  });
-
-  it('recommends the server image when the docker UI image is current', () => {
-    expect(
-      getUpgradeNotice({
-        distribution: 'docker',
-        installed: { ui: '2.54.1', server: '1.28.0' },
-        latest: { ui: '2.54.1', server: '1.32.0' },
+        latest: { ui: '2.54.1' },
       }),
     ).toEqual({
-      component: 'server',
-      current: '1.28.0',
-      latest: '1.32.0',
-      href: 'https://hub.docker.com/r/temporalio/server',
+      distribution: 'docker',
+      current: '2.39.0',
+      latest: '2.54.1',
+      href: 'https://hub.docker.com/r/temporalio/ui',
     });
   });
 
-  it('recommends the helm chart before its images', () => {
+  it('checks only the chart for helm', () => {
     expect(
       getUpgradeNotice({
         distribution: 'helm',
-        installed: { helm: '1.5.0', ui: '2.39.0', server: '1.28.0' },
+        installed: { helm: '1.7.0', ui: '2.39.0', server: '1.28.0' },
         latest: { helm: '1.7.0', ui: '2.54.1', server: '1.32.0' },
-      })?.component,
-    ).toBe('helm');
-  });
-
-  it('checks images when the helm chart is current', () => {
+      }),
+    ).toBeNull();
     expect(
       getUpgradeNotice({
         distribution: 'helm',
-        installed: { helm: '1.7.0', ui: '2.39.0', server: '1.32.0' },
-        latest: { helm: '1.7.0', ui: '2.54.1', server: '1.32.0' },
-      })?.component,
-    ).toBe('ui');
+        installed: { helm: '1.5.0' },
+        latest: { helm: '1.7.0' },
+      })?.latest,
+    ).toBe('1.7.0');
   });
 
   it('links source builds to the server releases', () => {

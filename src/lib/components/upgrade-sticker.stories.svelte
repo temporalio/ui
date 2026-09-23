@@ -3,6 +3,7 @@
 
   import {
     getUpgradeNotice,
+    releaseForDistribution,
     UPGRADE_DISTRIBUTIONS,
     type UpgradeDistribution,
   } from '$lib/utilities/upgrade-notice';
@@ -15,13 +16,6 @@
     latest: string;
     navOpen: boolean;
   };
-
-  const DISTRIBUTION_COMPONENT = {
-    cli: 'cli',
-    docker: 'ui',
-    helm: 'helm',
-    server: 'server',
-  } as const;
 
   const { Story } = defineMeta({
     title: 'Upgrade Sticker',
@@ -43,7 +37,7 @@
 </script>
 
 {#snippet template({ distribution, current, latest, navOpen }: Args)}
-  {@const component = DISTRIBUTION_COMPONENT[distribution]}
+  {@const component = releaseForDistribution(distribution)}
   {@const notice = getUpgradeNotice({
     distribution,
     installed: { [component]: current },

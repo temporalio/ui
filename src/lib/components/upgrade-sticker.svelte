@@ -20,8 +20,8 @@
 
   const key = $derived(upgradeNoticeKey(notice));
   const dismissed = $derived($dismissedUpgradeNotices.includes(key));
-  const current = $derived(`${notice.component}@${notice.current}`);
-  const latest = $derived(`${notice.component}@${notice.latest}`);
+  const current = $derived(`${notice.distribution}@${notice.current}`);
+  const latest = $derived(`${notice.distribution}@${notice.latest}`);
   const label = $derived(
     translate('common.upgrade-notice-label', {
       current,

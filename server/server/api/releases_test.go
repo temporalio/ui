@@ -86,10 +86,11 @@ func TestReleaseCheckerCachesFailuresBriefly(t *testing.T) {
 	assert.Equal(t, int32(2), calls.Load())
 }
 
-func TestReleasesForDistribution(t *testing.T) {
-	assert.Equal(t, []string{ReleaseCLI}, ReleasesForDistribution("cli"))
-	assert.Equal(t, []string{ReleaseUI, ReleaseServer}, ReleasesForDistribution("docker"))
-	assert.Equal(t, []string{ReleaseHelm, ReleaseUI, ReleaseServer}, ReleasesForDistribution("helm"))
-	assert.Equal(t, []string{ReleaseServer}, ReleasesForDistribution(""))
-	assert.Equal(t, []string{ReleaseServer}, ReleasesForDistribution("nix"))
+func TestReleaseForDistribution(t *testing.T) {
+	assert.Equal(t, ReleaseCLI, ReleaseForDistribution("cli"))
+	assert.Equal(t, ReleaseUI, ReleaseForDistribution("docker"))
+	assert.Equal(t, ReleaseHelm, ReleaseForDistribution("helm"))
+	assert.Equal(t, ReleaseServer, ReleaseForDistribution("server"))
+	assert.Equal(t, ReleaseServer, ReleaseForDistribution(""))
+	assert.Equal(t, ReleaseServer, ReleaseForDistribution("nix"))
 }
