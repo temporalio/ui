@@ -2,7 +2,7 @@
   import type { PointerEventHandler } from 'svelte/elements';
 
   import { translate } from '$lib/i18n/translate';
-  import { IconArrowUp, IconClose, IconStar } from '$lib/io/icon';
+  import { IconArrowUp, IconClose } from '$lib/io/icon';
   import { dismissedUpgradeNotices } from '$lib/stores/upgrade-notice';
   import {
     type UpgradeNotice,
@@ -67,10 +67,7 @@
       <span class="foil">
         <span class="sheen" aria-hidden="true"></span>
         <span class="relative flex flex-col gap-2 px-3 py-2 font-mono">
-          <span class="flex items-center justify-between text-[11px]">
-            {current}
-            <IconStar width={14} height={14} />
-          </span>
+          <span class="text-[11px]">{current}</span>
           <span class="flex flex-col">
             <span class="text-[10px] font-bold uppercase tracking-widest">
               {translate('common.upgrade-to')}
@@ -82,11 +79,11 @@
     </a>
     <button
       type="button"
-      class="absolute right-0 top-1 flex size-6 items-center justify-center rounded-full border border-primary bg-surface-primary text-primary hover:bg-surface-secondary"
+      class="absolute -top-2 right-0 flex size-5 items-center justify-center rounded-full border border-primary bg-surface-primary text-primary shadow hover:bg-surface-secondary"
       aria-label={translate('common.dismiss-upgrade-notice')}
       onclick={dismiss}
     >
-      <IconClose width={12} height={12} />
+      <IconClose width={10} height={10} />
     </button>
   </div>
   <a
