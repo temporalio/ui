@@ -1,68 +1,118 @@
 import { describe, expect, it } from 'vitest';
 
-import { getUpgradeNotice, toUpgradeDistribution } from './upgrade-notice';
-
-const cluster = (current: string, recommended: string) => ({
-  serverVersion: current,
-  versionInfo: {
-    current: { version: current },
-    recommended: { version: recommended },
-  },
-});
+import {
+  getInstalledVersions,
+  getUpgradeNotice,
+  toUpgradeDistribution,
+} from './upgrade-notice';
 
 describe('getUpgradeNotice', () => {
-  it('returns a notice when the recommended version is newer', () => {
+  it('recommends a newer CLI release', () => {
     expect(
       getUpgradeNotice({
-        cluster: cluster('1.20.1', '1.21.0'),
-        notifyOnNewVersion: true,
-        distribution: 'docker',
+        distribution: 'cli',
+        installed: { cli: '1.4.1', server: '1.28.0' },
+        latest: { cli: '1.9.1' },
       }),
     ).toEqual({
-      distribution: 'docker',
-      current: '1.20.1',
-      latest: '1.21.0',
-      href: 'https://github.com/temporalio/docker-compose',
+      component: 'cli',
+      current: '1.4.1',
+      latest: '1.9.1',
+      href: 'https://docs.temporal.io/cli#install',
     });
   });
 
-  it('returns null when notifications are off', () => {
+  it('ignores a newer server release for the CLI', () => {
     expect(
       getUpgradeNotice({
-        cluster: cluster('1.20.1', '1.21.0'),
-        notifyOnNewVersion: false,
+        distribution: 'cli',
+        installed: { cli: '1.9.1', server: '1.28.0' },
+        latest: { cli: '1.9.1', server: '1.32.0' },
       }),
     ).toBeNull();
   });
 
-  it('returns null when the server is up to date', () => {
+  it('recommends the UI image before the server image for docker', () => {
     expect(
       getUpgradeNotice({
-        cluster: cluster('1.21.0', '1.21.0'),
-        notifyOnNewVersion: true,
+        distribution: 'docker',
+        installed: { ui: '2.39.0', server: '1.28.0' },
+        latest: { ui: '2.54.1', server: '1.32.0' },
+      })?.component,
+    ).toBe('ui');
+  });
+
+  it('recommends the server image when the docker UI image is current', () => {
+    expect(
+      getUpgradeNotice({
+        distribution: 'docker',
+        installed: { ui: '2.54.1', server: '1.28.0' },
+        latest: { ui: '2.54.1', server: '1.32.0' },
+      }),
+    ).toEqual({
+      component: 'server',
+      current: '1.28.0',
+      latest: '1.32.0',
+      href: 'https://hub.docker.com/r/temporalio/server',
+    });
+  });
+
+  it('recommends the helm chart before its images', () => {
+    expect(
+      getUpgradeNotice({
+        distribution: 'helm',
+        installed: { helm: '1.5.0', ui: '2.39.0', server: '1.28.0' },
+        latest: { helm: '1.7.0', ui: '2.54.1', server: '1.32.0' },
+      })?.component,
+    ).toBe('helm');
+  });
+
+  it('checks images when the helm chart is current', () => {
+    expect(
+      getUpgradeNotice({
+        distribution: 'helm',
+        installed: { helm: '1.7.0', ui: '2.39.0', server: '1.32.0' },
+        latest: { helm: '1.7.0', ui: '2.54.1', server: '1.32.0' },
+      })?.component,
+    ).toBe('ui');
+  });
+
+  it('links source builds to the server releases', () => {
+    expect(
+      getUpgradeNotice({
+        distribution: 'server',
+        installed: { server: '1.28.0' },
+        latest: { server: '1.32.0' },
+      })?.href,
+    ).toBe('https://github.com/temporalio/temporal/releases');
+  });
+
+  it('returns null without a latest release', () => {
+    expect(
+      getUpgradeNotice({
+        distribution: 'cli',
+        installed: { cli: '1.4.1' },
+        latest: {},
       }),
     ).toBeNull();
   });
+});
 
-  it('returns null without version info', () => {
+describe('getInstalledVersions', () => {
+  it('uses the distribution version only for its own distribution', () => {
     expect(
-      getUpgradeNotice({
-        cluster: { serverVersion: '1.20.1' },
-        notifyOnNewVersion: true,
+      getInstalledVersions({
+        distribution: 'cli',
+        distributionVersion: '1.4.1',
+        uiVersion: '2.39.0',
+        serverVersion: '1.28.0',
       }),
-    ).toBeNull();
-  });
-
-  it('falls back to the server version when current is missing', () => {
-    expect(
-      getUpgradeNotice({
-        cluster: {
-          serverVersion: '1.20.1',
-          versionInfo: { recommended: { version: '1.21.0' } },
-        },
-        notifyOnNewVersion: true,
-      })?.current,
-    ).toBe('1.20.1');
+    ).toEqual({
+      cli: '1.4.1',
+      helm: undefined,
+      ui: '2.39.0',
+      server: '1.28.0',
+    });
   });
 });
 

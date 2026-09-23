@@ -1,5 +1,3 @@
-import type { GetClusterInfoResponse } from '$lib/types';
-
 import { isVersionNewer } from './version-check';
 
 export const UPGRADE_DISTRIBUTIONS = [
@@ -11,50 +9,85 @@ export const UPGRADE_DISTRIBUTIONS = [
 
 export type UpgradeDistribution = (typeof UPGRADE_DISTRIBUTIONS)[number];
 
+export type ReleaseComponent = 'cli' | 'helm' | 'ui' | 'server';
+
+export type ComponentVersions = Partial<Record<ReleaseComponent, string>>;
+
 export type UpgradeNotice = {
-  distribution: UpgradeDistribution;
+  component: ReleaseComponent;
   current: string;
   latest: string;
   href: string;
 };
 
-const UPGRADE_LINKS: Record<UpgradeDistribution, string> = {
-  cli: 'https://docs.temporal.io/cli#install',
-  docker: 'https://github.com/temporalio/docker-compose',
-  helm: 'https://github.com/temporalio/helm-charts',
-  server: 'https://github.com/temporalio/temporal/releases',
+const DISTRIBUTION_RELEASES: Record<UpgradeDistribution, ReleaseComponent[]> = {
+  cli: ['cli'],
+  docker: ['ui', 'server'],
+  helm: ['helm', 'ui', 'server'],
+  server: ['server'],
 };
+
+const UPGRADE_LINKS: Record<ReleaseComponent, string> = {
+  cli: 'https://docs.temporal.io/cli#install',
+  helm: 'https://github.com/temporalio/helm-charts',
+  ui: 'https://hub.docker.com/r/temporalio/ui',
+  server: 'https://hub.docker.com/r/temporalio/server',
+};
+
+const SERVER_RELEASES_LINK = 'https://github.com/temporalio/temporal/releases';
 
 export const toUpgradeDistribution = (value?: string): UpgradeDistribution =>
   UPGRADE_DISTRIBUTIONS.find((distribution) => distribution === value) ??
   'server';
 
-export const upgradeNoticeKey = ({
+export const upgradeNoticeKey = ({ component, latest }: UpgradeNotice) =>
+  `${component}@${latest}`;
+
+export const getInstalledVersions = ({
   distribution,
-  latest,
-}: UpgradeNotice): string => `${distribution}@${latest}`;
+  distributionVersion,
+  uiVersion,
+  serverVersion,
+}: {
+  distribution: UpgradeDistribution;
+  distributionVersion?: string;
+  uiVersion?: string;
+  serverVersion?: string;
+}): ComponentVersions => ({
+  cli: distribution === 'cli' ? distributionVersion : undefined,
+  helm: distribution === 'helm' ? distributionVersion : undefined,
+  ui: uiVersion,
+  server: serverVersion,
+});
+
+const upgradeLink = (
+  component: ReleaseComponent,
+  distribution: UpgradeDistribution,
+) =>
+  component === 'server' && distribution === 'server'
+    ? SERVER_RELEASES_LINK
+    : UPGRADE_LINKS[component];
 
 export const getUpgradeNotice = ({
-  cluster,
-  notifyOnNewVersion,
   distribution,
+  installed,
+  latest,
 }: {
-  cluster: GetClusterInfoResponse | undefined;
-  notifyOnNewVersion: boolean;
-  distribution?: string;
+  distribution: UpgradeDistribution;
+  installed: ComponentVersions;
+  latest: ComponentVersions;
 }): UpgradeNotice | null => {
-  if (!notifyOnNewVersion) return null;
-
-  const current =
-    cluster?.versionInfo?.current?.version || cluster?.serverVersion;
-  const latest = cluster?.versionInfo?.recommended?.version;
-  if (!current || !latest || !isVersionNewer(latest, current)) return null;
-
-  const upgradeDistribution = toUpgradeDistribution(distribution);
-  return {
-    distribution: upgradeDistribution,
-    current,
-    latest,
-    href: UPGRADE_LINKS[upgradeDistribution],
-  };
+  for (const component of DISTRIBUTION_RELEASES[distribution]) {
+    const current = installed[component];
+    const latestVersion = latest[component];
+    if (current && latestVersion && isVersionNewer(latestVersion, current)) {
+      return {
+        component,
+        current,
+        latest: latestVersion,
+        href: upgradeLink(component, distribution),
+      };
+    }
+  }
+  return null;
 };

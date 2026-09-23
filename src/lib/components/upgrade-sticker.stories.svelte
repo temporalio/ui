@@ -16,13 +16,20 @@
     navOpen: boolean;
   };
 
+  const DISTRIBUTION_COMPONENT = {
+    cli: 'cli',
+    docker: 'ui',
+    helm: 'helm',
+    server: 'server',
+  } as const;
+
   const { Story } = defineMeta({
     title: 'Upgrade Sticker',
     component: UpgradeSticker,
     args: {
       distribution: 'cli',
-      current: '1.20.1',
-      latest: '1.21.1',
+      current: '1.4.1',
+      latest: '1.9.1',
       navOpen: true,
     },
     argTypes: {
@@ -36,15 +43,11 @@
 </script>
 
 {#snippet template({ distribution, current, latest, navOpen }: Args)}
+  {@const component = DISTRIBUTION_COMPONENT[distribution]}
   {@const notice = getUpgradeNotice({
-    cluster: {
-      versionInfo: {
-        current: { version: current },
-        recommended: { version: latest },
-      },
-    },
-    notifyOnNewVersion: true,
     distribution,
+    installed: { [component]: current },
+    latest: { [component]: latest },
   })}
   <div
     class="group flex h-80 flex-col justify-end border-r border-primary bg-surface-primary px-2 py-4"
@@ -60,10 +63,19 @@
 
 <Story name="CLI" />
 
-<Story name="Docker" args={{ distribution: 'docker', latest: '1.21.0' }} />
+<Story
+  name="Docker"
+  args={{ distribution: 'docker', current: '2.39.0', latest: '2.54.1' }}
+/>
 
-<Story name="Helm" args={{ distribution: 'helm', latest: '1.21.0' }} />
+<Story
+  name="Helm"
+  args={{ distribution: 'helm', current: '1.5.0', latest: '1.7.0' }}
+/>
 
-<Story name="Server" args={{ distribution: 'server', latest: '1.21.0' }} />
+<Story
+  name="Server"
+  args={{ distribution: 'server', current: '1.28.0', latest: '1.32.0' }}
+/>
 
 <Story name="Collapsed Nav" args={{ navOpen: false }} />

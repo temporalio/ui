@@ -412,6 +412,7 @@ export type SettingsResponse = {
   DisableNewsFetch: boolean;
   NotifyOnNewVersion?: boolean;
   Distribution?: string;
+  DistributionVersion?: string;
   SupportURL?: string;
   Version: string;
 };

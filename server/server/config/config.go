@@ -48,6 +48,8 @@ type (
 		NotifyOnNewVersion  bool   `yaml:"notifyOnNewVersion"`
 		// How this server was installed: cli, docker, helm, or server
 		Distribution string `yaml:"distribution"`
+		// Version of the distribution, such as the CLI or Helm chart version
+		DistributionVersion string `yaml:"distributionVersion"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
 		// Collapse the left navigation and saved views navigation by default

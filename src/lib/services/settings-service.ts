@@ -174,6 +174,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     disableNewsFetch: !!settingsResponse?.DisableNewsFetch,
     notifyOnNewVersion: !!settingsResponse?.NotifyOnNewVersion,
     distribution: settingsResponse?.Distribution,
+    distributionVersion: settingsResponse?.DistributionVersion,
     supportURL: settingsResponse?.SupportURL,
     runtimeEnvironment: {
       get isCloud() {

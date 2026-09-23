@@ -147,6 +147,7 @@ export type Settings = {
   disableNewsFetch: boolean;
   notifyOnNewVersion: boolean;
   distribution?: string;
+  distributionVersion?: string;
   supportURL?: string;
   runtimeEnvironment: {
     isCloud: boolean;

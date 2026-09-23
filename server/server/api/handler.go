@@ -68,6 +68,7 @@ type SettingsResponse struct {
 	DisableNewsFetch              bool
 	NotifyOnNewVersion            bool
 	Distribution                  string
+	DistributionVersion           string
 	Codec                         *CodecResponse
 	CustomUI                      *CustomUISettingsResponse
 	Version                       string
@@ -291,6 +292,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			DisableNewsFetch:            cfg.DisableNewsFetch,
 			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
 			Distribution:                cfg.Distribution,
+			DistributionVersion:         cfg.DistributionVersion,
 			Codec: &CodecResponse{
 				Endpoint:            cfg.Codec.Endpoint,
 				PassAccessToken:     cfg.Codec.PassAccessToken,
