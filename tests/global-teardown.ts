@@ -16,7 +16,7 @@ export default async function (config: FullConfig) {
     await stopWorker();
     await disconnect();
     await codecServer.stop();
-    await uiServer.shutdown();
+    await uiServer?.shutdown();
     await temporal.shutdown();
   }
 }
