@@ -55,9 +55,15 @@
     class:w-12={!navOpen}
     data-nav={navOpen ? 'open' : 'closed'}
   >
-    {#if notice}
-      <UpgradeSticker {notice} />
-    {/if}
+    <div class="relative">
+      <p class="flex h-10 items-center px-2 group-data-[nav=closed]:hidden">
+        Feedback
+      </p>
+      <p class="py-3 text-center text-[0.6rem] text-secondary">2.54.1</p>
+      {#if notice}
+        <UpgradeSticker {notice} />
+      {/if}
+    </div>
   </div>
 {/snippet}
 

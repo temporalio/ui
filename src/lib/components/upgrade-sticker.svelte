@@ -51,7 +51,7 @@
 </script>
 
 {#if !dismissed}
-  <div class="relative group-data-[nav=closed]:hidden">
+  <div class="absolute inset-x-0 bottom-0 z-10 group-data-[nav=closed]:hidden">
     <a
       class="sticker"
       href={notice.href}
@@ -90,7 +90,7 @@
     </button>
   </div>
   <a
-    class="badge hidden group-data-[nav=closed]:flex"
+    class="badge hidden group-data-[nav=closed]:block"
     href={notice.href}
     target="_blank"
     rel="noopener noreferrer"
@@ -119,15 +119,19 @@
 
   .sticker {
     display: block;
-    margin: 0.75rem 0.5rem 0.25rem;
+    margin: 0 0.25rem 0.25rem;
     border-radius: 14px;
     transition: transform 140ms ease-out;
   }
 
   .badge {
+    position: absolute;
+    bottom: 0.25rem;
+    left: 50%;
+    z-index: 10;
     width: 2rem;
     height: 2rem;
-    margin: 0.5rem auto 0;
+    margin-left: -1rem;
     padding: 3px;
     border-radius: 9999px;
     transform: rotate(-6deg);
