@@ -10,9 +10,9 @@ export type UIServer = {
 
 export type ValidEnv = 'development' | 'e2e' | 'with-auth';
 
-let uiServer: UIServer;
+let uiServer: UIServer | undefined;
 
-export const getUIServer = (): UIServer => {
+export const getUIServer = (): UIServer | undefined => {
   return uiServer;
 };
 
