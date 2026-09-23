@@ -39,6 +39,8 @@
   let hovering = $state(false);
   let peeled = $state(false);
   let revealing = false;
+  const FLAT = { rx: 0, ry: 0, x: 30, y: 40 };
+  let tilt = $state(FLAT);
   let drag: { origin: Point; start: Point; moved: number } | null = null;
   let frame = 0;
 
@@ -59,6 +61,18 @@
   const peel = $derived(computePeel(width, height, corner, position));
   const progress = $derived(peelProgress(width, height, corner, position));
   const flapOpacity = $derived(Math.min(1, Math.max(0, (1 - progress) / 0.3)));
+
+  const transform = $derived(
+    `perspective(520px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+  );
+
+  const tiltToward = (event: PointerEvent) => {
+    if (!sticker || prefersReducedMotion.current) return;
+    const rect = sticker.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+    tilt = { rx: (0.5 - y) * 18, ry: (x - 0.5) * 22, x: x * 100, y: y * 100 };
+  };
 
   const toLocal = (event: PointerEvent): Point => {
     if (!sticker) return { x: 0, y: 0 };
@@ -113,11 +127,15 @@
     if (peeled || revealing) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     cancelAnimationFrame(frame);
+    tilt = FLAT;
     drag = { origin: toLocal(event), start: position, moved: 0 };
   };
 
   const moveDrag: PointerEventHandler<HTMLDivElement> = (event) => {
-    if (!drag) return;
+    if (!drag) {
+      tiltToward(event);
+      return;
+    }
     const local = toLocal(event);
     const dx = local.x - drag.origin.x;
     const dy = local.y - drag.origin.y;
@@ -150,6 +168,7 @@
   };
 
   const setHovering = (value: boolean) => {
+    if (!value) tilt = FLAT;
     if (peeled || revealing) return;
     pointer = position;
     hovering = value;
@@ -179,55 +198,70 @@
       onpointerenter={() => setHovering(true)}
       onpointerleave={() => setHovering(false)}
     >
-      <a
-        bind:this={link}
-        class="reveal font-mono"
-        href={notice.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={label}
-        inert={!peeled}
+      <div
+        class="surface"
+        style:transform
+        style:--holo-x="{tilt.x}%"
+        style:--holo-y="{tilt.y}%"
       >
-        <span class="text-[10px] font-bold uppercase tracking-widest">
-          {translate('common.upgrade-new-version')}
-        </span>
-        <span class="reveal-version">{latest}</span>
-        <span class="flex items-center gap-1 text-[11px] font-medium">
-          {translate('common.upgrade-view-release')}
-          <IconArrowUpRight width={12} height={12} />
-        </span>
-      </a>
-      {#if !peeled}
-        <button
-          type="button"
-          class="front"
-          style:clip-path={toClipPath(peel.front)}
-          aria-label={translate('common.upgrade-reveal-label', { current })}
-          onclick={revealFromKeyboard}
+        <a
+          bind:this={link}
+          class="reveal font-mono"
+          href={notice.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          inert={!peeled}
         >
-          <span class="foil">
-            <span class="sheen" aria-hidden="true"></span>
-            <span
-              class="relative flex h-full flex-col gap-1 px-3 py-2 font-mono"
-            >
-              <span class="text-[11px]">{current}</span>
-              <span class="text-[14px] font-extrabold">
-                {translate('common.upgrade-ready')}
-              </span>
-              <span class="text-[10px] font-bold uppercase tracking-widest">
-                {translate('common.upgrade-available')}
+          <span class="text-[10px] font-bold uppercase tracking-widest">
+            {translate('common.upgrade-new-version')}
+          </span>
+          <span class="reveal-version">{latest}</span>
+          <span class="flex items-center gap-1 text-[11px] font-medium">
+            {translate('common.upgrade-view-release')}
+            <IconArrowUpRight width={12} height={12} />
+          </span>
+        </a>
+        {#if !peeled}
+          <button
+            type="button"
+            class="front"
+            style:clip-path={toClipPath(peel.front)}
+            aria-label={translate('common.upgrade-reveal-label', { current })}
+            onclick={revealFromKeyboard}
+          >
+            <span class="foil">
+              <span class="sheen" aria-hidden="true"></span>
+              <span
+                class="relative flex h-full flex-col justify-between px-3 py-2 font-mono"
+              >
+                <span class="text-[11px]">{current}</span>
+                <span class="flex flex-col">
+                  <span class="text-[14px] font-extrabold leading-tight">
+                    {translate('common.upgrade-ready')}
+                  </span>
+                  <span
+                    class="text-[10px] font-bold uppercase leading-tight tracking-widest"
+                  >
+                    {translate('common.upgrade-available')}
+                  </span>
+                </span>
               </span>
             </span>
-          </span>
-        </button>
-        <div class="flap-shadow" style:opacity={flapOpacity} aria-hidden="true">
+          </button>
           <div
-            class="flap"
-            style:clip-path={toClipPath(peel.flap)}
-            style:transform={toMatrix(peel.matrix)}
-          ></div>
-        </div>
-      {/if}
+            class="flap-shadow"
+            style:opacity={flapOpacity}
+            aria-hidden="true"
+          >
+            <div
+              class="flap"
+              style:clip-path={toClipPath(peel.flap)}
+              style:transform={toMatrix(peel.matrix)}
+            ></div>
+          </div>
+        {/if}
+      </div>
     </div>
     <button
       type="button"
@@ -275,6 +309,18 @@
     height: 5.5rem;
     margin: 0 0.25rem 0.25rem;
     transform: rotate(-2deg);
+  }
+
+  .sticker::before {
+    position: absolute;
+    inset: -8px;
+    content: '';
+  }
+
+  .surface {
+    position: absolute;
+    inset: 0;
+    transition: transform 140ms ease-out;
   }
 
   .reveal,
@@ -389,7 +435,7 @@
       #bccfff 81%,
       #e2c2ff 100%
     );
-    background-position: 30% 40%;
+    background-position: var(--holo-x, 30%) var(--holo-y, 40%);
     background-size: 240% 240%;
   }
 
@@ -471,6 +517,10 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .surface {
+      transition: none;
+    }
+
     .sheen {
       animation: none;
     }
