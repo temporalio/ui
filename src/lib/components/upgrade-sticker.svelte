@@ -98,8 +98,8 @@
       <span class="sheen" aria-hidden="true"></span>
       <svg
         class="arrow"
-        width="18"
-        height="18"
+        width="14"
+        height="14"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -139,10 +139,10 @@
     bottom: 0.25rem;
     left: 50%;
     z-index: 10;
-    width: 2.25rem;
-    height: 2.25rem;
-    margin-left: -1.125rem;
-    padding: 3px;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-left: -0.875rem;
+    padding: 2px;
     border-radius: 9999px;
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 70%),
