@@ -2,7 +2,7 @@
   import type { PointerEventHandler } from 'svelte/elements';
 
   import { translate } from '$lib/i18n/translate';
-  import { IconArrowUp, IconClose } from '$lib/io/icon';
+  import { IconClose } from '$lib/io/icon';
   import { dismissedUpgradeNotices } from '$lib/stores/upgrade-notice';
   import {
     type UpgradeNotice,
@@ -94,11 +94,22 @@
     aria-label={label}
     title={label}
   >
-    <span class="foil flex size-full items-center justify-center rounded-full">
+    <span class="foil">
       <span class="sheen" aria-hidden="true"></span>
-      <span class="relative flex">
-        <IconArrowUp width={16} height={16} />
-      </span>
+      <svg
+        class="arrow"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 19V5M5 12l7-7 7 7" />
+      </svg>
     </span>
   </a>
 {/if}
@@ -128,12 +139,42 @@
     bottom: 0.25rem;
     left: 50%;
     z-index: 10;
-    width: 2rem;
-    height: 2rem;
-    margin-left: -1rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-left: -1.125rem;
     padding: 3px;
     border-radius: 9999px;
-    transform: rotate(-6deg);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 70%),
+      0 6px 14px rgb(0 0 0 / 35%);
+  }
+
+  .badge .foil {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: linear-gradient(
+      115deg,
+      #e2c2ff 0%,
+      #bccfff 20%,
+      #fff1b3 45%,
+      #cffbd2 65%,
+      #bfeaff 85%,
+      #e2c2ff 100%
+    );
+  }
+
+  .badge .foil::before,
+  .badge .foil::after {
+    display: none;
+  }
+
+  .arrow {
+    position: relative;
+    z-index: 2;
   }
 
   .foil {
