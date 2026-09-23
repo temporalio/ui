@@ -96,7 +96,9 @@
   >
     <span class="foil flex size-full items-center justify-center rounded-full">
       <span class="sheen" aria-hidden="true"></span>
-      <IconArrowUp class="relative" width={16} height={16} />
+      <span class="relative flex">
+        <IconArrowUp width={16} height={16} />
+      </span>
     </span>
   </a>
 {/if}
