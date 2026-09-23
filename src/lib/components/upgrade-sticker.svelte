@@ -107,7 +107,6 @@
 <style>
   .sticker,
   .badge {
-    display: block;
     padding: 4px;
     background: #f7f4ff;
     box-shadow:
@@ -119,6 +118,7 @@
   }
 
   .sticker {
+    display: block;
     margin: 0.75rem 0.5rem 0.25rem;
     border-radius: 14px;
     transition: transform 140ms ease-out;
