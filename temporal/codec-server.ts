@@ -101,11 +101,7 @@ export async function createCodecServer(
   const start = () =>
     new Promise<Server>((resolve, reject) => {
       const startedServer = app.listen(port, () => {
-        // server = app.listen(port, () => {
         console.log(`✨ codec server listening on http://127.0.0.1:${port}`);
-        // server.on('error', (error) => {
-        //   reject(error);
-        // });
         resolve(startedServer);
       });
 
