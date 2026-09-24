@@ -28,20 +28,23 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
-  import ComputeBadge from './compute-badge.svelte';
   import DeleteDeploymentModal from './delete-deployment-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
+  import VersionRegions from './version-regions.svelte';
 
   interface Props {
     deployment: ListWorkerDeployment;
     columns: ConfigurableTableHeader[];
     showConnectionStatus?: boolean;
+    /** Regions the namespace runs in, primary first. */
+    namespaceRegions?: readonly string[];
     onChange?: () => void;
   }
   let {
     deployment,
     columns,
     showConnectionStatus = true,
+    namespaceRegions,
     onChange,
   }: Props = $props();
 
@@ -137,21 +140,19 @@
     {:else if label === 'Current Version'}
       <td class={twMerge('py-1 text-left', clampToWidth)} style={widthStyle}>
         {#if currentBuildId}
-          <div class="flex items-center gap-2">
-            <Link
-              href={routeForWorkflowsWithQuery({
-                namespace: page.params.namespace,
-                query: `TemporalWorkerDeploymentVersion="${deployment.name}:${currentBuildId}"`,
-              }) ?? ''}
-            >
-              {currentBuildId}
-            </Link>
+          {@const href =
+            routeForWorkflowsWithQuery({
+              namespace: page.params.namespace,
+              query: `TemporalWorkerDeploymentVersion="${deployment.name}:${currentBuildId}"`,
+            }) ?? ''}
+          <div class="flex flex-wrap items-center gap-2">
+            <Link {href}>{currentBuildId}</Link>
             {#if currentComputeProviderType}
-              <ComputeBadge
-                type={currentComputeProviderType}
-                computeStatus={showConnectionStatus
-                  ? deployment.currentVersionSummary?.computeStatus
-                  : undefined}
+              <VersionRegions
+                computeConfig={deployment.currentVersionSummary?.computeConfig}
+                {namespaceRegions}
+                computeStatus={deployment.currentVersionSummary?.computeStatus}
+                {showConnectionStatus}
               />
             {/if}
           </div>
@@ -170,15 +171,13 @@
             {translate('deployments.same-as-current')}
           </span>
         {:else if latestBuildId}
-          <div class="flex items-center gap-2">
-            <Link
-              href={routeForWorkflowsWithQuery({
-                namespace: page.params.namespace,
-                query: `TemporalWorkerDeploymentVersion="${deployment.name}:${latestBuildId}"`,
-              }) ?? ''}
-            >
-              {latestBuildId}
-            </Link>
+          {@const href =
+            routeForWorkflowsWithQuery({
+              namespace: page.params.namespace,
+              query: `TemporalWorkerDeploymentVersion="${deployment.name}:${latestBuildId}"`,
+            }) ?? ''}
+          <div class="flex flex-wrap items-center gap-2">
+            <Link {href}>{latestBuildId}</Link>
             {#if latestVersionStatus}
               <DeploymentStatus
                 status={latestVersionStatus.status}
@@ -186,7 +185,10 @@
               />
             {/if}
             {#if latestComputeProviderType}
-              <ComputeBadge type={latestComputeProviderType} />
+              <VersionRegions
+                computeConfig={deployment.latestVersionSummary?.computeConfig}
+                {namespaceRegions}
+              />
             {/if}
           </div>
         {:else}

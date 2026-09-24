@@ -288,7 +288,7 @@
   }
 
   .hint-text {
-    @apply text-xs text-tertiary;
+    @apply text-xs text-secondary;
 
     &.error,
     &.invalid {

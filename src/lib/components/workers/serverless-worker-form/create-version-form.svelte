@@ -9,7 +9,13 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { VersionSummary } from '$lib/types/deployments';
+  import { shortRegion } from '$lib/utilities/compute-regions';
 
+  import {
+    type ComputeRegion,
+    lambdaArnPlaceholderFor,
+    regionPreview,
+  } from './multi-region';
   import {
     type ComputeProviderOption,
     type CreateVersionFormData,
@@ -20,8 +26,12 @@
 
   import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
+  import ComputeProviderPerRegion from './compute-provider-per-region.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
+  import FailoverPreview from './failover-preview.svelte';
   import RecentVersions from './recent-versions.svelte';
+  import RegionBlock from './region-block.svelte';
+  import RegionsHeading from './regions-heading.svelte';
 
   interface Props {
     onSubmit: (data: CreateVersionFormData) => Promise<void>;
@@ -33,6 +43,15 @@
     gcpRegions?: string[];
     terraformTemplate?: string;
     cloudRunTerraformTemplate?: string;
+    /**
+     * Regions this namespace runs in. When more than one is provided (a highly
+     * available namespace), the form collects a compute provider per region.
+     */
+    regions?: readonly ComputeRegion[];
+    /** Namespace name, shown in the multi-region heading. */
+    namespace?: string;
+    /** The Worker Deployment this version belongs to, shown in the preview. */
+    deploymentName?: string;
   }
 
   let {
@@ -45,7 +64,12 @@
     gcpRegions,
     terraformTemplate,
     cloudRunTerraformTemplate,
+    regions,
+    namespace = '',
+    deploymentName,
   }: Props = $props();
+
+  const isMultiRegion = $derived(!!regions && regions.length > 1);
 
   const superform = superForm(
     {
@@ -87,7 +111,7 @@
   const { form, errors, enhance, submitting } = superform;
 </script>
 
-<div class="flex flex-col gap-6">
+<div class="relative flex max-w-[45rem] flex-col gap-6">
   {#if error}
     <Alert intent="error" title={translate('common.error-occurred')}
       >{error}</Alert
@@ -122,36 +146,63 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker
-        bind:provider={$form.provider}
-        providers={computeProviders}
-      >
-        <CloudRunLatencyNotice provider={$form.provider} />
-        <ComputeFields
-          provider={$form.provider}
-          bind:lambdaArn={$form.lambdaArn}
-          bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
-          bind:iamRoleArn={$form.iamRoleArn}
-          bind:roleExternalId={$form.roleExternalId}
-          bind:gcpProject={$form.gcpProject}
-          bind:gcpRegion={$form.gcpRegion}
-          {gcpRegions}
-          bind:gcpWorkerPool={$form.gcpWorkerPool}
-          bind:gcpServiceAccount={$form.gcpServiceAccount}
-          bind:minReplicas={$form.minReplicas}
-          bind:maxReplicas={$form.maxReplicas}
-          bind:initialReplicas={$form.initialReplicas}
-          bind:utilizationTarget={$form.utilizationTarget}
-          bind:scaleDownStabilization={$form.scaleDownStabilization}
-          bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
-          bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
-          bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-          bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-          {terraformTemplate}
-          {cloudRunTerraformTemplate}
-          errors={$errors}
+      {#if isMultiRegion && regions}
+        <ComputeProviderPerRegion
+          {namespace}
+          {regions}
+          {computeProviders}
+          {deploymentName}
+          buildId={$form.buildId}
         />
-      </ComputeProviderPicker>
+      {:else}
+        <ComputeProviderPicker
+          layout="summary"
+          bind:provider={$form.provider}
+          providers={computeProviders}
+        />
+        <hr class="my-5 border-primary" />
+        {#if regions?.[0]}
+          <RegionsHeading {namespace} {regions} />
+          <FailoverPreview
+            {namespace}
+            provider={$form.provider}
+            regions={[regionPreview(regions[0], $form.provider, $form)]}
+            {deploymentName}
+            buildId={$form.buildId}
+          />
+        {/if}
+        <CloudRunLatencyNotice provider={$form.provider} class="mb-4" />
+        <RegionBlock region={regions?.[0]}>
+          <ComputeFields
+            provider={$form.provider}
+            leadingDivider={false}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+              regions?.[0] && shortRegion(regions[0].id),
+            )}
+            bind:lambdaArn={$form.lambdaArn}
+            bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
+            bind:iamRoleArn={$form.iamRoleArn}
+            bind:roleExternalId={$form.roleExternalId}
+            bind:gcpProject={$form.gcpProject}
+            bind:gcpRegion={$form.gcpRegion}
+            {gcpRegions}
+            bind:gcpWorkerPool={$form.gcpWorkerPool}
+            bind:gcpServiceAccount={$form.gcpServiceAccount}
+            bind:minReplicas={$form.minReplicas}
+            bind:maxReplicas={$form.maxReplicas}
+            bind:initialReplicas={$form.initialReplicas}
+            bind:utilizationTarget={$form.utilizationTarget}
+            bind:scaleDownStabilization={$form.scaleDownStabilization}
+            bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
+            bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
+            bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
+            bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+            {terraformTemplate}
+            {cloudRunTerraformTemplate}
+            errors={$errors}
+          />
+        </RegionBlock>
+      {/if}
     </Card>
 
     <div class="flex gap-4">
