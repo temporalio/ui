@@ -200,6 +200,7 @@ export const Strings = {
     'Wait this long after demand ends before scaling down. 0 = no wait. Default: 90s.',
   'compute-provider': 'Compute Provider',
   'provider-change': 'Change',
+  'provider-also-supports': 'Also supports {{providers}}',
   'compute-provider-description':
     'Select how your worker activities will be executed.',
   'provider-lambda': 'AWS Lambda',

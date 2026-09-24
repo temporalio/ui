@@ -11,6 +11,7 @@
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioControl from '$lib/holocene/radio-input/radio-control.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
+  import { formatList } from '$lib/i18n/format-list';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
   import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
@@ -108,6 +109,13 @@
     resolvedProviders.filter((option) => !option.hidden),
   );
 
+  /** Summary layout: the other providers Change offers, for the footer. */
+  const otherProviders = $derived(
+    visibleProviders.filter(
+      (option) => option.value !== provider && !option.disabled,
+    ),
+  );
+
   const providerStore = writable(provider);
 
   $effect(() => {
@@ -153,17 +161,42 @@
     (option) => option.value === provider,
   )}
   {#if !changing && selected}
-    <div class="flex items-center gap-3 rounded-lg border border-primary p-4">
-      {@render providerRow(selected)}
-      {#if visibleProviders.length > 1}
-        <Button
-          variant="tertiary"
-          size="sm"
-          class="shrink-0"
-          onclick={() => (changing = true)}
-        >
-          {translate('workers.provider-change')}
-        </Button>
+    <div class="overflow-hidden rounded-lg border border-primary">
+      <div class="flex items-center gap-3 p-4">
+        {@render providerRow(selected)}
+        {#if visibleProviders.length > 1}
+          <Button
+            variant="tertiary"
+            size="sm"
+            class="shrink-0"
+            onclick={() => (changing = true)}
+          >
+            {translate('workers.provider-change')}
+          </Button>
+        {/if}
+      </div>
+      {#if otherProviders.length}
+        <hr class="mx-4 border-primary" />
+        <div class="flex items-center gap-2 px-4 py-3">
+          <span class="flex shrink-0 items-center">
+            {#each otherProviders as option, index (option.value)}
+              {@const ProviderIcon = providerIcon[option.value]}
+              <span
+                class="flex h-5 w-5 items-center justify-center rounded border border-primary bg-surface-primary"
+                class:-ml-2={index > 0}
+              >
+                <ProviderIcon width={16} height={16} />
+              </span>
+            {/each}
+          </span>
+          <p class="text-xs text-secondary">
+            {translate('workers.provider-also-supports', {
+              providers: formatList(
+                otherProviders.map((option) => providerLabel(option.value)),
+              ),
+            })}
+          </p>
+        </div>
       {/if}
     </div>
   {:else}
