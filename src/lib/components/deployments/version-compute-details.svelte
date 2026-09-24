@@ -8,177 +8,212 @@
     decodeScalerDetails,
   } from '$lib/services/deployments-service';
   import type { ComputeConfig } from '$lib/types/deployments';
+  import {
+    formatDurationMs,
+    getScalingGroups,
+    isMultiRegionConfig,
+    shortRegion,
+  } from '$lib/utilities/compute-regions';
 
   let { computeConfig }: { computeConfig: ComputeConfig | undefined } =
     $props();
 
-  const lambdaDetails = $derived(decodeLambdaProviderDetails(computeConfig));
-  const agentCoreDetails = $derived(
-    decodeAgentCoreProviderDetails(computeConfig),
+  /** Header cell of the parent table's Region column, when there is one. */
+  const REGION_HEADER = 'thead th:nth-child(3)';
+
+  let table = $state<HTMLTableElement>();
+  /**
+   * Width of the label column, so the first Region's values start where the
+   * parent table's Region header text starts. Falls back to 12rem.
+   */
+  let labelWidth = $state<number>();
+
+  $effect(() => {
+    if (!table) return;
+    const own = table;
+    const header = own.parentElement
+      ?.closest('table')
+      ?.querySelector<HTMLElement>(REGION_HEADER);
+    if (!header) return;
+    const measure = () => {
+      const padding = parseFloat(getComputedStyle(header).paddingLeft) || 0;
+      labelWidth =
+        header.getBoundingClientRect().left +
+        padding -
+        own.getBoundingClientRect().left;
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    observer.observe(own);
+    return () => observer.disconnect();
+  });
+
+  /**
+   * Every field (resource, access, scaling) is per scaling group. Decode one
+   * group at a time so a multi-region version shows every group, not just the
+   * first.
+   */
+  const perGroup = $derived(
+    getScalingGroups(computeConfig).map(
+      ({ name, regionId, providerType, group }) => {
+        const single: ComputeConfig = { scalingGroups: { [name]: group } };
+        const lambda = decodeLambdaProviderDetails(single);
+        const agentCore = decodeAgentCoreProviderDetails(single);
+        return {
+          name,
+          regionId,
+          providerType,
+          lambda,
+          agentCore,
+          gcp: decodeGcpCloudRunProviderDetails(single),
+          scaler: decodeScalerDetails(single),
+          // Lambda and AgentCore share the assumed-role fields; only one decodes.
+          iamRoleArn: lambda.iamRoleArn ?? agentCore.iamRoleArn,
+          roleExternalId: lambda.roleExternalId ?? agentCore.roleExternalId,
+        };
+      },
+    ),
   );
-  const gcpDetails = $derived(decodeGcpCloudRunProviderDetails(computeConfig));
-  const scalerParams = $derived(decodeScalerDetails(computeConfig));
-  // Lambda and AgentCore share the assumed-role fields; only one decodes.
-  const iamRoleArn = $derived(
-    lambdaDetails.iamRoleArn ?? agentCoreDetails.iamRoleArn,
-  );
-  const roleExternalId = $derived(
-    lambdaDetails.roleExternalId ?? agentCoreDetails.roleExternalId,
-  );
+
+  const isMultiRegion = $derived(isMultiRegionConfig(computeConfig));
+
   const isCompute = $derived(
-    !!lambdaDetails.lambdaArn ||
-      !!agentCoreDetails.agentCoreEndpointArn ||
-      !!gcpDetails.gcpWorkerPool,
+    perGroup.some(
+      (r) =>
+        !!r.lambda.lambdaArn ||
+        !!r.agentCore.agentCoreEndpointArn ||
+        !!r.gcp.gcpWorkerPool,
+    ),
   );
-  const hasScalerParams = $derived(
-    scalerParams.scaleUpCooloffMs !== undefined ||
-      scalerParams.scaleUpBacklogThreshold !== undefined ||
-      scalerParams.maxWorkerLifetimeMs !== undefined ||
-      scalerParams.metricsPollIntervalMs !== undefined,
-  );
+
+  type Cell = { text: string; full?: string };
+  type Row = { label: string; cells: (Cell | undefined)[] };
+
+  const resource = (full: string | undefined): Cell | undefined =>
+    full ? { text: full, full } : undefined;
+  const plain = (text: string | undefined): Cell | undefined =>
+    text ? { text } : undefined;
+  const duration = (ms: number | undefined): Cell | undefined =>
+    ms === undefined ? undefined : { text: formatDurationMs(ms) };
+
+  /** One row per setting, one cell per scaling group; empty rows are dropped. */
+  const rows = $derived.by((): Row[] => {
+    const row = (
+      label: string,
+      cell: (group: (typeof perGroup)[number]) => Cell | undefined,
+    ): Row => ({ label, cells: perGroup.map(cell) });
+    return [
+      row(translate('workers.preview-resource-lambda'), (g) =>
+        resource(g.lambda.lambdaArn),
+      ),
+      row(translate('workers.preview-resource-agentcore'), (g) =>
+        resource(g.agentCore.agentCoreEndpointArn),
+      ),
+      row(translate('workers.gcp-worker-pool-label'), (g) =>
+        resource(g.gcp.gcpWorkerPool),
+      ),
+      row(translate('workers.gcp-project-label'), (g) =>
+        plain(g.gcp.gcpProject),
+      ),
+      row(translate('workers.gcp-region-label'), (g) => plain(g.gcp.gcpRegion)),
+      row(translate('workers.preview-access-aws'), (g) =>
+        resource(g.iamRoleArn),
+      ),
+      row(translate('workers.gcp-service-account-label'), (g) =>
+        resource(g.gcp.gcpServiceAccount),
+      ),
+      row(translate('deployments.role-external-id'), (g) =>
+        g.roleExternalId
+          ? { text: g.roleExternalId, full: g.roleExternalId }
+          : undefined,
+      ),
+      row(translate('deployments.scale-up-cooloff'), (g) =>
+        duration(g.scaler.scaleUpCooloffMs),
+      ),
+      row(translate('deployments.backlog-threshold'), (g) =>
+        g.scaler.scaleUpBacklogThreshold === undefined
+          ? undefined
+          : { text: `${g.scaler.scaleUpBacklogThreshold}` },
+      ),
+      row(translate('deployments.max-worker-lifetime'), (g) =>
+        duration(g.scaler.maxWorkerLifetimeMs),
+      ),
+      row(translate('deployments.metrics-poll-interval'), (g) =>
+        duration(g.scaler.metricsPollIntervalMs),
+      ),
+    ].filter(({ cells }) => cells.some(Boolean));
+  });
 </script>
 
+{#snippet value(cell: Cell | undefined)}
+  {#if cell?.full}
+    <!-- The 24px copy button would otherwise make these rows taller. -->
+    <Copyable
+      container-class="-my-1 min-w-0"
+      content={cell.full}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    >
+      <span class="block truncate" title={cell.full}>{cell.text}</span>
+    </Copyable>
+  {:else if cell}
+    {cell.text}
+  {:else}
+    <span class="text-secondary">{translate('workers.preview-not-set')}</span>
+  {/if}
+{/snippet}
+
 {#if isCompute}
-  <div
-    class="flex flex-col gap-2 bg-surface-secondary py-3 pl-6 text-xs text-primary"
-  >
-    {#if lambdaDetails.lambdaArn}
-      <div class="flex items-center gap-1">
-        <span class="font-medium text-secondary"
-          >{translate('workers.lambda-arn-label')}</span
-        >
-        <Copyable
-          content={lambdaDetails.lambdaArn}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        >
-          <code class="text-primary">{lambdaDetails.lambdaArn}</code>
-        </Copyable>
-      </div>
-    {/if}
-    {#if agentCoreDetails.agentCoreEndpointArn}
-      <div class="flex items-center gap-1">
-        <span class="font-medium text-secondary"
-          >{translate('workers.agentcore-endpoint-arn-label')}</span
-        >
-        <Copyable
-          content={agentCoreDetails.agentCoreEndpointArn}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        >
-          <code class="text-primary"
-            >{agentCoreDetails.agentCoreEndpointArn}</code
-          >
-        </Copyable>
-      </div>
-    {/if}
-    {#if iamRoleArn}
-      <div class="flex items-center gap-1">
-        <span class="font-medium text-secondary"
-          >{translate('workers.iam-role-label')}</span
-        >
-        <Copyable
-          content={iamRoleArn}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        >
-          <code class="text-primary">{iamRoleArn}</code>
-        </Copyable>
-      </div>
-    {/if}
-    {#if roleExternalId}
-      <div class="flex gap-1">
-        <span class="font-medium text-secondary"
-          >{translate('deployments.role-external-id')}</span
-        >
-        <code class="text-primary">{roleExternalId}</code>
-      </div>
-    {/if}
-    {#if gcpDetails.gcpWorkerPool}
-      <div class="flex items-center gap-1">
-        <span class="font-medium text-secondary"
-          >{translate('workers.gcp-worker-pool-label')}</span
-        >
-        <Copyable
-          content={gcpDetails.gcpWorkerPool}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        >
-          <code class="text-primary">{gcpDetails.gcpWorkerPool}</code>
-        </Copyable>
-      </div>
-    {/if}
-    {#if gcpDetails.gcpProject}
-      <div class="flex gap-1">
-        <span class="font-medium text-secondary"
-          >{translate('workers.gcp-project-label')}</span
-        >
-        <code class="text-primary">{gcpDetails.gcpProject}</code>
-      </div>
-    {/if}
-    {#if gcpDetails.gcpRegion}
-      <div class="flex gap-1">
-        <span class="font-medium text-secondary"
-          >{translate('workers.gcp-region-label')}</span
-        >
-        <code class="text-primary">{gcpDetails.gcpRegion}</code>
-      </div>
-    {/if}
-    {#if gcpDetails.gcpServiceAccount}
-      <div class="flex items-center gap-1">
-        <span class="font-medium text-secondary"
-          >{translate('workers.gcp-service-account-label')}</span
-        >
-        <Copyable
-          content={gcpDetails.gcpServiceAccount}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        >
-          <code class="text-primary">{gcpDetails.gcpServiceAccount}</code>
-        </Copyable>
-      </div>
-    {/if}
-    {#if hasScalerParams}
-      <div class="flex gap-3">
-        {#if scalerParams.scaleUpCooloffMs !== undefined}
-          <div class="flex gap-1">
-            <span class="font-medium text-secondary"
-              >{translate('deployments.scale-up-cooloff')}</span
-            >
-            <span class="text-primary">{scalerParams.scaleUpCooloffMs}ms</span>
-          </div>
+  <div class="bg-surface-secondary py-3 text-xs">
+    <div class="pl-6 pr-4">
+      <table bind:this={table} class="w-full table-fixed">
+        {#if isMultiRegion}
+          <thead>
+            <tr>
+              <th
+                class="pb-2"
+                class:w-48={labelWidth === undefined}
+                style:width={labelWidth === undefined
+                  ? undefined
+                  : `${labelWidth}px`}
+              ></th>
+              {#each perGroup as group (group.name)}
+                <th class="pb-2 text-left font-normal">
+                  <span class="flex items-center gap-1.5">
+                    <span class="font-medium text-primary">
+                      {group.regionId
+                        ? shortRegion(group.regionId)
+                        : translate('workers.region-all')}
+                    </span>
+                  </span>
+                </th>
+              {/each}
+            </tr>
+          </thead>
         {/if}
-        {#if scalerParams.scaleUpBacklogThreshold !== undefined}
-          <div class="flex gap-1">
-            <span class="font-medium text-secondary"
-              >{translate('deployments.backlog-threshold')}</span
-            >
-            <span class="text-primary"
-              >{scalerParams.scaleUpBacklogThreshold}</span
-            >
-          </div>
-        {/if}
-        {#if scalerParams.maxWorkerLifetimeMs !== undefined}
-          <div class="flex gap-1">
-            <span class="font-medium text-secondary"
-              >{translate('deployments.max-worker-lifetime')}</span
-            >
-            <span class="text-primary"
-              >{scalerParams.maxWorkerLifetimeMs}ms</span
-            >
-          </div>
-        {/if}
-        {#if scalerParams.metricsPollIntervalMs !== undefined}
-          <div class="flex gap-1">
-            <span class="font-medium text-secondary"
-              >{translate('deployments.metrics-poll-interval')}</span
-            >
-            <span class="text-primary"
-              >{scalerParams.metricsPollIntervalMs}ms</span
-            >
-          </div>
-        {/if}
-      </div>
-    {/if}
+        <tbody class="divide-y divide-primary">
+          {#each rows as row (row.label)}
+            <tr>
+              <th
+                scope="row"
+                class="py-1.5 pr-4 text-left font-normal text-secondary"
+                class:w-48={labelWidth === undefined}
+                style:width={labelWidth === undefined
+                  ? undefined
+                  : `${labelWidth}px`}
+              >
+                {row.label}
+              </th>
+              {#each row.cells as cell, index (index)}
+                <td class="py-1.5 pr-4 text-primary">
+                  {@render value(cell)}
+                </td>
+              {/each}
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
   </div>
 {/if}

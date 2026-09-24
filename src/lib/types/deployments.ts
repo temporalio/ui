@@ -157,6 +157,11 @@ export interface ComputeScaler {
 
 export interface ComputeConfigScalingGroup {
   taskQueueTypes?: string[];
+  /**
+   * Proposed (HA Serverless PRD): the Namespace region that activates this
+   * group, e.g. "aws-us-east-1". Empty means the group runs in any region.
+   */
+  regionId?: string;
   providerType?: string;
   provider?: ComputeProvider;
   scaler?: ComputeScaler;

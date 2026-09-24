@@ -11,12 +11,7 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    IconChevronDown,
-    IconChevronUp,
-    IconExternalLinkOptical,
-    IconInfo,
-  } from '$lib/io/icon';
+  import { IconExternalLinkOptical, IconInfo } from '$lib/io/icon';
 
   import {
     hasCloudRunImpersonatorPlaceholder,
@@ -61,6 +56,11 @@
     agentCoreCfnTemplateUrl?: string;
     agentCoreCfnTemplate?: string;
     agentCoreTerraformTemplate?: string;
+    lambdaArnPlaceholder?: string;
+    leadingDivider?: boolean;
+    sections?: ('resource' | 'access' | 'scaling')[];
+    /** Prefixes field ids so the fields can render more than once on a page. */
+    idPrefix?: string;
     errors?: {
       lambdaArn?: string[];
       agentCoreEndpointArn?: string[];
@@ -109,8 +109,15 @@
     agentCoreCfnTemplateUrl,
     agentCoreCfnTemplate: agentCoreCfnTemplateProp,
     agentCoreTerraformTemplate,
+    lambdaArnPlaceholder = translate('workers.lambda-arn-placeholder'),
+    leadingDivider = true,
+    sections = ['resource', 'access', 'scaling'],
+    idPrefix = '',
     errors = {},
   }: Props = $props();
+
+  const fieldId = (base: string): string =>
+    idPrefix ? `${idPrefix}-${base}` : base;
 
   // Both AWS providers assume a role, and the role each needs is different:
   // one grants lambda:InvokeFunction, the other bedrock-agentcore:
@@ -187,439 +194,465 @@
     a.click();
     URL.revokeObjectURL(url);
   }
+
+  /**
+   * The whole row toggles, but only the chevron shows hover, so the row reads
+   * as content rather than as a button.
+   */
+  const ACCORDION_CLASS = [
+    'rounded-lg border-0 bg-surface-secondary [&_h3]:text-sm',
+    '[&>div>button:hover]:bg-transparent',
+    '[&>div>button>div>svg:last-child]:-m-1 [&>div>button>div>svg:last-child]:box-content [&>div>button>div>svg:last-child]:rounded [&>div>button>div>svg:last-child]:p-1',
+    '[&>div>button:hover>div>svg:last-child]:bg-interactive-tertiary-hover',
+  ].join(' ');
 </script>
 
-<hr class="my-5 border-primary" />
+{#if leadingDivider}
+  <hr class="my-5 border-primary" />
+{/if}
 
-<h2 class="text-base font-medium">
-  {translate('workers.resource-section')}
-</h2>
-<p class="mb-4 text-sm text-secondary">
-  {translate('workers.resource-section-description')}
-</p>
+{#if sections.includes('resource')}
+  <h2 class="text-base font-medium">
+    {translate('workers.resource-section')}
+  </h2>
+  <p class="mb-4 text-sm text-secondary">
+    {translate('workers.resource-section-description')}
+  </p>
 
-{#if provider === 'lambda'}
-  <div class="flex flex-wrap items-end gap-4">
-    <Input
-      bind:value={lambdaArn}
-      id="lambdaArn"
-      name="lambdaArn"
-      label={translate('workers.lambda-arn-label')}
-      hintText={errors.lambdaArn?.[0]}
-      error={!!errors.lambdaArn?.[0]}
-      placeholder={translate('workers.lambda-arn-placeholder')}
-      required
-      class="flex-1"
-    />
-    <Button
-      variant="secondary"
-      type="button"
-      href="https://console.aws.amazon.com/lambda"
-      target="_blank"
-      TrailingIcon={IconExternalLinkOptical}
-    >
-      {translate('workers.open-lambda-console')}
-    </Button>
-  </div>
-{:else if provider === 'agentcore'}
-  <div class="flex flex-wrap items-end gap-4">
-    <Input
-      bind:value={agentCoreEndpointArn}
-      id="agentCoreEndpointArn"
-      name="agentCoreEndpointArn"
-      label={translate('workers.agentcore-endpoint-arn-label')}
-      hintText={errors.agentCoreEndpointArn?.[0] ||
-        translate('workers.agentcore-endpoint-arn-hint')}
-      error={!!errors.agentCoreEndpointArn?.[0]}
-      placeholder={translate('workers.agentcore-endpoint-arn-placeholder')}
-      required
-      class="flex-1"
-    />
-    <Button
-      variant="secondary"
-      type="button"
-      href="https://console.aws.amazon.com/bedrock-agentcore"
-      target="_blank"
-      TrailingIcon={IconExternalLinkOptical}
-    >
-      {translate('workers.open-agentcore-console')}
-    </Button>
-  </div>
-{:else}
-  <div class="flex flex-col gap-4">
-    <Input
-      bind:value={gcpProject}
-      id="gcpProject"
-      name="gcpProject"
-      label={translate('workers.gcp-project-label')}
-      hintText={errors.gcpProject?.[0]}
-      error={!!errors.gcpProject?.[0]}
-      placeholder={translate('workers.gcp-project-placeholder')}
-      required
-    />
-    <Combobox
-      bind:value={gcpRegion}
-      id="gcpRegion"
-      name="gcpRegion"
-      label={translate('workers.gcp-region-label')}
-      hintText={translate('workers.gcp-region-hint')}
-      placeholder={translate('workers.gcp-region-placeholder')}
-      options={gcpRegions}
-      noResultsText={translate('common.no-results')}
-      valid={!errors.gcpRegion?.[0]}
-      error={errors.gcpRegion?.[0]}
-      allowCustomValue
-      showChevron
-      required
-    />
-    <div class="flex flex-wrap items-end gap-4">
+  {#if provider === 'lambda'}
+    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
       <Input
-        bind:value={gcpWorkerPool}
-        id="gcpWorkerPool"
-        name="gcpWorkerPool"
-        label={translate('workers.gcp-worker-pool-label')}
-        hintText={errors.gcpWorkerPool?.[0]}
-        error={!!errors.gcpWorkerPool?.[0]}
-        placeholder={translate('workers.gcp-worker-pool-placeholder')}
+        bind:value={lambdaArn}
+        id={fieldId('lambdaArn')}
+        name={fieldId('lambdaArn')}
+        label={translate('workers.lambda-arn-label')}
+        hintText={errors.lambdaArn?.[0]}
+        error={!!errors.lambdaArn?.[0]}
+        placeholder={lambdaArnPlaceholder}
         required
         class="flex-1"
       />
       <Button
-        variant="secondary"
+        variant="tertiary"
         type="button"
-        href="https://console.cloud.google.com/run/worker-pools"
+        href="https://console.aws.amazon.com/lambda"
         target="_blank"
         TrailingIcon={IconExternalLinkOptical}
       >
-        {translate('workers.open-cloud-run-console')}
+        {translate('workers.open-lambda-console')}
       </Button>
     </div>
-  </div>
+  {:else if provider === 'agentcore'}
+    <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
+      <Input
+        bind:value={agentCoreEndpointArn}
+        id={fieldId('agentCoreEndpointArn')}
+        name={fieldId('agentCoreEndpointArn')}
+        label={translate('workers.agentcore-endpoint-arn-label')}
+        hintText={errors.agentCoreEndpointArn?.[0] ||
+          translate('workers.agentcore-endpoint-arn-hint')}
+        error={!!errors.agentCoreEndpointArn?.[0]}
+        placeholder={translate('workers.agentcore-endpoint-arn-placeholder')}
+        required
+        class="flex-1"
+      />
+      <Button
+        variant="tertiary"
+        type="button"
+        href="https://console.aws.amazon.com/bedrock-agentcore"
+        target="_blank"
+        TrailingIcon={IconExternalLinkOptical}
+      >
+        {translate('workers.open-agentcore-console')}
+      </Button>
+    </div>
+  {:else}
+    <div class="flex flex-col gap-4">
+      <Input
+        bind:value={gcpProject}
+        id={fieldId('gcpProject')}
+        name={fieldId('gcpProject')}
+        label={translate('workers.gcp-project-label')}
+        hintText={errors.gcpProject?.[0]}
+        error={!!errors.gcpProject?.[0]}
+        placeholder={translate('workers.gcp-project-placeholder')}
+        required
+      />
+      <Combobox
+        bind:value={gcpRegion}
+        id={fieldId('gcpRegion')}
+        name={fieldId('gcpRegion')}
+        label={translate('workers.gcp-region-label')}
+        hintText={translate('workers.gcp-region-hint')}
+        placeholder={translate('workers.gcp-region-placeholder')}
+        options={gcpRegions}
+        noResultsText={translate('common.no-results')}
+        valid={!errors.gcpRegion?.[0]}
+        error={errors.gcpRegion?.[0]}
+        allowCustomValue
+        showChevron
+        required
+      />
+      <div class="flex flex-wrap items-start gap-4 [&>:not(:first-child)]:mt-6">
+        <Input
+          bind:value={gcpWorkerPool}
+          id={fieldId('gcpWorkerPool')}
+          name={fieldId('gcpWorkerPool')}
+          label={translate('workers.gcp-worker-pool-label')}
+          hintText={errors.gcpWorkerPool?.[0]}
+          error={!!errors.gcpWorkerPool?.[0]}
+          placeholder={translate('workers.gcp-worker-pool-placeholder')}
+          required
+          class="flex-1"
+        />
+        <Button
+          variant="tertiary"
+          type="button"
+          href="https://console.cloud.google.com/run/worker-pools"
+          target="_blank"
+          TrailingIcon={IconExternalLinkOptical}
+        >
+          {translate('workers.open-cloud-run-console')}
+        </Button>
+      </div>
+    </div>
+  {/if}
 {/if}
 
-<hr class="my-5 border-primary" />
+{#if sections.includes('resource') && sections.includes('access')}
+  <hr class="my-5 border-primary" />
+{/if}
 
-<h2 class="text-base font-medium">
-  {translate('workers.access-section')}
-</h2>
-<p class="mb-4 text-sm text-secondary">
-  {translate('workers.access-section-description')}
-</p>
+{#if sections.includes('access')}
+  <h2 class="text-base font-medium">
+    {translate('workers.access-section')}
+  </h2>
+  <p class="mb-4 text-sm text-secondary">
+    {translate('workers.access-section-description')}
+  </p>
 
-{#if provider === 'lambda' || provider === 'agentcore'}
-  <div class="flex flex-col gap-4">
-    <Input
-      bind:value={iamRoleArn}
-      id="iamRoleArn"
-      name="iamRoleArn"
-      label={translate('workers.iam-role-label')}
-      hintText={errors.iamRoleArn?.[0] || translate('workers.iam-role-hint')}
-      error={!!errors.iamRoleArn?.[0]}
-      placeholder={translate('workers.iam-role-placeholder')}
-      required
-    />
-    <Input
-      bind:value={roleExternalId}
-      id="roleExternalId"
-      name="roleExternalId"
-      label={translate('workers.external-id-label')}
-      hintText={errors.roleExternalId?.[0] ||
-        translate('workers.external-id-hint')}
-      error={!!errors.roleExternalId?.[0]}
-      placeholder={translate('workers.external-id-placeholder')}
-      required
-    />
-    {#if provider === 'lambda' || provider === 'agentcore'}
-      <Accordion
-        Icon={IconInfo}
-        title={translate('workers.no-role-prompt')}
-        bind:open={showRoleHelp}
-        class="border-tertiary bg-background-primary [&_h3]:text-sm"
-      >
-        <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
-          <ToggleButtons>
-            <ToggleButton
-              active={activeRoleHelpTab === 'cloudformation'}
-              onclick={() => (activeRoleHelpTab = 'cloudformation')}
-            >
-              {translate('workers.cfn-tab')}
-            </ToggleButton>
-            <ToggleButton
-              active={activeRoleHelpTab === 'terraform'}
-              onclick={() => (activeRoleHelpTab = 'terraform')}
-            >
-              {translate('workers.terraform-tab')}
-            </ToggleButton>
-          </ToggleButtons>
-          {#if activeRoleHelpTab === 'cloudformation'}
-            <p class="text-sm text-secondary">
-              {translate('workers.launch-stack-description')}
-            </p>
-            <div class="flex flex-wrap items-center gap-4">
-              <Button
-                variant="secondary"
+  {#if provider === 'lambda' || provider === 'agentcore'}
+    <div class="flex flex-col gap-4">
+      <Input
+        bind:value={iamRoleArn}
+        id={fieldId('iamRoleArn')}
+        name={fieldId('iamRoleArn')}
+        label={translate('workers.iam-role-label')}
+        hintText={errors.iamRoleArn?.[0] || translate('workers.iam-role-hint')}
+        error={!!errors.iamRoleArn?.[0]}
+        placeholder={translate('workers.iam-role-placeholder')}
+        required
+      />
+      <Input
+        bind:value={roleExternalId}
+        id={fieldId('roleExternalId')}
+        name={fieldId('roleExternalId')}
+        label={translate('workers.external-id-label')}
+        hintText={errors.roleExternalId?.[0] ||
+          translate('workers.external-id-hint')}
+        error={!!errors.roleExternalId?.[0]}
+        placeholder={translate('workers.external-id-placeholder')}
+        required
+      />
+      {#if provider === 'lambda' || provider === 'agentcore'}
+        <Accordion
+          Icon={IconInfo}
+          title={translate('workers.no-role-prompt')}
+          bind:open={showRoleHelp}
+          class={ACCORDION_CLASS}
+        >
+          <div class="-mt-8 flex flex-col gap-3 pt-3">
+            <ToggleButtons>
+              <ToggleButton
+                variant="tertiary"
                 size="sm"
-                href={launchStackHref}
-                target="_blank"
-                TrailingIcon={IconExternalLinkOptical}
+                active={activeRoleHelpTab === 'cloudformation'}
+                onclick={() => (activeRoleHelpTab = 'cloudformation')}
               >
-                {translate('workers.launch-stack')}
-              </Button>
-              <Button
-                variant="secondary"
+                {translate('workers.cfn-tab')}
+              </ToggleButton>
+              <ToggleButton
+                variant="tertiary"
                 size="sm"
-                onclick={downloadCfnTemplate}
+                active={activeRoleHelpTab === 'terraform'}
+                onclick={() => (activeRoleHelpTab = 'terraform')}
               >
-                {translate('workers.download-template')}
-              </Button>
-            </div>
-          {:else}
+                {translate('workers.terraform-tab')}
+              </ToggleButton>
+            </ToggleButtons>
+            {#if activeRoleHelpTab === 'cloudformation'}
+              <p class="text-sm text-secondary">
+                {translate('workers.launch-stack-description')}
+              </p>
+              <div class="flex flex-wrap items-center gap-4">
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  href={launchStackHref}
+                  target="_blank"
+                  TrailingIcon={IconExternalLinkOptical}
+                >
+                  {translate('workers.launch-stack')}
+                </Button>
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  onclick={downloadCfnTemplate}
+                >
+                  {translate('workers.download-template')}
+                </Button>
+              </div>
+            {:else}
+              <p class="text-sm text-secondary">
+                {translate('workers.terraform-description-before')}<Link
+                  href={terraformModuleHref}
+                  newTab>{translate('workers.terraform-iam-module-link')}</Link
+                >{translate('workers.terraform-description-after')}
+              </p>
+              <CodeBlock
+                content={resolvedTerraformTemplate}
+                language="text"
+                maxHeight={300}
+                copyable
+                label={translate('workers.terraform-iam-module-link')}
+                copyIconTitle={translate('workers.copy-snippet')}
+                copySuccessIconTitle={translate('workers.copied')}
+              />
+            {/if}
+          </div>
+        </Accordion>
+      {/if}
+    </div>
+  {:else}
+    <div class="flex flex-col gap-4">
+      <Input
+        bind:value={gcpServiceAccount}
+        id={fieldId('gcpServiceAccount')}
+        name={fieldId('gcpServiceAccount')}
+        label={translate('workers.gcp-service-account-label')}
+        hintText={errors.gcpServiceAccount?.[0] ||
+          translate('workers.gcp-service-account-hint')}
+        error={!!errors.gcpServiceAccount?.[0]}
+        placeholder={translate('workers.gcp-service-account-placeholder')}
+        required
+      />
+      {#if provider === 'cloud-run'}
+        <Accordion
+          Icon={IconInfo}
+          title={translate('workers.cloud-run-setup-prompt')}
+          bind:open={showCloudRunHelp}
+          class={ACCORDION_CLASS}
+        >
+          <div class="-mt-8 flex flex-col gap-3 pt-3">
             <p class="text-sm text-secondary">
-              {translate('workers.terraform-description-before')}<Link
-                href={terraformModuleHref}
-                newTab>{translate('workers.terraform-iam-module-link')}</Link
-              >{translate('workers.terraform-description-after')}
+              {translate('workers.cloud-run-terraform-description-before')}<Link
+                href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
+                newTab
+                >{translate('workers.cloud-run-terraform-module-link')}</Link
+              >{translate('workers.cloud-run-terraform-description-after')}
             </p>
+            {#if showCloudRunImpersonatorWarning}
+              <p class="text-sm text-warning">
+                {translate('workers.cloud-run-impersonator-warning')}
+              </p>
+            {/if}
             <CodeBlock
-              content={resolvedTerraformTemplate}
+              content={resolvedCloudRunTerraformTemplate}
               language="text"
               maxHeight={300}
               copyable
-              label={translate('workers.terraform-iam-module-link')}
+              label={translate('workers.cloud-run-terraform-module-link')}
               copyIconTitle={translate('workers.copy-snippet')}
               copySuccessIconTitle={translate('workers.copied')}
             />
-          {/if}
-        </div>
-      </Accordion>
-    {/if}
-  </div>
-{:else}
-  <div class="flex flex-col gap-4">
-    <Input
-      bind:value={gcpServiceAccount}
-      id="gcpServiceAccount"
-      name="gcpServiceAccount"
-      label={translate('workers.gcp-service-account-label')}
-      hintText={errors.gcpServiceAccount?.[0] ||
-        translate('workers.gcp-service-account-hint')}
-      error={!!errors.gcpServiceAccount?.[0]}
-      placeholder={translate('workers.gcp-service-account-placeholder')}
-      required
-    />
-    {#if provider === 'cloud-run'}
-      <Accordion
-        Icon={IconInfo}
-        title={translate('workers.cloud-run-setup-prompt')}
-        bind:open={showCloudRunHelp}
-        class="border-tertiary bg-background-primary [&_h3]:text-sm"
-      >
-        <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
-          <p class="text-sm text-secondary">
-            {translate('workers.cloud-run-terraform-description-before')}<Link
-              href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
-              newTab
-              >{translate('workers.cloud-run-terraform-module-link')}</Link
-            >{translate('workers.cloud-run-terraform-description-after')}
-          </p>
-          {#if showCloudRunImpersonatorWarning}
-            <p class="text-sm text-warning">
-              {translate('workers.cloud-run-impersonator-warning')}
+            <p class="text-sm text-secondary">
+              {translate('workers.cloud-run-invoker-handoff')}
             </p>
-          {/if}
-          <CodeBlock
-            content={resolvedCloudRunTerraformTemplate}
-            language="text"
-            maxHeight={300}
-            copyable
-            label={translate('workers.cloud-run-terraform-module-link')}
-            copyIconTitle={translate('workers.copy-snippet')}
-            copySuccessIconTitle={translate('workers.copied')}
-          />
-          <p class="text-sm text-secondary">
-            {translate('workers.cloud-run-invoker-handoff')}
-          </p>
-        </div>
-      </Accordion>
-    {/if}
-  </div>
+          </div>
+        </Accordion>
+      {/if}
+    </div>
+  {/if}
 {/if}
 
-<hr class="my-5 border-primary" />
+{#if (sections.includes('resource') || sections.includes('access')) && sections.includes('scaling')}
+  <hr class="my-5 border-primary" />
+{/if}
 
-<div class="flex flex-wrap items-center justify-between gap-4">
-  <div>
-    <h2 class="text-base font-medium">
-      {translate('workers.scaling-lifecycle-section')}
-    </h2>
-    <p class="text-sm text-secondary">
-      {translate('workers.scaling-lifecycle-description')}
-    </p>
+{#if sections.includes('scaling')}
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 class="text-base font-medium">
+        {translate('workers.scaling-lifecycle-section')}
+      </h2>
+      <p class="text-sm text-secondary">
+        {translate('workers.scaling-lifecycle-description')}
+      </p>
+    </div>
+    <Button
+      variant="tertiary"
+      size="sm"
+      type="button"
+      onclick={() => (showScaling = !showScaling)}
+    >
+      {showScaling
+        ? translate('workers.hide-defaults')
+        : translate('workers.show-defaults')}
+    </Button>
   </div>
-  <Button
-    variant="secondary"
-    size="sm"
-    type="button"
-    TrailingIcon={showScaling ? IconChevronUp : IconChevronDown}
-    onclick={() => (showScaling = !showScaling)}
-  >
-    {showScaling
-      ? translate('workers.hide-defaults')
-      : translate('workers.show-defaults')}
-  </Button>
-</div>
-{#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
-  <div class="mt-4 flex flex-col gap-4">
-    <Input
-      value={scaleUpCooloffMs !== undefined ? String(scaleUpCooloffMs) : ''}
-      onchange={(e) => {
-        const val = (e.target as HTMLInputElement).value;
-        scaleUpCooloffMs = val === '' ? undefined : Number(val);
-      }}
-      id="scaleUpCooloffMs"
-      name="scaleUpCooloffMs"
-      label={translate('workers.scale-up-cooloff-ms-label')}
-      hintText={errors.scaleUpCooloffMs?.[0] ||
-        translate('workers.scale-up-cooloff-ms-hint')}
-      error={!!errors.scaleUpCooloffMs?.[0]}
-      placeholder="100"
-    />
-    <Input
-      value={scaleUpBacklogThreshold !== undefined
-        ? String(scaleUpBacklogThreshold)
-        : ''}
-      onchange={(e) => {
-        const val = (e.target as HTMLInputElement).value;
-        scaleUpBacklogThreshold = val === '' ? undefined : Number(val);
-      }}
-      id="scaleUpBacklogThreshold"
-      name="scaleUpBacklogThreshold"
-      label={translate('workers.scale-up-backlog-threshold-label')}
-      hintText={errors.scaleUpBacklogThreshold?.[0] ||
-        translate('workers.scale-up-backlog-threshold-hint')}
-      error={!!errors.scaleUpBacklogThreshold?.[0]}
-      placeholder="0"
-    />
-    <Input
-      value={maxWorkerLifetimeMs !== undefined
-        ? String(maxWorkerLifetimeMs)
-        : ''}
-      onchange={(e) => {
-        const val = (e.target as HTMLInputElement).value;
-        maxWorkerLifetimeMs = val === '' ? undefined : Number(val);
-      }}
-      id="maxWorkerLifetimeMs"
-      name="maxWorkerLifetimeMs"
-      label={translate('workers.max-worker-lifetime-ms-label')}
-      hintText={errors.maxWorkerLifetimeMs?.[0] ||
-        translate('workers.max-worker-lifetime-ms-hint')}
-      error={!!errors.maxWorkerLifetimeMs?.[0]}
-      placeholder="600000"
-    />
-    <Input
-      value={metricsPollIntervalMs !== undefined
-        ? String(metricsPollIntervalMs)
-        : ''}
-      onchange={(e) => {
-        const val = (e.target as HTMLInputElement).value;
-        metricsPollIntervalMs = val === '' ? undefined : Number(val);
-      }}
-      id="metricsPollIntervalMs"
-      name="metricsPollIntervalMs"
-      label={translate('workers.metrics-poll-interval-ms-label')}
-      hintText={errors.metricsPollIntervalMs?.[0] ||
-        translate('workers.metrics-poll-interval-ms-hint')}
-      error={!!errors.metricsPollIntervalMs?.[0]}
-      placeholder="60000"
-    />
-  </div>
-{:else if showScaling && provider === 'cloud-run'}
-  <div class="mt-4 flex flex-col gap-4">
-    <Input
-      value={String(minReplicas)}
-      onchange={(e) => {
-        minReplicas = Number((e.target as HTMLInputElement).value);
-      }}
-      id="minReplicas"
-      name="minReplicas"
-      type="number"
-      min={0}
-      max={2_147_483_647}
-      step={1}
-      label={translate('workers.min-replicas-label')}
-      hintText={errors.minReplicas?.[0] ||
-        translate('workers.min-replicas-hint')}
-      error={!!errors.minReplicas?.[0]}
-      required
-    />
-    <Input
-      value={String(maxReplicas)}
-      onchange={(e) => {
-        maxReplicas = Number((e.target as HTMLInputElement).value);
-      }}
-      id="maxReplicas"
-      name="maxReplicas"
-      type="number"
-      min={1}
-      max={2_147_483_647}
-      step={1}
-      label={translate('workers.max-replicas-label')}
-      hintText={errors.maxReplicas?.[0] ||
-        translate('workers.max-replicas-hint')}
-      error={!!errors.maxReplicas?.[0]}
-      required
-    />
-    <Input
-      value={String(initialReplicas)}
-      onchange={(e) => {
-        initialReplicas = Number((e.target as HTMLInputElement).value);
-      }}
-      id="initialReplicas"
-      name="initialReplicas"
-      type="number"
-      min={0}
-      max={2_147_483_647}
-      step={1}
-      label={translate('workers.initial-replicas-label')}
-      hintText={errors.initialReplicas?.[0] ||
-        translate('workers.initial-replicas-hint')}
-      error={!!errors.initialReplicas?.[0]}
-      required
-    />
-    <Input
-      value={String(utilizationTarget)}
-      onchange={(e) => {
-        utilizationTarget = Number((e.target as HTMLInputElement).value);
-      }}
-      id="utilizationTarget"
-      name="utilizationTarget"
-      type="number"
-      min={0}
-      max={1}
-      step="any"
-      label={translate('workers.utilization-target-label')}
-      hintText={errors.utilizationTarget?.[0] ||
-        translate('workers.utilization-target-hint')}
-      error={!!errors.utilizationTarget?.[0]}
-      required
-    />
-    <DurationInput
-      bind:value={scaleDownStabilization}
-      id="scaleDownStabilization"
-      name="scaleDownStabilization"
-      inputmode="numeric"
-      min={0}
-      units={scaleDownStabilizationUnits}
-      initialUnit={getFirstWholeNumberUnit(
-        scaleDownStabilization,
-        scaleDownStabilizationUnits,
-        'second(s)',
-      )}
-      label={translate('workers.scale-down-stabilization-label')}
-      hintText={errors.scaleDownStabilization?.[0] ||
-        translate('workers.scale-down-stabilization-hint')}
-      error={!!errors.scaleDownStabilization?.[0]}
-      required
-    />
-  </div>
+  {#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
+    <div class="mt-4 flex flex-col gap-4">
+      <Input
+        value={scaleUpCooloffMs !== undefined ? String(scaleUpCooloffMs) : ''}
+        onchange={(e) => {
+          const val = (e.target as HTMLInputElement).value;
+          scaleUpCooloffMs = val === '' ? undefined : Number(val);
+        }}
+        id={fieldId('scaleUpCooloffMs')}
+        name={fieldId('scaleUpCooloffMs')}
+        label={translate('workers.scale-up-cooloff-ms-label')}
+        hintText={errors.scaleUpCooloffMs?.[0] ||
+          translate('workers.scale-up-cooloff-ms-hint')}
+        error={!!errors.scaleUpCooloffMs?.[0]}
+        placeholder="100"
+      />
+      <Input
+        value={scaleUpBacklogThreshold !== undefined
+          ? String(scaleUpBacklogThreshold)
+          : ''}
+        onchange={(e) => {
+          const val = (e.target as HTMLInputElement).value;
+          scaleUpBacklogThreshold = val === '' ? undefined : Number(val);
+        }}
+        id={fieldId('scaleUpBacklogThreshold')}
+        name={fieldId('scaleUpBacklogThreshold')}
+        label={translate('workers.scale-up-backlog-threshold-label')}
+        hintText={errors.scaleUpBacklogThreshold?.[0] ||
+          translate('workers.scale-up-backlog-threshold-hint')}
+        error={!!errors.scaleUpBacklogThreshold?.[0]}
+        placeholder="0"
+      />
+      <Input
+        value={maxWorkerLifetimeMs !== undefined
+          ? String(maxWorkerLifetimeMs)
+          : ''}
+        onchange={(e) => {
+          const val = (e.target as HTMLInputElement).value;
+          maxWorkerLifetimeMs = val === '' ? undefined : Number(val);
+        }}
+        id={fieldId('maxWorkerLifetimeMs')}
+        name={fieldId('maxWorkerLifetimeMs')}
+        label={translate('workers.max-worker-lifetime-ms-label')}
+        hintText={errors.maxWorkerLifetimeMs?.[0] ||
+          translate('workers.max-worker-lifetime-ms-hint')}
+        error={!!errors.maxWorkerLifetimeMs?.[0]}
+        placeholder="600000"
+      />
+      <Input
+        value={metricsPollIntervalMs !== undefined
+          ? String(metricsPollIntervalMs)
+          : ''}
+        onchange={(e) => {
+          const val = (e.target as HTMLInputElement).value;
+          metricsPollIntervalMs = val === '' ? undefined : Number(val);
+        }}
+        id={fieldId('metricsPollIntervalMs')}
+        name={fieldId('metricsPollIntervalMs')}
+        label={translate('workers.metrics-poll-interval-ms-label')}
+        hintText={errors.metricsPollIntervalMs?.[0] ||
+          translate('workers.metrics-poll-interval-ms-hint')}
+        error={!!errors.metricsPollIntervalMs?.[0]}
+        placeholder="60000"
+      />
+    </div>
+  {:else if showScaling && provider === 'cloud-run'}
+    <div class="mt-4 flex flex-col gap-4">
+      <Input
+        value={String(minReplicas)}
+        onchange={(e) => {
+          minReplicas = Number((e.target as HTMLInputElement).value);
+        }}
+        id={fieldId('minReplicas')}
+        name={fieldId('minReplicas')}
+        type="number"
+        min={0}
+        max={2_147_483_647}
+        step={1}
+        label={translate('workers.min-replicas-label')}
+        hintText={errors.minReplicas?.[0] ||
+          translate('workers.min-replicas-hint')}
+        error={!!errors.minReplicas?.[0]}
+        required
+      />
+      <Input
+        value={String(maxReplicas)}
+        onchange={(e) => {
+          maxReplicas = Number((e.target as HTMLInputElement).value);
+        }}
+        id={fieldId('maxReplicas')}
+        name={fieldId('maxReplicas')}
+        type="number"
+        min={1}
+        max={2_147_483_647}
+        step={1}
+        label={translate('workers.max-replicas-label')}
+        hintText={errors.maxReplicas?.[0] ||
+          translate('workers.max-replicas-hint')}
+        error={!!errors.maxReplicas?.[0]}
+        required
+      />
+      <Input
+        value={String(initialReplicas)}
+        onchange={(e) => {
+          initialReplicas = Number((e.target as HTMLInputElement).value);
+        }}
+        id={fieldId('initialReplicas')}
+        name={fieldId('initialReplicas')}
+        type="number"
+        min={0}
+        max={2_147_483_647}
+        step={1}
+        label={translate('workers.initial-replicas-label')}
+        hintText={errors.initialReplicas?.[0] ||
+          translate('workers.initial-replicas-hint')}
+        error={!!errors.initialReplicas?.[0]}
+        required
+      />
+      <Input
+        value={String(utilizationTarget)}
+        onchange={(e) => {
+          utilizationTarget = Number((e.target as HTMLInputElement).value);
+        }}
+        id={fieldId('utilizationTarget')}
+        name={fieldId('utilizationTarget')}
+        type="number"
+        min={0}
+        max={1}
+        step="any"
+        label={translate('workers.utilization-target-label')}
+        hintText={errors.utilizationTarget?.[0] ||
+          translate('workers.utilization-target-hint')}
+        error={!!errors.utilizationTarget?.[0]}
+        required
+      />
+      <DurationInput
+        bind:value={scaleDownStabilization}
+        id={fieldId('scaleDownStabilization')}
+        name={fieldId('scaleDownStabilization')}
+        inputmode="numeric"
+        min={0}
+        units={scaleDownStabilizationUnits}
+        initialUnit={getFirstWholeNumberUnit(
+          scaleDownStabilization,
+          scaleDownStabilizationUnits,
+          'second(s)',
+        )}
+        label={translate('workers.scale-down-stabilization-label')}
+        hintText={errors.scaleDownStabilization?.[0] ||
+          translate('workers.scale-down-stabilization-hint')}
+        error={!!errors.scaleDownStabilization?.[0]}
+        required
+      />
+    </div>
+  {/if}
 {/if}

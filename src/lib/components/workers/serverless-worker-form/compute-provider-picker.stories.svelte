@@ -175,3 +175,13 @@
     />
   </div>
 </Story>
+
+<Story name="Selected + Change" asChild>
+  <div class="max-w-[45rem] p-4">
+    <ComputeProviderPicker
+      layout="summary"
+      provider="lambda"
+      providers={[{ value: 'lambda' }, { value: 'agentcore' }]}
+    />
+  </div>
+</Story>

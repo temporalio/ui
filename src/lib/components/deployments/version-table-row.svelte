@@ -38,14 +38,13 @@
   } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  import ComputeBadge from './compute-badge.svelte';
-  import ConnectionBadge from './connection-badge.svelte';
   import DeleteVersionModal from './delete-version-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
   import SetCurrentVersionModal from './set-current-version-modal.svelte';
   import SetRampingVersionModal from './set-ramping-version-modal.svelte';
   import ValidateConnectionModal from './validate-connection-modal.svelte';
   import VersionActionsMenu from './version-actions-menu.svelte';
+  import VersionRegions from './version-regions.svelte';
   import VersionRowDetails from './version-row-details.svelte';
 
   interface Props {
@@ -55,6 +54,8 @@
     deploymentName: string;
     conflictToken?: string;
     showConnectionStatus?: boolean;
+    /** Regions the namespace runs in, so unconfigured Regions are surfaced. */
+    namespaceRegions?: readonly string[];
     onChange?: () => void;
     onValidationComplete?: () => void;
   }
@@ -65,6 +66,7 @@
     deploymentName,
     conflictToken,
     showConnectionStatus = true,
+    namespaceRegions,
     onChange,
     onValidationComplete,
   }: Props = $props();
@@ -326,7 +328,7 @@
   }
 </script>
 
-<tr>
+<tr class="[&>td]:align-middle">
   <td class="text-left">
     <div class="flex items-center gap-1">
       {#if computeProviderType}
@@ -355,20 +357,20 @@
     </div>
   </td>
   <td class="text-left">
-    <DeploymentStatus {status} label={statusLabel} />
+    <DeploymentStatus {status} label={statusLabel} appearance="badge" />
   </td>
   <td class="text-left">
-    <ComputeBadge type={computeProviderType} />
+    {#if isVersionSummaryNew(version) && computeProviderType}
+      <VersionRegions
+        computeConfig={version.computeConfig}
+        {namespaceRegions}
+        computeStatus={version.computeStatus}
+        showConnectionStatus={showConnectionStatus && connectionVisible}
+      />
+    {:else}
+      <span class="text-secondary">—</span>
+    {/if}
   </td>
-  {#if showConnectionStatus}
-    <td class="text-left">
-      {#if connectionVisible && isVersionSummaryNew(version)}
-        <ConnectionBadge computeStatus={version.computeStatus} />
-      {:else}
-        <span class="text-secondary">—</span>
-      {/if}
-    </td>
-  {/if}
   <Timestamp
     as="td"
     class="whitespace-pre-line break-words text-left"
@@ -393,7 +395,7 @@
 
 {#if expanded}
   <tr class="border-y border-primary bg-surface-primary text-primary">
-    <td colspan={showConnectionStatus ? 6 : 5} class="!p-1">
+    <td colspan="5" class="!p-1">
       <VersionRowDetails
         {namespace}
         {deploymentName}

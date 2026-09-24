@@ -73,7 +73,6 @@
   </div>
   <div
     id="{id}-content"
-    aria-labelledby="{id}-trigger"
     class="block w-full bg-background-primary p-2"
     class:hidden={!open}
   >
