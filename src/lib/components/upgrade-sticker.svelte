@@ -125,7 +125,7 @@
 
   const startDrag: PointerEventHandler<HTMLDivElement> = (event) => {
     if (peeled || revealing) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     cancelAnimationFrame(frame);
     tilt = FLAT;
     drag = { origin: toLocal(event), start: position, moved: 0 };

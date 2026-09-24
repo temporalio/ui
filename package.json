@@ -5,6 +5,12 @@
     "pnpm": ">=10.10.0",
     "node": ">=22.14.0"
   },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14"
+  ],
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
