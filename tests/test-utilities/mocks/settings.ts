@@ -13,6 +13,7 @@ const defaultSettings = {
   DefaultNamespace: '',
   ShowTemporalSystemNamespace: false,
   FeedbackURL: '',
+  NotifyOnNewVersion: false,
   Codec: {
     Endpoint: '',
     PassAccessToken: false,

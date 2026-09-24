@@ -41,6 +41,7 @@ export type ParameterlessAPIRoutePath =
   | 'cluster'
   | 'settings'
   | 'ui-extensions'
+  | 'releases'
   | 'user'
   | 'nexus-endpoints'
   | 'namespaces';

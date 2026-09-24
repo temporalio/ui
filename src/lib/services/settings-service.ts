@@ -172,6 +172,9 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     navCollapsedByDefault: !!settingsResponse?.NavCollapsedByDefault,
     feedbackURL: settingsResponse?.FeedbackURL,
     disableNewsFetch: !!settingsResponse?.DisableNewsFetch,
+    notifyOnNewVersion: !!settingsResponse?.NotifyOnNewVersion,
+    distribution: settingsResponse?.Distribution,
+    distributionVersion: settingsResponse?.DistributionVersion,
     supportURL: settingsResponse?.SupportURL,
     runtimeEnvironment: {
       get isCloud() {

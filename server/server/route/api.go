@@ -72,6 +72,7 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 
 	route := e.Group("/api/v1")
 	route.GET("/settings", api.GetSettings(cfgProvider))
+	route.GET("/releases", api.GetLatestReleases(cfgProvider, api.NewReleaseChecker()))
 	route.GET("/ui-extensions", api.GetUIExtensions(cfgProvider, api.TemporalAccessCheck(conn, apiMiddleware)))
 
 	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)

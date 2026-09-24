@@ -10,6 +10,9 @@ cloudUi: {{ env "TEMPORAL_CLOUD_UI" | default "false" }}
 defaultNamespace: {{ env "TEMPORAL_DEFAULT_NAMESPACE" | default "default" }}
 feedbackUrl: {{ env "TEMPORAL_FEEDBACK_URL" | default "" }}
 disableNewsFetch: {{ env "TEMPORAL_DISABLE_NEWS_FETCH" | default "false" }}
+notifyOnNewVersion: {{ env "TEMPORAL_NOTIFY_ON_NEW_VERSION" | default "true" }}
+distribution: {{ env "TEMPORAL_UI_DISTRIBUTION" | default "docker" }}
+distributionVersion: {{ env "TEMPORAL_UI_DISTRIBUTION_VERSION" | default "" }}
 navCollapsedByDefault: {{ env "TEMPORAL_NAV_COLLAPSED_BY_DEFAULT" | default "false" }}
 refreshInterval: {{ env "TEMPORAL_CONFIG_REFRESH_INTERVAL" | default "0s" }}
 showTemporalSystemNamespace: {{ env "TEMPORAL_SHOW_TEMPORAL_SYSTEM_NAMESPACE" | default "false" }}

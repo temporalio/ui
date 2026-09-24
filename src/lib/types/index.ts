@@ -410,6 +410,9 @@ export type SettingsResponse = {
   NavCollapsedByDefault: boolean;
   FeedbackURL: string;
   DisableNewsFetch: boolean;
+  NotifyOnNewVersion?: boolean;
+  Distribution?: string;
+  DistributionVersion?: string;
   SupportURL?: string;
   Version: string;
 };

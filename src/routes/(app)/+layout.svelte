@@ -12,6 +12,7 @@
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
+  import UpgradeNotice from '$lib/components/upgrade-notice.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
@@ -423,6 +424,9 @@
             tooltip={translate('common.feedback')}
             external
           />
+          {#if page.data?.settings?.notifyOnNewVersion}
+            <UpgradeNotice />
+          {/if}
         {/if}
       {/snippet}
     </SideNavigation>

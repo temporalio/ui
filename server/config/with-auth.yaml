@@ -10,6 +10,8 @@ defaultNamespace: default
 showTemporalSystemNamespace: false
 feedbackUrl:
 disableNewsFetch: false
+notifyOnNewVersion: true
+distribution: server
 navCollapsedByDefault: false
 disableWriteActions: false
 workflowTerminateDisabled: false
