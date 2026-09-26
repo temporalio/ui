@@ -691,7 +691,24 @@ func TestNLSearchHandlerNotUnderstood(t *testing.T) {
 	conn := newFakeFrontendConn(t, &fakeFrontend{})
 	require.NoError(t, NLSearchHandler(NewTypeSafeGate(cfgProvider, nil, conn, ratelimit.New(ratelimit.Options{})))(e.NewContext(req, rec)))
 	assert.Equal(t, http.StatusOK, rec.Code)
-	assert.JSONEq(t, `{"filters": [], "confidence": 0, "understood": false}`, rec.Body.String())
+
+	var body struct {
+		Filters    []any                `json:"filters"`
+		Confidence float64              `json:"confidence"`
+		Understood bool                 `json:"understood"`
+		Trace      []nlsearch.TraceStep `json:"trace"`
+	}
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &body))
+	assert.Empty(t, body.Filters)
+	assert.NotNil(t, body.Filters)
+	assert.Zero(t, body.Confidence)
+	assert.False(t, body.Understood)
+	require.NotEmpty(t, body.Trace)
+	for _, step := range body.Trace {
+		assert.Equal(t, nlsearch.OutcomeMissing, step.Outcome, step.ID)
+		assert.Nil(t, step.Score, step.ID)
+		assert.Empty(t, step.Filters, step.ID)
+	}
 }
 
 func TestGetSettingsTypeSafeFeatureFlags(t *testing.T) {

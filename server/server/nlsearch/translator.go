@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -21,10 +22,10 @@ const (
 	questionTimeUnit      = "time_unit"
 	questionTimeDirection = "time_direction"
 	questionWorkflowType  = "workflow_type"
-	questionWorkflowID    = "workflow_id"
-	questionRunID         = "run_id"
-	questionIDIsPrefix    = "id_is_prefix"
 	questionCustomPrefix  = "custom_"
+
+	questionValueAttributePrefix  = "value_attribute_"
+	questionValueComparisonPrefix = "value_comparison_"
 )
 
 // Option keys that mean "no answer". They are reserved: addOptions drops a candidate
@@ -32,6 +33,7 @@ const (
 const (
 	optionNone         = "none"
 	optionNotMentioned = "not_mentioned"
+	optionNotAValue    = "not_a_value"
 )
 
 // Option keys of a Bool attribute question. That question has no text candidates.
@@ -46,12 +48,44 @@ const (
 	descriptionKnownType = "A known workflow type."
 	descriptionTyped     = "Typed by the user."
 	descriptionNumber    = "A number typed by the user."
+	descriptionAttribute = "In `searchAttributes`."
 )
 
-// knownAttributeTypes is the set of search attribute types. A filter never gets a type outside it.
-var knownAttributeTypes = map[string]bool{
-	"Text": true, TypeKeyword: true, "Int": true, "Double": true,
-	TypeBool: true, TypeDatetime: true, "KeywordList": true,
+// typeComparisons gives the conditionals that each search attribute type allows,
+// the same rules as the filter menu of the UI. A filter never gets a type outside it.
+var typeComparisons = map[string][]string{
+	TypeKeyword:     {ConditionalEquals, ConditionalNotEquals, ConditionalStartsWith},
+	TypeText:        {ConditionalEquals, ConditionalNotEquals},
+	TypeKeywordList: {ConditionalEquals, ConditionalNotEquals},
+	TypeInt:         {ConditionalEquals, ConditionalNotEquals, ConditionalGreater, ConditionalGreaterOrEqual, ConditionalLess, ConditionalLessOrEqual},
+	TypeDouble:      {ConditionalEquals, ConditionalNotEquals, ConditionalGreater, ConditionalGreaterOrEqual, ConditionalLess, ConditionalLessOrEqual},
+	TypeBool:        {ConditionalEquals, ConditionalNotEquals},
+	TypeDatetime:    {ConditionalGreaterOrEqual, ConditionalLess},
+}
+
+// valueTypes are the types whose values are words or numbers from the text.
+var valueTypes = map[string]bool{
+	TypeKeyword: true, TypeText: true, TypeKeywordList: true, TypeInt: true, TypeDouble: true,
+}
+
+// comparisons are the options of each value comparison question.
+var comparisons = []struct{ key, conditional, description string }{
+	{"equals", ConditionalEquals, "Equal to the value: \"is\", \"=\", \"named\", \"called\", \"for\", \"of\". Select this option when the request gives no other comparison."},
+	{"not_equals", ConditionalNotEquals, "Not equal to the value: \"is not\", \"except\", \"other than\", \"excluding\", \"without\"."},
+	{"starts_with", ConditionalStartsWith, "Starts with the value: \"starts with\", \"begins with\", \"prefixed with\", \"beginning with\", or a value that ends with *."},
+	{"greater", ConditionalGreater, "Greater than the value: \"more than\", \"greater than\", \"above\", \"over\"."},
+	{"greater_or_equal", ConditionalGreaterOrEqual, "Greater than or equal to the value: \"at least\", \"or more\", \"minimum\"."},
+	{"less", ConditionalLess, "Less than the value: \"less than\", \"fewer than\", \"below\", \"under\"."},
+	{"less_or_equal", ConditionalLessOrEqual, "Less than or equal to the value: \"at most\", \"or fewer\", \"maximum\"."},
+}
+
+func allows(attributeType, conditional string) bool {
+	for _, allowed := range typeComparisons[attributeType] {
+		if allowed == conditional {
+			return true
+		}
+	}
+	return false
 }
 
 // executionStatuses lists each status value with the words that users give for it.
@@ -98,11 +132,12 @@ func (t *Translator) Translate(ctx context.Context, in Input) (Result, error) {
 		return Result{}, fmt.Errorf("nlsearch: evaluation failed: %w", err)
 	}
 
-	return newResult(p.filters(res.Answers)), nil
+	filters := p.filters(res.Answers)
+	return newResult(filters, p.trace(res.Answers)), nil
 }
 
-func newResult(filters []Filter) Result {
-	result := Result{Filters: filters, Understood: len(filters) > 0}
+func newResult(filters []Filter, trace []TraceStep) Result {
+	result := Result{Filters: filters, Understood: len(filters) > 0, Trace: trace}
 	if result.Filters == nil {
 		result.Filters = []Filter{}
 	}
@@ -188,6 +223,9 @@ type plan struct {
 	questions map[string]typesafe.Question
 	amounts   map[string]int
 	customs   []customQuestion
+	values    []string
+	asked     []askedQuestion
+	steps     map[string]*TraceStep
 }
 
 func newPlan(in Input) *plan {
@@ -195,11 +233,13 @@ func newPlan(in Input) *plan {
 		in:        in,
 		local:     localNow(in.Now, in.TimezoneOffsetMinutes),
 		questions: map[string]typesafe.Question{},
+		steps:     map[string]*TraceStep{},
 	}
 
 	p.addStatusQuestions()
 	p.addTimeQuestions()
 	p.addIdentifierQuestions()
+	p.addValueQuestions()
 	p.addCustomQuestions()
 
 	return p
@@ -207,9 +247,22 @@ func newPlan(in Input) *plan {
 
 // state is the content that every question reads.
 func (p *plan) state() map[string]any {
-	customAttributes := make([]map[string]string, 0, len(p.customs))
-	for _, custom := range p.customs {
-		customAttributes = append(customAttributes, map[string]string{"name": custom.name, "type": custom.attributeType})
+	names := make([]string, 0, len(p.in.SearchAttributes))
+	for name, attributeType := range p.in.SearchAttributes {
+		if _, known := typeComparisons[attributeType]; known {
+			names = append(names, name)
+		}
+	}
+	sort.Strings(names)
+
+	searchAttributes := make([]map[string]any, 0, len(names))
+	for _, name := range names {
+		attributeType := p.in.SearchAttributes[name]
+		searchAttributes = append(searchAttributes, map[string]any{
+			"name":        name,
+			"type":        attributeType,
+			"comparisons": typeComparisons[attributeType],
+		})
 	}
 
 	knownWorkflowTypes := p.in.KnownWorkflowTypes
@@ -223,33 +276,39 @@ func (p *plan) state() map[string]any {
 			"date":    p.local.Format("2006-01-02"),
 			"weekday": p.local.Weekday().String(),
 		},
+		"searchAttributes":   searchAttributes,
 		"knownWorkflowTypes": knownWorkflowTypes,
-		"customAttributes":   customAttributes,
 	}
 }
 
 func (p *plan) addStatusQuestions() {
 	for _, status := range executionStatuses {
-		p.questions[questionStatusPrefix+status.value] = typesafe.NewNoul(
+		p.ask(questionStatusPrefix+status.value, TraceStatus, status.value, typesafe.NewNoul(
 			fmt.Sprintf("`text` is a request to search workflow executions. Does the user want workflows with the execution status %s? That status means %s.", status.value, status.meaning),
 			fmt.Sprintf("The request names the status %s, a synonym of it, or a group of statuses that includes it (for example, \"closed\" or \"not running\" includes each status other than Running).", status.value),
 			fmt.Sprintf("The request does not mention the status %s, or it excludes that status.", status.value),
-		)
+		))
 	}
 }
 
 func (p *plan) addTimeQuestions() {
-	p.questions[questionTimeAttribute] = typesafe.NewChoice(
-		"`text` is a request to search workflow executions. If it has a time expression, which timestamp of the workflow does the time expression apply to?",
-		typesafe.ChoiceCriteria{
-			AttributeStartTime:     "The time the workflow started: \"started\", \"began\", \"launched\", \"created\", \"ran\".",
-			AttributeCloseTime:     "The time the workflow closed: \"closed\", \"finished\", \"ended\", \"completed at\", \"failed at\".",
-			AttributeExecutionTime: "The time the workflow was scheduled to execute, for a delayed or cron workflow: \"scheduled for\", \"execution time\".",
-			optionNone:             "There is no time expression, or the request does not say which timestamp it applies to.",
-		},
-	)
+	timestamps := typesafe.ChoiceCriteria{
+		AttributeStartTime:     "The time the workflow started: \"started\", \"began\", \"launched\", \"created\", \"ran\".",
+		AttributeCloseTime:     "The time the workflow closed: \"closed\", \"finished\", \"ended\", \"completed at\", \"failed at\".",
+		AttributeExecutionTime: "The time the workflow was scheduled to execute, for a delayed or cron workflow: \"scheduled for\", \"execution time\".",
+	}
+	for _, name := range p.attributesOfType(TypeDatetime) {
+		if _, exists := timestamps[name]; !exists && len(timestamps) < maxCandidates {
+			timestamps[name] = fmt.Sprintf("The custom timestamp attribute %s.", name)
+		}
+	}
+	timestamps[optionNone] = "There is no time expression, or the request does not say which timestamp it applies to."
+	p.ask(questionTimeAttribute, TraceTimeAttribute, "", typesafe.NewChoice(
+		"`text` is a request to search workflow executions. If it has a time expression, which timestamp of the workflow does the time expression apply to? The timestamps are the Datetime entries of `searchAttributes`.",
+		timestamps,
+	))
 
-	p.questions[questionTimeRange] = typesafe.NewChoice(
+	p.ask(questionTimeRange, TraceTimeRange, "", typesafe.NewChoice(
 		"`text` is a request to search workflow executions. Which period of time does it name? `today` gives the current date of the user.",
 		typesafe.ChoiceCriteria{
 			rangeLast15Minutes:  "15 minutes, a quarter of an hour.",
@@ -265,9 +324,9 @@ func (p *plan) addTimeQuestions() {
 			rangeCustomRelative: "A different span given as a number and a unit: \"last 45 minutes\", \"past 2 weeks\", \"older than 3 days\", \"more than 6 hours ago\".",
 			optionNone:          "The request names no period of time, or it names a period that no other option covers.",
 		},
-	)
+	))
 
-	p.questions[questionTimeUnit] = typesafe.NewChoice(
+	p.ask(questionTimeUnit, TraceTimeUnit, "", typesafe.NewChoice(
 		"`text` is a request to search workflow executions. If it gives a span of time as a number and a unit, which unit is it?",
 		typesafe.ChoiceCriteria{
 			unitMinutes: "Minutes: \"min\", \"mins\", \"m\".",
@@ -277,15 +336,15 @@ func (p *plan) addTimeQuestions() {
 			unitMonths:  "Months.",
 			optionNone:  "The request gives no span of time with a unit.",
 		},
-	)
+	))
 
-	p.questions[questionTimeDirection] = typesafe.NewChoice(
+	p.ask(questionTimeDirection, TraceTimeDirection, "", typesafe.NewChoice(
 		"`text` is a request to search workflow executions. Does the user want workflows inside the named period of time, or workflows from before it?",
 		typesafe.ChoiceCriteria{
 			directionWithinRange: "Inside the period: \"in the last 3 hours\", \"from yesterday\", \"today\", \"since Monday\", \"newer than 2 days\". Also select this option when there is no period of time.",
 			directionOlderThan:   "Before the period: \"older than 3 days\", \"more than 2 weeks ago\", \"before yesterday\", \"not in the last hour\".",
 		},
-	)
+	))
 
 	amounts, values := amountCandidates(p.in.Text)
 	p.amounts = values
@@ -296,67 +355,80 @@ func (p *plan) addTimeQuestions() {
 		return
 	}
 	options[optionNone] = "No number in the request is an amount of time."
-	p.questions[questionTimeAmount] = typesafe.NewChoice(
+	p.ask(questionTimeAmount, TraceTimeAmount, "", typesafe.NewChoice(
 		"`text` is a request to search workflow executions. Which number is the amount of the span of time, such as the 3 in \"last 3 hours\" or in \"older than three days\"? Number words are given as digits. A number that is part of a name or an id is not an amount of time.",
 		options,
-	)
+	))
 }
 
 func (p *plan) addIdentifierQuestions() {
-	identifiers := identifierCandidates(p.in.Text)
+	if !p.hasAttribute(AttributeWorkflowType) {
+		return
+	}
+	options := typesafe.ChoiceCriteria{}
+	addOptions(options, p.in.KnownWorkflowTypes, descriptionKnownType, maxCandidates)
+	addOptions(options, identifierCandidates(p.in.Text), descriptionTyped, maxCandidates)
+	if len(options) == 0 {
+		return
+	}
+	options[optionNone] = "The request names no workflow type, or no option matches the named type. A value that the request gives as a workflow id or a run id is not a workflow type."
+	p.ask(questionWorkflowType, TraceWorkflowType, "", typesafe.NewChoice(
+		"`text` is a request to search workflow executions. Which option is the workflow type that the user wants? A workflow type is the name of a workflow definition, such as OrderWorkflow. The user can write it loosely: \"order workflows\" means OrderWorkflow when that option exists.",
+		options,
+	))
+}
 
-	if p.hasAttribute(AttributeWorkflowType) {
-		options := typesafe.ChoiceCriteria{}
-		addOptions(options, p.in.KnownWorkflowTypes, descriptionKnownType, maxCandidates)
-		addOptions(options, identifiers, descriptionTyped, maxCandidates)
-		if len(options) > 0 {
-			options[optionNone] = "The request names no workflow type, or no option matches the named type. A value that the request gives as a workflow id or a run id is not a workflow type."
-			p.questions[questionWorkflowType] = typesafe.NewChoice(
-				"`text` is a request to search workflow executions. Which option is the workflow type that the user wants? A workflow type is the name of a workflow definition, such as OrderWorkflow. The user can write it loosely: \"order workflows\" means OrderWorkflow when that option exists.",
-				options,
-			)
+// addValueQuestions asks, for each value in the text, which search attribute it
+// filters on and how it is compared. The options are every attribute in
+// `searchAttributes` whose values are words or numbers, so the model can build a
+// filter on any of them. The two questions of a value run in parallel: code keeps
+// the comparison only when the type of the selected attribute allows it.
+func (p *plan) addValueQuestions() {
+	var names []string
+	for _, name := range p.attributeNames() {
+		if name != AttributeExecutionStatus && valueTypes[p.attributeType(name)] {
+			names = append(names, name)
 		}
 	}
-
-	if p.hasAttribute(AttributeWorkflowID) {
-		options := typesafe.ChoiceCriteria{}
-		addOptions(options, identifiers, descriptionTyped, maxCandidates)
-		if len(options) > 0 {
-			options[optionNone] = "The request gives no workflow id. A workflow type name or a run id is not a workflow id."
-			p.questions[questionWorkflowID] = typesafe.NewChoice(
-				"`text` is a request to search workflow executions. Which option is the workflow id, or the start of the workflow id, that the user wants? A workflow id is the business identifier of one workflow, such as order-123. Users usually introduce it with \"workflow id\", \"id\", or \"wf id\".",
-				options,
-			)
-			p.questions[questionIDIsPrefix] = typesafe.NewNoul(
-				"`text` is a request to search workflow executions. Does the user want each workflow whose workflow id STARTS WITH a given value, and not one exact workflow id?",
-				"The request asks for a prefix: \"id starts with\", \"ids beginning with\", \"prefixed with\", or a value that ends with a wildcard.",
-				"The request gives one exact workflow id, or it gives no workflow id.",
-			)
-		}
+	if len(names) == 0 {
+		return
 	}
 
-	if p.hasAttribute(AttributeRunID) {
-		options := typesafe.ChoiceCriteria{}
-		addOptions(options, uuidCandidates(p.in.Text), descriptionTyped, maxCandidates)
-		if len(options) > 0 {
-			options[optionNone] = "The request gives no run id. A UUID that the request gives as a workflow id is not a run id."
-			p.questions[questionRunID] = typesafe.NewChoice(
-				"`text` is a request to search workflow executions. Which option is the run id that the user wants? A run id is the UUID of one run of a workflow. Users usually introduce it with \"run id\" or \"run\".",
-				options,
-			)
+	attributes := typesafe.ChoiceCriteria{}
+	for _, name := range names {
+		if len(attributes) >= maxCandidates {
+			break
 		}
+		attributes[name] = descriptionAttribute
+	}
+	attributes[optionNotAValue] = "The value is not a value to filter on: it is part of a phrase, it names an attribute, a status, or a time, or it is a filler word."
+
+	comparisonOptions := typesafe.ChoiceCriteria{}
+	for _, comparison := range comparisons {
+		comparisonOptions[comparison.key] = comparison.description
+	}
+
+	p.values = valueCandidates(p.in.Text, append(p.attributeNames(), AttributeExecutionStatus, AttributeStartTime, AttributeCloseTime, AttributeExecutionTime))
+	for i, value := range p.values {
+		index := strconv.Itoa(i)
+		p.ask(questionValueAttributePrefix+index, TraceValueAttribute, value, typesafe.NewChoice(
+			fmt.Sprintf("`text` is a request to search workflow executions. It contains the value %q. Which search attribute from `searchAttributes` does the user want to filter on with %q? A word that is part of an attribute name, such as \"id\" or \"type\", or a word that names a comparison, such as \"starts\" or \"more\", is not a value. For example, in \"workflow id starts with agent\", the value agent filters on WorkflowId.", value, value),
+			attributes,
+		))
+		p.ask(questionValueComparisonPrefix+index, TraceValueComparison, value, typesafe.NewChoice(
+			fmt.Sprintf("`text` is a request to search workflow executions. It contains the value %q. If the user filters on %q, how does the user compare the attribute to %q?", value, value, value),
+			comparisonOptions,
+		))
 	}
 }
 
 func (p *plan) addCustomQuestions() {
-	var keywords []string
 	seen := map[string]bool{}
-
 	for _, name := range p.in.CustomAttributeNames {
 		if len(p.customs) == MaxCustomAttributes {
 			return
 		}
-		if seen[name] {
+		if seen[name] || p.in.SearchAttributes[name] != TypeBool {
 			continue
 		}
 		seen[name] = true
@@ -364,38 +436,16 @@ func (p *plan) addCustomQuestions() {
 		custom := customQuestion{
 			id:            questionCustomPrefix + strconv.Itoa(len(p.customs)),
 			name:          name,
-			attributeType: p.in.SearchAttributes[name],
+			attributeType: TypeBool,
 		}
-
-		switch custom.attributeType {
-		case TypeBool:
-			p.questions[custom.id] = typesafe.NewChoice(
-				fmt.Sprintf("`text` is a request to search workflow executions. Workflows have a custom true or false attribute with the name %q. Which value of %q does the user want?", name, name),
-				typesafe.ChoiceCriteria{
-					optionTrue:         fmt.Sprintf("The user wants workflows where %q is true.", name),
-					optionFalse:        fmt.Sprintf("The user wants workflows where %q is false.", name),
-					optionNotMentioned: fmt.Sprintf("The request puts no condition on %q.", name),
-				},
-			)
-		case TypeKeyword:
-			if keywords == nil {
-				keywords = keywordCandidates(p.in.Text)
-			}
-			options := typesafe.ChoiceCriteria{}
-			addOptions(options, keywords, descriptionTyped, MaxKeywordOptions)
-			if len(options) == 0 {
-				continue
-			}
-			options[optionNotMentioned] = fmt.Sprintf("The request puts no condition on %q, or no option is the value.", name)
-			p.questions[custom.id] = typesafe.NewChoice(
-				fmt.Sprintf("`text` is a request to search workflow executions. Workflows have a custom text attribute with the name %q. Which option is the value of %q that the user wants? Do not select the name of the attribute.", name, name),
-				options,
-			)
-		default:
-			// Other attribute types get no question in this version.
-			continue
-		}
-
+		p.ask(custom.id, TraceCustom, name, typesafe.NewChoice(
+			fmt.Sprintf("`text` is a request to search workflow executions. Workflows have a custom true or false attribute with the name %q. Which value of %q does the user want?", name, name),
+			typesafe.ChoiceCriteria{
+				optionTrue:         fmt.Sprintf("The user wants workflows where %q is true.", name),
+				optionFalse:        fmt.Sprintf("The user wants workflows where %q is false.", name),
+				optionNotMentioned: fmt.Sprintf("The request puts no condition on %q.", name),
+			},
+		))
 		p.customs = append(p.customs, custom)
 	}
 }
@@ -408,7 +458,7 @@ func addOptions(options typesafe.ChoiceCriteria, candidates []string, descriptio
 		if len(options) >= limit {
 			return
 		}
-		if candidate == "" || candidate == optionNone || candidate == optionNotMentioned {
+		if candidate == "" || candidate == optionNone || candidate == optionNotMentioned || candidate == optionNotAValue {
 			continue
 		}
 		if _, exists := options[candidate]; !exists {
@@ -425,7 +475,31 @@ func (p *plan) hasAttribute(name string) bool {
 	case AttributeExecutionStatus, AttributeStartTime, AttributeCloseTime, AttributeExecutionTime:
 		return true
 	}
-	return knownAttributeTypes[p.in.SearchAttributes[name]]
+	_, known := typeComparisons[p.in.SearchAttributes[name]]
+	return known
+}
+
+// attributeNames gives the names of the search attributes that a filter can use, sorted.
+func (p *plan) attributeNames() []string {
+	names := make([]string, 0, len(p.in.SearchAttributes))
+	for name := range p.in.SearchAttributes {
+		if p.hasAttribute(name) {
+			names = append(names, name)
+		}
+	}
+	sort.Strings(names)
+	return names
+}
+
+// attributesOfType gives the sorted names of the search attributes of one type.
+func (p *plan) attributesOfType(attributeType string) []string {
+	var names []string
+	for _, name := range p.attributeNames() {
+		if p.attributeType(name) == attributeType {
+			names = append(names, name)
+		}
+	}
+	return names
 }
 
 // attributeType gives the type of the attribute from the request.
@@ -448,32 +522,48 @@ func (p *plan) selected(answers map[string]typesafe.Answer, id string) (string, 
 		return "", 0, false
 	}
 
+	step := p.observe(answers, id)
+	step.Threshold = threshold(MinChoiceConfidence)
 	answer, ok := answers[id]
 	if !ok {
+		step.Outcome = OutcomeMissing
 		return "", 0, false
 	}
 	if _, sent := options[answer.Choice]; !sent {
+		step.Outcome = OutcomeNoMatch
 		return "", 0, false
 	}
-	if answer.Choice == optionNone || answer.Choice == optionNotMentioned {
+	if answer.Choice == optionNone || answer.Choice == optionNotMentioned || answer.Choice == optionNotAValue {
+		step.Outcome = OutcomeNoMatch
 		return "", 0, false
 	}
 	confidence, ok := answer.ChoiceConfidence()
 	if !ok || confidence < MinChoiceConfidence {
+		step.Outcome = OutcomeBelowThreshold
 		return "", 0, false
 	}
 
+	step.Outcome = OutcomeKept
 	return answer.Choice, confidence, true
 }
 
-// noul gives the probability of true for a noul question.
-func (p *plan) noul(answers map[string]typesafe.Answer, id string) (float64, bool) {
+// noul gives the probability of true for a noul question, and records it in the
+// trace against the threshold that the caller applies.
+func (p *plan) noul(answers map[string]typesafe.Answer, id string, minimum float64) (float64, bool) {
 	if _, asked := p.questions[id]; !asked {
 		return 0, false
 	}
+	step := p.observe(answers, id)
+	step.Threshold = threshold(minimum)
 	answer, ok := answers[id]
 	if !ok || answer.Noul == nil {
+		step.Outcome = OutcomeMissing
 		return 0, false
+	}
+	if *answer.Noul >= minimum {
+		step.Outcome = OutcomeKept
+	} else {
+		step.Outcome = OutcomeBelowThreshold
 	}
 	return *answer.Noul, true
 }
@@ -484,9 +574,11 @@ func (p *plan) filters(answers map[string]typesafe.Answer) []Filter {
 	var all []Filter
 	all = append(all, p.statusFilters(answers)...)
 	all = append(all, p.identifierFilters(answers)...)
+	all = append(all, p.valueFilters(answers)...)
 	all = append(all, p.customFilters(answers)...)
-	all = keepStrongestPerValue(all)
-	all = append(all, p.timeFilters(answers)...)
+	strongest := keepStrongestPerValue(all)
+	p.markDropped(all, strongest, OutcomeConflict)
+	all = append(strongest, p.timeFilters(answers)...)
 
 	out := make([]Filter, 0, len(all))
 	for _, filter := range all {
@@ -494,72 +586,127 @@ func (p *plan) filters(answers map[string]typesafe.Answer) []Filter {
 			out = append(out, filter)
 		}
 	}
+	p.markDropped(all, out, OutcomeUnavailable)
 	return out
 }
 
 func (p *plan) statusFilters(answers map[string]typesafe.Answer) []Filter {
 	var out []Filter
 	for _, status := range executionStatuses {
-		probability, ok := p.noul(answers, questionStatusPrefix+status.value)
+		id := questionStatusPrefix + status.value
+		probability, ok := p.noul(answers, id, StatusThreshold)
 		if !ok || probability < StatusThreshold {
 			continue
 		}
-		out = append(out, Filter{
+		filter := Filter{
 			Attribute:   AttributeExecutionStatus,
 			Type:        TypeKeyword,
 			Conditional: ConditionalEquals,
 			Value:       status.value,
 			Confidence:  probability,
-		})
+		}
+		p.attach(answers, id, filter)
+		out = append(out, filter)
 	}
 	return out
 }
 
 func (p *plan) identifierFilters(answers map[string]typesafe.Answer) []Filter {
-	var out []Filter
+	value, confidence, ok := p.selected(answers, questionWorkflowType)
+	if !ok {
+		return nil
+	}
+	filter := Filter{
+		Attribute:   AttributeWorkflowType,
+		Type:        p.attributeType(AttributeWorkflowType),
+		Conditional: ConditionalEquals,
+		Value:       value,
+		Confidence:  confidence,
+	}
+	p.attach(answers, questionWorkflowType, filter)
+	return []Filter{filter}
+}
 
-	if value, confidence, ok := p.selected(answers, questionWorkflowType); ok {
-		out = append(out, Filter{
-			Attribute:   AttributeWorkflowType,
-			Type:        p.attributeType(AttributeWorkflowType),
-			Conditional: ConditionalEquals,
-			Value:       value,
-			Confidence:  confidence,
-		})
+// valueFilters builds one filter for each value whose attribute the model selected.
+// The comparison defaults to "=" when its answer is below the threshold. A
+// comparison that the type of the attribute does not allow, or a value that does
+// not fit the type, gives no filter.
+func (p *plan) valueFilters(answers map[string]typesafe.Answer) []Filter {
+	conditionals := map[string]string{}
+	for _, comparison := range comparisons {
+		conditionals[comparison.key] = comparison.conditional
 	}
 
-	if value, confidence, ok := p.selected(answers, questionWorkflowID); ok {
-		conditional := ConditionalEquals
-		// The prefix judgment contributes in both directions: a noul near 0.5 is a weak
-		// judgment for "=" and for STARTS_WITH.
-		if probability, answered := p.noul(answers, questionIDIsPrefix); answered {
-			if probability >= PrefixThreshold {
-				conditional = ConditionalStartsWith
-				confidence = min(confidence, probability)
-			} else {
-				confidence = min(confidence, 1-probability)
-			}
+	var out []Filter
+	for i, value := range p.values {
+		index := strconv.Itoa(i)
+		attributeID := questionValueAttributePrefix + index
+		attribute, confidence, ok := p.selected(answers, attributeID)
+		if !ok {
+			continue
 		}
-		out = append(out, Filter{
-			Attribute:   AttributeWorkflowID,
-			Type:        p.attributeType(AttributeWorkflowID),
+		attributeType := p.attributeType(attribute)
+
+		conditional := ConditionalEquals
+		if key, comparisonConfidence, ok := p.selected(answers, questionValueComparisonPrefix+index); ok {
+			conditional = conditionals[key]
+			confidence = min(confidence, comparisonConfidence)
+		}
+
+		if attribute == AttributeWorkflowType {
+			known, ok := p.knownWorkflowType(value)
+			if !ok {
+				p.observe(answers, attributeID).Outcome = OutcomeIncomplete
+				continue
+			}
+			value = known
+		}
+
+		if !allows(attributeType, conditional) || !fitsType(attributeType, value) {
+			p.observe(answers, attributeID).Outcome = OutcomeIncomplete
+			continue
+		}
+
+		filter := Filter{
+			Attribute:   attribute,
+			Type:        attributeType,
 			Conditional: conditional,
 			Value:       value,
 			Confidence:  confidence,
-		})
+		}
+		p.attach(answers, attributeID, filter)
+		out = append(out, filter)
 	}
-
-	if value, confidence, ok := p.selected(answers, questionRunID); ok {
-		out = append(out, Filter{
-			Attribute:   AttributeRunID,
-			Type:        p.attributeType(AttributeRunID),
-			Conditional: ConditionalEquals,
-			Value:       value,
-			Confidence:  confidence,
-		})
-	}
-
 	return out
+}
+
+// knownWorkflowType gives the known workflow type that a value names, without
+// regard to case. A value that names no known type gives no filter, because a
+// WorkflowType filter must match exactly: the workflow type question handles
+// loose names such as "order" for OrderWorkflow. Without known types, the value
+// stays as the user typed it.
+func (p *plan) knownWorkflowType(value string) (string, bool) {
+	if len(p.in.KnownWorkflowTypes) == 0 {
+		return value, true
+	}
+	for _, known := range p.in.KnownWorkflowTypes {
+		if strings.EqualFold(known, value) {
+			return known, true
+		}
+	}
+	return "", false
+}
+
+func fitsType(attributeType, value string) bool {
+	switch attributeType {
+	case TypeInt:
+		_, err := strconv.ParseInt(value, 10, 64)
+		return err == nil
+	case TypeDouble:
+		_, err := strconv.ParseFloat(value, 64)
+		return err == nil
+	}
+	return true
 }
 
 // keepStrongestPerValue resolves a conflict between questions. They cannot see one
@@ -595,13 +742,15 @@ func (p *plan) customFilters(answers map[string]typesafe.Answer) []Filter {
 		if !ok {
 			continue
 		}
-		out = append(out, Filter{
+		filter := Filter{
 			Attribute:   custom.name,
 			Type:        custom.attributeType,
 			Conditional: ConditionalEquals,
 			Value:       value,
 			Confidence:  confidence,
-		})
+		}
+		p.attach(answers, custom.id, filter)
+		out = append(out, filter)
 	}
 	return out
 }
@@ -614,12 +763,17 @@ func (p *plan) timeFilters(answers map[string]typesafe.Answer) []Filter {
 		return nil
 	}
 
+	incomplete := func() []Filter {
+		p.observe(answers, questionTimeRange).Outcome = OutcomeIncomplete
+		return nil
+	}
+
 	var span timeRange
 	if preset == rangeCustomRelative {
 		amountKey, amountConfidence, amountOK := p.selected(answers, questionTimeAmount)
 		unit, unitConfidence, unitOK := p.selected(answers, questionTimeUnit)
 		if !amountOK || !unitOK {
-			return nil
+			return incomplete()
 		}
 		span, ok = relativeRange(p.amounts[amountKey], unit, p.local)
 		confidence = min(confidence, amountConfidence, unitConfidence)
@@ -627,12 +781,12 @@ func (p *plan) timeFilters(answers map[string]typesafe.Answer) []Filter {
 		span, ok = presetRange(preset, p.local)
 	}
 	if !ok {
-		return nil
+		return incomplete()
 	}
 
 	direction, directionConfidence, ok := p.selected(answers, questionTimeDirection)
 	if !ok {
-		return nil
+		return incomplete()
 	}
 	confidence = min(confidence, directionConfidence)
 
@@ -643,5 +797,7 @@ func (p *plan) timeFilters(answers map[string]typesafe.Answer) []Filter {
 		confidence = min(confidence, attributeConfidence)
 	}
 
-	return span.filters(attribute, direction, confidence)
+	filters := span.filters(attribute, direction, confidence)
+	p.attach(answers, questionTimeRange, filters...)
+	return filters
 }

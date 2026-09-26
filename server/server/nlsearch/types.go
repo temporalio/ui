@@ -42,10 +42,9 @@ const (
 const (
 	// MaxCustomAttributes is the maximum number of custom attributes that get a question.
 	MaxCustomAttributes = 20
-	// MaxKeywordOptions is the maximum number of text candidates in the question of
-	// one Keyword attribute. It bounds the size of the request: each Keyword
-	// attribute gets the same candidates.
-	MaxKeywordOptions = 25
+	// MaxValueCandidates is the maximum number of values from the text that get
+	// value questions. Each value gets two questions, so this bounds the request.
+	MaxValueCandidates = 12
 	// maxCandidates leaves room for the "no answer" option of a choice question.
 	maxCandidates = typesafe.MaxChoiceOptions - 1
 )
@@ -56,8 +55,11 @@ const DefaultModel = "jev-latest"
 // Conditionals that a filter can use.
 const (
 	ConditionalEquals         = "="
+	ConditionalNotEquals      = "!="
+	ConditionalGreater        = ">"
 	ConditionalGreaterOrEqual = ">="
 	ConditionalLess           = "<"
+	ConditionalLessOrEqual    = "<="
 	ConditionalStartsWith     = "STARTS_WITH"
 )
 
@@ -71,9 +73,13 @@ const (
 	AttributeCloseTime       = "CloseTime"
 	AttributeExecutionTime   = "ExecutionTime"
 
-	TypeKeyword  = "Keyword"
-	TypeBool     = "Bool"
-	TypeDatetime = "Datetime"
+	TypeKeyword     = "Keyword"
+	TypeText        = "Text"
+	TypeKeywordList = "KeywordList"
+	TypeInt         = "Int"
+	TypeDouble      = "Double"
+	TypeBool        = "Bool"
+	TypeDatetime    = "Datetime"
 )
 
 type (
@@ -114,6 +120,8 @@ type (
 		Confidence float64 `json:"confidence"`
 		// Understood is false when no judgment crossed its threshold.
 		Understood bool `json:"understood"`
+		// Trace records each question, its answer, and what code did with it.
+		Trace []TraceStep `json:"trace"`
 	}
 
 	// ValidationError reports input that is outside the accepted limits.

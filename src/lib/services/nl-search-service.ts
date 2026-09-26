@@ -44,10 +44,37 @@ export type NLSearchRequest = {
   knownWorkflowTypes: string[];
 };
 
+export const NL_SEARCH_TRACE_OUTCOMES = [
+  'kept',
+  'below_threshold',
+  'no_match',
+  'missing',
+  'unused',
+  'incomplete',
+  'conflict',
+  'unavailable',
+] as const;
+
+export type NLSearchTraceOutcome = (typeof NL_SEARCH_TRACE_OUTCOMES)[number];
+
+export type NLSearchTraceStep = {
+  id: string;
+  question: string;
+  subject: string | null;
+  kind: 'noul' | 'choice';
+  answer: string | null;
+  score: number | null;
+  threshold: number | null;
+  probabilities: Record<string, number>;
+  outcome: NLSearchTraceOutcome;
+  filters: NLSearchFilter[];
+};
+
 export type NLSearchResponse = {
   filters: NLSearchFilter[];
   confidence: number;
   understood: boolean;
+  trace: NLSearchTraceStep[];
 };
 
 export type TranslateNaturalLanguageSearchOptions = {
@@ -166,7 +193,56 @@ export const translateNaturalLanguageSearch = async ({
     confidence:
       typeof response?.confidence === 'number' ? response.confidence : 0,
     understood: Boolean(response?.understood) && filters.length > 0,
+    trace: toNLSearchTrace(response?.trace),
   };
+};
+
+const finiteOrNull = (value: unknown): number | null =>
+  typeof value === 'number' && Number.isFinite(value) ? value : null;
+
+const nonEmptyOrNull = (value: unknown): string | null =>
+  typeof value === 'string' && value.length > 0 ? value : null;
+
+const isTraceOutcome = (value: unknown): value is NLSearchTraceOutcome =>
+  NL_SEARCH_TRACE_OUTCOMES.some((outcome) => outcome === value);
+
+export const toNLSearchTrace = (value: unknown): NLSearchTraceStep[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((raw): NLSearchTraceStep[] => {
+    const step = raw as Partial<Record<keyof NLSearchTraceStep, unknown>>;
+    if (typeof step?.id !== 'string' || typeof step.question !== 'string') {
+      return [];
+    }
+    if (!isTraceOutcome(step.outcome)) return [];
+
+    const probabilities =
+      step.probabilities && typeof step.probabilities === 'object'
+        ? Object.fromEntries(
+            Object.entries(step.probabilities).filter(
+              (entry): entry is [string, number] =>
+                finiteOrNull(entry[1]) !== null,
+            ),
+          )
+        : {};
+
+    return [
+      {
+        id: step.id,
+        question: step.question,
+        subject: nonEmptyOrNull(step.subject),
+        kind: step.kind === 'noul' ? 'noul' : 'choice',
+        answer: nonEmptyOrNull(step.answer),
+        score: finiteOrNull(step.score),
+        threshold: finiteOrNull(step.threshold),
+        probabilities,
+        outcome: step.outcome,
+        filters: Array.isArray(step.filters)
+          ? (step.filters as NLSearchFilter[])
+          : [],
+      },
+    ];
+  });
 };
 
 const knownWorkflowTypesCache = new Map<string, string[]>();
@@ -223,13 +299,58 @@ const requestKnownWorkflowTypes = async (
     knownWorkflowTypesCache.set(namespace, workflowTypes);
     return workflowTypes;
   } catch (error: unknown) {
-    // A 4xx means this server cannot answer the query (standard visibility
-    // only groups by ExecutionStatus), so asking again cannot help. A network
-    // or 5xx error can be temporary and is not cached.
-    const statusCode = Number((error as { statusCode?: number })?.statusCode);
-    if (statusCode >= 400 && statusCode < 500) {
-      knownWorkflowTypesCache.set(namespace, []);
+    // A 4xx means this server cannot group by WorkflowType (standard
+    // visibility only groups by ExecutionStatus), so the types come from the
+    // recent workflows instead. A network or 5xx error can be temporary and
+    // is not cached.
+    if (isClientError(error)) {
+      return requestRecentWorkflowTypes(namespace, request);
     }
+    return [];
+  }
+};
+
+const RECENT_WORKFLOWS_PAGE_SIZE = 200;
+
+const isClientError = (error: unknown): boolean => {
+  const statusCode = Number((error as { statusCode?: number })?.statusCode);
+  return statusCode >= 400 && statusCode < 500;
+};
+
+type RecentWorkflowsResponse = {
+  executions?: { type?: { name?: string } }[];
+};
+
+const requestRecentWorkflowTypes = async (
+  namespace: string,
+  request: typeof fetch,
+): Promise<string[]> => {
+  try {
+    const route = routeForApi('workflows', { namespace });
+    const { executions = [] } =
+      (await requestFromAPI<RecentWorkflowsResponse>(route, {
+        params: { pageSize: String(RECENT_WORKFLOWS_PAGE_SIZE) },
+        notifyOnError: false,
+        request,
+      })) ?? {};
+
+    const counts = new Map<string, number>();
+    for (const execution of executions) {
+      const name = execution?.type?.name;
+      if (typeof name === 'string' && isWithinNameLimit(name)) {
+        counts.set(name, (counts.get(name) ?? 0) + 1);
+      }
+    }
+
+    const workflowTypes = [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, NL_SEARCH_MAX_WORKFLOW_TYPES)
+      .map(([name]) => name);
+
+    knownWorkflowTypesCache.set(namespace, workflowTypes);
+    return workflowTypes;
+  } catch (error: unknown) {
+    if (isClientError(error)) knownWorkflowTypesCache.set(namespace, []);
     return [];
   }
 };

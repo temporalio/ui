@@ -125,9 +125,10 @@ describe('translateNaturalLanguageSearch', () => {
     };
     vi.mocked(requestFromAPI).mockResolvedValue(response);
 
-    await expect(translateNaturalLanguageSearch(options)).resolves.toEqual(
-      response,
-    );
+    await expect(translateNaturalLanguageSearch(options)).resolves.toEqual({
+      ...response,
+      trace: [],
+    });
 
     const [route, init] = vi.mocked(requestFromAPI).mock.calls[0];
     expect(route).toMatch(/\/api\/v1\/nl-search$/);
@@ -147,7 +148,68 @@ describe('translateNaturalLanguageSearch', () => {
       filters: [],
       confidence: 0,
       understood: false,
+      trace: [],
     });
+  });
+
+  it('keeps the trace of how the filters were chosen', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue({
+      filters: [],
+      confidence: 0,
+      understood: false,
+      trace: [
+        {
+          id: 'status_Failed',
+          question: 'status',
+          subject: 'Failed',
+          kind: 'noul',
+          score: 0.42,
+          threshold: 0.6,
+          outcome: 'below_threshold',
+        },
+        {
+          id: 'time_unit',
+          question: 'time_unit',
+          kind: 'choice',
+          answer: 'none',
+          score: 0.95,
+          threshold: null,
+          probabilities: { none: 0.95, hours: 'x' },
+          outcome: 'unused',
+        },
+        { id: 'broken', question: 'status', outcome: 'surprising' },
+        'not a step',
+      ],
+    });
+
+    const { trace } = await translateNaturalLanguageSearch(options);
+
+    expect(trace).toEqual([
+      {
+        id: 'status_Failed',
+        question: 'status',
+        subject: 'Failed',
+        kind: 'noul',
+        answer: null,
+        score: 0.42,
+        threshold: 0.6,
+        probabilities: {},
+        outcome: 'below_threshold',
+        filters: [],
+      },
+      {
+        id: 'time_unit',
+        question: 'time_unit',
+        subject: null,
+        kind: 'choice',
+        answer: 'none',
+        score: 0.95,
+        threshold: null,
+        probabilities: { none: 0.95 },
+        outcome: 'unused',
+        filters: [],
+      },
+    ]);
   });
 
   it('throws a typed error with the server message', async () => {
@@ -327,18 +389,41 @@ describe('fetchKnownWorkflowTypes', () => {
     expect(workflowTypes[0]).toBe('Type149');
   });
 
-  it('caches the empty result after a 4xx so the request is not repeated', async () => {
-    vi.mocked(requestFromAPI).mockRejectedValue({
-      statusCode: 400,
-      message: 'invalid query: GROUP BY WorkflowType',
-    });
+  it('falls back to the recent workflows when the server cannot group by type', async () => {
+    vi.mocked(requestFromAPI)
+      .mockRejectedValueOnce({
+        statusCode: 400,
+        message: 'invalid query: GROUP BY WorkflowType',
+      })
+      .mockResolvedValueOnce({
+        executions: [
+          { type: { name: 'RefundWorkflow' } },
+          { type: { name: 'OrderWorkflow' } },
+          { type: { name: 'OrderWorkflow' } },
+          { type: {} },
+        ],
+      });
+
+    expect(await fetchKnownWorkflowTypes('default')).toEqual([
+      'OrderWorkflow',
+      'RefundWorkflow',
+    ]);
+    expect(await fetchKnownWorkflowTypes('default')).toEqual([
+      'OrderWorkflow',
+      'RefundWorkflow',
+    ]);
+    expect(requestFromAPI).toHaveBeenCalledTimes(2);
+
+    const [route, init] = vi.mocked(requestFromAPI).mock.calls[1];
+    expect(route).toMatch(/\/namespaces\/default\/workflows$/);
+    expect(init?.params).toEqual({ pageSize: '200' });
+  });
+
+  it('caches the empty result when the fallback also gets a 4xx', async () => {
+    vi.mocked(requestFromAPI).mockRejectedValue({ statusCode: 403 });
 
     expect(await fetchKnownWorkflowTypes('default')).toEqual([]);
     expect(await fetchKnownWorkflowTypes('default')).toEqual([]);
-    expect(await fetchKnownWorkflowTypes('default')).toEqual([]);
-    expect(requestFromAPI).toHaveBeenCalledTimes(1);
-
-    await fetchKnownWorkflowTypes('other');
     expect(requestFromAPI).toHaveBeenCalledTimes(2);
   });
 

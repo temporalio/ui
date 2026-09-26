@@ -18,12 +18,21 @@
     translateNaturalLanguageSearch,
   } from '$lib/services/nl-search-service';
   import { prefixSearchEnabled } from '$lib/stores/capability-enablement';
+  import {
+    NL_SEARCH_PARAMETER,
+    nlSearchTrace,
+    nlSearchTraceOpen,
+    recordNLSearch,
+  } from '$lib/stores/nl-search-trace';
   import { currentPageKey } from '$lib/stores/pagination';
   import { allSearchAttributes } from '$lib/stores/search-attributes';
   import type { SearchAttributes } from '$lib/types/workflows';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { toFiltersFromNLSearch } from '$lib/utilities/query/nl-search-filters';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import {
+    updateMultipleQueryParameters,
+    updateQueryParameters,
+  } from '$lib/utilities/update-query-parameters';
 
   type Status = {
     kind: 'success' | 'hint' | 'error';
@@ -39,7 +48,10 @@
 
   let { filters, searchAttributes, id, onSearch }: Props = $props();
 
-  let text = $state('');
+  const urlText = $derived(
+    page.url.searchParams.get(NL_SEARCH_PARAMETER) ?? '',
+  );
+  let text = $derived(urlText);
   let loading = $state(false);
   let status = $state<Status | null>(null);
   let requestId = 0;
@@ -73,17 +85,27 @@
     const nextQuery = toListWorkflowQueryFromFilters(nextFilters);
     $filters = nextFilters;
 
-    if (nextQuery === query) {
+    if (nextQuery === query && text === urlText) {
       onSearch?.(nextQuery);
     } else {
-      updateQueryParameters({
+      updateMultipleQueryParameters({
         url: page.url,
-        parameter: 'query',
-        value: nextQuery,
-        allowEmpty: true,
+        parameters: [
+          { parameter: 'query', value: nextQuery },
+          { parameter: NL_SEARCH_PARAMETER, value: text },
+        ],
         clearParameters: [currentPageKey],
       });
     }
+  };
+
+  const rememberText = (value: string) => {
+    if (value === urlText) return;
+    updateQueryParameters({
+      url: page.url,
+      parameter: NL_SEARCH_PARAMETER,
+      value,
+    });
   };
 
   const handleSubmit = async (event: SubmitEvent) => {
@@ -115,6 +137,8 @@
         : [];
 
       if (!nextFilters.length) {
+        recordNLSearch(text, response, null);
+        rememberText(text);
         status = {
           kind: 'hint',
           message: translate('workflows.nl-search-not-understood'),
@@ -123,6 +147,11 @@
       }
 
       applyFilters(nextFilters);
+      recordNLSearch(
+        text,
+        response,
+        toListWorkflowQueryFromFilters(nextFilters),
+      );
 
       status =
         response.confidence < NL_SEARCH_LOW_CONFIDENCE_THRESHOLD
@@ -157,6 +186,8 @@
     requestId++;
     loading = false;
     status = null;
+    $nlSearchTraceOpen = false;
+    rememberText('');
   };
 </script>
 
@@ -197,16 +228,36 @@
       {translate('workflows.nl-search-submit')}
     </Button>
   </form>
-  <p
-    id="{id}-nl-search-status"
-    aria-live="polite"
-    data-testid="{id}-nl-search-status"
-    class="break-words border-t border-primary px-3 py-1.5 text-sm"
-    class:sr-only={!statusMessage}
-    class:text-danger={status?.kind === 'error'}
-    class:text-warning={status?.kind === 'hint'}
-    class:text-secondary={loading || status?.kind === 'success'}
+  <div
+    class="flex items-center gap-2"
+    class:border-t={!!statusMessage || !!$nlSearchTrace}
+    class:border-primary={!!statusMessage || !!$nlSearchTrace}
   >
-    {statusMessage}
-  </p>
+    <p
+      id="{id}-nl-search-status"
+      aria-live="polite"
+      data-testid="{id}-nl-search-status"
+      class="min-w-0 grow break-words px-3 py-1.5 text-sm"
+      class:sr-only={!statusMessage}
+      class:text-danger={status?.kind === 'error'}
+      class:text-warning={status?.kind === 'hint'}
+      class:text-secondary={loading || status?.kind === 'success'}
+    >
+      {statusMessage}
+    </p>
+    {#if $nlSearchTrace && !loading}
+      <Button
+        variant="ghost"
+        size="xs"
+        class="mr-1 shrink-0"
+        aria-label={translate('workflows.nl-search-explain-label')}
+        aria-expanded={$nlSearchTraceOpen}
+        aria-controls="{id}-nl-search-trace"
+        data-testid="{id}-nl-search-explain"
+        onclick={() => ($nlSearchTraceOpen = !$nlSearchTraceOpen)}
+      >
+        {translate('workflows.nl-search-explain')}
+      </Button>
+    {/if}
+  </div>
 </div>

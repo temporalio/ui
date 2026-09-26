@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -109,7 +110,7 @@ func defaultAnswer(questionType string, criteria map[string]any) typesafe.Answer
 	if questionType == string(typesafe.QuestionTypeNoul) {
 		return noul(0.02)
 	}
-	for _, key := range []string{optionNone, optionNotMentioned, directionWithinRange} {
+	for _, key := range []string{optionNone, optionNotMentioned, optionNotAValue, directionWithinRange} {
 		if _, ok := criteria[key]; ok {
 			return choice(key, 0.95)
 		}
@@ -166,12 +167,45 @@ func datetime(attribute, conditional, value string, confidence float64) Filter {
 	return Filter{Attribute: attribute, Type: TypeDatetime, Conditional: conditional, Value: value, Confidence: confidence}
 }
 
+// valueAnswers are the answers to the two questions of one value: the attribute
+// and the comparison. A zero answer leaves the question to the default answer.
+type valueAnswers [2]typesafe.Answer
+
+// withValueAnswers adds the answers of each value under the ids of its questions.
+func withValueAnswers(t *testing.T, text string, answers map[string]typesafe.Answer, values map[string]valueAnswers) map[string]typesafe.Answer {
+	t.Helper()
+	out := map[string]typesafe.Answer{}
+	for id, answer := range answers {
+		out[id] = answer
+	}
+	candidates := newPlan(testInput(text)).values
+	for value, pair := range values {
+		index := -1
+		for i, candidate := range candidates {
+			if candidate == value {
+				index = i
+				break
+			}
+		}
+		require.GreaterOrEqual(t, index, 0, "%q is not a value candidate of %q (candidates: %v)", value, text, candidates)
+		if pair[0].Type != "" {
+			out[questionValueAttributePrefix+strconv.Itoa(index)] = pair[0]
+		}
+		if pair[1].Type != "" {
+			out[questionValueComparisonPrefix+strconv.Itoa(index)] = pair[1]
+		}
+	}
+	return out
+}
+
 func TestTranslate(t *testing.T) {
 	tests := []struct {
-		name        string
-		text        string
-		mutate      func(*Input)
-		answers     map[string]typesafe.Answer
+		name    string
+		text    string
+		mutate  func(*Input)
+		answers map[string]typesafe.Answer
+		// values maps a value from the text to its attribute and comparison answers.
+		values      map[string]valueAnswers
 		unchecked   map[string]typesafe.Answer
 		wantOptions map[string][]string
 		// wantExactOptions lists all the options of a question.
@@ -262,15 +296,12 @@ func TestTranslate(t *testing.T) {
 		{
 			name: "workflow id prefix",
 			text: "workflow id starts with order-123",
-			answers: map[string]typesafe.Answer{
-				"workflow_id":  choice("order-123", 0.9),
-				"id_is_prefix": noul(0.95),
+			values: map[string]valueAnswers{
+				"order-123": {choice("WorkflowId", 0.9), choice("starts_with", 0.95)},
 			},
 			wantOptions: map[string][]string{
-				"workflow_id":   {"order-123", optionNone},
 				"workflow_type": {"order-123", "OrderWorkflow", optionNone},
 			},
-			wantNotAsked: []string{"time_amount", "run_id"},
 			wantFilters: []Filter{
 				keyword("WorkflowId", "STARTS_WITH", "order-123", 0.9),
 			},
@@ -279,36 +310,44 @@ func TestTranslate(t *testing.T) {
 		{
 			name: "exact workflow id in quotes",
 			text: `workflow id "12345"`,
-			answers: map[string]typesafe.Answer{
-				"workflow_id": choice("12345", 0.9),
+			values: map[string]valueAnswers{
+				"12345": {choice("WorkflowId", 0.9), choice("equals", 0.97)},
 			},
-			wantNotAsked: []string{"time_amount"},
 			wantFilters: []Filter{
 				keyword("WorkflowId", "=", "12345", 0.9),
 			},
 			wantConfidence: 0.9,
 		},
 		{
-			name: "uncertain prefix judgment lowers the confidence",
+			name: "a comparison below the threshold falls back to equals",
 			text: "id order-123",
-			answers: map[string]typesafe.Answer{
-				"workflow_id":  choice("order-123", 0.9),
-				"id_is_prefix": noul(0.5),
+			values: map[string]valueAnswers{
+				"order-123": {choice("WorkflowId", 0.9), choice("starts_with", 0.4)},
 			},
 			wantFilters: []Filter{
-				keyword("WorkflowId", "=", "order-123", 0.5),
+				keyword("WorkflowId", "=", "order-123", 0.9),
 			},
-			wantConfidence: 0.5,
+			wantConfidence: 0.9,
 		},
 		{
-			name: "run id candidates are UUIDs only",
+			name: "a plain word can be a workflow id",
+			text: "workflow id starts with agent",
+			values: map[string]valueAnswers{
+				"agent": {choice("WorkflowId", 0.86), choice("starts_with", 0.93)},
+			},
+			wantFilters: []Filter{
+				keyword("WorkflowId", "STARTS_WITH", "agent", 0.86),
+			},
+			wantConfidence: 0.86,
+		},
+		{
+			name: "a run id and a workflow type",
 			text: "run 3f2b8c1e-9a4d-4e7b-8c21-0a1b2c3d4e5f of payment_flow",
 			answers: map[string]typesafe.Answer{
-				"run_id":        choice("3f2b8c1e-9a4d-4e7b-8c21-0a1b2c3d4e5f", 0.96),
 				"workflow_type": choice("payment_flow", 0.75),
 			},
-			wantOptions: map[string][]string{
-				"run_id": {"3f2b8c1e-9a4d-4e7b-8c21-0a1b2c3d4e5f", optionNone},
+			values: map[string]valueAnswers{
+				"3f2b8c1e-9a4d-4e7b-8c21-0a1b2c3d4e5f": {choice("RunId", 0.96), choice("equals", 0.99)},
 			},
 			wantFilters: []Filter{
 				keyword("WorkflowType", "=", "payment_flow", 0.75),
@@ -321,7 +360,9 @@ func TestTranslate(t *testing.T) {
 			text: "find order-123",
 			answers: map[string]typesafe.Answer{
 				"workflow_type": choice("order-123", 0.6),
-				"workflow_id":   choice("order-123", 0.9),
+			},
+			values: map[string]valueAnswers{
+				"order-123": {choice("WorkflowId", 0.9), choice("equals", 0.95)},
 			},
 			wantFilters: []Filter{
 				keyword("WorkflowId", "=", "order-123", 0.9),
@@ -332,7 +373,7 @@ func TestTranslate(t *testing.T) {
 			name:         "text that is not a search is not understood",
 			text:         "hello there, how are you",
 			mutate:       func(in *Input) { in.KnownWorkflowTypes = nil },
-			wantNotAsked: []string{"workflow_type", "workflow_id", "run_id", "id_is_prefix", "time_amount"},
+			wantNotAsked: []string{"workflow_type", "time_amount"},
 			wantFilters:  []Filter{},
 		},
 		{
@@ -349,8 +390,10 @@ func TestTranslate(t *testing.T) {
 			text: "maybe failed order-123 today",
 			answers: map[string]typesafe.Answer{
 				"status_Failed": noul(0.59),
-				"workflow_id":   choice("order-123", 0.49),
 				"time_range":    choice(rangeToday, 0.49),
+			},
+			values: map[string]valueAnswers{
+				"order-123": {choice("WorkflowId", 0.49), choice("equals", 0.9)},
 			},
 			wantFilters: []Filter{},
 		},
@@ -383,20 +426,84 @@ func TestTranslate(t *testing.T) {
 			name: "bool and keyword custom attributes",
 			text: "vip customers in the gold tier",
 			answers: map[string]typesafe.Answer{
-				"custom_0": choice("gold", 0.8),
-				"custom_1": choice(optionTrue, 0.9),
+				"custom_0": choice(optionTrue, 0.9),
+			},
+			values: map[string]valueAnswers{
+				"gold": {choice("CustomerTier", 0.8), choice("equals", 0.9)},
 			},
 			wantOptions: map[string][]string{
-				"custom_0": {"gold", "vip", "tier", optionNotMentioned},
-				"custom_1": {optionTrue, optionFalse, optionNotMentioned},
+				"custom_0": {optionTrue, optionFalse, optionNotMentioned},
 			},
-			// Attempts is an Int attribute: no question in this version.
-			wantNotAsked: []string{"custom_2"},
 			wantFilters: []Filter{
 				keyword("CustomerTier", "=", "gold", 0.8),
 				{Attribute: "IsVip", Type: TypeBool, Conditional: "=", Value: "true", Confidence: 0.9},
 			},
 			wantConfidence: 0.8,
+		},
+		{
+			name: "a value on WorkflowType must name a known type",
+			text: "failed order workflows",
+			answers: map[string]typesafe.Answer{
+				"status_Failed": noul(0.95),
+				"workflow_type": choice("OrderWorkflow", 0.88),
+			},
+			values: map[string]valueAnswers{
+				"order": {choice("WorkflowType", 0.9), choice("equals", 0.9)},
+			},
+			wantFilters: []Filter{
+				keyword("ExecutionStatus", "=", "Failed", 0.95),
+				keyword("WorkflowType", "=", "OrderWorkflow", 0.88),
+			},
+			wantConfidence: 0.88,
+		},
+		{
+			name: "a value on WorkflowType takes the case of the known type",
+			text: "orderworkflow runs",
+			values: map[string]valueAnswers{
+				"orderworkflow": {choice("WorkflowType", 0.9), choice("equals", 0.9)},
+			},
+			wantFilters: []Filter{
+				keyword("WorkflowType", "=", "OrderWorkflow", 0.9),
+			},
+			wantConfidence: 0.9,
+		},
+		{
+			name: "an int attribute with a comparison",
+			text: "more than 3 attempts",
+			values: map[string]valueAnswers{
+				"3": {choice("Attempts", 0.9), choice("greater", 0.85)},
+			},
+			wantFilters: []Filter{
+				{Attribute: "Attempts", Type: TypeInt, Conditional: ">", Value: "3", Confidence: 0.85},
+			},
+			wantConfidence: 0.85,
+		},
+		{
+			name: "not equal on a keyword attribute",
+			text: "tier is not gold",
+			values: map[string]valueAnswers{
+				"gold": {choice("CustomerTier", 0.88), choice("not_equals", 0.9)},
+			},
+			wantFilters: []Filter{
+				keyword("CustomerTier", "!=", "gold", 0.88),
+			},
+			wantConfidence: 0.88,
+		},
+		{
+			name: "a comparison that the type does not allow gives no filter",
+			text: "attempts starting with 3",
+			values: map[string]valueAnswers{
+				"3": {choice("Attempts", 0.9), choice("starts_with", 0.9)},
+			},
+			wantFilters: []Filter{},
+		},
+		{
+			name: "a value that does not fit the type gives no filter",
+			text: "gold attempts",
+			values: map[string]valueAnswers{
+				"gold": {choice("Attempts", 0.9), choice("equals", 0.9)},
+			},
+			wantFilters: []Filter{},
 		},
 		{
 			name: "an answer without confidence uses the probability of its option",
@@ -421,17 +528,10 @@ func TestTranslate(t *testing.T) {
 			wantFilters: []Filter{},
 		},
 		{
-			name: "status and time words are not keyword candidates",
-			text: "failed order workflows from yesterday in the last 3 hours",
+			name: "status words are not value candidates",
+			text: "failed order workflows from yesterday",
 			answers: map[string]typesafe.Answer{
 				"status_Failed": noul(0.97),
-			},
-			// A model that selects "failed" selects an option that code did not send.
-			unchecked: map[string]typesafe.Answer{
-				"custom_0": choice("failed", 0.99),
-			},
-			wantExactOptions: map[string][]string{
-				"custom_0": {"order", optionNotMentioned},
 			},
 			wantFilters: []Filter{
 				keyword("ExecutionStatus", "=", "Failed", 0.97),
@@ -439,13 +539,15 @@ func TestTranslate(t *testing.T) {
 			wantConfidence: 0.97,
 		},
 		{
-			name: "one word has one role across the status and custom questions, without regard to case",
+			name: "one word has one role across the status and value questions, without regard to case",
 			text: `show the "failed" tier for order-123`,
 			answers: map[string]typesafe.Answer{
 				"status_Failed": noul(0.9),
-				"custom_0":      choice("failed", 0.7),
 				"workflow_type": choice("order-123", 0.6),
-				"workflow_id":   choice("order-123", 0.8),
+			},
+			values: map[string]valueAnswers{
+				"failed":    {choice("CustomerTier", 0.7), choice("equals", 0.9)},
+				"order-123": {choice("WorkflowId", 0.8), choice("equals", 0.9)},
 			},
 			wantFilters: []Filter{
 				keyword("ExecutionStatus", "=", "Failed", 0.9),
@@ -454,11 +556,13 @@ func TestTranslate(t *testing.T) {
 			wantConfidence: 0.8,
 		},
 		{
-			name: "the custom answer stays when it is stronger than the status answer",
+			name: "the value answer stays when it is stronger than the status answer",
 			text: `tier "failed"`,
 			answers: map[string]typesafe.Answer{
 				"status_Failed": noul(0.65),
-				"custom_0":      choice("failed", 0.95),
+			},
+			values: map[string]valueAnswers{
+				"failed": {choice("CustomerTier", 0.95), choice("equals", 0.97)},
 			},
 			wantFilters: []Filter{
 				keyword("CustomerTier", "=", "failed", 0.95),
@@ -483,25 +587,13 @@ func TestTranslate(t *testing.T) {
 			wantConfidence: 0.8,
 		},
 		{
-			name: "keyword options of one custom attribute have a cap",
-			text: "w01 w02 w03 w04 w05 w06 w07 w08 w09 w10 w11 w12 w13 w14 w15 w16 w17 w18 w19 w20 w21 w22 w23 w24 w25 w26 w27 w28 w29 w30",
-			wantExactOptions: map[string][]string{
-				"custom_0": {
-					"w01", "w02", "w03", "w04", "w05", "w06", "w07", "w08", "w09", "w10", "w11", "w12", "w13",
-					"w14", "w15", "w16", "w17", "w18", "w19", "w20", "w21", "w22", "w23", "w24", "w25",
-					optionNotMentioned,
-				},
-			},
-			wantFilters: []Filter{},
-		},
-		{
 			name: "an attribute with an unknown type gets no question",
 			text: "workflow id order-123 of vip customers",
 			mutate: func(in *Input) {
 				in.SearchAttributes = map[string]string{"WorkflowId": "Mystery", "WorkflowType": "", "IsVip": "bool"}
 				in.CustomAttributeNames = []string{"IsVip"}
 			},
-			wantNotAsked: []string{"workflow_id", "id_is_prefix", "workflow_type", "custom_0"},
+			wantNotAsked: []string{"workflow_type", "custom_0", "value_attribute_0", "value_comparison_0"},
 			wantFilters:  []Filter{},
 		},
 		{
@@ -513,7 +605,7 @@ func TestTranslate(t *testing.T) {
 			answers: map[string]typesafe.Answer{
 				"status_Completed": noul(0.9),
 			},
-			wantNotAsked: []string{"workflow_type", "workflow_id", "id_is_prefix", "run_id", "custom_0", "custom_1"},
+			wantNotAsked: []string{"workflow_type", "custom_0", "value_attribute_0"},
 			wantFilters: []Filter{
 				keyword("ExecutionStatus", "=", "Completed", 0.9),
 			},
@@ -523,7 +615,7 @@ func TestTranslate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fake := &fakeTypeSafe{checked: tt.answers, unchecked: tt.unchecked}
+			fake := &fakeTypeSafe{checked: withValueAnswers(t, tt.text, tt.answers, tt.values), unchecked: tt.unchecked}
 			translator := newTestTranslator(t, fake)
 
 			in := testInput(tt.text)
@@ -579,10 +671,18 @@ func TestTranslateState(t *testing.T) {
 	assert.Equal(t, "jev-1.13", sent.Model)
 	assert.Equal(t, map[string]any{"date": "2026-09-21", "weekday": "Monday"}, sent.State["today"])
 	assert.Equal(t, []any{"OrderWorkflow", "RefundWorkflow"}, sent.State["knownWorkflowTypes"])
-	assert.Equal(t, []any{
-		map[string]any{"name": "CustomerTier", "type": "Keyword"},
-		map[string]any{"name": "IsVip", "type": "Bool"},
-	}, sent.State["customAttributes"])
+	searchAttributes, ok := sent.State["searchAttributes"].([]any)
+	require.True(t, ok)
+	var names []string
+	for _, entry := range searchAttributes {
+		names = append(names, entry.(map[string]any)["name"].(string))
+	}
+	assert.Equal(t, []string{"Attempts", "CustomerTier", "IsVip", "RunId", "WorkflowId", "WorkflowType"}, names)
+	assert.Equal(t, map[string]any{
+		"name":        "CustomerTier",
+		"type":        "Keyword",
+		"comparisons": []any{"=", "!=", "STARTS_WITH"},
+	}, searchAttributes[1])
 }
 
 func TestTranslateCapsCustomAttributes(t *testing.T) {
@@ -793,6 +893,42 @@ func TestCandidates(t *testing.T) {
 		)
 	})
 
+	t.Run("value candidates include plain words, identifiers, UUIDs, and numbers", func(t *testing.T) {
+		assert.Equal(t,
+			[]string{"3f2b8c1e-9a4d-4e7b-8c21-0a1b2c3d4e5f", "order-7", "agent", "runs", "gold", "attempts", "3"},
+			valueCandidates("failed agent runs of order-7 in gold with 3f2b8c1e-9a4d-4e7b-8c21-0a1b2c3d4e5f and more than 3 attempts", []string{"CustomerTier"}),
+		)
+	})
+
+	t.Run("value candidates have a cap", func(t *testing.T) {
+		var words []string
+		for i := 0; i < MaxValueCandidates+5; i++ {
+			words = append(words, fmt.Sprintf("w%02d", i))
+		}
+		assert.Len(t, valueCandidates(strings.Join(words, " "), nil), MaxValueCandidates)
+	})
+
+	t.Run("attribute words and comparison words are not values outside quotes", func(t *testing.T) {
+		names := []string{"WorkflowId", "WorkflowType", "RunId", "CustomKeywordField"}
+		assert.Equal(t, []string{"agent"}, valueCandidates("workflow id starts with agent", names))
+		assert.Equal(t, []string{"gold"}, valueCandidates("custom keyword field is not gold", names))
+		assert.Equal(t, []string{"id", "agent"}, valueCandidates(`workflow id "id" or agent`, names))
+		assert.Equal(t,
+			[]string{"1.2.4", "agent"},
+			valueCandidates(
+				"workflow id starts with agent and the worker deployment is version 1.2.4",
+				append(names, "TemporalWorkerDeployment", "TemporalWorkerDeploymentVersion"),
+			),
+		)
+	})
+
+	t.Run("attribute words split at case changes and separators", func(t *testing.T) {
+		words := attributeWords([]string{"CustomKeywordField", "Batcher_Namespace", "RunId"})
+		for _, word := range []string{"customkeywordfield", "custom", "keyword", "field", "batcher", "namespace", "run", "id"} {
+			assert.True(t, words[word], word)
+		}
+	})
+
 	t.Run("options obey the limit and the reserved keys", func(t *testing.T) {
 		var candidates []string
 		for i := 0; i < 300; i++ {
@@ -851,7 +987,9 @@ func TestWorkflowTypeQuestionAtTheValidationLimit(t *testing.T) {
 // The worst case for the request size: the maximum number of Keyword attributes,
 // and a text of the maximum length that is all distinct candidates.
 func TestRequestSizeHasABound(t *testing.T) {
-	const maxRequestBytes = 48 << 10
+	// Each value question lists every attribute, so the worst case grows with
+	// MaxValueCandidates times MaxSearchAttributes.
+	const maxRequestBytes = 128 << 10
 
 	var words []string
 	for i := 0; len(strings.Join(words, " ")) < MaxTextLength-4; i++ {
@@ -868,7 +1006,7 @@ func TestRequestSizeHasABound(t *testing.T) {
 	in.KnownWorkflowTypes = manyWorkflowTypes(MaxKnownWorkflowTypes)
 	in.SearchAttributes = map[string]string{"WorkflowType": "Keyword", "WorkflowId": "Keyword", "RunId": "Keyword"}
 	in.CustomAttributeNames = nil
-	for i := 0; i < MaxCustomAttributes+5; i++ {
+	for i := 0; len(in.SearchAttributes) < MaxSearchAttributes; i++ {
 		name := fmt.Sprintf("CustomKeywordAttribute%02d", i)
 		in.SearchAttributes[name] = TypeKeyword
 		in.CustomAttributeNames = append(in.CustomAttributeNames, name)
@@ -879,12 +1017,14 @@ func TestRequestSizeHasABound(t *testing.T) {
 	require.Len(t, fake.requests, 1)
 
 	sent := fake.requests[0]
-	for i := 0; i < MaxCustomAttributes; i++ {
-		id := fmt.Sprintf("%s%d", questionCustomPrefix, i)
-		require.Contains(t, sent.Questions, id)
-		assert.Len(t, sent.options(id), MaxKeywordOptions+1, "options of %s", id)
+	var valueQuestions int
+	for id := range sent.Questions {
+		if strings.HasPrefix(id, questionValueAttributePrefix) {
+			valueQuestions++
+			assert.Len(t, sent.options(id), MaxSearchAttributes+1, "options of %s", id)
+		}
 	}
-	assert.NotContains(t, sent.Questions, fmt.Sprintf("%s%d", questionCustomPrefix, MaxCustomAttributes))
+	assert.Equal(t, MaxValueCandidates, valueQuestions)
 
 	t.Logf("request size: %d bytes, %d questions", fake.bodySizes[0], len(sent.Questions))
 	assert.Less(t, fake.bodySizes[0], maxRequestBytes)

@@ -179,3 +179,76 @@ func dedupe(values []string) []string {
 	}
 	return out
 }
+
+// comparisonWords name a comparison. Outside quotes they are never the value of a filter.
+var comparisonWords = wordSet(
+	"starts", "start", "starting", "begins", "begin", "beginning", "prefix", "prefixed",
+	"with", "than", "more", "less", "fewer", "least", "most", "greater", "above", "below",
+	"over", "under", "equal", "equals", "not", "except", "excluding", "without", "other",
+	"is", "are", "contains", "containing", "matches", "matching",
+)
+
+// attributeWords gives the words of the attribute names, split at each change from
+// lower case to upper case and at each separator, in lower case. "WorkflowId" gives
+// "workflowid", "workflow", and "id".
+func attributeWords(names []string) map[string]bool {
+	words := map[string]bool{}
+	for _, name := range names {
+		words[strings.ToLower(name)] = true
+		var word []rune
+		flush := func() {
+			if len(word) > 0 {
+				words[strings.ToLower(string(word))] = true
+				word = word[:0]
+			}
+		}
+		runes := []rune(name)
+		for i, r := range runes {
+			switch {
+			case !unicode.IsLetter(r) && !unicode.IsDigit(r):
+				flush()
+			case i > 0 && unicode.IsUpper(r) && unicode.IsLower(runes[i-1]):
+				flush()
+				word = append(word, r)
+			default:
+				word = append(word, r)
+			}
+		}
+		flush()
+	}
+	return words
+}
+
+// valueCandidates finds the text spans that can be the value of a filter: the
+// quoted spans, the words that are not stop, status, or time words, the
+// identifiers, the UUIDs, and the numbers. Outside quotes, a word that is part of
+// an attribute name or that names a comparison is not a candidate: "workflow id
+// starts with agent" has one value, agent. The model decides which attribute each
+// candidate filters on, or that it is not a value.
+func valueCandidates(text string, attributeNames []string) []string {
+	quoted := map[string]bool{}
+	for _, span := range quotedStrings(text) {
+		quoted[span] = true
+	}
+	excluded := attributeWords(attributeNames)
+
+	amounts, _ := amountCandidates(text)
+	var all []string
+	all = append(all, uuidCandidates(text)...)
+	all = append(all, identifierCandidates(text)...)
+	all = append(all, keywordCandidates(text)...)
+	all = append(all, amounts...)
+
+	var out []string
+	for _, candidate := range dedupe(all) {
+		lower := strings.ToLower(candidate)
+		if !quoted[candidate] && (excluded[lower] || comparisonWords[lower]) {
+			continue
+		}
+		out = append(out, candidate)
+		if len(out) == MaxValueCandidates {
+			break
+		}
+	}
+	return out
+}
