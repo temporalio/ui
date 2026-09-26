@@ -28,6 +28,7 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
+  import NLSearchTracePanel from '$lib/components/search-attribute-filter/nl-search-trace-panel.svelte';
   import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
@@ -49,6 +50,13 @@
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import {
+    NL_SEARCH_PARAMETER,
+    nlSearchHistory,
+    type NLSearchTrace,
+    nlSearchTraceOpen,
+  } from '$lib/stores/nl-search-trace';
+  import { currentPageKey } from '$lib/stores/pagination';
+  import {
     DEFAULT_WORKFLOW_SYSTEM_VIEW,
     getSystemWorkflowViews,
     savedWorkflowQueries,
@@ -63,6 +71,7 @@
   } from '$lib/stores/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
+  import { updateMultipleQueryParameters } from '$lib/utilities/update-query-parameters';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   const { headerActions, cloud }: { headerActions?: Snippet; cloud?: Snippet } =
@@ -100,6 +109,19 @@
       page.data.settings,
     ),
   );
+
+  const applyNLSearch = (entry: NLSearchTrace) => {
+    if (entry.query === null) return;
+    $workflowFilters = toListWorkflowFilters(entry.query, $searchAttributes);
+    updateMultipleQueryParameters({
+      url: page.url,
+      parameters: [
+        { parameter: 'query', value: entry.query },
+        { parameter: NL_SEARCH_PARAMETER, value: entry.text },
+      ],
+      clearParameters: [currentPageKey],
+    });
+  };
 
   onMount(() => {
     $lastUsedNamespace = page.params.namespace;
@@ -276,11 +298,23 @@
     {searchAttributes}
     id="workflow"
   />
-  <FilterBar />
-  <WorkflowsSummaryConfigurableTable
-    onClickConfigure={openCustomizationDrawer}
-    {cloud}
-  />
+  <div class="flex min-h-0 grow flex-col md:flex-row">
+    <div class="flex min-h-0 min-w-0 grow flex-col">
+      <FilterBar />
+      <WorkflowsSummaryConfigurableTable
+        onClickConfigure={openCustomizationDrawer}
+        {cloud}
+      />
+    </div>
+    {#if $nlSearchTraceOpen}
+      <NLSearchTracePanel
+        id="workflow-nl-search-trace"
+        history={$nlSearchHistory}
+        onClose={() => ($nlSearchTraceOpen = false)}
+        onSelect={applyNLSearch}
+      />
+    {/if}
+  </div>
 </MaximizableTableView>
 <ConfigurableTableHeadersDrawer
   {availableColumns}

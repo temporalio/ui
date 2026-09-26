@@ -17,6 +17,7 @@
 
   import Filter from './filter.svelte';
   import ManualQuery from './manual-query.svelte';
+  import NaturalLanguageQuery from './natural-language-query.svelte';
 
   interface Props {
     filters: Writable<SearchAttributeFilter[]>;
@@ -38,6 +39,10 @@
 
   let viewManualQuery = $state(false);
 
+  const showNaturalLanguageQuery = $derived(
+    id === 'workflow' && !!page.data?.settings?.nlSearchEnabled,
+  );
+
   // Back/forward changes the query param without going through the interactive
   // add/remove/edit path, so the pills have to be re-derived from the URL.
   afterNavigate(({ type }) => {
@@ -51,6 +56,14 @@
 </script>
 
 <div>
+  {#if showNaturalLanguageQuery}
+    <NaturalLanguageQuery
+      {filters}
+      {searchAttributes}
+      {id}
+      onSearch={onManualSearch}
+    />
+  {/if}
   <div
     class="flex w-full flex-wrap items-end justify-between gap-2 border-t border-primary bg-surface-primary p-1.5"
   >

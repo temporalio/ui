@@ -18,6 +18,11 @@ export const collapseIdleTime = persistStore<'on' | 'off'>(
   'on',
 );
 
+export const showAllReviewedEvents = persistStore<'on' | 'off'>(
+  'showAllReviewedEvents',
+  'off',
+);
+
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
 
 export const eventFilterSort = persistStore<EventSortOrder>(

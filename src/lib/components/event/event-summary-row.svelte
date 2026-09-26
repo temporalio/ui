@@ -59,6 +59,7 @@
     expanded?: boolean;
     hoveredEventId?: string | undefined;
     onRowClick?: () => void;
+    routine?: boolean;
   }
 
   let {
@@ -69,6 +70,7 @@
     compact = false,
     expanded: expandedProp = false,
     onRowClick = () => {},
+    routine = false,
     hoveredEventId = $bindable(),
   }: Props = $props();
 
@@ -252,7 +254,9 @@
     canceled && '!bg-alpha-amber-30 hover:!bg-alpha-amber-50',
     terminated && '!bg-alpha-pink-30 hover:!bg-alpha-pink-50',
     hasRelatedActivities(group, hoveredEventId) && 'active',
+    routine && 'text-secondary opacity-70',
   )}
+  data-routine={routine ? 'true' : undefined}
   id={`${event.id}-${index}`}
   data-eventid={event.id}
   data-testid="event-summary-row"

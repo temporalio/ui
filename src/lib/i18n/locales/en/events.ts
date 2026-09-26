@@ -104,4 +104,28 @@ export const Strings = {
   'empty-header-attributes': 'No Header Attributes Found',
   'import-format-1': 'Import Format 1',
   'import-format-2': 'Import Format 2',
+  'history-review-button': 'Review with Jev',
+  'history-review-again': 'Review again',
+  'history-review-loading': 'Jev is reviewing the event history',
+  'history-review-clear': 'Clear review',
+  'history-review-show-all': 'Show all events',
+  'history-review-summary':
+    '{{routine}} of {{total}} rows are routine. {{visible}} stay visible.',
+  'history-review-no-routine': 'Jev found no routine rows to hide.',
+  'history-review-error': 'Could not complete this review. Try again.',
+  'history-review-rate-limited': 'Too many reviews. Try again in a moment.',
+  'history-review-rate-limited-retry_one':
+    'Too many reviews. Try again in {{count}} second.',
+  'history-review-rate-limited-retry_other':
+    'Too many reviews. Try again in {{count}} seconds.',
+  'history-review-forbidden':
+    'You do not have permission to review this namespace.',
+  'hidden-run-hidden_one':
+    '{{count}} routine event hidden · events {{first}}–{{last}}',
+  'hidden-run-hidden_other':
+    '{{count}} routine events hidden · events {{first}}–{{last}}',
+  'hidden-run-shown_one':
+    '{{count}} routine event shown · events {{first}}–{{last}}',
+  'hidden-run-shown_other':
+    '{{count}} routine events shown · events {{first}}–{{last}}',
 } as const;

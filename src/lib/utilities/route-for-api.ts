@@ -188,6 +188,8 @@ export function pathForApi(
     'batch-operations.list': `/namespaces/${parameters?.namespace}/batch-operations`,
     'batch-operations': `/namespaces/${parameters?.namespace}/batch-operations/${parameters?.batchJobId}`,
     'nexus-endpoints': '/nexus/endpoints',
+    'nl-search': '/nl-search',
+    'history-review': '/history-review',
     'nexus-endpoint': `/nexus/endpoints/${parameters?.endpointId}`,
     'nexus-endpoint.update': `/nexus/endpoints/${parameters?.endpointId}/update`,
     'worker-deployments': `/namespaces/${parameters?.namespace}/worker-deployments`,
