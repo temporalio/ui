@@ -191,11 +191,7 @@ Initial depth defaults are:
 
 These are independent settings. The architecture must support greater child depth and different continue-as-new depths later.
 
-An unbounded forward continue-as-new depth does not imply eager history loading:
-
-- Discover metadata through the latest known run.
-- Load full histories lazily when required by expansion or viewport visibility.
-- Do not fetch every execution history solely because the forward depth is unbounded.
+Forward continue-as-new runs are loaded eagerly through the latest discoverable run by default. Each loaded history can reveal its successor; initial-history requests are concurrency-limited, but there is no default total-run cap. Child depth remains bounded independently.
 
 ### Collapsed workflows
 
@@ -300,8 +296,8 @@ However, the buffer cannot remain a single module-level timeline resource when m
 
 ### Lazy loading
 
-- Load the current execution immediately.
-- Discover related execution metadata separately from full histories when possible.
+- Load the current execution immediately and follow its forward continue-as-new chain through the latest discoverable run.
+- Discover other related execution metadata separately from full histories when possible.
 - Load expanded child histories on demand.
 - Load histories approaching the horizontal or vertical viewport when needed.
 - Limit concurrent child-history requests.

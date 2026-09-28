@@ -1,4 +1,6 @@
+import { getEagerExecutions } from './get-eager-executions';
 import type { ExecutionGraphRepository } from './repository';
+import type { ExecutionGraphSnapshot, ExecutionNode } from './types';
 import { loadExecutionHistory } from '../execution-history/load-execution-history';
 import { pollExecutionHistory } from '../execution-history/poll-execution-history';
 import type { ExecutionHistoryRepository } from '../execution-history/repository';
@@ -9,6 +11,8 @@ import {
   type ExecutionKey,
   getExecutionKey,
 } from '../identity-keys';
+
+const MAX_CONCURRENT_INITIAL_LOADS = 4;
 
 /** Coordinates history loading and polling for executions in the graph. */
 export class ExecutionGraphCoordinator {
@@ -21,6 +25,12 @@ export class ExecutionGraphCoordinator {
   private _historyEvents: HistoryEventRepository;
   private _unsubscribeGraph: () => void;
   private _unsubscribeEvents: () => void;
+  private _rootExecutionKey: ExecutionKey | null = null;
+  private _eligibleExecutionsCache: Readonly<{
+    graph: ExecutionGraphSnapshot;
+    rootExecutionKey: ExecutionKey;
+    executions: readonly ExecutionNode[];
+  }> | null = null;
 
   constructor(
     executionGraph: ExecutionGraphRepository,
@@ -41,6 +51,8 @@ export class ExecutionGraphCoordinator {
         for (const execution of executions) {
           this._executionHistories.register(execution.identity);
         }
+
+        this._loadEligibleExecutions();
       },
       { emitCurrentSnapshot: true },
     );
@@ -60,23 +72,62 @@ export class ExecutionGraphCoordinator {
     );
   }
 
-  /** Starts loading an execution, then polls it if no terminal event was seen. */
+  /** Registers the root execution and begins loading eligible graph histories. */
   start(identity: ExecutionIdentity): void {
     if (this._isDisposed) {
       return;
     }
 
+    this._rootExecutionKey = getExecutionKey(identity);
     this._executionGraph.addExecution(identity);
-    const executionHistory = this._executionHistories.startLoad(identity);
+    this._loadEligibleExecutions();
+  }
 
-    if (!executionHistory) {
+  private _getEligibleExecutions(
+    rootExecutionKey: ExecutionKey,
+  ): readonly ExecutionNode[] {
+    const graph = this._executionGraph.getSnapshot();
+    const cache = this._eligibleExecutionsCache;
+
+    if (cache?.graph === graph && cache.rootExecutionKey === rootExecutionKey) {
+      return cache.executions;
+    }
+
+    const executions = getEagerExecutions(graph, rootExecutionKey);
+    this._eligibleExecutionsCache = { graph, rootExecutionKey, executions };
+    return executions;
+  }
+
+  private _loadEligibleExecutions(): void {
+    if (this._isDisposed || !this._rootExecutionKey) {
       return;
     }
 
-    const controller = new AbortController();
-    const executionKey = executionHistory.executionKey;
-    this._initialLoads.set(executionKey, controller);
-    void this._load(identity, executionKey, controller);
+    const eligible = this._getEligibleExecutions(this._rootExecutionKey);
+
+    for (const execution of eligible) {
+      if (this._initialLoads.size >= MAX_CONCURRENT_INITIAL_LOADS) {
+        break;
+      }
+
+      const history = this._executionHistories.getExecutionHistory(
+        execution.executionKey,
+      );
+
+      if (history?.load.status !== 'pending') {
+        continue;
+      }
+
+      const started = this._executionHistories.startLoad(execution.identity);
+
+      if (!started) {
+        continue;
+      }
+
+      const controller = new AbortController();
+      this._initialLoads.set(started.executionKey, controller);
+      void this._load(execution.identity, started.executionKey, controller);
+    }
   }
 
   private async _load(
@@ -112,6 +163,7 @@ export class ExecutionGraphCoordinator {
     } finally {
       if (this._initialLoads.get(executionKey) === controller) {
         this._initialLoads.delete(executionKey);
+        this._loadEligibleExecutions();
       }
     }
   }
