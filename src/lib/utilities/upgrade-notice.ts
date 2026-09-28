@@ -9,7 +9,7 @@ export const UPGRADE_DISTRIBUTIONS = [
 
 export type UpgradeDistribution = (typeof UPGRADE_DISTRIBUTIONS)[number];
 
-export type ReleaseComponent = 'cli' | 'helm' | 'ui' | 'server';
+export type ReleaseComponent = 'cli' | 'image' | 'ui';
 
 export type ComponentVersions = Partial<Record<ReleaseComponent, string>>;
 
@@ -22,16 +22,16 @@ export type UpgradeNotice = {
 
 const DISTRIBUTION_RELEASE: Record<UpgradeDistribution, ReleaseComponent> = {
   cli: 'cli',
-  docker: 'ui',
-  helm: 'helm',
-  server: 'server',
+  docker: 'image',
+  helm: 'image',
+  server: 'ui',
 };
 
 const UPGRADE_LINKS: Record<UpgradeDistribution, string> = {
   cli: 'https://docs.temporal.io/cli#install',
   docker: 'https://hub.docker.com/r/temporalio/ui',
   helm: 'https://github.com/temporalio/helm-charts',
-  server: 'https://github.com/temporalio/temporal/releases',
+  server: 'https://github.com/temporalio/ui/releases',
 };
 
 export const toUpgradeDistribution = (value?: string): UpgradeDistribution =>
@@ -49,17 +49,14 @@ export const getInstalledVersions = ({
   distribution,
   distributionVersion,
   uiVersion,
-  serverVersion,
 }: {
   distribution: UpgradeDistribution;
   distributionVersion?: string;
   uiVersion?: string;
-  serverVersion?: string;
 }): ComponentVersions => ({
   cli: distribution === 'cli' ? distributionVersion : undefined,
-  helm: distribution === 'helm' ? distributionVersion : undefined,
+  image: uiVersion,
   ui: uiVersion,
-  server: serverVersion,
 });
 
 export const getUpgradeNotice = ({

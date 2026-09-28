@@ -25,7 +25,6 @@
         distribution,
         distributionVersion: page.data?.settings?.distributionVersion,
         uiVersion: page.data?.settings?.version,
-        serverVersion: page.data?.cluster?.serverVersion,
       }),
       latest,
     }),

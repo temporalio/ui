@@ -37,18 +37,14 @@ func newTestReleaseServer(t *testing.T, tags map[string]string, calls *atomic.In
 func TestReleaseCheckerNormalizesTags(t *testing.T) {
 	var calls atomic.Int32
 	server := newTestReleaseServer(t, map[string]string{
-		"temporalio/cli":         "v1.9.1",
-		"temporalio/helm-charts": "temporal-1.7.0",
-		"temporalio/ui-server":   "v2.54.1",
-		"temporalio/temporal":    "v1.32.0",
+		"temporalio/cli": "v1.9.1",
+		"temporalio/ui":  "v2.54.1",
 	}, &calls)
-	checker := newReleaseChecker(server.URL, server.Client(), time.Now)
+	checker := newReleaseChecker(server.URL, server.URL, server.Client(), time.Now)
 
 	for component, want := range map[string]string{
-		ReleaseCLI:    "1.9.1",
-		ReleaseHelm:   "1.7.0",
-		ReleaseUI:     "2.54.1",
-		ReleaseServer: "1.32.0",
+		ReleaseCLI: "1.9.1",
+		ReleaseUI:  "2.54.1",
 	} {
 		got, err := checker.Latest(context.Background(), component)
 		require.NoError(t, err)
@@ -60,7 +56,7 @@ func TestReleaseCheckerCachesResults(t *testing.T) {
 	var calls atomic.Int32
 	server := newTestReleaseServer(t, map[string]string{"temporalio/cli": "v1.9.1"}, &calls)
 	now := time.Now()
-	checker := newReleaseChecker(server.URL, server.Client(), func() time.Time { return now })
+	checker := newReleaseChecker(server.URL, server.URL, server.Client(), func() time.Time { return now })
 
 	_, err := checker.Latest(context.Background(), ReleaseCLI)
 	require.NoError(t, err)
@@ -78,7 +74,7 @@ func TestReleaseCheckerCachesFailuresBriefly(t *testing.T) {
 	var calls atomic.Int32
 	server := newTestReleaseServer(t, map[string]string{}, &calls)
 	now := time.Now()
-	checker := newReleaseChecker(server.URL, server.Client(), func() time.Time { return now })
+	checker := newReleaseChecker(server.URL, server.URL, server.Client(), func() time.Time { return now })
 
 	_, err := checker.Latest(context.Background(), ReleaseCLI)
 	require.Error(t, err)
@@ -91,47 +87,45 @@ func TestReleaseCheckerCachesFailuresBriefly(t *testing.T) {
 	assert.Equal(t, int32(2), calls.Load())
 }
 
-func TestReleaseForDistribution(t *testing.T) {
-	assert.Equal(t, ReleaseCLI, ReleaseForDistribution("cli"))
-	assert.Equal(t, ReleaseUI, ReleaseForDistribution("docker"))
-	assert.Equal(t, ReleaseHelm, ReleaseForDistribution("helm"))
-	assert.Equal(t, ReleaseServer, ReleaseForDistribution("server"))
-	assert.Equal(t, ReleaseServer, ReleaseForDistribution(""))
-	assert.Equal(t, ReleaseServer, ReleaseForDistribution("nix"))
-}
-
-func TestReleaseCheckerPicksTheTemporalChart(t *testing.T) {
-	var calls atomic.Int32
+func TestReleaseCheckerTakesTheHighestImageTag(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		calls.Add(1)
-		if r.URL.Path != "/repos/temporalio/helm-charts/releases" {
+		if r.URL.Path != "/v2/repositories/temporalio/ui/tags" {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-		fmt.Fprint(w, `[
-			{"tag_name":"temporal-proxy-0.2.1"},
-			{"tag_name":"temporal-1.8.0","prerelease":true},
-			{"tag_name":"temporal-1.7.0"},
-			{"tag_name":"temporal-1.6.0"}
-		]`)
+		// Ordered by push time, as the registry returns them: 2.50.1 was
+		// published after 2.51.1, and "latest" is not a version.
+		fmt.Fprint(w, `{"results":[
+			{"name":"latest"},
+			{"name":"2.50.1"},
+			{"name":"2.51.1"},
+			{"name":"2.49.0"}
+		]}`)
 	}))
 	t.Cleanup(server.Close)
-	checker := newReleaseChecker(server.URL, server.Client(), time.Now)
+	checker := newReleaseChecker(server.URL, server.URL, server.Client(), time.Now)
 
-	got, err := checker.Latest(context.Background(), ReleaseHelm)
+	got, err := checker.Latest(context.Background(), ReleaseImage)
 	require.NoError(t, err)
-	assert.Equal(t, "1.7.0", got)
+	assert.Equal(t, "2.51.1", got)
 }
 
-func TestReleaseCheckerErrorsWhenNoChartMatches(t *testing.T) {
-	var calls atomic.Int32
+func TestReleaseCheckerErrorsWhenImageHasNoVersionTag(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		calls.Add(1)
-		fmt.Fprint(w, `[{"tag_name":"temporal-proxy-0.2.1"}]`)
+		fmt.Fprint(w, `{"results":[{"name":"latest"},{"name":"sha-abc1234"}]}`)
 	}))
 	t.Cleanup(server.Close)
-	checker := newReleaseChecker(server.URL, server.Client(), time.Now)
+	checker := newReleaseChecker(server.URL, server.URL, server.Client(), time.Now)
 
-	_, err := checker.Latest(context.Background(), ReleaseHelm)
+	_, err := checker.Latest(context.Background(), ReleaseImage)
 	require.Error(t, err)
+}
+
+func TestReleaseForDistributionTracksTheInstalledArtifact(t *testing.T) {
+	assert.Equal(t, ReleaseCLI, ReleaseForDistribution("cli"))
+	assert.Equal(t, ReleaseImage, ReleaseForDistribution("docker"))
+	assert.Equal(t, ReleaseImage, ReleaseForDistribution("helm"))
+	assert.Equal(t, ReleaseUI, ReleaseForDistribution("server"))
+	assert.Equal(t, ReleaseUI, ReleaseForDistribution(""))
+	assert.Equal(t, ReleaseUI, ReleaseForDistribution("nix"))
 }

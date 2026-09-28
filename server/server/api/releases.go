@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/labstack/echo/v4"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
@@ -19,39 +21,40 @@ const (
 	releaseFailureCacheTTL = time.Hour
 	releaseRequestTimeout  = 5 * time.Second
 	defaultGitHubAPIURL    = "https://api.github.com"
-	releaseListPageSize    = 50
+	defaultRegistryAPIURL  = "https://hub.docker.com"
+	releaseListPageSize    = 100
 )
 
 // Release components that an install can be asked to upgrade.
 const (
-	ReleaseCLI    = "cli"
-	ReleaseHelm   = "helm"
-	ReleaseUI     = "ui"
-	ReleaseServer = "server"
+	ReleaseCLI   = "cli"
+	ReleaseImage = "image"
+	ReleaseUI    = "ui"
 )
 
+// GitHub repositories whose releases name a component's latest version.
 var releaseRepos = map[string]string{
-	ReleaseCLI:  "temporalio/cli",
-	ReleaseHelm: "temporalio/helm-charts",
-	// The Docker image is published by ui-server, after the temporalio/ui
-	// release it is built from. Both carry the same version, so tracking
-	// ui-server avoids advertising an image that has not been pushed yet.
-	ReleaseUI:     "temporalio/ui-server",
-	ReleaseServer: "temporalio/temporal",
+	ReleaseCLI: "temporalio/cli",
+	ReleaseUI:  "temporalio/ui",
 }
 
-// Repositories that publish more than one chart or module tag their releases
-// per artifact, so the newest release overall is not the one we track.
-var releaseTagPatterns = map[string]*regexp.Regexp{
-	ReleaseHelm: regexp.MustCompile(`^temporal-v?\d+\.\d+\.\d+$`),
+// Image tags that name a release. Floating tags such as "latest" and any
+// commit-sha tags are not versions a user can be told to move to.
+var imageVersionTag = regexp.MustCompile(`^\d+\.\d+\.\d+$`)
+
+// Container repositories whose tags name a component's latest version.
+var releaseImages = map[string]string{
+	ReleaseImage: "temporalio/ui",
 }
 
-// The release that each distribution is upgraded to.
+// The release that each distribution is upgraded to. Docker and Helm both
+// install the published image, so they track its tags rather than the
+// temporalio/ui release the image is built from.
 var distributionReleases = map[string]string{
 	"cli":    ReleaseCLI,
-	"docker": ReleaseUI,
-	"helm":   ReleaseHelm,
-	"server": ReleaseServer,
+	"docker": ReleaseImage,
+	"helm":   ReleaseImage,
+	"server": ReleaseUI,
 }
 
 // LatestReleasesResponse lists the latest published version of the
@@ -69,9 +72,10 @@ type releaseCacheEntry struct {
 // ReleaseChecker looks up the latest GitHub release of Temporal components
 // and caches the results.
 type ReleaseChecker struct {
-	client  *http.Client
-	baseURL string
-	now     func() time.Time
+	client      *http.Client
+	baseURL     string
+	registryURL string
+	now         func() time.Time
 
 	mu    sync.Mutex
 	cache map[string]releaseCacheEntry
@@ -79,15 +83,17 @@ type ReleaseChecker struct {
 
 // NewReleaseChecker creates a ReleaseChecker that queries the GitHub API.
 func NewReleaseChecker() *ReleaseChecker {
-	return newReleaseChecker(defaultGitHubAPIURL, &http.Client{Timeout: releaseRequestTimeout}, time.Now)
+	client := &http.Client{Timeout: releaseRequestTimeout}
+	return newReleaseChecker(defaultGitHubAPIURL, defaultRegistryAPIURL, client, time.Now)
 }
 
-func newReleaseChecker(baseURL string, client *http.Client, now func() time.Time) *ReleaseChecker {
+func newReleaseChecker(baseURL, registryURL string, client *http.Client, now func() time.Time) *ReleaseChecker {
 	return &ReleaseChecker{
-		client:  client,
-		baseURL: baseURL,
-		now:     now,
-		cache:   map[string]releaseCacheEntry{},
+		client:      client,
+		baseURL:     baseURL,
+		registryURL: registryURL,
+		now:         now,
+		cache:       map[string]releaseCacheEntry{},
 	}
 }
 
@@ -101,23 +107,34 @@ func ReleaseForDistribution(distribution string) string {
 }
 
 // Latest returns the latest released version of a component, without a
-// leading "v" or chart prefix.
+// leading "v".
 func (rc *ReleaseChecker) Latest(ctx context.Context, component string) (string, error) {
-	repo, ok := releaseRepos[component]
-	if !ok {
+	var key string
+	var fetch func(context.Context) (string, error)
+
+	switch {
+	case releaseRepos[component] != "":
+		repo := releaseRepos[component]
+		key = "github:" + repo
+		fetch = func(ctx context.Context) (string, error) { return rc.fetchLatestRelease(ctx, repo) }
+	case releaseImages[component] != "":
+		image := releaseImages[component]
+		key = "image:" + image
+		fetch = func(ctx context.Context) (string, error) { return rc.fetchLatestImageTag(ctx, image) }
+	default:
 		return "", fmt.Errorf("unknown release component %q", component)
 	}
 
 	rc.mu.Lock()
-	entry, cached := rc.cache[repo]
+	entry, cached := rc.cache[key]
 	rc.mu.Unlock()
 	if cached && rc.isFresh(entry) {
 		return entry.version, entry.err
 	}
 
-	version, err := rc.fetchLatest(ctx, repo, releaseTagPatterns[component])
+	version, err := fetch(ctx)
 	rc.mu.Lock()
-	rc.cache[repo] = releaseCacheEntry{version: version, err: err, fetchedAt: rc.now()}
+	rc.cache[key] = releaseCacheEntry{version: version, err: err, fetchedAt: rc.now()}
 	rc.mu.Unlock()
 	return version, err
 }
@@ -130,67 +147,91 @@ func (rc *ReleaseChecker) isFresh(entry releaseCacheEntry) bool {
 	return rc.now().Sub(entry.fetchedAt) < ttl
 }
 
-func (rc *ReleaseChecker) fetchLatest(ctx context.Context, repo string, pattern *regexp.Regexp) (string, error) {
-	tag, err := rc.fetchLatestTag(ctx, repo, pattern)
+func (rc *ReleaseChecker) fetchLatestRelease(ctx context.Context, repo string) (string, error) {
+	url := fmt.Sprintf("%s/repos/%s/releases/latest", rc.baseURL, repo)
+	body, err := rc.get(ctx, url, "application/vnd.github+json", fmt.Sprintf("latest release of %s", repo))
 	if err != nil {
 		return "", err
 	}
-	version := normalizeReleaseTag(tag)
+	defer body.Close()
+
+	var release struct {
+		TagName string `json:"tag_name"`
+	}
+	if err := json.NewDecoder(body).Decode(&release); err != nil {
+		return "", err
+	}
+	version := normalizeReleaseTag(release.TagName)
 	if version == "" {
 		return "", fmt.Errorf("latest release of %s has no tag", repo)
 	}
 	return version, nil
 }
 
-func (rc *ReleaseChecker) fetchLatestTag(ctx context.Context, repo string, pattern *regexp.Regexp) (string, error) {
-	path := fmt.Sprintf("/repos/%s/releases/latest", repo)
-	if pattern != nil {
-		path = fmt.Sprintf("/repos/%s/releases?per_page=%d", repo, releaseListPageSize)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rc.baseURL+path, nil)
+// fetchLatestImageTag returns the highest version tag published for an image.
+// The registry orders tags by push time, and a patch to an older line can be
+// pushed after a newer minor, so the tags are compared rather than trusted in
+// the order they arrive.
+func (rc *ReleaseChecker) fetchLatestImageTag(ctx context.Context, image string) (string, error) {
+	url := fmt.Sprintf("%s/v2/repositories/%s/tags?page_size=%d", rc.registryURL, image, releaseListPageSize)
+	body, err := rc.get(ctx, url, "application/json", fmt.Sprintf("tags of %s", image))
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("Accept", "application/vnd.github+json")
+	defer body.Close()
+
+	var page struct {
+		Results []struct {
+			Name string `json:"name"`
+		} `json:"results"`
+	}
+	if err := json.NewDecoder(body).Decode(&page); err != nil {
+		return "", err
+	}
+
+	latest := ""
+	for _, tag := range page.Results {
+		if !imageVersionTag.MatchString(tag.Name) {
+			continue
+		}
+		if latest == "" || newerVersion(tag.Name, latest) {
+			latest = tag.Name
+		}
+	}
+	if latest == "" {
+		return "", fmt.Errorf("no version tag published for %s", image)
+	}
+	return latest, nil
+}
+
+func (rc *ReleaseChecker) get(ctx context.Context, url, accept, what string) (io.ReadCloser, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Accept", accept)
 
 	resp, err := rc.client.Do(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("latest release of %s: unexpected status %d", repo, resp.StatusCode)
+		resp.Body.Close()
+		return nil, fmt.Errorf("%s: unexpected status %d", what, resp.StatusCode)
 	}
+	return resp.Body, nil
+}
 
-	type release struct {
-		TagName    string `json:"tag_name"`
-		Draft      bool   `json:"draft"`
-		Prerelease bool   `json:"prerelease"`
+func newerVersion(candidate, current string) bool {
+	c, err := semver.NewVersion(candidate)
+	if err != nil {
+		return false
 	}
-
-	if pattern == nil {
-		var latest release
-		if err := json.NewDecoder(resp.Body).Decode(&latest); err != nil {
-			return "", err
-		}
-		return latest.TagName, nil
+	base, err := semver.NewVersion(current)
+	if err != nil {
+		return true
 	}
-
-	var releases []release
-	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
-		return "", err
-	}
-	// GitHub returns releases newest first, so the first match is the latest.
-	for _, r := range releases {
-		if r.Draft || r.Prerelease {
-			continue
-		}
-		if pattern.MatchString(r.TagName) {
-			return r.TagName, nil
-		}
-	}
-	return "", fmt.Errorf("no release of %s matched %s", repo, pattern)
+	return c.GreaterThan(base)
 }
 
 func normalizeReleaseTag(tag string) string {
