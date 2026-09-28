@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import HistoryReviewControls from '$lib/components/event/history-review-controls.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -30,8 +31,13 @@
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
+  import { historyReview } from '$lib/services/history-review-state.svelte';
   import { clearActives } from '$lib/stores/active-events';
-  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import {
+    eventFilterSort,
+    eventViewType,
+    showAllReviewedEvents,
+  } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -155,6 +161,13 @@
 
   let showDownloadPrompt = $state(false);
 
+  const review = historyReview;
+
+  const historyReviewEnabled = $derived(
+    !!page.data?.settings?.historyReviewEnabled,
+  );
+  const showAllReviewed = $derived($showAllReviewedEvents === 'on');
+
   const onSort = () => {
     const newSort = reverseSort ? 'ascending' : 'descending';
     updateEventFilterParams(page.url, { sort: newSort }, goto);
@@ -269,6 +282,12 @@
         </ToggleButton>
       </ToggleButtons>
     </div>
+    {#if historyReviewEnabled && $eventViewType !== 'json'}
+      <HistoryReviewControls
+        fetchComplete={historyCtx.fetchComplete}
+        class="w-full pb-2"
+      />
+    {/if}
   </div>
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}
@@ -277,7 +296,12 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {...tableProps} />
+        <EventSummaryTable
+          {updating}
+          {...tableProps}
+          review={historyReviewEnabled ? review : undefined}
+          {showAllReviewed}
+        />
       </div>
     {/if}
   </div>

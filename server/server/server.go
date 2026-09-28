@@ -91,6 +91,8 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 			echo.HeaderXCSRFToken, echo.HeaderAuthorization, auth.AuthorizationExtrasHeader,
 			"Caller-Type",
 		},
+		// A cross-origin UI reads Retry-After from a rate-limited response
+		ExposeHeaders:    []string{echo.HeaderRetryAfter},
 		AllowCredentials: true,
 		ConfigProvider:   cfgProvider,
 	}))

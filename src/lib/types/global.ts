@@ -146,6 +146,8 @@ export type Settings = {
   feedbackURL: string;
   disableNewsFetch: boolean;
   supportURL?: string;
+  nlSearchEnabled: boolean;
+  historyReviewEnabled: boolean;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;

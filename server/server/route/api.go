@@ -32,6 +32,7 @@ import (
 
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/ratelimit"
 )
 
 func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.MiddlewareFunc {
@@ -81,6 +82,13 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 		api.WorkflowRawHistoryHandler(workflowservice.NewWorkflowServiceClient(conn)),
 		writeControlMiddleware,
 	)
+
+	// The TypeSafe endpoints are read operations: DisableWriteMiddleware must not block them.
+	// They share one gate (the checks before each paid call) and one limiter (one
+	// deployment has one TypeSafe key).
+	typeSafeGate := api.NewTypeSafeGate(cfgProvider, apiMiddleware, conn, ratelimit.New(ratelimit.Options{}))
+	route.POST(api.NLSearchUrl, api.NLSearchHandler(typeSafeGate))
+	route.POST(api.HistoryReviewUrl, api.HistoryReviewHandler(typeSafeGate))
 
 	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 

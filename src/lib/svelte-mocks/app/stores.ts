@@ -44,6 +44,8 @@ const settings: Settings = {
   },
   feedbackURL: '',
   disableNewsFetch: false,
+  nlSearchEnabled: false,
+  historyReviewEnabled: false,
   runtimeEnvironment: {
     isCloud: false,
     isLocal: true,

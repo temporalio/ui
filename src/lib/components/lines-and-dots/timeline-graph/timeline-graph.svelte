@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
   import {
@@ -10,6 +11,8 @@
     type LazyGroup,
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
+  import { HISTORY_REVIEW_COLLAPSE_THRESHOLD } from '$lib/services/history-review-service';
+  import type { HistoryReviewState } from '$lib/services/history-review-state.svelte';
   import { activeGroups } from '$lib/stores/active-events';
   import { collapseIdleTime } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -29,6 +32,12 @@
     removePanelGapFromBand,
   } from './timeline-positioning';
   import {
+    buildTimelineReviewRows,
+    getTimelineHeight,
+    isTimelineHiddenRun,
+    type TimelineRow,
+  } from './timeline-review-rows';
+  import {
     assignTimelineRowPool,
     type TimelineRowSlot,
   } from './timeline-row-pool';
@@ -37,6 +46,7 @@
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineCollapsedLayer from './timeline-collapsed-layer.svelte';
   import TimelineGraphRow from './timeline-graph-row.svelte';
+  import TimelineHiddenRunRow from './timeline-hidden-run-row.svelte';
   import TimelineIconDefs from './timeline-icon-defs.svelte';
   import { TimelineScale } from './timeline-scale.svelte';
   import { Timeline } from './timeline.svelte';
@@ -56,6 +66,8 @@
     descMinId?: number;
     panelHeight?: number;
     onTimelineInit?: (timeline: Timeline) => void;
+    review?: HistoryReviewState;
+    showAllReviewed?: boolean;
   }
 
   let {
@@ -69,6 +81,8 @@
     descMinId = 0,
     panelHeight = $bindable(0),
     onTimelineInit,
+    review = undefined,
+    showAllReviewed = false,
   }: Props = $props();
 
   const DOT_STROKE = 2; // dot border
@@ -154,6 +168,29 @@
   const filteredLazyGroups = $derived(
     getFailedOrPendingGroups(lazyGroups, $eventStatusFilter),
   );
+
+  // Row list the geometry is built from: groups, plus one entry per hidden run
+  // of routine groups after a review. Every y, the window, the pool and the
+  // height read this list, so a hidden run is one ROW_HEIGHT like any row.
+  // Off while loading: the two-cursor gap math needs the plain group list.
+  const reviewRows = $derived(
+    buildTimelineReviewRows<LazyGroup>({
+      groups: filteredLazyGroups,
+      scores: review?.scores ?? {},
+      threshold: HISTORY_REVIEW_COLLAPSE_THRESHOLD,
+      openKeys: review?.openKeys ?? new Set<string>(),
+      showAll: showAllReviewed,
+      enabled: !!review?.hasReview && !loading,
+      reverseSort,
+    }),
+  );
+  const timelineRows: TimelineRow<LazyGroup>[] = $derived(reviewRows.rows);
+
+  $effect(() => {
+    if (!review) return;
+    const summary = reviewRows.summary;
+    untrack(() => review.setSummary(summary));
+  });
 
   // Unfetched skeleton rows. totalExpectedEvents is already a density-adjusted
   // group count, so subtracting the loaded count is correct.
@@ -272,7 +309,12 @@
   );
 
   const groupIndexMap = $derived(
-    new Map(filteredLazyGroups.map((g, i) => [g.id, i])),
+    new Map(
+      timelineRows
+        .map((row, i) => [row, i] as const)
+        .filter(([row]) => !isTimelineHiddenRun(row))
+        .map(([row, i]) => [row.id, i]),
+    ),
   );
 
   // Active group's index in filteredLazyGroups (-1 = none). Derived here so the row
@@ -294,11 +336,11 @@
   }
 
   const descStart = $derived(
-    getDescStart(filteredLazyGroups, descMinId, loading, pendingGroupCount),
+    getDescStart(timelineRows, descMinId, loading, pendingGroupCount),
   );
 
   const totalForY = $derived(
-    getTotalForY(filteredLazyGroups.length, pendingGroupCount, descStart),
+    getTotalForY(timelineRows.length, pendingGroupCount, descStart),
   );
 
   const activePanelY = $derived(
@@ -316,10 +358,11 @@
   // Full drawn height (rows + axis + detail panel). The container is this tall and
   // scrolls with the page.
   const timelineHeight = $derived(
-    Math.max(
-      ROW_HEIGHT * (filteredLazyGroups.length + pendingGroupCount + 2),
-      120,
-    ) + panelHeight,
+    getTimelineHeight({
+      rowCount: timelineRows.length,
+      pendingGroupCount,
+      panelHeight,
+    }),
   );
   const AXIS_LABEL_ZONE = 150;
   const svgHeight = $derived(timelineHeight + AXIS_LABEL_ZONE);
@@ -424,7 +467,7 @@
     return getWindowBounds({
       bandTop: rowWindowBand.bandTop,
       bandHeight: rowWindowBand.bandHeight,
-      total: filteredLazyGroups.length,
+      total: timelineRows.length,
       overscan: OVERSCAN,
       reverseSort,
       descStart,
@@ -449,10 +492,10 @@
   // Reuse the prior slot object when nothing changed, or every row re-renders.
   // Version counts as changed: a lazy group's identity is stable for the whole
   // run, so identity alone would miss a group that gained an event.
-  let prevSlots: (TimelineRowSlot<LazyGroup> | null)[] = [];
+  let prevSlots: (TimelineRowSlot<TimelineRow<LazyGroup>> | null)[] = [];
   const pool = $derived.by(() => {
     const slots = assignTimelineRowPool({
-      groups: filteredLazyGroups,
+      groups: timelineRows,
       poolSize,
       previousSlots: prevSlots,
       windowEnd,
@@ -570,14 +613,34 @@
                 ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + shiftFor(slot.index)}px)`
                 : undefined}
             >
+              <!-- Read slot.lazy in place, not through a @const: a group keeps
+                 its identity when it gains an event, so only the new slot
+                 object tells the row to materialize again. -->
               {#if slot}
-                <TimelineGraphRow
-                  group={materializeGroup(slot.lazy)}
-                  eventCount={slot.lazy.eventCount}
-                  {canvasWidth}
-                  project={projectX}
-                  {readOnly}
-                />
+                {#if isTimelineHiddenRun<LazyGroup>(slot.lazy)}
+                  <TimelineHiddenRunRow
+                    run={slot.lazy}
+                    {canvasWidth}
+                    project={projectX}
+                    onToggle={(key) => review?.toggleRun(key)}
+                  />
+                {:else}
+                  <div
+                    class="absolute inset-0"
+                    class:opacity-60={reviewRows.routineIds.has(slot.lazy.id)}
+                    data-routine={reviewRows.routineIds.has(slot.lazy.id)
+                      ? 'true'
+                      : undefined}
+                  >
+                    <TimelineGraphRow
+                      group={materializeGroup(slot.lazy)}
+                      eventCount={slot.lazy.eventCount}
+                      {canvasWidth}
+                      project={projectX}
+                      {readOnly}
+                    />
+                  </div>
+                {/if}
               {/if}
             </li>
           {/each}
@@ -586,7 +649,7 @@
         {#if loading && pendingGroupCount > 0}
           {@const rectY = getPendingBlockY({
             descStart,
-            filteredGroupsLength: filteredLazyGroups.length,
+            filteredGroupsLength: timelineRows.length,
             reverseSort,
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
@@ -601,8 +664,8 @@
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
         {#if !readOnly && activeIdx >= 0}
-          {@const activeLazyGroup = filteredLazyGroups[activeIdx]}
-          {#if activeLazyGroup}
+          {@const activeLazyGroup = timelineRows[activeIdx]}
+          {#if activeLazyGroup && !isTimelineHiddenRun(activeLazyGroup)}
             {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
             <GroupDetailsRow
               y={panelY}

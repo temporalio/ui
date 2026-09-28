@@ -51,6 +51,8 @@ const settingsResponse = (
   NavCollapsedByDefault: false,
   FeedbackURL: '',
   DisableNewsFetch: false,
+  NLSearchEnabled: false,
+  HistoryReviewEnabled: false,
   Version: '2.51.0',
   ...overrides,
 });
@@ -139,6 +141,46 @@ describe('fetchSettings', () => {
     const settings = await fetchSettings();
 
     expect(settings.disableNewsFetch).toBe(true);
+  });
+
+  it('maps nlSearchEnabled from settings response', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({ NLSearchEnabled: true }),
+    );
+
+    const settings = await fetchSettings();
+
+    expect(settings.nlSearchEnabled).toBe(true);
+  });
+
+  it('defaults nlSearchEnabled to false when omitted', async () => {
+    const response = settingsResponse();
+    delete (response as Partial<SettingsResponse>).NLSearchEnabled;
+    vi.mocked(requestFromAPI).mockResolvedValue(response);
+
+    const settings = await fetchSettings();
+
+    expect(settings.nlSearchEnabled).toBe(false);
+  });
+
+  it('maps historyReviewEnabled from settings response', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({ HistoryReviewEnabled: true }),
+    );
+
+    const settings = await fetchSettings();
+
+    expect(settings.historyReviewEnabled).toBe(true);
+  });
+
+  it('defaults historyReviewEnabled to false when omitted', async () => {
+    const response = settingsResponse();
+    delete (response as Partial<SettingsResponse>).HistoryReviewEnabled;
+    vi.mocked(requestFromAPI).mockResolvedValue(response);
+
+    const settings = await fetchSettings();
+
+    expect(settings.historyReviewEnabled).toBe(false);
   });
 
   it('should map redirectToProvider auth settings', async () => {

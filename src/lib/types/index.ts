@@ -411,6 +411,8 @@ export type SettingsResponse = {
   FeedbackURL: string;
   DisableNewsFetch: boolean;
   SupportURL?: string;
+  NLSearchEnabled?: boolean;
+  HistoryReviewEnabled?: boolean;
   Version: string;
 };
 

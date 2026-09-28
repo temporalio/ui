@@ -43,7 +43,9 @@ export type ParameterlessAPIRoutePath =
   | 'ui-extensions'
   | 'user'
   | 'nexus-endpoints'
-  | 'namespaces';
+  | 'namespaces'
+  | 'nl-search'
+  | 'history-review';
 export type WorkerAPIRoutePath =
   | 'worker-task-reachability'
   | 'workers'

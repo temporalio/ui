@@ -82,3 +82,21 @@ forwardHeaders:
 {{- end }}
 
 hideLogs: {{ env "TEMPORAL_HIDE_LOGS" | default "false" }}
+
+typesafe:
+  # The template escapes HTML and writes the value as YAML without quotes. A key that has
+  # one of & < > ' " + or ": " or " #" does not survive (standard base64 has +): put that key in a config file,
+  # as a quoted string, in place of the variable. The characters = / - _ . are safe.
+  apiKey: {{ env "TEMPORAL_TYPESAFE_API_KEY" | default "" }}
+  model: {{ env "TEMPORAL_TYPESAFE_MODEL" | default "jev-latest" }}
+  baseUrl: {{ env "TEMPORAL_TYPESAFE_BASE_URL" | default "https://api.typesafe.ai" }}
+  timeout: {{ env "TEMPORAL_TYPESAFE_TIMEOUT" | default "5s" }}
+  rateLimit:
+    disabled: {{ env "TEMPORAL_TYPESAFE_RATE_LIMIT_DISABLED" | default "false" }}
+    requestsPerMinute: {{ env "TEMPORAL_TYPESAFE_RATE_LIMIT_RPM" | default "30" }}
+    burst: {{ env "TEMPORAL_TYPESAFE_RATE_LIMIT_BURST" | default "10" }}
+    deploymentRequestsPerMinute: {{ env "TEMPORAL_TYPESAFE_RATE_LIMIT_DEPLOYMENT_RPM" | default "300" }}
+nlSearch:
+  enabled: {{ env "TEMPORAL_NL_SEARCH_ENABLED" | default "false" }}
+historyReview:
+  enabled: {{ env "TEMPORAL_HISTORY_REVIEW_ENABLED" | default "false" }}

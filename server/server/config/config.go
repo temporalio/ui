@@ -26,7 +26,26 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
+	"regexp"
 	"time"
+)
+
+// escapedAPIKey matches the escape sequences that html/template writes.
+var escapedAPIKey = regexp.MustCompile(`&(#\d+|amp|lt|gt|quot);`)
+
+const (
+	// DefaultTypeSafeModel is the TypeSafe System One model.
+	DefaultTypeSafeModel = "jev-latest"
+	// DefaultTypeSafeBaseURL is the public TypeSafe API.
+	DefaultTypeSafeBaseURL = "https://api.typesafe.ai"
+	// DefaultTypeSafeTimeout bounds one TypeSafe call, retries included.
+	DefaultTypeSafeTimeout = 5 * time.Second
+	// Defaults of the TypeSafe rate limit.
+	DefaultTypeSafeRequestsPerMinute           = 30
+	DefaultTypeSafeBurst                       = 10
+	DefaultTypeSafeDeploymentRequestsPerMinute = 300
 )
 
 type (
@@ -77,6 +96,53 @@ type (
 		HideLogs       bool     `yaml:"hideLogs"`
 		// TLS configuration options to start UI Server in TLS mode
 		UIServerTLS UIServerTLS `yaml:"uiServerTLS"`
+		// TypeSafe holds the values that the features below share: one deployment has one TypeSafe API key
+		TypeSafe TypeSafe `yaml:"typesafe"`
+		// Natural-language workflow search
+		NLSearch NLSearch `yaml:"nlSearch"`
+		// Review of the workflow event history
+		HistoryReview HistoryReview `yaml:"historyReview"`
+	}
+
+	// TypeSafe configures the client of the TypeSafe System One API. The features that
+	// use it (nlSearch, historyReview) have their own gates.
+	TypeSafe struct {
+		// APIKey is the TypeSafe API key. It is a secret: the server never sends it to the browser.
+		APIKey string `yaml:"apiKey"`
+		// Model defaults to jev-latest
+		Model string `yaml:"model"`
+		// BaseURL defaults to https://api.typesafe.ai
+		BaseURL string `yaml:"baseUrl"`
+		// Timeout bounds one TypeSafe call, retries included. Defaults to 5s
+		Timeout time.Duration `yaml:"timeout"`
+		// RateLimit protects the quota of the API key
+		RateLimit TypeSafeRateLimit `yaml:"rateLimit"`
+	}
+
+	// NLSearch is the gate of the natural-language workflow search. It translates text
+	// into workflow filters. The feature is off by default.
+	NLSearch struct {
+		Enabled bool `yaml:"enabled"`
+	}
+
+	// HistoryReview is the gate of the event history review. It scores each row of a
+	// workflow history for its importance to the outcome. The feature is off by default.
+	HistoryReview struct {
+		Enabled bool `yaml:"enabled"`
+	}
+
+	// TypeSafeRateLimit protects the quota of the TypeSafe API key of the deployment.
+	// The limit is on unless Disabled is true: a zero value selects the default.
+	TypeSafeRateLimit struct {
+		// Disabled turns the rate limit off. It is the only way to turn it off
+		Disabled bool `yaml:"disabled"`
+		// RequestsPerMinute is the refill rate for each caller. A caller is the holder of one
+		// Authorization header, or one remote IP when there is no Authorization header. Defaults to 30
+		RequestsPerMinute int `yaml:"requestsPerMinute"`
+		// Burst is the number of requests that a caller can make at one time. Defaults to 10
+		Burst int `yaml:"burst"`
+		// DeploymentRequestsPerMinute is the refill rate for all callers together. Defaults to 300
+		DeploymentRequestsPerMinute int `yaml:"deploymentRequestsPerMinute"`
 	}
 
 	CORS struct {
@@ -196,6 +262,96 @@ func (c *Config) Validate() error {
 	}
 	if err := c.CustomUI.Validate(c.Auth.Enabled); err != nil {
 		return err
+	}
+
+	if err := c.ValidateTypeSafe(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// NLSearchEnabled reports whether the natural-language search is on. It needs an API key to be on.
+func (c *Config) NLSearchEnabled() bool {
+	return c.NLSearch.Enabled && c.TypeSafe.APIKey != ""
+}
+
+// HistoryReviewEnabled reports whether the event history review is on. It needs an API key to be on.
+func (c *Config) HistoryReviewEnabled() bool {
+	return c.HistoryReview.Enabled && c.TypeSafe.APIKey != ""
+}
+
+// UsesTypeSafe reports whether a gate of a TypeSafe feature is on.
+func (c *Config) UsesTypeSafe() bool {
+	return c.NLSearch.Enabled || c.HistoryReview.Enabled
+}
+
+// ValidateTypeSafe validates the typesafe block. The key and the URL matter only
+// when a feature uses them.
+func (c *Config) ValidateTypeSafe() error {
+	return c.TypeSafe.Validate(c.UsesTypeSafe())
+}
+
+// WithDefaults returns a copy with a default in place of each empty value.
+func (t TypeSafe) WithDefaults() TypeSafe {
+	if t.Model == "" {
+		t.Model = DefaultTypeSafeModel
+	}
+	if t.BaseURL == "" {
+		t.BaseURL = DefaultTypeSafeBaseURL
+	}
+	if t.Timeout <= 0 {
+		t.Timeout = DefaultTypeSafeTimeout
+	}
+	t.RateLimit = t.RateLimit.WithDefaults()
+	return t
+}
+
+// WithDefaults returns a copy with a default in place of each zero value. A config
+// with no rateLimit block gets the default limit, not "no limit": only Disabled
+// turns the limit off.
+func (r TypeSafeRateLimit) WithDefaults() TypeSafeRateLimit {
+	if r.RequestsPerMinute <= 0 {
+		r.RequestsPerMinute = DefaultTypeSafeRequestsPerMinute
+	}
+	if r.Burst <= 0 {
+		r.Burst = DefaultTypeSafeBurst
+	}
+	if r.DeploymentRequestsPerMinute <= 0 {
+		r.DeploymentRequestsPerMinute = DefaultTypeSafeDeploymentRequestsPerMinute
+	}
+	return r
+}
+
+// Validate validates the typesafe block. inUse says that a feature gate is on.
+func (t TypeSafe) Validate(inUse bool) error {
+	if t.RateLimit.RequestsPerMinute < 0 {
+		return errors.New("typesafe.rateLimit.requestsPerMinute must not be negative")
+	}
+	if t.RateLimit.Burst < 0 {
+		return errors.New("typesafe.rateLimit.burst must not be negative")
+	}
+	if t.RateLimit.DeploymentRequestsPerMinute < 0 {
+		return errors.New("typesafe.rateLimit.deploymentRequestsPerMinute must not be negative")
+	}
+
+	if !inUse {
+		return nil
+	}
+
+	// The config templates escape HTML. A key such as "abc+def" arrives as "abc&#43;def",
+	// and TypeSafe then rejects each request. Fail with a clear message.
+	if escapedAPIKey.MatchString(t.APIKey) {
+		return errors.New("typesafe.apiKey has an HTML escape sequence: the config template changed the key, set it in a config file as a quoted string")
+	}
+
+	if t.BaseURL == "" {
+		return nil
+	}
+
+	u, err := url.Parse(t.BaseURL)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		return fmt.Errorf("typesafe.baseUrl %q is not a valid http(s) URL", t.BaseURL)
 	}
 
 	return nil
