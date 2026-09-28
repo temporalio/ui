@@ -1,17 +1,13 @@
 import { createSubscriber } from 'svelte/reactivity';
 
+import { ExecutionGraphCoordinator } from './data/execution-graph/coordinator';
 import { ExecutionGraphRepository } from './data/execution-graph/repository';
 import type { ExecutionGraphSnapshot } from './data/execution-graph/types';
-import { loadExecutionHistory } from './data/execution-history/load-execution-history';
 import { ExecutionHistoryRepository } from './data/execution-history/repository';
 import type { ExecutionHistoryState } from './data/execution-history/types';
 import { HistoryEventRepository } from './data/history-events/repository';
 import type { QualifiedHistoryEvent } from './data/history-events/types';
-import type {
-  EventKey,
-  ExecutionIdentity,
-  ExecutionKey,
-} from './data/identity-keys';
+import type { ExecutionIdentity } from './data/identity-keys';
 import { LifecycleGroupRepository } from './data/lifecycle-groups/repository';
 import type { LifecycleGroup } from './data/lifecycle-groups/types';
 import { TimelineRowRepository } from './scene/timeline-rows/repository';
@@ -31,22 +27,51 @@ export type WorkflowTimeline = Readonly<{
   executionHistories: readonly ExecutionHistoryState[];
 }>;
 
-/** Creates and connects the repositories for a mounted workflow timeline. */
-export function useWorkflowTimeline(
-  getIdentity: () => ExecutionIdentity,
-): WorkflowTimeline {
-  const executionGraphRepository = new ExecutionGraphRepository();
-  const executionHistoryRepository = new ExecutionHistoryRepository();
-  const historyEventRepository = new HistoryEventRepository();
-  const lifecycleGroupRepository = new LifecycleGroupRepository();
-  const timelineRowRepository = new TimelineRowRepository();
-  const activeLoads: {
-    executionKey: ExecutionKey;
-    controller: AbortController;
-  }[] = [];
-  const getHistoryEvent = (eventKey: EventKey) =>
-    historyEventRepository.getEvent(eventKey);
+type TimelineRepositories = Pick<
+  WorkflowTimeline,
+  | 'executionGraphRepository'
+  | 'executionHistoryRepository'
+  | 'historyEventRepository'
+  | 'lifecycleGroupRepository'
+  | 'timelineRowRepository'
+>;
 
+function connectRepositories({
+  executionGraphRepository,
+  historyEventRepository,
+  lifecycleGroupRepository,
+  timelineRowRepository,
+}: TimelineRepositories): () => void {
+  const unsubscribeLifecycleGroups = historyEventRepository.subscribe(
+    (notification) => lifecycleGroupRepository.addEvents(notification.events),
+    { emitCurrentSnapshot: true },
+  );
+  const unsubscribeExecutionGraph = historyEventRepository.subscribe(
+    (notification) => executionGraphRepository.addEvents(notification.events),
+    { emitCurrentSnapshot: true },
+  );
+  const unsubscribeTimelineRows = lifecycleGroupRepository.subscribe(
+    (notification) =>
+      timelineRowRepository.upsertGroups(notification.groups, (eventKey) =>
+        historyEventRepository.getEvent(eventKey),
+      ),
+    { emitCurrentSnapshot: true },
+  );
+
+  return () => {
+    unsubscribeLifecycleGroups();
+    unsubscribeExecutionGraph();
+    unsubscribeTimelineRows();
+  };
+}
+
+function createReactiveTimeline({
+  executionGraphRepository,
+  executionHistoryRepository,
+  historyEventRepository,
+  lifecycleGroupRepository,
+  timelineRowRepository,
+}: TimelineRepositories): WorkflowTimeline {
   const subscribeToExecutionGraph = createSubscriber((update) =>
     executionGraphRepository.subscribe(update),
   );
@@ -62,120 +87,6 @@ export function useWorkflowTimeline(
   const subscribeToTimelineRows = createSubscriber((update) =>
     timelineRowRepository.subscribe(update),
   );
-
-  function abortActiveLoads(): void {
-    for (const activeLoad of activeLoads) {
-      activeLoad.controller.abort();
-    }
-
-    activeLoads.length = 0;
-  }
-
-  async function loadHistory(identity: ExecutionIdentity): Promise<void> {
-    const executionHistory = executionHistoryRepository.startLoad(identity);
-
-    if (!executionHistory) {
-      return;
-    }
-
-    const controller = new AbortController();
-    activeLoads.push({
-      executionKey: executionHistory.executionKey,
-      controller,
-    });
-
-    try {
-      const stats = await loadExecutionHistory({
-        identity,
-        historyEvents: historyEventRepository,
-        signal: controller.signal,
-        onProgress: (progress) => {
-          if (!controller.signal.aborted) {
-            executionHistoryRepository.updateLoadProgress(
-              executionHistory.executionKey,
-              progress,
-            );
-          }
-        },
-      });
-
-      if (!controller.signal.aborted) {
-        executionHistoryRepository.completeLoad(
-          executionHistory.executionKey,
-          stats,
-        );
-      }
-    } catch {
-      if (!controller.signal.aborted) {
-        executionHistoryRepository.failLoad(executionHistory.executionKey);
-      }
-    } finally {
-      const activeLoadIndex = activeLoads.findIndex(
-        (activeLoad) =>
-          activeLoad.executionKey === executionHistory.executionKey &&
-          activeLoad.controller === controller,
-      );
-
-      if (activeLoadIndex >= 0) {
-        activeLoads.splice(activeLoadIndex, 1);
-      }
-    }
-  }
-
-  $effect(() => {
-    return historyEventRepository.subscribe(
-      (notification) => {
-        lifecycleGroupRepository.addEvents(notification.events);
-      },
-      { emitCurrentSnapshot: true },
-    );
-  });
-
-  $effect(() => {
-    return historyEventRepository.subscribe(
-      (notification) => {
-        executionGraphRepository.addEvents(notification.events);
-      },
-      { emitCurrentSnapshot: true },
-    );
-  });
-
-  $effect(() => {
-    return lifecycleGroupRepository.subscribe(
-      (notification) => {
-        timelineRowRepository.upsertGroups(
-          notification.groups,
-          getHistoryEvent,
-        );
-      },
-      { emitCurrentSnapshot: true },
-    );
-  });
-
-  $effect(() => {
-    return executionGraphRepository.subscribe(
-      (notification) => {
-        const executions =
-          notification.type === 'EXECUTION_GRAPH_SNAPSHOT'
-            ? notification.graph.executions
-            : notification.executions;
-
-        for (const execution of executions) {
-          executionHistoryRepository.register(execution.identity);
-        }
-      },
-      { emitCurrentSnapshot: true },
-    );
-  });
-
-  $effect(() => {
-    const identity = getIdentity();
-
-    executionGraphRepository.addExecution(identity);
-    void loadHistory(identity);
-
-    return abortActiveLoads;
-  });
 
   return {
     executionGraphRepository,
@@ -204,4 +115,33 @@ export function useWorkflowTimeline(
       return executionHistoryRepository.getSnapshot();
     },
   };
+}
+
+/** Creates and connects the repositories for a mounted workflow timeline. */
+export function useWorkflowTimeline(
+  getIdentity: () => ExecutionIdentity,
+): WorkflowTimeline {
+  const repositories: TimelineRepositories = {
+    executionGraphRepository: new ExecutionGraphRepository(),
+    executionHistoryRepository: new ExecutionHistoryRepository(),
+    historyEventRepository: new HistoryEventRepository(),
+    lifecycleGroupRepository: new LifecycleGroupRepository(),
+    timelineRowRepository: new TimelineRowRepository(),
+  };
+
+  $effect(() => connectRepositories(repositories));
+
+  $effect(() => {
+    const identity = getIdentity();
+    const coordinator = new ExecutionGraphCoordinator(
+      repositories.executionGraphRepository,
+      repositories.executionHistoryRepository,
+      repositories.historyEventRepository,
+    );
+
+    coordinator.start(identity);
+    return () => coordinator.dispose();
+  });
+
+  return createReactiveTimeline(repositories);
 }

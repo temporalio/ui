@@ -77,11 +77,19 @@ export async function pollExecutionHistory({
           },
           options: { signal },
         });
+      if (signal.aborted) {
+        break;
+      }
+
       const events = response?.history?.events ?? [];
       const addedEvents = historyEvents.addEvents(
         executionKey,
         events.map(normalizeHistoryEvent),
       );
+      if (signal.aborted) {
+        break;
+      }
+
       const nextCursor = response?.nextPageToken
         ? String(response.nextPageToken)
         : '';
