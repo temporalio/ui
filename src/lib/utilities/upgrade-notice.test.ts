@@ -103,6 +103,16 @@ describe('getInstalledVersions', () => {
     });
   });
 
+  it('ignores a dev build version, which has no release to compare against', () => {
+    expect(
+      getInstalledVersions({
+        distribution: 'cli',
+        distributionVersion: '0.0.0-DEV',
+        uiVersion: '2.39.0',
+      }).cli,
+    ).toBeUndefined();
+  });
+
   it('leaves the CLI version unset for other distributions', () => {
     expect(
       getInstalledVersions({

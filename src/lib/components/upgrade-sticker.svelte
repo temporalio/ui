@@ -51,6 +51,20 @@
   const label = $derived(
     translate('common.upgrade-notice-label', { current, latest }),
   );
+  // The CLI embeds the UI, so its upgrade is a new CLI rather than a new UI.
+  // Naming it keeps the sticker from reading as a UI update next to the UI
+  // version it sits beside.
+  const isCli = $derived(notice.distribution === 'cli');
+  const availableLabel = $derived(
+    isCli
+      ? translate('common.upgrade-available-cli')
+      : translate('common.upgrade-available'),
+  );
+  const newVersionLabel = $derived(
+    isCli
+      ? translate('common.upgrade-new-version-cli')
+      : translate('common.upgrade-new-version'),
+  );
 
   const corner = $derived({ x: width, y: height });
   const rest = $derived.by(() => {
@@ -214,7 +228,7 @@
           inert={!peeled}
         >
           <span class="text-[10px] font-bold uppercase tracking-widest">
-            {translate('common.upgrade-new-version')}
+            {newVersionLabel}
           </span>
           <span class="reveal-version">{latest}</span>
           <span class="flex items-center gap-1 text-[11px] font-medium">
@@ -243,7 +257,7 @@
                   <span
                     class="text-[10px] font-bold uppercase leading-tight tracking-widest"
                   >
-                    {translate('common.upgrade-available')}
+                    {availableLabel}
                   </span>
                 </span>
               </span>

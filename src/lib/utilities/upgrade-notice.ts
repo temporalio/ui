@@ -45,6 +45,15 @@ export const releaseForDistribution = (
 export const upgradeNoticeKey = ({ distribution, latest }: UpgradeNotice) =>
   `${distribution}@${latest}`;
 
+// A build that reports something other than a plain release version, such as
+// the CLI's 0.0.0-DEV default, has nothing meaningful to compare against.
+// isVersionNewer parses per segment, so "0.0.0-DEV" would otherwise read as
+// 0.0.NaN and make every release look like an upgrade.
+const RELEASE_VERSION = /^\d+\.\d+\.\d+$/;
+
+const releaseVersion = (value?: string): string | undefined =>
+  value && RELEASE_VERSION.test(value) ? value : undefined;
+
 export const getInstalledVersions = ({
   distribution,
   distributionVersion,
@@ -54,9 +63,9 @@ export const getInstalledVersions = ({
   distributionVersion?: string;
   uiVersion?: string;
 }): ComponentVersions => ({
-  cli: distribution === 'cli' ? distributionVersion : undefined,
-  image: uiVersion,
-  ui: uiVersion,
+  cli: distribution === 'cli' ? releaseVersion(distributionVersion) : undefined,
+  image: releaseVersion(uiVersion),
+  ui: releaseVersion(uiVersion),
 });
 
 export const getUpgradeNotice = ({
