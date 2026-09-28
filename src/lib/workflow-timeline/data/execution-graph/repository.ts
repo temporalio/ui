@@ -58,7 +58,7 @@ export class ExecutionGraphRepository {
     }
 
     this._snapshotCache = {
-      executions: [...this._executionsByKey.values()],
+      executionsByKey: new Map(this._executionsByKey),
       relations: [...this._relationsByEventKey.values()],
     };
 

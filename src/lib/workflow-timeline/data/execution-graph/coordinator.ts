@@ -45,7 +45,7 @@ export class ExecutionGraphCoordinator {
       (notification) => {
         const executions =
           notification.type === 'EXECUTION_GRAPH_SNAPSHOT'
-            ? notification.graph.executions
+            ? notification.graph.executionsByKey.values()
             : notification.executions;
 
         for (const execution of executions) {

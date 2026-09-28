@@ -55,9 +55,6 @@ export function getEagerExecutions(
   rootExecutionKey: ExecutionKey,
   depths: EagerExecutionDepths = defaultDepths,
 ): readonly ExecutionNode[] {
-  const executionsByKey = new Map(
-    graph.executions.map((execution) => [execution.executionKey, execution]),
-  );
   const childrenByParent = new Map<ExecutionKey, ExecutionKey[]>();
   const nextByPrevious = new Map<ExecutionKey, ExecutionKey[]>();
   const previousByNext = new Map<ExecutionKey, ExecutionKey[]>();
@@ -104,7 +101,7 @@ export function getEagerExecutions(
     }
 
     visitedPositionKeys.add(visitKey);
-    const execution = executionsByKey.get(position.executionKey);
+    const execution = graph.executionsByKey.get(position.executionKey);
 
     if (!execution) {
       continue;

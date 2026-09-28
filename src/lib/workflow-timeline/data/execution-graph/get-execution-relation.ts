@@ -38,6 +38,8 @@ export function getExecutionRelation(
         return null;
       }
 
+      const initiatedId = String(initiatedEventId);
+
       return {
         kind: 'child-workflow',
         parentExecutionKey: event.executionKey,
@@ -46,10 +48,8 @@ export function getExecutionRelation(
           workflowId,
           runId,
         },
-        initiatedEventKey: getEventKey(
-          event.executionKey,
-          String(initiatedEventId),
-        ),
+        initiatedEventId: initiatedId,
+        initiatedEventKey: getEventKey(event.executionKey, initiatedId),
         startedEventKey: event.eventKey,
       };
     }

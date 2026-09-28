@@ -18,6 +18,7 @@ export type ChildWorkflowRelation = Readonly<{
   kind: 'child-workflow';
   parentExecutionKey: ExecutionKey;
   childExecutionIdentity: ExecutionIdentity;
+  initiatedEventId: string;
   initiatedEventKey: EventKey;
   startedEventKey: EventKey;
 }>;
@@ -34,7 +35,7 @@ export type ExecutionNode = Readonly<{
 
 /** A point-in-time execution graph snapshot. */
 export type ExecutionGraphSnapshot = Readonly<{
-  executions: readonly ExecutionNode[];
+  executionsByKey: ReadonlyMap<ExecutionKey, ExecutionNode>;
   relations: readonly ExecutionRelation[];
 }>;
 
