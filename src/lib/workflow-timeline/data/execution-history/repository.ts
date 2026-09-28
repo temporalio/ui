@@ -1,9 +1,6 @@
 import type {
-  BidirectionalProgress,
-  BidirectionalStats,
-} from '$lib/services/fetch-bidirectional';
-
-import type {
+  ExecutionHistoryLoadProgress,
+  ExecutionHistoryLoadStats,
   ExecutionHistoryRepositoryNotification,
   ExecutionHistoryRepositorySubscriber,
   ExecutionHistoryState,
@@ -143,7 +140,7 @@ export class ExecutionHistoryRepository {
   /** Updates initial-load progress for an execution. */
   updateLoadProgress(
     executionKey: ExecutionKey,
-    progress: BidirectionalProgress,
+    progress: ExecutionHistoryLoadProgress,
   ): void {
     const executionHistory = this._historiesByExecutionKey.get(executionKey);
 
@@ -161,7 +158,10 @@ export class ExecutionHistoryRepository {
   }
 
   /** Marks an execution's initial history load as complete. */
-  completeLoad(executionKey: ExecutionKey, stats: BidirectionalStats): void {
+  completeLoad(
+    executionKey: ExecutionKey,
+    stats: ExecutionHistoryLoadStats,
+  ): void {
     const executionHistory = this._historiesByExecutionKey.get(executionKey);
 
     if (executionHistory?.load.status !== 'loading') {

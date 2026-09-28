@@ -1,9 +1,8 @@
-import {
-  type BidirectionalProgress,
-  type BidirectionalStats,
-  fetchBidirectional,
-} from '$lib/services/fetch-bidirectional';
-
+import { fetchExecutionHistory } from './fetch-execution-history';
+import type {
+  ExecutionHistoryLoadProgress,
+  ExecutionHistoryLoadStats,
+} from './types';
 import { normalizeHistoryEvent } from '../history-events/normalize-history-event';
 import { type HistoryEventRepository } from '../history-events/repository';
 import { type ExecutionIdentity, getExecutionKey } from '../identity-keys';
@@ -13,7 +12,7 @@ export type LoadExecutionHistoryOptions = Readonly<{
   identity: ExecutionIdentity;
   historyEvents: HistoryEventRepository;
   signal?: AbortSignal;
-  onProgress?: (progress: BidirectionalProgress) => void;
+  onProgress?: (progress: ExecutionHistoryLoadProgress) => void;
 }>;
 
 /** Loads one workflow execution and ingests each fetched page as it arrives. */
@@ -22,15 +21,15 @@ export function loadExecutionHistory({
   historyEvents,
   signal,
   onProgress,
-}: LoadExecutionHistoryOptions): Promise<BidirectionalStats> {
+}: LoadExecutionHistoryOptions): Promise<ExecutionHistoryLoadStats> {
   const executionKey = getExecutionKey(identity);
 
-  return fetchBidirectional({
-    ...identity,
+  return fetchExecutionHistory({
+    identity,
     signal,
     onProgress,
-    onRawPage: (events) => {
-      historyEvents.addEvents(executionKey, events.map(normalizeHistoryEvent));
-    },
+    onPage: (events) =>
+      historyEvents.addEvents(executionKey, events.map(normalizeHistoryEvent))
+        .length,
   });
 }

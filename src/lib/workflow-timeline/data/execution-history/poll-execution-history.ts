@@ -1,3 +1,5 @@
+import { delay } from 'es-toolkit';
+
 import type { GetWorkflowExecutionHistoryResponse } from '$lib/types/events';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -15,27 +17,23 @@ export type PollExecutionHistoryOptions = Readonly<{
   historyEvents: HistoryEventRepository;
   signal: AbortSignal;
   startCursor?: string;
-  idleBackoffMs?: number;
-  errorBackoffMs?: number;
+  idleDelayMs?: number;
+  errorRetryDelayMs?: number;
   onCursorChange?: (cursor: string) => void;
   onStatusChange?: (status: ExecutionHistoryPollStatus) => void;
 }>;
 
-function waitForRetry(delayMs: number, signal: AbortSignal): Promise<void> {
-  if (signal.aborted) {
-    return Promise.resolve();
+async function waitForPollDelay(
+  delayMs: number,
+  signal: AbortSignal,
+): Promise<void> {
+  try {
+    await delay(delayMs, { signal });
+  } catch (error) {
+    if (!signal.aborted) {
+      throw error;
+    }
   }
-
-  return new Promise((resolve) => {
-    const complete = () => {
-      clearTimeout(timeout);
-      signal.removeEventListener('abort', complete);
-      resolve();
-    };
-    const timeout = setTimeout(complete, delayMs);
-
-    signal.addEventListener('abort', complete, { once: true });
-  });
 }
 
 /** Long-polls one workflow execution and ingests each response as one batch. */
@@ -44,8 +42,8 @@ export async function pollExecutionHistory({
   historyEvents,
   signal,
   startCursor = '',
-  idleBackoffMs = 2000,
-  errorBackoffMs = 5000,
+  idleDelayMs = 2000,
+  errorRetryDelayMs = 5000,
   onCursorChange,
   onStatusChange,
 }: PollExecutionHistoryOptions): Promise<string> {
@@ -102,12 +100,12 @@ export async function pollExecutionHistory({
       updateStatus('polling');
 
       if (!nextCursor && addedEvents.length === 0) {
-        await waitForRetry(idleBackoffMs, signal);
+        await waitForPollDelay(idleDelayMs, signal);
       }
     } catch {
       if (!signal.aborted) {
         updateStatus('retrying');
-        await waitForRetry(errorBackoffMs, signal);
+        await waitForPollDelay(errorRetryDelayMs, signal);
       }
     }
   }

@@ -1,15 +1,26 @@
-import type {
-  BidirectionalProgress,
-  BidirectionalStats,
-} from '$lib/services/fetch-bidirectional';
-
 import type { ExecutionIdentity, ExecutionKey } from '../identity-keys';
+
+/** Progress while fetching an execution's existing history. */
+export type ExecutionHistoryLoadProgress = Readonly<{
+  ascPages: number;
+  descPages: number;
+  eventsAdded: number;
+  elapsedMs: number;
+}>;
+
+/** Results from fetching an execution's existing history. */
+export type ExecutionHistoryLoadStats = Readonly<{
+  durationMs: number;
+  eventsAdded: number;
+  ascPages: number;
+  descPages: number;
+}>;
 
 /** Initial history loading state for one workflow execution. */
 export type ExecutionHistoryLoadState = Readonly<{
   status: 'pending' | 'loading' | 'loaded' | 'failed';
-  progress: BidirectionalProgress | null;
-  stats: BidirectionalStats | null;
+  progress: ExecutionHistoryLoadProgress | null;
+  stats: ExecutionHistoryLoadStats | null;
 }>;
 
 /** Live history polling state for one workflow execution. */
