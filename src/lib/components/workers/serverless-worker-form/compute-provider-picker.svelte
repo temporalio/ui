@@ -7,14 +7,14 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
-  import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
 
   import {
-    type ComputeProviderOption,
+    COMPUTE_PROVIDER_VALUES,
+    COMPUTE_PROVIDERS,
     type ComputeProviderReleaseStage,
     type ComputeProviderValue,
-    defaultReleaseStage,
-  } from './shared';
+  } from './compute-providers';
+  import { type ComputeProviderOption, defaultReleaseStage } from './shared';
 
   interface Props {
     provider?: string;
@@ -26,35 +26,11 @@
 
   const configuredProviders = untrack(() => providers);
 
-  // The brand marks, not the monochrome glyphs. These are vendor logos rather
-  // than UI icons, so they keep their own colour on either theme.
-  const providerIcon: Record<ComputeProviderValue, IconComponent> = {
-    lambda: IconAwsColor,
-    agentcore: IconAwsColor,
-    'cloud-run': IconGcpColor,
-  };
+  const providerLabel = (value: ComputeProviderValue): string =>
+    translate(COMPUTE_PROVIDERS[value].labelKey);
 
-  const providerLabel = (value: ComputeProviderValue): string => {
-    switch (value) {
-      case 'lambda':
-        return translate('workers.provider-lambda');
-      case 'agentcore':
-        return translate('workers.provider-agentcore');
-      case 'cloud-run':
-        return translate('workers.provider-cloud-run');
-    }
-  };
-
-  const providerDescription = (value: ComputeProviderValue): string => {
-    switch (value) {
-      case 'lambda':
-        return translate('workers.provider-lambda-description');
-      case 'agentcore':
-        return translate('workers.provider-agentcore-description');
-      case 'cloud-run':
-        return translate('workers.provider-cloud-run-description');
-    }
-  };
+  const providerDescription = (value: ComputeProviderValue): string =>
+    translate(COMPUTE_PROVIDERS[value].descriptionKey);
 
   const releaseStageOf = (
     option: ComputeProviderOption,
@@ -82,11 +58,9 @@
    * how Temporal Cloud offers only the providers matching the Namespace's own
    * cloud.
    */
-  const defaultProviders = $derived<ComputeProviderOption[]>([
-    { value: 'lambda' },
-    { value: 'agentcore' },
-    { value: 'cloud-run' },
-  ]);
+  const defaultProviders = $derived<ComputeProviderOption[]>(
+    COMPUTE_PROVIDER_VALUES.map((value) => ({ value })),
+  );
 
   const resolvedProviders = $derived(configuredProviders ?? defaultProviders);
   const visibleProviders = $derived(
@@ -130,7 +104,7 @@
         </span>
       {/snippet}
       {#snippet icon()}
-        {@const ProviderIcon = providerIcon[option.value]}
+        {@const ProviderIcon = COMPUTE_PROVIDERS[option.value].icon}
         <div
           class="flex h-11 w-11 items-center justify-center rounded border border-primary bg-surface-primary"
         >

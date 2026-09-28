@@ -10,6 +10,10 @@
   import { translate } from '$lib/i18n/translate';
 
   import {
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+  } from './compute-providers';
+  import {
     type ComputeProviderOption,
     type CreateDeploymentFormData,
     createDeploymentSchema,
@@ -33,12 +37,7 @@
     ) => Promise<SubmitFieldErrors | void>;
     onSuccess: () => void;
     cancelHref: string;
-    agentCoreCfnTemplateUrl?: string;
-    agentCoreCfnTemplate?: string;
-    cfnTemplateUrl?: string;
-    cfnTemplate?: string;
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
@@ -47,12 +46,7 @@
     onSubmit,
     onSuccess,
     cancelHref,
-    agentCoreCfnTemplateUrl,
-    agentCoreCfnTemplate,
-    cfnTemplateUrl,
-    cfnTemplate,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
     computeProviders,
     gcpRegions,
   }: Props = $props();
@@ -184,12 +178,7 @@
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-        {agentCoreCfnTemplateUrl}
-        {agentCoreCfnTemplate}
-        {cfnTemplateUrl}
-        {cfnTemplate}
-        {terraformTemplate}
-        {cloudRunTerraformTemplate}
+        {templates}
         errors={$errors}
       />
     </Card>

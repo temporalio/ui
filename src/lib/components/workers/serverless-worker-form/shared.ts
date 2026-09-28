@@ -14,6 +14,12 @@ import {
 } from '$lib/services/deployments-service';
 import type { ComputeConfig } from '$lib/types/deployments';
 
+import {
+  COMPUTE_PROVIDERS,
+  type ComputeProviderReleaseStage,
+  type ComputeProviderValue,
+} from './compute-providers';
+
 const scalingFields = {
   scaleUpCooloffMs: z.number().int().min(0).optional(),
   scaleUpBacklogThreshold: z.number().int().min(0).optional(),
@@ -271,13 +277,6 @@ export const buildComputeConfigFromForm = (
   );
 };
 
-export type ComputeProviderValue = 'lambda' | 'agentcore' | 'cloud-run';
-
-export type ComputeProviderReleaseStage =
-  | 'public-preview'
-  | 'pre-release'
-  | 'generally-available';
-
 export type ComputeProviderOption = {
   value: ComputeProviderValue;
   disabled?: boolean;
@@ -286,13 +285,23 @@ export type ComputeProviderOption = {
   releaseStage?: ComputeProviderReleaseStage;
 };
 
+/**
+ * Re-exported so the many modules already importing these from here keep
+ * working. COMPUTE_PROVIDERS is the source.
+ */
+export type {
+  ComputeProviderReleaseStage,
+  ComputeProviderValue,
+} from './compute-providers';
+
+/** Stated once, in the registry. Spelled out so the annotation checks every provider. */
 export const defaultReleaseStage: Record<
   ComputeProviderValue,
   ComputeProviderReleaseStage
 > = {
-  lambda: 'public-preview',
-  agentcore: 'pre-release',
-  'cloud-run': 'public-preview',
+  lambda: COMPUTE_PROVIDERS.lambda.releaseStage,
+  agentcore: COMPUTE_PROVIDERS.agentcore.releaseStage,
+  'cloud-run': COMPUTE_PROVIDERS['cloud-run'].releaseStage,
 };
 
 interface InitialComputeProviderOptions {
