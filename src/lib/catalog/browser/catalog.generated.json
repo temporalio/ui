@@ -1,5 +1,5 @@
 {
-  "sourceHash": "4be4b7bdce0105db55dcc4ce2e2bcce31edbf7016f0b2966893e91f0183c164d",
+  "sourceHash": "60d75e15572ab4f4f3ecd7ae4e9ee5ba7534e2ac7fc1c58c90ded94e2ef50223",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -171,6 +171,55 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "childWorkflowTest"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "continue-as-new",
+      "title": "Continue-as-new run chain",
+      "description": "Runs a short timer in each execution before continuing as new.",
+      "capabilityTags": ["continue-as-new", "timers", "event-history"],
+      "expectedEvidence": [
+        "By default, three executions share one workflow ID and have distinct run IDs.",
+        "The first two histories end with WorkflowExecutionContinuedAsNew; the final history completes.",
+        "Each execution contains a timer lifecycle."
+      ],
+      "input": {
+        "defaultValue": [3],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Total runs",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10
+            }
+          ],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "continueAsNewWorkflow"
       },
       "source": { "id": "oss", "label": "OSS" }
     },

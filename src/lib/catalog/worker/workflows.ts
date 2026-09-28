@@ -3,6 +3,7 @@ export { heartbeatWorkflow } from './examples/activity-heartbeat/workflow.js';
 export { retryWorkflow } from './examples/activity-retry/workflow.js';
 export { timeoutWorkflow } from './examples/activity-timeout/workflow.js';
 export { childWorkflowTest } from './examples/child-workflows/workflow.js';
+export { continueAsNewWorkflow } from './examples/continue-as-new/workflow.js';
 export { hello } from './examples/hello/workflow.js';
 export { highEventCountWorkflow } from './examples/high-event-count/workflow.js';
 export { localActivityWorkflow } from './examples/local-activity/workflow.js';

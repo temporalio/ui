@@ -51,6 +51,7 @@ const proofExampleIds = [
   'sequential-markdown-activities',
   'sequential-no-summary-activities',
   'sequential-plain-text-activities',
+  'continue-as-new',
 ] as const;
 
 const activitySummaryExamples = [
@@ -160,6 +161,7 @@ describe('shared workflow corpus', () => {
       [
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
+        'continueAsNewWorkflow',
         'nexusGreeting',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
@@ -615,6 +617,8 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/high-event-count/workflow.ts',
         'src/lib/catalog/worker/examples/child-workflows/example.ts',
         'src/lib/catalog/worker/examples/child-workflows/workflow.ts',
+        'src/lib/catalog/worker/examples/continue-as-new/example.ts',
+        'src/lib/catalog/worker/examples/continue-as-new/workflow.ts',
         'src/lib/catalog/worker/examples/local-activity/example.ts',
         'src/lib/catalog/worker/examples/local-activity/workflow.ts',
         'src/lib/catalog/worker/examples/workflow-patching/example.ts',
