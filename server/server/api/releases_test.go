@@ -22,6 +22,11 @@ func newTestReleaseServer(t *testing.T, tags map[string]string, calls *atomic.In
 				fmt.Fprintf(w, `{"tag_name":%q}`, tag)
 				return
 			}
+			// Components with a tag pattern list releases instead.
+			if r.URL.Path == fmt.Sprintf("/repos/%s/releases", repo) {
+				fmt.Fprintf(w, `[{"tag_name":%q}]`, tag)
+				return
+			}
 		}
 		w.WriteHeader(http.StatusNotFound)
 	}))
@@ -34,7 +39,7 @@ func TestReleaseCheckerNormalizesTags(t *testing.T) {
 	server := newTestReleaseServer(t, map[string]string{
 		"temporalio/cli":         "v1.9.1",
 		"temporalio/helm-charts": "temporal-1.7.0",
-		"temporalio/ui":          "v2.54.1",
+		"temporalio/ui-server":   "v2.54.1",
 		"temporalio/temporal":    "v1.32.0",
 	}, &calls)
 	checker := newReleaseChecker(server.URL, server.Client(), time.Now)
@@ -93,4 +98,40 @@ func TestReleaseForDistribution(t *testing.T) {
 	assert.Equal(t, ReleaseServer, ReleaseForDistribution("server"))
 	assert.Equal(t, ReleaseServer, ReleaseForDistribution(""))
 	assert.Equal(t, ReleaseServer, ReleaseForDistribution("nix"))
+}
+
+func TestReleaseCheckerPicksTheTemporalChart(t *testing.T) {
+	var calls atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		if r.URL.Path != "/repos/temporalio/helm-charts/releases" {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		fmt.Fprint(w, `[
+			{"tag_name":"temporal-proxy-0.2.1"},
+			{"tag_name":"temporal-1.8.0","prerelease":true},
+			{"tag_name":"temporal-1.7.0"},
+			{"tag_name":"temporal-1.6.0"}
+		]`)
+	}))
+	t.Cleanup(server.Close)
+	checker := newReleaseChecker(server.URL, server.Client(), time.Now)
+
+	got, err := checker.Latest(context.Background(), ReleaseHelm)
+	require.NoError(t, err)
+	assert.Equal(t, "1.7.0", got)
+}
+
+func TestReleaseCheckerErrorsWhenNoChartMatches(t *testing.T) {
+	var calls atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		fmt.Fprint(w, `[{"tag_name":"temporal-proxy-0.2.1"}]`)
+	}))
+	t.Cleanup(server.Close)
+	checker := newReleaseChecker(server.URL, server.Client(), time.Now)
+
+	_, err := checker.Latest(context.Background(), ReleaseHelm)
+	require.Error(t, err)
 }

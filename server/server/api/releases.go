@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -18,6 +19,7 @@ const (
 	releaseFailureCacheTTL = time.Hour
 	releaseRequestTimeout  = 5 * time.Second
 	defaultGitHubAPIURL    = "https://api.github.com"
+	releaseListPageSize    = 50
 )
 
 // Release components that an install can be asked to upgrade.
@@ -29,10 +31,19 @@ const (
 )
 
 var releaseRepos = map[string]string{
-	ReleaseCLI:    "temporalio/cli",
-	ReleaseHelm:   "temporalio/helm-charts",
-	ReleaseUI:     "temporalio/ui",
+	ReleaseCLI:  "temporalio/cli",
+	ReleaseHelm: "temporalio/helm-charts",
+	// The Docker image is published by ui-server, after the temporalio/ui
+	// release it is built from. Both carry the same version, so tracking
+	// ui-server avoids advertising an image that has not been pushed yet.
+	ReleaseUI:     "temporalio/ui-server",
 	ReleaseServer: "temporalio/temporal",
+}
+
+// Repositories that publish more than one chart or module tag their releases
+// per artifact, so the newest release overall is not the one we track.
+var releaseTagPatterns = map[string]*regexp.Regexp{
+	ReleaseHelm: regexp.MustCompile(`^temporal-v?\d+\.\d+\.\d+$`),
 }
 
 // The release that each distribution is upgraded to.
@@ -104,7 +115,7 @@ func (rc *ReleaseChecker) Latest(ctx context.Context, component string) (string,
 		return entry.version, entry.err
 	}
 
-	version, err := rc.fetchLatest(ctx, repo)
+	version, err := rc.fetchLatest(ctx, repo, releaseTagPatterns[component])
 	rc.mu.Lock()
 	rc.cache[repo] = releaseCacheEntry{version: version, err: err, fetchedAt: rc.now()}
 	rc.mu.Unlock()
@@ -119,9 +130,25 @@ func (rc *ReleaseChecker) isFresh(entry releaseCacheEntry) bool {
 	return rc.now().Sub(entry.fetchedAt) < ttl
 }
 
-func (rc *ReleaseChecker) fetchLatest(ctx context.Context, repo string) (string, error) {
-	url := fmt.Sprintf("%s/repos/%s/releases/latest", rc.baseURL, repo)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+func (rc *ReleaseChecker) fetchLatest(ctx context.Context, repo string, pattern *regexp.Regexp) (string, error) {
+	tag, err := rc.fetchLatestTag(ctx, repo, pattern)
+	if err != nil {
+		return "", err
+	}
+	version := normalizeReleaseTag(tag)
+	if version == "" {
+		return "", fmt.Errorf("latest release of %s has no tag", repo)
+	}
+	return version, nil
+}
+
+func (rc *ReleaseChecker) fetchLatestTag(ctx context.Context, repo string, pattern *regexp.Regexp) (string, error) {
+	path := fmt.Sprintf("/repos/%s/releases/latest", repo)
+	if pattern != nil {
+		path = fmt.Sprintf("/repos/%s/releases?per_page=%d", repo, releaseListPageSize)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rc.baseURL+path, nil)
 	if err != nil {
 		return "", err
 	}
@@ -136,17 +163,34 @@ func (rc *ReleaseChecker) fetchLatest(ctx context.Context, repo string) (string,
 		return "", fmt.Errorf("latest release of %s: unexpected status %d", repo, resp.StatusCode)
 	}
 
-	var release struct {
-		TagName string `json:"tag_name"`
+	type release struct {
+		TagName    string `json:"tag_name"`
+		Draft      bool   `json:"draft"`
+		Prerelease bool   `json:"prerelease"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
+
+	if pattern == nil {
+		var latest release
+		if err := json.NewDecoder(resp.Body).Decode(&latest); err != nil {
+			return "", err
+		}
+		return latest.TagName, nil
+	}
+
+	var releases []release
+	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
 		return "", err
 	}
-	version := normalizeReleaseTag(release.TagName)
-	if version == "" {
-		return "", fmt.Errorf("latest release of %s has no tag", repo)
+	// GitHub returns releases newest first, so the first match is the latest.
+	for _, r := range releases {
+		if r.Draft || r.Prerelease {
+			continue
+		}
+		if pattern.MatchString(r.TagName) {
+			return r.TagName, nil
+		}
 	}
-	return version, nil
+	return "", fmt.Errorf("no release of %s matched %s", repo, pattern)
 }
 
 func normalizeReleaseTag(tag string) string {
