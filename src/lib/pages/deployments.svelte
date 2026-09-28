@@ -28,11 +28,14 @@
   interface Props {
     canCreateServerlessDeployment?: boolean;
     showConnectionStatus?: boolean;
+    /** Regions the namespace runs in, primary first. */
+    namespaceRegions?: readonly string[];
   }
 
   let {
     canCreateServerlessDeployment = true,
     showConnectionStatus = true,
+    namespaceRegions,
   }: Props = $props();
 
   let error = $state('');
@@ -130,6 +133,7 @@
             {deployment}
             {columns}
             {showConnectionStatus}
+            {namespaceRegions}
             onChange={() => refresh.update((n) => n + 1)}
           />
         {/each}

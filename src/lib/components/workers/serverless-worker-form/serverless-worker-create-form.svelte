@@ -8,7 +8,13 @@
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { shortRegion } from '$lib/utilities/compute-regions';
 
+  import {
+    type ComputeRegion,
+    lambdaArnPlaceholderFor,
+    regionPreview,
+  } from './multi-region';
   import {
     type ComputeProviderOption,
     type CreateDeploymentFormData,
@@ -19,7 +25,11 @@
 
   import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
+  import ComputeProviderPerRegion from './compute-provider-per-region.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
+  import FailoverPreview from './failover-preview.svelte';
+  import RegionBlock from './region-block.svelte';
+  import RegionsHeading from './regions-heading.svelte';
 
   interface SubmitFieldErrors {
     lambdaArn?: string[];
@@ -41,6 +51,13 @@
     cloudRunTerraformTemplate?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    /**
+     * Regions this namespace runs in. When more than one is provided (a highly
+     * available namespace), the form collects a compute provider per region.
+     */
+    regions?: readonly ComputeRegion[];
+    /** Namespace name, shown in the multi-region heading. */
+    namespace?: string;
   }
 
   let {
@@ -55,9 +72,13 @@
     cloudRunTerraformTemplate,
     computeProviders,
     gcpRegions,
+    regions,
+    namespace = '',
   }: Props = $props();
 
   let error = $state<string | undefined>();
+
+  const isMultiRegion = $derived(!!regions && regions.length > 1);
 
   const superform = superForm(
     {
@@ -119,10 +140,10 @@
   const { form, errors, enhance, submitting } = superform;
 </script>
 
-<div class="flex max-w-[45rem] flex-col gap-4">
+<div class="relative flex max-w-[45rem] flex-col gap-4">
   <form class="flex flex-col gap-4" use:enhance novalidate>
     <Card class="p-5">
-      <h2 class="mb-1 text-base font-medium">
+      <h2 class="text-base font-medium">
         {translate('workers.configuration-section')}
       </h2>
       <p class="mb-4 text-sm text-secondary">
@@ -153,45 +174,73 @@
     </Card>
 
     <Card class="p-5">
-      <h2 class="mb-1 text-base font-medium">
+      <h2 class="text-base font-medium">
         {translate('workers.compute-provider')}
       </h2>
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker
-        bind:provider={$form.provider}
-        providers={computeProviders}
-      />
-      <CloudRunLatencyNotice provider={$form.provider} class="mt-4" />
-      <ComputeFields
-        provider={$form.provider}
-        bind:lambdaArn={$form.lambdaArn}
-        bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
-        bind:iamRoleArn={$form.iamRoleArn}
-        bind:roleExternalId={$form.roleExternalId}
-        bind:gcpProject={$form.gcpProject}
-        bind:gcpRegion={$form.gcpRegion}
-        {gcpRegions}
-        bind:gcpWorkerPool={$form.gcpWorkerPool}
-        bind:gcpServiceAccount={$form.gcpServiceAccount}
-        bind:minReplicas={$form.minReplicas}
-        bind:maxReplicas={$form.maxReplicas}
-        bind:initialReplicas={$form.initialReplicas}
-        bind:utilizationTarget={$form.utilizationTarget}
-        bind:scaleDownStabilization={$form.scaleDownStabilization}
-        bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
-        bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
-        bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-        bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-        {agentCoreCfnTemplateUrl}
-        {agentCoreCfnTemplate}
-        {cfnTemplateUrl}
-        {cfnTemplate}
-        {terraformTemplate}
-        {cloudRunTerraformTemplate}
-        errors={$errors}
-      />
+      {#if isMultiRegion && regions}
+        <ComputeProviderPerRegion
+          {namespace}
+          {regions}
+          {computeProviders}
+          deploymentName={$form.name}
+          buildId={$form.buildId}
+        />
+      {:else}
+        <ComputeProviderPicker
+          layout="summary"
+          bind:provider={$form.provider}
+          providers={computeProviders}
+        />
+        <hr class="my-5 border-primary" />
+        {#if regions?.[0]}
+          <RegionsHeading {namespace} {regions} />
+          <FailoverPreview
+            {namespace}
+            provider={$form.provider}
+            regions={[regionPreview(regions[0], $form.provider, $form)]}
+            deploymentName={$form.name}
+            buildId={$form.buildId}
+          />
+        {/if}
+        <CloudRunLatencyNotice provider={$form.provider} class="mb-4" />
+        <RegionBlock region={regions?.[0]}>
+          <ComputeFields
+            provider={$form.provider}
+            leadingDivider={false}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+              regions?.[0] && shortRegion(regions[0].id),
+            )}
+            bind:lambdaArn={$form.lambdaArn}
+            bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
+            bind:iamRoleArn={$form.iamRoleArn}
+            bind:roleExternalId={$form.roleExternalId}
+            bind:gcpProject={$form.gcpProject}
+            bind:gcpRegion={$form.gcpRegion}
+            {gcpRegions}
+            bind:gcpWorkerPool={$form.gcpWorkerPool}
+            bind:gcpServiceAccount={$form.gcpServiceAccount}
+            bind:minReplicas={$form.minReplicas}
+            bind:maxReplicas={$form.maxReplicas}
+            bind:initialReplicas={$form.initialReplicas}
+            bind:utilizationTarget={$form.utilizationTarget}
+            bind:scaleDownStabilization={$form.scaleDownStabilization}
+            bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
+            bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
+            bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
+            bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+            {agentCoreCfnTemplateUrl}
+            {agentCoreCfnTemplate}
+            {cfnTemplateUrl}
+            {cfnTemplate}
+            {terraformTemplate}
+            {cloudRunTerraformTemplate}
+            errors={$errors}
+          />
+        </RegionBlock>
+      {/if}
     </Card>
 
     {#if error}
