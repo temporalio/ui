@@ -8,6 +8,7 @@ import {
   detectCollision,
   getFlippedOffset,
   getFlippedPosition,
+  hasMoved,
 } from './position-calculator';
 import type { PortalPosition, Rect } from './types';
 
@@ -275,6 +276,28 @@ describe('position-calculator', () => {
       const result = getFlippedOffset({ x: 4, y: 8 }, 'bottom', 'top');
       expect(result.x).toBe(4);
       expect(result.y).toBe(-8);
+    });
+  });
+
+  describe('hasMoved', () => {
+    it('should report no movement for an identical rect', () => {
+      expect(hasMoved(anchorRect, createRect(100, 100, 50, 30))).toBe(false);
+    });
+
+    it('should detect vertical movement', () => {
+      expect(hasMoved(anchorRect, createRect(100, 140, 50, 30))).toBe(true);
+    });
+
+    it('should detect horizontal movement', () => {
+      expect(hasMoved(anchorRect, createRect(180, 100, 50, 30))).toBe(true);
+    });
+
+    it('should detect a width change', () => {
+      expect(hasMoved(anchorRect, createRect(100, 100, 80, 30))).toBe(true);
+    });
+
+    it('should detect a height change', () => {
+      expect(hasMoved(anchorRect, createRect(100, 100, 50, 60))).toBe(true);
     });
   });
 

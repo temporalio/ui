@@ -28,7 +28,7 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
-  import StatusCounts from '$lib/components/status-counts.svelte';
+  import StatusCountFilters from '$lib/components/status-count-filters.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
@@ -252,7 +252,7 @@
           {refreshTimeFormatted}
         </p>
       </div>
-      <StatusCounts bind:refreshTime />
+      <StatusCountFilters bind:refreshTime />
     </div>
     {#if headerActions || workflowStartEnabled}
       <div class="flex items-center gap-4">

@@ -16,9 +16,10 @@ test.beforeEach(async ({ page }) => {
     persistenceStore: 'postgres,elasticsearch',
   });
 
-  page.goto('/namespaces/default/workflows');
-
-  await waitForWorkflowsApis(page);
+  await Promise.all([
+    waitForWorkflowsApis(page),
+    page.goto('/namespaces/default/workflows'),
+  ]);
 });
 
 const getQueryParam = (url: string) =>

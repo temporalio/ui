@@ -1,13 +1,19 @@
 <script lang="ts">
+  import { twMerge } from 'tailwind-merge';
+
   import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
+  import {
+    COLUMN_WIDTH_CLAMP_CLASSES,
+    columnWidthStyle,
+  } from '$lib/utilities/column-width';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
+
+  import NexusOperationStatusBadge from '../nexus-operation-status-badge.svelte';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
@@ -17,8 +23,13 @@
   };
   let { column, operation }: Props = $props();
 
-  const { label } = $derived(column);
+  const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
+
+  const clampToWidth = $derived(
+    width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES,
+  );
+  const widthStyle = $derived(columnWidthStyle(width));
 
   let filterOrCopyButtonsVisible = $state(false);
   const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
@@ -44,7 +55,8 @@
 
 {#if filterableLabels.includes(label)}
   <td
-    class="relative h-8 whitespace-nowrap pr-24"
+    class={twMerge('relative h-8 whitespace-nowrap pr-24', clampToWidth)}
+    style={widthStyle}
     data-testid="nexus-operations-summary-table-body-cell"
     onmouseover={showFilterOrCopy}
     onfocus={showFilterOrCopy}
@@ -97,11 +109,12 @@
   </td>
 {:else}
   <td
-    class="h-8 whitespace-nowrap"
+    class={twMerge('h-8 whitespace-nowrap', clampToWidth)}
+    style={widthStyle}
     data-testid="nexus-operations-summary-table-body-cell"
   >
     {#if label === 'Status'}
-      <WorkflowStatus status={toNexusOperationStatus(operation.status)} />
+      <NexusOperationStatusBadge status={operation.status} />
     {:else if label === 'Schedule Time'}
       <Timestamp dateTime={operation.scheduleTime} />
     {:else if label === 'Close Time'}

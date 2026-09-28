@@ -2,7 +2,6 @@
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import PayloadInline from '$lib/components/payload/payload-inline.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isRawPayload, isRawPayloads } from '$lib/utilities/decode-payload';
@@ -65,9 +64,11 @@
         />
       </Copyable>
     {:else}
-      <Badge type="subtle" class="block select-none truncate">
+      <span
+        class="block select-none truncate rounded-sm border border-primary bg-surface-secondary px-1.5 py-0.5 text-secondary"
+      >
         {formatSummaryAttributeDisplayValue(value)}
-      </Badge>
+      </span>
     {/if}
   </div>
 {/if}

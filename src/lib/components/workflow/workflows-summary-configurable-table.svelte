@@ -6,6 +6,7 @@
   import { page } from '$app/state';
 
   import DownloadJsonButton from '$lib/components/download-json-button.svelte';
+  import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
@@ -25,7 +26,11 @@
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
-  import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import {
+    configurableTableColumns,
+    resizeColumn,
+    TABLE_TYPE,
+  } from '$lib/stores/configurable-table-columns';
   import { viewFeature } from '$lib/stores/new-feature-tags';
   import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
@@ -245,7 +250,18 @@
         onSelectPage={handleSelectPage}
       >
         {#each columns as column (column.label)}
-          <TableHeaderCell {column} />
+          <TableHeaderCell
+            {column}
+            onResize={baseColumns.some((c) => c.label === column.label)
+              ? (width) =>
+                  resizeColumn(
+                    column.label,
+                    width,
+                    namespace,
+                    TABLE_TYPE.WORKFLOWS,
+                  )
+              : undefined}
+          />
         {/each}
       </TableHeaderRow>
     {/snippet}
@@ -295,6 +311,11 @@
             : translate('common.comfortable')}
         ></Button>
       </Tooltip>
+      <ResetColumnWidthsButton
+        columns={baseColumns}
+        {namespace}
+        table={TABLE_TYPE.WORKFLOWS}
+      />
       <DownloadJsonButton
         items={visibleItems}
         {page}

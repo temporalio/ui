@@ -17,11 +17,13 @@
     getInitialComputeProvider,
   } from './shared';
 
+  import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
   interface SubmitFieldErrors {
     lambdaArn?: string[];
+    agentCoreEndpointArn?: string[];
     iamRoleArn?: string[];
   }
 
@@ -31,6 +33,8 @@
     ) => Promise<SubmitFieldErrors | void>;
     onSuccess: () => void;
     cancelHref: string;
+    agentCoreCfnTemplateUrl?: string;
+    agentCoreCfnTemplate?: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
@@ -43,6 +47,8 @@
     onSubmit,
     onSuccess,
     cancelHref,
+    agentCoreCfnTemplateUrl,
+    agentCoreCfnTemplate,
     cfnTemplateUrl,
     cfnTemplate,
     terraformTemplate,
@@ -61,6 +67,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: '',
+      agentCoreEndpointArn: '',
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject: '',
@@ -90,6 +97,9 @@
           if (fieldErrors) {
             if (fieldErrors.lambdaArn)
               form.errors.lambdaArn = fieldErrors.lambdaArn;
+            if (fieldErrors.agentCoreEndpointArn)
+              form.errors.agentCoreEndpointArn =
+                fieldErrors.agentCoreEndpointArn;
             if (fieldErrors.iamRoleArn)
               form.errors.iamRoleArn = fieldErrors.iamRoleArn;
             return;
@@ -153,9 +163,11 @@
         bind:provider={$form.provider}
         providers={computeProviders}
       />
+      <CloudRunLatencyNotice provider={$form.provider} class="mt-4" />
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
+        bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
         bind:iamRoleArn={$form.iamRoleArn}
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}
@@ -172,6 +184,8 @@
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+        {agentCoreCfnTemplateUrl}
+        {agentCoreCfnTemplate}
         {cfnTemplateUrl}
         {cfnTemplate}
         {terraformTemplate}

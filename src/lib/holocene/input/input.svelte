@@ -58,6 +58,7 @@
     name = id,
     copyable = false,
     disabled = false,
+    readonly = false,
     clearable = false,
     autocomplete = 'off',
     valid = true,
@@ -121,7 +122,16 @@
     <div
       class={merge(
         'input-container',
-        'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        'relative box-border inline-flex h-10 w-full items-center rounded border border-primary bg-background-primary text-sm text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-interactive-primary focus-within:ring-offset-2 focus-within:ring-offset-background-primary',
+        !isDisabled &&
+          !readonly &&
+          !showError &&
+          'focus-within:border-secondary hover:border-brand focus-within:hover:border-secondary',
+        value && !isDisabled && !showError && 'border-secondary',
+        readonly &&
+          !isDisabled &&
+          'border-primary bg-surface-primary hover:border-primary',
+        isDisabled && 'border-secondary bg-surface-tertiary text-tertiary',
         inputContainerClass,
       )}
       class:disabled={isDisabled}
@@ -148,6 +158,7 @@
         {name}
         {spellcheck}
         {required}
+        {readonly}
         aria-invalid={showError ? 'true' : undefined}
         aria-describedby={hintText ? (showError ? errorId : hintId) : undefined}
         {autocomplete}
@@ -240,28 +251,20 @@
   .input-container {
     &.error,
     &.invalid {
-      @apply border-danger focus-within:ring-danger/70;
-
-      > .input {
-        @apply caret-danger;
-      }
-    }
-
-    &.disabled {
-      @apply opacity-50;
+      @apply border-danger focus-within:border-danger;
     }
   }
 
   .input {
-    @apply m-2 h-full w-full bg-transparent focus:text-brand focus:outline-none;
+    @apply m-2 h-full w-full bg-transparent text-primary placeholder:text-tertiary focus:outline-none disabled:text-tertiary;
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
+    @apply block h-full w-fit rounded-l-[inherit] border-r border-primary px-4 py-2 text-secondary;
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
+    @apply block h-full w-fit rounded-r-[inherit] border-l border-primary bg-surface-tertiary px-4 py-2;
   }
 
   .noBorder {
@@ -273,7 +276,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-primary;
   }
 
   .disabled-icon-container {
@@ -285,7 +288,7 @@
   }
 
   .hint-text {
-    @apply text-xs text-primary;
+    @apply text-xs text-tertiary;
 
     &.error,
     &.invalid {

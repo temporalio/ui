@@ -18,6 +18,7 @@
     getInitialComputeProvider,
   } from './shared';
 
+  import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
   import RecentVersions from './recent-versions.svelte';
@@ -54,6 +55,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: '',
+      agentCoreEndpointArn: '',
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject: '',
@@ -124,9 +126,11 @@
         bind:provider={$form.provider}
         providers={computeProviders}
       >
+        <CloudRunLatencyNotice provider={$form.provider} />
         <ComputeFields
           provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}
+          bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
           bind:iamRoleArn={$form.iamRoleArn}
           bind:roleExternalId={$form.roleExternalId}
           bind:gcpProject={$form.gcpProject}

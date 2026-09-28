@@ -37,7 +37,9 @@
   args: ComponentProps<typeof ToggleSwitch>,
   context: StoryContext<ComponentProps<typeof ToggleSwitch>>,
 )}
-  <ToggleSwitch {...args} id={context.id} />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <ToggleSwitch {...args} id={context.id} />
+  </div>
 {/snippet}
 
 <Story name="Unchecked" />

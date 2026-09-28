@@ -128,6 +128,6 @@
 
 <style lang="postcss">
   .child {
-    @apply bg-slate-100/50 dark:bg-slate-100/5;
+    @apply bg-surface-secondary;
   }
 </style>

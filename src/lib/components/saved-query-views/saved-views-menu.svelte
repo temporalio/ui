@@ -12,7 +12,8 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
-  import { IconBookmark, IconSearch } from '$lib/io/icon';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { IconSearch } from '$lib/io/icon';
   import type { SavedQuery } from '$lib/stores/saved-queries';
 
   interface Props {
@@ -20,9 +21,9 @@
     views: SavedQuery[];
     activeView?: SavedQuery;
     draftView?: SavedQuery;
-    dirty?: boolean;
     maxQueries: number;
-    onSelect: (view: SavedQuery) => void;
+    onSelect: (view: SavedQuery, event?: MouseEvent) => void;
+    viewHref: (view: SavedQuery) => string;
   }
 
   let {
@@ -30,9 +31,9 @@
     views,
     activeView,
     draftView,
-    dirty = false,
     maxQueries,
     onSelect,
+    viewHref,
   }: Props = $props();
 
   const menuId = $derived(`${id}-saved-views-menu`);
@@ -48,19 +49,12 @@
       : views;
   });
 
-  const activeUserView = $derived(
-    activeView?.type === 'user' ? activeView : undefined,
-  );
   const draftActive = $derived(
     Boolean(draftView) && activeView?.id === draftView?.id,
   );
-  const noneSelected = $derived(!activeUserView && !draftActive);
   const label = $derived(
-    draftActive
-      ? (draftView?.name ?? '')
-      : (activeUserView?.name ?? translate('common.saved-views')),
+    draftActive ? (draftView?.name ?? '') : translate('common.saved-views'),
   );
-  const unsaved = $derived(draftActive || (Boolean(activeUserView) && dirty));
 
   const focusSearch = () => {
     requestAnimationFrame(() => document.getElementById(searchId)?.focus());
@@ -92,20 +86,16 @@
   <MenuButton
     id="{id}-saved-views-button"
     controls={menuId}
-    variant="secondary"
+    variant="tertiary"
     size="xs"
     hasIndicator
     title={label}
-    class={merge('max-w-full', unsaved && 'border-dashed')}
+    class={merge('max-w-full', draftActive && 'border-dashed')}
     data-testid="saved-views-button"
     onclick={(isOpen) => {
       if (isOpen) focusSearch();
     }}
   >
-    {#snippet leading()}
-      {@const Glyph = activeUserView?.Icon ?? IconBookmark}
-      <Glyph class={merge('size-4 shrink-0', draftActive && 'opacity-60')} />
-    {/snippet}
     <span
       class={merge(
         'min-w-0 truncate font-normal',
@@ -114,22 +104,19 @@
     >
       {label}
     </span>
-    {#if noneSelected}
-      <span
-        class="surface-subtle ml-1.5 shrink-0 rounded-full px-2 py-0.5 font-mono text-xs font-medium"
-      >
-        {views.length}/{maxQueries}
-      </span>
-    {:else if unsaved && !draftActive}
-      <span
-        class="surface-subtle ml-1.5 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium italic"
-      >
-        {translate('common.unsaved')}
-      </span>
-    {/if}
+    <BadgeCount
+      value={views.length}
+      total={maxQueries}
+      size="sm"
+      class="ml-1.5"
+    />
   </MenuButton>
 
-  <Menu id={menuId} class="w-max min-w-full max-w-[32rem]">
+  <Menu
+    id={menuId}
+    usePortal
+    class="w-max min-w-full max-w-[min(100dvw-1rem,32rem)]"
+  >
     <MenuItem
       class="p-0"
       hoverable={false}
@@ -164,7 +151,8 @@
       <MenuItem
         data-view-item
         selected={view.id === activeView?.id}
-        onclick={() => onSelect(view)}
+        href={viewHref(view)}
+        onclick={(event) => onSelect(view, event)}
         data-testid={view.name.toLowerCase().replace(/\s+/g, '-')}
         data-track-name="user-query-menu-item"
       >
@@ -178,9 +166,10 @@
       </MenuItem>
     {/each}
 
-    <MenuDivider />
-
-    <li role="presentation" class="px-3 py-2 text-xs text-secondary">
+    <li
+      role="presentation"
+      class="surface-primary sticky bottom-0 z-10 border-t border-secondary px-3 py-2 text-xs text-secondary"
+    >
       {translate('common.views-used', {
         used: views.length,
         total: maxQueries,

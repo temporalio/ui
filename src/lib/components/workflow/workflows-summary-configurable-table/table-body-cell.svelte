@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { Badge } from '$lib/io/badge';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import {
     customSearchAttributes,
@@ -17,6 +18,10 @@
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowExecution,
   } from '$lib/types/workflows';
+  import {
+    COLUMN_WIDTH_CLAMP_CLASSES,
+    columnWidthStyle,
+  } from '$lib/utilities/column-width';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -46,7 +51,7 @@
     archival = false,
   }: Props = $props();
 
-  const { label } = $derived(column);
+  const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
   const isCustomKeywordOrTextAttribute = $derived(
     isCustomSearchAttribute(label) &&
@@ -66,7 +71,13 @@
     'Scheduled By ID',
   ];
 
-  const className = 'relative h-8 whitespace-nowrap';
+  const className = $derived(
+    twMerge(
+      'relative h-8 whitespace-nowrap',
+      width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES,
+    ),
+  );
+  const widthStyle = $derived(columnWidthStyle(width));
   const testId = 'workflows-summary-table-body-cell';
 
   const hideTooltip = (value: string | undefined) => {
@@ -84,6 +95,7 @@
 )}
   <FilterableTableCell
     class={className}
+    style={widthStyle}
     data-testid={testId}
     {truncate}
     {...filterableCellProps}
@@ -176,23 +188,17 @@
     })}
   {/if}
 {:else}
-  <td class={className} data-testid={testId}>
+  <td class={className} style={widthStyle} data-testid={testId}>
     {#if label === 'Status'}
-      <WorkflowStatus
+      <WorkflowStatusBadge
         status={workflow.status}
         delayed={isWorkflowDelayed(workflow)}
         taskFailure={isWorkflowTaskFailure(workflow)}
       />
     {:else if label === 'End'}
-      <Timestamp
-        dateTime={workflow.endTime}
-        options={{ format: truncate ? 'short' : 'long' }}
-      />
+      <Timestamp dateTime={workflow.endTime} />
     {:else if label === 'Start'}
-      <Timestamp
-        dateTime={workflow.startTime}
-        options={{ format: truncate ? 'short' : 'long' }}
-      />
+      <Timestamp dateTime={workflow.startTime} />
     {:else if label === 'Task Queue'}
       <Tooltip
         usePortal
@@ -222,10 +228,7 @@
         ? workflow.stateTransitionCount
         : ''}
     {:else if label === 'Execution Time'}
-      <Timestamp
-        dateTime={workflow.executionTime}
-        options={{ format: truncate ? 'short' : 'long' }}
-      />
+      <Timestamp dateTime={workflow.executionTime} />
     {:else if label === 'Execution Duration'}
       {formatDistanceAbbreviated({
         start: workflow?.startTime,
@@ -238,22 +241,16 @@
       {@const content =
         workflow.searchAttributes?.indexedFields?.TemporalScheduledStartTime}
       {#if content && typeof content === 'string'}
-        <Timestamp
-          dateTime={content}
-          options={{ format: truncate ? 'short' : 'long' }}
-        />
+        <Timestamp dateTime={content} />
       {/if}
     {:else if label === 'Change Version'}
       {workflow.searchAttributes?.indexedFields?.TemporalChangeVersion}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
       {@const content = workflow.searchAttributes?.indexedFields?.[label]}
       {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
-        <Timestamp
-          dateTime={content}
-          options={{ format: truncate ? 'short' : 'long' }}
-        />
+        <Timestamp dateTime={content} />
       {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
-        <Badge>{content}</Badge>
+        <Badge text={content ?? ''} />
       {:else}
         <Tooltip
           usePortal

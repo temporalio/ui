@@ -5,6 +5,7 @@ import {
   getPendingBlockY,
   getRowY,
   getTotalForY,
+  removePanelGapFromBand,
 } from './timeline-positioning';
 
 // Real constants from TimelineConfig: height = baseRadius * 4 = 24, radius = baseRadius * 1.5 = 9
@@ -188,6 +189,36 @@ describe('getPendingBlockY', () => {
     // Same formula: (3+2)*H - R = 5H - R. The last row is at 4H so block is below it.
     expect(y).toBe(5 * H - R);
     expect(y).toBeGreaterThan(4 * H); // last row center
+  });
+});
+
+// ---------------------------------------------------------------------------
+// removePanelGapFromBand
+// ---------------------------------------------------------------------------
+
+describe('removePanelGapFromBand', () => {
+  const mapBand = (bandTop: number, bandHeight: number) =>
+    removePanelGapFromBand({
+      bandHeight,
+      bandTop,
+      panelHeight: 200,
+      panelTop: 300,
+    });
+
+  it('leaves a band above the panel unchanged', () => {
+    expect(mapBand(100, 100)).toEqual({ bandHeight: 100, bandTop: 100 });
+  });
+
+  it('subtracts the panel height from a band below it', () => {
+    expect(mapBand(600, 100)).toEqual({ bandHeight: 100, bandTop: 400 });
+  });
+
+  it('removes the panel gap from a band spanning it', () => {
+    expect(mapBand(200, 400)).toEqual({ bandHeight: 200, bandTop: 200 });
+  });
+
+  it('maps a band inside the panel to its insertion point', () => {
+    expect(mapBand(350, 100)).toEqual({ bandHeight: 0, bandTop: 300 });
   });
 });
 

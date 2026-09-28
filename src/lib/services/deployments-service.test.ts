@@ -3,10 +3,12 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { base } from '$app/paths';
 
 import {
+  buildAgentCoreComputeConfig,
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
   createWorkerDeployment,
   createWorkerDeploymentVersion,
+  decodeAgentCoreProviderDetails,
   decodeGcpCloudRunProviderDetails,
   decodeLambdaProviderDetails,
   decodeScalerDetails,
@@ -468,6 +470,62 @@ describe('deployments service', () => {
       const decoded = JSON.parse(atob(scalerData!));
       expect(decoded.scale_up_cooloff_ms).toBe(1000);
       expect(decoded.max_worker_lifetime_ms).toBe(60000);
+    });
+  });
+
+  describe('buildAgentCoreComputeConfig', () => {
+    const endpointArn =
+      'arn:aws:bedrock-agentcore:us-west-2:123456789012:runtime/orders-abc123/runtime-endpoint/DEFAULT';
+    const iamRoleArn = 'arn:aws:iam::123456789012:role/my-role';
+
+    test('writes the endpoint ARN under endpoint_arn, not arn', () => {
+      const result = buildAgentCoreComputeConfig(endpointArn, iamRoleArn);
+
+      const scalingGroup = result.scalingGroups?.['default'];
+      expect(scalingGroup?.provider?.type).toBe('aws-agentcore');
+
+      const decoded = JSON.parse(
+        atob(scalingGroup?.provider?.details?.data as string),
+      );
+      expect(decoded.endpoint_arn).toBe(endpointArn);
+      expect(decoded.arn).toBeUndefined();
+      expect(decoded.role).toBe(iamRoleArn);
+    });
+
+    test('pairs with the no-sync scaler, like Lambda', () => {
+      const result = buildAgentCoreComputeConfig(endpointArn, iamRoleArn, {
+        scaleUpCooloffMs: 1000,
+        maxWorkerLifetimeMs: 60000,
+      });
+
+      const scalingGroup = result.scalingGroups?.['default'];
+      expect(scalingGroup?.scaler?.type).toBe('no-sync');
+
+      const decoded = JSON.parse(
+        atob(scalingGroup?.scaler?.details?.data as string),
+      );
+      expect(decoded.scale_up_cooloff_ms).toBe(1000);
+      expect(decoded.max_worker_lifetime_ms).toBe(60000);
+    });
+
+    test('round-trips through decodeAgentCoreProviderDetails', () => {
+      const config = buildAgentCoreComputeConfig(endpointArn, iamRoleArn, {
+        roleExternalId: 'tmprl-ext-id',
+      });
+
+      expect(decodeAgentCoreProviderDetails(config)).toEqual({
+        agentCoreEndpointArn: endpointArn,
+        iamRoleArn,
+        roleExternalId: 'tmprl-ext-id',
+      });
+    });
+
+    test('decoders do not cross provider types', () => {
+      const agentCore = buildAgentCoreComputeConfig(endpointArn, iamRoleArn);
+      const lambda = buildLambdaComputeConfig('arn:lambda', iamRoleArn);
+
+      expect(decodeLambdaProviderDetails(agentCore)).toEqual({});
+      expect(decodeAgentCoreProviderDetails(lambda)).toEqual({});
     });
   });
 

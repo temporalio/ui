@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    'd7f2464b31a33221a79aee1b28edb90c8bf32a6aaf8d0bd990a1cf6a95c984ee',
+    '4be4b7bdce0105db55dcc4ce2e2bcce31edbf7016f0b2966893e91f0183c164d',
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -529,6 +529,150 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-markdown-activities',
+      title: 'Sequential activities with Markdown summaries',
+      description:
+        'Runs 20 activities by default with Markdown summaries and retries one step three times.',
+      capabilityTags: ['activities', 'sequencing', 'retries'],
+      expectedEvidence: [
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'When included, logging step 10 fails three attempts and succeeds on attempt four.',
+        'Each activity summary displays a Logging System link.',
+      ],
+      input: {
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialMarkdownActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-no-summary-activities',
+      title: 'Sequential activities without summaries',
+      description: 'Runs 20 activities by default without summaries.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'Activity timeline entries do not display summaries.',
+      ],
+      input: {
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialNoSummaryActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-plain-text-activities',
+      title: 'Sequential plain text activities',
+      description:
+        'Runs 20 activities by default with an indexed plain-text summary.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'Activity summaries range from Activity 1 through the configured count.',
+      ],
+      input: {
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialPlainTextActivities',
       },
       source: { id: 'oss', label: 'OSS' },
     },

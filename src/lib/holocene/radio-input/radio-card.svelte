@@ -6,6 +6,7 @@
 
   import type { RadioGroupContext } from './types';
 
+  import RadioControl from './radio-control.svelte';
   import { RADIO_GROUP_CONTEXT } from './radio-group.svelte';
 
   interface Props {
@@ -46,13 +47,17 @@
   const { name, group } = ctx;
 
   const selected = $derived($group === value);
+  // The panel sits directly beneath the card with a shared edge, so the card
+  // gives up its bottom corners rather than rounding into it.
+  const hasPanel = $derived(selected && !!children);
 </script>
 
 <div class={merge('flex flex-col', className)}>
   <div
     class={merge(
-      'flex items-start gap-3 border p-4',
-      'border-subtle',
+      'flex items-start gap-3 rounded border p-4',
+      'border-primary',
+      hasPanel && 'rounded-b-none',
       labelContainerClass,
       disabled && 'opacity-50',
     )}
@@ -64,10 +69,9 @@
       )}
       for={id}
     >
-      <input
-        bind:group={$group}
-        type="radio"
-        class="radio-card-input surface-primary mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border border-secondary"
+      <RadioControl
+        {group}
+        class="mt-0.5 shrink-0"
         {name}
         {value}
         {id}
@@ -91,33 +95,10 @@
   </div>
 
   {#if selected && children}
-    <div class="surface-background border border-t-0 border-subtle p-5">
+    <div
+      class="rounded-b border border-t-0 border-primary bg-background-primary p-5 text-primary"
+    >
       {@render children()}
     </div>
   {/if}
 </div>
-
-<style lang="postcss">
-  .radio-card-input {
-    @apply box-border cursor-pointer outline-none;
-
-    &:checked {
-      @apply bg-interactive shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
-    }
-
-    &:enabled {
-      &:focus-visible,
-      &:hover {
-        @apply bg-interactive-active ring-2 ring-primary/70;
-
-        &:not(:active) {
-          @apply border-inverse;
-        }
-      }
-    }
-
-    &:disabled {
-      @apply cursor-not-allowed opacity-50;
-    }
-  }
-</style>

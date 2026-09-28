@@ -19,7 +19,6 @@
   import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
   import {
     routeForSchedule,
-    routeForTaskQueue,
     routeForWorkerDeployment,
     routeForWorkflow,
     routeForWorkflowsWithQuery,
@@ -154,11 +153,14 @@
     {#if workflow?.taskQueue}
       <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
       <DetailListLinkValue
+        copyable
+        copyableText={workflow.taskQueue}
         text={workflow.taskQueue}
-        href={routeForTaskQueue({
+        href={routeForWorkflowsWithQuery({
           namespace,
-          queue: workflow.taskQueue,
-        })}
+          query: `TaskQueue="${workflow.taskQueue}"`,
+        }) ?? ''}
+        Icon={IconFilter}
       />
     {/if}
 

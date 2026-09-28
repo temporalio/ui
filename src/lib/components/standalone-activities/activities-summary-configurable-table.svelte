@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import DownloadJsonButton from '$lib/components/download-json-button.svelte';
+  import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import Button from '$lib/holocene/button.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -17,7 +18,11 @@
   import { fetchPaginatedActivities } from '$lib/services/standalone-activities';
   import { activityCount, activityRefresh } from '$lib/stores/activities';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import {
+    configurableTableColumns,
+    resizeColumn,
+    TABLE_TYPE,
+  } from '$lib/stores/configurable-table-columns';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import {
     getBatchSelectionTargets,
@@ -125,7 +130,16 @@
         onSelectPage={handleSelectPage}
       >
         {#each columns as column, i (`${column.label}:${i}`)}
-          <TableHeaderCell {column} />
+          <TableHeaderCell
+            {column}
+            onResize={(width) =>
+              resizeColumn(
+                column.label,
+                width,
+                namespace,
+                TABLE_TYPE.ACTIVITIES,
+              )}
+          />
         {/each}
       </TableHeaderRow>
     {/snippet}
@@ -147,6 +161,11 @@
       <TableEmptyState />
     {/snippet}
     {#snippet actionsEndAdditional({ visibleItems, page })}
+      <ResetColumnWidthsButton
+        {columns}
+        {namespace}
+        table={TABLE_TYPE.ACTIVITIES}
+      />
       <DownloadJsonButton items={visibleItems} {page} filePrefix="activities" />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button

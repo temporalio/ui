@@ -111,6 +111,14 @@ export const routeForCatalog = ({
   });
 };
 
+export const routeForAgents = ({
+  namespace,
+}: NamespaceParameter): ResolvedPathname => {
+  return withPrefix('/namespaces/[namespace]/agents', {
+    namespace,
+  });
+};
+
 export const routeForCatalogExample = ({
   namespace,
   exampleId,
@@ -119,10 +127,6 @@ export const routeForCatalogExample = ({
     namespace,
     exampleId: encodeURIForSvelte(exampleId),
   });
-};
-
-export const routeForCommonErrors = (): ResolvedPathname => {
-  return withPrefix('/common-errors', {});
 };
 
 export const routeForNexusEndpoint = (id: string): ResolvedPathname => {

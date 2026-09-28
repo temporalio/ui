@@ -6,6 +6,7 @@
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import NewsFeedWidget from '$lib/components/news-feed/news-feed-widget.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
@@ -19,6 +20,7 @@
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    IconAgent,
     IconArchive,
     IconBook,
     IconFeedback,
@@ -44,6 +46,7 @@
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
   import {
+    routeForAgents,
     routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForCatalog,
@@ -112,6 +115,7 @@
   const getRoutes = (namespace: string) => {
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
+      agentsRoute: routeForAgents({ namespace }),
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
       standaloneNexusOperationsRoute: routeForStandaloneNexusOperations({
         namespace,
@@ -131,6 +135,7 @@
   const getNavPrimaryLinks = (
     {
       workflowsRoute,
+      agentsRoute,
       standaloneActivitiesRoute,
       standaloneNexusOperationsRoute,
       schedulesRoute,
@@ -142,6 +147,7 @@
       nexusRoute,
     }: {
       workflowsRoute: string;
+      agentsRoute: string;
       standaloneActivitiesRoute: string;
       standaloneNexusOperationsRoute: string;
       schedulesRoute: string;
@@ -164,6 +170,7 @@
         isActive: (path) =>
           path.includes(namespacesRoute) &&
           !path.includes(workflowsRoute) &&
+          !path.includes(agentsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
           !path.includes(workersRoute) &&
@@ -205,6 +212,13 @@
         isActive: (path) => path.includes(schedulesRoute),
       },
       {
+        href: agentsRoute,
+        Icon: IconAgent,
+        testId: 'agents-button',
+        label: translate('common.agents'),
+        isActive: (path) => path.includes(agentsRoute),
+      },
+      {
         href: batchOperationsRoute,
         Icon: IconTemporalBatch,
         testId: 'batch-operation-button',
@@ -242,6 +256,7 @@
       historyImportRoute,
     }: {
       workflowsRoute: string;
+      agentsRoute: string;
       standaloneActivitiesRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
@@ -287,6 +302,7 @@
   );
   let {
     workflowsRoute,
+    agentsRoute,
     schedulesRoute,
     batchOperationsRoute,
     workersRoute,
@@ -299,6 +315,7 @@
   let showNamespacePicker = $derived(
     [
       workflowsRoute,
+      agentsRoute,
       schedulesRoute,
       workersRoute,
       workerDeploymentsRoute,
@@ -312,6 +329,10 @@
 
   function getCurrentHref(namespace: string) {
     const namespacePages = [
+      {
+        subPath: 'agents',
+        fullRoute: routeForAgents({ namespace }),
+      },
       {
         subPath: 'schedules',
         fullRoute: routeForSchedules({ namespace }),
@@ -435,6 +456,7 @@
       {/if}
       <UserMenu {logout} />
     </TopNavigation>
+    <ExtensionSlot name="app.top-nav.sub-nav" />
     {#snippet main()}
       <div
         class="flex h-full w-full flex-col gap-4 p-4 md:px-8 md:pb-0 md:pt-8"
@@ -463,7 +485,7 @@
             />
           {/each}
 
-          <hr class="border-subtle" />
+          <hr class="border-primary" />
 
           {#each [...linkList]
             .filter((item) => !item.hidden)

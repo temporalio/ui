@@ -12,7 +12,7 @@
 
 <div
   id="content-wrapper"
-  class="relative flex h-full w-max flex-auto flex-col overflow-auto"
+  class="relative flex h-full w-max flex-auto flex-col overflow-auto bg-background-primary text-primary"
   style="scroll-padding-top: var(--scroll-inset-top); scroll-padding-bottom: var(--scroll-inset-bottom);"
 >
   {@render children?.()}

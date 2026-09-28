@@ -95,13 +95,9 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 		ConfigProvider:   cfgProvider,
 	}))
 	e.Use(middleware.Secure())
-	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		CookiePath:     "/",
-		CookieHTTPOnly: false,
-		CookieSameSite: http.SameSiteStrictMode,
-		CookieSecure:   !cfg.CORS.CookieInsecure,
-		Skipper:        csrf.SkipOnAuthorizationHeader,
-	}))
+	csrfCookieSecure := !cfg.CORS.CookieInsecure
+	e.Use(csrf.EnsureTokenCookie(csrfCookieSecure))
+	e.Use(middleware.CSRFWithConfig(csrf.MiddlewareConfig(cfgProvider, csrfCookieSecure)))
 
 	e.Pre(route.PublicPath(cfg.PublicPath))
 	route.SetHealthRoute(e)
@@ -127,7 +123,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 				panic(err)
 			}
 		}
-		route.SetUIRoutes(e, cfg.PublicPath, assets)
+		route.SetUIRoutes(e, cfg.PublicPath, assets, cfgProvider)
 		route.SetRenderRoute(e, cfg.PublicPath)
 	}
 

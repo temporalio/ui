@@ -28,7 +28,7 @@
 
 <button
   class={merge(
-    'surface-interactive-secondary h-6 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    'h-6 border border-transparent bg-transparent p-1 text-primary hover:bg-interactive-tertiary-hover focus-visible:bg-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press',
     className,
   )}
   data-track-name="copyable-button"

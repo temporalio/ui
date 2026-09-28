@@ -73,6 +73,37 @@ export function getPendingBlockY({
   return (topSectionRows + 2) * ROW_HEIGHT - RADIUS;
 }
 
+// Rows below an open details panel are translated down by panelHeight. Convert
+// the visible display-space band back to row-space before choosing which rows
+// to mount, so the panel is not mistaken for additional row viewport.
+export function removePanelGapFromBand({
+  bandHeight,
+  bandTop,
+  panelHeight,
+  panelTop,
+}: {
+  bandHeight: number;
+  bandTop: number;
+  panelHeight: number;
+  panelTop: number | null;
+}): { bandHeight: number; bandTop: number } {
+  if (panelTop === null || panelHeight <= 0) return { bandHeight, bandTop };
+
+  const panelBottom = panelTop + panelHeight;
+  const toRowSpace = (displayY: number) => {
+    if (displayY <= panelTop) return displayY;
+    if (displayY >= panelBottom) return displayY - panelHeight;
+    return panelTop;
+  };
+  const rowTop = toRowSpace(bandTop);
+  const rowBottom = toRowSpace(bandTop + bandHeight);
+
+  return {
+    bandHeight: Math.max(0, rowBottom - rowTop),
+    bandTop: rowTop,
+  };
+}
+
 export const timelineTextPosition = (
   points: number[],
   y: number,

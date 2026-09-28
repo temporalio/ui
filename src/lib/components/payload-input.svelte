@@ -67,7 +67,7 @@
 <div class="flex flex-col gap-2">
   <span class="text-sm font-medium">{label}</span>
   <div class="flex gap-2">
-    {#key [loading, editing]}
+    {#key `${loading}-${editing}`}
       <CodeBlock
         {id}
         maxHeight={320}

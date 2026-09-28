@@ -12,6 +12,7 @@
   import { translate } from '$lib/i18n/translate';
   import { IconBookmark, IconCheckmark, IconLink } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { lastViewedSavedQueryIds } from '$lib/stores/last-viewed-saved-query';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     MAX_SAVED_QUERIES,
@@ -19,6 +20,8 @@
   } from '$lib/stores/saved-queries';
   import type { SearchAttributes } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { isModifiedClick } from '$lib/utilities/is-modified-click';
+  import { combineQueries } from '$lib/utilities/query/combine-queries';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -47,6 +50,9 @@
   }: Props = $props();
 
   let activeQueryView: SavedQuery | undefined = $state();
+  let addedSystemViewId: string | undefined = $state();
+  let addedSystemViewBase = $state('');
+  let addedSystemViewQuery = $state('');
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
   let pendingQueryTarget: string | undefined = $state();
@@ -62,12 +68,30 @@
   const namespaceSavedQueries = $derived(
     sortAlphabetically($savedQueries?.[namespace] || [], (q) => q.name),
   );
+  const lastViewedSavedQueryId = $derived(
+    $lastViewedSavedQueryIds[id]?.[namespace],
+  );
+  const lastViewedSavedQuery = $derived(
+    namespaceSavedQueries.find((view) => view.id === lastViewedSavedQueryId),
+  );
   const systemQueryView = $derived(
     (query && systemViews.find((q) => q.query === query)) ||
       (!query && defaultView),
   );
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
+  );
+  const savedQueryViewWithSystemView = $derived(
+    query &&
+      namespaceSavedQueries.find(
+        (saved) =>
+          saved.query &&
+          systemViews.some(
+            (system) =>
+              system.query &&
+              query === combineQueries(saved.query, system.query),
+          ),
+      ),
   );
   const unsavedView: SavedQuery = $derived({
     id: 'unsaved',
@@ -82,11 +106,67 @@
   const activeUserView = $derived(
     activeQueryView?.type === 'user' ? activeQueryView : undefined,
   );
+  const systemViewBaseQuery = $derived(activeUserView?.query ?? '');
+  const onCustomView = $derived(
+    Boolean(activeUserView) || Boolean(unsavedQuery),
+  );
+  const addedSystemView = $derived(
+    addedSystemViewId && addedSystemViewQuery === query
+      ? addedSystemViewId
+      : undefined,
+  );
+  const narrowsActiveView = (view: SavedQuery) =>
+    view.type === 'system' && view.id !== defaultView.id;
+  const isSystemViewActive = (view: SavedQuery) =>
+    narrowsActiveView(view)
+      ? addedSystemView === view.id ||
+        query === combineQueries(systemViewBaseQuery, view.query)
+      : query === view.query;
   const activeUserViewDirty = $derived(
     Boolean(activeUserView) &&
       Boolean(query) &&
       activeUserView?.query !== query,
   );
+  const lastViewedSavedQueryDirty = $derived(
+    activeUserViewDirty && activeUserView?.id === lastViewedSavedQuery?.id,
+  );
+
+  const rememberLastViewedSavedQuery = (view: SavedQuery) => {
+    if (view.type !== 'user') return;
+
+    const savedQueryIds = $lastViewedSavedQueryIds[id] ?? {};
+    if (savedQueryIds[namespace] === view.id) return;
+
+    $lastViewedSavedQueryIds = {
+      ...$lastViewedSavedQueryIds,
+      [id]: {
+        ...savedQueryIds,
+        [namespace]: view.id,
+      },
+    };
+  };
+
+  const forgetLastViewedSavedQuery = () => {
+    const savedQueryIds = $lastViewedSavedQueryIds[id];
+    if (!savedQueryIds?.[namespace]) return;
+
+    const remainingSavedQueryIds = { ...savedQueryIds };
+    delete remainingSavedQueryIds[namespace];
+
+    const nextLastViewedSavedQueryIds = { ...$lastViewedSavedQueryIds };
+    if (Object.keys(remainingSavedQueryIds).length) {
+      nextLastViewedSavedQueryIds[id] = remainingSavedQueryIds;
+    } else {
+      delete nextLastViewedSavedQueryIds[id];
+    }
+
+    $lastViewedSavedQueryIds = nextLastViewedSavedQueryIds;
+  };
+
+  const setSavedQueryView = (view: SavedQuery) => {
+    activeQueryView = view;
+    rememberLastViewedSavedQuery(view);
+  };
 
   onMount(() => {
     if (savedQueryParam) {
@@ -101,6 +181,7 @@
 
       if (!maxViewsReached) {
         $savedQueries[namespace] = [...$savedQueries[namespace], queryToSave];
+        rememberLastViewedSavedQuery(queryToSave);
       }
 
       activeQueryView = queryToSave;
@@ -108,7 +189,9 @@
       url.searchParams.delete('savedQuery');
       goto(url);
     } else if (savedQueryView) {
-      activeQueryView = savedQueryView;
+      setSavedQueryView(savedQueryView);
+    } else if (savedQueryViewWithSystemView) {
+      setSavedQueryView(savedQueryViewWithSystemView);
     } else if (systemQueryView) {
       activeQueryView = systemQueryView;
     } else if (query) {
@@ -130,7 +213,9 @@
     if (activeQueryView?.type === 'system') {
       if (query && activeQueryView.query !== query) {
         if (savedQueryView) {
-          activeQueryView = savedQueryView;
+          setSavedQueryView(savedQueryView);
+        } else if (savedQueryViewWithSystemView) {
+          setSavedQueryView(savedQueryViewWithSystemView);
         } else if (systemQueryView) {
           activeQueryView = systemQueryView;
         } else {
@@ -140,19 +225,70 @@
     }
   });
 
-  const setActiveQueryView = (view: SavedQuery) => {
-    if (view.id === activeQueryView?.id) return;
-    activeQueryView = view;
-    pendingQueryTarget = view.query || '';
-
-    if (view.query) {
-      $filters = toListWorkflowFilters(view.query, $searchAttributes);
+  $effect(() => {
+    if (
+      namespaceSavedQueries.length &&
+      lastViewedSavedQueryId &&
+      !lastViewedSavedQuery
+    ) {
+      forgetLastViewedSavedQuery();
     }
+  });
+
+  const viewHref = (view: SavedQuery) => {
+    const url = new URL(page.url);
+    if (view.query) {
+      url.searchParams.set('query', view.query);
+    } else {
+      url.searchParams.delete('query');
+    }
+    url.searchParams.delete(currentPageKey);
+    return `${url.pathname}${url.search}`;
+  };
+
+  const setActiveQueryView = (view: SavedQuery, event?: MouseEvent) => {
+    if (isModifiedClick(event)) return;
+    event?.preventDefault();
+
+    rememberLastViewedSavedQuery(view);
+
+    const removesActiveView =
+      narrowsActiveView(view) && isSystemViewActive(view);
+    const addsToActiveView =
+      narrowsActiveView(view) && onCustomView && !removesActiveView;
+    const baseQuery = addedSystemView ? addedSystemViewBase : query;
+    const nextQuery = removesActiveView
+      ? addedSystemView === view.id
+        ? addedSystemViewBase
+        : systemViewBaseQuery
+      : addsToActiveView
+        ? combineQueries(baseQuery, view.query)
+        : view.query;
+    const nextView = removesActiveView
+      ? nextQuery
+        ? activeQueryView
+        : defaultView
+      : addsToActiveView
+        ? activeQueryView
+        : view;
+
+    if (nextView?.id === activeQueryView?.id && nextQuery === query) return;
+
+    addedSystemViewId = addsToActiveView ? view.id : undefined;
+    addedSystemViewBase = addsToActiveView ? baseQuery : '';
+    addedSystemViewQuery = addsToActiveView ? nextQuery : '';
+
+    activeQueryView = nextView;
+    pendingQueryTarget = nextQuery || '';
+
+    $filters = nextQuery
+      ? toListWorkflowFilters(nextQuery, $searchAttributes)
+      : [];
 
     updateQueryParameters({
       url: page.url,
       parameter: 'query',
-      value: view.query,
+      value: nextQuery,
       allowEmpty: true,
       clearParameters: [currentPageKey],
     });
@@ -174,7 +310,7 @@
     }
 
     $savedQueries[namespace] = [...$savedQueries[namespace], view];
-    activeQueryView = view;
+    setSavedQueryView(view);
   };
 
   const onSaveView = (view: SavedQuery) => {
@@ -189,7 +325,7 @@
     } else {
       $savedQueries[namespace] = [...$savedQueries[namespace], view];
     }
-    activeQueryView = view;
+    setSavedQueryView(view);
   };
 
   const onDuplicateView = () => {
@@ -216,6 +352,9 @@
   };
 
   const onDeleteView = (view: SavedQuery) => {
+    if (lastViewedSavedQueryId === view.id) {
+      forgetLastViewedSavedQuery();
+    }
     $savedQueries[namespace] = $savedQueries[namespace].filter(
       (q) => q?.id !== view.id,
     );
@@ -232,7 +371,7 @@
 </script>
 
 <div
-  class="surface-primary flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-t border-subtle p-1.5 lg:flex-nowrap"
+  class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-surface-primary p-1.5 text-primary lg:flex-nowrap"
   role="group"
   aria-label={translate('common.saved-views')}
   data-testid="saved-views-bar"
@@ -241,12 +380,12 @@
     {#each systemViews as view (view.id)}
       {@render queryButton({
         ...view,
-        active: query === view.query,
+        active: isSystemViewActive(view),
       })}
     {/each}
   </div>
 
-  <div class="hidden h-6 shrink-0 border-l border-subtle lg:block"></div>
+  <div class="hidden h-6 shrink-0 border-l border-primary lg:block"></div>
 
   <div class="flex min-w-0 grow flex-wrap items-center gap-1 lg:flex-nowrap">
     <SavedViewsMenu
@@ -254,10 +393,62 @@
       views={namespaceSavedQueries}
       activeView={activeQueryView}
       draftView={unsavedQuery ? unsavedView : undefined}
-      dirty={activeUserViewDirty}
       {maxQueries}
+      {viewHref}
       onSelect={setActiveQueryView}
     />
+
+    {#if unsavedQuery}
+      <div class="flex shrink-0 items-center gap-1">
+        <Button
+          size="xs"
+          variant="ghost"
+          disabled={maxViewsReached}
+          data-testid="create-view-button"
+          data-track-name="create-view-button"
+          data-track-intent="action"
+          data-track-text="create"
+          onclick={() => {
+            saveViewModalOpen = true;
+          }}>{translate('common.save-as-new')}</Button
+        >
+      </div>
+    {/if}
+
+    {#if lastViewedSavedQuery}
+      <Button
+        variant="ghost"
+        aria-label={translate('common.last-viewed-saved-view', {
+          name: lastViewedSavedQuery.name,
+        })}
+        title={lastViewedSavedQuery.name}
+        data-testid="last-viewed-saved-view"
+        data-track-name="last-viewed-saved-view"
+        data-track-intent="action"
+        data-track-text={lastViewedSavedQuery.name}
+        href={viewHref(lastViewedSavedQuery)}
+        onclick={(event) => setActiveQueryView(lastViewedSavedQuery, event)}
+        class={merge(
+          'max-w-[240px]',
+          lastViewedSavedQueryDirty && 'border-dashed border-tertiary',
+        )}
+        active={activeUserView?.id === lastViewedSavedQuery.id &&
+          !lastViewedSavedQueryDirty}
+        size="xs"
+      >
+        {@const Glyph = lastViewedSavedQuery.Icon || IconBookmark}
+        <Glyph class="h-4 w-4 flex-shrink-0" />
+        <span class="min-w-0 truncate font-normal"
+          >{lastViewedSavedQuery.name}</span
+        >
+        {#if lastViewedSavedQueryDirty}
+          {@render queryBadge({
+            className: 'italic',
+            content: translate('common.unsaved'),
+          })}
+        {/if}
+      </Button>
+    {/if}
 
     {#if activeUserView}
       <div class="flex shrink-0 items-center gap-1">
@@ -314,21 +505,6 @@
             : translate('common.share')}</Button
         >
       </div>
-    {:else if unsavedQuery}
-      <div class="flex shrink-0 items-center gap-1">
-        <Button
-          size="xs"
-          variant="ghost"
-          disabled={maxViewsReached}
-          data-testid="create-view-button"
-          data-track-name="create-view-button"
-          data-track-intent="action"
-          data-track-text="create"
-          onclick={() => {
-            saveViewModalOpen = true;
-          }}>{translate('common.save-as-new')}</Button
-        >
-      </div>
     {/if}
   </div>
 </div>
@@ -353,13 +529,12 @@
 {#snippet queryButton(view: SavedQuery)}
   <Tooltip
     text={view.count != undefined ? `${view.name} • ${view.count}` : view.name}
-    bottom
+    top
     usePortal
     tooltipClass="max-w-[280px] xl:hidden"
   >
     <Button
       variant="ghost"
-      aria-label={view.name}
       data-testid={view.type === 'system'
         ? view.id
         : view.name.toLowerCase().replace(/\s+/g, '-')}
@@ -368,18 +543,16 @@
         : 'user-query-button'}
       data-track-intent="action"
       data-track-text={view.name}
-      onclick={() => setActiveQueryView(view)}
-      class={merge(
-        'max-w-[240px]',
-        (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
-      )}
+      href={viewHref(view)}
+      onclick={(event) => setActiveQueryView(view, event)}
+      class="max-w-[240px]"
       active={view.active}
       disabled={view.disabled}
       size="xs"
     >
       {@const Glyph = view.Icon || IconBookmark}
       <Glyph class="h-4 w-4 flex-shrink-0" />
-      <span class="hidden truncate font-normal xl:inline-block"
+      <span class="truncate font-normal max-xl:sr-only xl:inline-block"
         >{view.name}</span
       >
       {#if view.badge}
@@ -390,7 +563,7 @@
       {/if}
       {#if view.count != undefined}
         {@render queryBadge({
-          className: `font-mono ${view.count > 0 ? 'bg-red-50 dark:bg-red-900 text-red-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-600 text-blue-900 dark:text-white'}`,
+          className: `font-mono ${view.count > 0 ? 'bg-surface-danger text-danger' : 'bg-surface-information text-information'}`,
           content: view.count,
         })}
       {/if}
@@ -407,7 +580,7 @@
 })}
   <span
     class={merge(
-      'surface-subtle flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium',
+      'flex shrink-0 items-center rounded-full bg-surface-tertiary px-2 py-0.5 text-xs font-medium text-primary',
       className,
     )}
   >

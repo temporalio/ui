@@ -1,0 +1,253 @@
+// The stylesheet for a rendered markdown frame, as a string so that it ships
+// in the package and every consumer imports the same text: the SvelteKit
+// render route, scripts/generate-markdown-css.ts for the Go route, and
+// cloud-ui. It lives here rather than as a .css file because svelte-package
+// only publishes what is under src/lib, and esno (which runs the generator)
+// cannot resolve a ?raw import.
+//
+// This file is one template literal. A backtick or ${ anywhere in the CSS,
+// comments included, ends the literal early and breaks the build.
+export const markdownReset = `
+*,
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+body {
+  overscroll-behavior: none;
+  position: relative;
+  overflow-wrap: break-word;
+  padding: 1rem;
+  white-space: pre-line;
+  font-family: var(--markdown-font-sans);
+}
+
+/* The frame is sandboxed with default-src 'none', so it cannot load the
+   page's webfonts. Use the same system stacks Tailwind resolves to, so the
+   frame matches a page set in the system font (cloud-ui) and stays close to
+   one set in Inter. A bare sans-serif resolved to Helvetica on macOS, which
+   sat visibly apart from the page. */
+:root {
+  --markdown-font-sans:
+    ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --markdown-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
+/* No page padding, so a short string renders as a line of text rather than a
+   padded box. Wrapping stays on. */
+body.compact {
+  padding: 0;
+  overflow: hidden;
+  white-space: normal;
+}
+
+/* The reset above sizes every element with a star selector, which beats
+   inheritance, so compact restates the metrics or the text renders at
+   12.25px beside 14px text outside the frame. */
+body.compact,
+body.compact main,
+body.compact p,
+body.compact strong,
+body.compact em,
+body.compact a {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Blocks with the margins zeroed, not display: inline. The frame's height is
+   measured from main, and an inline box reports the text box rather than the
+   line box, which clips descenders. */
+body.compact main,
+body.compact p {
+  display: block;
+  margin: 0;
+}
+
+/* Vertical padding on an inline code span grows the line box. */
+body.compact code {
+  padding: 0 0.375rem;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.17em;
+}
+
+h4 {
+  font-size: 1em;
+}
+
+h5 {
+  font-size: 0.83em;
+}
+
+h6 {
+  font-size: 0.67em;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+th,
+td {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid;
+  border-color: color-mix(in srgb, currentColor 20%, transparent);
+}
+
+/* The star selector at the top sets font-weight on every element, beating the
+   UA default for strong. Without this, bold renders at normal weight. */
+strong,
+b {
+  font-weight: 600;
+}
+
+th {
+  font-weight: 600;
+}
+
+th:not([align]),
+td:not([align]) {
+  text-align: left;
+}
+
+ul,
+ol {
+  white-space: normal;
+}
+
+li {
+  list-style-position: inside;
+}
+
+li > p {
+  display: inline;
+}
+
+a {
+  gap: 0.5rem;
+  align-items: center;
+  border-radius: 0.25rem;
+  max-width: fit-content;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+blockquote {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 0.5rem;
+  border-left: 4px solid var(--color-border-brand);
+  background: var(--color-surface-secondary);
+  color: var(--color-content-primary);
+
+  p {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+code {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  background: var(--color-surface-secondary);
+  color: var(--color-content-primary);
+  font-family: var(--markdown-font-mono);
+}
+
+pre {
+  overflow-x: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 0.25rem;
+  background: var(--color-surface-secondary);
+  color: var(--color-content-primary);
+  font-family: var(--markdown-font-mono);
+  white-space: pre;
+
+  code {
+    padding: 0;
+    background: none;
+    color: inherit;
+  }
+}
+
+body[data-theme='light'],
+body[data-theme='dark'],
+body[data-theme='light-primary'],
+body[data-theme='dark-primary'] {
+  background-color: var(--color-surface-primary);
+  color: var(--color-content-primary);
+}
+
+body[data-theme='light-background'],
+body[data-theme='dark-background'] {
+  background-color: var(--color-background-primary);
+  color: var(--color-content-primary);
+}
+
+body[data-theme] a {
+  color: var(--color-content-brand);
+}
+
+/*
+ * A compact frame paints no background of its own. An iframe's canvas is
+ * transparent when the embedded document is, so the frame takes whatever
+ * surface the page put it on, in either colour scheme, without the page
+ * having to name that surface.
+ *
+ * Last in the file on purpose: the theme rules above set background-color at
+ * the same specificity, so order decides.
+ */
+body.compact {
+  background-color: transparent;
+}
+
+/*
+ * The transparency only holds if this document's colour scheme matches the
+ * one the page gave the iframe element. When they differ the browser paints
+ * an opaque canvas instead, so a dark page shows a white box. The theme is
+ * an attribute on body, so the root reads it from there.
+ */
+html {
+  color-scheme: light;
+}
+
+html:has(body[data-theme^='dark']) {
+  color-scheme: dark;
+}
+`;

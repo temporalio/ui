@@ -44,13 +44,13 @@
       {#if href}
         <Link
           {href}
-          class="surface-subtle w-fit truncate rounded-sm p-1 leading-4"
+          class="w-fit truncate rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
           >{content}</Link
         >
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
           <span
-            class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
+            class="w-fit select-all truncate rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
             >{content}</span
           >
         </Tooltip>
@@ -66,13 +66,13 @@
     {#if href}
       <Link
         {href}
-        class="surface-subtle w-fit truncate rounded-sm p-1 leading-4"
+        class="w-fit truncate rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
         >{content}</Link
       >
     {:else}
       <Tooltip text={tooltip} hide={!tooltip} top>
         <span
-          class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
+          class="w-fit select-all truncate rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
           >{content}</span
         >
       </Tooltip>

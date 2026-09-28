@@ -15,6 +15,7 @@
     args: {
       href: 'https://temporal.io',
       active: false,
+      disabled: false,
       newTab: false,
       light: false,
     },
@@ -31,7 +32,9 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Link>)}
-  <div class={twMerge(args.light && 'bg-space-black')}>
+  <div
+    class={twMerge('p-4', args.light ? 'bg-neutral-12' : 'bg-surface-primary')}
+  >
     <Link {...args}>This is a link.</Link>
   </div>
 {/snippet}
@@ -41,5 +44,7 @@
 <Story name="With Icon" args={{ LeadingIcon: ioIcons.IconClose }} />
 
 <Story name="Active" args={{ active: true }} />
+
+<Story name="Disabled" args={{ disabled: true }} />
 
 <Story name="Light" args={{ light: true }} />

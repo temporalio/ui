@@ -4,11 +4,9 @@
     ComputeProviderOption,
     CreateDeploymentFormData,
   } from '$lib/components/workers/serverless-worker-form/shared';
-  import { scaleDownStabilizationToMs } from '$lib/components/workers/serverless-worker-form/shared';
+  import { buildComputeConfigFromForm } from '$lib/components/workers/serverless-worker-form/shared';
   import { translate } from '$lib/i18n/translate';
   import {
-    buildGcpCloudRunComputeConfig,
-    buildLambdaComputeConfig,
     createWorkerDeployment,
     createWorkerDeploymentVersion,
     deleteWorkerDeployment,
@@ -22,6 +20,8 @@
   interface Props {
     namespace: string;
     onSuccess: () => void;
+    agentCoreCfnTemplateUrl?: string;
+    agentCoreCfnTemplate?: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     terraformTemplate?: string;
@@ -38,6 +38,8 @@
   let {
     namespace,
     onSuccess,
+    agentCoreCfnTemplateUrl,
+    agentCoreCfnTemplate,
     cfnTemplateUrl,
     cfnTemplate,
     terraformTemplate,
@@ -91,36 +93,7 @@
     );
     if (deploymentError) throw new Error(deploymentError);
 
-    let computeConfig: ComputeConfig;
-    if (data.provider === 'cloud-run') {
-      computeConfig = buildGcpCloudRunComputeConfig(
-        data.gcpProject,
-        data.gcpRegion,
-        data.gcpWorkerPool,
-        data.gcpServiceAccount,
-        {
-          minReplicas: data.minReplicas,
-          maxReplicas: data.maxReplicas,
-          initialReplicas: data.initialReplicas,
-          utilizationTarget: data.utilizationTarget,
-          scaleDownStabilizationMs: scaleDownStabilizationToMs(
-            data.scaleDownStabilization,
-          ),
-        },
-      );
-    } else {
-      computeConfig = buildLambdaComputeConfig(
-        data.lambdaArn,
-        data.iamRoleArn,
-        {
-          roleExternalId: data.roleExternalId,
-          scaleUpCooloffMs: data.scaleUpCooloffMs,
-          scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-          maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-          metricsPollIntervalMs: data.metricsPollIntervalMs,
-        },
-      );
-    }
+    const computeConfig = buildComputeConfigFromForm(data);
 
     let versionError: string | undefined;
     await createWorkerDeploymentVersion(
@@ -221,6 +194,8 @@
   cancelHref={routeForWorkers({ namespace })}
   {onSuccess}
   onSubmit={handleCreate}
+  {agentCoreCfnTemplateUrl}
+  {agentCoreCfnTemplate}
   {cfnTemplateUrl}
   {cfnTemplate}
   {terraformTemplate}

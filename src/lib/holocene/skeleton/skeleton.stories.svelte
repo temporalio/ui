@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import Skeleton from './index.svelte';
 
@@ -13,7 +14,14 @@
         description: 'Tailwind compliant "height" class, i.e. h-10',
       },
     },
+    render: template,
   });
 </script>
+
+{#snippet template(args: ComponentProps<typeof Skeleton>)}
+  <div class="bg-surface-primary p-4">
+    <Skeleton {...args} />
+  </div>
+{/snippet}
 
 <Story name="Default" />

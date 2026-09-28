@@ -1,0 +1,9 @@
+body.sb-show-main,
+#storybook-root {
+  background-color: var(--color-background-primary);
+  color: var(--color-content-primary);
+}
+
+#storybook-root {
+  min-height: 100vh;
+}

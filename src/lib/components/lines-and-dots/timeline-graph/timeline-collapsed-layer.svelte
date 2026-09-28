@@ -62,7 +62,7 @@
 
 {#snippet marker(centerX: number, centerY: number)}
   <div
-    class="absolute bg-primary"
+    class="absolute bg-surface-primary"
     style:left="{centerX - HIT_HALF_WIDTH}px"
     style:top="{centerY - RADIUS}px"
     style:width="{HIT_WIDTH}px"
@@ -149,6 +149,6 @@
 
 <style lang="postcss">
   .zigzag-path {
-    stroke: rgb(var(--color-text-secondary));
+    stroke: var(--color-content-secondary);
   }
 </style>

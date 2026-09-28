@@ -11,11 +11,13 @@
     args: {
       intent: 'default',
       button: false,
+      disabled: false,
       removeButtonLabel: 'Remove',
     },
     argTypes: {
       intent: { control: 'select', options: ['warning', 'default'] },
       button: { control: 'boolean' },
+      disabled: { control: 'boolean' },
       removeButtonLabel: {
         name: 'Aria label for remove button',
         control: 'text',
@@ -29,14 +31,20 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof Chip>)}
-  <Chip {...args} onremove={action('remove')} onclick={action('click')}>
-    ross.edfort@temporal.io
-  </Chip>
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <Chip {...args} onremove={action('remove')} onclick={action('click')}>
+      ross.edfort@temporal.io
+    </Chip>
+  </div>
 {/snippet}
 
 <Story name="Default" />
 
 <Story name="Warning" args={{ intent: 'warning' }} />
+
+<Story name="Disabled" args={{ disabled: true }} />
+
+<Story name="Warning Disabled" args={{ intent: 'warning', disabled: true }} />
 
 <Story name="Default (as Button)" args={{ button: true }} />
 

@@ -5,13 +5,17 @@
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import WorkerStatusCounts from '$lib/components/workers/worker-status-counts.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { createCountPoller } from '$lib/runes/count-poller.svelte';
-  import { fetchWorkerCount } from '$lib/services/worker-service';
+  import {
+    fetchWorkerCountByStatus,
+    sumWorkerStatusCounts,
+    type WorkerStatusCount,
+  } from '$lib/services/worker-service';
   import {
     refresh,
     workerCount,
@@ -50,33 +54,39 @@
     !!page.data?.namespace?.namespaceInfo?.capabilities?.workerHeartbeats,
   );
   const countEnabled = $derived(workerHeartbeatsEnabled && $workerCountEnabled);
+  const onWorkersTab = $derived(page.url.pathname.endsWith('/workers'));
+  const showCount = $derived(countEnabled && onWorkersTab);
 
-  let countLoaded = $state(false);
+  let statusCounts: WorkerStatusCount[] = $state([]);
 
   const countPoller = createCountPoller({
     getStore: () => workerCount,
     fetch: ({ signal }) =>
-      countEnabled
-        ? fetchWorkerCount({ namespace, query }, (input, init) =>
+      showCount
+        ? fetchWorkerCountByStatus({ namespace, query }, (input, init) =>
             fetch(input, { ...init, signal }),
           )
-        : Promise.resolve({ count: undefined }),
-    transform: (response) => response.count ?? $workerCount.count,
-    disabled: () => !countEnabled,
+        : Promise.resolve([]),
+    transform: (counts) => sumWorkerStatusCounts(counts) ?? $workerCount.count,
+    disabled: () => !showCount,
     watch() {
       void namespace;
       void query;
-      void countEnabled;
+      void showCount;
       void $refresh;
     },
     onReset: () => {
-      countLoaded = false;
+      statusCounts = [];
       workerCount.update((s) => ({ ...s, count: 0 }));
     },
-    onInitialFetch: (_count, response) => {
-      countLoaded = response.count !== undefined;
+    onInitialFetch: (_count, counts) => {
+      statusCounts = counts;
     },
   });
+
+  const statusCountTotal = $derived(
+    showCount ? sumWorkerStatusCounts(statusCounts) : undefined,
+  );
 
   const refreshTime = $derived(new Date(countPoller.refreshTime));
 
@@ -87,10 +97,24 @@
   <div class="flex min-h-10 flex-wrap items-start justify-between gap-2">
     <div>
       <div class="flex items-start gap-2">
-        <h1 class="leading-7" data-cy="workers-title">
-          {translate('workers.workers')}
+        <h1 class="flex items-center gap-2 leading-7" data-cy="workers-title">
+          <span
+            role="status"
+            aria-atomic="true"
+            class="flex items-center gap-2"
+          >
+            {#if statusCountTotal !== undefined}
+              {statusCountTotal.toLocaleString()}
+            {/if}
+            {translate('workers.workers', { count: statusCountTotal })}
+          </span>
         </h1>
-        <CountRefreshButton count={$workerCount.newCount} {refresh} />
+        <div class="flex flex-wrap items-center gap-2">
+          <CountRefreshButton count={$workerCount.newCount} {refresh} />
+          {#if showCount}
+            <WorkerStatusCounts counts={statusCounts} />
+          {/if}
+        </div>
       </div>
       <p class="mt-2 text-xs text-secondary">
         {refreshTimeFormatted}
@@ -106,14 +130,8 @@
         label={translate('workers.instance', { count: 2 })}
         id="workers-tab"
         href={workersHref}
-        active={page.url.pathname.endsWith('/workers')}
-      >
-        {#if countEnabled && countLoaded}
-          <Badge type="primary" class="px-2 py-0">
-            {$workerCount.count}
-          </Badge>
-        {/if}
-      </Tab>
+        active={onWorkersTab}
+      />
       <Tab
         label={translate('deployments.deployments')}
         id="deployments-tab"
