@@ -136,6 +136,12 @@ type (
 		Options map[string]interface{} `yaml:"options"`
 		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
 		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
+		// RefreshTokenDuration - optional lifetime of the refresh token this provider issues.
+		// It is only needed for providers that issue opaque (non-JWT) refresh tokens, whose
+		// lifetime the server cannot read. For JWT refresh tokens the exp claim is used and
+		// this value is ignored. If neither is available, a 7 day default applies.
+		// Example values: "8h", "24h", "168h" (1 week).
+		RefreshTokenDuration time.Duration `yaml:"refreshTokenDuration"`
 	}
 
 	Codec struct {

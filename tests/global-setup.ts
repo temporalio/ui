@@ -3,6 +3,7 @@ import { chromium, FullConfig } from '@playwright/test';
 import { connect, startWorkflows } from '../temporal/client';
 import { createCodecServer } from '../temporal/codec-server';
 import { runWorker } from '../temporal/worker';
+import { startAuthStack } from '../utilities/auth-e2e-stack';
 import { createTemporalServer } from '../utilities/temporal-server';
 import { createUIServer } from '../utilities/ui-server';
 
@@ -23,6 +24,12 @@ const setupDependencies = async () => {
     const client = await connect();
     await runWorker();
     await startWorkflows(client, { waitForResult: false });
+
+    // A second, auth-enabled ui-server plus a real identity provider, for
+    // tests/e2e/auth-cookie-lifetimes.spec.ts. The rest of the suite is
+    // unaffected: this listens on its own port and the other tests never
+    // navigate to it.
+    await startAuthStack();
   } catch (e) {
     console.log('Error setting up server: ', e);
   }

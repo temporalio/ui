@@ -28,6 +28,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -164,4 +165,35 @@ func buildConfig(env string) string {
     items:
       item1: ` + item1 + `
       item2: ` + item2
+}
+
+// TestDockerConfigSessionDefaultsAreUnset pins the defaults for the auth duration
+// settings in docker.yaml. Both must render to an unset duration, so that adding
+// them does not silently start expiring sessions, or shorten refresh cookies, for
+// Docker deployments that set neither environment variable.
+func TestDockerConfigSessionDefaultsAreUnset(t *testing.T) {
+	t.Setenv("TEMPORAL_AUTH_ENABLED", "true")
+
+	cfg, err := LoadConfig("../../config", "docker")
+	require.NoError(t, err)
+
+	require.Zero(t, cfg.Auth.MaxSessionDuration, "TEMPORAL_MAX_SESSION_DURATION must default to unset")
+	require.Len(t, cfg.Auth.Providers, 1)
+	require.Zero(t, cfg.Auth.Providers[0].RefreshTokenDuration, "TEMPORAL_AUTH_REFRESH_TOKEN_DURATION must default to unset")
+}
+
+// TestDockerConfigSessionDurationsFromEnv covers the reason these fields were added
+// to docker.yaml: without them a Docker operator has no way to set either value
+// short of supplying a wholly custom config file.
+func TestDockerConfigSessionDurationsFromEnv(t *testing.T) {
+	t.Setenv("TEMPORAL_AUTH_ENABLED", "true")
+	t.Setenv("TEMPORAL_MAX_SESSION_DURATION", "8h")
+	t.Setenv("TEMPORAL_AUTH_REFRESH_TOKEN_DURATION", "24h")
+
+	cfg, err := LoadConfig("../../config", "docker")
+	require.NoError(t, err)
+
+	require.Equal(t, 8*time.Hour, cfg.Auth.MaxSessionDuration)
+	require.Len(t, cfg.Auth.Providers, 1)
+	require.Equal(t, 24*time.Hour, cfg.Auth.Providers[0].RefreshTokenDuration)
 }
