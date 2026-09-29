@@ -44,6 +44,7 @@ const settings: Settings = {
   },
   feedbackURL: '',
   disableNewsFetch: false,
+  notifyOnNewVersion: false,
   runtimeEnvironment: {
     isCloud: false,
     isLocal: true,

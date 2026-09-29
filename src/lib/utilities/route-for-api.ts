@@ -162,6 +162,7 @@ export function pathForApi(
     'schedules.count': `/namespaces/${parameters?.namespace}/schedule-count`,
     settings: '/settings',
     'ui-extensions': '/ui-extensions',
+    releases: '/releases',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
     'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-build-id-compatibility`,
     'task-queue.rules': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-versioning-rules`,
