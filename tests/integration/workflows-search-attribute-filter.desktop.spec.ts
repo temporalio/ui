@@ -1,11 +1,13 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
+import { SEARCH_ATTRIBUTE_TYPE } from '$src/lib/types/workflows';
 import {
   mockClusterApi,
   mockWorkflowApis,
   mockWorkflowsApis,
   waitForWorkflowsApis,
 } from '~/test-utilities/mock-apis';
+import { mockSearchAttributesApi } from '~/test-utilities/mocks/search-attributes';
 
 test.beforeEach(async ({ page }) => {
   await mockWorkflowsApis(page);
@@ -303,4 +305,148 @@ test('it should resync the filter pills on back and forward navigation', async (
   await expect(
     page.getByRole('button', { name: 'HistoryLength = 10' }),
   ).toBeVisible();
+});
+
+// The raw value the mock workflows carry. The cell renders this through the
+// user's time format, so asserting the raw string proves the quick filter uses
+// the value behind the cell rather than the text in it.
+const MOCK_START_TIME = '2022-03-23T18:06:01.726484047Z';
+
+const bodyCellFor = async (page: Page, column: string) => {
+  const headers = page.locator(
+    '[data-testid^="workflows-summary-table-header-cell-"]',
+  );
+  const testIds = await headers.evaluateAll((elements) =>
+    elements.map((element) => element.getAttribute('data-testid')),
+  );
+  const index = testIds.indexOf(
+    `workflows-summary-table-header-cell-${column}`,
+  );
+  expect(index, `no ${column} column in the table`).toBeGreaterThanOrEqual(0);
+
+  return page
+    .getByTestId('workflows-summary-configurable-table-row')
+    .first()
+    .getByTestId('workflows-summary-table-body-cell')
+    .nth(index);
+};
+
+// The buttons only render while the cell is hovered or focused.
+const clickQuickFilter = async (page: Page, column: string) => {
+  const cell = await bodyCellFor(page, column);
+  await cell.hover();
+  await cell.getByTestId('quick-filter-button').click();
+};
+
+test('it should quick filter by a Status cell and toggle it back off', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Status');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`ExecutionStatus`="Running"');
+  await expect(
+    page.getByRole('button', { name: 'ExecutionStatus = Running' }),
+  ).toBeVisible();
+
+  await clickQuickFilter(page, 'Status');
+
+  await expect.poll(() => getQueryParam(page.url())).toBe('');
+  await expect(
+    page.getByRole('button', { name: 'ExecutionStatus = Running' }),
+  ).toBeHidden();
+});
+
+test('it should quick filter a Start cell on the raw timestamp with >=', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Start');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe(`\`StartTime\`>="${MOCK_START_TIME}"`);
+
+  await expect(
+    page.getByRole('button', { name: /StartTime >=/ }),
+  ).toBeVisible();
+});
+
+test('it should collapse a multi-status filter to the status that was clicked', async ({
+  page,
+}) => {
+  await page.getByTestId('add-filter-button').click();
+  await page.getByText('ExecutionStatus').click();
+
+  await page.getByTestId('status-dropdown-filter-chip-Completed').click();
+  await page.getByTestId('status-dropdown-filter-chip-Failed').click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('(`ExecutionStatus`="Completed" OR `ExecutionStatus`="Failed")');
+
+  // The status menu stays open on selection, so dismiss it to reach the table.
+  await page.keyboard.press('Escape');
+
+  await clickQuickFilter(page, 'Status');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`ExecutionStatus`="Running"');
+});
+
+test('it should not offer a quick filter for a column with no value', async ({
+  page,
+}) => {
+  // The mock workflows are all still running, so they have no close time.
+  const end = await bodyCellFor(page, 'End');
+  await end.hover();
+
+  await expect(end.getByTestId('quick-filter-button')).toBeHidden();
+});
+
+test.describe('custom search attribute columns', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockSearchAttributesApi(page, {
+      customAttributes: {
+        CustomBoolField: SEARCH_ATTRIBUTE_TYPE.BOOL,
+        CustomIntField: SEARCH_ATTRIBUTE_TYPE.INT,
+      },
+    });
+
+    await page.reload();
+    await waitForWorkflowsApis(page);
+  });
+
+  const addColumn = async (page: Page, column: string) => {
+    await page
+      .getByTestId('workflows-summary-table-configuration-button')
+      .click();
+    await page
+      .getByRole('button', { name: `Add ${column} column`, exact: true })
+      .click();
+    await page.getByRole('button', { name: /Close/ }).first().click();
+  };
+
+  test('it should quick filter a Bool value without quoting it', async ({
+    page,
+  }) => {
+    await addColumn(page, 'CustomBoolField');
+
+    await clickQuickFilter(page, 'CustomBoolField');
+
+    await expect
+      .poll(() => getQueryParam(page.url()))
+      .toBe('`CustomBoolField`=true');
+  });
+
+  test('it should quick filter an Int value of zero', async ({ page }) => {
+    await addColumn(page, 'CustomIntField');
+
+    await clickQuickFilter(page, 'CustomIntField');
+
+    await expect
+      .poll(() => getQueryParam(page.url()))
+      .toBe('`CustomIntField`=0');
+  });
 });
