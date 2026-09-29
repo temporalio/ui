@@ -292,7 +292,7 @@ export const defaultReleaseStage: Record<
 > = {
   lambda: 'public-preview',
   agentcore: 'pre-release',
-  'cloud-run': 'pre-release',
+  'cloud-run': 'public-preview',
 };
 
 interface InitialComputeProviderOptions {
