@@ -52,6 +52,7 @@ const proofExampleIds = [
   'sequential-no-summary-activities',
   'sequential-plain-text-activities',
   'continue-as-new',
+  'timeline-performance',
 ] as const;
 
 const activitySummaryExamples = [
@@ -162,6 +163,7 @@ describe('shared workflow corpus', () => {
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
         'continueAsNewWorkflow',
+        'timelinePerformanceWorkflow',
         'nexusGreeting',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
@@ -613,6 +615,8 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/activity-heartbeat/activity.ts',
         'src/lib/catalog/worker/examples/timer-driven-repetition/example.ts',
         'src/lib/catalog/worker/examples/timer-driven-repetition/workflow.ts',
+        'src/lib/catalog/worker/examples/timeline-performance/example.ts',
+        'src/lib/catalog/worker/examples/timeline-performance/workflow.ts',
         'src/lib/catalog/worker/examples/high-event-count/example.ts',
         'src/lib/catalog/worker/examples/high-event-count/workflow.ts',
         'src/lib/catalog/worker/examples/child-workflows/example.ts',

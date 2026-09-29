@@ -13,6 +13,7 @@ export type TimelineEventRow = Readonly<{
   rowKey: LifecycleKey;
   executionKey: ExecutionKey;
   kind: LifecycleKind;
+  label: string;
   eventKeys: readonly EventKey[];
   startEventId: string;
   endEventId: string;

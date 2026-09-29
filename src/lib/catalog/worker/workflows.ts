@@ -17,5 +17,6 @@ export { sequentialNoSummaryActivities } from './examples/sequential-no-summary-
 export { sequentialPlainTextActivities } from './examples/sequential-plain-text-activities/workflow.js';
 export { signalCollector } from './examples/signal-collector/workflow.js';
 export { signalWorkflow } from './examples/signal-handlers/workflow.js';
+export { timelinePerformanceWorkflow } from './examples/timeline-performance/workflow.js';
 export { scheduleWorkflow } from './examples/timer-driven-repetition/workflow.js';
 export { patchWorkflow } from './examples/workflow-patching/workflow.js';

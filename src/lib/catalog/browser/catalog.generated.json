@@ -1,5 +1,5 @@
 {
-  "sourceHash": "60d75e15572ab4f4f3ecd7ae4e9ee5ba7534e2ac7fc1c58c90ded94e2ef50223",
+  "sourceHash": "596427d0b87c82d32e1f953e6e962fcc32583bece6d5357469f48fda2ff35012",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -856,6 +856,54 @@
           "startToCloseTimeout": "30s"
         },
         "policies": { "retryPolicy": { "maximumAttempts": 3 } }
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "timeline-performance",
+      "title": "Timeline performance: many timers",
+      "description": "Creates a long history with short timers run in bounded parallel batches.",
+      "capabilityTags": ["event-history", "timers", "performance"],
+      "expectedEvidence": [
+        "Each timer produces started and fired events; each batch also produces workflow-task events.",
+        "Try 200, 2000, then 6000 timers to profile increasingly large paged histories."
+      ],
+      "input": {
+        "defaultValue": [200],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Timer count",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7000
+            }
+          ],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "timelinePerformanceWorkflow"
       },
       "source": { "id": "oss", "label": "OSS" }
     },

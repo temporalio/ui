@@ -1,3 +1,4 @@
+import { getTimelineEventLabel } from './get-timeline-event-label';
 import type { TimelineEventRow } from './types';
 import type { QualifiedHistoryEvent } from '../../data/history-events/types';
 import { compareEventIds, type EventKey } from '../../data/identity-keys';
@@ -40,6 +41,7 @@ export function toTimelineEventRow(
     rowKey: lifecycleGroup.lifecycleKey,
     executionKey: lifecycleGroup.executionKey,
     kind: lifecycleGroup.kind,
+    label: getTimelineEventLabel(firstEvent),
     eventKeys: lifecycleGroup.eventKeys,
     startEventId: firstEvent.eventId,
     endEventId: lastEvent.eventId,
