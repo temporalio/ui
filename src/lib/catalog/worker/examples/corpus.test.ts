@@ -52,6 +52,7 @@ const proofExampleIds = [
   'sequential-no-summary-activities',
   'sequential-plain-text-activities',
   'continue-as-new',
+  'timeline-kitchen-sink',
   'timeline-performance',
 ] as const;
 
@@ -163,6 +164,7 @@ describe('shared workflow corpus', () => {
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
         'continueAsNewWorkflow',
+        'timelineKitchenSink',
         'timelinePerformanceWorkflow',
         'nexusGreeting',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
@@ -174,6 +176,24 @@ describe('shared workflow corpus', () => {
         example.execution.workflow,
       );
     }
+  });
+
+  it('registers the timeline showcase with bounded inputs and its activity bindings', () => {
+    const registry = createCatalogRegistry();
+    catalogRegistrationSource.register(registry);
+    const generated = generateCatalog(registry);
+    const descriptor = generated.browserDescriptors.find(
+      ({ id }) => id === 'timeline-kitchen-sink',
+    );
+    const binding = generated.workerBindings[0];
+
+    expect(descriptor).toMatchObject({
+      input: { defaultValue: [2, 3] },
+      execution: { kind: 'workflow', workflowType: 'timelineKitchenSink' },
+    });
+    expect(binding?.activities).toHaveProperty('recordTimelineStep');
+    expect(binding?.activities).toHaveProperty('retryTimelineStep');
+    expect(binding?.activities).toHaveProperty('recordLocalTimelineStep');
   });
 
   it('registers the sequential activity summary variants with their activity bindings', async () => {
@@ -617,6 +637,9 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/timer-driven-repetition/workflow.ts',
         'src/lib/catalog/worker/examples/timeline-performance/example.ts',
         'src/lib/catalog/worker/examples/timeline-performance/workflow.ts',
+        'src/lib/catalog/worker/examples/timeline-kitchen-sink/activity.ts',
+        'src/lib/catalog/worker/examples/timeline-kitchen-sink/example.ts',
+        'src/lib/catalog/worker/examples/timeline-kitchen-sink/workflow.ts',
         'src/lib/catalog/worker/examples/high-event-count/example.ts',
         'src/lib/catalog/worker/examples/high-event-count/workflow.ts',
         'src/lib/catalog/worker/examples/child-workflows/example.ts',

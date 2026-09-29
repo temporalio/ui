@@ -1,9 +1,5 @@
 import type { ExecutionNode } from '../../data/execution-graph/types';
-import type {
-  EventKey,
-  ExecutionKey,
-  WorkflowKey,
-} from '../../data/identity-keys';
+import type { EventKey, WorkflowKey } from '../../data/identity-keys';
 import type { TimelineEventRow } from '../timeline-rows/types';
 
 /** One lifecycle row within an execution's ordered scene. */
@@ -36,38 +32,3 @@ export type WorkflowScene = Readonly<{
   workflowKey: WorkflowKey;
   executions: readonly ExecutionScene[];
 }>;
-
-/** A flattened workflow header, including a child's parent-event anchor. */
-export type WorkflowSceneRow = Readonly<{
-  kind: 'workflow';
-  key: string;
-  depth: number;
-  workflowDepth: number;
-  workflow: WorkflowScene;
-  initiatedEventId: string | null;
-}>;
-
-/** A flattened execution header. */
-export type ExecutionSceneRow = Readonly<{
-  kind: 'execution';
-  key: string;
-  depth: number;
-  workflowDepth: number;
-  execution: ExecutionScene;
-}>;
-
-/** A flattened lifecycle event row. */
-export type EventSceneRow = Readonly<{
-  kind: 'event';
-  key: string;
-  depth: number;
-  workflowDepth: number;
-  executionKey: ExecutionKey;
-  row: TimelineEventRow;
-}>;
-
-/** One visible entry in scene order, suitable for vertical windowing. */
-export type FlattenedSceneRow =
-  | WorkflowSceneRow
-  | ExecutionSceneRow
-  | EventSceneRow;

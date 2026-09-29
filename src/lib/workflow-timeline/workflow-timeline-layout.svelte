@@ -3,7 +3,6 @@
     type ExecutionIdentity,
     getExecutionKey,
   } from './data/identity-keys';
-  import { flattenWorkflowScene } from './scene/structure/flatten-workflow-scene';
   import { projectWorkflowScene } from './scene/structure/project-workflow-scene';
 
   import WorkflowTimelinePlot from './scene/plot/workflow-timeline-plot.svelte';
@@ -20,13 +19,16 @@
       rootExecutionKey,
     ),
   );
-  const flatRows = $derived(
-    scene ? flattenWorkflowScene(scene, rootExecutionKey) : [],
-  );
 </script>
 
 <div class="timeline-layout" data-testid="new-workflow-timeline">
-  <WorkflowTimelinePlot rows={flatRows} />
+  {#key rootExecutionKey}
+    <WorkflowTimelinePlot
+      {scene}
+      historyEvents={timeline.historyEvents}
+      executionHistories={timeline.executionHistories}
+    />
+  {/key}
 </div>
 
 <style>

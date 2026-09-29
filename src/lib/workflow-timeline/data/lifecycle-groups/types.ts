@@ -2,13 +2,13 @@ import type { EventKey, ExecutionKey, LifecycleKey } from '../identity-keys';
 
 /** The semantic kind of a history event lifecycle. */
 export type LifecycleKind =
+  | 'workflow'
   | 'activity'
   | 'child-workflow'
   | 'external-signal'
   | 'nexus-operation'
   | 'timer'
   | 'update'
-  | 'workflow-task'
   | 'event';
 
 /** Identifies a lifecycle within one workflow execution. */

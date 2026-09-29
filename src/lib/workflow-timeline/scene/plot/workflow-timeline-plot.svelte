@@ -1,258 +1,304 @@
 <script lang="ts">
-  import { SvelteSet } from 'svelte/reactivity';
+  import { tick, untrack } from 'svelte';
 
-  import { tick } from 'svelte';
+  import { colorScales } from '$lib/theme/io/themes';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { lifecycleVisuals } from './lifecycle-visuals';
   import {
-    getTimeDomain,
-    getTimeTicks,
-    getTimeTickStep,
-    timeToX,
-  } from './time-viewport';
-  import {
-    collapseSceneRows,
-    isSceneRowCollapsed,
-  } from '../structure/collapse-scene-rows';
-  import type { FlattenedSceneRow } from '../structure/types';
+    getMarkBounds,
+    getNodeAnchorX,
+    getNodeBounds,
+    type MarkBounds,
+  } from './mark-geometry';
+  import { getLineColor, getMarkColors } from './mark-visuals';
+  import { getTimeTicks, type TimeRange, timeToX } from './time-viewport';
+  import { getWheelTimeRange } from './wheel-time-range';
+  import type { ExecutionHistoryState } from '../../data/execution-history/types';
+  import type { QualifiedHistoryEvent } from '../../data/history-events/types';
+  import { flattenPlotScene } from '../structure/flatten-plot-scene';
+  import type { ExecutionScene, WorkflowScene } from '../structure/types';
   import type { TimelineEventRow } from '../timeline-rows/types';
 
   import WorkflowTimelineIconDefs from './workflow-timeline-icon-defs.svelte';
+  import WorkflowTimelineMarkLabel from './workflow-timeline-mark-label.svelte';
+  import WorkflowTimelineMinimap from './workflow-timeline-minimap.svelte';
 
-  let { rows }: { rows: readonly FlattenedSceneRow[] } = $props();
+  let {
+    scene,
+    historyEvents,
+    executionHistories,
+  }: {
+    scene: WorkflowScene | null;
+    historyEvents: readonly QualifiedHistoryEvent[];
+    executionHistories: readonly ExecutionHistoryState[];
+  } = $props();
 
-  const LABEL_WIDTH = 256;
-  const AXIS_HEIGHT = 48;
   const ROW_HEIGHT = 32;
-  const WINDOW_BUFFER_PAGES = 2;
-  const MAX_CONTENT_WIDTH = 4_000_000;
+  const AXIS_HEIGHT = 44;
+  const ENDPOINT_INSET = 32;
+  const BOX_PADDING = 24;
+  const BOX_BOTTOM_PADDING = 12;
+  const OVERSCAN = 20;
+  const MAX_WIDTH = 4_000_000;
 
   let scroller: HTMLDivElement;
   let scrollTop = $state(0);
   let scrollLeft = $state(0);
   let viewportWidth = $state(0);
   let viewportHeight = $state(0);
-  let zoomDurationMs = $state<number | null>(null);
-  let isDebugOpen = $state(false);
-  const collapsedKeys = new SvelteSet<string>();
-  const openedChildKeys = new SvelteSet<string>();
-
-  const displayedRows = $derived(
-    collapseSceneRows(rows, collapsedKeys, openedChildKeys),
+  let requestedDuration = $state<number | null>(null);
+  let initialLiveDuration = $state<number | null>(null);
+  let pinned = $state(true);
+  let unpinnedStartMs = $state<number | null>(null);
+  let selectedRow = $state<TimelineEventRow | null>(null);
+  let previousPolling = false;
+  let lastLiveViewport: TimeRange | null = null;
+  let now = $state(Date.now());
+  const rows = $derived(scene ? flattenPlotScene(scene) : []);
+  const eventByKey = $derived(
+    new Map(historyEvents.map((event) => [event.eventKey, event])),
   );
-  const domain = $derived(getTimeDomain(rows));
-  const domainDuration = $derived(domain ? domain.endMs - domain.startMs : 1);
-  const plotWidth = $derived(Math.max(1, viewportWidth - LABEL_WIDTH));
-  const duration = $derived(
-    Math.min(zoomDurationMs ?? domainDuration, domainDuration),
+  const eventTimes = $derived(historyEvents.map((event) => event.eventTimeMs));
+  const polling = $derived(
+    executionHistories.some(
+      (history) =>
+        history.stream.status === 'polling' ||
+        history.stream.status === 'retrying',
+    ),
   );
-  const contentWidth = $derived(plotWidth * (domainDuration / duration));
-  const viewport = $derived.by(() => {
-    if (!domain) return null;
-    const left = Math.min(scrollLeft, contentWidth - plotWidth);
-    const startMs = domain.startMs + (left / contentWidth) * domainDuration;
-    return { startMs, endMs: Math.min(domain.endMs, startMs + duration) };
+  const domain = $derived.by((): TimeRange | null => {
+    if (!historyEvents.length) return null;
+    let startMs = Infinity;
+    let endMs = -Infinity;
+    for (const event of historyEvents) {
+      startMs = Math.min(startMs, event.eventTimeMs);
+      endMs = Math.max(endMs, event.eventTimeMs);
+    }
+    return { startMs, endMs: Math.max(startMs + 1, polling ? now : endMs) };
   });
-  const ticks = $derived(viewport ? getTimeTicks(viewport, plotWidth) : []);
-  const tickSpacingPx = $derived(
-    viewport
-      ? (getTimeTickStep(viewport, plotWidth) / domainDuration) * contentWidth
-      : 0,
+  const domainDuration = $derived(domain ? domain.endMs - domain.startMs : 1);
+  const width = $derived(Math.max(1, viewportWidth));
+  const defaultDuration = $derived(
+    polling
+      ? Math.min(
+          domainDuration,
+          initialLiveDuration ??
+            Math.max(60_000, Math.min(3_600_000, domainDuration / 4)),
+        )
+      : domainDuration,
   );
-  const tickOriginPx = $derived(
-    domain && ticks.length && tickSpacingPx
-      ? timeToX(ticks[0], domain, contentWidth) % tickSpacingPx
-      : 0,
+  const duration = $derived(
+    Math.min(domainDuration, requestedDuration ?? defaultDuration),
   );
-  const pageRows = $derived(
-    Math.max(1, Math.ceil(Math.max(viewportHeight, AXIS_HEIGHT) / ROW_HEIGHT)),
+  const contentWidth = $derived(
+    Math.min(MAX_WIDTH, Math.max(width, (width * domainDuration) / duration)),
   );
-  const pageIndex = $derived(Math.floor(scrollTop / (pageRows * ROW_HEIGHT)));
-  const startIndex = $derived(
-    Math.min(
-      displayedRows.length,
-      Math.max(0, (pageIndex - WINDOW_BUFFER_PAGES) * pageRows),
+  const viewport = $derived.by((): TimeRange | null => {
+    if (!domain) return null;
+    const startMs =
+      domain.startMs + (scrollLeft / contentWidth) * domainDuration;
+    return {
+      startMs,
+      endMs: Math.min(
+        domain.endMs,
+        startMs + (width / contentWidth) * domainDuration,
+      ),
+    };
+  });
+  const ticks = $derived(viewport ? getTimeTicks(viewport, width) : []);
+  const firstIndex = $derived(
+    Math.max(
+      0,
+      Math.floor(Math.max(0, scrollTop - AXIS_HEIGHT) / ROW_HEIGHT) - OVERSCAN,
     ),
   );
-  const endIndex = $derived(
+  const lastIndex = $derived(
     Math.min(
-      displayedRows.length,
-      (pageIndex + WINDOW_BUFFER_PAGES + 2) * pageRows,
+      rows.length,
+      Math.ceil((scrollTop + viewportHeight) / ROW_HEIGHT) + OVERSCAN,
     ),
   );
-  const visibleRows = $derived(displayedRows.slice(startIndex, endIndex));
-  const inspectedRow = $derived.by(() => {
-    let firstEventRow: TimelineEventRow | null = null;
+  const visibleRows = $derived(rows.slice(firstIndex, lastIndex));
+  function plotX(timeMs: number, range: TimeRange, plotWidth: number): number {
+    const inset = Math.min(ENDPOINT_INSET, plotWidth / 2);
+    return Math.max(
+      inset,
+      Math.min(plotWidth - inset, timeToX(timeMs, range, plotWidth)),
+    );
+  }
 
-    for (const item of visibleRows) {
-      if (item.kind !== 'event') continue;
-      firstEventRow ??= item.row;
-      if (
-        viewport &&
-        item.row.endTimeMs >= viewport.startMs &&
-        item.row.startTimeMs <= viewport.endMs
-      ) {
-        return item.row;
+  const boxes = $derived.by(() => {
+    if (!domain) return [];
+    return rows.flatMap((item, index) => {
+      if (item.kind !== 'execution') return [];
+      const ranges = [executionRange(item.execution)].filter(
+        (range) => range !== null,
+      );
+      if (!ranges.length) return [];
+      const startMs = Math.min(...ranges.map((range) => range.startMs));
+      const endMs = Math.max(...ranges.map((range) => range.endMs));
+      let endIndex = index + 1;
+      while (endIndex < rows.length && rows[endIndex].depth > item.depth)
+        endIndex++;
+      return [
+        {
+          key: item.key,
+          startX: plotX(startMs, domain, contentWidth),
+          endX: plotX(endMs, domain, contentWidth),
+          top: index * ROW_HEIGHT - ROW_HEIGHT / 2,
+          depth: item.depth,
+          height:
+            (endIndex - index) * ROW_HEIGHT +
+            ROW_HEIGHT / 2 -
+            4 +
+            BOX_BOTTOM_PADDING,
+          label: `Run ${item.execution.execution.identity.runId.slice(0, 8)}…`,
+          title: item.execution.execution.identity.runId,
+        },
+      ];
+    });
+  });
+
+  function executionRange(execution: ExecutionScene): TimeRange | null {
+    const ranges = execution.entries
+      .filter((entry) => entry.kind === 'row')
+      .map((entry) => entry.row);
+    if (!ranges.length) return null;
+    const startMs = Math.min(...ranges.map((row) => row.startTimeMs));
+    const endMs = Math.max(...ranges.map((row) => row.endTimeMs));
+    const isRunning = executionHistories.some(
+      (history) =>
+        history.executionKey === execution.execution.executionKey &&
+        (history.stream.status === 'polling' ||
+          history.stream.status === 'retrying'),
+    );
+    return { startMs, endMs: isRunning ? Math.max(endMs, now) : endMs };
+  }
+
+  function getRowNodeBounds(
+    row: TimelineEventRow,
+    mark: MarkBounds,
+    range: TimeRange,
+  ): readonly MarkBounds[] {
+    return row.eventKeys.flatMap((key) => {
+      const event = eventByKey.get(key);
+      if (!event) return [];
+      const alignment =
+        row.startEventId !== row.endEventId &&
+        event.eventId === row.startEventId
+          ? 'start'
+          : row.startEventId !== row.endEventId &&
+              event.eventId === row.endEventId
+            ? 'end'
+            : 'center';
+      return [
+        getNodeBounds(
+          plotX(event.eventTimeMs, range, contentWidth),
+          mark,
+          alignment,
+        ),
+      ];
+    });
+  }
+
+  function endingEvent(
+    row: TimelineEventRow,
+  ): QualifiedHistoryEvent | undefined {
+    for (const key of row.eventKeys) {
+      const event = eventByKey.get(key);
+      if (event?.eventId === row.endEventId) return event;
+    }
+    return undefined;
+  }
+
+  function selectRange(range: TimeRange): void {
+    if (!domain || !scroller) return;
+    const nextDuration = Math.max(
+      1,
+      (domainDuration * width) / MAX_WIDTH,
+      range.endMs - range.startMs,
+    );
+    pinned = polling && range.endMs >= domain.endMs - 1;
+    unpinnedStartMs = pinned ? null : range.startMs;
+    requestedDuration = nextDuration;
+    void tick().then(() => {
+      if (!scroller || !domain) return;
+      scroller.scrollLeft = Math.max(
+        0,
+        timeToX(range.startMs, domain, contentWidth),
+      );
+    });
+  }
+
+  function handlePlotWheel(event: WheelEvent): void {
+    if (!(event.metaKey || event.ctrlKey) || !domain || !viewport) return;
+    if (!event.deltaX && !event.deltaY) return;
+    event.preventDefault();
+    const range = getWheelTimeRange({
+      deltaX: event.deltaX,
+      deltaY: event.deltaY,
+      deltaMode: event.deltaMode,
+      trackWidth: width,
+      selection: viewport,
+      domain,
+      minDurationMs: (domainDuration * width) / MAX_WIDTH,
+      pinnedLive: polling && pinned,
+    });
+    if (range) selectRange(range);
+  }
+
+  $effect(() => {
+    if (!scroller || !domain) return;
+    if (polling && pinned) {
+      scroller.scrollLeft = Math.max(0, contentWidth - width);
+    } else {
+      const startMs = untrack(() => unpinnedStartMs);
+      if (startMs !== null) {
+        scroller.scrollLeft = Math.max(
+          0,
+          timeToX(startMs, domain, contentWidth),
+        );
       }
     }
-
-    return firstEventRow;
   });
 
-  function toggleCollapsed(row: FlattenedSceneRow): void {
-    if (row.kind === 'event') return;
-    if (row.kind === 'workflow' && row.depth > 0) {
-      if (openedChildKeys.has(row.key)) openedChildKeys.delete(row.key);
-      else openedChildKeys.add(row.key);
-      return;
+  $effect.pre(() => {
+    if (polling && domain && initialLiveDuration === null) {
+      initialLiveDuration = Math.max(
+        60_000,
+        Math.min(3_600_000, domainDuration / 4),
+      );
     }
+    if (polling && viewport) lastLiveViewport = viewport;
+    if (previousPolling && !polling && lastLiveViewport) {
+      const range = lastLiveViewport;
+      requestedDuration = range.endMs - range.startMs;
+      unpinnedStartMs = range.startMs;
+      pinned = false;
+    }
+    previousPolling = polling;
+  });
 
-    if (collapsedKeys.has(row.key)) collapsedKeys.delete(row.key);
-    else collapsedKeys.add(row.key);
-  }
-
-  function showFirstEvent(row: TimelineEventRow): void {
-    if (!scroller || !domain) return;
-    const targetLeft = Math.max(
-      0,
-      Math.min(
-        timeToX(row.startTimeMs, domain, contentWidth) - plotWidth * 0.2,
-        contentWidth - plotWidth,
-      ),
-    );
-    scroller.scrollTo({
-      left: targetLeft,
-      top: scroller.scrollTop,
-      behavior: 'smooth',
-    });
-  }
-
-  function pan(direction: -1 | 1): void {
-    scroller?.scrollBy({
-      left: direction * plotWidth * 0.25,
-      behavior: 'smooth',
-    });
-  }
-
-  async function zoom(factor: number): Promise<void> {
-    if (!domain || !viewport) return;
-    const midpoint = (viewport.startMs + viewport.endMs) / 2;
-    const minimumDuration = Math.max(
-      1,
-      (domainDuration * plotWidth) / MAX_CONTENT_WIDTH,
-    );
-    zoomDurationMs = Math.max(
-      minimumDuration,
-      Math.min(duration * factor, domainDuration),
-    );
-
-    await tick();
-    if (!scroller || !domain) return;
-    const nextLeft = Math.max(
-      0,
-      Math.min(
-        timeToX(midpoint, domain, contentWidth) - plotWidth / 2,
-        contentWidth - plotWidth,
-      ),
-    );
-    scrollLeft = nextLeft;
-    scroller.scrollLeft = nextLeft;
-  }
-
-  function fit(): void {
-    zoomDurationMs = null;
-    scrollLeft = 0;
-    if (scroller) scroller.scrollLeft = 0;
-  }
+  $effect(() => {
+    if (!polling) return;
+    const interval = setInterval(() => {
+      now = Date.now();
+    }, 1000);
+    return () => clearInterval(interval);
+  });
 </script>
 
-<div class="plot">
+<div class="timeline">
   <WorkflowTimelineIconDefs />
-  <div class="controls">
-    <button
-      type="button"
-      onclick={() => pan(-1)}
-      disabled={!viewport || viewport.startMs <= (domain?.startMs ?? 0)}
-      aria-label="Pan earlier">←</button
-    >
-    <button
-      type="button"
-      onclick={() => pan(1)}
-      disabled={!viewport || viewport.endMs >= (domain?.endMs ?? 0)}
-      aria-label="Pan later">→</button
-    >
-    <button
-      type="button"
-      onclick={() => zoom(0.5)}
-      disabled={!viewport ||
-        duration <=
-          Math.max(1, (domainDuration * plotWidth) / MAX_CONTENT_WIDTH)}
-      aria-label="Zoom in">+</button
-    >
-    <button
-      type="button"
-      onclick={() => zoom(2)}
-      disabled={!viewport || duration >= domainDuration}
-      aria-label="Zoom out">−</button
-    >
-    <button type="button" onclick={fit} disabled={zoomDurationMs === null}
-      >Fit</button
-    >
-  </div>
-
-  <details class="debug-panel" bind:open={isDebugOpen}>
-    <summary>Debug coordinates</summary>
-    {#if isDebugOpen}
-      <div class="diagnostics">
-        {#if domain && viewport}
-          <div>
-            Known: {new Date(domain.startMs).toISOString()} – {new Date(
-              domain.endMs,
-            ).toISOString()}
-          </div>
-          <div>
-            Visible: {new Date(viewport.startMs).toISOString()} – {new Date(
-              viewport.endMs,
-            ).toISOString()}
-          </div>
-          <div>
-            Scroll X: {Math.round(scrollLeft)}px · Plot width: {Math.round(
-              plotWidth,
-            )}px · Surface width: {Math.round(contentWidth)}px · Mounted rows: {visibleRows.length}/{displayedRows.length}
-          </div>
-          {#if inspectedRow}
-            <div>
-              Sample {inspectedRow.kind}
-              {inspectedRow.startEventId}–{inspectedRow.endEventId}: {new Date(
-                inspectedRow.startTimeMs,
-              ).toISOString()} – {new Date(
-                inspectedRow.endTimeMs,
-              ).toISOString()} ({inspectedRow.endTimeMs < viewport.startMs ||
-              inspectedRow.startTimeMs > viewport.endMs
-                ? 'outside viewport'
-                : 'inside viewport'})
-            </div>
-            <div>
-              Sample X: {Math.round(
-                timeToX(inspectedRow.startTimeMs, domain, contentWidth),
-              )}–{Math.round(
-                timeToX(inspectedRow.endTimeMs, domain, contentWidth),
-              )}px on surface; visible X: {Math.round(
-                timeToX(inspectedRow.startTimeMs, domain, contentWidth) -
-                  scrollLeft,
-              )}–{Math.round(
-                timeToX(inspectedRow.endTimeMs, domain, contentWidth) -
-                  scrollLeft,
-              )}px
-            </div>
-          {/if}
-        {:else}
-          <div>No loaded lifecycle intervals yet.</div>
-        {/if}
-      </div>
-    {/if}
-  </details>
-
+  <WorkflowTimelineMinimap
+    {domain}
+    {viewport}
+    {eventTimes}
+    minDurationMs={(domainDuration * width) / MAX_WIDTH}
+    pinnedLive={polling && pinned}
+    onselect={selectRange}
+  />
   <div
     class="scroller"
     role="region"
@@ -260,369 +306,513 @@
     bind:this={scroller}
     bind:clientWidth={viewportWidth}
     bind:clientHeight={viewportHeight}
+    onwheel={handlePlotWheel}
     onscroll={(event) => {
       scrollTop = event.currentTarget.scrollTop;
       scrollLeft = event.currentTarget.scrollLeft;
+      if (polling) {
+        const remaining =
+          event.currentTarget.scrollWidth -
+          event.currentTarget.clientWidth -
+          scrollLeft;
+        if (remaining > 40) {
+          pinned = false;
+          unpinnedStartMs = viewport?.startMs ?? null;
+        } else if (remaining < 8) {
+          pinned = true;
+          unpinnedStartMs = null;
+        } else if (!pinned) {
+          unpinnedStartMs = viewport?.startMs ?? null;
+        }
+      }
     }}
   >
-    <div class="content" style:width={`${LABEL_WIDTH + contentWidth}px`}>
-      {#if domain}
-        <div class="axis">
-          <div class="label" aria-hidden="true"></div>
-          <div class="track">
-            {#each ticks as time (time)}
-              <span
-                class="tick"
-                style:left={`${timeToX(time, domain, contentWidth)}px`}
-              >
-                {new Date(time).toISOString()}
-              </span>
-            {/each}
-          </div>
-        </div>
-      {/if}
-
-      <div
-        role="list"
-        aria-label="Workflow timeline rows"
-        class:has-time-grid={tickSpacingPx > 0}
-        style:--tick-spacing={`${tickSpacingPx}px`}
-        style:--tick-origin={`${tickOriginPx}px`}
-        style:padding-top={`${startIndex * ROW_HEIGHT}px`}
-        style:padding-bottom={`${(displayedRows.length - endIndex) * ROW_HEIGHT}px`}
-      >
-        {#each visibleRows as item, index (item.key)}
-          {@const isCollapsed = isSceneRowCollapsed(
-            item,
-            collapsedKeys,
-            openedChildKeys,
-          )}
-          {@const icon =
-            item.kind === 'event'
-              ? lifecycleVisuals[item.row.kind].icon
-              : item.kind === 'workflow' && item.depth > 0
-                ? 'relationship'
-                : 'workflow'}
-          <div
-            role="listitem"
-            aria-posinset={startIndex + index + 1}
-            aria-setsize={displayedRows.length}
-            class="plot-row"
-            class:workflow-row={item.kind === 'workflow'}
-            class:execution-row={item.kind === 'execution'}
-            class:run-band={item.kind !== 'workflow' &&
-              item.workflowDepth === 0}
-            class:child-band={item.workflowDepth > 0}
-            class:child-header={item.kind === 'workflow' &&
-              item.workflowDepth > 0}
-            style:--row-color={item.kind === 'event'
-              ? lifecycleVisuals[item.row.kind].color
-              : 'var(--color-action-workflow-workflow)'}
-          >
-            <div
-              class="label"
-              class:has-group-rail={item.kind !== 'workflow' ||
-                item.workflowDepth > 0}
-              class:child-rail={item.workflowDepth > 0}
-              style:padding-left={`${item.depth * 1.25}rem`}
-              style:--rail-width={`${Math.min(2 + item.workflowDepth * 3, 11)}px`}
+    <div class="content" style:width={`${contentWidth}px`}>
+      <div class="axis" style:height={`${AXIS_HEIGHT}px`}>
+        {#if domain}
+          {#each ticks as time (time)}
+            <span
+              class="tick"
+              style:left={`${timeToX(time, domain, contentWidth)}px`}
             >
-              {#if item.kind === 'workflow' || item.kind === 'execution'}
-                <button
-                  type="button"
-                  class="toggle"
-                  aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} ${item.kind}`}
-                  aria-expanded={!isCollapsed}
-                  onclick={() => toggleCollapsed(item)}
-                  >{isCollapsed ? '▸' : '▾'}</button
-                >
-              {:else}
-                <button
-                  type="button"
-                  class="jump"
-                  title="Show first event on timeline"
-                  aria-label={`Show first event for ${item.row.label}`}
-                  disabled={!domain || contentWidth <= plotWidth}
-                  onclick={() => showFirstEvent(item.row)}>⌖</button
-                >
-              {/if}
-              <span class="row-icon" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 16 16">
-                  <use href={`#wt-icon-${icon}`} />
-                </svg>
-              </span>
-              <span class="label-text">
-                {#if item.kind === 'workflow'}
-                  Workflow {item.workflow.executions[0]?.execution.identity
-                    .workflowId}
-                {:else if item.kind === 'execution'}
-                  Run {item.execution.execution.identity.runId}
-                {:else}
-                  {item.row.label}
-                {/if}
-              </span>
-            </div>
+              {formatDistanceAbbreviated({
+                start: new Date(domain.startMs),
+                end: new Date(time),
+                includeMilliseconds: viewport
+                  ? viewport.endMs - viewport.startMs < 10_000
+                  : false,
+              }) || '0s'}
+            </span>
+          {/each}
+        {/if}
+      </div>
+      <div
+        class="body"
+        style:height={`${rows.length * ROW_HEIGHT + BOX_BOTTOM_PADDING}px`}
+        style:min-height={`${Math.max(0, viewportHeight - AXIS_HEIGHT)}px`}
+      >
+        {#if domain}
+          {#each ticks as time (time)}
+            <div
+              class="grid-line"
+              style:left={`${timeToX(time, domain, contentWidth)}px`}
+            ></div>
+          {/each}
+          {#each boxes as box (box.key)}
+            {#if box.top + box.height >= scrollTop - AXIS_HEIGHT - OVERSCAN * ROW_HEIGHT && box.top <= scrollTop + viewportHeight}
+              <div
+                class="group-box"
+                style:left={`${Math.max(0, box.startX - BOX_PADDING)}px`}
+                style:width={`${Math.max(1, Math.min(contentWidth, box.endX + BOX_PADDING) - Math.max(0, box.startX - BOX_PADDING))}px`}
+                style:top={`${box.top}px`}
+                style:height={`${box.height}px`}
+                style:--group-depth={box.depth}
+              >
+                <span class="group-label" title={box.title}>{box.label}</span>
+              </div>
+            {/if}
+          {/each}
+          {#each visibleRows as item, index (item.key)}
+            {@const rowIndex = firstIndex + index}
+            {#if item.kind !== 'gap'}
+              <div
+                class="row"
+                style:top={`${rowIndex * ROW_HEIGHT}px`}
+                style:--row-depth={item.depth}
+              >
+                {#if item.kind === 'execution'}
+                  {@const executionKey = item.execution.execution.executionKey}
+                  {@const historyState = executionHistories.find(
+                    (history) => history.executionKey === executionKey,
+                  )}
+                  {@const isRunning = executionHistories.some(
+                    (history) =>
+                      history.executionKey === executionKey &&
+                      (history.stream.status === 'polling' ||
+                        history.stream.status === 'retrying'),
+                  )}
+                  {@const executionRow = item.execution.entries.find(
+                    (entry) =>
+                      entry.kind === 'row' && entry.row.kind === 'workflow',
+                  )}
+                  {#if executionRow?.kind === 'row'}
+                    {@const left = plotX(
+                      executionRow.row.startTimeMs,
+                      domain,
+                      contentWidth,
+                    )}
+                    {@const right = plotX(
+                      isRunning
+                        ? Math.max(executionRow.row.endTimeMs, now)
+                        : executionRow.row.endTimeMs,
+                      domain,
+                      contentWidth,
+                    )}
+                    {@const bounds = getMarkBounds(left, right)}
+                    <div
+                      class="mark"
+                      style:left={`${bounds.left}px`}
+                      style:width={`${bounds.right - bounds.left}px`}
+                      style:--line-color={isRunning
+                        ? colorScales.blue[9]
+                        : getLineColor(
+                            endingEvent(executionRow.row)?.eventType,
+                            lifecycleVisuals.workflow.bgColor,
+                          )}
+                    >
+                      <span class="mark-line" class:running={isRunning}></span>
+                      <button
+                        type="button"
+                        class="mark-hit"
+                        aria-label={`View lifecycle details for run ${item.execution.execution.identity.runId}`}
+                        onclick={() => (selectedRow = executionRow.row)}
+                      ></button>
 
-            <div class="track">
-              {#if item.kind === 'event' && viewport && domain && item.row.endTimeMs >= viewport.startMs && item.row.startTimeMs <= viewport.endMs}
-                <span
-                  class="interval"
-                  style:left={`${Math.min(timeToX(item.row.startTimeMs, domain, contentWidth), Math.max(0, contentWidth - (item.row.startTimeMs === item.row.endTimeMs ? 2 : 0)))}px`}
-                  style:width={`${timeToX(item.row.endTimeMs, domain, contentWidth) - timeToX(item.row.startTimeMs, domain, contentWidth)}px`}
-                  title={`${item.row.kind}: ${new Date(item.row.startTimeMs).toISOString()} – ${new Date(item.row.endTimeMs).toISOString()}`}
-                ></span>
-              {/if}
-            </div>
-          </div>
-        {/each}
+                      {#each executionRow.row.eventKeys as eventKey (eventKey)}
+                        {@const event = eventByKey.get(eventKey)}
+                        {#if event}
+                          {@const colors = getMarkColors(event.eventType)}
+                          {@const isStart =
+                            event.eventId === executionRow.row.startEventId &&
+                            event.eventId !== executionRow.row.endEventId}
+                          {@const isEnd =
+                            event.eventId === executionRow.row.endEventId &&
+                            event.eventId !== executionRow.row.startEventId}
+                          <span
+                            class="node"
+                            class:start={isStart}
+                            class:end={isEnd}
+                            style:left={`${getNodeAnchorX(plotX(event.eventTimeMs, domain, contentWidth), bounds, isStart || isEnd) - bounds.left}px`}
+                            style:--node-color={colors.fill}
+                            style:--node-stroke={colors.stroke}
+                            title={event.eventType}
+                            ><svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 16 16"
+                              aria-hidden="true"
+                              ><use href="#wt-icon-workflow" /></svg
+                            ></span
+                          >
+                        {/if}
+                      {/each}
+                    </div>
+                  {:else}
+                    <span class="placeholder" title={executionKey}>
+                      Run {item.execution.execution.identity.runId.slice(0, 8)}…
+                      {#if historyState?.load.status === 'failed'}
+                        · History unavailable
+                      {:else if historyState?.load.status !== 'loaded'}
+                        · Loading history…{/if}
+                    </span>
+                  {/if}
+                {:else}
+                  {@const visual = lifecycleVisuals[item.row.kind]}
+                  {@const left = plotX(
+                    item.row.startTimeMs,
+                    domain,
+                    contentWidth,
+                  )}
+                  {@const right = plotX(
+                    item.row.endTimeMs,
+                    domain,
+                    contentWidth,
+                  )}
+                  {@const bounds = getMarkBounds(left, right)}
+                  {@const nodes = getRowNodeBounds(item.row, bounds, domain)}
+                  <div
+                    class="mark"
+                    style:left={`${bounds.left}px`}
+                    style:width={`${bounds.right - bounds.left}px`}
+                    style:--line-color={getLineColor(
+                      endingEvent(item.row)?.eventType,
+                      visual.bgColor,
+                    )}
+                  >
+                    {#if right > left}<span class="mark-line"></span>{/if}
+                    <button
+                      type="button"
+                      class="mark-hit"
+                      aria-label={`View lifecycle details for ${item.row.label}`}
+                      onclick={() => (selectedRow = item.row)}
+                    ></button>
+
+                    {#each item.row.eventKeys as eventKey (eventKey)}
+                      {@const event = eventByKey.get(eventKey)}
+                      {#if event}
+                        {@const colors = getMarkColors(event.eventType)}
+                        {@const isStart =
+                          event.eventId === item.row.startEventId &&
+                          event.eventId !== item.row.endEventId}
+                        {@const isEnd =
+                          event.eventId === item.row.endEventId &&
+                          event.eventId !== item.row.startEventId}
+                        <span
+                          class="node"
+                          class:start={isStart}
+                          class:end={isEnd}
+                          style:left={`${getNodeAnchorX(plotX(event.eventTimeMs, domain, contentWidth), bounds, isStart || isEnd) - bounds.left}px`}
+                          style:--node-color={colors.fill}
+                          style:--node-stroke={colors.stroke}
+                          title={event.eventType}
+                          ><svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 16 16"
+                            aria-hidden="true"
+                            ><use href={`#wt-icon-${visual.icon}`} /></svg
+                          ></span
+                        >
+                      {/if}
+                    {/each}
+                  </div>
+                  <WorkflowTimelineMarkLabel
+                    label={item.row.label}
+                    mark={bounds}
+                    {nodes}
+                    {scrollLeft}
+                    viewportWidth={width}
+                  />
+                {/if}
+              </div>
+            {/if}
+          {/each}
+        {/if}
       </div>
     </div>
   </div>
+  {#if selectedRow}
+    <aside class="details" aria-label="Lifecycle details">
+      <div class="details-heading">
+        <strong>{selectedRow.label}</strong>
+        <button
+          type="button"
+          aria-label="Close lifecycle details"
+          onclick={() => (selectedRow = null)}>Close</button
+        >
+      </div>
+      {#each selectedRow.eventKeys as eventKey (eventKey)}
+        {@const event = eventByKey.get(eventKey)}
+        {#if event}
+          <details>
+            <summary
+              >#{event.eventId}
+              {event.eventType} · {new Date(
+                event.eventTimeMs,
+              ).toISOString()}</summary
+            >
+            <pre>{JSON.stringify(
+                event,
+                (_key, value) =>
+                  typeof value === 'bigint' ? String(value) : value,
+                2,
+              )}</pre>
+          </details>
+        {/if}
+      {/each}
+    </aside>
+  {/if}
 </div>
 
 <style>
-  .plot {
-    --rail-gutter: 18px;
-
-    box-sizing: border-box;
+  .timeline {
+    position: relative;
     display: flex;
     flex: 1;
     flex-direction: column;
-    width: 100%;
     min-width: 0;
     min-height: 0;
-    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-  }
+    width: 100%;
 
-  .controls {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem;
-  }
-
-  .controls button {
-    min-width: 2rem;
-  }
-
-  .debug-panel {
-    padding-inline: 0.5rem;
-    font-size: 0.75rem;
-  }
-
-  .debug-panel summary {
-    width: fit-content;
-    padding-block: 0.25rem;
-    cursor: pointer;
-  }
-
-  .diagnostics {
-    overflow: hidden;
-    padding: 0.5rem;
-    font-size: 0.75rem;
-    font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
+    --page-gutter: 1rem;
   }
 
   .scroller {
+    box-sizing: border-box;
     flex: 1;
-    width: 100%;
-    min-width: 0;
     min-height: 12rem;
+    min-width: 0;
     overflow: auto;
+    border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    border-radius: 0.5rem;
+    background: var(--color-surface-primary);
+    color: var(--color-content-primary);
   }
 
-  .axis,
-  .plot-row {
-    display: flex;
-    align-items: center;
+  .content {
+    position: relative;
+    min-height: 100%;
+    overflow-x: clip;
   }
 
   .axis {
-    box-sizing: border-box;
     position: sticky;
     top: 0;
-    z-index: 2;
-    height: 48px;
-    border-block: 1px solid currentColor;
+    z-index: 5;
     background: var(--color-surface-primary);
-  }
-
-  .label {
-    position: sticky;
-    left: 0;
-    z-index: 1;
-    box-sizing: border-box;
-    display: flex;
-    flex: 0 0 256px;
-    align-items: center;
-    align-self: stretch;
-    min-width: 0;
-    gap: 0.375rem;
-    overflow: visible;
-    padding-inline: 0.5rem;
-    padding-right: calc(var(--rail-gutter) + 4px);
-    background: var(
-      --hover-surface,
-      var(--row-surface, var(--band-surface, var(--color-surface-primary)))
-    );
-    white-space: nowrap;
-  }
-
-  .toggle,
-  .jump {
-    display: inline-flex;
-    flex: 0 0 1rem;
-    align-items: center;
-    justify-content: center;
-    height: 1.5rem;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-  }
-
-  .toggle:focus-visible,
-  .jump:focus-visible {
-    outline: 2px solid currentColor;
-  }
-
-  .jump:disabled {
-    cursor: default;
-    opacity: 0.4;
-  }
-
-  .row-icon {
-    display: inline-flex;
-    flex: none;
-    color: var(--row-color);
-  }
-
-  .label-text {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .label.has-group-rail::after {
-    position: absolute;
-    top: 0;
-    left: calc(100% - var(--rail-gutter));
-    width: var(--rail-width);
-    height: 32px;
-    background: color-mix(in srgb, currentColor 15%, transparent);
-    pointer-events: none;
-    content: '';
-  }
-
-  .label.child-rail::after {
-    background: color-mix(
-      in srgb,
-      var(--color-action-workflow-workflow) 45%,
-      transparent
-    );
-  }
-
-  .track {
-    position: relative;
-    flex: 1;
-    height: 100%;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  .has-time-grid .plot-row .track {
-    background-image: linear-gradient(
-      to right,
-      color-mix(in srgb, currentColor 8%, transparent) 1px,
-      transparent 1px
-    );
-    background-position: var(--tick-origin) 0;
-    background-size: var(--tick-spacing) 100%;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
   }
 
   .tick {
     position: absolute;
-    bottom: 0;
-    font-size: 0.7rem;
+    bottom: 0.5rem;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
     white-space: nowrap;
     transform: translateX(-50%);
   }
 
-  .plot-row {
+  .body {
+    position: relative;
+  }
+
+  .grid-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: currentColor;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  .group-box {
+    position: absolute;
     box-sizing: border-box;
+    border: 1px solid var(--group-border-color);
+    border-radius: 4px;
+    background: color-mix(in srgb, currentColor 6%, transparent);
+    pointer-events: none;
+    --group-border-color: color-mix(
+      in srgb,
+      currentColor 60%,
+      var(--color-surface-primary)
+    );
+  }
+
+  .group-label {
+    position: sticky;
+    top: calc(52px + var(--group-depth) * 24px);
+    left: 8px;
+    z-index: 4;
+    display: inline-block;
+    max-width: calc(100% - 16px);
+    margin: -11px 0 0 12px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--group-border-color);
+    color: var(--color-content-primary);
+    font-size: 12px;
+    line-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+  }
+
+  .row {
+    position: absolute;
+    width: 100%;
     height: 32px;
-    border-bottom: 1px solid;
-    border-color: color-mix(in srgb, currentColor 8%, transparent);
-    background: var(
-      --hover-surface,
-      var(--row-surface, var(--band-surface, transparent))
-    );
   }
 
-  .plot-row:hover,
-  .plot-row:focus-within {
-    --hover-surface: color-mix(
-      in srgb,
-      currentColor 7%,
-      var(--row-surface, var(--band-surface, var(--color-surface-primary)))
-    );
-  }
-
-  .run-band {
-    --band-surface: color-mix(
-      in srgb,
-      var(--color-action-workflow-workflow) 2%,
-      var(--color-surface-primary)
-    );
-  }
-
-  .child-band {
-    --band-surface: color-mix(
-      in srgb,
-      var(--color-action-workflow-workflow) 5%,
-      var(--color-surface-primary)
-    );
-  }
-
-  .workflow-row {
-    --row-surface: var(--color-surface-secondary);
-
-    font-weight: 600;
-  }
-
-  .execution-row {
-    --row-surface: color-mix(
-      in srgb,
-      var(--color-surface-secondary) 60%,
-      var(--color-surface-primary)
-    );
-
-    font-weight: 500;
-  }
-
-  .child-header {
-    --row-surface: color-mix(
-      in srgb,
-      var(--color-action-workflow-workflow) 10%,
-      var(--color-surface-primary)
-    );
-  }
-
-  .child-band.execution-row {
-    --row-surface: color-mix(
-      in srgb,
-      var(--color-action-workflow-workflow) 7%,
-      var(--color-surface-primary)
-    );
-  }
-
-  .interval {
+  .mark {
     position: absolute;
     top: 50%;
-    height: 0.6rem;
-    min-width: 2px;
-    background: var(--row-color);
-    border-radius: 0.3rem;
-    transform: translateY(-50%);
+    height: 0;
+  }
+
+  .mark-line {
+    position: absolute;
+    top: -9px;
+    width: 100%;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--line-color, var(--color-action-workflow-workflow));
+  }
+
+  .mark-line.running {
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .mark-line.running::after {
+    position: absolute;
+    inset: 0 -6px 0 0;
+    background: repeating-linear-gradient(
+      to right,
+      var(--line-color) 0 3px,
+      transparent 3px 6px
+    );
+    background-size: 6px 100%;
+    animation: dash 1.8s linear infinite;
+    will-change: transform;
+    content: '';
+  }
+
+  @keyframes dash {
+    to {
+      transform: translateX(-6px);
+    }
+  }
+
+  .node {
+    position: absolute;
+    top: -10px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+    border: 2px solid var(--node-stroke, var(--color-content-primary));
+    border-radius: 4px;
+    background: var(--node-color);
+    color: black;
+    pointer-events: none;
+    transform: translateX(-50%);
+  }
+
+  .node.start {
+    transform: none;
+  }
+
+  .node.end {
+    transform: translateX(-100%);
+  }
+
+  .mark-hit {
+    position: absolute;
+    top: -11px;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    min-width: 24px;
+    height: 22px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .mark-hit::before {
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--line-color) 25%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    content: '';
+  }
+
+  .mark-hit:hover::before,
+  .mark-hit:focus-visible::before {
+    opacity: 1;
+  }
+
+  .mark-hit:focus-visible {
+    outline: 2px solid var(--color-content-primary);
+    outline-offset: 3px;
+    border-radius: 999px;
+  }
+
+  .placeholder {
+    position: sticky;
+    left: 8px;
+    top: 8px;
+    white-space: nowrap;
+  }
+
+  .details {
+    position: absolute;
+    right: calc(-1 * var(--page-gutter));
+    bottom: 0;
+    left: calc(-1 * var(--page-gutter));
+    z-index: 10;
+    box-sizing: border-box;
+    height: 14rem;
+    overflow: auto;
+    padding: 0.75rem;
+    border-top: 1px solid currentColor;
+    background: var(--color-surface-primary);
+    box-shadow: 0 -4px 16px color-mix(in srgb, black 15%, transparent);
+  }
+
+  @media (width >= 768px) {
+    .timeline {
+      --page-gutter: 2rem;
+    }
+  }
+
+  .details-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .details pre {
+    overflow: auto;
+    font-size: 0.75rem;
   }
 </style>

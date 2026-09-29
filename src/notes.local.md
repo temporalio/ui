@@ -22,7 +22,7 @@ The prototype in `~/Downloads/InfiniteTimelineWithChildren.mov` demonstrates the
 - Provide an overview minimap for navigation and orientation.
 - Continue to support large histories without rendering the entire scene into the DOM.
 - Keep event details outside the plotting area so selection does not alter row layout.
-- Support accessible keyboard navigation through the logical workflow hierarchy.
+- Eventually support accessible keyboard navigation through the logical workflow hierarchy (defer tree-navigation implementation until the redesigned visual scene is settled).
 
 ## Glossary
 
@@ -145,13 +145,15 @@ The plotting viewport supports:
 
 Axis ticks should be anchored to absolute timestamps and translated with the viewport. Tick intervals may change at zoom thresholds, but should use hysteresis or an equivalent technique to avoid rapid visual switching.
 
-### Follow latest
+### Follow latest and initial viewport (confirmed redesign requirements)
 
-The viewport can follow the right edge of the known time domain, such as the last hour relative to `now`.
-
-- New activity keeps the latest known time pinned to the right edge while follow-latest is enabled.
-- Manual panning or zooming disables follow-latest.
-- Re-enabling follow-latest returns the viewport to the latest known interval while preserving the selected viewport duration.
+- While live polling is active, start with a rolling live window pinned to the right edge of the growing time domain, using a reasonable default duration rather than fitting the full workflow. If the workflow is already known to be closed on initial load, start fitted to its full duration instead.
+- If the user manually scrolls away from the right edge, unpin the viewport. While polling continues and the domain grows to the right, keep the unpinned viewport's absolute time interval stable. Scrolling back near the right edge automatically re-enables live pinning, with a gentle snap toward the edge. Require a deliberate scroll away to break the pin again (hysteresis); tune exact thresholds during implementation.
+- Let the user choose a time-window duration (for example, five minutes). Rescale the main viewport to cover approximately that duration, and allow horizontal scrolling from there.
+- When live polling is off, the known time domain is normally static, but newly loaded related history may extend it. In that case, expand the domain and minimap without shifting or rescaling the main viewport's absolute time interval; the user pans to reach newly discovered events. Offer a Fit action that sets the visible duration to the full known workflow timeframe.
+- Choose the default live-window duration for a running workflow with a heuristic informed by what is already known about it (including elapsed running time), rather than a fixed duration for every workflow. The precise heuristic remains to be decided.
+- Changing the window duration while pinned live keeps the right edge pinned and expands or contracts the view toward the left. Changing the duration while unpinned scales the view around its current center time.
+- If a running workflow completes while its live window is visible, preserve the current viewport and zoom. Do not automatically fit the now-complete workflow.
 
 ## Minimap
 
@@ -161,8 +163,8 @@ The minimap displays the full known bounds of the root execution graph.
 - The known domain may expand as additional related executions are discovered.
 - A running graph uses `now` as its moving right boundary.
 - Collapsing or expanding workflow groups does not change known global bounds.
-- The minimap shows and controls the main plotting viewport.
-- The minimap supports dragging the viewport window and changing its duration to zoom.
+- The minimap shows and controls the main plotting viewport. Show event-activity density across the full time domain; tentatively overlay spans for executions and child workflows to convey their ranges (validate this treatment visually).
+- Click-drag on the minimap outside the current selection to select a visible time range (setting the main viewport's position and duration). Click-drag the existing selection to pan that same time range without changing its duration. Drag the selection edges or scroll vertically over the minimap to resize the window; wheel zoom anchors to its center unless live-pinned, when the right edge stays fixed. Horizontal scrolling over the minimap pans the selected window without changing its duration.
 
 The minimap and plotting area use separate projections over the same global time domain:
 
@@ -175,13 +177,13 @@ The minimap and plotting area use separate projections over the same global time
 
 Workflows provide the logical nesting hierarchy. Executions in a continue-as-new chain belong to the same workflow level and do not introduce additional hierarchy depth.
 
-A child workflow is nested within its parent workflow. The child's continue-as-new executions remain inside the child workflow's visual group.
+A child workflow's execution boxes nest visually within the initiating parent execution. If the child continues as new, its runs appear as sibling execution boxes without a chain-level outer box.
 
 Visual grouping must support arbitrary nesting of workflow, execution, and event collections.
 
 ### Default expansion and depth
 
-Child expansion is configurable and defaults to enabled.
+Child workflows start collapsed by default. Eventually provide a persistent preference to expand children by default; the persistence mechanism and scope are still to be decided.
 
 Initial depth defaults are:
 
@@ -208,14 +210,34 @@ Do not render a pending child workflow until a started event or equivalent execu
 
 ## Plotting and Visual Layout
 
+### Confirmed scene layout (redesign interview)
+
+- Place the minimap above the main timeline, outside its scrolling area. The minimap stays fixed while the main timeline scrolls, including on small screens. The main plot itself is a scroll area, including for horizontal panning. Wheel and trackpad gestures over the main plot remain ordinary scrolling unless Cmd or Ctrl is held; with either modifier, vertical scrolling zooms the selected time window and horizontal scrolling pans it, using the same behavior as unmodified scrolling over the minimap.
+- Overlay a viewport window on the minimap showing the time range visible in the main plot. De-emphasize the portions of the minimap outside that window.
+- Embed labels within their plotted rows rather than placing them in a dedicated sticky column. Prefer the earliest node-free gap inside the visible part of a lifecycle mark when the full label fits; left-align the label immediately after the preceding node instead of centering it in the gap. Otherwise place it outside on whichever side has more visible space, keeping it inside the viewport; only allow overlap with the mark when edge-sticking leaves no other room. As the plot pans horizontally, labels stay visible at whichever side of the row has the most available space, rather than following a left-first/right-fallback rule. Initial choice to validate visually: even when the entire lifecycle mark is off-screen, keep its label visible at an edge. Sticky labels must stay visually synchronized with native scrolling; avoid the delayed "catch-up" effect seen with JavaScript-driven label positioning. The result should feel like a graph, not a table.
+- Keep the time axis visible at the top while scrolling vertically. Its ticks move horizontally with the plotted rows when panning horizontally.
+- Attach the event-details panel to the bottom edge of the window as an overlay on both desktop and small screens. Opening it must not resize or reflow the main plotting area. A larger modal-like mobile presentation is a possible later revision after visual review.
+- Defer controls for now; the scene layout should not be driven by a particular control design yet.
+- Use the legacy timeline as the primary visual reference. The new scene must additionally group child workflows and workflow executions visually with border boxes encompassing the plots in each group, similar to the grouping in `InfiniteTimelineWithChildren.mov`. Start with mostly outline-only boxes, without prominent tinted fills, so the legacy-style marks remain visually dominant. Use the same border style at each nesting depth; spatial nesting should communicate hierarchy without depth-specific colors or weights.
+- Each group box spans its group's start and end times horizontally, not the full plot width. For a still-running execution, extend the box and execution mark continuously toward moving `now`, not just the latest event. Initially use a legacy-style animated dashed continuation for an ongoing run and reassess visually. Start with boxes encompassing both labels and plotted marks. Prefer allowing a child box to extend beyond its parent's right edge if the child outlives the parent, provided this does not add disproportionate complexity.
+- Nest child-workflow boxes visually within their parent execution's box, including recursively nested children. Place a child execution box immediately below the parent lifecycle row that started it.
+- Child workflows start collapsed by default. Initial collapsed-child treatment: keep a compact single row beneath the initiating lifecycle instead of hiding the child entirely. Reassess this choice after seeing it rendered. When a child is expanded but its history has not loaded yet, show its box immediately with a compact loading row inside.
+- A group's embedded label remains visible at whichever viewport edge has more available space when the box's start time pans off-screen; the time-bounded box itself need not remain fully visible. Keep the group label visible beneath the sticky time axis while vertically scrolling through its box, stacking nested group labels by depth so they do not cover one another.
+- Do not render a separate workflow header. The workflow execution is the largest visual grouping; put its label on the same row as its start-to-end mark. Label each execution `Run {first eight characters of its run UUID}…` instead of a run index (whose value could change as earlier runs are discovered). Show the full run ID on hover and in the details overlay. Nested boxes and the shortened run label are enough context in the plot for now; do not add a separate workflow type or ID label initially.
+- A continue-as-new chain does not get its own outer grouping. Give each run a sibling execution box, including single-run workflows (which need no redundant run row). Shared styling and placement are enough to associate consecutive runs; do not require a connector between them.
+- Keep rows compact within each visual grouping, close to the legacy timeline's density. Leave approximately one row of space before each bordered group; inset the group's border from its start/end nodes, leave extra room between the final row's icons and the bottom border, and place its label in a matching-color tab on the top border. Let time tick lines continue through the full visible plot height, including empty space beneath short histories.
+- The current opt-in scene feels like a table rather than a plotting area. Do not confine labels to a narrow fixed-width column where they are truncated. Small label indentations alone do not communicate the workflow hierarchy; the nested time-bounded boxes must do that visual work.
+- Put expand/collapse in its own reserved action spot near the embedded execution label; clicking the label or mark should not implicitly toggle the child. Reserve this spot only on rows that can expand or collapse; non-expandable lifecycle rows do not need a blank action slot.
+- Follow the legacy timeline's event-to-row grouping: the execution occupies one start-to-end row, while lifecycles such as activities and timers get their own rows and point events such as received signals appear on their own rows. Workflow-task events belong to the execution row rather than producing separate rows. Order sibling lifecycle rows chronologically by their initiating event, never by lifecycle type; a child box immediately follows its initiating row.
+- Plot every meaningful event in a lifecycle on its shared row, including intermediate event marks; do not reduce a lifecycle to just start and end markers. Inherit the legacy timeline's event-specific icon/color/status treatment (including started, completed, failed, and pending states), rather than giving every mark in a lifecycle one category-only icon/color. Hover feedback should highlight only the mark, not the full row. Allow event icons to overlap at the current zoom level rather than bundling them; retain all underlying events in lifecycle details. Keep centered intermediate icons within the rendered mark bounds. For marks shorter than an icon, extend only the painted mark enough to contain its time-anchored endpoint icons. Keep lifecycle labels vertically centered on the same row as their marks, in a node-free span inside the mark when one fits or outside according to available space, with subtly translucent, lightly rounded backgrounds.
+
 ### Flattened row model
 
 The logical execution graph should be flattened into a list of visible rows for layout and virtualization. Rows should use stable, execution-qualified identities.
 
 Expected row types include:
 
-- Workflow summary/header
-- Execution/run summary
+- Execution/run grouping and label (no separate workflow header)
 - Event lifecycle group
 - Loading state
 - Error state
@@ -224,28 +246,19 @@ Rows should remain fixed-height where possible. Workflow and execution container
 
 ### Decoration layers
 
-Render structural visuals separately from event rows, including:
-
-- Workflow boundaries
-- Execution/run boundaries
-- Parent-child connectors
-- Continue-as-new connectors
-- Group backgrounds
+Derive structural visuals from the scene separately from event-row marks. The initial redesign needs time-bounded, nested, mostly outline-only execution boxes (including child boxes). Continue-as-new runs are sibling boxes without a connecting line or chain-level outer box; prominent group background fills are not required.
 
 Decoration geometry should be derived from subtree row ranges and execution time intervals. This allows structural containers to remain visible when some descendant rows are virtualized.
 
 ### Event details
 
-Selecting an event or lifecycle group opens an external inspector. Details must not be inserted into the plotting rows or shift timeline content.
+Selecting a lifecycle's mark, line, or embedded label, including an individual event mark, opens the full lifecycle group's details in the edge-attached overlay. Include the individual details of each event in that group inside the same inspector. Details must not be inserted into plotting rows or shift timeline content.
 
-The exact presentation may be:
-
-- A side panel on larger screens
-- A bottom panel or drawer on smaller screens
-
-The timeline renderer should only manage selection. Inspector placement belongs to the surrounding layout.
+Start with a fixed-height bottom-edge overlay on desktop and small screens (not initially resizable). A larger modal-like mobile treatment and the exact height can be refined later. The timeline renderer should only manage selection; inspector placement belongs to the surrounding layout.
 
 ## Filtering
+
+Defer event filtering until the visual scene and core interactions are working. The requirements below describe the eventual behavior, not the first scene-redesign milestone.
 
 Filters apply only to already loaded event rows. Filtering must not trigger additional execution-history fetches.
 
@@ -261,9 +274,9 @@ Filtering should not suppress a matching descendant merely because its parent wo
 
 ## Sorting
 
-Ascending or descending sorting applies to sibling rows within each workflow group.
+Display sibling lifecycle rows oldest first by their initiating event; no reverse-order control is required for the scene redesign.
 
-Sorting must preserve:
+Ordering must preserve:
 
 - Workflow hierarchy
 - Parent-child relationships
@@ -311,7 +324,7 @@ Default-expanded children should not cause an unbounded fetch storm. Loading mus
 
 A child history failure must not fail the parent timeline.
 
-Keep the child's structural group visible and render a compact error row with a retry action. An error must remain distinguishable from a successfully loaded execution with no matching events.
+Keep the child's box visible and render a compact error row with a retry action inside it (confirmed for the scene redesign). An error must remain distinguishable from a successfully loaded execution with no matching events.
 
 ## Virtualization and Performance
 
@@ -343,25 +356,20 @@ During active pan or zoom:
 - Coalesce updates with `requestAnimationFrame`.
 - Avoid rebuilding the execution graph.
 - Avoid refetching data for every pointer movement.
-- Prefer transform or projection updates over DOM reconstruction.
+- Prefer transform or projection updates over DOM reconstruction, but do not use lagging JavaScript-driven scroll updates to position sticky labels.
 - Perform heavier culling and preloading work after or near the end of movement when possible.
 
 ## Identity and Selection
 
 All identities exposed to layout, selection, caching, accessibility, and rendering must be execution-qualified because event IDs restart for each workflow run.
 
-Selection should distinguish at least:
-
-- Workflow
-- Execution/run
-- Event lifecycle group
-- Individual event
+Selection for the initial scene should identify an execution or lifecycle group. An individual event mark selects its containing lifecycle group; individual event details are accessible within that group's inspector. Workflow-level or individual-event selection can be revisited later if needed.
 
 Selection state belongs outside pooled row positions and must remain stable while rows are recycled or temporarily virtualized out of the DOM.
 
 ## Accessibility and Keyboard Navigation
 
-Use a tree navigation model for the logical workflow hierarchy.
+Defer custom tree keyboard navigation until the redesigned scene's visual layout is settled. Keep native keyboard access to interactive controls and the details overlay in the meantime. The eventual tree model should support:
 
 - Up/down navigate visible rows.
 - Left collapses a group or moves to its parent.
@@ -406,7 +414,7 @@ Do not implement inline children by recursively nesting independent timeline com
 
 ## Suggested Implementation Order
 
-All phases below are implemented in `src/lib/workflow-timeline/`; they do not incrementally modify the legacy timeline.
+This original architectural roadmap is retained for background. The confirmed scene-redesign requirements above supersede its visual details and implementation order; new work remains isolated in `src/lib/workflow-timeline/` rather than modifying the legacy timeline.
 
 1. Add the disabled-by-default `?new_timeline=true` route opt-in and an empty new timeline entry point while preserving the legacy path.
 2. Build a single-execution vertical slice with a linear pannable and zoomable time viewport.
@@ -419,13 +427,18 @@ All phases below are implemented in `src/lib/workflow-timeline/`; they do not in
 9. Establish behavior and performance parity criteria before considering legacy removal or shared extraction.
 10. Profile real large histories before introducing more complex horizontal indexing.
 
-## Deferred Design Details
+## Scene Redesign: Open Choices and Follow-ups
 
-The following can be finalized during implementation without changing the core architecture:
+The visual and interaction requirements above are confirmed unless explicitly marked tentative. The following still need tuning or visual review:
 
-- Exact inspector placement and resizing behavior
-- Exact zoom limits and pointer/trackpad gestures
-- Minimap sparkline or density rendering style
-- Visual styling for workflow, execution, and relationship boundaries
-- Whether workflows with extremely large direct child counts override default expansion
-- Initial URL encoding for viewport or expansion state
+- Heuristic for the initial window duration of a running workflow, plus zoom limits and the live-edge snap/unpin thresholds.
+- Precise geometry of time-bounded boxes with embedded sticky labels, including how a child box can extend beyond its parent's right edge without creating layout problems. Labels must never visibly lag behind native scrolling.
+- Whether to keep labels visible when their entire lifecycle mark is outside the viewport; start with visible edge-pinned labels and review in the actual scene.
+- Collapsed child presentation; start with a compact single row and review in the actual scene.
+- Minimap styling: show event density, then test whether execution and child spans improve orientation or add clutter.
+- Exact bottom-overlay height; review whether mobile eventually needs a larger modal-like details view.
+- Exact visuals for an ongoing execution; start with the legacy-style animated dashed continuation.
+- Whether unusually large direct child counts need a different default expansion policy once the persistent expand-by-default preference exists.
+- Initial URL encoding for viewport or expansion state, if added later.
+
+For the initial redesign, prioritize a graph-like scene with legible in-mark labels, time-bounded nested outline boxes, legacy-style per-event marks, a fixed minimap, native scrolling without label catch-up, and stable live/closed viewport behavior. Defer filters, custom tree keyboard navigation, and full control styling until the scene itself is convincing.

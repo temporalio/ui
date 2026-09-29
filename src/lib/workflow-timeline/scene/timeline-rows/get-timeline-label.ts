@@ -2,15 +2,28 @@ import { formatDurationAbbreviated } from '$lib/utilities/format-time';
 import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
 import type { QualifiedHistoryEvent } from '../../data/history-events/types';
+import type { LifecycleGroup } from '../../data/lifecycle-groups/types';
 
-/** Names a lifecycle from its initiating event, matching the legacy timeline's group labels. */
-export function getTimelineEventLabel(event: QualifiedHistoryEvent): string {
+/** Names a lifecycle from its kind and initiating event. */
+export function getTimelineLabel({
+  lifecycleGroup,
+  event,
+}: {
+  lifecycleGroup: LifecycleGroup;
+  event: QualifiedHistoryEvent;
+}): string {
+  if (lifecycleGroup.kind === 'workflow') {
+    return 'Workflow Execution';
+  }
+
   switch (event.eventType) {
-    case 'ActivityTaskScheduled':
+    case 'ActivityTaskScheduled': {
       return (
         event.activityTaskScheduledEventAttributes?.activityType?.name ||
         'Activity'
       );
+    }
+
     case 'TimerStarted': {
       const attributes = event.timerStartedEventAttributes;
       const duration = attributes?.startToFireTimeout
@@ -22,30 +35,41 @@ export function getTimelineEventLabel(event: QualifiedHistoryEvent): string {
           .join(' ') || 'Timer'
       );
     }
-    case 'SignalExternalWorkflowExecutionInitiated':
+
+    case 'SignalExternalWorkflowExecutionInitiated': {
       return (
         event.signalExternalWorkflowExecutionInitiatedEventAttributes
           ?.signalName || 'Signal'
       );
-    case 'WorkflowExecutionSignaled':
+    }
+
+    case 'WorkflowExecutionSignaled': {
       return (
         event.workflowExecutionSignaledEventAttributes?.signalName ||
         'Signal received'
       );
-    case 'MarkerRecorded':
+    }
+
+    case 'MarkerRecorded': {
       return isLocalActivityMarkerEvent(event)
         ? 'Local Activity'
         : event.markerRecordedEventAttributes?.markerName || 'Marker';
-    case 'StartChildWorkflowExecutionInitiated':
+    }
+
+    case 'StartChildWorkflowExecutionInitiated': {
       return (
         event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType
           ?.name || 'Child Workflow'
       );
-    case 'WorkflowExecutionUpdateAccepted':
+    }
+
+    case 'WorkflowExecutionUpdateAccepted': {
       return (
         event.workflowExecutionUpdateAcceptedEventAttributes?.acceptedRequest
           ?.input?.name || 'Workflow Update'
       );
+    }
+
     case 'NexusOperationScheduled': {
       const attributes = event.nexusOperationScheduledEventAttributes;
       return (
@@ -54,7 +78,9 @@ export function getTimelineEventLabel(event: QualifiedHistoryEvent): string {
           .join('.') || 'Nexus Operation'
       );
     }
-    default:
+
+    default: {
       return event.eventType.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
   }
 }

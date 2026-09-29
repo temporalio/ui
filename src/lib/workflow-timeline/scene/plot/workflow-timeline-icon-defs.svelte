@@ -11,7 +11,7 @@
   } from '$lib/io/icon';
 </script>
 
-<svg class="icon-defs" aria-hidden="true">
+<svg class="sr-only" aria-hidden="true">
   <defs>
     <symbol id="wt-icon-workflow" viewBox="0 0 16 16">
       <IconTemporalWorkflow width="100%" height="100%" />
@@ -39,12 +39,3 @@
     </symbol>
   </defs>
 </svg>
-
-<style>
-  .icon-defs {
-    position: absolute;
-    width: 0;
-    height: 0;
-    overflow: hidden;
-  }
-</style>

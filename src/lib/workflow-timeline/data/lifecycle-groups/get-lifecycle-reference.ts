@@ -1,6 +1,12 @@
 import type { LifecycleReference } from './types';
 import type { QualifiedHistoryEvent } from '../history-events/types';
 
+// Each execution starts with history event 1, including when pages arrive out of order.
+const WORKFLOW_REFERENCE: LifecycleReference = {
+  kind: 'workflow',
+  headEventId: '1',
+};
+
 /** Having an eventType of never help ensure the switch in getLifecycleReference is exhaustive  */
 function getFallbackLifecycleReference(
   _eventType: never,
@@ -107,53 +113,6 @@ export function getLifecycleReference(
         kind: 'timer',
         headEventId: String(
           event.timerCanceledEventAttributes?.startedEventId ?? event.eventId,
-        ),
-      };
-    }
-
-    case 'WorkflowTaskScheduled': {
-      return {
-        kind: 'workflow-task',
-        headEventId: event.eventId,
-      };
-    }
-
-    case 'WorkflowTaskStarted': {
-      return {
-        kind: 'workflow-task',
-        headEventId: String(
-          event.workflowTaskStartedEventAttributes?.scheduledEventId ??
-            event.eventId,
-        ),
-      };
-    }
-
-    case 'WorkflowTaskCompleted': {
-      return {
-        kind: 'workflow-task',
-        headEventId: String(
-          event.workflowTaskCompletedEventAttributes?.scheduledEventId ??
-            event.eventId,
-        ),
-      };
-    }
-
-    case 'WorkflowTaskFailed': {
-      return {
-        kind: 'workflow-task',
-        headEventId: String(
-          event.workflowTaskFailedEventAttributes?.scheduledEventId ??
-            event.eventId,
-        ),
-      };
-    }
-
-    case 'WorkflowTaskTimedOut': {
-      return {
-        kind: 'workflow-task',
-        headEventId: String(
-          event.workflowTaskTimedOutEventAttributes?.scheduledEventId ??
-            event.eventId,
         ),
       };
     }
@@ -366,8 +325,6 @@ export function getLifecycleReference(
       };
     }
 
-    case 'WorkflowExecutionSignaled':
-    case 'MarkerRecorded':
     case 'WorkflowExecutionCanceled':
     case 'WorkflowExecutionCancelRequested':
     case 'WorkflowExecutionCompleted':
@@ -377,14 +334,24 @@ export function getLifecycleReference(
     case 'WorkflowExecutionTerminated':
     case 'WorkflowExecutionTimedOut':
     case 'WorkflowExecutionOptionsUpdated':
+    case 'WorkflowTaskScheduled':
+    case 'WorkflowTaskStarted':
+    case 'WorkflowTaskCompleted':
+    case 'WorkflowTaskFailed':
+    case 'WorkflowTaskTimedOut':
+    case 'WorkflowPropertiesModified': {
+      return WORKFLOW_REFERENCE;
+    }
+
+    case 'WorkflowExecutionSignaled':
+    case 'MarkerRecorded':
     case 'ExternalWorkflowExecutionCancelRequested':
     case 'RequestCancelExternalWorkflowExecutionFailed':
     case 'RequestCancelExternalWorkflowExecutionInitiated':
     case 'UpsertWorkflowSearchAttributes':
     case 'WorkflowExecutionUpdateAdmitted':
     case 'WorkflowExecutionUpdateRejected':
-    case 'WorkflowExecutionUpdateRequested':
-    case 'WorkflowPropertiesModified': {
+    case 'WorkflowExecutionUpdateRequested': {
       return {
         kind: 'event',
         headEventId: event.eventId,
