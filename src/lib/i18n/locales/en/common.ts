@@ -57,6 +57,8 @@ export const Strings = {
   before: 'Before',
   between: 'Between',
   'in-last': 'In Last',
+  in: 'In',
+  'not-in': 'Not In',
   'starts-with': 'Starts with',
   equals: 'Equals',
   'greater-than': 'Greater Than',
