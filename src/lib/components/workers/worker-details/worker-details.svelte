@@ -313,7 +313,7 @@
         </dt>
         <dd>
           <p class="truncate font-mono text-lg text-secondary">
-            <span class="text-2xl font-semibold text-brand">
+            <span class="text-2xl text-primary">
               {#if noSlotsConfigured}
                 -
               {:else}
@@ -345,7 +345,7 @@
         <dt class="mb-1 flex h-6 items-center text-sm text-secondary">
           {translate('workers.tasks-processed')}
         </dt>
-        <dd class="font-mono text-2xl font-semibold text-brand">
+        <dd class="font-mono text-2xl text-primary">
           {slots?.totalProcessedTasks !== undefined
             ? (slots.totalProcessedTasks ?? 0).toLocaleString()
             : '-'}
@@ -359,7 +359,7 @@
             {translate('workers.poller-count')}
           </dt>
           <dd>
-            <p class="font-mono text-2xl font-semibold text-brand">
+            <p class="font-mono text-2xl text-primary">
               {hasCurrentPollers ? (poller.currentPollers ?? 0) : '-'}
             </p>
             <Tooltip
@@ -442,7 +442,7 @@
     <h5 class="mb-2">{translate('workers.resource-utilization')}</h5>
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
-        <span id="cpu-label" class="flex items-center gap-1 font-semibold">
+        <span id="cpu-label" class="flex items-center gap-1">
           <IconMicrochip class="h-3 w-3 text-secondary" />
           {translate('workers.cpu-usage')}
         </span>
@@ -452,7 +452,7 @@
     </div>
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
-        <span id="memory-label" class="flex items-center gap-1 font-semibold">
+        <span id="memory-label" class="flex items-center gap-1">
           <IconTemporalServer class="h-3 w-3 text-secondary" />
           {translate('workers.memory-usage')}
         </span>
@@ -476,7 +476,7 @@
         <dt class="text-sm text-secondary">
           {translate('workers.cache-size')}
         </dt>
-        <dd class="font-mono text-2xl font-semibold text-brand">
+        <dd class="font-mono text-2xl text-primary">
           {currentStickyCacheSize.toLocaleString()}
         </dd>
         <dd class="text-xs text-secondary">
@@ -487,7 +487,7 @@
         <dt class="text-sm font-medium text-secondary">
           {translate('workers.cache-hits')}
         </dt>
-        <dd class="font-mono text-2xl font-semibold text-brand">
+        <dd class="font-mono text-2xl text-primary">
           {cacheHitRate}%
         </dd>
         <dd class="text-xs text-secondary">
