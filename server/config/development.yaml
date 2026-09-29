@@ -15,7 +15,7 @@ defaultNamespace: default
 showTemporalSystemNamespace: false
 feedbackUrl:
 disableNewsFetch: false
-notifyOnNewVersion: true
+notifyOnNewVersion: false
 distribution: server
 navCollapsedByDefault: false
 disableWriteActions: false
