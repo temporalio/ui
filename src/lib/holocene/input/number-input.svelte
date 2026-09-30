@@ -61,7 +61,7 @@
   const errorId = $derived(`${id}-error`);
 </script>
 
-<div class={merge('flex flex-col gap-1', className)}>
+<div class={merge('flex flex-col gap-1.5', className)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center">
     <div

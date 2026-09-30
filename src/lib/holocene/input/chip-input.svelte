@@ -109,7 +109,7 @@
 
 <div
   class={merge(
-    'group flex flex-col gap-1',
+    'group flex flex-col gap-1.5',
     disabled && 'cursor-not-allowed',
     className,
   )}
