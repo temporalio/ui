@@ -3,6 +3,7 @@ export { heartbeatWorkflow } from './examples/activity-heartbeat/workflow.js';
 export { retryWorkflow } from './examples/activity-retry/workflow.js';
 export { timeoutWorkflow } from './examples/activity-timeout/workflow.js';
 export { childWorkflowTest } from './examples/child-workflows/workflow.js';
+export { continueAsNewWorkflow } from './examples/continue-as-new/workflow.js';
 export { hello } from './examples/hello/workflow.js';
 export { highEventCountWorkflow } from './examples/high-event-count/workflow.js';
 export { localActivityWorkflow } from './examples/local-activity/workflow.js';
@@ -16,5 +17,7 @@ export { sequentialNoSummaryActivities } from './examples/sequential-no-summary-
 export { sequentialPlainTextActivities } from './examples/sequential-plain-text-activities/workflow.js';
 export { signalCollector } from './examples/signal-collector/workflow.js';
 export { signalWorkflow } from './examples/signal-handlers/workflow.js';
+export { timelineKitchenSink } from './examples/timeline-kitchen-sink/workflow.js';
+export { timelinePerformanceWorkflow } from './examples/timeline-performance/workflow.js';
 export { scheduleWorkflow } from './examples/timer-driven-repetition/workflow.js';
 export { patchWorkflow } from './examples/workflow-patching/workflow.js';

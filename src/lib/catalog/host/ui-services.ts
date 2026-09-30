@@ -5,7 +5,7 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import {
   routeForStandaloneActivityDetails,
   routeForStandaloneNexusOperationDetails,
-  routeForWorkflow,
+  routeForTimeline,
 } from '$lib/utilities/route-for';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
@@ -185,10 +185,11 @@ const evidenceHref = (
   const executionId = reference.attempt.executionId;
 
   if (reference.kind === 'workflow') {
-    return routeForWorkflow({
+    return routeForTimeline({
       namespace,
       workflow: executionId,
       run: reference.runId,
+      queryParams: { new_timeline: 'true' },
     });
   }
 
