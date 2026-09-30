@@ -17,6 +17,7 @@
     cancelHref?: string;
     validateNamespacesExist?: ValidateNamespacesExist;
     nameLeading?: Snippet;
+    fieldsInert?: boolean;
   };
 
   let {
@@ -29,6 +30,7 @@
     cancelHref = '/nexus',
     validateNamespacesExist,
     nameLeading,
+    fieldsInert = false,
   }: Props = $props();
 </script>
 
@@ -41,6 +43,7 @@
     {isCloud}
     {validateNamespacesExist}
     {nameLeading}
+    {fieldsInert}
     {cancelHref}
     submitButtonText={translate('nexus.create-endpoint')}
     onSubmit={onCreate}
