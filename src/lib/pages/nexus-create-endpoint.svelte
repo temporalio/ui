@@ -18,6 +18,7 @@
     validateNamespacesExist?: ValidateNamespacesExist;
     nameLeading?: Snippet;
     fieldsInert?: boolean;
+    class?: string;
   };
 
   let {
@@ -31,6 +32,7 @@
     validateNamespacesExist,
     nameLeading,
     fieldsInert = false,
+    class: className = '',
   }: Props = $props();
 </script>
 
@@ -44,6 +46,7 @@
     {validateNamespacesExist}
     {nameLeading}
     {fieldsInert}
+    class={className}
     {cancelHref}
     submitButtonText={translate('nexus.create-endpoint')}
     onSubmit={onCreate}
