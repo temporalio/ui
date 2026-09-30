@@ -157,6 +157,14 @@ export interface ComputeScaler {
 
 export interface ComputeConfigScalingGroup {
   taskQueueTypes?: string[];
+  /**
+   * The Namespace region this group runs in, e.g. "aws-us-east-1". Unset means
+   * it runs wherever the Namespace is active, which is every group today.
+   *
+   * Proposed by the HA Serverless PRD and not yet sent by the API. It is
+   * optional and read defensively, so it costs nothing until the field lands.
+   */
+  regionId?: string;
   providerType?: string;
   provider?: ComputeProvider;
   scaler?: ComputeScaler;
