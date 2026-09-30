@@ -345,7 +345,7 @@
         <dt class="mb-1 flex h-6 items-center text-sm text-secondary">
           {translate('workers.tasks-processed')}
         </dt>
-        <dd class="font-mono text-2xl text-primary">
+        <dd class="font-mono text-2xl">
           {slots?.totalProcessedTasks !== undefined
             ? (slots.totalProcessedTasks ?? 0).toLocaleString()
             : '-'}
@@ -359,7 +359,7 @@
             {translate('workers.poller-count')}
           </dt>
           <dd>
-            <p class="font-mono text-2xl text-primary">
+            <p class="font-mono text-2xl">
               {hasCurrentPollers ? (poller.currentPollers ?? 0) : '-'}
             </p>
             <Tooltip
@@ -476,7 +476,7 @@
         <dt class="text-sm text-secondary">
           {translate('workers.cache-size')}
         </dt>
-        <dd class="font-mono text-2xl text-primary">
+        <dd class="font-mono text-2xl">
           {currentStickyCacheSize.toLocaleString()}
         </dd>
         <dd class="text-xs text-secondary">
@@ -487,7 +487,7 @@
         <dt class="text-sm font-medium text-secondary">
           {translate('workers.cache-hits')}
         </dt>
-        <dd class="font-mono text-2xl text-primary">
+        <dd class="font-mono text-2xl">
           {cacheHitRate}%
         </dd>
         <dd class="text-xs text-secondary">
