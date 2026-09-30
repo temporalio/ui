@@ -193,7 +193,11 @@
 
 <section
   class={twMerge(
-    fitContent ? 'inline-flex shrink-0' : fill ? 'h-full w-full' : 'w-full',
+    fitContent
+      ? 'inline-flex min-w-0 max-w-full'
+      : fill
+        ? 'h-full w-full'
+        : 'w-full',
     className,
   )}
 >
@@ -203,7 +207,7 @@
     {title}
     class={twMerge(
       fitContent
-        ? 'block shrink-0 border-0 align-middle'
+        ? 'block min-w-0 max-w-full border-0 align-middle'
         : 'block w-full border-0',
       fitContent && loading && 'invisible !h-0 !w-0',
     )}

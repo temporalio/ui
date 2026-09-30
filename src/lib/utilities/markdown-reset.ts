@@ -88,6 +88,8 @@ body.compact code {
    always compact, so the metrics above still apply. */
 body.inline main {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* main stays a block, so the height still comes from the line box rather than
