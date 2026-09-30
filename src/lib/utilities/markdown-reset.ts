@@ -92,26 +92,38 @@ body.inline main {
   text-overflow: ellipsis;
 }
 
+body.inline main * {
+  display: inline;
+}
+
 /* main stays a block, so the height still comes from the line box rather than
    the text box, which would clip descenders. The metrics are restated for the
    same reason compact restates them: the star selector above beats
    inheritance, so a heading or a list item would render at 12.25px on a line
    of 14px text. */
-body.inline :is(p, h1, h2, h3, h4, h5, h6, ul, ol, li, blockquote, pre) {
-  display: inline;
+body.inline
+  :is(p, h1, h2, h3, h4, h5, h6, ul, ol, li, blockquote, pre, th, td) {
   margin: 0;
   white-space: nowrap;
   font-size: 14px;
   line-height: 20px;
 }
 
+/* A table cell's padding and border would paint outside the line. */
+body.inline :is(th, td) {
+  padding: 0;
+  border: 0;
+}
+
 /* The break between two blocks is the space between their words. A hard break
    leaves the newline in the source beside it, which collapses to that space. */
-body.inline br {
+body.inline :is(br, hr) {
   display: none;
 }
 
-body.inline :is(p, li, blockquote, pre) + :is(p, li, blockquote, pre)::before {
+body.inline
+  :is(p, h1, h2, h3, h4, h5, h6, ul, ol, li, blockquote, pre, hr, table, thead, tbody, tr, th, td)
+  + :is(p, h1, h2, h3, h4, h5, h6, ul, ol, li, blockquote, pre, table, thead, tbody, tr, th, td)::before {
   content: ' ';
 }
 

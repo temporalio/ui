@@ -71,7 +71,8 @@ describe('/render', () => {
 
     expect(html).toContain('class="prose compact inline"');
     expect(html).toContain('body.inline main {');
-    expect(html).toContain('body.inline br {');
+    expect(html).toContain('body.inline main * {');
+    expect(html).toContain('body.inline :is(br, hr) {');
   });
 
   it('only opts into inline on the exact string', async () => {

@@ -415,7 +415,8 @@ func TestSetRenderRoute_StylesheetCarriesInlineRules(t *testing.T) {
 	// Without these a summary written as two paragraphs, or with a hard
 	// break, paints as stacked lines in a row that has height for one.
 	assert.Contains(t, body, "body.inline main {")
-	assert.Contains(t, body, "body.inline br {")
+	assert.Contains(t, body, "body.inline main * {")
+	assert.Contains(t, body, "body.inline :is(br, hr) {")
 }
 
 // Regression: a star selector reset with no strong rule renders bold at normal
