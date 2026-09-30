@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { translate } from '$lib/i18n/translate';
   import NexusForm, {
     type NexusFormData,
@@ -14,6 +16,7 @@
     nameHintText?: string;
     cancelHref?: string;
     validateNamespacesExist?: ValidateNamespacesExist;
+    nameLeading?: Snippet;
   };
 
   let {
@@ -25,6 +28,7 @@
     nameHintText = undefined,
     cancelHref = '/nexus',
     validateNamespacesExist,
+    nameLeading,
   }: Props = $props();
 </script>
 
@@ -36,6 +40,7 @@
     {callerNamespaceList}
     {isCloud}
     {validateNamespacesExist}
+    {nameLeading}
     {cancelHref}
     submitButtonText={translate('nexus.create-endpoint')}
     onSubmit={onCreate}
