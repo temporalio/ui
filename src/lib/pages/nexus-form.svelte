@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
+  import { twMerge as merge } from 'tailwind-merge';
   import { z } from 'zod/v3';
 
   import Message from '$lib/components/form/message.svelte';
@@ -28,6 +29,7 @@
     footer?: Snippet<[{ submitting: boolean }]>;
     nameLeading?: Snippet;
     fieldsInert?: boolean;
+    class?: string;
     validateNamespacesExist?: ValidateNamespacesExist;
   };
 
@@ -45,6 +47,7 @@
     footer,
     nameLeading,
     fieldsInert = false,
+    class: className = '',
     validateNamespacesExist,
   }: Props = $props();
 
@@ -197,7 +200,11 @@
   );
 </script>
 
-<form class="flex w-full flex-col gap-4 xl:w-1/2" use:enhance novalidate>
+<form
+  class={merge('flex w-full flex-col gap-4 xl:w-1/2', className)}
+  use:enhance
+  novalidate
+>
   {#snippet nameInput()}
     <Input
       bind:value={$form.name}
