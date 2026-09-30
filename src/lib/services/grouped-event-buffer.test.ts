@@ -15,6 +15,7 @@ import {
   getEventArray,
   getGroupArray,
   getLazyGroups,
+  getPendingActivityScheduledEvent,
   getWorkflowTaskFailedEvent,
   ingestHistoryEvent,
   isWorkflowTaskGroup,
@@ -1525,5 +1526,94 @@ describe('lazy and materialized group agreement', () => {
 
     const [lazy] = getLazyGroups();
     expect(materializeGroup(lazy)).toBe(materializeGroup(lazy));
+  });
+});
+
+describe('getPendingActivityScheduledEvent', () => {
+  const pending = (overrides: Record<string, unknown> = {}) =>
+    [
+      {
+        activityId: '1',
+        state: 'Started',
+        activityType: 'MyActivity',
+        ...overrides,
+      },
+    ] as Parameters<typeof setPendingMetadata>[0];
+
+  it('returns the head event of a pending activity group', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    setPendingMetadata(pending(), []);
+
+    const scheduled = getPendingActivityScheduledEvent('1');
+    expect(scheduled?.id).toBe('1');
+    expect(scheduled?.eventType).toBe('ActivityTaskScheduled');
+  });
+
+  it('is undefined until the head event is ingested', () => {
+    reset(10);
+    setPendingMetadata(pending(), []);
+    expect(getPendingActivityScheduledEvent('1')).toBeUndefined();
+
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    expect(getPendingActivityScheduledEvent('1')?.id).toBe('1');
+  });
+
+  it('is undefined for an activity the history has resolved', () => {
+    reset(10);
+    const [scheduled, timedOut] = makeActivityTimeoutGroup(1);
+    ingestHistoryEvent(scheduled);
+    setPendingMetadata(pending(), []);
+    expect(getPendingActivityScheduledEvent('1')).toBeDefined();
+
+    ingestHistoryEvent(timedOut);
+    expect(getPendingActivityScheduledEvent('1')).toBeUndefined();
+  });
+
+  it('is undefined once the activity is no longer pending', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    setPendingMetadata(pending(), []);
+    setPendingMetadata([], []);
+
+    expect(getPendingActivityScheduledEvent('1')).toBeUndefined();
+  });
+
+  it('is cleared by reset', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    setPendingMetadata(pending(), []);
+
+    reset(10);
+    expect(getPendingActivityScheduledEvent('1')).toBeUndefined();
+  });
+
+  it('bumps the lazy group version without changing its identity when only the options change', () => {
+    reset(10);
+    ingestHistoryEvent(makeActivityScheduled(1, 'MyActivity'));
+    setPendingMetadata(
+      pending({ activityOptions: { retryPolicy: { maximumAttempts: 3 } } }),
+      [],
+    );
+
+    const [lazyBefore] = getLazyGroups();
+    const versionBefore = lazyBefore.version;
+    const groupBefore = materializeGroup(lazyBefore);
+
+    setPendingMetadata(
+      pending({ activityOptions: { retryPolicy: { maximumAttempts: 10 } } }),
+      [],
+    );
+
+    const [lazyAfter] = getLazyGroups();
+    // The record identity is stable for the life of the run, so consumers that
+    // derive off the lazy group alone must compare version, not reference.
+    expect(lazyAfter).toBe(lazyBefore);
+    expect(lazyAfter.version).toBeGreaterThan(versionBefore);
+    expect(materializeGroup(lazyAfter)).not.toBe(groupBefore);
+    expect(
+      materializeGroup(lazyAfter).pendingActivity?.activityOptions?.retryPolicy
+        ?.maximumAttempts,
+    ).toBe(10);
   });
 });

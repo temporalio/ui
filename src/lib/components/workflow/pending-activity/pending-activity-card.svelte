@@ -12,10 +12,12 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { BadgeCount } from '$lib/io/badge-count';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
+  import { getUpdatedActivityOptions } from '$lib/utilities/activity-options-diff';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -36,6 +38,16 @@
   );
   const isRunning = $derived($workflowRun?.workflow?.isRunning);
   const isPaused = $derived($workflowRun?.workflow?.isPaused);
+
+  const scheduledEvent = $derived(
+    eventBuffer.pendingActivityScheduledEvent(activity.activityId),
+  );
+  const updatedOptions = $derived(
+    getUpdatedActivityOptions(
+      activity.activityOptions,
+      scheduledEvent?.activityTaskScheduledEventAttributes,
+    ),
+  );
 
   let coreUser = coreUserStore();
   let showActivityCommands = $derived(
@@ -138,6 +150,14 @@
             activity.priority.fairnessKey,
           )}
         {/if}
+      {/if}
+      {#if updatedOptions.length}
+        <p class="mt-2 text-sm text-secondary">
+          {translate('activities.updated-activity-options')}
+        </p>
+        {#each updatedOptions as option (option.field)}
+          {@render detail(translate(option.label), option.current || '-')}
+        {/each}
       {/if}
     </div>
     <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
