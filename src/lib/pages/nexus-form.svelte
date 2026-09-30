@@ -26,6 +26,7 @@
     endpoint?: NexusEndpoint;
     nameDisabled?: boolean;
     footer?: Snippet<[{ submitting: boolean }]>;
+    nameLeading?: Snippet;
     validateNamespacesExist?: ValidateNamespacesExist;
   };
 
@@ -41,6 +42,7 @@
     endpoint = undefined,
     nameDisabled = false,
     footer,
+    nameLeading,
     validateNamespacesExist,
   }: Props = $props();
 
@@ -194,19 +196,33 @@
 </script>
 
 <form class="flex w-full flex-col gap-4 xl:w-1/2" use:enhance novalidate>
-  <Input
-    bind:value={$form.name}
-    required
-    disabled={nameDisabled}
-    error={!!$errors.name?.[0]}
-    hintText={$errors.name?.[0] || nameHintText}
-    label={translate('nexus.endpoint-name')}
-    id="name"
-    name="name"
-    maxLength={200}
-    placeholder={translate('nexus.endpoint-name-placeholder')}
-    {...$constraints.name}
-  />
+  {#snippet nameInput()}
+    <Input
+      bind:value={$form.name}
+      required
+      disabled={nameDisabled}
+      error={!!$errors.name?.[0]}
+      hintText={$errors.name?.[0] || nameHintText}
+      label={translate('nexus.endpoint-name')}
+      id="name"
+      name="name"
+      maxLength={200}
+      placeholder={translate('nexus.endpoint-name-placeholder')}
+      {...$constraints.name}
+    />
+  {/snippet}
+  {#if nameLeading}
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div>
+        {@render nameLeading()}
+      </div>
+      <div class="sm:col-span-2">
+        {@render nameInput()}
+      </div>
+    </div>
+  {:else}
+    {@render nameInput()}
+  {/if}
   <div class="flex flex-col gap-0">
     <p class="text-base text-primary">{translate('nexus.target')}</p>
     <p class="text-xs text-secondary">
