@@ -128,7 +128,7 @@
 </script>
 
 <MenuContainer class="w-full" {open}>
-  <div class="flex flex-col gap-1.5">
+  <div class="flex flex-col gap-2">
     <Label {label} hidden={labelHidden} for={id} {required} />
     {#key $labelCtx}
       <MenuButton

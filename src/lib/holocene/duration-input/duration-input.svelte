@@ -180,8 +180,13 @@
   };
 </script>
 
-<div class={twMerge('flex flex-col gap-1.5', className)}>
-  <div class="flex items-center justify-start gap-2">
+<div class={twMerge('flex flex-col gap-2', className)}>
+  <div
+    class={twMerge(
+      'flex items-center justify-start gap-2',
+      !afterLabel && 'contents',
+    )}
+  >
     <Label class="grow-0" {required} {label} hidden={labelHidden} for={id} />
     {@render afterLabel?.()}
   </div>

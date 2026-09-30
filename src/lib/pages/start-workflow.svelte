@@ -279,7 +279,7 @@
         onblur={(e) => onInputChange(e, 'workflowId')}
       />
       <RandomUuidButton
-        class="mt-0 md:mt-[1.625rem]"
+        class="mt-0 md:mt-7"
         bind:value={workflowId}
         onGenerate={syncWorkflowId}
       />
