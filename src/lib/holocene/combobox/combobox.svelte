@@ -749,7 +749,7 @@
 
 <style lang="postcss">
   .hint-text {
-    @apply text-xs text-primary;
+    @apply text-xs text-secondary;
 
     &.error {
       @apply text-danger;
