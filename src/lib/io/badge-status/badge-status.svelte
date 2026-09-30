@@ -63,7 +63,7 @@
     { text: string; colorScheme: BadgeStatusColorScheme }
   > = {
     Running: { text: 'running', colorScheme: 'info' },
-    Paused: { text: 'paused', colorScheme: 'info' },
+    Paused: { text: 'paused', colorScheme: 'warning' },
     Completed: { text: 'complete', colorScheme: 'success' },
     ContinuedAsNew: { text: 'continued as new', colorScheme: 'success' },
     Failed: { text: 'failed', colorScheme: 'danger' },
