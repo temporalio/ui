@@ -20,6 +20,7 @@ export type WorkflowTimeline = Readonly<{
   historyEventRepository: HistoryEventRepository;
   lifecycleGroupRepository: LifecycleGroupRepository;
   timelineRowRepository: TimelineRowRepository;
+  requestExecution: (identity: ExecutionIdentity) => void;
   historyEvents: readonly QualifiedHistoryEvent[];
   lifecycleGroups: readonly LifecycleGroup[];
   timelineRows: readonly TimelineEventRow[];
@@ -65,13 +66,16 @@ function connectRepositories({
   };
 }
 
-function createReactiveTimeline({
-  executionGraphRepository,
-  executionHistoryRepository,
-  historyEventRepository,
-  lifecycleGroupRepository,
-  timelineRowRepository,
-}: TimelineRepositories): WorkflowTimeline {
+function createReactiveTimeline(
+  {
+    executionGraphRepository,
+    executionHistoryRepository,
+    historyEventRepository,
+    lifecycleGroupRepository,
+    timelineRowRepository,
+  }: TimelineRepositories,
+  requestExecution: (identity: ExecutionIdentity) => void,
+): WorkflowTimeline {
   const subscribeToExecutionGraph = createSubscriber((update) =>
     executionGraphRepository.subscribe(update),
   );
@@ -94,6 +98,7 @@ function createReactiveTimeline({
     historyEventRepository,
     lifecycleGroupRepository,
     timelineRowRepository,
+    requestExecution,
     get historyEvents() {
       subscribeToHistoryEvents();
       return historyEventRepository.getSnapshot();
@@ -129,19 +134,26 @@ export function useWorkflowTimeline(
     timelineRowRepository: new TimelineRowRepository(),
   };
 
+  let coordinator: ExecutionGraphCoordinator | null = null;
   $effect(() => connectRepositories(repositories));
 
   $effect(() => {
     const identity = getIdentity();
-    const coordinator = new ExecutionGraphCoordinator(
+    const currentCoordinator = new ExecutionGraphCoordinator(
       repositories.executionGraphRepository,
       repositories.executionHistoryRepository,
       repositories.historyEventRepository,
     );
 
-    coordinator.start(identity);
-    return () => coordinator.dispose();
+    coordinator = currentCoordinator;
+    currentCoordinator.start(identity);
+    return () => {
+      coordinator = null;
+      currentCoordinator.dispose();
+    };
   });
 
-  return createReactiveTimeline(repositories);
+  return createReactiveTimeline(repositories, (identity) =>
+    coordinator?.requestExecution(identity),
+  );
 }

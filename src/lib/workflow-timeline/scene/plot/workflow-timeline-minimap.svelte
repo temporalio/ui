@@ -1,7 +1,12 @@
 <script lang="ts">
+  import { colorScales } from '$lib/theme/io/themes';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+
+  import type { MinimapMarker, MinimapSpan } from './minimap-landmarks';
   import type { TimeRange } from './time-viewport';
   import {
     boundTimeRange as boundRange,
+    centerTimeRange,
     getWheelTimeRange,
   } from './wheel-time-range';
 
@@ -9,6 +14,7 @@
     domain,
     viewport,
     eventTimes,
+    landmarks,
     minDurationMs,
     pinnedLive,
     onselect,
@@ -16,6 +22,10 @@
     domain: TimeRange | null;
     viewport: TimeRange | null;
     eventTimes: readonly number[];
+    landmarks: Readonly<{
+      spans: readonly MinimapSpan[];
+      markers: readonly MinimapMarker[];
+    }>;
     minDurationMs: number;
     pinnedLive: boolean;
     onselect: (range: TimeRange) => void;
@@ -62,6 +72,35 @@
           100
       : 0,
   );
+  const nearlyFull = $derived(
+    !!validDomain &&
+      !!selection &&
+      selection.endMs - selection.startMs >=
+        (validDomain.endMs - validDomain.startMs) * 0.999,
+  );
+  const durationLabel = $derived(
+    validDomain
+      ? formatDistanceAbbreviated({
+          start: new Date(validDomain.startMs),
+          end: new Date(validDomain.endMs),
+        })
+      : '',
+  );
+  const midpointLabel = $derived(
+    validDomain
+      ? formatDistanceAbbreviated({
+          start: new Date(validDomain.startMs),
+          end: new Date((validDomain.startMs + validDomain.endMs) / 2),
+        })
+      : '',
+  );
+  function percent(timeMs: number, bounds: TimeRange): number {
+    return clamp(
+      ((timeMs - bounds.startMs) / (bounds.endMs - bounds.startMs)) * 100,
+      0,
+      100,
+    );
+  }
   const density = $derived.by(() => {
     const bins = Array<number>(BIN_COUNT).fill(0);
     if (!validDomain) return bins;
@@ -181,7 +220,17 @@
 
   function endDrag(event: PointerEvent): void {
     if (event.pointerId !== drag?.pointerId) return;
-    if (event.type === 'pointerup') updateSelection(event.clientX);
+    if (event.type === 'pointerup') {
+      if (
+        drag.mode === 'select' &&
+        Math.abs(event.clientX - drag.startClientX) < 3 &&
+        validDomain &&
+        drag.initial
+      ) {
+        const center = pointerTime(event.clientX, validDomain);
+        onselect(centerTimeRange(center, drag.initial, validDomain));
+      } else updateSelection(event.clientX);
+    }
     drag = null;
     preview = null;
     if (track.hasPointerCapture(event.pointerId))
@@ -232,7 +281,7 @@
 <div
   class="minimap"
   role="slider"
-  aria-label="Workflow timeline viewport. Scroll vertically to zoom or horizontally to pan; drag a window edge to resize, drag inside to pan, or drag outside to select; arrow keys pan."
+  aria-label="Workflow timeline viewport. Click outside the window to center, drag outside to select, drag inside to pan, or drag an edge to resize; scroll vertically to zoom or horizontally to pan; arrow keys pan."
   aria-valuemin={validDomain?.startMs ?? 0}
   aria-valuemax={validDomain && selection
     ? validDomain.endMs - (selection.endMs - selection.startMs)
@@ -244,6 +293,10 @@
   tabindex={validDomain && selection ? 0 : -1}
   onkeydown={onKeydown}
 >
+  <div class="minimap-key" aria-hidden="true">
+    <span>Root</span><span>Children</span><span>Events</span>
+    {#if nearlyFull}<span class="full-range">Entire timeline</span>{/if}
+  </div>
   <div
     class="track"
     role="presentation"
@@ -256,19 +309,55 @@
     onpointercancel={endDrag}
     onlostpointercapture={endDrag}
   >
+    {#if validDomain}
+      <div class="spans" aria-hidden="true">
+        {#each landmarks.spans as span, index (index)}
+          {#if span.endMs >= validDomain.startMs && span.startMs <= validDomain.endMs}
+            <span
+              class="span"
+              class:child={span.kind === 'child'}
+              style:left={`${percent(span.startMs, validDomain)}%`}
+              style:width={`${Math.max(0.3, percent(span.endMs, validDomain) - percent(span.startMs, validDomain))}%`}
+            ></span>
+          {/if}
+        {/each}
+      </div>
+    {/if}
     <div class="activity" aria-hidden="true">
       {#each density as height, index (index)}
         <span class="bar" style:height={`${height}%`}></span>
       {/each}
     </div>
-    {#if selection}
+    {#if validDomain}
+      <div class="landmarks" aria-hidden="true">
+        {#each landmarks.markers as marker, index (index)}
+          {#if marker.timeMs >= validDomain.startMs && marker.timeMs <= validDomain.endMs}
+            <span
+              class="landmark"
+              class:child={marker.kind === 'child'}
+              class:failure={marker.kind === 'failure'}
+              class:completion={marker.kind === 'completion'}
+              style:left={`${percent(marker.timeMs, validDomain)}%`}
+              style:background={marker.kind === 'failure'
+                ? colorScales.red[9]
+                : marker.kind === 'completion'
+                  ? colorScales.green[9]
+                  : undefined}
+              title={marker.kind === 'child'
+                ? 'Child workflow started'
+                : marker.kind === 'failure'
+                  ? 'Workflow did not complete'
+                  : 'Workflow completed'}
+            ></span>
+          {/if}
+        {/each}
+      </div>
+    {/if}
+    {#if selection && !nearlyFull}
       <div class="shade left" style:width={`${leftPercent}%`}></div>
       <div class="shade right" style:width={`${rightPercent}%`}></div>
       <div
         class="window"
-        class:nearly-full={validDomain &&
-          selection.endMs - selection.startMs >=
-            (validDomain.endMs - validDomain.startMs) * 0.95}
         style:left={`${leftPercent}%`}
         style:right={`${rightPercent}%`}
       >
@@ -276,6 +365,9 @@
         <span class="resize-handle end" aria-hidden="true"></span>
       </div>
     {/if}
+  </div>
+  <div class="time-scale" aria-hidden="true">
+    <span>0</span><span>{midpointLabel}</span><span>{durationLabel}</span>
   </div>
 </div>
 
@@ -295,9 +387,51 @@
     outline-offset: -2px;
   }
 
+  .minimap-key,
+  .time-scale {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-content-secondary);
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .minimap-key {
+    padding-bottom: 3px;
+  }
+
+  .minimap-key span:not(.full-range)::before {
+    display: inline-block;
+    width: 8px;
+    height: 3px;
+    margin-right: 4px;
+    background: currentColor;
+    vertical-align: middle;
+    content: '';
+  }
+
+  .minimap-key span:nth-child(2)::before {
+    opacity: 0.5;
+  }
+
+  .minimap-key span:nth-child(3)::before {
+    height: 7px;
+    background: var(--color-action-workflow-workflow);
+  }
+
+  .full-range {
+    margin-left: auto;
+  }
+
+  .time-scale {
+    justify-content: space-between;
+    padding-top: 3px;
+  }
+
   .track {
     position: relative;
-    height: 2.5rem;
+    height: 2.75rem;
     overflow: hidden;
     border-radius: 0.25rem;
     background: var(--color-surface-secondary);
@@ -309,11 +443,35 @@
     cursor: default;
   }
 
-  .activity {
+  .spans,
+  .landmarks {
     position: absolute;
     inset: 0;
+    pointer-events: none;
+  }
+
+  .span {
+    position: absolute;
+    top: 5px;
+    height: 5px;
+    min-width: 2px;
+    border-radius: 2px;
+    background: var(--color-content-primary);
+  }
+
+  .span.child {
+    top: 15px;
+    opacity: 0.5;
+  }
+
+  .activity {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
     align-items: flex-end;
+    height: 18px;
     pointer-events: none;
   }
 
@@ -321,7 +479,26 @@
     flex: 1 1 0;
     min-width: 0;
     background: var(--color-action-workflow-workflow);
-    opacity: 0.8;
+    opacity: 0.65;
+  }
+
+  .landmark {
+    position: absolute;
+    z-index: 1;
+    pointer-events: auto;
+    top: 22px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-content-secondary);
+    transform: translateX(-50%);
+  }
+
+  .landmark.failure {
+    width: 6px;
+    height: 6px;
+    border-radius: 0;
+    transform: translateX(-50%) rotate(45deg);
   }
 
   .shade {
@@ -359,10 +536,6 @@
     cursor: grab;
   }
 
-  .window.nearly-full {
-    cursor: crosshair;
-  }
-
   .resize-handle {
     position: absolute;
     top: 0;
@@ -396,8 +569,12 @@
       padding: 0.375rem;
     }
 
+    .minimap-key {
+      gap: 0.4rem;
+    }
+
     .track {
-      height: 2rem;
+      height: 2.75rem;
     }
   }
 </style>

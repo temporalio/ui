@@ -27,6 +27,7 @@
       {scene}
       historyEvents={timeline.historyEvents}
       executionHistories={timeline.executionHistories}
+      onrequesthistory={timeline.requestExecution}
     />
   {/key}
 </div>

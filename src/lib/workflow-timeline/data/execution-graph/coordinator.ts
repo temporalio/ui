@@ -19,6 +19,7 @@ export class ExecutionGraphCoordinator {
   private _initialLoads = new Map<ExecutionKey, AbortController>();
   private _activeStreams = new Map<ExecutionKey, AbortController>();
   private _terminalExecutions = new Set<ExecutionKey>();
+  private _requestedExecutionKeys = new Set<ExecutionKey>();
   private _isDisposed = false;
   private _executionGraph: ExecutionGraphRepository;
   private _executionHistories: ExecutionHistoryRepository;
@@ -83,6 +84,23 @@ export class ExecutionGraphCoordinator {
     this._loadEligibleExecutions();
   }
 
+  /** Schedules a discovered execution when its row becomes visible. */
+  requestExecution(identity: ExecutionIdentity): void {
+    const key = getExecutionKey(identity);
+    if (
+      this._isDisposed ||
+      !this._rootExecutionKey ||
+      this._requestedExecutionKeys.has(key) ||
+      !this._executionGraph.getExecution(key)
+    ) {
+      return;
+    }
+
+    this._requestedExecutionKeys.add(key);
+    this._eligibleExecutionsCache = null;
+    this._loadEligibleExecutions();
+  }
+
   private _getEligibleExecutions(
     rootExecutionKey: ExecutionKey,
   ): readonly ExecutionNode[] {
@@ -93,7 +111,17 @@ export class ExecutionGraphCoordinator {
       return cache.executions;
     }
 
-    const executions = getEagerExecutions(graph, rootExecutionKey);
+    const eligibleByKey = new Map(
+      getEagerExecutions(graph, rootExecutionKey).map((execution) => [
+        execution.executionKey,
+        execution,
+      ]),
+    );
+    for (const key of this._requestedExecutionKeys) {
+      const execution = graph.executionsByKey.get(key);
+      if (execution) eligibleByKey.set(key, execution);
+    }
+    const executions = [...eligibleByKey.values()];
     this._eligibleExecutionsCache = { graph, rootExecutionKey, executions };
     return executions;
   }

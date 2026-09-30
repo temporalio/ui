@@ -10,6 +10,18 @@ export function boundTimeRange(range: TimeRange, bounds: TimeRange): TimeRange {
   return { startMs, endMs: startMs + duration };
 }
 
+export function centerTimeRange(
+  timeMs: number,
+  selection: TimeRange,
+  domain: TimeRange,
+): TimeRange {
+  const duration = selection.endMs - selection.startMs;
+  return boundTimeRange(
+    { startMs: timeMs - duration / 2, endMs: timeMs + duration / 2 },
+    domain,
+  );
+}
+
 export function getWheelTimeRange({
   deltaX,
   deltaY,

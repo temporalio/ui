@@ -7,6 +7,7 @@ export type PlotExecutionRow = Readonly<{
   kind: 'execution';
   key: string;
   depth: number;
+  continuesAsNew: boolean;
   execution: ExecutionScene;
 }>;
 
@@ -19,42 +20,47 @@ export type PlotEventRow = Readonly<{
   row: TimelineEventRow;
 }>;
 
-/** Space before a bordered group, retained in the flattened layout for virtualization. */
-export type PlotGapRow = Readonly<{
-  kind: 'gap';
+/** Child workflow header, visible even when its runs are collapsed. */
+export type PlotChildRow = Readonly<{
+  kind: 'child';
   key: string;
   depth: number;
+  workflow: WorkflowScene;
 }>;
 
-/** Visible execution, event, or spacer row in plot order. */
+/** Visible workflow, execution, or event row in plot order. */
 export type FlattenedPlotSceneRow =
+  | PlotChildRow
   | PlotExecutionRow
-  | PlotEventRow
-  | PlotGapRow;
+  | PlotEventRow;
 
 /** Projects a workflow scene into visible plot rows without changing the scene. */
 export function flattenPlotScene(
   root: WorkflowScene,
+  isChildCollapsed: (key: string) => boolean,
+  isExecutionCollapsed: (key: string) => boolean,
 ): readonly FlattenedPlotSceneRow[] {
   const flattened: FlattenedPlotSceneRow[] = [];
 
-  function visitExecution(execution: ExecutionScene, depth: number): void {
+  function visitExecution(
+    execution: ExecutionScene,
+    depth: number,
+    continuesAsNew: boolean,
+  ): void {
     const executionKey = execution.execution.executionKey;
-    flattened.push({
-      kind: 'gap',
-      key: `gap:execution:${executionKey}`,
-      depth,
-    });
+
     flattened.push({
       kind: 'execution',
       key: `execution:${executionKey}`,
       depth,
+      continuesAsNew,
       execution,
     });
 
+    if (isExecutionCollapsed(`execution:${executionKey}`)) return;
+
     for (const entry of execution.entries) {
       if (entry.kind === 'row') {
-        if (entry.row.kind === 'workflow') continue;
         flattened.push({
           kind: 'event',
           key: `row:${entry.row.rowKey}`,
@@ -65,15 +71,28 @@ export function flattenPlotScene(
         continue;
       }
 
-      for (const childExecution of entry.workflow.executions) {
-        visitExecution(childExecution, depth + 1);
-      }
+      const key = `child:${entry.initiatedEventKey}`;
+      flattened.push({
+        kind: 'child',
+        key,
+        depth: depth + 1,
+        workflow: entry.workflow,
+      });
+      if (isChildCollapsed(key)) continue;
+
+      entry.workflow.executions.forEach((childExecution, index) => {
+        visitExecution(
+          childExecution,
+          depth + 2,
+          index < entry.workflow.executions.length - 1,
+        );
+      });
     }
   }
 
-  for (const execution of root.executions) {
-    visitExecution(execution, 0);
-  }
+  root.executions.forEach((execution, index) => {
+    visitExecution(execution, 0, index < root.executions.length - 1);
+  });
 
   return flattened;
 }

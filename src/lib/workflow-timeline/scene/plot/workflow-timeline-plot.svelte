@@ -1,44 +1,47 @@
 <script lang="ts">
+  import { SvelteSet } from 'svelte/reactivity';
+
   import { tick, untrack } from 'svelte';
 
   import { colorScales } from '$lib/theme/io/themes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { lifecycleVisuals } from './lifecycle-visuals';
-  import {
-    getMarkBounds,
-    getNodeAnchorX,
-    getNodeBounds,
-    type MarkBounds,
-  } from './mark-geometry';
+  import { getMarkBounds, getNodeAnchorX } from './mark-geometry';
   import { getLineColor, getMarkColors } from './mark-visuals';
+  import { getMinimapLandmarks } from './minimap-landmarks';
   import { getTimeTicks, type TimeRange, timeToX } from './time-viewport';
   import { getWheelTimeRange } from './wheel-time-range';
+  import { getWorkflowStatus } from './workflow-status';
   import type { ExecutionHistoryState } from '../../data/execution-history/types';
   import type { QualifiedHistoryEvent } from '../../data/history-events/types';
+  import type {
+    ExecutionIdentity,
+    ExecutionKey,
+  } from '../../data/identity-keys';
   import { flattenPlotScene } from '../structure/flatten-plot-scene';
   import type { ExecutionScene, WorkflowScene } from '../structure/types';
   import type { TimelineEventRow } from '../timeline-rows/types';
 
   import WorkflowTimelineIconDefs from './workflow-timeline-icon-defs.svelte';
-  import WorkflowTimelineMarkLabel from './workflow-timeline-mark-label.svelte';
   import WorkflowTimelineMinimap from './workflow-timeline-minimap.svelte';
 
   let {
     scene,
     historyEvents,
     executionHistories,
+    onrequesthistory,
   }: {
     scene: WorkflowScene | null;
     historyEvents: readonly QualifiedHistoryEvent[];
     executionHistories: readonly ExecutionHistoryState[];
+    onrequesthistory: (identity: ExecutionIdentity) => void;
   } = $props();
 
   const ROW_HEIGHT = 32;
   const AXIS_HEIGHT = 44;
+  const MIN_PLOT_HEIGHT = 128;
   const ENDPOINT_INSET = 32;
-  const BOX_PADDING = 24;
-  const BOX_BOTTOM_PADDING = 12;
   const OVERSCAN = 20;
   const MAX_WIDTH = 4_000_000;
 
@@ -55,11 +58,30 @@
   let previousPolling = false;
   let lastLiveViewport: TimeRange | null = null;
   let now = $state(Date.now());
-  const rows = $derived(scene ? flattenPlotScene(scene) : []);
+  const expandedChildKeys = new SvelteSet<string>();
+  const collapsedExecutionKeys = new SvelteSet<string>();
+  const isChildCollapsed = (key: string): boolean =>
+    !expandedChildKeys.has(key);
+  const isExecutionCollapsed = (key: string): boolean =>
+    collapsedExecutionKeys.has(key);
+  const rows = $derived(
+    scene
+      ? flattenPlotScene(scene, isChildCollapsed, isExecutionCollapsed)
+      : [],
+  );
+  const plotHeight = $derived(
+    Math.max(MIN_PLOT_HEIGHT, AXIS_HEIGHT + rows.length * ROW_HEIGHT + 20),
+  );
   const eventByKey = $derived(
     new Map(historyEvents.map((event) => [event.eventKey, event])),
   );
   const eventTimes = $derived(historyEvents.map((event) => event.eventTimeMs));
+  const minimapLandmarks = $derived(getMinimapLandmarks(scene, historyEvents));
+  const historyByKey = $derived(
+    new Map(
+      executionHistories.map((history) => [history.executionKey, history]),
+    ),
+  );
   const polling = $derived(
     executionHistories.some(
       (history) =>
@@ -78,7 +100,10 @@
     return { startMs, endMs: Math.max(startMs + 1, polling ? now : endMs) };
   });
   const domainDuration = $derived(domain ? domain.endMs - domain.startMs : 1);
-  const width = $derived(Math.max(1, viewportWidth));
+  const labelWidth = $derived(
+    Math.min(300, Math.max(180, viewportWidth * 0.38)),
+  );
+  const width = $derived(Math.max(1, viewportWidth - labelWidth));
   const defaultDuration = $derived(
     polling
       ? Math.min(
@@ -128,80 +153,6 @@
     );
   }
 
-  const boxes = $derived.by(() => {
-    if (!domain) return [];
-    return rows.flatMap((item, index) => {
-      if (item.kind !== 'execution') return [];
-      const ranges = [executionRange(item.execution)].filter(
-        (range) => range !== null,
-      );
-      if (!ranges.length) return [];
-      const startMs = Math.min(...ranges.map((range) => range.startMs));
-      const endMs = Math.max(...ranges.map((range) => range.endMs));
-      let endIndex = index + 1;
-      while (endIndex < rows.length && rows[endIndex].depth > item.depth)
-        endIndex++;
-      return [
-        {
-          key: item.key,
-          startX: plotX(startMs, domain, contentWidth),
-          endX: plotX(endMs, domain, contentWidth),
-          top: index * ROW_HEIGHT - ROW_HEIGHT / 2,
-          depth: item.depth,
-          height:
-            (endIndex - index) * ROW_HEIGHT +
-            ROW_HEIGHT / 2 -
-            4 +
-            BOX_BOTTOM_PADDING,
-          label: `Run ${item.execution.execution.identity.runId.slice(0, 8)}…`,
-          title: item.execution.execution.identity.runId,
-        },
-      ];
-    });
-  });
-
-  function executionRange(execution: ExecutionScene): TimeRange | null {
-    const ranges = execution.entries
-      .filter((entry) => entry.kind === 'row')
-      .map((entry) => entry.row);
-    if (!ranges.length) return null;
-    const startMs = Math.min(...ranges.map((row) => row.startTimeMs));
-    const endMs = Math.max(...ranges.map((row) => row.endTimeMs));
-    const isRunning = executionHistories.some(
-      (history) =>
-        history.executionKey === execution.execution.executionKey &&
-        (history.stream.status === 'polling' ||
-          history.stream.status === 'retrying'),
-    );
-    return { startMs, endMs: isRunning ? Math.max(endMs, now) : endMs };
-  }
-
-  function getRowNodeBounds(
-    row: TimelineEventRow,
-    mark: MarkBounds,
-    range: TimeRange,
-  ): readonly MarkBounds[] {
-    return row.eventKeys.flatMap((key) => {
-      const event = eventByKey.get(key);
-      if (!event) return [];
-      const alignment =
-        row.startEventId !== row.endEventId &&
-        event.eventId === row.startEventId
-          ? 'start'
-          : row.startEventId !== row.endEventId &&
-              event.eventId === row.endEventId
-            ? 'end'
-            : 'center';
-      return [
-        getNodeBounds(
-          plotX(event.eventTimeMs, range, contentWidth),
-          mark,
-          alignment,
-        ),
-      ];
-    });
-  }
-
   function endingEvent(
     row: TimelineEventRow,
   ): QualifiedHistoryEvent | undefined {
@@ -210,6 +161,28 @@
       if (event?.eventId === row.endEventId) return event;
     }
     return undefined;
+  }
+
+  function workflowRowForExecution(
+    execution: ExecutionScene,
+  ): TimelineEventRow | undefined {
+    const entry = execution.entries.find(
+      (item) => item.kind === 'row' && item.row.kind === 'workflow',
+    );
+    return entry?.kind === 'row' ? entry.row : undefined;
+  }
+
+  function statusForExecution(execution: ExecutionScene) {
+    const workflowRow = workflowRowForExecution(execution);
+    return getWorkflowStatus(
+      workflowRow ? endingEvent(workflowRow)?.eventType : undefined,
+      historyByKey.get(execution.execution.executionKey)?.load.status,
+    );
+  }
+
+  function toggleKey(keys: SvelteSet<string>, key: string): void {
+    if (keys.has(key)) keys.delete(key);
+    else keys.add(key);
   }
 
   function selectRange(range: TimeRange): void {
@@ -247,6 +220,24 @@
     });
     if (range) selectRange(range);
   }
+
+  $effect(() => {
+    for (const item of visibleRows) {
+      const execution =
+        item.kind === 'execution'
+          ? item.execution
+          : item.kind === 'child' && isChildCollapsed(item.key)
+            ? item.workflow.executions.at(-1)
+            : undefined;
+      if (
+        execution &&
+        historyByKey.get(execution.execution.executionKey)?.load.status ===
+          'pending'
+      ) {
+        onrequesthistory(execution.execution.identity);
+      }
+    }
+  });
 
   $effect(() => {
     if (!scroller || !domain) return;
@@ -289,18 +280,89 @@
   });
 </script>
 
+{#snippet timelineMark(
+  row: TimelineEventRow,
+  executionKey: ExecutionKey,
+  range: TimeRange,
+)}
+  {@const visual = lifecycleVisuals[row.kind]}
+  {@const left = plotX(row.startTimeMs, range, contentWidth)}
+  {@const isRunning =
+    row.kind === 'workflow' &&
+    executionHistories.some(
+      (history) =>
+        history.executionKey === executionKey &&
+        (history.stream.status === 'polling' ||
+          history.stream.status === 'retrying'),
+    )}
+  {@const right = plotX(
+    isRunning ? Math.max(row.endTimeMs, now) : row.endTimeMs,
+    range,
+    contentWidth,
+  )}
+  {@const bounds = getMarkBounds(left, right)}
+
+  <div
+    class="mark"
+    style:left={`${labelWidth + bounds.left}px`}
+    style:width={`${bounds.right - bounds.left}px`}
+    style:--line-color={isRunning
+      ? colorScales.blue[9]
+      : getLineColor(endingEvent(row)?.eventType, visual.bgColor)}
+  >
+    {#if right > left || row.kind === 'workflow'}
+      <span class="mark-line" class:running={isRunning}></span>
+    {/if}
+    <button
+      type="button"
+      class="mark-hit"
+      aria-label={`View lifecycle details for ${row.label}`}
+      onclick={() => (selectedRow = row)}
+    ></button>
+
+    {#each row.eventKeys as eventKey (eventKey)}
+      {@const event = eventByKey.get(eventKey)}
+      {#if event}
+        {@const colors = getMarkColors(event.eventType)}
+        {@const isStart =
+          event.eventId === row.startEventId &&
+          event.eventId !== row.endEventId}
+        {@const isEnd =
+          event.eventId === row.endEventId &&
+          event.eventId !== row.startEventId}
+        <span
+          class="node"
+          class:start={isStart}
+          class:end={isEnd}
+          style:left={`${getNodeAnchorX(plotX(event.eventTimeMs, range, contentWidth), bounds, isStart || isEnd) - bounds.left}px`}
+          style:--node-color={colors.fill}
+          style:--node-stroke={colors.stroke}
+          title={event.eventType}
+          ><svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"
+            ><use href={`#wt-icon-${visual.icon}`} /></svg
+          ></span
+        >
+      {/if}
+    {/each}
+  </div>
+{/snippet}
+
 <div class="timeline">
   <WorkflowTimelineIconDefs />
-  <WorkflowTimelineMinimap
-    {domain}
-    {viewport}
-    {eventTimes}
-    minDurationMs={(domainDuration * width) / MAX_WIDTH}
-    pinnedLive={polling && pinned}
-    onselect={selectRange}
-  />
+  <div class="minimap-area" style:margin-left={`${labelWidth}px`}>
+    <WorkflowTimelineMinimap
+      {domain}
+      {viewport}
+      {eventTimes}
+      landmarks={minimapLandmarks}
+      minDurationMs={(domainDuration * width) / MAX_WIDTH}
+      pinnedLive={polling && pinned}
+      onselect={selectRange}
+    />
+  </div>
   <div
     class="scroller"
+    style:max-height={`${plotHeight}px`}
     role="region"
     aria-label="Workflow timeline plot"
     bind:this={scroller}
@@ -327,13 +389,16 @@
       }
     }}
   >
-    <div class="content" style:width={`${contentWidth}px`}>
+    <div class="content" style:width={`${labelWidth + contentWidth}px`}>
       <div class="axis" style:height={`${AXIS_HEIGHT}px`}>
+        <div class="axis-label" style:width={`${labelWidth}px`}>
+          Workflow / event
+        </div>
         {#if domain}
           {#each ticks as time (time)}
             <span
               class="tick"
-              style:left={`${timeToX(time, domain, contentWidth)}px`}
+              style:left={`${labelWidth + timeToX(time, domain, contentWidth)}px`}
             >
               {formatDistanceAbbreviated({
                 start: new Date(domain.startMs),
@@ -346,196 +411,173 @@
           {/each}
         {/if}
       </div>
-      <div
-        class="body"
-        style:height={`${rows.length * ROW_HEIGHT + BOX_BOTTOM_PADDING}px`}
-        style:min-height={`${Math.max(0, viewportHeight - AXIS_HEIGHT)}px`}
-      >
+      <div class="body" style:height={`${rows.length * ROW_HEIGHT}px`}>
         {#if domain}
           {#each ticks as time (time)}
             <div
               class="grid-line"
-              style:left={`${timeToX(time, domain, contentWidth)}px`}
+              style:left={`${labelWidth + timeToX(time, domain, contentWidth)}px`}
             ></div>
           {/each}
-          {#each boxes as box (box.key)}
-            {#if box.top + box.height >= scrollTop - AXIS_HEIGHT - OVERSCAN * ROW_HEIGHT && box.top <= scrollTop + viewportHeight}
-              <div
-                class="group-box"
-                style:left={`${Math.max(0, box.startX - BOX_PADDING)}px`}
-                style:width={`${Math.max(1, Math.min(contentWidth, box.endX + BOX_PADDING) - Math.max(0, box.startX - BOX_PADDING))}px`}
-                style:top={`${box.top}px`}
-                style:height={`${box.height}px`}
-                style:--group-depth={box.depth}
-              >
-                <span class="group-label" title={box.title}>{box.label}</span>
-              </div>
-            {/if}
-          {/each}
+
           {#each visibleRows as item, index (item.key)}
             {@const rowIndex = firstIndex + index}
-            {#if item.kind !== 'gap'}
+            {@const latestExecution =
+              item.kind === 'child'
+                ? item.workflow.executions.at(-1)
+                : undefined}
+            {@const isCollapsed =
+              item.kind === 'child'
+                ? isChildCollapsed(item.key)
+                : item.kind === 'execution' && isExecutionCollapsed(item.key)}
+            <div
+              class="row"
+              class:child={item.kind === 'child'}
+              class:execution={item.kind === 'execution'}
+              style:top={`${rowIndex * ROW_HEIGHT}px`}
+              style:--row-depth={item.depth}
+            >
               <div
-                class="row"
-                style:top={`${rowIndex * ROW_HEIGHT}px`}
-                style:--row-depth={item.depth}
+                class="row-label"
+                class:child={item.kind === 'child'}
+                class:execution={item.kind === 'execution'}
+                class:continued={item.kind === 'execution' &&
+                  item.continuesAsNew}
+                class:collapsed={isCollapsed}
+                style:width={`${item.kind === 'event' || isCollapsed ? labelWidth : viewportWidth}px`}
               >
-                {#if item.kind === 'execution'}
-                  {@const executionKey = item.execution.execution.executionKey}
-                  {@const historyState = executionHistories.find(
-                    (history) => history.executionKey === executionKey,
+                <span
+                  class="hierarchy-rail"
+                  title={`Level ${item.depth}`}
+                  aria-hidden="true"
+                >
+                  {#each [1, 2, 3, 4] as level (level)}
+                    <span
+                      class:visible={item.depth >= level}
+                      class:active={item.depth === level}
+                      class:continues={(rows[rowIndex + 1]?.depth ?? 0) >=
+                        level}
+                      style:--level={level}
+                    ></span>
+                  {/each}
+                </span>
+                {#if item.kind === 'child'}
+                  {@const workflowId =
+                    item.workflow.executions[0]?.execution.identity
+                      .workflowId ?? 'Child workflow'}
+                  <button
+                    type="button"
+                    class="toggle"
+                    aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} child workflow ${workflowId}`}
+                    aria-expanded={!isCollapsed}
+                    onclick={() => toggleKey(expandedChildKeys, item.key)}
+                    >{isCollapsed ? '▸' : '▾'}</button
+                  >
+                  {#if latestExecution}
+                    {@const status = statusForExecution(latestExecution)}
+                    <span
+                      class="status-dot"
+                      style:--status-color={status.color}
+                      title={status.label}
+                      aria-label={status.label}
+                    ></span>
+                  {/if}
+                  <span class="header-type child-type"
+                    ><svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 16 16"
+                      aria-hidden="true"><use href="#wt-icon-workflow" /></svg
+                    >Child</span
+                  >
+                  <span class="header-id"
+                    ><span class="row-text" title={workflowId}
+                      >{workflowId}</span
+                    ></span
+                  >
+                {:else if item.kind === 'execution'}
+                  {@const runId = item.execution.execution.identity.runId}
+                  {@const historyState = historyByKey.get(
+                    item.execution.execution.executionKey,
                   )}
-                  {@const isRunning = executionHistories.some(
-                    (history) =>
-                      history.executionKey === executionKey &&
-                      (history.stream.status === 'polling' ||
-                        history.stream.status === 'retrying'),
-                  )}
-                  {@const executionRow = item.execution.entries.find(
-                    (entry) =>
-                      entry.kind === 'row' && entry.row.kind === 'workflow',
-                  )}
-                  {#if executionRow?.kind === 'row'}
-                    {@const left = plotX(
-                      executionRow.row.startTimeMs,
-                      domain,
-                      contentWidth,
-                    )}
-                    {@const right = plotX(
-                      isRunning
-                        ? Math.max(executionRow.row.endTimeMs, now)
-                        : executionRow.row.endTimeMs,
-                      domain,
-                      contentWidth,
-                    )}
-                    {@const bounds = getMarkBounds(left, right)}
-                    <div
-                      class="mark"
-                      style:left={`${bounds.left}px`}
-                      style:width={`${bounds.right - bounds.left}px`}
-                      style:--line-color={isRunning
-                        ? colorScales.blue[9]
-                        : getLineColor(
-                            endingEvent(executionRow.row)?.eventType,
-                            lifecycleVisuals.workflow.bgColor,
-                          )}
+                  <button
+                    type="button"
+                    class="toggle"
+                    aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} run ${runId}`}
+                    aria-expanded={!isCollapsed}
+                    onclick={() => toggleKey(collapsedExecutionKeys, item.key)}
+                    >{isCollapsed ? '▸' : '▾'}</button
+                  >
+                  {@const status = statusForExecution(item.execution)}
+                  <span
+                    class="status-dot"
+                    style:--status-color={status.color}
+                    title={status.label}
+                    aria-label={status.label}
+                  ></span>
+                  {#if item.continuesAsNew}
+                    <span class="continuation-label" title="Continues as new"
+                      >Continued</span
                     >
-                      <span class="mark-line" class:running={isRunning}></span>
-                      <button
-                        type="button"
-                        class="mark-hit"
-                        aria-label={`View lifecycle details for run ${item.execution.execution.identity.runId}`}
-                        onclick={() => (selectedRow = executionRow.row)}
-                      ></button>
-
-                      {#each executionRow.row.eventKeys as eventKey (eventKey)}
-                        {@const event = eventByKey.get(eventKey)}
-                        {#if event}
-                          {@const colors = getMarkColors(event.eventType)}
-                          {@const isStart =
-                            event.eventId === executionRow.row.startEventId &&
-                            event.eventId !== executionRow.row.endEventId}
-                          {@const isEnd =
-                            event.eventId === executionRow.row.endEventId &&
-                            event.eventId !== executionRow.row.startEventId}
-                          <span
-                            class="node"
-                            class:start={isStart}
-                            class:end={isEnd}
-                            style:left={`${getNodeAnchorX(plotX(event.eventTimeMs, domain, contentWidth), bounds, isStart || isEnd) - bounds.left}px`}
-                            style:--node-color={colors.fill}
-                            style:--node-stroke={colors.stroke}
-                            title={event.eventType}
-                            ><svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 16 16"
-                              aria-hidden="true"
-                              ><use href="#wt-icon-workflow" /></svg
-                            ></span
-                          >
-                        {/if}
-                      {/each}
-                    </div>
-                  {:else}
-                    <span class="placeholder" title={executionKey}>
-                      Run {item.execution.execution.identity.runId.slice(0, 8)}…
-                      {#if historyState?.load.status === 'failed'}
-                        · History unavailable
-                      {:else if historyState?.load.status !== 'loaded'}
-                        · Loading history…{/if}
-                    </span>
+                  {/if}
+                  <span class="header-type"
+                    ><svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 16 16"
+                      aria-hidden="true"
+                      ><use href="#wt-icon-relationship" /></svg
+                    >Run</span
+                  >
+                  <span class="header-id"
+                    ><span class="row-text" title={runId}>{runId}</span></span
+                  >
+                  {#if historyState?.load.status === 'failed'}
+                    <span
+                      class="history-status failed"
+                      title="History unavailable"
+                      aria-label="History unavailable">!</span
+                    >
+                  {:else if historyState?.load.status === 'loading' || historyState?.load.status === 'pending'}
+                    <span
+                      class="history-status"
+                      title="Loading history"
+                      aria-label="Loading history">…</span
+                    >
                   {/if}
                 {:else}
-                  {@const visual = lifecycleVisuals[item.row.kind]}
-                  {@const left = plotX(
-                    item.row.startTimeMs,
-                    domain,
-                    contentWidth,
-                  )}
-                  {@const right = plotX(
-                    item.row.endTimeMs,
-                    domain,
-                    contentWidth,
-                  )}
-                  {@const bounds = getMarkBounds(left, right)}
-                  {@const nodes = getRowNodeBounds(item.row, bounds, domain)}
-                  <div
-                    class="mark"
-                    style:left={`${bounds.left}px`}
-                    style:width={`${bounds.right - bounds.left}px`}
-                    style:--line-color={getLineColor(
-                      endingEvent(item.row)?.eventType,
-                      visual.bgColor,
-                    )}
+                  <span class="toggle-spacer"></span>
+                  <button
+                    type="button"
+                    class="event-label row-text"
+                    title={item.row.label}
+                    onclick={() => (selectedRow = item.row)}
+                    >{item.row.label}</button
                   >
-                    {#if right > left}<span class="mark-line"></span>{/if}
-                    <button
-                      type="button"
-                      class="mark-hit"
-                      aria-label={`View lifecycle details for ${item.row.label}`}
-                      onclick={() => (selectedRow = item.row)}
-                    ></button>
-
-                    {#each item.row.eventKeys as eventKey (eventKey)}
-                      {@const event = eventByKey.get(eventKey)}
-                      {#if event}
-                        {@const colors = getMarkColors(event.eventType)}
-                        {@const isStart =
-                          event.eventId === item.row.startEventId &&
-                          event.eventId !== item.row.endEventId}
-                        {@const isEnd =
-                          event.eventId === item.row.endEventId &&
-                          event.eventId !== item.row.startEventId}
-                        <span
-                          class="node"
-                          class:start={isStart}
-                          class:end={isEnd}
-                          style:left={`${getNodeAnchorX(plotX(event.eventTimeMs, domain, contentWidth), bounds, isStart || isEnd) - bounds.left}px`}
-                          style:--node-color={colors.fill}
-                          style:--node-stroke={colors.stroke}
-                          title={event.eventType}
-                          ><svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 16 16"
-                            aria-hidden="true"
-                            ><use href={`#wt-icon-${visual.icon}`} /></svg
-                          ></span
-                        >
-                      {/if}
-                    {/each}
-                  </div>
-                  <WorkflowTimelineMarkLabel
-                    label={item.row.label}
-                    mark={bounds}
-                    {nodes}
-                    {scrollLeft}
-                    viewportWidth={width}
-                  />
                 {/if}
               </div>
-            {/if}
+              {#if item.kind === 'event'}
+                {@render timelineMark(item.row, item.executionKey, domain)}
+              {:else if item.kind === 'execution' && isCollapsed}
+                {@const workflowRow = workflowRowForExecution(item.execution)}
+                {#if workflowRow}
+                  {@render timelineMark(
+                    workflowRow,
+                    item.execution.execution.executionKey,
+                    domain,
+                  )}
+                {/if}
+              {:else if item.kind === 'child' && isCollapsed && latestExecution}
+                {@const workflowRow = workflowRowForExecution(latestExecution)}
+                {#if workflowRow}
+                  {@render timelineMark(
+                    workflowRow,
+                    latestExecution.execution.executionKey,
+                    domain,
+                  )}
+                {/if}
+              {/if}
+            </div>
           {/each}
         {/if}
       </div>
@@ -587,10 +629,14 @@
     --page-gutter: 1rem;
   }
 
+  .minimap-area {
+    min-width: 0;
+  }
+
   .scroller {
     box-sizing: border-box;
     flex: 1;
-    min-height: 12rem;
+    min-height: 8rem;
     min-width: 0;
     overflow: auto;
     border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
@@ -611,6 +657,21 @@
     z-index: 5;
     background: var(--color-surface-primary);
     border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  }
+
+  .axis-label {
+    position: sticky;
+    left: 0;
+    z-index: 6;
+    display: flex;
+    align-items: end;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 0 12px 8px;
+    border-right: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    background: var(--color-surface-primary);
+    font-size: 12px;
+    font-weight: 600;
   }
 
   .tick {
@@ -637,44 +698,221 @@
     pointer-events: none;
   }
 
-  .group-box {
+  .row {
     position: absolute;
     box-sizing: border-box;
-    border: 1px solid var(--group-border-color);
-    border-radius: 4px;
-    background: color-mix(in srgb, currentColor 6%, transparent);
-    pointer-events: none;
-    --group-border-color: color-mix(
-      in srgb,
-      currentColor 60%,
-      var(--color-surface-primary)
-    );
+    width: 100%;
+    height: 32px;
   }
 
-  .group-label {
-    position: sticky;
-    top: calc(52px + var(--group-depth) * 24px);
-    left: 8px;
+  .row.child,
+  .row.execution {
+    border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  }
+
+  .row:hover,
+  .row:focus-within {
     z-index: 4;
-    display: inline-block;
-    max-width: calc(100% - 16px);
-    margin: -11px 0 0 12px;
-    padding: 2px 8px;
-    border-radius: 3px;
-    background: var(--group-border-color);
-    color: var(--color-content-primary);
+  }
+
+  .row-label {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: 100%;
+    padding-left: calc(20px + min(var(--row-depth), 4) * 14px);
+    padding-right: 8px;
+    border-right: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+    background: var(--color-surface-primary);
+    box-shadow: inset 2px 0 color-mix(in srgb, currentColor 35%, transparent);
     font-size: 12px;
-    line-height: 16px;
+  }
+
+  .row-label.child {
+    border-right: 0;
+    border-bottom: 0;
+    background: color-mix(
+      in srgb,
+      currentColor 3%,
+      var(--color-surface-primary)
+    );
+    font-weight: 600;
+  }
+
+  .row-label.child.collapsed,
+  .row-label.execution.collapsed {
+    border-right: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  }
+
+  .row-label.execution {
+    border-right: 0;
+    border-bottom: 0;
+    background: color-mix(
+      in srgb,
+      currentColor 3%,
+      var(--color-surface-primary)
+    );
+    font-weight: 600;
+  }
+
+  .hierarchy-rail {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .hierarchy-rail span {
+    position: absolute;
+    top: 0;
+    left: calc(var(--level) * 14px);
+    width: 1px;
+    height: 50%;
+    background: currentColor;
+    opacity: 0;
+  }
+
+  .hierarchy-rail span.continues {
+    height: 100%;
+  }
+
+  .hierarchy-rail span.visible {
+    opacity: 0.4;
+  }
+
+  .hierarchy-rail span.active::after {
+    position: absolute;
+    top: 16px;
+    left: 0;
+    width: 10px;
+    border-top: 1px solid currentColor;
+    content: '';
+  }
+
+  .toggle,
+  .toggle-spacer {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin-right: 4px;
+  }
+
+  .toggle {
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .toggle:hover,
+  .toggle:focus-visible {
+    background: color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  .row-text {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    vertical-align: top;
   }
 
-  .row {
+  .header-type {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 3px;
+    margin-right: 6px;
+    color: var(--color-content-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .header-type.child-type {
+    color: var(--color-content-primary);
+  }
+
+  .header-id {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-id .row-text {
+    display: block;
+  }
+
+  .status-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: var(--status-color);
+  }
+
+  .continuation-label {
+    flex: none;
+    margin-right: 4px;
+    color: var(--color-content-secondary);
+    font-size: 11px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .history-status {
+    flex: none;
+    margin-left: auto;
+    padding-left: 4px;
+    color: var(--color-content-secondary);
+  }
+
+  .history-status.failed {
+    color: var(--color-content-primary);
+    font-weight: 700;
+  }
+
+  .row-label:hover .event-label,
+  .row-label:focus-within .event-label,
+  .row-label:hover .header-id .row-text,
+  .row-label:focus-within .header-id .row-text {
     position: absolute;
-    width: 100%;
-    height: 32px;
+    left: calc(46px + min(var(--row-depth), 4) * 14px);
+    width: max-content;
+    max-width: min(560px, calc(100vw - 80px));
+    padding: 4px 6px;
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 4px;
+    background: var(--color-surface-primary);
+    box-shadow: 0 2px 8px color-mix(in srgb, black 16%, transparent);
+  }
+
+  .row-label:hover .header-id .row-text,
+  .row-label:focus-within .header-id .row-text {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .event-label {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .event-label:hover {
+    text-decoration: underline;
   }
 
   .mark {
@@ -774,13 +1012,6 @@
     outline: 2px solid var(--color-content-primary);
     outline-offset: 3px;
     border-radius: 999px;
-  }
-
-  .placeholder {
-    position: sticky;
-    left: 8px;
-    top: 8px;
-    white-space: nowrap;
   }
 
   .details {

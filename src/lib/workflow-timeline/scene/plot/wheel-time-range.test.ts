@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getWheelTimeRange } from './wheel-time-range';
+import { centerTimeRange, getWheelTimeRange } from './wheel-time-range';
 
 const domain = { startMs: 0, endMs: 1000 };
 const selection = { startMs: 200, endMs: 400 };
@@ -14,6 +14,26 @@ const options = {
   minDurationMs: 10,
   pinnedLive: false,
 };
+
+describe('centerTimeRange', () => {
+  it('centers the same-duration viewport at the clicked time', () => {
+    expect(centerTimeRange(700, selection, domain)).toEqual({
+      startMs: 600,
+      endMs: 800,
+    });
+  });
+
+  it('clamps the window at both timeline edges', () => {
+    expect(centerTimeRange(0, selection, domain)).toEqual({
+      startMs: 0,
+      endMs: 200,
+    });
+    expect(centerTimeRange(1000, selection, domain)).toEqual({
+      startMs: 800,
+      endMs: 1000,
+    });
+  });
+});
 
 describe('getWheelTimeRange', () => {
   it('zooms around the center on vertical scroll', () => {
