@@ -214,15 +214,15 @@
     />
   {/snippet}
   {#if nameLeading}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_2fr] sm:gap-x-2">
       <div>
         {@render nameLeading()}
       </div>
-      <div
-        class="sm:col-span-2"
-        class:opacity-50={fieldsInert}
-        inert={fieldsInert}
+      <span
+        class="mt-6 hidden h-10 items-center text-2xl text-tertiary sm:flex"
+        aria-hidden="true">/</span
       >
+      <div class:opacity-50={fieldsInert} inert={fieldsInert}>
         {@render nameInput()}
       </div>
     </div>
