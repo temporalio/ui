@@ -8,6 +8,7 @@
   import Message from '$lib/components/form/message.svelte';
   import IsOssGuard from '$lib/components/is-oss-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
@@ -30,6 +31,7 @@
     nameLeading?: Snippet;
     fieldsInert?: boolean;
     class?: string;
+    card?: boolean;
     validateNamespacesExist?: ValidateNamespacesExist;
   };
 
@@ -48,6 +50,7 @@
     nameLeading,
     fieldsInert = false,
     class: className = '',
+    card = false,
     validateNamespacesExist,
   }: Props = $props();
 
@@ -220,99 +223,110 @@
       {...$constraints.name}
     />
   {/snippet}
-  {#if nameLeading}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_2fr] sm:gap-x-2">
-      <div>
-        {@render nameLeading()}
-      </div>
-      <span
-        class="mt-6 hidden h-10 items-center text-2xl text-tertiary sm:flex"
-        aria-hidden="true">/</span
+  {#snippet fields()}
+    {#if nameLeading}
+      <div
+        class="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_2fr] sm:gap-x-2"
       >
-      <div class:opacity-50={fieldsInert} inert={fieldsInert}>
-        {@render nameInput()}
+        <div>
+          {@render nameLeading()}
+        </div>
+        <span
+          class="mt-6 hidden h-10 items-center text-2xl text-tertiary sm:flex"
+          aria-hidden="true">/</span
+        >
+        <div class:opacity-50={fieldsInert} inert={fieldsInert}>
+          {@render nameInput()}
+        </div>
       </div>
-    </div>
-  {:else}
-    {@render nameInput()}
-  {/if}
-  <div
-    class="flex flex-col gap-4"
-    class:opacity-50={fieldsInert}
-    inert={fieldsInert}
-  >
-    <div class="flex flex-col gap-0">
-      <p class="text-base text-primary">{translate('nexus.target')}</p>
-      <p class="text-xs text-secondary">
-        {translate('nexus.target-description')}
-      </p>
-    </div>
-    <Combobox
-      label={translate('nexus.target-namespace')}
-      noResultsText={translate('common.no-results')}
-      valid={!$errors.targetNamespace}
-      error={$errors.targetNamespace?.[0] ||
-        translate('nexus.target-namespace-required')}
-      bind:value={$form.targetNamespace}
-      required
-      id="target-namespace"
-      name="targetNamespace"
-      placeholder={translate('nexus.select-namespace')}
-      LeadingIcon={IconNamespaceSwitcher}
-      options={targetNamespaceList}
-      optionValueKey="namespace"
-      minSize={32}
-    />
-    <Input
-      bind:value={$form.taskQueue}
-      required
-      error={!!$errors.taskQueue?.[0]}
-      hintText={$errors.taskQueue?.[0]}
-      label={translate('common.task-queue')}
-      id="task-queue"
-      name="taskQueue"
-      placeholder={translate('nexus.task-queue-placeholder')}
-      {...$constraints.taskQueue}
-    />
-    <IsOssGuard {isCloud}>
+    {:else}
+      {@render nameInput()}
+    {/if}
+    <div
+      class="flex flex-col gap-4"
+      class:opacity-50={fieldsInert}
+      inert={fieldsInert}
+    >
       <div class="flex flex-col gap-0">
-        <p class="text-base text-primary">
-          {translate('nexus.access-policy')}
-        </p>
+        <p class="text-base text-primary">{translate('nexus.target')}</p>
         <p class="text-xs text-secondary">
-          {translate('nexus.allowed-caller-namespaces-description')}
+          {translate('nexus.target-description')}
         </p>
       </div>
       <Combobox
-        id="caller-namespace-filter-menu"
-        name="allowedCallerNamespaces"
-        multiselect
-        displayChips={false}
-        allowCustomValue
-        required
-        bind:value={$form.allowedCallerNamespaces}
-        options={callerNamespaces}
-        label={translate('nexus.allowed-caller-namespaces')}
-        LeadingIcon={IconSearch}
+        label={translate('nexus.target-namespace')}
         noResultsText={translate('common.no-results')}
-        valid={!$errors.allowedCallerNamespaces}
-        error={$errors.allowedCallerNamespaces?._errors?.[0] ||
-          translate('nexus.caller-namespace-required')}
-        placeholder={translate('nexus.select-namespaces')}
-        optionValueKey="value"
-        optionLabelKey="label"
+        valid={!$errors.targetNamespace}
+        error={$errors.targetNamespace?.[0] ||
+          translate('nexus.target-namespace-required')}
+        bind:value={$form.targetNamespace}
+        required
+        id="target-namespace"
+        name="targetNamespace"
+        placeholder={translate('nexus.select-namespace')}
+        LeadingIcon={IconNamespaceSwitcher}
+        options={targetNamespaceList}
+        optionValueKey="namespace"
+        minSize={32}
       />
-    </IsOssGuard>
-    <div class="flex flex-col gap-2">
-      <p class="text-sm font-medium">
-        {translate('nexus.description-label')}
-      </p>
-      <MarkdownEditor bind:content={$form.descriptionString} />
-      <p class="text-xs text-secondary">
-        {translate('nexus.description-hint')}
-      </p>
+      <Input
+        bind:value={$form.taskQueue}
+        required
+        error={!!$errors.taskQueue?.[0]}
+        hintText={$errors.taskQueue?.[0]}
+        label={translate('common.task-queue')}
+        id="task-queue"
+        name="taskQueue"
+        placeholder={translate('nexus.task-queue-placeholder')}
+        {...$constraints.taskQueue}
+      />
+      <IsOssGuard {isCloud}>
+        <div class="flex flex-col gap-0">
+          <p class="text-base text-primary">
+            {translate('nexus.access-policy')}
+          </p>
+          <p class="text-xs text-secondary">
+            {translate('nexus.allowed-caller-namespaces-description')}
+          </p>
+        </div>
+        <Combobox
+          id="caller-namespace-filter-menu"
+          name="allowedCallerNamespaces"
+          multiselect
+          displayChips={false}
+          allowCustomValue
+          required
+          bind:value={$form.allowedCallerNamespaces}
+          options={callerNamespaces}
+          label={translate('nexus.allowed-caller-namespaces')}
+          LeadingIcon={IconSearch}
+          noResultsText={translate('common.no-results')}
+          valid={!$errors.allowedCallerNamespaces}
+          error={$errors.allowedCallerNamespaces?._errors?.[0] ||
+            translate('nexus.caller-namespace-required')}
+          placeholder={translate('nexus.select-namespaces')}
+          optionValueKey="value"
+          optionLabelKey="label"
+        />
+      </IsOssGuard>
+      <div class="flex flex-col gap-2">
+        <p class="text-sm font-medium">
+          {translate('nexus.description-label')}
+        </p>
+        <MarkdownEditor bind:content={$form.descriptionString} />
+        <p class="text-xs text-secondary">
+          {translate('nexus.description-hint')}
+        </p>
+      </div>
     </div>
-  </div>
+  {/snippet}
+  {#if card}
+    <Card class="flex flex-col gap-4 p-5">
+      {@render fields()}
+    </Card>
+  {:else}
+    {@render fields()}
+  {/if}
   <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
     <Button
       type="submit"
