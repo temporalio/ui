@@ -89,7 +89,7 @@
       size="sm"
       LeadingIcon={IconClose}
       data-testid="search-attribute-close-button"
-      class="mt-6 h-10 w-10 rounded-full sm:hidden"
+      class="mt-7 h-10 w-10 rounded-full sm:hidden"
       onclick={() => onRemove(label)}
     />
   </div>
@@ -147,7 +147,7 @@
     size="sm"
     LeadingIcon={IconClose}
     data-testid="search-attribute-close-button"
-    class="mt-6 h-10 w-10 rounded-full max-sm:hidden"
+    class="mt-7 h-10 w-10 rounded-full max-sm:hidden"
     onclick={() => onRemove(label)}
   />
 </div>

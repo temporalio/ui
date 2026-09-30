@@ -55,10 +55,12 @@
   };
 </script>
 
-<div class={merge('group flex flex-col gap-1', className)}>
+<div class={merge('group flex flex-col gap-2', className)}>
   <Label {required} hidden={labelHidden} {label} for={id} />
   {#if description}
-    <p class="-mt-1 text-sm text-secondary">{description}</p>
+    <p class={merge('text-sm text-secondary', !labelHidden && '-mt-2')}>
+      {description}
+    </p>
   {/if}
   <div
     class={merge(

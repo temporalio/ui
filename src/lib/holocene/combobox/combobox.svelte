@@ -532,7 +532,7 @@
 </script>
 
 <MenuContainer {open} onclose={handleMenuClose}>
-  <div class="flex flex-col gap-1.5">
+  <div class="flex flex-col gap-2">
     <Label hidden={labelHidden} {required} {label} for={id} />
     <div
       class={merge(
