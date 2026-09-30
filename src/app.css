@@ -29,7 +29,7 @@
   }
 
   body {
-    @apply body-normal relative overscroll-none bg-background-primary text-primary;
+    @apply body-normal relative overscroll-none bg-background-primary text-primary antialiased;
   }
 
   body[data-theme='light'] {
