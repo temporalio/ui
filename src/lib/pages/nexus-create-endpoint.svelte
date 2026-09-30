@@ -19,6 +19,8 @@
     nameLeading?: Snippet;
     fieldsInert?: boolean;
     class?: string;
+    card?: boolean;
+    submitButtonText?: string;
   };
 
   let {
@@ -33,6 +35,8 @@
     nameLeading,
     fieldsInert = false,
     class: className = '',
+    card = false,
+    submitButtonText = translate('nexus.create-endpoint'),
   }: Props = $props();
 </script>
 
@@ -48,7 +52,8 @@
     {fieldsInert}
     class={className}
     {cancelHref}
-    submitButtonText={translate('nexus.create-endpoint')}
+    {card}
+    {submitButtonText}
     onSubmit={onCreate}
   />
 </div>
