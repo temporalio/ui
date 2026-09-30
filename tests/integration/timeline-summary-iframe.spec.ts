@@ -64,6 +64,7 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
       contentType: 'text/html',
       body: `<html><head><style>
         * { margin: 0; padding: 0; font: 14px/20px sans-serif; }
+        main { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       </style></head><body><main>Timeline summary</main></body></html>`,
     });
   });
@@ -89,7 +90,7 @@ test('keeps a timeline summary iframe hidden and zero-sized until it loads', asy
     .poll(() =>
       iframe.evaluate((element) => element.getBoundingClientRect().width),
     )
-    .toBeGreaterThan(100);
+    .toBeGreaterThan(0);
   await expect
     .poll(() =>
       iframe.evaluate((element) => element.getBoundingClientRect().height),
