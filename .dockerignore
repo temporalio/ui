@@ -1,8 +1,0 @@
-.github
-.husky
-.svelte-kit
-.vscode
-build
-e2e
-node_modules
-server/ui/assets

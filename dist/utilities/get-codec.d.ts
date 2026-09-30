@@ -1,5 +1,0 @@
-/// <reference types="svelte" />
-import type { Settings } from '../types/global';
-export declare const getCodecEndpoint: (settings: Settings, endpoint?: Pick<import("svelte/store").Writable<string>, "update" | "subscribe" | "set">, override?: Pick<import("svelte/store").Writable<boolean>, "update" | "subscribe" | "set">) => string;
-export declare const getCodecPassAccessToken: (settings: Settings, passToken?: Pick<import("svelte/store").Writable<boolean>, "update" | "subscribe" | "set">, endpoint?: Pick<import("svelte/store").Writable<string>, "update" | "subscribe" | "set">, override?: Pick<import("svelte/store").Writable<boolean>, "update" | "subscribe" | "set">) => boolean;
-export declare const getCodecIncludeCredentials: (settings: Settings, includeCreds?: Pick<import("svelte/store").Writable<boolean>, "update" | "subscribe" | "set">, endpoint?: Pick<import("svelte/store").Writable<string>, "update" | "subscribe" | "set">, override?: Pick<import("svelte/store").Writable<boolean>, "update" | "subscribe" | "set">) => boolean;

@@ -1,9 +1,0 @@
-{
-  "autoAcceptChanges": "main",
-  "buildScriptName": "stories:build",
-  "exitOnceUploaded": true,
-  "exitZeroOnChanges": true,
-  "externals": ["public/**"],
-  "onlyChanged": true,
-  "skip": "dependabot/**"
-}
