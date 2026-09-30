@@ -42,6 +42,7 @@ describe('lockComputeProvider', () => {
         { value: 'lambda' },
         { value: 'agentcore', hidden: true },
         { value: 'cloud-run', hidden: true },
+        { value: 'modal', hidden: true },
       ],
     });
   });
@@ -53,6 +54,7 @@ describe('lockComputeProvider', () => {
         { value: 'lambda', hidden: true },
         { value: 'agentcore' },
         { value: 'cloud-run', hidden: true },
+        { value: 'modal', hidden: true },
       ],
     });
   });
@@ -142,6 +144,7 @@ describe('lockComputeProvider', () => {
     ['aws-lambda', 'lambda'],
     ['cloud-run', 'cloud-run'],
     ['gcp-cloud-run', 'cloud-run'],
+    ['modal', 'modal'],
   ] as const)('maps the %s provider type to %s', (type, provider) => {
     expect(lockComputeProvider(deployment([type]))?.provider).toBe(provider);
   });
@@ -181,6 +184,7 @@ describe('lockProvidersTo', () => {
       { value: 'lambda' },
       { value: 'agentcore', hidden: true },
       { value: 'cloud-run', hidden: true },
+      { value: 'modal', hidden: true },
     ]);
   });
 

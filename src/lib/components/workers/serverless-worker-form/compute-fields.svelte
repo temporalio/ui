@@ -45,6 +45,11 @@
     gcpRegions?: string[];
     gcpWorkerPool?: string;
     gcpServiceAccount?: string;
+    modalApp?: string;
+    modalFunction?: string;
+    modalEnvironment?: string;
+    modalTaskQueue?: string;
+    modalWorkerAddress?: string;
     minReplicas?: number;
     maxReplicas?: number;
     initialReplicas?: number;
@@ -70,6 +75,11 @@
       gcpRegion?: string[];
       gcpWorkerPool?: string[];
       gcpServiceAccount?: string[];
+      modalApp?: string[];
+      modalFunction?: string[];
+      modalEnvironment?: string[];
+      modalTaskQueue?: string[];
+      modalWorkerAddress?: string[];
       minReplicas?: string[];
       maxReplicas?: string[];
       initialReplicas?: string[];
@@ -93,6 +103,11 @@
     gcpRegions = [...GCP_REGIONS],
     gcpWorkerPool = $bindable(''),
     gcpServiceAccount = $bindable(''),
+    modalApp = $bindable(''),
+    modalFunction = $bindable(''),
+    modalEnvironment = $bindable(''),
+    modalTaskQueue = $bindable(''),
+    modalWorkerAddress = $bindable(''),
     minReplicas = $bindable(0),
     maxReplicas = $bindable(30),
     initialReplicas = $bindable(0),
@@ -245,6 +260,70 @@
       {translate('workers.open-agentcore-console')}
     </Button>
   </div>
+{:else if provider === 'modal'}
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-wrap items-end gap-4">
+      <Input
+        bind:value={modalApp}
+        id="modalApp"
+        name="modalApp"
+        label={translate('workers.modal-app-label')}
+        hintText={errors.modalApp?.[0] || translate('workers.modal-app-hint')}
+        error={!!errors.modalApp?.[0]}
+        placeholder={translate('workers.modal-app-placeholder')}
+        required
+        class="flex-1"
+      />
+      <Button
+        variant="secondary"
+        type="button"
+        href="https://modal.com/apps"
+        target="_blank"
+        TrailingIcon={IconExternalLinkOptical}
+      >
+        {translate('workers.open-modal-dashboard')}
+      </Button>
+    </div>
+    <Input
+      bind:value={modalFunction}
+      id="modalFunction"
+      name="modalFunction"
+      label={translate('workers.modal-function-label')}
+      hintText={errors.modalFunction?.[0] ||
+        translate('workers.modal-function-hint')}
+      error={!!errors.modalFunction?.[0]}
+      placeholder={translate('workers.modal-function-placeholder')}
+      required
+    />
+    <Input
+      bind:value={modalEnvironment}
+      id="modalEnvironment"
+      name="modalEnvironment"
+      label={translate('workers.modal-environment-label')}
+      hintText={errors.modalEnvironment?.[0] ||
+        translate('workers.modal-environment-hint')}
+      error={!!errors.modalEnvironment?.[0]}
+      placeholder={translate('workers.modal-environment-placeholder')}
+    />
+    <Input
+      bind:value={modalTaskQueue}
+      id="modalTaskQueue"
+      name="modalTaskQueue"
+      label={translate('workers.modal-task-queue-label')}
+      hintText={errors.modalTaskQueue?.[0] ||
+        translate('workers.modal-task-queue-hint')}
+      error={!!errors.modalTaskQueue?.[0]}
+    />
+    <Input
+      bind:value={modalWorkerAddress}
+      id="modalWorkerAddress"
+      name="modalWorkerAddress"
+      label={translate('workers.modal-server-address-label')}
+      hintText={errors.modalWorkerAddress?.[0] ||
+        translate('workers.modal-server-address-hint')}
+      error={!!errors.modalWorkerAddress?.[0]}
+    />
+  </div>
 {:else}
   <div class="flex flex-col gap-4">
     <Input
@@ -306,7 +385,11 @@
   {translate('workers.access-section-description')}
 </p>
 
-{#if provider === 'lambda' || provider === 'agentcore'}
+{#if provider === 'modal'}
+  <p class="text-sm text-secondary">
+    {translate('workers.modal-access-note')}
+  </p>
+{:else if provider === 'lambda' || provider === 'agentcore'}
   <div class="flex flex-col gap-4">
     <Input
       bind:value={iamRoleArn}
@@ -468,7 +551,7 @@
       : translate('workers.show-defaults')}
   </Button>
 </div>
-{#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
+{#if showScaling && (provider === 'lambda' || provider === 'agentcore' || provider === 'modal')}
   <div class="mt-4 flex flex-col gap-4">
     <Input
       value={scaleUpCooloffMs !== undefined ? String(scaleUpCooloffMs) : ''}

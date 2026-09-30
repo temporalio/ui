@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildComputeConfigFromForm,
   createDeploymentSchema,
   createVersionSchema,
   editVersionSchema,
@@ -338,5 +339,96 @@ describe('AgentCore provider validation', () => {
 
   it('does not require Lambda or Cloud Run fields', () => {
     expect(errorPaths(valid)).toEqual([]);
+  });
+});
+
+describe('Modal provider', () => {
+  const valid = {
+    buildId: 'v1',
+    provider: 'modal' as const,
+    modalApp: 'temporal-gpu-workers',
+    modalFunction: 'temporal_worker',
+  };
+
+  const errorPaths = (data: Record<string, unknown>): string[] => {
+    const result = createVersionSchema.safeParse(data);
+    if (result.success) return [];
+    return result.error.issues.map((issue) => issue.path.join('.'));
+  };
+
+  const detailsOf = (config: ReturnType<typeof buildComputeConfigFromForm>) => {
+    const group = config.scalingGroups?.default;
+    const decode = (data?: string) =>
+      data ? JSON.parse(atob(data)) : undefined;
+    return {
+      providerType: group?.provider?.type,
+      provider: decode(group?.provider?.details?.data),
+      scalerType: group?.scaler?.type,
+      scaler: decode(group?.scaler?.details?.data),
+    };
+  };
+
+  it('accepts an app and a function', () => {
+    expect(createVersionSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it('requires both the app and the function', () => {
+    const paths = errorPaths({ ...valid, modalApp: '', modalFunction: '' });
+    expect(paths).toContain('modalApp');
+    expect(paths).toContain('modalFunction');
+  });
+
+  // Modal is invoked with the Service's own Modal token, so there is no role
+  // to assume and none of the AWS or GCP fields apply.
+  it('does not require access or other providers\u2019 fields', () => {
+    expect(errorPaths(valid)).toEqual([]);
+  });
+
+  it('builds a modal provider paired with the no-sync scaler', () => {
+    const built = detailsOf(
+      buildComputeConfigFromForm({
+        ...createVersionSchema.parse(valid),
+        scaleUpCooloffMs: 250,
+      }),
+    );
+
+    expect(built.providerType).toBe('modal');
+    expect(built.provider).toEqual({
+      app: 'temporal-gpu-workers',
+      function: 'temporal_worker',
+    });
+    expect(built.scalerType).toBe('no-sync');
+    expect(built.scaler).toEqual({ scale_up_cooloff_ms: 250 });
+  });
+
+  // Anything the provider does not claim for itself is forwarded to the Modal
+  // function as a keyword argument, which is how the worker learns its queue.
+  it('passes the optional worker settings through as provider details', () => {
+    const built = detailsOf(
+      buildComputeConfigFromForm(
+        createVersionSchema.parse({
+          ...valid,
+          modalEnvironment: 'compute-testing',
+          modalTaskQueue: 'gpu-render',
+          modalWorkerAddress: '8.tcp.ngrok.io:14688',
+        }),
+      ),
+    );
+
+    expect(built.provider).toEqual({
+      app: 'temporal-gpu-workers',
+      function: 'temporal_worker',
+      environment: 'compute-testing',
+      task_queue: 'gpu-render',
+      server_address: '8.tcp.ngrok.io:14688',
+    });
+  });
+
+  it('omits the optional details when they are blank', () => {
+    const built = detailsOf(
+      buildComputeConfigFromForm(createVersionSchema.parse(valid)),
+    );
+
+    expect(Object.keys(built.provider)).toEqual(['app', 'function']);
   });
 });

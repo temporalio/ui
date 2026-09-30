@@ -426,8 +426,17 @@ const buildInvokeComputeConfig = (
   };
   if (scalingOptions.roleExternalId)
     providerPayload['role_external_id'] = scalingOptions.roleExternalId;
-  const providerJson = JSON.stringify(providerPayload);
-  const providerData = btoa(providerJson);
+  return invokeScalingGroup(providerType, providerPayload, scalingOptions);
+};
+
+// Every invoke-based provider pairs with the `no-sync` scaler and takes the same
+// set of scaling keys, so the group is assembled in one place and the providers
+// differ only in their own details payload.
+const invokeScalingGroup = (
+  providerType: string,
+  providerPayload: Record<string, string>,
+  scalingOptions: InvokeScalingOptions,
+): ComputeConfig => {
   const encoding = btoa('json/plain');
 
   const scalerConfig: Record<string, number> = {};
@@ -450,7 +459,10 @@ const buildInvokeComputeConfig = (
       default: {
         provider: {
           type: providerType,
-          details: { metadata: { encoding }, data: providerData },
+          details: {
+            metadata: { encoding },
+            data: btoa(JSON.stringify(providerPayload)),
+          },
         },
         scaler: {
           type: 'no-sync',
@@ -489,6 +501,36 @@ export const buildAgentCoreComputeConfig = (
     iamRoleArn,
     scalingOptions,
   );
+
+type ModalWorkerOptions = {
+  environment?: string;
+  taskQueue?: string;
+  serverAddress?: string;
+};
+
+/**
+ * Modal is invoke-based: the provider calls `Function.spawn()` on the named
+ * function, and every detail it doesn't claim for itself (`app`, `function`,
+ * `environment`) is forwarded to that function as a keyword argument. So the
+ * task queue and the address the container dials are configuration here, not
+ * constants in the worker's Python.
+ */
+export const buildModalComputeConfig = (
+  app: string,
+  functionName: string,
+  { environment, taskQueue, serverAddress }: ModalWorkerOptions = {},
+  scalingOptions: InvokeScalingOptions = {},
+): ComputeConfig => {
+  const providerPayload: Record<string, string> = {
+    app,
+    function: functionName,
+  };
+  if (environment) providerPayload['environment'] = environment;
+  if (taskQueue) providerPayload['task_queue'] = taskQueue;
+  if (serverAddress) providerPayload['server_address'] = serverAddress;
+
+  return invokeScalingGroup('modal', providerPayload, scalingOptions);
+};
 
 export const buildGcpCloudRunComputeConfig = (
   project: string,

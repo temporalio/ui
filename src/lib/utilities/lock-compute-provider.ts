@@ -16,6 +16,7 @@ const providerValue = (type?: string): ComputeProviderValue | undefined => {
   if (type === 'aws-lambda' || type === 'lambda') return 'lambda';
   if (type === 'aws-agentcore' || type === 'agentcore') return 'agentcore';
   if (type === 'gcp-cloud-run' || type === 'cloud-run') return 'cloud-run';
+  if (type === 'modal') return 'modal';
 };
 
 const computeConfigOf = (summary?: { computeConfig?: ComputeConfig }) =>
@@ -38,6 +39,7 @@ const DEFAULT_PROVIDERS: readonly ComputeProviderOption[] = [
   { value: 'lambda' },
   { value: 'agentcore' },
   { value: 'cloud-run' },
+  { value: 'modal' },
 ];
 
 /**

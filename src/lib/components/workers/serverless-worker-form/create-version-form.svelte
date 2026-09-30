@@ -62,6 +62,11 @@
       gcpRegion: '',
       gcpWorkerPool: '',
       gcpServiceAccount: '',
+      modalApp: '',
+      modalFunction: '',
+      modalEnvironment: '',
+      modalTaskQueue: '',
+      modalWorkerAddress: '',
       minReplicas: 0,
       maxReplicas: 30,
       initialReplicas: 0,
@@ -138,6 +143,11 @@
           {gcpRegions}
           bind:gcpWorkerPool={$form.gcpWorkerPool}
           bind:gcpServiceAccount={$form.gcpServiceAccount}
+          bind:modalApp={$form.modalApp}
+          bind:modalFunction={$form.modalFunction}
+          bind:modalEnvironment={$form.modalEnvironment}
+          bind:modalTaskQueue={$form.modalTaskQueue}
+          bind:modalWorkerAddress={$form.modalWorkerAddress}
           bind:minReplicas={$form.minReplicas}
           bind:maxReplicas={$form.maxReplicas}
           bind:initialReplicas={$form.initialReplicas}

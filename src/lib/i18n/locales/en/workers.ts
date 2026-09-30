@@ -210,6 +210,30 @@ export const Strings = {
   'provider-cloud-run': 'Google Cloud Run',
   'provider-cloud-run-description':
     'Run workers as Cloud Run services in your GCP project.',
+  'provider-modal': 'Modal',
+  'provider-modal-description':
+    'Run workers as Modal functions, with a GPU if the function asks for one.',
+  'modal-app-label': 'Modal App',
+  'modal-app-hint':
+    'The deployed Modal app that holds the worker function. Defaults to this Deployment\u2019s name.',
+  'modal-app-placeholder': 'temporal-gpu-workers',
+  'modal-function-label': 'Modal Function',
+  'modal-function-hint':
+    'The function to spawn. It receives the namespace, deployment name and build ID as keyword arguments.',
+  'modal-function-placeholder': 'temporal_worker',
+  'modal-environment-label': 'Modal Environment',
+  'modal-environment-hint':
+    'Optional. Leave blank to use the workspace default environment.',
+  'modal-environment-placeholder': 'main',
+  'modal-task-queue-label': 'Task Queue',
+  'modal-task-queue-hint':
+    'Optional. Passed to the function as the task_queue keyword argument.',
+  'modal-server-address-label': 'Server Address for Workers',
+  'modal-server-address-hint':
+    'Optional. The address Modal containers dial to reach this Service, passed as the server_address keyword argument.',
+  'modal-access-note':
+    'Nothing to configure: the Worker Controller calls Modal with this Service\u2019s own Modal token.',
+  'open-modal-dashboard': 'Open Modal Dashboard',
   'provider-vercel': 'Vercel Functions',
   'provider-vercel-description':
     'Run workers as serverless functions on the Vercel platform.',

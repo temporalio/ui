@@ -7,7 +7,12 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Badge } from '$lib/io/badge';
-  import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
+  import {
+    IconAwsColor,
+    type IconComponent,
+    IconGcpColor,
+    IconMicrochip,
+  } from '$lib/io/icon';
 
   import {
     type ComputeProviderOption,
@@ -31,6 +36,8 @@
     lambda: IconAwsColor,
     agentcore: IconAwsColor,
     'cloud-run': IconGcpColor,
+    // A neutral glyph rather than Modal's wordmark, which the icon set doesn't carry.
+    modal: IconMicrochip,
   };
 
   const providerLabel = (value: ComputeProviderValue): string => {
@@ -41,6 +48,8 @@
         return translate('workers.provider-agentcore');
       case 'cloud-run':
         return translate('workers.provider-cloud-run');
+      case 'modal':
+        return translate('workers.provider-modal');
     }
   };
 
@@ -52,6 +61,8 @@
         return translate('workers.provider-agentcore-description');
       case 'cloud-run':
         return translate('workers.provider-cloud-run-description');
+      case 'modal':
+        return translate('workers.provider-modal-description');
     }
   };
 
@@ -80,6 +91,7 @@
     { value: 'lambda' },
     { value: 'agentcore' },
     { value: 'cloud-run' },
+    { value: 'modal' },
   ]);
 
   const resolvedProviders = $derived(configuredProviders ?? defaultProviders);

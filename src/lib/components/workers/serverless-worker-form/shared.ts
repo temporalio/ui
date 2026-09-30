@@ -11,6 +11,7 @@ import {
   buildAgentCoreComputeConfig,
   buildGcpCloudRunComputeConfig,
   buildLambdaComputeConfig,
+  buildModalComputeConfig,
 } from '$lib/services/deployments-service';
 import type { ComputeConfig } from '$lib/types/deployments';
 
@@ -63,7 +64,9 @@ const AGENT_CORE_ENDPOINT_ARN =
   /^arn:aws:bedrock-agentcore:[a-z0-9-]+:\d{12}:runtime\/[^/]+\/runtime-endpoint\/[^/]+$/;
 
 const providerFields = {
-  provider: z.enum(['lambda', 'agentcore', 'cloud-run']).default('lambda'),
+  provider: z
+    .enum(['lambda', 'agentcore', 'cloud-run', 'modal'])
+    .default('lambda'),
   lambdaArn: z.string().default(''),
   agentCoreEndpointArn: z.string().default(''),
   iamRoleArn: z.string().default(''),
@@ -72,6 +75,11 @@ const providerFields = {
   gcpRegion: z.string().default(''),
   gcpWorkerPool: z.string().default(''),
   gcpServiceAccount: z.string().default(''),
+  modalApp: z.string().default(''),
+  modalFunction: z.string().default(''),
+  modalEnvironment: z.string().default(''),
+  modalTaskQueue: z.string().default(''),
+  modalWorkerAddress: z.string().default(''),
   minReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
   maxReplicas: z.number().int().min(1).max(2_147_483_647).default(30),
   initialReplicas: z.number().int().min(0).max(2_147_483_647).default(0),
@@ -143,6 +151,21 @@ const validateProviderFields = (
       });
     }
     validateAwsAccessFields(data, ctx);
+  } else if (data.provider === 'modal') {
+    // No access fields: the Worker Controller authenticates to Modal with the
+    // Service's own Modal token, so a Version only names what to spawn.
+    if (!data.modalApp)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalApp'],
+        message: 'Modal App is required',
+      });
+    if (!data.modalFunction)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['modalFunction'],
+        message: 'Modal Function is required',
+      });
   } else if (data.provider === 'cloud-run') {
     if (!data.gcpProject)
       ctx.addIssue({
@@ -256,6 +279,19 @@ export const buildComputeConfigFromForm = (
     metricsPollIntervalMs: data.metricsPollIntervalMs,
   };
 
+  if (data.provider === 'modal') {
+    return buildModalComputeConfig(
+      data.modalApp,
+      data.modalFunction,
+      {
+        environment: data.modalEnvironment,
+        taskQueue: data.modalTaskQueue,
+        serverAddress: data.modalWorkerAddress,
+      },
+      invokeScaling,
+    );
+  }
+
   if (data.provider === 'agentcore') {
     return buildAgentCoreComputeConfig(
       data.agentCoreEndpointArn,
@@ -271,7 +307,11 @@ export const buildComputeConfigFromForm = (
   );
 };
 
-export type ComputeProviderValue = 'lambda' | 'agentcore' | 'cloud-run';
+export type ComputeProviderValue =
+  | 'lambda'
+  | 'agentcore'
+  | 'cloud-run'
+  | 'modal';
 
 export type ComputeProviderReleaseStage =
   | 'public-preview'
@@ -293,6 +333,7 @@ export const defaultReleaseStage: Record<
   lambda: 'public-preview',
   agentcore: 'pre-release',
   'cloud-run': 'public-preview',
+  modal: 'pre-release',
 };
 
 interface InitialComputeProviderOptions {
