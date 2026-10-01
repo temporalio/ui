@@ -860,3 +860,496 @@ export async function MixedOpenWorkflow(): Promise<void> {
 
   await longSleep(12 * 60 * 1000);
 }
+
+/**
+ * Containment frame fixtures: a nested workflow tree built to exercise the
+ * timeline containment frames. Between them they produce sibling frames that
+ * overlap in time, a frame holding several runs from continue-as-new, a frame
+ * holding several runs from workflow retries, and a five-level deep nest.
+ *
+ * `paceSeconds` stretches every sleep so the run is slow enough to watch the
+ * frames fill in live.
+ */
+type ContainmentFrameArgs = {
+  label: string;
+  paceSeconds: number;
+};
+
+export async function ContainmentFrameLeafWorkflow({
+  label,
+  paceSeconds,
+}: ContainmentFrameArgs): Promise<string> {
+  await Activity(`${label}:leaf-start`);
+  await workflow.sleep(`${paceSeconds} seconds`);
+
+  return Activity(`${label}:leaf-done`);
+}
+
+export async function ContainmentFrameDeepWorkflow({
+  label,
+  paceSeconds,
+  depth,
+}: ContainmentFrameArgs & { depth: number }): Promise<string> {
+  const { workflowId } = workflow.workflowInfo();
+
+  await Activity(`${label}:enter-depth-${depth}`);
+  await workflow.sleep(`${paceSeconds} seconds`);
+
+  if (depth > 1) {
+    await workflow.executeChild(ContainmentFrameDeepWorkflow, {
+      args: [{ label, paceSeconds, depth: depth - 1 }],
+      workflowId: `${workflowId}-d${depth - 1}`,
+    });
+  } else {
+    await workflow.executeChild(ContainmentFrameLeafWorkflow, {
+      args: [{ label, paceSeconds }],
+      workflowId: `${workflowId}-leaf`,
+    });
+  }
+
+  return Activity(`${label}:exit-depth-${depth}`);
+}
+
+export async function ContainmentFrameBranchWorkflow({
+  label,
+  paceSeconds,
+  includeLeaf,
+}: ContainmentFrameArgs & { includeLeaf: boolean }): Promise<string> {
+  const { workflowId } = workflow.workflowInfo();
+
+  await Activity(`${label}:before`);
+  await workflow.sleep(`${paceSeconds} seconds`);
+
+  if (includeLeaf) {
+    await workflow.executeChild(ContainmentFrameLeafWorkflow, {
+      args: [{ label, paceSeconds }],
+      workflowId: `${workflowId}-leaf`,
+    });
+  }
+
+  await workflow.sleep(`${paceSeconds} seconds`);
+
+  return Activity(`${label}:after`);
+}
+
+export async function ContainmentFrameContinueAsNewWorkflow({
+  label,
+  paceSeconds,
+  remaining,
+}: ContainmentFrameArgs & { remaining: number }): Promise<string> {
+  await Activity(`${label}:run-with-${remaining}-remaining`);
+  await workflow.sleep(`${paceSeconds * 2} seconds`);
+
+  if (remaining > 1) {
+    await workflow.continueAsNew<typeof ContainmentFrameContinueAsNewWorkflow>({
+      label,
+      paceSeconds,
+      remaining: remaining - 1,
+    });
+  }
+
+  return `${label}:chain-complete`;
+}
+
+export async function ContainmentFrameRetryWorkflow({
+  label,
+  paceSeconds,
+}: ContainmentFrameArgs): Promise<string> {
+  const { attempt } = workflow.workflowInfo();
+
+  await Activity(`${label}:attempt-${attempt}`);
+  await workflow.sleep(`${paceSeconds} seconds`);
+
+  if (attempt < 3) {
+    throw workflow.ApplicationFailure.create({
+      message: `${label} failed on attempt ${attempt}`,
+    });
+  }
+
+  return `${label}:succeeded-on-attempt-${attempt}`;
+}
+
+export async function ContainmentFrameRootWorkflow(
+  paceSeconds = 1,
+): Promise<string[]> {
+  const { workflowId } = workflow.workflowInfo();
+
+  await Activity('root:setup');
+
+  const concurrent = await Promise.all([
+    workflow.executeChild(ContainmentFrameBranchWorkflow, {
+      args: [{ label: 'branch-a', paceSeconds, includeLeaf: true }],
+      workflowId: `${workflowId}-branch-a`,
+    }),
+    workflow.executeChild(ContainmentFrameBranchWorkflow, {
+      args: [{ label: 'branch-b', paceSeconds, includeLeaf: false }],
+      workflowId: `${workflowId}-branch-b`,
+    }),
+    workflow.executeChild(ContainmentFrameContinueAsNewWorkflow, {
+      args: [{ label: 'continue-chain', paceSeconds, remaining: 3 }],
+      workflowId: `${workflowId}-continue-chain`,
+    }),
+    workflow.executeChild(ContainmentFrameRetryWorkflow, {
+      args: [{ label: 'retry-chain', paceSeconds }],
+      workflowId: `${workflowId}-retry-chain`,
+      retry: {
+        initialInterval: `${paceSeconds} seconds`,
+        backoffCoefficient: 1,
+        maximumAttempts: 3,
+      },
+    }),
+  ]);
+
+  await workflow.sleep(`${paceSeconds * 2} seconds`);
+
+  const deep = await workflow.executeChild(ContainmentFrameDeepWorkflow, {
+    args: [{ label: 'deep', paceSeconds, depth: 3 }],
+    workflowId: `${workflowId}-deep-d3`,
+  });
+
+  await Activity('root:teardown');
+
+  return [...concurrent, deep];
+}
+
+/**
+ * Order-fulfillment fixture: the same shapes as the containment-frame
+ * workflows — a deep nest, sibling children, a continue-as-new chain and a
+ * retry chain — but named the way a real application would be, so the timeline
+ * can be designed against representative labels.
+ */
+const {
+  allocateStock,
+  bookCarrier,
+  capturePayment,
+  generateLabel,
+  notifyCustomer,
+  packItems,
+  renderInvoice,
+  reserveInventory,
+  schedulePickup,
+  scoreTransaction,
+  tokenizeCard,
+  validateOrder,
+} = workflow.proxyActivities<typeof activities>({
+  startToCloseTimeout: '1 minute',
+});
+
+export async function FraudCheckWorkflow(orderId: string): Promise<string> {
+  return scoreTransaction(orderId);
+}
+
+export async function PaymentWorkflow(orderId: string): Promise<string> {
+  await tokenizeCard(orderId);
+
+  await workflow.executeChild(FraudCheckWorkflow, {
+    args: [orderId],
+    workflowId: `fraud-check-${orderId}`,
+  });
+
+  return capturePayment(orderId);
+}
+
+export async function InventoryWorkflow(orderId: string): Promise<string> {
+  return allocateStock(orderId);
+}
+
+export async function InvoiceBatchWorkflow({
+  orderId,
+  remainingBatches,
+}: {
+  orderId: string;
+  remainingBatches: number;
+}): Promise<string> {
+  await renderInvoice(orderId);
+
+  if (remainingBatches > 1) {
+    await workflow.continueAsNew<typeof InvoiceBatchWorkflow>({
+      orderId,
+      remainingBatches: remainingBatches - 1,
+    });
+  }
+
+  return `invoiced:${orderId}`;
+}
+
+export async function CarrierBookingWorkflow(orderId: string): Promise<string> {
+  const { attempt } = workflow.workflowInfo();
+
+  await bookCarrier(orderId);
+
+  if (attempt < 3) {
+    throw workflow.ApplicationFailure.create({
+      message: `Carrier API unavailable for ${orderId} (attempt ${attempt})`,
+    });
+  }
+
+  return `booked:${orderId}:attempt-${attempt}`;
+}
+
+export async function CarrierPickupWorkflow(orderId: string): Promise<string> {
+  return schedulePickup(orderId);
+}
+
+export async function LabelGenerationWorkflow(
+  orderId: string,
+): Promise<string> {
+  await generateLabel(orderId);
+
+  await workflow.executeChild(CarrierPickupWorkflow, {
+    args: [orderId],
+    workflowId: `pickup-${orderId}`,
+  });
+
+  return `labelled:${orderId}`;
+}
+
+export async function PackagingWorkflow(orderId: string): Promise<string> {
+  await packItems(orderId);
+
+  await workflow.executeChild(LabelGenerationWorkflow, {
+    args: [orderId],
+    workflowId: `label-${orderId}`,
+  });
+
+  return `packaged:${orderId}`;
+}
+
+export async function ShipmentWorkflow(orderId: string): Promise<string> {
+  await workflow.executeChild(PackagingWorkflow, {
+    args: [orderId],
+    workflowId: `packaging-${orderId}`,
+  });
+
+  return `shipped:${orderId}`;
+}
+
+export async function OrderFulfillmentWorkflow(
+  orderId: string,
+): Promise<string> {
+  await validateOrder(orderId);
+  await reserveInventory(orderId);
+
+  await Promise.all([
+    workflow.executeChild(PaymentWorkflow, {
+      args: [orderId],
+      workflowId: `payment-${orderId}`,
+    }),
+    workflow.executeChild(InventoryWorkflow, {
+      args: [orderId],
+      workflowId: `inventory-${orderId}`,
+    }),
+    workflow.executeChild(InvoiceBatchWorkflow, {
+      args: [{ orderId, remainingBatches: 3 }],
+      workflowId: `invoice-${orderId}`,
+    }),
+    workflow.executeChild(CarrierBookingWorkflow, {
+      args: [orderId],
+      workflowId: `carrier-booking-${orderId}`,
+      retry: {
+        initialInterval: '1 second',
+        backoffCoefficient: 1,
+        maximumAttempts: 3,
+      },
+    }),
+  ]);
+
+  await workflow.executeChild(ShipmentWorkflow, {
+    args: [orderId],
+    workflowId: `shipment-${orderId}`,
+  });
+
+  await notifyCustomer(orderId);
+
+  return `fulfilled:${orderId}`;
+}
+
+/**
+ * Subscription-billing fixture: a monthly billing run over an account base too
+ * large to bill inside one history. The cycle rates and invoices a batch of
+ * accounts, then hands the cursor to a fresh run — the textbook reason to
+ * reach for continue-as-new. Dunning does the same thing three levels down,
+ * one run per escalation stage, so the timeline has a chain inside a chain.
+ */
+const {
+  applyCreditsAndDiscounts,
+  calculateTax,
+  chargePaymentMethod,
+  closeBillingPeriod,
+  emitBillingMetrics,
+  issueInvoice,
+  loadAccountBatch,
+  postJournalEntries,
+  rateUsageRecords,
+  recordCollectionAttempt,
+  refreshRevenueSchedule,
+  sendDunningNotice,
+  suspendService,
+} = workflow.proxyActivities<typeof activities>({
+  startToCloseTimeout: '1 minute',
+});
+
+const DUNNING_STAGES = ['first-reminder', 'final-notice', 'suspension'];
+
+export interface DunningInput {
+  accountId: string;
+  period: string;
+  stage?: number;
+}
+
+export async function DunningWorkflow({
+  accountId,
+  period,
+  stage = 1,
+}: DunningInput): Promise<string> {
+  const name = DUNNING_STAGES[stage - 1] ?? 'suspension';
+
+  await sendDunningNotice(`${accountId}:${period}:${name}`);
+
+  // A dunning sequence spans weeks of waiting. One run per stage keeps each
+  // history small and makes the escalation legible as a chain.
+  if (stage < DUNNING_STAGES.length) {
+    await workflow.continueAsNew<typeof DunningWorkflow>({
+      accountId,
+      period,
+      stage: stage + 1,
+    });
+  }
+
+  await suspendService(accountId);
+
+  return `dunned:${accountId}`;
+}
+
+export interface PaymentCollectionInput {
+  accountId: string;
+  period: string;
+  declined: boolean;
+  gatewayTimeout: boolean;
+}
+
+export async function PaymentCollectionWorkflow({
+  accountId,
+  period,
+  declined,
+  gatewayTimeout,
+}: PaymentCollectionInput): Promise<string> {
+  const { attempt } = workflow.workflowInfo();
+
+  await recordCollectionAttempt(`${accountId}:${period}:attempt-${attempt}`);
+
+  if (gatewayTimeout && attempt < 2) {
+    throw workflow.ApplicationFailure.create({
+      message: `Payment gateway timed out for ${accountId} (attempt ${attempt})`,
+    });
+  }
+
+  if (declined) {
+    await workflow.executeChild(DunningWorkflow, {
+      args: [{ accountId, period }],
+      workflowId: `dunning-${accountId}-${period}`,
+    });
+
+    return `escalated:${accountId}`;
+  }
+
+  await chargePaymentMethod(`${accountId}:${period}`);
+
+  return `collected:${accountId}`;
+}
+
+export interface AccountInvoicingInput {
+  accountId: string;
+  period: string;
+  declined: boolean;
+  gatewayTimeout: boolean;
+}
+
+export async function AccountInvoicingWorkflow({
+  accountId,
+  period,
+  declined,
+  gatewayTimeout,
+}: AccountInvoicingInput): Promise<string> {
+  await issueInvoice(`${accountId}:${period}`);
+
+  await workflow.executeChild(PaymentCollectionWorkflow, {
+    args: [{ accountId, period, declined, gatewayTimeout }],
+    workflowId: `collection-${accountId}-${period}`,
+    retry: {
+      initialInterval: '1 second',
+      backoffCoefficient: 1,
+      maximumAttempts: 3,
+    },
+  });
+
+  return `invoiced:${accountId}`;
+}
+
+export interface BillingCycleInput {
+  cycleId: string;
+  period: string;
+  batch?: number;
+  remainingBatches?: number;
+  accountsPerBatch?: number;
+}
+
+export async function BillingCycleWorkflow({
+  cycleId,
+  period,
+  batch = 1,
+  remainingBatches = 3,
+  accountsPerBatch = 4,
+}: BillingCycleInput): Promise<string> {
+  const cursor = `${period}:batch-${batch}`;
+  const firstAccount = 10001 + (batch - 1) * accountsPerBatch;
+  const accountIds = Array.from(
+    { length: accountsPerBatch },
+    (_, index) => `acct-${firstAccount + index}`,
+  );
+
+  await loadAccountBatch(cursor);
+  await rateUsageRecords(cursor);
+
+  await Promise.all([
+    (async () => {
+      await applyCreditsAndDiscounts(cursor);
+      await calculateTax(cursor);
+    })(),
+    (async () => {
+      await postJournalEntries(cursor);
+      await refreshRevenueSchedule(cursor);
+    })(),
+    ...accountIds.map((accountId, index) =>
+      workflow.executeChild(AccountInvoicingWorkflow, {
+        args: [
+          {
+            accountId,
+            period,
+            declined: index % 3 === 0,
+            gatewayTimeout: index % 4 === 1,
+          },
+        ],
+        workflowId: `invoicing-${accountId}-${period}`,
+      }),
+    ),
+  ]);
+
+  await emitBillingMetrics(cursor);
+
+  // The account base does not fit in one history, so each batch hands the
+  // cursor to a fresh run. The chain is what makes the cycle resumable.
+  if (remainingBatches > 1) {
+    await workflow.continueAsNew<typeof BillingCycleWorkflow>({
+      cycleId,
+      period,
+      batch: batch + 1,
+      remainingBatches: remainingBatches - 1,
+      accountsPerBatch,
+    });
+  }
+
+  await closeBillingPeriod(cycleId);
+
+  return `billed:${cycleId}`;
+}
