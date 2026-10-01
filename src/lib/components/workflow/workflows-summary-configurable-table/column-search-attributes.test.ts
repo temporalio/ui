@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import type { WorkflowExecution } from '$lib/types/workflows';
+import { getColumnAttribute } from '$lib/utilities/query/quick-filter-table';
 
 import {
-  getWorkflowColumnAttribute,
   getWorkflowColumnValue,
   UNFILTERABLE_WORKFLOW_COLUMNS,
   WORKFLOW_COLUMN_ATTRIBUTE,
@@ -32,14 +32,17 @@ const workflow = {
   },
 } as unknown as WorkflowExecution;
 
-describe('getWorkflowColumnAttribute', () => {
+describe('the workflow column attribute map', () => {
+  const attributeFor = (label: string) =>
+    getColumnAttribute(WORKFLOW_COLUMN_ATTRIBUTE, label);
+
   it('maps a column label to its search attribute', () => {
-    expect(getWorkflowColumnAttribute('Status')).toBe('ExecutionStatus');
-    expect(getWorkflowColumnAttribute('Task Queue')).toBe('TaskQueue');
+    expect(attributeFor('Status')).toBe('ExecutionStatus');
+    expect(attributeFor('Task Queue')).toBe('TaskQueue');
   });
 
   it('treats an unmapped label as a custom search attribute name', () => {
-    expect(getWorkflowColumnAttribute('CustomIntField')).toBe('CustomIntField');
+    expect(attributeFor('CustomIntField')).toBe('CustomIntField');
   });
 });
 

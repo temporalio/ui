@@ -5,6 +5,10 @@ import {
 } from '$lib/utilities/format-time';
 import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
+import {
+  getColumnAttribute,
+  type QuickFilterColumns,
+} from '$lib/utilities/query/quick-filter-table';
 
 export const WORKFLOW_COLUMN_ATTRIBUTE: Record<string, string> = {
   Status: 'ExecutionStatus',
@@ -38,9 +42,6 @@ export const ARCHIVAL_FILTERABLE_COLUMNS = ['Type', 'Workflow ID', 'Run ID'];
 
 const positiveCount = (count: string): string | undefined =>
   parseInt(count, 10) > 0 ? count : undefined;
-
-export const getWorkflowColumnAttribute = (label: string): string =>
-  WORKFLOW_COLUMN_ATTRIBUTE[label] ?? label;
 
 export const getWorkflowColumnValue = (
   label: string,
@@ -89,6 +90,15 @@ export const getWorkflowColumnValue = (
     case 'Parent Namespace':
       return undefined;
     default:
-      return indexedFields?.[getWorkflowColumnAttribute(label)];
+      return indexedFields?.[
+        getColumnAttribute(WORKFLOW_COLUMN_ATTRIBUTE, label)
+      ];
   }
 };
+
+export const WORKFLOW_QUICK_FILTER_COLUMNS: QuickFilterColumns<WorkflowExecution> =
+  {
+    attributes: WORKFLOW_COLUMN_ATTRIBUTE,
+    getValue: getWorkflowColumnValue,
+    unfilterable: UNFILTERABLE_WORKFLOW_COLUMNS,
+  };

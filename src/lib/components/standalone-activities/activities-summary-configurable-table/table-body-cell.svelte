@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import QuickFilterTableCell from '$lib/components/search-attribute-filter/quick-filter-table-cell.svelte';
+  import QuickFilterCell from '$lib/components/search-attribute-filter/quick-filter-cell.svelte';
   import ActivityStatusBadge from '$lib/components/standalone-activities/activity-status-badge.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -12,7 +12,6 @@
   import { activityFilters } from '$lib/stores/filters';
   import { activitySearchAttributes } from '$lib/stores/search-attributes';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
@@ -20,13 +19,9 @@
   import { isActivityDelayed } from '$lib/utilities/delayed-activities';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
-  import { toQuickFilterValue } from '$lib/utilities/query/quick-filter';
   import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
 
-  import {
-    getActivityColumnAttribute,
-    getActivityColumnValue,
-  } from './column-search-attributes';
+  import { ACTIVITY_QUICK_FILTER_COLUMNS } from './column-search-attributes';
 
   type Props = {
     column: ConfigurableTableHeader;
@@ -37,12 +32,12 @@
   const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
 
-  const attribute = $derived(getActivityColumnAttribute(label));
-  const type = $derived($activitySearchAttributes[attribute]);
-  const value = $derived(getActivityColumnValue(label, activity));
-  const filterValue = $derived(toQuickFilterValue({ attribute, type, value }));
-  const filterable = $derived(filterValue !== null);
-
+  const className = $derived(
+    twMerge(
+      'h-8 whitespace-nowrap',
+      width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES,
+    ),
+  );
   const href = $derived(
     ['Activity ID', 'Run ID'].includes(label)
       ? routeForStandaloneActivityDetails({
@@ -53,27 +48,11 @@
       : undefined,
   );
 
-  // Datetime cells display and copy the normalized ISO value, so the text in
-  // the cell and the value the filter uses never drift apart.
-  const displayValue = $derived(
-    type === SEARCH_ATTRIBUTE_TYPE.DATETIME
-      ? (filterValue ?? '')
-      : value === undefined
-        ? ''
-        : String(value),
-  );
-
-  const className = $derived(
-    twMerge(
-      'h-8 whitespace-nowrap',
-      width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES,
-    ),
-  );
   const widthStyle = $derived(columnWidthStyle(width));
   const testId = 'activities-summary-table-body-cell';
 </script>
 
-{#snippet cellContent()}
+{#snippet cellContent(displayValue: string)}
   {#if label === 'Status'}
     <ActivityStatusBadge
       status={toActivityStatus(activity.status)}
@@ -92,22 +71,18 @@
   {/if}
 {/snippet}
 
-{#if filterable}
-  <QuickFilterTableCell
-    class={className}
-    style={widthStyle}
-    data-testid={testId}
-    filterIconTitle={translate('common.filter-activities')}
-    filters={activityFilters}
-    {attribute}
-    {type}
-    {value}
-    copyValue={displayValue}
-  >
-    {@render cellContent()}
-  </QuickFilterTableCell>
-{:else}
-  <td class={className} style={widthStyle} data-testid={testId}>
-    {@render cellContent()}
-  </td>
-{/if}
+<QuickFilterCell
+  columns={ACTIVITY_QUICK_FILTER_COLUMNS}
+  searchAttributes={$activitySearchAttributes}
+  filters={activityFilters}
+  filterIconTitle={translate('common.filter-activities')}
+  {label}
+  row={activity}
+  class={className}
+  style={widthStyle}
+  data-testid={testId}
+>
+  {#snippet children({ displayValue })}
+    {@render cellContent(displayValue)}
+  {/snippet}
+</QuickFilterCell>

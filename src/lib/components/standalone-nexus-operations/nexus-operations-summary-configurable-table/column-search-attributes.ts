@@ -4,6 +4,7 @@ import {
   toQueryDuration,
 } from '$lib/utilities/format-time';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
+import type { QuickFilterColumns } from '$lib/utilities/query/quick-filter-table';
 
 export const NEXUS_OPERATION_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Operation ID': 'OperationId',
@@ -19,9 +20,6 @@ export const NEXUS_OPERATION_COLUMN_ATTRIBUTE: Record<string, string> = {
 };
 
 export const UNFILTERABLE_NEXUS_OPERATION_COLUMNS: string[] = [];
-
-export const getNexusOperationColumnAttribute = (label: string): string =>
-  NEXUS_OPERATION_COLUMN_ATTRIBUTE[label] ?? label;
 
 export const getNexusOperationColumnValue = (
   label: string,
@@ -56,3 +54,10 @@ export const getNexusOperationColumnValue = (
       return undefined;
   }
 };
+
+export const NEXUS_OPERATION_QUICK_FILTER_COLUMNS: QuickFilterColumns<NexusOperationExecutionListInfo> =
+  {
+    attributes: NEXUS_OPERATION_COLUMN_ATTRIBUTE,
+    getValue: getNexusOperationColumnValue,
+    unfilterable: UNFILTERABLE_NEXUS_OPERATION_COLUMNS,
+  };

@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import QuickFilterTableCell from '$lib/components/search-attribute-filter/quick-filter-table-cell.svelte';
+  import QuickFilterCell from '$lib/components/search-attribute-filter/quick-filter-cell.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -24,7 +24,7 @@
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { toQuickFilterValue } from '$lib/utilities/query/quick-filter';
+  import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
   import {
     routeForWorkerDeployment,
     routeForWorkflow,
@@ -37,8 +37,7 @@
 
   import {
     ARCHIVAL_FILTERABLE_COLUMNS,
-    getWorkflowColumnAttribute,
-    getWorkflowColumnValue,
+    WORKFLOW_QUICK_FILTER_COLUMNS,
   } from './column-search-attributes';
 
   type Props = {
@@ -57,16 +56,13 @@
   const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
 
-  const attribute = $derived(getWorkflowColumnAttribute(label));
-  const type = $derived($searchAttributes[attribute]);
-  const value = $derived(getWorkflowColumnValue(label, workflow));
-  const filterValue = $derived(toQuickFilterValue({ attribute, type, value }));
-  const filterable = $derived(
-    (!archival || ARCHIVAL_FILTERABLE_COLUMNS.includes(label)) &&
-      filterValue !== null,
+  // Archival visibility accepts a narrower query surface than standard, so it
+  // keeps only the columns it supported before.
+  const noFilter = $derived(
+    archival && !ARCHIVAL_FILTERABLE_COLUMNS.includes(label),
   );
 
-  const href = $derived.by(() => {
+  const hrefFor = (value: QuickFilterValue) => {
     if (['Type', 'Workflow ID', 'Run ID'].includes(label)) {
       return routeForWorkflow({
         namespace,
@@ -79,17 +75,7 @@
       return routeForWorkerDeployment({ namespace, deployment: String(value) });
     }
     return undefined;
-  });
-
-  // Datetime cells display and copy the normalized ISO value, so the text in
-  // the cell and the value the filter uses never drift apart.
-  const displayValue = $derived(
-    type === SEARCH_ATTRIBUTE_TYPE.DATETIME
-      ? (filterValue ?? '')
-      : value === undefined
-        ? ''
-        : String(value),
-  );
+  };
 
   const className = $derived(
     twMerge(
@@ -107,7 +93,7 @@
   };
 </script>
 
-{#snippet text(content: string)}
+{#snippet text(content: string, href: string | undefined)}
   <Tooltip
     usePortal
     text={content}
@@ -123,7 +109,12 @@
   </Tooltip>
 {/snippet}
 
-{#snippet cellContent()}
+{#snippet cellContent(
+  type: string | undefined,
+  value: QuickFilterValue,
+  displayValue: string,
+)}
+  {@const href = hrefFor(value)}
   {#if label === 'Status'}
     <WorkflowStatusBadge
       status={workflow.status}
@@ -143,33 +134,30 @@
       includeMilliseconds: true,
     })}
   {:else if label === 'Parent Namespace'}
-    {@render text(workflow?.parentNamespaceId ?? '')}
+    {@render text(workflow?.parentNamespaceId ?? '', href)}
   {:else if type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
     <Timestamp dateTime={displayValue} />
   {:else if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
     <Badge text={displayValue} />
   {:else}
-    {@render text(displayValue)}
+    {@render text(displayValue, href)}
   {/if}
 {/snippet}
 
-{#if filterable}
-  <QuickFilterTableCell
-    class={className}
-    style={widthStyle}
-    data-testid={testId}
-    density={truncate ? 'dense' : 'comfortable'}
-    filterIconTitle={translate('common.filter-workflows')}
-    filters={workflowFilters}
-    {attribute}
-    {type}
-    {value}
-    copyValue={displayValue}
-  >
-    {@render cellContent()}
-  </QuickFilterTableCell>
-{:else}
-  <td class={className} style={widthStyle} data-testid={testId}>
-    {@render cellContent()}
-  </td>
-{/if}
+<QuickFilterCell
+  columns={WORKFLOW_QUICK_FILTER_COLUMNS}
+  searchAttributes={$searchAttributes}
+  filters={workflowFilters}
+  filterIconTitle={translate('common.filter-workflows')}
+  {label}
+  row={workflow}
+  disabled={noFilter}
+  class={className}
+  style={widthStyle}
+  data-testid={testId}
+  density={truncate ? 'dense' : 'comfortable'}
+>
+  {#snippet children({ type, value, displayValue })}
+    {@render cellContent(type, value, displayValue)}
+  {/snippet}
+</QuickFilterCell>

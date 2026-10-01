@@ -5,6 +5,7 @@ import {
 } from '$lib/utilities/format-time';
 import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
+import type { QuickFilterColumns } from '$lib/utilities/query/quick-filter-table';
 
 export const ACTIVITY_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Activity ID': 'ActivityId',
@@ -20,9 +21,6 @@ export const ACTIVITY_COLUMN_ATTRIBUTE: Record<string, string> = {
 };
 
 export const UNFILTERABLE_ACTIVITY_COLUMNS: string[] = [];
-
-export const getActivityColumnAttribute = (label: string): string =>
-  ACTIVITY_COLUMN_ATTRIBUTE[label] ?? label;
 
 export const getActivityColumnValue = (
   label: string,
@@ -57,3 +55,10 @@ export const getActivityColumnValue = (
       return undefined;
   }
 };
+
+export const ACTIVITY_QUICK_FILTER_COLUMNS: QuickFilterColumns<ActivityExecutionInfo> =
+  {
+    attributes: ACTIVITY_COLUMN_ATTRIBUTE,
+    getValue: getActivityColumnValue,
+    unfilterable: UNFILTERABLE_ACTIVITY_COLUMNS,
+  };
