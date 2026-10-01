@@ -240,7 +240,9 @@
         </div>
       </div>
     {:else}
-      {@render nameInput()}
+      <div class:opacity-50={fieldsInert} inert={fieldsInert}>
+        {@render nameInput()}
+      </div>
     {/if}
     <div
       class="flex flex-col gap-4"
