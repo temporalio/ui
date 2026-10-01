@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { colorScales } from '$lib/theme/io/themes';
 
-import { getEventPresentation, getMarkPresentation } from './mark-presentation';
+import {
+  getEventDescription,
+  getEventLabel,
+  getEventPresentation,
+  getMarkPresentation,
+  outcomeColors,
+} from './mark-presentation';
 import type { QualifiedHistoryEvent } from '../../data/history-events/types';
 import type { LifecycleKind } from '../../data/lifecycle-groups/types';
 
@@ -65,6 +71,7 @@ describe('getMarkPresentation', () => {
 describe('getEventPresentation', () => {
   it.each<[EventType, string]>([
     ['WorkflowExecutionCompleted', colorScales.green[9]],
+    ['WorkflowExecutionUpdateCompleted', colorScales.green[9]],
     ['WorkflowExecutionFailed', colorScales.red[11]],
     ['WorkflowExecutionTerminated', colorScales.red[11]],
     ['WorkflowExecutionTimedOut', colorScales.persimmon[9]],
@@ -74,12 +81,12 @@ describe('getEventPresentation', () => {
     expect(getEventPresentation('workflow', eventType)).toEqual({
       color,
       isOutcome: true,
+      shape: eventType.includes('Update') ? 'diamond' : 'circle',
     });
   });
 
   it.each<EventType>([
     'WorkflowExecutionStarted',
-    'WorkflowExecutionSignaled',
     'WorkflowTaskScheduled',
     'WorkflowTaskStarted',
     'WorkflowTaskCompleted',
@@ -92,55 +99,170 @@ describe('getEventPresentation', () => {
     expect(getEventPresentation('workflow', eventType)).toEqual({
       color: colorScales.neutral[8],
       isOutcome: false,
+      shape: 'circle',
     });
   });
 
-  it.each<[LifecycleKind, EventType, string]>([
-    ['activity', 'ActivityTaskCompleted', colorScales.green[9]],
-    ['activity', 'ActivityTaskFailed', colorScales.red[11]],
-    ['activity', 'ActivityTaskTimedOut', colorScales.persimmon[9]],
-    ['activity', 'ActivityTaskCanceled', colorScales.amber[9]],
-    ['child-workflow', 'ChildWorkflowExecutionCompleted', colorScales.green[9]],
-    ['child-workflow', 'ChildWorkflowExecutionTerminated', colorScales.red[11]],
-    ['nexus-operation', 'NexusOperationCompleted', colorScales.green[9]],
-    ['nexus-operation', 'NexusOperationFailed', colorScales.red[11]],
-    ['timer', 'TimerFired', colorScales.tangerine[9]],
-    ['timer', 'TimerCanceled', colorScales.amber[9]],
-    ['update', 'WorkflowExecutionUpdateCompleted', colorScales.green[9]],
+  it.each<[LifecycleKind, EventType, string, 'circle' | 'diamond']>([
+    ['activity', 'ActivityTaskCompleted', colorScales.green[9], 'circle'],
+    ['activity', 'ActivityTaskFailed', colorScales.red[11], 'circle'],
+    ['activity', 'ActivityTaskTimedOut', colorScales.persimmon[9], 'circle'],
+    ['activity', 'ActivityTaskCanceled', colorScales.amber[9], 'circle'],
+    [
+      'child-workflow',
+      'ChildWorkflowExecutionCompleted',
+      colorScales.green[9],
+      'circle',
+    ],
+    [
+      'child-workflow',
+      'ChildWorkflowExecutionFailed',
+      colorScales.red[11],
+      'circle',
+    ],
+    [
+      'child-workflow',
+      'ChildWorkflowExecutionTerminated',
+      colorScales.red[11],
+      'circle',
+    ],
+    [
+      'child-workflow',
+      'ChildWorkflowExecutionTimedOut',
+      colorScales.persimmon[9],
+      'circle',
+    ],
+    [
+      'child-workflow',
+      'ChildWorkflowExecutionCanceled',
+      colorScales.amber[9],
+      'circle',
+    ],
+    [
+      'nexus-operation',
+      'NexusOperationCompleted',
+      colorScales.green[9],
+      'circle',
+    ],
+    ['nexus-operation', 'NexusOperationFailed', colorScales.red[11], 'circle'],
+    [
+      'nexus-operation',
+      'NexusOperationTimedOut',
+      colorScales.persimmon[9],
+      'circle',
+    ],
+    [
+      'nexus-operation',
+      'NexusOperationCanceled',
+      colorScales.amber[9],
+      'circle',
+    ],
+    ['timer', 'TimerFired', colorScales.green[9], 'circle'],
+    ['timer', 'TimerCanceled', colorScales.amber[9], 'circle'],
+    [
+      'update',
+      'WorkflowExecutionUpdateCompleted',
+      colorScales.green[9],
+      'diamond',
+    ],
     [
       'external-signal',
       'SignalExternalWorkflowExecutionFailed',
       colorScales.red[11],
+      'diamond',
     ],
-    ['event', 'WorkflowExecutionContinuedAsNew', colorScales.indigo[9]],
-  ])('colors %s event %s as an outcome', (kind, eventType, color) => {
+    [
+      'event',
+      'WorkflowExecutionContinuedAsNew',
+      colorScales.indigo[9],
+      'circle',
+    ],
+  ])('colors %s event %s as an outcome', (kind, eventType, color, shape) => {
     expect(getEventPresentation(kind, eventType)).toEqual({
       color,
       isOutcome: true,
+      shape,
     });
   });
 
-  it.each<[LifecycleKind, EventType, string]>([
-    ['activity', 'ActivityTaskStarted', colorScales.zaffre[9]],
-    ['child-workflow', 'ChildWorkflowExecutionStarted', colorScales.zaffre[9]],
-    ['nexus-operation', 'NexusOperationStarted', colorScales.zaffre[9]],
-    ['timer', 'TimerStarted', colorScales.zaffre[9]],
-    ['activity', 'ActivityTaskScheduled', colorScales.neutral[8]],
-    ['update', 'WorkflowExecutionUpdateAccepted', colorScales.neutral[8]],
-    ['event', 'MarkerRecorded', colorScales.neutral[8]],
-    ['event', 'WorkflowExecutionSignaled', colorScales.pink[9]],
-    [
-      'external-signal',
-      'ExternalWorkflowExecutionSignaled',
-      colorScales.pink[9],
-    ],
+  it.each<[LifecycleKind, EventType, 'circle' | 'diamond' | 'square']>([
+    ['activity', 'ActivityTaskStarted', 'circle'],
+    ['child-workflow', 'ChildWorkflowExecutionStarted', 'circle'],
+    ['nexus-operation', 'NexusOperationStarted', 'circle'],
+    ['timer', 'TimerStarted', 'circle'],
+    ['activity', 'ActivityTaskScheduled', 'circle'],
+    ['update', 'WorkflowExecutionUpdateAccepted', 'diamond'],
+    ['event', 'MarkerRecorded', 'square'],
+    ['workflow', 'MarkerRecorded', 'square'],
+    ['event', 'WorkflowExecutionStarted', 'circle'],
+    ['event', 'WorkflowExecutionSignaled', 'diamond'],
+    ['workflow', 'WorkflowExecutionSignaled', 'diamond'],
+
+    ['event', 'WorkflowExecutionUpdateAdmitted', 'diamond'],
+    ['event', 'WorkflowExecutionUpdateAccepted', 'diamond'],
+    ['external-signal', 'ExternalWorkflowExecutionSignaled', 'diamond'],
+    ['external-signal', 'SignalExternalWorkflowExecutionInitiated', 'diamond'],
+    ['external-signal', 'ActivityTaskStarted', 'diamond'],
+    ['update', 'ActivityTaskStarted', 'diamond'],
   ])(
-    'colors ordinary %s event %s without an outcome',
-    (kind, eventType, color) => {
+    'keeps ordinary %s event %s neutral with shape %s',
+    (kind, eventType, shape) => {
       expect(getEventPresentation(kind, eventType)).toEqual({
-        color,
+        color: colorScales.neutral[8],
         isOutcome: false,
+        shape,
       });
     },
   );
+
+  it.each<LifecycleKind>(['event', 'workflow', 'external-signal', 'update'])(
+    'keeps local markers square for kind %s',
+    (kind) => {
+      expect(getEventPresentation(kind, 'MarkerRecorded')).toEqual({
+        color: colorScales.neutral[8],
+        isOutcome: false,
+        shape: 'square',
+      });
+    },
+  );
+});
+
+describe('outcomeColors', () => {
+  it('exports the standardized legend palette', () => {
+    expect(outcomeColors).toEqual({
+      completed: colorScales.green[9],
+      failed: colorScales.red[11],
+      timedOut: colorScales.persimmon[9],
+      canceled: colorScales.amber[9],
+      continuedAsNew: colorScales.indigo[9],
+    });
+  });
+});
+
+describe('getEventLabel', () => {
+  it.each<[EventType, string]>([
+    ['ActivityTaskCompleted', 'Activity task completed'],
+    ['WorkflowExecutionContinuedAsNew', 'Workflow execution continued as new'],
+    ['WorkflowExecutionTimedOut', 'Workflow execution timed out'],
+    ['WorkflowExecutionSignaled', 'Workflow execution signaled'],
+    ['WorkflowExecutionUpdateAccepted', 'Workflow execution update accepted'],
+    ['MarkerRecorded', 'Marker recorded'],
+    ['TimerFired', 'Timer fired'],
+  ])('formats %s as %s', (eventType, label) => {
+    expect(getEventLabel(eventType)).toBe(label);
+  });
+});
+
+describe('getEventDescription', () => {
+  it.each([0, 1])('uses only the label for count %s', (count) => {
+    expect(getEventDescription('ActivityTaskCompleted', count)).toBe(
+      'Activity task completed',
+    );
+  });
+
+  it.each([2, 10, 100])('includes the cluster count %s', (count) => {
+    expect(getEventDescription('WorkflowExecutionContinuedAsNew', count)).toBe(
+      `${count} events · Workflow execution continued as new`,
+    );
+  });
 });

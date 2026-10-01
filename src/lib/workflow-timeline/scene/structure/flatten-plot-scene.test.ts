@@ -82,7 +82,7 @@ describe('flattenPlotScene', () => {
     ]);
   });
 
-  it('shows child workflow lifecycle rows before other child events', () => {
+  it('keeps child workflow lifecycle entries on executions and only flattens other events', () => {
     const parent = execution('parent', 'parent-run');
     const child = execution('child', 'child-run');
     const eventKey = getEventKey(child.execution.executionKey, '1');
@@ -148,16 +148,8 @@ describe('flattenPlotScene', () => {
       ['child', 2],
       ['execution', 3],
       ['event', 4],
-      ['event', 4],
     ]);
     expect(rows.filter((row) => row.kind === 'event')).toEqual([
-      {
-        kind: 'event',
-        key: `row:${lifecycle.row.rowKey}`,
-        depth: 4,
-        executionKey: child.execution.executionKey,
-        row: lifecycle.row,
-      },
       {
         kind: 'event',
         key: `row:${activity.row.rowKey}`,
@@ -168,7 +160,7 @@ describe('flattenPlotScene', () => {
     ]);
   });
 
-  it('shows a lifecycle-only child event when expanded and hides it when its run is collapsed', () => {
+  it('keeps a lifecycle-only child execution visible without details or child events', () => {
     const parent = execution('parent', 'parent-run');
     const child = execution('child', 'child-run');
     const eventKey = getEventKey(child.execution.executionKey, '1');
@@ -220,25 +212,113 @@ describe('flattenPlotScene', () => {
       ['execution', 1],
       ['child', 2],
       ['execution', 3],
-      ['event', 4],
     ]);
-    expect(expanded.filter((row) => row.kind === 'event')).toEqual([
-      {
-        kind: 'event',
-        key: `row:${lifecycle.row.rowKey}`,
-        depth: 4,
-        executionKey: child.execution.executionKey,
-        row: lifecycle.row,
-      },
-    ]);
+    expect(expanded.filter((row) => row.kind === 'event')).toEqual([]);
+    const childExecution = expanded.find(
+      (row) => row.kind === 'execution' && row.depth === 3,
+    );
+    expect(childExecution).toEqual({
+      kind: 'execution',
+      key: `execution:${child.execution.executionKey}`,
+      depth: 3,
+      continuesAsNew: false,
+      hasDetails: false,
+      runNumber: 1,
+      runCount: 1,
+      execution: { ...child, rowCount: 1, entries: [lifecycle] },
+    });
+    if (childExecution?.kind !== 'execution') {
+      throw new Error('Expected child execution');
+    }
+    expect(childExecution.execution.entries[0]).toBe(lifecycle);
     expect(
       flattenPlotScene(
         scene,
         () => false,
         (key) => key === `execution:${child.execution.executionKey}`,
       ),
-    ).toEqual(expanded.filter((row) => row.kind !== 'event'));
+    ).toEqual(expanded);
   });
+
+  it.each(['activity', 'loaded child workflow', 'unloaded child workflow'])(
+    'keeps hasDetails true for a collapsed run containing %s details and hides them',
+    (detail) => {
+      const parent = execution('parent', 'parent-run');
+      const child = execution('child', 'child-run');
+      const eventKey = getEventKey(parent.execution.executionKey, '1');
+      const parentExecution: ExecutionScene = {
+        ...parent,
+        entries:
+          detail === 'activity'
+            ? [
+                {
+                  kind: 'row',
+                  row: {
+                    rowKey: getLifecycleKey(eventKey),
+                    executionKey: parent.execution.executionKey,
+                    kind: 'activity',
+                    label: 'Activity',
+                    eventKeys: [eventKey],
+                    startEventId: '1',
+                    endEventId: '1',
+                    startTimeMs: 0,
+                    endTimeMs: 0,
+                  },
+                },
+              ]
+            : [
+                {
+                  kind: 'child-workflow',
+                  initiatedEventId: '1',
+                  initiatedEventKey: eventKey,
+                  workflow: {
+                    workflowKey: child.execution.workflowKey,
+                    executions:
+                      detail === 'loaded child workflow' ? [child] : [],
+                  },
+                },
+              ],
+      };
+      const scene: WorkflowScene = {
+        workflowKey: parent.execution.workflowKey,
+        executions: [parentExecution],
+      };
+      const expanded = flattenPlotScene(
+        scene,
+        () => false,
+        () => false,
+      );
+      const collapsed = flattenPlotScene(
+        scene,
+        () => false,
+        (key) => key === `execution:${parent.execution.executionKey}`,
+      );
+
+      expect(expanded.length).toBeGreaterThan(2);
+      expect(collapsed).toEqual([
+        {
+          kind: 'workflow',
+          key: `workflow:${scene.workflowKey}`,
+          depth: 0,
+          workflow: scene,
+        },
+        {
+          kind: 'execution',
+          key: `execution:${parent.execution.executionKey}`,
+          depth: 1,
+          continuesAsNew: false,
+          hasDetails: true,
+          runNumber: 1,
+          runCount: 1,
+          execution: parentExecution,
+        },
+      ]);
+      expect(collapsed[1]).toEqual(expanded[1]);
+      const run = collapsed.find((row) => row.kind === 'execution');
+      expect(run?.execution).toBe(parentExecution);
+      expect(run?.execution.entries).toBe(parentExecution.entries);
+    },
+  );
 
   it('shows every child workflow and execution in scene order', () => {
     const grandchild = execution('grandchild', 'grandchild-run');
@@ -356,7 +436,6 @@ describe('flattenPlotScene', () => {
     ).toEqual([
       ['root workflow', 0, false],
       ['parent-run-1', 1, true],
-      ['Workflow Execution', 2, false],
       ['Activity', 2, false],
       ['child workflow', 2, false],
       ['child-run-1', 3, true],
@@ -364,7 +443,6 @@ describe('flattenPlotScene', () => {
       ['grandchild-run', 5, false],
       ['child-run-2', 3, false],
       ['parent-run-2', 1, false],
-      ['Second Workflow Execution', 2, false],
     ]);
 
     expect(expanded[0]).toEqual({
@@ -380,35 +458,22 @@ describe('flattenPlotScene', () => {
           row.execution.execution.identity.runId,
           row.runNumber,
           row.runCount,
+          row.hasDetails,
         ]),
     ).toEqual([
-      ['parent-run-1', 1, 2],
-      ['child-run-1', 1, 2],
-      ['grandchild-run', 1, 1],
-      ['child-run-2', 2, 2],
-      ['parent-run-2', 2, 2],
+      ['parent-run-1', 1, 2, true],
+      ['child-run-1', 1, 2, true],
+      ['grandchild-run', 1, 1, false],
+      ['child-run-2', 2, 2, false],
+      ['parent-run-2', 2, 2, false],
     ]);
     expect(expanded.filter((row) => row.kind === 'event')).toEqual([
-      {
-        kind: 'event',
-        key: `row:${workflow.row.rowKey}`,
-        depth: 2,
-        executionKey: parentFirst.execution.executionKey,
-        row: workflow.row,
-      },
       {
         kind: 'event',
         key: `row:${activity.row.rowKey}`,
         depth: 2,
         executionKey: parentFirst.execution.executionKey,
         row: activity.row,
-      },
-      {
-        kind: 'event',
-        key: `row:${secondWorkflow.row.rowKey}`,
-        depth: 2,
-        executionKey: parentSecond.execution.executionKey,
-        row: secondWorkflow.row,
       },
     ]);
 
@@ -420,22 +485,14 @@ describe('flattenPlotScene', () => {
         (key) => key === childHeader.key,
         () => false,
       ).map((row) => row.kind),
-    ).toEqual([
-      'workflow',
-      'execution',
-      'event',
-      'event',
-      'child',
-      'execution',
-      'event',
-    ]);
+    ).toEqual(['workflow', 'execution', 'event', 'child', 'execution']);
     expect(
       flattenPlotScene(
         scene,
         () => false,
         (key) => key === `execution:${parentFirst.execution.executionKey}`,
       ).map((row) => row.kind),
-    ).toEqual(['workflow', 'execution', 'execution', 'event']);
+    ).toEqual(['workflow', 'execution', 'execution']);
 
     const expandedChildKeys = new Set<string>([
       `workflow:${scene.workflowKey}`,
@@ -452,24 +509,21 @@ describe('flattenPlotScene', () => {
     expect(defaultRows().map((row) => row.key)).toEqual([
       `workflow:${scene.workflowKey}`,
       firstKey,
-      `row:${workflow.row.rowKey}`,
+
       `row:${activity.row.rowKey}`,
       childHeader.key,
       secondKey,
-      `row:${secondWorkflow.row.rowKey}`,
     ]);
     expandedChildKeys.add(childHeader.key);
     expect(defaultRows().map((row) => row.kind)).toEqual([
       'workflow',
       'execution',
       'event',
-      'event',
       'child',
       'execution',
       'child',
       'execution',
       'execution',
-      'event',
     ]);
     collapsedExecutionKeys.add(
       `execution:${childFirst.execution.executionKey}`,

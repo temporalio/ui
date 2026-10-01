@@ -15,10 +15,10 @@
   import { lifecycleVisuals } from './lifecycle-visuals';
   import { getMarkGeometry } from './mark-geometry';
   import {
+    getEventDescription,
     getEventPresentation,
     getMarkPresentation,
   } from './mark-presentation';
-  import { getLineColor } from './mark-visuals';
   import { getMinimapLandmarks } from './minimap-landmarks';
   import { getTimeTicks, type TimeRange, timeToX } from './time-viewport';
   import { getWheelTimeRange } from './wheel-time-range';
@@ -34,6 +34,7 @@
   import type { TimelineEventRow } from '../timeline-rows/types';
 
   import WorkflowTimelineIconDefs from './workflow-timeline-icon-defs.svelte';
+  import WorkflowTimelineLegend from './workflow-timeline-legend.svelte';
   import WorkflowTimelineMinimap from './workflow-timeline-minimap.svelte';
 
   let {
@@ -302,7 +303,6 @@
   executionKey: ExecutionKey,
   range: TimeRange,
 )}
-  {@const visual = lifecycleVisuals[row.kind]}
   {@const left = plotX(row.startTimeMs, range, contentWidth)}
   {@const isRunning =
     row.kind === 'workflow' &&
@@ -332,15 +332,16 @@
     { clusterDistance: 8, radius: 5 },
   )}
   {@const bounds = geometry.bounds}
+  {@const finalEvent = endingEvent(row)}
 
   <div
     class="mark"
     class:workflow-events={presentation.isWorkflow}
     style:left={`${labelWidth + bounds.left}px`}
     style:width={`${bounds.right - bounds.left}px`}
-    style:--line-color={isRunning
-      ? colorScales.blue[9]
-      : getLineColor(endingEvent(row)?.eventType, visual.bgColor)}
+    style:--line-color={finalEvent
+      ? getEventPresentation(row.kind, finalEvent.eventType).color
+      : colorScales.neutral[8]}
   >
     {#if presentation.showLine}
       <span
@@ -358,10 +359,7 @@
     ></button>
 
     {#each geometry.ticks as eventTick (eventTick.x)}
-      {@const description =
-        eventTick.count > 1
-          ? `${eventTick.count} events · ${eventTick.eventType} · View lifecycle details`
-          : `${eventTick.eventType} · View lifecycle details`}
+      {@const description = `${getEventDescription(eventTick.eventType, eventTick.count)} · View lifecycle details`}
       {@const eventPresentation = getEventPresentation(
         row.kind,
         eventTick.eventType,
@@ -369,7 +367,8 @@
       <button
         type="button"
         class="event-dot"
-        class:point={presentation.isPoint}
+        class:diamond={eventPresentation.shape === 'diamond'}
+        class:square={eventPresentation.shape === 'square'}
         class:compact={presentation.isCompact}
         class:outcome={eventPresentation.isOutcome}
         class:cluster={eventTick.count > 1}
@@ -412,6 +411,7 @@
 
 <div class="timeline">
   <WorkflowTimelineIconDefs />
+  <WorkflowTimelineLegend />
   <div class="minimap-area" style:margin-left={`${labelWidth}px`}>
     <WorkflowTimelineMinimap
       {domain}
@@ -576,14 +576,19 @@
                   {@const historyState = historyByKey.get(
                     item.execution.execution.executionKey,
                   )}
-                  <button
-                    type="button"
-                    class="toggle"
-                    aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} run ${runId}`}
-                    aria-expanded={!isCollapsed}
-                    onclick={() => toggleKey(collapsedExecutionKeys, item.key)}
-                    >{isCollapsed ? '▸' : '▾'}</button
-                  >
+                  {#if item.hasDetails}
+                    <button
+                      type="button"
+                      class="toggle"
+                      aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} run ${runId}`}
+                      aria-expanded={!isCollapsed}
+                      onclick={() =>
+                        toggleKey(collapsedExecutionKeys, item.key)}
+                      >{isCollapsed ? '▸' : '▾'}</button
+                    >
+                  {:else}
+                    <span class="toggle-spacer" aria-hidden="true"></span>
+                  {/if}
                   {@const status = statusForExecution(item.execution)}
                   <span
                     class="status-dot"
@@ -645,17 +650,10 @@
               {:else if item.kind === 'execution'}
                 {@const workflowRow = workflowRowForExecution(item.execution)}
                 {#if workflowRow}
-                  {@render summaryMark(
-                    {
-                      startMs: workflowRow.startTimeMs,
-                      endMs: activeExecutionKeys.has(
-                        item.execution.execution.executionKey,
-                      )
-                        ? Math.max(workflowRow.endTimeMs, now)
-                        : workflowRow.endTimeMs,
-                    },
+                  {@render timelineMark(
                     workflowRow,
-                    false,
+                    item.execution.execution.executionKey,
+                    domain,
                   )}
                 {/if}
               {:else}
@@ -1100,22 +1098,33 @@
     transform: translate(-50%, -50%);
   }
 
-  .event-dot.cluster {
-    width: 7px;
-    height: 7px;
-  }
-
   .event-dot.outcome,
   .event-dot.compact {
     width: 9px;
     height: 9px;
   }
 
-  .event-dot.point {
+  .event-dot.diamond {
     width: 7px;
     height: 7px;
     border-radius: 1px;
     transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .event-dot.square {
+    width: 7px;
+    height: 7px;
+    border-radius: 1px;
+  }
+
+  .event-dot.cluster {
+    box-sizing: border-box;
+    width: 9px;
+    height: 9px;
+    border: 2px solid var(--event-color);
+    border-radius: 50%;
+    background: var(--color-surface-primary);
+    transform: translate(-50%, -50%);
   }
 
   .event-dot:focus-visible {
