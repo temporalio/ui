@@ -17,6 +17,7 @@ import {
   isEventParameters,
   isNamespaceParameter,
   isWorkflowParameters,
+  routeForAgents,
   routeForArchivalWorkflows,
   routeForAuthentication,
   routeForAuthenticationRedirect,
@@ -156,6 +157,12 @@ describe('routeFor', () => {
   it('should route to the catalog within a namespace', () => {
     expect(routeForCatalog({ namespace: 'default' })).toBe(
       `${base}/namespaces/default/catalog`,
+    );
+  });
+
+  it('should route to agents within a namespace', () => {
+    expect(routeForAgents({ namespace: 'default' })).toBe(
+      `${base}/namespaces/default/agents`,
     );
   });
 

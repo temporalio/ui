@@ -49,7 +49,9 @@
   args: ComponentProps<typeof ChipInput>,
   context: StoryContext<ComponentProps<typeof ChipInput>>,
 )}
-  <ChipInput {...args} id={context.id} />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <ChipInput {...args} id={context.id} />
+  </div>
 {/snippet}
 
 <Story name="Default" />

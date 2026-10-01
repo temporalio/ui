@@ -22,19 +22,25 @@
     hasCloudRunImpersonatorPlaceholder,
     interpolateCloudRunTerraformTemplate,
   } from './cloud-run-terraform';
+  import {
+    COMPUTE_PROVIDERS,
+    computeProviderFromType,
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+    defaultComputeProviderTemplates,
+    TERRAFORM_MODULES,
+  } from './compute-providers';
   import { GCP_REGIONS } from './gcp-regions';
-  import defaultCloudRunTerraformTemplate from './serverless-worker-cloud-run.tf?raw';
-  import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
   import {
     defaultScaleDownStabilization,
     interpolateTerraformTemplate,
     scaleDownStabilizationUnits,
   } from './shared';
-  import cfnTemplate from './temporal-worker-role.yaml?raw';
 
   interface Props {
     provider?: string;
     lambdaArn: string;
+    agentCoreEndpointArn?: string;
     iamRoleArn: string;
     roleExternalId: string;
     gcpProject?: string;
@@ -51,12 +57,17 @@
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
     metricsPollIntervalMs?: number;
-    cfnTemplateUrl?: string;
-    cfnTemplate?: string;
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    /**
+     * The templates offered per provider. Defaults to the ones bundled here,
+     * which is what a self-hosted deployment wants. A consumer overrides them
+     * by passing a full map: it is exhaustive over ComputeProviderValue, so
+     * adding a provider fails the consumer's type check until it supplies
+     * templates for it.
+     */
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     errors?: {
       lambdaArn?: string[];
+      agentCoreEndpointArn?: string[];
       iamRoleArn?: string[];
       roleExternalId?: string[];
       gcpProject?: string[];
@@ -78,6 +89,7 @@
   let {
     provider = 'lambda',
     lambdaArn = $bindable(),
+    agentCoreEndpointArn = $bindable(''),
     iamRoleArn = $bindable(),
     roleExternalId = $bindable(),
     gcpProject = $bindable(''),
@@ -94,26 +106,44 @@
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
     metricsPollIntervalMs = $bindable(),
-    cfnTemplateUrl,
-    cfnTemplate: cfnTemplateProp,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates = defaultComputeProviderTemplates,
     errors = {},
   }: Props = $props();
 
-  const resolvedCfnTemplate = $derived(cfnTemplateProp ?? cfnTemplate);
-  const resolvedTerraformTemplate = $derived(
-    interpolateTerraformTemplate(
-      terraformTemplate ?? defaultTerraformTemplate,
-      {
-        externalId: roleExternalId,
-        lambdaArn,
-      },
-    ),
+  // Both AWS providers assume a role, and the role each needs is different:
+  // one grants lambda:InvokeFunction, the other bedrock-agentcore:
+  // InvokeAgentRuntime. Handing out the Lambda role for AgentCore would
+  // produce a role that cannot invoke a runtime, so the templates follow the
+  // selected provider rather than being shared.
+  const isAgentCore = $derived(provider === 'agentcore');
+  // `provider` arrives as a form field, so it is a string until proven one of
+  // ours. Narrowing here rather than asserting keeps an unrecognised value from
+  // reading as a provider that happens to have no entry.
+  const providerValue = $derived(computeProviderFromType(provider));
+  const providerTemplates = $derived(
+    providerValue ? templates[providerValue] : undefined,
   );
+  const cloudFormation = $derived(providerTemplates?.cloudFormation);
+
+  const resolvedCfnTemplate = $derived(cloudFormation?.template ?? '');
+  // Only the key belonging to this provider's template is present, so both
+  // ARNs are passed and the absent one is a no-op.
+  const resolvedTerraformTemplate = $derived(
+    interpolateTerraformTemplate(providerTemplates?.terraform ?? '', {
+      externalId: roleExternalId,
+      lambdaArn,
+      agentCoreEndpointArn,
+    }),
+  );
+  const terraformModuleHref = $derived(
+    (providerValue && COMPUTE_PROVIDERS[providerValue].terraformModuleHref) ||
+      TERRAFORM_MODULES,
+  );
+  // Read from the map rather than the selected provider: the Cloud Run block
+  // renders inside its own branch, where `provider` is already 'cloud-run'.
   const resolvedCloudRunTerraformTemplate = $derived(
     interpolateCloudRunTerraformTemplate(
-      cloudRunTerraformTemplate ?? defaultCloudRunTerraformTemplate,
+      templates['cloud-run'].terraform,
       gcpProject,
     ),
   );
@@ -122,17 +152,22 @@
   );
 
   const launchStackHref = $derived.by(() => {
-    if (!cfnTemplateUrl) {
+    const templateUrl = cloudFormation?.url;
+
+    if (!templateUrl) {
       return 'https://console.aws.amazon.com/cloudformation/';
     }
-    const params = [`templateURL=${encodeURIComponent(cfnTemplateUrl)}`];
+    const params = [`templateURL=${encodeURIComponent(templateUrl)}`];
     if (roleExternalId) {
       params.push(
         `param_AssumeRoleExternalId=${encodeURIComponent(roleExternalId)}`,
       );
     }
-    if (lambdaArn) {
-      params.push(`param_LambdaFunctionARNs=${encodeURIComponent(lambdaArn)}`);
+    const resource = isAgentCore ? agentCoreEndpointArn : lambdaArn;
+    if (resource) {
+      params.push(
+        `param_${isAgentCore ? 'AgentRuntimeArns' : 'LambdaFunctionARNs'}=${encodeURIComponent(resource)}`,
+      );
     }
     return `https://console.aws.amazon.com/cloudformation/home#/stacks/create/review?${params.join('&')}`;
   });
@@ -149,13 +184,13 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'temporal-worker-role.yaml';
+    a.download = cloudFormation?.fileName ?? 'temporal-worker-role.yaml';
     a.click();
     URL.revokeObjectURL(url);
   }
 </script>
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <h2 class="text-base font-medium">
   {translate('workers.resource-section')}
@@ -185,6 +220,30 @@
       TrailingIcon={IconExternalLinkOptical}
     >
       {translate('workers.open-lambda-console')}
+    </Button>
+  </div>
+{:else if provider === 'agentcore'}
+  <div class="flex flex-wrap items-end gap-4">
+    <Input
+      bind:value={agentCoreEndpointArn}
+      id="agentCoreEndpointArn"
+      name="agentCoreEndpointArn"
+      label={translate('workers.agentcore-endpoint-arn-label')}
+      hintText={errors.agentCoreEndpointArn?.[0] ||
+        translate('workers.agentcore-endpoint-arn-hint')}
+      error={!!errors.agentCoreEndpointArn?.[0]}
+      placeholder={translate('workers.agentcore-endpoint-arn-placeholder')}
+      required
+      class="flex-1"
+    />
+    <Button
+      variant="secondary"
+      type="button"
+      href="https://console.aws.amazon.com/bedrock-agentcore"
+      target="_blank"
+      TrailingIcon={IconExternalLinkOptical}
+    >
+      {translate('workers.open-agentcore-console')}
     </Button>
   </div>
 {:else}
@@ -239,7 +298,7 @@
   </div>
 {/if}
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <h2 class="text-base font-medium">
   {translate('workers.access-section')}
@@ -248,7 +307,7 @@
   {translate('workers.access-section-description')}
 </p>
 
-{#if provider === 'lambda'}
+{#if provider === 'lambda' || provider === 'agentcore'}
   <div class="flex flex-col gap-4">
     <Input
       bind:value={iamRoleArn}
@@ -271,64 +330,70 @@
       placeholder={translate('workers.external-id-placeholder')}
       required
     />
-    <Accordion
-      Icon={IconInfo}
-      title={translate('workers.no-role-prompt')}
-      bind:open={showRoleHelp}
-      class="[&_h3]:text-sm"
-    >
-      <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
-        <ToggleButtons>
-          <ToggleButton
-            active={activeRoleHelpTab === 'cloudformation'}
-            onclick={() => (activeRoleHelpTab = 'cloudformation')}
-          >
-            {translate('workers.cfn-tab')}
-          </ToggleButton>
-          <ToggleButton
-            active={activeRoleHelpTab === 'terraform'}
-            onclick={() => (activeRoleHelpTab = 'terraform')}
-          >
-            {translate('workers.terraform-tab')}
-          </ToggleButton>
-        </ToggleButtons>
-        {#if activeRoleHelpTab === 'cloudformation'}
-          <p class="text-sm text-secondary">
-            {translate('workers.launch-stack-description')}
-          </p>
-          <div class="flex flex-wrap items-center gap-4">
-            <Button
-              variant="secondary"
-              size="sm"
-              href={launchStackHref}
-              target="_blank"
-              TrailingIcon={IconExternalLinkOptical}
+    {#if provider === 'lambda' || provider === 'agentcore'}
+      <Accordion
+        Icon={IconInfo}
+        title={translate('workers.no-role-prompt')}
+        bind:open={showRoleHelp}
+        class="border-tertiary bg-background-primary [&_h3]:text-sm"
+      >
+        <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
+          <ToggleButtons>
+            <ToggleButton
+              active={activeRoleHelpTab === 'cloudformation'}
+              onclick={() => (activeRoleHelpTab = 'cloudformation')}
             >
-              {translate('workers.launch-stack')}
-            </Button>
-            <Button variant="secondary" size="sm" onclick={downloadCfnTemplate}>
-              {translate('workers.download-template')}
-            </Button>
-          </div>
-        {:else}
-          <p class="text-sm text-secondary">
-            {translate('workers.terraform-description-before')}<Link
-              href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/aws/lambda"
-              newTab>{translate('workers.terraform-iam-module-link')}</Link
-            >{translate('workers.terraform-description-after')}
-          </p>
-          <CodeBlock
-            content={resolvedTerraformTemplate}
-            language="text"
-            maxHeight={300}
-            copyable
-            label={translate('workers.terraform-iam-module-link')}
-            copyIconTitle={translate('workers.copy-snippet')}
-            copySuccessIconTitle={translate('workers.copied')}
-          />
-        {/if}
-      </div>
-    </Accordion>
+              {translate('workers.cfn-tab')}
+            </ToggleButton>
+            <ToggleButton
+              active={activeRoleHelpTab === 'terraform'}
+              onclick={() => (activeRoleHelpTab = 'terraform')}
+            >
+              {translate('workers.terraform-tab')}
+            </ToggleButton>
+          </ToggleButtons>
+          {#if activeRoleHelpTab === 'cloudformation'}
+            <p class="text-sm text-secondary">
+              {translate('workers.launch-stack-description')}
+            </p>
+            <div class="flex flex-wrap items-center gap-4">
+              <Button
+                variant="secondary"
+                size="sm"
+                href={launchStackHref}
+                target="_blank"
+                TrailingIcon={IconExternalLinkOptical}
+              >
+                {translate('workers.launch-stack')}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onclick={downloadCfnTemplate}
+              >
+                {translate('workers.download-template')}
+              </Button>
+            </div>
+          {:else}
+            <p class="text-sm text-secondary">
+              {translate('workers.terraform-description-before')}<Link
+                href={terraformModuleHref}
+                newTab>{translate('workers.terraform-iam-module-link')}</Link
+              >{translate('workers.terraform-description-after')}
+            </p>
+            <CodeBlock
+              content={resolvedTerraformTemplate}
+              language="text"
+              maxHeight={300}
+              copyable
+              label={translate('workers.terraform-iam-module-link')}
+              copyIconTitle={translate('workers.copy-snippet')}
+              copySuccessIconTitle={translate('workers.copied')}
+            />
+          {/if}
+        </div>
+      </Accordion>
+    {/if}
   </div>
 {:else}
   <div class="flex flex-col gap-4">
@@ -348,9 +413,9 @@
         Icon={IconInfo}
         title={translate('workers.cloud-run-setup-prompt')}
         bind:open={showCloudRunHelp}
-        class="[&_h3]:text-sm"
+        class="border-tertiary bg-background-primary [&_h3]:text-sm"
       >
-        <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+        <div class="-mt-8 flex flex-col gap-3 border-t border-primary pt-3">
           <p class="text-sm text-secondary">
             {translate('workers.cloud-run-terraform-description-before')}<Link
               href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/gcp/cloud-run"
@@ -381,7 +446,7 @@
   </div>
 {/if}
 
-<hr class="my-5 border-subtle" />
+<hr class="my-5 border-primary" />
 
 <div class="flex flex-wrap items-center justify-between gap-4">
   <div>
@@ -404,7 +469,7 @@
       : translate('workers.show-defaults')}
   </Button>
 </div>
-{#if showScaling && provider === 'lambda'}
+{#if showScaling && (provider === 'lambda' || provider === 'agentcore')}
   <div class="mt-4 flex flex-col gap-4">
     <Input
       value={scaleUpCooloffMs !== undefined ? String(scaleUpCooloffMs) : ''}

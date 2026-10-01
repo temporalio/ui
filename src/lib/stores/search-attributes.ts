@@ -216,7 +216,7 @@ export const workerSearchAttributes: Readable<SearchAttributes> = readable({
   TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
   DeploymentName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-  // BuildId: SEARCH_ATTRIBUTE_TYPE.KEYWORD, // TODO: Add back with DT-3745
+  BuildId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   SdkName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   SdkVersion: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
 });

@@ -16,11 +16,14 @@ import { catalogExample as example8 } from './nexus-greeting/example.js';
 import { catalogExample as example9 } from './parallel-activities/example.js';
 import { catalogExample as example10 } from './priority-fairness/example.js';
 import { catalogExample as example11 } from './sequential-activities/example.js';
-import { catalogExample as example12 } from './signal-collector/example.js';
-import { catalogExample as example13 } from './signal-handlers/example.js';
-import { catalogExample as example14 } from './standalone-activity/example.js';
-import { catalogExample as example15 } from './timer-driven-repetition/example.js';
-import { catalogExample as example16 } from './workflow-patching/example.js';
+import { catalogExample as example12 } from './sequential-markdown-activities/example.js';
+import { catalogExample as example13 } from './sequential-no-summary-activities/example.js';
+import { catalogExample as example14 } from './sequential-plain-text-activities/example.js';
+import { catalogExample as example15 } from './signal-collector/example.js';
+import { catalogExample as example16 } from './signal-handlers/example.js';
+import { catalogExample as example17 } from './standalone-activity/example.js';
+import { catalogExample as example18 } from './timer-driven-repetition/example.js';
+import { catalogExample as example19 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -40,6 +43,9 @@ const sharedWorkflowDefinitions = [
   example14,
   example15,
   example16,
+  example17,
+  example18,
+  example19,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -111,6 +117,15 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/priority-fairness/workflow.ts',
   'src/lib/catalog/worker/examples/sequential-activities/example.ts',
   'src/lib/catalog/worker/examples/sequential-activities/workflow.ts',
+  'src/lib/catalog/worker/examples/sequential-markdown-activities/activities.ts',
+  'src/lib/catalog/worker/examples/sequential-markdown-activities/example.ts',
+  'src/lib/catalog/worker/examples/sequential-markdown-activities/workflow.ts',
+  'src/lib/catalog/worker/examples/sequential-no-summary-activities/activities.ts',
+  'src/lib/catalog/worker/examples/sequential-no-summary-activities/example.ts',
+  'src/lib/catalog/worker/examples/sequential-no-summary-activities/workflow.ts',
+  'src/lib/catalog/worker/examples/sequential-plain-text-activities/activities.ts',
+  'src/lib/catalog/worker/examples/sequential-plain-text-activities/example.ts',
+  'src/lib/catalog/worker/examples/sequential-plain-text-activities/workflow.ts',
   'src/lib/catalog/worker/examples/signal-collector/activity.ts',
   'src/lib/catalog/worker/examples/signal-collector/example.ts',
   'src/lib/catalog/worker/examples/signal-collector/workflow.ts',

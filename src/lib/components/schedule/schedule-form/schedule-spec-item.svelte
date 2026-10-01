@@ -110,7 +110,7 @@
           size="sm"
           Icon={IconTrash}
           label={translate('common.delete')}
-          class="mr-4 mt-[1.625rem] h-10"
+          class="mr-4 mt-7 h-10"
           onclick={onRemove}
         />
       {/if}
@@ -130,7 +130,7 @@
   {@const rawValue = getRawValue(spec)}
   <div
     bind:this={containerEl}
-    class="surface-background relative flex min-h-16 w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
+    class="relative flex min-h-16 w-full justify-between gap-4 rounded border border-primary bg-background-primary px-4 py-3 text-left text-primary transition-colors"
   >
     <div
       class="grid w-full grid-cols-1 items-center gap-2 text-sm md:grid-cols-[minmax(8rem,max-content)_4fr_minmax(max-content,1fr)] md:gap-4"

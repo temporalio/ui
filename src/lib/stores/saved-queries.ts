@@ -3,7 +3,6 @@ import {
   IconCheckCircle,
   IconClock,
   type IconComponent,
-  IconExclamationCircle,
   IconExclamationOctagon,
   IconHappyLappy,
   IconHeartbeat,
@@ -74,6 +73,13 @@ const systemWorkflowViews: SavedQuery[] = [
     name: 'Parent',
     query: '`ParentWorkflowId` is null',
     Icon: IconRelationship,
+    type: 'system',
+  },
+  {
+    id: 'scheduled-workflows',
+    name: 'Scheduled',
+    query: '`TemporalScheduledById` is not null',
+    Icon: IconTemporalSchedules,
     type: 'system',
   },
   {
@@ -152,7 +158,7 @@ export const systemActivityViews: SavedQuery[] = [
     id: 'failed',
     name: 'Failed',
     query: '`ExecutionStatus`="Failed"',
-    Icon: IconExclamationCircle,
+    Icon: IconExclamationOctagon,
     type: 'system',
   },
 ];
@@ -183,7 +189,7 @@ export const systemNexusViews: SavedQuery[] = [
   },
   {
     id: 'last-hour',
-    name: 'Last Hour',
+    name: 'Last 1h',
     query: `StartTime >= "${getLastHour()}"`,
     Icon: IconClock,
     type: 'system',

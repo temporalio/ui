@@ -119,7 +119,7 @@ fails before anything starts, naming the problem.
 
 ## Stages
 
-Four stages run in order. Each one is optional: turn it off with `"enabled":
+Five stages run in order. Each one is optional: turn it off with `"enabled":
 false` in the definition, or with `--skip <stage>` / `--only <stage>`. A stage
 also stands down on its own when something is already listening on its port, so
 a server or UI you started yourself is reused rather than fought over.
@@ -128,6 +128,7 @@ a server or UI you started yourself is reused rather than fought over.
 | ----------- | --------------------------------------------------------------- |
 | `server`    | Provisions a Temporal dev server and applies the dynamic config |
 | `worker`    | Starts the catalog worker against that server                   |
+| `tunnel`    | Publishes the frontend on a public address                       |
 | `ui`        | Starts the ui-server API and the UI dev server                  |
 | `scenarios` | Runs the workflows that exercise the feature                    |
 
@@ -142,6 +143,8 @@ a server or UI you started yourself is reused rather than fought over.
 | `serverRepo`       | Overrides `TEMPORAL_SERVER_REPO` for this definition, rarely wanted     |
 | `serverRef`        | Fails the run unless the server checkout is on this branch or commit    |
 | `minServerVersion` | Fails the run early if the resolved server is older than this           |
+| `requires.serverModules` | Go modules the built server must carry, as module path to minimum version |
+| `requires.commands`      | Executables the run needs on PATH                                 |
 | `dynamicConfig`    | `--dynamic-config-value` pairs, as JSON values                          |
 | `searchAttributes` | `--search-attribute` pairs, name to type                                |
 | `port`, `uiPort`, `httpPort`, `logLevel`, `dbFilename`, `namespace` | Dev server settings |
@@ -192,6 +195,211 @@ To build your own working tree instead, which is what developing the feature
 wants, point `TEMPORAL_SERVER_REPO` or `TEMPORAL_CLI_REPO` at it. An explicit
 path wins over a fetch, and only then are uncommitted changes part of the build
 cache key.
+
+### When the feature arrives through a dependency
+
+`requires.serverCommit` cannot express a feature that reaches the server
+through a dependency bump, because the commit lives in another repository.
+`requires.serverModules` checks the go.mod of the checkout being built:
+
+```ts
+requires: {
+  serverModules: {
+    'go.temporal.io/auto-scaled-workers': 'v0.0.0-20260824233950-312f95fb8b99',
+  },
+}
+```
+
+A pseudo-version is ordered by its embedded commit timestamp, so that value is
+satisfied by anything from that moment on, and a tagged release satisfies it
+outright.
+
+**A requirement that is not met is applied, not reported.** A feature can
+arrive in the server through a dependency bump with no server ref carrying it,
+because the bump is a one-line change nobody has pushed. So a checkout this
+tool fetched gets `go get` and `go mod tidy` run on it:
+
+```
+· Bumping 1 module requirement(s) in the fetched server checkout
+·   go get go.temporal.io/auto-scaled-workers@v0.0.0-20260824233950-312f95fb8b99
+```
+
+Two consequences worth knowing. The bump changes the checkout, so the build
+cache key includes the module requirements; otherwise a pre-bump binary would
+be reused against a bumped go.mod. And `go mod tidy` can lower a requirement
+another module constrains, so it is re-verified afterwards rather than assumed
+— if the pair is genuinely incompatible the failure says to move
+`requires.serverRef`.
+
+A checkout **you** pointed `TEMPORAL_SERVER_REPO` at is your working tree and
+is never modified. That case still fails, and says to bump it yourself or to
+unset the variable and let the tool use its own checkout.
+
+## `tunnel`
+
+| Field            | Meaning                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `provider`       | `ngrok`                                                   |
+| `targetPort`     | Defaults to the frontend port the server stage provisioned |
+| `readyTimeoutMs` | How long to wait for a public address                      |
+
+Publishes the frontend on a public address, and exposes it to a scenario as
+`context.publicAddress`.
+
+A server-scaled Worker runs wherever Temporal launched it — a Lambda, a Cloud
+Run pool, a Bedrock AgentCore session — and dials the frontend back to poll.
+That inbound leg is the only thing a dev server on localhost cannot offer; the
+outbound leg to the provider is never the problem. A scenario covering
+server-scaled Workers needs this stage, and one that does not should leave it
+off.
+
+**The address is not stable across runs.** A fresh tunnel means a fresh
+hostname, so anything holding it — a provider's environment, say — has to be
+updated per run rather than configured once. A scenario that repoints its
+provider each run works twice in a row; one that trusts a stored address works
+once.
+
+The stage implies `ngrok` on PATH, so a definition does not restate it, and
+preflight fails with that name before any stage starts.
+
+## Creating the Version through the UI
+
+`agentcore-serverless-worker` creates its Worker Deployment Version by driving
+the real create-version form with Playwright, not by calling the CLI.
+
+That is deliberate. The CLI could already create an AgentCore Version before
+any of this existed, so a run that shells out to `temporal worker deployment
+create-version` proves the server works and says nothing about the UI. What is
+under review is whether the form offers the provider, whether its one distinct
+field validates, and whether the config the form builds is one the server
+accepts. Only driving the form answers that.
+
+The run opens the form, selects **Amazon Bedrock AgentCore**, fills the Agent
+Runtime Endpoint ARN and the Access fields, submits, and reports what it saw.
+Screenshots land in the run directory, one per step, so a failure leaves a
+picture of where it stopped.
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `createVersion` | `ui` | `cli` falls back to the CLI, for a machine with no browser |
+| `headed` | `false` | `true` shows the browser doing it |
+
+The `ui` stage is load-bearing here: `--skip ui` leaves the scenario with
+nothing to drive, and it says so rather than falling back silently. Playwright
+downloads its browsers separately from the package, so preflight launches one
+before any stage starts rather than after a server build.
+
+### The Access fields need a real role
+
+The form makes **IAM Role ARN** and **External ID** required, and always sends
+them. Setting
+`workercontroller.compute_providers.aws.require_role_and_external_id` to false
+makes the role *optional*, not ignored: a compute config that carries a role is
+one the server will assume. A placeholder therefore does not get discarded, it
+fails at `sts:AssumeRole` after the form has already done its job.
+
+So the scenario provisions a real one, `TemporalDemoAgentCoreInvoke`, trusting
+this account with an `sts:ExternalId` condition and granting
+`bedrock-agentcore:InvokeAgentRuntime` and `GetAgentRuntimeEndpoint`. It is
+listed in the teardown commands with everything else. Set `iamRoleArn` to use a
+role you already have instead.
+
+This is a different role from `TemporalDemoAgentCoreExecution`. That one is
+handed to AgentCore so it can pull the image; this one is assumed by whatever
+runs the Worker Controller so it can invoke the runtime.
+
+Cloud differs in the trust policy only: there Temporal assumes the customer's
+role, so it names `temporal.io` rather than the caller's own account.
+
+The gap this leaves is real. The CLI can create a Version with no role at all
+via `--aws-agentcore-skip-role-and-external-id`; the form has no equivalent, so
+a self-hosted operator who turned the requirement off still has to supply a
+role that assumes.
+
+## Provisioning the AgentCore runtime
+
+`agentcore-serverless-worker` needs a Bedrock AgentCore Runtime to invoke.
+There are two ways to get one.
+
+### Let the scenario create it
+
+**This is the default for `agentcore-serverless-worker`**, because the scenario
+cannot run without a runtime and a demo whose first run fails is not a demo.
+`pnpm demo start agentcore-serverless-worker` therefore creates one.
+
+It **does bill while it exists.** The run says so when it starts provisioning,
+and the summary lists what was created with the commands to remove it.
+Provisioning is idempotent by name, so running the scenario repeatedly reuses
+one runtime rather than adding another.
+
+To point at your own instead, set `AGENTCORE_ENDPOINT_ARN` or `endpointArn`. To
+refuse outright, set `provision: false`; `AGENTCORE_PROVISION=1` turns it back
+on for a single run without editing a tracked file.
+
+Note that an explicit endpoint ARN **takes precedence over provisioning**, so a
+stale one left in your environment shadows it. Preflight checks that the
+runtime an ARN names actually exists and says so if it does not, because an ARN
+is a string and having one proves nothing about whether it resolves. It creates the ECR repository, builds
+and pushes the Worker image from `scenarios/agentcore-serverless-worker/worker`,
+creates the execution role, and creates the runtime and its endpoint.
+
+It is **off by default**, because an AgentCore runtime bills while it exists
+and starting a demo should not create billable cloud resources by surprise.
+
+Provisioning is idempotent by name, so turning it on for repeated runs reuses
+one runtime rather than adding another. Nothing is torn down at the end: a
+scenario's shutdown gets a three second grace, which is not enough to delete a
+runtime, and a reviewer wants the demo to still exist when the run finishes.
+The summary therefore lists exactly what was created and the commands to
+remove it.
+
+Before creating anything it checks that the calling identity can actually do
+every part, and it does so in the scenario's `preflight`, which runs before any
+stage. A missing permission therefore costs seconds rather than surfacing after
+a server build, and cannot leave a half-provisioned account.
+If something is missing it names the policies to attach, including the one
+that wastes people's time: **the ECR managed policies are named
+`AmazonEC2ContainerRegistry*`, so searching the IAM console for "ecr" finds
+nothing.** Search `ContainerRegistry`.
+
+What the calling identity needs:
+
+- `BedrockAgentCoreFullAccess` — search "AgentCore" in the policy list
+- `AmazonEC2ContainerRegistryFullAccess` — search "ContainerRegistry"
+- `iam:CreateRole`, `iam:PutRolePolicy`, `iam:GetRole`, `iam:PassRole`, to
+  create the execution role and hand it to AgentCore
+
+If you would rather not grant those, ask someone for a Runtime Endpoint ARN
+and use the other way.
+
+### Or bring your own
+
+Provision once by hand, then set `AGENTCORE_ENDPOINT_ARN` and leave
+`provision` off.
+
+The container has to answer `/ping` and `/invocations` on port 8080, be built
+for `linux/arm64`, and start a Temporal worker using the `deploymentName` and
+`buildId` from the invoke payload. Two things catch people out:
+
+- A worker built with `UseVersioning` must register every workflow through
+  `RegisterWorkflowWithOptions` with a `VersioningBehavior`. Plain
+  `RegisterWorkflow` panics with `workflow type does not have a versioning
+  behavior` before it ever polls.
+- Pass the **Runtime Endpoint** ARN, ending in `/runtime-endpoint/<name>`. The
+  provider parses the runtime id and endpoint name out of it, so a bare Runtime
+  ARN is rejected.
+
+```bash
+# The four-part endpoint ARN, which is what the scenario wants:
+aws bedrock-agentcore-control list-agent-runtime-endpoints \
+  --region us-west-2 --agent-runtime-id <runtime-id> \
+  --query 'runtimeEndpoints[].agentRuntimeEndpointArn' --output text
+```
+
+Creating the version is what invokes the runtime, and that first invoke is also
+what associates the task queue: the worker polls with versioning and matching
+learns the queue from that registration. `create-version` takes no task queue,
+so nothing else can teach it.
 
 ## `worker`
 

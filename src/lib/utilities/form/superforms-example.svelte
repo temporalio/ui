@@ -215,11 +215,10 @@
           name="description"
           id="description"
           rows="4"
-          class="border-gray-300 w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full rounded-md border border-primary bg-background-primary px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-interactive-primary focus:ring-offset-2 focus:ring-offset-background-primary"
         ></textarea>
         {#if $loadingErrors.description}
-          <span class="text-sm text-red-500"
-            >{$loadingErrors.description[0]}</span
+          <span class="text-sm text-error">{$loadingErrors.description[0]}</span
           >
         {/if}
       </div>
@@ -230,7 +229,7 @@
 
       {#if $loadingMessage}
         <div
-          class="rounded border border-green-300 bg-green-100 p-3 text-green-700"
+          class="rounded border border-success bg-surface-success p-3 text-success"
         >
           {$loadingMessage}
         </div>
@@ -264,7 +263,9 @@
       <Button type="submit">Set Password</Button>
 
       {#if $passwordAllErrors.length > 0}
-        <div class="rounded border border-red-300 bg-red-100 p-3 text-red-700">
+        <div
+          class="rounded border border-error bg-surface-error p-3 text-error"
+        >
           <p class="font-medium">Please fix the following errors:</p>
           <ul class="mt-2 list-inside list-disc">
             {#each $passwordAllErrors as error}

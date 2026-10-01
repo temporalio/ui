@@ -16,7 +16,7 @@ import {
 const hasScalingGroups = (config?: ComputeConfig): boolean =>
   Object.keys(config?.scalingGroups ?? {}).length > 0;
 
-const matchesVersion = (
+export const matchesVersion = (
   summary: VersionSummary,
   version: WorkerDeploymentVersion | undefined,
 ): boolean => {

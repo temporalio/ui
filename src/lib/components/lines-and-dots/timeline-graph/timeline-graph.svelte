@@ -24,9 +24,14 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
 
-  import { dotColors, getScopeColor, strokeColor } from '../colors';
+  import {
+    dotColors,
+    getScopeColor,
+    getStatusStrokeColor,
+    strokeColor,
+  } from '../colors';
   import EndTimeInterval from '../end-time-interval.svelte';
   import {
     DOT_STROKE,
@@ -417,6 +422,13 @@
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
+  // Icon size is a ratio of the dot's padding box (dotSize minus the border-2
+  // the rows hardcode), snapped to an even px.
+  const DOT_ICON_RATIO = 0.75;
+  const dotIconSize =
+    2 * Math.round(((dotSize - 2 * DOT_STROKE) * DOT_ICON_RATIO) / 2);
+  const completedColor = getStatusStrokeColor('Completed');
+  const failedColor = dotColors('Failed').fill;
 
   const treeWidthPx = $derived(nesting === 'gutter' ? LANE_TREE_WIDTH : 0);
   // The tree column's own border is the timeline's origin, so the canvas drops
@@ -2642,7 +2654,7 @@
    * plot draws frames, containers, bars and markers across several layers.
    */
   const DIM_SCRIM_BACKGROUND =
-    'color-mix(in srgb, rgb(var(--color-surface-background)) 50%, transparent)';
+    'color-mix(in srgb, var(--color-background-primary) 50%, transparent)';
   let hoverBand = $state<{
     topPx: number;
     heightPx: number;
@@ -2959,8 +2971,7 @@
     rendered.presentation.activeBlocks.flatMap((block) => block.chainFrames),
   );
   // Translucent so the scope outlines and bars underneath still read through.
-  const HOVER_BAND_BACKGROUND =
-    'color-mix(in srgb, rgb(var(--color-interactive-secondary-hover)) 55%, transparent)';
+  const HOVER_BAND_BACKGROUND = 'var(--color-interactive-secondary-hover)';
 
   const drawCanvasFrames = $derived(nesting !== 'gutter' && showGroups);
   /**
@@ -3094,9 +3105,9 @@
   data-live-paused={$pauseLiveUpdates}
   class:timeline-motion-active={shouldAnimateTimeline}
   class={twMerge(
-    'timeline-height-shell relative border border-t-0 border-subtle bg-primary',
+    'timeline-height-shell relative border border-t-0 border-primary bg-surface-primary',
     verticalScrollModel.segmented ? 'overflow-y-auto' : 'overflow-hidden',
-    error && 'bg-danger',
+    error && 'bg-surface-danger',
   )}
   style:height="{shellHeight}px"
   data-segmented-scroll={verticalScrollModel.segmented || undefined}
@@ -3179,6 +3190,9 @@
         style:height="{svgHeight}px"
         style:--dot="{dotSize}px"
         style:--dot-r="{dotRadius}px"
+        style:--dot-icon="{dotIconSize}px"
+        style:--completed-color={completedColor}
+        style:--failed-color={failedColor}
         style:--timeline-gutter="{GUTTER}px"
         style:--timeline-clip-inset="{GUTTER + RADIUS / 4}px"
         style:--timeline-clip-inset-left="{leftGutter - RADIUS / 4}px"
@@ -3284,7 +3298,7 @@
                        with it when the groups are switched off. -->
                   {#if scope.workflowId && showGroups}
                     <span
-                      class="pointer-events-none absolute z-10 -translate-y-1/2 select-none whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-xs leading-none text-subtle"
+                      class="pointer-events-none absolute z-10 -translate-y-1/2 select-none whitespace-nowrap rounded-full bg-surface-primary px-1.5 text-xs leading-none text-secondary"
                       data-testid="timeline-scope-span-label"
                       style:left="{bar.left + 6}px"
                       style:top="{scope.topPx}px"
@@ -3697,7 +3711,7 @@
             shiftFor(presentedPendingGap.insertionIndex)}
           {@const rectH = presentedPendingGap.rowCount * rowHeight + RADIUS}
           <div
-            class="absolute animate-pulse rounded bg-slate-400/30"
+            class="absolute animate-pulse rounded bg-surface-tertiary"
             style:left="{leftGutter}px"
             style:top="{rectY}px"
             style:width="{canvasWidth - GUTTER - leftGutter}px"
@@ -3739,7 +3753,7 @@
   .canvas {
     position: relative;
     margin-top: -1rem;
-    color: rgb(var(--color-text-primary));
+    color: var(--color-content-primary);
   }
 
   .canvas :global(.timeline-motion-layer) {
@@ -3803,7 +3817,11 @@
   }
 
   .canvas :global(.tl-line--gradient) {
-    background-image: linear-gradient(255deg, #1ff1a5 0%, #f55 100%);
+    background-image: linear-gradient(
+      255deg,
+      var(--completed-color) 0%,
+      var(--failed-color) 100%
+    );
   }
 
   .canvas :global(.tl-line--dashed) {

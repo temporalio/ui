@@ -76,6 +76,7 @@
     isFollowingContinues,
   } from '$lib/utilities/route-for';
   import { routeForApi } from '$lib/utilities/route-for-api';
+  import { shouldRefetchWorkflowRun } from '$lib/utilities/should-refetch-workflow-run';
 
   interface Props {
     children: Snippet;
@@ -131,6 +132,7 @@
   let _resumeRequested = false;
   let _lastPollToken = '';
   let _pollPaused = false;
+  let _refetchSeq = 0;
 
   const ctx: HistoryContext = {
     get fetchComplete() {
@@ -514,42 +516,56 @@
     refreshAction: RefreshAction,
     pause: boolean,
   ) => {
-    const shouldFetch =
-      refreshAction.timestamp &&
-      (refreshAction.action || (!pause && $workflowRun?.workflow?.isRunning));
+    const shouldFetch = shouldRefetchWorkflowRun({
+      refresh: refreshAction,
+      pauseLiveUpdates: pause,
+      isRunning: $workflowRun?.workflow?.isRunning,
+    });
+    if (!shouldFetch) return;
 
-    if (shouldFetch) {
-      const refreshGeneration = loadGeneration;
-      const refreshRunId = activeRunId;
-      if (!refreshRunId || refreshRunId !== activeBufferRunId) return;
-      const { workflow, error } = await fetchWorkflow({
-        namespace,
-        workflowId,
-        runId: refreshRunId,
-      });
-      if (
-        refreshGeneration !== loadGeneration ||
-        refreshRunId !== activeRunId ||
-        refreshRunId !== activeBufferRunId
-      ) {
-        return;
-      }
-      if (error) {
-        workflowError = error;
-        return;
-      }
-      if (workflow && workflow.runId !== refreshRunId) return;
-      $workflowRun.workflow = workflow ?? null;
+    // The 10s poll and an action's refetch overlap, so a poll that started
+    // before a mutation can resolve after it and write back a pre-mutation
+    // snapshot. Only the newest request for the current run may land.
+    const seq = ++_refetchSeq;
+    const ns = namespace;
+    const wfId = workflowId;
+    const refreshGeneration = loadGeneration;
+    const refreshRunId = activeRunId;
+    if (!refreshRunId || refreshRunId !== activeBufferRunId) return;
 
-      if (
-        following &&
-        !pause &&
-        workflow &&
-        !workflow.isRunning &&
-        !workflow.isPaused
-      ) {
-        await stageNextRun();
-      }
+    const { workflow, error } = await fetchWorkflow({
+      namespace: ns,
+      workflowId: wfId,
+      runId: refreshRunId,
+    });
+
+    if (seq !== _refetchSeq) return;
+    if (ns !== namespace || wfId !== workflowId) return;
+    // Following a chain moves the active run on; a response for a run that is
+    // no longer the one on screen must not land either.
+    if (
+      refreshGeneration !== loadGeneration ||
+      refreshRunId !== activeRunId ||
+      refreshRunId !== activeBufferRunId
+    ) {
+      return;
+    }
+
+    if (error) {
+      workflowError = error;
+      return;
+    }
+    if (workflow && workflow.runId !== refreshRunId) return;
+    $workflowRun.workflow = workflow ?? null;
+
+    if (
+      following &&
+      !pause &&
+      workflow &&
+      !workflow.isRunning &&
+      !workflow.isPaused
+    ) {
+      await stageNextRun();
     }
   };
 
@@ -757,6 +773,7 @@
     loadingRunId = '';
     activeBufferRunId = '';
     backfillSourceRunId = '';
+    _refetchSeq++;
     abortAll();
     resetLastDataEncoderSuccess();
     if (refreshInterval) clearInterval(refreshInterval);
@@ -886,7 +903,7 @@
 
 {#if showJson}
   <div
-    class="relative h-auto whitespace-break-spaces break-words bg-primary p-4"
+    class="relative h-auto whitespace-break-spaces break-words bg-surface-primary p-4"
   >
     <CopyButton
       copyIconTitle={translate('common.copy-icon-title')}

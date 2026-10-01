@@ -56,10 +56,7 @@
 </script>
 
 {#if open}
-  <div
-    class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8"
-    data-theme="dark"
-  >
+  <div class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8">
     <div class="flex items-center justify-between">
       <p>Timezone</p>
       <TimezoneSelect size="sm" />
@@ -68,7 +65,7 @@
       <p>{translate('common.theme')}</p>
       <DarkModeMenu />
     </div>
-    <hr class="border-subtle" />
+    <hr class="border-primary" />
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}

@@ -97,7 +97,7 @@
   showIcon: boolean,
 )}
   <div
-    class="absolute bg-primary"
+    class="absolute bg-surface-primary"
     style:left="{markerRange.startPx}px"
     style:top="{centerY - RADIUS}px"
     style:width="{markerRange.endPx - markerRange.startPx}px"
@@ -200,7 +200,7 @@
 
 <style lang="postcss">
   .zigzag-path {
-    stroke: rgb(var(--color-text-secondary));
+    stroke: var(--color-content-secondary);
   }
 
   .timeline-height-control {

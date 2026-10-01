@@ -12,7 +12,6 @@
   import {
     isLazyGroup,
     type LazyGroup,
-    materializeGroup,
   } from '$lib/services/grouped-event-buffer';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -104,10 +103,7 @@
 
   const materializeRowReactive = (
     item: IterableEventWithPending | LazyGroup,
-  ) => {
-    void eventBuffer.version;
-    return isLazyGroup(item) ? materializeGroup(item) : item;
-  };
+  ) => (isLazyGroup(item) ? eventBuffer.materializeGroup(item) : item);
 
   const iterableKey = (event: IterableEventWithPending | LazyGroup) => {
     if (isPendingNexusOperation(event)) {
@@ -145,7 +141,6 @@
     {updating}
     items={filteredItems}
     maxHeight="none"
-    class="border-t-0"
   >
     {#snippet headers()}
       <TableHeaderRow class="!h-8">

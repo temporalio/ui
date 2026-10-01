@@ -3,18 +3,18 @@
 
   import { type Snippet, untrack } from 'svelte';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconAws, type IconComponent, IconGcp } from '$lib/io/icon';
-  import { hasCapability } from '$lib/utilities/has-capability.svelte';
+  import { Badge } from '$lib/io/badge';
 
   import {
-    type ComputeProviderOption,
+    COMPUTE_PROVIDER_VALUES,
+    COMPUTE_PROVIDERS,
+    type ComputeProviderReleaseStage,
     type ComputeProviderValue,
-    defaultReleaseStage,
-  } from './shared';
+  } from './compute-providers';
+  import { type ComputeProviderOption, defaultReleaseStage } from './shared';
 
   interface Props {
     provider?: string;
@@ -26,33 +26,19 @@
 
   const configuredProviders = untrack(() => providers);
 
-  const providerIcon: Record<ComputeProviderValue, IconComponent> = {
-    lambda: IconAws,
-    'cloud-run': IconGcp,
-  };
+  const providerLabel = (value: ComputeProviderValue): string =>
+    translate(COMPUTE_PROVIDERS[value].labelKey);
 
-  const providerLabel = (value: ComputeProviderValue): string => {
-    switch (value) {
-      case 'lambda':
-        return translate('workers.provider-lambda');
-      case 'cloud-run':
-        return translate('workers.provider-cloud-run');
-    }
-  };
+  const providerDescription = (value: ComputeProviderValue): string =>
+    translate(COMPUTE_PROVIDERS[value].descriptionKey);
 
-  const providerDescription = (value: ComputeProviderValue): string => {
-    switch (value) {
-      case 'lambda':
-        return translate('workers.provider-lambda-description');
-      case 'cloud-run':
-        return translate('workers.provider-cloud-run-description');
-    }
-  };
-
-  const badgeClass = 'px-1.5 py-0 text-xs font-normal leading-5';
+  const releaseStageOf = (
+    option: ComputeProviderOption,
+  ): ComputeProviderReleaseStage =>
+    option.releaseStage ?? defaultReleaseStage[option.value];
 
   const releaseStageLabel = (option: ComputeProviderOption): string => {
-    switch (option.releaseStage ?? defaultReleaseStage[option.value]) {
+    switch (releaseStageOf(option)) {
       case 'public-preview':
         return translate('workers.public-preview');
       case 'pre-release':
@@ -62,20 +48,19 @@
     }
   };
 
-  const cloudRunCapable = $derived(
-    hasCapability('serverScaledProviderCloudRun'),
+  /**
+   * Every provider, selectable. Self-hosted has no per-account entitlement to
+   * express, and a Service that cannot run a provider rejects the Version with
+   * a reason, so gating the picker only hides the choice behind a badge that
+   * cannot be acted on.
+   *
+   * A caller that does need to restrict the list passes `providers`, which is
+   * how Temporal Cloud offers only the providers matching the Namespace's own
+   * cloud.
+   */
+  const defaultProviders = $derived<ComputeProviderOption[]>(
+    COMPUTE_PROVIDER_VALUES.map((value) => ({ value })),
   );
-
-  const defaultProviders = $derived<ComputeProviderOption[]>([
-    { value: 'lambda' },
-    {
-      value: 'cloud-run',
-      disabled: !cloudRunCapable,
-      disabledReason: cloudRunCapable
-        ? undefined
-        : translate('workers.coming-soon'),
-    },
-  ]);
 
   const resolvedProviders = $derived(configuredProviders ?? defaultProviders);
   const visibleProviders = $derived(
@@ -107,20 +92,21 @@
       {#snippet labelBadge()}
         <span>
           {#if option.disabled && option.disabledReason}
-            <Badge type="secondary" class={badgeClass}>
-              {option.disabledReason}
-            </Badge>
+            <Badge size="sm" text={option.disabledReason} />
           {:else if releaseStageLabel(option)}
-            <Badge type="secondary" class={badgeClass}>
-              {releaseStageLabel(option)}
-            </Badge>
+            <Badge
+              size="sm"
+              text={releaseStageLabel(option)}
+              colorScheme="accent"
+              data-release-stage={releaseStageOf(option)}
+            />
           {/if}
         </span>
       {/snippet}
       {#snippet icon()}
-        {@const ProviderIcon = providerIcon[option.value]}
+        {@const ProviderIcon = COMPUTE_PROVIDERS[option.value].icon}
         <div
-          class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded-none border border-subtle"
+          class="flex h-11 w-11 items-center justify-center rounded border border-primary bg-surface-primary"
         >
           <ProviderIcon width={32} height={32} />
         </div>

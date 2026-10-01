@@ -1,20 +1,16 @@
 <script module lang="ts">
   import { cva } from 'class-variance-authority';
 
+  import { WORKFLOW_ACTION_HOVER_CLASSES } from '../colors';
+
   // Module scope so the variant config is built once, not per mounted row.
   const groupHover = cva(['h-full w-full border-2'], {
     variants: {
       category: {
-        workflow: 'border-blue-700 bg-blue-800/80 ',
-        activity: 'border-purple-700 bg-purple-800/80 ',
-        'child-workflow': 'border-cyan-600  bg-cyan-600/80 ',
-        timer: 'border-yellow-700 bg-yellow-800/80',
-        signal: 'border-pink-700 bg-pink-800/80',
-        update: 'border-blue-700 bg-blue-800/80',
-        other: 'border-slate-700 bg-slate-800/80',
-        nexus: 'border-indigo-700 bg-indigo-800/80',
-        'local-activity': 'border-slate-700 bg-slate-800/80',
-        default: 'border-purple-700 bg-purple-900/80',
+        ...WORKFLOW_ACTION_HOVER_CLASSES,
+        update: 'border-blue-11 bg-indigo-11/80',
+        other: 'border-neutral-5 bg-indigo-12/80',
+        default: 'border-slate-blue-10 bg-slate-blue-11/80',
       },
     },
   });
@@ -22,6 +18,7 @@
 
 <script lang="ts">
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
+  import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { getEventGroupDisplayName } from '$lib/models/event-groups/get-group-name';
@@ -34,11 +31,9 @@
     getLocalActivityMarkerEvent,
   } from '$lib/utilities/decode-local-activity';
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
+  import { getEventClassificationLabel } from '$lib/utilities/get-event-classification-label';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
-  import {
-    getEventClassificationLabel,
-    getWorkflowStatusLabel,
-  } from '$lib/utilities/get-status-label';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
@@ -366,6 +361,23 @@
   const spanCy = HALO; // button-local vertical center
 </script>
 
+{#snippet summary(value: string)}
+  {#if materializedGroup?.userMetadata?.summary}
+    <Preview
+      content={value}
+      fill={false}
+      fitContent
+      compact
+      singleLine
+      minHeight={0}
+      overrideTheme="primary"
+      title={translate('workflows.summary')}
+    />
+  {:else}
+    {value}
+  {/if}
+{/snippet}
+
 <!-- lines/dots are inline snippets, not child components — plain divs, no
      per-element instances. -->
 {#snippet connector(
@@ -419,7 +431,7 @@
   >
     {#if icon}
       <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
+        class="absolute left-1/2 top-1/2 h-[var(--dot-icon)] w-[var(--dot-icon)] -translate-x-1/2 -translate-y-1/2 text-black"
         viewBox="0 0 16 16"
       >
         <use href="#ti-{icon}" />
@@ -439,7 +451,7 @@
   )}
   {@const clampedLabelLeft = `clamp(calc(${GUTTER + 1.5 * RADIUS - spanLeft}px + var(--timeline-frame-offset, 0px)), ${labelTextPositionX - spanLeft - (textAnchor === 'end' ? labelWidth : 0)}px, calc(${canvasWidth - GUTTER - 1.5 * RADIUS - labelWidth - spanLeft}px + var(--timeline-frame-offset, 0px)))`}
   <div
-    class="pointer-events-auto absolute z-10 flex select-none items-center gap-1 whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-xs leading-none {textAnchor ===
+    class="pointer-events-auto absolute z-10 flex select-none items-center gap-1 whitespace-nowrap rounded-full bg-surface-primary px-1.5 text-xs leading-none {textAnchor ===
     'end'
       ? `${shouldClampLabel ? '' : '-translate-x-full'} -translate-y-1/2 flex-row-reverse`
       : '-translate-y-1/2'}"
@@ -463,19 +475,19 @@
     {/if}
     <span
       class="inline-flex min-h-[var(--dot)] min-w-0 items-center overflow-hidden text-ellipsis rounded-full {subtleLabel
-        ? 'text-subtle'
+        ? 'text-secondary'
         : 'text-current'}"
     >
       {#if pendingActivity}
         {translate('workflows.attempt')}
         {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
-        •&nbsp;{decodedValue}
+        •&nbsp;{@render summary(decodedValue)}
       {:else if retried}
-        {retryAttempt} • {decodedValue}
+        {retryAttempt} •&nbsp; {@render summary(decodedValue)}
       {:else if decodedLocalActivity}
         {decodedLocalActivity.value}
       {:else}
-        {decodedValue}
+        {@render summary(decodedValue)}
       {/if}
     </span>
   </div>

@@ -1,10 +1,12 @@
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Preview } from '@storybook/sveltekit';
 import '../src/app.css';
+import './preview.css';
 import i18next from 'i18next';
 
 import { i18nNamespaces } from '../src/lib/i18n';
 import resources from '../src/lib/i18n/locales';
+import { defaultThemeName, themes } from '../src/lib/theme/io/themes';
 
 i18next.init({
   fallbackLng: 'en',
@@ -20,14 +22,15 @@ i18next.init({
   resources,
 });
 
+const storybookThemes = Object.fromEntries(
+  Object.keys(themes).map((name) => [name, name]),
+);
+
 const preview: Preview = {
   decorators: [
     withThemeByDataAttribute({
-      defaultTheme: 'light',
-      themes: {
-        light: 'light',
-        dark: 'dark',
-      },
+      defaultTheme: defaultThemeName,
+      themes: storybookThemes,
       attributeName: 'data-theme',
     }),
   ],

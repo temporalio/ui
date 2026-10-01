@@ -71,7 +71,7 @@
     <Button
       size="xs"
       variant="ghost"
-      class="focus-visible:border-table"
+      class="focus-visible:border-tertiary"
       data-testid="bulk-cancel-button"
       disabled={!$cancelableActivities.length}
       onclick={openBatchCancelConfirmationModal}
@@ -80,7 +80,7 @@
     <Button
       size="xs"
       variant="destructive"
-      class="focus-visible:border-table"
+      class="focus-visible:border-tertiary"
       data-testid="bulk-terminate-button"
       disabled={!$terminableActivities.length}
       onclick={openBatchTerminateConfirmationModal}

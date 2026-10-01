@@ -1,12 +1,17 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
-  import ActivityExecutionStatus from '$lib/components/execution-status.svelte';
+  import ActivityStatusBadge from '$lib/components/standalone-activities/activity-status-badge.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import {
+    COLUMN_WIDTH_CLAMP_CLASSES,
+    columnWidthStyle,
+  } from '$lib/utilities/column-width';
   import { isActivityDelayed } from '$lib/utilities/delayed-activities';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
@@ -20,12 +25,18 @@
   };
   let { column, activity }: Props = $props();
 
-  const { label } = $derived(column);
+  const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
 
   const filterableLabels = ['Activity ID', 'Run ID', 'Type', 'Task Queue'];
 
-  const className = 'h-8 whitespace-nowrap';
+  const className = $derived(
+    twMerge(
+      'h-8 whitespace-nowrap',
+      width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES,
+    ),
+  );
+  const widthStyle = $derived(columnWidthStyle(width));
   const testId = 'activities-summary-table-body-cell';
 </script>
 
@@ -37,6 +48,7 @@
 )}
   <FilterableTableCell
     class={className}
+    style={widthStyle}
     data-testid={testId}
     {...filterableCellProps}
   />
@@ -75,9 +87,9 @@
     })}
   {/if}
 {:else}
-  <td class={className} data-testid={testId}>
+  <td class={className} style={widthStyle} data-testid={testId}>
     {#if label === 'Status'}
-      <ActivityExecutionStatus
+      <ActivityStatusBadge
         status={toActivityStatus(activity.status)}
         delayed={isActivityDelayed(activity)}
       />

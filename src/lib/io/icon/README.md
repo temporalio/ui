@@ -22,9 +22,10 @@ There is no `<Icon name="…" />` lookup. To swap icons on state, use an `{#if}`
 
 ## Preparing an SVG
 
-### 1. Normalise the viewBox to `0 0 16 16`
+### 1. Normalise the viewBox
 
-Required — the wrapper hardcodes it. If the source viewBox differs, bake the transform into the coordinates rather than editing the attribute, which would crop the artwork:
+The wrapper defaults to `0 0 16 16`. If the source viewBox differs, prefer to
+bake the transform into the coordinates:
 
 ```
 scale = 16 / width
@@ -33,6 +34,10 @@ y' = (y - minY) * scale
 ```
 
 Only safe when the icon is paths. Strokes, `userSpaceOnUse` gradients, `<rect>` and `<circle>` carry their own coordinates and would need transforming too.
+
+When preserving another coordinate space is intentional, set `viewBox` on the
+wrapper inside the icon component. Keep it out of `IconProps` so consumers
+cannot override an icon's geometry.
 
 ### 2. Colour
 

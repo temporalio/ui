@@ -9,7 +9,7 @@
     IconTemporalNexus,
     IconTemporalTimer,
   } from '$lib/io/icon';
-  import { palette } from '$lib/theme/colors';
+  import { colorScales } from '$lib/theme/io/themes';
   import type { EventTypeCategory } from '$lib/types/events';
 
   import { getCategoryFillColor } from '../../colors';
@@ -77,7 +77,7 @@
   const INDENT_PX = MARKER_PX + MARKER_GAP_PX;
   /** Centres the rail on the marker its children hang from. */
   const RAIL_OFFSET_PX = ROW_PAD_PX + MARKER_PX / 2;
-  const NEUTRAL_MARK_COLOR = palette.slate[400];
+  const NEUTRAL_MARK_COLOR = colorScales.slate[8];
 
   const railX = (level: number) => level * INDENT_PX + RAIL_OFFSET_PX;
   const contentX = (depth: number) => depth * INDENT_PX + ROW_PAD_PX;
@@ -309,7 +309,7 @@
       style:height="{MARKER_PX}px"
     >
       <span
-        class="surface-background absolute left-1/2 top-0 flex items-center justify-center rounded-full px-0.5 text-[11px] font-semibold tabular-nums leading-none"
+        class="absolute left-1/2 top-0 flex items-center justify-center rounded-full px-0.5 text-[11px] font-semibold tabular-nums leading-none"
         style:height="{MARKER_PX}px"
         style:min-width="{MARKER_PX}px"
         style:transform="translateX(-50%)"
@@ -354,20 +354,20 @@
     <span class="flex min-w-0 flex-1 flex-col justify-center gap-1">
       <span
         class="-mb-0.5 truncate pb-0.5 leading-none"
-        class:text-subtle={cell.kind === 'run'}
+        class:text-secondary={cell.kind === 'run'}
         class:font-medium={isWorkflowLabel(cell)}
         style:color={isWorkflowLabel(cell) ? color : undefined}
       >
         {cell.label}
       </span>
-      <span class="-mb-0.5 truncate pb-0.5 text-xs leading-none text-subtle">
+      <span class="-mb-0.5 truncate pb-0.5 text-xs leading-none text-secondary">
         {cell.detail}
       </span>
     </span>
   {:else}
     <span
       class="truncate"
-      class:text-subtle={cell.kind === 'run'}
+      class:text-secondary={cell.kind === 'run'}
       class:font-medium={isWorkflowLabel(cell)}
       style:color={isWorkflowLabel(cell) ? color : undefined}
     >
@@ -381,17 +381,17 @@
      virtualized row carries its own segments and needs no continuous layer. */
   .tree-rail {
     width: 1px;
-    background: rgb(var(--color-border-subtle));
+    background: var(--color-border-primary);
   }
 
   .tree-elbow {
     height: 1px;
-    background: rgb(var(--color-border-subtle));
+    background: var(--color-border-primary);
   }
 
   /* The same rails, recoloured while their group is hovered. */
   .tree-rail-active,
   .tree-elbow-active {
-    background: rgb(var(--color-border-focus-info));
+    background: var(--color-border-brand);
   }
 </style>

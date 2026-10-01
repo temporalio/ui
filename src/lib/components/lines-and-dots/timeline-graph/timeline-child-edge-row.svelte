@@ -69,7 +69,7 @@
 
 {#if presentation === 'state'}
   <div
-    class="pointer-events-auto absolute flex h-full items-center gap-2 rounded border border-subtle bg-primary px-3 text-sm text-secondary"
+    class="pointer-events-auto absolute flex h-full items-center gap-2 rounded border border-primary bg-surface-primary px-3 text-sm text-secondary"
     style:left="{GUTTER + edge.depth * 8}px"
     style:width="{Math.max(0, canvasWidth - 2 * GUTTER - edge.depth * 16)}px"
     role="status"

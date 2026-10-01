@@ -65,7 +65,7 @@
 </script>
 
 <div
-  class="flex flex-col gap-2 border-b border-subtle pb-4 sm:flex-row sm:gap-4"
+  class="flex flex-col gap-2 border-b border-primary pb-4 sm:flex-row sm:gap-4"
 >
   <div class="flex min-w-fit justify-between gap-2 sm:gap-4">
     <div class="grow [&_button]:w-full">
@@ -89,7 +89,7 @@
       size="sm"
       LeadingIcon={IconClose}
       data-testid="search-attribute-close-button"
-      class="mt-6 h-10 w-10 rounded-full sm:hidden"
+      class="mt-7 h-10 w-10 rounded-full sm:hidden"
       onclick={() => onRemove(label)}
     />
   </div>
@@ -147,7 +147,7 @@
     size="sm"
     LeadingIcon={IconClose}
     data-testid="search-attribute-close-button"
-    class="mt-6 h-10 w-10 rounded-full max-sm:hidden"
+    class="mt-7 h-10 w-10 rounded-full max-sm:hidden"
     onclick={() => onRemove(label)}
   />
 </div>

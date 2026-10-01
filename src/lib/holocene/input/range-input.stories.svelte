@@ -49,7 +49,9 @@
   args: ComponentProps<typeof RangeInput>,
   context: StoryContext<ComponentProps<typeof RangeInput>>,
 )}
-  <RangeInput {...args} id={context.id} />
+  <div class="border border-primary bg-surface-primary p-4 text-primary">
+    <RangeInput {...args} id={context.id} />
+  </div>
 {/snippet}
 
 <Story name="Default" />

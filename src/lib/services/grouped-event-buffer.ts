@@ -338,6 +338,13 @@ export function createGroupedEventBuffer({
   let pendingByNexusScheduledId = new Map<string, PendingNexusOperation>();
   const enrichedRecords = new Set<GroupRecord>();
 
+  // Head event of each currently-pending activity's group, keyed by activityId.
+  // Maintained alongside enrichedRecords so a pending-activity card can diff its
+  // current options against the ones it was scheduled with without scanning. The
+  // head is always ActivityTaskScheduled: that is the only branch in
+  // applyPendingMetadataTo that assigns pendingActivity.
+  const scheduledEventByActivityId = new Map<string, WorkflowEvent>();
+
   /** Returns whether the record's pending metadata changed. */
   function applyPendingMetadataTo(record: GroupRecord): boolean {
     const head = record.initialEvent;
@@ -367,8 +374,18 @@ export function createGroupedEventBuffer({
       return false;
     }
 
+    const previousActivityId = record.pendingActivity?.activityId;
     record.pendingActivity = pendingActivity;
     record.pendingNexusOperation = pendingNexusOperation;
+    if (
+      previousActivityId &&
+      previousActivityId !== pendingActivity?.activityId
+    ) {
+      scheduledEventByActivityId.delete(previousActivityId);
+    }
+    if (pendingActivity) {
+      scheduledEventByActivityId.set(pendingActivity.activityId, head);
+    }
     if (pendingActivity || pendingNexusOperation) {
       enrichedRecords.add(record);
     } else {
@@ -509,6 +526,7 @@ export function createGroupedEventBuffer({
     headGroup = new Int32Array(size);
     records = [];
     enrichedRecords.clear();
+    scheduledEventByActivityId.clear();
     pendingByActivityId = new Map();
     pendingByNexusScheduledId = new Map();
     maxSlot = -1;
@@ -766,11 +784,23 @@ export function createGroupedEventBuffer({
     return cachedWftFailed;
   }
 
+  /**
+   * The ActivityTaskScheduled event that started a currently-pending activity, or
+   * undefined when that event has not been ingested yet. Only pending activities
+   * are indexed: a resolved one drops out with its pending metadata.
+   */
+  function getPendingActivityScheduledEvent(
+    activityId: string,
+  ): WorkflowEvent | undefined {
+    return scheduledEventByActivityId.get(activityId);
+  }
+
   return {
     getEventArray,
     getFirstEvent,
     getGroupArray,
     getLazyGroups,
+    getPendingActivityScheduledEvent,
     getWorkflowTaskFailedEvent,
     ingestHistoryEvent,
     isWorkflowTaskGroup,
@@ -828,6 +858,10 @@ export const getGroupArray = (opts?: GroupArrayOptions): EventGroup[] =>
   activeBufferHandle.current.getGroupArray(opts);
 export const getLazyGroups = (opts?: GroupArrayOptions): LazyGroup[] =>
   activeBufferHandle.current.getLazyGroups(opts);
+export const getPendingActivityScheduledEvent = (
+  activityId: string,
+): WorkflowEvent | undefined =>
+  activeBufferHandle.current.getPendingActivityScheduledEvent(activityId);
 export const getWorkflowTaskFailedEvent = (): WorkflowEvent | undefined =>
   activeBufferHandle.current.getWorkflowTaskFailedEvent();
 export const ingestHistoryEvent = (raw: HistoryEvent): boolean =>

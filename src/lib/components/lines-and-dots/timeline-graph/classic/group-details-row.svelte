@@ -4,7 +4,9 @@
   import { page } from '$app/stores';
 
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
+  import EventStatusBadge, {
+    type EventStatus,
+  } from '$lib/components/event/event-status-badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconClock, IconClose } from '$lib/io/icon';
@@ -62,14 +64,12 @@
     formatEventGroupDuration({ group, endTime, includeMilliseconds: true }),
   );
 
-  const status = $derived.by(() => {
+  const status = $derived.by<EventStatus | undefined>(() => {
     const pending = group?.pendingActivity;
     if (pending) {
-      if (pending.paused) return translate('workflows.paused');
-      if ((pending.attempt ?? 0) > 1) {
-        return translate('events.event-classification.retrying');
-      }
-      return translate('events.event-classification.pending');
+      if (pending.paused) return 'Paused';
+      if ((pending.attempt ?? 0) > 1) return 'Retrying';
+      return 'Pending';
     }
     return group?.finalClassification || group?.classification;
   });
@@ -83,11 +83,11 @@
 >
   <div bind:this={contentEl} class="flex flex-col">
     <div
-      class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
+      class="relative flex h-full items-center justify-between bg-surface-secondary text-sm"
     >
       <div class="flex h-full items-center gap-4 px-2">
         {#if status}
-          <WorkflowStatus {status} />
+          <EventStatusBadge {status} />
         {/if}
         {title}
         {#if duration}
@@ -103,11 +103,11 @@
         >
       </div>
     </div>
-    <div class="surface-primary">
+    <div class="bg-surface-primary text-primary">
       <EventDetailsFull {group} event={group.initialEvent} lazy={true} />
     </div>
     {#if childWorkflowStartedEvent}
-      <div class="surface-primary p-4">
+      <div class="bg-surface-primary p-4 text-primary">
         <div class="font-medium leading-4 text-secondary">Child Workflow</div>
         {#key group.eventList.length}
           {#if childWorkflowStartedEvent.attributes.workflowExecution?.workflowId}
@@ -118,7 +118,7 @@
               runId={childWorkflowStartedEvent.attributes.workflowExecution
                 .runId ?? undefined}
               viewportHeight={320}
-              class="surface-primary overflow-x-hidden border-t border-subtle"
+              class="overflow-x-hidden border-t border-primary bg-surface-primary text-primary"
             />
           {/if}
         {/key}

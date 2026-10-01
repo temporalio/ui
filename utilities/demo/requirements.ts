@@ -7,6 +7,14 @@
 export type FeatureRequirement = {
   serverCommit?: string;
   minServerVersion?: string;
+  serverModules?: Record<string, string>;
+  commands?: readonly string[];
+};
+
+export type ModuleRequirement = {
+  module: string;
+  required: string;
+  found?: string;
 };
 
 export type CommitFacts = {
@@ -195,4 +203,95 @@ export const pickCli = (
           ? candidate
           : best,
       undefined,
+    );
+
+/**
+ * A Go pseudo-version carries the commit timestamp of the revision it names,
+ * so ordering two of them orders the commits without any git history. Anything
+ * else falls back to semver.
+ */
+const pseudoTimestamp = (version: string): string | undefined =>
+  /^v\d+\.\d+\.\d+(?:-[\w.]*?)?-?(\d{14})-[0-9a-f]{12}$/.exec(version)?.[1];
+
+/**
+ * True when `found` is at least `required`. Two pseudo-versions compare by
+ * their embedded timestamps; otherwise semver decides. A tagged release always
+ * satisfies a pseudo-version requirement, because tagging happens downstream
+ * of the commit.
+ */
+export const moduleSatisfies = (found: string, required: string): boolean => {
+  const foundStamp = pseudoTimestamp(found);
+  const requiredStamp = pseudoTimestamp(required);
+
+  if (foundStamp && requiredStamp) return foundStamp >= requiredStamp;
+  if (requiredStamp && !foundStamp) return true;
+  if (foundStamp && !requiredStamp) return false;
+
+  return compareVersions(found, required) >= 0;
+};
+
+/** The version a go.mod pins for each module path named in `wanted`. */
+export const readModuleVersions = (
+  goMod: string,
+  wanted: readonly string[],
+): Record<string, string | undefined> => {
+  const found: Record<string, string | undefined> = {};
+
+  for (const module of wanted) {
+    const escaped = module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // `require` blocks and single-line requires both reduce to
+    // "<module> <version>" once the keyword and whitespace are stripped.
+    const match = new RegExp(
+      `(?:^|\\n)\\s*(?:require\\s+)?${escaped}\\s+(v\\S+)`,
+    ).exec(goMod);
+
+    found[module] = match?.[1];
+  }
+
+  return found;
+};
+
+/** Module requirements the server's go.mod does not meet. */
+export const unmetModuleRequirements = (
+  goMod: string,
+  required: Record<string, string> = {},
+): ModuleRequirement[] => {
+  const wanted = Object.keys(required);
+
+  if (!wanted.length) return [];
+
+  const found = readModuleVersions(goMod, wanted);
+
+  return wanted
+    .map((module) => ({
+      module,
+      required: required[module],
+      found: found[module],
+    }))
+    .filter(({ found: version, required: minimum }) =>
+      version ? !moduleSatisfies(version, minimum) : true,
+    );
+};
+
+/** The `go` directive a go.mod declares, if any. */
+export const goDirective = (goMod: string): string | undefined =>
+  /^go\s+(\d+\.\d+(?:\.\d+)?)\s*$/m.exec(goMod)?.[1];
+
+/**
+ * The `go` directive a workspace must declare to hold these modules: the
+ * highest any of them asks for. Go refuses to build a workspace whose
+ * directive is below a member module's, and both repositories bump theirs on
+ * their own schedule, so this cannot be a constant.
+ */
+export const workspaceGoVersion = (
+  goMods: readonly string[],
+  fallback = '1.24',
+): string =>
+  goMods
+    .map((mod) => goDirective(mod))
+    .filter((version): version is string => Boolean(version))
+    .reduce(
+      (highest, version) =>
+        compareVersions(version, highest) > 0 ? version : highest,
+      fallback,
     );

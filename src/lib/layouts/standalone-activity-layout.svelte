@@ -7,13 +7,13 @@
   import ActivityHeaderLoading from '$lib/components/standalone-activities/activity-header-loading.svelte';
   import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import ErrorComponent from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Badge } from '$lib/io/badge';
   import { IconChevronLeft } from '$lib/io/icon';
   import { getActivityPollers } from '$lib/services/pollers-service';
   import { fetchWorkerCount } from '$lib/services/worker-service';
@@ -22,6 +22,7 @@
     activityWorkerCount,
   } from '$lib/stores/activities';
   import { workerCountEnabled } from '$lib/stores/workers';
+  import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForStandaloneActivities,
@@ -138,7 +139,7 @@
   });
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex min-h-0 grow flex-col gap-4">
   <div class="flex items-center gap-2">
     <Link
       href={activitiesHref}
@@ -174,9 +175,7 @@
         active={pathMatches(page.url.pathname, workersRoute)}
       >
         {#if $activityWorkerCount !== undefined}
-          <Badge type="primary" class="px-2 py-0">
-            {$activityWorkerCount}
-          </Badge>
+          <Badge text={String($activityWorkerCount)} colorScheme="info" />
         {/if}
       </Tab>
       <Tab
@@ -200,9 +199,10 @@
         <NoWorkersPollingAlert
           {namespace}
           taskQueue={$activityExecution.info.taskQueue ?? ''}
-          runningWithNoWorkers={!response.pollers &&
+          runningWithNoWorkers={!response.pollers?.length &&
             $activityExecution.info.status ===
               'ACTIVITY_EXECUTION_STATUS_RUNNING'}
+          deployment={getWorkerDeploymentName(response, null)}
         />
       {/await}
     {/if}

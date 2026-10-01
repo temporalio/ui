@@ -5,7 +5,7 @@
   import { setActiveGroup } from '$lib/stores/active-events';
   import { resolveSystemNexusEvent } from '$lib/system-nexus-endpoints';
   import type { ValidTime } from '$lib/utilities/format-time';
-  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
+  import { getEventClassificationLabel } from '$lib/utilities/get-event-classification-label';
 
   import { dotColors } from '../colors';
   import { CategoryIcon } from '../constants';
@@ -92,7 +92,7 @@
       </svg>
     </span>
     <span
-      class="absolute z-10 -translate-y-1/2 select-none whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-xs leading-none"
+      class="absolute z-10 -translate-y-1/2 select-none whitespace-nowrap rounded-full bg-surface-primary px-1.5 text-xs leading-none"
       class:hidden={!showLabel}
       class:-translate-x-full={presentation.label.textAnchor === 'end'}
       style:left="{presentation.label.textPosition[0]}px"

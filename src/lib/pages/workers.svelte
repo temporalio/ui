@@ -53,7 +53,6 @@
       searchAttributes={$workerSearchAttributes}
       id="worker"
       statusAttribute="WorkerStatus"
-      includeNullConditions={false}
     />
     {#key [namespace, query, $refresh]}
       <WorkersTable

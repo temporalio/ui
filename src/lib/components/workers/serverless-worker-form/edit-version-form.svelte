@@ -8,8 +8,10 @@
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import { type ComputeProviderTemplates } from './compute-providers';
   import {
     type ComputeProviderOption,
+    type ComputeProviderValue,
     defaultScaleDownStabilization,
     type EditVersionFormData,
     editVersionSchema,
@@ -21,8 +23,9 @@
 
   interface Props {
     initialData: {
-      provider?: 'lambda' | 'cloud-run';
+      provider?: ComputeProviderValue;
       lambdaArn: string;
+      agentCoreEndpointArn?: string;
       iamRoleArn: string;
       roleExternalId: string;
       gcpProject?: string;
@@ -45,8 +48,7 @@
     error?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
   }
 
   let {
@@ -57,8 +59,7 @@
     error,
     computeProviders,
     gcpRegions,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
   }: Props = $props();
 
   const superform = superForm(
@@ -68,6 +69,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: initialData.lambdaArn,
+      agentCoreEndpointArn: initialData.agentCoreEndpointArn ?? '',
       iamRoleArn: initialData.iamRoleArn,
       roleExternalId: initialData.roleExternalId ?? '',
       gcpProject: initialData.gcpProject ?? '',
@@ -121,6 +123,7 @@
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
+        bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
         bind:iamRoleArn={$form.iamRoleArn}
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}
@@ -137,8 +140,7 @@
         bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
         bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-        {terraformTemplate}
-        {cloudRunTerraformTemplate}
+        {templates}
         errors={$errors}
       />
     </Card>

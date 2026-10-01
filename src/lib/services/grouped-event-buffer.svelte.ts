@@ -8,8 +8,10 @@ import {
   getFirstEvent,
   getGroupArray,
   getLazyGroups,
+  getPendingActivityScheduledEvent,
   getWorkflowTaskFailedEvent,
   type LazyGroup,
+  materializeGroup,
   onChange,
 } from './grouped-event-buffer';
 
@@ -57,6 +59,25 @@ class EventBufferView {
   /** Bumped once per batch of buffer writes. */
   get version(): number {
     return this._version;
+  }
+
+  /**
+   * Materialize a group, re-running whenever the buffer changes. A GroupRecord's
+   * identity is stable for the life of the run, so a caller deriving off the
+   * record alone would never see its contents change.
+   */
+  materializeGroup(group: LazyGroup): EventGroup {
+    void this._version;
+    return materializeGroup(group);
+  }
+
+  /**
+   * The ActivityTaskScheduled event for a currently-pending activity. Reads
+   * `_version` so callers re-derive once the head event lands.
+   */
+  pendingActivityScheduledEvent(activityId: string): WorkflowEvent | undefined {
+    void this._version;
+    return getPendingActivityScheduledEvent(activityId);
   }
 
   /**

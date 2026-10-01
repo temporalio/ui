@@ -1,14 +1,16 @@
 <script lang="ts">
+  import {
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+  } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import ServerlessWorkerCreateForm from '$lib/components/workers/serverless-worker-form/serverless-worker-create-form.svelte';
   import type {
     ComputeProviderOption,
     CreateDeploymentFormData,
   } from '$lib/components/workers/serverless-worker-form/shared';
-  import { scaleDownStabilizationToMs } from '$lib/components/workers/serverless-worker-form/shared';
+  import { buildComputeConfigFromForm } from '$lib/components/workers/serverless-worker-form/shared';
   import { translate } from '$lib/i18n/translate';
   import {
-    buildGcpCloudRunComputeConfig,
-    buildLambdaComputeConfig,
     createWorkerDeployment,
     createWorkerDeploymentVersion,
     deleteWorkerDeployment,
@@ -22,10 +24,7 @@
   interface Props {
     namespace: string;
     onSuccess: () => void;
-    cfnTemplateUrl?: string;
-    cfnTemplate?: string;
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
@@ -35,16 +34,8 @@
     iamRoleArn?: string[];
   }
 
-  let {
-    namespace,
-    onSuccess,
-    cfnTemplateUrl,
-    cfnTemplate,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
-    computeProviders,
-    gcpRegions,
-  }: Props = $props();
+  let { namespace, onSuccess, templates, computeProviders, gcpRegions }: Props =
+    $props();
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -91,36 +82,7 @@
     );
     if (deploymentError) throw new Error(deploymentError);
 
-    let computeConfig: ComputeConfig;
-    if (data.provider === 'cloud-run') {
-      computeConfig = buildGcpCloudRunComputeConfig(
-        data.gcpProject,
-        data.gcpRegion,
-        data.gcpWorkerPool,
-        data.gcpServiceAccount,
-        {
-          minReplicas: data.minReplicas,
-          maxReplicas: data.maxReplicas,
-          initialReplicas: data.initialReplicas,
-          utilizationTarget: data.utilizationTarget,
-          scaleDownStabilizationMs: scaleDownStabilizationToMs(
-            data.scaleDownStabilization,
-          ),
-        },
-      );
-    } else {
-      computeConfig = buildLambdaComputeConfig(
-        data.lambdaArn,
-        data.iamRoleArn,
-        {
-          roleExternalId: data.roleExternalId,
-          scaleUpCooloffMs: data.scaleUpCooloffMs,
-          scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-          maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-          metricsPollIntervalMs: data.metricsPollIntervalMs,
-        },
-      );
-    }
+    const computeConfig = buildComputeConfigFromForm(data);
 
     let versionError: string | undefined;
     await createWorkerDeploymentVersion(
@@ -221,10 +183,7 @@
   cancelHref={routeForWorkers({ namespace })}
   {onSuccess}
   onSubmit={handleCreate}
-  {cfnTemplateUrl}
-  {cfnTemplate}
-  {terraformTemplate}
-  {cloudRunTerraformTemplate}
+  {templates}
   {computeProviders}
   {gcpRegions}
 />

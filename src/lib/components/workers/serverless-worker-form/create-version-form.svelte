@@ -11,6 +11,10 @@
   import type { VersionSummary } from '$lib/types/deployments';
 
   import {
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+  } from './compute-providers';
+  import {
     type ComputeProviderOption,
     type CreateVersionFormData,
     createVersionSchema,
@@ -18,6 +22,7 @@
     getInitialComputeProvider,
   } from './shared';
 
+  import CloudRunLatencyNotice from './cloud-run-latency-notice.svelte';
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
   import RecentVersions from './recent-versions.svelte';
@@ -30,8 +35,7 @@
     computeProviders?: readonly ComputeProviderOption[];
     initialProvider?: ComputeProviderOption['value'];
     gcpRegions?: string[];
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
   }
 
   let {
@@ -42,8 +46,7 @@
     computeProviders,
     initialProvider,
     gcpRegions,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
   }: Props = $props();
 
   const superform = superForm(
@@ -54,6 +57,7 @@
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: '',
+      agentCoreEndpointArn: '',
       iamRoleArn: '',
       roleExternalId: '',
       gcpProject: '',
@@ -124,9 +128,11 @@
         bind:provider={$form.provider}
         providers={computeProviders}
       >
+        <CloudRunLatencyNotice provider={$form.provider} />
         <ComputeFields
           provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}
+          bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
           bind:iamRoleArn={$form.iamRoleArn}
           bind:roleExternalId={$form.roleExternalId}
           bind:gcpProject={$form.gcpProject}
@@ -143,8 +149,7 @@
           bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
           bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-          {terraformTemplate}
-          {cloudRunTerraformTemplate}
+          {templates}
           errors={$errors}
         />
       </ComputeProviderPicker>

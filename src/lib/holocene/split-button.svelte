@@ -46,6 +46,7 @@
       data-track-name="split-button"
       data-track-intent="primary"
       data-track-text={label}
+      class="rounded-r-none"
       {onclick}
     >
       {#if Icon}
@@ -54,7 +55,7 @@
       {label}
     </Button>
     <MenuButton
-      class="max-w-fit grow-0 px-3"
+      class="max-w-fit grow-0 rounded-l-none px-3"
       id="{id}-menu-button"
       label={menuLabel}
       controls="{id}-menu"

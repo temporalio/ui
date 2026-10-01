@@ -45,6 +45,11 @@ type (
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
 		DisableNewsFetch    bool   `yaml:"disableNewsFetch"`
+		NotifyOnNewVersion  bool   `yaml:"notifyOnNewVersion"`
+		// How this server was installed: cli, docker, helm, or server
+		Distribution string `yaml:"distribution"`
+		// Version of the distribution, such as the CLI or Helm chart version
+		DistributionVersion string `yaml:"distributionVersion"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
 		// Collapse the left navigation and saved views navigation by default
@@ -70,6 +75,8 @@ type (
 		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
 		// Whether to disable activity commands in the UI
 		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
+		// Custom UI extensions that can mount iframe content into stable UI slots
+		CustomUI CustomUI `yaml:"customUi"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
 		HideLogs       bool     `yaml:"hideLogs"`
@@ -134,6 +141,12 @@ type (
 		Options map[string]interface{} `yaml:"options"`
 		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
 		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
+		// RefreshTokenDuration - optional lifetime of the refresh token this provider issues.
+		// It is only needed for providers that issue opaque (non-JWT) refresh tokens, whose
+		// lifetime the server cannot read. For JWT refresh tokens the exp claim is used and
+		// this value is ignored. If neither is available, a 7 day default applies.
+		// Example values: "8h", "24h", "168h" (1 week).
+		RefreshTokenDuration time.Duration `yaml:"refreshTokenDuration"`
 	}
 
 	Codec struct {
@@ -142,6 +155,40 @@ type (
 		IncludeCredentials  bool   `yaml:"includeCredentials"`
 		DefaultErrorMessage string `yaml:"defaultErrorMessage"`
 		DefaultErrorLink    string `yaml:"defaultErrorLink"`
+	}
+
+	CustomUI struct {
+		Enabled          bool              `yaml:"enabled"`
+		IframeExtensions []IframeExtension `yaml:"iframeExtensions"`
+	}
+
+	IframeExtension struct {
+		ID            string                `yaml:"id"`
+		Title         string                `yaml:"title"`
+		Slot          string                `yaml:"slot"`
+		Src           string                `yaml:"src"`
+		AllowedOrigin string                `yaml:"allowedOrigin"`
+		RoutePatterns []string              `yaml:"routePatterns"`
+		Sandbox       IframeSandbox         `yaml:"sandbox"`
+		Sizing        IframeExtensionSizing `yaml:"sizing"`
+		Permissions   []string              `yaml:"permissions"`
+	}
+
+	IframeSandbox struct {
+		AllowDownloads  bool `yaml:"allowDownloads"`
+		AllowForms      bool `yaml:"allowForms"`
+		AllowModals     bool `yaml:"allowModals"`
+		AllowPopups     bool `yaml:"allowPopups"`
+		AllowSameOrigin bool `yaml:"allowSameOrigin"`
+	}
+
+	IframeExtensionSizing struct {
+		DefaultHeight int `yaml:"defaultHeight"`
+		MinHeight     int `yaml:"minHeight"`
+		MaxHeight     int `yaml:"maxHeight"`
+		DefaultWidth  int `yaml:"defaultWidth"`
+		MinWidth      int `yaml:"minWidth"`
+		MaxWidth      int `yaml:"maxWidth"`
 	}
 
 	Filesystem struct {
@@ -156,6 +203,9 @@ func (c *Config) Validate() error {
 	}
 
 	if err := c.Auth.Validate(); err != nil {
+		return err
+	}
+	if err := c.CustomUI.Validate(c.Auth.Enabled); err != nil {
 		return err
 	}
 

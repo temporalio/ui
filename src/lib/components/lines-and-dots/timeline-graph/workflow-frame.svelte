@@ -275,8 +275,8 @@
           <span
             class:frame-label-chain={kind === 'chain'}
             class:workflow-run-label={kind === 'run'}
-            class="pointer-events-none absolute z-10 inline-flex min-h-[var(--dot)] items-center truncate whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-xs leading-none {subtleLabel
-              ? 'text-subtle'
+            class="pointer-events-none absolute z-10 inline-flex min-h-[var(--dot)] items-center truncate whitespace-nowrap rounded-full bg-surface-primary px-1.5 text-xs leading-none {subtleLabel
+              ? 'text-secondary'
               : 'text-current'}"
             style:left={labelLeft}
             style:top="{geometry.topPx - RADIUS}px"

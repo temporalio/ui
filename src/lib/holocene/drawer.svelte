@@ -2,10 +2,11 @@
   import { fly } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
-  import { onDestroy, onMount, setContext } from 'svelte';
+  import { setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { clickoutside } from '$lib/holocene/outside-click';
+  import { portal } from '$lib/holocene/portal/portal-action';
   import { IconClose } from '$lib/io/icon';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
@@ -35,8 +36,6 @@
     children,
   }: Props = $props();
 
-  let portalElement = $state<HTMLElement | null>(null);
-
   const flyParamsIn = $derived({
     duration: 250,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
@@ -49,47 +48,21 @@
 
   // svelte-ignore state_referenced_locally
   setContext('drawer-pos', position);
-
-  onMount(() => {
-    portalElement = document.createElement('div');
-    portalElement.className = 'drawer-portal';
-    document.body.appendChild(portalElement);
-  });
-
-  onDestroy(() => {
-    if (portalElement) {
-      document.body.removeChild(portalElement);
-    }
-  });
-
-  function portal(node: HTMLElement) {
-    if (portalElement) {
-      portalElement.appendChild(node);
-    }
-
-    return {
-      destroy() {
-        if (node.parentNode) {
-          node.parentNode.removeChild(node);
-        }
-      },
-    };
-  }
 </script>
 
-{#if open && portalElement}
+{#if open}
   <!-- Order matters: use:portal must run before use:focusTrap. Actions set up
   top-to-bottom, and focusTrap inerts everything outside this node by walking up
   to <body> — so the node must already be portaled into its final location, or
   the wrong siblings get inerted. -->
   <aside
     {id}
+    data-theme={dark ? 'dark' : undefined}
     class={merge(
-      'surface-primary fixed z-[55] h-auto overflow-y-auto border-subtle text-primary',
+      'fixed z-[55] h-auto overflow-y-auto border-tertiary bg-background-primary text-primary',
       position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
       position === 'right' &&
         'right-0 top-0 h-full w-screen border-l sm:max-w-fit',
-      dark && 'bg-black text-off-white',
       className,
     )}
     in:fly={flyParamsIn}
@@ -105,10 +78,7 @@
         <IconButton
           data-testid="drawer-close-button"
           label={closeButtonLabel}
-          class={merge(
-            dark ? 'text-white' : 'text-primary',
-            'hover:text-primary',
-          )}
+          class="text-primary"
           Icon={IconClose}
           aria-expanded={open}
           aria-controls="navigation-drawer"

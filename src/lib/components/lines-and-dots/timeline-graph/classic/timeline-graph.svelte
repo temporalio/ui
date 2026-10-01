@@ -456,8 +456,8 @@
   aria-label="Timeline"
   data-display-mode="classic"
   class={twMerge(
-    'relative overflow-hidden border border-t-0 border-subtle bg-primary',
-    error && 'bg-danger',
+    'relative overflow-hidden border border-t-0 border-primary bg-surface-primary',
+    error && 'bg-surface-danger',
   )}
   style:height="{svgHeight}px"
   bind:this={containerEl}
@@ -563,7 +563,7 @@
           })}
           {@const rectH = pendingGroupCount * ROW_HEIGHT + RADIUS}
           <div
-            class="absolute animate-pulse rounded bg-slate-400/30"
+            class="absolute animate-pulse rounded bg-surface-tertiary"
             style:left="{GUTTER}px"
             style:top="{rectY}px"
             style:width="{canvasWidth - GUTTER * 2}px"
@@ -598,7 +598,7 @@
   .canvas {
     position: relative;
     margin-top: -1rem;
-    color: rgb(var(--color-text-primary));
+    color: var(--color-content-primary);
   }
 
   /* Connector-line styles for the row components' `.tl-line` divs; :global since

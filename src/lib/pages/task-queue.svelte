@@ -16,7 +16,7 @@
   );
 </script>
 
-<section class="flex flex-col gap-4">
+<section class="flex min-h-0 grow flex-col gap-4">
   <h1 data-testid="task-queue-title">{translate('workers.task-queue')}</h1>
   <h2 data-testid="task-queue-name">
     {taskQueue}

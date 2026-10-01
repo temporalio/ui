@@ -16,6 +16,7 @@
     variant?: ComponentProps<typeof MenuButton>['variant'];
     keepOpen?: ComponentProps<typeof Menu>['keepOpen'];
     position?: ComponentProps<typeof Menu>['position'];
+    usePortal?: ComponentProps<typeof Menu>['usePortal'];
     menuElement?: ComponentProps<typeof Menu>['menuElement'];
   };
 
@@ -27,6 +28,7 @@
       variant: 'primary',
       keepOpen: false,
       position: 'left',
+      usePortal: false,
     },
     argTypes: {
       variant: {
@@ -43,6 +45,10 @@
         control: 'inline-radio',
         options: ['left', 'right', 'top-left', 'top-right'],
       },
+      usePortal: {
+        name: 'Use Portal',
+        control: 'boolean',
+      },
       menuElement: {
         name: 'Menu Element',
         table: {
@@ -55,7 +61,9 @@
 </script>
 
 {#snippet template(args: MenuArgs, context: StoryContext<MenuArgs>)}
-  <div class="flex items-center justify-center">
+  <div
+    class="flex items-center justify-center border border-primary bg-surface-primary p-4 text-primary"
+  >
     <MenuContainer>
       <MenuButton hasIndicator variant={args.variant} controls={context.id}>
         {#snippet leading()}
@@ -68,6 +76,7 @@
         class="w-64"
         keepOpen={args.keepOpen}
         position={args.position}
+        usePortal={args.usePortal}
       >
         <MenuItem href="https://temporal.io" newTab onclick={action('click')}>
           Link

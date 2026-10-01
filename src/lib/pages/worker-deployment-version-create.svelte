@@ -1,14 +1,16 @@
 <script lang="ts">
+  import {
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+  } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import CreateVersionForm from '$lib/components/workers/serverless-worker-form/create-version-form.svelte';
   import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
-  import { scaleDownStabilizationToMs } from '$lib/components/workers/serverless-worker-form/shared';
+  import { buildComputeConfigFromForm } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconChevronLeft } from '$lib/io/icon';
   import {
-    buildGcpCloudRunComputeConfig,
-    buildLambdaComputeConfig,
     createWorkerDeploymentVersion,
     deleteWorkerDeploymentVersion,
     fetchDeployment,
@@ -24,8 +26,7 @@
     onSuccess: () => void;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
   }
 
   let {
@@ -34,8 +35,7 @@
     onSuccess,
     computeProviders,
     gcpRegions,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
   }: Props = $props();
 
   let error = $state<string | undefined>();
@@ -102,35 +102,11 @@
       computeProviders={lockedProvider?.providers ?? computeProviders}
       initialProvider={lockedProvider?.provider}
       {gcpRegions}
-      {terraformTemplate}
-      {cloudRunTerraformTemplate}
+      {templates}
       cancelHref={backHref}
       onSubmit={async (data) => {
         error = undefined;
-        const computeConfig =
-          data.provider === 'cloud-run'
-            ? buildGcpCloudRunComputeConfig(
-                data.gcpProject,
-                data.gcpRegion,
-                data.gcpWorkerPool,
-                data.gcpServiceAccount,
-                {
-                  minReplicas: data.minReplicas,
-                  maxReplicas: data.maxReplicas,
-                  initialReplicas: data.initialReplicas,
-                  utilizationTarget: data.utilizationTarget,
-                  scaleDownStabilizationMs: scaleDownStabilizationToMs(
-                    data.scaleDownStabilization,
-                  ),
-                },
-              )
-            : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {
-                roleExternalId: data.roleExternalId,
-                scaleUpCooloffMs: data.scaleUpCooloffMs,
-                scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-                maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-                metricsPollIntervalMs: data.metricsPollIntervalMs,
-              });
+        const computeConfig = buildComputeConfigFromForm(data);
         await createWorkerDeploymentVersion(
           {
             namespace,

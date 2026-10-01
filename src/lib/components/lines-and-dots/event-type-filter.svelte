@@ -110,11 +110,16 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton controls="status-menu" size="sm">
+  <MenuButton
+    controls="status-menu"
+    size="sm"
+    variant="tertiary"
+    class="rounded-none"
+  >
     {#snippet leading()}
       <div
         class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
-        class:bg-interactive={filterActive}
+        class:bg-interactive-primary={filterActive}
       >
         <IconFilter class={filterActive ? 'pt-0.5 text-white' : undefined} />
       </div>

@@ -2,7 +2,6 @@
   import type { Snippet } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -12,6 +11,7 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeCount } from '$lib/io/badge-count';
   import type { NexusEndpoint as Endpoint } from '$lib/types/nexus';
   import {
     routeForNamespace,
@@ -94,7 +94,7 @@
   <Card class="flex flex-col gap-4">
     <div class="flex items-center gap-2">
       <h5>{translate('nexus.allowed-caller-namespaces')}</h5>
-      <Badge type="count">{allowedCallerNamespaces?.length ?? 0}</Badge>
+      <BadgeCount value={allowedCallerNamespaces?.length ?? 0} />
     </div>
     <div class="flex flex-wrap items-center gap-4">
       <PaginatedTable

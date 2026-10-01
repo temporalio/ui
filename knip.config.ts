@@ -11,8 +11,9 @@ const config: KnipConfig = {
   ],
   project: ['**/*.{svelte,css,js,cjs,mjs,ts}'],
   ignore: [
-    // Is actually used via path.resolve in ./src/routes/(app)/render/+server.ts
-    './src/markdown.reset.css',
+    // Written by scripts/generate-markdown-css.ts and read by //go:embed in
+    // ./server/server/route/ui.go, so nothing in JavaScript imports it.
+    './server/server/route/markdown.gen.css',
   ],
   // from ./utilities/temporal-server.ts and ./utilities/ui-server.ts
   ignoreBinaries: ['which', 'server', 'go', 'air', 'make', 'start'],

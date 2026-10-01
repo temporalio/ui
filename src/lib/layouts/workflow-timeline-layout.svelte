@@ -863,7 +863,7 @@
   data-chain-route-run-id={workflowRunCtx.chainRunId}
 >
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary pb-2 text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="flex items-center gap-2">
       <h2>{translate('workflows.timeline-tab')}</h2>
@@ -939,7 +939,7 @@
             >
           </ToggleButton>
           <span
-            class="border-default flex min-w-12 items-center justify-center border-y px-2 text-xs font-medium tabular-nums text-secondary"
+            class="flex min-w-12 items-center justify-center border-y border-primary px-2 text-xs font-medium tabular-nums text-secondary"
             aria-live="polite"
             aria-label={translate('workflows.timeline-window-duration')}
             data-testid="timeline-window-duration"
@@ -1014,8 +1014,11 @@
           LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="timeline-sort"
           onclick={onSort}
-          size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+          size="sm"
+          variant="tertiary"
         >
+          {reverseSort ? 'Descending' : 'Ascending'}
+        </ToggleButton>
         <ToggleButton
           LeadingIcon={IconCollapse}
           data-testid="toggle-idle-time"
@@ -1024,6 +1027,7 @@
             !timeline?.hasCollapsibleSegments}
           onclick={onToggleIdleTime}
           size="sm"
+          variant="tertiary"
         >
           {timeline?.allCollapsibleSegmentsCollapsed
             ? translate('workflows.show-idle-time')
@@ -1036,12 +1040,13 @@
           disabled={isNotPending}
           data-testid="pause"
           size="sm"
+          variant="tertiary"
           onclick={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
+              ? 'bg-content-tertiary'
+              : 'bg-content-static-success'}"
           ></span>
           {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
@@ -1051,6 +1056,7 @@
           data-testid="download"
           LeadingIcon={IconDownload}
           size="sm"
+          variant="tertiary"
           onclick={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}
@@ -1094,7 +1100,7 @@
       />
       {#if instrumentTimelinePerformance}
         <div
-          class="flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-b border-subtle px-3 py-1 text-xs tabular-nums text-secondary"
+          class="flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-b border-primary px-3 py-1 text-xs tabular-nums text-secondary"
           data-testid="timeline-performance-stats"
         >
           <span>
@@ -1155,7 +1161,7 @@
       />
     {/if}
     {#if workflowRunCtx.truncation?.affectsVisibleInterval || committedInterval?.truncated}
-      <p class="text-muted mt-2 text-sm" role="status">
+      <p class="mt-2 text-sm text-tertiary" role="status">
         {translate('workflows.chained-timeline-truncated')}
       </p>
     {/if}

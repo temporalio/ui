@@ -412,7 +412,7 @@
 
 <div
   bind:this={overviewElement}
-  class="surface-background border-b border-subtle px-3 py-2"
+  class="border-b border-primary bg-background-primary px-3 py-2 text-primary"
   data-testid="timeline-chain-overview"
   data-chain-end-time-ms={endTimeMs}
   style:padding-left={leadingInsetPx ? `${leadingInsetPx}px` : undefined}
@@ -422,7 +422,7 @@
     <span class="font-medium"
       >{translate('workflows.timeline-chain-overview')}</span
     >
-    <span class="text-muted flex items-center gap-2 tabular-nums">
+    <span class="flex items-center gap-2 tabular-nums text-tertiary">
       {#if startTimeMs !== undefined}
         <span data-testid="timeline-chain-duration">
           {translate('workflows.timeline-chain-run-count', {
@@ -443,7 +443,7 @@
   </div>
   {#if startTimeMs !== undefined}
     <div
-      class="text-muted relative h-6 text-xs tabular-nums"
+      class="relative h-6 text-xs tabular-nums text-tertiary"
       data-testid="timeline-chain-time-axis"
     >
       {#each timeTicks as tick (tick.positionPercent)}
@@ -483,7 +483,7 @@
   {/if}
   <div
     bind:this={trackElement}
-    class="relative h-5 rounded border border-subtle bg-subtle"
+    class="relative h-5 rounded border border-primary bg-surface-tertiary"
     role="group"
     aria-label={`${translate('workflows.timeline-chain-overview-description')} ${continuationCount} continuations, ${continuationBinCount} visible markers.`}
     onpointermove={dragWindow}
@@ -497,7 +497,7 @@
         style:transform="scaleX(var(--overview-live-scale, 1))"
       >
         <svg
-          class="text-interactive absolute inset-0 h-full w-full overflow-visible"
+          class="absolute inset-0 h-full w-full overflow-visible text-brand"
           viewBox="0 0 {trackWidth} 20"
           preserveAspectRatio="none"
           aria-hidden="true"
@@ -518,7 +518,7 @@
       </div>
       {#each gaps as gap (gap.key)}
         <div
-          class="pointer-events-none absolute inset-y-0 border-x border-dashed border-warning bg-warning/10"
+          class="pointer-events-none absolute inset-y-0 border-x border-dashed border-warning bg-surface-warning"
           style:left="{gap.left}%"
           style:width="{gap.width}%"
           data-timeline-chain-gap={gap.key}
@@ -527,21 +527,21 @@
       {/each}
       {#if leadingBoundary && leadingBoundary.kind !== 'known-chain-start'}
         <div
-          class="pointer-events-none absolute inset-y-0 left-0 w-1 border-r border-dashed border-warning bg-warning/20"
+          class="pointer-events-none absolute inset-y-0 left-0 w-1 border-r border-dashed border-warning bg-surface-overlay-warning"
           data-timeline-chain-boundary={leadingBoundary.kind}
           title={`Earlier workflow history is ${leadingBoundary.kind}`}
         ></div>
       {/if}
       {#if trailingBoundary && trailingBoundary.kind !== 'known-chain-end' && trailingBoundary.kind !== 'live-edge'}
         <div
-          class="pointer-events-none absolute inset-y-0 right-0 w-1 border-l border-dashed border-warning bg-warning/20"
+          class="pointer-events-none absolute inset-y-0 right-0 w-1 border-l border-dashed border-warning bg-surface-overlay-warning"
           data-timeline-chain-boundary={trailingBoundary.kind}
           title={`Later workflow history is ${trailingBoundary.kind}`}
         ></div>
       {/if}
       {#if windowStartTimeMs !== undefined}
         <div
-          class="outline-interactive absolute -inset-y-1 z-10 touch-none rounded bg-transparent shadow-sm outline outline-[3px]"
+          class="absolute -inset-y-1 z-10 touch-none rounded bg-transparent shadow-sm outline outline-[3px] outline-interactive-primary"
           style:left={dragMode === null
             ? `var(--overview-window-left, ${displayedWindowLeft}%)`
             : `${displayedWindowLeft}%`}
@@ -571,7 +571,7 @@
             onkeydown={(event) => resizeWithKeyboard(event, 'start')}
           >
             <span
-              class="absolute bottom-1 right-0 top-1 w-0.5 rounded bg-interactive"
+              class="absolute bottom-1 right-0 top-1 w-0.5 rounded bg-interactive-primary"
             ></span>
           </button>
           <button
@@ -583,7 +583,7 @@
             onkeydown={(event) => resizeWithKeyboard(event, 'end')}
           >
             <span
-              class="absolute bottom-1 left-0 top-1 w-0.5 rounded bg-interactive"
+              class="absolute bottom-1 left-0 top-1 w-0.5 rounded bg-interactive-primary"
             ></span>
           </button>
         </div>

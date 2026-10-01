@@ -5,18 +5,19 @@
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
-  import WorkflowStatus from '$lib/components/execution-status.svelte';
+  import EventStatusBadge from '$lib/components/event/event-status-badge.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconRetry } from '$lib/io/icon';
+  import { BadgeCount } from '$lib/io/badge-count';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
+  import { getUpdatedActivityOptions } from '$lib/utilities/activity-options-diff';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -28,12 +29,25 @@
   let {
     activity,
     totalPending,
-  }: { activity: PendingActivity; totalPending?: number } = $props();
+  }: {
+    activity: PendingActivity;
+    totalPending?: number;
+  } = $props();
   const failed = $derived(
     (activity.attempt ?? 0) > 1 && !!activity.lastFailure,
   );
   const isRunning = $derived($workflowRun?.workflow?.isRunning);
   const isPaused = $derived($workflowRun?.workflow?.isPaused);
+
+  const scheduledEvent = $derived(
+    eventBuffer.pendingActivityScheduledEvent(activity.activityId),
+  );
+  const updatedOptions = $derived(
+    getUpdatedActivityOptions(
+      activity.activityOptions,
+      scheduledEvent?.activityTaskScheduledEventAttributes,
+    ),
+  );
 
   let coreUser = coreUserStore();
   let showActivityCommands = $derived(
@@ -47,11 +61,11 @@
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class="flex flex-1 cursor-default flex-col gap-2 border-b border-primary bg-surface-primary p-4 text-primary"
 >
   <div class="flex flex-1 flex-wrap justify-between gap-2">
     <div class="flex flex-wrap items-center space-x-3">
-      <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
+      <EventStatusBadge status={activity.paused ? 'Paused' : activity.state} />
       <h4>{activity.activityType}</h4>
     </div>
     {#if showActivityCommands}
@@ -137,6 +151,14 @@
           )}
         {/if}
       {/if}
+      {#if updatedOptions.length}
+        <p class="mt-2 text-sm text-secondary">
+          {translate('activities.updated-activity-options')}
+        </p>
+        {#each updatedOptions as option (option.field)}
+          {@render detail(translate(option.label), option.current || '-')}
+        {/each}
+      {/if}
     </div>
     <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
@@ -155,7 +177,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-secondary">
       {label}
     </p>
     <p class="w-full whitespace-pre-line">
@@ -170,7 +192,7 @@
 
 {#snippet heartbeat()}
   <div>
-    <p class="text-sm text-secondary/80">
+    <p class="text-sm text-secondary">
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
@@ -189,7 +211,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if activity.lastFailure}
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm text-secondary">
           {translate('workflows.last-failure')}
         </p>
         {#key activity.attempt}
@@ -203,7 +225,7 @@
     </div>
     {#if activity.lastFailure?.stackTrace}
       <div>
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm text-secondary">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock
@@ -224,6 +246,7 @@
     title={activity.lastFailure?.stackTrace
       ? translate('workflows.last-failure-with-stack-trace')
       : translate('workflows.last-failure')}
+    class="border-tertiary bg-background-primary"
   >
     {#snippet children(open)}
       {#if open}
@@ -235,7 +258,7 @@
 
 {#snippet nextRetry(timeDifference: string)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm text-secondary">
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
@@ -247,12 +270,10 @@
 
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
-    <Badge type={failed ? 'danger' : 'default'}>
-      <IconRetry class="mr-1 {failed && 'font-bold text-red-400'}" />
-      {activity.attempt ?? 0} of {formatMaximumAttempts(
-        activity.maximumAttempts ?? null,
-      )}
-    </Badge>
+    <BadgeCount
+      value={activity.attempt ?? 0}
+      total={formatMaximumAttempts(activity.maximumAttempts ?? null)}
+    />
     {#if activity.maximumAttempts}
       <p class="ml-1 text-sm text-secondary">
         {formatAttemptsLeft(activity.maximumAttempts, activity.attempt ?? 0)} remaining
