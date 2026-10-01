@@ -3,36 +3,55 @@ const NODE_RADIUS = NODE_WIDTH / 2;
 
 export type MarkBounds = Readonly<{ left: number; right: number }>;
 
-export function getNodeBounds(
-  x: number,
-  mark: MarkBounds,
-  alignment: 'start' | 'end' | 'center',
-): MarkBounds {
-  const anchor = getNodeAnchorX(x, mark, alignment !== 'center');
-  const left =
-    alignment === 'start'
-      ? anchor
-      : alignment === 'end'
-        ? anchor - NODE_WIDTH
-        : anchor - NODE_RADIUS;
-  return { left, right: left + NODE_WIDTH };
-}
+export function getMarkGeometry(
+  left: number,
+  right: number,
+  eventPositions: readonly number[],
+  contentWidth: number,
+): Readonly<{ bounds: MarkBounds; nodeCenters: readonly number[] }> {
+  const preferred = eventPositions.map((x, index) => {
+    if (eventPositions.length === 1) return x;
+    if (index === 0) return x + NODE_RADIUS;
+    if (index === eventPositions.length - 1) return x - NODE_RADIUS;
+    return x;
+  });
+  const nodeCenters: number[] = [];
 
-/** Leave enough painted mark for both time-anchored endpoint icons. */
-export function getMarkBounds(left: number, right: number): MarkBounds {
-  const shortfall = Math.max(0, NODE_WIDTH - (right - left));
-  return { left: left - shortfall, right: right + shortfall };
-}
+  for (const x of preferred) {
+    const previous = nodeCenters.at(-1);
+    nodeCenters.push(
+      previous === undefined ? x : Math.max(x, previous + NODE_WIDTH),
+    );
+  }
 
-/** Keep intermediate icons within the mark without shifting endpoint timestamps. */
-export function getNodeAnchorX(
-  x: number,
-  bounds: MarkBounds,
-  isEndpoint: boolean,
-): number {
-  if (isEndpoint) return x;
-  return Math.max(
-    bounds.left + NODE_RADIUS,
-    Math.min(bounds.right - NODE_RADIUS, x),
-  );
+  const first = nodeCenters[0];
+  const last = nodeCenters.at(-1);
+  const preferredFirst = preferred[0];
+  const preferredLast = preferred.at(-1);
+
+  if (
+    first === undefined ||
+    last === undefined ||
+    preferredFirst === undefined ||
+    preferredLast === undefined
+  ) {
+    return { bounds: { left, right }, nodeCenters };
+  }
+
+  const centeredShift = (preferredFirst - first + (preferredLast - last)) / 2;
+  const minimumShift = NODE_RADIUS - first;
+  const maximumShift = contentWidth - NODE_RADIUS - last;
+  const shift =
+    minimumShift <= maximumShift
+      ? Math.max(minimumShift, Math.min(maximumShift, centeredShift))
+      : minimumShift;
+  const displayedCenters = nodeCenters.map((x) => x + shift);
+
+  return {
+    bounds: {
+      left: Math.min(left, first + shift - NODE_RADIUS),
+      right: Math.max(right, last + shift + NODE_RADIUS),
+    },
+    nodeCenters: displayedCenters,
+  };
 }

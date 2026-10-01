@@ -8,6 +8,8 @@ export type PlotExecutionRow = Readonly<{
   key: string;
   depth: number;
   continuesAsNew: boolean;
+  runNumber: number;
+  runCount: number;
   execution: ExecutionScene;
 }>;
 
@@ -28,8 +30,16 @@ export type PlotChildRow = Readonly<{
   workflow: WorkflowScene;
 }>;
 
+export type PlotWorkflowRow = Readonly<{
+  kind: 'workflow';
+  key: string;
+  depth: number;
+  workflow: WorkflowScene;
+}>;
+
 /** Visible workflow, execution, or event row in plot order. */
 export type FlattenedPlotSceneRow =
+  | PlotWorkflowRow
   | PlotChildRow
   | PlotExecutionRow
   | PlotEventRow;
@@ -46,6 +56,8 @@ export function flattenPlotScene(
     execution: ExecutionScene,
     depth: number,
     continuesAsNew: boolean,
+    runNumber: number,
+    runCount: number,
   ): void {
     const executionKey = execution.execution.executionKey;
 
@@ -54,6 +66,8 @@ export function flattenPlotScene(
       key: `execution:${executionKey}`,
       depth,
       continuesAsNew,
+      runNumber,
+      runCount,
       execution,
     });
 
@@ -61,6 +75,8 @@ export function flattenPlotScene(
 
     for (const entry of execution.entries) {
       if (entry.kind === 'row') {
+        if (entry.row.kind === 'workflow') continue;
+
         flattened.push({
           kind: 'event',
           key: `row:${entry.row.rowKey}`,
@@ -85,13 +101,31 @@ export function flattenPlotScene(
           childExecution,
           depth + 2,
           index < entry.workflow.executions.length - 1,
+          index + 1,
+          entry.workflow.executions.length,
         );
       });
     }
   }
 
+  const workflowKey = `workflow:${root.workflowKey}`;
+  flattened.push({
+    kind: 'workflow',
+    key: workflowKey,
+    depth: 0,
+    workflow: root,
+  });
+
+  if (isChildCollapsed(workflowKey)) return flattened;
+
   root.executions.forEach((execution, index) => {
-    visitExecution(execution, 0, index < root.executions.length - 1);
+    visitExecution(
+      execution,
+      1,
+      index < root.executions.length - 1,
+      index + 1,
+      root.executions.length,
+    );
   });
 
   return flattened;

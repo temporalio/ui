@@ -2,7 +2,7 @@
   import { colorScales } from '$lib/theme/io/themes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
-  import type { MinimapMarker, MinimapSpan } from './minimap-landmarks';
+  import type { MinimapMarker } from './minimap-landmarks';
   import type { TimeRange } from './time-viewport';
   import {
     boundTimeRange as boundRange,
@@ -23,13 +23,20 @@
     viewport: TimeRange | null;
     eventTimes: readonly number[];
     landmarks: Readonly<{
-      spans: readonly MinimapSpan[];
       markers: readonly MinimapMarker[];
     }>;
     minDurationMs: number;
     pinnedLive: boolean;
     onselect: (range: TimeRange) => void;
   } = $props();
+
+  const markerColors: Record<MinimapMarker['kind'], string> = {
+    execution: colorScales.blue[9],
+    failure: colorScales.red[9],
+    retry: colorScales.amber[9],
+    continuation: colorScales.indigo[9],
+    completion: colorScales.green[9],
+  };
 
   const BIN_COUNT = 96;
   const RESIZE_HIT_PX = 12;
@@ -86,14 +93,7 @@
         })
       : '',
   );
-  const midpointLabel = $derived(
-    validDomain
-      ? formatDistanceAbbreviated({
-          start: new Date(validDomain.startMs),
-          end: new Date((validDomain.startMs + validDomain.endMs) / 2),
-        })
-      : '',
-  );
+
   function percent(timeMs: number, bounds: TimeRange): number {
     return clamp(
       ((timeMs - bounds.startMs) / (bounds.endMs - bounds.startMs)) * 100,
@@ -293,10 +293,6 @@
   tabindex={validDomain && selection ? 0 : -1}
   onkeydown={onKeydown}
 >
-  <div class="minimap-key" aria-hidden="true">
-    <span>Root</span><span>Children</span><span>Events</span>
-    {#if nearlyFull}<span class="full-range">Entire timeline</span>{/if}
-  </div>
   <div
     class="track"
     role="presentation"
@@ -309,20 +305,6 @@
     onpointercancel={endDrag}
     onlostpointercapture={endDrag}
   >
-    {#if validDomain}
-      <div class="spans" aria-hidden="true">
-        {#each landmarks.spans as span, index (index)}
-          {#if span.endMs >= validDomain.startMs && span.startMs <= validDomain.endMs}
-            <span
-              class="span"
-              class:child={span.kind === 'child'}
-              style:left={`${percent(span.startMs, validDomain)}%`}
-              style:width={`${Math.max(0.3, percent(span.endMs, validDomain) - percent(span.startMs, validDomain))}%`}
-            ></span>
-          {/if}
-        {/each}
-      </div>
-    {/if}
     <div class="activity" aria-hidden="true">
       {#each density as height, index (index)}
         <span class="bar" style:height={`${height}%`}></span>
@@ -334,20 +316,11 @@
           {#if marker.timeMs >= validDomain.startMs && marker.timeMs <= validDomain.endMs}
             <span
               class="landmark"
-              class:child={marker.kind === 'child'}
               class:failure={marker.kind === 'failure'}
-              class:completion={marker.kind === 'completion'}
-              style:left={`${percent(marker.timeMs, validDomain)}%`}
-              style:background={marker.kind === 'failure'
-                ? colorScales.red[9]
-                : marker.kind === 'completion'
-                  ? colorScales.green[9]
-                  : undefined}
-              title={marker.kind === 'child'
-                ? 'Child workflow started'
-                : marker.kind === 'failure'
-                  ? 'Workflow did not complete'
-                  : 'Workflow completed'}
+              class:retry={marker.kind === 'retry'}
+              style:left={`clamp(3px, ${percent(marker.timeMs, validDomain)}%, calc(100% - 3px))`}
+              style:color={markerColors[marker.kind]}
+              title={marker.label}
             ></span>
           {/if}
         {/each}
@@ -366,8 +339,20 @@
       </div>
     {/if}
   </div>
-  <div class="time-scale" aria-hidden="true">
-    <span>0</span><span>{midpointLabel}</span><span>{durationLabel}</span>
+  <div class="minimap-caption" aria-hidden="true">
+    <div class="minimap-key">
+      <span
+        ><span class="key-line failure" style:color={markerColors.failure}
+        ></span> Errors</span
+      >
+      <span
+        ><span class="key-line retry" style:color={markerColors.retry}></span> Retries</span
+      >
+      <span
+        ><span class="key-line" style:color={markerColors.execution}></span> Executions</span
+      >
+    </div>
+    <span>{nearlyFull ? 'Entire timeline · ' : ''}{durationLabel}</span>
   </div>
 </div>
 
@@ -377,7 +362,7 @@
     flex: none;
     width: 100%;
     min-width: 0;
-    padding: 0.5rem;
+    padding: 0.25rem;
     border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
     background: var(--color-surface-primary);
   }
@@ -387,51 +372,29 @@
     outline-offset: -2px;
   }
 
-  .minimap-key,
-  .time-scale {
+  .minimap-caption,
+  .minimap-key {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     color: var(--color-content-secondary);
     font-size: 10px;
-    line-height: 14px;
+    line-height: 12px;
   }
 
-  .minimap-key {
-    padding-bottom: 3px;
-  }
-
-  .minimap-key span:not(.full-range)::before {
-    display: inline-block;
-    width: 8px;
-    height: 3px;
-    margin-right: 4px;
-    background: currentColor;
-    vertical-align: middle;
-    content: '';
-  }
-
-  .minimap-key span:nth-child(2)::before {
-    opacity: 0.5;
-  }
-
-  .minimap-key span:nth-child(3)::before {
-    height: 7px;
-    background: var(--color-action-workflow-workflow);
-  }
-
-  .full-range {
-    margin-left: auto;
-  }
-
-  .time-scale {
+  .minimap-caption {
+    flex-wrap: wrap;
     justify-content: space-between;
-    padding-top: 3px;
+    padding-top: 2px;
+  }
+
+  .minimap-key > span {
+    white-space: nowrap;
   }
 
   .track {
     position: relative;
-    height: 2.75rem;
+    height: 18px;
     overflow: hidden;
     border-radius: 0.25rem;
     background: var(--color-surface-secondary);
@@ -443,25 +406,10 @@
     cursor: default;
   }
 
-  .spans,
   .landmarks {
     position: absolute;
     inset: 0;
     pointer-events: none;
-  }
-
-  .span {
-    position: absolute;
-    top: 5px;
-    height: 5px;
-    min-width: 2px;
-    border-radius: 2px;
-    background: var(--color-content-primary);
-  }
-
-  .span.child {
-    top: 15px;
-    opacity: 0.5;
   }
 
   .activity {
@@ -471,34 +419,63 @@
     left: 0;
     display: flex;
     align-items: flex-end;
-    height: 18px;
+    height: 100%;
     pointer-events: none;
   }
 
   .bar {
     flex: 1 1 0;
     min-width: 0;
-    background: var(--color-action-workflow-workflow);
-    opacity: 0.65;
+    background: currentColor;
+    opacity: 0.2;
   }
 
   .landmark {
     position: absolute;
     z-index: 1;
+    top: 0;
+    bottom: 0;
+    width: 6px;
     pointer-events: auto;
-    top: 22px;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--color-content-secondary);
     transform: translateX(-50%);
+    cursor: help;
+  }
+
+  .landmark::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    border-left: 1px solid currentColor;
+    content: '';
   }
 
   .landmark.failure {
-    width: 6px;
-    height: 6px;
-    border-radius: 0;
-    transform: translateX(-50%) rotate(45deg);
+    z-index: 2;
+  }
+
+  .landmark.failure::after {
+    border-left-width: 2px;
+  }
+
+  .landmark.retry::after {
+    border-left-style: dashed;
+  }
+
+  .key-line {
+    display: inline-block;
+    height: 8px;
+    margin-right: 3px;
+    border-left: 1px solid currentColor;
+    vertical-align: middle;
+  }
+
+  .key-line.failure {
+    border-left-width: 2px;
+  }
+
+  .key-line.retry {
+    border-left-style: dashed;
   }
 
   .shade {
@@ -566,15 +543,11 @@
 
   @media (width <= 480px) {
     .minimap {
-      padding: 0.375rem;
+      padding: 0.25rem;
     }
 
     .minimap-key {
       gap: 0.4rem;
-    }
-
-    .track {
-      height: 2.75rem;
     }
   }
 </style>

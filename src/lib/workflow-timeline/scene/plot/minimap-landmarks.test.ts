@@ -1,3 +1,4 @@
+import { temporal } from '@temporalio/proto';
 import { describe, expect, it } from 'vitest';
 
 import { getMinimapLandmarks } from './minimap-landmarks';
@@ -5,7 +6,6 @@ import type { QualifiedHistoryEvent } from '../../data/history-events/types';
 import {
   getEventKey,
   getExecutionKey,
-  getLifecycleKey,
   getWorkflowKey,
 } from '../../data/identity-keys';
 import type { ExecutionScene, WorkflowScene } from '../structure/types';
@@ -21,35 +21,6 @@ function execution(workflowId: string, runId: string): ExecutionScene {
     rowCount: 0,
     childCount: 0,
     entries: [],
-  };
-}
-
-function withWorkflowRow(
-  executionScene: ExecutionScene,
-  startTimeMs: number,
-  endTimeMs: number,
-): ExecutionScene {
-  const executionKey = executionScene.execution.executionKey;
-  const eventKey = getEventKey(executionKey, '1');
-  return {
-    ...executionScene,
-    entries: [
-      {
-        kind: 'row',
-        row: {
-          rowKey: getLifecycleKey(eventKey),
-          executionKey,
-          kind: 'workflow',
-          label: 'Workflow Execution',
-          eventKeys: [eventKey],
-          startEventId: '1',
-          endEventId: '1',
-          startTimeMs,
-          endTimeMs,
-        },
-      },
-      ...executionScene.entries,
-    ],
   };
 }
 
@@ -70,158 +41,111 @@ function historyEvent(
   };
 }
 
-describe('getMinimapLandmarks', () => {
-  it('collects all runs and nested children, including those not expanded in the plot', () => {
-    const rootFirst = withWorkflowRow(execution('root', 'one'), 10, 100);
-    const rootSecond = withWorkflowRow(execution('root', 'two'), 101, 200);
-    const childFirst = withWorkflowRow(execution('child', 'one'), 30, 70);
-    const childSecond = withWorkflowRow(execution('child', 'two'), 71, 90);
-    const grandchild = withWorkflowRow(execution('grandchild', 'one'), 45, 55);
-    const grandchildStart = historyEvent(
-      childFirst,
-      '4',
-      'StartChildWorkflowExecutionInitiated',
-      40,
-    );
-    const childStart = historyEvent(
-      rootFirst,
-      '3',
-      'StartChildWorkflowExecutionInitiated',
-      25,
-    );
-    const childWorkflow: WorkflowScene = {
-      workflowKey: childFirst.execution.workflowKey,
-      executions: [
+const root = execution('root', 'one');
+const child = execution('child', 'one');
+const nextRun = execution('root', 'two');
+const scene: WorkflowScene = {
+  workflowKey: root.execution.workflowKey,
+  executions: [
+    {
+      ...root,
+      entries: [
         {
-          ...childFirst,
-          entries: [
-            ...childFirst.entries,
-            {
-              kind: 'child-workflow',
-              initiatedEventId: '4',
-              initiatedEventKey: grandchildStart.eventKey,
-              workflow: {
-                workflowKey: grandchild.execution.workflowKey,
-                executions: [grandchild],
-              },
-            },
-          ],
+          kind: 'child-workflow',
+          initiatedEventId: '3',
+          initiatedEventKey: getEventKey(root.execution.executionKey, '3'),
+          workflow: {
+            workflowKey: child.execution.workflowKey,
+            executions: [child],
+          },
         },
-        childSecond,
       ],
-    };
-    const scene: WorkflowScene = {
-      workflowKey: rootFirst.execution.workflowKey,
-      executions: [
-        {
-          ...rootFirst,
-          entries: [
-            ...rootFirst.entries,
-            {
-              kind: 'child-workflow',
-              initiatedEventId: '3',
-              initiatedEventKey: childStart.eventKey,
-              workflow: childWorkflow,
-            },
-          ],
-        },
-        rootSecond,
-      ],
-    };
+    },
+    nextRun,
+  ],
+};
 
+const childStarted: QualifiedHistoryEvent = {
+  ...historyEvent(root, '4', 'ChildWorkflowExecutionStarted', 30),
+  childWorkflowExecutionStartedEventAttributes:
+    temporal.api.history.v1.ChildWorkflowExecutionStartedEventAttributes.fromObject(
+      {
+        initiatedEventId: '3',
+      },
+    ),
+};
+
+describe('getMinimapLandmarks', () => {
+  it('marks starts, continuations, failures and completions without duration lanes', () => {
     expect(
       getMinimapLandmarks(scene, [
-        childStart,
-        childStart,
-        grandchildStart,
-        historyEvent(childFirst, '8', 'WorkflowExecutionFailed', 70),
-        historyEvent(rootSecond, '9', 'WorkflowExecutionCompleted', 200),
-        historyEvent(childSecond, '7', 'WorkflowExecutionCompleted', 90),
-        historyEvent(rootFirst, '10', 'WorkflowExecutionContinuedAsNew', 100),
-        historyEvent(
-          rootFirst,
-          '11',
-          'StartChildWorkflowExecutionInitiated',
-          28,
-        ),
-      ]),
-    ).toEqual({
-      spans: [
-        { kind: 'root', startMs: 10, endMs: 100 },
-        { kind: 'child', startMs: 30, endMs: 70 },
-        { kind: 'child', startMs: 45, endMs: 55 },
-        { kind: 'child', startMs: 71, endMs: 90 },
-        { kind: 'root', startMs: 101, endMs: 200 },
-      ],
-      markers: [
-        { kind: 'child', timeMs: 25 },
-        { kind: 'child', timeMs: 40 },
-        { kind: 'failure', timeMs: 70 },
-        { kind: 'completion', timeMs: 200 },
-        { kind: 'completion', timeMs: 90 },
-      ],
-    });
+        historyEvent(root, '1', 'WorkflowExecutionStarted', 0),
+        childStarted,
+        historyEvent(child, '1', 'WorkflowExecutionStarted', 30),
+        historyEvent(child, '8', 'WorkflowExecutionFailed', 70),
+        historyEvent(root, '10', 'WorkflowExecutionContinuedAsNew', 100),
+        historyEvent(nextRun, '1', 'WorkflowExecutionStarted', 101),
+        historyEvent(nextRun, '9', 'WorkflowExecutionCompleted', 200),
+      ]).markers,
+    ).toEqual([
+      { kind: 'execution', timeMs: 0, label: 'Execution started' },
+      { kind: 'execution', timeMs: 30, label: 'Execution started' },
+      { kind: 'failure', timeMs: 70, label: 'WorkflowExecutionFailed' },
+      { kind: 'continuation', timeMs: 100, label: 'Continued as new' },
+      { kind: 'execution', timeMs: 101, label: 'Execution started' },
+      { kind: 'completion', timeMs: 200, label: 'Workflow completed' },
+    ]);
   });
 
-  it('skips missing lifecycle rows and invalid times without losing valid descendants or markers', () => {
-    const root = execution('root', 'one');
-    const child = execution('child', 'one');
-    const validChild = withWorkflowRow(child, 20, 40);
-    const invalidRoot = withWorkflowRow(root, Number.NaN, 50);
-    const childStart = historyEvent(
-      root,
-      '3',
-      'StartChildWorkflowExecutionInitiated',
-      15,
-    );
-    const scene: WorkflowScene = {
-      workflowKey: root.execution.workflowKey,
-      executions: [
-        {
-          ...invalidRoot,
-          entries: [
-            ...invalidRoot.entries,
-            {
-              kind: 'child-workflow',
-              initiatedEventId: '3',
-              initiatedEventKey: childStart.eventKey,
-              workflow: {
-                workflowKey: child.execution.workflowKey,
-                executions: [
-                  validChild,
-                  withWorkflowRow(execution('child', 'two'), 60, 30),
-                  execution('child', 'three'),
-                ],
-              },
-            },
-          ],
-        },
-        execution('root', 'two'),
-      ],
-    };
+  it('keeps child starts visible before child history loads', () => {
+    expect(getMinimapLandmarks(scene, [childStarted]).markers).toEqual([
+      { kind: 'execution', timeMs: 30, label: 'Child execution started' },
+    ]);
+  });
 
+  it('marks explicit retries without treating every failure as a retry', () => {
+    const events: QualifiedHistoryEvent[] = [
+      {
+        ...historyEvent(root, '2', 'ActivityTaskStarted', 20),
+        activityTaskStartedEventAttributes: { attempt: 1 },
+      },
+      {
+        ...historyEvent(root, '3', 'ActivityTaskStarted', 40),
+        activityTaskStartedEventAttributes: { attempt: 3 },
+      },
+      {
+        ...historyEvent(nextRun, '1', 'WorkflowExecutionStarted', 80),
+        workflowExecutionStartedEventAttributes: { attempt: 2 },
+      },
+      historyEvent(root, '5', 'ActivityTaskFailed', 50),
+      historyEvent(root, '6', 'WorkflowTaskTimedOut', 60),
+      historyEvent(root, '7', 'NexusOperationFailed', 70),
+    ];
+    expect(
+      getMinimapLandmarks(scene, events).markers.map((marker) => marker.kind),
+    ).toEqual(['retry', 'retry', 'failure', 'failure', 'failure']);
+    expect(getMinimapLandmarks(scene, events).markers[0]?.label).toBe(
+      'Activity retry · attempt 3',
+    );
+  });
+
+  it('ignores duplicates, invalid times, unrelated executions and routine events', () => {
+    const failure = historyEvent(root, '5', 'ActivityTaskFailed', 50);
     expect(
       getMinimapLandmarks(scene, [
-        childStart,
-        historyEvent(child, '4', 'WorkflowExecutionTimedOut', 40),
-        historyEvent(root, '5', 'WorkflowExecutionCompleted', Infinity),
+        failure,
+        failure,
+        historyEvent(root, '6', 'WorkflowExecutionCompleted', Infinity),
         historyEvent(
           execution('other', 'one'),
-          '6',
-          'WorkflowExecutionFailed',
-          25,
+          '1',
+          'WorkflowExecutionStarted',
+          20,
         ),
-      ]),
-    ).toEqual({
-      spans: [{ kind: 'child', startMs: 20, endMs: 40 }],
-      markers: [
-        { kind: 'child', timeMs: 15 },
-        { kind: 'failure', timeMs: 40 },
-      ],
-    });
-    expect(getMinimapLandmarks(null, [childStart])).toEqual({
-      spans: [],
-      markers: [],
-    });
+        historyEvent(root, '7', 'WorkflowTaskCompleted', 70),
+        historyEvent(root, '8', 'TimerFired', 80),
+      ]).markers,
+    ).toEqual([{ kind: 'failure', timeMs: 50, label: 'ActivityTaskFailed' }]);
+    expect(getMinimapLandmarks(null, [failure])).toEqual({ markers: [] });
   });
 });

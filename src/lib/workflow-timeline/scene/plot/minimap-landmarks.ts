@@ -1,55 +1,52 @@
 import type { QualifiedHistoryEvent } from '../../data/history-events/types';
-import type { EventKey, ExecutionKey } from '../../data/identity-keys';
+import {
+  type EventKey,
+  type ExecutionKey,
+  getEventKey,
+} from '../../data/identity-keys';
 import type { WorkflowScene } from '../structure/types';
 
-export type MinimapSpan = Readonly<{
-  kind: 'root' | 'child';
-  startMs: number;
-  endMs: number;
-}>;
-
 export type MinimapMarker = Readonly<{
-  kind: 'child' | 'failure' | 'completion';
+  kind: 'execution' | 'failure' | 'retry' | 'continuation' | 'completion';
   timeMs: number;
+  label: string;
 }>;
 
 export function getMinimapLandmarks(
   scene: WorkflowScene | null,
   events: readonly QualifiedHistoryEvent[],
-): Readonly<{
-  spans: readonly MinimapSpan[];
-  markers: readonly MinimapMarker[];
-}> {
-  const spans: MinimapSpan[] = [];
+): Readonly<{ markers: readonly MinimapMarker[] }> {
   const markers: MinimapMarker[] = [];
   const executionKeys = new Set<ExecutionKey>();
-  const initiatedEventKeys = new Set<EventKey>();
+  const childExecutions = new Map<EventKey, ExecutionKey>();
 
-  function visit(workflow: WorkflowScene, kind: MinimapSpan['kind']): void {
+  function visit(workflow: WorkflowScene): void {
     for (const execution of workflow.executions) {
       executionKeys.add(execution.execution.executionKey);
       for (const entry of execution.entries) {
-        if (entry.kind === 'child-workflow') {
-          initiatedEventKeys.add(entry.initiatedEventKey);
-          visit(entry.workflow, 'child');
-          continue;
+        if (entry.kind !== 'child-workflow') continue;
+        const firstExecution = entry.workflow.executions[0];
+        if (firstExecution) {
+          childExecutions.set(
+            entry.initiatedEventKey,
+            firstExecution.execution.executionKey,
+          );
         }
-
-        const row = entry.row;
-        if (
-          row.kind === 'workflow' &&
-          Number.isFinite(row.startTimeMs) &&
-          Number.isFinite(row.endTimeMs) &&
-          row.endTimeMs >= row.startTimeMs
-        ) {
-          spans.push({ kind, startMs: row.startTimeMs, endMs: row.endTimeMs });
-        }
+        visit(entry.workflow);
       }
     }
   }
 
-  if (scene) visit(scene, 'root');
-
+  if (scene) visit(scene);
+  const startedExecutions = new Set(
+    events
+      .filter(
+        (event) =>
+          event.eventType === 'WorkflowExecutionStarted' &&
+          Number.isFinite(event.eventTimeMs),
+      )
+      .map((event) => event.executionKey),
+  );
   const seenEvents = new Set<EventKey>();
   for (const event of events) {
     if (
@@ -60,23 +57,54 @@ export function getMinimapLandmarks(
       continue;
     }
     seenEvents.add(event.eventKey);
-
-    if (
-      event.eventType === 'StartChildWorkflowExecutionInitiated' &&
-      initiatedEventKeys.has(event.eventKey)
-    ) {
-      markers.push({ kind: 'child', timeMs: event.eventTimeMs });
-    } else if (event.eventType === 'WorkflowExecutionCompleted') {
-      markers.push({ kind: 'completion', timeMs: event.eventTimeMs });
+    const timeMs = event.eventTimeMs;
+    if (event.eventType === 'WorkflowExecutionStarted') {
+      const attempt =
+        event.workflowExecutionStartedEventAttributes?.attempt ?? 1;
+      markers.push({
+        kind: attempt > 1 ? 'retry' : 'execution',
+        timeMs,
+        label:
+          attempt > 1
+            ? `Workflow retry · attempt ${attempt}`
+            : 'Execution started',
+      });
+    } else if (event.eventType === 'ChildWorkflowExecutionStarted') {
+      const initiatedId =
+        event.childWorkflowExecutionStartedEventAttributes?.initiatedEventId;
+      const childKey = initiatedId
+        ? childExecutions.get(
+            getEventKey(event.executionKey, String(initiatedId)),
+          )
+        : undefined;
+      if (!childKey || !startedExecutions.has(childKey)) {
+        markers.push({
+          kind: 'execution',
+          timeMs,
+          label: 'Child execution started',
+        });
+      }
     } else if (
-      event.eventType === 'WorkflowExecutionFailed' ||
-      event.eventType === 'WorkflowExecutionTimedOut' ||
-      event.eventType === 'WorkflowExecutionTerminated' ||
-      event.eventType === 'WorkflowExecutionCanceled'
+      event.eventType === 'ActivityTaskStarted' &&
+      (event.activityTaskStartedEventAttributes?.attempt ?? 1) > 1
     ) {
-      markers.push({ kind: 'failure', timeMs: event.eventTimeMs });
+      markers.push({
+        kind: 'retry',
+        timeMs,
+        label: `Activity retry · attempt ${event.activityTaskStartedEventAttributes?.attempt}`,
+      });
+    } else if (event.eventType === 'WorkflowExecutionContinuedAsNew') {
+      markers.push({ kind: 'continuation', timeMs, label: 'Continued as new' });
+    } else if (event.eventType === 'WorkflowExecutionCompleted') {
+      markers.push({ kind: 'completion', timeMs, label: 'Workflow completed' });
+    } else if (
+      event.eventType.endsWith('Failed') ||
+      event.eventType.endsWith('TimedOut') ||
+      event.eventType === 'WorkflowExecutionTerminated'
+    ) {
+      markers.push({ kind: 'failure', timeMs, label: event.eventType });
     }
   }
 
-  return { spans, markers };
+  return { markers };
 }

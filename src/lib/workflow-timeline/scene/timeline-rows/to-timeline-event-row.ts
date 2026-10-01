@@ -8,7 +8,10 @@ function compareHistoryEvents(
   left: QualifiedHistoryEvent,
   right: QualifiedHistoryEvent,
 ): number {
-  return compareEventIds(left.eventId, right.eventId);
+  return (
+    left.eventTimeMs - right.eventTimeMs ||
+    compareEventIds(left.eventId, right.eventId)
+  );
 }
 
 /** Projects a lifecycle group into a renderable row when all events are available. */
@@ -42,7 +45,7 @@ export function toTimelineEventRow(
     executionKey: lifecycleGroup.executionKey,
     kind: lifecycleGroup.kind,
     label: getTimelineLabel({ lifecycleGroup, event: firstEvent }),
-    eventKeys: lifecycleGroup.eventKeys,
+    eventKeys: events.map((event) => event.eventKey),
     startEventId: firstEvent.eventId,
     endEventId: lastEvent.eventId,
     startTimeMs: firstEvent.eventTimeMs,
