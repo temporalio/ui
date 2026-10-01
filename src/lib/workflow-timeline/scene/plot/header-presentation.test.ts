@@ -5,6 +5,7 @@ import {
   getPlotRowLayout,
   getVisiblePlotRowRange,
   getWorkflowName,
+  getWorkflowRunRanges,
   getWorkflowTimeRange,
 } from './header-presentation';
 import type { QualifiedHistoryEvent } from '../../data/history-events/types';
@@ -293,6 +294,161 @@ describe('getWorkflowName', () => {
         started(firstRun, 'Order'),
       ]),
     ).toBe('Workflow');
+  });
+});
+
+describe('getWorkflowRunRanges', () => {
+  it('preserves independent run spans without filling the gap', () => {
+    const firstRow = lifecycle(firstRun, 10, 40);
+    const nextRow = lifecycle(nextRun, 50, 70);
+    const ranges = getWorkflowRunRanges(
+      {
+        ...workflow,
+        executions: [
+          { ...firstRun, entries: [firstRow] },
+          { ...nextRun, entries: [nextRow] },
+        ],
+      },
+      noActiveKeys,
+      500,
+    );
+
+    expect(ranges).toEqual([
+      {
+        executionKey: firstRun.execution.executionKey,
+        runNumber: 1,
+        startMs: 10,
+        endMs: 40,
+        row: firstRow.row,
+      },
+      {
+        executionKey: nextRun.execution.executionKey,
+        runNumber: 2,
+        startMs: 50,
+        endMs: 70,
+        row: nextRow.row,
+      },
+    ]);
+    expect(ranges[0].row).toBe(firstRow.row);
+    expect(ranges[1].row).toBe(nextRow.row);
+  });
+
+  it('includes only own matching workflow rows, not descendants or activities', () => {
+    expect(
+      getWorkflowRunRanges(
+        {
+          ...workflow,
+          executions: [
+            {
+              ...workflow.executions[0],
+              entries: [
+                ...workflow.executions[0].entries,
+                lifecycle(childRun, -3000, 3000),
+                lifecycle(nextRun, -4000, 4000),
+              ],
+            },
+            workflow.executions[1],
+          ],
+        },
+        new Set([childRun.execution.executionKey]),
+        5000,
+      ).map(({ runNumber, startMs, endMs }) => ({ runNumber, startMs, endMs })),
+    ).toEqual([
+      { runNumber: 1, startMs: 10, endMs: 40 },
+      { runNumber: 2, startMs: 50, endMs: 70 },
+    ]);
+  });
+
+  it('extends only the active last run and never truncates its recorded end', () => {
+    const activeKeys = new Set([nextRun.execution.executionKey]);
+    expect(
+      getWorkflowRunRanges(workflow, activeKeys, 100).map(
+        ({ startMs, endMs }) => ({ startMs, endMs }),
+      ),
+    ).toEqual([
+      { startMs: 10, endMs: 40 },
+      { startMs: 50, endMs: 100 },
+    ]);
+    expect(getWorkflowRunRanges(workflow, activeKeys, 60)[1].endMs).toBe(70);
+  });
+
+  it('preserves run numbering when an earlier run is unavailable', () => {
+    expect(
+      getWorkflowRunRanges(
+        { ...workflow, executions: [firstRun, workflow.executions[1]] },
+        noActiveKeys,
+        100,
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        executionKey: nextRun.execution.executionKey,
+        runNumber: 2,
+        startMs: 50,
+        endMs: 70,
+      }),
+    ]);
+  });
+
+  it.each([
+    [NaN, 100],
+    [10, NaN],
+    [-Infinity, 100],
+    [Infinity, 100],
+    [10, -Infinity],
+    [10, Infinity],
+    [100, 10],
+  ])('excludes malformed range [%s, %s] without renumbering', (start, end) => {
+    const invalid = {
+      ...workflow,
+      executions: [
+        ...workflowWithRange(start, end).executions,
+        workflow.executions[1],
+      ],
+    };
+    for (const activeKeys of [
+      noActiveKeys,
+      new Set([firstRun.execution.executionKey]),
+    ]) {
+      expect(getWorkflowRunRanges(invalid, activeKeys, 200)).toEqual([
+        expect.objectContaining({ runNumber: 2, startMs: 50, endMs: 70 }),
+      ]);
+    }
+  });
+
+  it.each([NaN, Infinity])(
+    'excludes non-finite active end with now %s',
+    (now) => {
+      expect(
+        getWorkflowRunRanges(
+          workflow,
+          new Set([nextRun.execution.executionKey]),
+          now,
+        ),
+      ).toEqual([
+        expect.objectContaining({ runNumber: 1, startMs: 10, endMs: 40 }),
+      ]);
+    },
+  );
+
+  it('preserves zero-duration ranges', () => {
+    expect(
+      getWorkflowRunRanges(workflowWithRange(0, 0), noActiveKeys, 100),
+    ).toEqual([
+      expect.objectContaining({ runNumber: 1, startMs: 0, endMs: 0 }),
+    ]);
+  });
+
+  it('returns an empty array when runs or workflow rows are absent', () => {
+    expect(
+      getWorkflowRunRanges({ ...workflow, executions: [] }, noActiveKeys, 100),
+    ).toEqual([]);
+    expect(
+      getWorkflowRunRanges(
+        { ...workflow, executions: [firstRun] },
+        noActiveKeys,
+        100,
+      ),
+    ).toEqual([]);
   });
 });
 

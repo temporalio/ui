@@ -28,7 +28,7 @@
           <span class="specimen" aria-hidden="true"
             ><span class="workflow"></span></span
           >
-          <span>Workflow duration</span>
+          <span>Workflow duration, divided by run</span>
         </li>
         <li>
           <span class="specimen" aria-hidden="true"
@@ -179,6 +179,15 @@
 
   .workflow {
     height: 8px;
+  }
+
+  .workflow::after {
+    position: absolute;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: var(--color-surface-primary);
+    content: '';
   }
 
   .run {

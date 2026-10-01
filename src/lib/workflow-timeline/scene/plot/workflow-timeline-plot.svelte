@@ -10,6 +10,7 @@
     getPlotRowLayout,
     getVisiblePlotRowRange,
     getWorkflowName,
+    getWorkflowRunRanges,
     getWorkflowTimeRange,
   } from './header-presentation';
   import { lifecycleVisuals } from './lifecycle-visuals';
@@ -382,29 +383,30 @@
   </div>
 {/snippet}
 
-{#snippet summaryMark(
-  range: TimeRange,
-  row: TimelineEventRow | undefined,
-  workflow: boolean,
-)}
+{#snippet summaryMark(range: TimeRange, workflow: WorkflowScene)}
   {#if domain}
     {@const left = plotX(range.startMs, domain, contentWidth)}
     {@const right = plotX(range.endMs, domain, contentWidth)}
+    {@const runs = getWorkflowRunRanges(workflow, activeExecutionKeys, now)}
     <div
       class="summary-mark"
-      class:workflow
       style:left={`${labelWidth + left}px`}
       style:width={`${Math.max(1, right - left)}px`}
     >
-      <span class="summary-line"></span>
-      {#if row}
+      {#each runs as run, index (run.executionKey)}
+        {@const runLeft = plotX(run.startMs, domain, contentWidth)}
+        {@const runRight = plotX(run.endMs, domain, contentWidth)}
         <button
           type="button"
-          class="mark-hit"
-          aria-label={workflow ? 'View latest run details' : 'View run details'}
-          onclick={() => (selectedRow = row)}
+          class="run-segment"
+          class:divider={index < runs.length - 1}
+          style:left={`${runLeft - left}px`}
+          style:width={`${Math.max(1, runRight - runLeft)}px`}
+          title={`Run ${run.runNumber} · View lifecycle details`}
+          aria-label={`View lifecycle details for run ${run.runNumber} of ${workflow.executions.length}`}
+          onclick={() => (selectedRow = run.row)}
         ></button>
-      {/if}
+      {/each}
     </div>
   {/if}
 {/snippet}
@@ -663,13 +665,7 @@
                   now,
                 )}
                 {#if workflowRange}
-                  {@render summaryMark(
-                    workflowRange,
-                    latestExecution
-                      ? workflowRowForExecution(latestExecution)
-                      : undefined,
-                    true,
-                  )}
+                  {@render summaryMark(workflowRange, item.workflow)}
                 {/if}
               {/if}
             </div>
@@ -1001,41 +997,43 @@
     color: var(--color-action-workflow-workflow);
   }
 
-  .summary-line {
+  .run-segment {
     position: absolute;
-    width: 100%;
-    border-top: 1px solid currentColor;
-  }
-
-  .summary-line::before,
-  .summary-line::after {
-    position: absolute;
-    top: -4px;
-    height: 7px;
-    border-left: 1px solid currentColor;
-    content: '';
-  }
-
-  .summary-line::before {
-    left: 0;
-  }
-
-  .summary-line::after {
-    right: 0;
-  }
-
-  .summary-mark.workflow .summary-line {
     top: -5px;
     height: 10px;
+    box-sizing: border-box;
+    padding: 0;
     border: 0;
-    border-radius: 999px;
+    border-radius: 0;
     background: currentColor;
+    color: inherit;
     opacity: 0.6;
+    cursor: pointer;
   }
 
-  .summary-mark.workflow .summary-line::before,
-  .summary-mark.workflow .summary-line::after {
-    display: none;
+  .run-segment:first-child {
+    border-radius: 999px 0 0 999px;
+  }
+
+  .run-segment:last-child {
+    border-radius: 0 999px 999px 0;
+  }
+
+  .run-segment:only-child {
+    border-radius: 999px;
+  }
+
+  .run-segment.divider {
+    border-right: 2px solid var(--color-surface-primary);
+  }
+
+  .run-segment:hover {
+    opacity: 0.85;
+  }
+
+  .run-segment:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
   }
 
   .mark {

@@ -3,6 +3,7 @@ import type { QualifiedHistoryEvent } from '../../data/history-events/types';
 import type { ExecutionKey } from '../../data/identity-keys';
 import type { FlattenedPlotSceneRow } from '../structure/flatten-plot-scene';
 import type { WorkflowScene } from '../structure/types';
+import type { TimelineEventRow } from '../timeline-rows/types';
 
 export function getWorkflowName(
   workflow: WorkflowScene,
@@ -41,15 +42,26 @@ export function getWorkflowName(
   return 'Workflow';
 }
 
-export function getWorkflowTimeRange(
+export function getWorkflowRunRanges(
   workflow: WorkflowScene,
   activeExecutionKeys: ReadonlySet<ExecutionKey>,
   now: number,
-): TimeRange | null {
-  let earliestStartMs = Infinity;
-  let latestEndMs = -Infinity;
+): readonly {
+  executionKey: ExecutionKey;
+  runNumber: number;
+  startMs: number;
+  endMs: number;
+  row: TimelineEventRow;
+}[] {
+  const ranges: {
+    executionKey: ExecutionKey;
+    runNumber: number;
+    startMs: number;
+    endMs: number;
+    row: TimelineEventRow;
+  }[] = [];
 
-  for (const { execution, entries } of workflow.executions) {
+  for (const [index, { execution, entries }] of workflow.executions.entries()) {
     for (const entry of entries) {
       if (
         entry.kind !== 'row' ||
@@ -72,9 +84,34 @@ export function getWorkflowTimeRange(
         : endTimeMs;
       if (!Number.isFinite(endMs)) continue;
 
-      earliestStartMs = Math.min(earliestStartMs, startMs);
-      latestEndMs = Math.max(latestEndMs, endMs);
+      ranges.push({
+        executionKey: execution.executionKey,
+        runNumber: index + 1,
+        startMs,
+        endMs,
+        row: entry.row,
+      });
     }
+  }
+
+  return ranges;
+}
+
+export function getWorkflowTimeRange(
+  workflow: WorkflowScene,
+  activeExecutionKeys: ReadonlySet<ExecutionKey>,
+  now: number,
+): TimeRange | null {
+  let earliestStartMs = Infinity;
+  let latestEndMs = -Infinity;
+
+  for (const { startMs, endMs } of getWorkflowRunRanges(
+    workflow,
+    activeExecutionKeys,
+    now,
+  )) {
+    earliestStartMs = Math.min(earliestStartMs, startMs);
+    latestEndMs = Math.max(latestEndMs, endMs);
   }
 
   return earliestStartMs === Infinity
