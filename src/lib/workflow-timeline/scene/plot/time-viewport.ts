@@ -13,23 +13,33 @@ export function timeToX(
   );
 }
 
-/** Chooses an absolute-time tick interval for the visible plot width. */
+const TICK_INTERVALS_MS = [
+  1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 15000, 30000,
+  60000, 120000, 300000, 600000, 900000, 1800000, 3600000, 7200000, 18000000,
+  36000000, 43200000, 86400000,
+];
+
 export function getTimeTickStep(viewport: TimeRange, widthPx: number): number {
-  if (widthPx <= 0) return 0;
+  if (widthPx <= 0 || viewport.endMs <= viewport.startMs) return 0;
 
   const roughStep = ((viewport.endMs - viewport.startMs) * 180) / widthPx;
-  const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+  const interval = TICK_INTERVALS_MS.find(
+    (candidate) => candidate >= roughStep,
+  );
+  if (interval) return interval;
+
+  const dayMs = 86400000;
+  const magnitude = 10 ** Math.floor(Math.log10(roughStep / dayMs));
   return (
     [1, 2, 5, 10]
-      .map((multiple) => multiple * magnitude)
-      .find((candidate) => candidate >= roughStep) ?? 10 * magnitude
+      .map((multiple) => multiple * magnitude * dayMs)
+      .find((candidate) => candidate >= roughStep) ?? 10 * magnitude * dayMs
   );
 }
-
-/** Returns absolute-time ticks spaced for the visible plot width. */
 export function getTimeTicks(
   viewport: TimeRange,
   widthPx: number,
+  originMs: number,
 ): readonly number[] {
   const step = getTimeTickStep(viewport, widthPx);
   if (!step) return [];
@@ -37,7 +47,8 @@ export function getTimeTicks(
   const ticks: number[] = [];
 
   for (
-    let time = Math.ceil(viewport.startMs / step) * step;
+    let time =
+      originMs + Math.ceil((viewport.startMs - originMs) / step) * step;
     time <= viewport.endMs;
     time += step
   ) {

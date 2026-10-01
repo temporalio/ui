@@ -12,6 +12,15 @@
     getWorkflowTimeRange,
   } from './header-presentation';
   import { lifecycleVisuals } from './lifecycle-visuals';
+  import {
+    getBufferedPlotEndMs,
+    getFollowAfterInteraction,
+    getLiveScrollLeft,
+    getViewportDuration,
+    getWheelInteraction,
+    isHorizontalPan,
+    type ViewportInteraction,
+  } from './live-viewport';
   import { getMarkGeometry } from './mark-geometry';
   import {
     getEventDescription,
@@ -19,9 +28,15 @@
     getMarkPresentation,
   } from './mark-presentation';
   import { getMinimapLandmarks } from './minimap-landmarks';
-  import { getTimeTicks, type TimeRange, timeToX } from './time-viewport';
+  import {
+    getTimeTicks,
+    getTimeTickStep,
+    type TimeRange,
+    timeToX,
+  } from './time-viewport';
   import {
     getInitialViewport,
+    getInitialViewportDuration,
     getViewportScrollLeft,
     getViewportStartMs,
   } from './viewport-anchor';
@@ -66,12 +81,13 @@
   let viewportHeight = $state(0);
   let requestedDuration = $state<number | null>(null);
   let initialViewport = $state<TimeRange | null>(null);
-  let pinned = $state(true);
+  let pinned = $state(false);
   let unpinnedStartMs = $state<number | null>(null);
   let selectedRow = $state<TimelineEventRow | null>(null);
   let previousPolling = false;
   let lastLiveViewport: TimeRange | null = null;
   let now = $state(Date.now());
+  let reducedMotion = $state(false);
   const expandedChildKeys = new SvelteSet<string>();
   const collapsedWorkflowKeys = new SvelteSet<string>();
   const collapsedExecutionKeys = new SvelteSet<string>();
@@ -93,7 +109,7 @@
   const eventByKey = $derived(
     new Map(historyEvents.map((event) => [event.eventKey, event])),
   );
-  const eventTimes = $derived(historyEvents.map((event) => event.eventTimeMs));
+
   const minimapLandmarks = $derived(getMinimapLandmarks(scene, historyEvents));
   const historyByKey = $derived(
     new Map(
@@ -112,7 +128,7 @@
     ),
   );
   const polling = $derived(activeExecutionKeys.size > 0);
-  const domain = $derived.by((): TimeRange | null => {
+  const recordedDomain = $derived.by((): TimeRange | null => {
     if (!historyEvents.length) return null;
     let startMs = Infinity;
     let endMs = -Infinity;
@@ -120,8 +136,41 @@
       startMs = Math.min(startMs, event.eventTimeMs);
       endMs = Math.max(endMs, event.eventTimeMs);
     }
-    return { startMs, endMs: Math.max(startMs + 1, polling ? now : endMs) };
+    return { startMs, endMs: Math.max(startMs + 1, endMs) };
   });
+  const domain = $derived(
+    recordedDomain
+      ? {
+          startMs: recordedDomain.startMs,
+          endMs: polling
+            ? Math.max(recordedDomain.endMs, now)
+            : recordedDomain.endMs,
+        }
+      : null,
+  );
+  const plotEndMs = $derived(
+    domain
+      ? Math.max(
+          getBufferedPlotEndMs(domain.endMs, polling && !reducedMotion),
+          (unpinnedStartMs ?? initialViewport?.startMs ?? domain.startMs) +
+            getViewportDuration(
+              requestedDuration ?? domain.endMs - domain.startMs,
+              polling,
+            ),
+        )
+      : null,
+  );
+  const plotDomain = $derived(
+    recordedDomain && plotEndMs !== null
+      ? {
+          startMs: recordedDomain.startMs,
+          endMs: plotEndMs,
+        }
+      : null,
+  );
+  const plotDuration = $derived(
+    plotDomain ? plotDomain.endMs - plotDomain.startMs : 1,
+  );
   const domainDuration = $derived(domain ? domain.endMs - domain.startMs : 1);
   const labelWidth = $derived(
     Math.min(360, Math.max(220, viewportWidth * 0.32)),
@@ -131,23 +180,31 @@
     getInitialViewport(historyEvents, executionHistories),
   );
   const duration = $derived(
-    Math.min(domainDuration, requestedDuration ?? domainDuration),
+    getViewportDuration(requestedDuration ?? domainDuration, polling),
+  );
+  const minimumDuration = $derived(
+    getViewportDuration(1, polling, (plotDuration * width) / MAX_WIDTH),
   );
   const contentWidth = $derived(
-    Math.min(MAX_WIDTH, Math.max(width, (width * domainDuration) / duration)),
+    Math.min(MAX_WIDTH, Math.max(width, (width * plotDuration) / duration)),
   );
   const viewport = $derived.by((): TimeRange | null => {
-    if (!domain) return null;
-    const startMs = getViewportStartMs(scrollLeft, domain, contentWidth);
+    if (!plotDomain) return null;
+    const startMs = getViewportStartMs(scrollLeft, plotDomain, contentWidth);
     return {
       startMs,
       endMs: Math.min(
-        domain.endMs,
-        startMs + (width / contentWidth) * domainDuration,
+        plotDomain.endMs,
+        startMs + (width / contentWidth) * plotDuration,
       ),
     };
   });
-  const ticks = $derived(viewport ? getTimeTicks(viewport, width) : []);
+  const tickStep = $derived(viewport ? getTimeTickStep(viewport, width) : 0);
+  const ticks = $derived(
+    viewport && plotDomain
+      ? getTimeTicks(viewport, width, plotDomain.startMs)
+      : [],
+  );
   const visibleRange = $derived(
     getVisiblePlotRowRange(
       rowLayout.rows,
@@ -163,7 +220,10 @@
     const inset = Math.min(ENDPOINT_INSET, plotWidth / 2);
     return Math.max(
       inset,
-      Math.min(plotWidth - inset, timeToX(timeMs, range, plotWidth)),
+      Math.min(
+        plotWidth - (polling ? 0 : inset),
+        timeToX(timeMs, range, plotWidth),
+      ),
     );
   }
 
@@ -199,16 +259,31 @@
     else keys.add(key);
   }
 
-  function selectRange(range: TimeRange): void {
+  function selectRange(
+    range: TimeRange,
+    interaction: ViewportInteraction,
+  ): void {
     if (!domain || !scroller) return;
-    const nextDuration = Math.max(
-      1,
-      (domainDuration * width) / MAX_WIDTH,
+    const nextDuration = getViewportDuration(
       range.endMs - range.startMs,
+      polling,
+      minimumDuration,
     );
-    pinned = polling && range.endMs >= domain.endMs - 1;
+    pinned =
+      polling &&
+      getFollowAfterInteraction(
+        pinned,
+        interaction,
+        range.startMs - (viewport?.startMs ?? range.startMs),
+      );
     unpinnedStartMs = pinned ? null : range.startMs;
     requestedDuration = nextDuration;
+  }
+
+  function toggleLiveFollow(): void {
+    if (!polling || !viewport) return;
+    pinned = !pinned;
+    unpinnedStartMs = pinned ? null : viewport.startMs;
   }
 
   function handlePlotWheel(event: WheelEvent): void {
@@ -222,10 +297,10 @@
       trackWidth: width,
       selection: viewport,
       domain,
-      minDurationMs: (domainDuration * width) / MAX_WIDTH,
-      pinnedLive: polling && pinned,
+      minDurationMs: minimumDuration,
     });
-    if (range) selectRange(range);
+    if (range)
+      selectRange(range, getWheelInteraction(event.deltaX, event.deltaY));
   }
 
   $effect(() => {
@@ -248,12 +323,12 @@
   });
 
   $effect(() => {
-    if (!scroller || !domain || !initialViewport) return;
+    if (!scroller || !domain || !plotDomain || !initialViewport) return;
     const startMs = unpinnedStartMs ?? initialViewport.startMs;
     const nextScrollLeft =
       polling && pinned
-        ? Math.max(0, contentWidth - width)
-        : getViewportScrollLeft(startMs, domain, contentWidth);
+        ? getLiveScrollLeft(domain, plotDomain, contentWidth, width)
+        : getViewportScrollLeft(startMs, plotDomain, contentWidth);
     scroller.scrollLeft = nextScrollLeft;
     scrollLeft = scroller.scrollLeft;
   });
@@ -261,12 +336,11 @@
   $effect.pre(() => {
     if (!initialViewport && initialViewportCandidate && domain) {
       initialViewport = initialViewportCandidate;
-      requestedDuration = polling
-        ? Math.min(
-            domainDuration,
-            Math.max(60_000, Math.min(3_600_000, domainDuration / 4)),
-          )
-        : initialViewportCandidate.endMs - initialViewportCandidate.startMs;
+      requestedDuration = getInitialViewportDuration(
+        initialViewportCandidate,
+        historyEvents,
+        executionHistories,
+      );
       unpinnedStartMs = initialViewportCandidate.startMs;
     }
     if (polling && viewport) lastLiveViewport = viewport;
@@ -280,11 +354,30 @@
   });
 
   $effect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reducedMotion = preference.matches;
+    function updatePreference() {
+      reducedMotion = preference.matches;
+    }
+    preference.addEventListener('change', updatePreference);
+    return () => preference.removeEventListener('change', updatePreference);
+  });
+
+  $effect(() => {
     if (!polling) return;
-    const interval = setInterval(() => {
+    if (reducedMotion) {
+      const interval = setInterval(() => {
+        now = Date.now();
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+    let frame: number;
+    function advanceLiveClock() {
       now = Date.now();
-    }, 1000);
-    return () => clearInterval(interval);
+      frame = requestAnimationFrame(advanceLiveClock);
+    }
+    frame = requestAnimationFrame(advanceLiveClock);
+    return () => cancelAnimationFrame(frame);
   });
 </script>
 
@@ -373,9 +466,9 @@
 {/snippet}
 
 {#snippet summaryMark(range: TimeRange, workflow: WorkflowScene)}
-  {#if domain}
-    {@const left = plotX(range.startMs, domain, contentWidth)}
-    {@const right = plotX(range.endMs, domain, contentWidth)}
+  {#if plotDomain}
+    {@const left = plotX(range.startMs, plotDomain, contentWidth)}
+    {@const right = plotX(range.endMs, plotDomain, contentWidth)}
     {@const runs = getWorkflowRunRanges(workflow, activeExecutionKeys, now)}
     <div
       class="summary-mark"
@@ -383,8 +476,8 @@
       style:width={`${Math.max(1, right - left)}px`}
     >
       {#each runs as run, index (run.executionKey)}
-        {@const runLeft = plotX(run.startMs, domain, contentWidth)}
-        {@const runRight = plotX(run.endMs, domain, contentWidth)}
+        {@const runLeft = plotX(run.startMs, plotDomain, contentWidth)}
+        {@const runRight = plotX(run.endMs, plotDomain, contentWidth)}
         <button
           type="button"
           class="run-segment"
@@ -403,11 +496,22 @@
 <div class="timeline">
   <WorkflowTimelineIconDefs />
   <div class="timeline-tools">
+    {#if polling}
+      <button
+        type="button"
+        class="fit-timeline"
+        aria-pressed={pinned}
+        disabled={!initialViewport}
+        onclick={toggleLiveFollow}
+        >{pinned ? 'Following live' : 'Follow live'}</button
+      >
+    {/if}
     <button
       type="button"
       class="fit-timeline"
       disabled={!domain || !initialViewport}
-      onclick={() => domain && selectRange(domain)}>Fit entire timeline</button
+      onclick={() => domain && selectRange(domain, 'zoom')}
+      >Fit entire timeline</button
     >
     <div><WorkflowTimelineLegend /></div>
   </div>
@@ -415,9 +519,8 @@
     <WorkflowTimelineMinimap
       {domain}
       {viewport}
-      {eventTimes}
       landmarks={minimapLandmarks}
-      minDurationMs={(domainDuration * width) / MAX_WIDTH}
+      minDurationMs={minimumDuration}
       pinnedLive={polling && pinned}
       onselect={selectRange}
     />
@@ -432,31 +535,26 @@
     bind:clientHeight={viewportHeight}
     onwheel={handlePlotWheel}
     onscroll={(event) => {
-      scrollTop = event.currentTarget.scrollTop;
+      const nextScrollTop = event.currentTarget.scrollTop;
       const nextScrollLeft = event.currentTarget.scrollLeft;
-      if (domain && Math.abs(nextScrollLeft - scrollLeft) > 0.5) {
-        unpinnedStartMs = getViewportStartMs(
-          nextScrollLeft,
-          domain,
-          contentWidth,
+      const horizontalPan = isHorizontalPan(
+        scrollLeft,
+        nextScrollLeft,
+        scrollTop,
+        nextScrollTop,
+      );
+      scrollTop = nextScrollTop;
+      if (plotDomain && horizontalPan) {
+        pinned = getFollowAfterInteraction(
+          pinned,
+          'pan',
+          nextScrollLeft - scrollLeft,
         );
+        unpinnedStartMs = pinned
+          ? null
+          : getViewportStartMs(nextScrollLeft, plotDomain, contentWidth);
       }
       scrollLeft = nextScrollLeft;
-      if (polling) {
-        const remaining =
-          event.currentTarget.scrollWidth -
-          event.currentTarget.clientWidth -
-          scrollLeft;
-        if (remaining > 40) {
-          pinned = false;
-          unpinnedStartMs = viewport?.startMs ?? null;
-        } else if (remaining < 8) {
-          pinned = true;
-          unpinnedStartMs = null;
-        } else if (!pinned) {
-          unpinnedStartMs = viewport?.startMs ?? null;
-        }
-      }
     }}
   >
     <div class="content" style:width={`${labelWidth + contentWidth}px`}>
@@ -464,29 +562,28 @@
         <div class="axis-label" style:width={`${labelWidth}px`}>
           Workflow / event
         </div>
-        {#if domain}
+        {#if plotDomain}
           {#each ticks as time (time)}
             <span
               class="tick"
-              style:left={`${labelWidth + timeToX(time, domain, contentWidth)}px`}
+              class:origin={time === plotDomain.startMs}
+              style:left={`${labelWidth + timeToX(time, plotDomain, contentWidth)}px`}
             >
               {formatDistanceAbbreviated({
-                start: new Date(domain.startMs),
+                start: new Date(plotDomain.startMs),
                 end: new Date(time),
-                includeMilliseconds: viewport
-                  ? viewport.endMs - viewport.startMs < 10_000
-                  : false,
-              }) || '0s'}
+                includeMilliseconds: tickStep < 1000,
+              }) || (tickStep < 1000 ? '0ms' : '0s')}
             </span>
           {/each}
         {/if}
       </div>
       <div class="body" style:height={`${rowLayout.height}px`}>
-        {#if domain}
+        {#if plotDomain}
           {#each ticks as time (time)}
             <div
               class="grid-line"
-              style:left={`${labelWidth + timeToX(time, domain, contentWidth)}px`}
+              style:left={`${labelWidth + timeToX(time, plotDomain, contentWidth)}px`}
             ></div>
           {/each}
 
@@ -653,14 +750,14 @@
                 {/if}
               </div>
               {#if item.kind === 'event'}
-                {@render timelineMark(item.row, item.executionKey, domain)}
+                {@render timelineMark(item.row, item.executionKey, plotDomain)}
               {:else if item.kind === 'execution'}
                 {@const workflowRow = workflowRowForExecution(item.execution)}
                 {#if workflowRow}
                   {@render timelineMark(
                     workflowRow,
                     item.execution.execution.executionKey,
-                    domain,
+                    plotDomain,
                   )}
                 {/if}
               {:else}
@@ -766,10 +863,52 @@
     min-height: 8rem;
     min-width: 0;
     overflow: auto;
+    overflow-x: scroll;
+    scrollbar-gutter: stable;
     border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
     border-radius: 0.5rem;
     background: var(--color-surface-primary);
     color: var(--color-content-primary);
+  }
+
+  .scroller::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scroller::-webkit-scrollbar-track,
+  .scroller::-webkit-scrollbar-corner {
+    background: var(--color-surface-primary);
+  }
+
+  .scroller::-webkit-scrollbar-thumb {
+    border: 2px solid var(--color-surface-primary);
+    border-radius: 999px;
+    background: color-mix(
+      in srgb,
+      var(--color-content-primary) 30%,
+      transparent
+    );
+  }
+
+  .scroller::-webkit-scrollbar-thumb:hover {
+    background: color-mix(
+      in srgb,
+      var(--color-content-primary) 45%,
+      transparent
+    );
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    .scroller {
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(
+          in srgb,
+          var(--color-content-primary) 30%,
+          transparent
+        )
+        var(--color-surface-primary);
+    }
   }
 
   .content {
@@ -809,6 +948,10 @@
     line-height: 1;
     white-space: nowrap;
     transform: translateX(-50%);
+  }
+
+  .tick.origin {
+    transform: translateX(4px);
   }
 
   .body {

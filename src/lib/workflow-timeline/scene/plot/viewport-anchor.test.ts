@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { TimeRange } from './time-viewport';
 import {
   getInitialViewport,
+  getInitialViewportDuration,
   getViewportScrollLeft,
   getViewportStartMs,
 } from './viewport-anchor';
@@ -28,12 +29,13 @@ function historyEvent(
   history: ExecutionHistoryState,
   eventId: string,
   eventTimeMs: number,
+  eventType: QualifiedHistoryEvent['eventType'] = 'WorkflowExecutionStarted',
 ): QualifiedHistoryEvent {
   return {
     executionKey: history.executionKey,
     eventKey: getEventKey(history.executionKey, eventId),
     eventId,
-    eventType: 'WorkflowExecutionStarted',
+    eventType,
     eventTypeFormat: 'readable',
     eventTimeMs,
   };
@@ -195,6 +197,126 @@ describe('single-timestamp initial history', () => {
     expect(
       getInitialViewport([historyEvent(root, '1', 100)], [history]),
     ).toBeNull();
+  });
+});
+
+describe('getInitialViewportDuration', () => {
+  it.each([1, 7000, 60_000, 90_000])(
+    'gives a running execution a minimum minute for a %i ms span before polling starts',
+    (duration) => {
+      const history = executionHistory('root', 'one', { status: 'loaded' });
+      const events = [historyEvent(history, '1', 100)];
+      expect(
+        getInitialViewportDuration(
+          { startMs: 100, endMs: 100 + duration },
+          events,
+          [history],
+        ),
+      ).toBe(Math.max(60_000, duration));
+    },
+  );
+
+  const terminalEventTypes: QualifiedHistoryEvent['eventType'][] = [
+    'WorkflowExecutionCompleted',
+    'WorkflowExecutionFailed',
+    'WorkflowExecutionCanceled',
+    'WorkflowExecutionTerminated',
+    'WorkflowExecutionTimedOut',
+    'WorkflowExecutionContinuedAsNew',
+  ];
+
+  it.each(terminalEventTypes)(
+    'fits a closed seven-second execution: %s',
+    (eventType) => {
+      expect(
+        getInitialViewportDuration(
+          { startMs: 100, endMs: 7100 },
+          [historyEvent(root, '2', 7100, eventType)],
+          [root],
+        ),
+      ).toBe(7000);
+    },
+  );
+
+  it('keeps the requested continuation span despite the new running history', () => {
+    expect(
+      getInitialViewportDuration(
+        rootRange,
+        [
+          historyEvent(nextRun, '1', 2100),
+          historyEvent(root, '2', 2100, 'WorkflowExecutionContinuedAsNew'),
+        ],
+        [root, nextRun],
+      ),
+    ).toBe(2000);
+  });
+
+  it.each([nextRun, child])(
+    'ignores a close event from $executionKey',
+    (unrelatedHistory) => {
+      expect(
+        getInitialViewportDuration(
+          rootRange,
+          [
+            historyEvent(
+              unrelatedHistory,
+              '2',
+              2100,
+              'WorkflowExecutionCompleted',
+            ),
+            ...rootEvents,
+          ],
+          [root, unrelatedHistory],
+        ),
+      ).toBe(60_000);
+    },
+  );
+
+  it('uses the first history rather than the first close event', () => {
+    expect(
+      getInitialViewportDuration(
+        rootRange,
+        [historyEvent(root, '2', 2100, 'WorkflowExecutionCompleted')],
+        [nextRun, root],
+      ),
+    ).toBe(60_000);
+  });
+
+  it.each<QualifiedHistoryEvent['eventType']>([
+    'WorkflowTaskCompleted',
+    'WorkflowExecutionCancelRequested',
+    'ChildWorkflowExecutionCompleted',
+  ])('does not treat %s as an execution close event', (eventType) => {
+    expect(
+      getInitialViewportDuration(
+        rootRange,
+        [historyEvent(root, '2', 2100, eventType)],
+        [root],
+      ),
+    ).toBe(60_000);
+  });
+
+  it.each([0, 1])(
+    'keeps a finished single-timestamp span of %i ms at one millisecond',
+    (duration) => {
+      expect(
+        getInitialViewportDuration(
+          { startMs: 100, endMs: 100 + duration },
+          [historyEvent(root, '1', 100, 'WorkflowExecutionCompleted')],
+          [root],
+        ),
+      ).toBe(1);
+    },
+  );
+
+  it('defaults to a minute without a requested execution', () => {
+    expect(
+      getInitialViewportDuration(
+        rootRange,
+        [historyEvent(root, '2', 2100, 'WorkflowExecutionCompleted')],
+        [],
+      ),
+    ).toBe(60_000);
   });
 });
 

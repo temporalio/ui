@@ -12,7 +12,6 @@ const options = {
   selection,
   domain,
   minDurationMs: 10,
-  pinnedLive: false,
 };
 
 describe('centerTimeRange', () => {
@@ -43,10 +42,50 @@ describe('getWheelTimeRange', () => {
     expect((range?.endMs ?? 0) - (range?.startMs ?? 0)).toBeLessThan(200);
   });
 
-  it('keeps the right edge fixed when live-pinned', () => {
-    const range = getWheelTimeRange({ ...options, pinnedLive: true });
-    expect(range?.endMs).toBe(400);
+  it.each([-100, 100])(
+    'keeps the right edge fixed at the end with zoom delta %i',
+    (deltaY) => {
+      const range = getWheelTimeRange({
+        ...options,
+        deltaY,
+        selection: { startMs: 800, endMs: 1000 },
+      });
+      expect(range?.endMs).toBe(1000);
+    },
+  );
+
+  it.each([-100, 100])(
+    'keeps the left edge fixed at the start with zoom delta %i',
+    (deltaY) => {
+      const range = getWheelTimeRange({
+        ...options,
+        deltaY,
+        selection: { startMs: 0, endMs: 200 },
+      });
+      expect(range?.startMs).toBe(0);
+      expect(range?.endMs).not.toBe(200);
+    },
+  );
+
+  it('anchors a fully fitted viewport to the start when zooming in', () => {
+    const range = getWheelTimeRange({ ...options, selection: domain });
+    expect(range?.startMs).toBe(0);
+    expect(range?.endMs).toBeLessThan(domain.endMs);
   });
+
+  it.each([
+    { startMs: 0.5, endMs: 200.5, anchor: 0 },
+    { startMs: 799.5, endMs: 999.5, anchor: 999.5 },
+  ])(
+    'tolerates subpixel edge offsets for $startMs',
+    ({ startMs, endMs, anchor }) => {
+      const range = getWheelTimeRange({
+        ...options,
+        selection: { startMs, endMs },
+      });
+      expect(anchor === 0 ? range?.startMs : range?.endMs).toBe(anchor);
+    },
+  );
 
   it('pans on horizontal scroll, clamping at the domain edge', () => {
     expect(getWheelTimeRange({ ...options, deltaX: 50, deltaY: 0 })).toEqual({
@@ -57,6 +96,58 @@ describe('getWheelTimeRange', () => {
       startMs: 800,
       endMs: 1000,
     });
+  });
+
+  it('does not shrink a spacious initial window when zooming out on a new workflow', () => {
+    expect(
+      getWheelTimeRange({
+        ...options,
+        deltaY: 100,
+        domain: { startMs: 0, endMs: 5000 },
+        selection: { startMs: 0, endMs: 60000 },
+      }),
+    ).toBeNull();
+  });
+
+  it('zooms in without collapsing to the tiny loaded domain', () => {
+    const range = getWheelTimeRange({
+      ...options,
+      domain: { startMs: 0, endMs: 5000 },
+      selection: { startMs: 0, endMs: 60000 },
+    });
+    expect(range?.startMs).toBe(0);
+    expect((range?.endMs ?? 0) - (range?.startMs ?? 0)).toBeGreaterThan(5000);
+    expect((range?.endMs ?? 0) - (range?.startMs ?? 0)).toBeLessThan(60000);
+  });
+
+  it('stops live zoom at ten seconds while retaining the right anchor', () => {
+    const liveOptions = {
+      ...options,
+      domain: { startMs: 0, endMs: 60000 },
+      selection: { startMs: 48000, endMs: 60000 },
+      minDurationMs: 10000,
+      deltaY: -10000,
+    };
+    const range = getWheelTimeRange(liveOptions);
+    expect(range).toEqual({ startMs: 50000, endMs: 60000 });
+    expect(
+      getWheelTimeRange({
+        ...liveOptions,
+        selection: { startMs: 50000, endMs: 60000 },
+      }),
+    ).toBeNull();
+  });
+
+  it('retains a ten-second minimum with less than ten seconds of history', () => {
+    expect(
+      getWheelTimeRange({
+        ...options,
+        domain: { startMs: 0, endMs: 2000 },
+        selection: { startMs: 0, endMs: 12000 },
+        minDurationMs: 10000,
+        deltaY: -10000,
+      }),
+    ).toEqual({ startMs: 0, endMs: 10000 });
   });
 
   it('does not zoom past the allowed duration', () => {

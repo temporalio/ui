@@ -37,6 +37,33 @@ export function getInitialViewport(
   return { startMs, endMs: Math.max(startMs + 1, endMs) };
 }
 
+export function getInitialViewportDuration(
+  range: TimeRange,
+  historyEvents: readonly QualifiedHistoryEvent[],
+  executionHistories: readonly ExecutionHistoryState[],
+): number {
+  const history = executionHistories[0];
+  const terminalSuffixes = [
+    'Completed',
+    'Failed',
+    'Canceled',
+    'Terminated',
+    'TimedOut',
+    'ContinuedAsNew',
+  ];
+  const closed = historyEvents.some(
+    (event) =>
+      history !== undefined &&
+      event.executionKey === history.executionKey &&
+      event.eventType.startsWith('WorkflowExecution') &&
+      terminalSuffixes.includes(
+        event.eventType.slice('WorkflowExecution'.length),
+      ),
+  );
+  const duration = range.endMs - range.startMs;
+  return Math.max(closed ? 1 : 60_000, duration);
+}
+
 export function getViewportScrollLeft(
   startMs: number,
   domain: TimeRange,

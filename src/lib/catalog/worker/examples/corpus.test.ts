@@ -53,6 +53,7 @@ const proofExampleIds = [
   'sequential-plain-text-activities',
   'continue-as-new',
   'timeline-kitchen-sink',
+  'timeline-live',
   'timeline-performance',
 ] as const;
 
@@ -165,6 +166,7 @@ describe('shared workflow corpus', () => {
         'priorityFairnessWorkflow',
         'continueAsNewWorkflow',
         'timelineKitchenSink',
+        'timelineLiveWorkflow',
         'timelinePerformanceWorkflow',
         'nexusGreeting',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
@@ -194,6 +196,22 @@ describe('shared workflow corpus', () => {
     expect(binding?.activities).toHaveProperty('recordTimelineStep');
     expect(binding?.activities).toHaveProperty('retryTimelineStep');
     expect(binding?.activities).toHaveProperty('recordLocalTimelineStep');
+  });
+
+  it('registers the long-running live timeline example and its activity', () => {
+    const registry = createCatalogRegistry();
+    catalogRegistrationSource.register(registry);
+    const generated = generateCatalog(registry);
+    const descriptor = generated.browserDescriptors.find(
+      ({ id }) => id === 'timeline-live',
+    );
+    expect(descriptor).toMatchObject({
+      input: { defaultValue: [86400, 5, 120] },
+      execution: { kind: 'workflow', workflowType: 'timelineLiveWorkflow' },
+    });
+    expect(generated.workerBindings[0]?.activities).toHaveProperty(
+      'recordLiveTimelineTick',
+    );
   });
 
   it('registers the sequential activity summary variants with their activity bindings', async () => {
@@ -635,6 +653,10 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/activity-heartbeat/activity.ts',
         'src/lib/catalog/worker/examples/timer-driven-repetition/example.ts',
         'src/lib/catalog/worker/examples/timer-driven-repetition/workflow.ts',
+        'src/lib/catalog/worker/examples/timeline-live/activity.ts',
+        'src/lib/catalog/worker/examples/timeline-live/example.ts',
+        'src/lib/catalog/worker/examples/timeline-live/workflow.ts',
+        'src/lib/catalog/worker/examples/timeline-live/workflow.test.ts',
         'src/lib/catalog/worker/examples/timeline-performance/example.ts',
         'src/lib/catalog/worker/examples/timeline-performance/workflow.ts',
         'src/lib/catalog/worker/examples/timeline-kitchen-sink/activity.ts',

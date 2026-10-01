@@ -2,6 +2,10 @@
   import { colorScales } from '$lib/theme/io/themes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
+  import {
+    getWheelInteraction,
+    type ViewportInteraction,
+  } from './live-viewport';
   import type { MinimapMarker } from './minimap-landmarks';
   import type { TimeRange } from './time-viewport';
   import {
@@ -13,7 +17,7 @@
   let {
     domain,
     viewport,
-    eventTimes,
+
     landmarks,
     minDurationMs,
     pinnedLive,
@@ -21,13 +25,13 @@
   }: {
     domain: TimeRange | null;
     viewport: TimeRange | null;
-    eventTimes: readonly number[];
+
     landmarks: Readonly<{
       markers: readonly MinimapMarker[];
     }>;
     minDurationMs: number;
     pinnedLive: boolean;
-    onselect: (range: TimeRange) => void;
+    onselect: (range: TimeRange, interaction: ViewportInteraction) => void;
   } = $props();
 
   const markerColors: Record<MinimapMarker['kind'], string> = {
@@ -38,7 +42,6 @@
     completion: colorScales.green[9],
   };
 
-  const BIN_COUNT = 96;
   const RESIZE_HIT_PX = 12;
   const clamp = (value: number, minimum: number, maximum: number): number =>
     Math.max(minimum, Math.min(maximum, value));
@@ -101,26 +104,6 @@
       100,
     );
   }
-  const density = $derived.by(() => {
-    const bins = Array<number>(BIN_COUNT).fill(0);
-    if (!validDomain) return bins;
-    const span = validDomain.endMs - validDomain.startMs;
-    for (const time of eventTimes) {
-      if (
-        !Number.isFinite(time) ||
-        time < validDomain.startMs ||
-        time > validDomain.endMs
-      )
-        continue;
-      const index = Math.min(
-        BIN_COUNT - 1,
-        Math.floor(((time - validDomain.startMs) / span) * BIN_COUNT),
-      );
-      bins[index] += 1;
-    }
-    const maximum = Math.max(1, ...bins);
-    return bins.map((count) => (count ? Math.sqrt(count / maximum) * 100 : 0));
-  });
 
   function pointerTime(clientX: number, bounds: TimeRange): number {
     const rect = track.getBoundingClientRect();
@@ -164,8 +147,19 @@
         validDomain,
       );
     }
+    const interaction: ViewportInteraction =
+      drag.mode === 'resize-start' || drag.mode === 'resize-end'
+        ? 'zoom'
+        : 'pan';
+    if (pinnedLive && interaction === 'zoom') {
+      const span = range.endMs - range.startMs;
+      range = boundRange(
+        { startMs: validDomain.endMs - span, endMs: validDomain.endMs },
+        validDomain,
+      );
+    }
     preview = range;
-    onselect(range);
+    onselect(range, interaction);
   }
 
   function getDragMode(
@@ -228,7 +222,7 @@
         drag.initial
       ) {
         const center = pointerTime(event.clientX, validDomain);
-        onselect(centerTimeRange(center, drag.initial, validDomain));
+        onselect(centerTimeRange(center, drag.initial, validDomain), 'pan');
       } else updateSelection(event.clientX);
     }
     drag = null;
@@ -246,12 +240,11 @@
       deltaY: event.deltaY,
       deltaMode: event.deltaMode,
       trackWidth: track.clientWidth,
-      selection,
+      selection: viewport ?? selection,
       domain: validDomain,
       minDurationMs,
-      pinnedLive,
     });
-    if (range) onselect(range);
+    if (range) onselect(range, getWheelInteraction(event.deltaX, event.deltaY));
   }
 
   function onKeydown(event: KeyboardEvent): void {
@@ -274,6 +267,7 @@
         },
         validDomain,
       ),
+      'pan',
     );
   }
 </script>
@@ -305,11 +299,6 @@
     onpointercancel={endDrag}
     onlostpointercapture={endDrag}
   >
-    <div class="activity" aria-hidden="true">
-      {#each density as height, index (index)}
-        <span class="bar" style:height={`${height}%`}></span>
-      {/each}
-    </div>
     {#if validDomain}
       <div class="landmarks" aria-hidden="true">
         {#each landmarks.markers as marker, index (index)}
@@ -410,24 +399,6 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-  }
-
-  .activity {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    display: flex;
-    align-items: flex-end;
-    height: 100%;
-    pointer-events: none;
-  }
-
-  .bar {
-    flex: 1 1 0;
-    min-width: 0;
-    background: currentColor;
-    opacity: 0.2;
   }
 
   .landmark {

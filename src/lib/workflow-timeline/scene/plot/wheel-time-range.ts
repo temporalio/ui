@@ -30,7 +30,6 @@ export function getWheelTimeRange({
   selection,
   domain,
   minDurationMs,
-  pinnedLive,
 }: {
   deltaX: number;
   deltaY: number;
@@ -39,7 +38,6 @@ export function getWheelTimeRange({
   selection: TimeRange;
   domain: TimeRange;
   minDurationMs: number;
-  pinnedLive: boolean;
 }): TimeRange | null {
   const duration = selection.endMs - selection.startMs;
   if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -54,7 +52,11 @@ export function getWheelTimeRange({
   }
   if (!deltaY) return null;
 
-  const span = domain.endMs - domain.startMs;
+  const zoomBounds = {
+    startMs: domain.startMs,
+    endMs: Math.max(domain.endMs, selection.endMs),
+  };
+  const span = zoomBounds.endMs - zoomBounds.startMs;
   const sensitivity = deltaMode === 1 ? 0.04 : deltaMode === 2 ? 0.45 : 0.002;
   const factor = Math.exp(clamp(deltaY * sensitivity, -0.35, 0.35));
   const nextDuration = clamp(
@@ -65,8 +67,13 @@ export function getWheelTimeRange({
   if (Math.abs(nextDuration - duration) < 0.001) return null;
 
   const centerMs = (selection.startMs + selection.endMs) / 2;
-  const startMs = pinnedLive
-    ? selection.endMs - nextDuration
-    : centerMs - nextDuration / 2;
-  return boundTimeRange({ startMs, endMs: startMs + nextDuration }, domain);
+  const edgeToleranceMs = duration / Math.max(1, trackWidth);
+  const atStart = selection.startMs - domain.startMs <= edgeToleranceMs;
+  const atEnd = Math.abs(selection.endMs - domain.endMs) <= edgeToleranceMs;
+  const startMs = atStart
+    ? domain.startMs
+    : atEnd
+      ? selection.endMs - nextDuration
+      : centerMs - nextDuration / 2;
+  return boundTimeRange({ startMs, endMs: startMs + nextDuration }, zoomBounds);
 }
