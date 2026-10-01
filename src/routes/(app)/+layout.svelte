@@ -36,7 +36,11 @@
   } from '$lib/io/icon';
   import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
-  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
+  import {
+    lastUsedNamespace,
+    namespaces,
+    namespacesLoading,
+  } from '$lib/stores/namespaces';
   import { initializeNavDefaults } from '$lib/stores/nav-open';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
@@ -432,7 +436,7 @@
     <TopNavigation>
       {#snippet left()}
         {#if showNamespacePicker}
-          <NamespacePicker {namespaceList} />
+          <NamespacePicker {namespaceList} loading={$namespacesLoading} />
         {/if}
       {/snippet}
       {#if showNewsFeed}

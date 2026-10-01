@@ -13,12 +13,14 @@
     namespaceList?: NamespaceListItem[];
     namespace?: string;
     noResultsText?: string;
+    loading?: boolean;
   }
 
   let {
     namespaceList = [],
     namespace,
     noResultsText = translate('common.no-results'),
+    loading = false,
   }: Props = $props();
 
   let value = $derived(
@@ -47,6 +49,8 @@
 <Combobox
   label={translate('namespaces.namespace-label', { namespace: value })}
   {noResultsText}
+  {loading}
+  loadingText={translate('common.loading')}
   labelHidden
   {value}
   id="namespace-switcher"
