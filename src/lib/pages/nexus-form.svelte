@@ -108,7 +108,7 @@
     resetForm: false,
     dataType: 'json',
     onUpdate: async ({ form, cancel }) => {
-      if (!form.valid) return;
+      if (!form.valid || fieldsInert) return;
 
       if (
         isCloud &&
