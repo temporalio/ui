@@ -75,8 +75,6 @@ export function flattenPlotScene(
 
     for (const entry of execution.entries) {
       if (entry.kind === 'row') {
-        if (entry.row.kind === 'workflow') continue;
-
         flattened.push({
           kind: 'event',
           key: `row:${entry.row.rowKey}`,

@@ -333,7 +333,7 @@
       ? colorScales.blue[9]
       : getLineColor(endingEvent(row)?.eventType, visual.bgColor)}
   >
-    {#if right > left || row.kind === 'workflow'}
+    {#if row.kind !== 'workflow' && right > left}
       <span
         class="mark-line"
         class:running={isRunning}
