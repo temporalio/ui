@@ -59,6 +59,11 @@ tls:
 uiServerTLS:
   certFile:
   keyFile:
+  # mTLS block is optional. Uncomment to require inbound clients to present
+  # a certificate signed by the configured CA (requires certFile+keyFile).
+  # mTLS:
+  #   caFile:      # required: path to PEM-encoded client CA bundle
+  #   clientAuth:  # optional: requireAndVerify (default), verifyIfGiven, request, requireAny
 codec:
   endpoint:
   passAccessToken: false

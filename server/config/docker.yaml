@@ -49,6 +49,11 @@ tls:
 uiServerTLS:
   certFile: {{ env "TEMPORAL_UI_SERVER_TLS_CERT" | default "" }}
   keyFile: {{ env "TEMPORAL_UI_SERVER_TLS_KEY" | default "" }}
+  # mTLS block is optional. Uncomment to require inbound clients to present
+  # a certificate signed by the configured CA (requires certFile+keyFile).
+  # mTLS:
+  #   caFile: {{ env "TEMPORAL_UI_SERVER_MTLS_CA" | default "" }}
+  #   clientAuth: {{ env "TEMPORAL_UI_SERVER_MTLS_CLIENT_AUTH" | default "" }}
 auth:
   enabled: {{ env "TEMPORAL_AUTH_ENABLED" | default "false" }}
   redirectToProvider: {{ env "TEMPORAL_AUTH_REDIRECT_TO_PROVIDER" | default "false" }}

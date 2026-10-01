@@ -1,4 +1,4 @@
-package rpc
+package tlsutil
 
 import (
 	"crypto/rand"
@@ -41,7 +41,7 @@ func TestCertLoader_ReloadsNewKeyPair(t *testing.T) {
 			assert.NoError(t, os.WriteFile(certPath, certPEM1, 0644))
 			assert.NoError(t, os.WriteFile(keyPath, keyPEM1, 0644))
 
-			loader := &certLoader{CertFile: certPath, KeyFile: keyPath}
+			loader := NewCertLoader(certPath, keyPath)
 
 			loaded1, err := loader.GetClientCertificate(nil)
 			assert.NoError(t, err)
