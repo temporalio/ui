@@ -81,6 +81,12 @@ export type TimelineRunSpan = {
   workflowKey: string;
   depth: number;
   ancestorRunKeys: string[];
+  /**
+   * Whether the run opens with a row of its own. A compacted single-run
+   * workflow has none, so a run container drawn there would have to put its
+   * label on the workflow's row.
+   */
+  headerRow: boolean;
 };
 
 export type TimelineWorkflowSpan = {
@@ -120,6 +126,19 @@ export type RecursiveContainmentLayoutInput = {
   reverseSort: boolean;
   pendingGroupCount: number;
   descMinId: number;
+  /**
+   * Drops rows that exist only to reserve canvas space for the workflow
+   * frames — the spacing below a nested workflow, and the run header of a
+   * workflow that only ever had one run. Views that draw nesting beside the
+   * plot instead of around it have nothing to put in them.
+   */
+  compactStructuralRows?: boolean;
+  /**
+   * Runs whose body is folded away. The run keeps its header row so it can be
+   * unfolded again; everything it contained, nested children included, is
+   * left out of the layout entirely.
+   */
+  collapsedRunKeys?: ReadonlySet<string>;
 };
 
 export const getObservedTimelineEdgeKeys = (
@@ -175,6 +194,8 @@ export function getRecursiveTimelineContainmentLayout({
   reverseSort,
   pendingGroupCount,
   descMinId,
+  compactStructuralRows = false,
+  collapsedRunKeys,
 }: RecursiveContainmentLayoutInput): TimelineContainmentLayout {
   const runById = new Map<string, TimelineRun>();
   const collectRuns = (node: TimelineWorkflowNode): void => {
@@ -289,15 +310,36 @@ export function getRecursiveTimelineContainmentLayout({
       const runKey = timelineRunKey(node.key, run.runId);
       const owners = [...ancestorRunKeys, runKey];
       const runStart = physicalRowIndex;
-      appendRow({
-        kind: 'frame-header',
-        key: `${runKey}:frame-header`,
-        workflowKey: node.key,
-        runKey,
-        runId: run.runId,
-        depth: node.depth,
-        ancestorRunKeys,
-      });
+      const skipRunHeader =
+        compactStructuralRows && participatingRuns.length <= 1;
+      if (!skipRunHeader) {
+        appendRow({
+          kind: 'frame-header',
+          key: `${runKey}:frame-header`,
+          workflowKey: node.key,
+          runKey,
+          runId: run.runId,
+          depth: node.depth,
+          ancestorRunKeys,
+        });
+      }
+
+      // A collapsed run keeps its header and drops its body, so the canvas and
+      // the tree stay in step over which rows exist. Without a header there is
+      // nothing to unfold it again, so such a run is never collapsed.
+      if (!skipRunHeader && collapsedRunKeys?.has(runKey)) {
+        allRunSpans.push({
+          key: runKey,
+          workflowKey: node.key,
+          runId: run.runId,
+          depth: node.depth,
+          ancestorRunKeys,
+          rowStart: runStart,
+          rowEnd: physicalRowIndex,
+          headerRow: true,
+        });
+        continue;
+      }
 
       const mask =
         visibilityByRunId.get(run.runId) ??
@@ -496,6 +538,7 @@ export function getRecursiveTimelineContainmentLayout({
         ancestorRunKeys,
         rowStart: runStart,
         rowEnd: physicalRowIndex,
+        headerRow: !skipRunHeader,
       });
     }
 
@@ -510,7 +553,7 @@ export function getRecursiveTimelineContainmentLayout({
         rowStart: workflowStart,
         rowEnd: physicalRowIndex,
       });
-      if (node.depth > 0) {
+      if (node.depth > 0 && !compactStructuralRows) {
         for (const suffix of ['after', 'after-padding']) {
           appendRow({
             kind: 'workflow-spacing',

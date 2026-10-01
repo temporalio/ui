@@ -464,3 +464,90 @@ describe('getRecursiveTimelineContainmentLayout', () => {
     },
   );
 });
+
+describe('compactStructuralRows', () => {
+  const buildTree = () => {
+    const childRun = {
+      ...run('child-run', 20),
+      groups: [entry('child-run', 5)],
+    };
+    const child = {
+      key: 'child',
+      namespace: 'default',
+      workflowId: 'child',
+      firstRunId: 'child-run',
+      workflow: { id: 'child' } as WorkflowExecution,
+      runs: [childRun],
+      childrenByGroupKey: new Map(),
+      depth: 1,
+    } as TimelineWorkflowNode;
+    const edge = {
+      key: 'edge:child',
+      parentGroupKey: 'root-run:1',
+      reference: {
+        namespace: 'default',
+        workflowId: 'child',
+        runId: 'child-run',
+      },
+      expansion: 'expanded',
+      load: { state: 'loaded', node: child },
+      depth: 1,
+      lastVisibleAt: 0,
+    } as TimelineChildEdge;
+    const root = {
+      key: 'root',
+      namespace: 'default',
+      workflowId: 'root',
+      firstRunId: 'root-run',
+      workflow: { id: 'root' } as WorkflowExecution,
+      runs: [{ ...run('root-run', 0), groups: [entry('root-run', 1)] }],
+      childrenByGroupKey: new Map([[edge.parentGroupKey, edge]]),
+      depth: 0,
+    } as TimelineWorkflowNode;
+    return {
+      root,
+      participating: new Set([
+        timelineRunKey('root', 'root-run'),
+        timelineRunKey('child', 'child-run'),
+      ]),
+    };
+  };
+
+  const layoutFor = (compactStructuralRows: boolean) => {
+    const { root, participating } = buildTree();
+    return getRecursiveTimelineContainmentLayout({
+      root,
+      visibleEntries: null,
+      participatingRunKeys: participating,
+      reverseSort: false,
+      pendingGroupCount: 0,
+      descMinId: 0,
+      compactStructuralRows,
+    });
+  };
+
+  it('keeps frame and spacing rows by default', () => {
+    const kinds = allRows(layoutFor(false)).map((row) => row.kind);
+
+    expect(kinds).toContain('frame-header');
+    expect(kinds).toContain('workflow-spacing');
+  });
+
+  it('drops the spacing and single-run header rows when compacting', () => {
+    const kinds = allRows(layoutFor(true)).map((row) => row.kind);
+
+    expect(kinds).not.toContain('workflow-spacing');
+    expect(kinds).not.toContain('frame-header');
+  });
+
+  it('keeps every group row when compacting', () => {
+    const groups = (compact: boolean) =>
+      allRows(layoutFor(compact)).filter((row) => row.kind === 'group').length;
+
+    expect(groups(true)).toBe(groups(false));
+  });
+
+  it('emits fewer rows overall when compacting', () => {
+    expect(layoutFor(true).rowCount).toBeLessThan(layoutFor(false).rowCount);
+  });
+});

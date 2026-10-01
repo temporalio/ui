@@ -1,3 +1,4 @@
+import { palette } from '$lib/theme/colors';
 import type { EventClassification, EventTypeCategory } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
 
@@ -31,6 +32,20 @@ export const getStatusStrokeColor = (
   status: WorkflowStatus | EventClassification | 'Delayed',
 ): string => (status && STATUS_STROKE_COLORS[status]) ?? DEFAULT_STROKE_COLOR;
 
+/**
+ * Statuses with no colour of their own resolve to `currentColor`, which is
+ * unreadable as a filled shape. Intermediate runs of a chain land here, so
+ * they take a muted tone that still reads next to the final run.
+ */
+const NEUTRAL_FILL_COLOR = palette.slate[400];
+
+export const getStatusFillColor = (
+  status: WorkflowStatus | EventClassification | 'Delayed',
+): string => {
+  const color = getStatusStrokeColor(status);
+  return color === DEFAULT_STROKE_COLOR ? NEUTRAL_FILL_COLOR : color;
+};
+
 const CATEGORY_STROKE_COLORS: Record<
   EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
   string
@@ -50,9 +65,58 @@ const CATEGORY_STROKE_COLORS: Record<
   other: DEFAULT_STROKE_COLOR,
 };
 
+/**
+ * Every colour here is a primitive from the design system's palette rather
+ * than a one-off hex, so the tree stays in step with io Design. The stroke
+ * colours above resolve some categories to `currentColor`, which is
+ * unreadable as a fill, so this is a map of its own rather than an override
+ * layer over them.
+ */
+const CATEGORY_FILL_COLORS: Record<
+  EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
+  string
+> = {
+  workflow: palette.indigo[600],
+  'child-workflow': palette.cyan[600],
+  activity: palette.purple[400],
+  'local-activity': palette.cyan[700],
+  timer: palette.yellow[600],
+  signal: palette.pink[700],
+  update: palette.red[300],
+  nexus: palette.blue[600],
+  pending: palette.purple[400],
+  retry: palette.red[300],
+  marker: palette.slate[500],
+  command: palette.slate[500],
+  other: palette.slate[500],
+};
+
+/**
+ * Category colour that stays readable as a filled shape — icons, connector
+ * dots and count badges in the timeline tree.
+ */
+export const getCategoryFillColor = (
+  category: EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
+): string => CATEGORY_FILL_COLORS[category] ?? palette.slate[500];
+
 export const getCategoryStrokeColor = (
   category: EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
 ): string => CATEGORY_STROKE_COLORS[category] ?? DEFAULT_STROKE_COLOR;
+
+/**
+ * Colours for nested workflow scopes. Depth picks the colour so adjacent and
+ * nested groupings stay distinguishable; a scope's status is carried by its
+ * row, not by the grouping.
+ */
+const SCOPE_COLORS = [
+  palette.green[700],
+  palette.cyan[700],
+  palette.purple[600],
+  palette.yellow[700],
+] as const;
+
+export const getScopeColor = (depth: number): string =>
+  SCOPE_COLORS[Math.abs(Math.trunc(depth)) % SCOPE_COLORS.length];
 
 export type DotColors = { readonly fill: string; readonly stroke: string };
 

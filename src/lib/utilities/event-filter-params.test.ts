@@ -64,6 +64,18 @@ describe('parseEventFilterParams', () => {
 
     expect(parseEventFilterParams(url).timelineDisplayMode).toBe('classic');
   });
+
+  it('shows containment groups when the param is absent', () => {
+    const url = new URL('http://localhost/');
+
+    expect(parseEventFilterParams(url).showGroups).toBe(true);
+  });
+
+  it('hides containment groups for show_groups=false', () => {
+    const url = new URL('http://localhost/?show_groups=false');
+
+    expect(parseEventFilterParams(url).showGroups).toBe(false);
+  });
 });
 
 describe('updateEventFilterParams', () => {
@@ -146,6 +158,34 @@ describe('updateEventFilterParams', () => {
     const calledUrl = mockGoto.mock.calls[0][0] as string;
     expect(calledUrl).not.toContain('timeline_mode');
     expect(calledUrl).toContain('sort=ascending');
+  });
+
+  it('adds show_groups=false to the URL when hiding groups', async () => {
+    const url = new URL('http://localhost/?timeline_mode=lanes');
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(
+      url,
+      { showGroups: false },
+      mockGoto as never,
+    );
+
+    const calledUrl = mockGoto.mock.calls[0][0] as string;
+    expect(calledUrl).toContain('show_groups=false');
+    expect(calledUrl).toContain('timeline_mode=lanes');
+  });
+
+  it('removes show_groups from the URL when showing groups again', async () => {
+    const url = new URL(
+      'http://localhost/?timeline_mode=lanes&show_groups=false',
+    );
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(url, { showGroups: true }, mockGoto as never);
+
+    const calledUrl = mockGoto.mock.calls[0][0] as string;
+    expect(calledUrl).not.toContain('show_groups');
+    expect(calledUrl).toContain('timeline_mode=lanes');
   });
 
   it('adds classic timeline mode to the URL', async () => {

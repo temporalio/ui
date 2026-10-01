@@ -13,6 +13,7 @@ export const SHARED_FILTER_PARAMS = [
   'refresh_off',
   'follow_continues',
   'timeline_mode',
+  'show_groups',
 ] as const;
 
 export function getSharedFilterParams(url: URL): Record<string, string> {
@@ -34,12 +35,16 @@ export function parseEventFilterParams(url: URL) {
   const categoryParam = url.searchParams.get('category');
   const timelineModeParam = url.searchParams.get('timeline_mode');
   const timelineDisplayMode: TimelineViewMode =
-    timelineModeParam === 'full-duration' || timelineModeParam === 'classic'
+    timelineModeParam === 'full-duration' ||
+    timelineModeParam === 'classic' ||
+    timelineModeParam === 'lanes'
       ? timelineModeParam
       : 'fixed-window';
 
   return {
     sort: (url.searchParams.get('sort') as EventSortOrder) || 'descending',
+    // Containment frames are the default, so the param only turns them off.
+    showGroups: url.searchParams.get('show_groups') !== 'false',
     categories: categoryParam
       ? (categoryParam.split(',') as EventTypeCategory[])
       : null,
@@ -55,6 +60,7 @@ type FilterUpdate = {
   statusFilter?: boolean;
   refresh_off?: boolean;
   timelineDisplayMode?: TimelineViewMode;
+  showGroups?: boolean;
 };
 
 export function updateEventFilterParams(
@@ -102,6 +108,13 @@ export function updateEventFilterParams(
         filters.timelineDisplayMode === 'fixed-window'
           ? undefined
           : filters.timelineDisplayMode,
+    });
+  }
+
+  if (filters.showGroups !== undefined) {
+    parameters.push({
+      parameter: 'show_groups',
+      value: filters.showGroups ? undefined : 'false',
     });
   }
 

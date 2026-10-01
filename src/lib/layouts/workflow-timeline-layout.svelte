@@ -9,6 +9,10 @@
   import { getTimelineGroups } from '$lib/components/lines-and-dots/timeline-graph/classic/sort-timeline-groups';
   import ClassicTimelineGraph from '$lib/components/lines-and-dots/timeline-graph/classic/timeline-graph.svelte';
   import { Timeline as ClassicTimeline } from '$lib/components/lines-and-dots/timeline-graph/classic/timeline.svelte';
+  import {
+    GUTTER,
+    LANE_TIME_ORIGIN_PX,
+  } from '$lib/components/lines-and-dots/timeline-graph/constants';
   import TimelineChainOverview from '$lib/components/lines-and-dots/timeline-graph/timeline-chain-overview.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
   import type { TimelinePerformanceStats } from '$lib/components/lines-and-dots/timeline-graph/timeline-performance';
@@ -18,7 +22,10 @@
     type TimelineWindowControls,
   } from '$lib/components/lines-and-dots/timeline-graph/timeline-window-controls';
   import type { Timeline } from '$lib/components/lines-and-dots/timeline-graph/timeline.svelte';
-  import type { TimelineViewMode } from '$lib/components/lines-and-dots/timeline-graph/types';
+  import type {
+    TimelineDisplayMode,
+    TimelineViewMode,
+  } from '$lib/components/lines-and-dots/timeline-graph/types';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
@@ -148,7 +155,18 @@
     page.url.searchParams.get('timeline_instrumentation') === 'on',
   );
   const requestedDisplayMode = $derived(urlParams.timelineDisplayMode);
+  const showGroups = $derived(urlParams.showGroups);
   const displayMode = $derived(requestedDisplayMode);
+  // Lanes renders on the full-duration scale; only where the nesting is drawn
+  // differs, so everything downstream of the view toggle treats it that way.
+  const nestedLanes = $derived(displayMode === 'lanes');
+  // The graph shell carries a 1px border the overview above it does not, so the
+  // canvas's coordinate origin sits one pixel further in.
+  const TIMELINE_SHELL_BORDER_PX = 1;
+  const graphDisplayMode = $derived<TimelineDisplayMode>(
+    displayMode === 'fixed-window' ? 'fixed-window' : 'full-duration',
+  );
+  const fullDurationScale = $derived(graphDisplayMode === 'full-duration');
   type IntervalRenderCommit = Readonly<{
     id: object;
     requestEpoch: number;
@@ -252,6 +270,10 @@
 
   const onDisplayMode = (timelineDisplayMode: TimelineViewMode) => {
     updateEventFilterParams(page.url, { timelineDisplayMode }, goto);
+  };
+
+  const onShowGroups = () => {
+    updateEventFilterParams(page.url, { showGroups: !showGroups }, goto);
   };
 
   // The timeline renders in normal page flow: the page (#content-wrapper)
@@ -448,7 +470,7 @@
       scanCurrentRunId,
       reset: true,
     }).then((snapshot) => {
-      if (!snapshot || requestedDisplayMode !== 'full-duration') return;
+      if (!snapshot || !fullDurationScale) return;
       const first = snapshot.segments[0]?.runs[0];
       const last = snapshot.segments.at(-1)?.runs.at(-1);
       if (!first || !last) return;
@@ -869,6 +891,14 @@
           {translate('workflows.timeline-sliding-window')}
         </ToggleButton>
         <ToggleButton
+          active={displayMode === 'lanes'}
+          data-testid="timeline-lanes"
+          onclick={() => onDisplayMode('lanes')}
+          size="sm"
+        >
+          {translate('workflows.timeline-lanes')}
+        </ToggleButton>
+        <ToggleButton
           active={displayMode === 'classic'}
           data-testid="timeline-classic"
           onclick={() => onDisplayMode('classic')}
@@ -877,6 +907,18 @@
           {translate('workflows.timeline-classic')}
         </ToggleButton>
       </ToggleButtons>
+      {#if displayMode !== 'classic'}
+        <ToggleButtons>
+          <ToggleButton
+            active={showGroups}
+            data-testid="timeline-show-groups"
+            onclick={onShowGroups}
+            size="sm"
+          >
+            {translate('workflows.timeline-show-groups')}
+          </ToggleButton>
+        </ToggleButtons>
+      {/if}
       {#if displayMode === 'fixed-window' && timelineWindowControls}
         <ToggleButtons
           role="group"
@@ -1027,6 +1069,10 @@
       <TimelineChainOverview
         segments={chainOverviewSegments}
         loading={chainOverviewLoading}
+        leadingInsetPx={nestedLanes
+          ? LANE_TIME_ORIGIN_PX + TIMELINE_SHELL_BORDER_PX
+          : 0}
+        trailingInsetPx={nestedLanes ? GUTTER : 0}
         windowStartTimeMs={displayMode === 'fixed-window'
           ? timelineWindowControls?.windowStartTimeMs
           : undefined}
@@ -1078,7 +1124,9 @@
     {:else}
       <TimelineGraph
         {namespace}
-        {displayMode}
+        displayMode={graphDisplayMode}
+        nesting={nestedLanes ? 'gutter' : 'canvas'}
+        {showGroups}
         {workflow}
         groups={bufferGroups}
         {reverseSort}
@@ -1098,7 +1146,7 @@
           ? workflowRunCtx.chainRunId
           : workflow.runId}
         knownChainStartRunId={workflowRunCtx.chainRunId}
-        chainStartTimeMs={requestedDisplayMode === 'full-duration'
+        chainStartTimeMs={fullDurationScale
           ? chainOverviewRuns[0]?.startTimeMs
           : undefined}
         bind:windowControls={timelineWindowControls}

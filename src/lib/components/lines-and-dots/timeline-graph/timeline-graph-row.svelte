@@ -77,7 +77,14 @@
     continuousConnector?: boolean;
     connectorColor?: string;
     displayNamePrefix?: string;
+    /** Replaces the composed label outright. */
+    displayNameOverride?: string;
+    showLabel?: boolean;
+    /** Renders the label as secondary text rather than in the primary colour. */
+    subtleLabel?: boolean;
     onBeforeSelect?: () => void;
+    /** Row height of the view this row sits in. */
+    rowHeight?: number;
   };
 
   let {
@@ -97,7 +104,11 @@
     continuousConnector = false,
     connectorColor,
     displayNamePrefix,
+    displayNameOverride,
+    showLabel = true,
+    subtleLabel = false,
     onBeforeSelect,
+    rowHeight = ROW_HEIGHT,
   }: Props = $props();
 
   const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
@@ -135,9 +146,10 @@
       getEventGroupDisplayName(group.initialEvent as never),
   );
   const displayName = $derived(
-    displayNamePrefix
-      ? `${displayNamePrefix} · ${baseDisplayName}`
-      : baseDisplayName,
+    displayNameOverride ??
+      (displayNamePrefix
+        ? `${displayNamePrefix} · ${baseDisplayName}`
+        : baseDisplayName),
   );
 
   // Reactive (not untrack) so a re-pointed pooled row relabels for its new group.
@@ -224,7 +236,7 @@
     }
     const { textAnchor, textPosition } = timelineTextPosition(
       points,
-      ROW_HEIGHT / 2,
+      rowHeight / 2,
       timelineWidth,
       isLivePending,
     );
@@ -290,12 +302,13 @@
           canvasWidth - labelSafeInset),
   );
   const labelVisible = $derived(
-    isTimelineLabelVisible(
-      labelTextPositionX,
-      GUTTER,
-      canvasWidth - GUTTER,
-      hasVisibleConnector,
-    ),
+    showLabel &&
+      isTimelineLabelVisible(
+        labelTextPositionX,
+        GUTTER,
+        canvasWidth - GUTTER,
+        hasVisibleConnector,
+      ),
   );
 
   const onClick = () => {
@@ -426,7 +439,7 @@
   )}
   {@const clampedLabelLeft = `clamp(calc(${GUTTER + 1.5 * RADIUS - spanLeft}px + var(--timeline-frame-offset, 0px)), ${labelTextPositionX - spanLeft - (textAnchor === 'end' ? labelWidth : 0)}px, calc(${canvasWidth - GUTTER - 1.5 * RADIUS - labelWidth - spanLeft}px + var(--timeline-frame-offset, 0px)))`}
   <div
-    class="pointer-events-auto absolute z-10 flex select-none items-center gap-1 whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-[13px] leading-none {textAnchor ===
+    class="pointer-events-auto absolute z-10 flex select-none items-center gap-1 whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-xs leading-none {textAnchor ===
     'end'
       ? `${shouldClampLabel ? '' : '-translate-x-full'} -translate-y-1/2 flex-row-reverse`
       : '-translate-y-1/2'}"
@@ -449,7 +462,9 @@
       </svg>
     {/if}
     <span
-      class="inline-flex min-h-[var(--dot)] min-w-0 items-center overflow-hidden text-ellipsis rounded-full text-current"
+      class="inline-flex min-h-[var(--dot)] min-w-0 items-center overflow-hidden text-ellipsis rounded-full {subtleLabel
+        ? 'text-subtle'
+        : 'text-current'}"
     >
       {#if pendingActivity}
         {translate('workflows.attempt')}
@@ -479,7 +494,7 @@
       aria-label={accessibleName}
       disabled={readOnly}
       style:left="{spanLeft}px"
-      style:top="{ROW_HEIGHT / 2 - HALO}px"
+      style:top="{rowHeight / 2 - HALO}px"
       style:width="{spanWidth}px"
       style:height="{RADIUS * 3}px"
       onclick={onClick}

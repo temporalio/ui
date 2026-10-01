@@ -19,6 +19,8 @@
     viewportOffsetPx?: number;
     viewportWidthPx: number;
     onToggle: (segmentKey: string) => void;
+    /** Row height of the view this row sits in. */
+    rowHeight?: number;
   };
   let {
     scale,
@@ -29,6 +31,7 @@
     viewportOffsetPx = 0,
     viewportWidthPx,
     onToggle,
+    rowHeight = ROW_HEIGHT,
   }: Props = $props();
 
   const ZIGZAG_HALF_WIDTH = 5;
@@ -156,7 +159,7 @@
       {@render marker(
         segmentWindow.markerRange,
         labelX,
-        ROW_HEIGHT,
+        rowHeight,
         segmentWindow.centerVisible,
       )}
       {@render marker(

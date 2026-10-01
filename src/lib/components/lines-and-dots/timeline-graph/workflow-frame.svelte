@@ -19,6 +19,8 @@
     headerKind?: 'synthetic' | 'relationship';
     depth?: number;
     paint: 'background' | 'foreground';
+    /** Renders the label as secondary text rather than in the frame's colour. */
+    subtleLabel?: boolean;
     bandTop: number;
     bandHeight: number;
     entryOffsetPx?: number;
@@ -40,6 +42,7 @@
     headerKind = 'synthetic',
     depth = 0,
     paint,
+    subtleLabel = false,
     bandTop,
     bandHeight,
     entryOffsetPx = 0,
@@ -272,7 +275,9 @@
           <span
             class:frame-label-chain={kind === 'chain'}
             class:workflow-run-label={kind === 'run'}
-            class="pointer-events-none absolute z-10 inline-flex min-h-[var(--dot)] items-center truncate whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-[13px] leading-none text-current"
+            class="pointer-events-none absolute z-10 inline-flex min-h-[var(--dot)] items-center truncate whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-xs leading-none {subtleLabel
+              ? 'text-subtle'
+              : 'text-current'}"
             style:left={labelLeft}
             style:top="{geometry.topPx - RADIUS}px"
             style:max-width={labelMaxWidth}

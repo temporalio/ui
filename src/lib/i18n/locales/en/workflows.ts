@@ -147,6 +147,8 @@ export const Strings = {
   'timeline-sliding-window': 'Sliding window',
   'timeline-full-duration': 'Full duration',
   'timeline-classic': 'Classic',
+  'timeline-lanes': 'Lanes',
+  'timeline-show-groups': 'Show groups',
   'child-timeline-loading': 'Loading child workflow…',
   'child-timeline-unavailable': 'Child workflow is unavailable.',
   'child-timeline-unauthorized':

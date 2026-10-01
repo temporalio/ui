@@ -26,9 +26,24 @@
   import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
   import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
 
-  import { dotColors, strokeColor } from '../colors';
+  import { dotColors, getScopeColor, strokeColor } from '../colors';
   import EndTimeInterval from '../end-time-interval.svelte';
-  import { DOT_STROKE, GUTTER, RADIUS, ROW_HEIGHT } from './constants';
+  import {
+    DOT_STROKE,
+    GUTTER,
+    LANE_LEFT_GUTTER,
+    LANE_ROW_HEIGHT,
+    LANE_TREE_WIDTH,
+    RADIUS,
+    ROW_HEIGHT,
+  } from './constants';
+  import {
+    gutterAncestorRunLevels,
+    gutterRunOrdinals,
+    gutterWorkflowSummaries,
+    toGutterCell,
+  } from './gutter/timeline-gutter-cells';
+  import { lineBox } from './primitives';
   import {
     flattenWorkflowNodes,
     getTimelineChildExecution,
@@ -131,6 +146,7 @@
   } from './workflow-frame-geometry';
 
   import GroupDetailsRow from './group-details-row.svelte';
+  import TimelineTreeGutter from './gutter/timeline-tree-gutter.svelte';
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineChildEdgeRow from './timeline-child-edge-row.svelte';
   import TimelineCollapsedLayer from './timeline-collapsed-layer.svelte';
@@ -171,6 +187,9 @@
     sceneGeneration?: object;
     chainIndexId?: object;
     disableVirtualization?: boolean;
+    nesting?: 'canvas' | 'gutter';
+    /** Whether the containment frames are painted over the plot at all. */
+    showGroups?: boolean;
   }
 
   let {
@@ -198,8 +217,16 @@
     modelLoading = false,
     sceneGeneration,
     chainIndexId,
+    nesting = 'canvas',
+    showGroups = true,
     disableVirtualization = false,
   }: Props = $props();
+
+  // Lanes rows hold two lines of text in the tree; every vertical measure in
+  // this view — rows, frames, virtualization — reads from this.
+  const rowHeight = $derived(
+    nesting === 'gutter' ? LANE_ROW_HEIGHT : ROW_HEIGHT,
+  );
 
   let nowMs = $state(Date.now());
 
@@ -391,7 +418,13 @@
   const dotSize = 2 * RADIUS + DOT_STROKE;
   const dotRadius = RADIUS * 0.3 + DOT_STROKE / 2;
 
-  let canvasWidth = $state(0);
+  const treeWidthPx = $derived(nesting === 'gutter' ? LANE_TREE_WIDTH : 0);
+  // The tree column's own border is the timeline's origin, so the canvas drops
+  // its left inset and keeps only enough room for a dot to sit on zero.
+  const leftGutter = $derived(nesting === 'gutter' ? LANE_LEFT_GUTTER : GUTTER);
+
+  let measuredWidth = $state(0);
+  const canvasWidth = $derived(Math.max(0, measuredWidth - treeWidthPx));
 
   // Width via ResizeObserver, not bind:clientWidth: the latter reads clientWidth
   // in every reactive flush, forcing a full sync layout of the tall canvas.
@@ -406,11 +439,11 @@
       const width = Math.round(entries[0].contentRect.width);
       if (isFirst) {
         isFirst = false;
-        canvasWidth = width;
+        measuredWidth = width;
       } else {
         cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(() => {
-          canvasWidth = width;
+          measuredWidth = width;
         });
       }
     });
@@ -421,7 +454,7 @@
     };
   });
 
-  const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
+  const timelineWidth = $derived(canvasWidth - GUTTER - leftGutter);
   // Geometry is recomputed on the coarse clock while the painted world moves
   // every animation frame. Keep a narrow offscreen strip mounted on the right
   // so that transform motion cannot expose a gap against the stationary rail.
@@ -1027,6 +1060,14 @@
       visibleTimeRange: fixedWindowTimeRange,
     }),
   );
+  // Folding a run is a tree-side affordance, so the set lives beside the
+  // gutter wiring rather than in the session, which knows only child edges.
+  const collapsedRunKeySet = new SvelteSet<string>();
+  const collapsedRunKeys = $derived(new Set(collapsedRunKeySet));
+  const toggleRun = (runKey: string) => {
+    if (!collapsedRunKeySet.delete(runKey)) collapsedRunKeySet.add(runKey);
+  };
+
   const nextContainmentLayout = $derived(
     getRecursiveTimelineContainmentLayout({
       root: workflowTree,
@@ -1035,6 +1076,10 @@
       reverseSort,
       pendingGroupCount,
       descMinId,
+      // Those rows exist to reserve space for the frames. With the frames
+      // off they would only leave gaps.
+      compactStructuralRows: nesting === 'gutter' || !showGroups,
+      collapsedRunKeys,
     }),
   );
   const rowPresentationScope = $derived(
@@ -1379,13 +1424,13 @@
     }
     const layer = childToggleExitLayerEl;
     const layerTop = layer.getBoundingClientRect().top;
-    const clipBoundaryY = originY + ROW_HEIGHT / 2;
+    const clipBoundaryY = originY + rowHeight / 2;
     const clipTop = Math.max(0, clipBoundaryY - layerTop);
     const fallbackOffsetPx = Math.max(
       0,
       ...exiting
         .filter((entry) => entry.kind === 'row')
-        .map((entry) => entry.top + ROW_HEIGHT - clipBoundaryY),
+        .map((entry) => entry.top + rowHeight - clipBoundaryY),
     );
     const exitOffsetPx =
       direction === 'collapse' ? fallbackOffsetPx : motionOffsetPx;
@@ -1403,7 +1448,7 @@
         kind: entry.kind,
         top: entry.top,
         originY,
-        rowHeight: ROW_HEIGHT,
+        rowHeight,
         offsetPx: exitOffsetPx,
       });
       return clone.animate(
@@ -1473,7 +1518,7 @@
           ...candidateRows.map(({ key, top }) => {
             const previousTop = previousTops.get(key);
             return previousTop === undefined
-              ? top + ROW_HEIGHT - (originY + ROW_HEIGHT / 2)
+              ? top + rowHeight - (originY + rowHeight / 2)
               : top - previousTop;
           }),
         );
@@ -1596,7 +1641,7 @@
         kind: entry.kind,
         top: entry.top,
         originY: pending.originY,
-        rowHeight: ROW_HEIGHT,
+        rowHeight,
       }),
     );
     const originKeys = new SvelteSet(originEntries.map((entry) => entry.key));
@@ -1790,7 +1835,7 @@
     const offsets = getTimelineRowEntryOffsets(
       previousKeys,
       currentKeys,
-      ROW_HEIGHT,
+      rowHeight,
       visualOffsets,
     );
 
@@ -1976,7 +2021,11 @@
   const virtualizeRows = $derived(
     !disableVirtualization && availableLayoutRowCount > RETAINED_DOM_ROW_LIMIT,
   );
-  const TIMELINE_VERTICAL_PADDING = ROW_HEIGHT;
+  // Lanes needs far less breathing room: its rows carry no rotated edge
+  // stamps and the tree column sets the vertical rhythm.
+  const TIMELINE_VERTICAL_PADDING = $derived(
+    nesting === 'gutter' ? 0 : rowHeight,
+  );
 
   // Closed-form inverse of getRowY (both cursor segments are linear) → the
   // [start, end) row-index range to mount for a given visible band.
@@ -2005,56 +2054,53 @@
       const cap = Math.min(total, 100);
       return reverseSort ? [Math.max(0, total - cap), total] : [0, cap];
     }
-    const yMin = bandTop - overscan * ROW_HEIGHT;
-    const yMax = bandTop + bandHeight + overscan * ROW_HEIGHT;
+    const yMin = bandTop - overscan * rowHeight;
+    const yMax = bandTop + bandHeight + overscan * rowHeight;
     let start = total;
     let end = 0;
     if (!reverseSort) {
-      // Segment 1 [0, descStart): y = (i+2)*ROW_HEIGHT
-      const seg1Start = Math.max(0, Math.ceil(yMin / ROW_HEIGHT - 2));
-      const seg1End = Math.min(
-        descStart,
-        Math.floor(yMax / ROW_HEIGHT - 2) + 1,
-      );
+      // Segment 1 [0, descStart): y = (i+2)*rowHeight
+      const seg1Start = Math.max(0, Math.ceil(yMin / rowHeight - 2));
+      const seg1End = Math.min(descStart, Math.floor(yMax / rowHeight - 2) + 1);
       if (seg1Start < seg1End) {
         start = Math.min(start, seg1Start);
         end = Math.max(end, seg1End);
       }
-      // Segment 2 [descStart, N): y = (i+2+pendingCount)*ROW_HEIGHT
+      // Segment 2 [descStart, N): y = (i+2+pendingCount)*rowHeight
       const seg2Start = Math.max(
         descStart,
-        Math.ceil(yMin / ROW_HEIGHT - 2 - pendingCount),
+        Math.ceil(yMin / rowHeight - 2 - pendingCount),
       );
       const seg2End = Math.min(
         total,
-        Math.floor(yMax / ROW_HEIGHT - 2 - pendingCount) + 1,
+        Math.floor(yMax / rowHeight - 2 - pendingCount) + 1,
       );
       if (seg2Start < seg2End) {
         start = Math.min(start, seg2Start);
         end = Math.max(end, seg2End);
       }
     } else {
-      // Segment 1 [0, descStart): i = totalForY+1 - y/ROW_HEIGHT
+      // Segment 1 [0, descStart): i = totalForY+1 - y/rowHeight
       const seg1Start = Math.max(
         0,
-        Math.ceil(totalForY + 1 - yMax / ROW_HEIGHT),
+        Math.ceil(totalForY + 1 - yMax / rowHeight),
       );
       const seg1End = Math.min(
         descStart,
-        Math.floor(totalForY + 1 - yMin / ROW_HEIGHT) + 1,
+        Math.floor(totalForY + 1 - yMin / rowHeight) + 1,
       );
       if (seg1Start < seg1End) {
         start = Math.min(start, seg1Start);
         end = Math.max(end, seg1End);
       }
-      // Segment 2 [descStart, N): i = totalForY+1-pendingCount - y/ROW_HEIGHT
+      // Segment 2 [descStart, N): i = totalForY+1-pendingCount - y/rowHeight
       const seg2Start = Math.max(
         descStart,
-        Math.ceil(totalForY + 1 - pendingCount - yMax / ROW_HEIGHT),
+        Math.ceil(totalForY + 1 - pendingCount - yMax / rowHeight),
       );
       const seg2End = Math.min(
         total,
-        Math.floor(totalForY + 1 - pendingCount - yMin / ROW_HEIGHT) + 1,
+        Math.floor(totalForY + 1 - pendingCount - yMin / rowHeight) + 1,
       );
       if (seg2Start < seg2End) {
         start = Math.min(start, seg2Start);
@@ -2128,14 +2174,14 @@
   // Widen the mount window by the panel's row span: shiftFor moves rows down but
   // getWindowBounds maps on the unshifted y, so without this they'd leave a blank.
   const windowOverscan = $derived(
-    OVERSCAN + Math.ceil(panelHeight / ROW_HEIGHT),
+    OVERSCAN + Math.ceil(panelHeight / rowHeight),
   );
 
   // Full drawn height (rows + axis + detail panel). The container is this tall and
   // scrolls with the page.
   const logicalTimelineHeight = $derived(
     Math.max(
-      ROW_HEIGHT * (heightRowCount + (chainFrameCandidates.length ? 3 : 2)),
+      rowHeight * (heightRowCount + (chainFrameCandidates.length ? 3 : 2)),
       120,
     ) +
       panelHeight +
@@ -2144,15 +2190,15 @@
   const verticalScrollModel = $derived(
     getTimelineSegmentedScrollModel({
       totalRows: heightRowCount + (chainFrameCandidates.length ? 3 : 2),
-      rowHeightPx: ROW_HEIGHT,
+      rowHeightPx: rowHeight,
       forceSegmented:
-        containmentLayout.totalRowCount * ROW_HEIGHT >
+        containmentLayout.totalRowCount * rowHeight >
         TIMELINE_NORMAL_SCROLL_LIMIT_PX,
     }),
   );
   let logicalOriginRow = $state(0);
   const verticalOriginOffsetPx = $derived(
-    verticalScrollModel.segmented ? logicalOriginRow * ROW_HEIGHT : 0,
+    verticalScrollModel.segmented ? logicalOriginRow * rowHeight : 0,
   );
   const timelineHeight = $derived(
     verticalScrollModel.segmented
@@ -2161,8 +2207,30 @@
           2 * TIMELINE_VERTICAL_PADDING
       : logicalTimelineHeight,
   );
-  const AXIS_LABEL_ZONE = 150;
+  // Reserved for the rotated start/end stamps hanging below the canvas.
+  // Lanes drops those, so it only needs a row of slack.
+  const AXIS_LABEL_ZONE = $derived(nesting === 'gutter' ? rowHeight / 2 : 150);
   const svgHeight = $derived(timelineHeight + AXIS_LABEL_ZONE);
+
+  const gutterWorkflows = $derived(
+    gutterWorkflowSummaries(
+      workflowNodes,
+      new SvelteMap(
+        [...incomingChildHeaderByWorkflowKey].map(([workflowKey, incoming]) => [
+          workflowKey,
+          { key: incoming.edge.key, expansion: incoming.edge.expansion },
+        ]),
+      ),
+    ),
+  );
+
+  const gutterRunLevels = $derived(gutterAncestorRunLevels(workflowTree));
+
+  const gutterOrdinals = $derived(
+    gutterRunOrdinals(workflowNodes, (workflowKey, runId) =>
+      timelineRunKey(workflowKey, runId),
+    ),
+  );
   const SEGMENTED_VIEWPORT_HEIGHT_PX = 800;
   const shellHeight = $derived(
     verticalScrollModel.segmented
@@ -2219,7 +2287,7 @@
       lastTop = top;
       lastHeight = viewHeight;
       stableFrames = 0;
-      const chunkHeight = PRESENTATION_CHUNK_SIZE * ROW_HEIGHT;
+      const chunkHeight = PRESENTATION_CHUNK_SIZE * rowHeight;
       const bandTop = virtualizeRows
         ? Math.floor(top / chunkHeight) * chunkHeight
         : top;
@@ -2473,6 +2541,45 @@
     focusedSlotIndex = null;
   });
 
+  const gutterSlots = $derived.by(() => {
+    if (nesting !== 'gutter') return [];
+    return renderedPresentationRows.flatMap((slot) => {
+      const cell = toGutterCell(slot.row, {
+        workflows: gutterWorkflows,
+        runOrdinals: gutterOrdinals,
+        collapsedRunKeys,
+        ancestorRunLevels: gutterRunLevels,
+      });
+      if (!cell) return [];
+      // A row that opens a child workflow stands for that workflow, not for
+      // the run it was started from, so hovering it reveals the child's own
+      // container rather than its parent's. A row that is merely an event in a
+      // run keeps naming that run, which is where it ran.
+      const childEdge =
+        slot.row.kind === 'group'
+          ? slot.row.childEdge
+          : slot.row.kind === 'child-state'
+            ? slot.row.edge
+            : undefined;
+      const childWorkflowKey =
+        childEdge?.load.state === 'loaded' && !childEdge.load.truncation
+          ? childEdge.load.node.key
+          : undefined;
+      return [
+        {
+          cell,
+          topPx: getY(slot.index) - rowHeight / 2 + shiftFor(slot.index),
+          visible: renderedActiveChunkKeys.has(slot.chunkKey),
+          workflowKey: childEdge ? childWorkflowKey : slot.row.workflowKey,
+          runKey:
+            childEdge === undefined && 'runKey' in slot.row
+              ? slot.row.runKey
+              : undefined,
+        },
+      ];
+    });
+  });
+
   const getY = $derived.by(
     () =>
       (i: number): number =>
@@ -2485,7 +2592,8 @@
             pendingGroupCount: layoutPendingCount,
             totalForY,
             reverseSort: false,
-          }) / ROW_HEIGHT,
+            rowHeight,
+          }) / rowHeight,
         ),
   );
 
@@ -2514,6 +2622,7 @@
       activeRowIndex,
       panelHeight,
       verticalPaddingPx: TIMELINE_VERTICAL_PADDING - verticalOriginOffsetPx,
+      rowHeight,
     }),
   );
   const frameBandTop = $derived(virtualizeRows ? layerBandTop : 0);
@@ -2527,6 +2636,32 @@
     new Map(layoutWorkflowSpans.map((span) => [span.workflowKey, span])),
   );
 
+  /**
+   * Veils the plot outside the hovered group so that group is the only thing
+   * at full strength. A pair of rects rather than per-element opacity: the
+   * plot draws frames, containers, bars and markers across several layers.
+   */
+  const DIM_SCRIM_BACKGROUND =
+    'color-mix(in srgb, rgb(var(--color-surface-background)) 50%, transparent)';
+  let hoverBand = $state<{
+    topPx: number;
+    heightPx: number;
+    workflowKey?: string;
+    runKey?: string;
+  } | null>(null);
+
+  /**
+   * With the groups switched off, hovering a row still reveals the containers
+   * it sits inside — so a reading of "which group is this in?" costs a hover
+   * rather than a round trip through the toggle.
+   */
+  const revealedWorkflowKey = $derived(
+    showGroups ? undefined : hoverBand?.workflowKey,
+  );
+  const revealedRunKey = $derived(showGroups ? undefined : hoverBand?.runKey);
+
+  const runFrameRowAlignPx = $derived(nesting === 'gutter' ? RADIUS : 0);
+
   const runFrameLayouts = $derived.by(() => {
     return participatingRunFrames.flatMap((candidate) => {
       const runKey = timelineRunKey(
@@ -2536,6 +2671,15 @@
       const vertical = frameVerticalLayout.runBoundsByKey.get(runKey);
       const span = runSpanByKey.get(runKey);
       if (!vertical || !span) return [];
+      // A run container puts its id on the run's own row. Where Lanes has
+      // compacted that row away the workflow outline already covers exactly
+      // this run, so the container would only repeat it over the workflow's
+      // label — unless the hover is asking for this very run, which is how a
+      // single-run child workflow still shows its run id on demand.
+      const askedFor =
+        candidate.workflowKey === revealedWorkflowKey ||
+        runKey === revealedRunKey;
+      if (nesting === 'gutter' && !span.headerRow && !askedFor) return [];
       const incomingChild = incomingChildHeaderByWorkflowKey.get(
         candidate.workflowKey ?? '',
       );
@@ -2571,12 +2715,16 @@
             endWorldPx: candidateEndWorldPx,
             viewportOffsetPx: viewport.offsetPx,
             viewportWidthPx: renderedViewportWidthPx,
-            gutterPx: GUTTER,
-            topPx: vertical.topPx,
-            bottomPx: vertical.bottomPx,
+            gutterPx: leftGutter,
+            // Lanes highlights whole rows, and the frame geometry sits a
+            // radius below them. Shifting both edges by that much puts the
+            // container on the same lines as the hover band.
+            topPx: vertical.topPx - runFrameRowAlignPx,
+            bottomPx: vertical.bottomPx - runFrameRowAlignPx,
             startBoundaryKnown: candidate.startBoundaryKnown,
             endBoundaryKnown: candidate.endBoundaryKnown,
             labelInsetPx: 2 * RADIUS,
+            rowHeight,
           }),
         },
       ];
@@ -2629,12 +2777,13 @@
             endWorldPx,
             viewportOffsetPx: viewport.offsetPx,
             viewportWidthPx: renderedViewportWidthPx,
-            gutterPx: GUTTER,
+            gutterPx: leftGutter,
             topPx: vertical.topPx,
             bottomPx: vertical.bottomPx,
             startBoundaryKnown: candidate.startBoundaryKnown,
             endBoundaryKnown: candidate.endBoundaryKnown,
             labelInsetPx: 2 * RADIUS,
+            rowHeight,
           }),
         },
       ];
@@ -2757,11 +2906,11 @@
       selectedRowId: $activeGroups[0],
     });
     const projectX = (time: ValidTime | undefined | null): number => {
-      if (!time) return GUTTER;
+      if (!time) return leftGutter;
       return (
         projection.project(validTimeToDate(time).getTime()) -
         viewport.offsetPx +
-        GUTTER
+        leftGutter
       );
     };
     const snapshot = Object.freeze({
@@ -2808,6 +2957,68 @@
   );
   const renderedChainFrameLayouts = $derived(
     rendered.presentation.activeBlocks.flatMap((block) => block.chainFrames),
+  );
+  // Translucent so the scope outlines and bars underneath still read through.
+  const HOVER_BAND_BACKGROUND =
+    'color-mix(in srgb, rgb(var(--color-interactive-secondary-hover)) 55%, transparent)';
+
+  const drawCanvasFrames = $derived(nesting !== 'gutter' && showGroups);
+  /**
+   * Lanes outlines a workflow's scope instead of framing it, but a run
+   * still gets the same container the other views draw, so a run reads the
+   * same way everywhere.
+   */
+  const drawRunFrames = $derived(showGroups);
+
+  const runFrameKeyOf = (candidate: { workflowKey?: string; runId: string }) =>
+    timelineRunKey(candidate.workflowKey ?? '', candidate.runId);
+
+  /**
+   * A named run reveals just that container. A hovered workflow names no run,
+   * so every run it owns is revealed — which is what shows the run ids of a
+   * child workflow rather than the run of the parent that started it.
+   */
+  const shownRunFrameLayouts = $derived(
+    drawRunFrames
+      ? renderedRunFrameLayouts
+      : renderedRunFrameLayouts.filter((frame) =>
+          revealedRunKey === undefined
+            ? revealedWorkflowKey !== undefined &&
+              frame.candidate.workflowKey === revealedWorkflowKey
+            : runFrameKeyOf(frame.candidate) === revealedRunKey,
+        ),
+  );
+
+  /**
+   * Option B brackets: the same workflow spans the frames used, expressed as a
+   * bracket beside the tree and an outline over the workflow's time extent.
+   */
+  const scopeSpans = $derived(
+    nesting === 'gutter'
+      ? renderedChainFrameLayouts.map((frame) => ({
+          key: frame.span.headerKey,
+          depth: frame.span.depth,
+          topPx: frame.geometry.topPx,
+          heightPx: Math.max(0, frame.geometry.bottomPx - frame.geometry.topPx),
+          // Frame geometry runs from the header row's centre and pads the
+          // bottom by a radius so a border clears the dots. The outline wants
+          // whole rows instead, or its edge cuts through the last one.
+          outlineTopPx: frame.geometry.topPx - rowHeight / 2,
+          outlineHeightPx: Math.max(
+            0,
+            frame.geometry.bottomPx - frame.geometry.topPx - RADIUS,
+          ),
+          startPx: frame.geometry.horizontal?.startPx ?? null,
+          endPx: frame.geometry.horizontal?.endPx ?? null,
+          color: getScopeColor(frame.span.depth),
+          // A child workflow's span is already drawn on the parent event row
+          // that started it. The root has no such row, so it draws its own.
+          ownsSpanBar: frame.span.depth === 0,
+          workflowKey: frame.span.workflowKey,
+          status: frame.candidate.status,
+          workflowId: frame.candidate.workflow?.id ?? '',
+        }))
+      : [],
   );
 
   const performanceTracker = new TimelinePerformanceTracker();
@@ -2941,36 +3152,58 @@
     {#snippet children({ endTime })}
       {@const visibleStartTime = fixedWindowTimeRange?.startTimeMs ?? startTime}
       {@const visibleEndTime = fixedWindowTimeRange?.endTimeMs ?? endTime}
-      <div
-        class="pointer-events-none sticky top-[120px]"
-        class:invisible={!!$activeGroups.length}
-      >
-        <div class="flex w-full justify-between text-xs">
-          <p class="w-60 -translate-x-24 rotate-90">
-            {$timestamp(visibleStartTime, { format: 'short' })}
-          </p>
-          <p class="w-60 translate-x-24 rotate-90">
-            {$timestamp(visibleEndTime, { format: 'short' })}
-          </p>
+      {#if nesting !== 'gutter'}
+        <!-- Rotated edge stamps. Lanes drops them: the chain overview above it
+           already labels the same window along its axis. -->
+        <div
+          class="pointer-events-none sticky top-[120px]"
+          class:invisible={!!$activeGroups.length}
+        >
+          <div class="flex w-full justify-between text-xs">
+            <p class="w-60 -translate-x-24 rotate-90">
+              {$timestamp(visibleStartTime, { format: 'short' })}
+            </p>
+            <p class="w-60 translate-x-24 rotate-90">
+              {$timestamp(visibleEndTime, { format: 'short' })}
+            </p>
+          </div>
         </div>
-      </div>
+      {/if}
       <!-- Tall scrolled layer; rows/lines/dots are absolutely-positioned divs,
          only the windowed slots exist in the DOM. -->
       <div
         class="canvas"
+        style:margin-left="{treeWidthPx}px"
+        style:margin-top={nesting === 'gutter' ? '0' : undefined}
         style:width="{canvasWidth}px"
         style:height="{svgHeight}px"
         style:--dot="{dotSize}px"
         style:--dot-r="{dotRadius}px"
         style:--timeline-gutter="{GUTTER}px"
         style:--timeline-clip-inset="{GUTTER + RADIUS / 4}px"
+        style:--timeline-clip-inset-left="{leftGutter - RADIUS / 4}px"
       >
         <TimelineIconDefs />
+
+        {#if nesting === 'gutter'}
+          <div class="absolute top-0" style:left="-{treeWidthPx}px">
+            <TimelineTreeGutter
+              {rowHeight}
+              slots={gutterSlots}
+              widthPx={treeWidthPx}
+              heightPx={svgHeight}
+              onToggle={toggleChild}
+              onToggleRun={toggleRun}
+              onHoverBand={(band) => (hoverBand = band)}
+            />
+          </div>
+        {/if}
 
         <!-- Border rails -->
         <div
           class="timeline-height-rail pointer-events-none absolute z-10 bg-current"
-          style:left="{GUTTER - RADIUS / 4}px"
+          class:hidden={nesting === 'gutter'}
+          style:left="{leftGutter - RADIUS / 4}px"
           style:top="{virtualizeRows ? layerBandTop : lineTop}px"
           style:width="{RADIUS / 2}px"
           style:height="{virtualizeRows ? layerBandHeight : lineBottom}px"
@@ -2983,6 +3216,21 @@
           style:height="{virtualizeRows ? layerBandHeight : lineBottom}px"
         ></div>
 
+        {#if hoverBand}
+          <div
+            class="pointer-events-none absolute left-0 right-0 top-0 z-40"
+            data-testid="timeline-dim-above"
+            style:height="{hoverBand.topPx}px"
+            style:background={DIM_SCRIM_BACKGROUND}
+          ></div>
+          <div
+            class="pointer-events-none absolute bottom-0 left-0 right-0 z-40"
+            data-testid="timeline-dim-below"
+            style:top="{hoverBand.topPx + hoverBand.heightPx}px"
+            style:background={DIM_SCRIM_BACKGROUND}
+          ></div>
+        {/if}
+
         <div class="timeline-viewport-clip absolute inset-0">
           <div
             class="timeline-motion-layer pointer-events-none absolute inset-0"
@@ -2990,35 +3238,94 @@
             data-projection-revision={rendered.projection.revision}
             data-presentation-revision={rendered.presentation.revision}
           >
-            {#each renderedChainFrameLayouts as frame (frame.candidate.key)}
-              <WorkflowFrame
-                geometry={frame.geometry}
-                label={frame.candidate.label}
-                workflowType={frame.candidate.workflow?.name}
-                accessibleName=""
-                color={workflowFrameColor}
-                colors={inheritedWorkflowDotColors}
-                live={frame.candidate.live}
-                kind="chain"
-                headerKind={frame.span.headerKind}
-                depth={frame.span.depth}
-                paint="background"
-                bandTop={frameBandTop}
-                bandHeight={frameBandHeight}
-                entryOffsetPx={workflowFrameEntryOffset(frame.span.headerKey)}
-                entryOffsetXPx={horizontalEntryOffset(
-                  frame.span.headerKey,
-                  frame.candidate.live,
-                )}
-                entryKey={frame.span.headerKey}
-                growthMotion={frameGrowthMotions.get(frame.span.headerKey)}
-                bottomEntryOffsetPx={frameBottomEntryOffset({
-                  topKey: frame.span.headerKey,
-                  rowEnd: frame.span.rowEnd,
-                })}
-              />
+            {#if hoverBand}
+              <div
+                class="pointer-events-none absolute left-0 right-0"
+                data-testid="timeline-hover-band"
+                style:top="{hoverBand.topPx}px"
+                style:height="{hoverBand.heightPx}px"
+                style:background={HOVER_BAND_BACKGROUND}
+              ></div>
+            {/if}
+            {#each scopeSpans as scope (scope.key)}
+              {#if scope.startPx !== null && scope.endPx !== null}
+                <!-- The root needs no frame: nothing contains it, and its own
+                     bar already spans the execution. The root's bar below is
+                     the workflow's duration, not a frame, so it stays put when
+                     the groups are switched off. -->
+                <div
+                  class="pointer-events-none absolute rounded-sm"
+                  class:hidden={scope.ownsSpanBar ||
+                    !(showGroups || scope.workflowKey === revealedWorkflowKey)}
+                  data-testid="timeline-scope-outline"
+                  style:left="{scope.startPx}px"
+                  style:width="{Math.max(0, scope.endPx - scope.startPx)}px"
+                  style:top="{scope.outlineTopPx}px"
+                  style:height="{scope.outlineHeightPx}px"
+                  style:border="1px solid color-mix(in srgb, {scope.color} 55%, transparent)"
+                ></div>
+                {#if scope.ownsSpanBar}
+                  {@const bar = lineBox(
+                    [scope.startPx, scope.topPx],
+                    [scope.endPx, scope.topPx],
+                  )}
+                  <div
+                    class="tl-line pointer-events-none absolute z-0"
+                    data-testid="timeline-scope-span-bar"
+                    style:left="{bar.left}px"
+                    style:top="{bar.top}px"
+                    style:width="{bar.width}px"
+                    style:height="{bar.height}px"
+                    style:--tl-line-color={workflowFrameColor}
+                    title={getWorkflowStatusLabel(scope.status)}
+                  ></div>
+                  <!-- In Lanes the tree already names every workflow, so the
+                       ids in the plot are part of the grouping overlay and go
+                       with it when the groups are switched off. -->
+                  {#if scope.workflowId && showGroups}
+                    <span
+                      class="pointer-events-none absolute z-10 -translate-y-1/2 select-none whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-xs leading-none text-subtle"
+                      data-testid="timeline-scope-span-label"
+                      style:left="{bar.left + 6}px"
+                      style:top="{scope.topPx}px"
+                    >
+                      {scope.workflowId}
+                    </span>
+                  {/if}
+                {/if}
+              {/if}
             {/each}
-            {#each renderedRunFrameLayouts as frame (frame.candidate.key)}
+            {#if drawCanvasFrames}
+              {#each renderedChainFrameLayouts as frame (frame.candidate.key)}
+                <WorkflowFrame
+                  geometry={frame.geometry}
+                  label={frame.candidate.label}
+                  workflowType={frame.candidate.workflow?.name}
+                  accessibleName=""
+                  color={workflowFrameColor}
+                  colors={inheritedWorkflowDotColors}
+                  live={frame.candidate.live}
+                  kind="chain"
+                  headerKind={frame.span.headerKind}
+                  depth={frame.span.depth}
+                  paint="background"
+                  bandTop={frameBandTop}
+                  bandHeight={frameBandHeight}
+                  entryOffsetPx={workflowFrameEntryOffset(frame.span.headerKey)}
+                  entryOffsetXPx={horizontalEntryOffset(
+                    frame.span.headerKey,
+                    frame.candidate.live,
+                  )}
+                  entryKey={frame.span.headerKey}
+                  growthMotion={frameGrowthMotions.get(frame.span.headerKey)}
+                  bottomEntryOffsetPx={frameBottomEntryOffset({
+                    topKey: frame.span.headerKey,
+                    rowEnd: frame.span.rowEnd,
+                  })}
+                />
+              {/each}
+            {/if}
+            {#each shownRunFrameLayouts as frame (frame.candidate.key)}
               <WorkflowFrame
                 geometry={frame.geometry}
                 label={frame.candidate.label}
@@ -3027,6 +3334,7 @@
                 colors={dotColors(frame.candidate.status)}
                 live={frame.candidate.live}
                 kind="run"
+                subtleLabel={nesting === 'gutter'}
                 depth={frame.span.depth}
                 paint="background"
                 bandTop={frameBandTop}
@@ -3071,9 +3379,9 @@
             data-presentation-revision={rendered.presentation.revision}
           >
             <TimelineAxis
-              x1={GUTTER - RADIUS / 4}
+              x1={leftGutter - RADIUS / 4}
               x2={canvasWidth - GUTTER + RADIUS / 4}
-              gutter={GUTTER}
+              gutter={leftGutter}
               {timelineHeight}
               bandTop={virtualizeRows ? layerBandTop : 0}
               bandHeight={virtualizeRows ? layerBandHeight : timelineHeight}
@@ -3086,12 +3394,13 @@
             <!-- Anchor's left provides the gutter offset for the layer's 0-based coords. -->
             <div
               class="timeline-motion-layer absolute top-0"
-              style:left="{GUTTER}px"
+              style:left="{leftGutter}px"
               data-render-id={rendered.requestEpoch}
               data-projection-revision={rendered.projection.revision}
               data-presentation-revision={rendered.presentation.revision}
             >
               <TimelineCollapsedLayer
+                {rowHeight}
                 scale={rendered.projection}
                 {timelineHeight}
                 bandTop={layerBandTop}
@@ -3110,38 +3419,40 @@
             data-projection-revision={rendered.projection.revision}
             data-presentation-revision={rendered.presentation.revision}
           >
-            {#each renderedChainFrameLayouts as frame (frame.candidate.key)}
-              <WorkflowFrame
-                geometry={frame.geometry}
-                label={frame.candidate.label}
-                workflowType={frame.candidate.workflow?.name}
-                accessibleName={translate('workflows.row-accessible-name', {
-                  workflowId: frame.candidate.workflow?.id ?? '',
-                  status: getWorkflowStatusLabel(frame.candidate.status),
-                })}
-                color={workflowFrameColor}
-                colors={inheritedWorkflowDotColors}
-                live={frame.candidate.live}
-                kind="chain"
-                headerKind={frame.span.headerKind}
-                depth={frame.span.depth}
-                paint="foreground"
-                bandTop={frameBandTop}
-                bandHeight={frameBandHeight}
-                entryOffsetPx={workflowFrameEntryOffset(frame.span.headerKey)}
-                entryOffsetXPx={horizontalEntryOffset(
-                  frame.span.headerKey,
-                  frame.candidate.live,
-                )}
-                entryKey={frame.span.headerKey}
-                growthMotion={frameGrowthMotions.get(frame.span.headerKey)}
-                bottomEntryOffsetPx={frameBottomEntryOffset({
-                  topKey: frame.span.headerKey,
-                  rowEnd: frame.span.rowEnd,
-                })}
-              />
-            {/each}
-            {#each renderedRunFrameLayouts as frame (frame.candidate.key)}
+            {#if drawCanvasFrames}
+              {#each renderedChainFrameLayouts as frame (frame.candidate.key)}
+                <WorkflowFrame
+                  geometry={frame.geometry}
+                  label={frame.candidate.label}
+                  workflowType={frame.candidate.workflow?.name}
+                  accessibleName={translate('workflows.row-accessible-name', {
+                    workflowId: frame.candidate.workflow?.id ?? '',
+                    status: getWorkflowStatusLabel(frame.candidate.status),
+                  })}
+                  color={workflowFrameColor}
+                  colors={inheritedWorkflowDotColors}
+                  live={frame.candidate.live}
+                  kind="chain"
+                  headerKind={frame.span.headerKind}
+                  depth={frame.span.depth}
+                  paint="foreground"
+                  bandTop={frameBandTop}
+                  bandHeight={frameBandHeight}
+                  entryOffsetPx={workflowFrameEntryOffset(frame.span.headerKey)}
+                  entryOffsetXPx={horizontalEntryOffset(
+                    frame.span.headerKey,
+                    frame.candidate.live,
+                  )}
+                  entryKey={frame.span.headerKey}
+                  growthMotion={frameGrowthMotions.get(frame.span.headerKey)}
+                  bottomEntryOffsetPx={frameBottomEntryOffset({
+                    topKey: frame.span.headerKey,
+                    rowEnd: frame.span.rowEnd,
+                  })}
+                />
+              {/each}
+            {/if}
+            {#each shownRunFrameLayouts as frame (frame.candidate.key)}
               <WorkflowFrame
                 geometry={frame.geometry}
                 label={frame.candidate.label}
@@ -3157,6 +3468,7 @@
                 colors={dotColors(frame.candidate.status)}
                 live={frame.candidate.live}
                 kind="run"
+                subtleLabel={nesting === 'gutter'}
                 depth={frame.span.depth}
                 paint="foreground"
                 bandTop={frameBandTop}
@@ -3247,14 +3559,14 @@
                 aria-setsize={layoutRowCount}
                 inert={!slotActive || undefined}
                 style:display={slotActive ? 'block' : 'none'}
-                style:height="{ROW_HEIGHT}px"
+                style:height="{rowHeight}px"
                 style:contain="layout"
                 style:--timeline-row-entry-offset={`${entryOffsetPx}px`}
                 style:--timeline-row-entry-x-offset={entryOffsetXPx
                   ? `calc(${entryOffsetXPx}px + var(--timeline-frame-offset, 0px))`
                   : '0px'}
                 style:transform={slot
-                  ? `translateY(${getY(slot.index) - ROW_HEIGHT / 2 + shiftFor(slot.index)}px)`
+                  ? `translateY(${getY(slot.index) - rowHeight / 2 + shiftFor(slot.index)}px)`
                   : undefined}
                 onfocusin={() => {
                   focusedGroupId =
@@ -3273,6 +3585,8 @@
                   <div class="timeline-motion-layer absolute inset-0">
                     {#if !('eventList' in timelineEntry.group) && timelineEntry.group.eventCount === 1 && !timelineEntry.group.isPending && timelineEntry.active === false}
                       <TimelineStaticMarkerRow
+                        {rowHeight}
+                        showLabel={nesting !== 'gutter'}
                         group={timelineEntry.group}
                         timelineKey={timelineEntry.timelineKey}
                         {canvasWidth}
@@ -3281,6 +3595,10 @@
                       />
                     {:else}
                       <TimelineGraphRow
+                        {rowHeight}
+                        showLabel={nesting !== 'gutter' ||
+                          (showGroups && Boolean(slot.row.childEdge))}
+                        subtleLabel={nesting === 'gutter'}
                         group={timelineEntry.group}
                         timelineKey={timelineEntry.timelineKey}
                         eventCount={timelineEntry.group.eventCount}
@@ -3302,8 +3620,13 @@
                         connectorColor={slot.row.childEdge
                           ? workflowFrameColor
                           : undefined}
-                        displayNamePrefix={slot.row.childEdge
+                        displayNamePrefix={slot.row.childEdge &&
+                        nesting !== 'gutter'
                           ? `${translate('common.workflow-id')}: ${slot.row.childEdge.reference.workflowId}`
+                          : undefined}
+                        displayNameOverride={slot.row.childEdge &&
+                        nesting === 'gutter'
+                          ? slot.row.childEdge.reference.workflowId
                           : undefined}
                         labelLeadingOffsetPx={slot.row.childEdge &&
                         childControl?.fitsAfter
@@ -3370,14 +3693,14 @@
         {#if timelineLoading && presentedPendingGap}
           {@const rectY =
             TIMELINE_VERTICAL_PADDING +
-            (presentedPendingGap.rowStart + 1.5) * ROW_HEIGHT +
+            (presentedPendingGap.rowStart + 1.5) * rowHeight +
             shiftFor(presentedPendingGap.insertionIndex)}
-          {@const rectH = presentedPendingGap.rowCount * ROW_HEIGHT + RADIUS}
+          {@const rectH = presentedPendingGap.rowCount * rowHeight + RADIUS}
           <div
             class="absolute animate-pulse rounded bg-slate-400/30"
-            style:left="{GUTTER}px"
+            style:left="{leftGutter}px"
             style:top="{rectY}px"
-            style:width="{canvasWidth - GUTTER * 2}px"
+            style:width="{canvasWidth - GUTTER - leftGutter}px"
             style:height="{rectH}px"
           ></div>
         {/if}
@@ -3427,7 +3750,10 @@
      it can glide in continuously. Clip it at the stationary inner edges of the
      rails; clipping the transformed layer itself would move this boundary. */
   .canvas :global(.timeline-viewport-clip) {
-    clip-path: inset(0 var(--timeline-clip-inset));
+    clip-path: inset(
+      0 var(--timeline-clip-inset) 0
+        var(--timeline-clip-inset-left, var(--timeline-clip-inset))
+    );
   }
 
   .timeline-motion-active .canvas :global(.timeline-motion-layer) {

@@ -19,9 +19,20 @@
     canvasWidth: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
+    showLabel?: boolean;
+    /** Row height of the view this row sits in. */
+    rowHeight?: number;
   };
 
-  let { group, timelineKey, canvasWidth, project, readOnly }: Props = $props();
+  let {
+    group,
+    timelineKey,
+    canvasWidth,
+    project,
+    readOnly,
+    showLabel = true,
+    rowHeight = ROW_HEIGHT,
+  }: Props = $props();
 
   const presentation = $derived.by(() => {
     const pointX = Math.round(project(group.initialEvent.eventTime));
@@ -36,7 +47,7 @@
       visible: pointX >= GUTTER && pointX <= canvasWidth - GUTTER,
       bounds: alignedDotBox(
         pointX,
-        ROW_HEIGHT / 2,
+        rowHeight / 2,
         effectiveCategory === 'signal' ? 'center' : 'start',
       ),
       displayName,
@@ -50,7 +61,7 @@
       icon: CategoryIcon[effectiveCategory].name,
       label: timelineTextPosition(
         [pointX],
-        ROW_HEIGHT / 2,
+        rowHeight / 2,
         canvasWidth - 2 * GUTTER,
         false,
       ),
@@ -81,10 +92,11 @@
       </svg>
     </span>
     <span
-      class="absolute z-10 -translate-y-1/2 select-none whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-[13px] leading-none"
+      class="absolute z-10 -translate-y-1/2 select-none whitespace-nowrap rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-xs leading-none"
+      class:hidden={!showLabel}
       class:-translate-x-full={presentation.label.textAnchor === 'end'}
       style:left="{presentation.label.textPosition[0]}px"
-      style:top="{ROW_HEIGHT / 2}px">{presentation.displayName}</span
+      style:top="{rowHeight / 2}px">{presentation.displayName}</span
     >
   </button>
 {/if}

@@ -128,6 +128,7 @@ describe('getTimelineFrameVerticalLayout', () => {
     rowEnd,
     depth,
     ancestorRunKeys: [],
+    headerRow: true,
   });
 
   const workflowSpan = (

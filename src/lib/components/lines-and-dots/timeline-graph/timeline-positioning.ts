@@ -50,17 +50,19 @@ export function getRowY(
     pendingGroupCount,
     totalForY,
     reverseSort,
+    rowHeight = ROW_HEIGHT,
   }: {
     descStart: number;
     pendingGroupCount: number;
     totalForY: number;
     reverseSort: boolean;
+    rowHeight?: number;
   },
 ): number {
   const offset = i >= descStart ? pendingGroupCount : 0;
   return reverseSort
-    ? (totalForY + 1 - i - offset) * ROW_HEIGHT
-    : (i + 2 + offset) * ROW_HEIGHT;
+    ? (totalForY + 1 - i - offset) * rowHeight
+    : (i + 2 + offset) * rowHeight;
 }
 
 // y (px) for the top of the pending-gap rectangle — just below whichever rows sit
@@ -69,15 +71,17 @@ export function getPendingBlockY({
   descStart,
   filteredGroupsLength,
   reverseSort,
+  rowHeight = ROW_HEIGHT,
 }: {
   descStart: number;
   filteredGroupsLength: number;
   reverseSort: boolean;
+  rowHeight?: number;
 }): number {
   const topSectionRows = reverseSort
     ? filteredGroupsLength - descStart
     : descStart;
-  return (topSectionRows + 2) * ROW_HEIGHT - RADIUS;
+  return (topSectionRows + 2) * rowHeight - RADIUS;
 }
 
 export const timelineTextPosition = (

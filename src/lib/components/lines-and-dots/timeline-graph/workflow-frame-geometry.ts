@@ -28,12 +28,14 @@ export function getTimelineFrameVerticalLayout({
   activeRowIndex,
   panelHeight,
   verticalPaddingPx,
+  rowHeight = ROW_HEIGHT,
 }: {
   runSpans: TimelineRunSpan[];
   workflowSpans: TimelineWorkflowSpan[];
   activeRowIndex: number;
   panelHeight: number;
   verticalPaddingPx: number;
+  rowHeight?: number;
 }): TimelineFrameVerticalLayout {
   const runBoundsByKey = new Map<string, { topPx: number; bottomPx: number }>();
   for (const span of runSpans) {
@@ -42,6 +44,7 @@ export function getTimelineFrameVerticalLayout({
       activeRowIndex,
       panelHeight,
       paddingPx: 0,
+      rowHeight,
     });
     runBoundsByKey.set(span.key, {
       topPx: bounds.topPx + verticalPaddingPx + RADIUS,
@@ -58,10 +61,11 @@ export function getTimelineFrameVerticalLayout({
       activeRowIndex,
       panelHeight,
       paddingPx: 0,
+      rowHeight,
     });
     workflowBoundsByKey.set(span.workflowKey, {
-      topPx: bounds.topPx + verticalPaddingPx + ROW_HEIGHT / 2,
-      bottomPx: bounds.bottomPx + verticalPaddingPx + RADIUS + ROW_HEIGHT / 2,
+      topPx: bounds.topPx + verticalPaddingPx + rowHeight / 2,
+      bottomPx: bounds.bottomPx + verticalPaddingPx + RADIUS + rowHeight / 2,
     });
   }
   return { runBoundsByKey, workflowBoundsByKey };
@@ -73,15 +77,17 @@ export function getWorkflowFrameVerticalBounds({
   activeRowIndex,
   panelHeight,
   paddingPx,
+  rowHeight = ROW_HEIGHT,
 }: {
   rowStart: number;
   rowEnd: number;
   activeRowIndex: number;
   panelHeight: number;
   paddingPx: number;
+  rowHeight?: number;
 }): { topPx: number; bottomPx: number } {
-  let topPx = (rowStart + 1.5) * ROW_HEIGHT;
-  let bottomPx = (rowEnd + 1.5) * ROW_HEIGHT;
+  let topPx = (rowStart + 1.5) * rowHeight;
+  let bottomPx = (rowEnd + 1.5) * rowHeight;
   if (activeRowIndex >= 0 && panelHeight > 0) {
     if (rowStart > activeRowIndex) {
       topPx += panelHeight;
@@ -104,6 +110,7 @@ export function getWorkflowFrameGeometry({
   startBoundaryKnown,
   endBoundaryKnown,
   labelInsetPx,
+  rowHeight = ROW_HEIGHT,
 }: {
   startWorldPx: number;
   endWorldPx: number;
@@ -115,6 +122,7 @@ export function getWorkflowFrameGeometry({
   startBoundaryKnown: boolean;
   endBoundaryKnown: boolean;
   labelInsetPx: number;
+  rowHeight?: number;
 }): WorkflowFrameGeometry {
   const viewport = { offsetPx: viewportOffsetPx, widthPx: viewportWidthPx };
   const clipped = clipConnectorToViewport(
@@ -122,11 +130,7 @@ export function getWorkflowFrameGeometry({
     viewport,
   );
   const normalizedTop = Math.min(topPx, bottomPx);
-  const normalizedBottom = Math.max(
-    topPx,
-    bottomPx,
-    normalizedTop + ROW_HEIGHT,
-  );
+  const normalizedBottom = Math.max(topPx, bottomPx, normalizedTop + rowHeight);
   if (!clipped) {
     return {
       horizontal: null,

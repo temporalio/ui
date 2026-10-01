@@ -24,6 +24,9 @@
     windowDurationMs?: number;
     windowMode?: TimelineWindowMode;
     loading?: boolean;
+    /** Aligns the overview's track with a plot area that starts further in. */
+    leadingInsetPx?: number;
+    trailingInsetPx?: number;
     onWindowMove?: (startTimeMs: number) => void;
     onWindowResize?: (range: {
       startTimeMs: number;
@@ -39,6 +42,8 @@
     windowDurationMs,
     windowMode,
     loading = false,
+    leadingInsetPx = 0,
+    trailingInsetPx = 0,
     onWindowMove,
     onWindowResize,
   }: Props = $props();
@@ -410,6 +415,8 @@
   class="surface-background border-b border-subtle px-3 py-2"
   data-testid="timeline-chain-overview"
   data-chain-end-time-ms={endTimeMs}
+  style:padding-left={leadingInsetPx ? `${leadingInsetPx}px` : undefined}
+  style:padding-right={trailingInsetPx ? `${trailingInsetPx}px` : undefined}
 >
   <div class="mb-1 flex items-center justify-between gap-2 text-xs">
     <span class="font-medium"
