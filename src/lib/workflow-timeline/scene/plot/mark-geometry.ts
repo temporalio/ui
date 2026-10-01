@@ -1,57 +1,52 @@
-const NODE_WIDTH = 20;
-const NODE_RADIUS = NODE_WIDTH / 2;
+import type { QualifiedHistoryEvent } from '../../data/history-events/types';
 
-export type MarkBounds = Readonly<{ left: number; right: number }>;
+type MarkEvent = { x: number; eventType: QualifiedHistoryEvent['eventType'] };
+type MarkTick = MarkEvent & { count: number; isOutcome: boolean };
+
+export type MarkBounds = { left: number; right: number };
+
+function getEventPriority(eventType: MarkEvent['eventType']): number {
+  if (/(Failed|Terminated|TimedOut)$/.test(eventType)) return 3;
+  if (eventType.endsWith('Canceled')) return 2;
+  if (/(Completed|Fired|ContinuedAsNew)$/.test(eventType)) return 1;
+  return 0;
+}
 
 export function getMarkGeometry(
   left: number,
   right: number,
-  eventPositions: readonly number[],
-  contentWidth: number,
-): Readonly<{ bounds: MarkBounds; nodeCenters: readonly number[] }> {
-  const preferred = eventPositions.map((x, index) => {
-    if (eventPositions.length === 1) return x;
-    if (index === 0) return x + NODE_RADIUS;
-    if (index === eventPositions.length - 1) return x - NODE_RADIUS;
-    return x;
-  });
-  const nodeCenters: number[] = [];
+  events: readonly MarkEvent[],
+  { clusterDistance = 2, radius = 1 } = {},
+): { bounds: MarkBounds; ticks: readonly MarkTick[] } {
+  const ticks: MarkTick[] = [];
+  let clusterStart = 0;
+  let clusterPriority = 0;
 
-  for (const x of preferred) {
-    const previous = nodeCenters.at(-1);
-    nodeCenters.push(
-      previous === undefined ? x : Math.max(x, previous + NODE_WIDTH),
-    );
+  for (const event of events) {
+    const priority = getEventPriority(event.eventType);
+    const previous = ticks.at(-1);
+
+    if (!previous || event.x - clusterStart > clusterDistance) {
+      clusterStart = event.x;
+      clusterPriority = priority;
+      ticks.push({ ...event, count: 1, isOutcome: priority > 0 });
+      continue;
+    }
+
+    previous.count += 1;
+    if (priority >= clusterPriority) {
+      previous.x = event.x;
+      previous.eventType = event.eventType;
+      previous.isOutcome = priority > 0;
+      clusterPriority = priority;
+    }
   }
 
-  const first = nodeCenters[0];
-  const last = nodeCenters.at(-1);
-  const preferredFirst = preferred[0];
-  const preferredLast = preferred.at(-1);
-
-  if (
-    first === undefined ||
-    last === undefined ||
-    preferredFirst === undefined ||
-    preferredLast === undefined
-  ) {
-    return { bounds: { left, right }, nodeCenters };
+  const bounds = { left, right };
+  for (const tick of ticks) {
+    bounds.left = Math.min(bounds.left, tick.x - radius);
+    bounds.right = Math.max(bounds.right, tick.x + radius);
   }
 
-  const centeredShift = (preferredFirst - first + (preferredLast - last)) / 2;
-  const minimumShift = NODE_RADIUS - first;
-  const maximumShift = contentWidth - NODE_RADIUS - last;
-  const shift =
-    minimumShift <= maximumShift
-      ? Math.max(minimumShift, Math.min(maximumShift, centeredShift))
-      : minimumShift;
-  const displayedCenters = nodeCenters.map((x) => x + shift);
-
-  return {
-    bounds: {
-      left: Math.min(left, first + shift - NODE_RADIUS),
-      right: Math.max(right, last + shift + NODE_RADIUS),
-    },
-    nodeCenters: displayedCenters,
-  };
+  return { bounds, ticks };
 }

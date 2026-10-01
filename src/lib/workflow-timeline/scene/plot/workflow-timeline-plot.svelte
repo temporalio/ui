@@ -14,7 +14,11 @@
   } from './header-presentation';
   import { lifecycleVisuals } from './lifecycle-visuals';
   import { getMarkGeometry } from './mark-geometry';
-  import { getLineColor, getMarkColors } from './mark-visuals';
+  import {
+    getEventPresentation,
+    getMarkPresentation,
+  } from './mark-presentation';
+  import { getLineColor } from './mark-visuals';
   import { getMinimapLandmarks } from './minimap-landmarks';
   import { getTimeTicks, type TimeRange, timeToX } from './time-viewport';
   import { getWheelTimeRange } from './wheel-time-range';
@@ -313,6 +317,7 @@
     range,
     contentWidth,
   )}
+  {@const presentation = getMarkPresentation(row.kind, left, right)}
   {@const events = row.eventKeys.flatMap((key) => {
     const event = eventByKey.get(key);
     return event ? [event] : [];
@@ -320,20 +325,24 @@
   {@const geometry = getMarkGeometry(
     left,
     right,
-    events.map((event) => plotX(event.eventTimeMs, range, contentWidth)),
-    contentWidth,
+    events.map((event) => ({
+      x: plotX(event.eventTimeMs, range, contentWidth),
+      eventType: event.eventType,
+    })),
+    { clusterDistance: 8, radius: 5 },
   )}
   {@const bounds = geometry.bounds}
 
   <div
     class="mark"
+    class:workflow-events={presentation.isWorkflow}
     style:left={`${labelWidth + bounds.left}px`}
     style:width={`${bounds.right - bounds.left}px`}
     style:--line-color={isRunning
       ? colorScales.blue[9]
       : getLineColor(endingEvent(row)?.eventType, visual.bgColor)}
   >
-    {#if row.kind !== 'workflow' && right > left}
+    {#if presentation.showLine}
       <span
         class="mark-line"
         class:running={isRunning}
@@ -348,18 +357,28 @@
       onclick={() => (selectedRow = row)}
     ></button>
 
-    {#each events as event, index (event.eventKey)}
-      {@const colors = getMarkColors(event.eventType)}
-      <span
-        class="node"
-        style:left={`${geometry.nodeCenters[index] - bounds.left}px`}
-        style:--node-color={colors.fill}
-        style:--node-stroke={colors.stroke}
-        title={event.eventType}
-        ><svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"
-          ><use href={`#wt-icon-${visual.icon}`} /></svg
-        ></span
-      >
+    {#each geometry.ticks as eventTick (eventTick.x)}
+      {@const description =
+        eventTick.count > 1
+          ? `${eventTick.count} events · ${eventTick.eventType} · View lifecycle details`
+          : `${eventTick.eventType} · View lifecycle details`}
+      {@const eventPresentation = getEventPresentation(
+        row.kind,
+        eventTick.eventType,
+      )}
+      <button
+        type="button"
+        class="event-dot"
+        class:point={presentation.isPoint}
+        class:compact={presentation.isCompact}
+        class:outcome={eventPresentation.isOutcome}
+        class:cluster={eventTick.count > 1}
+        style:left={`${eventTick.x - bounds.left}px`}
+        style:--event-color={eventPresentation.color}
+        title={description}
+        aria-label={description}
+        onclick={() => (selectedRow = row)}
+      ></button>
     {/each}
   </div>
 {/snippet}
@@ -1029,11 +1048,17 @@
 
   .mark-line {
     position: absolute;
-    top: -9px;
+    top: -3px;
     width: 100%;
-    height: 18px;
+    height: 6px;
     border-radius: 999px;
-    background: var(--line-color, var(--color-action-workflow-workflow));
+    background: color-mix(in srgb, var(--line-color) 45%, transparent);
+  }
+
+  .workflow-events .mark-line {
+    top: -0.5px;
+    height: 1px;
+    background: color-mix(in srgb, currentColor 20%, transparent);
   }
 
   .mark-line.running {
@@ -1061,34 +1086,56 @@
     }
   }
 
-  .node {
+  .event-dot {
     position: absolute;
-    top: -10px;
+    top: 0;
     z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 20px;
-    height: 20px;
-    box-sizing: border-box;
-    border: 2px solid var(--node-stroke, var(--color-content-primary));
-    border-radius: 4px;
-    background: var(--node-color);
-    color: black;
-    pointer-events: none;
-    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--event-color);
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+  }
+
+  .event-dot.cluster {
+    width: 7px;
+    height: 7px;
+  }
+
+  .event-dot.outcome,
+  .event-dot.compact {
+    width: 9px;
+    height: 9px;
+  }
+
+  .event-dot.point {
+    width: 7px;
+    height: 7px;
+    border-radius: 1px;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .event-dot:focus-visible {
+    outline: 2px solid var(--color-content-primary);
+    outline-offset: 3px;
   }
 
   .mark-hit {
     position: absolute;
     top: -11px;
-    left: 0;
+    left: 50%;
     z-index: 1;
     width: 100%;
     min-width: 24px;
     height: 22px;
+    padding: 0;
     border: 0;
     background: transparent;
     cursor: pointer;
+    transform: translateX(-50%);
   }
 
   .mark-hit::before {
