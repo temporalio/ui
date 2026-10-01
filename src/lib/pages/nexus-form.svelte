@@ -226,7 +226,7 @@
   {#snippet fields()}
     {#if nameLeading}
       <div
-        class="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_2fr] sm:gap-x-2"
+        class="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,2fr)] sm:gap-x-2"
       >
         <div>
           {@render nameLeading()}
