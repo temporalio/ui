@@ -258,7 +258,6 @@
           content={decodedValue}
           fill={false}
           compact
-          singleLine
           minHeight={0}
           overrideTheme="primary"
           title={translate('workflows.summary')}

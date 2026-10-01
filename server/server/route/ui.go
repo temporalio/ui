@@ -225,9 +225,14 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 		}
 
 		// Matches the SvelteKit route's parsing: only the exact string opts in.
+		inline := c.QueryParam("inline") == "true"
+		compact := c.QueryParam("compact") == "true"
 		bodyClass := "prose"
-		if c.QueryParam("compact") == "true" {
-			bodyClass = "prose compact"
+		if inline || compact {
+			bodyClass += " compact"
+		}
+		if inline {
+			bodyClass += " inline"
 		}
 
 		// Process markdown to HTML

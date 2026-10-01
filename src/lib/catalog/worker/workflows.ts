@@ -12,6 +12,7 @@ export { parallelActivities } from './examples/parallel-activities/workflow.js';
 export { priorityFairnessWorkflow } from './examples/priority-fairness/workflow.js';
 export { sequentialActivities } from './examples/sequential-activities/workflow.js';
 export { sequentialMarkdownActivities } from './examples/sequential-markdown-activities/workflow.js';
+export { sequentialMultilineSummaryActivities } from './examples/sequential-multiline-summary-activities/workflow.js';
 export { sequentialNoSummaryActivities } from './examples/sequential-no-summary-activities/workflow.js';
 export { sequentialPlainTextActivities } from './examples/sequential-plain-text-activities/workflow.js';
 export { signalCollector } from './examples/signal-collector/workflow.js';
