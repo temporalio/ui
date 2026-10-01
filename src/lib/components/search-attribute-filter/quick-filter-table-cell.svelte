@@ -13,7 +13,7 @@
   } from '$lib/types/workflows';
   import {
     createQuickFilter,
-    getDefaultConditional,
+    getQuickFilterConditional,
     isQuickFilterActive,
     type QuickFilterValue,
     toggleQuickFilter,
@@ -50,7 +50,7 @@
     isQuickFilterActive($filters, {
       attribute,
       value: filterValue ?? '',
-      conditional: getDefaultConditional(type),
+      conditional: getQuickFilterConditional({ attribute, type }),
     }),
   );
 

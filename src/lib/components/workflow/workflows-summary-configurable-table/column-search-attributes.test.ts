@@ -78,6 +78,25 @@ describe('getWorkflowColumnValue', () => {
     ]);
   });
 
+  it('builds a query duration from the start and end times', () => {
+    // The cell renders "1h ..." through a display formatter; the filter needs a
+    // value with no delimiter in it.
+    expect(getWorkflowColumnValue('Execution Duration', workflow)).toBe('1h');
+    expect(WORKFLOW_COLUMN_ATTRIBUTE['Execution Duration']).toBe(
+      'ExecutionDuration',
+    );
+  });
+
+  it('has no duration to filter on while the workflow is still running', () => {
+    const running = {
+      ...workflow,
+      endTime: undefined,
+    } as unknown as WorkflowExecution;
+    expect(
+      getWorkflowColumnValue('Execution Duration', running),
+    ).toBeUndefined();
+  });
+
   it.each(UNFILTERABLE_WORKFLOW_COLUMNS)(
     'has no value to filter on for %s',
     (label) => {

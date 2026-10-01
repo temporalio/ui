@@ -1,4 +1,8 @@
 import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+import {
+  durationStringToMilliseconds,
+  toQueryDuration,
+} from '$lib/utilities/format-time';
 import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
 
@@ -12,12 +16,10 @@ export const ACTIVITY_COLUMN_ATTRIBUTE: Record<string, string> = {
   End: 'CloseTime',
   'Execution Time': 'ExecutionTime',
   'State Transitions': 'StateTransitionCount',
+  'Execution Duration': 'ExecutionDuration',
 };
 
-// Execution Duration is derived rather than read from the activity, and its
-// ExecutionDuration attribute is indexed in nanoseconds, so there is no value
-// to filter by.
-export const UNFILTERABLE_ACTIVITY_COLUMNS = ['Execution Duration'];
+export const UNFILTERABLE_ACTIVITY_COLUMNS: string[] = [];
 
 export const getActivityColumnAttribute = (label: string): string =>
   ACTIVITY_COLUMN_ATTRIBUTE[label] ?? label;
@@ -45,6 +47,12 @@ export const getActivityColumnValue = (
       return activity.executionTime;
     case 'State Transitions':
       return activity.stateTransitionCount;
+    case 'Execution Duration': {
+      const milliseconds = durationStringToMilliseconds(
+        activity.executionDuration,
+      );
+      return milliseconds ? toQueryDuration(milliseconds) : undefined;
+    }
     default:
       return undefined;
   }

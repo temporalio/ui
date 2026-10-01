@@ -1,4 +1,8 @@
 import type { WorkflowExecution } from '$lib/types/workflows';
+import {
+  getMillisecondDuration,
+  toQueryDuration,
+} from '$lib/utilities/format-time';
 import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
 
@@ -14,6 +18,7 @@ export const WORKFLOW_COLUMN_ATTRIBUTE: Record<string, string> = {
   'History Size': 'HistorySizeBytes',
   'History Length': 'HistoryLength',
   'State Transitions': 'StateTransitionCount',
+  'Execution Duration': 'ExecutionDuration',
   Deployment: 'TemporalWorkerDeployment',
   'Deployment Version': 'TemporalWorkerDeploymentVersion',
   'Build ID': 'TemporalWorkerBuildId',
@@ -23,13 +28,9 @@ export const WORKFLOW_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Change Version': 'TemporalChangeVersion',
 };
 
-// Columns without a search attribute to filter on. Parent Namespace is not
-// indexed, and Execution Duration is derived from start and end times rather
-// than read from the workflow, so there is no value to filter by.
-export const UNFILTERABLE_WORKFLOW_COLUMNS = [
-  'Parent Namespace',
-  'Execution Duration',
-];
+// Parent Namespace is not an indexed search attribute, so there is nothing to
+// filter by.
+export const UNFILTERABLE_WORKFLOW_COLUMNS = ['Parent Namespace'];
 
 // Only columns the archival query surface supports. Archival visibility accepts
 // a narrower set of attributes and operators than standard visibility.
@@ -75,8 +76,17 @@ export const getWorkflowColumnValue = (
         indexedFields?.TemporalWorkerBuildId ||
         getBuildIdFromVersion(indexedFields?.TemporalWorkerDeploymentVersion)
       );
+    case 'Execution Duration': {
+      // No duration field on the workflow, and a running one has no end time, so
+      // the cell renders blank and there is nothing to filter by.
+      const milliseconds = getMillisecondDuration({
+        start: workflow.startTime,
+        end: workflow.endTime,
+        onlyUnderSecond: false,
+      });
+      return milliseconds ? toQueryDuration(milliseconds) : undefined;
+    }
     case 'Parent Namespace':
-    case 'Execution Duration':
       return undefined;
     default:
       return indexedFields?.[getWorkflowColumnAttribute(label)];

@@ -39,6 +39,41 @@ export const getDefaultConditional = (
   }
 };
 
+// Attributes that measure something, where an exact match is almost never what is
+// wanted: `HistoryLength = 17` is rarely useful when `>= 17` is. These read as
+// "at least this much" instead.
+export const RANGE_PREFERRED_ATTRIBUTES = new Set([
+  'ExecutionDuration',
+  'HistoryLength',
+  'HistorySizeBytes',
+  'StateTransitionCount',
+]);
+
+// Typed Int, but its value is a duration string rather than a number.
+const DURATION_ATTRIBUTE = 'ExecutionDuration';
+
+export const getQuickFilterConditional = ({
+  attribute,
+  type,
+}: {
+  attribute: string;
+  type: SearchAttributeType | undefined;
+}) => {
+  const isNumeric =
+    type === SEARCH_ATTRIBUTE_TYPE.INT || type === SEARCH_ATTRIBUTE_TYPE.DOUBLE;
+
+  if (isNumeric && RANGE_PREFERRED_ATTRIBUTES.has(attribute)) return '>=';
+
+  return getDefaultConditional(type);
+};
+
+// The quick filter asks for an operator whenever `=` is not the sensible default, so
+// the user picks rather than the table guessing.
+export const requiresOperatorChoice = (input: {
+  attribute: string;
+  type: SearchAttributeType | undefined;
+}): boolean => getQuickFilterConditional(input) !== '=';
+
 const formatBoolValue = (value: QuickFilterValue): string | null => {
   if (typeof value === 'boolean') return String(value);
   if (typeof value !== 'string') return null;
@@ -90,14 +125,22 @@ const formatKeywordListValue = (
 };
 
 export const formatQuickFilterValue = ({
+  attribute,
   type,
   value,
   conditional,
 }: {
+  attribute: string;
   type: SearchAttributeType;
   value: QuickFilterValue;
   conditional: string;
 }): string | null => {
+  // Already built as a duration string by the column, so it cannot go through the
+  // numeric formatting its Int type would otherwise select.
+  if (attribute === DURATION_ATTRIBUTE) {
+    return typeof value === 'string' && value ? value : null;
+  }
+
   switch (type) {
     case SEARCH_ATTRIBUTE_TYPE.BOOL:
       return formatBoolValue(value);
@@ -133,9 +176,10 @@ export const toQuickFilterValue = ({
   if (!attribute || !type) return null;
 
   return formatQuickFilterValue({
+    attribute,
     type,
     value,
-    conditional: getDefaultConditional(type),
+    conditional: getQuickFilterConditional({ attribute, type }),
   });
 };
 
@@ -151,7 +195,7 @@ export const createQuickFilter = ({
     attribute,
     type,
     value: formattedValue,
-    conditional: getDefaultConditional(type),
+    conditional: getQuickFilterConditional({ attribute, type }),
   });
 };
 

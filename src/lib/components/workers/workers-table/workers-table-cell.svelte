@@ -12,7 +12,7 @@
   import { workerSearchAttributes } from '$lib/stores/search-attributes';
   import {
     createQuickFilter,
-    getDefaultConditional,
+    getQuickFilterConditional,
     isQuickFilterActive,
     type QuickFilterValue,
     toggleQuickFilter,
@@ -71,7 +71,10 @@
       : isQuickFilterActive($workerFilters, {
           attribute: attribute ?? '',
           value: quickFilterValue ?? '',
-          conditional: getDefaultConditional(type),
+          conditional: getQuickFilterConditional({
+            attribute: attribute ?? '',
+            type,
+          }),
         }),
   );
 

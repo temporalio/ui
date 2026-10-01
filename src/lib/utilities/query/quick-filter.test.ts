@@ -11,7 +11,10 @@ import {
   createQuickFilter,
   formatQuickFilterValue,
   getDefaultConditional,
+  getQuickFilterConditional,
   isQuickFilterActive,
+  RANGE_PREFERRED_ATTRIBUTES,
+  requiresOperatorChoice,
   toggleQuickFilter,
   toQuickFilterValue,
 } from './quick-filter';
@@ -53,8 +56,9 @@ describe('getDefaultConditional', () => {
 });
 
 describe('formatQuickFilterValue', () => {
-  const format = (type, value) =>
+  const format = (type, value, attribute = 'CustomField') =>
     formatQuickFilterValue({
+      attribute,
       type,
       value,
       conditional: getDefaultConditional(type),
@@ -134,6 +138,7 @@ describe('formatQuickFilterValue', () => {
   it('does not parenthesize a KeywordList for a non-in conditional', () => {
     expect(
       formatQuickFilterValue({
+        attribute: 'CustomKeywordListField',
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
         value: ['a'],
         conditional: '=',
@@ -399,5 +404,126 @@ describe('toQuickFilterValue', () => {
         value: 'default',
       }),
     ).toBeNull();
+  });
+});
+
+describe('getQuickFilterConditional', () => {
+  it.each([...RANGE_PREFERRED_ATTRIBUTES])(
+    'prefers a range over an exact match for %s',
+    (attribute) => {
+      expect(
+        getQuickFilterConditional({
+          attribute,
+          type: SEARCH_ATTRIBUTE_TYPE.INT,
+        }),
+      ).toBe('>=');
+      expect(
+        getQuickFilterConditional({
+          attribute,
+          type: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+        }),
+      ).toBe('>=');
+    },
+  );
+
+  it('only prefers a range when the attribute is numeric', () => {
+    expect(
+      getQuickFilterConditional({
+        attribute: 'HistoryLength',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      }),
+    ).toBe('=');
+  });
+
+  it('defers to the type for every other attribute', () => {
+    expect(
+      getQuickFilterConditional({
+        attribute: 'CustomIntField',
+        type: SEARCH_ATTRIBUTE_TYPE.INT,
+      }),
+    ).toBe('=');
+    expect(
+      getQuickFilterConditional({
+        attribute: 'StartTime',
+        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      }),
+    ).toBe('>=');
+    expect(
+      getQuickFilterConditional({
+        attribute: 'CustomKeywordListField',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+      }),
+    ).toBe('in');
+  });
+});
+
+describe('requiresOperatorChoice', () => {
+  it.each([
+    ['StartTime', SEARCH_ATTRIBUTE_TYPE.DATETIME],
+    ['CustomDatetimeField', SEARCH_ATTRIBUTE_TYPE.DATETIME],
+    ['TemporalChangeVersion', SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST],
+    ['HistoryLength', SEARCH_ATTRIBUTE_TYPE.INT],
+    ['HistorySizeBytes', SEARCH_ATTRIBUTE_TYPE.INT],
+    ['StateTransitionCount', SEARCH_ATTRIBUTE_TYPE.INT],
+    ['ExecutionDuration', SEARCH_ATTRIBUTE_TYPE.INT],
+  ])('asks for an operator for %s', (attribute, type) => {
+    expect(requiresOperatorChoice({ attribute, type })).toBe(true);
+  });
+
+  it.each([
+    ['ExecutionStatus', SEARCH_ATTRIBUTE_TYPE.KEYWORD],
+    ['CustomTextField', SEARCH_ATTRIBUTE_TYPE.TEXT],
+    ['CustomBoolField', SEARCH_ATTRIBUTE_TYPE.BOOL],
+    ['CustomIntField', SEARCH_ATTRIBUTE_TYPE.INT],
+    ['CustomDoubleField', SEARCH_ATTRIBUTE_TYPE.DOUBLE],
+  ])('filters %s in one click', (attribute, type) => {
+    expect(requiresOperatorChoice({ attribute, type })).toBe(false);
+  });
+
+  it('does not ask for an operator when the type is unknown', () => {
+    expect(
+      requiresOperatorChoice({ attribute: 'ParentNamespace', type: undefined }),
+    ).toBe(false);
+  });
+});
+
+describe('ExecutionDuration', () => {
+  const executionDuration = (value) =>
+    toQuickFilterValue({
+      attribute: 'ExecutionDuration',
+      type: SEARCH_ATTRIBUTE_TYPE.INT,
+      value,
+    });
+
+  it('passes a duration string through rather than rejecting it as a number', () => {
+    expect(executionDuration('5m10s')).toBe('5m10s');
+    expect(executionDuration('123ms')).toBe('123ms');
+  });
+
+  it('has no value when the duration is missing', () => {
+    expect(executionDuration(undefined)).toBeNull();
+    expect(executionDuration('')).toBeNull();
+  });
+
+  it('round trips as a quoted duration', () => {
+    const filter = createQuickFilter({
+      attribute: 'ExecutionDuration',
+      type: SEARCH_ATTRIBUTE_TYPE.INT,
+      value: '5m10s',
+    });
+    expect(filter.conditional).toBe('>=');
+
+    const query = toListWorkflowQueryFromFilters([filter]);
+    expect(query).toBe('`ExecutionDuration`>="5m10s"');
+
+    const [parsed] = toListWorkflowFilters(query, {
+      ...attributes,
+      ExecutionDuration: SEARCH_ATTRIBUTE_TYPE.INT,
+    });
+    expect(parsed).toMatchObject({
+      attribute: 'ExecutionDuration',
+      value: '5m10s',
+      conditional: '>=',
+    });
   });
 });

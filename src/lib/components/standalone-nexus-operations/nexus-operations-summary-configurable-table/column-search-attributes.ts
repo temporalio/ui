@@ -1,4 +1,8 @@
 import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
+import {
+  durationStringToMilliseconds,
+  toQueryDuration,
+} from '$lib/utilities/format-time';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
 
 export const NEXUS_OPERATION_COLUMN_ATTRIBUTE: Record<string, string> = {
@@ -11,12 +15,10 @@ export const NEXUS_OPERATION_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Schedule Time': 'ScheduleTime',
   'Close Time': 'CloseTime',
   'State Transitions': 'StateTransitionCount',
+  'Execution Duration': 'ExecutionDuration',
 };
 
-// Execution Duration is derived from the schedule and close times, and its
-// ExecutionDuration attribute is indexed in nanoseconds, so there is no value
-// to filter by.
-export const UNFILTERABLE_NEXUS_OPERATION_COLUMNS = ['Execution Duration'];
+export const UNFILTERABLE_NEXUS_OPERATION_COLUMNS: string[] = [];
 
 export const getNexusOperationColumnAttribute = (label: string): string =>
   NEXUS_OPERATION_COLUMN_ATTRIBUTE[label] ?? label;
@@ -44,6 +46,12 @@ export const getNexusOperationColumnValue = (
       return operation.closeTime;
     case 'State Transitions':
       return operation.stateTransitionCount;
+    case 'Execution Duration': {
+      const milliseconds = durationStringToMilliseconds(
+        operation.executionDuration,
+      );
+      return milliseconds ? toQueryDuration(milliseconds) : undefined;
+    }
     default:
       return undefined;
   }
