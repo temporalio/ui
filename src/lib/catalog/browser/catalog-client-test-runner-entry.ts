@@ -173,8 +173,10 @@ export async function resolveReadiness(checks: ReadinessCheck[]) {
 
 export async function renderList({
   exampleHref = (exampleId: string) => `/examples/${exampleId}`,
+  workerState = 'ready',
 }: {
   exampleHref?: (exampleId: string) => string;
+  workerState?: ReadinessCheck['state'];
 } = {}) {
   readinessCallCount = 0;
   prepareStartPromise();
@@ -184,7 +186,7 @@ export async function renderList({
       {
         kind: 'worker',
         required: false,
-        state: 'ready',
+        state: workerState,
         taskQueueType: 1,
       },
     ];
