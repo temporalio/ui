@@ -49,8 +49,11 @@ const layerIcon = (layer: string) => {
 
 const hasExtension =
   Boolean(variant.colorScheme) || instance.getBoolean('showExtension');
+const extensionTextLayer = instance.findText('Extension Text');
 const extensionText =
-  hasExtension && instance.getBoolean('showExtensionText')
+  hasExtension &&
+  extensionTextLayer.type === 'TEXT' &&
+  instance.getBoolean('showExtensionText')
     ? instance.getString('extensionText')
     : undefined;
 const ExtensionLeadIcon =
