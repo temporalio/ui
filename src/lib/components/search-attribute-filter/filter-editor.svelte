@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { get, writable } from 'svelte/store';
+
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
 
@@ -53,15 +55,29 @@
     idPrefix: string;
     onApply: (filter: SearchAttributeFilter) => void;
     onRemove?: () => void;
+    // A cell popup is seeded with that row's own timestamp, so it has to start
+    // in absolute mode: relative mode recomputes the value from the duration
+    // inputs on apply and would throw the seeded value away.
+    defaultTimeMode?: 'relative' | 'absolute';
   };
 
-  let { filter, idPrefix, onApply, onRemove }: Props = $props();
+  let { filter, idPrefix, onApply, onRemove, defaultTimeMode }: Props =
+    $props();
 
   let localFilter = $state({ ...filter });
+
+  // Local so the radios do not rewrite the persisted preference until applied.
+  const timeMode = writable(defaultTimeMode ?? get(timeFormatType));
 
   const timezone = $derived(getTimezone($timeFormat ?? 'UTC'));
 
   let { start, end } = $state(getInitialDateTimes(filter, timezone));
+
+  // The date and time pickers only carry seconds, so recomputing the value from
+  // them would round off a seeded timestamp. Keep what we were given unless the
+  // controls were actually touched.
+  const seededTimes = JSON.stringify(getInitialDateTimes(filter, timezone));
+  const timesUntouched = () => JSON.stringify({ start, end }) === seededTimes;
 
   let chips = $derived(formatListFilterValue(localFilter.value));
   const isNullFilter = $derived(isNullConditional(localFilter.conditional));
@@ -139,6 +155,7 @@
       localFilter.value = `(${chips.map((item) => `"${item}"`).join(', ')})`;
     } else if (isDateTimeFilter(localFilter)) {
       onTimeApply();
+      timeFormatType.set($timeMode);
     }
     onApply(localFilter);
   }
@@ -170,13 +187,24 @@
 
   const onTimeApply = () => {
     if (isNullFilter) return;
-    if ($timeFormatType === 'relative' && !isTimeRange) {
+    if ($timeMode === 'relative' && !isTimeRange) {
       if (!$relativeTimeDuration) return;
       localFilter.value = toDate(
         `${$relativeTimeDuration} ${$relativeTimeUnit}`,
       );
       localFilter.customDate = false;
     } else {
+      if (
+        timesUntouched() &&
+        !isTimeRange &&
+        filter.value &&
+        !filter.customDate
+      ) {
+        localFilter.value = filter.value;
+        localFilter.customDate = false;
+        return;
+      }
+
       let startDateWithTime = applyTimeChanges(start.date, {
         hour: start.hour,
         minute: start.minute,
@@ -307,7 +335,7 @@
               id="{idPrefix}-relative-time"
               value="relative"
               name="{idPrefix}-time-filter-type"
-              group={timeFormatType}
+              group={timeMode}
               disabled={isNullFilter}
             />
             <div class="ml-6 flex gap-2 pt-2">
@@ -319,14 +347,14 @@
                 placeholder="00"
                 error={timeError($relativeTimeDuration)}
                 class="h-10"
-                disabled={$timeFormatType !== 'relative' || isNullFilter}
+                disabled={$timeMode !== 'relative' || isNullFilter}
               />
               <Select
                 bind:value={$relativeTimeUnit}
                 id="{idPrefix}-relative-datetime-unit-input"
                 label={translate('common.time-unit')}
                 labelHidden
-                disabled={$timeFormatType !== 'relative' || isNullFilter}
+                disabled={$timeMode !== 'relative' || isNullFilter}
               >
                 {#each TIME_UNIT_OPTIONS as unit (unit)}
                   <Option value={unit}>{unit} {translate('common.ago')}</Option>
@@ -340,7 +368,7 @@
               id="{idPrefix}-absolute-time"
               value="absolute"
               name="{idPrefix}-time-filter-type"
-              group={timeFormatType}
+              group={timeMode}
               disabled={isNullFilter}
             />
             <div class="ml-6 flex flex-col gap-2">
@@ -352,7 +380,7 @@
                 todayLabel={translate('common.today')}
                 closeLabel={translate('common.close')}
                 clearLabel={translate('common.clear-input-button-label')}
-                disabled={$timeFormatType !== 'absolute' || isNullFilter}
+                disabled={$timeMode !== 'absolute' || isNullFilter}
               />
               <TimePicker
                 class="flex-col sm:flex-row"
@@ -360,7 +388,7 @@
                 bind:minute={start.minute}
                 bind:second={start.second}
                 twelveHourClock={false}
-                disabled={$timeFormatType !== 'absolute'}
+                disabled={$timeMode !== 'absolute'}
               />
             </div>
           </div>

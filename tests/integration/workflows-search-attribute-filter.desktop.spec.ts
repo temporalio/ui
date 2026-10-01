@@ -358,18 +358,71 @@ test('it should quick filter by a Status cell and toggle it back off', async ({
   ).toBeHidden();
 });
 
-test('it should quick filter a Start cell on the raw timestamp with >=', async ({
+test('it should ask for an operator before filtering a Start cell', async ({
   page,
 }) => {
   await clickQuickFilter(page, 'Start');
 
+  // Opening the popup must not filter anything on its own.
+  await expect(page.getByRole('button', { name: 'After' })).toBeVisible();
+  expect(getQueryParam(page.url())).toBe('');
+
+  await page.getByTestId('apply-filter-button').click();
+
   await expect
     .poll(() => getQueryParam(page.url()))
     .toBe(`\`StartTime\`>="${MOCK_START_TIME}"`);
-
   await expect(
     page.getByRole('button', { name: /StartTime >=/ }),
   ).toBeVisible();
+});
+
+test('it should quick filter a Start cell with a chosen operator', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Start');
+
+  await page.getByRole('button', { name: 'Before' }).click();
+  await page.getByTestId('apply-filter-button').click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe(`\`StartTime\`<="${MOCK_START_TIME}"`);
+});
+
+test('it should seed the popup with the value in the cell', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Start');
+  await page.getByTestId('apply-filter-button').click();
+
+  // The cell renders the timestamp in the user's format; the filter has to carry
+  // the raw value behind it, down to the nanoseconds.
+  await expect.poll(() => getQueryParam(page.url())).toContain(MOCK_START_TIME);
+});
+
+test('it should filter a Status cell in one click, with no popup', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Status');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`ExecutionStatus`="Running"');
+  await expect(page.getByTestId('apply-filter-button')).toBeHidden();
+});
+
+test('it should keep the popup open when the pointer leaves the cell', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Start');
+  await expect(page.getByRole('button', { name: 'After' })).toBeVisible();
+
+  // The popup is anchored to a button that only exists while the cell is
+  // hovered, so the cell has to keep it mounted while the popup is open.
+  await page.getByTestId('workflows-summary-table-header-cell-Type').hover();
+
+  await expect(page.getByRole('button', { name: 'After' })).toBeVisible();
 });
 
 test('it should collapse a multi-status filter to the status that was clicked', async ({
