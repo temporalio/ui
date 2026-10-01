@@ -352,6 +352,24 @@ func renderRequest(t *testing.T, query string) string {
 	return rec.Body.String()
 }
 
+func TestSetRenderRoute_WithPublicPath(t *testing.T) {
+	e := echo.New()
+	e.Pre(PublicPath("/custom"))
+	SetRenderRoute(e, "/")
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/custom/render?content=Summary&theme=dark&overrideTheme=primary",
+		nil,
+	)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), "<p>Summary</p>")
+	assert.Contains(t, rec.Body.String(), `data-theme="dark-primary"`)
+}
+
 // The SvelteKit route and this one are separate implementations of the same
 // page, so an embedder that asks for compact has to get it from both.
 func TestSetRenderRoute_CompactBodyClass(t *testing.T) {
