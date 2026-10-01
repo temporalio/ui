@@ -1,7 +1,7 @@
 import { createRequire } from 'node:module';
 
 import { Client, Connection } from '@temporalio/client';
-import { Worker } from '@temporalio/worker';
+import { NativeConnection, Worker } from '@temporalio/worker';
 import yargs from 'yargs/yargs';
 
 import * as activities from '../temporal/activities/index';
@@ -29,10 +29,16 @@ const argv = await yargs(process.argv.slice(2))
   .parse();
 
 async function main() {
-  const connection = await Connection.connect();
+  const connection = await Connection.connect({
+    address: process.env.TEMPORAL_ADDRESS ?? '127.0.0.1:7233',
+  });
   const dataConverter = await getDataConverter();
   const client = new Client({ connection, dataConverter });
+  const nativeAddress = process.env.TEMPORAL_ADDRESS;
   const worker = await Worker.create({
+    connection: nativeAddress
+      ? await NativeConnection.connect({ address: nativeAddress })
+      : undefined,
     activities,
     dataConverter,
     taskQueue,

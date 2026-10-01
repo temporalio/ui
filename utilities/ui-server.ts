@@ -23,8 +23,9 @@ const portForEnv = (env: ValidEnv) => {
 
 export const createUIServer = async (
   env: ValidEnv = 'development',
-  options?: { verbose?: boolean },
+  options?: { verbose?: boolean; port?: number },
 ) => {
+  const port = options?.port ?? portForEnv(env);
   $.cwd = join(process.cwd(), 'server');
 
   // Check for verbose mode via env var or options
@@ -48,7 +49,7 @@ export const createUIServer = async (
     // Use Air for hot reloading in development
     uiServerProcess = verbose ? $`air` : $`air`.quiet();
     console.log(
-      `✨ ui-server running in ${env} mode with hot reload on port ${portForEnv(env)}`,
+      `✨ ui-server running in ${env} mode with hot reload on port ${port}`,
     );
   } else {
     // Use traditional build for e2e
@@ -56,9 +57,7 @@ export const createUIServer = async (
     uiServerProcess = verbose
       ? $`./ui-server --env ${env} start`
       : $`./ui-server --env ${env} start`.quiet();
-    console.log(
-      `✨ ui-server running in ${env} mode on port ${portForEnv(env)}`,
-    );
+    console.log(`✨ ui-server running in ${env} mode on port ${port}`);
   }
 
   const shutdown = async () => {
@@ -68,7 +67,7 @@ export const createUIServer = async (
   };
 
   const ready = async () => {
-    return waitForPort({ port: portForEnv(env), output: 'silent' });
+    return waitForPort({ port, output: 'silent' });
   };
 
   uiServer = {

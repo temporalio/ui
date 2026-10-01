@@ -38,9 +38,11 @@ export function uiServerPlugin(): Plugin {
       if (shouldSkip(server)) return;
 
       const uiPort = getPortFromApiEndpoint(server.config.env.VITE_API);
+      process.env.TEMPORAL_UI_PORT = String(uiPort);
+
       console.log(cyan(`Starting Temporal UI Server on Port ${uiPort}…`));
 
-      uiServer = await createUIServer(serverEnv(server));
+      uiServer = await createUIServer(serverEnv(server), { port: uiPort });
       await uiServer.ready();
 
       console.log(cyan(`Temporal UI Server is running on Port ${uiPort}.`));

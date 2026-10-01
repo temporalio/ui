@@ -81,7 +81,11 @@ export function temporalServer(): Plugin {
       if (shouldSkip(server)) return;
 
       const port = validatePort(server.config.env.VITE_TEMPORAL_PORT, 7233);
-      const uiPort = getPortFromApiEndpoint(server.config.env.VITE_API);
+      const uiPort = server.config.env.VITE_TEMPORAL_UI_PORT
+        ? validatePort(server.config.env.VITE_TEMPORAL_UI_PORT, 8233)
+        : getPortFromApiEndpoint(server.config.env.VITE_API);
+
+      process.env.TEMPORAL_ADDRESS = `127.0.0.1:${port}`;
 
       console.log(magenta(`Starting Temporal Server on Port ${port}…`));
 

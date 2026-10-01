@@ -1,6 +1,11 @@
 import { createRequire } from 'node:module';
 
-import { DefaultLogger, Runtime, Worker } from '@temporalio/worker';
+import {
+  DefaultLogger,
+  NativeConnection,
+  Runtime,
+  Worker,
+} from '@temporalio/worker';
 
 const logger = new DefaultLogger('ERROR', () => {});
 
@@ -14,7 +19,11 @@ const require = createRequire(import.meta.url);
 let worker: Worker;
 
 const createWorker = async (): Promise<Worker> => {
+  const address = process.env.TEMPORAL_ADDRESS;
   return Worker.create({
+    connection: address
+      ? await NativeConnection.connect({ address })
+      : undefined,
     dataConverter: await getDataConverter(),
     workflowsPath: require.resolve('./workflows'),
     activities,

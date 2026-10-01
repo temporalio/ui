@@ -21,8 +21,11 @@ export const disconnect = async () => {
   }
 };
 
+export const temporalAddress = (): string =>
+  process.env.TEMPORAL_ADDRESS ?? '127.0.0.1:7233';
+
 export const connect = async () => {
-  connection = await Connection.connect();
+  connection = await Connection.connect({ address: temporalAddress() });
 
   const client = new Client({
     connection,

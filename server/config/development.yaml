@@ -1,5 +1,7 @@
+# enable-template
+temporalGrpcAddress: {{ env "TEMPORAL_ADDRESS" | default "127.0.0.1:7233" }}
 publicPath:
-port: 8081
+port: {{ env "TEMPORAL_UI_PORT" | default "8081" }}
 enableUi: true
 cors:
   cookieInsecure: false
