@@ -63,10 +63,15 @@
           <span>Recorded marker (local activity)</span>
         </li>
         <li>
-          <span class="specimen" aria-hidden="true"
-            ><span class="cluster"></span></span
+          <span class="specimen cluster-specimens" aria-hidden="true">
+            <span class="cluster"></span>
+            <span class="cluster diamond"></span>
+            <span class="cluster marker"></span>
+          </span>
+          <span
+            >Outlined shapes group multiple events of that type; clusters
+            separate when zoomed in</span
           >
-          <span>Multiple events; clusters separate when zoomed in</span>
         </li>
       </ul>
     </section>
@@ -251,6 +256,20 @@
     border: 2px solid var(--workflow-color);
     border-radius: 50%;
     background: var(--color-surface-primary, white);
+  }
+
+  .cluster-specimens {
+    gap: 3px;
+  }
+
+  .cluster-specimens .cluster {
+    width: 9px;
+    height: 9px;
+  }
+
+  .cluster.diamond,
+  .cluster.marker {
+    border-radius: 1px;
   }
 
   .colors {

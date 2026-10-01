@@ -1120,9 +1120,12 @@
     width: 9px;
     height: 9px;
     border: 2px solid var(--event-color);
-    border-radius: 50%;
     background: var(--color-surface-primary);
-    transform: translate(-50%, -50%);
+  }
+
+  .event-dot.cluster.diamond {
+    width: 7px;
+    height: 7px;
   }
 
   .event-dot:focus-visible {
