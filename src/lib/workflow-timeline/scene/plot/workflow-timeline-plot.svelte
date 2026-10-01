@@ -1,8 +1,6 @@
 <script lang="ts">
   import { SvelteSet } from 'svelte/reactivity';
 
-  import { tick, untrack } from 'svelte';
-
   import { colorScales } from '$lib/theme/io/themes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
@@ -22,6 +20,11 @@
   } from './mark-presentation';
   import { getMinimapLandmarks } from './minimap-landmarks';
   import { getTimeTicks, type TimeRange, timeToX } from './time-viewport';
+  import {
+    getInitialViewport,
+    getViewportScrollLeft,
+    getViewportStartMs,
+  } from './viewport-anchor';
   import { getWheelTimeRange } from './wheel-time-range';
   import { getWorkflowStatus } from './workflow-status';
   import type { ExecutionHistoryState } from '../../data/execution-history/types';
@@ -62,7 +65,7 @@
   let viewportWidth = $state(0);
   let viewportHeight = $state(0);
   let requestedDuration = $state<number | null>(null);
-  let initialLiveDuration = $state<number | null>(null);
+  let initialViewport = $state<TimeRange | null>(null);
   let pinned = $state(true);
   let unpinnedStartMs = $state<number | null>(null);
   let selectedRow = $state<TimelineEventRow | null>(null);
@@ -124,25 +127,18 @@
     Math.min(360, Math.max(220, viewportWidth * 0.32)),
   );
   const width = $derived(Math.max(1, viewportWidth - labelWidth));
-  const defaultDuration = $derived(
-    polling
-      ? Math.min(
-          domainDuration,
-          initialLiveDuration ??
-            Math.max(60_000, Math.min(3_600_000, domainDuration / 4)),
-        )
-      : domainDuration,
+  const initialViewportCandidate = $derived(
+    getInitialViewport(historyEvents, executionHistories),
   );
   const duration = $derived(
-    Math.min(domainDuration, requestedDuration ?? defaultDuration),
+    Math.min(domainDuration, requestedDuration ?? domainDuration),
   );
   const contentWidth = $derived(
     Math.min(MAX_WIDTH, Math.max(width, (width * domainDuration) / duration)),
   );
   const viewport = $derived.by((): TimeRange | null => {
     if (!domain) return null;
-    const startMs =
-      domain.startMs + (scrollLeft / contentWidth) * domainDuration;
+    const startMs = getViewportStartMs(scrollLeft, domain, contentWidth);
     return {
       startMs,
       endMs: Math.min(
@@ -213,13 +209,6 @@
     pinned = polling && range.endMs >= domain.endMs - 1;
     unpinnedStartMs = pinned ? null : range.startMs;
     requestedDuration = nextDuration;
-    void tick().then(() => {
-      if (!scroller || !domain) return;
-      scroller.scrollLeft = Math.max(
-        0,
-        timeToX(range.startMs, domain, contentWidth),
-      );
-    });
   }
 
   function handlePlotWheel(event: WheelEvent): void {
@@ -259,26 +248,26 @@
   });
 
   $effect(() => {
-    if (!scroller || !domain) return;
-    if (polling && pinned) {
-      scroller.scrollLeft = Math.max(0, contentWidth - width);
-    } else {
-      const startMs = untrack(() => unpinnedStartMs);
-      if (startMs !== null) {
-        scroller.scrollLeft = Math.max(
-          0,
-          timeToX(startMs, domain, contentWidth),
-        );
-      }
-    }
+    if (!scroller || !domain || !initialViewport) return;
+    const startMs = unpinnedStartMs ?? initialViewport.startMs;
+    const nextScrollLeft =
+      polling && pinned
+        ? Math.max(0, contentWidth - width)
+        : getViewportScrollLeft(startMs, domain, contentWidth);
+    scroller.scrollLeft = nextScrollLeft;
+    scrollLeft = scroller.scrollLeft;
   });
 
   $effect.pre(() => {
-    if (polling && domain && initialLiveDuration === null) {
-      initialLiveDuration = Math.max(
-        60_000,
-        Math.min(3_600_000, domainDuration / 4),
-      );
+    if (!initialViewport && initialViewportCandidate && domain) {
+      initialViewport = initialViewportCandidate;
+      requestedDuration = polling
+        ? Math.min(
+            domainDuration,
+            Math.max(60_000, Math.min(3_600_000, domainDuration / 4)),
+          )
+        : initialViewportCandidate.endMs - initialViewportCandidate.startMs;
+      unpinnedStartMs = initialViewportCandidate.startMs;
     }
     if (polling && viewport) lastLiveViewport = viewport;
     if (previousPolling && !polling && lastLiveViewport) {
@@ -413,7 +402,15 @@
 
 <div class="timeline">
   <WorkflowTimelineIconDefs />
-  <WorkflowTimelineLegend />
+  <div class="timeline-tools">
+    <button
+      type="button"
+      class="fit-timeline"
+      disabled={!domain || !initialViewport}
+      onclick={() => domain && selectRange(domain)}>Fit entire timeline</button
+    >
+    <div><WorkflowTimelineLegend /></div>
+  </div>
   <div class="minimap-area" style:margin-left={`${labelWidth}px`}>
     <WorkflowTimelineMinimap
       {domain}
@@ -436,7 +433,15 @@
     onwheel={handlePlotWheel}
     onscroll={(event) => {
       scrollTop = event.currentTarget.scrollTop;
-      scrollLeft = event.currentTarget.scrollLeft;
+      const nextScrollLeft = event.currentTarget.scrollLeft;
+      if (domain && Math.abs(nextScrollLeft - scrollLeft) > 0.5) {
+        unpinnedStartMs = getViewportStartMs(
+          nextScrollLeft,
+          domain,
+          contentWidth,
+        );
+      }
+      scrollLeft = nextScrollLeft;
       if (polling) {
         const remaining =
           event.currentTarget.scrollWidth -
@@ -718,6 +723,37 @@
     width: 100%;
 
     --page-gutter: 1rem;
+  }
+
+  .timeline-tools {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 12px;
+    font-size: 12px;
+  }
+
+  .fit-timeline {
+    padding: 2px 6px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .fit-timeline:hover:not(:disabled) {
+    background: var(--color-surface-secondary);
+  }
+
+  .fit-timeline:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .fit-timeline:focus-visible {
+    outline: 2px solid var(--color-content-primary);
+    outline-offset: 2px;
   }
 
   .minimap-area {
