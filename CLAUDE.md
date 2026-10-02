@@ -56,7 +56,18 @@ const { form, errors, enhance } = $derived(
 3. **Test execution**: Run appropriate test suites based on changes
 4. **Follow patterns**: Use existing component patterns and utility functions
 5. **Design system**: Prefer Holocene components over custom implementations
-6. **Accessibility**: Ensure proper ARIA attributes and semantic HTML
+6. **Accessibility**: Enforced, not optional — see the Accessibility section below; run `pnpm check:a11y` before pushing UI changes.
+
+## Accessibility
+
+Svelte compiler accessibility warnings are gated as **CI errors** via `pnpm check:a11y` (the `check-a11y` job) — a PR that introduces an `a11y_*` warning fails. Run it locally before pushing.
+
+- **Compose Holocene primitives; don't hand-roll interactive elements.** `Button`, `Input`, `Select`, `Combobox`, `Checkbox`, `RadioGroup`, `Tooltip`, `Modal`, `Drawer`, `Menu`, `Table`, `Accordion` own the a11y contract (name, role, keyboard, focus). A `<div role="button">`, `<tr onclick>`, or CSS `:after` "tooltip" is the top source of audit findings.
+- **Every interactive control needs** an accessible name, a keyboard path (Enter/Space, Escape to dismiss), and a visible focus indicator. Icon-only buttons get an `aria-label`. Form controls get a real (non-empty) label; forward native `required`; set `aria-invalid`/`aria-describedby` on the focusable control.
+- **Don't signal state by color alone; live regions must pre-exist empty; `<th>` needs `scope`; DOM order must equal visual order (no `flex-*-reverse`).**
+- axe (Storybook `addon-a11y`, Playwright `tests/accessibility/`) is a floor — it can't see keyboard operability, focus order, or name quality. Keyboard-walk changes and verify announcements with a screen reader.
+
+Audit/review conventions (manifest, PR labels, per-SC authoring & review guidance) live in the `winston-claude-skills` a11y skills.
 
 ## Code Generation
 
