@@ -4,8 +4,8 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import LegacyWorkflowTimelineLayout from '$lib/layouts/workflow-timeline-layout.svelte';
-  import { shouldUseNewWorkflowTimeline } from '$lib/workflow-timeline/feature';
-  import WorkflowTimelineLayout from '$lib/workflow-timeline/workflow-timeline-layout.svelte';
+  import { shouldUseNewWorkflowTimeline } from '$lib/workflow-view/timeline/feature';
+  import WorkflowView from '$lib/workflow-view/workflow-view.svelte';
 
   const workflow = $derived(page.params.workflow);
   const identity = $derived({
@@ -24,7 +24,7 @@
 />
 {#if newTimelineEnabled}
   {#key page.url.pathname}
-    <WorkflowTimelineLayout {identity} />
+    <WorkflowView {identity} />
   {/key}
 {:else}
   <LegacyWorkflowTimelineLayout />
