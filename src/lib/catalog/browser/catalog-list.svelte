@@ -1,5 +1,7 @@
 <script lang="ts">
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -42,6 +44,7 @@
   let filter = $state<SourceFilter>('all');
   let runError = $state('');
   let pendingRunCounts = $state<Record<string, number>>({});
+  let workerUnavailable = $state(false);
   let sessions = $derived($sessionStore.sessions);
   let sources = $derived(catalogSources(descriptors));
   let visibleDescriptors = $derived(
@@ -61,6 +64,23 @@
       );
     }),
   );
+
+  $effect(() => {
+    const [example] = descriptors;
+    if (!example) return;
+    const controller = new AbortController();
+
+    host
+      .checkReadiness(example.id, controller.signal)
+      .then((checks) => {
+        workerUnavailable = checks.some(
+          (check) => check.kind === 'worker' && check.state === 'unavailable',
+        );
+      })
+      .catch(() => {});
+
+    return () => controller.abort();
+  });
 
   const latestSession = (descriptor: BrowserCatalogDescriptor) => {
     void sessions;
@@ -167,6 +187,27 @@
     <span class="text-secondary">Not run</span>
   {/if}
 {/snippet}
+
+<Alert
+  intent="warning"
+  title="No Worker is polling"
+  data-testid="catalog-worker-unavailable"
+  hidden={!workerUnavailable}
+>
+  <p>Catalog examples will wait until a Worker is running.</p>
+  <p class="-mt-2 flex items-end gap-1">
+    Start one with:
+    <Copyable
+      visible
+      clickAllToCopy
+      content="pnpm catalog worker"
+      copyIconTitle="Copy the worker start command"
+      copySuccessIconTitle="Copied the worker start command"
+      container-class="mt-2"
+      class="font-mono text-xs"
+    />
+  </p>
+</Alert>
 
 <div class="space-y-4">
   <div
