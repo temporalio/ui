@@ -1,5 +1,7 @@
 import { createSubscriber } from 'svelte/reactivity';
 
+import { untrack } from 'svelte';
+
 import { EventMarkerGroupRepository } from './data/event-marker-groups/repository';
 import type { EventMarkerGroup } from './data/event-marker-groups/types';
 import type { ExecutionDetailsState } from './data/execution-details/types';
@@ -8,9 +10,10 @@ import { ExecutionGraphRepository } from './data/execution-graph/repository';
 import type { ExecutionGraphSnapshot } from './data/execution-graph/types';
 import { ExecutionHistoryRepository } from './data/execution-history/repository';
 import type { ExecutionHistoryState } from './data/execution-history/types';
+import { isTerminalExecutionEvent } from './data/history-events/is-terminal-execution-event';
 import { HistoryEventRepository } from './data/history-events/repository';
 import type { QualifiedHistoryEvent } from './data/history-events/types';
-import type { ExecutionIdentity } from './data/identity-keys';
+import { type ExecutionIdentity, getExecutionKey } from './data/identity-keys';
 import { LifecycleGroupRepository } from './data/lifecycle-groups/repository';
 import type { LifecycleGroup } from './data/lifecycle-groups/types';
 
@@ -60,16 +63,26 @@ export function useWorkflowView(
     lifecycleGroupRepository.subscribe(update),
   );
 
-  $effect(() =>
-    historyEventRepository.subscribe(
+  $effect(() => {
+    const selectedExecutionKey = getExecutionKey(getIdentity());
+    return historyEventRepository.subscribe(
       ({ events }) => {
         lifecycleGroupRepository.addEvents(events);
         eventMarkerGroupRepository.addEvents(events);
         executionGraphRepository.addEvents(events);
+        if (
+          events.some(
+            (event) =>
+              event.executionKey === selectedExecutionKey &&
+              isTerminalExecutionEvent(event.eventType),
+          )
+        ) {
+          untrack(() => void executionDetails.refresh());
+        }
       },
       { emitCurrentSnapshot: true },
-    ),
-  );
+    );
+  });
 
   let coordinator: ExecutionGraphCoordinator | null = null;
   $effect(() => {
