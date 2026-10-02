@@ -8,6 +8,7 @@
   import { fromEventToRawEvent } from '$lib/models/event-history';
   import { decodeEventHistory } from '$lib/stores/events';
   import type { WorkflowEvents } from '$lib/types/events';
+  import { isEditableTarget } from '$lib/utilities/is-editable-target';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {
@@ -23,6 +24,7 @@
   );
 
   function handleKeydown(event: KeyboardEvent) {
+    if (isEditableTarget(event)) return;
     switch (event.code) {
       case 'ArrowRight':
       case 'KeyL':
