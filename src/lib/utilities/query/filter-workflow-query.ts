@@ -8,7 +8,12 @@ import {
   type SearchAttributeType,
 } from '$lib/types/workflows';
 
-import { isInConditional, isNullConditional, isStartsWith } from '../is';
+import {
+  isContains,
+  isInConditional,
+  isNullConditional,
+  isStartsWith,
+} from '../is';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
@@ -118,6 +123,12 @@ const toFilterQueryStatement = (
       type,
       conditional,
     })}`;
+  }
+
+  // Contains: the user-typed value is wrapped in '%' wildcards to produce a
+  // substring-matching LIKE pattern.
+  if (isContains(conditional)) {
+    return `\`${queryKey}\` ${conditional} "%${value}%"`;
   }
 
   return `\`${queryKey}\`${conditional}${formatValue({
