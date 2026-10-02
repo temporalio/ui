@@ -61,7 +61,7 @@ function toJSON({ metadata, data }: Payload): JSONPayload {
 export async function createCodecServer(
   { port }: CodecServerOptions = { port: PORT },
 ): Promise<CodecServer> {
-  let server: Server;
+  let server: Server | undefined;
   const app: Application = express();
   const codec = await EncryptionCodec.create('test-key-id');
 
@@ -100,23 +100,32 @@ export async function createCodecServer(
 
   const start = () =>
     new Promise<Server>((resolve, reject) => {
-      server = app.listen(port, () => {
+      const startedServer = app.listen(port, () => {
         console.log(`✨ codec server listening on http://127.0.0.1:${port}`);
-        server.on('error', (error) => {
-          reject(error);
-        });
-        resolve(server);
+        resolve(startedServer);
+      });
+
+      server = startedServer;
+
+      startedServer.on('error', (error) => {
+        reject(error);
       });
     });
 
   const stop = () =>
     new Promise<void>((resolve, reject) => {
+      if (!server) {
+        resolve();
+        return;
+      }
+
       server.close((error) => {
         if (error) {
           reject(error);
           return;
         }
 
+        server = undefined;
         console.log('🔪 killed codec server');
         resolve();
       });
