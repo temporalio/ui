@@ -27,6 +27,7 @@
     getMarkPresentation,
   } from './mark-presentation';
   import { getMinimapLandmarks } from './minimap-landmarks';
+  import { observePageViewport } from './observe-page-viewport';
   import {
     getTimeTicks,
     getTimeTickStep,
@@ -78,6 +79,7 @@
   let scrollLeft = $state(0);
   let viewportWidth = $state(0);
   let viewportHeight = $state(0);
+  let controlsHeight = $state(0);
   let requestedDuration = $state<number | null>(null);
   let initialViewport = $state<TimeRange | null>(null);
   let pinned = $state(false);
@@ -208,7 +210,7 @@
   const visibleRange = $derived(
     getVisiblePlotRowRange(
       rowLayout.rows,
-      Math.max(0, scrollTop - AXIS_HEIGHT),
+      Math.max(0, scrollTop + controlsHeight - AXIS_HEIGHT),
       Math.max(0, scrollTop + viewportHeight - AXIS_HEIGHT),
       OVERSCAN,
     ),
@@ -544,49 +546,54 @@
 
 <div class="timeline">
   <WorkflowTimelineIconDefs />
-  <div class="timeline-tools">
-    {#if polling}
+  <div class="timeline-controls" bind:clientHeight={controlsHeight}>
+    <div class="timeline-tools">
+      {#if polling}
+        <button
+          type="button"
+          class="fit-timeline"
+          aria-pressed={pinned}
+          disabled={!initialViewport}
+          onclick={toggleLiveFollow}
+          >{pinned ? 'Following live' : 'Follow live'}</button
+        >
+      {/if}
       <button
         type="button"
         class="fit-timeline"
-        aria-pressed={pinned}
-        disabled={!initialViewport}
-        onclick={toggleLiveFollow}
-        >{pinned ? 'Following live' : 'Follow live'}</button
+        disabled={!domain || !initialViewport}
+        onclick={() => domain && selectRange(domain, 'zoom')}
+        >Fit entire timeline</button
       >
-    {/if}
-    <button
-      type="button"
-      class="fit-timeline"
-      disabled={!domain || !initialViewport}
-      onclick={() => domain && selectRange(domain, 'zoom')}
-      >Fit entire timeline</button
-    >
-    <div><WorkflowTimelineLegend /></div>
+      <div><WorkflowTimelineLegend /></div>
+    </div>
+    <div class="minimap-area" style:margin-left={`${labelWidth}px`}>
+      <WorkflowTimelineMinimap
+        {domain}
+        {viewport}
+        landmarks={minimapLandmarks}
+        minDurationMs={minimumDuration}
+        pinnedLive={polling && pinned}
+        onselect={selectRange}
+      />
+    </div>
   </div>
-  <div class="minimap-area" style:margin-left={`${labelWidth}px`}>
-    <WorkflowTimelineMinimap
-      {domain}
-      {viewport}
-      landmarks={minimapLandmarks}
-      minDurationMs={minimumDuration}
-      pinnedLive={polling && pinned}
-      onselect={selectRange}
-    />
-  </div>
-  <div class="plot-frame" style:max-height={`${plotHeight}px`}>
+  <div class="plot-frame" style:height={`${plotHeight}px`}>
     <div
       class="scroller"
       role="region"
       aria-label="Workflow timeline plot"
       bind:this={scroller}
       bind:clientWidth={viewportWidth}
-      bind:clientHeight={viewportHeight}
+      use:observePageViewport={(viewport) => {
+        scrollTop = viewport.top;
+        viewportHeight = viewport.height;
+      }}
       onwheel={handlePlotWheel}
       onpointerdown={handlePlotPointerDown}
       onscroll={(event) => {
         const nextScrollLeft = event.currentTarget.scrollLeft;
-        scrollTop = event.currentTarget.scrollTop;
+
         if (!pinned && plotDomain && nextScrollLeft !== scrollLeft) {
           unpinnedStartMs = getViewportStartMs(
             nextScrollLeft,
@@ -598,7 +605,11 @@
       }}
     >
       <div class="content" style:width={`${labelWidth + contentWidth}px`}>
-        <div class="axis" style:height={`${AXIS_HEIGHT}px`}>
+        <div
+          class="axis"
+          style:height={`${AXIS_HEIGHT}px`}
+          style:transform={`translateY(${Math.min(rowLayout.height, Math.max(0, scrollTop + controlsHeight))}px)`}
+        >
           <div class="axis-label" style:width={`${labelWidth}px`}>
             Workflow / event
           </div>
@@ -868,6 +879,13 @@
     --page-gutter: 1rem;
   }
 
+  .timeline-controls {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--color-surface-primary);
+  }
+
   .timeline-tools {
     display: flex;
     align-items: center;
@@ -906,7 +924,7 @@
   .plot-frame {
     display: flex;
     box-sizing: border-box;
-    flex: 1;
+    flex: none;
     min-height: 8rem;
     min-width: 0;
     overflow: hidden;
@@ -920,9 +938,7 @@
     flex: 1;
     min-height: 0;
     min-width: 0;
-    overflow: auto;
-    overflow-x: scroll;
-    scrollbar-gutter: stable;
+    overflow: scroll hidden;
   }
 
   .scroller::-webkit-scrollbar {
@@ -972,7 +988,7 @@
   }
 
   .axis {
-    position: sticky;
+    position: relative;
     top: 0;
     z-index: 5;
     background: var(--color-surface-primary);

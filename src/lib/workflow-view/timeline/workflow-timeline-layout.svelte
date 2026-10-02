@@ -40,7 +40,7 @@
 <style>
   .timeline-layout {
     display: flex;
-    flex: 1;
+    flex: none;
     width: 100%;
     min-width: 0;
     min-height: 0;
