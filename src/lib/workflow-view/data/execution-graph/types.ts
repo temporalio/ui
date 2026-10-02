@@ -5,12 +5,11 @@ import type {
   WorkflowKey,
 } from '../identity-keys';
 
-/** Links an execution to the next execution in its continue-as-new chain. */
-export type ContinueAsNewRelation = Readonly<{
-  kind: 'continue-as-new';
+/** Links successive runs in a workflow execution chain. */
+export type ExecutionChainRelation = Readonly<{
+  kind: 'execution-chain';
   previousExecutionKey: ExecutionKey;
   nextExecutionIdentity: ExecutionIdentity;
-  continuedAsNewEventKey: EventKey;
 }>;
 
 /** Links a parent execution to a started child workflow execution. */
@@ -24,7 +23,7 @@ export type ChildWorkflowRelation = Readonly<{
 }>;
 
 /** A discovered relationship between workflow executions. */
-export type ExecutionRelation = ContinueAsNewRelation | ChildWorkflowRelation;
+export type ExecutionRelation = ExecutionChainRelation | ChildWorkflowRelation;
 
 /** A workflow execution registered in the execution graph. */
 export type ExecutionNode = Readonly<{

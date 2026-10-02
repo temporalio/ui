@@ -21,6 +21,7 @@ export class ExecutionGraphCoordinator {
   private _terminalExecutions = new Set<ExecutionKey>();
   private _requestedExecutionKeys = new Set<ExecutionKey>();
   private _isDisposed = false;
+  private _autoRefreshEnabled = true;
   private _executionGraph: ExecutionGraphRepository;
   private _executionHistories: ExecutionHistoryRepository;
   private _historyEvents: HistoryEventRepository;
@@ -99,6 +100,40 @@ export class ExecutionGraphCoordinator {
     this._requestedExecutionKeys.add(key);
     this._eligibleExecutionsCache = null;
     this._loadEligibleExecutions();
+  }
+
+  /** Enables or stops live polling without interrupting initial history loads. */
+  setAutoRefreshEnabled(enabled: boolean): void {
+    if (this._isDisposed || this._autoRefreshEnabled === enabled) return;
+
+    this._autoRefreshEnabled = enabled;
+    if (!enabled) {
+      this._stopStreams();
+      return;
+    }
+
+    if (!this._rootExecutionKey) return;
+    for (const execution of this._getEligibleExecutions(
+      this._rootExecutionKey,
+    )) {
+      const history = this._executionHistories.getExecutionHistory(
+        execution.executionKey,
+      );
+      if (history?.load.status === 'loaded') {
+        this._startStream(execution.identity);
+      }
+    }
+  }
+
+  private _stopStreams(): void {
+    for (const [executionKey, controller] of this._activeStreams) {
+      controller.abort();
+      const cursor =
+        this._executionHistories.getExecutionHistory(executionKey)?.stream
+          .cursor ?? '';
+      this._executionHistories.stopStream(executionKey, cursor);
+    }
+    this._activeStreams.clear();
   }
 
   private _getEligibleExecutions(
@@ -201,6 +236,7 @@ export class ExecutionGraphCoordinator {
 
     if (
       this._isDisposed ||
+      !this._autoRefreshEnabled ||
       this._terminalExecutions.has(executionKey) ||
       this._activeStreams.has(executionKey)
     ) {
@@ -256,7 +292,9 @@ export class ExecutionGraphCoordinator {
         },
       });
 
-      this._executionHistories.stopStream(executionKey, cursor);
+      if (this._activeStreams.get(executionKey) === controller) {
+        this._executionHistories.stopStream(executionKey, cursor);
+      }
     } finally {
       if (this._activeStreams.get(executionKey) === controller) {
         this._activeStreams.delete(executionKey);
@@ -278,15 +316,7 @@ export class ExecutionGraphCoordinator {
       controller.abort();
     }
 
-    for (const [executionKey, controller] of this._activeStreams) {
-      controller.abort();
-      const cursor =
-        this._executionHistories.getExecutionHistory(executionKey)?.stream
-          .cursor ?? '';
-      this._executionHistories.stopStream(executionKey, cursor);
-    }
-
+    this._stopStreams();
     this._initialLoads.clear();
-    this._activeStreams.clear();
   }
 }

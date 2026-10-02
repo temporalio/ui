@@ -1,6 +1,26 @@
-import type { ExecutionRelation } from './types';
+import type { ExecutionChainRelation, ExecutionRelation } from './types';
 import type { QualifiedHistoryEvent } from '../history-events/types';
 import { type ExecutionIdentity, getEventKey } from '../identity-keys';
+
+function toExecutionChainRelation({
+  runId,
+  event,
+  sourceIdentity,
+}: {
+  runId: string;
+  event: QualifiedHistoryEvent;
+  sourceIdentity: ExecutionIdentity;
+}): ExecutionChainRelation {
+  return {
+    kind: 'execution-chain',
+    previousExecutionKey: event.executionKey,
+    nextExecutionIdentity: {
+      namespace: sourceIdentity.namespace,
+      workflowId: sourceIdentity.workflowId,
+      runId,
+    },
+  };
+}
 
 /** Returns the execution relationship discovered by a history event, if any. */
 export function getExecutionRelation(
@@ -16,16 +36,56 @@ export function getExecutionRelation(
         return null;
       }
 
-      return {
-        kind: 'continue-as-new',
-        previousExecutionKey: event.executionKey,
-        nextExecutionIdentity: {
-          namespace: sourceIdentity.namespace,
-          workflowId: sourceIdentity.workflowId,
-          runId,
-        },
-        continuedAsNewEventKey: event.eventKey,
-      };
+      return toExecutionChainRelation({
+        runId,
+        sourceIdentity,
+        event,
+      });
+    }
+
+    case 'WorkflowExecutionCompleted': {
+      const runId =
+        event.workflowExecutionCompletedEventAttributes?.newExecutionRunId;
+
+      if (!runId) {
+        return null;
+      }
+
+      return toExecutionChainRelation({
+        runId,
+        sourceIdentity,
+        event,
+      });
+    }
+
+    case 'WorkflowExecutionFailed': {
+      const runId =
+        event.workflowExecutionFailedEventAttributes?.newExecutionRunId;
+
+      if (!runId) {
+        return null;
+      }
+
+      return toExecutionChainRelation({
+        runId,
+        sourceIdentity,
+        event,
+      });
+    }
+
+    case 'WorkflowExecutionTimedOut': {
+      const runId =
+        event.workflowExecutionTimedOutEventAttributes?.newExecutionRunId;
+
+      if (!runId) {
+        return null;
+      }
+
+      return toExecutionChainRelation({
+        runId,
+        sourceIdentity,
+        event,
+      });
     }
 
     case 'ChildWorkflowExecutionStarted': {

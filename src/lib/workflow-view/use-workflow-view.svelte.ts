@@ -28,6 +28,8 @@ export type WorkflowView = Readonly<{
   lifecycleGroupRepository: LifecycleGroupRepository;
   requestExecution: (identity: ExecutionIdentity) => void;
   refreshExecutionDetails: () => Promise<void>;
+  autoRefreshEnabled: boolean;
+  setAutoRefreshEnabled: (enabled: boolean) => void;
   executionDetails: ExecutionDetailsState;
   historyEvents: readonly QualifiedHistoryEvent[];
   eventMarkerGroups: readonly EventMarkerGroup[];
@@ -40,6 +42,7 @@ export type WorkflowView = Readonly<{
 export function useWorkflowView(
   getIdentity: () => ExecutionIdentity,
 ): WorkflowView {
+  let autoRefreshEnabled = $state(true);
   const executionDetails = useExecutionDetails(getIdentity);
   const executionGraphRepository = new ExecutionGraphRepository();
   const executionHistoryRepository = new ExecutionHistoryRepository();
@@ -94,6 +97,7 @@ export function useWorkflowView(
     );
 
     coordinator = currentCoordinator;
+    currentCoordinator.setAutoRefreshEnabled(untrack(() => autoRefreshEnabled));
     currentCoordinator.start(identity);
     return () => {
       coordinator = null;
@@ -109,6 +113,13 @@ export function useWorkflowView(
     lifecycleGroupRepository,
     requestExecution: (identity) => coordinator?.requestExecution(identity),
     refreshExecutionDetails: () => executionDetails.refresh(),
+    get autoRefreshEnabled() {
+      return autoRefreshEnabled;
+    },
+    setAutoRefreshEnabled: (enabled) => {
+      autoRefreshEnabled = enabled;
+      coordinator?.setAutoRefreshEnabled(enabled);
+    },
     get executionDetails() {
       return executionDetails.state;
     },

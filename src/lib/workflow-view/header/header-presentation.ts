@@ -34,10 +34,10 @@ export function getHeaderPresentation(
   for (;;) {
     const relation = graph.relations.find(
       (candidate) =>
-        candidate.kind === 'continue-as-new' &&
+        candidate.kind === 'execution-chain' &&
         candidate.previousExecutionKey === executionKey,
     );
-    if (!relation || relation.kind !== 'continue-as-new') break;
+    if (!relation || relation.kind !== 'execution-chain') break;
 
     nextRunId ??= relation.nextExecutionIdentity.runId;
     latestRunId = relation.nextExecutionIdentity.runId;

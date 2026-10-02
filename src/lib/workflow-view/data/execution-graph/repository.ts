@@ -8,28 +8,17 @@ import type {
 } from './types';
 import type { QualifiedHistoryEvent } from '../history-events/types';
 import {
-  type EventKey,
   type ExecutionIdentity,
   type ExecutionKey,
+  type ExecutionRelationKey,
   getExecutionKey,
+  getExecutionRelationKey,
   getWorkflowKey,
 } from '../identity-keys';
 
-function getRelationEventKey(relation: ExecutionRelation): EventKey {
-  switch (relation.kind) {
-    case 'continue-as-new': {
-      return relation.continuedAsNewEventKey;
-    }
-
-    case 'child-workflow': {
-      return relation.startedEventKey;
-    }
-  }
-}
-
 function getTargetIdentity(relation: ExecutionRelation): ExecutionIdentity {
   switch (relation.kind) {
-    case 'continue-as-new': {
+    case 'execution-chain': {
       return relation.nextExecutionIdentity;
     }
 
@@ -42,7 +31,7 @@ function getTargetIdentity(relation: ExecutionRelation): ExecutionIdentity {
 /** Stores workflow executions and the relationships discovered between them. */
 export class ExecutionGraphRepository {
   private _executionsByKey = new Map<ExecutionKey, ExecutionNode>();
-  private _relationsByEventKey = new Map<EventKey, ExecutionRelation>();
+  private _relationsByKey = new Map<ExecutionRelationKey, ExecutionRelation>();
   private _subscribers = new Set<ExecutionGraphRepositorySubscriber>();
   private _snapshotCache: ExecutionGraphSnapshot | null = null;
 
@@ -59,7 +48,7 @@ export class ExecutionGraphRepository {
 
     this._snapshotCache = {
       executionsByKey: new Map(this._executionsByKey),
-      relations: [...this._relationsByEventKey.values()],
+      relations: [...this._relationsByKey.values()],
     };
 
     return this._snapshotCache;
@@ -84,13 +73,13 @@ export class ExecutionGraphRepository {
   }
 
   private _addRelation(relation: ExecutionRelation): boolean {
-    const relationEventKey = getRelationEventKey(relation);
+    const relationKey = getExecutionRelationKey(relation);
 
-    if (this._relationsByEventKey.has(relationEventKey)) {
+    if (this._relationsByKey.has(relationKey)) {
       return false;
     }
 
-    this._relationsByEventKey.set(relationEventKey, relation);
+    this._relationsByKey.set(relationKey, relation);
     this._snapshotCache = null;
     return true;
   }

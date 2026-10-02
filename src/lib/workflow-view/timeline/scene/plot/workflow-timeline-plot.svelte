@@ -43,6 +43,7 @@
   import { getWheelTimeRange } from './wheel-time-range';
   import { getWorkflowStatus } from './workflow-status';
   import type { ExecutionHistoryState } from '../../../data/execution-history/types';
+  import { isTerminalExecutionEvent } from '../../../data/history-events/is-terminal-execution-event';
   import type { QualifiedHistoryEvent } from '../../../data/history-events/types';
   import type {
     ExecutionIdentity,
@@ -60,11 +61,13 @@
     scene,
     historyEvents,
     executionHistories,
+    autoRefreshEnabled,
     onrequesthistory,
   }: {
     scene: WorkflowScene | null;
     historyEvents: readonly QualifiedHistoryEvent[];
     executionHistories: readonly ExecutionHistoryState[];
+    autoRefreshEnabled: boolean;
     onrequesthistory: (identity: ExecutionIdentity) => void;
   } = $props();
 
@@ -86,7 +89,7 @@
   let unpinnedStartMs = $state<number | null>(null);
   let selectedRow = $state<TimelineEventRow | null>(null);
   let horizontalScrollbarPointerX: number | null = null;
-  let previousPolling = false;
+  let previousRunning = false;
   let lastLiveViewport: TimeRange | null = null;
   let now = $state(Date.now());
   let reducedMotion = $state(false);
@@ -118,18 +121,25 @@
       executionHistories.map((history) => [history.executionKey, history]),
     ),
   );
+  const terminalExecutionKeys = $derived(
+    new Set(
+      historyEvents
+        .filter((event) => isTerminalExecutionEvent(event.eventType))
+        .map((event) => event.executionKey),
+    ),
+  );
   const activeExecutionKeys = $derived(
     new Set(
       executionHistories
         .filter(
           (history) =>
-            history.stream.status === 'polling' ||
-            history.stream.status === 'retrying',
+            history.load.status === 'loaded' &&
+            !terminalExecutionKeys.has(history.executionKey),
         )
         .map((history) => history.executionKey),
     ),
   );
-  const polling = $derived(activeExecutionKeys.size > 0);
+  const running = $derived(activeExecutionKeys.size > 0);
   const recordedDomain = $derived.by((): TimeRange | null => {
     if (!historyEvents.length) return null;
     let startMs = Infinity;
@@ -144,7 +154,7 @@
     recordedDomain
       ? {
           startMs: recordedDomain.startMs,
-          endMs: polling
+          endMs: running
             ? Math.max(recordedDomain.endMs, now)
             : recordedDomain.endMs,
         }
@@ -153,11 +163,11 @@
   const plotEndMs = $derived(
     domain
       ? Math.max(
-          getBufferedPlotEndMs(domain.endMs, polling && !reducedMotion),
+          getBufferedPlotEndMs(domain.endMs, running && !reducedMotion),
           (unpinnedStartMs ?? initialViewport?.startMs ?? domain.startMs) +
             getViewportDuration(
               requestedDuration ?? domain.endMs - domain.startMs,
-              polling,
+              running,
             ),
         )
       : null,
@@ -182,10 +192,10 @@
     getInitialViewport(historyEvents, executionHistories),
   );
   const duration = $derived(
-    getViewportDuration(requestedDuration ?? domainDuration, polling),
+    getViewportDuration(requestedDuration ?? domainDuration, running),
   );
   const minimumDuration = $derived(
-    getViewportDuration(1, polling, (plotDuration * width) / MAX_WIDTH),
+    getViewportDuration(1, running, (plotDuration * width) / MAX_WIDTH),
   );
   const contentWidth = $derived(
     Math.min(MAX_WIDTH, Math.max(width, (width * plotDuration) / duration)),
@@ -223,7 +233,7 @@
     return Math.max(
       inset,
       Math.min(
-        plotWidth - (polling ? 0 : inset),
+        plotWidth - (running ? 0 : inset),
         timeToX(timeMs, range, plotWidth),
       ),
     );
@@ -268,11 +278,11 @@
     if (!domain || !scroller) return;
     const nextDuration = getViewportDuration(
       range.endMs - range.startMs,
-      polling,
+      running,
       minimumDuration,
     );
     pinned =
-      polling &&
+      running &&
       getFollowAfterInteraction(
         pinned,
         interaction,
@@ -283,7 +293,7 @@
   }
 
   function toggleLiveFollow(): void {
-    if (!polling || !viewport) return;
+    if (!running || !viewport) return;
     pinned = !pinned;
     unpinnedStartMs = pinned ? null : viewport.startMs;
   }
@@ -370,7 +380,7 @@
     if (!scroller || !domain || !plotDomain || !initialViewport) return;
     const startMs = unpinnedStartMs ?? initialViewport.startMs;
     const nextScrollLeft =
-      polling && pinned
+      running && pinned
         ? getLiveScrollLeft(domain, plotDomain, contentWidth, width)
         : getViewportScrollLeft(startMs, plotDomain, contentWidth);
     scroller.scrollLeft = nextScrollLeft;
@@ -387,14 +397,14 @@
       );
       unpinnedStartMs = initialViewportCandidate.startMs;
     }
-    if (polling && viewport) lastLiveViewport = viewport;
-    if (previousPolling && !polling && lastLiveViewport) {
+    if (running && viewport) lastLiveViewport = viewport;
+    if (previousRunning && !running && lastLiveViewport) {
       const range = lastLiveViewport;
       requestedDuration = range.endMs - range.startMs;
       unpinnedStartMs = range.startMs;
       pinned = false;
     }
-    previousPolling = polling;
+    previousRunning = running;
   });
 
   $effect(() => {
@@ -408,7 +418,8 @@
   });
 
   $effect(() => {
-    if (!polling) return;
+    if (!running || !autoRefreshEnabled) return;
+    now = Date.now();
     if (reducedMotion) {
       const interval = setInterval(() => {
         now = Date.now();
@@ -432,13 +443,7 @@
 )}
   {@const left = plotX(row.startTimeMs, range, contentWidth)}
   {@const isRunning =
-    row.kind === 'workflow' &&
-    executionHistories.some(
-      (history) =>
-        history.executionKey === executionKey &&
-        (history.stream.status === 'polling' ||
-          history.stream.status === 'retrying'),
-    )}
+    row.kind === 'workflow' && activeExecutionKeys.has(executionKey)}
   {@const right = plotX(
     isRunning ? Math.max(row.endTimeMs, now) : row.endTimeMs,
     range,
@@ -548,7 +553,7 @@
   <WorkflowTimelineIconDefs />
   <div class="timeline-controls" bind:clientHeight={controlsHeight}>
     <div class="timeline-tools">
-      {#if polling}
+      {#if running}
         <button
           type="button"
           class="fit-timeline"
@@ -573,7 +578,7 @@
         {viewport}
         landmarks={minimapLandmarks}
         minDurationMs={minimumDuration}
-        pinnedLive={polling && pinned}
+        pinnedLive={running && pinned}
         onselect={selectRange}
       />
     </div>
@@ -662,8 +667,7 @@
                   class:child={item.kind === 'child' ||
                     item.kind === 'workflow'}
                   class:execution={item.kind === 'execution'}
-                  class:continued={item.kind === 'execution' &&
-                    item.continuesAsNew}
+                  class:continued={item.kind === 'execution' && item.hasNextRun}
                   class:collapsed={isCollapsed}
                   style:width={`${labelWidth}px`}
                 >
@@ -755,10 +759,10 @@
                     <span class="header-id">
                       <span class="header-title run-title">
                         Run {item.runNumber} of {item.runCount}
-                        {#if item.continuesAsNew}
+                        {#if item.hasNextRun}
                           <span
                             class="continuation-label"
-                            title="Continues as new">↪</span
+                            title="Next run in execution chain">↪</span
                           >
                         {/if}
                       </span>

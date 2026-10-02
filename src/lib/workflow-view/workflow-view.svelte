@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { page } from '$app/state';
+
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
 
   import {
     type ExecutionIdentity,
@@ -17,6 +20,12 @@
   let { identity }: { identity: ExecutionIdentity } = $props();
 
   const workflowView = useWorkflowView(() => identity);
+
+  $effect(() => {
+    workflowView.setAutoRefreshEnabled(
+      page.url.searchParams.get('refresh_off') !== 'true',
+    );
+  });
   const executionKey = $derived(getExecutionKey(identity));
   const executionDetails = $derived(workflowView.executionDetails);
   const selectedEvents = $derived(
@@ -52,6 +61,9 @@
       {details}
       events={selectedEvents}
       graph={workflowView.executionGraph}
+      autoRefreshEnabled={workflowView.autoRefreshEnabled}
+      onAutoRefreshChange={(enabled) =>
+        updateEventFilterParams(page.url, { refresh_off: !enabled })}
     />
     <InputAndResults
       {identity}

@@ -7,6 +7,7 @@
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { BadgeCount } from '$lib/io/badge-count';
   import IconChevronLeft from '$lib/io/icon/icons/chevron-left.svelte';
@@ -40,11 +41,15 @@
     details,
     events,
     graph,
+    autoRefreshEnabled,
+    onAutoRefreshChange,
   }: {
     identity: ExecutionIdentity;
     details: WorkflowExecution;
     events: readonly QualifiedHistoryEvent[];
     graph: ExecutionGraphSnapshot;
+    autoRefreshEnabled: boolean;
+    onAutoRefreshChange: (enabled: boolean) => void;
   } = $props();
 
   const presentation = $derived(
@@ -65,6 +70,17 @@
   >
     {translate('workflows.back-to-workflows')}
   </Link>
+  <ToggleSwitch
+    id="workflow-view-auto-refresh"
+    label={translate('common.auto-refresh')}
+    labelPosition="left"
+    checked={autoRefreshEnabled}
+    onchange={(event) => {
+      if (event.currentTarget instanceof HTMLInputElement) {
+        onAutoRefreshChange(event.currentTarget.checked);
+      }
+    }}
+  />
 </div>
 <header class="flex flex-col gap-4">
   <div class="flex flex-col items-start justify-between gap-4 xl:flex-row">

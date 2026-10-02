@@ -221,7 +221,7 @@ describe('flattenPlotScene', () => {
       kind: 'execution',
       key: `execution:${child.execution.executionKey}`,
       depth: 3,
-      continuesAsNew: false,
+      hasNextRun: false,
       hasDetails: false,
       runNumber: 1,
       runCount: 1,
@@ -306,7 +306,7 @@ describe('flattenPlotScene', () => {
           kind: 'execution',
           key: `execution:${parent.execution.executionKey}`,
           depth: 1,
-          continuesAsNew: false,
+          hasNextRun: false,
           hasDetails: true,
           runNumber: 1,
           runCount: 1,
@@ -431,7 +431,7 @@ describe('flattenPlotScene', () => {
               ? 'root workflow'
               : row.row.label,
         row.depth,
-        row.kind === 'execution' ? row.continuesAsNew : false,
+        row.kind === 'execution' ? row.hasNextRun : false,
       ]),
     ).toEqual([
       ['root workflow', 0, false],

@@ -7,7 +7,7 @@ export type PlotExecutionRow = Readonly<{
   kind: 'execution';
   key: string;
   depth: number;
-  continuesAsNew: boolean;
+  hasNextRun: boolean;
   hasDetails: boolean;
   runNumber: number;
   runCount: number;
@@ -56,7 +56,7 @@ export function flattenPlotScene(
   function visitExecution(
     execution: ExecutionScene,
     depth: number,
-    continuesAsNew: boolean,
+    hasNextRun: boolean,
     runNumber: number,
     runCount: number,
   ): void {
@@ -66,7 +66,7 @@ export function flattenPlotScene(
       kind: 'execution',
       key: `execution:${executionKey}`,
       depth,
-      continuesAsNew,
+      hasNextRun,
       hasDetails: execution.entries.some(
         (entry) =>
           entry.kind === 'child-workflow' || entry.row.kind !== 'workflow',

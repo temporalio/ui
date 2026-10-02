@@ -1,3 +1,5 @@
+import type { ExecutionRelation } from './execution-graph/types';
+
 /** Stable serialized key for one logical workflow. */
 export type WorkflowKey = `workflow:(${string})`;
 
@@ -58,6 +60,27 @@ export function getEventKey(
   eventId: string,
 ): EventKey {
   return `event:(${JSON.stringify({ executionKey, eventId })})`;
+}
+
+/** Stable key for an execution relationship. */
+export type ExecutionRelationKey = `execution-chain:(${string})` | EventKey;
+
+/** Returns a stable key for an execution relationship. */
+export function getExecutionRelationKey(
+  relation: ExecutionRelation,
+): ExecutionRelationKey {
+  switch (relation.kind) {
+    case 'execution-chain': {
+      return `execution-chain:(${JSON.stringify({
+        previousExecutionKey: relation.previousExecutionKey,
+        nextExecutionKey: getExecutionKey(relation.nextExecutionIdentity),
+      })})`;
+    }
+
+    case 'child-workflow': {
+      return relation.startedEventKey;
+    }
+  }
 }
 
 /** Stable execution-qualified key for one event lifecycle. */

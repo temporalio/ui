@@ -25,7 +25,7 @@ export function projectWorkflowScene(
   const childrenByParent = new Map<ExecutionKey, ChildWorkflowRelation[]>();
 
   for (const relation of graph.relations) {
-    if (relation.kind === 'continue-as-new') {
+    if (relation.kind === 'execution-chain') {
       const nextKey = getExecutionKey(relation.nextExecutionIdentity);
       previousByNext.set(nextKey, relation.previousExecutionKey);
       nextByPrevious.set(relation.previousExecutionKey, nextKey);

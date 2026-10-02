@@ -146,7 +146,7 @@ const plotRows: readonly FlattenedPlotSceneRow[] = [
     kind: 'execution',
     key: 'execution',
     depth: 1,
-    continuesAsNew: true,
+    hasNextRun: true,
     runNumber: 1,
     runCount: 2,
     hasDetails: false,

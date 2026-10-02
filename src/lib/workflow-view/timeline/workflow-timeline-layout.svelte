@@ -32,6 +32,7 @@
       {scene}
       historyEvents={workflowView.historyEvents}
       executionHistories={workflowView.executionHistories}
+      autoRefreshEnabled={workflowView.autoRefreshEnabled}
       onrequesthistory={workflowView.requestExecution}
     />
   {/key}
