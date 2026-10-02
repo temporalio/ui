@@ -5,7 +5,7 @@ type WorkflowStatusFaviconValue = NonNullable<WorkflowStatus>;
 
 const statusColors: Record<WorkflowStatusFaviconValue, string> = {
   Running: colorScales.blue[11],
-  Paused: colorScales.blue[11],
+  Paused: colorScales.amber[11],
   Completed: colorScales.green[11],
   ContinuedAsNew: colorScales.green[11],
   Failed: colorScales.red[11],
