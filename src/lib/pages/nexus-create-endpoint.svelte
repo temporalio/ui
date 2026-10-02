@@ -18,6 +18,7 @@
     validateNamespacesExist?: ValidateNamespacesExist;
     nameLeading?: Snippet;
     fieldsInert?: boolean;
+    submitDisabled?: boolean;
     class?: string;
     card?: boolean;
     submitButtonText?: string;
@@ -34,6 +35,7 @@
     validateNamespacesExist,
     nameLeading,
     fieldsInert = false,
+    submitDisabled = false,
     class: className = '',
     card = false,
     submitButtonText = translate('nexus.create-endpoint'),
@@ -50,6 +52,7 @@
     {validateNamespacesExist}
     {nameLeading}
     {fieldsInert}
+    {submitDisabled}
     class={className}
     {cancelHref}
     {card}
