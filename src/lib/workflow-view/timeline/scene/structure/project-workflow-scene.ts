@@ -62,7 +62,8 @@ export function projectWorkflowScene(
       if (
         !previousKey ||
         precedingKeys.has(previousKey) ||
-        !graph.executionsByKey.has(previousKey)
+        !graph.executionsByKey.has(previousKey) ||
+        !rowsByExecution.has(previousKey)
       ) {
         break;
       }

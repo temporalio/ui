@@ -16,9 +16,22 @@ import {
   getWorkflowKey,
 } from '../identity-keys';
 
-function getTargetIdentity(relation: ExecutionRelation): ExecutionIdentity {
+function getDiscoveredIdentity(
+  relation: ExecutionRelation,
+  event: QualifiedHistoryEvent,
+): ExecutionIdentity {
   switch (relation.kind) {
     case 'execution-chain': {
+      const previousRunId =
+        event.eventType === 'WorkflowExecutionStarted'
+          ? event.workflowExecutionStartedEventAttributes
+              ?.continuedExecutionRunId
+          : undefined;
+
+      if (previousRunId) {
+        return { ...relation.nextExecutionIdentity, runId: previousRunId };
+      }
+
       return relation.nextExecutionIdentity;
     }
 
@@ -146,10 +159,12 @@ export class ExecutionGraphRepository {
         continue;
       }
 
-      const targetExecution = this._addExecution(getTargetIdentity(relation));
+      const discoveredExecution = this._addExecution(
+        getDiscoveredIdentity(relation, event),
+      );
 
-      if (targetExecution) {
-        addedExecutions.push(targetExecution);
+      if (discoveredExecution) {
+        addedExecutions.push(discoveredExecution);
       }
 
       if (this._addRelation(relation)) {

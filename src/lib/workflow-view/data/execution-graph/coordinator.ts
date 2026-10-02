@@ -85,7 +85,7 @@ export class ExecutionGraphCoordinator {
     this._loadEligibleExecutions();
   }
 
-  /** Schedules a discovered execution when its row becomes visible. */
+  /** Schedules history loading for a discovered execution. */
   requestExecution(identity: ExecutionIdentity): void {
     const key = getExecutionKey(identity);
     if (

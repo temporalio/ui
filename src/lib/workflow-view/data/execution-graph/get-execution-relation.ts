@@ -1,26 +1,10 @@
-import type { ExecutionChainRelation, ExecutionRelation } from './types';
+import type { ExecutionRelation } from './types';
 import type { QualifiedHistoryEvent } from '../history-events/types';
-import { type ExecutionIdentity, getEventKey } from '../identity-keys';
-
-function toExecutionChainRelation({
-  runId,
-  event,
-  sourceIdentity,
-}: {
-  runId: string;
-  event: QualifiedHistoryEvent;
-  sourceIdentity: ExecutionIdentity;
-}): ExecutionChainRelation {
-  return {
-    kind: 'execution-chain',
-    previousExecutionKey: event.executionKey,
-    nextExecutionIdentity: {
-      namespace: sourceIdentity.namespace,
-      workflowId: sourceIdentity.workflowId,
-      runId,
-    },
-  };
-}
+import {
+  type ExecutionIdentity,
+  getEventKey,
+  getExecutionKey,
+} from '../identity-keys';
 
 /** Returns the execution relationship discovered by a history event, if any. */
 export function getExecutionRelation(
@@ -28,64 +12,82 @@ export function getExecutionRelation(
   event: QualifiedHistoryEvent,
 ): ExecutionRelation | null {
   switch (event.eventType) {
-    case 'WorkflowExecutionContinuedAsNew': {
-      const runId =
-        event.workflowExecutionContinuedAsNewEventAttributes?.newExecutionRunId;
+    case 'WorkflowExecutionStarted': {
+      const previousRunId =
+        event.workflowExecutionStartedEventAttributes?.continuedExecutionRunId;
 
-      if (!runId) {
+      if (!previousRunId) {
         return null;
       }
 
-      return toExecutionChainRelation({
-        runId,
-        sourceIdentity,
-        event,
-      });
+      return {
+        kind: 'execution-chain',
+        previousExecutionKey: getExecutionKey({
+          ...sourceIdentity,
+          runId: previousRunId,
+        }),
+        nextExecutionIdentity: { ...sourceIdentity },
+      };
+    }
+
+    case 'WorkflowExecutionContinuedAsNew': {
+      const nextRunId =
+        event.workflowExecutionContinuedAsNewEventAttributes?.newExecutionRunId;
+
+      if (!nextRunId) {
+        return null;
+      }
+
+      return {
+        kind: 'execution-chain',
+        previousExecutionKey: event.executionKey,
+        nextExecutionIdentity: { ...sourceIdentity, runId: nextRunId },
+      };
     }
 
     case 'WorkflowExecutionCompleted': {
-      const runId =
+      const nextRunId =
         event.workflowExecutionCompletedEventAttributes?.newExecutionRunId;
 
-      if (!runId) {
+      if (!nextRunId) {
         return null;
       }
 
-      return toExecutionChainRelation({
-        runId,
-        sourceIdentity,
-        event,
-      });
+      return {
+        kind: 'execution-chain',
+        previousExecutionKey: event.executionKey,
+        nextExecutionIdentity: { ...sourceIdentity, runId: nextRunId },
+      };
     }
 
     case 'WorkflowExecutionFailed': {
-      const runId =
+      const nextRunId =
         event.workflowExecutionFailedEventAttributes?.newExecutionRunId;
 
-      if (!runId) {
+      if (!nextRunId) {
         return null;
       }
 
-      return toExecutionChainRelation({
-        runId,
-        sourceIdentity,
-        event,
-      });
+      return {
+        kind: 'execution-chain',
+        previousExecutionKey: event.executionKey,
+        nextExecutionIdentity: { ...sourceIdentity, runId: nextRunId },
+      };
     }
 
     case 'WorkflowExecutionTimedOut': {
-      const runId =
+      const nextRunId =
         event.workflowExecutionTimedOutEventAttributes?.newExecutionRunId;
 
-      if (!runId) {
+      if (!nextRunId) {
         return null;
       }
 
-      return toExecutionChainRelation({
-        runId,
-        sourceIdentity,
-        event,
-      });
+      return {
+        kind: 'execution-chain',
+        previousExecutionKey: event.executionKey,
+        nextExecutionIdentity: { ...sourceIdentity, runId: nextRunId },
+      };
     }
 
     case 'ChildWorkflowExecutionStarted': {

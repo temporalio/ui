@@ -10,7 +10,7 @@ export type EagerExecutionDepths = Readonly<{
 
 const defaultDepths: EagerExecutionDepths = {
   childWorkflowDepth: 1,
-  continuedRunDepthBefore: 1,
+  continuedRunDepthBefore: 0,
   continuedRunDepthAfter: Infinity,
 };
 
