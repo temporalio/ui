@@ -68,6 +68,23 @@ export function getLifecycleKey(headEventKey: EventKey): LifecycleKey {
   return `lifecycle:(${JSON.stringify({ headEventKey })})`;
 }
 
+/** Stable execution-qualified key for an event marker group. */
+export type EventMarkerGroupKey = `event-marker-group:(${string})`;
+
+/** Identifies an explicit or implicit event marker. */
+export type EventMarkerIdentity = Readonly<{
+  type: 'label' | 'inbound-event' | 'inbound-update';
+  id: string;
+}>;
+
+/** Returns a stable key for an event marker group. */
+export function getEventMarkerGroupKey(
+  executionKey: ExecutionKey,
+  marker: EventMarkerIdentity,
+): EventMarkerGroupKey {
+  return `event-marker-group:(${JSON.stringify({ executionKey, ...marker })})`;
+}
+
 /** Stable serialized key for a named lifecycle filter. */
 export type LifecycleFilterKey = `lifecycle-filter:(${string})`;
 
