@@ -67,3 +67,11 @@ export type LifecycleKey = `lifecycle:(${string})`;
 export function getLifecycleKey(headEventKey: EventKey): LifecycleKey {
   return `lifecycle:(${JSON.stringify({ headEventKey })})`;
 }
+
+/** Stable serialized key for a named lifecycle filter. */
+export type LifecycleFilterKey = `lifecycle-filter:(${string})`;
+
+/** Returns a stable key for a named lifecycle filter. */
+export function getLifecycleFilterKey(name: string): LifecycleFilterKey {
+  return `lifecycle-filter:(${JSON.stringify({ name })})`;
+}

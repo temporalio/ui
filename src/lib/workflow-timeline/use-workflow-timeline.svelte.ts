@@ -7,7 +7,12 @@ import { ExecutionHistoryRepository } from './data/execution-history/repository'
 import type { ExecutionHistoryState } from './data/execution-history/types';
 import { HistoryEventRepository } from './data/history-events/repository';
 import type { QualifiedHistoryEvent } from './data/history-events/types';
-import type { ExecutionIdentity } from './data/identity-keys';
+import type { ExecutionIdentity, LifecycleKey } from './data/identity-keys';
+import { LifecycleFilterRepository } from './data/lifecycle-group-filters/repository';
+import type {
+  LifecycleFilterDefinition,
+  LifecycleFilterQuery,
+} from './data/lifecycle-group-filters/types';
 import { LifecycleGroupRepository } from './data/lifecycle-groups/repository';
 import type { LifecycleGroup } from './data/lifecycle-groups/types';
 import { TimelineRowRepository } from './scene/timeline-rows/repository';
@@ -19,8 +24,10 @@ export type WorkflowTimeline = Readonly<{
   executionHistoryRepository: ExecutionHistoryRepository;
   historyEventRepository: HistoryEventRepository;
   lifecycleGroupRepository: LifecycleGroupRepository;
+  lifecycleFilterRepository: LifecycleFilterRepository;
   timelineRowRepository: TimelineRowRepository;
   requestExecution: (identity: ExecutionIdentity) => void;
+  getQuerySnapshot: (query: LifecycleFilterQuery) => readonly LifecycleKey[];
   historyEvents: readonly QualifiedHistoryEvent[];
   lifecycleGroups: readonly LifecycleGroup[];
   timelineRows: readonly TimelineEventRow[];
@@ -34,6 +41,7 @@ type TimelineRepositories = Pick<
   | 'executionHistoryRepository'
   | 'historyEventRepository'
   | 'lifecycleGroupRepository'
+  | 'lifecycleFilterRepository'
   | 'timelineRowRepository'
 >;
 
@@ -41,6 +49,7 @@ function connectRepositories({
   executionGraphRepository,
   historyEventRepository,
   lifecycleGroupRepository,
+  lifecycleFilterRepository,
   timelineRowRepository,
 }: TimelineRepositories): () => void {
   const unsubscribeLifecycleGroups = historyEventRepository.subscribe(
@@ -59,7 +68,14 @@ function connectRepositories({
     { emitCurrentSnapshot: true },
   );
 
+  const unsubscribeLifecycleFilters = lifecycleGroupRepository.subscribe(
+    (notification) =>
+      lifecycleFilterRepository.upsertGroups(notification.groups),
+    { emitCurrentSnapshot: true },
+  );
+
   return () => {
+    unsubscribeLifecycleFilters();
     unsubscribeLifecycleGroups();
     unsubscribeExecutionGraph();
     unsubscribeTimelineRows();
@@ -72,6 +88,7 @@ function createReactiveTimeline(
     executionHistoryRepository,
     historyEventRepository,
     lifecycleGroupRepository,
+    lifecycleFilterRepository,
     timelineRowRepository,
   }: TimelineRepositories,
   requestExecution: (identity: ExecutionIdentity) => void,
@@ -88,6 +105,10 @@ function createReactiveTimeline(
   const subscribeToLifecycleGroups = createSubscriber((update) =>
     lifecycleGroupRepository.subscribe(update),
   );
+  const querySubscribers = new WeakMap<
+    LifecycleFilterQuery,
+    ReturnType<typeof createSubscriber>
+  >();
   const subscribeToTimelineRows = createSubscriber((update) =>
     timelineRowRepository.subscribe(update),
   );
@@ -97,8 +118,21 @@ function createReactiveTimeline(
     executionHistoryRepository,
     historyEventRepository,
     lifecycleGroupRepository,
+    lifecycleFilterRepository,
     timelineRowRepository,
     requestExecution,
+    /** Returns a query snapshot with reactive membership updates. */
+    getQuerySnapshot(query) {
+      let subscribe = querySubscribers.get(query);
+      if (!subscribe) {
+        subscribe = createSubscriber((update) =>
+          lifecycleFilterRepository.subscribeQuery(query, update),
+        );
+        querySubscribers.set(query, subscribe);
+      }
+      subscribe();
+      return lifecycleFilterRepository.getQuerySnapshot(query);
+    },
     get historyEvents() {
       subscribeToHistoryEvents();
       return historyEventRepository.getSnapshot();
@@ -125,12 +159,18 @@ function createReactiveTimeline(
 /** Creates and connects the repositories for a mounted workflow timeline. */
 export function useWorkflowTimeline(
   getIdentity: () => ExecutionIdentity,
+  filters: readonly LifecycleFilterDefinition[] = [],
 ): WorkflowTimeline {
+  const historyEventRepository = new HistoryEventRepository();
   const repositories: TimelineRepositories = {
     executionGraphRepository: new ExecutionGraphRepository(),
     executionHistoryRepository: new ExecutionHistoryRepository(),
-    historyEventRepository: new HistoryEventRepository(),
+    historyEventRepository,
     lifecycleGroupRepository: new LifecycleGroupRepository(),
+    lifecycleFilterRepository: new LifecycleFilterRepository(
+      filters,
+      (eventKey) => historyEventRepository.getEvent(eventKey),
+    ),
     timelineRowRepository: new TimelineRowRepository(),
   };
 
