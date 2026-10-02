@@ -1,4 +1,4 @@
-import { namespaces } from '$lib/stores/namespaces';
+import { namespaces, namespacesLoading } from '$lib/stores/namespaces';
 import { toaster } from '$lib/stores/toaster';
 import type {
   DescribeNamespaceResponse,
@@ -55,8 +55,11 @@ export async function fetchNamespaces(
 
   if (runtimeEnvironment.isCloud) {
     namespaces.set([]);
+    namespacesLoading.set(false);
     return;
   }
+
+  namespacesLoading.set(true);
 
   try {
     const route = routeForApi('namespaces');
@@ -84,6 +87,8 @@ export async function fetchNamespaces(
     namespaces.set(_namespaces);
   } catch {
     namespaces.set([]);
+  } finally {
+    namespacesLoading.set(false);
   }
 }
 
