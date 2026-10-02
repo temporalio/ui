@@ -2,6 +2,7 @@ import { createSubscriber } from 'svelte/reactivity';
 
 import { EventMarkerGroupRepository } from './data/event-marker-groups/repository';
 import type { EventMarkerGroup } from './data/event-marker-groups/types';
+import type { ExecutionDetailsState } from './data/execution-details/types';
 import { ExecutionGraphCoordinator } from './data/execution-graph/coordinator';
 import { ExecutionGraphRepository } from './data/execution-graph/repository';
 import type { ExecutionGraphSnapshot } from './data/execution-graph/types';
@@ -13,6 +14,8 @@ import type { ExecutionIdentity } from './data/identity-keys';
 import { LifecycleGroupRepository } from './data/lifecycle-groups/repository';
 import type { LifecycleGroup } from './data/lifecycle-groups/types';
 
+import { useExecutionDetails } from './data/execution-details/use-execution-details.svelte';
+
 /** Shared repositories and reactive data for one mounted workflow view. */
 export type WorkflowView = Readonly<{
   executionGraphRepository: ExecutionGraphRepository;
@@ -21,6 +24,8 @@ export type WorkflowView = Readonly<{
   eventMarkerGroupRepository: EventMarkerGroupRepository;
   lifecycleGroupRepository: LifecycleGroupRepository;
   requestExecution: (identity: ExecutionIdentity) => void;
+  refreshExecutionDetails: () => Promise<void>;
+  executionDetails: ExecutionDetailsState;
   historyEvents: readonly QualifiedHistoryEvent[];
   eventMarkerGroups: readonly EventMarkerGroup[];
   lifecycleGroups: readonly LifecycleGroup[];
@@ -32,6 +37,7 @@ export type WorkflowView = Readonly<{
 export function useWorkflowView(
   getIdentity: () => ExecutionIdentity,
 ): WorkflowView {
+  const executionDetails = useExecutionDetails(getIdentity);
   const executionGraphRepository = new ExecutionGraphRepository();
   const executionHistoryRepository = new ExecutionHistoryRepository();
   const historyEventRepository = new HistoryEventRepository();
@@ -89,6 +95,10 @@ export function useWorkflowView(
     eventMarkerGroupRepository,
     lifecycleGroupRepository,
     requestExecution: (identity) => coordinator?.requestExecution(identity),
+    refreshExecutionDetails: () => executionDetails.refresh(),
+    get executionDetails() {
+      return executionDetails.state;
+    },
     get historyEvents() {
       subscribeToHistoryEvents();
       return historyEventRepository.getSnapshot();
