@@ -14,6 +14,10 @@
     copyIconTitle: string;
     copySuccessIconTitle: string;
     filterIconTitle: string;
+    // When the filter button opens a menu rather than filtering directly, the
+    // menu locates this button by its data-menu-anchor.
+    menuId?: string;
+    menuOpen?: boolean;
     class?: string;
   };
 
@@ -27,6 +31,8 @@
     copyIconTitle,
     copySuccessIconTitle,
     filterIconTitle,
+    menuId,
+    menuOpen = false,
     class: className = '',
   }: Props = $props();
 
@@ -46,6 +52,11 @@
         }}
         class="copy-or-filter-button"
         class:filtered
+        data-testid="quick-filter-button"
+        data-menu-anchor={menuId}
+        aria-haspopup={menuId ? 'true' : undefined}
+        aria-controls={menuId}
+        aria-expanded={menuId ? menuOpen : undefined}
       >
         {#key filtered}
           <IconFilter title={filterIconTitle} class="m-0.5" />

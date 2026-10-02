@@ -20,6 +20,8 @@
     copyIconTitle?: FilterOrCopyButtonsProps['copyIconTitle'];
     copySuccessIconTitle?: FilterOrCopyButtonsProps['copySuccessIconTitle'];
     filterIconTitle?: FilterOrCopyButtonsProps['filterIconTitle'];
+    menuId?: FilterOrCopyButtonsProps['menuId'];
+    menuOpen?: boolean;
   }
 
   const {
@@ -31,15 +33,20 @@
     copyIconTitle = translate('common.copy-icon-title'),
     copySuccessIconTitle = translate('common.copy-success-icon-title'),
     filterIconTitle = translate('common.filter-items'),
+    menuId,
+    menuOpen = false,
     ...cellProps
   }: Props = $props();
 
-  let areFilterOrCopyButtonsVisible = $state(false);
+  let isHovered = $state(false);
+  // The menu is portaled and anchored to the filter button, so unmounting the
+  // buttons on mouseleave would take an open menu with it.
+  const areFilterOrCopyButtonsVisible = $derived(isHovered || menuOpen);
   function showFilterOrCopyButtons() {
-    areFilterOrCopyButtonsVisible = true;
+    isHovered = true;
   }
   function hideFilterOrCopyButtons() {
-    areFilterOrCopyButtonsVisible = false;
+    isHovered = false;
   }
 
   const copyable = $derived(Boolean(copyValue));
@@ -93,5 +100,7 @@
     content={copyValue ?? ''}
     {onFilter}
     filtered={isFiltered}
+    {menuId}
+    {menuOpen}
   />
 </td>
