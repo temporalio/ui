@@ -66,27 +66,40 @@ export function formatTimelineChainTickTime({
   hourFormat: HourFormat;
 }): string {
   const timeZone = getTimezone(timeFormat);
+  // Under a few seconds the ticks fall within the same second, so they carry
+  // fractions of one to stay apart.
   const precision =
-    durationMs < 10 * 60_000
-      ? 'second'
-      : durationMs < 24 * 60 * 60_000
-        ? 'minute'
-        : durationMs < 365 * 24 * 60 * 60_000
-          ? 'day'
-          : 'year';
+    durationMs < 1_000
+      ? 'centisecond'
+      : durationMs < 5_000
+        ? 'decisecond'
+        : durationMs < 10 * 60_000
+          ? 'second'
+          : durationMs < 24 * 60 * 60_000
+            ? 'minute'
+            : durationMs < 365 * 24 * 60 * 60_000
+              ? 'day'
+              : 'year';
   const cacheKey = `${timeZone}|${hourFormat}|${precision}`;
   let formatter = formatterCache.get(cacheKey);
 
   if (!formatter) {
     const hour12 = hourFormat === 'system' ? undefined : hourFormat === '12';
     const options: Intl.DateTimeFormatOptions =
-      precision === 'second'
-        ? { hour: 'numeric', minute: '2-digit', second: '2-digit' }
-        : precision === 'minute'
-          ? { hour: 'numeric', minute: '2-digit' }
-          : precision === 'day'
-            ? { month: 'short', day: 'numeric', hour: 'numeric' }
-            : { year: 'numeric', month: 'short', day: 'numeric' };
+      precision === 'centisecond' || precision === 'decisecond'
+        ? {
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit',
+            fractionalSecondDigits: precision === 'centisecond' ? 2 : 1,
+          }
+        : precision === 'second'
+          ? { hour: 'numeric', minute: '2-digit', second: '2-digit' }
+          : precision === 'minute'
+            ? { hour: 'numeric', minute: '2-digit' }
+            : precision === 'day'
+              ? { month: 'short', day: 'numeric', hour: 'numeric' }
+              : { year: 'numeric', month: 'short', day: 'numeric' };
     formatter = new Intl.DateTimeFormat(undefined, {
       ...options,
       ...(hour12 !== undefined && { hour12 }),

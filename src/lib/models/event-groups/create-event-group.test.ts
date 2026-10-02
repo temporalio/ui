@@ -10,6 +10,7 @@ import {
   createEventGroup,
   groupCategory,
   groupIsPending,
+  restoreEventGroup,
 } from './create-event-group';
 
 const scheduledEvent = {
@@ -206,4 +207,26 @@ describe('groupCategory', () => {
       expect(groupCategory(head)).toBe(category);
     },
   );
+});
+
+describe('restoreEventGroup', () => {
+  it('gives a group back its derived fields after a JSON round trip', () => {
+    const group = createEventGroup({
+      ...scheduledEvent,
+      classification: 'Scheduled',
+    } as unknown as ActivityTaskScheduledEvent)!;
+    group.eventList.push({
+      ...completedEvent,
+      classification: 'Completed',
+    } as unknown as WorkflowEvent);
+
+    const parsed = JSON.parse(JSON.stringify(group));
+    expect(parsed.finalClassification).toBeUndefined();
+
+    const restored = restoreEventGroup(parsed);
+    expect(restored.finalClassification).toBe('Completed');
+    expect(restored.lastEvent.id).toBe('7');
+    expect(restored.eventCount).toBe(2);
+    expect(restored.classification).toBe('Scheduled');
+  });
 });

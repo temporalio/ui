@@ -56,6 +56,9 @@
   type Props = {
     group: EventGroup | LazyGroup;
     canvasWidth: number;
+    /** Space kept clear at each end of the plot; defaults to the shared gutter. */
+    startInsetPx?: number;
+    endInsetPx?: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
     // Reactive event count so the row recomputes on streamed appends (eventList
@@ -85,6 +88,8 @@
   let {
     group,
     canvasWidth,
+    startInsetPx = GUTTER,
+    endInsetPx = GUTTER,
     project,
     readOnly = false,
     eventCount = 0,
@@ -106,7 +111,7 @@
     rowHeight = ROW_HEIGHT,
   }: Props = $props();
 
-  const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
+  const timelineWidth = $derived(canvasWidth - startInsetPx - endInsetPx);
   const resolvedTerminal = $derived(
     Boolean(resolvedStatus) &&
       resolvedStatus !== 'Running' &&
@@ -253,8 +258,8 @@
   const rowGeometry = $derived(
     getTimelineRowGeometry({
       points,
-      viewportStartPx: GUTTER,
-      viewportEndPx: canvasWidth - GUTTER + viewportEndOverscanPx,
+      viewportStartPx: startInsetPx,
+      viewportEndPx: canvasWidth - endInsetPx + viewportEndOverscanPx,
       pendingEndPx:
         isLivePending && pendingEndTimeMs !== undefined
           ? Math.round(project(new Date(pendingEndTimeMs).toISOString()))
@@ -283,7 +288,8 @@
     visibleConnectors.some((connector) => connector.pending),
   );
   const hasVisibleConnector = $derived(visibleConnectors.length > 0);
-  const labelSafeInset = GUTTER + 1.5 * RADIUS;
+  const labelSafeStart = $derived(startInsetPx + 1.5 * RADIUS);
+  const labelSafeEnd = $derived(endInsetPx + 1.5 * RADIUS);
   const labelTextPositionX = $derived(
     textPosition[0] +
       (textAnchor === 'start' ? labelLeadingOffsetPx : -labelTrailingOffsetPx),
@@ -292,16 +298,16 @@
     hasVisibleConnector &&
       (hasVisiblePendingConnector ||
         labelTextPositionX - (textAnchor === 'end' ? labelWidth : 0) <
-          labelSafeInset ||
+          labelSafeStart ||
         labelTextPositionX + (textAnchor === 'end' ? 0 : labelWidth) >
-          canvasWidth - labelSafeInset),
+          canvasWidth - labelSafeEnd),
   );
   const labelVisible = $derived(
     showLabel &&
       isTimelineLabelVisible(
         labelTextPositionX,
-        GUTTER,
-        canvasWidth - GUTTER,
+        startInsetPx,
+        canvasWidth - endInsetPx,
         hasVisibleConnector,
       ),
   );
@@ -447,9 +453,9 @@
       : undefined}
   {@const clampedLabelMaxWidth = Math.max(
     0,
-    canvasWidth - 2 * (GUTTER + 1.5 * RADIUS),
+    canvasWidth - labelSafeStart - labelSafeEnd,
   )}
-  {@const clampedLabelLeft = `clamp(calc(${GUTTER + 1.5 * RADIUS - spanLeft}px + var(--timeline-frame-offset, 0px)), ${labelTextPositionX - spanLeft - (textAnchor === 'end' ? labelWidth : 0)}px, calc(${canvasWidth - GUTTER - 1.5 * RADIUS - labelWidth - spanLeft}px + var(--timeline-frame-offset, 0px)))`}
+  {@const clampedLabelLeft = `clamp(calc(${labelSafeStart - spanLeft}px + var(--timeline-frame-offset, 0px)), ${labelTextPositionX - spanLeft - (textAnchor === 'end' ? labelWidth : 0)}px, calc(${canvasWidth - labelSafeEnd - labelWidth - spanLeft}px + var(--timeline-frame-offset, 0px)))`}
   <div
     class="pointer-events-auto absolute z-10 flex select-none items-center gap-1 whitespace-nowrap rounded-full bg-surface-primary px-1.5 text-xs leading-none {textAnchor ===
     'end'
@@ -535,7 +541,7 @@
             dashed: visibleConnector.pending,
             animate: visibleConnector.pending,
             liveEdge: visibleConnector.pending,
-            viewportClippedStart: visibleConnector.startPx <= GUTTER,
+            viewportClippedStart: visibleConnector.startPx <= startInsetPx,
           },
         )}
       {/each}

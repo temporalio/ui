@@ -32,3 +32,23 @@ export {
   sendDunningNotice,
   suspendService,
 } from './subscription-billing';
+export {
+  checkRefundPolicy,
+  createAccount,
+  fetchCatalogPage,
+  fetchRegionalOverrides,
+  holdInventory,
+  issueRefund,
+  loadSyncCursor,
+  lookupOrder,
+  normalizeEmail,
+  notifyCustomerOfRefund,
+  provisionWorkspace,
+  publishCatalog,
+  rebuildPriceIndex,
+  scheduleDripEmail,
+  scoreRefundRisk,
+  sendWelcomeEmail,
+  syncCrmContact,
+  upsertProducts,
+} from './lanes-scenarios';

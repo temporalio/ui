@@ -1,4 +1,5 @@
 import type { ChildWorkflowReference } from '$lib/components/lines-and-dots/timeline-graph/recursive-timeline-model';
+import { restoreEventGroup } from '$lib/models/event-groups/create-event-group';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import {
   getEventGroupDisplayName,
@@ -978,9 +979,11 @@ export class SealedTimelineRunModel implements TimelineRunModel {
     }
     const detail = deepFreeze(
       prepareDetailsForDisplay(
-        JSON.parse(
-          detailAt(this.requireDetailBacking(), ordinal),
-        ) as EventGroup,
+        restoreEventGroup(
+          JSON.parse(
+            detailAt(this.requireDetailBacking(), ordinal),
+          ) as EventGroup,
+        ),
       ),
     );
     this.detailCache.set(cacheKey, detail, {

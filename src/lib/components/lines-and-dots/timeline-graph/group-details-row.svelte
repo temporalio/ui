@@ -2,15 +2,10 @@
   import { onMount } from 'svelte';
 
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
-  import EventStatusBadge, {
-    type EventStatus,
-  } from '$lib/components/event/event-status-badge.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import { IconClock, IconClose } from '$lib/io/icon';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
-  import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
+
+  import GroupDetailsHeader from './group-details-header.svelte';
 
   type Props = {
     group: EventGroup;
@@ -22,6 +17,8 @@
     onHeight?: (h: number) => void;
     timelineKey?: string;
     active?: boolean;
+    /** The workflow whose history the group's events belong to. */
+    historyOwner?: { namespace: string; workflowId: string; runId: string };
   };
 
   let {
@@ -33,6 +30,7 @@
     onHeight,
     timelineKey = group.id,
     active = true,
+    historyOwner,
   }: Props = $props();
 
   // ResizeObserver so the height re-measures when CodeMirror lazily swaps in.
@@ -51,22 +49,6 @@
     observer.observe(contentEl);
     return () => observer.disconnect();
   });
-
-  const title = $derived(group.displayName);
-
-  const duration = $derived(
-    formatEventGroupDuration({ group, endTime, includeMilliseconds: true }),
-  );
-
-  const status = $derived.by<EventStatus>(() => {
-    const pending = active ? group.pendingActivity : undefined;
-    if (pending) {
-      if (pending.paused) return 'Paused';
-      if ((pending.attempt ?? 0) > 1) return 'Retrying';
-      return 'Pending';
-    }
-    return group.finalClassification || group.classification;
-  });
 </script>
 
 <div
@@ -76,31 +58,17 @@
   style:width="{canvasWidth}px"
 >
   <div bind:this={contentEl} class="flex flex-col">
-    <div
-      class="relative flex h-full items-center justify-between bg-surface-secondary text-sm"
-    >
-      <div class="flex h-full items-center gap-4 px-2">
-        <EventStatusBadge {status} />
-        {title}
-        {#if duration}
-          <div class="flex items-center gap-1">
-            <IconClock />
-            {duration}
-          </div>
-        {/if}
-      </div>
-      <div class="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="xs"
-          onclick={() => setActiveGroup(group, timelineKey)}
-          >{translate('common.close')} <IconClose /></Button
-        >
-      </div>
-    </div>
+    <GroupDetailsHeader
+      class="relative h-full"
+      {group}
+      {endTime}
+      {active}
+      onClose={() => setActiveGroup(group, timelineKey)}
+    />
     <div class="bg-surface-primary text-primary">
       <EventDetailsFull
         {group}
+        {historyOwner}
         event={group.initialEvent}
         lazy={true}
         groupRow={true}

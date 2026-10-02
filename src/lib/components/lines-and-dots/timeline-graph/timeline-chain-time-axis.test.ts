@@ -18,6 +18,20 @@ describe('timeline chain time axis', () => {
     expect(formatTimelineChainDuration(durationMs)).toBe(expected);
   });
 
+  it('keeps ticks within the same second apart with fractions of one', () => {
+    const timeMs = Date.UTC(2026, 9, 2, 14, 34, 3, 462);
+    const format = (durationMs: number) =>
+      formatTimelineChainTickTime({
+        timeMs,
+        durationMs,
+        timeFormat: 'UTC',
+        hourFormat: '24',
+      });
+    expect(format(303)).toBe('14:34:03.46');
+    expect(format(3_000)).toBe('14:34:03.4');
+    expect(format(72_000)).toBe('14:34:03');
+  });
+
   it('adapts the number of ticks to the available width', () => {
     expect(
       getTimelineChainTimeTicks({

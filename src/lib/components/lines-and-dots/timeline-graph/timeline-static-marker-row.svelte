@@ -17,6 +17,9 @@
     group: LazyGroup;
     timelineKey: string;
     canvasWidth: number;
+    /** Space kept clear at each end of the plot; defaults to the shared gutter. */
+    startInsetPx?: number;
+    endInsetPx?: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
     showLabel?: boolean;
@@ -28,6 +31,8 @@
     group,
     timelineKey,
     canvasWidth,
+    startInsetPx = GUTTER,
+    endInsetPx = GUTTER,
     project,
     readOnly,
     showLabel = true,
@@ -44,7 +49,7 @@
       resolveSystemNexusEvent(group.initialEvent)?.timelineCategory ??
       group.category;
     return {
-      visible: pointX >= GUTTER && pointX <= canvasWidth - GUTTER,
+      visible: pointX >= startInsetPx && pointX <= canvasWidth - endInsetPx,
       bounds: alignedDotBox(
         pointX,
         rowHeight / 2,
@@ -62,7 +67,7 @@
       label: timelineTextPosition(
         [pointX],
         rowHeight / 2,
-        canvasWidth - 2 * GUTTER,
+        canvasWidth - startInsetPx - endInsetPx,
         false,
       ),
     };

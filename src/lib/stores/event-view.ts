@@ -35,3 +35,10 @@ export const workflowViewPreference = persistStore<WorkflowViewPreference>(
   'workflowViewPreference',
   'timeline',
 );
+
+export const laneTreeWidth = persistStore<number | null>('laneTreeWidth', null);
+
+export const laneDetailsWidth = persistStore<number | null>(
+  'laneDetailsWidth',
+  null,
+);
