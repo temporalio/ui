@@ -30,6 +30,7 @@
     footer?: Snippet<[{ submitting: boolean }]>;
     nameLeading?: Snippet;
     fieldsInert?: boolean;
+    submitDisabled?: boolean;
     class?: string;
     card?: boolean;
     validateNamespacesExist?: ValidateNamespacesExist;
@@ -49,6 +50,7 @@
     footer,
     nameLeading,
     fieldsInert = false,
+    submitDisabled = false,
     class: className = '',
     card = false,
     validateNamespacesExist,
@@ -108,7 +110,7 @@
     resetForm: false,
     dataType: 'json',
     onUpdate: async ({ form, cancel }) => {
-      if (!form.valid || fieldsInert) return;
+      if (!form.valid || fieldsInert || submitDisabled) return;
 
       if (
         isCloud &&
@@ -333,6 +335,7 @@
     <Button
       type="submit"
       disabled={fieldsInert ||
+        submitDisabled ||
         $submitting ||
         (endpoint && !isTainted($tainted))}
       loading={$submitting}
