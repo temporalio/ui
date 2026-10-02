@@ -1,5 +1,7 @@
 import { createSubscriber } from 'svelte/reactivity';
 
+import { EventMarkerGroupRepository } from './data/event-marker-groups/repository';
+import type { EventMarkerGroup } from './data/event-marker-groups/types';
 import { ExecutionGraphCoordinator } from './data/execution-graph/coordinator';
 import { ExecutionGraphRepository } from './data/execution-graph/repository';
 import type { ExecutionGraphSnapshot } from './data/execution-graph/types';
@@ -23,12 +25,14 @@ export type WorkflowTimeline = Readonly<{
   executionGraphRepository: ExecutionGraphRepository;
   executionHistoryRepository: ExecutionHistoryRepository;
   historyEventRepository: HistoryEventRepository;
+  eventMarkerGroupRepository: EventMarkerGroupRepository;
   lifecycleGroupRepository: LifecycleGroupRepository;
   lifecycleFilterRepository: LifecycleFilterRepository;
   timelineRowRepository: TimelineRowRepository;
   requestExecution: (identity: ExecutionIdentity) => void;
   getQuerySnapshot: (query: LifecycleFilterQuery) => readonly LifecycleKey[];
   historyEvents: readonly QualifiedHistoryEvent[];
+  eventMarkerGroups: readonly EventMarkerGroup[];
   lifecycleGroups: readonly LifecycleGroup[];
   timelineRows: readonly TimelineEventRow[];
   executionGraph: ExecutionGraphSnapshot;
@@ -40,6 +44,7 @@ type TimelineRepositories = Pick<
   | 'executionGraphRepository'
   | 'executionHistoryRepository'
   | 'historyEventRepository'
+  | 'eventMarkerGroupRepository'
   | 'lifecycleGroupRepository'
   | 'lifecycleFilterRepository'
   | 'timelineRowRepository'
@@ -48,12 +53,17 @@ type TimelineRepositories = Pick<
 function connectRepositories({
   executionGraphRepository,
   historyEventRepository,
+  eventMarkerGroupRepository,
   lifecycleGroupRepository,
   lifecycleFilterRepository,
   timelineRowRepository,
 }: TimelineRepositories): () => void {
   const unsubscribeLifecycleGroups = historyEventRepository.subscribe(
     (notification) => lifecycleGroupRepository.addEvents(notification.events),
+    { emitCurrentSnapshot: true },
+  );
+  const unsubscribeEventMarkerGroups = historyEventRepository.subscribe(
+    (notification) => eventMarkerGroupRepository.addEvents(notification.events),
     { emitCurrentSnapshot: true },
   );
   const unsubscribeExecutionGraph = historyEventRepository.subscribe(
@@ -75,6 +85,7 @@ function connectRepositories({
   );
 
   return () => {
+    unsubscribeEventMarkerGroups();
     unsubscribeLifecycleFilters();
     unsubscribeLifecycleGroups();
     unsubscribeExecutionGraph();
@@ -87,6 +98,7 @@ function createReactiveTimeline(
     executionGraphRepository,
     executionHistoryRepository,
     historyEventRepository,
+    eventMarkerGroupRepository,
     lifecycleGroupRepository,
     lifecycleFilterRepository,
     timelineRowRepository,
@@ -101,6 +113,9 @@ function createReactiveTimeline(
   );
   const subscribeToHistoryEvents = createSubscriber((update) =>
     historyEventRepository.subscribe(update),
+  );
+  const subscribeToEventMarkerGroups = createSubscriber((update) =>
+    eventMarkerGroupRepository.subscribe(update),
   );
   const subscribeToLifecycleGroups = createSubscriber((update) =>
     lifecycleGroupRepository.subscribe(update),
@@ -117,6 +132,7 @@ function createReactiveTimeline(
     executionGraphRepository,
     executionHistoryRepository,
     historyEventRepository,
+    eventMarkerGroupRepository,
     lifecycleGroupRepository,
     lifecycleFilterRepository,
     timelineRowRepository,
@@ -136,6 +152,10 @@ function createReactiveTimeline(
     get historyEvents() {
       subscribeToHistoryEvents();
       return historyEventRepository.getSnapshot();
+    },
+    get eventMarkerGroups() {
+      subscribeToEventMarkerGroups();
+      return eventMarkerGroupRepository.getSnapshot();
     },
     get lifecycleGroups() {
       subscribeToLifecycleGroups();
@@ -166,6 +186,7 @@ export function useWorkflowTimeline(
     executionGraphRepository: new ExecutionGraphRepository(),
     executionHistoryRepository: new ExecutionHistoryRepository(),
     historyEventRepository,
+    eventMarkerGroupRepository: new EventMarkerGroupRepository(),
     lifecycleGroupRepository: new LifecycleGroupRepository(),
     lifecycleFilterRepository: new LifecycleFilterRepository(
       filters,
