@@ -66,6 +66,16 @@ export const getStatusFillColor = (
   return color === DEFAULT_STROKE_COLOR ? NEUTRAL_FILL_COLOR : color;
 };
 
+/**
+ * Child workflows take a brighter blue than the root's navy, so a workflow
+ * started by another reads apart from the one at the top. Step 11 keeps the
+ * text readable on a light page.
+ */
+const CHILD_WORKFLOW_COLOR = colorScales.blue[11];
+
+/** A child workflow's bar on the timeline: the blue's step 9, as a fill. */
+export const CHILD_WORKFLOW_BAR_COLOR = colorScales.blue[9];
+
 const CATEGORY_STROKE_COLORS: Record<
   EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
   string
@@ -76,7 +86,7 @@ const CATEGORY_STROKE_COLORS: Record<
   workflow: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
   marker: colorScales.neutral[1],
   command: colorScales.neutral[1],
-  'child-workflow': WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
+  'child-workflow': CHILD_WORKFLOW_COLOR,
   update: colorScales.persimmon[8],
   pending: colorScales['slate-blue'][8],
   retry: colorScales.persimmon[8],
@@ -96,7 +106,7 @@ const CATEGORY_FILL_COLORS: Record<
   string
 > = {
   workflow: WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
-  'child-workflow': WORKFLOW_ACTION_COLOR_VARIABLES.workflow,
+  'child-workflow': CHILD_WORKFLOW_COLOR,
   activity: WORKFLOW_ACTION_COLOR_VARIABLES.activity,
   'local-activity': WORKFLOW_ACTION_COLOR_VARIABLES.activity,
   timer: WORKFLOW_ACTION_COLOR_VARIABLES.timer,

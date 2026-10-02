@@ -10,10 +10,23 @@
   import ClassicTimelineGraph from '$lib/components/lines-and-dots/timeline-graph/classic/timeline-graph.svelte';
   import { Timeline as ClassicTimeline } from '$lib/components/lines-and-dots/timeline-graph/classic/timeline.svelte';
   import {
-    GUTTER,
-    LANE_TIME_ORIGIN_PX,
+    LANE_DETAILS_MIN_WIDTH,
+    LANE_DURATION_COLUMN_PX,
+    LANE_HEADER_INSET_PX,
+    LANE_RETRIES_COLUMN_PX,
+    LANE_TREE_COLUMN_GAP_PX,
   } from '$lib/components/lines-and-dots/timeline-graph/constants';
+  import {
+    laneEdgeInsetPx,
+    laneTimeOriginPx,
+  } from '$lib/components/lines-and-dots/timeline-graph/gutter/lane-tree-width';
+  import {
+    clampLaneDetailsWidth,
+    maxLaneDetailsWidth,
+  } from '$lib/components/lines-and-dots/timeline-graph/lane-details-width';
+  import LaneFrameCorner from '$lib/components/lines-and-dots/timeline-graph/lane-frame-corner.svelte';
   import TimelineChainOverview from '$lib/components/lines-and-dots/timeline-graph/timeline-chain-overview.svelte';
+  import TimelineDetailsPanel from '$lib/components/lines-and-dots/timeline-graph/timeline-details-panel.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
   import type { TimelinePerformanceStats } from '$lib/components/lines-and-dots/timeline-graph/timeline-performance';
   import {
@@ -24,6 +37,7 @@
   import type { Timeline } from '$lib/components/lines-and-dots/timeline-graph/timeline.svelte';
   import type {
     TimelineDisplayMode,
+    TimelineSelectedDetails,
     TimelineViewMode,
   } from '$lib/components/lines-and-dots/timeline-graph/types';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
@@ -45,13 +59,15 @@
     IconAdd,
     IconArrowAscending,
     IconArrowDescending,
-    IconArrowLeft,
-    IconArrowRight,
+    IconArrowLeftToLine,
+    IconArrowRightToLine,
     IconCollapse,
+    IconCompact,
     IconDownload,
     IconHyphen,
     IconPause,
     IconPlay,
+    IconTimeline,
   } from '$lib/io/icon';
   import {
     getRenderableTimelineRuns,
@@ -74,7 +90,12 @@
     type WorkflowChainOverviewRun,
   } from '$lib/services/workflow-chain-overview';
   import { clearActives } from '$lib/stores/active-events';
-  import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
+  import {
+    collapseIdleTime,
+    eventFilterSort,
+    laneDetailsWidth,
+    laneTreeWidth,
+  } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -156,13 +177,115 @@
   );
   const requestedDisplayMode = $derived(urlParams.timelineDisplayMode);
   const showGroups = $derived(urlParams.showGroups);
+  const showTree = $derived(urlParams.showTree);
+  let renderedLaneTreeWidth = $state(0);
+  let selectedLaneDetails = $state<TimelineSelectedDetails | null>(null);
+  let timelineRowWidth = $state(0);
+  let toolbarEl = $state<HTMLDivElement | null>(null);
+  let toolbarBottomPx = $state(0);
+  let laneFrameEl = $state<HTMLDivElement | null>(null);
+  let laneHeaderHeightPx = $state(0);
+  // Once the header sticks, rows scroll under it; a shadow then lifts it off
+  // them. A marker at the top of the frame passing under the toolbar is the
+  // moment the header starts sticking.
+  let laneHeaderSentinelEl = $state<HTMLDivElement | null>(null);
+  let laneHeaderStuck = $state(false);
+  $effect(() => {
+    const sentinel = laneHeaderSentinelEl;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        laneHeaderStuck =
+          !entry.isIntersecting &&
+          entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0);
+      },
+      {
+        root: document.getElementById('content-wrapper'),
+        rootMargin: `-${toolbarBottomPx}px 0px 0px 0px`,
+      },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  });
+  let laneScrollerHeightPx = $state(0);
+  // The page's padding under the frame; only measurable once the page scrolls.
+  let laneBottomGapPx = $state(32);
+
+  // A short timeline still fills the screen: with its header stuck under the
+  // toolbar, the frame reaches down to the page's bottom padding. Measured
+  // rather than assumed, since the toolbar wraps and the page scrolls inside
+  // its own container.
+  $effect(() => {
+    const frame = laneFrameEl;
+    if (!frame) return;
+    const scroller = document.getElementById('content-wrapper');
+    const measure = () => {
+      if (!scroller) {
+        laneScrollerHeightPx = window.innerHeight;
+        return;
+      }
+      const scrollerTop = scroller.getBoundingClientRect().top;
+      const frameBottom =
+        frame.getBoundingClientRect().bottom - scrollerTop + scroller.scrollTop;
+      laneScrollerHeightPx = scroller.clientHeight;
+      if (scroller.scrollHeight > scroller.clientHeight + 1) {
+        laneBottomGapPx = Math.max(0, scroller.scrollHeight - frameBottom);
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (scroller) observer.observe(scroller);
+    observer.observe(frame);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  });
+  const laneMinPlotHeightPx = $derived(
+    Math.max(
+      0,
+      laneScrollerHeightPx -
+        toolbarBottomPx -
+        laneHeaderHeightPx -
+        laneBottomGapPx,
+    ),
+  );
+
+  // The details panel sticks right under the toolbar, which itself sticks
+  // under the top nav from md up; read where it ends rather than assume.
+  $effect(() => {
+    if (!toolbarEl) return;
+    const element = toolbarEl;
+    const measure = () => {
+      toolbarBottomPx =
+        (parseFloat(getComputedStyle(element).top) || 0) + element.offsetHeight;
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  });
+
+  const laneDetailsWidthPx = $derived(
+    clampLaneDetailsWidth($laneDetailsWidth, timelineRowWidth),
+  );
   const displayMode = $derived(requestedDisplayMode);
-  // Lanes renders on the full-duration scale; only where the nesting is drawn
-  // differs, so everything downstream of the view toggle treats it that way.
-  const nestedLanes = $derived(displayMode === 'lanes');
-  // The graph shell carries a 1px border the overview above it does not, so the
-  // canvas's coordinate origin sits one pixel further in.
-  const TIMELINE_SHELL_BORDER_PX = 1;
+  // Both full duration and the sliding window draw the tree layout (the tree,
+  // the frames and the details panel); only Classic keeps its own.
+  const nestedLanes = $derived(displayMode !== 'classic');
+  // Lanes heads its tree's column from the overview; without the tree there
+  // is no column to head, so the overview falls back to its usual layout.
+  const laneTreeShown = $derived(nestedLanes && showTree);
+  // Outside Lanes the graph shell carries a 1px border the overview above it
+  // does not, so the canvas's origin sits one pixel further in. Lanes frames
+  // both in one container instead, so they start at the same edge.
+  const TIMELINE_SHELL_BORDER_PX = $derived(nestedLanes ? 0 : 1);
+  const lanePanelOpen = $derived(nestedLanes && !!selectedLaneDetails);
   const graphDisplayMode = $derived<TimelineDisplayMode>(
     displayMode === 'fixed-window' ? 'fixed-window' : 'full-duration',
   );
@@ -276,6 +399,10 @@
     updateEventFilterParams(page.url, { showGroups: !showGroups }, goto);
   };
 
+  const onShowTree = () => {
+    updateEventFilterParams(page.url, { showTree: !showTree }, goto);
+  };
+
   // The timeline renders in normal page flow: the page (#content-wrapper)
   // scrolls it and the controls bar sticks to the top-nav. TimelineGraph
   // virtualizes internally from the visible page band, so there's no bounded
@@ -292,6 +419,20 @@
 
   let timeline = $state<Timeline | ClassicTimeline>();
   let timelineWindowControls = $state<TimelineWindowControls>();
+  // The playback controls are icon-only; these name them for tooltips and
+  // screen readers.
+  const playbackLabel = $derived(
+    timelineWindowControls?.mode === 'paused'
+      ? translate('workflows.timeline-resume')
+      : translate('workflows.timeline-pause'),
+  );
+  const jumpToEndLabel = $derived(
+    translate(
+      isNotPending
+        ? 'workflows.timeline-jump-end'
+        : 'workflows.timeline-jump-current',
+    ),
+  );
   let timelinePerformanceStats = $state<TimelinePerformanceStats>();
   let chainIndex = $state.raw<ChainIndexSnapshot | null>(null);
   const chainOverviewSegments = $derived(
@@ -863,62 +1004,37 @@
   data-chain-route-run-id={workflowRunCtx.chainRunId}
 >
   <div
-    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary pb-2 text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    bind:this={toolbarEl}
+    class="sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 bg-background-primary pb-2 text-primary md:top-[var(--top-nav-height)] md:pt-2 xl:gap-x-8"
   >
     <div class="flex items-center gap-2">
       <h2>{translate('workflows.timeline-tab')}</h2>
       <EventHistoryLegend />
     </div>
-    <div class="flex w-full flex-wrap items-center justify-end gap-2 xl:w-auto">
+    <div
+      class="flex w-full flex-wrap items-center justify-start gap-2 xl:w-auto"
+    >
       <ToggleButtons
         role="group"
         aria-label={translate('workflows.timeline-view')}
       >
         <ToggleButton
-          active={displayMode === 'full-duration'}
-          data-testid="timeline-full-duration"
-          onclick={() => onDisplayMode('full-duration')}
-          size="sm"
-        >
-          {translate('workflows.timeline-full-duration')}
-        </ToggleButton>
-        <ToggleButton
           active={displayMode === 'fixed-window'}
           data-testid="timeline-fixed-window"
           onclick={() => onDisplayMode('fixed-window')}
-          size="sm"
+          size="xs"
         >
           {translate('workflows.timeline-sliding-window')}
-        </ToggleButton>
-        <ToggleButton
-          active={displayMode === 'lanes'}
-          data-testid="timeline-lanes"
-          onclick={() => onDisplayMode('lanes')}
-          size="sm"
-        >
-          {translate('workflows.timeline-lanes')}
         </ToggleButton>
         <ToggleButton
           active={displayMode === 'classic'}
           data-testid="timeline-classic"
           onclick={() => onDisplayMode('classic')}
-          size="sm"
+          size="xs"
         >
           {translate('workflows.timeline-classic')}
         </ToggleButton>
       </ToggleButtons>
-      {#if displayMode !== 'classic'}
-        <ToggleButtons>
-          <ToggleButton
-            active={showGroups}
-            data-testid="timeline-show-groups"
-            onclick={onShowGroups}
-            size="sm"
-          >
-            {translate('workflows.timeline-show-groups')}
-          </ToggleButton>
-        </ToggleButtons>
-      {/if}
       {#if displayMode === 'fixed-window' && timelineWindowControls}
         <ToggleButtons
           role="group"
@@ -930,16 +1046,17 @@
             aria-label={translate('workflows.timeline-zoom-out')}
             title={translate('workflows.timeline-zoom-out')}
             disabled={!timelineWindowControls.canZoomOut}
+            class="gap-0"
             data-testid="timeline-zoom-out"
             onclick={() => zoomTimelineWindow('out')}
-            size="sm"
+            size="xs"
           >
             <span class="sr-only"
               >{translate('workflows.timeline-zoom-out')}</span
             >
           </ToggleButton>
           <span
-            class="flex min-w-12 items-center justify-center border-y border-primary px-2 text-xs font-medium tabular-nums text-secondary"
+            class="flex min-w-12 items-center justify-center border-y border-l border-brand bg-surface-primary px-2 text-xs font-medium tabular-nums text-secondary"
             aria-live="polite"
             aria-label={translate('workflows.timeline-window-duration')}
             data-testid="timeline-window-duration"
@@ -953,9 +1070,10 @@
             aria-label={translate('workflows.timeline-zoom-in')}
             title={translate('workflows.timeline-zoom-in')}
             disabled={!timelineWindowControls.canZoomIn}
+            class="gap-0"
             data-testid="timeline-zoom-in"
             onclick={() => zoomTimelineWindow('in')}
-            size="sm"
+            size="xs"
           >
             <span class="sr-only"
               >{translate('workflows.timeline-zoom-in')}</span
@@ -968,13 +1086,18 @@
           data-testid="sliding-window-controls"
         >
           <ToggleButton
-            LeadingIcon={IconArrowLeft}
+            LeadingIcon={IconArrowLeftToLine}
+            aria-label={translate('workflows.timeline-jump-beginning')}
+            title={translate('workflows.timeline-jump-beginning')}
             disabled={chainOverviewLoading || timelineAtChainBeginning}
+            class="gap-0"
             data-testid="timeline-window-beginning"
             onclick={jumpTimelineToBeginning}
-            size="sm"
+            size="xs"
           >
-            {translate('workflows.timeline-jump-beginning')}
+            <span class="sr-only"
+              >{translate('workflows.timeline-jump-beginning')}</span
+            >
           </ToggleButton>
           <ToggleButton
             LeadingIcon={timelineWindowControls.mode === 'paused'
@@ -984,37 +1107,63 @@
               !timelineWindowControls.atCurrent}
             disabled={timelineWindowControls.mode === 'paused' &&
               timelineWindowControls.atCurrent}
+            aria-label={playbackLabel}
+            title={playbackLabel}
+            class="gap-0"
             data-testid="timeline-window-playback"
             onclick={timelineWindowControls.mode === 'paused'
               ? timelineWindowControls.resume
               : timelineWindowControls.pause}
-            size="sm"
+            size="xs"
           >
-            {timelineWindowControls.mode === 'paused'
-              ? translate('workflows.timeline-resume')
-              : translate('workflows.timeline-pause')}
+            <span class="sr-only">{playbackLabel}</span>
           </ToggleButton>
           <ToggleButton
-            LeadingIcon={IconArrowRight}
+            LeadingIcon={IconArrowRightToLine}
+            aria-label={jumpToEndLabel}
+            title={jumpToEndLabel}
             disabled={timelineWindowControls.atCurrent}
+            class="gap-0"
             data-testid="timeline-window-current"
             onclick={jumpTimelineToCurrent}
-            size="sm"
+            size="xs"
           >
-            {translate(
-              isNotPending
-                ? 'workflows.timeline-jump-end'
-                : 'workflows.timeline-jump-current',
-            )}
+            <span class="sr-only">{jumpToEndLabel}</span>
           </ToggleButton>
         </ToggleButtons>
       {/if}
       <ToggleButtons>
+        {#if displayMode !== 'classic'}
+          {#if nestedLanes}
+            <ToggleButton
+              LeadingIcon={IconCompact}
+              data-testid="timeline-show-tree"
+              onclick={onShowTree}
+              size="xs"
+              variant="tertiary"
+            >
+              {showTree
+                ? translate('workflows.timeline-hide-tree')
+                : translate('workflows.timeline-show-tree')}
+            </ToggleButton>
+          {/if}
+          <ToggleButton
+            LeadingIcon={IconTimeline}
+            data-testid="timeline-show-groups"
+            onclick={onShowGroups}
+            size="xs"
+            variant="tertiary"
+          >
+            {showGroups
+              ? translate('workflows.timeline-hide-groups')
+              : translate('workflows.timeline-show-groups')}
+          </ToggleButton>
+        {/if}
         <ToggleButton
           LeadingIcon={reverseSort ? IconArrowDescending : IconArrowAscending}
           data-testid="timeline-sort"
           onclick={onSort}
-          size="sm"
+          size="xs"
           variant="tertiary"
         >
           {reverseSort ? 'Descending' : 'Ascending'}
@@ -1026,20 +1175,20 @@
           disabled={!historyCtx.fetchComplete ||
             !timeline?.hasCollapsibleSegments}
           onclick={onToggleIdleTime}
-          size="sm"
+          size="xs"
           variant="tertiary"
         >
           {timeline?.allCollapsibleSegmentsCollapsed
             ? translate('workflows.show-idle-time')
             : translate('workflows.hide-idle-time')}
         </ToggleButton>
-        <EventTypeFilter compact={false} />
+        <EventTypeFilter compact={false} size="xs" />
       </ToggleButtons>
       <ToggleButtons>
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
-          size="sm"
+          size="xs"
           variant="tertiary"
           onclick={onAutoRefreshToggle}
         >
@@ -1055,7 +1204,7 @@
         <ToggleButton
           data-testid="download"
           LeadingIcon={IconDownload}
-          size="sm"
+          size="xs"
           variant="tertiary"
           onclick={() => (showDownloadPrompt = true)}
         >
@@ -1071,100 +1220,192 @@
   no scroll-offset bridge).
 -->
   {#if workflow}
-    {#if displayMode !== 'classic'}
-      <TimelineChainOverview
-        segments={chainOverviewSegments}
-        loading={chainOverviewLoading}
-        leadingInsetPx={nestedLanes
-          ? LANE_TIME_ORIGIN_PX + TIMELINE_SHELL_BORDER_PX
-          : 0}
-        trailingInsetPx={nestedLanes ? GUTTER : 0}
-        windowStartTimeMs={displayMode === 'fixed-window'
-          ? timelineWindowControls?.windowStartTimeMs
-          : undefined}
-        windowEndTimeMs={displayMode === 'fixed-window'
-          ? timelineWindowControls?.windowEndTimeMs
-          : undefined}
-        windowDurationMs={displayMode === 'fixed-window'
-          ? timelineWindowControls?.windowDurationMs
-          : undefined}
-        windowMode={displayMode === 'fixed-window'
-          ? timelineWindowControls?.mode
-          : undefined}
-        onWindowMove={displayMode === 'fixed-window'
-          ? moveTimelineWindow
-          : undefined}
-        onWindowResize={displayMode === 'fixed-window'
-          ? resizeTimelineWindow
-          : undefined}
-      />
-      {#if instrumentTimelinePerformance}
+    <div
+      class="flex items-start {nestedLanes
+        ? 'relative overflow-clip rounded-lg bg-surface-primary'
+        : ''}"
+      bind:clientWidth={timelineRowWidth}
+      bind:this={laneFrameEl}
+    >
+      {#if nestedLanes}
+        <!-- The frame's outline is a layer of its own: the header and panel
+             stick above it and carry their own rounded tops once the
+             frame's top has scrolled away. -->
         <div
-          class="flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-b border-primary px-3 py-1 text-xs tabular-nums text-secondary"
-          data-testid="timeline-performance-stats"
-        >
-          <span>
-            Rows {timelinePerformanceStats?.mountedRows ?? 0} mounted / {timelinePerformanceStats?.logicalRows ??
-              0} total
-          </span>
-          <span>Lines {timelinePerformanceStats?.renderedLines ?? 0}</span>
-          <span>DOM {timelinePerformanceStats?.renderedElements ?? 0}</span>
-          <span>
-            Update {(timelinePerformanceStats?.updateMs ?? 0).toFixed(1)} ms · p95
-            {(timelinePerformanceStats?.p95UpdateMs ?? 0).toFixed(1)} ms
-          </span>
-        </div>
+          class="pointer-events-none absolute inset-0 z-[5] rounded-lg border border-secondary"
+          aria-hidden="true"
+        ></div>
       {/if}
-    {/if}
-    {#if displayMode === 'classic'}
-      <ClassicTimelineGraph
-        {workflow}
-        groups={classicGroups}
-        {reverseSort}
-        loading={!historyCtx.fetchComplete}
-        totalExpectedEvents={estimatedTotalGroups}
-        descMinId={historyCtx.descMinId}
-        error={Boolean(workflowTaskFailedError)}
-        onTimelineInit={handleTimelineInit}
-      />
-    {:else}
-      <TimelineGraph
-        {namespace}
-        displayMode={graphDisplayMode}
-        nesting={nestedLanes ? 'gutter' : 'canvas'}
-        {showGroups}
-        {workflow}
-        groups={bufferGroups}
-        {reverseSort}
-        disableVirtualization={disableTimelineVirtualization}
-        instrumentPerformance={instrumentTimelinePerformance}
-        modelLoading={intervalLoading}
-        sceneGeneration={committedInterval?.id}
-        chainIndexId={chainIndex?.id}
-        loading={!historyCtx.fetchComplete}
-        totalExpectedEvents={estimatedTotalGroups}
-        descMinId={historyCtx.descMinId}
-        {firstEventTime}
-        error={Boolean(workflowTaskFailedError)}
-        onTimelineInit={handleTimelineInit}
-        onRetentionWindow={workflowRunCtx.pruneRetainedRuns}
-        rowHeightRetentionScopeId={workflowRunCtx.following
-          ? workflowRunCtx.chainRunId
-          : workflow.runId}
-        knownChainStartRunId={workflowRunCtx.chainRunId}
-        chainStartTimeMs={fullDurationScale
-          ? chainOverviewRuns[0]?.startTimeMs
-          : undefined}
-        bind:windowControls={timelineWindowControls}
-        bind:performanceStats={timelinePerformanceStats}
-        {timelineRuns}
-      />
-    {/if}
-    {#if workflowRunCtx.truncation?.affectsVisibleInterval || committedInterval?.truncated}
-      <p class="mt-2 text-sm text-tertiary" role="status">
-        {translate('workflows.chained-timeline-truncated')}
-      </p>
-    {/if}
+      <div class="min-w-0 flex-1">
+        {#if displayMode !== 'classic'}
+          <!-- In Lanes the header draws the frame's rounded top itself, so the
+               line and its corners stay with it while it sticks under the
+               toolbar. -->
+          {#if nestedLanes}
+            <div
+              bind:this={laneHeaderSentinelEl}
+              class="h-0"
+              aria-hidden="true"
+            ></div>
+          {/if}
+          <div
+            class={nestedLanes
+              ? `lane-header sticky z-[10] ${laneHeaderStuck ? 'lane-header-stuck' : ''}`
+              : undefined}
+            style:top={nestedLanes ? `${toolbarBottomPx}px` : undefined}
+            bind:offsetHeight={laneHeaderHeightPx}
+          >
+            <TimelineChainOverview
+              segments={chainOverviewSegments}
+              loading={chainOverviewLoading}
+              leadingInsetPx={nestedLanes
+                ? laneTimeOriginPx(renderedLaneTreeWidth) +
+                  TIMELINE_SHELL_BORDER_PX
+                : 0}
+              trailingInsetPx={nestedLanes
+                ? laneEdgeInsetPx(renderedLaneTreeWidth)
+                : undefined}
+              leadingLabel={laneTreeShown
+                ? translate('workflows.timeline-events')
+                : undefined}
+              leadingLabelInsetPx={TIMELINE_SHELL_BORDER_PX +
+                LANE_HEADER_INSET_PX}
+              axisPlacement={nestedLanes ? 'inside' : 'above'}
+              leadingColumns={laneTreeShown
+                ? [
+                    {
+                      label: translate('workflows.timeline-duration'),
+                      widthPx: LANE_DURATION_COLUMN_PX,
+                    },
+                    {
+                      label: translate('workflows.timeline-retries'),
+                      widthPx: LANE_RETRIES_COLUMN_PX,
+                    },
+                  ]
+                : []}
+              leadingColumnsEndPx={TIMELINE_SHELL_BORDER_PX +
+                renderedLaneTreeWidth -
+                LANE_TREE_COLUMN_GAP_PX}
+              leadingColumnsGapPx={LANE_TREE_COLUMN_GAP_PX}
+              windowStartTimeMs={displayMode === 'fixed-window'
+                ? timelineWindowControls?.windowStartTimeMs
+                : undefined}
+              windowEndTimeMs={displayMode === 'fixed-window'
+                ? timelineWindowControls?.windowEndTimeMs
+                : undefined}
+              windowDurationMs={displayMode === 'fixed-window'
+                ? timelineWindowControls?.windowDurationMs
+                : undefined}
+              windowMode={displayMode === 'fixed-window'
+                ? timelineWindowControls?.mode
+                : undefined}
+              onWindowMove={displayMode === 'fixed-window'
+                ? moveTimelineWindow
+                : undefined}
+              onWindowResize={displayMode === 'fixed-window'
+                ? resizeTimelineWindow
+                : undefined}
+            />
+            {#if nestedLanes}
+              <LaneFrameCorner side="start" />
+              {#if !lanePanelOpen}
+                <LaneFrameCorner side="end" />
+              {/if}
+              <div
+                class="pointer-events-none absolute inset-0 rounded-tl-lg border-l border-t border-secondary {lanePanelOpen
+                  ? ''
+                  : 'rounded-tr-lg border-r'}"
+                aria-hidden="true"
+              ></div>
+            {/if}
+          </div>
+          {#if instrumentTimelinePerformance}
+            <div
+              class="flex flex-wrap items-center gap-x-3 gap-y-1 border-x border-b border-primary px-3 py-1 text-xs tabular-nums text-secondary"
+              data-testid="timeline-performance-stats"
+            >
+              <span>
+                Rows {timelinePerformanceStats?.mountedRows ?? 0} mounted / {timelinePerformanceStats?.logicalRows ??
+                  0} total
+              </span>
+              <span>Lines {timelinePerformanceStats?.renderedLines ?? 0}</span>
+              <span>DOM {timelinePerformanceStats?.renderedElements ?? 0}</span>
+              <span>
+                Update {(timelinePerformanceStats?.updateMs ?? 0).toFixed(1)} ms ·
+                p95
+                {(timelinePerformanceStats?.p95UpdateMs ?? 0).toFixed(1)} ms
+              </span>
+            </div>
+          {/if}
+        {/if}
+        {#if displayMode === 'classic'}
+          <ClassicTimelineGraph
+            {workflow}
+            groups={classicGroups}
+            {reverseSort}
+            loading={!historyCtx.fetchComplete}
+            totalExpectedEvents={estimatedTotalGroups}
+            descMinId={historyCtx.descMinId}
+            error={Boolean(workflowTaskFailedError)}
+            onTimelineInit={handleTimelineInit}
+          />
+        {:else}
+          <TimelineGraph
+            {namespace}
+            displayMode={graphDisplayMode}
+            nesting={nestedLanes ? 'gutter' : 'canvas'}
+            {showGroups}
+            {showTree}
+            minHeightPx={nestedLanes ? laneMinPlotHeightPx : 0}
+            treeWidth={$laneTreeWidth}
+            onTreeResize={(width) => laneTreeWidth.set(width ?? null)}
+            bind:renderedTreeWidth={renderedLaneTreeWidth}
+            detailsPlacement={nestedLanes ? 'panel' : 'inline'}
+            bind:selectedDetails={selectedLaneDetails}
+            {workflow}
+            groups={bufferGroups}
+            {reverseSort}
+            disableVirtualization={disableTimelineVirtualization}
+            instrumentPerformance={instrumentTimelinePerformance}
+            modelLoading={intervalLoading}
+            sceneGeneration={committedInterval?.id}
+            chainIndexId={chainIndex?.id}
+            loading={!historyCtx.fetchComplete}
+            totalExpectedEvents={estimatedTotalGroups}
+            descMinId={historyCtx.descMinId}
+            {firstEventTime}
+            error={Boolean(workflowTaskFailedError)}
+            onTimelineInit={handleTimelineInit}
+            onRetentionWindow={workflowRunCtx.pruneRetainedRuns}
+            rowHeightRetentionScopeId={workflowRunCtx.following
+              ? workflowRunCtx.chainRunId
+              : workflow.runId}
+            knownChainStartRunId={workflowRunCtx.chainRunId}
+            chainStartTimeMs={fullDurationScale
+              ? chainOverviewRuns[0]?.startTimeMs
+              : undefined}
+            bind:windowControls={timelineWindowControls}
+            bind:performanceStats={timelinePerformanceStats}
+            {timelineRuns}
+          />
+        {/if}
+        {#if workflowRunCtx.truncation?.affectsVisibleInterval || committedInterval?.truncated}
+          <p class="mt-2 text-sm text-tertiary" role="status">
+            {translate('workflows.chained-timeline-truncated')}
+          </p>
+        {/if}
+      </div>
+      {#if lanePanelOpen && selectedLaneDetails}
+        <TimelineDetailsPanel
+          details={selectedLaneDetails}
+          widthPx={laneDetailsWidthPx}
+          minWidthPx={LANE_DETAILS_MIN_WIDTH}
+          maxWidthPx={maxLaneDetailsWidth(timelineRowWidth)}
+          onResize={(width) => laneDetailsWidth.set(width ?? null)}
+          stickyTopPx={toolbarBottomPx}
+        />
+      {/if}
+    </div>
   {/if}
 </div>
 <!-- end wrapper -->
@@ -1177,3 +1418,18 @@
     runId={workflow.runId}
   />
 {/if}
+
+<style lang="postcss">
+  .lane-header {
+    transition: box-shadow 150ms ease-in-out;
+  }
+
+  /* Only along the bottom edge: the sides and top meet the frame and toolbar. */
+  .lane-header-stuck {
+    box-shadow: 0 6px 8px -6px rgb(0 0 0 / 18%);
+  }
+
+  :global([data-theme='dark']) .lane-header-stuck {
+    box-shadow: 0 6px 10px -6px rgb(0 0 0 / 60%);
+  }
+</style>

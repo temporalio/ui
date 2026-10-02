@@ -2,12 +2,12 @@
   import {
     IconFeather,
     IconPause,
-    IconRelationship,
     IconRetry,
-    IconStopwatch,
     IconTemporalActivity,
+    IconTemporalChildWorkflow,
     IconTemporalNexus,
     IconTemporalSignal,
+    IconTemporalTimer,
     IconTemporalUpdate,
     IconTemporalWorkflow,
     IconTerminal,
@@ -49,16 +49,16 @@
       <IconTemporalSignal width="100%" height="100%" />
     </symbol>
 
-    <symbol id="ti-retention" viewBox="0 0 16 16">
-      <IconStopwatch width="100%" height="100%" />
+    <symbol id="ti-timer" viewBox="0 0 16 16">
+      <IconTemporalTimer width="100%" height="100%" />
     </symbol>
 
     <symbol id="ti-feather" viewBox="0 0 16 16">
       <IconFeather width="100%" height="100%" />
     </symbol>
 
-    <symbol id="ti-relationship" viewBox="0 0 16 16">
-      <IconRelationship width="100%" height="100%" />
+    <symbol id="ti-child-workflow" viewBox="0 0 16 16">
+      <IconTemporalChildWorkflow width="100%" height="100%" />
     </symbol>
 
     <symbol id="ti-update" viewBox="0 0 16 16">

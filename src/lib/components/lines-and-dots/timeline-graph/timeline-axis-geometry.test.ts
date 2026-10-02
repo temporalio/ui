@@ -13,6 +13,12 @@ describe('getNiceTimelineIntervalMs', () => {
     expect(getNiceTimelineIntervalMs(4_200)).toBe(5_000);
     expect(getNiceTimelineIntervalMs(8_000)).toBe(10_000);
   });
+
+  it('steps in fractions of a second when asked to', () => {
+    expect(getNiceTimelineIntervalMs(40, 1)).toBe(50);
+    expect(getNiceTimelineIntervalMs(180, 1)).toBe(200);
+    expect(getNiceTimelineIntervalMs(400, 1)).toBe(500);
+  });
 });
 
 describe('getTimelineTimeTicks', () => {

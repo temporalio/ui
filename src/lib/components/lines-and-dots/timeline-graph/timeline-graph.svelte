@@ -27,6 +27,7 @@
   import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
 
   import {
+    CHILD_WORKFLOW_BAR_COLOR,
     dotColors,
     getScopeColor,
     getStatusStrokeColor,
@@ -36,12 +37,19 @@
   import {
     DOT_STROKE,
     GUTTER,
-    LANE_LEFT_GUTTER,
+    LANE_BOTTOM_GAP_PX,
+    LANE_MIN_PLOT_ROWS,
     LANE_ROW_HEIGHT,
-    LANE_TREE_WIDTH,
+    LANE_TOP_GAP_PX,
+    LANE_TREE_MIN_WIDTH,
     RADIUS,
     ROW_HEIGHT,
   } from './constants';
+  import {
+    clampLaneTreeWidth,
+    laneEdgeInsetPx,
+    maxLaneTreeWidth,
+  } from './gutter/lane-tree-width';
   import {
     gutterAncestorRunLevels,
     gutterRunOrdinals,
@@ -55,6 +63,7 @@
     type TimelineChildEdge,
     timelineRunKey,
   } from './recursive-timeline-model';
+  import { summarizeChildWorkflow } from './timeline-child-summary';
   import {
     getTimelineChildControlPlacement,
     getTimelineChildToggleExitOffset,
@@ -123,6 +132,7 @@
     getTimelineGroupEntry,
     type TimelineGroupEntry,
   } from './timeline-run-entries';
+  import { getRunSpanMarkers } from './timeline-run-span-markers';
   import {
     getTimelineSegmentedScrollModel,
     physicalYForLogicalRow,
@@ -143,7 +153,15 @@
     TIMELINE_WINDOW_DURATIONS_MS,
     timelineWindowIsAtEnd,
   } from './timeline-window-controls';
-  import type { TimelineDisplayMode } from './types';
+  import {
+    withWorkerWaitRows,
+    workerWaitSourceKey,
+  } from './timeline-worker-wait';
+  import type {
+    TimelineDisplayMode,
+    TimelineHistoryOwner,
+    TimelineSelectedDetails,
+  } from './types';
   import { syncTimelineViewport } from './viewport-lifecycle';
   import {
     getTimelineFrameVerticalLayout,
@@ -151,12 +169,16 @@
   } from './workflow-frame-geometry';
 
   import GroupDetailsRow from './group-details-row.svelte';
-  import TimelineTreeGutter from './gutter/timeline-tree-gutter.svelte';
+  import TimelineTreeGutter, {
+    type TimelineGutterHoverBand,
+  } from './gutter/timeline-tree-gutter.svelte';
+  import TimelineTreeResizeHandle from './gutter/timeline-tree-resize-handle.svelte';
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineChildEdgeRow from './timeline-child-edge-row.svelte';
   import TimelineCollapsedLayer from './timeline-collapsed-layer.svelte';
   import TimelineGraphRow from './timeline-graph-row.svelte';
   import TimelineIconDefs from './timeline-icon-defs.svelte';
+  import TimelineRunSpanMarker from './timeline-run-span-marker.svelte';
   import {
     DEFAULT_EXPANDED_DURATION_PER_VIEWPORT_MS,
     TimelineScale,
@@ -195,6 +217,26 @@
     nesting?: 'canvas' | 'gutter';
     /** Whether the containment frames are painted over the plot at all. */
     showGroups?: boolean;
+    /** Lanes only: whether its tree is shown beside the plot. */
+    showTree?: boolean;
+    /**
+     * Lanes only: the height, time labels included, the plot grows to when its
+     * rows need less, so a short workflow still fills the screen.
+     */
+    minHeightPx?: number;
+    /** The tree width the user chose; unset means the default. */
+    treeWidth?: number | null;
+    /** `undefined` asks for the default width back. */
+    onTreeResize?: (width: number | undefined) => void;
+    /** The tree width actually drawn, once bounded by the view's width. */
+    renderedTreeWidth?: number;
+    /**
+     * Where a selected event's details open: under its row, pushing the rows
+     * below down, or in a panel beside the timeline that the layout draws.
+     */
+    detailsPlacement?: 'inline' | 'panel';
+    /** The selected event, published for a panel to draw. */
+    selectedDetails?: TimelineSelectedDetails | null;
   }
 
   let {
@@ -224,6 +266,13 @@
     chainIndexId,
     nesting = 'canvas',
     showGroups = true,
+    showTree = true,
+    minHeightPx = 0,
+    treeWidth,
+    onTreeResize,
+    renderedTreeWidth = $bindable(0),
+    detailsPlacement = 'inline',
+    selectedDetails = $bindable(null),
     disableVirtualization = false,
   }: Props = $props();
 
@@ -250,10 +299,16 @@
         ],
   );
 
+  // Beside the tree, grandchild workflows start folded: they always sit below
+  // the tree's first three levels, so their histories wait to be opened.
   const recursiveSession = new RecursiveWorkflowSession({
     namespace: untrack(() => namespace),
     workflow: untrack(() => workflow),
     runs: untrack(() => workflowRuns),
+    initialExpansion:
+      untrack(() => nesting) === 'gutter'
+        ? (depth) => (depth >= 2 ? 'collapsed' : 'expanded')
+        : undefined,
   });
 
   $effect(() => {
@@ -268,7 +323,13 @@
 
   onDestroy(() => recursiveSession.dispose());
 
-  const workflowTree = $derived(recursiveSession.snapshot);
+  // Beside the tree in the sliding window, an activity that sat waiting for a
+  // worker gets a row of its own for the wait.
+  const workflowTree = $derived(
+    nesting === 'gutter' && showTree && displayMode === 'fixed-window'
+      ? withWorkerWaitRows(recursiveSession.snapshot, Date.now())
+      : recursiveSession.snapshot,
+  );
   const workflowNodes = $derived(flattenWorkflowNodes(workflowTree));
   const incomingChildHeaderByWorkflowKey = $derived.by(() => {
     const incomingChildren = new SvelteMap<
@@ -430,12 +491,41 @@
   const completedColor = getStatusStrokeColor('Completed');
   const failedColor = dotColors('Failed').fill;
 
-  const treeWidthPx = $derived(nesting === 'gutter' ? LANE_TREE_WIDTH : 0);
   // The tree column's own border is the timeline's origin, so the canvas drops
   // its left inset and keeps only enough room for a dot to sit on zero.
-  const leftGutter = $derived(nesting === 'gutter' ? LANE_LEFT_GUTTER : GUTTER);
 
   let measuredWidth = $state(0);
+  // With its tree hidden, Lanes keeps its own layout but names each row in
+  // the plot again, as the other views do.
+  const treeShown = $derived(nesting === 'gutter' && showTree);
+  // With the tree shown in the sliding window, the plot draws plain bars: no
+  // type icons and no markers on a bar's ends, only on single points, since
+  // the tree names each row's type. With the tree off, the markers return.
+  const plainMarkers = $derived(treeShown && displayMode === 'fixed-window');
+  const treeWidthPx = $derived(
+    treeShown ? clampLaneTreeWidth(treeWidth, measuredWidth) : 0,
+  );
+  const leftGutter = $derived(
+    nesting === 'gutter' ? laneEdgeInsetPx(treeWidthPx) : GUTTER,
+  );
+  const rightGutter = $derived(
+    nesting === 'gutter' ? laneEdgeInsetPx(treeWidthPx) : GUTTER,
+  );
+  // Lanes clips its plot just past the end of time, so a run frame closing
+  // there keeps its 2px right side; the other views clip just inside their
+  // gutter to hold back live paint.
+  const rightClipInsetPx = $derived(
+    nesting === 'gutter'
+      ? Math.max(0, rightGutter - RADIUS / 4)
+      : rightGutter + RADIUS / 4,
+  );
+  $effect(() => {
+    if (!treeShown) hoverBand = null;
+  });
+
+  $effect(() => {
+    renderedTreeWidth = treeWidthPx;
+  });
   const canvasWidth = $derived(Math.max(0, measuredWidth - treeWidthPx));
 
   // Width via ResizeObserver, not bind:clientWidth: the latter reads clientWidth
@@ -466,7 +556,7 @@
     };
   });
 
-  const timelineWidth = $derived(canvasWidth - GUTTER - leftGutter);
+  const timelineWidth = $derived(canvasWidth - rightGutter - leftGutter);
   // Geometry is recomputed on the coarse clock while the painted world moves
   // every animation frame. Keep a narrow offscreen strip mounted on the right
   // so that transform motion cannot expose a gap against the stationary rail.
@@ -1269,6 +1359,10 @@
   let rowEntryFrame = 0;
   let rowStackEl: HTMLUListElement | null = null;
   let childToggleExitLayerEl: HTMLDivElement | null = null;
+  // Lanes' tree sits outside the plot, so its rows need their own layer to
+  // slide out from, lined up with the plot's.
+  let gutterEl = $state<HTMLDivElement | null>(null);
+  let gutterExitLayerEl = $state<HTMLDivElement | null>(null);
   let rowEntryAnimations: Animation[] = [];
   let rowEntryGeneration = 0;
   let rowEntryDeadlineMs: number | null = null;
@@ -1326,7 +1420,42 @@
     top: number;
     kind: 'row' | 'frame';
     framePaint?: string;
+    /**
+     * Where a clone is drawn: the plot's exit layer, or the tree's for Lanes'
+     * tree rows. A run's span marker moves as a row of the plot.
+     */
+    layer?: 'plot' | 'gutter';
+    /** The attribute the live element is found by, to tell if it left. */
+    source?: 'row' | 'gutter' | 'marker';
   };
+
+  /** Lanes' tree rows and run markers, keyed like the plot rows they track. */
+  const companionRowElements = (): {
+    element: HTMLElement;
+    key: string;
+    source: 'gutter' | 'marker';
+  }[] => [
+    ...Array.from(
+      gutterEl?.querySelectorAll<HTMLElement>('[data-gutter-key]') ?? [],
+    )
+      .filter((element) => !element.closest('[data-gutter-exit-layer]'))
+      .map((element) => ({
+        element,
+        key: element.dataset.gutterKey ?? '',
+        source: 'gutter' as const,
+      })),
+    ...Array.from(
+      containerEl?.querySelectorAll<HTMLElement>(
+        '[data-timeline-run-span-key]',
+      ) ?? [],
+    )
+      .filter((element) => !element.closest('[data-child-toggle-exit-layer]'))
+      .map((element) => ({
+        element,
+        key: element.dataset.timelineRunSpanKey ?? '',
+        source: 'marker' as const,
+      })),
+  ];
 
   const captureChildToggleExitEntries = (
     previousTops: ReadonlyMap<string, number>,
@@ -1368,7 +1497,24 @@
         },
       ];
     });
-    return [...rows, ...frames];
+    const companions = companionRowElements().flatMap(
+      ({ element, key, source }) => {
+        const top = previousTops.get(key);
+        if (!key || top === undefined) return [];
+        return [
+          {
+            element: element.cloneNode(true) as HTMLElement,
+            key,
+            top,
+            kind: 'row' as const,
+            layer:
+              source === 'gutter' ? ('gutter' as const) : ('plot' as const),
+            source,
+          },
+        ];
+      },
+    );
+    return [...rows, ...frames, ...companions];
   };
 
   const frameEntrySignature = (element: HTMLElement): string =>
@@ -1405,12 +1551,21 @@
         ) ?? [],
       ).map(frameEntrySignature),
     );
+    const mountedCompanionKeys = new Set(
+      companionRowElements().map(({ key, source }) => `${source}:${key}`),
+    );
     const exiting = entries.filter((entry) =>
-      entry.kind === 'row'
-        ? !mountedRowKeys.has(entry.key)
-        : !mountedFrameSignatures.has(
-            `${entry.key}:${entry.framePaint ?? 'identity'}`,
-          ),
+      entry.source === 'marker' && mountedRowKeys.has(entry.key)
+        ? // Its row is still here: the run's container has taken its place,
+          // so the marker goes at once rather than trailing the motion.
+          false
+        : entry.source === 'gutter' || entry.source === 'marker'
+          ? !mountedCompanionKeys.has(`${entry.source}:${entry.key}`)
+          : entry.kind === 'row'
+            ? !mountedRowKeys.has(entry.key)
+            : !mountedFrameSignatures.has(
+                `${entry.key}:${entry.framePaint ?? 'identity'}`,
+              ),
     );
     const layerOrder = (entry: ChildToggleExitEntry): number =>
       entry.kind === 'row' ? 1 : entry.framePaint === 'background' ? 0 : 2;
@@ -1421,23 +1576,34 @@
       return { animations: [], cleanup: () => undefined, offsetPx: 0 };
     }
     const clones: HTMLElement[] = [];
+    const plotLayer = childToggleExitLayerEl;
+    const layerFor = (entry: ChildToggleExitEntry) =>
+      entry.layer === 'gutter' && gutterExitLayerEl
+        ? gutterExitLayerEl
+        : plotLayer;
     for (const entry of ordered) {
       const clone = entry.element.cloneNode(true) as HTMLElement;
       clone.setAttribute('aria-hidden', 'true');
       clone.setAttribute('inert', '');
+      // A tree row leaves as it rests, not carrying the hover it was
+      // toggled under.
+      if (entry.source === 'gutter') {
+        clone.classList.remove('bg-interactive-secondary-hover', 'opacity-50');
+      }
       clone
         .querySelectorAll('[id]')
         .forEach((element) => element.removeAttribute('id'));
       // This layer is reserved for detached animation snapshots, so Svelte
       // never reconciles its children.
-      // eslint-disable-next-line svelte/no-dom-manipulating
-      childToggleExitLayerEl.append(clone);
+
+      layerFor(entry).append(clone);
       clones.push(clone);
     }
-    const layer = childToggleExitLayerEl;
-    const layerTop = layer.getBoundingClientRect().top;
+    const layers = [
+      plotLayer,
+      ...(gutterExitLayerEl ? [gutterExitLayerEl] : []),
+    ];
     const clipBoundaryY = originY + rowHeight / 2;
-    const clipTop = Math.max(0, clipBoundaryY - layerTop);
     const fallbackOffsetPx = Math.max(
       0,
       ...exiting
@@ -1447,11 +1613,17 @@
     const exitOffsetPx =
       direction === 'collapse' ? fallbackOffsetPx : motionOffsetPx;
     const generation = ++childToggleExitGeneration;
-    layer.style.zIndex = direction === 'expand' ? '30' : '10';
-    if (direction === 'collapse') {
-      layer.style.clipPath = `inset(${clipTop}px 0 0 0)`;
-    } else {
-      layer.style.removeProperty('clip-path');
+    for (const layer of layers) {
+      layer.style.zIndex = direction === 'expand' ? '30' : '10';
+      if (direction === 'collapse') {
+        const clipTop = Math.max(
+          0,
+          clipBoundaryY - layer.getBoundingClientRect().top,
+        );
+        layer.style.clipPath = `inset(${clipTop}px 0 0 0)`;
+      } else {
+        layer.style.removeProperty('clip-path');
+      }
     }
     const animations = clones.map((clone, index) => {
       const entry = ordered[index];
@@ -1476,8 +1648,10 @@
       cleanup: () => {
         clones.forEach((clone) => clone.remove());
         if (childToggleExitGeneration === generation) {
-          layer.style.removeProperty('clip-path');
-          layer.style.removeProperty('z-index');
+          for (const layer of layers) {
+            layer.style.removeProperty('clip-path');
+            layer.style.removeProperty('z-index');
+          }
         }
       },
       offsetPx: exitOffsetPx,
@@ -1540,6 +1714,16 @@
       direction,
       motionOffsetPx: expansionOffsetPx,
     });
+    // Rows that are new start stacked at the toggled row, so they fade in
+    // over the first part of the slide rather than showing as a pile.
+    const slideIn = (key: string, offsetPx: number): Keyframe[] =>
+      !collapsing && !previousTops.has(key)
+        ? [
+            { translate: `0 ${offsetPx}px`, opacity: 0 },
+            { opacity: 1, offset: 0.6 },
+            { translate: '0 0', opacity: 1 },
+          ]
+        : [{ translate: `0 ${offsetPx}px` }, { translate: '0 0' }];
     const rowAnimations = candidateRows.flatMap(({ element, key, top }) => {
       const offsetPx = collapsing
         ? top > originY
@@ -1551,15 +1735,26 @@
       rowOffsets.set(key, offsetPx);
       if (!offsetPx) return [];
       return [
-        element.animate(
-          [{ translate: `0 ${offsetPx}px` }, { translate: '0 0' }],
-          {
-            duration: 1200,
-            easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-          },
-        ),
+        element.animate(slideIn(key, offsetPx), {
+          duration: 1200,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        }),
       ];
     });
+    // The tree's rows and the run markers take the offset of the plot row
+    // they share a key with, so both halves of the view move as one.
+    const companionAnimations = companionRowElements().flatMap(
+      ({ element, key }) => {
+        const offsetPx = rowOffsets.get(key);
+        if (!offsetPx) return [];
+        return [
+          element.animate(slideIn(key, offsetPx), {
+            duration: 1200,
+            easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          }),
+        ];
+      },
+    );
     const previousFrameKeys = new Set(
       exitEntries
         .filter((entry) => entry.kind === 'frame')
@@ -1601,6 +1796,7 @@
     });
     mountedChildToggleAnimations = [
       ...rowAnimations,
+      ...companionAnimations,
       ...frameAnimations,
       ...exit.animations,
     ];
@@ -1674,28 +1870,61 @@
     animateMountedRowsAfterChildToggle(pending);
   };
 
-  const toggleChild = (edgeKey: string) => {
-    const edgeBeforeToggle = childEdgeForKey(edgeKey);
-    const expanding = edgeBeforeToggle?.expansion === 'collapsed';
-    const stageUnloadedExpansion =
-      expanding &&
-      edgeBeforeToggle?.load.state !== 'loaded' &&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** The row the user toggled from, which the motion opens and closes at. */
+  const toggleOriginY = (): number => {
     const activeElement = document.activeElement;
-    const originY =
-      activeElement instanceof HTMLElement
-        ? activeElement.getBoundingClientRect().top +
+    return activeElement instanceof HTMLElement
+      ? activeElement.getBoundingClientRect().top +
           activeElement.getBoundingClientRect().height / 2
-        : (containerEl?.getBoundingClientRect().top ?? 0);
-    const previousTops = mountedRowTops(originY);
-    const exitEntries = captureChildToggleExitEntries(previousTops);
-    const direction = expanding ? 'expand' : 'collapse';
+      : (containerEl?.getBoundingClientRect().top ?? 0);
+  };
+
+  const prepareToggleMotion = () => {
     pendingLoadedChildToggleAnimation = null;
     mountedChildToggleAnimations.forEach((animation) => animation.cancel());
     mountedChildToggleAnimations = [];
     presentNextChildToggleImmediately = true;
     suppressRowEntryAfterChildToggleUntilMs =
       performance.now() + CHILD_TOGGLE_SETTLE_MS + 1200;
+  };
+
+  // Folding a run reuses the child workflow's motion: rows open out of, and
+  // close back into, the row that was toggled.
+  // Rows the user has folded or opened themselves, so the default fold below
+  // never overrides them.
+  const userToggledKeys = new SvelteSet<string>();
+  const toggleRunWithMotion = (runKey: string) => {
+    userToggledKeys.add(runKey);
+    const direction = collapsedRunKeySet.has(runKey) ? 'expand' : 'collapse';
+    const originY = toggleOriginY();
+    const previousTops = mountedRowTops(originY);
+    const exitEntries = captureChildToggleExitEntries(previousTops);
+    prepareToggleMotion();
+    flushSync(() => toggleRun(runKey));
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    animateMountedRowsAfterChildToggle({
+      previousTops,
+      originY,
+      exitEntries,
+      direction,
+    });
+  };
+
+  const toggleChild = (edgeKey: string) => {
+    userToggledKeys.add(edgeKey);
+    const edgeBeforeToggle = childEdgeForKey(edgeKey);
+    const expanding = edgeBeforeToggle?.expansion === 'collapsed';
+    const stageUnloadedExpansion =
+      expanding &&
+      edgeBeforeToggle?.load.state !== 'loaded' &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const originY = toggleOriginY();
+    const previousTops = mountedRowTops(originY);
+    const exitEntries = captureChildToggleExitEntries(previousTops);
+    const direction = expanding ? 'expand' : 'collapse';
+    prepareToggleMotion();
     if (stageUnloadedExpansion) {
       pendingLoadedChildToggleAnimation = {
         edgeKey,
@@ -2001,7 +2230,10 @@
   const rootChainFrameCandidate = $derived(
     chainFrameCandidates.find((candidate) => candidate.depth === 0),
   );
-  const workflowFrameColor = strokeColor({ category: 'child-workflow' });
+  // Frames and the root's bar keep the workflow navy; a child workflow's own
+  // bar takes the child blue, so the two read apart.
+  const workflowFrameColor = strokeColor({ category: 'workflow' });
+  const childWorkflowColor = CHILD_WORKFLOW_BAR_COLOR;
   const inheritedWorkflowDotColors = $derived(
     dotColors(rootChainFrameCandidate?.status ?? workflow.status),
   );
@@ -2034,9 +2266,15 @@
     !disableVirtualization && availableLayoutRowCount > RETAINED_DOM_ROW_LIMIT,
   );
   // Lanes needs far less breathing room: its rows carry no rotated edge
-  // stamps and the tree column sets the vertical rhythm.
+  // stamps, and the chain overview above already labels the time, so the
+  // first row starts just under the timeline's top edge. Rows sit 1.5 rows
+  // down by default; the top padding lifts them back up. The bottom trims the
+  // same slack so the time labels sit just under the last row.
   const TIMELINE_VERTICAL_PADDING = $derived(
-    nesting === 'gutter' ? 0 : rowHeight,
+    nesting === 'gutter' ? LANE_TOP_GAP_PX - 1.5 * rowHeight : rowHeight,
+  );
+  const TIMELINE_BOTTOM_PADDING = $derived(
+    nesting === 'gutter' ? LANE_BOTTOM_GAP_PX - 1.5 * rowHeight : rowHeight,
   );
 
   // Closed-form inverse of getRowY (both cursor segments are linear) → the
@@ -2151,6 +2389,96 @@
     if ($activeGroups.length === 0) panelHeight = 0;
   });
 
+  // With the details in a side panel the timeline itself never moves; it
+  // only says which event is open.
+  const selectedEntry = $derived(
+    detailsPlacement === 'panel' && activeLayoutRow?.kind === 'group'
+      ? activeLayoutRow.entry
+      : undefined,
+  );
+  // Kept apart from the end time, which ticks while the workflow runs, so the
+  // panel's content isn't rebuilt every second.
+  const selectedGroup = $derived(
+    selectedEntry ? materializeTimelineGroup(selectedEntry) : undefined,
+  );
+
+  // The workflow whose history a row's events come from: in Lanes a nested
+  // child's events are numbered in the child's own history, not the page's.
+  const ownerForRow = (
+    row: TimelineLayoutRow | undefined,
+  ): TimelineHistoryOwner | undefined => {
+    if (row?.kind !== 'group') return undefined;
+    const node = workflowNodes.find(
+      (candidate) => candidate.key === row.workflowKey,
+    );
+    return node
+      ? {
+          namespace: node.namespace,
+          workflowId: node.workflowId,
+          runId: row.entry.runId,
+          workflowType: node.workflow.name ?? '',
+        }
+      : undefined;
+  };
+  const selectedOwner = $derived(
+    selectedEntry ? ownerForRow(activeLayoutRow) : undefined,
+  );
+
+  // Selecting a child workflow shows what ran inside it, not only the three
+  // events its parent recorded about it.
+  // A folded child hasn't loaded its history, so opening its details loads it
+  // without unfolding it.
+  $effect(() => {
+    const edge =
+      activeLayoutRow?.kind === 'group' ? activeLayoutRow.childEdge : undefined;
+    if (
+      !edge ||
+      (edge.load.state !== 'idle' && edge.load.state !== 'evicted')
+    ) {
+      return;
+    }
+    const edgeKey = edge.key;
+    untrack(() => recursiveSession.load(edgeKey));
+  });
+  const selectedChild = $derived.by(() => {
+    if (!selectedEntry || activeLayoutRow?.kind !== 'group') return undefined;
+    const edge = activeLayoutRow.childEdge;
+    if (edge?.load.state !== 'loaded') return undefined;
+    const summary = summarizeChildWorkflow(edge.load.node);
+    return {
+      ...summary,
+      runs: summary.runs.map((run) => ({
+        ...run,
+        items: run.items.map((item) => ({
+          ...item,
+          selectable:
+            containmentLayout.indexOfGroup(item.timelineKey) !== undefined,
+        })),
+      })),
+    };
+  });
+  $effect(() => {
+    const entry = selectedEntry;
+    if (!entry || !selectedGroup) {
+      selectedDetails = null;
+      return;
+    }
+    selectedDetails = {
+      group: selectedGroup,
+      timelineKey: entry.timelineKey,
+      endTime:
+        entry.active === false
+          ? entry.runEndTimeMs
+          : (workflow?.endTime ?? nowMs),
+      active: entry.active ?? true,
+      owner: selectedOwner,
+      child: selectedChild,
+    };
+  });
+
+  const showDetails = (timelineKey: string) =>
+    activeGroups.set([workerWaitSourceKey(timelineKey)]);
+
   $effect.pre(() => {
     const activeGroupId = $activeGroups[0];
     if (
@@ -2189,15 +2517,32 @@
     OVERSCAN + Math.ceil(panelHeight / rowHeight),
   );
 
+  // Reserved for the rotated start/end stamps hanging below the canvas.
+  // Lanes drops those and keeps only the angled tick labels, so it leaves
+  // just the room the axis measures them taking.
+  let tickLabelHeightPx = $state(0);
+  const AXIS_LABEL_ZONE = $derived(
+    nesting === 'gutter' ? tickLabelHeightPx : 150,
+  );
+
   // Full drawn height (rows + axis + detail panel). The container is this tall and
   // scrolls with the page.
   const logicalTimelineHeight = $derived(
     Math.max(
-      rowHeight * (heightRowCount + (chainFrameCandidates.length ? 3 : 2)),
-      120,
-    ) +
-      panelHeight +
-      2 * TIMELINE_VERTICAL_PADDING,
+      Math.max(
+        rowHeight * (heightRowCount + (chainFrameCandidates.length ? 3 : 2)),
+        120,
+      ) +
+        panelHeight +
+        TIMELINE_VERTICAL_PADDING +
+        TIMELINE_BOTTOM_PADDING,
+      nesting === 'gutter'
+        ? Math.max(
+            LANE_MIN_PLOT_ROWS * rowHeight,
+            minHeightPx - AXIS_LABEL_ZONE,
+          )
+        : 0,
+    ),
   );
   const verticalScrollModel = $derived(
     getTimelineSegmentedScrollModel({
@@ -2216,12 +2561,10 @@
     verticalScrollModel.segmented
       ? verticalScrollModel.physicalHeightPx +
           panelHeight +
-          2 * TIMELINE_VERTICAL_PADDING
+          TIMELINE_VERTICAL_PADDING +
+          TIMELINE_BOTTOM_PADDING
       : logicalTimelineHeight,
   );
-  // Reserved for the rotated start/end stamps hanging below the canvas.
-  // Lanes drops those, so it only needs a row of slack.
-  const AXIS_LABEL_ZONE = $derived(nesting === 'gutter' ? rowHeight / 2 : 150);
   const svgHeight = $derived(timelineHeight + AXIS_LABEL_ZONE);
 
   const gutterWorkflows = $derived(
@@ -2582,6 +2925,7 @@
           cell,
           topPx: getY(slot.index) - rowHeight / 2 + shiftFor(slot.index),
           visible: renderedActiveChunkKeys.has(slot.chunkKey),
+          rowIndex: slot.index,
           workflowKey: childEdge ? childWorkflowKey : slot.row.workflowKey,
           runKey:
             childEdge === undefined && 'runKey' in slot.row
@@ -2655,12 +2999,7 @@
    */
   const DIM_SCRIM_BACKGROUND =
     'color-mix(in srgb, var(--color-background-primary) 50%, transparent)';
-  let hoverBand = $state<{
-    topPx: number;
-    heightPx: number;
-    workflowKey?: string;
-    runKey?: string;
-  } | null>(null);
+  let hoverBand = $state<TimelineGutterHoverBand | null>(null);
 
   /**
    * With the groups switched off, hovering a row still reveals the containers
@@ -2957,6 +3296,53 @@
   });
   const rendered = $derived(committedRender ?? renderCandidate);
   const renderedPresentationRows = $derived(rendered.view.rows);
+
+  // The tree opens showing its first three levels, and anything that folds
+  // below them starts folded. Whether a run adds a level depends on the
+  // workflow, so this goes by the row's depth in the tree. Earlier runs load
+  // in after the first paint and push the latest run's rows a level down, so a
+  // row folds whenever it lands below the third level, once, and never after
+  // the user has folded or opened it.
+  const TREE_OPEN_LEVELS = 3;
+  const defaultFoldedKeys = new SvelteSet<string>();
+  $effect.pre(() => {
+    const cells = gutterSlots.map((slot) => slot.cell);
+    untrack(() => {
+      for (const cell of cells) {
+        const foldKey = cell.toggleEdgeKey ?? cell.toggleRunKey;
+        if (
+          !foldKey ||
+          cell.depth < TREE_OPEN_LEVELS - 1 ||
+          defaultFoldedKeys.has(foldKey) ||
+          userToggledKeys.has(foldKey)
+        ) {
+          continue;
+        }
+        defaultFoldedKeys.add(foldKey);
+        if (!cell.expanded) continue;
+        if (cell.toggleEdgeKey) recursiveSession.toggle(cell.toggleEdgeKey);
+        else collapsedRunKeySet.add(foldKey);
+      }
+    });
+  });
+
+  // A folded child still loads in the background once its row is on screen,
+  // so the row can show how much it holds. Each is tried once.
+  const preloadedEdgeKeys = new SvelteSet<string>();
+  $effect(() => {
+    const edgeKeys = gutterSlots.flatMap((slot) =>
+      slot.visible && slot.cell.toggleEdgeKey && !slot.cell.expanded
+        ? [slot.cell.toggleEdgeKey]
+        : [],
+    );
+    untrack(() => {
+      for (const edgeKey of edgeKeys) {
+        if (preloadedEdgeKeys.has(edgeKey)) continue;
+        preloadedEdgeKeys.add(edgeKey);
+        recursiveSession.preload(edgeKey);
+      }
+    });
+  });
   const renderedActiveChunkKeys = $derived(
     new Set(
       rendered.presentation.activeBlocks.flatMap((block) =>
@@ -2990,14 +3376,42 @@
    * child workflow rather than the run of the parent that started it.
    */
   const shownRunFrameLayouts = $derived(
-    drawRunFrames
+    (drawRunFrames
       ? renderedRunFrameLayouts
       : renderedRunFrameLayouts.filter((frame) =>
           revealedRunKey === undefined
             ? revealedWorkflowKey !== undefined &&
               frame.candidate.workflowKey === revealedWorkflowKey
             : runFrameKeyOf(frame.candidate) === revealedRunKey,
-        ),
+        )
+    ).filter(
+      // A folded run is down to its own row, which a container can't frame;
+      // the run's span marker stands in for it instead.
+      (frame) => !collapsedRunKeys.has(runFrameKeyOf(frame.candidate)),
+    ),
+  );
+
+  const runSpanMarkers = $derived(
+    nesting === 'gutter'
+      ? getRunSpanMarkers({
+          rows: gutterSlots.map((slot) => ({
+            key: slot.cell.key,
+            runKey: slot.cell.toggleRunKey,
+            topPx: slot.topPx,
+            visible: slot.visible,
+          })),
+          geometryByRunKey: new Map(
+            renderedRunFrameLayouts.map((frame) => [
+              runFrameKeyOf(frame.candidate),
+              frame.geometry,
+            ]),
+          ),
+          framedRunKeys: new Set(
+            shownRunFrameLayouts.map((frame) => runFrameKeyOf(frame.candidate)),
+          ),
+          rowHeight,
+        })
+      : [],
   );
 
   /**
@@ -3105,8 +3519,17 @@
   data-live-paused={$pauseLiveUpdates}
   class:timeline-motion-active={shouldAnimateTimeline}
   class={twMerge(
-    'timeline-height-shell relative border border-t-0 border-primary bg-surface-primary',
-    verticalScrollModel.segmented ? 'overflow-y-auto' : 'overflow-hidden',
+    'timeline-height-shell relative bg-surface-primary',
+    // Lanes sits inside a bordered container of its own, so the shell's
+    // border would only double it.
+    nesting !== 'gutter' && 'border border-t-0 border-primary',
+    verticalScrollModel.segmented
+      ? 'overflow-y-auto'
+      : // Clipping without becoming a scroller lets Lanes' time labels stick
+        // to the bottom of the page.
+        nesting === 'gutter'
+        ? 'overflow-clip'
+        : 'overflow-hidden',
     error && 'bg-surface-danger',
   )}
   style:height="{shellHeight}px"
@@ -3184,6 +3607,8 @@
          only the windowed slots exist in the DOM. -->
       <div
         class="canvas"
+        class:canvas-squared-bars={nesting === 'gutter' &&
+          displayMode === 'fixed-window'}
         style:margin-left="{treeWidthPx}px"
         style:margin-top={nesting === 'gutter' ? '0' : undefined}
         style:width="{canvasWidth}px"
@@ -3193,24 +3618,53 @@
         style:--dot-icon="{dotIconSize}px"
         style:--completed-color={completedColor}
         style:--failed-color={failedColor}
-        style:--timeline-gutter="{GUTTER}px"
-        style:--timeline-clip-inset="{GUTTER + RADIUS / 4}px"
-        style:--timeline-clip-inset-left="{leftGutter - RADIUS / 4}px"
+        style:--timeline-gutter="{rightGutter}px"
+        style:--timeline-clip-inset="{rightClipInsetPx}px"
+        style:--timeline-clip-inset-left="{Math.max(
+          0,
+          leftGutter - RADIUS / 4,
+        )}px"
       >
         <TimelineIconDefs />
 
-        {#if nesting === 'gutter'}
-          <div class="absolute top-0" style:left="-{treeWidthPx}px">
+        {#if treeShown}
+          <div
+            class="absolute top-0"
+            style:left="-{treeWidthPx}px"
+            bind:this={gutterEl}
+          >
             <TimelineTreeGutter
               {rowHeight}
               slots={gutterSlots}
               widthPx={treeWidthPx}
               heightPx={svgHeight}
               onToggle={toggleChild}
-              onToggleRun={toggleRun}
+              onToggleRun={toggleRunWithMotion}
               onHoverBand={(band) => (hoverBand = band)}
+              onShowDetails={detailsPlacement === 'panel'
+                ? showDetails
+                : undefined}
+              selectedDetailsKey={$activeGroups[0]}
+              {nowMs}
             />
+            <div
+              class="pointer-events-none absolute left-0 top-0"
+              style:width="{treeWidthPx}px"
+              style:height="{svgHeight}px"
+              aria-hidden="true"
+              data-gutter-exit-layer
+              bind:this={gutterExitLayerEl}
+            ></div>
           </div>
+          {#if onTreeResize}
+            <TimelineTreeResizeHandle
+              width={treeWidthPx}
+              min={LANE_TREE_MIN_WIDTH}
+              max={maxLaneTreeWidth(measuredWidth)}
+              heightPx={svgHeight}
+              onResize={onTreeResize}
+            />
+          {/if}
         {/if}
 
         <!-- Border rails -->
@@ -3224,13 +3678,14 @@
         ></div>
         <div
           class="timeline-height-rail pointer-events-none absolute z-10 bg-current"
-          style:left="{canvasWidth - GUTTER - RADIUS / 4}px"
+          class:hidden={nesting === 'gutter'}
+          style:left="{canvasWidth - rightGutter - RADIUS / 4}px"
           style:top="{virtualizeRows ? layerBandTop : lineTop}px"
           style:width="{RADIUS / 2}px"
           style:height="{virtualizeRows ? layerBandHeight : lineBottom}px"
         ></div>
 
-        {#if hoverBand}
+        {#if hoverBand && !hoverBand.selection}
           <div
             class="pointer-events-none absolute left-0 right-0 top-0 z-40"
             data-testid="timeline-dim-above"
@@ -3276,7 +3731,8 @@
                   style:width="{Math.max(0, scope.endPx - scope.startPx)}px"
                   style:top="{scope.outlineTopPx}px"
                   style:height="{scope.outlineHeightPx}px"
-                  style:border="1px solid color-mix(in srgb, {scope.color} 55%, transparent)"
+                  style:border="1px solid color-mix(in srgb, {scope.color} 90%, transparent)"
+                  style:background="color-mix(in srgb, {scope.color} 3%, transparent)"
                 ></div>
                 {#if scope.ownsSpanBar}
                   {@const bar = lineBox(
@@ -3312,6 +3768,7 @@
             {#if drawCanvasFrames}
               {#each renderedChainFrameLayouts as frame (frame.candidate.key)}
                 <WorkflowFrame
+                  showIcons={!plainMarkers}
                   geometry={frame.geometry}
                   label={frame.candidate.label}
                   workflowType={frame.candidate.workflow?.name}
@@ -3341,6 +3798,7 @@
             {/if}
             {#each shownRunFrameLayouts as frame (frame.candidate.key)}
               <WorkflowFrame
+                showIcons={!plainMarkers}
                 geometry={frame.geometry}
                 label={frame.candidate.label}
                 accessibleName=""
@@ -3393,8 +3851,11 @@
             data-presentation-revision={rendered.presentation.revision}
           >
             <TimelineAxis
+              showBaseline={nesting !== 'gutter'}
+              showTickLabels={nesting !== 'gutter'}
+              subtleGrid={nesting === 'gutter'}
               x1={leftGutter - RADIUS / 4}
-              x2={canvasWidth - GUTTER + RADIUS / 4}
+              x2={canvasWidth - rightGutter + RADIUS / 4}
               gutter={leftGutter}
               {timelineHeight}
               bandTop={virtualizeRows ? layerBandTop : 0}
@@ -3436,6 +3897,7 @@
             {#if drawCanvasFrames}
               {#each renderedChainFrameLayouts as frame (frame.candidate.key)}
                 <WorkflowFrame
+                  showIcons={!plainMarkers}
                   geometry={frame.geometry}
                   label={frame.candidate.label}
                   workflowType={frame.candidate.workflow?.name}
@@ -3468,6 +3930,7 @@
             {/if}
             {#each shownRunFrameLayouts as frame (frame.candidate.key)}
               <WorkflowFrame
+                showIcons={!plainMarkers}
                 geometry={frame.geometry}
                 label={frame.candidate.label}
                 accessibleName={translate(
@@ -3518,6 +3981,9 @@
                   rowEnd: frame.span.rowEnd,
                 })}
               />
+            {/each}
+            {#each runSpanMarkers as marker (marker.runKey)}
+              <TimelineRunSpanMarker {...marker} color={workflowFrameColor} />
             {/each}
           </div>
 
@@ -3599,24 +4065,30 @@
                   <div class="timeline-motion-layer absolute inset-0">
                     {#if !('eventList' in timelineEntry.group) && timelineEntry.group.eventCount === 1 && !timelineEntry.group.isPending && timelineEntry.active === false}
                       <TimelineStaticMarkerRow
+                        showIcon={!plainMarkers}
                         {rowHeight}
-                        showLabel={nesting !== 'gutter'}
+                        showLabel={!treeShown}
                         group={timelineEntry.group}
                         timelineKey={timelineEntry.timelineKey}
                         {canvasWidth}
+                        startInsetPx={leftGutter}
+                        endInsetPx={rightGutter}
                         project={rendered.axis.projectX}
                         {readOnly}
                       />
                     {:else}
                       <TimelineGraphRow
+                        showIcons={!plainMarkers}
                         {rowHeight}
-                        showLabel={nesting !== 'gutter' ||
+                        showLabel={!treeShown ||
                           (showGroups && Boolean(slot.row.childEdge))}
                         subtleLabel={nesting === 'gutter'}
                         group={timelineEntry.group}
                         timelineKey={timelineEntry.timelineKey}
                         eventCount={timelineEntry.group.eventCount}
                         {canvasWidth}
+                        startInsetPx={leftGutter}
+                        endInsetPx={rightGutter}
                         project={rendered.axis.projectX}
                         {readOnly}
                         active={timelineEntry?.active ?? true}
@@ -3632,7 +4104,7 @@
                           : 0}
                         continuousConnector={Boolean(slot.row.childEdge)}
                         connectorColor={slot.row.childEdge
-                          ? workflowFrameColor
+                          ? childWorkflowColor
                           : undefined}
                         displayNamePrefix={slot.row.childEdge &&
                         nesting !== 'gutter'
@@ -3704,6 +4176,24 @@
             bind:this={childToggleExitLayerEl}
           ></div>
         </div>
+        {#if nesting === 'gutter'}
+          <!-- Lanes' time labels stick to the bottom of the screen on a strip
+               that also covers the tree, so it sits outside the plot's clip. -->
+          <TimelineAxis
+            showGrid={false}
+            showBaseline={false}
+            stickyTickLabels
+            tickLabelStripStartPx={-treeWidthPx}
+            onTickLabelHeight={(height) => (tickLabelHeightPx = height)}
+            x1={leftGutter - RADIUS / 4}
+            x2={canvasWidth - rightGutter + RADIUS / 4}
+            gutter={leftGutter}
+            {timelineHeight}
+            startTime={rendered.axis.startTime}
+            scale={rendered.projection}
+            viewportOffsetPx={rendered.axis.viewportOffsetPx}
+          />
+        {/if}
         {#if timelineLoading && presentedPendingGap}
           {@const rectY =
             TIMELINE_VERTICAL_PADDING +
@@ -3714,13 +4204,13 @@
             class="absolute animate-pulse rounded bg-surface-tertiary"
             style:left="{leftGutter}px"
             style:top="{rectY}px"
-            style:width="{canvasWidth - GUTTER - leftGutter}px"
+            style:width="{canvasWidth - rightGutter - leftGutter}px"
             style:height="{rectH}px"
           ></div>
         {/if}
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
-        {#if !readOnly && activeIdx >= 0}
+        {#if !readOnly && activeIdx >= 0 && detailsPlacement === 'inline'}
           {#if activeLayoutRow?.kind === 'group'}
             {@const activeTimelineEntry = activeLayoutRow.entry}
             {@const activeGroup = materializeTimelineGroup(activeTimelineEntry)}
@@ -3728,6 +4218,7 @@
             <GroupDetailsRow
               y={panelY}
               group={activeGroup}
+              historyOwner={ownerForRow(activeLayoutRow)}
               timelineKey={activeTimelineEntry.timelineKey}
               {canvasWidth}
               endTime={activeTimelineEntry?.active === false
@@ -3752,6 +4243,7 @@
      fallback row labels, so it must be theme-aware (white only reads on dark). */
   .canvas {
     position: relative;
+    isolation: isolate;
     margin-top: -1rem;
     color: var(--color-content-primary);
   }
@@ -3803,6 +4295,17 @@
   /* Render each live connector as one fixed-width pattern and reveal through
      its interpolated endpoint. A separate extension would restart the stripe
      pattern at its seam; scaling it would distort stripe width. */
+
+  /* The sliding window draws its spans as bars with small rounded corners
+     rather than pills. */
+  .canvas.canvas-squared-bars :global(.tl-line) {
+    border-radius: 4px;
+  }
+
+  .canvas.canvas-squared-bars :global(.tl-line--live) {
+    border-radius: 4px 0 0 4px;
+  }
+
   .canvas :global(.tl-line--live) {
     border-radius: 9999px 0 0 9999px;
     clip-path: inset(

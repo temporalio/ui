@@ -72,7 +72,7 @@ async function main() {
     `Subscription billing fixture: workflowId=${cycleId} batches=${remainingBatches} accountsPerBatch=${accountsPerBatch}`,
   );
   const timelineUrl = (runId: string) =>
-    `  http://localhost:${uiPort}/namespaces/${namespace}/workflows/${cycleId}/${runId}/timeline?timeline_mode=lanes`;
+    `  http://localhost:${uiPort}/namespaces/${namespace}/workflows/${cycleId}/${runId}/timeline`;
 
   console.log(timelineUrl(handle.firstExecutionRunId));
 

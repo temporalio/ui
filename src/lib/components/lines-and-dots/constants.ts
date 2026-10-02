@@ -1,11 +1,11 @@
 import {
   type IconComponent,
   IconFeather,
-  IconRelationship,
-  IconStopwatch,
   IconTemporalActivity,
+  IconTemporalChildWorkflow,
   IconTemporalNexus,
   IconTemporalSignal,
+  IconTemporalTimer,
   IconTemporalUpdate,
   IconTemporalWorkflow,
   IconTerminal,
@@ -20,9 +20,9 @@ export type TimelineIconName =
   | 'pause'
   | 'activity'
   | 'signal'
-  | 'retention'
+  | 'timer'
   | 'feather'
-  | 'relationship'
+  | 'child-workflow'
   | 'update'
   | 'terminal'
   | 'nexus';
@@ -35,15 +35,15 @@ export const CategoryIcon: Record<
   signal: { name: 'signal', Icon: IconTemporalSignal, title: 'Signal' },
   activity: { name: 'activity', Icon: IconTemporalActivity, title: 'Activity' },
   nexus: { name: 'nexus', Icon: IconTemporalNexus, title: 'Nexus' },
-  timer: { name: 'retention', Icon: IconStopwatch, title: 'Timer' },
+  timer: { name: 'timer', Icon: IconTemporalTimer, title: 'Timer' },
   'local-activity': {
     name: 'feather',
     Icon: IconFeather,
     title: 'Local Activity',
   },
   'child-workflow': {
-    name: 'relationship',
-    Icon: IconRelationship,
+    name: 'child-workflow',
+    Icon: IconTemporalChildWorkflow,
     title: 'Child Workflow',
   },
   update: { name: 'update', Icon: IconTemporalUpdate, title: 'Update' },

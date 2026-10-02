@@ -2,6 +2,8 @@ export const Namespace = 'events' as const;
 
 export const Strings = {
   'empty-state-title': 'No Events Match',
+  configuration: 'Configuration',
+  'copy-event-link': 'Copy link to event',
   'empty-state-description':
     'There are no events that match your filters or selected view. Adjust your filters or view to see your events.',
   'group-empty-state-title': 'Event Group Not Found',

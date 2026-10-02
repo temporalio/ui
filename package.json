@@ -97,6 +97,7 @@
     "run-workflows:containment-frames": "esno scripts/start-containment-frames.ts",
     "run-workflows:order-fulfillment": "esno scripts/start-order-fulfillment.ts",
     "run-workflows:subscription-billing": "esno scripts/start-subscription-billing.ts",
+    "run-workflows:lanes-scenarios": "esno scripts/start-lanes-scenarios.ts",
     "validate:versions": "./scripts/validate-versions.sh",
     "knip": "knip",
     "a11y:manifest:test": "node scripts/a11y/manifest.test.mjs",

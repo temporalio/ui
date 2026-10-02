@@ -27,6 +27,24 @@
     /** Aligns the overview's track with a plot area that starts further in. */
     leadingInsetPx?: number;
     trailingInsetPx?: number;
+    /** Heads the column the leading inset sits over, e.g. a tree beside it. */
+    leadingLabel?: string;
+    /** Where that label starts, so it lines up with the column's content. */
+    leadingLabelInsetPx?: number;
+    /**
+     * Titles for columns at the right of that column, ending at
+     * `leadingColumnsEndPx` so they sit over the columns they name.
+     */
+    leadingColumns?: readonly { label: string; widthPx: number }[];
+    leadingColumnsEndPx?: number;
+    leadingColumnsGapPx?: number;
+    /**
+     * Where the time labels go: on their own row above the track, or inside
+     * the track beside their tick lines, which saves the row. Inside, the
+     * overview is one 40px row, the same height as the details panel's
+     * header beside it, so the two read as one header bar.
+     */
+    axisPlacement?: 'above' | 'inside';
     onWindowMove?: (startTimeMs: number) => void;
     onWindowResize?: (range: {
       startTimeMs: number;
@@ -43,7 +61,13 @@
     windowMode,
     loading = false,
     leadingInsetPx = 0,
-    trailingInsetPx = 0,
+    trailingInsetPx,
+    leadingLabel,
+    leadingLabelInsetPx = 12,
+    leadingColumns = [],
+    leadingColumnsEndPx,
+    leadingColumnsGapPx = 8,
+    axisPlacement = 'above',
     onWindowMove,
     onWindowResize,
   }: Props = $props();
@@ -65,10 +89,11 @@
   let visualWindowWidth = 0.4;
   let trackWidth = $state(1);
   let liveNowMs = $state(0);
+  // A run that continued as new has ended; the runs after it belong to a later
+  // stretch of the chain this view hasn't loaded, which the trailing boundary
+  // marks. Running the axis on to now would stretch it past the plot below.
   const chainEndIsLive = $derived(
-    runs.at(-1)?.status === 'Running' ||
-      runs.at(-1)?.status === 'Paused' ||
-      runs.at(-1)?.status === 'ContinuedAsNew',
+    runs.at(-1)?.status === 'Running' || runs.at(-1)?.status === 'Paused',
   );
 
   const startTimeMs = $derived(runs[0]?.startTimeMs);
@@ -412,36 +437,62 @@
 
 <div
   bind:this={overviewElement}
-  class="border-b border-primary bg-background-primary px-3 py-2 text-primary"
+  class="relative border-b border-primary px-3 text-primary {axisPlacement ===
+  'inside'
+    ? 'h-10 bg-surface-secondary'
+    : 'bg-background-primary py-2'}"
   data-testid="timeline-chain-overview"
   data-chain-end-time-ms={endTimeMs}
   style:padding-left={leadingInsetPx ? `${leadingInsetPx}px` : undefined}
-  style:padding-right={trailingInsetPx ? `${trailingInsetPx}px` : undefined}
+  style:padding-right={trailingInsetPx === undefined
+    ? undefined
+    : `${trailingInsetPx}px`}
 >
-  <div class="mb-1 flex items-center justify-between gap-2 text-xs">
-    <span class="font-medium"
-      >{translate('workflows.timeline-chain-overview')}</span
+  {#if leadingLabel && leadingInsetPx}
+    <!-- With a column beside the track, the overview heads that column
+         instead: its label carries the chain's summary, sitting level with
+         the track, and the overview drops its own title row. -->
+    <div
+      class="absolute inset-y-0 flex items-center text-xs"
+      style:left="{leadingLabelInsetPx}px"
+      style:width={leadingColumnsEndPx === undefined
+        ? undefined
+        : `${leadingColumnsEndPx - leadingLabelInsetPx}px`}
+      style:gap="{leadingColumnsGapPx}px"
     >
-    <span class="flex items-center gap-2 tabular-nums text-tertiary">
-      {#if startTimeMs !== undefined}
-        <span data-testid="timeline-chain-duration">
-          {translate('workflows.timeline-chain-run-count', {
-            count: runs.length,
-          })}
-          ·
-          {translate('workflows.timeline-chain-elapsed', {
-            duration: displayedDuration,
-          })}
-        </span>
-      {/if}
-      {#if loading}
-        <span role="status">
-          {translate('workflows.timeline-chain-loading')}
-        </span>
-      {/if}
-    </span>
-  </div>
-  {#if startTimeMs !== undefined}
+      <div
+        class="flex min-w-0 flex-1 items-center gap-1.5"
+        data-testid="timeline-chain-leading-label"
+      >
+        <h3 class="shrink-0 text-base font-medium">{leadingLabel}</h3>
+        {#if startTimeMs !== undefined}
+          <span class="truncate tabular-nums text-secondary"
+            >({@render summary()})</span
+          >
+        {/if}
+        {@render loadingStatus()}
+      </div>
+      {#each leadingColumns as column (column.label)}
+        <span
+          class="shrink-0 text-right text-secondary"
+          style:width="{column.widthPx}px">{column.label}</span
+        >
+      {/each}
+    </div>
+  {:else if axisPlacement === 'above'}
+    <div class="mb-1 flex items-center justify-between gap-2 text-xs">
+      <span class="font-medium"
+        >{translate('workflows.timeline-chain-overview')}</span
+      >
+      <span class="flex items-center gap-2 tabular-nums text-tertiary">
+        {#if startTimeMs !== undefined}
+          {@render summary()}
+        {/if}
+        {@render loadingStatus()}
+      </span>
+    </div>
+  {/if}
+  {#if startTimeMs !== undefined && axisPlacement === 'above'}
     <div
       class="relative h-6 text-xs tabular-nums text-tertiary"
       data-testid="timeline-chain-time-axis"
@@ -459,15 +510,7 @@
           style:left="{tick.positionPercent}%"
           data-timeline-chain-time-ms={tick.timeMs}
         >
-          {#if tick.edge === 'end' && chainEndIsLive}
-            {translate('workflows.timeline-chain-now')} ·
-          {/if}
-          {formatTimelineChainTickTime({
-            timeMs: tick.timeMs,
-            durationMs: displayedDurationMs,
-            timeFormat: $timeFormat,
-            hourFormat: $hourFormat,
-          })}
+          {@render tickText(tick)}
           <span
             class="absolute top-[calc(100%+2px)] h-1.5 w-px bg-current {tick.edge ===
             'start'
@@ -483,7 +526,9 @@
   {/if}
   <div
     bind:this={trackElement}
-    class="relative h-5 rounded border border-primary bg-surface-tertiary"
+    class="relative border border-primary {axisPlacement === 'inside'
+      ? `h-full border-y-0 bg-surface-secondary ${trailingInsetPx === 0 ? 'border-r-0' : ''}`
+      : 'h-5 rounded bg-surface-tertiary'}"
     role="group"
     aria-label={`${translate('workflows.timeline-chain-overview-description')} ${continuationCount} continuations, ${continuationBinCount} visible markers.`}
     onpointermove={dragWindow}
@@ -516,6 +561,36 @@
           {/each}
         </svg>
       </div>
+      {#if axisPlacement === 'inside'}
+        <!-- Each time sits beside its own tick line, inside the track, rather
+             than on a row of its own above it. -->
+        <div
+          class="pointer-events-none absolute inset-0 text-[11px] tabular-nums leading-none text-secondary"
+          data-testid="timeline-chain-time-axis"
+        >
+          {#each timeTicks as tick (tick.positionPercent)}
+            {#if tick.edge !== 'start' && tick.edge !== 'end'}
+              <span
+                class="absolute inset-y-0 w-px bg-border-primary"
+                style:left="{tick.positionPercent}%"
+                aria-hidden="true"
+              ></span>
+            {/if}
+            <span
+              class="absolute top-1/2 -translate-y-1/2 whitespace-nowrap {tick.edge ===
+              'end'
+                ? '-translate-x-full pr-1.5'
+                : 'pl-1.5'} {tick.edge === 'end' && chainEndIsLive
+                ? 'text-success'
+                : ''}"
+              style:left="{tick.positionPercent}%"
+              data-timeline-chain-time-ms={tick.timeMs}
+            >
+              {@render tickText(tick)}
+            </span>
+          {/each}
+        </div>
+      {/if}
       {#each gaps as gap (gap.key)}
         <div
           class="pointer-events-none absolute inset-y-0 border-x border-dashed border-warning bg-surface-warning"
@@ -541,7 +616,9 @@
       {/if}
       {#if windowStartTimeMs !== undefined}
         <div
-          class="absolute -inset-y-1 z-10 touch-none rounded bg-transparent shadow-sm outline outline-[3px] outline-interactive-primary"
+          class="absolute z-10 touch-none {axisPlacement === 'inside'
+            ? 'window-inside inset-y-0 rounded-sm outline outline-2 -outline-offset-2 outline-interactive-primary'
+            : '-inset-y-1 rounded bg-transparent shadow-sm outline outline-[3px] outline-interactive-primary'}"
           style:left={dragMode === null
             ? `var(--overview-window-left, ${displayedWindowLeft}%)`
             : `${displayedWindowLeft}%`}
@@ -562,28 +639,42 @@
             data-testid="timeline-window-move"
             onpointerdown={(event) => startDragging(event, 'move')}
           ></button>
+          <!-- In the header the handles sit just inside the window's edges, so
+               they stay reachable when the window spans the whole track. -->
           <button
             type="button"
-            class="absolute -bottom-1.5 -top-1.5 right-full z-20 w-6 cursor-ew-resize touch-none bg-transparent p-0"
+            class="absolute z-20 cursor-ew-resize touch-none bg-transparent p-0 {axisPlacement ===
+            'inside'
+              ? 'window-handle inset-y-0 left-0 w-3'
+              : '-bottom-1.5 -top-1.5 right-full w-6'}"
             aria-label={translate('workflows.timeline-resize-window-start')}
             data-testid="timeline-window-resize-start"
             onpointerdown={(event) => startDragging(event, 'resize-start')}
             onkeydown={(event) => resizeWithKeyboard(event, 'start')}
           >
             <span
-              class="absolute bottom-1 right-0 top-1 w-0.5 rounded bg-interactive-primary"
+              class="absolute rounded bg-interactive-primary {axisPlacement ===
+              'inside'
+                ? 'left-1 top-1/2 h-4 w-1 -translate-y-1/2'
+                : 'bottom-1 right-0 top-1 w-0.5'}"
             ></span>
           </button>
           <button
             type="button"
-            class="absolute -bottom-1.5 -top-1.5 left-full z-20 w-6 cursor-ew-resize touch-none bg-transparent p-0"
+            class="absolute z-20 cursor-ew-resize touch-none bg-transparent p-0 {axisPlacement ===
+            'inside'
+              ? 'window-handle inset-y-0 right-0 w-3'
+              : '-bottom-1.5 -top-1.5 left-full w-6'}"
             aria-label={translate('workflows.timeline-resize-window-end')}
             data-testid="timeline-window-resize-end"
             onpointerdown={(event) => startDragging(event, 'resize-end')}
             onkeydown={(event) => resizeWithKeyboard(event, 'end')}
           >
             <span
-              class="absolute bottom-1 left-0 top-1 w-0.5 rounded bg-interactive-primary"
+              class="absolute rounded bg-interactive-primary {axisPlacement ===
+              'inside'
+                ? 'right-1 top-1/2 h-4 w-1 -translate-y-1/2'
+                : 'bottom-1 left-0 top-1 w-0.5'}"
             ></span>
           </button>
         </div>
@@ -591,3 +682,54 @@
     {/if}
   </div>
 </div>
+
+{#snippet summary()}
+  <span data-testid="timeline-chain-duration">
+    {translate('workflows.timeline-chain-run-count', {
+      count: runs.length,
+    })}
+    ·
+    {translate('workflows.timeline-chain-elapsed', {
+      duration: displayedDuration,
+    })}
+  </span>
+{/snippet}
+
+{#snippet loadingStatus()}
+  {#if loading}
+    <span class="text-tertiary" role="status">
+      {translate('workflows.timeline-chain-loading')}
+    </span>
+  {/if}
+{/snippet}
+
+{#snippet tickText(tick: (typeof timeTicks)[number])}
+  {#if tick.edge === 'end' && chainEndIsLive}
+    {translate('workflows.timeline-chain-now')} ·
+  {/if}
+  {formatTimelineChainTickTime({
+    timeMs: tick.timeMs,
+    durationMs: displayedDurationMs,
+    timeFormat: $timeFormat,
+    hourFormat: $hourFormat,
+  })}
+{/snippet}
+
+<style lang="postcss">
+  .window-handle:hover,
+  .window-handle:focus-visible {
+    background: color-mix(
+      in srgb,
+      var(--color-interactive-primary) 18%,
+      transparent
+    );
+  }
+
+  .window-inside {
+    background: color-mix(
+      in srgb,
+      var(--color-interactive-primary) 10%,
+      transparent
+    );
+  }
+</style>

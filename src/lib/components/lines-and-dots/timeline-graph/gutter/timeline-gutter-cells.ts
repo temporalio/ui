@@ -1,11 +1,14 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import { getEventGroupDisplayName } from '$lib/models/event-groups/get-group-name';
 import type { LazyGroup } from '$lib/services/grouped-event-buffer';
-import type { EventTypeCategory } from '$lib/types/events';
+import type { EventClassification, EventTypeCategory } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
+import { validTimeToDate } from '$lib/utilities/format-time';
 
 import type { TimelineWorkflowNode } from '../recursive-timeline-model';
 import { getChildWorkflowReference } from '../timeline-child-reference';
 import type { TimelineLayoutRow } from '../timeline-containment-layout';
+import { isWorkerWaitKey } from '../timeline-worker-wait';
 
 /**
  * What the left gutter draws for one timeline row. The plot area keeps only
@@ -16,17 +19,65 @@ export type TimelineGutterCell = {
   key: string;
   kind: 'workflow' | 'run' | 'event' | 'child-state';
   depth: number;
+  /** The row's one line of text. */
   label: string;
-  detail?: string;
+  /** What the row's hover card shows: the half of its identity left out. */
+  reveal?: TimelineGutterReveal;
+  /** Selects the row's event group for the details panel. */
+  detailsKey?: string;
+  /** An activity or child workflow that ran to completion, marked done. */
+  completed?: boolean;
+  /** How an activity or child workflow ended without completing, if it did. */
+  outcome?: 'Failed' | 'TimedOut' | 'Canceled' | 'Terminated';
+  /** When the row's work ran, for its duration. */
+  timing?: TimelineGutterTiming;
+  /** An activity's attempt number, set only once it has retried. */
+  attempt?: number;
   status?: WorkflowStatus;
   /** Drives the row's icon and its dim kind prefix. */
   category?: EventTypeCategory;
+  /** A first attempt's time on the task queue before a worker started it. */
+  waiting?: boolean;
   toggleEdgeKey?: string;
   /** Set instead of toggleEdgeKey on a run row, which folds by run not edge. */
   toggleRunKey?: string;
   expanded?: boolean;
+  /** How many rows a folded row holds, from the data rather than its rows. */
+  childCount?: number;
   /** Set on a run row only when its workflow owns more than one run. */
   runOrdinal?: { index: number; total: number };
+};
+
+/** What opening a child shows: its runs, or with one run, that run's work. */
+const childWorkflowRowCount = (node: TimelineWorkflowNode): number =>
+  node.runs.length > 1 ? node.runs.length : (node.runs[0]?.groups.length ?? 0);
+
+const isActivityCategory = (category: EventTypeCategory | undefined) =>
+  category === 'activity' || category === 'local-activity';
+
+/** Activities and child workflows end in an outcome worth marking. */
+const hasOutcome = (group: EventGroup | LazyGroup) =>
+  isActivityCategory(group.category) || group.category === 'child-workflow';
+
+const outcomeOf = (
+  classification: EventClassification | undefined,
+): TimelineGutterCell['outcome'] =>
+  classification === 'Failed' ||
+  classification === 'TimedOut' ||
+  classification === 'Canceled' ||
+  classification === 'Terminated'
+    ? classification
+    : undefined;
+
+/** An open end means the work is still running, so its duration counts up. */
+export type TimelineGutterTiming = {
+  startTimeMs: number;
+  endTimeMs?: number;
+};
+
+export type TimelineGutterReveal = {
+  kind: 'run-id' | 'workflow-id';
+  value: string;
 };
 
 export type GutterWorkflowSummary = {
@@ -37,6 +88,72 @@ export type GutterWorkflowSummary = {
   runCount: number;
   incomingEdgeKey?: string;
   expanded: boolean;
+  /** The workflow's whole span, from its first run's start to its last's end. */
+  timing?: TimelineGutterTiming;
+  runTimings?: ReadonlyMap<string, TimelineGutterTiming>;
+  runGroupCounts?: ReadonlyMap<string, number>;
+};
+
+type TimedRun = { startTimeMs: number; endTimeMs: number; active: boolean };
+
+const runTiming = (run: TimedRun): TimelineGutterTiming => ({
+  startTimeMs: run.startTimeMs,
+  endTimeMs: run.active ? undefined : run.endTimeMs,
+});
+
+const workflowTiming = (
+  runs: readonly TimedRun[],
+): TimelineGutterTiming | undefined => {
+  if (!runs.length) return undefined;
+  const startTimeMs = Math.min(...runs.map((run) => run.startTimeMs));
+  const endTimeMs = runs.some((run) => run.active)
+    ? undefined
+    : Math.max(...runs.map((run) => run.endTimeMs));
+  return { startTimeMs, endTimeMs };
+};
+
+const eventTimeMs = (event: { eventTime?: unknown } | undefined) =>
+  event?.eventTime
+    ? validTimeToDate(event.eventTime as never).getTime()
+    : undefined;
+
+/**
+ * The span an event group's work took. A group of one event happened at an
+ * instant — a signal, a marker — so it has none. A group still waiting runs
+ * to now while its run is live, and to the run's end once it isn't.
+ */
+export const groupTiming = (entry: {
+  group: EventGroup | LazyGroup;
+  active: boolean;
+  runEndTimeMs: number;
+}): TimelineGutterTiming | undefined => {
+  const { group } = entry;
+  if (group.eventCount <= 1 && !group.isPending) return undefined;
+  const startTimeMs =
+    ('startTimeMs' in group ? group.startTimeMs : undefined) ??
+    eventTimeMs(group.initialEvent);
+  if (startTimeMs === undefined) return undefined;
+  if (group.isPending) {
+    return {
+      startTimeMs,
+      endTimeMs: entry.active ? undefined : entry.runEndTimeMs,
+    };
+  }
+  const endTimeMs =
+    ('lastTimeMs' in group ? group.lastTimeMs : undefined) ??
+    eventTimeMs(group.lastEvent);
+  return endTimeMs === undefined ? undefined : { startTimeMs, endTimeMs };
+};
+
+/** The attempt an activity is on, or ended on, once it has retried. */
+export const groupAttempt = (
+  group: EventGroup | LazyGroup,
+): number | undefined => {
+  if (!isActivityCategory(group.category)) return undefined;
+  const attempt =
+    group.pendingActivity?.attempt ??
+    ('activityAttempt' in group ? group.activityAttempt : undefined);
+  return attempt !== undefined && attempt > 1 ? attempt : undefined;
 };
 
 export const gutterWorkflowSummaries = (
@@ -58,6 +175,11 @@ export const gutterWorkflowSummaries = (
       runCount: node.runs.length,
       incomingEdgeKey: edge?.key,
       expanded: edge ? edge.expansion === 'expanded' : true,
+      timing: workflowTiming(node.runs),
+      runTimings: new Map(node.runs.map((run) => [run.runId, runTiming(run)])),
+      runGroupCounts: new Map(
+        node.runs.map((run) => [run.runId, run.groups.length]),
+      ),
     });
   }
 
@@ -83,6 +205,9 @@ const groupLabel = (group: EventGroup | LazyGroup): string => {
     eventGroup.displayName ||
     eventGroup.name ||
     eventGroup.label ||
+    // Groups from a run still in progress carry no precomputed name, so it
+    // comes from the event that started them, as the plot's rows do.
+    getEventGroupDisplayName(group.initialEvent as never) ||
     // The event that starts a child names the child, not its category:
     // "child-workflow" repeated down a tree says nothing.
     lazy.childWorkflow?.workflowId ||
@@ -90,6 +215,15 @@ const groupLabel = (group: EventGroup | LazyGroup): string => {
     'Event'
   );
 };
+
+/**
+ * What a group is called wherever the timeline names it: a child workflow by
+ * its id, anything else by its own name.
+ */
+export const timelineGroupName = (
+  group: EventGroup | LazyGroup,
+  namespace: string,
+): string => groupChildWorkflowId(group, namespace) ?? groupLabel(group);
 
 /**
  * Maps one layout row to its gutter cell. Rows that exist purely to reserve
@@ -126,9 +260,11 @@ export const toGutterCell = (
         key: row.key,
         kind: 'workflow',
         depth: row.depth + lift,
-        // The name carries the row and the id trails it as the disambiguator.
-        label: summary.workflowType || summary.workflowId,
-        detail: summary.workflowType ? summary.workflowId : undefined,
+        // The id is what tells repeated workflows apart, so it carries the
+        // row, and its hover card offers the same id to copy.
+        label: summary.workflowId,
+        reveal: { kind: 'workflow-id', value: summary.workflowId },
+        timing: summary.timing,
         status: summary.status,
         category: 'workflow',
         toggleEdgeKey: summary.incomingEdgeKey,
@@ -144,13 +280,15 @@ export const toGutterCell = (
         key: row.key,
         kind: 'run',
         depth: row.depth + lift + 1,
-        // The count carries the row and the id trails it, so a narrow column
-        // gives up the id rather than the run's place in the chain.
+        // The run's place in the chain carries the row; its id is only
+        // wanted when someone goes looking, so it waits in the hover card.
         label: ordinal ? `Run ${ordinal.index} of ${ordinal.total}` : 'Run',
-        detail: row.runId,
+        reveal: { kind: 'run-id', value: row.runId },
+        timing: summary.runTimings?.get(row.runId),
         runOrdinal: ordinal,
         toggleRunKey: row.runKey,
         expanded: !collapsedRunKeys?.has(row.runKey),
+        childCount: summary.runGroupCounts?.get(row.runId),
       };
     }
 
@@ -164,14 +302,32 @@ export const toGutterCell = (
         key: row.key,
         kind: 'event',
         depth: row.depth + lift + contentOffset(row.workflowKey),
-        label: groupLabel(row.entry.group),
-        detail: childWorkflowId,
+        // A row that starts a child workflow is named like the workflow
+        // itself: by its id, which its hover card offers to copy.
+        label: childWorkflowId ?? groupLabel(row.entry.group),
+        reveal: childWorkflowId
+          ? { kind: 'workflow-id', value: childWorkflowId }
+          : undefined,
         status: row.entry.resolvedStatus,
         category: row.entry.group.category,
+        waiting: isWorkerWaitKey(row.entry.timelineKey) || undefined,
+        detailsKey: row.entry.timelineKey,
+        completed:
+          hasOutcome(row.entry.group) &&
+          row.entry.group.finalClassification === 'Completed',
+        outcome: hasOutcome(row.entry.group)
+          ? outcomeOf(row.entry.group.finalClassification)
+          : undefined,
+        timing: groupTiming(row.entry),
+        attempt: groupAttempt(row.entry.group),
         toggleEdgeKey: row.childEdge?.key,
         expanded: row.childEdge
           ? row.childEdge.expansion === 'expanded'
           : undefined,
+        childCount:
+          row.childEdge?.load.state === 'loaded'
+            ? childWorkflowRowCount(row.childEdge.load.node)
+            : undefined,
       };
     }
 

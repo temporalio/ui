@@ -17,21 +17,29 @@
     group: LazyGroup;
     timelineKey: string;
     canvasWidth: number;
+    /** Space kept clear at each end of the plot; defaults to the shared gutter. */
+    startInsetPx?: number;
+    endInsetPx?: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
     showLabel?: boolean;
     /** Row height of the view this row sits in. */
     rowHeight?: number;
+    /** Draws the marker's type icon; off when a tree beside the plot names it. */
+    showIcon?: boolean;
   };
 
   let {
     group,
     timelineKey,
     canvasWidth,
+    startInsetPx = GUTTER,
+    endInsetPx = GUTTER,
     project,
     readOnly,
     showLabel = true,
     rowHeight = ROW_HEIGHT,
+    showIcon = true,
   }: Props = $props();
 
   const presentation = $derived.by(() => {
@@ -44,7 +52,7 @@
       resolveSystemNexusEvent(group.initialEvent)?.timelineCategory ??
       group.category;
     return {
-      visible: pointX >= GUTTER && pointX <= canvasWidth - GUTTER,
+      visible: pointX >= startInsetPx && pointX <= canvasWidth - endInsetPx,
       bounds: alignedDotBox(
         pointX,
         rowHeight / 2,
@@ -62,7 +70,7 @@
       label: timelineTextPosition(
         [pointX],
         rowHeight / 2,
-        canvasWidth - 2 * GUTTER,
+        canvasWidth - startInsetPx - endInsetPx,
         false,
       ),
     };
@@ -84,12 +92,14 @@
       style:border-color={presentation.colors.stroke}
       style:background={presentation.colors.fill}
     >
-      <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
-        viewBox="0 0 16 16"
-      >
-        <use href="#ti-{presentation.icon}" />
-      </svg>
+      {#if showIcon}
+        <svg
+          class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
+          viewBox="0 0 16 16"
+        >
+          <use href="#ti-{presentation.icon}" />
+        </svg>
+      {/if}
     </span>
     <span
       class="absolute z-10 -translate-y-1/2 select-none whitespace-nowrap rounded-full bg-surface-primary px-1.5 text-xs leading-none"

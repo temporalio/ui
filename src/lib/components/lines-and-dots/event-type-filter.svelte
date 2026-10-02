@@ -28,9 +28,11 @@
 
   interface Props {
     compact?: boolean;
+    /** Matches the toolbar the filter sits in. */
+    size?: 'xs' | 'sm' | 'md';
   }
 
-  let { compact = false }: Props = $props();
+  let { compact = false, size = 'sm' }: Props = $props();
 
   const open = writable(false);
 
@@ -112,7 +114,7 @@
 <MenuContainer {open}>
   <MenuButton
     controls="status-menu"
-    size="sm"
+    {size}
     variant="tertiary"
     class="rounded-none"
   >
@@ -124,7 +126,7 @@
         <IconFilter class={filterActive ? 'pt-0.5 text-white' : undefined} />
       </div>
     {/snippet}
-    <span class="hidden text-sm md:block">{translate('common.filter')}</span>
+    <span class="hidden md:block">{translate('common.filter')}</span>
   </MenuButton>
   <Menu
     id="event-type-menu"

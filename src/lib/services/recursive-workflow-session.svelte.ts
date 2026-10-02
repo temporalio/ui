@@ -108,6 +108,9 @@ export class RecursiveWorkflowSession {
   private disposed = false;
   private paused = false;
   private readonly livePoller: LivePoller;
+  private readonly initialExpansion: (
+    depth: number,
+  ) => TimelineChildEdge['expansion'];
   private readonly livePollsByExecutionKey = new SvelteMap<
     string,
     { controller: AbortController; edges: Set<TimelineChildEdge> }
@@ -127,6 +130,7 @@ export class RecursiveWorkflowSession {
     loader = loadChildWorkflow,
     describer = describeChildWorkflow,
     livePoller = runLivePoll,
+    initialExpansion = () => 'expanded',
   }: {
     namespace: string;
     workflow: WorkflowExecution;
@@ -135,7 +139,10 @@ export class RecursiveWorkflowSession {
     loader?: Loader;
     describer?: Describer;
     livePoller?: LivePoller;
+    /** Whether a child found at this depth starts open; the root is depth 0. */
+    initialExpansion?: (depth: number) => TimelineChildEdge['expansion'];
   }) {
+    this.initialExpansion = initialExpansion;
     this.limits = limits;
     this.loader = loader;
     this.describer = describer;
@@ -259,6 +266,17 @@ export class RecursiveWorkflowSession {
     this.changed();
   }
 
+  /**
+   * Loads a folded child's history without opening it, so its row can say
+   * what it holds. Unlike a load the user asks for, it never evicts others.
+   */
+  preload(edgeKey: string): void {
+    const found = this.findEdge(edgeKey);
+    if (!found || found.edge.load.state !== 'idle') return;
+    this.enqueue(found.edge, found.ancestry);
+    this.changed();
+  }
+
   retry(edgeKey: string): void {
     const found = this.findEdge(edgeKey);
     if (!found || found.edge.load.state === 'loading') return;
@@ -369,7 +387,7 @@ export class RecursiveWorkflowSession {
             }),
             parentGroupKey: entry.timelineKey,
             reference,
-            expansion: 'expanded',
+            expansion: this.initialExpansion(node.depth + 1),
             load: { state: 'idle' },
             depth: node.depth + 1,
             lastVisibleAt: 0,

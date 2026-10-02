@@ -116,6 +116,14 @@ const createGroupFor = (
   });
 };
 
+/**
+ * A group that has been through JSON keeps only its own fields; the derived
+ * ones — lastEvent, finalClassification, eventTime, eventCount, isPending —
+ * live on the shared prototype. This puts a parsed group back on it.
+ */
+export const restoreEventGroup = (group: EventGroup): EventGroup =>
+  Object.setPrototypeOf(group, eventGroupProto) as EventGroup;
+
 // Called by addToExistingGroup after pushing a new event into a group's eventList.
 // Updates all eagerly-maintained fields in one place so getters stay zero-cost.
 export const addEventToGroup = (group: EventGroup, event: WorkflowEvent) => {

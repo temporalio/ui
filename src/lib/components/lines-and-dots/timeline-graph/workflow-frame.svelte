@@ -28,6 +28,8 @@
     entryKey?: string;
     bottomEntryOffsetPx?: number;
     growthMotion?: TimelineFrameGrowthMotion;
+    /** Draws the workflow icon in the frame's dots; off beside the tree. */
+    showIcons?: boolean;
   }
 
   let {
@@ -50,6 +52,7 @@
     entryKey,
     bottomEntryOffsetPx = 0,
     growthMotion = undefined,
+    showIcons = true,
   }: Props = $props();
 
   const frameBottomEntryOffsetPx = $derived(
@@ -306,11 +309,13 @@
               style:border-color={colors.stroke}
               style:background={colors.fill}
             >
-              <svg
-                aria-hidden="true"
-                class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
-                viewBox="0 0 24 24"><use href="#ti-workflow" /></svg
-              >
+              {#if showIcons}
+                <svg
+                  aria-hidden="true"
+                  class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
+                  viewBox="0 0 24 24"><use href="#ti-workflow" /></svg
+                >
+              {/if}
             </div>
           {/each}
         {/if}

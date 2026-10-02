@@ -40,6 +40,7 @@
   } from '$lib/utilities/is-event-type';
 
   import { alignedDotBox, lineBox } from './primitives';
+  import { isWorkerWaitKey, workerWaitSourceKey } from './timeline-worker-wait';
   import { type DotColors, dotColors, strokeColor } from '../colors';
   import { CategoryIcon, type TimelineIconName } from '../constants';
   import { DOT_STROKE, GUTTER, RADIUS, ROW_HEIGHT } from './constants';
@@ -56,6 +57,9 @@
   type Props = {
     group: EventGroup | LazyGroup;
     canvasWidth: number;
+    /** Space kept clear at each end of the plot; defaults to the shared gutter. */
+    startInsetPx?: number;
+    endInsetPx?: number;
     project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
     // Reactive event count so the row recomputes on streamed appends (eventList
@@ -75,6 +79,8 @@
     /** Replaces the composed label outright. */
     displayNameOverride?: string;
     showLabel?: boolean;
+    /** Draws each marker's type icon; off when a tree beside the plot names it. */
+    showIcons?: boolean;
     /** Renders the label as secondary text rather than in the primary colour. */
     subtleLabel?: boolean;
     onBeforeSelect?: () => void;
@@ -85,6 +91,8 @@
   let {
     group,
     canvasWidth,
+    startInsetPx = GUTTER,
+    endInsetPx = GUTTER,
     project,
     readOnly = false,
     eventCount = 0,
@@ -101,12 +109,13 @@
     displayNamePrefix,
     displayNameOverride,
     showLabel = true,
+    showIcons = true,
     subtleLabel = false,
     onBeforeSelect,
     rowHeight = ROW_HEIGHT,
   }: Props = $props();
 
-  const timelineWidth = $derived(canvasWidth - 2 * GUTTER);
+  const timelineWidth = $derived(canvasWidth - startInsetPx - endInsetPx);
   const resolvedTerminal = $derived(
     Boolean(resolvedStatus) &&
       resolvedStatus !== 'Running' &&
@@ -253,8 +262,8 @@
   const rowGeometry = $derived(
     getTimelineRowGeometry({
       points,
-      viewportStartPx: GUTTER,
-      viewportEndPx: canvasWidth - GUTTER + viewportEndOverscanPx,
+      viewportStartPx: startInsetPx,
+      viewportEndPx: canvasWidth - endInsetPx + viewportEndOverscanPx,
       pendingEndPx:
         isLivePending && pendingEndTimeMs !== undefined
           ? Math.round(project(new Date(pendingEndTimeMs).toISOString()))
@@ -264,6 +273,33 @@
       haloPx: HALO,
     }),
   );
+  // Without type icons a bar's markers are only empty boxes on its ends, so a
+  // bar is drawn on its own. A single point, or a bar too short to see (an
+  // instant update), keeps its last marker, which is all there is of it.
+  const shownDots = $derived.by(() => {
+    if (showIcons) return rowGeometry.dots;
+    // Only markers that actually draw count: an unfinished row's last slot
+    // may have nothing to show.
+    const drawn = rowGeometry.dots.filter((dot) =>
+      getTimelineDotRole({
+        index: dot.index,
+        eventCount: group.eventCount,
+        pointCount: points.length,
+        pending: group.isPending || isLivePending,
+        livePending: isLivePending,
+        hasPauseTime: Boolean(pauseTime),
+        active,
+        resolvedTerminal,
+        showLivePendingMarker: !continuousConnector,
+      }),
+    );
+    const barPx = rowGeometry.connectors.reduce(
+      (widest, connector) =>
+        Math.max(widest, connector.endPx - connector.startPx),
+      0,
+    );
+    return barPx >= 2 * RADIUS ? [] : drawn.slice(-1);
+  });
   const visibleConnectors = $derived(
     continuousConnector
       ? mergeTimelineRowConnectors(rowGeometry.connectors)
@@ -283,7 +319,8 @@
     visibleConnectors.some((connector) => connector.pending),
   );
   const hasVisibleConnector = $derived(visibleConnectors.length > 0);
-  const labelSafeInset = GUTTER + 1.5 * RADIUS;
+  const labelSafeStart = $derived(startInsetPx + 1.5 * RADIUS);
+  const labelSafeEnd = $derived(endInsetPx + 1.5 * RADIUS);
   const labelTextPositionX = $derived(
     textPosition[0] +
       (textAnchor === 'start' ? labelLeadingOffsetPx : -labelTrailingOffsetPx),
@@ -292,16 +329,16 @@
     hasVisibleConnector &&
       (hasVisiblePendingConnector ||
         labelTextPositionX - (textAnchor === 'end' ? labelWidth : 0) <
-          labelSafeInset ||
+          labelSafeStart ||
         labelTextPositionX + (textAnchor === 'end' ? 0 : labelWidth) >
-          canvasWidth - labelSafeInset),
+          canvasWidth - labelSafeEnd),
   );
   const labelVisible = $derived(
     showLabel &&
       isTimelineLabelVisible(
         labelTextPositionX,
-        GUTTER,
-        canvasWidth - GUTTER,
+        startInsetPx,
+        canvasWidth - endInsetPx,
         hasVisibleConnector,
       ),
   );
@@ -309,7 +346,8 @@
   const onClick = () => {
     if (readOnly) return;
     onBeforeSelect?.();
-    setActiveGroup(group, timelineKey);
+    // A waiting row stands in for its activity.
+    setActiveGroup(group, workerWaitSourceKey(timelineKey));
   };
 
   // Only activity groups carry an ActivityTaskStarted event; guard so other
@@ -324,6 +362,7 @@
   );
   const retried = $derived(retryAttempt > 1);
 
+  const waitRow = $derived(isWorkerWaitKey(timelineKey));
   const effectiveCategory = $derived(
     compiledTimelineCategory ??
       resolveSystemNexusEvent(group.initialEvent)?.timelineCategory ??
@@ -333,7 +372,7 @@
   const lineColor = $derived(
     connectorColor ??
       strokeColor({
-        category: effectiveCategory,
+        category: waitRow ? 'pending' : effectiveCategory,
         classification: group.lastEvent.classification,
       }),
   );
@@ -349,7 +388,9 @@
           ? (pendingActivity.attempt ?? 0) > 1
             ? 'retry'
             : 'pending'
-          : effectiveCategory,
+          : waitRow
+            ? 'pending'
+            : effectiveCategory,
         classification: group.lastEvent.classification,
       }),
   );
@@ -429,7 +470,7 @@
     style:border-color={colors.stroke}
     style:background={colors.fill}
   >
-    {#if icon}
+    {#if icon && showIcons}
       <svg
         class="absolute left-1/2 top-1/2 h-[var(--dot-icon)] w-[var(--dot-icon)] -translate-x-1/2 -translate-y-1/2 text-black"
         viewBox="0 0 16 16"
@@ -447,9 +488,9 @@
       : undefined}
   {@const clampedLabelMaxWidth = Math.max(
     0,
-    canvasWidth - 2 * (GUTTER + 1.5 * RADIUS),
+    canvasWidth - labelSafeStart - labelSafeEnd,
   )}
-  {@const clampedLabelLeft = `clamp(calc(${GUTTER + 1.5 * RADIUS - spanLeft}px + var(--timeline-frame-offset, 0px)), ${labelTextPositionX - spanLeft - (textAnchor === 'end' ? labelWidth : 0)}px, calc(${canvasWidth - GUTTER - 1.5 * RADIUS - labelWidth - spanLeft}px + var(--timeline-frame-offset, 0px)))`}
+  {@const clampedLabelLeft = `clamp(calc(${labelSafeStart - spanLeft}px + var(--timeline-frame-offset, 0px)), ${labelTextPositionX - spanLeft - (textAnchor === 'end' ? labelWidth : 0)}px, calc(${canvasWidth - labelSafeEnd - labelWidth - spanLeft}px + var(--timeline-frame-offset, 0px)))`}
   <div
     class="pointer-events-auto absolute z-10 flex select-none items-center gap-1 whitespace-nowrap rounded-full bg-surface-primary px-1.5 text-xs leading-none {textAnchor ===
     'end'
@@ -465,7 +506,7 @@
     style:max-width={shouldClampLabel ? `${clampedLabelMaxWidth}px` : undefined}
     use:measureLabel
   >
-    {#if iconName}
+    {#if iconName && showIcons}
       <svg
         class="h-[var(--dot)] w-[var(--dot)] shrink-0 rounded-full p-[3px] text-current"
         viewBox="0 0 16 16"
@@ -526,20 +567,23 @@
           visibleConnector.pending ? pendingLineColor : lineColor,
           {
             gradient: !visibleConnector.pending && showRetryGradient,
+            // A child workflow's bar is one merged span, not a wait followed
+            // by work, so none of it is faded as waiting.
             dim:
               !visibleConnector.pending &&
               scheduling &&
+              !continuousConnector &&
               visibleConnector.index === 0
                 ? 0.35
                 : undefined,
             dashed: visibleConnector.pending,
             animate: visibleConnector.pending,
             liveEdge: visibleConnector.pending,
-            viewportClippedStart: visibleConnector.startPx <= GUTTER,
+            viewportClippedStart: visibleConnector.startPx <= startInsetPx,
           },
         )}
       {/each}
-      {#each rowGeometry.dots as visibleDot (visibleDot.index)}
+      {#each shownDots as visibleDot (visibleDot.index)}
         {@const localX = visibleDot.xPx - spanLeft}
         {@const index = visibleDot.index}
         {@const alignment = getTimelineDotAlignment({

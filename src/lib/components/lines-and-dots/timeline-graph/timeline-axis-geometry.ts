@@ -3,8 +3,12 @@ export interface TimelineAxisTick {
   worldPx: number;
 }
 
-export function getNiceTimelineIntervalMs(targetIntervalMs: number): number {
-  const targetSeconds = Math.max(1, targetIntervalMs / 1000);
+export function getNiceTimelineIntervalMs(
+  targetIntervalMs: number,
+  /** Whole seconds by default; a shorter span can ask for less. */
+  minIntervalMs = 1000,
+): number {
+  const targetSeconds = Math.max(minIntervalMs / 1000, targetIntervalMs / 1000);
   const magnitude = 10 ** Math.floor(Math.log10(targetSeconds));
   const candidates = [1, 2, 5, 10].map((multiple) => multiple * magnitude);
   const intervalSeconds = candidates.reduce((closest, candidate) =>
@@ -12,7 +16,7 @@ export function getNiceTimelineIntervalMs(targetIntervalMs: number): number {
       ? candidate
       : closest,
   );
-  return intervalSeconds * 1000;
+  return Math.max(1, Math.round(intervalSeconds * 1000));
 }
 
 export function getTimelineTimeTicks({

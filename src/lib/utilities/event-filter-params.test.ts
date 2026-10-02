@@ -51,11 +51,11 @@ describe('parseEventFilterParams', () => {
     );
   });
 
-  it('parses the full-duration timeline mode', () => {
+  it('opens full-duration links in the sliding window while it is hidden', () => {
     const url = new URL('http://localhost/?timeline_mode=full-duration');
 
     expect(parseEventFilterParams(url).timelineDisplayMode).toBe(
-      'full-duration',
+      'fixed-window',
     );
   });
 
@@ -63,6 +63,13 @@ describe('parseEventFilterParams', () => {
     const url = new URL('http://localhost/?timeline_mode=classic');
 
     expect(parseEventFilterParams(url).timelineDisplayMode).toBe('classic');
+  });
+
+  it('opens old lanes links in the sliding window, which now has the tree', () => {
+    const url = new URL('http://localhost/?timeline_mode=lanes');
+    expect(parseEventFilterParams(url).timelineDisplayMode).toBe(
+      'fixed-window',
+    );
   });
 
   it('shows containment groups when the param is absent', () => {
@@ -75,6 +82,18 @@ describe('parseEventFilterParams', () => {
     const url = new URL('http://localhost/?show_groups=false');
 
     expect(parseEventFilterParams(url).showGroups).toBe(false);
+  });
+
+  it('shows the Lanes tree when the param is absent', () => {
+    const url = new URL('http://localhost/');
+
+    expect(parseEventFilterParams(url).showTree).toBe(true);
+  });
+
+  it('hides the Lanes tree for show_tree=false', () => {
+    const url = new URL('http://localhost/?show_tree=false');
+
+    expect(parseEventFilterParams(url).showTree).toBe(false);
   });
 });
 
@@ -160,8 +179,31 @@ describe('updateEventFilterParams', () => {
     expect(calledUrl).toContain('sort=ascending');
   });
 
+  it('adds show_tree=false to the URL when hiding the tree', async () => {
+    const url = new URL('http://localhost/?timeline_mode=full-duration');
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(url, { showTree: false }, mockGoto as never);
+
+    const calledUrl = mockGoto.mock.calls[0][0] as string;
+    expect(calledUrl).toContain('show_tree=false');
+    expect(calledUrl).toContain('timeline_mode=full-duration');
+  });
+
+  it('removes show_tree from the URL when showing the tree again', async () => {
+    const url = new URL(
+      'http://localhost/?timeline_mode=full-duration&show_tree=false',
+    );
+    const mockGoto = vi.fn(() => Promise.resolve());
+
+    await updateEventFilterParams(url, { showTree: true }, mockGoto as never);
+
+    const calledUrl = mockGoto.mock.calls[0][0] as string;
+    expect(calledUrl).not.toContain('show_tree');
+  });
+
   it('adds show_groups=false to the URL when hiding groups', async () => {
-    const url = new URL('http://localhost/?timeline_mode=lanes');
+    const url = new URL('http://localhost/?timeline_mode=full-duration');
     const mockGoto = vi.fn(() => Promise.resolve());
 
     await updateEventFilterParams(
@@ -172,12 +214,12 @@ describe('updateEventFilterParams', () => {
 
     const calledUrl = mockGoto.mock.calls[0][0] as string;
     expect(calledUrl).toContain('show_groups=false');
-    expect(calledUrl).toContain('timeline_mode=lanes');
+    expect(calledUrl).toContain('timeline_mode=full-duration');
   });
 
   it('removes show_groups from the URL when showing groups again', async () => {
     const url = new URL(
-      'http://localhost/?timeline_mode=lanes&show_groups=false',
+      'http://localhost/?timeline_mode=full-duration&show_groups=false',
     );
     const mockGoto = vi.fn(() => Promise.resolve());
 
@@ -185,7 +227,7 @@ describe('updateEventFilterParams', () => {
 
     const calledUrl = mockGoto.mock.calls[0][0] as string;
     expect(calledUrl).not.toContain('show_groups');
-    expect(calledUrl).toContain('timeline_mode=lanes');
+    expect(calledUrl).toContain('timeline_mode=full-duration');
   });
 
   it('adds classic timeline mode to the URL', async () => {

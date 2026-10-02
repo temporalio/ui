@@ -14,6 +14,7 @@ export const SHARED_FILTER_PARAMS = [
   'follow_continues',
   'timeline_mode',
   'show_groups',
+  'show_tree',
 ] as const;
 
 export function getSharedFilterParams(url: URL): Record<string, string> {
@@ -34,17 +35,18 @@ export function sharedFilterParamsToString(
 export function parseEventFilterParams(url: URL) {
   const categoryParam = url.searchParams.get('category');
   const timelineModeParam = url.searchParams.get('timeline_mode');
+  // Full duration is hidden for now: the sliding window covers the same ground
+  // (zoomed out it shows the whole run). Links to it, and to the old `lanes`
+  // view, open the sliding window rather than a mode the toolbar can't show.
   const timelineDisplayMode: TimelineViewMode =
-    timelineModeParam === 'full-duration' ||
-    timelineModeParam === 'classic' ||
-    timelineModeParam === 'lanes'
-      ? timelineModeParam
-      : 'fixed-window';
+    timelineModeParam === 'classic' ? 'classic' : 'fixed-window';
 
   return {
     sort: (url.searchParams.get('sort') as EventSortOrder) || 'descending',
     // Containment frames are the default, so the param only turns them off.
     showGroups: url.searchParams.get('show_groups') !== 'false',
+    // The tree is shown by default, so the param only hides it.
+    showTree: url.searchParams.get('show_tree') !== 'false',
     categories: categoryParam
       ? (categoryParam.split(',') as EventTypeCategory[])
       : null,
@@ -61,6 +63,7 @@ type FilterUpdate = {
   refresh_off?: boolean;
   timelineDisplayMode?: TimelineViewMode;
   showGroups?: boolean;
+  showTree?: boolean;
 };
 
 export function updateEventFilterParams(
@@ -115,6 +118,13 @@ export function updateEventFilterParams(
     parameters.push({
       parameter: 'show_groups',
       value: filters.showGroups ? undefined : 'false',
+    });
+  }
+
+  if (filters.showTree !== undefined) {
+    parameters.push({
+      parameter: 'show_tree',
+      value: filters.showTree ? undefined : 'false',
     });
   }
 

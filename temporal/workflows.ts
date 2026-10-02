@@ -1353,3 +1353,307 @@ export async function BillingCycleWorkflow({
 
   return `billed:${cycleId}`;
 }
+
+/**
+ * Lanes scenario fixtures: three workflows of rising complexity that between
+ * them end in every status and use every primitive the Lanes view draws —
+ * activities and local activities, retries, timers, signals, updates, child
+ * workflows that complete, fail, time out, get cancelled or terminated, and a
+ * continue-as-new chain.
+ */
+const {
+  createAccount,
+  provisionWorkspace,
+  scheduleDripEmail,
+  sendWelcomeEmail,
+  notifyCustomerOfRefund,
+  scoreRefundRisk,
+  fetchCatalogPage,
+  upsertProducts,
+  rebuildPriceIndex,
+  publishCatalog,
+} = workflow.proxyActivities<typeof activities>({
+  startToCloseTimeout: '1 minute',
+});
+
+const { normalizeEmail, checkRefundPolicy, loadSyncCursor } =
+  workflow.proxyLocalActivities<typeof activities>({
+    startToCloseTimeout: '10 seconds',
+  });
+
+// Task queues the scenario script staffs late (a backlog) or never (nobody
+// owns them), so activities on them sit waiting for a worker.
+export const LANES_BACKLOG_TASK_QUEUE = 'lanes-scenarios-backlog';
+export const LANES_UNSTAFFED_TASK_QUEUE = 'lanes-scenarios-unstaffed';
+
+const { lookupOrder: lookupOrderOnBacklog } = workflow.proxyActivities<
+  typeof activities
+>({
+  taskQueue: LANES_BACKLOG_TASK_QUEUE,
+  startToCloseTimeout: '1 minute',
+});
+
+const { notifySalesTeam } = workflow.proxyActivities<typeof activities>({
+  taskQueue: LANES_UNSTAFFED_TASK_QUEUE,
+  startToCloseTimeout: '1 minute',
+});
+
+const { syncCrmContact } = workflow.proxyActivities<typeof activities>({
+  startToCloseTimeout: '10 seconds',
+  retry: {
+    initialInterval: '2 seconds',
+    backoffCoefficient: 2,
+    maximumInterval: '1 minute',
+  },
+});
+
+const { holdInventory } = workflow.proxyActivities<typeof activities>({
+  startToCloseTimeout: '2 minutes',
+  heartbeatTimeout: '5 seconds',
+  cancellationType:
+    workflow.ActivityCancellationType.WAIT_CANCELLATION_COMPLETED,
+});
+
+const { issueRefund, fetchRegionalOverrides } = workflow.proxyActivities<
+  typeof activities
+>({
+  startToCloseTimeout: '10 seconds',
+  retry: { initialInterval: '1 second', backoffCoefficient: 1 },
+});
+
+export const emailVerifiedSignal = workflow.defineSignal('email-verified');
+export const choosePlanUpdate = workflow.defineUpdate<string, [string]>(
+  'choose-plan',
+);
+
+/** Runs alongside a trial, sending its drip emails; still waiting on day 3. */
+export async function OnboardingDripWorkflow(email: string): Promise<string> {
+  await scheduleDripEmail(`${email}:day-1`);
+  await workflow.sleep('3 days');
+  await scheduleDripEmail(`${email}:day-3`);
+  return `dripped:${email}`;
+}
+
+/**
+ * Simple, and still running: a trial signup that waits for the user to
+ * verify their email and pick a plan, then keeps trying to reach a CRM that
+ * rate-limits every call, while its drip campaign waits on a timer.
+ */
+export async function TrialSignupWorkflow(email: string): Promise<string> {
+  let verified = false;
+  let plan = 'free';
+  workflow.setHandler(emailVerifiedSignal, () => void (verified = true));
+  workflow.setHandler(choosePlanUpdate, (chosen) => {
+    plan = chosen;
+    return `plan:${chosen}`;
+  });
+
+  const normalized = await normalizeEmail(email);
+  await createAccount(normalized);
+  await sendWelcomeEmail(normalized);
+
+  await workflow.condition(() => verified, '1 hour');
+  await provisionWorkspace(`${normalized}:${plan}`);
+
+  await Promise.all([
+    workflow.executeChild(OnboardingDripWorkflow, {
+      args: [normalized],
+      workflowId: `${workflow.workflowInfo().workflowId}-drip`,
+    }),
+    syncCrmContact(normalized),
+    notifySalesTeam(normalized),
+    workflow.sleep('14 days'),
+  ]);
+
+  return `trial-ended:${normalized}`;
+}
+
+/** A fraud check that takes far longer than the refund will wait for it. */
+export async function FraudReviewWorkflow(orderId: string): Promise<string> {
+  await scoreRefundRisk(orderId);
+  await workflow.sleep('1 minute');
+  return `reviewed:${orderId}`;
+}
+
+export async function RefundNotificationWorkflow(
+  orderId: string,
+): Promise<string> {
+  await notifyCustomerOfRefund(orderId);
+  return `notified:${orderId}`;
+}
+
+/**
+ * Medium, and failed: a refund that gives up on a slow fraud review (the
+ * child times out), releases the stock it was holding (the activity is
+ * cancelled), tells the customer, then fails for good when the card turns out
+ * to be closed after two gateway timeouts.
+ */
+export async function RefundRequestWorkflow(orderId: string): Promise<string> {
+  await lookupOrderOnBacklog(orderId);
+  await checkRefundPolicy(orderId);
+
+  try {
+    await workflow.executeChild(FraudReviewWorkflow, {
+      args: [orderId],
+      workflowId: `${workflow.workflowInfo().workflowId}-fraud-review`,
+      workflowExecutionTimeout: '3 seconds',
+    });
+  } catch (error) {
+    if (!(error instanceof workflow.ChildWorkflowFailure)) throw error;
+  }
+
+  const hold = new workflow.CancellationScope();
+  const held = hold.run(() => holdInventory(orderId));
+  await workflow.sleep('2 seconds');
+  hold.cancel();
+  try {
+    await held;
+  } catch (error) {
+    if (!workflow.isCancellation(error)) throw error;
+  }
+
+  await workflow.executeChild(RefundNotificationWorkflow, {
+    args: [orderId],
+    workflowId: `${workflow.workflowInfo().workflowId}-notification`,
+  });
+
+  await issueRefund(orderId);
+
+  return `refunded:${orderId}`;
+}
+
+export const manifestReadySignal = workflow.defineSignal('manifest-ready');
+export const publishSignal = workflow.defineSignal('publish');
+export const rebalanceShardsUpdate = workflow.defineUpdate<number, [number]>(
+  'rebalance-shards',
+);
+
+export async function PriceIndexWorkflow(region: string): Promise<string> {
+  await rebuildPriceIndex(region);
+  return `indexed:${region}`;
+}
+
+export interface RegionSyncInput {
+  region: string;
+  page: number;
+  flakyOverrides?: boolean;
+  waitForManifest?: boolean;
+}
+
+/**
+ * One region's share of a catalog page. Some regions wait on a manifest that
+ * never comes (and get terminated), some hit a flaky overrides service, and
+ * every region that finishes rebuilds its price index in a grandchild.
+ */
+export async function RegionSyncWorkflow({
+  region,
+  page,
+  flakyOverrides = false,
+  waitForManifest = false,
+}: RegionSyncInput): Promise<string> {
+  let manifestReady = false;
+  workflow.setHandler(manifestReadySignal, () => void (manifestReady = true));
+
+  if (waitForManifest) {
+    await workflow.condition(() => manifestReady, '10 minutes');
+  }
+
+  await upsertProducts(`${region}:page-${page}`);
+  if (flakyOverrides) await fetchRegionalOverrides(region);
+  await workflow.sleep('2 seconds');
+
+  await workflow.executeChild(PriceIndexWorkflow, {
+    args: [region],
+    workflowId: `${workflow.workflowInfo().workflowId}-price-index`,
+  });
+
+  return `synced:${region}:${page}`;
+}
+
+export interface CatalogSyncInput {
+  syncId: string;
+  page?: number;
+  pages?: number;
+}
+
+/**
+ * Complex, and completed as a chain: each page fans out to regional syncs in
+ * parallel. On the first page APAC waits on a manifest until an operator
+ * terminates it; on the second the sync gives up on LATAM and cancels it, is
+ * rebalanced by an update and waits for a publish signal. Each page is its
+ * own run, handed on with continue-as-new.
+ */
+export async function CatalogSyncWorkflow({
+  syncId,
+  page = 1,
+  pages = 2,
+}: CatalogSyncInput): Promise<string> {
+  let published = false;
+  let shards = 4;
+  workflow.setHandler(publishSignal, () => void (published = true));
+  workflow.setHandler(rebalanceShardsUpdate, (count) => {
+    shards = count;
+    return shards;
+  });
+
+  const cursor = await loadSyncCursor(page);
+  await fetchCatalogPage(cursor);
+
+  const region = (name: string, options: Partial<RegionSyncInput> = {}) =>
+    workflow.executeChild(RegionSyncWorkflow, {
+      args: [{ region: name, page, ...options }],
+      workflowId: `${syncId}-p${page}-${name}`,
+    });
+  const tolerate = async (pending: Promise<unknown>) => {
+    try {
+      await pending;
+    } catch (error) {
+      if (
+        !(error instanceof workflow.ChildWorkflowFailure) &&
+        !workflow.isCancellation(error)
+      ) {
+        throw error;
+      }
+    }
+  };
+
+  if (page === 1) {
+    await Promise.all([
+      region('us'),
+      region('eu', { flakyOverrides: true }),
+      tolerate(region('apac', { waitForManifest: true })),
+    ]);
+  } else {
+    const latamScope = new workflow.CancellationScope();
+    const latam = latamScope.run(() =>
+      workflow.executeChild(RegionSyncWorkflow, {
+        args: [{ region: 'latam', page, waitForManifest: true }],
+        workflowId: `${syncId}-p${page}-latam`,
+        cancellationType:
+          workflow.ChildWorkflowCancellationType.WAIT_CANCELLATION_COMPLETED,
+      }),
+    );
+    await Promise.all([
+      region('us'),
+      region('eu'),
+      (async () => {
+        await workflow.sleep('3 seconds');
+        latamScope.cancel();
+        await tolerate(latam);
+      })(),
+    ]);
+    await workflow.condition(() => published, '2 minutes');
+  }
+
+  await publishCatalog(`${cursor}:shards-${shards}`);
+
+  if (page < pages) {
+    await workflow.continueAsNew<typeof CatalogSyncWorkflow>({
+      syncId,
+      page: page + 1,
+      pages,
+    });
+  }
+
+  return `catalog-synced:${syncId}`;
+}

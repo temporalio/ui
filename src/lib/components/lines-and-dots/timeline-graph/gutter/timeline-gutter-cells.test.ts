@@ -11,6 +11,8 @@ import type {
 import type { TimelineLayoutRow } from '../timeline-containment-layout';
 import type { TimelineGroupEntry } from '../timeline-run-entries';
 import {
+  groupAttempt,
+  groupTiming,
   gutterAncestorRunLevels,
   gutterRunOrdinals,
   gutterSubtreeRange,
@@ -60,13 +62,13 @@ describe('toGutterCell', () => {
 
     expect(toGutterCell(row, { workflows: summary() })).toMatchObject({
       kind: 'workflow',
-      label: 'OrderWorkflow',
-      detail: 'order-123',
+      label: 'order-123',
+      reveal: { kind: 'workflow-id', value: 'order-123' },
       depth: 1,
     });
   });
 
-  it('leaves the type off when it is unknown', () => {
+  it('offers the id to copy even when the type is unknown', () => {
     const row = {
       kind: 'workflow-header',
       key: 'wf:header',
@@ -78,7 +80,10 @@ describe('toGutterCell', () => {
 
     expect(
       toGutterCell(row, { workflows: summary({ workflowType: '' }) }),
-    ).toMatchObject({ label: 'order-123', detail: undefined });
+    ).toMatchObject({
+      label: 'order-123',
+      reveal: { kind: 'workflow-id', value: 'order-123' },
+    });
   });
 
   it('carries the incoming edge so the row can fold its own subtree', () => {
@@ -176,7 +181,7 @@ describe('toGutterCell', () => {
     expect(cell).toMatchObject({
       kind: 'run',
       label: 'Run 2 of 3',
-      detail: 'run-2',
+      reveal: { kind: 'run-id', value: 'run-2' },
     });
   });
 
@@ -317,6 +322,8 @@ describe('gutterWorkflowSummaries', () => {
       runCount: 1,
       incomingEdgeKey: 'edge:a',
       expanded: false,
+      timing: expect.any(Object),
+      runTimings: expect.any(Map),
     });
   });
 
@@ -585,16 +592,81 @@ describe('child workflow event rows', () => {
       rowIndex: 0,
     }) as TimelineLayoutRow;
 
-  it('names the child by its type with the id trailing', () => {
+  it('names the child by its id and offers that id to copy', () => {
     const row = childGroupRow({
       displayName: 'ShipmentWorkflow',
       childWorkflow: { workflowId: 'shipment-order-1', runId: 'r' },
     } as Partial<EventGroup>);
 
     expect(toGutterCell(row, { workflows: summary() })).toMatchObject({
-      label: 'ShipmentWorkflow',
-      detail: 'shipment-order-1',
+      label: 'shipment-order-1',
+      reveal: { kind: 'workflow-id', value: 'shipment-order-1' },
     });
+  });
+
+  it('lets an event row open its details', () => {
+    const row = childGroupRow({ displayName: 'validateOrder' });
+
+    expect(toGutterCell(row, { workflows: summary() })?.detailsKey).toBe(
+      'run-1:1',
+    );
+  });
+
+  it('marks an activity that completed', () => {
+    const row = childGroupRow({
+      displayName: 'validateOrder',
+      category: 'activity',
+      finalClassification: 'Completed',
+    } as Partial<EventGroup>);
+
+    expect(toGutterCell(row, { workflows: summary() })?.completed).toBe(true);
+  });
+
+  it('leaves an activity that has not completed unmarked', () => {
+    const row = childGroupRow({
+      displayName: 'validateOrder',
+      category: 'activity',
+      finalClassification: 'Failed',
+    } as Partial<EventGroup>);
+
+    expect(toGutterCell(row, { workflows: summary() })?.completed).toBe(false);
+  });
+
+  it('marks a child workflow that completed', () => {
+    const row = childGroupRow({
+      displayName: 'ShipmentWorkflow',
+      category: 'child-workflow',
+      finalClassification: 'Completed',
+      childWorkflow: { workflowId: 'shipment-order-1', runId: 'r' },
+    } as Partial<EventGroup>);
+
+    expect(toGutterCell(row, { workflows: summary() })?.completed).toBe(true);
+  });
+
+  it('only marks activities and child workflows as completed', () => {
+    const row = childGroupRow({
+      displayName: '1m timer',
+      category: 'timer',
+      finalClassification: 'Completed',
+    } as Partial<EventGroup>);
+
+    expect(toGutterCell(row, { workflows: summary() })?.completed).toBe(false);
+  });
+
+  it('names a group with no precomputed name from the event that started it', () => {
+    const row = childGroupRow({
+      category: 'activity',
+      initialEvent: {
+        eventType: 'ActivityTaskScheduled',
+        activityTaskScheduledEventAttributes: {
+          activityType: { name: 'chargeCard' },
+        },
+      },
+    } as unknown as Partial<EventGroup>);
+
+    expect(toGutterCell(row, { workflows: summary() })?.label).toBe(
+      'chargeCard',
+    );
   });
 
   it('leaves a plain activity row alone', () => {
@@ -602,7 +674,7 @@ describe('child workflow event rows', () => {
 
     expect(toGutterCell(row, { workflows: summary() })).toMatchObject({
       label: 'validateOrder',
-      detail: undefined,
+      reveal: undefined,
     });
   });
 });
@@ -668,5 +740,77 @@ describe('gutterTreeLines rail continuity', () => {
     for (const [index, line] of lines.entries()) {
       expect(line.guides).not.toContain([0, 1, 2, 1][index] - 1);
     }
+  });
+});
+
+describe('groupTiming', () => {
+  const group = (fields: Record<string, unknown>) =>
+    ({ eventCount: 3, isPending: false, ...fields }) as unknown as EventGroup;
+
+  it('spans a group from its first event to its last', () => {
+    expect(
+      groupTiming({
+        group: group({ startTimeMs: 1_000, lastTimeMs: 1_507 }),
+        active: false,
+        runEndTimeMs: 9_000,
+      }),
+    ).toEqual({ startTimeMs: 1_000, endTimeMs: 1_507 });
+  });
+
+  it('gives an instant event no duration', () => {
+    expect(
+      groupTiming({
+        group: group({ eventCount: 1, startTimeMs: 1_000, lastTimeMs: 1_000 }),
+        active: false,
+        runEndTimeMs: 9_000,
+      }),
+    ).toBeUndefined();
+  });
+
+  it('leaves the end open while the work is still running', () => {
+    expect(
+      groupTiming({
+        group: group({ eventCount: 1, isPending: true, startTimeMs: 1_000 }),
+        active: true,
+        runEndTimeMs: 9_000,
+      }),
+    ).toEqual({ startTimeMs: 1_000, endTimeMs: undefined });
+  });
+
+  it('ends pending work with its run once the run is over', () => {
+    expect(
+      groupTiming({
+        group: group({ isPending: true, startTimeMs: 1_000 }),
+        active: false,
+        runEndTimeMs: 9_000,
+      }),
+    ).toEqual({ startTimeMs: 1_000, endTimeMs: 9_000 });
+  });
+});
+
+describe('groupAttempt', () => {
+  const group = (fields: Record<string, unknown>) =>
+    ({ category: 'activity', ...fields }) as unknown as EventGroup;
+
+  it('reports an activity that retried', () => {
+    expect(groupAttempt(group({ activityAttempt: 3 }))).toBe(3);
+  });
+
+  it('leaves a first attempt blank', () => {
+    expect(groupAttempt(group({ activityAttempt: 1 }))).toBeUndefined();
+  });
+
+  it('prefers the live attempt of a running activity', () => {
+    expect(
+      groupAttempt(
+        group({ activityAttempt: 2, pendingActivity: { attempt: 5 } }),
+      ),
+    ).toBe(5);
+  });
+
+  it('only counts attempts for activities', () => {
+    expect(
+      groupAttempt(group({ category: 'timer', activityAttempt: 4 })),
+    ).toBeUndefined();
   });
 });

@@ -180,7 +180,7 @@ test.describe('Timeline performance gates', () => {
       );
       return performance.now() - startedAt;
     });
-    await page.getByRole('button', { name: 'Sliding window' }).click();
+    await page.getByRole('button', { name: 'Unified' }).click();
     const resizeHandle = page.getByTestId('timeline-window-resize-end');
     const resizeBox = await resizeHandle.boundingBox();
     expect(resizeBox).not.toBeNull();
