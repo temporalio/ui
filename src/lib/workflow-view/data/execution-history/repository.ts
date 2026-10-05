@@ -92,6 +92,7 @@ export class ExecutionHistoryRepository {
     const executionHistory: ExecutionHistoryState = {
       executionKey,
       identity: { ...identity },
+      discovery: { status: 'pending' },
       load: {
         status: 'pending',
         progress: null,
@@ -105,6 +106,70 @@ export class ExecutionHistoryRepository {
 
     this._upsert(executionHistory);
     return executionHistory;
+  }
+
+  /** Starts discovery unless discovery or a full load is loading or loaded. */
+  startDiscovery(identity: ExecutionIdentity): ExecutionHistoryState | null {
+    const executionHistory = this.register(identity);
+
+    if (
+      executionHistory.discovery.status === 'loading' ||
+      executionHistory.discovery.status === 'loaded' ||
+      executionHistory.load.status === 'loading' ||
+      executionHistory.load.status === 'loaded'
+    ) {
+      return null;
+    }
+
+    const updatedHistory: ExecutionHistoryState = {
+      ...executionHistory,
+      discovery: { status: 'loading' },
+    };
+
+    this._upsert(updatedHistory);
+    return updatedHistory;
+  }
+
+  /** Marks discovery complete after successful started-event ingestion. */
+  completeDiscovery(executionKey: ExecutionKey): void {
+    const executionHistory = this._historiesByExecutionKey.get(executionKey);
+
+    if (!executionHistory || executionHistory.discovery.status === 'loaded') {
+      return;
+    }
+
+    this._upsert({
+      ...executionHistory,
+      discovery: { status: 'loaded' },
+    });
+  }
+
+  /** Marks an in-flight discovery as failed. */
+  failDiscovery(executionKey: ExecutionKey): void {
+    const executionHistory = this._historiesByExecutionKey.get(executionKey);
+
+    if (executionHistory?.discovery.status !== 'loading') {
+      return;
+    }
+
+    this._upsert({
+      ...executionHistory,
+      discovery: { status: 'failed' },
+    });
+  }
+
+  /** Returns an in-flight discovery to pending after cancellation. */
+  cancelDiscovery(executionKey: ExecutionKey): void {
+    const executionHistory = this._historiesByExecutionKey.get(executionKey);
+
+    if (executionHistory?.discovery.status !== 'loading') {
+      return;
+    }
+
+    this._upsert({
+      ...executionHistory,
+      discovery: { status: 'pending' },
+    });
   }
 
   /** Starts loading an execution unless it is already loading or loaded. */
@@ -122,6 +187,7 @@ export class ExecutionHistoryRepository {
     const executionHistory: ExecutionHistoryState = {
       executionKey,
       identity: existingHistory?.identity ?? { ...identity },
+      discovery: existingHistory?.discovery ?? { status: 'pending' },
       load: {
         status: 'loading',
         progress: null,

@@ -20,6 +20,7 @@ function executionHistory(
   return {
     executionKey: getExecutionKey(identity),
     identity,
+    discovery: { status: 'pending' },
     load: { status: 'loading', progress: null, stats: null, ...load },
     stream: { status: 'idle', cursor: '' },
   };

@@ -5,11 +5,11 @@ import { untrack } from 'svelte';
 import { EventMarkerGroupRepository } from './data/event-marker-groups/repository';
 import type { EventMarkerGroup } from './data/event-marker-groups/types';
 import type { ExecutionDetailsState } from './data/execution-details/types';
-import { ExecutionGraphCoordinator } from './data/execution-graph/coordinator';
 import { ExecutionGraphRepository } from './data/execution-graph/repository';
 import type { ExecutionGraphSnapshot } from './data/execution-graph/types';
 import { ExecutionHistoryRepository } from './data/execution-history/repository';
 import type { ExecutionHistoryState } from './data/execution-history/types';
+import { ExecutionLoader } from './data/execution-loading/execution-loader';
 import { isTerminalExecutionEvent } from './data/history-events/is-terminal-execution-event';
 import { HistoryEventRepository } from './data/history-events/repository';
 import type { QualifiedHistoryEvent } from './data/history-events/types';
@@ -27,6 +27,7 @@ export type WorkflowView = Readonly<{
   eventMarkerGroupRepository: EventMarkerGroupRepository;
   lifecycleGroupRepository: LifecycleGroupRepository;
   requestExecution: (identity: ExecutionIdentity) => void;
+  discoverExecution: (identity: ExecutionIdentity) => Promise<void>;
   refreshExecutionDetails: () => Promise<void>;
   autoRefreshEnabled: boolean;
   setAutoRefreshEnabled: (enabled: boolean) => void;
@@ -87,21 +88,37 @@ export function useWorkflowView(
     );
   });
 
-  let coordinator: ExecutionGraphCoordinator | null = null;
+  let loader: ExecutionLoader | null = null;
   $effect(() => {
     const identity = getIdentity();
-    const currentCoordinator = new ExecutionGraphCoordinator(
+    const currentLoader = new ExecutionLoader(
       executionGraphRepository,
       executionHistoryRepository,
       historyEventRepository,
     );
 
-    coordinator = currentCoordinator;
-    currentCoordinator.setAutoRefreshEnabled(untrack(() => autoRefreshEnabled));
-    currentCoordinator.start(identity);
+    loader = currentLoader;
+    const unsubscribeGraph = executionGraphRepository.subscribe(
+      (notification) => {
+        const executions =
+          notification.type === 'EXECUTION_GRAPH_SNAPSHOT'
+            ? notification.graph.executionsByKey.values()
+            : notification.executions;
+        currentLoader.addExecutions(executions);
+      },
+      { emitCurrentSnapshot: true },
+    );
+    const unsubscribeEvents = historyEventRepository.subscribe(
+      ({ events }) => currentLoader.addEvents(events),
+      { emitCurrentSnapshot: true },
+    );
+    currentLoader.setAutoRefreshEnabled(untrack(() => autoRefreshEnabled));
+    currentLoader.start(identity);
     return () => {
-      coordinator = null;
-      currentCoordinator.dispose();
+      loader = null;
+      unsubscribeGraph();
+      unsubscribeEvents();
+      currentLoader.dispose();
     };
   });
 
@@ -111,14 +128,16 @@ export function useWorkflowView(
     historyEventRepository,
     eventMarkerGroupRepository,
     lifecycleGroupRepository,
-    requestExecution: (identity) => coordinator?.requestExecution(identity),
+    requestExecution: (identity) => loader?.requestExecution(identity),
+    discoverExecution: (identity) =>
+      loader?.discoverExecution(identity) ?? Promise.resolve(),
     refreshExecutionDetails: () => executionDetails.refresh(),
     get autoRefreshEnabled() {
       return autoRefreshEnabled;
     },
     setAutoRefreshEnabled: (enabled) => {
       autoRefreshEnabled = enabled;
-      coordinator?.setAutoRefreshEnabled(enabled);
+      loader?.setAutoRefreshEnabled(enabled);
     },
     get executionDetails() {
       return executionDetails.state;

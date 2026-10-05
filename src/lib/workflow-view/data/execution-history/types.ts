@@ -29,10 +29,16 @@ export type ExecutionHistoryStreamState = Readonly<{
   cursor: string;
 }>;
 
-/** Loading and streaming state for one workflow execution history. */
+/** On-demand discovery state for one workflow execution. */
+export type ExecutionHistoryDiscoveryState = Readonly<{
+  status: 'pending' | 'loading' | 'loaded' | 'failed';
+}>;
+
+/** Discovery, loading, and streaming state for one workflow execution history. */
 export type ExecutionHistoryState = Readonly<{
   executionKey: ExecutionKey;
   identity: ExecutionIdentity;
+  discovery: ExecutionHistoryDiscoveryState;
   load: ExecutionHistoryLoadState;
   stream: ExecutionHistoryStreamState;
 }>;

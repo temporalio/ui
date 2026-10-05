@@ -22,6 +22,7 @@
       workflowView.executionGraph,
       timeline.timelineRows,
       rootExecutionKey,
+      workflowView.executionHistories,
     ),
   );
 </script>

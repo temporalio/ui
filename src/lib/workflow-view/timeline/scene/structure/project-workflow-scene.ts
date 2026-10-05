@@ -4,6 +4,7 @@ import type {
   ChildWorkflowRelation,
   ExecutionGraphSnapshot,
 } from '../../../data/execution-graph/types';
+import type { ExecutionHistoryState } from '../../../data/execution-history/types';
 import {
   type ExecutionKey,
   getExecutionKey,
@@ -15,6 +16,7 @@ export function projectWorkflowScene(
   graph: ExecutionGraphSnapshot,
   rows: readonly TimelineEventRow[],
   rootExecutionKey: ExecutionKey,
+  executionHistories: readonly ExecutionHistoryState[],
 ): WorkflowScene | null {
   if (!graph.executionsByKey.has(rootExecutionKey)) {
     return null;
@@ -44,6 +46,12 @@ export function projectWorkflowScene(
     rowsByExecution.set(row.executionKey, executionRows);
   }
 
+  const loadStatusesByExecution = new Map(
+    executionHistories.map((history) => [
+      history.executionKey,
+      history.load.status,
+    ]),
+  );
   const projectedExecutions = new Set<ExecutionKey>();
 
   function buildWorkflow(startKey: ExecutionKey): WorkflowScene | null {
@@ -58,12 +66,16 @@ export function projectWorkflowScene(
 
     while (previousByNext.has(firstKey)) {
       const previousKey = previousByNext.get(firstKey);
+      const loadStatus = previousKey
+        ? loadStatusesByExecution.get(previousKey)
+        : undefined;
 
       if (
         !previousKey ||
         precedingKeys.has(previousKey) ||
         !graph.executionsByKey.has(previousKey) ||
-        !rowsByExecution.has(previousKey)
+        !loadStatus ||
+        loadStatus === 'pending'
       ) {
         break;
       }

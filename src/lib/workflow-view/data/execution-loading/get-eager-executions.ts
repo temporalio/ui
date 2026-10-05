@@ -1,4 +1,7 @@
-import type { ExecutionGraphSnapshot, ExecutionNode } from './types';
+import type {
+  ExecutionGraphSnapshot,
+  ExecutionNode,
+} from '../execution-graph/types';
 import { type ExecutionKey, getExecutionKey } from '../identity-keys';
 
 /** Maximum relationship depths whose histories should load eagerly. */
