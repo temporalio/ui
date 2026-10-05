@@ -121,7 +121,7 @@ export const encodeMultiplePayloads = async ({
   encoding,
   messageType = '',
   encodeWithCodec = true,
-}: EncodeMultiplePayloads): Promise<Payload[]> => {
+}: EncodeMultiplePayloads): Promise<Payload[] | null> => {
   const nonEmptyInputs = inputs.filter((input) => Boolean(input));
   if (!nonEmptyInputs.length) return null;
 

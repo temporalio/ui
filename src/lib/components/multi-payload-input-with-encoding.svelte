@@ -10,6 +10,7 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { IconAdd, IconTrash } from '$lib/io/icon';
   import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
 
   import PayloadInput from './payload-input.svelte';
@@ -71,14 +72,15 @@
             id="input-{index}"
             {editing}
             clearOnDestroy={false}
+            labelHidden
           />
         </div>
         {#if editing && inputs.length > 1}
           <IconButton
-            icon="trash"
+            Icon={IconTrash}
             label={translate('workflows.remove-input')}
             data-testid="remove-input-{index}"
-            on:click={() => removeInput(index)}
+            onclick={() => removeInput(index)}
           />
         {/if}
       </div>
@@ -87,9 +89,9 @@
       <div>
         <Button
           variant="ghost"
-          leadingIcon="add"
+          LeadingIcon={IconAdd}
           data-testid="add-input"
-          on:click={addInput}>{translate('workflows.add-input')}</Button
+          onclick={addInput}>{translate('workflows.add-input')}</Button
         >
       </div>
     {/if}

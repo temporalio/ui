@@ -46,9 +46,17 @@
     if (val !== encoding) encoding = val;
   });
 
+  // `inputs` is backed by a SuperForms store, which does not react to nested
+  // array-element mutations. We keep a local reactive copy that the editor
+  // binds to and sync the whole array back to the form on change.
+  let localInputs = $state<string[]>([...inputs]);
   let initialInputs = $state<string[]>(['']);
   let initialEncoding = $state<PayloadInputEncoding>('json/plain');
   let initialMessageType = $state('');
+
+  $effect(() => {
+    inputs = [...localInputs];
+  });
 
   const setInitialInput = (result: DecodedPayloadResult): void => {
     const decodedInputs = (result ?? [])
@@ -58,7 +66,7 @@
 
     if (decodedInputs.length) {
       initialInputs = decodedInputs;
-      inputs = decodedInputs;
+      localInputs = [...decodedInputs];
 
       let currentEncoding: PayloadInputEncoding = 'json/plain';
       let currentMessageType = '';
@@ -86,7 +94,7 @@
   const handleEdit = () => {
     if (editInput) {
       editInput = false;
-      inputs = initialInputs;
+      localInputs = [...initialInputs];
       encoding = initialEncoding;
       messageType = initialMessageType;
     } else {
@@ -99,7 +107,7 @@
   <PayloadDecoder value={payloads ?? {}} onDecode={setInitialInput}>
     {#snippet children(_decodedValue)}
       <MultiPayloadInputWithEncoding
-        bind:inputs
+        bind:inputs={localInputs}
         encoding={encodingStore}
         bind:messageType
         editing={editInput}

@@ -116,6 +116,18 @@ test.describe('Start a Workflow', () => {
       await expect(editors).toHaveCount(1);
       await expect(editors.nth(0)).toHaveText('"second"');
     });
+
+    test('keeps input value after clicking outside the field', async ({
+      page,
+    }) => {
+      const editors = page.locator('[id^="input-"] .cm-content');
+
+      await editors.nth(0).click();
+      await editors.nth(0).pressSequentially('{"a":1}');
+      await page.locator('#workflowId').click();
+
+      await expect(editors.nth(0)).toContainText('"a"');
+    });
   });
 
   test.describe('Custom Search Attributes', () => {
