@@ -147,12 +147,6 @@ export class ExecutionLoader {
         historyEvents: this._historyEvents,
         signal: controller.signal,
       });
-      if (
-        !controller.signal.aborted &&
-        this._discoveries.get(executionKey)?.controller === controller
-      ) {
-        this._executionHistories.completeDiscovery(executionKey);
-      }
     } catch {
       if (
         !controller.signal.aborted &&
