@@ -29,20 +29,15 @@ test.describe('Creates Schedule Successfully', () => {
   });
 
   test('submits the typed input payload', async ({ page }) => {
-    await page.getByTestId('schedule-name-input').fill('test');
-    await page.getByTestId('schedule-type-input').fill('test');
-    await page.getByTestId('schedule-workflow-id-input').fill('test');
-    await page.getByTestId('schedule-task-queue-input').fill('test');
+    await fillBaseFields(page);
 
     const editor = page.locator('[id^="input-"] .cm-content').first();
     await editor.click();
     await editor.pressSequentially('"hello"');
 
-    await page.getByTestId('interval-tab').click();
-    await page.getByTestId('days-input').fill('1');
-    await page.getByTestId('hour-interval-input').fill('2');
-    await page.getByTestId('minute-interval-input').fill('30');
-    await page.getByTestId('second-interval-input').fill('0');
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
+    await page.getByLabel('Time Interval').fill('90');
 
     const createButton = page.getByTestId('create-schedule-button');
     await expect(createButton).toBeEnabled();
