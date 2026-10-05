@@ -224,7 +224,7 @@ test.describe('Schedules List with schedules', () => {
     const payloadInput = page.locator('#input-0').getByRole('textbox');
     await expect(payloadInput).toContainText('"hello"');
 
-    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
 
     await payloadInput.click();
     await page.keyboard.press('ControlOrMeta+a');
