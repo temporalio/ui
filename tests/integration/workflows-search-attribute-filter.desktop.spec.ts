@@ -1,11 +1,13 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
+import { SEARCH_ATTRIBUTE_TYPE } from '$src/lib/types/workflows';
 import {
   mockClusterApi,
   mockWorkflowApis,
   mockWorkflowsApis,
   waitForWorkflowsApis,
 } from '~/test-utilities/mock-apis';
+import { mockSearchAttributesApi } from '~/test-utilities/mocks/search-attributes';
 
 test.beforeEach(async ({ page }) => {
   await mockWorkflowsApis(page);
@@ -303,4 +305,70 @@ test('it should resync the filter pills on back and forward navigation', async (
   await expect(
     page.getByRole('button', { name: 'HistoryLength = 10' }),
   ).toBeVisible();
+});
+
+test.describe('KeywordList search attributes', () => {
+  const NOT_IN_QUERY = '`CustomKeywordListField`not in("Hello", "World")';
+  const NOT_IN_CHIP = 'CustomKeywordListField not in ("Hello", "World")';
+
+  test.beforeEach(async ({ page }) => {
+    await mockSearchAttributesApi(page, {
+      customAttributes: {
+        CustomKeywordListField: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+      },
+    });
+
+    await page.reload();
+    await waitForWorkflowsApis(page);
+  });
+
+  const addKeywordListFilter = async (page: Page, conditional: string) => {
+    await page.getByTestId('add-filter-button').click();
+    await page
+      .getByRole('menuitem', { name: 'CustomKeywordListField KeywordList' })
+      .click();
+
+    await page.getByRole('button', { name: conditional, exact: true }).click();
+
+    const input = page.locator('#list-filter');
+    await input.fill('Hello');
+    await input.press('Enter');
+    await input.fill('World');
+    await input.press('Enter');
+
+    await page.getByTestId('apply-filter-button').click();
+  };
+
+  test('it should filter a KeywordList with the not in conditional', async ({
+    page,
+  }) => {
+    await addKeywordListFilter(page, 'Not In');
+
+    await expect.poll(() => getQueryParam(page.url())).toBe(NOT_IN_QUERY);
+    await expect(page.getByRole('button', { name: NOT_IN_CHIP })).toBeVisible();
+  });
+
+  test('it should still filter a KeywordList with the in conditional', async ({
+    page,
+  }) => {
+    await addKeywordListFilter(page, 'In');
+
+    await expect
+      .poll(() => getQueryParam(page.url()))
+      .toBe('`CustomKeywordListField`in("Hello", "World")');
+  });
+
+  test('it should parse a not in KeywordList query back into a filter', async ({
+    page,
+  }) => {
+    await page.getByTestId('toggle-manual-query').click();
+    await page.getByTestId('workflow-manual-search-input').fill(NOT_IN_QUERY);
+    await page.getByTestId('workflow-manual-search-button').click();
+
+    await expect.poll(() => getQueryParam(page.url())).toBe(NOT_IN_QUERY);
+
+    await page.getByTestId('toggle-manual-query').click();
+
+    await expect(page.getByRole('button', { name: NOT_IN_CHIP })).toBeVisible();
+  });
 });
