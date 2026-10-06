@@ -1,6 +1,6 @@
 # Claude AI Assistant Rules for Temporal UI
 
-SvelteKit + Svelte 5 + TypeScript + TailwindCSS + Holocene design system
+SvelteKit + Svelte 5 + TypeScript + TailwindCSS + Io and Holocene design systems
 
 ## Commands
 
@@ -55,7 +55,7 @@ const { form, errors, enhance } = $derived(
 2. **Type checking**: Run `pnpm check` to verify TypeScript compliance
 3. **Test execution**: Run appropriate test suites based on changes
 4. **Follow patterns**: Use existing component patterns and utility functions
-5. **Design system**: Prefer Holocene components over custom implementations
+5. **Design system**: Prefer Io components (`src/lib/io`), then Holocene components (`src/lib/holocene`), over custom implementations. Io replaces Holocene over time
 6. **Accessibility**: Ensure proper ARIA attributes and semantic HTML
 
 ## Code Generation
