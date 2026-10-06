@@ -7,12 +7,14 @@ import type {
   ScheduleRequestBody,
 } from '$lib/types/schedule';
 import type { WorkflowExecution } from '$lib/types/workflows';
+import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
 import { getEpochMilliseconds } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
+import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
 import { fetchWorkflowsForQuery } from './workflow-service';
 
@@ -119,6 +121,9 @@ export const toRecentScheduleRuns = (
       runId: action.startWorkflowResult?.runId ?? '',
       actualTime: action.actualTime,
       status: toWorkflowStatusReadable(action.startWorkflowStatus ?? null),
+      delayed: false,
+      taskFailure: false,
+      inVisibility: false,
     }));
 
 export const toUpcomingScheduleRuns = (
@@ -149,13 +154,16 @@ export const withLatestWorkflowStatuses = (
   return runs.map((run) => {
     const latestWorkflow = latest.get(run.workflowId);
     if (!latestWorkflow) {
-      return run;
+      return { ...run, inVisibility: false };
     }
     return {
       actualTime: run.actualTime,
       workflowId: latestWorkflow.id || run.workflowId,
       status: latestWorkflow.status || run.status,
       runId: latestWorkflow.runId || run.runId,
+      delayed: isWorkflowDelayed(latestWorkflow),
+      taskFailure: isWorkflowTaskFailure(latestWorkflow),
+      inVisibility: true,
     };
   });
 };

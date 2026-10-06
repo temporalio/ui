@@ -149,7 +149,7 @@
 
   <dl class="-mt-2 flex flex-col gap-1">
     <dt class="text-secondary">
-      {translate('schedules.total-workflows-all-time')}
+      {translate('schedules.total-workflows')}
     </dt>
     <dd class="flex flex-wrap items-center gap-2">
       <span class="font-mono" data-testid="workflow-count"

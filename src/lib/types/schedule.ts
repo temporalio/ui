@@ -52,6 +52,9 @@ export type RecentScheduleRun = {
   runId: string;
   actualTime: ScheduleActionResult['actualTime'];
   status: WorkflowStatus;
+  delayed: boolean;
+  taskFailure: boolean;
+  inVisibility: boolean;
 };
 
 /**
