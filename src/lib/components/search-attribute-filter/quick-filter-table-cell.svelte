@@ -156,7 +156,11 @@
   {#if hasPopup && $open}
     {@const seed = createQuickFilter({ attribute, type, value })}
     {#if seed}
-      <Menu id={menuId} usePortal class="max-h-fit w-min max-w-fit p-4">
+      <Menu
+        id={menuId}
+        usePortal
+        class="max-h-fit w-min min-w-0 max-w-[calc(100dvw-1rem)] p-4"
+      >
         <FilterEditor
           filter={seed}
           idPrefix={menuId}
