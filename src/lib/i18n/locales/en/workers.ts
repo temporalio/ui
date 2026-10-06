@@ -277,7 +277,7 @@ export const Strings = {
   'region-section-description':
     'is a single region Namespace. Temporal invokes the resource in',
   'regions-section': 'Regions',
-  'preview-title': 'Worker Deployment Preview',
+  'preview-title': 'Preview',
   'preview-description': 'Where Temporal sends Tasks.',
   'preview-namespace': 'Namespace',
   'preview-worker-deployment': 'Worker Deployment',
