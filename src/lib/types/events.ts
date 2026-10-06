@@ -16,6 +16,7 @@ export type HistoryEvent = Replace<
   {
     eventType: EventType;
     eventId: string;
+    eventGroupMarkers?: EventGroupMarker[] | null;
     links?: EventLink[];
     principal?: Principal;
   }
@@ -23,7 +24,10 @@ export type HistoryEvent = Replace<
 
 export type GetWorkflowExecutionHistoryResponse = Replace<
   import('$lib/types').GetWorkflowExecutionHistoryResponse,
-  { history: EventHistory }
+  {
+    history: EventHistory;
+    nextPageToken?: string | null;
+  }
 >;
 
 export type PendingActivityInfo = Replace<
@@ -34,6 +38,20 @@ export type PendingActivityInfo = Replace<
 export type Payload = {
   metadata?: { [k: string]: string };
   data?: string;
+};
+
+/** Event attribution metadata in the HTTP API's JSON representation. */
+export type EventGroupMarker = {
+  label?: {
+    id?: string | null;
+    label?: Payload | null;
+  } | null;
+  inboundEvent?: {
+    inboundEventId?: string | null;
+  } | null;
+  inboundUpdate?: {
+    inboundUpdateId?: string | null;
+  } | null;
 };
 
 export type PauseInfo = {

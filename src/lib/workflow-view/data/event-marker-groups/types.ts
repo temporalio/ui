@@ -1,4 +1,4 @@
-import type { temporal } from '@temporalio/proto';
+import type { EventGroupMarker as HttpEventGroupMarker } from '$lib/types/events';
 
 import type {
   EventKey,
@@ -8,7 +8,7 @@ import type {
 } from '../identity-keys';
 
 /** An explicit label or implicit signal/update marker. */
-export type EventGroupMarker = temporal.api.sdk.v1.IEventGroupMarker;
+export type EventGroupMarker = HttpEventGroupMarker;
 
 /** A mutable marker-group working copy for batch updates. */
 export type MutableEventMarkerGroup = {

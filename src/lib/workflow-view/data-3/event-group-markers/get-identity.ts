@@ -1,10 +1,11 @@
-import type { EventGroupMarker } from './types';
-import type { EventMarkerIdentity } from '../identity-keys';
+import type { EventGroupMarker } from '$lib/types/events';
 
-/** Resolves a marker's opaque identity without decoding its label. */
-export function getMarkerIdentity(
+import type { EventGroupMarkerIdentity } from './types';
+
+/** Returns a marker's opaque identity without decoding its label. */
+export function getEventGroupMarkerIdentity(
   marker: EventGroupMarker,
-): EventMarkerIdentity | undefined {
+): EventGroupMarkerIdentity | null {
   if (marker.label?.id) {
     return { type: 'label', id: marker.label.id };
   }
@@ -21,5 +22,5 @@ export function getMarkerIdentity(
     };
   }
 
-  return undefined;
+  return null;
 }
