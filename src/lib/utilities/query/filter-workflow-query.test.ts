@@ -364,4 +364,44 @@ describe('toListWorkflowQueryFromFilters', () => {
       '`CustomKeywordListField`in("Hello", "World") AND `CustomKeywordListField` is null AND `CustomKeywordListField`="Hello"',
     );
   });
+
+  it('should convert a KeywordList filter with a not in conditional', () => {
+    const filters = [
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'not in',
+        operator: '',
+        parenthesis: '',
+        value: '("Hello", "World")',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`CustomKeywordListField`not in("Hello", "World")');
+  });
+
+  it('should combine a not in KeywordList filter with another filter', () => {
+    const filters = [
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'not in',
+        operator: '',
+        parenthesis: '',
+        value: '("Hello", "World")',
+      },
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'ExampleWorkflow',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
+    expect(query).toBe(
+      '`CustomKeywordListField`not in("Hello", "World") AND `WorkflowType`="ExampleWorkflow"',
+    );
+  });
 });

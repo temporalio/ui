@@ -142,7 +142,8 @@
   ]);
 
   const listConditionalOptions = $derived([
-    { value: 'in', label: 'In' },
+    { value: 'in', label: translate('common.in') },
+    { value: 'not in', label: translate('common.not-in') },
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
     ...defaultConditionOptions,

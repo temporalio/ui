@@ -1,3 +1,7 @@
+import {
+  COMPUTE_PROVIDER_VALUES,
+  computeProviderFromType,
+} from '$lib/components/workers/serverless-worker-form/compute-providers';
 import type {
   ComputeProviderOption,
   ComputeProviderValue,
@@ -12,11 +16,7 @@ export type LockedComputeProvider = {
   providers: readonly ComputeProviderOption[];
 };
 
-const providerValue = (type?: string): ComputeProviderValue | undefined => {
-  if (type === 'aws-lambda' || type === 'lambda') return 'lambda';
-  if (type === 'aws-agentcore' || type === 'agentcore') return 'agentcore';
-  if (type === 'gcp-cloud-run' || type === 'cloud-run') return 'cloud-run';
-};
+const providerValue = computeProviderFromType;
 
 const computeConfigOf = (summary?: { computeConfig?: ComputeConfig }) =>
   summary?.computeConfig;
@@ -34,11 +34,8 @@ const providersInConfig = (
   return providers as ComputeProviderValue[];
 };
 
-const DEFAULT_PROVIDERS: readonly ComputeProviderOption[] = [
-  { value: 'lambda' },
-  { value: 'agentcore' },
-  { value: 'cloud-run' },
-];
+const DEFAULT_PROVIDERS: readonly ComputeProviderOption[] =
+  COMPUTE_PROVIDER_VALUES.map((value) => ({ value }));
 
 /**
  * Ungates the provider a Version already uses, leaving the alternatives alone.
