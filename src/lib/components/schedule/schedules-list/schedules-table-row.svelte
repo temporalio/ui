@@ -20,7 +20,7 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
-  import ScheduleWorkflowStatusBadge from '../schedule-workflow-status-badge.svelte';
+  import ScheduleStatusBadge from '../schedule-status-badge.svelte';
 
   import ScheduleFrequency from './schedule-frequency.svelte';
 
@@ -68,7 +68,7 @@
     {@const clampToWidth = width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES}
     {#if label === translate('common.status')}
       <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
-        <ScheduleWorkflowStatusBadge {status} />
+        <ScheduleStatusBadge {status} />
       </td>
     {:else if label === translate('schedules.id')}
       <td
