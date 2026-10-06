@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { translate } from '$lib/i18n/translate';
   import NexusForm, {
     type NexusFormData,
@@ -14,6 +16,12 @@
     nameHintText?: string;
     cancelHref?: string;
     validateNamespacesExist?: ValidateNamespacesExist;
+    nameLeading?: Snippet;
+    fieldsInert?: boolean;
+    submitDisabled?: boolean;
+    class?: string;
+    card?: boolean;
+    submitButtonText?: string;
   };
 
   let {
@@ -25,6 +33,12 @@
     nameHintText = undefined,
     cancelHref = '/nexus',
     validateNamespacesExist,
+    nameLeading,
+    fieldsInert = false,
+    submitDisabled = false,
+    class: className = '',
+    card = false,
+    submitButtonText = translate('nexus.create-endpoint'),
   }: Props = $props();
 </script>
 
@@ -36,8 +50,13 @@
     {callerNamespaceList}
     {isCloud}
     {validateNamespacesExist}
+    {nameLeading}
+    {fieldsInert}
+    {submitDisabled}
+    class={className}
     {cancelHref}
-    submitButtonText={translate('nexus.create-endpoint')}
+    {card}
+    {submitButtonText}
     onSubmit={onCreate}
   />
 </div>
