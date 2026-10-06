@@ -37,7 +37,7 @@
     extension !== false && extension !== null && extension !== undefined;
 
   const sharedClasses =
-    'inline-flex max-w-full items-stretch overflow-hidden whitespace-nowrap rounded-full font-mono font-medium leading-none uppercase tracking-wide';
+    'inline-flex max-w-full items-stretch overflow-hidden whitespace-nowrap rounded-full font-sans uppercase font-medium py-0.5';
   const segmentClasses =
     'inline-flex flex-nowrap items-center justify-center gap-1 border';
 
@@ -45,8 +45,11 @@
     BadgeStatusSize,
     { badge: string; segment: string }
   > = {
-    sm: { badge: 'text-2xs', segment: 'py-0.5 px-1' },
-    md: { badge: 'text-xs', segment: 'py-1 px-1.5' },
+    sm: {
+      badge: 'text-2xs leading-none  min-h-[16px]',
+      segment: ' px-1',
+    },
+    md: { badge: 'text-xs leading-none min-h-[20px]', segment: 'px-1.5' },
   };
 
   const colorSchemeClasses: Record<BadgeStatusColorScheme, string> = {
@@ -109,7 +112,7 @@
 </script>
 
 <span
-  class={twMerge(sharedClasses, sizeClasses[size].badge, className)}
+  class={twMerge(sizeClasses[size].badge, sharedClasses, className)}
   {...rest}
 >
   <span
@@ -121,7 +124,7 @@
       visibleExtensions.length ? 'rounded-l-full border-r-0' : 'rounded-full',
     )}
   >
-    <span class="truncate">
+    <span class="-my-0.5 truncate py-0.5">
       {#if typeof count === 'number'}
         {count.toLocaleString()} {text ?? configuration.text}
       {:else if count != null}

@@ -20,13 +20,13 @@
   };
 
   const sharedClasses =
-    'inline-flex whitespace-nowrap divide-x divide-inherit rounded-full border font-mono font-medium leading-none uppercase';
+    'inline-flex whitespace-nowrap divide-x divide-inherit rounded-full border font-sans uppercase font-medium py-0.5';
   const segmentClasses =
     'inline-flex flex-nowrap items-center justify-center gap-1';
 
   const sizeClasses: Record<BadgeSize, { badge: string; segment: string }> = {
-    sm: { badge: 'text-2xs', segment: 'py-0.5 px-1' },
-    md: { badge: 'text-xs', segment: 'py-1 px-1.5' },
+    sm: { badge: 'text-2xs leading-none min-h-[16px]', segment: 'px-1' },
+    md: { badge: 'text-xs leading-none min-h-[20px]', segment: 'px-1.5' },
   };
 
   const colorSchemeClasses: Record<BadgeColorScheme, string> = {

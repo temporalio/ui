@@ -2,7 +2,7 @@
   export type BadgeCountSize = 'sm' | 'md';
 
   const sharedClasses =
-    'inline-flex whitespace-nowrap rounded-full border border-secondary bg-surface-tertiary font-mono font-medium leading-none text-primary uppercase';
+    'inline-flex whitespace-nowrap rounded-full border border-secondary bg-surface-tertiary font-sans uppercase font-medium leading-none text-primary';
   const segmentClasses =
     'inline-flex flex-nowrap items-center justify-center gap-1';
 
@@ -10,8 +10,14 @@
     BadgeCountSize,
     { badge: string; segment: string }
   > = {
-    sm: { badge: 'text-2xs', segment: 'py-0.5 px-1' },
-    md: { badge: 'text-xs', segment: 'py-1 px-1.5' },
+    sm: {
+      badge: 'text-2xs leading-none min-h-[16px] py-0.5',
+      segment: ' px-1',
+    },
+    md: {
+      badge: 'text-xs leading-none min-h-[20px] py-0.5 ',
+      segment: 'px-1.5',
+    },
   };
 </script>
 
@@ -43,12 +49,15 @@
   class={twMerge(sharedClasses, sizeClasses[size].badge, className)}
   {...rest}
 >
-  <span class={twMerge(segmentClasses, sizeClasses[size].segment)}>{value}</span
-  >
+  <span class={twMerge(segmentClasses, sizeClasses[size].segment)}>
+    <span>{value}</span>
+  </span>
   {#if total !== undefined}
-    <span class="inline-flex items-center justify-center py-0.5">/</span>
-    <span class={twMerge(segmentClasses, sizeClasses[size].segment)}
-      >{total}</span
-    >
+    <span class="inline-flex items-center justify-center">
+      <span>/</span>
+    </span>
+    <span class={twMerge(segmentClasses, sizeClasses[size].segment)}>
+      <span>{total}</span>
+    </span>
   {/if}
 </span>
