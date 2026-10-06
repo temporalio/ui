@@ -4,7 +4,6 @@
   import type { Snippet } from 'svelte';
 
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import type { TableDensity } from '$lib/stores/table-density';
   import type { SearchAttributes } from '$lib/types/workflows';
   import {
     type QuickFilterColumns,
@@ -24,7 +23,6 @@
     // Withholds the filter without changing how the cell renders, for a surface
     // whose query language cannot support it.
     disabled?: boolean;
-    density?: TableDensity;
     class?: string;
     style?: string;
     'data-testid'?: string;
@@ -39,7 +37,6 @@
     label,
     row,
     disabled = false,
-    density,
     class: className,
     style,
     'data-testid': testId,
@@ -58,7 +55,6 @@
     data-testid={testId}
     {filters}
     {filterIconTitle}
-    {density}
     attribute={resolved.attribute}
     type={resolved.type}
     value={resolved.value}

@@ -155,7 +155,6 @@
   class={className}
   style={widthStyle}
   data-testid={testId}
-  density={truncate ? 'dense' : 'comfortable'}
 >
   {#snippet children({ type, value, displayValue })}
     {@render cellContent(type, value, displayValue)}

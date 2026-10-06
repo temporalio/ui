@@ -331,11 +331,17 @@ const bodyCellFor = async (page: Page, column: string) => {
     .nth(index);
 };
 
-// The buttons only render while the cell is hovered or focused.
+// The buttons render only while the cell is hovered, and float outside it, so
+// they are looked up at the page rather than inside the cell.
+const quickFilterButton = (page: Page) =>
+  page.getByTestId('quick-filter-button');
+
 const clickQuickFilter = async (page: Page, column: string) => {
   const cell = await bodyCellFor(page, column);
   await cell.hover();
-  await cell.getByTestId('quick-filter-button').click();
+  // A cell left moments ago keeps its buttons briefly, so wait for just one.
+  await expect(quickFilterButton(page)).toHaveCount(1);
+  await quickFilterButton(page).click();
 };
 
 test('it should quick filter by a Status cell and toggle it back off', async ({
@@ -455,7 +461,48 @@ test('it should not offer a quick filter for a column with no value', async ({
   const end = await bodyCellFor(page, 'End');
   await end.hover();
 
-  await expect(end.getByTestId('quick-filter-button')).toBeHidden();
+  await expect(quickFilterButton(page)).toHaveCount(0);
+});
+
+test('it should not reserve cell width for the hover buttons', async ({
+  page,
+}) => {
+  const cells = page
+    .getByTestId('workflows-summary-configurable-table-row')
+    .first()
+    .getByTestId('workflows-summary-table-body-cell');
+
+  // The buttons float outside the cell, so no column pads space for them.
+  const paddings = await cells.evaluateAll((tds) =>
+    tds.map((td) => getComputedStyle(td).paddingRight),
+  );
+  expect(new Set(paddings)).toEqual(new Set(['8px']));
+
+  // And they are not in the row at all until the cell is hovered.
+  await expect(quickFilterButton(page)).toHaveCount(0);
+});
+
+test('it should float the buttons above the cell rather than over its value', async ({
+  page,
+}) => {
+  const cell = await bodyCellFor(page, 'Type');
+  await cell.hover();
+
+  const button = quickFilterButton(page);
+  await expect(button).toBeVisible();
+  expect(await button.evaluate((b) => !!b.closest('td'))).toBe(false);
+
+  const buttonBox = await button.boundingBox();
+  const cellBox = await cell.boundingBox();
+  expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(cellBox.y + 2);
+
+  // Leaving the cell for the buttons must not take them away mid-reach.
+  await button.hover();
+  await page.waitForTimeout(300);
+  await expect(button).toBeVisible();
+
+  // And only ever one at a time, so sweeping a row leaves no trail.
+  await expect(button).toHaveCount(1);
 });
 
 test.describe('custom search attribute columns', () => {

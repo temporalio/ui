@@ -82,12 +82,13 @@
 {/if}
 
 <style lang="postcss">
+  /* Positioned by the portal that owns it, so it reserves no space in the cell. */
   .copy-or-filter {
-    @apply absolute bottom-0 right-0 top-0 inline-flex gap-1 px-1;
+    @apply inline-flex items-center gap-1 rounded border border-primary bg-surface-secondary p-1 shadow;
   }
 
   .copy-or-filter-button {
-    @apply relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full bg-surface-primary p-0.5 text-primary hover:bg-interactive-tertiary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press;
+    @apply h-6 w-6 rounded-full bg-surface-primary p-0.5 text-primary hover:bg-interactive-tertiary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press;
   }
 
   .filtered {
