@@ -8,7 +8,6 @@
   } from '$lib/components/detail-list';
   import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
-  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -33,6 +32,7 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import ScheduleActionModals from '../schedule-action-modals/schedule-action-modals.svelte';
+  import ScheduleStatusBadge from '../schedule-status-badge.svelte';
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';
@@ -65,7 +65,7 @@
       class="flex flex-wrap items-center gap-2 text-3xl"
       data-testid="schedule-name"
     >
-      <WorkflowStatusBadge
+      <ScheduleStatusBadge
         status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
       />
       <span class="select-all">

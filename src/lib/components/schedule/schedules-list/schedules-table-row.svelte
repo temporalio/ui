@@ -5,7 +5,6 @@
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -20,6 +19,8 @@
     routeForWorkflow,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
+
+  import ScheduleWorkflowStatusBadge from '../schedule-workflow-status-badge.svelte';
 
   import ScheduleFrequency from './schedule-frequency.svelte';
 
@@ -67,7 +68,7 @@
     {@const clampToWidth = width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES}
     {#if label === translate('common.status')}
       <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
-        <WorkflowStatusBadge {status} />
+        <ScheduleWorkflowStatusBadge {status} />
       </td>
     {:else if label === translate('schedules.id')}
       <td

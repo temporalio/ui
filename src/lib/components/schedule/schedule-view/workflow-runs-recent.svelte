@@ -2,7 +2,6 @@
   import { twMerge } from 'tailwind-merge';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -14,6 +13,8 @@
     RecentScheduleRun,
   } from '$lib/types/schedule';
   import { routeForWorkflow } from '$lib/utilities/route-for';
+
+  import ScheduleWorkflowStatusBadge from '../schedule-workflow-status-badge.svelte';
 
   import WorkflowRunsEmpty from './workflow-runs-empty.svelte';
 
@@ -70,7 +71,7 @@
         class="grid grid-cols-[max-content_1fr] gap-x-2 gap-y-1 border-b border-primary py-2 sm:grid-cols-[minmax(max-content,7rem)_1fr_max-content]"
       >
         <div class="col-start-1 row-start-1 flex items-center">
-          <WorkflowStatusBadge status={run.status} />
+          <ScheduleWorkflowStatusBadge status={run.status} />
         </div>
 
         <div
