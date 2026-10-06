@@ -16,8 +16,6 @@
     'children' | 'class'
   > {
     status: WorkflowStatus;
-    delayed?: boolean;
-    taskFailure?: boolean;
   }
 
   let { status, ...rest }: Props = $props();
