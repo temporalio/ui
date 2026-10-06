@@ -1617,3 +1617,55 @@ describe('getPendingActivityScheduledEvent', () => {
     ).toBe(10);
   });
 });
+
+describe('event group labels', () => {
+  const label = {
+    metadata: { encoding: btoa('json/plain') },
+    data: btoa(JSON.stringify('Checkout')),
+  };
+  const withMarker = (
+    event: HistoryEvent,
+    marker: { id: string; label?: typeof label },
+  ) =>
+    ({
+      ...event,
+      eventGroupMarkers: [{ label: marker }],
+    }) as unknown as HistoryEvent;
+
+  it('resolves a label from an event ingested later', () => {
+    const [started, fired] = makeTimerGroup(1);
+    ingestHistoryEvent(withMarker(fired, { id: 'group-1' }));
+    ingestHistoryEvent(
+      withMarker(started, {
+        key: 'label:group-1',
+        kind: 'label',
+        id: 'group-1',
+        label,
+      }),
+    );
+
+    expect(getEventArray().map((event) => event.eventGroups)).toEqual([
+      [{ key: 'label:group-1', kind: 'label', id: 'group-1', label }],
+      [{ key: 'label:group-1', kind: 'label', id: 'group-1', label }],
+    ]);
+  });
+
+  it('does not carry labels across a reset', () => {
+    const [started, fired] = makeTimerGroup(1);
+    ingestHistoryEvent(
+      withMarker(started, {
+        key: 'label:group-1',
+        kind: 'label',
+        id: 'group-1',
+        label,
+      }),
+    );
+
+    reset(0);
+    ingestHistoryEvent(withMarker(fired, { id: 'group-1' }));
+
+    expect(getEventArray()[0].eventGroups).toEqual([
+      { key: 'label:group-1', kind: 'label', id: 'group-1' },
+    ]);
+  });
+});

@@ -1,0 +1,220 @@
+import type { Payload } from '$lib/types';
+import type { HistoryEvent } from '$lib/types/events';
+import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+
+export type EventGroupKind = 'label' | 'event' | 'update';
+
+type InboundSourceDetails = {
+  name?: string;
+  sourceEventType?: string;
+};
+
+export type EventGroupLabel = InboundSourceDetails & {
+  key: string;
+  kind: EventGroupKind;
+  id: string;
+  label?: Payload;
+};
+
+export type EventGroupLabelRegistry = {
+  resolve: (historyEvent: HistoryEvent) => EventGroupLabel[] | undefined;
+};
+
+type InboundSource = {
+  kind: Exclude<EventGroupKind, 'label'>;
+  id: string;
+  name?: string;
+  eventType: string;
+};
+
+const hasPayloadContent = (
+  payload: Payload | null | undefined,
+): payload is Payload =>
+  Boolean(payload?.data || Object.keys(payload?.metadata ?? {}).length);
+
+const nonEmptyString = (value: unknown): string | undefined =>
+  typeof value === 'string' && value ? value : undefined;
+
+const toKey = (kind: EventGroupKind, id: string) => `${kind}:${id}`;
+
+const getInboundSource = (
+  historyEvent: HistoryEvent,
+  eventId: string,
+): InboundSource | undefined => {
+  if (historyEvent.workflowExecutionStartedEventAttributes) {
+    return {
+      kind: 'event',
+      id: eventId,
+      eventType: 'WorkflowExecutionStarted',
+    };
+  }
+
+  const signaled = historyEvent.workflowExecutionSignaledEventAttributes;
+  if (signaled) {
+    return {
+      kind: 'event',
+      id: eventId,
+      name: nonEmptyString(signaled.signalName),
+      eventType: 'WorkflowExecutionSignaled',
+    };
+  }
+
+  const admitted =
+    historyEvent.workflowExecutionUpdateAdmittedEventAttributes?.request;
+  const admittedUpdateId = nonEmptyString(admitted?.meta?.updateId);
+  if (admittedUpdateId) {
+    return {
+      kind: 'update',
+      id: admittedUpdateId,
+      name: nonEmptyString(admitted?.input?.name),
+      eventType: 'WorkflowExecutionUpdateAdmitted',
+    };
+  }
+
+  const accepted = historyEvent.workflowExecutionUpdateAcceptedEventAttributes;
+  const acceptedUpdateId =
+    nonEmptyString(accepted?.acceptedRequest?.meta?.updateId) ??
+    nonEmptyString(accepted?.protocolInstanceId);
+  if (acceptedUpdateId) {
+    return {
+      kind: 'update',
+      id: acceptedUpdateId,
+      name: nonEmptyString(accepted?.acceptedRequest?.input?.name),
+      eventType: 'WorkflowExecutionUpdateAccepted',
+    };
+  }
+};
+
+const recordSource = (
+  details: InboundSourceDetails,
+  { name, eventType }: InboundSource,
+) => {
+  if (name) details.name = name;
+  details.sourceEventType ??= eventType;
+};
+
+export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
+  const entries = new Map<string, EventGroupLabel>();
+  const pendingSources = new Map<string, InboundSourceDetails>();
+  const labelSourceEventIds = new Map<string, number>();
+
+  const getEntry = (kind: EventGroupKind, id: string): EventGroupLabel => {
+    const key = toKey(kind, id);
+    let entry = entries.get(key);
+    if (!entry) {
+      entry = { key, kind, id, ...pendingSources.get(key) };
+      pendingSources.delete(key);
+      entries.set(key, entry);
+    }
+    return entry;
+  };
+
+  const indexInboundSource = (source: InboundSource) => {
+    const key = toKey(source.kind, source.id);
+    let details = entries.get(key) ?? pendingSources.get(key);
+    if (!details) {
+      details = {};
+      pendingSources.set(key, details);
+    }
+    recordSource(details, source);
+  };
+
+  const resolve = (
+    historyEvent: HistoryEvent,
+  ): EventGroupLabel[] | undefined => {
+    const eventId = String(historyEvent.eventId);
+    const source = getInboundSource(historyEvent, eventId);
+    if (source) indexInboundSource(source);
+
+    const markers = historyEvent.eventGroupMarkers;
+    if (!markers?.length) return;
+
+    const eventNumber = Number(eventId);
+    const resolved = new Set<EventGroupLabel>();
+
+    for (const marker of markers) {
+      const labelId = nonEmptyString(marker?.label?.id);
+      if (labelId) {
+        const entry = getEntry('label', labelId);
+        const payload = marker.label?.label;
+        const sourceEventId = labelSourceEventIds.get(entry.key);
+        if (
+          hasPayloadContent(payload) &&
+          (sourceEventId === undefined || eventNumber < sourceEventId)
+        ) {
+          entry.label = payload;
+          labelSourceEventIds.set(entry.key, eventNumber);
+        }
+        resolved.add(entry);
+        continue;
+      }
+
+      const inboundEventId = marker?.inboundEvent?.inboundEventId;
+      if (inboundEventId !== undefined && inboundEventId !== null) {
+        resolved.add(getEntry('event', String(inboundEventId)));
+        continue;
+      }
+
+      const inboundUpdateId = nonEmptyString(
+        marker?.inboundUpdate?.inboundUpdateId,
+      );
+      if (inboundUpdateId) resolved.add(getEntry('update', inboundUpdateId));
+    }
+
+    return resolved.size ? [...resolved] : undefined;
+  };
+
+  return { resolve };
+};
+
+export const formatEventGroupName = ({
+  id,
+  name,
+  sourceEventType,
+}: EventGroupLabel): string => {
+  if (name) return `${name} (${id})`;
+  return sourceEventType ?? id;
+};
+
+const decodedLabels = new WeakMap<Payload, Promise<string | undefined>>();
+
+export const decodeEventGroupLabel = async (
+  group: EventGroupLabel,
+  decode: (
+    payload: Payload,
+  ) => Promise<unknown> = decodePayloadAndParseDataToJSON,
+): Promise<string> => {
+  const payload = group.label;
+  if (!payload) return formatEventGroupName(group);
+
+  let decoded = decodedLabels.get(payload);
+  if (!decoded) {
+    decoded = decode(payload).then(
+      (value) => (typeof value === 'string' && value ? value : undefined),
+      () => undefined,
+    );
+    decodedLabels.set(payload, decoded);
+  }
+
+  const label = await decoded;
+  if (label === undefined && decodedLabels.get(payload) === decoded) {
+    decodedLabels.delete(payload);
+  }
+  return label ?? formatEventGroupName(group);
+};
+
+const eventGroupNameSeparator = ', ';
+
+export const formatEventGroupNames = (groups: EventGroupLabel[]): string =>
+  groups
+    .map((group) => formatEventGroupName(group))
+    .join(eventGroupNameSeparator);
+
+export const decodeEventGroupNames = async (
+  groups: EventGroupLabel[],
+): Promise<string> => {
+  const names = await Promise.all(
+    groups.map((group) => decodeEventGroupLabel(group)),
+  );
+  return names.join(eventGroupNameSeparator);
+};

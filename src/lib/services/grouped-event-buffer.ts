@@ -9,6 +9,7 @@ import {
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import { getGroupId } from '$lib/models/event-groups/get-group-id';
 import { toEvent } from '$lib/models/event-history';
+import { createEventGroupLabelRegistry } from '$lib/models/event-history/event-group-markers';
 import type {
   CommonHistoryEvent,
   HistoryEvent,
@@ -189,6 +190,7 @@ let failedEvent: HistoryEvent | null = null;
 // and the live poll — the direction an event arrives from is a fetch detail,
 // and one workflow task's markers bill once however they were loaded.
 const processedWorkflowTaskIds = new Set<string>();
+let eventGroupLabels = createEventGroupLabelRegistry();
 
 // Bumped by every write. Read caches hold the revision they were built at, so
 // invalidation is a single counter rather than scattered cache-busting calls.
@@ -296,6 +298,7 @@ function toWorkflowEvent(raw: HistoryEvent): WorkflowEvent {
   return toEvent(raw, {
     shouldNotAddBillableAction,
     processedWorkflowTaskIds,
+    eventGroupLabels,
   });
 }
 
@@ -397,6 +400,7 @@ export function reset(historyLength: number): void {
 
   failedEvent = null;
   processedWorkflowTaskIds.clear();
+  eventGroupLabels = createEventGroupLabelRegistry();
 
   revision++;
   cachedGroups = null;
