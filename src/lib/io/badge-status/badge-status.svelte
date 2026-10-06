@@ -37,19 +37,22 @@
     extension !== false && extension !== null && extension !== undefined;
 
   const sharedClasses =
-    'inline-flex max-w-full items-stretch overflow-hidden whitespace-nowrap rounded-full font-sans uppercase font-medium py-0.5';
+    'inline-flex max-w-full items-stretch overflow-hidden whitespace-nowrap rounded-full font-sans uppercase font-medium ';
   const segmentClasses =
-    'inline-flex flex-nowrap items-center justify-center gap-1 border';
+    'inline-flex flex-nowrap items-center justify-center gap-1 border py-0.5';
 
   const sizeClasses: Record<
     BadgeStatusSize,
     { badge: string; segment: string }
   > = {
     sm: {
-      badge: 'text-2xs leading-none  min-h-[16px]',
-      segment: ' px-1',
+      badge: 'text-2xs leading-none',
+      segment: ' px-1 min-h-[16px]',
     },
-    md: { badge: 'text-xs leading-none min-h-[20px]', segment: 'px-1.5' },
+    md: {
+      badge: 'text-xs leading-none',
+      segment: 'px-1.5 min-h-[20px]',
+    },
   };
 
   const colorSchemeClasses: Record<BadgeStatusColorScheme, string> = {
