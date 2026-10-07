@@ -20,11 +20,15 @@ import type { ActivityOptions, Payload, SearchAttribute } from '$lib/types';
 import type {
   ActivityExecution,
   ActivityExecutionInfo,
+  ActivityExecutionListInfo,
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
 import type { Callback } from '$lib/types/nexus';
 import { activityOptionsUpdateMask } from '$lib/utilities/activity-options-update-mask';
-import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+import {
+  decodePayloadAndParseDataToJSON,
+  parseSearchAttributes,
+} from '$lib/utilities/decode-payload';
 import {
   encodePayloads,
   setSearchAttributes,
@@ -101,10 +105,17 @@ export interface StartStandaloneActivityResponse {
   started: boolean;
 }
 
+const toActivityExecutionListInfo = (
+  activity: ActivityExecutionInfo,
+): ActivityExecutionListInfo => ({
+  ...activity,
+  searchAttributes: parseSearchAttributes(activity.searchAttributes),
+});
+
 export type PaginatedActivitiesPromise = (
   pageSize?: number,
   token?: string,
-) => Promise<{ items: ActivityExecutionInfo[]; nextPageToken: string }>;
+) => Promise<{ items: ActivityExecutionListInfo[]; nextPageToken: string }>;
 
 export const fetchPaginatedActivities = async (
   namespace: string,
@@ -134,7 +145,7 @@ export const fetchPaginatedActivities = async (
     }).then((response) => {
       const { executions = [], nextPageToken = '' } = response || {};
       return {
-        items: executions,
+        items: executions.map(toActivityExecutionListInfo),
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });
