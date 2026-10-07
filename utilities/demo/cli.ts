@@ -1,6 +1,6 @@
-import type { DefinitionSummary, Stage } from './definition';
-import { STAGES } from './definition';
 import type { StartOptions } from './run';
+import type { DefinitionSummary, Stage } from '../../src/lib/demo/definition';
+import { STAGES } from '../../src/lib/demo/definition';
 
 export const demoHelp = `Usage: demo <command>
 

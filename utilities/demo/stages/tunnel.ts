@@ -5,10 +5,10 @@ import { join } from 'path';
 
 import { chalk } from 'zx';
 
-import type { TunnelDefinition } from '../definition';
-import { type Logger, runDirFor } from '../paths';
-import { startDetached, type Supervised } from '../process';
-import { failure, NGROK_DOC, ngrokFixes } from '../remedy';
+import type { TunnelDefinition } from '../../../src/lib/demo/definition';
+import { type Logger, runDirFor } from '../../../src/lib/demo/paths';
+import { startDetached, type Supervised } from '../../../src/lib/demo/process';
+import { failure, NGROK_DOC, ngrokFixes } from '../../../src/lib/demo/remedy';
 
 export type RunningTunnel = {
   process?: Supervised;

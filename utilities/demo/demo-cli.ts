@@ -11,13 +11,10 @@
 import { pathToFileURL } from 'node:url';
 
 import { demoHelp, runDemoCli } from './cli';
-import {
-  listDefinitions,
-  loadDefinition,
-  scaffoldDefinition,
-} from './definition';
-import { loadLocalEnvironment } from './paths';
 import { ReportedRunFailure, startFeatureDemo, stopFeatureDemo } from './run';
+import { scaffoldDefinition } from './scaffold';
+import { listDefinitions, loadDefinition } from '../../src/lib/demo/definition';
+import { loadLocalEnvironment } from '../../src/lib/demo/paths';
 
 export { demoHelp };
 

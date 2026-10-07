@@ -3,28 +3,37 @@ import { pathToFileURL } from 'url';
 
 import { chalk } from 'zx';
 
-import {
-  hasOwnScenario,
-  loadDefinition,
-  ownScenarioPath,
-  type Stage,
-} from './definition';
 import { startCatalogExamples } from './examples';
-import { WORK_DIR } from './paths';
-import { runPreflight } from './preflight';
-import { listenersOn, stopPid, type Supervised } from './process';
-import type { Scenario, StartedWorkflow } from './scenario';
 import { startServer } from './stages/server';
 import { startTunnel } from './stages/tunnel';
 import { startUi } from './stages/ui';
 import { startCatalogWorker } from './stages/worker';
-import { clearState, isRunning, readState, writeState } from './state';
 import {
   printSummary,
   type StageOutcome,
   type SummaryInput,
   writeSummary,
 } from './summary';
+import {
+  hasOwnScenario,
+  loadDefinition,
+  ownScenarioPath,
+  type Stage,
+} from '../../src/lib/demo/definition';
+import { WORK_DIR } from '../../src/lib/demo/paths';
+import { runPreflight } from '../../src/lib/demo/preflight';
+import {
+  listenersOn,
+  stopPid,
+  type Supervised,
+} from '../../src/lib/demo/process';
+import type { Scenario, StartedWorkflow } from '../../src/lib/demo/scenario';
+import {
+  clearState,
+  isRunning,
+  readState,
+  writeState,
+} from '../../src/lib/demo/state';
 
 /** Thrown after the failure has already been reported through `io`. */
 export class ReportedRunFailure extends Error {

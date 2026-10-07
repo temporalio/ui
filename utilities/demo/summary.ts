@@ -4,9 +4,9 @@ import { join } from 'path';
 import { chalk } from 'zx';
 
 import { catalogExampleUrl } from './catalog';
-import type { Definition, Stage } from './definition';
-import { runDirFor } from './paths';
-import type { StartedWorkflow } from './scenario';
+import type { Definition, Stage } from '../../src/lib/demo/definition';
+import { runDirFor } from '../../src/lib/demo/paths';
+import type { StartedWorkflow } from '../../src/lib/demo/scenario';
 
 export type StageOutcome = {
   stage: Stage;

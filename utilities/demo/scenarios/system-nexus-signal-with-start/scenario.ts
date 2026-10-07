@@ -13,8 +13,12 @@ import {
 import { z } from 'zod';
 
 import { SystemNexusSignalWithStartCaller } from './caller-workflow';
+import type {
+  Scenario,
+  ScenarioContext,
+  ScenarioResult,
+} from '../../../../src/lib/demo/scenario';
 import { assertValidExampleInput, requireWorkflowExample } from '../../catalog';
-import type { Scenario, ScenarioContext, ScenarioResult } from '../../scenario';
 
 const require = createRequire(import.meta.url);
 

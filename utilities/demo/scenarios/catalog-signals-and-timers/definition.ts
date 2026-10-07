@@ -1,4 +1,4 @@
-import { defineScenario } from '../../definition';
+import { defineScenario } from '../../../../src/lib/demo/definition';
 
 export const definition = defineScenario({
   name: 'catalog-signals-and-timers',

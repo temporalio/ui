@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { DemoCommands } from './cli';
 import { demoHelp, parseStartOptions, runDemoCli } from './cli';
-import type { DefinitionSummary } from './definition';
+import type { DefinitionSummary } from '../../src/lib/demo/definition';
 
 const definition: DefinitionSummary = {
   name: 'system-nexus-signal-with-start',
