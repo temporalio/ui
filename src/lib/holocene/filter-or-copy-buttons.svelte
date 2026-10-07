@@ -82,9 +82,10 @@
 {/if}
 
 <style lang="postcss">
-  /* Positioned by the portal that owns it, so it reserves no space in the cell. */
+  /* Sits over the right edge of the cell it belongs to, so it is obvious which
+     value it acts on. Absolute, so it still reserves no width. */
   .copy-or-filter {
-    @apply inline-flex items-center gap-1 rounded border border-primary bg-surface-secondary p-1 shadow;
+    @apply absolute right-1 top-1/2 z-10 inline-flex -translate-y-1/2 items-center gap-1 rounded border border-primary bg-surface-secondary p-1 shadow;
   }
 
   .copy-or-filter-button {

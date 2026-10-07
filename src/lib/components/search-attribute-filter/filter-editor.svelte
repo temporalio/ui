@@ -59,10 +59,21 @@
     // in absolute mode: relative mode recomputes the value from the duration
     // inputs on apply and would throw the seeded value away.
     defaultTimeMode?: 'relative' | 'absolute';
+    // A popover opens without moving focus, so Enter cannot reach the form on
+    // its own.
+    applyOnEnter?: boolean;
   };
 
-  let { filter, idPrefix, onApply, onRemove, defaultTimeMode }: Props =
-    $props();
+  let {
+    filter,
+    idPrefix,
+    onApply,
+    onRemove,
+    defaultTimeMode,
+    applyOnEnter = false,
+  }: Props = $props();
+
+  let formElement = $state<HTMLFormElement | null>(null);
 
   let localFilter = $state({ ...filter });
 
@@ -160,6 +171,39 @@
     }
     onApply(localFilter);
   }
+
+  $effect(() => {
+    if (!applyOnEnter) return;
+
+    const onKeydown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter') return;
+
+      const target = e.target;
+      // A button in the form already does something with Enter: a toggle flips,
+      // Apply submits. The button that opened the popover is not in the form,
+      // and is where focus still sits, so Enter there applies.
+      if (
+        target instanceof HTMLButtonElement &&
+        formElement?.contains(target)
+      ) {
+        return;
+      }
+      // The chip input claims Enter to commit a keyword.
+      if (
+        target instanceof HTMLInputElement &&
+        target.id === `${idPrefix}-list-filter` &&
+        target.value !== ''
+      ) {
+        return;
+      }
+
+      e.preventDefault();
+      formElement?.requestSubmit();
+    };
+
+    document.addEventListener('keydown', onKeydown);
+    return () => document.removeEventListener('keydown', onKeydown);
+  });
 
   function timeError(x: string) {
     if (x) return isNaN(Number(x)) || isNaN(parseFloat(x));
@@ -275,7 +319,7 @@
   </ToggleButtons>
 {/snippet}
 
-<form onsubmit={applyChanges}>
+<form bind:this={formElement} onsubmit={applyChanges}>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-medium">Filter by {filter.attribute}</h3>

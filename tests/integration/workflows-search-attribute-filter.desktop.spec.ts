@@ -499,7 +499,7 @@ test('it should not reserve cell width for the hover buttons', async ({
   await expect(quickFilterButton(page)).toHaveCount(0);
 });
 
-test('it should float the buttons above the cell rather than over its value', async ({
+test('it should show the buttons over the cell they act on', async ({
   page,
 }) => {
   const cell = await bodyCellFor(page, 'Type');
@@ -507,19 +507,45 @@ test('it should float the buttons above the cell rather than over its value', as
 
   const button = quickFilterButton(page);
   await expect(button).toBeVisible();
-  expect(await button.evaluate((b) => !!b.closest('td'))).toBe(false);
+
+  // Inside the cell, so it is obvious which value they apply to. Covering the
+  // tail of a long value is accepted.
+  expect(await button.evaluate((b) => !!b.closest('td'))).toBe(true);
 
   const buttonBox = await button.boundingBox();
   const cellBox = await cell.boundingBox();
-  expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(cellBox.y + 2);
+  expect(buttonBox.y).toBeGreaterThanOrEqual(cellBox.y - 1);
+  expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(
+    cellBox.y + cellBox.height + 1,
+  );
 
-  // Leaving the cell for the buttons must not take them away mid-reach.
-  await button.hover();
-  await page.waitForTimeout(300);
-  await expect(button).toBeVisible();
-
-  // And only ever one at a time, so sweeping a row leaves no trail.
+  // Only ever one at a time, so sweeping a row leaves no trail.
   await expect(button).toHaveCount(1);
+});
+
+test('it should apply the quick filter on Enter', async ({ page }) => {
+  await clickQuickFilter(page, 'Type');
+  await expect(page.getByTestId('apply-filter-button')).toBeVisible();
+
+  // The popover opens without taking focus, so Enter has to reach it anyway.
+  await page.keyboard.press('Enter');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="ImportantWorkflowType"');
+  await expect(page.getByTestId('apply-filter-button')).toBeHidden();
+});
+
+test('it should apply an edited value on Enter', async ({ page }) => {
+  await clickQuickFilter(page, 'Type');
+
+  const input = page.locator('#quick-filter-WorkflowType-text');
+  await input.fill('AnotherWorkflowType');
+  await page.keyboard.press('Enter');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="AnotherWorkflowType"');
 });
 
 test.describe('custom search attribute columns', () => {

@@ -165,6 +165,7 @@
           filter={seed}
           idPrefix={menuId}
           defaultTimeMode="absolute"
+          applyOnEnter
           onApply={(filter) => {
             if (!isFiltered && atQueryLimit) return;
             replaceFilter(filter);
