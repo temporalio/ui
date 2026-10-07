@@ -59,8 +59,10 @@ export const resolveQuickFilter = <Row>({
     displayValue:
       type === SEARCH_ATTRIBUTE_TYPE.DATETIME
         ? (filterValue ?? '')
-        : value === undefined
-          ? ''
-          : String(value),
+        : Array.isArray(value)
+          ? value.join(', ')
+          : value === undefined
+            ? ''
+            : String(value),
   };
 };

@@ -4,7 +4,10 @@ import {
   toQueryDuration,
 } from '$lib/utilities/format-time';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
-import type { QuickFilterColumns } from '$lib/utilities/query/quick-filter-table';
+import {
+  getColumnAttribute,
+  type QuickFilterColumns,
+} from '$lib/utilities/query/quick-filter-table';
 
 export const NEXUS_OPERATION_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Operation ID': 'OperationId',
@@ -51,7 +54,9 @@ export const getNexusOperationColumnValue = (
       return milliseconds ? toQueryDuration(milliseconds) : undefined;
     }
     default:
-      return undefined;
+      return operation.searchAttributes?.indexedFields?.[
+        getColumnAttribute(NEXUS_OPERATION_COLUMN_ATTRIBUTE, label)
+      ];
   }
 };
 

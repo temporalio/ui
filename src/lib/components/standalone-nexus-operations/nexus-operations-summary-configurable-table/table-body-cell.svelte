@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import QuickFilterCell from '$lib/components/search-attribute-filter/quick-filter-cell.svelte';
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -11,6 +12,7 @@
   import { nexusOperationFilters } from '$lib/stores/filters';
   import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
+  import type { SearchAttributeType } from '$lib/types/workflows';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
@@ -50,7 +52,10 @@
   const testId = 'nexus-operations-summary-table-body-cell';
 </script>
 
-{#snippet cellContent(displayValue: string)}
+{#snippet cellContent(
+  type: SearchAttributeType | undefined,
+  displayValue: string,
+)}
   {#if label === 'Status'}
     <NexusOperationStatusBadge status={operation.status} />
   {:else if label === 'Schedule Time' || label === 'Close Time'}
@@ -66,7 +71,7 @@
   {:else if href}
     <Link {href}>{displayValue}</Link>
   {:else}
-    {displayValue}
+    <SearchAttributeValue value={displayValue} {type} />
   {/if}
 {/snippet}
 
@@ -81,7 +86,7 @@
   style={widthStyle}
   data-testid={testId}
 >
-  {#snippet children({ displayValue })}
-    {@render cellContent(displayValue)}
+  {#snippet children({ type, displayValue })}
+    {@render cellContent(type, displayValue)}
   {/snippet}
 </QuickFilterCell>

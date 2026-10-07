@@ -6,7 +6,10 @@ import type {
   NexusOperationIdReusePolicy,
   StartNexusOperationExecutionRequest,
 } from '.';
-import type { WorkflowSearchAttributes } from './workflows';
+import type {
+  DecodedWorkflowSearchAttributes,
+  WorkflowSearchAttributes,
+} from './workflows';
 
 export type NexusOperationExecutionStatus =
   keyof typeof temporal.api.enums.v1.NexusOperationExecutionStatus;
@@ -82,8 +85,15 @@ export interface NexusOperationExecutionListInfo extends Omit<
   closeTime: string;
   stateTransitionCount: string;
   executionDuration: string;
-  searchAttributes: WorkflowSearchAttributes;
+  searchAttributes: DecodedWorkflowSearchAttributes;
 }
+
+export type NexusOperationExecutionListInfoAPIResponse = Omit<
+  NexusOperationExecutionListInfo,
+  'searchAttributes'
+> & {
+  searchAttributes?: WorkflowSearchAttributes;
+};
 
 export interface NexusOperationExecution extends Omit<
   DescribeNexusOperationResponse,

@@ -1,11 +1,14 @@
-import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
 import {
   durationStringToMilliseconds,
   toQueryDuration,
 } from '$lib/utilities/format-time';
 import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
-import type { QuickFilterColumns } from '$lib/utilities/query/quick-filter-table';
+import {
+  getColumnAttribute,
+  type QuickFilterColumns,
+} from '$lib/utilities/query/quick-filter-table';
 
 export const ACTIVITY_COLUMN_ATTRIBUTE: Record<string, string> = {
   'Activity ID': 'ActivityId',
@@ -24,7 +27,7 @@ export const UNFILTERABLE_ACTIVITY_COLUMNS: string[] = [];
 
 export const getActivityColumnValue = (
   label: string,
-  activity: ActivityExecutionInfo,
+  activity: ActivityExecutionListInfo,
 ): QuickFilterValue => {
   switch (label) {
     case 'Activity ID':
@@ -52,11 +55,13 @@ export const getActivityColumnValue = (
       return milliseconds ? toQueryDuration(milliseconds) : undefined;
     }
     default:
-      return undefined;
+      return activity.searchAttributes?.indexedFields?.[
+        getColumnAttribute(ACTIVITY_COLUMN_ATTRIBUTE, label)
+      ];
   }
 };
 
-export const ACTIVITY_QUICK_FILTER_COLUMNS: QuickFilterColumns<ActivityExecutionInfo> =
+export const ACTIVITY_QUICK_FILTER_COLUMNS: QuickFilterColumns<ActivityExecutionListInfo> =
   {
     attributes: ACTIVITY_COLUMN_ATTRIBUTE,
     getValue: getActivityColumnValue,

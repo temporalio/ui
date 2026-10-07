@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import QuickFilterCell from '$lib/components/search-attribute-filter/quick-filter-cell.svelte';
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -13,9 +14,9 @@
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import {
-    SEARCH_ATTRIBUTE_TYPE,
-    type WorkflowExecution,
+  import type {
+    SearchAttributeType,
+    WorkflowExecution,
   } from '$lib/types/workflows';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
@@ -110,7 +111,7 @@
 {/snippet}
 
 {#snippet cellContent(
-  type: string | undefined,
+  type: SearchAttributeType | undefined,
   value: QuickFilterValue,
   displayValue: string,
 )}
@@ -135,12 +136,10 @@
     })}
   {:else if label === 'Parent Namespace'}
     {@render text(workflow?.parentNamespaceId ?? '', href)}
-  {:else if type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
-    <Timestamp dateTime={displayValue} />
-  {:else if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
-    <Badge text={displayValue} />
-  {:else}
+  {:else if href}
     {@render text(displayValue, href)}
+  {:else}
+    <SearchAttributeValue value={displayValue} {type} {truncate} />
   {/if}
 {/snippet}
 

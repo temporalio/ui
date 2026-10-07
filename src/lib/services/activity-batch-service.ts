@@ -1,6 +1,6 @@
 import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 import { type Execution, ExecutionType } from '$lib/types';
-import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -12,7 +12,7 @@ type CreateActivityBatchOperationOptions = {
   reason: string;
   jobId: string;
   query?: string;
-  activities?: ActivityExecutionInfo[];
+  activities?: ActivityExecutionListInfo[];
   identity?: string;
 };
 
@@ -48,7 +48,7 @@ const activityActionToOperation = (
 const toTargetExecution = ({
   activityId,
   runId,
-}: ActivityExecutionInfo): Execution => ({
+}: ActivityExecutionListInfo): Execution => ({
   type: ExecutionType.EXECUTION_TYPE_ACTIVITY,
   businessId: activityId ?? '',
   runId: runId ?? '',

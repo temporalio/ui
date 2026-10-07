@@ -23,7 +23,7 @@
     resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
-  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
   import {
     getBatchSelectionTargets,
     getPageSelectionStatus,
@@ -58,7 +58,7 @@
     standaloneActivityBulkActionsEnabled(page) && $supportsAdvancedVisibility,
   );
 
-  let visiblePaginatedItems: ActivityExecutionInfo[] = $state([]);
+  let visiblePaginatedItems: ActivityExecutionListInfo[] = $state([]);
 
   const pageSelectionStatus: PageSelectionStatus = $derived(
     getPageSelectionStatus(
@@ -72,7 +72,7 @@
 
   const handleSelectPage = (
     isSelected: boolean,
-    activities: ActivityExecutionInfo[],
+    activities: ActivityExecutionListInfo[],
   ) => {
     selectActivities(isSelected, activities);
     prevClickedIndex = null;

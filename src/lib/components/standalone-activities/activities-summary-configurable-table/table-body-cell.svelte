@@ -5,13 +5,15 @@
 
   import QuickFilterCell from '$lib/components/search-attribute-filter/quick-filter-cell.svelte';
   import ActivityStatusBadge from '$lib/components/standalone-activities/activity-status-badge.svelte';
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { activityFilters } from '$lib/stores/filters';
   import { activitySearchAttributes } from '$lib/stores/search-attributes';
-  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
+  import type { SearchAttributeType } from '$lib/types/workflows';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
@@ -25,7 +27,7 @@
 
   type Props = {
     column: ConfigurableTableHeader;
-    activity: ActivityExecutionInfo;
+    activity: ActivityExecutionListInfo;
   };
   let { column, activity }: Props = $props();
 
@@ -52,7 +54,10 @@
   const testId = 'activities-summary-table-body-cell';
 </script>
 
-{#snippet cellContent(displayValue: string)}
+{#snippet cellContent(
+  type: SearchAttributeType | undefined,
+  displayValue: string,
+)}
   {#if label === 'Status'}
     <ActivityStatusBadge
       status={toActivityStatus(activity.status)}
@@ -67,7 +72,7 @@
   {:else if href}
     <Link {href}>{displayValue}</Link>
   {:else}
-    {displayValue}
+    <SearchAttributeValue value={displayValue} {type} />
   {/if}
 {/snippet}
 
@@ -82,7 +87,7 @@
   style={widthStyle}
   data-testid={testId}
 >
-  {#snippet children({ displayValue })}
-    {@render cellContent(displayValue)}
+  {#snippet children({ type, displayValue })}
+    {@render cellContent(type, displayValue)}
   {/snippet}
 </QuickFilterCell>
