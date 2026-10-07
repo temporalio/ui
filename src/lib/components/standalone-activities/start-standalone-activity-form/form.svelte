@@ -239,14 +239,20 @@
     unsubscribe?.();
   });
 
+  let latestTaskQueueCheck = 0;
+
+  // A slower earlier check must not overwrite a newer one. A failed check
+  // has already shown an error toast, so it only hides the stale result.
   const checkTaskQueue = async (queue: string) => {
     if (!queue) return;
+    const check = ++latestTaskQueueCheck;
     taskQueueActive = null;
-    const response = await getActivityPollers({ namespace, queue });
-    if (response.pollers && response.pollers.length > 0) {
-      taskQueueActive = true;
-    } else {
-      taskQueueActive = false;
+    try {
+      const response = await getActivityPollers({ namespace, queue });
+      if (check !== latestTaskQueueCheck) return;
+      taskQueueActive = Boolean(response.pollers?.length);
+    } catch {
+      if (check === latestTaskQueueCheck) taskQueueActive = null;
     }
   };
 </script>

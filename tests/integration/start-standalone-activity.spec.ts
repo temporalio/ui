@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import { StartStandaloneActivityPage } from '~/pages/start-standalone-activity';
 import {
@@ -9,7 +9,37 @@ import {
   mockSearchAttributesApi,
   mockSettingsApi,
   mockTaskQueuesApi,
+  TASK_QUEUES_API,
 } from '~/test-utilities/mock-apis';
+
+// Holds every response for slow-queue until release() is called, so a test
+// can make an earlier check finish after a later one.
+const heldTaskQueues = async (page: Page) => {
+  let release = () => {};
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+
+  await page.route(TASK_QUEUES_API, async (route) => {
+    if (route.request().url().includes('/task-queues/slow-queue')) {
+      await released;
+      return route.fulfill({
+        json: { pollers: [{ identity: 'worker' }], taskQueueStatus: null },
+      });
+    }
+    return route.fulfill({ json: { pollers: [], taskQueueStatus: null } });
+  });
+
+  return release;
+};
+
+const nextFrames = (page: Page) =>
+  page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
 
 test.describe('Start a Standalone Activity', () => {
   test.beforeEach(async ({ page }) => {
@@ -142,5 +172,32 @@ test.describe('Start a Standalone Activity', () => {
       startStandaloneActivityPage.startToCloseTimeoutInput,
     ).toBeVisible();
     await expect(startStandaloneActivityPage.startDelayInput).toBeHidden();
+  });
+
+  test('keeps the latest Task Queue result when an earlier check responds later', async ({
+    page,
+  }) => {
+    const releaseSlowQueue = await heldTaskQueues(page);
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    const { taskQueueInput } = startStandaloneActivityPage;
+    await taskQueueInput.fill('slow-queue');
+    await taskQueueInput.blur();
+    await taskQueueInput.fill('fast-queue');
+    await taskQueueInput.blur();
+
+    // The inactive box is an error alert, so match its title, not a role.
+    const status = page.getByText(/^Task Queue is (active|inactive)$/);
+    await expect(status).toHaveText('Task Queue is inactive');
+
+    const slowQueueAnswered = page.waitForResponse(
+      /\/task-queues\/slow-queue\?taskQueueType=2/,
+    );
+
+    releaseSlowQueue();
+    await slowQueueAnswered;
+    await nextFrames(page);
+    await expect(status).toHaveText('Task Queue is inactive');
   });
 });

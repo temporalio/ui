@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import { SEARCH_ATTRIBUTE_TYPE } from '$src/lib/types/workflows';
 import {
@@ -7,7 +7,37 @@ import {
   mockSearchAttributesApi,
   mockSettingsApi,
   mockTaskQueuesApi,
+  TASK_QUEUES_API,
 } from '~/test-utilities/mock-apis';
+
+// Holds every response for slow-queue until release() is called, so a test
+// can make an earlier check finish after a later one.
+const heldTaskQueues = async (page: Page) => {
+  let release = () => {};
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+
+  await page.route(TASK_QUEUES_API, async (route) => {
+    if (route.request().url().includes('/task-queues/slow-queue')) {
+      await released;
+      return route.fulfill({
+        json: { pollers: [{ identity: 'worker' }], taskQueueStatus: null },
+      });
+    }
+    return route.fulfill({ json: { pollers: [], taskQueueStatus: null } });
+  });
+
+  return release;
+};
+
+const nextFrames = (page: Page) =>
+  page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
 
 test.describe('Start a Workflow', () => {
   const startWorkflowUrl = '/namespaces/default/workflows/start-workflow';
@@ -54,6 +84,35 @@ test.describe('Start a Workflow', () => {
         'Task Queue is Active',
       );
       await expect(page.getByTestId('start-workflow-button')).toBeEnabled();
+    });
+  });
+
+  test.describe('Task Queue check', () => {
+    test('keeps the latest result when an earlier check responds later', async ({
+      page,
+    }) => {
+      await mockSettingsApi(page, { StartWorkflowDisabled: false });
+      await mockSearchAttributesApi(page);
+      const releaseSlowQueue = await heldTaskQueues(page);
+      await page.goto(startWorkflowUrl);
+
+      const taskQueue = page.locator('#taskQueue');
+      await taskQueue.fill('slow-queue');
+      await taskQueue.blur();
+      await taskQueue.fill('fast-queue');
+      await taskQueue.blur();
+
+      const status = page.getByRole('status');
+      await expect(status).toContainText('Task Queue is Inactive');
+
+      const slowQueueAnswered = page.waitForResponse(
+        /\/task-queues\/slow-queue\?taskQueueType=3/,
+      );
+
+      releaseSlowQueue();
+      await slowQueueAnswered;
+      await nextFrames(page);
+      await expect(status).toContainText('Task Queue is Inactive');
     });
   });
 
