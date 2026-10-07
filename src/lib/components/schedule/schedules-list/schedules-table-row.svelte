@@ -10,13 +10,13 @@
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { toSearchAttributes } from '$lib/models/workflow-execution';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { customSearchAttributes } from '$lib/stores/search-attributes';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
   } from '$lib/utilities/column-width';
+  import { parseSearchAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
     routeForWorkflow,
@@ -39,7 +39,7 @@
   const status = $derived(schedule?.info?.paused ? 'Paused' : 'Running');
   const spec = $derived(schedule?.info?.spec);
   const decodedSearchAttributes = $derived(
-    toSearchAttributes(schedule?.searchAttributes ?? {}).indexedFields ?? {},
+    parseSearchAttributes(schedule?.searchAttributes ?? {}).indexedFields ?? {},
   );
 
   const sortRecentActions = (recentActions: ScheduleActionResult[]) => {

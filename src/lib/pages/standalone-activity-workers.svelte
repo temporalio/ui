@@ -2,8 +2,8 @@
   import { page } from '$app/state';
 
   import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
-  import { toSearchAttributes } from '$lib/models/workflow-execution';
   import { activityWorkerCount } from '$lib/stores/activities';
+  import { parseSearchAttributes } from '$lib/utilities/decode-payload';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   interface Props {
@@ -20,7 +20,7 @@
   );
 
   const decodedSearchAttributes = $derived(
-    toSearchAttributes(searchAttributes ?? {}).indexedFields ?? {},
+    parseSearchAttributes(searchAttributes ?? {}).indexedFields ?? {},
   );
 </script>
 

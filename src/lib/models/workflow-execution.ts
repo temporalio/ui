@@ -1,6 +1,3 @@
-import { mapValues } from 'es-toolkit';
-
-import type { SearchAttribute } from '$lib/types';
 import type {
   Callbacks,
   PendingActivity,
@@ -11,14 +8,12 @@ import type {
 } from '$lib/types/events';
 import type { Callback } from '$lib/types/nexus';
 import type {
-  DecodedWorkflowSearchAttributes,
   ListWorkflowExecutionsResponse,
   MostRecentWorkflowVersionStamp,
   WorkflowExecution,
   WorkflowExecutionAPIResponse,
-  WorkflowSearchAttributes,
 } from '$lib/types/workflows';
-import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
+import { parseSearchAttributes } from '$lib/utilities/decode-payload';
 import {
   toCallbackStateReadable,
   toPendingActivityStateReadable,
@@ -68,19 +63,6 @@ const toCallbacks = (callbacks?: Callbacks): Callback[] => {
   });
 };
 
-export const toSearchAttributes = (
-  apiSearchAttributes: WorkflowSearchAttributes | SearchAttribute,
-): DecodedWorkflowSearchAttributes => {
-  if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
-  const decoded = mapValues(apiSearchAttributes.indexedFields, (payload) =>
-    parseRawPayloadToJSON(payload),
-  ) as Record<string, string>;
-
-  return {
-    indexedFields: decoded,
-  };
-};
-
 const getStartDelay = ({
   executionTime,
   startTime,
@@ -101,7 +83,7 @@ export const toWorkflowExecution = (
   response?: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
   const info = response?.workflowExecutionInfo;
-  const searchAttributes = toSearchAttributes(info?.searchAttributes ?? {});
+  const searchAttributes = parseSearchAttributes(info?.searchAttributes ?? {});
   const memo = info?.memo ?? {};
   const name = info?.type?.name ?? '';
   const id = info?.execution?.workflowId ?? '';

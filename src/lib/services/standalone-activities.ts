@@ -15,7 +15,6 @@ import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
-import { toSearchAttributes } from '$lib/models/workflow-execution';
 import { activityError } from '$lib/stores/activities';
 import type { ActivityOptions, Payload, SearchAttribute } from '$lib/types';
 import type {
@@ -26,7 +25,10 @@ import type {
 } from '$lib/types/activity-execution';
 import type { Callback } from '$lib/types/nexus';
 import { activityOptionsUpdateMask } from '$lib/utilities/activity-options-update-mask';
-import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+import {
+  decodePayloadAndParseDataToJSON,
+  parseSearchAttributes,
+} from '$lib/utilities/decode-payload';
 import {
   encodePayloads,
   setSearchAttributes,
@@ -107,7 +109,7 @@ const toActivityExecutionListInfo = (
   activity: ActivityExecutionInfo,
 ): ActivityExecutionListInfo => ({
   ...activity,
-  searchAttributes: toSearchAttributes(activity.searchAttributes),
+  searchAttributes: parseSearchAttributes(activity.searchAttributes),
 });
 
 export type PaginatedActivitiesPromise = (

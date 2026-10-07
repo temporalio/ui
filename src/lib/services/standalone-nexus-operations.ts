@@ -2,7 +2,6 @@ import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
-import { toSearchAttributes } from '$lib/models/workflow-execution';
 import { nexusOperationError } from '$lib/stores/nexus-operations';
 import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 import type {
@@ -19,7 +18,10 @@ import type {
   NexusOperationExecutionListInfoAPIResponse,
   StartNexusOperationRequest,
 } from '$lib/types/nexus-operation-execution';
-import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+import {
+  decodePayloadAndParseDataToJSON,
+  parseSearchAttributes,
+} from '$lib/utilities/decode-payload';
 import {
   encodePayloads,
   setSearchAttributes,
@@ -59,7 +61,7 @@ const toNexusOperationExecutionListInfo = (
   operation: NexusOperationExecutionListInfoAPIResponse,
 ): NexusOperationExecutionListInfo => ({
   ...operation,
-  searchAttributes: toSearchAttributes(operation.searchAttributes ?? {}),
+  searchAttributes: parseSearchAttributes(operation.searchAttributes ?? {}),
 });
 
 export type PaginatedNexusOperationsPromise = (
