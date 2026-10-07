@@ -51,6 +51,7 @@
 
 <Story
   name="429 Rate Limited"
+  exportName="RateLimited"
   args={{
     error: { statusCode: 429, message: 'namespace rate limit exceeded' },
     back,
