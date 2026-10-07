@@ -14,10 +14,10 @@
   });
 </script>
 
-<Story name="Page Not Found" />
+<Story name="404 Page Not Found" />
 
 <Story
-  name="Resource Not Found"
+  name="404 Resource Not Found"
   args={{
     error: {
       statusCode: 404,
@@ -29,7 +29,7 @@
 />
 
 <Story
-  name="Resource Not Found Without Namespace"
+  name="404 Resource Not Found Without Namespace"
   args={{
     error: { statusCode: 404, message: 'Page Not Found' },
     resource: 'Nexus Endpoint',
@@ -39,7 +39,7 @@
 />
 
 <Story
-  name="Bad Request"
+  name="400 Bad Request"
   args={{
     error: { statusCode: 400, message: 'Invalid RunId.' },
     back,
@@ -47,7 +47,7 @@
 />
 
 <Story
-  name="Something Went Wrong"
+  name="500 Something Went Wrong"
   args={{
     error: { statusCode: 500, message: 'Internal Error' },
     back,
