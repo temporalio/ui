@@ -7,7 +7,7 @@
 
   let { class: className = '' }: Props = $props();
 
-  const PARTICLE_COUNT = 200;
+  const STAR_COUNT = 200;
   const CAMERA_DISTANCE = 2;
 
   const randomPointInSphere = () => {
@@ -24,7 +24,7 @@
     if (!context) return;
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+    const stars = Array.from({ length: STAR_COUNT }, () => ({
       ...randomPointInSphere(),
       size: 0.6 + Math.random() * 0.8,
       phase: Math.random() * Math.PI * 2,
@@ -44,7 +44,7 @@
       context.clearRect(0, 0, width, height);
       context.fillStyle = getComputedStyle(canvas).color;
 
-      for (const { x, y, z, size, phase } of particles) {
+      for (const { x, y, z, size, phase } of stars) {
         const wobble = Math.sin(seconds * 0.6 + phase) * 0.02;
         const spunX = x * cosSpin - z * sinSpin + wobble;
         const spunZ = x * sinSpin + z * cosSpin;
