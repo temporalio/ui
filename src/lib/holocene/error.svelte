@@ -53,7 +53,13 @@
     has(error, 'statusCode') ? Number(error.statusCode) : statusProp,
   );
   const kind = $derived(
-    status === 400 ? 'bad-request' : status === 404 ? 'not-found' : 'unknown',
+    status === 400
+      ? 'bad-request'
+      : status === 404
+        ? 'not-found'
+        : status === 429
+          ? 'rate-limited'
+          : 'unknown',
   );
   const copy = $derived(
     kind !== 'not-found' || !resource
@@ -67,6 +73,17 @@
   const details = $derived(
     JSON.stringify({ status, message, path, time }, null, 2),
   );
+
+  let seconds = $state(10);
+
+  $effect(() => {
+    if (kind !== 'rate-limited') return;
+    const timer = setInterval(() => {
+      seconds -= 1;
+      if (seconds <= 0) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  });
 </script>
 
 <section
@@ -77,12 +94,17 @@
     {translate(`errors.${copy}-title`, { resource })}
   </h1>
   <p class="mx-auto mt-2 max-w-xl text-lg">
-    {translate(`errors.${copy}-description`, { resource })}
+    {translate(`errors.${copy}-description`, { resource, count: seconds })}
   </p>
 
   {#if back || kind !== 'unknown'}
     <div class="mt-6 flex items-center justify-center gap-4">
-      {#if back}
+      {#if kind === 'rate-limited'}
+        <Button onclick={reset}>{translate('errors.try-now')}</Button>
+        {#if back}
+          <Link href={back.href}>{back.label}</Link>
+        {/if}
+      {:else if back}
         <Button LeadingIcon={IconArrowLeft} href={back.href}>
           {back.label}
         </Button>

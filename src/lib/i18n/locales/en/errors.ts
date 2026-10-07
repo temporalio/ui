@@ -13,11 +13,19 @@ export const Strings = {
   'not-found-unscoped-resource-title': '{{resource}} not found',
   'not-found-unscoped-resource-description':
     'It may have been deleted, or the ID is wrong.',
+  'rate-limited-title': 'Namespace rate limit exceeded',
+  'rate-limited-description_zero':
+    'This Namespace received too many requests. You can try again now.',
+  'rate-limited-description_one':
+    'This Namespace received too many requests. You can try again in {{count}} second.',
+  'rate-limited-description_other':
+    'This Namespace received too many requests. You can try again in {{count}} seconds.',
   'unknown-title': 'Something went wrong',
   'unknown-description':
     'Try again. If it keeps happening, share the technical details with support.',
   'technical-details': 'Technical details',
   'go-back': 'Go back',
+  'try-now': 'Try now',
   'ask-on-slack': 'Ask on Slack',
   'view-namespaces': 'View Namespaces',
 } as const;
