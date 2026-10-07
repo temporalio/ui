@@ -59,10 +59,19 @@
 />
 
 <Story
-  name="500 Something Went Wrong"
-  exportName="SomethingWentWrong"
+  name="500 Server Error"
+  exportName="ServerError"
   args={{
     error: { statusCode: 500, message: 'Internal Error' },
+    back,
+  }}
+/>
+
+<Story
+  name="No Status (Crash)"
+  exportName="Crash"
+  args={{
+    error: { message: "Cannot read properties of undefined (reading 'id')" },
     back,
   }}
 />
