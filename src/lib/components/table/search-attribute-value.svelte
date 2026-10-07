@@ -20,19 +20,27 @@
   let { value, type, truncate = false }: Props = $props();
 
   const displayValue = $derived(
-    Array.isArray(value) ? value.join(', ') : String(value ?? ''),
+    Array.isArray(value) ? value.join(', ') : String(value),
   );
   const hideTooltip = $derived(
     !truncate || truncateValue(displayValue).length <= TRUNCATE_LENGTH,
   );
 </script>
 
-{#if type === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof value === 'string'}
-  <Timestamp dateTime={value} />
-{:else if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
-  <Badge text={displayValue} />
-{:else}
-  <Tooltip usePortal text={displayValue} top class="min-w-0" hide={hideTooltip}>
-    {truncate ? truncateValue(displayValue) : displayValue}
-  </Tooltip>
+{#if value != null}
+  {#if type === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof value === 'string'}
+    <Timestamp dateTime={value} />
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
+    <Badge text={displayValue} />
+  {:else}
+    <Tooltip
+      usePortal
+      text={displayValue}
+      top
+      class="min-w-0"
+      hide={hideTooltip}
+    >
+      {truncate ? truncateValue(displayValue) : displayValue}
+    </Tooltip>
+  {/if}
 {/if}
