@@ -5,7 +5,7 @@
  * reset refers to. Run `pnpm generate:markdown-css` after changing either.
  */
 :root {
---color-background-primary: #f8f8f8;
+--color-background-primary: #ffffff;
 --color-content-brand: #3e63dd;
 --color-content-primary: #1e1d1b;
 --color-surface-primary: #fbfbfa;
