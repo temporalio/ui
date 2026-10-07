@@ -52,6 +52,9 @@ export type RecentScheduleRun = {
   runId: string;
   actualTime: ScheduleActionResult['actualTime'];
   status: WorkflowStatus;
+};
+
+export type RecentScheduleRunEnriched = RecentScheduleRun & {
   delayed: boolean;
   taskFailure: boolean;
   inVisibility: boolean;

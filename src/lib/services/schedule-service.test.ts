@@ -63,16 +63,15 @@ describe('toRecentScheduleRuns', () => {
     expect(toRecentScheduleRuns(schedule)[0].status).toBe('Running');
   });
 
-  test('defaults modifier and visibility flags to false before visibility resolves', () => {
+  test('does not add visibility-derived fields to recorded runs', () => {
     const schedule = scheduleWith([
       action('a', '2026-08-01T00:00:00Z', 'WORKFLOW_EXECUTION_STATUS_RUNNING'),
     ]);
 
-    expect(toRecentScheduleRuns(schedule)[0]).toMatchObject({
-      delayed: false,
-      taskFailure: false,
-      inVisibility: false,
-    });
+    const run = toRecentScheduleRuns(schedule)[0];
+    expect(run).not.toHaveProperty('delayed');
+    expect(run).not.toHaveProperty('taskFailure');
+    expect(run).not.toHaveProperty('inVisibility');
   });
 
   test('does not mutate the schedule response', () => {
@@ -112,6 +111,7 @@ describe('withLatestWorkflowStatuses', () => {
   });
 
   test('derives delay flags from execution time', () => {
+    const originalRuns = structuredClone(runs);
     const merged = withLatestWorkflowStatuses(runs, [
       {
         ...execution('a', '2026-08-01T00:00:00Z', 'Running'),
@@ -124,12 +124,13 @@ describe('withLatestWorkflowStatuses', () => {
     ]);
 
     expect(merged.map((run) => run.delayed)).toEqual([false, true]);
-    expect(runs.every((run) => !run.delayed)).toBe(true);
+    expect(runs).toEqual(originalRuns);
   });
 
   test.each(['category=WorkflowTaskFailed', 'category=WorkflowTaskTimedOut'])(
     'sets taskFailure for a running workflow reporting %s',
     (problem) => {
+      const originalRuns = structuredClone(runs);
       const merged = withLatestWorkflowStatuses(runs, [
         {
           ...execution('a', '2026-08-01T00:00:00Z', 'Running'),
@@ -142,20 +143,14 @@ describe('withLatestWorkflowStatuses', () => {
       expect(merged.find((run) => run.workflowId === 'a')?.taskFailure).toBe(
         true,
       );
-      expect(runs.every((run) => !run.taskFailure)).toBe(true);
+      expect(runs).toEqual(originalRuns);
     },
   );
 
-  test('clears stale modifier flags when the matched workflow has none', () => {
-    const flaggedRuns = runs.map((run) => ({
-      ...run,
-      delayed: true,
-      taskFailure: true,
-    }));
-    const merged = withLatestWorkflowStatuses(flaggedRuns, [
+  test('does not mark completed workflows as task-failed', () => {
+    const merged = withLatestWorkflowStatuses(runs, [
       {
         ...execution('a', '2026-08-01T00:00:00Z', 'Completed'),
-        executionTime: '2026-08-05T00:00:00Z',
         searchAttributes: {
           indexedFields: {
             TemporalReportedProblems: ['category=WorkflowTaskFailed'],
@@ -164,12 +159,8 @@ describe('withLatestWorkflowStatuses', () => {
       },
     ]);
 
-    expect(merged.find((run) => run.workflowId === 'a')).toMatchObject({
-      delayed: false,
-      taskFailure: false,
-    });
-    expect(merged.find((run) => run.workflowId === 'b')).toEqual(
-      flaggedRuns[0],
+    expect(merged.find((run) => run.workflowId === 'a')?.taskFailure).toBe(
+      false,
     );
   });
 
@@ -217,15 +208,7 @@ describe('withLatestWorkflowStatuses', () => {
     ]);
 
     expect(merged.map((run) => run.inVisibility)).toEqual([true, false]);
-    expect(runs.every((run) => !run.inVisibility)).toBe(true);
-  });
-
-  test('clears a previous visibility match when an execution disappears', () => {
-    const visibleRuns = runs.map((run) => ({ ...run, inVisibility: true }));
-    const merged = withLatestWorkflowStatuses(visibleRuns, []);
-
-    expect(merged).toEqual(runs);
-    expect(visibleRuns.every((run) => run.inVisibility)).toBe(true);
+    expect(runs.every((run) => !('inVisibility' in run))).toBe(true);
   });
 
   test('uses the newest execution of a continue-as-new chain', () => {
@@ -253,8 +236,15 @@ describe('withLatestWorkflowStatuses', () => {
     });
   });
 
-  test('leaves runs untouched when visibility returns nothing', () => {
-    expect(withLatestWorkflowStatuses(runs, [])).toEqual(runs);
+  test('defaults modifier and visibility flags when visibility returns nothing', () => {
+    expect(withLatestWorkflowStatuses(runs, [])).toEqual(
+      runs.map((run) => ({
+        ...run,
+        delayed: false,
+        taskFailure: false,
+        inVisibility: false,
+      })),
+    );
   });
 });
 
