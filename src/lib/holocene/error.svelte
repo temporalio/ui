@@ -7,7 +7,7 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Particles from '$lib/holocene/particles.svelte';
+  import Starfield from '$lib/holocene/starfield.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconArrowLeft } from '$lib/io/icon';
   import type { NetworkError } from '$lib/types/global';
@@ -89,7 +89,7 @@
 <section
   class="relative isolate min-h-dvh overflow-hidden bg-background-primary px-4 pt-32 text-center"
 >
-  <Particles class="absolute inset-0 -z-10 size-full text-secondary" />
+  <Starfield class="absolute inset-0 -z-10 size-full text-secondary" />
   <h1 class="text-3xl font-semibold">
     {translate(`errors.${copy}-title`, { resource })}
   </h1>
