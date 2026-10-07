@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   colorAlphaScales,
+  colorScales,
   defaultThemeName,
   themes,
   toCssVariables,
@@ -21,26 +22,28 @@ describe('registered IO themes', () => {
     expect(variableNames).toEqual(colorContract);
   });
 
-  it.each(registeredThemes)('%s has 81 color variables', (_, theme) => {
+  it.each(registeredThemes)('%s has 83 color variables', (_, theme) => {
     const variables = toCssVariables(theme.color, 'color');
 
-    expect(Object.keys(variables)).toHaveLength(81);
+    expect(Object.keys(variables)).toHaveLength(83);
+    expect(variables['--color-action-update']).toBe('#ffba18');
     expect(variables['--color-interactive-tertiary']).toBe('transparent');
   });
 
   it.each(registeredThemes)(
-    '%s defines workflow action hover colors at 80 percent opacity',
-    (_, theme) => {
+    '%s defines action overlays with the exported theme opacity',
+    (name, theme) => {
       const variables = toCssVariables(theme.color, 'color');
+      const opacity = name === 'dark' ? 50 : 20;
 
       expect(variables).toMatchObject({
-        '--color-action-workflow-workflow-hover': colorAlphaScales.zaffre[80],
-        '--color-action-workflow-activity-hover':
-          colorAlphaScales['dark-magenta'][80],
-        '--color-action-workflow-signal-hover': colorAlphaScales.persimmon[80],
-        '--color-action-workflow-timer-hover': colorAlphaScales.pink[80],
-        '--color-action-workflow-nexus-hover':
-          colorAlphaScales['peacock-blue'][80],
+        '--color-action-workflow-overlay': colorAlphaScales.zaffre[opacity],
+        '--color-action-activity-overlay':
+          colorAlphaScales['dark-magenta'][opacity],
+        '--color-action-signal-overlay': colorAlphaScales.persimmon[opacity],
+        '--color-action-timer-overlay': `color-mix(in srgb, ${colorScales.pink[11]} ${opacity}%, transparent)`,
+        '--color-action-nexus-overlay':
+          colorAlphaScales['peacock-blue'][opacity],
       });
     },
   );
