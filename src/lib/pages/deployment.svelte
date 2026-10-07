@@ -232,5 +232,12 @@
       : undefined}
   />
 {:catch error}
-  <Error {error} />
+  <Error
+    {error}
+    resource={translate('deployments.deployment')}
+    back={{
+      href: routeForWorkerDeployments({ namespace }),
+      label: translate('deployments.back-to-deployments'),
+    }}
+  />
 {/await}

@@ -88,6 +88,8 @@
     `${routeForStandaloneActivities({ namespace })}?${$activitiesSearchParams}`,
   );
 
+  const showError = $derived(!$activityExecution && !loading && !!error);
+
   // activityExecution.info.taskQueue is intentional here, when the poller resolves, the reference to
   // activityExecution is updated, causing the $derived to re-run and the #await block to re-trigger.
   const getPollersRequest = $derived.by(() => {
@@ -140,58 +142,62 @@
 </script>
 
 <div class="flex min-h-0 grow flex-col gap-4">
-  <div class="flex items-center gap-2">
-    <Link
-      href={activitiesHref}
-      data-testid="back-to-activities"
-      LeadingIcon={IconChevronLeft}
-    >
-      {translate('standalone-activities.back-to-activities')}
-    </Link>
-  </div>
-
-  {#if $activityExecution}
-    <ActivityExecutionHeader
-      {namespace}
-      {poller}
-      activityExecutionInfo={$activityExecution.info}
-    />
-  {:else if loading}
-    <ActivityHeaderLoading />
-  {/if}
-
-  <Tabs>
-    <TabList label={translate('standalone-activities.layout-tabs-label')}>
-      <Tab
-        label={translate('standalone-activities.layout-details-tab')}
-        id="activity-execution-details-tab"
-        href={detailsRoute}
-        active={pathMatches(page.url.pathname, detailsRoute)}
-      />
-      <Tab
-        label={translate('standalone-activities.layout-workers-tab')}
-        id="activity-execution-workers-tab"
-        href={workersRoute}
-        active={pathMatches(page.url.pathname, workersRoute)}
+  {#if !showError}
+    <div class="flex items-center gap-2">
+      <Link
+        href={activitiesHref}
+        data-testid="back-to-activities"
+        LeadingIcon={IconChevronLeft}
       >
-        {#if $activityWorkerCount !== undefined}
-          <Badge text={String($activityWorkerCount)} colorScheme="info" />
-        {/if}
-      </Tab>
-      <Tab
-        label={translate('standalone-activities.layout-search-attributes-tab')}
-        id="activity-execution-search-attributes-tab"
-        href={searchAttributesRoute}
-        active={pathMatches(page.url.pathname, searchAttributesRoute)}
+        {translate('standalone-activities.back-to-activities')}
+      </Link>
+    </div>
+
+    {#if $activityExecution}
+      <ActivityExecutionHeader
+        {namespace}
+        {poller}
+        activityExecutionInfo={$activityExecution.info}
       />
-      <Tab
-        label={translate('standalone-activities.layout-user-metadata-tab')}
-        id="activity-execution-metadata-tab"
-        href={metadataRoute}
-        active={pathMatches(page.url.pathname, metadataRoute)}
-      />
-    </TabList>
-  </Tabs>
+    {:else if loading}
+      <ActivityHeaderLoading />
+    {/if}
+
+    <Tabs>
+      <TabList label={translate('standalone-activities.layout-tabs-label')}>
+        <Tab
+          label={translate('standalone-activities.layout-details-tab')}
+          id="activity-execution-details-tab"
+          href={detailsRoute}
+          active={pathMatches(page.url.pathname, detailsRoute)}
+        />
+        <Tab
+          label={translate('standalone-activities.layout-workers-tab')}
+          id="activity-execution-workers-tab"
+          href={workersRoute}
+          active={pathMatches(page.url.pathname, workersRoute)}
+        >
+          {#if $activityWorkerCount !== undefined}
+            <Badge text={String($activityWorkerCount)} colorScheme="info" />
+          {/if}
+        </Tab>
+        <Tab
+          label={translate(
+            'standalone-activities.layout-search-attributes-tab',
+          )}
+          id="activity-execution-search-attributes-tab"
+          href={searchAttributesRoute}
+          active={pathMatches(page.url.pathname, searchAttributesRoute)}
+        />
+        <Tab
+          label={translate('standalone-activities.layout-user-metadata-tab')}
+          id="activity-execution-metadata-tab"
+          href={metadataRoute}
+          active={pathMatches(page.url.pathname, metadataRoute)}
+        />
+      </TabList>
+    </Tabs>
+  {/if}
 
   {#if $activityExecution}
     {#if getPollersRequest}
@@ -210,6 +216,15 @@
   {:else if loading}
     <ActivityDetailsLoading />
   {:else if error}
-    <ErrorComponent {error} />
+    <ErrorComponent
+      {error}
+      resource={translate('standalone-activities.activities-plural', {
+        count: 1,
+      })}
+      back={{
+        href: activitiesHref,
+        label: translate('standalone-activities.back-to-activities'),
+      }}
+    />
   {/if}
 </div>
