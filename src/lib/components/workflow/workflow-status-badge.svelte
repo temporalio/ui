@@ -8,7 +8,7 @@
     BadgeStatus,
     type BadgeStatusExtensions,
   } from '$lib/io/badge-status';
-  import { IconClock, IconExclamationOctagon, IconPause } from '$lib/io/icon';
+  import { IconClock, IconExclamationOctagon } from '$lib/io/icon';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
@@ -33,10 +33,6 @@
   const delayedText = $derived(translate('workflows.delayed'));
   const taskFailureText = $derived(translate('workflows.task-failure'));
   const extensions = $derived<BadgeStatusExtensions>([
-    status === 'Paused' && {
-      colorScheme: 'warning',
-      TrailIcon: IconPause,
-    },
     delayed && {
       colorScheme: 'warning',
       TrailIcon: IconClock,

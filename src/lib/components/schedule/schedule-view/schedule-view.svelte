@@ -13,6 +13,7 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeStatus } from '$lib/io/badge-status';
   import { IconChevronLeft, IconFilter } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import {
@@ -32,7 +33,6 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import ScheduleActionModals from '../schedule-action-modals/schedule-action-modals.svelte';
-  import ScheduleStatusBadge from '../schedule-status-badge.svelte';
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';
@@ -65,8 +65,9 @@
       class="flex flex-wrap items-center gap-2 text-3xl"
       data-testid="schedule-name"
     >
-      <ScheduleStatusBadge
+      <BadgeStatus
         status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
+        data-testid="schedule-status"
       />
       <span class="select-all">
         {scheduleId}
