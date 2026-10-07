@@ -67,12 +67,18 @@ export const getQuickFilterConditional = ({
   return getDefaultConditional(type);
 };
 
-// The quick filter asks for an operator whenever `=` is not the sensible default, so
-// the user picks rather than the table guessing.
-export const requiresOperatorChoice = (input: {
+// Status filters render as a multi-select chip rather than the operator form —
+// isTextFilter even refuses them — so a status cell applies `=` in one click and
+// every other cell asks which operator it meant.
+export const STATUS_ATTRIBUTES = new Set(['ExecutionStatus', 'WorkerStatus']);
+
+export const requiresOperatorChoice = ({
+  attribute,
+  type,
+}: {
   attribute: string;
   type: SearchAttributeType | undefined;
-}): boolean => getQuickFilterConditional(input) !== '=';
+}): boolean => Boolean(type) && !STATUS_ATTRIBUTES.has(attribute);
 
 const formatBoolValue = (value: QuickFilterValue): string | null => {
   if (typeof value === 'boolean') return String(value);

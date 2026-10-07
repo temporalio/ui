@@ -407,6 +407,23 @@ test('it should seed the popup with the value in the cell', async ({
   await expect.poll(() => getQueryParam(page.url())).toContain(MOCK_START_TIME);
 });
 
+test('it should ask for an operator on a Keyword column too', async ({
+  page,
+}) => {
+  // `=` is a sensible default for a Keyword, but it is still the cell guessing,
+  // so every column but Status offers the choice.
+  await clickQuickFilter(page, 'Type');
+
+  await expect(page.getByTestId('apply-filter-button')).toBeVisible();
+  expect(getQueryParam(page.url())).toBe('');
+
+  await page.getByTestId('apply-filter-button').click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="ImportantWorkflowType"');
+});
+
 test('it should filter a Status cell in one click, with no popup', async ({
   page,
 }) => {
@@ -535,6 +552,10 @@ test.describe('custom search attribute columns', () => {
 
     await clickQuickFilter(page, 'CustomBoolField');
 
+    // A Bool offers its own True/False toggles rather than an operator row.
+    await expect(page.getByRole('button', { name: 'True' })).toBeVisible();
+    await page.getByTestId('apply-filter-button').click();
+
     await expect
       .poll(() => getQueryParam(page.url()))
       .toBe('`CustomBoolField`=true');
@@ -544,6 +565,8 @@ test.describe('custom search attribute columns', () => {
     await addColumn(page, 'CustomIntField');
 
     await clickQuickFilter(page, 'CustomIntField');
+
+    await page.getByTestId('apply-filter-button').click();
 
     await expect
       .poll(() => getQueryParam(page.url()))

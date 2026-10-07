@@ -15,6 +15,7 @@ import {
   isQuickFilterActive,
   RANGE_PREFERRED_ATTRIBUTES,
   requiresOperatorChoice,
+  STATUS_ATTRIBUTES,
   toggleQuickFilter,
   toQuickFilterValue,
 } from './quick-filter';
@@ -463,22 +464,29 @@ describe('requiresOperatorChoice', () => {
     ['CustomDatetimeField', SEARCH_ATTRIBUTE_TYPE.DATETIME],
     ['TemporalChangeVersion', SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST],
     ['HistoryLength', SEARCH_ATTRIBUTE_TYPE.INT],
-    ['HistorySizeBytes', SEARCH_ATTRIBUTE_TYPE.INT],
-    ['StateTransitionCount', SEARCH_ATTRIBUTE_TYPE.INT],
     ['ExecutionDuration', SEARCH_ATTRIBUTE_TYPE.INT],
+    // Keyword, Text and Bool columns ask too: `=` is a sensible default but it
+    // is still only a default, and the cell should not decide for the user.
+    ['WorkflowType', SEARCH_ATTRIBUTE_TYPE.KEYWORD],
+    ['TaskQueue', SEARCH_ATTRIBUTE_TYPE.KEYWORD],
+    ['CustomTextField', SEARCH_ATTRIBUTE_TYPE.TEXT],
+    ['CustomBoolField', SEARCH_ATTRIBUTE_TYPE.BOOL],
+    ['CustomIntField', SEARCH_ATTRIBUTE_TYPE.INT],
   ])('asks for an operator for %s', (attribute, type) => {
     expect(requiresOperatorChoice({ attribute, type })).toBe(true);
   });
 
-  it.each([
-    ['ExecutionStatus', SEARCH_ATTRIBUTE_TYPE.KEYWORD],
-    ['CustomTextField', SEARCH_ATTRIBUTE_TYPE.TEXT],
-    ['CustomBoolField', SEARCH_ATTRIBUTE_TYPE.BOOL],
-    ['CustomIntField', SEARCH_ATTRIBUTE_TYPE.INT],
-    ['CustomDoubleField', SEARCH_ATTRIBUTE_TYPE.DOUBLE],
-  ])('filters %s in one click', (attribute, type) => {
-    expect(requiresOperatorChoice({ attribute, type })).toBe(false);
-  });
+  it.each([...STATUS_ATTRIBUTES])(
+    'filters %s in one click, since it has its own chip',
+    (attribute) => {
+      expect(
+        requiresOperatorChoice({
+          attribute,
+          type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        }),
+      ).toBe(false);
+    },
+  );
 
   it('does not ask for an operator when the type is unknown', () => {
     expect(
