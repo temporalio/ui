@@ -20,12 +20,16 @@ export const Strings = {
     'This Namespace received too many requests. You can try again in {{count}} second.',
   'rate-limited-description_other':
     'This Namespace received too many requests. You can try again in {{count}} seconds.',
+  'server-title': 'Something went wrong on the server',
+  'server-description':
+    "This isn't something you can fix. Try again, and if it keeps happening, share the technical details with support.",
   'unknown-title': 'Something went wrong',
   'unknown-description':
     'Try again. If it keeps happening, share the technical details with support.',
   'technical-details': 'Technical details',
   'go-back': 'Go back',
   'try-now': 'Try now',
+  'try-again': 'Try again',
   'ask-on-slack': 'Ask on Slack',
   'view-namespaces': 'View Namespaces',
 } as const;
