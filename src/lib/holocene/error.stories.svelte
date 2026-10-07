@@ -47,6 +47,14 @@
 />
 
 <Story
+  name="Rate Limited"
+  args={{
+    error: { statusCode: 429, message: 'namespace rate limit exceeded' },
+    back,
+  }}
+/>
+
+<Story
   name="Something Went Wrong"
   args={{
     error: { statusCode: 500, message: 'Internal Error' },
