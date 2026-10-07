@@ -733,12 +733,20 @@
       />
     {:else}
       {#if !showAddCustom && loading === false}
-        <ComboboxOption disabled label={noResultsText} />
+        <ComboboxOption
+          disabled
+          label={noResultsText}
+          class="!text-secondary !opacity-100"
+        />
       {/if}
     {/each}
 
     {#if loading}
-      <ComboboxOption disabled label={loadingText}>
+      <ComboboxOption
+        disabled
+        label={loadingText}
+        class="!text-secondary !opacity-100"
+      >
         {#snippet leading()}
           <IconSpinner class="animate-spin" />
         {/snippet}
