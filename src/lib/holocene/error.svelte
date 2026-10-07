@@ -53,7 +53,15 @@
     has(error, 'statusCode') ? Number(error.statusCode) : statusProp,
   );
   const kind = $derived(
-    status === 400 ? 'bad-request' : status === 404 ? 'not-found' : 'unknown',
+    status === 400
+      ? 'bad-request'
+      : status === 404
+        ? 'not-found'
+        : status === 429
+          ? 'rate-limited'
+          : status && status >= 500
+            ? 'server'
+            : 'unknown',
   );
   const copy = $derived(
     kind !== 'not-found' || !resource
@@ -67,6 +75,17 @@
   const details = $derived(
     JSON.stringify({ status, message, path, time }, null, 2),
   );
+
+  let seconds = $state(10);
+
+  $effect(() => {
+    if (kind !== 'rate-limited') return;
+    const timer = setInterval(() => {
+      seconds -= 1;
+      if (seconds <= 0) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  });
 </script>
 
 <section
@@ -83,20 +102,25 @@
     {translate(`errors.${copy}-title`, { resource })}
   </h1>
   <p class="mx-auto mt-2 max-w-xl text-lg">
-    {translate(`errors.${copy}-description`, { resource })}
+    {translate(`errors.${copy}-description`, { resource, count: seconds })}
   </p>
 
-  {#if back || kind !== 'unknown'}
-    <div class="mt-6 flex items-center justify-center gap-4 text-base">
-      {#if kind === 'not-found' && namespaced}
-        <Link href={routeForNamespaces()}>
-          {translate('errors.view-namespaces')}
-        </Link>
-      {:else if kind === 'bad-request'}
-        <Link newTab href="https://temporal.io/slack">
-          {translate('errors.ask-on-slack')}
-        </Link>
-      {/if}
+  <div class="mt-6 flex items-center justify-center gap-4 text-base">
+    {#if kind !== 'bad-request' && kind !== 'not-found'}
+      <Link href={back?.href ?? routeForNamespaces()}>
+        {back?.label ?? translate('errors.view-namespaces')}
+      </Link>
+    {/if}
+    {#if kind === 'not-found' && namespaced}
+      <Link href={routeForNamespaces()}>
+        {translate('errors.view-namespaces')}
+      </Link>
+    {:else if kind !== 'not-found' && kind !== 'rate-limited'}
+      <Link newTab href="https://temporal.io/slack">
+        {translate('errors.ask-on-slack')}
+      </Link>
+    {/if}
+    {#if kind === 'bad-request' || kind === 'not-found'}
       {#if back}
         <Button href={back.href}>
           {back.label}
@@ -106,19 +130,14 @@
           {translate('errors.go-back')}
         </Button>
       {/if}
-    </div>
-  {/if}
-  {#if kind === 'unknown'}
-    <p class="mt-4 text-lg">
-      <button class="underline hover:text-brand" tabindex={0} onclick={reset}
-        >Try a refresh</button
-      >
-      or
-      <Link newTab href="https://temporal.io/slack"
-        >jump on our Slack Channel</Link
-      >.
-    </p>
-  {/if}
+    {:else}
+      <Button onclick={reset}>
+        {translate(
+          kind === 'rate-limited' ? 'errors.try-now' : 'errors.try-again',
+        )}
+      </Button>
+    {/if}
+  </div>
 
   <div class="mx-auto mt-8 max-w-xl text-left">
     <h2 class="mb-2 text-sm font-medium text-secondary">
