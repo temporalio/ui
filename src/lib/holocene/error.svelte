@@ -4,10 +4,10 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import BlackholeText from '$lib/holocene/blackhole-text.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import ScatterText from '$lib/holocene/scatter-text.svelte';
   import Starfield from '$lib/holocene/starfield.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NetworkError } from '$lib/types/global';
@@ -74,7 +74,7 @@
 >
   <Starfield class="absolute inset-0 -z-10 size-full text-secondary" />
   {#if status}
-    <ScatterText
+    <BlackholeText
       text={String(status)}
       class="mx-auto mb-6 h-40 w-full max-w-md text-brand"
     />
