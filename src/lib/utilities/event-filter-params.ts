@@ -10,6 +10,7 @@ export const SHARED_FILTER_PARAMS = [
   'category',
   'status',
   'refresh_off',
+  'groups',
 ] as const;
 
 export function getSharedFilterParams(url: URL): Record<string, string> {
@@ -27,9 +28,28 @@ export function sharedFilterParamsToString(
   return new URLSearchParams(params).toString();
 }
 
+const eventGroupSeparator = ',';
+
+const decodeEventGroupKey = (key: string): string => {
+  try {
+    return decodeURIComponent(key);
+  } catch {
+    return key;
+  }
+};
+
+const parseEventGroups = (value: string | null): string[] =>
+  value
+    ? value.split(eventGroupSeparator).filter(Boolean).map(decodeEventGroupKey)
+    : [];
+
+const serializeEventGroups = (keys: string[]): string =>
+  keys.map((key) => encodeURIComponent(key)).join(eventGroupSeparator);
+
 export function parseEventFilterParams(url: URL) {
   const categoryParam = url.searchParams.get('category');
   return {
+    eventGroups: parseEventGroups(url.searchParams.get('groups')),
     sort: (url.searchParams.get('sort') as EventSortOrder) || 'descending',
     categories: categoryParam
       ? (categoryParam.split(',') as EventTypeCategory[])
@@ -44,6 +64,7 @@ type FilterUpdate = {
   categories?: EventTypeCategory[] | null;
   statusFilter?: boolean;
   refresh_off?: boolean;
+  eventGroups?: string[] | null;
 };
 
 export function updateEventFilterParams(
@@ -81,6 +102,15 @@ export function updateEventFilterParams(
     parameters.push({
       parameter: 'refresh_off',
       value: filters.refresh_off ? 'true' : undefined,
+    });
+  }
+
+  if (filters.eventGroups !== undefined) {
+    parameters.push({
+      parameter: 'groups',
+      value: filters.eventGroups?.length
+        ? serializeEventGroups(filters.eventGroups)
+        : undefined,
     });
   }
 

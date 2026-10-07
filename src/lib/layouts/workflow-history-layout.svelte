@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -81,12 +82,20 @@
     historyCtx.resume();
   });
 
+  const selectedEventGroups = $derived(
+    parseEventFilterParams(page.url).eventGroups,
+  );
+  const eventGroupMatcher = $derived(
+    eventBuffer.eventGroupMatcher(selectedEventGroups),
+  );
+
   const filteredLazyGroups = $derived.by(() => {
     const active = $eventTypeFilter;
     const cats = $eventCategoryFilter;
     return bufferLazyGroups.filter((g) => {
       if (!active.includes(g.category)) return false;
       if (cats && cats.length && !cats.includes(g.category)) return false;
+      if (eventGroupMatcher && !eventGroupMatcher.hasGroup(g.id)) return false;
       return true;
     });
   });
@@ -98,6 +107,7 @@
       const cat = (ev as WorkflowEvent).category;
       if (!active.includes(cat)) return false;
       if (cats && cats.length && !cats.includes(cat)) return false;
+      if (eventGroupMatcher && !eventGroupMatcher.hasEvent(ev)) return false;
       return true;
     });
   });
@@ -241,6 +251,7 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
+        <EventGroupFilter options={eventBuffer.eventGroupOptions} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"

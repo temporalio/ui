@@ -4,7 +4,11 @@ import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { WorkflowEvent } from '$lib/types/events';
 
 import {
+  type EventGroupMatcher,
+  type EventGroupOption,
   getEventArray,
+  getEventGroupMatcher,
+  getEventGroupOptions,
   getGroupArray,
   getLazyGroups,
   getPendingActivityScheduledEvent,
@@ -96,6 +100,21 @@ class EventBufferView {
     void this._version;
     return getGroupArray({ excludeWorkflowTasks: true });
   });
+
+  /** Every event group in the run, in order of first appearance. */
+  readonly eventGroupOptions: EventGroupOption[] = $derived.by(() => {
+    void this._version;
+    return getEventGroupOptions();
+  });
+
+  /**
+   * Matcher for the selected event group keys, re-derived as events arrive.
+   * Undefined when none of the keys exist in this run.
+   */
+  eventGroupMatcher(keys: readonly string[]): EventGroupMatcher | undefined {
+    void this._version;
+    return getEventGroupMatcher(keys);
+  }
 
   readonly events: WorkflowEvent[] = $derived.by(() => {
     void this._version;

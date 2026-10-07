@@ -99,6 +99,8 @@ export const Strings = {
   'event-types': 'Event Types',
   'decode-failed': 'Decoding failed',
   'event-groups': 'Event Groups',
+  'event-group-filter-more-results':
+    'Showing {{shown, number}} of {{total, number}} Event Groups. Refine your search to see more.',
   'view-raw-history': 'View Raw History',
   'empty-search-attributes': 'No Search Attributes Found',
   'empty-memo-attributes': 'No Memo Attributes Found',
