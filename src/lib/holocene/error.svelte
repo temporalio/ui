@@ -7,9 +7,9 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import ScatterText from '$lib/holocene/scatter-text.svelte';
   import Starfield from '$lib/holocene/starfield.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconArrowLeft } from '$lib/io/icon';
   import type { NetworkError } from '$lib/types/global';
   import { has } from '$lib/utilities/has';
   import { routeForNamespaces } from '$lib/utilities/route-for';
@@ -90,6 +90,12 @@
   class="relative isolate min-h-dvh overflow-hidden bg-background-primary px-4 pt-32 text-center"
 >
   <Starfield class="absolute inset-0 -z-10 size-full text-secondary" />
+  {#if status}
+    <ScatterText
+      text={String(status)}
+      class="mx-auto mb-6 h-40 w-full max-w-md text-brand"
+    />
+  {/if}
   <h1 class="text-3xl font-semibold">
     {translate(`errors.${copy}-title`, { resource })}
   </h1>
@@ -98,29 +104,31 @@
   </p>
 
   {#if back || kind !== 'unknown'}
-    <div class="mt-6 flex items-center justify-center gap-4">
+    <div class="mt-6 flex items-center justify-center gap-4 text-base">
       {#if kind === 'rate-limited'}
-        <Button onclick={reset}>{translate('errors.try-now')}</Button>
         {#if back}
           <Link href={back.href}>{back.label}</Link>
         {/if}
-      {:else if back}
-        <Button LeadingIcon={IconArrowLeft} href={back.href}>
-          {back.label}
-        </Button>
+        <Button onclick={reset}>{translate('errors.try-now')}</Button>
       {:else}
-        <Button LeadingIcon={IconArrowLeft} onclick={goBack}>
-          {translate('errors.go-back')}
-        </Button>
-      {/if}
-      {#if kind === 'not-found' && namespaced}
-        <Link href={routeForNamespaces()}>
-          {translate('errors.view-namespaces')}
-        </Link>
-      {:else if kind === 'bad-request'}
-        <Link newTab href="https://temporal.io/slack">
-          {translate('errors.ask-on-slack')}
-        </Link>
+        {#if kind === 'not-found' && namespaced}
+          <Link href={routeForNamespaces()}>
+            {translate('errors.view-namespaces')}
+          </Link>
+        {:else if kind === 'bad-request'}
+          <Link newTab href="https://temporal.io/slack">
+            {translate('errors.ask-on-slack')}
+          </Link>
+        {/if}
+        {#if back}
+          <Button href={back.href}>
+            {back.label}
+          </Button>
+        {:else}
+          <Button onclick={goBack}>
+            {translate('errors.go-back')}
+          </Button>
+        {/if}
       {/if}
     </div>
   {/if}
