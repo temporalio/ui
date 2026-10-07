@@ -1,66 +1,39 @@
 import { describe, expect, it } from 'vitest';
 
 import type { WorkflowRunWithWorkers } from '$lib/stores/workflow-run';
-import type { PollerInfo, TaskQueueResponse } from '$lib/types';
+import type { TaskQueueResponse } from '$lib/types';
 import type { WorkflowExecution } from '$lib/types/workflows';
 
 import {
-  ACTIVE_POLLER_WINDOW_MS,
-  countActivePollers,
+  countPollers,
   getWorkerAvailability,
-  hasActivePollers,
-  isActivePoller,
+  hasPollers,
   isRunningWithNoWorkers,
   needsServerlessCheck,
   workflowRunAvailabilityInput,
 } from './worker-availability';
 
-const NOW = Date.parse('2026-10-07T12:00:00Z');
+const polling: TaskQueueResponse = {
+  pollers: [{ identity: 'worker', lastAccessTime: '2020-01-01T00:00:00Z' }],
+};
+const empty: TaskQueueResponse = { pollers: [] };
+const deployed: TaskQueueResponse = {
+  pollers: [],
+  versioningInfo: {
+    currentDeploymentVersion: { deploymentName: 'orders', buildId: 'v1' },
+  },
+};
 
-const poller = (msAgo?: number): PollerInfo => ({
-  identity: `worker-${msAgo}`,
-  lastAccessTime:
-    msAgo === undefined ? undefined : new Date(NOW - msAgo).toISOString(),
-});
-
-const queue = (...pollers: PollerInfo[]): TaskQueueResponse => ({
-  pollers,
-});
-
-const fresh = queue(poller(5_000));
-const stale = queue(poller(ACTIVE_POLLER_WINDOW_MS + 1));
-const empty = queue();
-
-describe('isActivePoller', () => {
-  it('counts a poller seen inside the window', () => {
-    expect(isActivePoller(poller(ACTIVE_POLLER_WINDOW_MS), NOW)).toBe(true);
+describe('countPollers / hasPollers', () => {
+  it('counts every poller the server lists, however long since it polled', () => {
+    expect(countPollers(polling)).toBe(1);
+    expect(hasPollers(polling)).toBe(true);
   });
 
-  it('drops a poller last seen outside the window', () => {
-    expect(isActivePoller(poller(ACTIVE_POLLER_WINDOW_MS + 1), NOW)).toBe(
-      false,
-    );
-  });
-
-  it('counts a poller with no access time', () => {
-    expect(isActivePoller(poller(), NOW)).toBe(true);
-  });
-
-  it('counts a poller with an unreadable access time', () => {
-    expect(isActivePoller({ lastAccessTime: 'not a time' }, NOW)).toBe(true);
-  });
-});
-
-describe('countActivePollers / hasActivePollers', () => {
-  it('ignores stale pollers', () => {
-    const workers = queue(poller(1_000), poller(ACTIVE_POLLER_WINDOW_MS * 2));
-    expect(countActivePollers(workers, NOW)).toBe(1);
-    expect(hasActivePollers(stale, NOW)).toBe(false);
-  });
-
-  it('treats missing workers as none', () => {
-    expect(countActivePollers(undefined, NOW)).toBe(0);
-    expect(hasActivePollers({}, NOW)).toBe(false);
+  it('treats an empty or missing list as none', () => {
+    expect(countPollers(empty)).toBe(0);
+    expect(countPollers(undefined)).toBe(0);
+    expect(hasPollers({})).toBe(false);
   });
 });
 
@@ -70,7 +43,6 @@ describe('getWorkerAvailability', () => {
     workers: empty,
     deployment: undefined,
     serverless: undefined,
-    now: NOW,
   };
 
   it('is not-waiting when nothing needs a worker', () => {
@@ -85,11 +57,11 @@ describe('getWorkerAvailability', () => {
     );
   });
 
-  it('is polling when an active worker is present, even for serverless', () => {
+  it('is polling when the server lists a poller, even for serverless', () => {
     expect(
       getWorkerAvailability({
         ...base,
-        workers: fresh,
+        workers: polling,
         deployment: 'orders',
         serverless: true,
       }).state,
@@ -98,12 +70,6 @@ describe('getWorkerAvailability', () => {
 
   it('is no-workers when no deployment serves the queue', () => {
     expect(getWorkerAvailability(base).state).toBe('no-workers');
-  });
-
-  it('is no-workers when only stale pollers remain', () => {
-    expect(getWorkerAvailability({ ...base, workers: stale }).state).toBe(
-      'no-workers',
-    );
   });
 
   it('holds at checking-deployment until the compute config resolves', () => {
@@ -138,27 +104,23 @@ describe('needsServerlessCheck', () => {
   const base = { waiting: true, workers: empty, deployment: 'orders' };
 
   it('checks only an empty queue with a deployment', () => {
-    expect(needsServerlessCheck({ ...base, now: NOW })).toBe(true);
-    expect(needsServerlessCheck({ ...base, workers: fresh, now: NOW })).toBe(
+    expect(needsServerlessCheck(base)).toBe(true);
+    expect(needsServerlessCheck({ ...base, workers: polling })).toBe(false);
+    expect(needsServerlessCheck({ ...base, deployment: undefined })).toBe(
       false,
     );
-    expect(
-      needsServerlessCheck({ ...base, deployment: undefined, now: NOW }),
-    ).toBe(false);
-    expect(needsServerlessCheck({ ...base, waiting: false, now: NOW })).toBe(
-      false,
-    );
+    expect(needsServerlessCheck({ ...base, waiting: false })).toBe(false);
   });
 });
 
-describe('workflowRunAvailabilityInput', () => {
-  const run = (
-    workflow: Partial<WorkflowExecution>,
-    workers: TaskQueueResponse,
-    workersLoaded = true,
-  ): WorkflowRunWithWorkers =>
-    ({ workflow, workers, workersLoaded }) as WorkflowRunWithWorkers;
+const run = (
+  workflow: Partial<WorkflowExecution>,
+  workers: TaskQueueResponse,
+  workersLoaded = true,
+): WorkflowRunWithWorkers =>
+  ({ workflow, workers, workersLoaded }) as WorkflowRunWithWorkers;
 
+describe('workflowRunAvailabilityInput', () => {
   it('waits for running and paused workflows', () => {
     expect(
       workflowRunAvailabilityInput(run({ isRunning: true }, empty)).waiting,
@@ -177,37 +139,37 @@ describe('workflowRunAvailabilityInput', () => {
   });
 
   it('resolves the deployment from the task queue', () => {
-    const workers: TaskQueueResponse = {
-      pollers: [],
-      versioningInfo: {
-        currentDeploymentVersion: { deploymentName: 'orders', buildId: 'v1' },
-      },
-    };
     expect(
-      workflowRunAvailabilityInput(run({ isRunning: true }, workers))
+      workflowRunAvailabilityInput(run({ isRunning: true }, deployed))
         .deployment,
     ).toBe('orders');
   });
 });
 
 describe('isRunningWithNoWorkers', () => {
-  const run = (workers: TaskQueueResponse, workersLoaded = true) =>
-    ({
-      workflow: { isRunning: true },
-      workers,
-      workersLoaded,
-    }) as WorkflowRunWithWorkers;
-
   it('is true for an empty, loaded queue', () => {
-    expect(isRunningWithNoWorkers(run(empty))).toBe(true);
+    expect(isRunningWithNoWorkers(run({ isRunning: true }, empty))).toBe(true);
+  });
+
+  it('is true for an empty queue with a deployment, whatever its compute', () => {
+    expect(isRunningWithNoWorkers(run({ isRunning: true }, deployed))).toBe(
+      true,
+    );
   });
 
   it('is false before pollers load', () => {
-    expect(isRunningWithNoWorkers(run(empty, false))).toBe(false);
+    expect(isRunningWithNoWorkers(run({ isRunning: true }, empty, false))).toBe(
+      false,
+    );
   });
 
-  it('is false with a live poller', () => {
-    const live = { lastAccessTime: new Date().toISOString() };
-    expect(isRunningWithNoWorkers(run(queue(live)))).toBe(false);
+  it('is false with a listed poller', () => {
+    expect(isRunningWithNoWorkers(run({ isRunning: true }, polling))).toBe(
+      false,
+    );
+  });
+
+  it('is false for a completed workflow', () => {
+    expect(isRunningWithNoWorkers(run({}, empty))).toBe(false);
   });
 });

@@ -295,28 +295,21 @@ describe('createApiWorkbenchHost', () => {
     );
   });
 
-  it('only counts pollers seen in the last two minutes as ready', async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-10-01T12:00:00Z'));
-    const stopped = {
-      identity: 'stopped',
-      lastAccessTime: '2026-10-01T11:57:59Z',
-    };
-    const running = {
-      identity: 'running',
-      lastAccessTime: '2026-10-01T11:59:10Z',
+  it('counts any poller the server lists as ready, however long since it polled', async () => {
+    const busy = {
+      identity: 'busy',
+      lastAccessTime: '2020-01-01T00:00:00Z',
     };
     const request = vi
       .fn()
-      .mockResolvedValueOnce(jsonResponse({ pollers: [stopped] }))
-      .mockResolvedValueOnce(jsonResponse({ pollers: [stopped, running] }));
+      .mockResolvedValueOnce(jsonResponse({ pollers: [busy] }))
+      .mockResolvedValueOnce(jsonResponse({ pollers: [] }));
     const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
 
+    expect((await host.checkReadiness(descriptor.id))[0].state).toBe('ready');
     expect((await host.checkReadiness(descriptor.id))[0].state).toBe(
       'unavailable',
     );
-    expect((await host.checkReadiness(descriptor.id))[0].state).toBe('ready');
-    vi.useRealTimers();
   });
 
   it('checks activity readiness with task queue type 2', async () => {

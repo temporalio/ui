@@ -6,7 +6,7 @@ import {
   type WorkerAvailabilityInput,
 } from '$lib/utilities/worker-availability';
 
-type Input = Omit<WorkerAvailabilityInput, 'serverless' | 'now'> & {
+type Input = Omit<WorkerAvailabilityInput, 'serverless'> & {
   namespace: string;
 };
 
@@ -19,7 +19,7 @@ type ServerlessCheck = {
 /**
  * Resolves whether an empty task queue belongs to a serverless deployment,
  * fetching the deployment only when no worker is polling. A failed lookup
- * falls back to the self-managed message.
+ * falls back to the self-managed message; a cancelled one is ignored.
  */
 export const getWorkerAvailabilityState = (
   input: () => Input,
@@ -39,15 +39,11 @@ export const getWorkerAvailabilityState = (
     if (!namespace || !deployment) return;
 
     const controller = new AbortController();
-    isServerlessDeployment(
-      namespace,
-      deployment,
-      fetch,
-      controller.signal,
-    ).then((serverless) => {
-      if (controller.signal.aborted) return;
-      check = { namespace, deployment, serverless };
-    });
+    isServerlessDeployment(namespace, deployment, fetch, controller.signal)
+      .then((serverless) => {
+        check = { namespace, deployment, serverless };
+      })
+      .catch(() => {});
 
     return () => controller.abort();
   });

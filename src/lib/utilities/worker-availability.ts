@@ -1,47 +1,21 @@
 import type { WorkflowRunWithWorkers } from '$lib/stores/workflow-run';
-import type { PollerInfo, TaskQueueResponse } from '$lib/types';
+import type { TaskQueueResponse } from '$lib/types';
 
-import { validTimeToDate } from './format-time';
 import { getWorkerDeploymentName } from './get-worker-deployment-name';
 
-// DescribeTaskQueue keeps a poller listed for several minutes after it last
-// polled. A live worker re-polls at least once per long-poll timeout (~1
-// minute), so anything older than this has stopped.
-export const ACTIVE_POLLER_WINDOW_MS = 2 * 60 * 1000;
+// DescribeTaskQueue lists a poller until it has been silent for the server's
+// matching.PollerHistoryTTL (5 minutes by default). Deferring to that list
+// keeps a worker whose task slots are all busy, and so has paused polling,
+// from being reported as gone.
+export const countPollers = (workers: TaskQueueResponse | undefined): number =>
+  workers?.pollers?.length ?? 0;
 
-const lastAccessMs = (poller: PollerInfo): number | undefined => {
-  if (!poller.lastAccessTime) return undefined;
-  try {
-    return validTimeToDate(poller.lastAccessTime).getTime();
-  } catch {
-    return undefined;
-  }
-};
-
-// A poller without a readable access time counts as active: reporting "no
-// workers" when one may be running is the worse mistake.
-export const isActivePoller = (
-  poller: PollerInfo,
-  now: number = Date.now(),
-): boolean => {
-  const accessed = lastAccessMs(poller);
-  return accessed === undefined || now - accessed <= ACTIVE_POLLER_WINDOW_MS;
-};
-
-export const countActivePollers = (
-  workers: TaskQueueResponse | undefined,
-  now: number = Date.now(),
-): number =>
-  workers?.pollers?.filter((poller) => isActivePoller(poller, now)).length ?? 0;
-
-export const hasActivePollers = (
-  workers: TaskQueueResponse | undefined,
-  now: number = Date.now(),
-): boolean => countActivePollers(workers, now) > 0;
+export const hasPollers = (workers: TaskQueueResponse | undefined): boolean =>
+  countPollers(workers) > 0;
 
 /**
  * - `not-waiting`: nothing is waiting on a worker, or pollers have not loaded.
- * - `polling`: an active worker is polling the task queue.
+ * - `polling`: the server lists at least one poller on the task queue.
  * - `checking-deployment`: no pollers, and the deployment's compute config is
  *   still being fetched. Render nothing so the wrong message never flashes.
  * - `serverless-idle`: Temporal invokes the workers for this deployment and it
@@ -60,7 +34,6 @@ export type WorkerAvailabilityInput = {
   workers: TaskQueueResponse | undefined;
   deployment: string | undefined;
   serverless: boolean | undefined;
-  now?: number;
 };
 
 export const getWorkerAvailability = ({
@@ -68,10 +41,9 @@ export const getWorkerAvailability = ({
   workers,
   deployment,
   serverless,
-  now = Date.now(),
 }: WorkerAvailabilityInput): WorkerAvailability => {
   if (!waiting || !workers) return { state: 'not-waiting' };
-  if (hasActivePollers(workers, now)) return { state: 'polling' };
+  if (hasPollers(workers)) return { state: 'polling' };
   if (!deployment) return { state: 'no-workers' };
   if (serverless === undefined) {
     return { state: 'checking-deployment', deployment };
@@ -93,8 +65,11 @@ export const workflowRunAvailabilityInput = ({
 export const isRunningWithNoWorkers = (
   workflowRun: WorkflowRunWithWorkers,
 ): boolean => {
-  const { waiting, workers } = workflowRunAvailabilityInput(workflowRun);
-  return waiting && Boolean(workers) && !hasActivePollers(workers);
+  const { state } = getWorkerAvailability({
+    ...workflowRunAvailabilityInput(workflowRun),
+    serverless: undefined,
+  });
+  return state === 'no-workers' || state === 'checking-deployment';
 };
 
 export const needsServerlessCheck = (

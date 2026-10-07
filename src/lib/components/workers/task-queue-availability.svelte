@@ -10,21 +10,15 @@
     routeForTaskQueue,
     routeForWorkerDeployment,
   } from '$lib/utilities/route-for';
-  import { countActivePollers } from '$lib/utilities/worker-availability';
+  import { countPollers } from '$lib/utilities/worker-availability';
 
   interface Props {
     namespace: string;
     taskQueue: string;
     workers: TaskQueueResponse | undefined;
-    showTaskQueueLink?: boolean;
   }
 
-  let {
-    namespace,
-    taskQueue,
-    workers,
-    showTaskQueueLink = true,
-  }: Props = $props();
+  let { namespace, taskQueue, workers }: Props = $props();
 
   const availability = getWorkerAvailabilityState(() => ({
     namespace,
@@ -33,15 +27,13 @@
     deployment: getWorkerDeploymentName(workers, null),
   }));
 
-  const workerCount = $derived(countActivePollers(workers));
+  const workerCount = $derived(countPollers(workers));
 </script>
 
 {#snippet taskQueueLink()}
-  {#if showTaskQueueLink}
-    <Link href={routeForTaskQueue({ namespace, queue: taskQueue })} newTab>
-      {translate('workers.view-task-queue')}
-    </Link>
-  {/if}
+  <Link href={routeForTaskQueue({ namespace, queue: taskQueue })} newTab>
+    {translate('workers.view-task-queue')}
+  </Link>
 {/snippet}
 
 {#if availability.current.state === 'polling'}

@@ -13,7 +13,6 @@
   $effect(() => {
     const namespace = targetNamespace;
     const queue = targetTaskQueue;
-    workers = undefined;
     if (!namespace || !queue) return;
 
     let current = true;
@@ -21,7 +20,9 @@
       .then((response) => {
         if (current) workers = response;
       })
-      .catch(() => {});
+      .catch(() => {
+        if (current) workers = undefined;
+      });
 
     return () => {
       current = false;
@@ -34,6 +35,5 @@
     namespace={targetNamespace}
     taskQueue={targetTaskQueue}
     {workers}
-    showTaskQueueLink={false}
   />
 {/if}

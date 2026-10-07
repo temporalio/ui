@@ -18,7 +18,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
   import {
-    hasActivePollers,
+    hasPollers,
     workflowRunAvailabilityInput,
   } from '$lib/utilities/worker-availability';
 
@@ -57,7 +57,7 @@
 </script>
 
 <section>
-  {#if workflow?.isRunning && hasActivePollers(workers)}
+  {#if workflow?.isRunning && hasPollers(workers)}
     {#await stackTrace}
       <div class="flex flex-col gap-2">
         <Skeleton class="h-16 w-1/3 rounded-sm" />
