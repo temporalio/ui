@@ -48,6 +48,7 @@
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForApi } from '$lib/utilities/route-for-api';
   import { shouldRefetchWorkflowRun } from '$lib/utilities/should-refetch-workflow-run';
+  import { hasActivePollers } from '$lib/utilities/worker-availability';
 
   interface Props {
     children: Snippet;
@@ -214,7 +215,7 @@
       });
     }
 
-    if (workflow.isRunning && workers?.pollers?.length) {
+    if (workflow.isRunning && hasActivePollers(workers)) {
       getWorkflowMetadata(
         { namespace: ns, workflow: { id: wfId, runId: rId } },
         workflowRunController.signal,

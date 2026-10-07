@@ -236,6 +236,10 @@ export const Strings = {
   'call-stack-link-preface': 'To enable ',
   'call-stack-link': 'call stacks',
   'call-stack-link-postface': ', run a Worker on the {{taskQueue}} Task Queue.',
+  'call-stack-serverless-idle':
+    'Call stacks are available while a Worker is running. The serverless Worker Deployment {{deployment}} has scaled to zero and will start Workers when there are tasks to process.',
+  'query-serverless-idle':
+    'Queries need a running Worker. The serverless Worker Deployment {{deployment}} has scaled to zero and will start Workers when there are tasks to process.',
   'json-formatting': 'JSON Formatting',
   'query-type': 'Query Type',
   'query-arg': 'Query Arg',

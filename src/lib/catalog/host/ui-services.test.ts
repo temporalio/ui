@@ -331,6 +331,74 @@ describe('createApiWorkbenchHost', () => {
     expect(request.mock.calls[0][0]).toMatch(/\?taskQueueType=2$/);
   });
 
+  it('treats an idle serverless deployment as ready', async () => {
+    const version = { deploymentName: 'catalog-serverless', buildId: 'v1' };
+    const request = vi.fn().mockImplementation(async (url: string) => {
+      if (url.includes('/task-queues/')) {
+        return jsonResponse({
+          pollers: [],
+          versioningInfo: { currentDeploymentVersion: version },
+        });
+      }
+      return jsonResponse({
+        workerDeploymentInfo: {
+          name: 'catalog-serverless',
+          routingConfig: { currentDeploymentVersion: version },
+          versionSummaries: [
+            {
+              deploymentVersion: version,
+              computeConfig: {
+                scalingGroups: { default: { providerType: 'aws-lambda' } },
+              },
+            },
+          ],
+        },
+      });
+    });
+    const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
+
+    await expect(host.checkReadiness(descriptor.id)).resolves.toEqual([
+      {
+        kind: 'worker',
+        required: false,
+        state: 'ready',
+        taskQueueType: 1,
+        serverlessDeployment: 'catalog-serverless',
+      },
+    ]);
+    expect(request.mock.calls[1][0]).toContain(
+      '/worker-deployments/catalog-serverless',
+    );
+  });
+
+  it('reports a self-managed deployment with no pollers as unavailable', async () => {
+    const request = vi.fn().mockImplementation(async (url: string) => {
+      if (url.includes('/task-queues/')) {
+        return jsonResponse({
+          pollers: [],
+          versioningInfo: {
+            currentDeploymentVersion: {
+              deploymentName: 'catalog-self-managed',
+              buildId: 'v1',
+            },
+          },
+        });
+      }
+      return jsonResponse({
+        workerDeploymentInfo: {
+          name: 'catalog-self-managed',
+          routingConfig: {},
+          versionSummaries: [],
+        },
+      });
+    });
+    const host = createApiWorkbenchHost({ descriptors: [descriptor], request });
+
+    expect((await host.checkReadiness(descriptor.id))[0].state).toBe(
+      'unavailable',
+    );
+  });
+
   it('checks Nexus readiness with task queue type 3 and the exact endpoint', async () => {
     const request = vi.fn().mockImplementation(async (url: string) => {
       if (url.includes('/task-queues/')) {

@@ -9,7 +9,7 @@
 
   import { page } from '$app/state';
 
-  import Alert from '$lib/holocene/alert.svelte';
+  import TaskQueueAvailability from '$lib/components/workers/task-queue-availability.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput, {
@@ -20,7 +20,6 @@
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
@@ -42,15 +41,13 @@
     type SearchAttributesSchema,
   } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
+  import type { TaskQueueResponse } from '$lib/types';
   import {
     activityIDConflictPolicyOptions,
     activityIDReusePolicyOptions,
   } from '$lib/types/activity-execution';
   import { getIdentity } from '$lib/utilities/core-context';
-  import {
-    routeForStandaloneActivityDetails,
-    routeForTaskQueue,
-  } from '$lib/utilities/route-for';
+  import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
   import type { StandaloneActivityFormDefaults } from './types';
@@ -83,7 +80,10 @@
   const encoding = writable<PayloadInputEncoding>('json/plain');
 
   let searchAttributes = $state<SearchAttributesSchema>([]);
-  let taskQueueActive = $state<boolean | null>(null);
+  let checkedTaskQueue = $state<{
+    queue: string;
+    workers: TaskQueueResponse;
+  }>();
   let advancedOptionsVisible = $state(false);
 
   const isPositiveDuration = (value: string | undefined): boolean => {
@@ -241,13 +241,11 @@
 
   const checkTaskQueue = async (queue: string) => {
     if (!queue) return;
-    taskQueueActive = null;
-    const response = await getActivityPollers({ namespace, queue });
-    if (response.pollers && response.pollers.length > 0) {
-      taskQueueActive = true;
-    } else {
-      taskQueueActive = false;
-    }
+    checkedTaskQueue = undefined;
+    checkedTaskQueue = {
+      queue,
+      workers: await getActivityPollers({ namespace, queue }),
+    };
   };
 </script>
 
@@ -277,22 +275,12 @@
     hintText={$errors.taskQueue?.[0]}
     onblur={() => checkTaskQueue($form.taskQueue)}
   />
-  {#if taskQueueActive !== null}
-    <Alert
-      intent={taskQueueActive ? 'success' : 'error'}
-      title={taskQueueActive
-        ? 'Task Queue is active'
-        : 'Task Queue is inactive'}
-    >
-      <div class="flex w-full items-center justify-between">
-        <Link
-          href={routeForTaskQueue({ namespace, queue: $form.taskQueue })}
-          newTab
-        >
-          View Task Queue
-        </Link>
-      </div>
-    </Alert>
+  {#if checkedTaskQueue}
+    <TaskQueueAvailability
+      {namespace}
+      taskQueue={checkedTaskQueue.queue}
+      workers={checkedTaskQueue.workers}
+    />
   {/if}
   <Input
     id="activityType"

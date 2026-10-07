@@ -8,7 +8,7 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
-  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
+  import { isRunningWithNoWorkers } from '$lib/utilities/worker-availability';
 
   import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-warning.svelte';
   import WorkersQueryEmptyState from './workers-query-empty-state.svelte';

@@ -12,13 +12,22 @@
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconRetry } from '$lib/io/icon';
+  import { getWorkerAvailabilityState } from '$lib/runes/worker-availability.svelte';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
+  import {
+    hasActivePollers,
+    workflowRunAvailabilityInput,
+  } from '$lib/utilities/worker-availability';
 
   let { workflow, workers } = $derived($workflowRun);
   const namespace = $derived(page.params.namespace);
+  const availability = getWorkerAvailabilityState(() => ({
+    namespace: namespace ?? '',
+    ...workflowRunAvailabilityInput($workflowRun),
+  }));
   let stackTrace: Eventual<ParsedQuery> = $state();
 
   let refreshDate = $state<string>();
@@ -48,7 +57,7 @@
 </script>
 
 <section>
-  {#if workflow?.isRunning && (workers?.pollers?.length ?? 0) > 0}
+  {#if workflow?.isRunning && hasActivePollers(workers)}
     {#await stackTrace}
       <div class="flex flex-col gap-2">
         <Skeleton class="h-16 w-1/3 rounded-sm" />
@@ -104,7 +113,13 @@
       title={translate('workflows.call-stack-empty-state')}
       testId="query-call-stack-empty"
     >
-      {#if workflow?.isRunning && workers?.pollers?.length === 0}
+      {#if workflow?.isRunning && availability.current.state === 'serverless-idle'}
+        <p>
+          {translate('workflows.call-stack-serverless-idle', {
+            deployment: availability.current.deployment,
+          })}
+        </p>
+      {:else if workflow?.isRunning && availability.current.state === 'no-workers'}
         <p>
           {translate('workflows.call-stack-link-preface')}<Link
             newTab
