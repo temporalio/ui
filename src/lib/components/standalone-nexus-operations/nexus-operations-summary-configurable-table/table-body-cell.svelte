@@ -3,8 +3,13 @@
 
   import { page } from '$app/state';
 
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
+  import {
+    customSearchAttributes,
+    isFilterableCustomSearchAttribute,
+  } from '$lib/stores/search-attributes';
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
@@ -51,9 +56,20 @@
     'Service',
     'Operation',
   ];
+
+  const customSearchAttributeValue = $derived(
+    operation.searchAttributes?.indexedFields?.[label],
+  );
+  const isCustomKeywordOrTextAttribute = $derived(
+    isFilterableCustomSearchAttribute(
+      $customSearchAttributes,
+      label,
+      customSearchAttributeValue,
+    ),
+  );
 </script>
 
-{#if filterableLabels.includes(label)}
+{#if filterableLabels.includes(label) || isCustomKeywordOrTextAttribute}
   <td
     class={twMerge('relative h-8 whitespace-nowrap pr-24', clampToWidth)}
     style={widthStyle}
@@ -105,6 +121,13 @@
         attribute="Operation"
         value={operation.operation ?? ''}
       />
+    {:else if isCustomKeywordOrTextAttribute}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute={label}
+        value={customSearchAttributeValue ?? ''}
+        type={$customSearchAttributes[label]}
+      />
     {/if}
   </td>
 {:else}
@@ -129,6 +152,11 @@
       {/if}
     {:else if label === 'State Transitions'}
       {operation.stateTransitionCount ?? ''}
+    {:else if label in $customSearchAttributes && customSearchAttributeValue !== undefined}
+      <SearchAttributeValue
+        value={customSearchAttributeValue}
+        type={$customSearchAttributes[label]}
+      />
     {/if}
   </td>
 {/if}

@@ -99,18 +99,18 @@
   };
 
   const getWorkflowActionTokens = (theme: IoTheme): ThemeToken[] =>
-    Object.entries(
-      toCssVariables(theme.color.action.workflow, 'color-action-workflow'),
-    ).map(([cssVariable, value]) => {
-      const name = cssVariable.split('-').at(-1) || cssVariable;
+    Object.entries(toCssVariables(theme.color.action, 'color-action')).map(
+      ([cssVariable, value]) => {
+        const name = cssVariable.slice('--color-action-'.length);
 
-      return {
-        name,
-        cssVariable,
-        tailwindClass: ['text', 'action', 'workflow', name].join('-'),
-        value,
-      };
-    });
+        return {
+          name,
+          cssVariable,
+          tailwindClass: ['text', 'action', name].join('-'),
+          value,
+        };
+      },
+    );
 
   const primitiveTokenGroups: PrimitiveTokenGroup[] = Object.entries(
     colorScales,

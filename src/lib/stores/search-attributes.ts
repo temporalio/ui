@@ -1,4 +1,4 @@
-import { derived, get, readable, type Readable, writable } from 'svelte/store';
+import { derived, readable, type Readable, writable } from 'svelte/store';
 
 import { z } from 'zod/v3';
 
@@ -85,10 +85,14 @@ export const customSearchAttributeOptions: Readable<
   }));
 });
 
-export const isCustomSearchAttribute = (key: string) => {
-  const customSearchAttrs = get(customSearchAttributes);
-  return key in customSearchAttrs;
-};
+export const isFilterableCustomSearchAttribute = (
+  customAttributes: SearchAttributes,
+  attribute: string,
+  value: unknown,
+): value is string =>
+  typeof value === 'string' &&
+  (customAttributes[attribute] === SEARCH_ATTRIBUTE_TYPE.KEYWORD ||
+    customAttributes[attribute] === SEARCH_ATTRIBUTE_TYPE.TEXT);
 
 export const workflowIncludesSearchAttribute = (
   workflow: WorkflowExecution,
