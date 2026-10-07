@@ -27,9 +27,7 @@ describe('registered IO themes', () => {
 
     expect(Object.keys(variables)).toHaveLength(83);
     expect(variables['--color-action-update']).toBe('#ffba18');
-    expect(variables['--color-interactive-tertiary']).toBe(
-      theme.color.surface.primary,
-    );
+    expect(variables['--color-interactive-tertiary']).toBe('transparent');
   });
 
   it.each(registeredThemes)(
