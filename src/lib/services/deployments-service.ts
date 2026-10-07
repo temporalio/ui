@@ -541,10 +541,21 @@ export const buildGcpCloudRunComputeConfig = (
 const providerTypeOf = (scalingGroup?: ComputeConfigScalingGroup) =>
   scalingGroup?.providerType ?? scalingGroup?.provider?.type;
 
-export const decodeLambdaProviderDetails = (
-  computeConfig?: ComputeConfig,
+/**
+ * The group these decoders read when given a whole config.
+ *
+ * A compute config can hold several scaling groups — one per task queue type,
+ * and with highly available Namespaces one per region — but a caller handing
+ * over the whole config has not said which it means, so this keeps the
+ * long-standing answer: the first. A caller that does know uses the ForGroup
+ * variants and passes the group itself.
+ */
+const firstScalingGroup = (computeConfig?: ComputeConfig) =>
+  Object.values(computeConfig?.scalingGroups ?? {})[0];
+
+export const decodeLambdaProviderDetailsForGroup = (
+  scalingGroup?: ComputeConfigScalingGroup,
 ): { lambdaArn?: string; iamRoleArn?: string; roleExternalId?: string } => {
-  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
   if (providerTypeOf(scalingGroup) !== 'aws-lambda') return {};
   if (!scalingGroup?.provider?.details?.data) return {};
   try {
@@ -563,19 +574,19 @@ export const decodeLambdaProviderDetails = (
   }
 };
 
-export const decodeAgentCoreProviderDetails = (
-  computeConfig?: ComputeConfig,
+export const decodeAgentCoreProviderDetailsForGroup = (
+  scalingGroup?: ComputeConfigScalingGroup,
 ): {
   agentCoreEndpointArn?: string;
   iamRoleArn?: string;
   roleExternalId?: string;
 } => {
-  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
   if (providerTypeOf(scalingGroup) !== 'aws-agentcore') return {};
   if (!scalingGroup?.provider?.details?.data) return {};
   try {
     const raw = JSON.parse(atob(scalingGroup.provider.details.data));
-    const result: ReturnType<typeof decodeAgentCoreProviderDetails> = {};
+    const result: ReturnType<typeof decodeAgentCoreProviderDetailsForGroup> =
+      {};
     if (raw.endpoint_arn) result.agentCoreEndpointArn = raw.endpoint_arn;
     if (raw.role) result.iamRoleArn = raw.role;
     if (raw.role_external_id) result.roleExternalId = raw.role_external_id;
@@ -585,20 +596,20 @@ export const decodeAgentCoreProviderDetails = (
   }
 };
 
-export const decodeGcpCloudRunProviderDetails = (
-  computeConfig?: ComputeConfig,
+export const decodeGcpCloudRunProviderDetailsForGroup = (
+  scalingGroup?: ComputeConfigScalingGroup,
 ): {
   gcpProject?: string;
   gcpRegion?: string;
   gcpWorkerPool?: string;
   gcpServiceAccount?: string;
 } => {
-  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
   if (providerTypeOf(scalingGroup) !== 'gcp-cloud-run') return {};
   if (!scalingGroup?.provider?.details?.data) return {};
   try {
     const raw = JSON.parse(atob(scalingGroup.provider.details.data));
-    const result: ReturnType<typeof decodeGcpCloudRunProviderDetails> = {};
+    const result: ReturnType<typeof decodeGcpCloudRunProviderDetailsForGroup> =
+      {};
     if (raw.project) result.gcpProject = raw.project;
     if (raw.region) result.gcpRegion = raw.region;
     if (raw.worker_pool) result.gcpWorkerPool = raw.worker_pool;
@@ -609,8 +620,8 @@ export const decodeGcpCloudRunProviderDetails = (
   }
 };
 
-export const decodeScalerDetails = (
-  computeConfig?: ComputeConfig,
+export const decodeScalerDetailsForGroup = (
+  scalingGroup?: ComputeConfigScalingGroup,
 ): {
   scaleUpCooloffMs?: number;
   scaleUpBacklogThreshold?: number;
@@ -623,11 +634,10 @@ export const decodeScalerDetails = (
   utilizationTarget?: number;
   scaleDownStabilizationMs?: number;
 } => {
-  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
   if (!scalingGroup?.scaler?.details?.data) return {};
   try {
     const raw = JSON.parse(atob(scalingGroup.scaler.details.data));
-    const result: ReturnType<typeof decodeScalerDetails> = {};
+    const result: ReturnType<typeof decodeScalerDetailsForGroup> = {};
     if (raw['scale_up_cooloff_ms'] !== undefined)
       result.scaleUpCooloffMs = raw['scale_up_cooloff_ms'];
     if (raw['scale_up_backlog_threshold'] !== undefined)
@@ -651,3 +661,22 @@ export const decodeScalerDetails = (
     return {};
   }
 };
+
+/**
+ * Provider and scaler details for a whole compute config.
+ *
+ * Each reads the config's first scaling group, which is what they have always
+ * done. Per-region display passes a group directly instead.
+ */
+export const decodeLambdaProviderDetails = (computeConfig?: ComputeConfig) =>
+  decodeLambdaProviderDetailsForGroup(firstScalingGroup(computeConfig));
+
+export const decodeAgentCoreProviderDetails = (computeConfig?: ComputeConfig) =>
+  decodeAgentCoreProviderDetailsForGroup(firstScalingGroup(computeConfig));
+
+export const decodeGcpCloudRunProviderDetails = (
+  computeConfig?: ComputeConfig,
+) => decodeGcpCloudRunProviderDetailsForGroup(firstScalingGroup(computeConfig));
+
+export const decodeScalerDetails = (computeConfig?: ComputeConfig) =>
+  decodeScalerDetailsForGroup(firstScalingGroup(computeConfig));

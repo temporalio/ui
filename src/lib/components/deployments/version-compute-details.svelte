@@ -8,9 +8,25 @@
     decodeScalerDetails,
   } from '$lib/services/deployments-service';
   import type { ComputeConfig } from '$lib/types/deployments';
+  import {
+    isMultiRegion,
+    type NamespaceRegion,
+  } from '$lib/utilities/compute-regions';
 
-  let { computeConfig }: { computeConfig: ComputeConfig | undefined } =
-    $props();
+  import VersionRegions from './version-regions.svelte';
+
+  interface Props {
+    computeConfig: ComputeConfig | undefined;
+    /**
+     * The Namespace's regions, when a consumer has them. Passing fewer than two
+     * leaves this exactly as it was: the details of the first scaling group.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
+  }
+
+  let { computeConfig, namespaceRegions = [] }: Props = $props();
+
+  const multiRegion = $derived(isMultiRegion(namespaceRegions));
 
   const lambdaDetails = $derived(decodeLambdaProviderDetails(computeConfig));
   const agentCoreDetails = $derived(
@@ -42,6 +58,9 @@
   <div
     class="flex flex-col gap-2 bg-surface-secondary py-3 pl-6 text-xs text-primary"
   >
+    {#if multiRegion}
+      <VersionRegions {computeConfig} {namespaceRegions} />
+    {/if}
     {#if lambdaDetails.lambdaArn}
       <div class="flex items-center gap-1">
         <span class="font-medium text-secondary"

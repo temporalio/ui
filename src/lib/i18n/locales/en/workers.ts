@@ -163,6 +163,12 @@ export const Strings = {
   'external-id-help':
     'A secret string that must match the ExternalId condition in your IAM role trust policy. This prevents confused deputy attacks when Temporal assumes your role.',
   'region-label': 'Region',
+  'region-role-primary': 'Active',
+  'region-role-replica': 'Replica',
+  'region-covered-by-default': 'Default compute',
+  'region-uncovered': 'No compute configured',
+  'region-uncovered-help':
+    'Workers will not start in this region if the Namespace fails over to it.',
   'region-hint': 'The AWS region where the Lambda function is deployed.',
   'region-help':
     'Choose the AWS region where your Lambda function is deployed. For best performance, match your Temporal namespace region.',
