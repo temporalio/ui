@@ -1,5 +1,6 @@
 import { mapValues } from 'es-toolkit';
 
+import type { SearchAttribute } from '$lib/types';
 import type {
   Callbacks,
   PendingActivity,
@@ -68,7 +69,7 @@ const toCallbacks = (callbacks?: Callbacks): Callback[] => {
 };
 
 export const toSearchAttributes = (
-  apiSearchAttributes: WorkflowSearchAttributes,
+  apiSearchAttributes: WorkflowSearchAttributes | SearchAttribute,
 ): DecodedWorkflowSearchAttributes => {
   if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
   const decoded = mapValues(apiSearchAttributes.indexedFields, (payload) =>

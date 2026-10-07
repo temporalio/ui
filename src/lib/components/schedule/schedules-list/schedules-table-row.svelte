@@ -4,17 +4,19 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { toSearchAttributes } from '$lib/models/workflow-execution';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
+  import { customSearchAttributes } from '$lib/stores/search-attributes';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
   } from '$lib/utilities/column-width';
-  import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
     routeForWorkflow,
@@ -36,9 +38,8 @@
 
   const status = $derived(schedule?.info?.paused ? 'Paused' : 'Running');
   const spec = $derived(schedule?.info?.spec);
-  const searchAttributes = $derived(schedule?.searchAttributes ?? {});
-  const decodedAttributes = $derived(
-    parsePayloadAttributes({ searchAttributes }),
+  const decodedSearchAttributes = $derived(
+    toSearchAttributes(schedule?.searchAttributes ?? {}).indexedFields ?? {},
   );
 
   const sortRecentActions = (recentActions: ScheduleActionResult[]) => {
@@ -142,7 +143,12 @@
       </td>
     {:else}
       <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
-        {decodedAttributes?.searchAttributes?.indexedFields?.[label] ?? ''}
+        {#if decodedSearchAttributes[label] !== undefined}
+          <SearchAttributeValue
+            value={decodedSearchAttributes[label]}
+            type={$customSearchAttributes[label]}
+          />
+        {/if}
       </td>
     {/if}
   {/each}

@@ -2,6 +2,7 @@ import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
+import { toSearchAttributes } from '$lib/models/workflow-execution';
 import { nexusOperationError } from '$lib/stores/nexus-operations';
 import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 import type {
@@ -15,6 +16,7 @@ import type {
   NexusOperationExecution,
   NexusOperationExecutionInfo,
   NexusOperationExecutionListInfo,
+  NexusOperationExecutionListInfoAPIResponse,
   StartNexusOperationRequest,
 } from '$lib/types/nexus-operation-execution';
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
@@ -30,7 +32,7 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 export type ListNexusOperationsResponse = {
-  operations: NexusOperationExecutionListInfo[];
+  operations: NexusOperationExecutionListInfoAPIResponse[];
   nextPageToken: string;
 };
 
@@ -52,6 +54,13 @@ const emptyNexusOperationExecutionInfo: NexusOperationExecutionInfo = {
 const emptyNexusOperationExecution: NexusOperationExecution = {
   info: emptyNexusOperationExecutionInfo,
 };
+
+const toNexusOperationExecutionListInfo = (
+  operation: NexusOperationExecutionListInfoAPIResponse,
+): NexusOperationExecutionListInfo => ({
+  ...operation,
+  searchAttributes: toSearchAttributes(operation.searchAttributes ?? {}),
+});
 
 export type PaginatedNexusOperationsPromise = (
   pageSize?: number,
@@ -90,7 +99,7 @@ export const fetchPaginatedNexusOperations = async (
     }).then((response) => {
       const { operations = [], nextPageToken = '' } = response || {};
       return {
-        items: operations,
+        items: operations.map(toNexusOperationExecutionListInfo),
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });

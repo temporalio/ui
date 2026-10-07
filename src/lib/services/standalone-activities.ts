@@ -103,7 +103,7 @@ export interface StartStandaloneActivityResponse {
   started: boolean;
 }
 
-export const toActivityExecutionListInfo = (
+const toActivityExecutionListInfo = (
   activity: ActivityExecutionInfo,
 ): ActivityExecutionListInfo => ({
   ...activity,
