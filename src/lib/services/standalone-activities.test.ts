@@ -4,6 +4,7 @@ import type { StandaloneActivityFormData } from '$lib/components/standalone-acti
 
 import {
   toActivityCallbacks,
+  toActivityExecutionListInfo,
   toStartActivityExecutionRequest,
 } from './standalone-activities';
 
@@ -101,5 +102,46 @@ describe('toActivityCallbacks', () => {
         typeof toActivityCallbacks
       >[0]),
     ).toEqual([]);
+  });
+});
+
+describe('toActivityExecutionListInfo', () => {
+  it('decodes search attribute payloads', () => {
+    const activity = toActivityExecutionListInfo({
+      status: 'ACTIVITY_EXECUTION_STATUS_RUNNING',
+      scheduleToCloseTimeout: '',
+      scheduleToStartTimeout: '',
+      startToCloseTimeout: '',
+      heartbeatTimeout: '',
+      stateTransitionCount: '',
+      currentRetryInterval: '',
+      searchAttributes: {
+        indexedFields: {
+          CustomKeyword: {
+            metadata: { encoding: btoa('json/plain') },
+            data: btoa('"keyword-value"'),
+          },
+        },
+      },
+    });
+
+    expect(activity.searchAttributes.indexedFields).toEqual({
+      CustomKeyword: 'keyword-value',
+    });
+  });
+
+  it('returns empty search attributes when there are none', () => {
+    const activity = toActivityExecutionListInfo({
+      status: 'ACTIVITY_EXECUTION_STATUS_RUNNING',
+      scheduleToCloseTimeout: '',
+      scheduleToStartTimeout: '',
+      startToCloseTimeout: '',
+      heartbeatTimeout: '',
+      stateTransitionCount: '',
+      currentRetryInterval: '',
+      searchAttributes: {},
+    });
+
+    expect(activity.searchAttributes).toEqual({});
   });
 });

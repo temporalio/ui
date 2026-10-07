@@ -5,9 +5,14 @@
   import { page } from '$app/state';
 
   import ActivityStatusBadge from '$lib/components/standalone-activities/activity-status-badge.svelte';
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
-  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import {
+    customSearchAttributes,
+    isFilterableCustomSearchAttribute,
+  } from '$lib/stores/search-attributes';
+  import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
@@ -21,7 +26,7 @@
 
   type Props = {
     column: ConfigurableTableHeader;
-    activity: ActivityExecutionInfo;
+    activity: ActivityExecutionListInfo;
   };
   let { column, activity }: Props = $props();
 
@@ -29,6 +34,17 @@
   const namespace = $derived(page.params.namespace);
 
   const filterableLabels = ['Activity ID', 'Run ID', 'Type', 'Task Queue'];
+
+  const customSearchAttributeValue = $derived(
+    activity.searchAttributes?.indexedFields?.[label],
+  );
+  const isCustomKeywordOrTextAttribute = $derived(
+    isFilterableCustomSearchAttribute(
+      $customSearchAttributes,
+      label,
+      customSearchAttributeValue,
+    ),
+  );
 
   const className = $derived(
     twMerge(
@@ -43,7 +59,7 @@
 {#snippet renderFilterableTableCell(
   filterableCellProps: Pick<
     ComponentProps<typeof FilterableTableCell>,
-    'attribute' | 'value' | 'href'
+    'attribute' | 'value' | 'href' | 'type'
   >,
 )}
   <FilterableTableCell
@@ -54,7 +70,7 @@
   />
 {/snippet}
 
-{#if filterableLabels.includes(label)}
+{#if filterableLabels.includes(label) || isCustomKeywordOrTextAttribute}
   {#if label === 'Activity ID'}
     {@render renderFilterableTableCell({
       attribute: 'ActivityId',
@@ -85,6 +101,12 @@
       attribute: 'TaskQueue',
       value: activity.taskQueue ?? '',
     })}
+  {:else if isCustomKeywordOrTextAttribute}
+    {@render renderFilterableTableCell({
+      attribute: label,
+      value: customSearchAttributeValue ?? '',
+      type: $customSearchAttributes[label],
+    })}
   {/if}
 {:else}
   <td class={className} style={widthStyle} data-testid={testId}>
@@ -105,6 +127,11 @@
       {activity.stateTransitionCount ?? ''}
     {:else if label === 'Execution Time'}
       <Timestamp dateTime={activity.executionTime} />
+    {:else if label in $customSearchAttributes && customSearchAttributeValue !== undefined}
+      <SearchAttributeValue
+        value={customSearchAttributeValue}
+        type={$customSearchAttributes[label]}
+      />
     {/if}
   </td>
 {/if}

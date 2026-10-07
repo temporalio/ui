@@ -67,7 +67,7 @@ const toCallbacks = (callbacks?: Callbacks): Callback[] => {
   });
 };
 
-const toSearchAttributes = (
+export const toSearchAttributes = (
   apiSearchAttributes: WorkflowSearchAttributes,
 ): DecodedWorkflowSearchAttributes => {
   if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};

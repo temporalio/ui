@@ -15,11 +15,13 @@ import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
+import { toSearchAttributes } from '$lib/models/workflow-execution';
 import { activityError } from '$lib/stores/activities';
 import type { ActivityOptions, Payload, SearchAttribute } from '$lib/types';
 import type {
   ActivityExecution,
   ActivityExecutionInfo,
+  ActivityExecutionListInfo,
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
 import type { Callback } from '$lib/types/nexus';
@@ -101,10 +103,17 @@ export interface StartStandaloneActivityResponse {
   started: boolean;
 }
 
+export const toActivityExecutionListInfo = (
+  activity: ActivityExecutionInfo,
+): ActivityExecutionListInfo => ({
+  ...activity,
+  searchAttributes: toSearchAttributes(activity.searchAttributes),
+});
+
 export type PaginatedActivitiesPromise = (
   pageSize?: number,
   token?: string,
-) => Promise<{ items: ActivityExecutionInfo[]; nextPageToken: string }>;
+) => Promise<{ items: ActivityExecutionListInfo[]; nextPageToken: string }>;
 
 export const fetchPaginatedActivities = async (
   namespace: string,
@@ -134,7 +143,7 @@ export const fetchPaginatedActivities = async (
     }).then((response) => {
       const { executions = [], nextPageToken = '' } = response || {};
       return {
-        items: executions,
+        items: executions.map(toActivityExecutionListInfo),
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });

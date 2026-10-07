@@ -4,20 +4,17 @@
 
   import { page } from '$app/state';
 
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { Badge } from '$lib/io/badge';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import {
     customSearchAttributes,
-    isCustomSearchAttribute,
+    isFilterableCustomSearchAttribute,
     workflowIncludesSearchAttribute,
   } from '$lib/stores/search-attributes';
-  import {
-    SEARCH_ATTRIBUTE_TYPE,
-    type WorkflowExecution,
-  } from '$lib/types/workflows';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
@@ -54,10 +51,11 @@
   const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
   const isCustomKeywordOrTextAttribute = $derived(
-    isCustomSearchAttribute(label) &&
-      ($customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.KEYWORD ||
-        $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.TEXT) &&
-      typeof workflow.searchAttributes?.indexedFields?.[label] === 'string',
+    isFilterableCustomSearchAttribute(
+      $customSearchAttributes,
+      label,
+      workflow.searchAttributes?.indexedFields?.[label],
+    ),
   );
 
   const filterableLabels = [
@@ -245,23 +243,12 @@
       {/if}
     {:else if label === 'Change Version'}
       {workflow.searchAttributes?.indexedFields?.TemporalChangeVersion}
-    {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
-      {@const content = workflow.searchAttributes?.indexedFields?.[label]}
-      {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
-        <Timestamp dateTime={content} />
-      {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
-        <Badge text={content ?? ''} />
-      {:else}
-        <Tooltip
-          usePortal
-          text={content}
-          top
-          class="min-w-0"
-          hide={hideTooltip(content)}
-        >
-          {truncate ? truncateValue(content) : content}
-        </Tooltip>
-      {/if}
+    {:else if label in $customSearchAttributes && workflowIncludesSearchAttribute(workflow, label)}
+      <SearchAttributeValue
+        value={workflow.searchAttributes?.indexedFields?.[label]}
+        type={$customSearchAttributes[label]}
+        {truncate}
+      />
     {/if}
   </td>
 {/if}
