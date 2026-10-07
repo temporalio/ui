@@ -14,7 +14,7 @@
   const SPRING = 0.06;
   const DAMPING = 0.82;
 
-  const scatter: Attachment<HTMLCanvasElement> = (canvas) => {
+  const animate: Attachment<HTMLCanvasElement> = (canvas) => {
     const context = canvas.getContext('2d');
     if (!context) return;
 
@@ -150,4 +150,4 @@
   };
 </script>
 
-<canvas {@attach scatter} aria-hidden="true" class={className}></canvas>
+<canvas {@attach animate} aria-hidden="true" class={className}></canvas>
