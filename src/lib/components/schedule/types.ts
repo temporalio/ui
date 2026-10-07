@@ -5,5 +5,3 @@ export type { DurationString } from '$lib/types/schedule';
 export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
 export type DayOfMonth = (typeof DAYS_OF_MONTH)[number];
 export type Month = (typeof MONTHS)[number];
-
-export type ScheduleStatus = 'Running' | 'Paused';

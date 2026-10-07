@@ -6,8 +6,7 @@
     type BadgeStatusExtensions,
   } from '$lib/io/badge-status';
   import { IconPause } from '$lib/io/icon';
-
-  import type { ScheduleStatus } from './types';
+  import type { ScheduleStatus } from '$lib/types/schedule';
 
   interface Props extends Omit<
     HTMLAttributes<HTMLSpanElement>,
