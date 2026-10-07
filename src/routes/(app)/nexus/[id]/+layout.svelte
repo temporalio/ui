@@ -17,7 +17,10 @@
 
 {#if !endpoint}
   <Error
-    error={undefined}
+    error={{
+      statusCode: 404,
+      message: translate('common.page-not-found'),
+    }}
     status={404}
     resource={translate('nexus.nexus-endpoint-simple')}
     namespaced={false}

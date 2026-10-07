@@ -2,6 +2,7 @@
   import { BROWSER } from 'esm-env';
 
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -10,7 +11,6 @@
   import { translate } from '$lib/i18n/translate';
   import { IconArrowLeft } from '$lib/io/icon';
   import type { NetworkError } from '$lib/types/global';
-  import { getErrorKind } from '$lib/utilities/error-presentation';
   import { has } from '$lib/utilities/has';
   import { routeForNamespaces } from '$lib/utilities/route-for';
 
@@ -52,7 +52,9 @@
   const status = $derived(
     has(error, 'statusCode') ? Number(error.statusCode) : statusProp,
   );
-  const kind = $derived(getErrorKind(status));
+  const kind = $derived(
+    status === 400 ? 'bad-request' : status === 404 ? 'not-found' : 'unknown',
+  );
   const copy = $derived(
     kind !== 'not-found' || !resource
       ? kind
@@ -60,7 +62,7 @@
         ? 'not-found-resource'
         : 'not-found-unscoped-resource',
   );
-  const path = BROWSER ? window.location.pathname + window.location.search : '';
+  const path = $derived(page.url.pathname + page.url.search);
   const time = new Date().toISOString();
   const details = $derived(
     JSON.stringify({ status, message, path, time }, null, 2),
@@ -78,7 +80,7 @@
     {translate(`errors.${copy}-description`, { resource })}
   </p>
 
-  {#if kind === 'bad-request' || kind === 'not-found'}
+  {#if back || kind !== 'unknown'}
     <div class="mt-6 flex items-center justify-center gap-4">
       {#if back}
         <Button LeadingIcon={IconArrowLeft} href={back.href}>
@@ -99,7 +101,8 @@
         </Link>
       {/if}
     </div>
-  {:else}
+  {/if}
+  {#if kind === 'unknown'}
     <p class="mt-4 text-lg">
       <button class="underline hover:text-brand" tabindex={0} onclick={reset}
         >Try a refresh</button
@@ -115,8 +118,10 @@
     <h2 class="mb-2 text-sm font-medium text-secondary">
       {translate('errors.technical-details')}
     </h2>
-    <div class="rounded backdrop-blur-sm">
-      <CodeBlock content={details} />
-    </div>
+    <CodeBlock
+      class="rounded backdrop-blur-sm"
+      content={details}
+      label={translate('errors.technical-details')}
+    />
   </div>
 </section>

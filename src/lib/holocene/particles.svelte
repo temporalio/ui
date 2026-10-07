@@ -2,13 +2,12 @@
   import type { Attachment } from 'svelte/attachments';
 
   interface Props {
-    count?: number;
-    speed?: number;
     class?: string;
   }
 
-  let { count = 200, speed = 1, class: className = '' }: Props = $props();
+  let { class: className = '' }: Props = $props();
 
+  const PARTICLE_COUNT = 200;
   const CAMERA_DISTANCE = 2;
 
   const randomPointInSphere = () => {
@@ -25,7 +24,7 @@
     if (!context) return;
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const particles = Array.from({ length: count }, () => ({
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
       ...randomPointInSphere(),
       size: 0.6 + Math.random() * 0.8,
       phase: Math.random() * Math.PI * 2,
@@ -35,7 +34,7 @@
     let frame = 0;
 
     const draw = (time: number) => {
-      const seconds = (time / 1000) * speed;
+      const seconds = time / 1000;
       const spin = seconds * 0.05;
       const tilt = Math.sin(seconds * 0.2) * 0.15;
       const [sinSpin, cosSpin] = [Math.sin(spin), Math.cos(spin)];
@@ -82,7 +81,7 @@
       if (reducedMotion.matches) {
         draw(0);
       } else {
-        frame = requestAnimationFrame(loop);
+        loop(performance.now());
       }
     };
 

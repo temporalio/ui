@@ -251,6 +251,7 @@ export const Strings = {
   description: 'Description',
   active: 'Active',
   inactive: 'Inactive',
+  'page-not-found': 'Page Not Found',
   value: 'Value',
   table: 'Table',
   failure: 'Failure',
