@@ -16,6 +16,29 @@ describe('CatalogList client interactions', () => {
   afterEach(async () => client.cleanup());
   afterAll(closeCatalogClientTestRunner);
 
+  it('warns when no worker is polling', async () => {
+    const target = await client.renderList({ workerState: 'unavailable' });
+    await client.flush();
+    const alert = target.querySelector(
+      '[data-testid="catalog-worker-unavailable"]',
+    );
+
+    expect(alert?.classList.contains('hidden')).toBe(false);
+    expect(alert?.textContent).toContain('No Worker is polling');
+    expect(alert?.textContent).toContain('pnpm catalog worker');
+  });
+
+  it('does not warn when a worker is polling', async () => {
+    const target = await client.renderList();
+    await client.flush();
+
+    expect(
+      target
+        .querySelector('[data-testid="catalog-worker-unavailable"]')
+        ?.classList.contains('hidden'),
+    ).toBe(true);
+  });
+
   it('filters examples and dispatches Quick Run through the shared session host', async () => {
     const target = await client.renderList();
     await client.flush();

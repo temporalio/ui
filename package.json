@@ -1,10 +1,16 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.54.1",
+  "version": "2.55.0",
   "engines": {
     "pnpm": ">=10.10.0",
     "node": ">=22.14.0"
   },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14"
+  ],
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -29,6 +35,10 @@
     "dev:temporal-cli": "vite dev --mode temporal-server",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --mode docker",
     "dev:with-auth": "vite dev --mode with-auth",
+    "dev:ui:extension-example": "TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED=true pnpm dev:local-temporal",
+    "dev:extension-example": "node examples/custom-ui-extension/server.mjs",
+    "dev:ui:extension-auth-example": "TEMPORAL_UI_EXTENSION_AUTH_EXAMPLE_ENABLED=true pnpm dev:local-temporal",
+    "dev:extension-auth-example": "node examples/custom-ui-extension-with-auth/server.mjs",
     "build:local": "vite build",
     "build:docker": "VITE_API=http://localhost:8080 vite build",
     "build:server": "VITE_API= BUILD_PATH=server/ui/assets/local vite build",

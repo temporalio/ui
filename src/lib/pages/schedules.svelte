@@ -7,12 +7,14 @@
   import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import ResetColumnWidthsButton from '$lib/components/table/reset-column-widths-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import ColumnResizeHandle from '$lib/holocene/table/column-resize-handle.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import MaximizableTableView from '$lib/holocene/table/paginated-table/maximizable-view.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -24,6 +26,8 @@
   import {
     availableScheduleColumns,
     configurableTableColumns,
+    MIN_COLUMN_WIDTH,
+    resizeColumn,
     TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
   import { coreUserStore } from '$lib/stores/core-user';
@@ -38,6 +42,7 @@
     scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
   } from '$lib/stores/search-attributes';
+  import { columnWidthStyle } from '$lib/utilities/column-width';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -172,8 +177,22 @@
       {/snippet}
       {#snippet headers()}
         <tr class="text-left">
-          {#each columns as { label }, i (`${label}:${i}`)}
-            <th>{label}</th>
+          {#each columns as { label, width }, i (`${label}:${i}`)}
+            <th class="relative" style={columnWidthStyle(width)}>
+              <span class="block truncate">{label}</span>
+              <ColumnResizeHandle
+                {label}
+                {width}
+                min={MIN_COLUMN_WIDTH}
+                onResize={(newWidth) =>
+                  resizeColumn(
+                    label,
+                    newWidth,
+                    namespace,
+                    TABLE_TYPE.SCHEDULES,
+                  )}
+              />
+            </th>
           {/each}
         </tr>
       {/snippet}
@@ -213,6 +232,11 @@
         </div>
       {/snippet}
       {#snippet actionsEndAdditional()}
+        <ResetColumnWidthsButton
+          {columns}
+          {namespace}
+          table={TABLE_TYPE.SCHEDULES}
+        />
         <Tooltip text={translate('common.configure-columns')} top>
           <Button
             onclick={openCustomizationDrawer}

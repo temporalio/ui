@@ -35,7 +35,10 @@ type AnyWorkflowHeaderLabel = WorkflowHeaderLabel | (string & {});
 export type ConfigurableTableHeader = {
   label: AnyWorkflowHeaderLabel;
   pinned?: boolean;
+  width?: number;
 };
+
+export const MIN_COLUMN_WIDTH = 80;
 
 export const TABLE_TYPE = {
   WORKFLOWS: 'workflows',
@@ -82,6 +85,15 @@ type Action =
       payload: {
         from: number;
         to: number;
+        namespace: string;
+        table: ConfigurableTableType;
+      };
+    }
+  | {
+      type: 'CONFIGURABLE_COLUMN.RESIZE';
+      payload: {
+        label: AnyWorkflowHeaderLabel;
+        width: number | undefined;
         namespace: string;
         table: ConfigurableTableType;
       };
@@ -505,6 +517,22 @@ const reducer = (action: Action, state: State): State => {
         [namespace]: tempColumns,
       };
     }
+    case 'CONFIGURABLE_COLUMN.RESIZE': {
+      const { label: labelToResize, width, namespace } = action.payload;
+      const columns = state?.[namespace] ?? defaultColumns;
+
+      return {
+        ...state,
+        [namespace]: columns.map((column) => {
+          if (column.label !== labelToResize) return column;
+          if (width === undefined) {
+            const { width: _removed, ...rest } = column;
+            return rest;
+          }
+          return { ...column, width: Math.max(MIN_COLUMN_WIDTH, width) };
+        }),
+      };
+    }
     default:
       return state;
   }
@@ -549,6 +577,18 @@ export const removeColumn = (
   dispatch({
     type: 'CONFIGURABLE_COLUMN.REMOVE',
     payload: { label, namespace, table },
+  });
+};
+
+export const resizeColumn = (
+  label: AnyWorkflowHeaderLabel,
+  width: number | undefined,
+  namespace: string,
+  table: ConfigurableTableType,
+) => {
+  dispatch({
+    type: 'CONFIGURABLE_COLUMN.RESIZE',
+    payload: { label, width, namespace, table },
   });
 };
 

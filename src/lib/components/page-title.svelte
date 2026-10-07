@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { statusFavicon } from '$lib/stores/favicon';
   import apple from '$lib/vendor/apple-touch-icon.png';
   import banner from '$lib/vendor/banner.png';
   import favicon from '$lib/vendor/favicon.ico';
@@ -19,7 +20,7 @@
 
 <svelte:head>
   <title>{title}</title>
-  <link rel="icon" href={favicon} />
+  <link rel="icon" href={$statusFavicon ?? favicon} />
   <link rel="manifest" href={manifest} />
   <link rel="apple-touch-icon" href={apple} />
 

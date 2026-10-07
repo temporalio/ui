@@ -1,5 +1,6 @@
-import type { Payload, TaskQueueResponse } from '$lib/types';
+import type { Payload, PollerInfo, TaskQueueResponse } from '$lib/types';
 import { encodePayloads } from '$lib/utilities/encode-payload';
+import { validTimeToDate } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import {
@@ -39,6 +40,13 @@ type ApiWorkbenchHostOptions = {
   getIdentity?: () => string | undefined;
   createRequestId?: () => string;
 };
+
+const ACTIVE_POLLER_WINDOW_MS = 2 * 60 * 1000;
+
+const isActivePoller = (poller: PollerInfo) =>
+  !poller.lastAccessTime ||
+  Date.now() - validTimeToDate(poller.lastAccessTime).getTime() <=
+    ACTIVE_POLLER_WINDOW_MS;
 
 const defaultEncodeInput: EncodeInput = async (input, positional) => {
   const values = positional && Array.isArray(input) ? input : [input];
@@ -423,7 +431,7 @@ export const createApiWorkbenchHost = ({
         options: { signal },
       });
 
-      return Boolean(response?.pollers?.length);
+      return response?.pollers?.some(isActivePoller) ?? false;
     },
     checkNexusEndpoint: async ({ endpoint }, signal) => {
       const route = routeForApi('nexus-endpoints');

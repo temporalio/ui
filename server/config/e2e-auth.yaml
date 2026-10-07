@@ -1,0 +1,49 @@
+# =============================================================================
+# Auth configuration for the Playwright E2E suite.
+#
+# This is the counterpart to with-auth.yaml, which is tuned for `pnpm
+# dev:with-auth` and a human clicking through the UI. The durations here are
+# deliberately short so that tests/e2e/auth-cookie-lifetimes.spec.ts can wait
+# out an access token in a few seconds, and so that maxSessionDuration is below
+# the 60s user cookie lifetime and the clamp on those cookies is observable.
+#
+# The matching identity provider TTLs are set in tests/global-setup.ts via the
+# OIDC_*_TTL environment variables.
+# =============================================================================
+publicPath:
+port: 8081
+enableUi: true
+cors:
+  cookieInsecure: true
+  allowOrigins:
+    - http://localhost:8081
+refreshInterval: 1m
+defaultNamespace: default
+showTemporalSystemNamespace: false
+disableWriteActions: false
+auth:
+  enabled: true
+  redirectToProvider: false
+  # Below the 60s user cookie lifetime, so that the clamp is visible at login.
+  maxSessionDuration: 45s
+  providers:
+    - label: E2E OIDC
+      type: oidc
+      providerUrl: http://localhost:8889
+      issuerUrl: ''
+      clientId: temporal-ui
+      clientSecret: temporal-secret
+      scopes:
+        - openid
+        - profile
+        - email
+        - offline_access
+      callbackUrl: http://localhost:8081/auth/sso/callback
+      # The mock provider issues opaque refresh tokens, so this is the value the
+      # refresh cookie should fall back to. A provider issuing JWT refresh
+      # tokens would have its own exp claim take precedence over this.
+      refreshTokenDuration: 24h
+codec:
+  endpoint:
+  passAccessToken: false
+  includeCredentials: false

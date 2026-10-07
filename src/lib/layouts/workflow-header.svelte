@@ -10,6 +10,7 @@
   import DetailListLabel from '$lib/components/detail-list/detail-list-label.svelte';
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import DetailList from '$lib/components/detail-list/detail-list.svelte';
+  import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
@@ -33,6 +34,7 @@
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { getSharedFilterParams } from '$lib/utilities/event-filter-params';
+  import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
@@ -65,11 +67,9 @@
 
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
 
-  const { workflow, workerCount } = $derived($workflowRun);
+  const { workflow, workers, workerCount } = $derived($workflowRun);
   const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
-  const workerDeployment = $derived(
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
-  );
+  const workerDeployment = $derived(getWorkerDeploymentName(workers, workflow));
   const routeParameters = $derived({
     namespace,
     workflow: workflowId,
@@ -195,6 +195,19 @@
   </div>
   <CodecServerErrorBanner />
   <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
+  <ExtensionSlot
+    name="workflow.header.after-details"
+    class="flex w-full flex-col gap-2"
+    context={{
+      workflow: {
+        workflowId,
+        runId,
+        status: workflow?.status ?? undefined,
+        taskQueue: workflow?.taskQueue,
+        workflowType: workflow?.name,
+      },
+    }}
+  />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert

@@ -1,5 +1,5 @@
 {
-  "sourceHash": "66123f70d6c4db8f6633b8f1a3ebcb68565c30e40ebed47297df9338a88c0a76",
+  "sourceHash": "82001742adbfde973143b4b765ec8e7f0e932a99d21915fa7cfb7604eb54932e",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -628,6 +628,53 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "sequentialMarkdownActivities"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "sequential-multiline-summary-activities",
+      "title": "Sequential activities with multi-line Markdown summaries",
+      "description": "Runs 20 activities by default with Markdown summaries that alternate between a paragraph break and a hard break.",
+      "capabilityTags": ["activities", "sequencing"],
+      "expectedEvidence": [
+        "The configured number of non-overlapping activity executions in deterministic order.",
+        "Each activity summary spans two Markdown blocks, and the timeline label stays on one line."
+      ],
+      "input": {
+        "defaultValue": [20],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Activity count",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000
+            }
+          ],
+          "items": false,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "sequentialMultilineSummaryActivities"
       },
       "source": { "id": "oss", "label": "OSS" }
     },

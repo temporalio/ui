@@ -25,6 +25,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/labstack/echo/v4"
@@ -65,7 +66,11 @@ type SettingsResponse struct {
 	NavCollapsedByDefault         bool
 	FeedbackURL                   string
 	DisableNewsFetch              bool
+	NotifyOnNewVersion            bool
+	Distribution                  string
+	DistributionVersion           string
 	Codec                         *CodecResponse
+	CustomUI                      *CustomUISettingsResponse
 	Version                       string
 	DisableWriteActions           bool
 	WorkflowTerminateDisabled     bool
@@ -80,6 +85,46 @@ type SettingsResponse struct {
 	RefreshWorkflowCountsDisabled bool
 	ActivityCommandsDisabled      bool
 }
+
+type CustomUISettingsResponse struct {
+	Enabled bool
+}
+
+type CustomUIResponse struct {
+	Enabled          bool
+	IframeExtensions []IframeExtensionResponse
+}
+
+type IframeExtensionResponse struct {
+	ID            string
+	Title         string
+	Slot          string
+	Src           string
+	AllowedOrigin string
+	RoutePatterns []string
+	Sandbox       IframeSandboxResponse
+	Sizing        IframeExtensionSizingResponse
+	Permissions   []string
+}
+
+type IframeSandboxResponse struct {
+	AllowDownloads  bool
+	AllowForms      bool
+	AllowModals     bool
+	AllowPopups     bool
+	AllowSameOrigin bool
+}
+
+type IframeExtensionSizingResponse struct {
+	DefaultHeight int
+	MinHeight     int
+	MaxHeight     int
+	DefaultWidth  int
+	MinWidth      int
+	MaxWidth      int
+}
+
+type AccessCheck func(echo.Context) error
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware, conn *grpc.ClientConn) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -113,6 +158,112 @@ func CreateGRPCConnection(cfgProvider *config.ConfigProviderWithRefresh) (*grpc.
 	return conn, nil
 }
 
+func customUIResponse(customUI config.CustomUI) *CustomUIResponse {
+	if !customUI.Enabled {
+		return &CustomUIResponse{
+			Enabled:          false,
+			IframeExtensions: []IframeExtensionResponse{},
+		}
+	}
+
+	iframeExtensions := make([]IframeExtensionResponse, 0, len(customUI.IframeExtensions))
+	for _, extension := range customUI.IframeExtensions {
+		iframeExtensions = append(iframeExtensions, IframeExtensionResponse{
+			ID:            extension.ID,
+			Title:         extension.Title,
+			Slot:          extension.Slot,
+			Src:           extension.Src,
+			AllowedOrigin: extension.AllowedOrigin,
+			RoutePatterns: extension.RoutePatterns,
+			Sandbox: IframeSandboxResponse{
+				AllowDownloads:  extension.Sandbox.AllowDownloads,
+				AllowForms:      extension.Sandbox.AllowForms,
+				AllowModals:     extension.Sandbox.AllowModals,
+				AllowPopups:     extension.Sandbox.AllowPopups,
+				AllowSameOrigin: extension.Sandbox.AllowSameOrigin,
+			},
+			Sizing: IframeExtensionSizingResponse{
+				DefaultHeight: extension.Sizing.DefaultHeight,
+				MinHeight:     extension.Sizing.MinHeight,
+				MaxHeight:     extension.Sizing.MaxHeight,
+				DefaultWidth:  extension.Sizing.DefaultWidth,
+				MinWidth:      extension.Sizing.MinWidth,
+				MaxWidth:      extension.Sizing.MaxWidth,
+			},
+			Permissions: extension.Permissions,
+		})
+	}
+
+	return &CustomUIResponse{
+		Enabled:          customUI.Enabled,
+		IframeExtensions: iframeExtensions,
+	}
+}
+
+// TemporalAccessCheck verifies the request against the same Temporal API
+// authority used by the rest of the application. This is required in addition
+// to the local header/JWT check because supported custom-auth deployments rely
+// on Temporal's claim mapper and authorizer to validate access tokens.
+func TemporalAccessCheck(conn *grpc.ClientConn, apiMiddleware []Middleware) AccessCheck {
+	return func(c echo.Context) error {
+		mux, err := getTemporalClientMux(c, conn, apiMiddleware)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadGateway, "unable to verify Temporal API access").SetInternal(err)
+		}
+
+		request := c.Request().Clone(c.Request().Context())
+		request.Method = http.MethodGet
+		request.URL.Path = "/api/v1/system-info"
+		request.URL.RawPath = ""
+		request.URL.RawQuery = ""
+		request.RequestURI = request.URL.RequestURI()
+		request.Body = nil
+		request.ContentLength = 0
+
+		response := httptest.NewRecorder()
+		mux.ServeHTTP(response, request)
+		if response.Code >= http.StatusOK && response.Code < http.StatusMultipleChoices {
+			return nil
+		}
+		if response.Code == http.StatusUnauthorized || response.Code == http.StatusForbidden {
+			return echo.NewHTTPError(response.Code, "unauthorized")
+		}
+		return echo.NewHTTPError(http.StatusBadGateway, "unable to verify Temporal API access")
+	}
+}
+
+// GetUIExtensions returns the effective inline extension registry. Unlike the
+// public bootstrap settings, this endpoint verifies access through the same
+// Temporal API authority when authentication is enabled.
+func GetUIExtensions(cfgProvider *config.ConfigProviderWithRefresh, accessCheck AccessCheck) func(echo.Context) error {
+	return func(c echo.Context) error {
+		c.Response().Header().Set("Cache-Control", "no-store")
+		c.Response().Header().Set("Vary", echo.HeaderAuthorization)
+
+		if err := auth.ValidateAuthHeaderExists(c, cfgProvider); err != nil {
+			return err
+		}
+
+		cfg, err := cfgProvider.GetConfig()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		if cfg.Auth.Enabled {
+			if accessCheck == nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, "UI extension authorization is not configured")
+			}
+			if err := accessCheck(c); err != nil {
+				return err
+			}
+		}
+		if err := cfg.CustomUI.Validate(cfg.Auth.Enabled); err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "invalid custom UI configuration").SetInternal(err)
+		}
+
+		return c.JSON(http.StatusOK, customUIResponse(cfg.CustomUI))
+	}
+}
+
 func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Context) error {
 	return func(c echo.Context) error {
 		cfg, err := cfgProvider.GetConfig()
@@ -139,12 +290,18 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			NavCollapsedByDefault:       cfg.NavCollapsedByDefault,
 			FeedbackURL:                 cfg.FeedbackURL,
 			DisableNewsFetch:            cfg.DisableNewsFetch,
+			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
+			Distribution:                cfg.Distribution,
+			DistributionVersion:         cfg.DistributionVersion,
 			Codec: &CodecResponse{
 				Endpoint:            cfg.Codec.Endpoint,
 				PassAccessToken:     cfg.Codec.PassAccessToken,
 				IncludeCredentials:  cfg.Codec.IncludeCredentials,
 				DefaultErrorMessage: cfg.Codec.DefaultErrorMessage,
 				DefaultErrorLink:    cfg.Codec.DefaultErrorLink,
+			},
+			CustomUI: &CustomUISettingsResponse{
+				Enabled: cfg.CustomUI.Enabled,
 			},
 			Version:                       version.UIVersion,
 			DisableWriteActions:           cfg.DisableWriteActions,
@@ -209,6 +366,13 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 			// This is necessary to get error details properly
 			// marshalled in unary requests.
 			runtime.WithErrorHandler(errorHandler),
+			// Without this the mux honours X-HTTP-Method-Override on POSTs sent
+			// as application/x-www-form-urlencoded, rewriting the method before
+			// routing. A proxy or WAF in front of this that allows or denies by
+			// method would be deciding on a method the mux then discards
+			// (CVE-2026-37236). Nothing here needs the header, and the option is
+			// opt-in, so upgrading alone would not have removed the behaviour.
+			runtime.WithDisableHTTPMethodOverride(),
 		)...,
 	)
 

@@ -18,16 +18,17 @@ import { catalogExample as example10 } from './parallel-activities/example.js';
 import { catalogExample as example11 } from './priority-fairness/example.js';
 import { catalogExample as example12 } from './sequential-activities/example.js';
 import { catalogExample as example13 } from './sequential-markdown-activities/example.js';
-import { catalogExample as example14 } from './sequential-no-summary-activities/example.js';
-import { catalogExample as example15 } from './sequential-plain-text-activities/example.js';
-import { catalogExample as example16 } from './signal-collector/example.js';
-import { catalogExample as example17 } from './signal-handlers/example.js';
-import { catalogExample as example18 } from './standalone-activity/example.js';
-import { catalogExample as example19 } from './timeline-kitchen-sink/example.js';
-import { catalogExample as example20 } from './timeline-live/example.js';
-import { catalogExample as example21 } from './timeline-performance/example.js';
-import { catalogExample as example22 } from './timer-driven-repetition/example.js';
-import { catalogExample as example23 } from './workflow-patching/example.js';
+import { catalogExample as example14 } from './sequential-multiline-summary-activities/example.js';
+import { catalogExample as example15 } from './sequential-no-summary-activities/example.js';
+import { catalogExample as example16 } from './sequential-plain-text-activities/example.js';
+import { catalogExample as example17 } from './signal-collector/example.js';
+import { catalogExample as example18 } from './signal-handlers/example.js';
+import { catalogExample as example19 } from './standalone-activity/example.js';
+import { catalogExample as example20 } from './timeline-kitchen-sink/example.js';
+import { catalogExample as example21 } from './timeline-live/example.js';
+import { catalogExample as example22 } from './timeline-performance/example.js';
+import { catalogExample as example23 } from './timer-driven-repetition/example.js';
+import { catalogExample as example24 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -54,6 +55,7 @@ const sharedWorkflowDefinitions = [
   example21,
   example22,
   example23,
+  example24,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -130,6 +132,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/sequential-markdown-activities/activities.ts',
   'src/lib/catalog/worker/examples/sequential-markdown-activities/example.ts',
   'src/lib/catalog/worker/examples/sequential-markdown-activities/workflow.ts',
+  'src/lib/catalog/worker/examples/sequential-multiline-summary-activities/activities.ts',
+  'src/lib/catalog/worker/examples/sequential-multiline-summary-activities/example.ts',
+  'src/lib/catalog/worker/examples/sequential-multiline-summary-activities/workflow.ts',
   'src/lib/catalog/worker/examples/sequential-no-summary-activities/activities.ts',
   'src/lib/catalog/worker/examples/sequential-no-summary-activities/example.ts',
   'src/lib/catalog/worker/examples/sequential-no-summary-activities/workflow.ts',

@@ -31,6 +31,13 @@
      */
     compact?: boolean;
     /**
+     * Compact, and held to one line: paragraphs and hard breaks run together
+     * as text rather than stacking. For a label in a row that has height for
+     * one line, where markdown written as several blocks would otherwise
+     * paint as several lines.
+     */
+    inline?: boolean;
+    /**
      * Accessible name for the frame. Name what the content is, so a frame in
      * a list of them is distinguishable.
      */
@@ -47,6 +54,7 @@
     minHeight = 100,
     previewTheme,
     compact = false,
+    inline = false,
     title = 'output',
   }: Props = $props();
 
@@ -167,10 +175,7 @@
     previewTheme ?? ($useDarkMode ? 'dark' : 'light'),
   );
   const previewPath = $derived(
-    resolve(
-      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&compact=${compact}`,
-      {},
-    ),
+    `${resolve('/render', {})}?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}&compact=${compact}&inline=${inline}`,
   );
 
   $effect(() => {
@@ -188,7 +193,11 @@
 
 <section
   class={twMerge(
-    fitContent ? 'inline-flex shrink-0' : fill ? 'h-full w-full' : 'w-full',
+    fitContent
+      ? 'inline-flex min-w-0 max-w-full'
+      : fill
+        ? 'h-full w-full'
+        : 'w-full',
     className,
   )}
 >
@@ -198,7 +207,7 @@
     {title}
     class={twMerge(
       fitContent
-        ? 'block shrink-0 border-0 align-middle'
+        ? 'block min-w-0 max-w-full border-0 align-middle'
         : 'block w-full border-0',
       fitContent && loading && 'invisible !h-0 !w-0',
     )}

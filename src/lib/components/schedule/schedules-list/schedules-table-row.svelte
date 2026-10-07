@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twMerge } from 'tailwind-merge';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -8,6 +10,10 @@
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
+  import {
+    COLUMN_WIDTH_CLAMP_CLASSES,
+    columnWidthStyle,
+  } from '$lib/utilities/column-width';
   import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
   import {
     routeForSchedule,
@@ -56,13 +62,18 @@
 </script>
 
 <tr class="max-h-32">
-  {#each columns as { label } (label)}
+  {#each columns as { label, width } (label)}
+    {@const widthStyle = columnWidthStyle(width)}
+    {@const clampToWidth = width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES}
     {#if label === translate('common.status')}
-      <td class="cell">
+      <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
         <WorkflowStatusBadge {status} />
       </td>
     {:else if label === translate('schedules.id')}
-      <td class="cell whitespace-pre-line break-words">
+      <td
+        class={twMerge('cell whitespace-pre-line break-words', clampToWidth)}
+        style={widthStyle}
+      >
         <Link href={route}>{schedule.scheduleId}</Link>
       </td>
     {:else if label === translate('common.workflow-type')}
@@ -78,7 +89,8 @@
           .join(' AND '),
       })}
       <TableCellWithFilterOrCopyButtons
-        class="cell whitespace-pre-line break-words"
+        class={twMerge('cell whitespace-pre-line break-words', clampToWidth)}
+        style={widthStyle}
         filterIconTitle={translate('common.filter-workflows')}
         copyValue={workflowTypeName ?? undefined}
         onFilter={() => {
@@ -96,7 +108,7 @@
         {/if}
       </TableCellWithFilterOrCopyButtons>
     {:else if label === translate('schedules.recent-runs')}
-      <td class="cell truncate">
+      <td class={twMerge('cell truncate', clampToWidth)} style={widthStyle}>
         {#each sortRecentActions(schedule?.info?.recentActions ?? []) as run (run)}
           {@const startWorkflowResult = run?.startWorkflowResult}
           <p>
@@ -117,19 +129,19 @@
         {/each}
       </td>
     {:else if label === translate('schedules.upcoming-runs')}
-      <td class="cell truncate">
+      <td class={twMerge('cell truncate', clampToWidth)} style={widthStyle}>
         {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run (run)}
           <Timestamp as="div" dateTime={run} />
         {/each}
       </td>
     {:else if label === translate('schedules.schedule-spec')}
-      <td class="cell">
+      <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
         {#if spec}
           <ScheduleFrequency {spec} />
         {/if}
       </td>
     {:else}
-      <td class="cell">
+      <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
         {decodedAttributes?.searchAttributes?.indexedFields?.[label] ?? ''}
       </td>
     {/if}

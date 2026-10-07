@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -17,6 +18,10 @@
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowExecution,
   } from '$lib/types/workflows';
+  import {
+    COLUMN_WIDTH_CLAMP_CLASSES,
+    columnWidthStyle,
+  } from '$lib/utilities/column-width';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -46,7 +51,7 @@
     archival = false,
   }: Props = $props();
 
-  const { label } = $derived(column);
+  const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
   const isCustomKeywordOrTextAttribute = $derived(
     isCustomSearchAttribute(label) &&
@@ -66,7 +71,13 @@
     'Scheduled By ID',
   ];
 
-  const className = 'relative h-8 whitespace-nowrap';
+  const className = $derived(
+    twMerge(
+      'relative h-8 whitespace-nowrap',
+      width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES,
+    ),
+  );
+  const widthStyle = $derived(columnWidthStyle(width));
   const testId = 'workflows-summary-table-body-cell';
 
   const hideTooltip = (value: string | undefined) => {
@@ -84,6 +95,7 @@
 )}
   <FilterableTableCell
     class={className}
+    style={widthStyle}
     data-testid={testId}
     {truncate}
     {...filterableCellProps}
@@ -176,7 +188,7 @@
     })}
   {/if}
 {:else}
-  <td class={className} data-testid={testId}>
+  <td class={className} style={widthStyle} data-testid={testId}>
     {#if label === 'Status'}
       <WorkflowStatusBadge
         status={workflow.status}

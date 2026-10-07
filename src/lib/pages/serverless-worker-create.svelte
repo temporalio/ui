@@ -1,4 +1,8 @@
 <script lang="ts">
+  import {
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+  } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import ServerlessWorkerCreateForm from '$lib/components/workers/serverless-worker-form/serverless-worker-create-form.svelte';
   import type {
     ComputeProviderOption,
@@ -20,10 +24,7 @@
   interface Props {
     namespace: string;
     onSuccess: () => void;
-    cfnTemplateUrl?: string;
-    cfnTemplate?: string;
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
@@ -33,16 +34,8 @@
     iamRoleArn?: string[];
   }
 
-  let {
-    namespace,
-    onSuccess,
-    cfnTemplateUrl,
-    cfnTemplate,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
-    computeProviders,
-    gcpRegions,
-  }: Props = $props();
+  let { namespace, onSuccess, templates, computeProviders, gcpRegions }: Props =
+    $props();
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -190,10 +183,7 @@
   cancelHref={routeForWorkers({ namespace })}
   {onSuccess}
   onSubmit={handleCreate}
-  {cfnTemplateUrl}
-  {cfnTemplate}
-  {terraformTemplate}
-  {cloudRunTerraformTemplate}
+  {templates}
   {computeProviders}
   {gcpRegions}
 />

@@ -52,6 +52,21 @@ const configuration: Record<string, unknown> = {
       response_types: ['code'],
       token_endpoint_auth_method: 'client_secret_basic',
     },
+    // Used by examples/custom-ui-extension-with-auth. Custom UI extensions run
+    // in a sandboxed iframe with an opaque origin, so they cannot complete a
+    // redirect-based login. The device flow needs no redirect URI and no
+    // browser storage.
+    {
+      client_id: 'custom-ui-extension',
+      client_secret: 'custom-ui-extension-secret',
+      grant_types: [
+        'urn:ietf:params:oauth:grant-type:device_code',
+        'refresh_token',
+      ],
+      response_types: [],
+      redirect_uris: [],
+      token_endpoint_auth_method: 'client_secret_basic',
+    },
   ],
   interactions: {
     url(_ctx: unknown, interaction: { uid: string }): string {

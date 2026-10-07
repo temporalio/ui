@@ -188,6 +188,14 @@
         : RADIUS * 3),
   );
   const spanCy = HALO; // button-local vertical center
+  const labelMaxWidth = $derived(
+    Math.max(
+      0,
+      textAnchor === 'end'
+        ? textPosition[0] - GUTTER
+        : canvasWidth - GUTTER - textPosition[0],
+    ),
+  );
 </script>
 
 {#snippet summary(value: string)}
@@ -196,7 +204,7 @@
       content={value}
       fill={false}
       fitContent
-      compact
+      inline
       minHeight={0}
       overrideTheme="primary"
       title={translate('workflows.summary')}
@@ -327,15 +335,16 @@
             ? 'retry'
             : undefined}
         <div
-          class="pointer-events-auto absolute flex select-none items-center gap-1 whitespace-nowrap text-[13px] leading-none {textAnchor ===
+          class="pointer-events-auto absolute flex w-max select-none items-center gap-1 whitespace-nowrap text-[13px] leading-none {textAnchor ===
           'end'
             ? '-translate-x-full -translate-y-1/2 flex-row-reverse'
             : '-translate-y-1/2'}"
           style:left="{textPosition[0] - spanLeft}px"
           style:top="{spanCy}px"
+          style:max-width="{labelMaxWidth}px"
         >
           <span
-            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-surface-primary px-1.5 text-current"
+            class="inline-flex min-h-[var(--dot)] min-w-0 max-w-full items-center overflow-hidden rounded-full bg-surface-primary px-1.5 text-current"
           >
             {#if iconName}
               <svg class="h-[14px] w-[20px] text-current" viewBox="0 0 16 16">

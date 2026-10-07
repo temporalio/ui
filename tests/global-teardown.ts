@@ -3,6 +3,7 @@ import { FullConfig } from '@playwright/test';
 import { disconnect, stopWorkflows } from '../temporal/client';
 import { getCodecServer } from '../temporal/codec-server';
 import { stopWorker } from '../temporal/worker';
+import { stopAuthStack } from '../utilities/auth-e2e-stack';
 import { getTemporalServer } from '../utilities/temporal-server';
 import { getUIServer } from '../utilities/ui-server';
 
@@ -12,11 +13,12 @@ export default async function (config: FullConfig) {
     const codecServer = getCodecServer();
     const uiServer = getUIServer();
 
+    await stopAuthStack();
     await stopWorkflows();
     await stopWorker();
     await disconnect();
     await codecServer.stop();
-    await uiServer.shutdown();
+    await uiServer?.shutdown();
     await temporal.shutdown();
   }
 }

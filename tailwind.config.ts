@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 import temporal, { textStyles } from './src/lib/theme/plugin';
+import { fontSize } from './src/lib/theme/preset';
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
@@ -39,9 +40,7 @@ const config = {
       animation: {
         'spin-slow': 'spin 3s linear infinite',
       },
-      fontSize: {
-        '2xs': '0.625rem',
-      },
+      fontSize,
       zIndex: {
         100: '100',
       },
