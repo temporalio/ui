@@ -4,15 +4,18 @@ import type {
   DescribeFullSchedule,
   OverlapPolicy,
   RecentScheduleRun,
+  RecentScheduleRunEnriched,
   ScheduleRequestBody,
 } from '$lib/types/schedule';
 import type { WorkflowExecution } from '$lib/types/workflows';
+import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
 import { getEpochMilliseconds } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
+import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
 import { fetchWorkflowsForQuery } from './workflow-service';
 
@@ -133,7 +136,7 @@ export const toUpcomingScheduleRuns = (
 export const withLatestWorkflowStatuses = (
   runs: RecentScheduleRun[],
   workflows: WorkflowExecution[],
-): RecentScheduleRun[] => {
+): RecentScheduleRunEnriched[] => {
   const latest = new Map<string, WorkflowExecution>();
   for (const workflow of workflows) {
     const current = latest.get(workflow.id);
@@ -149,13 +152,21 @@ export const withLatestWorkflowStatuses = (
   return runs.map((run) => {
     const latestWorkflow = latest.get(run.workflowId);
     if (!latestWorkflow) {
-      return run;
+      return {
+        ...run,
+        delayed: false,
+        taskFailure: false,
+        inVisibility: false,
+      };
     }
     return {
       actualTime: run.actualTime,
       workflowId: latestWorkflow.id || run.workflowId,
       status: latestWorkflow.status || run.status,
       runId: latestWorkflow.runId || run.runId,
+      delayed: isWorkflowDelayed(latestWorkflow),
+      taskFailure: isWorkflowTaskFailure(latestWorkflow),
+      inVisibility: true,
     };
   });
 };
@@ -179,12 +190,12 @@ type RecentRunStatusParams = {
 export const fetchRecentScheduleRunStatuses = async (
   { namespace, scheduleId, runs }: RecentRunStatusParams,
   request = fetch,
-): Promise<RecentScheduleRun[]> => {
+): Promise<RecentScheduleRunEnriched[]> => {
   const workflowIds = [
     ...new Set(runs.map((run) => run.workflowId).filter(Boolean)),
   ];
   if (!workflowIds.length) {
-    return runs;
+    return withLatestWorkflowStatuses(runs, []);
   }
 
   // Backslashes first: the query tokenizer treats them as escape characters, so

@@ -12,6 +12,7 @@
   import type {
     DescribeFullSchedule,
     RecentScheduleRun,
+    RecentScheduleRunEnriched,
   } from '$lib/types/schedule';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
@@ -34,7 +35,7 @@
   }: Props = $props();
 
   const recordedRuns = $derived(toRecentScheduleRuns(schedule));
-  const runsPromise = $derived(
+  const enrichedRunsPromise = $derived(
     fetchRecentScheduleRunStatuses({
       namespace,
       scheduleId: schedule.schedule_id,
@@ -54,7 +55,7 @@
     {openTriggerConfirmationModal}
   />
 {:else}
-  {#await runsPromise}
+  {#await enrichedRunsPromise}
     {@render runList(recordedRuns)}
   {:then runs}
     {@render runList(runs)}
@@ -63,28 +64,38 @@
   {/await}
 {/if}
 
-{#snippet runList(runs: RecentScheduleRun[])}
+{#snippet runList(runs: (RecentScheduleRun | RecentScheduleRunEnriched)[])}
   <ul class={twMerge('flex flex-col gap-2', className)}>
     {#each runs as run, i (run.runId || i)}
+      {@const isEnriched =
+        'delayed' in run && 'taskFailure' in run && 'inVisibility' in run}
       <li
         class="grid grid-cols-[max-content_1fr] gap-x-2 gap-y-1 border-b border-primary py-2 sm:grid-cols-[minmax(max-content,7rem)_1fr_max-content]"
       >
         <div class="col-start-1 row-start-1 flex items-center">
-          <WorkflowStatusBadge status={run.status} />
+          <WorkflowStatusBadge
+            status={run.status}
+            delayed={isEnriched && run.delayed}
+            taskFailure={isEnriched && run.taskFailure}
+          />
         </div>
 
         <div
           class="col-span-2 row-start-2 flex justify-center sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:justify-start"
         >
-          <Link
-            href={routeForWorkflow({
-              workflow: run.workflowId,
-              run: run.runId,
-              namespace,
-            })}
-          >
+          {#if isEnriched && run.inVisibility}
+            <Link
+              href={routeForWorkflow({
+                workflow: run.workflowId,
+                run: run.runId,
+                namespace,
+              })}
+            >
+              {run.workflowId}
+            </Link>
+          {:else}
             {run.workflowId}
-          </Link>
+          {/if}
         </div>
 
         <p

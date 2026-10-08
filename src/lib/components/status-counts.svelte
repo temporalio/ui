@@ -12,7 +12,6 @@
     refresh as workflowRefresh,
   } from '$lib/stores/workflows';
   import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
-  import { getWorkflowStatusLabel } from '$lib/utilities/get-workflow-status-label';
 
   import {
     createStatusCountsState,
@@ -64,7 +63,6 @@
       {#if status}
         <BadgeStatus
           {status}
-          text={getWorkflowStatusLabel(status)}
           {count}
           extensions={difference
             ? [

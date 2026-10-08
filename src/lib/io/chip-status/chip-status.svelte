@@ -18,9 +18,9 @@
     | 'error';
 
   const sharedClasses =
-    "relative inline-flex appearance-none items-stretch overflow-hidden whitespace-nowrap rounded-sm border p-0 font-mono text-xs leading-none uppercase before:pointer-events-none before:absolute before:inset-0 before:z-0 before:rounded-[inherit] before:bg-transparent before:content-[''] enabled:cursor-pointer enabled:hover:before:bg-surface-overlay-primary enabled:active:before:bg-surface-overlay-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary disabled:cursor-not-allowed disabled:opacity-disabled";
+    "relative inline-flex appearance-none items-stretch overflow-hidden whitespace-nowrap rounded-sm border p-0 font-sans uppercase font-medium text-xs leading-none before:pointer-events-none before:absolute before:inset-0 before:z-0 before:rounded-[inherit] before:bg-transparent before:content-[''] enabled:cursor-pointer enabled:hover:before:bg-surface-overlay-primary enabled:active:before:bg-surface-overlay-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary disabled:cursor-not-allowed disabled:opacity-disabled min-h-[20px]";
   const segmentClasses =
-    'relative z-10 inline-flex flex-nowrap items-center justify-center gap-1 p-1';
+    'relative z-10 inline-flex flex-nowrap items-center justify-center gap-1 py-0.5 px-1';
 
   const colorSchemeClasses: Record<
     ChipStatusColorScheme,
@@ -116,7 +116,9 @@
   )}
   {...rest}
 >
-  <span class="{segmentClasses} font-medium">{label}</span>
+  <span class="{segmentClasses} font-medium">
+    <span>{label}</span>
+  </span>
   {#if extension !== undefined}
     <span
       class={twMerge(
@@ -125,11 +127,13 @@
         'font-normal',
       )}
     >
-      {#if typeof extension === 'number'}
-        {extension.toLocaleString(undefined, { signDisplay: 'always' })}
-      {:else}
-        {extension}
-      {/if}
+      <span>
+        {#if typeof extension === 'number'}
+          {extension.toLocaleString(undefined, { signDisplay: 'always' })}
+        {:else}
+          {extension}
+        {/if}
+      </span>
     </span>
   {/if}
 </button>
