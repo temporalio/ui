@@ -1,6 +1,7 @@
 import { readonly, writable } from 'svelte/store';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
 import type { WorkflowEvent } from '$lib/types/events';
 
 import {
@@ -111,7 +112,9 @@ class EventBufferView {
    * Matcher for the selected event group keys, re-derived as events arrive.
    * Undefined when none of the keys exist in this run.
    */
-  eventGroupMatcher(keys: readonly string[]): EventGroupMatcher | undefined {
+  eventGroupMatcher(
+    keys: readonly EventGroupKey[],
+  ): EventGroupMatcher | undefined {
     void this._version;
     return getEventGroupMatcher(keys);
   }

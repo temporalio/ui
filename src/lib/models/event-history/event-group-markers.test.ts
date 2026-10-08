@@ -11,6 +11,8 @@ import {
   type EventGroupLabel,
   formatEventGroupName,
   formatEventGroupNames,
+  isEventGroupKey,
+  toEventGroupKey,
 } from './event-group-markers';
 
 type Markers = HistoryEvent['eventGroupMarkers'];
@@ -298,6 +300,25 @@ describe('createEventGroupLabelRegistry', () => {
         ),
       ).toBe('adjustOrbit (update-1)');
     });
+  });
+});
+
+describe('event group keys', () => {
+  it('prefixes the id with its kind', () => {
+    expect(toEventGroupKey('label', 'phase:ascent')).toBe('label:phase:ascent');
+    expect(toEventGroupKey('event', '18')).toBe('event:18');
+  });
+
+  it('recognizes keys for each kind', () => {
+    expect(isEventGroupKey('label:a')).toBe(true);
+    expect(isEventGroupKey('event:18')).toBe(true);
+    expect(isEventGroupKey('update:adjust-orbit')).toBe(true);
+  });
+
+  it('rejects values without a known kind', () => {
+    expect(isEventGroupKey('a')).toBe(false);
+    expect(isEventGroupKey('labels:a')).toBe(false);
+    expect(isEventGroupKey('timer:5')).toBe(false);
   });
 });
 

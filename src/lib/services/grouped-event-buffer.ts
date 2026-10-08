@@ -11,6 +11,7 @@ import { getGroupId } from '$lib/models/event-groups/get-group-id';
 import { toEvent } from '$lib/models/event-history';
 import {
   createEventGroupLabelRegistry,
+  type EventGroupKey,
   type EventGroupLabel,
 } from '$lib/models/event-history/event-group-markers';
 import type {
@@ -212,7 +213,7 @@ let eventGroupLabels = createEventGroupLabelRegistry();
 
 // Event group key -> the events carrying that marker and the lifecycle groups
 // they belong to, so the event group filter is a set lookup per row.
-let eventGroupIndex = new Map<string, EventGroupIndexEntry>();
+let eventGroupIndex = new Map<EventGroupKey, EventGroupIndexEntry>();
 let cachedEventGroupOptions: EventGroupOption[] | null = null;
 let cachedEventGroupOptionsRevision = -1;
 
@@ -671,7 +672,7 @@ export function getEventGroupOptions(): EventGroupOption[] {
  * when none remain, so a stale selection never hides the whole history.
  */
 export function getEventGroupMatcher(
-  keys: readonly string[],
+  keys: readonly EventGroupKey[],
 ): EventGroupMatcher | undefined {
   const headSlots = new Set<number>();
   for (const key of keys) {

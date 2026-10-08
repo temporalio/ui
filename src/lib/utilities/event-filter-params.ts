@@ -1,5 +1,9 @@
 import { goto as navigateTo } from '$app/navigation';
 
+import {
+  type EventGroupKey,
+  isEventGroupKey,
+} from '$lib/models/event-history/event-group-markers';
 import type { EventSortOrder } from '$lib/stores/event-view';
 import type { EventTypeCategory } from '$lib/types/events';
 
@@ -38,12 +42,15 @@ const decodeEventGroupKey = (key: string): string => {
   }
 };
 
-const parseEventGroups = (value: string | null): string[] =>
+const parseEventGroups = (value: string | null): EventGroupKey[] =>
   value
-    ? value.split(eventGroupSeparator).filter(Boolean).map(decodeEventGroupKey)
+    ? value
+        .split(eventGroupSeparator)
+        .map(decodeEventGroupKey)
+        .filter(isEventGroupKey)
     : [];
 
-const serializeEventGroups = (keys: string[]): string =>
+const serializeEventGroups = (keys: EventGroupKey[]): string =>
   keys.map((key) => encodeURIComponent(key)).join(eventGroupSeparator);
 
 export function parseEventFilterParams(url: URL) {
@@ -64,7 +71,7 @@ type FilterUpdate = {
   categories?: EventTypeCategory[] | null;
   statusFilter?: boolean;
   refresh_off?: boolean;
-  eventGroups?: string[] | null;
+  eventGroups?: EventGroupKey[] | null;
 };
 
 export function updateEventFilterParams(

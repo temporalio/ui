@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
+
 import {
   parseEventFilterParams,
   updateEventFilterParams,
@@ -90,7 +92,11 @@ describe('event group filter params', () => {
   });
 
   it('round-trips event group keys containing separators', async () => {
-    const keys = ['label:a,b', 'update:adjust orbit', 'event:18'];
+    const keys: EventGroupKey[] = [
+      'label:a,b',
+      'update:adjust orbit',
+      'event:18',
+    ];
     const mockGoto = vi.fn(() => Promise.resolve());
 
     await updateEventFilterParams(
@@ -116,6 +122,14 @@ describe('event group filter params', () => {
 
     const [href] = mockGoto.mock.calls[0] as unknown as [string];
     expect(href).not.toContain('groups=');
+  });
+
+  it('drops keys without a known kind', () => {
+    expect(
+      parseEventFilterParams(
+        new URL('http://localhost/?groups=label%3Aa,phase,timer%3A5'),
+      ).eventGroups,
+    ).toEqual(['label:a']);
   });
 
   it('keeps malformed keys instead of throwing', () => {

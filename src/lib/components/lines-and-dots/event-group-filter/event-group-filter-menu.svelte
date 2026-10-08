@@ -15,6 +15,7 @@
   import { IconSearch } from '$lib/io/icon';
   import {
     decodeEventGroupLabel,
+    type EventGroupKey,
     type EventGroupLabel,
     formatEventGroupName,
   } from '$lib/models/event-history/event-group-markers';
@@ -99,7 +100,7 @@
     };
   });
 
-  const setSelection = (keys: string[]) => {
+  const setSelection = (keys: EventGroupKey[]) => {
     clearActiveGroups();
     updateEventFilterParams(
       page.url,
@@ -108,7 +109,7 @@
     );
   };
 
-  const toggle = (key: string) => {
+  const toggle = (key: EventGroupKey) => {
     setSelection(
       selectedKeys.has(key)
         ? selected.filter((selectedKey) => selectedKey !== key)

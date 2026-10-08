@@ -2,7 +2,11 @@ import type { Payload } from '$lib/types';
 import type { HistoryEvent } from '$lib/types/events';
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 
-export type EventGroupKind = 'label' | 'event' | 'update';
+const eventGroupKinds = ['label', 'event', 'update'] as const;
+
+export type EventGroupKind = (typeof eventGroupKinds)[number];
+
+export type EventGroupKey = `${EventGroupKind}:${string}`;
 
 type InboundSourceDetails = {
   name?: string;
@@ -10,7 +14,7 @@ type InboundSourceDetails = {
 };
 
 export type EventGroupLabel = InboundSourceDetails & {
-  key: string;
+  key: EventGroupKey;
   kind: EventGroupKind;
   id: string;
   label?: Payload;
@@ -32,10 +36,19 @@ const hasPayloadContent = (
 ): payload is Payload =>
   Boolean(payload?.data || Object.keys(payload?.metadata ?? {}).length);
 
-const nonEmptyString = (value: unknown): string | undefined =>
-  typeof value === 'string' && value ? value : undefined;
+const nonEmptyString = (value: unknown): string | undefined => {
+  if (typeof value === 'string' && value) return value;
 
-const toKey = (kind: EventGroupKind, id: string) => `${kind}:${id}`;
+  return undefined;
+};
+
+export const toEventGroupKey = (
+  kind: EventGroupKind,
+  id: string,
+): EventGroupKey => `${kind}:${id}`;
+
+export const isEventGroupKey = (value: string): value is EventGroupKey =>
+  eventGroupKinds.some((kind) => value.startsWith(`${kind}:`));
 
 const getInboundSource = (
   historyEvent: HistoryEvent,
@@ -94,11 +107,11 @@ const recordSource = (
 };
 
 export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
-  const entries = new Map<string, EventGroupLabel>();
-  const pendingSources = new Map<string, InboundSourceDetails>();
+  const entries = new Map<EventGroupKey, EventGroupLabel>();
+  const pendingSources = new Map<EventGroupKey, InboundSourceDetails>();
 
   const getEntry = (kind: EventGroupKind, id: string): EventGroupLabel => {
-    const key = toKey(kind, id);
+    const key = toEventGroupKey(kind, id);
     let entry = entries.get(key);
     if (!entry) {
       entry = { key, kind, id, ...pendingSources.get(key) };
@@ -109,7 +122,7 @@ export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
   };
 
   const indexInboundSource = (source: InboundSource) => {
-    const key = toKey(source.kind, source.id);
+    const key = toEventGroupKey(source.kind, source.id);
     let details = entries.get(key) ?? pendingSources.get(key);
     if (!details) {
       details = {};
@@ -180,10 +193,7 @@ export const decodeEventGroupLabel = async (
 
   let decoded = decodedLabels.get(payload);
   if (!decoded) {
-    decoded = decode(payload).then(
-      (value) => (typeof value === 'string' && value ? value : undefined),
-      () => undefined,
-    );
+    decoded = decode(payload).then(nonEmptyString, () => undefined);
     decodedLabels.set(payload, decoded);
   }
 

@@ -1,3 +1,4 @@
+import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
 import type { EventGroupOption } from '$lib/services/grouped-event-buffer';
 
 export const EVENT_GROUP_FILTER_OPTION_LIMIT = 100;
@@ -16,7 +17,7 @@ export const matchesEventGroupSearch = (
 
 export const limitEventGroupOptions = (
   options: EventGroupOption[],
-  selectedKeys: ReadonlySet<string>,
+  selectedKeys: ReadonlySet<EventGroupKey>,
   limit = EVENT_GROUP_FILTER_OPTION_LIMIT,
 ): EventGroupOption[] => {
   if (options.length <= limit) return options;
