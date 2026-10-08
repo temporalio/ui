@@ -320,3 +320,36 @@ export const fromNumberToDuration = (duration: string): string | undefined => {
   if (!duration) return undefined;
   return duration + 's';
 };
+
+// A duration in the compact form Temporal's query language accepts, e.g. 1h5m10s123ms.
+// The display formatters are not usable for a query: they put a delimiter between units,
+// and which delimiter depends on the caller, so their output can contain a comma. This
+// truncates rather than rounds so that `>=` on a row's own duration still matches that
+// row, and rolls days into hours because Go durations have no day unit.
+export function toQueryDuration(milliseconds: number): string {
+  if (!Number.isFinite(milliseconds) || milliseconds < 0) return '';
+
+  const total = Math.floor(milliseconds);
+  if (total === 0) return '0s';
+
+  const units: [number, string][] = [
+    [Math.floor(total / 3600000), 'h'],
+    [Math.floor((total % 3600000) / 60000), 'm'],
+    [Math.floor((total % 60000) / 1000), 's'],
+    [total % 1000, 'ms'],
+  ];
+
+  return units
+    .filter(([value]) => value > 0)
+    .map(([value, unit]) => `${value}${unit}`)
+    .join('');
+}
+
+// The seconds string a protobuf Duration serializes to, e.g. "310.5s".
+export function durationStringToMilliseconds(
+  duration: string | undefined | null,
+): number | null {
+  if (!duration || !/^\d+(\.\d+)?s$/.test(duration)) return null;
+
+  return parseFloat(duration) * 1000;
+}

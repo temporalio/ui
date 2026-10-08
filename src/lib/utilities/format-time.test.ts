@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  durationStringToMilliseconds,
   formatDistance,
   formatDistanceAbbreviated,
   formatDurationAbbreviated,
@@ -11,6 +12,7 @@ import {
   getEpochMilliseconds,
   getTimestampDifference,
   maxDate,
+  toQueryDuration,
   validTimeToDate,
 } from './format-time';
 
@@ -509,5 +511,74 @@ describe('validTimeToDate', () => {
 
   it('should throw on an empty string', () => {
     expect(() => validTimeToDate('')).toThrow(TypeError);
+  });
+});
+
+describe('toQueryDuration', () => {
+  it('omits the components that are zero', () => {
+    expect(toQueryDuration(610000)).toBe('10m10s');
+    expect(toQueryDuration(3600000)).toBe('1h');
+    expect(toQueryDuration(123)).toBe('123ms');
+  });
+
+  it('combines every component', () => {
+    expect(toQueryDuration(3661123)).toBe('1h1m1s123ms');
+  });
+
+  it('rolls days into hours, since a Go duration has no day unit', () => {
+    expect(toQueryDuration(86400000 * 2)).toBe('48h');
+  });
+
+  it('truncates so a row still matches a >= filter on its own duration', () => {
+    expect(toQueryDuration(1999.9)).toBe('1s999ms');
+  });
+
+  it('is never empty for a zero duration', () => {
+    expect(toQueryDuration(0)).toBe('0s');
+  });
+
+  it('has no value for a negative or unusable duration', () => {
+    expect(toQueryDuration(-1)).toBe('');
+    expect(toQueryDuration(NaN)).toBe('');
+    expect(toQueryDuration(Infinity)).toBe('');
+  });
+
+  // The display formatters delimit units, and one of them uses ', '. That output is
+  // not a valid duration, which is the whole reason this helper exists.
+  it.each([610000, 3661123, 123, 0, 86400000])(
+    'never emits a delimiter for %i ms',
+    (milliseconds) => {
+      const duration = toQueryDuration(milliseconds);
+      expect(duration).not.toContain(',');
+      expect(duration).not.toContain(' ');
+    },
+  );
+});
+
+describe('durationStringToMilliseconds', () => {
+  it('parses the seconds string a protobuf Duration serializes to', () => {
+    expect(durationStringToMilliseconds('310.5s')).toBe(310500);
+    expect(durationStringToMilliseconds('0.123s')).toBe(123);
+    expect(durationStringToMilliseconds('60s')).toBe(60000);
+  });
+
+  it('reaches the same duration as a start and end difference', () => {
+    const fromProto = toQueryDuration(
+      durationStringToMilliseconds('310.5s') ?? 0,
+    );
+    const fromInterval = toQueryDuration(
+      new Date('2024-01-02T03:09:15.500Z').getTime() -
+        new Date('2024-01-02T03:04:05.000Z').getTime(),
+    );
+
+    expect(fromProto).toBe('5m10s500ms');
+    expect(fromInterval).toBe(fromProto);
+  });
+
+  it('rejects anything that is not a seconds string', () => {
+    expect(durationStringToMilliseconds('')).toBeNull();
+    expect(durationStringToMilliseconds(undefined)).toBeNull();
+    expect(durationStringToMilliseconds('5m10s')).toBeNull();
+    expect(durationStringToMilliseconds('310.5ms')).toBeNull();
   });
 });
