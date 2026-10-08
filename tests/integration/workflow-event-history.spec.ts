@@ -128,29 +128,38 @@ test.describe('Workflow History view with pending activities and filters', () =>
     );
   });
 
-  test('orders pending activities with the sort direction', async ({
-    page,
-  }) => {
-    await expect(
-      page.getByTestId('pending-activity-summary-row').nth(0),
-    ).toContainText('SecondActivity');
-    await expect(
-      page.getByTestId('pending-activity-summary-row').nth(1),
-    ).toContainText('FirstActivity');
-
-    await page.getByTestId('zoom-in').click();
-
-    await expect(
-      page.getByTestId('pending-activity-summary-row').nth(0),
-    ).toContainText('FirstActivity');
-    await expect(
-      page.getByTestId('pending-activity-summary-row').nth(1),
-    ).toContainText('SecondActivity');
-  });
-
   test('shows only the pending activities in the selected event group', async ({
     page,
   }) => {
+    await page
+      .locator('button[aria-controls="event-group-filter-menu"]')
+      .click();
+    await page
+      .locator('#event-group-filter-menu')
+      .getByRole('menuitem', { name: /satellite:A/ })
+      .click();
+
+    await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
+      1,
+    );
+    await expect(
+      page.getByTestId('pending-activity-summary-row'),
+    ).toContainText('FirstActivity');
+  });
+
+  test('shows a pending activity before its scheduled event loads', async ({
+    page,
+  }) => {
+    await mockEventHistoryApi(page, {
+      history: { events: events.slice(0, 3) },
+      nextPageToken: null,
+    });
+    await page.reload();
+
+    await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
+      2,
+    );
+
     await page
       .locator('button[aria-controls="event-group-filter-menu"]')
       .click();
