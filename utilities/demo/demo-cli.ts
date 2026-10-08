@@ -7,16 +7,35 @@
  *   pnpm demo start system-nexus-signal-with-start
  *   pnpm demo start system-nexus-signal-with-start --skip ui
  *   pnpm demo stop
+ *
+ * The harness itself is in src/lib/demo, which ships in the package. This file
+ * is the part that is particular to this repository: which stages exist, and
+ * how a catalog example gets started.
  */
 import { pathToFileURL } from 'node:url';
 
-import { demoHelp, runDemoCli } from './cli';
-import { ReportedRunFailure, startFeatureDemo, stopFeatureDemo } from './run';
+import { startCatalogExamples } from './examples';
 import { scaffoldDefinition } from './scaffold';
+import { uiDemoStages } from './stages';
+import { demoHelpFor, runDemoCli } from '../../src/lib/demo/cli';
 import { listDefinitions, loadDefinition } from '../../src/lib/demo/definition';
 import { loadLocalEnvironment } from '../../src/lib/demo/paths';
+import {
+  type DemoRunner,
+  ReportedRunFailure,
+  startFeatureDemo,
+  stopFeatureDemo,
+} from '../../src/lib/demo/run';
+import { stageNames } from '../../src/lib/demo/stage';
 
-export { demoHelp };
+const runner: DemoRunner = {
+  stages: uiDemoStages,
+  runExamples: startCatalogExamples,
+};
+
+const stages = stageNames(uiDemoStages);
+
+export const demoHelp = demoHelpFor(stages);
 
 const isReportedDemoCliError = (error: unknown) => {
   if (error instanceof ReportedRunFailure) return true;
@@ -49,10 +68,12 @@ const main = async () => {
     await runDemoCli({
       argv: process.argv.slice(2),
       io,
+      stages,
       commands: {
-        list: () => listDefinitions(),
+        list: () => listDefinitions(uiDemoStages),
         show: showDefinition,
-        start: (target, options) => startFeatureDemo(target, options, io),
+        start: (target, options) =>
+          startFeatureDemo(target, options, io, runner),
         stop: (name) => stopFeatureDemo(name, io),
         create: (name, exampleIds) => scaffoldDefinition(name, exampleIds),
       },

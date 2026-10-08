@@ -5,6 +5,8 @@ import { pathToFileURL } from 'url';
 
 import { z } from 'zod';
 
+import { type DemoStage, SCENARIOS_STAGE } from './stage';
+
 /**
  * A catalog example a demo starts. The shape is plain on purpose: validating an
  * id against the catalog belongs to whatever starts it, not to the definition.
@@ -20,15 +22,12 @@ export const exampleEntrySchema = z.object({
 
 export type ExampleEntry = z.infer<typeof exampleEntrySchema>;
 
-export const STAGES = [
-  'server',
-  'worker',
-  'tunnel',
-  'ui',
-  'scenarios',
-] as const;
-
-export type Stage = (typeof STAGES)[number];
+/**
+ * A stage is whatever the registry a runner is given names, so this is a plain
+ * string rather than a fixed union. The runner validates a --skip or --only
+ * against the registry it holds.
+ */
+export type Stage = string;
 
 // Arrays included: some settings are lists, and the server takes them as JSON
 // on the same flag, so they need no special handling beyond being allowed here.
@@ -258,6 +257,7 @@ const scenarioNames = (cwd: string): string[] => {
 };
 
 export const listDefinitions = async (
+  stages: readonly DemoStage[],
   cwd = process.cwd(),
 ): Promise<DefinitionSummary[]> =>
   Promise.all(
@@ -271,11 +271,8 @@ export const listDefinitions = async (
         ownScenario: hasOwnScenario(data.name, cwd),
         path,
         stages: [
-          ...(data.server.enabled ? ['server'] : []),
-          ...(data.worker.enabled ? ['worker'] : []),
-          ...(data.tunnel.enabled ? ['tunnel'] : []),
-          ...(data.ui.enabled ? ['ui'] : []),
-          ...(hasWork(data, cwd) ? ['scenarios'] : []),
+          ...stages.filter((stage) => stage.enabled(data)).map((s) => s.name),
+          ...(hasWork(data, cwd) ? [SCENARIOS_STAGE] : []),
         ],
         examples: data.examples.map((entry) => entry.id),
       };

@@ -134,11 +134,7 @@ export const requireWorkflowExample = (
   };
 };
 
-export const catalogExampleUrl = (
-  base: string,
-  namespace: string,
-  id: string,
-) => `${base}/namespaces/${namespace}/catalog/${encodeURIComponent(id)}`;
+export { catalogExampleUrl } from '../../src/lib/demo/summary';
 
 /**
  * Checks input against the example's own declared schema, so a definition
