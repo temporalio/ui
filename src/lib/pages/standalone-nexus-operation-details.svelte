@@ -83,6 +83,7 @@
     input={$nexusOperationExecution.input ?? undefined}
     result={$nexusOperationExecution.result ?? undefined}
     failure={$nexusOperationExecution.failure ?? undefined}
+    isPending={info.status === 'NEXUS_OPERATION_EXECUTION_STATUS_RUNNING'}
   />
   <Card class="space-y-6">
     <h5>{translate('standalone-nexus-operations.operation-event-history')}</h5>

@@ -197,4 +197,7 @@ export const Strings = {
   'form-start-to-close-timeout-hint':
     'If not set or set to zero, no timeout will be enforced.',
   'form-update-policies-button': 'Update Policies',
+  'operation-input': 'Nexus Operation Input',
+  'operation-result': 'Nexus Operation Result',
+  'results-pending': 'Results will appear upon completion.',
 } as const;
