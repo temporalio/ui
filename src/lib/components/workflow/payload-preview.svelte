@@ -156,7 +156,7 @@
       <IconButton
         Icon={IconChevronDown}
         size="xs"
-        class="h-8 w-8 rounded-l-none text-secondary max-sm:h-11 max-sm:w-11"
+        class="h-8 w-8 text-secondary max-sm:h-11 max-sm:w-11"
         label={`${translate('common.preview')} ${title}`}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -179,7 +179,7 @@
       <IconButton
         Icon={IconArrowExpand}
         size="xs"
-        class="h-8 w-8 rounded-l-none text-secondary max-sm:h-11 max-sm:w-11"
+        class="h-8 w-8 text-secondary max-sm:h-11 max-sm:w-11"
         label={`${translate('common.maximize')} ${title}`}
         aria-haspopup="dialog"
         aria-expanded={expanded}
