@@ -1,6 +1,11 @@
 import plugin from 'tailwindcss/plugin';
 
-import { themesBaseStyles } from './io/themes';
+import {
+  defaultThemeName,
+  themes,
+  themesBaseStyles,
+  toCssVariableReferences,
+} from './io/themes';
 import { colorTheme, opacityTheme } from './tailwind-colors';
 
 const textStyles = plugin(({ addBase, theme }) => {
@@ -64,6 +69,10 @@ const temporal = plugin(
     theme: {
       ...colorTheme,
       extend: {
+        spacing: toCssVariableReferences(
+          themes[defaultThemeName].spacing,
+          'spacing',
+        ),
         opacity: opacityTheme,
         transitionProperty: {
           width: 'width',
