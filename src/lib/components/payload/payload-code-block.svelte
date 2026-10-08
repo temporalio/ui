@@ -42,6 +42,7 @@
     value: Payload | Payloads | PayloadContainingObject;
     label?: string;
     maxHeight?: number;
+    disableMaximize?: boolean;
     testId?: string;
     filenameData?: PayloadDownloadFilenameData;
     lazy?: boolean;
@@ -51,6 +52,7 @@
     value,
     label = '',
     maxHeight,
+    disableMaximize = false,
     testId,
     filenameData = undefined,
     lazy = false,
@@ -111,6 +113,7 @@
       <CodeBlock
         content={stringifyWithBigInt(value)}
         {label}
+        {disableMaximize}
         {maxHeight}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -129,6 +132,7 @@
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue.data)}
               {label}
+              {disableMaximize}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -179,6 +183,7 @@
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue.data)}
               {label}
+              {disableMaximize}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -190,6 +195,7 @@
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue)}
               {label}
+              {disableMaximize}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -205,6 +211,7 @@
       <CodeBlock
         content={stringifyWithBigInt(value)}
         {label}
+        {disableMaximize}
         {maxHeight}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}

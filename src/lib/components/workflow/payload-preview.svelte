@@ -1,19 +1,26 @@
 <script lang="ts">
   import { onDestroy, type Snippet, tick } from 'svelte';
 
-  import Button from '$lib/holocene/button.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
+  import { portal } from '$lib/holocene/portal/portal-action';
   import Portal from '$lib/holocene/portal/portal.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { IconArrowExpand, IconChevronDown, IconClose } from '$lib/io/icon';
   import { getFocusableElements } from '$lib/utilities/focus-trap';
 
   let {
     title,
     preview,
     children,
-  }: { title: string; preview: Snippet; children: Snippet } = $props();
+  }: { title: string; preview: Snippet; children: Snippet<[number?]> } =
+    $props();
 
   const id = $props.id();
-  let anchor = $state<HTMLHeadingElement>();
+  let anchor = $state<HTMLSpanElement>();
+  let expandAnchor = $state<HTMLSpanElement>();
   let panel = $state<HTMLElement>();
+  let expandedPanel = $state<HTMLDialogElement>();
+  let expanded = $state(false);
   let open = $state(false);
   let pinned = $state(false);
   let closeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -23,6 +30,7 @@
   }
 
   function show() {
+    if (expanded) return;
     cancelClose();
     open = true;
   }
@@ -53,7 +61,7 @@
   }
 
   async function handleFocusOut(event: FocusEvent) {
-    if (contains(event.relatedTarget)) return;
+    if (expanded || contains(event.relatedTarget)) return;
     await tick();
     if (!contains(document.activeElement) && !anchor?.closest('[inert]')) {
       close();
@@ -65,7 +73,13 @@
   }
 
   function handleEscape(event: KeyboardEvent) {
-    if (event.key !== 'Escape' || !open || anchor?.closest('[inert]')) return;
+    if (
+      expanded ||
+      event.key !== 'Escape' ||
+      !open ||
+      anchor?.closest('[inert]')
+    )
+      return;
     if (panel?.contains(document.activeElement)) {
       anchor?.querySelector('button')?.focus();
     }
@@ -107,6 +121,20 @@
     }
   }
 
+  async function expand() {
+    expanded = true;
+    close();
+    await tick();
+    expandedPanel?.showModal();
+  }
+
+  async function collapse() {
+    close();
+    expandAnchor?.querySelector('button')?.focus();
+    await tick();
+    expanded = false;
+  }
+
   onDestroy(cancelClose);
 </script>
 
@@ -116,39 +144,54 @@
 />
 
 <div class="flex min-w-0 items-center gap-3">
-  <h5 bind:this={anchor} class="shrink-0">
-    <Button
-      variant="ghost"
-      size="xs"
-      class="h-auto min-h-8 cursor-help border-0 p-0 text-base font-medium underline decoration-dotted underline-offset-4 hover:bg-transparent hover:text-primary focus-visible:bg-transparent active:scale-100 active:bg-transparent max-sm:min-h-11"
-      aria-label={title}
-      aria-haspopup="dialog"
-      aria-expanded={open}
-      aria-controls={open ? id : undefined}
-      onpointerenter={show}
-      onpointerleave={scheduleClose}
-      onfocus={show}
-      onblur={handleFocusOut}
-      onkeydown={focusPanel}
-      onclick={() => {
-        if (pinned) close();
-        else {
-          show();
-          pinned = true;
-        }
-      }}
-    >
-      {title}
-    </Button>
-  </h5>
-  <code
-    class="min-w-0 flex-1 truncate rounded border border-secondary bg-surface-overlay-primary px-2 py-1.5 font-mono text-xs text-primary"
-    >{@render preview()}</code
+  <h5 class="shrink-0 text-base font-medium">{title}</h5>
+  <div
+    class="flex min-w-0 flex-1 items-center rounded border border-secondary bg-surface-overlay-primary"
   >
+    <code
+      class="min-w-0 flex-1 truncate px-2 py-1.5 font-mono text-xs text-primary"
+      >{@render preview()}</code
+    >
+    <span bind:this={anchor} class="flex shrink-0">
+      <IconButton
+        Icon={IconChevronDown}
+        size="xs"
+        class="h-8 w-8 rounded-l-none text-secondary max-sm:h-11 max-sm:w-11"
+        label={`${translate('common.preview')} ${title}`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-controls={open ? id : undefined}
+        onpointerenter={show}
+        onpointerleave={scheduleClose}
+        onfocus={show}
+        onblur={handleFocusOut}
+        onkeydown={focusPanel}
+        onclick={() => {
+          if (pinned) close();
+          else {
+            show();
+            pinned = true;
+          }
+        }}
+      />
+    </span>
+    <span bind:this={expandAnchor} class="flex shrink-0">
+      <IconButton
+        Icon={IconArrowExpand}
+        size="xs"
+        class="h-8 w-8 rounded-l-none text-secondary max-sm:h-11 max-sm:w-11"
+        label={`${translate('common.maximize')} ${title}`}
+        aria-haspopup="dialog"
+        aria-expanded={expanded}
+        aria-controls={expanded ? `${id}-expanded` : undefined}
+        onclick={expand}
+      />
+    </span>
+  </div>
 </div>
 
-{#if anchor}
-  <Portal {anchor} {open} position="bottom-left" offset={{ y: 8 }}>
+{#if anchor && !expanded}
+  <Portal {anchor} {open} position="bottom-right" offset={{ y: 8 }}>
     <div
       bind:this={panel}
       {id}
@@ -162,7 +205,31 @@
       onfocusout={handleFocusOut}
       onkeydowncapture={handlePanelKeydown}
     >
-      {@render children()}
+      {@render children(300)}
     </div>
   </Portal>
 {/if}
+
+<dialog
+  bind:this={expandedPanel}
+  use:portal
+  id={`${id}-expanded`}
+  aria-label={title}
+  aria-modal="true"
+  class="fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none overflow-auto bg-surface-primary p-4 text-primary"
+  onclose={collapse}
+  onclick={(event) => {
+    if (event.target === expandedPanel) expandedPanel.close();
+  }}
+>
+  {#if expanded}
+    <div class="mb-3 flex justify-end">
+      <IconButton
+        Icon={IconClose}
+        label={translate('common.close')}
+        onclick={() => expandedPanel?.close()}
+      />
+    </div>
+    {@render children()}
+  {/if}
+</dialog>

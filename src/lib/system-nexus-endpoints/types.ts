@@ -64,6 +64,7 @@ export type SystemNexusPresentation = {
 export type SystemNexusInputRendererProps = {
   payload: Payload;
   maxHeight?: number;
+  disableMaximize?: boolean;
 };
 
 /**

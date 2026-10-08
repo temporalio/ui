@@ -58,28 +58,36 @@
 >
   <PayloadPreview title={translate('workflows.input')}>
     {#snippet preview()}{@render previewContent(workflowEvents.input)}{/snippet}
-    <InputAndResultsPayload
-      title={translate('workflows.input')}
-      content={workflowEvents.input ?? undefined}
-      payloadDownloadFilenameData={{
-        ...payloadDownloadFilenameData,
-        type: 'input',
-      }}
-    />
+    {#snippet children(maxHeight)}
+      <InputAndResultsPayload
+        disableMaximize
+        maxHeight={maxHeight ?? 0}
+        title={translate('workflows.input')}
+        content={workflowEvents.input ?? undefined}
+        payloadDownloadFilenameData={{
+          ...payloadDownloadFilenameData,
+          type: 'input',
+        }}
+      />
+    {/snippet}
   </PayloadPreview>
   <PayloadPreview title={translate('workflows.result')}>
     {#snippet preview()}{@render previewContent(
         workflowEvents.results,
         isPending,
       )}{/snippet}
-    <InputAndResultsPayload
-      title={translate('workflows.result')}
-      content={workflowEvents.results ?? undefined}
-      {isPending}
-      payloadDownloadFilenameData={{
-        ...payloadDownloadFilenameData,
-        type: 'result',
-      }}
-    />
+    {#snippet children(maxHeight)}
+      <InputAndResultsPayload
+        disableMaximize
+        maxHeight={maxHeight ?? 0}
+        title={translate('workflows.result')}
+        content={workflowEvents.results ?? undefined}
+        {isPending}
+        payloadDownloadFilenameData={{
+          ...payloadDownloadFilenameData,
+          type: 'result',
+        }}
+      />
+    {/snippet}
   </PayloadPreview>
 </div>
