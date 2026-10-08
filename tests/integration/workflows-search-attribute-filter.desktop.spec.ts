@@ -552,7 +552,8 @@ test('it should leave Enter alone outside the popover', async ({ page }) => {
 test('it should apply an edited value on Enter', async ({ page }) => {
   await clickQuickFilter(page, 'Type');
 
-  const input = page.locator('#quick-filter-WorkflowType-text');
+  // The id carries a per-cell unique segment, so match on the suffix.
+  const input = page.locator('input[id$="-WorkflowType-text"]');
   await input.fill('AnotherWorkflowType');
   await page.keyboard.press('Enter');
 

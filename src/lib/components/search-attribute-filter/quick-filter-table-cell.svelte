@@ -80,9 +80,8 @@
   // single click. Anywhere else the operator is a guess, so ask instead.
   const needsOperator = $derived(requiresOperatorChoice({ attribute, type }));
   const hasPopup = $derived(needsOperator && filterValue !== null);
-const quickFilterCellId = $props.id();
-const menuId = $derived(`quick-filter-${quickFilterCellId}-${attribute}`);
-
+  const quickFilterCellId = $props.id();
+  const menuId = $derived(`quick-filter-${quickFilterCellId}-${attribute}`);
 
   const atQueryLimit = $derived(
     (page.url.searchParams.get('query') ?? '').length >= MAX_QUERY_LENGTH,
