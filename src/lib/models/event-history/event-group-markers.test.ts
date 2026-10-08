@@ -203,6 +203,19 @@ describe('createEventGroupLabelRegistry', () => {
       ).toBe('WorkflowExecutionSignaled');
     });
 
+    it('formats a screaming-case event type from the source event', () => {
+      const registry = createEventGroupLabelRegistry();
+      registry.resolve(
+        toSourceEvent('3', {
+          eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_SIGNALED',
+          workflowExecutionSignaledEventAttributes: {},
+        }),
+      );
+      expect(
+        formatEventGroupName(resolveOne(registry, '6', [signalMarker('3')])[0]),
+      ).toBe('WorkflowExecutionSignaled');
+    });
+
     it('labels a marker on the started event with its event type', () => {
       const registry = createEventGroupLabelRegistry();
       registry.resolve(

@@ -1,6 +1,7 @@
 import type { Payload } from '$lib/types';
 import type { HistoryEvent } from '$lib/types/events';
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+import { toEventNameReadable } from '$lib/utilities/screaming-enums';
 
 const eventGroupKinds = ['label', 'event', 'update'] as const;
 
@@ -28,7 +29,6 @@ type InboundSource = {
   kind: Exclude<EventGroupKind, 'label'>;
   id: string;
   name?: string;
-  eventType: string;
 };
 
 const hasPayloadContent = (
@@ -58,7 +58,6 @@ const getInboundSource = (
     return {
       kind: 'event',
       id: eventId,
-      eventType: 'WorkflowExecutionStarted',
     };
   }
 
@@ -68,7 +67,6 @@ const getInboundSource = (
       kind: 'event',
       id: eventId,
       name: nonEmptyString(signaled.signalName),
-      eventType: 'WorkflowExecutionSignaled',
     };
   }
 
@@ -80,7 +78,6 @@ const getInboundSource = (
       kind: 'update',
       id: admittedUpdateId,
       name: nonEmptyString(admitted?.input?.name),
-      eventType: 'WorkflowExecutionUpdateAdmitted',
     };
   }
 
@@ -93,24 +90,18 @@ const getInboundSource = (
       kind: 'update',
       id: acceptedUpdateId,
       name: nonEmptyString(accepted?.acceptedRequest?.input?.name),
-      eventType: 'WorkflowExecutionUpdateAccepted',
     };
   }
-};
-
-const recordSource = (
-  details: InboundSourceDetails,
-  { name, eventType }: InboundSource,
-) => {
-  if (name) details.name = name;
-  details.sourceEventType ??= eventType;
 };
 
 export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
   const entries = new Map<EventGroupKey, EventGroupLabel>();
   const pendingSources = new Map<EventGroupKey, InboundSourceDetails>();
 
-  const getEntry = (kind: EventGroupKind, id: string): EventGroupLabel => {
+  const getOrCreateGroupLabel = (
+    kind: EventGroupKind,
+    id: string,
+  ): EventGroupLabel => {
     const key = toEventGroupKey(kind, id);
     let entry = entries.get(key);
     if (!entry) {
@@ -121,14 +112,18 @@ export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
     return entry;
   };
 
-  const indexInboundSource = (source: InboundSource) => {
-    const key = toEventGroupKey(source.kind, source.id);
+  const indexInboundSource = (
+    { kind, id, name }: InboundSource,
+    eventType: string,
+  ) => {
+    const key = toEventGroupKey(kind, id);
     let details = entries.get(key) ?? pendingSources.get(key);
     if (!details) {
       details = {};
       pendingSources.set(key, details);
     }
-    recordSource(details, source);
+    if (name) details.name = name;
+    details.sourceEventType ??= eventType;
   };
 
   const resolve = (
@@ -136,7 +131,9 @@ export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
   ): EventGroupLabel[] | undefined => {
     const eventId = String(historyEvent.eventId);
     const source = getInboundSource(historyEvent, eventId);
-    if (source) indexInboundSource(source);
+    if (source) {
+      indexInboundSource(source, toEventNameReadable(historyEvent.eventType));
+    }
 
     const markers = historyEvent.eventGroupMarkers;
     if (!markers?.length) return;
@@ -146,7 +143,7 @@ export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
     for (const marker of markers) {
       const labelId = nonEmptyString(marker?.label?.id);
       if (labelId) {
-        const entry = getEntry('label', labelId);
+        const entry = getOrCreateGroupLabel('label', labelId);
         const payload = marker.label?.label;
         if (!entry.label && hasPayloadContent(payload)) entry.label = payload;
         resolved.add(entry);
@@ -155,14 +152,15 @@ export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
 
       const inboundEventId = marker?.inboundEvent?.inboundEventId;
       if (inboundEventId !== undefined && inboundEventId !== null) {
-        resolved.add(getEntry('event', String(inboundEventId)));
+        resolved.add(getOrCreateGroupLabel('event', String(inboundEventId)));
         continue;
       }
 
       const inboundUpdateId = nonEmptyString(
         marker?.inboundUpdate?.inboundUpdateId,
       );
-      if (inboundUpdateId) resolved.add(getEntry('update', inboundUpdateId));
+      if (inboundUpdateId)
+        resolved.add(getOrCreateGroupLabel('update', inboundUpdateId));
     }
 
     return resolved.size ? [...resolved] : undefined;
