@@ -96,7 +96,6 @@ const recordSource = (
 export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
   const entries = new Map<string, EventGroupLabel>();
   const pendingSources = new Map<string, InboundSourceDetails>();
-  const labelSourceEventIds = new Map<string, number>();
 
   const getEntry = (kind: EventGroupKind, id: string): EventGroupLabel => {
     const key = toKey(kind, id);
@@ -129,7 +128,6 @@ export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
     const markers = historyEvent.eventGroupMarkers;
     if (!markers?.length) return;
 
-    const eventNumber = Number(eventId);
     const resolved = new Set<EventGroupLabel>();
 
     for (const marker of markers) {
@@ -137,14 +135,7 @@ export const createEventGroupLabelRegistry = (): EventGroupLabelRegistry => {
       if (labelId) {
         const entry = getEntry('label', labelId);
         const payload = marker.label?.label;
-        const sourceEventId = labelSourceEventIds.get(entry.key);
-        if (
-          hasPayloadContent(payload) &&
-          (sourceEventId === undefined || eventNumber < sourceEventId)
-        ) {
-          entry.label = payload;
-          labelSourceEventIds.set(entry.key, eventNumber);
-        }
+        if (!entry.label && hasPayloadContent(payload)) entry.label = payload;
         resolved.add(entry);
         continue;
       }

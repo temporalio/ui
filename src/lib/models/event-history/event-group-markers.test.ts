@@ -126,18 +126,26 @@ describe('createEventGroupLabelRegistry', () => {
     ]);
   });
 
-  it('applies the first-use label to events resolved before it', () => {
+  it('applies a label to events resolved before it', () => {
     const registry = createEventGroupLabelRegistry();
-    const first = labelPayload('First');
-    const [laterGroup] = resolveOne(registry, '9', [
-      labelMarker('group-1', labelPayload('Later')),
-    ]);
+    const label = labelPayload('Checkout');
     const [unlabeledGroup] = resolveOne(registry, '5', [
       labelMarker('group-1'),
     ]);
-    resolveOne(registry, '1', [labelMarker('group-1', first)]);
-    expect(laterGroup.label).toBe(first);
-    expect(unlabeledGroup.label).toBe(first);
+    resolveOne(registry, '1', [labelMarker('group-1', label)]);
+    expect(unlabeledGroup.label).toBe(label);
+  });
+
+  it('keeps the first label payload it sees when events arrive out of order', () => {
+    const registry = createEventGroupLabelRegistry();
+    const seenFirst = labelPayload('Seen first');
+    const [group] = resolveOne(registry, '9', [
+      labelMarker('group-1', seenFirst),
+    ]);
+    resolveOne(registry, '1', [
+      labelMarker('group-1', labelPayload('Earlier')),
+    ]);
+    expect(group.label).toBe(seenFirst);
   });
 
   it('skips duplicate markers on an event', () => {
@@ -558,18 +566,16 @@ describe('decodeEventGroupLabel', () => {
     expect(results).toEqual(['group-1', 'group-2']);
   });
 
-  it('decodes again when an earlier label replaces the payload', async () => {
+  it('decodes once when an earlier event arrives with another payload', async () => {
     const registry = createEventGroupLabelRegistry();
     const [group] = resolveOne(registry, '5', [
       labelMarker('group-1', labelPayload('Later')),
     ]);
-    const decode = vi
-      .fn()
-      .mockResolvedValueOnce('Later')
-      .mockResolvedValueOnce('First');
+    const decode = vi.fn().mockResolvedValue('Later');
 
     expect(await decodeEventGroupLabel(group, decode)).toBe('Later');
     resolveOne(registry, '1', [labelMarker('group-1', labelPayload('First'))]);
-    expect(await decodeEventGroupLabel(group, decode)).toBe('First');
+    expect(await decodeEventGroupLabel(group, decode)).toBe('Later');
+    expect(decode).toHaveBeenCalledTimes(1);
   });
 });
