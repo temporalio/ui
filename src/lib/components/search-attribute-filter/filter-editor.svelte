@@ -176,18 +176,24 @@
     if (!applyOnEnter) return;
 
     const onKeydown = (e: KeyboardEvent) => {
-      if (e.key !== 'Enter') return;
+      if (e.key !== 'Enter' || e.defaultPrevented || e.isComposing) return;
 
       const target = e.target;
+      if (!(target instanceof Element)) return;
+
+      // Only the form and the button that opened it. Anything else with focus —
+      // the Copy button beside the trigger, say — keeps its own Enter.
+      const isInsideForm = formElement?.contains(target) ?? false;
+      const isOpeningTrigger =
+        target
+          .closest('[data-menu-anchor]')
+          ?.getAttribute('data-menu-anchor') === idPrefix;
+      if (!isInsideForm && !isOpeningTrigger) return;
+
       // A button in the form already does something with Enter: a toggle flips,
-      // Apply submits. The button that opened the popover is not in the form,
-      // and is where focus still sits, so Enter there applies.
-      if (
-        target instanceof HTMLButtonElement &&
-        formElement?.contains(target)
-      ) {
-        return;
-      }
+      // Apply submits.
+      if (target instanceof HTMLButtonElement && isInsideForm) return;
+
       // The chip input claims Enter to commit a keyword.
       if (
         target instanceof HTMLInputElement &&

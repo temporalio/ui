@@ -536,6 +536,19 @@ test('it should apply the quick filter on Enter', async ({ page }) => {
   await expect(page.getByTestId('apply-filter-button')).toBeHidden();
 });
 
+test('it should leave Enter alone outside the popover', async ({ page }) => {
+  await clickQuickFilter(page, 'Type');
+  await expect(page.getByTestId('apply-filter-button')).toBeVisible();
+
+  // Focus stays on the trigger, so Tab reaches the Copy button beside it. Enter
+  // there belongs to Copy, not to the pending filter.
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Enter');
+
+  expect(getQueryParam(page.url())).toBe('');
+  await expect(page.getByTestId('apply-filter-button')).toBeVisible();
+});
+
 test('it should apply an edited value on Enter', async ({ page }) => {
   await clickQuickFilter(page, 'Type');
 
