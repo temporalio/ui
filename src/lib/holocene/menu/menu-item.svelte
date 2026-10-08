@@ -289,7 +289,7 @@
     }
 
     &.disabled {
-      @apply pointer-events-none cursor-not-allowed text-tertiary opacity-50;
+      @apply pointer-events-none cursor-not-allowed text-secondary opacity-80;
     }
   }
 
