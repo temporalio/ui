@@ -10,7 +10,7 @@ const operation = {
   endpoint: 'my-endpoint',
   service: 'my-service',
   operation: 'my-op',
-  status: 'Completed',
+  status: 'NEXUS_OPERATION_EXECUTION_STATUS_COMPLETED',
   scheduleTime: '2024-01-02T03:04:05Z',
   closeTime: '2024-01-02T03:09:15.5Z',
   executionDuration: '310.5s',
@@ -30,6 +30,10 @@ describe('getNexusOperationColumnValue', () => {
     expect(getNexusOperationColumnValue('Schedule Time', operation)).toBe(
       '2024-01-02T03:04:05Z',
     );
+  });
+
+  it('filters status on the readable form, not the enum key', () => {
+    expect(getNexusOperationColumnValue('Status', operation)).toBe('Completed');
   });
 
   it('builds a query duration from the proto seconds string', () => {

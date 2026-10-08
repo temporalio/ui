@@ -3,6 +3,7 @@ import {
   durationStringToMilliseconds,
   toQueryDuration,
 } from '$lib/utilities/format-time';
+import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
 import type { QuickFilterValue } from '$lib/utilities/query/quick-filter';
 import {
   getColumnAttribute,
@@ -40,7 +41,7 @@ export const getNexusOperationColumnValue = (
     case 'Operation':
       return operation.operation;
     case 'Status':
-      return operation.status;
+      return toNexusOperationStatus(operation.status);
     case 'Schedule Time':
       return operation.scheduleTime;
     case 'Close Time':

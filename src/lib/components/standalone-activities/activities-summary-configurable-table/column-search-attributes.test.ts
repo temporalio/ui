@@ -9,7 +9,7 @@ const activity = {
   runId: 'my-run',
   activityType: { name: 'MyActivityType' },
   taskQueue: 'my-task-queue',
-  status: 'Completed',
+  status: 'ACTIVITY_EXECUTION_STATUS_COMPLETED',
   scheduleTime: '2024-01-02T03:04:05Z',
   closeTime: '2024-01-02T03:09:15.5Z',
   executionDuration: '310.5s',
@@ -29,6 +29,10 @@ describe('getActivityColumnValue', () => {
     expect(getActivityColumnValue('Start', activity)).toBe(
       '2024-01-02T03:04:05Z',
     );
+  });
+
+  it('filters status on the readable form, not the enum key', () => {
+    expect(getActivityColumnValue('Status', activity)).toBe('Completed');
   });
 
   it('builds a query duration from the proto seconds string', () => {
