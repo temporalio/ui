@@ -24,7 +24,7 @@ export type ResolvedQuickFilter = {
   value: QuickFilterValue;
   filterValue: string | null;
   filterable: boolean;
-  displayValue: string;
+  displayValue: string | undefined;
 };
 
 export const getColumnAttribute = (
@@ -55,14 +55,15 @@ export const resolveQuickFilter = <Row>({
     filterValue,
     filterable: filterValue !== null && !columns.unfilterable?.includes(label),
     // A Datetime cell displays and copies the normalized value, so the text in
-    // the cell and the value the filter uses cannot drift apart.
+    // the cell and the value the filter uses cannot drift apart. A cell with no
+    // value stays undefined, so it renders nothing rather than an empty badge.
     displayValue:
       type === SEARCH_ATTRIBUTE_TYPE.DATETIME
-        ? (filterValue ?? '')
+        ? (filterValue ?? undefined)
         : Array.isArray(value)
           ? value.join(', ')
-          : value === undefined
-            ? ''
+          : value === undefined || value === null
+            ? undefined
             : String(value),
   };
 };

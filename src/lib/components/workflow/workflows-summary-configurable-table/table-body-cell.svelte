@@ -94,7 +94,7 @@
   };
 </script>
 
-{#snippet text(content: string, href: string | undefined)}
+{#snippet text(content: string | undefined, href: string | undefined)}
   <Tooltip
     usePortal
     text={content}
@@ -113,7 +113,7 @@
 {#snippet cellContent(
   type: SearchAttributeType | undefined,
   value: QuickFilterValue,
-  displayValue: string,
+  displayValue: string | undefined,
 )}
   {@const href = hrefFor(value)}
   {#if label === 'Status'}

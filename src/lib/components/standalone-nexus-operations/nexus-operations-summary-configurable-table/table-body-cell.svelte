@@ -54,7 +54,7 @@
 
 {#snippet cellContent(
   type: SearchAttributeType | undefined,
-  displayValue: string,
+  displayValue: string | undefined,
 )}
   {#if label === 'Status'}
     <NexusOperationStatusBadge status={operation.status} />

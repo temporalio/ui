@@ -89,8 +89,14 @@ describe('resolveQuickFilter', () => {
     expect(resolve('Nothing')).toMatchObject({
       filterValue: null,
       filterable: false,
-      displayValue: '',
+      displayValue: undefined,
     });
+  });
+
+  it('leaves a missing value undefined so nothing renders for it', () => {
+    // An empty string would pass SearchAttributeValue's nullish guard and draw
+    // an empty badge for a Bool column the row never set.
+    expect(resolve('Nothing').displayValue).toBeUndefined();
   });
 
   it('is not filterable when the column has no known type', () => {
