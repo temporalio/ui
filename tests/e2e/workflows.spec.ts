@@ -11,13 +11,13 @@ test.describe('Workflow Execution Page', () => {
 
     const inputAndResult = page.getByTestId('input-and-result');
     await inputAndResult
-      .getByRole('button', { name: 'Input', exact: true })
+      .getByRole('button', { name: 'Preview Input', exact: true })
       .hover();
     await expect(
       page.getByRole('dialog', { name: 'Input', exact: true }),
     ).toContainText('Plain text input 1');
     await inputAndResult
-      .getByRole('button', { name: 'Result', exact: true })
+      .getByRole('button', { name: 'Preview Result', exact: true })
       .hover();
     await expect(
       page.getByRole('dialog', { name: 'Result', exact: true }),
