@@ -10,8 +10,18 @@ test.describe('Workflow Execution Page', () => {
     await page.getByRole('link', { name: 'e2e-workflow-1' }).click();
 
     const inputAndResult = page.getByTestId('input-and-result');
-    await expect(inputAndResult).toContainText('Plain text input 1');
-    await expect(inputAndResult).toContainText('Received Plain text input 1');
+    await inputAndResult
+      .getByRole('button', { name: 'Input', exact: true })
+      .hover();
+    await expect(
+      page.getByRole('dialog', { name: 'Input', exact: true }),
+    ).toContainText('Plain text input 1');
+    await inputAndResult
+      .getByRole('button', { name: 'Result', exact: true })
+      .hover();
+    await expect(
+      page.getByRole('dialog', { name: 'Result', exact: true }),
+    ).toContainText('Received Plain text input 1');
   });
 
   test('should render decoded call stack', async ({ page }) => {
