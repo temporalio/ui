@@ -21,6 +21,10 @@ import {
 } from '$lib/utilities/is-event-type';
 import { toEventNameReadable } from '$lib/utilities/screaming-enums';
 
+import {
+  createEventGroupLabelRegistry,
+  type EventGroupLabelRegistry,
+} from './event-group-markers';
 import { getEventBillableActions } from './get-event-billable-actions';
 import { getCategoryForEvent } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
@@ -64,6 +68,7 @@ export const toEvent = (
   options: {
     shouldNotAddBillableAction?: (event: WorkflowEvent) => boolean;
     processedWorkflowTaskIds?: Set<string>;
+    eventGroupLabels?: EventGroupLabelRegistry;
   } = {},
 ): WorkflowEvent => {
   const id = String(historyEvent.eventId);
@@ -86,6 +91,9 @@ export const toEvent = (
   const completionLinks = completionCallbacks || attachedCompletionCallbacks;
   const links = historyEvent?.links || completionLinks || [];
   const principal = historyEvent?.principal;
+  const eventGroupLabels =
+    options.eventGroupLabels ?? createEventGroupLabelRegistry();
+  const eventGroups = eventGroupLabels.resolve(historyEvent);
 
   const event = {
     ...historyEvent,
@@ -97,6 +105,7 @@ export const toEvent = (
     category,
     links,
     principal,
+    ...(eventGroups && { eventGroups }),
     billableActions: 0,
     attributes: simplifyAttributes({ type: key, ...attributes }),
   };
@@ -115,8 +124,13 @@ export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
   };
 
   const processedWorkflowTaskIds = new Set<string>();
+  const eventGroupLabels = createEventGroupLabelRegistry();
   return events.map((event) =>
-    toEvent(event, { shouldNotAddBillableAction, processedWorkflowTaskIds }),
+    toEvent(event, {
+      shouldNotAddBillableAction,
+      processedWorkflowTaskIds,
+      eventGroupLabels,
+    }),
   );
 };
 
@@ -136,6 +150,7 @@ export const fromEventToRawEvent = (event: WorkflowEvent): HistoryEvent => {
     classification: _classification,
     category: _category,
     attributes: _attributes,
+    eventGroups: _eventGroups,
     ...workflowEvent
   } = event;
   return workflowEvent;

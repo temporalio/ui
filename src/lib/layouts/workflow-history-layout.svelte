@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import EventGroupFilter from '$lib/components/lines-and-dots/event-group-filter/event-group-filter.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -27,7 +28,10 @@
     IconDownload,
     IconFeed,
   } from '$lib/io/icon';
-  import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
+  import {
+    CATEGORIES,
+    isCategoryType,
+  } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { clearActives } from '$lib/stores/active-events';
@@ -36,6 +40,7 @@
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
+    EventTypeCategory,
     WorkflowEvent,
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
@@ -50,10 +55,6 @@
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
-  const pendingActivities = $derived(workflow?.pendingActivities ?? []);
-  const pendingNexusOperations = $derived(
-    workflow?.pendingNexusOperations ?? [],
-  );
 
   $effect(() => {
     const urlParams = parseEventFilterParams(page.url);
@@ -81,26 +82,35 @@
     historyCtx.resume();
   });
 
-  const filteredLazyGroups = $derived.by(() => {
+  const selectedEventGroups = $derived(
+    parseEventFilterParams(page.url).eventGroups,
+  );
+  const eventGroupMatcher = $derived(
+    eventBuffer.eventGroupMatcher(selectedEventGroups),
+  );
+
+  const isCategoryVisible = $derived.by(() => {
     const active = $eventTypeFilter;
     const cats = $eventCategoryFilter;
-    return bufferLazyGroups.filter((g) => {
-      if (!active.includes(g.category)) return false;
-      if (cats && cats.length && !cats.includes(g.category)) return false;
-      return true;
-    });
+    return (category: EventTypeCategory) =>
+      active.includes(category) && (!cats?.length || cats.includes(category));
   });
 
-  const filteredEvents = $derived.by(() => {
-    const active = $eventTypeFilter;
-    const cats = $eventCategoryFilter;
-    return bufferEvents.filter((ev) => {
-      const cat = (ev as WorkflowEvent).category;
-      if (!active.includes(cat)) return false;
-      if (cats && cats.length && !cats.includes(cat)) return false;
-      return true;
-    });
-  });
+  const filteredLazyGroups = $derived(
+    bufferLazyGroups.filter(
+      (g) =>
+        isCategoryVisible(g.category) &&
+        (!eventGroupMatcher || eventGroupMatcher.hasGroup(g.id)),
+    ),
+  );
+
+  const filteredEvents = $derived(
+    bufferEvents.filter(
+      (ev) =>
+        isCategoryVisible((ev as WorkflowEvent).category) &&
+        (!eventGroupMatcher || eventGroupMatcher.hasEvent(ev)),
+    ),
+  );
 
   const workflowTaskFailedError = $derived.by(() => {
     if (!historyCtx.fetchComplete) return undefined;
@@ -121,6 +131,29 @@
     reverseSort ? filteredEvents.toReversed() : filteredEvents,
   );
 
+  const pending = $derived.by(() => {
+    const isInSelectedGroups = (scheduledEventId: string | undefined) =>
+      !eventGroupMatcher ||
+      (!!scheduledEventId && eventGroupMatcher.hasGroup(scheduledEventId));
+    return {
+      activities: isCategoryVisible(CATEGORIES.ACTIVITY)
+        ? (workflow?.pendingActivities ?? []).filter(({ activityId }) =>
+            isInSelectedGroups(
+              eventBuffer.pendingActivityScheduledEvent(activityId)?.id,
+            ),
+          )
+        : [],
+      nexusOperations: isCategoryVisible(CATEGORIES.NEXUS)
+        ? (workflow?.pendingNexusOperations ?? []).filter(
+            ({ scheduledEventId }) =>
+              isInSelectedGroups(
+                scheduledEventId != null ? String(scheduledEventId) : undefined,
+              ),
+          )
+        : [],
+    };
+  });
+
   // EventSummaryTable's props are a union on `compact`, so the pair travels as
   // one object. Keeps the materialized groups on the feed branch too.
   const tableProps = $derived(
@@ -132,8 +165,8 @@
       : {
           compact: false as const,
           items: reverseSort
-            ? [...pendingNexusOperations, ...pendingActivities, ...history]
-            : [...history, ...pendingActivities, ...pendingNexusOperations],
+            ? [...pending.nexusOperations, ...pending.activities, ...history]
+            : [...history, ...pending.activities, ...pending.nexusOperations],
           groups: eventBuffer.groupsWithoutWorkflowTasks,
         },
   );
@@ -241,6 +274,7 @@
           </ToggleButton>
         {/if}
         <EventTypeFilter {compact} />
+        <EventGroupFilter options={eventBuffer.eventGroupOptions} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"

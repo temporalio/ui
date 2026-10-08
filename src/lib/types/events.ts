@@ -2,6 +2,7 @@ import type { Timestamp } from '@temporalio/common';
 import type { google } from '@temporalio/proto';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { EventGroupLabel } from '$lib/models/event-history/event-group-markers';
 import type { ActivityOptions, EventLink } from '$lib/types';
 
 import type { Replace } from './global';
@@ -12,7 +13,7 @@ export type EventHistory = Replace<
 >;
 
 export type HistoryEvent = Replace<
-  import('$lib/types').HistoryEvent,
+  Omit<import('$lib/types').HistoryEvent, 'attributes'>,
   {
     eventType: EventType;
     eventId: string;
@@ -92,6 +93,7 @@ export interface WorkflowEvent extends HistoryEvent {
   links?: EventLink[];
   billableActions?: number;
   principal?: Principal;
+  eventGroups?: EventGroupLabel[];
 }
 
 export type WorkflowEvents = WorkflowEvent[];
@@ -114,7 +116,8 @@ export type CommonEventKey =
   | 'workerMayIgnore'
   | 'name'
   | 'links'
-  | 'principal';
+  | 'principal'
+  | 'eventGroups';
 
 export type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 
