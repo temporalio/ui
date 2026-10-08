@@ -22,17 +22,24 @@
   } from '$lib/stores/configurable-table-columns';
   import { refresh } from '$lib/stores/workers';
   import { columnWidthStyle } from '$lib/utilities/column-width';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
   interface Props {
     canCreateServerlessDeployment?: boolean;
     showConnectionStatus?: boolean;
+    /**
+     * The Namespace's regions. A consumer passes these when its own entitlement
+     * says the Namespace is highly available; fewer than two shows no regions.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
   }
 
   let {
     canCreateServerlessDeployment = true,
     showConnectionStatus = true,
+    namespaceRegions = [],
   }: Props = $props();
 
   let error = $state('');
@@ -130,6 +137,7 @@
             {deployment}
             {columns}
             {showConnectionStatus}
+            {namespaceRegions}
             onChange={() => refresh.update((n) => n + 1)}
           />
         {/each}
