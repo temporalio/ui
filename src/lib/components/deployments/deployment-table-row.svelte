@@ -22,26 +22,32 @@
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
   } from '$lib/utilities/column-width';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
     routeForWorkerDeployment,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
+
   import ComputeBadge from './compute-badge.svelte';
   import DeleteDeploymentModal from './delete-deployment-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
+  import RegionBadges from './region-badges.svelte';
 
   interface Props {
     deployment: ListWorkerDeployment;
     columns: ConfigurableTableHeader[];
     showConnectionStatus?: boolean;
+    /** The Namespace's regions, when a consumer has them. Fewer than two shows none. */
+    namespaceRegions?: readonly NamespaceRegion[];
     onChange?: () => void;
   }
   let {
     deployment,
     columns,
     showConnectionStatus = true,
+    namespaceRegions = [],
     onChange,
   }: Props = $props();
 
@@ -154,6 +160,10 @@
                   : undefined}
               />
             {/if}
+            <RegionBadges
+              computeConfig={deployment.currentVersionSummary?.computeConfig}
+              {namespaceRegions}
+            />
           </div>
         {:else}
           <span class="text-secondary"
@@ -187,6 +197,10 @@
             {/if}
             {#if latestComputeProviderType}
               <ComputeBadge type={latestComputeProviderType} />
+              <RegionBadges
+                computeConfig={deployment.latestVersionSummary?.computeConfig}
+                {namespaceRegions}
+              />
             {/if}
           </div>
         {:else}
