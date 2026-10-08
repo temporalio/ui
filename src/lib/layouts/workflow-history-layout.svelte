@@ -37,6 +37,8 @@
   import { eventCategoryFilter, eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
+    PendingActivity,
+    PendingNexusOperation,
     WorkflowEvent,
     WorkflowTaskFailedEvent,
     WorkflowTaskTimedOutEvent,
@@ -51,10 +53,6 @@
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
-  const pendingActivities = $derived(workflow?.pendingActivities ?? []);
-  const pendingNexusOperations = $derived(
-    workflow?.pendingNexusOperations ?? [],
-  );
 
   $effect(() => {
     const urlParams = parseEventFilterParams(page.url);
@@ -131,6 +129,22 @@
     reverseSort ? filteredEvents.toReversed() : filteredEvents,
   );
 
+  const pending = $derived.by(() => {
+    const activities: PendingActivity[] = [];
+    const nexusOperations: PendingNexusOperation[] = [];
+    if (
+      !workflow?.pendingActivities?.length &&
+      !workflow?.pendingNexusOperations?.length
+    ) {
+      return { activities, nexusOperations };
+    }
+    for (const { pendingActivity, pendingNexusOperation } of lazyGroups) {
+      if (pendingActivity) activities.push(pendingActivity);
+      if (pendingNexusOperation) nexusOperations.push(pendingNexusOperation);
+    }
+    return { activities, nexusOperations };
+  });
+
   // EventSummaryTable's props are a union on `compact`, so the pair travels as
   // one object. Keeps the materialized groups on the feed branch too.
   const tableProps = $derived(
@@ -142,8 +156,8 @@
       : {
           compact: false as const,
           items: reverseSort
-            ? [...pendingNexusOperations, ...pendingActivities, ...history]
-            : [...history, ...pendingActivities, ...pendingNexusOperations],
+            ? [...pending.nexusOperations, ...pending.activities, ...history]
+            : [...history, ...pending.activities, ...pending.nexusOperations],
           groups: eventBuffer.groupsWithoutWorkflowTasks,
         },
   );
