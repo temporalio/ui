@@ -3,8 +3,8 @@ import { fileURLToPath } from 'node:url';
 
 import { $ } from 'zx';
 
-import type { Logger } from '../../paths';
-import { failure } from '../../remedy';
+import type { Logger } from '../../../../src/lib/demo/paths';
+import { failure } from '../../../../src/lib/demo/remedy';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 

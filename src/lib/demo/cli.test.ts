@@ -1,8 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { DemoCommands } from './cli';
-import { demoHelp, parseStartOptions, runDemoCli } from './cli';
+import { demoHelpFor, parseStartOptions, runDemoCli } from './cli';
 import type { DefinitionSummary } from './definition';
+
+/** A registry stands in for a repository's stages, which the core has none of. */
+const STAGES = ['server', 'worker', 'tunnel', 'ui', 'scenarios'];
+const demoHelp = demoHelpFor(STAGES);
 
 const definition: DefinitionSummary = {
   name: 'system-nexus-signal-with-start',
@@ -36,6 +40,7 @@ const setup = (overrides: Partial<DemoCommands> = {}) => {
         writeError: (message) => errors.push(message),
       },
       commands,
+      stages: STAGES,
     });
 
   return { commands, output, errors, run };
@@ -271,7 +276,7 @@ describe('parseStartOptions', () => {
       throw new Error('failed');
     }) as unknown as (message: string) => never;
 
-    expect(() => parseStartOptions(['--nope'], fail)).toThrow('failed');
+    expect(() => parseStartOptions(['--nope'], STAGES, fail)).toThrow('failed');
     expect(fail).toHaveBeenCalledWith(
       expect.stringContaining('Usage: demo start <definition>'),
     );

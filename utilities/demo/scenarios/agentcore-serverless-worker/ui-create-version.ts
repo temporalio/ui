@@ -1,7 +1,7 @@
 import { chromium, type Locator, type Page } from '@playwright/test';
 
-import type { Logger } from '../../paths';
-import { failure } from '../../remedy';
+import type { Logger } from '../../../../src/lib/demo/paths';
+import { failure } from '../../../../src/lib/demo/remedy';
 
 export type UiCreateVersionOptions = {
   uiUrl: string;

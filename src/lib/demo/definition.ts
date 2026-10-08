@@ -1,23 +1,33 @@
 import { existsSync, readdirSync } from 'fs';
-import { mkdir, writeFile } from 'fs/promises';
 import { homedir } from 'os';
 import { join, resolve } from 'path';
 import { pathToFileURL } from 'url';
 
 import { z } from 'zod';
 
-import { requireWorkflowExample } from './catalog';
-import { exampleEntrySchema } from './examples';
+import { type DemoStage, SCENARIOS_STAGE } from './stage';
 
-export const STAGES = [
-  'server',
-  'worker',
-  'tunnel',
-  'ui',
-  'scenarios',
-] as const;
+/**
+ * A catalog example a demo starts. The shape is plain on purpose: validating an
+ * id against the catalog belongs to whatever starts it, not to the definition.
+ */
+export const exampleEntrySchema = z.object({
+  id: z.string(),
+  workflowId: z.string().optional(),
+  /** Replaces the example's own default input when given. */
+  input: z.array(z.unknown()).optional(),
+  role: z.string().optional(),
+  note: z.string().optional(),
+});
 
-export type Stage = (typeof STAGES)[number];
+export type ExampleEntry = z.infer<typeof exampleEntrySchema>;
+
+/**
+ * A stage is whatever the registry a runner is given names, so this is a plain
+ * string rather than a fixed union. The runner validates a --skip or --only
+ * against the registry it holds.
+ */
+export type Stage = string;
 
 // Arrays included: some settings are lists, and the server takes them as JSON
 // on the same flag, so they need no special handling beyond being allowed here.
@@ -177,7 +187,15 @@ export const hasOwnScenario = (name: string, cwd = process.cwd()) =>
 const hasWork = (data: Definition, cwd: string) =>
   data.examples.length > 0 || hasOwnScenario(data.name, cwd);
 
-export const SCENARIOS_DIR = join('utilities', 'demo', 'scenarios');
+/**
+ * Where scenario directories live, relative to the cwd. Overridable because a
+ * consumer of this harness keeps its scenarios on its own layout, and every
+ * lookup below is relative to this one value. Environment rather than an
+ * argument: it is a property of the repository, not of a call, and the harness
+ * already layers machine-local settings this way (see loadLocalEnvironment).
+ */
+export const SCENARIOS_DIR =
+  process.env.DEMO_SCENARIOS_DIR ?? join('utilities', 'demo', 'scenarios');
 
 /** A scenario is a directory holding its definition and its own behaviour. */
 export const scenarioDirectory = (name: string, cwd = process.cwd()) =>
@@ -239,6 +257,7 @@ const scenarioNames = (cwd: string): string[] => {
 };
 
 export const listDefinitions = async (
+  stages: readonly DemoStage[],
   cwd = process.cwd(),
 ): Promise<DefinitionSummary[]> =>
   Promise.all(
@@ -252,94 +271,10 @@ export const listDefinitions = async (
         ownScenario: hasOwnScenario(data.name, cwd),
         path,
         stages: [
-          ...(data.server.enabled ? ['server'] : []),
-          ...(data.worker.enabled ? ['worker'] : []),
-          ...(data.tunnel.enabled ? ['tunnel'] : []),
-          ...(data.ui.enabled ? ['ui'] : []),
-          ...(hasWork(data, cwd) ? ['scenarios'] : []),
+          ...stages.filter((stage) => stage.enabled(data)).map((s) => s.name),
+          ...(hasWork(data, cwd) ? [SCENARIOS_STAGE] : []),
         ],
         examples: data.examples.map((entry) => entry.id),
       };
     }),
   );
-
-const exampleEntries = (exampleIds: readonly string[], cwd: string) =>
-  exampleIds.map((id) => {
-    // Resolved now so a mistyped id fails while scaffolding, not at run time.
-    const example = requireWorkflowExample(id, cwd);
-
-    return {
-      id: example.id,
-      workflowId: `catalog-${example.id}`,
-      role: example.title,
-      note: example.description,
-    };
-  });
-
-const exampleSource = (examples: ReturnType<typeof exampleEntries>) =>
-  examples.length
-    ? examples
-        .map(
-          (example) => `    {
-      id: ${JSON.stringify(example.id)},
-      workflowId: ${JSON.stringify(example.workflowId)},
-      role: ${JSON.stringify(example.role)},
-      note: ${JSON.stringify(example.note)},
-    },`,
-        )
-        .join('\n')
-    : `    // Run "pnpm catalog list" for the ids.
-    { id: 'hello', role: 'TODO: what this one shows' },`;
-
-const template = (
-  name: string,
-  examples: ReturnType<typeof exampleEntries>,
-) => `import { defineScenario } from '../../definition';
-
-export const definition = defineScenario({
-  name: '${name}',
-  title: 'TODO: what a reviewer sees when ${name} works',
-  summary: 'TODO: what changes, and what it looked like before.',
-  server: {
-    source: 'auto',
-    // A feature no release carries yet needs the commit that added it:
-    // requires: { serverCommit: '...' },
-    dynamicConfig: {},
-    searchAttributes: {
-      CustomKeywordField: 'Keyword',
-      CustomIntField: 'Int',
-    },
-  },
-  examples: [
-${exampleSource(examples)}
-  ],
-  preview: {
-    notes: ['TODO: the first thing a reviewer must check.'],
-  },
-});
-`;
-
-export const scaffoldDefinition = async (
-  name: string,
-  exampleIds: readonly string[] = [],
-  cwd = process.cwd(),
-): Promise<string> => {
-  if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(name)) {
-    throw new Error(
-      `A scenario name must be kebab-case, for example system-nexus-signal-with-start (got "${name}").`,
-    );
-  }
-
-  const path = definitionPath(name, cwd);
-
-  if (existsSync(path)) {
-    throw new Error(`${SCENARIOS_DIR}/${name}/definition.ts already exists.`);
-  }
-
-  const examples = exampleEntries(exampleIds, cwd);
-
-  await mkdir(scenarioDirectory(name, cwd), { recursive: true });
-  await writeFile(path, template(name, examples));
-
-  return path;
-};

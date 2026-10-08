@@ -1,8 +1,11 @@
 import type { DefinitionSummary, Stage } from './definition';
-import { STAGES } from './definition';
 import type { StartOptions } from './run';
 
-export const demoHelp = `Usage: demo <command>
+/**
+ * The help text names the stages a runner actually has, so a repository that
+ * contributes its own does not advertise this one's.
+ */
+export const demoHelpFor = (stages: readonly string[]) => `Usage: demo <command>
 
 Commands:
   demo help                      Show this help text.
@@ -12,7 +15,7 @@ Commands:
                                  Start the stages the definition declares and
                                  leave them running. --once tears them down
                                  again before returning.
-                                 Stages: ${STAGES.join(', ')}.
+                                 Stages: ${stages.join(', ')}.
                                  Repeat --skip or --only to name more than one.
   demo stop [<definition>]       Stop what an earlier start left running.
   demo new <name> [example-id...]
@@ -68,6 +71,7 @@ const formatDefinitions = (definitions: readonly DefinitionSummary[]) => {
 
 export const parseStartOptions = (
   args: readonly string[],
+  stages: readonly string[],
   fail: (message: string) => never,
 ): StartOptions => {
   const skip: Stage[] = [];
@@ -86,9 +90,9 @@ export const parseStartOptions = (
 
     const value = args[index + 1];
 
-    if (!value || !STAGES.includes(value as Stage)) {
+    if (!value || !stages.includes(value)) {
       fail(
-        `${argument} needs one of these stages: ${STAGES.join(', ')}.\n\n${START_USAGE}`,
+        `${argument} needs one of these stages: ${stages.join(', ')}.\n\n${START_USAGE}`,
       );
     }
 
@@ -103,11 +107,15 @@ export const runDemoCli = async ({
   argv,
   io,
   commands,
+  stages,
 }: {
   argv: readonly string[];
   io: DemoIo;
   commands: DemoCommands;
+  /** The stage names this runner accepts for --skip and --only. */
+  stages: readonly string[];
 }) => {
+  const demoHelp = demoHelpFor(stages);
   if (argv.length === 0 || argv.includes('--help')) {
     io.writeOutput(demoHelp);
     return;
@@ -135,7 +143,10 @@ export const runDemoCli = async ({
   }
 
   if (command === 'start' && argv.length >= 2) {
-    await commands.start(argv[1], parseStartOptions(argv.slice(2), fail));
+    await commands.start(
+      argv[1],
+      parseStartOptions(argv.slice(2), stages, fail),
+    );
     return;
   }
 

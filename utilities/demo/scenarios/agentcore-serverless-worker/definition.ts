@@ -1,5 +1,5 @@
 import type { Options } from './scenario';
-import { defineScenario } from '../../definition';
+import { defineScenario } from '../../../../src/lib/demo/definition';
 
 export const definition = defineScenario({
   name: 'agentcore-serverless-worker',
