@@ -39,9 +39,7 @@
           .map(({ decodedValue }) =>
             stringifyWithBigInt(
               isParsedPayload(decodedValue) ? decodedValue.data : decodedValue,
-              undefined,
-              1,
-            )?.replace(/\n\s*/g, ' '),
+            ),
           )
           .join(', ') || 'null'}
       {/snippet}
