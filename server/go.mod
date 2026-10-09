@@ -1,6 +1,6 @@
 module github.com/temporalio/ui-server/v2
 
-go 1.26.5
+go 1.26.9
 
 require (
 	github.com/Masterminds/semver/v3 v3.3.0
