@@ -9,10 +9,9 @@ import type {
   WorkflowExecutionIdentity,
   WorkflowExecutionKey,
 } from './types';
-import { getEventGroupMarkerReferences } from '../event-group-markers/get-event-group-marker-references';
+import { EventGroupMarkerGroupsProjection } from '../event-group-markers/event-group-marker-groups-projection';
 import type {
   EventGroupMarkerGroup,
-  EventGroupMarkerGroupMutable,
   EventGroupMarkerKey,
 } from '../event-group-markers/types';
 import { assertDiscoveredStartEvent } from '../history-events/assert-discovered-start-event';
@@ -21,13 +20,12 @@ import { getNextExecutionIdentity } from '../history-events/get-next-execution-i
 import { isTerminalExecutionEvent } from '../history-events/is-terminal-execution-event';
 import type {
   DiscoveredStartEvent,
+  HistoryEventId,
   NormalizedHistoryEvent,
 } from '../history-events/types';
 import { getLifecycleReference } from '../lifecycle-groups/get-lifecycle-reference';
-import type {
-  LifecycleGroup,
-  LifecycleGroupMutable,
-} from '../lifecycle-groups/types';
+import { LifecycleGroupsProjection } from '../lifecycle-groups/lifecycle-groups-projection';
+import type { LifecycleGroup } from '../lifecycle-groups/types';
 import type { WorkflowExecutionChainIdentity } from '../workflow-execution-chain/types';
 
 export class WorkflowExecution {
@@ -50,14 +48,12 @@ export class WorkflowExecution {
 
   private _nextExecutionIdentity: WorkflowExecutionIdentity | null = null;
 
-  private _lifecycleGroups = new Map<string, LifecycleGroupMutable>();
+  private _lifecycleGroupsProjection = new LifecycleGroupsProjection();
 
-  private _eventGroupMarkerGroups = new Map<
-    EventGroupMarkerKey,
-    EventGroupMarkerGroupMutable
-  >();
+  private _eventGroupMarkerGroupsProjection =
+    new EventGroupMarkerGroupsProjection();
 
-  private _events = new Map<string, NormalizedHistoryEvent>();
+  private _events = new Map<HistoryEventId, NormalizedHistoryEvent>();
 
   /** Fetches the start event and constructs a discovered execution. */
   static async discover(
@@ -110,8 +106,8 @@ export class WorkflowExecution {
   private _notifySubscribers(
     changes: readonly WorkflowExecutionChange[],
   ): void {
-    const eventIds = new Set<string>();
-    const headEventIds = new Set<string>();
+    const eventIds = new Set<HistoryEventId>();
+    const headEventIds = new Set<HistoryEventId>();
     const eventGroupMarkerKeys = new Set<EventGroupMarkerKey>();
 
     for (const change of changes) {
@@ -197,90 +193,25 @@ export class WorkflowExecution {
     // Lifecycle grouping
 
     const lifecycleReference = getLifecycleReference(event);
-    const existingLifecycleGroup = this._lifecycleGroups.get(
-      lifecycleReference.headEventId,
+    const lifecycleGroupChange = this._lifecycleGroupsProjection.addEvent(
+      event,
+      lifecycleReference,
     );
-    let lifecycleChanged = false;
 
-    if (existingLifecycleGroup) {
-      const prevSize = existingLifecycleGroup.eventIds.size;
-
-      existingLifecycleGroup.eventIds.add(event.eventId);
-
-      const nextSize = existingLifecycleGroup.eventIds.size;
-      existingLifecycleGroup.revision = nextSize;
-
-      lifecycleChanged = prevSize !== nextSize;
-    } else {
-      this._lifecycleGroups.set(lifecycleReference.headEventId, {
-        ...lifecycleReference,
-        revision: 1,
-        eventIds: new Set([event.eventId]),
-      });
-      lifecycleChanged = true;
-    }
-
-    if (lifecycleChanged) {
-      changes.push({
-        type: 'LIFECYCLE_GROUP_CHANGED',
-        headEventId: lifecycleReference.headEventId,
-      });
+    if (lifecycleGroupChange) {
+      changes.push(lifecycleGroupChange);
     }
 
     // Event group marker grouping
-    for (const eventGroupMarkerReference of getEventGroupMarkerReferences(
-      event,
-    )) {
-      const existingMarkerGroup = this._eventGroupMarkerGroups.get(
-        eventGroupMarkerReference.key,
+
+    const eventGroupMarkerGroupChanges =
+      this._eventGroupMarkerGroupsProjection.addEvent(
+        event,
+        lifecycleReference,
       );
 
-      let eventMarkerGroupChanged = false;
-
-      if (existingMarkerGroup) {
-        const previousEventCount = existingMarkerGroup.eventIds.size;
-        const previousLifecycleCount =
-          existingMarkerGroup.lifecycleHeadEventIds.size;
-
-        existingMarkerGroup.eventIds.add(event.eventId);
-        existingMarkerGroup.lifecycleHeadEventIds.add(
-          lifecycleReference.headEventId,
-        );
-
-        eventMarkerGroupChanged =
-          existingMarkerGroup.eventIds.size !== previousEventCount ||
-          existingMarkerGroup.lifecycleHeadEventIds.size !==
-            previousLifecycleCount;
-
-        if (
-          !existingMarkerGroup.marker.label?.label &&
-          eventGroupMarkerReference.marker.label?.label
-        ) {
-          existingMarkerGroup.marker = eventGroupMarkerReference.marker;
-          eventMarkerGroupChanged = true;
-        }
-
-        if (eventMarkerGroupChanged) {
-          existingMarkerGroup.revision += 1;
-        }
-      } else {
-        this._eventGroupMarkerGroups.set(eventGroupMarkerReference.key, {
-          identity: eventGroupMarkerReference.identity,
-          marker: eventGroupMarkerReference.marker,
-          eventIds: new Set([event.eventId]),
-          lifecycleHeadEventIds: new Set([lifecycleReference.headEventId]),
-          revision: 1,
-        });
-
-        eventMarkerGroupChanged = true;
-      }
-
-      if (eventMarkerGroupChanged) {
-        changes.push({
-          type: 'EVENT_GROUP_MARKER_GROUP_CHANGED',
-          eventGroupMarkerKey: eventGroupMarkerReference.key,
-        });
-      }
+    if (eventGroupMarkerGroupChanges?.length) {
+      changes.push(...eventGroupMarkerGroupChanges);
     }
 
     return changes;
@@ -337,8 +268,8 @@ export class WorkflowExecution {
   }
 
   /** Returns map of the lifecycle groups by headEventId */
-  get lifecycleGroups(): ReadonlyMap<string, LifecycleGroup> {
-    return this._lifecycleGroups;
+  get lifecycleGroups(): ReadonlyMap<HistoryEventId, LifecycleGroup> {
+    return this._lifecycleGroupsProjection.lifecycleGroups;
   }
 
   /** Returns a live readonly view of groups keyed by marker identity. */
@@ -346,13 +277,11 @@ export class WorkflowExecution {
     EventGroupMarkerKey,
     EventGroupMarkerGroup
   > {
-    return this._eventGroupMarkerGroups;
+    return this._eventGroupMarkerGroupsProjection.eventGroupMarkerGroups;
   }
 
   /** Returns a stored event by its ID within this execution. */
-  getEvent(
-    eventId: NormalizedHistoryEvent['eventId'],
-  ): NormalizedHistoryEvent | undefined {
+  getEvent(eventId: HistoryEventId): NormalizedHistoryEvent | undefined {
     return this._events.get(eventId);
   }
 

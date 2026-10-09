@@ -1,5 +1,8 @@
 import type { LifecycleReference } from './types';
-import type { NormalizedHistoryEvent } from '../history-events/types';
+import type {
+  HistoryEventId,
+  NormalizedHistoryEvent,
+} from '../history-events/types';
 
 // Each execution starts with history event 1, including when pages arrive out of order.
 const WORKFLOW_REFERENCE: LifecycleReference = {
@@ -10,7 +13,7 @@ const WORKFLOW_REFERENCE: LifecycleReference = {
 /** Having an eventType of never help ensure the switch in getLifecycleReference is exhaustive  */
 function getFallbackLifecycleReference(
   _eventType: never,
-  eventId: string,
+  eventId: HistoryEventId,
 ): LifecycleReference {
   return {
     kind: 'event',

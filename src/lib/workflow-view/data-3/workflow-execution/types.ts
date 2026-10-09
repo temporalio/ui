@@ -1,4 +1,9 @@
-import type { EventGroupMarkerKey } from '../event-group-markers/types';
+import type {
+  EventGroupMarkerGroupsProjectionChange,
+  EventGroupMarkerKey,
+} from '../event-group-markers/types';
+import type { HistoryEventId } from '../history-events/types';
+import type { LifecycleGroupsProjectionChange } from '../lifecycle-groups/types';
 export type WorkflowExecutionIdentity = Readonly<{
   namespace: string;
   workflowId: string;
@@ -11,24 +16,18 @@ export type WorkflowExecutionKey = `workflow-execution:(${string})`;
 export type WorkflowExecutionChange =
   | Readonly<{
       type: 'EVENT_ADDED';
-      eventId: string;
+      eventId: HistoryEventId;
     }>
-  | Readonly<{
-      type: 'LIFECYCLE_GROUP_CHANGED';
-      headEventId: string;
-    }>
-  | Readonly<{
-      type: 'EVENT_GROUP_MARKER_GROUP_CHANGED';
-      eventGroupMarkerKey: EventGroupMarkerKey;
-    }>;
+  | LifecycleGroupsProjectionChange
+  | EventGroupMarkerGroupsProjectionChange;
 
 /** Consolidated batch payloads for each execution subscription topic. */
 export type NotificationByTopic = {
   EVENTS_ADDED: Readonly<{
-    eventIds: readonly string[];
+    eventIds: readonly HistoryEventId[];
   }>;
   LIFECYCLE_GROUPS_CHANGED: Readonly<{
-    headEventIds: readonly string[];
+    headEventIds: readonly HistoryEventId[];
   }>;
   EVENT_GROUP_MARKER_GROUPS_CHANGED: Readonly<{
     eventGroupMarkerKeys: readonly EventGroupMarkerKey[];
