@@ -1,7 +1,8 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import {
   mockEventHistoryApi,
+  mockSettingsApi,
   mockWorkflowApis,
 } from '../test-utilities/mock-apis';
 import { mockWorkflow } from '../test-utilities/mocks/workflow';
@@ -197,4 +198,171 @@ test('the chevron toggles the mini preview and outside clicks dismiss it', async
   await expect(preview).toBeVisible();
   await page.getByTestId('workflow-id-heading').click();
   await expect(preview).toBeHidden();
+});
+
+const encodedPayload = (data: string) => ({
+  metadata: { encoding: 'YmluYXJ5L2VuY3J5cHRlZA==' },
+  data,
+});
+const encryptedInput = 'ZW5jcnlwdGVkLWlucHV0';
+const encryptedResult = 'ZW5jcnlwdGVkLXJlc3VsdA==';
+
+async function mockEncodedWorkflow(page: Page) {
+  await mockSettingsApi(page, {
+    Codec: {
+      Endpoint: `${new URL(page.url()).origin}/test-codec`,
+      PassAccessToken: false,
+      IncludeCredentials: false,
+    },
+  });
+  await mockEventHistoryApi(page, {
+    history: {
+      events: [
+        {
+          eventId: '1',
+          eventType: 'WorkflowExecutionStarted',
+          eventTime: '2022-04-28T05:30:19.427247101Z',
+          workflowExecutionStartedEventAttributes: {
+            input: { payloads: [encodedPayload(encryptedInput)] },
+          },
+        },
+        {
+          eventId: '2',
+          eventType: 'WorkflowExecutionCompleted',
+          eventTime: '2022-04-28T05:31:19.427247101Z',
+          workflowExecutionCompletedEventAttributes: {
+            result: { payloads: [encodedPayload(encryptedResult)] },
+          },
+        },
+      ],
+    },
+  });
+}
+
+for (const [title, encrypted] of [
+  ['Input', encryptedInput],
+  ['Result', encryptedResult],
+]) {
+  test(`${title} shares decoding across inline, hover, and expanded views without flashing encoded data`, async ({
+    page,
+  }) => {
+    await mockEncodedWorkflow(page);
+    let requests = 0;
+    let finishDecoding: () => void;
+    const decoding = new Promise<void>((resolve) => (finishDecoding = resolve));
+    await page.route('**/test-codec/decode?*', async (route) => {
+      const body = route.request().postDataJSON();
+      if (body.payloads.some((payload) => payload.data === encrypted)) {
+        requests++;
+        await decoding;
+      }
+      await route.fulfill({
+        json: {
+          payloads: body.payloads.map((payload) =>
+            payload.data === encrypted
+              ? {
+                  metadata: { encoding: 'anNvbi9wbGFpbg==' },
+                  data: Buffer.from(
+                    JSON.stringify(`Decoded ${title}`),
+                  ).toString('base64'),
+                }
+              : payload,
+          ),
+        },
+      });
+    });
+
+    await page.reload();
+    const inline = page.getByTestId('input-and-result');
+    const trigger = inline.getByRole('button', {
+      name: `Preview ${title}`,
+      exact: true,
+    });
+    const expand = inline.getByRole('button', {
+      name: `Maximize ${title}`,
+      exact: true,
+    });
+    const preview = page.getByRole('dialog', { name: title, exact: true });
+    await expect(inline).toContainText('Loading');
+    await expect(inline).not.toContainText(encrypted);
+    // The history row decodes independently. Only the Input/Result previews
+    // share the other request, including while it is still pending.
+    await expect.poll(() => requests).toBe(2);
+    await trigger.hover();
+    await expect(preview.getByRole('status')).toBeVisible();
+    await expect(preview).not.toContainText(encrypted);
+    await expect(
+      preview.getByRole('button', { name: 'Click to copy content' }),
+    ).toHaveCount(0);
+    await expand.click();
+    await expect(preview).toHaveJSProperty('tagName', 'DIALOG');
+    await expect(preview.getByRole('status')).toBeVisible();
+    await expect(preview).not.toContainText(encrypted);
+    expect(requests).toBe(2);
+
+    finishDecoding();
+    await expect(preview.locator('.cm-content')).toHaveText(
+      `"Decoded ${title}"`,
+    );
+    await expect(inline).toContainText(`Decoded ${title}`);
+    await page.keyboard.press('Escape');
+    await trigger.hover();
+    await expect(preview.locator('.cm-content')).toHaveText(
+      `"Decoded ${title}"`,
+    );
+    await expand.click();
+    await expect(preview.locator('.cm-content')).toHaveText(
+      `"Decoded ${title}"`,
+    );
+    expect(requests).toBe(2);
+  });
+}
+
+test('encoded payloads appear only after decoding fails and a later preview can retry', async ({
+  page,
+}) => {
+  await mockEncodedWorkflow(page);
+  let fail = true;
+  let finishDecoding: () => void;
+  const decoding = new Promise<void>((resolve) => (finishDecoding = resolve));
+  await page.route('**/test-codec/decode?*', async (route) => {
+    const body = route.request().postDataJSON();
+    if (!body.payloads.some((payload) => payload.data === encryptedInput)) {
+      await route.fulfill({ json: body });
+      return;
+    }
+    await decoding;
+    if (fail) {
+      await route.fulfill({ status: 403 });
+    } else {
+      await route.fulfill({
+        json: {
+          payloads: [
+            {
+              metadata: { encoding: 'anNvbi9wbGFpbg==' },
+              data: 'InJlY292ZXJlZCI=',
+            },
+          ],
+        },
+      });
+    }
+  });
+  await page.reload();
+  const inline = page.getByTestId('input-and-result');
+  const trigger = inline.getByRole('button', {
+    name: 'Preview Input',
+    exact: true,
+  });
+  const preview = page.getByRole('dialog', { name: 'Input', exact: true });
+  await trigger.hover();
+  await expect(preview.getByRole('status')).toBeVisible();
+  await expect(preview).not.toContainText(encryptedInput);
+  finishDecoding();
+  await expect(preview.locator('.cm-content')).toContainText(encryptedInput);
+  await expect(inline).toContainText(encryptedInput);
+  await page.keyboard.press('Escape');
+  await expect(preview).toBeHidden();
+  fail = false;
+  await trigger.click();
+  await expect(preview.locator('.cm-content')).toHaveText('"recovered"');
 });

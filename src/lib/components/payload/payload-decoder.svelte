@@ -8,6 +8,14 @@
 <script lang="ts">
   import { type Snippet, untrack } from 'svelte';
 
+  import { page } from '$app/state';
+
+  import {
+    codecEndpoint,
+    includeCredentials,
+    overrideRemoteCodecConfiguration,
+    passAccessToken,
+  } from '$lib/stores/data-encoder-config';
   import type { Payload, Payloads } from '$lib/types';
   import {
     decodeEventAttributes,
@@ -25,7 +33,9 @@
   const decodePayloadValue = async (
     value: Payload,
   ): Promise<DecodedPayloadResult> => {
-    const decodedPayload = await decodePayloadAndParseDataToJSON(value, false);
+    const decodedPayload = await decodePayloadAndParseDataToJSON(value, false, {
+      cache,
+    });
     const result = [
       {
         decodedValue: decodedPayload,
@@ -43,6 +53,7 @@
     const decodedPayloads = await decodePayloadsAndParseDataToJSON(
       value,
       false,
+      { cache },
     );
     const result = decodedPayloads.map((decodedPayload, idx) => {
       return {
@@ -60,7 +71,7 @@
   >(
     value: T,
   ): Promise<DecodedPayloadResult> => {
-    const decodedValue = await decodeEventAttributes(value);
+    const decodedValue = await decodeEventAttributes(value, { cache });
     const result: DecodedPayloadResult = [
       {
         decodedValue: decodedValue ?? value,
@@ -88,22 +99,43 @@
 
   type Props = {
     value: Payload | Payloads | T;
+    cache?: boolean;
     children: Snippet<[DecodedPayloadResult]>;
     onDecode?: (result: DecodedPayloadResult) => void;
     loading?: Snippet<[]>;
     error?: Snippet<[{ error: unknown; retry: () => void }]>;
   };
 
-  let { value, children, onDecode, loading, error }: Props = $props();
+  let {
+    value,
+    cache = false,
+    children,
+    onDecode,
+    loading,
+    error,
+  }: Props = $props();
 
   // `value` does not have referential integrity (its reference may change while the underlying value does not)
   // stringifying it allows us to only re-compute `decodePromise` below when the value itself changes.
   const valueJson = $derived(stringifyWithBigInt(value));
+  const codecConfiguration = $derived(
+    stringifyWithBigInt([
+      page.params.namespace,
+      page.params.workflow,
+      page.params.run,
+      page.data.settings?.codec,
+      $codecEndpoint,
+      $includeCredentials,
+      $overrideRemoteCodecConfiguration,
+      $passAccessToken,
+    ]),
+  );
 
   // we do not want this derived state to be invalidated by referential updates to `value`, thus we `untrack()` it.
   // we do however want this derived state to be invalidated by updates to `valueJson`, thus we `void` it.
   let decodePromise = $derived.by(() => {
     void valueJson;
+    void codecConfiguration;
     return decodeValue(untrack(() => value));
   });
 

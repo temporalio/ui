@@ -32,7 +32,7 @@
   pending = false,
 )}
   {#if content}
-    <PayloadDecoder value={content}>
+    <PayloadDecoder value={content} cache>
       {#snippet loading()}{translate('common.loading')}{/snippet}
       {#snippet children(results)}
         {results
@@ -58,6 +58,7 @@
     {#snippet preview()}{@render previewContent(workflowEvents.input)}{/snippet}
     {#snippet children(maxHeight)}
       <InputAndResultsPayload
+        cache
         disableMaximize
         maxHeight={maxHeight ?? 0}
         title={translate('workflows.input')}
@@ -76,6 +77,7 @@
       )}{/snippet}
     {#snippet children(maxHeight)}
       <InputAndResultsPayload
+        cache
         disableMaximize
         maxHeight={maxHeight ?? 0}
         title={translate('workflows.result')}

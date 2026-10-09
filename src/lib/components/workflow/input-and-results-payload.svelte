@@ -17,6 +17,7 @@
     titleSnippet?: Snippet;
     content?: Payloads | CompletionEventAttributes | Payload;
     isPending?: boolean;
+    cache?: boolean;
     payloadDownloadFilenameData: PayloadDownloadFilenameData;
   };
   let {
@@ -26,6 +27,7 @@
     titleSnippet = defaultTitleSnippet,
     content,
     isPending = false,
+    cache = false,
     payloadDownloadFilenameData,
   }: Props = $props();
 
@@ -50,6 +52,7 @@
     />
   {:else if content}
     <PayloadCodeBlock
+      {cache}
       {disableMaximize}
       {maxHeight}
       value={content}
