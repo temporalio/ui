@@ -577,7 +577,7 @@ describe('createApiWorkbenchHost', () => {
     expect(request).not.toHaveBeenCalled();
   });
 
-  it('links an accepted workflow to its existing details page', () => {
+  it('links an accepted workflow directly to the new timeline', () => {
     const host = createApiWorkbenchHost({ descriptors: [descriptor] });
     const outcome: AcceptedLaunchOutcome = {
       status: 'accepted',
@@ -595,7 +595,7 @@ describe('createApiWorkbenchHost', () => {
     };
 
     expect(host.evidenceLink(outcome).href).toMatch(
-      /\/namespaces\/catalog-demo\/workflows\/workflow-6\/run-6\/timeline$/,
+      /\/namespaces\/catalog-demo\/workflows\/workflow-6\/run-6\/timeline\?new_timeline=true$/,
     );
   });
 
