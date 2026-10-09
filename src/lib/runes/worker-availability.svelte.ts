@@ -26,11 +26,13 @@ export const getWorkerAvailabilityState = (
 ): { readonly current: WorkerAvailability } => {
   let check = $state.raw<ServerlessCheck>();
 
+  const resolved = $derived(input());
+  const needsCheck = $derived(needsServerlessCheck(resolved));
   const pendingNamespace = $derived(
-    needsServerlessCheck(input()) ? input().namespace : undefined,
+    needsCheck ? resolved.namespace : undefined,
   );
   const pendingDeployment = $derived(
-    needsServerlessCheck(input()) ? input().deployment : undefined,
+    needsCheck ? resolved.deployment : undefined,
   );
 
   $effect(() => {
@@ -48,16 +50,18 @@ export const getWorkerAvailabilityState = (
     return () => controller.abort();
   });
 
-  const serverless = $derived.by(() => {
-    const { namespace, deployment } = input();
-    return check?.namespace === namespace && check.deployment === deployment
+  const serverless = $derived(
+    check?.namespace === resolved.namespace &&
+      check.deployment === resolved.deployment
       ? check.serverless
-      : undefined;
-  });
+      : undefined,
+  );
+
+  const current = $derived(getWorkerAvailability({ ...resolved, serverless }));
 
   return {
     get current() {
-      return getWorkerAvailability({ ...input(), serverless });
+      return current;
     },
   };
 };

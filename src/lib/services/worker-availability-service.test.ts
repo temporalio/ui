@@ -84,4 +84,53 @@ describe('isServerlessDeployment', () => {
     ).resolves.toBe(true);
     expect(request).toHaveBeenCalledTimes(2);
   });
+
+  it('does not let an expired lookup that fails evict a newer one', async () => {
+    vi.useFakeTimers();
+    try {
+      let failFirst: (error: Error) => void = () => {};
+      const request = vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise<Response>((_, reject) => {
+              failFirst = reject;
+            }),
+        )
+        .mockImplementation(async () => deploymentResponse('race', true));
+
+      const first = isServerlessDeployment('default', 'race', request);
+      vi.advanceTimersByTime(30_001);
+      await expect(
+        isServerlessDeployment('default', 'race', request),
+      ).resolves.toBe(true);
+
+      failFirst(new TypeError('network down'));
+      await expect(first).resolves.toBe(false);
+
+      await expect(
+        isServerlessDeployment('default', 'race', request),
+      ).resolves.toBe(true);
+      expect(request).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('looks up again once a cached result expires', async () => {
+    vi.useFakeTimers();
+    try {
+      const request = vi
+        .fn()
+        .mockImplementation(async () => deploymentResponse('expiry', true));
+
+      await isServerlessDeployment('default', 'expiry', request);
+      vi.advanceTimersByTime(30_001);
+      await isServerlessDeployment('default', 'expiry', request);
+
+      expect(request).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

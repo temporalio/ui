@@ -10,20 +10,28 @@ import {
 // deployment within moments of each other; share one request between them.
 const RESULT_TTL_MS = 30_000;
 
-const lookups = new Map<
-  string,
-  { result: Promise<boolean>; expires: number }
->();
+type Lookup = { result: Promise<boolean>; expires: number };
+
+const lookups = new Map<string, Lookup>();
+
+const removeExpired = (now: number) => {
+  for (const [key, lookup] of lookups) {
+    if (lookup.expires <= now) lookups.delete(key);
+  }
+};
 
 // A failed lookup resolves to false so the caller falls back to the
-// self-managed message instead of surfacing an error toast.
+// self-managed message instead of surfacing an error toast. It evicts only
+// its own entry, never a newer lookup stored under the same key.
 const lookUpServerless = (
   namespace: string,
   deployment: string,
   request: typeof fetch,
   key: string,
-): Promise<boolean> =>
-  fetchDeployment(
+  now: number,
+): Lookup => {
+  const lookup = { expires: now + RESULT_TTL_MS } as Lookup;
+  lookup.result = fetchDeployment(
     { namespace, deploymentName: deployment },
     request,
     undefined,
@@ -33,9 +41,11 @@ const lookUpServerless = (
       deploymentHasComputeConfig(response?.workerDeploymentInfo),
     )
     .catch(() => {
-      lookups.delete(key);
+      if (lookups.get(key) === lookup) lookups.delete(key);
       return false;
     });
+  return lookup;
+};
 
 const abortReason = (signal: AbortSignal) =>
   signal.reason ?? new DOMException('Aborted', 'AbortError');
@@ -62,15 +72,13 @@ export const isServerlessDeployment = (
   signal?: AbortSignal,
 ): Promise<boolean> => {
   const key = `${namespace}/${deployment}`;
-  const cached = lookups.get(key);
-  const lookup =
-    cached && cached.expires > Date.now()
-      ? cached
-      : {
-          result: lookUpServerless(namespace, deployment, request, key),
-          expires: Date.now() + RESULT_TTL_MS,
-        };
-  lookups.set(key, lookup);
+  const now = Date.now();
+  removeExpired(now);
+  let lookup = lookups.get(key);
+  if (!lookup) {
+    lookup = lookUpServerless(namespace, deployment, request, key, now);
+    lookups.set(key, lookup);
+  }
 
   return unlessAborted(lookup.result, signal);
 };

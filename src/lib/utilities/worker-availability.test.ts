@@ -8,7 +8,6 @@ import {
   countPollers,
   getWorkerAvailability,
   hasPollers,
-  isRunningWithNoWorkers,
   needsServerlessCheck,
   workflowRunAvailabilityInput,
 } from './worker-availability';
@@ -143,33 +142,5 @@ describe('workflowRunAvailabilityInput', () => {
       workflowRunAvailabilityInput(run({ isRunning: true }, deployed))
         .deployment,
     ).toBe('orders');
-  });
-});
-
-describe('isRunningWithNoWorkers', () => {
-  it('is true for an empty, loaded queue', () => {
-    expect(isRunningWithNoWorkers(run({ isRunning: true }, empty))).toBe(true);
-  });
-
-  it('is true for an empty queue with a deployment, whatever its compute', () => {
-    expect(isRunningWithNoWorkers(run({ isRunning: true }, deployed))).toBe(
-      true,
-    );
-  });
-
-  it('is false before pollers load', () => {
-    expect(isRunningWithNoWorkers(run({ isRunning: true }, empty, false))).toBe(
-      false,
-    );
-  });
-
-  it('is false with a listed poller', () => {
-    expect(isRunningWithNoWorkers(run({ isRunning: true }, polling))).toBe(
-      false,
-    );
-  });
-
-  it('is false for a completed workflow', () => {
-    expect(isRunningWithNoWorkers(run({}, empty))).toBe(false);
   });
 });

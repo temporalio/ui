@@ -62,16 +62,6 @@ export const workflowRunAvailabilityInput = ({
   deployment: getWorkerDeploymentName(workers, workflow),
 });
 
-export const isRunningWithNoWorkers = (
-  workflowRun: WorkflowRunWithWorkers,
-): boolean => {
-  const { state } = getWorkerAvailability({
-    ...workflowRunAvailabilityInput(workflowRun),
-    serverless: undefined,
-  });
-  return state === 'no-workers' || state === 'checking-deployment';
-};
-
 export const needsServerlessCheck = (
   input: Omit<WorkerAvailabilityInput, 'serverless'>,
 ): boolean =>
