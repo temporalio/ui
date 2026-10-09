@@ -31,10 +31,7 @@ test.describe('Schedules Page', () => {
     await page.getByTestId('schedule-type-input').fill('test-type-e2e');
     await page.getByTestId('schedule-workflow-id-input').fill('e2e-1234');
     await page.getByTestId('schedule-task-queue-input').fill('default');
-    await page
-      .locator('#schedule-payload-input')
-      .getByRole('textbox')
-      .fill('"abc"');
+    await page.locator('#input-0').getByRole('textbox').fill('"abc"');
     await page.getByTestId('spec-type-0-button').click();
     await page.getByRole('option', { name: 'Interval' }).click();
     await page.getByLabel('Time Interval').fill('90');

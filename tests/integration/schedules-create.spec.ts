@@ -28,6 +28,33 @@ test.describe('Creates Schedule Successfully', () => {
     await page.goto(createScheduleUrl);
   });
 
+  test('submits the typed input payload', async ({ page }) => {
+    await fillBaseFields(page);
+
+    const editor = page.locator('[id^="input-"] .cm-content').first();
+    await editor.click();
+    await editor.pressSequentially('"hello"');
+
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
+    await page.getByLabel('Time Interval').fill('90');
+
+    const createButton = page.getByTestId('create-schedule-button');
+    await expect(createButton).toBeEnabled();
+
+    const createRequest = page.waitForRequest(
+      (req) => req.method() === 'POST' && /\/schedules\//.test(req.url()),
+    );
+    await createButton.click();
+    const body = JSON.parse((await createRequest).postData() ?? '{}');
+
+    const payloads =
+      body?.schedule?.action?.startWorkflow?.input?.payloads ?? [];
+    expect(payloads).toHaveLength(1);
+    // base64("\"hello\"") === "ImhlbGxvIg=="
+    expect(payloads[0].data).toBe('ImhlbGxvIg==');
+  });
+
   test('fills out interval-based schedule and submits', async ({ page }) => {
     await fillBaseFields(page);
     await page.getByTestId('spec-type-0-button').click();
@@ -39,6 +66,78 @@ test.describe('Creates Schedule Successfully', () => {
     await createButton.click();
 
     await expect(page.getByTestId('loading')).toBeVisible();
+  });
+
+  test.describe('Multiple Inputs', () => {
+    test('adds and removes input rows', async ({ page }) => {
+      await expect(page.getByTestId('add-input')).toBeVisible();
+      await expect(page.getByTestId('remove-input-0')).toBeHidden();
+
+      await page.getByTestId('add-input').click();
+      await expect(page.getByTestId('remove-input-0')).toBeVisible();
+      await expect(page.getByTestId('remove-input-1')).toBeVisible();
+
+      await page.getByTestId('remove-input-1').click();
+      await expect(page.getByTestId('remove-input-0')).toBeHidden();
+    });
+
+    test('does not duplicate editors after add -> remove -> add', async ({
+      page,
+    }) => {
+      const editors = page.locator('[id^="input-"] .cm-content');
+
+      await expect(editors).toHaveCount(1);
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+
+      await page.getByTestId('remove-input-1').click();
+      await expect(editors).toHaveCount(1);
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+    });
+
+    test('removing the first input keeps the correct remaining content', async ({
+      page,
+    }) => {
+      const editors = page.locator('[id^="input-"] .cm-content');
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+
+      await editors.nth(0).fill('"first"');
+      await editors.nth(1).fill('"second"');
+
+      await page.getByTestId('remove-input-0').click();
+
+      await expect(editors).toHaveCount(1);
+      await expect(editors.nth(0)).toHaveText('"second"');
+    });
+
+    test('keeps input value after clicking outside the field', async ({
+      page,
+    }) => {
+      const editors = page.locator('[id^="input-"] .cm-content');
+
+      await editors.nth(0).click();
+      await editors.nth(0).pressSequentially('{"a":1}');
+      await page.getByTestId('schedule-name-input').click();
+
+      await expect(editors.nth(0)).toContainText('"a"');
+    });
+
+    test('keeps multiple input values after blur', async ({ page }) => {
+      const editors = page.locator('[id^="input-"] .cm-content');
+
+      await page.getByTestId('add-input').click();
+      await editors.nth(0).fill('"first"');
+      await editors.nth(1).fill('"second"');
+      await page.getByTestId('schedule-name-input').click();
+
+      await expect(editors.nth(0)).toHaveText('"first"');
+      await expect(editors.nth(1)).toHaveText('"second"');
+    });
   });
 
   test('fills out schedule with custom search attributes and submits', async ({

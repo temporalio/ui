@@ -197,9 +197,7 @@ test.describe('Schedules List with schedules', () => {
 
     await page.goto(scheduleEditUrl);
 
-    const payloadInput = page
-      .locator('#schedule-payload-input')
-      .getByRole('textbox');
+    const payloadInput = page.locator('#input-0').getByRole('textbox');
     await expect(payloadInput).toContainText('"message"');
 
     await page.getByRole('button', { name: 'Edit', exact: true }).click();
@@ -216,6 +214,27 @@ test.describe('Schedules List with schedules', () => {
     );
   });
 
+  test('keeps edited input value after clicking outside the field', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, scheduleWithInput('ImhlbGxvIg=='));
+
+    await page.goto(scheduleEditUrl);
+
+    const payloadInput = page.locator('#input-0').getByRole('textbox');
+    await expect(payloadInput).toContainText('"hello"');
+
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
+
+    await payloadInput.click();
+    await page.keyboard.press('ControlOrMeta+a');
+    await payloadInput.pressSequentially('"changed"');
+
+    await page.getByTestId('schedule-task-queue-input').click();
+
+    await expect(payloadInput).toContainText('changed');
+  });
+
   test('edits an existing schedule with a string input payload', async ({
     page,
   }) => {
@@ -223,9 +242,7 @@ test.describe('Schedules List with schedules', () => {
 
     await page.goto(scheduleEditUrl);
 
-    const payloadInput = page
-      .locator('#schedule-payload-input')
-      .getByRole('textbox');
+    const payloadInput = page.locator('#input-0').getByRole('textbox');
     await expect(payloadInput).toContainText('"hello"');
     await expect(page.getByText('Input must be valid JSON')).toBeHidden();
 
