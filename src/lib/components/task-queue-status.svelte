@@ -15,6 +15,7 @@
     const queue = targetTaskQueue;
     if (!namespace || !queue) return;
 
+    workers = undefined;
     let current = true;
     getPollers({ namespace, queue })
       .then((response) => {
