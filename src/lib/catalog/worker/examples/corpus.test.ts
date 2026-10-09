@@ -54,7 +54,9 @@ const proofExampleIds = [
   'sequential-no-summary-activities',
   'sequential-plain-text-activities',
   'continue-as-new',
+
   'timeline-kitchen-sink',
+  'timeline-kitchen-sink-long-running',
   'timeline-live',
   'timeline-performance',
   'satellite-launch-event-groups',
@@ -180,7 +182,9 @@ describe('shared workflow corpus', () => {
         ...migratedWorkflowTypes,
         'priorityFairnessWorkflow',
         'continueAsNewWorkflow',
+
         'timelineKitchenSink',
+        'timelineKitchenSinkLongRunning',
         'timelineLiveWorkflow',
         'timelinePerformanceWorkflow',
         'nexusGreeting',
@@ -212,6 +216,25 @@ describe('shared workflow corpus', () => {
     expect(binding?.activities).toHaveProperty('recordTimelineStep');
     expect(binding?.activities).toHaveProperty('retryTimelineStep');
     expect(binding?.activities).toHaveProperty('recordLocalTimelineStep');
+  });
+
+  it('registers the long-running kitchen sink on the shared worker', () => {
+    const registry = createCatalogRegistry();
+    catalogRegistrationSource.register(registry);
+    const generated = generateCatalog(registry);
+
+    expect(
+      generated.browserDescriptors.find(
+        ({ id }) => id === 'timeline-kitchen-sink-long-running',
+      ),
+    ).toMatchObject({
+      input: { defaultValue: [100, 30, 5, 3] },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        workflowType: 'timelineKitchenSinkLongRunning',
+      },
+    });
   });
 
   it('registers the long-running live timeline example and its activity', () => {
@@ -681,12 +704,16 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/timeline-kitchen-sink/activity.ts',
         'src/lib/catalog/worker/examples/timeline-kitchen-sink/example.ts',
         'src/lib/catalog/worker/examples/timeline-kitchen-sink/workflow.ts',
+        'src/lib/catalog/worker/examples/timeline-kitchen-sink-long-running/example.ts',
+        'src/lib/catalog/worker/examples/timeline-kitchen-sink-long-running/workflow.ts',
+
         'src/lib/catalog/worker/examples/high-event-count/example.ts',
         'src/lib/catalog/worker/examples/high-event-count/workflow.ts',
         'src/lib/catalog/worker/examples/child-workflows/example.ts',
         'src/lib/catalog/worker/examples/child-workflows/workflow.ts',
         'src/lib/catalog/worker/examples/continue-as-new/example.ts',
         'src/lib/catalog/worker/examples/continue-as-new/workflow.ts',
+
         'src/lib/catalog/worker/examples/local-activity/example.ts',
         'src/lib/catalog/worker/examples/local-activity/workflow.ts',
         'src/lib/catalog/worker/examples/workflow-patching/example.ts',

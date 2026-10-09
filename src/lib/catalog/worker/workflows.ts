@@ -20,6 +20,7 @@ export { sequentialPlainTextActivities } from './examples/sequential-plain-text-
 export { signalCollector } from './examples/signal-collector/workflow.js';
 export { signalWorkflow } from './examples/signal-handlers/workflow.js';
 export { timelineKitchenSink } from './examples/timeline-kitchen-sink/workflow.js';
+export { timelineKitchenSinkLongRunning } from './examples/timeline-kitchen-sink-long-running/workflow.js';
 export { timelineLiveWorkflow } from './examples/timeline-live/workflow.js';
 export { timelinePerformanceWorkflow } from './examples/timeline-performance/workflow.js';
 export { scheduleWorkflow } from './examples/timer-driven-repetition/workflow.js';

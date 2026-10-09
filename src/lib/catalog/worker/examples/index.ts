@@ -26,10 +26,11 @@ import { catalogExample as example18 } from './signal-collector/example.js';
 import { catalogExample as example19 } from './signal-handlers/example.js';
 import { catalogExample as example20 } from './standalone-activity/example.js';
 import { catalogExample as example21 } from './timeline-kitchen-sink/example.js';
-import { catalogExample as example22 } from './timeline-live/example.js';
-import { catalogExample as example23 } from './timeline-performance/example.js';
-import { catalogExample as example24 } from './timer-driven-repetition/example.js';
-import { catalogExample as example25 } from './workflow-patching/example.js';
+import { catalogExample as example22 } from './timeline-kitchen-sink-long-running/example.js';
+import { catalogExample as example23 } from './timeline-live/example.js';
+import { catalogExample as example24 } from './timeline-performance/example.js';
+import { catalogExample as example25 } from './timer-driven-repetition/example.js';
+import { catalogExample as example26 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -58,6 +59,7 @@ const sharedWorkflowDefinitions = [
   example23,
   example24,
   example25,
+  example26,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -157,6 +159,8 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/timeline-kitchen-sink/activity.ts',
   'src/lib/catalog/worker/examples/timeline-kitchen-sink/example.ts',
   'src/lib/catalog/worker/examples/timeline-kitchen-sink/workflow.ts',
+  'src/lib/catalog/worker/examples/timeline-kitchen-sink-long-running/example.ts',
+  'src/lib/catalog/worker/examples/timeline-kitchen-sink-long-running/workflow.ts',
   'src/lib/catalog/worker/examples/timeline-live/activity.ts',
   'src/lib/catalog/worker/examples/timeline-live/example.ts',
   'src/lib/catalog/worker/examples/timeline-live/workflow.test.ts',
