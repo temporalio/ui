@@ -4,7 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { page } from '$app/stores';
 
-import { handleError } from './handle-error';
+import {
+  FORBIDDEN_ERROR_MESSAGE,
+  handleError,
+  handleUnauthorizedOrForbiddenError,
+} from './handle-error';
 import { routeForAuthenticationRedirect, routeForLoginPage } from './route-for';
 
 const realLocation = window.location.assign;
@@ -65,7 +69,7 @@ describe('handleError', () => {
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
-  it('should redirect if it is a forbidden error with status', () => {
+  it('should redirect to the login page with an error if it is a forbidden error with statusCode', () => {
     const error = {
       statusCode: 403,
       statusText: 'Forbidden',
@@ -73,10 +77,12 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    expect(window.location.assign).toHaveBeenCalledWith(
+      routeForLoginPage(FORBIDDEN_ERROR_MESSAGE),
+    );
   });
 
-  it('should redirect if it is a forbidden error with statusCode', () => {
+  it('should redirect to the login page with an error if it is a forbidden error with status', () => {
     const error = {
       status: 403,
       statusText: 'Forbidden',
@@ -84,7 +90,23 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    expect(window.location.assign).toHaveBeenCalledWith(
+      routeForLoginPage(FORBIDDEN_ERROR_MESSAGE),
+    );
+  });
+
+  it('should not redirect to SSO if it is forbidden and redirectToProvider is enabled', () => {
+    get(page).data.settings.auth.redirectToProvider = true;
+    const error = {
+      status: 403,
+      statusText: 'Forbidden',
+      response: null as unknown as Response,
+    };
+
+    expect(() => handleError(error)).toThrowError();
+    expect(window.location.assign).toHaveBeenCalledWith(
+      routeForLoginPage(FORBIDDEN_ERROR_MESSAGE),
+    );
   });
 
   it('should not redirect if not 401/403', () => {
@@ -142,5 +164,49 @@ describe('handleError', () => {
       variant: 'error',
       message: 'lol',
     });
+  });
+});
+
+describe('handleUnauthorizedOrForbiddenError', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', { value: fakeLocation });
+  });
+
+  afterEach(() => {
+    get(page).data.settings.auth.redirectToProvider = false;
+    Object.defineProperty(window, 'location', { value: realLocation });
+    vi.clearAllMocks();
+  });
+
+  it('should redirect to SSO if it is unauthorized and redirectToProvider is enabled', () => {
+    get(page).data.settings.auth.redirectToProvider = true;
+    get(page).data.settings.baseUrl = 'https://t.io';
+
+    handleUnauthorizedOrForbiddenError({
+      status: 401,
+      statusText: 'Unauthorized',
+      body: { code: 16, message: 'Request unauthenticated', details: [] },
+    });
+
+    expect(window.location.assign).toHaveBeenCalledWith(
+      routeForAuthenticationRedirect(
+        get(page).data.settings,
+        new URL(fakeLocation.href),
+      ),
+    );
+  });
+
+  it('should redirect to the login page with an error if it is forbidden and redirectToProvider is enabled', () => {
+    get(page).data.settings.auth.redirectToProvider = true;
+
+    handleUnauthorizedOrForbiddenError({
+      status: 403,
+      statusText: 'Forbidden',
+      body: { code: 7, message: 'Request unauthorized', details: [] },
+    });
+
+    expect(window.location.assign).toHaveBeenCalledWith(
+      routeForLoginPage(FORBIDDEN_ERROR_MESSAGE),
+    );
   });
 });

@@ -17,6 +17,9 @@ interface NetworkErrorWithReport extends NetworkError {
   report?: boolean;
 }
 
+export const FORBIDDEN_ERROR_MESSAGE =
+  'You are signed in, but you do not have permission to access this Temporal resource. Ask your administrator for access.';
+
 export const handleError = (
   error: unknown,
   toasts = toaster,
@@ -42,7 +45,7 @@ export const handleError = (
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForCurrentAuthSettings());
+    window.location.assign(routeForLoginPage(FORBIDDEN_ERROR_MESSAGE));
   }
 
   if (isNetworkError(error)) {
@@ -67,7 +70,7 @@ export const handleUnauthorizedOrForbiddenError = (
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForCurrentAuthSettings());
+    window.location.assign(routeForLoginPage(FORBIDDEN_ERROR_MESSAGE));
     return;
   }
 };
