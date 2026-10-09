@@ -18,6 +18,7 @@ export class StandaloneNexusOperationPoller {
   private operationId: string;
   private runId: string;
   private token: string = '';
+  private input: NexusOperationExecution['input'];
   private onUpdate: (nexusOperationExecution: NexusOperationExecution) => void;
   private onError: (error: Error) => void;
 
@@ -51,6 +52,7 @@ export class StandaloneNexusOperationPoller {
       return;
     }
 
+    this.input = nexusOperationExecution.input;
     this.onUpdate(nexusOperationExecution);
 
     if (
@@ -75,7 +77,10 @@ export class StandaloneNexusOperationPoller {
             !isEmptyObject(polledNexusOperationExecution)
           ) {
             this.token = polledNexusOperationExecution.longPollToken ?? '';
-            this.onUpdate(polledNexusOperationExecution);
+            this.onUpdate({
+              ...polledNexusOperationExecution,
+              input: polledNexusOperationExecution.input ?? this.input,
+            });
           }
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
@@ -95,6 +100,7 @@ export class StandaloneNexusOperationPoller {
       this.operationId,
       this.runId,
     );
+    this.input = nexusOperationExecution.input;
     this.onUpdate(nexusOperationExecution);
   }
 
