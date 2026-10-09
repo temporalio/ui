@@ -26,7 +26,7 @@ const lookUpServerless = (
   fetchDeployment(
     { namespace, deploymentName: deployment },
     request,
-    () => {},
+    undefined,
     false,
   )
     .then((response) =>
