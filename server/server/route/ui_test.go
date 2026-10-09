@@ -338,6 +338,59 @@ func TestBuildUIIndexHandler_FailsClosedForInvalidExtensionConfiguration(t *test
 	assert.Empty(t, rec.Header().Get("Content-Security-Policy"))
 }
 
+func TestBuildUIAssetsHandler_CacheControl(t *testing.T) {
+	handler := buildUIAssetsHandler(fstest.MapFS{
+		"_app/immutable/chunk.js":   &fstest.MapFile{Data: []byte("chunk")},
+		"_app/immutable/index.html": &fstest.MapFile{Data: []byte("index")},
+		"_app/styles.css":           &fstest.MapFile{Data: []byte("styles")},
+	})
+
+	tests := []struct {
+		name         string
+		path         string
+		status       int
+		cacheControl string
+		location     string
+	}{
+		{
+			name:         "immutable asset is cached",
+			path:         "/_app/immutable/chunk.js",
+			status:       http.StatusOK,
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+		{
+			name:   "non immutable asset is unchanged",
+			path:   "/_app/styles.css",
+			status: http.StatusOK,
+		},
+		{
+			name:     "immutable redirect is unchanged",
+			path:     "/_app/immutable/index.html",
+			status:   http.StatusMovedPermanently,
+			location: "./",
+		},
+		{
+			name:   "missing immutable asset is unchanged",
+			path:   "/_app/immutable/missing.js",
+			status: http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			rec := httptest.NewRecorder()
+
+			err := handler(e.NewContext(req, rec))
+			require.NoError(t, err)
+			assert.Equal(t, tt.status, rec.Code)
+			assert.Equal(t, tt.cacheControl, rec.Header().Get("Cache-Control"))
+			assert.Equal(t, tt.location, rec.Header().Get("Location"))
+		})
+	}
+}
+
 func renderRequest(t *testing.T, query string) string {
 	t.Helper()
 

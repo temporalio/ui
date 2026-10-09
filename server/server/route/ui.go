@@ -140,7 +140,35 @@ func splitRequestURI(uri string) (reqPath, rawQuery string) {
 
 func buildUIAssetsHandler(assets fs.FS) echo.HandlerFunc {
 	handler := http.FileServer(http.FS(assets))
-	return echo.WrapHandler(handler)
+	return echo.WrapHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/_app/immutable/") {
+			handler.ServeHTTP(&immutableAssetResponseWriter{ResponseWriter: w}, r)
+			return
+		}
+		handler.ServeHTTP(w, r)
+	}))
+}
+
+type immutableAssetResponseWriter struct {
+	http.ResponseWriter
+	wroteHeader bool
+}
+
+func (w *immutableAssetResponseWriter) WriteHeader(status int) {
+	if !w.wroteHeader {
+		if status >= http.StatusOK && status < http.StatusMultipleChoices {
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		}
+		w.wroteHeader = true
+	}
+	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *immutableAssetResponseWriter) Write(data []byte) (int, error) {
+	if !w.wroteHeader {
+		w.WriteHeader(http.StatusOK)
+	}
+	return w.ResponseWriter.Write(data)
 }
 
 func generateNonce() string {
