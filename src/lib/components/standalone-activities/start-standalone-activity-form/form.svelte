@@ -237,22 +237,31 @@
 
   onDestroy(() => {
     unsubscribe?.();
+    taskQueueCheck?.abort();
   });
 
-  let latestTaskQueueCheck = 0;
+  let taskQueueCheck: AbortController | undefined;
 
-  // A slower earlier check must not overwrite a newer one. A failed check
-  // has already shown an error toast, so it only hides the stale result.
+  // Each check aborts the previous one and clears its result, so a slower
+  // earlier check or an emptied field never shows a stale result. A failed
+  // check has already shown an error toast and leaves no result.
   const checkTaskQueue = async (queue: string) => {
-    if (!queue) return;
-    const check = ++latestTaskQueueCheck;
+    taskQueueCheck?.abort();
+    const controller = new AbortController();
+    taskQueueCheck = controller;
     taskQueueActive = null;
+    if (!queue) return;
     try {
-      const response = await getActivityPollers({ namespace, queue });
-      if (check !== latestTaskQueueCheck) return;
-      taskQueueActive = Boolean(response.pollers?.length);
+      const response = await getActivityPollers(
+        { namespace, queue },
+        fetch,
+        controller.signal,
+      );
+      if (!controller.signal.aborted) {
+        taskQueueActive = Boolean(response.pollers?.length);
+      }
     } catch {
-      if (check === latestTaskQueueCheck) taskQueueActive = null;
+      return;
     }
   };
 </script>

@@ -1,43 +1,18 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { SEARCH_ATTRIBUTE_TYPE } from '$src/lib/types/workflows';
+import {
+  heldTaskQueues,
+  nextFrames,
+  slowQueueAborted,
+} from '~/test-utilities/held-task-queues';
 import {
   mockGlobalApis,
   mockNamespaceApi,
   mockSearchAttributesApi,
   mockSettingsApi,
   mockTaskQueuesApi,
-  TASK_QUEUES_API,
 } from '~/test-utilities/mock-apis';
-
-// Holds every response for slow-queue until release() is called, so a test
-// can make an earlier check finish after a later one.
-const heldTaskQueues = async (page: Page) => {
-  let release = () => {};
-  const released = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-
-  await page.route(TASK_QUEUES_API, async (route) => {
-    if (route.request().url().includes('/task-queues/slow-queue')) {
-      await released;
-      return route.fulfill({
-        json: { pollers: [{ identity: 'worker' }], taskQueueStatus: null },
-      });
-    }
-    return route.fulfill({ json: { pollers: [], taskQueueStatus: null } });
-  });
-
-  return release;
-};
-
-const nextFrames = (page: Page) =>
-  page.evaluate(
-    () =>
-      new Promise((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(resolve)),
-      ),
-  );
 
 test.describe('Start a Workflow', () => {
   const startWorkflowUrl = '/namespaces/default/workflows/start-workflow';
@@ -105,14 +80,48 @@ test.describe('Start a Workflow', () => {
       const status = page.getByRole('status');
       await expect(status).toContainText('Task Queue is Inactive');
 
-      const slowQueueAnswered = page.waitForResponse(
-        /\/task-queues\/slow-queue\?taskQueueType=3/,
-      );
-
       releaseSlowQueue();
-      await slowQueueAnswered;
       await nextFrames(page);
       await expect(status).toContainText('Task Queue is Inactive');
+    });
+
+    test('aborts the earlier check when the Task Queue changes', async ({
+      page,
+    }) => {
+      await mockSettingsApi(page, { StartWorkflowDisabled: false });
+      await mockSearchAttributesApi(page);
+      const releaseSlowQueue = await heldTaskQueues(page);
+      await page.goto(startWorkflowUrl);
+
+      const taskQueue = page.locator('#taskQueue');
+      await taskQueue.fill('slow-queue');
+      await taskQueue.blur();
+      const aborted = slowQueueAborted(page);
+      await taskQueue.fill('fast-queue');
+      await taskQueue.blur();
+
+      const failed = await aborted;
+      expect(failed.failure()?.errorText).toBeTruthy();
+      releaseSlowQueue();
+    });
+
+    test('shows no result after the Task Queue is emptied during a check', async ({
+      page,
+    }) => {
+      await mockSettingsApi(page, { StartWorkflowDisabled: false });
+      await mockSearchAttributesApi(page);
+      const releaseSlowQueue = await heldTaskQueues(page);
+      await page.goto(startWorkflowUrl);
+
+      const taskQueue = page.locator('#taskQueue');
+      await taskQueue.fill('slow-queue');
+      await taskQueue.blur();
+      await taskQueue.fill('');
+      await taskQueue.blur();
+
+      releaseSlowQueue();
+      await nextFrames(page);
+      await expect(page.getByText(/^Task Queue is/)).toHaveCount(0);
     });
   });
 
