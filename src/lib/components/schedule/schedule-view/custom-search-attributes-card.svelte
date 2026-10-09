@@ -54,7 +54,6 @@
 )}
   <ul class="w-full">
     {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue] (searchAttrName)}
-      {@const value = payloadToString(searchAttrValue)}
       {@const query = getSearchAttributeQuery(
         searchAttrName,
         kind === 'schedule'
@@ -62,9 +61,7 @@
           : $searchAttributes[searchAttrName],
         searchAttrValue,
       )}
-      <li
-        class="flex flex-wrap items-center gap-2 border-b border-primary py-2 last-of-type:border-b-0"
-      >
+      <li class="flex flex-wrap items-center gap-2 py-2">
         <a
           href={query
             ? kind === 'schedule'
@@ -77,16 +74,16 @@
                   query,
                 })
             : undefined}
-          class={twMerge(
-            'flex flex-wrap items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary',
-            query && 'underline',
-          )}
+          class="flex flex-wrap items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary"
         >
-          <span class="break-all">{searchAttrName}</span>
+          <span class={twMerge('break-all', query && 'underline')}
+            >{searchAttrName}</span
+          >
           <span
             class="select-all rounded-sm bg-surface-tertiary p-1 leading-4 text-primary"
-            >{value}</span
           >
+            {payloadToString(searchAttrValue)}
+          </span>
         </a>
       </li>
     {:else}
