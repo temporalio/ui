@@ -3,6 +3,10 @@ import type {
   EventGroupMarkerKey,
 } from '../event-group-markers/types';
 import type { HistoryEventId } from '../history-events/types';
+import type {
+  LifecycleGroupFilterIndexProjectionChange,
+  LifecycleGroupFilterKey,
+} from '../lifecycle-group-filter-indexes/types';
 import type { LifecycleGroupsProjectionChange } from '../lifecycle-groups/types';
 export type WorkflowExecutionIdentity = Readonly<{
   namespace: string;
@@ -19,10 +23,14 @@ export type WorkflowExecutionChange =
       eventId: HistoryEventId;
     }>
   | LifecycleGroupsProjectionChange
-  | EventGroupMarkerGroupsProjectionChange;
+  | EventGroupMarkerGroupsProjectionChange
+  | LifecycleGroupFilterIndexProjectionChange;
 
 /** Consolidated batch payloads for each execution subscription topic. */
 export type NotificationByTopic = {
+  LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED: Readonly<{
+    lifecycleGroupFilterKeys: readonly LifecycleGroupFilterKey[];
+  }>;
   EVENTS_ADDED: Readonly<{
     eventIds: readonly HistoryEventId[];
   }>;

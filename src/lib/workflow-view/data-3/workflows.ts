@@ -1,3 +1,4 @@
+import { allLifecycleGroupFilterDefinitions } from './lifecycle-group-filter-indexes/filter-definitions';
 import { getWorkflowExecutionKeyFromIdentity } from './workflow-execution/get-key-from-identity';
 import type {
   WorkflowExecutionIdentity,
@@ -28,7 +29,11 @@ export class Workflows {
       return storedExecution;
     }
 
-    const newExecution = await WorkflowExecution.discover(identity, signal);
+    const newExecution = await WorkflowExecution.discover(
+      identity,
+      allLifecycleGroupFilterDefinitions,
+      signal,
+    );
     const registeredExecution = this._executions.get(key);
 
     if (registeredExecution) {

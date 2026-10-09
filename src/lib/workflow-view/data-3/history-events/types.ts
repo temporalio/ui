@@ -1,5 +1,4 @@
-import type { HistoryEvent } from '$lib/types/events';
-import { type EventType } from '$lib/utilities/is-event-type';
+import type { EventType, HistoryEvent } from '$lib/types/events';
 
 /** Identifies a history event within one workflow execution. */
 export type HistoryEventId = string;

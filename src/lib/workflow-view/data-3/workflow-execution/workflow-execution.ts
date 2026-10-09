@@ -23,6 +23,11 @@ import type {
   HistoryEventId,
   NormalizedHistoryEvent,
 } from '../history-events/types';
+import { LifecycleGroupsFilterIndexesProjection } from '../lifecycle-group-filter-indexes/lifecycle-group-filter-indexes-projection';
+import type {
+  LifecycleGroupFilterDefinition,
+  LifecycleGroupFilterKey,
+} from '../lifecycle-group-filter-indexes/types';
 import { getLifecycleReference } from '../lifecycle-groups/get-lifecycle-reference';
 import { LifecycleGroupsProjection } from '../lifecycle-groups/lifecycle-groups-projection';
 import type { LifecycleGroup } from '../lifecycle-groups/types';
@@ -41,6 +46,7 @@ export class WorkflowExecution {
   private _subscribersByTopic: {
     [T in SubscriptionTopic]: Set<Subscriber<T>>;
   } = {
+    LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED: new Set(),
     EVENTS_ADDED: new Set(),
     LIFECYCLE_GROUPS_CHANGED: new Set(),
     EVENT_GROUP_MARKER_GROUPS_CHANGED: new Set(),
@@ -53,11 +59,14 @@ export class WorkflowExecution {
   private _eventGroupMarkerGroupsProjection =
     new EventGroupMarkerGroupsProjection();
 
+  private _lifecycleGroupFilterIndexesProjection: LifecycleGroupsFilterIndexesProjection;
+
   private _events = new Map<HistoryEventId, NormalizedHistoryEvent>();
 
   /** Fetches the start event and constructs a discovered execution. */
   static async discover(
     identity: WorkflowExecutionIdentity,
+    filterDefinitions: readonly LifecycleGroupFilterDefinition[] = [],
     signal?: AbortSignal,
   ): Promise<WorkflowExecution> {
     signal?.throwIfAborted();
@@ -67,13 +76,16 @@ export class WorkflowExecution {
     signal?.throwIfAborted();
     assertDiscoveredStartEvent(startEvent);
 
-    return new WorkflowExecution(identity, startEvent);
+    return new WorkflowExecution(identity, startEvent, filterDefinitions);
   }
 
   private constructor(
     identity: WorkflowExecutionIdentity,
     startEvent: DiscoveredStartEvent,
+    filterDefinitions: readonly LifecycleGroupFilterDefinition[],
   ) {
+    this._lifecycleGroupFilterIndexesProjection =
+      new LifecycleGroupsFilterIndexesProjection(filterDefinitions);
     this.startEvent = startEvent;
     this._latestEvent = startEvent;
 
@@ -99,8 +111,7 @@ export class WorkflowExecution {
         }
       : null;
 
-    // calling _addEvent to ensure startEvent is "ingested"
-    this._addEvent(startEvent);
+    this._ingestEvents([startEvent]);
   }
 
   private _notifySubscribers(
@@ -109,9 +120,14 @@ export class WorkflowExecution {
     const eventIds = new Set<HistoryEventId>();
     const headEventIds = new Set<HistoryEventId>();
     const eventGroupMarkerKeys = new Set<EventGroupMarkerKey>();
+    const lifecycleGroupFilterKeys = new Set<LifecycleGroupFilterKey>();
 
     for (const change of changes) {
       switch (change.type) {
+        case 'LIFECYCLE_GROUP_FILTER_INDEX_CHANGED': {
+          lifecycleGroupFilterKeys.add(change.lifecycleGroupFilterKey);
+          break;
+        }
         case 'EVENT_ADDED': {
           eventIds.add(change.eventId);
           break;
@@ -126,6 +142,18 @@ export class WorkflowExecution {
           eventGroupMarkerKeys.add(change.eventGroupMarkerKey);
           break;
         }
+      }
+    }
+
+    if (lifecycleGroupFilterKeys.size) {
+      const notification: NotificationByTopic['LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED'] =
+        {
+          lifecycleGroupFilterKeys: Array.from(lifecycleGroupFilterKeys),
+        };
+
+      for (const subscriber of this._subscribersByTopic
+        .LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED) {
+        subscriber(notification);
       }
     }
 
@@ -163,67 +191,72 @@ export class WorkflowExecution {
     }
   }
 
-  /** Adds an event if one with the same eventId isn't already present. */
-  private _addEvent(
-    event: NormalizedHistoryEvent,
-  ): readonly WorkflowExecutionChange[] {
-    if (this._events.has(event.eventId)) {
-      return [];
-    }
+  /** Ingests a batch, updates affected filter indexes, then notifies subscribers. */
+  private _ingestEvents(events: readonly NormalizedHistoryEvent[]): void {
+    const batchChanges: WorkflowExecutionChange[] = [];
 
-    const changes: WorkflowExecutionChange[] = [];
+    for (const event of events) {
+      if (this._events.has(event.eventId)) {
+        continue;
+      }
 
-    this._events.set(event.eventId, event);
-    changes.push({ type: 'EVENT_ADDED', eventId: event.eventId });
+      this._events.set(event.eventId, event);
+      batchChanges.push({ type: 'EVENT_ADDED', eventId: event.eventId });
 
-    // Discover next execution if it exists
+      const nextIdentity = getNextExecutionIdentity(this.identity, event);
 
-    const nextIdentity = getNextExecutionIdentity(this.identity, event);
+      if (nextIdentity) {
+        this._nextExecutionIdentity = nextIdentity;
+      }
 
-    if (nextIdentity) {
-      this._nextExecutionIdentity = nextIdentity;
-    }
+      if (compareEventIds(event.eventId, this._latestEvent.eventId) > 0) {
+        this._latestEvent = event;
+      }
 
-    // Ensure _latestEvent actually points to the latest event
-
-    if (compareEventIds(event.eventId, this._latestEvent.eventId) > 0) {
-      this._latestEvent = event;
-    }
-
-    // Lifecycle grouping
-
-    const lifecycleReference = getLifecycleReference(event);
-    const lifecycleGroupChange = this._lifecycleGroupsProjection.addEvent(
-      event,
-      lifecycleReference,
-    );
-
-    if (lifecycleGroupChange) {
-      changes.push(lifecycleGroupChange);
-    }
-
-    // Event group marker grouping
-
-    const eventGroupMarkerGroupChanges =
-      this._eventGroupMarkerGroupsProjection.addEvent(
+      const lifecycleReference = getLifecycleReference(event);
+      const lifecycleGroupChange = this._lifecycleGroupsProjection.addEvent(
         event,
         lifecycleReference,
       );
 
-    if (eventGroupMarkerGroupChanges?.length) {
-      changes.push(...eventGroupMarkerGroupChanges);
+      if (lifecycleGroupChange) {
+        batchChanges.push(lifecycleGroupChange);
+      }
+
+      const eventGroupMarkerGroupChanges =
+        this._eventGroupMarkerGroupsProjection.addEvent(
+          event,
+          lifecycleReference,
+        );
+
+      if (eventGroupMarkerGroupChanges?.length) {
+        batchChanges.push(...eventGroupMarkerGroupChanges);
+      }
     }
 
-    return changes;
-  }
+    const changedLifecycleGroupHeadEventIds = new Set<HistoryEventId>();
+    for (const change of batchChanges) {
+      if (change.type === 'LIFECYCLE_GROUP_CHANGED') {
+        changedLifecycleGroupHeadEventIds.add(change.headEventId);
+      }
+    }
 
-  /** Adds batch of events and notifies history subscribers on change */
-  private _addEventsAndNotify(events: readonly NormalizedHistoryEvent[]): void {
-    const batchChanges: WorkflowExecutionChange[] = [];
+    for (const headEventId of changedLifecycleGroupHeadEventIds) {
+      const group =
+        this._lifecycleGroupsProjection.lifecycleGroups.get(headEventId);
+      if (!group) {
+        throw new Error(`Missing lifecycle group ${headEventId}`);
+      }
 
-    for (const event of events) {
-      const changes = this._addEvent(event);
-      batchChanges.push(...changes);
+      const filterChanges =
+        this._lifecycleGroupFilterIndexesProjection.updateGroup(
+          group,
+          (eventId) => this.getEvent(eventId),
+        );
+
+      if (filterChanges) {
+        batchChanges.push(...filterChanges);
+      }
     }
 
     if (batchChanges.length) {
@@ -236,7 +269,7 @@ export class WorkflowExecution {
     await fetchHistory(
       this.identity,
       (events) => {
-        this._addEventsAndNotify(events);
+        this._ingestEvents(events);
       },
       signal,
     );
@@ -249,7 +282,7 @@ export class WorkflowExecution {
     const event = await fetchLatestEvent(this.identity, signal);
 
     signal?.throwIfAborted();
-    this._addEventsAndNotify([event]);
+    this._ingestEvents([event]);
   }
 
   /** Returns the latest event known to this execution. */
@@ -280,6 +313,14 @@ export class WorkflowExecution {
     return this._eventGroupMarkerGroupsProjection.eventGroupMarkerGroups;
   }
 
+  /** Returns a live readonly view of matching lifecycle head IDs by filter. */
+  get lifecycleGroupFilterIndexes(): ReadonlyMap<
+    LifecycleGroupFilterKey,
+    ReadonlySet<HistoryEventId>
+  > {
+    return this._lifecycleGroupFilterIndexesProjection.filterIndex;
+  }
+
   /** Returns a stored event by its ID within this execution. */
   getEvent(eventId: HistoryEventId): NormalizedHistoryEvent | undefined {
     return this._events.get(eventId);
@@ -296,6 +337,12 @@ export class WorkflowExecution {
     }
 
     switch (topic) {
+      case 'LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED': {
+        return subscribeTo(
+          this._subscribersByTopic.LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED,
+          handler,
+        );
+      }
       case 'EVENTS_ADDED': {
         return subscribeTo(this._subscribersByTopic.EVENTS_ADDED, handler);
       }
