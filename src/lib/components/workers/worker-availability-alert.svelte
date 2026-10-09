@@ -3,64 +3,35 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconArrowRight, IconInfo, IconWarning } from '$lib/io/icon';
-  import { fetchDeployment } from '$lib/services/deployments-service';
-  import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
+  import { getWorkerAvailabilityState } from '$lib/runes/worker-availability.svelte';
+  import type { TaskQueueResponse } from '$lib/types';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
   interface Props {
     namespace: string;
     taskQueue: string;
-    runningWithNoWorkers: boolean;
-    deployment?: string;
+    waiting: boolean;
+    workers: TaskQueueResponse | undefined;
+    deployment: string | undefined;
   }
 
-  let { namespace, taskQueue, runningWithNoWorkers, deployment }: Props =
-    $props();
+  let { namespace, taskQueue, waiting, workers, deployment }: Props = $props();
 
-  let serverlessDeployment = $state(false);
-  let deploymentChecked = $state(false);
-
-  $effect(() => {
-    if (!runningWithNoWorkers || !deployment) {
-      serverlessDeployment = false;
-      deploymentChecked = true;
-      return;
-    }
-
-    deploymentChecked = false;
-    const controller = new AbortController();
-
-    fetchDeployment(
-      { namespace, deploymentName: deployment },
-      fetch,
-      () => {},
-      false,
-      controller.signal,
-    )
-      .then((response) => {
-        if (controller.signal.aborted) return;
-        serverlessDeployment = deploymentHasComputeConfig(
-          response?.workerDeploymentInfo,
-        );
-        deploymentChecked = true;
-      })
-      .catch(() => {
-        if (controller.signal.aborted) return;
-        serverlessDeployment = false;
-        deploymentChecked = true;
-      });
-
-    return () => controller.abort();
-  });
+  const availability = getWorkerAvailabilityState(() => ({
+    namespace,
+    waiting,
+    workers,
+    deployment,
+  }));
 </script>
 
-{#if serverlessDeployment && deployment}
+{#if availability.current.state === 'serverless-idle'}
+  {@const { deployment } = availability.current}
   <Alert
     Icon={IconInfo}
     intent="info"
     title={translate('workflows.workflow-error-no-workers-serverless-title')}
     class="max-w-screen-lg xl:w-2/3"
-    hidden={!runningWithNoWorkers}
   >
     {translate('workflows.workflow-error-no-workers-serverless-description', {
       taskQueue,
@@ -74,13 +45,12 @@
       <IconArrowRight />
     </Link>
   </Alert>
-{:else}
+{:else if availability.current.state === 'no-workers'}
   <Alert
     Icon={IconWarning}
     intent="warning"
     title={translate('workflows.workflow-error-no-workers-title')}
     class="max-w-screen-lg xl:w-2/3"
-    hidden={!runningWithNoWorkers || !deploymentChecked}
   >
     {translate('workflows.workflow-error-no-workers-description', {
       taskQueue,

@@ -1,6 +1,7 @@
-import type { Payload, PollerInfo, TaskQueueResponse } from '$lib/types';
+import { resolveWorkerAvailability } from '$lib/services/worker-availability-service';
+import type { Payload, TaskQueueResponse } from '$lib/types';
 import { encodePayloads } from '$lib/utilities/encode-payload';
-import { validTimeToDate } from '$lib/utilities/format-time';
+import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import {
@@ -9,6 +10,7 @@ import {
   routeForWorkflow,
 } from '$lib/utilities/route-for';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import type { WorkerAvailability } from '$lib/utilities/worker-availability';
 
 import {
   ApiObservationError,
@@ -40,13 +42,6 @@ type ApiWorkbenchHostOptions = {
   getIdentity?: () => string | undefined;
   createRequestId?: () => string;
 };
-
-const ACTIVE_POLLER_WINDOW_MS = 2 * 60 * 1000;
-
-const isActivePoller = (poller: PollerInfo) =>
-  !poller.lastAccessTime ||
-  Date.now() - validTimeToDate(poller.lastAccessTime).getTime() <=
-    ACTIVE_POLLER_WINDOW_MS;
 
 const defaultEncodeInput: EncodeInput = async (input, positional) => {
   const values = positional && Array.isArray(input) ? input : [input];
@@ -418,7 +413,7 @@ export const createApiWorkbenchHost = ({
     checkWorker: async (
       { namespace, taskQueue, taskQueueType },
       signal,
-    ): Promise<boolean> => {
+    ): Promise<WorkerAvailability> => {
       const route = routeForApi('task-queue', {
         namespace,
         queue: taskQueue,
@@ -430,7 +425,16 @@ export const createApiWorkbenchHost = ({
         options: { signal },
       });
 
-      return response?.pollers?.some(isActivePoller) ?? false;
+      return resolveWorkerAvailability(
+        namespace,
+        {
+          waiting: true,
+          workers: response ?? {},
+          deployment: getWorkerDeploymentName(response, null),
+        },
+        request,
+        signal,
+      );
     },
     checkNexusEndpoint: async ({ endpoint }, signal) => {
       const route = routeForApi('nexus-endpoints');

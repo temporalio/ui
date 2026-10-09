@@ -12,7 +12,7 @@
   import DetailList from '$lib/components/detail-list/detail-list.svelte';
   import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
-  import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
+  import WorkerAvailabilityAlert from '$lib/components/workers/worker-availability-alert.svelte';
   import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -34,12 +34,10 @@
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { getSharedFilterParams } from '$lib/utilities/event-filter-params';
-  import { getWorkerDeploymentName } from '$lib/utilities/get-worker-deployment-name';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
   } from '$lib/utilities/get-workflow-relationships';
-  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
@@ -56,6 +54,7 @@
     routeForWorkflowSearchAttributes,
     routeForWorkflowWorkers,
   } from '$lib/utilities/route-for';
+  import { workflowRunAvailabilityInput } from '$lib/utilities/worker-availability';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
   const {
@@ -67,9 +66,7 @@
 
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
 
-  const { workflow, workers, workerCount } = $derived($workflowRun);
-  const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
-  const workerDeployment = $derived(getWorkerDeploymentName(workers, workflow));
+  const { workflow, workerCount } = $derived($workflowRun);
   const routeParameters = $derived({
     namespace,
     workflow: workflowId,
@@ -282,11 +279,10 @@
   {#if headerSnippet}
     {@render headerSnippet()}
   {/if}
-  <NoWorkersPollingAlert
+  <WorkerAvailabilityAlert
     {namespace}
     {taskQueue}
-    {runningWithNoWorkers}
-    deployment={workerDeployment}
+    {...workflowRunAvailabilityInput($workflowRun)}
   />
   <Tabs>
     <TabList label="workflow detail">

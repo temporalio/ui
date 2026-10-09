@@ -6,9 +6,10 @@
     type PaginatedRequest,
   } from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getWorkerAvailabilityState } from '$lib/runes/worker-availability.svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
-  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
+  import { workflowRunAvailabilityInput } from '$lib/utilities/worker-availability';
 
   import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-warning.svelte';
   import WorkersQueryEmptyState from './workers-query-empty-state.svelte';
@@ -43,7 +44,10 @@
   ];
 
   const hasQuery = $derived(page.url.searchParams.get('query') !== null);
-  const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
+  const availability = getWorkerAvailabilityState(() => ({
+    namespace,
+    ...workflowRunAvailabilityInput($workflowRun),
+  }));
 </script>
 
 <PaginatedTable
@@ -80,9 +84,22 @@
     <div class="flex h-full flex-col items-center justify-center">
       {#if hasQuery}
         <WorkersQueryEmptyState />
-      {:else if runningWithNoWorkers}
+      {:else if availability.current.state === 'serverless-idle'}
+        <EmptyState
+          title={translate(
+            'workflows.workflow-error-no-workers-serverless-title',
+          )}
+          content={translate(
+            'workflows.workflow-error-no-workers-serverless-description',
+            {
+              taskQueue: $workflowRun.workflow?.taskQueue ?? '',
+              deployment: availability.current.deployment,
+            },
+          )}
+        />
+      {:else if availability.current.state === 'no-workers'}
         <EmptyState title={translate('workers.empty-state-title')} />
-      {:else}
+      {:else if availability.current.state !== 'checking-deployment'}
         <WorkerHeartbeatsSDKAlert />
       {/if}
     </div>

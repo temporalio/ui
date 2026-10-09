@@ -14,6 +14,7 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { IconRetry } from '$lib/io/icon';
+  import { getWorkerAvailabilityState } from '$lib/runes/worker-availability.svelte';
   import {
     getQuery,
     getWorkflowMetadata,
@@ -24,6 +25,7 @@
   import type { WorkflowInteractionDefinition } from '$lib/types/workflows';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { workflowRunAvailabilityInput } from '$lib/utilities/worker-availability';
 
   const { namespace, workflow: workflowId, run: runId } = page.params;
 
@@ -31,6 +33,18 @@
     id: workflowId,
     runId,
   };
+
+  const availability = getWorkerAvailabilityState(() => ({
+    namespace: namespace ?? '',
+    ...workflowRunAvailabilityInput($workflowRun),
+  }));
+  const serverlessIdleMessage = $derived(
+    availability.current.state === 'serverless-idle'
+      ? translate('workflows.query-serverless-idle', {
+          deployment: availability.current.deployment,
+        })
+      : undefined,
+  );
 
   let queryType = $state('');
   let initialQueryType = $state('');
@@ -132,13 +146,17 @@
   {#if metadataError}
     <EmptyState
       title={translate('common.error-occurred')}
-      content={translate('workflows.no-workers-running-message')}
+      content={serverlessIdleMessage ??
+        translate('workflows.no-workers-running-message')}
       error={$workflowRun.metadata?.error?.message}
     />
   {:else if !queryTypes.length}
     <div class="text-center">
       <Loading />
-      <p class="-mt-10">{translate('workflows.no-workers-failure-message')}</p>
+      <p class="-mt-10">
+        {serverlessIdleMessage ??
+          translate('workflows.no-workers-failure-message')}
+      </p>
     </div>
   {:else}
     <div class="flex w-3/4 gap-4 max-2xl:w-full max-lg:flex-col">

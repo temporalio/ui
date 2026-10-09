@@ -8,6 +8,7 @@
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
+  import TaskQueueAvailability from '$lib/components/workers/task-queue-availability.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -43,10 +44,9 @@
   } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
+  import type { TaskQueueResponse } from '$lib/types';
   import { getIdentity } from '$lib/utilities/core-context';
-  import { pluralize } from '$lib/utilities/pluralize';
   import {
-    routeForTaskQueue,
     routeForWorkflow,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -72,7 +72,10 @@
   let initialWorkflowType = $state('');
 
   let error = $state('');
-  let pollerCount = $state<undefined | number>(undefined);
+  let checkedTaskQueue = $state<{
+    queue: string;
+    workers: TaskQueueResponse;
+  }>();
   let viewAdvancedOptions = $state(false);
 
   let searchAttributes = $state<SearchAttributesSchema>([]);
@@ -165,10 +168,17 @@
     });
   };
 
-  const checkTaskQueue = async (queue: string) => {
-    if (queue) {
-      const { pollers } = await getPollers({ namespace, queue });
-      pollerCount = pollers?.length ?? 0;
+  // Each check clears the previous result, and the effect aborts it, so a
+  // slower earlier check or an emptied field never shows a stale result. A
+  // failed check has already shown an error toast and leaves no result.
+  const checkTaskQueue = async (queue: string, signal: AbortSignal) => {
+    checkedTaskQueue = undefined;
+    if (!queue) return;
+    try {
+      const workers = await getPollers({ namespace, queue }, fetch, signal);
+      if (!signal.aborted) checkedTaskQueue = { queue, workers };
+    } catch {
+      return;
     }
   };
 
@@ -249,7 +259,9 @@
   );
 
   $effect(() => {
-    checkTaskQueue(taskQueueParam ?? '');
+    const controller = new AbortController();
+    checkTaskQueue(taskQueueParam ?? '', controller.signal);
+    return () => controller.abort();
   });
 </script>
 
@@ -294,24 +306,12 @@
         onblur={(e) => onInputChange(e, 'taskQueue')}
       />
     </div>
-    {#if pollerCount !== undefined}
-      <Alert
-        intent={pollerCount > 0 ? 'success' : 'warning'}
-        title={pollerCount ? 'Task Queue is Active' : 'Task Queue is Inactive'}
-      >
-        <div class="flex w-full items-center justify-between">
-          <p>
-            {pollerCount}
-            {pluralize('Worker', pollerCount)}
-          </p>
-          <Link
-            href={routeForTaskQueue({ namespace, queue: taskQueue })}
-            newTab
-          >
-            View Task Queue
-          </Link>
-        </div></Alert
-      >
+    {#if checkedTaskQueue}
+      <TaskQueueAvailability
+        {namespace}
+        taskQueue={checkedTaskQueue.queue}
+        workers={checkedTaskQueue.workers}
+      />
     {/if}
     <Input
       id="workflowType"

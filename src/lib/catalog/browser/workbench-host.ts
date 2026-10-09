@@ -91,6 +91,7 @@ export type WorkerReadinessCheck = {
   required: false;
   state: ReadinessState;
   taskQueueType: 1 | 2 | 3;
+  serverlessDeployment?: string;
 };
 
 export type NexusEndpointReadinessCheck = {
