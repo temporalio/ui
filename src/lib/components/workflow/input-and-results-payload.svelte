@@ -5,6 +5,7 @@
     type PayloadDownloadFilenameData,
   } from '$lib/components/payload/payload-code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import type { DecodedPayloadState } from '$lib/runes/decoded-payload.svelte';
   import { systemNexusInputRenderer } from '$lib/system-nexus-endpoints';
   import type { Payload, Payloads } from '$lib/types';
   import { isRawPayload } from '$lib/utilities/decode-payload';
@@ -17,6 +18,7 @@
     titleSnippet?: Snippet;
     content?: Payloads | CompletionEventAttributes | Payload;
     isPending?: boolean;
+    decoded?: DecodedPayloadState;
     payloadDownloadFilenameData: PayloadDownloadFilenameData;
   };
   let {
@@ -26,6 +28,7 @@
     titleSnippet = defaultTitleSnippet,
     content,
     isPending = false,
+    decoded,
     payloadDownloadFilenameData,
   }: Props = $props();
 
@@ -53,6 +56,7 @@
       {disableMaximize}
       {maxHeight}
       value={content}
+      {decoded}
       label={title}
       filenameData={payloadDownloadFilenameData}
     />

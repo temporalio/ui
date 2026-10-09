@@ -23,6 +23,7 @@
     IconExternalLink,
     IconRetry,
   } from '$lib/io/icon';
+  import type { DecodedPayloadState } from '$lib/runes/decoded-payload.svelte';
   import { downloadExternalPayloadWithCodec } from '$lib/services/data-encoder';
   import type { Payload, Payloads } from '$lib/types';
   import {
@@ -31,6 +32,7 @@
     parseRawPayloadToJSON,
     type PayloadContainingObject,
   } from '$lib/utilities/decode-payload';
+  import type { DecodedPayloadResult } from '$lib/utilities/decode-payload-result';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { getCodecEndpoint } from '$lib/utilities/get-codec';
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -46,6 +48,7 @@
     testId?: string;
     filenameData?: PayloadDownloadFilenameData;
     lazy?: boolean;
+    decoded?: DecodedPayloadState;
   }
 
   let {
@@ -56,6 +59,7 @@
     testId,
     filenameData = undefined,
     lazy = false,
+    decoded,
   }: Props = $props();
 
   let downloadError: string | undefined = $state(undefined);
@@ -104,139 +108,159 @@
   };
 </script>
 
+{#snippet encodedBlock()}
+  <CodeBlock
+    content={stringifyWithBigInt(value)}
+    {label}
+    {disableMaximize}
+    {maxHeight}
+    copyIconTitle={translate('common.copy-icon-title')}
+    copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    {testId}
+    language="json"
+    {lazy}
+  />
+{/snippet}
+{#snippet resultsBlock(results: DecodedPayloadResult)}
+  <div class="space-y-2">
+    {#each results as result (result)}
+      {#if isExternallyStoredRawPayload(result?.decodedValue)}
+        {@const size = formatBytes(
+          result.decodedValue.externalPayloads?.[0].sizeBytes ?? 0,
+        )}
+        <CodeBlock
+          content={stringifyWithBigInt(result.decodedValue.data)}
+          {label}
+          {disableMaximize}
+          {maxHeight}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          {testId}
+          language="json"
+          {lazy}
+        >
+          {#snippet headerActions()}
+            <Tooltip
+              width={192}
+              top
+              hide={!!getCodecEndpoint(page.data.settings)}
+              text="Add a codec server with a /download endpoint to download this payload."
+            >
+              <Button
+                size="sm"
+                variant="ghost"
+                LeadingIcon={IconDownload}
+                disabled={!getCodecEndpoint(page.data.settings)}
+                loading={downloadLoading}
+                onclick={() => downloadExternalPayload(result.originalValue)}
+              >
+                {size}
+              </Button>
+            </Tooltip>
+          {/snippet}
+        </CodeBlock>
+        {#if downloadError}
+          <div class="flex items-start gap-2 text-danger">
+            <IconExclamationOctagon width={16} height={16} />
+            <p class="leading-4">{downloadError}</p>
+          </div>
+        {/if}
+        <p>
+          Payload downloads require a codec server with a <span
+            class="rounded-sm bg-surface-overlay-primary px-1 font-mono"
+            >/download</span
+          >
+          endpoint. <Link href="https://docs.temporal.io/codec-server" newTab
+            >How to set up a codec server
+          </Link>
+          <IconExternalLink class="inline" />
+        </p>
+      {:else if isParsedPayload(result.decodedValue)}
+        <CodeBlock
+          content={stringifyWithBigInt(result.decodedValue.data)}
+          {label}
+          {disableMaximize}
+          {maxHeight}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          {testId}
+          language="json"
+          {lazy}
+        />
+      {:else}
+        <CodeBlock
+          content={stringifyWithBigInt(result.decodedValue)}
+          {label}
+          {disableMaximize}
+          {maxHeight}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          {testId}
+          language="json"
+          {lazy}
+        />
+      {/if}
+    {/each}
+  </div>
+{/snippet}
+{#snippet errorBlock(error: unknown, retry: () => void)}
+  <CodeBlock
+    content={stringifyWithBigInt(value)}
+    {label}
+    {disableMaximize}
+    {maxHeight}
+    copyIconTitle={translate('common.copy-icon-title')}
+    copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    {testId}
+    language="json"
+    {lazy}
+  >
+    {#snippet headerActions()}
+      <IconButton
+        Icon={IconRetry}
+        onclick={retry}
+        label={translate('common.retry')}
+      />
+    {/snippet}
+  </CodeBlock>
+  <div class="flex items-start gap-2 text-danger">
+    <IconExclamationOctagon width={16} height={16} />
+    <p class="leading-4">
+      {#if isNetworkError(error)}
+        {error.message} - {error.statusText}
+      {:else}
+        {stringifyWithBigInt(error)}
+      {/if}
+    </p>
+  </div>
+{/snippet}
+
 <!-- w-0 + min-w-full clamps the codeblock to its container's resolved width so
      a long unbroken payload (e.g. raw base64) wraps instead of expanding a
      table-auto cell. Covers loading, decoded, and error states. -->
 <div class="w-0 min-w-full">
-  <PayloadDecoder {value}>
-    {#snippet loading()}
-      <CodeBlock
-        content={stringifyWithBigInt(value)}
-        {label}
-        {disableMaximize}
-        {maxHeight}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        {testId}
-        language="json"
-        {lazy}
-      />
-    {/snippet}
-    {#snippet children(results)}
-      <div class="space-y-2">
-        {#each results as result (result)}
-          {#if isExternallyStoredRawPayload(result?.decodedValue)}
-            {@const size = formatBytes(
-              result.decodedValue.externalPayloads?.[0].sizeBytes ?? 0,
-            )}
-            <CodeBlock
-              content={stringifyWithBigInt(result.decodedValue.data)}
-              {label}
-              {disableMaximize}
-              {maxHeight}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              {testId}
-              language="json"
-              {lazy}
-            >
-              {#snippet headerActions()}
-                <Tooltip
-                  width={192}
-                  top
-                  hide={!!getCodecEndpoint(page.data.settings)}
-                  text="Add a codec server with a /download endpoint to download this payload."
-                >
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    LeadingIcon={IconDownload}
-                    disabled={!getCodecEndpoint(page.data.settings)}
-                    loading={downloadLoading}
-                    onclick={() =>
-                      downloadExternalPayload(result.originalValue)}
-                  >
-                    {size}
-                  </Button>
-                </Tooltip>
-              {/snippet}
-            </CodeBlock>
-            {#if downloadError}
-              <div class="flex items-start gap-2 text-danger">
-                <IconExclamationOctagon width={16} height={16} />
-                <p class="leading-4">{downloadError}</p>
-              </div>
-            {/if}
-            <p>
-              Payload downloads require a codec server with a <span
-                class="rounded-sm bg-surface-overlay-primary px-1 font-mono"
-                >/download</span
-              >
-              endpoint. <Link
-                href="https://docs.temporal.io/codec-server"
-                newTab
-                >How to set up a codec server
-              </Link>
-              <IconExternalLink class="inline" />
-            </p>
-          {:else if isParsedPayload(result.decodedValue)}
-            <CodeBlock
-              content={stringifyWithBigInt(result.decodedValue.data)}
-              {label}
-              {disableMaximize}
-              {maxHeight}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              {testId}
-              language="json"
-              {lazy}
-            />
-          {:else}
-            <CodeBlock
-              content={stringifyWithBigInt(result.decodedValue)}
-              {label}
-              {disableMaximize}
-              {maxHeight}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              {testId}
-              language="json"
-              {lazy}
-            />
-          {/if}
-        {/each}
-      </div>
-    {/snippet}
-    {#snippet error({ error, retry })}
-      <CodeBlock
-        content={stringifyWithBigInt(value)}
-        {label}
-        {disableMaximize}
-        {maxHeight}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        {testId}
-        language="json"
-        {lazy}
-      >
-        {#snippet headerActions()}
-          <IconButton
-            Icon={IconRetry}
-            onclick={retry}
-            label={translate('common.retry')}
-          />
-        {/snippet}
-      </CodeBlock>
-      <div class="flex items-start gap-2 text-danger">
-        <IconExclamationOctagon width={16} height={16} />
-        <p class="leading-4">
-          {#if isNetworkError(error)}
-            {error.message} - {error.statusText}
-          {:else}
-            {stringifyWithBigInt(error)}
-          {/if}
-        </p>
-      </div>
-    {/snippet}
-  </PayloadDecoder>
+  {#if decoded?.status === 'success'}
+    {@render resultsBlock(decoded.results)}
+  {:else if decoded?.status === 'error'}
+    {@render errorBlock(decoded.error, decoded.retry)}
+  {:else if decoded}
+    <CodeBlock
+      content={translate('common.loading')}
+      {label}
+      language="text"
+      copyable={false}
+      {disableMaximize}
+      {maxHeight}
+      {testId}
+    />
+  {:else}
+    <PayloadDecoder {value}>
+      {#snippet loading()}{@render encodedBlock()}{/snippet}
+      {#snippet children(results)}{@render resultsBlock(results)}{/snippet}
+      {#snippet error({ error, retry })}{@render errorBlock(
+          error,
+          retry,
+        )}{/snippet}
+    </PayloadDecoder>
+  {/if}
 </div>

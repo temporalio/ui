@@ -1,9 +1,7 @@
 <script lang="ts">
   import { get, type Writable, writable } from 'svelte/store';
 
-  import PayloadDecoder, {
-    type DecodedPayloadResult,
-  } from '$lib/components/payload/payload-decoder.svelte';
+  import PayloadDecoder from '$lib/components/payload/payload-decoder.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -16,6 +14,7 @@
     base64ParsePayloadMetadata,
     isParsedPayload,
   } from '$lib/utilities/decode-payload';
+  import type { DecodedPayloadResult } from '$lib/utilities/decode-payload-result';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {

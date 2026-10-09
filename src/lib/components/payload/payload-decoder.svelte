@@ -1,89 +1,22 @@
-<script lang="ts" module>
-  export type DecodedPayloadResult = {
-    decodedValue: ParsedPayload | PayloadContainingObject;
-    originalValue: Payload | PayloadContainingObject;
-  }[];
-</script>
-
 <script lang="ts">
   import { type Snippet, untrack } from 'svelte';
 
   import type { Payload, Payloads } from '$lib/types';
+  import type { PayloadContainingObject } from '$lib/utilities/decode-payload';
   import {
-    decodeEventAttributes,
-    decodePayloadAndParseDataToJSON,
-    decodePayloadsAndParseDataToJSON,
-    isRawPayload,
-    isRawPayloads,
-    type ParsedPayload,
-    type PayloadContainingObject,
-  } from '$lib/utilities/decode-payload';
+    type DecodedPayloadResult,
+    decodePayloadResult,
+  } from '$lib/utilities/decode-payload-result';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   type T = $$Generic<PayloadContainingObject>;
 
-  const decodePayloadValue = async (
-    value: Payload,
-  ): Promise<DecodedPayloadResult> => {
-    const decodedPayload = await decodePayloadAndParseDataToJSON(value, false);
-    const result = [
-      {
-        decodedValue: decodedPayload,
-        originalValue: value,
-      },
-    ];
-
-    onDecode?.(result);
-    return result;
-  };
-
-  const decodePayloadsValue = async (
-    value: Payloads,
-  ): Promise<DecodedPayloadResult> => {
-    const decodedPayloads = await decodePayloadsAndParseDataToJSON(
-      value,
-      false,
-    );
-    const result = decodedPayloads.map((decodedPayload, idx) => {
-      return {
-        decodedValue: decodedPayload,
-        originalValue: value.payloads![idx],
-      };
-    });
-
-    onDecode?.(result);
-    return result;
-  };
-
-  const decodePayloadContainingObjectValue = async <
-    T extends PayloadContainingObject,
-  >(
-    value: T,
-  ): Promise<DecodedPayloadResult> => {
-    const decodedValue = await decodeEventAttributes(value);
-    const result: DecodedPayloadResult = [
-      {
-        decodedValue: decodedValue ?? value,
-        originalValue: value,
-      },
-    ];
-
-    onDecode?.(result);
-    return result;
-  };
-
-  const decodeValue = (
+  const decodeValue = async (
     value: Payload | Payloads | T,
   ): Promise<DecodedPayloadResult> => {
-    if (isRawPayload(value)) {
-      return decodePayloadValue(value);
-    }
-
-    if (isRawPayloads(value)) {
-      return decodePayloadsValue(value);
-    }
-
-    return decodePayloadContainingObjectValue(value);
+    const result = await decodePayloadResult(value);
+    onDecode?.(result);
+    return result;
   };
 
   type Props = {

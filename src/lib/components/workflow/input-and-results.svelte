@@ -1,6 +1,9 @@
 <script lang="ts">
-  import PayloadDecoder from '$lib/components/payload/payload-decoder.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    createDecodedPayload,
+    type DecodedPayloadState,
+  } from '$lib/runes/decoded-payload.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { isParsedPayload } from '$lib/utilities/decode-payload';
@@ -21,6 +24,8 @@
       $workflowRun.workflow?.isPaused ||
       false,
   );
+  const decodedInput = createDecodedPayload(() => workflowEvents.input);
+  const decodedResults = createDecodedPayload(() => workflowEvents.results);
   const payloadDownloadFilenameData = $derived({
     workflowId: $workflowRun.workflow?.id ?? '',
     runId: $workflowRun.workflow?.runId ?? '',
@@ -29,22 +34,23 @@
 
 {#snippet previewContent(
   content: WorkflowInputAndResults['results'],
+  decoded: DecodedPayloadState,
   pending = false,
 )}
   {#if content}
-    <PayloadDecoder value={content}>
-      {#snippet loading()}{translate('common.loading')}{/snippet}
-      {#snippet children(results)}
-        {results
-          .map(({ decodedValue }) =>
-            stringifyWithBigInt(
-              isParsedPayload(decodedValue) ? decodedValue.data : decodedValue,
-            ),
-          )
-          .join(', ') || 'null'}
-      {/snippet}
-      {#snippet error()}{stringifyWithBigInt(content)}{/snippet}
-    </PayloadDecoder>
+    {#if decoded.status === 'success'}
+      {decoded.results
+        .map(({ decodedValue }) =>
+          stringifyWithBigInt(
+            isParsedPayload(decodedValue) ? decodedValue.data : decodedValue,
+          ),
+        )
+        .join(', ') || 'null'}
+    {:else if decoded.status === 'error'}
+      {stringifyWithBigInt(content)}
+    {:else}
+      {translate('common.loading')}
+    {/if}
   {:else}
     {pending ? 'Results will appear upon completion.' : 'null'}
   {/if}
@@ -55,13 +61,17 @@
   data-testid="input-and-result"
 >
   <PayloadPreview title={translate('workflows.input')}>
-    {#snippet preview()}{@render previewContent(workflowEvents.input)}{/snippet}
+    {#snippet preview()}{@render previewContent(
+        workflowEvents.input,
+        decodedInput.current,
+      )}{/snippet}
     {#snippet children(maxHeight)}
       <InputAndResultsPayload
         disableMaximize
         maxHeight={maxHeight ?? 0}
         title={translate('workflows.input')}
         content={workflowEvents.input ?? undefined}
+        decoded={decodedInput.current}
         payloadDownloadFilenameData={{
           ...payloadDownloadFilenameData,
           type: 'input',
@@ -72,6 +82,7 @@
   <PayloadPreview title={translate('workflows.result')}>
     {#snippet preview()}{@render previewContent(
         workflowEvents.results,
+        decodedResults.current,
         isPending,
       )}{/snippet}
     {#snippet children(maxHeight)}
@@ -80,6 +91,7 @@
         maxHeight={maxHeight ?? 0}
         title={translate('workflows.result')}
         content={workflowEvents.results ?? undefined}
+        decoded={decodedResults.current}
         {isPending}
         payloadDownloadFilenameData={{
           ...payloadDownloadFilenameData,
