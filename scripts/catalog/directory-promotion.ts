@@ -131,6 +131,13 @@ const validateAuthoredTree = async (
 
   if (kind === 'workflow') {
     const workflowPath = join(sourcePath, 'workflow.ts');
+
+    if (!(await pathExists(workflowPath))) {
+      throw new Error(
+        `${relative(rootDirectory, sourcePath)} must contain workflow.ts for a workflow example`,
+      );
+    }
+
     const workflow = await readFile(workflowPath, 'utf8');
     const exportedWorkflow = new RegExp(
       `\\bexport\\s+(?:(?:async\\s+)?function|const)\\s+${workflowType ?? ''}\\b`,
@@ -211,13 +218,8 @@ export const planDirectoryCatalogPromotion = async ({
     );
   }
 
-  if (
-    !(await pathExists(join(sourcePath, 'example.ts'))) ||
-    !(await pathExists(join(sourcePath, 'workflow.ts')))
-  ) {
-    throw new Error(
-      `${sourceDirectory} must contain example.ts and workflow.ts`,
-    );
+  if (!(await pathExists(join(sourcePath, 'example.ts')))) {
+    throw new Error(`${sourceDirectory} must contain example.ts`);
   }
 
   await validateAuthoredTree(rootDirectory, sourcePath, exampleId);
