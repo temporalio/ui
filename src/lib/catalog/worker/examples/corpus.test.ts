@@ -54,6 +54,7 @@ const proofExampleIds = [
   'sequential-no-summary-activities',
   'sequential-plain-text-activities',
   'satellite-launch-event-groups',
+  'agent-loop',
 ] as const;
 
 const activitySummaryExamples = [
@@ -177,6 +178,7 @@ describe('shared workflow corpus', () => {
         'priorityFairnessWorkflow',
         'nexusGreeting',
         'satelliteLaunchEventGroups',
+        'agentLoop',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
     );
@@ -652,6 +654,9 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/satellite-launch-event-groups/example.ts',
         'src/lib/catalog/worker/examples/satellite-launch-event-groups/workflow.ts',
         'src/lib/catalog/worker/examples/satellite-launch-event-groups/activity.ts',
+        'src/lib/catalog/worker/examples/agent-loop/example.ts',
+        'src/lib/catalog/worker/examples/agent-loop/workflow.ts',
+        'src/lib/catalog/worker/examples/agent-loop/activity.ts',
       ].sort(),
     );
   });

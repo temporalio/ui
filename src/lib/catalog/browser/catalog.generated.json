@@ -1,5 +1,5 @@
 {
-  "sourceHash": "849e980a208b983daf8b0f76f76d2687fcb1fb7d812e2869242e497281839241",
+  "sourceHash": "de5aab1eba539cef37a934a1b4b901e0a3ab5f9eae07b72adb8db902135a1d2e",
   "descriptors": [
     {
       "id": "activity-heartbeat",
@@ -137,6 +137,153 @@
         "namespace": "default",
         "taskQueue": "ui-catalog",
         "workflowType": "timeoutWorkflow"
+      },
+      "source": { "id": "oss", "label": "OSS" }
+    },
+    {
+      "id": "agent-loop",
+      "title": "Agent loop stress test",
+      "description": "Simulated AI agent producing thousands of nested, grouped history events.",
+      "capabilityTags": [
+        "event-history",
+        "event-groups",
+        "signals",
+        "updates",
+        "child-workflows",
+        "continue-as-new",
+        "concurrency"
+      ],
+      "expectedEvidence": [
+        "Thousands of events per run, grouped by Turn with nested Tool calls and Sub-agents groups.",
+        "Explicit groups attached directly to commands: Tool: <name> across every turn, Depth N sub-agents on child starts, and Handoff to run N on context compaction and the continue-as-new.",
+        "Implicit groups from handlers: each recordApproval activity grouped under its approveTool signal, and each applySteering activity grouped under its steer update.",
+        "A responseChunk signal for every streamed chunk of each model response.",
+        "Nested sub-agent child workflows (children and grandchildren) sharing the same root workflow.",
+        "A chain of continued-as-new runs for the root agent and for long-running sub-agents."
+      ],
+      "setupMarkdown": "Large values generate a lot of history quickly. Turns × (stream chunks + 3 × tools per turn) roughly sizes each run; sub-agents multiply that by `subAgentsPerSpawn ^ maxDepth`. Raise `stepDelayMs` if the local server falls behind.",
+      "input": {
+        "defaultValue": [
+          {
+            "turns": 120,
+            "turnsPerRun": 30,
+            "toolsPerTurn": 3,
+            "streamChunks": 8,
+            "subAgentEvery": 10,
+            "subAgentsPerSpawn": 2,
+            "subAgentTurns": 12,
+            "maxDepth": 2,
+            "steerEvery": 15,
+            "stepDelayMs": 50
+          }
+        ],
+        "schema": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "Agent loop",
+              "type": "object",
+              "properties": {
+                "turns": {
+                  "title": "Total turns (root agent)",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10000
+                },
+                "turnsPerRun": {
+                  "title": "Turns per run before continue-as-new",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "toolsPerTurn": {
+                  "title": "Parallel tool calls per turn",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 20
+                },
+                "streamChunks": {
+                  "title": "Streamed chunks per model response",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 200
+                },
+                "subAgentEvery": {
+                  "title": "Start sub-agents every N turns (0 = never)",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "subAgentsPerSpawn": {
+                  "title": "Sub-agents per spawn",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 20
+                },
+                "subAgentTurns": {
+                  "title": "Turns per sub-agent",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "maxDepth": {
+                  "title": "Maximum sub-agent nesting depth",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 5
+                },
+                "steerEvery": {
+                  "title": "Send a steering update every N turns (0 = never)",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "stepDelayMs": {
+                  "title": "Delay per step in milliseconds",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 5000
+                }
+              },
+              "required": [
+                "turns",
+                "turnsPerRun",
+                "toolsPerTurn",
+                "streamChunks",
+                "subAgentEvery",
+                "subAgentsPerSpawn",
+                "subAgentTurns",
+                "maxDepth",
+                "steerEvery",
+                "stepDelayMs"
+              ],
+              "additionalProperties": false
+            }
+          ],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      },
+      "startOptions": {
+        "defaultValue": {},
+        "schema": {
+          "type": "object",
+          "properties": {
+            "details": { "type": "string" },
+            "searchAttributes": { "type": "object" },
+            "summary": { "type": "string" },
+            "workflowStartDelay": { "type": "string" },
+            "workflowId": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "execution": {
+        "kind": "workflow",
+        "targetId": "shared-workflows",
+        "namespace": "default",
+        "taskQueue": "ui-catalog",
+        "workflowType": "agentLoop"
       },
       "source": { "id": "oss", "label": "OSS" }
     },

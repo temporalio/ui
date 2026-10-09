@@ -7,25 +7,26 @@ import type {
 import { catalogExample as example0 } from './activity-heartbeat/example.js';
 import { catalogExample as example1 } from './activity-retry/example.js';
 import { catalogExample as example2 } from './activity-timeout/example.js';
-import { catalogExample as example3 } from './child-workflows/example.js';
-import { catalogExample as example4 } from './hello/example.js';
-import { catalogExample as example5 } from './high-event-count/example.js';
-import { catalogExample as example6 } from './local-activity/example.js';
-import { catalogExample as example7 } from './long-activity/example.js';
-import { catalogExample as example8 } from './nexus-greeting/example.js';
-import { catalogExample as example9 } from './parallel-activities/example.js';
-import { catalogExample as example10 } from './priority-fairness/example.js';
-import { catalogExample as example11 } from './satellite-launch-event-groups/example.js';
-import { catalogExample as example12 } from './sequential-activities/example.js';
-import { catalogExample as example13 } from './sequential-markdown-activities/example.js';
-import { catalogExample as example14 } from './sequential-multiline-summary-activities/example.js';
-import { catalogExample as example15 } from './sequential-no-summary-activities/example.js';
-import { catalogExample as example16 } from './sequential-plain-text-activities/example.js';
-import { catalogExample as example17 } from './signal-collector/example.js';
-import { catalogExample as example18 } from './signal-handlers/example.js';
-import { catalogExample as example19 } from './standalone-activity/example.js';
-import { catalogExample as example20 } from './timer-driven-repetition/example.js';
-import { catalogExample as example21 } from './workflow-patching/example.js';
+import { catalogExample as example3 } from './agent-loop/example.js';
+import { catalogExample as example4 } from './child-workflows/example.js';
+import { catalogExample as example5 } from './hello/example.js';
+import { catalogExample as example6 } from './high-event-count/example.js';
+import { catalogExample as example7 } from './local-activity/example.js';
+import { catalogExample as example8 } from './long-activity/example.js';
+import { catalogExample as example9 } from './nexus-greeting/example.js';
+import { catalogExample as example10 } from './parallel-activities/example.js';
+import { catalogExample as example11 } from './priority-fairness/example.js';
+import { catalogExample as example12 } from './satellite-launch-event-groups/example.js';
+import { catalogExample as example13 } from './sequential-activities/example.js';
+import { catalogExample as example14 } from './sequential-markdown-activities/example.js';
+import { catalogExample as example15 } from './sequential-multiline-summary-activities/example.js';
+import { catalogExample as example16 } from './sequential-no-summary-activities/example.js';
+import { catalogExample as example17 } from './sequential-plain-text-activities/example.js';
+import { catalogExample as example18 } from './signal-collector/example.js';
+import { catalogExample as example19 } from './signal-handlers/example.js';
+import { catalogExample as example20 } from './standalone-activity/example.js';
+import { catalogExample as example21 } from './timer-driven-repetition/example.js';
+import { catalogExample as example22 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -50,6 +51,7 @@ const sharedWorkflowDefinitions = [
   example19,
   example20,
   example21,
+  example22,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -100,6 +102,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/activity-timeout/activity.ts',
   'src/lib/catalog/worker/examples/activity-timeout/example.ts',
   'src/lib/catalog/worker/examples/activity-timeout/workflow.ts',
+  'src/lib/catalog/worker/examples/agent-loop/activity.ts',
+  'src/lib/catalog/worker/examples/agent-loop/example.ts',
+  'src/lib/catalog/worker/examples/agent-loop/workflow.ts',
   'src/lib/catalog/worker/examples/child-workflows/example.ts',
   'src/lib/catalog/worker/examples/child-workflows/workflow.ts',
   'src/lib/catalog/worker/examples/hello/example.ts',
