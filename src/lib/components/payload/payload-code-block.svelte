@@ -46,6 +46,7 @@
     testId?: string;
     filenameData?: PayloadDownloadFilenameData;
     lazy?: boolean;
+    cache?: boolean;
   }
 
   let {
@@ -56,6 +57,7 @@
     testId,
     filenameData = undefined,
     lazy = false,
+    cache = false,
   }: Props = $props();
 
   let downloadError: string | undefined = $state(undefined);
@@ -108,19 +110,16 @@
      a long unbroken payload (e.g. raw base64) wraps instead of expanding a
      table-auto cell. Covers loading, decoded, and error states. -->
 <div class="w-0 min-w-full">
-  <PayloadDecoder {value}>
+  <PayloadDecoder {value} {cache}>
     {#snippet loading()}
-      <CodeBlock
-        content={stringifyWithBigInt(value)}
-        {label}
-        {disableMaximize}
-        {maxHeight}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        {testId}
-        language="json"
-        {lazy}
-      />
+      <div
+        class="rounded border border-secondary bg-surface-overlay-primary p-2 font-mono text-xs text-secondary"
+        role="status"
+        aria-label={translate('common.loading')}
+        data-testid={testId}
+      >
+        {translate('common.loading')}
+      </div>
     {/snippet}
     {#snippet children(results)}
       <div class="space-y-2">

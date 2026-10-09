@@ -15,10 +15,16 @@ import {
 } from '$lib/stores/data-encoder-config';
 import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 
-import { codeServerRequest } from './data-encoder';
+import {
+  clearCodecDecodeCache,
+  codeServerRequest,
+  decodePayloadsWithCodec,
+} from './data-encoder';
 
 const mockGetAccessToken = vi.mocked(getAccessToken);
 const mockGetIdToken = vi.mocked(getIdToken);
+
+beforeEach(() => clearCodecDecodeCache());
 
 describe('Codec Server Requests for Decode and Encode', () => {
   const payloads = { payloads: [{}] };
@@ -345,4 +351,215 @@ describe('download with namespace-level codec endpoint', () => {
       expect.any(Object),
     );
   });
+});
+
+describe('decoded payload cache', () => {
+  const payloads = {
+    payloads: [{ metadata: { encoding: 'encrypted' }, data: 'encoded' }],
+  };
+  const decoded = {
+    payloads: [{ metadata: { encoding: 'json/plain' }, data: 'decoded' }],
+  };
+  const decode = (value = payloads) =>
+    decodePayloadsWithCodec({ payloads: value, cache: true });
+
+  beforeEach(() => {
+    page.params.workflow = 'workflow-id';
+    page.params.run = 'run-id';
+    overrideRemoteCodecConfiguration.set(true);
+    codecEndpoint.set('https://codec.example.com');
+    mockGetAccessToken.mockResolvedValue('');
+    mockGetIdToken.mockResolvedValue(undefined);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async () => ({
+        ok: true,
+        json: async () => structuredClone(decoded),
+      })),
+    );
+  });
+
+  afterEach(() => {
+    clearCodecDecodeCache();
+    codecEndpoint.set(null);
+    passAccessToken.set(false);
+    includeCredentials.set(false);
+    overrideRemoteCodecConfiguration.set(false);
+    page.params.namespace = 'default';
+    delete page.params.workflow;
+    delete page.params.run;
+    vi.clearAllMocks();
+  });
+
+  it('does not read or populate the cache unless explicitly enabled', async () => {
+    await decodePayloadsWithCodec({ payloads });
+    await decodePayloadsWithCodec({ payloads });
+    expect(fetch).toHaveBeenCalledTimes(2);
+
+    await decode();
+    expect(fetch).toHaveBeenCalledTimes(3);
+    await decodePayloadsWithCodec({ payloads });
+    expect(fetch).toHaveBeenCalledTimes(4);
+    await decode();
+    expect(fetch).toHaveBeenCalledTimes(4);
+  });
+
+  it('does not share an opted-in pending request with other payload views', async () => {
+    let resolveResponse: (response: Response) => void;
+    vi.mocked(fetch).mockImplementationOnce(
+      () => new Promise((resolve) => (resolveResponse = resolve)),
+    );
+    const pending = decode();
+    expect(await decodePayloadsWithCodec({ payloads })).toEqual(decoded);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    resolveResponse({ ok: true, json: async () => decoded } as Response);
+    await pending;
+    expect(await decode()).toEqual(decoded);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('shares pending requests and reuses results for equivalent payload objects', async () => {
+    let resolveResponse: (response: Response) => void;
+    vi.mocked(fetch).mockImplementationOnce(
+      () => new Promise((resolve) => (resolveResponse = resolve)),
+    );
+
+    const inline = decode();
+    const tooltip = decode(structuredClone(payloads));
+    expect(fetch).toHaveBeenCalledTimes(1);
+    resolveResponse({ ok: true, json: async () => decoded } as Response);
+    expect(await inline).toEqual(decoded);
+    expect(await tooltip).toEqual(decoded);
+    expect(await decode(structuredClone(payloads))).toEqual(decoded);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps callers from mutating the cached response', async () => {
+    const result = await decode();
+    result.payloads[0].data = 'changed by a caller';
+    expect(await decode()).toEqual(decoded);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('decodes new payload contents', async () => {
+    await decode();
+    await decode({
+      payloads: [{ ...payloads.payloads[0], data: 'new input' }],
+    });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    ['namespace', () => (page.params.namespace = 'another-namespace')],
+    ['workflow ID', () => (page.params.workflow = 'another-workflow')],
+    ['run ID', () => (page.params.run = 'another-run')],
+    ['endpoint', () => codecEndpoint.set('https://another-codec.example.com')],
+    ['credentials', () => includeCredentials.set(true)],
+    ['token forwarding', () => passAccessToken.set(true)],
+  ] as const)('invalidates results when %s changes', async (_name, change) => {
+    await decode();
+    change();
+    await decode();
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('invalidates results when forwarded authentication changes', async () => {
+    passAccessToken.set(true);
+    mockGetAccessToken.mockResolvedValue('first-session');
+    await decode();
+    mockGetAccessToken.mockResolvedValue('second-session');
+    await decode();
+    mockGetIdToken.mockResolvedValue('new-id-token');
+    await decode();
+    expect(fetch).toHaveBeenCalledTimes(3);
+  });
+
+  it.each(['namespace', 'workflow', 'run'] as const)(
+    'does not reuse old entries after leaving and returning to a %s',
+    async (param) => {
+      const original = page.params[param];
+      await decode();
+      page.params[param] = 'another-value';
+      await decode();
+      page.params[param] = original;
+      await decode();
+      expect(fetch).toHaveBeenCalledTimes(3);
+    },
+  );
+
+  it('does not cache failed decodes and retries on the next request', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 403,
+      statusText: 'Forbidden',
+    } as Response);
+    expect(await decode()).toEqual(payloads);
+    expect(await decode()).toEqual(decoded);
+    expect(await decode()).toEqual(decoded);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['namespace', 'workflow', 'run'] as const)(
+    'does not let a stale request overwrite the current %s cache',
+    async (param) => {
+      let resolveResponse: (response: Response) => void;
+      vi.mocked(fetch).mockImplementationOnce(
+        () => new Promise((resolve) => (resolveResponse = resolve)),
+      );
+      const stale = decode();
+      page.params[param] = 'another-value';
+      await decode();
+      resolveResponse({ ok: true, json: async () => payloads } as Response);
+      await stale;
+      expect(await decode()).toEqual(decoded);
+      expect(fetch).toHaveBeenCalledTimes(2);
+    },
+  );
+
+  it('evicts the least recently used entries', async () => {
+    const withData = (data: string) => ({
+      payloads: [{ ...payloads.payloads[0], data }],
+    });
+    for (let i = 0; i < 20; i++) await decode(withData(String(i)));
+    await decode(withData('0'));
+    await decode(withData('20'));
+    await decode(withData('0'));
+    expect(fetch).toHaveBeenCalledTimes(21);
+    await decode(withData('1'));
+    expect(fetch).toHaveBeenCalledTimes(22);
+  });
+
+  it('does not retain a response larger than the memory budget', async () => {
+    const largeResult = {
+      payloads: [{ data: 'x'.repeat(6 * 1024 * 1024) }],
+    };
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => largeResult,
+    } as Response);
+    await decode();
+    expect(await decode()).toEqual(decoded);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps abortable requests independent of shared requests', async () => {
+    await decode();
+    await codeServerRequest({
+      type: 'decode',
+      payloads,
+      signal: new AbortController().signal,
+      cache: true,
+    });
+    await decode();
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['encode', 'download'] as const)(
+    'does not cache %s requests',
+    async (type) => {
+      await codeServerRequest({ type, payloads, cache: true });
+      await codeServerRequest({ type, payloads, cache: true });
+      expect(fetch).toHaveBeenCalledTimes(2);
+    },
+  );
 });

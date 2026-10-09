@@ -3,6 +3,8 @@ import { get } from 'svelte/store';
 import { afterEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
 
+import { clearCodecDecodeCache } from '$lib/services/data-encoder';
+
 import {
   decodeEventAttributes,
   parsePayloadAttributes,
@@ -326,6 +328,7 @@ describe('parsePayloadAttributes', () => {
 
 describe('decodeEventAttributes', () => {
   beforeEach(() => {
+    clearCodecDecodeCache();
     overrideRemoteCodecConfiguration.set(true);
   });
 
@@ -350,6 +353,26 @@ describe('decodeEventAttributes', () => {
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual(null);
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
+  });
+
+  it('only caches nested payloads and encoded attributes when opted in', async () => {
+    codecEndpoint.set('https://codec.example.com');
+    const fetchCodec = vi.fn(async (_url: string, options: RequestInit) => ({
+      ok: true,
+      json: async () => JSON.parse(String(options.body)),
+    }));
+    vi.stubGlobal('fetch', fetchCodec);
+
+    const first = await decodeEventAttributes(getTestPayloadEvent(), {
+      cache: true,
+    });
+    expect(fetchCodec).toHaveBeenCalledTimes(3);
+    expect(
+      await decodeEventAttributes(getTestPayloadEvent(), { cache: true }),
+    ).toEqual(first);
+    expect(fetchCodec).toHaveBeenCalledTimes(3);
+    expect(await decodeEventAttributes(getTestPayloadEvent())).toEqual(first);
+    expect(fetchCodec).toHaveBeenCalledTimes(6);
   });
 
   it('Should convert a payload through data-converter and set the success status when the endpoint is set and the endpoint connects', async () => {

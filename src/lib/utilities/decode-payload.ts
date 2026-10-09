@@ -1,6 +1,9 @@
 import { mapValues } from 'es-toolkit';
 
-import { decodePayloadsWithCodec as callCodecEndpoint } from '$lib/services/data-encoder';
+import {
+  decodePayloadsWithCodec as callCodecEndpoint,
+  type CodecDecodeOptions,
+} from '$lib/services/data-encoder';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import { schemaForMessageType } from '$lib/system-nexus-endpoints';
 import type { Memo, Payload, Payloads, SearchAttribute } from '$lib/types';
@@ -268,8 +271,12 @@ export const parsePayloadAttributes = <
 const decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON = async (
   payloads: unknown[],
   returnDataOnly: boolean = true,
+  options: CodecDecodeOptions = {},
 ): Promise<unknown[]> => {
-  const awaitData = await callCodecEndpoint({ payloads: { payloads } });
+  const awaitData = await callCodecEndpoint({
+    payloads: { payloads },
+    ...options,
+  });
   return (awaitData?.payloads ?? []).map((p) =>
     parseRawPayloadToJSON(p, returnDataOnly),
   );
@@ -284,8 +291,12 @@ const decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON = async (
  */
 const decodePayloadsWithRemoteCodec = async (
   payloads: unknown[],
+  options: CodecDecodeOptions = {},
 ): Promise<Payload[]> => {
-  const awaitData = await callCodecEndpoint({ payloads: { payloads } });
+  const awaitData = await callCodecEndpoint({
+    payloads: { payloads },
+    ...options,
+  });
   return awaitData?.payloads ?? [];
 };
 
@@ -344,13 +355,18 @@ export async function decodePayloadAndParseDataToJSON(
 export async function decodePayloadAndParseDataToJSON(
   payload: Payload,
   returnDataOnly: false,
+  options?: CodecDecodeOptions,
 ): Promise<ParsedPayload>;
 export async function decodePayloadAndParseDataToJSON(
   payload: Payload | null | undefined,
   returnDataOnly: boolean = true,
+  options: CodecDecodeOptions = {},
 ): Promise<unknown | ParsedPayload> {
   if (!payload) return null;
-  const decoded = await decodePayloadsWithRemoteCodec(toArray(payload));
+  const decoded = await decodePayloadsWithRemoteCodec(
+    toArray(payload),
+    options,
+  );
 
   if (!decoded || !decoded[0]) {
     return null;
@@ -365,12 +381,17 @@ export async function decodePayloadsAndParseDataToJSON(
 export async function decodePayloadsAndParseDataToJSON(
   payload: Payloads,
   returnDataOnly: false,
+  options?: CodecDecodeOptions,
 ): Promise<ParsedPayload[]>;
 export async function decodePayloadsAndParseDataToJSON(
   payloads: Payloads | null | undefined,
   returnDataOnly: boolean = true,
+  options: CodecDecodeOptions = {},
 ): Promise<unknown[]> {
-  const decoded = await decodePayloadsWithRemoteCodec(payloads?.payloads ?? []);
+  const decoded = await decodePayloadsWithRemoteCodec(
+    payloads?.payloads ?? [],
+    options,
+  );
 
   if (!decoded || !decoded[0]) {
     return [null];
@@ -400,20 +421,25 @@ const decodeEventAttributesInternal = async (
     | null,
   decodeSetting: DownloadEventHistorySetting,
   returnDataOnly: boolean,
+  options: CodecDecodeOptions = {},
 ): Promise<
   PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
 > => {
   if (!anyAttributes) return anyAttributes;
 
-  const decode =
+  const decode = (payloads: unknown[]) =>
     decodeSetting === 'readable'
-      ? decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON
-      : decodePayloadsWithRemoteCodec;
+      ? decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON(
+          payloads,
+          returnDataOnly,
+          options,
+        )
+      : decodePayloadsWithRemoteCodec(payloads, options);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
     // Now that we can have single Payload that is not an array (Nexus)
     if (isRawPayload(clone)) {
-      const decoded = await decode(toArray(clone), returnDataOnly);
+      const decoded = await decode(toArray(clone));
       return decoded?.[0] ?? clone;
     }
 
@@ -422,13 +448,14 @@ const decodeEventAttributesInternal = async (
       const value = record[key];
       if (keyIs(key, 'payloads', 'encodedAttributes') && value) {
         const data = toArray(value as Payload | Payload[]);
-        const decoded = await decode(data, returnDataOnly);
+        const decoded = await decode(data);
         record[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
       } else if (isObject(value)) {
         record[key] = await decodeEventAttributesInternal(
           value,
           decodeSetting,
           returnDataOnly,
+          options,
         );
       }
     }
@@ -454,9 +481,10 @@ export const decodeEventAttributes = (
     | WorkflowEvent
     | Memo
     | null,
+  options: CodecDecodeOptions = {},
 ): Promise<
   PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
-> => decodeEventAttributesInternal(anyAttributes, 'readable', true);
+> => decodeEventAttributesInternal(anyAttributes, 'readable', true, options);
 
 /**
  * Phase 2 only — async, requires a configured codec endpoint.
