@@ -1,0 +1,7 @@
+{
+  "codeConnect": {
+    "include": ["src/lib/**/*.figma.ts"],
+    "label": "Svelte",
+    "language": "jsx"
+  }
+}
