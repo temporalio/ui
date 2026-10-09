@@ -88,6 +88,8 @@
     `${routeForStandaloneActivities({ namespace })}?${$activitiesSearchParams}`,
   );
 
+  const showError = $derived(!$activityExecution && !loading && !!error);
+
   // activityExecution.info.taskQueue is intentional here, when the poller resolves, the reference to
   // activityExecution is updated, causing the $derived to re-run and the #await block to re-trigger.
   const getPollersRequest = $derived.by(() => {
@@ -140,7 +142,7 @@
 </script>
 
 <div class="flex min-h-0 grow flex-col gap-4">
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2" class:hidden={showError}>
     <Link
       href={activitiesHref}
       data-testid="back-to-activities"
@@ -160,7 +162,7 @@
     <ActivityHeaderLoading />
   {/if}
 
-  <Tabs>
+  <Tabs hidden={showError}>
     <TabList label={translate('standalone-activities.layout-tabs-label')}>
       <Tab
         label={translate('standalone-activities.layout-details-tab')}
@@ -210,6 +212,15 @@
   {:else if loading}
     <ActivityDetailsLoading />
   {:else if error}
-    <ErrorComponent {error} />
+    <ErrorComponent
+      {error}
+      resource={translate('standalone-activities.activities-plural', {
+        count: 1,
+      })}
+      back={{
+        href: activitiesHref,
+        label: translate('standalone-activities.back-to-activities'),
+      }}
+    />
   {/if}
 </div>

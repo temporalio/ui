@@ -75,6 +75,8 @@
     `${routeForStandaloneNexusOperations({ namespace })}?${$nexusOperationsSearchParams}`,
   );
 
+  const showError = $derived(!$nexusOperationExecution && !loading && !!error);
+
   onMount(async () => {
     poller.start();
   });
@@ -86,7 +88,7 @@
 </script>
 
 <div class="flex min-h-0 grow flex-col gap-4">
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2" class:hidden={showError}>
     <Link
       href={nexusOperationsHref}
       data-testid="back-to-nexus-operations"
@@ -106,7 +108,7 @@
     <NexusOperationLayoutLoading />
   {/if}
 
-  <Tabs>
+  <Tabs hidden={showError}>
     <TabList label={translate('standalone-nexus-operations.layout-tabs-label')}>
       <Tab
         label={translate('standalone-nexus-operations.layout-details-tab')}
@@ -138,6 +140,18 @@
   {:else if loading}
     <NexusOperationDetailsLoading />
   {:else if error}
-    <ErrorComponent {error} />
+    <ErrorComponent
+      {error}
+      resource={translate(
+        'standalone-nexus-operations.nexus-operations-plural',
+        { count: 1 },
+      )}
+      back={{
+        href: nexusOperationsHref,
+        label: translate(
+          'standalone-nexus-operations.back-to-nexus-operations',
+        ),
+      }}
+    />
   {/if}
 </div>

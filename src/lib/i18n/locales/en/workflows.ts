@@ -157,7 +157,6 @@ export const Strings = {
   'update-tab': 'Update',
   'search-attributes-tab': 'Search Attributes',
   'memo-tab': 'Memo',
-  'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
     'We are having technical difficulties retrieving this Workflow',
   'workflow-error-no-workers-title': 'No workers polling',
