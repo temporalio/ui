@@ -1,9 +1,6 @@
-import type { HandleClientError } from '@sveltejs/kit';
-
 import { getAuthUser } from '$lib/stores/auth-user';
 import { consumeAuthCookies } from '$lib/utilities/auth-user-cookie';
 import { initCoreProvider } from '$lib/utilities/core-provider';
-import { isNetworkError } from '$lib/utilities/is-network-error';
 import {
   ossGetDataEncoderEndpoint,
   ossPostResponse,
@@ -34,14 +31,3 @@ initCoreProvider({
   },
   getDataEncoderEndpoint: ossGetDataEncoderEndpoint,
 });
-
-export const handleError: HandleClientError = ({ error, message }) => {
-  if (isNetworkError(error)) {
-    return {
-      message: error.message || error.statusText || message,
-      statusCode: error.statusCode,
-    };
-  }
-
-  return { message };
-};

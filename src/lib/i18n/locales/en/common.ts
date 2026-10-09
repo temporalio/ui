@@ -93,9 +93,6 @@ export const Strings = {
   maybe: 'Maybe',
   refresh: 'Refresh',
   'error-occurred': 'An Error Occurred',
-  'permission-denied-title': "You don't have permission",
-  'permission-denied-description':
-    'Your account cannot view this page. Contact your administrator for access.',
   save: 'Save',
   create: 'Create',
   'workflow-type': 'Workflow Type',

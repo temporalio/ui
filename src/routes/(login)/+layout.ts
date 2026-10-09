@@ -17,7 +17,7 @@ export const load: LayoutLoad = async function ({ fetch, url }) {
     error(404);
   }
 
-  if (settings.auth.redirectToProvider) {
+  if (settings.auth.redirectToProvider && !url.searchParams.has('error')) {
     redirect(
       302,
       routeForAuthentication({
