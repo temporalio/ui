@@ -2,6 +2,11 @@ import { expect, test } from '@playwright/test';
 
 import { StartStandaloneActivityPage } from '~/pages/start-standalone-activity';
 import {
+  heldTaskQueues,
+  nextFrames,
+  slowQueueAborted,
+} from '~/test-utilities/held-task-queues';
+import {
   mockClusterApi,
   mockGlobalApis,
   mockNamespaceApi,
@@ -142,5 +147,66 @@ test.describe('Start a Standalone Activity', () => {
       startStandaloneActivityPage.startToCloseTimeoutInput,
     ).toBeVisible();
     await expect(startStandaloneActivityPage.startDelayInput).toBeHidden();
+  });
+
+  test('keeps the latest Task Queue result when an earlier check responds later', async ({
+    page,
+  }) => {
+    const releaseSlowQueue = await heldTaskQueues(page);
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    const { taskQueueInput } = startStandaloneActivityPage;
+    await taskQueueInput.fill('slow-queue');
+    await taskQueueInput.blur();
+    await taskQueueInput.fill('fast-queue');
+    await taskQueueInput.blur();
+
+    // The inactive box is an error alert, so match its title, not a role.
+    const status = page.getByText(/^Task Queue is (active|inactive)$/);
+    await expect(status).toHaveText('Task Queue is inactive');
+
+    releaseSlowQueue();
+    await nextFrames(page);
+    await expect(status).toHaveText('Task Queue is inactive');
+  });
+
+  test('aborts the earlier Task Queue check when the Task Queue changes', async ({
+    page,
+  }) => {
+    const releaseSlowQueue = await heldTaskQueues(page);
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    const { taskQueueInput } = startStandaloneActivityPage;
+    await taskQueueInput.fill('slow-queue');
+    await taskQueueInput.blur();
+    const aborted = slowQueueAborted(page);
+    await taskQueueInput.fill('fast-queue');
+    await taskQueueInput.blur();
+
+    const failed = await aborted;
+    expect(failed.failure()?.errorText).toBeTruthy();
+    releaseSlowQueue();
+  });
+
+  test('shows no Task Queue result after the field is emptied during a check', async ({
+    page,
+  }) => {
+    const releaseSlowQueue = await heldTaskQueues(page);
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    const { taskQueueInput } = startStandaloneActivityPage;
+    await taskQueueInput.fill('slow-queue');
+    await taskQueueInput.blur();
+    await taskQueueInput.fill('');
+    await taskQueueInput.blur();
+
+    releaseSlowQueue();
+    await nextFrames(page);
+    await expect(
+      page.getByText(/^Task Queue is (active|inactive)$/),
+    ).toHaveCount(0);
   });
 });

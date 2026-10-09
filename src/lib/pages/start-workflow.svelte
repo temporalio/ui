@@ -165,10 +165,17 @@
     });
   };
 
-  const checkTaskQueue = async (queue: string) => {
-    if (queue) {
-      const { pollers } = await getPollers({ namespace, queue });
-      pollerCount = pollers?.length ?? 0;
+  // Each check clears the previous result, and the effect aborts it, so a
+  // slower earlier check or an emptied field never shows a stale result. A
+  // failed check has already shown an error toast and leaves no result.
+  const checkTaskQueue = async (queue: string, signal: AbortSignal) => {
+    pollerCount = undefined;
+    if (!queue) return;
+    try {
+      const { pollers } = await getPollers({ namespace, queue }, fetch, signal);
+      if (!signal.aborted) pollerCount = pollers?.length ?? 0;
+    } catch {
+      return;
     }
   };
 
@@ -249,7 +256,9 @@
   );
 
   $effect(() => {
-    checkTaskQueue(taskQueueParam ?? '');
+    const controller = new AbortController();
+    checkTaskQueue(taskQueueParam ?? '', controller.signal);
+    return () => controller.abort();
   });
 </script>
 
