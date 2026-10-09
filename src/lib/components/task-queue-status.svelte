@@ -13,21 +13,19 @@
   $effect(() => {
     const namespace = targetNamespace;
     const queue = targetTaskQueue;
+    workers = undefined;
     if (!namespace || !queue) return;
 
-    workers = undefined;
-    let current = true;
-    getPollers({ namespace, queue })
+    const controller = new AbortController();
+    getPollers({ namespace, queue }, fetch, controller.signal)
       .then((response) => {
-        if (current) workers = response;
+        if (!controller.signal.aborted) workers = response;
       })
       .catch(() => {
-        if (current) workers = undefined;
+        // requestFromAPI has already shown an error toast.
       });
 
-    return () => {
-      current = false;
-    };
+    return () => controller.abort();
   });
 </script>
 
