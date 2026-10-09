@@ -1,7 +1,16 @@
 import type { GetClusterInfoResponse, GetSystemInfoResponse } from '$lib/types';
 import type { Settings } from '$lib/types/global';
-import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { handleError, isForbidden } from '$lib/utilities/handle-error';
+import {
+  type APIErrorResponse,
+  requestFromAPI,
+} from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+
+const ignoreForbidden = (error: APIErrorResponse): void => {
+  if (isForbidden(error)) return;
+  handleError(error);
+};
 
 export const fetchCluster = async (
   settings: Settings,
@@ -12,6 +21,7 @@ export const fetchCluster = async (
   const route = routeForApi('cluster');
   return await requestFromAPI<GetClusterInfoResponse>(route, {
     request,
+    handleError: ignoreForbidden,
   }).then((clusterInformation) => {
     return clusterInformation ?? {};
   });
@@ -26,6 +36,7 @@ export const fetchSystemInfo = async (
   const route = routeForApi('systemInfo');
   return await requestFromAPI<GetSystemInfoResponse>(route, {
     request,
+    handleError: ignoreForbidden,
   }).then((systemInformation) => {
     return systemInformation ?? {};
   });
