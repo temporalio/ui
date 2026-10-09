@@ -389,6 +389,22 @@ export const mockWorkflowWithPausedActivity: WorkflowExecutionAPIResponse = {
   ],
 };
 
+export const mockWorkflowWithPendingActivities: WorkflowExecutionAPIResponse = {
+  ...mockRunningWorkflow,
+  pendingActivities: [
+    {
+      ...mockWorkflow.pendingActivities[0],
+      activityId: '2',
+      activityType: { name: 'FirstActivity' },
+    },
+    {
+      ...mockWorkflow.pendingActivities[0],
+      activityId: '4',
+      activityType: { name: 'SecondActivity' },
+    },
+  ],
+};
+
 export const mockActivityPauseApi = (page: Page) => {
   return page.route(ACTIVITY_PAUSE_API, (route) => route.fulfill({ json: {} }));
 };

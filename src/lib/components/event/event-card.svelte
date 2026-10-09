@@ -10,6 +10,11 @@
   import Preview from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    decodeEventGroupNames,
+    type EventGroupLabel,
+    formatEventGroupNames,
+  } from '$lib/models/event-history/event-group-markers';
+  import {
     resolveSystemNexusEvent,
     systemNexusInputRenderer,
     type SystemNexusLink,
@@ -166,6 +171,9 @@
       {#each linkFields as [key, value] (key)}
         {@render link(key, value)}
       {/each}
+      {#if event?.eventGroups?.length}
+        {@render eventGroups(event.eventGroups)}
+      {/if}
     </div>
     {#if payloadFields.length}
       <div class="flex w-full flex-col gap-1 xl:w-1/2">
@@ -264,6 +272,21 @@
         />
       {/snippet}
     </PayloadSummary>
+  </div>
+{/snippet}
+
+{#snippet eventGroups(groups: EventGroupLabel[])}
+  <div class="flex items-start gap-4">
+    <p class="min-w-56 text-sm text-secondary">
+      {translate('events.event-groups')}
+    </p>
+    <p class="whitespace-pre-line break-all">
+      {#await decodeEventGroupNames(groups)}
+        {formatEventGroupNames(groups)}
+      {:then names}
+        {names}
+      {/await}
+    </p>
   </div>
 {/snippet}
 
