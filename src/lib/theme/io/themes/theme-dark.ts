@@ -78,9 +78,9 @@ export const darkTheme = {
       tertiary: 'transparent',
       'tertiary-hover': colorAlphaScales.slate[15],
       'tertiary-press': colorAlphaScales.slate[10],
-      danger: colorAlphaScales.red[20],
-      'danger-hover': colorAlphaScales.red[30],
-      'danger-press': colorAlphaScales.red[15],
+      danger: colorScales.red[9],
+      'danger-hover': colorAlphaScales.red[90],
+      'danger-press': colorAlphaScales.red[80],
     },
     action: {
       workflow: colorScales.zaffre[8],
