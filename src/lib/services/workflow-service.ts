@@ -56,7 +56,7 @@ import {
   setSearchAttributes,
 } from '$lib/utilities/encode-payload';
 import {
-  handleUnauthorizedOrForbiddenError,
+  handleUnauthorizedError,
   isForbidden,
   isUnauthorized,
 } from '$lib/utilities/handle-error';
@@ -177,8 +177,7 @@ export const fetchAllWorkflows = async (
 
   let error = '';
   const onError: ErrorCallback = (err) => {
-    // Kick out to login if 401/403
-    handleUnauthorizedOrForbiddenError(err);
+    handleUnauthorizedError(err);
     if (err?.body?.message || err?.status) {
       error =
         err?.body?.message ??
@@ -1131,9 +1130,11 @@ export const fetchPaginatedWorkflows = async (
     workflowError.set('');
 
     const onError: ErrorCallback = (err) => {
-      handleUnauthorizedOrForbiddenError(err);
+      handleUnauthorizedError(err);
 
-      if (get(hideWorkflowQueryErrors)) {
+      if (isForbidden(err)) {
+        workflowError.set(translate('common.permission-denied-description'));
+      } else if (get(hideWorkflowQueryErrors)) {
         workflowError.set(translate('workflows.workflows-error-querying'));
       } else {
         workflowError.set(
@@ -1169,7 +1170,7 @@ export const fetchPaginatedArchivedWorkflows = async (
 ): Promise<PaginatedWorkflowsPromise> => {
   return (pageSize = 100, token = '') => {
     const onError: ErrorCallback = (err) => {
-      handleUnauthorizedOrForbiddenError(err);
+      handleUnauthorizedError(err);
     };
 
     const route = routeForApi('workflows.archived', { namespace });
