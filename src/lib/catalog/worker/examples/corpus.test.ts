@@ -652,6 +652,9 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/satellite-launch-event-groups/example.ts',
         'src/lib/catalog/worker/examples/satellite-launch-event-groups/workflow.ts',
         'src/lib/catalog/worker/examples/satellite-launch-event-groups/activity.ts',
+        'src/lib/catalog/worker/examples/slow-nexus-operation/example.ts',
+        'src/lib/catalog/worker/examples/slow-nexus-operation/handler.ts',
+        'src/lib/catalog/worker/examples/slow-nexus-operation/service.ts',
       ].sort(),
     );
   });

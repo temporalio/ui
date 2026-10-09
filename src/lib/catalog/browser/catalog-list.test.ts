@@ -133,6 +133,52 @@ describe('CatalogList', () => {
     expect(body).toContain('hidden sm:inline');
   });
 
+  it('renders standalone Nexus operation examples in a separate table beneath the workflow examples', () => {
+    const nexusDescriptor: BrowserCatalogDescriptor = {
+      ...descriptor,
+      id: 'slow-nexus-operation',
+      title: 'Slow Nexus operation',
+      execution: {
+        kind: 'standalone-nexus-operation',
+        targetId: 'catalog',
+        namespace: 'default',
+        taskQueue: 'catalog-tasks',
+        endpoint: 'catalog-endpoint',
+        service: 'catalog-service',
+        operation: 'slowGreeting',
+        policies: {},
+      },
+    };
+    const sessionStore = createCatalogSessionStore(host);
+    const { body } = renderComponent(catalogList, {
+      props: {
+        descriptors: [nexusDescriptor, descriptor],
+        host,
+        sessionStore,
+        exampleHref,
+      },
+    });
+    const [workflowTable, nexusTable] = body
+      .split('<table')
+      .slice(1)
+      .map((table) => table.split('</table>')[0] ?? '');
+
+    expect(workflowTable).toContain('aria-label="Workflow examples"');
+    expect(workflowTable).toContain('Order lifecycle');
+    expect(workflowTable).not.toContain('Slow Nexus operation');
+    expect(nexusTable).toContain(
+      'aria-label="Standalone Nexus Operation examples"',
+    );
+    expect(nexusTable).toMatch(
+      /<th[^>]*scope="col"[^>]*>Nexus Operation<\/th>/,
+    );
+    expect(nexusTable).toMatch(/<th[^>]*scope="col"[^>]*>Endpoint<\/th>/);
+    expect(nexusTable).toContain('Slow Nexus operation');
+    expect(nexusTable).toContain('catalog-endpoint');
+    expect(body).toMatch(/<h2[^>]*>Workflows<\/h2>/);
+    expect(body).toMatch(/<h2[^>]*>Standalone Nexus Operations<\/h2>/);
+  });
+
   it('keeps the workflow name readable on small screens', () => {
     const sessionStore = createCatalogSessionStore(host);
     const { body } = renderComponent(catalogList, {
@@ -307,8 +353,8 @@ describe('CatalogList', () => {
     );
 
     expect(source).toContain("import Link from '$lib/holocene/link.svelte';");
-    expect(source).toContain(
-      '<Link\n                class="table-link block break-words text-sm font-medium text-primary"\n                href={exampleHref(descriptor.id)}',
+    expect(source).toMatch(
+      /<Link\s+class="table-link block break-words text-sm font-medium text-primary"\s+href=\{exampleHref\(descriptor\.id\)\}/,
     );
   });
 
