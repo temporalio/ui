@@ -17,6 +17,7 @@ const colorReferences = toCssVariableReferences(defaultTheme.color, 'color');
 
 const {
   action: actionColors,
+  extension: extensionColors,
   background: backgroundColors,
   border: borderColors,
   content: { black: fixedBlack, white: fixedWhite, ...contentColors },
@@ -54,6 +55,7 @@ const semanticColors = {
   border: borderColors,
   interactive: interactiveColors,
   action: actionColors,
+  extension: extensionColors,
 };
 
 export const colorTheme = {
@@ -61,6 +63,7 @@ export const colorTheme = {
   accentColor: {
     ...basePaintColors,
     action: actionColors,
+    extension: extensionColors,
     auto: 'auto',
   },
   backgroundColor: {
@@ -73,17 +76,20 @@ export const colorTheme = {
     ...borderColors,
     interactive: interactiveColors,
     action: actionColors,
+    extension: extensionColors,
     content: contentColors,
   },
   boxShadowColor: {
     ...basePaintColors,
     action: actionColors,
+    extension: extensionColors,
     content: contentColors,
   },
   caretColor: {
     ...basePaintColors,
     ...contentColors,
     action: actionColors,
+    extension: extensionColors,
   },
   divideColor: {
     ...basePaintColors,
@@ -94,6 +100,7 @@ export const colorTheme = {
     none: 'none',
     ...contentColors,
     action: actionColors,
+    extension: extensionColors,
   },
   gradientColorStops: {
     ...basePaintColors,
@@ -122,16 +129,19 @@ export const colorTheme = {
   stroke: {
     ...basePaintColors,
     action: actionColors,
+    extension: extensionColors,
     none: 'none',
   },
   textColor: {
     ...basePaintColors,
     ...contentColors,
     action: actionColors,
+    extension: extensionColors,
   },
   textDecorationColor: {
     ...basePaintColors,
     ...contentColors,
     action: actionColors,
+    extension: extensionColors,
   },
 } satisfies Readonly<Record<string, ColorThemeValue>>;

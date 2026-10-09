@@ -11,6 +11,7 @@ export { longActivity } from './examples/long-activity/workflow.js';
 export { nexusGreeting } from './examples/nexus-greeting/workflow.js';
 export { parallelActivities } from './examples/parallel-activities/workflow.js';
 export { priorityFairnessWorkflow } from './examples/priority-fairness/workflow.js';
+export { satelliteLaunchEventGroups } from './examples/satellite-launch-event-groups/workflow.js';
 export { sequentialActivities } from './examples/sequential-activities/workflow.js';
 export { sequentialMarkdownActivities } from './examples/sequential-markdown-activities/workflow.js';
 export { sequentialMultilineSummaryActivities } from './examples/sequential-multiline-summary-activities/workflow.js';

@@ -6,7 +6,8 @@
   import type { SystemNexusInputRendererProps } from '../types';
   import { requestSchema } from './schemas';
 
-  let { payload, maxHeight }: SystemNexusInputRendererProps = $props();
+  let { payload, maxHeight, disableMaximize }: SystemNexusInputRendererProps =
+    $props();
 
   const decoded = $derived(
     decodeBinaryProtobuf(payload, requestSchema)?.data as
@@ -30,13 +31,13 @@
       {#if workflowInput}
         <p class="text-xs text-secondary">Signal Input</p>
       {/if}
-      <PayloadCodeBlock value={signalInput} {maxHeight} />
+      <PayloadCodeBlock value={signalInput} {maxHeight} {disableMaximize} />
     {/if}
     {#if workflowInput}
       <p class="text-xs text-secondary">Workflow Input</p>
-      <PayloadCodeBlock value={workflowInput} {maxHeight} />
+      <PayloadCodeBlock value={workflowInput} {maxHeight} {disableMaximize} />
     {/if}
   {:else}
-    <PayloadCodeBlock value={payload} {maxHeight} />
+    <PayloadCodeBlock value={payload} {maxHeight} {disableMaximize} />
   {/if}
 </div>

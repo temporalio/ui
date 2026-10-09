@@ -276,5 +276,5 @@ export const Strings = {
   'add-another-spec': '+ Add another schedule spec',
   'run-time-based-on-timezone':
     'Based on the specified timezone ({{- timezoneName}})',
-  'total-workflows-all-time': 'Total Workflows (All Time)',
+  'total-workflows': 'Total Workflows',
 } as const;

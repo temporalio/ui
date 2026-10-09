@@ -7,6 +7,7 @@ import {
   decodeEventAttributes,
   parsePayloadAttributes,
   parseRawPayloadToJSON,
+  parseSearchAttributes,
 } from './decode-payload';
 import {
   dataConvertedWorkflowStartedEvent,
@@ -242,6 +243,38 @@ describe('parseRawPayloadToJSON with returnDataOnly = false', () => {
     expect(
       parseRawPayloadToJSON(JsonObjectEncodedWithConstructor, false),
     ).toEqual(fullDecodedPayload);
+  });
+});
+
+describe('parseSearchAttributes', () => {
+  it('parses indexed field payloads', () => {
+    expect(
+      parseSearchAttributes({
+        indexedFields: {
+          CustomKeyword: {
+            metadata: { encoding: btoa('json/plain') },
+            data: btoa('"keyword-value"'),
+          },
+          CustomKeywordList: {
+            metadata: { encoding: btoa('json/plain') },
+            data: btoa('["a","b"]'),
+          },
+        },
+      }),
+    ).toEqual({
+      indexedFields: {
+        CustomKeyword: 'keyword-value',
+        CustomKeywordList: ['a', 'b'],
+      },
+    });
+  });
+
+  it('returns an empty object when there are no indexed fields', () => {
+    expect(parseSearchAttributes({})).toEqual({});
+  });
+
+  it('returns an empty object when indexed fields are null', () => {
+    expect(parseSearchAttributes({ indexedFields: null })).toEqual({});
   });
 });
 

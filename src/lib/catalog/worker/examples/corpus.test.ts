@@ -57,6 +57,7 @@ const proofExampleIds = [
   'timeline-kitchen-sink',
   'timeline-live',
   'timeline-performance',
+  'satellite-launch-event-groups',
 ] as const;
 
 const activitySummaryExamples = [
@@ -183,6 +184,7 @@ describe('shared workflow corpus', () => {
         'timelineLiveWorkflow',
         'timelinePerformanceWorkflow',
         'nexusGreeting',
+        'satelliteLaunchEventGroups',
         ...activitySummaryExamples.map(({ workflowType }) => workflowType),
       ].sort(),
     );
@@ -700,6 +702,9 @@ describe('shared workflow corpus', () => {
         'src/lib/catalog/worker/examples/nexus-greeting/workflow.ts',
         'src/lib/catalog/worker/examples/nexus-greeting/service.ts',
         'src/lib/catalog/worker/examples/nexus-greeting/handler.ts',
+        'src/lib/catalog/worker/examples/satellite-launch-event-groups/example.ts',
+        'src/lib/catalog/worker/examples/satellite-launch-event-groups/workflow.ts',
+        'src/lib/catalog/worker/examples/satellite-launch-event-groups/activity.ts',
       ].sort(),
     );
   });

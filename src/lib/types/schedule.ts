@@ -54,6 +54,12 @@ export type RecentScheduleRun = {
   status: WorkflowStatus;
 };
 
+export type RecentScheduleRunEnriched = RecentScheduleRun & {
+  delayed: boolean;
+  taskFailure: boolean;
+  inVisibility: boolean;
+};
+
 /**
  * Schedule create/edit request bodies. The Temporal HTTP API encodes durations
  * and timestamps as strings, enums as their string names and 64-bit integers as

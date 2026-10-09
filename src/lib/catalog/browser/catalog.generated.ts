@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    '82001742adbfde973143b4b765ec8e7f0e932a99d21915fa7cfb7604eb54932e',
+    '6da0da2d37959335648d5c0d4d9ef80815b90d679e2270ddcbcea8083b8ba8e9',
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -535,6 +535,80 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'priorityFairnessWorkflow',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'satellite-launch-event-groups',
+      title: 'Event marker groups',
+      description:
+        'Launches a rocket and deploys satellites, grouping history events by mission phase and satellite.',
+      capabilityTags: ['event-groups', 'signals', 'updates', 'activities'],
+      expectedEvidence: [
+        'Events grouped under Pre-launch checks, Ascent, and Payload deployment, with deployment events also grouped by satellite.',
+        'Launch poll events grouped by the goForLaunch signal, and orbit burn events grouped by both the adjustOrbit update and their satellite.',
+      ],
+      input: {
+        defaultValue: [
+          {
+            missionName: 'Aurora-7',
+            satellites: ['SAT-A', 'SAT-B'],
+            launchPollTimeoutSeconds: 30,
+          },
+        ],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Mission',
+              type: 'object',
+              properties: {
+                missionName: { type: 'string', minLength: 1 },
+                satellites: {
+                  type: 'array',
+                  items: { type: 'string', minLength: 1 },
+                  minItems: 1,
+                  maxItems: 5,
+                  uniqueItems: true,
+                },
+                launchPollTimeoutSeconds: {
+                  type: 'integer',
+                  minimum: 5,
+                  maximum: 300,
+                },
+              },
+              required: [
+                'missionName',
+                'satellites',
+                'launchPollTimeoutSeconds',
+              ],
+              additionalProperties: false,
+            },
+          ],
+          items: false,
+          minItems: 1,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'satelliteLaunchEventGroups',
       },
       source: { id: 'oss', label: 'OSS' },
     },

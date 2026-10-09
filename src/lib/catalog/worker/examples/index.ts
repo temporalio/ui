@@ -16,19 +16,20 @@ import { catalogExample as example8 } from './long-activity/example.js';
 import { catalogExample as example9 } from './nexus-greeting/example.js';
 import { catalogExample as example10 } from './parallel-activities/example.js';
 import { catalogExample as example11 } from './priority-fairness/example.js';
-import { catalogExample as example12 } from './sequential-activities/example.js';
-import { catalogExample as example13 } from './sequential-markdown-activities/example.js';
-import { catalogExample as example14 } from './sequential-multiline-summary-activities/example.js';
-import { catalogExample as example15 } from './sequential-no-summary-activities/example.js';
-import { catalogExample as example16 } from './sequential-plain-text-activities/example.js';
-import { catalogExample as example17 } from './signal-collector/example.js';
-import { catalogExample as example18 } from './signal-handlers/example.js';
-import { catalogExample as example19 } from './standalone-activity/example.js';
-import { catalogExample as example20 } from './timeline-kitchen-sink/example.js';
-import { catalogExample as example21 } from './timeline-live/example.js';
-import { catalogExample as example22 } from './timeline-performance/example.js';
-import { catalogExample as example23 } from './timer-driven-repetition/example.js';
-import { catalogExample as example24 } from './workflow-patching/example.js';
+import { catalogExample as example12 } from './satellite-launch-event-groups/example.js';
+import { catalogExample as example13 } from './sequential-activities/example.js';
+import { catalogExample as example14 } from './sequential-markdown-activities/example.js';
+import { catalogExample as example15 } from './sequential-multiline-summary-activities/example.js';
+import { catalogExample as example16 } from './sequential-no-summary-activities/example.js';
+import { catalogExample as example17 } from './sequential-plain-text-activities/example.js';
+import { catalogExample as example18 } from './signal-collector/example.js';
+import { catalogExample as example19 } from './signal-handlers/example.js';
+import { catalogExample as example20 } from './standalone-activity/example.js';
+import { catalogExample as example21 } from './timeline-kitchen-sink/example.js';
+import { catalogExample as example22 } from './timeline-live/example.js';
+import { catalogExample as example23 } from './timeline-performance/example.js';
+import { catalogExample as example24 } from './timer-driven-repetition/example.js';
+import { catalogExample as example25 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -56,6 +57,7 @@ const sharedWorkflowDefinitions = [
   example22,
   example23,
   example24,
+  example25,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -127,6 +129,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/parallel-activities/workflow.ts',
   'src/lib/catalog/worker/examples/priority-fairness/example.ts',
   'src/lib/catalog/worker/examples/priority-fairness/workflow.ts',
+  'src/lib/catalog/worker/examples/satellite-launch-event-groups/activity.ts',
+  'src/lib/catalog/worker/examples/satellite-launch-event-groups/example.ts',
+  'src/lib/catalog/worker/examples/satellite-launch-event-groups/workflow.ts',
   'src/lib/catalog/worker/examples/sequential-activities/example.ts',
   'src/lib/catalog/worker/examples/sequential-activities/workflow.ts',
   'src/lib/catalog/worker/examples/sequential-markdown-activities/activities.ts',

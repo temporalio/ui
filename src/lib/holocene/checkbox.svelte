@@ -83,7 +83,13 @@
   );
 
   const errorId = $derived(`${id}-error`);
+  const descriptionId = $derived(`${id}-description`);
   const showError = $derived(!valid && !!error);
+  const describedBy = $derived(
+    [description && descriptionId, showError && errorId]
+      .filter(Boolean)
+      .join(' ') || undefined,
+  );
 </script>
 
 <div
@@ -124,7 +130,7 @@
       data-track-intent="toggle"
       data-track-text={label}
       aria-invalid={!valid ? 'true' : undefined}
-      aria-describedby={showError ? errorId : undefined}
+      aria-describedby={describedBy}
       {disabled}
       {required}
       {...rest}
@@ -193,14 +199,14 @@
             >
           {/if}
         </span>
-        {#if description}
-          <p class="text-sm font-normal text-secondary">
-            {description}
-          </p>
-        {/if}
       </div>
     {/if}
   </Label>
+  {#if description}
+    <p id={descriptionId} class="ml-8 text-sm font-normal text-secondary">
+      {description}
+    </p>
+  {/if}
   <span id={errorId} role="alert" class="text-xs text-danger">
     {#if showError}{error}{/if}
   </span>

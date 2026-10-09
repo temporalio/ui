@@ -1,30 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
 import {
-  allSearchAttributes,
-  isCustomSearchAttribute,
+  isFilterableCustomSearchAttribute,
   workflowIncludesSearchAttribute,
 } from './search-attributes';
 
 describe('search attributes store', () => {
-  describe('isCustomSearchAttribute', () => {
-    test('returns false when the key is not a custom search attribute', () => {
-      allSearchAttributes.set({
-        systemAttributes: { WorkflowType: 'Keyword' },
-        customAttributes: {},
-      });
-      expect(isCustomSearchAttribute('CustomBool')).toBe(false);
-    });
-
-    test('returns true when the key is a custom search attribute', () => {
-      allSearchAttributes.set({
-        systemAttributes: { WorkflowType: 'Keyword' },
-        customAttributes: { CustomBool: 'Bool' },
-      });
-      expect(isCustomSearchAttribute('CustomBool')).toBe(true);
-    });
-  });
-
   describe('workflowIncludesSearchAttribute', () => {
     test('returns true when the search attribute is defined on the workflow', () => {
       const mockWorkflow = {
@@ -77,6 +58,52 @@ describe('search attributes store', () => {
       expect(workflowIncludesSearchAttribute(mockWorkflow, 'CustomBool')).toBe(
         false,
       );
+    });
+  });
+
+  describe('isFilterableCustomSearchAttribute', () => {
+    const customAttributes = {
+      CustomKeyword: 'Keyword',
+      CustomText: 'Text',
+      CustomInt: 'Int',
+    } as const;
+
+    test('returns true for a string Keyword value', () => {
+      expect(
+        isFilterableCustomSearchAttribute(
+          customAttributes,
+          'CustomKeyword',
+          'value',
+        ),
+      ).toBe(true);
+    });
+
+    test('returns true for a string Text value', () => {
+      expect(
+        isFilterableCustomSearchAttribute(customAttributes, 'CustomText', 'a'),
+      ).toBe(true);
+    });
+
+    test('returns false for a non-string value', () => {
+      expect(
+        isFilterableCustomSearchAttribute(
+          customAttributes,
+          'CustomKeyword',
+          undefined,
+        ),
+      ).toBe(false);
+    });
+
+    test('returns false for other types', () => {
+      expect(
+        isFilterableCustomSearchAttribute(customAttributes, 'CustomInt', '1'),
+      ).toBe(false);
+    });
+
+    test('returns false for unknown attributes', () => {
+      expect(
+        isFilterableCustomSearchAttribute(customAttributes, 'Unknown', 'a'),
+      ).toBe(false);
     });
   });
 });

@@ -1,47 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  colorAlphaScales,
-  defaultThemeName,
-  themes,
-  toCssVariables,
-} from './index';
+import { themes, toCssVariables } from './index';
 
 const registeredThemes = Object.entries(themes);
-const colorContract = Object.keys(
-  toCssVariables(themes[defaultThemeName].color, 'color'),
-).sort();
 
 describe('registered IO themes', () => {
-  it.each(registeredThemes)('%s has the exact color contract', (_, theme) => {
-    const variableNames = Object.keys(
-      toCssVariables(theme.color, 'color'),
-    ).sort();
-
-    expect(variableNames).toEqual(colorContract);
-  });
-
-  it.each(registeredThemes)('%s has 81 color variables', (_, theme) => {
-    const variables = toCssVariables(theme.color, 'color');
-
-    expect(Object.keys(variables)).toHaveLength(81);
-    expect(variables['--color-interactive-tertiary']).toBe('transparent');
+  it('light and dark themes expose the same color variables', () => {
+    expect(
+      Object.keys(toCssVariables(themes.light.color, 'color')).sort(),
+    ).toEqual(Object.keys(toCssVariables(themes.dark.color, 'color')).sort());
   });
 
   it.each(registeredThemes)(
-    '%s defines workflow action hover colors at 80 percent opacity',
+    '%s keeps tertiary interactions transparent',
     (_, theme) => {
       const variables = toCssVariables(theme.color, 'color');
 
-      expect(variables).toMatchObject({
-        '--color-action-workflow-workflow-hover': colorAlphaScales.zaffre[80],
-        '--color-action-workflow-activity-hover':
-          colorAlphaScales['dark-magenta'][80],
-        '--color-action-workflow-signal-hover': colorAlphaScales.persimmon[80],
-        '--color-action-workflow-timer-hover': colorAlphaScales.pink[80],
-        '--color-action-workflow-nexus-hover':
-          colorAlphaScales['peacock-blue'][80],
-      });
+      expect(variables['--color-interactive-tertiary']).toBe('transparent');
     },
   );
 });

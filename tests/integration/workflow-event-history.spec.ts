@@ -1,7 +1,18 @@
 import { expect, test } from '@playwright/test';
 
-import { mockWorkflowApis } from '~/test-utilities/mock-apis';
-import { mockWorkflow } from '~/test-utilities/mocks/workflow';
+import {
+  makeActivityScheduled,
+  makeActivityStarted,
+  makeWorkflowStarted,
+} from '$src/lib/services/test-helpers/synthetic-events';
+import {
+  mockEventHistoryApi,
+  mockWorkflowApis,
+} from '~/test-utilities/mock-apis';
+import {
+  mockWorkflow,
+  mockWorkflowWithPendingActivities,
+} from '~/test-utilities/mocks/workflow';
 
 const workflowUrl = `/namespaces/default/workflows/${mockWorkflow.workflowExecutionInfo.execution.workflowId}/${mockWorkflow.workflowExecutionInfo.execution.runId}/history`;
 
@@ -84,5 +95,95 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();
     await expect(page.getByTestId('event-summary-table')).toBeVisible();
+  });
+});
+
+const inSatelliteGroup = (
+  event: ReturnType<typeof makeActivityScheduled>,
+  satellite: string,
+) => ({
+  ...event,
+  eventGroupMarkers: [{ label: { id: `satellite:${satellite}` } }],
+});
+
+const events = [
+  makeWorkflowStarted(1),
+  inSatelliteGroup(makeActivityScheduled(2, 'FirstActivity'), 'A'),
+  makeActivityStarted(3, 2),
+  inSatelliteGroup(makeActivityScheduled(4, 'SecondActivity'), 'B'),
+  makeActivityStarted(5, 4),
+];
+
+test.describe('Workflow History view with pending activities and filters', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockWorkflowApis(page, mockWorkflowWithPendingActivities);
+    await mockEventHistoryApi(page, {
+      history: { events },
+      nextPageToken: null,
+    });
+    await page.goto(workflowUrl);
+    await expect(page.getByTestId('event-summary-table')).toBeVisible();
+    await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
+      2,
+    );
+  });
+
+  test('shows only the pending activities in the selected event group', async ({
+    page,
+  }) => {
+    await page
+      .locator('button[aria-controls="event-group-filter-menu"]')
+      .click();
+    await page
+      .locator('#event-group-filter-menu')
+      .getByRole('menuitem', { name: /satellite:A/ })
+      .click();
+
+    await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
+      1,
+    );
+    await expect(
+      page.getByTestId('pending-activity-summary-row'),
+    ).toContainText('FirstActivity');
+  });
+
+  test('shows a pending activity before its scheduled event loads', async ({
+    page,
+  }) => {
+    await mockEventHistoryApi(page, {
+      history: { events: events.slice(0, 3) },
+      nextPageToken: null,
+    });
+    await page.reload();
+
+    await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
+      2,
+    );
+
+    await page
+      .locator('button[aria-controls="event-group-filter-menu"]')
+      .click();
+    await page
+      .locator('#event-group-filter-menu')
+      .getByRole('menuitem', { name: /satellite:A/ })
+      .click();
+
+    await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
+      1,
+    );
+    await expect(
+      page.getByTestId('pending-activity-summary-row'),
+    ).toContainText('FirstActivity');
+  });
+
+  test('hides pending activities when activities are filtered out', async ({
+    page,
+  }) => {
+    await page.locator('button[aria-controls="status-menu"]').click();
+    await page.locator('#event-type-menu').getByTestId('Activity').click();
+
+    await expect(page.getByTestId('pending-activity-summary-row')).toHaveCount(
+      0,
+    );
   });
 });

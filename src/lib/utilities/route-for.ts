@@ -336,6 +336,21 @@ export const routeForSchedules = (
   return `${routeForNamespace(parameters)}/schedules`;
 };
 
+export const routeForSchedulesWithQuery = ({
+  namespace,
+  query,
+  page,
+}: QueryParameters): ResolvedPathname | undefined => {
+  if (!BROWSER) {
+    return undefined;
+  }
+
+  return toURL(routeForSchedules({ namespace }), {
+    query: query ?? '',
+    ...(page && { page }),
+  });
+};
+
 export const routeForScheduleCreate = ({
   namespace,
 }: NamespaceParameter): ResolvedPathname => {

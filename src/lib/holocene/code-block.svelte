@@ -56,6 +56,7 @@
     testId?: string;
     minHeight?: number;
     maxHeight?: number;
+    disableMaximize?: boolean;
     label?: string;
     class?: string;
     tabs?: string[];
@@ -84,6 +85,7 @@
     testId = undefined,
     minHeight = undefined,
     maxHeight = undefined,
+    disableMaximize = false,
     label = '',
     onchange = undefined,
     tabs,
@@ -158,7 +160,10 @@
   let maximized = $state(false);
 
   const maximizable = $derived(
-    !!maxHeight && !hasHeader && (editorView?.contentHeight ?? 0) > maxHeight,
+    !disableMaximize &&
+      !!maxHeight &&
+      !hasHeader &&
+      (editorView?.contentHeight ?? 0) > maxHeight,
   );
 
   // a compartment allows us to update extensions like the theme
