@@ -19,7 +19,6 @@
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
-  import { durationToSeconds } from '$lib/utilities/common-error-detection';
   import { isRawPayload } from '$lib/utilities/decode-payload';
   import {
     type EventLinkDisplay,
@@ -31,16 +30,15 @@
     spaceBetweenCapitalLetters,
   } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
-  import { getEpochMilliseconds } from '$lib/utilities/format-time';
   import {
     displayLinkType,
     getCodeBlockValue,
     getStackTrace,
+    getTimerFireTime,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import {
     isLocalActivityMarkerEvent,
-    isTimerStartedEvent,
     isWorkflowExecutionSignaledEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
@@ -79,17 +77,7 @@
     return attrs;
   });
 
-  const fireTime = $derived(
-    isTimerStartedEvent(event)
-      ? new Date(
-          getEpochMilliseconds(event.eventTime) +
-            durationToSeconds(
-              event.timerStartedEventAttributes?.startToFireTimeout,
-            ) *
-              1000,
-        ).toISOString()
-      : undefined,
-  );
+  const fireTime = $derived(getTimerFireTime(event));
 
   const displayName = $derived(
     systemNexus?.displayName ??
