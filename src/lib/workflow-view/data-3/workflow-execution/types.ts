@@ -1,3 +1,5 @@
+import type { WorkflowExecutionAPIResponse } from '$lib/types/workflows';
+
 import type {
   EventGroupMarkerGroupsProjectionChange,
   EventGroupMarkerKey,
@@ -16,6 +18,9 @@ export type WorkflowExecutionIdentity = Readonly<{
 
 export type WorkflowExecutionKey = `workflow-execution:(${string})`;
 
+/** A replaceable DescribeWorkflowExecution snapshot, separate from history. */
+export type WorkflowExecutionDetails = Readonly<WorkflowExecutionAPIResponse>;
+
 /** An individual change produced while ingesting a history event. */
 export type WorkflowExecutionChange =
   | Readonly<{
@@ -28,6 +33,9 @@ export type WorkflowExecutionChange =
 
 /** Consolidated batch payloads for each execution subscription topic. */
 export type NotificationByTopic = {
+  EXECUTION_DETAILS_CHANGED: Readonly<{
+    details: WorkflowExecutionDetails;
+  }>;
   LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED: Readonly<{
     lifecycleGroupFilterKeys: readonly LifecycleGroupFilterKey[];
   }>;

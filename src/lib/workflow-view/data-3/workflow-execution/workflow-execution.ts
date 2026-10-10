@@ -1,4 +1,9 @@
-import { fetchHistory, fetchLatestEvent, fetchStartEvent } from './api';
+import {
+  fetchExecutionDetails,
+  fetchHistory,
+  fetchLatestEvent,
+  fetchStartEvent,
+} from './api';
 import { getWorkflowExecutionKeyFromIdentity } from './get-key-from-identity';
 import type {
   NotificationByTopic,
@@ -6,6 +11,7 @@ import type {
   SubscriptionArgs,
   SubscriptionTopic,
   WorkflowExecutionChange,
+  WorkflowExecutionDetails,
   WorkflowExecutionIdentity,
   WorkflowExecutionKey,
 } from './types';
@@ -42,10 +48,13 @@ export class WorkflowExecution {
   readonly previousExecutionIdentity: WorkflowExecutionIdentity | null;
   readonly startEvent: DiscoveredStartEvent;
   private _latestEvent: NormalizedHistoryEvent;
+  private _executionDetails: WorkflowExecutionDetails | null = null;
+  private _executionDetailsRequestSequence = 0;
 
   private _subscribersByTopic: {
     [T in SubscriptionTopic]: Set<Subscriber<T>>;
   } = {
+    EXECUTION_DETAILS_CHANGED: new Set(),
     LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED: new Set(),
     EVENTS_ADDED: new Set(),
     LIFECYCLE_GROUPS_CHANGED: new Set(),
@@ -252,6 +261,7 @@ export class WorkflowExecution {
         this._lifecycleGroupFilterIndexesProjection.updateGroup(
           group,
           (eventId) => this.getEvent(eventId),
+          this._executionDetails,
         );
 
       if (filterChanges) {
@@ -262,6 +272,42 @@ export class WorkflowExecution {
     if (batchChanges.length) {
       this._notifySubscribers(batchChanges);
     }
+  }
+
+  /** Refreshes details; only the most recently started request may replace the snapshot. */
+  async loadExecutionDetails(signal?: AbortSignal): Promise<void> {
+    signal?.throwIfAborted();
+
+    const sequence = ++this._executionDetailsRequestSequence;
+    const details = await fetchExecutionDetails(this.identity, signal);
+
+    signal?.throwIfAborted();
+    if (sequence !== this._executionDetailsRequestSequence) {
+      return;
+    }
+
+    this._executionDetails = details;
+
+    const filterChanges =
+      this._lifecycleGroupFilterIndexesProjection.updateExecutionDetails(
+        this._lifecycleGroupsProjection.lifecycleGroups.values(),
+        (eventId) => this.getEvent(eventId),
+        details,
+      );
+
+    if (filterChanges) {
+      this._notifySubscribers(filterChanges);
+    }
+
+    for (const subscriber of this._subscribersByTopic
+      .EXECUTION_DETAILS_CHANGED) {
+      subscriber({ details });
+    }
+  }
+
+  /** Returns the last successful details snapshot, or null before the first load. */
+  get executionDetails(): WorkflowExecutionDetails | null {
+    return this._executionDetails;
   }
 
   /** Loads history, retaining previously stored events. */
@@ -337,6 +383,12 @@ export class WorkflowExecution {
     }
 
     switch (topic) {
+      case 'EXECUTION_DETAILS_CHANGED': {
+        return subscribeTo(
+          this._subscribersByTopic.EXECUTION_DETAILS_CHANGED,
+          handler,
+        );
+      }
       case 'LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED': {
         return subscribeTo(
           this._subscribersByTopic.LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED,

@@ -1,8 +1,12 @@
 import type { GetWorkflowExecutionHistoryResponse } from '$lib/types/events';
+import type { WorkflowExecutionAPIResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
-import type { WorkflowExecutionIdentity } from './types';
+import type {
+  WorkflowExecutionDetails,
+  WorkflowExecutionIdentity,
+} from './types';
 import { compareEventIds } from '../history-events/compare-event-ids';
 import { normalizeHistoryEvent } from '../history-events/normalize-history-event';
 import { type NormalizedHistoryEvent } from '../history-events/types';
@@ -11,6 +15,28 @@ import {
   type PageFetcherFn,
 } from '../network-utils/fetch-bidirectional-pages';
 import { retryableGet } from '../network-utils/retryable-get';
+
+/** Fetches current execution details, including pending activities and Nexus operations. */
+export async function fetchExecutionDetails(
+  identity: WorkflowExecutionIdentity,
+  signal?: AbortSignal,
+): Promise<WorkflowExecutionDetails> {
+  const response = await requestFromAPI<WorkflowExecutionAPIResponse>(
+    routeForApi('workflow', identity),
+    {
+      request: retryableGet,
+      params: { 'execution.runId': identity.runId },
+      notifyOnError: false,
+      options: { signal },
+    },
+  );
+
+  if (!response) {
+    throw new Error('Missing execution details response');
+  }
+
+  return response;
+}
 
 /** Fetches and validates the execution's WorkflowExecutionStarted event. */
 export async function fetchStartEvent(
