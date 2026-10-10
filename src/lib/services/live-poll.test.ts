@@ -662,3 +662,65 @@ describe('runLivePoll — pause/resume cursor', () => {
     expect(onEvent2.mock.calls[0][0].eventId).toBe('3');
   });
 });
+
+// ---------------------------------------------------------------------------
+// Workflow close — the loop stops once the run has closed
+// ---------------------------------------------------------------------------
+
+describe('runLivePoll — workflow close', () => {
+  const closedResponse = () => ({
+    history: {
+      events: [
+        makeRawEvent(1),
+        {
+          ...makeRawEvent(2),
+          eventType: 'WorkflowExecutionCompleted',
+          workflowExecutionCompletedEventAttributes: {},
+        },
+      ],
+    },
+  });
+
+  function pollUntilClosed(onEventReturn: boolean) {
+    const ctrl = new AbortController();
+    const onEvent = vi.fn().mockReturnValue(onEventReturn);
+    const onNewEvents = vi.fn();
+    requestFromAPI
+      .mockResolvedValueOnce(closedResponse())
+      .mockResolvedValue(pollResponse([]));
+
+    const done = runLivePoll({
+      route: '/api/events',
+      runId: 'run-1',
+      startToken: '',
+      signal: ctrl.signal,
+      onEvent,
+      onNewEvents,
+      ...FAST,
+    });
+
+    return { ctrl, onEvent, onNewEvents, done };
+  }
+
+  it('stops on its own after delivering the close event', async () => {
+    const { ctrl, onEvent, onNewEvents, done } = pollUntilClosed(true);
+    await done;
+    expect(requestFromAPI).toHaveBeenCalledTimes(1);
+    expect(onEvent).toHaveBeenCalledTimes(2);
+    expect(onNewEvents).toHaveBeenCalledTimes(1);
+    expect(ctrl.signal.aborted).toBe(false);
+  });
+
+  it('stops when the close event was already delivered', async () => {
+    const { onNewEvents, done } = pollUntilClosed(false);
+    await done;
+    expect(requestFromAPI).toHaveBeenCalledTimes(1);
+    expect(onNewEvents).not.toHaveBeenCalled();
+  });
+
+  it('keeps polling after events that do not close the workflow', async () => {
+    const { done } = startPoll([pollResponse([1]), pollResponse([2])]);
+    await done;
+    expect(requestFromAPI).toHaveBeenCalledTimes(2);
+  });
+});

@@ -394,6 +394,16 @@ export const isWorkflowExecutionContinuedAsNewEvent =
     'workflowExecutionContinuedAsNewEventAttributes',
   );
 
+export const isWorkflowCloseEvent = (
+  event: IterableEvent | CommonHistoryEvent | HistoryEvent | undefined,
+): boolean =>
+  isWorkflowExecutionCompletedEvent(event) ||
+  isWorkflowExecutionFailedEvent(event) ||
+  isWorkflowExecutionTimedOutEvent(event) ||
+  isWorkflowExecutionCanceledEvent(event) ||
+  isWorkflowExecutionTerminatedEvent(event) ||
+  isWorkflowExecutionContinuedAsNewEvent(event);
+
 export const isStartChildWorkflowExecutionInitiatedEvent =
   hasAttributes<StartChildWorkflowExecutionInitiatedEvent>(
     'startChildWorkflowExecutionInitiatedEventAttributes',

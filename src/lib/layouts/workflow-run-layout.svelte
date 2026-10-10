@@ -153,7 +153,8 @@
     startToken: string,
   ) => {
     livePollingController?.abort();
-    livePollingController = new AbortController();
+    const controller = new AbortController();
+    livePollingController = controller;
     runLivePoll({
       route: routeForApi('events.ascending', {
         namespace: ns,
@@ -161,7 +162,7 @@
       }),
       runId: rId,
       startToken,
-      signal: livePollingController.signal,
+      signal: controller.signal,
       onEvent: (ev) => {
         const isNew = ingestHistoryEvent(ev);
         if (isNew)
@@ -170,6 +171,7 @@
       },
     }).then((lastToken) => {
       _lastPollToken = lastToken;
+      if (!controller.signal.aborted) livePollingController = null;
     });
   };
 

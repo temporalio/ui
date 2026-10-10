@@ -2,6 +2,7 @@ import type {
   GetWorkflowExecutionHistoryResponse,
   HistoryEvent,
 } from '$lib/types/events';
+import { isWorkflowCloseEvent } from '$lib/utilities/is-event-type';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 
 export type LivePollOptions = {
@@ -35,7 +36,8 @@ export type LivePollOptions = {
  *     2 s before retrying so we don't spin on an idle workflow.
  *   - Network error → back off 5 s and retry.
  *
- * The loop exits cleanly when `signal` is aborted.
+ * The loop exits cleanly when `signal` is aborted or once it receives the
+ * workflow's close event.
  */
 /**
  * Returns the last cursor token when the loop exits (due to abort or error).
@@ -70,6 +72,7 @@ export async function runLivePoll({
         if (onEvent(ev)) added++;
       }
       if (added > 0) onNewEvents?.();
+      if (events.some(isWorkflowCloseEvent)) break;
 
       if (response?.nextPageToken) {
         token = response.nextPageToken as unknown as string;

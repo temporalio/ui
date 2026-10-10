@@ -5,7 +5,10 @@ import { expect } from 'vitest';
 import { describe, it } from 'vitest';
 
 import type { EventType } from './is-event-type';
-import { isLocalActivityMarkerEvent } from './is-event-type';
+import {
+  isLocalActivityMarkerEvent,
+  isWorkflowCloseEvent,
+} from './is-event-type';
 import { toEvent } from '../models/event-history';
 
 const baseEvent = {
@@ -55,5 +58,32 @@ describe('isLocalActivityMarkerEvent', () => {
       },
     });
     expect(isLocalActivityMarkerEvent(event)).toBe(false);
+  });
+});
+
+describe('isWorkflowCloseEvent', () => {
+  it.each([
+    'workflowExecutionCompletedEventAttributes',
+    'workflowExecutionFailedEventAttributes',
+    'workflowExecutionTimedOutEventAttributes',
+    'workflowExecutionCanceledEventAttributes',
+    'workflowExecutionTerminatedEventAttributes',
+    'workflowExecutionContinuedAsNewEventAttributes',
+  ])('returns true for an event with %s', (attributes) => {
+    expect(isWorkflowCloseEvent({ ...baseEvent, [attributes]: {} })).toBe(true);
+  });
+
+  it.each([
+    'workflowExecutionStartedEventAttributes',
+    'workflowTaskCompletedEventAttributes',
+    'childWorkflowExecutionCompletedEventAttributes',
+  ])('returns false for an event with %s', (attributes) => {
+    expect(isWorkflowCloseEvent({ ...baseEvent, [attributes]: {} })).toBe(
+      false,
+    );
+  });
+
+  it('returns false for an undefined event', () => {
+    expect(isWorkflowCloseEvent(undefined)).toBe(false);
   });
 });
