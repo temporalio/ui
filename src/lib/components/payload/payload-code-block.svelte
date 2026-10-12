@@ -63,13 +63,11 @@
     decoded,
   }: Props = $props();
 
-  const hasSharedDecode = $derived(!!decoded && decoded.status !== 'idle');
-  const ownDecoded = createDecodedPayload(() =>
-    hasSharedDecode ? null : value,
+  const sharedDecode = $derived(
+    decoded?.status === 'idle' ? undefined : decoded,
   );
-  const decodedState = $derived(
-    hasSharedDecode && decoded ? decoded : ownDecoded.current,
-  );
+  const ownDecoded = createDecodedPayload(() => (sharedDecode ? null : value));
+  const decodedState = $derived(sharedDecode ?? ownDecoded.current);
 
   let downloadError: string | undefined = $state(undefined);
   let downloadLoading: boolean = $state(false);
