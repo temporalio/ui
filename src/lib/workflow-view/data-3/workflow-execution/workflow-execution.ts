@@ -11,11 +11,12 @@ import type {
   Subscriber,
   SubscriptionArgs,
   SubscriptionTopic,
-  WorkflowExecutionChange,
   WorkflowExecutionDetails,
   WorkflowExecutionIdentity,
   WorkflowExecutionKey,
+  WorkflowExecutionNotification,
 } from './types';
+import { WorkflowExecutionChangeBatch } from './workflow-execution-change-batch';
 import { EventGroupMarkerGroupsProjection } from '../event-group-markers/event-group-marker-groups-projection';
 import { getEventGroupMarkerSource } from '../event-group-markers/get-event-group-marker-source';
 import type {
@@ -134,103 +135,25 @@ export class WorkflowExecution {
   }
 
   private _notifySubscribers(
-    changes: readonly WorkflowExecutionChange[],
+    notifications: readonly WorkflowExecutionNotification[],
   ): void {
-    const eventIds = new Set<HistoryEventId>();
-    const headEventIds = new Set<HistoryEventId>();
-    const childExecutionHeadEventIds = new Set<HistoryEventId>();
-    const eventGroupMarkerKeys = new Set<EventGroupMarkerKey>();
-
-    const lifecycleGroupFilterKeys = new Set<LifecycleGroupFilterKey>();
-
-    for (const change of changes) {
-      switch (change.type) {
-        case 'CHILD_EXECUTION_REFERENCE_ADDED': {
-          childExecutionHeadEventIds.add(change.headEventId);
-          break;
-        }
-        case 'LIFECYCLE_GROUP_FILTER_INDEX_CHANGED': {
-          lifecycleGroupFilterKeys.add(change.lifecycleGroupFilterKey);
-          break;
-        }
-        case 'EVENT_ADDED': {
-          eventIds.add(change.eventId);
-          break;
-        }
-
-        case 'LIFECYCLE_GROUP_CHANGED': {
-          headEventIds.add(change.headEventId);
-          break;
-        }
-
-        case 'EVENT_GROUP_MARKER_GROUP_CHANGED': {
-          eventGroupMarkerKeys.add(change.eventGroupMarkerKey);
-          break;
-        }
+    const notify = <T extends SubscriptionTopic>(
+      topic: T,
+      payload: NotificationByTopic[T],
+    ) => {
+      for (const subscriber of this._subscribersByTopic[topic]) {
+        subscriber(payload);
       }
-    }
+    };
 
-    if (childExecutionHeadEventIds.size) {
-      const notification: NotificationByTopic['CHILD_EXECUTION_REFERENCES_ADDED'] =
-        {
-          headEventIds: Array.from(childExecutionHeadEventIds),
-        };
-
-      for (const subscriber of this._subscribersByTopic
-        .CHILD_EXECUTION_REFERENCES_ADDED) {
-        subscriber(notification);
-      }
-    }
-
-    if (lifecycleGroupFilterKeys.size) {
-      const notification: NotificationByTopic['LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED'] =
-        {
-          lifecycleGroupFilterKeys: Array.from(lifecycleGroupFilterKeys),
-        };
-
-      for (const subscriber of this._subscribersByTopic
-        .LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED) {
-        subscriber(notification);
-      }
-    }
-
-    if (eventIds.size) {
-      const notification: NotificationByTopic['EVENTS_ADDED'] = {
-        eventIds: Array.from(eventIds),
-      };
-
-      for (const subscriber of this._subscribersByTopic.EVENTS_ADDED) {
-        subscriber(notification);
-      }
-    }
-
-    if (headEventIds.size) {
-      const notification: NotificationByTopic['LIFECYCLE_GROUPS_CHANGED'] = {
-        headEventIds: Array.from(headEventIds),
-      };
-
-      for (const subscriber of this._subscribersByTopic
-        .LIFECYCLE_GROUPS_CHANGED) {
-        subscriber(notification);
-      }
-    }
-
-    if (eventGroupMarkerKeys.size) {
-      const notification: NotificationByTopic['EVENT_GROUP_MARKER_GROUPS_CHANGED'] =
-        {
-          eventGroupMarkerKeys: Array.from(eventGroupMarkerKeys),
-        };
-
-      for (const subscriber of this._subscribersByTopic
-        .EVENT_GROUP_MARKER_GROUPS_CHANGED) {
-        subscriber(notification);
-      }
+    for (const notification of notifications) {
+      notify(notification.topic, notification.payload);
     }
   }
 
   /** Ingests a batch, updates affected filter indexes, then notifies subscribers. */
   private _ingestEvents(events: readonly NormalizedHistoryEvent[]): void {
-    const batchChanges: WorkflowExecutionChange[] = [];
+    const batch = new WorkflowExecutionChangeBatch();
 
     for (const event of events) {
       if (this._events.has(event.eventId)) {
@@ -243,7 +166,7 @@ export class WorkflowExecution {
       );
 
       this._events.set(event.eventId, event);
-      batchChanges.push({ type: 'EVENT_ADDED', eventId: event.eventId });
+      batch.add({ type: 'EVENT_ADDED', eventId: event.eventId });
 
       const nextIdentity = getNextExecutionIdentity(this.identity, event);
 
@@ -262,7 +185,7 @@ export class WorkflowExecution {
       );
 
       if (lifecycleGroupChange) {
-        batchChanges.push(lifecycleGroupChange);
+        batch.add(lifecycleGroupChange);
       }
       if (
         childReference &&
@@ -272,7 +195,7 @@ export class WorkflowExecution {
           childReference.headEventId,
           childReference,
         );
-        batchChanges.push({
+        batch.add({
           type: 'CHILD_EXECUTION_REFERENCE_ADDED',
           headEventId: childReference.headEventId,
         });
@@ -284,19 +207,10 @@ export class WorkflowExecution {
           lifecycleReference,
         );
 
-      if (eventGroupMarkerGroupChanges?.length) {
-        batchChanges.push(...eventGroupMarkerGroupChanges);
-      }
+      batch.addAll(eventGroupMarkerGroupChanges);
     }
 
-    const changedLifecycleGroupHeadEventIds = new Set<HistoryEventId>();
-    for (const change of batchChanges) {
-      if (change.type === 'LIFECYCLE_GROUP_CHANGED') {
-        changedLifecycleGroupHeadEventIds.add(change.headEventId);
-      }
-    }
-
-    for (const headEventId of changedLifecycleGroupHeadEventIds) {
+    for (const headEventId of batch.changedLifecycleHeadEventIds) {
       const group =
         this._lifecycleGroupsProjection.lifecycleGroups.get(headEventId);
       if (!group) {
@@ -310,14 +224,10 @@ export class WorkflowExecution {
           this._executionDetails,
         );
 
-      if (filterChanges) {
-        batchChanges.push(...filterChanges);
-      }
+      batch.addAll(filterChanges);
     }
 
-    if (batchChanges.length) {
-      this._notifySubscribers(batchChanges);
-    }
+    this._notifySubscribers(batch.notifications);
   }
 
   /** Refreshes details; only the most recently started request may replace the snapshot. */
@@ -341,9 +251,9 @@ export class WorkflowExecution {
         details,
       );
 
-    if (filterChanges) {
-      this._notifySubscribers(filterChanges);
-    }
+    const batch = new WorkflowExecutionChangeBatch();
+    batch.addAll(filterChanges);
+    this._notifySubscribers(batch.notifications);
 
     for (const subscriber of this._subscribersByTopic
       .EXECUTION_DETAILS_CHANGED) {

@@ -82,6 +82,14 @@ export type NotificationByTopic = {
 /** A supported execution notification topic. */
 export type SubscriptionTopic = keyof NotificationByTopic;
 
+/** Keeps a notification topic paired with its corresponding batch payload. */
+export type WorkflowExecutionNotification = {
+  [T in SubscriptionTopic]: Readonly<{
+    topic: T;
+    payload: NotificationByTopic[T];
+  }>;
+}[SubscriptionTopic];
+
 /** Receives the batch payload associated with one topic. */
 export type Subscriber<T extends SubscriptionTopic> = (
   notification: NotificationByTopic[T],
