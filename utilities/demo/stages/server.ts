@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import { existsSync, readdirSync } from 'fs';
 import { chmod, mkdir, readFile, writeFile } from 'fs/promises';
 import zlib from 'node:zlib';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { finished } from 'stream/promises';
 
 import fetch from 'node-fetch';
@@ -382,6 +382,52 @@ const applyModuleRequirements = async (
     .slice(0, 12);
 };
 
+/**
+ * Applies a scenario's patches to a checkout this tool owns. A pinned checkout
+ * is reused between runs, so a patch that is already applied is skipped. The
+ * returned key joins the binary's cache key, so a changed patch builds again
+ * instead of reusing a binary built without it.
+ */
+const applyPatches = async (
+  repo: RepoSource,
+  patches: readonly string[],
+  log: Logger,
+): Promise<string> => {
+  if (!patches.length) return '';
+
+  const hash = createHash('sha256');
+
+  for (const patch of patches) {
+    const path = resolve(process.cwd(), expandPath(patch));
+    hash.update(await readFile(path, 'utf8'));
+
+    const applied = await $`git -C ${repo.path} apply --reverse --check ${path}`
+      .quiet()
+      .nothrow();
+
+    if (applied.exitCode === 0) {
+      log(chalk.dim(`  ${patch} is already applied`));
+      continue;
+    }
+
+    log(chalk.dim(`  git apply ${patch}`));
+
+    const result = await $`git -C ${repo.path} apply ${path}`.quiet().nothrow();
+
+    if (result.exitCode !== 0) {
+      throw new Error(
+        [
+          `Could not apply ${patch} to ${repo.path}.`,
+          'The patch was written against another revision of the server. Regenerate it against the ref this scenario fetches.',
+          result.stderr.trim(),
+        ].join('\n'),
+      );
+    }
+  }
+
+  return hash.digest('hex').slice(0, 12);
+};
+
 const buildWorkspaceCli = async (
   server: ServerDefinition,
   log: Logger,
@@ -460,9 +506,20 @@ const buildWorkspaceCli = async (
     );
   }
 
+  if (server.patches.length && !temporal.owned) {
+    throw new Error(
+      [
+        `This scenario patches the server checkout, and ${temporal.path} is your working tree, so this tool will not modify it.`,
+        `Apply ${server.patches.join(', ')} there, or unset TEMPORAL_SERVER_REPO to let the tool fetch and patch its own checkout.`,
+      ].join('\n'),
+    );
+  }
+
+  const patchKey = await applyPatches(temporal, server.patches, log);
+
   const binary = join(
     BIN_DIR,
-    `temporal-workspace-${cli.key}-${temporal.key}${moduleKey ? `-${moduleKey}` : ''}`,
+    `temporal-workspace-${cli.key}-${temporal.key}${moduleKey ? `-${moduleKey}` : ''}${patchKey ? `-${patchKey}` : ''}`,
   );
   const goWork = join(WORK_DIR, 'go.work');
 
@@ -819,6 +876,7 @@ export const startServer = async (
     binary,
     ['server', 'start-dev', ...flags],
     {
+      env: { ...process.env, ...server.env },
       logFile: join(runDirFor(runName), 'server.log'),
     },
   );

@@ -82,6 +82,15 @@ const serverSchema = z
     namespace: z.string().default('default'),
     dynamicConfig: z.record(z.string(), dynamicConfigValue).default({}),
     searchAttributes: z.record(z.string(), z.string()).default({}),
+    /**
+     * Patches applied to a checkout this tool fetched, before it builds, as
+     * paths from the repository root. For a change only a demo needs, such as
+     * supplying a value the open-source server leaves out. A checkout somebody
+     * pointed at is never patched.
+     */
+    patches: z.array(z.string()).default([]),
+    /** Extra environment for the server process. */
+    env: z.record(z.string(), z.string()).default({}),
   })
   .prefault({});
 
@@ -118,6 +127,8 @@ const uiSchema = z
     apiPort: z.number().int().default(8081),
     webPort: z.number().int().default(3000),
     rebuildUiServer: z.boolean().default(false),
+    /** Extra environment for the UI dev server, such as VITE_ settings. */
+    env: z.record(z.string(), z.string()).default({}),
   })
   .prefault({});
 
