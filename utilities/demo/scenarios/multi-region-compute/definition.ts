@@ -64,11 +64,11 @@ export const definition = defineScenario({
   examples: [],
   preview: {
     notes: [
-      `Prerequisite: a Lambda function in each region (${PRIMARY} and ${REPLICA}) and AWS credentials in this shell that can reach both. The server validates each region's group against AWS when the Version is saved, and the form deletes the Version again if validation fails. The serverless-worker-aws skill sets these up.`,
+      `Prerequisite: a Lambda function in each region (${PRIMARY} and ${REPLICA}), an IAM role this shell's AWS credentials can assume, and those credentials in this shell. Creating a Version validates every group against AWS, and nothing is saved if one fails, so a made-up ARN or role stops the save at the provider. The serverless-worker-aws skill sets these up.`,
       "Open Workers, then Create Serverless Worker. The Compute section shows one block per region: the primary first, then the replica. The replica suggests its Lambda ARN from the primary's by swapping the region, and takes the primary's Access and Scaling until Customize is pressed.",
       "Leave a required field empty in one region and submit. The error shows in that region's block, and nothing is saved.",
       'Fill both regions and submit. The deployments list shows the Version with both regions covered. Open it: each region names the group that serves it.',
-      `To see an uncovered region, create a Version on this server through the API with a single group whose region_ids names only ${PRIMARY}. The list then marks ${REPLICA} as the region a failover would find no workers in.`,
+      `To see an uncovered region, create a Version through the API with one group whose region_ids names only ${PRIMARY}; that needs a Lambda in ${PRIMARY} alone. The deployments list and the Version table then mark ${REPLICA} as the region a failover would find no workers in.`,
       `This server is hosted in ${PRIMARY}, so its worker controller scales only the groups that list ${PRIMARY}. Showing a failover needs a second server hosted in ${REPLICA}, which this scenario does not start.`,
     ],
   },
