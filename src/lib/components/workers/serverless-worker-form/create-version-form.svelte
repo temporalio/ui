@@ -14,6 +14,7 @@
     type ComputeProviderTemplates,
     type ComputeProviderValue,
   } from './compute-providers';
+  import { revealFirstProblem } from './motion';
   import {
     type ComputeRegion,
     lambdaArnPlaceholderFor,
@@ -95,6 +96,13 @@
 
   /** A server error that names a region shows in that region's block. */
   const errorsByRegion = $derived(regionServerErrors(error, regions));
+
+  let formRoot = $state<HTMLElement>();
+
+  // A server error can land in a region card far above the submit button.
+  $effect(() => {
+    if (error) untrack(() => revealFirstProblem(formRoot));
+  });
   const errorInRegion = $derived(Object.keys(errorsByRegion).length > 0);
 
   const superform = superForm(
@@ -135,7 +143,10 @@
         if (!form.valid) return;
         if (offersHighAvailability) {
           regionErrors = validateRegionValues(regionValues);
-          if (Object.keys(regionErrors).length) return;
+          if (Object.keys(regionErrors).length) {
+            revealFirstProblem(formRoot);
+            return;
+          }
           // Without high availability the one region saves what a
           // single-region Version saves.
           if (regionValues.length > 1) {
@@ -153,7 +164,7 @@
   const { form, errors, enhance, submitting } = superform;
 </script>
 
-<div class="relative flex max-w-[45rem] flex-col gap-6">
+<div class="relative flex max-w-[45rem] flex-col gap-6" bind:this={formRoot}>
   {#if error && !errorInRegion}
     <Alert intent="error" title={translate('common.error-occurred')}
       >{error}</Alert

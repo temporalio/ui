@@ -13,6 +13,7 @@
     type ComputeProviderTemplates,
     type ComputeProviderValue,
   } from './compute-providers';
+  import { revealFirstProblem } from './motion';
   import {
     type ComputeRegion,
     lambdaArnPlaceholderFor,
@@ -87,6 +88,13 @@
 
   /** A server error that names a region shows in that region's block. */
   const errorsByRegion = $derived(regionServerErrors(error, regions));
+
+  let formRoot = $state<HTMLElement>();
+
+  // A server error can land in a region card far above the submit button.
+  $effect(() => {
+    if (error) untrack(() => revealFirstProblem(formRoot));
+  });
   const errorInRegion = $derived(Object.keys(errorsByRegion).length > 0);
 
   const superform = superForm(
@@ -128,7 +136,10 @@
         error = undefined;
         if (offersHighAvailability) {
           regionErrors = validateRegionValues(regionValues);
-          if (Object.keys(regionErrors).length) return;
+          if (Object.keys(regionErrors).length) {
+            revealFirstProblem(formRoot);
+            return;
+          }
         }
         try {
           // Without high availability the one region saves what a
@@ -165,7 +176,7 @@
   const { form, errors, enhance, submitting } = superform;
 </script>
 
-<div class="relative flex max-w-[45rem] flex-col gap-4">
+<div class="relative flex max-w-[45rem] flex-col gap-4" bind:this={formRoot}>
   <form class="flex flex-col gap-4" use:enhance novalidate>
     <Card class="p-5">
       <h2 class="text-base font-medium">

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   import { translate } from '$lib/i18n/translate';
   import {
     IconAwsColor,
@@ -10,6 +12,7 @@
   } from '$lib/io/icon';
   import { colorScales } from '$lib/theme/io/themes';
 
+  import { motion } from './motion';
   import {
     type PreviewRegion,
     type PreviewSlot,
@@ -80,6 +83,21 @@
     deploymentName === undefined || deploymentName.trim() !== '',
   );
   const routeReady = $derived(deploymentReady && isReady(active));
+
+  /**
+   * The pulse shows a change in the route, then stops. Motion that never
+   * stops beside a form pulls attention from the fields (WCAG 2.2.2).
+   */
+  const PULSE_REPEATS = 2;
+  const pulseKey = $derived(regions.map(({ regionId }) => regionId).join());
+
+  /**
+   * An animation added to a running SVG timeline counts from the document's
+   * start and can already be over, so each pulse starts itself on mount.
+   */
+  const startPulse = (node: SVGAnimationElement) => {
+    node.beginElement();
+  };
 
   const trunkClass = $derived(
     deploymentReady ? 'flow' : 'text-secondary opacity-50',
@@ -154,22 +172,28 @@
 </script>
 
 {#snippet pulsePath(connector: Connector, start: number)}
-  <path
-    d={connector.d}
-    fill="none"
-    stroke-width="5"
-    stroke-dasharray="{PULSE_DASH} {connector.length + PULSE_DASH}"
-    stroke-dashoffset={PULSE_DASH}
-    class="pulse"
-  >
-    <animate
-      attributeName="stroke-dashoffset"
-      values="{PULSE_DASH};{PULSE_DASH};{-connector.length};{-connector.length}"
-      keyTimes={pulse.keyTimes(start, connector.length)}
-      dur="{pulse.duration}s"
-      repeatCount="indefinite"
-    />
-  </path>
+  <!-- Keyed on the regions, so the pulse replays when a region is added or
+  removed. -->
+  {#key pulseKey}
+    <path
+      d={connector.d}
+      fill="none"
+      stroke-width="5"
+      stroke-dasharray="{PULSE_DASH} {connector.length + PULSE_DASH}"
+      stroke-dashoffset={PULSE_DASH}
+      class="pulse"
+    >
+      <animate
+        attributeName="stroke-dashoffset"
+        values="{PULSE_DASH};{PULSE_DASH};{-connector.length};{-connector.length}"
+        keyTimes={pulse.keyTimes(start, connector.length)}
+        dur="{pulse.duration}s"
+        repeatCount={PULSE_REPEATS}
+        begin="indefinite"
+        {@attach startPulse}
+      />
+    </path>
+  {/key}
 {/snippet}
 
 {#snippet field(label: string, value: PreviewSlot)}
@@ -381,6 +405,7 @@
           <div
             class="flex min-w-0 flex-col rounded-lg border border-primary bg-surface-primary transition-[border-color,box-shadow]"
             class:neon-box={isLit}
+            in:fade={motion('swap')}
           >
             <div
               class="flex flex-col justify-center gap-0.5 border-b border-primary px-2.5"

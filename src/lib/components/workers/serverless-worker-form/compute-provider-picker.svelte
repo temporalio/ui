@@ -4,8 +4,9 @@
 
 <script lang="ts">
   import { writable } from 'svelte/store';
+  import { fade, slide } from 'svelte/transition';
 
-  import { type Snippet, untrack } from 'svelte';
+  import { type Snippet, tick, untrack } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
@@ -21,6 +22,7 @@
     type ComputeProviderReleaseStage,
     type ComputeProviderValue,
   } from './compute-providers';
+  import { motion } from './motion';
   import { type ComputeProviderOption, defaultReleaseStage } from './shared';
 
   interface Props {
@@ -47,6 +49,43 @@
 
   /** Summary layout: the cards are open for choosing another provider. */
   let changing = $state(false);
+  let changeButton = $state<HTMLElement>();
+  let cards = $state<HTMLElement>();
+
+  /**
+   * Opening and closing the cards removes the control that has focus, so
+   * focus moves on: to the checked card when they open, and back to Change
+   * when they close.
+   */
+  const openCards = async () => {
+    changing = true;
+    await tick();
+    cards?.querySelector<HTMLInputElement>('input:checked')?.focus();
+  };
+
+  const closeCards = async () => {
+    if (!changing) return;
+    changing = false;
+    await tick();
+    changeButton?.querySelector('button')?.focus();
+  };
+
+  /**
+   * Arrow keys move through a radio group and select as they go, so they
+   * must not close the cards: a keyboard user browsing the options would
+   * switch providers and lose the list at once. Enter and Space choose.
+   */
+  const handleCardKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      closeCards();
+    }
+  };
+
+  /** A pointer click chooses. A click a key press makes has no detail. */
+  const handleCardClick = (event: MouseEvent, disabled?: boolean) => {
+    if (event.detail > 0 && !disabled) closeCards();
+  };
 
   // Label, description and brand mark all come from the registry, so a
   // provider stays described in one place.
@@ -106,7 +145,6 @@
 
   $effect(() => {
     return providerStore.subscribe((value) => {
-      if (value !== untrack(() => provider)) changing = false;
       provider = value;
     });
   });
@@ -147,19 +185,21 @@
   {@const selected = visibleProviders.find(
     (option) => option.value === provider,
   )}
+  <!-- No out transitions: the summary and the cards never show together, so
+  the height never doubles. The cards grow down from where the summary was. -->
   {#if !changing && selected}
-    <div class="overflow-hidden rounded-lg border border-primary">
+    <div
+      class="overflow-hidden rounded-lg border border-primary"
+      in:fade={motion('swap')}
+    >
       <div class="flex items-center gap-3 p-4">
         {@render providerRow(selected)}
         {#if visibleProviders.length > 1}
-          <Button
-            variant="tertiary"
-            size="sm"
-            class="shrink-0"
-            onclick={() => (changing = true)}
-          >
-            {translate('workers.provider-change')}
-          </Button>
+          <span class="shrink-0" bind:this={changeButton}>
+            <Button variant="tertiary" size="sm" onclick={openCards}>
+              {translate('workers.provider-change')}
+            </Button>
+          </span>
         {/if}
       </div>
       {#if otherProviders.length}
@@ -191,38 +231,38 @@
       {/if}
     </div>
   {:else}
-    <div
-      role="radiogroup"
-      aria-label={translate('workers.compute-provider')}
-      class="flex flex-col gap-3"
-    >
-      {#each visibleProviders as option (option.value)}
-        <label
-          for={`${name}-${option.value}`}
-          class="flex cursor-pointer items-center gap-3 rounded-lg border border-primary p-4"
-          class:cursor-not-allowed={option.disabled}
-          class:opacity-50={option.disabled}
-        >
-          <RadioControl
-            group={providerStore}
-            {name}
-            value={option.value}
-            id={`${name}-${option.value}`}
-            disabled={option.disabled}
-            class="shrink-0"
-          />
-          {@render providerRow(option)}
-        </label>
-      {/each}
+    <div class="flow-root" in:slide={motion('reveal')}>
+      <div
+        role="radiogroup"
+        aria-label={translate('workers.compute-provider')}
+        class="flex flex-col gap-3"
+        bind:this={cards}
+        onkeydown={handleCardKeydown}
+      >
+        {#each visibleProviders as option (option.value)}
+          <label
+            for={`${name}-${option.value}`}
+            class="flex cursor-pointer items-center gap-3 rounded-lg border border-primary p-4"
+            class:cursor-not-allowed={option.disabled}
+            class:opacity-50={option.disabled}
+            onclick={(event) => handleCardClick(event, option.disabled)}
+          >
+            <RadioControl
+              group={providerStore}
+              {name}
+              value={option.value}
+              id={`${name}-${option.value}`}
+              disabled={option.disabled}
+              class="shrink-0"
+            />
+            {@render providerRow(option)}
+          </label>
+        {/each}
+      </div>
+      <Button variant="tertiary" size="sm" class="mt-3" onclick={closeCards}>
+        {translate('common.cancel')}
+      </Button>
     </div>
-    <Button
-      variant="tertiary"
-      size="sm"
-      class="mt-3"
-      onclick={() => (changing = false)}
-    >
-      {translate('common.cancel')}
-    </Button>
   {/if}
 {:else}
   <RadioGroup {name} group={providerStore}>

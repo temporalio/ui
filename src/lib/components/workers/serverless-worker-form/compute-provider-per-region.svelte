@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
+  import { fade, slide } from 'svelte/transition';
+
+  import { tick, untrack } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import { motion } from './motion';
   import {
     type ComputeRegion,
     lambdaArnPlaceholderFor,
@@ -220,6 +223,19 @@
       : undefined,
   );
 
+  /**
+   * The warning, once the ARN stops changing. Typing an ARN passes through
+   * regions on the way, and a warning that comes and goes on each keystroke
+   * moves the fields below it.
+   */
+  let shownSameRegionWarning = $state(untrack(() => sameRegionWarning));
+  $effect(() => {
+    const next = sameRegionWarning;
+    if (next === untrack(() => shownSameRegionWarning)) return;
+    const timer = setTimeout(() => (shownSameRegionWarning = next), 400);
+    return () => clearTimeout(timer);
+  });
+
   const isSuggested = $derived(
     provider === 'agentcore'
       ? replica.agentCoreEndpointArnOverride === undefined &&
@@ -240,6 +256,20 @@
     if (!inheritsPrimary) return;
     INHERITED_FIELDS.forEach((field) => copyField(primary, replica, field));
     replica.customized = true;
+  };
+
+  let replicaSettings = $state<HTMLElement>();
+
+  /**
+   * Customize removes its own button, so focus moves to the first field it
+   * reveals rather than falling to the page.
+   */
+  const customizeAndFocus = async () => {
+    customize();
+    await tick();
+    replicaSettings
+      ?.querySelector<HTMLElement>('input, select, textarea')
+      ?.focus();
   };
 
   /**
@@ -392,30 +422,36 @@
       showRole
     >
       {@render serverError(primaryRegion.id)}
-      <ComputeFields
-        {provider}
-        leadingDivider={false}
-        idPrefix={primaryRegion.id}
-        lambdaArnPlaceholder={lambdaArnPlaceholderFor(primaryRegion.label)}
-        bind:lambdaArn={primary.lambdaArn}
-        bind:agentCoreEndpointArn={primary.agentCoreEndpointArn}
-        bind:iamRoleArn={primary.iamRoleArn}
-        bind:roleExternalId={primary.roleExternalId}
-        bind:gcpProject={primary.gcpProject}
-        bind:gcpRegion={primary.gcpRegion}
-        bind:gcpWorkerPool={primary.gcpWorkerPool}
-        bind:gcpServiceAccount={primary.gcpServiceAccount}
-        bind:minReplicas={primary.minReplicas}
-        bind:maxReplicas={primary.maxReplicas}
-        bind:initialReplicas={primary.initialReplicas}
-        bind:utilizationTarget={primary.utilizationTarget}
-        bind:scaleDownStabilization={primary.scaleDownStabilization}
-        bind:scaleUpCooloffMs={primary.scaleUpCooloffMs}
-        bind:scaleUpBacklogThreshold={primary.scaleUpBacklogThreshold}
-        bind:maxWorkerLifetimeMs={primary.maxWorkerLifetimeMs}
-        bind:metricsPollIntervalMs={primary.metricsPollIntervalMs}
-        errors={regionErrors[primaryRegion.id]}
-      />
+      <!-- A new provider brings new labels (Function, Worker Pool). The fade
+      shows the fields changed; a slide would move every field twice. -->
+      {#key provider}
+        <div in:fade={motion('swap')}>
+          <ComputeFields
+            {provider}
+            leadingDivider={false}
+            idPrefix={primaryRegion.id}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(primaryRegion.label)}
+            bind:lambdaArn={primary.lambdaArn}
+            bind:agentCoreEndpointArn={primary.agentCoreEndpointArn}
+            bind:iamRoleArn={primary.iamRoleArn}
+            bind:roleExternalId={primary.roleExternalId}
+            bind:gcpProject={primary.gcpProject}
+            bind:gcpRegion={primary.gcpRegion}
+            bind:gcpWorkerPool={primary.gcpWorkerPool}
+            bind:gcpServiceAccount={primary.gcpServiceAccount}
+            bind:minReplicas={primary.minReplicas}
+            bind:maxReplicas={primary.maxReplicas}
+            bind:initialReplicas={primary.initialReplicas}
+            bind:utilizationTarget={primary.utilizationTarget}
+            bind:scaleDownStabilization={primary.scaleDownStabilization}
+            bind:scaleUpCooloffMs={primary.scaleUpCooloffMs}
+            bind:scaleUpBacklogThreshold={primary.scaleUpBacklogThreshold}
+            bind:maxWorkerLifetimeMs={primary.maxWorkerLifetimeMs}
+            bind:metricsPollIntervalMs={primary.metricsPollIntervalMs}
+            errors={regionErrors[primaryRegion.id]}
+          />
+        </div>
+      {/key}
     </RegionBlock>
 
     {#if replicaRegion}
@@ -436,92 +472,139 @@
             bind:checked={highAvailability}
           />
         {/snippet}
+        <!-- Each branch grows down from the toggle, so nothing above it moves.
+        flow-root keeps the children's margins inside the sliding box. -->
         {#if replicated}
-          {@render serverError(replicaKey)}
-          <ComputeFields
-            {provider}
-            leadingDivider={false}
-            sections={['resource']}
-            idPrefix="replica"
-            lambdaArnPlaceholder={lambdaArnPlaceholderFor(replicaRegion?.label)}
-            bind:lambdaArn={
-              () => replicaLambdaArn,
-              (value) => (replica.lambdaArnOverride = value)
-            }
-            bind:agentCoreEndpointArn={
-              () => replicaAgentCoreArn,
-              (value) => (replica.agentCoreEndpointArnOverride = value)
-            }
-            bind:iamRoleArn={replica.iamRoleArn}
-            bind:roleExternalId={replica.roleExternalId}
-            bind:gcpProject={() => replicaProject, setReplicaProject}
-            bind:gcpRegion={replica.gcpRegion}
-            bind:gcpWorkerPool={replica.gcpWorkerPool}
-            bind:gcpServiceAccount={replica.gcpServiceAccount}
-            bind:minReplicas={replica.minReplicas}
-            bind:maxReplicas={replica.maxReplicas}
-            bind:initialReplicas={replica.initialReplicas}
-            bind:utilizationTarget={replica.utilizationTarget}
-            bind:scaleDownStabilization={replica.scaleDownStabilization}
-            bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
-            bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
-            bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
-            bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
-            errors={replicaErrors}
-          />
-          {#if sameRegionWarning}
-            <Alert intent="warning" title={sameRegionWarning} class="mt-3" />
-          {/if}
-          {#if isSuggested}
-            <p class="mt-2 text-xs text-secondary">
-              {translate('workers.region-arn-suggested-from-primary')}
-              <span class="font-medium text-primary">{replicaLabel}</span>.
-            </p>
-          {/if}
-          {#if inheritsPrimary}
-            <hr class="my-5 border-primary" />
-            <div class="flex flex-col items-start gap-3">
-              <p class="text-sm text-secondary">
-                {translate('workers.region-inherits-primary')}
-                {translate('workers.region-the-primary')}
-              </p>
-              <Button variant="tertiary" size="sm" onclick={customize}>
-                {translate('workers.region-customize')}
-              </Button>
-            </div>
-          {:else}
-            <ComputeFields
-              {provider}
-              sections={['access', 'scaling']}
-              idPrefix="replica"
-              bind:lambdaArn={
-                () => replicaLambdaArn,
-                (value) => (replica.lambdaArnOverride = value)
-              }
-              bind:agentCoreEndpointArn={
-                () => replicaAgentCoreArn,
-                (value) => (replica.agentCoreEndpointArnOverride = value)
-              }
-              bind:iamRoleArn={replica.iamRoleArn}
-              bind:roleExternalId={replica.roleExternalId}
-              bind:gcpProject={replica.gcpProject}
-              bind:gcpRegion={replica.gcpRegion}
-              bind:gcpWorkerPool={replica.gcpWorkerPool}
-              bind:gcpServiceAccount={replica.gcpServiceAccount}
-              bind:minReplicas={replica.minReplicas}
-              bind:maxReplicas={replica.maxReplicas}
-              bind:initialReplicas={replica.initialReplicas}
-              bind:utilizationTarget={replica.utilizationTarget}
-              bind:scaleDownStabilization={replica.scaleDownStabilization}
-              bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
-              bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
-              bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
-              bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
-              errors={replicaErrors}
-            />
-          {/if}
+          <div
+            class="flow-root"
+            in:slide={motion('reveal')}
+            out:slide={motion('conceal')}
+          >
+            {#key provider}
+              <div in:fade={motion('swap')}>
+                {@render serverError(replicaKey)}
+                <ComputeFields
+                  {provider}
+                  leadingDivider={false}
+                  sections={['resource']}
+                  idPrefix="replica"
+                  lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+                    replicaRegion?.label,
+                  )}
+                  bind:lambdaArn={
+                    () => replicaLambdaArn,
+                    (value) => (replica.lambdaArnOverride = value)
+                  }
+                  bind:agentCoreEndpointArn={
+                    () => replicaAgentCoreArn,
+                    (value) => (replica.agentCoreEndpointArnOverride = value)
+                  }
+                  bind:iamRoleArn={replica.iamRoleArn}
+                  bind:roleExternalId={replica.roleExternalId}
+                  bind:gcpProject={() => replicaProject, setReplicaProject}
+                  bind:gcpRegion={replica.gcpRegion}
+                  bind:gcpWorkerPool={replica.gcpWorkerPool}
+                  bind:gcpServiceAccount={replica.gcpServiceAccount}
+                  bind:minReplicas={replica.minReplicas}
+                  bind:maxReplicas={replica.maxReplicas}
+                  bind:initialReplicas={replica.initialReplicas}
+                  bind:utilizationTarget={replica.utilizationTarget}
+                  bind:scaleDownStabilization={replica.scaleDownStabilization}
+                  bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
+                  bind:scaleUpBacklogThreshold={replica.scaleUpBacklogThreshold}
+                  bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
+                  bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
+                  errors={replicaErrors}
+                />
+                <!-- Mounted while the replica shows, so a screen reader announces
+          the warning when it appears. -->
+                <div aria-live="polite">
+                  {#if shownSameRegionWarning}
+                    <div
+                      class="pt-3"
+                      in:slide={motion('reveal')}
+                      out:slide={motion('conceal')}
+                    >
+                      <Alert intent="warning" title={shownSameRegionWarning} />
+                    </div>
+                  {/if}
+                </div>
+                {#if isSuggested}
+                  <p
+                    class="mt-2 text-xs text-secondary"
+                    in:fade={motion('swap')}
+                  >
+                    {translate('workers.region-arn-suggested-from-primary')}
+                    <span class="font-medium text-primary">{replicaLabel}</span
+                    >.
+                  </p>
+                {/if}
+                {#if inheritsPrimary}
+                  <hr class="my-5 border-primary" />
+                  <div class="flex flex-col items-start gap-3">
+                    <p class="text-sm text-secondary">
+                      {translate('workers.region-inherits-primary')}
+                      {translate('workers.region-the-primary')}
+                    </p>
+                    <Button
+                      variant="tertiary"
+                      size="sm"
+                      onclick={customizeAndFocus}
+                    >
+                      {translate('workers.region-customize')}
+                    </Button>
+                  </div>
+                {:else}
+                  <div
+                    class="flow-root"
+                    bind:this={replicaSettings}
+                    in:slide={motion('reveal')}
+                  >
+                    <ComputeFields
+                      {provider}
+                      sections={['access', 'scaling']}
+                      idPrefix="replica"
+                      bind:lambdaArn={
+                        () => replicaLambdaArn,
+                        (value) => (replica.lambdaArnOverride = value)
+                      }
+                      bind:agentCoreEndpointArn={
+                        () => replicaAgentCoreArn,
+                        (value) =>
+                          (replica.agentCoreEndpointArnOverride = value)
+                      }
+                      bind:iamRoleArn={replica.iamRoleArn}
+                      bind:roleExternalId={replica.roleExternalId}
+                      bind:gcpProject={replica.gcpProject}
+                      bind:gcpRegion={replica.gcpRegion}
+                      bind:gcpWorkerPool={replica.gcpWorkerPool}
+                      bind:gcpServiceAccount={replica.gcpServiceAccount}
+                      bind:minReplicas={replica.minReplicas}
+                      bind:maxReplicas={replica.maxReplicas}
+                      bind:initialReplicas={replica.initialReplicas}
+                      bind:utilizationTarget={replica.utilizationTarget}
+                      bind:scaleDownStabilization={
+                        replica.scaleDownStabilization
+                      }
+                      bind:scaleUpCooloffMs={replica.scaleUpCooloffMs}
+                      bind:scaleUpBacklogThreshold={
+                        replica.scaleUpBacklogThreshold
+                      }
+                      bind:maxWorkerLifetimeMs={replica.maxWorkerLifetimeMs}
+                      bind:metricsPollIntervalMs={replica.metricsPollIntervalMs}
+                      errors={replicaErrors}
+                    />
+                  </div>
+                {/if}
+              </div>
+            {/key}
+          </div>
         {:else}
-          <p class="text-sm text-secondary">
+          <p
+            class="text-sm text-secondary"
+            in:slide={motion('reveal')}
+            out:slide={motion('conceal')}
+          >
             {translate('workers.high-availability-off')}
           </p>
         {/if}

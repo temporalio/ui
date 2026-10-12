@@ -278,8 +278,10 @@ export const Strings = {
   'regions-section': 'Regions',
   'region-runs-anywhere':
     'Serverless Workers use these resources wherever the Namespace is active.',
+  // Kept no longer than region-runs-anywhere, so turning high availability on
+  // cannot wrap the line and move the toggle the user just used.
   'regions-run-in':
-    "Serverless Workers use these resources, and the replica's after a failover to {{replica}}.",
+    'Serverless Workers use the replica after a failover to {{replica}}.',
   'preview-title': 'Preview',
   'preview-description': 'Where Temporal sends Tasks.',
   'preview-namespace': 'Namespace',
