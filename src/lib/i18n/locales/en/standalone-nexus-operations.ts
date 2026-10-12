@@ -68,7 +68,6 @@ export const Strings = {
   'cancellation-state': 'Cancellation State',
   'cancellation-reason': 'Reason',
   'nexus-header': 'Nexus Header',
-  'operation-event-history': 'Operation Event History',
   'run-details-section': 'Run Details',
   'operation-details-section': 'Operation Details',
   'attempt-section': 'Attempt',

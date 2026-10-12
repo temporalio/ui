@@ -86,7 +86,7 @@
     isPending={info.status === 'NEXUS_OPERATION_EXECUTION_STATUS_RUNNING'}
   />
   <Card class="space-y-6">
-    <h5>{translate('standalone-nexus-operations.operation-event-history')}</h5>
+    <h5 class="break-all">{info.operationId}</h5>
 
     <div class="space-y-4">
       <h5 class="text-secondary">
