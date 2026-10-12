@@ -226,6 +226,7 @@
         bind:value={lambdaArn}
         id={fieldId('lambdaArn')}
         name={fieldId('lambdaArn')}
+        spellcheck={false}
         label={translate('workers.lambda-arn-label')}
         hintText={errors.lambdaArn?.[0]}
         error={!!errors.lambdaArn?.[0]}
@@ -249,6 +250,7 @@
         bind:value={agentCoreEndpointArn}
         id={fieldId('agentCoreEndpointArn')}
         name={fieldId('agentCoreEndpointArn')}
+        spellcheck={false}
         label={translate('workers.agentcore-endpoint-arn-label')}
         hintText={errors.agentCoreEndpointArn?.[0] ||
           translate('workers.agentcore-endpoint-arn-hint')}
@@ -338,6 +340,7 @@
         bind:value={iamRoleArn}
         id={fieldId('iamRoleArn')}
         name={fieldId('iamRoleArn')}
+        spellcheck={false}
         label={translate('workers.iam-role-label')}
         hintText={errors.iamRoleArn?.[0] || translate('workers.iam-role-hint')}
         error={!!errors.iamRoleArn?.[0]}

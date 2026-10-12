@@ -355,8 +355,9 @@
   />
 
   <div class="flex flex-col gap-4">
-    <!-- The primary saves as the unscoped default group, so its only region is
-    the one its resource names. The header shows it once there is one. -->
+    <!-- Both headers name where a resource runs, once it gives a region. The
+    replica's group is scoped to the Namespace's replica either way; the
+    Regions line and the Replica tooltip say which. -->
     <RegionBlock
       region={primaryResourceRegion
         ? {
@@ -398,7 +399,14 @@
 
     {#if replicaRegion}
       <RegionBlock
-        region={replicated ? replicaRegion : undefined}
+        region={replicated && replicaResourceRegion
+          ? {
+              id: replicaKey,
+              role: 'replica',
+              label: replicaResourceRegion,
+              provider,
+            }
+          : undefined}
         title={translate('workers.region-role-replica')}
         showRole
         roleTooltip={translate('workers.region-role-replica-tooltip', {
