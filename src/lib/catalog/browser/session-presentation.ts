@@ -1,5 +1,7 @@
-import type { BadgeStatusValue } from '$lib/io/badge-status';
+import type { BadgeStatusValue } from '$lib/io/badge-status/badge-status.svelte';
+import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
+import type { CatalogSession, CatalogSessionState } from './session-store';
 import type { ExecutionTerminalStatus } from './workbench-host';
 
 type TerminalStatusPresentation = {
@@ -25,3 +27,39 @@ const terminalStatusPresentations: Record<
 export const terminalStatusPresentation = (
   status: ExecutionTerminalStatus,
 ): TerminalStatusPresentation => terminalStatusPresentations[status];
+
+export interface LatestRunPresentation {
+  label: string;
+  status?: BadgeStatusValue;
+}
+
+const sessionStateLabels: Record<CatalogSessionState, string> = {
+  'execution-terminal': 'Finished',
+  'launch-rejected': 'Launch rejected',
+  'launch-uncertain': 'Launch uncertain',
+  'observation-paused': 'Observation paused',
+  observing: 'Running',
+  starting: 'Starting',
+  stopped: 'Stopped',
+};
+
+export const latestRunPresentation = ({
+  state,
+  terminalStatus,
+}: Pick<CatalogSession, 'state' | 'terminalStatus'>): LatestRunPresentation => {
+  if (state === 'execution-terminal' && terminalStatus) {
+    return terminalStatusPresentation(terminalStatus);
+  }
+
+  return { label: sessionStateLabels[state] };
+};
+
+export const relativeRunTime = (createdAt: number, now: number): string => {
+  const distance = formatDistanceAbbreviated({
+    start: createdAt,
+    end: now,
+    flexibleUnits: true,
+  });
+
+  return distance ? `${distance} ago` : 'just now';
+};

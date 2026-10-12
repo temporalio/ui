@@ -144,6 +144,8 @@
   import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
+  import { catalogKinds } from './catalog-kinds';
+  import { featureLabel } from './catalog-list-state';
   import { launchOutcomeExplanation } from './launch-outcome-presentation';
   import { createReadinessLoader } from './readiness-loader';
   import { terminalStatusPresentation } from './session-presentation';
@@ -351,17 +353,8 @@
 
   const formatJson = (value: JsonValue) => JSON.stringify(value, null, 2);
 
-  const executionKindLabels: Record<
-    BrowserCatalogDescriptor['execution']['kind'],
-    string
-  > = {
-    workflow: 'Workflow',
-    'standalone-activity': 'Standalone Activity',
-    'standalone-nexus-operation': 'Standalone Nexus Operation',
-  };
-
   let executionKindLabel = $derived(
-    executionKindLabels[descriptor.execution.kind],
+    catalogKinds[descriptor.execution.kind].label,
   );
 
   const sessionStateLabels: Record<CatalogSessionState, string> = {
@@ -759,7 +752,7 @@
         {#if capabilityTags.length}
           <ul class="flex flex-wrap gap-2" aria-label="Capabilities">
             {#each capabilityTags as capability (capability)}
-              <li><Tag text={capability} Icon={null} /></li>
+              <li><Tag text={featureLabel(capability)} Icon={null} /></li>
             {/each}
           </ul>
         {/if}

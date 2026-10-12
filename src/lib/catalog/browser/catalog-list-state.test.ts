@@ -1,72 +1,42 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  capabilityTagLabel,
+  activeCatalogFilters,
+  type CatalogFacetOption,
   catalogFacets,
   type CatalogFilters,
-  catalogKind,
+  changePendingRunCount,
+  clearCatalogFilter,
+  clearCatalogFilters,
   emptyCatalogFilters,
+  featureLabel,
+  toggleCatalogFilter,
 } from './catalog-list-state';
-import type {
-  BrowserCatalogDescriptor,
-  BrowserCatalogExecution,
-} from './types';
+import {
+  activityExecution,
+  nexusOperationExecution,
+  testDescriptor,
+  workflowExecution,
+} from './catalog-test-descriptors';
+import type { BrowserCatalogDescriptor } from './types';
 
-const target = {
-  targetId: 'catalog',
-  namespace: 'default',
-  taskQueue: 'catalog-tasks',
-};
-
-const descriptor = (
-  id: string,
-  execution: BrowserCatalogExecution,
-  capabilityTags: string[] = [],
-  source = { id: 'oss', label: 'OSS' },
-): BrowserCatalogDescriptor => ({
-  id,
-  source,
-  title: id,
-  description: '',
-  capabilityTags,
-  expectedEvidence: [],
-  input: { defaultValue: [], schema: {} },
-  startOptions: { defaultValue: {}, schema: {} },
-  execution,
-});
-
-const workflow = descriptor(
-  'workflow',
-  { ...target, kind: 'workflow', workflowType: 'Workflow' },
-  ['activities', 'retries'],
-);
-const localWorkflow = descriptor(
+const workflow = testDescriptor('workflow', workflowExecution(), [
+  'activities',
+  'retries',
+]);
+const localWorkflow = testDescriptor(
   'local-workflow',
-  { ...target, kind: 'workflow', workflowType: 'LocalWorkflow' },
+  workflowExecution('LocalWorkflow'),
   ['signals'],
   { id: 'local', label: 'Local' },
 );
-const activity = descriptor(
-  'activity',
-  {
-    ...target,
-    kind: 'standalone-activity',
-    activityType: 'activity',
-    timeouts: {},
-    policies: {},
-  },
-  ['activities', 'standalone'],
-);
-const nexusOperation = descriptor(
+const activity = testDescriptor('activity', activityExecution, [
+  'activities',
+  'standalone',
+]);
+const nexusOperation = testDescriptor(
   'nexus-operation',
-  {
-    ...target,
-    kind: 'standalone-nexus-operation',
-    endpoint: 'catalog-endpoint',
-    service: 'service',
-    operation: 'operation',
-    policies: {},
-  },
+  nexusOperationExecution,
   ['nexus', 'standalone', 'retries'],
 );
 
@@ -77,32 +47,38 @@ const sources = [
 ];
 const facets = (filters: Partial<CatalogFilters>) =>
   catalogFacets(all, sources, { ...emptyCatalogFilters, ...filters });
-const counts = (options: { id: string; count: number }[]) =>
-  Object.fromEntries(options.map(({ id, count }) => [id, count]));
+const counts = (options: CatalogFacetOption[]) =>
+  Object.fromEntries(options.map(({ id, count }) => [id ?? 'all', count]));
 const ids = (descriptors: BrowserCatalogDescriptor[]) =>
   descriptors.map(({ id }) => id);
 
 describe('catalogFacets', () => {
   it('returns every example and full counts without filters', () => {
-    const result = facets({});
+    const { options, descriptors } = facets({});
 
-    expect(ids(result.descriptors)).toEqual(ids(all));
-    expect(counts(result.kinds)).toEqual({
+    expect(ids(descriptors)).toEqual(ids(all));
+    expect(counts(options.kind)).toEqual({
       all: 4,
       workflow: 2,
       'standalone-activity': 1,
       'standalone-nexus-operation': 1,
     });
-    expect(counts(result.sources)).toEqual({ all: 4, oss: 3, local: 1 });
+    expect(counts(options.source)).toEqual({ all: 4, oss: 3, local: 1 });
   });
 
   it('orders features by count, then by label', () => {
-    expect(facets({}).features.map(({ id, count }) => [id, count])).toEqual([
-      ['activities', 2],
-      ['retries', 2],
-      ['standalone', 2],
-      ['nexus', 1],
-      ['signals', 1],
+    expect(
+      facets({}).options.feature.map(({ id, label, count }) => [
+        id,
+        label,
+        count,
+      ]),
+    ).toEqual([
+      ['activities', 'Activities', 2],
+      ['retries', 'Retries', 2],
+      ['standalone', 'Standalone', 2],
+      ['nexus', 'Nexus', 1],
+      ['signals', 'Signals', 1],
     ]);
   });
 
@@ -111,12 +87,12 @@ describe('catalogFacets', () => {
       'workflow',
       'local-workflow',
     ]);
-    expect(ids(facets({ tag: 'retries' }).descriptors)).toEqual([
+    expect(ids(facets({ feature: 'retries' }).descriptors)).toEqual([
       'workflow',
       'nexus-operation',
     ]);
     expect(
-      ids(facets({ kind: 'workflow', tag: 'retries' }).descriptors),
+      ids(facets({ kind: 'workflow', feature: 'retries' }).descriptors),
     ).toEqual(['workflow']);
     expect(ids(facets({ source: 'local' }).descriptors)).toEqual([
       'local-workflow',
@@ -124,55 +100,117 @@ describe('catalogFacets', () => {
   });
 
   it("ignores a facet's own selection when it counts that facet", () => {
-    const result = facets({ kind: 'workflow', tag: 'retries' });
+    const { options } = facets({ kind: 'workflow', feature: 'retries' });
 
-    expect(counts(result.kinds)).toEqual({
+    expect(counts(options.kind)).toEqual({
       all: 2,
       workflow: 1,
       'standalone-activity': 0,
       'standalone-nexus-operation': 1,
     });
-    expect(counts(result.features)).toEqual({
+    expect(counts(options.feature)).toEqual({
       activities: 1,
       retries: 1,
       signals: 1,
     });
-    expect(counts(result.sources)).toEqual({ all: 1, oss: 1, local: 0 });
+    expect(counts(options.source)).toEqual({ all: 1, oss: 1, local: 0 });
   });
 
   it('keeps the selected feature visible when nothing else matches it', () => {
-    const result = facets({ tag: 'signals', source: 'oss' });
+    const { options, descriptors } = facets({
+      feature: 'signals',
+      source: 'oss',
+    });
 
-    expect(result.descriptors).toEqual([]);
-    expect(counts(result.features)).toMatchObject({ signals: 0 });
+    expect(descriptors).toEqual([]);
+    expect(counts(options.feature)).toMatchObject({ signals: 0 });
   });
 
-  it('applies search before it counts', () => {
-    const result = facets({ query: '  NEXUS ' });
+  it('searches titles, kind labels, and feature labels before it counts', () => {
+    const byKind = facets({ query: '  STANDALONE ACTIVITY ' });
+    expect(ids(byKind.descriptors)).toEqual(['activity']);
+    expect(counts(byKind.options.kind)).toMatchObject({ all: 1, workflow: 0 });
 
-    expect(ids(result.descriptors)).toEqual(['nexus-operation']);
-    expect(counts(result.kinds)).toMatchObject({ all: 1, workflow: 0 });
-  });
-});
-
-describe('catalogKind', () => {
-  it('labels Nexus operations by endpoint and other kinds by task queue', () => {
-    expect(
-      [workflow, activity, nexusOperation].map((d) => {
-        const { locationHeader, location } = catalogKind(d.execution.kind);
-        return [locationHeader, location(d)];
-      }),
-    ).toEqual([
-      ['Task Queue', 'catalog-tasks'],
-      ['Task Queue', 'catalog-tasks'],
-      ['Endpoint', 'catalog-endpoint'],
+    expect(ids(facets({ query: 'nexus' }).descriptors)).toEqual([
+      'nexus-operation',
     ]);
   });
 });
 
-describe('capabilityTagLabel', () => {
-  it('turns a tag slug into a sentence-case label', () => {
-    expect(capabilityTagLabel('child-workflows')).toBe('Child workflows');
-    expect(capabilityTagLabel('Workflow')).toBe('Workflow');
+describe('catalog filter changes', () => {
+  it('selects a value, and clears it when the same value is chosen again', () => {
+    const selected = toggleCatalogFilter(
+      emptyCatalogFilters,
+      'kind',
+      'workflow',
+    );
+
+    expect(selected.kind).toBe('workflow');
+    expect(toggleCatalogFilter(selected, 'kind', 'workflow').kind).toBeNull();
+    expect(toggleCatalogFilter(selected, 'kind', null).kind).toBeNull();
+  });
+
+  it('clears one filter or all filters, and keeps the search query', () => {
+    const filters: CatalogFilters = {
+      query: 'retry',
+      kind: 'workflow',
+      feature: 'retries',
+      source: 'oss',
+    };
+
+    expect(clearCatalogFilter(filters, 'feature')).toEqual({
+      ...filters,
+      feature: null,
+    });
+    expect(clearCatalogFilters(filters)).toEqual({
+      ...emptyCatalogFilters,
+      query: 'retry',
+    });
+  });
+});
+
+describe('activeCatalogFilters', () => {
+  it('labels each selected filter from its facet option, in facet order', () => {
+    const filters: CatalogFilters = {
+      ...emptyCatalogFilters,
+      source: 'local',
+      kind: 'standalone-nexus-operation',
+      feature: 'child-workflows',
+    };
+
+    expect(activeCatalogFilters(facets(filters), filters)).toEqual([
+      { key: 'kind', label: 'Standalone Nexus Operation' },
+      { key: 'feature', label: 'Child workflows' },
+      { key: 'source', label: 'Local' },
+    ]);
+  });
+
+  it('returns nothing without filters', () => {
+    expect(activeCatalogFilters(facets({}), emptyCatalogFilters)).toEqual([]);
+  });
+});
+
+describe('featureLabel', () => {
+  it('turns a feature slug into a sentence-case label', () => {
+    expect(featureLabel('child-workflows')).toBe('Child workflows');
+    expect(featureLabel('Workflow')).toBe('Workflow');
+  });
+});
+
+describe('changePendingRunCount', () => {
+  it('tracks overlapping runs per example and drops finished examples', () => {
+    const first = changePendingRunCount({}, 'shared-order', 1);
+    const overlapping = changePendingRunCount(
+      changePendingRunCount(first, 'shared-order', 1),
+      'local-order',
+      1,
+    );
+
+    expect(changePendingRunCount(overlapping, 'shared-order', -1)).toEqual({
+      'shared-order': 1,
+      'local-order': 1,
+    });
+    expect(changePendingRunCount(first, 'shared-order', -1)).toEqual({});
+    expect(changePendingRunCount({}, 'missing', -1)).toEqual({});
   });
 });

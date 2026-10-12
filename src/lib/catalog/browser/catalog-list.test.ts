@@ -1,8 +1,6 @@
 // @vitest-environment node
 
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { resolve } from 'node:path';
 
 import type { render } from 'svelte/server';
 
@@ -14,7 +12,6 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { startIsolatedViteServer } from '$lib/test-utilities/isolated-vite-server';
 
 import { catalogHarnessSetupTimeoutMs } from './catalog-harness-timeout';
-import { changePendingRunCount } from './catalog-list-state';
 import { createCatalogSessionStore } from './session-store';
 import type { BrowserCatalogDescriptor } from './types';
 import type { WorkbenchHost } from './workbench-host';
@@ -98,7 +95,6 @@ describe('CatalogList', () => {
 
     expect(body).toContain('aria-label="Catalog examples"');
     expect(body).toContain('No examples match the current filters.');
-    expect(body).toMatch(/<strong[^>]*>0<\/strong> of 0\s+examples/);
   });
 
   it('renders each example with its kind, location, source, features, run, and actions', () => {
@@ -114,85 +110,14 @@ describe('CatalogList', () => {
 
     expect(body).toContain('Order lifecycle');
     expect(body).toContain('Start and inspect an order workflow.');
-    expect(body).toMatch(
-      /bg-action-workflow-overlay[^"]*"[^>]*>(?:<!--[^>]*-->|\s)*<span[^>]*bg-action-workflow[^>]*><\/span>(?:<!--[^>]*-->|\s)*Workflow<\/span>/,
-    );
-    expect(body).toMatch(/Task Queue\s*<span[^>]*font-mono[^>]*>catalog-tasks/);
-    expect(body).toContain('<span>OSS</span>');
-    expect(body).toMatch(
-      /<button[^>]*class="catalog-tag[^"]*"[^>]*aria-pressed="false"[^>]*>Child workflows<\/button>/,
-    );
+    expect(body).toContain('data-testid="catalog-kind-badge"');
+    expect(body).toContain('Task Queue');
+    expect(body).toContain('catalog-tasks');
+    expect(body).toContain('OSS');
+    expect(body).toContain('Child workflows');
     expect(body.match(/Not run/g)).toHaveLength(1);
     expect(body).toContain('>Start<');
     expect(body).toContain('Configure');
-  });
-
-  it('shows kind, feature, and source facets with counts', () => {
-    const sessionStore = createCatalogSessionStore(host);
-    const { body } = renderComponent(catalogList, {
-      props: { descriptors: [descriptor], host, sessionStore, exampleHref },
-    });
-    const nav = body
-      .split('aria-label="Filter examples"')[1]
-      ?.split('</nav>')[0];
-
-    expect(nav).toContain('Execution kind');
-    expect(nav).toContain('Feature');
-    expect(nav).toContain('Source');
-    expect(nav).toMatch(/All kinds<\/span>\s*<span[^>]*>1<\/span>/);
-    expect(nav).toMatch(
-      /Standalone Nexus Operation<\/span>\s*<span[^>]*>0<\/span>/,
-    );
-    expect(nav).toMatch(/OSS<\/span>\s*<span[^>]*>1<\/span>/);
-  });
-
-  it('lists standalone Nexus operation examples with workflows and labels them by endpoint', () => {
-    const nexusDescriptor: BrowserCatalogDescriptor = {
-      ...descriptor,
-      id: 'slow-nexus-operation',
-      title: 'Slow Nexus operation',
-      execution: {
-        kind: 'standalone-nexus-operation',
-        targetId: 'catalog',
-        namespace: 'default',
-        taskQueue: 'catalog-tasks',
-        endpoint: 'catalog-endpoint',
-        service: 'catalog-service',
-        operation: 'slowGreeting',
-        policies: {},
-      },
-    };
-    const sessionStore = createCatalogSessionStore(host);
-    const { body } = renderComponent(catalogList, {
-      props: {
-        descriptors: [nexusDescriptor, descriptor],
-        host,
-        sessionStore,
-        exampleHref,
-      },
-    });
-    const list = body.split('aria-label="Catalog examples"')[1] ?? '';
-
-    expect(body.match(/<ul/g)).toHaveLength(1);
-    expect(list.indexOf('Slow Nexus operation')).toBeLessThan(
-      list.indexOf('Order lifecycle'),
-    );
-    expect(list).toMatch(
-      /bg-action-nexus-overlay[^"]*"[^>]*>(?:<!--[^>]*-->|\s)*<span[^>]*bg-action-nexus[^>]*><\/span>(?:<!--[^>]*-->|\s)*Standalone Nexus Operation<\/span>/,
-    );
-    expect(list).toMatch(/Endpoint\s*<span[^>]*>catalog-endpoint/);
-  });
-
-  it('keeps the example name readable on small screens', () => {
-    const sessionStore = createCatalogSessionStore(host);
-    const { body } = renderComponent(catalogList, {
-      props: { descriptors: [descriptor], host, sessionStore, exampleHref },
-    });
-
-    expect(body).toMatch(
-      /<a[^>]*class="[^"]*break-words[^"]*"[^>]*>[\s\S]*?Order lifecycle[\s\S]*?<\/a>/,
-    );
-    expect(body).not.toMatch(/<a[^>]*class="[^"]*table-link[^"]*truncate/);
   });
 
   it('uses the host-provided href for the workflow title link', () => {
@@ -294,64 +219,5 @@ describe('CatalogList', () => {
 
     expect(body).toContain('Launch rejected');
     expect(body).not.toContain('>launch-rejected<');
-  });
-
-  it('derives source filter controls and source labels from supplied descriptors', () => {
-    const source = readFileSync(
-      resolve('src/lib/catalog/browser/catalog-list.svelte'),
-      'utf8',
-    );
-
-    expect(source).toContain('catalog-search');
-    expect(source).toContain('descriptor.source.label');
-    expect(source).not.toContain("['all', 'shared', 'local']");
-    expect(source).toContain('exampleHref: (exampleId: string) => string;');
-    expect(source).not.toContain('routeForCatalogExample');
-    expect(
-      source.match(/href=\{exampleHref\(descriptor\.id\)\}/g),
-    ).toHaveLength(2);
-    expect(source).toContain('startWithDefaults');
-    expect(source).toContain('sessionStore.latest');
-    expect(source).not.toContain('Textarea');
-    expect(source).not.toContain('JSON.stringify(');
-  });
-
-  it('uses client navigation when opening a workflow from its title', () => {
-    const source = readFileSync(
-      resolve('src/lib/catalog/browser/catalog-list.svelte'),
-      'utf8',
-    );
-
-    expect(source).toContain("import Link from '$lib/holocene/link.svelte';");
-    expect(source).toMatch(
-      /<Link\s+class="table-link block break-words text-sm font-medium text-primary"\s+href=\{exampleHref\(descriptor\.id\)\}/,
-    );
-  });
-
-  it('tracks overlapping quick runs per example without disabling repeat runs', () => {
-    const source = readFileSync(
-      resolve('src/lib/catalog/browser/catalog-list.svelte'),
-      'utf8',
-    );
-    const firstRun = changePendingRunCount({}, 'shared-order', 1);
-    const overlappingRuns = changePendingRunCount(
-      changePendingRunCount(firstRun, 'shared-order', 1),
-      'local-order',
-      1,
-    );
-    const oneSharedRunFinished = changePendingRunCount(
-      overlappingRuns,
-      'shared-order',
-      -1,
-    );
-
-    expect(oneSharedRunFinished).toEqual({
-      'shared-order': 1,
-      'local-order': 1,
-    });
-    expect(source).toContain('pendingRunCount(descriptor.id)');
-    expect(source).toContain('pointer-events-none absolute');
-    expect(source).toContain('Start (${pending} pending)');
-    expect(source).not.toContain('disabled={runningExampleId');
   });
 });

@@ -172,9 +172,11 @@ export async function resolveReadiness(checks: ReadinessCheck[]) {
 }
 
 export async function renderList({
+  descriptors = [descriptor, localDescriptor, cloudDescriptor],
   exampleHref = (exampleId: string) => `/examples/${exampleId}`,
   workerState = 'ready',
 }: {
+  descriptors?: BrowserCatalogDescriptor[];
   exampleHref?: (exampleId: string) => string;
   workerState?: ReadinessCheck['state'];
 } = {}) {
@@ -196,7 +198,7 @@ export async function renderList({
     mount(CatalogList, {
       target,
       props: {
-        descriptors: [descriptor, localDescriptor, cloudDescriptor],
+        descriptors,
         host,
         sessionStore: createCatalogSessionStore(host),
         exampleHref,

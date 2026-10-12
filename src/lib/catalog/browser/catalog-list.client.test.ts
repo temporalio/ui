@@ -5,6 +5,11 @@ import {
   getCatalogClientTestRunner,
 } from './catalog-client-test-runner';
 import { catalogHarnessSetupTimeoutMs } from './catalog-harness-timeout';
+import {
+  nexusOperationExecution,
+  testDescriptor,
+  workflowExecution,
+} from './catalog-test-descriptors';
 
 describe('CatalogList client interactions', () => {
   let client: Awaited<ReturnType<typeof getCatalogClientTestRunner>>;
@@ -119,7 +124,7 @@ describe('CatalogList client interactions', () => {
     const target = await client.renderList();
     await client.flush();
 
-    facet(target, 'Standalone Activity')?.click();
+    facet(target, 'Standalone Activity', '[data-facet="kind"]')?.click();
     client.flushSync();
     expect(summary(target)).toMatch(/^0 of 3 examples Standalone Activity/);
     expect(target.textContent).toContain(
@@ -133,24 +138,30 @@ describe('CatalogList client interactions', () => {
     client.flushSync();
     expect(summary(target)).toBe('3 of 3 examples');
 
-    const tag = buttons(target, '.catalog-tag').find(
-      (candidate) => candidate.textContent?.trim() === 'Workflow',
-    );
+    const tag = buttons(
+      target,
+      '[aria-label="Order lifecycle features"] button',
+    ).find((candidate) => candidate.textContent?.trim() === 'Workflow');
     tag?.click();
     client.flushSync();
     expect(tag?.getAttribute('aria-pressed')).toBe('true');
     expect(
-      facet(target, 'Workflow', 'fieldset:nth-of-type(2)')?.getAttribute(
+      facet(target, 'Workflow', '[data-facet="feature"]')?.getAttribute(
         'aria-pressed',
       ),
     ).toBe('true');
     expect(
-      facet(target, 'Workflow', 'fieldset:nth-of-type(1)')?.getAttribute(
+      facet(target, 'Workflow', '[data-facet="kind"]')?.getAttribute(
         'aria-pressed',
       ),
     ).toBe('false');
 
     facet(target, 'Local')?.click();
+    client.flushSync();
+    facet(target, 'Workflow', '[data-facet="feature"]')?.click();
+    client.flushSync();
+    expect(summary(target)).toBe('1 of 3 examples Local Clear filters');
+    facet(target, 'Workflow', '[data-facet="feature"]')?.click();
     client.flushSync();
     expect(summary(target)).toMatch(/^1 of 3 examples Workflow Local/);
 
@@ -159,6 +170,42 @@ describe('CatalogList client interactions', () => {
       ?.click();
     client.flushSync();
     expect(summary(target)).toBe('3 of 3 examples');
+  });
+
+  it('shows the kind, location, and source of each example', async () => {
+    const target = await client.renderList({
+      descriptors: [
+        testDescriptor('order-workflow', workflowExecution(), ['retries']),
+        testDescriptor('slow-nexus', nexusOperationExecution, [
+          'child-workflows',
+        ]),
+      ],
+    });
+    await client.flush();
+    const rows = Array.from(
+      target.querySelectorAll('[data-testid="catalog-example"]'),
+    );
+    const text = (row: Element, testId: string) =>
+      row
+        .querySelector(`[data-testid="${testId}"]`)
+        ?.textContent?.replace(/\s+/g, ' ')
+        .trim();
+
+    expect(rows.map((row) => text(row, 'catalog-kind-badge'))).toEqual([
+      'Workflow',
+      'Standalone Nexus Operation',
+    ]);
+    expect(rows.map((row) => text(row, 'catalog-location'))).toEqual([
+      'Task Queue catalog-tasks',
+      'Endpoint catalog-endpoint',
+    ]);
+    expect(rows.map((row) => text(row, 'catalog-source'))).toEqual([
+      'OSS',
+      'OSS',
+    ]);
+    expect(rows[1]?.textContent).toContain('Child workflows');
+    expect(facetCount(target, 'Standalone Nexus Operation')).toBe('1');
+    expect(facetCount(target, 'Standalone Activity')).toBe('0');
   });
 
   it('uses the host-provided href for the Configure action', async () => {
