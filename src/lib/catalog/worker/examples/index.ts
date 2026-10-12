@@ -24,13 +24,14 @@ import { catalogExample as example16 } from './sequential-no-summary-activities/
 import { catalogExample as example17 } from './sequential-plain-text-activities/example.js';
 import { catalogExample as example18 } from './signal-collector/example.js';
 import { catalogExample as example19 } from './signal-handlers/example.js';
-import { catalogExample as example20 } from './standalone-activity/example.js';
-import { catalogExample as example21 } from './timeline-kitchen-sink/example.js';
-import { catalogExample as example22 } from './timeline-kitchen-sink-long-running/example.js';
-import { catalogExample as example23 } from './timeline-live/example.js';
-import { catalogExample as example24 } from './timeline-performance/example.js';
-import { catalogExample as example25 } from './timer-driven-repetition/example.js';
-import { catalogExample as example26 } from './workflow-patching/example.js';
+import { catalogExample as example20 } from './slow-nexus-operation/example.js';
+import { catalogExample as example21 } from './standalone-activity/example.js';
+import { catalogExample as example22 } from './timeline-kitchen-sink/example.js';
+import { catalogExample as example23 } from './timeline-kitchen-sink-long-running/example.js';
+import { catalogExample as example24 } from './timeline-live/example.js';
+import { catalogExample as example25 } from './timeline-performance/example.js';
+import { catalogExample as example26 } from './timer-driven-repetition/example.js';
+import { catalogExample as example27 } from './workflow-patching/example.js';
 
 const sharedWorkflowDefinitions = [
   example0,
@@ -60,6 +61,7 @@ const sharedWorkflowDefinitions = [
   example24,
   example25,
   example26,
+  example27,
 ] satisfies readonly CatalogExampleDefinition[];
 
 export const sharedWorkflowExamples: readonly CatalogExampleRegistration[] =
@@ -154,6 +156,9 @@ export const sharedWorkflowSourceFiles = [
   'src/lib/catalog/worker/examples/signal-handlers/activity.ts',
   'src/lib/catalog/worker/examples/signal-handlers/example.ts',
   'src/lib/catalog/worker/examples/signal-handlers/workflow.ts',
+  'src/lib/catalog/worker/examples/slow-nexus-operation/example.ts',
+  'src/lib/catalog/worker/examples/slow-nexus-operation/handler.ts',
+  'src/lib/catalog/worker/examples/slow-nexus-operation/service.ts',
   'src/lib/catalog/worker/examples/standalone-activity/activity.ts',
   'src/lib/catalog/worker/examples/standalone-activity/example.ts',
   'src/lib/catalog/worker/examples/timeline-kitchen-sink/activity.ts',

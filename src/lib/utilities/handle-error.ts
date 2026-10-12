@@ -5,6 +5,7 @@ import { BROWSER } from 'esm-env';
 import { page } from '$app/stores';
 
 import { networkError } from '$lib/stores/error';
+import { lastUsedNamespace } from '$lib/stores/namespaces';
 import { toaster } from '$lib/stores/toaster';
 import type { NetworkError } from '$lib/types/global';
 
@@ -16,6 +17,9 @@ import { routeForAuthenticationRedirect, routeForLoginPage } from './route-for';
 interface NetworkErrorWithReport extends NetworkError {
   report?: boolean;
 }
+
+export const FORBIDDEN_ERROR_MESSAGE =
+  'You are signed in, but you do not have permission to access this Temporal resource. Ask your administrator for access.';
 
 export const handleError = (
   error: unknown,
@@ -42,7 +46,7 @@ export const handleError = (
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForCurrentAuthSettings());
+    redirectForbidden();
   }
 
   if (isNetworkError(error)) {
@@ -67,7 +71,7 @@ export const handleUnauthorizedOrForbiddenError = (
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForCurrentAuthSettings());
+    redirectForbidden();
     return;
   }
 };
@@ -101,6 +105,14 @@ const hasStatusCode = (
   }
 
   return false;
+};
+
+const redirectForbidden = (): void => {
+  const settings = get(page)?.data?.settings;
+  if (settings && !settings.auth) return;
+
+  lastUsedNamespace.set('default');
+  window.location.assign(routeForLoginPage(FORBIDDEN_ERROR_MESSAGE));
 };
 
 const routeForCurrentAuthSettings = (): string => {
