@@ -243,16 +243,8 @@
     {@render resultsBlock(decoded.results)}
   {:else if decoded?.status === 'error'}
     {@render errorBlock(decoded.error, decoded.retry)}
-  {:else if decoded}
-    <CodeBlock
-      content={translate('common.loading')}
-      {label}
-      language="text"
-      copyable={false}
-      {disableMaximize}
-      {maxHeight}
-      {testId}
-    />
+  {:else if decoded?.status === 'loading'}
+    {@render encodedBlock()}
   {:else}
     <PayloadDecoder {value}>
       {#snippet loading()}{@render encodedBlock()}{/snippet}

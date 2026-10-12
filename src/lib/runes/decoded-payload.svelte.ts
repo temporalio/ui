@@ -38,7 +38,15 @@ export function createDecodedPayload(
       const results = await decodePayloadResult(value);
       if (id === request) state = { status: 'success', results };
     } catch (error) {
-      if (id === request) state = { status: 'error', error, retry: decode };
+      if (id === request) {
+        state = {
+          status: 'error',
+          error,
+          retry: () => {
+            if (id === request) decode();
+          },
+        };
+      }
     }
   };
 

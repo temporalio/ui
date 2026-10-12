@@ -169,4 +169,41 @@ describe('createDecodedPayload', () => {
     );
     expect(mockDecode).toHaveBeenCalledTimes(2);
   });
+
+  it('ignores a retry after teardown', async () => {
+    mockDecode.mockRejectedValueOnce(new Error('codec unavailable'));
+    const setupResult = setup(payloads('a'));
+    await vi.waitFor(() =>
+      expect(setupResult.decoded.current.status).toBe('error'),
+    );
+    const state = setupResult.decoded.current;
+    setupResult.cleanup();
+    if (state.status === 'error') state.retry();
+    expect(mockDecode).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores a retry from a previous value', async () => {
+    mockDecode
+      .mockRejectedValueOnce(new Error('codec unavailable'))
+      .mockResolvedValueOnce(results('b'));
+    const setupResult = setup(payloads('a'));
+    cleanup = setupResult.cleanup;
+    await vi.waitFor(() =>
+      expect(setupResult.decoded.current.status).toBe('error'),
+    );
+    const staleState = setupResult.decoded.current;
+    setupResult.setValue(payloads('b'));
+    await vi.waitFor(() =>
+      expect(setupResult.decoded.current).toEqual({
+        status: 'success',
+        results: results('b'),
+      }),
+    );
+    if (staleState.status === 'error') staleState.retry();
+    expect(mockDecode).toHaveBeenCalledTimes(2);
+    expect(setupResult.decoded.current).toEqual({
+      status: 'success',
+      results: results('b'),
+    });
+  });
 });
