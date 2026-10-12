@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Payloads } from '$lib/types';
 import { decodePayloadResult } from '$lib/utilities/decode-payload-result';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import { createDecodedPayload } from './decoded-payload.svelte';
 
@@ -10,7 +11,14 @@ vi.mock('$lib/utilities/decode-payload-result', () => ({
   decodePayloadResult: vi.fn(),
 }));
 
+vi.mock('$lib/utilities/parse-with-big-int', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('$lib/utilities/parse-with-big-int')>();
+  return { ...actual, stringifyWithBigInt: vi.fn(actual.stringifyWithBigInt) };
+});
+
 const mockDecode = vi.mocked(decodePayloadResult);
+const mockStringify = vi.mocked(stringifyWithBigInt);
 
 const payloads = (data: string): Payloads => ({
   payloads: [{ metadata: {}, data: new TextEncoder().encode(data) }],
@@ -205,5 +213,29 @@ describe('createDecodedPayload', () => {
       status: 'success',
       results: results('b'),
     });
+  });
+
+  it('does not re-stringify an unchanged value', async () => {
+    mockDecode.mockResolvedValue(results('a'));
+    const value = payloads('a');
+    let tick = $state(0);
+    const cleanup = $effect.root(() => {
+      const decoded = createDecodedPayload(() => {
+        void tick;
+        return value;
+      });
+      $effect.pre(() => {
+        void decoded.current;
+      });
+    });
+    flushSync();
+    const calls = mockStringify.mock.calls.length;
+    tick++;
+    flushSync();
+    tick++;
+    flushSync();
+    expect(mockStringify.mock.calls.length).toBe(calls);
+    expect(mockDecode).toHaveBeenCalledTimes(1);
+    cleanup();
   });
 });

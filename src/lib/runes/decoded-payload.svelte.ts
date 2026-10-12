@@ -22,7 +22,17 @@ export function createDecodedPayload(
   let state = $state<DecodedPayloadState>({ status: 'idle' });
   let stateValueJson = $state<string>();
   let request = 0;
-  const valueJson = $derived(stringifyWithBigInt(getValue()));
+  let lastValue: DecodableValue | null | undefined;
+  let lastValueJson: string | undefined;
+  const valueJson = $derived.by(() => {
+    const value = getValue();
+    if (value !== lastValue) {
+      lastValue = value;
+      lastValueJson = stringifyWithBigInt(value);
+    }
+    return lastValueJson;
+  });
+  const hasValue = $derived(Boolean(getValue()));
 
   const decode = async () => {
     const id = ++request;
@@ -61,7 +71,7 @@ export function createDecodedPayload(
   return {
     get current(): DecodedPayloadState {
       if (stateValueJson === valueJson) return state;
-      return getValue() ? { status: 'loading' } : { status: 'idle' };
+      return hasValue ? { status: 'loading' } : { status: 'idle' };
     },
   };
 }
