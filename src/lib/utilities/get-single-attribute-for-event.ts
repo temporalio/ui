@@ -7,12 +7,15 @@ import type {
 } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
+import { durationToSeconds } from './common-error-detection';
 import { isRawPayload, parseRawPayloadToJSON } from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
+import { getEpochMilliseconds } from './format-time';
 import { has } from './has';
 import { isObject } from './is';
 import {
   isLocalActivityMarkerEvent,
+  isTimerStartedEvent,
   isWorkflowExecutionUpdateAcceptedEvent,
 } from './is-event-type';
 import {
@@ -414,3 +417,14 @@ export const getSecondaryAttributeForEvent = (
 
   return emptyAttribute;
 };
+
+export const getTimerFireTime = (event: WorkflowEvent): string | undefined =>
+  isTimerStartedEvent(event)
+    ? new Date(
+        getEpochMilliseconds(event.eventTime) +
+          durationToSeconds(
+            event.timerStartedEventAttributes?.startToFireTimeout,
+          ) *
+            1000,
+      ).toISOString()
+    : undefined;

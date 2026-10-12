@@ -307,6 +307,313 @@ test('it should resync the filter pills on back and forward navigation', async (
   ).toBeVisible();
 });
 
+// The raw value the mock workflows carry. The cell renders this through the
+// user's time format, so asserting the raw string proves the quick filter uses
+// the value behind the cell rather than the text in it.
+const MOCK_START_TIME = '2022-03-23T18:06:01.726484047Z';
+
+const bodyCellFor = async (page: Page, column: string) => {
+  const headers = page.locator(
+    '[data-testid^="workflows-summary-table-header-cell-"]',
+  );
+  const testIds = await headers.evaluateAll((elements) =>
+    elements.map((element) => element.getAttribute('data-testid')),
+  );
+  const index = testIds.indexOf(
+    `workflows-summary-table-header-cell-${column}`,
+  );
+  expect(index, `no ${column} column in the table`).toBeGreaterThanOrEqual(0);
+
+  return page
+    .getByTestId('workflows-summary-configurable-table-row')
+    .first()
+    .getByTestId('workflows-summary-table-body-cell')
+    .nth(index);
+};
+
+// The buttons render only while the cell is hovered, and float outside it, so
+// they are looked up at the page rather than inside the cell.
+const quickFilterButton = (page: Page) =>
+  page.getByTestId('quick-filter-button');
+
+const clickQuickFilter = async (page: Page, column: string) => {
+  const cell = await bodyCellFor(page, column);
+  await cell.hover();
+  // A cell left moments ago keeps its buttons briefly, so wait for just one.
+  await expect(quickFilterButton(page)).toHaveCount(1);
+  await quickFilterButton(page).click();
+};
+
+test('it should quick filter by a Status cell and toggle it back off', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Status');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`ExecutionStatus`="Running"');
+  await expect(
+    page.getByRole('button', { name: 'ExecutionStatus = Running' }),
+  ).toBeVisible();
+
+  await clickQuickFilter(page, 'Status');
+
+  await expect.poll(() => getQueryParam(page.url())).toBe('');
+  await expect(
+    page.getByRole('button', { name: 'ExecutionStatus = Running' }),
+  ).toBeHidden();
+});
+
+test('it should ask for an operator before filtering a Start cell', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Start');
+
+  // Opening the popup must not filter anything on its own.
+  await expect(page.getByRole('button', { name: 'After' })).toBeVisible();
+  expect(getQueryParam(page.url())).toBe('');
+
+  await page.getByTestId('apply-filter-button').click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe(`\`StartTime\`>="${MOCK_START_TIME}"`);
+  await expect(
+    page.getByRole('button', { name: /StartTime >=/ }),
+  ).toBeVisible();
+});
+
+test('it should quick filter a Start cell with a chosen operator', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Start');
+
+  await page.getByRole('button', { name: 'Before' }).click();
+  await page.getByTestId('apply-filter-button').click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe(`\`StartTime\`<="${MOCK_START_TIME}"`);
+});
+
+test('it should seed the popup with the value in the cell', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Start');
+  await page.getByTestId('apply-filter-button').click();
+
+  // The cell renders the timestamp in the user's format; the filter has to carry
+  // the raw value behind it, down to the nanoseconds.
+  await expect.poll(() => getQueryParam(page.url())).toContain(MOCK_START_TIME);
+});
+
+test('it should ask for an operator on a Keyword column too', async ({
+  page,
+}) => {
+  // `=` is a sensible default for a Keyword, but it is still the cell guessing,
+  // so every column but Status offers the choice.
+  await clickQuickFilter(page, 'Type');
+
+  await expect(page.getByTestId('apply-filter-button')).toBeVisible();
+  expect(getQueryParam(page.url())).toBe('');
+
+  await page.getByTestId('apply-filter-button').click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="ImportantWorkflowType"');
+});
+
+test('it should filter a Status cell in one click, with no popup', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Status');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`ExecutionStatus`="Running"');
+  await expect(page.getByTestId('apply-filter-button')).toBeHidden();
+});
+
+test('it should keep the popup open when the pointer leaves the cell', async ({
+  page,
+}) => {
+  await clickQuickFilter(page, 'Start');
+  await expect(page.getByRole('button', { name: 'After' })).toBeVisible();
+
+  // The popup is anchored to a button that only exists while the cell is
+  // hovered, so the cell has to keep it mounted while the popup is open.
+  await page.getByTestId('workflows-summary-table-header-cell-Type').hover();
+
+  await expect(page.getByRole('button', { name: 'After' })).toBeVisible();
+});
+
+test('it should collapse a multi-status filter to the status that was clicked', async ({
+  page,
+}) => {
+  await page.getByTestId('add-filter-button').click();
+  await page.getByText('ExecutionStatus').click();
+
+  await page.getByTestId('status-dropdown-filter-chip-Completed').click();
+  await page.getByTestId('status-dropdown-filter-chip-Failed').click();
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('(`ExecutionStatus`="Completed" OR `ExecutionStatus`="Failed")');
+
+  // The status menu stays open on selection, so dismiss it to reach the table.
+  await page.keyboard.press('Escape');
+
+  await clickQuickFilter(page, 'Status');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`ExecutionStatus`="Running"');
+});
+
+test('it should not offer a quick filter for a column with no value', async ({
+  page,
+}) => {
+  // The mock workflows are all still running, so they have no close time.
+  const end = await bodyCellFor(page, 'End');
+  await end.hover();
+
+  await expect(quickFilterButton(page)).toHaveCount(0);
+});
+
+test('it should not reserve cell width for the hover buttons', async ({
+  page,
+}) => {
+  const cells = page
+    .getByTestId('workflows-summary-configurable-table-row')
+    .first()
+    .getByTestId('workflows-summary-table-body-cell');
+
+  // The buttons float outside the cell, so no column pads space for them.
+  const paddings = await cells.evaluateAll((tds) =>
+    tds.map((td) => getComputedStyle(td).paddingRight),
+  );
+  expect(new Set(paddings)).toEqual(new Set(['8px']));
+
+  // And they are not in the row at all until the cell is hovered.
+  await expect(quickFilterButton(page)).toHaveCount(0);
+});
+
+test('it should show the buttons over the cell they act on', async ({
+  page,
+}) => {
+  const cell = await bodyCellFor(page, 'Type');
+  await cell.hover();
+
+  const button = quickFilterButton(page);
+  await expect(button).toBeVisible();
+
+  // Inside the cell, so it is obvious which value they apply to. Covering the
+  // tail of a long value is accepted.
+  expect(await button.evaluate((b) => !!b.closest('td'))).toBe(true);
+
+  const buttonBox = await button.boundingBox();
+  const cellBox = await cell.boundingBox();
+  expect(buttonBox.y).toBeGreaterThanOrEqual(cellBox.y - 1);
+  expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(
+    cellBox.y + cellBox.height + 1,
+  );
+
+  // Only ever one at a time, so sweeping a row leaves no trail.
+  await expect(button).toHaveCount(1);
+});
+
+test('it should apply the quick filter on Enter', async ({ page }) => {
+  await clickQuickFilter(page, 'Type');
+  await expect(page.getByTestId('apply-filter-button')).toBeVisible();
+
+  // The popover opens without taking focus, so Enter has to reach it anyway.
+  await page.keyboard.press('Enter');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="ImportantWorkflowType"');
+  await expect(page.getByTestId('apply-filter-button')).toBeHidden();
+});
+
+test('it should leave Enter alone outside the popover', async ({ page }) => {
+  await clickQuickFilter(page, 'Type');
+  await expect(page.getByTestId('apply-filter-button')).toBeVisible();
+
+  // Focus stays on the trigger, so Tab reaches the Copy button beside it. Enter
+  // there belongs to Copy, not to the pending filter.
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Enter');
+
+  expect(getQueryParam(page.url())).toBe('');
+  await expect(page.getByTestId('apply-filter-button')).toBeVisible();
+});
+
+test('it should apply an edited value on Enter', async ({ page }) => {
+  await clickQuickFilter(page, 'Type');
+
+  // The id carries a per-cell unique segment, so match on the suffix.
+  const input = page.locator('input[id$="-WorkflowType-text"]');
+  await input.fill('AnotherWorkflowType');
+  await page.keyboard.press('Enter');
+
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`WorkflowType`="AnotherWorkflowType"');
+});
+
+test.describe('custom search attribute columns', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockSearchAttributesApi(page, {
+      customAttributes: {
+        CustomBoolField: SEARCH_ATTRIBUTE_TYPE.BOOL,
+        CustomIntField: SEARCH_ATTRIBUTE_TYPE.INT,
+      },
+    });
+
+    await page.reload();
+    await waitForWorkflowsApis(page);
+  });
+
+  const addColumn = async (page: Page, column: string) => {
+    await page
+      .getByTestId('workflows-summary-table-configuration-button')
+      .click();
+    await page
+      .getByRole('button', { name: `Add ${column} column`, exact: true })
+      .click();
+    await page.getByRole('button', { name: /Close/ }).first().click();
+  };
+
+  test('it should quick filter a Bool value without quoting it', async ({
+    page,
+  }) => {
+    await addColumn(page, 'CustomBoolField');
+
+    await clickQuickFilter(page, 'CustomBoolField');
+
+    // A Bool offers its own True/False toggles rather than an operator row.
+    await expect(page.getByRole('button', { name: 'True' })).toBeVisible();
+    await page.getByTestId('apply-filter-button').click();
+
+    await expect
+      .poll(() => getQueryParam(page.url()))
+      .toBe('`CustomBoolField`=true');
+  });
+
+  test('it should quick filter an Int value of zero', async ({ page }) => {
+    await addColumn(page, 'CustomIntField');
+
+    await clickQuickFilter(page, 'CustomIntField');
+
+    await page.getByTestId('apply-filter-button').click();
+
+    await expect
+      .poll(() => getQueryParam(page.url()))
+      .toBe('`CustomIntField`=0');
+  });
+});
+
 test.describe('KeywordList search attributes', () => {
   const NOT_IN_QUERY = '`CustomKeywordListField`not in("Hello", "World")';
   const NOT_IN_CHIP = 'CustomKeywordListField not in ("Hello", "World")';
@@ -330,7 +637,9 @@ test.describe('KeywordList search attributes', () => {
 
     await page.getByRole('button', { name: conditional, exact: true }).click();
 
-    const input = page.locator('#list-filter');
+    const input = page.locator(
+      '#dropdown-filter-chip-CustomKeywordListField-0-list-filter',
+    );
     await input.fill('Hello');
     await input.press('Enter');
     await input.fill('World');

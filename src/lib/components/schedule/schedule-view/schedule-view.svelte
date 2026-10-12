@@ -8,12 +8,12 @@
   } from '$lib/components/detail-list';
   import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
-  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeStatus } from '$lib/io/badge-status';
   import { IconChevronLeft, IconFilter } from '$lib/io/icon';
   import { coreUserStore } from '$lib/stores/core-user';
   import {
@@ -65,8 +65,9 @@
       class="flex flex-wrap items-center gap-2 text-3xl"
       data-testid="schedule-name"
     >
-      <WorkflowStatusBadge
+      <BadgeStatus
         status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
+        data-testid="schedule-status"
       />
       <span class="select-all">
         {scheduleId}
@@ -149,7 +150,7 @@
 
   <dl class="-mt-2 flex flex-col gap-1">
     <dt class="text-secondary">
-      {translate('schedules.total-workflows-all-time')}
+      {translate('schedules.total-workflows')}
     </dt>
     <dd class="flex flex-wrap items-center gap-2">
       <span class="font-mono" data-testid="workflow-count"

@@ -6,10 +6,10 @@
 
   import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatusBadge from '$lib/components/workflow/workflow-status-badge.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { BadgeStatus } from '$lib/io/badge-status';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { customSearchAttributes } from '$lib/stores/search-attributes';
   import {
@@ -68,7 +68,7 @@
     {@const clampToWidth = width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES}
     {#if label === translate('common.status')}
       <td class={twMerge('cell', clampToWidth)} style={widthStyle}>
-        <WorkflowStatusBadge {status} />
+        <BadgeStatus {status} data-testid="schedule-status" />
       </td>
     {:else if label === translate('schedules.id')}
       <td

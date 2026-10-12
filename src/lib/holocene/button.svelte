@@ -44,7 +44,7 @@
           tertiary:
             'border-tertiary bg-interactive-tertiary text-primary hover:bg-interactive-tertiary-hover active:bg-interactive-tertiary-press focus-visible:bg-surface-primary data-[active=true]:bg-interactive-tertiary-press data-[active=true]:hover:bg-interactive-tertiary-press data-[active=true]:active:bg-interactive-tertiary-press data-[active=true]:focus-visible:bg-interactive-tertiary-press',
           destructive:
-            'border-transparent bg-interactive-danger text-white hover:bg-interactive-danger-hover active:bg-interactive-danger-press focus-visible:bg-interactive-danger data-[active=true]:bg-interactive-danger-press data-[active=true]:hover:bg-interactive-danger-press data-[active=true]:active:bg-interactive-danger-press data-[active=true]:focus-visible:bg-interactive-danger-press',
+            'border-danger bg-interactive-danger text-primary hover:bg-interactive-danger-hover active:bg-interactive-danger-press focus-visible:bg-interactive-danger data-[active=true]:bg-interactive-danger-press data-[active=true]:hover:bg-interactive-danger-press data-[active=true]:active:bg-interactive-danger-press data-[active=true]:focus-visible:bg-interactive-danger-press',
           ghost:
             'border-transparent bg-transparent text-secondary hover:bg-interactive-tertiary-hover active:bg-interactive-tertiary-press focus-visible:bg-surface-primary data-[active=true]:bg-interactive-tertiary-press data-[active=true]:hover:bg-interactive-tertiary-press data-[active=true]:active:bg-interactive-tertiary-press data-[active=true]:focus-visible:bg-interactive-tertiary-press',
           'table-header':
