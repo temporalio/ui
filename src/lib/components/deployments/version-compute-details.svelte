@@ -11,7 +11,7 @@
   import {
     formatDurationMs,
     getScalingGroups,
-    isMultiRegionConfig,
+    hasRegionScopedGroups,
     shortRegion,
   } from '$lib/utilities/compute-regions';
 
@@ -76,7 +76,7 @@
     ),
   );
 
-  const isMultiRegion = $derived(isMultiRegionConfig(computeConfig));
+  const isMultiRegion = $derived(hasRegionScopedGroups(computeConfig));
 
   const isCompute = $derived(
     perGroup.some(

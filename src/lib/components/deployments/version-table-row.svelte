@@ -20,6 +20,7 @@
     type RoutingConfig,
     type VersionSummary,
   } from '$lib/types/deployments';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import {
     resolveValidationOutcome,
     type ValidationOutcome,
@@ -55,7 +56,7 @@
     conflictToken?: string;
     showConnectionStatus?: boolean;
     /** Regions the namespace runs in, so unconfigured Regions are surfaced. */
-    namespaceRegions?: readonly string[];
+    namespaceRegions?: readonly NamespaceRegion[];
     onChange?: () => void;
     onValidationComplete?: () => void;
   }

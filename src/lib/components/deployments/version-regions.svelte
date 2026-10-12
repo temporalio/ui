@@ -7,6 +7,7 @@
     computeProviderLabel,
     computeProviderShortLabel,
     getScalingGroups,
+    type NamespaceRegion,
     type RegionMatch,
     resolveRegionCoverage,
     shortRegion,
@@ -20,8 +21,13 @@
 
   interface Props {
     computeConfig: ComputeConfig | undefined;
-    /** Regions the namespace runs in, primary first. */
-    namespaceRegions?: readonly string[];
+    /**
+     * The Namespace's regions. A consumer passes these when its own
+     * entitlement says the Namespace is highly available; fewer than two
+     * shows no regions. Each region states its own role rather than relying
+     * on list order.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
     /**
      * Version-level connection status. The API reports one per version, so
      * it colors every Region the version covers.
@@ -125,6 +131,8 @@
           {@const tone = regionTone(uncovered)}
           <span
             class="inline-flex whitespace-nowrap rounded-full border font-mono text-xs font-medium uppercase leading-none {tone}"
+            data-region-role={isMultiRegion ? row.role : undefined}
+            data-region-match={isMultiRegion ? row.match : undefined}
           >
             <span
               class="inline-flex items-center gap-1 rounded-l-full bg-surface-primary px-1.5 py-1 text-secondary"

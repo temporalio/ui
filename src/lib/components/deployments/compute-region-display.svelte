@@ -5,14 +5,20 @@
   import type { ComputeConfig } from '$lib/types/deployments';
   import {
     getScalingGroups,
+    type NamespaceRegion,
     resolveRegionCoverage,
     shortRegion,
   } from '$lib/utilities/compute-regions';
 
   interface Props {
     computeConfig: ComputeConfig | undefined;
-    /** Regions the namespace runs in, primary first. */
-    namespaceRegions?: readonly string[];
+    /**
+     * The Namespace's regions. A consumer passes these when its own
+     * entitlement says the Namespace is highly available; fewer than two
+     * shows no regions. Each region states its own role rather than relying
+     * on list order.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
     scrollContainer?: string;
   }
 

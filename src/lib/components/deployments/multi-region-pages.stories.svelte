@@ -9,6 +9,7 @@
     ComputeStatus,
     DeploymentStatus as VersionStatus,
   } from '$lib/types/deployments';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
 
   import DeploymentStatus from './deployment-status.svelte';
   import VersionComputeDetails from './version-compute-details.svelte';
@@ -102,8 +103,14 @@
   };
   const pending: ComputeStatus = { providerValidation: {} };
 
-  const namespaceRegionsFor = (namespace: Topology): string[] =>
-    namespace === 'multi' ? [EAST, WEST] : [EAST];
+  // The active region states its role rather than relying on being first.
+  const namespaceRegionsFor = (namespace: Topology): NamespaceRegion[] =>
+    namespace === 'multi'
+      ? [
+          { regionId: EAST, role: 'primary' },
+          { regionId: WEST, role: 'replica' },
+        ]
+      : [{ regionId: EAST, role: 'primary' }];
 
   const deploymentsFor = (namespace: Topology) =>
     [

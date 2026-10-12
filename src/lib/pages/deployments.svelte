@@ -22,14 +22,20 @@
   } from '$lib/stores/configurable-table-columns';
   import { refresh } from '$lib/stores/workers';
   import { columnWidthStyle } from '$lib/utilities/column-width';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
   interface Props {
     canCreateServerlessDeployment?: boolean;
     showConnectionStatus?: boolean;
-    /** Regions the namespace runs in, primary first. */
-    namespaceRegions?: readonly string[];
+    /**
+     * The Namespace's regions. A consumer passes these when its own
+     * entitlement says the Namespace is highly available; fewer than two
+     * shows no regions. Each region states its own role rather than relying
+     * on list order.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
   }
 
   let {

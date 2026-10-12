@@ -22,6 +22,7 @@
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
   } from '$lib/utilities/column-width';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
     routeForWorkerDeployment,
@@ -36,8 +37,13 @@
     deployment: ListWorkerDeployment;
     columns: ConfigurableTableHeader[];
     showConnectionStatus?: boolean;
-    /** Regions the namespace runs in, primary first. */
-    namespaceRegions?: readonly string[];
+    /**
+     * The Namespace's regions. A consumer passes these when its own
+     * entitlement says the Namespace is highly available; fewer than two
+     * shows no regions. Each region states its own role rather than relying
+     * on list order.
+     */
+    namespaceRegions?: readonly NamespaceRegion[];
     onChange?: () => void;
   }
   let {

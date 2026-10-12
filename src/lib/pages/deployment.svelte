@@ -18,6 +18,7 @@
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { deploymentShowsConnectionStatus } from '$lib/utilities/connection-status';
   import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
@@ -27,7 +28,7 @@
     showInstancesLink?: boolean;
     showConnectionStatus?: boolean;
     /** Regions the namespace runs in (highly available namespaces have more than one). */
-    namespaceRegions?: readonly string[];
+    namespaceRegions?: readonly NamespaceRegion[];
   }
 
   let {
