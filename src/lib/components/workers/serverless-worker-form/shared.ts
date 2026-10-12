@@ -277,6 +277,34 @@ export const buildComputeConfigFromForm = (
   );
 };
 
+/**
+ * One scaling group per Namespace region, for a highly available Namespace.
+ *
+ * A group per region rather than one group listing several, because the
+ * resource is regional: a Lambda ARN names its region, so the two regions
+ * cannot share a group even when every other setting matches.
+ * `region_ids` is repeated and would allow the shared shape, which is what a
+ * provider with a non-regional resource would use.
+ *
+ * The group takes the region's own identifier as its name. The name is free
+ * text as far as the API is concerned and `region_ids` is what actually
+ * decides where a group runs, but a map keyed by something meaningful is
+ * easier to read in a diff and in an error message than `group-1`.
+ */
+export const buildComputeConfigForRegions = (
+  entries: readonly { regionId: string; values: ComputeFormValues }[],
+): ComputeConfig => ({
+  scalingGroups: Object.fromEntries(
+    entries.map(({ regionId, values }) => {
+      // Each provider builder emits exactly one group, which is the group this
+      // region needs; only its name and its regions are added here.
+      const built = buildComputeConfigFromForm(values);
+      const [group] = Object.values(built.scalingGroups ?? {});
+      return [regionId, { ...group, regionIds: [regionId] }];
+    }),
+  ),
+});
+
 export type ComputeProviderOption = {
   value: ComputeProviderValue;
   disabled?: boolean;
