@@ -11,11 +11,11 @@
     type ActivityBatchOperationContext,
   } from '$lib/pages/standalone-activities.svelte';
   import { activitiesQuery, activityCount } from '$lib/stores/activities';
-  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
   import { standaloneActivityBulkActionsEnabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   type Props = {
-    activities: ActivityExecutionInfo[];
+    activities: ActivityExecutionListInfo[];
   };
 
   let { activities }: Props = $props();

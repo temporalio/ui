@@ -3,9 +3,16 @@
 
   import { page } from '$app/state';
 
+  import QuickFilterCell from '$lib/components/search-attribute-filter/quick-filter-cell.svelte';
+  import SearchAttributeValue from '$lib/components/table/search-attribute-value.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
+  import { nexusOperationFilters } from '$lib/stores/filters';
+  import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
+  import type { SearchAttributeType } from '$lib/types/workflows';
   import {
     COLUMN_WIDTH_CLAMP_CLASSES,
     columnWidthStyle,
@@ -14,8 +21,7 @@
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
 
   import NexusOperationStatusBadge from '../nexus-operation-status-badge.svelte';
-
-  import FilterableTableCell from './filterable-table-cell.svelte';
+  import { NEXUS_OPERATION_QUICK_FILTER_COLUMNS } from './column-search-attributes';
 
   type Props = {
     column: ConfigurableTableHeader;
@@ -26,109 +32,61 @@
   const { label, width } = $derived(column);
   const namespace = $derived(page.params.namespace);
 
-  const clampToWidth = $derived(
-    width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES,
+  const className = $derived(
+    twMerge(
+      'h-8 whitespace-nowrap',
+      width !== undefined && COLUMN_WIDTH_CLAMP_CLASSES,
+    ),
   );
+  const href = $derived(
+    ['Operation ID', 'Run ID'].includes(label)
+      ? routeForStandaloneNexusOperationDetails({
+          namespace,
+          operationId: operation.operationId ?? '',
+          runId: operation.runId ?? '',
+        })
+      : undefined,
+  );
+
   const widthStyle = $derived(columnWidthStyle(width));
-
-  let filterOrCopyButtonsVisible = $state(false);
-  const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
-  const hideFilterOrCopy = () => (filterOrCopyButtonsVisible = false);
-  const handleFocusOut = (e: FocusEvent) => {
-    const nextTarget = e.relatedTarget as HTMLElement;
-    if (
-      nextTarget &&
-      !['filter-button', 'copy-button'].includes(nextTarget.id)
-    ) {
-      hideFilterOrCopy();
-    }
-  };
-
-  const filterableLabels = [
-    'Operation ID',
-    'Run ID',
-    'Endpoint',
-    'Service',
-    'Operation',
-  ];
+  const testId = 'nexus-operations-summary-table-body-cell';
 </script>
 
-{#if filterableLabels.includes(label)}
-  <td
-    class={twMerge('relative h-8 whitespace-nowrap pr-24', clampToWidth)}
-    style={widthStyle}
-    data-testid="nexus-operations-summary-table-body-cell"
-    onmouseover={showFilterOrCopy}
-    onfocus={showFilterOrCopy}
-    onfocusin={showFilterOrCopy}
-    onfocusout={handleFocusOut}
-    onmouseleave={hideFilterOrCopy}
-    onblur={hideFilterOrCopy}
-  >
-    {#if label === 'Operation ID'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="OperationId"
-        value={operation.operationId ?? ''}
-        href={routeForStandaloneNexusOperationDetails({
-          namespace,
-          operationId: operation.operationId ?? '',
-          runId: operation.runId ?? '',
-        })}
-      />
-    {:else if label === 'Run ID'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="RunId"
-        value={operation.runId ?? ''}
-        href={routeForStandaloneNexusOperationDetails({
-          namespace,
-          operationId: operation.operationId ?? '',
-          runId: operation.runId ?? '',
-        })}
-      />
-    {:else if label === 'Endpoint'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="Endpoint"
-        value={operation.endpoint ?? ''}
-      />
-    {:else if label === 'Service'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="Service"
-        value={operation.service ?? ''}
-      />
-    {:else if label === 'Operation'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="Operation"
-        value={operation.operation ?? ''}
-      />
+{#snippet cellContent(
+  type: SearchAttributeType | undefined,
+  displayValue: string | undefined,
+)}
+  {#if label === 'Status'}
+    <NexusOperationStatusBadge status={operation.status} />
+  {:else if label === 'Schedule Time' || label === 'Close Time'}
+    <Timestamp dateTime={displayValue} />
+  {:else if label === 'Execution Duration'}
+    {#if operation.executionDuration}
+      {formatDistanceAbbreviated({
+        start: operation.scheduleTime,
+        end: operation.closeTime,
+        includeMilliseconds: true,
+      })}
     {/if}
-  </td>
-{:else}
-  <td
-    class={twMerge('h-8 whitespace-nowrap', clampToWidth)}
-    style={widthStyle}
-    data-testid="nexus-operations-summary-table-body-cell"
-  >
-    {#if label === 'Status'}
-      <NexusOperationStatusBadge status={operation.status} />
-    {:else if label === 'Schedule Time'}
-      <Timestamp dateTime={operation.scheduleTime} />
-    {:else if label === 'Close Time'}
-      <Timestamp dateTime={operation.closeTime} />
-    {:else if label === 'Execution Duration'}
-      {#if operation.executionDuration}
-        {formatDistanceAbbreviated({
-          start: operation.scheduleTime,
-          end: operation.closeTime,
-          includeMilliseconds: true,
-        })}
-      {/if}
-    {:else if label === 'State Transitions'}
-      {operation.stateTransitionCount ?? ''}
-    {/if}
-  </td>
-{/if}
+  {:else if href}
+    <Link {href}>{displayValue}</Link>
+  {:else}
+    <SearchAttributeValue value={displayValue} {type} />
+  {/if}
+{/snippet}
+
+<QuickFilterCell
+  columns={NEXUS_OPERATION_QUICK_FILTER_COLUMNS}
+  searchAttributes={$nexusOperationSearchAttributes}
+  filters={nexusOperationFilters}
+  filterIconTitle={translate('common.filter-nexus-operations')}
+  {label}
+  row={operation}
+  class={className}
+  style={widthStyle}
+  data-testid={testId}
+>
+  {#snippet children({ type, displayValue })}
+    {@render cellContent(type, displayValue)}
+  {/snippet}
+</QuickFilterCell>

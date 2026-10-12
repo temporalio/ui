@@ -1,0 +1,110 @@
+import { describe, expect, it } from 'vitest';
+
+import type { WorkflowExecution } from '$lib/types/workflows';
+import { getColumnAttribute } from '$lib/utilities/query/quick-filter-table';
+
+import {
+  getWorkflowColumnValue,
+  UNFILTERABLE_WORKFLOW_COLUMNS,
+  WORKFLOW_COLUMN_ATTRIBUTE,
+} from './column-search-attributes';
+
+const workflow = {
+  name: 'MyWorkflowType',
+  id: 'my-workflow-id',
+  runId: 'my-run-id',
+  status: 'Completed',
+  startTime: '2024-01-02T03:04:05Z',
+  endTime: '2024-01-02T04:04:05Z',
+  executionTime: '2024-01-02T03:04:05Z',
+  taskQueue: 'my-task-queue',
+  historySizeBytes: '2048',
+  historyEvents: '17',
+  stateTransitionCount: '0',
+  parentNamespaceId: 'parent-namespace',
+  searchAttributes: {
+    indexedFields: {
+      TemporalWorkerDeploymentVersion: 'my-deployment.abc123',
+      TemporalChangeVersion: ['v1', 'v2'],
+      CustomIntField: 42,
+      CustomBoolField: true,
+    },
+  },
+} as unknown as WorkflowExecution;
+
+describe('the workflow column attribute map', () => {
+  const attributeFor = (label: string) =>
+    getColumnAttribute(WORKFLOW_COLUMN_ATTRIBUTE, label);
+
+  it('maps a column label to its search attribute', () => {
+    expect(attributeFor('Status')).toBe('ExecutionStatus');
+    expect(attributeFor('Task Queue')).toBe('TaskQueue');
+  });
+
+  it('treats an unmapped label as a custom search attribute name', () => {
+    expect(attributeFor('CustomIntField')).toBe('CustomIntField');
+  });
+});
+
+describe('getWorkflowColumnValue', () => {
+  it('returns raw values rather than the formatted cell text', () => {
+    expect(getWorkflowColumnValue('Start', workflow)).toBe(
+      '2024-01-02T03:04:05Z',
+    );
+    expect(getWorkflowColumnValue('End', workflow)).toBe(
+      '2024-01-02T04:04:05Z',
+    );
+    expect(getWorkflowColumnValue('History Size', workflow)).toBe('2048');
+    expect(getWorkflowColumnValue('History Length', workflow)).toBe('17');
+  });
+
+  it('returns the readable status used by the status filter chip', () => {
+    expect(getWorkflowColumnValue('Status', workflow)).toBe('Completed');
+  });
+
+  it('omits a count the cell renders as blank', () => {
+    expect(
+      getWorkflowColumnValue('State Transitions', workflow),
+    ).toBeUndefined();
+  });
+
+  it('falls back to the deployment version for Build ID', () => {
+    expect(getWorkflowColumnValue('Build ID', workflow)).toBe('abc123');
+  });
+
+  it('reads custom search attributes with their runtime types intact', () => {
+    expect(getWorkflowColumnValue('CustomIntField', workflow)).toBe(42);
+    expect(getWorkflowColumnValue('CustomBoolField', workflow)).toBe(true);
+    expect(getWorkflowColumnValue('Change Version', workflow)).toEqual([
+      'v1',
+      'v2',
+    ]);
+  });
+
+  it('builds a query duration from the start and end times', () => {
+    // The cell renders "1h ..." through a display formatter; the filter needs a
+    // value with no delimiter in it.
+    expect(getWorkflowColumnValue('Execution Duration', workflow)).toBe('1h');
+    expect(WORKFLOW_COLUMN_ATTRIBUTE['Execution Duration']).toBe(
+      'ExecutionDuration',
+    );
+  });
+
+  it('has no duration to filter on while the workflow is still running', () => {
+    const running = {
+      ...workflow,
+      endTime: undefined,
+    } as unknown as WorkflowExecution;
+    expect(
+      getWorkflowColumnValue('Execution Duration', running),
+    ).toBeUndefined();
+  });
+
+  it.each(UNFILTERABLE_WORKFLOW_COLUMNS)(
+    'has no value to filter on for %s',
+    (label) => {
+      expect(getWorkflowColumnValue(label, workflow)).toBeUndefined();
+      expect(WORKFLOW_COLUMN_ATTRIBUTE[label]).toBeUndefined();
+    },
+  );
+});

@@ -69,7 +69,7 @@
     {@render children()}
   {/if}
 </div>
-<div class="self-end">
+<div class="relative self-end">
   {#if bottom}
     {@render bottom()}
   {/if}

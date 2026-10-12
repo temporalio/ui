@@ -93,7 +93,7 @@
       logo: integrationVercel,
       links: [
         {
-          href: 'https://github.com/temporalio/samples-typescript/tree/main/ai-sdk',
+          href: 'https://docs.temporal.io/develop/typescript/integrations/ai-sdk',
           languages: ['TypeScript'],
         },
       ],
@@ -129,7 +129,7 @@
       ],
     },
     {
-      name: 'Strands Agent',
+      name: 'Strands Agents',
       logo: integrationStrands,
       links: [
         {
@@ -163,7 +163,7 @@
       ],
     },
     {
-      name: 'Tenuo Integration',
+      name: 'Tenuo',
       logo: integrationTenuo,
       links: [
         {
@@ -177,7 +177,7 @@
       logo: integrationTuningEngines,
       links: [
         {
-          href: 'https://app.tuningengines.com/docs/orchestration',
+          href: 'https://app.tuningengines.com/docs/orchestration#use-tuning-engines-from-temporal',
           languages: ['Python'],
         },
       ],

@@ -34,6 +34,8 @@ const prefixQuery = '`WorkflowType` STARTS_WITH "hello"';
 const isEmptyQuery = '`WorkflowType` is null';
 const isNotEmptyQuery = '`StartTime` IS NOT NULL';
 const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
+const keywordListNotInQuery =
+  '`CustomKeywordListField`not in("Hello", "World")';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -315,6 +317,47 @@ describe('toListWorkflowFilters', () => {
         operator: '',
         parenthesis: '',
         value: '("Hello", "World")',
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should parse a query with a KeywordList not in conditional', () => {
+    const result = toListWorkflowFilters(keywordListNotInQuery, attributes);
+    const expectedFilters = [
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'not in',
+        operator: '',
+        parenthesis: '',
+        value: '("Hello", "World")',
+      },
+    ];
+    expect(result).toMatchObject(expectedFilters);
+  });
+
+  it('should parse a KeywordList not in conditional joined to another filter', () => {
+    const result = toListWorkflowFilters(
+      keywordListNotInQuery + ' AND `WorkflowType`="ExampleWorkflow"',
+      attributes,
+    );
+    const expectedFilters = [
+      {
+        attribute: 'CustomKeywordListField',
+        type: 'KeywordList',
+        conditional: 'not in',
+        operator: 'AND',
+        parenthesis: '',
+        value: '("Hello", "World")',
+      },
+      {
+        attribute: 'WorkflowType',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'ExampleWorkflow',
       },
     ];
     expect(result).toMatchObject(expectedFilters);

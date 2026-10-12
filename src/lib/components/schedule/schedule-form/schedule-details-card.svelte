@@ -197,7 +197,6 @@
       />
 
       <Input
-        class="gap-1.5"
         id="jitter"
         label={translate('schedules.jitter')}
         type="number"

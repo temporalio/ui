@@ -46,4 +46,8 @@ export const Strings = {
   'heartbeat-timeout-duration-description':
     'Maximum permitted time between successful Worker Heartbeats.',
   'task-queue-name': 'Task Queue Name',
+  'heartbeat-timeout': 'Heartbeat Timeout',
+  'retry-initial-interval': 'Retry Initial Interval',
+  'retry-maximum-interval': 'Retry Maximum Interval',
+  'updated-activity-options': 'Updated Activity Options',
 };

@@ -23,6 +23,7 @@ const defaultSettings = {
   showTemporalSystemNamespace: false,
   feedbackURL: '',
   disableNewsFetch: false,
+  notifyOnNewVersion: false,
   codec: {
     endpoint: '',
     passAccessToken: false,

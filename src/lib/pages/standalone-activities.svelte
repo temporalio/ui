@@ -1,27 +1,27 @@
 <script lang="ts" module>
   import type { Readable, Writable } from 'svelte/store';
 
-  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
 
   export const ACTIVITY_BATCH_OPERATION_CONTEXT =
     'ACTIVITY_BATCH_OPERATION_CONTEXT';
 
   export type ActivityBatchOperationContext = {
     allSelected: Writable<boolean>;
-    cancelableActivities: Readable<ActivityExecutionInfo[]>;
-    terminableActivities: Readable<ActivityExecutionInfo[]>;
-    selectedActivities: Writable<ActivityExecutionInfo[]>;
+    cancelableActivities: Readable<ActivityExecutionListInfo[]>;
+    terminableActivities: Readable<ActivityExecutionListInfo[]>;
+    selectedActivities: Writable<ActivityExecutionListInfo[]>;
     batchActionsVisible: Readable<boolean>;
     openBatchCancelConfirmationModal: () => void;
     openBatchTerminateConfirmationModal: () => void;
-    handleSelectAll: (activities: ActivityExecutionInfo[]) => void;
+    handleSelectAll: (activities: ActivityExecutionListInfo[]) => void;
     selectActivities: (
       checked: boolean,
-      activities: ActivityExecutionInfo[],
+      activities: ActivityExecutionListInfo[],
     ) => void;
   };
 
-  export const activityKey = (activity: ActivityExecutionInfo): string =>
+  export const activityKey = (activity: ActivityExecutionListInfo): string =>
     `${activity.activityId ?? ''}:${activity.runId ?? ''}`;
 </script>
 
@@ -120,9 +120,9 @@
     selectItems: selectActivities,
     handleSelectAll,
     reset: resetSelection,
-  } = createBatchSelection<ActivityExecutionInfo>(activityKey);
+  } = createBatchSelection<ActivityExecutionListInfo>(activityKey);
 
-  const isRunning = (activity: ActivityExecutionInfo) =>
+  const isRunning = (activity: ActivityExecutionListInfo) =>
     activity.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING';
 
   const cancelableActivities = derivedStore(selectedActivities, (activities) =>

@@ -9,6 +9,7 @@ import { process } from '$lib/utilities/render-markdown';
 
 type RenderOptions = {
   compact?: boolean;
+  inline?: boolean;
   host: string;
   nonce: string;
   theme?: string;
@@ -38,12 +39,23 @@ const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
   return `base-uri 'self'; default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; frame-ancestors 'self'; form-action 'none'; ${sandbox};`;
 };
 
+const bodyClass = ({
+  compact,
+  inline,
+}: Pick<RenderOptions, 'compact' | 'inline'>) => {
+  const classes = ['prose'];
+  if (compact || inline) classes.push('compact');
+  if (inline) classes.push('inline');
+
+  return classes.join(' ');
+};
+
 /**
  * Create a new HTML page with the given AST.
  */
 const createPage = (
   ast: ReturnType<typeof toHast>,
-  { compact, nonce, theme, overrideTheme }: RenderOptions,
+  { compact, inline, nonce, theme, overrideTheme }: RenderOptions,
 ) => {
   return toHtml(
     h('html', [
@@ -60,7 +72,7 @@ const createPage = (
       h(
         'body',
         {
-          class: compact ? 'prose compact' : 'prose',
+          class: bodyClass({ compact, inline }),
           'data-theme': overrideTheme ? `${theme}-${overrideTheme}` : theme,
         },
         h('main', ast),
@@ -77,6 +89,7 @@ export const GET = async (req: Request) => {
   const theme = url.searchParams.get('theme') || '';
   const overrideTheme = url.searchParams.get('overrideTheme') || '';
   const compact = url.searchParams.get('compact') === 'true';
+  const inline = url.searchParams.get('inline') === 'true';
 
   if (host === null) return new Response('Not found', { status: 404 });
   if (content === null) return new Response('Not found', { status: 404 });
@@ -84,6 +97,7 @@ export const GET = async (req: Request) => {
   const nonce = generateNonce();
   const html = createPage(await process(content), {
     compact,
+    inline,
     nonce,
     host,
     theme,

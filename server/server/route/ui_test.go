@@ -352,6 +352,24 @@ func renderRequest(t *testing.T, query string) string {
 	return rec.Body.String()
 }
 
+func TestSetRenderRoute_WithPublicPath(t *testing.T) {
+	e := echo.New()
+	e.Pre(PublicPath("/custom"))
+	SetRenderRoute(e, "/")
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/custom/render?content=Summary&theme=dark&overrideTheme=primary",
+		nil,
+	)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), "<p>Summary</p>")
+	assert.Contains(t, rec.Body.String(), `data-theme="dark-primary"`)
+}
+
 // The SvelteKit route and this one are separate implementations of the same
 // page, so an embedder that asks for compact has to get it from both.
 func TestSetRenderRoute_CompactBodyClass(t *testing.T) {
@@ -380,6 +398,16 @@ func TestSetRenderRoute_CompactBodyClass(t *testing.T) {
 			query: "content=hello&compact=TRUE",
 			want:  `class="prose"`,
 		},
+		{
+			name:  "inline opts into compact too",
+			query: "content=hello&inline=true",
+			want:  `class="prose compact inline"`,
+		},
+		{
+			name:  "only the exact string opts into inline",
+			query: "content=hello&inline=TRUE",
+			want:  `class="prose"`,
+		},
 	}
 
 	for _, tt := range tests {
@@ -397,6 +425,16 @@ func TestSetRenderRoute_StylesheetCarriesCompactRules(t *testing.T) {
 	assert.Contains(t, body, "body.compact {")
 	assert.Contains(t, body, "body.compact main,")
 	assert.Contains(t, body, "body.compact code {")
+}
+
+func TestSetRenderRoute_StylesheetCarriesInlineRules(t *testing.T) {
+	body := renderRequest(t, "content=hello&inline=true")
+
+	// Without these a summary written as two paragraphs, or with a hard
+	// break, paints as stacked lines in a row that has height for one.
+	assert.Contains(t, body, "body.inline main {")
+	assert.Contains(t, body, "body.inline main * {")
+	assert.Contains(t, body, "body.inline :is(br, hr) {")
 }
 
 // Regression: a star selector reset with no strong rule renders bold at normal

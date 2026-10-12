@@ -14,6 +14,10 @@
     copyIconTitle: string;
     copySuccessIconTitle: string;
     filterIconTitle: string;
+    // When the filter button opens a menu rather than filtering directly, the
+    // menu locates this button by its data-menu-anchor.
+    menuId?: string;
+    menuOpen?: boolean;
     class?: string;
   };
 
@@ -27,6 +31,8 @@
     copyIconTitle,
     copySuccessIconTitle,
     filterIconTitle,
+    menuId,
+    menuOpen = false,
     class: className = '',
   }: Props = $props();
 
@@ -46,6 +52,11 @@
         }}
         class="copy-or-filter-button"
         class:filtered
+        data-testid="quick-filter-button"
+        data-menu-anchor={menuId}
+        aria-haspopup={menuId ? 'true' : undefined}
+        aria-controls={menuId}
+        aria-expanded={menuId ? menuOpen : undefined}
       >
         {#key filtered}
           <IconFilter title={filterIconTitle} class="m-0.5" />
@@ -71,12 +82,14 @@
 {/if}
 
 <style lang="postcss">
+  /* Sits over the right edge of the cell it belongs to, so it is obvious which
+     value it acts on. Absolute, so it still reserves no width. */
   .copy-or-filter {
-    @apply absolute bottom-0 right-0 top-0 inline-flex gap-1 px-1;
+    @apply absolute right-1 top-1/2 z-10 inline-flex -translate-y-1/2 items-center gap-1 rounded border border-primary bg-surface-secondary p-1 shadow;
   }
 
   .copy-or-filter-button {
-    @apply relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full bg-surface-primary p-0.5 text-primary hover:bg-interactive-tertiary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press;
+    @apply h-6 w-6 rounded-full bg-surface-primary p-0.5 text-primary hover:bg-interactive-tertiary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-interactive-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary active:bg-interactive-tertiary-press;
   }
 
   .filtered {

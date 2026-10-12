@@ -2,7 +2,7 @@ import type { BrowserCatalogArtifact } from './types';
 
 export const catalogArtifact: BrowserCatalogArtifact = {
   sourceHash:
-    '4be4b7bdce0105db55dcc4ce2e2bcce31edbf7016f0b2966893e91f0183c164d',
+    '849e980a208b983daf8b0f76f76d2687fcb1fb7d812e2869242e497281839241',
   descriptors: [
     {
       id: 'activity-heartbeat',
@@ -494,6 +494,80 @@ export const catalogArtifact: BrowserCatalogArtifact = {
       source: { id: 'oss', label: 'OSS' },
     },
     {
+      id: 'satellite-launch-event-groups',
+      title: 'Event marker groups',
+      description:
+        'Launches a rocket and deploys satellites, grouping history events by mission phase and satellite.',
+      capabilityTags: ['event-groups', 'signals', 'updates', 'activities'],
+      expectedEvidence: [
+        'Events grouped under Pre-launch checks, Ascent, and Payload deployment, with deployment events also grouped by satellite.',
+        'Launch poll events grouped by the goForLaunch signal, and orbit burn events grouped by both the adjustOrbit update and their satellite.',
+      ],
+      input: {
+        defaultValue: [
+          {
+            missionName: 'Aurora-7',
+            satellites: ['SAT-A', 'SAT-B'],
+            launchPollTimeoutSeconds: 30,
+          },
+        ],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Mission',
+              type: 'object',
+              properties: {
+                missionName: { type: 'string', minLength: 1 },
+                satellites: {
+                  type: 'array',
+                  items: { type: 'string', minLength: 1 },
+                  minItems: 1,
+                  maxItems: 5,
+                  uniqueItems: true,
+                },
+                launchPollTimeoutSeconds: {
+                  type: 'integer',
+                  minimum: 5,
+                  maximum: 300,
+                },
+              },
+              required: [
+                'missionName',
+                'satellites',
+                'launchPollTimeoutSeconds',
+              ],
+              additionalProperties: false,
+            },
+          ],
+          items: false,
+          minItems: 1,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'satelliteLaunchEventGroups',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
       id: 'sequential-activities',
       title: 'Sequential activities',
       description: 'Runs three activity commands one after another.',
@@ -578,6 +652,54 @@ export const catalogArtifact: BrowserCatalogArtifact = {
         namespace: 'default',
         taskQueue: 'ui-catalog',
         workflowType: 'sequentialMarkdownActivities',
+      },
+      source: { id: 'oss', label: 'OSS' },
+    },
+    {
+      id: 'sequential-multiline-summary-activities',
+      title: 'Sequential activities with multi-line Markdown summaries',
+      description:
+        'Runs 20 activities by default with Markdown summaries that alternate between a paragraph break and a hard break.',
+      capabilityTags: ['activities', 'sequencing'],
+      expectedEvidence: [
+        'The configured number of non-overlapping activity executions in deterministic order.',
+        'Each activity summary spans two Markdown blocks, and the timeline label stays on one line.',
+      ],
+      input: {
+        defaultValue: [20],
+        schema: {
+          type: 'array',
+          prefixItems: [
+            {
+              title: 'Activity count',
+              type: 'integer',
+              minimum: 1,
+              maximum: 2000,
+            },
+          ],
+          items: false,
+          maxItems: 1,
+        },
+      },
+      startOptions: {
+        defaultValue: {},
+        schema: {
+          type: 'object',
+          properties: {
+            details: { type: 'string' },
+            searchAttributes: { type: 'object' },
+            summary: { type: 'string' },
+            workflowStartDelay: { type: 'string' },
+            workflowId: { type: 'string', minLength: 1 },
+          },
+        },
+      },
+      execution: {
+        kind: 'workflow',
+        targetId: 'shared-workflows',
+        namespace: 'default',
+        taskQueue: 'ui-catalog',
+        workflowType: 'sequentialMultilineSummaryActivities',
       },
       source: { id: 'oss', label: 'OSS' },
     },

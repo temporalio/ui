@@ -29,7 +29,6 @@
     ...rest
   }: Props = $props();
 
-  const text = $derived(getWorkflowStatusLabel(status));
   const delayedText = $derived(translate('workflows.delayed'));
   const taskFailureText = $derived(translate('workflows.task-failure'));
   const extensions = $derived<BadgeStatusExtensions>([
@@ -53,12 +52,15 @@
   {#if status && isWorkflowStatusType(status)}
     <BadgeStatus
       {status}
-      {text}
       {extensions}
       {...rest}
       data-testid="execution-status"
     />
   {:else}
-    <Badge {text} {...rest} data-testid="execution-status" />
+    <Badge
+      text={getWorkflowStatusLabel(status)}
+      {...rest}
+      data-testid="execution-status"
+    />
   {/if}
 </Tooltip>

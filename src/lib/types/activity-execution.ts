@@ -3,7 +3,10 @@ import type { temporal } from '@temporalio/proto';
 import type { Callback } from '$lib/types/nexus';
 
 import type { Failure, Payloads } from '.';
-import type { WorkflowSearchAttributes } from './workflows';
+import type {
+  DecodedWorkflowSearchAttributes,
+  WorkflowSearchAttributes,
+} from './workflows';
 
 // Enum values arrive over REST/JSON as their SCREAMING_SNAKE names, so these are
 // string unions of the proto enum keys (not the numeric proto enum). Keying off
@@ -98,6 +101,13 @@ export interface ActivityExecutionInfo extends Omit<
       })
     | null;
 }
+
+export type ActivityExecutionListInfo = Omit<
+  ActivityExecutionInfo,
+  'searchAttributes'
+> & {
+  searchAttributes: DecodedWorkflowSearchAttributes;
+};
 
 export interface ActivityExecution {
   runId: string;

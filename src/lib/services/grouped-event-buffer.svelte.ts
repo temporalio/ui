@@ -1,14 +1,21 @@
 import { readonly, writable } from 'svelte/store';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { EventGroupKey } from '$lib/models/event-history/event-group-markers';
 import type { WorkflowEvent } from '$lib/types/events';
 
 import {
+  type EventGroupMatcher,
+  type EventGroupOption,
   getEventArray,
+  getEventGroupMatcher,
+  getEventGroupOptions,
   getGroupArray,
   getLazyGroups,
+  getPendingActivityScheduledEvent,
   getWorkflowTaskFailedEvent,
   type LazyGroup,
+  materializeGroup,
   onChange,
 } from './grouped-event-buffer';
 
@@ -59,6 +66,25 @@ class EventBufferView {
   }
 
   /**
+   * Materialize a group, re-running whenever the buffer changes. A GroupRecord's
+   * identity is stable for the life of the run, so a caller deriving off the
+   * record alone would never see its contents change.
+   */
+  materializeGroup(group: LazyGroup): EventGroup {
+    void this._version;
+    return materializeGroup(group);
+  }
+
+  /**
+   * The ActivityTaskScheduled event for a currently-pending activity. Reads
+   * `_version` so callers re-derive once the head event lands.
+   */
+  pendingActivityScheduledEvent(activityId: string): WorkflowEvent | undefined {
+    void this._version;
+    return getPendingActivityScheduledEvent(activityId);
+  }
+
+  /**
    * Lazy groups with WorkflowTask groups filtered out — enough to filter,
    * sort and lay out, so callers materialize only what they render.
    */
@@ -75,6 +101,23 @@ class EventBufferView {
     void this._version;
     return getGroupArray({ excludeWorkflowTasks: true });
   });
+
+  /** Every event group in the run, in order of first appearance. */
+  readonly eventGroupOptions: EventGroupOption[] = $derived.by(() => {
+    void this._version;
+    return getEventGroupOptions();
+  });
+
+  /**
+   * Matcher for the selected event group keys, re-derived as events arrive.
+   * Undefined when none of the keys exist in this run.
+   */
+  eventGroupMatcher(
+    keys: readonly EventGroupKey[],
+  ): EventGroupMatcher | undefined {
+    void this._version;
+    return getEventGroupMatcher(keys);
+  }
 
   readonly events: WorkflowEvent[] = $derived.by(() => {
     void this._version;

@@ -11,6 +11,7 @@
     component: Checkbox,
     args: {
       label: 'Check Me',
+      description: '',
       disabled: false,
       checked: false,
       labelHidden: false,
@@ -22,6 +23,7 @@
     },
     argTypes: {
       label: { control: 'text' },
+      description: { control: 'text' },
       disabled: { control: 'boolean' },
       checked: { control: 'boolean' },
 
@@ -57,6 +59,14 @@
 <Story name="Indeterminate" args={{ indeterminate: true }} />
 
 <Story name="Required" args={{ required: true }} />
+
+<Story
+  name="With Description"
+  args={{
+    description:
+      'Supporting text renders below the label and is announced as the checkbox description. Long descriptions wrap without shifting the checkbox.',
+  }}
+/>
 
 <Story name="Invalid with Error" args={{ error: 'Error', valid: false }} />
 

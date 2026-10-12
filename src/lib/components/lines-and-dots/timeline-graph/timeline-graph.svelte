@@ -10,6 +10,7 @@
     type LazyGroup,
     materializeGroup,
   } from '$lib/services/grouped-event-buffer';
+  import { eventBuffer } from '$lib/services/grouped-event-buffer.svelte';
   import { activeGroups } from '$lib/stores/active-events';
   import { collapseIdleTime } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
@@ -279,6 +280,16 @@
   // pool doesn't subscribe to $activeGroups directly.
   const activeIdx = $derived(
     $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
+  );
+
+  // Materialized here rather than inline in the template: a GroupRecord keeps
+  // the same identity for the life of the run, so a derived over the lazy group
+  // alone never invalidates and the open panel would keep the EventGroup it was
+  // built with, missing later pending-metadata changes.
+  const activeGroup = $derived(
+    activeIdx >= 0 && filteredLazyGroups[activeIdx]
+      ? eventBuffer.materializeGroup(filteredLazyGroups[activeIdx])
+      : undefined,
   );
 
   $effect(() => {
@@ -600,20 +611,17 @@
         {/if}
 
         <!-- Last child so it paints above rows; onHeight feeds shiftFor. -->
-        {#if !readOnly && activeIdx >= 0}
-          {@const activeLazyGroup = filteredLazyGroups[activeIdx]}
-          {#if activeLazyGroup}
-            {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
-            <GroupDetailsRow
-              y={panelY}
-              group={materializeGroup(activeLazyGroup)}
-              {canvasWidth}
-              endTime={workflow?.endTime ? endTime : nowMs}
-              onHeight={(height) => {
-                panelHeight = height;
-              }}
-            />
-          {/if}
+        {#if !readOnly && activeGroup}
+          {@const panelY = getY(activeIdx) + 1.33 * RADIUS}
+          <GroupDetailsRow
+            y={panelY}
+            group={activeGroup}
+            {canvasWidth}
+            endTime={workflow?.endTime ? endTime : nowMs}
+            onHeight={(height) => {
+              panelHeight = height;
+            }}
+          />
         {/if}
       </div>
     {/snippet}

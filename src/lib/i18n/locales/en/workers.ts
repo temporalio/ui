@@ -82,13 +82,13 @@ export const Strings = {
   'worker-heartbeats-enablement':
     'To enable Heartbeats for this Namespace, set the following value in Dynamic Config.',
   'simple-maximum-poller':
-    'Slot count is set to auto-adjust on based on CPU/memory usage. ',
+    'Poller count is set to a fixed maximum and does not autoscale.',
   'autoscaling-poller':
-    'Poller count is set to to scale within a given range, based on the workflow and feedback from the server.',
+    'Poller count is set to scale within a given range, based on the workflow and feedback from the server.',
   'slot-supplier-kind-fixed':
     'Slot count is set to a fixed limit and won’t auto-adjust based on load.',
   'slot-supplier-kind-resource-based':
-    'Slot count is set to auto-adjust on based on CPU/memory usage.',
+    'Slot count is set to auto-adjust based on CPU/memory usage.',
   'slot-supplier-kind-custom':
     'Slot count is set based on custom slot supplier implementation.',
   'last-refreshed': 'Last refreshed',

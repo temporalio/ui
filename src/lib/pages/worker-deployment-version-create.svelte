@@ -1,4 +1,8 @@
 <script lang="ts">
+  import {
+    type ComputeProviderTemplates,
+    type ComputeProviderValue,
+  } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import CreateVersionForm from '$lib/components/workers/serverless-worker-form/create-version-form.svelte';
   import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
   import { buildComputeConfigFromForm } from '$lib/components/workers/serverless-worker-form/shared';
@@ -22,8 +26,7 @@
     onSuccess: () => void;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
   }
 
   let {
@@ -32,8 +35,7 @@
     onSuccess,
     computeProviders,
     gcpRegions,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
   }: Props = $props();
 
   let error = $state<string | undefined>();
@@ -100,8 +102,7 @@
       computeProviders={lockedProvider?.providers ?? computeProviders}
       initialProvider={lockedProvider?.provider}
       {gcpRegions}
-      {terraformTemplate}
-      {cloudRunTerraformTemplate}
+      {templates}
       cancelHref={backHref}
       onSubmit={async (data) => {
         error = undefined;

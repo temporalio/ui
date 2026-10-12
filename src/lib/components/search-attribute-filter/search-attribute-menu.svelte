@@ -17,10 +17,8 @@
   import { IconFilter, IconSearch } from '$lib/io/icon';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
-  import {
-    SEARCH_ATTRIBUTE_TYPE,
-    type SearchAttributeType,
-  } from '$lib/types/workflows';
+  import type { SearchAttributeType } from '$lib/types/workflows';
+  import { getDefaultConditional } from '$lib/utilities/query/quick-filter';
   import {
     createFilter,
     updateQueryParamsFromFilter,
@@ -52,27 +50,6 @@
   const focusSearch = async () => {
     await tick();
     document.getElementById(searchId)?.focus();
-  };
-
-  const getDefaultConditional = (type: SearchAttributeType) => {
-    switch (type) {
-      case SEARCH_ATTRIBUTE_TYPE.BOOL:
-        return '=';
-      case SEARCH_ATTRIBUTE_TYPE.DATETIME:
-        return '>=';
-      case SEARCH_ATTRIBUTE_TYPE.INT:
-        return '=';
-      case SEARCH_ATTRIBUTE_TYPE.DOUBLE:
-        return '=';
-      case SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST:
-        return 'in';
-      case SEARCH_ATTRIBUTE_TYPE.KEYWORD:
-        return '=';
-      case SEARCH_ATTRIBUTE_TYPE.TEXT:
-        return '=';
-      default:
-        return '=';
-    }
   };
 
   function handleNewQuery(value: string, type: SearchAttributeType) {

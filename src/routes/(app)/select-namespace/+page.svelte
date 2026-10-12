@@ -7,7 +7,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { namespaces } from '$lib/stores/namespaces';
+  import { namespaces, namespacesLoading } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import { routeForWorkflows } from '$lib/utilities/route-for';
 
@@ -50,6 +50,7 @@
   <NamespacePicker
     {namespaceList}
     namespace=""
+    loading={$namespacesLoading}
     noResultsText={$namespaces.length
       ? translate('common.no-results')
       : translate('namespaces.select-namespace-empty-state')}

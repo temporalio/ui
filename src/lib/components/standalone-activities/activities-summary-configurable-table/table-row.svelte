@@ -11,11 +11,11 @@
     type ActivityBatchOperationContext,
     activityKey,
   } from '$lib/pages/standalone-activities.svelte';
-  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import type { ActivityExecutionListInfo } from '$lib/types/activity-execution';
   import { standaloneActivityWriteActionsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   interface Props {
-    activity?: ActivityExecutionInfo;
+    activity?: ActivityExecutionListInfo;
     empty?: boolean;
     showBatchActions?: boolean;
     onClickBatchSelect?: (e: MouseEvent) => void;

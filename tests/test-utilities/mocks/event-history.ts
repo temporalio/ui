@@ -452,9 +452,9 @@ export const mockEventHistoryApi = (
   const descending = page.route(EVENT_HISTORY_API_REVERSE, (route) => {
     return route.fulfill({
       json: {
-        ...mockEventHistory,
+        ...history,
         history: {
-          events: mockEventHistory.history.events.reverse(),
+          events: [...(history.history?.events ?? [])].reverse(),
         },
       },
     });

@@ -45,6 +45,11 @@ type (
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
 		DisableNewsFetch    bool   `yaml:"disableNewsFetch"`
+		NotifyOnNewVersion  bool   `yaml:"notifyOnNewVersion"`
+		// How this server was installed: cli, docker, helm, or server
+		Distribution string `yaml:"distribution"`
+		// Version of the distribution, such as the CLI or Helm chart version
+		DistributionVersion string `yaml:"distributionVersion"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
 		// Collapse the left navigation and saved views navigation by default
@@ -102,6 +107,20 @@ type (
 	UIServerTLS struct {
 		CertFile string `yaml:"certFile"`
 		KeyFile  string `yaml:"keyFile"`
+		// MTLS - optional. When set, enables mTLS on the UI server.
+		MTLS *UIServerMTLS `yaml:"mTLS,omitempty"`
+	}
+
+	UIServerMTLS struct {
+		// CaFile is the path to a CA bundle used to verify client certificates.
+		CaFile string `yaml:"caFile"`
+		// ClientAuth controls how client certificates are handled. Valid values:
+		//   ""                 -> tls.RequireAndVerifyClientCert (default)
+		//   "requireAndVerify" -> tls.RequireAndVerifyClientCert
+		//   "verifyIfGiven"    -> tls.VerifyClientCertIfGiven
+		//   "request"          -> tls.RequestClientCert
+		//   "requireAny"       -> tls.RequireAnyClientCert
+		ClientAuth string `yaml:"clientAuth"`
 	}
 
 	Auth struct {
@@ -136,6 +155,12 @@ type (
 		Options map[string]interface{} `yaml:"options"`
 		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
 		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
+		// RefreshTokenDuration - optional lifetime of the refresh token this provider issues.
+		// It is only needed for providers that issue opaque (non-JWT) refresh tokens, whose
+		// lifetime the server cannot read. For JWT refresh tokens the exp claim is used and
+		// this value is ignored. If neither is available, a 7 day default applies.
+		// Example values: "8h", "24h", "168h" (1 week).
+		RefreshTokenDuration time.Duration `yaml:"refreshTokenDuration"`
 	}
 
 	Codec struct {
@@ -194,7 +219,12 @@ func (c *Config) Validate() error {
 	if err := c.Auth.Validate(); err != nil {
 		return err
 	}
+
 	if err := c.CustomUI.Validate(c.Auth.Enabled); err != nil {
+		return err
+	}
+
+	if err := c.UIServerTLS.Validate(); err != nil {
 		return err
 	}
 

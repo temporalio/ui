@@ -12,6 +12,7 @@
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
+  import UpgradeNotice from '$lib/components/upgrade-notice.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
@@ -36,7 +37,11 @@
   } from '$lib/io/icon';
   import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
-  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
+  import {
+    lastUsedNamespace,
+    namespaces,
+    namespacesLoading,
+  } from '$lib/stores/namespaces';
   import { initializeNavDefaults } from '$lib/stores/nav-open';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
@@ -423,6 +428,9 @@
             tooltip={translate('common.feedback')}
             external
           />
+          {#if page.data?.settings?.notifyOnNewVersion}
+            <UpgradeNotice />
+          {/if}
         {/if}
       {/snippet}
     </SideNavigation>
@@ -432,7 +440,7 @@
     <TopNavigation>
       {#snippet left()}
         {#if showNamespacePicker}
-          <NamespacePicker {namespaceList} />
+          <NamespacePicker {namespaceList} loading={$namespacesLoading} />
         {/if}
       {/snippet}
       {#if showNewsFeed}

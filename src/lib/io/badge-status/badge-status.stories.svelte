@@ -42,6 +42,7 @@
       size: { control: 'select', options: sizes },
       TrailIcon: { control: false },
       extensions: { control: 'object' },
+      showImpliedExtensions: { control: 'boolean' },
       class: { table: { disable: true } },
     },
     parameters: {
@@ -60,6 +61,26 @@
 <Story name="Playground" />
 
 <Story name="With trail icon" args={{ TrailIcon: IconHeartbeat }} />
+
+<Story name="Implied pause extension" args={{ status: 'Paused' }} />
+
+<Story
+  name="Without implied extensions"
+  args={{ status: 'Paused', showImpliedExtensions: false }}
+/>
+
+<Story
+  name="Implied and conditional extensions"
+  args={{
+    status: 'Paused',
+    extensions: [
+      false,
+      null,
+      undefined,
+      { text: 'extra', colorScheme: 'neutral' },
+    ],
+  }}
+/>
 
 <Story
   name="With extensions"

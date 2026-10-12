@@ -9,6 +9,7 @@
   import { translate } from '$lib/i18n/translate';
   import { shortRegion } from '$lib/utilities/compute-regions';
 
+  import { type ComputeProviderTemplates } from './compute-providers';
   import {
     type ComputeRegion,
     lambdaArnPlaceholderFor,
@@ -58,8 +59,14 @@
     error?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
-    terraformTemplate?: string;
-    cloudRunTerraformTemplate?: string;
+    /**
+     * The templates offered per provider. Defaults to the ones bundled here,
+     * which is what a self-hosted deployment wants. A consumer overrides them
+     * by passing a full map: it is exhaustive over ComputeProviderValue, so
+     * adding a provider fails the consumer's type check until it supplies
+     * templates for it.
+     */
+    templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
     /**
      * Regions this namespace runs in. When more than one is provided (a highly
      * available namespace), the form edits a compute provider per region.
@@ -83,8 +90,7 @@
     error,
     computeProviders,
     gcpRegions,
-    terraformTemplate,
-    cloudRunTerraformTemplate,
+    templates,
     regions,
     namespace = '',
     deploymentName,
@@ -199,8 +205,7 @@
             bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
             bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
             bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-            {terraformTemplate}
-            {cloudRunTerraformTemplate}
+            {templates}
             errors={$errors}
           />
         </RegionBlock>
