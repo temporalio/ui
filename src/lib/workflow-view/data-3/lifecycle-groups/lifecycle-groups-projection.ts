@@ -1,10 +1,12 @@
 import { getLifecycleReference } from './get-lifecycle-reference';
+import { getTerminalOutcome, isPendingLifecycleEvent } from './lifecycle-state';
 import type {
   LifecycleGroup,
   LifecycleGroupMutable,
   LifecycleGroupsProjectionChange,
   LifecycleReference,
 } from './types';
+import { compareEventIds } from '../history-events/compare-event-ids';
 import type {
   HistoryEventId,
   NormalizedHistoryEvent,
@@ -13,7 +15,7 @@ import type {
 export class LifecycleGroupsProjection {
   private _lifecycleGroups = new Map<HistoryEventId, LifecycleGroupMutable>();
 
-  /** Adds an event to its lifecycle, returning null if membership is unchanged. */
+  /** Adds an event and updates lifecycle facts before reporting a group change. */
   addEvent(
     event: NormalizedHistoryEvent,
     reference: LifecycleReference = getLifecycleReference(event),
@@ -24,16 +26,43 @@ export class LifecycleGroupsProjection {
       return null;
     }
 
-    if (existing) {
-      existing.eventIds.add(event.eventId);
-      existing.revision += 1;
-    } else {
-      this._lifecycleGroups.set(reference.headEventId, {
-        ...reference,
-        revision: 1,
-        eventIds: new Set([event.eventId]),
-      });
+    const group: LifecycleGroupMutable = existing ?? {
+      ...reference,
+      revision: 0,
+      eventIds: new Set(),
+      hasPendingEvent: false,
+      terminalEventId: null,
+      terminalOutcome: null,
+      activityId: null,
+    };
+
+    if (!existing) {
+      this._lifecycleGroups.set(reference.headEventId, group);
     }
+
+    group.eventIds.add(event.eventId);
+
+    if (isPendingLifecycleEvent(event)) {
+      group.hasPendingEvent = true;
+    }
+
+    if (event.eventType === 'ActivityTaskScheduled') {
+      group.activityId =
+        event.activityTaskScheduledEventAttributes?.activityId ?? null;
+    }
+
+    const terminalOutcome = getTerminalOutcome(event);
+
+    if (
+      terminalOutcome &&
+      (!group.terminalEventId ||
+        compareEventIds(event.eventId, group.terminalEventId) > 0)
+    ) {
+      group.terminalEventId = event.eventId;
+      group.terminalOutcome = terminalOutcome;
+    }
+
+    group.revision += 1;
 
     return {
       type: 'LIFECYCLE_GROUP_CHANGED',

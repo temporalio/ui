@@ -17,19 +17,30 @@ export type LifecycleReference = Readonly<{
   headEventId: HistoryEventId;
 }>;
 
-/** Related history events within one workflow execution. */
+/** An observed closing outcome; absence does not prove a lifecycle is running. */
+export type LifecycleTerminalOutcome =
+  | 'completed'
+  | 'failed'
+  | 'timed-out'
+  | 'canceled'
+  | 'terminated'
+  | 'continued-as-new';
+
+/** Related history events and incrementally maintained lifecycle facts. */
 export type LifecycleGroup = Readonly<{
   revision: number;
   kind: LifecycleReference['kind'];
   headEventId: HistoryEventId;
   eventIds: ReadonlySet<HistoryEventId>;
+  hasPendingEvent: boolean;
+  terminalEventId: HistoryEventId | null;
+  terminalOutcome: LifecycleTerminalOutcome | null;
+  activityId: string | null;
 }>;
 
-export type LifecycleGroupMutable = Omit<
-  LifecycleGroup,
-  'eventIds' | 'revision'
-> & {
-  revision: number;
+export type LifecycleGroupMutable = {
+  -readonly [K in keyof Omit<LifecycleGroup, 'eventIds'>]: LifecycleGroup[K];
+} & {
   eventIds: Set<HistoryEventId>;
 };
 

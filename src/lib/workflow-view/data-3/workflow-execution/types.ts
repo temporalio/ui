@@ -1,3 +1,7 @@
+import type {
+  PendingActivityInfo,
+  PendingNexusOperation,
+} from '$lib/types/events';
 import type { WorkflowExecutionAPIResponse } from '$lib/types/workflows';
 
 import type {
@@ -19,7 +23,18 @@ export type WorkflowExecutionIdentity = Readonly<{
 export type WorkflowExecutionKey = `workflow-execution:(${string})`;
 
 /** A replaceable DescribeWorkflowExecution snapshot, separate from history. */
-export type WorkflowExecutionDetails = Readonly<WorkflowExecutionAPIResponse>;
+export type WorkflowExecutionDetails = Readonly<
+  Omit<
+    WorkflowExecutionAPIResponse,
+    'pendingActivities' | 'pendingNexusOperations'
+  > & {
+    pendingActivitiesByActivityId: ReadonlyMap<string, PendingActivityInfo>;
+    pendingNexusOperationsByHeadEventId: ReadonlyMap<
+      HistoryEventId,
+      PendingNexusOperation
+    >;
+  }
+>;
 
 /** An individual change produced while ingesting a history event. */
 export type WorkflowExecutionChange =

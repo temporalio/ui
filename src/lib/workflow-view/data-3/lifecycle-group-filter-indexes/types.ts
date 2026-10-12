@@ -3,17 +3,33 @@ import type {
   NormalizedHistoryEvent,
 } from '../history-events/types';
 import type { LifecycleGroup } from '../lifecycle-groups/types';
+import type { WorkflowExecutionDetails } from '../workflow-execution/types';
 
 export type LifecycleGroupFilterKey = string;
 
-/** A named predicate evaluated against a group's known events. */
-export type LifecycleGroupFilterDefinition = Readonly<{
-  key: LifecycleGroupFilterKey;
-  matches: (
-    lifecycleGroup: LifecycleGroup,
-    getEvent: (eventId: HistoryEventId) => NormalizedHistoryEvent | undefined,
-  ) => boolean;
-}>;
+/** A named predicate whose inputs are determined by its details dependency. */
+export type LifecycleGroupFilterDefinition =
+  | Readonly<{
+      key: LifecycleGroupFilterKey;
+      dependsOnExecutionDetails?: false;
+      matches: (
+        lifecycleGroup: LifecycleGroup,
+        getEvent: (
+          eventId: HistoryEventId,
+        ) => NormalizedHistoryEvent | undefined,
+      ) => boolean;
+    }>
+  | Readonly<{
+      key: LifecycleGroupFilterKey;
+      dependsOnExecutionDetails: true;
+      matches: (
+        lifecycleGroup: LifecycleGroup,
+        getEvent: (
+          eventId: HistoryEventId,
+        ) => NormalizedHistoryEvent | undefined,
+        details: WorkflowExecutionDetails | null,
+      ) => boolean;
+    }>;
 
 /** A filter whose lifecycle group membership changed. */
 export type LifecycleGroupFilterIndexProjectionChange = Readonly<{

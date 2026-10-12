@@ -1,4 +1,8 @@
-import type { GetWorkflowExecutionHistoryResponse } from '$lib/types/events';
+import type {
+  GetWorkflowExecutionHistoryResponse,
+  PendingActivityInfo,
+  PendingNexusOperation,
+} from '$lib/types/events';
 import type { WorkflowExecutionAPIResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -9,12 +13,52 @@ import type {
 } from './types';
 import { compareEventIds } from '../history-events/compare-event-ids';
 import { normalizeHistoryEvent } from '../history-events/normalize-history-event';
-import { type NormalizedHistoryEvent } from '../history-events/types';
+import type {
+  HistoryEventId,
+  NormalizedHistoryEvent,
+} from '../history-events/types';
 import {
   fetchBidirectionalPages,
   type PageFetcherFn,
 } from '../network-utils/fetch-bidirectional-pages';
 import { retryableGet } from '../network-utils/retryable-get';
+
+/** Converts the execution details API response into lookup maps for pending membership and metadata access. */
+function toExecutionDetails(
+  response: WorkflowExecutionAPIResponse,
+): WorkflowExecutionDetails {
+  const { pendingActivities, pendingNexusOperations, ...details } = response;
+  const pendingActivitiesByActivityId = new Map<string, PendingActivityInfo>();
+  const pendingNexusOperationsByHeadEventId = new Map<
+    HistoryEventId,
+    PendingNexusOperation
+  >();
+
+  for (const activity of pendingActivities ?? []) {
+    if (!activity.activityId) {
+      throw new Error('Pending activity is missing its activity ID');
+    }
+    pendingActivitiesByActivityId.set(activity.activityId, activity);
+  }
+
+  for (const operation of pendingNexusOperations ?? []) {
+    if (operation.scheduledEventId == null) {
+      throw new Error(
+        'Pending Nexus operation is missing its scheduled event ID',
+      );
+    }
+    pendingNexusOperationsByHeadEventId.set(
+      String(operation.scheduledEventId),
+      operation,
+    );
+  }
+
+  return {
+    ...details,
+    pendingActivitiesByActivityId,
+    pendingNexusOperationsByHeadEventId,
+  };
+}
 
 /** Fetches current execution details, including pending activities and Nexus operations. */
 export async function fetchExecutionDetails(
@@ -35,7 +79,7 @@ export async function fetchExecutionDetails(
     throw new Error('Missing execution details response');
   }
 
-  return response;
+  return toExecutionDetails(response);
 }
 
 /** Fetches and validates the execution's WorkflowExecutionStarted event. */
