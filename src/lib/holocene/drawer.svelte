@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReducedMotion } from 'svelte/motion';
   import { fade, fly } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
@@ -44,12 +45,12 @@
   }: Props = $props();
 
   const flyParamsIn = $derived({
-    duration: 250,
+    duration: prefersReducedMotion.current ? 0 : 250,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
   });
 
   const flyParamsOut = $derived({
-    duration: 150,
+    duration: prefersReducedMotion.current ? 0 : 150,
     ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
   });
 
@@ -79,7 +80,7 @@
     class="fixed inset-0 z-[54] bg-surface-overlay-neutral"
     aria-hidden="true"
     data-inert-skip
-    transition:fade={{ duration: 200 }}
+    transition:fade={{ duration: prefersReducedMotion.current ? 0 : 200 }}
     use:portal
   ></div>
 {/if}
