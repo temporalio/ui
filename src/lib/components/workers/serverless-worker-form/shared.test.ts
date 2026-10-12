@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildComputeConfigForRegions,
   createDeploymentSchema,
   createVersionSchema,
   editVersionSchema,
@@ -338,5 +339,86 @@ describe('AgentCore provider validation', () => {
 
   it('does not require Lambda or Cloud Run fields', () => {
     expect(errorPaths(valid)).toEqual([]);
+  });
+});
+
+describe('buildComputeConfigForRegions', () => {
+  const EAST = 'aws-us-east-1';
+  const WEST = 'aws-us-west-2';
+
+  const lambda = (lambdaArn: string) => ({
+    provider: 'lambda' as const,
+    lambdaArn,
+    iamRoleArn: 'arn:aws:iam::123456789012:role/worker',
+    agentCoreEndpointArn: '',
+    roleExternalId: '',
+    gcpProject: '',
+    gcpRegion: '',
+    gcpWorkerPool: '',
+    gcpServiceAccount: '',
+    minReplicas: 0,
+    maxReplicas: 30,
+    initialReplicas: 0,
+    utilizationTarget: 0.8,
+    scaleDownStabilization: '90s',
+  });
+
+  const read = (group: { provider?: { details?: { data?: string } } }) =>
+    JSON.parse(atob(group.provider?.details?.data ?? btoa('{}')));
+
+  it('writes one group per region, each naming only its own', () => {
+    // A group per region rather than one listing both: a Lambda ARN is
+    // regional, so the two cannot share a group.
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: EAST,
+        values: lambda('arn:aws:lambda:us-east-1:1:function:w'),
+      },
+      {
+        regionId: WEST,
+        values: lambda('arn:aws:lambda:us-west-2:1:function:w'),
+      },
+    ]);
+
+    const groups = config.scalingGroups ?? {};
+    expect(Object.keys(groups)).toEqual([EAST, WEST]);
+    expect(groups[EAST].regionIds).toEqual([EAST]);
+    expect(groups[WEST].regionIds).toEqual([WEST]);
+  });
+
+  it('keeps each region its own resource', () => {
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: EAST,
+        values: lambda('arn:aws:lambda:us-east-1:1:function:w'),
+      },
+      {
+        regionId: WEST,
+        values: lambda('arn:aws:lambda:us-west-2:1:function:w'),
+      },
+    ]);
+
+    const groups = config.scalingGroups ?? {};
+    expect(read(groups[EAST]).arn).toBe(
+      'arn:aws:lambda:us-east-1:1:function:w',
+    );
+    expect(read(groups[WEST]).arn).toBe(
+      'arn:aws:lambda:us-west-2:1:function:w',
+    );
+  });
+
+  it('does not write the hardcoded default group', () => {
+    const config = buildComputeConfigForRegions([
+      {
+        regionId: EAST,
+        values: lambda('arn:aws:lambda:us-east-1:1:function:w'),
+      },
+    ]);
+
+    expect(Object.keys(config.scalingGroups ?? {})).not.toContain('default');
+  });
+
+  it('writes nothing for no regions, rather than an empty default', () => {
+    expect(buildComputeConfigForRegions([]).scalingGroups).toEqual({});
   });
 });

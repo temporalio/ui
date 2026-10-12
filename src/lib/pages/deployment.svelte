@@ -18,6 +18,7 @@
     setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import type { DescribeWorkerDeploymentResponse } from '$lib/types/deployments';
+  import type { NamespaceRegion } from '$lib/utilities/compute-regions';
   import { deploymentShowsConnectionStatus } from '$lib/utilities/connection-status';
   import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
@@ -26,10 +27,15 @@
   interface Props {
     showInstancesLink?: boolean;
     showConnectionStatus?: boolean;
+    /** Regions the namespace runs in (highly available namespaces have more than one). */
+    namespaceRegions?: readonly NamespaceRegion[];
   }
 
-  let { showInstancesLink = true, showConnectionStatus = true }: Props =
-    $props();
+  let {
+    showInstancesLink = true,
+    showConnectionStatus = true,
+    namespaceRegions,
+  }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
@@ -180,10 +186,12 @@
         <tr>
           <th>{translate('deployments.build-id')}</th>
           <th>{translate('deployments.lifecycle')}</th>
-          <th>{translate('deployments.compute')}</th>
-          {#if connectionColumnVisible}
-            <th>{translate('deployments.connection')}</th>
-          {/if}
+          <th class="whitespace-nowrap">
+            {translate('workers.region')}
+            <span class="font-normal text-secondary">
+              {translate('workers.region-order-hint')}
+            </span>
+          </th>
           <th>{translate('deployments.deployed')}</th>
           <th>{translate('deployments.actions')}</th>
         </tr>
@@ -197,6 +205,7 @@
             {deploymentName}
             conflictToken={deployment.conflictToken}
             showConnectionStatus={connectionColumnVisible}
+            {namespaceRegions}
             onChange={reload}
             onValidationComplete={reload}
           />

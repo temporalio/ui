@@ -10,6 +10,12 @@
 
   import { type ComputeProviderTemplates } from './compute-providers';
   import {
+    type ComputeRegion,
+    lambdaArnPlaceholderFor,
+    type RegionCoverageMode,
+    regionPreview,
+  } from './multi-region';
+  import {
     type ComputeProviderOption,
     type ComputeProviderValue,
     defaultScaleDownStabilization,
@@ -19,7 +25,11 @@
   } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
+  import ComputeProviderPerRegion from './compute-provider-per-region.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
+  import FailoverPreview from './failover-preview.svelte';
+  import RegionBlock from './region-block.svelte';
+  import RegionsHeading from './regions-heading.svelte';
 
   interface Props {
     initialData: {
@@ -48,7 +58,27 @@
     error?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
+    /**
+     * The templates offered per provider. Defaults to the ones bundled here,
+     * which is what a self-hosted deployment wants. A consumer overrides them
+     * by passing a full map: it is exhaustive over ComputeProviderValue, so
+     * adding a provider fails the consumer's type check until it supplies
+     * templates for it.
+     */
     templates?: Record<ComputeProviderValue, ComputeProviderTemplates>;
+    /**
+     * Regions this namespace runs in. When more than one is provided (a highly
+     * available namespace), the form edits a compute provider per region.
+     */
+    regions?: readonly ComputeRegion[];
+    /** Namespace name, shown in the multi-region heading. */
+    namespace?: string;
+    /** The Worker Deployment this version belongs to, shown in the preview. */
+    deploymentName?: string;
+    /** The version being edited, shown in the preview. */
+    buildId?: string;
+    /** How the existing version covers the namespace's regions. */
+    initialRegionMode?: RegionCoverageMode;
   }
 
   let {
@@ -60,7 +90,14 @@
     computeProviders,
     gcpRegions,
     templates,
+    regions,
+    namespace = '',
+    deploymentName,
+    buildId,
+    initialRegionMode,
   }: Props = $props();
+
+  const isMultiRegion = $derived(!!regions && regions.length > 1);
 
   const superform = superForm(
     {
@@ -102,7 +139,7 @@
   const { form, errors, enhance, submitting } = superform;
 </script>
 
-<div class="flex flex-col gap-6">
+<div class="relative flex max-w-[45rem] flex-col gap-6">
   {#if error}
     <Alert intent="error" title={translate('common.error-occurred')}
       >{error}</Alert
@@ -116,33 +153,62 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker
-        bind:provider={$form.provider}
-        providers={computeProviders}
-      />
-      <ComputeFields
-        provider={$form.provider}
-        bind:lambdaArn={$form.lambdaArn}
-        bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
-        bind:iamRoleArn={$form.iamRoleArn}
-        bind:roleExternalId={$form.roleExternalId}
-        bind:gcpProject={$form.gcpProject}
-        bind:gcpRegion={$form.gcpRegion}
-        {gcpRegions}
-        bind:gcpWorkerPool={$form.gcpWorkerPool}
-        bind:gcpServiceAccount={$form.gcpServiceAccount}
-        bind:minReplicas={$form.minReplicas}
-        bind:maxReplicas={$form.maxReplicas}
-        bind:initialReplicas={$form.initialReplicas}
-        bind:utilizationTarget={$form.utilizationTarget}
-        bind:scaleDownStabilization={$form.scaleDownStabilization}
-        bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
-        bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
-        bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-        bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-        {templates}
-        errors={$errors}
-      />
+      {#if isMultiRegion && regions}
+        <ComputeProviderPerRegion
+          {namespace}
+          {regions}
+          {computeProviders}
+          initialMode={initialRegionMode}
+          {deploymentName}
+          {buildId}
+        />
+      {:else}
+        <ComputeProviderPicker
+          layout="summary"
+          bind:provider={$form.provider}
+          providers={computeProviders}
+        />
+        <hr class="my-5 border-primary" />
+        {#if regions?.[0]}
+          <RegionsHeading {namespace} {regions} />
+          <FailoverPreview
+            {namespace}
+            provider={$form.provider}
+            regions={[regionPreview(regions[0], $form.provider, $form)]}
+            {deploymentName}
+            {buildId}
+          />
+        {/if}
+        <RegionBlock region={regions?.[0]}>
+          <ComputeFields
+            provider={$form.provider}
+            leadingDivider={false}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
+              regions?.[0] && (regions[0].label ?? regions[0].id),
+            )}
+            bind:lambdaArn={$form.lambdaArn}
+            bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
+            bind:iamRoleArn={$form.iamRoleArn}
+            bind:roleExternalId={$form.roleExternalId}
+            bind:gcpProject={$form.gcpProject}
+            bind:gcpRegion={$form.gcpRegion}
+            {gcpRegions}
+            bind:gcpWorkerPool={$form.gcpWorkerPool}
+            bind:gcpServiceAccount={$form.gcpServiceAccount}
+            bind:minReplicas={$form.minReplicas}
+            bind:maxReplicas={$form.maxReplicas}
+            bind:initialReplicas={$form.initialReplicas}
+            bind:utilizationTarget={$form.utilizationTarget}
+            bind:scaleDownStabilization={$form.scaleDownStabilization}
+            bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
+            bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
+            bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
+            bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+            {templates}
+            errors={$errors}
+          />
+        </RegionBlock>
+      {/if}
     </Card>
 
     <div class="flex items-center justify-between">
