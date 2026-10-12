@@ -5,19 +5,24 @@
     DetailListLinkValue,
     DetailListTextValue,
     DetailListTimestampValue,
+    DetailListValue,
   } from '$lib/components/detail-list';
   import NexusOperationInputAndOutcome from '$lib/components/standalone-nexus-operations/nexus-operation-input-and-outcome.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconFilter } from '$lib/io/icon';
+  import { Badge } from '$lib/io/badge';
+  import { IconFilter, IconRetry } from '$lib/io/icon';
   import {
     eventLinkTargetTypeLabel,
     toEventLinkView,
   } from '$lib/utilities/event-link';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
-  import { toNexusOperationCancellationStateReadable } from '$lib/utilities/screaming-enums';
+  import {
+    toNexusOperationCancellationStateReadable,
+    toPendingNexusOperationStateReadable,
+  } from '$lib/utilities/screaming-enums';
   import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
@@ -30,6 +35,11 @@
   const info = $derived($nexusOperationExecution?.info);
 
   const hasLastAttemptFailure = $derived(!!info?.lastAttemptFailure);
+  const isRetrying = $derived((info?.attempt ?? 0) > 1);
+  const hasState = $derived(
+    !!info?.state &&
+      String(info.state) !== 'PENDING_NEXUS_OPERATION_STATE_UNSPECIFIED',
+  );
   const hasNexusHeader = $derived(
     Object.keys(info?.nexusHeader ?? {}).length > 0,
   );
@@ -149,6 +159,66 @@
           <DetailListTextValue copyable text={info.operationToken} />
         {/if}
       </DetailList>
+    </div>
+
+    <div class="space-y-4">
+      <h5 class="text-secondary">
+        {translate('standalone-nexus-operations.start-attempts')}
+      </h5>
+      <DetailList
+        rowCount={3}
+        aria-label={translate('standalone-nexus-operations.start-attempts')}
+        class="gap-y-4"
+      >
+        <DetailListLabel
+          >{translate(
+            'standalone-nexus-operations.start-attempts',
+          )}</DetailListLabel
+        >
+        <DetailListValue class="items-center gap-1">
+          <Badge
+            text={String(info.attempt ?? 0)}
+            colorScheme={isRetrying ? 'danger' : 'neutral'}
+            Icon={IconRetry}
+          />
+          {#if hasState}
+            <Badge
+              text={String(
+                toPendingNexusOperationStateReadable(info.state ?? undefined),
+              )}
+              colorScheme="info"
+            />
+          {/if}
+        </DetailListValue>
+        <DetailListLabel
+          >{translate(
+            'standalone-nexus-operations.last-attempt-complete-time',
+          )}</DetailListLabel
+        >
+        <DetailListTimestampValue
+          timestamp={info.lastAttemptCompleteTime}
+          fallback="-"
+        />
+        <DetailListLabel
+          >{translate(
+            'standalone-nexus-operations.next-attempt-schedule-time',
+          )}</DetailListLabel
+        >
+        <DetailListTimestampValue
+          timestamp={info.nextAttemptScheduleTime}
+          fallback="-"
+        />
+      </DetailList>
+      {#if hasLastAttemptFailure}
+        <div class="space-y-2">
+          <p class="font-medium text-secondary">
+            {translate('standalone-nexus-operations.last-attempt-failure')}
+          </p>
+          <CodeBlock
+            content={JSON.stringify(info.lastAttemptFailure, null, 2)}
+          />
+        </div>
+      {/if}
     </div>
 
     <div class="space-y-4">
@@ -299,52 +369,6 @@
         <DetailListTextValue text={fromSeconds(info.startToCloseTimeout)} />
       </DetailList>
     </div>
-
-    {#if (info.attempt ?? 0) > 1}
-      <div class="space-y-4">
-        <h5 class="text-secondary">
-          {translate('standalone-nexus-operations.attempt-section')}
-        </h5>
-        <DetailList
-          rowCount={3}
-          aria-label={translate('standalone-nexus-operations.attempt-section')}
-          class="gap-y-4"
-        >
-          <DetailListLabel
-            >{translate('standalone-nexus-operations.attempt')}</DetailListLabel
-          >
-          <DetailListTextValue text={String(info.attempt)} />
-          <DetailListLabel
-            >{translate(
-              'standalone-nexus-operations.last-attempt-complete-time',
-            )}</DetailListLabel
-          >
-          <DetailListTimestampValue
-            timestamp={info.lastAttemptCompleteTime}
-            fallback="-"
-          />
-          <DetailListLabel
-            >{translate(
-              'standalone-nexus-operations.next-attempt-schedule-time',
-            )}</DetailListLabel
-          >
-          <DetailListTimestampValue
-            timestamp={info.nextAttemptScheduleTime}
-            fallback="-"
-          />
-        </DetailList>
-        {#if hasLastAttemptFailure}
-          <div class="space-y-2">
-            <p class="font-medium text-secondary">
-              {translate('standalone-nexus-operations.last-attempt-failure')}
-            </p>
-            <CodeBlock
-              content={JSON.stringify(info.lastAttemptFailure, null, 2)}
-            />
-          </div>
-        {/if}
-      </div>
-    {/if}
 
     {#if info.cancellationInfo}
       <div class="space-y-4">
