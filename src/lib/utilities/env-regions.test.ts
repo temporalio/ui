@@ -65,12 +65,10 @@ describe('parseReplicaRegions', () => {
     expect(
       providers?.find(({ value }) => value === 'cloud-run')?.replicaRegions,
     ).toEqual([{ regionId: 'gcp-us-east1' }]);
-    // A provider nobody named is not offered, as a consumer offers only the
-    // providers that match its Namespace's cloud.
-    expect(providers?.map(({ value }) => value)).toEqual([
-      'lambda',
-      'cloud-run',
-    ]);
+    // Every provider stays on offer; one nobody named offers no replica.
+    expect(
+      providers?.find(({ value }) => value === 'agentcore')?.replicaRegions,
+    ).toEqual([]);
   });
 
   it('keeps a label given after a replica region', () => {

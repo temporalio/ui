@@ -337,7 +337,9 @@
 
   <hr class="my-5 border-primary" />
 
-  <RegionsHeading regions={shownRegions} />
+  {#if replicated}
+    <RegionsHeading regions={shownRegions} />
+  {/if}
   <FailoverPreview
     {namespace}
     {provider}
@@ -347,8 +349,10 @@
   />
 
   <div class="flex flex-col gap-4">
+    <!-- Without high availability the group is not scoped to a region, so the
+    card names none. -->
     <RegionBlock
-      region={primaryRegion}
+      region={replicated ? primaryRegion : undefined}
       showRole={replicated}
       roleTooltip={translate('workers.region-role-primary-tooltip', {
         region: primaryLabel,

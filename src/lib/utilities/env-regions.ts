@@ -55,8 +55,8 @@ const PROVIDERS: ReadonlySet<string> = new Set(COMPUTE_PROVIDER_VALUES);
 /**
  * Reads `provider:region` pairs separated by commas, where a region is
  * `regionId` or `regionId=label`, for example
- * `lambda:aws-us-west-2=us-west-2,lambda:aws-us-west-1`, into the providers it
- * names, each with the replica regions it was given. Returns undefined when no pair is valid, which
+ * `lambda:aws-us-west-2=us-west-2,lambda:aws-us-west-1`, into every provider,
+ * each with the replica regions it was given. Returns undefined when no pair is valid, which
  * leaves the form's default providers in place.
  */
 export const parseReplicaRegions = (
@@ -70,11 +70,7 @@ export const parseReplicaRegions = (
         PROVIDERS.has(provider) && !!region(value ?? '').regionId,
     );
   if (!pairs.length) return undefined;
-  // Only the providers named, as a consumer offers only the providers that
-  // match its Namespace's cloud.
-  return COMPUTE_PROVIDER_VALUES.filter((value) =>
-    pairs.some(([provider]) => provider === value),
-  ).map((value: ComputeProviderValue) => ({
+  return COMPUTE_PROVIDER_VALUES.map((value: ComputeProviderValue) => ({
     value,
     replicaRegions: pairs
       .filter(([provider]) => provider === value)
