@@ -21,6 +21,10 @@
     label = option.label,
     onclick,
   }: Props = $props();
+
+  const accessibleName = $derived(
+    `${option.label}, ${option.count === 1 ? '1 example' : `${option.count} examples`}`,
+  );
 </script>
 
 <button
@@ -28,14 +32,18 @@
   class="catalog-facet-option {variant}"
   class:text-secondary={!option.count && !pressed}
   aria-pressed={pressed}
-  data-facet-label={option.label}
+  aria-label={accessibleName}
   {onclick}
 >
   {#if isCatalogKind(option.id)}
     <CatalogKindGlyph kind={option.id} />
   {/if}
   <span class="min-w-0 flex-1 truncate">{label}</span>
-  <BadgeCount value={option.count} class="tabular-nums text-secondary" />
+  <BadgeCount
+    value={option.count}
+    class="tabular-nums text-secondary"
+    aria-hidden="true"
+  />
 </button>
 
 <style lang="postcss">

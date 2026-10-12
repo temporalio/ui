@@ -5,8 +5,8 @@
   import IconExternalLink from '$lib/io/icon/icons/external-link.svelte';
 
   import {
-    latestRunPresentation,
     relativeRunTime,
+    sessionStatusPresentation,
   } from './session-presentation';
   import type { CatalogSession } from './session-store';
   import type { WorkbenchHost } from './workbench-host';
@@ -18,7 +18,7 @@
 
   let { latest, host }: Props = $props();
 
-  const run = $derived(latest ? latestRunPresentation(latest) : undefined);
+  const run = $derived(latest ? sessionStatusPresentation(latest) : undefined);
   const evidence = $derived(
     latest?.outcome?.status === 'accepted'
       ? host.evidenceLink(latest.outcome)

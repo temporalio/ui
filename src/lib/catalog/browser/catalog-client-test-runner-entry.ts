@@ -1,5 +1,6 @@
 import { flushSync as flushSvelte, mount, tick, unmount } from 'svelte';
 
+import type { CatalogFilters } from './catalog-list-state';
 import { createCatalogSessionStore } from './session-store';
 import type { BrowserCatalogDescriptor } from './types';
 import type {
@@ -175,10 +176,14 @@ export async function renderList({
   descriptors = [descriptor, localDescriptor, cloudDescriptor],
   exampleHref = (exampleId: string) => `/examples/${exampleId}`,
   workerState = 'ready',
+  initialFilters,
+  onfilterschange,
 }: {
   descriptors?: BrowserCatalogDescriptor[];
   exampleHref?: (exampleId: string) => string;
   workerState?: ReadinessCheck['state'];
+  initialFilters?: CatalogFilters;
+  onfilterschange?: (filters: CatalogFilters) => void;
 } = {}) {
   readinessCallCount = 0;
   prepareStartPromise();
@@ -199,6 +204,8 @@ export async function renderList({
       target,
       props: {
         descriptors,
+        initialFilters,
+        onfilterschange,
         host,
         sessionStore: createCatalogSessionStore(host),
         exampleHref,

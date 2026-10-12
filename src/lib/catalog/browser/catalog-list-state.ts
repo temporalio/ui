@@ -1,4 +1,9 @@
-import { catalogKinds, orderedCatalogKinds } from './catalog-kinds';
+import {
+  type CatalogExecutionKind,
+  catalogKinds,
+  isCatalogKind,
+  orderedCatalogKinds,
+} from './catalog-kinds';
 import type { BrowserCatalogDescriptor, BrowserCatalogSource } from './types';
 
 export type PendingRunCounts = Readonly<Record<string, number>>;
@@ -29,15 +34,14 @@ export const catalogFilterKeys: readonly CatalogFilterKey[] = [
   'source',
 ];
 
-export const catalogFilterTitles: Readonly<Record<CatalogFilterKey, string>> = {
-  kind: 'Execution kind',
-  feature: 'Feature',
-  source: 'Source',
-};
+export const drawerFilterKeys: readonly CatalogFilterKey[] = [
+  'feature',
+  'source',
+];
 
 export interface CatalogFilters {
   query: string;
-  kind: string | null;
+  kind: CatalogExecutionKind | null;
   feature: string | null;
   source: string | null;
 }
@@ -49,26 +53,32 @@ export const emptyCatalogFilters: CatalogFilters = {
   source: null,
 };
 
+const parseKind = (value: string | null): CatalogExecutionKind | null => {
+  if (value === null || isCatalogKind(value)) return value;
+  throw new Error(`Unknown catalog execution kind "${value}"`);
+};
+
+const withFilterValue = (
+  filters: CatalogFilters,
+  key: CatalogFilterKey,
+  value: string | null,
+): CatalogFilters => {
+  if (key === 'kind') return { ...filters, kind: parseKind(value) };
+  return { ...filters, [key]: value };
+};
+
 export const toggleCatalogFilter = (
   filters: CatalogFilters,
   key: CatalogFilterKey,
   value: string | null,
-): CatalogFilters => ({
-  ...filters,
-  [key]: filters[key] === value ? null : value,
-});
-
-export const clearCatalogFilter = (
-  filters: CatalogFilters,
-  key: CatalogFilterKey,
-): CatalogFilters => ({ ...filters, [key]: null });
+): CatalogFilters =>
+  withFilterValue(filters, key, filters[key] === value ? null : value);
 
 export const clearCatalogFilters = (
   filters: CatalogFilters,
-): CatalogFilters => ({
-  ...emptyCatalogFilters,
-  query: filters.query,
-});
+  keys: readonly CatalogFilterKey[] = catalogFilterKeys,
+): CatalogFilters =>
+  keys.reduce((next, key) => withFilterValue(next, key, null), filters);
 
 export interface CatalogFacetOption {
   id: string | null;
@@ -86,13 +96,77 @@ export interface ActiveCatalogFilter {
   label: string;
 }
 
-const facetValues: Readonly<
-  Record<CatalogFilterKey, (descriptor: BrowserCatalogDescriptor) => string[]>
-> = {
-  kind: ({ execution }) => [execution.kind],
-  feature: ({ capabilityTags }) => [...new Set(capabilityTags)],
-  source: ({ source }) => [source.id],
+interface FacetOptionContext {
+  candidates: readonly BrowserCatalogDescriptor[];
+  counts: ReadonlyMap<string, number>;
+  sources: readonly BrowserCatalogSource[];
+  selected: string | null;
+}
+
+interface FacetDefinition {
+  title: string;
+  values: (descriptor: BrowserCatalogDescriptor) => string[];
+  options: (context: FacetOptionContext) => CatalogFacetOption[];
+}
+
+const allOption = (label: string, count: number): CatalogFacetOption => ({
+  id: null,
+  label,
+  count,
+});
+
+const byCountThenLabel = (a: CatalogFacetOption, b: CatalogFacetOption) =>
+  b.count - a.count || a.label.localeCompare(b.label);
+
+const facetDefinitions: Readonly<Record<CatalogFilterKey, FacetDefinition>> = {
+  kind: {
+    title: 'Execution kind',
+    values: ({ execution }) => [execution.kind],
+    options: ({ candidates, counts }) => [
+      allOption('All kinds', candidates.length),
+      ...orderedCatalogKinds.map(({ kind, label }) => ({
+        id: kind,
+        label,
+        count: counts.get(kind) ?? 0,
+      })),
+    ],
+  },
+  feature: {
+    title: 'Feature',
+    values: ({ capabilityTags }) => [...new Set(capabilityTags)],
+    options: ({ counts, selected }) =>
+      [...new Set([...counts.keys(), ...(selected ? [selected] : [])])]
+        .map((id) => ({
+          id,
+          label: featureLabel(id),
+          count: counts.get(id) ?? 0,
+        }))
+        .sort(byCountThenLabel),
+  },
+  source: {
+    title: 'Source',
+    values: ({ source }) => [source.id],
+    options: ({ candidates, counts, sources }) => [
+      allOption('All sources', candidates.length),
+      ...sources.map(({ id, label }) => ({
+        id,
+        label,
+        count: counts.get(id) ?? 0,
+      })),
+    ],
+  },
 };
+
+export const catalogFilterTitle = (key: CatalogFilterKey): string =>
+  facetDefinitions[key].title;
+
+const mapFilterKeys = <Value>(
+  build: (key: CatalogFilterKey) => Value,
+): Record<CatalogFilterKey, Value> => ({
+  kind: build('kind'),
+  feature: build('feature'),
+  source: build('source'),
+});
 
 const matchesQuery = (descriptor: BrowserCatalogDescriptor, query: string) => {
   if (!query) return true;
@@ -117,36 +191,19 @@ const matchesFacets = (
   catalogFilterKeys.every((key) => {
     const selected = filters[key];
     if (key === ignoredKey || selected === null) return true;
-    return facetValues[key](descriptor).includes(selected);
+    return facetDefinitions[key].values(descriptor).includes(selected);
   });
 
 const countValues = (
   descriptors: readonly BrowserCatalogDescriptor[],
-  key: CatalogFilterKey,
+  values: FacetDefinition['values'],
 ) => {
   const counts = new Map<string, number>();
-  for (const value of descriptors.flatMap(facetValues[key])) {
+  for (const value of descriptors.flatMap(values)) {
     counts.set(value, (counts.get(value) ?? 0) + 1);
   }
   return counts;
 };
-
-const featureOptions = (
-  counts: ReadonlyMap<string, number>,
-  selected: string | null,
-) => {
-  const ids = selected && !counts.has(selected) ? [selected] : [];
-
-  return [...counts.keys(), ...ids]
-    .map((id) => ({ id, label: featureLabel(id), count: counts.get(id) ?? 0 }))
-    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-};
-
-const allOption = (label: string, count: number): CatalogFacetOption => ({
-  id: null,
-  label,
-  count,
-});
 
 export const catalogFacets = (
   descriptors: readonly BrowserCatalogDescriptor[],
@@ -157,35 +214,23 @@ export const catalogFacets = (
   const searched = descriptors.filter((descriptor) =>
     matchesQuery(descriptor, query),
   );
-  const candidatesFor = (key: CatalogFilterKey) =>
-    searched.filter((descriptor) => matchesFacets(descriptor, filters, key));
 
-  const kindCandidates = candidatesFor('kind');
-  const kindCounts = countValues(kindCandidates, 'kind');
-  const featureCounts = countValues(candidatesFor('feature'), 'feature');
-  const sourceCandidates = candidatesFor('source');
-  const sourceCounts = countValues(sourceCandidates, 'source');
+  const options = mapFilterKeys((key) => {
+    const { values, options: buildOptions } = facetDefinitions[key];
+    const candidates = searched.filter((descriptor) =>
+      matchesFacets(descriptor, filters, key),
+    );
+
+    return buildOptions({
+      candidates,
+      counts: countValues(candidates, values),
+      sources,
+      selected: filters[key],
+    });
+  });
 
   return {
-    options: {
-      kind: [
-        allOption('All kinds', kindCandidates.length),
-        ...orderedCatalogKinds.map(({ kind, label }) => ({
-          id: kind,
-          label,
-          count: kindCounts.get(kind) ?? 0,
-        })),
-      ],
-      feature: featureOptions(featureCounts, filters.feature),
-      source: [
-        allOption('All sources', sourceCandidates.length),
-        ...sources.map(({ id, label }) => ({
-          id,
-          label,
-          count: sourceCounts.get(id) ?? 0,
-        })),
-      ],
-    },
+    options,
     descriptors: searched.filter((descriptor) =>
       matchesFacets(descriptor, filters),
     ),
@@ -203,3 +248,35 @@ export const activeCatalogFilters = (
     const option = facets.options[key].find(({ id }) => id === selected);
     return [{ key, label: option?.label ?? selected }];
   });
+
+const searchParamNames: readonly [keyof CatalogFilters, string][] = [
+  ['query', 'q'],
+  ['kind', 'kind'],
+  ['feature', 'feature'],
+  ['source', 'source'],
+];
+
+export const catalogFiltersFromSearchParams = (
+  params: URLSearchParams,
+): CatalogFilters => {
+  const kind = params.get('kind');
+
+  return {
+    query: params.get('q') ?? '',
+    kind: isCatalogKind(kind) ? kind : null,
+    feature: params.get('feature') || null,
+    source: params.get('source') || null,
+  };
+};
+
+export const catalogFiltersUrl = (url: URL, filters: CatalogFilters): URL => {
+  const next = new URL(url);
+
+  for (const [field, name] of searchParamNames) {
+    next.searchParams.delete(name);
+    const value = filters[field];
+    if (value) next.searchParams.set(name, value);
+  }
+
+  return next;
+};

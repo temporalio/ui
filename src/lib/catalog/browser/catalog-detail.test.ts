@@ -859,10 +859,6 @@ describe('CatalogDetail', () => {
     );
 
     expect(body).toContain('Nothing to verify was specified.');
-    expect(source).toContain("'launch-rejected': 'Start failed'");
-    expect(source).toContain("'launch-uncertain': 'Start not confirmed'");
-    expect(source).toContain("'observation-paused': 'Status checks paused'");
-    expect(source).toContain("stopped: 'Status checks stopped'");
     expect(source).toContain('aria-label="Resume checking"');
     expect(source).toContain('aria-label="Stop checking"');
     expect(source).toContain(

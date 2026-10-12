@@ -4,7 +4,7 @@
     type CatalogFilterKey,
     catalogFilterKeys,
     type CatalogFilters,
-    catalogFilterTitles,
+    catalogFilterTitle,
   } from './catalog-list-state';
 
   import CatalogFacetOption from './catalog-facet-option.svelte';
@@ -27,7 +27,7 @@
       <legend
         class="mb-1.5 text-xs font-medium uppercase tracking-wider text-secondary"
       >
-        {catalogFilterTitles[key]}
+        {catalogFilterTitle(key)}
       </legend>
       {#each facets.options[key] as option (option.id)}
         <CatalogFacetOption

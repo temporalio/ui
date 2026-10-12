@@ -47,10 +47,9 @@ describe('CatalogList client interactions', () => {
   const buttons = (target: HTMLElement, selector = 'button') =>
     Array.from(target.querySelectorAll<HTMLButtonElement>(selector));
   const facet = (target: HTMLElement, label: string, group = '') =>
-    buttons(target, `nav[aria-label="Filter examples"] ${group} button`).find(
-      (candidate) =>
-        candidate.querySelector('.truncate')?.textContent?.trim() === label,
-    );
+    target.querySelector<HTMLButtonElement>(
+      `nav[aria-label="Filter examples"] ${group} button[aria-label^="${label}, "]`,
+    ) ?? undefined;
   const facetCount = (target: HTMLElement, label: string) =>
     facet(target, label)?.lastElementChild?.textContent?.trim();
   const summary = (target: HTMLElement) =>
@@ -206,6 +205,36 @@ describe('CatalogList client interactions', () => {
     expect(rows[1]?.textContent).toContain('Child workflows');
     expect(facetCount(target, 'Standalone Nexus Operation')).toBe('1');
     expect(facetCount(target, 'Standalone Activity')).toBe('0');
+  });
+
+  it('starts from the given filters and reports only later changes', async () => {
+    const changes: unknown[] = [];
+    const target = await client.renderList({
+      initialFilters: {
+        query: '',
+        kind: null,
+        feature: null,
+        source: 'local',
+      },
+      onfilterschange: (filters) => changes.push(filters),
+    });
+    await client.flush();
+
+    expect(summary(target)).toBe('1 of 3 examples Local Clear filters');
+    expect(changes).toEqual([]);
+    expect(facet(target, 'Local')?.getAttribute('aria-label')).toBe(
+      'Local, 1 example',
+    );
+
+    facet(target, 'Workflow', '[data-facet="kind"]')?.click();
+    await client.flush();
+
+    expect(changes.at(-1)).toEqual({
+      query: '',
+      kind: 'workflow',
+      feature: null,
+      source: 'local',
+    });
   });
 
   it('uses the host-provided href for the Configure action', async () => {

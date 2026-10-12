@@ -5,9 +5,11 @@ import {
   type CatalogFacetOption,
   catalogFacets,
   type CatalogFilters,
+  catalogFiltersFromSearchParams,
+  catalogFiltersUrl,
   changePendingRunCount,
-  clearCatalogFilter,
   clearCatalogFilters,
+  drawerFilterKeys,
   emptyCatalogFilters,
   featureLabel,
   toggleCatalogFilter,
@@ -150,7 +152,13 @@ describe('catalog filter changes', () => {
     expect(toggleCatalogFilter(selected, 'kind', null).kind).toBeNull();
   });
 
-  it('clears one filter or all filters, and keeps the search query', () => {
+  it('rejects an execution kind that is not registered', () => {
+    expect(() =>
+      toggleCatalogFilter(emptyCatalogFilters, 'kind', 'schedule'),
+    ).toThrow('Unknown catalog execution kind "schedule"');
+  });
+
+  it('clears the given filters, or all filters, and keeps the search query', () => {
     const filters: CatalogFilters = {
       query: 'retry',
       kind: 'workflow',
@@ -158,14 +166,61 @@ describe('catalog filter changes', () => {
       source: 'oss',
     };
 
-    expect(clearCatalogFilter(filters, 'feature')).toEqual({
+    expect(clearCatalogFilters(filters, ['feature'])).toEqual({
       ...filters,
       feature: null,
+    });
+    expect(clearCatalogFilters(filters, drawerFilterKeys)).toEqual({
+      ...filters,
+      feature: null,
+      source: null,
     });
     expect(clearCatalogFilters(filters)).toEqual({
       ...emptyCatalogFilters,
       query: 'retry',
     });
+  });
+});
+
+describe('catalog filter URLs', () => {
+  const base = new URL('https://ui.test/namespaces/default/catalog?tab=all');
+
+  it('writes each filter to its own search parameter and keeps others', () => {
+    const url = catalogFiltersUrl(base, {
+      query: 'nexus op',
+      kind: 'standalone-nexus-operation',
+      feature: 'retries',
+      source: null,
+    });
+
+    expect(url.searchParams.get('tab')).toBe('all');
+    expect(url.searchParams.get('q')).toBe('nexus op');
+    expect(url.searchParams.get('kind')).toBe('standalone-nexus-operation');
+    expect(url.searchParams.get('feature')).toBe('retries');
+    expect(url.searchParams.has('source')).toBe(false);
+    expect(catalogFiltersFromSearchParams(url.searchParams)).toEqual({
+      query: 'nexus op',
+      kind: 'standalone-nexus-operation',
+      feature: 'retries',
+      source: null,
+    });
+  });
+
+  it('removes cleared filters from the URL', () => {
+    const filtered = catalogFiltersUrl(base, {
+      ...emptyCatalogFilters,
+      kind: 'workflow',
+    });
+
+    expect(catalogFiltersUrl(filtered, emptyCatalogFilters).search).toBe(
+      '?tab=all',
+    );
+  });
+
+  it('ignores an unknown execution kind in the URL', () => {
+    expect(
+      catalogFiltersFromSearchParams(new URLSearchParams('kind=schedule&q=')),
+    ).toEqual(emptyCatalogFilters);
   });
 });
 

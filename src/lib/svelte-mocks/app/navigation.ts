@@ -40,3 +40,8 @@ export function afterNavigate(
 ): void {
   fn;
 }
+
+export function replaceState(url: string | URL, state: App.PageState): void {
+  void url;
+  void state;
+}

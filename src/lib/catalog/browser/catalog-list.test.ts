@@ -217,7 +217,7 @@ describe('CatalogList', () => {
       },
     });
 
-    expect(body).toContain('Launch rejected');
+    expect(body).toContain('Start failed');
     expect(body).not.toContain('>launch-rejected<');
   });
 });

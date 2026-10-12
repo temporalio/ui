@@ -148,9 +148,8 @@
   import { featureLabel } from './catalog-list-state';
   import { launchOutcomeExplanation } from './launch-outcome-presentation';
   import { createReadinessLoader } from './readiness-loader';
-  import { terminalStatusPresentation } from './session-presentation';
+  import { sessionStatusPresentation } from './session-presentation';
   import {
-    type CatalogSessionState,
     type CatalogSessionStore,
     catalogTargetFingerprint,
   } from './session-store';
@@ -356,16 +355,6 @@
   let executionKindLabel = $derived(
     catalogKinds[descriptor.execution.kind].label,
   );
-
-  const sessionStateLabels: Record<CatalogSessionState, string> = {
-    'execution-terminal': 'Finished',
-    'launch-rejected': 'Start failed',
-    'launch-uncertain': 'Start not confirmed',
-    'observation-paused': 'Status checks paused',
-    observing: 'Running',
-    starting: 'Starting',
-    stopped: 'Status checks stopped',
-  };
 
   const relativeSessionTime = (createdAt: number) => {
     const distance = formatDistanceAbbreviated({
@@ -664,6 +653,7 @@
                   session.outcome?.status === 'accepted'
                     ? host.evidenceLink(session.outcome)
                     : undefined}
+                {@const status = sessionStatusPresentation(session)}
                 <TableRow>
                   <td class="truncate py-2 font-mono text-xs text-secondary">
                     {session.reference.attempt.executionId}
@@ -672,16 +662,13 @@
                     {relativeSessionTime(session.createdAt)}
                   </td>
                   <td>
-                    {#if session.state === 'execution-terminal'}
-                      {@const status = terminalStatusPresentation(
-                        session.terminalStatus!,
-                      )}
+                    {#if status.status}
                       <BadgeStatus status={status.status} text={status.label} />
                     {:else}
                       {@const explanation =
                         launchOutcomeExplanation(session.outcome) ??
                         session.error}
-                      <Badge text={sessionStateLabels[session.state]} />
+                      <Badge text={status.label} />
                       {#if explanation}
                         <p class="mt-1 text-xs text-secondary">
                           {explanation}

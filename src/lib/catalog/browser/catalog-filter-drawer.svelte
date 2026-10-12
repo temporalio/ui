@@ -7,7 +7,8 @@
     type CatalogFacets,
     type CatalogFilterKey,
     type CatalogFilters,
-    catalogFilterTitles,
+    catalogFilterTitle,
+    drawerFilterKeys,
   } from './catalog-list-state';
 
   import CatalogFacetOption from './catalog-facet-option.svelte';
@@ -28,7 +29,6 @@
     onclear,
   }: Props = $props();
 
-  const drawerKeys: readonly CatalogFilterKey[] = ['feature', 'source'];
   const resultCount = $derived(facets.descriptors.length);
 </script>
 
@@ -42,12 +42,12 @@
   class="max-h-[82vh] md:hidden"
 >
   <DrawerContent title="Filters" class="flex flex-col gap-5">
-    {#each drawerKeys as key (key)}
+    {#each drawerFilterKeys as key (key)}
       <fieldset class="flex min-w-0 flex-col" data-facet={key}>
         <legend
           class="mb-1.5 text-xs font-medium uppercase tracking-wider text-secondary"
         >
-          {catalogFilterTitles[key]}
+          {catalogFilterTitle(key)}
         </legend>
         <div class="flex flex-wrap gap-1.5">
           {#each facets.options[key] as option (option.id)}

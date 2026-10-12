@@ -12,13 +12,13 @@
     type CatalogFilterKey,
     type CatalogFilters,
     changePendingRunCount,
-    clearCatalogFilter,
     clearCatalogFilters,
+    drawerFilterKeys,
     emptyCatalogFilters,
     toggleCatalogFilter,
   } from './catalog-list-state';
   import { catalogSources } from './catalog-sources';
-  import type { CatalogSessionStore } from './session-store';
+  import { type CatalogSessionStore, findLatestSession } from './session-store';
   import { startWithDefaults } from './start-example';
   import type { BrowserCatalogDescriptor } from './types';
   import type { WorkbenchHost } from './workbench-host';
@@ -34,11 +34,21 @@
     host: WorkbenchHost;
     sessionStore: CatalogSessionStore;
     exampleHref: (exampleId: string) => string;
+    initialFilters?: CatalogFilters;
+    onfilterschange?: (filters: CatalogFilters) => void;
   }
 
-  let { descriptors, host, sessionStore, exampleHref }: Props = $props();
+  let {
+    descriptors,
+    host,
+    sessionStore,
+    exampleHref,
+    initialFilters = emptyCatalogFilters,
+    onfilterschange,
+  }: Props = $props();
 
-  let filters = $state<CatalogFilters>({ ...emptyCatalogFilters });
+  // svelte-ignore state_referenced_locally
+  let filters = $state<CatalogFilters>({ ...initialFilters });
   let filtersOpen = $state(false);
   let runError = $state('');
   let pendingRunCounts = $state<Record<string, number>>({});
@@ -48,27 +58,39 @@
   const facets = $derived(catalogFacets(descriptors, sources, filters));
   const activeFilters = $derived(activeCatalogFilters(facets, filters));
   const drawerFilterCount = $derived(
-    activeFilters.filter(({ key }) => key !== 'kind').length,
+    activeFilters.filter(({ key }) => drawerFilterKeys.includes(key)).length,
+  );
+  const latestSessions = $derived(
+    new Map(
+      descriptors.map((descriptor) => [
+        descriptor.id,
+        findLatestSession(
+          $sessionStore.sessions,
+          descriptor.id,
+          descriptor.execution,
+        ),
+      ]),
+    ),
   );
 
-  const selectFilter = (key: CatalogFilterKey, value: string | null) => {
-    filters = toggleCatalogFilter(filters, key, value);
+  const setFilters = (next: CatalogFilters) => {
+    filters = next;
+    onfilterschange?.(next);
   };
 
-  const removeFilter = (key: CatalogFilterKey) => {
-    filters = clearCatalogFilter(filters, key);
-  };
+  const selectFilter = (key: CatalogFilterKey, value: string | null) =>
+    setFilters(toggleCatalogFilter(filters, key, value));
 
-  const removeFilters = () => {
-    filters = clearCatalogFilters(filters);
-  };
+  const removeFilter = (key: CatalogFilterKey) =>
+    setFilters(clearCatalogFilters(filters, [key]));
 
-  const removeDrawerFilters = () => {
-    filters = clearCatalogFilter(
-      clearCatalogFilter(filters, 'feature'),
-      'source',
-    );
-  };
+  const removeFilters = () => setFilters(clearCatalogFilters(filters));
+
+  const removeDrawerFilters = () =>
+    setFilters(clearCatalogFilters(filters, drawerFilterKeys));
+
+  const search = (event: Event & { currentTarget: HTMLInputElement }) =>
+    setFilters({ ...filters, query: event.currentTarget.value });
 
   $effect(() => {
     const [example] = descriptors;
@@ -86,11 +108,6 @@
 
     return () => controller.abort();
   });
-
-  const latestSession = (descriptor: BrowserCatalogDescriptor) => {
-    void $sessionStore.sessions;
-    return sessionStore.latest(descriptor.id, descriptor.execution);
-  };
 
   const startErrorMessage = (error: string) =>
     error === 'required-readiness-unavailable'
@@ -150,7 +167,8 @@
     <div role="search" aria-label="Search example catalog">
       <Input
         id="catalog-search"
-        bind:value={filters.query}
+        value={filters.query}
+        oninput={search}
         Icon={IconSearch}
         label="Search examples"
         labelHidden
@@ -213,7 +231,7 @@
         <CatalogExampleRow
           {descriptor}
           {host}
-          latest={latestSession(descriptor)}
+          latest={latestSessions.get(descriptor.id)}
           pendingRuns={pendingRunCounts[descriptor.id] ?? 0}
           selectedFeature={filters.feature}
           href={exampleHref(descriptor.id)}

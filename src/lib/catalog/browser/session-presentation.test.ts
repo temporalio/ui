@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  latestRunPresentation,
   relativeRunTime,
+  sessionStatusPresentation,
   terminalStatusPresentation,
 } from './session-presentation';
 
@@ -22,10 +22,10 @@ describe('terminalStatusPresentation', () => {
   });
 });
 
-describe('latestRunPresentation', () => {
+describe('sessionStatusPresentation', () => {
   it('presents a finished run by its terminal status', () => {
     expect(
-      latestRunPresentation({
+      sessionStatusPresentation({
         state: 'execution-terminal',
         terminalStatus: 'failed',
       }),
@@ -33,11 +33,20 @@ describe('latestRunPresentation', () => {
   });
 
   it('presents other runs by their session state', () => {
-    expect(latestRunPresentation({ state: 'launch-rejected' })).toEqual({
-      label: 'Launch rejected',
+    expect(sessionStatusPresentation({ state: 'launch-rejected' })).toEqual({
+      label: 'Start failed',
     });
-    expect(latestRunPresentation({ state: 'execution-terminal' })).toEqual({
+    expect(sessionStatusPresentation({ state: 'execution-terminal' })).toEqual({
       label: 'Finished',
+    });
+    expect(sessionStatusPresentation({ state: 'launch-uncertain' })).toEqual({
+      label: 'Start not confirmed',
+    });
+    expect(sessionStatusPresentation({ state: 'observation-paused' })).toEqual({
+      label: 'Status checks paused',
+    });
+    expect(sessionStatusPresentation({ state: 'stopped' })).toEqual({
+      label: 'Status checks stopped',
     });
   });
 });

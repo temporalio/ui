@@ -28,25 +28,28 @@ export const terminalStatusPresentation = (
   status: ExecutionTerminalStatus,
 ): TerminalStatusPresentation => terminalStatusPresentations[status];
 
-export interface LatestRunPresentation {
+export interface SessionStatusPresentation {
   label: string;
   status?: BadgeStatusValue;
 }
 
 const sessionStateLabels: Record<CatalogSessionState, string> = {
   'execution-terminal': 'Finished',
-  'launch-rejected': 'Launch rejected',
-  'launch-uncertain': 'Launch uncertain',
-  'observation-paused': 'Observation paused',
+  'launch-rejected': 'Start failed',
+  'launch-uncertain': 'Start not confirmed',
+  'observation-paused': 'Status checks paused',
   observing: 'Running',
   starting: 'Starting',
-  stopped: 'Stopped',
+  stopped: 'Status checks stopped',
 };
 
-export const latestRunPresentation = ({
+export const sessionStatusPresentation = ({
   state,
   terminalStatus,
-}: Pick<CatalogSession, 'state' | 'terminalStatus'>): LatestRunPresentation => {
+}: Pick<
+  CatalogSession,
+  'state' | 'terminalStatus'
+>): SessionStatusPresentation => {
   if (state === 'execution-terminal' && terminalStatus) {
     return terminalStatusPresentation(terminalStatus);
   }
