@@ -158,10 +158,17 @@ export interface ComputeScaler {
 export interface ComputeConfigScalingGroup {
   taskQueueTypes?: string[];
   /**
-   * Proposed (HA Serverless PRD): the Namespace region that activates this
-   * group, e.g. "aws-us-east-1". Empty means the group runs in any region.
+   * The Namespace regions that activate this group. Empty or absent means the
+   * group runs wherever the Namespace is active, which is every group written
+   * before this field existed.
+   *
+   * Repeated, so one group can serve several regions: that is the shape for a
+   * provider whose resource is not regional. A regional resource, such as a
+   * Lambda ARN, needs a group per region instead.
+   *
+   * `region_ids` on `ComputeConfigScalingGroup`, added by temporalio/api#875.
    */
-  regionId?: string;
+  regionIds?: string[];
   providerType?: string;
   provider?: ComputeProvider;
   scaler?: ComputeScaler;

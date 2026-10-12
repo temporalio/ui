@@ -26,7 +26,7 @@ const regions = (...ids: string[]): NamespaceRegion[] =>
   }));
 
 const config = (
-  groups: Record<string, { regionId?: string; providerType?: string }>,
+  groups: Record<string, { regionIds?: string[]; providerType?: string }>,
 ): ComputeConfig => ({ scalingGroups: groups });
 
 describe('isMultiRegion', () => {
@@ -41,7 +41,7 @@ describe('isMultiRegion', () => {
     expect(isMultiRegion(regions)).toBe(expected);
   });
 
-  test('a regionId on a group does not make a single-region Namespace multi-region', () => {
+  test('a region on a group does not make a single-region Namespace multi-region', () => {
     // The compute config deliberately gets no vote: two conditions that can
     // disagree is how a half-gated feature reaches someone who should not see it.
     expect(isMultiRegion(regions(EAST))).toBe(false);
@@ -50,19 +50,19 @@ describe('isMultiRegion', () => {
 
 describe('getScalingGroups', () => {
   test('keeps the group name and reads its region', () => {
-    expect(getScalingGroups(config({ east: { regionId: EAST } }))).toEqual([
+    expect(getScalingGroups(config({ east: { regionIds: [EAST] } }))).toEqual([
       {
         name: 'east',
-        regionId: EAST,
+        regionIds: [EAST],
         providerType: undefined,
-        group: { regionId: EAST },
+        group: { regionIds: [EAST] },
       },
     ]);
   });
 
-  test('reads an empty regionId as unset, not as a region no Namespace has', () => {
+  test('reads a blank region id as unset, not as a region no Namespace has', () => {
     expect(
-      getScalingGroups(config({ any: { regionId: '' } }))[0].regionId,
+      getScalingGroups(config({ any: { regionIds: [''] } }))[0].regionId,
     ).toBeUndefined();
   });
 
@@ -90,7 +90,7 @@ describe('resolveRegionCoverage', () => {
 
   test('each region takes its own group', () => {
     const coverage = resolveRegionCoverage(
-      config({ east: { regionId: EAST }, west: { regionId: WEST } }),
+      config({ east: { regionIds: [EAST] }, west: { regionIds: [WEST] } }),
       regions(EAST, WEST),
     );
 
@@ -103,7 +103,7 @@ describe('resolveRegionCoverage', () => {
 
   test('an exact region wins over a catch-all', () => {
     const coverage = resolveRegionCoverage(
-      config({ any: {}, east: { regionId: EAST } }),
+      config({ any: {}, east: { regionIds: [EAST] } }),
       regions(EAST, WEST),
     );
 
@@ -143,7 +143,10 @@ describe('resolveRegionCoverage', () => {
   test('every group matching a region is returned, not just the first', () => {
     // A region can have more than one group, e.g. one per task queue type.
     const coverage = resolveRegionCoverage(
-      config({ activities: { regionId: EAST }, workflows: { regionId: EAST } }),
+      config({
+        activities: { regionIds: [EAST] },
+        workflows: { regionIds: [EAST] },
+      }),
       regions(EAST),
     );
 
@@ -165,7 +168,7 @@ describe('resolveRegionCoverage', () => {
 
   test('a region with neither a match nor a catch-all is uncovered', () => {
     const coverage = resolveRegionCoverage(
-      config({ west: { regionId: WEST } }),
+      config({ west: { regionIds: [WEST] } }),
       regions(EAST, WEST),
     );
 
@@ -181,7 +184,7 @@ describe('getUncoveredRegions', () => {
   test('names the regions that would fail over to no workers', () => {
     expect(
       getUncoveredRegions(
-        config({ west: { regionId: WEST } }),
+        config({ west: { regionIds: [WEST] } }),
         regions(EAST, WEST),
       ),
     ).toEqual([EAST]);
@@ -225,7 +228,7 @@ describe('hasRegionScopedGroups', () => {
   });
 
   test('one region-scoped group is enough', () => {
-    expect(hasRegionScopedGroups(config({ east: { regionId: EAST } }))).toBe(
+    expect(hasRegionScopedGroups(config({ east: { regionIds: [EAST] } }))).toBe(
       true,
     );
   });
@@ -236,8 +239,8 @@ describe('hasRegionScopedGroups', () => {
 
   test('does not decide whether a deployment is multi-region', () => {
     // The two questions are kept apart on purpose: a single-region Namespace
-    // with a stray regionId must not read as highly available.
-    expect(hasRegionScopedGroups(config({ east: { regionId: EAST } }))).toBe(
+    // with a stray region id must not read as highly available.
+    expect(hasRegionScopedGroups(config({ east: { regionIds: [EAST] } }))).toBe(
       true,
     );
     expect(isMultiRegion(regions(EAST))).toBe(false);
@@ -341,10 +344,58 @@ describe('region labels', () => {
 
   test('matching still joins on the identifier, not the label', () => {
     const coverage = resolveRegionCoverage(
-      config({ west: { regionId: 'aws-us-west-2' } }),
+      config({ west: { regionIds: ['aws-us-west-2'] } }),
       [{ regionId: 'aws-us-west-2', label: 'us-west-2', role: 'primary' }],
     );
 
     expect(coverage[0].match).toBe('region');
+  });
+});
+
+describe('a group serving several regions', () => {
+  // region_ids is repeated, so one group can cover more than one region. That
+  // is the shape for a provider whose resource is not regional; a Lambda ARN
+  // is, so that case still needs a group per region.
+  test('one group listing both regions covers both', () => {
+    const coverage = resolveRegionCoverage(
+      config({ both: { regionIds: [EAST, WEST] } }),
+      regions(EAST, WEST),
+    );
+
+    expect(coverage.map(({ match }) => match)).toEqual(['region', 'region']);
+    expect(coverage.map(({ groups }) => groups.map((g) => g.name))).toEqual([
+      ['both'],
+      ['both'],
+    ]);
+  });
+
+  test('listing one region of two leaves the other uncovered', () => {
+    const coverage = resolveRegionCoverage(
+      config({ east: { regionIds: [EAST] } }),
+      regions(EAST, WEST),
+    );
+
+    expect(coverage.map(({ match }) => match)).toEqual(['region', 'none']);
+  });
+
+  test('a group naming a region beats a catch-all for that region only', () => {
+    const coverage = resolveRegionCoverage(
+      config({ any: {}, east: { regionIds: [EAST] } }),
+      regions(EAST, WEST),
+    );
+
+    expect(coverage[0]).toMatchObject({ match: 'region' });
+    expect(coverage[0].groups.map((g) => g.name)).toEqual(['east']);
+    expect(coverage[1]).toMatchObject({ match: 'catch-all' });
+    expect(coverage[1].groups.map((g) => g.name)).toEqual(['any']);
+  });
+
+  test('a blank entry among real ones does not become a region', () => {
+    const coverage = resolveRegionCoverage(
+      config({ east: { regionIds: ['', EAST] } }),
+      regions(EAST, WEST),
+    );
+
+    expect(coverage.map(({ match }) => match)).toEqual(['region', 'none']);
   });
 });

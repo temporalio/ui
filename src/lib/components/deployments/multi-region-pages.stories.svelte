@@ -72,8 +72,8 @@
   /** One group per Region. Group names are arbitrary. */
   const perRegion = (fn: string): ComputeConfig => ({
     scalingGroups: {
-      'orders-east': { ...lambdaGroup('us-east-1', fn), regionId: EAST },
-      'orders-west': { ...lambdaGroup('us-west-2', fn), regionId: WEST },
+      'orders-east': { ...lambdaGroup('us-east-1', fn), regionIds: [EAST] },
+      'orders-west': { ...lambdaGroup('us-west-2', fn), regionIds: [WEST] },
     },
   });
 
@@ -81,14 +81,14 @@
   const upgraded = (fn: string): ComputeConfig => ({
     scalingGroups: {
       default: lambdaGroup('us-east-1', fn),
-      secondary: { ...lambdaGroup('us-west-2', fn), regionId: WEST },
+      secondary: { ...lambdaGroup('us-west-2', fn), regionIds: [WEST] },
     },
   });
 
   /** Configured before the replica was added; nothing runs after failover. */
   const primaryOnly = (fn: string): ComputeConfig => ({
     scalingGroups: {
-      'orders-east': { ...lambdaGroup('us-east-1', fn), regionId: EAST },
+      'orders-east': { ...lambdaGroup('us-east-1', fn), regionIds: [EAST] },
     },
   });
 

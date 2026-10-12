@@ -95,13 +95,20 @@
         }),
       );
     }
-    return groups.map((group, index) => ({
-      key: group.name,
-      label: group.regionId,
-      role: index === 0 ? 'primary' : 'replica',
-      match: group.regionId ? 'region' : 'catch-all',
-      providerType: group.providerType,
-    }));
+    // No Namespace regions to resolve against, so each group speaks for
+    // itself. A group naming several regions is shown once per region, because
+    // a row stands for a place workers run.
+    return groups.flatMap((group, index) =>
+      (group.regionIds.length ? group.regionIds : [undefined]).map(
+        (regionId) => ({
+          key: `${group.name}:${regionId ?? ''}`,
+          label: regionId,
+          role: index === 0 ? 'primary' : 'replica',
+          match: regionId ? ('region' as const) : ('catch-all' as const),
+          providerType: group.providerType,
+        }),
+      ),
+    );
   });
 
   const roleLabel = (role: string): string =>

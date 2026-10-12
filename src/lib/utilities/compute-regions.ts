@@ -21,21 +21,24 @@ import type {
  * Namespace may use. An empty or single-entry list means single region, which
  * is every self-hosted install and every Namespace without HA.
  *
- * That is deliberately the only switch. A scaling group carrying a `regionId`
- * does not by itself make a deployment multi-region — a single-region Namespace
- * with a stray `regionId` is still single region — so there is one question to
- * ask and one answer, rather than two conditions that can disagree.
+ * That is deliberately the only switch. A scaling group naming a region does
+ * not by itself make a deployment multi-region — a single-region Namespace
+ * with a stray `region_ids` entry is still single region — so there is one
+ * question to ask and one answer, rather than two that can disagree.
  * `hasRegionScopedGroups` asks the other question, about the config's shape,
  * and is kept separate for that reason.
  *
  * ## Region identifiers
  *
- * A `regionId` is a cloud provider and a region name joined by a hyphen, as in
- * `aws-us-west-2` or `gcp-us-central1`. That is the spelling Temporal Cloud
- * already uses for a Namespace's replica regions, so the two sides join on it
- * directly. It is a plain string rather than a structured value because
- * `ComputeConfigScalingGroup.region_id` is one, and a Namespace is in a single
- * cloud today, so the provider is never ambiguous within one Namespace.
+ * Opaque strings, compared only for equality. This repo does not parse one,
+ * because it does not own the format: Temporal Cloud spells a region
+ * `aws-us-west-2` while a self-hosted cluster is named whatever its operator
+ * named it. Both sides of the join use the same strings, which is all the
+ * matching needs. See `NamespaceRegion.label` for display.
+ *
+ * `ComputeConfigScalingGroup.region_ids` is repeated, so a group can serve
+ * several regions. A group serves a region by listing it, and a group that
+ * lists none is a catch-all.
  */
 
 /** A Namespace is active in one region at a time; the rest hold replicas. */
@@ -70,14 +73,15 @@ export interface NamespaceRegion {
 }
 
 /**
- * How a region found its groups. `catch-all` is the pre-HA shape: a group with
- * no `regionId` runs wherever the Namespace is active.
+ * How a region found its groups. `catch-all` is the pre-HA shape: a group
+ * naming no regions runs wherever the Namespace is active.
  */
 export type RegionMatch = 'region' | 'catch-all' | 'none';
 
 export interface ScalingGroupEntry {
   name: string;
-  regionId?: string;
+  /** Empty means a catch-all: the group runs wherever the Namespace is active. */
+  regionIds: string[];
   providerType?: string;
   group: ComputeConfigScalingGroup;
 }
@@ -106,9 +110,10 @@ export const getScalingGroups = (
 ): ScalingGroupEntry[] =>
   Object.entries(computeConfig?.scalingGroups ?? {}).map(([name, group]) => ({
     name,
-    // An empty string is how the API spells "unset", and it must read as a
-    // catch-all rather than as a region no Namespace has.
-    regionId: group?.regionId || undefined,
+    // An empty string is how the API spells "unset" for a scalar, and the same
+    // care applies here: a blank entry must not read as a region no Namespace
+    // has. Dropping them leaves an empty list, which is the catch-all.
+    regionIds: (group?.regionIds ?? []).filter(Boolean),
     providerType: group?.providerType ?? group?.provider?.type,
     group,
   }));
@@ -125,11 +130,11 @@ export const getScalingGroups = (
 export const hasRegionScopedGroups = (
   computeConfig: ComputeConfig | undefined,
 ): boolean =>
-  getScalingGroups(computeConfig).some(({ regionId }) => !!regionId);
+  getScalingGroups(computeConfig).some(({ regionIds }) => regionIds.length > 0);
 
 /**
- * The groups serving each Namespace region, in the PRD's matching order: an
- * exact `regionId` first, then any catch-all.
+ * The groups serving each Namespace region: those naming it in `regionIds`
+ * first, then any catch-all.
  *
  * Order does not matter: each region carries its own role.
  */
@@ -138,11 +143,15 @@ export const resolveRegionCoverage = (
   namespaceRegions: readonly NamespaceRegion[],
 ): RegionCoverage[] => {
   const groups = getScalingGroups(computeConfig);
-  const catchAll = groups.filter(({ regionId }) => !regionId);
+  const catchAll = groups.filter(({ regionIds }) => regionIds.length === 0);
 
   return namespaceRegions.map(({ regionId, role = 'replica', label }) => {
     const shown = label ?? regionId;
-    const exact = groups.filter((group) => group.regionId === regionId);
+    // `region_ids` is repeated, so a group serves a region by listing it among
+    // others, not by being equal to it.
+    const exact = groups.filter(({ regionIds }) =>
+      regionIds.includes(regionId),
+    );
 
     if (exact.length) {
       return { regionId, label: shown, role, match: 'region', groups: exact };

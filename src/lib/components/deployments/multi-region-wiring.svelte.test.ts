@@ -46,7 +46,7 @@ const deploymentResponse = {
         deploymentVersion: { deploymentName: 'deployment', buildId: 'current' },
         createTime: msNumberToTs(1_000),
         computeConfig: {
-          scalingGroups: { east: { ...lambda, regionId: EAST } },
+          scalingGroups: { east: { ...lambda, regionIds: [EAST] } },
         },
       },
     ],
@@ -112,7 +112,7 @@ describe('multi-region wiring', () => {
     client.renderDeployment({
       fetchDeployment: deploymentResponse,
       fetchDeploymentVersion: versionResponse({
-        east: { ...lambda, regionId: EAST },
+        east: { ...lambda, regionIds: [EAST] },
       }),
       ...(namespaceRegions === undefined ? {} : { namespaceRegions }),
     });
@@ -165,7 +165,7 @@ describe('multi-region wiring', () => {
       const rows = client.renderRows({
         computeStatuses: { Pending: { providerValidation: {} } },
         namespaceRegions: BOTH_REGIONS,
-        scalingGroups: { east: { ...lambda, regionId: EAST } },
+        scalingGroups: { east: { ...lambda, regionIds: [EAST] } },
       });
 
       expect(rows.innerHTML).toContain('data-region-match="none"');

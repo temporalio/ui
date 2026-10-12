@@ -40,9 +40,7 @@
     }
     const regionIds = [
       ...new Set(
-        getScalingGroups(computeConfig).flatMap(({ regionId }) =>
-          regionId ? [regionId] : [],
-        ),
+        getScalingGroups(computeConfig).flatMap(({ regionIds }) => regionIds),
       ),
     ];
     // A scaling group's own regionId arrives without a label to resolve, so

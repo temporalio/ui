@@ -55,13 +55,13 @@
    */
   const perGroup = $derived(
     getScalingGroups(computeConfig).map(
-      ({ name, regionId, providerType, group }) => {
+      ({ name, regionIds, providerType, group }) => {
         const single: ComputeConfig = { scalingGroups: { [name]: group } };
         const lambda = decodeLambdaProviderDetails(single);
         const agentCore = decodeAgentCoreProviderDetails(single);
         return {
           name,
-          regionId,
+          regionIds,
           providerType,
           lambda,
           agentCore,
@@ -181,8 +181,8 @@
                 <th class="pb-2 text-left font-normal">
                   <span class="flex items-center gap-1.5">
                     <span class="font-medium text-primary">
-                      {group.regionId
-                        ? group.regionId
+                      {group.regionIds.length
+                        ? group.regionIds.join(', ')
                         : translate('workers.region-all')}
                     </span>
                   </span>
