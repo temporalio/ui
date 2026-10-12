@@ -1,10 +1,10 @@
-import { getLifecycleReference } from './get-lifecycle-reference';
+import { getLifecycleIdentity } from './get-lifecycle-identity';
 import { getTerminalOutcome, isPendingLifecycleEvent } from './lifecycle-state';
 import type {
   LifecycleGroup,
   LifecycleGroupMutable,
   LifecycleGroupsProjectionChange,
-  LifecycleReference,
+  LifecycleIdentity,
 } from './types';
 import { compareEventIds } from '../history-events/compare-event-ids';
 import type {
@@ -18,16 +18,16 @@ export class LifecycleGroupsProjection {
   /** Adds an event and updates lifecycle facts before reporting a group change. */
   addEvent(
     event: NormalizedHistoryEvent,
-    reference: LifecycleReference = getLifecycleReference(event),
+    identity: LifecycleIdentity = getLifecycleIdentity(event),
   ): LifecycleGroupsProjectionChange | null {
-    const existing = this._lifecycleGroups.get(reference.headEventId);
+    const existing = this._lifecycleGroups.get(identity.headEventId);
 
     if (existing?.eventIds.has(event.eventId)) {
       return null;
     }
 
     const group: LifecycleGroupMutable = existing ?? {
-      ...reference,
+      ...identity,
       revision: 0,
       eventIds: new Set(),
       hasPendingEvent: false,
@@ -37,7 +37,7 @@ export class LifecycleGroupsProjection {
     };
 
     if (!existing) {
-      this._lifecycleGroups.set(reference.headEventId, group);
+      this._lifecycleGroups.set(identity.headEventId, group);
     }
 
     group.eventIds.add(event.eventId);
@@ -66,7 +66,7 @@ export class LifecycleGroupsProjection {
 
     return {
       type: 'LIFECYCLE_GROUP_CHANGED',
-      headEventId: reference.headEventId,
+      headEventId: identity.headEventId,
     };
   }
 

@@ -6,7 +6,7 @@ import {
 } from './api';
 import { getWorkflowExecutionKeyFromIdentity } from './get-key-from-identity';
 import type {
-  ChildWorkflowExecutionReference,
+  ChildWorkflowExecutionAssociation,
   NotificationByTopic,
   Subscriber,
   SubscriptionArgs,
@@ -18,17 +18,15 @@ import type {
 } from './types';
 import { WorkflowExecutionChangeBatch } from './workflow-execution-change-batch';
 import { EventGroupMarkerGroupsProjection } from '../event-group-markers/event-group-marker-groups-projection';
-import { getEventGroupMarkerSource } from '../event-group-markers/get-event-group-marker-source';
 import type {
   EventGroupMarkerDescriptor,
   EventGroupMarkerGroup,
   EventGroupMarkerKey,
   EventGroupMarkerSource,
 } from '../event-group-markers/types';
+import { ExecutionRelationshipsProjection } from '../execution-relationships/execution-relationships-projection';
 import { assertDiscoveredStartEvent } from '../history-events/assert-discovered-start-event';
 import { compareEventIds } from '../history-events/compare-event-ids';
-import { getChildWorkflowExecutionReference } from '../history-events/get-child-workflow-execution-reference';
-import { getNextExecutionIdentity } from '../history-events/get-next-execution-identity';
 import { isTerminalExecutionEvent } from '../history-events/is-terminal-execution-event';
 import type {
   DiscoveredStartEvent,
@@ -40,7 +38,7 @@ import type {
   LifecycleGroupFilterDefinition,
   LifecycleGroupFilterKey,
 } from '../lifecycle-group-filter-indexes/types';
-import { getLifecycleReference } from '../lifecycle-groups/get-lifecycle-reference';
+import { getLifecycleIdentity } from '../lifecycle-groups/get-lifecycle-identity';
 import { LifecycleGroupsProjection } from '../lifecycle-groups/lifecycle-groups-projection';
 import type { LifecycleGroup } from '../lifecycle-groups/types';
 import type { WorkflowExecutionChainIdentity } from '../workflow-execution-chain/types';
@@ -60,7 +58,7 @@ export class WorkflowExecution {
   private _subscribersByTopic: {
     [T in SubscriptionTopic]: Set<Subscriber<T>>;
   } = {
-    CHILD_EXECUTION_REFERENCES_ADDED: new Set(),
+    CHILD_EXECUTION_ASSOCIATIONS_ADDED: new Set(),
     EXECUTION_DETAILS_CHANGED: new Set(),
     LIFECYCLE_GROUP_FILTER_INDEXES_CHANGED: new Set(),
     EVENTS_ADDED: new Set(),
@@ -68,7 +66,7 @@ export class WorkflowExecution {
     EVENT_GROUP_MARKER_GROUPS_CHANGED: new Set(),
   };
 
-  private _nextExecutionIdentity: WorkflowExecutionIdentity | null = null;
+  private _executionRelationshipsProjection: ExecutionRelationshipsProjection;
 
   private _lifecycleGroupsProjection = new LifecycleGroupsProjection();
 
@@ -78,10 +76,6 @@ export class WorkflowExecution {
   private _lifecycleGroupFilterIndexesProjection: LifecycleGroupsFilterIndexesProjection;
 
   private _events = new Map<HistoryEventId, NormalizedHistoryEvent>();
-  private _childExecutionReferences = new Map<
-    HistoryEventId,
-    ChildWorkflowExecutionReference
-  >();
 
   /** Fetches the start event and constructs a discovered execution. */
   static async discover(
@@ -111,6 +105,8 @@ export class WorkflowExecution {
 
     this.key = getWorkflowExecutionKeyFromIdentity(identity);
     this.identity = identity;
+    this._executionRelationshipsProjection =
+      new ExecutionRelationshipsProjection(identity);
 
     this.executionChainIdentity = {
       namespace: identity.namespace,
@@ -160,51 +156,34 @@ export class WorkflowExecution {
         continue;
       }
 
-      const childReference = getChildWorkflowExecutionReference(
-        this.identity.namespace,
-        event,
-      );
+      const relationshipChange =
+        this._executionRelationshipsProjection.addEvent(event);
 
       this._events.set(event.eventId, event);
       batch.add({ type: 'EVENT_ADDED', eventId: event.eventId });
 
-      const nextIdentity = getNextExecutionIdentity(this.identity, event);
-
-      if (nextIdentity) {
-        this._nextExecutionIdentity = nextIdentity;
+      if (relationshipChange) {
+        batch.add(relationshipChange);
       }
 
       if (compareEventIds(event.eventId, this._latestEvent.eventId) > 0) {
         this._latestEvent = event;
       }
 
-      const lifecycleReference = getLifecycleReference(event);
+      const lifecycleIdentity = getLifecycleIdentity(event);
       const lifecycleGroupChange = this._lifecycleGroupsProjection.addEvent(
         event,
-        lifecycleReference,
+        lifecycleIdentity,
       );
 
       if (lifecycleGroupChange) {
         batch.add(lifecycleGroupChange);
       }
-      if (
-        childReference &&
-        !this._childExecutionReferences.has(childReference.headEventId)
-      ) {
-        this._childExecutionReferences.set(
-          childReference.headEventId,
-          childReference,
-        );
-        batch.add({
-          type: 'CHILD_EXECUTION_REFERENCE_ADDED',
-          headEventId: childReference.headEventId,
-        });
-      }
 
       const eventGroupMarkerGroupChanges =
         this._eventGroupMarkerGroupsProjection.addEvent(
           event,
-          lifecycleReference,
+          lifecycleIdentity,
         );
 
       batch.addAll(eventGroupMarkerGroupChanges);
@@ -299,15 +278,15 @@ export class WorkflowExecution {
 
   /** Returns the reported successor, or null if none has been discovered. */
   get nextExecutionIdentity(): WorkflowExecutionIdentity | null {
-    return this._nextExecutionIdentity;
+    return this._executionRelationshipsProjection.nextExecutionIdentity;
   }
 
   /** Returns known started children keyed by their parent lifecycle head event ID. */
-  get childExecutionReferences(): ReadonlyMap<
+  get childWorkflowExecutions(): ReadonlyMap<
     HistoryEventId,
-    ChildWorkflowExecutionReference
+    ChildWorkflowExecutionAssociation
   > {
-    return this._childExecutionReferences;
+    return this._executionRelationshipsProjection.childWorkflowExecutions;
   }
 
   /** Returns map of the lifecycle groups by headEventId */
@@ -335,14 +314,8 @@ export class WorkflowExecution {
   getEventGroupMarkerSource(
     marker: EventGroupMarkerDescriptor,
   ): EventGroupMarkerSource | null {
-    return getEventGroupMarkerSource(
-      marker,
-      (eventId) => this.getEvent(eventId),
-      marker.type === 'inbound-update'
-        ? this._eventGroupMarkerGroupsProjection.updateSourceEventIds.get(
-            marker.updateId,
-          )
-        : undefined,
+    return this._eventGroupMarkerGroupsProjection.getSource(marker, (eventId) =>
+      this.getEvent(eventId),
     );
   }
 
@@ -362,9 +335,9 @@ export class WorkflowExecution {
     }
 
     switch (topic) {
-      case 'CHILD_EXECUTION_REFERENCES_ADDED': {
+      case 'CHILD_EXECUTION_ASSOCIATIONS_ADDED': {
         return subscribeTo(
-          this._subscribersByTopic.CHILD_EXECUTION_REFERENCES_ADDED,
+          this._subscribersByTopic.CHILD_EXECUTION_ASSOCIATIONS_ADDED,
           handler,
         );
       }

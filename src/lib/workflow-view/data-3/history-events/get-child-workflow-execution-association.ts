@@ -1,11 +1,11 @@
 import type { NormalizedHistoryEvent } from './types';
-import type { ChildWorkflowExecutionReference } from '../workflow-execution/types';
+import type { ChildWorkflowExecutionAssociation } from '../workflow-execution/types';
 
 /** Resolves a started child's identity and parent lifecycle; rejects incomplete start metadata. */
-export function getChildWorkflowExecutionReference(
+export function getChildWorkflowExecutionAssociation(
   parentNamespace: string,
   event: NormalizedHistoryEvent,
-): ChildWorkflowExecutionReference | null {
+): ChildWorkflowExecutionAssociation | null {
   if (event.eventType !== 'ChildWorkflowExecutionStarted') {
     return null;
   }

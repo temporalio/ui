@@ -1,20 +1,20 @@
-import type { LifecycleReference } from './types';
+import type { LifecycleIdentity } from './types';
 import type {
   HistoryEventId,
   NormalizedHistoryEvent,
 } from '../history-events/types';
 
 // Each execution starts with history event 1, including when pages arrive out of order.
-const WORKFLOW_REFERENCE: LifecycleReference = {
+const WORKFLOW_IDENTITY: LifecycleIdentity = {
   kind: 'workflow',
   headEventId: '1',
 };
 
-/** Having an eventType of never help ensure the switch in getLifecycleReference is exhaustive  */
-function getFallbackLifecycleReference(
+/** Having an eventType of never help ensure the switch in getLifecycleIdentity is exhaustive  */
+function getFallbackLifecycleIdentity(
   _eventType: never,
   eventId: HistoryEventId,
-): LifecycleReference {
+): LifecycleIdentity {
   return {
     kind: 'event',
     headEventId: eventId,
@@ -22,9 +22,9 @@ function getFallbackLifecycleReference(
 }
 
 /** Returns the lifecycle kind and head event ID for a history event. */
-export function getLifecycleReference(
+export function getLifecycleIdentity(
   event: NormalizedHistoryEvent,
-): LifecycleReference {
+): LifecycleIdentity {
   const eventType = event.eventType;
 
   switch (eventType) {
@@ -343,7 +343,7 @@ export function getLifecycleReference(
     case 'WorkflowTaskFailed':
     case 'WorkflowTaskTimedOut':
     case 'WorkflowPropertiesModified': {
-      return WORKFLOW_REFERENCE;
+      return WORKFLOW_IDENTITY;
     }
 
     case 'WorkflowExecutionSignaled':
@@ -362,7 +362,7 @@ export function getLifecycleReference(
     }
 
     default: {
-      return getFallbackLifecycleReference(eventType, event.eventId);
+      return getFallbackLifecycleIdentity(eventType, event.eventId);
     }
   }
 }

@@ -12,7 +12,7 @@ type LifecycleKind =
   | 'event';
 
 /** Identifies a lifecycle within one workflow execution. */
-export type LifecycleReference = Readonly<{
+export type LifecycleIdentity = Readonly<{
   kind: LifecycleKind;
   headEventId: HistoryEventId;
 }>;
@@ -29,7 +29,7 @@ export type LifecycleTerminalOutcome =
 /** Related history events and incrementally maintained lifecycle facts. */
 export type LifecycleGroup = Readonly<{
   revision: number;
-  kind: LifecycleReference['kind'];
+  kind: LifecycleIdentity['kind'];
   headEventId: HistoryEventId;
   eventIds: ReadonlySet<HistoryEventId>;
   hasPendingEvent: boolean;

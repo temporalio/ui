@@ -27,7 +27,7 @@ export type EventGroupMarkerDescriptor =
 
 export type EventGroupMarkerKey = `event-group-marker:(${string})`;
 
-export type EventGroupMarkerReference = Readonly<{
+export type KeyedEventGroupMarker = Readonly<{
   key: EventGroupMarkerKey;
   marker: EventGroupMarkerDescriptor;
 }>;

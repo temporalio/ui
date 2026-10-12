@@ -1,13 +1,13 @@
 import { getEventGroupMarkerKey } from './get-key-from-marker';
 import { normalizeEventGroupMarker } from './normalize-event-group-marker';
-import type { EventGroupMarkerReference } from './types';
+import type { KeyedEventGroupMarker } from './types';
 import type { NormalizedHistoryEvent } from '../history-events/types';
 
-/** Resolves marker-group references recorded on a history event. */
-export function getEventGroupMarkerReferences(
+/** Normalizes history markers and pairs each with its execution-local key. */
+export function getKeyedEventGroupMarkers(
   event: NormalizedHistoryEvent,
-): readonly EventGroupMarkerReference[] {
-  const references: EventGroupMarkerReference[] = [];
+): readonly KeyedEventGroupMarker[] {
+  const keyedMarkers: KeyedEventGroupMarker[] = [];
 
   for (const rawMarker of event.eventGroupMarkers ?? []) {
     const marker = normalizeEventGroupMarker(rawMarker);
@@ -16,11 +16,11 @@ export function getEventGroupMarkerReferences(
       continue;
     }
 
-    references.push({
+    keyedMarkers.push({
       key: getEventGroupMarkerKey(marker),
       marker,
     });
   }
 
-  return references;
+  return keyedMarkers;
 }

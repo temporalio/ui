@@ -179,7 +179,7 @@ export class Workflows {
     return Array.from(executions.values());
   }
 
-  /** Discovers currently known children with bounded concurrency, in reference order.
+  /** Discovers currently known children with bounded concurrency, in association order.
    * Does not load child histories or traverse grandchildren. */
   async discoverChildExecutions(
     parentExecution: WorkflowExecution,
@@ -197,11 +197,11 @@ export class Workflows {
       );
     }
 
-    const references = Array.from(
-      parentExecution.childExecutionReferences.values(),
+    const associations = Array.from(
+      parentExecution.childWorkflowExecutions.values(),
     );
 
-    if (!references.length) {
+    if (!associations.length) {
       return [];
     }
 
@@ -225,8 +225,8 @@ export class Workflows {
       maxConcurrentDiscoveries,
     );
 
-    const discoveries = references.map((reference) =>
-      discoverChild(reference.identity),
+    const discoveries = associations.map((association) =>
+      discoverChild(association.identity),
     );
 
     try {

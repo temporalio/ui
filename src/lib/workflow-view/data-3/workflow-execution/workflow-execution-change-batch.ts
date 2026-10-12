@@ -25,7 +25,7 @@ export class WorkflowExecutionChangeBatch {
         this._lifecycleHeadEventIds.add(change.headEventId);
         break;
 
-      case 'CHILD_EXECUTION_REFERENCE_ADDED':
+      case 'CHILD_EXECUTION_ASSOCIATION_ADDED':
         this._childExecutionHeadEventIds.add(change.headEventId);
         break;
 
@@ -61,7 +61,7 @@ export class WorkflowExecutionChangeBatch {
 
     if (this._childExecutionHeadEventIds.size) {
       notifications.push({
-        topic: 'CHILD_EXECUTION_REFERENCES_ADDED',
+        topic: 'CHILD_EXECUTION_ASSOCIATIONS_ADDED',
         payload: { headEventIds: Array.from(this._childExecutionHeadEventIds) },
       });
     }

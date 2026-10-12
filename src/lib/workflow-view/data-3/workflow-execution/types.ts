@@ -8,6 +8,7 @@ import type {
   EventGroupMarkerGroupsProjectionChange,
   EventGroupMarkerKey,
 } from '../event-group-markers/types';
+import type { ExecutionRelationshipsProjectionChange } from '../execution-relationships/types';
 import type { HistoryEventId } from '../history-events/types';
 import type {
   LifecycleGroupFilterIndexProjectionChange,
@@ -23,7 +24,7 @@ export type WorkflowExecutionIdentity = Readonly<{
 export type WorkflowExecutionKey = `workflow-execution:(${string})`;
 
 /** Associates a started child execution with its lifecycle in the parent's history. */
-export type ChildWorkflowExecutionReference = Readonly<{
+export type ChildWorkflowExecutionAssociation = Readonly<{
   headEventId: HistoryEventId;
   identity: WorkflowExecutionIdentity;
 }>;
@@ -48,17 +49,14 @@ export type WorkflowExecutionChange =
       type: 'EVENT_ADDED';
       eventId: HistoryEventId;
     }>
-  | Readonly<{
-      type: 'CHILD_EXECUTION_REFERENCE_ADDED';
-      headEventId: HistoryEventId;
-    }>
+  | ExecutionRelationshipsProjectionChange
   | LifecycleGroupsProjectionChange
   | EventGroupMarkerGroupsProjectionChange
   | LifecycleGroupFilterIndexProjectionChange;
 
 /** Consolidated batch payloads for each execution subscription topic. */
 export type NotificationByTopic = {
-  CHILD_EXECUTION_REFERENCES_ADDED: Readonly<{
+  CHILD_EXECUTION_ASSOCIATIONS_ADDED: Readonly<{
     headEventIds: readonly HistoryEventId[];
   }>;
   EXECUTION_DETAILS_CHANGED: Readonly<{
