@@ -65,6 +65,14 @@ const serverSchema = z
          */
         serverModules: z.record(z.string(), z.string()).default({}),
         /**
+         * Go modules pinned to an exact version across the whole workspace,
+         * through a replace in go.work. For a commit whose pseudo-version sorts
+         * below a release the CLI already requires: a floor cannot win there,
+         * because the workspace takes the higher version. Pin only what needs
+         * it, since a pin can also move a module backwards.
+         */
+        pinnedModules: z.record(z.string(), z.string()).default({}),
+        /**
          * Executables the run needs on PATH. Checked before any stage starts,
          * so a missing `docker` or `ngrok` fails immediately with a name
          * rather than midway through a build.

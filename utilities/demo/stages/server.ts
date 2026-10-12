@@ -517,9 +517,21 @@ const buildWorkspaceCli = async (
 
   const patchKey = await applyPatches(temporal, server.patches, log);
 
+  const pins = Object.entries(server.requires.pinnedModules).sort(([a], [b]) =>
+    a.localeCompare(b),
+  );
+  const pinKey = pins.length
+    ? createHash('sha256')
+        .update(
+          pins.map(([module, version]) => `${module}@${version}`).join('\n'),
+        )
+        .digest('hex')
+        .slice(0, 12)
+    : '';
+
   const binary = join(
     BIN_DIR,
-    `temporal-workspace-${cli.key}-${temporal.key}${moduleKey ? `-${moduleKey}` : ''}${patchKey ? `-${patchKey}` : ''}`,
+    `temporal-workspace-${cli.key}-${temporal.key}${moduleKey ? `-${moduleKey}` : ''}${patchKey ? `-${patchKey}` : ''}${pinKey ? `-${pinKey}` : ''}`,
   );
   const goWork = join(WORK_DIR, 'go.work');
 
@@ -529,9 +541,21 @@ const buildWorkspaceCli = async (
   // checkouts rather than being pinned here.
   const goVersion = workspaceGoVersion([serverGoMod, cliGoMod]);
 
+  const replaces = pins.length
+    ? `\nreplace (\n${pins.map(([module, version]) => `\t${module} => ${module} ${version}\n`).join('')})\n`
+    : '';
+
+  if (pins.length) {
+    log(
+      chalk.dim(
+        `  pinning ${pins.map(([module, version]) => `${module}@${version}`).join(', ')} in go.work`,
+      ),
+    );
+  }
+
   await writeFile(
     goWork,
-    `go ${goVersion}\n\nuse (\n\t${cli.path}\n\t${temporal.path}\n)\n`,
+    `go ${goVersion}\n\nuse (\n\t${cli.path}\n\t${temporal.path}\n)\n${replaces}`,
   );
 
   const provenance = [

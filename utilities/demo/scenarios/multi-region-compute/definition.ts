@@ -1,39 +1,75 @@
 import { defineScenario } from '../../definition';
 
+const PRIMARY = 'aws-us-east-1';
+const REPLICA = 'aws-us-west-2';
+
 export const definition = defineScenario({
   name: 'multi-region-compute',
   title: 'Compute per Namespace region for serverless Workers',
   summary:
-    "Shows which regions a Worker Deployment Version covers, and the region nothing serves — the one a failover finds no workers in. The UI reads a Namespace's regions from its replication config, so the display needs a Namespace on more than one cluster. A dev server cannot provide that, so this scenario does not start one: point it at a multi-cluster deployment and it drives the UI against it.",
+    'Saves a Worker Deployment Version with one scaling group per Namespace region and shows which regions it covers. The server comes from the branch that maps region_ids into the worker controller, with a demo-only patch that gives the server a host region. The UI takes its Namespace regions from VITE_DEMO_NAMESPACE_REGIONS, because only a consumer can supply real ones.',
   server: {
-    // Deliberately off. `start-dev` names every instance "active", so two of
-    // them cannot be registered to each other: the second upsert is refused
-    // with "Cannot update current cluster metadata from rpc calls". A Namespace
-    // on one cluster is single region, which is the correct result and shows
-    // nothing. The run points the UI at 127.0.0.1:7233, so put a multi-cluster
-    // frontend there — directly, or over a tunnel.
-    enabled: false,
-    port: 7233,
+    // region_ids reaches the server through two unreleased changes: the server
+    // branch that maps the field, and the worker controller that honours it.
+    source: 'workspace',
+    requires: {
+      serverRef: 'mani/ha-serverless-api',
+      serverModules: {
+        // The api-go build generated from the region_ids proto change.
+        'go.temporal.io/api': 'v1.63.7-0.20261008215930-cdda301d97b4',
+      },
+      pinnedModules: {
+        // The worker controller with region_ids and a host region; the server
+        // branch does not compile without it. Pinned, not a floor: the CLI
+        // requires a release that sorts above this commit's pseudo-version.
+        'go.temporal.io/auto-scaled-workers':
+          'v0.0.0-20261009204226-a34447bb557c',
+        // The server branch moved to SDK v1.49.0, which removed a field the
+        // CLI still sets (StartActivityOptions.Details). v1.48.0 suits both.
+        'go.temporal.io/sdk': 'v1.48.0',
+      },
+      commands: ['aws', 'temporal'],
+    },
+    // The open-source server supplies no host region, and without one the
+    // worker controller rejects every group that sets region_ids.
+    patches: [
+      'utilities/demo/scenarios/multi-region-compute/host-region.patch',
+    ],
+    env: { TEMPORAL_DEMO_HOST_REGION: PRIMARY },
+    // Distinct ports on purpose. Every stage stands down when something already
+    // listens, and a stock server or UI there would make this run prove nothing.
+    port: 7633,
+    uiPort: 8633,
+    httpPort: 7643,
+    dynamicConfig: {
+      'workercontroller.enabled': true,
+      'workercontroller.compute_providers.enabled': ['aws-lambda'],
+      // Ambient AWS credentials instead of an assumed role. Local only.
+      'workercontroller.compute_providers.aws.require_role_and_external_id': false,
+    },
   },
-  // The catalog cannot exercise this feature, so it is left out rather than
-  // started for appearance. The catalog worker is unversioned — it declares no
-  // deployment name or build id — so it registers no Worker Deployment and the
-  // deployments list stays empty. Even a versioned one would not help: a
-  // compute config is attached through UpdateWorkerDeploymentVersionComputeConfig,
-  // not by a Worker describing itself, and nothing here renders from workflow
-  // history. The Versions this screen needs are created through the UI's own
-  // serverless Worker form, or the CLI.
+  ui: {
+    apiPort: 8681,
+    webPort: 3600,
+    // The reused ui-server must carry an api build that knows region_ids.
+    rebuildUiServer: true,
+    env: {
+      VITE_DEMO_NAMESPACE_REGIONS: `${PRIMARY}:primary,${REPLICA}:replica`,
+    },
+  },
+  // The catalog cannot exercise this feature. Its worker is unversioned, so it
+  // registers no Worker Deployment, and a compute config is attached through
+  // the update RPC, not by a Worker describing itself.
   worker: { enabled: false },
   examples: [],
   preview: {
     notes: [
-      'Prerequisite: a frontend on 127.0.0.1:7233 belonging to a deployment with at least two clusters, and a global Namespace replicated across them. `temporal operator namespace describe -n <ns>` must show more than one entry under ReplicationConfig.Clusters, with ActiveClusterName naming one of them. Everything below renders from that response.',
-      'Open the Worker Deployments list for that Namespace. Each Version with a compute config shows one badge per Namespace region. The badge for the active cluster reads Primary and the rest read Replica, taken from ActiveClusterName rather than from list order.',
-      'A Namespace on a single cluster must show no regions at all, on the list and on the detail page. One region is not multi-region, and this is what every ordinary deployment looks like.',
-      'Open a Version. Its regions appear with what serves each one. A scaling group carrying a region_id serves that region; a group without one is a catch-all and is named as covering the region by default, which is not the same as being configured for it.',
-      'The case worth seeing: a region nothing serves is the only one coloured, and it is where a failover finds no workers. Until temporalio/api#875 lands, no scaling group carries a region_id, so every group reads as a catch-all and every region reads as covered by default. That is honest — it is precisely the state where no region-specific compute exists — but it means the uncovered case cannot be produced against a stock server.',
-      "To see per-region matching, the server needs region_id on ComputeConfigScalingGroup. Build one with TEMPORAL_SERVER_REPO pointed at a checkout carrying temporalio/api#875, then give one Version a scaling group naming only one of the Namespace's regions. The other region must then read as uncovered.",
-      'Region identifiers are shown as the server spells them. This repo does not split them, because it does not own the format: a cluster named "us-east-1" is a whole identifier, and shortening it by its first hyphen would display "east-1". A caller that knows its own format passes a label.',
+      `Prerequisite: a Lambda function in each region (${PRIMARY} and ${REPLICA}) and AWS credentials in this shell that can reach both. The server validates each region's group against AWS when the Version is saved, and the form deletes the Version again if validation fails. The serverless-worker-aws skill sets these up.`,
+      "Open Workers, then Create Serverless Worker. The Compute section shows one block per region: the primary first, then the replica. The replica suggests its Lambda ARN from the primary's by swapping the region, and takes the primary's Access and Scaling until Customize is pressed.",
+      "Leave a required field empty in one region and submit. The error shows in that region's block, and nothing is saved.",
+      'Fill both regions and submit. The deployments list shows the Version with both regions covered. Open it: each region names the group that serves it.',
+      `To see an uncovered region, create a Version on this server through the API with a single group whose region_ids names only ${PRIMARY}. The list then marks ${REPLICA} as the region a failover would find no workers in.`,
+      `This server is hosted in ${PRIMARY}, so its worker controller scales only the groups that list ${PRIMARY}. Showing a failover needs a second server hosted in ${REPLICA}, which this scenario does not start.`,
     ],
   },
 });
