@@ -1,14 +1,9 @@
-import type { CoreUser } from '$lib/models/core-user';
-import type { Settings } from '$lib/types/global';
+import {
+  corePermissions,
+  type WorkflowPermissionSettings,
+} from '$lib/utilities/core-provider';
 
 export const workflowUpdateEnabled = (
-  settings: Settings,
-  coreUser: CoreUser,
   namespace: string,
-): boolean => {
-  return (
-    !settings.disableWriteActions &&
-    !settings.workflowUpdateDisabled &&
-    !coreUser.namespaceWriteDisabled(namespace)
-  );
-};
+  settings?: WorkflowPermissionSettings,
+): boolean => corePermissions.namespaces.canUpdateWorkflow(namespace, settings);

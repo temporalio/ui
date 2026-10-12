@@ -245,7 +245,7 @@
       !!taskQueue &&
       !!workflowType &&
       !!inputValid &&
-      !workflowCreateDisabled(page),
+      !workflowCreateDisabled(namespace, page.data.settings),
   );
 
   $effect(() => {

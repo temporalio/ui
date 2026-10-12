@@ -3,15 +3,14 @@ import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
 import { routeForWorkflows } from '$lib/utilities/route-for';
+import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
 export const load: PageLoad = async function ({ params, parent }) {
   const data = await parent();
-  const disabled =
-    data?.settings?.disableWriteActions ||
-    data?.settings?.startWorkflowDisabled;
+  const { namespace } = params;
+  const disabled = workflowCreateDisabled(namespace, data?.settings);
 
   if (disabled) {
-    const { namespace } = params;
     redirect(302, routeForWorkflows({ namespace }));
   }
 };

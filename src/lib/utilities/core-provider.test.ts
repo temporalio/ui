@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  corePermissions,
   getAccessToken,
   getIdToken,
   initCoreProvider,
@@ -9,6 +10,12 @@ import {
 } from './core-provider';
 
 describe('core-provider', () => {
+  afterEach(() => {
+    initCoreProvider({
+      getAccessToken: async () => '',
+    });
+  });
+
   describe('getAccessToken', () => {
     it('should return token from provided getAccessToken function', async () => {
       initCoreProvider({
@@ -149,6 +156,16 @@ describe('core-provider', () => {
   });
 
   describe('dependency injection', () => {
+    it('should fail clearly when permissions are used before initialization', async () => {
+      vi.resetModules();
+      const { corePermissions: uninitializedPermissions } =
+        await import('./core-provider');
+
+      expect(() =>
+        uninitializedPermissions.namespaces.canStartWorkflow('namespace'),
+      ).toThrow('Core provider has not been initialized');
+    });
+
     it('should allow swapping providers at runtime', async () => {
       initCoreProvider({
         getAccessToken: async () => 'first',
@@ -159,6 +176,95 @@ describe('core-provider', () => {
         getAccessToken: async () => 'second',
       });
       expect(await getAccessToken()).toBe('second');
+    });
+
+    it('should use default workflow permissions when none are provided', () => {
+      initCoreProvider({
+        getAccessToken: async () => '',
+      });
+
+      expect(
+        corePermissions.namespaces.canTerminateWorkflow('namespace', {
+          disableWriteActions: false,
+          workflowTerminateDisabled: false,
+        }),
+      ).toBe(true);
+      expect(
+        corePermissions.namespaces.canTerminateWorkflow('namespace', {
+          workflowTerminateDisabled: true,
+        }),
+      ).toBe(false);
+      expect(
+        corePermissions.namespaces.canStartWorkflow('namespace', {
+          startWorkflowDisabled: true,
+        }),
+      ).toBe(false);
+      expect(
+        corePermissions.namespaces.canChangeWorkflowPauseState('namespace', {
+          workflowPauseDisabled: true,
+        }),
+      ).toBe(false);
+    });
+
+    it('should delegate every workflow permission to the injected provider', () => {
+      const injectedPermissions = {
+        canStartWorkflow: vi.fn(() => false),
+        canRequestWorkflowCancellation: vi.fn(() => false),
+        canSignalWorkflow: vi.fn(() => false),
+        canUpdateWorkflow: vi.fn(() => false),
+        canTerminateWorkflow: vi.fn(() => false),
+        canResetWorkflow: vi.fn(() => false),
+        canChangeWorkflowPauseState: vi.fn(() => false),
+      };
+
+      initCoreProvider({
+        getAccessToken: async () => '',
+        permissions: {
+          namespaces: injectedPermissions,
+        },
+      });
+
+      const settings = {
+        disableWriteActions: false,
+      };
+      const checks = [
+        [
+          corePermissions.namespaces.canStartWorkflow,
+          injectedPermissions.canStartWorkflow,
+        ],
+        [
+          corePermissions.namespaces.canRequestWorkflowCancellation,
+          injectedPermissions.canRequestWorkflowCancellation,
+        ],
+        [
+          corePermissions.namespaces.canSignalWorkflow,
+          injectedPermissions.canSignalWorkflow,
+        ],
+        [
+          corePermissions.namespaces.canUpdateWorkflow,
+          injectedPermissions.canUpdateWorkflow,
+        ],
+        [
+          corePermissions.namespaces.canTerminateWorkflow,
+          injectedPermissions.canTerminateWorkflow,
+        ],
+        [
+          corePermissions.namespaces.canResetWorkflow,
+          injectedPermissions.canResetWorkflow,
+        ],
+        [
+          corePermissions.namespaces.canChangeWorkflowPauseState,
+          injectedPermissions.canChangeWorkflowPauseState,
+        ],
+      ];
+
+      for (const [check, injectedCheck] of checks) {
+        expect(check('restricted-namespace', settings)).toBe(false);
+        expect(injectedCheck).toHaveBeenCalledWith(
+          'restricted-namespace',
+          settings,
+        );
+      }
     });
   });
 });
