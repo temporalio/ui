@@ -6,14 +6,11 @@
   import { translate } from '$lib/i18n/translate';
   import WorkersLayout from '$lib/layouts/workers-layout.svelte';
   import WorkerDeployments from '$lib/pages/deployments.svelte';
-  import { namespaceRegionsFromReplication } from '$lib/utilities/compute-regions';
+  import { demoNamespaceRegions } from '$lib/utilities/demo-namespace-regions';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
-  // Self-hosted: a Namespace's regions are the clusters it replicates to.
-  const namespaceRegions = $derived(
-    namespaceRegionsFromReplication(page.data.namespace),
-  );
+  const namespaceRegions = demoNamespaceRegions();
   const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 </script>
 

@@ -3,7 +3,6 @@ import {
   computeProviderFromType,
 } from '$lib/components/workers/serverless-worker-form/compute-providers';
 import { translate } from '$lib/i18n/translate';
-import type { DescribeNamespaceResponse } from '$lib/types';
 import type {
   ComputeConfig,
   ComputeConfigScalingGroup,
@@ -214,35 +213,4 @@ export const formatDurationMs = (ms: number): string => {
   ];
   const unit = units.find(([size]) => ms >= size && ms % size === 0);
   return unit ? `${ms / unit[0]}${unit[1]}` : `${ms}ms`;
-};
-
-/**
- * The regions of a Namespace, read from its replication config.
- *
- * This is the self-hosted answer to the question `namespaceRegions` asks. A
- * server has no region vocabulary — it knows clusters — so a cluster name is
- * the region identifier here, which is what the form side already documents
- * for self-hosted. The active cluster is the primary and the rest hold
- * replicas, exactly as the Namespace page already reads them.
- *
- * A Namespace replicated to one cluster, or none, returns fewer than two
- * entries and so reads as single region, which is the common case.
- *
- * Temporal Cloud does not go through here: it knows its Namespace's real
- * regions and passes them itself.
- */
-export const namespaceRegionsFromReplication = (
-  namespace: DescribeNamespaceResponse | undefined,
-): NamespaceRegion[] => {
-  const replication = namespace?.replicationConfig;
-  const active = replication?.activeClusterName;
-
-  return (replication?.clusters ?? [])
-    .map(({ clusterName }) => clusterName)
-    .filter((clusterName): clusterName is string => !!clusterName)
-    .map((clusterName) => ({
-      regionId: clusterName,
-      role:
-        clusterName === active ? ('primary' as const) : ('replica' as const),
-    }));
 };

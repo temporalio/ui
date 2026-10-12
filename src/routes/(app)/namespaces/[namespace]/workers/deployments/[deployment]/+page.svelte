@@ -4,13 +4,10 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import Deployment from '$lib/pages/deployment.svelte';
-  import { namespaceRegionsFromReplication } from '$lib/utilities/compute-regions';
+  import { demoNamespaceRegions } from '$lib/utilities/demo-namespace-regions';
 
   const deployment = $derived(page.params.deployment);
-  // Self-hosted: a Namespace's regions are the clusters it replicates to.
-  const namespaceRegions = $derived(
-    namespaceRegionsFromReplication(page.data.namespace),
-  );
+  const namespaceRegions = demoNamespaceRegions();
 </script>
 
 <PageTitle

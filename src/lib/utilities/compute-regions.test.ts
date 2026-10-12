@@ -11,7 +11,6 @@ import {
   hasRegionScopedGroups,
   isMultiRegion,
   type NamespaceRegion,
-  namespaceRegionsFromReplication,
   resolveRegionCoverage,
 } from './compute-regions';
 
@@ -256,67 +255,6 @@ describe('formatDurationMs', () => {
     [0, '0ms'],
   ])('%i -> %s', (ms, expected) => {
     expect(formatDurationMs(ms)).toBe(expected);
-  });
-});
-
-describe('namespaceRegionsFromReplication', () => {
-  const namespace = (activeClusterName: string, ...clusters: string[]) =>
-    ({
-      replicationConfig: {
-        activeClusterName,
-        clusters: clusters.map((clusterName) => ({ clusterName })),
-      },
-    }) as Parameters<typeof namespaceRegionsFromReplication>[0];
-
-  test('the active cluster is the primary and the rest are replicas', () => {
-    expect(
-      namespaceRegionsFromReplication(namespace('east', 'east', 'west')),
-    ).toEqual([
-      { regionId: 'east', role: 'primary' },
-      { regionId: 'west', role: 'replica' },
-    ]);
-  });
-
-  test('role follows the active cluster, not the order it is listed in', () => {
-    expect(
-      namespaceRegionsFromReplication(namespace('west', 'east', 'west')),
-    ).toEqual([
-      { regionId: 'east', role: 'replica' },
-      { regionId: 'west', role: 'primary' },
-    ]);
-  });
-
-  test('a Namespace on one cluster is not multi-region', () => {
-    const regions = namespaceRegionsFromReplication(namespace('east', 'east'));
-
-    expect(regions).toHaveLength(1);
-    expect(isMultiRegion(regions)).toBe(false);
-  });
-
-  test('a Namespace on two clusters is multi-region', () => {
-    expect(
-      isMultiRegion(
-        namespaceRegionsFromReplication(namespace('east', 'east', 'west')),
-      ),
-    ).toBe(true);
-  });
-
-  test('no replication config means no regions', () => {
-    expect(namespaceRegionsFromReplication(undefined)).toEqual([]);
-    expect(namespaceRegionsFromReplication({} as never)).toEqual([]);
-  });
-
-  test('a cluster with no name is dropped rather than read as an empty region', () => {
-    const malformed = {
-      replicationConfig: {
-        activeClusterName: 'east',
-        clusters: [{}, { clusterName: 'east' }],
-      },
-    } as Parameters<typeof namespaceRegionsFromReplication>[0];
-
-    expect(namespaceRegionsFromReplication(malformed)).toEqual([
-      { regionId: 'east', role: 'primary' },
-    ]);
   });
 });
 
