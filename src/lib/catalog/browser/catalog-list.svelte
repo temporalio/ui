@@ -17,7 +17,10 @@
   } from '$lib/io/icon';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
-  import { changePendingRunCount } from './catalog-list-state';
+  import {
+    catalogTableGroups,
+    changePendingRunCount,
+  } from './catalog-list-state';
   import { catalogSources } from './catalog-sources';
   import { terminalStatusPresentation } from './session-presentation';
   import type {
@@ -64,6 +67,7 @@
       );
     }),
   );
+  let tableGroups = $derived(catalogTableGroups(visibleDescriptors));
 
   $effect(() => {
     const [example] = descriptors;
@@ -254,99 +258,106 @@
     <p class="text-sm text-danger" role="alert">{runError}</p>
   {/if}
 
-  <div class="catalog-table-region w-full overflow-x-auto">
-    <Table aria-label="Workflow examples" fixed>
-      {#snippet caption()}
-        <caption class="sr-only">Workflow examples</caption>
-      {/snippet}
-      {#snippet headers()}
-        <TableHeaderRow>
-          <th scope="col" class="w-auto">Workflow</th>
-          <th scope="col" class="hidden w-20 sm:table-cell">Source</th>
-          <th scope="col" class="hidden w-44 lg:table-cell">Task queue</th>
-          <th scope="col" class="hidden w-36 sm:table-cell">Latest run</th>
-          <th
-            scope="col"
-            class="sticky right-0 z-20 w-36 bg-surface-tertiary !text-right text-primary sm:w-60"
-            >Actions</th
-          >
-        </TableHeaderRow>
-      {/snippet}
-      {#if visibleDescriptors.length}
-        {#each visibleDescriptors as descriptor (descriptor.id)}
-          {@const latest = latestSession(descriptor)}
-          {@const pending = pendingRunCount(descriptor.id)}
-          <TableRow>
-            <td class="min-w-0 py-2">
-              <Link
-                class="table-link block break-words text-sm font-medium text-primary"
-                href={exampleHref(descriptor.id)}
+  {#each tableGroups as group (group.kind)}
+    <section class="space-y-2">
+      <h2 class="text-base font-medium">{group.heading}</h2>
+      <div class="catalog-table-region w-full overflow-x-auto">
+        <Table aria-label={group.label} fixed>
+          {#snippet caption()}
+            <caption class="sr-only">{group.label}</caption>
+          {/snippet}
+          {#snippet headers()}
+            <TableHeaderRow>
+              <th scope="col" class="w-auto">{group.nameHeader}</th>
+              <th scope="col" class="hidden w-20 sm:table-cell">Source</th>
+              <th scope="col" class="hidden w-44 lg:table-cell"
+                >{group.locationHeader}</th
               >
-                {descriptor.title}
-              </Link>
-              <p class="hidden truncate text-xs text-secondary sm:block">
-                {descriptor.description}
-              </p>
-              <div
-                class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:hidden"
+              <th scope="col" class="hidden w-36 sm:table-cell">Latest run</th>
+              <th
+                scope="col"
+                class="sticky right-0 z-20 w-36 bg-surface-tertiary !text-right text-primary sm:w-60"
+                >Actions</th
               >
-                {@render sourceBadge(descriptor)}
-                {@render latestRun(latest)}
-              </div>
-            </td>
-            <td class="hidden sm:table-cell">
-              {@render sourceBadge(descriptor)}
-            </td>
-            <td class="hidden truncate font-mono text-xs lg:table-cell">
-              {descriptor.execution.taskQueue}
-            </td>
-            <td class="hidden text-xs sm:table-cell">
-              <div class="flex flex-col items-start gap-0.5">
-                {@render latestRun(latest)}
-              </div>
-            </td>
-            <td
-              class="catalog-actions-cell sticky right-0 z-[5] bg-surface-primary text-primary"
-            >
-              <div class="flex items-center justify-end gap-1 sm:gap-2">
-                <Button
-                  href={exampleHref(descriptor.id)}
-                  aria-label="Configure"
-                  LeadingIcon={IconTemporalSettings}
-                  size="xs"
-                  variant="secondary"
-                >
-                  <span class="hidden sm:inline">Configure</span>
-                </Button>
-                <div class="relative">
-                  <Button
-                    size="xs"
-                    LeadingIcon={IconPlaySolid}
-                    aria-label={pending
-                      ? `Start (${pending} pending)`
-                      : 'Start'}
-                    onclick={() => runDefaults(descriptor)}>Start</Button
+            </TableHeaderRow>
+          {/snippet}
+          {#if group.descriptors.length}
+            {#each group.descriptors as descriptor (descriptor.id)}
+              {@const latest = latestSession(descriptor)}
+              {@const pending = pendingRunCount(descriptor.id)}
+              <TableRow>
+                <td class="min-w-0 py-2">
+                  <Link
+                    class="table-link block break-words text-sm font-medium text-primary"
+                    href={exampleHref(descriptor.id)}
                   >
-                  {#if pending}
-                    <span
-                      class="pointer-events-none absolute -right-1 -top-1 min-w-4 rounded-full border border-primary bg-surface-primary px-1 text-center text-[10px] leading-4 text-primary"
-                      aria-hidden="true">{pending}</span
+                    {descriptor.title}
+                  </Link>
+                  <p class="hidden truncate text-xs text-secondary sm:block">
+                    {descriptor.description}
+                  </p>
+                  <div
+                    class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:hidden"
+                  >
+                    {@render sourceBadge(descriptor)}
+                    {@render latestRun(latest)}
+                  </div>
+                </td>
+                <td class="hidden sm:table-cell">
+                  {@render sourceBadge(descriptor)}
+                </td>
+                <td class="hidden truncate font-mono text-xs lg:table-cell">
+                  {group.location(descriptor)}
+                </td>
+                <td class="hidden text-xs sm:table-cell">
+                  <div class="flex flex-col items-start gap-0.5">
+                    {@render latestRun(latest)}
+                  </div>
+                </td>
+                <td
+                  class="catalog-actions-cell sticky right-0 z-[5] bg-surface-primary text-primary"
+                >
+                  <div class="flex items-center justify-end gap-1 sm:gap-2">
+                    <Button
+                      href={exampleHref(descriptor.id)}
+                      aria-label="Configure"
+                      LeadingIcon={IconTemporalSettings}
+                      size="xs"
+                      variant="secondary"
                     >
-                  {/if}
-                </div>
-              </div>
-            </td>
-          </TableRow>
-        {/each}
-      {:else}
-        <TableRow>
-          <td colspan="5" class="py-6 text-center text-sm text-secondary">
-            No examples match the current filters.
-          </td>
-        </TableRow>
-      {/if}
-    </Table>
-  </div>
+                      <span class="hidden sm:inline">Configure</span>
+                    </Button>
+                    <div class="relative">
+                      <Button
+                        size="xs"
+                        LeadingIcon={IconPlaySolid}
+                        aria-label={pending
+                          ? `Start (${pending} pending)`
+                          : 'Start'}
+                        onclick={() => runDefaults(descriptor)}>Start</Button
+                      >
+                      {#if pending}
+                        <span
+                          class="pointer-events-none absolute -right-1 -top-1 min-w-4 rounded-full border border-primary bg-surface-primary px-1 text-center text-[10px] leading-4 text-primary"
+                          aria-hidden="true">{pending}</span
+                        >
+                      {/if}
+                    </div>
+                  </div>
+                </td>
+              </TableRow>
+            {/each}
+          {:else}
+            <TableRow>
+              <td colspan="5" class="py-6 text-center text-sm text-secondary">
+                No examples match the current filters.
+              </td>
+            </TableRow>
+          {/if}
+        </Table>
+      </div>
+    </section>
+  {/each}
 </div>
 
 <style lang="postcss">
