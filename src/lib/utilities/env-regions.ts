@@ -13,10 +13,17 @@ const ROLES: ReadonlySet<string> = new Set<ComputeRegionRole>([
   'replica',
 ]);
 
+/** `regionId` or `regionId=label`, the label being the provider's own name. */
+const region = (value: string): { regionId: string; label?: string } => {
+  const [regionId, label] = value.split('=');
+  return label ? { regionId, label } : { regionId };
+};
+
 /**
- * Reads `regionId:role` pairs separated by commas, for example
- * `aws-us-east-1:primary,aws-us-west-2:replica`. Entries without a region or
- * with an unknown role are skipped.
+ * Reads `region:role` pairs separated by commas, where a region is `regionId`
+ * or `regionId=label`, for example
+ * `aws-us-east-1=us-east-1:primary,aws-us-west-2=us-west-2:replica`. Entries
+ * without a region or with an unknown role are skipped.
  */
 export const parseNamespaceRegions = (
   value: string | undefined,
@@ -24,9 +31,11 @@ export const parseNamespaceRegions = (
   (value ?? '')
     .split(',')
     .map((entry) => entry.trim().split(':'))
-    .filter(([regionId, role]) => !!regionId && ROLES.has(role))
-    .map(([regionId, role]) => ({
-      regionId,
+    .filter(
+      ([value, role]) => !!region(value ?? '').regionId && ROLES.has(role),
+    )
+    .map(([value, role]) => ({
+      ...region(value),
       role: role as ComputeRegionRole,
     }));
 
@@ -44,9 +53,10 @@ export const namespaceRegionsFromEnv = (): NamespaceRegion[] =>
 const PROVIDERS: ReadonlySet<string> = new Set(COMPUTE_PROVIDER_VALUES);
 
 /**
- * Reads `provider:regionId` pairs separated by commas, for example
- * `lambda:aws-us-west-2,lambda:aws-us-west-1`, into every provider with the
- * replica regions it was given. Returns undefined when no pair is valid, which
+ * Reads `provider:region` pairs separated by commas, where a region is
+ * `regionId` or `regionId=label`, for example
+ * `lambda:aws-us-west-2=us-west-2,lambda:aws-us-west-1`, into the providers it
+ * names, each with the replica regions it was given. Returns undefined when no pair is valid, which
  * leaves the form's default providers in place.
  */
 export const parseReplicaRegions = (
@@ -55,13 +65,20 @@ export const parseReplicaRegions = (
   const pairs = (value ?? '')
     .split(',')
     .map((entry) => entry.trim().split(':'))
-    .filter(([provider, regionId]) => PROVIDERS.has(provider) && !!regionId);
+    .filter(
+      ([provider, value]) =>
+        PROVIDERS.has(provider) && !!region(value ?? '').regionId,
+    );
   if (!pairs.length) return undefined;
-  return COMPUTE_PROVIDER_VALUES.map((value: ComputeProviderValue) => ({
+  // Only the providers named, as a consumer offers only the providers that
+  // match its Namespace's cloud.
+  return COMPUTE_PROVIDER_VALUES.filter((value) =>
+    pairs.some(([provider]) => provider === value),
+  ).map((value: ComputeProviderValue) => ({
     value,
     replicaRegions: pairs
       .filter(([provider]) => provider === value)
-      .map(([, regionId]) => ({ regionId })),
+      .map(([, value]) => region(value)),
   }));
 };
 

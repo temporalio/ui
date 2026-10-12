@@ -4,32 +4,28 @@
   import type { ComputeRegion } from './multi-region';
 
   interface Props {
-    namespace: string;
+    /** Where the compute runs: the primary, then the replica if any. */
     regions: readonly ComputeRegion[];
   }
 
-  let { namespace, regions }: Props = $props();
+  let { regions }: Props = $props();
 
-  const multiRegion = $derived(regions.length > 1);
-
-  const shortNamespace = $derived(namespace.replace(/\.[a-z0-9]{5}$/i, ''));
+  const label = (region: ComputeRegion) => region.label ?? region.id;
+  const [primary, replica] = $derived(regions);
 </script>
 
 <h2 class="text-base font-medium">
-  {multiRegion
+  {replica
     ? translate('workers.regions-section')
     : translate('workers.region-section')}
 </h2>
 <p class="mb-4 text-sm text-secondary">
-  {#if shortNamespace}
-    <span class="font-medium text-primary">{shortNamespace}</span>
-  {/if}
-  {#if multiRegion}
-    {translate('workers.regions-section-description')}
-  {:else}
-    {translate('workers.region-section-description')}
-    <span class="font-medium text-primary"
-      >{regions[0].label ?? regions[0].id}</span
-    >.
+  {#if primary && replica}
+    {translate('workers.regions-run-in', {
+      primary: label(primary),
+      replica: label(replica),
+    })}
+  {:else if primary}
+    {translate('workers.region-runs-in', { region: label(primary) })}
   {/if}
 </p>

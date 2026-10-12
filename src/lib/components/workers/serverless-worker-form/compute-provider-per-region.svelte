@@ -145,6 +145,14 @@
   const replicaLabel = $derived(
     replicaRegion ? (replicaRegion.label ?? replicaRegion.id) : '',
   );
+
+  /**
+   * A regional resource name needs the provider's own name for the region,
+   * which is the label a consumer gives. The id is not one: an ARN naming
+   * "aws-us-east-1" is invalid. Without a label, nothing is suggested.
+   */
+  const suggestFor = (arn: string): string =>
+    replicaRegion?.label ? suggestRegionalArn(arn, replicaRegion.label) : '';
   const replicated = $derived(highAvailability && !!replicaRegion);
 
   /** A resource is regional, so a different region starts it over. */
@@ -159,12 +167,11 @@
   const inheritsPrimary = $derived(!replica.customized);
 
   const replicaLambdaArn = $derived(
-    replica.lambdaArnOverride ??
-      suggestRegionalArn(primary.lambdaArn, replicaLabel),
+    replica.lambdaArnOverride ?? suggestFor(primary.lambdaArn),
   );
   const replicaAgentCoreArn = $derived(
     replica.agentCoreEndpointArnOverride ??
-      suggestRegionalArn(primary.agentCoreEndpointArn, replicaLabel),
+      suggestFor(primary.agentCoreEndpointArn),
   );
 
   const isSuggested = $derived(
@@ -330,7 +337,7 @@
 
   <hr class="my-5 border-primary" />
 
-  <RegionsHeading {namespace} regions={shownRegions} />
+  <RegionsHeading regions={shownRegions} />
   <FailoverPreview
     {namespace}
     {provider}
@@ -352,7 +359,7 @@
         {provider}
         leadingDivider={false}
         idPrefix={primaryRegion.id}
-        lambdaArnPlaceholder={lambdaArnPlaceholderFor(primaryLabel)}
+        lambdaArnPlaceholder={lambdaArnPlaceholderFor(primaryRegion.label)}
         bind:lambdaArn={primary.lambdaArn}
         bind:agentCoreEndpointArn={primary.agentCoreEndpointArn}
         bind:iamRoleArn={primary.iamRoleArn}
@@ -417,7 +424,7 @@
           leadingDivider={false}
           sections={['resource']}
           idPrefix={replicaRegion.id}
-          lambdaArnPlaceholder={lambdaArnPlaceholderFor(replicaLabel)}
+          lambdaArnPlaceholder={lambdaArnPlaceholderFor(replicaRegion.label)}
           bind:lambdaArn={
             () => replicaLambdaArn,
             (value) => (replica.lambdaArnOverride = value)

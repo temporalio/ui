@@ -21,6 +21,17 @@ describe('parseNamespaceRegions', () => {
     ]);
   });
 
+  it('keeps a label given after the region', () => {
+    expect(
+      parseNamespaceRegions(
+        'aws-us-east-1=us-east-1:primary,aws-us-west-2:replica',
+      ),
+    ).toEqual([
+      { regionId: 'aws-us-east-1', label: 'us-east-1', role: 'primary' },
+      { regionId: 'aws-us-west-2', role: 'replica' },
+    ]);
+  });
+
   it('ignores spaces around entries', () => {
     expect(parseNamespaceRegions(' aws-us-east-1:primary , ')).toEqual([
       { regionId: 'aws-us-east-1', role: 'primary' },
@@ -54,9 +65,20 @@ describe('parseReplicaRegions', () => {
     expect(
       providers?.find(({ value }) => value === 'cloud-run')?.replicaRegions,
     ).toEqual([{ regionId: 'gcp-us-east1' }]);
+    // A provider nobody named is not offered, as a consumer offers only the
+    // providers that match its Namespace's cloud.
+    expect(providers?.map(({ value }) => value)).toEqual([
+      'lambda',
+      'cloud-run',
+    ]);
+  });
+
+  it('keeps a label given after a replica region', () => {
     expect(
-      providers?.find(({ value }) => value === 'agentcore')?.replicaRegions,
-    ).toEqual([]);
+      parseReplicaRegions('lambda:aws-us-west-2=us-west-2')?.find(
+        ({ value }) => value === 'lambda',
+      )?.replicaRegions,
+    ).toEqual([{ regionId: 'aws-us-west-2', label: 'us-west-2' }]);
   });
 
   it.each([

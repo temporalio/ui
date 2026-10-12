@@ -54,10 +54,10 @@ export const definition = defineScenario({
     // The reused ui-server must carry an api build that knows region_ids.
     rebuildUiServer: true,
     env: {
-      VITE_NAMESPACE_REGIONS: `${PRIMARY}:primary,${REPLICA}:replica`,
+      VITE_NAMESPACE_REGIONS: `${PRIMARY}=us-east-1:primary,${REPLICA}=us-west-2:replica`,
       // The regions a consumer would offer Lambda for a replica. The second is
       // not one of the Namespace's, which is the case the list flags.
-      VITE_REPLICA_REGIONS: `lambda:${REPLICA},lambda:aws-us-west-1`,
+      VITE_REPLICA_REGIONS: `lambda:${REPLICA}=us-west-2,lambda:aws-us-west-1=us-west-1`,
     },
   },
   // The catalog cannot exercise this feature. Its worker is unversioned, so it

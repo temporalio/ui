@@ -200,6 +200,7 @@ export const Strings = {
     'Wait this long after demand ends before scaling down. 0 = no wait. Default: 90s.',
   'compute-provider': 'Compute Provider',
   'provider-change': 'Change',
+  'provider-also-supports-count': 'Also supports {{count}} other providers',
   'provider-also-supports': 'Also supports {{providers}}',
   'compute-provider-description':
     'Select how your worker activities will be executed.',
@@ -274,9 +275,10 @@ export const Strings = {
   'compute-section': 'Compute',
   'compute-description': 'Choose where your Workers run.',
   'region-section': 'Region',
-  'region-section-description':
-    'is a single region Namespace. Temporal invokes the resource in',
   'regions-section': 'Regions',
+  'region-runs-in': 'Serverless Workers run in {{region}}.',
+  'regions-run-in':
+    'Serverless Workers run in {{primary}}, and in {{replica}} after a failover.',
   'preview-title': 'Preview',
   'preview-description': 'Where Temporal sends Tasks.',
   'preview-namespace': 'Namespace',
@@ -293,8 +295,6 @@ export const Strings = {
   'preview-not-set': 'Not set',
   'preview-workers': 'Workers',
   'preview-no-serverless-workers': 'No Serverless Workers',
-  'regions-section-description':
-    'is a multi-region Namespace. Temporal invokes the resource in the active Region.',
   'region-role-primary-tooltip':
     'Temporal invokes this resource while the Namespace is active in {{region}}',
   'region-role-replica-tooltip':

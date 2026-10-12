@@ -177,11 +177,15 @@
             {/each}
           </span>
           <p class="text-xs text-secondary">
-            {translate('workers.provider-also-supports', {
-              providers: formatList(
-                otherProviders.map((option) => providerLabel(option.value)),
-              ),
-            })}
+            {otherProviders.length > 2
+              ? translate('workers.provider-also-supports-count', {
+                  count: otherProviders.length,
+                })
+              : translate('workers.provider-also-supports', {
+                  providers: formatList(
+                    otherProviders.map((option) => providerLabel(option.value)),
+                  ),
+                })}
           </p>
         </div>
       {/if}

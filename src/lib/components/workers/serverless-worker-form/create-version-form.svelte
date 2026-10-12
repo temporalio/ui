@@ -208,7 +208,7 @@
         />
         <hr class="my-5 border-primary" />
         {#if regions?.[0]}
-          <RegionsHeading {namespace} {regions} />
+          <RegionsHeading regions={regions.slice(0, 1)} />
           <FailoverPreview
             {namespace}
             provider={$form.provider}
@@ -222,9 +222,7 @@
           <ComputeFields
             provider={$form.provider}
             leadingDivider={false}
-            lambdaArnPlaceholder={lambdaArnPlaceholderFor(
-              regions?.[0] && (regions[0].label ?? regions[0].id),
-            )}
+            lambdaArnPlaceholder={lambdaArnPlaceholderFor(regions?.[0]?.label)}
             bind:lambdaArn={$form.lambdaArn}
             bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}
             bind:iamRoleArn={$form.iamRoleArn}

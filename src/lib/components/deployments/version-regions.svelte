@@ -1,7 +1,10 @@
 <script lang="ts">
+  import {
+    COMPUTE_PROVIDERS,
+    computeProviderFromType,
+  } from '$lib/components/workers/serverless-worker-form/compute-providers';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { IconAwsColor, type IconComponent, IconGcpColor } from '$lib/io/icon';
   import type { ComputeConfig, ComputeStatus } from '$lib/types/deployments';
   import {
     computeProviderLabel,
@@ -59,20 +62,6 @@
   };
 
   const groups = $derived(getScalingGroups(computeConfig));
-  const cloudIcon = (providerType: string | undefined): IconComponent =>
-    providerType === 'gcp-cloud-run' ? IconGcpColor : IconAwsColor;
-
-  const providerType = $derived(
-    groups.find((group) => group.providerType)?.providerType,
-  );
-  const providerShortLabel = $derived(computeProviderShortLabel(providerType));
-  const ProviderIcon = $derived(cloudIcon(providerType));
-  const providerLabel = $derived(
-    computeProviderLabel(
-      groups.find((group) => group.providerType)?.providerType,
-    ),
-  );
-
   const isMultiRegion = $derived(namespaceRegions.length > 1);
 
   type Row = {
@@ -121,18 +110,23 @@
   <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
     {#each rows as row (row.key)}
       {@const uncovered = row.match === 'none'}
+      {@const rowProvider = computeProviderFromType(row.providerType)}
+      {@const RowIcon = rowProvider
+        ? COMPUTE_PROVIDERS[rowProvider].icon
+        : undefined}
+      {@const rowShortLabel = computeProviderShortLabel(row.providerType)}
       {@const tooltip =
         row.match === 'none'
           ? translate('workers.region-not-configured-tooltip')
           : [
-              providerLabel ?? '',
+              computeProviderLabel(row.providerType) ?? '',
               state ? connectionStateLabel(state) : '',
               state ? connectionTooltip(computeStatus) : '',
             ]
               .filter(Boolean)
               .join(' · ')}
       {@const detail = row.label ?? (state ? connectionStateLabel(state) : '')}
-      {#if detail || providerShortLabel}
+      {#if detail || rowShortLabel}
         <Tooltip text={tooltip} hide={!tooltip} topLeft width={260} usePortal>
           {@const tone = regionTone(uncovered)}
           <span
@@ -144,10 +138,14 @@
               class="inline-flex items-center gap-1 rounded-l-full bg-surface-primary px-1.5 py-1 text-secondary"
               class:rounded-r-full={!detail}
             >
-              <ProviderIcon width={14} height={14} />
-              {providerShortLabel}
+              {#if RowIcon}
+                <RowIcon width={14} height={14} />
+              {/if}
+              {rowShortLabel ?? ''}
               {#if isMultiRegion}
-                <span aria-hidden="true">·</span>
+                {#if rowShortLabel}
+                  <span aria-hidden="true">·</span>
+                {/if}
                 {roleLabel(row.role)}
               {/if}
             </span>
