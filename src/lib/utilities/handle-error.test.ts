@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { page } from '$app/stores';
 
+import { lastUsedNamespace } from '$lib/stores/namespaces';
+
 import {
   FORBIDDEN_ERROR_MESSAGE,
   handleError,
@@ -107,6 +109,39 @@ describe('handleError', () => {
     expect(window.location.assign).toHaveBeenCalledWith(
       routeForLoginPage(FORBIDDEN_ERROR_MESSAGE),
     );
+  });
+
+  it('should reset the last used namespace if it is a forbidden error', () => {
+    lastUsedNamespace.set('payments');
+    const error = {
+      status: 403,
+      statusText: 'Forbidden',
+      response: null as unknown as Response,
+    };
+
+    expect(() => handleError(error)).toThrowError();
+    expect(get(lastUsedNamespace)).toBe('default');
+  });
+
+  it('should not redirect or reset the last used namespace if it is forbidden and the settings have no auth', () => {
+    const settings = get(page).data.settings;
+    const { auth } = settings;
+    lastUsedNamespace.set('payments');
+    delete (settings as Partial<typeof settings>).auth;
+    const error = {
+      status: 403,
+      statusText: 'Forbidden',
+      response: null as unknown as Response,
+    };
+
+    try {
+      expect(() => handleError(error)).toThrowError();
+      expect(window.location.assign).not.toHaveBeenCalled();
+      expect(get(lastUsedNamespace)).toBe('payments');
+    } finally {
+      settings.auth = auth;
+      lastUsedNamespace.set('default');
+    }
   });
 
   it('should not redirect if not 401/403', () => {

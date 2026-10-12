@@ -5,6 +5,7 @@ import { BROWSER } from 'esm-env';
 import { page } from '$app/stores';
 
 import { networkError } from '$lib/stores/error';
+import { lastUsedNamespace } from '$lib/stores/namespaces';
 import { toaster } from '$lib/stores/toaster';
 import type { NetworkError } from '$lib/types/global';
 
@@ -45,7 +46,7 @@ export const handleError = (
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(FORBIDDEN_ERROR_MESSAGE));
+    redirectForbidden();
   }
 
   if (isNetworkError(error)) {
@@ -70,7 +71,7 @@ export const handleUnauthorizedOrForbiddenError = (
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(FORBIDDEN_ERROR_MESSAGE));
+    redirectForbidden();
     return;
   }
 };
@@ -104,6 +105,14 @@ const hasStatusCode = (
   }
 
   return false;
+};
+
+const redirectForbidden = (): void => {
+  const settings = get(page)?.data?.settings;
+  if (settings && !settings.auth) return;
+
+  lastUsedNamespace.set('default');
+  window.location.assign(routeForLoginPage(FORBIDDEN_ERROR_MESSAGE));
 };
 
 const routeForCurrentAuthSettings = (): string => {
