@@ -10,7 +10,6 @@
     type NamespaceRegion,
     type RegionMatch,
     resolveRegionCoverage,
-    shortRegion,
   } from '$lib/utilities/compute-regions';
   import {
     type ConnectionState,
@@ -89,7 +88,7 @@
       return resolveRegionCoverage(computeConfig, namespaceRegions).map(
         (coverage) => ({
           key: coverage.regionId,
-          label: shortRegion(coverage.regionId),
+          label: coverage.label,
           role: coverage.role,
           match: coverage.match,
           providerType: coverage.groups[0]?.providerType,
@@ -98,7 +97,7 @@
     }
     return groups.map((group, index) => ({
       key: group.name,
-      label: group.regionId && shortRegion(group.regionId),
+      label: group.regionId,
       role: index === 0 ? 'primary' : 'replica',
       match: group.regionId ? 'region' : 'catch-all',
       providerType: group.providerType,

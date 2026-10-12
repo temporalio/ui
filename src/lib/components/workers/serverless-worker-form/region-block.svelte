@@ -4,7 +4,6 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { shortRegion } from '$lib/utilities/compute-regions';
 
   import type { ComputeRegion } from './multi-region';
 
@@ -36,7 +35,7 @@
       class="flex min-h-12 items-center gap-2 rounded-t-lg border-b border-primary bg-surface-secondary px-4 py-2"
     >
       <span class="inline-flex items-center gap-1">
-        <span class="text-sm font-medium">{shortRegion(region.id)}</span>
+        <span class="text-sm font-medium">{region.label ?? region.id}</span>
         {#if showRole}
           {@const roleLabel =
             region.role === 'replica'

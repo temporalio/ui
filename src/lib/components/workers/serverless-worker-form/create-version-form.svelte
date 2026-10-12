@@ -9,7 +9,6 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { VersionSummary } from '$lib/types/deployments';
-  import { shortRegion } from '$lib/utilities/compute-regions';
 
   import {
     type ComputeProviderTemplates,
@@ -186,7 +185,7 @@
             provider={$form.provider}
             leadingDivider={false}
             lambdaArnPlaceholder={lambdaArnPlaceholderFor(
-              regions?.[0] && shortRegion(regions[0].id),
+              regions?.[0] && (regions[0].label ?? regions[0].id),
             )}
             bind:lambdaArn={$form.lambdaArn}
             bind:agentCoreEndpointArn={$form.agentCoreEndpointArn}

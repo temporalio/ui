@@ -12,7 +12,6 @@
     formatDurationMs,
     getScalingGroups,
     hasRegionScopedGroups,
-    shortRegion,
   } from '$lib/utilities/compute-regions';
 
   let { computeConfig }: { computeConfig: ComputeConfig | undefined } =
@@ -183,7 +182,7 @@
                   <span class="flex items-center gap-1.5">
                     <span class="font-medium text-primary">
                       {group.regionId
-                        ? shortRegion(group.regionId)
+                        ? group.regionId
                         : translate('workers.region-all')}
                     </span>
                   </span>

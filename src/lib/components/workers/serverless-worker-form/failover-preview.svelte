@@ -10,7 +10,6 @@
     IconTemporalVersioning,
   } from '$lib/io/icon';
   import { colorScales } from '$lib/theme/io/themes';
-  import { shortRegion } from '$lib/utilities/compute-regions';
 
   import {
     type PreviewRegion,
@@ -50,7 +49,7 @@
 
   const multiRegion = $derived(regions.length > 1);
   const active = $derived(regions[activeIndex] ?? regions[0]);
-  const primaryRegion = $derived(shortRegion(regions[0]?.regionId ?? ''));
+  const primaryRegion = $derived(regions[0]?.label ?? '');
   const shortNamespace = $derived(namespace.replace(/\.[a-z0-9]{5}$/i, ''));
 
   const resourceLabel = $derived(
@@ -225,9 +224,7 @@
     {#each regions as region (region.regionId)}
       <span class="inline-flex items-center gap-1.5">
         {@render mark(isReady(region) ? 'set' : 'missing')}
-        <span class="font-medium text-primary"
-          >{shortRegion(region.regionId)}</span
-        >
+        <span class="font-medium text-primary">{region.label}</span>
         {#if region.selfManaged}
           <span class="text-secondary">
             {translate('workers.preview-own-workers')}
@@ -402,7 +399,7 @@
                   <CloudIcon width={16} height={16} />
                 </span>
                 <span class="whitespace-nowrap font-medium text-primary">
-                  {shortRegion(region.regionId)}
+                  {region.label}
                 </span>
               </span>
               {#if multiRegion}

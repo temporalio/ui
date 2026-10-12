@@ -29,6 +29,12 @@ export interface ComputeRegion {
    */
   id: string;
   role?: ComputeRegionRole;
+  /**
+   * What to show, and the Region segment of a regional resource like a Lambda
+   * ARN. Defaults to `id`. Whoever supplies the identifier owns its format and
+   * so supplies the short form; this repo does not split it.
+   */
+  label?: string;
   /** The compute provider for this region, derived from the region's cloud. */
   provider: ComputeProviderValue;
 }
@@ -64,6 +70,7 @@ export interface PreviewSlot {
 
 export interface PreviewRegion {
   regionId: string;
+  label: string;
   role?: ComputeRegionRole;
   /** The customer's own Workers serve this Region. */
   selfManaged: boolean;
@@ -122,6 +129,7 @@ export const regionPreview = (
   fields: PreviewFields,
 ): PreviewRegion => ({
   regionId: region.id,
+  label: region.label ?? region.id,
   role: region.role,
   selfManaged: false,
   resource: previewSlot(resourceValue(provider, fields)),

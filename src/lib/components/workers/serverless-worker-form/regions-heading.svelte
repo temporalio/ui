@@ -1,6 +1,5 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-  import { shortRegion } from '$lib/utilities/compute-regions';
 
   import type { ComputeRegion } from './multi-region';
 
@@ -29,6 +28,8 @@
     {translate('workers.regions-section-description')}
   {:else}
     {translate('workers.region-section-description')}
-    <span class="font-medium text-primary">{shortRegion(regions[0].id)}</span>.
+    <span class="font-medium text-primary"
+      >{regions[0].label ?? regions[0].id}</span
+    >.
   {/if}
 </p>

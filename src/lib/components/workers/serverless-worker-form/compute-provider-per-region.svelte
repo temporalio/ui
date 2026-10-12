@@ -4,7 +4,6 @@
   import Button from '$lib/holocene/button.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { shortRegion } from '$lib/utilities/compute-regions';
 
   import {
     type ComputeRegion,
@@ -57,6 +56,7 @@
 
   const emptyEntry = (region: ComputeRegion) => ({
     regionId: region.id,
+    label: region.label ?? region.id,
     role: region.role,
     cloud: region.provider,
     lambdaArn: '',
@@ -104,9 +104,7 @@
     !selfManagedPrimary && !replica.customized;
 
   const suggestedFor = (arn: string, replica: Replica): string =>
-    selfManagedPrimary
-      ? ''
-      : suggestRegionalArn(arn, shortRegion(replica.regionId));
+    selfManagedPrimary ? '' : suggestRegionalArn(arn, replica.label);
 
   const replicaLambdaArn = (replica: Replica): string =>
     replica.lambdaArnOverride ?? suggestedFor(primary.lambdaArn, replica);
@@ -165,7 +163,7 @@
     to[field] = from[field];
   };
 
-  const primaryRegion = $derived(shortRegion(primary.regionId));
+  const primaryRegion = $derived(primary.label);
 
   /** Suggested until the user edits it; previewSlot handles an empty value. */
   const replicaResourceState = (replica: Replica): 'set' | 'suggested' => {
@@ -201,7 +199,7 @@
     }),
   ]);
   const replicaRegions = $derived(
-    replicas.map((replica) => shortRegion(replica.regionId)).join(', '),
+    replicas.map((replica) => replica.label).join(', '),
   );
 </script>
 
@@ -210,7 +208,7 @@
     {provider}
     leadingDivider={false}
     idPrefix={entry.regionId}
-    lambdaArnPlaceholder={lambdaArnPlaceholderFor(shortRegion(entry.regionId))}
+    lambdaArnPlaceholder={lambdaArnPlaceholderFor(entry.label)}
     bind:lambdaArn={entry.lambdaArn}
     bind:agentCoreEndpointArn={entry.agentCoreEndpointArn}
     bind:iamRoleArn={entry.iamRoleArn}
@@ -289,7 +287,7 @@
         region={regions[index + 1]}
         showRole
         roleTooltip={translate('workers.region-role-replica-tooltip', {
-          region: shortRegion(replica.regionId),
+          region: replica.label,
         })}
       >
         <ComputeFields
@@ -297,9 +295,7 @@
           leadingDivider={false}
           sections={['resource']}
           idPrefix={replica.regionId}
-          lambdaArnPlaceholder={lambdaArnPlaceholderFor(
-            shortRegion(replica.regionId),
-          )}
+          lambdaArnPlaceholder={lambdaArnPlaceholderFor(replica.label)}
           bind:lambdaArn={
             () => replicaLambdaArn(replica),
             (value) => (replica.lambdaArnOverride = value)
@@ -329,9 +325,7 @@
             {translate('workers.region-arn-suggested')}
             <span class="font-medium text-primary">{primaryRegion}</span>
             {translate('workers.region-arn-suggested-hint')}
-            <span class="font-medium text-primary"
-              >{shortRegion(replica.regionId)}</span
-            >.
+            <span class="font-medium text-primary">{replica.label}</span>.
           </p>
         {/if}
         {#if inheritsPrimary(replica)}

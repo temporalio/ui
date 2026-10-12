@@ -3,6 +3,7 @@ import {
   computeProviderFromType,
 } from '$lib/components/workers/serverless-worker-form/compute-providers';
 import { translate } from '$lib/i18n/translate';
+import type { DescribeNamespaceResponse } from '$lib/types';
 import type {
   ComputeConfig,
   ComputeConfigScalingGroup,
@@ -55,6 +56,17 @@ export type ComputeRegionRole = 'primary' | 'replica';
 export interface NamespaceRegion {
   regionId: string;
   role?: ComputeRegionRole;
+  /**
+   * What to show for this region. Defaults to `regionId`.
+   *
+   * This repo does not parse a region identifier, because it does not own the
+   * format. Temporal Cloud spells one `aws-us-west-2` and would rather show
+   * `us-west-2`; a self-hosted cluster is named whatever its operator named
+   * it, and splitting that on a hyphen turns `us-east-1` into `east-1`.
+   * Whoever supplies the identifier knows how to shorten it, so they supply
+   * the label too.
+   */
+  label?: string;
 }
 
 /**
@@ -72,6 +84,8 @@ export interface ScalingGroupEntry {
 
 export interface RegionCoverage {
   regionId: string;
+  /** `NamespaceRegion.label` when one was given, otherwise `regionId`. */
+  label: string;
   role: ComputeRegionRole;
   match: RegionMatch;
   groups: ScalingGroupEntry[];
@@ -86,10 +100,6 @@ export interface RegionCoverage {
 export const isMultiRegion = (
   namespaceRegions: readonly NamespaceRegion[] | undefined,
 ): boolean => (namespaceRegions?.length ?? 0) > 1;
-
-/** Strips the cloud prefix for display: "aws-us-east-1" becomes "us-east-1". */
-export const shortRegion = (regionId: string): string =>
-  regionId.replace(/^[a-z]+-/, '');
 
 export const getScalingGroups = (
   computeConfig: ComputeConfig | undefined,
@@ -130,14 +140,23 @@ export const resolveRegionCoverage = (
   const groups = getScalingGroups(computeConfig);
   const catchAll = groups.filter(({ regionId }) => !regionId);
 
-  return namespaceRegions.map(({ regionId, role = 'replica' }) => {
+  return namespaceRegions.map(({ regionId, role = 'replica', label }) => {
+    const shown = label ?? regionId;
     const exact = groups.filter((group) => group.regionId === regionId);
 
-    if (exact.length) return { regionId, role, match: 'region', groups: exact };
-    if (catchAll.length) {
-      return { regionId, role, match: 'catch-all', groups: catchAll };
+    if (exact.length) {
+      return { regionId, label: shown, role, match: 'region', groups: exact };
     }
-    return { regionId, role, match: 'none', groups: [] };
+    if (catchAll.length) {
+      return {
+        regionId,
+        label: shown,
+        role,
+        match: 'catch-all',
+        groups: catchAll,
+      };
+    }
+    return { regionId, label: shown, role, match: 'none', groups: [] };
   });
 };
 
@@ -186,4 +205,35 @@ export const formatDurationMs = (ms: number): string => {
   ];
   const unit = units.find(([size]) => ms >= size && ms % size === 0);
   return unit ? `${ms / unit[0]}${unit[1]}` : `${ms}ms`;
+};
+
+/**
+ * The regions of a Namespace, read from its replication config.
+ *
+ * This is the self-hosted answer to the question `namespaceRegions` asks. A
+ * server has no region vocabulary — it knows clusters — so a cluster name is
+ * the region identifier here, which is what the form side already documents
+ * for self-hosted. The active cluster is the primary and the rest hold
+ * replicas, exactly as the Namespace page already reads them.
+ *
+ * A Namespace replicated to one cluster, or none, returns fewer than two
+ * entries and so reads as single region, which is the common case.
+ *
+ * Temporal Cloud does not go through here: it knows its Namespace's real
+ * regions and passes them itself.
+ */
+export const namespaceRegionsFromReplication = (
+  namespace: DescribeNamespaceResponse | undefined,
+): NamespaceRegion[] => {
+  const replication = namespace?.replicationConfig;
+  const active = replication?.activeClusterName;
+
+  return (replication?.clusters ?? [])
+    .map(({ clusterName }) => clusterName)
+    .filter((clusterName): clusterName is string => !!clusterName)
+    .map((clusterName) => ({
+      regionId: clusterName,
+      role:
+        clusterName === active ? ('primary' as const) : ('replica' as const),
+    }));
 };

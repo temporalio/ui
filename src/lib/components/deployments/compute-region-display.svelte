@@ -7,7 +7,6 @@
     getScalingGroups,
     type NamespaceRegion,
     resolveRegionCoverage,
-    shortRegion,
   } from '$lib/utilities/compute-regions';
 
   interface Props {
@@ -31,8 +30,9 @@
   const coverage = $derived.by(() => {
     if (namespaceRegions.length > 1) {
       return resolveRegionCoverage(computeConfig, namespaceRegions).map(
-        ({ regionId, role, match }) => ({
+        ({ regionId, label, role, match }) => ({
           regionId,
+          label,
           role,
           covered: match !== 'none',
         }),
@@ -45,8 +45,11 @@
         ),
       ),
     ];
+    // A scaling group's own regionId arrives without a label to resolve, so
+    // it is shown as the API spelled it.
     return regionIds.map((regionId, index) => ({
       regionId,
+      label: regionId,
       role: index === 0 ? 'primary' : 'replica',
       covered: true,
     }));
@@ -58,9 +61,7 @@
   const showRegionRoles = $derived(coverage.length > 1);
   const uncoveredLabel = $derived(
     translate('workers.region-not-configured-in', {
-      regions: uncovered
-        .map(({ regionId }) => shortRegion(regionId))
-        .join(', '),
+      regions: uncovered.map(({ label }) => label).join(', '),
     }),
   );
 </script>
@@ -80,9 +81,7 @@
         usePortal
         {scrollContainer}
       >
-        <span class="font-medium">{shortRegion(region.regionId)}</span>{isLast
-          ? ''
-          : ','}
+        <span class="font-medium">{region.label}</span>{isLast ? '' : ','}
       </Tooltip>
     {/each}
     {#if uncovered.length}
